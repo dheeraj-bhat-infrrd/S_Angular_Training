@@ -243,9 +243,11 @@ public class LoginController {
 						
 						// setting linkedin popup attribute
 						boolean showLinkedInPopup = false;
+						boolean showSendSurveyPopup = false;
 						for (UserProfile profile : user.getUserProfiles()) {
 							if (profile.getProfilesMaster().getProfileId() == CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID) {
 								showLinkedInPopup = true;
+								showSendSurveyPopup = true;
 								break;
 							}
 						}
@@ -253,6 +255,7 @@ public class LoginController {
 							showLinkedInPopup = false;
 						}
 						model.addAttribute("showLinkedInPopup", String.valueOf(showLinkedInPopup));
+						model.addAttribute("showSendSurveyPopup", String.valueOf(showSendSurveyPopup));
 						
 						// update the last login time and number of logins
 						userManagementService.updateUserLoginTimeAndNum(user);
