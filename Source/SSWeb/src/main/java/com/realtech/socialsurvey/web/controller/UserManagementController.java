@@ -1007,7 +1007,7 @@ public class UserManagementController {
 		}
 
 		LOG.info("Method completeRegistration() to complete registration of user finished.");
-		return JspResolver.USER_LOGIN;
+		return JspResolver.LANDING;
 	}
 	
 	@RequestMapping(value = "/showlinkedindatacompare")
