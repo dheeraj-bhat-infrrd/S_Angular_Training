@@ -28,7 +28,7 @@
 </head>
 <body>
 	<div id="overlay-login" class="overlay-login overlay-main hide"></div>
-	<c:if test="${user.numOfLogins > 1}">
+	<c:if test="${user.numOfLogins > 0}">
 		<div class="overlay-login overlay-main">
 			<div class="welcome-popup-wrapper">
 				<div class="welcome-popup-hdr-wrapper clearfix">

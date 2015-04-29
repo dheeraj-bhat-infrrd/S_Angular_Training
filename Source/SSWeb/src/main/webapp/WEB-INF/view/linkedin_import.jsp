@@ -6,7 +6,7 @@
 	<c:set value="${profile.profilesMaster.profileId}" var="profilemasterid"></c:set>
 </c:if>
 
-<c:if test="${user.numOfLogins == 1 && profilemasterid == 4}">
+<c:if test="${user.numOfLogins == 0 && profilemasterid == 4}">
 	<!-- Fetch data from linkedIn -->
 	<div id="welocome-step1" class="welcome-popup-wrapper">
 		<div class="welcome-popup-hdr-wrapper clearfix">

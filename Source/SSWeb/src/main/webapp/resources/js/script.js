@@ -681,13 +681,13 @@ function validateInputField(elementId) {
 
 function validateTextArea(elementId) {
 	if ($(window).width() < 768) {
-		if ($('#' + elementId).text() != "") {
+		if ($('#' + elementId).val() != "") {
 			return true;
 		} else {
 			return false;
 		}
 	} else {
-		if ($('#' + elementId).text() != "") {
+		if ($('#' + elementId).val() != "") {
 			return true;
 		} else {
 			return false;

@@ -995,6 +995,9 @@ public class UserManagementController {
 				session.setAttribute(CommonConstants.PROFILE_NAME_COLUMN, profileAbridgedMap.get(selectedProfile.getUserProfileId()).getUserProfileName());
 			}
 			session.setAttribute(CommonConstants.USER_PROFILE_MAP, profileMap);
+			
+			// update the last login time and number of logins
+			userManagementService.updateUserLoginTimeAndNum(user);
 		}
 		catch (NonFatalException e) {
 			LOG.error("NonFatalException while setting new Password. Reason : " + e.getMessage(), e);
