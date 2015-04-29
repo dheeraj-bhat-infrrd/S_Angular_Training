@@ -503,6 +503,8 @@ function resetInputFields(elementId) {
 function addRegion(formId) {
 	var url = "./addregion.do";
 	showOverlay();
+	var selectedType = $('.bd-cust-rad-img-checked').attr("data-type");
+	$('input[name="userSelectionType"').val(selectedType);
 	callAjaxFormSubmit(url, addRegionCallBack, formId);
 }
 
@@ -665,6 +667,8 @@ function validateOfficeForm() {
 function addOffice(formId) {
 	var url = "./addbranch.do";
 	showOverlay();
+	var selectedType = $('.bd-cust-rad-img-checked').attr("data-type");
+	$('input[name="userSelectionType"').val(selectedType);
 	callAjaxFormSubmit(url, addOfficeCallBack, formId);
 }
 
@@ -831,6 +835,8 @@ function validateIndividualForm() {
 function addIndividual(formId) {
 	var url = "./addindividual.do";
 	showOverlay();
+	var selectedType = $('.bd-cust-rad-img-checked').attr("data-type");
+	$('input[name="userSelectionType"').val(selectedType);
 	callAjaxFormSubmit(url, addIndividualCallBack, formId);
 }
 
@@ -1138,6 +1144,8 @@ function bindUserEditClicks() {
 function updateRegion(formId,regionId) {
 	var url = "./updateregion.do";
 	showOverlay();
+	var selectedType = $('.bd-cust-rad-img-checked').attr("data-type");
+	$('input[name="userSelectionType"').val(selectedType);
 	callAjaxFormSubmit(url, function(data){
 		updateRegionCallBack(data, regionId);
 	}, formId);
@@ -1152,6 +1160,8 @@ function updateRegionCallBack(data,regionId) {
 
 function updateBranch(formId,branchId) {
 	var url = "./updatebranch.do";
+	var selectedType = $('.bd-cust-rad-img-checked').attr("data-type");
+	$('input[name="userSelectionType"').val(selectedType);
 	callAjaxFormSubmit(url, function(data){
 		updateBranchCallBack(data,branchId);
 	}, formId);

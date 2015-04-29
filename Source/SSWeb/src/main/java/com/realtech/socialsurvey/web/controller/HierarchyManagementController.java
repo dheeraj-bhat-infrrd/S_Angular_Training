@@ -465,10 +465,16 @@ public class HierarchyManagementController {
 			String regionAddress1 = request.getParameter("regionAddress1");
 			String regionAddress2 = request.getParameter("regionAddress2");
 			String selectedUserIdStr = request.getParameter("selectedUserId");
-			String selectedUserEmail = request.getParameter("selectedUserEmail");
-
-			if (selectedUserEmail == null || selectedUserEmail.isEmpty()) {
-				selectedUserEmail = request.getParameter("selectedUserEmailArray");
+			String selectedUserEmail = "";
+			String userSelectionType = request.getParameter("userSelectionType");
+			
+			if(userSelectionType!=null){
+				if(userSelectionType.equalsIgnoreCase(CommonConstants.USER_SELECTION_TYPE_SINGLE)){
+					selectedUserEmail = request.getParameter("selectedUserEmail");
+				}
+				else{
+					selectedUserEmail = request.getParameter("selectedUserEmailArray");
+				}
 			}
 
 			String isAdminStr = request.getParameter("isAdmin");
@@ -488,6 +494,8 @@ public class HierarchyManagementController {
 				isAdmin = Boolean.parseBoolean(isAdminStr);
 			}
 			validateRegionForm(regionName);
+			// To replace all the white spaces present in the string.
+			selectedUserEmail = selectedUserEmail.replaceAll("\\s","");
 			String[] assigneeEmailIds = validateAndParseEmailIds(selectedUserId, selectedUserEmail);
 
 			User loggedInUser = sessionHelper.getCurrentUser();
@@ -535,10 +543,16 @@ public class HierarchyManagementController {
 			String branchAddress2 = request.getParameter("officeAddress2");
 			String strRegionId = request.getParameter("regionId");
 			String selectedUserIdStr = request.getParameter("selectedUserId");
-			String selectedUserEmail = request.getParameter("selectedUserEmail");
-
-			if (selectedUserEmail == null || selectedUserEmail.isEmpty()) {
-				selectedUserEmail = request.getParameter("selectedUserEmailArray");
+			String selectedUserEmail = "";
+			String userSelectionType = request.getParameter("userSelectionType");
+			
+			if(userSelectionType!=null){
+				if(userSelectionType.equalsIgnoreCase(CommonConstants.USER_SELECTION_TYPE_SINGLE)){
+					selectedUserEmail = request.getParameter("selectedUserEmail");
+				}
+				else{
+					selectedUserEmail = request.getParameter("selectedUserEmailArray");
+				}
 			}
 
 			String isAdminStr = request.getParameter("isAdmin");
@@ -557,7 +571,8 @@ public class HierarchyManagementController {
 			if (isAdminStr != null && !isAdminStr.isEmpty()) {
 				isAdmin = Boolean.parseBoolean(isAdminStr);
 			}
-
+			// To replace all the white spaces present in the string.
+			selectedUserEmail = selectedUserEmail.replaceAll("\\s","");
 			validateBranchForm(branchName, branchAddress1);
 			String[] assigneeEmailIds = validateAndParseEmailIds(selectedUserId, selectedUserEmail);
 
@@ -619,11 +634,17 @@ public class HierarchyManagementController {
 			String strRegionId = request.getParameter("regionId");
 			String strBranchId = request.getParameter("officeId");
 			String selectedUserIdStr = request.getParameter("selectedUserId");
-			String selectedUserEmail = request.getParameter("selectedUserEmail");
+			String selectedUserEmail = "";
 			String isAdminStr = request.getParameter("isAdmin");
-
-			if (selectedUserEmail == null || selectedUserEmail.isEmpty()) {
-				selectedUserEmail = request.getParameter("selectedUserEmailArray");
+			String userSelectionType = request.getParameter("userSelectionType");
+			
+			if(userSelectionType!=null){
+				if(userSelectionType.equalsIgnoreCase(CommonConstants.USER_SELECTION_TYPE_SINGLE)){
+					selectedUserEmail = request.getParameter("selectedUserEmail");
+				}
+				else{
+					selectedUserEmail = request.getParameter("selectedUserEmailArray");
+				}
 			}
 
 			long selectedUserId = 0l;
@@ -728,10 +749,16 @@ public class HierarchyManagementController {
 			String branchAddress2 = request.getParameter("officeAddress2");
 			String strRegionId = request.getParameter("regionId");
 			String selectedUserIdStr = request.getParameter("selectedUserId");
-			String selectedUserEmail = request.getParameter("selectedUserEmail");
-
-			if (selectedUserEmail == null || selectedUserEmail.isEmpty()) {
-				selectedUserEmail = request.getParameter("selectedUserEmailArray");
+			String selectedUserEmail = "";
+			String userSelectionType = request.getParameter("userSelectionType");
+			
+			if(userSelectionType!=null){
+				if(userSelectionType.equalsIgnoreCase(CommonConstants.USER_SELECTION_TYPE_SINGLE)){
+					selectedUserEmail = request.getParameter("selectedUserEmail");
+				}
+				else{
+					selectedUserEmail = request.getParameter("selectedUserEmailArray");
+				}
 			}
 
 			String isAdminStr = request.getParameter("isAdmin");
@@ -888,11 +915,18 @@ public class HierarchyManagementController {
 		String regionAddress1 = request.getParameter("regionAddress1");
 		String regionAddress2 = request.getParameter("regionAddress2");
 		String selectedUserIdStr = request.getParameter("selectedUserId");
-		String selectedUserEmail = request.getParameter("selectedUserEmail");
-
-		if (selectedUserEmail == null || selectedUserEmail.isEmpty()) {
-			selectedUserEmail = request.getParameter("selectedUserEmailArray");
+		String selectedUserEmail = "";
+		String userSelectionType = request.getParameter("userSelectionType");
+		
+		if(userSelectionType!=null){
+			if(userSelectionType.equalsIgnoreCase(CommonConstants.USER_SELECTION_TYPE_SINGLE)){
+				selectedUserEmail = request.getParameter("selectedUserEmail");
+			}
+			else{
+				selectedUserEmail = request.getParameter("selectedUserEmailArray");
+			}
 		}
+		
 		String isAdminStr = request.getParameter("isAdmin");
 
 		long selectedUserId = 0l;
@@ -902,7 +936,7 @@ public class HierarchyManagementController {
 				regionId = Long.parseLong(strRegionId);
 			}
 			catch (NumberFormatException e) {
-				throw new InvalidInputException("regionid is invalid in update region. Reson:" + e.getMessage(),
+				throw new InvalidInputException("regionid is invalid in update region. Reason:" + e.getMessage(),
 						DisplayMessageConstants.GENERAL_ERROR, e);
 			}
 			if (selectedUserIdStr != null && !selectedUserIdStr.isEmpty()) {
