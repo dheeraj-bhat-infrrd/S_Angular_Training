@@ -80,7 +80,6 @@
 	<div class="container">
 		<div class="hm-header-row hm-header-row-main clearfix">
 			<div class="float-left hm-header-row-left"><spring:message code="label.profileheader.key" /></div>
-			
 			<c:if test="${not empty profileList && fn:length(profileList) > 1}">
 				<div class="float-right header-right clearfix hr-dsh-adj-rt" style="z-index: 9999; margin-left: 50px;">
 					<div class="float-left hr-txt1"><spring:message code="label.viewas.key" /></div>
@@ -207,12 +206,20 @@
 							</c:choose>
 						</c:when>
 						<c:otherwise>
-							<c:if test="${profilemasterid != 4}">
-								<div id="prof-logo-edit" class="prof-image-rp prof-image-edit pos-relative cursor-pointer" style="background-image:initial; 50% 50% no-repeat; background: no-repeat center; background-size: cover;"></div>
-								<form class="form_contact_image" enctype="multipart/form-data">
-									<input type="file" id="prof-logo" class="con_img_inp_file">
-								</form>
-							</c:if>
+							<c:choose>
+								<c:when test="${profilemasterid != 4}">
+									<div id="prof-logo-edit" class="prof-image-rp prof-image-edit pos-relative cursor-pointer" style="background-image:initial; 50% 50% no-repeat; background: no-repeat center; background-size: cover;"></div>
+									<form class="form_contact_image" enctype="multipart/form-data">
+										<input type="file" id="prof-logo" class="con_img_inp_file">
+									</form>
+								</c:when>
+								<c:when test="${accountMasterId == 1 || accountMasterId == 5}">
+									<div id="prof-logo-edit" class="prof-image-rp prof-image-edit pos-relative cursor-pointer" style="background-image:initial; 50% 50% no-repeat; background: no-repeat center; background-size: cover;"></div>
+									<form class="form_contact_image" enctype="multipart/form-data">
+										<input type="file" id="prof-logo" class="con_img_inp_file">
+									</form>
+								</c:when>
+							</c:choose>
 						</c:otherwise>
 					</c:choose>
 				</div>
