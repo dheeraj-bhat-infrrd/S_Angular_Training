@@ -26,14 +26,17 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.type.TypeFactory;
 import com.google.gson.Gson;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
+import com.realtech.socialsurvey.core.entities.AbridgedUserProfile;
 import com.realtech.socialsurvey.core.entities.AgentSettings;
 import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
 import com.realtech.socialsurvey.core.entities.SurveyDetails;
+import com.realtech.socialsurvey.core.entities.SurveyRecipient;
 import com.realtech.socialsurvey.core.entities.User;
 import com.realtech.socialsurvey.core.entities.UserProfile;
-import com.realtech.socialsurvey.core.entities.AbridgedUserProfile;
 import com.realtech.socialsurvey.core.entities.UserSettings;
 import com.realtech.socialsurvey.core.enums.AccountType;
 import com.realtech.socialsurvey.core.enums.DisplayMessageType;
@@ -50,6 +53,7 @@ import com.realtech.socialsurvey.core.services.organizationmanagement.UserManage
 import com.realtech.socialsurvey.core.services.search.SolrSearchService;
 import com.realtech.socialsurvey.core.services.search.exception.SolrException;
 import com.realtech.socialsurvey.core.services.surveybuilder.SurveyHandler;
+import com.realtech.socialsurvey.core.utils.DisplayMessageConstants;
 import com.realtech.socialsurvey.core.utils.MessageUtils;
 import com.realtech.socialsurvey.web.common.JspResolver;
 
@@ -978,7 +982,7 @@ public class DashboardController {
 			sendSurveyInvitationMail(custFirstName, custLastName, custEmail, custRelationWithAgent, user);
 		}
 		catch (NonFatalException e) {
-			LOG.error("NonFatalException caught in sendSurveyInvittion(). Nested exception is ", e);
+			LOG.error("NonFatalException caught in sendSurveyInvitation(). Nested exception is ", e);
 		}
 
 		LOG.info("Method sendSurveyInvitation() finished from DashboardController.");
@@ -990,17 +994,31 @@ public class DashboardController {
 	@RequestMapping(value = "/sendmultiplesurveyinvites", method = RequestMethod.POST)
 	public String sendMultipleSurveyInvitations(HttpServletRequest request) {
 		LOG.info("Method sendMultipleSurveyInvitations() called from DashboardController.");
-		String custFirstName = request.getParameter("firstName");
-		String custLastName = request.getParameter("lastName");
-		String custEmail = request.getParameter("email");
-		String custRelationWithAgent = request.getParameter("relation");
 		User user = sessionHelper.getCurrentUser();
-
+		List<SurveyRecipient> surveyRecipients = null;
+		
 		try {
-			sendSurveyInvitationMail(custFirstName, custLastName, custEmail, custRelationWithAgent, user);
+			String payload = request.getParameter("receiversList");
+			try {
+				if (payload == null) {
+					throw new InvalidInputException("SurveyRecipients passed was null or empty");
+				}
+				surveyRecipients = new ObjectMapper().readValue(payload,
+						TypeFactory.defaultInstance().constructCollectionType(List.class, SurveyRecipient.class));
+			}
+			catch (IOException ioException) {
+				throw new NonFatalException("Error occurred while parsing the Json.", DisplayMessageConstants.GENERAL_ERROR, ioException);
+			}
+			
+			// sending mails on traversing the list
+			if (!surveyRecipients.isEmpty()) {
+				for (SurveyRecipient recipient : surveyRecipients) {
+					sendSurveyInvitationMail(recipient.getFirstname(), recipient.getLastname(), recipient.getEmailId(), null, user);
+				}
+			}
 		}
 		catch (NonFatalException e) {
-			LOG.error("NonFatalException caught in sendSurveyInvittion(). Nested exception is ", e);
+			LOG.error("NonFatalException caught in sendMultipleSurveyInvitations(). Nested exception is ", e);
 		}
 
 		LOG.info("Method sendMultipleSurveyInvitations() finished from DashboardController.");

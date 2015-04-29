@@ -36,7 +36,7 @@
 			<div class="welcome-popup-body-wrapper clearfix">
 				<div class="wc-popup-body-hdr"><spring:message code="label.happyreviews.key" /></div>
 				<div class="wc-popup-body-cont">
-					<div class="wc-review-table">
+					<div id="wc-review-table" class="wc-review-table">
 						<div class="wc-review-tr wc-review-hdr clearfix">
 							<div class="wc-review-th1 float-left"><spring:message code="label.firstname.key" /></div>
 							<div class="wc-review-th2 float-left"><spring:message code="label.lastname.key" /></div>

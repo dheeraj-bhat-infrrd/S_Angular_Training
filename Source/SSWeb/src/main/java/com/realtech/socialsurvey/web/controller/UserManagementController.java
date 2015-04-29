@@ -978,6 +978,7 @@ public class UserManagementController {
 			// updating session with selected user profile if not set
 			LOG.debug("Updating session with selected user profile if not set");
 			boolean showLinkedInPopup = false;
+			boolean showSendSurveyPopup = false;
 			Map<Long, UserProfile> profileMap = new HashMap<Long, UserProfile>();
 			UserProfile selectedProfile = user.getUserProfiles().get(CommonConstants.INITIAL_INDEX);
 			for (UserProfile profile : user.getUserProfiles()) {
@@ -986,10 +987,12 @@ public class UserManagementController {
 
 					// setting linkedin popup attribute
 					showLinkedInPopup = true;
+					showSendSurveyPopup = true;
 					break;
 				}
 			}
 			model.addAttribute("showLinkedInPopup", String.valueOf(showLinkedInPopup));
+			model.addAttribute("showSendSurveyPopup", String.valueOf(showSendSurveyPopup));
 			session.setAttribute(CommonConstants.USER_PROFILE, selectedProfile);
 			
 			// updating session with aggregated user profiles, if not set

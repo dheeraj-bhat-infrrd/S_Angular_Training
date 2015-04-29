@@ -5,6 +5,8 @@
 <script type="text/javascript">
 $(document).ready(function() {
 	var showLinkedInPopup = "${showLinkedInPopup}";
+	var showSendSurveyPopup = "${showSendSurveyPopup}";
+	
 	if (showLinkedInPopup == "true") {
 		callAjaxGET("./linkedindataimport.do", function(data) {
 			$('#overlay-linkedin-import').html(data);
@@ -13,7 +15,7 @@ $(document).ready(function() {
 			}
 		}, true);
 	}
-	else {
+	else if (showSendSurveyPopup == "true") {
 		$('#overlay-send-survey').removeClass("hide");
 	}
 	
