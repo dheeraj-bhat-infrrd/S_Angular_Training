@@ -1,6 +1,7 @@
 <%@ taglib uri="http://www.springframework.org/tags" prefix="spring"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <c:set value="${sessionScope.SPRING_SECURITY_CONTEXT.authentication.principal}" var="user" />
+<c:set value="${user.company.licenseDetails[0].accountsMaster.accountsMasterId}" var="accountMasterId"/>
 <c:if test="${not empty profileSettings && not empty profileSettings.logo}">
 	<c:set value="${profileSettings.logo}" var="profilelogo"></c:set>
 	<c:set value="${profileSettings.lockSettings}" var="lock"></c:set>
@@ -30,11 +31,19 @@
 		</c:choose>
 	</c:when>
 	<c:otherwise>
-		<c:if test="${profilemasterid != 4}">
-			<div id="prof-logo-edit" class="prof-image-rp prof-image-edit pos-relative cursor-pointer" style="background-image:initial; 50% 50% no-repeat; background: no-repeat center; background-size: cover;"></div>
-			<form class="form_contact_image" enctype="multipart/form-data">
-				<input type="file" id="prof-logo" class="con_img_inp_file">
-			</form>
-		</c:if>
+		<c:choose>
+			<c:when test="${profilemasterid != 4}">
+				<div id="prof-logo-edit" class="prof-image-rp prof-image-edit pos-relative cursor-pointer" style="background-image:initial; 50% 50% no-repeat; background: no-repeat center; background-size: cover;"></div>
+				<form class="form_contact_image" enctype="multipart/form-data">
+					<input type="file" id="prof-logo" class="con_img_inp_file">
+				</form>
+			</c:when>
+			<c:when test="${accountMasterId == 1 || accountMasterId == 5}">
+				<div id="prof-logo-edit" class="prof-image-rp prof-image-edit pos-relative cursor-pointer" style="background-image:initial; 50% 50% no-repeat; background: no-repeat center; background-size: cover;"></div>
+				<form class="form_contact_image" enctype="multipart/form-data">
+					<input type="file" id="prof-logo" class="con_img_inp_file">
+				</form>
+			</c:when>
+		</c:choose>
 	</c:otherwise>
 </c:choose>
