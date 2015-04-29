@@ -5,7 +5,6 @@
 <!-- Setting common page variables -->
 <c:set value="${sessionScope.SPRING_SECURITY_CONTEXT.authentication.principal}" var="user" />
 <c:set value="${user.company.licenseDetails[0].accountsMaster.accountsMasterId}" var="accountMasterId"/>
-
 <c:if test="${not empty profile}">
 	<c:set value="${profile.profilesMaster.profileId}" var="profilemasterid"></c:set>
 </c:if>
@@ -250,11 +249,11 @@
 					<c:if test="${accountMasterId != 5}">
 						<div id="prof-edit-social-link"
 							class="prof-edit-social-link float-right hm-hr-row-right clearfix">
-							<div class="float-left social-item-icon icn-fb" data-link="${facebookToken.facebookPageLink}"></div>
-							<div class="float-left social-item-icon icn-twit" data-link="${twitterToken.twitterPageLink}"></div>
-							<div class="float-left social-item-icon icn-lin" data-link="${linkedInToken.linkedInPageLink}"></div>
-							<div class="float-left social-item-icon icn-yelp" data-link="${yelpToken.yelpPageLink}"></div>
-                            <div class="float-left social-item-icon icn-gplus" data-link="${googleToken.profileLink}"></div>
+							<div id="icn-fb" class="float-left social-item-icon icn-fb" data-link="${facebookToken.facebookPageLink}"></div>
+							<div id="icn-twit" class="float-left social-item-icon icn-twit" data-link="${twitterToken.twitterPageLink}"></div>
+							<div id="icn-lin" class="float-left social-item-icon icn-lin" data-link="${linkedInToken.linkedInPageLink}"></div>
+							<div id="icn-yelp" class="float-left social-item-icon icn-yelp" data-link="${yelpToken.yelpPageLink}"></div>
+                            <div id="icn-gplus" class="float-left social-item-icon icn-gplus" data-link="${googleToken.profileLink}"></div>
 							<input id="social-token-text" type="text" class="social-token-text hide"
 								placeholder='<spring:message code="label.socialpage.placeholder.key"/>'>
 						</div>
@@ -662,6 +661,7 @@
 <link rel="stylesheet" href="${pageContext.request.contextPath}/resources/jcrop/jquery.Jcrop.min.css">
 
 <script src="${pageContext.request.contextPath}/resources/js/editprofiledropdown.js"></script>
+<script src="${pageContext.request.contextPath}/resources/js/jcrop.js"></script>
 <script src="${pageContext.request.contextPath}/resources/jcrop/jquery.Jcrop.min.js"></script>
 <script>
 	$(document).ready(function() {

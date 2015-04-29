@@ -7,9 +7,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
 import javax.annotation.Resource;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
@@ -19,7 +17,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.DependsOn;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
-
 import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.commons.ProfileCompletionList;
 import com.realtech.socialsurvey.core.commons.Utils;
@@ -50,6 +47,7 @@ import com.realtech.socialsurvey.core.entities.UserInvite;
 import com.realtech.socialsurvey.core.entities.UserProfile;
 import com.realtech.socialsurvey.core.entities.AbridgedUserProfile;
 import com.realtech.socialsurvey.core.entities.UserSettings;
+import com.realtech.socialsurvey.core.entities.UsercountModificationNotification;
 import com.realtech.socialsurvey.core.enums.AccountType;
 import com.realtech.socialsurvey.core.exception.DatabaseException;
 import com.realtech.socialsurvey.core.exception.FatalException;
@@ -101,6 +99,9 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 
 	@Autowired
 	private GenericDao<ProfilesMaster, Integer> profilesMasterDao;
+	
+	@Autowired
+	private GenericDao<UsercountModificationNotification, Long> userCountModificationDao;
 
 	@Autowired
 	private Utils utils;
@@ -2101,5 +2102,36 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 		user.setNumOfLogins(user.getNumOfLogins()+1);
 		userDao.update(user);
 		LOG.info("Updated user login time and number of login");
+	}
+	
+	@Transactional
+	@Override
+	public void updateUserCountModificationNotification(Company company) throws InvalidInputException{
+		if(company == null){
+			throw new InvalidInputException("Company passed in updateUserCountModificationNotification is null");
+		}
+		LOG.info("Adding a record in user count modification notification table for company "+company.getCompany());
+		// search for the record in the table. it might be possible that record is already present.
+		List<UsercountModificationNotification> userCountNotifications = userCountModificationDao.findByColumn(UsercountModificationNotification.class, CommonConstants.COMPANY_COLUMN, company);
+		UsercountModificationNotification userCountNotification = null;
+		if(userCountNotifications != null && !userCountNotifications.isEmpty()){
+			// record is already present. if the status is active do nothing. if status is under processing, set it to active
+			userCountNotification = userCountNotifications.get(CommonConstants.INITIAL_INDEX);
+			if(userCountNotification.getStatus() == CommonConstants.STATUS_UNDER_PROCESSING){
+				// set the status to active and update
+				userCountNotification.setStatus(CommonConstants.STATUS_ACTIVE);
+				userCountModificationDao.update(userCountNotification);
+			}
+		}else{
+			// no records present. add a record
+			userCountNotification =  new UsercountModificationNotification();
+			userCountNotification.setCompany(company);
+			userCountNotification.setStatus(CommonConstants.STATUS_ACTIVE);
+			userCountNotification.setCreatedOn(new Timestamp(System.currentTimeMillis()));
+			userCountNotification.setModifiedOn(new Timestamp(System.currentTimeMillis()));
+			userCountModificationDao.save(userCountNotification);
+		}
+		
+		LOG.info("Finished adding a record in user count modification notification table for company "+company.getCompany());
 	}
 }

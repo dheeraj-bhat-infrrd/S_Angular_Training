@@ -309,10 +309,6 @@
 <script src="${pageContext.request.contextPath}/resources/ckeditor/ckeditor.js"></script>
 <script src="${pageContext.request.contextPath}/resources/ckeditor/adapters/jquery.js"></script>
 <script>
-function openAuthPage(socialNetwork) {
-	window.open("./socialauth.do?social=" + socialNetwork, "Authorization Page", "width=800,height=600,scrollbars=yes");
-}
-
 $(document).ready(function(){
 	hideOverlay();
 	$(document).attr("title", "Edit Settings");
