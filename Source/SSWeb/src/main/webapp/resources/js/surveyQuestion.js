@@ -114,11 +114,13 @@ function initSurveyWithUrl(q) {
 			}
 		},
 		error : function(e) {
-			console.error("error : " + e.responseText);
-			$('#overlay-toast').html(e.responseText);
-			showToast();
+			showPageNotFoundError();
 		}
 	});
+}
+
+function showPageNotFoundError(){
+	window.location = window.location.origin + surveyUrl + "notfound";
 }
 
 function loadAgentPic(agentId){
