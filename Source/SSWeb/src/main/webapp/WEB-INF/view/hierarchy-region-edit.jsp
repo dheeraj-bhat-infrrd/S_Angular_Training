@@ -23,6 +23,7 @@
 	     <div class="float-left bd-frm-left"></div>
 	     <div class="float-left bd-frm-right">
 	         <div class="bd-frm-rad-wrapper clearfix">
+	         	<input type="hidden" class="hide" name="userSelectionType">
 	             <div class="float-left bd-cust-rad-item clearfix">
 	                 <div data-type="single" class="float-left bd-cust-rad-img bd-cust-rad-img-checked"></div>
 	                 <div class="float-left bd-cust-rad-txt"><spring:message code="label.addsingleuser.key"/></div>
@@ -76,3 +77,20 @@
 	     </div>
 	 </div>
  </form>
+ <script>
+ $(document).ready(function(){
+	 $('.bd-check-img').click(function(e) {
+		 $(this).toggleClass('bd-check-img-checked');
+		/**
+		 * If class is "bd-check-img-checked", check box is unchecked ,
+		 * hence setting the hidden value as false
+		 */
+		 if($(this).hasClass('bd-check-img-checked') ){
+			$(this).next("#is-admin-chk").val("false");
+		 }
+		 else {
+			$(this).next("#is-admin-chk").val("true");
+		 }
+   });
+});
+</script>
