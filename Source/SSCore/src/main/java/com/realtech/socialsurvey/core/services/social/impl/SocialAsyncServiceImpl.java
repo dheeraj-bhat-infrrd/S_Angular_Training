@@ -49,11 +49,12 @@ public class SocialAsyncServiceImpl implements SocialAsyncService {
 			LinkedInToken linkedInToken) {
 		LOG.info("Method linkedInDataUpdateAsync() called from SocialAsyncServiceImpl");
 		unitSettings = linkedInDataUpdate(collection, unitSettings, linkedInToken);
-		
+		unitSettings = updateLinkedInProfileImage(collection, unitSettings);
 		LOG.info("Method linkedInDataUpdateAsync() finished from SocialAsyncServiceImpl");
 		return new AsyncResult<OrganizationUnitSettings>(unitSettings);
 	}
 
+	
 	@Override
 	public OrganizationUnitSettings linkedInDataUpdate(String collection, OrganizationUnitSettings unitSettings, LinkedInToken linkedInToken) {
 		LOG.info("Method linkedInDataUpdate() called from SocialAsyncServiceImpl");
@@ -98,7 +99,7 @@ public class SocialAsyncServiceImpl implements SocialAsyncService {
 				isContactDetailsUpdated = true;
 			}
 		}
-		
+
 		if (unitSettings.getContact_details().getName() == null || unitSettings.getContact_details().getName().isEmpty()) {
 			LOG.debug("Name is empty. Filling with linkedin data");
 			unitSettings.getContact_details().setFirstName(linkedInProfileData.getFirstName());
@@ -139,20 +140,6 @@ public class SocialAsyncServiceImpl implements SocialAsyncService {
 			LOG.debug("Contact details were updated. Updating the same in database");
 			try {
 				profileManagementService.updateContactDetails(collection, unitSettings, unitSettings.getContact_details());
-			}
-			catch (InvalidInputException e) {
-				LOG.error(e.getMessage(), e);
-			}
-		}
-
-		// updating profile image url to mongo
-		if (unitSettings.getProfileImageUrl() == null || unitSettings.getProfileImageUrl().isEmpty()) {
-			try {
-				if (linkedInProfileData.getPictureUrls() != null && linkedInProfileData.getPictureUrls().getValues() != null
-						&& !linkedInProfileData.getPictureUrls().getValues().isEmpty()) {
-					unitSettings.setProfileImageUrl(linkedInProfileData.getPictureUrls().getValues().get(0));
-					profileManagementService.updateProfileImage(collection, unitSettings, unitSettings.getProfileImageUrl());
-				}
 			}
 			catch (InvalidInputException e) {
 				LOG.error(e.getMessage(), e);
@@ -227,7 +214,6 @@ public class SocialAsyncServiceImpl implements SocialAsyncService {
 				LOG.debug("Updating details in solr");
 				solrSearchService.editUserInSolr(agentSettings.getIden(), CommonConstants.ABOUT_ME_SOLR, agentSettings.getContact_details()
 						.getAbout_me());
-				solrSearchService.editUserInSolr(agentSettings.getIden(), CommonConstants.PROFILE_IMAGE_URL_SOLR, agentSettings.getProfileImageUrl());
 			}
 			catch (SolrException e) {
 				LOG.error("Could not update details in solr", e);
@@ -235,6 +221,38 @@ public class SocialAsyncServiceImpl implements SocialAsyncService {
 		}
 
 		LOG.info("Method linkedInDataUpdate() finished from SocialAsyncServiceImpl");
+		return unitSettings;
+	}
+	
+	@Override
+	public OrganizationUnitSettings updateLinkedInProfileImage(String collection, OrganizationUnitSettings unitSettings) {
+		LOG.debug("Method updateLinkedInProfileImage() called from SocialAsyncServiceImpl");
+		LinkedInProfileData linkedInProfileData = unitSettings.getLinkedInProfileData();
+
+		// updating profile image url to mongo
+		if (unitSettings.getProfileImageUrl() == null || unitSettings.getProfileImageUrl().isEmpty()) {
+			try {
+				if (linkedInProfileData.getPictureUrls() != null && linkedInProfileData.getPictureUrls().getValues() != null
+						&& !linkedInProfileData.getPictureUrls().getValues().isEmpty()) {
+					unitSettings.setProfileImageUrl(linkedInProfileData.getPictureUrls().getValues().get(0));
+					profileManagementService.updateProfileImage(collection, unitSettings, unitSettings.getProfileImageUrl());
+				}
+			}
+			catch (InvalidInputException e) {
+				LOG.error(e.getMessage(), e);
+			}
+		}
+
+		// updating profile image url to solr
+		try {
+			LOG.debug("Updating profile image in solr");
+			solrSearchService.editUserInSolr(unitSettings.getIden(), CommonConstants.PROFILE_IMAGE_URL_SOLR, unitSettings.getProfileImageUrl());
+		}
+		catch (SolrException e) {
+			LOG.error("Could not update details in solr", e);
+		}
+
+		LOG.debug("Method updateLinkedInProfileImage() called from SocialAsyncServiceImpl");
 		return unitSettings;
 	}
 }

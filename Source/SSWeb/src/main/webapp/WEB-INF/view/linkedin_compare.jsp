@@ -132,6 +132,7 @@
 <script src="${pageContext.request.contextPath}/resources/js/jcrop.js"></script>
 <script>
 var selectedCountryRegEx = "";
+var profilemasterid = "${profilemasterid}";
 $(document).ready(function() {
 	if ($('#com-country').val() != "" && $('#country-code').val() != "") {
 		var countryCode = $('#country-code').val();
@@ -145,7 +146,6 @@ $(document).ready(function() {
 	}
 	
 	// update default image
-	var profilemasterid = "${profilemasterid}";
 	if (profilemasterid == 4) {
 		$("#wc-photo-upload").addClass('dsh-pers-default-img');
 	} else if (profilemasterid == 3) {
@@ -187,7 +187,7 @@ $(document).ready(function() {
 	};
 });
 
-// Profile image
+// Profile image upload
 $(document).on('click', '#wc-photo-upload', function() {
 	$('#prof-image').trigger('click');
 });
@@ -199,6 +199,16 @@ $(document).on('change', '#prof-image', function() {
 function callBackOnProfileImageUpload(data) {
 	$('#message-header').html(data);
 	callAjaxGET("./fetchuploadedprofileimage.do", function(profileImageUrl) {
+		if (profilemasterid == 4) {
+			$("#wc-photo-upload").removeClass('dsh-pers-default-img');
+		} else if (profilemasterid == 3) {
+			$("#wc-photo-upload").removeClass('dsh-office-default-img');
+		} else if (profilemasterid == 2) {
+			$("#wc-photo-upload").removeClass('dsh-region-default-img');
+		} else if (profilemasterid == 1) {
+			$("#wc-photo-upload").removeClass('dsh-comp-default-img');
+		}
+		
 		$('#wc-photo-upload').css("background", "url(" + profileImageUrl + ") no-repeat center");
 		$('#wc-photo-upload').css("background-size","contain");
 		hideOverlay();
