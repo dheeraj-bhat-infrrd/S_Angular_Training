@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 import com.braintreegateway.WebhookNotification;
+import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.commons.CoreCommon;
 import com.realtech.socialsurvey.core.exception.DatabaseException;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
@@ -33,10 +34,10 @@ public class WebHookController {
 
 	@Autowired
 	private Payment gateway;
-	
+
 	@Autowired
 	private MessageUtils messageUtils;
-	
+
 	@Autowired
 	private CoreCommon commonServices;
 
@@ -76,8 +77,8 @@ public class WebHookController {
 		
 		String testingFlag = request.getParameter("testing");
 		WebhookNotification webhookNotification = null;
-		
-		if(testingFlag == null || testingFlag.equals("0")){
+
+		if (testingFlag == null || testingFlag.equals("0")) {
 			webhookNotification = gateway.getGatewayInstance().webhookNotification()
 					.parse(request.getParameter("bt_signature"), request.getParameter("bt_payload"));
 
@@ -85,72 +86,77 @@ public class WebHookController {
 					+ " | Subscription: " + webhookNotification.getSubscription().getId());
 		}
 		else {
-			
+
 			String kind = request.getParameter("kind");
 			String subscriptionId = request.getParameter("subscription_id");
-			
+
 			LOG.info("kind : " + kind);
 			LOG.info("subscription id : " + subscriptionId);
-			
-			if(kind == null || kind.isEmpty()){
+
+			if (kind == null || kind.isEmpty()) {
 				return "kind flag is empty";
 			}
-			
-			if(subscriptionId == null || subscriptionId.isEmpty()){
+
+			if (subscriptionId == null || subscriptionId.isEmpty()) {
 				return "subscription id is empty";
 			}
 			
-			if(kind.equals(WebhookNotification.Kind.SUBSCRIPTION_WENT_PAST_DUE.toString())){
-				HashMap<String, String> sampleNotification = gateway.getGatewayInstance().webhookTesting().sampleNotification(
-					    WebhookNotification.Kind.SUBSCRIPTION_WENT_PAST_DUE, subscriptionId
-					);
+			HashMap<String, String> sampleNotification = null;
 
-				webhookNotification = gateway.getGatewayInstance().webhookNotification().parse(
-					    sampleNotification.get("bt_signature"),
-					    sampleNotification.get("bt_payload")
-					);
-				LOG.info("Webhook Received " + webhookNotification.getTimestamp().getTime() + " | Kind: " + webhookNotification.getKind()
-						+ " | Subscription: " + webhookNotification.getSubscription().getId());
+			if (kind.equals(WebhookNotification.Kind.SUBSCRIPTION_WENT_PAST_DUE.toString())) {
+				sampleNotification = gateway.getGatewayInstance().webhookTesting()
+						.sampleNotification(WebhookNotification.Kind.SUBSCRIPTION_WENT_PAST_DUE, subscriptionId);
 			}
-			else if(kind.equals(WebhookNotification.Kind.SUBSCRIPTION_CHARGED_UNSUCCESSFULLY.toString())) {
-				HashMap<String, String> sampleNotification = gateway.getGatewayInstance().webhookTesting().sampleNotification(
-					    WebhookNotification.Kind.SUBSCRIPTION_CHARGED_UNSUCCESSFULLY, subscriptionId
-					);
-
-				webhookNotification = gateway.getGatewayInstance().webhookNotification().parse(
-					    sampleNotification.get("bt_signature"),
-					    sampleNotification.get("bt_payload")
-					);
-				LOG.info("Webhook Received " + webhookNotification.getTimestamp().getTime() + " | Kind: " + webhookNotification.getKind()
-						+ " | Subscription: " + webhookNotification.getSubscription().getId());
+			else if (kind.equals(WebhookNotification.Kind.SUBSCRIPTION_CHARGED_UNSUCCESSFULLY.toString())) {
+				sampleNotification = gateway.getGatewayInstance().webhookTesting()
+						.sampleNotification(WebhookNotification.Kind.SUBSCRIPTION_CHARGED_UNSUCCESSFULLY, subscriptionId);
 			}
-			else if(kind.equals(WebhookNotification.Kind.SUBSCRIPTION_CHARGED_SUCCESSFULLY.toString())) {
-				HashMap<String, String> sampleNotification = gateway.getGatewayInstance().webhookTesting().sampleNotification(
-					    WebhookNotification.Kind.SUBSCRIPTION_CHARGED_SUCCESSFULLY, subscriptionId
-					);
-
-				webhookNotification = gateway.getGatewayInstance().webhookNotification().parse(
-					    sampleNotification.get("bt_signature"),
-					    sampleNotification.get("bt_payload")
-					);
-				LOG.info("Webhook Received " + webhookNotification.getTimestamp().getTime() + " | Kind: " + webhookNotification.getKind()
-						+ " | Subscription: " + webhookNotification.getSubscription().getId());
-			}
-			else{
+			else if (kind.equals(WebhookNotification.Kind.SUBSCRIPTION_CHARGED_SUCCESSFULLY.toString())) {
+				sampleNotification = gateway.getGatewayInstance().webhookTesting()
+						.sampleNotification(WebhookNotification.Kind.SUBSCRIPTION_CHARGED_SUCCESSFULLY, subscriptionId);
+			}else if (kind.equals(WebhookNotification.Kind.SUBSCRIPTION_CANCELED.toString())){
+				// TODO: Implement
+				
+			}else if (kind.equals(WebhookNotification.Kind.SUBSCRIPTION_EXPIRED.toString())){
+				// TODO: Implement
+				
+			}else if (kind.equals(WebhookNotification.Kind.SUBSCRIPTION_TRIAL_ENDED.toString())){
+				// TODO: Implement
+				
+			}else if (kind.equals(WebhookNotification.Kind.SUBSCRIPTION_WENT_ACTIVE.toString())){
+				// TODO: Implement
+				
+			}else if (kind.equals(WebhookNotification.Kind.DISPUTE_OPENED.toString())){
+				// TODO: Implement
+				
+			}else if (kind.equals(WebhookNotification.Kind.DISPUTE_WON.toString())){
+				// TODO: Implement
+				
+			}else if (kind.equals(WebhookNotification.Kind.DISPUTE_LOST.toString())){
+				// TODO: Implement
+				
+			}else {
 				return "Kind not known!";
 			}
-			
-		}	
+			webhookNotification = gateway.getGatewayInstance().webhookNotification()
+					.parse(sampleNotification.get("bt_signature"), sampleNotification.get("bt_payload"));
+			LOG.info("Webhook Received " + webhookNotification.getTimestamp().getTime() + " | Kind: " + webhookNotification.getKind()
+					+ " | Subscription: " + webhookNotification.getSubscription().getId());
+
+		}
 
 		try {
 			if (webhookNotification.getKind() == WebhookNotification.Kind.SUBSCRIPTION_WENT_PAST_DUE) {
-				gateway.changeLicenseToPastDue(webhookNotification.getSubscription());
+				// gateway.changeLicenseToPastDue(webhookNotification.getSubscription());
+				gateway.intimateUser(webhookNotification.getSubscription(), CommonConstants.SUBSCRIPTION_WENT_PAST_DUE);
 			}
 			else if (webhookNotification.getKind() == WebhookNotification.Kind.SUBSCRIPTION_CHARGED_UNSUCCESSFULLY) {
-				gateway.incrementRetriesAndSendMail(webhookNotification.getSubscription());
+				// gateway.incrementRetriesAndSendMail(webhookNotification.getSubscription());
+				gateway.intimateUser(webhookNotification.getSubscription(), CommonConstants.SUBSCRIPTION_CHARGED_UNSUCCESSFULLY);
 			}
 			else if (webhookNotification.getKind() == WebhookNotification.Kind.SUBSCRIPTION_CHARGED_SUCCESSFULLY) {
-				gateway.checkIfCompanyIsDisabledOrSubscriptionIsPastDueAndEnableIt(webhookNotification.getSubscription());
+				// gateway.checkIfCompanyIsDisabledOrSubscriptionIsPastDueAndEnableIt(webhookNotification.getSubscription());
+				gateway.intimateUser(webhookNotification.getSubscription(), CommonConstants.SUBSCRIPTION_CHARGED_SUCCESSFULLY);
 			}
 		}
 		catch (InvalidInputException e) {

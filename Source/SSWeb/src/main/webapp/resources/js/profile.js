@@ -230,7 +230,6 @@ function paintProfilePage(result) {
             var webAddresses = contactDetails.web_addresses;
             if (webAddresses != undefined) {
             	if (webAddresses.work != undefined) {
-            		// making a proper url
             		var validWebAddress = returnValidWebAddress(webAddresses.work);
             		
             		$('#web-addr-header').show();
@@ -242,7 +241,6 @@ function paintProfilePage(result) {
             	}
             	if (webAddresses.blogs != undefined) {
             		var validBlogAddress = returnValidWebAddress(webAddresses.blogs);
-            		
                     contactInfoHtml =	contactInfoHtml+'<div class="lp-con-row lp-row clearfix">';		        
                     contactInfoHtml =	contactInfoHtml+'<div class="float-left lp-con-icn icn-blog"></div>';		            
                     contactInfoHtml =	contactInfoHtml+'<div class="float-left lp-con-row-item blue-text"><a href="' + validBlogAddress + '" target="_blank">Our Blogs</a></div></div>';	            
@@ -250,19 +248,19 @@ function paintProfilePage(result) {
             }
             
             var contactNumbers	 = contactDetails.contact_numbers;
-            if(contactNumbers != undefined) {
-            	if(contactNumbers.personal != undefined) {
+            if (contactNumbers != undefined) {
+            	if (contactNumbers.personal != undefined) {
             		contactInfoHtml =	contactInfoHtml+'<div class="lp-con-row lp-row clearfix">';		        
 	                contactInfoHtml =	contactInfoHtml+'	<div class="float-left lp-con-icn icn-mbl"></div>';		            
 	                contactInfoHtml =	contactInfoHtml+'	<div class="float-left lp-con-row-item">'+contactNumbers.personal+'</div></div>';		            
             	}
-            	if(contactNumbers.work != undefined) {
+            	if (contactNumbers.work != undefined) {
             		contactInfoHtml =	contactInfoHtml+'<div class="lp-con-row lp-row clearfix">';		        
   	                contactInfoHtml =	contactInfoHtml+'	<div class="float-left lp-con-icn icn-phone"></div>';		            
   	                contactInfoHtml =	contactInfoHtml+'	<div class="float-left lp-con-row-item">'+contactNumbers.work+'</div></div>';		            
   	               
             	}
-            	if(contactNumbers.fax != undefined) {
+            	if (contactNumbers.fax != undefined) {
             		contactInfoHtml =	contactInfoHtml+'<div class="lp-con-row lp-row clearfix">';		        
             		contactInfoHtml =	contactInfoHtml+'	<div class="float-left lp-con-icn icn-fax"></div>'	;	            
             		contactInfoHtml =	contactInfoHtml+'	<div class="float-left lp-con-row-item">'+contactNumbers.fax+'</div></div>';
@@ -278,47 +276,48 @@ function paintProfilePage(result) {
             	
             });
             
-            $('#mob-review-btn').click(function(e){
+            $('#mob-review-btn').click(function(e) {
             	e.stopPropagation();
             	findProList(result.iden,result.contact_details.name);
-            	
             });
             
             
-            //Add social links
-            if(result.socialMediaTokens){
+            // Add social links
+            if (result.socialMediaTokens) {
             	var socialToken = result.socialMediaTokens;
-            	if(socialToken.facebookToken && socialToken.facebookToken.facebookPageLink){
-            		$('#icn-fb').data('link',socialToken.facebookToken.facebookPageLink);            		
+            	if (socialToken.facebookToken && socialToken.facebookToken.facebookPageLink) {
+            		$('#icn-fb').data('link', socialToken.facebookToken.facebookPageLink);            		
             	}
-            	if(socialToken.twitterToken && socialToken.twitterToken.twitterPageLink){
-            		$('#icn-twit').data('link',socialToken.twitterToken.twitterPageLink);            		
+            	if (socialToken.twitterToken && socialToken.twitterToken.twitterPageLink) {
+            		$('#icn-twit').data('link', socialToken.twitterToken.twitterPageLink);            		
             	}
-            	if(socialToken.linkedInToken && socialToken.linkedInToken.linkedInPageLink){
-            		$('#icn-lin').data('link',socialToken.linkedInToken.linkedInPageLink);            		
+            	if (socialToken.linkedInToken && socialToken.linkedInToken.linkedInPageLink) {
+            		$('#icn-lin').data('link', socialToken.linkedInToken.linkedInPageLink);
             	}
-            	if(socialToken.yelpToken && socialToken.yelpToken.yelpPageLink){
-            		$('#icn-yelp').data('link',socialToken.yelpToken.yelpPageLink);            		
+            	if (socialToken.yelpToken && socialToken.yelpToken.yelpPageLink) {
+            		$('#icn-yelp').data('link', socialToken.yelpToken.yelpPageLink);            		
+            	}
+            	if (socialToken.googleToken && socialToken.googleToken.profileLink) {
+            		$('#icn-gplus').data('link', socialToken.googleToken.profileLink);            		
             	}
             	
-            	$('.social-item-icon').bind('click',function(){
+            	$('.social-item-icon').bind('click', function() {
             		var link = $(this).data('link');
-            		
-            		if(link == undefined || link == ""){
+            		if (link == undefined || link == "") {
             			return false;
             		}
-            		window.open(link,'_blank');
+            		window.open(returnValidWebAddress(link), '_blank');
             	});
             }
 		}         
 	}
 }
 
-function returnValidWebAddress(webAddress) {
-	if (webAddress && !webAddress.match(/^http([s]?):\/\/.*/)) {
-		webAddress = 'http://' + webAddress;
+function returnValidWebAddress(url) {
+	if (url && !url.match(/^http([s]?):\/\/.*/)) {
+		url = 'http://' + url;
 	}
-	return webAddress;
+	return url;
 }
 
 function focusOnContact() {

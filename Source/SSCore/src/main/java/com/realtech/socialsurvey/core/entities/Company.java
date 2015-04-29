@@ -52,9 +52,9 @@ public class Company implements Serializable {
 
 	@Column(name = "STATUS")
 	private int status;
-	
+
 	@ManyToOne
-	@JoinColumn(name="VERTICAL_ID")
+	@JoinColumn(name = "VERTICAL_ID")
 	private VerticalsMaster verticalsMaster;
 
 	// bi-directional many-to-one association to Branch
@@ -77,6 +77,10 @@ public class Company implements Serializable {
 	@OneToMany(mappedBy = "company", fetch = FetchType.LAZY)
 	private List<SurveyCompanyMapping> surveyCompanyMappings;
 
+	// bi-directional many-to-one association to UsercountModificationNotification
+	@OneToMany(mappedBy = "company", fetch = FetchType.LAZY)
+	private List<UsercountModificationNotification> usercountModificationNotifications;
+
 	// bi-directional many-to-one association to User
 	@OneToMany(mappedBy = "company", fetch = FetchType.LAZY)
 	private List<User> users;
@@ -88,7 +92,7 @@ public class Company implements Serializable {
 	// bi-directional many-to-one association to UserProfile
 	@OneToMany(mappedBy = "company", fetch = FetchType.LAZY)
 	private List<UserProfile> userProfiles;
-	
+
 	// bi-directional many-to-one association to DisabledAccount
 	@OneToMany(mappedBy = "company", fetch = FetchType.LAZY)
 	private List<DisabledAccount> disabledAccounts;
@@ -244,7 +248,7 @@ public class Company implements Serializable {
 	public void setRegions(List<Region> regions) {
 		this.regions = regions;
 	}
-	
+
 	public VerticalsMaster getVerticalsMaster() {
 		return verticalsMaster;
 	}
@@ -296,7 +300,30 @@ public class Company implements Serializable {
 
 		return surveyCompanyMapping;
 	}
-	
+
+	public List<UsercountModificationNotification> getUsercountModificationNotifications() {
+		return this.usercountModificationNotifications;
+	}
+
+	public void setUsercountModificationNotifications(List<UsercountModificationNotification> usercountModificationNotifications) {
+		this.usercountModificationNotifications = usercountModificationNotifications;
+	}
+
+	public UsercountModificationNotification addUsercountModificationNotification(UsercountModificationNotification usercountModificationNotification) {
+		getUsercountModificationNotifications().add(usercountModificationNotification);
+		usercountModificationNotification.setCompany(this);
+
+		return usercountModificationNotification;
+	}
+
+	public UsercountModificationNotification removeUsercountModificationNotification(
+			UsercountModificationNotification usercountModificationNotification) {
+		getUsercountModificationNotifications().remove(usercountModificationNotification);
+		usercountModificationNotification.setCompany(null);
+
+		return usercountModificationNotification;
+	}
+
 	public List<User> getUsers() {
 		return this.users;
 	}

@@ -83,7 +83,7 @@ $(document).ready(function() {
 	var flow = "${socialFlow}";
 	if (parseInt(error) == 1) {
 		if (flow == "registration") {
-			parentWindow.location.href = "./landing.do";
+			// parentWindow.location.href = "./landing.do";
 		}
 		window.close();
 	}
@@ -91,7 +91,7 @@ $(document).ready(function() {
 	// close on success
 	setTimeout(function() {
 		if (flow == "registration") {
-			parentWindow.location.href = "./landing.do";
+			// parentWindow.location.href = "./landing.do";
 		}
 		window.close();
 	}, 3000);
