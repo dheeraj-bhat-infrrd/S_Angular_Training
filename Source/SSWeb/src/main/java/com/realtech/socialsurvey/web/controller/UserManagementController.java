@@ -1367,7 +1367,7 @@ public class UserManagementController {
 	}
 	
 	@ResponseBody
-	@RequestMapping(value = "/sendverificationmail", method = RequestMethod.POST)
+	@RequestMapping(value = "/sendverificationmail", method = RequestMethod.GET)
 	public String sendVerificationMail(Model model, HttpServletRequest request) {
 		LOG.info("Method sendVerificationMail() called from UserManagementController");
 		try {
