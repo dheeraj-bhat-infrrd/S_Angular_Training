@@ -496,7 +496,7 @@ function linkedInDataImport() {
 		$('#overlay-linkedin-import').html(data);
 		if ($("#welocome-step1").length) {
 			$('#overlay-linkedin-import').removeClass("hide");
-			$('#overlay-send-survey').show();
+			$('#overlay-linkedin-import').show();
 		}
 	}, true);
 }
