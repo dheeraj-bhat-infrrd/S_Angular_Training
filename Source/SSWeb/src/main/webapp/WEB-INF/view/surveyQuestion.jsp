@@ -70,7 +70,7 @@
 					<div class="float-left user-info-logo" style="background: url(${displaylogo}) no-repeat center; background-size: 100% auto;"></div>
 				</c:if>
 			</div>
-			<div id="header-menu-icn" class="header-menu-icn icn-menu hide float-right"></div>
+			<!-- <div id="header-menu-icn" class="header-menu-icn icn-menu hide float-right"></div> -->
 		</div>
 	</div>
 
