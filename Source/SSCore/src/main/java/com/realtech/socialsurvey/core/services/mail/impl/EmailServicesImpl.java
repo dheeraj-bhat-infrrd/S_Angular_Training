@@ -1185,7 +1185,7 @@ public class EmailServicesImpl implements EmailServices {
 		LOG.debug("Calling email sender to send mail");
 		emailSender.sendEmailWithBodyReplacements(emailEntity, subjectFileName, messageBodyReplacements);
 
-		LOG.info("Successfully sent survey completion mail");
+		LOG.info("Successfully sent survey invitation mail");
 	}
 	
 	@Async
@@ -1329,5 +1329,62 @@ public class EmailServicesImpl implements EmailServices {
 		LOG.info("Successfully sent subscription revised mail");
 	}
 
+	
+	@Async
+	@Override
+	public void sendDefaultSurveyInvitationMailByCustomer(String recipientMailId, String displayName, String agentName, String link, String agentEmailId) throws InvalidInputException,
+			UndeliveredEmailException {
+
+		if (recipientMailId == null || recipientMailId.isEmpty()) {
+			LOG.error("Recipient email Id is empty or null for sending survey completion mail ");
+			throw new InvalidInputException("Recipient email Id is empty or null for sending survey completion mail ");
+		}
+
+		if (displayName == null || displayName.isEmpty()) {
+			LOG.error("displayName parameter is empty or null for sending account upgrade mail ");
+			throw new InvalidInputException("displayName parameter is empty or null for sending survey completion mail ");
+		}
+
+		LOG.info("Sending survey reminder email to : " + recipientMailId);
+
+		EmailEntity emailEntity = prepareEmailEntityForSendingEmail(recipientMailId, agentEmailId, agentName);
+
+		String subjectFileName = EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER + EmailTemplateConstants.SURVEY_INVITATION_MAIL_CUSTOMER_SUBJECT;
+
+		FileContentReplacements messageBodyReplacements = new FileContentReplacements();
+		messageBodyReplacements.setFileName(EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER + EmailTemplateConstants.SURVEY_INVITATION_MAIL_CUSTOMER_BODY);
+
+		messageBodyReplacements.setReplacementArgs(Arrays.asList(displayName, agentName, link, agentName));
+
+		LOG.debug("Calling email sender to send mail");
+		emailSender.sendEmailWithBodyReplacements(emailEntity, subjectFileName, messageBodyReplacements);
+
+		LOG.info("Successfully sent survey invitation mail");
+	}
+	
+	@Async
+	@Override
+	public void sendSurveyInvitationMailByCustomer(String recipientMailId, String subject, String mailBody, String emailId, String name) throws InvalidInputException,
+			UndeliveredEmailException {
+
+		if (recipientMailId == null || recipientMailId.isEmpty()) {
+			LOG.error("Recipient email Id is empty or null for sending survey completion mail ");
+			throw new InvalidInputException("Recipient email Id is empty or null for sending survey completion mail ");
+		}
+
+		if (subject == null || subject.isEmpty()) {
+			LOG.error("subject parameter is empty or null for sending social post reminder mail ");
+			throw new InvalidInputException("displayName parameter is empty or null for sending survey completion mail ");
+		}
+
+		LOG.info("Sending survey invitation email to : " + recipientMailId);
+
+		EmailEntity emailEntity = prepareEmailEntityForSendingEmail(recipientMailId, emailId, name);
+
+		LOG.debug("Calling email sender to send mail");
+		emailSender.sendEmail(emailEntity, subject, mailBody);
+
+		LOG.info("Successfully sent survey invitation mail");
+	}
 }
 // JIRA: SS-7: By RM02: EOC
