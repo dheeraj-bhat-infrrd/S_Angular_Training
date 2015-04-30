@@ -1367,17 +1367,18 @@ public class UserManagementController {
 	}
 	
 	@ResponseBody
-	@RequestMapping(value = "/sendverificationmail", method = RequestMethod.GET)
+	@RequestMapping(value = "/sendverificationmail", method = RequestMethod.POST)
 	public String sendVerificationMail(Model model, HttpServletRequest request) {
 		LOG.info("Method sendVerificationMail() called from UserManagementController");
 		try {
 			User user = sessionHelper.getCurrentUser();
-			userManagementService.inviteCorporateToRegister(user.getFirstName(), user.getLastName(), user.getEmailId(), true);
+			userManagementService.sendVerificationLink(user);
 		}
 		catch (NonFatalException e) {
 			LOG.error("InvalidInputException while updating profile. Reason : " + e.getMessage(), e);
+			return "Sorry, Something went wrong while sending mail.";
 		}
-		return "success";
+		return "Verification Mail has been sent to your email id. Please click on the link provided to continue.";
 	}
 
 	// verify change password parameters
