@@ -200,10 +200,10 @@ function changeRatingPattern(rating, ratingParent,isOverallRating) {
 	var ratingImgHtml = "<div class='rating-image float-left smiley-rat-"+ratingIntVal+"'></div>";
 	var ratingValHtml = "<div class='rating-rounded float-left'>"+roundedFloatingVal+"</div>";
 	
-	if(isOverallRating){
+	/*if(isOverallRating){
 		ratingValHtml = "<div class='rating-rounded float-left'>"+roundedFloatingVal+" - </div>";
 		$('#prof-header-rating').addClass('smiley-rat-'+ratingIntVal);
-	}
+	}*/
 	
 	ratingParent.html('');
 	

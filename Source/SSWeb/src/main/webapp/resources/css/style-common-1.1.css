@@ -370,8 +370,7 @@ a, a:hover, a:visited{
     position: relative;
     width: 600px;
     height: 70px;
-
-    background-color: rgba(0, 159, 224, 0.8);
+	/* background-color: rgba(0, 159, 224, 0.8); */
     color: #fff;
     padding: 15px;
 }
@@ -620,8 +619,8 @@ input#find-pro-submit{
 .blue-ext-right {
     position: absolute;
     width: 1500px;
-    /* height: 70px; */
-    /* background-color: rgba(0, 159, 224, 0.8); */
+    height: 70px;
+    background-color: rgba(0, 159, 224, 0.8);
     top: 0;
     left: 0;
     /* z-index: 9; */
