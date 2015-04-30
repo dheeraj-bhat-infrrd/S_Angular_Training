@@ -10,8 +10,6 @@ public interface JspResolver {
 	public static final String ACCOUNT_TYPE_SELECTION = "accounttypeselection";
 	public static final String COMPLETE_REGISTRATION = "completeregistration";
 	public static final String LINKEDIN_ACCESS = "linkedinaccess";
-	public static final String LINKEDIN_COMPARE = "linkedin_compare";
-	public static final String LINKEDIN_IMPORT = "linkedin_import";
 	public static final String INVITATION = "invitation";
 	public static final String USER_ID_ON_INVITE = "useridoninvite";
 
@@ -34,6 +32,9 @@ public interface JspResolver {
 	public static final String UPGRADE_CONFIRMATION = "upgradeconfirmation";
 
 	// Dashboard
+	public static final String LINKEDIN_IMPORT = "linkedin_import";
+	public static final String LINKEDIN_COMPARE = "linkedin_compare";
+	public static final String HEADER_SURVEY_INVITE = "header_sendsurveyinvite";
 	public static final String USER_LOGIN = "userlogin";
 	public static final String ACCOUNT_DISABLED_PAGE = "accountdisabled";
 	public static final String LANDING = "landing";

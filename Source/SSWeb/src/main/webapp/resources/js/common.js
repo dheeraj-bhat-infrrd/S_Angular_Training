@@ -426,6 +426,11 @@ $(document).on('input', '.wc-review-fname, .wc-review-lname, .wc-review-email', 
 		if (parentDiv.parent().children().length > 2) {
 			$('.wc-review-rmv-icn').removeClass('hide');
 		}
+		
+		// setting up perfect scrollbar
+		setTimeout(function() {
+			$('#wc-review-table').perfectScrollbar();
+		}, 1000);
 	}
 });
 
@@ -437,6 +442,11 @@ $(document).on('click', '.wc-review-rmv-icn', function() {
 		$('.wc-review-rmv-icn').addClass('hide');
 	}
 	parentDiv.remove();
+
+	// setting up perfect scrollbar
+	setTimeout(function() {
+		$('#wc-review-table').perfectScrollbar();
+	}, 1000);
 });
 
 $(document).on('click', '#wc-send-survey', function() {
@@ -462,5 +472,31 @@ $(document).on('click', '#wc-send-survey', function() {
 	var payload = {
 		"receiversList" : receiversList
 	};
-	callAjaxPostWithPayloadData("./sendmultiplesurveyinvites.do", function(data) {}, payload);
+	callAjaxPostWithPayloadData("./sendmultiplesurveyinvites.do", function(data) {
+		$('#overlay-send-survey').html('');
+	}, payload);
 });
+
+$(document).on('click', '#wc-skip-send-survey', function() {
+	$('#overlay-send-survey').html('');
+});
+
+function sendSurveyInvitation() {
+	callAjaxGET("./sendsurveyinvitation.do", function(data) {
+		$('#overlay-send-survey').html(data);
+		if ($("#welcome-popup-invite").length) {
+			$('#overlay-send-survey').removeClass("hide");
+			$('#overlay-send-survey').show();
+		}
+	}, true);
+}
+
+function linkedInDataImport() {
+	callAjaxGET("./linkedindataimport.do", function(data) {
+		$('#overlay-linkedin-import').html(data);
+		if ($("#welocome-step1").length) {
+			$('#overlay-linkedin-import').removeClass("hide");
+			$('#overlay-send-survey').show();
+		}
+	}, true);
+}
