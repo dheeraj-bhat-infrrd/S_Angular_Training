@@ -1350,6 +1350,12 @@
 	  line-height: 30px;
 	  margin-left: 5px;
 	}
+	.welcome-popup-wrapper{
+		width: 100%;
+	}
+	.wc-review-table{
+		padding: 0;
+	}
 }
 
 
@@ -1395,7 +1401,7 @@
         font-size: 13px;
     }
     .um-item-row-left{
-        width: 70px;
+        width: 100%;
         font-size: 13px;
     }
     .hm-item-row-txt{
@@ -1639,6 +1645,9 @@
 	.bd-hr-img{
 		margin-right: 7px;
 	}
+	.welcome-popup-wrapper{
+		width: 95%;
+	}
 }
 
 /* ============== MEDIUM SIZED SCREENS ==============*/
@@ -1786,6 +1795,9 @@
     .prof-captcha-cont #recaptcha_image {
     	width: 265px !important;
     }
+    .welcome-popup-wrapper{
+		width: 95%;
+	}
 }
 
 /* ============== LARGE SIZED SCREENS ==============*/
