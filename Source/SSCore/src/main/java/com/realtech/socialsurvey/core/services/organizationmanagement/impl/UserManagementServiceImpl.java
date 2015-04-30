@@ -1103,7 +1103,8 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 	 * @throws InvalidInputException
 	 * @throws UndeliveredEmailException
 	 */
-	private void sendVerificationLink(User user) throws InvalidInputException, UndeliveredEmailException {
+	@Override
+	public void sendVerificationLink(User user) throws InvalidInputException, UndeliveredEmailException {
 		LOG.debug("Method sendVerificationLink of Registration service called");
 		String verificationUrl = null;
 		try {

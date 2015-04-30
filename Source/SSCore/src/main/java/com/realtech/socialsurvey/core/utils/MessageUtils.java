@@ -62,14 +62,11 @@ public final class MessageUtils {
 		LOG.info("Getting display message for the errorCode : " + errorCode + " and message type : " + displayMessageType.getName());
 
 		String errorMessage = propertyFileReader.getProperty(CommonConstants.MESSAGE_PROPERTIES_FILE, errorCode);
-		
-		for(int paramCount = 1; paramCount <= params.length; paramCount++){
-			if(paramCount==1)
-				errorMessage.replace("$"+paramCount, "<a href=\""+params[paramCount]+"\">here</a>");
-			else
-				errorMessage.replace("$"+paramCount, params[paramCount]);
+
+		for (int paramCount = 0; paramCount < params.length; paramCount++) {
+			errorMessage = errorMessage.replace("$" + paramCount, params[paramCount]);
 		}
-		
+
 		DisplayMessage displayMessage = new DisplayMessage(errorMessage, displayMessageType);
 
 		LOG.info("Returning message to be displayed : " + displayMessage.getMessage());
