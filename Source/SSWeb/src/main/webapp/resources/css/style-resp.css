@@ -556,7 +556,7 @@
         display: none;
     }
     .ppl-header-left, .ppl-header-right{
-        float: none !important;
+        /* float: none !important; */
     }
     .ppl-share-wrapper{
         line-height: 30px;
@@ -729,15 +729,15 @@
         width: 100%;
     }
     .sq-smile{
-        width: 50px;
+        /* width: 50px; */
     }
     .hdr-links{
         display: none;
     }
     .sq-star{
-        width: 50px;
+        /* width: 50px;
         height: 42px;
-        background-size: 40px !important;
+        background-size: 40px !important; */
     }
     .sq-slider-wrapper {
         width: 80%;
@@ -804,7 +804,7 @@
         margin-bottom: 0;
     }
     .sq-star-wrapper {
-        width: 100%;
+        width: 310px;
     }
     .sq-ques-wrapper{
         margin: 0 -15px;
@@ -821,6 +821,7 @@
     .sq-btn-continue{
         width: 100%;
         border-radius: 0;
+        margin: 0;
     }
     .sq-btn-wrapper{
         margin-top: -10px;
@@ -896,7 +897,7 @@
     }
     .util-gph-item{
         margin-left: 0;
-        width: 280px;
+        width: 90%;
         overflow: hidden;
         float: none !important;
         margin: 15px auto 0;
@@ -921,30 +922,23 @@
         font-size: 16px;
     }
     .dsh-star-wrapper{
-        width: 100%;
+        width: 250px;
         margin: 10px auto;
     }
     .dsh-star-item{
-        width: 20%;
+        /* width: 20%; */
         background-size: 40px;
     }
-    .dsh-rating-item{
-        float: none !important;
-        clear: both;
-        margin: 0 auto;
-        height: 40px;
-        line-height: 40px;
-        font-size: 18px;
-        position: relative;
-        top: 10px;
-    }
-    .dsh-btn-complete{
-        width: 100%;
-        margin-top: 25px;
-        height: 40px;
-        line-height: 40px;
+    .dsh-rating-item {
+		font-size: 18px;
+		width: auto;
+		margin: 0 10px;
+	}
+	.dsh-btn-complete{
         font-size: 14px;
-    }
+        width: auto;
+		padding: 0 20px;
+	}
     .dash-top-info{
         border-bottom: 0;
     }
@@ -1324,6 +1318,38 @@
     .dash-lp-txt span{
     	display: block;
     }
+    .hr-txt1,.hr-txt2 {
+	  height: 48px;
+	  line-height: 48px;
+	}
+	.bd-hr-rt-panel{
+		border-left: none;
+	}
+	.bd-hr-left-panel{
+		border-right: none;
+	}
+	.sq-rat-wrapper{
+		padding: 0 5px;
+	}
+	.sq-btn-post-social {
+		width: auto;
+		border-radius: 3px;
+		padding: 0 20px;
+		margin: 0 30px;
+	}
+	#frm-login{
+		position: relative;
+	}
+	.btn-forgot-passwd-link{
+		position: absolute;
+		bottom: 0;
+		margin-bottom: -20px;
+		margin-right: 0;
+	}
+	.bd-frm-left {
+	  line-height: 30px;
+	  margin-left: 5px;
+	}
 }
 
 
