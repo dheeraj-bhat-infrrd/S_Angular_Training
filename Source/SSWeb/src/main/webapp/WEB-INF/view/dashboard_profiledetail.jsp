@@ -44,9 +44,9 @@
 		</div>
 		<div id="pro-cmplt-stars" class="dsh-star-wrapper clearfix">
 			<div class="float-left dsh-star-item"></div>
-			<div id="profile-completed" class="float-right dsh-rating-item">${fn:substringBefore(profileCompleteness * 5 / 100, '.')}/5</div>
+			<div id="profile-completed" class="float-left dsh-rating-item">${fn:substringBefore(profileCompleteness * 5 / 100, '.')}/5</div>
+			<div class="dsh-btn-complete float-left" onclick="showMainContent('./showprofilepage.do')"><spring:message code="label.sendsurvey.btn.key" /></div>
 		</div>
-		<div class="dsh-btn-complete" onclick="showMainContent('./showprofilepage.do')"><spring:message code="label.complete.profile.key" /></div>
 	</div>
 </div>
 

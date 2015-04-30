@@ -233,7 +233,7 @@
 			<div class="container">
 				<div class="prof-details-header-row clearfix">
 					<div class="prof-link-header float-left clearfix">
-						<div id="prof-header-rating" class="rating-image float-left"></div>
+						<div id="prof-header-rating" class="rating-image float-left smiley-rat-5"></div>
 						<c:if test="${not empty completeProfileUrl}">
 							<div id="prof-header-url" class="rating-image-txt float-left">${completeProfileUrl}</div>
 						</c:if>

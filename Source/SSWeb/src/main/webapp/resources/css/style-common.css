@@ -2990,7 +2990,7 @@ button.paypal.is-active {
 }
 
 #recaptcha_image img#recaptcha_challenge_image {
-	width: 100%;
+	width: 99%;
 }
 
 .reg-captcha-img {
@@ -3723,22 +3723,22 @@ button.paypal.is-active {
 }
 
 .dsh-star-wrapper {
-	width: 300px;
+	width: 360px;
 	margin: 25px auto;
 }
 
 .dsh-star-item {
-	height: 50px;
-	width: 43px;
-	background-size: 40px;
+	height: 53px;
+	width: 50px;
+	/* background-size: 40px !important; */
 }
 
 .dsh-rating-item {
-	background-color: #009FE0;
-	color: #fff;
+	/* background-color: #009FE0; */
+	color: #009FE0;
 	line-height: 42px;
 	text-align: center;
-	font-size: 20px;
+	font-size: 28px;
 	height: 42px;
 	width: 75px;
 	border-radius: 5px;
@@ -3750,14 +3750,13 @@ button.paypal.is-active {
 	background-color: #009FE0;
 	height: 42px;
 	line-height: 42px;
-	width: 300px;
+	width: 230px;
 	text-align: center;
 	color: #fff;
 	border-radius: 3px;
-	margin: 10px auto;
-	font-size: 14px;
-	font-family: 'opensanslight';
-	text-transform: uppercase;
+	margin: 5px 0 5px 5px;
+	font-size: 18px;
+	font-family: 'opensanssemibold';
 	cursor: pointer;
 }
 
