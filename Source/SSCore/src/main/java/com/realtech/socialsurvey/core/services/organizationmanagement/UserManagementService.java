@@ -289,5 +289,7 @@ public interface UserManagementService {
 	 * @throws InvalidInputException
 	 */
 	public void updateUserCountModificationNotification(Company company) throws InvalidInputException;
+
+	public void sendVerificationLink(User user) throws InvalidInputException, UndeliveredEmailException;
 }
 // JIRA SS-34 BY RM02 BOC
