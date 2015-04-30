@@ -1287,6 +1287,47 @@ public class EmailServicesImpl implements EmailServices {
 
 		LOG.info("Successfully sent account blocking mail");		
 	}
+	
+	@Async
+	@Override
+	public void sendSubscriptionRevisionMail(String recipientMailId, String name, String oldAmount, String revisedAmount, String numOfUsers) throws InvalidInputException, UndeliveredEmailException{
+		LOG.info("Sending subscription revision mail to "+recipientMailId+" with name "+name);
+		if(recipientMailId == null || recipientMailId.isEmpty()){
+			LOG.error("Email id is not sent");
+			throw new InvalidInputException("Email id is not sent");
+		}
+		if(name == null || name.isEmpty()){
+			LOG.error("Name is not sent");
+			throw new InvalidInputException("Name is not sent");
+		}
+		if(oldAmount == null || oldAmount.isEmpty()){
+			LOG.error("oldAmount is not sent");
+			throw new InvalidInputException("oldAmount is not sent");
+		}
+		if(revisedAmount == null || revisedAmount.isEmpty()){
+			LOG.error("revisedAmount is not sent");
+			throw new InvalidInputException("revisedAmount is not sent");
+		}
+		if(numOfUsers == null || numOfUsers.isEmpty()){
+			LOG.error("numOfUsers is not sent");
+			throw new InvalidInputException("numOfUsers is not sent");
+		}
+		LOG.info("Sending subscription revision email to : " + recipientMailId);
+
+		EmailEntity emailEntity = prepareEmailEntityForSendingEmail(recipientMailId);
+
+		String subjectFileName = EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER + EmailTemplateConstants.SUBSCRIPTION_PRICE_UPDATED_MAIL_SUBJECT;
+
+		FileContentReplacements messageBodyReplacements = new FileContentReplacements();
+		messageBodyReplacements.setFileName(EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER + EmailTemplateConstants.SUBSCRIPTION_PRICE_UPDATED_MAIL_BODY);
+
+		messageBodyReplacements.setReplacementArgs(Arrays.asList(name, numOfUsers, oldAmount, revisedAmount));
+
+		LOG.debug("Calling email sender to send mail");
+		emailSender.sendEmailWithBodyReplacements(emailEntity, subjectFileName, messageBodyReplacements);
+
+		LOG.info("Successfully sent subscription revised mail");
+	}
 
 }
 // JIRA: SS-7: By RM02: EOC

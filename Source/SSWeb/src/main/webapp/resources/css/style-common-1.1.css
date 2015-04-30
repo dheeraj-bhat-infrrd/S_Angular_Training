@@ -370,8 +370,7 @@ a, a:hover, a:visited{
     position: relative;
     width: 600px;
     height: 70px;
-
-    background-color: rgba(0, 159, 224, 0.8);
+	/* background-color: rgba(0, 159, 224, 0.8); */
     color: #fff;
     padding: 15px;
 }
@@ -620,8 +619,8 @@ input#find-pro-submit{
 .blue-ext-right {
     position: absolute;
     width: 1500px;
-    /* height: 70px; */
-    /* background-color: rgba(0, 159, 224, 0.8); */
+    height: 70px;
+    background-color: rgba(0, 159, 224, 0.8);
     top: 0;
     left: 0;
     /* z-index: 9; */
@@ -885,6 +884,15 @@ span.txt-highlight {
     cursor: pointer;
 }
 
+.wc-sub-send-btn {
+    width: 140px;
+    text-align: center;
+    border-radius: 3px;
+    color: #fff;
+    background: #009FE0;
+    cursor: pointer;
+}
+
 .wl-import-btn:hover, .wc-sub-btn:hover{
     background: #7AB400;
 }
@@ -1033,7 +1041,7 @@ textarea.wc-about-prof-txt {
     width: 150px;
     height: 150px;
     border: 1px dashed #dcdcdc;
-    background: #F9F9FB;
+    /* background: #F9F9FB; */
 }
 
 .wc-linkedin-photo-txt {
