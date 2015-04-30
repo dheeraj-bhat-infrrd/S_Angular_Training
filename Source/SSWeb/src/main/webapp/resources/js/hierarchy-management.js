@@ -1330,3 +1330,30 @@ function deleteBranchCallBack(data,branchId) {
 	$("#tr-branch-row-"+branchId).hide();
 	$("#tr-branch-row-"+branchId).next(".tr-branch-edit").hide();
 }
+
+function resendVerificationMail(){
+	$.ajax({
+		url : "./sendverificationmail.do",
+		type : "GET",
+		dataType : "text",
+		success : function(data) {
+			if (data.errCode == undefined){
+				$('#overlay-toast').html(data);
+				showToast();
+				hideError();
+				hideInfo();
+			}
+			else {
+				$('#overlay-toast').html(data);
+				showToast();
+				hideError();
+				hideInfo();
+			}
+		},
+		error : function(e) {
+			console.error("error : " + e.responseText);
+			$('#overlay-toast').html(e.responseText);
+			showToast();
+		}
+	});
+}
