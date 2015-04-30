@@ -93,7 +93,7 @@ public class HierarchyManagementController {
 					LOG.error("Inactive or unauthorized users can not access build hierarchy page");
 					isUserAuthorized = false;
 					model.addAttribute("message", messageUtils.getDisplayMessage(DisplayMessageConstants.HIERARCHY_MANAGEMENT_NOT_AUTHORIZED,
-							DisplayMessageType.ERROR_MESSAGE));
+							DisplayMessageType.ERROR_MESSAGE, "javascript:resendVerificationMail()"));
 				}
 				LOG.debug("Calling service for checking the if the region addition is allowed");
 				isRegionAdditionAllowed = organizationManagementService.isRegionAdditionAllowed(user, accountType);

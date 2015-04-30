@@ -19,6 +19,7 @@ public interface JspResolver {
 	public static final String INDEX = "index";
 	public static final String MESSAGE_HEADER = "messageheader";
 	public static final String ERROR_PAGE = "errorpage500";
+	public static final String NOT_FOUND_PAGE = "errorpage404";
 	public static final String LOGIN = "login";
 	public static final String PROFILE_LIST = "proList";
 	public static final String PROFILE_PAGE = "profile";
