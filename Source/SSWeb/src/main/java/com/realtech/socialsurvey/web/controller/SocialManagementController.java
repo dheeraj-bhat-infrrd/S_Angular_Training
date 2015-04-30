@@ -985,7 +985,7 @@ public class SocialManagementController {
 	}
 	
 	@RequestMapping(value = "/linkedindataimport")
-	public String linkedInDataImport(Model model, HttpServletRequest request) {
+	public String linkedInDataImport() {
 		LOG.info("Method linkedInDataImport() called from SocialManagementController");
 		return JspResolver.LINKEDIN_IMPORT;
 	}
@@ -1005,5 +1005,11 @@ public class SocialManagementController {
 		
 		LOG.info("Method finalizeProfileImage() finished from SocialManagementController");
 		return CommonConstants.SUCCESS_ATTRIBUTE;
+	}
+	
+	@RequestMapping(value = "/sendsurveyinvitation")
+	public String sendSurveyInvite() {
+		LOG.info("Method sendSurveyInvite() called from SocialManagementController");
+		return JspResolver.HEADER_SURVEY_INVITE;
 	}
 }

@@ -2,6 +2,8 @@
 <%@ taglib prefix="spring" uri="http://www.springframework.org/tags"%>
 <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions"%>
 
+<c:set value="${sessionScope.SPRING_SECURITY_CONTEXT.authentication.principal}" var="user" />
+<c:set value="${user.company.licenseDetails[0].accountsMaster.accountsMasterId}" var="accountMasterId"/>
 <c:if test="${not empty profile}">
 	<c:set value="${profile.profilesMaster.profileId}" var="profilemasterid"></c:set>
 </c:if>
@@ -34,7 +36,7 @@
 	<div class="container">
 
 		<!-- Starting code for Encompass details -->
-		<c:if test="${profilemasterid == 1}">
+		<c:if test="${profilemasterid == 1 || accountMasterId == 1}">
 			<form id="encompass-form">
 				<div class="um-top-container">
 					<div class="um-header"><spring:message code="label.header.encompass.configuration.key" /></div>
@@ -96,7 +98,7 @@
 		</c:if>
 		
 		<!-- Starting code for Autopost Score -->
-		<c:if test="${profilemasterid == 1}">
+		<c:if test="${profilemasterid == 1 || accountMasterId == 1}">
 			<div class="um-top-container">
 				<div class="um-header margin-top-25"><spring:message code="label.scorepost.key" /></div>
 				<div class="clearfix st-score-wrapper">
@@ -136,7 +138,7 @@
 		</c:if>
 		
 		<!-- Starting code for Text for Happy/Neutral/Sad flow -->
-		<c:if test="${profilemasterid == 1}">
+		<c:if test="${profilemasterid == 1 || accountMasterId == 1}">
 			<div class="um-top-container">
 				<div class="um-header  margin-top-25"><spring:message code="label.flow.text.key" /></div>
 				<div class="clearfix um-panel-content">
@@ -181,7 +183,7 @@
 		</div>
 		
 		<!-- Starting code for Mail text -->
-		<c:if test="${profilemasterid == 1}">
+		<c:if test="${profilemasterid == 1 || accountMasterId == 1}">
 			<div class="um-top-container">
 				<form id="mail-body-settings-form">
 					<input type="hidden" name="mailcategory" id="mailcategory">
@@ -246,7 +248,7 @@
 		</c:if>
 		
 		<!-- Starting code for Other settings -->
-		<c:if test="${profilemasterid == 1}">
+		<c:if test="${profilemasterid == 1 || accountMasterId == 1}">
 			<div class="um-top-container border-0">
 				<div class="um-header margin-top-25"><spring:message code="label.othersettings.key" /></div>
 				<form id="other-settings-form">
@@ -314,7 +316,8 @@ $(document).ready(function(){
 	$(document).attr("title", "Edit Settings");
 	
 	var profileMasterId = "${profilemasterid}";
-	if (profileMasterId == 1) {
+	var accountMasterId = "${accountMasterId}";
+	if (profileMasterId == 1 || accountMasterId == 1) {
 		$('#survey-participation-mailcontent').ckeditor();
 		$('#survey-participation-mailcontent').ckeditorGet().config.readOnly = true;
 		

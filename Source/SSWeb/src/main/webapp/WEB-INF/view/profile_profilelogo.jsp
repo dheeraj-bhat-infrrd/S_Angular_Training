@@ -22,6 +22,11 @@
 					<input type="file" id="prof-logo" class="con_img_inp_file">
 				</form>
 			</c:when>
+			<c:when test="${accountMasterId == 1 || accountMasterId == 5}">
+				<form class="form_contact_image" enctype="multipart/form-data">
+					<input type="file" id="prof-logo" class="con_img_inp_file">
+				</form>
+			</c:when>
 			<c:when	test="${not parentLock.isLogoLocked && not lock.isLogoLocked && profilemasterid != 4}">
 				<div id="prof-logo-lock" data-state="unlocked" data-control="user" class="prof-img-lock-item prof-img-lock"></div>
 				<form class="form_contact_image" enctype="multipart/form-data">
