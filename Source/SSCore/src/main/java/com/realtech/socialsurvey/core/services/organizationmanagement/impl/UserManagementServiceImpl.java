@@ -393,7 +393,6 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 	@Transactional
 	@Override
 	public void removeExistingUser(User admin, long userIdToRemove) throws InvalidInputException {
-
 		if (admin == null) {
 			throw new InvalidInputException("Admin user is null in deactivateExistingUser");
 		}
@@ -402,11 +401,8 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 		}
 
 		LOG.info("Method to deactivate user " + userIdToRemove + " called.");
-
 		User userToBeDeactivated = userDao.findById(User.class, userIdToRemove);
-
 		userToBeDeactivated.setLoginName(userToBeDeactivated.getLoginName() + "_" + System.currentTimeMillis());
-
 		userToBeDeactivated.setStatus(CommonConstants.STATUS_INACTIVE);
 		userToBeDeactivated.setModifiedBy(String.valueOf(admin.getUserId()));
 		userToBeDeactivated.setModifiedOn(new Timestamp(System.currentTimeMillis()));
@@ -1867,7 +1863,9 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 		else if (admin.getIsOwner() != CommonConstants.IS_OWNER && admin.isRegionAdmin()) {
 			for (UserFromSearch user : users) {
 				boolean hasCommon = Collections.disjoint(adminFromSearch.getRegions(), user.getRegions());
-				user.setCanEdit(!hasCommon);
+				if (user.getIsOwner() != 1) {
+					user.setCanEdit(!hasCommon);
+				}
 			}
 		}
 		/**
@@ -1876,7 +1874,9 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 		else if (admin.getIsOwner() != CommonConstants.IS_OWNER && admin.isBranchAdmin()) {
 			for (UserFromSearch user : users) {
 				boolean hasCommon = Collections.disjoint(adminFromSearch.getBranches(), user.getBranches());
-				user.setCanEdit(!hasCommon);
+				if (user.getIsOwner() != 1) {
+					user.setCanEdit(!hasCommon);
+				}
 			}
 		}
 		LOG.info("Method checkUserCanEdit executed successfully");

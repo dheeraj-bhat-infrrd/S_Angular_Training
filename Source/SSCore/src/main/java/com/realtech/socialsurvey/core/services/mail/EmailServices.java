@@ -208,4 +208,22 @@ public interface EmailServices {
 	 * @throws UndeliveredEmailException 
 	 */
 	public void sendAccountReactivationMail(String recipientMailId, String displayName) throws InvalidInputException, UndeliveredEmailException;
+	
+	/**
+	 * Sends a subscription revision mail to the user
+	 * @param recipientMailId
+	 * @param name
+	 * @param oldAmount
+	 * @param revisedAmount
+	 * @param numOfUsers
+	 * @throws InvalidInputException
+	 * @throws UndeliveredEmailException
+	 */
+	public void sendSubscriptionRevisionMail(String recipientMailId, String name, String oldAmount, String revisedAmount, String numOfUsers) throws InvalidInputException, UndeliveredEmailException;
+
+	public void sendDefaultSurveyInvitationMailByCustomer(String recipientMailId, String displayName, String agentName, String link, String agentEmailId)
+			throws InvalidInputException, UndeliveredEmailException;
+
+	public void sendSurveyInvitationMailByCustomer(String recipientMailId, String subject, String mailBody, String emailId, String name)
+			throws InvalidInputException, UndeliveredEmailException;
 }

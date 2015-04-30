@@ -261,7 +261,8 @@ public interface CommonConstants {
 	public static final String BRANCH_PROFILE_FIXED_URL = "pages";
 	public static final String REGION_PROFILE_FIXED_URL = "pages";
 	public static final String COMPANY_PROFILE_FIXED_URL = "pages/company";
-	public static final String SURVEY_REQUEST_MAIL_FILENAME = "EmailTemplates/SurveyParticipationMailBody.html";
+	public static final String SURVEY_REQUEST_MAIL_FILENAME = "EmailTemplates/SurveyInvitationMailBody.html";
+	public static final String SURVEY_CUSTOMER_REQUEST_MAIL_FILENAME = "EmailTemplates/SurveyCustomerInvitationMailBody.html";
 	public static final String SURVEY_REMINDER_MAIL_FILENAME = "EmailTemplates/SurveyParticipationMailBody.html";
 	public static final float DEFAULT_AUTOPOST_SCORE = 3.5f;
 	public static final String USER_SELECTION_TYPE_SINGLE = "single";
@@ -476,4 +477,10 @@ public interface CommonConstants {
 	public static final int SUBSCRIPTION_WENT_PAST_DUE = 1;
 	public static final int SUBSCRIPTION_CHARGED_UNSUCCESSFULLY = 2;
 	public static final int SUBSCRIPTION_CHARGED_SUCCESSFULLY = 3;
+	
+	// Subscription price modification result constants
+	public static final String SUBSCRIPTION_PRICE_CHANGED = "SUBSCRIPTION_PRICE_CHANGED";
+	public static final String SUBSCRIPTION_OLD_PRICE = "SUBSCRIPTION_OLD_PRICE";
+	public static final String SUBSCRIPTION_REVISED_PRICE = "SUBSCRIPTION_REVISED_PRICE";
+	public static final String SUBSCRIPTION_REVISED_NUMOFUSERS = "SUBSCRIPTION_REVISED_NUMOFUSERS";
 }

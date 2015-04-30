@@ -117,7 +117,7 @@
 			<div class="container">
 				<div class="prof-details-header-row clearfix">
 					<div class="prof-link-header float-left clearfix">
-						<div id="prof-header-rating" class="rating-image float-left"></div>
+						<div id="prof-header-rating" class="rating-image float-left smiley-rat-5"></div>
 						<div id="prof-header-url" class="rating-image-txt float-left"></div>
 					</div>
 					<div id="web-addr-header" class="web-addr-header float-left clearfix hide">
@@ -138,7 +138,7 @@
 		
 		<div class="container">
 			<div class="row margin-top-10">
-            <div class="prof-left-panel-wrapper margin-top-25 col-lg-4 col-md-4 col-sm-4 col-xs-12">
+            <div class="prof-left-panel-wrapper col-lg-4 col-md-4 col-sm-4 col-xs-12">
                 
                 <!-- <div class="prof-left-row prof-left-info bord-bot-dc">
                     <div class="left-contact-wrapper">

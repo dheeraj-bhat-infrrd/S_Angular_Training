@@ -43,14 +43,10 @@
 			<div id="company" class="dsh-txt-3">${company}</div>
 		</div>
 		<div id="pro-cmplt-stars" class="dsh-star-wrapper clearfix">
-			<div class="float-left dsh-star-item no-star"></div>
-			<div class="float-left dsh-star-item no-star"></div>
-			<div class="float-left dsh-star-item no-star"></div>
-			<div class="float-left dsh-star-item no-star"></div>
-			<div class="float-left dsh-star-item no-star"></div>
-			<div id="profile-completed" class="float-right dsh-rating-item">${fn:substringBefore(profileCompleteness * 5 / 100, '.')}/5</div>
+			<div class="float-left dsh-star-item"></div>
+			<div id="profile-completed" class="float-left dsh-rating-item">${fn:substringBefore(profileCompleteness * 5 / 100, '.')}/5</div>
+			<div class="dsh-btn-complete float-left" onclick="showMainContent('./showprofilepage.do')"><spring:message code="label.sendsurvey.btn.key" /></div>
 		</div>
-		<div class="dsh-btn-complete" onclick="showMainContent('./showprofilepage.do')"><spring:message code="label.complete.profile.key" /></div>
 	</div>
 </div>
 
@@ -118,13 +114,27 @@ $(document).ready(function() {
 	
 	// Change rating pattern
 	var starVal = profileCompleted * 5 / 100;
-	$("#pro-cmplt-stars").find('.dsh-star-item').removeClass('sq-full-star');
-	$("#pro-cmplt-stars").find('.dsh-star-item').each(function(index) {
+	
+	var ratingIntVal = 0;
+	
+
+	if (ratingIntVal % 1 == 0) {
+		ratingIntVal = parseInt(starVal);
+	} else {
+		ratingIntVal = parseInt(starVal) + 1;
+	}
+
+	if (ratingIntVal == 0) {
+		ratingIntVal = 1;
+	}
+	
+	$("#pro-cmplt-stars").find('.dsh-star-item').addClass('smiley-bg-rat-'+ratingIntVal);
+	/* $("#pro-cmplt-stars").find('.dsh-star-item').each(function(index) {
 		if (index < starVal) {
 			$(this).removeClass('no-star');
 			$(this).addClass('sq-full-star');
 		}
-	});
+	}); */
 	
 	$('#srv-scr').click(function(){
 		showSurveyRequestPage();

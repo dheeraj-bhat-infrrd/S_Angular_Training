@@ -29,6 +29,7 @@ import com.realtech.socialsurvey.core.entities.SurveyDetails;
 import com.realtech.socialsurvey.core.entities.SurveyQuestionDetails;
 import com.realtech.socialsurvey.core.entities.SurveyResponse;
 import com.realtech.socialsurvey.core.entities.SurveySettings;
+import com.realtech.socialsurvey.core.entities.User;
 import com.realtech.socialsurvey.core.enums.DisplayMessageType;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.exception.NoRecordsFetchedException;
@@ -255,7 +256,6 @@ public class SurveyManagementController {
 	@RequestMapping(value = "/triggersurvey")
 	public String triggerSurvey(Model model, HttpServletRequest request) {
 		LOG.info("Method to store initial details of customer and agent and to get questions of survey, triggerSurvey() started.");
-		Map<String, Object> surveyAndStage = new HashMap<>();
 		try {
 			long agentId = 0;
 			String customerEmail;
@@ -264,7 +264,6 @@ public class SurveyManagementController {
 			String captchaResponse;
 			String challengeField;
 			String custRelationWithAgent;
-			String url;
 			try {
 				String user = request.getParameter(CommonConstants.AGENT_ID_COLUMN);
 				agentId = Long.parseLong(user);
@@ -274,7 +273,6 @@ public class SurveyManagementController {
 				captchaResponse = request.getParameter("captchaResponse");
 				challengeField = request.getParameter("recaptcha_challenge_field");
 				custRelationWithAgent = request.getParameter("relationship");
-				url = getApplicationBaseUrl() + "rest/survey/showsurveypageforurl";
 			}
 			catch (NumberFormatException e) {
 				LOG.error("NumberFormatException caught in triggerSurvey(). Details are " + e);
@@ -289,18 +287,19 @@ public class SurveyManagementController {
 				throw new InvalidInputException(errorMsg, DisplayMessageConstants.INVALID_CAPTCHA);
 
 			}
-			surveyAndStage = getSurvey(agentId, customerEmail, firstName, lastName, 0, custRelationWithAgent, url);
+			User user = userManagementService.getUserByUserId(agentId);
+			surveyHandler.sendSurveyInvitationMail(firstName, lastName, customerEmail, custRelationWithAgent, user, false);
 		}
 		catch (NonFatalException e) {
 			LOG.error("Exception caught in getSurvey() method of SurveyManagementController.");
-			ErrorResponse errorResponse = new ErrorResponse();
+			/*ErrorResponse errorResponse = new ErrorResponse();
 			errorResponse.setErrCode(ErrorCodes.REQUEST_FAILED);
 			errorResponse.setErrMessage(e.getMessage());
-			String errorMessage = new Gson().toJson(errorResponse);
-			return errorMessage;
+			String errorMessage = new Gson().toJson(errorResponse);*/
+			return "Something went wrong while sending survey link. Please try again later.";
 		}
 		LOG.info("Method to store initial details of customer and agent and to get questions of survey, triggerSurvey() started.");
-		return new Gson().toJson(surveyAndStage);
+		return "Link to take survey has been sent on your email id successfully.";
 	}
 
 	@ResponseBody
