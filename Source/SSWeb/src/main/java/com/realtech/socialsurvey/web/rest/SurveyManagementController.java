@@ -732,6 +732,11 @@ public class SurveyManagementController {
 		}
 	}
 
+	@RequestMapping(value = "/notfound")
+	public String showNotFoundPage(HttpServletRequest request) {
+		return JspResolver.NOT_FOUND_PAGE;
+	}	
+	
 	private SurveyDetails storeInitialSurveyDetails(long agentId, String customerEmail, String firstName, String lastName, int reminderCount,
 			String custRelationWithAgent, String url) throws SolrException, NoRecordsFetchedException, InvalidInputException {
 		return surveyHandler.storeInitialSurveyDetails(agentId, customerEmail, firstName, lastName, reminderCount, custRelationWithAgent, url);
