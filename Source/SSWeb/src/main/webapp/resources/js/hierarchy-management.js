@@ -1334,7 +1334,7 @@ function deleteBranchCallBack(data,branchId) {
 function resendVerificationMail(){
 	$.ajax({
 		url : "./sendverificationmail.do",
-		type : "POST",
+		type : "GET",
 		dataType : "text",
 		success : function(data) {
 			if (data.errCode == undefined){
