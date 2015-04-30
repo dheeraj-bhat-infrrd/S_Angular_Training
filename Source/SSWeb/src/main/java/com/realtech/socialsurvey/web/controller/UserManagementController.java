@@ -476,9 +476,11 @@ public class UserManagementController {
 			}
 
 			try {
-				userManagementService.removeExistingUser(user, userIdToRemove);
-				// update the user count modificaiton notification
-				userManagementService.updateUserCountModificationNotification(user.getCompany());
+				if (!user.isCompanyAdmin()) {
+					userManagementService.removeExistingUser(user, userIdToRemove);
+					// update the user count modificaiton notification
+					userManagementService.updateUserCountModificationNotification(user.getCompany());
+				}
 			}
 			catch (InvalidInputException e) {
 				throw new InvalidInputException(e.getMessage(), DisplayMessageConstants.REGISTRATION_INVITE_GENERAL_ERROR, e);
