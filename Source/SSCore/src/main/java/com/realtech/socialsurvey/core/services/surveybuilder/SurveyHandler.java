@@ -3,8 +3,10 @@ package com.realtech.socialsurvey.core.services.surveybuilder;
 import java.util.List;
 import org.apache.solr.client.solrj.SolrServerException;
 import com.realtech.socialsurvey.core.entities.SurveyDetails;
+import com.realtech.socialsurvey.core.entities.User;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.exception.NoRecordsFetchedException;
+import com.realtech.socialsurvey.core.services.mail.UndeliveredEmailException;
 import com.realtech.socialsurvey.core.services.search.exception.SolrException;
 
 public interface SurveyHandler {
@@ -72,4 +74,7 @@ public interface SurveyHandler {
 	public String getSurveyUrl(long agentId, String customerEmail, String baseUrl) throws InvalidInputException;
 
 	public void changeStatusOfSurvey(long agentId, String customerEmail, boolean editable);
+
+	public void sendSurveyInvitationMail(String custFirstName, String custLastName, String custEmail, String custRelationWithAgent, User user,
+			boolean isAgent) throws InvalidInputException, SolrException, NoRecordsFetchedException, UndeliveredEmailException;
 }

@@ -476,7 +476,11 @@ public class UserManagementController {
 			}
 
 			try {
-				userManagementService.removeExistingUser(user, userIdToRemove);
+				if (!user.isCompanyAdmin()) {
+					userManagementService.removeExistingUser(user, userIdToRemove);
+					// update the user count modificaiton notification
+					userManagementService.updateUserCountModificationNotification(user.getCompany());
+				}
 			}
 			catch (InvalidInputException e) {
 				throw new InvalidInputException(e.getMessage(), DisplayMessageConstants.REGISTRATION_INVITE_GENERAL_ERROR, e);
@@ -970,6 +974,8 @@ public class UserManagementController {
 				LOG.info("Fetching the user's canonical settings and setting it in session");
 				sessionHelper.getCanonicalSettings(session);
 				sessionHelper.setSettingVariablesInSession(session);
+				LOG.debug("Updating user count modification notification");
+				userManagementService.updateUserCountModificationNotification(user.getCompany());
 			}
 			else {
 				// TODO: add logic for what happens when no user profile present
@@ -977,14 +983,22 @@ public class UserManagementController {
 			
 			// updating session with selected user profile if not set
 			LOG.debug("Updating session with selected user profile if not set");
+			boolean showLinkedInPopup = false;
+			boolean showSendSurveyPopup = false;
 			Map<Long, UserProfile> profileMap = new HashMap<Long, UserProfile>();
 			UserProfile selectedProfile = user.getUserProfiles().get(CommonConstants.INITIAL_INDEX);
 			for (UserProfile profile : user.getUserProfiles()) {
 				if (profile.getProfilesMaster().getProfileId() == CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID) {
 					selectedProfile = profile;
+
+					// setting linkedin popup attribute
+					showLinkedInPopup = true;
+					showSendSurveyPopup = true;
 					break;
 				}
 			}
+			model.addAttribute("showLinkedInPopup", String.valueOf(showLinkedInPopup));
+			model.addAttribute("showSendSurveyPopup", String.valueOf(showSendSurveyPopup));
 			session.setAttribute(CommonConstants.USER_PROFILE, selectedProfile);
 			
 			// updating session with aggregated user profiles, if not set
@@ -995,6 +1009,9 @@ public class UserManagementController {
 				session.setAttribute(CommonConstants.PROFILE_NAME_COLUMN, profileAbridgedMap.get(selectedProfile.getUserProfileId()).getUserProfileName());
 			}
 			session.setAttribute(CommonConstants.USER_PROFILE_MAP, profileMap);
+			
+			// update the last login time and number of logins
+			userManagementService.updateUserLoginTimeAndNum(user);
 		}
 		catch (NonFatalException e) {
 			LOG.error("NonFatalException while setting new Password. Reason : " + e.getMessage(), e);
