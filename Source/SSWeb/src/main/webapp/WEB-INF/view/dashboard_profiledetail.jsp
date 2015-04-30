@@ -1,5 +1,10 @@
 <%@ taglib prefix="spring" uri="http://www.springframework.org/tags"%>
 <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions"%>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+
+<c:if test="${not empty profile}">
+	<c:set value="${profile.profilesMaster.profileId}" var="profilemasterid"></c:set>
+</c:if>
 
 <div class="float-right dash-main-right col-lg-6 col-md-6 col-sm-6 col-xs-12">
 	<div class="dsh-graph-wrapper">
@@ -45,7 +50,14 @@
 		<div id="pro-cmplt-stars" class="dsh-star-wrapper clearfix">
 			<div class="float-left dsh-star-item"></div>
 			<div id="profile-completed" class="float-left dsh-rating-item">${fn:substringBefore(profileCompleteness * 5 / 100, '.')}/5</div>
-			<div class="dsh-btn-complete float-left" onclick="showMainContent('./showprofilepage.do')"><spring:message code="label.sendsurvey.btn.key" /></div>
+			<c:choose>
+				<c:when test="${profilemasterid == 4}">
+					<div class="dsh-btn-complete float-left" onclick="sendSurveyInvitation();"><spring:message code="label.sendsurvey.btn.key" /></div>
+				</c:when>
+				<c:otherwise>
+					<div class="dsh-btn-complete float-left" onclick="showMainContent('./showprofilepage.do');"><spring:message code="label.complete.profile.key" /></div>
+				</c:otherwise>
+			</c:choose>
 		</div>
 	</div>
 </div>
