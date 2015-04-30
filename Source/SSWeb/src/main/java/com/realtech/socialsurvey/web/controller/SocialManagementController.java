@@ -249,9 +249,6 @@ public class SocialManagementController {
 				LOG.error("Error while creating access token for facebook: " + e.getLocalizedMessage(), e);
 			}
 
-			// TODO fetch profile url
-			
-			
 			// Storing token
 			SocialMediaTokens mediaTokens;
 			int profilesMaster = selectedProfile.getProfilesMaster().getProfileId();
@@ -582,7 +579,6 @@ public class SocialManagementController {
 				mediaTokens = updateLinkedInToken(accessToken, mediaTokens);
 				mediaTokens = socialManagementService.updateAgentSocialMediaTokens(agentSettings, mediaTokens);
 				agentSettings.setSocialMediaTokens(mediaTokens);
-				userSettings.setAgentSettings(agentSettings);
 
 				String socialFlow = (String) session.getAttribute(CommonConstants.SOCIAL_FLOW);
 				if (socialFlow != null && socialFlow.equalsIgnoreCase(CommonConstants.FLOW_REGISTRATION)) {
@@ -595,6 +591,8 @@ public class SocialManagementController {
 					socialAsyncService.linkedInDataUpdateAsync(MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION, agentSettings,
 							mediaTokens.getLinkedInToken());
 				}
+
+				userSettings.setAgentSettings(agentSettings);
 			}
 			else {
 				throw new InvalidInputException("Invalid input exception occurred while creating access token for linkedin", DisplayMessageConstants.GENERAL_ERROR);
@@ -984,5 +982,28 @@ public class SocialManagementController {
 		
 		LOG.info("Method to get Google details, getGooglePlusLink() finished.");
 		return new Gson().toJson(googleUrl);
+	}
+	
+	@RequestMapping(value = "/linkedindataimport")
+	public String linkedInDataImport(Model model, HttpServletRequest request) {
+		LOG.info("Method linkedInDataImport() called from SocialManagementController");
+		return JspResolver.LINKEDIN_IMPORT;
+	}
+	
+	@ResponseBody
+	@RequestMapping(value = "/finalizeprofileimage")
+	public String finalizeProfileImage(Model model, HttpServletRequest request) {
+		LOG.info("Method finalizeProfileImage() called from SocialManagementController");
+		HttpSession session = request.getSession(false);
+		UserSettings userSettings = (UserSettings) session.getAttribute(CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION);
+		UserProfile selectedProfile = (UserProfile) session.getAttribute(CommonConstants.USER_PROFILE);
+		
+		if (selectedProfile != null) {
+			AgentSettings agentSettings = userSettings.getAgentSettings();
+			socialAsyncService.updateLinkedInProfileImage(MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION, agentSettings);
+		}
+		
+		LOG.info("Method finalizeProfileImage() finished from SocialManagementController");
+		return CommonConstants.SUCCESS_ATTRIBUTE;
 	}
 }

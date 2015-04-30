@@ -4,7 +4,7 @@ var startIndex = 0;
 var numOfRows = 3;
 var minScore=0;
 var publicPostStartIndex = 0;
-var publicPostNumRows = 3;
+var publicPostNumRows = 4;
 var currentProfileName;
 var doStopPublicPostPagination = false;
 var monthNames = [ "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug",
@@ -211,7 +211,7 @@ function paintProfilePage(result) {
         		}
             }
             if(contactDetails.about_me != undefined) {
-            	var companyIntroHtml = '<div class="main-con-header mgn-top-10m">About '+ contactDetails.name+'</div>';
+            	var companyIntroHtml = '<div class="main-con-header">About '+ contactDetails.name+'</div>';
             	companyIntroHtml = companyIntroHtml + '<div class="pe-whitespace intro-body">'+contactDetails.about_me+'</div>';
             	 $("#prof-company-intro").html(companyIntroHtml).show();
             }
@@ -602,6 +602,7 @@ function fetchReviewsForCompanyCallBack(data) {
 function paintReviews(result){
 	var reviewsHtml = "";
 	var resultSize = result.length;
+	$('.ppl-review-item-last').removeClass('ppl-review-item-last').addClass('ppl-review-item');
 	$.each(result, function(i, reviewItem) {
 		var date = Date.parse(reviewItem.updatedOn);
 		var lastItemClass = "ppl-review-item";

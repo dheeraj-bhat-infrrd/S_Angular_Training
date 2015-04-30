@@ -70,7 +70,7 @@
 					<div class="float-left user-info-logo" style="background: url(${displaylogo}) no-repeat center; background-size: 100% auto;"></div>
 				</c:if>
 			</div>
-			<div id="header-menu-icn" class="header-menu-icn icn-menu hide float-right"></div>
+			<!-- <div id="header-menu-icn" class="header-menu-icn icn-menu hide float-right"></div> -->
 		</div>
 	</div>
 
@@ -352,7 +352,12 @@ $(document).ready(function() {
 	function captchaLoaded() {
 		var imgData = $(".recaptcha_image_cell").html();
 		console.log("Captcha image data : " + imgData);
-		$(".reg-captcha-img").html(imgData);
+		var challenge = Recaptcha.get_challenge('6LdlHOsSAAAAAM8ypy8W2KXvgMtY2dFsiQT3HVq-');
+		if(challenge == undefined){
+			Recaptcha.reload();
+		}else{
+			$(".reg-captcha-img").html(imgData);
+		}
 	}
 
 	$(".reg-cap-reload").click(function() {

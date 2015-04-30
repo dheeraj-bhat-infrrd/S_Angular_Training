@@ -10,4 +10,6 @@ public interface SocialAsyncService {
 			LinkedInToken linkedInToken);
 
 	public OrganizationUnitSettings linkedInDataUpdate(String collection, OrganizationUnitSettings unitSettings, LinkedInToken linkedInToken);
+
+	public OrganizationUnitSettings updateLinkedInProfileImage(String collection, OrganizationUnitSettings unitSettings);
 }

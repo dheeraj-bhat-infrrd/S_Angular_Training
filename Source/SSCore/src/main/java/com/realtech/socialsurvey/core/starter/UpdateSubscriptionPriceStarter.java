@@ -30,7 +30,9 @@ public class UpdateSubscriptionPriceStarter {
 					batch.processChargeOnSubscription(userModificationRecord);
 				}
 				catch (NonFatalException e) {
-					LOG.error("Could not process subscription for "+userModificationRecord.getCompany());
+					LOG.error("Could not process subscription for "+userModificationRecord.getCompany(), e);
+				}catch (Exception e) {
+					LOG.error("Could not process subscription for "+userModificationRecord.getCompany(), e);
 				}
 			}
 		}else{
