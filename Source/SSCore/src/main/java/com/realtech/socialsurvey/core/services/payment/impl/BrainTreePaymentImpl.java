@@ -182,7 +182,9 @@ public class BrainTreePaymentImpl implements Payment, InitializingBean {
 	 * @param userId
 	 * @throws InvalidInputException
 	 */
-	private void insertIntoLicenseTable(int accountsMasterId, User user, String subscriptionId) throws InvalidInputException {
+	@Transactional
+	@Override
+	public void insertIntoLicenseTable(int accountsMasterId, User user, String subscriptionId) throws InvalidInputException {
 
 		if (accountsMasterId <= 0) {
 			LOG.error("updateLicenseTable : accountsMasterId parameter is invalid");
@@ -227,7 +229,7 @@ public class BrainTreePaymentImpl implements Payment, InitializingBean {
 		licenseDetail.setModifiedBy(String.valueOf(user.getUserId()));
 		licenseDetail.setCreatedOn(new Timestamp(System.currentTimeMillis()));
 		licenseDetail.setModifiedOn(new Timestamp(System.currentTimeMillis()));
-		licenseDetail.setPaymentMode(CommonConstants.AUTO_PAYMENT_MODE);
+		licenseDetail.setPaymentMode(user.getCompany().getBillingMode());
 		licenseDetail.setNextRetryTime(new Timestamp(CommonConstants.EPOCH_TIME_IN_MILLIS));
 		licenseDetail.setSubscriptionIdSource(CommonConstants.PAYMENT_GATEWAY);
 		licenseDetail.setStatus(CommonConstants.STATUS_ACTIVE);
