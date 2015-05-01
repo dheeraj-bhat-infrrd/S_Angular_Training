@@ -13,7 +13,7 @@
 		<div class="hm-header-row clearfix">
 			<div class="float-left hm-header-row-left"><spring:message code="label.title.settings.key" /></div>
 			<c:if test="${not empty profileList && fn:length(profileList) > 1}">
-				<div class="float-right header-right clearfix hr-dsh-adj-rt" style="z-index: 9999; margin-left: 50px;">
+				<div class="float-right header-right clearfix hr-dsh-adj-rt" style="z-index: 999; margin-left: 50px;">
 					<div class="float-left hr-txt1"><spring:message code="label.viewas.key" /></div>
 					<div id="setting-sel" class="float-left hr-txt2 cursor-pointer">${profileName}</div>
 					<div id="se-dd-wrapper-profiles" class="va-dd-wrapper hide">
