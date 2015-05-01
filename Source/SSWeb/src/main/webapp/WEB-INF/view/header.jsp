@@ -76,6 +76,11 @@
 						<a href="javascript:showMainContent('./showbuildhierarchypage.do')"><spring:message code="label.header.buildhierarchy.key" /></a>
 					</div>
 				</c:if>
+				<c:if test="${highestrole == 1 && accountMasterId != 5}">
+					<div class="header-links-item">
+						<a href="javascript:showMainContent('./showbuildsurveypage.do')"><spring:message code="label.header.buildsurvey.key" /></a>
+					</div>
+				</c:if>
 				<c:if test="${accountMasterId != 5}">
 					<div class="header-links-item">
 						<a href="javascript:showMainContent('./showcompanysettings.do')"><spring:message code="label.editsettings.key" /></a>
