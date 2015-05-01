@@ -325,7 +325,7 @@ function bindAssignToSelectorClick(){
  */
 function bindAdminCheckBoxClick(){
 	$('.bd-check-img').click(function(e) {
-		 $(this).toggleClass('bd-check-img-checked');
+		/* $(this).toggleClass('bd-check-img-checked');*/
 		/**
 		 * If class is "bd-check-img-checked", check box is unchecked ,
 		 * hence setting the hidden value as false
