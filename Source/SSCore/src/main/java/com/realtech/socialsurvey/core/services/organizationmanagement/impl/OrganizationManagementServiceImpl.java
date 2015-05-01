@@ -386,8 +386,10 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 		// Setting default values for mail content in Mail content settings of company settings.
 		String takeSurveyMail = "";
 		String takeSurveyReminderMail = "";
+		String takeSurveyByCustomerMail = "";
 		try {
 			takeSurveyMail = readMailContentFromFile(CommonConstants.SURVEY_REQUEST_MAIL_FILENAME);
+			takeSurveyByCustomerMail = readMailContentFromFile(CommonConstants.SURVEY_CUSTOMER_REQUEST_MAIL_FILENAME);
 			takeSurveyReminderMail = readMailContentFromFile(CommonConstants.SURVEY_REMINDER_MAIL_FILENAME);
 		}
 		catch (IOException e) {
@@ -399,6 +401,8 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 		mailContentSettings.setTake_survey_mail(mailContent);
 		mailContent.setMail_body(takeSurveyReminderMail);
 		mailContentSettings.setTake_survey_reminder_mail(mailContent);
+		mailContent.setMail_body(takeSurveyByCustomerMail);
+		mailContentSettings.setTake_survey_mail_customer(mailContent);
 		companySettings.setMail_content(mailContentSettings);;
 				
 		LOG.debug("Inserting company settings.");
