@@ -38,7 +38,6 @@ $(document).on('click', '.sq-np-item-next', function() {
  */
 function initSurvey(firstName, lastName, email, agentId, agentName,
 		captchaResponse, recaptcha_challenge_field, relationship) {
-	var success = false;
 	this.agentId = agentId;
 	this.agentName = agentName;
 	customerEmail = email;
@@ -54,25 +53,13 @@ function initSurvey(firstName, lastName, email, agentId, agentName,
 	$.ajax({
 		url : window.location.origin + surveyUrl + "triggersurvey",
 		type : "GET",
-		dataType : "JSON",
+		dataType : "TEXT",
 		data : payload,
-		success : function(data) {
-			if (data.errCode == undefined)
-				success = true;
-			else {
-				/*$("div[data-ques-type]").hide();
-				$("div[data-ques-type='error']").show();
-				$('#content').html(data.errMessage);*/
-				
-				$('#overlay-toast').html(data.errMessage);
-				$("#recaptcha_reload").click();
-				showToast();
-			}
-		},
-		complete : function(data) {
-			if (success) {
-				paintSurveyPage(data);
-			}
+		success : function(data) {			
+			$('#overlay-toast').html(data);
+			$("#recaptcha_reload").click();
+			showToast();
+			clearForm();
 		},
 		error : function(e) {
 			console.error("error : " + e.responseText);
@@ -574,6 +561,13 @@ function increaseOpacityOfSmiles(value){
 				$(this).removeClass('opacity-red');
 			}
 	});
+}
+
+function clearForm(){
+	$('#firstName').val('');
+	$('#lastName').val('');
+	$('#email').val('');
+	$('#captcha-text').val('');
 }
 
 // Starting click events.
