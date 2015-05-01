@@ -20,7 +20,7 @@ public class UserLoginHandler extends SavedRequestAwareAuthenticationSuccessHand
 			ServletException {
 		LOG.info("Inside onAuthenticationSuccess controller");
 		String isDirectRegistration = request.getParameter("j_isDirectRegistration");
-		LOG.debug("isDirectRegistration in UserLoginHandler is "+isDirectRegistration);
+		LOG.debug("isDirectRegistration in UserLoginHandler is " + isDirectRegistration);
 		HttpSession session = request.getSession(false);
 		String redirectTo = null;
 
@@ -34,9 +34,9 @@ public class UserLoginHandler extends SavedRequestAwareAuthenticationSuccessHand
 			LOG.info("Url Check: " + redirectTo);
 		}
 		else {
-			redirectTo = "./"+JspResolver.USER_LOGIN+".do";
-			if(isDirectRegistration.equalsIgnoreCase("false")){
-				redirectTo = redirectTo+"?bm=I";
+			redirectTo = "./" + JspResolver.USER_LOGIN + ".do";
+			if (isDirectRegistration != null && isDirectRegistration.equalsIgnoreCase("false")) {
+				redirectTo = redirectTo + "?bm=I";
 			}
 			response.sendRedirect(redirectTo);
 			LOG.info("Final Check: " + redirectTo);
