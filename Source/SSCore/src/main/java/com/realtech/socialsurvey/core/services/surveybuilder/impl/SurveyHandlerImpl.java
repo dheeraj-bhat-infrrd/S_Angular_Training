@@ -33,6 +33,9 @@ import com.realtech.socialsurvey.core.entities.UserProfile;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.exception.NoRecordsFetchedException;
 import com.realtech.socialsurvey.core.services.generator.URLGenerator;
+import com.realtech.socialsurvey.core.services.mail.EmailServices;
+import com.realtech.socialsurvey.core.services.mail.UndeliveredEmailException;
+import com.realtech.socialsurvey.core.services.organizationmanagement.OrganizationManagementService;
 import com.realtech.socialsurvey.core.services.organizationmanagement.UserManagementService;
 import com.realtech.socialsurvey.core.services.search.SolrSearchService;
 import com.realtech.socialsurvey.core.services.search.exception.SolrException;
@@ -63,16 +66,22 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean {
 
 	@Autowired
 	private OrganizationUnitSettingsDao organizationUnitSettingsDao;
-	
+
 	@Autowired
 	private UserManagementService userManagementService;
-	
+
+	@Autowired
+	private OrganizationManagementService organizationManagementService;
+
+	@Autowired
+	private EmailServices emailServices;
+
 	@Value("${APPLICATION_BASE_URL}")
 	private String applicationBaseUrl;
-	
+
 	@Value("${MOODS_TO_SEND_MAIL}")
 	private String moodsToSendMail;
-	
+
 	@Value("${GOOGLE_SHARE_URI}")
 	private String googleShareUri;
 
@@ -133,12 +142,13 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean {
 	}
 
 	/*
-	 * Method to generate survey URL to start a survey directly based upon agentId and customer email id. 
+	 * Method to generate survey URL to start a survey directly based upon agentId and customer
+	 * email id.
 	 */
 	@Override
 	public String getSurveyUrl(long agentId, String customerEmail, String baseUrl) throws InvalidInputException {
 		Map<String, String> urlParam = new HashMap<>();
-		urlParam.put(CommonConstants.AGENT_ID_COLUMN, agentId+"");
+		urlParam.put(CommonConstants.AGENT_ID_COLUMN, agentId + "");
 		urlParam.put(CommonConstants.CUSTOMER_EMAIL_COLUMN, customerEmail);
 		return urlGenerator.generateUrl(urlParam, baseUrl);
 	}
@@ -174,7 +184,6 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean {
 		surveyDetailsDao.updateFinalScore(agentId, customerEmail);
 		LOG.info("Method to update customer review and final score on the basis of rating questions in SURVEY_DETAILS, updateCustomerAnswersInSurvey() finished.");
 	}
-
 
 	public SurveyDetails getSurveyDetails(long agentId, String customerEmail) {
 		LOG.info("Method getSurveyDetails() to return survey details by agent id and customer email started.");
@@ -250,16 +259,19 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean {
 		User agent = userDao.findById(User.class, agentId);
 		Map<String, Object> queries = new HashMap<>();
 		queries.put(CommonConstants.USER_COLUMN, agent);
-		queries.put(CommonConstants.PROFILE_MASTER_COLUMN, userManagementService.getProfilesMasterById(CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID));
+		queries.put(CommonConstants.PROFILE_MASTER_COLUMN,
+				userManagementService.getProfilesMasterById(CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID));
 		List<UserProfile> agentProfiles = userProfileDao.findByKeyValue(UserProfile.class, queries);
 		for (UserProfile agentProfile : agentProfiles) {
 			queries.clear();
 			queries.put(CommonConstants.BRANCH_ID_COLUMN, agentProfile.getBranchId());
-			queries.put(CommonConstants.PROFILE_MASTER_COLUMN, userManagementService.getProfilesMasterById(CommonConstants.PROFILES_MASTER_BRANCH_ADMIN_PROFILE_ID));
+			queries.put(CommonConstants.PROFILE_MASTER_COLUMN,
+					userManagementService.getProfilesMasterById(CommonConstants.PROFILES_MASTER_BRANCH_ADMIN_PROFILE_ID));
 			admins.addAll(userProfileDao.findByKeyValue(UserProfile.class, queries));
 			queries.clear();
 			queries.put(CommonConstants.REGION_ID_COLUMN, agentProfile.getRegionId());
-			queries.put(CommonConstants.PROFILE_MASTER_COLUMN, userManagementService.getProfilesMasterById(CommonConstants.PROFILES_MASTER_REGION_ADMIN_PROFILE_ID));
+			queries.put(CommonConstants.PROFILE_MASTER_COLUMN,
+					userManagementService.getProfilesMasterById(CommonConstants.PROFILES_MASTER_REGION_ADMIN_PROFILE_ID));
 			admins.addAll(userProfileDao.findByKeyValue(UserProfile.class, queries));
 		}
 		for (UserProfile admin : admins) {
@@ -304,7 +316,7 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean {
 	}
 
 	/*
-	 * Method to get surveys 
+	 * Method to get surveys
 	 */
 	@Override
 	public List<SurveyDetails> getIncompleteSocialPostSurveys(long companyId) {
@@ -326,23 +338,24 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean {
 				}
 			}
 		}
-		incompleteSocialPostCustomers = surveyDetailsDao.getIncompleteSocialPostCustomersEmail(companyId, surveyReminderInterval, maxReminders, autopostScore);
+		incompleteSocialPostCustomers = surveyDetailsDao.getIncompleteSocialPostCustomersEmail(companyId, surveyReminderInterval, maxReminders,
+				autopostScore);
 		LOG.info("finished.");
 		return incompleteSocialPostCustomers;
 	}
-	
+
 	@Override
-	public String getMoodsToSendMail(){
-		return 	moodsToSendMail;
+	public String getMoodsToSendMail() {
+		return moodsToSendMail;
 	}
-	
+
 	@Override
-	public String getGoogleShareUri(){
-		return 	googleShareUri;
+	public String getGoogleShareUri() {
+		return googleShareUri;
 	}
-	
+
 	@Override
-	public void increaseSurveyCountForAgent(long agentId) throws SolrException{
+	public void increaseSurveyCountForAgent(long agentId) throws SolrException {
 		LOG.info("Method to increase survey count for agent started.");
 		organizationUnitSettingsDao.updateCompletedSurveyCountForAgent(agentId);
 		solrSearchService.updateCompletedSurveyCountForUserInSolr(agentId);
@@ -361,6 +374,104 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean {
 		LOG.info("Method to update status of survey in SurveyDetails collection, changeStatusOfSurvey() started.");
 		surveyDetailsDao.changeStatusOfSurvey(agentId, customerEmail, editable);
 		LOG.info("Method to update status of survey in SurveyDetails collection, changeStatusOfSurvey() finished.");
+	}
+
+	/*
+	 * Method to store initial details of customer to initiate survey and send a mail with link of
+	 * survey.
+	 */
+	@Override
+	@Transactional
+	public void sendSurveyInvitationMail(String custFirstName, String custLastName, String custEmail, String custRelationWithAgent, User user,
+			boolean isAgent) throws InvalidInputException, SolrException, NoRecordsFetchedException, UndeliveredEmailException {
+		LOG.debug("Method sendSurveyInvitationMail() called from DashboardController.");
+		if (custFirstName == null || custFirstName.isEmpty()) {
+			LOG.error("Null/Empty value found for customer's first name.");
+			throw new InvalidInputException("Null/Empty value found for customer's first name.");
+		}
+		if (custLastName == null || custLastName.isEmpty()) {
+			LOG.error("Null/Empty value found for customer's last name.");
+			throw new InvalidInputException("Null/Empty value found for customer's last name.");
+		}
+		if (custEmail == null || custEmail.isEmpty()) {
+			LOG.error("Null/Empty value found for customer's email id.");
+			throw new InvalidInputException("Null/Empty value found for customer's email id.");
+		}
+
+		String link = composeLink(user.getUserId(), custEmail);
+		storeInitialSurveyDetails(user.getUserId(), custEmail, custFirstName, custLastName, 0, custRelationWithAgent, link);
+		if(isAgent)
+			sendInvitationMailByAgent(user, custFirstName, custLastName, custEmail, link);
+		else
+			sendInvitationMailByCustomer(user, custFirstName, custLastName, custEmail, link);
+		LOG.debug("Method sendSurveyInvitationMail() finished from DashboardController.");
+	}
+
+	/*
+	 * Method to compose link for sending to a user to start survey started.
+	 */
+	private String composeLink(long userId, String custEmail) throws InvalidInputException {
+		LOG.debug("Method composeLink() started");
+		Map<String, String> urlParams = new HashMap<>();
+		urlParams.put(CommonConstants.AGENT_ID_COLUMN, userId + "");
+		urlParams.put(CommonConstants.CUSTOMER_EMAIL_COLUMN, custEmail);
+		LOG.debug("Method composeLink() finished");
+		return urlGenerator.generateUrl(urlParams, getApplicationBaseUrl() + "rest/survey/showsurveypageforurl");
+	}
+
+	/*
+	 * Method to send email by agent to initiate survey.
+	 */
+	private void sendInvitationMailByAgent(User user, String custFirstName, String custLastName, String custEmail, String link) throws InvalidInputException, UndeliveredEmailException {
+		LOG.debug("sendInvitationMailByAgent() started.");
+		OrganizationUnitSettings companySettings = organizationManagementService.getCompanySettings(user.getCompany().getCompanyId());
+		if (companySettings != null && companySettings.getMail_content() != null && companySettings.getMail_content().getTake_survey_mail() != null) {
+			String mailBody = companySettings.getMail_content().getTake_survey_mail().getMail_body();
+			mailBody = mailBody.replaceAll("\\[AgentName\\]", user.getFirstName() + " " + user.getLastName());
+			mailBody = mailBody.replaceAll("\\[Name\\]", custFirstName + " " + custLastName);
+			mailBody = mailBody.replaceAll("\\[Link\\]", link);
+			String mailSubject = CommonConstants.SURVEY_MAIL_SUBJECT;
+			try {
+				emailServices.sendSurveyInvitationMail(custEmail, mailSubject, mailBody, user.getEmailId(), user.getFirstName()
+						+ (user.getLastName() != null ? " " + user.getLastName() : ""));
+			}
+			catch (InvalidInputException | UndeliveredEmailException e) {
+				LOG.error("Exception caught while sending mail to " + custEmail + ". Nested exception is ", e);
+			}
+		}
+		else {
+			emailServices.sendDefaultSurveyInvitationMail(custEmail, custFirstName + " " + custLastName, user.getFirstName()
+					+ (user.getLastName() != null ? " " + user.getLastName() : ""), link, user.getEmailId());
+		}
+		LOG.debug("sendInvitationMailByAgent() finished.");
+	}
+	
+	/*
+	 * Method to send email by customer to initiate survey.
+	 */
+	private void sendInvitationMailByCustomer(User user, String custFirstName, String custLastName, String custEmail, String link) throws InvalidInputException, UndeliveredEmailException {
+		LOG.debug("sendInvitationMailByCustomer() started.");
+		OrganizationUnitSettings companySettings = organizationManagementService.getCompanySettings(user.getCompany().getCompanyId());
+		if (companySettings != null && companySettings.getMail_content() != null && companySettings.getMail_content().getTake_survey_mail_customer() != null) {
+			String mailBody = companySettings.getMail_content().getTake_survey_mail_customer().getMail_body();
+			mailBody = mailBody.replaceAll("\\[AgentName\\]", user.getFirstName() + " " + user.getLastName());
+			mailBody = mailBody.replaceAll("\\[Name\\]", custFirstName + " " + custLastName);
+			mailBody = mailBody.replaceAll("\\[Link\\]", link);
+			mailBody = mailBody.replaceAll("null", "");
+			String mailSubject = CommonConstants.SURVEY_MAIL_SUBJECT;
+			try {
+				emailServices.sendSurveyInvitationMailByCustomer(custEmail, mailSubject, mailBody, user.getEmailId(), user.getFirstName()
+						+ (user.getLastName() != null ? " " + user.getLastName() : ""));
+			}
+			catch (InvalidInputException | UndeliveredEmailException e) {
+				LOG.error("Exception caught while sending mail to " + custEmail + ". Nested exception is ", e);
+			}
+		}
+		else {
+			emailServices.sendDefaultSurveyInvitationMailByCustomer(custEmail, custFirstName + " " + custLastName, user.getFirstName()
+					+ (user.getLastName() != null ? " " + user.getLastName() : ""), link, user.getEmailId());
+		}
+		LOG.debug("sendInvitationMailByCustomer() finished.");
 	}
 }
 // JIRA SS-119 by RM-05:EOC
