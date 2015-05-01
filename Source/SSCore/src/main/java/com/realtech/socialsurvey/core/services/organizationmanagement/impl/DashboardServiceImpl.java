@@ -3,13 +3,17 @@ package com.realtech.socialsurvey.core.services.organizationmanagement.impl;
 import java.io.IOException;
 import java.text.ParseException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
+import org.apache.commons.lang.StringUtils;
 import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.CellStyle;
 import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.xssf.usermodel.XSSFDataFormat;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.slf4j.Logger;
@@ -174,6 +178,9 @@ public class DashboardServiceImpl implements DashboardService, InitializingBean 
 
 		// Create a blank sheet
 		XSSFSheet sheet = workbook.createSheet();
+		XSSFDataFormat df = workbook.createDataFormat();
+		CellStyle style = workbook.createCellStyle();
+		style.setDataFormat(df.getFormat("d-mm-yyyy"));
 		Integer counter = 1;
 		int max = 0;
 		int internalMax = 0;
@@ -192,7 +199,7 @@ public class DashboardServiceImpl implements DashboardService, InitializingBean 
 			if (survey.getSharedOn() == null)
 				surveyDetailsToPopulate.add(null);
 			else
-				surveyDetailsToPopulate.add(survey.getSharedOn().toArray());
+				surveyDetailsToPopulate.add(StringUtils.join(survey.getSharedOn(), ","));
 			for (SurveyResponse response : survey.getSurveyResponse()) {
 				internalMax++;
 				surveyDetailsToPopulate.add(response.getAnswer());
@@ -228,6 +235,12 @@ public class DashboardServiceImpl implements DashboardService, InitializingBean 
 					cell.setCellValue((String) obj);
 				else if (obj instanceof Integer)
 					cell.setCellValue((Integer) obj);
+				else if (obj instanceof Double)
+					cell.setCellValue((Double) obj);
+				else if (obj instanceof Date){
+					cell.setCellStyle(style);
+					cell.setCellValue((Date) obj);
+				}
 			}
 		}
 		/** try {
@@ -253,6 +266,9 @@ public class DashboardServiceImpl implements DashboardService, InitializingBean 
 
 		// Create a blank sheet
 		XSSFSheet sheet = workbook.createSheet();
+		XSSFDataFormat df = workbook.createDataFormat();
+		CellStyle style = workbook.createCellStyle();
+		style.setDataFormat(df.getFormat("d-mm-yyyy"));
 		Integer counter = 1;
 		int max = 0;
 		int internalMax = 0;
@@ -297,6 +313,10 @@ public class DashboardServiceImpl implements DashboardService, InitializingBean 
 					cell.setCellValue((String) obj);
 				else if (obj instanceof Integer)
 					cell.setCellValue((Integer) obj);
+				else if (obj instanceof Date){
+					cell.setCellStyle(style);
+					cell.setCellValue((Date) obj);
+				}
 			}
 		}
 		/**try {
