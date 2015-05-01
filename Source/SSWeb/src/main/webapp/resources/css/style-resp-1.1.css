@@ -487,4 +487,8 @@
     	margin: 5px 0;
     	float: none;
     }
+    .wc-linkedin-photo,.wc-photo-upload{
+    	width: 100px;
+    	height: 100px;
+    }
 }

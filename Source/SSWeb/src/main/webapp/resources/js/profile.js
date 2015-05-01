@@ -968,62 +968,48 @@ function fetchReviewsForAgentCallBack(data) {
 	}
 }
 
-function paintIndividualDetails(result){
-	var individualDetailsHtml = "";
-	if(result.associations != undefined && result.associations.length > 0){
-		individualDetailsHtml = individualDetailsHtml + '<div class="prof-left-row prof-left-assoc bord-bot-dc">';
-		individualDetailsHtml = individualDetailsHtml + '	<div class="left-assoc-wrapper">';
-		individualDetailsHtml = individualDetailsHtml + '		<div class="left-panel-header lph-dd lph-dd-closed lph-dd-open">Memberships</div>';
-		individualDetailsHtml = individualDetailsHtml + '		<div class="left-panel-content lph-dd-content">';
-		$.each(result.associations,function(i,associations){
-			individualDetailsHtml = individualDetailsHtml + '<div class="lp-assoc-row lp-row clearfix">'+associations.name+'</div>';
-		});
-		individualDetailsHtml = individualDetailsHtml + '		</div>';
-		individualDetailsHtml = individualDetailsHtml + '	</div>';
-		individualDetailsHtml = individualDetailsHtml + '</div>';
-	}
-	
-	//paint expertise
-	if(result.expertise != undefined && result.expertise.length > 0){
-		individualDetailsHtml = individualDetailsHtml + '<div class="prof-left-row prof-left-ach bord-bot-dc">';
-		individualDetailsHtml = individualDetailsHtml + '	<div class="left-ach-wrapper">';
-		individualDetailsHtml = individualDetailsHtml + '		<div class="left-panel-header lph-dd lph-dd-closed">Specialities</div>';
-		individualDetailsHtml = individualDetailsHtml + '		<div class="left-panel-content lph-dd-content">';
-		for(var i=0;i<result.expertise.length;i++){
-			individualDetailsHtml = individualDetailsHtml + '<div class="lp-ach-row lp-row clearfix">'+result.expertise[i]+'</div>';
+function paintIndividualDetails(result) {
+	// Paint licenses
+	var licenses = result.licenses;
+	if (licenses != undefined) {
+		if (licenses.authorized_in != undefined && licenses.authorized_in.length > 0) {
+			individualDetailsHtml = individualDetailsHtml + '<div class="prof-left-row prof-left-auth bord-bot-dc">';
+			individualDetailsHtml = individualDetailsHtml + '	<div class="left-auth-wrapper">';
+			individualDetailsHtml = individualDetailsHtml + '		<div class="left-panel-header lph-dd lph-dd-closed">Licenses</div>';
+			individualDetailsHtml = individualDetailsHtml + '		<div class="left-panel-content lph-dd-content">';
+			$.each(licenses.authorized_in, function(i, authorizedIn) {
+				individualDetailsHtml = individualDetailsHtml + '<div class="lp-auth-row lp-row clearfix">' + authorizedIn + '</div>';
+			});
+			individualDetailsHtml = individualDetailsHtml + '		</div>';
+			individualDetailsHtml = individualDetailsHtml + '	</div>';
+			individualDetailsHtml = individualDetailsHtml + '</div>';
 		}
-		individualDetailsHtml = individualDetailsHtml + '		</div>';
-		individualDetailsHtml = individualDetailsHtml + '	</div>';
-		individualDetailsHtml = individualDetailsHtml + '</div>';
 	}
 	
-	//Paint postions
-	var positions = result.positions; 
-	if(positions != undefined && positions.length > 0){
+	// Paint postions
+	var positions = result.positions;
+	if (positions != undefined && positions.length > 0) {
 		individualDetailsHtml = individualDetailsHtml + '<div class="prof-left-row prof-left-assoc bord-bot-dc">';
 		individualDetailsHtml = individualDetailsHtml + '	<div class="left-postions-wrapper">';
 		individualDetailsHtml = individualDetailsHtml + '		<div class="left-panel-header lph-dd lph-dd-closed lph-dd-open">Positions</div>';
 		individualDetailsHtml = individualDetailsHtml + '		<div class="left-panel-content lph-dd-content">';
-		for(var i=0;i<positions.length;i++){
+
+		for (var i = 0; i < positions.length; i++) {
 			individualDetailsHtml += '<div class="postions-content">';
+			
 			var positionObj = positions[i];
-			individualDetailsHtml = individualDetailsHtml + '<div class="lp-pos-row-1 lp-row clearfix">'+positionObj.name+'</div>';
-			if(positionObj.title){
-				individualDetailsHtml = individualDetailsHtml + '<div class="lp-pos-row-2 lp-row clearfix">'+positionObj.title+'</div>';	
+			individualDetailsHtml = individualDetailsHtml + '<div class="lp-pos-row-1 lp-row clearfix">' + positionObj.name + '</div>';
+			if (positionObj.title) {
+				individualDetailsHtml = individualDetailsHtml + '<div class="lp-pos-row-2 lp-row clearfix">' + positionObj.title + '</div>';
 			}
-			if(positionObj.startTime){
-				
-				var startDateStr = positionObj.startTime.split("-");
-				
-				
-				if(!positionObj.isCurrent && positionObj.endTime){
-					
-					var endDateStr = positionObj.endTime.split("-");
-					
-					individualDetailsHtml = individualDetailsHtml + '<div class="lp-pos-row-3 lp-row clearfix">'+monthNames[startDateStr[0] - 1]+ " " + startDateStr[1] +" - "+monthNames[endDateStr[0] - 1]+ " " + endDateStr[1] +'</div>';				
-				}else{
-					individualDetailsHtml = individualDetailsHtml + '<div class="lp-pos-row-3 lp-row clearfix">'+monthNames[startDateStr[0] - 1]+ " " + startDateStr[1] +' - Current</div>';
-				}				
+			if (positionObj.startTime) {
+				var startDateDisplay = constructDate(positionObj.startTime.split("-"));
+				if (!positionObj.isCurrent && positionObj.endTime) {
+					var endDateDisplay = constructDate(positionObj.endTime.split("-"));
+					individualDetailsHtml = individualDetailsHtml + '<div class="lp-pos-row-3 lp-row clearfix">' + startDateDisplay + " - " + endDateDisplay + '</div>';
+				} else {
+					individualDetailsHtml = individualDetailsHtml + '<div class="lp-pos-row-3 lp-row clearfix">' + startDateDisplay + ' - Current</div>';
+				}
 			}
 			individualDetailsHtml += '</div>';
 		}
@@ -1031,59 +1017,69 @@ function paintIndividualDetails(result){
 		individualDetailsHtml = individualDetailsHtml + '	</div>';
 		individualDetailsHtml = individualDetailsHtml + '</div>';
 	}
-	
-	if(result.achievements != undefined && result.achievements.length > 0){
-		individualDetailsHtml = individualDetailsHtml + '<div class="prof-left-row prof-left-ach bord-bot-dc">';
-		individualDetailsHtml = individualDetailsHtml + '	<div class="left-ach-wrapper">';
-		individualDetailsHtml = individualDetailsHtml + '		<div class="left-panel-header lph-dd lph-dd-closed">Achievements</div>';
+
+	// Paint Associations
+	var individualDetailsHtml = "";
+	if (result.associations != undefined && result.associations.length > 0) {
+		individualDetailsHtml = individualDetailsHtml + '<div class="prof-left-row prof-left-assoc bord-bot-dc">';
+		individualDetailsHtml = individualDetailsHtml + '	<div class="left-assoc-wrapper">';
+		individualDetailsHtml = individualDetailsHtml + '		<div class="left-panel-header lph-dd lph-dd-closed lph-dd-open">Memberships</div>';
 		individualDetailsHtml = individualDetailsHtml + '		<div class="left-panel-content lph-dd-content">';
-		$.each(result.achievements,function(i,achievements){
-			individualDetailsHtml = individualDetailsHtml + '<div class="lp-ach-row lp-row clearfix">'+achievements.achievement+'</div>';
+		$.each(result.associations, function(i, associations) {
+			individualDetailsHtml = individualDetailsHtml + '<div class="lp-assoc-row lp-row clearfix">' + associations.name + '</div>';
 		});
 		individualDetailsHtml = individualDetailsHtml + '		</div>';
 		individualDetailsHtml = individualDetailsHtml + '	</div>';
 		individualDetailsHtml = individualDetailsHtml + '</div>';
 	}
-	
-	//paint hobbies
-	if(result.hobbies != undefined && result.hobbies.length > 0){
+
+	// paint expertise
+	if (result.expertise != undefined && result.expertise.length > 0) {
 		individualDetailsHtml = individualDetailsHtml + '<div class="prof-left-row prof-left-ach bord-bot-dc">';
 		individualDetailsHtml = individualDetailsHtml + '	<div class="left-ach-wrapper">';
-		individualDetailsHtml = individualDetailsHtml + '		<div class="left-panel-header lph-dd lph-dd-closed">Hobbies</div>';
+		individualDetailsHtml = individualDetailsHtml + '		<div class="left-panel-header lph-dd lph-dd-closed">Specialities</div>';
 		individualDetailsHtml = individualDetailsHtml + '		<div class="left-panel-content lph-dd-content">';
-		for(var i=0;i<result.hobbies.length;i++){
-			individualDetailsHtml = individualDetailsHtml + '<div class="lp-ach-row lp-row clearfix">'+result.hobbies[i]+'</div>';
+		for (var i = 0; i < result.expertise.length; i++) {
+			individualDetailsHtml = individualDetailsHtml + '<div class="lp-ach-row lp-row clearfix">' + result.expertise[i] + '</div>';
 		}
 		individualDetailsHtml = individualDetailsHtml + '		</div>';
 		individualDetailsHtml = individualDetailsHtml + '	</div>';
 		individualDetailsHtml = individualDetailsHtml + '</div>';
 	}
 	
-	
-	var licenses = result.licenses;
-	if(licenses != undefined){
-		if(licenses.authorized_in != undefined && licenses.authorized_in.length > 0) {
-			individualDetailsHtml = individualDetailsHtml + '<div class="prof-left-row prof-left-auth bord-bot-dc">';
-			individualDetailsHtml = individualDetailsHtml + '	<div class="left-auth-wrapper">';
-			individualDetailsHtml = individualDetailsHtml + '		<div class="left-panel-header lph-dd lph-dd-closed">Licenses</div>';
-			individualDetailsHtml = individualDetailsHtml + '		<div class="left-panel-content lph-dd-content">';
-			
-			$.each(licenses.authorized_in, function(i, authorizedIn) {
-				individualDetailsHtml = individualDetailsHtml + '<div class="lp-auth-row lp-row clearfix">'+authorizedIn+'</div>';
-			});
-			
-			individualDetailsHtml = individualDetailsHtml + '		</div>';
-			individualDetailsHtml = individualDetailsHtml + '	</div>';
-			individualDetailsHtml = individualDetailsHtml + '</div>';
-		}		
+	if (result.achievements != undefined && result.achievements.length > 0) {
+		individualDetailsHtml = individualDetailsHtml + '<div class="prof-left-row prof-left-ach bord-bot-dc">';
+		individualDetailsHtml = individualDetailsHtml + '	<div class="left-ach-wrapper">';
+		individualDetailsHtml = individualDetailsHtml + '		<div class="left-panel-header lph-dd lph-dd-closed">Achievements</div>';
+		individualDetailsHtml = individualDetailsHtml + '		<div class="left-panel-content lph-dd-content">';
+		$.each(result.achievements, function(i, achievements) {
+			individualDetailsHtml = individualDetailsHtml + '<div class="lp-ach-row lp-row clearfix">' + achievements.achievement + '</div>';
+		});
+		individualDetailsHtml = individualDetailsHtml + '		</div>';
+		individualDetailsHtml = individualDetailsHtml + '	</div>';
+		individualDetailsHtml = individualDetailsHtml + '</div>';
 	}
+
+	// paint hobbies
+	if (result.hobbies != undefined && result.hobbies.length > 0) {
+		individualDetailsHtml = individualDetailsHtml + '<div class="prof-left-row prof-left-ach bord-bot-dc">';
+		individualDetailsHtml = individualDetailsHtml + '	<div class="left-ach-wrapper">';
+		individualDetailsHtml = individualDetailsHtml + '		<div class="left-panel-header lph-dd lph-dd-closed">Hobbies</div>';
+		individualDetailsHtml = individualDetailsHtml + '		<div class="left-panel-content lph-dd-content">';
+		for (var i = 0; i < result.hobbies.length; i++) {
+			individualDetailsHtml = individualDetailsHtml + '<div class="lp-ach-row lp-row clearfix">' + result.hobbies[i] + '</div>';
+		}
+		individualDetailsHtml = individualDetailsHtml + '		</div>';
+		individualDetailsHtml = individualDetailsHtml + '	</div>';
+		individualDetailsHtml = individualDetailsHtml + '</div>';
+	}
+
 	$("#individual-details").html(individualDetailsHtml);
-	$('.lph-dd').click(function(){
-        $(this).next('.lph-dd-content').slideToggle(200);
-    });	
-    
+	$('.lph-dd').click(function() {
+		$(this).next('.lph-dd-content').slideToggle(200);
+	});
+
 	$('.lph-dd:nth(0)').trigger('click');
-            
 }
 
 function fetchAgentProfile(agentProfileName){
@@ -1272,3 +1268,16 @@ $('body').on("click",".comp-region",function(){
 	}
 	
 });
+
+function constructDate(dateStr) {
+	var dateDisplay = "";
+	if (typeof dateStr[0] != 'undefined' && typeof dateStr[1] != 'undefined') {
+		dateDisplay = monthNames[dateStr[0] - 1] + " " + dateStr[1];
+	} else if (typeof dateStr[0] != 'undefined') {
+		dateDisplay = monthNames[dateStr[0] - 1];
+	} else if (typeof dateStr[1] != 'undefined') {
+		dateDisplay = dateStr[1];
+	}
+	
+	return dateDisplay;
+}
