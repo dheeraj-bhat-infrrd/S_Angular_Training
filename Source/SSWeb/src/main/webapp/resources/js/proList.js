@@ -105,7 +105,7 @@ function paintProList(usersList) {
 		var usersHtml = "";
 		
 		if (usersSize > 0) {
-			$.each(usersList,function(i,user){
+			$.each(usersList, function(i, user) {
 				var evenOddClass = (i % 2 == 0) ? '' : 'ctnt-list-item-even';
 				usersHtml = usersHtml + '<div class="ctnt-list-item clearfix ' + evenOddClass + '" data-profilename="' + user.profileUrl + '">';
 				if (user.profileImageUrl != undefined) {
@@ -114,39 +114,36 @@ function paintProList(usersList) {
 					usersHtml = usersHtml + '<div class="float-left ctnt-list-item-img pro-list-default-img"></div>';
 				}
 				usersHtml = usersHtml + '<div class="float-left ctnt-list-item-txt-wrap">';
-				usersHtml = usersHtml + '	<div class="ctnt-item-name user-display-name">' + user.displayName + '</div>';
+				usersHtml = usersHtml + '<div class="ctnt-item-name user-display-name">' + user.displayName + '</div>';
 
-				if(user.title != undefined){
+				if (user.title != undefined) {
 					usersHtml = usersHtml + '<div class="ctnt-item-desig">' + user.title + '</div>';
 				}
-				
-				if(user.location != undefined) {
-					usersHtml = usersHtml +' <div class="pro-addr-cont">'+user.location;
-	            	if(user.industry != undefined){
-	            		usersHtml += " | "+ user.industry;
+				if (user.location != undefined) {
+					usersHtml = usersHtml + '<div class="pro-addr-cont">' + user.location;
+	            	if (user.industry != undefined) {
+	            		usersHtml += " | " + user.industry;
 	            	}
 	            	usersHtml += "</div>";
 	            }
-				
-				if(user.aboutMe != undefined){
+				if (user.aboutMe != undefined) {
 					usersHtml = usersHtml + '<div class="ctnt-item-comment">' + user.aboutMe + '</div>';
 				}
 				
 				var reviewCount = 0;
-				
-				if(user.reviewCount){
+				if (user.reviewCount) {
 					reviewCount  = user.reviewCount;
 				}
 				
 				var reviewScore = 0;
-				if(user.reviewScore){
+				if (user.reviewScore) {
 					reviewScore  = user.reviewScore;
 				}
 				
 				usersHtml = usersHtml + '</div>';
 				usersHtml = usersHtml + '<div class="float-left ctnt-list-item-btn-wrap clearfix">';
 				usersHtml = usersHtml + '<div class="float-left ctnt-review-score" data-score="' + reviewScore + '"></div>';
-				usersHtml = usersHtml + '<div class="float-left ctnt-review-count" user="' + user.userId + '">'+reviewCount+' Review(s)</div>';
+				usersHtml = usersHtml + '<div class="float-left ctnt-review-count" user="' + user.userId + '">' + reviewCount + ' Review(s)</div>';
 				usersHtml = usersHtml + '</div>';
 				usersHtml = usersHtml + '</div>';
 			});
