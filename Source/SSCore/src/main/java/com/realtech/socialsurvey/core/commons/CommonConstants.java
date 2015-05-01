@@ -73,7 +73,7 @@ public interface CommonConstants {
 	/**
 	 * Status constants
 	 */
-	public static final int ONE = 1; 
+	public static final int ONE = 1;
 	public static final int STATUS_ACTIVE = 1;
 	public static final int STATUS_INACTIVE = 0;
 	public static final int STATUS_SURVEY_TEMPLATE = 2;
@@ -188,7 +188,7 @@ public interface CommonConstants {
 	public static final String COUNTRY = "country";
 	public static final String CRM_SOURCE = "crm_source";
 	public static final String VERTICAL = "vertical";
-	//JIRA - SS-536: Added for manual registration via invite
+	// JIRA - SS-536: Added for manual registration via invite
 	public static final String BILLING_MODE_COLUMN = "billingMode";
 	public static final String VERTICAL_COLUMN = "verticalsMaster";
 	public static final String PAID_PLAN_UPGRADE_FLAG = "paidUpgrade";
@@ -270,7 +270,7 @@ public interface CommonConstants {
 	public static final float DEFAULT_AUTOPOST_SCORE = 3.5f;
 	public static final String USER_SELECTION_TYPE_SINGLE = "single";
 	public static final String USER_SELECTION_TYPE_MULTIPLE = "multiple";
-	
+
 	/**
 	 * Logo related config
 	 */
@@ -475,19 +475,20 @@ public interface CommonConstants {
 	 */
 	public static final int FIND_PRO_START_INDEX = 0;
 	public static final int FIND_PRO_BATCH_SIZE = 10;
-	
+
 	// Braintree subscription types
 	public static final int SUBSCRIPTION_WENT_PAST_DUE = 1;
 	public static final int SUBSCRIPTION_CHARGED_UNSUCCESSFULLY = 2;
 	public static final int SUBSCRIPTION_CHARGED_SUCCESSFULLY = 3;
-	
+
 	// Subscription price modification result constants
 	public static final String SUBSCRIPTION_PRICE_CHANGED = "SUBSCRIPTION_PRICE_CHANGED";
 	public static final String SUBSCRIPTION_OLD_PRICE = "SUBSCRIPTION_OLD_PRICE";
 	public static final String SUBSCRIPTION_REVISED_PRICE = "SUBSCRIPTION_REVISED_PRICE";
 	public static final String SUBSCRIPTION_REVISED_NUMOFUSERS = "SUBSCRIPTION_REVISED_NUMOFUSERS";
-	
+
 	// Billing Modes
 	public static final String BILLING_MODE_AUTO = "A";
 	public static final String BILLING_MODE_INVOICE = "I";
+	public static final String INVOICE_BILLED_DEFULAT_SUBSCRIPTION_ID = "invoicebilling";
 }
