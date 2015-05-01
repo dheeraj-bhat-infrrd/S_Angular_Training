@@ -170,8 +170,6 @@
 	cursor: pointer;
 }
 </style>
-
-<script src="${pageContext.request.contextPath}/resources/js/dashboard.js"></script>
 <script>
 $(document).ready(function() {
 	hideOverlay();
