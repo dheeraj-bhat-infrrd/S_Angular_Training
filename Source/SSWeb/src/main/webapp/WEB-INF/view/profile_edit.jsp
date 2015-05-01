@@ -163,12 +163,11 @@
 						</c:choose>
 					</div>
 					<div class="prof-address">
-						<div class="prof-addline1 prof-edditable">${profileSettings.vertical}</div>
-						
 						<c:if test="${profilemasterid != 1}">
 							<input id="prof-title" class="prof-addline2 prof-edditable" value="${contactdetail.title}" placeholder='<spring:message code="label.profiletitle.placeholder.key"/>'>
 							<div id="prof-title-lock" data-state="unlocked" data-control="user" class="hide float-left"></div>
 						</c:if>
+						<div class="prof-addline1 prof-edditable">${profileSettings.vertical}</div>
 					</div>
 					
 					<div id="prof-rating-review-count" class="prof-rating clearfix">
@@ -317,7 +316,7 @@
 									</c:choose>
 	  							</div>
 							</div>
-							<div class="lp-con-row lp-row clearfix">
+							<%-- <div class="lp-con-row lp-row clearfix">
 								<div class="float-left lp-con-icn icn-blog"></div>
 								<div>
 									<c:choose>
@@ -424,7 +423,7 @@
 										</c:when>
 									</c:choose>
 								</div>
-							</div>
+							</div> --%>
 						</div>
 					</div>
 				</div>
