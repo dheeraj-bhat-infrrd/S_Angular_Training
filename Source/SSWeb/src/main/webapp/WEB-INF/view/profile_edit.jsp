@@ -8,6 +8,9 @@
 <c:if test="${not empty profile}">
 	<c:set value="${profile.profilesMaster.profileId}" var="profilemasterid"></c:set>
 </c:if>
+<c:if test="${not empty profile && not empty profileSettings.completeProfileUrl}">
+	<c:set value="${profileSettings.completeProfileUrl}" var="completeProfileUrl"></c:set>
+</c:if>
 <c:if test="${not empty profileSettings && not empty profileSettings.contact_details}">
 	<c:set value="${profileSettings.lockSettings}" var="lock"></c:set>
 	<c:set value="${profileSettings.logo}" var="profilelogo"></c:set>
@@ -29,29 +32,27 @@
 </c:if>
 
 <!-- Setting agent page variables -->
-<c:if test="${not empty profile && not empty profileSettings.associations}">
-	<c:set value="${profileSettings.associations}" var="associations"></c:set>
-</c:if>
-<c:if test="${not empty profile && not empty profileSettings.achievements}">
-	<c:set value="${profileSettings.achievements}" var="achievements"></c:set>
-</c:if>
-<c:if test="${not empty profile && not empty profileSettings.licenses}">
-	<c:set value="${profileSettings.licenses.authorized_in}" var="authorisedInList"></c:set>
-</c:if>
-<c:if test="${not empty profile && not empty profileSettings.completeProfileUrl}">
-	<c:set value="${profileSettings.completeProfileUrl}" var="completeProfileUrl"></c:set>
-</c:if>
 <c:if test="${profilemasterid == 4}">
-	<c:if test="${not empty profile && not empty profileSettings.expertise}">
-		<c:set value="${profileSettings.expertise}" var="expertiseList"></c:set>
+	<c:if test="${not empty profile && not empty profileSettings.licenses}">
+		<c:set value="${profileSettings.licenses.authorized_in}" var="authorisedInList"></c:set>
 	</c:if>
 	<c:if test="${not empty profile && not empty profileSettings.positions}">
 		<c:set value="${profileSettings.positions}" var="positions"></c:set>
+	</c:if>
+	<c:if test="${not empty profile && not empty profileSettings.associations}">
+		<c:set value="${profileSettings.associations}" var="associations"></c:set>
+	</c:if>
+	<c:if test="${not empty profile && not empty profileSettings.expertise}">
+		<c:set value="${profileSettings.expertise}" var="expertiseList"></c:set>
+	</c:if>
+	<c:if test="${not empty profile && not empty profileSettings.achievements}">
+		<c:set value="${profileSettings.achievements}" var="achievements"></c:set>
 	</c:if>
 	<c:if test="${not empty profile && not empty profileSettings.hobbies}">
 		<c:set value="${profileSettings.hobbies}" var="hobbies"></c:set>
 	</c:if>
 </c:if>
+
 <div id="prof-message-header" class="hide"></div>
 <div class="hm-header-main-wrapper">
 	<div>
@@ -62,15 +63,12 @@
 			</c:when>
 			<c:when test="${profilemasterid == 2}">
 				<input type="hidden" id="prof-region-id" value="${profile.regionId}">
-				<%-- <input type="hidden" id="prof-region-name" value="${profileSettings.profileName}"> --%>
 			</c:when>
 			<c:when test="${profilemasterid == 3}">
 				<input type="hidden" id="prof-branch-id" value="${profile.branchId}">
-				<%-- <input type="hidden" id="prof-branch-name" value="${profileSettings.profileName}"> --%>
 			</c:when>
 			<c:when test="${profilemasterid == 4}">
 				<input type="hidden" id="prof-agent-id" value="${profile.agentId}">
-				<%-- <input type="hidden" id="prof-agent-name" value="${profileSettings.profileName}"> --%>
 			</c:when>
 		</c:choose>
 		<input type="hidden" id="profile-id" value="${profile.userProfileId}"/>
@@ -253,10 +251,10 @@
 						</c:if>
 						
 					</div>
-					<c:if test="${not empty webAddresses.work }">
+					<c:if test="${not empty webAddresses.work}">
 						<div id="web-addr-header" class="web-addr-header float-left clearfix">
 							<div class="web-address-img float-left"></div>
-							<div id="web-address-txt" class="web-address-txt float-left">${webAddresses.work }</div>
+							<div id="web-address-txt" class="web-address-txt float-left">${webAddresses.work}</div>
 						</div>
 					</c:if>
 
@@ -434,6 +432,30 @@
 				<div id="prof-agent-container">
 				<c:choose>
 					<c:when	test="${profilemasterid == 4}">
+						<!-- Licences left panel -->
+						<div class="prof-left-row prof-left-auth bord-bot-dc">
+							<div class="left-auth-wrapper">
+								<div class="clearfix">
+									<div class="float-left left-panel-header"><spring:message code="label.licenses.key" /></div>
+									<div class="float-right icn-share icn-plus-open-agent" onclick="addAuthorisedIn();"></div>
+								</div>
+								<div id="authorised-in-container" class="left-panel-content">
+									<c:choose>
+										<c:when test="${not empty authorisedInList}">
+											<c:forEach items="${authorisedInList}" var="authorisedIn">
+												<div class="lp-dummy-row clearfix">
+													<input class="lp-auth-row lp-row clearfix prof-edditable-sin-agent" value="${authorisedIn}" data-status="saved">
+													<div class="float-right lp-ach-item-img hide" data-type="license"></div>
+												</div>
+											</c:forEach>
+										</c:when>
+										<c:otherwise>
+											<span><spring:message code="label.licenses.empty.key"></spring:message></span>
+										</c:otherwise>
+									</c:choose>
+								</div>
+							</div>
+						</div>
 						<!-- Associations left panel -->
 						<div class="prof-left-row prof-left-assoc bord-bot-dc">
 							<div class="left-assoc-wrapper">
@@ -501,30 +523,6 @@
 										</c:when>
 										<c:otherwise>
 											<span><spring:message code="label.achievement.empty.key"></spring:message></span>
-										</c:otherwise>
-									</c:choose>
-								</div>
-							</div>
-						</div>
-						<!-- Licences left panel -->
-						<div class="prof-left-row prof-left-auth bord-bot-dc">
-							<div class="left-auth-wrapper">
-								<div class="clearfix">
-									<div class="float-left left-panel-header"><spring:message code="label.licenses.key" /></div>
-									<div class="float-right icn-share icn-plus-open-agent" onclick="addAuthorisedIn();"></div>
-								</div>
-								<div id="authorised-in-container" class="left-panel-content">
-									<c:choose>
-										<c:when test="${not empty authorisedInList}">
-											<c:forEach items="${authorisedInList}" var="authorisedIn">
-												<div class="lp-dummy-row clearfix">
-													<input class="lp-auth-row lp-row clearfix prof-edditable-sin-agent" value="${authorisedIn}" data-status="saved">
-													<div class="float-right lp-ach-item-img hide" data-type="license"></div>
-												</div>
-											</c:forEach>
-										</c:when>
-										<c:otherwise>
-											<span><spring:message code="label.licenses.empty.key"></spring:message></span>
 										</c:otherwise>
 									</c:choose>
 								</div>
@@ -671,12 +669,6 @@
 	<div class="float-left mob-icn icn-star-smile"></div>
 	<div class="float-left mob-icn inc-more"></div>
 </div>
-
-<link rel="stylesheet" href="${pageContext.request.contextPath}/resources/jcrop/jquery.Jcrop.min.css">
-
-<script src="${pageContext.request.contextPath}/resources/js/editprofiledropdown.js"></script>
-<script src="${pageContext.request.contextPath}/resources/js/jcrop.js"></script>
-<script src="${pageContext.request.contextPath}/resources/jcrop/jquery.Jcrop.min.js"></script>
 <script>
 	$(document).ready(function() {
 		hideOverlay();

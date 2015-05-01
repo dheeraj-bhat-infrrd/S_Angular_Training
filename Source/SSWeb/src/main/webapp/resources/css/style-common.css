@@ -5002,10 +5002,13 @@ tr.u-tbl-header {
 	font-weight: bold !important;
 }
 
+tr.u-tbl-row{
+	border-bottom: 1px solid #dcdcdc;	
+}
+
 tr.u-tbl-row td {
 	font-size: 14px;
 	height: 40px;
-	border-bottom: 1px solid #dcdcdc;
 }
 
 .v-um-tbl {
