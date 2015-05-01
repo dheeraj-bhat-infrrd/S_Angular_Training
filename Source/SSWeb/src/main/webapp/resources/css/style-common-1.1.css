@@ -574,7 +574,7 @@ input#find-pro-submit{
 }
 
 .ctnt-list-item-txt-wrap{
-	height: 72px;
+	/* height: 72px; */
 	overflow: hidden;
     margin-right: 25px;
 }
