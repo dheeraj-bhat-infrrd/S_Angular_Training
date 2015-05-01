@@ -1,10 +1,9 @@
 // Profile View as
-$('#profile-sel').click(function(e) {
+$('body').on('click','#profile-sel',function(e) {
 	e.stopPropagation();
 	$('#pe-dd-wrapper-profiles').slideToggle(200);
 });
-
-$('.pe-dd-item').click(function() {
+$('body').on('click','.pe-dd-item',function(e) {
 	var newProfileId = $(this).data('profile-id');
 
 	$('#profile-sel').html($(this).html());

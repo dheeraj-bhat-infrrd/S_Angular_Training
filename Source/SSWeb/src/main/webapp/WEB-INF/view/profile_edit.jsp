@@ -669,12 +669,6 @@
 	<div class="float-left mob-icn icn-star-smile"></div>
 	<div class="float-left mob-icn inc-more"></div>
 </div>
-
-<link rel="stylesheet" href="${pageContext.request.contextPath}/resources/jcrop/jquery.Jcrop.min.css">
-
-<script src="${pageContext.request.contextPath}/resources/js/editprofiledropdown.js"></script>
-<script src="${pageContext.request.contextPath}/resources/js/jcrop.js"></script>
-<script src="${pageContext.request.contextPath}/resources/jcrop/jquery.Jcrop.min.js"></script>
 <script>
 	$(document).ready(function() {
 		hideOverlay();
