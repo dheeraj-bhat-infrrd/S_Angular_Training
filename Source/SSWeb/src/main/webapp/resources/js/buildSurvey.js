@@ -9,7 +9,17 @@ function loadActiveSurveyQuestions() {
 	var url = "./getactivesurveyquestions.do";
 	callAjaxGET(url, function(data) {
 		$('#bs-ques-wrapper').html(data);
+		resizeAdjBuildSurvey();
 	}, true);
+}
+
+function resizeAdjBuildSurvey(){
+	var winW = $(window).width();
+	if (winW < 768) {
+		var txtW = winW - 118;
+		$('.srv-tbl-txt').width(txtW);
+	}
+	else {}
 }
 
 // On Hover
