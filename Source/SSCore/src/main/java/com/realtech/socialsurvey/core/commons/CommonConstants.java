@@ -60,6 +60,7 @@ public interface CommonConstants {
 	public static final String ADD_COMPANY_STAGE = "addcompanyinformation.do";
 	public static final String ADD_ACCOUNT_TYPE_STAGE = "addaccounttype.do";
 	public static final String RESET_PASSWORD = "resetpassword.do";
+	public static final String MANUAL_REGISTRATION = "invitetoregister.do";
 	public static final String DASHBOARD_STAGE = "dashboard.do";
 	public static final String PROFILE_STAGES_COMPLETE = "complete";
 	public static final String REQUEST_MAPPING_EMAIL_EDIT_VERIFICATION = "emailverification.do";
@@ -187,6 +188,8 @@ public interface CommonConstants {
 	public static final String COUNTRY = "country";
 	public static final String CRM_SOURCE = "crm_source";
 	public static final String VERTICAL = "vertical";
+	//JIRA - SS-536: Added for manual registration via invite
+	public static final String BILLING_MODE_COLUMN = "billingMode";
 	public static final String VERTICAL_COLUMN = "verticalsMaster";
 	public static final String PAID_PLAN_UPGRADE_FLAG = "paidUpgrade";
 	public static final String LINKEDIN_AUTH_URL = "authUrl";
@@ -482,4 +485,8 @@ public interface CommonConstants {
 	public static final String SUBSCRIPTION_OLD_PRICE = "SUBSCRIPTION_OLD_PRICE";
 	public static final String SUBSCRIPTION_REVISED_PRICE = "SUBSCRIPTION_REVISED_PRICE";
 	public static final String SUBSCRIPTION_REVISED_NUMOFUSERS = "SUBSCRIPTION_REVISED_NUMOFUSERS";
+	
+	// Billing Modes
+	public static final String BILLING_MODE_AUTO = "A";
+	public static final String BILLING_MODE_INVOICE = "I";
 }

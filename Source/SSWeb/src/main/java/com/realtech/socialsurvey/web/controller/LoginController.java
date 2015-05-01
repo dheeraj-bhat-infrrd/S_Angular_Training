@@ -148,8 +148,14 @@ public class LoginController {
 		User user = null;
 		AccountType accountType = null;
 		String redirectTo = null;
-
+		String isDirectRegistration = null;
 		try {
+			// Setting the direct registration flag
+			isDirectRegistration = request.getParameter("isDirectRegistration");
+			// handle direct registration, if the user has incomplete registration for manual invite. in that cas bm will be set as I
+			if(request.getParameter("bm") != null && request.getParameter("bm").equals("I")){
+				isDirectRegistration = "false";
+			}
 			user = sessionHelper.getCurrentUser();
 			HttpSession session = request.getSession(true);
 
@@ -272,9 +278,12 @@ public class LoginController {
 		catch (NonFatalException e) {
 			LOG.error("NonFatalException while logging in. Reason : " + e.getMessage(), e);
 			model.addAttribute("message", messageUtils.getDisplayMessage(e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE));
+			model.addAttribute("isDirectRegistration", isDirectRegistration);
 			return JspResolver.LOGIN;
 		}
-
+		// set the direct registration value, in case if its a manual registration
+		LOG.debug("Settings isDirectRegistration to "+request.getParameter("isDirectRegistration"));
+		model.addAttribute("isDirectRegistration", isDirectRegistration);
 		return redirectTo;
 	}
 

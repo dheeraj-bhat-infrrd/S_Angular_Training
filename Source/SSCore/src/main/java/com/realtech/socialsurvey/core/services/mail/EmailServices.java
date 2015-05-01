@@ -220,4 +220,15 @@ public interface EmailServices {
 	 * @throws UndeliveredEmailException
 	 */
 	public void sendSubscriptionRevisionMail(String recipientMailId, String name, String oldAmount, String revisedAmount, String numOfUsers) throws InvalidInputException, UndeliveredEmailException;
+	
+	/**
+	 * Sends manual registration link
+	 * @param recipientId
+	 * @param firstName
+	 * @param lastName
+	 * @param link
+	 * @throws InvalidInputException
+	 * @throws UndeliveredEmailException
+	 */
+	public void sendManualRegistrationLink(String recipientId, String firstName, String lastName, String link) throws InvalidInputException, UndeliveredEmailException;
 }
