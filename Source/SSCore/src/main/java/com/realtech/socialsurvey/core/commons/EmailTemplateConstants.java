@@ -40,6 +40,8 @@ public final class EmailTemplateConstants {
 	public static final String SURVEY_COMPLETION_ADMINS_MAIL_SUBJECT = "SurveyCompletionAdminsMailSubject.txt";
 	public static final String SURVEY_INVITATION_MAIL_SUBJECT = "SurveyInvitationMailSubject.txt";
 	public static final String SURVEY_INVITATION_MAIL_BODY = "SurveyInvitationMailBody.html";
+	public static final String SURVEY_INVITATION_MAIL_CUSTOMER_SUBJECT = "SurveyCustomerInvitationMailSubject.txt";
+	public static final String SURVEY_INVITATION_MAIL_CUSTOMER_BODY = "SurveyCustomerInvitationMailBody.html";
 	public static final String SURVEY_COMPLETION_ADMINS_MAIL_BODY = "SurveyCompletionAdminsMailBody.html";
 	public static final String SOCIALPOST_REMINDER_MAIL_SUBJECT = "SocialPostReminderMailSubject.txt";
 	public static final String SOCIALPOST_REMINDER_MAIL_BODY = "SocialPostReminderMailBody.html";
