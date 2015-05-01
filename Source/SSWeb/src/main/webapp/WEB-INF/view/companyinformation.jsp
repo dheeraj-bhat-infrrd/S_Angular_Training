@@ -117,6 +117,7 @@
 				<input type="hidden" value="${emailid}" name="originalemailid" id="originalemailid">
 				<input type="hidden" value="${countryCode}" name="countrycode" id="country-code">
 				<input type="hidden" value="${message}" data-status="${status}" name="message" id="message"/>
+				<input type="hidden" value="${isDirectRegistration}" name="isDirectRegistration" id="isDirectRegistration"/>
 			</form>
 			
 		</div>

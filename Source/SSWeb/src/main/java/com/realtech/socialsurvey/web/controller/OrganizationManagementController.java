@@ -151,6 +151,8 @@ public class OrganizationManagementController {
 		String zipCode = request.getParameter("zipcode");
 		String companyContactNo = request.getParameter("contactno");
 		String vertical = request.getParameter("vertical");
+		// JIRA SS-536: Added for manual registration via invitation
+		String strIsDirectRegistration = request.getParameter("isDirectRegistration");
 
 		try {
 			try {
@@ -169,6 +171,7 @@ public class OrganizationManagementController {
 					model.addAttribute("countryCode", countryCode);
 					model.addAttribute("zipCode", zipCode);
 					model.addAttribute("companyContactNo", companyContactNo);
+					model.addAttribute("isDirectRegistration", strIsDirectRegistration);
 				}
 				catch (InvalidInputException e1) {
 					throw new InvalidInputException("Invalid Input exception occured in method getAllVerticalsMaster()", DisplayMessageConstants.GENERAL_ERROR, e1);
@@ -200,6 +203,12 @@ public class OrganizationManagementController {
 				companyDetails.put(CommonConstants.LOGO_NAME, logoName);
 			}
 			companyDetails.put(CommonConstants.VERTICAL, vertical);
+			// JIRA SS-536: Added for manual registration via invitation
+			if(strIsDirectRegistration.equalsIgnoreCase("false")){
+				companyDetails.put(CommonConstants.BILLING_MODE_COLUMN, CommonConstants.BILLING_MODE_INVOICE);
+			}else{
+				companyDetails.put(CommonConstants.BILLING_MODE_COLUMN, CommonConstants.BILLING_MODE_AUTO);
+			}
 
 			LOG.debug("Calling services to add company details");
 			user = organizationManagementService.addCompanyInformation(user, companyDetails);

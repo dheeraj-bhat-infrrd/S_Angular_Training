@@ -1,17 +1,23 @@
 package com.realtech.socialsurvey.web.controller;
 
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
+import java.net.URLEncoder;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.entities.User;
 import com.realtech.socialsurvey.core.entities.VerticalsMaster;
@@ -20,6 +26,8 @@ import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.exception.NonFatalException;
 import com.realtech.socialsurvey.core.exception.UserAlreadyExistsException;
 import com.realtech.socialsurvey.core.services.authentication.CaptchaValidation;
+import com.realtech.socialsurvey.core.services.generator.URLGenerator;
+import com.realtech.socialsurvey.core.services.mail.EmailServices;
 import com.realtech.socialsurvey.core.services.mail.UndeliveredEmailException;
 import com.realtech.socialsurvey.core.services.organizationmanagement.OrganizationManagementService;
 import com.realtech.socialsurvey.core.services.organizationmanagement.UserManagementService;
@@ -29,10 +37,10 @@ import com.realtech.socialsurvey.core.utils.DisplayMessageConstants;
 import com.realtech.socialsurvey.core.utils.MessageUtils;
 import com.realtech.socialsurvey.web.common.JspResolver;
 
-//JIRA : SS-13 by RM-06 : BOC
+// JIRA : SS-13 by RM-06 : BOC
 /**
-* Registration Controller Sends an invitation to the corporate admin
-*/
+ * Registration Controller Sends an invitation to the corporate admin
+ */
 @Controller
 public class RegistrationController {
 
@@ -50,6 +58,15 @@ public class RegistrationController {
 	private SessionHelper sessionHelper;
 	@Autowired
 	private OrganizationManagementService organizationManagementService;
+	@Autowired
+	private EmailServices emailServices;
+
+	@Value("${APPLICATION_BASE_URL}")
+	private String applicationBaseUrl;
+
+	// JIRA - SS-536: Added for manual registration via invite
+	@Autowired
+	private URLGenerator urlGenerator;
 
 	@RequestMapping(value = "/invitation")
 	public String initInvitationPage(Model model) {
@@ -124,7 +141,7 @@ public class RegistrationController {
 	@RequestMapping(value = "/showregistrationpage")
 	public String showRegistrationPage(@RequestParam("q") String encryptedUrlParams, HttpServletRequest request, Model model) {
 		LOG.info("Method showRegistrationPage of Registration Controller called with encryptedUrl : " + encryptedUrlParams);
-		
+
 		try {
 			LOG.debug("Calling registration service for validating registration url and extracting parameters from it");
 			Map<String, String> urlParams = null;
@@ -134,7 +151,7 @@ public class RegistrationController {
 			catch (InvalidInputException e) {
 				throw new InvalidInputException(e.getMessage(), DisplayMessageConstants.INVALID_REGISTRATION_INVITE, e);
 			}
-			
+
 			if (urlParams == null || urlParams.isEmpty()) {
 				throw new InvalidInputException("Url params are null or empty in showRegistrationPage");
 			}
@@ -159,7 +176,7 @@ public class RegistrationController {
 	 * @param model
 	 * @param request
 	 * @return
-	 * @throws IOException 
+	 * @throws IOException
 	 */
 	@RequestMapping(value = "/registration")
 	public String initDirectRegistration(Model model, HttpServletRequest request) {
@@ -234,7 +251,8 @@ public class RegistrationController {
 			 */
 			try {
 				LOG.debug("Registering user with emailId : " + emailId);
-				User user = userManagementService.addCorporateAdminAndUpdateStage(firstName, lastName, emailId, confirmPassword, isDirectRegistration);
+				User user = userManagementService
+						.addCorporateAdminAndUpdateStage(firstName, lastName, emailId, confirmPassword, isDirectRegistration);
 				LOG.debug("Succesfully completed registration of user with emailId : " + emailId);
 
 				LOG.debug("Adding newly added user {} to mongo", user.getFirstName());
@@ -258,7 +276,7 @@ public class RegistrationController {
 			catch (UndeliveredEmailException e) {
 				throw new UndeliveredEmailException(e.getMessage(), DisplayMessageConstants.GENERAL_ERROR, e);
 			}
-			
+
 			List<VerticalsMaster> verticalsMasters = null;
 			try {
 				verticalsMasters = organizationManagementService.getAllVerticalsMaster();
@@ -268,6 +286,8 @@ public class RegistrationController {
 						DisplayMessageConstants.GENERAL_ERROR, e);
 			}
 			model.addAttribute("verticals", verticalsMasters);
+			// JIRA - SS-536
+			model.addAttribute("isDirectRegistration", strIsDirectRegistration);
 		}
 		catch (NonFatalException e) {
 			LOG.error("NonFatalException while registering user. Reason : " + e.getMessage(), e);
@@ -308,12 +328,78 @@ public class RegistrationController {
 		}
 		catch (SolrException e) {
 			LOG.error("SolrException while verifying account. Reason : " + e.getMessage(), e);
-			model.addAttribute("message",
-					messageUtils.getDisplayMessage("SolrException", DisplayMessageType.ERROR_MESSAGE));
+			model.addAttribute("message", messageUtils.getDisplayMessage("SolrException", DisplayMessageType.ERROR_MESSAGE));
 		}
 		LOG.info("Method to verify account finished");
 		return JspResolver.LOGIN;
 
+	}
+
+	// JIRA - SS-536: Added for manual registration via invite
+	@RequestMapping(value = "/invitetoregister")
+	public String initManualRegistration(@RequestParam("q") String encryptedUrlParams, HttpServletRequest request, Model model) {
+		LOG.info("Manual invitation for registration");
+		// decrypt the url
+		try {
+			Map<String, String> urlParams = urlGenerator.decryptParameters(encryptedUrlParams);
+			if (urlParams.get(CommonConstants.FIRST_NAME) != null) {
+				model.addAttribute("firstname", URLDecoder.decode(urlParams.get(CommonConstants.FIRST_NAME), "UTF-8"));
+			}
+			else {
+				throw new InvalidInputException("First name is not present");
+			}
+			if (urlParams.get(CommonConstants.LAST_NAME) != null) {
+				model.addAttribute("lastname", URLDecoder.decode(urlParams.get(CommonConstants.LAST_NAME), "UTF-8"));
+			}
+			else {
+				model.addAttribute("lastname", "");
+			}
+			if (urlParams.get(CommonConstants.EMAIL_ID) != null) {
+				model.addAttribute("emailid", URLDecoder.decode(urlParams.get(CommonConstants.EMAIL_ID), "UTF-8"));
+			}
+			else {
+				throw new InvalidInputException("Email id is not present");
+			}
+			model.addAttribute("isDirectRegistration", false);
+			// check if the email id exists.
+			if(userManagementService.userExists(URLDecoder.decode(urlParams.get(CommonConstants.EMAIL_ID), "UTF-8"))){
+				return JspResolver.LOGIN;
+			}
+			
+		}
+		catch (InvalidInputException | UnsupportedEncodingException e) {
+			LOG.error("Exception while inviting user for manual registration", e);
+			model.addAttribute("message",
+					messageUtils.getDisplayMessage(DisplayMessageConstants.INVALID_VERIFICATION_URL, DisplayMessageType.ERROR_MESSAGE));
+		}
+		return JspResolver.REGISTRATION;
+	}
+
+	// JIRA - SS-536: Added for manual registration via invite
+	@ResponseBody
+	@RequestMapping(value = "/generateregistrationurl")
+	public String geerateRegistrationUrlForManualCompanyCreation(@RequestParam("firstName") String firstName,
+			@RequestParam("lastName") String lastName, @RequestParam("emailId") String emailId, @RequestParam("creatorEmailId") String creatorEmailId) {
+		LOG.info("Creating invitation url for " + firstName + " " + lastName + " and email " + emailId);
+		String result = null;
+		try {
+			// generate the url
+			Map<String, String> params = new HashMap<String, String>();
+			params.put(CommonConstants.FIRST_NAME, URLEncoder.encode(firstName, "UTF-8"));
+			if(lastName != null){
+				params.put(CommonConstants.LAST_NAME, URLEncoder.encode(lastName, "UTF-8"));
+			}
+			params.put(CommonConstants.EMAIL_ID, URLEncoder.encode(emailId, "UTF-8"));
+
+			String url = urlGenerator.generateUrl(params, applicationBaseUrl + CommonConstants.MANUAL_REGISTRATION);
+			emailServices.sendManualRegistrationLink(creatorEmailId, firstName, lastName, url);
+			result = "Done";
+		}
+		catch (InvalidInputException | UndeliveredEmailException | UnsupportedEncodingException e) {
+			LOG.error("Exception caught while sending mail to generating registration url", e);
+			result = "Something went wrong";
+		}
+		return result;
 	}
 
 	/**
@@ -392,7 +478,7 @@ public class RegistrationController {
 		 */
 		validateFormParameters(firstName, lastName, emailId);
 
-		if (password == null || password.isEmpty() || password.length()<CommonConstants.PASSWORD_LENGTH || confirmPassword == null
+		if (password == null || password.isEmpty() || password.length() < CommonConstants.PASSWORD_LENGTH || confirmPassword == null
 				|| confirmPassword.isEmpty()) {
 			throw new InvalidInputException("Password is not valid in registration", DisplayMessageConstants.INVALID_PASSWORD);
 		}
