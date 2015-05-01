@@ -46,7 +46,7 @@
 		</c:choose>
 	</div>
 </div>
-<div class="lp-con-row lp-row clearfix">
+<%-- <div class="lp-con-row lp-row clearfix">
 	<div class="float-left lp-con-icn icn-blog"></div>
 	<div>
 		<c:choose>
@@ -153,4 +153,4 @@
 			</c:when>
 		</c:choose>
 	</div>
-</div>
+</div> --%>

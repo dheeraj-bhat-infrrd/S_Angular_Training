@@ -1131,6 +1131,7 @@ function bindUserEditClicks() {
 			$(this).parent().parent().parent().next('.user-edit-row').slideUp(200);
 			$(".user-assignment-edit-div").html("");
 			$(".user-edit-row").slideUp();
+			$(this).attr('clicked','false');
 	    }
 	});
 	$(".user-del-icn").unbind('click');
