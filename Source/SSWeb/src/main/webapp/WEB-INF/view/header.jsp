@@ -17,6 +17,7 @@
 	<title><spring:message code="label.login.title.key" /></title>
 	<link rel="shortcut icon" href="${pageContext.request.contextPath}/favicon.ico" sizes="16x16">
 	<link rel="stylesheet" href="${pageContext.request.contextPath}/resources/css/bootstrap.min.css">
+	<link rel="stylesheet" href="${pageContext.request.contextPath}/resources/jcrop/jquery.Jcrop.min.css">
 	<link rel="stylesheet" href="${pageContext.request.contextPath}/resources/css/style.css">
 	<link rel="stylesheet" href="${pageContext.request.contextPath}/resources/css/style-common.css">
 	<link rel="stylesheet" href="${pageContext.request.contextPath}/resources/css/rangeslider.css">

@@ -1096,8 +1096,16 @@
     .v-um-hdr-left, .v-um-hdr-right{
         font-size: 14px;
     }
-    .v-tbl-edit,.v-tbl-rem{
-        width: 6%;
+    .v-tbl-edit,.v-tbl-rem {
+		width: 10%;
+		min-width: 30px;
+		display: inline-block;
+	}
+	.v-tbl-uname{
+    	width: 30%;
+    }
+    .v-tbl-email{	
+    	width: 50%;
     }
     .col-lg-6.col-md-6.col-sm-6.col-xs-12.um-panel-item {
         margin-bottom: 1px;

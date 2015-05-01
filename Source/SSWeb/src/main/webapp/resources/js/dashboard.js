@@ -29,12 +29,12 @@ $(document).on('click', '.icn-remove', function() {
 	$(this).parent().find('.icn-plus-open').show();
 });
 
-$('#hr-txt2').click(function(e) {
+$(document).on('click', '#hr-txt2', function(e) {
 	e.stopPropagation();
 	$('#hr-dd-wrapper').slideToggle(200);
 });
 
-$('.hr-dd-item').click(function(e) {
+$(document).on('click', '.hr-dd-item', function(e) {
 	e.stopPropagation();
 });
 
@@ -691,12 +691,12 @@ function showSurveyRequestPage(){
 	//window.open('./redirecttosurveyrequestpage.do', '_self');
 }
 
-$('#dashboard-sel').click(function(e){
+$(document).on('click','#dashboard-sel',function(e){
 	e.stopPropagation();
 	$('#da-dd-wrapper-profiles').slideToggle(200);
 });
 
-$('.da-dd-item').click(function(){
+$(document).on('click','.da-dd-item',function(e){
 	$('#dashboard-sel').html($(this).html());
 	$('#da-dd-wrapper-profiles').slideToggle(200);
 	
@@ -719,7 +719,7 @@ $('.da-dd-item').click(function(){
 	colValue = newProfileValue;
 });
 
-$('body').click(function(){
+$(document).click(function(){
 	if ($('#da-dd-wrapper-profiles').css('display') == "block") {
 		$('#da-dd-wrapper-profiles').toggle();
 	}
