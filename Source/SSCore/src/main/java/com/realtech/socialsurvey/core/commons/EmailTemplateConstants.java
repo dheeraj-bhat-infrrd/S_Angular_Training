@@ -9,11 +9,23 @@ public final class EmailTemplateConstants {
 
 	public static final String EMAIL_TEMPLATES_FOLDER = "EmailTemplates/";
 
+	public static final String ACCOUNT_DISABLED_MAIL_BODY = "AccountDisabledMailBody.html";
+	public static final String ACCOUNT_DISABLED_MAIL_SUBJECT = "AccountDisabledMailSubject.txt";
+
+	public static final String ACCOUNT_UPGRADE_MAIL_BODY = "AccountUpgradeMailBody.html";
+	public static final String ACCOUNT_UPGRADE_MAIL_SUBJECT = "AccountUpgradeMailSubject.txt";
+
 	public static final String COMPLETE_REGISTRATION_MAIL_BODY = "CompleteRegistrationMailBody.html";
 	public static final String COMPLETE_REGISTRATION_MAIL_SUBJECT = "CompleteRegistrationMailSubject.txt";
 
 	public static final String RESET_PASSWORD_MAIL_BODY = "ResetPasswordMailBody.html";
 	public static final String RESET_PASSWORD_MAIL_SUBJECT = "ResetPasswordMailSubject.txt";
+
+	public static final String RETRIES_EXHAUSTED_MAIL_BODY = "RetriesExhaustedMailBody.html";
+	public static final String RETRIES_EXHAUSTED_MAIL_SUBJECT = "RetriesExhaustedMailSubject.txt";
+
+	public static final String RETRY_CHARGE_MAIL_BODY = "RetryChargeMailBody.html";
+	public static final String RETRY_CHARGE_MAIL_SUBJECT = "RetryChargeMailSubject.txt";
 
 	public static final String SURVEY_COMPLETION_MAIL_BODY = "SurveyCompletionMailBody.html";
 	public static final String SURVEY_COMPLETION_MAIL_SUBJECT = "SurveyCompletionMailSubject.txt";
@@ -31,14 +43,8 @@ public final class EmailTemplateConstants {
 	public static final String ACCOUNT_BLOCKING_MAIL_SUBJECT = "AccountBlockingMailSubject.txt";
 	public static final String ACCOUNT_BLOCKING_MAIL_BODY = "AccountBlockingMailBody.html";
 
-	public static final String ACCOUNT_DISABLED_MAIL_SUBJECT = "AccountDisabledMailSubject.txt";
-	public static final String ACCOUNT_DISABLED_MAIL_BODY = "AccountDisabledMailBody.html";
-
 	public static final String ACCOUNT_REACTIVATION_MAIL_BODY = "AccountReactivationMailBody.html";
 	public static final String ACCOUNT_REACTIVATION_MAIL_SUBJECT = "AccountReactivationMailSubject.txt";
-
-	public static final String ACCOUNT_UPGRADE_MAIL_SUBJECT = "AccountUpgradeMailSubject.txt";
-	public static final String ACCOUNT_UPGRADE_MAIL_BODY = "AccountUpgradeMailBody.html";
 
 	public static final String CONTACT_US_MAIL_SUBJECT = "ContactUsMailSubject.txt";
 	public static final String CONTACT_US_MAIL_BODY = "ContactUsMailBody.html";
@@ -54,12 +60,6 @@ public final class EmailTemplateConstants {
 
 	public static final String REGISTRATION_INVITATION_MAIL_BODY = "RegistrationInvitationMailBody.html";
 	public static final String REGISTRATION_INVITATION_MAIL_SUBJECT = "RegistrationInvitationMailSubject.txt";
-
-	public static final String RETRIES_EXHAUSTED_MAIL_BODY = "RetriesExhaustedMailBody.html";
-	public static final String RETRIES_EXHAUSTED_MAIL_SUBJECT = "RetriesExhaustedMailSubject.txt";
-
-	public static final String RETRY_CHARGE_MAIL_BODY = "RetryChargeMailBody.html";
-	public static final String RETRY_CHARGE_MAIL_SUBJECT = "RetryChargeMailSubject.txt";
 
 	public static final String SUBSCRIPTION_PRICE_UPDATED_MAIL_SUBJECT = "SubscriptionPriceUpdate.txt";
 	public static final String SUBSCRIPTION_PRICE_UPDATED_MAIL_BODY = "SubscriptionPriceUpdateBody.html";
