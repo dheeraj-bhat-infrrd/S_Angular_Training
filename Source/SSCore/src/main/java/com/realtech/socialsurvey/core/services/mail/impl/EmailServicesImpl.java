@@ -602,7 +602,7 @@ public class EmailServicesImpl implements EmailServices {
 
 		FileContentReplacements messageBodyReplacements = new FileContentReplacements();
 		messageBodyReplacements.setFileName(EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER + EmailTemplateConstants.RETRY_CHARGE_MAIL_BODY);
-		messageBodyReplacements.setReplacementArgs(Arrays.asList(displayName));
+		messageBodyReplacements.setReplacementArgs(Arrays.asList(displayName, recipientMailId));
 
 		LOG.debug("Calling email sender to send mail");
 		emailSender.sendEmailWithBodyReplacements(emailEntity, subjectFileName, messageBodyReplacements);
@@ -651,7 +651,7 @@ public class EmailServicesImpl implements EmailServices {
 
 		FileContentReplacements messageBodyReplacements = new FileContentReplacements();
 		messageBodyReplacements.setFileName(EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER + EmailTemplateConstants.RETRIES_EXHAUSTED_MAIL_BODY);
-		messageBodyReplacements.setReplacementArgs(Arrays.asList(displayName));
+		messageBodyReplacements.setReplacementArgs(Arrays.asList(displayName, recipientMailId));
 
 		LOG.debug("Calling email sender to send mail");
 		emailSender.sendEmailWithBodyReplacements(emailEntity, subjectFileName, messageBodyReplacements);
@@ -700,7 +700,7 @@ public class EmailServicesImpl implements EmailServices {
 
 		FileContentReplacements messageBodyReplacements = new FileContentReplacements();
 		messageBodyReplacements.setFileName(EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER + EmailTemplateConstants.ACCOUNT_DISABLED_MAIL_BODY);
-		messageBodyReplacements.setReplacementArgs(Arrays.asList(displayName));
+		messageBodyReplacements.setReplacementArgs(Arrays.asList(displayName, recipientMailId));
 
 		LOG.debug("Calling email sender to send mail");
 		emailSender.sendEmailWithBodyReplacements(emailEntity, subjectFileName, messageBodyReplacements);
@@ -749,7 +749,7 @@ public class EmailServicesImpl implements EmailServices {
 
 		FileContentReplacements messageBodyReplacements = new FileContentReplacements();
 		messageBodyReplacements.setFileName(EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER + EmailTemplateConstants.ACCOUNT_UPGRADE_MAIL_BODY);
-		messageBodyReplacements.setReplacementArgs(Arrays.asList(displayName));
+		messageBodyReplacements.setReplacementArgs(Arrays.asList(displayName, recipientMailId));
 
 		LOG.debug("Calling email sender to send mail");
 		emailSender.sendEmailWithBodyReplacements(emailEntity, subjectFileName, messageBodyReplacements);
