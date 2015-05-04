@@ -135,6 +135,8 @@ public interface CommonConstants {
 	public static final String VERTICALS_MASTER_NAME_COLUMN = "verticalName";
 	public static final String FEED_SOURCE_COLUMN = "feedSource";
 	public static final String PASSWORD_COLUMN = "loginPassword";
+	public static final String API_SECRET_COLUMN = "apiSecret";
+	public static final String API_KEY_COLUMN = "apiKey";
 
 	/**
 	 * Mongo entities and column name constants
@@ -171,6 +173,7 @@ public interface CommonConstants {
 	public static final String COMPANY_CONTACT_NUMBER = "companyContactNo";
 	public static final String COMPANY = "company";
 	public static final String EMAIL_ID = "emailId";
+	public static final String ACCOUNT_CRETOR_EMAIL_ID = "creatorEmailId"; //used for registration via invite
 	public static final String FIRST_NAME = "firstName";
 	public static final String LAST_NAME = "lastName";
 	public static final String USER_ID = "userId";
@@ -491,4 +494,7 @@ public interface CommonConstants {
 	public static final String BILLING_MODE_AUTO = "A";
 	public static final String BILLING_MODE_INVOICE = "I";
 	public static final String INVOICE_BILLED_DEFULAT_SUBSCRIPTION_ID = "invoicebilling";
+
+	// API constants
+	public static final String API_KEY_FROM_URL = "api_key";
 }

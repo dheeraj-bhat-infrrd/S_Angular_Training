@@ -75,6 +75,7 @@
 				<value>com.realtech.socialsurvey.core.entities.CrmMaster</value>
 				<value>com.realtech.socialsurvey.core.entities.FeedStatus</value>
 				<value>com.realtech.socialsurvey.core.entities.UsercountModificationNotification</value>
+				<value>com.realtech.socialsurvey.core.entities.UserApiKey</value>
 			</list>
 		</property>
 	</bean>
