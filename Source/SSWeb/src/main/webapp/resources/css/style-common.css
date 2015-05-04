@@ -1691,6 +1691,7 @@ button.paypal.is-active {
 .ppl-head-1 {
 	font-size: 14px;
 	font-weight: bold !important;
+	text-transform: capitalize;
 }
 
 .ppl-head-2 {
@@ -6247,10 +6248,6 @@ tr.u-tbl-header td {
 	background: #fff;
 	border: 1px solid #c4c4c4;
 	border-radius: 3px;
-}
-
-.edit-prof-pic-name-wrapper{
-    border-bottom: 1px solid #dcdcdc;
 }
 
 .user-display-name {

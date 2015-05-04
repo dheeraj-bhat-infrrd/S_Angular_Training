@@ -575,7 +575,7 @@
     		}
     	}
     	
-    	$('#lp-input-name').blur(function() {
+    	/* $('#lp-input-name').blur(function() {
     		if (validateName(this.id)) {
     			hideError();
     		}
@@ -597,7 +597,7 @@
     		if (validateMessage(this.id)) {
     			hideError();
     		}
-    	});
+    	}); */
     	
     	
     	function validateContactUsForm() {
