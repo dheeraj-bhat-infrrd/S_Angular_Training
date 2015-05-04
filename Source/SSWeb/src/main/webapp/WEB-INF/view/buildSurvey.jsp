@@ -127,7 +127,7 @@
 		</div>
 	</div>
 </div>
-
+<script src="${pageContext.request.contextPath}/resources/js/buildSurvey.js"></script>
 <script>
 $(document).ready(function() {
 	hideOverlay();
