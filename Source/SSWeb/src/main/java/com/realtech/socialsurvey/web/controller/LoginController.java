@@ -156,6 +156,12 @@ public class LoginController {
 			if(request.getParameter("bm") != null && request.getParameter("bm").equals("I")){
 				isDirectRegistration = "false";
 			}
+			// code to hide the overlay during registration
+			if(isDirectRegistration.equals("false")){
+				model.addAttribute("skippayment","true");
+			}else if(isDirectRegistration.equals("true")){
+				model.addAttribute("skippayment","false");
+			}
 			user = sessionHelper.getCurrentUser();
 			HttpSession session = request.getSession(true);
 
