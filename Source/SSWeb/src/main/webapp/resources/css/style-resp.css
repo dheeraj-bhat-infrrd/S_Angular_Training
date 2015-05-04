@@ -1096,8 +1096,16 @@
     .v-um-hdr-left, .v-um-hdr-right{
         font-size: 14px;
     }
-    .v-tbl-edit,.v-tbl-rem{
-        width: 6%;
+    .v-tbl-edit,.v-tbl-rem {
+		width: 10%;
+		min-width: 30px;
+		display: inline-block;
+	}
+	.v-tbl-uname{
+    	width: 30%;
+    }
+    .v-tbl-email{	
+    	width: 50%;
     }
     .col-lg-6.col-md-6.col-sm-6.col-xs-12.um-panel-item {
         margin-bottom: 1px;
@@ -1352,9 +1360,39 @@
 	}
 	.welcome-popup-wrapper{
 		width: 100%;
+		padding: 10px;
 	}
 	.wc-review-table{
 		padding: 0;
+	}
+	.wc-btn-row{
+		margin-top: 10px;
+	}
+	.wc-sub-send-btn,.wc-sub-btn{
+	  	width: auto;
+  		padding: 0 30px;
+	}
+	.wc-popup-body-cont{
+		padding: 10px 0;
+	}
+	.wc-form-txt {
+		width: 100%;
+		height:auto;
+		text-align: left;
+		padding-left: 10px;
+	}
+	.wc-form-input-cont{
+		width: 50%;
+		padding: 0 10px;
+	}
+	input.wc-form-input{
+		width: 100%;
+	}
+	.wc-social-icn-row{
+		padding-left: 10%;
+	}
+	.edit-prof-pic-name-wrapper{
+	    border-bottom: 1px solid #dcdcdc;
 	}
 }
 

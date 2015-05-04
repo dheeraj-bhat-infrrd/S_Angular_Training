@@ -1691,6 +1691,7 @@ button.paypal.is-active {
 .ppl-head-1 {
 	font-size: 14px;
 	font-weight: bold !important;
+	text-transform: capitalize;
 }
 
 .ppl-head-2 {
@@ -5002,10 +5003,13 @@ tr.u-tbl-header {
 	font-weight: bold !important;
 }
 
+tr.u-tbl-row{
+	border-bottom: 1px solid #dcdcdc;	
+}
+
 tr.u-tbl-row td {
 	font-size: 14px;
 	height: 40px;
-	border-bottom: 1px solid #dcdcdc;
 }
 
 .v-um-tbl {
@@ -6244,10 +6248,6 @@ tr.u-tbl-header td {
 	background: #fff;
 	border: 1px solid #c4c4c4;
 	border-radius: 3px;
-}
-
-.edit-prof-pic-name-wrapper{
-    border-bottom: 1px solid #dcdcdc;
 }
 
 .user-display-name {

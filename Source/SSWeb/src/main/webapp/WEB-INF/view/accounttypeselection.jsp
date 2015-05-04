@@ -125,7 +125,7 @@
 				<%-- Payment options for new user --%>
 				<c:otherwise>
 					<c:if test="${ empty paidUpgrade }">
-                     <div class="acc-type-item text-center" onclick="selectAccountType(5, 'Free')">
+                     <div class="acc-type-item text-center" onclick="selectAccountType(5, 'Free', ${skippayment})">
 						<div class="act-header" id="account-type-0"><spring:message code="label.accounttype.freeaccount.key"/></div>
 						<div class="act-price">
 							<spring:message code="label.free.key"/>
@@ -138,7 +138,7 @@
 	                <c:choose>
 							<c:when test="${ paidUpgrade == 1 }">
 								<div class="acc-type-item text-center" onclick="javascript:makePaidUpgrade(1,'$35')"></c:when>
-							<c:otherwise><div class="acc-type-item text-center" onclick="selectAccountType(1, '$35')"></c:otherwise>
+							<c:otherwise><div class="acc-type-item text-center" onclick="selectAccountType(1, '$35', ${skippayment})"></c:otherwise>
 					</c:choose>
 						<div class="act-header" id="account-type-1"><spring:message code="label.accounttype.individual.key"/></div>
 						<div class="act-price">
@@ -150,7 +150,7 @@
 					</div>
 					<c:choose>
 							<c:when test="${ paidUpgrade == 1 }"><div class="acc-type-item text-center" onclick="javascript:makePaidUpgrade(2,'$45')"></c:when>
-							<c:otherwise><div class="acc-type-item text-center" onclick="selectAccountType(2, '$45')"></c:otherwise>
+							<c:otherwise><div class="acc-type-item text-center" onclick="selectAccountType(2, '$45', ${skippayment})"></c:otherwise>
 					</c:choose>
 						<div class="act-header" id="account-type-2"><spring:message code="label.accounttype.team.key"/></div>
 						<div class="act-price">
@@ -162,7 +162,7 @@
 					</div>
 					<c:choose>
 							<c:when test="${ paidUpgrade == 1 }"><div class="acc-type-item text-center" onclick="javascript:makePaidUpgrade(3, '$65')"></c:when>
-							<c:otherwise><div class="acc-type-item text-center" onclick="selectAccountType(3, '$65')"></c:otherwise>
+							<c:otherwise><div class="acc-type-item text-center" onclick="selectAccountType(3, '$65', ${skippayment})"></c:otherwise>
 					</c:choose>
 						<div class="act-header" id="account-type-3"><spring:message code="label.accounttype.company.key"/></div>
 						<div class="act-price">
@@ -174,7 +174,7 @@
 					</div>
 					<c:choose>
 							<c:when test="${ paidUpgrade == 1 }"><div class="acc-type-item text-center" onclick="javascript:makePaidUpgrade(4, '$99')"></c:when>
-							<c:otherwise><div class="acc-type-item text-center" onclick="selectAccountType(4, '$99')"></c:otherwise>
+							<c:otherwise><div class="acc-type-item text-center" onclick="selectAccountType(4, '$99', ${skippayment})"></c:otherwise>
 					</c:choose>
 						<div class="act-header" id="account-type-4"><spring:message code="label.accounttype.enterprise.key"/></div>
 						<div class="act-price">
@@ -214,26 +214,32 @@
 </c:if>  
 
 <script>
-function selectAccountType(accountType, paymentAmount) {
+function selectAccountType(accountType, paymentAmount, skippayment) {
 	if ($(this).attr('data-status') == 'disabled') {
 		return;
 	}
-	
 	console.log("selecting and saving account type");
 	$('#account-type').val(accountType);
 
 	// show the progress icon
 	showOverlay();
-
+	console.log("skip payment "+skippayment);
 	var url = "./addaccounttype.do";
 	var $form = $("#account-type-selection-form");
 	var payLoad = $form.serialize();
 	$.ajax({
 		url : url,
 		type : "POST",
+		async : false,
 		data : payLoad,
 		success : function(data) {
-			selectAccountTypeCallBack(data, accountType, paymentAmount);
+			if(skippayment == undefined || Boolean(skippayment) != true){
+				console.log("showing payment screen");
+				selectAccountTypeCallBack(data, accountType, paymentAmount);
+			}else{
+				console.log("skipping payment");
+            	location.href="./landing.do";
+			}
 		},
 		error : function(e) {
 			console.error("error : " + e);

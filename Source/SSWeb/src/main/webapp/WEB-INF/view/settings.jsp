@@ -13,7 +13,7 @@
 		<div class="hm-header-row clearfix">
 			<div class="float-left hm-header-row-left"><spring:message code="label.title.settings.key" /></div>
 			<c:if test="${not empty profileList && fn:length(profileList) > 1}">
-				<div class="float-right header-right clearfix hr-dsh-adj-rt" style="z-index: 9999; margin-left: 50px;">
+				<div class="float-right header-right clearfix hr-dsh-adj-rt" style="z-index: 999; margin-left: 50px;">
 					<div class="float-left hr-txt1"><spring:message code="label.viewas.key" /></div>
 					<div id="setting-sel" class="float-left hr-txt2 cursor-pointer">${profileName}</div>
 					<div id="se-dd-wrapper-profiles" class="va-dd-wrapper hide">
@@ -176,7 +176,8 @@
 						<div class="float-left soc-nw-icns cursor-pointer icn-wide-twitter" onclick="openAuthPage('twitter');"></div>
 						<!-- <div class="float-left soc-nw-icns cursor-pointer icn-wide-rss" onclick="openAuthPage('rss');"></div> -->
 						<div class="float-left soc-nw-icns cursor-pointer icn-wide-linkedin soc-nw-adj" onclick="openAuthPage('linkedin');"></div>
-						<div class="float-left soc-nw-icns cursor-pointer icn-wide-yelp" onclick="openAuthPage('yelp');"></div>
+						<!-- <div class="float-left soc-nw-icns cursor-pointer icn-wide-yelp" onclick="openAuthPage('yelp');"></div> -->
+						<div class="float-left soc-nw-icns cursor-pointer icn-wide-gplus" onclick="openAuthPage('google');"></div>
 					</div>
 				</div>
 			</div>
@@ -307,9 +308,6 @@
 	}
 </style>
 
-<script src="${pageContext.request.contextPath}/resources/js/settings.js"></script>
-<script src="${pageContext.request.contextPath}/resources/ckeditor/ckeditor.js"></script>
-<script src="${pageContext.request.contextPath}/resources/ckeditor/adapters/jquery.js"></script>
 <script>
 $(document).ready(function(){
 	hideOverlay();
@@ -338,5 +336,218 @@ $(document).ready(function(){
 			$('#hm-main-content-wrapper').attr("data-nutl"),
 			$('#hm-main-content-wrapper').attr("data-sad"));
 	}
+	
+	
+	
+	//Event binding
+	
+	
+	
+	// Settings View as
+	$('body').on('click','#setting-sel',function(e){
+		e.stopPropagation();
+		$('#se-dd-wrapper-profiles').slideToggle(200);
+	});
+	
+	$('body').on('click','.se-dd-item',function(e){
+		var newProfileId = $(this).data('profile-id');
+		
+		$('#setting-sel').html($(this).html());
+		$('#se-dd-wrapper-profiles').slideToggle(200);
+		
+		showMainContent('./showcompanysettings.do?profileId=' + newProfileId);
+	});
+	
+	$('body').click(function(){
+		if ($('#se-dd-wrapper-profiles').css('display') == "block") {
+			$('#se-dd-wrapper-profiles').toggle();
+		}
+	});
+	
+	$('#encompass-username').blur(function() {
+		validateEncompassUserName(this.id);
+	});
+	$('#encompass-password').blur(function() {
+		validateEncompassPassword(this.id);
+	});
+	$('#encompass-url').blur(function() {
+		validateURL(this.id);
+	});
+	$('body').on('click','#encompass-save',function(){
+		if(validateEncompassInput('encompass-form-div')) {
+			saveEncompassDetails("encompass-form");
+		}
+	}); 
+	$('body').on('click','#encompass-testconnection',function(){
+		if(validateEncompassInput('encompass-form-div')) {
+			testEncompassConnection("encompass-form");
+		}
+	});
+
+	$('body').on('click','.st-dd-item-auto-post',function(){
+		$('#rating-auto-post').val($(this).html());
+		$('#st-dd-wrapper-auto-post').slideToggle(200);
+
+		$('#ratingcategory').val('rating-auto-post');
+		var rating = $('#rating-auto-post').val();
+		var ratingParent = $('#rating-auto-post-parent');
+
+		changeRatingPattern(rating, ratingParent);
+		updatePostScore("rating-settings-form");
+	});
+
+	$('body').on('click','.st-dd-item-min-post',function(){
+		$('#rating-min-post').val($(this).html());
+		$('#st-dd-wrapper-min-post').slideToggle(200);
+		
+		$('#ratingcategory').val('rating-min-post');
+		
+		var rating = $('#rating-min-post').val();
+		var ratingParent = $('#rating-min-post-parent');
+		changeRatingPattern(rating, ratingParent);
+		
+		updatePostScore("rating-settings-form");
+	});
+
+
+	$('#edit-participation-mail-content').click(function(){
+		$('#survey-participation-mailcontent').ckeditorGet().setReadOnly(false);
+		
+		$('#save-participation-mail-content').show();
+		$('#save-participation-mail-content-disabled').hide();
+		
+		$('#edit-participation-mail-content-disabled').show();
+		$(this).hide();
+	});
+	$('#save-participation-mail-content').click(function(){
+		$('#mailcategory').val('participationmail');
+		updateMailContent("mail-body-settings-form");
+		
+		$('#survey-participation-mailcontent').ckeditorGet().setReadOnly(true);
+		
+		$(this).hide();
+		$('#save-participation-mail-content-disabled').show();
+
+		$('#edit-participation-mail-content').show();
+		$('#edit-participation-mail-content-disabled').hide();
+	});
+
+
+	$('#edit-participation-reminder-mail-content').click(function(){
+		$('#survey-participation-reminder-mailcontent').ckeditorGet().setReadOnly(false);
+		
+		$('#save-participation-reminder-mail-content').show();
+		$('#save-participation-reminder-mail-content-disabled').hide();
+		
+		$('#edit-participation-reminder-mail-content-disabled').show();
+		$(this).hide();
+	});
+	$('#save-participation-reminder-mail-content').click(function(){
+		$('#mailcategory').val('participationremindermail');
+		updateMailContent("mail-body-settings-form");
+		;
+		$('#survey-participation-reminder-mailcontent').ckeditorGet().setReadOnly(true);
+		
+		$(this).hide();
+		$('#save-participation-reminder-mail-content-disabled').show();
+
+		$('#edit-participation-reminder-mail-content').show();
+		$('#edit-participation-reminder-mail-content-disabled').hide();
+	});
+
+
+	$('#reminder-interval').change(function() {
+		$('#mailcategory').val('reminder-interval');
+		if(validateReminderInterval('reminder-interval')) {
+			updateReminderSettings("mail-body-settings-form");
+		}
+	});
+
+	$('#st-reminder-on').click(function(){
+		$('#mailcategory').val('reminder-needed');
+		
+		$('#reminder-needed-hidden').val('false');
+		$('#st-reminder-off').show();
+		$(this).hide();
+
+		$('#reminder-interval').removeAttr("disabled");
+		updateReminderSettings("mail-body-settings-form");
+	});
+	$('#st-reminder-off').click(function(){
+		$('#mailcategory').val('reminder-needed');
+
+		$('#reminder-needed-hidden').val('true');
+		$('#st-reminder-on').show();
+		$(this).hide();
+		
+		$('#reminder-interval').attr("disabled", true);
+		updateReminderSettings("mail-body-settings-form");
+	});
+
+
+	$('#st-settings-location-on').click(function(){
+		$('#othercategory').val('other-location');
+		$('#other-location').val('false');
+		
+		$('#st-settings-location-off').show();
+		$(this).hide();
+		
+		updateOtherSettings("other-settings-form");
+	});
+	$('#st-settings-location-off').click(function(){
+		$('#othercategory').val('other-location');
+		$('#other-location').val('true');
+
+		$('#st-settings-location-on').show();
+		$(this).hide();
+		
+		updateOtherSettings("other-settings-form");
+	});
+
+
+	$('#st-settings-payment-on').click(function(){
+		$('#st-settings-payment-off').show();
+		$(this).hide();
+	});
+	$('#st-settings-payment-off').click(function(){
+		$('#st-settings-payment-on').show();
+		$(this).hide();
+		showPaymentOptions();
+	});
+
+
+	$('#st-settings-account-on').click(function(){
+		$('#other-account').val('false');
+		createPopupConfirm("Enable Account", "Do you want to Continue?");
+		overlayAccount();
+	});
+	$('#st-settings-account-off').click(function(){
+		$('#other-account').val('true');
+		createPopupConfirm("Disable Account", "You will not be able to access the application after your billing cycle.<br/> Do you want to Continue?");
+		overlayAccount();
+	});
+
+	$('#happy-text').blur(function() {
+		  saveTextForMoodFlow($("#happy-text").val(), "happy");
+	});
+
+	$('#neutral-text').blur(function() {
+		saveTextForMoodFlow($("#neutral-text").val(), "neutral");
+	});
+
+	$('#sad-text').blur(function() {
+		saveTextForMoodFlow($("#sad-text").val(), "sad");
+	});
+
+	$('#atpst-chk-box').click(function(){
+		if($('#atpst-chk-box').hasClass('bd-check-img-checked')){
+			$('#atpst-chk-box').removeClass('bd-check-img-checked');
+			updateAutoPostSetting(true);
+		}
+		else{
+			$('#atpst-chk-box').addClass('bd-check-img-checked');
+			updateAutoPostSetting(false);
+		}
+	});
 });
 </script>

@@ -127,7 +127,6 @@
 		</div>
 	</div>
 </div>
-
 <script src="${pageContext.request.contextPath}/resources/js/buildSurvey.js"></script>
 <script>
 $(document).ready(function() {
@@ -137,15 +136,7 @@ $(document).ready(function() {
 	$('#bs-ques-wrapper').html('');
 	loadActiveSurveyQuestions();
 	
-	resizeAdj();
-	$(window).resize(resizeAdj);
-	function resizeAdj(){
-		var winW = $(window).width();
-		if (winW < 768) {
-			var txtW = winW - 118;
-			$('.srv-tbl-txt').width(txtW);
-		}
-		else {}
-	}
+	resizeAdjBuildSurvey();
+	$(window).resize(resizeAdjBuildSurvey);
 });
 </script>

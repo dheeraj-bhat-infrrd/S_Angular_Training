@@ -134,7 +134,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 	public User addCompanyInformation(User user, Map<String, String> organizationalDetails) throws SolrException, InvalidInputException {
 		LOG.info("Method addCompanyInformation started for user " + user.getLoginName());
 		Company company = addCompany(user, organizationalDetails.get(CommonConstants.COMPANY_NAME), CommonConstants.STATUS_ACTIVE,
-				organizationalDetails.get(CommonConstants.VERTICAL));
+				organizationalDetails.get(CommonConstants.VERTICAL), organizationalDetails.get(CommonConstants.BILLING_MODE_COLUMN));
 
 		LOG.debug("Calling method for updating company of user");
 		updateCompanyForUser(user, company);
@@ -266,13 +266,13 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 	/*
 	 * This method adds a new company into the COMPANY table.
 	 */
-	private Company addCompany(User user, String companyName, int isRegistrationComplete, String vertical) {
+	private Company addCompany(User user, String companyName, int isRegistrationComplete, String vertical, String billingMode) {
 		LOG.debug("Method addCompany started for user " + user.getLoginName());
 		Company company = new Company();
 		company.setCompany(companyName);
 		company.setIsRegistrationComplete(isRegistrationComplete);
 		company.setStatus(CommonConstants.STATUS_ACTIVE);
-
+		company.setBillingMode(billingMode);
 		// We fetch the vertical and set it
 		VerticalsMaster verticalsMaster = verticalMastersDao.findByColumn(VerticalsMaster.class, CommonConstants.VERTICALS_MASTER_NAME_COLUMN,
 				vertical).get(CommonConstants.INITIAL_INDEX);
