@@ -176,7 +176,8 @@
 						<div class="float-left soc-nw-icns cursor-pointer icn-wide-twitter" onclick="openAuthPage('twitter');"></div>
 						<!-- <div class="float-left soc-nw-icns cursor-pointer icn-wide-rss" onclick="openAuthPage('rss');"></div> -->
 						<div class="float-left soc-nw-icns cursor-pointer icn-wide-linkedin soc-nw-adj" onclick="openAuthPage('linkedin');"></div>
-						<div class="float-left soc-nw-icns cursor-pointer icn-wide-yelp" onclick="openAuthPage('yelp');"></div>
+						<!-- <div class="float-left soc-nw-icns cursor-pointer icn-wide-yelp" onclick="openAuthPage('yelp');"></div> -->
+						<div class="float-left soc-nw-icns cursor-pointer icn-wide-gplus" onclick="openAuthPage('google');"></div>
 					</div>
 				</div>
 			</div>
