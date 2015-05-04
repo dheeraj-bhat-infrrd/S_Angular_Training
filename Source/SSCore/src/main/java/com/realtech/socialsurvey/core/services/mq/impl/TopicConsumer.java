@@ -121,19 +121,25 @@ public class TopicConsumer implements Runnable {
 		emailServices.sendRegistrationInviteMail(url, recipient, firstName, lastName);
 	}
 	
-	private void parseMailMessage(String message, EmailHeader header) throws NonFatalException{
-		LOG.debug("Mail message: "+message);
-		if(message.indexOf(RECIPIENT_MARKER) == -1 || message.indexOf(URL_MARKER) == -1 || message.indexOf(NAME_MARKER) == -1){
-			throw new InvalidMessageFormatException("Invalid format for "+header.getName()+" mail");
+	private void parseMailMessage(String message, EmailHeader header) throws NonFatalException {
+		LOG.debug("Mail message: " + message);
+		if (message.indexOf(RECIPIENT_MARKER) == -1 || message.indexOf(URL_MARKER) == -1 || message.indexOf(NAME_MARKER) == -1) {
+			throw new InvalidMessageFormatException("Invalid format for " + header.getName() + " mail");
 		}
+
 		String recipient = message.substring(RECIPIENT_MARKER.length(), message.indexOf(ELEMENTS_DELIMITER));
-		LOG.debug("Recipient: "+recipient);
-		int messageParsedIndex = RECIPIENT_MARKER.length()+recipient.length()+ELEMENTS_DELIMITER.length(); // holds the index till the message has been parsed.
-		String url = message.substring(messageParsedIndex+URL_MARKER.length(), message.indexOf(ELEMENTS_DELIMITER, messageParsedIndex));
-		LOG.debug("Url: "+url);
-		messageParsedIndex+=URL_MARKER.length()+url.length()+ELEMENTS_DELIMITER.length();
-		String name = message.substring(messageParsedIndex+NAME_MARKER.length());
-		LOG.debug("Name: "+name);
+		LOG.debug("Recipient: " + recipient);
+
+		// holds the index till the message has been parsed.
+		int messageParsedIndex = RECIPIENT_MARKER.length() + recipient.length() + ELEMENTS_DELIMITER.length();
+		
+		String url = message.substring(messageParsedIndex + URL_MARKER.length(), message.indexOf(ELEMENTS_DELIMITER, messageParsedIndex));
+		messageParsedIndex += URL_MARKER.length() + url.length() + ELEMENTS_DELIMITER.length();
+		LOG.debug("Url: " + url);
+		
+		String name = message.substring(messageParsedIndex + NAME_MARKER.length());
+		LOG.debug("Name: " + name);
+
 		if (header == EmailHeader.VERFICATION) {
 			LOG.debug("Sending verification mail");
 			emailServices.sendVerificationMail(url, recipient, name);

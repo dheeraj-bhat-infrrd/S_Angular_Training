@@ -1103,8 +1103,8 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 	public void sendVerificationLink(User user) throws InvalidInputException, UndeliveredEmailException {
 		LOG.debug("Method sendVerificationLink of Registration service called");
 		String verificationUrl = null;
+		
 		try {
-
 			Map<String, String> params = new HashMap<String, String>();
 			params.put(CommonConstants.EMAIL_ID, user.getEmailId());
 			params.put(CommonConstants.USER_ID, String.valueOf(user.getUserId()));
@@ -1126,7 +1126,6 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 				emailServices.sendVerificationMail(verificationUrl, user.getEmailId(),
 						user.getFirstName() + " " + (user.getLastName() != null ? user.getLastName() : ""));
 			}
-
 		}
 		catch (InvalidInputException e) {
 			throw new InvalidInputException("Could not send mail for verification.Reason : " + e.getMessage(), e);

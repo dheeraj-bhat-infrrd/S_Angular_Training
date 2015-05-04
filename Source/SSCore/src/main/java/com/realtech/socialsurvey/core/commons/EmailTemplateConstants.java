@@ -8,6 +8,13 @@ public final class EmailTemplateConstants {
 	private EmailTemplateConstants() {}
 
 	public static final String EMAIL_TEMPLATES_FOLDER = "EmailTemplates/";
+
+	// Mail Subjects
+	public static final String VERIFICATION_MAIL_SUBJECT = "VerificationMailSubject.txt";
+
+	// Mail Bodies
+	public static final String VERIFICATION_MAIL_BODY = "VerificationMailBody.html";
+
 	public static final String REGISTRATION_INVITATION_MAIL_SUBJECT = "RegistrationInvitationMailSubject.txt";
 	public static final String REGISTRATION_INVITATION_MAIL_BODY = "RegistrationInvitationMailBody.html";
 	public static final String RESET_PASSWORD_MAIL_SUBJECT = "ResetPasswordMailSubject.txt";
@@ -16,8 +23,6 @@ public final class EmailTemplateConstants {
 	public static final String SUBSCRIPTION_UNSUCCESSFUL_MAIL_SUBJECT = "SubscriptionChargeUnsuccessfulMailSubject.txt";
 	public static final String EMAIL_VERIFICATION_MAIL_BODY = "EmailVerificationMailBody.html";
 	public static final String EMAIL_VERIFICATION_MAIL_SUBJECT = "EmailVerificationMailSubject.txt";
-	public static final String VERIFICATION_MAIL_BODY = "VerificationMailBody.html";
-	public static final String VERIFICATION_MAIL_SUBJECT = "VerificationMailSubject.txt";
 	public static final String FATAL_EXCEPTION_MAIL_BODY = "FatalExceptionMailBody.html";
 	public static final String FATAL_EXCEPTION_MAIL_SUBJECT = "FatalExceptionMailSubject.txt";
 	public static final String RETRY_CHARGE_MAIL_BODY = "RetryChargeMailBody.html";
@@ -53,5 +58,4 @@ public final class EmailTemplateConstants {
 	public static final String ACCOUNT_REACTIVATION_MAIL_SUBJECT = "AccountReactivationMailSubject.txt";
 	public static final String SUBSCRIPTION_PRICE_UPDATED_MAIL_SUBJECT = "SubscriptionPriceUpdate.txt";
 	public static final String SUBSCRIPTION_PRICE_UPDATED_MAIL_BODY = "SubscriptionPriceUpdateBody.html";
-
 }

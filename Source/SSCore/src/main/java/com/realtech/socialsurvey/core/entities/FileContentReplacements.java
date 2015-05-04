@@ -5,12 +5,11 @@ import javax.persistence.Entity;
 import javax.persistence.Table;
 
 // JIRA: SS-7: By RM02: BOC
-
 /**
  * Class with attributes that contain a file name and arguments to be replaced in that file
  */
 @Entity
-@Table(name="FILE_CONTENT_REPLACEMENTS")
+@Table(name = "FILE_CONTENT_REPLACEMENTS")
 public class FileContentReplacements {
 
 	private String fileName;
@@ -31,6 +30,5 @@ public class FileContentReplacements {
 	public void setReplacementArgs(List<String> replacementArgs) {
 		this.replacementArgs = replacementArgs;
 	}
-
 }
 // JIRA: SS-7: By RM02: BOC
