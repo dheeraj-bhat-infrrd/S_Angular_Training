@@ -43,6 +43,7 @@ import com.realtech.socialsurvey.core.entities.Region;
 import com.realtech.socialsurvey.core.entities.RegionFromSearch;
 import com.realtech.socialsurvey.core.entities.RemovedUser;
 import com.realtech.socialsurvey.core.entities.User;
+import com.realtech.socialsurvey.core.entities.UserApiKey;
 import com.realtech.socialsurvey.core.entities.UserFromSearch;
 import com.realtech.socialsurvey.core.entities.UserInvite;
 import com.realtech.socialsurvey.core.entities.UserProfile;
@@ -122,6 +123,9 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 
 	@Autowired
 	private GenericDao<Region, Long> regionDao;
+	
+	@Autowired
+	private GenericDao<UserApiKey, Long> apiKeyDao;
 
 	@Autowired
 	private OrganizationUnitSettingsDao organizationUnitSettingsDao;
@@ -2117,5 +2121,31 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 		}
 		
 		LOG.info("Finished adding a record in user count modification notification table for company "+company.getCompany());
+	}
+	
+	@Transactional
+	@Override
+	public boolean isValidApiKey(String apiSecret, String apiKey) throws InvalidInputException, NoRecordsFetchedException{
+		LOG.info("Validation api key for secret : "+apiSecret+" and key : "+apiKey);
+		if(apiSecret == null || apiSecret.isEmpty()){
+			LOG.warn("Api Secret is null");
+			throw new InvalidInputException("Invalid api secret");
+		}
+		if(apiKey == null || apiKey.isEmpty()){
+			LOG.warn("Api key is null");
+			throw new InvalidInputException("Invalid api key");
+		}
+		boolean isApiKeyValid = false;
+		Map<String, Object> queryMap = new HashMap<String, Object>();
+		queryMap.put(CommonConstants.API_SECRET_COLUMN, apiSecret.trim());
+		queryMap.put(CommonConstants.API_KEY_COLUMN, apiKey.trim());
+		queryMap.put(CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_ACTIVE);
+		long count = apiKeyDao.findNumberOfRowsByKeyValue(UserApiKey.class, queryMap);
+		LOG.debug("Found "+count+" records from the api keys");
+		if(count > 0l){
+			LOG.info("API key is valid");
+			isApiKeyValid = true;
+		}
+		return isApiKeyValid;
 	}
 }
