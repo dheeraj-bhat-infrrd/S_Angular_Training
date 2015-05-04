@@ -143,9 +143,7 @@ public final class EmailSenderImpl implements EmailSender {
 
 		// Send the mail
 		sendMail(emailEntity);
-
 		LOG.info("Method sendEmailWithBodyReplacements completed successfully");
-
 	}
 
 	/**
