@@ -59,7 +59,7 @@
                 <span class="txt-bold txt-header-small">Professionals</span> <span class="txt-header-small">and</span>
                 <span class="txt-bold txt-header-small">Customers </span><span class="txt-header-small">connect</span> -->
                 <span>Amplify the Voice of Your Customer</span><br/>
-                <span class="font-22">Engaging customers and enhancing your online reputation</span>
+                <span class="font-22 s-font-16">Engaging customers and enhancing your online reputation</span>
 			</div>
 			<div class="content-wrapper clearfix">
 				<div class="float-left c-pic-panel">
