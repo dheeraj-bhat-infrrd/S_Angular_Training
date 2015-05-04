@@ -218,7 +218,7 @@ function selectAccountType(accountType, paymentAmount, skippayment) {
 	if ($(this).attr('data-status') == 'disabled') {
 		return;
 	}
-	
+	debugger;
 	console.log("selecting and saving account type");
 	$('#account-type').val(accountType);
 
@@ -231,13 +231,15 @@ function selectAccountType(accountType, paymentAmount, skippayment) {
 	$.ajax({
 		url : url,
 		type : "POST",
+		async : false,
 		data : payLoad,
 		success : function(data) {
-			if(skippayment == undefined || skippayment != "true"){
+			if(skippayment == undefined || Boolean(skippayment) != true){
 				console.log("showing payment screen");
 				selectAccountTypeCallBack(data, accountType, paymentAmount);
 			}else{
 				console.log("skipping payment");
+            	location.href="./landing.do";
 			}
 		},
 		error : function(e) {
