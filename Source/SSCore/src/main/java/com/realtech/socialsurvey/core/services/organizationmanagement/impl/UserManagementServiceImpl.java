@@ -27,6 +27,7 @@ import com.realtech.socialsurvey.core.dao.UserDao;
 import com.realtech.socialsurvey.core.dao.UserInviteDao;
 import com.realtech.socialsurvey.core.dao.UserProfileDao;
 import com.realtech.socialsurvey.core.dao.impl.MongoOrganizationUnitSettingDaoImpl;
+import com.realtech.socialsurvey.core.entities.AbridgedUserProfile;
 import com.realtech.socialsurvey.core.entities.AgentSettings;
 import com.realtech.socialsurvey.core.entities.Branch;
 import com.realtech.socialsurvey.core.entities.BranchFromSearch;
@@ -42,10 +43,10 @@ import com.realtech.socialsurvey.core.entities.Region;
 import com.realtech.socialsurvey.core.entities.RegionFromSearch;
 import com.realtech.socialsurvey.core.entities.RemovedUser;
 import com.realtech.socialsurvey.core.entities.User;
+import com.realtech.socialsurvey.core.entities.UserApiKey;
 import com.realtech.socialsurvey.core.entities.UserFromSearch;
 import com.realtech.socialsurvey.core.entities.UserInvite;
 import com.realtech.socialsurvey.core.entities.UserProfile;
-import com.realtech.socialsurvey.core.entities.AbridgedUserProfile;
 import com.realtech.socialsurvey.core.entities.UserSettings;
 import com.realtech.socialsurvey.core.entities.UsercountModificationNotification;
 import com.realtech.socialsurvey.core.enums.AccountType;
@@ -122,6 +123,9 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 
 	@Autowired
 	private GenericDao<Region, Long> regionDao;
+	
+	@Autowired
+	private GenericDao<UserApiKey, Long> apiKeyDao;
 
 	@Autowired
 	private OrganizationUnitSettingsDao organizationUnitSettingsDao;
@@ -231,6 +235,11 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 		if (isDirectRegistration) {
 			status = CommonConstants.STATUS_NOT_VERIFIED;
 		}
+		// JIRA - SS-536: Added for manual registration via invite 
+		else{
+			// setting the status as active as creation is done by admin
+			status = CommonConstants.STATUS_ACTIVE;
+		}
 
 		LOG.debug("Creating new user with emailId : " + emailId + " and verification status : " + status);
 		User user = createUser(company, encryptedPassword, emailId, firstName, lastName, CommonConstants.STATUS_ACTIVE, status,
@@ -254,10 +263,13 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 			LOG.debug("Calling method for sending verification link for user : " + user.getUserId());
 			sendVerificationLink(user);
 		}
+		// JIRA - SS-536 removed for manual registration via invite
+		/*
 		else {
 			LOG.debug("Invalidating registration link for emailId : " + emailId);
 			invalidateRegistrationInvite(emailId);
-		}
+		
+		}*/
 		setProfilesOfUser(user);
 		LOG.info("Successfully executed method to add corporate admin for emailId : " + emailId);
 		return user;
@@ -1314,32 +1326,6 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 		return userInvite;
 	}
 
-	/**
-	 * Method to invalidate the registration invite link based on emailIds
-	 * 
-	 * @param emailId
-	 * @throws InvalidInputException
-	 */
-	private void invalidateRegistrationInvite(String emailId) throws InvalidInputException {
-		if (emailId == null || emailId.isEmpty()) {
-			throw new InvalidInputException("Email id is null for invalidating registration invite");
-		}
-		LOG.debug("Method to invalidate registration invite called for emailId : " + emailId);
-		List<UserInvite> userInvites = userInviteDao.findByColumn(UserInvite.class, CommonConstants.INVITATION_EMAIL_ID_COLUMN, emailId);
-		if (userInvites != null && !userInvites.isEmpty()) {
-			for (UserInvite userInvite : userInvites) {
-				userInvite.setStatus(CommonConstants.STATUS_INACTIVE);
-				userInvite.setModifiedBy(CommonConstants.GUEST_USER_NAME);
-				userInvite.setModifiedOn(new Timestamp(System.currentTimeMillis()));
-				userInviteDao.update(userInvite);
-			}
-		}
-		else {
-			LOG.debug("Registration invite link to be invalidated is not present");
-		}
-		LOG.debug("Method to invalidate registration invite finished for emailId : " + emailId);
-
-	}
 
 	/**
 	 * Method to check whether a user with selected user name exists
@@ -1347,6 +1333,7 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 	 * @param userName
 	 * @return
 	 */
+	@Transactional
 	@Override
 	public boolean userExists(String userName) {
 		LOG.debug("Method to check if user exists called for username : " + userName);
@@ -2133,5 +2120,31 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 		}
 		
 		LOG.info("Finished adding a record in user count modification notification table for company "+company.getCompany());
+	}
+	
+	@Transactional
+	@Override
+	public boolean isValidApiKey(String apiSecret, String apiKey) throws InvalidInputException, NoRecordsFetchedException{
+		LOG.info("Validation api key for secret : "+apiSecret+" and key : "+apiKey);
+		if(apiSecret == null || apiSecret.isEmpty()){
+			LOG.warn("Api Secret is null");
+			throw new InvalidInputException("Invalid api secret");
+		}
+		if(apiKey == null || apiKey.isEmpty()){
+			LOG.warn("Api key is null");
+			throw new InvalidInputException("Invalid api key");
+		}
+		boolean isApiKeyValid = false;
+		Map<String, Object> queryMap = new HashMap<String, Object>();
+		queryMap.put(CommonConstants.API_SECRET_COLUMN, apiSecret.trim());
+		queryMap.put(CommonConstants.API_KEY_COLUMN, apiKey.trim());
+		queryMap.put(CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_ACTIVE);
+		long count = apiKeyDao.findNumberOfRowsByKeyValue(UserApiKey.class, queryMap);
+		LOG.debug("Found "+count+" records from the api keys");
+		if(count > 0l){
+			LOG.info("API key is valid");
+			isApiKeyValid = true;
+		}
+		return isApiKeyValid;
 	}
 }

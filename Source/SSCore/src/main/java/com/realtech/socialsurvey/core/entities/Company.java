@@ -53,6 +53,9 @@ public class Company implements Serializable {
 	@Column(name = "STATUS")
 	private int status;
 
+	@Column(name = "BILLING_MODE")
+	private String billingMode;
+
 	@ManyToOne
 	@JoinColumn(name = "VERTICAL_ID")
 	private VerticalsMaster verticalsMaster;
@@ -173,6 +176,14 @@ public class Company implements Serializable {
 
 	public void setStatus(int status) {
 		this.status = status;
+	}
+
+	public String getBillingMode() {
+		return billingMode;
+	}
+
+	public void setBillingMode(String billingMode) {
+		this.billingMode = billingMode;
 	}
 
 	public List<Branch> getBranches() {

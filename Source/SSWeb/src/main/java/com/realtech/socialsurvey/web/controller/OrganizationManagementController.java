@@ -89,6 +89,9 @@ public class OrganizationManagementController {
 
 	@Autowired
 	private SurveyBuilder surveyBuilder;
+	
+	@Autowired
+	private Payment payment;
 
 	@Value("${AMAZON_ENDPOINT}")
 	private String endpoint;
@@ -151,6 +154,8 @@ public class OrganizationManagementController {
 		String zipCode = request.getParameter("zipcode");
 		String companyContactNo = request.getParameter("contactno");
 		String vertical = request.getParameter("vertical");
+		// JIRA SS-536: Added for manual registration via invitation
+		String strIsDirectRegistration = request.getParameter("isDirectRegistration");
 
 		try {
 			try {
@@ -161,7 +166,7 @@ public class OrganizationManagementController {
 				try {
 					verticalsMasters = organizationManagementService.getAllVerticalsMaster();
 					model.addAttribute("verticals", verticalsMasters);
-					
+
 					model.addAttribute("companyName", companyName);
 					model.addAttribute("address1", address1);
 					model.addAttribute("address2", address2);
@@ -169,14 +174,16 @@ public class OrganizationManagementController {
 					model.addAttribute("countryCode", countryCode);
 					model.addAttribute("zipCode", zipCode);
 					model.addAttribute("companyContactNo", companyContactNo);
+					model.addAttribute("isDirectRegistration", strIsDirectRegistration);
 				}
 				catch (InvalidInputException e1) {
-					throw new InvalidInputException("Invalid Input exception occured in method getAllVerticalsMaster()", DisplayMessageConstants.GENERAL_ERROR, e1);
+					throw new InvalidInputException("Invalid Input exception occured in method getAllVerticalsMaster()",
+							DisplayMessageConstants.GENERAL_ERROR, e1);
 				}
-				
+
 				throw new InvalidInputException("Invalid input exception occured while validating form parameters", e.getErrorCode(), e);
 			}
-			
+
 			HttpSession session = request.getSession(false);
 			User user = sessionHelper.getCurrentUser();
 			String logoName = null;
@@ -200,12 +207,22 @@ public class OrganizationManagementController {
 				companyDetails.put(CommonConstants.LOGO_NAME, logoName);
 			}
 			companyDetails.put(CommonConstants.VERTICAL, vertical);
+			// JIRA SS-536: Added for manual registration via invitation
+			if (strIsDirectRegistration.equalsIgnoreCase("false")) {
+				companyDetails.put(CommonConstants.BILLING_MODE_COLUMN, CommonConstants.BILLING_MODE_INVOICE);
+				model.addAttribute("skippayment","true");
+			}
+			else {
+				companyDetails.put(CommonConstants.BILLING_MODE_COLUMN, CommonConstants.BILLING_MODE_AUTO);
+				model.addAttribute("skippayment","false");
+			}
 
 			LOG.debug("Calling services to add company details");
 			user = organizationManagementService.addCompanyInformation(user, companyDetails);
 
 			LOG.debug("Updating profile completion stage");
-			userManagementService.updateProfileCompletionStage(user, CommonConstants.PROFILES_MASTER_COMPANY_ADMIN_PROFILE_ID, CommonConstants.ADD_ACCOUNT_TYPE_STAGE);
+			userManagementService.updateProfileCompletionStage(user, CommonConstants.PROFILES_MASTER_COMPANY_ADMIN_PROFILE_ID,
+					CommonConstants.ADD_ACCOUNT_TYPE_STAGE);
 		}
 		catch (NonFatalException e) {
 			LOG.error("NonFatalException while adding company information. Reason :" + e.getMessage(), e);
@@ -213,11 +230,11 @@ public class OrganizationManagementController {
 			model.addAttribute("message", messageUtils.getDisplayMessage(e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE));
 			return JspResolver.COMPANY_INFORMATION;
 		}
-		
+
 		LOG.info("Method addCompanyInformation of UserManagementController completed successfully");
 		return JspResolver.ACCOUNT_TYPE_SELECTION;
 	}
-	
+
 	/**
 	 * Method to validate form parameters of company information provided by the user
 	 * 
@@ -251,12 +268,12 @@ public class OrganizationManagementController {
 		if (zipCode == null || zipCode.isEmpty()) {
 			throw new InvalidInputException("Zipcode is not valid while adding company information", DisplayMessageConstants.INVALID_ZIPCODE);
 		}
-		
+
 		if (companyContactNo == null || companyContactNo.isEmpty() || !companyContactNo.matches(CommonConstants.PHONENUMBER_REGEX)) {
 			throw new InvalidInputException("Company contact number is not valid while adding company information",
 					DisplayMessageConstants.INVALID_COMPANY_PHONEN0);
 		}
-		
+
 		if (vertical == null || vertical.isEmpty()) {
 			throw new InvalidInputException("Vertical selected is not valid", DisplayMessageConstants.INVALID_VERTICAL);
 		}
@@ -294,6 +311,7 @@ public class OrganizationManagementController {
 	public String addAccountType(Model model, HttpServletRequest request, HttpServletResponse response) {
 		LOG.info("Method addAccountType of UserManagementController called");
 		String strAccountType = request.getParameter("accounttype");
+		String returnPage = null;
 		try {
 			if (strAccountType == null || strAccountType.isEmpty()) {
 				throw new InvalidInputException("Accounttype is null for adding account type", DisplayMessageConstants.INVALID_ADDRESS);
@@ -302,36 +320,55 @@ public class OrganizationManagementController {
 
 			User user = sessionHelper.getCurrentUser();
 
-			LOG.debug("Checking if payment has already been made.");
-			if (gateway.checkIfPaymentMade(user.getCompany())
-					&& user.getCompany().getLicenseDetails().get(CommonConstants.INITIAL_INDEX).getAccountsMaster().getAccountsMasterId() != CommonConstants.ACCOUNTS_MASTER_FREE) {
-				LOG.debug("Payment for this company has already been made. Redirecting to dashboard.");
-				return JspResolver.PAYMENT_ALREADY_MADE;
+			// JIRA - SS-536
+			// check the company and see if manual registaration. Skip payment in that case
+			if (user.getCompany().getBillingMode().equals(CommonConstants.BILLING_MODE_INVOICE)) {
+				// do what is done after payment
+				// insert into license table
+				// the account type is the accounts master id
+				payment.insertIntoLicenseTable(Integer.parseInt(strAccountType), user, CommonConstants.INVOICE_BILLED_DEFULAT_SUBSCRIPTION_ID);
+				// set profile completion flag for the company admin
+				LOG.debug("Calling sevices for updating profile completion stage");
+				userManagementService.updateProfileCompletionStage(user, CommonConstants.PROFILES_MASTER_COMPANY_ADMIN_PROFILE_ID,
+						CommonConstants.PRE_PROCESSING_BEFORE_LOGIN_STAGE);
+				LOG.debug("Successfully executed sevices for updating profile completion stage");
+				returnPage = "redirect:./" + CommonConstants.PRE_PROCESSING_BEFORE_LOGIN_STAGE;
 			}
+			else {
 
-			// We check if there is mapped survey for the company and add a default survey if not.
-			if (surveyBuilder.checkForExistingSurvey(user) == null) {
-				surveyBuilder.addDefaultSurveyToCompany(user);
+				LOG.debug("Checking if payment has already been made.");
+				if (gateway.checkIfPaymentMade(user.getCompany())
+						&& user.getCompany().getLicenseDetails().get(CommonConstants.INITIAL_INDEX).getAccountsMaster().getAccountsMasterId() != CommonConstants.ACCOUNTS_MASTER_FREE) {
+					LOG.debug("Payment for this company has already been made. Redirecting to dashboard.");
+					return JspResolver.PAYMENT_ALREADY_MADE;
+				}
+
+				// We check if there is mapped survey for the company and add a default survey if
+				// not.
+				if (surveyBuilder.checkForExistingSurvey(user) == null) {
+					surveyBuilder.addDefaultSurveyToCompany(user);
+				}
+
+				if (Integer.parseInt(strAccountType) == CommonConstants.ACCOUNTS_MASTER_FREE) {
+					LOG.debug("Since its a free account type returning no popup jsp");
+					return null;
+				}
+
+				model.addAttribute("accounttype", strAccountType);
+				model.addAttribute("clienttoken", gateway.getClientToken());
+				model.addAttribute("message",
+						messageUtils.getDisplayMessage(DisplayMessageConstants.ACCOUNT_TYPE_SELECTION_SUCCESSFUL, DisplayMessageType.SUCCESS_MESSAGE));
+
+				LOG.info("Method addAccountType of UserManagementController completed successfully");
+				returnPage = JspResolver.PAYMENT;
 			}
-
-			if (Integer.parseInt(strAccountType) == CommonConstants.ACCOUNTS_MASTER_FREE) {
-				LOG.debug("Since its a free account type returning no popup jsp");
-				return null;
-			}
-
-			model.addAttribute("accounttype", strAccountType);
-			model.addAttribute("clienttoken", gateway.getClientToken());
-			model.addAttribute("message",
-					messageUtils.getDisplayMessage(DisplayMessageConstants.ACCOUNT_TYPE_SELECTION_SUCCESSFUL, DisplayMessageType.SUCCESS_MESSAGE));
-
-			LOG.info("Method addAccountType of UserManagementController completed successfully");
 		}
 		catch (NonFatalException e) {
 			LOG.error("NonfatalException while adding account type. Reason: " + e.getMessage(), e);
 			model.addAttribute("message", messageUtils.getDisplayMessage(e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE));
 			return JspResolver.MESSAGE_HEADER;
 		}
-		return JspResolver.PAYMENT;
+		return returnPage;
 
 	}
 
@@ -351,7 +388,7 @@ public class OrganizationManagementController {
 
 		AccountType accountType = (AccountType) session.getAttribute(CommonConstants.ACCOUNT_TYPE_IN_SESSION);
 		UserSettings userSettings = (UserSettings) session.getAttribute(CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION);
-		
+
 		UserProfile selectedProfile = null;
 		String profileIdStr = request.getParameter("profileId");
 		if (profileIdStr == null) {
@@ -359,14 +396,15 @@ public class OrganizationManagementController {
 		}
 		if (selectedProfile == null) {
 			Map<Long, UserProfile> profileMap = (Map<Long, UserProfile>) session.getAttribute(CommonConstants.USER_PROFILE_MAP);
-			Map<Long, AbridgedUserProfile> profileAbridgedMap = (Map<Long, AbridgedUserProfile>) session.getAttribute(CommonConstants.USER_PROFILE_LIST);
+			Map<Long, AbridgedUserProfile> profileAbridgedMap = (Map<Long, AbridgedUserProfile>) session
+					.getAttribute(CommonConstants.USER_PROFILE_LIST);
 
 			selectedProfile = userManagementService.updateSelectedProfile(user, accountType, profileMap, profileIdStr);
-			
+
 			session.setAttribute(CommonConstants.USER_PROFILE, selectedProfile);
 			session.setAttribute(CommonConstants.PROFILE_NAME_COLUMN, profileAbridgedMap.get(selectedProfile.getUserProfileId()).getUserProfileName());
 		}
-		
+
 		OrganizationUnitSettings unitSettings = null;
 		int profileMasterId = selectedProfile.getProfilesMaster().getProfileId();
 		if (profileMasterId == CommonConstants.PROFILES_MASTER_COMPANY_ADMIN_PROFILE_ID) {
@@ -977,7 +1015,8 @@ public class OrganizationManagementController {
 					.getAccountsMasterId();
 
 			model.addAttribute("balanceAmount",
-					String.format("%.02f", gateway.getBalacnceAmountForPlanUpgrade(user.getCompany(), fromAccountsMasterId, toAccountsMasterId)) + "$");
+					String.format("%.02f", gateway.getBalacnceAmountForPlanUpgrade(user.getCompany(), fromAccountsMasterId, toAccountsMasterId))
+							+ "$");
 			model.addAttribute(CommonConstants.ACCOUNT_TYPE_IN_SESSION, toAccountsMasterId);
 		}
 		catch (InvalidInputException e) {
@@ -1006,7 +1045,6 @@ public class OrganizationManagementController {
 				LOG.error("createDefaultBranchesAndRegions : user not found in session!");
 				throw new InvalidInputException("createDefaultBranchesAndRegions : user not found in session!");
 			}
-
 			LicenseDetail currentLicenseDetail = user.getCompany().getLicenseDetails().get(CommonConstants.INITIAL_INDEX);
 			HttpSession session = request.getSession(false);
 			AccountType accountType = null;
@@ -1056,7 +1094,7 @@ public class OrganizationManagementController {
 				LOG.error("InvalidInputException while updating profile completion stage. Reason : " + e.getMessage(), e);
 				throw new InvalidInputException(e.getMessage(), DisplayMessageConstants.GENERAL_ERROR, e);
 			}
-			
+
 			// setting linkedin popup attribute
 			boolean showLinkedInPopup = false;
 			boolean showSendSurveyPopup = false;
@@ -1070,7 +1108,7 @@ public class OrganizationManagementController {
 			}
 			model.addAttribute("showLinkedInPopup", String.valueOf(showLinkedInPopup));
 			model.addAttribute("showSendSurveyPopup", String.valueOf(showSendSurveyPopup));
-			
+
 			// update the last login time and number of logins
 			userManagementService.updateUserLoginTimeAndNum(user);
 		}

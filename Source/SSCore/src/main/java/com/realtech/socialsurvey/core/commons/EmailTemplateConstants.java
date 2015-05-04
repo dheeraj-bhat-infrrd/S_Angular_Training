@@ -66,6 +66,8 @@ public final class EmailTemplateConstants {
 
 	public static final String SUBSCRIPTION_PRICE_UPDATED_MAIL_SUBJECT = "SubscriptionPriceUpdate.txt";
 	public static final String SUBSCRIPTION_PRICE_UPDATED_MAIL_BODY = "SubscriptionPriceUpdateBody.html";
+	public static final String MANUAL_REGISTRATION_MAIL_SUBJECT = "ManualRegistrationSubject.txt";
+	public static final String MANUAL_REGISTRATION_MAIL_BODY = "ManualRegistrationBody.html";
 
 	public static final String SUBSCRIPTION_UNSUCCESSFUL_MAIL_BODY = "SubscriptionChargeUnsuccessfulMailBody.html";
 	public static final String SUBSCRIPTION_UNSUCCESSFUL_MAIL_SUBJECT = "SubscriptionChargeUnsuccessfulMailSubject.txt";

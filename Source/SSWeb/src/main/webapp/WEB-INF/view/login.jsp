@@ -66,6 +66,7 @@
 				</div>
 			</div>
 			<input type="hidden" value="${message}" data-status="${status}" name="message" id="message"/>
+			<input type="hidden" value="${isDirectRegistration}" name="j_isDirectRegistration" id="j_isDirectRegistration"/>
 		</form>
 		
 	</div>

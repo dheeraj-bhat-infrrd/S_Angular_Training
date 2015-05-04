@@ -28,6 +28,8 @@
 		<intercept-url pattern="/register.do" access="permitAll" />
 		<intercept-url pattern="/showcompleteregistrationpage.do" access="permitAll" />
 		<intercept-url pattern="/completeregistration.do" access="permitAll" />
+		<intercept-url pattern="/generateregistrationurl.do" access="permitAll" />
+		<intercept-url pattern="/invitetoregister.do" access="permitAll" />
 		
 		<intercept-url pattern="/forgotPassword.do" access="permitAll" />
 		<intercept-url pattern="/sendresetpasswordlink.do" access="permitAll" />
