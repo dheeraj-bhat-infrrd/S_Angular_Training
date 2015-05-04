@@ -852,7 +852,7 @@ public class EmailServicesImpl implements EmailServices {
 
 		FileContentReplacements messageBodyReplacements = new FileContentReplacements();
 		messageBodyReplacements.setFileName(EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER + EmailTemplateConstants.SURVEY_REMINDER_MAIL_BODY);
-		messageBodyReplacements.setReplacementArgs(Arrays.asList(displayName, agentName, link, link, recipientMailId));
+		messageBodyReplacements.setReplacementArgs(Arrays.asList(displayName, link, link, agentName));
 
 		LOG.debug("Calling email sender to send mail");
 		emailSender.sendEmailWithBodyReplacements(emailEntity, subjectFileName, messageBodyReplacements);
@@ -1051,7 +1051,7 @@ public class EmailServicesImpl implements EmailServices {
 
 		FileContentReplacements messageBodyReplacements = new FileContentReplacements();
 		messageBodyReplacements.setFileName(EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER + EmailTemplateConstants.SURVEY_INVITATION_MAIL_BODY);
-		messageBodyReplacements.setReplacementArgs(Arrays.asList(displayName, agentName, link, link));
+		messageBodyReplacements.setReplacementArgs(Arrays.asList(displayName, link, link, agentName));
 
 		LOG.debug("Calling email sender to send mail");
 		emailSender.sendEmailWithBodyReplacements(emailEntity, subjectFileName, messageBodyReplacements);
