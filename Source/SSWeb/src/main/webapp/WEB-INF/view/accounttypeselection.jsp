@@ -218,7 +218,6 @@ function selectAccountType(accountType, paymentAmount, skippayment) {
 	if ($(this).attr('data-status') == 'disabled') {
 		return;
 	}
-	debugger;
 	console.log("selecting and saving account type");
 	$('#account-type').val(accountType);
 
