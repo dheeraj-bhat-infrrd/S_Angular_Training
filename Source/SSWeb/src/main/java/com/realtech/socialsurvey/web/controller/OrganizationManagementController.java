@@ -210,9 +210,11 @@ public class OrganizationManagementController {
 			// JIRA SS-536: Added for manual registration via invitation
 			if (strIsDirectRegistration.equalsIgnoreCase("false")) {
 				companyDetails.put(CommonConstants.BILLING_MODE_COLUMN, CommonConstants.BILLING_MODE_INVOICE);
+				model.addAttribute("skippayment","true");
 			}
 			else {
 				companyDetails.put(CommonConstants.BILLING_MODE_COLUMN, CommonConstants.BILLING_MODE_AUTO);
+				model.addAttribute("skippayment","false");
 			}
 
 			LOG.debug("Calling services to add company details");
@@ -1043,7 +1045,6 @@ public class OrganizationManagementController {
 				LOG.error("createDefaultBranchesAndRegions : user not found in session!");
 				throw new InvalidInputException("createDefaultBranchesAndRegions : user not found in session!");
 			}
-
 			LicenseDetail currentLicenseDetail = user.getCompany().getLicenseDetails().get(CommonConstants.INITIAL_INDEX);
 			HttpSession session = request.getSession(false);
 			AccountType accountType = null;
