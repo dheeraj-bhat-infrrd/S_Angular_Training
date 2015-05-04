@@ -72,14 +72,15 @@ public final class FileOperations {
 			throw new InvalidInputException("file and contents to replace are null while replacing file contents");
 		}
 		LOG.debug("Method replaceFileContents called for : " + fileContentReplacements.getFileName());
+		
 		String fileContent = getContentFromFile(fileContentReplacements.getFileName());
 		if (fileContent == null) {
 			throw new InvalidInputException("Content not found for file : " + fileContentReplacements.getFileName());
 		}
+		
 		String replacedContent = fileContent;
 		List<String> replacementArgs = fileContentReplacements.getReplacementArgs();
 		if (replacementArgs != null && !replacementArgs.isEmpty()) {
-
 			LOG.trace("Replacing the file contents with replacement arguments");
 			for (String replacementArg : replacementArgs) {
 				replacedContent = replacedContent.replaceFirst("%s", replacementArg);

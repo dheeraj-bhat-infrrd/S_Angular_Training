@@ -23,7 +23,6 @@ import com.realtech.socialsurvey.core.services.mail.UndeliveredEmailException;
 import com.realtech.socialsurvey.core.utils.FileOperations;
 
 // JIRA: SS-7: By RM02: BOC
-
 /**
  * Class with utility methods to send mails
  */
@@ -148,7 +147,7 @@ public final class EmailSenderImpl implements EmailSender {
 		LOG.info("Method sendEmailWithBodyReplacements completed successfully");
 
 	}
-	
+
 	/**
 	 * Method to mail with subject and body provided as parameters.
 	 * 
@@ -159,9 +158,8 @@ public final class EmailSenderImpl implements EmailSender {
 	 * @throws UndeliveredEmailException
 	 */
 	@Override
-	public void sendEmail(EmailEntity emailEntity, String subject, String mailBody)
-			throws InvalidInputException, UndeliveredEmailException {
-		LOG.info("Method sendEmailWithBodyReplacements called for subject : "+subject);
+	public void sendEmail(EmailEntity emailEntity, String subject, String mailBody) throws InvalidInputException, UndeliveredEmailException {
+		LOG.info("Method sendEmailWithBodyReplacements called for subject : " + subject);
 
 		if (subject == null || subject.isEmpty()) {
 			throw new InvalidInputException("Subject is null for sending mail");
@@ -265,5 +263,4 @@ public final class EmailSenderImpl implements EmailSender {
 		message.setContent(emailEntity.getBody(), "text/html");
 		return message;
 	}
-
 }

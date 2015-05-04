@@ -372,16 +372,14 @@ public class EmailServicesImpl implements EmailServices {
 	@Async
 	@Override
 	public void queueVerificationMail(String url, String recipientMailId, String recipientName) throws InvalidInputException {
-		LOG.info("Method to queue verification mail called for url : " + url + " recipientMailId : " + recipientMailId);
+		LOG.info("Method to queue verification mail called for url: " + url + " recipientMailId: " + recipientMailId);
 
 		if (url == null || url.isEmpty()) {
 			throw new InvalidInputException("URL generated can not be null or empty");
 		}
-
 		if (recipientMailId == null || recipientMailId.isEmpty()) {
 			throw new InvalidInputException("Recipients Email Id can not be null or empty");
 		}
-
 		if (recipientName == null || recipientName.isEmpty()) {
 			throw new InvalidInputException("Recipients Name can not be null or empty");
 		}
@@ -392,6 +390,7 @@ public class EmailServicesImpl implements EmailServices {
 		contentBuilder.append("RECIPIENT^^").append(recipientMailId);
 		contentBuilder.append("$$").append("URL^^").append(url);
 		contentBuilder.append("$$").append("NAME^^").append(recipientName);
+		
 		LOG.debug("queueing content: " + contentBuilder.toString());
 		queueProducer.queueEmail(EmailHeader.VERFICATION, contentBuilder.toString());
 		LOG.info("Queued the verification mail");
@@ -410,32 +409,29 @@ public class EmailServicesImpl implements EmailServices {
 	@Override
 	public void sendVerificationMail(String url, String recipientMailId, String recipientName) throws InvalidInputException,
 			UndeliveredEmailException {
-		LOG.info("Method to send verification mail called for url : " + url + " recipientMailId : " + recipientMailId);
-
+		LOG.info("Method to send verification mail called for url: " + url + " recipientMailId: " + recipientMailId);
 		if (url == null || url.isEmpty()) {
 			throw new InvalidInputException("URL generated can not be null or empty");
 		}
-
 		if (recipientMailId == null || recipientMailId.isEmpty()) {
 			throw new InvalidInputException("Recipients Email Id can not be null or empty");
 		}
-
 		if (recipientName == null || recipientName.isEmpty()) {
 			throw new InvalidInputException("Recipients Name can not be null or empty");
 		}
 
+		// Fetching mail body
 		EmailEntity emailEntity = prepareEmailEntityForVerificationMail(recipientMailId);
 		String subjectFileName = EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER + EmailTemplateConstants.VERIFICATION_MAIL_SUBJECT;
+		
+		// File content replacements in same order
 		FileContentReplacements fileContentReplacements = new FileContentReplacements();
 		fileContentReplacements.setFileName(EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER + EmailTemplateConstants.VERIFICATION_MAIL_BODY);
-
-		/**
-		 * order of arguments should be same as in the template
-		 */
-		fileContentReplacements.setReplacementArgs(Arrays.asList(recipientName, url));
+		fileContentReplacements.setReplacementArgs(Arrays.asList(recipientName, url, url, recipientMailId));
+		
+		// sending email
 		LOG.debug("Calling email sender to send verification mail");
 		emailSender.sendEmailWithBodyReplacements(emailEntity, subjectFileName, fileContentReplacements);
-
 		LOG.info("Successfully sent verification mail");
 	}
 
@@ -531,9 +527,9 @@ public class EmailServicesImpl implements EmailServices {
 
 		EmailEntity emailEntity = new EmailEntity();
 		emailEntity.setRecipients(recipients);
-//		emailEntity.setSenderEmailId(sendgridSenderUsername);
-//		emailEntity.setSenderPassword(sendgridSenderPassword);
-//		emailEntity.setSenderName(sendgridSenderName);
+		// emailEntity.setSenderEmailId(sendgridSenderUsername);
+		// emailEntity.setSenderPassword(sendgridSenderPassword);
+		// emailEntity.setSenderName(sendgridSenderName);
 		emailEntity.setRecipientType(EmailEntity.RECIPIENT_TYPE_TO);
 
 		LOG.debug("Prepared email entity for verification mail");
