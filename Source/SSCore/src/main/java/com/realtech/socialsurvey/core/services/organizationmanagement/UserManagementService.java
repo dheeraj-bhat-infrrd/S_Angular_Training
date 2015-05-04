@@ -2,7 +2,6 @@ package com.realtech.socialsurvey.core.services.organizationmanagement;
 
 import java.util.List;
 import java.util.Map;
-
 import com.realtech.socialsurvey.core.entities.AbridgedUserProfile;
 import com.realtech.socialsurvey.core.entities.AgentSettings;
 import com.realtech.socialsurvey.core.entities.Branch;
@@ -291,5 +290,15 @@ public interface UserManagementService {
 	public void updateUserCountModificationNotification(Company company) throws InvalidInputException;
 
 	public void sendVerificationLink(User user) throws InvalidInputException, UndeliveredEmailException;
+	
+	/**
+	 * Checks if the api secret and api key is a valid combination
+	 * @param apiSecret
+	 * @param apiKey
+	 * @return
+	 * @throws InvalidInputException
+	 * @throws NoRecordsFetchedException
+	 */
+	public boolean isValidApiKey(String apiSecret, String apiKey) throws InvalidInputException, NoRecordsFetchedException;
 }
 // JIRA SS-34 BY RM02 BOC

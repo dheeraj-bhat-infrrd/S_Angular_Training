@@ -17,6 +17,7 @@
 	<title><spring:message code="label.login.title.key" /></title>
 	<link rel="shortcut icon" href="${pageContext.request.contextPath}/favicon.ico" sizes="16x16">
 	<link rel="stylesheet" href="${pageContext.request.contextPath}/resources/css/bootstrap.min.css">
+	<link rel="stylesheet" href="${pageContext.request.contextPath}/resources/jcrop/jquery.Jcrop.min.css">
 	<link rel="stylesheet" href="${pageContext.request.contextPath}/resources/css/style.css">
 	<link rel="stylesheet" href="${pageContext.request.contextPath}/resources/css/style-common.css">
 	<link rel="stylesheet" href="${pageContext.request.contextPath}/resources/css/rangeslider.css">
@@ -73,6 +74,11 @@
 				<c:if test="${(accountMasterId == 2 || accountMasterId == 3 || accountMasterId == 4) && (highestrole == 1 || highestrole == 2 || highestrole == 3)}">
 					<div class="header-links-item">
 						<a href="javascript:showMainContent('./showbuildhierarchypage.do')"><spring:message code="label.header.buildhierarchy.key" /></a>
+					</div>
+				</c:if>
+				<c:if test="${highestrole == 1 && accountMasterId != 5}">
+					<div class="header-links-item">
+						<a href="javascript:showMainContent('./showbuildsurveypage.do')"><spring:message code="label.header.buildsurvey.key" /></a>
 					</div>
 				</c:if>
 				<c:if test="${accountMasterId != 5}">

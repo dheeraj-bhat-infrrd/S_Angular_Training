@@ -278,7 +278,9 @@ function deleteUser(userId) {
 			}
 			
 			// hide the row of the user deleted
-			$('#user-row-' + userId).hide();
+			$('#user-row-' + userId).next('.v-tbl-row').remove();
+			$('#user-row-' + userId).next('.u-tbl-row').remove();
+			$('#user-row-' + userId).remove();
 		},
 		complete : function() {
 			hideOverlay();

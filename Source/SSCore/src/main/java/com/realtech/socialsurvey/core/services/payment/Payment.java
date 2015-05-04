@@ -240,5 +240,14 @@ public interface Payment {
 	 * @throws SubscriptionUpgradeUnsuccessfulException
 	 */
 	public Map<String, Object> updateSubscriptionPriceBasedOnUsersCount(Company company) throws InvalidInputException, NoRecordsFetchedException, PaymentException, SubscriptionUpgradeUnsuccessfulException;
+	
+	/**
+	 * Inserts records into license table
+	 * @param accountsMasterId
+	 * @param user
+	 * @param subscriptionId
+	 * @throws InvalidInputException
+	 */
+	public void insertIntoLicenseTable(int accountsMasterId, User user, String subscriptionId) throws InvalidInputException;
 		
 }

@@ -1328,6 +1328,42 @@ public class EmailServicesImpl implements EmailServices {
 
 		LOG.info("Successfully sent subscription revised mail");
 	}
+	
+	@Async
+	@Override
+	public void sendManualRegistrationLink(String recipientId, String firstName, String lastName, String link) throws InvalidInputException, UndeliveredEmailException{
+		LOG.info("Sending manual registration link to "+recipientId+" and name "+firstName);
+		if(recipientId == null || recipientId.isEmpty()){
+			LOG.error("Recipient id is not present");
+			throw new InvalidInputException("Recipient id is not present");
+		}
+		if(firstName == null || firstName.isEmpty()){
+			LOG.error("firstName is not present");
+			throw new InvalidInputException("firstName id is not present");
+		}
+		if(lastName == null || lastName.isEmpty()){
+			lastName = "";
+		}
+		if(link == null || link.isEmpty()){
+			LOG.error("link is not present");
+			throw new InvalidInputException("link id is not present");
+		}
+		LOG.info("Sending manual registration email to : " + recipientId);
+
+		EmailEntity emailEntity = prepareEmailEntityForSendingEmail(recipientId);
+
+		String subjectFileName = EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER + EmailTemplateConstants.MANUAL_REGISTRATION_MAIL_SUBJECT;
+
+		FileContentReplacements messageBodyReplacements = new FileContentReplacements();
+		messageBodyReplacements.setFileName(EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER + EmailTemplateConstants.MANUAL_REGISTRATION_MAIL_BODY);
+
+		messageBodyReplacements.setReplacementArgs(Arrays.asList(firstName+" "+lastName, link));
+
+		LOG.debug("Calling email sender to send mail");
+		emailSender.sendEmailWithBodyReplacements(emailEntity, subjectFileName, messageBodyReplacements);
+
+		LOG.info("Successfully sent manual registration mail");
+	}
 
 	
 	@Async
