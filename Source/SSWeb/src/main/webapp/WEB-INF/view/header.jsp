@@ -86,6 +86,11 @@
 						<a href="javascript:showMainContent('./showcompanysettings.do')"><spring:message code="label.editsettings.key" /></a>
 					</div>
 				</c:if>
+				<c:if test="${highestrole == 1 && accountMasterId != 5}">
+					<div class="header-links-item">
+						<a href="javascript:showViewHierarchyPage();"><spring:message code="label.viewcompanyhierachy.key" /></a>
+					</div>
+				</c:if>
 				<c:if test="${accountMasterId > 1 && accountMasterId <5 && highestrole != 4}">
 					<div class="header-links-item">
 						<a href="javascript:showMainContent('./showusermangementpage.do')"><spring:message code="label.header.usermanagement.key" /></a>

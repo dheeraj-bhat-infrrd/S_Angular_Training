@@ -1091,3 +1091,9 @@ span.wc-highlight {
 .footer-ul span{
 	padding: 0 2px;
 }
+
+.reg-prof-url {
+  line-height: 40px;
+  cursor: pointer;
+  color: rgb(0, 159, 224);
+}
