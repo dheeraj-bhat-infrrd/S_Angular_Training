@@ -497,4 +497,18 @@ public interface CommonConstants {
 
 	// API constants
 	public static final String API_KEY_FROM_URL = "api_key";
+	
+	// Email constants
+	public static final String ELEMENTS_DELIMITER = "$$";
+	public static final String HEADER_MARKER = "HEADER^^";
+	public static final String RECIPIENT_MARKER = "RECIPIENT^^";
+	public static final String URL_MARKER = "URL^^";
+	public static final String NAME_MARKER = "NAME^^";
+	public static final String FIRSTNAME_MARKER = "FIRSTNAME^^";
+	public static final String LASTNAME_MARKER = "LASTNAME^^";
+	public static final String RETRYDAYS_MARKER = "RETRYDAYS^^";
+	public static final String RETRIES_MARKER = "RETRIES^^";
+	public static final String AGENTNAME_MARKER = "AGENTNAME^^";
+	public static final String LOGINNAME_MARKER = "LOGINNAME^^";
+	public static final String PROFILENAME_MARKER = "PROFILENAME^^";
 }

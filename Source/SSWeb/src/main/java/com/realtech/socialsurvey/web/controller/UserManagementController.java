@@ -187,7 +187,9 @@ public class UserManagementController {
 						solrSearchService.addUserToSolr(user);
 						LOG.debug("Added newly added user {} to solr", user.getFirstName());
 
-						userManagementService.sendRegistrationCompletionLink(emailId, firstName, lastName, admin.getCompany().getCompanyId());
+						String profileName = userManagementService.getUserSettings(user.getUserId()).getProfileName();
+						userManagementService.sendRegistrationCompletionLink(emailId, firstName, lastName, admin.getCompany().getCompanyId(),
+								profileName, user.getLoginName());
 
 						// If account type is team assign user to default branch
 						if (accountType.getValue() == CommonConstants.ACCOUNTS_MASTER_TEAM) {
@@ -1366,7 +1368,10 @@ public class UserManagementController {
 			}
 
 			LOG.debug("Sending invitation...");
-			userManagementService.sendRegistrationCompletionLink(emailId, firstName, lastName, user.getCompany().getCompanyId());
+			User invitedUser = userManagementService.getUserByEmail(emailId);
+			String profileName = userManagementService.getUserSettings(invitedUser.getUserId()).getProfileName();
+			userManagementService.sendRegistrationCompletionLink(emailId, firstName, lastName, user.getCompany().getCompanyId(), profileName,
+					user.getLoginName());
 
 			message = messageUtils.getDisplayMessage(DisplayMessageConstants.INVITATION_RESEND_SUCCESSFUL, DisplayMessageType.SUCCESS_MESSAGE)
 					.getMessage();

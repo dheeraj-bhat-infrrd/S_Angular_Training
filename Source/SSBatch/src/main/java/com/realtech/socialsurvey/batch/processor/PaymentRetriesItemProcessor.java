@@ -305,17 +305,18 @@ public class PaymentRetriesItemProcessor implements ItemProcessor<LicenseDetail,
 				// Now a mail regarding the same is sent to the user
 				LOG.info("Sending a mail regarding the blocking of subscription to the user.");
 				try {
-					if(enableKafka.equals(CommonConstants.YES)){
-						emailServices.queueRetryExhaustedEmail(user.getEmailId(), user.getFirstName() + " " + user.getLastName());
-					}else{
-						emailServices.sendRetryExhaustedEmail(user.getEmailId(), user.getFirstName() + " " + user.getLastName());
+					if (enableKafka.equals(CommonConstants.YES)) {
+						emailServices
+								.queueRetryExhaustedEmail(user.getEmailId(), user.getFirstName() + " " + user.getLastName(), user.getLoginName());
+					}
+					else {
+						emailServices.sendRetryExhaustedEmail(user.getEmailId(), user.getFirstName() + " " + user.getLastName(), user.getLoginName());
 					}
 					LOG.info("Mail successfully sent.");
 				}
 				catch (InvalidInputException e1) {
 					LOG.error("Exception caught when sending Fatal Exception mail. Message : " + e1.getMessage(),e1);
 					coreCommonServices.sendEmailSendingFailureMail(user.getEmailId(), user.getFirstName()+" "+user.getLastName(), e1);
-
 				}
 				catch (UndeliveredEmailException e) {
 					LOG.error("Exception caught when sending Fatal Exception mail. Message : " + e.getMessage(),e);

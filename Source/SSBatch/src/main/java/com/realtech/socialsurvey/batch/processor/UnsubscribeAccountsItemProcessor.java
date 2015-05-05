@@ -1,6 +1,6 @@
 package com.realtech.socialsurvey.batch.processor;
-// SS-74 RM03
 
+// SS-74 RM03
 import java.sql.Timestamp;
 import java.util.HashMap;
 import java.util.Map;
@@ -27,98 +27,91 @@ import com.realtech.socialsurvey.core.services.payment.exception.SubscriptionCan
 /**
  * The processor class for the batch job for cancelling subscriptions
  */
-public class UnsubscribeAccountsItemProcessor implements ItemProcessor<DisabledAccount, Map<String, Object>>{
-	
+public class UnsubscribeAccountsItemProcessor implements ItemProcessor<DisabledAccount, Map<String, Object>> {
 	@Autowired
 	private Payment gateway;
-	
+
 	@Autowired
 	private GenericDao<Company, Long> companyDao;
-	
+
 	@Autowired
 	private GenericDao<DisabledAccount, Long> disabledAccountDao;
-	
+
 	@Autowired
 	private GenericDao<User, Long> userDao;
-	
+
 	@Autowired
 	private EmailServices emailServices;
-	
+
 	@Autowired
 	private BatchCommon commonServices;
-	
+
 	@Autowired
 	private CoreCommon coreCommonServices;
-	
+
 	private Map<String, Object> writerObjectsMap = new HashMap<String, Object>();
-	
+
 	@Value("${ENABLE_KAFKA}")
 	private String enableKafka;
-	
+
 	private static final Logger LOG = LoggerFactory.getLogger(UnsubscribeAccountsItemProcessor.class);
-	
+
 	@Override
-	public Map<String,Object> process(DisabledAccount disabledAccount) {
-		
+	public Map<String, Object> process(DisabledAccount disabledAccount) {
 		LOG.info("Processing the Disabled Account record with id : " + disabledAccount.getId());
-		
-		try{
+
+		try {
 			Company company = disabledAccount.getCompany();
-			
-			//Make Api call to cancel the subscription.
+
+			// Make Api call to cancel the subscription.
 			LOG.info("Making api call to Braintree to cancel the subscription.");
 			gateway.unsubscribe(disabledAccount.getLicenseDetail().getSubscriptionId());
 			LOG.info("Cancellation successful.");
-			
-			//Sending mail to the respective user. We fetch the corporate admin for the company
+
+			// Sending mail to the respective user. We fetch the corporate admin for the company
 			User user = commonServices.getCorporateAdmin(company);
 			LOG.info("Sending mail to the respective corporate admin with email id : " + user.getEmailId());
-			if(enableKafka.equals(CommonConstants.YES)){
-				emailServices.queueAccountDisabledMail(user.getEmailId(), user.getFirstName()+" "+user.getLastName());
-			}else{
-				emailServices.sendAccountDisabledMail(user.getEmailId(), user.getFirstName()+" "+user.getLastName());
+			if (enableKafka.equals(CommonConstants.YES)) {
+				emailServices.queueAccountDisabledMail(user.getEmailId(), user.getFirstName() + " " + user.getLastName(), user.getLoginName());
+			}
+			else {
+				emailServices.sendAccountDisabledMail(user.getEmailId(), user.getFirstName() + " " + user.getLastName(), user.getLoginName());
 			}
 			LOG.info("Email successfully sent!");
-			
-			//Updating the company record to reflect changes
+
+			// Updating the company record to reflect changes
 			LOG.info("Updating corresponding company entity to reflect changes");
 			company.setStatus(CommonConstants.STATUS_INACTIVE);
 			company.setModifiedOn(new Timestamp(System.currentTimeMillis()));
 			writerObjectsMap.put(CommonConstants.COMPANY_OBJECT_KEY, company);
 			LOG.info("Updated company entity");
-			
-			//Performing soft delete of the disabled account record
+
+			// Performing soft delete of the disabled account record
 			LOG.info("Updating the disabled account record to perform soft delete.");
 			disabledAccount.setStatus(CommonConstants.STATUS_INACTIVE);
 			disabledAccount.setModifiedOn(new Timestamp(System.currentTimeMillis()));
 			writerObjectsMap.put(CommonConstants.DISABLED_ACCOUNT_OBJECT_KEY, disabledAccount);
-			LOG.info("Updated disabled account entity to reflect changes.");			
-			
+			LOG.info("Updated disabled account entity to reflect changes.");
 		}
-		catch(SubscriptionCancellationUnsuccessfulException e){			
-			
+		catch (SubscriptionCancellationUnsuccessfulException e) {
 			LOG.error("Subscription cancellation unsuccessful for Disabled Account with id : " + disabledAccount.getId());
-			coreCommonServices.sendFailureMail(e);		
+			coreCommonServices.sendFailureMail(e);
 			LOG.info("Processing of the item with id : " + disabledAccount.getId() + " UNSUCCESSFUL!");
 			return null;
-			
 		}
-		catch(UnexpectedException e){
-			
+		catch (UnexpectedException e) {
 			LOG.error("Unexpected Exception caught : Message : " + e.getMessage());
 			coreCommonServices.sendFailureMail(e);
 			LOG.info("Processing of the item with id : " + disabledAccount.getId() + " UNSUCCESSFUL!");
 			return null;
 		}
 		catch (InvalidInputException | NoRecordsFetchedException | UndeliveredEmailException e) {
-			
-			LOG.error("Invalid Input Exception caught : Message : " + e.getMessage(),e);
+			LOG.error("Invalid Input Exception caught : Message : " + e.getMessage(), e);
 			LOG.info("Processing of item : License detail object with id : " + disabledAccount.getId() + " UNSUCCESSFUL");
 			return null;
 		}
-		
+
 		LOG.info("Processing of the Disabled Account record with id : " + disabledAccount.getId() + " Successful.");
 		return writerObjectsMap;
 	}
-
 }
