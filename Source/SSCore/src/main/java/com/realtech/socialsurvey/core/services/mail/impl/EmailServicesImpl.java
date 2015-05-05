@@ -111,7 +111,7 @@ public class EmailServicesImpl implements EmailServices {
 		}
 		FileContentReplacements messageBodyReplacements = new FileContentReplacements();
 		messageBodyReplacements.setFileName(EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER + EmailTemplateConstants.REGISTRATION_INVITATION_MAIL_BODY);
-		messageBodyReplacements.setReplacementArgs(Arrays.asList(fullName, url));
+		messageBodyReplacements.setReplacementArgs(Arrays.asList(fullName, url, url, recipientMailId));
 
 		LOG.debug("Calling email sender to send mail");
 		emailSender.sendEmailWithBodyReplacements(emailEntity, subjectFileName, messageBodyReplacements);
@@ -278,7 +278,7 @@ public class EmailServicesImpl implements EmailServices {
 		FileContentReplacements messageBodyReplacements = new FileContentReplacements();
 		messageBodyReplacements.setFileName(EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER
 				+ EmailTemplateConstants.SUBSCRIPTION_UNSUCCESSFUL_MAIL_BODY);
-		messageBodyReplacements.setReplacementArgs(Arrays.asList(name, retryDays));
+		messageBodyReplacements.setReplacementArgs(Arrays.asList(name, retryDays, recipientMailId));
 
 		LOG.info("Sending the mail.");
 		emailSender.sendEmailWithBodyReplacements(emailEntity, subjectFileName, messageBodyReplacements);
@@ -340,7 +340,7 @@ public class EmailServicesImpl implements EmailServices {
 
 		FileContentReplacements fileContentReplacements = new FileContentReplacements();
 		fileContentReplacements.setFileName(EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER + EmailTemplateConstants.EMAIL_VERIFICATION_MAIL_BODY);
-		fileContentReplacements.setReplacementArgs(Arrays.asList(recipientName, url));
+		fileContentReplacements.setReplacementArgs(Arrays.asList(recipientName, url, url));
 
 		LOG.debug("Calling email sender to send verification mail");
 		emailSender.sendEmailWithBodyReplacements(emailEntity, subjectFileName, fileContentReplacements);
@@ -1178,7 +1178,7 @@ public class EmailServicesImpl implements EmailServices {
 		FileContentReplacements messageBodyReplacements = new FileContentReplacements();
 		messageBodyReplacements.setFileName(EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER
 				+ EmailTemplateConstants.SUBSCRIPTION_PRICE_UPDATED_MAIL_BODY);
-		messageBodyReplacements.setReplacementArgs(Arrays.asList(name, numOfUsers, oldAmount, revisedAmount));
+		messageBodyReplacements.setReplacementArgs(Arrays.asList(name, numOfUsers, oldAmount, revisedAmount, recipientMailId));
 
 		LOG.debug("Calling email sender to send mail");
 		emailSender.sendEmailWithBodyReplacements(emailEntity, subjectFileName, messageBodyReplacements);
@@ -1198,9 +1198,6 @@ public class EmailServicesImpl implements EmailServices {
 			LOG.error("firstName is not present");
 			throw new InvalidInputException("firstName id is not present");
 		}
-		if (lastName == null || lastName.isEmpty()) {
-			lastName = "";
-		}
 		if (link == null || link.isEmpty()) {
 			LOG.error("link is not present");
 			throw new InvalidInputException("link id is not present");
@@ -1210,9 +1207,14 @@ public class EmailServicesImpl implements EmailServices {
 		EmailEntity emailEntity = prepareEmailEntityForSendingEmail(recipientId);
 		String subjectFileName = EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER + EmailTemplateConstants.MANUAL_REGISTRATION_MAIL_SUBJECT;
 
+		// Preparing full name of the recipient
+		String fullName = firstName;
+		if (lastName != null && !lastName.isEmpty()) {
+			fullName = firstName + " " + lastName;
+		}
 		FileContentReplacements messageBodyReplacements = new FileContentReplacements();
 		messageBodyReplacements.setFileName(EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER + EmailTemplateConstants.MANUAL_REGISTRATION_MAIL_BODY);
-		messageBodyReplacements.setReplacementArgs(Arrays.asList(firstName + " " + lastName, link));
+		messageBodyReplacements.setReplacementArgs(Arrays.asList(fullName, fullName, link, link));
 
 		LOG.debug("Calling email sender to send mail");
 		emailSender.sendEmailWithBodyReplacements(emailEntity, subjectFileName, messageBodyReplacements);

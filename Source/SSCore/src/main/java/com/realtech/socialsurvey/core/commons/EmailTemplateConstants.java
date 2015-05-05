@@ -27,6 +27,21 @@ public final class EmailTemplateConstants {
 	public static final String CONTACT_US_MAIL_BODY = "ContactUsMailBody.html";
 	public static final String CONTACT_US_MAIL_SUBJECT = "ContactUsMailSubject.txt";
 
+	public static final String EMAIL_SENDING_FAILURE_MAIL_BODY = "EmailSendingFailureMailBody.html";
+	public static final String EMAIL_SENDING_FAILURE_MAIL_SUBJECT = "EmailSendingFailureMailSubject.txt";
+
+	public static final String EMAIL_VERIFICATION_MAIL_BODY = "EmailVerificationMailBody.html";
+	public static final String EMAIL_VERIFICATION_MAIL_SUBJECT = "EmailVerificationMailSubject.txt";
+
+	public static final String FATAL_EXCEPTION_MAIL_BODY = "FatalExceptionMailBody.html";
+	public static final String FATAL_EXCEPTION_MAIL_SUBJECT = "FatalExceptionMailSubject.txt";
+
+	public static final String MANUAL_REGISTRATION_MAIL_BODY = "ManualRegistrationBody.html";
+	public static final String MANUAL_REGISTRATION_MAIL_SUBJECT = "ManualRegistrationSubject.txt";
+
+	public static final String REGISTRATION_INVITATION_MAIL_BODY = "RegistrationInvitationMailBody.html";
+	public static final String REGISTRATION_INVITATION_MAIL_SUBJECT = "RegistrationInvitationMailSubject.txt";
+
 	public static final String RESET_PASSWORD_MAIL_BODY = "ResetPasswordMailBody.html";
 	public static final String RESET_PASSWORD_MAIL_SUBJECT = "ResetPasswordMailSubject.txt";
 
@@ -35,6 +50,15 @@ public final class EmailTemplateConstants {
 
 	public static final String RETRY_CHARGE_MAIL_BODY = "RetryChargeMailBody.html";
 	public static final String RETRY_CHARGE_MAIL_SUBJECT = "RetryChargeMailSubject.txt";
+
+	public static final String SUBSCRIPTION_PRICE_UPDATED_MAIL_BODY = "SubscriptionPriceUpdateBody.html";
+	public static final String SUBSCRIPTION_PRICE_UPDATED_MAIL_SUBJECT = "SubscriptionPriceUpdate.txt";
+
+	public static final String SUBSCRIPTION_UNSUCCESSFUL_MAIL_BODY = "SubscriptionChargeUnsuccessfulMailBody.html";
+	public static final String SUBSCRIPTION_UNSUCCESSFUL_MAIL_SUBJECT = "SubscriptionChargeUnsuccessfulMailSubject.txt";
+
+	public static final String SURVEY_COMPLETION_ADMINS_MAIL_BODY = "SurveyCompletionAdminsMailBody.html";
+	public static final String SURVEY_COMPLETION_ADMINS_MAIL_SUBJECT = "SurveyCompletionAdminsMailSubject.txt";
 
 	public static final String SURVEY_COMPLETION_MAIL_BODY = "SurveyCompletionMailBody.html";
 	public static final String SURVEY_COMPLETION_MAIL_SUBJECT = "SurveyCompletionMailSubject.txt";
@@ -45,39 +69,15 @@ public final class EmailTemplateConstants {
 	public static final String SURVEY_INVITATION_MAIL_CUSTOMER_BODY = "SurveyCustomerInvitationMailBody.html";
 	public static final String SURVEY_INVITATION_MAIL_CUSTOMER_SUBJECT = "SurveyCustomerInvitationMailSubject.txt";
 
+	public static final String SURVEY_PARTICIPATION_MAIL_BODY = "SurveyParticipationMailBody.html";
+
 	public static final String SURVEY_REMINDER_MAIL_BODY = "SurveyReminderMailBody.html";
 	public static final String SURVEY_REMINDER_MAIL_SUBJECT = "SurveyReminderMailSubject.txt";
 
-	public static final String VERIFICATION_MAIL_BODY = "VerificationMailBody.html";
-	public static final String VERIFICATION_MAIL_SUBJECT = "VerificationMailSubject.txt";
-
 	// TODO
-	public static final String EMAIL_SENDING_FAILURE_MAIL_BODY = "EmailSendingFailureMailBody.html";
-	public static final String EMAIL_SENDING_FAILURE_MAIL_SUBJECT = "EmailSendingFailureMailSubject.txt";
-
-	public static final String EMAIL_VERIFICATION_MAIL_BODY = "EmailVerificationMailBody.html";
-	public static final String EMAIL_VERIFICATION_MAIL_SUBJECT = "EmailVerificationMailSubject.txt";
-
-	public static final String FATAL_EXCEPTION_MAIL_BODY = "FatalExceptionMailBody.html";
-	public static final String FATAL_EXCEPTION_MAIL_SUBJECT = "FatalExceptionMailSubject.txt";
-
-	public static final String MANUAL_REGISTRATION_MAIL_SUBJECT = "ManualRegistrationSubject.txt";
-	public static final String MANUAL_REGISTRATION_MAIL_BODY = "ManualRegistrationBody.html";
-
-	public static final String REGISTRATION_INVITATION_MAIL_BODY = "RegistrationInvitationMailBody.html";
-	public static final String REGISTRATION_INVITATION_MAIL_SUBJECT = "RegistrationInvitationMailSubject.txt";
-
-	public static final String SUBSCRIPTION_PRICE_UPDATED_MAIL_SUBJECT = "SubscriptionPriceUpdate.txt";
-	public static final String SUBSCRIPTION_PRICE_UPDATED_MAIL_BODY = "SubscriptionPriceUpdateBody.html";
-	
-	public static final String SUBSCRIPTION_UNSUCCESSFUL_MAIL_BODY = "SubscriptionChargeUnsuccessfulMailBody.html";
-	public static final String SUBSCRIPTION_UNSUCCESSFUL_MAIL_SUBJECT = "SubscriptionChargeUnsuccessfulMailSubject.txt";
-
-	public static final String SURVEY_COMPLETION_ADMINS_MAIL_SUBJECT = "SurveyCompletionAdminsMailSubject.txt";
-	public static final String SURVEY_COMPLETION_ADMINS_MAIL_BODY = "SurveyCompletionAdminsMailBody.html";
-
-	public static final String SURVEY_PARTICIPATION_MAIL_BODY = "SurveyParticipationMailBody.html";
-
 	public static final String SOCIALPOST_REMINDER_MAIL_BODY = "SocialPostReminderMailBody.html";
 	public static final String SOCIALPOST_REMINDER_MAIL_SUBJECT = "SocialPostReminderMailSubject.txt";
+
+	public static final String VERIFICATION_MAIL_BODY = "VerificationMailBody.html";
+	public static final String VERIFICATION_MAIL_SUBJECT = "VerificationMailSubject.txt";
 }
