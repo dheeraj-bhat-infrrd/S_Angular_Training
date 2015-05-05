@@ -254,11 +254,11 @@ function validateEmailId(elementId){
 		if (emailRegex.test(emailId) == true) {
 			return true;
 		} else {
-			showErrorMobileAndWeb('Please enter a valid Email Id');
+			showErrorMobileAndWeb('Please enter a valid Email Address');
 			return false;
 		}
 	} else {
-		showErrorMobileAndWeb('Please enter a valid Email Id');
+		showErrorMobileAndWeb('Please enter a valid Email Address');
 		return false;
 	}
 }
