@@ -441,14 +441,20 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean {
 				agentPhone = agentSettings.getContact_details().getContact_numbers().getWork();
 			}
 			
+			String agentName = user.getFirstName();
+			if (user.getLastName() != null && !user.getLastName().isEmpty()) {
+				agentName = user.getFirstName() + " " + user.getLastName();
+			}
+			
 			String mailBody = companySettings.getMail_content().getTake_survey_mail().getMail_body();
-			mailBody = mailBody.replaceAll("\\[AgentName\\]", user.getFirstName() + " " + user.getLastName());
+			mailBody = mailBody.replaceAll("\\[AgentName\\]", agentName);
 			mailBody = mailBody.replaceAll("\\[Name\\]", custFirstName + " " + custLastName);
 			mailBody = mailBody.replaceAll("\\[Link\\]", link);
 			mailBody = mailBody.replaceAll("\\[AgentPhone\\]", agentPhone);
 			mailBody = mailBody.replaceAll("\\[AgentTitle\\]", agentTitle);
 			mailBody = mailBody.replaceAll("\\[CompanyName\\]", user.getCompany().getCompany());
-			String mailSubject = CommonConstants.SURVEY_MAIL_SUBJECT;
+			
+			String mailSubject = CommonConstants.SURVEY_MAIL_SUBJECT + agentName;
 			try {
 				emailServices.sendSurveyInvitationMail(custEmail, mailSubject, mailBody, user.getEmailId(), user.getFirstName()
 						+ (user.getLastName() != null ? " " + user.getLastName() : ""));
@@ -476,7 +482,7 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean {
 			mailBody = mailBody.replaceAll("\\[Name\\]", custFirstName + " " + custLastName);
 			mailBody = mailBody.replaceAll("\\[Link\\]", link);
 			mailBody = mailBody.replaceAll("null", "");
-			String mailSubject = CommonConstants.SURVEY_MAIL_SUBJECT;
+			String mailSubject = CommonConstants.SURVEY_MAIL_SUBJECT_CUSTOMER;
 			try {
 				emailServices.sendSurveyInvitationMailByCustomer(custEmail, mailSubject, mailBody, user.getEmailId(), user.getFirstName()
 						+ (user.getLastName() != null ? " " + user.getLastName() : ""));

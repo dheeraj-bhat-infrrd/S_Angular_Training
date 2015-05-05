@@ -1042,14 +1042,17 @@ public class EmailServicesImpl implements EmailServices {
 
 		LOG.info("Sending contact us email to : " + recipientEmailId);
 		EmailEntity emailEntity = prepareEmailEntityForSendingEmail(recipientEmailId);
-		String subjectFileName = EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER + EmailTemplateConstants.CONTACT_US_MAIL_SUBJECT;
+
+		FileContentReplacements subjectReplacements = new FileContentReplacements();
+		subjectReplacements.setFileName(EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER + EmailTemplateConstants.CONTACT_US_MAIL_SUBJECT);
+		subjectReplacements.setReplacementArgs(Arrays.asList(senderName));
 
 		FileContentReplacements messageBodyReplacements = new FileContentReplacements();
 		messageBodyReplacements.setFileName(EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER + EmailTemplateConstants.CONTACT_US_MAIL_BODY);
 		messageBodyReplacements.setReplacementArgs(Arrays.asList(displayName, senderName, senderEmailId, message));
 
 		LOG.debug("Calling email sender to send mail");
-		emailSender.sendEmailWithBodyReplacements(emailEntity, subjectFileName, messageBodyReplacements);
+		emailSender.sendEmailWithSubjectAndBodyReplacements(emailEntity, subjectReplacements, messageBodyReplacements);
 		LOG.info("Successfully sent contact us mail");
 	}
 
