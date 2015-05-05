@@ -215,26 +215,26 @@ public class SurveyManagementController {
 	
 	private String generateSurveyTextForMail(String customerName, String mood, SurveyDetails survey) {
 		StringBuilder surveyDetail = new StringBuilder(customerName).append(" Complete Survey Response for ").append(survey.getAgentName());
-		surveyDetail.append("\n").append("Date Sent: ").append(survey.getCreatedOn().toString());
-		surveyDetail.append("\n").append("Date Completed: ").append(survey.getModifiedOn().toString());
-		surveyDetail.append("\n").append("Average Score: ").append(String.valueOf(survey.getScore()));
-		surveyDetail.append("\n");
+		surveyDetail.append("<br />").append("Date Sent: ").append(survey.getCreatedOn().toString());
+		surveyDetail.append("<br />").append("Date Completed: ").append(survey.getModifiedOn().toString());
+		surveyDetail.append("<br />").append("Average Score: ").append(String.valueOf(survey.getScore()));
+		surveyDetail.append("<br />");
 		int count = 1;
 		for (SurveyResponse response : survey.getSurveyResponse()) {
-			surveyDetail.append("\n").append("Question " + count + ": ").append(response.getQuestion());
-			surveyDetail.append("\n").append("Response to Q" + count + ": ").append(response.getAnswer());
+			surveyDetail.append("<br />").append("Question " + count + ": ").append(response.getQuestion());
+			surveyDetail.append("<br />").append("Response to Q" + count + ": ").append(response.getAnswer());
 			count ++;
 		}
-		surveyDetail.append("\n");
-		surveyDetail.append("\n").append("Customer Comments: ").append(survey.getReview());
-		surveyDetail.append("\n").append("Customer Mood: ").append(mood);
+		surveyDetail.append("<br />");
+		surveyDetail.append("<br />").append("Customer Comments: ").append(survey.getReview());
+		surveyDetail.append("<br />").append("Customer Mood: ").append(mood);
 		if (survey.getSharedOn() != null && !survey.getSharedOn().isEmpty()) {
-			surveyDetail.append("\n").append("Share Checkbox: ").append("Yes");
+			surveyDetail.append("<br />").append("Share Checkbox: ").append("Yes");
+			surveyDetail.append("<br />").append("Shared on: ").append(StringUtils.join(survey.getSharedOn(), ", "));
 		}
 		else {
-			surveyDetail.append("\n").append("Share Checkbox: ").append("No");
+			surveyDetail.append("<br />").append("Share Checkbox: ").append("No");
 		}
-		surveyDetail.append("\n").append("Shared on: ").append(StringUtils.join(survey.getSharedOn(), ", "));
 		
 		return surveyDetail.toString();
 	}
