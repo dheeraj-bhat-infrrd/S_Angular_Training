@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
+import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.commons.EmailTemplateConstants;
 import com.realtech.socialsurvey.core.entities.EmailEntity;
 import com.realtech.socialsurvey.core.entities.FileContentReplacements;
@@ -67,10 +68,10 @@ public class EmailServicesImpl implements EmailServices {
 		// format for the registration mail is RECIPIENT^^<comman separated
 		// recipients>$$URL^^<URL>$$FIRSTNAME^^<firstName>$$LASTNAME^^<lastName>
 		StringBuilder contentBuilder = new StringBuilder();
-		contentBuilder.append("RECIPIENT^^").append(recipientMailId);
-		contentBuilder.append("$$").append("URL^^").append(url);
-		contentBuilder.append("$$").append("FIRSTNAME^^").append(firstName);
-		contentBuilder.append("$$").append("LASTNAME^^").append(lastName);
+		contentBuilder.append(CommonConstants.RECIPIENT_MARKER).append(recipientMailId);
+		contentBuilder.append(CommonConstants.ELEMENTS_DELIMITER).append(CommonConstants.URL_MARKER).append(url);
+		contentBuilder.append(CommonConstants.ELEMENTS_DELIMITER).append(CommonConstants.FIRSTNAME_MARKER).append(firstName);
+		contentBuilder.append(CommonConstants.ELEMENTS_DELIMITER).append(CommonConstants.LASTNAME_MARKER).append(lastName);
 
 		LOG.debug("queueing content: " + contentBuilder.toString());
 		queueProducer.queueEmail(EmailHeader.REGISTRATION, contentBuilder.toString());
@@ -120,7 +121,7 @@ public class EmailServicesImpl implements EmailServices {
 
 	@Async
 	@Override
-	public void queueResetPasswordEmail(String url, String recipientMailId, String name) throws InvalidInputException {
+	public void queueResetPasswordEmail(String url, String recipientMailId, String name, String loginName) throws InvalidInputException {
 		LOG.info("Method to queue Email to reset the password link with URL : " + url + "\t and Recipients Mail ID : " + recipientMailId);
 		if (url == null || url.isEmpty()) {
 			LOG.error("URL generated can not be null or empty");
@@ -138,10 +139,11 @@ public class EmailServicesImpl implements EmailServices {
 		// format for the reset password mail is RECIPIENT^^<comman separated
 		// recipients>$$URL^^<URL>$$NAME^^<name>
 		StringBuilder contentBuilder = new StringBuilder();
-		contentBuilder.append("RECIPIENT^^").append(recipientMailId);
-		contentBuilder.append("$$").append("URL^^").append(url);
-		contentBuilder.append("$$").append("NAME^^").append(name);
-
+		contentBuilder.append(CommonConstants.RECIPIENT_MARKER).append(recipientMailId);
+		contentBuilder.append(CommonConstants.ELEMENTS_DELIMITER).append(CommonConstants.URL_MARKER).append(url);
+		contentBuilder.append(CommonConstants.ELEMENTS_DELIMITER).append(CommonConstants.NAME_MARKER).append(name);
+		contentBuilder.append(CommonConstants.ELEMENTS_DELIMITER).append(CommonConstants.LOGINNAME_MARKER).append(loginName);
+		
 		LOG.debug("queueing content: " + contentBuilder.toString());
 		queueProducer.queueEmail(EmailHeader.RESET_PASSWORD, contentBuilder.toString());
 		LOG.info("Queued the send reset password mail");
@@ -157,7 +159,8 @@ public class EmailServicesImpl implements EmailServices {
 	 */
 	@Async
 	@Override
-	public void sendResetPasswordEmail(String url, String recipientMailId, String name) throws InvalidInputException, UndeliveredEmailException {
+	public void sendResetPasswordEmail(String url, String recipientMailId, String name, String loginName) throws InvalidInputException,
+			UndeliveredEmailException {
 		LOG.info("Method to send Email to reset the password link with URL : " + url + "\t and Recipients Mail ID : " + recipientMailId);
 		if (url == null || url.isEmpty()) {
 			LOG.error("URL generated can not be null or empty");
@@ -177,7 +180,7 @@ public class EmailServicesImpl implements EmailServices {
 
 		FileContentReplacements messageBodyReplacements = new FileContentReplacements();
 		messageBodyReplacements.setFileName(EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER + EmailTemplateConstants.RESET_PASSWORD_MAIL_BODY);
-		messageBodyReplacements.setReplacementArgs(Arrays.asList(name, recipientMailId, url, url));
+		messageBodyReplacements.setReplacementArgs(Arrays.asList(name, loginName, url, url));
 
 		LOG.debug("Calling email sender to send mail");
 		emailSender.sendEmailWithBodyReplacements(emailEntity, subjectFileName, messageBodyReplacements);
@@ -237,9 +240,9 @@ public class EmailServicesImpl implements EmailServices {
 		// format for the subscription charge unsuccessful mail is RECIPIENT^^<comman separated
 		// recipients>$$NAME^^<name>$$RETRYDAYS^^<retryDays>
 		StringBuilder contentBuilder = new StringBuilder();
-		contentBuilder.append("RECIPIENT^^").append(recipientMailId);
-		contentBuilder.append("$$").append("NAME^^").append(name);
-		contentBuilder.append("$$").append("RETRYDAYS^^").append(retryDays);
+		contentBuilder.append(CommonConstants.RECIPIENT_MARKER).append(recipientMailId);
+		contentBuilder.append(CommonConstants.ELEMENTS_DELIMITER).append(CommonConstants.NAME_MARKER).append(name);
+		contentBuilder.append(CommonConstants.ELEMENTS_DELIMITER).append(CommonConstants.RETRYDAYS_MARKER).append(retryDays);
 
 		LOG.debug("queueing content: " + contentBuilder.toString());
 		queueProducer.queueEmail(EmailHeader.SUBSCRIPTION_CHARGE_UNSUCESSFUL, contentBuilder.toString());
@@ -302,9 +305,9 @@ public class EmailServicesImpl implements EmailServices {
 		// format for the registration mail is RECIPIENT^^<comman separated
 		// recipients>$$URL^^<URL>$$NAME^^<recipientName>
 		StringBuilder contentBuilder = new StringBuilder();
-		contentBuilder.append("RECIPIENT^^").append(recipientMailId);
-		contentBuilder.append("$$").append("URL^^").append(url);
-		contentBuilder.append("$$").append("NAME^^").append(recipientName);
+		contentBuilder.append(CommonConstants.RECIPIENT_MARKER).append(recipientMailId);
+		contentBuilder.append(CommonConstants.ELEMENTS_DELIMITER).append(CommonConstants.URL_MARKER).append(url);
+		contentBuilder.append(CommonConstants.ELEMENTS_DELIMITER).append(CommonConstants.NAME_MARKER).append(recipientName);
 
 		LOG.debug("queueing content: " + contentBuilder.toString());
 		queueProducer.queueEmail(EmailHeader.EMAIL_VERFICATION, contentBuilder.toString());
@@ -364,9 +367,9 @@ public class EmailServicesImpl implements EmailServices {
 		// format for the registration mail is RECIPIENT^^<comman separated
 		// recipients>$$URL^^<URL>$$NAME^^<recipientName>
 		StringBuilder contentBuilder = new StringBuilder();
-		contentBuilder.append("RECIPIENT^^").append(recipientMailId);
-		contentBuilder.append("$$").append("URL^^").append(url);
-		contentBuilder.append("$$").append("NAME^^").append(recipientName);
+		contentBuilder.append(CommonConstants.RECIPIENT_MARKER).append(recipientMailId);
+		contentBuilder.append(CommonConstants.ELEMENTS_DELIMITER).append(CommonConstants.URL_MARKER).append(url);
+		contentBuilder.append(CommonConstants.ELEMENTS_DELIMITER).append(CommonConstants.NAME_MARKER).append(recipientName);
 
 		LOG.debug("queueing content: " + contentBuilder.toString());
 		queueProducer.queueEmail(EmailHeader.VERFICATION, contentBuilder.toString());
@@ -415,7 +418,8 @@ public class EmailServicesImpl implements EmailServices {
 
 	@Async
 	@Override
-	public void queueRegistrationCompletionEmail(String url, String recipientMailId, String name) throws InvalidInputException {
+	public void queueRegistrationCompletionEmail(String url, String recipientMailId, String name, String profileName, String loginName)
+			throws InvalidInputException {
 		LOG.info("Method to queue Email to complete registration link with URL: " + url + "\t and Recipients Mail ID: " + recipientMailId);
 		if (url == null || url.isEmpty()) {
 			LOG.error("URL generated can not be null or empty");
@@ -433,10 +437,12 @@ public class EmailServicesImpl implements EmailServices {
 		// format for the registration mail is RECIPIENT^^<comman separated
 		// recipients>$$URL^^<URL>$$NAME^^<name>
 		StringBuilder contentBuilder = new StringBuilder();
-		contentBuilder.append("RECIPIENT^^").append(recipientMailId);
-		contentBuilder.append("$$").append("URL^^").append(url);
-		contentBuilder.append("$$").append("NAME^^").append(name);
-
+		contentBuilder.append(CommonConstants.RECIPIENT_MARKER).append(recipientMailId);
+		contentBuilder.append(CommonConstants.ELEMENTS_DELIMITER).append(CommonConstants.URL_MARKER).append(url);
+		contentBuilder.append(CommonConstants.ELEMENTS_DELIMITER).append(CommonConstants.NAME_MARKER).append(name);
+		contentBuilder.append(CommonConstants.ELEMENTS_DELIMITER).append(CommonConstants.LOGINNAME_MARKER).append(loginName);
+		contentBuilder.append(CommonConstants.ELEMENTS_DELIMITER).append(CommonConstants.PROFILENAME_MARKER).append(profileName);
+		
 		LOG.debug("queueing content: " + contentBuilder.toString());
 		queueProducer.queueEmail(EmailHeader.REGISTRATION_COMPLETE, contentBuilder.toString());
 		LOG.info("Queued the registration complete mail");
@@ -453,8 +459,8 @@ public class EmailServicesImpl implements EmailServices {
 	 */
 	@Async
 	@Override
-	public void sendRegistrationCompletionEmail(String url, String recipientMailId, String name) throws InvalidInputException,
-			UndeliveredEmailException {
+	public void sendRegistrationCompletionEmail(String url, String recipientMailId, String name, String profileName, String loginName)
+			throws InvalidInputException, UndeliveredEmailException {
 		LOG.info("Method to send Email to complete registration link with URL: " + url + "\t and Recipients Mail ID: " + recipientMailId);
 		if (url == null || url.isEmpty()) {
 			LOG.error("URL generated can not be null or empty");
@@ -474,7 +480,7 @@ public class EmailServicesImpl implements EmailServices {
 
 		FileContentReplacements messageBodyReplacements = new FileContentReplacements();
 		messageBodyReplacements.setFileName(EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER + EmailTemplateConstants.COMPLETE_REGISTRATION_MAIL_BODY);
-		messageBodyReplacements.setReplacementArgs(Arrays.asList(name, url, url, PROFILE_NAME, PROFILE_NAME, recipientMailId));
+		messageBodyReplacements.setReplacementArgs(Arrays.asList(name, url, url, PROFILE_NAME, PROFILE_NAME, loginName));
 
 		LOG.debug("Calling email sender to send mail");
 		emailSender.sendEmailWithBodyReplacements(emailEntity, subjectFileName, messageBodyReplacements);
@@ -576,8 +582,8 @@ public class EmailServicesImpl implements EmailServices {
 		// format for the registration mail is RECIPIENT^^<comman separated
 		// recipients>$$NAME^^<displayName>$$RETRIES^^<retries>
 		StringBuilder contentBuilder = new StringBuilder();
-		contentBuilder.append("RECIPIENT^^").append(recipientMailId);
-		contentBuilder.append("$$").append("NAME^^").append(displayName);
+		contentBuilder.append(CommonConstants.RECIPIENT_MARKER).append(recipientMailId);
+		contentBuilder.append(CommonConstants.ELEMENTS_DELIMITER).append(CommonConstants.NAME_MARKER).append(displayName);
 
 		LOG.debug("queueing content: " + contentBuilder.toString());
 		queueProducer.queueEmail(EmailHeader.RETRY_CHARGE, contentBuilder.toString());
@@ -611,7 +617,7 @@ public class EmailServicesImpl implements EmailServices {
 
 	@Async
 	@Override
-	public void queueRetryExhaustedEmail(String recipientMailId, String displayName) throws InvalidInputException {
+	public void queueRetryExhaustedEmail(String recipientMailId, String displayName, String loginName) throws InvalidInputException {
 		if (recipientMailId == null || recipientMailId.isEmpty()) {
 			LOG.error("Recipient email Id is empty or null for sending retries exhausted mail ");
 			throw new InvalidInputException("Recipient email Id is empty or null for sending retries exhausted mail ");
@@ -625,9 +631,10 @@ public class EmailServicesImpl implements EmailServices {
 		// format for the retry exhausted mail is RECIPIENT^^<comman separated
 		// recipients>$$NAME^^<displayName>
 		StringBuilder contentBuilder = new StringBuilder();
-		contentBuilder.append("RECIPIENT^^").append(recipientMailId);
-		contentBuilder.append("$$").append("NAME^^").append(displayName);
-
+		contentBuilder.append(CommonConstants.RECIPIENT_MARKER).append(recipientMailId);
+		contentBuilder.append(CommonConstants.ELEMENTS_DELIMITER).append(CommonConstants.NAME_MARKER).append(displayName);
+		contentBuilder.append(CommonConstants.ELEMENTS_DELIMITER).append(CommonConstants.LOGINNAME_MARKER).append(loginName);
+		
 		LOG.debug("queueing content: " + contentBuilder.toString());
 		queueProducer.queueEmail(EmailHeader.RETRY_EXHAUSTED, contentBuilder.toString());
 		LOG.info("Queued the retry charged mail");
@@ -635,7 +642,8 @@ public class EmailServicesImpl implements EmailServices {
 
 	@Async
 	@Override
-	public void sendRetryExhaustedEmail(String recipientMailId, String displayName) throws InvalidInputException, UndeliveredEmailException {
+	public void sendRetryExhaustedEmail(String recipientMailId, String displayName, String loginName) throws InvalidInputException,
+			UndeliveredEmailException {
 		if (recipientMailId == null || recipientMailId.isEmpty()) {
 			LOG.error("Recipient email Id is empty or null for sending retries exhausted mail ");
 			throw new InvalidInputException("Recipient email Id is empty or null for sending retries exhausted mail ");
@@ -651,7 +659,7 @@ public class EmailServicesImpl implements EmailServices {
 
 		FileContentReplacements messageBodyReplacements = new FileContentReplacements();
 		messageBodyReplacements.setFileName(EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER + EmailTemplateConstants.RETRIES_EXHAUSTED_MAIL_BODY);
-		messageBodyReplacements.setReplacementArgs(Arrays.asList(displayName, recipientMailId));
+		messageBodyReplacements.setReplacementArgs(Arrays.asList(displayName, loginName));
 
 		LOG.debug("Calling email sender to send mail");
 		emailSender.sendEmailWithBodyReplacements(emailEntity, subjectFileName, messageBodyReplacements);
@@ -660,7 +668,7 @@ public class EmailServicesImpl implements EmailServices {
 
 	@Async
 	@Override
-	public void queueAccountDisabledMail(String recipientMailId, String displayName) throws InvalidInputException {
+	public void queueAccountDisabledMail(String recipientMailId, String displayName, String loginName) throws InvalidInputException {
 		if (recipientMailId == null || recipientMailId.isEmpty()) {
 			LOG.error("Recipient email Id is empty or null for sending retries exhausted mail ");
 			throw new InvalidInputException("Recipient email Id is empty or null for sending retries exhausted mail ");
@@ -674,8 +682,9 @@ public class EmailServicesImpl implements EmailServices {
 		// format for the account disabled mail is RECIPIENT^^<comman separated
 		// recipients>$$NAME^^<displayName>
 		StringBuilder contentBuilder = new StringBuilder();
-		contentBuilder.append("RECIPIENT^^").append(recipientMailId);
-		contentBuilder.append("$$").append("NAME^^").append(displayName);
+		contentBuilder.append(CommonConstants.RECIPIENT_MARKER).append(recipientMailId);
+		contentBuilder.append(CommonConstants.ELEMENTS_DELIMITER).append(CommonConstants.NAME_MARKER).append(displayName);
+		contentBuilder.append(CommonConstants.ELEMENTS_DELIMITER).append(CommonConstants.LOGINNAME_MARKER).append(loginName);
 
 		LOG.debug("queueing content: " + contentBuilder.toString());
 		queueProducer.queueEmail(EmailHeader.ACCOUNT_DISABLED, contentBuilder.toString());
@@ -684,7 +693,8 @@ public class EmailServicesImpl implements EmailServices {
 
 	@Async
 	@Override
-	public void sendAccountDisabledMail(String recipientMailId, String displayName) throws InvalidInputException, UndeliveredEmailException {
+	public void sendAccountDisabledMail(String recipientMailId, String displayName, String loginName) throws InvalidInputException,
+			UndeliveredEmailException {
 		if (recipientMailId == null || recipientMailId.isEmpty()) {
 			LOG.error("Recipient email Id is empty or null for sending retries exhausted mail ");
 			throw new InvalidInputException("Recipient email Id is empty or null for sending retries exhausted mail ");
@@ -700,7 +710,7 @@ public class EmailServicesImpl implements EmailServices {
 
 		FileContentReplacements messageBodyReplacements = new FileContentReplacements();
 		messageBodyReplacements.setFileName(EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER + EmailTemplateConstants.ACCOUNT_DISABLED_MAIL_BODY);
-		messageBodyReplacements.setReplacementArgs(Arrays.asList(displayName, recipientMailId));
+		messageBodyReplacements.setReplacementArgs(Arrays.asList(displayName, loginName));
 
 		LOG.debug("Calling email sender to send mail");
 		emailSender.sendEmailWithBodyReplacements(emailEntity, subjectFileName, messageBodyReplacements);
@@ -709,7 +719,7 @@ public class EmailServicesImpl implements EmailServices {
 
 	@Async
 	@Override
-	public void queueAccountUpgradeMail(String recipientMailId, String displayName) throws InvalidInputException {
+	public void queueAccountUpgradeMail(String recipientMailId, String displayName, String loginName) throws InvalidInputException {
 		if (recipientMailId == null || recipientMailId.isEmpty()) {
 			LOG.error("Recipient email Id is empty or null for sending account upgrade mail ");
 			throw new InvalidInputException("Recipient email Id is empty or null for sending account upgrade mail ");
@@ -723,8 +733,9 @@ public class EmailServicesImpl implements EmailServices {
 		// format for the account upgrade mail is RECIPIENT^^<comman separated
 		// recipients>$$NAME^^<displayName>
 		StringBuilder contentBuilder = new StringBuilder();
-		contentBuilder.append("RECIPIENT^^").append(recipientMailId);
-		contentBuilder.append("$$").append("NAME^^").append(displayName);
+		contentBuilder.append(CommonConstants.RECIPIENT_MARKER).append(recipientMailId);
+		contentBuilder.append(CommonConstants.ELEMENTS_DELIMITER).append(CommonConstants.NAME_MARKER).append(displayName);
+		contentBuilder.append(CommonConstants.ELEMENTS_DELIMITER).append(CommonConstants.LOGINNAME_MARKER).append(loginName);
 
 		LOG.debug("queueing content: " + contentBuilder.toString());
 		queueProducer.queueEmail(EmailHeader.ACCOUNT_UPGRADE, contentBuilder.toString());
@@ -733,7 +744,8 @@ public class EmailServicesImpl implements EmailServices {
 
 	@Async
 	@Override
-	public void sendAccountUpgradeMail(String recipientMailId, String displayName) throws InvalidInputException, UndeliveredEmailException {
+	public void sendAccountUpgradeMail(String recipientMailId, String displayName, String loginName) throws InvalidInputException,
+			UndeliveredEmailException {
 		if (recipientMailId == null || recipientMailId.isEmpty()) {
 			LOG.error("Recipient email Id is empty or null for sending account upgrade mail ");
 			throw new InvalidInputException("Recipient email Id is empty or null for sending account upgrade mail ");
@@ -772,9 +784,9 @@ public class EmailServicesImpl implements EmailServices {
 		// format for the survey complete mail is RECIPIENT^^<comman separated
 		// recipients>$$NAME^^<displayName>$$AGENTNAME^^<agentName>
 		StringBuilder contentBuilder = new StringBuilder();
-		contentBuilder.append("RECIPIENT^^").append(recipientMailId);
-		contentBuilder.append("$$").append("NAME^^").append(displayName);
-		contentBuilder.append("$$").append("AGENTNAME^^").append(agentName);
+		contentBuilder.append(CommonConstants.RECIPIENT_MARKER).append(recipientMailId);
+		contentBuilder.append(CommonConstants.ELEMENTS_DELIMITER).append(CommonConstants.NAME_MARKER).append(displayName);
+		contentBuilder.append(CommonConstants.ELEMENTS_DELIMITER).append(CommonConstants.AGENTNAME_MARKER).append(agentName);
 
 		LOG.debug("queueing content: " + contentBuilder.toString());
 		queueProducer.queueEmail(EmailHeader.ACCOUNT_UPGRADE, contentBuilder.toString());
@@ -823,10 +835,10 @@ public class EmailServicesImpl implements EmailServices {
 		// format for the survey complete mail is RECIPIENT^^<comman separated
 		// recipients>$$NAME^^<displayName>$$AGENTNAME^^<agentName>
 		StringBuilder contentBuilder = new StringBuilder();
-		contentBuilder.append("RECIPIENT^^").append(recipientMailId);
-		contentBuilder.append("$$").append("NAME^^").append(displayName);
-		contentBuilder.append("$$").append("AGENTNAME^^").append(agentName);
-		contentBuilder.append("$$").append("LINK^^").append(link);
+		contentBuilder.append(CommonConstants.RECIPIENT_MARKER).append(recipientMailId);
+		contentBuilder.append(CommonConstants.ELEMENTS_DELIMITER).append(CommonConstants.NAME_MARKER).append(displayName);
+		contentBuilder.append(CommonConstants.ELEMENTS_DELIMITER).append(CommonConstants.AGENTNAME_MARKER).append(agentName);
+		contentBuilder.append(CommonConstants.ELEMENTS_DELIMITER).append("LINK^^").append(link);
 
 		LOG.debug("queueing content: " + contentBuilder.toString());
 		queueProducer.queueEmail(EmailHeader.ACCOUNT_UPGRADE, contentBuilder.toString());
@@ -897,9 +909,9 @@ public class EmailServicesImpl implements EmailServices {
 		// format for the survey complete mail is RECIPIENT^^<comman separated
 		// recipients>$$NAME^^<displayName>$$AGENTNAME^^<agentName>
 		StringBuilder contentBuilder = new StringBuilder();
-		contentBuilder.append("RECIPIENT^^").append(recipientMailId);
-		contentBuilder.append("$$").append("NAME^^").append(customerName);
-		contentBuilder.append("$$").append("AGENTNAME^^").append(agentName);
+		contentBuilder.append(CommonConstants.RECIPIENT_MARKER).append(recipientMailId);
+		contentBuilder.append(CommonConstants.ELEMENTS_DELIMITER).append(CommonConstants.NAME_MARKER).append(customerName);
+		contentBuilder.append(CommonConstants.ELEMENTS_DELIMITER).append(CommonConstants.AGENTNAME_MARKER).append(agentName);
 
 		LOG.debug("queueing content: " + contentBuilder.toString());
 		queueProducer.queueEmail(EmailHeader.ACCOUNT_UPGRADE, contentBuilder.toString());
@@ -949,9 +961,9 @@ public class EmailServicesImpl implements EmailServices {
 		// format for the survey complete mail is RECIPIENT^^<comman separated
 		// recipients>$$NAME^^<displayName>$$AGENTNAME^^<agentName>
 		StringBuilder contentBuilder = new StringBuilder();
-		contentBuilder.append("RECIPIENT^^").append(recipientMailId);
-		contentBuilder.append("$$").append("NAME^^").append(displayName);
-		contentBuilder.append("$$").append("AGENTNAME^^").append(agentName);
+		contentBuilder.append(CommonConstants.RECIPIENT_MARKER).append(recipientMailId);
+		contentBuilder.append(CommonConstants.ELEMENTS_DELIMITER).append(CommonConstants.NAME_MARKER).append(displayName);
+		contentBuilder.append(CommonConstants.ELEMENTS_DELIMITER).append(CommonConstants.AGENTNAME_MARKER).append(agentName);
 
 		LOG.debug("queueing content: " + contentBuilder.toString());
 		queueProducer.queueEmail(EmailHeader.ACCOUNT_UPGRADE, contentBuilder.toString());
@@ -1089,7 +1101,8 @@ public class EmailServicesImpl implements EmailServices {
 	 */
 	@Async
 	@Override
-	public void sendAccountBlockingMail(String recipientMailId, String displayName) throws InvalidInputException, UndeliveredEmailException {
+	public void sendAccountBlockingMail(String recipientMailId, String displayName, String loginName) throws InvalidInputException,
+			UndeliveredEmailException {
 		if (recipientMailId == null || recipientMailId.isEmpty()) {
 			LOG.error("Recipient email Id is empty or null for sending survey completion mail ");
 			throw new InvalidInputException("Recipient email Id is empty or null for sending survey completion mail ");
@@ -1105,7 +1118,7 @@ public class EmailServicesImpl implements EmailServices {
 
 		FileContentReplacements messageBodyReplacements = new FileContentReplacements();
 		messageBodyReplacements.setFileName(EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER + EmailTemplateConstants.ACCOUNT_BLOCKING_MAIL_BODY);
-		messageBodyReplacements.setReplacementArgs(Arrays.asList(displayName, recipientMailId));
+		messageBodyReplacements.setReplacementArgs(Arrays.asList(displayName, loginName));
 
 		LOG.debug("Calling email sender to send mail");
 		emailSender.sendEmailWithBodyReplacements(emailEntity, subjectFileName, messageBodyReplacements);
@@ -1122,7 +1135,8 @@ public class EmailServicesImpl implements EmailServices {
 	 */
 	@Async
 	@Override
-	public void sendAccountReactivationMail(String recipientMailId, String displayName) throws InvalidInputException, UndeliveredEmailException {
+	public void sendAccountReactivationMail(String recipientMailId, String displayName, String loginName) throws InvalidInputException,
+			UndeliveredEmailException {
 		if (recipientMailId == null || recipientMailId.isEmpty()) {
 			LOG.error("Recipient email Id is empty or null for sending survey completion mail ");
 			throw new InvalidInputException("Recipient email Id is empty or null for sending survey completion mail ");
@@ -1138,7 +1152,7 @@ public class EmailServicesImpl implements EmailServices {
 
 		FileContentReplacements messageBodyReplacements = new FileContentReplacements();
 		messageBodyReplacements.setFileName(EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER + EmailTemplateConstants.ACCOUNT_REACTIVATION_MAIL_BODY);
-		messageBodyReplacements.setReplacementArgs(Arrays.asList(displayName, recipientMailId));
+		messageBodyReplacements.setReplacementArgs(Arrays.asList(displayName, loginName));
 
 		LOG.debug("Calling email sender to send mail");
 		emailSender.sendEmailWithBodyReplacements(emailEntity, subjectFileName, messageBodyReplacements);
@@ -1184,7 +1198,7 @@ public class EmailServicesImpl implements EmailServices {
 		emailSender.sendEmailWithBodyReplacements(emailEntity, subjectFileName, messageBodyReplacements);
 		LOG.info("Successfully sent subscription revised mail");
 	}
-	
+
 	@Async
 	@Override
 	public void sendManualRegistrationLink(String recipientId, String firstName, String lastName, String link) throws InvalidInputException,

@@ -1225,10 +1225,10 @@ public class BrainTreePaymentImpl implements Payment, InitializingBean {
 
 		LOG.info("Sending mail to the customer about the upgrade");
 		if (enableKafka.equals(CommonConstants.YES)) {
-			emailServices.queueAccountUpgradeMail(user.getEmailId(), user.getFirstName() + " " + user.getLastName());
+			emailServices.queueAccountUpgradeMail(user.getEmailId(), user.getFirstName() + " " + user.getLastName(), user.getLoginName());
 		}
 		else {
-			emailServices.sendAccountUpgradeMail(user.getEmailId(), user.getFirstName() + " " + user.getLastName());
+			emailServices.sendAccountUpgradeMail(user.getEmailId(), user.getFirstName() + " " + user.getLastName(), user.getLoginName());
 		}
 		LOG.info("Mail successfully sent");
 
@@ -1531,7 +1531,7 @@ public class BrainTreePaymentImpl implements Payment, InitializingBean {
 		try {
 			if (enableKafka.equals(CommonConstants.YES)) {
 				if (retriesExceeded) {
-					emailServices.sendAccountBlockingMail(user.getEmailId(), user.getFirstName() + " " + user.getLastName());
+					emailServices.sendAccountBlockingMail(user.getEmailId(), user.getFirstName() + " " + user.getLastName(), user.getLoginName());
 				}
 				else {
 					emailServices.queueRetryChargeEmail(user.getEmailId(), user.getFirstName() + " " + user.getLastName());
@@ -1539,7 +1539,7 @@ public class BrainTreePaymentImpl implements Payment, InitializingBean {
 			}
 			else {
 				if (retriesExceeded) {
-					emailServices.sendAccountBlockingMail(user.getEmailId(), user.getFirstName() + " " + user.getLastName());
+					emailServices.sendAccountBlockingMail(user.getEmailId(), user.getFirstName() + " " + user.getLastName(), user.getLoginName());
 				}
 				else {
 					emailServices.sendRetryChargeEmail(user.getEmailId(), user.getFirstName() + " " + user.getLastName());
@@ -1579,14 +1579,12 @@ public class BrainTreePaymentImpl implements Payment, InitializingBean {
 
 		List<LicenseDetail> licenseDetails = licenseDetailDao.findByColumn(LicenseDetail.class, CommonConstants.SUBSCRIPTION_ID_COLUMN,
 				subscription.getId());
-
 		if (licenseDetails == null || licenseDetails.isEmpty()) {
 			LOG.error("License details objecy not found for subscription id : " + subscription.getId());
 			throw new NoRecordsFetchedException("License details objecy not found for subscription id : " + subscription.getId());
 		}
 
 		LicenseDetail licenseDetail = licenseDetails.get(CommonConstants.INITIAL_INDEX);
-
 		if (licenseDetail.getIsSubscriptionDue() == CommonConstants.YES) {
 
 			Company company = licenseDetail.getCompany();
@@ -1601,6 +1599,7 @@ public class BrainTreePaymentImpl implements Payment, InitializingBean {
 				companyDao.update(company);
 				LOG.debug("Company table updated!");
 			}
+			
 			// We set the license details record to reflect changes
 			licenseDetail.setIsSubscriptionDue(CommonConstants.NO);
 			licenseDetail.setPaymentRetries(CommonConstants.INITIAL_PAYMENT_RETRIES);
@@ -1608,18 +1607,16 @@ public class BrainTreePaymentImpl implements Payment, InitializingBean {
 			LOG.debug("License detail table updated!");
 
 			User user = coreCommonServices.getCorporateAdmin(company);
-
 			if (user == null) {
 				LOG.error("Corporate admin not found for company : " + company.getCompanyId());
 				throw new NoRecordsFetchedException("Corporate admin not found for company : " + company.getCompanyId());
 			}
 
-			emailServices.sendAccountReactivationMail(user.getEmailId(), user.getFirstName() + " " + user.getLastName());
+			emailServices.sendAccountReactivationMail(user.getEmailId(), user.getFirstName() + " " + user.getLastName(), user.getLoginName());
 			LOG.info("Company activated!");
 		}
 
 		LOG.info("checkIfCompanyIsDisabledOrSubscriptionIsPastDueAndEnableIt execution complete!");
-
 	}
 
 	@Transactional

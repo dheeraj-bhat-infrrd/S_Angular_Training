@@ -367,7 +367,8 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 		LOG.debug("Inserting agent settings for the user:" + user);
 		insertAgentSettings(user);
 
-		sendRegistrationCompletionLink(emailId, firstName, lastName, admin.getCompany().getCompanyId());
+		String profileName = getUserSettings(user.getUserId()).getProfileName();
+		sendRegistrationCompletionLink(emailId, firstName, lastName, admin.getCompany().getCompanyId(), profileName, user.getLoginName());
 		LOG.info("Method to add a new user, inviteUserToRegister finished for email id : " + emailId);
 		return user;
 	}
@@ -1029,10 +1030,10 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 	 * @throws InvalidInputException
 	 */
 	@Override
-	public void sendRegistrationCompletionLink(String emailId, String firstName, String lastName, long companyId) throws InvalidInputException,
-			UndeliveredEmailException {
-
+	public void sendRegistrationCompletionLink(String emailId, String firstName, String lastName, long companyId, String profileName, String loginName)
+			throws InvalidInputException, UndeliveredEmailException {
 		LOG.info("Method to send profile completion link to the user started.");
+		
 		Map<String, String> urlParams = new HashMap<String, String>();
 		urlParams.put(CommonConstants.EMAIL_ID, emailId);
 		urlParams.put(CommonConstants.FIRST_NAME, firstName);
@@ -1045,12 +1046,13 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 		if (lastName != null && !lastName.isEmpty()) {
 			name = name + " " + lastName;
 		}
+		
 		// Send reset password link to the user email ID
 		if (enableKafka.equals(CommonConstants.YES)) {
-			emailServices.queueRegistrationCompletionEmail(url, emailId, name);
+			emailServices.queueRegistrationCompletionEmail(url, emailId, name, profileName, loginName);
 		}
 		else {
-			emailServices.sendRegistrationCompletionEmail(url, emailId, name);
+			emailServices.sendRegistrationCompletionEmail(url, emailId, name, profileName, loginName);
 		}
 	}
 
