@@ -169,7 +169,10 @@ function paintSurveyPageFromJson() {
 		$("div[data-ques-type='error']").show();
 		$('#content-head').html('Survey');
 		$('#content').html(
-				"You have already taken survey for " + agentName + "!");
+				"OOPS! It looks like you have already taken a survey for " + agentName + "."
+				+"<br/><br/>"
+				+"Are you trying to amend a prior response? If so click the link below and we will email you the access required<br/><br/>")
+				.append("<div class='cursor-pointer'>Link to resend origin Survey Responses so they can be amended</div>");
 	}
 	questionDetails = questions[qno];
 	var question = questionDetails.question;

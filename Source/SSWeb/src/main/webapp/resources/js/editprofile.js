@@ -1458,6 +1458,7 @@ function paintPosts(posts) {
 	if (proPostStartIndex == 0){
 		$('#prof-posts').html(divToPopulate);
 		$('#prof-posts').perfectScrollbar();
+		$('#prof-posts').perfectScrollbar('update');
 	}
 	else{
 		$('#prof-posts').append(divToPopulate);
