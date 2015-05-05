@@ -940,6 +940,7 @@ function bindArrowKeysWithSelector(e,textBoxId,dropListId,populatorFunction,hidd
 }
 
 function showViewHierarchyPage() {
+	closeMoblieScreenMenu();
 	var url = "./viewhierarchy.do";
 	callAjaxGET(url, viewHierarchyCallBack, true);
 }
