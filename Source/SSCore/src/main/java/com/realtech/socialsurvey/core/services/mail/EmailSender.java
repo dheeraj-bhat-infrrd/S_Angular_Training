@@ -13,13 +13,17 @@ public interface EmailSender {
 	/**
 	 * Sends mail with subject and body provided as raw text
 	 */
-	//public void sendMail(EmailEntity emailEntity) throws InvalidInputException, UndeliveredEmailException;
+	// public void sendMail(EmailEntity emailEntity) throws InvalidInputException,
+	// UndeliveredEmailException;
 
 	/**
 	 * Sends mail with subject and body provided from templates and mail body replacements required
 	 */
 	public void sendEmailWithBodyReplacements(EmailEntity emailEntity, String subjectFileName, FileContentReplacements messageBodyReplacements)
 			throws InvalidInputException, UndeliveredEmailException;
+
+	public void sendEmailWithSubjectAndBodyReplacements(EmailEntity emailEntity, FileContentReplacements subjectReplacements,
+			FileContentReplacements messageBodyReplacements) throws InvalidInputException, UndeliveredEmailException;
 
 	public void sendEmail(EmailEntity emailEntity, String subject, String mailBody) throws InvalidInputException, UndeliveredEmailException;
 }

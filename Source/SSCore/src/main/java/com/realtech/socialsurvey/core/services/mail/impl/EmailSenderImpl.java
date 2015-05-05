@@ -125,7 +125,7 @@ public final class EmailSenderImpl implements EmailSender {
 			throw new InvalidInputException("Subject file name is null for sending mail");
 		}
 		if (messageBodyReplacements == null) {
-			throw new InvalidInputException("Email body file name  and replacements are null for sending mail");
+			throw new InvalidInputException("Email body file name and replacements are null for sending mail");
 		}
 
 		/**
@@ -133,6 +133,36 @@ public final class EmailSenderImpl implements EmailSender {
 		 */
 		LOG.debug("Reading template to set the mail subject");
 		emailEntity.setSubject(fileOperations.getContentFromFile(subjectFileName));
+
+		/**
+		 * Read the mail body template, replace the required contents with arguments provided and
+		 * set in emailEntity
+		 */
+		LOG.debug("Reading template to set the mail body");
+		emailEntity.setBody(fileOperations.replaceFileContents(messageBodyReplacements));
+
+		// Send the mail
+		sendMail(emailEntity);
+		LOG.info("Method sendEmailWithBodyReplacements completed successfully");
+	}
+	
+	public void sendEmailWithSubjectAndBodyReplacements(EmailEntity emailEntity, FileContentReplacements subjectReplacements,
+			FileContentReplacements messageBodyReplacements) throws InvalidInputException, UndeliveredEmailException {
+		LOG.info("Method sendEmailWithBodyReplacements called for emailEntity : " + emailEntity + " subjectReplacements : " + subjectReplacements
+				+ " and messageBodyReplacements : " + messageBodyReplacements);
+
+		if (subjectReplacements == null) {
+			throw new InvalidInputException("Email subject file name and replacements are null for sending mail");
+		}
+		if (messageBodyReplacements == null) {
+			throw new InvalidInputException("Email body file name and replacements are null for sending mail");
+		}
+
+		/**
+		 * Read the subject template to get the subject and set in emailEntity
+		 */
+		LOG.debug("Reading template to set the mail subject");
+		emailEntity.setSubject(fileOperations.replaceFileContents(subjectReplacements));
 
 		/**
 		 * Read the mail body template, replace the required contents with arguments provided and
