@@ -7,7 +7,7 @@
 			<div class="float-left hm-header-row-left hr-dsh-adj-lft"><spring:message code="label.header.dashboard.key" /></div>
 			
 			<c:if test="${not empty profileList && fn:length(profileList) > 1}">
-				<div class="float-right header-right clearfix hr-dsh-adj-rt" style="z-index: 999; margin-left: 50px;">
+				<div class="float-right header-right clearfix hr-dsh-adj-rt" style="z-index: 99; margin-left: 50px;">
 					<div class="float-left hr-txt1"><spring:message code="label.viewas.key" /></div>
 					<div id="dashboard-sel" class="float-left hr-txt2 cursor-pointer">${profileName}</div>
 					<div id="da-dd-wrapper-profiles" class="va-dd-wrapper hide">

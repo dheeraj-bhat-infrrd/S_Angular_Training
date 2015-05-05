@@ -29,7 +29,7 @@
 							<div class="h-lbl">email address</div>
 							<div class="h-inp-wrapper">
 								<div class="m-inp-img m-inp-img-uname"></div>
-								<input type="text" class="h-inp" placeholder="Username" id="login-user-id" name="j_username">
+								<input type="text" class="h-inp" placeholder="Email Address" id="login-user-id" name="j_username">
 							</div>
 						</div>
 						<div class="float-left h-pwd-wrapper">
@@ -53,19 +53,21 @@
 			</div>
 			
 			<div class="hero-txt-wrapper">
-				<span class="txt-bold">read, write</span> and 
+				<!-- <span class="txt-bold">read, write</span> and 
 				<span class="txt-bold">Share </span>reviews<br/>
                 <span class="txt-header-small">Social Survey is where </span>
                 <span class="txt-bold txt-header-small">Professionals</span> <span class="txt-header-small">and</span>
-                <span class="txt-bold txt-header-small">Customers </span><span class="txt-header-small">connect</span>
+                <span class="txt-bold txt-header-small">Customers </span><span class="txt-header-small">connect</span> -->
+                <span>Amplify the Voice of Your Customer</span><br/>
+                <span class="font-22 s-font-16">Engaging customers and enhancing your online reputation</span>
 			</div>
 			<div class="content-wrapper clearfix">
 				<div class="float-left c-pic-panel">
 					<div class="clearfix c-pic-panel-top">
 						<div class="float-left c-pic-top-1">
 							<div class="blue-ext-left"></div>
-							<div class="c-panel-txt-top txt-bold">Manage Your Online Reputation!</div>
-							<div class="c-panel-txt-bot">Don't let one bad review be the way customers find you online. With Social-Survey you can Automate survey requests, connect to your point of sale system and syndicate surveys. To view all of our features - <b>Click Here</b></div>
+							<div class="c-panel-txt-top txt-bold">Manage Your Online Reputation</div>
+							<div class="c-panel-txt-bot">We Offer companies and quality professionals a simple way to manage their online reputation, and capture customer data to create a winning social strategy and boost customer satisfaction.</div>
 						</div>
 						<div class="float-left c-pic-img c-pic-top-2">
 							<div class="pic-bot-txt">
@@ -109,8 +111,8 @@
 					</div>
 					
 			   		<form id="registration-form" class="registration-form-cls" method="POST" action="./registration.do">
-						<div class="reg-txt-top1">Create Your Free Account</div>
-						<div class="reg-txt-top2">Registration Takes Less Than 2 Minutes</div>
+						<div class="reg-txt-top1">Professionals, Take Control NOW!</div>
+						<div class="reg-txt-top2">Register for FREE. It takes less than 2 minutes</div>
 						<div class="clearfix reg-item reg-item-bord-top">
 							<div class="m-inp-img-fname m-inp-img"></div>
 							<div class="m-inp-img-lname m-inp-img m-inp-img-adj"></div>
@@ -149,7 +151,7 @@
 			<div id="pro-wrapper" class="pro-wrapper clearfix">
 				<div id="pro-list-con" class="pro-left-wrapper float-left">
 					<div class="blue-ext-right blue-ext-right-adj hide"></div>
-					<div class="fp-txt-1">Read and Write reviews - Find a professional</div>
+					<div class="fp-txt-1">Find a professional</div>
 				</div>
 				
 				<form id="find-pro-form" method="POST" action="./findapro.do">
@@ -164,7 +166,18 @@
 				</form>
 				
 			</div>
-			<div id="footer-wrapper" class="footer-wrapper">&copy; Copyright 2015. All Rights Reserved.</div>
+			<div id="footer-wrapper" class="footer-wrapper">
+				&copy; Copyright 2015. All Rights Reserved.<br/>
+				Created by BuyersRoad, Inc. in San Francisco 
+				<span class="footer-ul">
+					<span>&bull; Privacy Policy</span>
+					<span>&bull; Features & Pricing</span><br/>
+					<span>&bull; Report Bugs to support@socialsurvey.me</span>
+					<span>&bull; Press Inquiries: pr@socialsurvey.me</span><br/>
+					<span>&bull; Security</span>
+					<span>&bull; Terms of Service</span>
+				</span>
+			</div>
 		</div>
 	</div>
 <div style="display: none">
