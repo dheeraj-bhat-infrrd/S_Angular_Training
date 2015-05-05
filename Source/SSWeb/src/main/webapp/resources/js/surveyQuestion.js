@@ -844,6 +844,13 @@ $('#start-btn').click(function() {
 		return;
 	}
 	
+	var agentEmail = $('#prof-container').attr("data-agent-email");
+	if(agentEmail.toUpperCase() == email.toUpperCase()){
+		$('#overlay-toast').html('Agents can not take survey for themselves!');
+		showToast();
+		return;
+	}
+	
 	/*if (!validateUserEmailId('email')) {
 		$('#overlay-toast').html('Please enter valid Email Id!');
 		showToast();
