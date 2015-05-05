@@ -670,6 +670,7 @@
 </div>
 <script>
 	$(document).ready(function() {
+		debugger;
 		hideOverlay();
 		countPosts();
 		$(document).attr("title", "Profile Settings");
