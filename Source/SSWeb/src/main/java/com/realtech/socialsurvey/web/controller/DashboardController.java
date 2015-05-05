@@ -74,7 +74,7 @@ public class DashboardController {
 
 	@Autowired
 	private UserManagementService userManagementService;
-	
+
 	@Autowired
 	private OrganizationManagementService organizationManagementService;
 
@@ -86,7 +86,7 @@ public class DashboardController {
 
 	@Autowired
 	private SurveyHandler surveyHandler;
-	
+
 	@Autowired
 	private URLGenerator urlGenerator;
 
@@ -184,7 +184,7 @@ public class DashboardController {
 			model.addAttribute("columnName", CommonConstants.AGENT_ID_COLUMN);
 			model.addAttribute("columnValue", selectedProfile.getAgentId());
 		}
-		
+
 		return model;
 	}
 
@@ -368,7 +368,7 @@ public class DashboardController {
 		LOG.info("Method to get reviews of company, region, branch, agent getReviews() started.");
 		User user = sessionHelper.getCurrentUser();
 		List<SurveyDetails> surveyDetails = new ArrayList<>();
-		
+
 		try {
 			String startIndexStr = request.getParameter("startIndex");
 			String batchSizeStr = request.getParameter("batchSize");
@@ -421,9 +421,9 @@ public class DashboardController {
 	}
 
 	/*
-	 * Method to fetch count of all the reviews in SURVEY_DETAILS collection.
-	 * It returns dta on the basis of columnName and columnValue which can be either of 
-	 * companyId/RegionId/BranchId/AgentId. 
+	 * Method to fetch count of all the reviews in SURVEY_DETAILS collection. It returns dta on the
+	 * basis of columnName and columnValue which can be either of
+	 * companyId/RegionId/BranchId/AgentId.
 	 */
 	@ResponseBody
 	@RequestMapping(value = "/fetchdashboardreviewCount")
@@ -527,7 +527,6 @@ public class DashboardController {
 
 	/*
 	 * Method to fetch incomplete survey data.
-	 *  
 	 */
 	@RequestMapping(value = "/fetchdashboardincompletesurvey")
 	public String getIncompleteSurvey(Model model, HttpServletRequest request) {
@@ -572,14 +571,16 @@ public class DashboardController {
 
 	@RequestMapping(value = "/redirecttosurveyrequestpage")
 	public String redirectToSurveyRequestPage(Model model, HttpServletRequest request) {
-		model.addAttribute("agentId", request.getParameter("agentId"));
-		model.addAttribute("agentName", request.getParameter("agentName"));
+		User agent = sessionHelper.getCurrentUser();
+		model.addAttribute("agentId", agent.getUserId());
+		model.addAttribute("agentName", agent.getFirstName() + agent.getLastName());
+		model.addAttribute("agentEmail", agent.getEmailId());
 		return JspResolver.SURVEY_REQUEST;
 	}
 
 	/*
-	 * Fetches incomplete surveys based upon the criteria.
-	 * Criteria can be startIndex and/or batchSize.
+	 * Fetches incomplete surveys based upon the criteria. Criteria can be startIndex and/or
+	 * batchSize.
 	 */
 	private List<SurveyDetails> fetchIncompleteSurveys(HttpServletRequest request, User user) throws InvalidInputException {
 		LOG.debug("Method fetchIncompleteSurveys() started");
@@ -875,10 +876,10 @@ public class DashboardController {
 				LOG.error("Invalid value (null/empty) passed for profile level.");
 				throw new InvalidInputException("Invalid value (null/empty) passed for profile level.");
 			}
-			
+
 			String startDateStr = request.getParameter("startDate");
 			String endDateStr = request.getParameter("endDate");
-			
+
 			Date startDate = null;
 			Date endDate = Calendar.getInstance().getTime();
 			if (startDateStr != null) {
@@ -897,7 +898,7 @@ public class DashboardController {
 					LOG.error("ParseException caught in getCompleteSurveyFile() while parsing startDate. Nested exception is ", e);
 				}
 			}
-			
+
 			String profileLevel = getProfileLevel(columnName);
 			long iden = 0;
 
@@ -942,7 +943,7 @@ public class DashboardController {
 						responseStream.close();
 					}
 					catch (IOException e) {
-						LOG.error("IOException caught in getIncompleteSurveyFile(). Nested exception is ",e);
+						LOG.error("IOException caught in getIncompleteSurveyFile(). Nested exception is ", e);
 					}
 				}
 				response.flushBuffer();
@@ -962,9 +963,8 @@ public class DashboardController {
 	}
 
 	/*
-	 * Method to
-	 * 1. Store initial details of customer.
-	 * 2. Send Invitation mail to the customer to take survey.
+	 * Method to 1. Store initial details of customer. 2. Send Invitation mail to the customer to
+	 * take survey.
 	 */
 	@ResponseBody
 	@RequestMapping(value = "/sendsurveyinvite")
@@ -986,14 +986,14 @@ public class DashboardController {
 		LOG.info("Method sendSurveyInvitation() finished from DashboardController.");
 		return "Success";
 	}
-	
+
 	@ResponseBody
 	@RequestMapping(value = "/sendmultiplesurveyinvites", method = RequestMethod.POST)
 	public String sendMultipleSurveyInvitations(HttpServletRequest request) {
 		LOG.info("Method sendMultipleSurveyInvitations() called from DashboardController.");
 		User user = sessionHelper.getCurrentUser();
 		List<SurveyRecipient> surveyRecipients = null;
-		
+
 		try {
 			String payload = request.getParameter("receiversList");
 			try {
@@ -1006,11 +1006,12 @@ public class DashboardController {
 			catch (IOException ioException) {
 				throw new NonFatalException("Error occurred while parsing the Json.", DisplayMessageConstants.GENERAL_ERROR, ioException);
 			}
-			
+
 			// sending mails on traversing the list
 			if (!surveyRecipients.isEmpty()) {
 				for (SurveyRecipient recipient : surveyRecipients) {
-					surveyHandler.sendSurveyInvitationMail(recipient.getFirstname(), recipient.getLastname(), recipient.getEmailId(), null, user, true);
+					surveyHandler.sendSurveyInvitationMail(recipient.getFirstname(), recipient.getLastname(), recipient.getEmailId(), null, user,
+							true);
 				}
 			}
 		}
