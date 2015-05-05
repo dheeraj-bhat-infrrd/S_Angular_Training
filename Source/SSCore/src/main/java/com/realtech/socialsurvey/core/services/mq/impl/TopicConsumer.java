@@ -32,6 +32,7 @@ public class TopicConsumer implements Runnable {
 	private static final String COMPANYNAME_MARKER = "COMPANYNAME^^";
 	private static final String LOGINNAME_MARKER = "LOGINNAME^^";
 	private static final String PROFILENAME_MARKER = "PROFILENAME^^";
+	private static final String SURVEYDETAIL_MARKER = "SURVEYDETAIL^^";
 
 	private KafkaStream<byte[], byte[]> stream;
 	private EmailServices emailServices;
@@ -120,8 +121,7 @@ public class TopicConsumer implements Runnable {
 			parseSurveyCompletionMail(message);
 		}
 		else if (header.equals(EmailHeader.SURVEY_COMPLETION_ADMIN.getName())) {
-			// TODO
-			parseMailWithRecipientAndName(message, EmailHeader.ACCOUNT_UPGRADE);
+			parseSurveyCompletionAdminMail(message);
 		}
 	}
 
@@ -338,5 +338,27 @@ public class TopicConsumer implements Runnable {
 
 		LOG.debug("Sending retry exhausted mail");
 		emailServices.sendDefaultSurveyReminderMail(recipient, name, agentName, link, agentPhone, agentTitle, companyName);
+	}
+	
+	private void parseSurveyCompletionAdminMail(String message) throws NonFatalException {
+		LOG.debug("Survey completion admin mail message: " + message);
+		if (message.indexOf(RECIPIENT_MARKER) == -1 || message.indexOf(LOGINNAME_MARKER) == -1 || message.indexOf(SURVEYDETAIL_MARKER) == -1) {
+			throw new InvalidMessageFormatException("Invalid format for Survey completion mail");
+		}
+
+		String recipient = message.substring(RECIPIENT_MARKER.length(), message.indexOf(ELEMENTS_DELIMITER));
+		LOG.debug("Recipient: " + recipient);
+
+		// holds the index till the message has been parsed.
+		int messageParsedIndex = RECIPIENT_MARKER.length() + recipient.length() + ELEMENTS_DELIMITER.length();
+		String loginName = message.substring(messageParsedIndex + LOGINNAME_MARKER.length(), message.indexOf(ELEMENTS_DELIMITER, messageParsedIndex));
+		LOG.debug("loginName: " + loginName);
+
+		messageParsedIndex += LOGINNAME_MARKER.length() + loginName.length() + ELEMENTS_DELIMITER.length();
+		String surveyDetail = message.substring(messageParsedIndex + SURVEYDETAIL_MARKER.length());
+		LOG.debug("surveyDetail: " + surveyDetail);
+
+		LOG.debug("Sending account completion admin mail");
+		emailServices.sendSurveyCompletionMailToAdmins(recipient, surveyDetail);
 	}
 }
