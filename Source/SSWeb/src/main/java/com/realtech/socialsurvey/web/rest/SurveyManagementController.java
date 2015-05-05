@@ -175,16 +175,17 @@ public class SurveyManagementController {
 					emailServices.sendSurveyCompletionMail(customerEmail, survey.getCustomerFirstName() + " " + survey.getCustomerLastName(),
 							survey.getAgentName());
 				}
+				
 				if (enableKafka.equals(CommonConstants.YES)) {
 					for (String emailId : emailIdsToSendMail) {
 						emailServices.queueSurveyCompletionMailToAdmins(emailId, survey.getCustomerFirstName() + " " + survey.getCustomerLastName(),
-								survey.getAgentName(), mood);
+								survey.getAgentName(), mood, survey);
 					}
 				}
 				else {
 					for (String emailId : emailIdsToSendMail) {
 						emailServices.sendSurveyCompletionMailToAdmins(emailId, survey.getCustomerFirstName() + " " + survey.getCustomerLastName(),
-								survey.getAgentName(), mood);
+								survey.getAgentName(), mood, survey);
 					}
 				}
 			}

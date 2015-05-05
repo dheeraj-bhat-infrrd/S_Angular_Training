@@ -113,11 +113,15 @@ public class TopicConsumer implements Runnable {
 		else if (header.equals(EmailHeader.ACCOUNT_UPGRADE.getName())) {
 			parseMailWithRecipientAndName(message, EmailHeader.ACCOUNT_UPGRADE);
 		}
+		else if (header.equals(EmailHeader.SURVEY_REMINDER.getName())) {
+			parseMailWithRecipientAndAgentDetails(message);
+		}
 		else if (header.equals(EmailHeader.SURVEY_COMPLETION.getName())) {
 			parseSurveyCompletionMail(message);
 		}
-		else if (header.equals(EmailHeader.SURVEY_REMINDER.getName())) {
-			parseMailWithRecipientAndAgentDetails(message);
+		else if (header.equals(EmailHeader.SURVEY_COMPLETION_ADMIN.getName())) {
+			// TODO
+			parseMailWithRecipientAndName(message, EmailHeader.ACCOUNT_UPGRADE);
 		}
 	}
 

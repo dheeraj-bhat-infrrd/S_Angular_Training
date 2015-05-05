@@ -69,6 +69,7 @@ public final class EmailTemplateConstants {
 	public static final String SURVEY_INVITATION_MAIL_CUSTOMER_BODY = "SurveyCustomerInvitationMailBody.html";
 	public static final String SURVEY_INVITATION_MAIL_CUSTOMER_SUBJECT = "SurveyCustomerInvitationMailSubject.txt";
 
+	// never used
 	public static final String SURVEY_PARTICIPATION_MAIL_BODY = "SurveyParticipationMailBody.html";
 
 	public static final String SURVEY_REMINDER_MAIL_BODY = "SurveyReminderMailBody.html";
