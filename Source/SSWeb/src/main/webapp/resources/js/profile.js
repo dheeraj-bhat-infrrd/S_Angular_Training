@@ -969,6 +969,7 @@ function fetchReviewsForAgentCallBack(data) {
 }
 
 function paintIndividualDetails(result) {
+	var individualDetailsHtml = "";
 	// Paint licenses
 	var licenses = result.licenses;
 	if (licenses != undefined) {
@@ -1019,7 +1020,6 @@ function paintIndividualDetails(result) {
 	}
 
 	// Paint Associations
-	var individualDetailsHtml = "";
 	if (result.associations != undefined && result.associations.length > 0) {
 		individualDetailsHtml = individualDetailsHtml + '<div class="prof-left-row prof-left-assoc bord-bot-dc">';
 		individualDetailsHtml = individualDetailsHtml + '	<div class="left-assoc-wrapper">';
