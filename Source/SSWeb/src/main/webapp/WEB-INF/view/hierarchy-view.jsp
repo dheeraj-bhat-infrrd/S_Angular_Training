@@ -20,7 +20,7 @@
 	    <tr class="v-tbl-header" id="hierarchy-list-header">
 	        <td class="v-tbl-line"></td>
 	        <td class="v-tbl-name"><spring:message code="label.name.key"/></td>
-	        <td class="v-tbl-add"><spring:message code="label.address.key"/></td>
+	        <td class="v-tbl-add"><spring:message code="label.emailid.key"/></td>
 	        <td class="v-tbl-role"><spring:message code="label.role.key"/></td>
 	        <td class="v-tbl-btns"></td>
 	        <td class="v-tbl-spacer"></td>

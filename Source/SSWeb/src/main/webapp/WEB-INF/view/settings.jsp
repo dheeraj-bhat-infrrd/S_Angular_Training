@@ -141,20 +141,40 @@
 		<c:if test="${profilemasterid == 1 || accountMasterId == 1}">
 			<div class="um-top-container">
 				<div class="um-header  margin-top-25"><spring:message code="label.flow.text.key" /></div>
+				<div class="um-header-detail"><spring:message code="label.flow.desc.text.key" /></div>
 				<div class="clearfix um-panel-content">
 					<div class="bd-mcq-row clearfix txtareaRow">
-						<div class="float-left cs-gq-lbl">Please enter text to be shown for Happy Customer</div>
+						<div class="float-left cs-gq-lbl"><spring:message code="label.flow.happy.label.text" /></div>
 						<textarea id="happy-text" class="float-left textarea-bd-mcq-txt" style=""></textarea>
 					</div>
 					
 					<div class="bd-mcq-row clearfix txtareaRow">
-						<div class="float-left cs-gq-lbl">Please enter text to be shown for Neutral Customer</div>
+						<div class="float-left cs-gq-lbl"><spring:message code="label.flow.ok.label.text" /></div>
 						<textarea id="neutral-text" class="float-left textarea-bd-mcq-txt" style=""></textarea>
 					</div>
 					
 					<div class="bd-mcq-row clearfix txtareaRow">
-						<div class="float-left cs-gq-lbl">Please enter text to be shown for Sad Customer</div>
+						<div class="float-left cs-gq-lbl"><spring:message code="label.flow.sad.label.text" /></div>
 						<textarea id="sad-text" class="float-left textarea-bd-mcq-txt" style=""></textarea>
+					</div>
+				</div>
+				<div class="um-gateway-cont">
+					<div class="um-header-detail"><spring:message code="label.complete.desc.text.key" /></div>
+					<div class="clearfix um-panel-content">
+						<div class="bd-mcq-row clearfix txtareaRow">
+							<div class="float-left cs-gq-lbl"><spring:message code="label.complete.happy.label.text" /></div>
+							<textarea id="happy-text-complete" class="float-left textarea-bd-mcq-txt" style=""></textarea>
+						</div>
+						
+						<div class="bd-mcq-row clearfix txtareaRow">
+							<div class="float-left cs-gq-lbl"><spring:message code="label.complete.ok.label.text" /></div>
+							<textarea id="neutral-text-complete" class="float-left textarea-bd-mcq-txt" style=""></textarea>
+						</div>
+						
+						<div class="bd-mcq-row clearfix txtareaRow">
+							<div class="float-left cs-gq-lbl"><spring:message code="label.complete.sad.label.text" /></div>
+							<textarea id="sad-text-complete" class="float-left textarea-bd-mcq-txt" style=""></textarea>
+						</div>
 					</div>
 				</div>
 			</div>
@@ -523,7 +543,7 @@ $(document).ready(function(){
 	});
 	$('#st-settings-account-off').click(function(){
 		$('#other-account').val('true');
-		createPopupConfirm("Disable Account", "You will not be able to access the application after your billing cycle.<br/> Do you want to Continue?");
+		createPopupConfirm("Disable Account", "You will not be able to access your SocialSurvey profile after the current billing cycle. Also for Branch or Company Accounts, this will disable all accounts in your hierarchy under this account.<br/> Do you want to Continue?");
 		overlayAccount();
 	});
 

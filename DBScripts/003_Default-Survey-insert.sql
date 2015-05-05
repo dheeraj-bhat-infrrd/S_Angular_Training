@@ -34,7 +34,7 @@ UNLOCK TABLES;
 
 LOCK TABLES `SURVEY_QUESTIONS` WRITE;
 /*!40000 ALTER TABLE `SURVEY_QUESTIONS` DISABLE KEYS */;
-INSERT INTO `SURVEY_QUESTIONS` VALUES (1,'sb-range-star','Please rate the level of advice and communication you received from [name]?',1, NOW(),'1',NOW(),'1'),(2,'sb-range-star','How would you rate the service and support you received?',1,NOW(),'1',NOW(),'1'),(3,'sb-range-star','How likely are you to refer friends and family to [name]?',1,NOW(),'1',NOW(),'1');
+INSERT INTO `SURVEY_QUESTIONS` VALUES (1,'sb-range-star','Please rate the level of advice and communication you received from [name]?',1, NOW(),'1',NOW(),'1'),(2,'sb-range-star','How likely are you to refer friends and family to [name]?',1,NOW(),'1',NOW(),'1'),(3,'sb-range-star','How would you rate the service and support you received?',1,NOW(),'1',NOW(),'1');
 /*!40000 ALTER TABLE `SURVEY_QUESTIONS` ENABLE KEYS */;
 UNLOCK TABLES;
 
