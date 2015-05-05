@@ -9,14 +9,23 @@ public final class EmailTemplateConstants {
 
 	public static final String EMAIL_TEMPLATES_FOLDER = "EmailTemplates/";
 
+	public static final String ACCOUNT_BLOCKING_MAIL_BODY = "AccountBlockingMailBody.html";
+	public static final String ACCOUNT_BLOCKING_MAIL_SUBJECT = "AccountBlockingMailSubject.txt";
+
 	public static final String ACCOUNT_DISABLED_MAIL_BODY = "AccountDisabledMailBody.html";
 	public static final String ACCOUNT_DISABLED_MAIL_SUBJECT = "AccountDisabledMailSubject.txt";
+
+	public static final String ACCOUNT_REACTIVATION_MAIL_BODY = "AccountReactivationMailBody.html";
+	public static final String ACCOUNT_REACTIVATION_MAIL_SUBJECT = "AccountReactivationMailSubject.txt";
 
 	public static final String ACCOUNT_UPGRADE_MAIL_BODY = "AccountUpgradeMailBody.html";
 	public static final String ACCOUNT_UPGRADE_MAIL_SUBJECT = "AccountUpgradeMailSubject.txt";
 
 	public static final String COMPLETE_REGISTRATION_MAIL_BODY = "CompleteRegistrationMailBody.html";
 	public static final String COMPLETE_REGISTRATION_MAIL_SUBJECT = "CompleteRegistrationMailSubject.txt";
+
+	public static final String CONTACT_US_MAIL_BODY = "ContactUsMailBody.html";
+	public static final String CONTACT_US_MAIL_SUBJECT = "ContactUsMailSubject.txt";
 
 	public static final String RESET_PASSWORD_MAIL_BODY = "ResetPasswordMailBody.html";
 	public static final String RESET_PASSWORD_MAIL_SUBJECT = "ResetPasswordMailSubject.txt";
@@ -43,15 +52,6 @@ public final class EmailTemplateConstants {
 	public static final String VERIFICATION_MAIL_SUBJECT = "VerificationMailSubject.txt";
 
 	// TODO
-	public static final String ACCOUNT_BLOCKING_MAIL_SUBJECT = "AccountBlockingMailSubject.txt";
-	public static final String ACCOUNT_BLOCKING_MAIL_BODY = "AccountBlockingMailBody.html";
-
-	public static final String ACCOUNT_REACTIVATION_MAIL_BODY = "AccountReactivationMailBody.html";
-	public static final String ACCOUNT_REACTIVATION_MAIL_SUBJECT = "AccountReactivationMailSubject.txt";
-
-	public static final String CONTACT_US_MAIL_SUBJECT = "ContactUsMailSubject.txt";
-	public static final String CONTACT_US_MAIL_BODY = "ContactUsMailBody.html";
-
 	public static final String EMAIL_SENDING_FAILURE_MAIL_BODY = "EmailSendingFailureMailBody.html";
 	public static final String EMAIL_SENDING_FAILURE_MAIL_SUBJECT = "EmailSendingFailureMailSubject.txt";
 
@@ -61,14 +61,15 @@ public final class EmailTemplateConstants {
 	public static final String FATAL_EXCEPTION_MAIL_BODY = "FatalExceptionMailBody.html";
 	public static final String FATAL_EXCEPTION_MAIL_SUBJECT = "FatalExceptionMailSubject.txt";
 
+	public static final String MANUAL_REGISTRATION_MAIL_SUBJECT = "ManualRegistrationSubject.txt";
+	public static final String MANUAL_REGISTRATION_MAIL_BODY = "ManualRegistrationBody.html";
+
 	public static final String REGISTRATION_INVITATION_MAIL_BODY = "RegistrationInvitationMailBody.html";
 	public static final String REGISTRATION_INVITATION_MAIL_SUBJECT = "RegistrationInvitationMailSubject.txt";
 
 	public static final String SUBSCRIPTION_PRICE_UPDATED_MAIL_SUBJECT = "SubscriptionPriceUpdate.txt";
 	public static final String SUBSCRIPTION_PRICE_UPDATED_MAIL_BODY = "SubscriptionPriceUpdateBody.html";
-	public static final String MANUAL_REGISTRATION_MAIL_SUBJECT = "ManualRegistrationSubject.txt";
-	public static final String MANUAL_REGISTRATION_MAIL_BODY = "ManualRegistrationBody.html";
-
+	
 	public static final String SUBSCRIPTION_UNSUCCESSFUL_MAIL_BODY = "SubscriptionChargeUnsuccessfulMailBody.html";
 	public static final String SUBSCRIPTION_UNSUCCESSFUL_MAIL_SUBJECT = "SubscriptionChargeUnsuccessfulMailSubject.txt";
 
