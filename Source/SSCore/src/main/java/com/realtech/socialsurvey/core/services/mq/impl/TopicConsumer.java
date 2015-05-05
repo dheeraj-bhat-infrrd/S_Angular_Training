@@ -19,6 +19,7 @@ public class TopicConsumer implements Runnable {
 	private static final String ELEMENTS_DELIMITER = "$$";
 	private static final String HEADER_MARKER = "HEADER^^";
 	private static final String RECIPIENT_MARKER = "RECIPIENT^^";
+	private static final String LINK_MARKER = "LINK^^";
 	private static final String URL_MARKER = "URL^^";
 	private static final String NAME_MARKER = "NAME^^";
 	private static final String FIRSTNAME_MARKER = "FIRSTNAME^^";
@@ -26,6 +27,9 @@ public class TopicConsumer implements Runnable {
 	private static final String RETRYDAYS_MARKER = "RETRYDAYS^^";
 	private static final String RETRIES_MARKER = "RETRIES^^";
 	private static final String AGENTNAME_MARKER = "AGENTNAME^^";
+	private static final String AGENTPHONE_MARKER = "AGENTPHONE^^";
+	private static final String AGENTTITLE_MARKER = "AGENTTITLE^^";
+	private static final String COMPANYNAME_MARKER = "COMPANYNAME^^";
 	private static final String LOGINNAME_MARKER = "LOGINNAME^^";
 	private static final String PROFILENAME_MARKER = "PROFILENAME^^";
 
@@ -112,6 +116,9 @@ public class TopicConsumer implements Runnable {
 		else if (header.equals(EmailHeader.SURVEY_COMPLETION.getName())) {
 			parseSurveyCompletionMail(message);
 		}
+		else if (header.equals(EmailHeader.SURVEY_REMINDER.getName())) {
+			parseMailWithRecipientAndAgentDetails(message);
+		}
 	}
 
 	private void parseRegistrationMailMessage(String message) throws NonFatalException {
@@ -160,15 +167,21 @@ public class TopicConsumer implements Runnable {
 		LOG.debug("Name: " + name);
 
 		String loginName = "";
-		if (header == EmailHeader.RESET_PASSWORD || header == EmailHeader.REGISTRATION_COMPLETE) {
+		if (header == EmailHeader.RESET_PASSWORD || header == EmailHeader.REGISTRATION_COMPLETE || header == EmailHeader.VERFICATION) {
 			messageParsedIndex += NAME_MARKER.length() + name.length() + ELEMENTS_DELIMITER.length();
 			loginName = message.substring(messageParsedIndex + LOGINNAME_MARKER.length());
 			LOG.debug("LoginName: " + loginName);
 		}
+		String profileName = "";
+		if (header == EmailHeader.REGISTRATION_COMPLETE || header == EmailHeader.VERFICATION) {
+			messageParsedIndex += LOGINNAME_MARKER.length() + loginName.length() + ELEMENTS_DELIMITER.length();
+			profileName = message.substring(messageParsedIndex + PROFILENAME_MARKER.length());
+			LOG.debug("profileName: " + profileName);
+		}
 		
 		if (header == EmailHeader.VERFICATION) {
 			LOG.debug("Sending verification mail");
-			emailServices.sendVerificationMail(url, recipient, name);
+			emailServices.sendVerificationMail(url, recipient, name, profileName, loginName);
 		}
 		else if (header == EmailHeader.EMAIL_VERFICATION) {
 			LOG.debug("Sending verification mail");
@@ -179,10 +192,6 @@ public class TopicConsumer implements Runnable {
 			emailServices.sendResetPasswordEmail(url, recipient, name, loginName);
 		}
 		else if (header == EmailHeader.REGISTRATION_COMPLETE) {
-			messageParsedIndex += LOGINNAME_MARKER.length() + loginName.length() + ELEMENTS_DELIMITER.length();
-			String profileName = message.substring(messageParsedIndex + PROFILENAME_MARKER.length());
-			LOG.debug("profileName: " + profileName);
-
 			LOG.debug("Sending registration complete mail");
 			emailServices.sendRegistrationCompletionEmail(url, recipient, name, profileName, loginName);
 		}
@@ -225,11 +234,14 @@ public class TopicConsumer implements Runnable {
 		LOG.debug("Name: " + name);
 
 		messageParsedIndex += NAME_MARKER.length() + name.length() + ELEMENTS_DELIMITER.length();
+		String loginName = message.substring(messageParsedIndex + LOGINNAME_MARKER.length());
+		LOG.debug("LoginName: " + loginName);
+		/*messageParsedIndex += NAME_MARKER.length() + name.length() + ELEMENTS_DELIMITER.length();
 		String retries = message.substring(messageParsedIndex + RETRIES_MARKER.length());
-		LOG.debug("Retries: " + retries);
+		LOG.debug("Retries: " + retries);*/
 
 		LOG.debug("Sending retry charge mail");
-		emailServices.sendRetryChargeEmail(recipient, name);
+		emailServices.sendRetryChargeEmail(recipient, name, loginName);
 	}
 
 	private void parseMailWithRecipientAndName(String message, EmailHeader header) throws NonFatalException {
@@ -284,5 +296,43 @@ public class TopicConsumer implements Runnable {
 
 		LOG.debug("Sending account completion mail");
 		emailServices.sendSurveyCompletionMail(recipient, name, agentName);
+	}
+	
+	private void parseMailWithRecipientAndAgentDetails(String message) throws NonFatalException {
+		LOG.debug("Message for: " + message);
+		if (message.indexOf(RECIPIENT_MARKER) == -1 || message.indexOf(NAME_MARKER) == -1) {
+			throw new InvalidMessageFormatException("Invalid message format");
+		}
+
+		String recipient = message.substring(RECIPIENT_MARKER.length(), message.indexOf(ELEMENTS_DELIMITER));
+		LOG.debug("Recipient: " + recipient);
+
+		// holds the index till the message has been parsed.
+		int messageParsedIndex = RECIPIENT_MARKER.length() + recipient.length() + ELEMENTS_DELIMITER.length();
+		String name = message.substring(messageParsedIndex + NAME_MARKER.length());
+		LOG.debug("Name: " + name);
+
+		messageParsedIndex += NAME_MARKER.length() + name.length() + ELEMENTS_DELIMITER.length();
+		String agentName = message.substring(messageParsedIndex + AGENTNAME_MARKER.length());
+		LOG.debug("agentName: " + agentName);
+
+		messageParsedIndex += AGENTNAME_MARKER.length() + agentName.length() + ELEMENTS_DELIMITER.length();
+		String link = message.substring(messageParsedIndex + LINK_MARKER.length());
+		LOG.debug("link: " + link);
+
+		messageParsedIndex += LINK_MARKER.length() + link.length() + ELEMENTS_DELIMITER.length();
+		String agentPhone = message.substring(messageParsedIndex + AGENTPHONE_MARKER.length());
+		LOG.debug("agentPhone: " + agentPhone);
+
+		messageParsedIndex += AGENTPHONE_MARKER.length() + agentPhone.length() + ELEMENTS_DELIMITER.length();
+		String agentTitle = message.substring(messageParsedIndex + AGENTTITLE_MARKER.length());
+		LOG.debug("agentTitle: " + agentTitle);
+
+		messageParsedIndex += AGENTTITLE_MARKER.length() + agentTitle.length() + ELEMENTS_DELIMITER.length();
+		String companyName = message.substring(messageParsedIndex + COMPANYNAME_MARKER.length());
+		LOG.debug("companyName: " + companyName);
+
+		LOG.debug("Sending retry exhausted mail");
+		emailServices.sendDefaultSurveyReminderMail(recipient, name, agentName, link, agentPhone, agentTitle, companyName);
 	}
 }

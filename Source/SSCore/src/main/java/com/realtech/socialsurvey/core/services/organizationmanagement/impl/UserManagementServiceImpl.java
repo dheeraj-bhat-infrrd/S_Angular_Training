@@ -259,10 +259,10 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 		/**
 		 * if it is direct registration, send verification link else invalidate the invitation link
 		 */
-		if (isDirectRegistration) {
+		/*if (isDirectRegistration) {
 			LOG.debug("Calling method for sending verification link for user : " + user.getUserId());
 			sendVerificationLink(user);
-		}
+		}*/
 		// JIRA - SS-536 removed for manual registration via invite
 		/*
 		else {
@@ -1132,13 +1132,15 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 
 		try {
 			LOG.debug("Calling email services to send verification mail for user " + user.getEmailId());
+			String profileName = getUserSettings(user.getUserId()).getProfileName();
+			
 			if (enableKafka.equals(CommonConstants.YES)) {
 				emailServices.queueVerificationMail(verificationUrl, user.getEmailId(), user.getFirstName() + " "
-						+ (user.getLastName() != null ? user.getLastName() : ""));
+						+ (user.getLastName() != null ? user.getLastName() : ""), profileName, user.getLoginName());
 			}
 			else {
 				emailServices.sendVerificationMail(verificationUrl, user.getEmailId(),
-						user.getFirstName() + " " + (user.getLastName() != null ? user.getLastName() : ""));
+						user.getFirstName() + " " + (user.getLastName() != null ? user.getLastName() : ""), profileName, user.getLoginName());
 			}
 		}
 		catch (InvalidInputException e) {

@@ -71,10 +71,11 @@ public interface EmailServices {
 	 * @param recipientName
 	 * @throws InvalidInputException
 	 */
-	public void queueVerificationMail(String url, String recipientMailId, String recipientName) throws InvalidInputException;
+	public void queueVerificationMail(String url, String recipientMailId, String recipientName, String profileName, String loginName)
+			throws InvalidInputException;
 
-	public void sendVerificationMail(String url, String recipientMailId, String recipientName) throws InvalidInputException,
-			UndeliveredEmailException;
+	public void sendVerificationMail(String url, String recipientMailId, String recipientName, String profileName, String loginName)
+			throws InvalidInputException, UndeliveredEmailException;
 
 	/**
 	 * Queues the email verification mail
@@ -97,9 +98,10 @@ public interface EmailServices {
 	 * @param retries
 	 * @throws InvalidInputException
 	 */
-	public void queueRetryChargeEmail(String recipientMailId, String displayName) throws InvalidInputException;
+	public void queueRetryChargeEmail(String recipientMailId, String displayName, String loginName) throws InvalidInputException;
 
-	public void sendRetryChargeEmail(String recipientMailId, String displayName) throws InvalidInputException, UndeliveredEmailException;
+	public void sendRetryChargeEmail(String recipientMailId, String displayName, String loginName) throws InvalidInputException,
+			UndeliveredEmailException;
 
 	/**
 	 * Queues the retry exhausted mail
@@ -158,10 +160,11 @@ public interface EmailServices {
 	 * @param agentName
 	 * @throws InvalidInputException
 	 */
-	public void queueSurveyReminderMail(String recipientMailId, String displayName, String agentName, String link) throws InvalidInputException;
+	public void queueSurveyReminderMail(String recipientMailId, String displayName, String agentName, String link, String agentPhone,
+			String agentTitle, String companyName) throws InvalidInputException;
 
-	public void sendDefaultSurveyReminderMail(String recipientMailId, String displayName, String agentName, String link)
-			throws InvalidInputException, UndeliveredEmailException;
+	public void sendDefaultSurveyReminderMail(String recipientMailId, String displayName, String agentName, String link, String agentPhone,
+			String agentTitle, String companyName) throws InvalidInputException, UndeliveredEmailException;
 
 	/**
 	 * Queues the survey complete admin mail

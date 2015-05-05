@@ -28,7 +28,6 @@ import com.realtech.socialsurvey.core.services.mq.ProducerForQueue;
 public class EmailServicesImpl implements EmailServices {
 
 	public static final Logger LOG = LoggerFactory.getLogger(EmailServicesImpl.class);
-	public static final String PROFILE_NAME = "USERNAME";
 
 	@Autowired
 	private ProducerForQueue queueProducer;
@@ -352,7 +351,8 @@ public class EmailServicesImpl implements EmailServices {
 
 	@Async
 	@Override
-	public void queueVerificationMail(String url, String recipientMailId, String recipientName) throws InvalidInputException {
+	public void queueVerificationMail(String url, String recipientMailId, String recipientName, String profileName, String loginName)
+			throws InvalidInputException {
 		LOG.info("Method to queue verification mail called for url: " + url + " recipientMailId: " + recipientMailId);
 		if (url == null || url.isEmpty()) {
 			throw new InvalidInputException("URL generated can not be null or empty");
@@ -370,6 +370,8 @@ public class EmailServicesImpl implements EmailServices {
 		contentBuilder.append(CommonConstants.RECIPIENT_MARKER).append(recipientMailId);
 		contentBuilder.append(CommonConstants.ELEMENTS_DELIMITER).append(CommonConstants.URL_MARKER).append(url);
 		contentBuilder.append(CommonConstants.ELEMENTS_DELIMITER).append(CommonConstants.NAME_MARKER).append(recipientName);
+		contentBuilder.append(CommonConstants.ELEMENTS_DELIMITER).append(CommonConstants.LOGINNAME_MARKER).append(loginName);
+		contentBuilder.append(CommonConstants.ELEMENTS_DELIMITER).append(CommonConstants.PROFILENAME_MARKER).append(profileName);
 
 		LOG.debug("queueing content: " + contentBuilder.toString());
 		queueProducer.queueEmail(EmailHeader.VERFICATION, contentBuilder.toString());
@@ -387,8 +389,8 @@ public class EmailServicesImpl implements EmailServices {
 	 */
 	@Async
 	@Override
-	public void sendVerificationMail(String url, String recipientMailId, String recipientName) throws InvalidInputException,
-			UndeliveredEmailException {
+	public void sendVerificationMail(String url, String recipientMailId, String recipientName, String profileName, String loginName)
+			throws InvalidInputException, UndeliveredEmailException {
 		LOG.info("Method to send verification mail called for url: " + url + " recipientMailId: " + recipientMailId);
 		if (url == null || url.isEmpty()) {
 			throw new InvalidInputException("URL generated can not be null or empty");
@@ -408,7 +410,7 @@ public class EmailServicesImpl implements EmailServices {
 		FileContentReplacements fileContentReplacements = new FileContentReplacements();
 		fileContentReplacements.setFileName(EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER + EmailTemplateConstants.VERIFICATION_MAIL_BODY);
 		fileContentReplacements
-				.setReplacementArgs(Arrays.asList(recipientName, recipientName, url, url, PROFILE_NAME, PROFILE_NAME, recipientMailId));
+				.setReplacementArgs(Arrays.asList(recipientName, recipientName, url, url, profileName, profileName, loginName));
 
 		// sending email
 		LOG.debug("Calling email sender to send verification mail");
@@ -480,7 +482,7 @@ public class EmailServicesImpl implements EmailServices {
 
 		FileContentReplacements messageBodyReplacements = new FileContentReplacements();
 		messageBodyReplacements.setFileName(EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER + EmailTemplateConstants.COMPLETE_REGISTRATION_MAIL_BODY);
-		messageBodyReplacements.setReplacementArgs(Arrays.asList(name, url, url, PROFILE_NAME, PROFILE_NAME, loginName));
+		messageBodyReplacements.setReplacementArgs(Arrays.asList(name, url, url, profileName, profileName, loginName));
 
 		LOG.debug("Calling email sender to send mail");
 		emailSender.sendEmailWithBodyReplacements(emailEntity, subjectFileName, messageBodyReplacements);
@@ -568,7 +570,7 @@ public class EmailServicesImpl implements EmailServices {
 
 	@Async
 	@Override
-	public void queueRetryChargeEmail(String recipientMailId, String displayName) throws InvalidInputException {
+	public void queueRetryChargeEmail(String recipientMailId, String displayName, String loginName) throws InvalidInputException {
 		if (recipientMailId == null || recipientMailId.isEmpty()) {
 			LOG.error("Recipient email Id is empty or null for sending retry charge mail ");
 			throw new InvalidInputException("Recipient email Id is empty or null for sending retry charge mail ");
@@ -584,7 +586,8 @@ public class EmailServicesImpl implements EmailServices {
 		StringBuilder contentBuilder = new StringBuilder();
 		contentBuilder.append(CommonConstants.RECIPIENT_MARKER).append(recipientMailId);
 		contentBuilder.append(CommonConstants.ELEMENTS_DELIMITER).append(CommonConstants.NAME_MARKER).append(displayName);
-
+		contentBuilder.append(CommonConstants.ELEMENTS_DELIMITER).append(CommonConstants.LOGINNAME_MARKER).append(loginName);
+		
 		LOG.debug("queueing content: " + contentBuilder.toString());
 		queueProducer.queueEmail(EmailHeader.RETRY_CHARGE, contentBuilder.toString());
 		LOG.info("Queued the retry charged mail");
@@ -592,7 +595,8 @@ public class EmailServicesImpl implements EmailServices {
 
 	@Async
 	@Override
-	public void sendRetryChargeEmail(String recipientMailId, String displayName) throws InvalidInputException, UndeliveredEmailException {
+	public void sendRetryChargeEmail(String recipientMailId, String displayName, String loginName) throws InvalidInputException,
+			UndeliveredEmailException {
 		if (recipientMailId == null || recipientMailId.isEmpty()) {
 			LOG.error("Recipient email Id is empty or null for sending retry charge mail ");
 			throw new InvalidInputException("Recipient email Id is empty or null for sending retry charge mail ");
@@ -608,7 +612,7 @@ public class EmailServicesImpl implements EmailServices {
 
 		FileContentReplacements messageBodyReplacements = new FileContentReplacements();
 		messageBodyReplacements.setFileName(EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER + EmailTemplateConstants.RETRY_CHARGE_MAIL_BODY);
-		messageBodyReplacements.setReplacementArgs(Arrays.asList(displayName, recipientMailId));
+		messageBodyReplacements.setReplacementArgs(Arrays.asList(displayName, loginName));
 
 		LOG.debug("Calling email sender to send mail");
 		emailSender.sendEmailWithBodyReplacements(emailEntity, subjectFileName, messageBodyReplacements);
@@ -821,7 +825,8 @@ public class EmailServicesImpl implements EmailServices {
 
 	@Async
 	@Override
-	public void queueSurveyReminderMail(String recipientMailId, String displayName, String agentName, String link) throws InvalidInputException {
+	public void queueSurveyReminderMail(String recipientMailId, String displayName, String agentName, String link, String agentPhone,
+			String agentTitle, String companyName) throws InvalidInputException {
 		if (recipientMailId == null || recipientMailId.isEmpty()) {
 			LOG.error("Recipient email Id is empty or null for sending survey completion mail ");
 			throw new InvalidInputException("Recipient email Id is empty or null for sending survey completion mail ");
@@ -838,17 +843,20 @@ public class EmailServicesImpl implements EmailServices {
 		contentBuilder.append(CommonConstants.RECIPIENT_MARKER).append(recipientMailId);
 		contentBuilder.append(CommonConstants.ELEMENTS_DELIMITER).append(CommonConstants.NAME_MARKER).append(displayName);
 		contentBuilder.append(CommonConstants.ELEMENTS_DELIMITER).append(CommonConstants.AGENTNAME_MARKER).append(agentName);
-		contentBuilder.append(CommonConstants.ELEMENTS_DELIMITER).append("LINK^^").append(link);
+		contentBuilder.append(CommonConstants.ELEMENTS_DELIMITER).append(CommonConstants.LINK_MARKER).append(link);
+		contentBuilder.append(CommonConstants.ELEMENTS_DELIMITER).append(CommonConstants.AGENTPHONE_MARKER).append(agentPhone);
+		contentBuilder.append(CommonConstants.ELEMENTS_DELIMITER).append(CommonConstants.AGENTTITLE_MARKER).append(agentTitle);
+		contentBuilder.append(CommonConstants.ELEMENTS_DELIMITER).append(CommonConstants.COMPANYNAME_MARKER).append(companyName);
 
 		LOG.debug("queueing content: " + contentBuilder.toString());
-		queueProducer.queueEmail(EmailHeader.ACCOUNT_UPGRADE, contentBuilder.toString());
+		queueProducer.queueEmail(EmailHeader.SURVEY_REMINDER, contentBuilder.toString());
 		LOG.info("Queued the survey completion mail");
 	}
 
 	@Async
 	@Override
-	public void sendDefaultSurveyReminderMail(String recipientMailId, String displayName, String agentName, String link)
-			throws InvalidInputException, UndeliveredEmailException {
+	public void sendDefaultSurveyReminderMail(String recipientMailId, String displayName, String agentName, String link, String agentPhone,
+			String agentTitle, String companyName) throws InvalidInputException, UndeliveredEmailException {
 		if (recipientMailId == null || recipientMailId.isEmpty()) {
 			LOG.error("Recipient email Id is empty or null for sending survey completion mail ");
 			throw new InvalidInputException("Recipient email Id is empty or null for sending survey completion mail ");
@@ -864,7 +872,7 @@ public class EmailServicesImpl implements EmailServices {
 
 		FileContentReplacements messageBodyReplacements = new FileContentReplacements();
 		messageBodyReplacements.setFileName(EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER + EmailTemplateConstants.SURVEY_REMINDER_MAIL_BODY);
-		messageBodyReplacements.setReplacementArgs(Arrays.asList(displayName, link, link, agentName));
+		messageBodyReplacements.setReplacementArgs(Arrays.asList(displayName, link, link, agentName, agentPhone, agentTitle, companyName));
 
 		LOG.debug("Calling email sender to send mail");
 		emailSender.sendEmailWithBodyReplacements(emailEntity, subjectFileName, messageBodyReplacements);
