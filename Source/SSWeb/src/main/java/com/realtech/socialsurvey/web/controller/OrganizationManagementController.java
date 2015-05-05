@@ -321,6 +321,13 @@ public class OrganizationManagementController {
 			User user = sessionHelper.getCurrentUser();
 
 			// JIRA - SS-536
+			
+			// We check if there is mapped survey for the company and add a default survey if
+			// not.
+			if (surveyBuilder.checkForExistingSurvey(user) == null) {
+				surveyBuilder.addDefaultSurveyToCompany(user);
+			}
+			
 			// check the company and see if manual registaration. Skip payment in that case
 			if (user.getCompany().getBillingMode().equals(CommonConstants.BILLING_MODE_INVOICE)) {
 				// do what is done after payment
@@ -341,12 +348,6 @@ public class OrganizationManagementController {
 						&& user.getCompany().getLicenseDetails().get(CommonConstants.INITIAL_INDEX).getAccountsMaster().getAccountsMasterId() != CommonConstants.ACCOUNTS_MASTER_FREE) {
 					LOG.debug("Payment for this company has already been made. Redirecting to dashboard.");
 					return JspResolver.PAYMENT_ALREADY_MADE;
-				}
-
-				// We check if there is mapped survey for the company and add a default survey if
-				// not.
-				if (surveyBuilder.checkForExistingSurvey(user) == null) {
-					surveyBuilder.addDefaultSurveyToCompany(user);
 				}
 
 				if (Integer.parseInt(strAccountType) == CommonConstants.ACCOUNTS_MASTER_FREE) {

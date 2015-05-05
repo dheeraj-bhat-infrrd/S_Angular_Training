@@ -176,6 +176,9 @@ public class LoginController {
 					model.addAttribute("skippayment", "false");
 				}
 			}
+			else{
+				model.addAttribute("skippayment", "false");
+			}
 			user = sessionHelper.getCurrentUser();
 			HttpSession session = request.getSession(true);
 
