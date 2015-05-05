@@ -1182,7 +1182,6 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 		}
 
 		LOG.debug("Method inviteUser finished successfully");
-
 	}
 
 	/**
