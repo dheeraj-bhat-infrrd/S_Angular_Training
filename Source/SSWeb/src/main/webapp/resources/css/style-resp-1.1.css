@@ -1,5 +1,8 @@
 /* ============== SMARTPHONES ==============*/
 @media (max-width: 767px) {
+	.s-font-16{
+		font-size: 16px;
+	}
     .header-logo-wrapper{
         height: 50px;
         float: none;
