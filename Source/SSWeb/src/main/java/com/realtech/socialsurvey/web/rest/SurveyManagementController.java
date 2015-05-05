@@ -228,7 +228,7 @@ public class SurveyManagementController {
 		surveyDetail.append("\n");
 		surveyDetail.append("\n").append("Customer Comments: ").append(survey.getReview());
 		surveyDetail.append("\n").append("Customer Mood: ").append(mood);
-		if (!survey.getSharedOn().isEmpty()) {
+		if (survey.getSharedOn() != null && !survey.getSharedOn().isEmpty()) {
 			surveyDetail.append("\n").append("Share Checkbox: ").append("Yes");
 		}
 		else {
