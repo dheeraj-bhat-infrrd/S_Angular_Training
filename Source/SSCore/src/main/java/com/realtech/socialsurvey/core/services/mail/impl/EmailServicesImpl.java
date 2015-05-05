@@ -13,6 +13,7 @@ import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.commons.EmailTemplateConstants;
 import com.realtech.socialsurvey.core.entities.EmailEntity;
 import com.realtech.socialsurvey.core.entities.FileContentReplacements;
+import com.realtech.socialsurvey.core.entities.SurveyDetails;
 import com.realtech.socialsurvey.core.enums.EmailHeader;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.services.mail.EmailSender;
@@ -902,7 +903,7 @@ public class EmailServicesImpl implements EmailServices {
 
 	@Async
 	@Override
-	public void queueSurveyCompletionMailToAdmins(String recipientMailId, String customerName, String agentName, String mood)
+	public void queueSurveyCompletionMailToAdmins(String recipientMailId, String customerName, String agentName, String mood, SurveyDetails survey)
 			throws InvalidInputException {
 		if (recipientMailId == null || recipientMailId.isEmpty()) {
 			LOG.error("Recipient email Id is empty or null for sending survey completion mail ");
@@ -922,13 +923,13 @@ public class EmailServicesImpl implements EmailServices {
 		contentBuilder.append(CommonConstants.ELEMENTS_DELIMITER).append(CommonConstants.AGENTNAME_MARKER).append(agentName);
 
 		LOG.debug("queueing content: " + contentBuilder.toString());
-		queueProducer.queueEmail(EmailHeader.ACCOUNT_UPGRADE, contentBuilder.toString());
+		queueProducer.queueEmail(EmailHeader.SURVEY_COMPLETION_ADMIN, contentBuilder.toString());
 		LOG.info("Queued the survey completion mail");
 	}
 
 	@Async
 	@Override
-	public void sendSurveyCompletionMailToAdmins(String recipientMailId, String customerName, String agentName, String mood)
+	public void sendSurveyCompletionMailToAdmins(String recipientMailId, String customerName, String agentName, String mood, SurveyDetails survey)
 			throws InvalidInputException, UndeliveredEmailException {
 		if (recipientMailId == null || recipientMailId.isEmpty()) {
 			LOG.error("Recipient email Id is empty or null for sending survey completion mail ");

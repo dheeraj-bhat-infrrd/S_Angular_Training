@@ -1,5 +1,6 @@
 package com.realtech.socialsurvey.core.services.mail;
 
+import com.realtech.socialsurvey.core.entities.SurveyDetails;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 
 /**
@@ -174,10 +175,10 @@ public interface EmailServices {
 	 * @param agentName
 	 * @throws InvalidInputException
 	 */
-	public void queueSurveyCompletionMailToAdmins(String recipientMailId, String customerName, String agentName, String mood)
+	public void queueSurveyCompletionMailToAdmins(String recipientMailId, String customerName, String agentName, String mood, SurveyDetails survey)
 			throws InvalidInputException;
 
-	public void sendSurveyCompletionMailToAdmins(String recipientMailId, String customerName, String agentName, String mood)
+	public void sendSurveyCompletionMailToAdmins(String recipientMailId, String customerName, String agentName, String mood, SurveyDetails survey)
 			throws InvalidInputException, UndeliveredEmailException;
 
 	/**
