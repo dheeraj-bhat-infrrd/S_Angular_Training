@@ -22,6 +22,7 @@
 	<bean id="surveyHandler" class="com.realtech.socialsurvey.core.services.surveybuilder.impl.SurveyHandlerImpl" />
 	<bean id="emailServices" class="com.realtech.socialsurvey.core.services.mail.impl.EmailServicesImpl" />
 	<bean id="organizationManagementService" class="com.realtech.socialsurvey.core.services.organizationmanagement.impl.OrganizationManagementServiceImpl" />
+	<bean id="userManagementService" class="com.realtech.socialsurvey.core.services.organizationmanagement.impl.UserManagementServiceImpl" />
 	
 	<bean id="surveyGenerationService" class="com.realtech.socialsurvey.core.dummy.generator.SurveyGenerationServiceImpl" />
 	<bean id="surveyBuilder" class="com.realtech.socialsurvey.core.services.surveybuilder.impl.SurveyBuilderImpl" />

@@ -502,6 +502,7 @@ public interface CommonConstants {
 	public static final String ELEMENTS_DELIMITER = "$$";
 	public static final String HEADER_MARKER = "HEADER^^";
 	public static final String RECIPIENT_MARKER = "RECIPIENT^^";
+	public static final String LINK_MARKER = "LINK^^";
 	public static final String URL_MARKER = "URL^^";
 	public static final String NAME_MARKER = "NAME^^";
 	public static final String FIRSTNAME_MARKER = "FIRSTNAME^^";
@@ -509,6 +510,9 @@ public interface CommonConstants {
 	public static final String RETRYDAYS_MARKER = "RETRYDAYS^^";
 	public static final String RETRIES_MARKER = "RETRIES^^";
 	public static final String AGENTNAME_MARKER = "AGENTNAME^^";
+	public static final String AGENTPHONE_MARKER = "AGENTPHONE^^";
+	public static final String AGENTTITLE_MARKER = "AGENTTITLE^^";
+	public static final String COMPANYNAME_MARKER = "COMPANYNAME^^";
 	public static final String LOGINNAME_MARKER = "LOGINNAME^^";
 	public static final String PROFILENAME_MARKER = "PROFILENAME^^";
 }

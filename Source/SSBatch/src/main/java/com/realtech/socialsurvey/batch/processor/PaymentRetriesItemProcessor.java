@@ -144,9 +144,9 @@ public class PaymentRetriesItemProcessor implements ItemProcessor<LicenseDetail,
 
 		try {
 			if(enableKafka.equals(CommonConstants.YES)){
-				emailServices.queueRetryChargeEmail(user.getEmailId(), user.getFirstName() + " " + user.getLastName());
+				emailServices.queueRetryChargeEmail(user.getEmailId(), user.getFirstName() + " " + user.getLastName(), user.getLoginName());
 			}else{
-				emailServices.sendRetryChargeEmail(user.getEmailId(), user.getFirstName() + " " + user.getLastName());
+				emailServices.sendRetryChargeEmail(user.getEmailId(), user.getFirstName() + " " + user.getLastName(), user.getLoginName());
 			}
 		}
 		catch (InvalidInputException e1) {
