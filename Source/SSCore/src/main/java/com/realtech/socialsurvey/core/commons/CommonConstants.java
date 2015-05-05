@@ -189,6 +189,8 @@ public interface CommonConstants {
 	public static final String UPGRADE_FLAG = "upgrade";
 	public static final String COUNTRY_CODE = "countryCode";
 	public static final String COUNTRY = "country";
+	public static final String STATE = "state";
+	public static final String CITY = "city";
 	public static final String CRM_SOURCE = "crm_source";
 	public static final String VERTICAL = "vertical";
 	// JIRA - SS-536: Added for manual registration via invite
