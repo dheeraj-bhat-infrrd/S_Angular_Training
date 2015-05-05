@@ -7,7 +7,7 @@
 	value="${sessionScope.SPRING_SECURITY_CONTEXT.authentication.principal}" />
 
 	<div id="req-prof-container" data-agentid="${agentId}"
-		data-agentName="${agentName}"
+		data-agentName="${agentName}" data-agent-email="${agentEmail}"
 		class="prof-main-content-wrapper margin-top-25 margin-bottom-25 min-height-container">
 		<div class="">
 			<div class="sq-ques-wrapper">
@@ -79,6 +79,14 @@
 				var lname = $('#reqLastName').val().trim();
 				var customerEmail = $('#reqEmail').val().trim();
 				var relationWithAgent = $('#req-cust-agnt-rel').val().trim();
+				
+				var agentEmail = $('#req-prof-container').attr("data-agent-email");
+				if(agentEmail.toUpperCase() == customerEmail.toUpperCase()){
+					$('#overlay-toast').html('Agents can not take survey for themselves!');
+					showToast();
+					return;
+				}
+				
 				var payload = {
 					"firstName" : fname,
 					"lastName" : lname,

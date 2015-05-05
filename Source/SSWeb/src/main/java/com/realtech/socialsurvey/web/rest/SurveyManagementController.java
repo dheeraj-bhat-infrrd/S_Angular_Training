@@ -215,7 +215,7 @@ public class SurveyManagementController {
 		LOG.info("Method to start survey initiateSurvey() started.");
 		if (agentIdStr == null || agentIdStr.isEmpty()) {
 			LOG.error("Invalid agentId passed. Agent Id can not be null or empty.");
-			return "errorpage500";
+			return JspResolver.ERROR_PAGE;
 		}
 		Long agentId = 0l;
 		try {
@@ -223,18 +223,24 @@ public class SurveyManagementController {
 		}
 		catch (NumberFormatException e) {
 			LOG.error("Invalid agent Id passed. Error is : " + e);
-			return "errorpage500";
+			return JspResolver.ERROR_PAGE;
 		}
 		String agentName = "";
+		String agentEmail = "";
 		try {
-			agentName = solrSearchService.getUserDisplayNameById(agentId);
+			SolrDocument user = solrSearchService.getUserByUniqueId(agentId);
+			if(user!=null){
+				agentName = user.get(CommonConstants.USER_DISPLAY_NAME_SOLR).toString();
+				agentEmail = user.get(CommonConstants.USER_EMAIL_ID_SOLR).toString();
+			}
 		}
-		catch (NoRecordsFetchedException | InvalidInputException | SolrServerException e) {
-			LOG.error("Error occured while fetching display name of agent. Error is : " + e);
-			return "errorpage500";
+		catch (InvalidInputException | SolrServerException e) {
+			LOG.error("Error occured while fetching details of agent. Error is : " + e);
+			return JspResolver.ERROR_PAGE;
 		}
 		model.addAttribute("agentId", agentId);
 		model.addAttribute("agentName", agentName);
+		model.addAttribute("agentEmail", agentEmail);
 		LOG.info("Method to start survey initiateSurvey() finished.");
 		return JspResolver.SHOW_SURVEY_QUESTIONS;
 	}
