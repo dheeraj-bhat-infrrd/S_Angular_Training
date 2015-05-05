@@ -63,7 +63,7 @@ $(document).on('mouseout', '.bd-srv-tbl-row', function() {
 });
 
 // Add Survey Question overlay
-$('#btn-add-question').click(function() {
+$(document).on('click', '#btn-add-question', function() {
 	$('#bd-srv-pu').show();
 	$(document).addClass('body-no-scroll');
 });
