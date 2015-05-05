@@ -38,7 +38,7 @@
 
 <div class="prof-main-content-wrapper margin-top-25 margin-bottom-25">
 	<div class="container reg_panel_container">
-		<div class="reg_header"><spring:message code="label.logintodosurvey.key"/></div>
+		<div class="reg_header"><spring:message code="label.login.title.desc.key"/></div>
 		
 		<form id="frm-login" method="POST" action="j_spring_security_check">
 			<div id="login-form" class="reg_form_wrapper_1">
@@ -159,13 +159,13 @@ $(document).ready(function(){
 				} else {
 					// $('#overlay-toast').html('Please enter a valid user name.');
 					// showToast();
-					showError('Please enter a valid user name');
+					showError('Please enter a valid email address');
 					return false;
 				}
 			} else {
 				// $('#overlay-toast').html('Please enter user name.');
 				// showToast();
-				showError('Please enter user name');
+				showError('Please enter email address');
 				return false;
 			}
 		}else{
@@ -176,13 +176,13 @@ $(document).ready(function(){
 				} else {
 					// $('#'+elementId).parent().next('.login-reg-err').html('Please enter a valid user name.');
 					// $('#'+elementId).parent().next('.login-reg-err').show();
-					showError('Please enter a valid user name');
+					showError('Please enter a valid email address');
 					return false;
 				}
 			} else {
 				// $('#'+elementId).parent().next('.login-reg-err').html('Please enter user name.');
 				// $('#'+elementId).parent().next('.login-reg-err').show();
-				showError('Please enter user name');
+				showError('Please enter email address');
 				return false;
 			}
 		}
