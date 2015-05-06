@@ -278,9 +278,6 @@ public interface CommonConstants {
 	public static final String SURVEY_REQUEST_MAIL_FILENAME = "EmailTemplates/SurveyInvitationMailBody.html";
 	public static final String SURVEY_CUSTOMER_REQUEST_MAIL_FILENAME = "EmailTemplates/SurveyCustomerInvitationMailBody.html";
 	public static final String SURVEY_REMINDER_MAIL_FILENAME = "EmailTemplates/SurveyParticipationMailBody.html";
-	public static final String PARAM_PATTERN = "%s";
-	public static final String PARAM_OPEN = "[";
-	public static final String PARAM_CLOSE = "]";
 
 	/**
 	 * Logo related config
