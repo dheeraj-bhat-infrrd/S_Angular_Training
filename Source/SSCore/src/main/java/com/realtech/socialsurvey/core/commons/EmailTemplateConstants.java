@@ -69,6 +69,9 @@ public final class EmailTemplateConstants {
 	public static final String SURVEY_INVITATION_MAIL_CUSTOMER_BODY = "SurveyCustomerInvitationMailBody.html";
 	public static final String SURVEY_INVITATION_MAIL_CUSTOMER_SUBJECT = "SurveyCustomerInvitationMailSubject.txt";
 
+	// Mail template for mail settings
+	public static final String SURVEY_PARTICIPATION_MAIL_BODY = "SurveyParticipationMailBody.html";
+	
 	public static final String SURVEY_REMINDER_MAIL_BODY = "SurveyReminderMailBody.html";
 	public static final String SURVEY_REMINDER_MAIL_SUBJECT = "SurveyReminderMailSubject.txt";
 
@@ -78,7 +81,4 @@ public final class EmailTemplateConstants {
 
 	public static final String VERIFICATION_MAIL_BODY = "VerificationMailBody.html";
 	public static final String VERIFICATION_MAIL_SUBJECT = "VerificationMailSubject.txt";
-
-	// not used
-	public static final String SURVEY_PARTICIPATION_MAIL_BODY = "SurveyParticipationMailBody.html";
 }

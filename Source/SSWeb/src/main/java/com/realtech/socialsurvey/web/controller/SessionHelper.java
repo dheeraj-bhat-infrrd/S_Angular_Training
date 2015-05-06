@@ -1,11 +1,14 @@
 package com.realtech.socialsurvey.web.controller;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import javax.servlet.http.HttpSession;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -16,6 +19,8 @@ import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.commons.EmailTemplateConstants;
 import com.realtech.socialsurvey.core.commons.UserProfileComparator;
 import com.realtech.socialsurvey.core.entities.FileContentReplacements;
+import com.realtech.socialsurvey.core.entities.MailContent;
+import com.realtech.socialsurvey.core.entities.MailContentSettings;
 import com.realtech.socialsurvey.core.entities.User;
 import com.realtech.socialsurvey.core.entities.UserProfile;
 import com.realtech.socialsurvey.core.entities.UserSettings;
@@ -23,6 +28,7 @@ import com.realtech.socialsurvey.core.enums.AccountType;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.exception.NoRecordsFetchedException;
 import com.realtech.socialsurvey.core.services.organizationmanagement.UserManagementService;
+import com.realtech.socialsurvey.core.utils.EmailFormatHelper;
 import com.realtech.socialsurvey.core.utils.EncryptionHelper;
 import com.realtech.socialsurvey.core.utils.FileOperations;
 import com.realtech.socialsurvey.core.utils.PropertyFileReader;
@@ -53,6 +59,12 @@ public class SessionHelper {
 
 	@Autowired
 	private EncryptionHelper encryptionHelper;
+
+	@Autowired
+	private EmailFormatHelper emailFormatHelper;
+
+	@Value("${PARAM_ORDER_TAKE_SURVEY_REMINDER}")
+	String paramOrderTakeSurveyReminder;
 
 	@Transactional
 	public void getCanonicalSettings(HttpSession session) throws InvalidInputException, NoRecordsFetchedException {
@@ -127,12 +139,15 @@ public class SessionHelper {
 		String body = null;
 		FileContentReplacements replacements = new FileContentReplacements();
 		replacements.setFileName(EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER + EmailTemplateConstants.SURVEY_PARTICIPATION_MAIL_BODY);
-		
+
 		if (userSettings.getCompanySettings().getMail_content() == null) {
 			LOG.debug("Setting default survey participation mail body.");
-			// set the mail contents
+
 			try {
+				List<String> paramOrder = new ArrayList<String>(Arrays.asList(paramOrderTakeSurveyReminder.split(",")));
 				body = fileOperations.replaceFileContents(replacements);
+				body = emailFormatHelper.replaceEmailBodyWithParams(body, paramOrder);
+				
 				session.setAttribute(CommonConstants.SURVEY_PARTICIPATION_MAIL_BODY_IN_SESSION, body);
 				session.setAttribute(CommonConstants.SURVEY_PARTICIPATION_REMINDER_MAIL_BODY_IN_SESSION, body);
 			}
@@ -142,27 +157,41 @@ public class SessionHelper {
 		}
 		else {
 			LOG.debug("Company already has mail body settings. Hence, setting the same");
+
+			MailContentSettings mailSettings = userSettings.getCompanySettings().getMail_content();
 			if (userSettings.getCompanySettings().getMail_content().getTake_survey_mail() != null) {
-				session.setAttribute(CommonConstants.SURVEY_PARTICIPATION_MAIL_BODY_IN_SESSION, userSettings.getCompanySettings().getMail_content()
-						.getTake_survey_mail().getMail_body());
+				MailContent mailContent = mailSettings.getTake_survey_mail();
+				String mailBody = emailFormatHelper.replaceEmailBodyWithParams(mailContent.getMail_body(), mailContent.getParam_order());
+				
+				mailSettings.getTake_survey_mail().setMail_body(mailBody);
+				session.setAttribute(CommonConstants.SURVEY_PARTICIPATION_MAIL_BODY_IN_SESSION, mailBody);
 			}
 			else {
 				try {
+					List<String> paramOrder = new ArrayList<String>(Arrays.asList(paramOrderTakeSurveyReminder.split(",")));
 					body = fileOperations.replaceFileContents(replacements);
+					body = emailFormatHelper.replaceEmailBodyWithParams(body, paramOrder);
+					
 					session.setAttribute(CommonConstants.SURVEY_PARTICIPATION_MAIL_BODY_IN_SESSION, body);
 				}
 				catch (InvalidInputException e) {
 					LOG.warn("Could not set mail content for survey participation");
 				}
 			}
-			
+
 			if (userSettings.getCompanySettings().getMail_content().getTake_survey_reminder_mail() != null) {
-				session.setAttribute(CommonConstants.SURVEY_PARTICIPATION_REMINDER_MAIL_BODY_IN_SESSION, userSettings.getCompanySettings()
-						.getMail_content().getTake_survey_reminder_mail().getMail_body());
+				MailContent mailContent = mailSettings.getTake_survey_reminder_mail();
+				String mailBody = emailFormatHelper.replaceEmailBodyWithParams(mailContent.getMail_body(), mailContent.getParam_order());
+				
+				mailSettings.getTake_survey_reminder_mail().setMail_body(mailBody);
+				session.setAttribute(CommonConstants.SURVEY_PARTICIPATION_REMINDER_MAIL_BODY_IN_SESSION, mailBody);
 			}
 			else {
 				try {
+					List<String> paramOrder = new ArrayList<String>(Arrays.asList(paramOrderTakeSurveyReminder.split(",")));
 					body = fileOperations.replaceFileContents(replacements);
+					body = emailFormatHelper.replaceEmailBodyWithParams(body, paramOrder);
+					
 					session.setAttribute(CommonConstants.SURVEY_PARTICIPATION_REMINDER_MAIL_BODY_IN_SESSION, body);
 				}
 				catch (InvalidInputException e) {
