@@ -781,8 +781,10 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 		MailContent mailContent = new MailContent();
 		
 		// updating mail body
-		mailBody = emailFormatHelper.replaceEmailBodyParamsWithDefaultValue(mailBody);
+		List<String> paramOrder = new ArrayList<String>();
+		mailBody = emailFormatHelper.replaceEmailBodyParamsWithDefaultValue(mailBody, paramOrder);
 		mailContent.setMail_body(mailBody);
+		mailContent.setParam_order(paramOrder);
 		
 		if (mailCategory.equals(CommonConstants.SURVEY_MAIL_BODY_CATEGORY)) {
 			if (originalContentSettings != null) {

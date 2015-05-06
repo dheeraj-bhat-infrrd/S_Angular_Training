@@ -25,6 +25,7 @@ import com.realtech.socialsurvey.core.dao.UserDao;
 import com.realtech.socialsurvey.core.dao.UserProfileDao;
 import com.realtech.socialsurvey.core.dao.impl.MongoOrganizationUnitSettingDaoImpl;
 import com.realtech.socialsurvey.core.entities.AgentSettings;
+import com.realtech.socialsurvey.core.entities.MailContent;
 import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
 import com.realtech.socialsurvey.core.entities.SurveyDetails;
 import com.realtech.socialsurvey.core.entities.SurveyResponse;
@@ -455,7 +456,8 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean {
 		OrganizationUnitSettings companySettings = organizationManagementService.getCompanySettings(user.getCompany().getCompanyId());
 		if (companySettings != null && companySettings.getMail_content() != null && companySettings.getMail_content().getTake_survey_mail() != null) {
 
-			String mailBody = emailFormatHelper.replaceEmailBodyWithParams(companySettings.getMail_content().getTake_survey_mail());
+			MailContent takeSurvey = companySettings.getMail_content().getTake_survey_mail();
+			String mailBody = emailFormatHelper.replaceEmailBodyWithParams(takeSurvey.getMail_body(), takeSurvey.getParam_order());
 			mailBody = mailBody.replaceAll("\\[AgentName\\]", agentName);
 			mailBody = mailBody.replaceAll("\\[Name\\]", custFirstName + " " + custLastName);
 			mailBody = mailBody.replaceAll("\\[Link\\]", link);
@@ -489,7 +491,8 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean {
 		if (companySettings != null && companySettings.getMail_content() != null
 				&& companySettings.getMail_content().getTake_survey_mail_customer() != null) {
 
-			String mailBody = emailFormatHelper.replaceEmailBodyWithParams(companySettings.getMail_content().getTake_survey_mail_customer());
+			MailContent takeSurveyCustomer = companySettings.getMail_content().getTake_survey_mail_customer();
+			String mailBody = emailFormatHelper.replaceEmailBodyWithParams(takeSurveyCustomer.getMail_body(), takeSurveyCustomer.getParam_order());
 			mailBody = mailBody.replaceAll("\\[AgentName\\]", user.getFirstName() + " " + user.getLastName());
 			mailBody = mailBody.replaceAll("\\[Name\\]", custFirstName + " " + custLastName);
 			mailBody = mailBody.replaceAll("\\[Link\\]", link);
