@@ -137,6 +137,8 @@ public interface CommonConstants {
 	public static final String PASSWORD_COLUMN = "loginPassword";
 	public static final String API_SECRET_COLUMN = "apiSecret";
 	public static final String API_KEY_COLUMN = "apiKey";
+	public static final String SURVEY_SOURCE_KEY_COLUMN = "surveySource";
+	public static final String SURVEY_SOURCE_ID_COLUMN = "surveySourceId";
 
 	/**
 	 * Mongo entities and column name constants
