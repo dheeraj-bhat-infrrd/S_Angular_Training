@@ -8,6 +8,7 @@ import java.lang.reflect.Type;
 import java.net.MalformedURLException;
 import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -78,7 +79,6 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 
 	private static final Logger LOG = LoggerFactory.getLogger(OrganizationManagementServiceImpl.class);
 	private static Map<Integer, VerticalsMaster> verticalsMastersMap = new HashMap<Integer, VerticalsMaster>();
-	
 
 	@Autowired
 	private GenericDao<Company, Long> companyDao;
@@ -119,6 +119,15 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 	@Value("${SAD_TEXT}")
 	private String sadText;
 	
+	@Value("${PARAM_ORDER_TAKE_SURVEY}")
+	String paramOrderTakeSurvey;
+
+	@Value("${PARAM_ORDER_TAKE_SURVEY_CUSTOMER}")
+	String paramOrderTakeSurveyCustomer;
+
+	@Value("${PARAM_ORDER_TAKE_SURVEY_REMINDER}")
+	String paramOrderTakeSurveyReminder;
+
 	@Autowired
 	private ProfileCompletionList profileCompletionList;
 
@@ -403,15 +412,18 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 		MailContentSettings mailContentSettings = new MailContentSettings();
 		MailContent mailContent = new MailContent();
 		mailContent.setMail_body(takeSurveyMail);
+		mailContent.setParam_order(new ArrayList<String>(Arrays.asList(paramOrderTakeSurvey.split(","))));
 		mailContentSettings.setTake_survey_mail(mailContent);
 		
 		mailContent = new MailContent();
-		mailContent.setMail_body(takeSurveyReminderMail);
-		mailContentSettings.setTake_survey_reminder_mail(mailContent);
+		mailContent.setMail_body(takeSurveyByCustomerMail);
+		mailContent.setParam_order(new ArrayList<String>(Arrays.asList(paramOrderTakeSurveyCustomer.split(","))));
+		mailContentSettings.setTake_survey_mail_customer(mailContent);
 		
 		mailContent = new MailContent();
-		mailContent.setMail_body(takeSurveyByCustomerMail);
-		mailContentSettings.setTake_survey_mail_customer(mailContent);
+		mailContent.setMail_body(takeSurveyReminderMail);
+		mailContent.setParam_order(new ArrayList<String>(Arrays.asList(paramOrderTakeSurveyReminder.split(","))));
+		mailContentSettings.setTake_survey_reminder_mail(mailContent);
 		
 		companySettings.setMail_content(mailContentSettings);
 				
