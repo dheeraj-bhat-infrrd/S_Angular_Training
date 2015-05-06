@@ -24,6 +24,7 @@ import com.realtech.socialsurvey.core.dao.SurveyDetailsDao;
 import com.realtech.socialsurvey.core.dao.UserDao;
 import com.realtech.socialsurvey.core.dao.UserProfileDao;
 import com.realtech.socialsurvey.core.dao.impl.MongoOrganizationUnitSettingDaoImpl;
+import com.realtech.socialsurvey.core.entities.AgentSettings;
 import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
 import com.realtech.socialsurvey.core.entities.SurveyDetails;
 import com.realtech.socialsurvey.core.entities.SurveyResponse;
@@ -400,7 +401,8 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean {
 
 		String link = composeLink(user.getUserId(), custEmail);
 		storeInitialSurveyDetails(user.getUserId(), custEmail, custFirstName, custLastName, 0, custRelationWithAgent, link);
-		if(isAgent)
+		
+		if (isAgent)
 			sendInvitationMailByAgent(user, custFirstName, custLastName, custEmail, link);
 		else
 			sendInvitationMailByCustomer(user, custFirstName, custLastName, custEmail, link);
@@ -426,11 +428,33 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean {
 		LOG.debug("sendInvitationMailByAgent() started.");
 		OrganizationUnitSettings companySettings = organizationManagementService.getCompanySettings(user.getCompany().getCompanyId());
 		if (companySettings != null && companySettings.getMail_content() != null && companySettings.getMail_content().getTake_survey_mail() != null) {
+			
+			AgentSettings agentSettings = userManagementService.getUserSettings(user.getUserId());
+			String agentTitle = "";
+			if (agentSettings.getContact_details() != null && agentSettings.getContact_details().getTitle() != null) {
+				agentTitle = agentSettings.getContact_details().getTitle();
+			}
+			
+			String agentPhone = "";
+			if (agentSettings.getContact_details() != null && agentSettings.getContact_details().getContact_numbers() != null && 
+					agentSettings.getContact_details().getContact_numbers().getWork() != null) {
+				agentPhone = agentSettings.getContact_details().getContact_numbers().getWork();
+			}
+			
+			String agentName = user.getFirstName();
+			if (user.getLastName() != null && !user.getLastName().isEmpty()) {
+				agentName = user.getFirstName() + " " + user.getLastName();
+			}
+			
 			String mailBody = companySettings.getMail_content().getTake_survey_mail().getMail_body();
-			mailBody = mailBody.replaceAll("\\[AgentName\\]", user.getFirstName() + " " + user.getLastName());
+			mailBody = mailBody.replaceAll("\\[AgentName\\]", agentName);
 			mailBody = mailBody.replaceAll("\\[Name\\]", custFirstName + " " + custLastName);
 			mailBody = mailBody.replaceAll("\\[Link\\]", link);
-			String mailSubject = CommonConstants.SURVEY_MAIL_SUBJECT;
+			mailBody = mailBody.replaceAll("\\[AgentPhone\\]", agentPhone);
+			mailBody = mailBody.replaceAll("\\[AgentTitle\\]", agentTitle);
+			mailBody = mailBody.replaceAll("\\[CompanyName\\]", user.getCompany().getCompany());
+			
+			String mailSubject = CommonConstants.SURVEY_MAIL_SUBJECT + agentName;
 			try {
 				emailServices.sendSurveyInvitationMail(custEmail, mailSubject, mailBody, user.getEmailId(), user.getFirstName()
 						+ (user.getLastName() != null ? " " + user.getLastName() : ""));
@@ -458,7 +482,7 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean {
 			mailBody = mailBody.replaceAll("\\[Name\\]", custFirstName + " " + custLastName);
 			mailBody = mailBody.replaceAll("\\[Link\\]", link);
 			mailBody = mailBody.replaceAll("null", "");
-			String mailSubject = CommonConstants.SURVEY_MAIL_SUBJECT;
+			String mailSubject = CommonConstants.SURVEY_MAIL_SUBJECT_CUSTOMER;
 			try {
 				emailServices.sendSurveyInvitationMailByCustomer(custEmail, mailSubject, mailBody, user.getEmailId(), user.getFirstName()
 						+ (user.getLastName() != null ? " " + user.getLastName() : ""));

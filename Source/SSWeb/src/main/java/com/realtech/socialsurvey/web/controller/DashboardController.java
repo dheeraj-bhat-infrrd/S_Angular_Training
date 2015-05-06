@@ -737,6 +737,7 @@ public class DashboardController {
 				LOG.error("NumberFormatException caught while parsing agentId in sendReminderMailForSurvey(). Nested exception is ", e);
 				throw e;
 			}
+			
 			String surveyLink = "";
 			SurveyDetails survey = surveyHandler.getSurveyDetails(agentId, customerEmail);
 			if (survey != null) {
@@ -744,11 +745,27 @@ public class DashboardController {
 			}
 
 			try {
+				AgentSettings agentSettings = userManagementService.getUserSettings(agentId);
+				String agentTitle = "";
+				if (agentSettings.getContact_details() != null && agentSettings.getContact_details().getTitle() != null) {
+					agentTitle = agentSettings.getContact_details().getTitle();
+				}
+				
+				String agentPhone = "";
+				if (agentSettings.getContact_details() != null && agentSettings.getContact_details().getContact_numbers() != null && 
+						agentSettings.getContact_details().getContact_numbers().getWork() != null) {
+					agentPhone = agentSettings.getContact_details().getContact_numbers().getWork();
+				}
+				
+				User user = userManagementService.getUserByUserId(agentId);
+				String companyName = user.getCompany().getCompany();
+
 				if (enableKafka.equals(CommonConstants.YES)) {
-					emailServices.queueSurveyReminderMail(customerEmail, customerName, agentName, surveyLink);
+					emailServices.queueSurveyReminderMail(customerEmail, customerName, agentName, surveyLink, agentPhone, agentTitle, companyName);
 				}
 				else {
-					emailServices.sendDefaultSurveyReminderMail(customerEmail, customerName, agentName, surveyLink);
+					emailServices.sendDefaultSurveyReminderMail(customerEmail, customerName, agentName, surveyLink, agentPhone, agentTitle,
+							companyName);
 				}
 			}
 			catch (InvalidInputException e) {

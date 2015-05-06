@@ -55,7 +55,6 @@ public class KafkaProducerImpl implements ProducerForQueue, InitializingBean, Di
 		finalContent.append("HEADER^^").append(header.getName()).append("$$").append(content);
 		KeyedMessage<String, String> data = new KeyedMessage<String, String>(DEFAULT_EMAIL_TOPIC, header.getName(), finalContent.toString());
 		EMAIL_PRODUCER.send(data);
-		
 	}
 
 	@Override
@@ -80,5 +79,4 @@ public class KafkaProducerImpl implements ProducerForQueue, InitializingBean, Di
 			EMAIL_PRODUCER.close();
 		}
 	}
-	
 }

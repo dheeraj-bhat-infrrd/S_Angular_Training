@@ -259,10 +259,10 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 		/**
 		 * if it is direct registration, send verification link else invalidate the invitation link
 		 */
-		if (isDirectRegistration) {
+		/*if (isDirectRegistration) {
 			LOG.debug("Calling method for sending verification link for user : " + user.getUserId());
 			sendVerificationLink(user);
-		}
+		}*/
 		// JIRA - SS-536 removed for manual registration via invite
 		/*
 		else {
@@ -367,7 +367,8 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 		LOG.debug("Inserting agent settings for the user:" + user);
 		insertAgentSettings(user);
 
-		sendRegistrationCompletionLink(emailId, firstName, lastName, admin.getCompany().getCompanyId());
+		String profileName = getUserSettings(user.getUserId()).getProfileName();
+		sendRegistrationCompletionLink(emailId, firstName, lastName, admin.getCompany().getCompanyId(), profileName, user.getLoginName());
 		LOG.info("Method to add a new user, inviteUserToRegister finished for email id : " + emailId);
 		return user;
 	}
@@ -1029,10 +1030,10 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 	 * @throws InvalidInputException
 	 */
 	@Override
-	public void sendRegistrationCompletionLink(String emailId, String firstName, String lastName, long companyId) throws InvalidInputException,
-			UndeliveredEmailException {
-
+	public void sendRegistrationCompletionLink(String emailId, String firstName, String lastName, long companyId, String profileName, String loginName)
+			throws InvalidInputException, UndeliveredEmailException {
 		LOG.info("Method to send profile completion link to the user started.");
+		
 		Map<String, String> urlParams = new HashMap<String, String>();
 		urlParams.put(CommonConstants.EMAIL_ID, emailId);
 		urlParams.put(CommonConstants.FIRST_NAME, firstName);
@@ -1045,12 +1046,13 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 		if (lastName != null && !lastName.isEmpty()) {
 			name = name + " " + lastName;
 		}
+		
 		// Send reset password link to the user email ID
 		if (enableKafka.equals(CommonConstants.YES)) {
-			emailServices.queueRegistrationCompletionEmail(url, emailId, name);
+			emailServices.queueRegistrationCompletionEmail(url, emailId, name, profileName, loginName);
 		}
 		else {
-			emailServices.sendRegistrationCompletionEmail(url, emailId, name);
+			emailServices.sendRegistrationCompletionEmail(url, emailId, name, profileName, loginName);
 		}
 	}
 
@@ -1115,8 +1117,8 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 	public void sendVerificationLink(User user) throws InvalidInputException, UndeliveredEmailException {
 		LOG.debug("Method sendVerificationLink of Registration service called");
 		String verificationUrl = null;
+		
 		try {
-
 			Map<String, String> params = new HashMap<String, String>();
 			params.put(CommonConstants.EMAIL_ID, user.getEmailId());
 			params.put(CommonConstants.USER_ID, String.valueOf(user.getUserId()));
@@ -1130,15 +1132,16 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 
 		try {
 			LOG.debug("Calling email services to send verification mail for user " + user.getEmailId());
+			String profileName = getUserSettings(user.getUserId()).getProfileName();
+			
 			if (enableKafka.equals(CommonConstants.YES)) {
 				emailServices.queueVerificationMail(verificationUrl, user.getEmailId(), user.getFirstName() + " "
-						+ (user.getLastName() != null ? user.getLastName() : ""));
+						+ (user.getLastName() != null ? user.getLastName() : ""), profileName, user.getLoginName());
 			}
 			else {
 				emailServices.sendVerificationMail(verificationUrl, user.getEmailId(),
-						user.getFirstName() + " " + (user.getLastName() != null ? user.getLastName() : ""));
+						user.getFirstName() + " " + (user.getLastName() != null ? user.getLastName() : ""), profileName, user.getLoginName());
 			}
-
 		}
 		catch (InvalidInputException e) {
 			throw new InvalidInputException("Could not send mail for verification.Reason : " + e.getMessage(), e);
@@ -1183,7 +1186,6 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 		}
 
 		LOG.debug("Method inviteUser finished successfully");
-
 	}
 
 	/**
