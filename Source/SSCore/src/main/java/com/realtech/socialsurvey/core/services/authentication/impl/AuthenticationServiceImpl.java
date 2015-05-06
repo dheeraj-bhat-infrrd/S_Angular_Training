@@ -145,7 +145,8 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 	 * @throws InvalidInputException
 	 */
 	@Override
-	public void sendResetPasswordLink(String emailId, String name, long companyId) throws InvalidInputException, UndeliveredEmailException {
+	public void sendResetPasswordLink(String emailId, String name, long companyId, String loginName) throws InvalidInputException,
+			UndeliveredEmailException {
 		LOG.info("Send a reset password link to the user");
 		Map<String, String> urlParams = new HashMap<String, String>();
 		urlParams.put(CommonConstants.EMAIL_ID, emailId);
@@ -157,10 +158,10 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 
 		// Send reset password link to the user email ID
 		if (enableKafka.equals(CommonConstants.YES)) {
-			emailServices.queueResetPasswordEmail(url, emailId, name);
+			emailServices.queueResetPasswordEmail(url, emailId, name, loginName);
 		}
 		else {
-			emailServices.sendResetPasswordEmail(url, emailId, name);
+			emailServices.sendResetPasswordEmail(url, emailId, name, loginName);
 		}
 	}
 

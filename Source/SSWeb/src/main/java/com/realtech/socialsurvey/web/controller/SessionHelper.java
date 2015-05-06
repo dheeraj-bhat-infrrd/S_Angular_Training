@@ -127,6 +127,7 @@ public class SessionHelper {
 		String body = null;
 		FileContentReplacements replacements = new FileContentReplacements();
 		replacements.setFileName(EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER + EmailTemplateConstants.SURVEY_PARTICIPATION_MAIL_BODY);
+		
 		if (userSettings.getCompanySettings().getMail_content() == null) {
 			LOG.debug("Setting default survey participation mail body.");
 			// set the mail contents
@@ -154,6 +155,7 @@ public class SessionHelper {
 					LOG.warn("Could not set mail content for survey participation");
 				}
 			}
+			
 			if (userSettings.getCompanySettings().getMail_content().getTake_survey_reminder_mail() != null) {
 				session.setAttribute(CommonConstants.SURVEY_PARTICIPATION_REMINDER_MAIL_BODY_IN_SESSION, userSettings.getCompanySettings()
 						.getMail_content().getTake_survey_reminder_mail().getMail_body());

@@ -262,7 +262,8 @@ public interface CommonConstants {
 	public static final String BRANCHES_MAP_KEY = "branches";
 	public static final String REGIONS_MAP_KEY = "regions";
 	public static final String REMINDER_MAIL_SUBJECT = "Gentle reminder to take survey";
-	public static final String SURVEY_MAIL_SUBJECT = "Invitation to take survey";
+	public static final String SURVEY_MAIL_SUBJECT = "Transaction with ";
+	public static final String SURVEY_MAIL_SUBJECT_CUSTOMER = "Invitation to take survey";
 	public static final String AGENT_PROFILE_FIXED_URL = "pages";
 	public static final String BRANCH_PROFILE_FIXED_URL = "pages";
 	public static final String REGION_PROFILE_FIXED_URL = "pages";
@@ -497,4 +498,23 @@ public interface CommonConstants {
 
 	// API constants
 	public static final String API_KEY_FROM_URL = "api_key";
+	
+	// Email constants
+	public static final String ELEMENTS_DELIMITER = "$$";
+	public static final String HEADER_MARKER = "HEADER^^";
+	public static final String RECIPIENT_MARKER = "RECIPIENT^^";
+	public static final String LINK_MARKER = "LINK^^";
+	public static final String URL_MARKER = "URL^^";
+	public static final String NAME_MARKER = "NAME^^";
+	public static final String FIRSTNAME_MARKER = "FIRSTNAME^^";
+	public static final String LASTNAME_MARKER = "LASTNAME^^";
+	public static final String RETRYDAYS_MARKER = "RETRYDAYS^^";
+	public static final String RETRIES_MARKER = "RETRIES^^";
+	public static final String AGENTNAME_MARKER = "AGENTNAME^^";
+	public static final String AGENTPHONE_MARKER = "AGENTPHONE^^";
+	public static final String AGENTTITLE_MARKER = "AGENTTITLE^^";
+	public static final String COMPANYNAME_MARKER = "COMPANYNAME^^";
+	public static final String LOGINNAME_MARKER = "LOGINNAME^^";
+	public static final String PROFILENAME_MARKER = "PROFILENAME^^";
+	public static final String SURVEYDETAIL_MARKER = "SURVEYDETAIL^^";
 }

@@ -164,4 +164,9 @@ public class SendGridEmailSenderImpl implements EmailSender, InitializingBean {
 		}
 	}
 
+	@Override
+	public void sendEmailWithSubjectAndBodyReplacements(EmailEntity emailEntity, FileContentReplacements subjectReplacements,
+			FileContentReplacements messageBodyReplacements) throws InvalidInputException, UndeliveredEmailException {
+		// TODO Auto-generated method stub	
+	}
 }
