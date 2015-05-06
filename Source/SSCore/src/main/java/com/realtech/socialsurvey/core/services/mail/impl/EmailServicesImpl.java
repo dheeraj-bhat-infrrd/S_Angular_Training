@@ -870,9 +870,11 @@ public class EmailServicesImpl implements EmailServices {
 		EmailEntity emailEntity = prepareEmailEntityForSendingEmail(recipientMailId);
 		String subjectFileName = EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER + EmailTemplateConstants.SURVEY_REMINDER_MAIL_SUBJECT;
 
+		String agentSignature = buildAgentSignature(agentPhone, agentTitle, companyName);
+
 		FileContentReplacements messageBodyReplacements = new FileContentReplacements();
 		messageBodyReplacements.setFileName(EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER + EmailTemplateConstants.SURVEY_REMINDER_MAIL_BODY);
-		messageBodyReplacements.setReplacementArgs(Arrays.asList(displayName, link, link, agentName, agentPhone, agentTitle, companyName));
+		messageBodyReplacements.setReplacementArgs(Arrays.asList(displayName, link, link, agentName, agentSignature));
 
 		LOG.debug("Calling email sender to send mail");
 		emailSender.sendEmailWithBodyReplacements(emailEntity, subjectFileName, messageBodyReplacements);
@@ -1055,8 +1057,8 @@ public class EmailServicesImpl implements EmailServices {
 
 	@Async
 	@Override
-	public void sendDefaultSurveyInvitationMail(String recipientMailId, String displayName, String agentName, String link, String agentEmailId)
-			throws InvalidInputException, UndeliveredEmailException {
+	public void sendDefaultSurveyInvitationMail(String recipientMailId, String displayName, String agentName, String link, String agentEmailId,
+			String agentPhone, String agentTitle, String companyName) throws InvalidInputException, UndeliveredEmailException {
 		if (recipientMailId == null || recipientMailId.isEmpty()) {
 			LOG.error("Recipient email Id is empty or null for sending survey completion mail ");
 			throw new InvalidInputException("Recipient email Id is empty or null for sending survey completion mail ");
@@ -1070,9 +1072,11 @@ public class EmailServicesImpl implements EmailServices {
 		EmailEntity emailEntity = prepareEmailEntityForSendingEmail(recipientMailId, agentEmailId, agentName);
 		String subjectFileName = EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER + EmailTemplateConstants.SURVEY_INVITATION_MAIL_SUBJECT;
 
+		String agentSignature = buildAgentSignature(agentPhone, agentTitle, companyName);
+		
 		FileContentReplacements messageBodyReplacements = new FileContentReplacements();
 		messageBodyReplacements.setFileName(EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER + EmailTemplateConstants.SURVEY_INVITATION_MAIL_BODY);
-		messageBodyReplacements.setReplacementArgs(Arrays.asList(displayName, link, link, agentName));
+		messageBodyReplacements.setReplacementArgs(Arrays.asList(displayName, link, link, agentName, agentSignature));
 
 		LOG.debug("Calling email sender to send mail");
 		emailSender.sendEmailWithBodyReplacements(emailEntity, subjectFileName, messageBodyReplacements);
@@ -1290,6 +1294,20 @@ public class EmailServicesImpl implements EmailServices {
 		LOG.debug("Calling email sender to send mail");
 		emailSender.sendEmail(emailEntity, subject, mailBody);
 		LOG.info("Successfully sent survey invitation mail");
+	}
+	
+	private String buildAgentSignature(String agentPhone, String agentTitle, String companyName) {
+		StringBuilder agentDetail = new StringBuilder();
+		if (agentPhone != null && !agentPhone.isEmpty()) {
+			agentDetail.append(agentPhone).append("<br />");
+		}
+		if (agentTitle != null && !agentTitle.isEmpty()) {
+			agentDetail.append(agentTitle).append("<br />");
+		}
+		if (companyName != null && !companyName.isEmpty()) {
+			agentDetail.append(companyName).append("<br />");
+		}
+		return agentDetail.toString();
 	}
 }
 // JIRA: SS-7: By RM02: EOC
