@@ -776,27 +776,19 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 		}
 		LOG.debug("Updating " + mailCategory + " for settings: " + companySettings.toString() + " with mail body: " + mailBody);
 		
-		MailContentSettings originalContentSettings = companySettings.getMail_content();
-		MailContentSettings mailContentSettings = new MailContentSettings();
-		MailContent mailContent = new MailContent();
-		
 		// updating mail body
 		List<String> paramOrder = new ArrayList<String>();
 		mailBody = emailFormatHelper.replaceEmailBodyParamsWithDefaultValue(mailBody, paramOrder);
+		MailContent mailContent = new MailContent();
 		mailContent.setMail_body(mailBody);
 		mailContent.setParam_order(paramOrder);
 		
+		MailContentSettings originalContentSettings = companySettings.getMail_content();
 		if (mailCategory.equals(CommonConstants.SURVEY_MAIL_BODY_CATEGORY)) {
-			if (originalContentSettings != null) {
-				mailContentSettings.setTake_survey_reminder_mail(originalContentSettings.getTake_survey_reminder_mail());
-			}
-			mailContentSettings.setTake_survey_mail(mailContent);
+			originalContentSettings.setTake_survey_mail(mailContent);
 		}
 		else if (mailCategory.equals(CommonConstants.SURVEY_REMINDER_MAIL_BODY_CATEGORY)) {
-			if (originalContentSettings != null) {
-				mailContentSettings.setTake_survey_mail(originalContentSettings.getTake_survey_mail());
-			}
-			mailContentSettings.setTake_survey_reminder_mail(mailContent);
+			originalContentSettings.setTake_survey_reminder_mail(mailContent);
 		}
 		else {
 			throw new InvalidInputException("Invalid mail category");
@@ -804,10 +796,10 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 		
 		LOG.info("Updating company settings mail content");
 		organizationUnitSettingsDao.updateParticularKeyOrganizationUnitSettings(MongoOrganizationUnitSettingDaoImpl.KEY_MAIL_CONTENT,
-				mailContentSettings, companySettings, MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION);
+				originalContentSettings, companySettings, MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION);
 		LOG.info("Updated company settings mail content");
 		
-		return mailContentSettings;
+		return originalContentSettings;
 	}
 
 	@Override
