@@ -19,6 +19,7 @@ import com.realtech.socialsurvey.core.services.mail.EmailSender;
 import com.realtech.socialsurvey.core.services.mail.EmailServices;
 import com.realtech.socialsurvey.core.services.mail.UndeliveredEmailException;
 import com.realtech.socialsurvey.core.services.mq.ProducerForQueue;
+import com.realtech.socialsurvey.core.utils.EmailFormatHelper;
 
 // JIRA: SS-7: By RM02: BOC
 /**
@@ -28,6 +29,9 @@ import com.realtech.socialsurvey.core.services.mq.ProducerForQueue;
 public class EmailServicesImpl implements EmailServices {
 
 	public static final Logger LOG = LoggerFactory.getLogger(EmailServicesImpl.class);
+
+	@Autowired
+	private EmailFormatHelper emailFormatHelper;
 
 	@Autowired
 	private ProducerForQueue queueProducer;
@@ -870,9 +874,11 @@ public class EmailServicesImpl implements EmailServices {
 		EmailEntity emailEntity = prepareEmailEntityForSendingEmail(recipientMailId);
 		String subjectFileName = EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER + EmailTemplateConstants.SURVEY_REMINDER_MAIL_SUBJECT;
 
+		String agentSignature = emailFormatHelper.buildAgentSignature(agentPhone, agentTitle, companyName);
+
 		FileContentReplacements messageBodyReplacements = new FileContentReplacements();
 		messageBodyReplacements.setFileName(EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER + EmailTemplateConstants.SURVEY_REMINDER_MAIL_BODY);
-		messageBodyReplacements.setReplacementArgs(Arrays.asList(displayName, link, link, agentName, agentPhone, agentTitle, companyName));
+		messageBodyReplacements.setReplacementArgs(Arrays.asList(displayName, link, link, agentName, agentSignature));
 
 		LOG.debug("Calling email sender to send mail");
 		emailSender.sendEmailWithBodyReplacements(emailEntity, subjectFileName, messageBodyReplacements);
@@ -1055,8 +1061,8 @@ public class EmailServicesImpl implements EmailServices {
 
 	@Async
 	@Override
-	public void sendDefaultSurveyInvitationMail(String recipientMailId, String displayName, String agentName, String link, String agentEmailId)
-			throws InvalidInputException, UndeliveredEmailException {
+	public void sendDefaultSurveyInvitationMail(String recipientMailId, String displayName, String agentName, String link, String agentEmailId,
+			String agentSignature) throws InvalidInputException, UndeliveredEmailException {
 		if (recipientMailId == null || recipientMailId.isEmpty()) {
 			LOG.error("Recipient email Id is empty or null for sending survey completion mail ");
 			throw new InvalidInputException("Recipient email Id is empty or null for sending survey completion mail ");
@@ -1072,7 +1078,7 @@ public class EmailServicesImpl implements EmailServices {
 
 		FileContentReplacements messageBodyReplacements = new FileContentReplacements();
 		messageBodyReplacements.setFileName(EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER + EmailTemplateConstants.SURVEY_INVITATION_MAIL_BODY);
-		messageBodyReplacements.setReplacementArgs(Arrays.asList(displayName, link, link, agentName));
+		messageBodyReplacements.setReplacementArgs(Arrays.asList(displayName, link, link, agentName, agentSignature));
 
 		LOG.debug("Calling email sender to send mail");
 		emailSender.sendEmailWithBodyReplacements(emailEntity, subjectFileName, messageBodyReplacements);

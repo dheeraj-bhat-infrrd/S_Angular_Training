@@ -1,12 +1,14 @@
 package com.realtech.socialsurvey.core.entities;
 
+import java.util.List;
+
 /**
  * Holds the mail content
  */
 public class MailContent {
-
 	private String mail_subject;
 	private String mail_body;
+	private List<String> param_order;
 
 	public String getMail_subject() {
 		return mail_subject;
@@ -24,4 +26,11 @@ public class MailContent {
 		this.mail_body = mail_body;
 	}
 
+	public List<String> getParam_order() {
+		return param_order;
+	}
+
+	public void setParam_order(List<String> param_order) {
+		this.param_order = param_order;
+	}
 }

@@ -8,6 +8,7 @@ import java.lang.reflect.Type;
 import java.net.MalformedURLException;
 import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -70,6 +71,7 @@ import com.realtech.socialsurvey.core.services.payment.exception.PaymentExceptio
 import com.realtech.socialsurvey.core.services.search.SolrSearchService;
 import com.realtech.socialsurvey.core.services.search.exception.SolrException;
 import com.realtech.socialsurvey.core.utils.DisplayMessageConstants;
+import com.realtech.socialsurvey.core.utils.EmailFormatHelper;
 import com.realtech.socialsurvey.core.utils.EncryptionHelper;
 
 @DependsOn("generic")
@@ -78,7 +80,6 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 
 	private static final Logger LOG = LoggerFactory.getLogger(OrganizationManagementServiceImpl.class);
 	private static Map<Integer, VerticalsMaster> verticalsMastersMap = new HashMap<Integer, VerticalsMaster>();
-	
 
 	@Autowired
 	private GenericDao<Company, Long> companyDao;
@@ -108,6 +109,9 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 	private EncryptionHelper encryptionHelper;
 
 	@Autowired
+	private EmailFormatHelper emailFormatHelper;
+
+	@Autowired
 	private ProfileManagementService profileManagementService;
 
 	@Value("${HAPPY_TEXT}")
@@ -119,6 +123,15 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 	@Value("${SAD_TEXT}")
 	private String sadText;
 	
+	@Value("${PARAM_ORDER_TAKE_SURVEY}")
+	String paramOrderTakeSurvey;
+
+	@Value("${PARAM_ORDER_TAKE_SURVEY_CUSTOMER}")
+	String paramOrderTakeSurveyCustomer;
+
+	@Value("${PARAM_ORDER_TAKE_SURVEY_REMINDER}")
+	String paramOrderTakeSurveyReminder;
+
 	@Autowired
 	private ProfileCompletionList profileCompletionList;
 
@@ -236,7 +249,6 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 
 		LOG.debug("Method createDefaultHierarchy finished.");
 	}
-
 	// JIRA: SS-28: By RM05: EOC
 
 	/**
@@ -335,12 +347,14 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 	 */
 	private void addOrganizationalDetails(User user, Company company, Map<String, String> organizationalDetails) throws InvalidInputException {
 		LOG.debug("Method addOrganizationalDetails called.");
+		
 		// create a organization settings object
 		OrganizationUnitSettings companySettings = new OrganizationUnitSettings();
 		companySettings.setIden(company.getCompanyId());
 		if (organizationalDetails.get(CommonConstants.LOGO_NAME) != null) {
 			companySettings.setLogo(organizationalDetails.get(CommonConstants.LOGO_NAME));
 		}
+		
 		ContactDetailsSettings contactDetailSettings = new ContactDetailsSettings();
 		contactDetailSettings.setName(company.getCompany());
 		contactDetailSettings.setAddress(organizationalDetails.get(CommonConstants.ADDRESS));
@@ -349,18 +363,20 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 		contactDetailSettings.setZipcode(organizationalDetails.get(CommonConstants.ZIPCODE));
 		contactDetailSettings.setCountry(organizationalDetails.get(CommonConstants.COUNTRY));
 		contactDetailSettings.setCountryCode(organizationalDetails.get(CommonConstants.COUNTRY_CODE));
+		
 		// Add work phone number in contact details
 		ContactNumberSettings contactNumberSettings = new ContactNumberSettings();
 		contactNumberSettings.setWork(organizationalDetails.get(CommonConstants.COMPANY_CONTACT_NUMBER));
 		contactDetailSettings.setContact_numbers(contactNumberSettings);
+		
 		// Add work Mail id in contact details
 		MailIdSettings mailIdSettings = new MailIdSettings();
 		mailIdSettings.setWork(user.getEmailId());
 		contactDetailSettings.setMail_ids(mailIdSettings);
+		
 		companySettings.setVertical(organizationalDetails.get(CommonConstants.VERTICAL));
 		companySettings.setContact_details(contactDetailSettings);
 		companySettings.setProfileName(generateProfileNameForCompany(company.getCompany(), company.getCompanyId()));
-		// profile url for company will be same as profile name
 		companySettings.setProfileUrl("/" + companySettings.getProfileName());
 		companySettings.setCreatedOn(System.currentTimeMillis());
 		companySettings.setCreatedBy(String.valueOf(user.getUserId()));
@@ -375,14 +391,14 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 		surveySettings.setSadText(sadText);
 		surveySettings.setAutoPostEnabled(true);
 		surveySettings.setShow_survey_above_score(CommonConstants.DEFAULT_AUTOPOST_SCORE);
-		
 		companySettings.setSurvey_settings(surveySettings);
 		
-
 		// set seo content flag
 		companySettings.setSeoContentModified(true);
+		
 		// set default profile stages.
 		companySettings.setProfileStages(profileCompletionList.getDefaultProfileCompletionList());	
+		
 		// Setting default values for mail content in Mail content settings of company settings.
 		String takeSurveyMail = "";
 		String takeSurveyReminderMail = "";
@@ -395,15 +411,24 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 		catch (IOException e) {
 			LOG.error("IOException occured in addOrganizationalDetails while copying default Email content. Nested exception is ",e);
 		}
-		MailContent mailContent = new MailContent();
+		
 		MailContentSettings mailContentSettings = new MailContentSettings();
+		MailContent mailContent = new MailContent();
 		mailContent.setMail_body(takeSurveyMail);
+		mailContent.setParam_order(new ArrayList<String>(Arrays.asList(paramOrderTakeSurvey.split(","))));
 		mailContentSettings.setTake_survey_mail(mailContent);
-		mailContent.setMail_body(takeSurveyReminderMail);
-		mailContentSettings.setTake_survey_reminder_mail(mailContent);
+		
+		mailContent = new MailContent();
 		mailContent.setMail_body(takeSurveyByCustomerMail);
+		mailContent.setParam_order(new ArrayList<String>(Arrays.asList(paramOrderTakeSurveyCustomer.split(","))));
 		mailContentSettings.setTake_survey_mail_customer(mailContent);
-		companySettings.setMail_content(mailContentSettings);;
+		
+		mailContent = new MailContent();
+		mailContent.setMail_body(takeSurveyReminderMail);
+		mailContent.setParam_order(new ArrayList<String>(Arrays.asList(paramOrderTakeSurveyReminder.split(","))));
+		mailContentSettings.setTake_survey_reminder_mail(mailContent);
+		
+		companySettings.setMail_content(mailContentSettings);
 				
 		LOG.debug("Inserting company settings.");
 		organizationUnitSettingsDao.insertOrganizationUnitSettings(companySettings, MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION);
@@ -750,30 +775,31 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 			throw new InvalidInputException("Invalid mail category.");
 		}
 		LOG.debug("Updating " + mailCategory + " for settings: " + companySettings.toString() + " with mail body: " + mailBody);
-		MailContentSettings originalContentSettings = companySettings.getMail_content();
-		MailContentSettings mailContentSettings = new MailContentSettings();
+		
+		// updating mail body
+		List<String> paramOrder = new ArrayList<String>();
+		mailBody = emailFormatHelper.replaceEmailBodyParamsWithDefaultValue(mailBody, paramOrder);
 		MailContent mailContent = new MailContent();
 		mailContent.setMail_body(mailBody);
+		mailContent.setParam_order(paramOrder);
+		
+		MailContentSettings originalContentSettings = companySettings.getMail_content();
 		if (mailCategory.equals(CommonConstants.SURVEY_MAIL_BODY_CATEGORY)) {
-			if (originalContentSettings != null) {
-				mailContentSettings.setTake_survey_reminder_mail(originalContentSettings.getTake_survey_reminder_mail());
-			}
-			mailContentSettings.setTake_survey_mail(mailContent);
+			originalContentSettings.setTake_survey_mail(mailContent);
 		}
 		else if (mailCategory.equals(CommonConstants.SURVEY_REMINDER_MAIL_BODY_CATEGORY)) {
-			if (originalContentSettings != null) {
-				mailContentSettings.setTake_survey_mail(originalContentSettings.getTake_survey_mail());
-			}
-			mailContentSettings.setTake_survey_reminder_mail(mailContent);
+			originalContentSettings.setTake_survey_reminder_mail(mailContent);
 		}
 		else {
 			throw new InvalidInputException("Invalid mail category");
 		}
+		
 		LOG.info("Updating company settings mail content");
 		organizationUnitSettingsDao.updateParticularKeyOrganizationUnitSettings(MongoOrganizationUnitSettingDaoImpl.KEY_MAIL_CONTENT,
-				mailContentSettings, companySettings, MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION);
+				originalContentSettings, companySettings, MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION);
 		LOG.info("Updated company settings mail content");
-		return mailContentSettings;
+		
+		return originalContentSettings;
 	}
 
 	@Override

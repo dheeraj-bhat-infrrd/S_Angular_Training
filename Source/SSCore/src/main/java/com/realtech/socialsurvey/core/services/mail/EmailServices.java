@@ -270,8 +270,8 @@ public interface EmailServices {
 	public void sendSurveyReminderMail(String recipientMailId, String subject, String mailBody) throws InvalidInputException,
 			UndeliveredEmailException;
 
-	public void sendDefaultSurveyInvitationMail(String recipientMailId, String displayName, String agentName, String link, String agentEmailId)
-			throws InvalidInputException, UndeliveredEmailException;
+	public void sendDefaultSurveyInvitationMail(String recipientMailId, String displayName, String agentName, String link, String agentEmailId,
+			String agentSignature) throws InvalidInputException, UndeliveredEmailException;
 
 	public void sendDefaultSurveyInvitationMailByCustomer(String recipientMailId, String displayName, String agentName, String link,
 			String agentEmailId) throws InvalidInputException, UndeliveredEmailException;
