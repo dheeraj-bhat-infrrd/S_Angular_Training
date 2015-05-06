@@ -295,11 +295,11 @@ public class SurveyManagementController {
 	/*
 	 * Method to retrieve survey questions for a survey based upon the company id and agent id.
 	 */
-
 	@ResponseBody
 	@RequestMapping(value = "/triggersurvey")
 	public String triggerSurvey(Model model, HttpServletRequest request) {
 		LOG.info("Method to store initial details of customer and agent and to get questions of survey, triggerSurvey() started.");
+		
 		try {
 			long agentId = 0;
 			String customerEmail;
@@ -308,6 +308,7 @@ public class SurveyManagementController {
 			String captchaResponse;
 			String challengeField;
 			String custRelationWithAgent;
+			
 			try {
 				String user = request.getParameter(CommonConstants.AGENT_ID_COLUMN);
 				agentId = Long.parseLong(user);
@@ -322,24 +323,19 @@ public class SurveyManagementController {
 				LOG.error("NumberFormatException caught in triggerSurvey(). Details are " + e);
 				throw e;
 			}
+			
 			if (!captchaValidation.isCaptchaValid(request.getRemoteAddr(), challengeField, captchaResponse)) {
 				LOG.error("Captcha Validation failed!");
-				// throw new InvalidInputException("Captcha Validation failed!",
-				// DisplayMessageConstants.INVALID_CAPTCHA);
 				String errorMsg = messageUtils.getDisplayMessage(DisplayMessageConstants.INVALID_CAPTCHA, DisplayMessageType.ERROR_MESSAGE)
 						.getMessage();
 				throw new InvalidInputException(errorMsg, DisplayMessageConstants.INVALID_CAPTCHA);
-
 			}
+			
 			User user = userManagementService.getUserByUserId(agentId);
 			surveyHandler.sendSurveyInvitationMail(firstName, lastName, customerEmail, custRelationWithAgent, user, false);
 		}
 		catch (NonFatalException e) {
 			LOG.error("Exception caught in getSurvey() method of SurveyManagementController.");
-			/*ErrorResponse errorResponse = new ErrorResponse();
-			errorResponse.setErrCode(ErrorCodes.REQUEST_FAILED);
-			errorResponse.setErrMessage(e.getMessage());
-			String errorMessage = new Gson().toJson(errorResponse);*/
 			return "Something went wrong while sending survey link. Please try again later.";
 		}
 		LOG.info("Method to store initial details of customer and agent and to get questions of survey, triggerSurvey() started.");

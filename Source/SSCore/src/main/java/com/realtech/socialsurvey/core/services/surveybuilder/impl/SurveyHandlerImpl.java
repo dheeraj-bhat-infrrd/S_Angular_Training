@@ -426,25 +426,28 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean {
 	 */
 	private void sendInvitationMailByAgent(User user, String custFirstName, String custLastName, String custEmail, String link) throws InvalidInputException, UndeliveredEmailException {
 		LOG.debug("sendInvitationMailByAgent() started.");
+		
+		// fetching params
+		AgentSettings agentSettings = userManagementService.getUserSettings(user.getUserId());
+		String companyName = user.getCompany().getCompany();
+		String agentTitle = "";
+		if (agentSettings.getContact_details() != null && agentSettings.getContact_details().getTitle() != null) {
+			agentTitle = agentSettings.getContact_details().getTitle();
+		}
+		
+		String agentPhone = "";
+		if (agentSettings.getContact_details() != null && agentSettings.getContact_details().getContact_numbers() != null && 
+				agentSettings.getContact_details().getContact_numbers().getWork() != null) {
+			agentPhone = agentSettings.getContact_details().getContact_numbers().getWork();
+		}
+		
+		String agentName = user.getFirstName();
+		if (user.getLastName() != null && !user.getLastName().isEmpty()) {
+			agentName = user.getFirstName() + " " + user.getLastName();
+		}
+		
 		OrganizationUnitSettings companySettings = organizationManagementService.getCompanySettings(user.getCompany().getCompanyId());
 		if (companySettings != null && companySettings.getMail_content() != null && companySettings.getMail_content().getTake_survey_mail() != null) {
-			
-			AgentSettings agentSettings = userManagementService.getUserSettings(user.getUserId());
-			String agentTitle = "";
-			if (agentSettings.getContact_details() != null && agentSettings.getContact_details().getTitle() != null) {
-				agentTitle = agentSettings.getContact_details().getTitle();
-			}
-			
-			String agentPhone = "";
-			if (agentSettings.getContact_details() != null && agentSettings.getContact_details().getContact_numbers() != null && 
-					agentSettings.getContact_details().getContact_numbers().getWork() != null) {
-				agentPhone = agentSettings.getContact_details().getContact_numbers().getWork();
-			}
-			
-			String agentName = user.getFirstName();
-			if (user.getLastName() != null && !user.getLastName().isEmpty()) {
-				agentName = user.getFirstName() + " " + user.getLastName();
-			}
 			
 			String mailBody = companySettings.getMail_content().getTake_survey_mail().getMail_body();
 			mailBody = mailBody.replaceAll("\\[AgentName\\]", agentName);
@@ -452,8 +455,9 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean {
 			mailBody = mailBody.replaceAll("\\[Link\\]", link);
 			mailBody = mailBody.replaceAll("\\[AgentPhone\\]", agentPhone);
 			mailBody = mailBody.replaceAll("\\[AgentTitle\\]", agentTitle);
-			mailBody = mailBody.replaceAll("\\[CompanyName\\]", user.getCompany().getCompany());
-			
+			mailBody = mailBody.replaceAll("\\[CompanyName\\]", companyName);
+			mailBody = mailBody.replaceAll("null", "");
+
 			String mailSubject = CommonConstants.SURVEY_MAIL_SUBJECT + agentName;
 			try {
 				emailServices.sendSurveyInvitationMail(custEmail, mailSubject, mailBody, user.getEmailId(), user.getFirstName()
@@ -465,7 +469,7 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean {
 		}
 		else {
 			emailServices.sendDefaultSurveyInvitationMail(custEmail, custFirstName + " " + custLastName, user.getFirstName()
-					+ (user.getLastName() != null ? " " + user.getLastName() : ""), link, user.getEmailId());
+					+ (user.getLastName() != null ? " " + user.getLastName() : ""), link, user.getEmailId(), agentPhone, agentTitle, companyName);
 		}
 		LOG.debug("sendInvitationMailByAgent() finished.");
 	}
@@ -475,13 +479,16 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean {
 	 */
 	private void sendInvitationMailByCustomer(User user, String custFirstName, String custLastName, String custEmail, String link) throws InvalidInputException, UndeliveredEmailException {
 		LOG.debug("sendInvitationMailByCustomer() started.");
+		
 		OrganizationUnitSettings companySettings = organizationManagementService.getCompanySettings(user.getCompany().getCompanyId());
 		if (companySettings != null && companySettings.getMail_content() != null && companySettings.getMail_content().getTake_survey_mail_customer() != null) {
+			
 			String mailBody = companySettings.getMail_content().getTake_survey_mail_customer().getMail_body();
 			mailBody = mailBody.replaceAll("\\[AgentName\\]", user.getFirstName() + " " + user.getLastName());
 			mailBody = mailBody.replaceAll("\\[Name\\]", custFirstName + " " + custLastName);
 			mailBody = mailBody.replaceAll("\\[Link\\]", link);
 			mailBody = mailBody.replaceAll("null", "");
+			
 			String mailSubject = CommonConstants.SURVEY_MAIL_SUBJECT_CUSTOMER;
 			try {
 				emailServices.sendSurveyInvitationMailByCustomer(custEmail, mailSubject, mailBody, user.getEmailId(), user.getFirstName()

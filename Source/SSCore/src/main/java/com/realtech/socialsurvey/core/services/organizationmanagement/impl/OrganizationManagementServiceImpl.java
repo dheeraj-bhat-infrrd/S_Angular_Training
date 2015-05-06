@@ -335,12 +335,14 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 	 */
 	private void addOrganizationalDetails(User user, Company company, Map<String, String> organizationalDetails) throws InvalidInputException {
 		LOG.debug("Method addOrganizationalDetails called.");
+		
 		// create a organization settings object
 		OrganizationUnitSettings companySettings = new OrganizationUnitSettings();
 		companySettings.setIden(company.getCompanyId());
 		if (organizationalDetails.get(CommonConstants.LOGO_NAME) != null) {
 			companySettings.setLogo(organizationalDetails.get(CommonConstants.LOGO_NAME));
 		}
+		
 		ContactDetailsSettings contactDetailSettings = new ContactDetailsSettings();
 		contactDetailSettings.setName(company.getCompany());
 		contactDetailSettings.setAddress(organizationalDetails.get(CommonConstants.ADDRESS));
@@ -349,18 +351,20 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 		contactDetailSettings.setZipcode(organizationalDetails.get(CommonConstants.ZIPCODE));
 		contactDetailSettings.setCountry(organizationalDetails.get(CommonConstants.COUNTRY));
 		contactDetailSettings.setCountryCode(organizationalDetails.get(CommonConstants.COUNTRY_CODE));
+		
 		// Add work phone number in contact details
 		ContactNumberSettings contactNumberSettings = new ContactNumberSettings();
 		contactNumberSettings.setWork(organizationalDetails.get(CommonConstants.COMPANY_CONTACT_NUMBER));
 		contactDetailSettings.setContact_numbers(contactNumberSettings);
+		
 		// Add work Mail id in contact details
 		MailIdSettings mailIdSettings = new MailIdSettings();
 		mailIdSettings.setWork(user.getEmailId());
 		contactDetailSettings.setMail_ids(mailIdSettings);
+		
 		companySettings.setVertical(organizationalDetails.get(CommonConstants.VERTICAL));
 		companySettings.setContact_details(contactDetailSettings);
 		companySettings.setProfileName(generateProfileNameForCompany(company.getCompany(), company.getCompanyId()));
-		// profile url for company will be same as profile name
 		companySettings.setProfileUrl("/" + companySettings.getProfileName());
 		companySettings.setCreatedOn(System.currentTimeMillis());
 		companySettings.setCreatedBy(String.valueOf(user.getUserId()));
@@ -375,14 +379,14 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 		surveySettings.setSadText(sadText);
 		surveySettings.setAutoPostEnabled(true);
 		surveySettings.setShow_survey_above_score(CommonConstants.DEFAULT_AUTOPOST_SCORE);
-		
 		companySettings.setSurvey_settings(surveySettings);
 		
-
 		// set seo content flag
 		companySettings.setSeoContentModified(true);
+		
 		// set default profile stages.
 		companySettings.setProfileStages(profileCompletionList.getDefaultProfileCompletionList());	
+		
 		// Setting default values for mail content in Mail content settings of company settings.
 		String takeSurveyMail = "";
 		String takeSurveyReminderMail = "";
@@ -395,15 +399,21 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 		catch (IOException e) {
 			LOG.error("IOException occured in addOrganizationalDetails while copying default Email content. Nested exception is ",e);
 		}
-		MailContent mailContent = new MailContent();
+		
 		MailContentSettings mailContentSettings = new MailContentSettings();
+		MailContent mailContent = new MailContent();
 		mailContent.setMail_body(takeSurveyMail);
 		mailContentSettings.setTake_survey_mail(mailContent);
+		
+		mailContent = new MailContent();
 		mailContent.setMail_body(takeSurveyReminderMail);
 		mailContentSettings.setTake_survey_reminder_mail(mailContent);
+		
+		mailContent = new MailContent();
 		mailContent.setMail_body(takeSurveyByCustomerMail);
 		mailContentSettings.setTake_survey_mail_customer(mailContent);
-		companySettings.setMail_content(mailContentSettings);;
+		
+		companySettings.setMail_content(mailContentSettings);
 				
 		LOG.debug("Inserting company settings.");
 		organizationUnitSettingsDao.insertOrganizationUnitSettings(companySettings, MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION);
