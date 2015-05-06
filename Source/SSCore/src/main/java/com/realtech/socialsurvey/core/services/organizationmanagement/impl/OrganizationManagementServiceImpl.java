@@ -71,6 +71,7 @@ import com.realtech.socialsurvey.core.services.payment.exception.PaymentExceptio
 import com.realtech.socialsurvey.core.services.search.SolrSearchService;
 import com.realtech.socialsurvey.core.services.search.exception.SolrException;
 import com.realtech.socialsurvey.core.utils.DisplayMessageConstants;
+import com.realtech.socialsurvey.core.utils.EmailFormatHelper;
 import com.realtech.socialsurvey.core.utils.EncryptionHelper;
 
 @DependsOn("generic")
@@ -106,6 +107,9 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 
 	@Autowired
 	private EncryptionHelper encryptionHelper;
+
+	@Autowired
+	private EmailFormatHelper emailFormatHelper;
 
 	@Autowired
 	private ProfileManagementService profileManagementService;
@@ -245,7 +249,6 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 
 		LOG.debug("Method createDefaultHierarchy finished.");
 	}
-
 	// JIRA: SS-28: By RM05: EOC
 
 	/**
@@ -772,10 +775,15 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 			throw new InvalidInputException("Invalid mail category.");
 		}
 		LOG.debug("Updating " + mailCategory + " for settings: " + companySettings.toString() + " with mail body: " + mailBody);
+		
 		MailContentSettings originalContentSettings = companySettings.getMail_content();
 		MailContentSettings mailContentSettings = new MailContentSettings();
 		MailContent mailContent = new MailContent();
+		
+		// updating mail body
+		mailBody = emailFormatHelper.replaceEmailBodyParamsWithDefaultValue(mailBody);
 		mailContent.setMail_body(mailBody);
+		
 		if (mailCategory.equals(CommonConstants.SURVEY_MAIL_BODY_CATEGORY)) {
 			if (originalContentSettings != null) {
 				mailContentSettings.setTake_survey_reminder_mail(originalContentSettings.getTake_survey_reminder_mail());
@@ -791,10 +799,12 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 		else {
 			throw new InvalidInputException("Invalid mail category");
 		}
+		
 		LOG.info("Updating company settings mail content");
 		organizationUnitSettingsDao.updateParticularKeyOrganizationUnitSettings(MongoOrganizationUnitSettingDaoImpl.KEY_MAIL_CONTENT,
 				mailContentSettings, companySettings, MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION);
 		LOG.info("Updated company settings mail content");
+		
 		return mailContentSettings;
 	}
 
