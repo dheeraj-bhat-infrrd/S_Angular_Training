@@ -69,5 +69,4 @@ public class SurveyPreInitiationDaoImpl extends GenericDaoImpl<SurveyPreInitiati
 		return processedRecords;
 	}
 
-
 }

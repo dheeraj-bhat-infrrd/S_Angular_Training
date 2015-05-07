@@ -40,11 +40,11 @@ public class Engagement {
 		this.source = source;
 	}
 
-	public List<Customer> getCustomer() {
+	public List<Customer> getCustomers() {
 		return customers;
 	}
 
-	public void setCustomer(List<Customer> customers) {
+	public void setCustomers(List<Customer> customers) {
 		this.customers = customers;
 	}
 

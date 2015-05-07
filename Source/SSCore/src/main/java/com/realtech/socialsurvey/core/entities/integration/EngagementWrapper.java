@@ -44,7 +44,7 @@ public class EngagementWrapper {
 		customers.add(customer);
 		customers.add(customer);
 		customers.add(customer);
-		engagement.setCustomer(customers);
+		engagement.setCustomers(customers);
 		engagement.setAgent(agent);
 		engagement.setEngagementId("1234");
 		engagement.setCompanyId(1l);
