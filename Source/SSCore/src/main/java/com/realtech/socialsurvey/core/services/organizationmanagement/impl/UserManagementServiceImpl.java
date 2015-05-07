@@ -860,7 +860,7 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 		/**
 		 * Updating status of user into solr
 		 */
-		solrSearchService.addUserToSolr(user);
+		solrSearchService.editUserInSolr(user.getUserId(), CommonConstants.STATUS_SOLR, String.valueOf(status));
 		LOG.info("Successfully completed method to update user status");
 	}
 
