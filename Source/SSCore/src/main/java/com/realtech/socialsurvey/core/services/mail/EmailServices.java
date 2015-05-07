@@ -283,4 +283,7 @@ public interface EmailServices {
 
 	public void sendEmailSendingFailureMail(String recipientMailId, String destinationMailId, String displayName, String stackTrace)
 			throws InvalidInputException, UndeliveredEmailException;
+	
+	public void sendDefaultSurveyRestartMail(String recipientMailId, String displayName, String agentName, String link, String agentEmailId,
+			String agentSignature) throws InvalidInputException, UndeliveredEmailException;
 }

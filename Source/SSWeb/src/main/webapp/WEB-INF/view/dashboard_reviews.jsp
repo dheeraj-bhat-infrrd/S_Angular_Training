@@ -10,7 +10,7 @@
 				<c:set value="ppl-review-item-last" var="reviewitemclass"></c:set>
 			</c:if> --%>
 			<div data-firstname="${feedback.customerFirstName}" data-lastname="${feedback.customerLastName}"
-				data-agentid="${feedback.agentId}" data-agentname="${feedback.agentName}"
+				data-agentid="${feedback.agentId}" data-agentname="${feedback.agentName}" data-customeremail="${feedback.customerEmail}"
 				data-review="${feedback.review}" data-score="${feedback.score}" class="${reviewitemclass}">
 				
 				<div class="ppl-header-wrapper clearfix">
@@ -38,6 +38,7 @@
 						<div class="float-left ppl-share-icns icn-lin"></div>
 						<div class="float-left ppl-share-icns icn-yelp"></div>
                         <div class="float-left ppl-share-icns icn-gplus"></div>
+                        <div id="restart-survey-mail" class="float-left ppl-share-icns icn-restart-survey-mail"></div>
 					</div>
 					<div class="float-left icn-share icn-remove icn-rem-size hide" style="display: none;"></div>
 				</div>
