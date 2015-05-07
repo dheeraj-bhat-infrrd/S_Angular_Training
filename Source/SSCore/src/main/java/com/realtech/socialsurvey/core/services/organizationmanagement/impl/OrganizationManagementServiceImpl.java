@@ -14,6 +14,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
 import org.apache.solr.common.SolrDocumentList;
 import org.noggit.JSONUtil;
 import org.slf4j.Logger;
@@ -24,6 +25,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.DependsOn;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
+
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
@@ -50,11 +52,13 @@ import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
 import com.realtech.socialsurvey.core.entities.ProfilesMaster;
 import com.realtech.socialsurvey.core.entities.Region;
 import com.realtech.socialsurvey.core.entities.RegionFromSearch;
+import com.realtech.socialsurvey.core.entities.StateLookup;
 import com.realtech.socialsurvey.core.entities.SurveySettings;
 import com.realtech.socialsurvey.core.entities.User;
 import com.realtech.socialsurvey.core.entities.UserFromSearch;
 import com.realtech.socialsurvey.core.entities.UserProfile;
 import com.realtech.socialsurvey.core.entities.VerticalsMaster;
+import com.realtech.socialsurvey.core.entities.ZipCodeLookup;
 import com.realtech.socialsurvey.core.enums.AccountType;
 import com.realtech.socialsurvey.core.exception.FatalException;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
@@ -102,6 +106,12 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 	@Autowired
 	private GenericDao<DisabledAccount, Long> disabledAccountDao;
 
+	@Autowired
+	private GenericDao<StateLookup, Integer> stateLookupDao;
+	
+	@Autowired
+	private GenericDao<ZipCodeLookup, Integer> zipCodeLookupDao;
+	
 	@Autowired
 	private Payment gateway;
 
@@ -3022,6 +3032,22 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 		return content.toString();
 	}
 
+	/*
+	 * Method to fetch the list of states in US
+	 */
+	public String getUsStateList() {
+		LOG.debug("Method getUSStateList called to fetch the list of states in US");
+		return new Gson().toJson(stateLookupDao.findAll(StateLookup.class));
+    }
 	
+	/*
+	 *  Method to fetch the list of cities and zipcodes in the state
+	 */
+	public String getZipCodesByStateId(int stateId) {
+	    LOG.debug("Method getZipCodesByStateId called to fetch the list of cities and zipcodes in the state");
+		List<ZipCodeLookup> zipCodes = (List<ZipCodeLookup>) zipCodeLookupDao.findByColumn(ZipCodeLookup.class, "stateId", stateId);
+		return new Gson().toJson(zipCodes);
+    }
+
 }
 // JIRA: SS-27: By RM05: EOC
