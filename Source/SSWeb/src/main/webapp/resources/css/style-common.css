@@ -3879,7 +3879,7 @@ button.paypal.is-active {
 .dash-lp-item-grp {
 	max-height: 200px;
 	position: relative;
-	padding-right: 15px;
+	padding-right: 0px;
 }
 
 .dash-lp-txt span {
