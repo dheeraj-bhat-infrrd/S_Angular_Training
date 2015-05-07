@@ -3585,7 +3585,7 @@ button.paypal.is-active {
 }
 
 .reg-cap-nw-adj .reg-cap-txt {
-	width: 184px;
+	width: 184px !important;
 }
 
 .reg-cap-nw-adj .sq-btn-continue {
