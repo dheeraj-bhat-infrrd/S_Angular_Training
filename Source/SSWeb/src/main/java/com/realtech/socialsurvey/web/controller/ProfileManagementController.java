@@ -2677,7 +2677,7 @@ public class ProfileManagementController {
 						DisplayMessageType.ERROR_MESSAGE).getMessage());
 			}
 			if (!patternFirst.trim().matches(CommonConstants.FINDAPRO_FIRST_NAME_REGEX)
-					&& !patternFirst.trim().matches(CommonConstants.FINDAPRO_LAST_NAME_REGEX)) {
+					&& !patternLast.trim().matches(CommonConstants.FINDAPRO_LAST_NAME_REGEX)) {
 				LOG.error("Invalid search key passed in method findAProfileScroll().");
 				throw new InvalidInputException(messageUtils.getDisplayMessage(DisplayMessageConstants.INVALID_FIRSTORLAST_NAME_PATTERN,
 						DisplayMessageType.ERROR_MESSAGE).getMessage());
