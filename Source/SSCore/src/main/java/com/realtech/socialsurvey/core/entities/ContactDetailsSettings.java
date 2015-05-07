@@ -12,6 +12,8 @@ public class ContactDetailsSettings {
 	private String address1;
 	private String address2;
 	private String country;
+	private String state;
+	private String city;
 	private String countryCode;
 	private String zipcode;
 	private String location;
@@ -157,6 +159,22 @@ public class ContactDetailsSettings {
 
 	public void setWeb_addresses(WebAddressSettings web_addresses) {
 		this.web_addresses = web_addresses;
+	}
+
+	public String getState() {
+		return state;
+	}
+
+	public void setState(String state) {
+		this.state = state;
+	}
+
+	public String getCity() {
+		return city;
+	}
+
+	public void setCity(String city) {
+		this.city = city;
 	}
 
 	@Override

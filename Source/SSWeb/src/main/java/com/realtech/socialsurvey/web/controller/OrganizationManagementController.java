@@ -156,6 +156,8 @@ public class OrganizationManagementController {
 		String country = request.getParameter("country");
 		String countryCode = request.getParameter("countrycode");
 		String zipCode = request.getParameter("zipcode");
+		String state = request.getParameter("state");
+		String city = request.getParameter("city");
 		String companyContactNo = request.getParameter("contactno");
 		String vertical = request.getParameter("vertical");
 		// JIRA SS-536: Added for manual registration via invitation
@@ -177,6 +179,8 @@ public class OrganizationManagementController {
 					model.addAttribute("country", country);
 					model.addAttribute("countryCode", countryCode);
 					model.addAttribute("zipCode", zipCode);
+					model.addAttribute("state", state);
+					model.addAttribute("city", city);
 					model.addAttribute("companyContactNo", companyContactNo);
 					model.addAttribute("isDirectRegistration", strIsDirectRegistration);
 				}
@@ -204,6 +208,8 @@ public class OrganizationManagementController {
 				companyDetails.put(CommonConstants.ADDRESS2, address2);
 			}
 			companyDetails.put(CommonConstants.COUNTRY, country);
+			companyDetails.put(CommonConstants.STATE, state);
+			companyDetails.put(CommonConstants.CITY, city);
 			companyDetails.put(CommonConstants.COUNTRY_CODE, countryCode);
 			companyDetails.put(CommonConstants.ZIPCODE, zipCode);
 			companyDetails.put(CommonConstants.COMPANY_CONTACT_NUMBER, companyContactNo);
