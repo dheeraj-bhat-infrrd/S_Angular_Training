@@ -2658,6 +2658,16 @@ public class ProfileManagementController {
 		try {
 			String patternFirst = request.getParameter("find-pro-first-name");
 			String patternLast = request.getParameter("find-pro-last-name");
+			if (patternFirst == null && patternLast == null) {
+				LOG.error("Invalid search key passed in method findAProfileScroll().");
+				throw new InvalidInputException("Invalid searchKey passed in method findAProfileScroll().");
+			}
+			if (!patternFirst.trim().matches(CommonConstants.FINDAPRO_FIRST_NAME_REGEX)
+					&& !patternFirst.trim().matches(CommonConstants.FINDAPRO_LAST_NAME_REGEX)) {
+				LOG.error("Invalid search key passed in method findAProfileScroll().");
+				throw new InvalidInputException(messageUtils.getDisplayMessage(DisplayMessageConstants.INVALID_FIRSTORLAST_NAME_PATTERN,
+						DisplayMessageType.ERROR_MESSAGE).getMessage());
+			}
 
 			int startIndex;
 			try {
@@ -2675,18 +2685,11 @@ public class ProfileManagementController {
 				batchSize = CommonConstants.FIND_PRO_BATCH_SIZE;
 			}
 			
-			if (patternFirst == null && patternLast == null) {
-				LOG.error("Invalid search key passed in method findAProfileScroll().");
-				throw new InvalidInputException("Invalid searchKey passed in method findAProfileScroll().");
-			}
-
 			try {
 				SolrDocumentList results = solrSearchService.searchUsersByFirstOrLastName(patternFirst, patternLast, startIndex, batchSize);
-				
 				for (SolrDocument solrDocument : results) {
 					userIds.add((Long)solrDocument.getFieldValue("userId"));
 				}
-				
 				users = userManagementService.getMultipleUsersByUserId(userIds);
 				
 				userList.setUsers(users);
@@ -2701,7 +2704,7 @@ public class ProfileManagementController {
 			LOG.error("NonFatalException while searching in findAProfileScroll(). Reason : " + nonFatalException.getMessage(), nonFatalException);
 			ErrorResponse errorResponse = new ErrorResponse();
 			errorResponse.setErrCode(ErrorCodes.REQUEST_FAILED);
-			errorResponse.setErrMessage(ErrorMessages.REQUEST_FAILED);
+			errorResponse.setErrMessage(nonFatalException.getMessage());
 			return new Gson().toJson(errorResponse);
 		}
 		
