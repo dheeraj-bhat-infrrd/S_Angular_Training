@@ -29,15 +29,16 @@
 				</div>
 			</div>
 		</div>
-
+		<div id="err-nw-wrapper" class="err-nw-wrapper">
+			<span class="err-new-close"></span>
+			<span id="err-nw-txt"></span>
+		</div>
 		<div class="hero-wrapper">
 			<div class="hero-container container">
-				<div class="hr-txt">
-					<spring:message code="label.notrelevatprofile.key" />
-				</div>
+				<div class="hr-txt"><spring:message code="label.notrelevatprofile.key" /></div>
 			</div>
 		</div>
-
+		
 		<div class="fp-wrapper">
 			<div class="fp-container container clearfix">
 				<div class="row">
@@ -46,8 +47,10 @@
 						<div class="float-left fp-right-item">
 							<form id="find-pro-form" method="POST" action="./findapro.do">
 								<div class="fp-wrapper clearfix">
-									<input id="find-pro-first-name" name="find-pro-first-name" value="${patternFirst}" class="fp-inp" placeholder="First Name">
-									<input id="find-pro-last-name" name="find-pro-last-name" value="${patternLast}" class="fp-inp" placeholder="Last Name">
+									<input id="find-pro-first-name" name="find-pro-first-name" value="${patternFirst}"
+										class="fp-inp" placeholder="First Name">
+									<input id="find-pro-last-name" name="find-pro-last-name" value="${patternLast}"
+										class="fp-inp" placeholder="Last Name">
 									<input id="find-pro-submit" type="button" class="fp-inp pro-btn" value="Search">
 								</div>
 							</form>
@@ -75,44 +78,16 @@
 										</c:otherwise>
 									</c:choose>
 								<input id="fp-users-size" type="hidden">
-								<input id="fp-profile-level-fetch-info" data-searchcriteria="${searchCriteria}" data-profile-level="${profileLevel}" data-iden="${iden}" type="hidden"/>
+								<input id="fp-profile-level-fetch-info" data-searchcriteria="${searchCriteria}"
+									data-profile-level="${profileLevel}" data-iden="${iden}" type="hidden"/>
 							</div>
 							<div class="ctnt-list-header-right float-right">
-								<span id="srch-num" class="srch-num"></span>
+								<span id="srch-num" class="srch-num"><spring:message code="label.no.key" /></span>
 								<spring:message code="label.profilelistfound.key" />
 							</div>
 						</div>
 						
-						<div id="ctnt-list-wrapper" class="ctnt-list-wrapper">
-							<!-- Example user search results -->
-							<div class="ctnt-list-item clearfix hide">
-								<div class="float-left ctnt-list-item-img"></div>
-								<div class="float-left ctnt-list-item-txt-wrap">
-									<div class="ctnt-item-name">James Anderson</div>
-									<div class="ctnt-item-desig">Marketting Head at Ralecon</div>
-									<div class="ctnt-item-comment">lorem ipsum doe ir lera</div>
-								</div>
-								<div class="float-left ctnt-list-item-btn-wrap">
-									<div class="ctnt-review-btn">
-										<spring:message code="label.reviewbutton.key" />
-									</div>
-								</div>
-							</div>
-							<div class="ctnt-list-item ctnt-list-item-even clearfix hide">
-								<div class="float-left ctnt-list-item-img"></div>
-								<div class="float-left ctnt-list-item-txt-wrap">
-									<div class="ctnt-item-name">James Anderson</div>
-									<div class="ctnt-item-desig">Marketting Head at Ralecon</div>
-									<div class="ctnt-item-comment">lorem ipsum doe ir lera</div>
-								</div>
-								<div class="float-left ctnt-list-item-btn-wrap">
-									<div class="ctnt-review-btn">
-										<spring:message code="label.reviewbutton.key" />
-									</div>
-								</div>
-							</div>
-						</div>
-						
+						<div id="ctnt-list-wrapper" class="ctnt-list-wrapper"></div>
 					</div>
 					<div class="ctnt-right-item col-lg-3 col-md-3 col-sm-3 col-xs-12 ads-container"></div>
 				</div>
