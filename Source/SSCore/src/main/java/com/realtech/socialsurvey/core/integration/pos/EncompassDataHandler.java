@@ -12,6 +12,7 @@ import com.realtech.socialsurvey.core.entities.integration.EngagementProcessingS
 import com.realtech.socialsurvey.core.entities.integration.EngagementWrapper;
 import com.realtech.socialsurvey.core.exception.FatalException;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
+import com.realtech.socialsurvey.core.services.integeration.pos.AgentNotAvailableException;
 import com.realtech.socialsurvey.core.services.integeration.pos.POSIntegration;
 
 /**
@@ -71,17 +72,31 @@ public class EncompassDataHandler {
 	}
 
 	private void processEncompassEngagements(List<Engagement> engagements) {
-		// TODO: implement
+		LOG.debug("Inserting engagements into the pre intitation database");
+		if (engagements != null && engagements.size() > 0) {
+			for (Engagement engagement : engagements) {
+				try {
+					posIntegration.insertSurveyPreInitiationRecord(engagement, true);
+				}
+				catch (AgentNotAvailableException e) {
+					LOG.warn("Skipping agent " + engagement.getAgent().getAgentEmailId());
+				}
+				catch (InvalidInputException | FatalException e) {
+					LOG.error("Error while inserting pre initiation record.", e);
+				}
+			}
+		}
 	}
 
 	private void preProcess() throws InvalidInputException {
 		LOG.debug("Fetching the last run time");
 		lastProcessedTime = posIntegration.getLastRunTime(CommonConstants.CRM_INFO_SOURCE_ENCOMPASS);
 	}
-	
-	private void postProcess(EncompassIntegrationAPI ecompassIntegrationApi) throws InvalidInputException{
+
+	private void postProcess(EncompassIntegrationAPI ecompassIntegrationApi) throws InvalidInputException {
 		LOG.debug("Getting the records inserted after the last run time");
-		List<EngagementProcessingStatus> processedRecords = posIntegration.getProcessedRecords(CommonConstants.CRM_INFO_SOURCE_ENCOMPASS, lastProcessedTime);
+		List<EngagementProcessingStatus> processedRecords = posIntegration.getProcessedRecords(CommonConstants.CRM_INFO_SOURCE_ENCOMPASS,
+				lastProcessedTime);
 		ecompassIntegrationApi.updateProcessingStatus(processedRecords);
 	}
 }

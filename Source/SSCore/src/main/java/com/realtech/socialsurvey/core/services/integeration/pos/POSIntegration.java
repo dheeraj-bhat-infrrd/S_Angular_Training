@@ -2,6 +2,7 @@ package com.realtech.socialsurvey.core.services.integeration.pos;
 
 import java.sql.Timestamp;
 import java.util.List;
+import com.realtech.socialsurvey.core.entities.integration.Engagement;
 import com.realtech.socialsurvey.core.entities.integration.EngagementProcessingStatus;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 
@@ -27,4 +28,13 @@ public interface POSIntegration {
 	 * @throws InvalidInputException
 	 */
 	public List<EngagementProcessingStatus> getProcessedRecords(String source, Timestamp lastRunTime) throws InvalidInputException;
+	
+	/**
+	 * Inserts a survey preinitiation records from engagement
+	 * @param engagement
+	 * @param checkForAgentExistence - should be false only in case of direct survey
+	 * @throws InvalidInputException
+	 * @throws AgentNotAvailableException
+	 */
+	public void insertSurveyPreInitiationRecord(Engagement engagement, boolean checkForAgentExistence) throws InvalidInputException, AgentNotAvailableException;
 }
