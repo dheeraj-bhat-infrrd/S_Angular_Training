@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import javax.servlet.http.HttpServletRequest;
+import org.apache.commons.lang.StringUtils;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.common.SolrDocument;
 import org.slf4j.Logger;
@@ -119,44 +120,49 @@ public class SurveyManagementController {
 	@RequestMapping(value = "/data/storeFeedback")
 	public String storeFeedback(HttpServletRequest request) {
 		LOG.info("Method storeFeedback() started to store response of customer.");
+		
 		// To store final feedback provided by customer in mongoDB.
 		try {
 			String feedback = request.getParameter("feedback");
 			String mood = request.getParameter("mood");
 			String customerEmail = request.getParameter("customerEmail");
-			String agentIdStr = request.getParameter("agentId");
+			
 			long agentId = 0;
-			if (agentIdStr == null || agentIdStr.isEmpty()) {
-				LOG.error("Null/empty value found for agentId in storeFeedback().");
-				throw new InvalidInputException("Null/empty value found for agentId in storeFeedback().");
-			}
 			try {
+				String agentIdStr = request.getParameter("agentId");
+				if (agentIdStr == null || agentIdStr.isEmpty()) {
+					LOG.error("Null/empty value found for agentId in storeFeedback().");
+					throw new InvalidInputException("Null/empty value found for agentId in storeFeedback().");
+				}
 				agentId = Long.valueOf(agentIdStr);
 			}
 			catch (NumberFormatException e) {
 				LOG.error("NumberFormatException occurred in storeFeedback() while getting agentId.");
 			}
+			
 			boolean isAbusive = Boolean.parseBoolean(request.getParameter("isAbusive"));
 			surveyHandler.updateGatewayQuestionResponseAndScore(agentId, customerEmail, mood, feedback, isAbusive);
 			surveyHandler.increaseSurveyCountForAgent(agentId);
 
 			// TODO Search Engine Optimisation
-
 			if (mood == null || mood.isEmpty()) {
 				LOG.error("Null/empty value found for mood in storeFeedback().");
 				throw new InvalidInputException("Null/empty value found for mood in storeFeedback().");
 			}
 			Set<String> emailIdsToSendMail = new HashSet<>();
 			SolrDocument solrDocument = null;
+			
 			try {
 				solrDocument = solrSearchService.getUserByUniqueId(agentId);
 			}
 			catch (SolrServerException e) {
 				LOG.error("SolrServerException occurred in storeFeedback() while fetching email id of agent. NEsted exception is ", e);
 			}
+			
 			if (solrDocument != null && !solrDocument.isEmpty()) {
 				emailIdsToSendMail.add(solrDocument.get(CommonConstants.USER_EMAIL_ID_SOLR).toString());
 			}
+			
 			String moodsToSendMail = surveyHandler.getMoodsToSendMail();
 			if (!moodsToSendMail.isEmpty() && moodsToSendMail != null) {
 				List<String> moods = new ArrayList<>(Arrays.asList(moodsToSendMail.split(",")));
@@ -164,27 +170,33 @@ public class SurveyManagementController {
 					emailIdsToSendMail.addAll(surveyHandler.getEmailIdsOfAdminsInHierarchy(agentId));
 				}
 			}
+			
 			// Sending email to the customer telling about successful completion of survey.
 			SurveyDetails survey = surveyHandler.getSurveyDetails(agentId, customerEmail);
 			try {
+				String customerName = survey.getCustomerFirstName();
+				if (survey.getCustomerLastName() != null && !survey.getCustomerLastName().isEmpty()) {
+					customerName = survey.getCustomerFirstName() + " " + survey.getCustomerLastName();
+				}
+				
 				if (enableKafka.equals(CommonConstants.YES)) {
-					emailServices.queueSurveyCompletionMail(customerEmail, survey.getCustomerFirstName() + " " + survey.getCustomerLastName(),
-							survey.getAgentName());
+					emailServices.queueSurveyCompletionMail(customerEmail, customerName, survey.getAgentName());
 				}
 				else {
-					emailServices.sendSurveyCompletionMail(customerEmail, survey.getCustomerFirstName() + " " + survey.getCustomerLastName(),
-							survey.getAgentName());
+					emailServices.sendSurveyCompletionMail(customerEmail, customerName, survey.getAgentName());
 				}
+				
+				// Generate the text as in mail
+				String surveyDetail = generateSurveyTextForMail(customerName, mood, survey);
+				
 				if (enableKafka.equals(CommonConstants.YES)) {
 					for (String emailId : emailIdsToSendMail) {
-						emailServices.queueSurveyCompletionMailToAdmins(emailId, survey.getCustomerFirstName() + " " + survey.getCustomerLastName(),
-								survey.getAgentName(), mood);
+						emailServices.queueSurveyCompletionMailToAdmins(emailId, surveyDetail);
 					}
 				}
 				else {
 					for (String emailId : emailIdsToSendMail) {
-						emailServices.sendSurveyCompletionMailToAdmins(emailId, survey.getCustomerFirstName() + " " + survey.getCustomerLastName(),
-								survey.getAgentName(), mood);
+						emailServices.sendSurveyCompletionMailToAdmins(emailId, surveyDetail);
 					}
 				}
 			}
@@ -199,6 +211,32 @@ public class SurveyManagementController {
 		}
 		LOG.info("Method storeFeedback() finished to store response of customer.");
 		return "Survey stored successfully";
+	}
+	
+	private String generateSurveyTextForMail(String customerName, String mood, SurveyDetails survey) {
+		StringBuilder surveyDetail = new StringBuilder(customerName).append(" Complete Survey Response for ").append(survey.getAgentName());
+		surveyDetail.append("<br />").append("Date Sent: ").append(survey.getCreatedOn().toString());
+		surveyDetail.append("<br />").append("Date Completed: ").append(survey.getModifiedOn().toString());
+		surveyDetail.append("<br />").append("Average Score: ").append(String.valueOf(survey.getScore()));
+		surveyDetail.append("<br />");
+		int count = 1;
+		for (SurveyResponse response : survey.getSurveyResponse()) {
+			surveyDetail.append("<br />").append("Question " + count + ": ").append(response.getQuestion());
+			surveyDetail.append("<br />").append("Response to Q" + count + ": ").append(response.getAnswer());
+			count ++;
+		}
+		surveyDetail.append("<br />");
+		surveyDetail.append("<br />").append("Customer Comments: ").append(survey.getReview());
+		surveyDetail.append("<br />").append("Customer Mood: ").append(mood);
+		if (survey.getSharedOn() != null && !survey.getSharedOn().isEmpty()) {
+			surveyDetail.append("<br />").append("Share Checkbox: ").append("Yes");
+			surveyDetail.append("<br />").append("Shared on: ").append(StringUtils.join(survey.getSharedOn(), ", "));
+		}
+		else {
+			surveyDetail.append("<br />").append("Share Checkbox: ").append("No");
+		}
+		
+		return surveyDetail.toString();
 	}
 
 	@ResponseBody
@@ -257,11 +295,11 @@ public class SurveyManagementController {
 	/*
 	 * Method to retrieve survey questions for a survey based upon the company id and agent id.
 	 */
-
 	@ResponseBody
 	@RequestMapping(value = "/triggersurvey")
 	public String triggerSurvey(Model model, HttpServletRequest request) {
 		LOG.info("Method to store initial details of customer and agent and to get questions of survey, triggerSurvey() started.");
+		
 		try {
 			long agentId = 0;
 			String customerEmail;
@@ -270,6 +308,7 @@ public class SurveyManagementController {
 			String captchaResponse;
 			String challengeField;
 			String custRelationWithAgent;
+			
 			try {
 				String user = request.getParameter(CommonConstants.AGENT_ID_COLUMN);
 				agentId = Long.parseLong(user);
@@ -284,24 +323,19 @@ public class SurveyManagementController {
 				LOG.error("NumberFormatException caught in triggerSurvey(). Details are " + e);
 				throw e;
 			}
+			
 			if (!captchaValidation.isCaptchaValid(request.getRemoteAddr(), challengeField, captchaResponse)) {
 				LOG.error("Captcha Validation failed!");
-				// throw new InvalidInputException("Captcha Validation failed!",
-				// DisplayMessageConstants.INVALID_CAPTCHA);
 				String errorMsg = messageUtils.getDisplayMessage(DisplayMessageConstants.INVALID_CAPTCHA, DisplayMessageType.ERROR_MESSAGE)
 						.getMessage();
 				throw new InvalidInputException(errorMsg, DisplayMessageConstants.INVALID_CAPTCHA);
-
 			}
+			
 			User user = userManagementService.getUserByUserId(agentId);
 			surveyHandler.sendSurveyInvitationMail(firstName, lastName, customerEmail, custRelationWithAgent, user, false);
 		}
 		catch (NonFatalException e) {
 			LOG.error("Exception caught in getSurvey() method of SurveyManagementController.");
-			/*ErrorResponse errorResponse = new ErrorResponse();
-			errorResponse.setErrCode(ErrorCodes.REQUEST_FAILED);
-			errorResponse.setErrMessage(e.getMessage());
-			String errorMessage = new Gson().toJson(errorResponse);*/
 			return "Something went wrong while sending survey link. Please try again later.";
 		}
 		LOG.info("Method to store initial details of customer and agent and to get questions of survey, triggerSurvey() started.");

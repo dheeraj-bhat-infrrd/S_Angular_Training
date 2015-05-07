@@ -259,7 +259,7 @@ public class RegistrationController {
 				LOG.debug("Adding newly added user {} to mongo", user.getFirstName());
 				userManagementService.insertAgentSettings(user);
 				LOG.debug("Added newly added user {} to mongo", user.getFirstName());
-
+				
 				LOG.debug("Adding newly added user {} to solr", user.getFirstName());
 				solrSearchService.addUserToSolr(user);
 				LOG.debug("Added newly added user {} to solr", user.getFirstName());
@@ -267,6 +267,12 @@ public class RegistrationController {
 				LOG.debug("Adding newly registered user to principal session");
 				sessionHelper.loginOnRegistration(emailId, password);
 				LOG.debug("Successfully added registered user to principal session");
+
+				// send verification mail
+				if (isDirectRegistration) {
+					LOG.debug("Calling method for sending verification link for user : " + user.getUserId());
+					userManagementService.sendVerificationLink(user);
+				}
 			}
 			catch (InvalidInputException e) {
 				throw new InvalidInputException(e.getMessage(), DisplayMessageConstants.REGISTRATION_GENERAL_ERROR, e);

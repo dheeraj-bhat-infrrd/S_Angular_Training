@@ -8,7 +8,6 @@ import com.realtech.socialsurvey.core.exception.NoRecordsFetchedException;
 import com.realtech.socialsurvey.core.services.mail.UndeliveredEmailException;
 
 // JIRA : SS-21 by RM-06 : BOC
-
 /**
  * Contains the methods to be implemented for authentication
  */
@@ -22,7 +21,8 @@ public interface AuthenticationService {
 
 	public User verifyRegisteredUser(String emailId) throws InvalidInputException;
 
-	public void sendResetPasswordLink(String emailId, String name, long companyId) throws InvalidInputException, UndeliveredEmailException;
+	public void sendResetPasswordLink(String emailId, String name, long companyId, String loginName) throws InvalidInputException,
+			UndeliveredEmailException;
 
 	public void changePassword(User user, String password) throws InvalidInputException;
 
@@ -31,5 +31,4 @@ public interface AuthenticationService {
 	public UserProfile getCompanyAdminProfileForUser(User user) throws InvalidInputException;
 
 }
-
 // JIRA : SS-21 by RM-06 : EOC

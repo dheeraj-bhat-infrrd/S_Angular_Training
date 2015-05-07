@@ -1225,10 +1225,10 @@ public class BrainTreePaymentImpl implements Payment, InitializingBean {
 
 		LOG.info("Sending mail to the customer about the upgrade");
 		if (enableKafka.equals(CommonConstants.YES)) {
-			emailServices.queueAccountUpgradeMail(user.getEmailId(), user.getFirstName() + " " + user.getLastName());
+			emailServices.queueAccountUpgradeMail(user.getEmailId(), user.getFirstName() + " " + user.getLastName(), user.getLoginName());
 		}
 		else {
-			emailServices.sendAccountUpgradeMail(user.getEmailId(), user.getFirstName() + " " + user.getLastName());
+			emailServices.sendAccountUpgradeMail(user.getEmailId(), user.getFirstName() + " " + user.getLastName(), user.getLoginName());
 		}
 		LOG.info("Mail successfully sent");
 
@@ -1489,14 +1489,12 @@ public class BrainTreePaymentImpl implements Payment, InitializingBean {
 	@Transactional
 	@Override
 	public void incrementRetriesAndSendMail(Subscription subscription) throws InvalidInputException, NoRecordsFetchedException {
-
 		if (subscription == null) {
 			LOG.error("subscription parameter is null or empty");
 			throw new InvalidInputException("subscription parameter is null or empty");
 		}
 
 		boolean retriesExceeded = false;
-
 		List<LicenseDetail> licenseDetails = licenseDetailDao.findByColumn(LicenseDetail.class, CommonConstants.SUBSCRIPTION_ID_COLUMN,
 				subscription.getId());
 
@@ -1504,7 +1502,6 @@ public class BrainTreePaymentImpl implements Payment, InitializingBean {
 			LOG.error("No license details record found for the subscription id : " + subscription.getId());
 			throw new NoRecordsFetchedException("No license details record found for the subscription id : " + subscription.getId());
 		}
-
 		LicenseDetail licenseDetail = licenseDetails.get(CommonConstants.INITIAL_INDEX);
 
 		// Sending retry email to client.
@@ -1517,6 +1514,7 @@ public class BrainTreePaymentImpl implements Payment, InitializingBean {
 			licenseDetail.setPaymentRetries(licenseDetail.getPaymentRetries() + CommonConstants.PAYMENT_INCREMENT);
 			licenseDetail.setModifiedOn(new Timestamp(System.currentTimeMillis()));
 			licenseDetailDao.update(licenseDetail);
+			
 			Company company = user.getCompany();
 			company.setStatus(CommonConstants.STATUS_PAYMENT_FAILED);
 			companyDao.update(company);
@@ -1531,29 +1529,27 @@ public class BrainTreePaymentImpl implements Payment, InitializingBean {
 		try {
 			if (enableKafka.equals(CommonConstants.YES)) {
 				if (retriesExceeded) {
-					emailServices.sendAccountBlockingMail(user.getEmailId(), user.getFirstName() + " " + user.getLastName());
+					emailServices.sendAccountBlockingMail(user.getEmailId(), user.getFirstName() + " " + user.getLastName(), user.getLoginName());
 				}
 				else {
-					emailServices.queueRetryChargeEmail(user.getEmailId(), user.getFirstName() + " " + user.getLastName());
+					emailServices.queueRetryChargeEmail(user.getEmailId(), user.getFirstName() + " " + user.getLastName(), user.getLoginName());
 				}
 			}
 			else {
 				if (retriesExceeded) {
-					emailServices.sendAccountBlockingMail(user.getEmailId(), user.getFirstName() + " " + user.getLastName());
+					emailServices.sendAccountBlockingMail(user.getEmailId(), user.getFirstName() + " " + user.getLastName(), user.getLoginName());
 				}
 				else {
-					emailServices.sendRetryChargeEmail(user.getEmailId(), user.getFirstName() + " " + user.getLastName());
+					emailServices.sendRetryChargeEmail(user.getEmailId(), user.getFirstName() + " " + user.getLastName(), user.getLoginName());
 				}
 			}
 		}
 		catch (InvalidInputException e1) {
 			LOG.error("CustomItemProcessor : Exception caught when sending retry charge mail. Message : " + e1.getMessage());
-
 			coreCommonServices.sendEmailSendingFailureMail(user.getEmailId(), user.getFirstName() + " " + user.getLastName(), e1);
 		}
 		catch (UndeliveredEmailException e) {
 			LOG.error("CustomItemProcessor : Exception caught when sending retry charge mail. Message : " + e.getMessage());
-
 			coreCommonServices.sendEmailSendingFailureMail(user.getEmailId(), user.getFirstName() + " " + user.getLastName(), e);
 		}
 	}
@@ -1579,14 +1575,12 @@ public class BrainTreePaymentImpl implements Payment, InitializingBean {
 
 		List<LicenseDetail> licenseDetails = licenseDetailDao.findByColumn(LicenseDetail.class, CommonConstants.SUBSCRIPTION_ID_COLUMN,
 				subscription.getId());
-
 		if (licenseDetails == null || licenseDetails.isEmpty()) {
 			LOG.error("License details objecy not found for subscription id : " + subscription.getId());
 			throw new NoRecordsFetchedException("License details objecy not found for subscription id : " + subscription.getId());
 		}
 
 		LicenseDetail licenseDetail = licenseDetails.get(CommonConstants.INITIAL_INDEX);
-
 		if (licenseDetail.getIsSubscriptionDue() == CommonConstants.YES) {
 
 			Company company = licenseDetail.getCompany();
@@ -1601,6 +1595,7 @@ public class BrainTreePaymentImpl implements Payment, InitializingBean {
 				companyDao.update(company);
 				LOG.debug("Company table updated!");
 			}
+			
 			// We set the license details record to reflect changes
 			licenseDetail.setIsSubscriptionDue(CommonConstants.NO);
 			licenseDetail.setPaymentRetries(CommonConstants.INITIAL_PAYMENT_RETRIES);
@@ -1608,18 +1603,16 @@ public class BrainTreePaymentImpl implements Payment, InitializingBean {
 			LOG.debug("License detail table updated!");
 
 			User user = coreCommonServices.getCorporateAdmin(company);
-
 			if (user == null) {
 				LOG.error("Corporate admin not found for company : " + company.getCompanyId());
 				throw new NoRecordsFetchedException("Corporate admin not found for company : " + company.getCompanyId());
 			}
 
-			emailServices.sendAccountReactivationMail(user.getEmailId(), user.getFirstName() + " " + user.getLastName());
+			emailServices.sendAccountReactivationMail(user.getEmailId(), user.getFirstName() + " " + user.getLastName(), user.getLoginName());
 			LOG.info("Company activated!");
 		}
 
 		LOG.info("checkIfCompanyIsDisabledOrSubscriptionIsPastDueAndEnableIt execution complete!");
-
 	}
 
 	@Transactional
@@ -1668,7 +1661,7 @@ public class BrainTreePaymentImpl implements Payment, InitializingBean {
 		}
 		else if (notificationType == CommonConstants.SUBSCRIPTION_CHARGED_UNSUCCESSFULLY) {
 			LOG.debug("Sending charge unsuccessful mail");
-			emailServices.sendRetryChargeEmail(user.getEmailId(), user.getFirstName() + " " + user.getLastName());
+			emailServices.sendRetryChargeEmail(user.getEmailId(), user.getFirstName() + " " + user.getLastName(), user.getLoginName());
 		}
 	}
 

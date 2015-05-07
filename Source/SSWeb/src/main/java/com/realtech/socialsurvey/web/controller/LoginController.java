@@ -388,9 +388,8 @@ public class LoginController {
 
 			// Send reset password link
 			try {
-				authenticationService.sendResetPasswordLink(emailId,
-						user.getFirstName() + " " + user.getLastName(), user
-								.getCompany().getCompanyId());
+				authenticationService.sendResetPasswordLink(emailId, user.getFirstName() + " " + user.getLastName(),
+						user.getCompany().getCompanyId(), user.getLoginName());
 			} catch (InvalidInputException e) {
 				LOG.error(
 						"Invalid Input exception in sending reset password link. Reason "

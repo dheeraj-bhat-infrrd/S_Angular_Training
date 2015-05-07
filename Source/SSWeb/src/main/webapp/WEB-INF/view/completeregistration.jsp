@@ -31,14 +31,14 @@
 <div class="hm-header-main-wrapper">
 	<div class="container">
 		<div class="hm-header-row hm-header-row-main clearfix">
-			<div class="float-left hm-header-row-left text-center"><spring:message code="label.completeregistration.title.key" /></div>
+			<div class="hm-header-row-left text-center"><spring:message code="label.completeregistration.title.key" /></div>
 		</div>
 	</div>
 </div>
 
 <div class="prof-main-content-wrapper margin-top-25 margin-bottom-25">
 	<div class="container reg_panel_container">
-		<div class="reg_header"><spring:message code="label.completeregistration.title.key"/></div>
+		<div class="reg_header"><spring:message code="label.completeregistration.header.key" /></div>
 		
 		<form id="complete-registration-form" method="POST" action="./completeregistration.do">
 			<div class="reg_form_wrapper_2">
@@ -69,6 +69,12 @@
 						<div class="rfr_icn icn-mail"></div>
 						<input class="rfr_txt_fld" id="complete-reg-user-id" data-non-empty="true" data-email="true"
 							name="emailId" value="${emailId}" placeholder='<spring:message code="label.emailid.key"/>' readonly="readonly" >
+					</div>
+				</div>
+				<div class="reg_form_row clearfix">
+					<div class="float-left rfr_lbl"><spring:message code="label.profilepage.key" /></div>
+					<div class="float-left rfr_txt">
+						<div class="reg-prof-url"><a href="${profileUrl}" target="_blank">${profileUrl}</a></div>
 					</div>
 				</div>
 				<div class="reg_form_row clearfix">

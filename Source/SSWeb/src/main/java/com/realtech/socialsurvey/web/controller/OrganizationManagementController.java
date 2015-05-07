@@ -51,6 +51,7 @@ import com.realtech.socialsurvey.core.services.search.exception.SolrException;
 import com.realtech.socialsurvey.core.services.surveybuilder.SurveyBuilder;
 import com.realtech.socialsurvey.core.services.upload.FileUploadService;
 import com.realtech.socialsurvey.core.utils.DisplayMessageConstants;
+import com.realtech.socialsurvey.core.utils.EmailFormatHelper;
 import com.realtech.socialsurvey.core.utils.EncryptionHelper;
 import com.realtech.socialsurvey.core.utils.MessageUtils;
 import com.realtech.socialsurvey.web.common.JspResolver;
@@ -86,6 +87,9 @@ public class OrganizationManagementController {
 
 	@Autowired
 	private SessionHelper sessionHelper;
+
+	@Autowired
+	private EmailFormatHelper emailFormatHelper;
 
 	@Autowired
 	private SurveyBuilder surveyBuilder;
@@ -426,8 +430,8 @@ public class OrganizationManagementController {
 		else if (profileMasterId == CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID) {
 			unitSettings = userSettings.getAgentSettings();
 		}
+		
 		session.setAttribute(CommonConstants.USER_ACCOUNT_SETTINGS, unitSettings);
-
 		return JspResolver.EDIT_SETTINGS;
 	}
 

@@ -1,1 +1,1 @@
-Fatal Exception has occured.
+Fatal Exception occurred.

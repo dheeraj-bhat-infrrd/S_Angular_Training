@@ -7,6 +7,7 @@
  * @param url
  */
 function showMainContent(url) {
+	closeMoblieScreenMenu();
 	callAjaxGET(url, showMainContentCallBack, true);
 }
 
