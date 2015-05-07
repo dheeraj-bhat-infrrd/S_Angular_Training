@@ -7,8 +7,10 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
+
 import org.apache.solr.client.solrj.SolrServerException;
 import org.noggit.JSONUtil;
 import org.slf4j.Logger;
@@ -20,12 +22,14 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
+
 import com.amazonaws.util.json.JSONException;
 import com.amazonaws.util.json.JSONObject;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.entities.AbridgedUserProfile;
+import com.realtech.socialsurvey.core.entities.AgentSettings;
 import com.realtech.socialsurvey.core.entities.Branch;
 import com.realtech.socialsurvey.core.entities.BranchFromSearch;
 import com.realtech.socialsurvey.core.entities.LicenseDetail;
@@ -187,7 +191,9 @@ public class UserManagementController {
 						solrSearchService.addUserToSolr(user);
 						LOG.debug("Added newly added user {} to solr", user.getFirstName());
 
-						userManagementService.sendRegistrationCompletionLink(emailId, firstName, lastName, admin.getCompany().getCompanyId());
+						String profileName = userManagementService.getUserSettings(user.getUserId()).getProfileName();
+						userManagementService.sendRegistrationCompletionLink(emailId, firstName, lastName, admin.getCompany().getCompanyId(),
+								profileName, user.getLoginName());
 
 						// If account type is team assign user to default branch
 						if (accountType.getValue() == CommonConstants.ACCOUNTS_MASTER_TEAM) {
@@ -864,11 +870,17 @@ public class UserManagementController {
 			// checking status of user
 			String emailId = urlParams.get(CommonConstants.EMAIL_ID);
 			User newUser = userManagementService.getUserByEmailAndCompany(companyId, emailId);
+			
 			if (newUser.getStatus() == CommonConstants.STATUS_NOT_VERIFIED) {
 				model.addAttribute(CommonConstants.COMPANY, urlParams.get(CommonConstants.COMPANY));
 				model.addAttribute(CommonConstants.FIRST_NAME, urlParams.get(CommonConstants.FIRST_NAME));
 				model.addAttribute(CommonConstants.EMAIL_ID, emailId);
-
+				User user = userManagementService.getUserByEmail(emailId);
+				AgentSettings agentSettings = userManagementService.getAgentSettingsForUserProfiles(user.getUserId());
+				if(agentSettings==null){
+					throw new InvalidInputException("Settings not found for the given user.");
+				}
+				model.addAttribute("profileUrl", agentSettings.getCompleteProfileUrl());
 				String lastName = urlParams.get(CommonConstants.LAST_NAME);
 				if (lastName != null && !lastName.isEmpty()) {
 					model.addAttribute(CommonConstants.LAST_NAME, urlParams.get(CommonConstants.LAST_NAME));
@@ -1366,7 +1378,10 @@ public class UserManagementController {
 			}
 
 			LOG.debug("Sending invitation...");
-			userManagementService.sendRegistrationCompletionLink(emailId, firstName, lastName, user.getCompany().getCompanyId());
+			User invitedUser = userManagementService.getUserByEmail(emailId);
+			String profileName = userManagementService.getUserSettings(invitedUser.getUserId()).getProfileName();
+			userManagementService.sendRegistrationCompletionLink(emailId, firstName, lastName, user.getCompany().getCompanyId(), profileName,
+					user.getLoginName());
 
 			message = messageUtils.getDisplayMessage(DisplayMessageConstants.INVITATION_RESEND_SUCCESSFUL, DisplayMessageType.SUCCESS_MESSAGE)
 					.getMessage();

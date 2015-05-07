@@ -98,7 +98,6 @@ public interface UserManagementService {
 	 */
 	public User getUserByUserId(long userId) throws InvalidInputException;
 
-
 	public List<ProListUser> getMultipleUsersByUserId(List<Long> userIds) throws InvalidInputException;
 
 	// Method to get list of the branches assigned to the given user.
@@ -146,8 +145,8 @@ public interface UserManagementService {
 	 * Sends an email to user with the link to complete registration. User has to provide password
 	 * to set. Also, user can choose to change name.
 	 */
-	public void sendRegistrationCompletionLink(String emailId, String firstName, String lastName, long companyId) throws InvalidInputException,
-			UndeliveredEmailException;
+	public void sendRegistrationCompletionLink(String emailId, String firstName, String lastName, long companyId, String profileName, String loginName)
+			throws InvalidInputException, UndeliveredEmailException;
 
 	// Method to set properties of a user based upon active profiles available for the user.
 	public void setProfilesOfUser(User user);
@@ -159,8 +158,8 @@ public interface UserManagementService {
 	 * 
 	 * @throws NonFatalException
 	 */
-	public void inviteCorporateToRegister(String firstName, String lastName, String emailId, boolean isReinvitation) throws InvalidInputException, UndeliveredEmailException,
-			NonFatalException;
+	public void inviteCorporateToRegister(String firstName, String lastName, String emailId, boolean isReinvitation) throws InvalidInputException,
+			UndeliveredEmailException, NonFatalException;
 
 	public Map<String, String> validateRegistrationUrl(String encryptedUrlParameter) throws InvalidInputException;
 
@@ -198,7 +197,7 @@ public interface UserManagementService {
 	 * @throws InvalidInputException
 	 */
 	public AgentSettings getUserSettings(long agentId) throws InvalidInputException;
-	
+
 	/**
 	 * Get all the agent settings linked to the user profile
 	 * 
@@ -271,28 +270,32 @@ public interface UserManagementService {
 	 * @return
 	 * @throws NonFatalException
 	 */
-	public Map<Long, AbridgedUserProfile> processedUserProfiles(User user, AccountType accountType, Map<Long, UserProfile> profileMap) throws NonFatalException;
+	public Map<Long, AbridgedUserProfile> processedUserProfiles(User user, AccountType accountType, Map<Long, UserProfile> profileMap)
+			throws NonFatalException;
 
 	public UserProfile updateSelectedProfile(User user, AccountType accountType, Map<Long, UserProfile> profileMap, String profileIdStr);
-	
+
 	/**
 	 * Updates the users last login time and num of login
+	 * 
 	 * @param user
 	 * @throws NonFatalException
 	 */
 	public void updateUserLoginTimeAndNum(User user) throws NonFatalException;
-	
+
 	/**
 	 * Updates the user modification notification table
+	 * 
 	 * @param company
 	 * @throws InvalidInputException
 	 */
 	public void updateUserCountModificationNotification(Company company) throws InvalidInputException;
 
 	public void sendVerificationLink(User user) throws InvalidInputException, UndeliveredEmailException;
-	
+
 	/**
 	 * Checks if the api secret and api key is a valid combination
+	 * 
 	 * @param apiSecret
 	 * @param apiKey
 	 * @return

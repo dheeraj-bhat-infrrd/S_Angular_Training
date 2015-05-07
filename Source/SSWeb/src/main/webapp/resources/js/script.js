@@ -254,11 +254,11 @@ function validateEmailId(elementId){
 		if (emailRegex.test(emailId) == true) {
 			return true;
 		} else {
-			showErrorMobileAndWeb('Please enter a valid Email Id');
+			showErrorMobileAndWeb('Please enter a valid Email Address');
 			return false;
 		}
 	} else {
-		showErrorMobileAndWeb('Please enter a valid Email Id');
+		showErrorMobileAndWeb('Please enter a valid Email Address');
 		return false;
 	}
 }
@@ -573,7 +573,10 @@ $(window).resize(function(){
    }
 });
 
-
+function closeMoblieScreenMenu() {
+	$('#header-slider-wrapper').removeClass('rt-panel-slide');
+	$('body').removeClass('body-no-scroll');
+}
 
 function upgradeToPaidPlan(){
 	 console.log("upgrade plan button clicked");

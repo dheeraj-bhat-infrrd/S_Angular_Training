@@ -76,6 +76,7 @@
 				<value>com.realtech.socialsurvey.core.entities.FeedStatus</value>
 				<value>com.realtech.socialsurvey.core.entities.UsercountModificationNotification</value>
 				<value>com.realtech.socialsurvey.core.entities.UserApiKey</value>
+				<value>com.realtech.socialsurvey.core.entities.SurveyPreInitiation</value>
 			</list>
 		</property>
 	</bean>

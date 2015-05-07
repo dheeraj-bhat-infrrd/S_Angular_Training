@@ -36,7 +36,11 @@
 		<!-- Google json -->
 		<gson.version>1.7.1</gson.version>
 
+		<dependency.path>/Users/nishit/work/lib</dependency.path>
+
 	</properties>
+
+
 
 	<dependencies>
 		<!-- Spring and Transactions -->
@@ -74,11 +78,11 @@
 			<version>${logback.version}</version>
 			<!-- <scope>runtime</scope> -->
 		</dependency>
-		
+
 		<dependency>
-		    <groupId>ch.qos.logback</groupId>
-		    <artifactId>logback-core</artifactId>
-		    <version>${logback.version}</version>
+			<groupId>ch.qos.logback</groupId>
+			<artifactId>logback-core</artifactId>
+			<version>${logback.version}</version>
 		</dependency>
 
 		<!-- Hibernate -->
@@ -217,11 +221,8 @@
 			<artifactId>httpclient</artifactId>
 			<version>4.3.6</version>
 		</dependency>
-		<!-- <dependency>
-			<groupId>org.slf4j</groupId>
-			<artifactId>slf4j-simple</artifactId>
-			<version>1.5.6</version>
-		</dependency> -->
+		<!-- <dependency> <groupId>org.slf4j</groupId> <artifactId>slf4j-simple</artifactId> 
+			<version>1.5.6</version> </dependency> -->
 		<dependency>
 			<groupId>org.apache.httpcomponents</groupId>
 			<artifactId>httpmime</artifactId>
@@ -271,13 +272,10 @@
 				</exclusion>
 			</exclusions>
 		</dependency>
-		
+
 		<!-- Social Network Connectors -->
-		<!-- <dependency>
-			<groupId>com.googlecode.linkedin-j</groupId>
-			<artifactId>linkedin-j-core</artifactId>
-			<version>1.0.416</version>
-		</dependency> -->
+		<!-- <dependency> <groupId>com.googlecode.linkedin-j</groupId> <artifactId>linkedin-j-core</artifactId> 
+			<version>1.0.416</version> </dependency> -->
 		<dependency>
 			<groupId>org.facebook4j</groupId>
 			<artifactId>facebook4j-core</artifactId>
@@ -295,18 +293,25 @@
 		</dependency>
 		<!-- vcard dependency -->
 		<dependency>
-		   <groupId>com.googlecode.ez-vcard</groupId>
-		   <artifactId>ez-vcard</artifactId>
-		   <version>0.9.6</version>
+			<groupId>com.googlecode.ez-vcard</groupId>
+			<artifactId>ez-vcard</artifactId>
+			<version>0.9.6</version>
 		</dependency>
-		
+
 		<!-- sendgrid dependency -->
 		<dependency>
-            <groupId>com.sendgrid</groupId>
-            <artifactId>sendgrid-java</artifactId>
-            <version>2.1.0</version>
-        </dependency>
-		
+			<groupId>com.sendgrid</groupId>
+			<artifactId>sendgrid-java</artifactId>
+			<version>2.1.0</version>
+		</dependency>
+
+		<!-- retrofit dependency -->
+		<dependency>
+			<groupId>com.squareup.retrofit</groupId>
+			<artifactId>retrofit</artifactId>
+			<version>1.9.0</version>
+		</dependency>
+
 	</dependencies>
 
 	<build>
@@ -317,6 +322,11 @@
 			</resource>
 		</resources>
 		<plugins>
+			<!-- <plugin> <groupId>org.apache.maven.plugins</groupId> <artifactId>maven-dependency-plugin</artifactId> 
+				<version>2.5.1</version> <executions> <execution> <id>copy-dependencies</id> 
+				<phase>package</phase> <goals> <goal>copy-dependencies</goal> </goals> <configuration> 
+				<outputDirectory> ${dependency.path} </outputDirectory> </configuration> 
+				</execution> </executions> </plugin> -->
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-compiler-plugin</artifactId>
