@@ -9,7 +9,6 @@
 	<link rel="stylesheet" href="${pageContext.request.contextPath}/resources/css/bootstrap.min.css">
 	<link rel="stylesheet" href="${pageContext.request.contextPath}/resources/css/style-common-1.1.css">
 	<link rel="stylesheet" href="${pageContext.request.contextPath}/resources/css/style-resp-1.1.css">
-	
 </head>
 
 <body class="index-body">
@@ -153,7 +152,6 @@
 					<div class="blue-ext-right blue-ext-right-adj hide"></div>
 					<div class="fp-txt-1">Find a professional</div>
 				</div>
-				
 				<form id="find-pro-form" method="POST" action="./findapro.do">
 					<div class="pro-right-wrapper clearfix float-left">
 						<div class="blue-ext-right"></div>
@@ -164,8 +162,8 @@
 						<input id="find-pro-submit" type="button" class="pro-inp pro-btn" value="Search">
 					</div>
 				</form>
-				
 			</div>
+			
 			<div id="footer-wrapper" class="footer-wrapper">
 				&copy; Copyright 2015. All Rights Reserved.<br/>
 				Created by BuyersRoad, Inc. in San Francisco 
@@ -340,16 +338,11 @@ $(document).ready(function(){
 	// Find a pro
 	$('#find-pro-submit').click(function(e) {
 		e.preventDefault();
-		submitFindProForm();
-	});
-	
-	function submitFindProForm() {
+		
 		console.log("Submitting Find a Profile form");
-		if(validateFindProForm('find-pro-form')){
-			$('#find-pro-form').submit();
-		}
+		$('#find-pro-form').submit();
 		showOverlay();
-	}
+	});
 	
 	$('#header-search-icn').click(function(e) {
 		$('#pro-wrapper-top').slideToggle(200);
