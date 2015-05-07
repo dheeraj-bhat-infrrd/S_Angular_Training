@@ -77,4 +77,7 @@ public interface SurveyHandler {
 
 	public void sendSurveyInvitationMail(String custFirstName, String custLastName, String custEmail, String custRelationWithAgent, User user,
 			boolean isAgent) throws InvalidInputException, SolrException, NoRecordsFetchedException, UndeliveredEmailException;
+
+	public void sendSurveyRestartMail(String custFirstName, String custLastName, String custEmail, String custRelationWithAgent, User user, String link)
+			throws InvalidInputException, UndeliveredEmailException;
 }

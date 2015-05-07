@@ -1297,5 +1297,31 @@ public class EmailServicesImpl implements EmailServices {
 		emailSender.sendEmail(emailEntity, subject, mailBody);
 		LOG.info("Successfully sent survey invitation mail");
 	}
+	
+	@Async
+	@Override
+	public void sendDefaultSurveyRestartMail(String recipientMailId, String displayName, String agentName, String link, String agentEmailId,
+			String agentSignature) throws InvalidInputException, UndeliveredEmailException {
+		if (recipientMailId == null || recipientMailId.isEmpty()) {
+			LOG.error("Recipient email Id is empty or null for sending survey restart mail ");
+			throw new InvalidInputException("Recipient email Id is empty or null for sending survey restart mail ");
+		}
+		if (displayName == null || displayName.isEmpty()) {
+			LOG.error("displayName parameter is empty or null for sending survey restart mail ");
+			throw new InvalidInputException("displayName parameter is empty or null for sending survey restart mail ");
+		}
+
+		LOG.info("Sending survey restart email to : " + recipientMailId);
+		EmailEntity emailEntity = prepareEmailEntityForSendingEmail(recipientMailId, agentEmailId, agentName);
+		String subjectFileName = EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER + EmailTemplateConstants.SURVEY_RESTART_MAIL_SUBJECT;
+
+		FileContentReplacements messageBodyReplacements = new FileContentReplacements();
+		messageBodyReplacements.setFileName(EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER + EmailTemplateConstants.SURVEY_RESTART_MAIL_BODY);
+		messageBodyReplacements.setReplacementArgs(Arrays.asList(displayName, link, link, agentName, agentSignature));
+
+		LOG.debug("Calling email sender to send mail");
+		emailSender.sendEmailWithBodyReplacements(emailEntity, subjectFileName, messageBodyReplacements);
+		LOG.info("Successfully sent survey invitation mail");
+	}
 }
 // JIRA: SS-7: By RM02: EOC

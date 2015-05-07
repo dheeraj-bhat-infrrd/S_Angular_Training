@@ -867,6 +867,10 @@ public class ProfileManagementController {
 		contactDetailsSettings.setCity(city);
 		contactDetailsSettings.setCountryCode(countryCode);
 		contactDetailsSettings.setZipcode(zipcode);
+		
+		if (contactDetailsSettings.getContact_numbers() == null) {
+			contactDetailsSettings.setContact_numbers(new ContactNumberSettings());
+		}
 		contactDetailsSettings.getContact_numbers().setWork(contactNo);
 		LOG.debug("Method updateAddressDetail() finished from ProfileManagementController");
 		return contactDetailsSettings;

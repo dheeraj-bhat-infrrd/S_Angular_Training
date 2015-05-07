@@ -398,6 +398,8 @@ $('body').on('click', '.wc-skip-btn, .wc-sub-btn', function() {
 		callAjaxGET("./finalizeprofileimage.do", function(data) {
 			console.log(data);
 		}, false);
+		
+		$('#wc-address-submit').trigger('click');
 	}
 	
 	var parent = $(this).closest('.welcome-popup-wrapper');
