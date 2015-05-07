@@ -2641,11 +2641,12 @@ public class ProfileManagementController {
 			patternLast = request.getParameter("find-pro-last-name");
 			if (patternFirst == null && patternLast == null) {
 				LOG.error("Invalid search key passed in method findAProfile().");
-				throw new InvalidInputException("Invalid searchKey passed in method findAProfile().");
+				throw new InvalidInputException(messageUtils.getDisplayMessage(DisplayMessageConstants.INVALID_FIRSTORLAST_NAME_PATTERN,
+						DisplayMessageType.ERROR_MESSAGE).getMessage());
 			}
 
-			model.addAttribute("patternFirst", patternFirst);
-			model.addAttribute("patternLast", patternLast);
+			model.addAttribute("patternFirst", patternFirst.trim());
+			model.addAttribute("patternLast", patternLast.trim());
 		}
 		catch (NonFatalException nonFatalException) {
 			LOG.error("NonFatalException while searching in findAProfile(). Reason : " + nonFatalException.getMessage(), nonFatalException);
@@ -2672,7 +2673,8 @@ public class ProfileManagementController {
 			String patternLast = request.getParameter("find-pro-last-name");
 			if (patternFirst == null && patternLast == null) {
 				LOG.error("Invalid search key passed in method findAProfileScroll().");
-				throw new InvalidInputException("Invalid searchKey passed in method findAProfileScroll().");
+				throw new InvalidInputException(messageUtils.getDisplayMessage(DisplayMessageConstants.INVALID_FIRSTORLAST_NAME_PATTERN,
+						DisplayMessageType.ERROR_MESSAGE).getMessage());
 			}
 			if (!patternFirst.trim().matches(CommonConstants.FINDAPRO_FIRST_NAME_REGEX)
 					&& !patternFirst.trim().matches(CommonConstants.FINDAPRO_LAST_NAME_REGEX)) {
@@ -2698,7 +2700,8 @@ public class ProfileManagementController {
 			}
 			
 			try {
-				SolrDocumentList results = solrSearchService.searchUsersByFirstOrLastName(patternFirst, patternLast, startIndex, batchSize);
+				SolrDocumentList results = solrSearchService.searchUsersByFirstOrLastName(patternFirst.trim(), patternLast.trim(), startIndex,
+						batchSize);
 				for (SolrDocument solrDocument : results) {
 					userIds.add((Long)solrDocument.getFieldValue("userId"));
 				}
@@ -2709,7 +2712,7 @@ public class ProfileManagementController {
 			}
 			catch (MalformedURLException e) {
 				LOG.error("Error occured while searching in findAProfileScroll(). Reason is ", e);
-				throw new NonFatalException("Error occured while searching in findAProfileScroll(). Reason is ", e);
+				throw new NonFatalException("Error occured while searching in findAProfileScroll()", e);
 			}
 		}
 		catch (NonFatalException nonFatalException) {
