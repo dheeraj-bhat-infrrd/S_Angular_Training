@@ -193,7 +193,10 @@ $(document).ready(function() {
 			}
 			return false;
 		},
-		close: function(event, ui) {}
+		close: function(event, ui) {},
+		create: function(event, ui) {
+	        $('.ui-helper-hidden-accessible').remove();
+	    }
 	}).autocomplete("instance")._renderItem = function(ul, item) {
 		return $("<li>").append(item.label).appendTo(ul);
   	};
