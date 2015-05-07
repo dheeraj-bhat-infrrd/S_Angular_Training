@@ -668,9 +668,8 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao {
 				break;
 		}
 		Date startDate = getNdaysBackDate(numberOfPastDaysToConsider);
-		aggregation = new TypedAggregation<SurveyDetails>(SurveyDetails.class, Aggregation.match(Criteria.where(CommonConstants.MODIFIED_ON_COLUMN)
-				.lt(endDate)), Aggregation.match(Criteria.where(CommonConstants.SURVEY_CLICKED_COLUMN).is(true)), Aggregation.match(Criteria.where(
-				columnName).is(columnValue)), Aggregation.match(Criteria.where("surveyResponse").size(0)), Aggregation.match(Criteria.where(
+		aggregation = new TypedAggregation<SurveyDetails>(SurveyDetails.class, Aggregation.match(Criteria.where(CommonConstants.SURVEY_CLICKED_COLUMN).is(true)), Aggregation.match(Criteria.where(
+				columnName).is(columnValue)), Aggregation.match(Criteria.where(
 				CommonConstants.MODIFIED_ON_COLUMN).gte(startDate)), Aggregation.project(CommonConstants.MODIFIED_ON_COLUMN)
 				.andExpression(criteriaColumn + "(modifiedOn)").as("groupCol"), Aggregation.group("groupCol").count().as("count"));
 
@@ -680,7 +679,7 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao {
 
 			if (criteriaColumn.equals("dayOfMonth")) {
 				Date currDate = new Date();
-				int reductionInDate = 1;
+				int reductionInDate = 0;
 				for (int i = 0; i < 7; i++) {
 					currDate = getNdaysBackDate(reductionInDate++);
 					clickedSurveys.put(new SimpleDateFormat(CommonConstants.DATE_FORMAT).format(currDate).toString(), 0l);
@@ -698,7 +697,7 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao {
 			else if (criteriaColumn.equals("month")) {
 				int currMonth = Calendar.getInstance().get(Calendar.MONTH);
 				for (int i = 0; i < 12; i++) {
-					clickedSurveys.put(getMonthAsString((currMonth++) % 12).toString(), 0l);
+					clickedSurveys.put(getMonthAsString((++currMonth) % 12).toString(), 0l);
 				}
 			}
 			Calendar calendar = Calendar.getInstance();
@@ -772,7 +771,7 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao {
 
 			if (criteriaColumn.equals("dayOfMonth")) {
 				Date currDate = new Date();
-				int reductionInDate = 1;
+				int reductionInDate = 0;
 				for (int i = 0; i < 7; i++) {
 					currDate = getNdaysBackDate(reductionInDate++);
 					sentSurveys.put(new SimpleDateFormat(CommonConstants.DATE_FORMAT).format(currDate).toString(), 0l);
@@ -790,7 +789,7 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao {
 			else if (criteriaColumn.equals("month")) {
 				int currMonth = Calendar.getInstance().get(Calendar.MONTH);
 				for (int i = 0; i < 12; i++) {
-					sentSurveys.put(getMonthAsString((currMonth++) % 12).toString(), 0l);
+					sentSurveys.put(getMonthAsString((++currMonth) % 12).toString(), 0l);
 				}
 			}
 			Calendar calendar = Calendar.getInstance();
@@ -864,7 +863,7 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao {
 		if (result != null) {
 			if (criteriaColumn.equals("dayOfMonth")) {
 				Date currDate = new Date();
-				int reductionInDate = 1;
+				int reductionInDate = 0;
 				for (int i = 0; i < 7; i++) {
 					currDate = getNdaysBackDate(reductionInDate++);
 					completedSurveys.put(new SimpleDateFormat(CommonConstants.DATE_FORMAT).format(currDate).toString(), 0l);
@@ -882,7 +881,7 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao {
 			else if (criteriaColumn.equals("month")) {
 				int currMonth = Calendar.getInstance().get(Calendar.MONTH);
 				for (int i = 0; i < 12; i++) {
-					completedSurveys.put(getMonthAsString((currMonth++) % 12).toString(), 0l);
+					completedSurveys.put(getMonthAsString((++currMonth) % 12).toString(), 0l);
 				}
 			}
 			Calendar calendar = Calendar.getInstance();
@@ -957,7 +956,7 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao {
 		if (result != null) {
 			if (criteriaColumn.equals("dayOfMonth")) {
 				Date currDate = new Date();
-				int reductionInDate = 1;
+				int reductionInDate = 0;
 				for (int i = 0; i < 7; i++) {
 					socialPosts.put(new SimpleDateFormat(CommonConstants.DATE_FORMAT).format(currDate).toString(), 0l);
 					currDate = getNdaysBackDate(reductionInDate++);
@@ -975,7 +974,7 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao {
 			else if (criteriaColumn.equals("month")) {
 				int currMonth = Calendar.getInstance().get(Calendar.MONTH);
 				for (int i = 0; i < 12; i++) {
-					socialPosts.put(getMonthAsString((currMonth++) % 12).toString(), 0l);
+					socialPosts.put(getMonthAsString((++currMonth) % 12).toString(), 0l);
 				}
 			}
 			Calendar calendar = Calendar.getInstance();
@@ -1086,6 +1085,7 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao {
 		query.addCriteria(Criteria.where(CommonConstants.CUSTOMER_EMAIL_COLUMN).is(customerEmail));
 		Update update = new Update();
 		update.set(CommonConstants.EDITABLE_SURVEY_COLUMN, editable);
+		update.set(CommonConstants.STAGE_COLUMN, 0);
 		update.set(CommonConstants.MODIFIED_ON_COLUMN, new Date());
 		mongoTemplate.updateMulti(query, update, SURVEY_DETAILS_COLLECTION);
 		LOG.info("Method to update status of survey in SurveyDetails collection, changeStatusOfSurvey() finished.");
