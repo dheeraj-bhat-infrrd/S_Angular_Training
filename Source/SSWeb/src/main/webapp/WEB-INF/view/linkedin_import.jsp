@@ -50,20 +50,20 @@
 		<div class="wc-popup-body-hdr"><spring:message code="label.sharehappyreviews.key" /></div>
 		<div class="wc-popup-body-cont wc-step3-body-cont">
 			<div class="wc-social-icn-row clearfix">
-				<div class="wc-social-icn float-left i-fb" onclick="openAuthPage('facebook');"></div>
-				<div class="wc-icn-txt float-left">www.facebook.com/scott-harris</div>
+				<div class="wc-social-icn float-left i-fb" onclick="authenticate('facebook');"></div>
+				<div id="fb-profile-url" class="wc-icn-txt float-left">${facebookProfileUrl}</div>
 			</div>
 			<div class="wc-social-icn-row clearfix">
-				<div class="wc-social-icn float-left i-twt" onclick="openAuthPage('twitter');"></div>
-				<div class="wc-icn-txt float-left">www.twitter.com/scott-harris</div>
+				<div class="wc-social-icn float-left i-twt" onclick="authenticate('twitter');"></div>
+				<div id="twitter-profile-url" class="wc-icn-txt float-left">${twitterProfileUrl}</div>
 			</div>
 			<div class="wc-social-icn-row clearfix">
-				<div class="wc-social-icn float-left i-ln" onclick="openAuthPage('linkedin');"></div>
-				<div class="wc-icn-txt float-left">www.linkedin.com/scott-harris</div>
+				<div class="wc-social-icn float-left i-ln" onclick="authenticate('linkedin');"></div>
+				<div id="linkedin-profile-url" class="wc-icn-txt float-left">${linkedinProfileUrl}</div>
 			</div>
 			<div class="wc-social-icn-row clearfix">
-				<div class="wc-social-icn float-left i-gplus" onclick="openAuthPage('google');"></div>
-				<div class="wc-icn-txt float-left">www.googleplus.com/scott-harris</div>
+				<div class="wc-social-icn float-left i-gplus" onclick="authenticate('google');"></div>
+				<div id="ggl-profile-url" class="wc-icn-txt float-left">${googleProfileUrl}</div>
 			</div>
 			<!-- <div class="wc-social-icn-row clearfix">
 				<div class="wc-social-icn i-rss float-left"></div>
