@@ -622,6 +622,8 @@ public class ProfileManagementController {
 			String name = request.getParameter("profName");
 			String address1 = request.getParameter(CommonConstants.ADDRESS1);
 			String address2 = request.getParameter(CommonConstants.ADDRESS2);
+			String state = request.getParameter(CommonConstants.STATE);
+			String city = request.getParameter(CommonConstants.CITY);
 			String country = request.getParameter(CommonConstants.COUNTRY);
 			String zipcode = request.getParameter(CommonConstants.ZIPCODE);
 			if (name == null || name.isEmpty()) {
@@ -644,7 +646,8 @@ public class ProfileManagementController {
 					throw new InvalidInputException("No company settings found in current session");
 				}
 				contactDetailsSettings = companySettings.getContact_details();
-				contactDetailsSettings = updateAddressDetail(contactDetailsSettings, name, address1, address2, country, zipcode);
+				contactDetailsSettings = updateAddressDetail(contactDetailsSettings, name, address1, address2, country, 
+						state, city, zipcode);
 				contactDetailsSettings = profileManagementService.updateContactDetails(
 						MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION, companySettings, contactDetailsSettings);
 				companySettings.setContact_details(contactDetailsSettings);
@@ -657,7 +660,8 @@ public class ProfileManagementController {
 					throw new InvalidInputException("No Region settings found in current session");
 				}
 				contactDetailsSettings = regionSettings.getContact_details();
-				contactDetailsSettings = updateAddressDetail(contactDetailsSettings, name, address1, address2, country, zipcode);
+				contactDetailsSettings = updateAddressDetail(contactDetailsSettings, name, address1, address2, country, 
+						state, city, zipcode);
 				contactDetailsSettings = profileManagementService.updateContactDetails(
 						MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION, regionSettings, contactDetailsSettings);
 				regionSettings.setContact_details(contactDetailsSettings);
@@ -670,7 +674,8 @@ public class ProfileManagementController {
 					throw new InvalidInputException("No Branch settings found in current session");
 				}
 				contactDetailsSettings = branchSettings.getContact_details();
-				contactDetailsSettings = updateAddressDetail(contactDetailsSettings, name, address1, address2, country, zipcode);
+				contactDetailsSettings = updateAddressDetail(contactDetailsSettings, name, address1, address2, country, 
+						state, city, zipcode);
 				contactDetailsSettings = profileManagementService.updateContactDetails(
 						MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION, branchSettings, contactDetailsSettings);
 				branchSettings.setContact_details(contactDetailsSettings);
@@ -682,7 +687,8 @@ public class ProfileManagementController {
 					throw new InvalidInputException("No Agent settings found in current session");
 				}
 				contactDetailsSettings = agentSettings.getContact_details();
-				contactDetailsSettings = updateAddressDetail(contactDetailsSettings, name, address1, address2, country, zipcode);
+				contactDetailsSettings = updateAddressDetail(contactDetailsSettings, name, address1, address2, country, 
+						state, city, zipcode);
 				contactDetailsSettings = profileManagementService.updateAgentContactDetails(
 						MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION, agentSettings, contactDetailsSettings);
 				agentSettings.setContact_details(contactDetailsSettings);
@@ -720,13 +726,15 @@ public class ProfileManagementController {
 
 	// Update address details
 	private ContactDetailsSettings updateAddressDetail(ContactDetailsSettings contactDetailsSettings, String name, String address1, String address2,
-			String country, String zipcode) {
+			String country, String state, String city, String zipcode) {
 		LOG.debug("Method updateAddressDetail() called from ProfileManagementController");
 		contactDetailsSettings.setName(name);
 		contactDetailsSettings.setAddress(address1 + ", " + address2);
 		contactDetailsSettings.setAddress1(address1);
 		contactDetailsSettings.setAddress2(address2);
 		contactDetailsSettings.setCountry(country);
+		contactDetailsSettings.setState(state);
+		contactDetailsSettings.setCity(city);
 		contactDetailsSettings.setZipcode(zipcode);
 		LOG.debug("Method updateAddressDetail() finished from ProfileManagementController");
 		return contactDetailsSettings;
@@ -750,6 +758,8 @@ public class ProfileManagementController {
 			String address1 = request.getParameter("address1");
 			String address2 = request.getParameter("address2");
 			String country = request.getParameter("country");
+			String state = request.getParameter("state");
+			String city = request.getParameter("city");
 			String countryCode = request.getParameter("countrycode");
 			String zipcode = request.getParameter("zipcode");
 			String companyContactNo = request.getParameter("contactno");
@@ -781,7 +791,7 @@ public class ProfileManagementController {
 					throw new InvalidInputException("No company settings found in current session");
 				}
 				contactDetailsSettings = companySettings.getContact_details();
-				contactDetailsSettings = editCompanyInformation(contactDetailsSettings, address1, address2, country, countryCode, zipcode, companyContactNo);
+				contactDetailsSettings = editCompanyInformation(contactDetailsSettings, address1, address2, country, state, city, countryCode, zipcode, companyContactNo);
 				contactDetailsSettings = profileManagementService.updateContactDetails(
 						MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION, companySettings, contactDetailsSettings);
 				companySettings.setContact_details(contactDetailsSettings);
@@ -794,7 +804,7 @@ public class ProfileManagementController {
 					throw new InvalidInputException("No Region settings found in current session");
 				}
 				contactDetailsSettings = regionSettings.getContact_details();
-				contactDetailsSettings = editCompanyInformation(contactDetailsSettings, address1, address2, country, countryCode, zipcode, companyContactNo);
+				contactDetailsSettings = editCompanyInformation(contactDetailsSettings, address1, address2, country, state, city, countryCode, zipcode, companyContactNo);
 				contactDetailsSettings = profileManagementService.updateContactDetails(
 						MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION, regionSettings, contactDetailsSettings);
 				regionSettings.setContact_details(contactDetailsSettings);
@@ -807,7 +817,7 @@ public class ProfileManagementController {
 					throw new InvalidInputException("No Branch settings found in current session");
 				}
 				contactDetailsSettings = branchSettings.getContact_details();
-				contactDetailsSettings = editCompanyInformation(contactDetailsSettings, address1, address2, country, countryCode, zipcode, companyContactNo);
+				contactDetailsSettings = editCompanyInformation(contactDetailsSettings, address1, address2, country, state, city, countryCode, zipcode, companyContactNo);
 				contactDetailsSettings = profileManagementService.updateContactDetails(
 						MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION, branchSettings, contactDetailsSettings);
 				branchSettings.setContact_details(contactDetailsSettings);
@@ -819,7 +829,7 @@ public class ProfileManagementController {
 					throw new InvalidInputException("No Agent settings found in current session");
 				}
 				contactDetailsSettings = agentSettings.getContact_details();
-				contactDetailsSettings = editCompanyInformation(contactDetailsSettings, address1, address2, country, countryCode, zipcode, companyContactNo);
+				contactDetailsSettings = editCompanyInformation(contactDetailsSettings, address1, address2, country, state, city, countryCode, zipcode, companyContactNo);
 				contactDetailsSettings = profileManagementService.updateAgentContactDetails(
 						MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION, agentSettings, contactDetailsSettings);
 				agentSettings.setContact_details(contactDetailsSettings);
@@ -847,12 +857,14 @@ public class ProfileManagementController {
 	
 	// Update address details
 	private ContactDetailsSettings editCompanyInformation(ContactDetailsSettings contactDetailsSettings, String address1, String address2,
-			String country, String countryCode, String zipcode, String contactNo) {
+			String country, String state, String city, String countryCode, String zipcode, String contactNo) {
 		LOG.debug("Method updateAddressDetail() called from ProfileManagementController");
 		contactDetailsSettings.setAddress(address1 + ", " + address2);
 		contactDetailsSettings.setAddress1(address1);
 		contactDetailsSettings.setAddress2(address2);
 		contactDetailsSettings.setCountry(country);
+		contactDetailsSettings.setState(state);
+		contactDetailsSettings.setCity(city);
 		contactDetailsSettings.setCountryCode(countryCode);
 		contactDetailsSettings.setZipcode(zipcode);
 		contactDetailsSettings.getContact_numbers().setWork(contactNo);

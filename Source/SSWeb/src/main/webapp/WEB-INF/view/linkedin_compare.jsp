@@ -188,7 +188,7 @@ $(document).ready(function() {
 });
 
 // Profile image upload
-$(document).on('click', '#wc-photo-upload', function() {
+$(document).on('click', '#prof-image-upload-btn', function() {
 	$('#prof-image').trigger('click');
 });
 

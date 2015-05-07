@@ -77,6 +77,9 @@ a, a:hover, a:visited{
     margin: 0 auto;
 }
 
+.font-22{
+	font-size:22px;
+}
 
 .body-wrapper {
     overflow: hidden;
@@ -234,6 +237,7 @@ a, a:hover, a:visited{
     margin-bottom: 5px;
     font-weight: bold !important;
     font-family: opensans;
+    text-transform: uppercase;
 }
 
 .pic-bot-txt {
@@ -334,7 +338,7 @@ a, a:hover, a:visited{
 }
 
 .reg-txt-top1 {
-    font-size: 22px;
+    font-size: 18px;
     margin-top: -14px;
     font-weight: bold;
     letter-spacing: 1px;
@@ -435,9 +439,10 @@ input#find-pro-submit{
 }
 
 .footer-wrapper {
-    margin: 20px 0;
-    text-align: center;
-    font-size: 12px;
+	margin: 20px auto;
+	max-width: 470px;
+	text-align: center;
+	font-size: 12px;
 }
 
 .hdr-log-reg-btn {
@@ -1080,4 +1085,8 @@ span.wc-highlight {
 	margin-right:20px;
 	background: url(../images/LInkedin.png) no-repeat center;
 	background-color: transparent;
+}
+
+.footer-ul span{
+	padding: 0 2px;
 }

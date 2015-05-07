@@ -13,7 +13,7 @@
 		<div class="hm-header-row clearfix">
 			<div class="float-left hm-header-row-left"><spring:message code="label.title.settings.key" /></div>
 			<c:if test="${not empty profileList && fn:length(profileList) > 1}">
-				<div class="float-right header-right clearfix hr-dsh-adj-rt" style="z-index: 999; margin-left: 50px;">
+				<div class="float-right header-right clearfix hr-dsh-adj-rt" style="z-index: 99; margin-left: 50px;">
 					<div class="float-left hr-txt1"><spring:message code="label.viewas.key" /></div>
 					<div id="setting-sel" class="float-left hr-txt2 cursor-pointer">${profileName}</div>
 					<div id="se-dd-wrapper-profiles" class="va-dd-wrapper hide">
@@ -102,7 +102,7 @@
 			<div class="um-top-container">
 				<div class="um-header margin-top-25"><spring:message code="label.scorepost.key" /></div>
 				<div class="clearfix st-score-wrapper">
-					<div class="float-left st-score-txt">Lorem ipsum doret it emle Lorem ipsum doret it emle Lorem ipsum doret it emle Lorem ipsum doret it emle Lorem ipsum doret it emle Lorem ipsum doret it emle </div>
+					<div class="float-left st-score-txt"><spring:message code="label.scorepost.desc.key" /></div>
 					<form id="rating-settings-form">
 						<input type="hidden" name="ratingcategory" id="ratingcategory">
 						<div class="clearfix float-right st-score-rt">
@@ -167,7 +167,7 @@
 		<div class="${containerclass}">
 			<div class="um-header margin-top-25"><spring:message code="label.socialconnect.key" /></div>
 			<div class="clearfix st-score-wrapper">
-				<div class="float-left st-score-txt">Lorem ipsum doret it emle Lorem ipsum doret it emle Lorem ipsum doret it emle Lorem ipsum doret it emle Lorem ipsum doret it emle Lorem ipsum doret it emle </div>
+				<div class="float-left st-score-txt"><spring:message code="label.socialconnect.desc.key" /></div>
 				<input type="hidden" name="ratingcategory" id="ratingcategory">
 				<div class="clearfix float-right st-score-rt">
 					<div class="soc-nw-wrapper clearfix">
@@ -282,7 +282,7 @@
 								</div>
 								<div class="float-left st-check-txt-OR"><spring:message code="label.disable.account.key" /></div>
 							</div>
-							<div class="st-settings-text">Lorem ipsum dore it ler sun soay Lorem ipsum dore it ler sun soay Lorem ipsum dore it ler sun soay Lorem ipsum dore it ler sun soay Lorem ipsum dore it ler sun soay Lorem ipsum dore it ler sun soay Lorem ipsum dore it ler sun soay </div>
+							<div class="st-settings-text"><spring:message code="label.disable.account.des.key" /><span class="accounts-email"><spring:message code="label.account.email.key" /></span></div>
 						</div>
 						<div class="col-lg-4 col-md-4 col-sm-4 col-xs-12">
 							<div class="clearfix st-settings-item-wrapper">
@@ -292,7 +292,7 @@
 								</div>
 								<div class="float-left st-check-txt-OR" id="st-chg-payment-info"><spring:message code="label.change.payment.key" /></div>
 							</div>
-							<div class="st-settings-text">Lorem ipsum dore it ler sun soay Lorem ipsum dore it ler sun soay Lorem ipsum dore it ler sun soay Lorem ipsum dore it ler sun soay Lorem ipsum dore it ler sun soay Lorem ipsum dore it ler sun soay Lorem ipsum dore it ler sun soay </div>
+							<div class="st-settings-text"><spring:message code="label.change.payment.desc.key" /></div>
 						</div>
 					</div>
 				</form>
