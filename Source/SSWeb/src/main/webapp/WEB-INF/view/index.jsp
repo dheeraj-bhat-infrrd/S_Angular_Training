@@ -194,10 +194,10 @@ $(document).ready(function(){
 	$(window).resize(resizeFunc);
 	
 	function resizeFunc(){
-		var winW = $(window).width();
+		var winW = window.innerWidth;
 		if (winW < 768) {
-			var offset = winW - 114 - 20;
-			$('.reg-cap-txt').css('max-width',offset+'px');
+			var offset = winW - 114 - 50;
+			$('.reg-cap-txt').css('width',offset+'px');
 			if ($('#pro-wrapper-top').html() == "") {
 				$('#pro-wrapper-top').html($('#pro-wrapper').html());
 				$('#pro-wrapper').html('');
@@ -221,18 +221,17 @@ $(document).ready(function(){
   	}
 	
   	// Login form
+  	
+  	$('#login-form input').on('keyup',function(e){
+		  if(e.which == 13){
+			  $('#login-submit').trigger('click');
+		  }
+  	});
+  	
 	$('#login-submit').click(function(){
 		loginUser();
 	});
    
-	/* $('#login-form input').keypress(function(e){
-		// detect enter
-		if (e.which==13){
-			e.preventDefault();
-			loginUser();
-		}
-	});*/
-	
 	$('#login-user-id').blur(function() {
 		validateUserId(this.id);
 	});
@@ -258,13 +257,12 @@ $(document).ready(function(){
 		submitRegistrationForm();
 	});
 
-	/*$('#registration-form input').keypress(function(e){
+	$('#registration-form input').keyup(function(e){
 		// detect enter
 		if (e.which==13){
-			e.preventDefault();
-			submitRegistrationForm();
+			$('#reg-submit').trigger('click');
 		}
-	}); */
+	});
 	
 	$('#reg-fname').blur(function() {
 		if (validateRegFirstName(this.id)) {
@@ -336,14 +334,26 @@ $(document).ready(function(){
 	});
 	
 	// Find a pro
+	
 	$('#find-pro-submit').click(function(e) {
 		e.preventDefault();
-		
-		console.log("Submitting Find a Profile form");
-		$('#find-pro-form').submit();
-		showOverlay();
+		submitFindProForm();
 	});
+
+	function submitFindProForm() {
+		console.log("Submitting Find a Profile form");
+		if(validateFindProForm('find-pro-form')){
+			$('#find-pro-form').submit();
+		}
+		showOverlay();
+	}
+
 	
+	$('#find-pro-form input').on('keyup',function(e){
+		if(e.which == 13){
+			$('#find-pro-submit').trigger('click');
+		}
+	});
 	$('#header-search-icn').click(function(e) {
 		$('#pro-wrapper-top').slideToggle(200);
 	});

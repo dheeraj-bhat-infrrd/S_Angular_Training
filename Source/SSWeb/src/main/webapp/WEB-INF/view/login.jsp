@@ -46,16 +46,20 @@
 					<div class="float-left rfr_lbl rfr_lbl_width-98"><spring:message code="label.username.key"/></div>
 					<div class="float-left rfr_txt">
 						<div class="rfr_icn icn-fname"></div>
-						<input class="rfr_txt_fld" id="login-user-id" data-non-empty="true"
+						<div class="rfr_txt_fld">
+						<input class="rfr_input_fld" id="login-user-id" data-non-empty="true"
 							name="j_username" data-email="true" placeholder='<spring:message code="label.username.key"/>'>
+						</div>
 					</div>
 				</div>
 				<div class="reg_form_row clearfix">
 					<div class="float-left rfr_lbl rfr_lbl_width-98"><spring:message code="label.password.key" /></div>
 					<div class="float-left rfr_txt">
 						<div class="rfr_icn icn-password"></div>
-						<input type="password" class="rfr_txt_fld" id="login-pwd" data-non-empty="true"
+						<div class="rfr_txt_fld">
+						<input type="password" class="rfr_input_fld" id="login-pwd" data-non-empty="true"
 							name="j_password" placeholder='<spring:message code="label.password.key"/>'>
+						</div>
 					</div>
 				</div>
 				<div class="btn-forgot-passwd-link">
