@@ -38,6 +38,25 @@ $(document).on('click', '.hr-dd-item', function(e) {
 	e.stopPropagation();
 });
 
+$(document).on('click', '#restart-survey-mail', function(e) {
+	
+	var firstName = $(this).parent().parent().parent().attr('data-firstname');
+	var lastName = $(this).parent().parent().parent().attr('data-lastname');
+	var agentName = $(this).parent().parent().parent().attr('data-agentname');
+	var customerEmail = $(this).parent().parent().parent().attr('data-customeremail');
+	var agentId = $(this).parent().parent().parent().attr('data-agentid');
+	var payload = {
+			"customerEmail" : customerEmail,
+			"agentId" : agentId,
+			"firstName" : firstName,
+			"lastName" : lastName,
+			"agentName" : agentName
+	};
+	callAjaxGetWithPayloadData('./restartsurvey.do', '', payload, true);
+	$('#overlay-toast').html('Mail sent to '+firstName +' '+' to retake the survey for you.');
+	showToast();
+});
+
 $('body').click(function() {
 	$('#hr-dd-wrapper').slideUp(200);
 });
@@ -610,11 +629,12 @@ function sendSurveyReminderMail(agentId, agentName, customerEmail, customerName)
 		complete : function(data) {
 			if (success) {
 				$('#overlay-toast').html("Reminder Mail sent successfully to " + customerName);
+				showToast();
 			}
 		},
 		error : function(e) {
 			console.error("error : " + e.responseText);
-			$('#overlay-toast').html(e.responseText);
+			$('#overlay-toast').html('Something went wrong while sending mail. Please try again after sometime.');
 			showToast();
 		}
 	});
