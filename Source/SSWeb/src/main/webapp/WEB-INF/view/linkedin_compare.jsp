@@ -96,10 +96,12 @@
 					<form id="wc-summary-form">
 						<div class="wc-prof-details-row clearfix">
 							<div class="wc-prof-input-cont float-left">
-								<input id="wc-industry" class="wc-form-input" value="${linkedInData.industry}">
+								<input id="wc-industry" class="wc-form-input" value="${linkedInData.industry}"
+									placeholder='<spring:message code="label.industry.key"/>'>
 							</div>
 							<div class="wc-prof-input-cont float-left">
-								<input id="wc-location" class="wc-form-input" value="${linkedInData.location.name}">
+								<input id="wc-location" class="wc-form-input" value="${linkedInData.location.name}"
+									placeholder='<spring:message code="label.location.key"/>'>
 							</div>
 							<div class="wc-linkedin-photo-txt float-right">
 								<spring:message code="label.data.from.key" />
@@ -107,7 +109,8 @@
 							</div>
 						</div>
 						<div class="wc-prof-details-row clearfix">
-							<textarea id="wc-summary" class="wc-about-prof-txt">${linkedInData.summary}</textarea>
+							<textarea id="wc-summary" class="wc-about-prof-txt"
+								placeholder='<spring:message code="label.aboutcompany.empty.key"/>'>${linkedInData.summary}</textarea>
 						</div>
 						<div class="wc-prof-details-row clearfix">
 							<div id="wc-summary-submit" class="wc-submit-btn float-right"><spring:message code="label.update.key" /></div>
