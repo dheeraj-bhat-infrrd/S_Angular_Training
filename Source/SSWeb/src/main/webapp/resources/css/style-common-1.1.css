@@ -1,21 +1,25 @@
 @font-face{
     font-family:'OpenSans';
-    src:url('../fonts/OpenSans-Regular.ttf') format('truetype');
+    src: url('../fonts/OpenSans-Regular-webfont.eot')
+		format('embedded-opentype'),url('../fonts/OpenSans-Regular.ttf') format('truetype');
 }
 
 @font-face{
     font-family:'OpenSansLight';
-    src:url('../fonts/OpenSans-Light.ttf') format('truetype');
+    src:url('../fonts/OpenSans-Light-webfont.eot')
+		format('embedded-opentype'),url('../fonts/OpenSans-Light.ttf') format('truetype');
 }
 
 @font-face{
     font-family:'OpenSansSemiBold';
-    src:url('../fonts/OpenSans-Semibold.ttf') format('truetype');
+    src:url('../fonts/OpenSans-Semibold-webfont.eot')
+		format('embedded-opentype'),url('../fonts/OpenSans-Semibold.ttf') format('truetype');
 }
 
 @font-face{
     font-family:'OpenSansBold';
-    src:url('../fonts/OpenSans-Bold.ttf') format('truetype');
+    src:url('../fonts/OpenSans-Bold-webfont.eot')
+		format('embedded-opentype'),url('../fonts/OpenSans-Bold.ttf') format('truetype');
 }
 
 *{

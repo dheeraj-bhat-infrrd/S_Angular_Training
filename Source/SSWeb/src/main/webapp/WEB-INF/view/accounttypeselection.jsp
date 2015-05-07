@@ -75,7 +75,7 @@
 			<c:choose>
 				<%-- Payment options for upgrade --%>
 				<c:when test="${upgrade == 1}">
-					<div class="acc-type-item text-center" data-status="disabled">
+					<%-- <div class="acc-type-item text-center" data-status="disabled">
 						<div class="act-header" id="account-type-1"><spring:message code="label.accounttype.individual.key"/></div>
 						<div class="act-price">
 							$35<sup>99</sup><span><spring:message code="label.permonth.key"/></span>
@@ -83,8 +83,8 @@
 						<div class="act-txt-1"><strong>1</strong> <spring:message code="label.accounttype.useraccounts.key"/></div>
 						<div class="act-txt-2">Lor em ip sum do ie aje lanjds Lor em ip sum do ie aje lanjds Lor em ip sum do ie aje lanjds Lor em ip sum do ie aje lanjds</div>
 						<div class="act-txt-3"><spring:message code="label.accounttype.select.key"/></div>
-					</div>
-					<c:choose>
+					</div> --%>
+					<%-- <c:choose>
 						<c:when test="${currentplan < 2}"><div class="acc-type-item text-center" onclick="confirmUpgradation(2)"></c:when>
 						<c:otherwise><div class="acc-type-item text-center" data-status="disabled"></c:otherwise>
 					</c:choose>
@@ -108,7 +108,7 @@
 						<div class="act-txt-1"><strong>60</strong> <spring:message code="label.accounttype.useraccounts.key"/></div>
 						<div class="act-txt-2">Lor em ip sum do ie aje lanjds Lor em ip sum do ie aje lanjds Lor em ip sum do ie aje lanjds Lor em ip sum do ie aje lanjds</div>
 						<div class="act-txt-3"><spring:message code="label.accounttype.select.key"/></div>
-					</div>
+					</div> --%>
 					
 					<c:choose>
 						<c:when test="${currentplan < 4}"><div class="acc-type-item text-center" onclick="confirmUpgradation(4)"></c:when>
@@ -127,22 +127,37 @@
 				<%-- Payment options for new user --%>
 				<c:otherwise>
 					<c:if test="${ empty paidUpgrade }">
-                     <div class="acc-type-item text-center" onclick="javascript:selectAccountType(5, 'Free', ${skippayment})">
-						<div class="act-header" id="account-type-0"><spring:message code="label.accounttype.freeaccount.key"/></div>
-						<div class="act-price">
-							<spring:message code="label.free.key"/>
-						</div>
-						<div class="act-txt-1"><strong>1</strong> <spring:message code="label.accounttype.useraccounts.key"/></div>
-						<div class="act-txt-2">Lor em ip sum do ie aje lanjds Lor em ip sum do ie aje lanjds Lor em ip sum do ie aje lanjds Lor em ip sum do ie aje lanjds</div>
-						<div class="act-txt-3"><spring:message code="label.accounttype.select.key"/></div>
-					</div>
-	                </c:if>
-	                <c:choose>
-							<c:when test="${ paidUpgrade == 1 }">
-								<div class="acc-type-item text-center" onclick="javascript:makePaidUpgrade(1,'$35')"></c:when>
-							<c:otherwise><div class="acc-type-item text-center" onclick="javascript:selectAccountType(1, '$35', ${skippayment})"></c:otherwise>
+						<%-- <div class="acc-type-item text-center"
+							onclick="javascript:selectAccountType(5, 'Free', ${skippayment})">
+							<div class="act-header" id="account-type-0">
+								<spring:message code="label.accounttype.freeaccount.key" />
+							</div>
+							<div class="act-price">
+								<spring:message code="label.free.key" />
+							</div>
+							<div class="act-txt-1">
+								<strong>1</strong>
+								<spring:message code="label.accounttype.useraccounts.key" />
+							</div>
+							<div class="act-txt-2">Lor em ip sum do ie aje lanjds Lor em ip
+								sum do ie aje lanjds Lor em ip sum do ie aje lanjds Lor em ip sum do
+								ie aje lanjds</div>
+							<div class="act-txt-3">
+								<spring:message code="label.accounttype.select.key" />
+							</div>
+						</div> --%>
+					</c:if>
+					<c:choose>
+						<c:when test="${ paidUpgrade == 1 }">
+							<div class="acc-type-item text-center"
+								onclick="javascript:makePaidUpgrade(1,'$35')">
+						</c:when>
+						<c:otherwise>
+							<div class="acc-type-item text-center"
+								onclick="javascript:selectAccountType(1, '$35', ${skippayment})">
+						</c:otherwise>
 					</c:choose>
-						<div class="act-header" id="account-type-1"><spring:message code="label.accounttype.individual.key"/></div>
+					<div class="act-header" id="account-type-1"><spring:message code="label.accounttype.individual.key"/></div>
 						<div class="act-price">
 							$35<sup>99</sup><span><spring:message code="label.permonth.key"/></span>
 						</div>
@@ -150,7 +165,7 @@
 						<div class="act-txt-2">Lor em ip sum do ie aje lanjds Lor em ip sum do ie aje lanjds Lor em ip sum do ie aje lanjds Lor em ip sum do ie aje lanjds</div>
 						<div class="act-txt-3"><spring:message code="label.accounttype.select.key"/></div>
 					</div>
-					<c:choose>
+					<%-- <c:choose>
 							<c:when test="${ paidUpgrade == 1 }"><div class="acc-type-item text-center" onclick="javascript:makePaidUpgrade(2,'$45')"></c:when>
 							<c:otherwise><div class="acc-type-item text-center" onclick="javascript:selectAccountType(2, '$45', ${skippayment})"></c:otherwise>
 					</c:choose>
@@ -173,7 +188,7 @@
 						<div class="act-txt-1"><strong>60</strong> <spring:message code="label.accounttype.useraccounts.key"/></div>
 						<div class="act-txt-2">Lor em ip sum do ie aje lanjds Lor em ip sum do ie aje lanjds Lor em ip sum do ie aje lanjds Lor em ip sum do ie aje lanjds</div>
 						<div class="act-txt-3"><spring:message code="label.accounttype.select.key"/></div>
-					</div>
+					</div> --%>
 					<c:choose>
 							<c:when test="${ paidUpgrade == 1 }"><div class="acc-type-item text-center" onclick="javascript:makePaidUpgrade(4, '$99')"></c:when>
 							<c:otherwise><div class="acc-type-item text-center" onclick="javascript:selectAccountType(4, '$99', ${skippayment})"></c:otherwise>

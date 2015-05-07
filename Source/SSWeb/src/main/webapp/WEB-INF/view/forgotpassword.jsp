@@ -45,8 +45,10 @@
 						<div class="float-left rfr_lbl rfr_lbl_width-98"><spring:message code="label.emailid.key"/></div>
 						<div class="float-left rfr_txt">
 							<div class="rfr_icn icn-mail"></div>
-							<input class="rfr_txt_fld" id="login-user-id" data-non-empty="true" data-email=""
-								name="emailId" placeholder='<spring:message code="label.emailid.key"/>'>
+							<div class="rfr_txt_fld">
+								<input class="rfr_input_fld" id="login-user-id" data-non-empty="true" data-email=""
+									name="emailId" placeholder='<spring:message code="label.emailid.key"/>'>
+							</div>
 						</div>
 					</div>
 					

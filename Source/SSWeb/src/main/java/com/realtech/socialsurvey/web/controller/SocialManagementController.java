@@ -1104,36 +1104,36 @@ public class SocialManagementController {
 		String socialNetwork = request.getParameter("socialNetwork");
 		HttpSession session = request.getSession(false);
 		UserSettings usersettings = (UserSettings) session.getAttribute(CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION);
-		String profileUrl = "";
-		if(socialNetwork.equalsIgnoreCase("facebook")){
-			if(usersettings!=null && usersettings.getAgentSettings()!=null && usersettings.getAgentSettings().getSocialMediaTokens()!=null 
-					&& usersettings.getAgentSettings().getSocialMediaTokens().getFacebookToken()!=null
-					&& usersettings.getAgentSettings().getSocialMediaTokens().getFacebookToken().getFacebookPageLink()!=null){
-					profileUrl = usersettings.getAgentSettings().getSocialMediaTokens().getFacebookToken().getFacebookPageLink();
-				}
-		}
-		else if(socialNetwork.equalsIgnoreCase("twitter")){
-			if(usersettings!=null && usersettings.getAgentSettings()!=null && usersettings.getAgentSettings().getSocialMediaTokens()!=null
-					&& usersettings.getAgentSettings().getSocialMediaTokens().getTwitterToken().getTwitterPageLink()!=null){
-					profileUrl = usersettings.getAgentSettings().getSocialMediaTokens().getTwitterToken().getTwitterPageLink();
-			}
-		}
-		else if(socialNetwork.equals("linkedin")){
-			if(usersettings!=null && usersettings.getAgentSettings()!=null && usersettings.getAgentSettings().getSocialMediaTokens()!=null
-					&& usersettings.getAgentSettings().getSocialMediaTokens().getLinkedInToken()!=null
-					&& usersettings.getAgentSettings().getSocialMediaTokens().getLinkedInToken().getLinkedInPageLink()!=null){
-					profileUrl = usersettings.getAgentSettings().getSocialMediaTokens().getLinkedInToken().getLinkedInPageLink();
-			}
-		}
-		else if(socialNetwork.equalsIgnoreCase("google")){
-			if(usersettings!=null && usersettings.getAgentSettings()!=null && usersettings.getAgentSettings().getSocialMediaTokens()!=null
-					&& usersettings.getAgentSettings().getSocialMediaTokens().getGoogleToken()!=null
-					&& usersettings.getAgentSettings().getSocialMediaTokens().getGoogleToken().getProfileLink()!=null){
-					profileUrl = usersettings.getAgentSettings().getSocialMediaTokens().getGoogleToken().getProfileLink();
-			}
-		}
 		
+		String profileUrl = "";
+		if (socialNetwork.equalsIgnoreCase("facebook")) {
+			if (usersettings != null && usersettings.getAgentSettings() != null && usersettings.getAgentSettings().getSocialMediaTokens() != null
+					&& usersettings.getAgentSettings().getSocialMediaTokens().getFacebookToken() != null
+					&& usersettings.getAgentSettings().getSocialMediaTokens().getFacebookToken().getFacebookPageLink() != null) {
+				profileUrl = usersettings.getAgentSettings().getSocialMediaTokens().getFacebookToken().getFacebookPageLink();
+			}
+		}
+		else if (socialNetwork.equalsIgnoreCase("twitter")) {
+			if (usersettings != null && usersettings.getAgentSettings() != null && usersettings.getAgentSettings().getSocialMediaTokens() != null
+					&& usersettings.getAgentSettings().getSocialMediaTokens().getTwitterToken().getTwitterPageLink() != null) {
+				profileUrl = usersettings.getAgentSettings().getSocialMediaTokens().getTwitterToken().getTwitterPageLink();
+			}
+		}
+		else if (socialNetwork.equals("linkedin")) {
+			if (usersettings != null && usersettings.getAgentSettings() != null && usersettings.getAgentSettings().getSocialMediaTokens() != null
+					&& usersettings.getAgentSettings().getSocialMediaTokens().getLinkedInToken() != null
+					&& usersettings.getAgentSettings().getSocialMediaTokens().getLinkedInToken().getLinkedInPageLink() != null) {
+				profileUrl = usersettings.getAgentSettings().getSocialMediaTokens().getLinkedInToken().getLinkedInPageLink();
+			}
+		}
+		else if (socialNetwork.equalsIgnoreCase("google")) {
+			if (usersettings != null && usersettings.getAgentSettings() != null && usersettings.getAgentSettings().getSocialMediaTokens() != null
+					&& usersettings.getAgentSettings().getSocialMediaTokens().getGoogleToken() != null
+					&& usersettings.getAgentSettings().getSocialMediaTokens().getGoogleToken().getProfileLink() != null) {
+				profileUrl = usersettings.getAgentSettings().getSocialMediaTokens().getGoogleToken().getProfileLink();
+			}
+		}
+
 		return profileUrl;
 	}
-	
 }
