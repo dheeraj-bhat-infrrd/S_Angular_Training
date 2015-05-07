@@ -77,7 +77,6 @@ function paintDashboard(profileMasterId, newProfileName, newProfileValue, typeoO
 	batchSizeInc = 6;
 	totalReviewsInc = 0;
 	surveyFetchedSoFarInc = 0;
-	showDisplayPic();
 
 	var oldConW = $('.container').width();
 	var newConW = $('.container').width();
@@ -108,6 +107,8 @@ function paintDashboard(profileMasterId, newProfileName, newProfileValue, typeoO
 		window.location.href = "./downloaddashboardcompletesurvey.do?columnName="
 				+ colName + "&columnValue=" + colValue;
 	});
+	
+	showDisplayPic();
 }
 
 function showCompanyAdminFlow(newProfileName, newProfileValue) {
@@ -660,20 +661,18 @@ function sendSurveyReminderMail(agentId, agentName, customerEmail, customerName)
 }*/
 
 function showDisplayPic() {
-	var success = false;
 	$.ajax({
 		url : "./getdisplaypiclocation.do",
 		type : "GET",
 		dataType : "JSON",
 		success : function(data) {
-			if (data.errCode == undefined)
-				success = true;
+			
 		},
 		complete : function(data) {
-			if (success) {
+			if (data.errCode == undefined){
 				console.log("Image location : " + data.responseJSON);
 				var imageUrl = data.responseJSON;
-				if (imageUrl != '' || imageUrl != undefined) {
+				if (imageUrl != '' && imageUrl != undefined && imageUrl != "undefined") {
 					$("#dsh-prsn-img").css("background", "url(" + imageUrl + ") no-repeat center");
 					$("#dsh-prsn-img").css("background-size", "cover");
 				}
@@ -681,6 +680,7 @@ function showDisplayPic() {
 			}
 		},
 		error : function() {
+			console.log("Logged in id as : "+colName);
 			$("#dsh-prsn-img").removeClass('person-img');
 			if (colName == 'agentId') {
 				$("#dsh-prsn-img").addClass('dsh-pers-default-img');
