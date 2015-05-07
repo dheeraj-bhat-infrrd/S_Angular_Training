@@ -1,16 +1,19 @@
 @font-face {
 	font-family: 'OpenSansLight';
-	src: url('../fonts/OpenSans-Light.ttf') format('truetype');
+	src:url('../fonts/OpenSans-Light-webfont.eot')
+		format('embedded-opentype'),url('../fonts/OpenSans-Light.ttf') format('truetype');
 }
 
 @font-face {
 	font-family: 'OpenSansBold';
-	src: url('../fonts/OpenSans-Bold.ttf') format('truetype');
+	src:url('../fonts/OpenSans-Bold-webfont.eot')
+		format('embedded-opentype'),url('../fonts/OpenSans-Bold.ttf') format('truetype');
 }
 
 @font-face {
 	font-family: 'OpenSans';
-	src: url('../fonts/OpenSans-Regular.ttf') format('truetype');
+	src: url('../fonts/OpenSans-Regular-webfont.eot')
+		format('embedded-opentype'),url('../fonts/OpenSans-Regular.ttf') format('truetype');
 }
 
 * {
@@ -805,6 +808,7 @@ html.is-modern.card-root.js.no-touch.csstransitions.svg.inlinesvg.placeholder
 .icn-menu {
 	background: url(../images/menu-icn.png) no-repeat center;
 	background-size: 20px;
+	cursor: pointer;
 }
 
 .dd-icn {
@@ -4162,6 +4166,17 @@ button.paypal.is-active {
 	font-size: 12px;
 }
 
+select.rfr_txt_fld,select.rfr_input_fld{
+	padding-right: 0;
+}
+
+.rfr_input_fld {
+  height: 100%;
+  width: 100%;
+  background: transparent;
+  border: none;
+}
+
 .rfr_txt {
 	position: relative;
 }
@@ -4169,8 +4184,8 @@ button.paypal.is-active {
 .rfr_icn {
 	display: none;
 	position: absolute;
-	height: 50px;
-	width: 50px;
+	height: 60px;
+	width: 60px;
 }
 
 .reg_btn {
@@ -6280,3 +6295,7 @@ tr.u-tbl-header td {
   width: 200px;
   margin: 0 auto 50px auto;
  }
+ 
+ span.ui-helper-hidden-accessible {
+  display: none;
+}
