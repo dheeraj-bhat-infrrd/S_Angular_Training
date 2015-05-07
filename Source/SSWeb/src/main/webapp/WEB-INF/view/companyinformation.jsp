@@ -46,16 +46,18 @@
 						<div class="float-left rfr_lbl"><spring:message code="label.company.key"/></div>
 						<div class="float-left rfr_txt">
 							<div class="rfr_icn icn-company"></div>
-							<input class="rfr_txt_fld" id="com-company" data-non-empty="true"
+							<div class="rfr_txt_fld">
+								<input class="rfr_input_fld" id="com-company" data-non-empty="true"
 								name="company" value="${companyName}" placeholder='<spring:message code="label.company.key"/>'>
+							</div>
 						</div>
 					</div>
 					<div class="reg_form_row clearfix">
 						<div class="float-left rfr_lbl"><spring:message code="label.logo.key"/></div>
 						<div class="float-left rfr_txt">
 							<div class="icn-lname input-file-icn-left" id="input-file-icn-left"></div>
-							<input type="text" class="rfr_txt_fld" id="com-logo-decoy" placeholder='<spring:message code="label.logo.placeholder.key"/>'>
-							<input type="file" class="rfr_txt_fld com-logo-comp-info" id="com-logo" name="logo">
+							<div class="rfr_txt_fld"><input type="text" class="rfr_input_fld" id="com-logo-decoy" placeholder='<spring:message code="label.logo.placeholder.key"/>'></div>
+							<div><input type="file" class="rfr_input_fld com-logo-comp-info" id="com-logo" name="logo"></div>
 							<div class="float-right input-icon-internal icn-file file-pick-logo file-pick-logo-adj" id="icn-file"></div>
 						</div>
 					</div>
@@ -63,34 +65,61 @@
 						<div class="float-left rfr_lbl"><spring:message code="label.address.key" /></div>
 						<div class="float-left rfr_txt">
 							<div class="rfr_icn icn-fname"></div>
-							<input class="rfr_txt_fld" id="com-address1" data-non-empty="true"
+							<div class="rfr_txt_fld"><input class="rfr_input_fld" id="com-address1" data-non-empty="true"
 								name="address1" value="${address1}" placeholder='<spring:message code="label.address1.key"/>'>
+							</div>
 						</div>
 						<div class="float-left rfr_txt">
 							<div class="rfr_icn icn-lname"></div>
-							<input class="rfr_txt_fld" id="com-address2"
-								name="address2" value="${address2}" placeholder='<spring:message code="label.address2.key"/>'>
+							<div class="rfr_txt_fld">
+								<input class="rfr_input_fld" id="com-address2" name="address2"
+									value="${address2}"
+									placeholder='<spring:message code="label.address2.key"/>'>
+							</div>
 						</div>
 					</div>
 					<div class="reg_form_row clearfix">
 						<div class="float-left rfr_lbl" style="visibility:hidden;"><spring:message code="label.address.key" /></div>
 						<div class="float-left rfr_txt">
 							<div class="rfr_icn icn-fname"></div>
-							<input class="rfr_txt_fld" id="com-country" data-non-empty="true"
+							<div class="rfr_txt_fld">
+							<input class="rfr_input_fld" id="com-country" data-non-empty="true"
 								name="country" value="${country}" placeholder='<spring:message code="label.country.key"/>'>
+							</div>
 						</div>
 						<div class="float-left rfr_txt">
 							<div class="rfr_icn icn-lname"></div>
-							<input class="rfr_txt_fld" id="com-zipcode" data-non-empty="true" data-zipcode="true"
+							<div class="rfr_txt_fld">
+							<input class="rfr_input_fld" id="com-zipcode" data-non-empty="true" data-zipcode="true"
 								name="zipcode" value="${zipCode}" placeholder='<spring:message code="label.zipcode.key"/>'>
+							</div>
+						</div>
+					</div>
+					<div id="state-city-row" class="reg_form_row clearfix hide">
+						<div class="float-left rfr_lbl" style="visibility:hidden;"><spring:message code="label.address.key" /></div>
+						<div class="float-left rfr_txt">
+							<div class="rfr_icn icn-fname"></div>
+							<div class="rfr_txt_fld">
+							<input class="rfr_input_fld" id="com-state" data-non-empty="true"
+								name="state" value="${state}" placeholder='<spring:message code="label.state.key"/>'>
+								</div>
+						</div>
+						<div class="float-left rfr_txt">
+							<div class="rfr_icn icn-lname"></div>
+							<div class="rfr_txt_fld">
+							<input class="rfr_input_fld" id="com-city" data-non-empty="true"
+								name="city" value="${city}" placeholder='<spring:message code="label.city.key"/>'>
+								</div>
 						</div>
 					</div>
 					<div class="reg_form_row clearfix">
 						<div class="float-left rfr_lbl"><spring:message code="label.phoneno.key" /></div>
 						<div class="float-left rfr_txt">
 							<div class="rfr_icn icn-mbl"></div>
-							<input class="rfr_txt_fld" id="com-contactno" data-non-empty="true" data-phone="true"
+							<div class="rfr_txt_fld">
+							<input class="rfr_input_fld" id="com-contactno" data-non-empty="true" data-phone="true"
 								name="contactno" value="${companyContactNo}" placeholder="<spring:message code="label.phoneno.key" />">
+								</div>
 						</div>
 					</div>
 					<div class="reg_form_row clearfix">
@@ -134,6 +163,7 @@
 <script>
 var isCompanyInfoPageValid;
 var selectedCountryRegEx = "";
+var stateList;
 $(document).ready(function() {
 	isCompanyInfoPageValid = false;
 
@@ -191,12 +221,19 @@ $(document).ready(function() {
 					break;
 				}
 			}
+			/* if(ui.item.code=="US"){
+				$('#state-city-row').show();
+				callAjaxGET("", function(data){
+					
+				}, true);
+			}else{
+				$('#state-city-row').hide();
+			} */
 			return false;
 		},
 		close: function(event, ui) {},
 		create: function(event, ui) {
 	        $('.ui-helper-hidden-accessible').remove();
-	    }
 	}).autocomplete("instance")._renderItem = function(ul, item) {
 		return $("<li>").append(item.label).appendTo(ul);
   	};
