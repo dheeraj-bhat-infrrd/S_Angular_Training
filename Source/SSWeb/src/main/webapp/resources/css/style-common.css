@@ -6296,6 +6296,10 @@ tr.u-tbl-header td {
   margin: 0 auto 50px auto;
  }
  
+ .icn-restart-survey-mail {
+	background: url(../images/resend.png) no-repeat center;
+ }
+ 
  span.ui-helper-hidden-accessible {
   display: none;
 }
