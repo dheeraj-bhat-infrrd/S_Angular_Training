@@ -15,9 +15,7 @@ var minPwdLength = 6;
 var maxPwdLength = 15;
 var firstNamePatternRegex = /^[a-zA-Z]{2,}$/;
 var lastNamePatternRegEx = /^[a-zA-Z]{2,}$/;
-
 var pageInitialized = false;
-
 
 function buildMessageDiv(){
 	if($('.err-nw-wrapper').length == 0){
@@ -29,6 +27,7 @@ function buildMessageDiv(){
         $('.hm-header-main-wrapper').after(errorDiv);
     }
 }
+
 function showError(msg){
 	buildMessageDiv();
     $('#err-nw-txt').html(msg);
@@ -56,6 +55,11 @@ function hideInfo(){
     },200);
 }
 
+$(document).on('click', '.err-new-close', function() {
+	hideError();
+	hideInfo();
+});
+
 function showRegErr(msg){
     $('#reg-err-pu-msg').html(msg);
     $('#reg-err-pu').fadeIn();
@@ -82,11 +86,6 @@ function showInfoMobileAndWeb(msg) {
 		showInfo(msg);
 	}
 }
-$(document).on('click', '.err-new-close', function() {
-	hideError();
-	hideInfo();
-});
-
 
 function validateForm(id) {
 	var validate = true;
