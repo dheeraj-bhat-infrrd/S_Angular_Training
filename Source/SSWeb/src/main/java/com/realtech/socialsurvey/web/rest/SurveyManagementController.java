@@ -829,15 +829,19 @@ public class SurveyManagementController {
 
 		AgentSettings agentSettings = userManagementService.getUserSettings(agentId);
 		try {
-			agentSettings.getSocialMediaTokens().getYelpToken().getYelpPageLink();
-			surveyAndStage.put("yelpEnabled", true);
+			if(agentSettings.getSocialMediaTokens().getYelpToken().getYelpPageLink() != null)
+				surveyAndStage.put("yelpEnabled", true);
+			else
+				surveyAndStage.put("yelpEnabled", false);
 		}
 		catch (NullPointerException e) {
 			surveyAndStage.put("yelpEnabled", false);
 		}
 		try {
-			agentSettings.getSocialMediaTokens().getGoogleToken().getProfileLink();
-			surveyAndStage.put("googleEnabled", true);
+			if (agentSettings.getSocialMediaTokens().getGoogleToken().getProfileLink() != null)
+				surveyAndStage.put("googleEnabled", true);
+			else
+				surveyAndStage.put("googleEnabled", false);
 		}
 		catch (NullPointerException e) {
 			surveyAndStage.put("googleEnabled", false);

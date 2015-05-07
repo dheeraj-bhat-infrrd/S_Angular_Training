@@ -96,6 +96,42 @@ $(document).ready(function() {
 		window.close();
 	}, 3000);
 });
+
+$(window).on('unload', function(){
+	console.log('unloading');
+	alert('unloading');
+	var payload = {
+			'socialNetwork' : "${socialNetwork}"
+	};
+	callAjaxWithPayload(payload);
+	
+});
+
+function callAjaxWithPayload(payload){
+	alert('callAjaxWithPayload');
+	$.ajax({
+		url : './profileUrl.do',
+		type : "GET",
+		data : payload,
+		async : false,
+		success : function(data){
+			console.log('succeed callAjaxWithPayload');
+			authenticateCallBack(data);
+		},
+		error : function(e) {
+			redirectErrorpage();
+		}
+	});
+}
+
+function authenticateCallBack(data){
+	var parentWindow;
+	if (window.opener != null && !window.opener.closed) {
+		parentWindow = window.opener;
+		parentWindow.showProfileLink("${socialNetwork}", data);
+	}
+}
+
 </script>
 
 </body>

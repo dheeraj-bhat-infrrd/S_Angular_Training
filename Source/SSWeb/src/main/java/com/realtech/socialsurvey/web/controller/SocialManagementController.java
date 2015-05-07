@@ -9,6 +9,7 @@ import javax.servlet.http.HttpSession;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
+import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.impl.client.BasicResponseHandler;
 import org.apache.http.impl.client.HttpClientBuilder;
@@ -37,6 +38,7 @@ import com.realtech.socialsurvey.core.dao.impl.MongoOrganizationUnitSettingDaoIm
 import com.realtech.socialsurvey.core.entities.AgentSettings;
 import com.realtech.socialsurvey.core.entities.FacebookToken;
 import com.realtech.socialsurvey.core.entities.LinkedInToken;
+import com.realtech.socialsurvey.core.entities.LinkedinUserProfileResponse;
 import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
 import com.realtech.socialsurvey.core.entities.SocialMediaTokens;
 import com.realtech.socialsurvey.core.entities.SocialProfileToken;
@@ -94,6 +96,8 @@ public class SocialManagementController {
 	private String linkedinAuthUri;
 	@Value("${LINKED_IN_ACCESS_URI}")
 	private String linkedinAccessUri;
+	@Value("${LINKED_IN_PROFILE_URI}")
+	private String linkedinProfileUri;
 
 	// Google
 	@Value("${GOOGLE_API_KEY}")
@@ -106,6 +110,8 @@ public class SocialManagementController {
 	private String googleApiScope;
 	@Value("${GOOGLE_SHARE_URI}")
 	private String googleShareUri;
+	@Value("${GOOGLE_PROFILE_URI}")
+	private String googleProfileUri;
 
 	// Yelp
 	@Value("${YELP_REDIRECT_URI}")
@@ -113,7 +119,7 @@ public class SocialManagementController {
 
 	@Value("${APPLICATION_BASE_URL}")
 	private String applicationBaseUrl;
-	
+
 	/**
 	 * Returns the social authorization page
 	 * 
@@ -132,11 +138,11 @@ public class SocialManagementController {
 		// AuthUrl for diff social networks
 		String socialNetwork = request.getParameter("social");
 		String socialFlow = request.getParameter("flow");
-		
+
 		session.removeAttribute(CommonConstants.SOCIAL_FLOW);
 		switch (socialNetwork) {
 
-			// Building facebook authUrl
+		// Building facebook authUrl
 			case "facebook":
 				Facebook facebook = socialManagementService.getFacebookInstance();
 
@@ -240,10 +246,13 @@ public class SocialManagementController {
 			// Getting Oauth accesstoken for facebook
 			String oauthCode = request.getParameter("code");
 			Facebook facebook = (Facebook) session.getAttribute(CommonConstants.SOCIAL_REQUEST_TOKEN);
-
+			String profileLink = null;
 			facebook4j.auth.AccessToken accessToken = null;
 			try {
 				accessToken = facebook.getOAuthAccessToken(oauthCode, facebookRedirectUri);
+				facebook4j.User user = facebook.getUser(facebook.getId());
+				if (user != null)
+					profileLink = user.getLink().toString();
 			}
 			catch (FacebookException e) {
 				LOG.error("Error while creating access token for facebook: " + e.getLocalizedMessage(), e);
@@ -258,7 +267,7 @@ public class SocialManagementController {
 					throw new InvalidInputException("No company settings found in current session");
 				}
 				mediaTokens = companySettings.getSocialMediaTokens();
-				mediaTokens = updateFacebookToken(accessToken, mediaTokens);
+				mediaTokens = updateFacebookToken(accessToken, mediaTokens, profileLink);
 				mediaTokens = socialManagementService.updateSocialMediaTokens(MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION,
 						companySettings, mediaTokens);
 				companySettings.setSocialMediaTokens(mediaTokens);
@@ -271,7 +280,7 @@ public class SocialManagementController {
 					throw new InvalidInputException("No Region settings found in current session");
 				}
 				mediaTokens = regionSettings.getSocialMediaTokens();
-				mediaTokens = updateFacebookToken(accessToken, mediaTokens);
+				mediaTokens = updateFacebookToken(accessToken, mediaTokens, profileLink);
 				mediaTokens = socialManagementService.updateSocialMediaTokens(MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION,
 						regionSettings, mediaTokens);
 				regionSettings.setSocialMediaTokens(mediaTokens);
@@ -284,7 +293,7 @@ public class SocialManagementController {
 					throw new InvalidInputException("No Branch settings found in current session");
 				}
 				mediaTokens = branchSettings.getSocialMediaTokens();
-				mediaTokens = updateFacebookToken(accessToken, mediaTokens);
+				mediaTokens = updateFacebookToken(accessToken, mediaTokens, profileLink);
 				mediaTokens = socialManagementService.updateSocialMediaTokens(MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION,
 						branchSettings, mediaTokens);
 				branchSettings.setSocialMediaTokens(mediaTokens);
@@ -297,13 +306,14 @@ public class SocialManagementController {
 				}
 
 				mediaTokens = agentSettings.getSocialMediaTokens();
-				mediaTokens = updateFacebookToken(accessToken, mediaTokens);
+				mediaTokens = updateFacebookToken(accessToken, mediaTokens, profileLink);
 				mediaTokens = socialManagementService.updateAgentSocialMediaTokens(agentSettings, mediaTokens);
 				agentSettings.setSocialMediaTokens(mediaTokens);
 				userSettings.setAgentSettings(agentSettings);
 			}
 			else {
-				throw new InvalidInputException("Invalid input exception occurred while creating access token for facebook", DisplayMessageConstants.GENERAL_ERROR);
+				throw new InvalidInputException("Invalid input exception occurred while creating access token for facebook",
+						DisplayMessageConstants.GENERAL_ERROR);
 			}
 		}
 		catch (Exception e) {
@@ -315,12 +325,12 @@ public class SocialManagementController {
 		// Updating attributes
 		session.removeAttribute(CommonConstants.SOCIAL_REQUEST_TOKEN);
 		model.addAttribute(CommonConstants.SUCCESS_ATTRIBUTE, CommonConstants.YES);
-
+		model.addAttribute("socialNetwork", "facebook");
 		LOG.info("Facebook Access tokens obtained and added to mongo successfully!");
 		return JspResolver.SOCIAL_AUTH_MESSAGE;
 	}
 
-	private SocialMediaTokens updateFacebookToken(facebook4j.auth.AccessToken accessToken, SocialMediaTokens mediaTokens) {
+	private SocialMediaTokens updateFacebookToken(facebook4j.auth.AccessToken accessToken, SocialMediaTokens mediaTokens, String profileLink) {
 		LOG.debug("Method updateFacebookToken() called from SocialManagementController");
 		if (mediaTokens == null) {
 			LOG.debug("Media tokens do not exist. Creating them and adding the facebook access token");
@@ -333,6 +343,9 @@ public class SocialManagementController {
 				mediaTokens.setFacebookToken(new FacebookToken());
 			}
 		}
+
+		if (profileLink != null)
+			mediaTokens.getFacebookToken().setFacebookPageLink(profileLink);
 
 		mediaTokens.getFacebookToken().setFacebookAccessToken(accessToken.getToken());
 		mediaTokens.getFacebookToken().setFacebookAccessTokenCreatedOn(System.currentTimeMillis());
@@ -372,13 +385,16 @@ public class SocialManagementController {
 
 			// Getting Oauth accesstoken for Twitter
 			AccessToken accessToken = null;
+			String profileLink = null;
 			while (null == accessToken) {
 				Twitter twitter = socialManagementService.getTwitterInstance();
-
 				String oauthVerifier = request.getParameter("oauth_verifier");
 				RequestToken requestToken = (RequestToken) session.getAttribute(CommonConstants.SOCIAL_REQUEST_TOKEN);
 				try {
 					accessToken = twitter.getOAuthAccessToken(requestToken, oauthVerifier);
+					twitter4j.User user = twitter.showUser(twitter.getId());
+					if (user != null && user.getScreenName() != null)
+						profileLink = CommonConstants.TWITTER_BASE_URL + user.getScreenName();
 				}
 				catch (TwitterException te) {
 					if (TwitterException.UNAUTHORIZED == te.getStatusCode()) {
@@ -399,7 +415,7 @@ public class SocialManagementController {
 					throw new InvalidInputException("No company settings found in current session");
 				}
 				mediaTokens = companySettings.getSocialMediaTokens();
-				mediaTokens = updateTwitterToken(accessToken, mediaTokens);
+				mediaTokens = updateTwitterToken(accessToken, mediaTokens, profileLink);
 				mediaTokens = socialManagementService.updateSocialMediaTokens(MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION,
 						companySettings, mediaTokens);
 				companySettings.setSocialMediaTokens(mediaTokens);
@@ -412,7 +428,7 @@ public class SocialManagementController {
 					throw new InvalidInputException("No Region settings found in current session");
 				}
 				mediaTokens = regionSettings.getSocialMediaTokens();
-				mediaTokens = updateTwitterToken(accessToken, mediaTokens);
+				mediaTokens = updateTwitterToken(accessToken, mediaTokens, profileLink);
 				mediaTokens = socialManagementService.updateSocialMediaTokens(MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION,
 						regionSettings, mediaTokens);
 				regionSettings.setSocialMediaTokens(mediaTokens);
@@ -425,7 +441,7 @@ public class SocialManagementController {
 					throw new InvalidInputException("No Branch settings found in current session");
 				}
 				mediaTokens = branchSettings.getSocialMediaTokens();
-				mediaTokens = updateTwitterToken(accessToken, mediaTokens);
+				mediaTokens = updateTwitterToken(accessToken, mediaTokens, profileLink);
 				mediaTokens = socialManagementService.updateSocialMediaTokens(MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION,
 						branchSettings, mediaTokens);
 				branchSettings.setSocialMediaTokens(mediaTokens);
@@ -438,13 +454,14 @@ public class SocialManagementController {
 				}
 
 				mediaTokens = agentSettings.getSocialMediaTokens();
-				mediaTokens = updateTwitterToken(accessToken, mediaTokens);
+				mediaTokens = updateTwitterToken(accessToken, mediaTokens, profileLink);
 				mediaTokens = socialManagementService.updateAgentSocialMediaTokens(agentSettings, mediaTokens);
 				agentSettings.setSocialMediaTokens(mediaTokens);
 				userSettings.setAgentSettings(agentSettings);
 			}
 			else {
-				throw new InvalidInputException("Invalid input exception occurred while creating access token for twitter", DisplayMessageConstants.GENERAL_ERROR);
+				throw new InvalidInputException("Invalid input exception occurred while creating access token for twitter",
+						DisplayMessageConstants.GENERAL_ERROR);
 			}
 		}
 		catch (Exception e) {
@@ -456,12 +473,12 @@ public class SocialManagementController {
 		// Updating attributes
 		session.removeAttribute(CommonConstants.SOCIAL_REQUEST_TOKEN);
 		model.addAttribute(CommonConstants.SUCCESS_ATTRIBUTE, CommonConstants.YES);
-
+		model.addAttribute("socialNetwork", "twitter");
 		LOG.info("Twitter Access tokens obtained and added to mongo successfully!");
 		return JspResolver.SOCIAL_AUTH_MESSAGE;
 	}
 
-	private SocialMediaTokens updateTwitterToken(AccessToken accessToken, SocialMediaTokens mediaTokens) {
+	private SocialMediaTokens updateTwitterToken(AccessToken accessToken, SocialMediaTokens mediaTokens, String profileLink) {
 		LOG.debug("Method updateTwitterToken() called from SocialManagementController");
 		if (mediaTokens == null) {
 			LOG.debug("Media tokens do not exist. Creating them and adding the twitter access token");
@@ -474,6 +491,9 @@ public class SocialManagementController {
 				mediaTokens.setTwitterToken(new TwitterToken());
 			}
 		}
+
+		if (profileLink != null)
+			mediaTokens.getTwitterToken().setTwitterPageLink(profileLink);
 
 		mediaTokens.getTwitterToken().setTwitterAccessToken(accessToken.getToken());
 		mediaTokens.getTwitterToken().setTwitterAccessTokenSecret(accessToken.getTokenSecret());
@@ -528,6 +548,14 @@ public class SocialManagementController {
 			String accessTokenStr = httpclient.execute(httpPost, new BasicResponseHandler());
 			Map<String, Object> map = new Gson().fromJson(accessTokenStr, new TypeToken<Map<String, String>>() {}.getType());
 			String accessToken = (String) map.get("access_token");
+			String profileLink = null;
+			linkedinAccessUri = linkedinProfileUri;
+			linkedinAccessUri += accessToken;
+			HttpGet httpGet = new HttpGet(linkedinAccessUri);
+			String basicProfileStr = httpclient.execute(httpGet, new BasicResponseHandler());
+			
+			LinkedinUserProfileResponse profileData = new Gson().fromJson(basicProfileStr, LinkedinUserProfileResponse.class);
+			profileLink = (String) profileData.getSiteStandardProfileRequest().getUrl();
 
 			SocialMediaTokens mediaTokens;
 			int profilesMaster = selectedProfile.getProfilesMaster().getProfileId();
@@ -537,7 +565,7 @@ public class SocialManagementController {
 					throw new InvalidInputException("No company settings found in current session");
 				}
 				mediaTokens = companySettings.getSocialMediaTokens();
-				mediaTokens = updateLinkedInToken(accessToken, mediaTokens);
+				mediaTokens = updateLinkedInToken(accessToken, mediaTokens, profileLink);
 				mediaTokens = socialManagementService.updateSocialMediaTokens(MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION,
 						companySettings, mediaTokens);
 				companySettings.setSocialMediaTokens(mediaTokens);
@@ -550,7 +578,7 @@ public class SocialManagementController {
 					throw new InvalidInputException("No Region settings found in current session");
 				}
 				mediaTokens = regionSettings.getSocialMediaTokens();
-				mediaTokens = updateLinkedInToken(accessToken, mediaTokens);
+				mediaTokens = updateLinkedInToken(accessToken, mediaTokens, profileLink);
 				mediaTokens = socialManagementService.updateSocialMediaTokens(MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION,
 						regionSettings, mediaTokens);
 				regionSettings.setSocialMediaTokens(mediaTokens);
@@ -563,7 +591,7 @@ public class SocialManagementController {
 					throw new InvalidInputException("No Branch settings found in current session");
 				}
 				mediaTokens = branchSettings.getSocialMediaTokens();
-				mediaTokens = updateLinkedInToken(accessToken, mediaTokens);
+				mediaTokens = updateLinkedInToken(accessToken, mediaTokens, profileLink);
 				mediaTokens = socialManagementService.updateSocialMediaTokens(MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION,
 						branchSettings, mediaTokens);
 				branchSettings.setSocialMediaTokens(mediaTokens);
@@ -576,7 +604,7 @@ public class SocialManagementController {
 				}
 
 				mediaTokens = agentSettings.getSocialMediaTokens();
-				mediaTokens = updateLinkedInToken(accessToken, mediaTokens);
+				mediaTokens = updateLinkedInToken(accessToken, mediaTokens, profileLink);
 				mediaTokens = socialManagementService.updateAgentSocialMediaTokens(agentSettings, mediaTokens);
 				agentSettings.setSocialMediaTokens(mediaTokens);
 
@@ -595,7 +623,8 @@ public class SocialManagementController {
 				userSettings.setAgentSettings(agentSettings);
 			}
 			else {
-				throw new InvalidInputException("Invalid input exception occurred while creating access token for linkedin", DisplayMessageConstants.GENERAL_ERROR);
+				throw new InvalidInputException("Invalid input exception occurred while creating access token for linkedin",
+						DisplayMessageConstants.GENERAL_ERROR);
 			}
 		}
 		catch (Exception e) {
@@ -605,12 +634,12 @@ public class SocialManagementController {
 
 		// Updating attributes
 		model.addAttribute(CommonConstants.SUCCESS_ATTRIBUTE, CommonConstants.YES);
-
+		model.addAttribute("socialNetwork", "linkedin");
 		LOG.info("Method authenticateLinkedInAccess() finished from SocialManagementController");
 		return JspResolver.SOCIAL_AUTH_MESSAGE;
 	}
 
-	private SocialMediaTokens updateLinkedInToken(String accessToken, SocialMediaTokens mediaTokens) {
+	private SocialMediaTokens updateLinkedInToken(String accessToken, SocialMediaTokens mediaTokens, String profileLink) {
 		LOG.debug("Method updateLinkedInToken() called from SocialManagementController");
 		if (mediaTokens == null) {
 			LOG.debug("Media tokens do not exist. Creating them and adding the LinkedIn access token");
@@ -625,6 +654,10 @@ public class SocialManagementController {
 		}
 
 		mediaTokens.getLinkedInToken().setLinkedInAccessToken(accessToken);
+		if (profileLink != null){
+			profileLink = profileLink.split("&")[0];
+			mediaTokens.getLinkedInToken().setLinkedInPageLink(profileLink);
+		}
 		mediaTokens.getLinkedInToken().setLinkedInAccessTokenCreatedOn(System.currentTimeMillis());
 
 		LOG.debug("Method updateLinkedInToken() finished from SocialManagementController");
@@ -665,7 +698,17 @@ public class SocialManagementController {
 					.callback(googleApiRedirectUri).scope(googleApiScope).build();
 			Token accessToken = service.getAccessToken(null, new Verifier(OAuthCode));
 			LOG.info("Token: " + accessToken.getToken());
-
+			service.getAuthorizationUrl(accessToken);
+			String googleAccessUri = googleProfileUri;
+			googleAccessUri += accessToken.getToken();
+			HttpClient httpclient = HttpClientBuilder.create().build();
+			HttpGet httpGet = new HttpGet(googleAccessUri);
+			String basicProfileStr = httpclient.execute(httpGet, new BasicResponseHandler());
+			Map<String, Object> profileData = new Gson().fromJson(basicProfileStr, new TypeToken<Map<String, String>>() {}.getType());
+			String profileLink = null;
+			if (profileData != null) {
+				profileLink = profileData.get("link").toString();
+			}
 			// Storing access token
 			SocialMediaTokens mediaTokens;
 			int profilesMaster = selectedProfile.getProfilesMaster().getProfileId();
@@ -675,7 +718,7 @@ public class SocialManagementController {
 					throw new InvalidInputException("No company settings found in current session");
 				}
 				mediaTokens = companySettings.getSocialMediaTokens();
-				mediaTokens = updateGoogleToken(accessToken, mediaTokens);
+				mediaTokens = updateGoogleToken(accessToken, mediaTokens, profileLink);
 				mediaTokens = socialManagementService.updateSocialMediaTokens(MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION,
 						companySettings, mediaTokens);
 				companySettings.setSocialMediaTokens(mediaTokens);
@@ -688,7 +731,7 @@ public class SocialManagementController {
 					throw new InvalidInputException("No Region settings found in current session");
 				}
 				mediaTokens = regionSettings.getSocialMediaTokens();
-				mediaTokens = updateGoogleToken(accessToken, mediaTokens);
+				mediaTokens = updateGoogleToken(accessToken, mediaTokens, profileLink);
 				mediaTokens = socialManagementService.updateSocialMediaTokens(MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION,
 						regionSettings, mediaTokens);
 				regionSettings.setSocialMediaTokens(mediaTokens);
@@ -701,7 +744,7 @@ public class SocialManagementController {
 					throw new InvalidInputException("No Branch settings found in current session");
 				}
 				mediaTokens = branchSettings.getSocialMediaTokens();
-				mediaTokens = updateGoogleToken(accessToken, mediaTokens);
+				mediaTokens = updateGoogleToken(accessToken, mediaTokens, profileLink);
 				mediaTokens = socialManagementService.updateSocialMediaTokens(MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION,
 						branchSettings, mediaTokens);
 				branchSettings.setSocialMediaTokens(mediaTokens);
@@ -714,13 +757,14 @@ public class SocialManagementController {
 				}
 
 				mediaTokens = agentSettings.getSocialMediaTokens();
-				mediaTokens = updateGoogleToken(accessToken, mediaTokens);
+				mediaTokens = updateGoogleToken(accessToken, mediaTokens, profileLink);
 				mediaTokens = socialManagementService.updateAgentSocialMediaTokens(agentSettings, mediaTokens);
 				agentSettings.setSocialMediaTokens(mediaTokens);
 				userSettings.setAgentSettings(agentSettings);
 			}
 			else {
-				throw new InvalidInputException("Invalid input exception occurred while creating access token for google", DisplayMessageConstants.GENERAL_ERROR);
+				throw new InvalidInputException("Invalid input exception occurred while creating access token for google",
+						DisplayMessageConstants.GENERAL_ERROR);
 			}
 		}
 		catch (Exception e) {
@@ -732,12 +776,12 @@ public class SocialManagementController {
 		// Updating attributes
 		session.removeAttribute(CommonConstants.SOCIAL_REQUEST_TOKEN);
 		model.addAttribute(CommonConstants.SUCCESS_ATTRIBUTE, CommonConstants.YES);
-
+		model.addAttribute("socialNetwork", "google");
 		LOG.info("Method authenticateGoogleAccess() finished from SocialManagementController");
 		return JspResolver.SOCIAL_AUTH_MESSAGE;
 	}
 
-	private SocialMediaTokens updateGoogleToken(Token accessToken, SocialMediaTokens mediaTokens) {
+	private SocialMediaTokens updateGoogleToken(Token accessToken, SocialMediaTokens mediaTokens, String profileLink) {
 		LOG.debug("Method updateGoogleToken() called from SocialManagementController");
 		if (mediaTokens == null) {
 			LOG.debug("Media tokens do not exist. Creating them and adding the Google access token");
@@ -750,6 +794,8 @@ public class SocialManagementController {
 				mediaTokens.setGoogleToken(new SocialProfileToken());
 			}
 		}
+		if (profileLink != null)
+			mediaTokens.getGoogleToken().setProfileLink(profileLink);
 		mediaTokens.getGoogleToken().setAccessToken(accessToken.getToken());
 		mediaTokens.getGoogleToken().setAccessTokenSecret(accessToken.getSecret());
 		mediaTokens.getGoogleToken().setAccessTokenCreatedOn(System.currentTimeMillis());
@@ -757,7 +803,7 @@ public class SocialManagementController {
 		LOG.debug("Method updateGoogleToken() finished from SocialManagementController");
 		return mediaTokens;
 	}
-	
+
 	@ResponseBody
 	@RequestMapping(value = "/postonfacebook", method = RequestMethod.GET)
 	public String postToFacebook(HttpServletRequest request) {
@@ -766,7 +812,7 @@ public class SocialManagementController {
 		String custFirstName = request.getParameter("firstName");
 		String custLastName = request.getParameter("lastName");
 		String agentIdStr = request.getParameter("agentId");
-		
+
 		double rating = 0;
 		long agentId = 0;
 		try {
@@ -782,33 +828,34 @@ public class SocialManagementController {
 		User user = sessionHelper.getCurrentUser();
 		List<OrganizationUnitSettings> settings = socialManagementService.getBranchAndRegionSettingsForUser(user.getUserId());
 		rating = Math.round(rating * 100) / 100;
-		
+
 		String agentProfileLink = "";
 		AgentSettings agentSettings;
 		try {
 			agentSettings = userManagementService.getUserSettings(agentId);
-			if(agentSettings!=null && agentSettings.getProfileUrl()!=null){
+			if (agentSettings != null && agentSettings.getProfileUrl() != null) {
 				agentProfileLink = agentSettings.getProfileUrl();
 			}
 		}
 		catch (InvalidInputException e) {
 			LOG.error("InvalidInputException caught in postToFacebook(). Nested exception is ", e);
 		}
-		
+
 		String facebookMessage = rating + "-Star Survey Response from " + custFirstName + " " + custLastName + " for " + agentName
 				+ " on Social Survey - view at " + applicationBaseUrl + CommonConstants.AGENT_PROFILE_FIXED_URL + agentProfileLink;
 		facebookMessage = facebookMessage.replaceAll("null", "");
-		
+
 		for (OrganizationUnitSettings setting : settings) {
 			try {
 				if (setting != null)
 					socialManagementService.updateStatusIntoFacebookPage(setting, facebookMessage);
 			}
 			catch (FacebookException | InvalidInputException e) {
-				LOG.error("FacebookException/InvalidInputException caught in postToFacebook() while trying to post to facebook. Nested excption is ", e);
+				LOG.error("FacebookException/InvalidInputException caught in postToFacebook() while trying to post to facebook. Nested excption is ",
+						e);
 			}
 		}
-		
+
 		LOG.info("Method to post feedback of customer to facebook finished.");
 		return "Successfully posted to all the your facebook profiles";
 	}
@@ -822,7 +869,7 @@ public class SocialManagementController {
 			String custFirstName = request.getParameter("firstName");
 			String custLastName = request.getParameter("lastName");
 			String agentIdStr = request.getParameter("agentId");
-			
+
 			double rating = 0;
 			long agentId = 0;
 			try {
@@ -839,14 +886,14 @@ public class SocialManagementController {
 			AgentSettings agentSettings;
 			try {
 				agentSettings = userManagementService.getUserSettings(agentId);
-				if(agentSettings!=null && agentSettings.getProfileUrl()!=null){
+				if (agentSettings != null && agentSettings.getProfileUrl() != null) {
 					agentProfileLink = agentSettings.getProfileUrl();
 				}
 			}
 			catch (InvalidInputException e) {
 				LOG.error("InvalidInputException caught in postToFacebook(). Nested exception is ", e);
 			}
-			
+
 			User user = sessionHelper.getCurrentUser();
 			List<OrganizationUnitSettings> settings = socialManagementService.getBranchAndRegionSettingsForUser(user.getUserId());
 			rating = Math.round(rating * 100) / 100;
@@ -871,7 +918,7 @@ public class SocialManagementController {
 			LOG.error("Non fatal Exception caught in postToTwitter() while trying to post to social networking sites. Nested excption is ", e);
 			return e.getMessage();
 		}
-		
+
 		LOG.info("Method to post feedback of customer to various pages of twitter finished.");
 		return "Successfully posted to all the your twitter profiles";
 	}
@@ -884,7 +931,7 @@ public class SocialManagementController {
 		String custFirstName = request.getParameter("firstName");
 		String custLastName = request.getParameter("lastName");
 		String agentIdStr = request.getParameter("agentId");
-		
+
 		double rating = 0;
 		long agentId = 0;
 		try {
@@ -896,12 +943,12 @@ public class SocialManagementController {
 			LOG.error("Number format exception caught in postToLinkedin() while trying to convert agent Id. Nested exception is ", e);
 			return e.getMessage();
 		}
-		
+
 		String agentProfileLink = "";
 		AgentSettings agentSettings;
 		try {
 			agentSettings = userManagementService.getUserSettings(agentId);
-			if(agentSettings!=null && agentSettings.getProfileUrl()!=null){
+			if (agentSettings != null && agentSettings.getProfileUrl() != null) {
 				agentProfileLink = agentSettings.getProfileUrl();
 			}
 		}
@@ -912,10 +959,10 @@ public class SocialManagementController {
 		User user = sessionHelper.getCurrentUser();
 		List<OrganizationUnitSettings> settings = socialManagementService.getBranchAndRegionSettingsForUser(user.getUserId());
 		rating = Math.round(rating * 100) / 100;
-		String message = rating + "-Star Survey Response from " + custFirstName + custLastName + " for " + agentName
-				+ " on SocialSurvey - view at " + applicationBaseUrl + CommonConstants.AGENT_PROFILE_FIXED_URL + agentProfileLink;
+		String message = rating + "-Star Survey Response from " + custFirstName + custLastName + " for " + agentName + " on SocialSurvey - view at "
+				+ applicationBaseUrl + CommonConstants.AGENT_PROFILE_FIXED_URL + agentProfileLink;
 		message = message.replaceAll("null", "");
-		
+
 		for (OrganizationUnitSettings setting : settings) {
 			try {
 				if (setting != null)
@@ -938,9 +985,10 @@ public class SocialManagementController {
 
 		try {
 			sessionHelper.getCanonicalSettings(request.getSession(false));
-			OrganizationUnitSettings settings = (OrganizationUnitSettings) request.getSession(false).getAttribute(CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION);
+			OrganizationUnitSettings settings = (OrganizationUnitSettings) request.getSession(false).getAttribute(
+					CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION);
 
-			if (settings.getSocialMediaTokens() != null && settings.getSocialMediaTokens().getYelpToken() != null){
+			if (settings.getSocialMediaTokens() != null && settings.getSocialMediaTokens().getYelpToken() != null) {
 				yelpUrl.put("host", yelpRedirectUri);
 				yelpUrl.put("relativePath", settings.getSocialMediaTokens().getYelpToken().getYelpPageLink());
 			}
@@ -952,11 +1000,11 @@ public class SocialManagementController {
 			response.setErrMessage(e.getMessage());
 			return new Gson().toJson(response);
 		}
-		
+
 		LOG.info("Method to get Yelp details, getYelpLink() finished.");
 		return new Gson().toJson(yelpUrl);
 	}
-	
+
 	@ResponseBody
 	@RequestMapping(value = "/getgooglepluslink", method = RequestMethod.GET)
 	public String getGooglePlusLink(HttpServletRequest request) {
@@ -965,9 +1013,10 @@ public class SocialManagementController {
 
 		try {
 			sessionHelper.getCanonicalSettings(request.getSession(false));
-			OrganizationUnitSettings settings = (OrganizationUnitSettings) request.getSession(false).getAttribute(CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION);
+			OrganizationUnitSettings settings = (OrganizationUnitSettings) request.getSession(false).getAttribute(
+					CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION);
 
-			if (settings.getSocialMediaTokens() != null && settings.getSocialMediaTokens().getGoogleToken() != null){
+			if (settings.getSocialMediaTokens() != null && settings.getSocialMediaTokens().getGoogleToken() != null) {
 				googleUrl.put("host", googleShareUri);
 				googleUrl.put("relativePath", settings.getSocialMediaTokens().getGoogleToken().getProfileLink());
 			}
@@ -979,17 +1028,52 @@ public class SocialManagementController {
 			response.setErrMessage(e.getMessage());
 			return new Gson().toJson(response);
 		}
-		
+
 		LOG.info("Method to get Google details, getGooglePlusLink() finished.");
 		return new Gson().toJson(googleUrl);
 	}
-	
+
 	@RequestMapping(value = "/linkedindataimport")
-	public String linkedInDataImport() {
+	public String linkedInDataImport(HttpServletRequest request, Model model) {
 		LOG.info("Method linkedInDataImport() called from SocialManagementController");
+		String facebookProfileUrl = "";
+		String twitterProfileUrl = "";
+		String linkedinProfileUrl = "";
+		String googleProfileUrl = "";
+		try {
+			sessionHelper.getCanonicalSettings(request.getSession(false));
+		}
+		catch (InvalidInputException | NoRecordsFetchedException e) {
+			LOG.error("Exception caught while importing links for various pages of the Agent. Nested exception is ", e.getMessage());
+			return JspResolver.ERROR_PAGE;
+		}
+		/*	HttpSession session = request.getSession(false);
+		UserSettings usersettings = (UserSettings) session.getAttribute(CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION);
+		if(usersettings!=null && usersettings.getAgentSettings()!=null && usersettings.getAgentSettings().getSocialMediaTokens()!=null){
+			if(usersettings.getAgentSettings().getSocialMediaTokens().getFacebookToken()!=null
+				&& usersettings.getAgentSettings().getSocialMediaTokens().getFacebookToken().getFacebookPageLink()!=null){
+				facebookProfileUrl = usersettings.getAgentSettings().getSocialMediaTokens().getFacebookToken().getFacebookPageLink();
+			}
+			if(usersettings.getAgentSettings().getSocialMediaTokens().getFacebookToken()!=null
+				&& usersettings.getAgentSettings().getSocialMediaTokens().getTwitterToken().getTwitterPageLink()!=null){
+				twitterProfileUrl = usersettings.getAgentSettings().getSocialMediaTokens().getTwitterToken().getTwitterPageLink();
+			}
+			if(usersettings.getAgentSettings().getSocialMediaTokens().getGoogleToken()!=null
+					&& usersettings.getAgentSettings().getSocialMediaTokens().getGoogleToken().getProfileLink()!=null){
+					googleProfileUrl = usersettings.getAgentSettings().getSocialMediaTokens().getGoogleToken().getProfileLink();
+			}
+			if(usersettings.getAgentSettings().getSocialMediaTokens().getLinkedInToken()!=null
+					&& usersettings.getAgentSettings().getSocialMediaTokens().getLinkedInToken().getLinkedInPageLink()!=null){
+					linkedinProfileUrl = usersettings.getAgentSettings().getSocialMediaTokens().getLinkedInToken().getLinkedInPageLink();
+			}
+		}*/
+		model.addAttribute("facebookProfileUrl", facebookProfileUrl);
+		model.addAttribute("twitterProfileUrl", twitterProfileUrl);
+		model.addAttribute("linkedinProfileUrl", linkedinProfileUrl);
+		model.addAttribute("googleProfileUrl", googleProfileUrl);
 		return JspResolver.LINKEDIN_IMPORT;
 	}
-	
+
 	@ResponseBody
 	@RequestMapping(value = "/finalizeprofileimage")
 	public String finalizeProfileImage(Model model, HttpServletRequest request) {
@@ -997,19 +1081,59 @@ public class SocialManagementController {
 		HttpSession session = request.getSession(false);
 		UserSettings userSettings = (UserSettings) session.getAttribute(CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION);
 		UserProfile selectedProfile = (UserProfile) session.getAttribute(CommonConstants.USER_PROFILE);
-		
+
 		if (selectedProfile != null) {
 			AgentSettings agentSettings = userSettings.getAgentSettings();
 			socialAsyncService.updateLinkedInProfileImage(MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION, agentSettings);
 		}
-		
+
 		LOG.info("Method finalizeProfileImage() finished from SocialManagementController");
 		return CommonConstants.SUCCESS_ATTRIBUTE;
 	}
-	
+
 	@RequestMapping(value = "/sendsurveyinvitation")
 	public String sendSurveyInvite() {
 		LOG.info("Method sendSurveyInvite() called from SocialManagementController");
 		return JspResolver.HEADER_SURVEY_INVITE;
 	}
+	
+	@ResponseBody
+	@RequestMapping(value = "/profileUrl")
+	public String getProfileUrl(HttpServletRequest request) {
+		LOG.info("Method getProfileUrl() called from SocialManagementController");
+		String socialNetwork = request.getParameter("socialNetwork");
+		HttpSession session = request.getSession(false);
+		UserSettings usersettings = (UserSettings) session.getAttribute(CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION);
+		String profileUrl = "";
+		if(socialNetwork.equalsIgnoreCase("facebook")){
+			if(usersettings!=null && usersettings.getAgentSettings()!=null && usersettings.getAgentSettings().getSocialMediaTokens()!=null 
+					&& usersettings.getAgentSettings().getSocialMediaTokens().getFacebookToken()!=null
+					&& usersettings.getAgentSettings().getSocialMediaTokens().getFacebookToken().getFacebookPageLink()!=null){
+					profileUrl = usersettings.getAgentSettings().getSocialMediaTokens().getFacebookToken().getFacebookPageLink();
+				}
+		}
+		else if(socialNetwork.equalsIgnoreCase("twitter")){
+			if(usersettings!=null && usersettings.getAgentSettings()!=null && usersettings.getAgentSettings().getSocialMediaTokens()!=null
+					&& usersettings.getAgentSettings().getSocialMediaTokens().getTwitterToken().getTwitterPageLink()!=null){
+					profileUrl = usersettings.getAgentSettings().getSocialMediaTokens().getTwitterToken().getTwitterPageLink();
+			}
+		}
+		else if(socialNetwork.equals("linkedin")){
+			if(usersettings!=null && usersettings.getAgentSettings()!=null && usersettings.getAgentSettings().getSocialMediaTokens()!=null
+					&& usersettings.getAgentSettings().getSocialMediaTokens().getLinkedInToken()!=null
+					&& usersettings.getAgentSettings().getSocialMediaTokens().getLinkedInToken().getLinkedInPageLink()!=null){
+					profileUrl = usersettings.getAgentSettings().getSocialMediaTokens().getLinkedInToken().getLinkedInPageLink();
+			}
+		}
+		else if(socialNetwork.equalsIgnoreCase("google")){
+			if(usersettings!=null && usersettings.getAgentSettings()!=null && usersettings.getAgentSettings().getSocialMediaTokens()!=null
+					&& usersettings.getAgentSettings().getSocialMediaTokens().getGoogleToken()!=null
+					&& usersettings.getAgentSettings().getSocialMediaTokens().getGoogleToken().getProfileLink()!=null){
+					profileUrl = usersettings.getAgentSettings().getSocialMediaTokens().getGoogleToken().getProfileLink();
+			}
+		}
+		
+		return profileUrl;
+	}
+	
 }
