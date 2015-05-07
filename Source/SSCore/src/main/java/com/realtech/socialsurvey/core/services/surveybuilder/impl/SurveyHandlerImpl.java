@@ -132,6 +132,7 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean {
 		surveyDetails.setStage(CommonConstants.INITIAL_INDEX);
 		surveyDetails.setReminderCount(reminderCount);
 		surveyDetails.setModifiedOn(new Date());
+		surveyDetails.setCreatedOn(new Date());
 		surveyDetails.setSurveyResponse(new ArrayList<SurveyResponse>());
 		surveyDetails.setCustRelationWithAgent(custRelationWithAgent);
 		surveyDetails.setUrl(getSurveyUrl(agentId, customerEmail, baseUrl));
