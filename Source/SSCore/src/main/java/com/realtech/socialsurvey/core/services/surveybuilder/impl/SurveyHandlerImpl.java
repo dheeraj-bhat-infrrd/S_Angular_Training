@@ -413,6 +413,59 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean {
 			sendInvitationMailByCustomer(user, custFirstName, custLastName, custEmail, link);
 		LOG.debug("Method sendSurveyInvitationMail() finished from DashboardController.");
 	}
+	
+	/*
+	 * Method to send email to customer by agent for restarting an already completed survey.
+	 */
+	@Override
+	public void sendSurveyRestartMail(String custFirstName, String custLastName, String custEmail, String custRelationWithAgent, User user,
+			String link) throws InvalidInputException, UndeliveredEmailException{
+		LOG.info("sendSurveyRestartMail() started.");
+		AgentSettings agentSettings = userManagementService.getUserSettings(user.getUserId());
+		String companyName = user.getCompany().getCompany();
+		String agentTitle = "";
+		if (agentSettings.getContact_details() != null && agentSettings.getContact_details().getTitle() != null) {
+			agentTitle = agentSettings.getContact_details().getTitle();
+		}
+
+		String agentPhone = "";
+		if (agentSettings.getContact_details() != null && agentSettings.getContact_details().getContact_numbers() != null
+				&& agentSettings.getContact_details().getContact_numbers().getWork() != null) {
+			agentPhone = agentSettings.getContact_details().getContact_numbers().getWork();
+		}
+
+		String agentName = user.getFirstName();
+		if (user.getLastName() != null && !user.getLastName().isEmpty()) {
+			agentName = user.getFirstName() + " " + user.getLastName();
+		}
+		String agentSignature = emailFormatHelper.buildAgentSignature(agentPhone, agentTitle, companyName);
+
+		OrganizationUnitSettings companySettings = organizationManagementService.getCompanySettings(user.getCompany().getCompanyId());
+		if (companySettings != null && companySettings.getMail_content() != null && companySettings.getMail_content().getRestart_survey_mail() != null) {
+
+			MailContent restartSurvey = companySettings.getMail_content().getRestart_survey_mail();
+			String mailBody = emailFormatHelper.replaceEmailBodyWithParams(restartSurvey.getMail_body(), restartSurvey.getParam_order());
+			mailBody = mailBody.replaceAll("\\[AgentName\\]", agentName);
+			mailBody = mailBody.replaceAll("\\[Name\\]", custFirstName + " " + custLastName);
+			mailBody = mailBody.replaceAll("\\[Link\\]", link);
+			mailBody = mailBody.replaceAll("\\[AgentSignature\\]", agentSignature);
+			mailBody = mailBody.replaceAll("null", "");
+
+			String mailSubject = CommonConstants.SURVEY_MAIL_SUBJECT + agentName;
+			try {
+				emailServices.sendSurveyInvitationMail(custEmail, mailSubject, mailBody, user.getEmailId(), user.getFirstName()
+						+ (user.getLastName() != null ? " " + user.getLastName() : ""));
+			}
+			catch (InvalidInputException | UndeliveredEmailException e) {
+				LOG.error("Exception caught while sending mail to " + custEmail + ". Nested exception is ", e);
+			}
+		}
+		else {
+			emailServices.sendDefaultSurveyInvitationMail(custEmail, custFirstName + " " + custLastName, user.getFirstName()
+					+ (user.getLastName() != null ? " " + user.getLastName() : ""), link, user.getEmailId(), agentSignature);
+		}
+		LOG.info("sendSurveyRestartMail() finished.");
+	}
 
 	/*
 	 * Method to compose link for sending to a user to start survey started.
