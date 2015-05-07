@@ -648,7 +648,7 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao {
 	public Map<String, Long> getClickedSurveyByCriteria(String columnName, long columnValue, String groupByCriteria) throws ParseException {
 		LOG.info("Method to get");
 		TypedAggregation<SurveyDetails> aggregation;
-		Date endDate = new Date();
+//		Date endDate = new Date();
 		int numberOfPastDaysToConsider = 7;
 		String criteriaColumn = "";
 		switch (groupByCriteria) {
@@ -657,12 +657,12 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao {
 				criteriaColumn = "dayOfMonth";
 				break;
 			case "monthly":
-				endDate = getNdaysBackDate(Calendar.getInstance().get(Calendar.DAY_OF_WEEK));
+//				endDate = getNdaysBackDate(Calendar.getInstance().get(Calendar.DAY_OF_WEEK));
 				numberOfPastDaysToConsider = 30 + Calendar.getInstance().get(Calendar.DAY_OF_WEEK);
 				criteriaColumn = "week";
 				break;
 			case "yearly":
-				endDate = getNdaysBackDate(Calendar.getInstance().get(Calendar.DAY_OF_MONTH));
+//				endDate = getNdaysBackDate(Calendar.getInstance().get(Calendar.DAY_OF_MONTH));
 				numberOfPastDaysToConsider = 365 + Calendar.getInstance().get(Calendar.DAY_OF_MONTH);
 				criteriaColumn = "month";
 				break;
@@ -687,11 +687,11 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao {
 			}
 			else if (criteriaColumn.equals("week")) {
 				Date currDate = new Date();
-				int reductionInDate = 0;
+				int reductionInDate = Calendar.getInstance().get(Calendar.DAY_OF_WEEK)-1;
 				for (int i = 0; i < 4; i++) {
+					currDate = getNdaysBackDate(reductionInDate);
 					clickedSurveys.put(new SimpleDateFormat(CommonConstants.DATE_FORMAT).format(currDate).toString(), 0l);
 					reductionInDate += 7;
-					currDate = getNdaysBackDate(reductionInDate);
 				}
 			}
 			else if (criteriaColumn.equals("month")) {
@@ -739,7 +739,7 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao {
 	public Map<String, Long> getSentSurveyByCriteria(String columnName, long columnValue, String groupByCriteria) throws ParseException {
 		LOG.info("Method to get count of sent surveys based upon criteria(Weekly/Monthly/Yearly) getSentSurveyByCriteria() started.");
 		TypedAggregation<SurveyDetails> aggregation;
-		Date endDate = new Date();
+//		Date endDate = new Date();
 		int numberOfPastDaysToConsider = 7;
 		String criteriaColumn = "";
 		switch (groupByCriteria) {
@@ -748,19 +748,18 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao {
 				criteriaColumn = "dayOfMonth";
 				break;
 			case "monthly":
-				endDate = getNdaysBackDate(Calendar.getInstance().get(Calendar.DAY_OF_WEEK));
+//				endDate = getNdaysBackDate(Calendar.getInstance().get(Calendar.DAY_OF_WEEK));
 				numberOfPastDaysToConsider = 30 + Calendar.getInstance().get(Calendar.DAY_OF_WEEK);
 				criteriaColumn = "week";
 				break;
 			case "yearly":
-				endDate = getNdaysBackDate(Calendar.getInstance().get(Calendar.DAY_OF_MONTH));
+//				endDate = getNdaysBackDate(Calendar.getInstance().get(Calendar.DAY_OF_MONTH));
 				numberOfPastDaysToConsider = 365 + Calendar.getInstance().get(Calendar.DAY_OF_MONTH);
 				criteriaColumn = "month";
 				break;
 		}
 		Date startDate = getNdaysBackDate(numberOfPastDaysToConsider);
-		aggregation = new TypedAggregation<SurveyDetails>(SurveyDetails.class, Aggregation.match(Criteria.where(CommonConstants.CREATED_ON).lt(
-				endDate)), Aggregation.match(Criteria.where(CommonConstants.CREATED_ON).gte(startDate)), Aggregation.match(Criteria.where(columnName)
+		aggregation = new TypedAggregation<SurveyDetails>(SurveyDetails.class, Aggregation.match(Criteria.where(CommonConstants.CREATED_ON).gte(startDate)), Aggregation.match(Criteria.where(columnName)
 				.is(columnValue)), Aggregation.project(CommonConstants.CREATED_ON)
 				.andExpression(criteriaColumn + "(" + CommonConstants.CREATED_ON + ")").as("groupCol"), Aggregation.group("groupCol").count()
 				.as("count"));
@@ -779,7 +778,7 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao {
 			}
 			else if (criteriaColumn.equals("week")) {
 				Date currDate = new Date();
-				int reductionInDate = 0;
+				int reductionInDate = Calendar.getInstance().get(Calendar.DAY_OF_WEEK)-1;
 				for (int i = 0; i < 4; i++) {
 					sentSurveys.put(new SimpleDateFormat(CommonConstants.DATE_FORMAT).format(currDate).toString(), 0l);
 					reductionInDate += 7;
@@ -831,7 +830,7 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao {
 	public Map<String, Long> getCompletedSurveyByCriteria(String columnName, long columnValue, String groupByCriteria) throws ParseException {
 		LOG.info("Method to get count of completed surveys based upon criteria(Weekly/Monthly/Yearly) getCompletedSurveyByCriteria() started.");
 		TypedAggregation<SurveyDetails> aggregation;
-		Date endDate = new Date();
+//		Date endDate = new Date();
 		int numberOfPastDaysToConsider = 7;
 		String criteriaColumn = "";
 		switch (groupByCriteria) {
@@ -840,20 +839,19 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao {
 				criteriaColumn = "dayOfMonth";
 				break;
 			case "monthly":
-				endDate = getNdaysBackDate(Calendar.getInstance().get(Calendar.DAY_OF_WEEK));
+//				endDate = getNdaysBackDate(Calendar.getInstance().get(Calendar.DAY_OF_WEEK));
 				numberOfPastDaysToConsider = 30 + Calendar.getInstance().get(Calendar.DAY_OF_WEEK);
 				criteriaColumn = "week";
 				break;
 			case "yearly":
-				endDate = getNdaysBackDate(Calendar.getInstance().get(Calendar.DAY_OF_MONTH));
+//				endDate = getNdaysBackDate(Calendar.getInstance().get(Calendar.DAY_OF_MONTH));
 				numberOfPastDaysToConsider = 365 + Calendar.getInstance().get(Calendar.DAY_OF_MONTH);
 				criteriaColumn = "month";
 				break;
 		}
 		Date startDate = getNdaysBackDate(numberOfPastDaysToConsider);
 		aggregation = new TypedAggregation<SurveyDetails>(SurveyDetails.class, Aggregation.match(Criteria.where(CommonConstants.STAGE_COLUMN).is(
-				CommonConstants.SURVEY_STAGE_COMPLETE)), Aggregation.match(Criteria.where(columnName).is(columnValue)), Aggregation.match(Criteria
-				.where(CommonConstants.MODIFIED_ON_COLUMN).lt(endDate)), Aggregation.match(Criteria.where(CommonConstants.MODIFIED_ON_COLUMN).gte(
+				CommonConstants.SURVEY_STAGE_COMPLETE)), Aggregation.match(Criteria.where(columnName).is(columnValue)), Aggregation.match(Criteria.where(CommonConstants.MODIFIED_ON_COLUMN).gte(
 				startDate)), Aggregation.project(CommonConstants.MODIFIED_ON_COLUMN)
 				.andExpression(criteriaColumn + "(" + CommonConstants.MODIFIED_ON_COLUMN + ")").as("groupCol"), Aggregation.group("groupCol").count()
 				.as("count"));
@@ -871,7 +869,7 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao {
 			}
 			else if (criteriaColumn.equals("week")) {
 				Date currDate = new Date();
-				int reductionInDate = 0;
+				int reductionInDate = Calendar.getInstance().get(Calendar.DAY_OF_WEEK)-1;
 				for (int i = 0; i < 4; i++) {
 					completedSurveys.put(new SimpleDateFormat(CommonConstants.DATE_FORMAT).format(currDate).toString(), 0l);
 					reductionInDate += 7;
@@ -923,30 +921,29 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao {
 	public Map<String, Long> getSocialPostsCountByCriteria(String columnName, long columnValue, String groupByCriteria) throws ParseException {
 		LOG.info("Method to get count of social posts based upon criteria(Weekly/Monthly/Yearly), getSocialPostsCountByCriteria() started.");
 		TypedAggregation<SurveyDetails> aggregation;
-		Date endDate = new Date();
+//		Date endDate = new Date();
 		int numberOfPastDaysToConsider = 7;
 		String criteriaColumn = "";
 		switch (groupByCriteria) {
 			case "weekly":
-				endDate = getNdaysBackDate(7);
+//				endDate = getNdaysBackDate(7);
 				numberOfPastDaysToConsider = 7;
 				criteriaColumn = "dayOfMonth";
 				break;
 			case "monthly":
-				endDate = getNdaysBackDate(Calendar.getInstance().get(Calendar.DAY_OF_WEEK));
+//				endDate = getNdaysBackDate(Calendar.getInstance().get(Calendar.DAY_OF_WEEK));
 				numberOfPastDaysToConsider = 30 + Calendar.getInstance().get(Calendar.DAY_OF_WEEK);
 				criteriaColumn = "week";
 				break;
 			case "yearly":
-				endDate = getNdaysBackDate(Calendar.getInstance().get(Calendar.DAY_OF_MONTH));
+//				endDate = getNdaysBackDate(Calendar.getInstance().get(Calendar.DAY_OF_MONTH));
 				numberOfPastDaysToConsider = 365 + Calendar.getInstance().get(Calendar.DAY_OF_MONTH);
 				criteriaColumn = "month";
 				break;
 		}
 		Date startDate = getNdaysBackDate(numberOfPastDaysToConsider);
 		aggregation = new TypedAggregation<SurveyDetails>(SurveyDetails.class, Aggregation.match(Criteria.where(CommonConstants.SHARED_ON_COLUMN)
-				.exists(true)), Aggregation.match(Criteria.where(columnName).is(columnValue)), Aggregation.match(Criteria.where(
-				CommonConstants.MODIFIED_ON_COLUMN).lt(endDate)),
+				.exists(true)), Aggregation.match(Criteria.where(columnName).is(columnValue)),
 				Aggregation.match(Criteria.where(CommonConstants.MODIFIED_ON_COLUMN).gte(startDate)), Aggregation
 						.project(CommonConstants.MODIFIED_ON_COLUMN).andExpression(criteriaColumn + "(" + CommonConstants.MODIFIED_ON_COLUMN + ")")
 						.as("groupCol"), Aggregation.group("groupCol").count().as("count"));
@@ -958,13 +955,13 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao {
 				Date currDate = new Date();
 				int reductionInDate = 0;
 				for (int i = 0; i < 7; i++) {
-					socialPosts.put(new SimpleDateFormat(CommonConstants.DATE_FORMAT).format(currDate).toString(), 0l);
 					currDate = getNdaysBackDate(reductionInDate++);
+					socialPosts.put(new SimpleDateFormat(CommonConstants.DATE_FORMAT).format(currDate).toString(), 0l);
 				}
 			}
 			else if (criteriaColumn.equals("week")) {
 				Date currDate = new Date();
-				int reductionInDate = 0;
+				int reductionInDate = Calendar.getInstance().get(Calendar.DAY_OF_WEEK)-1;
 				for (int i = 0; i < 4; i++) {
 					socialPosts.put(new SimpleDateFormat(CommonConstants.DATE_FORMAT).format(currDate).toString(), 0l);
 					reductionInDate += 7;
