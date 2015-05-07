@@ -18,8 +18,10 @@
 					<div class="float-left rfr_lbl rfr_lbl_long"><spring:message code="label.currentpassword.key" /></div>
 					<div class="float-left rfr_txt">
 						<div class="rfr_icn icn-password"></div>
-						<input type="password" class="rfr_txt_fld" id="current-pwd" data-non-empty="true"
+						<div class="rfr_txt_fld">
+						<input type="password" class="rfr_input_fld" id="current-pwd" data-non-empty="true"
 							name="oldpassword" placeholder="<spring:message code="label.currentpassword.key" />">
+						</div>
 					</div>
 				</div>
 				
@@ -27,13 +29,17 @@
 					<div class="float-left rfr_lbl rfr_lbl_long"><spring:message code="label.newpassword.key" /></div>
 					<div class="float-left rfr_txt">
 						<div class="rfr_icn icn-password"></div>
-						<input type="password" class="rfr_txt_fld" id="new-pwd" data-non-empty="true"
-							name="newpassword" placeholder="<spring:message code="label.newpassword.key" />">
+						<div class="rfr_txt_fld">
+							<input type="password" class="rfr_input_fld" id="new-pwd" data-non-empty="true"
+								name="newpassword" placeholder="<spring:message code="label.newpassword.key" />">
+						</div>
 					</div>
 					<div class="float-left rfr_txt">
 						<div class="rfr_icn icn-confirm-password"></div>
-						<input type="password" class="rfr_txt_fld" id="confnw-pwd" data-non-empty="true"
-							name="confirmnewpassword" placeholder="<spring:message code="label.confirmnewpassword.key" />">
+						<div class="rfr_txt_fld">
+							<input type="password" class="rfr_input_fld" id="confnw-pwd" data-non-empty="true"
+								name="confirmnewpassword" placeholder="<spring:message code="label.confirmnewpassword.key" />">
+						</div>
 					</div>
 				</div>
 				<div class="reg_form_row clearfix">

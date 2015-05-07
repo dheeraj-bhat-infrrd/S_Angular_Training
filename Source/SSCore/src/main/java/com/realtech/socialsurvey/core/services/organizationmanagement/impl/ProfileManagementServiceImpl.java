@@ -1253,12 +1253,10 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 	@Override
 	public void findProfileMailIdAndSendMail(String profileName, String message,String senderName, String senderMailId, String profileType)
 			throws InvalidInputException, NoRecordsFetchedException, UndeliveredEmailException {
-
 		if (profileName == null || profileName.isEmpty()) {
-			LOG.error("contactAgent : profile name parameter is empty or null!");
-			throw new InvalidInputException("contactAgent : profile name parameter is empty or null!");
+			LOG.error("contactAgent : profileName parameter is empty or null!");
+			throw new InvalidInputException("contactAgent : profileName parameter is empty or null!");
 		}
-
 		if (message == null || message.isEmpty()) {
 			LOG.error("contactAgent : message parameter is empty or null!");
 			throw new InvalidInputException("contactAgent : message parameter is empty or null!");
@@ -1267,19 +1265,16 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 			LOG.error("contactAgent : senderName parameter is empty or null!");
 			throw new InvalidInputException("contactAgent : senderName parameter is empty or null!");
 		}
-
 		if (senderMailId == null || senderMailId.isEmpty()) {
 			LOG.error("contactAgent : senderMailId parameter is empty or null!");
 			throw new InvalidInputException("contactAgent : senderMailId parameter is empty or null!");
 		}
-
 		if (profileType == null || profileType.isEmpty()) {
 			LOG.error("contactAgent : profileType parameter is empty or null!");
 			throw new InvalidInputException("contactAgent : profileType parameter is empty or null!");
 		}
 
 		OrganizationUnitSettings settings = null;
-
 		if (profileType.equals(CommonConstants.PROFILE_LEVEL_INDIVIDUAL)) {
 			LOG.debug("Fetching the agent settings from mongo for the agent with profile name : " + profileName);
 			settings = organizationUnitSettingsDao.fetchOrganizationUnitSettingsByProfileName(profileName, CommonConstants.AGENT_SETTINGS_COLLECTION);
@@ -1311,7 +1306,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 		if (settings != null) {
 			LOG.debug("Sending the contact us mail to the agent");
 			emailServices.sendContactUsMail(settings.getContact_details().getMail_ids().getWork(), settings.getContact_details().getName(),
-					senderName,senderMailId, message);
+					senderName, senderMailId, message);
 			LOG.debug("Contact us mail sent!");
 		}
 		else {

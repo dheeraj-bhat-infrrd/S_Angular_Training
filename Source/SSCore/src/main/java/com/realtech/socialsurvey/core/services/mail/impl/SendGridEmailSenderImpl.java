@@ -86,6 +86,7 @@ public class SendGridEmailSenderImpl implements EmailSender, InitializingBean {
 			LOG.error("Exception while sending the mail. " + emailEntity.toString(), e);
 			throw new UndeliveredEmailException("Could not send message. Reason: " + e.getMessage());
 		}
+		
 		if (response.getStatus()) {
 			LOG.debug("Mail sent successfully to " + emailEntity.toString());
 		}
@@ -100,6 +101,7 @@ public class SendGridEmailSenderImpl implements EmailSender, InitializingBean {
 			throws InvalidInputException, UndeliveredEmailException {
 		LOG.info("Method sendEmailWithBodyReplacements called for emailEntity : " + emailEntity + " subjectFileName : " + subjectFileName
 				+ " and messageBodyReplacements : " + messageBodyReplacements);
+
 		// check if mail needs to be sent
 		if (sendMail.equals(CommonConstants.YES_STRING)) {
 			if (subjectFileName == null || subjectFileName.isEmpty()) {
@@ -127,7 +129,39 @@ public class SendGridEmailSenderImpl implements EmailSender, InitializingBean {
 		}
 
 		LOG.info("Method sendEmailWithBodyReplacements completed successfully");
+	}
 
+	@Override
+	public void sendEmailWithSubjectAndBodyReplacements(EmailEntity emailEntity, FileContentReplacements subjectReplacements,
+			FileContentReplacements messageBodyReplacements) throws InvalidInputException, UndeliveredEmailException {
+		LOG.info("Method sendEmailWithBodyReplacements called for emailEntity : " + emailEntity + " subjectReplacements : " + subjectReplacements
+				+ " and messageBodyReplacements : " + messageBodyReplacements);
+
+		if (sendMail.equals(CommonConstants.YES_STRING)) {
+			if (subjectReplacements == null) {
+				throw new InvalidInputException("Email subject file name and replacements are null for sending mail");
+			}
+			if (messageBodyReplacements == null) {
+				throw new InvalidInputException("Email body file name and replacements are null for sending mail");
+			}
+
+			/**
+			 * Read the subject template to get the subject and set in emailEntity
+			 */
+			LOG.debug("Reading template to set the mail subject");
+			emailEntity.setSubject(fileOperations.replaceFileContents(subjectReplacements));
+
+			/**
+			 * Read the mail body template, replace the required contents with arguments provided
+			 * and set in emailEntity
+			 */
+			LOG.debug("Reading template to set the mail body");
+			emailEntity.setBody(fileOperations.replaceFileContents(messageBodyReplacements));
+
+			// Send the mail
+			sendMail(emailEntity);
+			LOG.info("Method sendEmailWithBodyReplacements completed successfully");
+		}
 	}
 
 	@Override
@@ -141,10 +175,8 @@ public class SendGridEmailSenderImpl implements EmailSender, InitializingBean {
 				throw new InvalidInputException("Email body is null for sending mail");
 			}
 
-			LOG.debug("Setting the mail subject");
+			LOG.debug("Setting the mail subject and body");
 			emailEntity.setSubject(subject);
-
-			LOG.debug("Setting the mail body");
 			emailEntity.setBody(mailBody);
 
 			// Send the mail
@@ -162,11 +194,5 @@ public class SendGridEmailSenderImpl implements EmailSender, InitializingBean {
 			sendGrid = new SendGrid(sendGridUserName, sendGridPassword);
 			LOG.info("Sendgrid gateway initialised!");
 		}
-	}
-
-	@Override
-	public void sendEmailWithSubjectAndBodyReplacements(EmailEntity emailEntity, FileContentReplacements subjectReplacements,
-			FileContentReplacements messageBodyReplacements) throws InvalidInputException, UndeliveredEmailException {
-		// TODO Auto-generated method stub	
 	}
 }

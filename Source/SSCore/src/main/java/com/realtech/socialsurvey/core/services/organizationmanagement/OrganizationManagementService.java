@@ -4,6 +4,7 @@ import java.net.MalformedURLException;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
 import com.realtech.socialsurvey.core.entities.Branch;
 import com.realtech.socialsurvey.core.entities.BranchFromSearch;
 import com.realtech.socialsurvey.core.entities.BranchSettings;
@@ -651,4 +652,8 @@ public interface OrganizationManagementService {
 	 */
 	public List<UserFromSearch> getUsersUnderRegionFromSolr(Set<Long> regionIds, int start, int rows) throws InvalidInputException,
 			NoRecordsFetchedException, SolrException;
+	
+	public String getUsStateList();
+	
+	public String getZipCodesByStateId(int stateId);
 }

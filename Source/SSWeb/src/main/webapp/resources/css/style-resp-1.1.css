@@ -79,6 +79,7 @@
         padding: 10px 0px;
         font-size: 18px;
         margin: 0;
+        line-height: normal;
     }
     .txt-header-small{
         font-size: 18px;
@@ -98,7 +99,7 @@
         color: #3e3e3e;
     }
     .reg-txt-top1{
-        font-size: 18px;
+        font-size: 16px;
         text-align: center;
         margin-top: 5px;
     
@@ -134,7 +135,7 @@
         border-bottom: 1px solid #dcdcdc;
     }
     .reg-cap-txt{
-/*        max-width: 165px;*/
+       /* max-width: 175px; */
     }
     .reg-btn{
         display: block;
@@ -149,12 +150,14 @@
 		margin: 10px 0 !important;
 		overflow: auto;
 		width: 100%;
+		background: rgba(0, 159, 224, 0.8);
 	}
 	.pro-left-wrapper {
 		width: 100%;
 		text-align: center;
 		height: 50px;
 		line-height: 50px;
+		background-color: transparent;
 	}
 	.pro-right-wrapper{
         width: 100%;
@@ -332,7 +335,7 @@
     }
     .reg-cap-txt{
         max-width: 895px !important;
-        width: 565px;
+        width: 565px !important;
     }
     .reg-inp-1 {
         margin-right: 5px !important;
@@ -418,7 +421,7 @@
         width: 300px;
     }
     .reg-txt-top1{
-        font-size: 16px;
+        font-size: 15px;
         margin-top: -10px;
     }
     .reg-item{
@@ -426,7 +429,7 @@
     }
     .reg-inp{
         width: 100% !important;
-        margin-bottom: 7px;
+        margin-bottom: 7px !important;
         height: 40px;
     }
     .disclaimer {
@@ -434,12 +437,13 @@
     }
     .reg-txt-top2 {
         margin-bottom: 5px;
+        font-size: 12px;
     }
     .reg-captcha-wrapper{
         margin-bottom: 7px;
     }
     .reg-cap-txt{
-        width: 162px;
+        width: 162px !important;
     }
     .c-reg-panel{
         padding: 12px;
@@ -462,6 +466,9 @@
         height: 50px;
         line-height: 50px;
     }
+    input#find-pro-submit{
+    	width: 145px;
+    }
 }
 
 
@@ -471,6 +478,9 @@
     .ctnt-list-item-txt-wrap{
 		width:537px !important;
 	}
+	.reg-cap-txt{
+        width: 256px !important;
+    }
 }
 
 

@@ -46,19 +46,25 @@
 					<div class="float-left rfr_lbl"><spring:message code="label.name.key" /></div>
 					<div class="float-left rfr_txt">
 						<div class="rfr_icn icn-fname"></div>
-						<input class="rfr_txt_fld" id="complete-reg-fname" data-non-empty="true"
-							name="firstName" value="${firstName}" placeholder='<spring:message code="label.firstname.key" />'>
+						<div class="rfr_txt_fld">
+							<input class="rfr_input_fld" id="complete-reg-fname" data-non-empty="true"
+								name="firstName" value="${firstName}" placeholder='<spring:message code="label.firstname.key" />'>
+						</div>
 					</div>
 					<div class="float-left rfr_txt">
 						<div class="rfr_icn icn-lname"></div>
 					<c:choose>
 						<c:when test="${not empty lastName && not lastName eq 'null'}">
-							<input class="rfr_txt_fld" id="complete-reg-lname" name="lastName" value="${lastName}" 
+						<div class="rfr_txt_fld">
+							<input class="rfr_input_fld" id="complete-reg-lname" name="lastName" value="${lastName}" 
 								placeholder='<spring:message code="label.lastname.key" />'>
+						</div>
 						</c:when>
 						<c:otherwise>
-							<input class="rfr_txt_fld" id="complete-reg-lname" name="lastName"
+						<div class="rfr_txt_fld">
+							<input class="rfr_input_fld" id="complete-reg-lname" name="lastName"
 								placeholder="<spring:message code="label.lastname.key" />">
+						</div>
 						</c:otherwise>
 					</c:choose>
 					</div>
@@ -67,8 +73,10 @@
 					<div class="float-left rfr_lbl"><spring:message code="label.emailid.key" /></div>
 					<div class="float-left rfr_txt">
 						<div class="rfr_icn icn-mail"></div>
-						<input class="rfr_txt_fld" id="complete-reg-user-id" data-non-empty="true" data-email="true"
+						<div class="rfr_txt_fld">
+						<input class="rfr_input_fld" id="complete-reg-user-id" data-non-empty="true" data-email="true"
 							name="emailId" value="${emailId}" placeholder='<spring:message code="label.emailid.key"/>' readonly="readonly" >
+						</div>
 					</div>
 				</div>
 				<div class="reg_form_row clearfix">
@@ -81,13 +89,17 @@
 					<div class="float-left rfr_lbl"><spring:message code="label.password.key" /></div>
 					<div class="float-left rfr_txt">
 						<div class="rfr_icn icn-password"></div>
-						<input type="password" class="rfr_txt_fld" id="complete-reg-pwd" data-non-empty="true"
+						<div class="rfr_txt_fld">
+						<input type="password" class="rfr_input_fld" id="complete-reg-pwd" data-non-empty="true"
 							name="password" placeholder='<spring:message code="label.password.key" />'>
+						</div>
 					</div>
 					<div class="float-left rfr_txt">
 						<div class="rfr_icn icn-confirm-password"></div>
-						<input type="password" class="rfr_txt_fld" id="complete-reg-cnf-pwd" data-non-empty="true"
+						<div class="rfr_txt_fld">
+						<input type="password" class="rfr_input_fld" id="complete-reg-cnf-pwd" data-non-empty="true"
 							name="confirmPassword" placeholder='<spring:message code="label.confirmpassword.key" />'>
+						</div>
 					</div>
 				</div>
 				<div class="reg_form_row clearfix">
