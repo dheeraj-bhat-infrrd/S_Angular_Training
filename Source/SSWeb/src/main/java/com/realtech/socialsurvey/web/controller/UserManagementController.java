@@ -1037,6 +1037,7 @@ public class UserManagementController {
 	
 	@RequestMapping(value = "/showlinkedindatacompare")
 	public String showLinkedInDataCompare(Model model, HttpServletRequest request) {
+		LOG.info("Method showLinkedInDataCompare() called");
 		HttpSession session = request.getSession(false);
 		
 		User user = sessionHelper.getCurrentUser();
@@ -1075,6 +1076,7 @@ public class UserManagementController {
 		}
 		session.setAttribute(CommonConstants.PARENT_LOCK, parentLock);
 		
+		LOG.info("Method showLinkedInDataCompare() finished");
 		return JspResolver.LINKEDIN_COMPARE;
 	}
 	
