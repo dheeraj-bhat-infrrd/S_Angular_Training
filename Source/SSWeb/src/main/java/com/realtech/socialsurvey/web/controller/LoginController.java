@@ -269,6 +269,15 @@ public class LoginController {
 
 					if (redirectTo.equals(JspResolver.LANDING)) {
 						setSession(session);
+						
+						// Setting session variable to show linkedin signup and sendsurvey popups only once
+						String popupStatus = (String) session.getAttribute(CommonConstants.POPUP_FLAG_IN_SESSION);
+						if (popupStatus == null) {
+							session.setAttribute(CommonConstants.POPUP_FLAG_IN_SESSION, CommonConstants.YES_STRING);
+						}
+						else if (popupStatus.equals(CommonConstants.YES_STRING)) {
+							session.setAttribute(CommonConstants.POPUP_FLAG_IN_SESSION, CommonConstants.NO_STRING);
+						}						
 
 						// setting linkedin popup attribute
 						boolean showLinkedInPopup = false;
