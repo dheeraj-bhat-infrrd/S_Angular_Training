@@ -114,10 +114,14 @@ public class DashboardController {
 			model.addAttribute("emailId", user.getEmailId());
 
 			// updating session with selected user profile if not set
-			Map<Long, UserProfile> profileMap = new HashMap<Long, UserProfile>();
+			Map<Long, UserProfile> profileMap = (Map<Long, UserProfile>) session.getAttribute(CommonConstants.USER_PROFILE_MAP);
+			if (profileMap == null) {
+				profileMap = new HashMap<Long, UserProfile>();
+			}
+			
 			UserProfile selectedProfile = (UserProfile) session.getAttribute(CommonConstants.USER_PROFILE);
+			List<UserProfile> profiles = userManagementService.getAllUserProfilesForUser(user);
 			if (selectedProfile == null) {
-				List<UserProfile> profiles = userManagementService.getAllUserProfilesForUser(user);
 				selectedProfile = profiles.get(CommonConstants.INITIAL_INDEX);
 				for (UserProfile profile : profiles) {
 					if (profile.getProfilesMaster().getProfileId() == CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID) {
