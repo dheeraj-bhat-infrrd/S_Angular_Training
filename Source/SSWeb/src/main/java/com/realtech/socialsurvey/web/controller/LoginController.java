@@ -277,7 +277,7 @@ public class LoginController {
 						}
 						else if (popupStatus.equals(CommonConstants.YES_STRING)) {
 							session.setAttribute(CommonConstants.POPUP_FLAG_IN_SESSION, CommonConstants.NO_STRING);
-						}						
+						}
 
 						// setting linkedin popup attribute
 						boolean showLinkedInPopup = false;
