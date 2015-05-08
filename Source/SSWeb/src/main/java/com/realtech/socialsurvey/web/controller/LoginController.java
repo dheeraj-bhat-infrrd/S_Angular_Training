@@ -583,7 +583,7 @@ public class LoginController {
 		HttpSession session = request.getSession(false);
 		User user = sessionHelper.getCurrentUser();
 		String imageUrl = "";
-
+		String profileMasterIdStr = request.getParameter("profileMasterId");
 		try {
 			user = userManagementService.getUserByUserId(user.getUserId());
 			UserProfile currentProfile = (UserProfile) session
@@ -607,6 +607,15 @@ public class LoginController {
 
 			int profileMasterId = currentProfile.getProfilesMaster()
 					.getProfileId();
+			
+			if(profileMasterIdStr!=null && !profileMasterIdStr.isEmpty()){
+				try{
+					profileMasterId = Integer.parseInt(profileMasterIdStr);
+				}catch(NumberFormatException e){
+					LOG.error("Error occured while parsing provided profileMasterId as parameter. Proceeding with default id.");
+				}
+			}
+			
 			if (profileMasterId == CommonConstants.PROFILES_MASTER_COMPANY_ADMIN_PROFILE_ID) {
 				imageUrl = userSettings.getCompanySettings()
 						.getProfileImageUrl();
