@@ -77,6 +77,8 @@
 				<value>com.realtech.socialsurvey.core.entities.UsercountModificationNotification</value>
 				<value>com.realtech.socialsurvey.core.entities.UserApiKey</value>
 				<value>com.realtech.socialsurvey.core.entities.SurveyPreInitiation</value>
+				<value>com.realtech.socialsurvey.core.entities.ZipCodeLookup</value>
+				<value>com.realtech.socialsurvey.core.entities.StateLookup</value>
 			</list>
 		</property>
 	</bean>
