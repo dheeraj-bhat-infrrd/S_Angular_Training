@@ -4,13 +4,14 @@
 <script src="${pageContext.request.contextPath}/resources/js/landing.js"></script>
 <script type="text/javascript">
 $(document).ready(function() {
+	var popupStatus = "${popupStatus}";
 	var showLinkedInPopup = "${showLinkedInPopup}";
 	var showSendSurveyPopup = "${showSendSurveyPopup}";
 	
-	if (showLinkedInPopup == "true") {
+	if (showLinkedInPopup == "true" && popupStatus == "Y") {
 		linkedInDataImport();
 	}
-	else if (showSendSurveyPopup == "true") {
+	else if (showSendSurveyPopup == "true" && popupStatus == "Y") {
 		sendSurveyInvitation();
 	}
 	
