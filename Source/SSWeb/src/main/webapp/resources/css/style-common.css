@@ -3879,7 +3879,7 @@ button.paypal.is-active {
 .dash-lp-item-grp {
 	max-height: 200px;
 	position: relative;
-	padding-right: 15px;
+	padding-right: 0px;
 }
 
 .dash-lp-txt span {
@@ -4157,7 +4157,6 @@ button.paypal.is-active {
 .rfr_txt_fld {
 	width: 275px;
 	height: 40px;
-	padding: 0 10px;
 	border-radius: 3px;
 	outline: none;
 	box-shadow: none;
@@ -4175,6 +4174,7 @@ select.rfr_txt_fld,select.rfr_input_fld{
   width: 100%;
   background: transparent;
   border: none;
+  padding: 0 10px;
 }
 
 .rfr_txt {
