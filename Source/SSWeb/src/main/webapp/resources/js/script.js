@@ -594,11 +594,15 @@ function upgradeToPaidPlan(){
 	    	});
 }
 
-function loadDisplayPicture(){
+function loadDisplayPicture(profileMasterId){
 	var success = false;
+	var payload = {
+		"profileMasterId" : profileMasterId
+	};
 	$.ajax({
 		url : "./getdisplaypiclocation.do",
 		type : "GET",
+		data : payload,
 		dataType : "JSON",
 		success : function(data) {
 			if (data.errCode == undefined)
