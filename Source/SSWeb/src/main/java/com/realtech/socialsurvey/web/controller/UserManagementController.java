@@ -7,10 +7,8 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
-
 import org.apache.solr.client.solrj.SolrServerException;
 import org.noggit.JSONUtil;
 import org.slf4j.Logger;
@@ -22,7 +20,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
-
 import com.amazonaws.util.json.JSONException;
 import com.amazonaws.util.json.JSONObject;
 import com.google.gson.Gson;
@@ -991,6 +988,15 @@ public class UserManagementController {
 			}
 			else {
 				// TODO: add logic for what happens when no user profile present
+			}
+			
+			// Setting session variable to show linkedin signup and sendsurvey popups only once
+			String popupStatus = (String) session.getAttribute(CommonConstants.POPUP_FLAG_IN_SESSION);
+			if (popupStatus == null) {
+				session.setAttribute(CommonConstants.POPUP_FLAG_IN_SESSION, CommonConstants.YES_STRING);
+			}
+			else if (popupStatus.equals(CommonConstants.YES_STRING)) {
+				session.setAttribute(CommonConstants.POPUP_FLAG_IN_SESSION, CommonConstants.NO_STRING);
 			}
 			
 			// updating session with selected user profile if not set
