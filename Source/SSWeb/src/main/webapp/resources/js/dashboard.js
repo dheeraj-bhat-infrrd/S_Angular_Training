@@ -501,7 +501,7 @@ function paintSurveyGraph() {
 	}
 	var element = document.getElementById("dsh-grph-format");
 	if(element == null){
-		return;l
+		return;
 	}
 	var format = element.options[element.selectedIndex].value;
 	var type = '';
