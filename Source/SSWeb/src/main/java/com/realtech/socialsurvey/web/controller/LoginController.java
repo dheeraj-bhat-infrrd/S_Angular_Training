@@ -152,8 +152,7 @@ public class LoginController {
 	 * @return
 	 */
 	@RequestMapping(value = "/userlogin", method = RequestMethod.GET)
-	public String login(Model model, HttpServletRequest request,
-			HttpServletResponse response) {
+	public String login(Model model, HttpServletRequest request, HttpServletResponse response) {
 		LOG.info("Login controller called for user login");
 		User user = null;
 		AccountType accountType = null;
@@ -164,51 +163,47 @@ public class LoginController {
 			isDirectRegistration = request.getParameter("isDirectRegistration");
 			// handle direct registration, if the user has incomplete
 			// registration for manual invite. in that cas bm will be set as I
-			if (request.getParameter("bm") != null
-					&& request.getParameter("bm").equals("I")) {
+			if (request.getParameter("bm") != null && request.getParameter("bm").equals("I")) {
 				isDirectRegistration = "false";
 			}
 			// code to hide the overlay during registration
 			if (isDirectRegistration != null) {
 				if (isDirectRegistration.equals("false")) {
 					model.addAttribute("skippayment", "true");
-				} else if (isDirectRegistration.equals("true")) {
+				}
+				else if (isDirectRegistration.equals("true")) {
 					model.addAttribute("skippayment", "false");
 				}
 			}
-			else{
+			else {
 				model.addAttribute("skippayment", "false");
 			}
 			user = sessionHelper.getCurrentUser();
 			HttpSession session = request.getSession(true);
 
-			List<LicenseDetail> licenseDetails = user.getCompany()
-					.getLicenseDetails();
+			List<LicenseDetail> licenseDetails = user.getCompany().getLicenseDetails();
 			if (licenseDetails != null && !licenseDetails.isEmpty()) {
 
 				LicenseDetail licenseDetail = licenseDetails.get(0);
-				accountType = AccountType.getAccountType(licenseDetail
-						.getAccountsMaster().getAccountsMasterId());
+				accountType = AccountType.getAccountType(licenseDetail.getAccountsMaster().getAccountsMasterId());
 				LOG.debug("Adding account type in session");
-				session.setAttribute(CommonConstants.ACCOUNT_TYPE_IN_SESSION,
-						accountType);
+				session.setAttribute(CommonConstants.ACCOUNT_TYPE_IN_SESSION, accountType);
 
 				LOG.debug("Checking if the account is disabled because of payment failure");
 				if (user.getCompany().getStatus() == CommonConstants.STATUS_PAYMENT_FAILED) {
 					LOG.debug("Payment has failed. Returning account disabled page");
 					setSession(session);
-					model.addAttribute(CommonConstants.DISABLED_ACCOUNT_FLAG,
-							CommonConstants.YES);
+					model.addAttribute(CommonConstants.DISABLED_ACCOUNT_FLAG, CommonConstants.YES);
 					return JspResolver.ACCOUNT_DISABLED_PAGE;
 				}
-			} else {
+			}
+			else {
 				LOG.debug("License details not found for the user's company");
 			}
 
 			/**
-			 * Check if if the company inserted is default company or
-			 * registration is not complete , if company registration not done
-			 * redirect to company registration page
+			 * Check if if the company inserted is default company or registration is not complete ,
+			 * if company registration not done redirect to company registration page
 			 */
 			LOG.debug("Checking if company profile registration complete");
 			if (user.getCompany().getCompanyId() == CommonConstants.DEFAULT_COMPANY_ID
@@ -219,70 +214,56 @@ public class LoginController {
 				if (redirectTo.equals(JspResolver.COMPANY_INFORMATION)) {
 					List<VerticalsMaster> verticalsMasters = null;
 					try {
-						verticalsMasters = organizationManagementService
-								.getAllVerticalsMaster();
-					} catch (InvalidInputException e) {
-						throw new InvalidInputException(
-								"Invalid Input exception occured in method getAllVerticalsMaster()",
+						verticalsMasters = organizationManagementService.getAllVerticalsMaster();
+					}
+					catch (InvalidInputException e) {
+						throw new InvalidInputException("Invalid Input exception occured in method getAllVerticalsMaster()",
 								DisplayMessageConstants.GENERAL_ERROR, e);
 					}
 					model.addAttribute("verticals", verticalsMasters);
 				}
-			} else {
+			}
+			else {
 				LOG.debug("Company profile complete, check any of the user profiles is entered");
 				if (user.getIsAtleastOneUserprofileComplete() == CommonConstants.PROCESS_COMPLETE) {
 					/**
 					 * Set the regions and branches in session from solr
 					 */
 					long companyId = user.getCompany().getCompanyId();
-					LOG.debug("Fetching regions from solr to set in session for company:"
-							+ companyId);
+					LOG.debug("Fetching regions from solr to set in session for company:" + companyId);
 					try {
-						Map<Long, RegionFromSearch> regions = organizationManagementService
-								.fetchRegionsMapByCompany(companyId);
-						session.setAttribute(
-								CommonConstants.REGIONS_IN_SESSION, regions);
-					} catch (MalformedURLException e) {
-						LOG.error(
-								"MalformedURLException while fetching regions. Reason : "
-										+ e.getMessage(), e);
-						throw new NonFatalException(
-								"MalformedURLException while fetching regions",
-								e);
+						Map<Long, RegionFromSearch> regions = organizationManagementService.fetchRegionsMapByCompany(companyId);
+						session.setAttribute(CommonConstants.REGIONS_IN_SESSION, regions);
+					}
+					catch (MalformedURLException e) {
+						LOG.error("MalformedURLException while fetching regions. Reason : " + e.getMessage(), e);
+						throw new NonFatalException("MalformedURLException while fetching regions", e);
 					}
 
-					LOG.debug("Fetching branches from solr to set in session for company:"
-							+ companyId);
+					LOG.debug("Fetching branches from solr to set in session for company:" + companyId);
 					try {
-						Map<Long, BranchFromSearch> branches = organizationManagementService
-								.fetchBranchesMapByCompany(companyId);
-						session.setAttribute(
-								CommonConstants.BRANCHES_IN_SESSION, branches);
-					} catch (MalformedURLException e) {
-						LOG.error(
-								"MalformedURLException while fetching branches. Reason : "
-										+ e.getMessage(), e);
-						throw new NonFatalException(
-								"MalformedURLException while fetching branches",
-								e);
+						Map<Long, BranchFromSearch> branches = organizationManagementService.fetchBranchesMapByCompany(companyId);
+						session.setAttribute(CommonConstants.BRANCHES_IN_SESSION, branches);
+					}
+					catch (MalformedURLException e) {
+						LOG.error("MalformedURLException while fetching branches. Reason : " + e.getMessage(), e);
+						throw new NonFatalException("MalformedURLException while fetching branches", e);
 					}
 
 					/**
-					 * Compute all conditions for user and if user is CA then
-					 * check for profile completion stage.
+					 * Compute all conditions for user and if user is CA then check for profile
+					 * completion stage.
 					 */
 					if (user.isCompanyAdmin()) {
 						UserProfile adminProfile = null;
 						for (UserProfile userProfile : user.getUserProfiles()) {
-							if ((userProfile.getCompany().getCompanyId() == user
-									.getCompany().getCompanyId())
-									&& (userProfile.getProfilesMaster()
-											.getProfileId() == CommonConstants.PROFILES_MASTER_COMPANY_ADMIN_PROFILE_ID))
+							if ((userProfile.getCompany().getCompanyId() == user.getCompany().getCompanyId())
+									&& (userProfile.getProfilesMaster().getProfileId() == CommonConstants.PROFILES_MASTER_COMPANY_ADMIN_PROFILE_ID))
 								adminProfile = userProfile;
 						}
-						redirectTo = getRedirectionFromProfileCompletionStage(adminProfile
-								.getProfileCompletionStage());
-					} else {
+						redirectTo = getRedirectionFromProfileCompletionStage(adminProfile.getProfileCompletionStage());
+					}
+					else {
 						redirectTo = JspResolver.LANDING;
 					}
 
@@ -302,15 +283,14 @@ public class LoginController {
 						if (user.getNumOfLogins() != 0) {
 							showLinkedInPopup = false;
 						}
-						model.addAttribute("showLinkedInPopup",
-								String.valueOf(showLinkedInPopup));
-						model.addAttribute("showSendSurveyPopup",
-								String.valueOf(showSendSurveyPopup));
+						model.addAttribute("showLinkedInPopup", String.valueOf(showLinkedInPopup));
+						model.addAttribute("showSendSurveyPopup", String.valueOf(showSendSurveyPopup));
 
 						// update the last login time and number of logins
 						userManagementService.updateUserLoginTimeAndNum(user);
 					}
-				} else {
+				}
+				else {
 					LOG.info("No User profile present");
 					// TODO: add logic for what happens when no user profile
 					// present
@@ -318,19 +298,16 @@ public class LoginController {
 			}
 
 			LOG.info("User login successful");
-		} catch (NonFatalException e) {
-			LOG.error(
-					"NonFatalException while logging in. Reason : "
-							+ e.getMessage(), e);
-			model.addAttribute("message", messageUtils.getDisplayMessage(
-					e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE));
+		}
+		catch (NonFatalException e) {
+			LOG.error("NonFatalException while logging in. Reason : " + e.getMessage(), e);
+			model.addAttribute("message", messageUtils.getDisplayMessage(e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE));
 			model.addAttribute("isDirectRegistration", isDirectRegistration);
 			return JspResolver.LOGIN;
 		}
 		// set the direct registration value, in case if its a manual
 		// registration
-		LOG.debug("Settings isDirectRegistration to "
-				+ request.getParameter("isDirectRegistration"));
+		LOG.debug("Settings isDirectRegistration to " + request.getParameter("isDirectRegistration"));
 		model.addAttribute("isDirectRegistration", isDirectRegistration);
 		return redirectTo;
 	}
