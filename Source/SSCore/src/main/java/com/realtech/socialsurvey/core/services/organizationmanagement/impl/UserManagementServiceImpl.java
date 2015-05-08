@@ -2087,9 +2087,9 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 	@Transactional
 	@Override
 	public void updateUserLoginTimeAndNum(User user) throws NonFatalException {
-		LOG.info("Updating users login time and number of logins for user: "+user.toString());
+		LOG.info("Updating users login time and number of logins for user: " + user.toString());
 		user.setLastLogin(new Timestamp(System.currentTimeMillis()));
-		user.setNumOfLogins(user.getNumOfLogins()+1);
+		user.setNumOfLogins(user.getNumOfLogins() + 1);
 		userDao.update(user);
 		LOG.info("Updated user login time and number of login");
 	}

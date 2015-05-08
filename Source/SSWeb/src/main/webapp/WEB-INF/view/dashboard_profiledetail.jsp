@@ -51,13 +51,13 @@
 			<div id="designation" class="dsh-txt-2">${title}</div>
 			<div id="company" class="dsh-txt-3">${company}</div>
 			<c:if test="${not empty companysettings.vertical}">
-				<div id="vertical" class="dsh-txt-3">${companysettings.vertical}</div>
+				<div id="vertical" class="dsh-txt-4">${companysettings.vertical}</div>
 			</c:if>
 			<c:if test="${not empty contactdetail.address}">
-				<div id="address-one" class="dsh-txt-3">${contactdetail.address}</div>
+				<div id="address-one" class="dsh-txt-4">${contactdetail.address}</div>
 			</c:if>
 			<c:if test="${not empty contactdetail.country && not empty contactdetail.zipcode}">
-				<div id="address-two" class="dsh-txt-3">${contactdetail.country}, ${contactdetail.zipcode}</div>
+				<div id="address-two" class="dsh-txt-4">${contactdetail.country}, ${contactdetail.zipcode}</div>
 			</c:if>
 		</div>
 		<div id="pro-cmplt-stars" class="dsh-star-wrapper clearfix">
