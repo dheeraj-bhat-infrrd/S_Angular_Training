@@ -237,7 +237,7 @@ public class DashboardController {
 		}
 		else if (columnName.equalsIgnoreCase(CommonConstants.AGENT_ID_COLUMN)) {
 			columnValue = user.getUserId();
-			model.addAttribute("name", user.getFirstName() + " " + user.getLastName());
+			model.addAttribute("name", user.getFirstName() + " " + (user.getLastName() != null ? user.getLastName() : ""));
 			model.addAttribute("title", getTitle(request, columnName, columnValue, user));
 			model.addAttribute("company", user.getCompany().getCompany());
 		}

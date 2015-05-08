@@ -51,6 +51,10 @@ public final class EmailTemplateConstants {
 	public static final String RETRY_CHARGE_MAIL_BODY = "RetryChargeMailBody.html";
 	public static final String RETRY_CHARGE_MAIL_SUBJECT = "RetryChargeMailSubject.txt";
 
+	// TODO
+	public static final String SOCIALPOST_REMINDER_MAIL_BODY = "SocialPostReminderMailBody.html";
+	public static final String SOCIALPOST_REMINDER_MAIL_SUBJECT = "SocialPostReminderMailSubject.txt";
+
 	public static final String SUBSCRIPTION_PRICE_UPDATED_MAIL_BODY = "SubscriptionPriceUpdateBody.html";
 	public static final String SUBSCRIPTION_PRICE_UPDATED_MAIL_SUBJECT = "SubscriptionPriceUpdate.txt";
 
@@ -75,12 +79,8 @@ public final class EmailTemplateConstants {
 	public static final String SURVEY_REMINDER_MAIL_BODY = "SurveyReminderMailBody.html";
 	public static final String SURVEY_REMINDER_MAIL_SUBJECT = "SurveyReminderMailSubject.txt";
 	
-	public static final String SURVEY_RESTART_MAIL_BODY = "SurveyRestartInvitationMailBody.html";
-	public static final String SURVEY_RESTART_MAIL_SUBJECT = "SurveyRestartInvitationMailSubject.txt";
-
-	// TODO
-	public static final String SOCIALPOST_REMINDER_MAIL_BODY = "SocialPostReminderMailBody.html";
-	public static final String SOCIALPOST_REMINDER_MAIL_SUBJECT = "SocialPostReminderMailSubject.txt";
+	public static final String SURVEY_RESTART_MAIL_BODY = "SurveyRestartMailBody.html";
+	public static final String SURVEY_RESTART_MAIL_SUBJECT = "SurveyRestartMailSubject.txt";
 
 	public static final String VERIFICATION_MAIL_BODY = "VerificationMailBody.html";
 	public static final String VERIFICATION_MAIL_SUBJECT = "VerificationMailSubject.txt";
