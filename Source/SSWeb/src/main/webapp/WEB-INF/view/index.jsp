@@ -190,7 +190,6 @@
 <script src="${pageContext.request.contextPath}/resources/js/common.js"></script>
 <script src="${pageContext.request.contextPath}/resources/js/script.js"></script>
 <script src="${pageContext.request.contextPath}/resources/js/index.js"></script>
-<script src="${pageContext.request.contextPath}/resources/js/proList.js"></script>
 <script>
 $(document).ready(function(){
 	var captchaText=true;
@@ -346,9 +345,7 @@ $(document).ready(function(){
 
 	function submitFindProForm() {
 		console.log("Submitting Find a Profile form");
-		if(validateFindProForm('find-pro-form')){
-			$('#find-pro-form').submit();
-		}
+		$('#find-pro-form').submit();
 		showOverlay();
 	}
 
