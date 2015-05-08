@@ -17,6 +17,11 @@ var graphData;
 var colName;
 var colValue;
 var searchColumn;
+var lastColNameForCount;
+var lastColValueForCount;
+var lastColNameForGraph;
+var lastColValueForGraph;
+
 
 $(document).on('click', '.icn-plus-open', function() {
 	$(this).hide();
@@ -107,7 +112,9 @@ function paintDashboard(profileMasterId, newProfileName, newProfileValue, typeoO
 		window.location.href = "./downloaddashboardcompletesurvey.do?columnName="
 				+ colName + "&columnValue=" + colValue;
 	});
-	
+	// Loads the image in circle od header.
+	loadDisplayPicture(profileMasterId);
+	// Loads the master image in dashboard.
 	showDisplayPic();
 }
 
@@ -215,10 +222,22 @@ function bindSelectButtons() {
 		$('.dsh-res-display').hide();
 	});
 	$("#dsh-grph-format").change(function() {
-		showSurveyStatisticsGraphically(colName, colValue);
+		var columnName = colName;
+		var columnValue = colValue;
+		if($('#dsh-grph-srch-survey-div').is(':visible')){
+			columnName = lastColNameForGraph;
+			columnValue = lastColValueForGraph;
+		}
+		showSurveyStatisticsGraphically(columnName, columnValue);
 	});
 	$("#survey-count-days").change(function() {
-		showSurveyStatistics(colName, colValue);
+		var columnName = colName;
+		var columnValue = colValue;
+		if($('#dsh-srch-survey-div').is(':visible')){
+			columnName = lastColNameForCount;
+			columnValue = lastColValueForCount;
+		}
+		showSurveyStatistics(columnName, columnValue);
 	});
 }
 
@@ -600,10 +619,16 @@ function searchBranchRegionOrAgent(searchKeyword, flow) {
 				columnName = "agentId";
 			}
 			
-			if (flow == 'icons')
+			if (flow == 'icons'){
+				lastColNameForCount = columnName;
+				lastColValueForCount = value;
 				showSurveyStatistics(columnName, value);
-			else if (flow == 'graph')
+			}
+			else if (flow == 'graph'){
+				lastColNameForGraph = columnName;
+				lastColValueForGraph = value;
 				showSurveyStatisticsGraphically(columnName, value);
+			}
 			$('.dsh-res-display').hide();
 		});
 	}, payload, false);

@@ -30,7 +30,7 @@
 					<c:forEach begin="1" end="${clickedSurveyCount}" var="counttwo">
 						<div class='float-left stat-icn-img stat-icn-img-blue'></div>
 					</c:forEach>
-					<div id='survey-clicked' class='float-left stat-icn-txt-rt'>${clickedPrc}%</div>
+					<div id='survey-clicked' class='float-left stat-icn-txt-rt'>${clickedPrc}%-${clickedSurveyCount}</div>
 				</c:when>
 				<c:otherwise>
 					<div id='survey-clicked' class='float-left stat-icn-txt-rt'>0%</div>
@@ -49,7 +49,7 @@
 					<c:forEach begin="1" end="${completedSurveyCount}" var="counttwo">
 						<div class="float-left stat-icn-img stat-icn-img-yellow"></div>
 					</c:forEach>
-					<div id='survey-completed' class='float-left stat-icn-txt-rt'>${completedPrc}%</div>
+					<div id='survey-completed' class='float-left stat-icn-txt-rt'>${completedPrc}%-${completedSurveyCount}</div>
 				</c:when>
 				<c:otherwise>
 					<div id='survey-completed' class='float-left stat-icn-txt-rt'>0%</div>
