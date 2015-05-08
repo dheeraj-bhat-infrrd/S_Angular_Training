@@ -5,6 +5,10 @@
 <c:if test="${not empty profile}">
 	<c:set value="${profile.profilesMaster.profileId}" var="profilemasterid"></c:set>
 </c:if>
+<c:if test="${not empty cannonicalusersettings}">
+	<c:set value="${cannonicalusersettings.companySettings}" var="companysettings"></c:set>
+	<c:set value="${cannonicalusersettings.companySettings.contact_details}" var="contactdetail"></c:set>
+</c:if>
 
 <div class="float-right dash-main-right col-lg-6 col-md-6 col-sm-6 col-xs-12">
 	<div class="dsh-graph-wrapper">
@@ -46,6 +50,15 @@
 			<div id="name" class="dsh-txt-1">${name}</div>
 			<div id="designation" class="dsh-txt-2">${title}</div>
 			<div id="company" class="dsh-txt-3">${company}</div>
+			<c:if test="${not empty companysettings.vertical}">
+				<div id="vertical" class="dsh-txt-3">${companysettings.vertical}</div>
+			</c:if>
+			<c:if test="${not empty contactdetail.address}">
+				<div id="address-one" class="dsh-txt-3">${contactdetail.address}</div>
+			</c:if>
+			<c:if test="${not empty contactdetail.country && not empty contactdetail.zipcode}">
+				<div id="address-two" class="dsh-txt-3">${contactdetail.country}, ${contactdetail.zipcode}</div>
+			</c:if>
 		</div>
 		<div id="pro-cmplt-stars" class="dsh-star-wrapper clearfix">
 			<div class="float-left dsh-star-item"></div>
