@@ -861,7 +861,7 @@ public class SolrSearchServiceImpl implements SolrSearchService {
 		List<SolrDocument> results = new ArrayList<SolrDocument>();
 		QueryResponse response = null;
 		searchKey = searchKey + "*";
-		
+		SolrQuery query = new SolrQuery();
 		try {
 			SolrServer solrServer;
 			switch (searchColumn) {
@@ -879,11 +879,12 @@ public class SolrSearchServiceImpl implements SolrSearchService {
 					else if (columnName.equals(CommonConstants.BRANCH_ID_COLUMN)) {
 						columnName = "branches";
 					}
+					query.addFilterQuery("isAgent" + ":" + true);
 					break;
 				default:
 					solrServer = new HttpSolrServer(solrRegionUrl);
 			}
-			SolrQuery query = new SolrQuery();
+			
 			query.setQuery(columnName + ":" + id);
 
 			query.addFilterQuery(searchColumn + ":" + searchKey);
