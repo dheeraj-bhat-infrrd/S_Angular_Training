@@ -44,8 +44,12 @@
 	<div class="dash-left-txt-wrapper">
 		<div class="dsh-name-wrapper">
 			<div id="name" class="dsh-txt-1">${name}</div>
-			<div id="designation" class="dsh-txt-2">${title}</div>
-			<div id="company" class="dsh-txt-3">${company}</div>
+			<c:if test="${not empty title}">
+				<div id="designation" class="dsh-txt-2">${title}</div>
+			</c:if>
+			<c:if test="${not empty company}">
+				<div id="company" class="dsh-txt-3">${company}</div>
+			</c:if>
 		</div>
 		<div id="pro-cmplt-stars" class="dsh-star-wrapper clearfix">
 			<div class="float-left dsh-star-item"></div>
