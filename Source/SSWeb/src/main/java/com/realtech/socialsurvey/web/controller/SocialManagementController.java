@@ -549,8 +549,8 @@ public class SocialManagementController {
 			Map<String, Object> map = new Gson().fromJson(accessTokenStr, new TypeToken<Map<String, String>>() {}.getType());
 			String accessToken = (String) map.get("access_token");
 			String profileLink = null;
-			linkedinProfileUri += accessToken;
-			HttpGet httpGet = new HttpGet(linkedinProfileUri);
+			String linkedinProfileUriWithAccessToken = linkedinProfileUri + accessToken; 
+			HttpGet httpGet = new HttpGet(linkedinProfileUriWithAccessToken);
 			String basicProfileStr = httpclient.execute(httpGet, new BasicResponseHandler());
 			
 			LinkedinUserProfileResponse profileData = new Gson().fromJson(basicProfileStr, LinkedinUserProfileResponse.class);
