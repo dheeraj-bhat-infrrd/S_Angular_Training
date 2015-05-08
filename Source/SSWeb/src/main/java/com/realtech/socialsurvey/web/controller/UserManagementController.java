@@ -998,8 +998,9 @@ public class UserManagementController {
 			boolean showLinkedInPopup = false;
 			boolean showSendSurveyPopup = false;
 			Map<Long, UserProfile> profileMap = new HashMap<Long, UserProfile>();
-			UserProfile selectedProfile = user.getUserProfiles().get(CommonConstants.INITIAL_INDEX);
-			for (UserProfile profile : user.getUserProfiles()) {
+			List<UserProfile> profiles = userManagementService.getAllUserProfilesForUser(user);
+			UserProfile selectedProfile = profiles.get(CommonConstants.INITIAL_INDEX);
+			for (UserProfile profile : profiles) {
 				if (profile.getProfilesMaster().getProfileId() == CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID) {
 					selectedProfile = profile;
 
