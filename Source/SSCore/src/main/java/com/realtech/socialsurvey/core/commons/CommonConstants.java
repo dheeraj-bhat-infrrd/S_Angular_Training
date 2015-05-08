@@ -230,6 +230,7 @@ public interface CommonConstants {
 	public static final String BRANCH_ID = "branchId";
 	public static final String AGENT_ID = "agentId";
 	public static final String FLOW_REGISTRATION = "registration";
+	public static final String POPUP_FLAG_IN_SESSION = "popupStatus";
 
 	/**
 	 * Batch Constants
