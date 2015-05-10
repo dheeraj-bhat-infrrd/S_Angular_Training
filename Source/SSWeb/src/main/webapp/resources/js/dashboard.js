@@ -399,6 +399,11 @@ function showReviews(columnName, columnValue) {
 			var agentId = $(this).parent().parent().parent().attr('data-agentid');
 			shareOnYelp(agentId, window.location.origin+"/rest/survey/");
 		});
+		$('.icn-gplus').unbind('click');
+		$(".icn-gplus").click(function() {
+			var agentId = $(this).parent().parent().parent().attr('data-agentid');
+			shareOnGooglePlus(agentId, window.location.origin+"/rest/survey/");
+		});
 		
 		startIndexCmp += batchSizeCmp;
 	}, payload, false);
@@ -501,7 +506,7 @@ function paintSurveyGraph() {
 	}
 	var element = document.getElementById("dsh-grph-format");
 	if(element == null){
-		return;l
+		return;
 	}
 	var format = element.options[element.selectedIndex].value;
 	var type = '';
