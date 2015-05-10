@@ -811,7 +811,7 @@ public class SocialManagementController {
 		String custFirstName = request.getParameter("firstName");
 		String custLastName = request.getParameter("lastName");
 		String agentIdStr = request.getParameter("agentId");
-
+		boolean facebookNotSetup = true;
 		double rating = 0;
 		long agentId = 0;
 		try {
@@ -847,7 +847,8 @@ public class SocialManagementController {
 		for (OrganizationUnitSettings setting : settings) {
 			try {
 				if (setting != null)
-					socialManagementService.updateStatusIntoFacebookPage(setting, facebookMessage);
+					if(!socialManagementService.updateStatusIntoFacebookPage(setting, facebookMessage))
+						facebookNotSetup = false;
 			}
 			catch (FacebookException | InvalidInputException e) {
 				LOG.error("FacebookException/InvalidInputException caught in postToFacebook() while trying to post to facebook. Nested excption is ",
@@ -856,19 +857,20 @@ public class SocialManagementController {
 		}
 
 		LOG.info("Method to post feedback of customer to facebook finished.");
-		return "Successfully posted to all the your facebook profiles";
+		return facebookNotSetup+"";
 	}
 
 	@ResponseBody
 	@RequestMapping(value = "/postontwitter", method = RequestMethod.GET)
 	public String postToTwitter(HttpServletRequest request) {
 		LOG.info("Method to post feedback of customer on twitter started.");
+		boolean twitterNotSetup = true;
 		try {
 			String agentName = request.getParameter("agentName");
 			String custFirstName = request.getParameter("firstName");
 			String custLastName = request.getParameter("lastName");
 			String agentIdStr = request.getParameter("agentId");
-
+			
 			double rating = 0;
 			long agentId = 0;
 			try {
@@ -892,7 +894,7 @@ public class SocialManagementController {
 			catch (InvalidInputException e) {
 				LOG.error("InvalidInputException caught in postToFacebook(). Nested exception is ", e);
 			}
-
+			
 			User user = sessionHelper.getCurrentUser();
 			List<OrganizationUnitSettings> settings = socialManagementService.getBranchAndRegionSettingsForUser(user.getUserId());
 			rating = Math.round(rating * 100) / 100;
@@ -903,7 +905,8 @@ public class SocialManagementController {
 			for (OrganizationUnitSettings setting : settings) {
 				try {
 					if (setting != null)
-						socialManagementService.tweet(setting, twitterMessage);
+						if(!socialManagementService.tweet(setting, twitterMessage))
+							twitterNotSetup = false;
 				}
 				catch (TwitterException e) {
 					LOG.error("TwitterException caught in postToTwitter() while trying to post to twitter. Nested excption is ", e);
@@ -919,7 +922,7 @@ public class SocialManagementController {
 		}
 
 		LOG.info("Method to post feedback of customer to various pages of twitter finished.");
-		return "Successfully posted to all the your twitter profiles";
+		return twitterNotSetup+"";
 	}
 
 	@ResponseBody
@@ -930,6 +933,7 @@ public class SocialManagementController {
 		String custFirstName = request.getParameter("firstName");
 		String custLastName = request.getParameter("lastName");
 		String agentIdStr = request.getParameter("agentId");
+		boolean linkedinNotSetup = true;
 
 		double rating = 0;
 		long agentId = 0;
@@ -965,7 +969,8 @@ public class SocialManagementController {
 		for (OrganizationUnitSettings setting : settings) {
 			try {
 				if (setting != null)
-					socialManagementService.updateLinkedin(setting, message);
+					if(!socialManagementService.updateLinkedin(setting, message))
+						linkedinNotSetup = false;
 			}
 			catch (NonFatalException e) {
 				LOG.error("NonFatalException caught in postToLinkedin() while trying to post to twitter. Nested excption is ", e);
@@ -973,7 +978,7 @@ public class SocialManagementController {
 		}
 
 		LOG.info("Method to post feedback of customer to various pages of twitter finished.");
-		return "Successfully posted to all the your twitter profiles";
+		return linkedinNotSetup+"";
 	}
 
 	@ResponseBody
