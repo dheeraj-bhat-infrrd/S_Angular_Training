@@ -801,7 +801,7 @@ public class DashboardController {
 			String endDateStr = request.getParameter("endDate");
 			
 			Date startDate = null;
-			if (startDateStr != null) {
+			if (startDateStr != null && !startDateStr.isEmpty()) {
 				try {
 					startDate = new SimpleDateFormat(CommonConstants.DATE_FORMAT).parse(startDateStr);
 				}
@@ -811,7 +811,7 @@ public class DashboardController {
 			}
 			
 			Date endDate = Calendar.getInstance().getTime();
-			if (endDateStr != null) {
+			if (endDateStr != null && !endDateStr.isEmpty()) {
 				try {
 					endDate = new SimpleDateFormat(CommonConstants.DATE_FORMAT).parse(endDateStr);
 				}
