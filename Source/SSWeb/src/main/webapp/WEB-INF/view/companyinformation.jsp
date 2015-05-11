@@ -55,6 +55,7 @@
 					<div class="reg_form_row clearfix">
 						<div class="float-left rfr_lbl"><spring:message code="label.logo.key"/></div>
 						<div class="float-left rfr_txt">
+							<div class="rfr_icn icn-logo"></div>
 							<div class="icn-lname input-file-icn-left" id="input-file-icn-left"></div>
 							<div class="rfr_txt_fld"><input type="text" class="rfr_input_fld" id="com-logo-decoy" placeholder='<spring:message code="label.logo.placeholder.key"/>'></div>
 							<div><input type="file" class="rfr_input_fld com-logo-comp-info" id="com-logo" name="logo"></div>
@@ -64,13 +65,13 @@
 					<div class="reg_form_row clearfix">
 						<div class="float-left rfr_lbl"><spring:message code="label.address.key" /></div>
 						<div class="float-left rfr_txt">
-							<div class="rfr_icn icn-fname"></div>
+							<div class="rfr_icn icn-address1"></div>
 							<div class="rfr_txt_fld"><input class="rfr_input_fld" id="com-address1" data-non-empty="true"
 								name="address1" value="${address1}" placeholder='<spring:message code="label.address1.key"/>'>
 							</div>
 						</div>
 						<div class="float-left rfr_txt">
-							<div class="rfr_icn icn-lname"></div>
+							<div class="rfr_icn icn-address2"></div>
 							<div class="rfr_txt_fld">
 								<input class="rfr_input_fld" id="com-address2" name="address2"
 									value="${address2}"
@@ -81,14 +82,14 @@
 					<div class="reg_form_row clearfix">
 						<div class="float-left rfr_lbl" style="visibility:hidden;"><spring:message code="label.address.key" /></div>
 						<div class="float-left rfr_txt">
-							<div class="rfr_icn icn-fname"></div>
+							<div class="rfr_icn icn-country"></div>
 							<div class="rfr_txt_fld">
 							<input class="rfr_input_fld" id="com-country" data-non-empty="true"
 								name="country" value="${country}" placeholder='<spring:message code="label.country.key"/>'>
 							</div>
 						</div>
 						<div class="float-left rfr_txt">
-							<div class="rfr_icn icn-lname"></div>
+							<div class="rfr_icn icn-zip"></div>
 							<div class="rfr_txt_fld">
 							<input class="rfr_input_fld" id="com-zipcode" data-non-empty="true" data-zipcode="true"
 								name="zipcode" value="${zipCode}" placeholder='<spring:message code="label.zipcode.key"/>'>
@@ -98,14 +99,14 @@
 					<div id="state-city-row" class="reg_form_row clearfix hide">
 						<div class="float-left rfr_lbl" style="visibility:hidden;"><spring:message code="label.address.key" /></div>
 						<div class="float-left rfr_txt">
-							<div class="rfr_icn icn-fname"></div>
+							<div class="rfr_icn icn-state"></div>
 							<div class="rfr_txt_fld">
 							<input class="rfr_input_fld" id="com-state" data-non-empty="true"
 								name="state" value="${state}" placeholder='<spring:message code="label.state.key"/>'>
 								</div>
 						</div>
 						<div class="float-left rfr_txt">
-							<div class="rfr_icn icn-lname"></div>
+							<div class="rfr_icn icn-city"></div>
 							<div class="rfr_txt_fld">
 							<input class="rfr_input_fld" id="com-city" data-non-empty="true"
 								name="city" value="${city}" placeholder='<spring:message code="label.city.key"/>'>
@@ -158,8 +159,8 @@
 <script src="${pageContext.request.contextPath}/resources/js/script.js"></script>
 <script src="${pageContext.request.contextPath}/resources/js/countrydata.js"></script>
 <script src="${pageContext.request.contextPath}/resources/js/zipcoderegex.js"></script>
-<script src="http://code.jquery.com/jquery-1.10.2.js"></script>
-<script src="http://code.jquery.com/ui/1.11.2/jquery-ui.js"></script>
+<script src="//code.jquery.com/jquery-1.10.2.js"></script>
+<script src="//code.jquery.com/ui/1.11.2/jquery-ui.js"></script>
 <script>
 var isCompanyInfoPageValid;
 var selectedCountryRegEx = "";
