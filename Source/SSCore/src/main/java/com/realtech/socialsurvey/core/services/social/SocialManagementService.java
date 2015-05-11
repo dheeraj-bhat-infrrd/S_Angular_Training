@@ -45,16 +45,16 @@ public interface SocialManagementService {
 	public SocialMediaTokens updateAgentSocialMediaTokens(AgentSettings agentSettings, SocialMediaTokens mediaTokens)
 			throws InvalidInputException;
 	
-	public void updateStatusIntoFacebookPage(OrganizationUnitSettings agentSettings, String message) throws InvalidInputException,
+	public boolean updateStatusIntoFacebookPage(OrganizationUnitSettings agentSettings, String message) throws InvalidInputException,
 			FacebookException;
 
-	public void tweet(OrganizationUnitSettings agentSettings, String message) throws InvalidInputException, TwitterException;
+	public boolean tweet(OrganizationUnitSettings agentSettings, String message) throws InvalidInputException, TwitterException;
 	
 	public List<OrganizationUnitSettings> getSettingsForBranchesAndRegionsInHierarchy(long agentId) throws InvalidInputException;
 	
 	public List<OrganizationUnitSettings> getBranchAndRegionSettingsForUser(long userId);
 	
-	public void updateLinkedin(OrganizationUnitSettings agentSettings, String message) throws NonFatalException;
+	public boolean updateLinkedin(OrganizationUnitSettings agentSettings, String message) throws NonFatalException;
 
 }
 // JIRA SS-34 BY RM02 BOC
