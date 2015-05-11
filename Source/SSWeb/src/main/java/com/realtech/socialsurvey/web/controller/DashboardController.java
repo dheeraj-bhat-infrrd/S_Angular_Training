@@ -799,8 +799,8 @@ public class DashboardController {
 			String columnName = request.getParameter("columnName");
 			String startDateStr = request.getParameter("startDate");
 			String endDateStr = request.getParameter("endDate");
+			
 			Date startDate = null;
-			Date endDate = Calendar.getInstance().getTime();
 			if (startDateStr != null) {
 				try {
 					startDate = new SimpleDateFormat(CommonConstants.DATE_FORMAT).parse(startDateStr);
@@ -809,6 +809,8 @@ public class DashboardController {
 					LOG.error("ParseException caught in getCompleteSurveyFile() while parsing startDate. Nested exception is ", e);
 				}
 			}
+			
+			Date endDate = Calendar.getInstance().getTime();
 			if (endDateStr != null) {
 				try {
 					endDate = new SimpleDateFormat(CommonConstants.DATE_FORMAT).parse(endDateStr);
@@ -817,10 +819,12 @@ public class DashboardController {
 					LOG.error("ParseException caught in getCompleteSurveyFile() while parsing startDate. Nested exception is ", e);
 				}
 			}
+			
 			if (columnName == null || columnName.isEmpty()) {
 				LOG.error("Invalid value (null/empty) passed for profile level.");
 				throw new InvalidInputException("Invalid value (null/empty) passed for profile level.");
 			}
+			
 			String profileLevel = getProfileLevel(columnName);
 			long iden = 0;
 
@@ -843,6 +847,7 @@ public class DashboardController {
 					}
 				}
 			}
+			
 			try {
 				surveyDetails = profileManagementService.getReviews(iden, -1, -1, -1, -1, profileLevel, true, startDate, endDate);
 				String fileLocation = "Completed_Survey_" + profileLevel + "_" + iden + EXCEL_FILE_EXTENSION;
@@ -851,6 +856,7 @@ public class DashboardController {
 				String headerKey = CONTENT_DISPOSITION_HEADER;
 				String headerValue = String.format("attachment; filename=\"%s\"", new File(fileLocation).getName());
 				response.setHeader(headerKey, headerValue);
+				
 				// write into file
 				OutputStream responseStream = null;
 				try {

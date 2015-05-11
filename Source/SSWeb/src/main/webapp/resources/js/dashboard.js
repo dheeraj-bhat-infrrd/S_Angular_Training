@@ -108,10 +108,13 @@ function paintDashboard(profileMasterId, newProfileName, newProfileValue, typeoO
 				+ colName + "&columnValue=" + colValue;
 	});
 
-	$('#dsh-cmp-dwnld').click(function() {
+	$('#dsh-dwnld-btn').click(function() {
+		var startDate = $('#dsh-start-date').val();
+		var endDate = $("#dsh-end-date").val();
 		window.location.href = "./downloaddashboardcompletesurvey.do?columnName="
-				+ colName + "&columnValue=" + colValue;
+				+ colName + "&columnValue=" + colValue + "&startDate=" + startDate + "&endDate=" + endDate;
 	});
+	
 	// Loads the image in circle od header.
 	loadDisplayPicture(profileMasterId);
 	// Loads the master image in dashboard.
@@ -338,7 +341,17 @@ function getReviewsCountAndShowReviews(columnName, columnValue) {
 				return;
 			} else {
 				$("#review-desc").html("What people say about " + name.substring(1, name.length - 1));
+				
 				$("#dsh-cmp-dwnld").show();
+				$("#dsh-start-date").datepicker({
+					orientation: "bottom auto",
+					autoclose: true
+				});
+				$("#dsh-end-date").datepicker({
+					orientation: "bottom auto",
+					autoclose: true,
+					endDate: new Date()
+				});
 			}
 		}, payload, false);
 		
