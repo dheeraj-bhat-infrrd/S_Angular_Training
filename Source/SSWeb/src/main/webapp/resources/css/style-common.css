@@ -216,6 +216,30 @@ a,a:hover,a:visited {
 	background-position: -50px center;
 }
 
+.icn-country {
+	background: url('../images/country.png') no-repeat center;
+}
+
+.icn-logo {
+	background: url('../images/logo_placeholder.png') no-repeat center;
+}
+
+.icn-address1 {
+	background: url(../images/address-1.png) no-repeat center;
+}
+
+.icn-address2 {
+	background: url(../images/address-2.png) no-repeat center;
+}
+
+.icn-state {
+	background: url('../images/state.png') no-repeat center;
+}
+
+.icn-city {
+	background: url('../images/city.png') no-repeat center;
+}
+
 .icn-address-mobile {
 	background: url(../images/address-1.png) no-repeat center;
 	background-position: -50px center;
