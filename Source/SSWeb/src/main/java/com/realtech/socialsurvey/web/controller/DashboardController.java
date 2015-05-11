@@ -9,7 +9,6 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
@@ -100,7 +99,6 @@ public class DashboardController {
 	/*
 	 * Method to initiate dashboard
 	 */
-	@SuppressWarnings("unchecked")
 	@RequestMapping(value = "/dashboard")
 	public String initDashboardPage(Model model, HttpServletRequest request) {
 		LOG.info("Dashboard Page started");
@@ -108,44 +106,33 @@ public class DashboardController {
 		User user = sessionHelper.getCurrentUser();
 
 		try {
-			// fetching user with updated user profiles
-			user = userManagementService.getUserByUserId(user.getUserId());
-			model.addAttribute("userId", user.getUserId());
-			model.addAttribute("emailId", user.getEmailId());
-
 			// updating session with selected user profile if not set
-			Map<Long, UserProfile> profileMap = (Map<Long, UserProfile>) session.getAttribute(CommonConstants.USER_PROFILE_MAP);
-			if (profileMap == null) {
-				profileMap = new HashMap<Long, UserProfile>();
-			}
+			sessionHelper.updateProcessedUserProfiles(session, user);
 			
 			UserProfile selectedProfile = (UserProfile) session.getAttribute(CommonConstants.USER_PROFILE);
-			List<UserProfile> profiles = userManagementService.getAllUserProfilesForUser(user);
-			if (selectedProfile == null) {
-				selectedProfile = profiles.get(CommonConstants.INITIAL_INDEX);
-				for (UserProfile profile : profiles) {
-					if (profile.getProfilesMaster().getProfileId() == CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID) {
-						selectedProfile = profile;
-						break;
-					}
-				}
-				session.setAttribute(CommonConstants.USER_PROFILE, selectedProfile);
-			}
-			model = setSelectedProfileAttributes(model, user, selectedProfile);
+			int profileMasterId = selectedProfile.getProfilesMaster().getProfileId();
 
-			// updating session with aggregated user profiles, if not set
-			AccountType accountType = (AccountType) session.getAttribute(CommonConstants.ACCOUNT_TYPE_IN_SESSION);
-			Map<Long, AbridgedUserProfile> profileAbridgedMap = (Map<Long, AbridgedUserProfile>) session
-					.getAttribute(CommonConstants.USER_PROFILE_LIST);
-			if (profileAbridgedMap == null) {
-				profileAbridgedMap = userManagementService.processedUserProfiles(user, accountType, profileMap);
+			model.addAttribute("userId", user.getUserId());
+			model.addAttribute("emailId", user.getEmailId());
+			model.addAttribute("profileId", selectedProfile.getUserProfileId());
+			model.addAttribute("profileMasterId", profileMasterId);
+			
+			if (profileMasterId == CommonConstants.PROFILES_MASTER_COMPANY_ADMIN_PROFILE_ID) {
+				model.addAttribute("columnName", CommonConstants.COMPANY_ID_COLUMN);
+				model.addAttribute("columnValue", user.getCompany().getCompanyId());
 			}
-			if (profileAbridgedMap.size() > 0) {
-				session.setAttribute(CommonConstants.USER_PROFILE_LIST, profileAbridgedMap);
-				session.setAttribute(CommonConstants.PROFILE_NAME_COLUMN, profileAbridgedMap.get(selectedProfile.getUserProfileId())
-						.getUserProfileName());
+			else if (profileMasterId == CommonConstants.PROFILES_MASTER_REGION_ADMIN_PROFILE_ID) {
+				model.addAttribute("columnName", CommonConstants.REGION_ID_COLUMN);
+				model.addAttribute("columnValue", selectedProfile.getRegionId());
 			}
-			session.setAttribute(CommonConstants.USER_PROFILE_MAP, profileMap);
+			else if (profileMasterId == CommonConstants.PROFILES_MASTER_BRANCH_ADMIN_PROFILE_ID) {
+				model.addAttribute("columnName", CommonConstants.BRANCH_ID_COLUMN);
+				model.addAttribute("columnValue", selectedProfile.getBranchId());
+			}
+			else if (profileMasterId == CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID) {
+				model.addAttribute("columnName", CommonConstants.AGENT_ID_COLUMN);
+				model.addAttribute("columnValue", selectedProfile.getAgentId());
+			}
 		}
 		catch (InvalidInputException e) {
 			LOG.error("InvalidInputException caught in initDashboardPage while setting details about user. Nested exception is ", e);
@@ -165,31 +152,6 @@ public class DashboardController {
 			return JspResolver.LOGIN;
 		}
 		return JspResolver.DASHBOARD;
-	}
-
-	private Model setSelectedProfileAttributes(Model model, User user, UserProfile selectedProfile) {
-		int profileMasterId = selectedProfile.getProfilesMaster().getProfileId();
-
-		model.addAttribute("profileId", selectedProfile.getUserProfileId());
-		model.addAttribute("profileMasterId", profileMasterId);
-		if (profileMasterId == CommonConstants.PROFILES_MASTER_COMPANY_ADMIN_PROFILE_ID) {
-			model.addAttribute("columnName", CommonConstants.COMPANY_ID_COLUMN);
-			model.addAttribute("columnValue", user.getCompany().getCompanyId());
-		}
-		else if (profileMasterId == CommonConstants.PROFILES_MASTER_REGION_ADMIN_PROFILE_ID) {
-			model.addAttribute("columnName", CommonConstants.REGION_ID_COLUMN);
-			model.addAttribute("columnValue", selectedProfile.getRegionId());
-		}
-		else if (profileMasterId == CommonConstants.PROFILES_MASTER_BRANCH_ADMIN_PROFILE_ID) {
-			model.addAttribute("columnName", CommonConstants.BRANCH_ID_COLUMN);
-			model.addAttribute("columnValue", selectedProfile.getBranchId());
-		}
-		else if (profileMasterId == CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID) {
-			model.addAttribute("columnName", CommonConstants.AGENT_ID_COLUMN);
-			model.addAttribute("columnValue", selectedProfile.getAgentId());
-		}
-
-		return model;
 	}
 
 	/*
