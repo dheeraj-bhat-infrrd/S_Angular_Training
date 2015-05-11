@@ -1106,7 +1106,16 @@ public class OrganizationManagementController {
 				throw new InvalidInputException(e.getMessage(), DisplayMessageConstants.GENERAL_ERROR, e);
 			}
 
-			// setting linkedin popup attribute
+			// Setting session variable to show linkedin signup and sendsurvey popups only once
+			String popupStatus = (String) session.getAttribute(CommonConstants.POPUP_FLAG_IN_SESSION);
+			if (popupStatus == null) {
+				session.setAttribute(CommonConstants.POPUP_FLAG_IN_SESSION, CommonConstants.YES_STRING);
+			}
+			else if (popupStatus.equals(CommonConstants.YES_STRING)) {
+				session.setAttribute(CommonConstants.POPUP_FLAG_IN_SESSION, CommonConstants.NO_STRING);
+			}
+			
+			// setting popup attributes
 			boolean showLinkedInPopup = false;
 			boolean showSendSurveyPopup = false;
 			user = userManagementService.getUserByUserId(user.getUserId());

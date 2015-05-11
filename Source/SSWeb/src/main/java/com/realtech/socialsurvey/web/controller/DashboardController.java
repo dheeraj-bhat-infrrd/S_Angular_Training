@@ -114,10 +114,14 @@ public class DashboardController {
 			model.addAttribute("emailId", user.getEmailId());
 
 			// updating session with selected user profile if not set
-			Map<Long, UserProfile> profileMap = new HashMap<Long, UserProfile>();
+			Map<Long, UserProfile> profileMap = (Map<Long, UserProfile>) session.getAttribute(CommonConstants.USER_PROFILE_MAP);
+			if (profileMap == null) {
+				profileMap = new HashMap<Long, UserProfile>();
+			}
+			
 			UserProfile selectedProfile = (UserProfile) session.getAttribute(CommonConstants.USER_PROFILE);
+			List<UserProfile> profiles = userManagementService.getAllUserProfilesForUser(user);
 			if (selectedProfile == null) {
-				List<UserProfile> profiles = userManagementService.getAllUserProfilesForUser(user);
 				selectedProfile = profiles.get(CommonConstants.INITIAL_INDEX);
 				for (UserProfile profile : profiles) {
 					if (profile.getProfilesMaster().getProfileId() == CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID) {
@@ -233,7 +237,7 @@ public class DashboardController {
 		}
 		else if (columnName.equalsIgnoreCase(CommonConstants.AGENT_ID_COLUMN)) {
 			columnValue = user.getUserId();
-			model.addAttribute("name", user.getFirstName() + " " + user.getLastName());
+			model.addAttribute("name", user.getFirstName() + " " + (user.getLastName() != null ? user.getLastName() : ""));
 			model.addAttribute("title", getTitle(request, columnName, columnValue, user));
 			model.addAttribute("company", user.getCompany().getCompany());
 		}

@@ -1,7 +1,7 @@
 <%@ taglib uri="http://www.springframework.org/tags" prefix="spring"%>
 
 <script src="${pageContext.request.contextPath}/resources/js/jquery-2.1.1.min.js"></script>
-<script src="http://code.jquery.com/ui/1.11.2/jquery-ui.js"></script>
+<script src="//code.jquery.com/ui/1.11.2/jquery-ui.js"></script>
 <script src="${pageContext.request.contextPath}/resources/js/perfect-scrollbar.jquery.min.js"></script>
 <script src="${pageContext.request.contextPath}/resources/js/countrydata.js"></script>
 <script src="${pageContext.request.contextPath}/resources/js/zipcoderegex.js"></script>
