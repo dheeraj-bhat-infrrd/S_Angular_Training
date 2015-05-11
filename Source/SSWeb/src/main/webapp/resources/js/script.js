@@ -595,7 +595,6 @@ function upgradeToPaidPlan(){
 }
 
 function loadDisplayPicture(profileMasterId){
-	var success = false;
 	var payload = {
 		"profileMasterId" : profileMasterId
 	};
@@ -605,11 +604,7 @@ function loadDisplayPicture(profileMasterId){
 		data : payload,
 		dataType : "JSON",
 		success : function(data) {
-			if (data.errCode == undefined)
-				success = true;
-		},
-		complete : function(data) {
-			if (success) {
+			if (data.errCode == undefined){
 				console.log("Image location : " + data.responseJSON);
 				var imageUrl = data.responseJSON;
 				if (imageUrl != '' && imageUrl != undefined) {
@@ -617,13 +612,20 @@ function loadDisplayPicture(profileMasterId){
 					$("#hdr-usr-img").css("background-size", "cover");
 					$("#usr-initl").html("");
 				}
-				return data.responseJSON;
+				else{
+					callAjaxGET('./initialofusername.do', displayPicCallback, false);
+				}
 			}
+			return data.responseJSON;
 		},
 		error : function() {
-			console.log("error");
+			console.log("error in displaypilocation script.js");
+			callAjaxGET('./initialofusername.do', displayPicCallback, false);
 		}
 	});
+}
+function displayPicCallback(data){
+	$("#usr-initl").html(data);
 }
 
 /**
