@@ -164,11 +164,12 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
 	}
 
 	@Override
-	public void updateStatusIntoFacebookPage(OrganizationUnitSettings agentSettings, String message) throws InvalidInputException, FacebookException {
+	public boolean updateStatusIntoFacebookPage(OrganizationUnitSettings agentSettings, String message) throws InvalidInputException, FacebookException {
 		if (agentSettings == null) {
 			throw new InvalidInputException("AgentSettings can not be null");
 		}
 		LOG.info("Updating Social Tokens information");
+		boolean facebookNotSetup = true;
 		Facebook facebook = getFacebookInstance();
 		if (agentSettings != null) {
 			if (agentSettings.getSocialMediaTokens() != null) {
@@ -177,6 +178,7 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
 					facebook.setOAuthAccessToken(new AccessToken(agentSettings.getSocialMediaTokens().getFacebookToken().getFacebookAccessToken(),
 							null));
 					try {
+						facebookNotSetup = false;
 						facebook.postStatusMessage(message);
 					}
 					catch (RuntimeException e) {
@@ -185,15 +187,17 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
 				}
 			}
 		}
-		LOG.info("Social Tokens updated successfully");
+		LOG.info("Status updated successfully");
+		return facebookNotSetup;
 	}
 
 	@Override
-	public void tweet(OrganizationUnitSettings agentSettings, String message) throws InvalidInputException, TwitterException {
+	public boolean tweet(OrganizationUnitSettings agentSettings, String message) throws InvalidInputException, TwitterException {
 		if (agentSettings == null) {
 			throw new InvalidInputException("AgentSettings can not be null");
 		}
 		LOG.info("Getting Social Tokens information");
+		boolean twitterNotSetup = true;
 		Twitter twitter = getTwitterInstance();
 		if (agentSettings != null) {
 			if (agentSettings.getSocialMediaTokens() != null) {
@@ -203,6 +207,7 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
 					twitter.setOAuthAccessToken(new twitter4j.auth.AccessToken(agentSettings.getSocialMediaTokens().getTwitterToken()
 							.getTwitterAccessToken(), agentSettings.getSocialMediaTokens().getTwitterToken().getTwitterAccessTokenSecret()));
 					try {
+						twitterNotSetup = false;
 						twitter.updateStatus(message);
 					}
 					catch (RuntimeException e) {
@@ -212,19 +217,21 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
 			}
 		}
 		LOG.info("Social Tokens updated successfully");
+		return twitterNotSetup;
 	}
 
 	@Override
-	public void updateLinkedin(OrganizationUnitSettings agentSettings, String message) throws NonFatalException {
+	public boolean updateLinkedin(OrganizationUnitSettings agentSettings, String message) throws NonFatalException {
 		if (agentSettings == null) {
 			throw new InvalidInputException("AgentSettings can not be null");
 		}
+		boolean linkedinNotSetup = true;
 		LOG.info("updateLinkedin() started.");
 		if (agentSettings != null) {
 			if (agentSettings.getSocialMediaTokens() != null) {
 				if (agentSettings.getSocialMediaTokens().getLinkedInToken() != null &&
 						agentSettings.getSocialMediaTokens().getLinkedInToken().getLinkedInAccessToken() !=null ) {
-
+					linkedinNotSetup = false;
 					String linkedInPost = new StringBuilder(linkedInRestApiUri).substring(0, linkedInRestApiUri.length() - 1);
 					linkedInPost += "/shares?oauth2_access_token=" + agentSettings.getSocialMediaTokens().getLinkedInToken().getLinkedInAccessToken();
 					linkedInPost += "&format=json";
@@ -252,6 +259,7 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
 			}
 		}
 		LOG.info("updateLinkedin() finished");
+		return linkedinNotSetup;
 	}
 
 	@Override
