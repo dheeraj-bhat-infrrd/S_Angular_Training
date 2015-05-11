@@ -112,7 +112,8 @@ function paintDashboard(profileMasterId, newProfileName, newProfileValue, typeoO
 		window.location.href = "./downloaddashboardcompletesurvey.do?columnName="
 				+ colName + "&columnValue=" + colValue;
 	});
-	// Loads the image in circle od header.
+	
+	// Loads the image in circle of header.
 	loadDisplayPicture(profileMasterId);
 	// Loads the master image in dashboard.
 	showDisplayPic();
