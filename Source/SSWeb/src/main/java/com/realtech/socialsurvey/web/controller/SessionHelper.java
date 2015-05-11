@@ -3,7 +3,9 @@ package com.realtech.socialsurvey.web.controller;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import javax.servlet.http.HttpSession;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -18,6 +20,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.commons.EmailTemplateConstants;
 import com.realtech.socialsurvey.core.commons.UserProfileComparator;
+import com.realtech.socialsurvey.core.entities.AbridgedUserProfile;
 import com.realtech.socialsurvey.core.entities.FileContentReplacements;
 import com.realtech.socialsurvey.core.entities.MailContent;
 import com.realtech.socialsurvey.core.entities.MailContentSettings;
@@ -27,6 +30,7 @@ import com.realtech.socialsurvey.core.entities.UserSettings;
 import com.realtech.socialsurvey.core.enums.AccountType;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.exception.NoRecordsFetchedException;
+import com.realtech.socialsurvey.core.exception.NonFatalException;
 import com.realtech.socialsurvey.core.services.organizationmanagement.UserManagementService;
 import com.realtech.socialsurvey.core.utils.EmailFormatHelper;
 import com.realtech.socialsurvey.core.utils.EncryptionHelper;
@@ -103,7 +107,6 @@ public class SessionHelper {
 		setProfileImage(session, userSettings);
 		LOG.info("Logo successfully updated in session");
 	}
-
 	// JIRA SS-97 by RM-06 : EOC
 
 	private void setLogo(HttpSession session, UserSettings userSettings) {
@@ -252,5 +255,45 @@ public class SessionHelper {
 			user = (User) sessionUser;
 		}
 		return user;
+	}
+	
+	/**
+	 * Method to update user profiles in session
+	 * @throws NonFatalException 
+	 */
+	@SuppressWarnings("unchecked")
+	public void updateProcessedUserProfiles(HttpSession session, User user) throws NonFatalException {
+		LOG.info("Method updateProcessedUserProfiles() called from SessionHelper");
+
+		UserProfile selectedProfile = (UserProfile) session.getAttribute(CommonConstants.USER_PROFILE);
+		AccountType accountType = (AccountType) session.getAttribute(CommonConstants.ACCOUNT_TYPE_IN_SESSION);
+		Map<Long, AbridgedUserProfile> profileAbridgedMap = (Map<Long, AbridgedUserProfile>) session.getAttribute(CommonConstants.USER_PROFILE_LIST);
+		Map<Long, UserProfile> profileMap = (Map<Long, UserProfile>) session.getAttribute(CommonConstants.USER_PROFILE_MAP);
+		
+		if (profileMap == null) {
+			profileMap = new HashMap<Long, UserProfile>();
+		}
+
+		List<UserProfile> profiles = userManagementService.getAllUserProfilesForUser(user);
+		if (selectedProfile == null) {
+			selectedProfile = profiles.get(CommonConstants.INITIAL_INDEX);
+			for (UserProfile profile : profiles) {
+				if (profile.getProfilesMaster().getProfileId() == CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID) {
+					selectedProfile = profile;
+					break;
+				}
+			}
+			session.setAttribute(CommonConstants.USER_PROFILE, selectedProfile);
+		}
+
+		// updating session with aggregated user profiles, if not set
+		profileAbridgedMap = userManagementService.processedUserProfiles(user, accountType, profileMap, profiles);
+		if (profileAbridgedMap.size() > 0) {
+			session.setAttribute(CommonConstants.USER_PROFILE_LIST, profileAbridgedMap);
+			session.setAttribute(CommonConstants.PROFILE_NAME_COLUMN, profileAbridgedMap.get(selectedProfile.getUserProfileId()).getUserProfileName());
+		}
+		session.setAttribute(CommonConstants.USER_PROFILE_MAP, profileMap);
+
+		LOG.info("Method updateProcessedUserProfiles() finished from SessionHelper");
 	}
 }

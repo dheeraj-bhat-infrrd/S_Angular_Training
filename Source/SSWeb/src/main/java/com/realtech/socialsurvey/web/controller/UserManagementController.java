@@ -1022,7 +1022,8 @@ public class UserManagementController {
 			
 			// updating session with aggregated user profiles, if not set
 			LOG.debug("Updating session with aggregated user profiles, if not set");
-			Map<Long, AbridgedUserProfile> profileAbridgedMap = userManagementService.processedUserProfiles(user, accountType, profileMap);
+			Map<Long, AbridgedUserProfile> profileAbridgedMap = userManagementService.processedUserProfiles(user, accountType, profileMap,
+					user.getUserProfiles());
 			if (profileAbridgedMap.size() > 0) {
 				session.setAttribute(CommonConstants.USER_PROFILE_LIST, profileAbridgedMap);
 				session.setAttribute(CommonConstants.PROFILE_NAME_COLUMN, profileAbridgedMap.get(selectedProfile.getUserProfileId()).getUserProfileName());
@@ -1344,6 +1345,17 @@ public class UserManagementController {
 
 			message = messageUtils.getDisplayMessage(DisplayMessageConstants.PROFILE_UPDATE_SUCCESSFUL, DisplayMessageType.SUCCESS_MESSAGE).getMessage();
 			statusMap.put("status", CommonConstants.SUCCESS_ATTRIBUTE);
+			
+			// update user profiles in session if current user
+			User updatedUser = userManagementService.getUserByProfileId(profileId);
+			if (user.getUserId() == updatedUser.getUserId()) {
+				try {
+					sessionHelper.updateProcessedUserProfiles(request.getSession(false), user);
+				}
+				catch (NonFatalException e) {
+					LOG.error("NonFatalException while logging in. Reason : " + e.getMessage(), e);
+				}
+			}
 		}
 		catch (NumberFormatException e) {
 			LOG.error("NumberFormatException while parsing profileId. Reason : " + e.getMessage(), e);
