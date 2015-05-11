@@ -91,6 +91,9 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean {
 	@Value("${GOOGLE_SHARE_URI}")
 	private String googleShareUri;
 
+	@Value("${APPLICATION_LOGO_URL}")
+	private String appLogoUrl;
+
 	/**
 	 * Method to store question and answer format into mongo.
 	 * 
@@ -512,6 +515,8 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean {
 
 			MailContent takeSurvey = companySettings.getMail_content().getTake_survey_mail();
 			String mailBody = emailFormatHelper.replaceEmailBodyWithParams(takeSurvey.getMail_body(), takeSurvey.getParam_order());
+			mailBody = mailBody.replaceAll("\\[LogoUrl\\]", appLogoUrl);
+			mailBody = mailBody.replaceAll("\\[BaseUrl\\]", applicationBaseUrl);
 			mailBody = mailBody.replaceAll("\\[AgentName\\]", agentName);
 			mailBody = mailBody.replaceAll("\\[Name\\]", custFirstName + " " + custLastName);
 			mailBody = mailBody.replaceAll("\\[Link\\]", link);
@@ -547,6 +552,8 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean {
 
 			MailContent takeSurveyCustomer = companySettings.getMail_content().getTake_survey_mail_customer();
 			String mailBody = emailFormatHelper.replaceEmailBodyWithParams(takeSurveyCustomer.getMail_body(), takeSurveyCustomer.getParam_order());
+			mailBody = mailBody.replaceAll("\\[LogoUrl\\]", appLogoUrl);
+			mailBody = mailBody.replaceAll("\\[BaseUrl\\]", applicationBaseUrl);
 			mailBody = mailBody.replaceAll("\\[AgentName\\]", user.getFirstName() + " " + user.getLastName());
 			mailBody = mailBody.replaceAll("\\[Name\\]", custFirstName + " " + custLastName);
 			mailBody = mailBody.replaceAll("\\[Link\\]", link);

@@ -1687,8 +1687,8 @@ public class BrainTreePaymentImpl implements Payment, InitializingBean {
 			LOG.debug("Upgrading the account for " + company.getCompany() + " with by " + numOfUsers + " users for an amount of " + amount);
 			// Calling braintree for updating the amount
 			LOG.debug("Calling braintree for updating the amount");
-			SubscriptionRequest updateRequest = new SubscriptionRequest().price(new BigDecimal(String.valueOf(amount))).options()
-					.prorateCharges(true).revertSubscriptionOnProrationFailure(false).done();
+			// proration is not required
+			SubscriptionRequest updateRequest = new SubscriptionRequest().price(new BigDecimal(String.valueOf(amount)));
 
 			Result<Subscription> result = null;
 			try {
