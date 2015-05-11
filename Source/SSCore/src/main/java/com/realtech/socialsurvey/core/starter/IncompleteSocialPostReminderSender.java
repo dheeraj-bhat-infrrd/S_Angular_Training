@@ -85,7 +85,6 @@ public class IncompleteSocialPostReminderSender {
 		String subUrl = "";
 		switch (socialSite) {
 			case "facebook":
-				;
 				subUrl = "posttofacebook";
 				break;
 			case "twitter":
