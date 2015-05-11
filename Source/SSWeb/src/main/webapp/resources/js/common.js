@@ -241,7 +241,12 @@ function shareOnFacebook(firstName, lastName, agentName, review, score, agentId)
 			},
 			complete : function(data) {
 				if (success) {
-					showToast(data);
+					data = data.responseText;
+					if(data=='true')
+						$('#overlay-toast').html('No facebook account setup in hierarchy to share.');
+					else
+						$('#overlay-toast').html('Successfully shared on facebook.');
+					showToast();
 				}
 			},
 			error : function(e) {
@@ -273,7 +278,12 @@ function shareOnTwitter(firstName, lastName, agentName, review, score, agentId){
 			},
 			complete : function(data) {
 				if (success) {
-					showToast(data);
+					data = data.responseText;
+					if(data=='true')
+						$('#overlay-toast').html('No twitter account setup in hierarchy to share.');
+					else
+						$('#overlay-toast').html('Successfully shared on twitter.');
+					showToast();
 				}
 			},
 			error : function(e) {
@@ -305,6 +315,11 @@ function shareOnLinkedin(firstName, lastName, agentName, review, score, agentId)
 			},
 			complete : function(data) {
 				if (success) {
+					data = data.responseText;
+					if(data=='true')
+						$('#overlay-toast').html('No linkedin account setup in hierarchy to share.');
+					else
+						$('#overlay-toast').html('Successfully shared on linkedin.');
 					showToast(data);
 				}
 			},
@@ -333,7 +348,12 @@ function shareOnYelp(agentId, location){
 		complete : function(data) {
 			data = data.responseJSON;
 			if (success) {
-				window.open(data.relativePath);
+				if(data.host!=undefined && data.relativePath!=undefined)
+					window.open(data.host+data.relativePath);
+				else{
+					$('#overlay-toast').html('Please setup your Yelp account to share.');
+					showToast();
+				}
 			}
 		},
 		error : function(e) {
@@ -361,8 +381,13 @@ function shareOnGooglePlus(agentId, location){
 		complete : function(data) {
 			if (success) {
 				data = data.responseJSON;
-				window.open(data.host + data.profileServer
+				if(data.host!=undefined && data.profileServer!=undefined && data.relativePath!=undefined)
+					window.open(data.host + data.profileServer
 						+ data.relativePath);
+				else{
+					$('#overlay-toast').html('Please setup your Google+ account to share.');
+					showToast();
+				}
 			}
 		},
 		error : function(e) {
