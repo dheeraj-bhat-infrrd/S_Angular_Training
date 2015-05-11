@@ -507,6 +507,7 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao {
 	public List<SurveyDetails> getFeedbacks(String columnName, long columnValue, int start, int rows, double startScore, double limitScore,
 			boolean fetchAbusive, Date startDate, Date endDate) {
 		LOG.info("Method to fetch all the feedbacks from SURVEY_DETAILS collection, getFeedbacks() started.");
+
 		Query query = new Query();
 		if (columnName != null) {
 			query.addCriteria(Criteria.where(columnName).is(columnValue));
@@ -516,15 +517,18 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao {
 		 * fetching only completed surveys
 		 */
 		query.addCriteria(Criteria.where(CommonConstants.STAGE_COLUMN).is(CommonConstants.SURVEY_STAGE_COMPLETE));
-		
-		if(startDate!=null){
+
+		if (startDate != null && endDate != null) {
+			query.addCriteria(Criteria.where(CommonConstants.MODIFIED_ON_COLUMN).gte(startDate)
+					.andOperator(Criteria.where(CommonConstants.MODIFIED_ON_COLUMN).lte(endDate)));
+		}
+		else if (startDate != null) {
 			query.addCriteria(Criteria.where(CommonConstants.MODIFIED_ON_COLUMN).gte(startDate));
 		}
-
-		if(endDate!=null){
+		else if (endDate != null) {
 			query.addCriteria(Criteria.where(CommonConstants.MODIFIED_ON_COLUMN).lte(endDate));
 		}
-		
+
 		/**
 		 * adding isabusive criteria only if fetch abusive flag is false, i.e only non abusive posts
 		 * are to be fetched else fetch all the records
