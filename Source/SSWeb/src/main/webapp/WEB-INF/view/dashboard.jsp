@@ -126,7 +126,14 @@
 						<div class="main-con-header clearfix pad-bot-10-resp">
 							<div id="review-desc" class="float-left dash-ppl-say-lbl">
 								<spring:message code="label.peoplesayabout.key" />${profileName}</div>
-							<div id="dsh-cmp-dwnld" class="float-right dash-btn-dl-sd hide"><spring:message code="label.downloadsurveydata.key" /></div>
+							<div id="dsh-cmp-dwnld" class="float-right dash-btn-dl-sd hide">
+								<div id="dsh-dwnld-btn" class="dsh-dwnld-btn float-left cursor-pointer">
+									<spring:message code="label.downloadsurveydata.key" />
+								</div>
+								<input id="dsh-start-date" class="dsh-date-picker" placeholder="<spring:message code="label.startdate.key" />">
+								<span>-</span>
+								<input id="dsh-end-date" class="dsh-date-picker" placeholder="<spring:message code="label.enddate.key" />">
+							</div>
 						</div>
 						<div id="review-details" class="ppl-review-item-wrapper">
 							<!-- Populated with reviews -->
@@ -170,6 +177,8 @@
 	cursor: pointer;
 }
 </style>
+<link rel="stylesheet" href="${pageContext.request.contextPath}/resources/css/datepicker3.css">
+
 <script>
 $(document).ready(function() {
 	hideOverlay();

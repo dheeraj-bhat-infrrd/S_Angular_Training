@@ -656,6 +656,20 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 		return user;
 	}
 	
+	@Override
+	@Transactional
+	public User getUserByProfileId(long profileId) throws InvalidInputException {
+		LOG.info("Method to find userprofile on the basis of profile id started for profileId " + profileId);
+		
+		UserProfile userProfile = userProfileDao.findById(UserProfile.class, profileId);
+		if (userProfile == null) {
+			throw new InvalidInputException("UserProfile not found for userId:" + profileId);
+		}
+		
+		LOG.info("Method to find userprofile on the basis of user id finished for profileId " + profileId);
+		return userProfile.getUser();
+	}
+	
 	/**
 	 * Method to get multiple users object for the given list of user ids, fetches users along with profile name and
 	 * profile url
@@ -1942,9 +1956,9 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 	}
 
 	@Override
-	public Map<Long, AbridgedUserProfile> processedUserProfiles(User user, AccountType accountType, Map<Long, UserProfile> profileMap)
-			throws NonFatalException {
-		LOG.debug("Method getUserProfile() called from UserManagementService");
+	public Map<Long, AbridgedUserProfile> processedUserProfiles(User user, AccountType accountType, Map<Long, UserProfile> profileMap,
+			List<UserProfile> profiles) throws NonFatalException {
+		LOG.debug("Method processedUserProfiles() called from UserManagementService");
 
 		// Fetch Regions and Branches from Solr
 		long companyId = user.getCompany().getCompanyId();
@@ -1967,7 +1981,7 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 		Map<Long, AbridgedUserProfile> abridgedUserProfileMap = new HashMap<Long, AbridgedUserProfile>();
 
 		AbridgedUserProfile profileAbridged = null;
-		for (UserProfile profile : user.getUserProfiles()) {
+		for (UserProfile profile : profiles) {
 			if (profile.getStatus() == CommonConstants.STATUS_ACTIVE) {
 				profileAbridged = new AbridgedUserProfile();
 
@@ -2031,7 +2045,7 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 			default:
 		}
 
-		LOG.debug("Method getUserProfile() finished from UserManagementService");
+		LOG.debug("Method processedUserProfiles() finished from UserManagementService");
 		return new HashMap<Long, AbridgedUserProfile>();
 	}
 
