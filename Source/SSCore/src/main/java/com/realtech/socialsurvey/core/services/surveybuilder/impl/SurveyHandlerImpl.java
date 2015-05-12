@@ -400,8 +400,7 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean {
 			throw new InvalidInputException("Null/Empty value found for customer's first name.");
 		}
 		if (custLastName == null || custLastName.isEmpty()) {
-			LOG.error("Null/Empty value found for customer's last name.");
-			throw new InvalidInputException("Null/Empty value found for customer's last name.");
+			custLastName = "";
 		}
 		if (custEmail == null || custEmail.isEmpty()) {
 			LOG.error("Null/Empty value found for customer's email id.");

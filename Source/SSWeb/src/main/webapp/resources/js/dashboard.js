@@ -115,7 +115,7 @@ function paintDashboard(profileMasterId, newProfileName, newProfileValue, typeoO
 				+ colName + "&columnValue=" + colValue + "&startDate=" + startDate + "&endDate=" + endDate;
 	});
 	
-	// Loads the image in circle od header.
+	// Loads the image in circle of header.
 	loadDisplayPicture(profileMasterId);
 	// Loads the master image in dashboard.
 	showDisplayPic();

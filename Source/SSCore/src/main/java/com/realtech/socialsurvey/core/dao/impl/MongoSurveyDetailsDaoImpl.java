@@ -154,7 +154,7 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao {
 			}
 		}
 		Update update = new Update();
-		update.set(CommonConstants.SCORE_COLUMN, answer / noOfResponse);
+		update.set(CommonConstants.SCORE_COLUMN, Math.round(answer / noOfResponse * 100.0) / 100.0);
 		update.set(CommonConstants.MODIFIED_ON_COLUMN, new Date());
 		mongoTemplate.updateMulti(query, update, SURVEY_DETAILS_COLLECTION);
 		LOG.info("Method to calculate and update final score based upon rating questions finished.");
