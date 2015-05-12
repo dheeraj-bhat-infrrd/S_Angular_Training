@@ -97,6 +97,8 @@ public interface UserManagementService {
 	 * @throws InvalidInputException
 	 */
 	public User getUserByUserId(long userId) throws InvalidInputException;
+	
+	public User getUserByProfileId(long profileId) throws InvalidInputException;
 
 	public List<ProListUser> getMultipleUsersByUserId(List<Long> userIds) throws InvalidInputException;
 
@@ -270,8 +272,8 @@ public interface UserManagementService {
 	 * @return
 	 * @throws NonFatalException
 	 */
-	public Map<Long, AbridgedUserProfile> processedUserProfiles(User user, AccountType accountType, Map<Long, UserProfile> profileMap)
-			throws NonFatalException;
+	public Map<Long, AbridgedUserProfile> processedUserProfiles(User user, AccountType accountType, Map<Long, UserProfile> profileMap,
+			List<UserProfile> profiles) throws NonFatalException;
 
 	public UserProfile updateSelectedProfile(User user, AccountType accountType, Map<Long, UserProfile> profileMap, String profileIdStr);
 
