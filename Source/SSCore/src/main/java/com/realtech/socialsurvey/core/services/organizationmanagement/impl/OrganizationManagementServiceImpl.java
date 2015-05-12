@@ -126,19 +126,22 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 
 	@Value("${HAPPY_TEXT}")
 	private String happyText;
-
 	@Value("${NEUTRAL_TEXT}")
 	private String neutralText;
-
 	@Value("${SAD_TEXT}")
 	private String sadText;
 	
+	@Value("${HAPPY_TEXT_COMPLETE}")
+	private String happyTextComplete;
+	@Value("${NEUTRAL_TEXT_COMPLETE}")
+	private String neutralTextComplete;
+	@Value("${SAD_TEXT_COMPLETE}")
+	private String sadTextComplete;
+
 	@Value("${PARAM_ORDER_TAKE_SURVEY}")
 	String paramOrderTakeSurvey;
-
 	@Value("${PARAM_ORDER_TAKE_SURVEY_CUSTOMER}")
 	String paramOrderTakeSurveyCustomer;
-
 	@Value("${PARAM_ORDER_TAKE_SURVEY_REMINDER}")
 	String paramOrderTakeSurveyReminder;
 
@@ -399,8 +402,12 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 		surveySettings.setHappyText(happyText);
 		surveySettings.setNeutralText(neutralText);
 		surveySettings.setSadText(sadText);
+		surveySettings.setHappyTextComplete(happyTextComplete);
+		surveySettings.setNeutralTextComplete(neutralTextComplete);
+		surveySettings.setSadTextComplete(sadTextComplete);
 		surveySettings.setAutoPostEnabled(true);
 		surveySettings.setShow_survey_above_score(CommonConstants.DEFAULT_AUTOPOST_SCORE);
+		surveySettings.setSurvey_reminder_interval_in_days(CommonConstants.DEFAULT_REMINDERMAIL_INTERVAL);
 		companySettings.setSurvey_settings(surveySettings);
 		
 		// set seo content flag

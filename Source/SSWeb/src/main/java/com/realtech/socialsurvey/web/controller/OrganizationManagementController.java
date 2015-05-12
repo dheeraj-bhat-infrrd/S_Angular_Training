@@ -418,7 +418,9 @@ public class OrganizationManagementController {
 
 		OrganizationUnitSettings unitSettings = null;
 		int profileMasterId = selectedProfile.getProfilesMaster().getProfileId();
-		if (profileMasterId == CommonConstants.PROFILES_MASTER_COMPANY_ADMIN_PROFILE_ID) {
+		int accountMasterId = accountType.getValue();
+		if (profileMasterId == CommonConstants.PROFILES_MASTER_COMPANY_ADMIN_PROFILE_ID
+				|| accountMasterId == CommonConstants.ACCOUNTS_MASTER_INDIVIDUAL) {
 			unitSettings = userSettings.getCompanySettings();
 		}
 		else if (profileMasterId == CommonConstants.PROFILES_MASTER_REGION_ADMIN_PROFILE_ID) {
@@ -1150,31 +1152,23 @@ public class OrganizationManagementController {
 	 * @param model
 	 * @return
 	 */
-	@RequestMapping(value = "/storetextforflow")
+	@RequestMapping(value = "/storetextforflow", method = RequestMethod.GET)
 	public void storeTextForFlow(HttpServletRequest request, Model model) {
-
 		LOG.info("Method to store text to be displayed to a customer after choosing the flow, storeTextForFlow() started.");
-
 		User user = sessionHelper.getCurrentUser();
 
 		try {
-			if (user == null) {
-				LOG.error("storeTextForFlow() : user not found in session!");
-				throw new InvalidInputException("storeTextForFlow() : user not found in session!");
-			}
-
 			String text = request.getParameter("text");
 			String mood = request.getParameter("mood");
-
 			if (text == null || text.isEmpty()) {
 				LOG.error("Null or empty value found in storeTextForFlow() for text.");
 				throw new InvalidInputException("Null or empty value found in storeTextForFlow() for text.");
 			}
-
 			if (mood == null || mood.isEmpty()) {
 				LOG.error("Null or empty value found in storeTextForFlow() for mood.");
 				throw new InvalidInputException("Null or empty value found in storeTextForFlow() for mood.");
 			}
+			
 			OrganizationUnitSettings companySettings = organizationManagementService.getCompanySettings(user);
 			SurveySettings surveySettings = companySettings.getSurvey_settings();
 			if (mood.equalsIgnoreCase("happy"))
@@ -1183,6 +1177,12 @@ public class OrganizationManagementController {
 				surveySettings.setNeutralText(text);
 			else if (mood.equalsIgnoreCase("sad"))
 				surveySettings.setSadText(text);
+			else if (mood.equalsIgnoreCase("happyComplete"))
+				surveySettings.setHappyTextComplete(text);
+			else if (mood.equalsIgnoreCase("neutralComplete"))
+				surveySettings.setNeutralTextComplete(text);
+			else if (mood.equalsIgnoreCase("sadComplete"))
+				surveySettings.setSadTextComplete(text);
 
 			organizationManagementService.updateSurveySettings(companySettings, surveySettings);
 		}

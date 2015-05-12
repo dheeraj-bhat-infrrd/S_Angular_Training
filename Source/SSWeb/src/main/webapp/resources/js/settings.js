@@ -267,6 +267,7 @@ function saveTextForMoodFlow(content, mood){
 		},
 		complete : function(data) {
 			if (success) {
+				console.log("success");
 				$('#overlay-toast').html("Content added successfully!");
 			}
 		},
@@ -276,11 +277,12 @@ function saveTextForMoodFlow(content, mood){
 	});
 }
 
-function paintTextForMood(happyText, neutralText, sadText){
-	console.log(happyText);
-	console.log(neutralText);
-	console.log(sadText);
+function paintTextForMood(happyText, neutralText, sadText, happyTextComplete, neutralTextComplete, sadTextComplete){
 	$('#happy-text').html(happyText);
 	$('#neutral-text').html(neutralText);
 	$('#sad-text').html(sadText);
+
+	$('#happy-text-complete').html(happyTextComplete);
+	$('#neutral-text-complete').html(neutralTextComplete);
+	$('#sad-text-complete').html(sadTextComplete);
 }
