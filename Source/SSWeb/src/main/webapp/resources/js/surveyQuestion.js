@@ -172,7 +172,11 @@ function paintSurveyPageFromJson() {
 				"OOPS! It looks like you have already taken a survey for " + agentName + "."
 				+"<br/><br/>"
 				+"Are you trying to amend a prior response? If so click the link below and we will email you the access required<br/><br/>")
-				.append("<div class='cursor-pointer'>Link to resend origin Survey Responses so they can be amended</div>");
+				.append("<div id='changeSurvey' class='cursor-pointer'>Link to resend origin Survey Responses so they can be amended</div>");
+		$(document).on('click', '#changeSurvey', function() {
+			retakeSurveyRequest();
+		});
+		return;
 	}
 	questionDetails = questions[qno];
 	var question = questionDetails.question;
@@ -248,6 +252,19 @@ function paintSurveyPageFromJson() {
 		$("#skip-ques-mcq").hide();
 	}
 	$(".sq-main-txt").html("Survey for " + agentName);
+}
+
+function retakeSurveyRequest(){
+	var payload = {
+			"customerEmail" : customerEmail,
+			"agentId" : agentId,
+			"firstName" : firstName,
+			"lastName" : lastName,
+			"agentName" : agentName
+	};
+	callAjaxGetWithPayloadData(window.location.origin + surveyUrl + 'restartsurvey', '', payload, true);
+	$('#overlay-toast').html('Mail sent to your registered email id for retaking the survey for '+agentName);
+	showToast();
 }
 
 /*

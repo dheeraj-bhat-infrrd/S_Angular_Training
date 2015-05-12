@@ -754,7 +754,27 @@ public class SurveyManagementController {
 		return new Gson().toJson("Success");
 	}
 
-
+	@ResponseBody
+	@RequestMapping(value = "/restartsurvey")
+	public void restartSurvey(HttpServletRequest request) {
+		String agentIdStr = request.getParameter("agentId");
+		String customerEmail = request.getParameter("customerEmail");
+		String firstName = request.getParameter("firstName");
+		String lastName = request.getParameter("lastName");
+		try {
+			if (agentIdStr == null || agentIdStr.isEmpty()) {
+				throw new InvalidInputException("Invalid value (Null/Empty) found for agentId.");
+			}
+			long agentId = Long.parseLong(agentIdStr);
+			surveyHandler.changeStatusOfSurvey(agentId, customerEmail, true);
+			SurveyDetails survey = surveyHandler.getSurveyDetails(agentId, customerEmail);
+			User user = userManagementService.getUserByUserId(agentId);
+			surveyHandler.sendSurveyRestartMail(firstName, lastName, customerEmail, survey.getCustRelationWithAgent(), user, survey.getUrl());
+		}
+		catch (NonFatalException e) {
+			LOG.error("NonfatalException caught in makeSurveyEditable(). Nested exception is ", e);
+		}
+	}
 
 	@RequestMapping(value = "/notfound")
 	public String showNotFoundPage(HttpServletRequest request) {
