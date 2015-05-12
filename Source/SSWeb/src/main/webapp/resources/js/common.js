@@ -484,7 +484,7 @@ $(document).on('click', '#wc-send-survey', function() {
 			var lastname = $(this).find('input.wc-review-lname').first().val();
 			var emailId = $(this).find('input.wc-review-email').first().val();
 			if (nameRegex.test(firstname) && lastNameRegEx.test(lastname) && emailRegex.test(emailId)) {
-				var receiver = {};
+				var receiver = new Object();
 				receiver.firstname = firstname;
 				receiver.lastname = lastname;
 				receiver.emailId = emailId;

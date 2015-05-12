@@ -172,7 +172,11 @@ function paintSurveyPageFromJson() {
 				"OOPS! It looks like you have already taken a survey for " + agentName + "."
 				+"<br/><br/>"
 				+"Are you trying to amend a prior response? If so click the link below and we will email you the access required<br/><br/>")
-				.append("<div class='cursor-pointer'>Link to resend origin Survey Responses so they can be amended</div>");
+				.append("<div id='changeSurvey' class='cursor-pointer'>Link to resend origin Survey Responses so they can be amended</div>");
+		$(document).on('click', '#changeSurvey', function() {
+			retakeSurveyRequest();
+		});
+		return;
 	}
 	questionDetails = questions[qno];
 	var question = questionDetails.question;
@@ -248,6 +252,19 @@ function paintSurveyPageFromJson() {
 		$("#skip-ques-mcq").hide();
 	}
 	$(".sq-main-txt").html("Survey for " + agentName);
+}
+
+function retakeSurveyRequest(){
+	var payload = {
+			"customerEmail" : customerEmail,
+			"agentId" : agentId,
+			"firstName" : firstName,
+			"lastName" : lastName,
+			"agentName" : agentName
+	};
+	callAjaxGetWithPayloadData(window.location.origin + surveyUrl + 'restartsurvey', '', payload, true);
+	$('#overlay-toast').html('Mail sent to your registered email id for retaking the survey for '+agentName);
+	showToast();
 }
 
 /*
@@ -337,7 +354,7 @@ function showFeedbackPage(mood) {
 	$("#next-textarea-smiley").removeClass("btn-com-disabled");
 	isSmileTypeQuestion = false;
 	switch (mood) {
-	case "happy":
+	case "Great":
 		question = happyText;
 		$("#ques-text-textarea").html(question);
 		var currResponse = 0;
@@ -357,11 +374,11 @@ function showFeedbackPage(mood) {
 		if((rating >= autoPostScore) && (Boolean(autoPost) == true))
 			$("#pst-srvy-div").show();
 		break;
-	case "neutral":
+	case "OK":
 		question = neutralText;
 		$("#ques-text-textarea").html(question);
 		break;
-	case "sad":
+	case "Unpleasant":
 		question = sadText;
 		$("#ques-text-textarea").html(question);
 		break;
@@ -448,11 +465,11 @@ function showMasterQuestionPage(){
 		if($('#shr-post-chk-box').hasClass('bd-check-img') && (rating >= autoPostScore) && (Boolean(autoPost) == true)){
 			postToSocialMedia(feedback);
 			$('#social-post-lnk').show();
-			if(yelpEnabled && (mood=='happy'))
+			if(yelpEnabled && (mood=='Great'))
 				$('#ylp-btn').show();
 			else
 				$('#ylp-btn').hide();
-			if(googleEnabled && (mood=='happy'))
+			if(googleEnabled && (mood=='Great'))
 				$('#ggl-btn').show();
 			else
 				$('#ggl-btn').hide();
@@ -801,7 +818,7 @@ $('.sq-smile').hover(function() {
 
 $('.sq-happy-smile').click(function() {
 	// Update customer's mood in db and ask for cutomer's kind words.
-	mood = "happy";
+	mood = "Great";
 	$('#next-textarea-smiley').removeClass("btn-com-disabled");
 	isSmileTypeQuestion = true;
 	$('.sq-happy-smile').removeClass('opacity-red');
@@ -811,7 +828,7 @@ $('.sq-happy-smile').click(function() {
 $('.sq-neutral-smile').click(function() {
 	// Update customer's mood in db and ask for feedback that could have made
 	// him happy.
-	mood = "neutral";
+	mood = "OK";
 	$('#next-textarea-smiley').removeClass("btn-com-disabled");
 	isSmileTypeQuestion = true;
 	$('.sq-neutral-smile').removeClass('opacity-red');
@@ -821,7 +838,7 @@ $('.sq-neutral-smile').click(function() {
 $('.sq-sad-smile').click(function() {
 	// Update customer's mood in db and ask what went wrong during the entire
 	// course.
-	mood = "sad";
+	mood = "Unpleasant";
 	$('#next-textarea-smiley').removeClass("btn-com-disabled");
 	isSmileTypeQuestion = true;
 	$('.sq-sad-smile').removeClass('opacity-red');
