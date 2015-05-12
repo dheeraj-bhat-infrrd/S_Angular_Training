@@ -23,7 +23,6 @@
 <script src="${pageContext.request.contextPath}/resources/js/hierarchy-management.js"></script>
 <script src="${pageContext.request.contextPath}/resources/js/buildSurvey.js"></script>
 <script src="${pageContext.request.contextPath}/resources/js/dashboard.js"></script>
-<script src="${pageContext.request.contextPath}/resources/js/settings.js"></script>
 <script src="${pageContext.request.contextPath}/resources/ckeditor/ckeditor.js"></script>
 <script src="${pageContext.request.contextPath}/resources/ckeditor/adapters/jquery.js"></script>
 <script src="${pageContext.request.contextPath}/resources/js/editprofiledropdown.js"></script>
