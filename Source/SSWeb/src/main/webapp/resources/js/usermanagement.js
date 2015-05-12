@@ -800,7 +800,8 @@ function updateUserProfile(profileId, profileStatus) {
 		            var profileId = $(this).parent().data('profile-id');
 		            updateUserProfile(profileId, 0);
 		        });
-			} else if (profileStatus == 0) {
+			}
+			else if (profileStatus == 0) {
 				$('#v-edt-tbl-row-' + profileId).find('.v-edt-tbl-switch').removeClass('tbl-switch-on');
 				$('#v-edt-tbl-row-' + profileId).find('.v-edt-tbl-switch').addClass('tbl-switch-off');
 				$('#v-edt-tbl-row-' + profileId).find('.v-edt-tbl-switch').attr('title', 'InActive');

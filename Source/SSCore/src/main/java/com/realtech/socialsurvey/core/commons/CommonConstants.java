@@ -484,7 +484,7 @@ public interface CommonConstants {
 	public static final int MAX_SURVEY_SCORE = 5;
 	public static final int MAX_SENT_SURVEY_COUNT = 10;
 	public static final int MAX_SOCIAL_POSTS = 10;
-	public static final String DATE_FORMAT = "dd-MM-yyyy";
+	public static final String DATE_FORMAT = "dd/MM/yyyy";
 
 	/*
 	 * Constats for Find a pro

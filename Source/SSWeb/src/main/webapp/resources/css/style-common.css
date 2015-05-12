@@ -3933,6 +3933,7 @@ button.paypal.is-active {
 	overflow: hidden;
 	text-overflow: ellipsis;
 	white-space: nowrap;
+	line-height: normal;
 }
 
 .dash-btn-dl-sd {
@@ -3941,11 +3942,23 @@ button.paypal.is-active {
 	line-height: 32px;
 	margin-top: 6px;
 	border: 1px solid #009FE0;
-	cursor: pointer;
-	width: 180px;
+	height: 32px;
+	width: 350px;
 	text-align: center;
 	font-size: 13px;
 	text-transform: initial;
+}
+
+.dsh-dwnld-btn {
+	width: 45%;
+	padding-left: 5px;
+}
+.dsh-date-picker {
+	width: 25%;
+	padding: 0 0 0 5px;
+	height: 100%;
+	border: none;
+	color: #777;
 }
 
 .dash-ppl-say-lbl {
