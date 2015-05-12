@@ -331,7 +331,7 @@ function shareOnLinkedin(firstName, lastName, agentName, review, score, agentId)
 		});
 }
 
-function shareOnYelp(agentId, location){
+function shareOnYelp(agentId, location, yelpElement){
 	var success= false;
 	var payload = {
 			"agentId" : agentId
@@ -349,7 +349,11 @@ function shareOnYelp(agentId, location){
 			data = data.responseJSON;
 			if (success) {
 				if(data.host!=undefined && data.relativePath!=undefined)
-					window.open(data.host+data.relativePath);
+					if(yelpElement==undefined){
+						window.open(data.host+data.relativePath);
+					}else{
+						yelpElement.href = data.host+data.relativePath;
+					}
 				else{
 					$('#overlay-toast').html('Please setup your Yelp account to share.');
 					showToast();
@@ -364,7 +368,7 @@ function shareOnYelp(agentId, location){
 	});
 }
 
-function shareOnGooglePlus(agentId, location){
+function shareOnGooglePlus(agentId, location, googleElement){
 	var success= false;
 	var payload = {
 			"agentId" : agentId
@@ -381,9 +385,15 @@ function shareOnGooglePlus(agentId, location){
 		complete : function(data) {
 			if (success) {
 				data = data.responseJSON;
-				if(data.host!=undefined && data.profileServer!=undefined && data.relativePath!=undefined)
-					window.open(data.host + data.profileServer
-						+ data.relativePath);
+				if(data.host!=undefined && data.profileServer!=undefined && data.relativePath!=undefined){
+					if(googleElement==undefined){
+						window.open(data.host + data.profileServer
+								+ data.relativePath);
+					}
+					else{
+						googleElement.href = data.host + data.profileServer + data.relativePath;
+					}
+				}
 				else{
 					$('#overlay-toast').html('Please setup your Google+ account to share.');
 					showToast();

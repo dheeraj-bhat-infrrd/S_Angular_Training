@@ -956,14 +956,16 @@ $('.sq-pts-dgreen').click(function() {
 });
 
 $('#ylp-btn').click(function(e) {
-	e.stopImmediatePropagation();
-	shareOnYelp(agentId, window.location.origin+"/rest/survey/");
+	//e.stopImmediatePropagation();
+	var yelpElement = document.getElementById('ylp-btn');
+	shareOnYelp(agentId, window.location.origin+"/rest/survey/", yelpElement);
 	updateSharedOn("yelp", agentId, customerEmail);
 });
 
 $('#ggl-btn').click(function(e) {
-	e.stopImmediatePropagation();
-	shareOnGooglePlus(agentId, window.location.origin+"/rest/survey/");
+	//e.stopImmediatePropagation();
+	var googleElement = document.getElementById('ggl-btn');
+	shareOnGooglePlus(agentId, window.location.origin+"/rest/survey/", googleElement);
 	updateSharedOn("google", agentId, customerEmail);
 });
 
