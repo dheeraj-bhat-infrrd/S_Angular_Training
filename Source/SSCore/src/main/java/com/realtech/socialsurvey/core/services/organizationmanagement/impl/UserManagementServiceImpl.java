@@ -232,15 +232,16 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 		 * verification link is sent. For an invitation, email is already verified hence status is
 		 * active
 		 */
-		if (isDirectRegistration) {
+		/**if (isDirectRegistration) {
 			status = CommonConstants.STATUS_NOT_VERIFIED;
 		}
 		// JIRA - SS-536: Added for manual registration via invite 
 		else{
 			// setting the status as active as creation is done by admin
 			status = CommonConstants.STATUS_ACTIVE;
-		}
-
+		}**/
+		// set the status as active as with the new sign up path, validation is not required.
+		status = CommonConstants.STATUS_ACTIVE;
 		LOG.debug("Creating new user with emailId : " + emailId + " and verification status : " + status);
 		User user = createUser(company, encryptedPassword, emailId, firstName, lastName, CommonConstants.STATUS_ACTIVE, status,
 				CommonConstants.ADMIN_USER_NAME);
