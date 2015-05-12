@@ -117,7 +117,7 @@ public class UserManagementController {
 				model.addAttribute("message",
 						messageUtils.getDisplayMessage(DisplayMessageConstants.USER_MANAGEMENT_NOT_AUTHORIZED, DisplayMessageType.ERROR_MESSAGE));
 			}
-			
+
 			long companyId = user.getCompany().getCompanyId();
 			try {
 				long usersCount = solrSearchService.countUsersByCompany(companyId, 0, SOLR_BATCH_SIZE);
@@ -867,14 +867,14 @@ public class UserManagementController {
 			// checking status of user
 			String emailId = urlParams.get(CommonConstants.EMAIL_ID);
 			User newUser = userManagementService.getUserByEmailAndCompany(companyId, emailId);
-			
+
 			if (newUser.getStatus() == CommonConstants.STATUS_NOT_VERIFIED) {
 				model.addAttribute(CommonConstants.COMPANY, urlParams.get(CommonConstants.COMPANY));
 				model.addAttribute(CommonConstants.FIRST_NAME, urlParams.get(CommonConstants.FIRST_NAME));
 				model.addAttribute(CommonConstants.EMAIL_ID, emailId);
 				User user = userManagementService.getUserByEmail(emailId);
 				AgentSettings agentSettings = userManagementService.getAgentSettingsForUserProfiles(user.getUserId());
-				if(agentSettings==null){
+				if (agentSettings == null) {
 					throw new InvalidInputException("Settings not found for the given user.");
 				}
 				model.addAttribute("profileUrl", agentSettings.getCompleteProfileUrl());
@@ -948,7 +948,7 @@ public class UserManagementController {
 				throw new InvalidInputException("NumberFormat exception parsing companyId. Reason : " + e.getMessage(),
 						DisplayMessageConstants.GENERAL_ERROR, e);
 			}
-			
+
 			AccountType accountType = null;
 			HttpSession session = request.getSession(true);
 			try {
@@ -989,7 +989,7 @@ public class UserManagementController {
 			else {
 				// TODO: add logic for what happens when no user profile present
 			}
-			
+
 			// Setting session variable to show linkedin signup and sendsurvey popups only once
 			String popupStatus = (String) session.getAttribute(CommonConstants.POPUP_FLAG_IN_SESSION);
 			if (popupStatus == null) {
@@ -998,7 +998,7 @@ public class UserManagementController {
 			else if (popupStatus.equals(CommonConstants.YES_STRING)) {
 				session.setAttribute(CommonConstants.POPUP_FLAG_IN_SESSION, CommonConstants.NO_STRING);
 			}
-			
+
 			// updating session with selected user profile if not set
 			LOG.debug("Updating session with selected user profile if not set");
 			boolean showLinkedInPopup = false;
@@ -1019,17 +1019,18 @@ public class UserManagementController {
 			model.addAttribute("showLinkedInPopup", String.valueOf(showLinkedInPopup));
 			model.addAttribute("showSendSurveyPopup", String.valueOf(showSendSurveyPopup));
 			session.setAttribute(CommonConstants.USER_PROFILE, selectedProfile);
-			
+
 			// updating session with aggregated user profiles, if not set
 			LOG.debug("Updating session with aggregated user profiles, if not set");
 			Map<Long, AbridgedUserProfile> profileAbridgedMap = userManagementService.processedUserProfiles(user, accountType, profileMap,
 					user.getUserProfiles());
 			if (profileAbridgedMap.size() > 0) {
 				session.setAttribute(CommonConstants.USER_PROFILE_LIST, profileAbridgedMap);
-				session.setAttribute(CommonConstants.PROFILE_NAME_COLUMN, profileAbridgedMap.get(selectedProfile.getUserProfileId()).getUserProfileName());
+				session.setAttribute(CommonConstants.PROFILE_NAME_COLUMN, profileAbridgedMap.get(selectedProfile.getUserProfileId())
+						.getUserProfileName());
 			}
 			session.setAttribute(CommonConstants.USER_PROFILE_MAP, profileMap);
-			
+
 			// update the last login time and number of logins
 			userManagementService.updateUserLoginTimeAndNum(user);
 		}
@@ -1042,17 +1043,17 @@ public class UserManagementController {
 		LOG.info("Method completeRegistration() to complete registration of user finished.");
 		return JspResolver.LANDING;
 	}
-	
+
 	@RequestMapping(value = "/showlinkedindatacompare")
 	public String showLinkedInDataCompare(Model model, HttpServletRequest request) {
 		LOG.info("Method showLinkedInDataCompare() called");
 		HttpSession session = request.getSession(false);
-		
+
 		User user = sessionHelper.getCurrentUser();
 		AccountType accountType = (AccountType) session.getAttribute(CommonConstants.ACCOUNT_TYPE_IN_SESSION);
 		UserSettings userSettings = (UserSettings) session.getAttribute(CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION);
 		UserProfile selectedProfile = (UserProfile) session.getAttribute(CommonConstants.USER_PROFILE);
-		
+
 		long branchId = 0;
 		long regionId = 0;
 		int profilesMaster = 0;
@@ -1061,7 +1062,7 @@ public class UserManagementController {
 			regionId = selectedProfile.getRegionId();
 			profilesMaster = selectedProfile.getProfilesMaster().getProfileId();
 		}
-		
+
 		// Setting userSettings in session
 		OrganizationUnitSettings profileSettings = null;
 		try {
@@ -1083,11 +1084,11 @@ public class UserManagementController {
 			model.addAttribute("message", messageUtils.getDisplayMessage(e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE));
 		}
 		session.setAttribute(CommonConstants.PARENT_LOCK, parentLock);
-		
+
 		LOG.info("Method showLinkedInDataCompare() finished");
 		return JspResolver.LINKEDIN_COMPARE;
 	}
-	
+
 	@ResponseBody
 	@RequestMapping(value = "/fetchuploadedprofileimage", method = RequestMethod.GET)
 	public String fetchProfileImage(Model model, HttpServletRequest request) {
@@ -1123,7 +1124,7 @@ public class UserManagementController {
 			LOG.error("EmailId not valid");
 			throw new InvalidInputException("EmailId not valid", DisplayMessageConstants.INVALID_EMAILID);
 		}
-		if (password == null || password.isEmpty() || password.length()<CommonConstants.PASSWORD_LENGTH) {
+		if (password == null || password.isEmpty() || password.length() < CommonConstants.PASSWORD_LENGTH) {
 			LOG.error("Password passed was invalid");
 			throw new InvalidInputException("Password passed was invalid", DisplayMessageConstants.INVALID_PASSWORD);
 		}
@@ -1343,7 +1344,8 @@ public class UserManagementController {
 
 			userManagementService.updateUserProfile(user, profileId, status);
 
-			message = messageUtils.getDisplayMessage(DisplayMessageConstants.PROFILE_UPDATE_SUCCESSFUL, DisplayMessageType.SUCCESS_MESSAGE).getMessage();
+			message = messageUtils.getDisplayMessage(DisplayMessageConstants.PROFILE_UPDATE_SUCCESSFUL, DisplayMessageType.SUCCESS_MESSAGE)
+					.getMessage();
 			statusMap.put("status", CommonConstants.SUCCESS_ATTRIBUTE);
 			
 			// update user profiles in session if current user
@@ -1394,7 +1396,7 @@ public class UserManagementController {
 				LOG.warn("First Name is not present to resend invitation");
 				throw new InvalidInputException("Invalid first name.", DisplayMessageConstants.INVALID_FIRSTNAME);
 			}
-			if( lastName == null || lastName.isEmpty()){
+			if (lastName == null || lastName.isEmpty()) {
 				lastName = " ";
 			}
 
@@ -1418,7 +1420,7 @@ public class UserManagementController {
 		statusMap.put("message", message);
 		return new Gson().toJson(statusMap);
 	}
-	
+
 	@ResponseBody
 	@RequestMapping(value = "/sendverificationmail", method = RequestMethod.GET)
 	public String sendVerificationMail(Model model, HttpServletRequest request) {
@@ -1434,14 +1436,29 @@ public class UserManagementController {
 		return "Verification Mail has been sent to your email id. Please click on the link provided to continue.";
 	}
 
+	@ResponseBody
+	@RequestMapping(value = "/initialofusername", method = RequestMethod.GET)
+	public String getInitialOfUserName(Model model, HttpServletRequest request) {
+		LOG.info("Method sendVerificationMail() called from UserManagementController");
+		User user;
+		String initial = "";
+		user = sessionHelper.getCurrentUser();
+		if (user != null) {
+			if (user.getFirstName() != null) {
+				initial = user.getFirstName().substring(0, 1);
+			}
+		}
+		return initial;
+	}
+
 	// verify change password parameters
 	private void validateChangePasswordFormParameters(String oldPassword, String newPassword, String confirmNewPassword) throws InvalidInputException {
 		LOG.debug("Validating change password form paramters");
-		if (oldPassword == null || oldPassword.isEmpty() || oldPassword.length()<CommonConstants.PASSWORD_LENGTH) {
+		if (oldPassword == null || oldPassword.isEmpty() || oldPassword.length() < CommonConstants.PASSWORD_LENGTH) {
 			LOG.error("Invalid old password");
 			throw new InvalidInputException("Invalid old password", DisplayMessageConstants.INVALID_CURRENT_PASSWORD);
 		}
-		if (newPassword == null || newPassword.isEmpty() || newPassword.length()<CommonConstants.PASSWORD_LENGTH) {
+		if (newPassword == null || newPassword.isEmpty() || newPassword.length() < CommonConstants.PASSWORD_LENGTH) {
 			LOG.error("Invalid new password");
 			throw new InvalidInputException("Invalid new password", DisplayMessageConstants.INVALID_NEW_PASSWORD);
 		}
