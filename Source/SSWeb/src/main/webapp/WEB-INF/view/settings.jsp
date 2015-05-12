@@ -7,6 +7,9 @@
 <c:if test="${not empty profile}">
 	<c:set value="${profile.profilesMaster.profileId}" var="profilemasterid"></c:set>
 </c:if>
+<c:if test="${not empty accountSettings && not empty accountSettings.survey_settings}">
+	<c:set value="${accountSettings.survey_settings}" var="surveysettings"></c:set>
+</c:if>
 
 <div class="hm-header-main-wrapper">
 	<div class="container">
@@ -29,9 +32,9 @@
 
 <div id="temp-div"></div>
 <div id="hm-main-content-wrapper" class="hm-main-content-wrapper margin-top-25 margin-bottom-25"
-	data-hpy="${accountSettings.survey_settings.happyText}"
-	data-nutl="${accountSettings.survey_settings.neutralText}" 
-	data-sad="${accountSettings.survey_settings.sadText}">
+	data-hpy="${surveysettings.happyText}" data-hpy-compl="${surveysettings.happyTextComplete}" 
+	data-nutl="${surveysettings.neutralText}" data-nutl-compl="${surveysettings.neutralTextComplete}" 
+	data-sad="${surveysettings.sadText}" data-sad-compl="${surveysettings.sadTextComplete}">
 	
 	<div class="container">
 
@@ -328,8 +331,9 @@
 	}
 </style>
 
+<script src="${pageContext.request.contextPath}/resources/js/settings.js"></script>
 <script>
-$(document).ready(function(){
+$(document).ready(function() {
 	hideOverlay();
 	$(document).attr("title", "Edit Settings");
 	
@@ -352,16 +356,14 @@ $(document).ready(function(){
 		autoSetCheckboxStatus('#st-settings-account-on', '#st-settings-account-off', '#other-account');
 		autoSetCheckboxStatus('#st-reminder-on', '#st-reminder-off', '#reminder-needed-hidden');
 		autoSetReminderIntervalStatus();
+		
 		paintTextForMood($('#hm-main-content-wrapper').attr("data-hpy"), 
 			$('#hm-main-content-wrapper').attr("data-nutl"),
-			$('#hm-main-content-wrapper').attr("data-sad"));
+			$('#hm-main-content-wrapper').attr("data-sad"),
+			$('#hm-main-content-wrapper').attr("data-hpy-compl"), 
+			$('#hm-main-content-wrapper').attr("data-nutl-compl"),
+			$('#hm-main-content-wrapper').attr("data-sad-compl"));
 	}
-	
-	
-	
-	//Event binding
-	
-	
 	
 	// Settings View as
 	$('body').on('click','#setting-sel',function(e){
@@ -369,7 +371,7 @@ $(document).ready(function(){
 		$('#se-dd-wrapper-profiles').slideToggle(200);
 	});
 	
-	$('body').on('click','.se-dd-item',function(e){
+	$('body').on('click','.se-dd-item',function(e) {
 		var newProfileId = $(this).data('profile-id');
 		
 		$('#setting-sel').html($(this).html());
@@ -378,7 +380,7 @@ $(document).ready(function(){
 		showMainContent('./showcompanysettings.do?profileId=' + newProfileId);
 	});
 	
-	$('body').click(function(){
+	$('body').click(function() {
 		if ($('#se-dd-wrapper-profiles').css('display') == "block") {
 			$('#se-dd-wrapper-profiles').toggle();
 		}
@@ -393,18 +395,18 @@ $(document).ready(function(){
 	$('#encompass-url').blur(function() {
 		validateURL(this.id);
 	});
-	$('body').on('click','#encompass-save',function(){
+	$('body').on('click','#encompass-save',function() {
 		if(validateEncompassInput('encompass-form-div')) {
 			saveEncompassDetails("encompass-form");
 		}
 	}); 
-	$('body').on('click','#encompass-testconnection',function(){
+	$('body').on('click','#encompass-testconnection',function() {
 		if(validateEncompassInput('encompass-form-div')) {
 			testEncompassConnection("encompass-form");
 		}
 	});
 
-	$('body').on('click','.st-dd-item-auto-post',function(){
+	$('body').on('click','.st-dd-item-auto-post',function() {
 		$('#rating-auto-post').val($(this).html());
 		$('#st-dd-wrapper-auto-post').slideToggle(200);
 
@@ -416,7 +418,7 @@ $(document).ready(function(){
 		updatePostScore("rating-settings-form");
 	});
 
-	$('body').on('click','.st-dd-item-min-post',function(){
+	$('body').on('click','.st-dd-item-min-post',function() {
 		$('#rating-min-post').val($(this).html());
 		$('#st-dd-wrapper-min-post').slideToggle(200);
 		
@@ -429,8 +431,7 @@ $(document).ready(function(){
 		updatePostScore("rating-settings-form");
 	});
 
-
-	$('#edit-participation-mail-content').click(function(){
+	$('#edit-participation-mail-content').click(function() {
 		$('#survey-participation-mailcontent').ckeditorGet().setReadOnly(false);
 		
 		$('#save-participation-mail-content').show();
@@ -439,10 +440,9 @@ $(document).ready(function(){
 		$('#edit-participation-mail-content-disabled').show();
 		$(this).hide();
 	});
-	$('#save-participation-mail-content').click(function(){
+	$('#save-participation-mail-content').click(function() {
 		$('#mailcategory').val('participationmail');
 		updateMailContent("mail-body-settings-form");
-		
 		$('#survey-participation-mailcontent').ckeditorGet().setReadOnly(true);
 		
 		$(this).hide();
@@ -453,7 +453,7 @@ $(document).ready(function(){
 	});
 
 
-	$('#edit-participation-reminder-mail-content').click(function(){
+	$('#edit-participation-reminder-mail-content').click(function() {
 		$('#survey-participation-reminder-mailcontent').ckeditorGet().setReadOnly(false);
 		
 		$('#save-participation-reminder-mail-content').show();
@@ -462,10 +462,9 @@ $(document).ready(function(){
 		$('#edit-participation-reminder-mail-content-disabled').show();
 		$(this).hide();
 	});
-	$('#save-participation-reminder-mail-content').click(function(){
+	$('#save-participation-reminder-mail-content').click(function() {
 		$('#mailcategory').val('participationremindermail');
 		updateMailContent("mail-body-settings-form");
-		;
 		$('#survey-participation-reminder-mailcontent').ckeditorGet().setReadOnly(true);
 		
 		$(this).hide();
@@ -483,7 +482,7 @@ $(document).ready(function(){
 		}
 	});
 
-	$('#st-reminder-on').click(function(){
+	$('#st-reminder-on').click(function() {
 		$('#mailcategory').val('reminder-needed');
 		
 		$('#reminder-needed-hidden').val('false');
@@ -493,7 +492,7 @@ $(document).ready(function(){
 		$('#reminder-interval').removeAttr("disabled");
 		updateReminderSettings("mail-body-settings-form");
 	});
-	$('#st-reminder-off').click(function(){
+	$('#st-reminder-off').click(function() {
 		$('#mailcategory').val('reminder-needed');
 
 		$('#reminder-needed-hidden').val('true');
@@ -505,7 +504,7 @@ $(document).ready(function(){
 	});
 
 
-	$('#st-settings-location-on').click(function(){
+	$('#st-settings-location-on').click(function() {
 		$('#othercategory').val('other-location');
 		$('#other-location').val('false');
 		
@@ -514,7 +513,7 @@ $(document).ready(function(){
 		
 		updateOtherSettings("other-settings-form");
 	});
-	$('#st-settings-location-off').click(function(){
+	$('#st-settings-location-off').click(function() {
 		$('#othercategory').val('other-location');
 		$('#other-location').val('true');
 
@@ -525,46 +524,53 @@ $(document).ready(function(){
 	});
 
 
-	$('#st-settings-payment-on').click(function(){
+	$('#st-settings-payment-on').click(function() {
 		$('#st-settings-payment-off').show();
 		$(this).hide();
 	});
-	$('#st-settings-payment-off').click(function(){
+	$('#st-settings-payment-off').click(function() {
 		$('#st-settings-payment-on').show();
 		$(this).hide();
 		showPaymentOptions();
 	});
 
 
-	$('#st-settings-account-on').click(function(){
+	$('#st-settings-account-on').click(function() {
 		$('#other-account').val('false');
 		createPopupConfirm("Enable Account", "Do you want to Continue?");
 		overlayAccount();
 	});
-	$('#st-settings-account-off').click(function(){
+	$('#st-settings-account-off').click(function() {
 		$('#other-account').val('true');
 		createPopupConfirm("Disable Account", "You will not be able to access your SocialSurvey profile after the current billing cycle. Also for Branch or Company Accounts, this will disable all accounts in your hierarchy under this account.<br/> Do you want to Continue?");
 		overlayAccount();
 	});
 
 	$('#happy-text').blur(function() {
-		  saveTextForMoodFlow($("#happy-text").val(), "happy");
+		saveTextForMoodFlow($("#happy-text").val(), "happy");
 	});
-
 	$('#neutral-text').blur(function() {
 		saveTextForMoodFlow($("#neutral-text").val(), "neutral");
 	});
-
 	$('#sad-text').blur(function() {
 		saveTextForMoodFlow($("#sad-text").val(), "sad");
 	});
 
-	$('#atpst-chk-box').click(function(){
-		if($('#atpst-chk-box').hasClass('bd-check-img-checked')){
+	$('#happy-text-complete').blur(function() {
+		saveTextForMoodFlow($("#happy-text").val(), "happyComplete");
+	});
+	$('#neutral-text-complete').blur(function() {
+		saveTextForMoodFlow($("#neutral-text").val(), "neutralComplete");
+	});
+	$('#sad-text-complete').blur(function() {
+		saveTextForMoodFlow($("#sad-text").val(), "sadComplete");
+	});
+
+	$('#atpst-chk-box').click(function() {
+		if ($('#atpst-chk-box').hasClass('bd-check-img-checked')) {
 			$('#atpst-chk-box').removeClass('bd-check-img-checked');
 			updateAutoPostSetting(true);
-		}
-		else{
+		} else {
 			$('#atpst-chk-box').addClass('bd-check-img-checked');
 			updateAutoPostSetting(false);
 		}
