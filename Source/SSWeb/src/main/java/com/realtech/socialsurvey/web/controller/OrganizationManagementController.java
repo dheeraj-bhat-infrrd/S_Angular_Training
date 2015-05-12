@@ -1152,10 +1152,12 @@ public class OrganizationManagementController {
 	 * @param model
 	 * @return
 	 */
+	@ResponseBody
 	@RequestMapping(value = "/storetextforflow", method = RequestMethod.GET)
-	public void storeTextForFlow(HttpServletRequest request, Model model) {
+	public String storeTextForFlow(HttpServletRequest request, Model model) {
 		LOG.info("Method to store text to be displayed to a customer after choosing the flow, storeTextForFlow() started.");
 		User user = sessionHelper.getCurrentUser();
+		String status = "";
 
 		try {
 			String text = request.getParameter("text");
@@ -1170,6 +1172,7 @@ public class OrganizationManagementController {
 			}
 			
 			OrganizationUnitSettings companySettings = organizationManagementService.getCompanySettings(user);
+			
 			SurveySettings surveySettings = companySettings.getSurvey_settings();
 			if (mood.equalsIgnoreCase("happy"))
 				surveySettings.setHappyText(text);
@@ -1185,12 +1188,14 @@ public class OrganizationManagementController {
 				surveySettings.setSadTextComplete(text);
 
 			organizationManagementService.updateSurveySettings(companySettings, surveySettings);
+			status = CommonConstants.SUCCESS_ATTRIBUTE;
 		}
 		catch (NonFatalException e) {
 			LOG.error("Non fatal exception caught in storeTextForFlow(). Nested exception is ", e);
 		}
+		
 		LOG.info("Method to store text to be displayed to a customer after choosing the flow, storeTextForFlow() finished.");
+		return status;
 	}
 }
-
 // JIRA: SS-24 BY RM02 EOC

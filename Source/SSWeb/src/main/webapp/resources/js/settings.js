@@ -256,25 +256,14 @@ function saveTextForMoodFlow(content, mood){
 		"text" : content,
 		"mood" : mood
 	};
-	var success = false;
-	$.ajax({
-		url : "./storetextforflow.do",
-		type : "GET",
-		data : payload,
-		success : function(data) {
-			if (data.errCode == undefined)
-				success = true;
-		},
-		complete : function(data) {
-			if (success) {
-				console.log("success");
-				$('#overlay-toast').html("Content added successfully!");
-			}
-		},
-		error : function() {
+	callAjaxGetWithPayloadData("./storetextforflow.do", function(data) {
+		if (data == "success") {
+			$('#overlay-toast').html("Content added successfully!");
+		} else {
 			$('#overlay-toast').html("Oops! Something went wrong. Please try again later.");
 		}
-	});
+		showToast();
+	}, payload, true);
 }
 
 function paintTextForMood(happyText, neutralText, sadText, happyTextComplete, neutralTextComplete, sadTextComplete){
