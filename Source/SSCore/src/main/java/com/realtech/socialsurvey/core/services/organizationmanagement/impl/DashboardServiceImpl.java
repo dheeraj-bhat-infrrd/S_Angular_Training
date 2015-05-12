@@ -214,7 +214,7 @@ public class DashboardServiceImpl implements DashboardService, InitializingBean 
 		surveyDetailsToPopulate.add("Started On");
 		surveyDetailsToPopulate.add("Completed On");
 		surveyDetailsToPopulate.add("Score");
-		surveyDetailsToPopulate.add("Gateway Question");
+		surveyDetailsToPopulate.add("Experience");
 		surveyDetailsToPopulate.add("Comments");
 		surveyDetailsToPopulate.add("Social");
 		for (counter = 1; counter <= max; counter++) {

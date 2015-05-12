@@ -144,7 +144,7 @@ public class SurveyManagementController {
 			surveyHandler.updateGatewayQuestionResponseAndScore(agentId, customerEmail, mood, feedback, isAbusive);
 			surveyHandler.increaseSurveyCountForAgent(agentId);
 
-			// TODO Search Engine Optimisation
+			// TODO Search Engine Optimization
 			if (mood == null || mood.isEmpty()) {
 				LOG.error("Null/empty value found for mood in storeFeedback().");
 				throw new InvalidInputException("Null/empty value found for mood in storeFeedback().");
