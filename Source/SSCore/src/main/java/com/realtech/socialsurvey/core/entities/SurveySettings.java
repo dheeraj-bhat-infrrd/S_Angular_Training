@@ -14,6 +14,9 @@ public class SurveySettings {
 	private String happyText;
 	private String neutralText;
 	private String sadText;
+	private String happyTextComplete;
+	private String neutralTextComplete;
+	private String sadTextComplete;
 
 	public float getAuto_post_score() {
 		return auto_post_score;
@@ -85,6 +88,30 @@ public class SurveySettings {
 
 	public void setSadText(String sadText) {
 		this.sadText = sadText;
+	}
+
+	public String getHappyTextComplete() {
+		return happyTextComplete;
+	}
+
+	public void setHappyTextComplete(String happyTextComplete) {
+		this.happyTextComplete = happyTextComplete;
+	}
+
+	public String getNeutralTextComplete() {
+		return neutralTextComplete;
+	}
+
+	public void setNeutralTextComplete(String neutralTextComplete) {
+		this.neutralTextComplete = neutralTextComplete;
+	}
+
+	public String getSadTextComplete() {
+		return sadTextComplete;
+	}
+
+	public void setSadTextComplete(String sadTextComplete) {
+		this.sadTextComplete = sadTextComplete;
 	}
 
 	@Override
