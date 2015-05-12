@@ -236,7 +236,12 @@ public class SurveyManagementController {
 			surveyDetail.append("<br />").append("Share Checkbox: ").append("No");
 		}
 		
-		return surveyDetail.toString();
+		// update survey details with values
+		String surveyDetailStr = surveyDetail.toString();
+		surveyDetailStr = surveyDetailStr.replaceAll("\\[name\\]", survey.getAgentName());
+		surveyDetailStr = surveyDetailStr.replaceAll("\\[Name\\]", survey.getAgentName());
+		
+		return surveyDetailStr;
 	}
 
 	@ResponseBody
