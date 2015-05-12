@@ -1,5 +1,6 @@
 <%@ taglib prefix="spring" uri="http://www.springframework.org/tags"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+
 <div id="hm-header-main-wrapper" class="hm-header-main-wrapper">
 	<div class="container">
 		<div class="hm-header-row hm-header-row-main clearfix">
@@ -52,8 +53,6 @@
 	</div>
 </div>
 
-<script src="${pageContext.request.contextPath}/resources/js/jquery-2.1.1.min.js"></script>
-<script src="${pageContext.request.contextPath}/resources/js/bootstrap.min.js"></script>
 <script>
 var isChangePasswordFormValid;
 $(document).ready(function() {
@@ -153,6 +152,3 @@ $(document).ready(function() {
 	}
 });
 </script>
-
-</body>
-</html>
