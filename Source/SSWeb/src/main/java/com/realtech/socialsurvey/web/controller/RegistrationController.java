@@ -159,7 +159,7 @@ public class RegistrationController {
 			model.addAttribute("firstname", urlParams.get(CommonConstants.FIRST_NAME));
 			model.addAttribute("lastname", urlParams.get(CommonConstants.LAST_NAME));
 			model.addAttribute("emailid", urlParams.get(CommonConstants.EMAIL_ID));
-			model.addAttribute("isDirectRegistration", false);
+			model.addAttribute("isDirectRegistration", true);
 
 			LOG.debug("Validation of url completed. Service returning params to be prepopulated in registration page");
 		}
@@ -187,6 +187,14 @@ public class RegistrationController {
 		String emailId = request.getParameter("emailId");
 
 		try {
+			LOG.debug("Validating form elements");
+			validateFormParameters(firstName, lastName, emailId);
+			LOG.debug("Form parameters validation passed for firstName: " + firstName + " lastName: " + lastName + " and emailID: " + emailId);
+			//check if email id already exists
+			if(userManagementService.userExists(emailId.trim())){
+				LOG.warn(emailId+" is already present");
+				throw new UserAlreadyExistsException("Email address "+emailId+" already exists.");
+			}
 			String captchaResponse = request.getParameter("captchaResponse");
 			String challengeField = request.getParameter("recaptcha_challenge_field");
 			String remoteAddress = request.getRemoteAddr();
@@ -196,24 +204,28 @@ public class RegistrationController {
 			}
 			LOG.debug("Captcha validation complete!");
 
-			LOG.debug("Validating form elements");
-			validateFormParameters(firstName, lastName, emailId);
-			LOG.debug("Form parameters validation passed for firstName: " + firstName + " lastName: " + lastName + " and emailID: " + emailId);
-
 			model.addAttribute("firstname", firstName);
 			model.addAttribute("lastname", lastName);
 			model.addAttribute("emailid", emailId);
 			model.addAttribute("isDirectRegistration", true);
-			return JspResolver.REGISTRATION;
-		}
-		catch (NonFatalException e) {
+			// send verification mail and then redirect to index page
+			LOG.debug("Calling service for sending the registration invitation");
+			userManagementService.inviteCorporateToRegister(firstName, lastName, emailId, false);
+			LOG.debug("Service for sending the registration invitation excecuted successfully");
+			model.addAttribute("message", messageUtils.getDisplayMessage(DisplayMessageConstants.REGISTRATION_INVITE_SUCCESSFUL, DisplayMessageType.SUCCESS_MESSAGE));
+		}catch(UserAlreadyExistsException e){
+			model.addAttribute("message", messageUtils.getDisplayMessage(DisplayMessageConstants.USERNAME_ALREADY_TAKEN, DisplayMessageType.ERROR_MESSAGE));
+			model.addAttribute("firstname", firstName);
+			model.addAttribute("lastname", lastName);
+			model.addAttribute("emailid", emailId);
+		}catch (NonFatalException e) {
 			LOG.error("NonFatalException while showing registration page. Reason : " + e.getMessage(), e);
 			model.addAttribute("message", messageUtils.getDisplayMessage(DisplayMessageConstants.INVALID_CAPTCHA, DisplayMessageType.ERROR_MESSAGE));
 			model.addAttribute("firstname", firstName);
 			model.addAttribute("lastname", lastName);
 			model.addAttribute("emailid", emailId);
-			return JspResolver.INDEX;
 		}
+		return JspResolver.INDEX;
 	}
 
 	/**
@@ -269,10 +281,11 @@ public class RegistrationController {
 				LOG.debug("Successfully added registered user to principal session");
 
 				// send verification mail
-				if (isDirectRegistration) {
+				// no need to send verification mail as the new sign up path doesn't need it
+				/**if (isDirectRegistration) {
 					LOG.debug("Calling method for sending verification link for user : " + user.getUserId());
 					userManagementService.sendVerificationLink(user);
-				}
+				}*/
 			}
 			catch (InvalidInputException e) {
 				throw new InvalidInputException(e.getMessage(), DisplayMessageConstants.REGISTRATION_GENERAL_ERROR, e);
