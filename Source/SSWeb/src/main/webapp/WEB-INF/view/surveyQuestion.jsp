@@ -291,10 +291,10 @@
 					<div id="social-post-lnk" class="clearfix hide">
 						<div class="sq-bord-bot-sm"></div>
 						<div class="sq-btn-social-wrapper float-left">
-							<div id="ylp-btn" class="sq-btn-continue sq-btn-post-social float-right">Yelp</div>
+							<a id="ylp-btn" target="_blank" class="sq-btn-continue sq-btn-post-social float-right">Yelp</a>
 						</div>
 						<div class="sq-btn-social-wrapper float-left">
-							<div id="ggl-btn" class="sq-btn-continue sq-btn-post-social float-left">Google+</div>
+							<a id="ggl-btn" target="_blank" class="sq-btn-continue sq-btn-post-social float-left">Google+</a>
 						</div>
 					</div>
 				</div>

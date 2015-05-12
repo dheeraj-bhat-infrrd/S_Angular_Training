@@ -92,8 +92,6 @@ public class SurveyManagementController {
 	@Value("${ENABLE_KAFKA}")
 	private String enableKafka;
 
-	@Value("${YELP_REDIRECT_URI}")
-	private String yelpRedirectUri;
 
 	/*
 	 * Method to store answer to the current question of the survey.
@@ -668,7 +666,7 @@ public class SurveyManagementController {
 
 			}
 			else {
-				yelpUrl.put("host", yelpRedirectUri);
+				yelpUrl.put("host", surveyHandler.getYelpShareUri());
 				yelpUrl.put("relativePath", settings.getSocialMediaTokens().getYelpToken().getYelpPageLink());
 			}
 		}
