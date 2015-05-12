@@ -98,8 +98,6 @@ $(document).ready(function() {
 });
 
 $(window).on('unload', function(){
-	console.log('unloading');
-	alert('unloading');
 	var payload = {
 			'socialNetwork' : "${socialNetwork}"
 	};
