@@ -70,6 +70,8 @@ public interface SurveyHandler {
 	public void updateSharedOn(List<String> socialSites, long agentId, String customerEmail);
 
 	public String getGoogleShareUri();
+	
+	public String getYelpShareUri();
 
 	public String getSurveyUrl(long agentId, String customerEmail, String baseUrl) throws InvalidInputException;
 
