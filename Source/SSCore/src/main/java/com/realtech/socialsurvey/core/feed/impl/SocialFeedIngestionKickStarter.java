@@ -106,6 +106,14 @@ public class SocialFeedIngestionKickStarter {
 					LOG.warn("No google+ token found for " + collectionName + " with iden: " + ingestionEntity.getIden());
 				}
 
+				if (token.getTwitterToken() != null) {
+					LOG.info("Processing twitter tweets for " + collectionName + " with iden: " + ingestionEntity.getIden());
+					executors.addTwitterProcessorToPool(ingestionEntity, collectionName);
+				}
+				else {
+					LOG.warn("No twitter token found for " + collectionName + " with iden: " + ingestionEntity.getIden());
+				}
+				
 				if (token.getLinkedInToken() != null) {
 					// TODO: process linkedin token
 				}
@@ -118,14 +126,6 @@ public class SocialFeedIngestionKickStarter {
 				}
 				else {
 					LOG.warn("No rss token found for " + collectionName + " with iden: " + ingestionEntity.getIden());
-				}
-
-				if (token.getTwitterToken() != null) {
-					LOG.info("Processing twitter tweets for " + collectionName + " with iden: " + ingestionEntity.getIden());
-					executors.addTwitterProcessorToPool(ingestionEntity, collectionName);
-				}
-				else {
-					LOG.warn("No twitter token found for " + collectionName + " with iden: " + ingestionEntity.getIden());
 				}
 
 				if (token.getYelpToken() != null) {
