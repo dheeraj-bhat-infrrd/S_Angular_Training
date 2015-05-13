@@ -18,7 +18,7 @@
 	<link rel="stylesheet" href="${pageContext.request.contextPath}/resources/css/rangeslider.css">
 	<link rel="stylesheet" href="${pageContext.request.contextPath}/resources/css/style-common-1.1.css">
 	<link rel="stylesheet" href="${pageContext.request.contextPath}/resources/css/style-resp-1.1.css">
-	
+	<script src='//www.google.com/recaptcha/api.js'></script>
 </head>
 
 <body>
@@ -118,6 +118,8 @@
 							</div>
 							<div class="clearfix reg-captcha-wrapper reg-item reg-cap-nw-adj">
 								<div class="reg-cap-nw-adj-container">
+									<div class="g-recaptcha" data-sitekey="6Le2wQYTAAAAAAacBUn0Dia5zMMyHfMXhoOh5A7K"></div>
+									<!-- 
 									<div class="reg-captcha-img"></div>
 									<div class="reg-captcha-btns clearfix">
 										<input id="captcha-text" class="float-left reg-cap-txt"
@@ -129,11 +131,13 @@
 											<div class="float-left reg-cap-img reg-cap-info"></div>
 										</div>
 									</div>
+									 -->
 								</div>
 							</div>
-							<div id="outer_captcha" style="display: none;">
+							<!-- <div id="outer_captcha" style="display: none;">
 								<div id="recaptcha"></div>
 							</div>
+							 -->
 							<div class="sq-btn-wrapper">
 								<div id="start-btn" class="sq-btn-continue">Start</div>
 							</div>
@@ -310,9 +314,10 @@
 		<!-- close -->
 	</div>
 	
-<div style="display: none">
+<!-- <div style="display: none">
 	<script src="https://www.google.com/recaptcha/api/challenge?k=6LdlHOsSAAAAAM8ypy8W2KXvgMtY2dFsiQT3HVq-"></script>
 </div>
+ -->
 <script src="${pageContext.request.contextPath}/resources/js/jquery-2.1.1.min.js"></script>
 <script src="${pageContext.request.contextPath}/resources/js/bootstrap.min.js"></script>
 <script src="${pageContext.request.contextPath}/resources/js/common.js"></script>
@@ -337,7 +342,7 @@ $(document).ready(function() {
 	
 	var q = $('#prof-container').attr("data-q");
 	console.log(q);
-	console.log("Loading captcha");
+	/**console.log("Loading captcha");
 	try {
 		Recaptcha.create('6LdlHOsSAAAAAM8ypy8W2KXvgMtY2dFsiQT3HVq-',
 				'recaptcha', {
@@ -347,7 +352,7 @@ $(document).ready(function() {
 		console.log("Captcha loaded");
 	} catch (error) {
 		console.log("Could not load captcha");
-	}
+	}*/
 	
 	function captchaLoaded() {
 		var imgData = $(".recaptcha_image_cell").html();
