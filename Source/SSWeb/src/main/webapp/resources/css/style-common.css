@@ -6181,7 +6181,7 @@ tr.u-tbl-header td {
 
 .prof-captcha-cont {
 	width: 300px;
-	border: 1px solid #dcdcdc;
+	/*border: 1px solid #dcdcdc;*/
 	border-radius: 3px;
 }
 
