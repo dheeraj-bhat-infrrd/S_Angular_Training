@@ -8,14 +8,14 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
+import com.realtech.socialsurvey.core.entities.GooglePlusPost;
 import com.realtech.socialsurvey.core.entities.SocialProfileToken;
 import com.realtech.socialsurvey.core.exception.NonFatalException;
 import com.realtech.socialsurvey.core.feed.SocialNetworkDataProcessor;
 
-
 @Component
 @Scope(value = ConfigurableBeanFactory.SCOPE_PROTOTYPE)
-public class GoogleFeedIngester implements Runnable{
+public class GoogleFeedIngester implements Runnable {
 
 	private static final Logger LOG = LoggerFactory.getLogger(GoogleFeedIngester.class);
 
@@ -26,7 +26,6 @@ public class GoogleFeedIngester implements Runnable{
 	private SocialProfileToken token;
 	private String collectionName;
 	private long iden;
-
 
 	public void setToken(SocialProfileToken token) {
 		this.token = token;
@@ -54,8 +53,7 @@ public class GoogleFeedIngester implements Runnable{
 			e.printStackTrace();
 		}
 		finally {
-			LOG.info("Done fetching tweets for " + collectionName + " with iden: " + iden);
+			LOG.info("Done fetching google plus posts for " + collectionName + " with iden: " + iden);
 		}
-		
 	}
 }
