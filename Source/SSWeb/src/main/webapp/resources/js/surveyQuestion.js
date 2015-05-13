@@ -37,7 +37,7 @@ $(document).on('click', '.sq-np-item-next', function() {
  * questions which are shown one after one to the customer.
  */
 function initSurvey(firstName, lastName, email, agentId, agentName,
-		captchaResponse, recaptcha_challenge_field, relationship) {
+		grecaptcharesponse, relationship) {
 	this.agentId = agentId;
 	this.agentName = agentName;
 	customerEmail = email;
@@ -46,8 +46,7 @@ function initSurvey(firstName, lastName, email, agentId, agentName,
 		"firstName" : firstName,
 		"lastName" : lastName,
 		"customerEmail" : email,
-		"captchaResponse" : captchaResponse,
-		"recaptcha_challenge_field" : recaptcha_challenge_field,
+		"g-recaptcha-response" : grecaptcharesponse,
 		"relationship" : relationship
 	};
 	$.ajax({
@@ -858,8 +857,8 @@ $('#start-btn').click(function() {
 	firstName = $('#firstName').val().trim();
 	lastName = $('#lastName').val().trim();
 	var email = $('#email').val().trim();
-	var captchaResponse = $('#captcha-text').val();
-	var recaptcha_challenge_field = $('#recaptcha_challenge_field').val();
+	var grecaptcharesponse = $('#g-recaptcha-response').val();
+	// var recaptcha_challenge_field = $('#recaptcha_challenge_field').val();
 	
 	if (!validateUserFirstName('firstName')) {
 		$('#overlay-toast').html('Please enter valid First Name!');
@@ -891,7 +890,7 @@ $('#start-btn').click(function() {
 	var e = document.getElementById("cust-agnt-rel");
 	var relationship = e.options[e.selectedIndex].value;
 	initSurvey(firstName, lastName, email, agentId, agentName,
-			captchaResponse, recaptcha_challenge_field, relationship);
+			grecaptcharesponse, relationship);
 	
 	// Google analytics for reviews
 	ga('send', {

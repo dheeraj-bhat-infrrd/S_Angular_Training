@@ -7,6 +7,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import org.apache.commons.lang.StringUtils;
 import org.apache.solr.client.solrj.SolrServerException;
@@ -14,6 +15,7 @@ import org.apache.solr.common.SolrDocument;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -74,7 +76,8 @@ public class SurveyManagementController {
 	@Autowired
 	private SolrSearchService solrSearchService;
 
-	@Autowired
+	@Resource
+	@Qualifier("nocaptcha")
 	private CaptchaValidation captchaValidation;
 
 	@Autowired
@@ -91,6 +94,12 @@ public class SurveyManagementController {
 
 	@Value("${ENABLE_KAFKA}")
 	private String enableKafka;
+	
+	@Value("${VALIDATE_CAPTCHA}")
+	private String validateCaptcha;
+	
+	@Value("${CAPTCHA_SECRET}")
+	private String captchaSecretKey;
 
 
 	/*
@@ -308,8 +317,6 @@ public class SurveyManagementController {
 			String customerEmail;
 			String firstName;
 			String lastName;
-			String captchaResponse;
-			String challengeField;
 			String custRelationWithAgent;
 			
 			try {
@@ -318,8 +325,6 @@ public class SurveyManagementController {
 				customerEmail = request.getParameter(CommonConstants.CUSTOMER_EMAIL_COLUMN);
 				firstName = request.getParameter("firstName");
 				lastName = request.getParameter("lastName");
-				captchaResponse = request.getParameter("captchaResponse");
-				challengeField = request.getParameter("recaptcha_challenge_field");
 				custRelationWithAgent = request.getParameter("relationship");
 			}
 			catch (NumberFormatException e) {
@@ -327,13 +332,14 @@ public class SurveyManagementController {
 				throw e;
 			}
 			
-			if (!captchaValidation.isCaptchaValid(request.getRemoteAddr(), challengeField, captchaResponse)) {
-				LOG.error("Captcha Validation failed!");
-				String errorMsg = messageUtils.getDisplayMessage(DisplayMessageConstants.INVALID_CAPTCHA, DisplayMessageType.ERROR_MESSAGE)
-						.getMessage();
-				throw new InvalidInputException(errorMsg, DisplayMessageConstants.INVALID_CAPTCHA);
+			if (validateCaptcha.equals(CommonConstants.YES_STRING)) {
+				if (!captchaValidation.isCaptchaValid(request.getRemoteAddr(), captchaSecretKey, request.getParameter("g-recaptcha-response"))) {
+					LOG.error("Captcha Validation failed!");
+					String errorMsg = messageUtils.getDisplayMessage(DisplayMessageConstants.INVALID_CAPTCHA, DisplayMessageType.ERROR_MESSAGE)
+							.getMessage();
+					throw new InvalidInputException(errorMsg, DisplayMessageConstants.INVALID_CAPTCHA);
+				}
 			}
-			
 			User user = userManagementService.getUserByUserId(agentId);
 			surveyHandler.sendSurveyInvitationMail(firstName, lastName, customerEmail, custRelationWithAgent, user, false);
 		}

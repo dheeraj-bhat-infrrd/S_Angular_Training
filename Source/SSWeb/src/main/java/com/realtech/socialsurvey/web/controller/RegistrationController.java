@@ -7,10 +7,12 @@ import java.net.URLEncoder;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -47,7 +49,8 @@ public class RegistrationController {
 
 	private static final Logger LOG = LoggerFactory.getLogger(RegistrationController.class);
 
-	@Autowired
+	@Resource
+	@Qualifier("nocaptcha")
 	private CaptchaValidation captchaValidation;
 	@Autowired
 	private UserManagementService userManagementService;
@@ -62,8 +65,14 @@ public class RegistrationController {
 	@Autowired
 	private EmailServices emailServices;
 
+	@Value("${VALIDATE_CAPTCHA}")
+	private String validateCaptcha;
+
 	@Value("${APPLICATION_BASE_URL}")
 	private String applicationBaseUrl;
+	
+	@Value("${CAPTCHA_SECRET}")
+	private String captchaSecretKey;
 
 	// JIRA - SS-536: Added for manual registration via invite
 	@Autowired
@@ -190,19 +199,18 @@ public class RegistrationController {
 			LOG.debug("Validating form elements");
 			validateFormParameters(firstName, lastName, emailId);
 			LOG.debug("Form parameters validation passed for firstName: " + firstName + " lastName: " + lastName + " and emailID: " + emailId);
-			//check if email id already exists
-			if(userManagementService.userExists(emailId.trim())){
-				LOG.warn(emailId+" is already present");
-				throw new UserAlreadyExistsException("Email address "+emailId+" already exists.");
+			// check if email id already exists
+			if (userManagementService.userExists(emailId.trim())) {
+				LOG.warn(emailId + " is already present");
+				throw new UserAlreadyExistsException("Email address " + emailId + " already exists.");
 			}
-			String captchaResponse = request.getParameter("captchaResponse");
-			String challengeField = request.getParameter("recaptcha_challenge_field");
-			String remoteAddress = request.getRemoteAddr();
-			if (!captchaValidation.isCaptchaValid(remoteAddress, challengeField, captchaResponse)) {
-				LOG.error("Captcha Validation failed!");
-				throw new InvalidInputException("Captcha Validation failed!", DisplayMessageConstants.INVALID_CAPTCHA);
+			if (validateCaptcha.equals(CommonConstants.YES_STRING)) {
+				if (!captchaValidation.isCaptchaValid(request.getRemoteAddr(), captchaSecretKey, request.getParameter("g-recaptcha-response"))) {
+					LOG.error("Captcha Validation failed!");
+					throw new InvalidInputException("Captcha Validation failed!", DisplayMessageConstants.INVALID_CAPTCHA);
+				}
+				LOG.debug("Captcha validation complete!");
 			}
-			LOG.debug("Captcha validation complete!");
 
 			model.addAttribute("firstname", firstName);
 			model.addAttribute("lastname", lastName);
@@ -212,13 +220,17 @@ public class RegistrationController {
 			LOG.debug("Calling service for sending the registration invitation");
 			userManagementService.inviteCorporateToRegister(firstName, lastName, emailId, false);
 			LOG.debug("Service for sending the registration invitation excecuted successfully");
-			model.addAttribute("message", messageUtils.getDisplayMessage(DisplayMessageConstants.REGISTRATION_INVITE_SUCCESSFUL, DisplayMessageType.SUCCESS_MESSAGE));
-		}catch(UserAlreadyExistsException e){
-			model.addAttribute("message", messageUtils.getDisplayMessage(DisplayMessageConstants.USERNAME_ALREADY_TAKEN, DisplayMessageType.ERROR_MESSAGE));
+			model.addAttribute("message",
+					messageUtils.getDisplayMessage(DisplayMessageConstants.REGISTRATION_INVITE_SUCCESSFUL, DisplayMessageType.SUCCESS_MESSAGE));
+		}
+		catch (UserAlreadyExistsException e) {
+			model.addAttribute("message",
+					messageUtils.getDisplayMessage(DisplayMessageConstants.USERNAME_ALREADY_TAKEN, DisplayMessageType.ERROR_MESSAGE));
 			model.addAttribute("firstname", firstName);
 			model.addAttribute("lastname", lastName);
 			model.addAttribute("emailid", emailId);
-		}catch (NonFatalException e) {
+		}
+		catch (NonFatalException e) {
 			LOG.error("NonFatalException while showing registration page. Reason : " + e.getMessage(), e);
 			model.addAttribute("message", messageUtils.getDisplayMessage(DisplayMessageConstants.INVALID_CAPTCHA, DisplayMessageType.ERROR_MESSAGE));
 			model.addAttribute("firstname", firstName);
@@ -271,7 +283,7 @@ public class RegistrationController {
 				LOG.debug("Adding newly added user {} to mongo", user.getFirstName());
 				userManagementService.insertAgentSettings(user);
 				LOG.debug("Added newly added user {} to mongo", user.getFirstName());
-				
+
 				LOG.debug("Adding newly added user {} to solr", user.getFirstName());
 				solrSearchService.addUserToSolr(user);
 				LOG.debug("Added newly added user {} to solr", user.getFirstName());
@@ -282,10 +294,11 @@ public class RegistrationController {
 
 				// send verification mail
 				// no need to send verification mail as the new sign up path doesn't need it
-				/**if (isDirectRegistration) {
-					LOG.debug("Calling method for sending verification link for user : " + user.getUserId());
-					userManagementService.sendVerificationLink(user);
-				}*/
+				/**
+				 * if (isDirectRegistration) {
+				 * LOG.debug("Calling method for sending verification link for user : " +
+				 * user.getUserId()); userManagementService.sendVerificationLink(user); }
+				 */
 			}
 			catch (InvalidInputException e) {
 				throw new InvalidInputException(e.getMessage(), DisplayMessageConstants.REGISTRATION_GENERAL_ERROR, e);
@@ -391,7 +404,7 @@ public class RegistrationController {
 				throw new InvalidInputException("Creator email id is not present");
 			}
 			if (urlParams.get(CommonConstants.API_KEY_FROM_URL) != null) {
-				if(!userManagementService.isValidApiKey(creatorEmailId, urlParams.get(CommonConstants.API_KEY_FROM_URL))){
+				if (!userManagementService.isValidApiKey(creatorEmailId, urlParams.get(CommonConstants.API_KEY_FROM_URL))) {
 					throw new InvalidInputException("Could not authenticate the API key");
 				}
 			}
@@ -433,18 +446,18 @@ public class RegistrationController {
 			params.put(CommonConstants.ACCOUNT_CRETOR_EMAIL_ID, URLEncoder.encode(creatorEmailId, "UTF-8"));
 			params.put(CommonConstants.API_KEY_FROM_URL, apiKey);
 			LOG.debug("Validating api key");
-			if(!userManagementService.isValidApiKey(creatorEmailId, apiKey)){
+			if (!userManagementService.isValidApiKey(creatorEmailId, apiKey)) {
 				LOG.warn("Invalid api key");
 				throw new InvalidInputException("Could not authenticate the API key.");
 			}
-			
+
 			String url = urlGenerator.generateUrl(params, applicationBaseUrl + CommonConstants.MANUAL_REGISTRATION);
 			emailServices.sendManualRegistrationLink(creatorEmailId, firstName, lastName, url);
 			result = "Done";
 		}
 		catch (InvalidInputException | UndeliveredEmailException | UnsupportedEncodingException | NoRecordsFetchedException e) {
 			LOG.error("Exception caught while sending mail to generating registration url", e);
-			result = "Something went wrong. "+e.getMessage();
+			result = "Something went wrong. " + e.getMessage();
 		}
 		return result;
 	}

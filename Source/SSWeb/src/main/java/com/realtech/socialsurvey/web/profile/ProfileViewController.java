@@ -5,11 +5,14 @@ package com.realtech.socialsurvey.web.profile;
 
 import java.io.IOException;
 import java.util.List;
+import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -38,7 +41,8 @@ public class ProfileViewController {
 	
 	private static final Logger LOG = LoggerFactory.getLogger(ProfileViewController.class);
 	
-	@Autowired
+	@Resource
+	@Qualifier("nocaptcha")
 	private CaptchaValidation captchaValidation;
 	
 	@Autowired
@@ -49,6 +53,12 @@ public class ProfileViewController {
 	
 	@Autowired
 	private OrganizationManagementService organizationManagementService;
+	
+	@Value("${VALIDATE_CAPTCHA}")
+	private String validateCaptcha;
+	
+	@Value("${CAPTCHA_SECRET}")
+	private String captchaSecretKey;
 	
 	/**
 	 * Method to return company profile page
@@ -247,14 +257,14 @@ public class ProfileViewController {
 			String senderName = request.getParameter("name");
 			String senderMailId = request.getParameter("email");
 			String message = request.getParameter("message");
-			String recaptcha_challenge_field = request.getParameter("recaptcha_challenge_field");
-			String recaptchaInput = request.getParameter("recaptcha_input");
-			String remoteAddress = request.getRemoteAddr();
 			
-			if (!captchaValidation.isCaptchaValid(remoteAddress, recaptcha_challenge_field, recaptchaInput)) {
-				LOG.error("Captcha Validation failed!");
-				returnMessage = messageUtils.getDisplayMessage(DisplayMessageConstants.INVALID_CAPTCHA, DisplayMessageType.SUCCESS_MESSAGE).toString();
-				return makeJsonMessage(CommonConstants.STATUS_INACTIVE, returnMessage);
+			if (validateCaptcha.equals(CommonConstants.YES_STRING)) {
+				
+				if (!captchaValidation.isCaptchaValid(request.getRemoteAddr(), captchaSecretKey, request.getParameter("g-recaptcha-response"))) {
+					LOG.error("Captcha Validation failed!");
+					returnMessage = messageUtils.getDisplayMessage(DisplayMessageConstants.INVALID_CAPTCHA, DisplayMessageType.SUCCESS_MESSAGE).toString();
+					return makeJsonMessage(CommonConstants.STATUS_INACTIVE, returnMessage);
+				}
 			}
 			
 			LOG.debug("Sending mail to :  "  + profileName + " from : " + senderMailId);
