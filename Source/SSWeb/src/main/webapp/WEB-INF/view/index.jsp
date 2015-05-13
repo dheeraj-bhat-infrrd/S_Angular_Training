@@ -9,6 +9,7 @@
 	<link rel="stylesheet" href="${pageContext.request.contextPath}/resources/css/bootstrap.min.css">
 	<link rel="stylesheet" href="${pageContext.request.contextPath}/resources/css/style-common-1.1.css">
 	<link rel="stylesheet" href="${pageContext.request.contextPath}/resources/css/style-resp-1.1.css">
+	<script src='//www.google.com/recaptcha/api.js'></script>
 </head>
 
 <body class="index-body">
@@ -123,7 +124,8 @@
 							<input type="text" name="emailId" id="reg-email" class="reg-inp reg-inp-3" value="${emailid}" placeholder="Email">
 						</div>
 						<div class="clearfix reg-captcha-wrapper reg-item">
-							<div class="reg-captcha-img"></div>
+							<div class="g-recaptcha" data-sitekey="6Le2wQYTAAAAAAacBUn0Dia5zMMyHfMXhoOh5A7K"></div>
+							<!-- <div class="reg-captcha-img"></div>
 							<div class="reg-captcha-btns clearfix">
 								<input class="float-left reg-cap-txt" name="captchaResponse" 
 									placeholder="Type the above text" autocomplete="off" autocorrect="off" autocapitalize="off">
@@ -133,10 +135,12 @@
 									<div class="float-left reg-cap-img reg-cap-info"></div>
 								</div>
 							</div>
+							-->
 						</div>
-						<div id="outer_captcha" style="display: none;">
+						<!-- <div id="outer_captcha" style="display: none;">
 							<div id="recaptcha"></div>
 						</div>
+						 -->
 						<div class="clearfix reg-item">
 							<input id="reg-submit"  type="submit" class="reg-inp reg-btn" value="Join Now">
 						</div>
@@ -178,9 +182,10 @@
 			</div>
 		</div>
 	</div>
-<div style="display: none">
+<!-- <div style="display: none">
 	<script src="https://www.google.com/recaptcha/api/challenge?k=6LdlHOsSAAAAAM8ypy8W2KXvgMtY2dFsiQT3HVq-"></script>
 </div>
+ -->
 <script src="//ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
 <script>
 	if (!window.jQuery) { document.write('<script src="${pageContext.request.contextPath}/resources/js/jquery-2.1.1.min.js""><\/script>'); }
@@ -213,7 +218,7 @@ $(document).ready(function(){
 		}
 	}
 	
-	try {
+	/**try {
 		Recaptcha.create('6LdlHOsSAAAAAM8ypy8W2KXvgMtY2dFsiQT3HVq-', 'recaptcha', {
 			theme : 'white',
 			callback : captchaLoaded
@@ -221,7 +226,7 @@ $(document).ready(function(){
 		console.log("Captcha loaded");
   	} catch(error) {
   			console.log("Could not load captcha");
-  	}
+  	}*/
 	
   	// Login form
   	

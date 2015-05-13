@@ -98,6 +98,8 @@ public class SocialManagementController {
 	private String linkedinAccessUri;
 	@Value("${LINKED_IN_PROFILE_URI}")
 	private String linkedinProfileUri;
+	@Value("${LINKED_IN_SCOPE}")
+	private String linkedinScope;
 
 	// Google
 	@Value("${GOOGLE_API_KEY}")
@@ -182,6 +184,7 @@ public class SocialManagementController {
 				linkedInAuth.append("&client_id=").append(linkedInApiKey);
 				linkedInAuth.append("&redirect_uri=").append(linkedinRedirectUri);
 				linkedInAuth.append("&state=").append("SOCIALSURVEY");
+				linkedInAuth.append("&scope=").append(linkedinScope);
 
 				model.addAttribute(CommonConstants.SOCIAL_AUTH_URL, linkedInAuth.toString());
 

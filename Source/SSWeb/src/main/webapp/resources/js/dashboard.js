@@ -716,6 +716,11 @@ function showDisplayPic() {
 				console.log("Image location : " + data.responseJSON);
 				var imageUrl = data.responseJSON;
 				if (imageUrl != '' && imageUrl != undefined && imageUrl != "undefined") {
+					$("#dsh-prsn-img").removeClass('dsh-pers-default-img');
+					$("#dsh-prsn-img").removeClass('dsh-office-default-img');
+					$("#dsh-prsn-img").removeClass('dsh-region-default-img');
+					$("#dsh-prsn-img").removeClass('dsh-comp-default-img');
+					
 					$("#dsh-prsn-img").css("background", "url(" + imageUrl + ") no-repeat center");
 					$("#dsh-prsn-img").css("background-size", "cover");
 				}

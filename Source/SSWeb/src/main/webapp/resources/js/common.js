@@ -444,6 +444,7 @@ $('body').on('click', '.wc-skip-btn, .wc-sub-btn', function() {
 
 $('body').on('click', '.wc-final-skip, .wc-final-submit', function(){
 	$(this).closest('.overlay-login').hide();
+	showDisplayPic();
 });
 
 // Send Survey
@@ -466,6 +467,7 @@ $(document).on('input', '.wc-review-fname, .wc-review-lname, .wc-review-email', 
 		// setting up perfect scrollbar
 		setTimeout(function() {
 			$('#wc-review-table').perfectScrollbar();
+			$('#wc-review-table').perfectScrollbar('update');
 		}, 1000);
 	}
 });
@@ -482,12 +484,13 @@ $(document).on('click', '.wc-review-rmv-icn', function() {
 	// setting up perfect scrollbar
 	setTimeout(function() {
 		$('#wc-review-table').perfectScrollbar();
+		$('#wc-review-table').perfectScrollbar('update');
 	}, 1000);
 });
 
 $(document).on('click', '#wc-send-survey', function() {
 	var receiversList = [];
-	$('#wc-review-table').children().each(function() {
+	$('#wc-review-table-inner').children().each(function() {
 		if (!$(this).hasClass('wc-review-hdr')) {
 			
 			var firstname = $(this).find('input.wc-review-fname').first().val();

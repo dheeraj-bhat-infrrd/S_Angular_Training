@@ -827,6 +827,15 @@ input#find-pro-submit{
     padding-bottom: 30px;
 }
 
+.wc-review-table {
+	padding: 15px;
+}
+
+.wc-review-table-cont{
+	max-height: 205px;
+	position: relative;
+}
+
 span.txt-highlight {
     font-size: 14px;
     color: #3E9DCB;
