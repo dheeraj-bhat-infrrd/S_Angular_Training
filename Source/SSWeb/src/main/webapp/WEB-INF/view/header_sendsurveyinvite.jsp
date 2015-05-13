@@ -6,7 +6,7 @@
 	</div>
 	<div class="welcome-popup-body-wrapper clearfix">
 		<div class="wc-popup-body-hdr"><spring:message code="label.happyreviews.key" /></div>
-		<div id="wc-review-table" class="wc-popup-body-cont" style="max-height: 205px;">
+		<div id="wc-review-table" class="wc-popup-body-cont wc-review-table-cont">
 			<div id="wc-review-table-inner" class="wc-review-table">
 				<div class="wc-review-tr wc-review-hdr clearfix">
 					<div class="wc-review-th1 float-left"><spring:message code="label.firstname.key" /></div>
@@ -32,3 +32,9 @@
 		</div>
 	</div>
 </div>
+<script>
+	$(document).ready(function(){
+		$('#wc-review-table').perfectScrollbar();
+		$('#wc-review-table').perfectScrollbar('update');
+	});
+</script>
