@@ -512,7 +512,8 @@ $(document).on('click', '#wc-send-survey', function() {
 		"receiversList" : receiversList
 	};
 	callAjaxPostWithPayloadData("./sendmultiplesurveyinvites.do", function(data) {
-		$('#overlay-send-survey').html('');
+		$('#overlay-toast').html('Survey request sent successfully!');
+		showToast();
 	}, payload);
 });
 
