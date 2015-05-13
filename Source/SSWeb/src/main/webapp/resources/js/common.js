@@ -487,7 +487,7 @@ $(document).on('click', '.wc-review-rmv-icn', function() {
 
 $(document).on('click', '#wc-send-survey', function() {
 	var receiversList = [];
-	$('#wc-review-table').children().each(function() {
+	$('#wc-review-table-inner').children().each(function() {
 		if (!$(this).hasClass('wc-review-hdr')) {
 			
 			var firstname = $(this).find('input.wc-review-fname').first().val();
