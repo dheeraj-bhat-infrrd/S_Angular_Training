@@ -32,6 +32,7 @@ import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.dao.GenericDao;
 import com.realtech.socialsurvey.core.dao.impl.MongoOrganizationUnitSettingDaoImpl;
 import com.realtech.socialsurvey.core.entities.FeedStatus;
+import com.realtech.socialsurvey.core.entities.GooglePlusPost;
 import com.realtech.socialsurvey.core.entities.GooglePlusSocialPost;
 import com.realtech.socialsurvey.core.entities.SocialProfileToken;
 import com.realtech.socialsurvey.core.exception.NonFatalException;
@@ -172,7 +173,7 @@ public class GoogleFeedProcessorImpl implements SocialNetworkDataProcessor<Googl
 			if (response.getStatusLine().getStatusCode() != 200) {
 				throw new NonFatalException("Failed : HTTP error code : " + response.getStatusLine().getStatusCode());
 			}
-			
+
 			InputStreamReader jsonReader = new InputStreamReader(response.getEntity().getContent());
 			fetchPosts(posts, jsonReader);
 		}

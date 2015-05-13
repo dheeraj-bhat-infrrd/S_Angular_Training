@@ -177,7 +177,7 @@ public class FacebookFeedProcessorImpl implements SocialNetworkDataProcessor<Pos
 			status.setRetries(status.getRetries() + 1);
 			feedStatusDao.saveOrUpdate(status);
 		}
-		
+
 		return posts;
 	}
 
