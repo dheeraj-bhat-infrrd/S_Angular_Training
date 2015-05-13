@@ -53,7 +53,7 @@ public class FacebookFeedIngester implements Runnable {
 			e.printStackTrace();
 		}
 		finally {
-			LOG.info("Done fetching tweets for " + collectionName + " with iden: " + iden);
+			LOG.info("Done fetching status posts for " + collectionName + " with iden: " + iden);
 		}
 	}
 }
