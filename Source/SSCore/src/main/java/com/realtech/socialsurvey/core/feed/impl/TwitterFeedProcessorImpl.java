@@ -41,7 +41,7 @@ public class TwitterFeedProcessorImpl implements SocialNetworkDataProcessor<Stat
 
 	private static final Logger LOG = LoggerFactory.getLogger(TwitterFeedProcessorImpl.class);
 	private static final String FEED_SOURCE = "twitter";
-	private static final int PAGE_SIZE = 10;
+	private static final int PAGE_SIZE = 200;
 
 	@Autowired
 	private GenericDao<FeedStatus, Long> feedStatusDao;
