@@ -2,7 +2,6 @@ package com.realtech.socialsurvey.core.feed.impl;
 
 import java.sql.Timestamp;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -17,7 +16,6 @@ import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
-import com.realtech.socialsurvey.core.commons.FacebookPostCreatedTimeComparator;
 import com.realtech.socialsurvey.core.dao.GenericDao;
 import com.realtech.socialsurvey.core.dao.impl.MongoOrganizationUnitSettingDaoImpl;
 import com.realtech.socialsurvey.core.entities.FacebookSocialPost;
@@ -39,7 +37,7 @@ public class FacebookFeedProcessorImpl implements SocialNetworkDataProcessor<Pos
 
 	private static final Logger LOG = LoggerFactory.getLogger(FacebookFeedProcessorImpl.class);
 	private static final String FEED_SOURCE = "facebook";
-	private static final int PAGE_SIZE = 10;
+	private static final int PAGE_SIZE = 200;
 
 	@Autowired
 	private GenericDao<FeedStatus, Long> feedStatusDao;
@@ -160,14 +158,14 @@ public class FacebookFeedProcessorImpl implements SocialNetworkDataProcessor<Pos
 		try {
 			ResponseList<Post> resultList;
 			if (lastFetchedTill != null) {
-				resultList = facebook.getFeed(new Reading().limit(PAGE_SIZE).since(lastFetchedTill));
+				resultList = facebook.getStatuses(new Reading().limit(PAGE_SIZE).since(lastFetchedTill));
 			}
 			else {
-				resultList = facebook.getFeed(new Reading().limit(PAGE_SIZE));
+				resultList = facebook.getStatuses(new Reading().limit(PAGE_SIZE));
 			}
 			posts.addAll(resultList);
 
-			while (resultList.getPaging() != null) {
+			while (resultList.getPaging() != null && resultList.getPaging().getNext() != null) {
 				resultList = facebook.fetchNext(resultList.getPaging());
 				posts.addAll(resultList);
 			}
@@ -186,15 +184,14 @@ public class FacebookFeedProcessorImpl implements SocialNetworkDataProcessor<Pos
 	@Override
 	public void processFeed(List<Post> posts, String organizationUnit) throws NonFatalException {
 		LOG.info("Process posts for organizationUnit " + organizationUnit);
-		Collections.sort(posts, new FacebookPostCreatedTimeComparator());
 		if (lastFetchedTill == null) {
-			lastFetchedTill = posts.get(0).getCreatedTime();
+			lastFetchedTill = posts.get(0).getUpdatedTime();
 		}
 
 		FacebookSocialPost feed;
 		for (Post post : posts) {
-			if (lastFetchedTill.before(post.getCreatedTime()))
-				lastFetchedTill = post.getCreatedTime();
+			if (lastFetchedTill.before(post.getUpdatedTime()))
+				lastFetchedTill = post.getUpdatedTime();
 
 			feed = new FacebookSocialPost();
 			feed.setPost(post);
@@ -212,7 +209,7 @@ public class FacebookFeedProcessorImpl implements SocialNetworkDataProcessor<Pos
 			feed.setSource(FEED_SOURCE);
 			feed.setPostId(post.getId());
 			feed.setPostedBy(post.getFrom().getName());
-			feed.setTimeInMillis(post.getCreatedTime().getTime());
+			feed.setTimeInMillis(post.getUpdatedTime().getTime());
 
 			switch (organizationUnit) {
 				case MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION:
