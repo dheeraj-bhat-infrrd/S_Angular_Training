@@ -1,6 +1,5 @@
 package com.realtech.socialsurvey.core.entities;
 
-import com.realtech.socialsurvey.core.feed.impl.GooglePlusPost;
 
 public class GooglePlusSocialPost extends SocialPost {
 

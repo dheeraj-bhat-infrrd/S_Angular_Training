@@ -24,7 +24,6 @@ public class SocialFeedExecutors implements InitializingBean {
 	private ExecutorService twitterExecutor;
 	private ExecutorService facebookExecutor;
 	private ExecutorService googleExecutor;
-	//private ExecutorService yelpExecutor;
 
 	public void setContext(ApplicationContext context) {
 		this.context = context;
@@ -36,7 +35,6 @@ public class SocialFeedExecutors implements InitializingBean {
 		twitterExecutor = Executors.newFixedThreadPool(numOfThreads);
 		facebookExecutor = Executors.newFixedThreadPool(numOfThreads);
 		googleExecutor = Executors.newFixedThreadPool(numOfThreads);
-		//yelpExecutor = Executors.newFixedThreadPool(numOfThreads);
 		LOG.info("Done Creating executors for social feed");
 	}
 
@@ -45,7 +43,7 @@ public class SocialFeedExecutors implements InitializingBean {
 		if (context == null) {
 			throw new NoContextFoundException("No Application context found");
 		}
-		
+
 		TwitterFeedIngester twitterFeedIngester = context.getBean(TwitterFeedIngester.class);
 		twitterFeedIngester.setCollectionName(collectionName);
 		twitterFeedIngester.setIden(ingestionEntity.getIden());
@@ -58,7 +56,7 @@ public class SocialFeedExecutors implements InitializingBean {
 		if (context == null) {
 			throw new NoContextFoundException("No Application context found");
 		}
-		
+
 		FacebookFeedIngester facebookFeedIngester = context.getBean(FacebookFeedIngester.class);
 		facebookFeedIngester.setCollectionName(collectionName);
 		facebookFeedIngester.setIden(ingestionEntity.getIden());
@@ -71,19 +69,11 @@ public class SocialFeedExecutors implements InitializingBean {
 		if (context == null) {
 			throw new NoContextFoundException("No Application context found");
 		}
-		GoogleFeedIngester googleFeedIngester =context.getBean(GoogleFeedIngester.class);
+		GoogleFeedIngester googleFeedIngester = context.getBean(GoogleFeedIngester.class);
 		googleFeedIngester.setCollectionName(collectionName);
 		googleFeedIngester.setIden(ingestionEntity.getIden());
 		googleFeedIngester.setToken(ingestionEntity.getSocialMediaTokens().getGoogleToken());
 		googleExecutor.execute(googleFeedIngester);
-	}
-
-	public void addYelpProcessorToPool(FeedIngestionEntity ingestionEntity, String collectionName) throws NoContextFoundException {
-		LOG.info("Adding Yelp details to pool");
-		if (context == null) {
-			throw new NoContextFoundException("No Application context found");
-		}
-		// TODO
 	}
 
 	public void shutDownExecutors() {
@@ -91,13 +81,11 @@ public class SocialFeedExecutors implements InitializingBean {
 		twitterExecutor.shutdown();
 		facebookExecutor.shutdown();
 		googleExecutor.shutdown();
-		//yelpExecutor.shutdown();
 
 		try {
 			twitterExecutor.awaitTermination(Long.MAX_VALUE, TimeUnit.NANOSECONDS);
 			facebookExecutor.awaitTermination(Long.MAX_VALUE, TimeUnit.NANOSECONDS);
 			googleExecutor.awaitTermination(Long.MAX_VALUE, TimeUnit.NANOSECONDS);
-			//yelpExecutor.awaitTermination(Long.MAX_VALUE, TimeUnit.NANOSECONDS);
 		}
 		catch (InterruptedException e) {
 			e.printStackTrace();
@@ -110,13 +98,11 @@ public class SocialFeedExecutors implements InitializingBean {
 		twitterExecutor.shutdownNow();
 		facebookExecutor.shutdownNow();
 		googleExecutor.shutdownNow();
-		//yelpExecutor.shutdownNow();
 
 		try {
 			twitterExecutor.awaitTermination(Long.MAX_VALUE, TimeUnit.NANOSECONDS);
 			facebookExecutor.awaitTermination(Long.MAX_VALUE, TimeUnit.NANOSECONDS);
 			googleExecutor.awaitTermination(Long.MAX_VALUE, TimeUnit.NANOSECONDS);
-			//yelpExecutor.awaitTermination(Long.MAX_VALUE, TimeUnit.NANOSECONDS);
 		}
 		catch (InterruptedException e) {
 			e.printStackTrace();

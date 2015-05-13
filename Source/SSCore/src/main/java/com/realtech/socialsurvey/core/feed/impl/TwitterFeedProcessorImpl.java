@@ -6,7 +6,6 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,7 +15,6 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
-
 import twitter4j.Paging;
 import twitter4j.ResponseList;
 import twitter4j.Status;
@@ -24,7 +22,6 @@ import twitter4j.Twitter;
 import twitter4j.TwitterException;
 import twitter4j.TwitterFactory;
 import twitter4j.auth.AccessToken;
-
 import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.commons.TwitterStatusTimeComparator;
 import com.realtech.socialsurvey.core.dao.GenericDao;
@@ -41,14 +38,14 @@ public class TwitterFeedProcessorImpl implements SocialNetworkDataProcessor<Stat
 
 	private static final Logger LOG = LoggerFactory.getLogger(TwitterFeedProcessorImpl.class);
 	private static final String FEED_SOURCE = "twitter";
-	private static final int PAGE_SIZE = 10;
+	private static final int PAGE_SIZE = 200;
 
 	@Autowired
 	private GenericDao<FeedStatus, Long> feedStatusDao;
 
 	@Autowired
 	private MongoTemplate mongoTemplate;
-	
+
 	@Value("${TWITTER_CONSUMER_KEY}")
 	private String twitterConsumerKey;
 
@@ -172,7 +169,7 @@ public class TwitterFeedProcessorImpl implements SocialNetworkDataProcessor<Stat
 		}
 		catch (TwitterException e) {
 			LOG.error("Exception in Twitter feed extration. Reason: " + e.getMessage());
-			
+
 			// setting no.of retries
 			status.setRetries(status.getRetries() + 1);
 			feedStatusDao.saveOrUpdate(status);
@@ -183,8 +180,8 @@ public class TwitterFeedProcessorImpl implements SocialNetworkDataProcessor<Stat
 	@Override
 	public void processFeed(List<Status> tweets, String organizationUnit) throws NonFatalException {
 		LOG.info("Process tweets for organizationUnit " + organizationUnit);
-		
-		Collections.sort(tweets,new TwitterStatusTimeComparator());
+
+		Collections.sort(tweets, new TwitterStatusTimeComparator());
 		TwitterSocialPost post;
 		for (Status tweet : tweets) {
 			post = new TwitterSocialPost();
