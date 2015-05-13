@@ -95,7 +95,7 @@
 <div class="container bd-svry-container">
 	<div class="bd-svry-header clearfix">
 		<div class="float-left bd-svry-left"><spring:message code="label.surveyquestions.key" /></div>
-		<div id="btn-add-question" class="float-right bd-svry-right"><spring:message code="label.addnewquestion.key" /></div>
+		<%-- <div id="btn-add-question" class="float-right bd-svry-right"><spring:message code="label.addnewquestion.key" /></div> --%>
 	</div>
 	
 	<div class="bd-srv-q-tbl">
@@ -124,6 +124,9 @@
 					<div class="float-left srv-tbl-rem">Remove</div>
 				</div>
 			</div>
+		</div>
+		<div class="btn-add-ques-bottom-row clearfix">
+			<div id="btn-add-question" class="float-right bd-svry-right"><spring:message code="label.addnewquestion.key" /></div>
 		</div>
 	</div>
 </div>
