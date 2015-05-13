@@ -36,9 +36,10 @@
         </div>
 
         <div class="error-main-wrapper container">
-            <div class="err-line-1 text-center">OOPS !!! The page you are looking for cannot be found</div>
-            <div class="err-line-2 text-center">404</div>
-            <div class="err-line-3 text-center"><em>Lorem ipsumm dore eit lewht njbskjlhjn jb hhtreke Lorem ipsumm dore eit lewht njbskjlhjn jb hhtreke</em></div>
+            <div class="err-line-1 text-center">OOPS!!! That wasn't supposed to happen.</div>
+            <div class="err-line-2 text-center">We apologize for the inconvenience. Click the link below to be redirected to the home page.</div>
+            <div class="err-page-btn">Go back to Homepage</div>
+            <div class="err-line-3 text-center">If this persists, please send a quick message to <u>support@socialsurvey.me</u> and tell us what you did to get this error page, so we can get it fixed.</div>
         </div>
 
         <div class="footer-main-wrapper">
@@ -63,6 +64,9 @@
                 }
                 $('.error-main-wrapper').css('min-height', minH+'px');
             }
+            $('.err-page-btn').click(function() {
+				window.open(window.location.origin,'_self');
+			});
         });
     </script>
 </body>

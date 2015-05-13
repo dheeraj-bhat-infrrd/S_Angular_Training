@@ -466,6 +466,7 @@ $(document).on('input', '.wc-review-fname, .wc-review-lname, .wc-review-email', 
 		// setting up perfect scrollbar
 		setTimeout(function() {
 			$('#wc-review-table').perfectScrollbar();
+			$('#wc-review-table').perfectScrollbar('update');
 		}, 1000);
 	}
 });
@@ -482,6 +483,7 @@ $(document).on('click', '.wc-review-rmv-icn', function() {
 	// setting up perfect scrollbar
 	setTimeout(function() {
 		$('#wc-review-table').perfectScrollbar();
+		$('#wc-review-table').perfectScrollbar('update');
 	}, 1000);
 });
 

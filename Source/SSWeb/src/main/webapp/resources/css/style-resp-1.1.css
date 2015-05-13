@@ -504,4 +504,10 @@
     	width: 100px;
     	height: 100px;
     }
+    .dash-btn-dl-sd{
+    	width: 300px;
+    }
+    .dash-btn-dl-sd *{
+    	font-size: 11px;
+    }
 }
