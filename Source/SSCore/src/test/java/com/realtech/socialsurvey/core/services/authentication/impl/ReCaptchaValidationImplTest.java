@@ -2,6 +2,7 @@
 package com.realtech.socialsurvey.core.services.authentication.impl;
 
 import static org.junit.Assert.assertEquals;
+import javax.annotation.Resource;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -11,13 +12,15 @@ import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import com.realtech.socialsurvey.core.services.authentication.CaptchaValidation;
 
 @RunWith(PowerMockRunner.class)
 @PrepareForTest(ReCaptchaValidationImpl.class)
 public class ReCaptchaValidationImplTest {
 
-	@Autowired
+	@Resource
+	@Qualifier("nocaptcha")
 	CaptchaValidation captchaImp;
 	
 	

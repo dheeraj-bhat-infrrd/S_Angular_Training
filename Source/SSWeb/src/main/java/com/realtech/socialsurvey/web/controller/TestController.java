@@ -3,12 +3,14 @@ package com.realtech.socialsurvey.web.controller;
 import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import javax.annotation.Resource;
 import javax.servlet.ServletRequest;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -31,7 +33,8 @@ public class TestController {
 	private SessionHelper sessionHelper;
 	@Autowired
 	private MessageUtils messageUtils;
-	@Autowired
+	@Resource
+	@Qualifier("nocaptcha")
 	private CaptchaValidation captchaValidation;
 
 	private static final Logger LOG = LoggerFactory.getLogger(TestController.class);

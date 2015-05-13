@@ -17,6 +17,7 @@
     <link rel="stylesheet" href="${pageContext.request.contextPath}/resources/css/rangeslider.css">
     <link rel="stylesheet" href="${pageContext.request.contextPath}/resources/css/style-common-1.1.css">
     <link rel="stylesheet" href="${pageContext.request.contextPath}/resources/css/style-resp-1.1.css">
+    <script src='//www.google.com/recaptcha/api.js'></script>
 </head>
 <body>
     
@@ -219,6 +220,8 @@
 	                    			</div>
 	                    			<div class="lp-row">
 		                    			<div class="prof-captcha-cont">
+		                    			<div class="g-recaptcha" data-sitekey="6Le2wQYTAAAAAAacBUn0Dia5zMMyHfMXhoOh5A7K"></div>
+		                    				<!-- 
 											<div id="prof-captcha-img" class="prof-captcha-img"></div>
 											<div class="reg-captcha-btns clearfix">
 												<input id="captcha-text" class="float-left prof-cap-txt"
@@ -230,6 +233,7 @@
 													<div class="float-left reg-cap-img reg-cap-info"></div>
 												</div>
 											</div>
+											-->
 										</div>
 	                    			</div>
 	                    			<div class="lp-row">
@@ -293,9 +297,10 @@
     </div>
 </div>
 
-<div id="outer_captcha" style="display: none;">
+<!-- <div id="outer_captcha" style="display: none;">
 	<div id="recaptcha"></div>
 </div>
+ -->
 
 <div class="mobile-tabs hide clearfix">
     <div class="float-left mob-icn mob-icn-active icn-person"></div>
@@ -303,10 +308,10 @@
     <div class="float-left mob-icn icn-star-smile"></div>
     <div class="float-left mob-icn inc-more"></div>
 </div>
-<div style="display: none">
+<!-- <div style="display: none">
 	<script src="https://www.google.com/recaptcha/api/challenge?k=6LdlHOsSAAAAAM8ypy8W2KXvgMtY2dFsiQT3HVq-"></script>
 </div>
-
+ -->
 <!-- Code snippet to show aggregated ratings for agent in Google results : BOC-->
 
 <div class="hide" itemscope itemtype="http://schema.org/Product">
@@ -420,7 +425,6 @@
         $('.lp-button').click(function(event){
         	
         	if(validateContactUsForm()){
-        		
         		url = window.location.origin + "/pages/profile/sendmail.do";
     			data = "";
     			if($("#agent-profile-name").val() != ""){
@@ -443,9 +447,8 @@
     			data += "&name=" + $('#lp-input-name').val();
     			data += "&email=" + $('#lp-input-email').val();
     			data += "&message=" + $('#lp-input-message').val();
-    			data += "&recaptcha_challenge_field=" + $('#recaptcha_challenge_field').val();
-    			data += "&recaptcha_input=" + $('#captcha-text').val();
-    			
+    			data += "&g-recaptcha-response=" + $('#g-recaptcha-response').val();
+    			//data += "&recaptcha_input=" + $('#captcha-text').val();
     			showOverlay();
     			callAjaxPostWithPayloadData(url,showMessage,data,true);
         	}			
@@ -500,7 +503,7 @@
     	
     	
     	var captchaText = true;
-    	try {
+    	/**try {
     		
     		Recaptcha.create('6LdlHOsSAAAAAM8ypy8W2KXvgMtY2dFsiQT3HVq-',
     				'recaptcha', {
@@ -510,7 +513,7 @@
     		console.log("Captcha loaded");
     	} catch (error) {
     		console.log("Could not load captcha");
-    	}
+    	}*/
     	
     	function captchaLoaded() {
     		var imgData = $(".recaptcha_image_cell").html();

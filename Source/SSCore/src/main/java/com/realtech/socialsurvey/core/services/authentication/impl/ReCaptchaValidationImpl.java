@@ -11,7 +11,7 @@ import com.realtech.socialsurvey.core.entities.Captcha;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.services.authentication.CaptchaValidation;
 
-@Component
+@Component("recaptcha")
 public class ReCaptchaValidationImpl implements CaptchaValidation {
 
 	private static final Logger LOG = LoggerFactory.getLogger(CaptchaValidation.class);
