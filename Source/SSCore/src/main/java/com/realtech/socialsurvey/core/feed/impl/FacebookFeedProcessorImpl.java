@@ -39,7 +39,7 @@ public class FacebookFeedProcessorImpl implements SocialNetworkDataProcessor<Pos
 
 	private static final Logger LOG = LoggerFactory.getLogger(FacebookFeedProcessorImpl.class);
 	private static final String FEED_SOURCE = "facebook";
-	private static final int PAGE_SIZE = 200;
+	private static final int PAGE_SIZE = 10;
 
 	@Autowired
 	private GenericDao<FeedStatus, Long> feedStatusDao;
@@ -167,7 +167,7 @@ public class FacebookFeedProcessorImpl implements SocialNetworkDataProcessor<Pos
 			}
 			posts.addAll(resultList);
 
-			while (resultList.size() == PAGE_SIZE) {
+			while (resultList.getPaging() != null) {
 				resultList = facebook.fetchNext(resultList.getPaging());
 				posts.addAll(resultList);
 			}
