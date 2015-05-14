@@ -11,6 +11,7 @@ public interface JspResolver {
 	public static final String ACCOUNT_TYPE_SELECTION = "accounttypeselection";
 	public static final String COMPLETE_REGISTRATION = "completeregistration";
 	public static final String USER_ID_ON_INVITE = "useridoninvite";
+	public static final String REGISTRATION_INVITE_SUCCESSFUL = "registration-invite-successful";
 
 	// Generic pages
 	public static final String INDEX = "index";
@@ -63,6 +64,7 @@ public interface JspResolver {
 	public static final String SURVEY_BUILDER_QUESTION_NEW = "buildSurvey_questionnew";
 	public static final String SHOW_SURVEY_QUESTIONS = "surveyQuestion";
 	public static final String SURVEY_REQUEST = "surveyRequest";
+	public static final String SURVEY_INVITE_SUCCESSFUL = "survey-request-successful";
 
 	// User Management
 	public static final String USER_MANAGEMENT = "view-user-management";
