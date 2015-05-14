@@ -602,11 +602,11 @@ function loadDisplayPicture(profileMasterId){
 		url : "./getdisplaypiclocation.do",
 		type : "GET",
 		data : payload,
-		dataType : "JSON",
+		dataType : "text",
 		success : function(data) {
-			if (data.errCode == undefined){
-				console.log("Image location : " + data.responseJSON);
-				var imageUrl = data.responseJSON;
+			if (data != undefined){
+				console.log("Image location : " + data);
+				var imageUrl = data;
 				if (imageUrl != '' && imageUrl != undefined) {
 					$("#hdr-usr-img").css("background", "url(" + imageUrl + ") no-repeat center");
 					$("#hdr-usr-img").css("background-size", "cover");

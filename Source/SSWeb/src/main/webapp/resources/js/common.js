@@ -443,6 +443,7 @@ $('body').on('click', '.wc-skip-btn, .wc-sub-btn', function() {
 });
 
 $('body').on('click', '.wc-final-skip, .wc-final-submit', function(){
+	loadDisplayPicture();
 	$(this).closest('.overlay-login').hide();
 	showDisplayPic();
 });
@@ -512,7 +513,8 @@ $(document).on('click', '#wc-send-survey', function() {
 		"receiversList" : receiversList
 	};
 	callAjaxPostWithPayloadData("./sendmultiplesurveyinvites.do", function(data) {
-		$('#overlay-send-survey').html('');
+		$('#overlay-toast').html('Survey request sent successfully!');
+		showToast();
 	}, payload);
 });
 
