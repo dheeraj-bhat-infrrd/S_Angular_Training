@@ -369,7 +369,7 @@ public class DashboardController {
 			}
 
 			try {
-				surveyDetails = profileManagementService.getReviews(iden, -1, -1, startIndex, batchSize, profileLevel, true, null, null);
+				surveyDetails = profileManagementService.getReviews(iden, -1, -1, startIndex, batchSize, profileLevel, true, null, null, "date");
 			}
 			catch (InvalidInputException e) {
 				LOG.error("InvalidInputException caught in getReviews() while fetching reviews. Nested exception is ", e);
@@ -811,7 +811,7 @@ public class DashboardController {
 			}
 			
 			try {
-				surveyDetails = profileManagementService.getReviews(iden, -1, -1, -1, -1, profileLevel, true, startDate, endDate);
+				surveyDetails = profileManagementService.getReviews(iden, -1, -1, -1, -1, profileLevel, true, startDate, endDate, "date");
 				String fileLocation = "Completed_Survey_" + profileLevel + "_" + iden + EXCEL_FILE_EXTENSION;
 				XSSFWorkbook workbook = dashboardService.downloadCompleteSurveyData(surveyDetails, fileLocation);
 				response.setContentType(EXCEL_FORMAT);
