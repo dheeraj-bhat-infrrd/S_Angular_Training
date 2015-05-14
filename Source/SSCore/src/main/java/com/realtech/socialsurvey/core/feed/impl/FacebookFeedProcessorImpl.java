@@ -2,12 +2,10 @@ package com.realtech.socialsurvey.core.feed.impl;
 
 import java.sql.Timestamp;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,9 +15,7 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
-
 import com.realtech.socialsurvey.core.commons.CommonConstants;
-import com.realtech.socialsurvey.core.commons.FacebookPostCreatedTimeComparator;
 import com.realtech.socialsurvey.core.dao.GenericDao;
 import com.realtech.socialsurvey.core.dao.impl.MongoOrganizationUnitSettingDaoImpl;
 import com.realtech.socialsurvey.core.entities.FacebookSocialPost;
@@ -27,7 +23,6 @@ import com.realtech.socialsurvey.core.entities.FacebookToken;
 import com.realtech.socialsurvey.core.entities.FeedStatus;
 import com.realtech.socialsurvey.core.exception.NonFatalException;
 import com.realtech.socialsurvey.core.feed.SocialNetworkDataProcessor;
-
 import facebook4j.Facebook;
 import facebook4j.FacebookException;
 import facebook4j.FacebookFactory;
@@ -42,14 +37,14 @@ public class FacebookFeedProcessorImpl implements SocialNetworkDataProcessor<Pos
 
 	private static final Logger LOG = LoggerFactory.getLogger(FacebookFeedProcessorImpl.class);
 	private static final String FEED_SOURCE = "facebook";
-	private static final int PAGE_SIZE = 10;
+	private static final int PAGE_SIZE = 200;
 
 	@Autowired
 	private GenericDao<FeedStatus, Long> feedStatusDao;
 
 	@Autowired
 	private MongoTemplate mongoTemplate;
-	
+
 	@Value("${FB_CLIENT_ID}")
 	private String facebookClientId;
 
@@ -149,8 +144,9 @@ public class FacebookFeedProcessorImpl implements SocialNetworkDataProcessor<Pos
 	}
 
 	@Override
+	@Transactional
 	public List<Post> fetchFeed(long iden, String organizationUnit, FacebookToken token) throws NonFatalException {
-		LOG.info("Getting tweets for " + organizationUnit + " with id: " + iden);
+		LOG.info("Getting posts for " + organizationUnit + " with id: " + iden);
 
 		// Settings Consumer and Access Tokens
 		Facebook facebook = new FacebookFactory().getInstance();
@@ -160,58 +156,60 @@ public class FacebookFeedProcessorImpl implements SocialNetworkDataProcessor<Pos
 		// building query to fetch
 		List<Post> posts = new ArrayList<Post>();
 		try {
-			// TODO
 			ResponseList<Post> resultList;
-			do {
-				if (lastFetchedTill != null) {
-					resultList = facebook.getFeed(new Reading().limit(PAGE_SIZE).until(lastFetchedTill));
-				}
-				else {
-					resultList = facebook.getFeed(new Reading().limit(PAGE_SIZE));
-				}
-
-				posts.addAll(resultList);
-				Collections.sort(resultList,new FacebookPostCreatedTimeComparator());
-				
-				// updating last post time
-				if (resultList.size() > 0) {
-					lastFetchedTill = resultList.get(0).getCreatedTime();
-				}
-				
+			if (lastFetchedTill != null) {
+				resultList = facebook.getStatuses(new Reading().limit(PAGE_SIZE).since(lastFetchedTill));
 			}
-			while (resultList.size() == PAGE_SIZE);
+			else {
+				resultList = facebook.getStatuses(new Reading().limit(PAGE_SIZE));
+			}
+			posts.addAll(resultList);
+
+			while (resultList.getPaging() != null && resultList.getPaging().getNext() != null) {
+				resultList = facebook.fetchNext(resultList.getPaging());
+				posts.addAll(resultList);
+			}
 		}
 		catch (FacebookException e) {
 			LOG.error("Exception in Facebook feed extration. Reason: " + e.getMessage());
-			
-			// setting no.of retries
+
+			// increasing no.of retries
 			status.setRetries(status.getRetries() + 1);
 			feedStatusDao.saveOrUpdate(status);
 		}
+
 		return posts;
 	}
 
 	@Override
 	public void processFeed(List<Post> posts, String organizationUnit) throws NonFatalException {
 		LOG.info("Process posts for organizationUnit " + organizationUnit);
+		if (lastFetchedTill == null) {
+			lastFetchedTill = posts.get(0).getUpdatedTime();
+		}
 
 		FacebookSocialPost feed;
 		for (Post post : posts) {
+			if (lastFetchedTill.before(post.getUpdatedTime()))
+				lastFetchedTill = post.getUpdatedTime();
+
 			feed = new FacebookSocialPost();
 			feed.setPost(post);
-			
-			if(post.getMessage() != null){
+
+			if (post.getMessage() != null) {
 				feed.setPostText(post.getMessage());
-			}else if(post.getName() != null){
+			}
+			else if (post.getName() != null) {
 				feed.setPostText(post.getName());
-			}else{
+			}
+			else {
 				feed.setPostText(post.getStory());
 			}
-			
+
 			feed.setSource(FEED_SOURCE);
 			feed.setPostId(post.getId());
 			feed.setPostedBy(post.getFrom().getName());
-			feed.setTimeInMillis(post.getCreatedTime().getTime());
+			feed.setTimeInMillis(post.getUpdatedTime().getTime());
 
 			switch (organizationUnit) {
 				case MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION:

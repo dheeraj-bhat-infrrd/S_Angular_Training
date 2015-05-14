@@ -3394,7 +3394,7 @@ button.paypal.is-active {
 }
 
 .sq-i-txt-fld {
-	width: 300px;
+	width: 304px;
 	height: 40px;
 	padding: 0 10px;
 	border-radius: 3px;
@@ -3604,17 +3604,15 @@ button.paypal.is-active {
 }
 
 .reg-cap-nw-adj {
-	margin-right: 10px;
+	margin-right: 7px;
 	overflow: visible !important;
 }
 
 .reg-cap-nw-adj .reg-cap-nw-adj-container {
 	float: right;
-	width: 300px;
+	width: 304px;
 	overflow: hidden;
-	border: 1px solid #e3e3e3;
 	border-radius: 3px;
-	box-shadow: 0px 2px 2px 0px #e3e3e3;
 }
 
 .reg-cap-nw-adj .reg-captcha-img {
