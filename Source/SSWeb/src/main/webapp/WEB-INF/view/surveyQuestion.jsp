@@ -87,61 +87,68 @@
 					</div>
 					<div class="sq-bord-bot-sm"></div>
 					<div class="sq-rat-wrapper">
-						<div
-							class="sq-star-wrapper sq-i-container clearfix ques-wrapper-adj">
-							<div class="clearfix sq-info-wrapper">
-								<div class="sq-i-lbl float-left">First Name</div>
-								<div class="sq-i-txt float-left">
-									<div class="hide sq-img-adj icn-fname"></div>
-									<input id="firstName" class="sq-i-txt-fld">
-								</div>
-							</div>
-							<div class="clearfix sq-info-wrapper">
-								<div class="sq-i-lbl float-left">Last Name</div>
-								<div class="sq-i-txt float-left">
-									<div class="hide sq-img-adj icn-lname"></div>
-									<input id="lastName" class="sq-i-txt-fld">
-								</div>
-							</div>
-							<div class="clearfix sq-info-wrapper">
-								<div class="sq-i-lbl float-left">Email</div>
-								<div class="sq-i-txt float-left">
-									<div class="hide sq-img-adj icn-email"></div>
-									<input id="email" class="sq-i-txt-fld">
-								</div>
-							</div>
-							<div class="clearfix sq-info-wrapper">
-								<div class="sq-i-lbl float-left">I</div>
-								<div class="sq-i-txt float-left">
-									<select id="cust-agnt-rel" class="sq-i-txt-fld"></select>
-								</div>
-							</div>
-							<div class="clearfix reg-captcha-wrapper reg-item reg-cap-nw-adj">
-								<div class="reg-cap-nw-adj-container">
-									<div class="g-recaptcha" data-sitekey="6Le2wQYTAAAAAAacBUn0Dia5zMMyHfMXhoOh5A7K"></div>
-									<!-- 
-									<div class="reg-captcha-img"></div>
-									<div class="reg-captcha-btns clearfix">
-										<input id="captcha-text" class="float-left reg-cap-txt"
-											name="captchaResponse" placeholder="Type the above text"
-											autocomplete="off" autocorrect="off" autocapitalize="off">
-										<div class="clearfix reg-btns-wrapper float-right">
-											<div class="float-left reg-cap-img reg-cap-reload"></div>
-											<div class="float-left reg-cap-img reg-cap-sound"></div>
-											<div class="float-left reg-cap-img reg-cap-info"></div>
-										</div>
+						<form id="survey-request-form" action="${pageContext.request.contextPath}/rest/survey/triggersurvey">
+							<div
+								class="sq-star-wrapper sq-i-container clearfix ques-wrapper-adj">
+								<div class="clearfix sq-info-wrapper">
+									<div class="sq-i-lbl float-left">First Name</div>
+									<div class="sq-i-txt float-left">
+										<div class="hide sq-img-adj icn-fname"></div>
+										<input id="firstName" class="sq-i-txt-fld" name="firstName">
 									</div>
-									 -->
+								</div>
+								<div class="clearfix sq-info-wrapper">
+									<div class="sq-i-lbl float-left">Last Name</div>
+									<div class="sq-i-txt float-left">
+										<div class="hide sq-img-adj icn-lname"></div>
+										<input id="lastName" class="sq-i-txt-fld" name="lastName">
+									</div>
+								</div>
+								<div class="clearfix sq-info-wrapper">
+									<div class="sq-i-lbl float-left">Email</div>
+									<div class="sq-i-txt float-left">
+										<div class="hide sq-img-adj icn-email"></div>
+										<input id="email" class="sq-i-txt-fld" name="customerEmail">
+									</div>
+								</div>
+								<div class="clearfix sq-info-wrapper">
+									<div class="sq-i-lbl float-left">I</div>
+									<div class="sq-i-txt float-left">
+										<select id="cust-agnt-rel" class="sq-i-txt-fld"></select>
+									</div>
+								</div>
+								<div class="clearfix reg-captcha-wrapper reg-item reg-cap-nw-adj">
+									<div class="reg-cap-nw-adj-container">
+										<div class="g-recaptcha" data-sitekey="6Le2wQYTAAAAAAacBUn0Dia5zMMyHfMXhoOh5A7K"></div>
+										<!-- 
+										<div class="reg-captcha-img"></div>
+										<div class="reg-captcha-btns clearfix">
+											<input id="captcha-text" class="float-left reg-cap-txt"
+												name="captchaResponse" placeholder="Type the above text"
+												autocomplete="off" autocorrect="off" autocapitalize="off">
+											<div class="clearfix reg-btns-wrapper float-right">
+												<div class="float-left reg-cap-img reg-cap-reload"></div>
+												<div class="float-left reg-cap-img reg-cap-sound"></div>
+												<div class="float-left reg-cap-img reg-cap-info"></div>
+											</div>
+										</div>
+										 -->
+									</div>
+								</div>
+								<!-- <div id="outer_captcha" style="display: none;">
+									<div id="recaptcha"></div>
+								</div>
+								 -->
+								 <div style="display: none">
+								 	<input type="hidden" name="agentId" value="${agentId}">
+								 	<input type="hidden" name="relationship">
+								 	<input type="hidden" name="g-recaptcha-response">
+								 </div>
+								<div class="sq-btn-wrapper">
+									<div id="start-btn" class="sq-btn-continue">Start</div>
 								</div>
 							</div>
-							<!-- <div id="outer_captcha" style="display: none;">
-								<div id="recaptcha"></div>
-							</div>
-							 -->
-							<div class="sq-btn-wrapper">
-								<div id="start-btn" class="sq-btn-continue">Start</div>
-							</div>
-						</div>
+						</form>
 					</div>
 				</div>
 
