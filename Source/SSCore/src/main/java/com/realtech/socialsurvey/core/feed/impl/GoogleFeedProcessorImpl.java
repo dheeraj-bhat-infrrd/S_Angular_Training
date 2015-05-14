@@ -40,15 +40,15 @@ import com.realtech.socialsurvey.core.dao.impl.MongoOrganizationUnitSettingDaoIm
 import com.realtech.socialsurvey.core.entities.FeedStatus;
 import com.realtech.socialsurvey.core.entities.GooglePlusPost;
 import com.realtech.socialsurvey.core.entities.GooglePlusSocialPost;
+import com.realtech.socialsurvey.core.entities.GoogleToken;
 import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
-import com.realtech.socialsurvey.core.entities.SocialProfileToken;
 import com.realtech.socialsurvey.core.exception.NonFatalException;
 import com.realtech.socialsurvey.core.feed.SocialNetworkDataProcessor;
 import com.realtech.socialsurvey.core.services.mail.EmailServices;
 
 @Component("googleFeed")
 @Scope(value = ConfigurableBeanFactory.SCOPE_PROTOTYPE)
-public class GoogleFeedProcessorImpl implements SocialNetworkDataProcessor<GooglePlusPost, SocialProfileToken> {
+public class GoogleFeedProcessorImpl implements SocialNetworkDataProcessor<GooglePlusPost, GoogleToken> {
 
 	private static final Logger LOG = LoggerFactory.getLogger(GoogleFeedProcessorImpl.class);
 	private static final String FEED_SOURCE = "google";
@@ -91,7 +91,7 @@ public class GoogleFeedProcessorImpl implements SocialNetworkDataProcessor<Googl
 
 	@Override
 	@Transactional
-	public void preProcess(long iden, String organizationUnit, SocialProfileToken token) {
+	public void preProcess(long iden, String organizationUnit, GoogleToken token) {
 		List<FeedStatus> statuses = null;
 		Map<String, Object> queries = new HashMap<>();
 		queries.put(CommonConstants.FEED_SOURCE_COLUMN, FEED_SOURCE);
@@ -179,12 +179,12 @@ public class GoogleFeedProcessorImpl implements SocialNetworkDataProcessor<Googl
 
 	@Override
 	@Transactional
-	public List<GooglePlusPost> fetchFeed(long iden, String organizationUnit, SocialProfileToken token) throws NonFatalException {
+	public List<GooglePlusPost> fetchFeed(long iden, String organizationUnit, GoogleToken token) throws NonFatalException {
 		LOG.info("Getting google posts for " + organizationUnit + " with id: " + iden);
 		List<GooglePlusPost> posts = new ArrayList<GooglePlusPost>();
 
 		try {
-			String accessToken = token.getAccessToken();
+			String accessToken = token.getGoogleAccessToken();
 			
 			HttpClient httpClient = HttpClientBuilder.create().build();
 			HttpGet getRequest = new HttpGet(createGooglePlusFeedURL(accessToken));
@@ -195,7 +195,7 @@ public class GoogleFeedProcessorImpl implements SocialNetworkDataProcessor<Googl
 				
 				OAuthRequest request = new OAuthRequest(Verb.POST, "https://accounts.google.com/o/oauth2/token");
 				request.addBodyParameter("grant_type", "refresh_token");
-				request.addBodyParameter("refresh_token", token.getAccessTokenSecret());
+				request.addBodyParameter("refresh_token", token.getGoogleRefreshToken());
 				request.addBodyParameter("client_id", googleApiKey);
 				request.addBodyParameter("client_secret", googleApiSecretKey);
 				Response tokenResponse = request.send();

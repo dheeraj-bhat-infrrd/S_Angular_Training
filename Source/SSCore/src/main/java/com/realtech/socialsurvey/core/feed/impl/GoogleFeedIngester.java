@@ -9,7 +9,7 @@ import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 import com.realtech.socialsurvey.core.entities.GooglePlusPost;
-import com.realtech.socialsurvey.core.entities.SocialProfileToken;
+import com.realtech.socialsurvey.core.entities.GoogleToken;
 import com.realtech.socialsurvey.core.exception.NonFatalException;
 import com.realtech.socialsurvey.core.feed.SocialNetworkDataProcessor;
 
@@ -21,13 +21,13 @@ public class GoogleFeedIngester implements Runnable {
 
 	@Resource
 	@Qualifier("googleFeed")
-	private SocialNetworkDataProcessor<GooglePlusPost, SocialProfileToken> processor;
+	private SocialNetworkDataProcessor<GooglePlusPost, GoogleToken> processor;
 
-	private SocialProfileToken token;
+	private GoogleToken token;
 	private String collectionName;
 	private long iden;
 
-	public void setToken(SocialProfileToken token) {
+	public void setToken(GoogleToken token) {
 		this.token = token;
 	}
 
