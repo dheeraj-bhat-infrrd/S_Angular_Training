@@ -190,6 +190,11 @@ public class FacebookFeedProcessorImpl implements SocialNetworkDataProcessor<Pos
 
 		FacebookSocialPost feed;
 		for (Post post : posts) {
+			// skipping empty or deleted status from fetched feed
+			if (post.getMessage() != null) {
+				continue;
+			}
+			
 			if (lastFetchedTill.before(post.getUpdatedTime()))
 				lastFetchedTill = post.getUpdatedTime();
 
