@@ -3065,7 +3065,7 @@ public class ProfileManagementController {
 				}
 
 				reviewItems = profileManagementService.getReviews(companyId, minScore, maxScore, startIndex, numRows,
-						CommonConstants.PROFILE_LEVEL_COMPANY, fetchAbusive, null, null);
+						CommonConstants.PROFILE_LEVEL_COMPANY, fetchAbusive, null, null, null);
 			}
 			else if (profilesMaster == CommonConstants.PROFILES_MASTER_REGION_ADMIN_PROFILE_ID) {
 				long regionId = Long.parseLong(request.getParameter("regionId"));
@@ -3075,7 +3075,7 @@ public class ProfileManagementController {
 				}
 
 				reviewItems = profileManagementService.getReviews(regionId, minScore, maxScore, startIndex, numRows,
-						CommonConstants.PROFILE_LEVEL_REGION, fetchAbusive, null, null);
+						CommonConstants.PROFILE_LEVEL_REGION, fetchAbusive, null, null, null);
 			}
 			else if (profilesMaster == CommonConstants.PROFILES_MASTER_BRANCH_ADMIN_PROFILE_ID) {
 				long branchId = Long.parseLong(request.getParameter("branchId"));
@@ -3085,7 +3085,7 @@ public class ProfileManagementController {
 				}
 
 				reviewItems = profileManagementService.getReviews(branchId, minScore, maxScore, startIndex, numRows,
-						CommonConstants.PROFILE_LEVEL_BRANCH, fetchAbusive, null, null);
+						CommonConstants.PROFILE_LEVEL_BRANCH, fetchAbusive, null, null, null);
 			}
 			else if (profilesMaster == CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID) {
 				long agentId = Long.parseLong(request.getParameter("agentId"));
@@ -3095,7 +3095,7 @@ public class ProfileManagementController {
 				}
 
 				reviewItems = profileManagementService.getReviews(agentId, minScore, maxScore, startIndex, numRows,
-						CommonConstants.PROFILE_LEVEL_INDIVIDUAL, fetchAbusive, null, null);
+						CommonConstants.PROFILE_LEVEL_INDIVIDUAL, fetchAbusive, null, null, null);
 			}
 
 			model.addAttribute("reviewItems", reviewItems);

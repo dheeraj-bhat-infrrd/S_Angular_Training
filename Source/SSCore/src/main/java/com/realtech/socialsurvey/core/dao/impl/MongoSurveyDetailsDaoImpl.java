@@ -505,7 +505,7 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao {
 	 */
 	@Override
 	public List<SurveyDetails> getFeedbacks(String columnName, long columnValue, int start, int rows, double startScore, double limitScore,
-			boolean fetchAbusive, Date startDate, Date endDate) {
+			boolean fetchAbusive, Date startDate, Date endDate, String sortCriteria) {
 		LOG.info("Method to fetch all the feedbacks from SURVEY_DETAILS collection, getFeedbacks() started.");
 
 		Query query = new Query();
@@ -549,8 +549,14 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao {
 			query.limit(rows);
 		}
 
-		query.with(new Sort(Sort.Direction.DESC, CommonConstants.MODIFIED_ON_COLUMN));
-		query.with(new Sort(Sort.Direction.DESC, CommonConstants.SCORE_COLUMN));
+		if(sortCriteria != null && sortCriteria.equalsIgnoreCase(CommonConstants.REVIEWS_SORT_CRITERIA_DATE))
+			query.with(new Sort(Sort.Direction.DESC, CommonConstants.MODIFIED_ON_COLUMN));
+		else if(sortCriteria != null && sortCriteria.equalsIgnoreCase(CommonConstants.REVIEWS_SORT_CRITERIA_FEATURE))
+			query.with(new Sort(Sort.Direction.DESC, CommonConstants.SCORE_COLUMN));
+		else{
+			query.with(new Sort(Sort.Direction.DESC, CommonConstants.MODIFIED_ON_COLUMN));
+			query.with(new Sort(Sort.Direction.DESC, CommonConstants.SCORE_COLUMN));
+		}
 		List<SurveyDetails> surveysWithReviews = mongoTemplate.find(query, SurveyDetails.class, SURVEY_DETAILS_COLLECTION);
 
 		LOG.info("Method to fetch all the feedbacks from SURVEY_DETAILS collection, getFeedbacks() finished.");
