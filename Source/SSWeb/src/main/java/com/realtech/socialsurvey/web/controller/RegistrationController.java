@@ -222,6 +222,7 @@ public class RegistrationController {
 			LOG.debug("Service for sending the registration invitation excecuted successfully");
 			model.addAttribute("message",
 					messageUtils.getDisplayMessage(DisplayMessageConstants.REGISTRATION_INVITE_SUCCESSFUL, DisplayMessageType.SUCCESS_MESSAGE));
+			return JspResolver.REGISTRATION_INVITE_SUCCESSFUL;
 		}
 		catch (UserAlreadyExistsException e) {
 			model.addAttribute("message",
@@ -240,6 +241,42 @@ public class RegistrationController {
 		return JspResolver.INDEX;
 	}
 
+	/*
+	 * Resend co-operate invite
+	 */
+	@ResponseBody
+	@RequestMapping(value = "/resendRegistrationMail", method = RequestMethod.GET)
+	public String initResendDirectRegistration(Model model, HttpServletRequest request) {
+		LOG.info("Method called for showing up the direct registration page");
+		String firstName = request.getParameter("firstName");
+		String lastName = request.getParameter("lastName");
+		String emailId = request.getParameter("emailId");
+
+		try {
+			LOG.debug("Validating form elements");
+			validateFormParameters(firstName, lastName, emailId);
+			LOG.debug("Form parameters validation passed for firstName: " + firstName + " lastName: " + lastName + " and emailID: " + emailId);
+			// check if email id already exists
+			if (userManagementService.userExists(emailId.trim())) {
+				LOG.warn(emailId + " is already present");
+				throw new UserAlreadyExistsException("Email address " + emailId + " already exists.");
+			}
+			
+			LOG.debug("Calling service for sending the registration invitation");
+			userManagementService.inviteCorporateToRegister(firstName, lastName, emailId, false);
+			LOG.debug("Service for sending the registration invitation excecuted successfully");
+			model.addAttribute("message",
+					messageUtils.getDisplayMessage(DisplayMessageConstants.REGISTRATION_INVITE_SUCCESSFUL, DisplayMessageType.SUCCESS_MESSAGE));
+		}
+		catch (UserAlreadyExistsException e) {
+			return "User already registered";
+		}
+		catch (NonFatalException e) {
+			return "Some error occurred while sending registration mail";
+		}
+		return "Registration invite resend successfully";
+	}
+	
 	/**
 	 * JIRA:SS-26 BY RM02 Method to validate registration form parameters and call service to add a
 	 * new user in application
