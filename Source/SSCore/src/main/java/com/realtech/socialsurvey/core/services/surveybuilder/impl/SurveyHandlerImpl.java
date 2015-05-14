@@ -266,8 +266,8 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean {
 	 */
 	@Transactional
 	@Override
-	public List<String> getEmailIdsOfAdminsInHierarchy(long agentId) throws InvalidInputException {
-		List<String> emailIdsOfAdmins = new ArrayList<>();
+	public Map<String, String> getEmailIdsOfAdminsInHierarchy(long agentId) throws InvalidInputException {
+		Map<String, String> emailIdsOfAdmins = new HashMap<String, String>();
 		List<UserProfile> admins = new ArrayList<>();
 		User agent = userDao.findById(User.class, agentId);
 		Map<String, Object> queries = new HashMap<>();
@@ -288,7 +288,10 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean {
 			admins.addAll(userProfileDao.findByKeyValue(UserProfile.class, queries));
 		}
 		for (UserProfile admin : admins) {
-			emailIdsOfAdmins.add(admin.getEmailId());
+			String name = admin.getUser().getFirstName();
+			if(admin.getUser().getLastName()!=null)
+				name += " " + admin.getUser().getLastName();
+			emailIdsOfAdmins.put(admin.getEmailId(), name);
 		}
 		return emailIdsOfAdmins;
 	}
