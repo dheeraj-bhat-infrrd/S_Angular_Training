@@ -1,12 +1,14 @@
 var companyProfileName = $("#company-profile-name").val();
 var currentProfileIden = "";
 var startIndex = 0;
-var numOfRows = 3;
+var numOfRows = 5;
 var minScore=0;
 var publicPostStartIndex = 0;
 var publicPostNumRows = 4;
 var currentProfileName;
 var doStopPublicPostPagination = false;
+var reviewsSortBy = 'feature';
+var showAllReviews = false;
 var monthNames = [ "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug",
 		"Sep", "Oct", "Nov", "Dec" ];
 
@@ -574,7 +576,7 @@ function fetchReviewsForCompany(companyId,start,numRows,minScore) {
 	if(companyId == undefined || companyId == ""){
 		return;
 	}
-	var url = window.location.origin +'/rest/profile/company/'+companyId+'/reviews?start='+start+"&numRows="+numRows;
+	var url = window.location.origin +'/rest/profile/company/'+companyId+'/reviews?start='+start+"&numRows="+numRows+"&sortCriteria="+reviewsSortBy;
 	if(minScore != undefined) {
 		url = url +"&minScore="+minScore;
 	}
@@ -675,7 +677,10 @@ $(document).scroll(function(){
 		startIndex = startIndex + numOfRows;
 		$("#profile-fetch-info").attr("fetch-all-reviews","false");
 		var profileLevel = $("#profile-fetch-info").attr("profile-level");
-		fetchReviewsBasedOnProfileLevel(profileLevel, currentProfileIden, startIndex, numOfRows, minScore);
+		if(showAllReviews)
+			fetchReviewsBasedOnProfileLevel(profileLevel, currentProfileIden, startIndex, numOfRows, 0);
+		else
+			fetchReviewsBasedOnProfileLevel(profileLevel, currentProfileIden, startIndex, numOfRows, minScore);
 	}
 });
 
@@ -751,7 +756,7 @@ function paintHiddenReviewsCount(data) {
 				startIndex = 0;
 				$("#profile-fetch-info").attr("fetch-all-reviews", "true");
 				$(window).scrollTop($('#reviews-container').offset().top);
-
+				showAllReviews = true;
 				var profileLevel = $("#profile-fetch-info").attr("profile-level");
 				fetchReviewsBasedOnProfileLevel(profileLevel, currentProfileIden, startIndex, numOfRows, 0);
 			});
@@ -762,8 +767,9 @@ function paintHiddenReviewsCount(data) {
 				$('#prof-review-item').html('');
 				startIndex = 0;
 				$("#profile-fetch-info").attr("fetch-all-reviews","false");
-
+				showAllReviews = false;
 				var profileLevel = $("#profile-fetch-info").attr("profile-level");
+				reviewsSortBy = 'feature';
 				fetchReviewsBasedOnProfileLevel(profileLevel, currentProfileIden, startIndex, numOfRows, minScore);
 			});
 
@@ -775,6 +781,7 @@ function paintHiddenReviewsCount(data) {
 				$("#profile-fetch-info").attr("fetch-all-reviews","true");
 				
 				var profileLevel = $("#profile-fetch-info").attr("profile-level");
+				reviewsSortBy = 'date';
 				fetchReviewsBasedOnProfileLevel(profileLevel, currentProfileIden, startIndex, numOfRows, 0);
 			});
 		}
@@ -816,7 +823,7 @@ function fetchReviewsForRegion(regionId,start,numRows,minScore) {
 	if(regionId == undefined || regionId == ""){
 		return;
 	}
-	var url = window.location.origin +"/rest/profile/region/"+regionId+"/reviews?start="+start+"&numRows="+numRows;
+	var url = window.location.origin +"/rest/profile/region/"+regionId+"/reviews?start="+start+"&numRows="+numRows+"&sortCriteria="+reviewsSortBy;
 	if(minScore != undefined) {
 		url = url +"&minScore="+minScore;
 	}
@@ -861,7 +868,7 @@ function fetchReviewsForBranch(branchId,start,numRows,minScore){
 	if(branchId == undefined || branchId == ""){
 		return;
 	}
-	var url = window.location.origin +"/rest/profile/branch/"+branchId+"/reviews?start="+start+"&numRows="+numRows;
+	var url = window.location.origin +"/rest/profile/branch/"+branchId+"/reviews?start="+start+"&numRows="+numRows+"&sortCriteria="+reviewsSortBy;
 	if(minScore != undefined) {
 		url = url +"&minScore="+minScore;
 	}
@@ -942,7 +949,7 @@ function fetchReviewsForAgent(agentId,start,numRows,minScore){
 	if(agentId == undefined || agentId == ""){
 		return;
 	}
-	var url = window.location.origin +"/rest/profile/individual/"+agentId+"/reviews?start="+start+"&numRows="+numRows;
+	var url = window.location.origin +"/rest/profile/individual/"+agentId+"/reviews?start="+start+"&numRows="+numRows+"&sortCriteria="+reviewsSortBy;
 	if(minScore != undefined) {
 		url = url +"&minScore="+minScore;
 	}

@@ -265,7 +265,7 @@ public interface ProfileManagementService {
 	 * @throws InvalidInputException
 	 */
 	public List<SurveyDetails> getReviews(long iden, double startScore, double limitScore, int startIndex, int numOfRows, String profileLevel,
-			boolean fetchAbusive, Date startDate, Date endDate) throws InvalidInputException;
+			boolean fetchAbusive, Date startDate, Date endDate, String sortCriteria) throws InvalidInputException;
 
 	/**
 	 * Method to get average ratings based on the profile level specified, iden is one of
