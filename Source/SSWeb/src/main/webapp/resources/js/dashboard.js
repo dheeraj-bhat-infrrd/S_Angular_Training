@@ -345,10 +345,14 @@ function getReviewsCountAndShowReviews(columnName, columnValue) {
 				$("#dsh-cmp-dwnld").show();
 				$("#dsh-start-date").datepicker({
 					orientation: "bottom auto",
+					format: 'dd/mm/yyyy',
+					todayHighlight : true,
 					autoclose: true
 				});
 				$("#dsh-end-date").datepicker({
 					orientation: "bottom auto",
+					format: 'dd/mm/yyyy',
+					todayHighlight : true,
 					autoclose: true,
 					endDate: new Date()
 				});
