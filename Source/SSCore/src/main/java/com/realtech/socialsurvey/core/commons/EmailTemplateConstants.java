@@ -55,6 +55,9 @@ public final class EmailTemplateConstants {
 	public static final String SOCIALPOST_REMINDER_MAIL_BODY = "SocialPostReminderMailBody.html";
 	public static final String SOCIALPOST_REMINDER_MAIL_SUBJECT = "SocialPostReminderMailSubject.txt";
 
+	public static final String SOCIAL_CONNECT_MAIL_BODY = "SocialConnectMailBody.html";
+	public static final String SOCIAL_CONNECT_MAIL_SUBJECT = "SocialConnectMailSubject.txt";
+
 	public static final String SUBSCRIPTION_PRICE_UPDATED_MAIL_BODY = "SubscriptionPriceUpdateBody.html";
 	public static final String SUBSCRIPTION_PRICE_UPDATED_MAIL_SUBJECT = "SubscriptionPriceUpdate.txt";
 

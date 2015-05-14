@@ -35,13 +35,16 @@ import com.google.gson.JsonParser;
 import com.google.gson.reflect.TypeToken;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.dao.GenericDao;
+import com.realtech.socialsurvey.core.dao.OrganizationUnitSettingsDao;
 import com.realtech.socialsurvey.core.dao.impl.MongoOrganizationUnitSettingDaoImpl;
 import com.realtech.socialsurvey.core.entities.FeedStatus;
 import com.realtech.socialsurvey.core.entities.GooglePlusPost;
 import com.realtech.socialsurvey.core.entities.GooglePlusSocialPost;
+import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
 import com.realtech.socialsurvey.core.entities.SocialProfileToken;
 import com.realtech.socialsurvey.core.exception.NonFatalException;
 import com.realtech.socialsurvey.core.feed.SocialNetworkDataProcessor;
+import com.realtech.socialsurvey.core.services.mail.EmailServices;
 
 @Component("googleFeed")
 @Scope(value = ConfigurableBeanFactory.SCOPE_PROTOTYPE)
@@ -57,6 +60,15 @@ public class GoogleFeedProcessorImpl implements SocialNetworkDataProcessor<Googl
 	@Autowired
 	private MongoTemplate mongoTemplate;
 
+	@Autowired
+	private OrganizationUnitSettingsDao settingsDao;
+
+	@Autowired
+	private EmailServices emailServices;
+	
+	@Value("${SOCIAL_CONNECT_REMINDER_THRESHOLD}")
+	private long socialConnectThreshold;
+	
 	@Value("${GOOGLE_API_KEY}")
 	private String googleApiKey;
 
@@ -178,6 +190,8 @@ public class GoogleFeedProcessorImpl implements SocialNetworkDataProcessor<Googl
 			HttpResponse response = httpClient.execute(getRequest);
 			
 			if (response.getStatusLine().getStatusCode() != 200) {
+				LOG.error("Failed : HTTP error code : " + response.getStatusLine().getStatusCode());
+				
 				OAuthRequest request = new OAuthRequest(Verb.POST, "https://accounts.google.com/o/oauth2/token");
 				request.addBodyParameter("grant_type", "refresh_token");
 				request.addBodyParameter("refresh_token", accessToken);
@@ -192,8 +206,6 @@ public class GoogleFeedProcessorImpl implements SocialNetworkDataProcessor<Googl
 				
 				getRequest = new HttpGet(createGooglePlusFeedURL(accessToken));
 				response = httpClient.execute(getRequest);
-				
-				// throw new NonFatalException("Failed : HTTP error code : " + response.getStatusLine().getStatusCode());
 			}
 
 			InputStreamReader jsonReader = new InputStreamReader(response.getEntity().getContent());
@@ -204,6 +216,17 @@ public class GoogleFeedProcessorImpl implements SocialNetworkDataProcessor<Googl
 			
 			// setting no.of retries
 			status.setRetries(status.getRetries() + 1);
+			
+			// sending reminder mail and increasing counter
+			if (status.getRemindersSent() < socialConnectThreshold) {
+				OrganizationUnitSettings unitSettings = settingsDao.fetchOrganizationUnitSettingsById(iden, organizationUnit);
+				
+				String userEmail = unitSettings.getContact_details().getMail_ids().getWork();
+				emailServices.sendSocialConnectMail(userEmail, unitSettings.getContact_details().getName(), userEmail, FEED_SOURCE);
+				
+				status.setRemindersSent(status.getRemindersSent() + 1);
+			}
+			
 			feedStatusDao.saveOrUpdate(status);
 		}
 
