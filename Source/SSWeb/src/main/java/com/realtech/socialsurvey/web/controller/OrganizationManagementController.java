@@ -1028,8 +1028,7 @@ public class OrganizationManagementController {
 					.getAccountsMasterId();
 
 			model.addAttribute("balanceAmount",
-					String.format("%.02f", gateway.getBalacnceAmountForPlanUpgrade(user.getCompany(), fromAccountsMasterId, toAccountsMasterId))
-							+ "$");
+					String.format("%.02f", gateway.getBalacnceAmountForPlanUpgrade(user.getCompany(), fromAccountsMasterId, toAccountsMasterId)));
 			model.addAttribute(CommonConstants.ACCOUNT_TYPE_IN_SESSION, toAccountsMasterId);
 		}
 		catch (InvalidInputException e) {
