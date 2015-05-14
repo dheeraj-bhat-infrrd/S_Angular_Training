@@ -443,6 +443,7 @@ $('body').on('click', '.wc-skip-btn, .wc-sub-btn', function() {
 });
 
 $('body').on('click', '.wc-final-skip, .wc-final-submit', function(){
+	loadDisplayPicture();
 	$(this).closest('.overlay-login').hide();
 	showDisplayPic();
 });
