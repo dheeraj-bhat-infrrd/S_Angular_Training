@@ -530,4 +530,5 @@ public interface CommonConstants {
 	public static final String LOGINNAME_MARKER = "LOGINNAME^^";
 	public static final String PROFILENAME_MARKER = "PROFILENAME^^";
 	public static final String SURVEYDETAIL_MARKER = "SURVEYDETAIL^^";
+	public static final String RECIPIENT_NAME_MARKER = "RECIPIENTNAME^^";
 }

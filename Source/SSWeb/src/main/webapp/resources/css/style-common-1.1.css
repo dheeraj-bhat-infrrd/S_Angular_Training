@@ -1119,3 +1119,46 @@ span.wc-highlight {
     display: -webkit-box;    
     -webkit-line-clamp: 2;    -webkit-box-orient: vertical;
 }
+
+/* .g-recaptcha>div div:first-child{
+	width: 100% !important;
+}
+
+.g-recaptcha iframe{
+	width: 100% !important;
+}
+ */
+ 
+ .inv-succ-text1 {
+    color: #48AE5E;
+    margin-bottom: 20px;
+    font-size: 24px;
+    font-family: 'opensanssemibold';
+}
+
+.inv-succ-text2 {
+    margin-bottom: 30px;
+    color: #009EE3;
+    font-size: 18px;
+    font-family: 'opensanssemibold';
+}
+
+.inv-succ-email {
+    margin-bottom: 30px;
+    padding: 5px 0;
+    color:#000;
+    border-bottom: 3px dotted #dcdcdc;
+}
+
+.inv-succ-text3 {
+    margin-bottom: 40px;
+    font-size: 18px;
+    color: #000;
+}
+
+.inv-succ-link {
+    float: left;
+    clear: both;
+    color: #009EE3;
+    cursor: pointer;
+}
