@@ -584,7 +584,7 @@ public class ProfileController {
 	@RequestMapping(value = "/company/{companyId}/reviews")
 	public Response getReviewsForCompany(@PathVariable long companyId, @QueryParam(value = "minScore") Double minScore,
 			@QueryParam(value = "maxScore") Double maxScore, @QueryParam(value = "start") Integer start,
-			@QueryParam(value = "numRows") Integer numRows) {
+			@QueryParam(value = "numRows") Integer numRows, @QueryParam(value = "sortCriteria") String sortCriteria) {
 		LOG.info("Service to fetch reviews of company called for companyId:" + companyId + " ,minScore:" + minScore + " and maxscore:" + maxScore);
 		Response response = null;
 		try {
@@ -605,9 +605,12 @@ public class ProfileController {
 			if (numRows == null) {
 				numRows = -1;
 			}
+			if(sortCriteria == null){
+				sortCriteria = "date";
+			}
 			try {
 				List<SurveyDetails> reviews = profileManagementService.getReviews(companyId, minScore, maxScore, start, numRows,
-						CommonConstants.PROFILE_LEVEL_COMPANY, false, null, null);
+						CommonConstants.PROFILE_LEVEL_COMPANY, false, null, null, sortCriteria);
 				String json = new Gson().toJson(reviews);
 				LOG.debug("reviews json : " + json);
 				response = Response.ok(json).build();
@@ -639,7 +642,7 @@ public class ProfileController {
 	@RequestMapping(value = "/region/{regionId}/reviews")
 	public Response getReviewsForRegion(@PathVariable long regionId, @QueryParam(value = "minScore") Double minScore,
 			@QueryParam(value = "maxScore") Double maxScore, @QueryParam(value = "start") Integer start,
-			@QueryParam(value = "numRows") Integer numRows) {
+			@QueryParam(value = "numRows") Integer numRows, @QueryParam(value = "sortCriteria") String sortCriteria) {
 		LOG.info("Service to fetch reviews of region called for regionId:" + regionId + " ,minScore:" + minScore + " and maxscore:" + maxScore);
 		Response response = null;
 		try {
@@ -660,9 +663,12 @@ public class ProfileController {
 			if (numRows == null) {
 				numRows = -1;
 			}
+			if(sortCriteria == null){
+				sortCriteria = "date";
+			}
 			try {
 				List<SurveyDetails> reviews = profileManagementService.getReviews(regionId, minScore, maxScore, start, numRows,
-						CommonConstants.PROFILE_LEVEL_REGION, false, null, null);
+						CommonConstants.PROFILE_LEVEL_REGION, false, null, null, sortCriteria);
 				String json = new Gson().toJson(reviews);
 				LOG.debug("reviews json : " + json);
 				response = Response.ok(json).build();
@@ -938,7 +944,7 @@ public class ProfileController {
 	@RequestMapping(value = "/branch/{branchId}/reviews")
 	public Response getReviewsForBranch(@PathVariable long branchId, @QueryParam(value = "minScore") Double minScore,
 			@QueryParam(value = "maxScore") Double maxScore, @QueryParam(value = "start") Integer start,
-			@QueryParam(value = "numRows") Integer numRows) {
+			@QueryParam(value = "numRows") Integer numRows, @QueryParam(value = "sortCriteria") String sortCriteria) {
 		LOG.info("Service to fetch reviews of branch called for branchId:" + branchId + " ,minScore:" + minScore + " and maxscore:" + maxScore);
 		Response response = null;
 		try {
@@ -959,9 +965,12 @@ public class ProfileController {
 			if (numRows == null) {
 				numRows = -1;
 			}
+			if(sortCriteria == null){
+				sortCriteria = "date";
+			}
 			try {
 				List<SurveyDetails> reviews = profileManagementService.getReviews(branchId, minScore, maxScore, start, numRows,
-						CommonConstants.PROFILE_LEVEL_BRANCH, false, null, null);
+						CommonConstants.PROFILE_LEVEL_BRANCH, false, null, null, sortCriteria);
 				String json = new Gson().toJson(reviews);
 				LOG.debug("reviews json : " + json);
 				response = Response.ok(json).build();
@@ -1074,7 +1083,7 @@ public class ProfileController {
 	@RequestMapping(value = "/individual/{agentId}/reviews")
 	public Response getReviewsForAgent(@PathVariable long agentId, @QueryParam(value = "minScore") Double minScore,
 			@QueryParam(value = "maxScore") Double maxScore, @QueryParam(value = "start") Integer start,
-			@QueryParam(value = "numRows") Integer numRows) {
+			@QueryParam(value = "numRows") Integer numRows, @QueryParam(value = "sortCriteria") String sortCriteria) {
 		LOG.info("Service to fetch reviews of an agent called for agentId:" + agentId + " ,minScore:" + minScore + " and maxscore:" + maxScore);
 		Response response = null;
 		try {
@@ -1083,7 +1092,7 @@ public class ProfileController {
 						CommonConstants.SERVICE_CODE_REGION_REVIEWS, "Agent id is invalid"),
 						"agent id is not valid while fetching all reviews for an agent");
 			}
-			if (minScore == null) {
+			if (minScore == null || sortCriteria.equalsIgnoreCase(CommonConstants.REVIEWS_SORT_CRITERIA_DATE)) {
 				minScore = CommonConstants.MIN_RATING_SCORE;
 			}
 			if (maxScore == null) {
@@ -1095,9 +1104,12 @@ public class ProfileController {
 			if (numRows == null) {
 				numRows = -1;
 			}
+			if(sortCriteria == null){
+				sortCriteria = CommonConstants.REVIEWS_SORT_CRITERIA_DATE;
+			}
 			try {
 				List<SurveyDetails> reviews = profileManagementService.getReviews(agentId, minScore, maxScore, start, numRows,
-						CommonConstants.PROFILE_LEVEL_INDIVIDUAL, false, null, null);
+						CommonConstants.PROFILE_LEVEL_INDIVIDUAL, false, null, null, sortCriteria);
 				String json = new Gson().toJson(reviews);
 				LOG.debug("reviews json : " + json);
 				response = Response.ok(json).build();

@@ -1004,7 +1004,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 	 */
 	@Override
 	public List<SurveyDetails> getReviews(long iden, double startScore, double limitScore, int startIndex, int numOfRows, String profileLevel,
-			boolean fetchAbusive, Date startDate, Date endDate) throws InvalidInputException {
+			boolean fetchAbusive, Date startDate, Date endDate, String sortCriteria) throws InvalidInputException {
 		LOG.info("Method getReviews called for iden:" + iden + " startScore:" + startScore + " limitScore:" + limitScore + " startIndex:"
 				+ startIndex + " numOfRows:" + numOfRows + " profileLevel:" + profileLevel);
 		List<SurveyDetails> surveyDetails = null;
@@ -1013,7 +1013,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 		}
 		String idenColumnName = getIdenColumnNameFromProfileLevel(profileLevel);
 		surveyDetails = surveyDetailsDao.getFeedbacks(idenColumnName, iden, startIndex, numOfRows, startScore, limitScore, fetchAbusive,
-				startDate, endDate);
+				startDate, endDate, sortCriteria);
 		return surveyDetails;
 	}
 
