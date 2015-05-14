@@ -1,6 +1,7 @@
 package com.realtech.socialsurvey.core.services.organizationmanagement.impl;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
@@ -406,9 +407,10 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 		AgentSettings agentSettingsType = null;
 		if (agentSettings instanceof AgentSettings) {
 			agentSettingsType = (AgentSettings) agentSettings;
-			// sort the company positions. since we are type casting the settings here, we are sorting the same here
+			// sort the company positions. since we are type casting the settings here, we are
+			// sorting the same here
 			sortCompanyPositions(agentSettingsType.getPositions());
-			
+
 		}
 
 		// add the company profile data into agent settings
@@ -905,7 +907,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 		LOG.info("Method getIndividualByProfileName executed successfully");
 		return agentSettings;
 	}
-	
+
 	/**
 	 * Method to get User by profileName
 	 * 
@@ -1011,9 +1013,20 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 		if (iden <= 0l) {
 			throw new InvalidInputException("iden is invalid while fetching reviews");
 		}
+		Calendar calendar = Calendar.getInstance();
+		if (startDate != null) {
+			calendar.setTime(startDate);
+			calendar.add(Calendar.DATE, 1);
+			startDate = calendar.getTime();
+		}
+		if (endDate != null) {
+			calendar.setTime(endDate);
+			calendar.add(Calendar.DATE, 1);
+			endDate = calendar.getTime();
+		}
 		String idenColumnName = getIdenColumnNameFromProfileLevel(profileLevel);
-		surveyDetails = surveyDetailsDao.getFeedbacks(idenColumnName, iden, startIndex, numOfRows, startScore, limitScore, fetchAbusive,
-				startDate, endDate, sortCriteria);
+		surveyDetails = surveyDetailsDao.getFeedbacks(idenColumnName, iden, startIndex, numOfRows, startScore, limitScore, fetchAbusive, startDate,
+				endDate, sortCriteria);
 		return surveyDetails;
 	}
 
@@ -1186,8 +1199,8 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 	 * agentId/branchId/regionId or companyId based on the profile level
 	 */
 	@Override
-	public List<SurveyDetails> getIncompleteSurvey(long iden, double startScore, double limitScore, int startIndex, int numOfRows, String profileLevel,
-			Date startDate, Date endDate) throws InvalidInputException {
+	public List<SurveyDetails> getIncompleteSurvey(long iden, double startScore, double limitScore, int startIndex, int numOfRows,
+			String profileLevel, Date startDate, Date endDate) throws InvalidInputException {
 		LOG.info("Method getIncompleteSurvey() called for iden:" + iden + " startScore:" + startScore + " limitScore:" + limitScore + " startIndex:"
 				+ startIndex + " numOfRows:" + numOfRows + " profileLevel:" + profileLevel);
 		List<SurveyDetails> surveyDetails = null;
@@ -1251,7 +1264,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 	 * @throws UndeliveredEmailException
 	 */
 	@Override
-	public void findProfileMailIdAndSendMail(String profileName, String message,String senderName, String senderMailId, String profileType)
+	public void findProfileMailIdAndSendMail(String profileName, String message, String senderName, String senderMailId, String profileType)
 			throws InvalidInputException, NoRecordsFetchedException, UndeliveredEmailException {
 		if (profileName == null || profileName.isEmpty()) {
 			LOG.error("contactAgent : profileName parameter is empty or null!");
@@ -1325,7 +1338,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 			throw new InvalidInputException("No user settings found in session");
 		}
 		SocialPost socialPost = new SocialPost();
-		socialPost.setPostedBy(selectedProfile.getUser().getFirstName()+" "+selectedProfile.getUser().getLastName());
+		socialPost.setPostedBy(selectedProfile.getUser().getFirstName() + " " + selectedProfile.getUser().getLastName());
 		socialPost.setPostText(postText);
 		socialPost.setSource("SocialSurvey");
 		int profilesMaster = selectedProfile.getProfilesMaster().getProfileId();
@@ -1338,7 +1351,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 		else if (profilesMaster == CommonConstants.PROFILES_MASTER_BRANCH_ADMIN_PROFILE_ID) {
 			socialPost.setBranchId(selectedProfile.getBranchId());
 		}
-		else{
+		else {
 			socialPost.setAgentId(selectedProfile.getAgentId());
 		}
 		socialPost.setTimeInMillis(System.currentTimeMillis());
@@ -1350,14 +1363,14 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 	 * Method to fetch social posts for a particular user.
 	 */
 	@Override
-	public List<SocialPost> getSocialPosts(UserProfile selectedProfile, int startIndex, int batchSize) throws InvalidInputException{
+	public List<SocialPost> getSocialPosts(UserProfile selectedProfile, int startIndex, int batchSize) throws InvalidInputException {
 		LOG.info("Method to fetch social posts , getSocialPosts() started.");
 		if (selectedProfile == null) {
 			throw new InvalidInputException("No user settings found in session");
 		}
 		String key = CommonConstants.AGENT_ID;
 		long iden = selectedProfile.getAgentId();
-		
+
 		int profilesMaster = selectedProfile.getProfilesMaster().getProfileId();
 		if (profilesMaster == CommonConstants.PROFILES_MASTER_COMPANY_ADMIN_PROFILE_ID) {
 			key = CommonConstants.COMPANY_ID;
@@ -1371,7 +1384,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 			key = CommonConstants.BRANCH_ID;
 			iden = selectedProfile.getBranchId();
 		}
-		
+
 		List<SocialPost> posts = socialPostDao.getSocialPosts(iden, key, startIndex, batchSize);
 		LOG.info("Method to fetch social posts , getSocialPosts() finished.");
 		return posts;
@@ -1411,7 +1424,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 		organizationUnitSettingsDao.updateParticularKeyAgentSettings(MongoOrganizationUnitSettingDaoImpl.KEY_EXPERTISE, expertise, agentSettings);
 		LOG.info("Updated agent expertise.");
 	}
-	
+
 	@Override
 	public void updateAgentHobbies(AgentSettings agentSettings, List<String> hobbies) throws InvalidInputException {
 		if (hobbies == null || hobbies.isEmpty()) {
@@ -1432,13 +1445,13 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 				agentSettings);
 		LOG.info("Updated company positions.");
 	}
-	
-	private List<CompanyPositions> sortCompanyPositions(List<CompanyPositions> positions){
+
+	private List<CompanyPositions> sortCompanyPositions(List<CompanyPositions> positions) {
 		LOG.debug("Sorting company positions");
-		if(positions!= null && positions.size() > 0){
+		if (positions != null && positions.size() > 0) {
 			Collections.sort(positions);
 		}
 		return positions;
 	}
-	
+
 }
