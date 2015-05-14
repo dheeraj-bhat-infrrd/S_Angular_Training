@@ -41,7 +41,7 @@ public class FacebookFeedIngester implements Runnable {
 
 	@Override
 	public void run() {
-		LOG.info("Starting the ingestion thread for twitter for " + collectionName + " with iden: " + iden);
+		LOG.info("Starting the ingestion thread for facebook for " + collectionName + " with iden: " + iden);
 		try {
 			processor.preProcess(iden, collectionName, token);
 			List<Post> posts = processor.fetchFeed(iden, collectionName, token);
@@ -49,11 +49,11 @@ public class FacebookFeedIngester implements Runnable {
 			processor.postProcess(iden, collectionName);
 		}
 		catch (NonFatalException e) {
-			LOG.error("Exception caught while processesing tweets for " + collectionName + " with iden: " + iden, e);
+			LOG.error("Exception caught while processesing facebook statuses for " + collectionName + " with iden: " + iden, e);
 			e.printStackTrace();
 		}
 		finally {
-			LOG.info("Done fetching status posts for " + collectionName + " with iden: " + iden);
+			LOG.info("Done fetching facebook posts for " + collectionName + " with iden: " + iden);
 		}
 	}
 }
