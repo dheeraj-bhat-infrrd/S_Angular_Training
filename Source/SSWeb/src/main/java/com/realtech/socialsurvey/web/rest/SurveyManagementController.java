@@ -3,10 +3,9 @@ package com.realtech.socialsurvey.web.rest;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
+import java.util.Map.Entry;
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import org.apache.commons.lang.StringUtils;
@@ -156,7 +155,7 @@ public class SurveyManagementController {
 				LOG.error("Null/empty value found for mood in storeFeedback().");
 				throw new InvalidInputException("Null/empty value found for mood in storeFeedback().");
 			}
-			Set<String> emailIdsToSendMail = new HashSet<>();
+			Map<String, String> emailIdsToSendMail = new HashMap<>();
 			SolrDocument solrDocument = null;
 			
 			try {
@@ -167,14 +166,14 @@ public class SurveyManagementController {
 			}
 			
 			if (solrDocument != null && !solrDocument.isEmpty()) {
-				emailIdsToSendMail.add(solrDocument.get(CommonConstants.USER_EMAIL_ID_SOLR).toString());
+				emailIdsToSendMail.put(solrDocument.get(CommonConstants.USER_EMAIL_ID_SOLR).toString(), solrDocument.get(CommonConstants.USER_DISPLAY_NAME_SOLR).toString());
 			}
 			
 			String moodsToSendMail = surveyHandler.getMoodsToSendMail();
 			if (!moodsToSendMail.isEmpty() && moodsToSendMail != null) {
 				List<String> moods = new ArrayList<>(Arrays.asList(moodsToSendMail.split(",")));
 				if (moods.contains(mood)) {
-					emailIdsToSendMail.addAll(surveyHandler.getEmailIdsOfAdminsInHierarchy(agentId));
+					emailIdsToSendMail.putAll(surveyHandler.getEmailIdsOfAdminsInHierarchy(agentId));
 				}
 			}
 			
@@ -197,13 +196,13 @@ public class SurveyManagementController {
 				String surveyDetail = generateSurveyTextForMail(customerName, mood, survey);
 				
 				if (enableKafka.equals(CommonConstants.YES)) {
-					for (String emailId : emailIdsToSendMail) {
-						emailServices.queueSurveyCompletionMailToAdmins(emailId, surveyDetail);
+					for (Entry<String, String> admin : emailIdsToSendMail.entrySet()) {
+						emailServices.queueSurveyCompletionMailToAdminsAndAgent(admin.getValue(), admin.getKey(), surveyDetail);
 					}
 				}
 				else {
-					for (String emailId : emailIdsToSendMail) {
-						emailServices.sendSurveyCompletionMailToAdmins(emailId, surveyDetail);
+					for (Entry<String, String> admin : emailIdsToSendMail.entrySet()) {
+						emailServices.sendSurveyCompletionMailToAdminsAndAgent(admin.getValue(), admin.getKey(), surveyDetail);
 					}
 				}
 			}
