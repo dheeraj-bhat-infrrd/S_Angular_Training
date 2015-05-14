@@ -178,6 +178,7 @@ public class GoogleFeedProcessorImpl implements SocialNetworkDataProcessor<Googl
 	}
 
 	@Override
+	@Transactional
 	public List<GooglePlusPost> fetchFeed(long iden, String organizationUnit, SocialProfileToken token) throws NonFatalException {
 		LOG.info("Getting google posts for " + organizationUnit + " with id: " + iden);
 		List<GooglePlusPost> posts = new ArrayList<GooglePlusPost>();
@@ -194,10 +195,14 @@ public class GoogleFeedProcessorImpl implements SocialNetworkDataProcessor<Googl
 				
 				OAuthRequest request = new OAuthRequest(Verb.POST, "https://accounts.google.com/o/oauth2/token");
 				request.addBodyParameter("grant_type", "refresh_token");
-				request.addBodyParameter("refresh_token", accessToken);
+				request.addBodyParameter("refresh_token", token.getAccessTokenSecret());
 				request.addBodyParameter("client_id", googleApiKey);
 				request.addBodyParameter("client_secret", googleApiSecretKey);
 				Response tokenResponse = request.send();
+				
+				if (tokenResponse.getCode() != 200) {
+					throw new IOException("Google access token expired");
+				}
 				
 				Map<String, Object> tokenData = new Gson().fromJson(tokenResponse.getBody(), new TypeToken<Map<String, String>>() {}.getType());
 				if (tokenData != null) {
@@ -216,6 +221,7 @@ public class GoogleFeedProcessorImpl implements SocialNetworkDataProcessor<Googl
 			
 			// setting no.of retries
 			status.setRetries(status.getRetries() + 1);
+			status.setLastFetchedPostId(lastFetchedPostId);
 			
 			// sending reminder mail and increasing counter
 			if (status.getRemindersSent() < socialConnectThreshold) {
@@ -295,6 +301,8 @@ public class GoogleFeedProcessorImpl implements SocialNetworkDataProcessor<Googl
 					post.setPostedBy(actor.get("displayName").getAsString());
 					post.setLastUpdatedOn(profileUpdatedOn);
 					posts.add(post);
+					
+					lastFetchedPostId = post.getId();
 				}
 			}
 		}

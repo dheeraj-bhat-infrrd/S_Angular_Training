@@ -153,6 +153,7 @@ public class TwitterFeedProcessorImpl implements SocialNetworkDataProcessor<Stat
 	}
 
 	@Override
+	@Transactional
 	public List<Status> fetchFeed(long iden, String organizationUnit, TwitterToken token) throws NonFatalException {
 		LOG.info("Getting tweets for " + organizationUnit + " with id: " + iden);
 
