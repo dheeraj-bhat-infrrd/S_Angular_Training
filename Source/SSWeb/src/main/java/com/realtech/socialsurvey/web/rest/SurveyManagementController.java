@@ -307,7 +307,6 @@ public class SurveyManagementController {
 	/*
 	 * Method to retrieve survey questions for a survey based upon the company id and agent id.
 	 */
-	@ResponseBody
 	@RequestMapping(value = "/triggersurvey")
 	public String triggerSurvey(Model model, HttpServletRequest request) {
 		LOG.info("Method to store initial details of customer and agent and to get questions of survey, triggerSurvey() started.");
@@ -342,13 +341,19 @@ public class SurveyManagementController {
 			}
 			User user = userManagementService.getUserByUserId(agentId);
 			surveyHandler.sendSurveyInvitationMail(firstName, lastName, customerEmail, custRelationWithAgent, user, false);
+			model.addAttribute("agentId", agentId);
+			model.addAttribute("firstName", firstName);
+			model.addAttribute("lastName", lastName);
+			model.addAttribute("customerEmail", customerEmail);
+			model.addAttribute("relation", custRelationWithAgent);
+			
 		}
 		catch (NonFatalException e) {
 			LOG.error("Exception caught in getSurvey() method of SurveyManagementController.");
-			return "Something went wrong while sending survey link. Please try again later.";
+			return JspResolver.SHOW_SURVEY_QUESTIONS;
 		}
 		LOG.info("Method to store initial details of customer and agent and to get questions of survey, triggerSurvey() started.");
-		return "Link to take survey has been sent on your email id successfully.";
+		return JspResolver.SURVEY_INVITE_SUCCESSFUL;
 	}
 
 	@ResponseBody
@@ -776,6 +781,29 @@ public class SurveyManagementController {
 			}
 			long agentId = Long.parseLong(agentIdStr);
 			surveyHandler.changeStatusOfSurvey(agentId, customerEmail, true);
+			SurveyDetails survey = surveyHandler.getSurveyDetails(agentId, customerEmail);
+			User user = userManagementService.getUserByUserId(agentId);
+			surveyHandler.sendSurveyRestartMail(firstName, lastName, customerEmail, survey.getCustRelationWithAgent(), user, survey.getUrl());
+		}
+		catch (NonFatalException e) {
+			LOG.error("NonfatalException caught in makeSurveyEditable(). Nested exception is ", e);
+		}
+	}
+	
+	// Method to re-send mail to the customer for taking survey.
+	
+	@ResponseBody
+	@RequestMapping(value = "/resendsurveylink", method = RequestMethod.POST)
+	public void resendSurveyLink(HttpServletRequest request) {
+		String agentIdStr = request.getParameter("agentId");
+		String customerEmail = request.getParameter("customerEmail");
+		String firstName = request.getParameter("firstName");
+		String lastName = request.getParameter("lastName");
+		try {
+			if (agentIdStr == null || agentIdStr.isEmpty()) {
+				throw new InvalidInputException("Invalid value (Null/Empty) found for agentId.");
+			}
+			long agentId = Long.parseLong(agentIdStr);
 			SurveyDetails survey = surveyHandler.getSurveyDetails(agentId, customerEmail);
 			User user = userManagementService.getUserByUserId(agentId);
 			surveyHandler.sendSurveyRestartMail(firstName, lastName, customerEmail, survey.getCustRelationWithAgent(), user, survey.getUrl());
