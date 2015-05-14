@@ -551,13 +551,13 @@ public class SocialManagementController {
 			String accessTokenStr = httpclient.execute(httpPost, new BasicResponseHandler());
 			Map<String, Object> map = new Gson().fromJson(accessTokenStr, new TypeToken<Map<String, String>>() {}.getType());
 			String accessToken = (String) map.get("access_token");
-			String profileLink = null;
+
 			String linkedinProfileUriWithAccessToken = linkedinProfileUri + accessToken; 
 			HttpGet httpGet = new HttpGet(linkedinProfileUriWithAccessToken);
 			String basicProfileStr = httpclient.execute(httpGet, new BasicResponseHandler());
 			
 			LinkedinUserProfileResponse profileData = new Gson().fromJson(basicProfileStr, LinkedinUserProfileResponse.class);
-			profileLink = (String) profileData.getSiteStandardProfileRequest().getUrl();
+			String profileLink = (String) profileData.getSiteStandardProfileRequest().getUrl();
 
 			SocialMediaTokens mediaTokens;
 			int profilesMaster = selectedProfile.getProfilesMaster().getProfileId();
@@ -700,9 +700,11 @@ public class SocialManagementController {
 					.callback(googleApiRedirectUri).scope(googleApiScope).build();
 			Token accessToken = service.getAccessToken(null, new Verifier(OAuthCode));
 			LOG.info("Token: " + accessToken.getToken());
+			
 			service.getAuthorizationUrl(accessToken);
 			String googleAccessUri = googleProfileUri;
 			googleAccessUri += accessToken.getToken();
+			
 			HttpClient httpclient = HttpClientBuilder.create().build();
 			HttpGet httpGet = new HttpGet(googleAccessUri);
 			String basicProfileStr = httpclient.execute(httpGet, new BasicResponseHandler());
@@ -711,6 +713,7 @@ public class SocialManagementController {
 			if (profileData != null) {
 				profileLink = profileData.get("link").toString();
 			}
+			
 			// Storing access token
 			SocialMediaTokens mediaTokens;
 			int profilesMaster = selectedProfile.getProfilesMaster().getProfileId();

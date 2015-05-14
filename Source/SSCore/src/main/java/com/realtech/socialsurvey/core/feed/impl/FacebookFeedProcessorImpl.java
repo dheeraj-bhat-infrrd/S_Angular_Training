@@ -190,8 +190,14 @@ public class FacebookFeedProcessorImpl implements SocialNetworkDataProcessor<Pos
 
 		FacebookSocialPost feed;
 		for (Post post : posts) {
-			if (lastFetchedTill.before(post.getUpdatedTime()))
+			// skipping empty or deleted status from fetched feed
+			if (post.getMessage() == null && post.getName() == null && post.getStory() == null) {
+				continue;
+			}
+			
+			if (lastFetchedTill.before(post.getUpdatedTime())) {
 				lastFetchedTill = post.getUpdatedTime();
+			}
 
 			feed = new FacebookSocialPost();
 			feed.setPost(post);
@@ -229,9 +235,8 @@ public class FacebookFeedProcessorImpl implements SocialNetworkDataProcessor<Pos
 					break;
 			}
 
-			// updating last fetched details
 			lastFetchedPostId = post.getId();
-
+			
 			// pushing to mongo
 			mongoTemplate.insert(feed, CommonConstants.SOCIAL_POST_COLLECTION);
 		}
