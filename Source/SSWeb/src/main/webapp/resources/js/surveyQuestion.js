@@ -41,15 +41,22 @@ function initSurvey(firstName, lastName, email, agentId, agentName,
 	this.agentId = agentId;
 	this.agentName = agentName;
 	customerEmail = email;
-	var payload = {
+	/*var payload = {
 		"agentId" : agentId,
 		"firstName" : firstName,
 		"lastName" : lastName,
 		"customerEmail" : email,
 		"g-recaptcha-response" : grecaptcharesponse,
 		"relationship" : relationship
-	};
-	$.ajax({
+	};*/
+	
+	
+	$('input[relationship]').val(relationship);
+	$('input[g-recaptcha-response]').val(grecaptcharesponse);
+	
+	$('#survey-request-form').submit();
+	
+	/*$.ajax({
 		url : window.location.origin + surveyUrl + "triggersurvey",
 		type : "GET",
 		dataType : "TEXT",
@@ -65,7 +72,7 @@ function initSurvey(firstName, lastName, email, agentId, agentName,
 			$('#overlay-toast').html(e.responseText);
 			showToast();
 		}
-	});
+	});*/
 }
 
 function initSurveyWithUrl(q) {

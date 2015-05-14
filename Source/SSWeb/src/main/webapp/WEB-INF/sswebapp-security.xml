@@ -36,6 +36,7 @@
 		<intercept-url pattern="/setnewpassword.do" access="permitAll" />
 		<intercept-url pattern="/resetPassword.do" access="permitAll" />
 		<intercept-url pattern="/showregistrationpage.do" access="permitAll" />
+		<intercept-url pattern="/resendRegistrationMail.do" access="permitAll" />
 
 		<intercept-url pattern="/testpage.do" access="permitAll" />	
 		<intercept-url pattern="/*.do" access="isAuthenticated()" />
