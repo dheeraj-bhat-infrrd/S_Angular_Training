@@ -278,6 +278,8 @@ public interface CommonConstants {
 	public static final int DEFAULT_REMINDERMAIL_INTERVAL = 3;
 	public static final String USER_SELECTION_TYPE_SINGLE = "single";
 	public static final String USER_SELECTION_TYPE_MULTIPLE = "multiple";
+	public static final String REVIEWS_SORT_CRITERIA_DATE = "date";
+	public static final String REVIEWS_SORT_CRITERIA_FEATURE = "feature";
 	
 	/**
 	 * Email templates config
