@@ -324,20 +324,24 @@ function bindAssignToSelectorClick(){
  * binds the check and uncheck of admin privileges checkbox
  */
 function bindAdminCheckBoxClick(){
-	$('.bd-check-img').click(function(e) {
+	$('.bd-check-img').unbind('click');
+	$('.bd-check-img').click(function(){
 		/* $(this).toggleClass('bd-check-img-checked');*/
 		/**
 		 * If class is "bd-check-img-checked", check box is unchecked ,
 		 * hence setting the hidden value as false
 		 */
 		 if($(this).hasClass('bd-check-img-checked') ){
+			$(this).removeClass('bd-check-img-checked');
 			$(this).next("#is-admin-chk").val("false");
 		 }
 		 else {
+			$(this).addClass('bd-check-img-checked');
 			$(this).next("#is-admin-chk").val("true");
 		 }
-   });
+	});
 }
+
 /**
  * Method to show/hide the other selectors based on the assign to option selected
  * @param assignToOption
