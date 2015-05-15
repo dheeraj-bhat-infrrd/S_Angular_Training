@@ -6,6 +6,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 import com.realtech.socialsurvey.core.entities.UsercountModificationNotification;
 import com.realtech.socialsurvey.core.exception.NonFatalException;
 
@@ -13,15 +15,16 @@ import com.realtech.socialsurvey.core.exception.NonFatalException;
  * Gets the list of users where number of user have been modified
  *
  */
+@Component("updatesubscriptionprice")
 public class UpdateSubscriptionPriceStarter {
 
 	public static final Logger LOG = LoggerFactory.getLogger(UpdateSubscriptionPriceStarter.class);
 	
-	public static void main(String[] args){
-		LOG.info("Fetching the comapnies who modified user count");
-		LOG.debug("Loading the application context");
-		ApplicationContext context = new ClassPathXmlApplicationContext("ss-starter-config.xml");
-		ReviseSubscriptionPrice batch = context.getBean(ReviseSubscriptionPrice.class);
+	@Autowired
+	private ReviseSubscriptionPrice batch;
+	
+	public void execute(){
+		LOG.info("ExecutingUpdateSubscriptionPriceStarter ");
 		List<UsercountModificationNotification> userModificatonRecords = batch.getCompaniesWithUserCountModified();
 		if(userModificatonRecords != null && !userModificatonRecords.isEmpty()){
 			LOG.debug("Found "+userModificatonRecords.size()+" to process");
@@ -40,7 +43,5 @@ public class UpdateSubscriptionPriceStarter {
 			LOG.info("No records to modify subscription price");
 		}
 		
-		// Closing the context
-		((ConfigurableApplicationContext) context).close();
 	}
 }

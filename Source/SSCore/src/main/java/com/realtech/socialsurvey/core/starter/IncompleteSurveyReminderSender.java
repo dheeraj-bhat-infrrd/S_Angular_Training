@@ -4,8 +4,10 @@ import java.util.ArrayList;
 import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
+import org.springframework.stereotype.Component;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.entities.AgentSettings;
 import com.realtech.socialsurvey.core.entities.Company;
@@ -19,10 +21,23 @@ import com.realtech.socialsurvey.core.services.organizationmanagement.Organizati
 import com.realtech.socialsurvey.core.services.organizationmanagement.UserManagementService;
 import com.realtech.socialsurvey.core.services.surveybuilder.SurveyHandler;
 
+@Component("incompletesurveyreminder")
 public class IncompleteSurveyReminderSender {
 
 	public static final Logger LOG = LoggerFactory.getLogger(IncompleteSurveyReminderSender.class);
-
+	
+	@Autowired
+	private SurveyHandler surveyHandler;
+	
+	@Autowired
+	private EmailServices emailServices;
+	
+	@Autowired
+	private UserManagementService userManagementService;
+	
+	@Autowired
+	private OrganizationManagementService organizationManagementService;
+	
 	public static void main(String[] args) {
 		@SuppressWarnings("resource") ApplicationContext context = new ClassPathXmlApplicationContext("ss-starter-config.xml");
 		SurveyHandler surveyHandler = (SurveyHandler) context.getBean("surveyHandler");
@@ -30,6 +45,27 @@ public class IncompleteSurveyReminderSender {
 		UserManagementService userManagementService = (UserManagementService) context.getBean("userManagementService");
 		OrganizationManagementService organizationManagementService = (OrganizationManagementService) context
 				.getBean("organizationManagementService");
+
+		for (Company company : organizationManagementService.getAllCompanies()) {
+			List<SurveyDetails> incompleteSurveyCustomers = surveyHandler.getIncompleteSurveyCustomersEmail(company.getCompanyId());
+			List<Long> agents = new ArrayList<>();
+			List<String> customers = new ArrayList<>();
+			for (SurveyDetails survey : incompleteSurveyCustomers) {
+				try {
+					sendEmail(emailServices, organizationManagementService, userManagementService, survey, company.getCompanyId());
+				}
+				catch (InvalidInputException e) {
+					e.printStackTrace();
+				}
+				agents.add(survey.getAgentId());
+				customers.add(survey.getCustomerEmail());
+			}
+			surveyHandler.updateReminderCount(agents, customers);
+		}
+	}
+	
+	public void execute(){
+		LOG.info("Executing IncompleteSurveyReminderSender");
 
 		for (Company company : organizationManagementService.getAllCompanies()) {
 			List<SurveyDetails> incompleteSurveyCustomers = surveyHandler.getIncompleteSurveyCustomersEmail(company.getCompanyId());
