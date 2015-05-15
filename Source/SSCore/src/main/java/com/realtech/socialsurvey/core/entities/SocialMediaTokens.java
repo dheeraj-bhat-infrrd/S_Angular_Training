@@ -6,7 +6,7 @@ public class SocialMediaTokens {
 	private TwitterToken twitterToken;
 	private LinkedInToken linkedInToken;
 	private YelpToken yelpToken;
-	private SocialProfileToken googleToken;
+	private GoogleToken googleToken;
 	private SocialProfileToken rssToken;
 
 	public FacebookToken getFacebookToken() {
@@ -41,11 +41,11 @@ public class SocialMediaTokens {
 		this.yelpToken = yelpToken;
 	}
 
-	public SocialProfileToken getGoogleToken() {
+	public GoogleToken getGoogleToken() {
 		return googleToken;
 	}
 
-	public void setGoogleToken(SocialProfileToken googleToken) {
+	public void setGoogleToken(GoogleToken googleToken) {
 		this.googleToken = googleToken;
 	}
 

@@ -286,4 +286,7 @@ public interface EmailServices {
 	
 	public void sendDefaultSurveyRestartMail(String recipientMailId, String displayName, String agentName, String link, String agentEmailId,
 			String agentSignature) throws InvalidInputException, UndeliveredEmailException;
+
+	public void sendSocialConnectMail(String recipientMailId, String displayName, String loginName, String account) throws InvalidInputException,
+			UndeliveredEmailException;
 }

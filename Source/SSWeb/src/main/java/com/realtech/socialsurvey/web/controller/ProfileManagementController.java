@@ -41,6 +41,7 @@ import com.realtech.socialsurvey.core.entities.ContactDetailsSettings;
 import com.realtech.socialsurvey.core.entities.ContactNumberSettings;
 import com.realtech.socialsurvey.core.entities.DisplayMessage;
 import com.realtech.socialsurvey.core.entities.FacebookToken;
+import com.realtech.socialsurvey.core.entities.GoogleToken;
 import com.realtech.socialsurvey.core.entities.Licenses;
 import com.realtech.socialsurvey.core.entities.LinkedInToken;
 import com.realtech.socialsurvey.core.entities.LockSettings;
@@ -51,7 +52,6 @@ import com.realtech.socialsurvey.core.entities.ProListUser;
 import com.realtech.socialsurvey.core.entities.Region;
 import com.realtech.socialsurvey.core.entities.SocialMediaTokens;
 import com.realtech.socialsurvey.core.entities.SocialPost;
-import com.realtech.socialsurvey.core.entities.SocialProfileToken;
 import com.realtech.socialsurvey.core.entities.SurveyDetails;
 import com.realtech.socialsurvey.core.entities.TwitterToken;
 import com.realtech.socialsurvey.core.entities.User;
@@ -2223,9 +2223,9 @@ public class ProfileManagementController {
 			socialMediaTokens = new SocialMediaTokens();
 		}
 		if (socialMediaTokens.getGoogleToken() == null) {
-			socialMediaTokens.setGoogleToken(new SocialProfileToken());
+			socialMediaTokens.setGoogleToken(new GoogleToken());
 		}
-		SocialProfileToken googleToken = socialMediaTokens.getGoogleToken();
+		GoogleToken googleToken = socialMediaTokens.getGoogleToken();
 		googleToken.setProfileLink(gplusLink);
 		socialMediaTokens.setGoogleToken(googleToken);
 		LOG.debug("Method updateGoogleToken() finished from ProfileManagementController");

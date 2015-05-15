@@ -5,6 +5,7 @@ import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationContext;
+import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 import org.springframework.transaction.annotation.Transactional;
 import com.realtech.socialsurvey.core.entities.User;
@@ -16,28 +17,26 @@ import com.realtech.socialsurvey.core.services.upload.CsvUploadService;
 
 @Transactional
 public class CsvUpload {
-	
+
 	public static final Logger LOG = LoggerFactory.getLogger(CsvUpload.class);
-	
-	public static void main(String[] args){
-		
+
+	public static void main(String[] args) {
+
 		LOG.info("Starting the csv uploader");
 		LOG.debug("Loading the application context");
 		ApplicationContext context = new ClassPathXmlApplicationContext("ss-starter-config.xml");
-				
+
 		CsvUploadService csvUploadService = context.getBean(CsvUploadService.class);
-			
+
 		User adminUser = csvUploadService.getUser(18153l);
 		adminUser.setCompanyAdmin(true);
-		
+
 		List<String> errorList = null;
-			
-			
 		Map<String, List<Object>> uploadObjects = csvUploadService.parseCsv("/Users/nishit/work/Social_Survey/testhierarchy.txt");
 		try {
 			errorList = csvUploadService.createAndReturnErrors(uploadObjects, adminUser);
-			
-			for(String error : errorList){
+
+			for (String error : errorList) {
 				LOG.info(error);
 			}
 			csvUploadService.postProcess(adminUser);
@@ -58,6 +57,8 @@ public class CsvUpload {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-	}
 
+		// Closing the context
+		((ConfigurableApplicationContext) context).close();
+	}
 }
