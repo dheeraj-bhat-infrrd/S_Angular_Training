@@ -310,20 +310,24 @@ public class SurveyManagementController {
 	public String triggerSurvey(Model model, HttpServletRequest request) {
 		LOG.info("Method to store initial details of customer and agent and to get questions of survey, triggerSurvey() started.");
 		
+		long agentId = 0;
+		String customerEmail;
+		String firstName;
+		String lastName;
+		String custRelationWithAgent;
+		String user = "";
+		String agentName;
+		user = request.getParameter(CommonConstants.AGENT_ID_COLUMN);
+		customerEmail = request.getParameter(CommonConstants.CUSTOMER_EMAIL_COLUMN);
+		firstName = request.getParameter("firstName");
+		lastName = request.getParameter("lastName");
+		agentName = request.getParameter("agentName");
+		//custRelationWithAgent = request.getParameter("relationship");
+		//TODO:remove customer relation with agent
+		custRelationWithAgent = "transacted";
 		try {
-			long agentId = 0;
-			String customerEmail;
-			String firstName;
-			String lastName;
-			String custRelationWithAgent;
-			
 			try {
-				String user = request.getParameter(CommonConstants.AGENT_ID_COLUMN);
 				agentId = Long.parseLong(user);
-				customerEmail = request.getParameter(CommonConstants.CUSTOMER_EMAIL_COLUMN);
-				firstName = request.getParameter("firstName");
-				lastName = request.getParameter("lastName");
-				custRelationWithAgent = request.getParameter("relationship");
 			}
 			catch (NumberFormatException e) {
 				LOG.error("NumberFormatException caught in triggerSurvey(). Details are " + e);
@@ -338,8 +342,8 @@ public class SurveyManagementController {
 					throw new InvalidInputException(errorMsg, DisplayMessageConstants.INVALID_CAPTCHA);
 				}
 			}
-			User user = userManagementService.getUserByUserId(agentId);
-			surveyHandler.sendSurveyInvitationMail(firstName, lastName, customerEmail, custRelationWithAgent, user, false);
+			User userObj = userManagementService.getUserByUserId(agentId);
+			surveyHandler.sendSurveyInvitationMail(firstName, lastName, customerEmail, custRelationWithAgent, userObj, false);
 			model.addAttribute("agentId", agentId);
 			model.addAttribute("firstName", firstName);
 			model.addAttribute("lastName", lastName);
@@ -349,6 +353,12 @@ public class SurveyManagementController {
 		}
 		catch (NonFatalException e) {
 			LOG.error("Exception caught in getSurvey() method of SurveyManagementController.");
+			model.addAttribute("agentId", agentId);
+ 			model.addAttribute("agentName", agentName);
+			model.addAttribute("firstName", firstName);
+			model.addAttribute("lastName", lastName);
+			model.addAttribute("customerEmail", customerEmail);
+			model.addAttribute("relation", custRelationWithAgent);
 			return JspResolver.SHOW_SURVEY_QUESTIONS;
 		}
 		LOG.info("Method to store initial details of customer and agent and to get questions of survey, triggerSurvey() started.");

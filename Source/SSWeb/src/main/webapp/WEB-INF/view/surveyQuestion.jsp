@@ -80,7 +80,7 @@
 			<div class="sq-ques-wrapper">
 				<div id="agnt-img" class="sq-top-img"></div>
 				<div data-ques-type="user-details" class="sq-quest-item hide">
-					<!-- <div id="agnt-img" class="sq-top-img"></div> -->
+					<!-- <div id="agnt-img" cust-agnt-rel class="sq-top-img"></div> -->
 					<!-- <div class="sq-main-txt">Survey Question</div> -->
 					<div class="sq-ques">
 						<i><span class="sq-ques-txt"><spring:message code="label.surveyquestion.header.key" /><br><span class="semibold">${agentName}</span></span></i>
@@ -94,27 +94,30 @@
 									<div class="sq-i-lbl float-left">First Name</div>
 									<div class="sq-i-txt float-left">
 										<div class="hide sq-img-adj icn-fname"></div>
-										<input id="firstName" class="sq-i-txt-fld" name="firstName">
+										<input id="firstName" class="sq-i-txt-fld" name="firstName" value="${firstName }">
 									</div>
 								</div>
 								<div class="clearfix sq-info-wrapper">
 									<div class="sq-i-lbl float-left">Last Name</div>
 									<div class="sq-i-txt float-left">
 										<div class="hide sq-img-adj icn-lname"></div>
-										<input id="lastName" class="sq-i-txt-fld" name="lastName">
+										<input id="lastName" class="sq-i-txt-fld" name="lastName" value="${lastName }">
 									</div>
 								</div>
 								<div class="clearfix sq-info-wrapper">
 									<div class="sq-i-lbl float-left">Email</div>
 									<div class="sq-i-txt float-left">
 										<div class="hide sq-img-adj icn-email"></div>
-										<input id="email" class="sq-i-txt-fld" name="customerEmail">
+										<input id="email" class="sq-i-txt-fld" name="customerEmail" value="${customerEmail}">
 									</div>
 								</div>
 								<div class="clearfix sq-info-wrapper">
-									<div class="sq-i-lbl float-left">I</div>
+									<div class="sq-i-lbl float-left">
+										<div id="cust-agent-verify" class="bd-check-img bd-check-img-checked float-right sq-checkbox"></div>
+									</div>
 									<div class="sq-i-txt float-left">
-										<select id="cust-agnt-rel" class="sq-i-txt-fld"></select>
+										<div class="sq-i-check-txt">I verify that I have done business with ${agentName}</div>
+										<!-- <select id="cust-agnt-rel" class="sq-i-txt-fld"></select> -->
 									</div>
 								</div>
 								<div class="clearfix reg-captcha-wrapper reg-item reg-cap-nw-adj">
@@ -141,6 +144,7 @@
 								 -->
 								 <div style="display: none">
 								 	<input type="hidden" name="agentId" value="${agentId}">
+								 	<input type="hidden" name="agentName" value="${agentName}">
 								 	<input type="hidden" name="relationship">
 								 	<input type="hidden" name="g-recaptcha-response">
 								 </div>
@@ -411,7 +415,7 @@ $(document).ready(function() {
 		$("div[data-ques-type='user-details']").show();
 		loadAgentPic(agentId);
 		
-		$("#cust-agnt-rel").html(paintListOptions($('#prof-container').attr("data-agentName")));
+		/* $("#cust-agnt-rel").html(paintListOptions($('#prof-container').attr("data-agentName"))); */
 	}
 	var survQuesNo = 1;
 	var nextQ, prevQ;
@@ -475,6 +479,14 @@ $(document).ready(function() {
 			$('.reg-cap-txt').css('max-width', offset + 'px');
 		}
 	}
+	
+	$('#cust-agent-verify').on('click',function(){
+		if($(this).hasClass('bd-check-img-checked')){
+			$(this).removeClass('bd-check-img-checked');
+		}else{
+			$(this).addClass('bd-check-img-checked');
+		}
+	});
 });
 </script>
 <jsp:include page="footer.jsp" />
