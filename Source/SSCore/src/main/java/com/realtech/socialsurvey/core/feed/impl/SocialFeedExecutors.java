@@ -18,12 +18,13 @@ import com.realtech.socialsurvey.core.exception.NoContextFoundException;
 public class SocialFeedExecutors implements InitializingBean {
 
 	private static final Logger LOG = LoggerFactory.getLogger(SocialFeedExecutors.class);
-
-	private int numOfThreads = 10;
+	private static final int numOfThreads = 10;
+	
 	private ApplicationContext context;
-	private ExecutorService twitterExecutor;
 	private ExecutorService facebookExecutor;
 	private ExecutorService googleExecutor;
+	private ExecutorService linkedInExecutor;
+	private ExecutorService twitterExecutor;
 
 	public void setContext(ApplicationContext context) {
 		this.context = context;
@@ -32,23 +33,11 @@ public class SocialFeedExecutors implements InitializingBean {
 	@Override
 	public void afterPropertiesSet() throws Exception {
 		LOG.info("Creating executors for social feed");
-		twitterExecutor = Executors.newFixedThreadPool(numOfThreads);
 		facebookExecutor = Executors.newFixedThreadPool(numOfThreads);
 		googleExecutor = Executors.newFixedThreadPool(numOfThreads);
+		linkedInExecutor = Executors.newFixedThreadPool(numOfThreads);
+		twitterExecutor = Executors.newFixedThreadPool(numOfThreads);
 		LOG.info("Done Creating executors for social feed");
-	}
-
-	public void addTwitterProcessorToPool(FeedIngestionEntity ingestionEntity, String collectionName) throws NoContextFoundException {
-		LOG.info("Adding twitter details to pool");
-		if (context == null) {
-			throw new NoContextFoundException("No Application context found");
-		}
-
-		TwitterFeedIngester twitterFeedIngester = context.getBean(TwitterFeedIngester.class);
-		twitterFeedIngester.setCollectionName(collectionName);
-		twitterFeedIngester.setIden(ingestionEntity.getIden());
-		twitterFeedIngester.setToken(ingestionEntity.getSocialMediaTokens().getTwitterToken());
-		twitterExecutor.execute(twitterFeedIngester);
 	}
 
 	public void addFacebookProcessorToPool(FeedIngestionEntity ingestionEntity, String collectionName) throws NoContextFoundException {
@@ -76,16 +65,40 @@ public class SocialFeedExecutors implements InitializingBean {
 		googleExecutor.execute(googleFeedIngester);
 	}
 
+	public void addLinkedInProcessorToPool(FeedIngestionEntity ingestionEntity, String collectionName) throws NoContextFoundException {
+		LOG.info("Adding linkedin details to pool");
+		if (context == null) {
+			throw new NoContextFoundException("No Application context found");
+		}
+
+		// TODO
+	}
+
+	public void addTwitterProcessorToPool(FeedIngestionEntity ingestionEntity, String collectionName) throws NoContextFoundException {
+		LOG.info("Adding twitter details to pool");
+		if (context == null) {
+			throw new NoContextFoundException("No Application context found");
+		}
+
+		TwitterFeedIngester twitterFeedIngester = context.getBean(TwitterFeedIngester.class);
+		twitterFeedIngester.setCollectionName(collectionName);
+		twitterFeedIngester.setIden(ingestionEntity.getIden());
+		twitterFeedIngester.setToken(ingestionEntity.getSocialMediaTokens().getTwitterToken());
+		twitterExecutor.execute(twitterFeedIngester);
+	}
+
 	public void shutDownExecutors() {
 		LOG.debug("Shutting down executors.");
-		twitterExecutor.shutdown();
 		facebookExecutor.shutdown();
 		googleExecutor.shutdown();
+		linkedInExecutor.shutdown();
+		twitterExecutor.shutdown();
 
 		try {
-			twitterExecutor.awaitTermination(Long.MAX_VALUE, TimeUnit.NANOSECONDS);
 			facebookExecutor.awaitTermination(Long.MAX_VALUE, TimeUnit.NANOSECONDS);
 			googleExecutor.awaitTermination(Long.MAX_VALUE, TimeUnit.NANOSECONDS);
+			linkedInExecutor.awaitTermination(Long.MAX_VALUE, TimeUnit.NANOSECONDS);
+			twitterExecutor.awaitTermination(Long.MAX_VALUE, TimeUnit.NANOSECONDS);
 		}
 		catch (InterruptedException e) {
 			e.printStackTrace();
@@ -95,14 +108,16 @@ public class SocialFeedExecutors implements InitializingBean {
 
 	public void shutDownExecutorsNow() {
 		LOG.debug("Shutting down executors Now.");
-		twitterExecutor.shutdownNow();
 		facebookExecutor.shutdownNow();
 		googleExecutor.shutdownNow();
+		linkedInExecutor.shutdownNow();
+		twitterExecutor.shutdownNow();
 
 		try {
-			twitterExecutor.awaitTermination(Long.MAX_VALUE, TimeUnit.NANOSECONDS);
 			facebookExecutor.awaitTermination(Long.MAX_VALUE, TimeUnit.NANOSECONDS);
 			googleExecutor.awaitTermination(Long.MAX_VALUE, TimeUnit.NANOSECONDS);
+			linkedInExecutor.awaitTermination(Long.MAX_VALUE, TimeUnit.NANOSECONDS);
+			twitterExecutor.awaitTermination(Long.MAX_VALUE, TimeUnit.NANOSECONDS);
 		}
 		catch (InterruptedException e) {
 			e.printStackTrace();
