@@ -108,8 +108,7 @@ public class SocialFeedIngestionKickStarter {
 
 				// check for linkedin entry
 				if (token.getLinkedInToken() != null) {
-					LOG.info("Processing linkedin posts for " + collectionName + " with iden: " + ingestionEntity.getIden());
-					executors.addLinkedInProcessorToPool(ingestionEntity, collectionName);
+					// TODO
 				}
 				else {
 					LOG.warn("No linkedin token found for " + collectionName + " with iden: " + ingestionEntity.getIden());

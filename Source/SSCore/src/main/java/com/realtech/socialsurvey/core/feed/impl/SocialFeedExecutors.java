@@ -23,7 +23,6 @@ public class SocialFeedExecutors implements InitializingBean {
 	private ApplicationContext context;
 	private ExecutorService facebookExecutor;
 	private ExecutorService googleExecutor;
-	private ExecutorService linkedInExecutor;
 	private ExecutorService twitterExecutor;
 
 	public void setContext(ApplicationContext context) {
@@ -35,7 +34,6 @@ public class SocialFeedExecutors implements InitializingBean {
 		LOG.info("Creating executors for social feed");
 		facebookExecutor = Executors.newFixedThreadPool(numOfThreads);
 		googleExecutor = Executors.newFixedThreadPool(numOfThreads);
-		linkedInExecutor = Executors.newFixedThreadPool(numOfThreads);
 		twitterExecutor = Executors.newFixedThreadPool(numOfThreads);
 		LOG.info("Done Creating executors for social feed");
 	}
@@ -65,15 +63,6 @@ public class SocialFeedExecutors implements InitializingBean {
 		googleExecutor.execute(googleFeedIngester);
 	}
 
-	public void addLinkedInProcessorToPool(FeedIngestionEntity ingestionEntity, String collectionName) throws NoContextFoundException {
-		LOG.info("Adding linkedin details to pool");
-		if (context == null) {
-			throw new NoContextFoundException("No Application context found");
-		}
-
-		// TODO
-	}
-
 	public void addTwitterProcessorToPool(FeedIngestionEntity ingestionEntity, String collectionName) throws NoContextFoundException {
 		LOG.info("Adding twitter details to pool");
 		if (context == null) {
@@ -91,13 +80,11 @@ public class SocialFeedExecutors implements InitializingBean {
 		LOG.debug("Shutting down executors.");
 		facebookExecutor.shutdown();
 		googleExecutor.shutdown();
-		linkedInExecutor.shutdown();
 		twitterExecutor.shutdown();
 
 		try {
 			facebookExecutor.awaitTermination(Long.MAX_VALUE, TimeUnit.NANOSECONDS);
 			googleExecutor.awaitTermination(Long.MAX_VALUE, TimeUnit.NANOSECONDS);
-			linkedInExecutor.awaitTermination(Long.MAX_VALUE, TimeUnit.NANOSECONDS);
 			twitterExecutor.awaitTermination(Long.MAX_VALUE, TimeUnit.NANOSECONDS);
 		}
 		catch (InterruptedException e) {
@@ -110,13 +97,11 @@ public class SocialFeedExecutors implements InitializingBean {
 		LOG.debug("Shutting down executors Now.");
 		facebookExecutor.shutdownNow();
 		googleExecutor.shutdownNow();
-		linkedInExecutor.shutdownNow();
 		twitterExecutor.shutdownNow();
 
 		try {
 			facebookExecutor.awaitTermination(Long.MAX_VALUE, TimeUnit.NANOSECONDS);
 			googleExecutor.awaitTermination(Long.MAX_VALUE, TimeUnit.NANOSECONDS);
-			linkedInExecutor.awaitTermination(Long.MAX_VALUE, TimeUnit.NANOSECONDS);
 			twitterExecutor.awaitTermination(Long.MAX_VALUE, TimeUnit.NANOSECONDS);
 		}
 		catch (InterruptedException e) {
