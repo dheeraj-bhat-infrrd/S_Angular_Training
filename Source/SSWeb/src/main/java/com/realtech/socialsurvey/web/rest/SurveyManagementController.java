@@ -197,12 +197,12 @@ public class SurveyManagementController {
 				
 				if (enableKafka.equals(CommonConstants.YES)) {
 					for (Entry<String, String> admin : emailIdsToSendMail.entrySet()) {
-						emailServices.queueSurveyCompletionMailToAdminsAndAgent(admin.getValue(), admin.getKey(), surveyDetail);
+						emailServices.queueSurveyCompletionMailToAdminsAndAgent(admin.getValue(), admin.getKey(), surveyDetail, customerName);
 					}
 				}
 				else {
 					for (Entry<String, String> admin : emailIdsToSendMail.entrySet()) {
-						emailServices.sendSurveyCompletionMailToAdminsAndAgent(admin.getValue(), admin.getKey(), surveyDetail);
+						emailServices.sendSurveyCompletionMailToAdminsAndAgent(admin.getValue(), admin.getKey(), surveyDetail, customerName);
 					}
 				}
 			}

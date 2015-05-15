@@ -420,7 +420,7 @@ public class EmailServicesImpl implements EmailServices {
 		FileContentReplacements fileContentReplacements = new FileContentReplacements();
 		fileContentReplacements.setFileName(EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER + EmailTemplateConstants.VERIFICATION_MAIL_BODY);
 		fileContentReplacements.setReplacementArgs(Arrays.asList(appLogoUrl, recipientName, recipientName, url, url, url, appBaseUrl, profileName,
-				appBaseUrl, profileName, loginName, appBaseUrl));
+				appBaseUrl, profileName, loginName, appBaseUrl, appBaseUrl));
 
 		// sending email
 		LOG.debug("Calling email sender to send verification mail");
@@ -915,7 +915,8 @@ public class EmailServicesImpl implements EmailServices {
 
 	@Async
 	@Override
-	public void queueSurveyCompletionMailToAdminsAndAgent(String recipientName, String recipientMailId, String surveyDetail) throws InvalidInputException {
+	public void queueSurveyCompletionMailToAdminsAndAgent(String recipientName, String recipientMailId, String surveyDetail, String customerName)
+			throws InvalidInputException {
 		if (recipientMailId == null || recipientMailId.isEmpty()) {
 			LOG.error("Recipient email Id is empty or null for sending survey completion mail ");
 			throw new InvalidInputException("Recipient email Id is empty or null for sending survey completion mail ");
@@ -933,6 +934,7 @@ public class EmailServicesImpl implements EmailServices {
 		contentBuilder.append(CommonConstants.ELEMENTS_DELIMITER).append(CommonConstants.LOGINNAME_MARKER).append(recipientMailId);
 		contentBuilder.append(CommonConstants.ELEMENTS_DELIMITER).append(CommonConstants.SURVEYDETAIL_MARKER).append(surveyDetail);
 		contentBuilder.append(CommonConstants.ELEMENTS_DELIMITER).append(CommonConstants.RECIPIENT_NAME_MARKER).append(recipientName);
+		contentBuilder.append(CommonConstants.ELEMENTS_DELIMITER).append(CommonConstants.CUSTOMER_NAME_MARKER).append(customerName);
 
 		LOG.debug("queueing content: " + contentBuilder.toString());
 		queueProducer.queueEmail(EmailHeader.SURVEY_COMPLETION_ADMIN, contentBuilder.toString());
@@ -941,7 +943,8 @@ public class EmailServicesImpl implements EmailServices {
 
 	@Async
 	@Override
-	public void sendSurveyCompletionMailToAdminsAndAgent(String recipientName, String recipientMailId, String surveyDetail) throws InvalidInputException, UndeliveredEmailException {
+	public void sendSurveyCompletionMailToAdminsAndAgent(String recipientName, String recipientMailId, String surveyDetail, String customerName)
+			throws InvalidInputException, UndeliveredEmailException {
 		if (recipientMailId == null || recipientMailId.isEmpty()) {
 			LOG.error("Recipient email Id is empty or null for sending survey completion mail ");
 			throw new InvalidInputException("Recipient email Id is empty or null for sending survey completion mail ");
@@ -953,7 +956,10 @@ public class EmailServicesImpl implements EmailServices {
 
 		LOG.info("Sending survey completion email to : " + recipientMailId);
 		EmailEntity emailEntity = prepareEmailEntityForSendingEmail(recipientMailId);
-		String subjectFileName = EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER + EmailTemplateConstants.SURVEY_COMPLETION_ADMINS_MAIL_SUBJECT;
+		
+		FileContentReplacements subjectReplacements = new FileContentReplacements();
+		subjectReplacements.setFileName(EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER + EmailTemplateConstants.SURVEY_COMPLETION_ADMINS_MAIL_SUBJECT);
+		subjectReplacements.setReplacementArgs(Arrays.asList(customerName));
 
 		FileContentReplacements messageBodyReplacements = new FileContentReplacements();
 		messageBodyReplacements
@@ -961,7 +967,7 @@ public class EmailServicesImpl implements EmailServices {
 		messageBodyReplacements.setReplacementArgs(Arrays.asList(appLogoUrl, recipientName, recipientMailId, surveyDetail));
 
 		LOG.debug("Calling email sender to send mail");
-		emailSender.sendEmailWithBodyReplacements(emailEntity, subjectFileName, messageBodyReplacements);
+		emailSender.sendEmailWithSubjectAndBodyReplacements(emailEntity, subjectReplacements, messageBodyReplacements);
 		LOG.info("Successfully sent survey completion mail");
 	}
 
