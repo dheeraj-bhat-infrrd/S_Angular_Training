@@ -3781,7 +3781,7 @@ button.paypal.is-active {
 }
 
 .dsh-star-wrapper {
-	width: 360px;
+	width: 230px;
 	margin: 25px auto;
 }
 
@@ -3812,18 +3812,18 @@ button.paypal.is-active {
 	text-align: center;
 	color: #fff;
 	border-radius: 3px;
-	margin: 5px 0 5px 5px;
+	margin: 5px 0;
 	font-size: 18px;
 	font-family: 'opensanssemibold';
 	cursor: pointer;
 }
 
-.dsh-btn-complete:hover {
-	background-color: #7AB400 !important;
+.dsh-btn-orange {
+    background: rgb(233, 127, 48);
 }
 
-.dsh-btn-complete:active {
-	background-color: #70A501 !important;
+.dsh-btn-green {
+    background: rgb(122, 180, 0);
 }
 
 .dsh-txt-2,.dsh-txt-3 {
