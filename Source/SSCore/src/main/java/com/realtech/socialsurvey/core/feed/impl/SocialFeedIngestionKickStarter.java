@@ -53,14 +53,12 @@ public class SocialFeedIngestionKickStarter {
 	@Transactional
 	public void startFeedIngestion(String collectionName) {
 		LOG.info("Kick starting company feed ingestion");
-		LOG.debug("Getting a list of companies with access tokens");
 		List<FeedIngestionEntity> tokens = null;
 		int currentBatch = 0;
 
+		LOG.debug("Getting a list of entities with access tokens");
 		do {
-			// get a list of records in batches
 			tokens = settingsDao.fetchSocialMediaTokens(collectionName, currentBatch, BATCH_SIZE);
-
 			if (tokens == null || tokens.size() == 0) {
 				LOG.debug("No more tokens for " + collectionName);
 				break;
@@ -89,7 +87,7 @@ public class SocialFeedIngestionKickStarter {
 			LOG.debug("Starting to fetch the feed.");
 
 			try {
-				// check for individual social media entry
+				// check for facebook entry
 				SocialMediaTokens token = ingestionEntity.getSocialMediaTokens();
 				if (token.getFacebookToken() != null) {
 					LOG.info("Processing facebook posts for " + collectionName + " with iden: " + ingestionEntity.getIden());
@@ -99,13 +97,33 @@ public class SocialFeedIngestionKickStarter {
 					LOG.warn("No facebook token found for " + collectionName + " with iden: " + ingestionEntity.getIden());
 				}
 
+				// check for google entry
 				if (token.getGoogleToken() != null) {
+					LOG.info("Processing google plus activities for " + collectionName + " with iden: " + ingestionEntity.getIden());
 					executors.addGoogleProcessorToPool(ingestionEntity, collectionName);
 				}
 				else {
 					LOG.warn("No google+ token found for " + collectionName + " with iden: " + ingestionEntity.getIden());
 				}
 
+				// check for linkedin entry
+				if (token.getLinkedInToken() != null) {
+					LOG.info("Processing linkedin posts for " + collectionName + " with iden: " + ingestionEntity.getIden());
+					executors.addLinkedInProcessorToPool(ingestionEntity, collectionName);
+				}
+				else {
+					LOG.warn("No linkedin token found for " + collectionName + " with iden: " + ingestionEntity.getIden());
+				}
+
+				// check for rss entry
+				if (token.getRssToken() != null) {
+					// TODO
+				}
+				else {
+					LOG.warn("No rss token found for " + collectionName + " with iden: " + ingestionEntity.getIden());
+				}
+				
+				// check for twitter entry
 				if (token.getTwitterToken() != null) {
 					LOG.info("Processing twitter tweets for " + collectionName + " with iden: " + ingestionEntity.getIden());
 					executors.addTwitterProcessorToPool(ingestionEntity, collectionName);
@@ -114,22 +132,9 @@ public class SocialFeedIngestionKickStarter {
 					LOG.warn("No twitter token found for " + collectionName + " with iden: " + ingestionEntity.getIden());
 				}
 				
-				if (token.getLinkedInToken() != null) {
-					// TODO: process linkedin token
-				}
-				else {
-					LOG.warn("No linkedin token found for " + collectionName + " with iden: " + ingestionEntity.getIden());
-				}
-
-				if (token.getRssToken() != null) {
-					// TODO: process rss token
-				}
-				else {
-					LOG.warn("No rss token found for " + collectionName + " with iden: " + ingestionEntity.getIden());
-				}
-
+				// check for yelp entry
 				if (token.getYelpToken() != null) {
-					// TODO: process yelp token
+					// TODO
 				}
 				else {
 					LOG.warn("No yelp token found for " + collectionName + " with iden: " + ingestionEntity.getIden());
