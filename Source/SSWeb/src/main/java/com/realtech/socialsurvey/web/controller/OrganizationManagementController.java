@@ -422,9 +422,25 @@ public class OrganizationManagementController {
 		if (profileMasterId == CommonConstants.PROFILES_MASTER_COMPANY_ADMIN_PROFILE_ID
 				|| accountMasterId == CommonConstants.ACCOUNTS_MASTER_INDIVIDUAL) {
 			unitSettings = userSettings.getCompanySettings();
+			if(unitSettings != null && unitSettings.getSocialMediaTokens() != null && 
+					unitSettings.getSocialMediaTokens().getFacebookToken()!= null && 
+					unitSettings.getSocialMediaTokens().getFacebookToken().getFacebookPageLink() != null){
+				model.addAttribute("facebookLink", unitSettings.getSocialMediaTokens().getFacebookToken().getFacebookPageLink());
+			}
+			else{
+				model.addAttribute("facebookLink", "");
+			}
 		}
 		else if (profileMasterId == CommonConstants.PROFILES_MASTER_REGION_ADMIN_PROFILE_ID) {
 			unitSettings = userSettings.getRegionSettings().get(selectedProfile.getRegionId());
+			if(unitSettings != null && unitSettings.getSocialMediaTokens() != null && 
+					unitSettings.getSocialMediaTokens().getTwitterToken()!= null && 
+					unitSettings.getSocialMediaTokens().getTwitterToken().getTwitterPageLink() != null){
+				model.addAttribute("twitterLink", unitSettings.getSocialMediaTokens().getTwitterToken().getTwitterPageLink());
+			}
+			else{
+				model.addAttribute("twitterLink", "");
+			}
 		}
 		else if (profileMasterId == CommonConstants.PROFILES_MASTER_BRANCH_ADMIN_PROFILE_ID) {
 			unitSettings = userSettings.getBranchSettings().get(selectedProfile.getBranchId());
@@ -432,6 +448,32 @@ public class OrganizationManagementController {
 		else if (profileMasterId == CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID) {
 			unitSettings = userSettings.getAgentSettings();
 		}
+		
+		model.addAttribute("facebookLink", "");
+		model.addAttribute("twitterLink", "");
+		model.addAttribute("linkedinLink", "");
+		model.addAttribute("googleLink", "");
+		
+		if(unitSettings != null && unitSettings.getSocialMediaTokens() != null) {
+			
+			if( unitSettings.getSocialMediaTokens().getFacebookToken()!= null && 
+					unitSettings.getSocialMediaTokens().getFacebookToken().getFacebookPageLink() != null){
+				model.addAttribute("facebookLink", unitSettings.getSocialMediaTokens().getFacebookToken().getFacebookPageLink());
+			}
+			if( unitSettings.getSocialMediaTokens().getTwitterToken()!= null && 
+					unitSettings.getSocialMediaTokens().getTwitterToken().getTwitterPageLink() != null){
+				model.addAttribute("twitterLink", unitSettings.getSocialMediaTokens().getTwitterToken().getTwitterPageLink());
+			}
+			if( unitSettings.getSocialMediaTokens().getLinkedInToken()!= null && 
+					unitSettings.getSocialMediaTokens().getLinkedInToken().getLinkedInPageLink() != null){
+				model.addAttribute("linkedinLink", unitSettings.getSocialMediaTokens().getLinkedInToken().getLinkedInPageLink());
+			}
+			if( unitSettings.getSocialMediaTokens().getGoogleToken()!= null && 
+					unitSettings.getSocialMediaTokens().getGoogleToken().getProfileLink() != null){
+				model.addAttribute("googleLink", unitSettings.getSocialMediaTokens().getGoogleToken().getProfileLink());
+			}
+		}
+		
 		
 		session.setAttribute(CommonConstants.USER_ACCOUNT_SETTINGS, unitSettings);
 		return JspResolver.EDIT_SETTINGS;
