@@ -71,12 +71,12 @@ public class TwitterFeedProcessorImpl implements SocialNetworkDataProcessor<Stat
 
 	@Override
 	@Transactional
-	public void preProcess(long iden, String organizationUnit, TwitterToken token) {
+	public void preProcess(long iden, String collection, TwitterToken token) {
 		List<FeedStatus> statuses = null;
 		Map<String, Object> queries = new HashMap<>();
 		queries.put(CommonConstants.FEED_SOURCE_COLUMN, FEED_SOURCE);
 
-		switch (organizationUnit) {
+		switch (collection) {
 			case MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION:
 				queries.put(CommonConstants.COMPANY_ID_COLUMN, iden);
 
@@ -154,8 +154,8 @@ public class TwitterFeedProcessorImpl implements SocialNetworkDataProcessor<Stat
 
 	@Override
 	@Transactional
-	public List<Status> fetchFeed(long iden, String organizationUnit, TwitterToken token) throws NonFatalException {
-		LOG.info("Getting tweets for " + organizationUnit + " with id: " + iden);
+	public List<Status> fetchFeed(long iden, String collection, TwitterToken token) throws NonFatalException {
+		LOG.info("Getting tweets for " + collection + " with id: " + iden);
 
 		// Settings Consumer and Access Tokens
 		Twitter twitter = new TwitterFactory().getInstance();
@@ -188,7 +188,7 @@ public class TwitterFeedProcessorImpl implements SocialNetworkDataProcessor<Stat
 			
 			// sending reminder mail and increasing counter
 			if (status.getRemindersSent() < socialConnectThreshold) {
-				OrganizationUnitSettings unitSettings = settingsDao.fetchOrganizationUnitSettingsById(iden, organizationUnit);
+				OrganizationUnitSettings unitSettings = settingsDao.fetchOrganizationUnitSettingsById(iden, collection);
 				
 				String userEmail = unitSettings.getContact_details().getMail_ids().getWork();
 				emailServices.sendSocialConnectMail(userEmail, unitSettings.getContact_details().getName(), userEmail, FEED_SOURCE);
@@ -202,8 +202,8 @@ public class TwitterFeedProcessorImpl implements SocialNetworkDataProcessor<Stat
 	}
 
 	@Override
-	public void processFeed(List<Status> tweets, String organizationUnit) throws NonFatalException {
-		LOG.info("Process tweets for organizationUnit " + organizationUnit);
+	public void processFeed(List<Status> tweets, String collection) throws NonFatalException {
+		LOG.info("Process tweets for organizationUnit " + collection);
 
 		Collections.sort(tweets, new TwitterStatusTimeComparator());
 		TwitterSocialPost post;
@@ -216,7 +216,7 @@ public class TwitterFeedProcessorImpl implements SocialNetworkDataProcessor<Stat
 			post.setPostedBy(tweet.getUser().getName());
 			post.setTimeInMillis(tweet.getCreatedAt().getTime());
 
-			switch (organizationUnit) {
+			switch (collection) {
 				case MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION:
 					post.setCompanyId(profileId);
 					break;
@@ -245,7 +245,7 @@ public class TwitterFeedProcessorImpl implements SocialNetworkDataProcessor<Stat
 
 	@Override
 	@Transactional
-	public void postProcess(long iden, String organizationUnit) throws NonFatalException {
+	public void postProcess(long iden, String collection) throws NonFatalException {
 		status.setLastFetchedTill(lastFetchedTill);
 		status.setLastFetchedPostId(lastFetchedPostId);
 
