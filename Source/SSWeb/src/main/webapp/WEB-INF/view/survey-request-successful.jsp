@@ -8,7 +8,7 @@
 <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title><spring:message
-		code="label.completeregistration.title.key" /></title>
+		code="label.surveyrequestsuccessful.title.key" /></title>
 <link rel="shortcut icon"
 	href="${pageContext.request.contextPath}/favicon.ico" sizes="16x16">
 <link rel="stylesheet"
@@ -49,7 +49,7 @@
 		<div class="container">
 			<div class="hm-header-row hm-header-row-main clearfix">
 				<div class="hm-header-row-left text-center">
-					<spring:message code="label.completeregistration.title.key" />
+					<spring:message code="label.surveyrequestsuccessful.title.key" />
 				</div>
 			</div>
 		</div>
