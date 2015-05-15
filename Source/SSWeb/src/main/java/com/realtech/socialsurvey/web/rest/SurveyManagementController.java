@@ -232,17 +232,7 @@ public class SurveyManagementController {
 		}
 		surveyDetail.append("<br />");
 		surveyDetail.append("<br />").append("Customer Comments: ").append(survey.getReview());
-		
-		surveyDetail.append("<br />").append("Overall Experience: ");
-		if (mood.equalsIgnoreCase(CommonConstants.SURVEY_CUSTOMER_MOOD_HAPPY)) {
-			surveyDetail.append(CommonConstants.SURVEY_CUSTOMER_MOOD_GREAT);
-		}
-		else if (mood.equalsIgnoreCase(CommonConstants.SURVEY_CUSTOMER_MOOD_NEUTRAL)) {
-			surveyDetail.append(CommonConstants.SURVEY_CUSTOMER_MOOD_JUSTOK);
-		}
-		else if (mood.equalsIgnoreCase(CommonConstants.SURVEY_CUSTOMER_MOOD_SAD)) {
-			surveyDetail.append(CommonConstants.SURVEY_CUSTOMER_MOOD_UNPLEASANT);
-		}
+		surveyDetail.append("<br />").append("Overall Experience: ").append(mood);
 		
 		if (survey.getSharedOn() != null && !survey.getSharedOn().isEmpty()) {
 			surveyDetail.append("<br />").append("Share Checkbox: ").append("Yes");

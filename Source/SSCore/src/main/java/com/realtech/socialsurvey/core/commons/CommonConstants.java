@@ -388,13 +388,7 @@ public interface CommonConstants {
 	public static final int QUESTION_RATING_VALUE_TRUE = 1;
 	public static final int QUESTION_RATING_VALUE_FALSE = 0;
 	public static final int SURVEY_STAGE_COMPLETE = -1;
-	public static final String SURVEY_CUSTOMER_MOOD_HAPPY = "happy";
-	public static final String SURVEY_CUSTOMER_MOOD_NEUTRAL = "neutral";
 	public static final String SURVEY_CUSTOMER_MOOD_SAD = "sad";
-
-	public static final String SURVEY_CUSTOMER_MOOD_GREAT = "GREAT";
-	public static final String SURVEY_CUSTOMER_MOOD_JUSTOK = "JUST OK";
-	public static final String SURVEY_CUSTOMER_MOOD_UNPLEASANT = "UNPLEASANT";
 	
 	/**
 	 * Error codes
