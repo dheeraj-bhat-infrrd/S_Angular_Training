@@ -389,7 +389,7 @@ public interface CommonConstants {
 	public static final int QUESTION_RATING_VALUE_FALSE = 0;
 	public static final int SURVEY_STAGE_COMPLETE = -1;
 	public static final String SURVEY_CUSTOMER_MOOD_SAD = "sad";
-
+	
 	/**
 	 * Error codes
 	 */
@@ -533,4 +533,6 @@ public interface CommonConstants {
 	public static final String PROFILENAME_MARKER = "PROFILENAME^^";
 	public static final String SURVEYDETAIL_MARKER = "SURVEYDETAIL^^";
 	public static final String RECIPIENT_NAME_MARKER = "RECIPIENTNAME^^";
+	public static final String CUSTOMER_NAME_MARKER = "CUSTOMERNAME^^";
+	public static final String AGENTEMAIL_MARKER = "AGENTEMAIL^^";
 }

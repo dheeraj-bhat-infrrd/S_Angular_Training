@@ -185,24 +185,24 @@ public class SurveyManagementController {
 					customerName = survey.getCustomerFirstName() + " " + survey.getCustomerLastName();
 				}
 				
+				String agentEmail = userManagementService.getUserByUserId(agentId).getEmailId();
 				if (enableKafka.equals(CommonConstants.YES)) {
-					emailServices.queueSurveyCompletionMail(customerEmail, customerName, survey.getAgentName());
+					emailServices.queueSurveyCompletionMail(customerEmail, customerName, survey.getAgentName(), agentEmail);
 				}
 				else {
-					emailServices.sendSurveyCompletionMail(customerEmail, customerName, survey.getAgentName());
+					emailServices.sendSurveyCompletionMail(customerEmail, customerName, survey.getAgentName(), agentEmail);
 				}
 				
 				// Generate the text as in mail
 				String surveyDetail = generateSurveyTextForMail(customerName, mood, survey);
-				
 				if (enableKafka.equals(CommonConstants.YES)) {
 					for (Entry<String, String> admin : emailIdsToSendMail.entrySet()) {
-						emailServices.queueSurveyCompletionMailToAdminsAndAgent(admin.getValue(), admin.getKey(), surveyDetail);
+						emailServices.queueSurveyCompletionMailToAdminsAndAgent(admin.getValue(), admin.getKey(), surveyDetail, customerName);
 					}
 				}
 				else {
 					for (Entry<String, String> admin : emailIdsToSendMail.entrySet()) {
-						emailServices.sendSurveyCompletionMailToAdminsAndAgent(admin.getValue(), admin.getKey(), surveyDetail);
+						emailServices.sendSurveyCompletionMailToAdminsAndAgent(admin.getValue(), admin.getKey(), surveyDetail, customerName);
 					}
 				}
 			}
@@ -233,7 +233,8 @@ public class SurveyManagementController {
 		}
 		surveyDetail.append("<br />");
 		surveyDetail.append("<br />").append("Customer Comments: ").append(survey.getReview());
-		surveyDetail.append("<br />").append("Customer Mood: ").append(mood);
+		surveyDetail.append("<br />").append("Overall Experience: ").append(mood);
+		
 		if (survey.getSharedOn() != null && !survey.getSharedOn().isEmpty()) {
 			surveyDetail.append("<br />").append("Share Checkbox: ").append("Yes");
 			surveyDetail.append("<br />").append("Shared on: ").append(StringUtils.join(survey.getSharedOn(), ", "));
