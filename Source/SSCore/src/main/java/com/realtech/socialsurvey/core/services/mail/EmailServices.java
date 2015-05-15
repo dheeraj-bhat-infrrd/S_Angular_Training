@@ -147,10 +147,11 @@ public interface EmailServices {
 	 * @param agentName
 	 * @throws InvalidInputException
 	 */
-	public void queueSurveyCompletionMail(String recipientMailId, String displayName, String agentName) throws InvalidInputException;
+	public void queueSurveyCompletionMail(String recipientMailId, String displayName, String agentName, String agentEmail)
+			throws InvalidInputException;
 
-	public void sendSurveyCompletionMail(String recipientMailId, String displayName, String agentName) throws InvalidInputException,
-			UndeliveredEmailException;
+	public void sendSurveyCompletionMail(String recipientMailId, String displayName, String agentName, String agentEmail)
+			throws InvalidInputException, UndeliveredEmailException;
 
 	/**
 	 * Queues the survey reminder mail
@@ -174,9 +175,11 @@ public interface EmailServices {
 	 * @param agentName
 	 * @throws InvalidInputException
 	 */
-	public void queueSurveyCompletionMailToAdminsAndAgent(String recipientName, String recipientMailId, String surveyDetail) throws InvalidInputException;
+	public void queueSurveyCompletionMailToAdminsAndAgent(String recipientName, String recipientMailId, String surveyDetail, String customerName)
+			throws InvalidInputException;
 
-	public void sendSurveyCompletionMailToAdminsAndAgent(String agentName, String recipientMailId, String surveyDetail) throws InvalidInputException, UndeliveredEmailException;
+	public void sendSurveyCompletionMailToAdminsAndAgent(String agentName, String recipientMailId, String surveyDetail, String customerName)
+			throws InvalidInputException, UndeliveredEmailException;
 
 	/**
 	 * Queues the social post reminder mail
@@ -283,7 +286,7 @@ public interface EmailServices {
 
 	public void sendEmailSendingFailureMail(String recipientMailId, String destinationMailId, String displayName, String stackTrace)
 			throws InvalidInputException, UndeliveredEmailException;
-	
+
 	public void sendDefaultSurveyRestartMail(String recipientMailId, String displayName, String agentName, String link, String agentEmailId,
 			String agentSignature) throws InvalidInputException, UndeliveredEmailException;
 

@@ -1,1 +1,1 @@
-Completed Survey
+%s Completed Survey
