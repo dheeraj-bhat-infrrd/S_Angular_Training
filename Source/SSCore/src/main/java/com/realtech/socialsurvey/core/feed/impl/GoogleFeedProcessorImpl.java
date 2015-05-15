@@ -15,6 +15,9 @@ import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.HttpClientBuilder;
+import org.scribe.model.OAuthRequest;
+import org.scribe.model.Response;
+import org.scribe.model.Verb;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,23 +27,28 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
+import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import com.google.gson.reflect.TypeToken;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.dao.GenericDao;
+import com.realtech.socialsurvey.core.dao.OrganizationUnitSettingsDao;
 import com.realtech.socialsurvey.core.dao.impl.MongoOrganizationUnitSettingDaoImpl;
 import com.realtech.socialsurvey.core.entities.FeedStatus;
 import com.realtech.socialsurvey.core.entities.GooglePlusPost;
 import com.realtech.socialsurvey.core.entities.GooglePlusSocialPost;
-import com.realtech.socialsurvey.core.entities.SocialProfileToken;
+import com.realtech.socialsurvey.core.entities.GoogleToken;
+import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
 import com.realtech.socialsurvey.core.exception.NonFatalException;
 import com.realtech.socialsurvey.core.feed.SocialNetworkDataProcessor;
+import com.realtech.socialsurvey.core.services.mail.EmailServices;
 
 @Component("googleFeed")
 @Scope(value = ConfigurableBeanFactory.SCOPE_PROTOTYPE)
-public class GoogleFeedProcessorImpl implements SocialNetworkDataProcessor<GooglePlusPost, SocialProfileToken> {
+public class GoogleFeedProcessorImpl implements SocialNetworkDataProcessor<GooglePlusPost, GoogleToken> {
 
 	private static final Logger LOG = LoggerFactory.getLogger(GoogleFeedProcessorImpl.class);
 	private static final String FEED_SOURCE = "google";
@@ -52,6 +60,15 @@ public class GoogleFeedProcessorImpl implements SocialNetworkDataProcessor<Googl
 	@Autowired
 	private MongoTemplate mongoTemplate;
 
+	@Autowired
+	private OrganizationUnitSettingsDao settingsDao;
+
+	@Autowired
+	private EmailServices emailServices;
+	
+	@Value("${SOCIAL_CONNECT_REMINDER_THRESHOLD}")
+	private long socialConnectThreshold;
+	
 	@Value("${GOOGLE_API_KEY}")
 	private String googleApiKey;
 
@@ -74,7 +91,7 @@ public class GoogleFeedProcessorImpl implements SocialNetworkDataProcessor<Googl
 
 	@Override
 	@Transactional
-	public void preProcess(long iden, String organizationUnit, SocialProfileToken token) {
+	public void preProcess(long iden, String organizationUnit, GoogleToken token) {
 		List<FeedStatus> statuses = null;
 		Map<String, Object> queries = new HashMap<>();
 		queries.put(CommonConstants.FEED_SOURCE_COLUMN, FEED_SOURCE);
@@ -161,17 +178,39 @@ public class GoogleFeedProcessorImpl implements SocialNetworkDataProcessor<Googl
 	}
 
 	@Override
-	public List<GooglePlusPost> fetchFeed(long iden, String organizationUnit, SocialProfileToken token) throws NonFatalException {
-		LOG.info("Getting tweets for " + organizationUnit + " with id: " + iden);
+	@Transactional
+	public List<GooglePlusPost> fetchFeed(long iden, String organizationUnit, GoogleToken token) throws NonFatalException {
+		LOG.info("Getting google posts for " + organizationUnit + " with id: " + iden);
 		List<GooglePlusPost> posts = new ArrayList<GooglePlusPost>();
 
 		try {
+			String accessToken = token.getGoogleAccessToken();
+			
 			HttpClient httpClient = HttpClientBuilder.create().build();
-			String url = createGooglePlusFeedURL(token.getAccessToken());
-			HttpGet getRequest = new HttpGet(url);
+			HttpGet getRequest = new HttpGet(createGooglePlusFeedURL(accessToken));
 			HttpResponse response = httpClient.execute(getRequest);
+			
 			if (response.getStatusLine().getStatusCode() != 200) {
-				throw new NonFatalException("Failed : HTTP error code : " + response.getStatusLine().getStatusCode());
+				LOG.error("Failed : HTTP error code : " + response.getStatusLine().getStatusCode());
+				
+				OAuthRequest request = new OAuthRequest(Verb.POST, "https://accounts.google.com/o/oauth2/token");
+				request.addBodyParameter("grant_type", "refresh_token");
+				request.addBodyParameter("refresh_token", token.getGoogleRefreshToken());
+				request.addBodyParameter("client_id", googleApiKey);
+				request.addBodyParameter("client_secret", googleApiSecretKey);
+				Response tokenResponse = request.send();
+				
+				if (tokenResponse.getCode() != 200) {
+					throw new IOException("Google access token expired");
+				}
+				
+				Map<String, Object> tokenData = new Gson().fromJson(tokenResponse.getBody(), new TypeToken<Map<String, String>>() {}.getType());
+				if (tokenData != null) {
+					accessToken = tokenData.get("access_token").toString();
+				}
+				
+				getRequest = new HttpGet(createGooglePlusFeedURL(accessToken));
+				response = httpClient.execute(getRequest);
 			}
 
 			InputStreamReader jsonReader = new InputStreamReader(response.getEntity().getContent());
@@ -179,8 +218,21 @@ public class GoogleFeedProcessorImpl implements SocialNetworkDataProcessor<Googl
 		}
 		catch (IOException e) {
 			LOG.error("Exception in Google feed extration. Reason: " + e.getMessage());
+			
 			// setting no.of retries
 			status.setRetries(status.getRetries() + 1);
+			status.setLastFetchedPostId(lastFetchedPostId);
+			
+			// sending reminder mail and increasing counter
+			if (status.getRemindersSent() < socialConnectThreshold) {
+				OrganizationUnitSettings unitSettings = settingsDao.fetchOrganizationUnitSettingsById(iden, organizationUnit);
+				
+				String userEmail = unitSettings.getContact_details().getMail_ids().getWork();
+				emailServices.sendSocialConnectMail(userEmail, unitSettings.getContact_details().getName(), userEmail, FEED_SOURCE);
+				
+				status.setRemindersSent(status.getRemindersSent() + 1);
+			}
+			
 			feedStatusDao.saveOrUpdate(status);
 		}
 
@@ -226,29 +278,32 @@ public class GoogleFeedProcessorImpl implements SocialNetworkDataProcessor<Googl
 				nextPageToken = parentObj.get("nextPageToken").getAsString();
 			}
 
-			Timestamp profileUpdatedOn = convertStringToDate(parentObj.get("updated").getAsString());
-			if (!nextPageToken.isEmpty()) {
-				lastFetchedPostId = nextPageToken;
-			}
-
 			JsonArray array = (JsonArray) parentObj.get("items");
-			for (JsonElement jsonElement : array) {
-				if (jsonElement == null) {
-					continue;
+			if (array != null && array.size() > 0) {
+				Timestamp profileUpdatedOn = convertStringToDate(parentObj.get("updated").getAsString());
+				if (!nextPageToken.isEmpty()) {
+					lastFetchedPostId = nextPageToken;
 				}
 
-				JsonObject items = (JsonObject) jsonElement;
+				for (JsonElement jsonElement : array) {
+					if (jsonElement == null) {
+						continue;
+					}
+					JsonObject items = (JsonObject) jsonElement;
 
-				Timestamp postCreatedOn = convertStringToDate(items.get("published").getAsString());
-				JsonObject actor = (JsonObject) items.get("actor");
+					Timestamp postCreatedOn = convertStringToDate(items.get("published").getAsString());
+					JsonObject actor = (JsonObject) items.get("actor");
 
-				GooglePlusPost post = new GooglePlusPost();
-				post.setId(items.get("id").getAsString());
-				post.setCreatedOn(postCreatedOn);
-				post.setPost(items.get("title").getAsString());
-				post.setPostedBy(actor.get("displayName").getAsString());
-				post.setLastUpdatedOn(profileUpdatedOn);
-				posts.add(post);
+					GooglePlusPost post = new GooglePlusPost();
+					post.setId(items.get("id").getAsString());
+					post.setCreatedOn(postCreatedOn);
+					post.setPost(items.get("title").getAsString());
+					post.setPostedBy(actor.get("displayName").getAsString());
+					post.setLastUpdatedOn(profileUpdatedOn);
+					posts.add(post);
+					
+					lastFetchedPostId = post.getId();
+				}
 			}
 		}
 		catch (NonFatalException e) {

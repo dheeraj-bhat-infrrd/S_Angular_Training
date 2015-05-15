@@ -14,10 +14,9 @@ import org.apache.http.client.methods.HttpPost;
 import org.apache.http.impl.client.BasicResponseHandler;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.message.BasicNameValuePair;
-import org.scribe.builder.ServiceBuilder;
-import org.scribe.model.Token;
-import org.scribe.model.Verifier;
-import org.scribe.oauth.OAuthService;
+import org.scribe.model.OAuthRequest;
+import org.scribe.model.Response;
+import org.scribe.model.Verb;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,11 +36,11 @@ import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.dao.impl.MongoOrganizationUnitSettingDaoImpl;
 import com.realtech.socialsurvey.core.entities.AgentSettings;
 import com.realtech.socialsurvey.core.entities.FacebookToken;
+import com.realtech.socialsurvey.core.entities.GoogleToken;
 import com.realtech.socialsurvey.core.entities.LinkedInToken;
 import com.realtech.socialsurvey.core.entities.LinkedinUserProfileResponse;
 import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
 import com.realtech.socialsurvey.core.entities.SocialMediaTokens;
-import com.realtech.socialsurvey.core.entities.SocialProfileToken;
 import com.realtech.socialsurvey.core.entities.TwitterToken;
 import com.realtech.socialsurvey.core.entities.User;
 import com.realtech.socialsurvey.core.entities.UserProfile;
@@ -52,7 +51,6 @@ import com.realtech.socialsurvey.core.exception.NonFatalException;
 import com.realtech.socialsurvey.core.services.organizationmanagement.UserManagementService;
 import com.realtech.socialsurvey.core.services.social.SocialAsyncService;
 import com.realtech.socialsurvey.core.services.social.SocialManagementService;
-import com.realtech.socialsurvey.core.services.social.api.Google2Api;
 import com.realtech.socialsurvey.core.utils.DisplayMessageConstants;
 import com.realtech.socialsurvey.web.common.ErrorResponse;
 import com.realtech.socialsurvey.web.common.JspResolver;
@@ -78,6 +76,9 @@ public class SocialManagementController {
 
 	@Autowired
 	private UserManagementService userManagementService;
+
+	@Value("${APPLICATION_BASE_URL}")
+	private String applicationBaseUrl;
 
 	// Facebook
 	@Value("${FB_REDIRECT_URI}")
@@ -118,9 +119,6 @@ public class SocialManagementController {
 	// Yelp
 	@Value("${YELP_REDIRECT_URI}")
 	private String yelpRedirectUri;
-
-	@Value("${APPLICATION_BASE_URL}")
-	private String applicationBaseUrl;
 
 	/**
 	 * Returns the social authorization page
@@ -193,13 +191,17 @@ public class SocialManagementController {
 
 			// Building Google authUrl
 			case "google":
-				OAuthService service = new ServiceBuilder().provider(Google2Api.class).apiKey(googleApiKey).apiSecret(googleApiSecret)
-						.callback(googleApiRedirectUri).scope(googleApiScope).build();
+				StringBuilder googleAuth = new StringBuilder("https://accounts.google.com/o/oauth2/auth");
+				googleAuth.append("?scope=").append(googleApiScope);
+				googleAuth.append("&state=").append("security_token");
+				googleAuth.append("&response_type=").append("code");
+				googleAuth.append("&redirect_uri=").append(googleApiRedirectUri);
+				googleAuth.append("&client_id=").append(googleApiKey);
+				googleAuth.append("&access_type=").append("offline");
+				
+				model.addAttribute(CommonConstants.SOCIAL_AUTH_URL, googleAuth.toString());
 
-				String redirectURL = service.getAuthorizationUrl(null);
-				model.addAttribute(CommonConstants.SOCIAL_AUTH_URL, redirectURL);
-
-				LOG.info("Returning the google authorizationurl : " + redirectURL);
+				LOG.info("Returning the google authorizationurl : " + googleAuth.toString());
 				break;
 
 			// TODO Building Yelp authUrl
@@ -551,13 +553,13 @@ public class SocialManagementController {
 			String accessTokenStr = httpclient.execute(httpPost, new BasicResponseHandler());
 			Map<String, Object> map = new Gson().fromJson(accessTokenStr, new TypeToken<Map<String, String>>() {}.getType());
 			String accessToken = (String) map.get("access_token");
-			String profileLink = null;
+
 			String linkedinProfileUriWithAccessToken = linkedinProfileUri + accessToken; 
 			HttpGet httpGet = new HttpGet(linkedinProfileUriWithAccessToken);
 			String basicProfileStr = httpclient.execute(httpGet, new BasicResponseHandler());
 			
 			LinkedinUserProfileResponse profileData = new Gson().fromJson(basicProfileStr, LinkedinUserProfileResponse.class);
-			profileLink = (String) profileData.getSiteStandardProfileRequest().getUrl();
+			String profileLink = (String) profileData.getSiteStandardProfileRequest().getUrl();
 
 			SocialMediaTokens mediaTokens;
 			int profilesMaster = selectedProfile.getProfilesMaster().getProfileId();
@@ -696,13 +698,28 @@ public class SocialManagementController {
 
 			// Getting Oauth accesstoken for Google+
 			String OAuthCode = request.getParameter("code");
-			OAuthService service = new ServiceBuilder().provider(Google2Api.class).apiKey(googleApiKey).apiSecret(googleApiSecret)
-					.callback(googleApiRedirectUri).scope(googleApiScope).build();
-			Token accessToken = service.getAccessToken(null, new Verifier(OAuthCode));
-			LOG.info("Token: " + accessToken.getToken());
-			service.getAuthorizationUrl(accessToken);
+			
+			OAuthRequest googleAuth = new OAuthRequest(Verb.POST, "https://accounts.google.com/o/oauth2/token");
+			googleAuth.addBodyParameter("code", OAuthCode);
+			googleAuth.addBodyParameter("client_id", googleApiKey);
+			googleAuth.addBodyParameter("client_secret", googleApiSecret);
+			googleAuth.addBodyParameter("redirect_uri", googleApiRedirectUri);
+			googleAuth.addBodyParameter("grant_type", "authorization_code");
+			Response tokenResponse = googleAuth.send();
+			
+			String accessToken = "";
+			String refreshToken = "";
+			Map<String, Object> tokenData = new Gson().fromJson(tokenResponse.getBody(), new TypeToken<Map<String, String>>() {}.getType());
+			if (tokenData != null) {
+				accessToken = tokenData.get("access_token").toString();
+				refreshToken = tokenData.get("refresh_token").toString();
+			}
+			LOG.info("Token: " + accessToken);
+			LOG.info("Token: " + refreshToken);
+			
 			String googleAccessUri = googleProfileUri;
-			googleAccessUri += accessToken.getToken();
+			googleAccessUri += accessToken;
+			
 			HttpClient httpclient = HttpClientBuilder.create().build();
 			HttpGet httpGet = new HttpGet(googleAccessUri);
 			String basicProfileStr = httpclient.execute(httpGet, new BasicResponseHandler());
@@ -711,6 +728,7 @@ public class SocialManagementController {
 			if (profileData != null) {
 				profileLink = profileData.get("link").toString();
 			}
+			
 			// Storing access token
 			SocialMediaTokens mediaTokens;
 			int profilesMaster = selectedProfile.getProfilesMaster().getProfileId();
@@ -720,7 +738,7 @@ public class SocialManagementController {
 					throw new InvalidInputException("No company settings found in current session");
 				}
 				mediaTokens = companySettings.getSocialMediaTokens();
-				mediaTokens = updateGoogleToken(accessToken, mediaTokens, profileLink);
+				mediaTokens = updateGoogleToken(accessToken, refreshToken, mediaTokens, profileLink);
 				mediaTokens = socialManagementService.updateSocialMediaTokens(MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION,
 						companySettings, mediaTokens);
 				companySettings.setSocialMediaTokens(mediaTokens);
@@ -733,7 +751,7 @@ public class SocialManagementController {
 					throw new InvalidInputException("No Region settings found in current session");
 				}
 				mediaTokens = regionSettings.getSocialMediaTokens();
-				mediaTokens = updateGoogleToken(accessToken, mediaTokens, profileLink);
+				mediaTokens = updateGoogleToken(accessToken, refreshToken, mediaTokens, profileLink);
 				mediaTokens = socialManagementService.updateSocialMediaTokens(MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION,
 						regionSettings, mediaTokens);
 				regionSettings.setSocialMediaTokens(mediaTokens);
@@ -746,7 +764,7 @@ public class SocialManagementController {
 					throw new InvalidInputException("No Branch settings found in current session");
 				}
 				mediaTokens = branchSettings.getSocialMediaTokens();
-				mediaTokens = updateGoogleToken(accessToken, mediaTokens, profileLink);
+				mediaTokens = updateGoogleToken(accessToken, refreshToken, mediaTokens, profileLink);
 				mediaTokens = socialManagementService.updateSocialMediaTokens(MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION,
 						branchSettings, mediaTokens);
 				branchSettings.setSocialMediaTokens(mediaTokens);
@@ -759,7 +777,7 @@ public class SocialManagementController {
 				}
 
 				mediaTokens = agentSettings.getSocialMediaTokens();
-				mediaTokens = updateGoogleToken(accessToken, mediaTokens, profileLink);
+				mediaTokens = updateGoogleToken(accessToken, refreshToken, mediaTokens, profileLink);
 				mediaTokens = socialManagementService.updateAgentSocialMediaTokens(agentSettings, mediaTokens);
 				agentSettings.setSocialMediaTokens(mediaTokens);
 				userSettings.setAgentSettings(agentSettings);
@@ -783,24 +801,24 @@ public class SocialManagementController {
 		return JspResolver.SOCIAL_AUTH_MESSAGE;
 	}
 
-	private SocialMediaTokens updateGoogleToken(Token accessToken, SocialMediaTokens mediaTokens, String profileLink) {
+	private SocialMediaTokens updateGoogleToken(String accessToken, String refreshToken, SocialMediaTokens mediaTokens, String profileLink) {
 		LOG.debug("Method updateGoogleToken() called from SocialManagementController");
 		if (mediaTokens == null) {
 			LOG.debug("Media tokens do not exist. Creating them and adding the Google access token");
 			mediaTokens = new SocialMediaTokens();
-			mediaTokens.setGoogleToken(new SocialProfileToken());
+			mediaTokens.setGoogleToken(new GoogleToken());
 		}
 		else {
 			LOG.debug("Updating the existing media tokens for google plus");
 			if (mediaTokens.getGoogleToken() == null) {
-				mediaTokens.setGoogleToken(new SocialProfileToken());
+				mediaTokens.setGoogleToken(new GoogleToken());
 			}
 		}
 		if (profileLink != null)
 			mediaTokens.getGoogleToken().setProfileLink(profileLink);
-		mediaTokens.getGoogleToken().setAccessToken(accessToken.getToken());
-		mediaTokens.getGoogleToken().setAccessTokenSecret(accessToken.getSecret());
-		mediaTokens.getGoogleToken().setAccessTokenCreatedOn(System.currentTimeMillis());
+		mediaTokens.getGoogleToken().setGoogleAccessToken(accessToken);
+		mediaTokens.getGoogleToken().setGoogleRefreshToken(refreshToken);
+		mediaTokens.getGoogleToken().setGoogleAccessTokenCreatedOn(System.currentTimeMillis());
 
 		LOG.debug("Method updateGoogleToken() finished from SocialManagementController");
 		return mediaTokens;

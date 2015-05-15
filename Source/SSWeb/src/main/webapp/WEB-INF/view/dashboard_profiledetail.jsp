@@ -53,16 +53,19 @@
 			</c:if>
 		</div>
 		<div id="pro-cmplt-stars" class="dsh-star-wrapper clearfix">
-			<div class="float-left dsh-star-item"></div>
-			<div id="profile-completed" class="float-left dsh-rating-item">${fn:substringBefore(profileCompleteness * 5 / 100, '.')}/5</div>
-			<c:choose>
+			<%-- <div class="float-left dsh-star-item"></div>
+			<div id="profile-completed" class="float-left dsh-rating-item">${fn:substringBefore(profileCompleteness * 5 / 100, '.')}/5</div> --%>
+			<div class="dsh-btn-complete float-left" onclick="sendSurveyInvitation();"><spring:message code="label.sendsurvey.btn.key" /></div>
+			<div class="dsh-btn-complete dsh-btn-orange float-left">Connect to Linkedin</div>
+			<div class="dsh-btn-complete dsh-btn-green float-left">Connect to Twitter</div>
+			<%-- <c:choose>
 				<c:when test="${profilemasterid == 4}">
 					<div class="dsh-btn-complete float-left" onclick="sendSurveyInvitation();"><spring:message code="label.sendsurvey.btn.key" /></div>
 				</c:when>
 				<c:otherwise>
 					<div class="dsh-btn-complete float-left" onclick="showMainContent('./showprofilepage.do');"><spring:message code="label.complete.profile.key" /></div>
 				</c:otherwise>
-			</c:choose>
+			</c:choose> --%>
 		</div>
 	</div>
 </div>

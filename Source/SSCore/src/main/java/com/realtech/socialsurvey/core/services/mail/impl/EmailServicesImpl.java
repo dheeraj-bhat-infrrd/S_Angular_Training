@@ -1332,5 +1332,31 @@ public class EmailServicesImpl implements EmailServices {
 		emailSender.sendEmailWithBodyReplacements(emailEntity, subjectFileName, messageBodyReplacements);
 		LOG.info("Successfully sent survey invitation mail");
 	}
+
+	@Async
+	@Override
+	public void sendSocialConnectMail(String recipientMailId, String displayName, String loginName, String account) throws InvalidInputException,
+			UndeliveredEmailException {
+		if (recipientMailId == null || recipientMailId.isEmpty()) {
+			LOG.error("Recipient email Id is empty or null for sending survey completion mail ");
+			throw new InvalidInputException("Recipient email Id is empty or null for sending survey completion mail ");
+		}
+		if (displayName == null || displayName.isEmpty()) {
+			LOG.error("displayName parameter is empty or null for sending account upgrade mail ");
+			throw new InvalidInputException("displayName parameter is empty or null for sending survey completion mail ");
+		}
+
+		LOG.info("Sending account blocking email to : " + recipientMailId);
+		EmailEntity emailEntity = prepareEmailEntityForSendingEmail(recipientMailId);
+		String subjectFileName = EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER + EmailTemplateConstants.SOCIAL_CONNECT_MAIL_SUBJECT;
+
+		FileContentReplacements messageBodyReplacements = new FileContentReplacements();
+		messageBodyReplacements.setFileName(EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER + EmailTemplateConstants.SOCIAL_CONNECT_MAIL_BODY);
+		messageBodyReplacements.setReplacementArgs(Arrays.asList(appLogoUrl, displayName, account, loginName, appBaseUrl, appBaseUrl, appBaseUrl));
+
+		LOG.debug("Calling email sender to send mail");
+		emailSender.sendEmailWithBodyReplacements(emailEntity, subjectFileName, messageBodyReplacements);
+		LOG.info("Successfully sent social connect mail");
+	}
 }
 // JIRA: SS-7: By RM02: EOC

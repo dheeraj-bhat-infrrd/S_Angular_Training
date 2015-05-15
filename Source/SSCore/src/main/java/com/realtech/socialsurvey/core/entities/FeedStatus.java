@@ -48,6 +48,9 @@ public class FeedStatus implements Serializable {
 	@Column(name = "RETRIES")
 	private long retries;
 
+	@Column(name = "REMINDERS_SENT")
+	private long remindersSent;
+
 	@Column(name = "REMINDER_SENT_ON")
 	private Timestamp reminderSentOn;
 
@@ -133,6 +136,14 @@ public class FeedStatus implements Serializable {
 
 	public void setReminderSentOn(Timestamp reminderSentOn) {
 		this.reminderSentOn = reminderSentOn;
+	}
+
+	public long getRemindersSent() {
+		return remindersSent;
+	}
+
+	public void setRemindersSent(long remindersSent) {
+		this.remindersSent = remindersSent;
 	}
 
 	@Override
