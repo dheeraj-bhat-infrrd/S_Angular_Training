@@ -37,7 +37,7 @@ $(document).on('click', '.sq-np-item-next', function() {
  * questions which are shown one after one to the customer.
  */
 function initSurvey(firstName, lastName, email, agentId, agentName,
-		grecaptcharesponse, relationship) {
+		grecaptcharesponse) {
 	this.agentId = agentId;
 	this.agentName = agentName;
 	customerEmail = email;
@@ -51,8 +51,14 @@ function initSurvey(firstName, lastName, email, agentId, agentName,
 	};*/
 	
 	
-	$('input[relationship]').val(relationship);
+	//$('input[relationship]').val(relationship);
 	$('input[g-recaptcha-response]').val(grecaptcharesponse);
+	
+	if($('#cust-agent-verify').hasClass('bd-check-img-checked')){
+		$('#overlay-toast').html("Verify that you have done business with the agent");
+		showToast();
+		return false;
+	}
 	
 	$('#survey-request-form').submit();
 	
@@ -895,9 +901,9 @@ $('#start-btn').click(function() {
 	var agentId = $('#prof-container').attr("data-agentId");
 	var agentName = $('#prof-container').attr("data-agentName");
 	var e = document.getElementById("cust-agnt-rel");
-	var relationship = e.options[e.selectedIndex].value;
+	//var relationship = e.options[e.selectedIndex].value;
 	initSurvey(firstName, lastName, email, agentId, agentName,
-			grecaptcharesponse, relationship);
+			grecaptcharesponse);
 	
 	// Google analytics for reviews
 	ga('send', {

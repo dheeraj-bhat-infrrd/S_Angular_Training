@@ -76,7 +76,7 @@
 								</c:choose>
 							</div>
 						</div>
-						<div class="col-lg-4 col-md-4 col-sm-4 col-xs-12">
+						<%-- <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12">
 							<div data-id="sb-range-scale" class="bd-ans-img-wrapper">
 								<c:choose>
 									<c:when test="${questionType != 'sb-range-scale'}">
@@ -89,7 +89,7 @@
 									</c:otherwise>
 								</c:choose>
 							</div>
-						</div>
+						</div> --%>
 					</div>
 				</div>
 				
@@ -124,6 +124,11 @@
 									<input name="sb-answers-${surveyQuestion.questionId}[]" class="float-left bd-mcq-txt">
 									<div class="float-left bd-mcq-close hide"></div>
 								</div>
+								<div class="bd-mcq-row clearfix">
+									<div class="float-left bd-mcq-lbl"><spring:message code="label.option.key" /></div>
+									<input name="sb-answers-${surveyQuestion.questionId}[]" class="float-left bd-mcq-txt">
+									<div class="float-left bd-mcq-close hide"></div>
+								</div>
 							</c:otherwise>
 						</c:choose>
 					</div>
@@ -134,7 +139,7 @@
 				</c:if>
 				<div class="bd-ans-type-com bd-ans-type-item ${comclass}">
 					<div class="clearfix bd-com-wrapper">
-						<div class="float-left bd-com-chk"></div>
+						<!-- <div class="float-left bd-com-chk"></div> -->
 						<div class="float-left bd-com-txt"><spring:message code="label.textarea.key" /></div>
 					</div>
 				</div>
