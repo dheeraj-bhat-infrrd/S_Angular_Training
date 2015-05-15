@@ -495,9 +495,7 @@
     	
     	function submitFindProForm() {
     		console.log("Submitting Find a Profile form");
-    		if(validateFindProForm('find-pro-form')){
-    			$('#find-pro-form').submit();
-    		}
+			$('#find-pro-form').submit();
     		showOverlay();
     	}
     	
