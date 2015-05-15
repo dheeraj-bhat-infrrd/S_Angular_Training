@@ -111,8 +111,8 @@
 					</div>
 					
 			   		<form id="registration-form" class="registration-form-cls" method="POST" action="./registration.do">
-						<div class="reg-txt-top1">Professionals, Take Control NOW!</div>
-						<div class="reg-txt-top2">Register for FREE. It takes less than 2 minutes</div>
+						<div class="reg-txt-top1">Professionals: Take Control of Your Social Reputation NOW!</div>
+						<div class="reg-txt-top2">Sign up for a FREE account. It takes less than 2 minutes</div>
 						<div class="clearfix reg-item reg-item-bord-top">
 							<div class="m-inp-img-fname m-inp-img"></div>
 							<div class="m-inp-img-lname m-inp-img m-inp-img-adj"></div>
