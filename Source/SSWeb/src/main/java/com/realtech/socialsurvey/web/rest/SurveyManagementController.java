@@ -315,9 +315,7 @@ public class SurveyManagementController {
 		String firstName;
 		String lastName;
 		String custRelationWithAgent;
-		String user = "";
 		String agentName;
-		user = request.getParameter(CommonConstants.AGENT_ID_COLUMN);
 		customerEmail = request.getParameter(CommonConstants.CUSTOMER_EMAIL_COLUMN);
 		firstName = request.getParameter("firstName");
 		lastName = request.getParameter("lastName");
@@ -327,7 +325,8 @@ public class SurveyManagementController {
 		custRelationWithAgent = "transacted";
 		try {
 			try {
-				agentId = Long.parseLong(user);
+				String agentIdStr = request.getParameter(CommonConstants.AGENT_ID_COLUMN);
+				agentId = Long.parseLong(agentIdStr);
 			}
 			catch (NumberFormatException e) {
 				LOG.error("NumberFormatException caught in triggerSurvey(). Details are " + e);
@@ -342,13 +341,21 @@ public class SurveyManagementController {
 					throw new InvalidInputException(errorMsg, DisplayMessageConstants.INVALID_CAPTCHA);
 				}
 			}
-			User userObj = userManagementService.getUserByUserId(agentId);
-			surveyHandler.sendSurveyInvitationMail(firstName, lastName, customerEmail, custRelationWithAgent, userObj, false);
+
 			model.addAttribute("agentId", agentId);
 			model.addAttribute("firstName", firstName);
 			model.addAttribute("lastName", lastName);
 			model.addAttribute("customerEmail", customerEmail);
 			model.addAttribute("relation", custRelationWithAgent);
+			
+			User user = userManagementService.getUserByUserId(agentId);
+			SurveyDetails survey = surveyHandler.getSurveyDetails(agentId, customerEmail);
+			if(survey!=null){
+				model.addAttribute("surveyCompleted", "yes");
+				model.addAttribute("agentName", survey.getAgentName());
+				return JspResolver.SURVEY_INVITE_SUCCESSFUL;
+			}
+			surveyHandler.sendSurveyInvitationMail(firstName, lastName, customerEmail, custRelationWithAgent, user, false);
 			
 		}
 		catch (NonFatalException e) {

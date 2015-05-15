@@ -216,14 +216,20 @@ public class DashboardController {
 			throw e;
 		}
 
-		int surveyScore = (int) Math.round(dashboardService.getSurveyScore(columnName, columnValue, numberOfDays));
+		double surveyScore = (double) Math.round(dashboardService.getSurveyScore(columnName, columnValue, numberOfDays)*1000.0)/1000.0;
 		int sentSurveyCount = (int) dashboardService.getAllSurveyCountForPastNdays(columnName, columnValue, numberOfDays);
 		int socialPostsCount = (int) dashboardService.getSocialPostsForPastNdays(columnName, columnValue, numberOfDays);
 		int profileCompleteness = dashboardService.getProfileCompletionPercentage(user, columnName, columnValue, userSettings);
 
 		model.addAttribute("socialScore", surveyScore);
-		model.addAttribute("surveyCount", sentSurveyCount);
-		model.addAttribute("socialPosts", socialPostsCount);
+		if(sentSurveyCount>999)
+			model.addAttribute("surveyCount", "1K+");
+		else
+			model.addAttribute("surveyCount", sentSurveyCount);
+		if(socialPostsCount>999)
+			model.addAttribute("socialPosts", "1K+");
+		else
+			model.addAttribute("socialPosts", socialPostsCount);
 		model.addAttribute("profileCompleteness", profileCompleteness);
 		model.addAttribute("badges", dashboardService.getBadges(surveyScore, sentSurveyCount, socialPostsCount, profileCompleteness));
 

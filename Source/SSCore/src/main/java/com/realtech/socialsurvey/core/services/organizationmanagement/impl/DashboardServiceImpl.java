@@ -145,7 +145,7 @@ public class DashboardServiceImpl implements DashboardService, InitializingBean 
 	 * profile completeness.
 	 */
 	@Override
-	public int getBadges(int surveyScore, int surveyCount, int socialPosts, int profileCompleteness) {
+	public int getBadges(double surveyScore, int surveyCount, int socialPosts, int profileCompleteness) {
 		LOG.info("Method to calculate number of badges started.");
 		int badges = 0;
 		double normalizedSurveyScore = surveyScore * 25 / CommonConstants.MAX_SURVEY_SCORE;

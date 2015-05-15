@@ -198,6 +198,7 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean {
 		LOG.info("Method to update customer review and final score on the basis of rating questions in SURVEY_DETAILS, updateCustomerAnswersInSurvey() finished.");
 	}
 
+	@Override
 	public SurveyDetails getSurveyDetails(long agentId, String customerEmail) {
 		LOG.info("Method getSurveyDetails() to return survey details by agent id and customer email started.");
 		SurveyDetails surveyDetails;
