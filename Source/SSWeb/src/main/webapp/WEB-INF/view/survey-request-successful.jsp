@@ -54,7 +54,8 @@
 			</div>
 		</div>
 	</div>
-	<div class="prof-main-content-wrapper margin-top-25 margin-bottom-25">
+	
+	<div id="survey-invite-success" class="prof-main-content-wrapper margin-top-25 margin-bottom-25 hide">
 		<div class="container">
 			<div class="inv-succ-text1 text-center">GREAT!</div>
 			<div class="inv-succ-text2 text-center">Now, check your email</div>
@@ -63,9 +64,17 @@
 			<div class="inv-succ-link" onclick="resendSurveyActivationLink();">Resend access link</div>
 		</div>
 	</div>
+	<div id="survey-invite-fail" class="prof-main-content-wrapper margin-top-25 margin-bottom-25 hide">
+		<div class="container">
+			<div class="inv-succ-text1 text-center">OOPS! It looks like you have already taken a survey for ${agentName}.</div>
+			<div class="inv-succ-text2 text-center">Are you trying to amend a prior response? If so click the link below and we will email you the access required</div>
+			<div id='changeSurvey' onclick="retakeSurveyLink();" class="inv-succ-link">Link to resend origin Survey Responses</div>
+		</div>
+	</div>
 	<div style="display:none;">
 		<form id="survey-form">
 			<input type="text" name="agentId" value="${agentId}">
+			<input type="text" name="agentName" value="${agentName}">
 			<input type="text" name="firstName" value="${firstname}">
 			<input type="text" name="lastName" value="${lastname}">
 			<input type="text" name="customerEmail" value="${customerEmail}">
@@ -83,6 +92,13 @@
 	<script type="text/javascript">
 		$(document).ready(function(){
 			
+			var surveyCompleted = "${surveyCompleted}";
+			if(surveyCompleted == 'yes'){
+				$('#survey-invite-fail').removeClass('hide');
+			}
+			else{
+				$('#survey-invite-success').removeClass('hide');
+			}
 		});
 		function resendSurveyActivationLink() {
 			var payload = $('#survey-form').serialize();
@@ -93,6 +109,23 @@
 				dataType : "TEXT",
 				success : function(){
 					$('#overlay-toast').html("We just sent you a link to access the requested survey.");
+					showToast();
+				},
+				error : function(e){
+					console.log(e);
+				}
+			});
+		}
+		
+		function retakeSurveyLink(){
+			var payload = $('#survey-form').serialize();
+			$.ajax({
+				url : window.location.origin + "/rest/survey/restartsurvey",
+				data : payload,
+				type : "GET",
+				dataType : "TEXT",
+				success : function(){
+					$('#overlay-toast').html('Mail sent to your registered email id for retaking the survey for ' + "${agentName}");
 					showToast();
 				},
 				error : function(e){
