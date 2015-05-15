@@ -11,8 +11,8 @@
 		<div class="dsh-g-wrap dsh-g-wrap-1">
 			<div class="dsh-graph-item dsh-graph-item-1">
 				<div id="dg-img-1" class="dsh-graph-img"></div>
-				<div id="socl-post" class="dsh-graph-num">${socialPosts}</div>
-				<div class="dsh-graph-txt dsh-graph-txt-1"><spring:message code="label.socialposts.key" /></div>
+				<div id="srv-scr" class="dsh-graph-num">${socialScore}/5</div>
+				<div class="dsh-graph-txt dsh-graph-txt-1"><spring:message code="label.surveyscore.key" /></div>
 			</div>
 		</div>
 		<div class="dsh-g-wrap dsh-g-wrap-2">
@@ -23,12 +23,13 @@
 			</div>
 		</div>
 		<div class="dsh-g-wrap dsh-g-wrap-3">
-			<div class="dsh-graph-item dsh-graph-item-1">
+			<div class="dsh-graph-item dsh-graph-item-3">
 				<div id="dg-img-3" class="dsh-graph-img"></div>
-				<div id="srv-scr" class="dsh-graph-num">${socialScore}/5</div>
-				<div class="dsh-graph-txt dsh-graph-txt-3"><spring:message code="label.surveyscore.key" /></div>
+				<div id="socl-post" class="dsh-graph-num">${socialPosts}</div>
+				<div class="dsh-graph-txt dsh-graph-txt-3"><spring:message code="label.socialposts.key" /></div>
 			</div>
 		</div>
+		
 		<div class="dsh-g-wrap dsh-g-wrap-4">
 			<div class="dsh-graph-item dsh-graph-item-1">
 				<div id="dg-img-4" class="dsh-graph-img dsh-graph-img-4"></div>

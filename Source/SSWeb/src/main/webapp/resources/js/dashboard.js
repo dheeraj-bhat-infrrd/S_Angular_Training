@@ -130,7 +130,7 @@ function showCompanyAdminFlow(newProfileName, newProfileValue) {
 	$("#dsh-srch-survey-div").show();
 	$("#dsh-grph-srch-survey-div").show();
 
-	showProfileDetails(newProfileName, 0, 30);
+	showProfileDetails(newProfileName, 0, 90);
 	bindSelectButtons();
 	if((accountType!="INDIVIDUAL") && (accountType!="FREE"))
 		populateSurveyStatisticsList(newProfileName);
@@ -150,7 +150,7 @@ function showRegionAdminFlow(newProfileName, newProfileValue) {
 	$("#dsh-srch-survey-div").show();
 	$("#dsh-grph-srch-survey-div").show();
 
-	showProfileDetails(newProfileName, newProfileValue, 30);
+	showProfileDetails(newProfileName, newProfileValue, 90);
 	bindSelectButtons();
 	if((accountType!="INDIVIDUAL") && (accountType!="FREE"))
 		populateSurveyStatisticsList(newProfileName);
@@ -170,7 +170,7 @@ function showBranchAdminFlow(newProfileName, newProfileValue) {
 	$("#dsh-srch-survey-div").show();
 	$("#dsh-grph-srch-survey-div").show();
 
-	showProfileDetails(newProfileName, newProfileValue, 30);
+	showProfileDetails(newProfileName, newProfileValue, 90);
 	bindSelectButtons();
 	if((accountType!="INDIVIDUAL") && (accountType!="FREE"))
 		populateSurveyStatisticsList(newProfileName);
@@ -190,7 +190,7 @@ function showAgentFlow(newProfileName, newProfileValue) {
 	$("#dsh-srch-survey-div").hide();
 	$("#dsh-grph-srch-survey-div").hide();
 
-	showProfileDetails(newProfileName, 0, 30);
+	showProfileDetails(newProfileName, 0, 90);
 	bindSelectButtons();
 	showSurveyCount(newProfileName, 0, 30);
 	showSurveyStatisticsGraphically(newProfileName, 0);
