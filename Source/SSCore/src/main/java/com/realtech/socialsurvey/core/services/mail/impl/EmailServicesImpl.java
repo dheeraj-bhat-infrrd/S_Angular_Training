@@ -196,43 +196,6 @@ public class EmailServicesImpl implements EmailServices {
 		LOG.info("Successfully sent reset password mail");
 	}
 
-	/**
-	 * Method to prepare email entity required to send email
-	 * 
-	 * @param recipientMailId
-	 * @return
-	 */
-	private EmailEntity prepareEmailEntityForSendingEmail(String recipientMailId) {
-		LOG.debug("Preparing email entity for registration invitation for recipientMailId " + recipientMailId);
-		List<String> recipients = new ArrayList<String>();
-		recipients.add(recipientMailId);
-
-		EmailEntity emailEntity = new EmailEntity();
-		emailEntity.setRecipients(recipients);
-		// emailEntity.setSenderEmailId(sendgridSenderUsername);
-		// emailEntity.setSenderPassword(sendgridSenderPassword);
-		// emailEntity.setSenderName(sendgridSenderName);
-		emailEntity.setRecipientType(EmailEntity.RECIPIENT_TYPE_TO);
-
-		LOG.debug("Prepared email entity for registrationInvite");
-		return emailEntity;
-	}
-
-	private EmailEntity prepareEmailEntityForSendingEmail(String recipientMailId, String emailId, String name) {
-		LOG.debug("Preparing email entity for sending mail to " + recipientMailId + " agent email name: " + emailId + " name: " + name);
-		List<String> recipients = new ArrayList<String>();
-		recipients.add(recipientMailId);
-
-		EmailEntity emailEntity = new EmailEntity();
-		emailEntity.setRecipients(recipients);
-		emailEntity.setSenderName(name);
-		emailEntity.setSenderEmailId(emailId.substring(0, emailId.indexOf("@") + 1) + defaultEmailDomain);
-		emailEntity.setRecipientType(EmailEntity.RECIPIENT_TYPE_TO);
-
-		LOG.debug("Prepared email entity for sending mail");
-		return emailEntity;
-	}
-
 	@Async
 	@Override
 	public void queueSubscriptionChargeUnsuccessfulEmail(String recipientMailId, String name, String retryDays) throws InvalidInputException {
@@ -347,7 +310,7 @@ public class EmailServicesImpl implements EmailServices {
 			throw new InvalidInputException("Recipients Name can not be null or empty");
 		}
 
-		EmailEntity emailEntity = prepareEmailEntityForVerificationMail(recipientMailId);
+		EmailEntity emailEntity = prepareEmailEntityForSendingEmail(recipientMailId);
 		String subjectFileName = EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER + EmailTemplateConstants.EMAIL_VERIFICATION_MAIL_SUBJECT;
 
 		FileContentReplacements fileContentReplacements = new FileContentReplacements();
@@ -413,7 +376,7 @@ public class EmailServicesImpl implements EmailServices {
 		}
 
 		// Fetching mail body
-		EmailEntity emailEntity = prepareEmailEntityForVerificationMail(recipientMailId);
+		EmailEntity emailEntity = prepareEmailEntityForSendingEmail(recipientMailId);
 		String subjectFileName = EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER + EmailTemplateConstants.VERIFICATION_MAIL_SUBJECT;
 
 		// File content replacements in same order
@@ -501,28 +464,6 @@ public class EmailServicesImpl implements EmailServices {
 	}
 
 	// JIRA SS-42 by RM-05 : EOC
-
-	/**
-	 * Method to prepare email entity for verification mail
-	 * 
-	 * @param recipientMailId
-	 * @return
-	 */
-	private EmailEntity prepareEmailEntityForVerificationMail(String recipientMailId) {
-		LOG.debug("Preparing email entity for verification mail for recipientMailId " + recipientMailId);
-		List<String> recipients = new ArrayList<String>();
-		recipients.add(recipientMailId);
-
-		EmailEntity emailEntity = new EmailEntity();
-		emailEntity.setRecipients(recipients);
-		// emailEntity.setSenderEmailId(sendgridSenderUsername);
-		// emailEntity.setSenderPassword(sendgridSenderPassword);
-		// emailEntity.setSenderName(sendgridSenderName);
-		emailEntity.setRecipientType(EmailEntity.RECIPIENT_TYPE_TO);
-
-		LOG.debug("Prepared email entity for verification mail");
-		return emailEntity;
-	}
 
 	@Async
 	@Override
@@ -822,7 +763,7 @@ public class EmailServicesImpl implements EmailServices {
 		}
 
 		LOG.info("Sending survey completion email to : " + recipientMailId);
-		EmailEntity emailEntity = prepareEmailEntityForSendingEmail(recipientMailId);
+		EmailEntity emailEntity = prepareEmailEntityForSendingEmail(recipientMailId, agentName);
 		String subjectFileName = EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER + EmailTemplateConstants.SURVEY_COMPLETION_MAIL_SUBJECT;
 
 		FileContentReplacements messageBodyReplacements = new FileContentReplacements();
@@ -1364,6 +1305,60 @@ public class EmailServicesImpl implements EmailServices {
 		LOG.debug("Calling email sender to send mail");
 		emailSender.sendEmailWithBodyReplacements(emailEntity, subjectFileName, messageBodyReplacements);
 		LOG.info("Successfully sent social connect mail");
+	}
+	
+	/**
+	 * Method to prepare email entity required to send email
+	 * 
+	 * @param recipientMailId
+	 * @return
+	 */
+	private EmailEntity prepareEmailEntityForSendingEmail(String recipientMailId) {
+		LOG.debug("Preparing email entity for registration invitation for recipientMailId " + recipientMailId);
+		List<String> recipients = new ArrayList<String>();
+		recipients.add(recipientMailId);
+
+		EmailEntity emailEntity = new EmailEntity();
+		emailEntity.setRecipients(recipients);
+		emailEntity.setRecipientType(EmailEntity.RECIPIENT_TYPE_TO);
+
+		LOG.debug("Prepared email entity for registrationInvite");
+		return emailEntity;
+	}
+
+	/**
+	 * Method to prepare email entity for verification mail
+	 * 
+	 * @param recipientMailId
+	 * @return
+	 */
+	private EmailEntity prepareEmailEntityForSendingEmail(String recipientMailId, String senderName) {
+		LOG.debug("Preparing email entity for verification mail for recipientMailId " + recipientMailId);
+		List<String> recipients = new ArrayList<String>();
+		recipients.add(recipientMailId);
+
+		EmailEntity emailEntity = new EmailEntity();
+		emailEntity.setRecipients(recipients);
+		emailEntity.setSenderName(senderName);
+		emailEntity.setRecipientType(EmailEntity.RECIPIENT_TYPE_TO);
+
+		LOG.debug("Prepared email entity for verification mail");
+		return emailEntity;
+	}
+	
+	private EmailEntity prepareEmailEntityForSendingEmail(String recipientMailId, String emailId, String name) {
+		LOG.debug("Preparing email entity for sending mail to " + recipientMailId + " agent email name: " + emailId + " name: " + name);
+		List<String> recipients = new ArrayList<String>();
+		recipients.add(recipientMailId);
+
+		EmailEntity emailEntity = new EmailEntity();
+		emailEntity.setRecipients(recipients);
+		emailEntity.setSenderName(name);
+		emailEntity.setSenderEmailId(emailId.substring(0, emailId.indexOf("@") + 1) + defaultEmailDomain);
+		emailEntity.setRecipientType(EmailEntity.RECIPIENT_TYPE_TO);
+
+		LOG.debug("Prepared email entity for sending mail");
+		return emailEntity;
 	}
 }
 // JIRA: SS-7: By RM02: EOC
