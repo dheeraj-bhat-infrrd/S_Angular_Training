@@ -841,7 +841,6 @@ public class SocialManagementController {
 
 		User user = sessionHelper.getCurrentUser();
 		List<OrganizationUnitSettings> settings = socialManagementService.getBranchAndRegionSettingsForUser(user.getUserId());
-		rating = Math.round(rating * 100) / 100;
 
 		String agentProfileLink = "";
 		AgentSettings agentSettings;
@@ -912,7 +911,6 @@ public class SocialManagementController {
 			
 			User user = sessionHelper.getCurrentUser();
 			List<OrganizationUnitSettings> settings = socialManagementService.getBranchAndRegionSettingsForUser(user.getUserId());
-			rating = Math.round(rating * 100) / 100;
 			String twitterMessage = rating + "-Star Survey Response from " + custFirstName + custLastName + " for " + agentName
 					+ " on @SocialSurvey - view at " + applicationBaseUrl + CommonConstants.AGENT_PROFILE_FIXED_URL + agentProfileLink;
 			twitterMessage = twitterMessage.replaceAll("null", "");
@@ -976,7 +974,6 @@ public class SocialManagementController {
 
 		User user = sessionHelper.getCurrentUser();
 		List<OrganizationUnitSettings> settings = socialManagementService.getBranchAndRegionSettingsForUser(user.getUserId());
-		rating = Math.round(rating * 100) / 100;
 		String message = rating + "-Star Survey Response from " + custFirstName + custLastName + " for " + agentName + " on SocialSurvey - view at "
 				+ applicationBaseUrl + CommonConstants.AGENT_PROFILE_FIXED_URL + agentProfileLink;
 		message = message.replaceAll("null", "");

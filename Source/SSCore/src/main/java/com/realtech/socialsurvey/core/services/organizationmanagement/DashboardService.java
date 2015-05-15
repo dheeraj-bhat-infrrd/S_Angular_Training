@@ -27,7 +27,7 @@ public interface DashboardService {
 
 	public int getProfileCompletionPercentage(User user, String columnName, long columnValue, UserSettings userSettings);
 
-	public int getBadges(int surveyScore, int surveyCount, int socialPosts, int profileCompleteness);
+	public int getBadges(double surveyScore, int surveyCount, int socialPosts, int profileCompleteness);
 
 	public XSSFWorkbook downloadCompleteSurveyData(List<SurveyDetails> surveyDetails, String fileLocation) throws IOException;
 
