@@ -346,12 +346,14 @@ a, a:hover, a:visited{
     font-size: 18px;
     margin-top: -14px;
     font-weight: bold;
-    letter-spacing: 1px;
+    text-align: center;
 }
 
 .reg-txt-top2 {
     margin-bottom: 10px;
     text-transform: capitalize;
+    font-size: 13px;
+    text-align: center;
 }
 
 .pic-bot-txt-top {
@@ -1161,4 +1163,37 @@ span.wc-highlight {
     clear: both;
     color: #009EE3;
     cursor: pointer;
+}
+
+.sq-i-check-txt {
+    width: 304px;
+    text-align: left;
+    padding-top: 12px;
+}
+
+.sq-checkbox{
+	margin-right: 0 !important;
+}
+
+.change-survey-btn {
+    width: 200px;
+    height: 40px;
+    line-height: 40px;
+    margin: 15px auto;
+    text-align: center;
+    background: #009FE0;
+    color: #fff;
+    border-radius: 3px;
+    cursor: pointer;
+    font-style: normal;
+}
+
+.privacy-policy-link {
+    color: #009FE0;
+    text-align: center;
+    cursor: pointer;
+}
+
+.take-sur-link {
+	margin: 0px 0px 0px 80px;
 }

@@ -156,8 +156,16 @@ a,a:hover,a:visited {
 	background: #7AB400;
 }
 
+.opensanslight{
+	font-family: 'opensanslight';
+}
+
 .font-18 {
 	font-size: 18px;
+}
+
+.font-11 {
+    font-size: 11px;
 }
 
 .login-wrapper {
@@ -1858,12 +1866,12 @@ button.paypal.is-active {
 }
 
 .err-line-2 {
-	font-size: 14px;
+	font-size: 16px;
 	font-family: 'opensanslight';
 }
 
 .err-line-3, .err-line-3 * {
-	font-size: 14px;
+	font-size: 16px;
 	font-family: 'opensanslight';
 }
 
@@ -3773,7 +3781,7 @@ button.paypal.is-active {
 }
 
 .dsh-star-wrapper {
-	width: 360px;
+	width: 230px;
 	margin: 25px auto;
 }
 
@@ -3804,18 +3812,18 @@ button.paypal.is-active {
 	text-align: center;
 	color: #fff;
 	border-radius: 3px;
-	margin: 5px 0 5px 5px;
+	margin: 5px 0;
 	font-size: 18px;
 	font-family: 'opensanssemibold';
 	cursor: pointer;
 }
 
-.dsh-btn-complete:hover {
-	background-color: #7AB400 !important;
+.dsh-btn-orange {
+    background: rgb(233, 127, 48);
 }
 
-.dsh-btn-complete:active {
-	background-color: #70A501 !important;
+.dsh-btn-green {
+    background: rgb(122, 180, 0);
 }
 
 .dsh-txt-2,.dsh-txt-3 {
@@ -3910,6 +3918,7 @@ button.paypal.is-active {
 }
 
 .dash-lp-item {
+	margin-bottom:5px;
 	padding-left: 15px;
 	line-height: 35px;
 	max-height: 200px;
@@ -5780,17 +5789,17 @@ tr.u-tbl-header td {
 
 .bd-ans-smiley {
 	background: url(../images/smiley.png) no-repeat center;
-	background-size: 100% auto;
+	background-size: auto 100%;
 }
 
 .bd-ans-star {
 	background: url(../images/stars.png) no-repeat center;
-	background-size: 100% auto;
+	background-size: auto 100%;
 }
 
 .bd-ans-scale {
 	background: url(../images/scale.png) no-repeat center;
-	background-size: 100% auto;
+	background-size: auto 100%;
 }
 
 .srv-tbl-move-up,.srv-tbl-move-dn {

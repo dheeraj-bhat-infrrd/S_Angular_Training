@@ -38,12 +38,12 @@
 								<div class="bd-ans-img-txt"><spring:message code="label.star.key" /></div>
 							</div>
 						</div>
-						<div class="col-lg-4 col-md-4 col-sm-4 col-xs-12">
+						<%-- <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12">
 							<div data-id="sb-range-scale" class="bd-ans-img-wrapper">
 								<div class="bd-ans-img bd-ans-scale"></div>
 								<div class="bd-ans-img-txt"><spring:message code="label.scale.key" /></div>
 							</div>
-						</div>
+						</div> --%>
 					</div>
 				</div>
 				<div id="" class="bd-ans-type-mcq bd-ans-type-item hide">
@@ -59,11 +59,15 @@
 							<input name="sb-answers-${order}[]" class="float-left bd-mcq-txt">
 							<div class="float-left bd-mcq-close hide"></div>
 						</div>
+						<div class="bd-mcq-row clearfix">
+							<div class="float-left bd-mcq-lbl"><spring:message code="label.option.key" /></div>
+							<input name="sb-answers-${order}[]" class="float-left bd-mcq-txt">
+							<div class="float-left bd-mcq-close hide"></div>
+						</div>
 					</div>
 				</div>
 				<div id="" class="bd-ans-type-com bd-ans-type-item hide">
 					<div class="clearfix bd-com-wrapper">
-						<div class="float-left bd-com-chk"></div>
 						<div class="float-left bd-com-txt"><spring:message code="label.textarea.key" /></div>
 					</div>
 				</div>
