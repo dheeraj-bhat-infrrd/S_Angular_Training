@@ -9,8 +9,7 @@ import java.util.Set;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.support.ClassPathXmlApplicationContext;
+import org.springframework.stereotype.Component;
 import com.realtech.socialsurvey.core.entities.AgentSettings;
 import com.realtech.socialsurvey.core.entities.Company;
 import com.realtech.socialsurvey.core.entities.SurveyDetails;
@@ -22,6 +21,7 @@ import com.realtech.socialsurvey.core.services.organizationmanagement.Organizati
 import com.realtech.socialsurvey.core.services.organizationmanagement.UserManagementService;
 import com.realtech.socialsurvey.core.services.surveybuilder.SurveyHandler;
 
+@Component("incompletesocialpost")
 public class IncompleteSocialPostReminderSender {
 
 	@Autowired
@@ -32,19 +32,22 @@ public class IncompleteSocialPostReminderSender {
 
 	@Autowired
 	private SurveyHandler surveyHandler;
+	
+	@Autowired
+	private EmailServices emailServices;
+	
+	@Autowired
+	private OrganizationManagementService organizationManagementService;
 
 	public static final Logger LOG = LoggerFactory.getLogger(IncompleteSocialPostReminderSender.class);
 
 	private static List<String> socialSites = new ArrayList<>();
 
-	public static void main(String[] args) {
-		@SuppressWarnings("resource") ApplicationContext context = new ClassPathXmlApplicationContext("ss-starter-config.xml");
-		SurveyHandler surveyHandler = (SurveyHandler) context.getBean("surveyHandler");
-		EmailServices emailServices = (EmailServices) context.getBean("emailServices");
+	
+	public void execute(){
+		LOG.info("Executing IncompleteSocialPostReminderSender");
 		populateSocialSites();
 		IncompleteSocialPostReminderSender sender = new IncompleteSocialPostReminderSender();
-		OrganizationManagementService organizationManagementService = (OrganizationManagementService) context
-				.getBean("organizationManagementService");
 		StringBuilder links = new StringBuilder();
 		for (Company company : organizationManagementService.getAllCompanies()) {
 			List<SurveyDetails> incompleteSocialPostCustomers = surveyHandler.getIncompleteSocialPostSurveys(company.getCompanyId());

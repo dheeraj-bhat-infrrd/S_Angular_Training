@@ -4,8 +4,9 @@ import java.util.ArrayList;
 import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
-import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 import com.realtech.socialsurvey.core.dao.OrganizationUnitSettingsDao;
@@ -18,40 +19,44 @@ import com.realtech.socialsurvey.core.entities.SiteMapEntry;
 public class MongoSiteMapContentFetcher implements SitemapContentFecher {
 
 	private static final Logger LOG = LoggerFactory.getLogger(MongoSiteMapContentFetcher.class);
-	
+
 	private String collectionName;
 	private String interval;
-	
+
 	private int limit = 50;
 	private long count;
 	private int recordsFetched;
 	private boolean areMoreRecordsPresent;
-	
+
+	@Autowired
 	private OrganizationUnitSettingsDao organizationUnitSettingsDao;
-	
+
+	@Value("${APPLICATION_BASE_URL}")
 	private String applicationUrl;
-	
-	public MongoSiteMapContentFetcher(String collectionName, String interval, ApplicationContext context){
-		this.collectionName = collectionName;
+
+	public void setInterval(String interval) {
 		this.interval = interval;
-		organizationUnitSettingsDao = context.getBean(OrganizationUnitSettingsDao.class);
-		applicationUrl = context.getEnvironment().getProperty("APPLICATION_BASE_URL");
 	}
 	
+	public void setCollectionName(String collectionName){
+		this.collectionName = collectionName;
+	}
+
 	@Override
 	public List<SiteMapEntry> getInitialContent() {
 		LOG.info("Getting initial content for collection");
 		List<SiteMapEntry> entries = null;
 		// check the interval
-		if(interval.equals(SiteMapGenerator.DAILY_CONTENT)){
+		if (interval.equals(SiteMapGenerator.DAILY_CONTENT)) {
 			count = organizationUnitSettingsDao.fetchSEOOptimizedOrganizationUnitCount(collectionName);
-			LOG.debug("Total number of records are "+count+". Limit is "+limit);
-			if(count <= limit){
+			LOG.debug("Total number of records are " + count + ". Limit is " + limit);
+			if (count <= limit) {
 				areMoreRecordsPresent = false;
-			}else{
+			}
+			else {
 				areMoreRecordsPresent = true;
 			}
-			if(count > 0){
+			if (count > 0) {
 				// get the records
 				List<ProfileUrlEntity> profileUrls = organizationUnitSettingsDao.fetchSEOOptimizedOrganizationUnitSettings(collectionName, 0, limit);
 				// convert profile urls to Site Map Entry
@@ -69,39 +74,44 @@ public class MongoSiteMapContentFetcher implements SitemapContentFecher {
 
 	@Override
 	public List<SiteMapEntry> nextBatch() {
-		LOG.info("Getting next batch with limit "+limit+" from "+recordsFetched);
+		LOG.info("Getting next batch with limit " + limit + " from " + recordsFetched);
 		List<SiteMapEntry> entries = null;
-		if(areMoreRecordsPresent){
-			if(interval.equals(SiteMapGenerator.DAILY_CONTENT)){
-				List<ProfileUrlEntity> profileUrls = organizationUnitSettingsDao.fetchSEOOptimizedOrganizationUnitSettings(collectionName, recordsFetched, limit);
+		if (areMoreRecordsPresent) {
+			if (interval.equals(SiteMapGenerator.DAILY_CONTENT)) {
+				List<ProfileUrlEntity> profileUrls = organizationUnitSettingsDao.fetchSEOOptimizedOrganizationUnitSettings(collectionName,
+						recordsFetched, limit);
 				entries = prepareSMEObjects(profileUrls);
 			}
 			recordsFetched += limit;
 		}
-		if(recordsFetched >= count){
+		if (recordsFetched >= count) {
 			areMoreRecordsPresent = false;
 		}
 		return entries;
 	}
-	
-	private String generateLocation(String profileUrl){
+
+	private String generateLocation(String profileUrl) {
 		// check the collection name and generate location accordingly
-		LOG.debug("Generating location url for "+profileUrl+" for collection "+collectionName);
-		if(collectionName.equals(MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION)){
-			return applicationUrl+"pages/company/"+profileUrl;
-		}else if(collectionName.equals(MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION)|| collectionName.equals(MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION) || collectionName.equals(MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION)){
-			return applicationUrl+"pages"+profileUrl;
-		}else{
+		LOG.debug("Generating location url for " + profileUrl + " for collection " + collectionName);
+		if (collectionName.equals(MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION)) {
+			return applicationUrl + "pages/company/" + profileUrl;
+		}
+		else if (collectionName.equals(MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION)
+				|| collectionName.equals(MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION)
+				|| collectionName.equals(MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION)) {
+			return applicationUrl + "pages" + profileUrl;
+		}
+		else {
 			return null;
 		}
 	}
-	
-	private List<SiteMapEntry> prepareSMEObjects(List<ProfileUrlEntity> profileUrls){
+
+	private List<SiteMapEntry> prepareSMEObjects(List<ProfileUrlEntity> profileUrls) {
 		LOG.info("Preparing SME objects");
 		List<SiteMapEntry> entries = new ArrayList<SiteMapEntry>();
 		SiteMapEntry entry = null;
-		for(ProfileUrlEntity profileUrl : profileUrls){
-			LOG.info("Converting "+profileUrl+" to SME");
+		for (ProfileUrlEntity profileUrl : profileUrls) {
+			LOG.info("Converting " + profileUrl + " to SME");
 			entry = new SiteMapEntry();
 			// generate location
 			entry.setLocation(generateLocation(profileUrl.getProfileUrl()));
