@@ -17,12 +17,15 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.dao.GenericDao;
+import com.realtech.socialsurvey.core.dao.OrganizationUnitSettingsDao;
 import com.realtech.socialsurvey.core.dao.impl.MongoOrganizationUnitSettingDaoImpl;
 import com.realtech.socialsurvey.core.entities.FacebookSocialPost;
 import com.realtech.socialsurvey.core.entities.FacebookToken;
 import com.realtech.socialsurvey.core.entities.FeedStatus;
+import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
 import com.realtech.socialsurvey.core.exception.NonFatalException;
 import com.realtech.socialsurvey.core.feed.SocialNetworkDataProcessor;
+import com.realtech.socialsurvey.core.services.mail.EmailServices;
 import facebook4j.Facebook;
 import facebook4j.FacebookException;
 import facebook4j.FacebookFactory;
@@ -45,6 +48,15 @@ public class FacebookFeedProcessorImpl implements SocialNetworkDataProcessor<Pos
 	@Autowired
 	private MongoTemplate mongoTemplate;
 
+	@Autowired
+	private OrganizationUnitSettingsDao settingsDao;
+
+	@Autowired
+	private EmailServices emailServices;
+	
+	@Value("${SOCIAL_CONNECT_REMINDER_THRESHOLD}")
+	private long socialConnectThreshold;
+	
 	@Value("${FB_CLIENT_ID}")
 	private String facebookClientId;
 
@@ -175,6 +187,17 @@ public class FacebookFeedProcessorImpl implements SocialNetworkDataProcessor<Pos
 
 			// increasing no.of retries
 			status.setRetries(status.getRetries() + 1);
+			
+			// sending reminder mail and increasing counter
+			if (status.getRemindersSent() < socialConnectThreshold) {
+				OrganizationUnitSettings unitSettings = settingsDao.fetchOrganizationUnitSettingsById(iden, organizationUnit);
+				
+				String userEmail = unitSettings.getContact_details().getMail_ids().getWork();
+				emailServices.sendSocialConnectMail(userEmail, unitSettings.getContact_details().getName(), userEmail, FEED_SOURCE);
+				
+				status.setRemindersSent(status.getRemindersSent() + 1);
+			}
+			
 			feedStatusDao.saveOrUpdate(status);
 		}
 

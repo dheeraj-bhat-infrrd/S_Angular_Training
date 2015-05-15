@@ -4,6 +4,7 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationContext;
+import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 import com.realtech.socialsurvey.core.entities.UsercountModificationNotification;
 import com.realtech.socialsurvey.core.exception.NonFatalException;
@@ -38,5 +39,8 @@ public class UpdateSubscriptionPriceStarter {
 		}else{
 			LOG.info("No records to modify subscription price");
 		}
+		
+		// Closing the context
+		((ConfigurableApplicationContext) context).close();
 	}
 }
