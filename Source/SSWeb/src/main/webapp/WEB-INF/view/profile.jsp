@@ -203,13 +203,13 @@
 	                    			<div class="lp-row">
 	                    				<div class="lp-input-cont">
 	                    					<div class="float-left lp-username-icn lp-input-icn"></div>
-	                    					<input id="lp-input-name" type="text" class="lp-input" placeholder="example: John Doe">
+	                    					<input id="lp-input-name" type="text" class="lp-input" placeholder="Your name">
 	                    				</div>
 	                    			</div>
 	                    			<div class="lp-row">
 	                    				<div class="lp-input-cont lp-email">
 	                    					<div class="float-left lp-email-icn lp-input-icn"></div>
-	                    					<input id="lp-input-email" type="email" class="lp-input" placeholder="example: office@example.com">
+	                    					<input id="lp-input-email" type="email" class="lp-input" placeholder="Email Address">
 	                    				</div>
 	                    			</div>
 	                    			<div class="lp-row">
@@ -239,6 +239,7 @@
 	                    			<div class="lp-row">
 	                    				<div class="lp-button">Submit Your message</div>
 	                    			</div>
+	                    			<div id="privacy-policy-link" class="privacy-policy-link">Privacy Policy</div>
                     			</form>
                     		</div>
                     	</div>
