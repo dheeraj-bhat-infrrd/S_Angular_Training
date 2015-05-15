@@ -86,6 +86,10 @@
 						<i><span class="sq-ques-txt"><spring:message code="label.surveyquestion.header.key" /><br><span class="semibold">${agentName}</span></span></i>
 					</div>
 					<div class="sq-bord-bot-sm"></div>
+					<input type="hidden" value="${message}" data-status="${status}" name="message" id="message"/>
+					<div id="err-nw-wrapper" class="err-nw-wrapper" style="margin-bottom: 10px;">
+						<span class="err-new-close"></span><span id="err-nw-txt"></span>
+					</div>
 					<div class="sq-rat-wrapper">
 						<form id="survey-request-form" action="${pageContext.request.contextPath}/rest/survey/triggersurvey">
 							<div
@@ -151,6 +155,7 @@
 								<div class="sq-btn-wrapper">
 									<div id="start-btn" class="sq-btn-continue">Start</div>
 								</div>
+								<div id="privacy-policy-link" class="privacy-policy-link take-sur-link">Privacy Policy</div>
 							</div>
 						</form>
 					</div>
@@ -350,7 +355,13 @@
 <script>
 $(document).ready(function() {
 	$("div[data-ques-type]").hide();
-	
+	if ($('#message').val() != "") {
+		if ($('#message').attr('data-status') == 'ERROR_MESSAGE') {
+			showError($('#message').val());
+		} else {
+			showInfo($('#message').val());
+		}
+	}
 	var q = $('#prof-container').attr("data-q");
 	console.log(q);
 	/**console.log("Loading captcha");

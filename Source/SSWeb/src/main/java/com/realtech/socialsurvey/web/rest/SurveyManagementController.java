@@ -353,6 +353,8 @@ public class SurveyManagementController {
 		}
 		catch (NonFatalException e) {
 			LOG.error("Exception caught in getSurvey() method of SurveyManagementController.");
+			model.addAttribute("status", DisplayMessageType.ERROR_MESSAGE);
+			model.addAttribute("message", messageUtils.getDisplayMessage(DisplayMessageConstants.INVALID_CAPTCHA, DisplayMessageType.ERROR_MESSAGE));
 			model.addAttribute("agentId", agentId);
  			model.addAttribute("agentName", agentName);
 			model.addAttribute("firstName", firstName);

@@ -8,7 +8,7 @@
 <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title><spring:message
-		code="label.completeregistration.title.key" /></title>
+		code="label.registrationinvitesuccessful.title.key" /></title>
 <link rel="shortcut icon"
 	href="${pageContext.request.contextPath}/favicon.ico" sizes="16x16">
 <link rel="stylesheet"
@@ -47,19 +47,19 @@
 		<div class="container">
 			<div class="hm-header-row hm-header-row-main clearfix">
 				<div class="hm-header-row-left text-center">
-					<spring:message code="label.completeregistration.title.key" />
+					<spring:message code="label.registrationinvitesuccessful.title.key" />
 				</div>
 			</div>
 		</div>
 	</div>
 	<div class="prof-main-content-wrapper margin-top-25 margin-bottom-25">
 		<div class="container">
-			<div class="inv-succ-text1 text-center">Congratulations, You're in!</div>
-			<div class="inv-succ-text2 text-center">Check your email</div>
+			<div class="inv-succ-text1 text-center"><spring:message code="label.registerinvitesuccessful.text1.key" /></div>
+			<div class="inv-succ-text2 text-center"><spring:message code="label.registerinvitesuccessful.text2.key" /></div>
 			<div class="inv-succ-email text-center">${emailid }</div>
-			<div class="inv-succ-text3">Click on the activation link in the email to verify your account and complete your setup.</div>
-			<div class="inv-succ-link" onclick="resendActivationLink();">Resend activation link</div>
-			<div class="inv-succ-link" onclick="redirectToLoginpage();">I already have an account - login</div>
+			<div class="inv-succ-text3"><spring:message code="label.registerinvitesuccessful.text3.key" /></div>
+			<div class="inv-succ-link" onclick="resendActivationLink();"><spring:message code="label.registerinvitesuccessful.resendlink.key" /></div>
+			<div class="inv-succ-link" onclick="redirectToLoginpage();"><spring:message code="label.registerinvitesuccessful.loginlink.key" /></div>
 		</div>
 	</div>
 	<div style="display:none;">

@@ -1174,3 +1174,26 @@ span.wc-highlight {
 .sq-checkbox{
 	margin-right: 0 !important;
 }
+
+.change-survey-btn {
+    width: 200px;
+    height: 40px;
+    line-height: 40px;
+    margin: 15px auto;
+    text-align: center;
+    background: #009FE0;
+    color: #fff;
+    border-radius: 3px;
+    cursor: pointer;
+    font-style: normal;
+}
+
+.privacy-policy-link {
+    color: #009FE0;
+    text-align: center;
+    cursor: pointer;
+}
+
+.take-sur-link {
+	margin: 0px 0px 0px 80px;
+}

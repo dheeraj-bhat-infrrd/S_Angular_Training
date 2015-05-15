@@ -184,7 +184,15 @@ function paintSurveyPageFromJson() {
 				"OOPS! It looks like you have already taken a survey for " + agentName + "."
 				+"<br/><br/>"
 				+"Are you trying to amend a prior response? If so click the link below and we will email you the access required<br/><br/>")
-				.append("<div id='changeSurvey' class='cursor-pointer'>Link to resend origin Survey Responses so they can be amended</div>");
+				.append("<div>Link to resend original Survey Responses so they can be amended</div>");
+		
+		var linkToResendSurvey = $('<div>').attr({
+			"id" : "changeSurvey",
+			"class" : "change-survey-btn"
+		}).html("Retake survey");
+		
+		$('#content').append(linkToResendSurvey);
+		
 		$(document).on('click', '#changeSurvey', function() {
 			retakeSurveyRequest();
 		});
