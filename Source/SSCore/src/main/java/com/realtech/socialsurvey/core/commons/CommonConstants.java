@@ -534,4 +534,5 @@ public interface CommonConstants {
 	public static final String SURVEYDETAIL_MARKER = "SURVEYDETAIL^^";
 	public static final String RECIPIENT_NAME_MARKER = "RECIPIENTNAME^^";
 	public static final String CUSTOMER_NAME_MARKER = "CUSTOMERNAME^^";
+	public static final String AGENTEMAIL_MARKER = "AGENTEMAIL^^";
 }

@@ -726,7 +726,8 @@ public class EmailServicesImpl implements EmailServices {
 
 	@Async
 	@Override
-	public void queueSurveyCompletionMail(String recipientMailId, String displayName, String agentName) throws InvalidInputException {
+	public void queueSurveyCompletionMail(String recipientMailId, String displayName, String agentName, String agentEmail)
+			throws InvalidInputException {
 		if (recipientMailId == null || recipientMailId.isEmpty()) {
 			LOG.error("Recipient email Id is empty or null for sending survey completion mail ");
 			throw new InvalidInputException("Recipient email Id is empty or null for sending survey completion mail ");
@@ -743,6 +744,7 @@ public class EmailServicesImpl implements EmailServices {
 		contentBuilder.append(CommonConstants.RECIPIENT_MARKER).append(recipientMailId);
 		contentBuilder.append(CommonConstants.ELEMENTS_DELIMITER).append(CommonConstants.NAME_MARKER).append(displayName);
 		contentBuilder.append(CommonConstants.ELEMENTS_DELIMITER).append(CommonConstants.AGENTNAME_MARKER).append(agentName);
+		contentBuilder.append(CommonConstants.ELEMENTS_DELIMITER).append(CommonConstants.AGENTEMAIL_MARKER).append(agentEmail);
 
 		LOG.debug("queueing content: " + contentBuilder.toString());
 		queueProducer.queueEmail(EmailHeader.ACCOUNT_UPGRADE, contentBuilder.toString());
@@ -751,8 +753,8 @@ public class EmailServicesImpl implements EmailServices {
 
 	@Async
 	@Override
-	public void sendSurveyCompletionMail(String recipientMailId, String displayName, String agentName) throws InvalidInputException,
-			UndeliveredEmailException {
+	public void sendSurveyCompletionMail(String recipientMailId, String displayName, String agentName, String agentEmail)
+			throws InvalidInputException, UndeliveredEmailException {
 		if (recipientMailId == null || recipientMailId.isEmpty()) {
 			LOG.error("Recipient email Id is empty or null for sending survey completion mail ");
 			throw new InvalidInputException("Recipient email Id is empty or null for sending survey completion mail ");
@@ -763,7 +765,7 @@ public class EmailServicesImpl implements EmailServices {
 		}
 
 		LOG.info("Sending survey completion email to : " + recipientMailId);
-		EmailEntity emailEntity = prepareEmailEntityForSendingEmail(recipientMailId, agentName);
+		EmailEntity emailEntity = prepareEmailEntityForSendingEmail(recipientMailId, agentEmail, agentName);
 		String subjectFileName = EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER + EmailTemplateConstants.SURVEY_COMPLETION_MAIL_SUBJECT;
 
 		FileContentReplacements messageBodyReplacements = new FileContentReplacements();
@@ -1326,26 +1328,6 @@ public class EmailServicesImpl implements EmailServices {
 		return emailEntity;
 	}
 
-	/**
-	 * Method to prepare email entity for verification mail
-	 * 
-	 * @param recipientMailId
-	 * @return
-	 */
-	private EmailEntity prepareEmailEntityForSendingEmail(String recipientMailId, String senderName) {
-		LOG.debug("Preparing email entity for verification mail for recipientMailId " + recipientMailId);
-		List<String> recipients = new ArrayList<String>();
-		recipients.add(recipientMailId);
-
-		EmailEntity emailEntity = new EmailEntity();
-		emailEntity.setRecipients(recipients);
-		emailEntity.setSenderName(senderName);
-		emailEntity.setRecipientType(EmailEntity.RECIPIENT_TYPE_TO);
-
-		LOG.debug("Prepared email entity for verification mail");
-		return emailEntity;
-	}
-	
 	private EmailEntity prepareEmailEntityForSendingEmail(String recipientMailId, String emailId, String name) {
 		LOG.debug("Preparing email entity for sending mail to " + recipientMailId + " agent email name: " + emailId + " name: " + name);
 		List<String> recipients = new ArrayList<String>();
