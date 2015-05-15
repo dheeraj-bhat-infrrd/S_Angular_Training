@@ -14,7 +14,7 @@ public interface SocialNetworkDataProcessor<K, V> {
 	 * @param organizationUnit
 	 * @param token
 	 */
-	public void preProcess(long iden, String organizationUnit, V token);
+	public void preProcess(long iden, String collection, V token);
 
 	/**
 	 * Fetches feed for the provided identifier. The identifier could be company, region, branch or
@@ -26,7 +26,7 @@ public interface SocialNetworkDataProcessor<K, V> {
 	 * @return
 	 * @throws NonFatalException
 	 */
-	public List<K> fetchFeed(long iden, String organizationUnit, V token) throws NonFatalException;
+	public List<K> fetchFeed(long iden, String collection, V token) throws NonFatalException;
 
 	/**
 	 * Processes the list of feed.
@@ -35,7 +35,7 @@ public interface SocialNetworkDataProcessor<K, V> {
 	 * @param organizationUnit
 	 * @throws NonFatalException
 	 */
-	public void processFeed(List<K> feed, String organizationUnit) throws NonFatalException;
+	public void processFeed(List<K> feed, String collection) throws NonFatalException;
 
 	/**
 	 * Post processor hook
@@ -44,5 +44,5 @@ public interface SocialNetworkDataProcessor<K, V> {
 	 * @param organizationUnit
 	 * @throws NonFatalException
 	 */
-	public void postProcess(long iden, String organizationUnit) throws NonFatalException;
+	public void postProcess(long iden, String collection) throws NonFatalException;
 }
