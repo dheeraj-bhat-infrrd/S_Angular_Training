@@ -194,7 +194,6 @@ public class SurveyManagementController {
 				
 				// Generate the text as in mail
 				String surveyDetail = generateSurveyTextForMail(customerName, mood, survey);
-				
 				if (enableKafka.equals(CommonConstants.YES)) {
 					for (Entry<String, String> admin : emailIdsToSendMail.entrySet()) {
 						emailServices.queueSurveyCompletionMailToAdminsAndAgent(admin.getValue(), admin.getKey(), surveyDetail, customerName);
@@ -233,7 +232,18 @@ public class SurveyManagementController {
 		}
 		surveyDetail.append("<br />");
 		surveyDetail.append("<br />").append("Customer Comments: ").append(survey.getReview());
-		surveyDetail.append("<br />").append("Customer Mood: ").append(mood);
+		
+		surveyDetail.append("<br />").append("Overall Experience: ");
+		if (mood.equalsIgnoreCase(CommonConstants.SURVEY_CUSTOMER_MOOD_HAPPY)) {
+			surveyDetail.append(CommonConstants.SURVEY_CUSTOMER_MOOD_GREAT);
+		}
+		else if (mood.equalsIgnoreCase(CommonConstants.SURVEY_CUSTOMER_MOOD_NEUTRAL)) {
+			surveyDetail.append(CommonConstants.SURVEY_CUSTOMER_MOOD_JUSTOK);
+		}
+		else if (mood.equalsIgnoreCase(CommonConstants.SURVEY_CUSTOMER_MOOD_SAD)) {
+			surveyDetail.append(CommonConstants.SURVEY_CUSTOMER_MOOD_UNPLEASANT);
+		}
+		
 		if (survey.getSharedOn() != null && !survey.getSharedOn().isEmpty()) {
 			surveyDetail.append("<br />").append("Share Checkbox: ").append("Yes");
 			surveyDetail.append("<br />").append("Shared on: ").append(StringUtils.join(survey.getSharedOn(), ", "));
