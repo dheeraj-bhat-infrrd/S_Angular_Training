@@ -110,7 +110,7 @@ function callAjaxFormSubmit(url, callBackFunction, formId) {
  * Generic function to be used for making form submission with ajax post
  */
 function redirectErrorpage(){
-	window.location = "errorpage.do";
+	window.open(window.location.origin + "/errorpage.do",'_self');
 }
 
 /**
