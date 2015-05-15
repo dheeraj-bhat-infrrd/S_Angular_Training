@@ -421,6 +421,21 @@ function openAuthPageRegistration(socialNetwork) {
 	window.open("./socialauth.do?social=" + socialNetwork + "&flow=registration", "Authorization Page", "width=600,height=600,scrollbars=yes");
 }
 
+function showProfileLinkInEditProfilePage(source, profileUrl){
+	if(source=='facebook'){
+		$('#edt-prof-fb-lnk').html(profileUrl);
+	}
+	else if(source=='twitter'){
+		$('#edt-prof-twt-lnk').html(profileUrl);
+	}
+	else if(source=='linkedin'){
+		$('#edt-prof-linkedin-lnk').html(profileUrl);
+	}
+	else if(source=='google'){
+		$('#edt-prof-ggl-lnk').html(profileUrl);
+	}
+}
+
 // Skip / Next buttons 
 $('body').on('click', '.wc-skip-btn, .wc-sub-btn', function() {
 	if ($(this).closest('.wc-btn-row').attr('data-page') == 'one') {
