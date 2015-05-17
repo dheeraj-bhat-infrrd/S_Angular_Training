@@ -7,7 +7,6 @@ import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.util.List;
 import java.util.Set;
-import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrDocumentList;
 import com.realtech.socialsurvey.core.entities.Branch;
@@ -131,11 +130,11 @@ public interface SolrSearchService {
 	 * 
 	 * @param userId
 	 * @return
-	 * @throws SolrServerException
 	 * @throws NoRecordsFetchedException
 	 * @throws InvalidInputException
+	 * @throws SolrException 
 	 */
-	public String getUserDisplayNameById(long userId) throws SolrServerException, NoRecordsFetchedException, InvalidInputException;
+	public String getUserDisplayNameById(long userId) throws NoRecordsFetchedException, InvalidInputException, SolrException;
 
 	/**
 	 * Method to fetch user based on the userid provided
@@ -143,9 +142,9 @@ public interface SolrSearchService {
 	 * @param userId
 	 * @return
 	 * @throws InvalidInputException
-	 * @throws SolrServerException
+	 * @throws SolrException 
 	 */
-	public SolrDocument getUserByUniqueId(long userId) throws InvalidInputException, SolrServerException;
+	public SolrDocument getUserByUniqueId(long userId) throws InvalidInputException, SolrException;
 
 	public void editUserInSolr(long userId, String key, String value) throws SolrException;
 

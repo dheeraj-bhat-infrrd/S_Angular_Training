@@ -87,4 +87,7 @@ public final class EmailTemplateConstants {
 
 	public static final String VERIFICATION_MAIL_BODY = "VerificationMailBody.html";
 	public static final String VERIFICATION_MAIL_SUBJECT = "VerificationMailSubject.txt";
+	
+	public static final String REPORT_ABUSE_MAIL_BODY = "ReportAbuseMailBody.html";
+	public static final String REPORT_ABUSE_MAIL_SUBJECT = "ReportAbuseMailSubject.txt";
 }
