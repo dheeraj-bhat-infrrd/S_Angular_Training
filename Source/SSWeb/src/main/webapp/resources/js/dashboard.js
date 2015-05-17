@@ -62,6 +62,27 @@ $(document).on('click', '#restart-survey-mail', function(e) {
 	showToast();
 });
 
+$(document).on('click', '#report-abuse', function(e) {
+	
+	var firstName = $(this).parent().parent().parent().attr('data-firstname');
+	var lastName = $(this).parent().parent().parent().attr('data-lastname');
+	var agentName = $(this).parent().parent().parent().attr('data-agentname');
+	var customerEmail = $(this).parent().parent().parent().attr('data-customeremail');
+	var agentId = $(this).parent().parent().parent().attr('data-agentid');
+	var review = $(this).parent().parent().parent().attr('data-review');
+	var payload = {
+			"customerEmail" : customerEmail,
+			"agentId" : agentId,
+			"firstName" : firstName,
+			"lastName" : lastName,
+			"agentName" : agentName,
+			"review" : review
+	};
+	callAjaxGetWithPayloadData('./reportabuse.do', '', payload, true);
+	$('#overlay-toast').html('Reported Successfully!');
+	showToast();
+});
+
 $('body').click(function() {
 	$('#hr-dd-wrapper').slideUp(200);
 });

@@ -6368,6 +6368,10 @@ tr.u-tbl-header td {
 	background: url(../images/resend.png) no-repeat center;
  }
  
+ .icn-report-abuse {
+ 	background: url(../images/abuse.png) no-repeat center;
+ }
+ 
  span.ui-helper-hidden-accessible {
   display: none;
 }

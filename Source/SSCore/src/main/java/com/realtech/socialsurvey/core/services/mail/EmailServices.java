@@ -289,4 +289,7 @@ public interface EmailServices {
 
 	public void sendSocialConnectMail(String recipientMailId, String displayName, String loginName, String account) throws InvalidInputException,
 			UndeliveredEmailException;
+
+	public void sendReportAbuseMail(String recipientMailId, String displayName, String agentName, String customerName, 
+			String customerEmail, String review) throws InvalidInputException, UndeliveredEmailException;
 }

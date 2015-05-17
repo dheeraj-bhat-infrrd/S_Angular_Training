@@ -9,7 +9,6 @@ import java.util.Map.Entry;
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import org.apache.commons.lang.StringUtils;
-import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.common.SolrDocument;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -161,8 +160,8 @@ public class SurveyManagementController {
 			try {
 				solrDocument = solrSearchService.getUserByUniqueId(agentId);
 			}
-			catch (SolrServerException e) {
-				LOG.error("SolrServerException occurred in storeFeedback() while fetching email id of agent. NEsted exception is ", e);
+			catch (SolrException e) {
+				LOG.error("SolrException occurred in storeFeedback() while fetching email id of agent. NEsted exception is ", e);
 			}
 			
 			if (solrDocument != null && !solrDocument.isEmpty()) {
@@ -283,7 +282,7 @@ public class SurveyManagementController {
 				agentEmail = user.get(CommonConstants.USER_EMAIL_ID_SOLR).toString();
 			}
 		}
-		catch (InvalidInputException | SolrServerException e) {
+		catch (InvalidInputException | SolrException e) {
 			LOG.error("Error occured while fetching details of agent. Error is : " + e);
 			return JspResolver.ERROR_PAGE;
 		}
