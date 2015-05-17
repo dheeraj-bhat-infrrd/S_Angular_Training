@@ -76,7 +76,7 @@ function paintProfilePage(result) {
 		
 		if(contactDetails != undefined){
 			
-			$('#social-connect-txt').text("Contact using "+contactDetails.name+":");
+			$('#social-connect-txt').text("Contact "+contactDetails.name+" using :");
 			$('#prof-header-url').text(location.href);
 			$('#prof-contact-hdr').text("Contact "+contactDetails.name);
 			$('#agent-desc').html(contactDetails.name+" - Reviews And Ratings");
@@ -288,19 +288,34 @@ function paintProfilePage(result) {
             if (result.socialMediaTokens) {
             	var socialToken = result.socialMediaTokens;
             	if (socialToken.facebookToken && socialToken.facebookToken.facebookPageLink) {
-            		$('#icn-fb').data('link', socialToken.facebookToken.facebookPageLink);            		
+            		$('#icn-fb').data('link', socialToken.facebookToken.facebookPageLink);
+            	}
+            	else{
+            		$('#icn-fb').hide();
             	}
             	if (socialToken.twitterToken && socialToken.twitterToken.twitterPageLink) {
-            		$('#icn-twit').data('link', socialToken.twitterToken.twitterPageLink);            		
+            		$('#icn-twit').data('link', socialToken.twitterToken.twitterPageLink);
+            	}
+            	else{
+        			$('#icn-twit').hide();
             	}
             	if (socialToken.linkedInToken && socialToken.linkedInToken.linkedInPageLink) {
             		$('#icn-lin').data('link', socialToken.linkedInToken.linkedInPageLink);
             	}
+            	else{
+        			$('#icn-lin').hide();
+            	}
             	if (socialToken.yelpToken && socialToken.yelpToken.yelpPageLink) {
             		$('#icn-yelp').data('link', socialToken.yelpToken.yelpPageLink);            		
             	}
+            	else{
+            		$('#icn-yelp').hide();
+            	}
             	if (socialToken.googleToken && socialToken.googleToken.profileLink) {
             		$('#icn-gplus').data('link', socialToken.googleToken.profileLink);            		
+            	}
+            	else{
+            		$('#icn-gplus').hide();
             	}
             	
             	$('.social-item-icon').bind('click', function() {
@@ -310,6 +325,14 @@ function paintProfilePage(result) {
             		}
             		window.open(returnValidWebAddress(link), '_blank');
             	});
+            }
+            else{
+            	$('#icn-fb').hide();
+            	$('#icn-twit').hide();
+            	$('#icn-lin').hide();
+            	$('#icn-yelp').hide();
+            	$('#icn-gplus').hide();
+            	$('#prof-contact-hdr').hide();
             }
 		}         
 	}
