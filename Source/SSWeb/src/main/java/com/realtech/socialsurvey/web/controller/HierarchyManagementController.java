@@ -8,7 +8,6 @@ import java.util.Map;
 import java.util.Set;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
-import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.common.SolrDocumentList;
 import org.noggit.JSONUtil;
 import org.slf4j.Logger;
@@ -1351,9 +1350,9 @@ public class HierarchyManagementController {
 				Type searchedUser = new TypeToken<UserFromSearch>() {}.getType();
 				adminUser = new Gson().fromJson(adminUserDoc.toString(), searchedUser);
 			}
-			catch (SolrServerException e) {
-				LOG.error("SolrServerException while searching for user id. Reason : " + e.getMessage(), e);
-				throw new NonFatalException("SolrServerException while searching for user id.", DisplayMessageConstants.GENERAL_ERROR, e);
+			catch (SolrException e) {
+				LOG.error("SolrException while searching for user id. Reason : " + e.getMessage(), e);
+				throw new NonFatalException("SolrException while searching for user id.", DisplayMessageConstants.GENERAL_ERROR, e);
 			}
 
 			users = userManagementService.checkUserCanEdit(admin, adminUser, users);
@@ -1414,9 +1413,9 @@ public class HierarchyManagementController {
 				Type searchedUser = new TypeToken<UserFromSearch>() {}.getType();
 				adminUser = new Gson().fromJson(adminUserDoc.toString(), searchedUser);
 			}
-			catch (SolrServerException e) {
-				LOG.error("SolrServerException while searching for user id. Reason : " + e.getMessage(), e);
-				throw new NonFatalException("SolrServerException while searching for user id.", DisplayMessageConstants.GENERAL_ERROR, e);
+			catch (SolrException e) {
+				LOG.error("SolrException while searching for user id. Reason : " + e.getMessage(), e);
+				throw new NonFatalException("SolrException while searching for user id.", DisplayMessageConstants.GENERAL_ERROR, e);
 			}
 
 			usersList = userManagementService.checkUserCanEdit(admin, adminUser, usersList);
@@ -1469,9 +1468,9 @@ public class HierarchyManagementController {
 				Type searchedUser = new TypeToken<UserFromSearch>() {}.getType();
 				adminUser = new Gson().fromJson(adminUserDoc.toString(), searchedUser);
 			}
-			catch (SolrServerException e) {
-				LOG.error("SolrServerException while searching for user id. Reason : " + e.getMessage(), e);
-				throw new NonFatalException("SolrServerException while searching for user id.", DisplayMessageConstants.GENERAL_ERROR, e);
+			catch (SolrException e) {
+				LOG.error("SolrException while searching for user id. Reason : " + e.getMessage(), e);
+				throw new NonFatalException("SolrException while searching for user id.", DisplayMessageConstants.GENERAL_ERROR, e);
 			}
 
 			if (highestRole == CommonConstants.PROFILES_MASTER_COMPANY_ADMIN_PROFILE_ID) {
