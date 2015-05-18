@@ -36,7 +36,6 @@ public class TopicConsumer implements Runnable {
 	private static final String RECIPIENT_NAME_MARKER = "RECIPIENTNAME^^";
 	private static final String CUSTOMER_NAME_MARKER = "CUSTOMERNAME^^";
 	private static final String AGENTEMAIL_MARKER = "AGENTEMAIL^^";
-	private static final String AGENTPROFILE_MARKER = "AGENTPROFILE^^";
 
 	private KafkaStream<byte[], byte[]> stream;
 	private EmailServices emailServices;
@@ -307,8 +306,8 @@ public class TopicConsumer implements Runnable {
 		LOG.debug("Agent email: " + agentEmail);
 		
 		messageParsedIndex += AGENTEMAIL_MARKER.length() + name.length() + ELEMENTS_DELIMITER.length();
-		String agentProfile = message.substring(messageParsedIndex + AGENTPROFILE_MARKER.length());
-		LOG.debug("Agent profile url: " + agentProfile);
+		String agentProfile = message.substring(messageParsedIndex + PROFILENAME_MARKER.length());
+		LOG.debug("Agent profile: " + agentProfile);
 
 		LOG.debug("Sending account completion mail");
 		emailServices.sendSurveyCompletionMail(recipient, name, agentName, agentEmail, agentProfile);

@@ -189,11 +189,11 @@ public class SurveyManagementController {
 				User agent = userManagementService.getUserByUserId(agentId);
 				if (enableKafka.equals(CommonConstants.YES)) {
 					emailServices.queueSurveyCompletionMail(customerEmail, customerName, survey.getAgentName(), agent.getEmailId(),
-							agent.getProfileUrl());
+							agent.getProfileName());
 				}
 				else {
 					emailServices.sendSurveyCompletionMail(customerEmail, customerName, survey.getAgentName(), agent.getEmailId(),
-							agent.getProfileUrl());
+							agent.getProfileName());
 				}
 				
 				// Generate the text as in mail

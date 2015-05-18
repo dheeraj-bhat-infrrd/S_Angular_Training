@@ -147,10 +147,10 @@ public interface EmailServices {
 	 * @param agentName
 	 * @throws InvalidInputException
 	 */
-	public void queueSurveyCompletionMail(String recipientMailId, String displayName, String agentName, String agentEmail, String agentProfileUrl)
+	public void queueSurveyCompletionMail(String recipientMailId, String displayName, String agentName, String agentEmail, String agentProfileName)
 			throws InvalidInputException;
 
-	public void sendSurveyCompletionMail(String recipientMailId, String displayName, String agentName, String agentEmail, String agentProfileUrl)
+	public void sendSurveyCompletionMail(String recipientMailId, String displayName, String agentName, String agentEmail, String agentProfileName)
 			throws InvalidInputException, UndeliveredEmailException;
 
 	/**

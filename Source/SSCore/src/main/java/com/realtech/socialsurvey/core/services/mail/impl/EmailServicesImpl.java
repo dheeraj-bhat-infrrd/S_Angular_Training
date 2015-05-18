@@ -726,7 +726,7 @@ public class EmailServicesImpl implements EmailServices {
 
 	@Async
 	@Override
-	public void queueSurveyCompletionMail(String recipientMailId, String displayName, String agentName, String agentEmail, String agentProfileUrl)
+	public void queueSurveyCompletionMail(String recipientMailId, String displayName, String agentName, String agentEmail, String agentProfileName)
 			throws InvalidInputException {
 		if (recipientMailId == null || recipientMailId.isEmpty()) {
 			LOG.error("Recipient email Id is empty or null for sending survey completion mail ");
@@ -745,7 +745,7 @@ public class EmailServicesImpl implements EmailServices {
 		contentBuilder.append(CommonConstants.ELEMENTS_DELIMITER).append(CommonConstants.NAME_MARKER).append(displayName);
 		contentBuilder.append(CommonConstants.ELEMENTS_DELIMITER).append(CommonConstants.AGENTNAME_MARKER).append(agentName);
 		contentBuilder.append(CommonConstants.ELEMENTS_DELIMITER).append(CommonConstants.AGENTEMAIL_MARKER).append(agentEmail);
-		contentBuilder.append(CommonConstants.ELEMENTS_DELIMITER).append(CommonConstants.AGENTPROFILE_MARKER).append(agentProfileUrl);
+		contentBuilder.append(CommonConstants.ELEMENTS_DELIMITER).append(CommonConstants.PROFILENAME_MARKER).append(agentProfileName);
 
 		LOG.debug("queueing content: " + contentBuilder.toString());
 		queueProducer.queueEmail(EmailHeader.ACCOUNT_UPGRADE, contentBuilder.toString());
@@ -754,7 +754,7 @@ public class EmailServicesImpl implements EmailServices {
 
 	@Async
 	@Override
-	public void sendSurveyCompletionMail(String recipientMailId, String displayName, String agentName, String agentEmail, String agentProfileUrl)
+	public void sendSurveyCompletionMail(String recipientMailId, String displayName, String agentName, String agentEmail, String agentProfileName)
 			throws InvalidInputException, UndeliveredEmailException {
 		if (recipientMailId == null || recipientMailId.isEmpty()) {
 			LOG.error("Recipient email Id is empty or null for sending survey completion mail ");
@@ -771,8 +771,8 @@ public class EmailServicesImpl implements EmailServices {
 
 		FileContentReplacements messageBodyReplacements = new FileContentReplacements();
 		messageBodyReplacements.setFileName(EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER + EmailTemplateConstants.SURVEY_COMPLETION_MAIL_BODY);
-		messageBodyReplacements.setReplacementArgs(Arrays.asList(appLogoUrl, displayName, agentName, agentName, agentProfileUrl, agentProfileUrl,
-				agentName, appBaseUrl));
+		messageBodyReplacements.setReplacementArgs(Arrays.asList(appLogoUrl, displayName, agentName, agentName, appBaseUrl, agentProfileName,
+				appBaseUrl, agentProfileName, agentName, appBaseUrl));
 
 		LOG.debug("Calling email sender to send mail");
 		emailSender.sendEmailWithBodyReplacements(emailEntity, subjectFileName, messageBodyReplacements);
