@@ -3837,7 +3837,7 @@ button.paypal.is-active {
 .dash-top-info {
 	border-bottom: 1px solid #dcdcdc;
 	overflow: hidden;
-	height: 400px;
+	height: 425px;
 }
 
 .stats-left {
@@ -4153,7 +4153,7 @@ button.paypal.is-active {
 	display: inline-block;
 	height: 10px;
 	width: 10px;
-	margin-left: 20px;
+	margin-left: 10px;
 }
 
 .util-gph-legend {
@@ -4162,7 +4162,7 @@ button.paypal.is-active {
 	line-height: 25px;
 	left: -210px;
 	font-size: 13px;
-	width: 192px;
+	width: 193px;
 	text-align: right;
 }
 
@@ -4627,7 +4627,7 @@ select.rfr_txt_fld,select.rfr_input_fld{
 .bd-frm-left {
 	line-height: 40px;
 	margin-right: 20px;
-	width: 190px;
+	width: 200px;
 	min-height: 10px;
 	text-align: right;
 	font-family: opensanslight;
@@ -5426,7 +5426,8 @@ tr.u-tbl-header td {
 }
 
 .bd-srv-tbl-header {
-	line-height: 55px;
+	padding:15px 0;
+	line-height: 25px;
 	color: #fff;
 	text-align: center;
 	background-color: #3E9DCB;
@@ -5490,8 +5491,8 @@ tr.u-tbl-header td {
 	text-align: center;
 	line-height: 35px;
 	margin-top: 8px;
-	margin-left: 10px;
-	margin-right: 10px;
+	margin-left: 9px;
+	margin-right: 9px;
 }
 
 .vs-tbl-num span {
@@ -5570,7 +5571,7 @@ tr.u-tbl-header td {
 }
 
 .bd-q-pu-txt-edit {
-	padding: 0 40px 0 10px;
+	padding: 0 10px 0 10px;
 	border: 1px solid #3E9DCB;
 	height: 40px;
 	border-radius: 2px;

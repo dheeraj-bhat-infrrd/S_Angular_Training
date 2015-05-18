@@ -59,7 +59,7 @@
                 <span class="txt-bold txt-header-small">Professionals</span> <span class="txt-header-small">and</span>
                 <span class="txt-bold txt-header-small">Customers </span><span class="txt-header-small">connect</span> -->
                 <span>Amplify the Voice of Your Customer</span><br/>
-                <span class="font-22 s-font-16">Engaging customers and enhancing your online reputation</span>
+                <span class="font-22 s-font-16">Engaging Customers and Enhancing Your Online Reputation</span>
 			</div>
 			<div class="content-wrapper clearfix">
 				<div class="float-left c-pic-panel">
@@ -67,7 +67,7 @@
 						<div class="float-left c-pic-top-1">
 							<div class="blue-ext-left"></div>
 							<div class="c-panel-txt-top txt-bold">Manage Your Online Reputation</div>
-							<div class="c-panel-txt-bot">We offer companies and quality professionals a simple way to manage their online reputation, and capture customer data to create a winning social strategy and boost customer satisfaction.</div>
+							<div class="c-panel-txt-bot">We offer companies and quality professionals a simple way to manage their online reputation and capture customer data to create a winning social strategy and boost customer satisfaction.</div>
 						</div>
 						<div class="float-left c-pic-img c-pic-top-2">
 							<div class="pic-bot-txt">
