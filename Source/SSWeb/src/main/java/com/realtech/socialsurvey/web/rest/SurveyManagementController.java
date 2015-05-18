@@ -74,10 +74,6 @@ public class SurveyManagementController {
 	@Autowired
 	private SolrSearchService solrSearchService;
 
-	@Resource
-	@Qualifier("nocaptcha")
-	private CaptchaValidation captchaValidation;
-
 	@Autowired
 	private EmailServices emailServices;
 
@@ -90,6 +86,10 @@ public class SurveyManagementController {
 	@Autowired
 	private UserManagementService userManagementService;
 
+	@Resource
+	@Qualifier("nocaptcha")
+	private CaptchaValidation captchaValidation;
+
 	@Value("${ENABLE_KAFKA}")
 	private String enableKafka;
 	
@@ -99,7 +99,9 @@ public class SurveyManagementController {
 	@Value("${CAPTCHA_SECRET}")
 	private String captchaSecretKey;
 
-
+	@Value("${GATEWAY_QUESTION}")
+	private String gatewayQuestion;
+	
 	/*
 	 * Method to store answer to the current question of the survey.
 	 */
@@ -184,12 +186,14 @@ public class SurveyManagementController {
 					customerName = survey.getCustomerFirstName() + " " + survey.getCustomerLastName();
 				}
 				
-				String agentEmail = userManagementService.getUserByUserId(agentId).getEmailId();
+				User agent = userManagementService.getUserByUserId(agentId);
 				if (enableKafka.equals(CommonConstants.YES)) {
-					emailServices.queueSurveyCompletionMail(customerEmail, customerName, survey.getAgentName(), agentEmail);
+					emailServices.queueSurveyCompletionMail(customerEmail, customerName, survey.getAgentName(), agent.getEmailId(),
+							agent.getProfileName());
 				}
 				else {
-					emailServices.sendSurveyCompletionMail(customerEmail, customerName, survey.getAgentName(), agentEmail);
+					emailServices.sendSurveyCompletionMail(customerEmail, customerName, survey.getAgentName(), agent.getEmailId(),
+							agent.getProfileName());
 				}
 				
 				// Generate the text as in mail
@@ -223,17 +227,21 @@ public class SurveyManagementController {
 		surveyDetail.append("<br />").append("Date Sent: ").append(survey.getCreatedOn().toString());
 		surveyDetail.append("<br />").append("Date Completed: ").append(survey.getModifiedOn().toString());
 		surveyDetail.append("<br />").append("Average Score: ").append(String.valueOf(survey.getScore()));
-		surveyDetail.append("<br />");
+		
 		int count = 1;
+		surveyDetail.append("<br />");
 		for (SurveyResponse response : survey.getSurveyResponse()) {
 			surveyDetail.append("<br />").append("Question " + count + ": ").append(response.getQuestion());
 			surveyDetail.append("<br />").append("Response to Q" + count + ": ").append(response.getAnswer());
 			count ++;
 		}
-		surveyDetail.append("<br />");
-		surveyDetail.append("<br />").append("Customer Comments: ").append(survey.getReview());
-		surveyDetail.append("<br />").append("Overall Experience: ").append(mood);
 		
+		surveyDetail.append("<br />");
+		surveyDetail.append("<br />").append("Gateway Question: ").append(gatewayQuestion);
+		surveyDetail.append("<br />").append("Response to GQ: ").append(mood);
+		surveyDetail.append("<br />").append("Customer Comments: ").append(survey.getReview());
+		
+		surveyDetail.append("<br />");
 		if (survey.getSharedOn() != null && !survey.getSharedOn().isEmpty()) {
 			surveyDetail.append("<br />").append("Share Checkbox: ").append("Yes");
 			surveyDetail.append("<br />").append("Shared on: ").append(StringUtils.join(survey.getSharedOn(), ", "));

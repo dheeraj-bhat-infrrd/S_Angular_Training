@@ -305,8 +305,12 @@ public class TopicConsumer implements Runnable {
 		String agentEmail = message.substring(messageParsedIndex + AGENTEMAIL_MARKER.length());
 		LOG.debug("Agent email: " + agentEmail);
 		
+		messageParsedIndex += AGENTEMAIL_MARKER.length() + name.length() + ELEMENTS_DELIMITER.length();
+		String agentProfile = message.substring(messageParsedIndex + PROFILENAME_MARKER.length());
+		LOG.debug("Agent profile: " + agentProfile);
+
 		LOG.debug("Sending account completion mail");
-		emailServices.sendSurveyCompletionMail(recipient, name, agentName, agentEmail);
+		emailServices.sendSurveyCompletionMail(recipient, name, agentName, agentEmail, agentProfile);
 	}
 	
 	private void parseMailWithRecipientAndAgentDetails(String message) throws NonFatalException {

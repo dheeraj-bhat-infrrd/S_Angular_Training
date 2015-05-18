@@ -80,58 +80,57 @@ $(document).ready(function() {
 	
 	// close on error
 	var error = "${error}";
-	var flow = "${socialFlow}";
 	if (parseInt(error) == 1) {
-		if (flow == "registration") {
-			// parentWindow.location.href = "./landing.do";
-		}
 		window.close();
 	}
 	
 	// close on success
 	setTimeout(function() {
-		if (flow == "registration") {
-			// parentWindow.location.href = "./landing.do";
-		}
 		window.close();
 	}, 3000);
 });
 
 $(window).on('unload', function(){
-	var payload = {
-			'socialNetwork' : "${socialNetwork}"
-	};
+
+	var parentWindow = null;
+	if (window.opener != null && !window.opener.closed) {
+		parentWindow = window.opener;
+	}
 	var restful = "${restful}";
-	if(restful != "1")
-		callAjaxWithPayload(payload);
-	
+	var flow = "${socialFlow}";
+	if(restful != "1"){
+		if (flow == "registration") {
+			var payload = {
+				'socialNetwork' : "linkedin"
+			};
+			fetchSocialProfileUrl(payload, function(data) {
+				parentWindow.showLinkedInProfileUrl(data);
+			});
+		}
+		else {
+			var payload = {
+				'socialNetwork' : "${socialNetwork}"
+			};
+			fetchSocialProfileUrl(payload, function(data) {
+				parentWindow.showProfileLink("${socialNetwork}", data);
+				parentWindow.showProfileLinkInEditProfilePage("${socialNetwork}", data);
+			});
+		}
+	}
 });
 
-function callAjaxWithPayload(payload){
+function fetchSocialProfileUrl(payload, callBackFunction){
 	$.ajax({
 		url : './profileUrl.do',
 		type : "GET",
 		data : payload,
 		async : false,
-		success : function(data){
-			console.log('succeed callAjaxWithPayload');
-			authenticateCallBack(data);
-		},
+		success : callBackFunction,
 		error : function(e) {
 			redirectErrorpage();
 		}
 	});
 }
-
-function authenticateCallBack(data){
-	var parentWindow;
-	if (window.opener != null && !window.opener.closed) {
-		parentWindow = window.opener;
-		parentWindow.showProfileLink("${socialNetwork}", data);
-		parentWindow.showProfileLinkInEditProfilePage("${socialNetwork}", data);
-	}
-}
-
 </script>
 
 </body>

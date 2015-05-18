@@ -24,24 +24,24 @@
 				<div id="" class="bd-ans-type-rating bd-ans-type-item">
 					<div class="bd-and-tier2"><spring:message code="label.customer.answer.key" /></div>
 					<div class="row clearfix bd-ans-type bd-ans-type-rating-adj">
-						<div class="col-lg-4 col-md-4 col-sm-4 col-xs-12">
+						<div class="col-lg-4 col-md-4 col-sm-4 col-xs-6">
 							<div data-id="sb-range-smiles" class="bd-ans-img-wrapper">
 								<div class="bd-ans-img bd-ans-smiley"></div>
 								<div class="bd-ans-img-txt"><spring:message code="label.smiles.key" /></div>
 							</div>
 						</div>
-						<div class="col-lg-4 col-md-4 col-sm-4 col-xs-12">
+						<div class="col-lg-4 col-md-4 col-sm-4 col-xs-6">
 							<div data-id="sb-range-star" class="bd-ans-img-wrapper">
 								<div class="bd-ans-img bd-ans-star"></div>
 								<div class="bd-ans-img-txt"><spring:message code="label.star.key" /></div>
 							</div>
 						</div>
-						<div class="col-lg-4 col-md-4 col-sm-4 col-xs-12">
+						<%-- <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12">
 							<div data-id="sb-range-scale" class="bd-ans-img-wrapper">
 								<div class="bd-ans-img bd-ans-scale"></div>
 								<div class="bd-ans-img-txt"><spring:message code="label.scale.key" /></div>
 							</div>
-						</div>
+						</div> --%>
 					</div>
 				</div>
 				<div id="" class="bd-ans-type-mcq bd-ans-type-item hide">

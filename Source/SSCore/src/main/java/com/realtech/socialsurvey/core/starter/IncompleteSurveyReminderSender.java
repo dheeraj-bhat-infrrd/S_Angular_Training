@@ -2,10 +2,11 @@ package com.realtech.socialsurvey.core.starter;
 
 import java.util.ArrayList;
 import java.util.List;
+import org.quartz.JobDataMap;
+import org.quartz.JobExecutionContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.support.ClassPathXmlApplicationContext;
+import org.springframework.scheduling.quartz.QuartzJobBean;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.entities.AgentSettings;
 import com.realtech.socialsurvey.core.entities.Company;
@@ -19,18 +20,23 @@ import com.realtech.socialsurvey.core.services.organizationmanagement.Organizati
 import com.realtech.socialsurvey.core.services.organizationmanagement.UserManagementService;
 import com.realtech.socialsurvey.core.services.surveybuilder.SurveyHandler;
 
-public class IncompleteSurveyReminderSender {
+public class IncompleteSurveyReminderSender extends QuartzJobBean {
 
 	public static final Logger LOG = LoggerFactory.getLogger(IncompleteSurveyReminderSender.class);
 
-	public static void main(String[] args) {
-		@SuppressWarnings("resource") ApplicationContext context = new ClassPathXmlApplicationContext("ss-starter-config.xml");
-		SurveyHandler surveyHandler = (SurveyHandler) context.getBean("surveyHandler");
-		EmailServices emailServices = (EmailServices) context.getBean("emailServices");
-		UserManagementService userManagementService = (UserManagementService) context.getBean("userManagementService");
-		OrganizationManagementService organizationManagementService = (OrganizationManagementService) context
-				.getBean("organizationManagementService");
+	private SurveyHandler surveyHandler;
 
+	private EmailServices emailServices;
+
+	private UserManagementService userManagementService;
+
+	private OrganizationManagementService organizationManagementService;
+
+	@Override
+	protected void executeInternal(JobExecutionContext jobExecutionContext) {
+		LOG.info("Executing IncompleteSurveyReminderSender");
+		// initialize the dependencies
+		initializeDependencies(jobExecutionContext.getMergedJobDataMap());
 		for (Company company : organizationManagementService.getAllCompanies()) {
 			List<SurveyDetails> incompleteSurveyCustomers = surveyHandler.getIncompleteSurveyCustomersEmail(company.getCompanyId());
 			List<Long> agents = new ArrayList<>();
@@ -47,6 +53,15 @@ public class IncompleteSurveyReminderSender {
 			}
 			surveyHandler.updateReminderCount(agents, customers);
 		}
+		LOG.info("Completed IncompleteSurveyReminderSender");
+	}
+
+	private void initializeDependencies(JobDataMap jobMap) {
+		surveyHandler = (SurveyHandler) jobMap.get("surveyHandler");
+		emailServices = (EmailServices) jobMap.get("emailServices");
+		userManagementService = (UserManagementService) jobMap.get("userManagementService");
+		organizationManagementService = (OrganizationManagementService) jobMap.get("organizationManagementService");
+
 	}
 
 	private static void sendEmail(EmailServices emailServices, OrganizationManagementService organizationManagementService,
