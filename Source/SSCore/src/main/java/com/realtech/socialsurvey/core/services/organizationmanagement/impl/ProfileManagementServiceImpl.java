@@ -1019,7 +1019,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 		Calendar calendar = Calendar.getInstance();
 		if (startDate != null) {
 			calendar.setTime(startDate);
-			calendar.add(Calendar.DATE, 1);
+			calendar.add(Calendar.DATE, 0);
 			startDate = calendar.getTime();
 		}
 		if (endDate != null) {

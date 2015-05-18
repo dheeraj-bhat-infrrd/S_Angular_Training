@@ -768,11 +768,18 @@ public class DashboardController {
 	@RequestMapping(value = "/downloaddashboardcompletesurvey")
 	public void getCompleteSurveyFile(Model model, HttpServletRequest request, HttpServletResponse response) {
 		LOG.info("Method to get file containg completed surveys list getCompleteSurveyFile() started.");
+		User user = sessionHelper.getCurrentUser();
 		List<SurveyDetails> surveyDetails = new ArrayList<>();
+		
 		try {
 			String columnName = request.getParameter("columnName");
 			String startDateStr = request.getParameter("startDate");
 			String endDateStr = request.getParameter("endDate");
+			
+			if (columnName == null || columnName.isEmpty()) {
+				LOG.error("Invalid value (null/empty) passed for profile level.");
+				throw new InvalidInputException("Invalid value (null/empty) passed for profile level.");
+			}
 			
 			Date startDate = null;
 			if (startDateStr != null && !startDateStr.isEmpty()) {
@@ -794,15 +801,8 @@ public class DashboardController {
 				}
 			}
 			
-			if (columnName == null || columnName.isEmpty()) {
-				LOG.error("Invalid value (null/empty) passed for profile level.");
-				throw new InvalidInputException("Invalid value (null/empty) passed for profile level.");
-			}
-			
-			String profileLevel = getProfileLevel(columnName);
 			long iden = 0;
-
-			User user = sessionHelper.getCurrentUser();
+			String profileLevel = getProfileLevel(columnName);
 			if (profileLevel.equals(CommonConstants.PROFILE_LEVEL_COMPANY)) {
 				iden = user.getCompany().getCompanyId();
 			}
