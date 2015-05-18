@@ -190,9 +190,9 @@
 		<div class="${containerclass}">
 			<div class="um-header margin-top-25"><spring:message code="label.socialconnect.key" /></div>
 			<div class="clearfix st-score-wrapper">
-				<div class="float-left st-score-txt"><spring:message code="label.socialconnect.desc.key" /></div>
+				<div class="float-left st-social-score col-lg-4 col-md-4 col-sm-4 col-xs-12"><spring:message code="label.socialconnect.desc.key" /></div>
 				<input type="hidden" name="ratingcategory" id="ratingcategory">
-				<div class="clearfix float-right st-score-rt">
+				<div class="clearfix float-right st-score-rt col-lg-8 col-md-8 col-sm-8 col-xs-12">
 					<div class="soc-nw-wrapper clearfix">
 						<div class="soc-nw-icns-cont clearfix">
 							<div class="float-left soc-nw-icns cursor-pointer icn-wide-fb soc-nw-adj" onclick="openAuthPage('facebook');"></div>

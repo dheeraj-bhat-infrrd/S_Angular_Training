@@ -29,7 +29,7 @@
 							<div class="h-lbl">email address</div>
 							<div class="h-inp-wrapper">
 								<div class="m-inp-img m-inp-img-uname"></div>
-								<input type="text" class="h-inp" placeholder="Email Address" id="login-user-id" name="j_username">
+								<input type="email" class="h-inp" placeholder="Email Address" id="login-user-id" name="j_username">
 							</div>
 						</div>
 						<div class="float-left h-pwd-wrapper">
@@ -121,7 +121,7 @@
 						</div>
 						<div class="clearfix reg-item">
 							<div class="m-inp-img-email m-inp-img"></div>
-							<input type="text" name="emailId" id="reg-email" class="reg-inp reg-inp-3" value="${emailid}" placeholder="Email">
+							<input type="email" name="emailId" id="reg-email" class="reg-inp reg-inp-3" value="${emailid}" placeholder="Email">
 						</div>
 						<div class="clearfix reg-captcha-wrapper reg-item">
 							<div class="g-recaptcha" data-sitekey="6Le2wQYTAAAAAAacBUn0Dia5zMMyHfMXhoOh5A7K"></div>

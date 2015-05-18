@@ -8,6 +8,11 @@ public class BranchUploadVO {
 	private String branchName;
 	private String branchAddress1;
 	private String branchAddress2;
+	private String branchCountry;
+	private String branchCountryCode;
+	private String branchState;
+	private String branchCity;
+	private String branchZipcode;
 	private boolean assignToCompany;
 	private String assignedRegionName;
 	
@@ -33,6 +38,46 @@ public class BranchUploadVO {
 
 	public void setBranchAddress2(String branchAddress2) {
 		this.branchAddress2 = branchAddress2;
+	}
+	
+	public String getBranchCountry() {
+		return branchCountry;
+	}
+
+	public void setBranchCountry(String branchCountry) {
+		this.branchCountry = branchCountry;
+	}
+
+	public String getBranchCountryCode() {
+		return branchCountryCode;
+	}
+
+	public void setBranchCountryCode(String branchCountryCode) {
+		this.branchCountryCode = branchCountryCode;
+	}
+
+	public String getBranchState() {
+		return branchState;
+	}
+
+	public void setBranchState(String branchState) {
+		this.branchState = branchState;
+	}
+
+	public String getBranchCity() {
+		return branchCity;
+	}
+
+	public void setBranchCity(String branchCity) {
+		this.branchCity = branchCity;
+	}
+
+	public String getBranchZipcode() {
+		return branchZipcode;
+	}
+
+	public void setBranchZipcode(String branchZipcode) {
+		this.branchZipcode = branchZipcode;
 	}
 
 	public boolean isAssignToCompany() {
