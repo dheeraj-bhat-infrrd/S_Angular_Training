@@ -634,7 +634,7 @@ function paintReviews(result){
 		if (i == resultSize - 1) {
 			lastItemClass = "ppl-review-item-last";
         }
-		reviewsHtml=  reviewsHtml+'<div class="' + lastItemClass + '">';
+		reviewsHtml=  reviewsHtml+'<div class="' + lastItemClass + '" data-cust-first-name='+ reviewItem.customerFirstName +' data-cust-last-name='+reviewItem.customerLastName+' data-agent-name='+reviewItem.agentName+' data-rating='+reviewItem.score+' data-review='+reviewItem.review+'>';
 		reviewsHtml=  reviewsHtml+'	<div class="ppl-header-wrapper clearfix">';
 		reviewsHtml=  reviewsHtml+'		<div class="float-left ppl-header-left">';    
 		reviewsHtml=  reviewsHtml+'			<div class="ppl-head-1">'+reviewItem.customerFirstName+' '+reviewItem.customerLastName+'</div>';
@@ -657,10 +657,10 @@ function paintReviews(result){
 		reviewsHtml=  reviewsHtml+'    		<div class="float-left blue-text ppl-share-shr-txt">Share</div>';
 		reviewsHtml=  reviewsHtml+'    		<div class="float-left icn-share icn-plus-open"></div>';
 		reviewsHtml=  reviewsHtml+'    		<div class="float-left clearfix ppl-share-social hide">';
-		reviewsHtml=  reviewsHtml+'        	<div class="float-left ppl-share-icns icn-fb"></div>';
-		reviewsHtml=  reviewsHtml+'        	<div class="float-left ppl-share-icns icn-twit"></div>';
-		reviewsHtml=  reviewsHtml+'        	<div class="float-left ppl-share-icns icn-lin"></div>';
-		reviewsHtml=  reviewsHtml+'       	<div class="float-left ppl-share-icns icn-yelp"></div>';
+		reviewsHtml=  reviewsHtml+'        	<div class="float-left ppl-share-icns icn-fb icn-fb-pp"></div>';
+		reviewsHtml=  reviewsHtml+'        	<div class="float-left ppl-share-icns icn-twit icn-twit-pp"></div>';
+		reviewsHtml=  reviewsHtml+'        	<div class="float-left ppl-share-icns icn-lin icn-lin-pp"></div>';
+		reviewsHtml=  reviewsHtml+'       	<div class="float-left ppl-share-icns icn-yelp icn-yelp-pp"></div>';
 		reviewsHtml=  reviewsHtml+'    	</div>';
 		reviewsHtml=  reviewsHtml+'   <div class="float-left icn-share icn-remove icn-rem-size hide"></div>';
 		reviewsHtml=  reviewsHtml+'	</div>';
@@ -690,6 +690,27 @@ function paintReviews(result){
         $(this).hide();
         $(this).parent().find('.ppl-share-social').hide();
         $(this).parent().find('.icn-plus-open').show();
+    });
+    
+    $('.icn-fb-pp').click(function(){
+    	var firstName = $(this).parent().parent().parent().attr('data-cust-first-name');
+    	var lastName = $(this).parent().parent().parent().attr('data-cust-last-name');
+    	var agentName = $(this).parent().parent().parent().attr('data-agent-name');
+    	var rating = $(this).parent().parent().parent().attr('data-rating');
+    	var review = $(this).parent().parent().parent().attr('data-review');
+    	postOnSocialNetworkOnce('facebook', firstName, lastName, agentName, rating, review);
+    });
+    
+    $('.icn-twt-pp').click(function(){
+    	
+    });
+    
+    $('.icn-lin-pp').click(function(){
+    	
+    });
+    
+    $('.icn-yelp-pp').click(function(){
+    	
     });
 
 }

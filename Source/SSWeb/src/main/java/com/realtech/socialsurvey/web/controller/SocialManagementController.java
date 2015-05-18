@@ -83,7 +83,7 @@ public class SocialManagementController {
 	// Facebook
 	@Value("${FB_REDIRECT_URI}")
 	private String facebookRedirectUri;
-
+	
 	// LinkedIn
 	@Value("${LINKED_IN_REST_API_URI}")
 	private String linkedInRestApiUri;
@@ -1153,4 +1153,5 @@ public class SocialManagementController {
 		LOG.info("Method getProfileUrl() finished from SocialManagementController");
 		return profileUrl;
 	}
+	
 }
