@@ -147,10 +147,10 @@ public interface EmailServices {
 	 * @param agentName
 	 * @throws InvalidInputException
 	 */
-	public void queueSurveyCompletionMail(String recipientMailId, String displayName, String agentName, String agentEmail)
+	public void queueSurveyCompletionMail(String recipientMailId, String displayName, String agentName, String agentEmail, String agentProfileUrl)
 			throws InvalidInputException;
 
-	public void sendSurveyCompletionMail(String recipientMailId, String displayName, String agentName, String agentEmail)
+	public void sendSurveyCompletionMail(String recipientMailId, String displayName, String agentName, String agentEmail, String agentProfileUrl)
 			throws InvalidInputException, UndeliveredEmailException;
 
 	/**
@@ -293,6 +293,6 @@ public interface EmailServices {
 	public void sendSocialConnectMail(String recipientMailId, String displayName, String loginName, String account) throws InvalidInputException,
 			UndeliveredEmailException;
 
-	public void sendReportAbuseMail(String recipientMailId, String displayName, String agentName, String customerName, 
-			String customerEmail, String review) throws InvalidInputException, UndeliveredEmailException;
+	public void sendReportAbuseMail(String recipientMailId, String displayName, String agentName, String customerName, String customerEmail,
+			String review) throws InvalidInputException, UndeliveredEmailException;
 }

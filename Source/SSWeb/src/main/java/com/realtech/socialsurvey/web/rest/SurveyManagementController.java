@@ -184,12 +184,14 @@ public class SurveyManagementController {
 					customerName = survey.getCustomerFirstName() + " " + survey.getCustomerLastName();
 				}
 				
-				String agentEmail = userManagementService.getUserByUserId(agentId).getEmailId();
+				User agent = userManagementService.getUserByUserId(agentId);
 				if (enableKafka.equals(CommonConstants.YES)) {
-					emailServices.queueSurveyCompletionMail(customerEmail, customerName, survey.getAgentName(), agentEmail);
+					emailServices.queueSurveyCompletionMail(customerEmail, customerName, survey.getAgentName(), agent.getEmailId(),
+							agent.getProfileUrl());
 				}
 				else {
-					emailServices.sendSurveyCompletionMail(customerEmail, customerName, survey.getAgentName(), agentEmail);
+					emailServices.sendSurveyCompletionMail(customerEmail, customerName, survey.getAgentName(), agent.getEmailId(),
+							agent.getProfileUrl());
 				}
 				
 				// Generate the text as in mail
