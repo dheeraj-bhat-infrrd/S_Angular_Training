@@ -1,12 +1,12 @@
 package com.realtech.socialsurvey.core.starter;
 
 import java.util.List;
+import org.quartz.JobDataMap;
+import org.quartz.JobExecutionContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.ConfigurableApplicationContext;
-import org.springframework.context.support.ClassPathXmlApplicationContext;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.quartz.QuartzJobBean;
 import org.springframework.stereotype.Component;
 import com.realtech.socialsurvey.core.entities.UsercountModificationNotification;
 import com.realtech.socialsurvey.core.exception.NonFatalException;
@@ -16,22 +16,24 @@ import com.realtech.socialsurvey.core.exception.NonFatalException;
  *
  */
 @Component("updatesubscriptionprice")
-public class UpdateSubscriptionPriceStarter {
+public class UpdateSubscriptionPriceStarter extends QuartzJobBean{
 
 	public static final Logger LOG = LoggerFactory.getLogger(UpdateSubscriptionPriceStarter.class);
 	
 	@Autowired
-	private ReviseSubscriptionPrice batch;
+	private ReviseSubscriptionPrice reviseSubscription;
 	
-	public void execute(){
+	@Override
+	protected void executeInternal(JobExecutionContext jobExecutionContext) {
 		LOG.info("ExecutingUpdateSubscriptionPriceStarter ");
-		List<UsercountModificationNotification> userModificatonRecords = batch.getCompaniesWithUserCountModified();
+		initializeDependencies(jobExecutionContext.getMergedJobDataMap());
+		List<UsercountModificationNotification> userModificatonRecords = reviseSubscription.getCompaniesWithUserCountModified();
 		if(userModificatonRecords != null && !userModificatonRecords.isEmpty()){
 			LOG.debug("Found "+userModificatonRecords.size()+" to process");
 			for(UsercountModificationNotification userModificationRecord : userModificatonRecords){
 				LOG.debug("Fetching data for user modification record: "+userModificationRecord.getUsercountModificationNotificationId());
 				try {
-					batch.processChargeOnSubscription(userModificationRecord);
+					reviseSubscription.processChargeOnSubscription(userModificationRecord);
 				}
 				catch (NonFatalException e) {
 					LOG.error("Could not process subscription for "+userModificationRecord.getCompany(), e);
@@ -43,5 +45,9 @@ public class UpdateSubscriptionPriceStarter {
 			LOG.info("No records to modify subscription price");
 		}
 		
+	}
+	
+	private void initializeDependencies(JobDataMap jobMap) {
+		reviseSubscription = (ReviseSubscriptionPrice) jobMap.get("reviseSubscription");
 	}
 }

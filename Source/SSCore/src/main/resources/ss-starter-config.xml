@@ -4,7 +4,8 @@
 	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
 
 	<import resource="classpath:sscore-beans.xml" />
-	<bean id="dataSource" class="org.springframework.jdbc.datasource.DriverManagerDataSource">
+	<bean id="dataSource"
+		class="org.springframework.jdbc.datasource.DriverManagerDataSource">
 		<property name="url">
 			<value>${DATABASE_URL}</value>
 		</property>
@@ -18,84 +19,193 @@
 			<value>${DATABASE_PASSWORD}</value>
 		</property>
 	</bean>
-	
+
 	<!-- setting site map generetor job detail -->
-	<bean id="sitemapjobdetail" class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
-	    <property name="targetObject" ref="appsitemapgenerator"/>
-	    <property name="targetMethod" value="execute"/>
-	</bean>
-	
-	<!-- Setting incomplete social post reminder job detail -->
-	<bean id="incompletesocialpostjobdetail" class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
-	    <property name="targetObject" ref="incompletesocialpost"/>
-	    <property name="targetMethod" value="execute"/>
-	</bean>
-	
-	<!-- Setting incomplete survey reminder job detail -->
-	<bean id="incompletesurveyjobdetail" class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
-	    <property name="targetObject" ref="incompletesurveyreminder"/>
-	    <property name="targetMethod" value="execute"/>
-	</bean>
-	
-	<!-- Setting update subscription price job detail -->
-	<bean id="updatesubscriptionpricejobdetail" class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
-	    <property name="targetObject" ref="updatesubscriptionprice"/>
-	    <property name="targetMethod" value="execute"/>
-	</bean>
-	
-	<!-- setting cron for site map generator -->
-	<bean id="sitemapgeneratorcron" class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
-	    <property name="jobDetail" ref="sitemapjobdetail" />
-    	<property name="cronExpression" value="* 40 * * * ?" />
-	</bean>
-	
-	<!-- setting cron for incomplete social post reminder -->
-	<bean id="incompletesocialpostcron" class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
-	    <property name="jobDetail" ref="incompletesocialpostjobdetail" />
-    	<property name="cronExpression" value="* 37 * * * ?" />
-	</bean>
-	
-	<!-- setting cron for incomplete survey reminder -->
-	<bean id="incompletesurveycron" class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
-	    <property name="jobDetail" ref="incompletesurveyjobdetail" />
-    	<property name="cronExpression" value="* 46 * * * ?" />
-	</bean>
-	
-	<!-- setting cron for update subscription price -->
-	<bean id="updatesubscriptionpricecron" class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
-	    <property name="jobDetail" ref="updatesubscriptionpricejobdetail" />
-    	<property name="cronExpression" value="* 59 * * * ?" />
-	</bean>
-	
-	<!-- Scheduler factory -->
-	<bean  class="org.springframework.scheduling.quartz.SchedulerFactoryBean">
-	    <property name="jobDetails">
-        <list>
-            <ref bean="sitemapjobdetail" />
-            <ref bean="incompletesocialpostjobdetail" />
-            <ref bean="incompletesurveyjobdetail" />
-            <ref bean="updatesubscriptionpricejobdetail" />
-        </list>
-	    </property>
-	 
-	    <property name="triggers">
-	        <list>
-	            <ref bean="sitemapgeneratorcron" />
-	            <ref bean="incompletesocialpostcron" />
-	            <ref bean="incompletesurveycron" />
-	            <ref bean="updatesubscriptionpricecron" />
-	        </list>
-	    </property>
+	<bean id="sitemapjobdetail"
+		class="org.springframework.scheduling.quartz.JobDetailFactoryBean">
+		<property name="jobClass"
+			value="com.realtech.socialsurvey.core.starter.ApplicationSiteMapGenerator" />
+		<property name="jobDataAsMap">
+			<map>
+				<entry key="companySiteMapGenerator" value-ref="sitemapgenerator" />
+				<entry key="regionSiteMapGenerator" value-ref="sitemapgenerator" />
+				<entry key="branchSiteMapGenerator" value-ref="sitemapgenerator" />
+				<entry key="agentSiteMapGenerator" value-ref="sitemapgenerator" />
+				<entry key="uploadService" value-ref="uploadService" />
+				<entry key="envPrefix" value="${AMAZON_ENV_PREFIX}" />
+				<entry key="companySiteMapPath" value="${COMPANY_SITEMAP_PATH}" />
+				<entry key="regionSiteMapPath" value="${REGION_SITEMAP_PATH}" />
+				<entry key="branchSiteMapPath" value="${BRANCH_SITEMAP_PATH}" />
+				<entry key="individualSiteMapPath" value="${INDIVIDUAL_SITEMAP_PATH}" />
+			</map>
+		</property>
+		<property name="durability" value="true" />
 	</bean>
 
-	
-	<bean id="surveyGenerationService" class="com.realtech.socialsurvey.core.dummy.generator.SurveyGenerationServiceImpl" />
-	<bean id="surveyBuilder" class="com.realtech.socialsurvey.core.services.surveybuilder.impl.SurveyBuilderImpl" />
-	
-	<bean id="regionsFullImport" class="com.realtech.socialsurvey.core.utils.solr.RegionsFullImport" />
-	<bean id="branchesFullImport" class="com.realtech.socialsurvey.core.utils.solr.BranchesFullImport" />
-	<bean id="usersFullImport" class="com.realtech.socialsurvey.core.utils.solr.UsersFullImport" />
-	
+	<!-- Setting incomplete social post reminder job detail -->
+	<bean id="incompletesocialpostjobdetail"
+		class="org.springframework.scheduling.quartz.JobDetailFactoryBean">
+		<property name="jobClass"
+			value="com.realtech.socialsurvey.core.starter.IncompleteSocialPostReminderSender" />
+		<property name="jobDataAsMap">
+			<map>
+				<entry key="urlGenerator" value-ref="urlGenerator" />
+				<entry key="surveyHandler" value-ref="surveyHandler" />
+				<entry key="emailServices" value-ref="emailServices" />
+				<entry key="userManagementService" value-ref="userManagementService" />
+				<entry key="organizationManagementService" value-ref="organizationManagementService" />
+			</map>
+		</property>
+		<property name="durability" value="true" />
+	</bean>
+
+	<!-- Setting incomplete survey reminder job detail -->
+	<bean id="incompletesurveyjobdetail"
+		class="org.springframework.scheduling.quartz.JobDetailFactoryBean">
+		<property name="jobClass"
+			value="com.realtech.socialsurvey.core.starter.IncompleteSurveyReminderSender" />
+		<property name="jobDataAsMap">
+			<map>
+				<entry key="surveyHandler" value-ref="surveyHandler" />
+				<entry key="emailServices" value-ref="emailServices" />
+				<entry key="userManagementService" value-ref="userManagementService" />
+				<entry key="organizationManagementService" value-ref="organizationManagementService" />
+			</map>
+		</property>
+		<property name="durability" value="true" />
+	</bean>
+
+	<!-- Setting update subscription price job detail -->
+	<bean id="updatesubscriptionpricejobdetail"
+		class="org.springframework.scheduling.quartz.JobDetailFactoryBean">
+		<property name="jobClass"
+			value="com.realtech.socialsurvey.core.starter.UpdateSubscriptionPriceStarter" />
+		<property name="jobDataAsMap">
+			<map>
+				<entry key="reviseSubscription" value-ref="reviseSubscription" />
+			</map>
+		</property>
+		<property name="durability" value="true" />
+	</bean>
+
+	<!-- Setting social feed ingester job detail -->
+	<bean id="socialfeedingesterjobdetail"
+		class="org.springframework.scheduling.quartz.JobDetailFactoryBean">
+		<property name="jobClass"
+			value="com.realtech.socialsurvey.core.starter.SocialFeedIngester" />
+		<property name="jobDataAsMap">
+			<map>
+				<entry key="ingestor" value-ref="ingestor" />
+			</map>
+		</property>
+		<property name="durability" value="true" />
+	</bean>
+
+	<!-- setting cron for site map generator -->
+	<bean id="sitemapgeneratorcron"
+		class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
+		<property name="jobDetail" ref="sitemapjobdetail" />
+		<property name="cronExpression" value="0 0/1 * * * ?" />
+	</bean>
+
+	<!-- setting cron for incomplete social post reminder -->
+	<bean id="incompletesocialpostcron"
+		class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
+		<property name="jobDetail" ref="incompletesocialpostjobdetail" />
+		<property name="cronExpression" value="0 0/1 * * * ?" />
+	</bean>
+
+	<!-- setting cron for incomplete survey reminder -->
+	<bean id="incompletesurveycron"
+		class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
+		<property name="jobDetail" ref="incompletesurveyjobdetail" />
+		<property name="cronExpression" value="0 0/1 * * * ?" />
+	</bean>
+
+	<!-- setting cron for update subscription price -->
+	<bean id="updatesubscriptionpricecron"
+		class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
+		<property name="jobDetail" ref="updatesubscriptionpricejobdetail" />
+		<property name="cronExpression" value="0 0/1 * * * ?" />
+	</bean>
+
+	<!-- setting cron for social feed ingester -->
+	<bean id="socialfeedingestercron"
+		class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
+		<property name="jobDetail" ref="socialfeedingesterjobdetail" />
+		<property name="cronExpression" value="0 0/1 * * * ?" />
+	</bean>
+
+	<!-- Scheduler factory -->
+	<bean class="org.springframework.scheduling.quartz.SchedulerFactoryBean">
+		<property name="jobDetails">
+			<list>
+				<!-- <ref bean="sitemapjobdetail" /> -->
+				<!-- <ref bean="incompletesocialpostjobdetail" /> -->
+				<!-- <ref bean="incompletesurveyjobdetail" /> -->
+				<!-- <ref bean="updatesubscriptionpricejobdetail" />  -->
+				<ref bean="socialfeedingesterjobdetail" />
+			</list>
+		</property>
+
+		<property name="triggers">
+			<list>
+				<!-- <ref bean="sitemapgeneratorcron" /> -->
+				<!-- <ref bean="incompletesocialpostcron" /> -->
+				<!--<ref bean="incompletesurveycron" /> -->
+				<!-- <ref bean="updatesubscriptionpricecron" /> -->
+				<ref bean="socialfeedingestercron" />
+			</list>
+		</property>
+		<property name="quartzProperties">
+			<props>
+				<prop key="org.quartz.threadPool.threadCount">1</prop>
+			</props>
+		</property>
+	</bean>
+
+
+	<!-- Bean definitions -->
+	<!-- Site map generetor dependencies -->
+	<bean id="sitemapgenerator"
+		class=" com.realtech.socialsurvey.core.utils.sitemap.SiteMapGenerator"
+		scope="prototype" />
+	<bean id="uploadService"
+		class="com.realtech.socialsurvey.core.services.upload.impl.CloudUploadServiceImpl" />
+
+	<!-- Incomplete survey reminder and social post reminder dependencies -->
+	<bean id="urlGenerator"
+		class="com.realtech.socialsurvey.core.services.generator.impl.UrlGeneratorImpl" />
+	<bean id="surveyHandler"
+		class="com.realtech.socialsurvey.core.services.surveybuilder.impl.SurveyHandlerImpl" />
+	<bean id="emailServices"
+		class="com.realtech.socialsurvey.core.services.mail.impl.EmailServicesImpl" />
+	<bean id="userManagementService"
+		class="com.realtech.socialsurvey.core.services.organizationmanagement.impl.UserManagementServiceImpl" />
+	<bean id="organizationManagementService"
+		class="com.realtech.socialsurvey.core.services.organizationmanagement.impl.OrganizationManagementServiceImpl" />
+
+	<!-- Update subscription dependencies -->
+	<bean id="reviseSubscription"
+		class="com.realtech.socialsurvey.core.starter.ReviseSubscriptionPrice" />
+
+	<!-- Social feed ingestor dependencies -->
+	<bean id="ingestor"
+		class="com.realtech.socialsurvey.core.feed.impl.SocialFeedIngestionKickStarter" />
+
+
+	<bean id="surveyGenerationService"
+		class="com.realtech.socialsurvey.core.dummy.generator.SurveyGenerationServiceImpl" />
+	<bean id="surveyBuilder"
+		class="com.realtech.socialsurvey.core.services.surveybuilder.impl.SurveyBuilderImpl" />
+
+	<bean id="regionsFullImport"
+		class="com.realtech.socialsurvey.core.utils.solr.RegionsFullImport" />
+	<bean id="branchesFullImport"
+		class="com.realtech.socialsurvey.core.utils.solr.BranchesFullImport" />
+	<bean id="usersFullImport"
+		class="com.realtech.socialsurvey.core.utils.solr.UsersFullImport" />
+
 	<!-- Posts to wall -->
 	<bean id="postToWall" class="com.realtech.socialsurvey.core.utils.mongo.PostToWall" />
 </beans>
