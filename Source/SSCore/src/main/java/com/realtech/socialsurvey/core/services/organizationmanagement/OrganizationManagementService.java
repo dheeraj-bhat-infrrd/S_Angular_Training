@@ -14,6 +14,7 @@ import com.realtech.socialsurvey.core.entities.MailContentSettings;
 import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
 import com.realtech.socialsurvey.core.entities.Region;
 import com.realtech.socialsurvey.core.entities.RegionFromSearch;
+import com.realtech.socialsurvey.core.entities.StateLookup;
 import com.realtech.socialsurvey.core.entities.SurveySettings;
 import com.realtech.socialsurvey.core.entities.User;
 import com.realtech.socialsurvey.core.entities.UserFromSearch;
@@ -653,7 +654,7 @@ public interface OrganizationManagementService {
 	public List<UserFromSearch> getUsersUnderRegionFromSolr(Set<Long> regionIds, int start, int rows) throws InvalidInputException,
 			NoRecordsFetchedException, SolrException;
 	
-	public String getUsStateList();
+	public List<StateLookup> getUsStateList();
 	
 	public String getZipCodesByStateId(int stateId);
 }

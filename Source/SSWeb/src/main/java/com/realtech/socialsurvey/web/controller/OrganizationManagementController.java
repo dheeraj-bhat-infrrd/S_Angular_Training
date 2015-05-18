@@ -4,9 +4,11 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,18 +20,21 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
+
 import com.amazonaws.util.json.JSONException;
 import com.amazonaws.util.json.JSONObject;
+import com.google.gson.Gson;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
+import com.realtech.socialsurvey.core.entities.AbridgedUserProfile;
 import com.realtech.socialsurvey.core.entities.AccountsMaster;
 import com.realtech.socialsurvey.core.entities.EncompassCrmInfo;
 import com.realtech.socialsurvey.core.entities.LicenseDetail;
 import com.realtech.socialsurvey.core.entities.MailContentSettings;
 import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
+import com.realtech.socialsurvey.core.entities.StateLookup;
 import com.realtech.socialsurvey.core.entities.SurveySettings;
 import com.realtech.socialsurvey.core.entities.User;
 import com.realtech.socialsurvey.core.entities.UserProfile;
-import com.realtech.socialsurvey.core.entities.AbridgedUserProfile;
 import com.realtech.socialsurvey.core.entities.UserSettings;
 import com.realtech.socialsurvey.core.entities.VerticalsMaster;
 import com.realtech.socialsurvey.core.enums.AccountType;
@@ -1237,6 +1242,28 @@ public class OrganizationManagementController {
 		
 		LOG.info("Method to store text to be displayed to a customer after choosing the flow, storeTextForFlow() finished.");
 		return status;
+	}
+	@ResponseBody
+	@RequestMapping(value = "/getusstatelist", method = RequestMethod.GET)
+	public String getUsStateList(HttpServletRequest request) {
+		List<StateLookup> lookups = organizationManagementService.getUsStateList();
+		String usStateList = new Gson().toJson(lookups);
+		return usStateList;
+	}
+	
+	@ResponseBody
+	@RequestMapping(value = "/getzipcodesbystateid", method = RequestMethod.GET)
+	public String getZipCodesByStateId(HttpServletRequest request) {
+		
+		String stateIdStr = request.getParameter("stateId");
+		int stateId = 0;
+		try{
+			stateId = Integer.parseInt(stateIdStr);
+		}catch(NumberFormatException e){
+			LOG.error("Error occurred while parsing state Id");
+		}
+		String usStateZipcodeList = organizationManagementService.getZipCodesByStateId(stateId);
+		return usStateZipcodeList;
 	}
 }
 // JIRA: SS-24 BY RM02 EOC

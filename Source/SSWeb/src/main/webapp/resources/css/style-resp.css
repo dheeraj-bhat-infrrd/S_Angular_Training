@@ -936,8 +936,6 @@
 	}
 	.dsh-btn-complete{
         font-size: 14px;
-        width: auto;
-		padding: 0 20px;
 	}
     .dash-top-info{
         border-bottom: 0;
@@ -1399,6 +1397,9 @@
 	}
 	.file-pick-logo-adj{
 		right: 0;
+	}
+	.bd-com-wrapper {
+		padding: 20px 10px;
 	}
 }
 
