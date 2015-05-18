@@ -101,7 +101,9 @@ $(window).on('unload', function(){
 	var payload = {
 			'socialNetwork' : "${socialNetwork}"
 	};
-	callAjaxWithPayload(payload);
+	var restful = "${restful}";
+	if(restful != "1")
+		callAjaxWithPayload(payload);
 	
 });
 
