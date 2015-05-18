@@ -362,9 +362,9 @@ function getReviewsCountAndShowReviews(columnName, columnValue) {
 				return;
 			} else {
 				$("#review-desc").html("What people say about " + name.substring(1, name.length - 1));
-				
 				$("#dsh-cmp-dwnld").show();
 				
+				// initializing datepickers
 				var startDate;
 				var fromEndDate = new Date();
 				var toEndDate = new Date();
