@@ -125,7 +125,8 @@
 					<div class="people-say-wrapper rt-content-main rt-content-main-adj">
 						<div class="main-con-header clearfix pad-bot-10-resp">
 							<div id="review-desc" class="float-left dash-ppl-say-lbl">
-								<spring:message code="label.peoplesayabout.key" />${profileName}</div>
+								<spring:message code="label.peoplesayabout.key" />${profileName}
+							</div>
 							<div id="dsh-cmp-dwnld" class="float-right dash-btn-dl-sd hide">
 								<div id="dsh-dwnld-btn" class="dsh-dwnld-btn float-left cursor-pointer">
 									<spring:message code="label.downloadsurveydata.key" />
