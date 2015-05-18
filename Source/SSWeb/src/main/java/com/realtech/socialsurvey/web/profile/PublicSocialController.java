@@ -1,7 +1,18 @@
 package com.realtech.socialsurvey.web.profile;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
+import org.apache.http.NameValuePair;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.entity.UrlEncodedFormEntity;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.entity.StringEntity;
+import org.apache.http.impl.client.BasicResponseHandler;
+import org.apache.http.impl.client.HttpClientBuilder;
+import org.apache.http.message.BasicNameValuePair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,7 +22,10 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import twitter4j.Twitter;
+import twitter4j.TwitterException;
 import twitter4j.auth.RequestToken;
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.services.social.SocialManagementService;
 import com.realtech.socialsurvey.web.common.JspResolver;
@@ -31,10 +45,10 @@ public class PublicSocialController {
 
 	@Value("${FB_REDIRECT_URI_SESSION}")
 	private String facebookRedirectUriInSession;
-	
+
 	@Value("${TWITTER_REDIRECT_URI_SESSION}")
 	private String twitterRedirectUriInSession;
-	
+
 	// LinkedIn
 	@Value("${LINKED_IN_REST_API_URI}")
 	private String linkedInRestApiUri;
@@ -52,7 +66,7 @@ public class PublicSocialController {
 	private String linkedinProfileUri;
 	@Value("${LINKED_IN_SCOPE}")
 	private String linkedinScope;
-	
+
 	// Google
 	@Value("${GOOGLE_API_KEY}")
 	private String googleApiKey;
@@ -66,10 +80,10 @@ public class PublicSocialController {
 	private String googleShareUri;
 	@Value("${GOOGLE_PROFILE_URI}")
 	private String googleProfileUri;
-	
+
 	@Autowired
 	private SocialManagementService socialManagementService;
-	
+
 	/**
 	 * Returns the social authorization page
 	 * 
@@ -90,13 +104,13 @@ public class PublicSocialController {
 		String socialFlow = request.getParameter("flow");
 
 		session.removeAttribute(CommonConstants.SOCIAL_FLOW);
-		
+
 		session.setAttribute("agentName", request.getParameter("agentName"));
 		session.setAttribute("firstName", request.getParameter("firstName"));
 		session.setAttribute("lastName", request.getParameter("lastName"));
 		session.setAttribute("review", request.getParameter("review"));
 		session.setAttribute("rating", request.getParameter("rating"));
-		
+
 		switch (socialNetwork) {
 
 		// Building facebook authUrl
@@ -155,7 +169,7 @@ public class PublicSocialController {
 				googleAuth.append("&redirect_uri=").append(googleApiRedirectUriInSession);
 				googleAuth.append("&client_id=").append(googleApiKey);
 				googleAuth.append("&access_type=").append("offline");
-				
+
 				model.addAttribute(CommonConstants.SOCIAL_AUTH_URL, googleAuth.toString());
 
 				LOG.info("Returning the google authorizationurl : " + googleAuth.toString());
@@ -177,9 +191,9 @@ public class PublicSocialController {
 		model.addAttribute("restful", CommonConstants.YES);
 		return JspResolver.SOCIAL_AUTH_MESSAGE;
 	}
-	
+
 	/**
-	 * The url that Facebook send request to with the oauth verification code
+	 * The url that Facebook sends request to with oauth verification code
 	 * 
 	 * @param model
 	 * @param request
@@ -212,8 +226,9 @@ public class PublicSocialController {
 
 			// Share On facebook using newly generated token of end user
 			facebook.setOAuthAccessToken(new AccessToken(accessToken.getToken(), null));
-			String message = session.getAttribute("rating") + "-Star Survey Response from " + session.getAttribute("firstName")+ " " + session.getAttribute("lastName") + " for " + session.getAttribute("agentName")
-					+ " on Social Survey. Below is the feedback\n " + session.getAttribute("review");
+			String message = session.getAttribute("rating") + "-Star Survey Response from " + session.getAttribute("firstName") + " "
+					+ session.getAttribute("lastName") + " for " + session.getAttribute("agentName")
+					+ " on Social Survey. Below is the feedback :\n " + session.getAttribute("review");
 			message = message.replaceAll("null", "");
 			facebook.postStatusMessage(message);
 		}
@@ -230,5 +245,140 @@ public class PublicSocialController {
 		LOG.info("Facebook Access tokens obtained and added to mongo successfully!");
 		return JspResolver.SOCIAL_AUTH_MESSAGE;
 	}
-	
+
+	/**
+	 * The url that twitter send request to with the oauth verification code
+	 * 
+	 * @param model
+	 * @param request
+	 * @return
+	 */
+	@RequestMapping(value = "/twitterauthinsession", method = RequestMethod.GET)
+	public String authenticateTwitterAccess(Model model, HttpServletRequest request) {
+		LOG.info("Twitter authentication url requested");
+		HttpSession session = request.getSession(false);
+
+		try {
+			// On auth error
+			String errorCode = request.getParameter("oauth_problem");
+			if (errorCode != null) {
+				LOG.error("Error code : " + errorCode);
+				model.addAttribute(CommonConstants.ERROR, CommonConstants.YES);
+				return JspResolver.SOCIAL_AUTH_MESSAGE;
+			}
+
+			// Getting Oauth accesstoken for Twitter
+			twitter4j.auth.AccessToken accessToken = null;
+			Twitter twitter = socialManagementService.getTwitterInstance();
+			while (null == accessToken) {
+				String oauthVerifier = request.getParameter("oauth_verifier");
+				RequestToken requestToken = (RequestToken) session.getAttribute(CommonConstants.SOCIAL_REQUEST_TOKEN);
+				try {
+					accessToken = twitter.getOAuthAccessToken(requestToken, oauthVerifier);
+				}
+				catch (TwitterException te) {
+					if (TwitterException.UNAUTHORIZED == te.getStatusCode()) {
+						LOG.info("Unable to get the access token. Reason: UNAUTHORISED");
+					}
+					else {
+						LOG.error(te.getErrorMessage());
+					}
+				}
+			}
+			// Tweeting
+			String twitterMessage = session.getAttribute("rating") + "-Star Survey Response from " + session.getAttribute("firstName") + " "
+					+ session.getAttribute("lastName") + " for " + session.getAttribute("agentName")
+					+ " on @Social Survey. Below is the feedback :\n " + session.getAttribute("review");
+			twitterMessage = twitterMessage.replaceAll("null", "");
+			twitter.setOAuthAccessToken(new twitter4j.auth.AccessToken(accessToken.getToken(), accessToken.getTokenSecret()));
+			twitter.updateStatus(twitterMessage);
+		}
+		catch (Exception e) {
+			session.removeAttribute(CommonConstants.SOCIAL_REQUEST_TOKEN);
+			LOG.error("Exception while getting twitter access token. Reason : " + e.getMessage(), e);
+			return JspResolver.SOCIAL_AUTH_MESSAGE;
+		}
+
+		// Updating attributes
+		session.removeAttribute(CommonConstants.SOCIAL_REQUEST_TOKEN);
+		model.addAttribute(CommonConstants.SUCCESS_ATTRIBUTE, CommonConstants.YES);
+		model.addAttribute("socialNetwork", "twitter");
+		return JspResolver.SOCIAL_AUTH_MESSAGE;
+	}
+
+	/**
+	 * The url that LinkedIn send request to with the oauth verification code
+	 * 
+	 * @param model
+	 * @param request
+	 * @return
+	 */
+	@RequestMapping(value = "/linkedinauthinsession", method = RequestMethod.GET)
+	public String authenticateLinkedInAccess(Model model, HttpServletRequest request) {
+		LOG.info("Method authenticateLinkedInAccess() called from SocialManagementController");
+		HttpSession session = request.getSession(false);
+
+		try {
+			// On auth error
+			String errorCode = request.getParameter("error");
+			if (errorCode != null) {
+				LOG.error("Error code : " + errorCode);
+				model.addAttribute(CommonConstants.ERROR, CommonConstants.YES);
+				return JspResolver.SOCIAL_AUTH_MESSAGE;
+			}
+
+			// Getting Oauth accesstoken for Linkedin
+			String oauthCode = request.getParameter("code");
+			List<NameValuePair> params = new ArrayList<NameValuePair>(2);
+			params.add(new BasicNameValuePair("grant_type", "authorization_code"));
+			params.add(new BasicNameValuePair("code", oauthCode));
+			params.add(new BasicNameValuePair("redirect_uri", linkedinRedirectUriInSession));
+			params.add(new BasicNameValuePair("client_id", linkedInApiKey));
+			params.add(new BasicNameValuePair("client_secret", linkedInApiSecret));
+
+			// fetching access token
+			HttpClient httpclient = HttpClientBuilder.create().build();
+			HttpPost httpPost = new HttpPost(linkedinAccessUri);
+			httpPost.setEntity(new UrlEncodedFormEntity(params, "UTF-8"));
+			String accessTokenStr = httpclient.execute(httpPost, new BasicResponseHandler());
+			Map<String, Object> map = new Gson().fromJson(accessTokenStr, new TypeToken<Map<String, String>>() {}.getType());
+			String accessToken = (String) map.get("access_token");
+
+			// Post on linkedin
+			String message = session.getAttribute("rating") + "-Star Survey Response from " + session.getAttribute("firstName") + " "
+					+ session.getAttribute("lastName") + " for " + session.getAttribute("agentName")
+					+ " on Social Survey. Below is the feedback :\n " + session.getAttribute("review");
+			message = message.replaceAll("null", "");
+			String linkedInPost = new StringBuilder(linkedInRestApiUri).substring(0, linkedInRestApiUri.length() - 1);
+			linkedInPost += "/shares?oauth2_access_token=" + accessToken;
+			linkedInPost += "&format=json";
+
+			HttpClient client = HttpClientBuilder.create().build();
+			HttpPost post = new HttpPost(linkedInPost);
+
+			// add header
+			post.setHeader("Content-Type", "application/json");
+
+			StringEntity entity = new StringEntity("{\"comment\": \"" + message + "\",\"visibility\": {\"code\": \"anyone\"}}");
+
+			post.setEntity(entity);
+			try {
+				client.execute(post);
+			}
+			catch (RuntimeException e) {
+				LOG.error("Runtime exception caught while trying to add an update on linkedin. Nested exception is ", e);
+			}
+		}
+		catch (Exception e) {
+			LOG.error("Exception while getting linkedin access token. Reason : " + e.getMessage(), e);
+			return JspResolver.SOCIAL_AUTH_MESSAGE;
+		}
+
+		// Updating attributes
+		model.addAttribute(CommonConstants.SUCCESS_ATTRIBUTE, CommonConstants.YES);
+		model.addAttribute("socialNetwork", "linkedin");
+		LOG.info("Method authenticateLinkedInAccess() finished from SocialManagementController");
+		return JspResolver.SOCIAL_AUTH_MESSAGE;
+	}
+
 }

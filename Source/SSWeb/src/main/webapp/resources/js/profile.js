@@ -660,7 +660,8 @@ function paintReviews(result){
 		reviewsHtml=  reviewsHtml+'        	<div class="float-left ppl-share-icns icn-fb icn-fb-pp"></div>';
 		reviewsHtml=  reviewsHtml+'        	<div class="float-left ppl-share-icns icn-twit icn-twit-pp"></div>';
 		reviewsHtml=  reviewsHtml+'        	<div class="float-left ppl-share-icns icn-lin icn-lin-pp"></div>';
-		reviewsHtml=  reviewsHtml+'       	<div class="float-left ppl-share-icns icn-yelp icn-yelp-pp"></div>';
+		reviewsHtml=  reviewsHtml+'			<div class="float-left ppl-share-icns icn-gplus"></div>';
+		reviewsHtml=  reviewsHtml+'       	<div class="float-left ppl-share-icns icn-yelp"></div>';
 		reviewsHtml=  reviewsHtml+'    	</div>';
 		reviewsHtml=  reviewsHtml+'   <div class="float-left icn-share icn-remove icn-rem-size hide"></div>';
 		reviewsHtml=  reviewsHtml+'	</div>';
@@ -701,17 +702,29 @@ function paintReviews(result){
     	postOnSocialNetworkOnce('facebook', firstName, lastName, agentName, rating, review);
     });
     
-    $('.icn-twt-pp').click(function(){
-    	
+    $('.icn-twit-pp').click(function(){
+    	var firstName = $(this).parent().parent().parent().attr('data-cust-first-name');
+    	var lastName = $(this).parent().parent().parent().attr('data-cust-last-name');
+    	var agentName = $(this).parent().parent().parent().attr('data-agent-name');
+    	var rating = $(this).parent().parent().parent().attr('data-rating');
+    	var review = $(this).parent().parent().parent().attr('data-review');
+    	postOnSocialNetworkOnce('twitter', firstName, lastName, agentName, rating, review);
     });
     
     $('.icn-lin-pp').click(function(){
-    	
+    	var firstName = $(this).parent().parent().parent().attr('data-cust-first-name');
+    	var lastName = $(this).parent().parent().parent().attr('data-cust-last-name');
+    	var agentName = $(this).parent().parent().parent().attr('data-agent-name');
+    	var rating = $(this).parent().parent().parent().attr('data-rating');
+    	var review = $(this).parent().parent().parent().attr('data-review');
+    	postOnSocialNetworkOnce('linkedin', firstName, lastName, agentName, rating, review);
     });
     
     $('.icn-yelp-pp').click(function(){
     	
     });
+    
+    $('.icn-gplus-pp').href = "http://localhost:8080";
 
 }
 
