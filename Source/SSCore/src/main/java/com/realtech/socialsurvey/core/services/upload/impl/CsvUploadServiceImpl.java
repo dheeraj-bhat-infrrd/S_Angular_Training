@@ -425,14 +425,14 @@ public class CsvUploadServiceImpl implements CsvUploadService {
 				else {
 					Region region = regions.get(CommonConstants.INITIAL_INDEX);
 					organizationManagementService.addNewBranch(adminUser, region.getRegionId(), CommonConstants.NO, branch.getBranchName(),
-							branch.getBranchAddress1(), branch.getBranchAddress2());
+							branch.getBranchAddress1(), branch.getBranchAddress2(),branch.getBranchCountry(), branch.getBranchCountryCode(),branch.getBranchState(),branch.getBranchCity(),branch.getBranchZipcode());
 					LOG.debug("Branch added!");
 				}
 			}
 			else if (branch.isAssignToCompany()) {
 				LOG.debug("adding branch : " + branch.getBranchName() + " under the company!");
 				organizationManagementService.addNewBranch(adminUser, 0l, CommonConstants.NO, branch.getBranchName(), branch.getBranchAddress1(),
-						branch.getBranchAddress2());
+						branch.getBranchAddress2(),branch.getBranchCountry(), branch.getBranchCountryCode(),branch.getBranchState(),branch.getBranchCity(),branch.getBranchZipcode());
 				LOG.debug("Branch added!");
 			}
 			else {
@@ -479,9 +479,9 @@ public class CsvUploadServiceImpl implements CsvUploadService {
 			}
 			LOG.debug("Adding region : " + region.getRegionName());
 			Region newRegion = organizationManagementService.addNewRegion(adminUser, region.getRegionName(), CommonConstants.NO,
-					region.getRegionAddress1(), region.getRegionAddress2());
+					region.getRegionAddress1(), region.getRegionAddress2(), region.getRegionCountry(), region.getRegionCountryCode(), region.getRegionState(), region.getRegionCity(), region.getRegionZipcode());
 			organizationManagementService.addNewBranch(adminUser, newRegion.getRegionId(), CommonConstants.YES, CommonConstants.DEFAULT_BRANCH_NAME,
-					CommonConstants.DEFAULT_ADDRESS, null);
+					CommonConstants.DEFAULT_ADDRESS, null,null,null,null,null,null);
 		}
 		else {
 			LOG.error("admin user : " + adminUser.getEmailId() + " is not authorized to add regions");

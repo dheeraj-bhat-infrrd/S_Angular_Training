@@ -466,6 +466,11 @@ public class HierarchyManagementController {
 			String regionName = request.getParameter("regionName");
 			String regionAddress1 = request.getParameter("regionAddress1");
 			String regionAddress2 = request.getParameter("regionAddress2");
+			String regionCountry = request.getParameter("regionCountry");
+			String regionCountryCode = request.getParameter("regionCountrycode");
+			String regionState = request.getParameter("regionState");
+			String regionCity = request.getParameter("regionCity");
+			String regionZipcode = request.getParameter("regionZipcode");
 			String selectedUserIdStr = request.getParameter("selectedUserId");
 			String userSelectionType = request.getParameter("userSelectionType");
 			
@@ -505,7 +510,7 @@ public class HierarchyManagementController {
 			LOG.debug("Calling service to add a new region and assigning user to it if specified");
 			try {
 				Region region = organizationManagementService.addNewRegionWithUser(loggedInUser, regionName.trim(), CommonConstants.NO,
-						regionAddress1, regionAddress2, selectedUserId, assigneeEmailIds, isAdmin);
+						regionAddress1, regionAddress2, regionCountry, regionCountryCode, regionState, regionCity, regionZipcode, selectedUserId, assigneeEmailIds, isAdmin);
 				addOrUpdateRegionInSession(region, session);
 
 				model.addAttribute("message",
@@ -546,6 +551,11 @@ public class HierarchyManagementController {
 			String branchName = request.getParameter("officeName");
 			String branchAddress1 = request.getParameter("officeAddress1");
 			String branchAddress2 = request.getParameter("officeAddress2");
+			String branchCountry = request.getParameter("officeCountry");
+			String branchCountryCode = request.getParameter("officeCountrycode");
+			String branchState = request.getParameter("officeState");
+			String branchCity = request.getParameter("officeCity");
+			String branchZipcode = request.getParameter("officeZipcode");
 			String strRegionId = request.getParameter("regionId");
 			String selectedUserIdStr = request.getParameter("selectedUserId");
 			String userSelectionType = request.getParameter("userSelectionType");
@@ -600,7 +610,7 @@ public class HierarchyManagementController {
 			try {
 				LOG.debug("Calling service to add a new branch");
 				Branch branch = organizationManagementService.addNewBranchWithUser(user, branchName.trim(), regionId, CommonConstants.NO,
-						branchAddress1, branchAddress2, selectedUserId, assigneeEmailIds, isAdmin);
+						branchAddress1, branchAddress2, branchCountry,branchCountryCode, branchState, branchCity, branchZipcode, selectedUserId, assigneeEmailIds, isAdmin);
 				LOG.debug("Successfully executed service to add a new branch");
 
 				addOrUpdateBranchInSession(branch, session);
@@ -760,6 +770,11 @@ public class HierarchyManagementController {
 			String branchName = request.getParameter("officeName");
 			String branchAddress1 = request.getParameter("officeAddress1");
 			String branchAddress2 = request.getParameter("officeAddress2");
+			String branchCountry = request.getParameter("officeCountry");
+			String branchCountryCode = request.getParameter("officeCountrycode");
+			String branchState = request.getParameter("officeState");
+			String branchCity = request.getParameter("officeCity");
+			String branchZipcode = request.getParameter("officeZipcode");
 			String strRegionId = request.getParameter("regionId");
 			String selectedUserIdStr = request.getParameter("selectedUserId");
 			String userSelectionType = request.getParameter("userSelectionType");
@@ -824,7 +839,7 @@ public class HierarchyManagementController {
 			try {
 				LOG.debug("Calling service to update branch with Id : " + branchId);
 				Branch branch = organizationManagementService.updateBranch(user, branchId, regionId, branchName, branchAddress1, branchAddress2,
-						selectedUserId, assigneeEmailIds, isAdmin);
+						branchCountry, branchCountryCode, branchState, branchCity, branchZipcode, selectedUserId, assigneeEmailIds, isAdmin);
 				addOrUpdateBranchInSession(branch, session);
 
 				LOG.debug("Successfully executed service to update a branch");
@@ -930,6 +945,11 @@ public class HierarchyManagementController {
 		String strRegionId = request.getParameter("regionId");
 		String regionAddress1 = request.getParameter("regionAddress1");
 		String regionAddress2 = request.getParameter("regionAddress2");
+		String regionCountry = request.getParameter("regionCountry");
+		String regionCountryCode = request.getParameter("regionCountrycode");
+		String regionState = request.getParameter("regionState");
+		String regionCity = request.getParameter("regionCity");
+		String regionZipcode = request.getParameter("regionZipcode");
 		String selectedUserIdStr = request.getParameter("selectedUserId");
 		String userSelectionType = request.getParameter("userSelectionType");
 		
@@ -979,7 +999,7 @@ public class HierarchyManagementController {
 			HttpSession session = request.getSession(false);
 			try {
 				LOG.debug("Calling service to update region with Id : " + regionId);
-				Region region = organizationManagementService.updateRegion(user, regionId, regionName, regionAddress1, regionAddress2,
+				Region region = organizationManagementService.updateRegion(user, regionId, regionName, regionAddress1, regionAddress2,regionCountry,regionCountryCode,regionState,regionCity,regionZipcode,
 						selectedUserId, assigneeEmailIds, isAdmin);
 				addOrUpdateRegionInSession(region, session);
 
