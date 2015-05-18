@@ -1,3 +1,13 @@
+function showLinkedInProfileUrl(data) {
+	if (data == undefined || data == null) {
+		return;
+	}
+	
+	$('#wl-import-btn').remove();
+	$('#wl-import-btn-msg').removeClass('hide');
+	$('#wc-connect-link').html('LinkedIn Profile <u><a href=' + data + '>' + data + '</a></u>');
+}
+
 function authenticate(socialNetwork) {
 	openAuthPage(socialNetwork);
 	payload = {

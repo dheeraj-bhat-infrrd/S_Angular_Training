@@ -15,9 +15,13 @@
 				<spring:message code="label.linkedin.profile.key" /><br />
 				<spring:message code="label.linkedin.savetime.key" />
 			</div>
-			<div class="wl-import-btn" onclick="openAuthPageRegistration('linkedin');">
+			<div id="wl-import-btn" class="wl-import-btn" onclick="openAuthPageRegistration('linkedin');">
 				<spring:message code="label.linkedin.import.button.key" />
 			</div>
+			<div id="wl-import-btn-msg" class="wl-import-btn hide">
+				<spring:message code="label.linkedin.connected.key" />
+			</div>
+			<div id="wc-connect-link" class="wc-connect-txt wc-connect-link"></div>
 			<div class="wc-connect-txt">
 				<spring:message code="label.linkedin.noaccount.key" /><br />
 				<spring:message code="label.linkedin.also.key" />

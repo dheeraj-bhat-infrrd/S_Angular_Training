@@ -28,11 +28,9 @@ public class SocialFeedIngestionKickStarter {
 	@Autowired
 	private SocialFeedExecutors executors;
 
+	@Autowired
 	private ApplicationContext context;
 
-	public void setContext(ApplicationContext context) {
-		this.context = context;
-	}
 
 	@Transactional
 	public void startFeedIngestion() {
@@ -67,7 +65,11 @@ public class SocialFeedIngestionKickStarter {
 				LOG.debug("Found " + (currentBatch + tokens.size()) + " tokens for " + collectionName + " till now.");
 				// get individual entity
 				for (FeedIngestionEntity ingestionEntity : tokens) {
-					fetchFeedFromIndividualSocialMediaTokens(ingestionEntity, collectionName);
+					try{
+						fetchFeedFromIndividualSocialMediaTokens(ingestionEntity, collectionName);
+					}catch(Exception e){
+						LOG.warn("Exception for "+collectionName+" and "+ingestionEntity.getIden());
+					}
 				}
 				if (tokens.size() < BATCH_SIZE) {
 					LOG.debug("No more tokens left for " + collectionName + ". Breaking from loop.");
