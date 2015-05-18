@@ -62,6 +62,27 @@ $(document).on('click', '#restart-survey-mail', function(e) {
 	showToast();
 });
 
+$(document).on('click', '#report-abuse', function(e) {
+	
+	var firstName = $(this).parent().parent().parent().attr('data-firstname');
+	var lastName = $(this).parent().parent().parent().attr('data-lastname');
+	var agentName = $(this).parent().parent().parent().attr('data-agentname');
+	var customerEmail = $(this).parent().parent().parent().attr('data-customeremail');
+	var agentId = $(this).parent().parent().parent().attr('data-agentid');
+	var review = $(this).parent().parent().parent().attr('data-review');
+	var payload = {
+			"customerEmail" : customerEmail,
+			"agentId" : agentId,
+			"firstName" : firstName,
+			"lastName" : lastName,
+			"agentName" : agentName,
+			"review" : review
+	};
+	callAjaxGetWithPayloadData('./reportabuse.do', '', payload, true);
+	$('#overlay-toast').html('Reported Successfully!');
+	showToast();
+});
+
 $('body').click(function() {
 	$('#hr-dd-wrapper').slideUp(200);
 });
@@ -130,7 +151,7 @@ function showCompanyAdminFlow(newProfileName, newProfileValue) {
 	$("#dsh-srch-survey-div").show();
 	$("#dsh-grph-srch-survey-div").show();
 
-	showProfileDetails(newProfileName, 0, 30);
+	showProfileDetails(newProfileName, 0, 90);
 	bindSelectButtons();
 	if((accountType!="INDIVIDUAL") && (accountType!="FREE"))
 		populateSurveyStatisticsList(newProfileName);
@@ -150,7 +171,7 @@ function showRegionAdminFlow(newProfileName, newProfileValue) {
 	$("#dsh-srch-survey-div").show();
 	$("#dsh-grph-srch-survey-div").show();
 
-	showProfileDetails(newProfileName, newProfileValue, 30);
+	showProfileDetails(newProfileName, newProfileValue, 90);
 	bindSelectButtons();
 	if((accountType!="INDIVIDUAL") && (accountType!="FREE"))
 		populateSurveyStatisticsList(newProfileName);
@@ -170,7 +191,7 @@ function showBranchAdminFlow(newProfileName, newProfileValue) {
 	$("#dsh-srch-survey-div").show();
 	$("#dsh-grph-srch-survey-div").show();
 
-	showProfileDetails(newProfileName, newProfileValue, 30);
+	showProfileDetails(newProfileName, newProfileValue, 90);
 	bindSelectButtons();
 	if((accountType!="INDIVIDUAL") && (accountType!="FREE"))
 		populateSurveyStatisticsList(newProfileName);
@@ -190,7 +211,7 @@ function showAgentFlow(newProfileName, newProfileValue) {
 	$("#dsh-srch-survey-div").hide();
 	$("#dsh-grph-srch-survey-div").hide();
 
-	showProfileDetails(newProfileName, 0, 30);
+	showProfileDetails(newProfileName, 0, 90);
 	bindSelectButtons();
 	showSurveyCount(newProfileName, 0, 30);
 	showSurveyStatisticsGraphically(newProfileName, 0);
@@ -345,10 +366,14 @@ function getReviewsCountAndShowReviews(columnName, columnValue) {
 				$("#dsh-cmp-dwnld").show();
 				$("#dsh-start-date").datepicker({
 					orientation: "bottom auto",
+					format: 'dd/mm/yyyy',
+					todayHighlight : true,
 					autoclose: true
 				});
 				$("#dsh-end-date").datepicker({
 					orientation: "bottom auto",
+					format: 'dd/mm/yyyy',
+					todayHighlight : true,
 					autoclose: true,
 					endDate: new Date()
 				});

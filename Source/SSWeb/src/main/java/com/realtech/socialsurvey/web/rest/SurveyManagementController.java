@@ -9,7 +9,6 @@ import java.util.Map.Entry;
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import org.apache.commons.lang.StringUtils;
-import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.common.SolrDocument;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -161,8 +160,8 @@ public class SurveyManagementController {
 			try {
 				solrDocument = solrSearchService.getUserByUniqueId(agentId);
 			}
-			catch (SolrServerException e) {
-				LOG.error("SolrServerException occurred in storeFeedback() while fetching email id of agent. NEsted exception is ", e);
+			catch (SolrException e) {
+				LOG.error("SolrException occurred in storeFeedback() while fetching email id of agent. NEsted exception is ", e);
 			}
 			
 			if (solrDocument != null && !solrDocument.isEmpty()) {
@@ -185,24 +184,24 @@ public class SurveyManagementController {
 					customerName = survey.getCustomerFirstName() + " " + survey.getCustomerLastName();
 				}
 				
+				String agentEmail = userManagementService.getUserByUserId(agentId).getEmailId();
 				if (enableKafka.equals(CommonConstants.YES)) {
-					emailServices.queueSurveyCompletionMail(customerEmail, customerName, survey.getAgentName());
+					emailServices.queueSurveyCompletionMail(customerEmail, customerName, survey.getAgentName(), agentEmail);
 				}
 				else {
-					emailServices.sendSurveyCompletionMail(customerEmail, customerName, survey.getAgentName());
+					emailServices.sendSurveyCompletionMail(customerEmail, customerName, survey.getAgentName(), agentEmail);
 				}
 				
 				// Generate the text as in mail
 				String surveyDetail = generateSurveyTextForMail(customerName, mood, survey);
-				
 				if (enableKafka.equals(CommonConstants.YES)) {
 					for (Entry<String, String> admin : emailIdsToSendMail.entrySet()) {
-						emailServices.queueSurveyCompletionMailToAdminsAndAgent(admin.getValue(), admin.getKey(), surveyDetail);
+						emailServices.queueSurveyCompletionMailToAdminsAndAgent(admin.getValue(), admin.getKey(), surveyDetail, customerName);
 					}
 				}
 				else {
 					for (Entry<String, String> admin : emailIdsToSendMail.entrySet()) {
-						emailServices.sendSurveyCompletionMailToAdminsAndAgent(admin.getValue(), admin.getKey(), surveyDetail);
+						emailServices.sendSurveyCompletionMailToAdminsAndAgent(admin.getValue(), admin.getKey(), surveyDetail, customerName);
 					}
 				}
 			}
@@ -233,7 +232,8 @@ public class SurveyManagementController {
 		}
 		surveyDetail.append("<br />");
 		surveyDetail.append("<br />").append("Customer Comments: ").append(survey.getReview());
-		surveyDetail.append("<br />").append("Customer Mood: ").append(mood);
+		surveyDetail.append("<br />").append("Overall Experience: ").append(mood);
+		
 		if (survey.getSharedOn() != null && !survey.getSharedOn().isEmpty()) {
 			surveyDetail.append("<br />").append("Share Checkbox: ").append("Yes");
 			surveyDetail.append("<br />").append("Shared on: ").append(StringUtils.join(survey.getSharedOn(), ", "));
@@ -283,7 +283,7 @@ public class SurveyManagementController {
 				agentEmail = user.get(CommonConstants.USER_EMAIL_ID_SOLR).toString();
 			}
 		}
-		catch (InvalidInputException | SolrServerException e) {
+		catch (InvalidInputException | SolrException e) {
 			LOG.error("Error occured while fetching details of agent. Error is : " + e);
 			return JspResolver.ERROR_PAGE;
 		}
@@ -315,9 +315,7 @@ public class SurveyManagementController {
 		String firstName;
 		String lastName;
 		String custRelationWithAgent;
-		String user = "";
 		String agentName;
-		user = request.getParameter(CommonConstants.AGENT_ID_COLUMN);
 		customerEmail = request.getParameter(CommonConstants.CUSTOMER_EMAIL_COLUMN);
 		firstName = request.getParameter("firstName");
 		lastName = request.getParameter("lastName");
@@ -327,7 +325,8 @@ public class SurveyManagementController {
 		custRelationWithAgent = "transacted";
 		try {
 			try {
-				agentId = Long.parseLong(user);
+				String agentIdStr = request.getParameter(CommonConstants.AGENT_ID_COLUMN);
+				agentId = Long.parseLong(agentIdStr);
 			}
 			catch (NumberFormatException e) {
 				LOG.error("NumberFormatException caught in triggerSurvey(). Details are " + e);
@@ -342,13 +341,21 @@ public class SurveyManagementController {
 					throw new InvalidInputException(errorMsg, DisplayMessageConstants.INVALID_CAPTCHA);
 				}
 			}
-			User userObj = userManagementService.getUserByUserId(agentId);
-			surveyHandler.sendSurveyInvitationMail(firstName, lastName, customerEmail, custRelationWithAgent, userObj, false);
+
 			model.addAttribute("agentId", agentId);
 			model.addAttribute("firstName", firstName);
 			model.addAttribute("lastName", lastName);
 			model.addAttribute("customerEmail", customerEmail);
 			model.addAttribute("relation", custRelationWithAgent);
+			
+			User user = userManagementService.getUserByUserId(agentId);
+			SurveyDetails survey = surveyHandler.getSurveyDetails(agentId, customerEmail);
+			if(survey!=null){
+				model.addAttribute("surveyCompleted", "yes");
+				model.addAttribute("agentName", survey.getAgentName());
+				return JspResolver.SURVEY_INVITE_SUCCESSFUL;
+			}
+			surveyHandler.sendSurveyInvitationMail(firstName, lastName, customerEmail, custRelationWithAgent, user, false);
 			
 		}
 		catch (NonFatalException e) {

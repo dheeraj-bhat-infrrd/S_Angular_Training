@@ -39,6 +39,7 @@
 						<div class="float-left ppl-share-icns icn-yelp"></div>
                         <div class="float-left ppl-share-icns icn-gplus"></div>
                         <div id="restart-survey-mail" class="float-left ppl-share-icns icn-restart-survey-mail"></div>
+                        <div id="report-abuse" class="float-left ppl-share-icns icn-report-abuse"></div>
 					</div>
 					<div class="float-left icn-share icn-remove icn-rem-size hide" style="display: none;"></div>
 				</div>

@@ -545,19 +545,17 @@ public class SocialManagementController {
 			params.add(new BasicNameValuePair("client_id", linkedInApiKey));
 			params.add(new BasicNameValuePair("client_secret", linkedInApiSecret));
 
+			// fetching access token
 			HttpClient httpclient = HttpClientBuilder.create().build();
 			HttpPost httpPost = new HttpPost(linkedinAccessUri);
 			httpPost.setEntity(new UrlEncodedFormEntity(params, "UTF-8"));
-
-			// Fetching oauth token from json response
 			String accessTokenStr = httpclient.execute(httpPost, new BasicResponseHandler());
 			Map<String, Object> map = new Gson().fromJson(accessTokenStr, new TypeToken<Map<String, String>>() {}.getType());
 			String accessToken = (String) map.get("access_token");
 
-			String linkedinProfileUriWithAccessToken = linkedinProfileUri + accessToken; 
-			HttpGet httpGet = new HttpGet(linkedinProfileUriWithAccessToken);
+			// fetching linkedin profile url
+			HttpGet httpGet = new HttpGet(linkedinProfileUri + accessToken);
 			String basicProfileStr = httpclient.execute(httpGet, new BasicResponseHandler());
-			
 			LinkedinUserProfileResponse profileData = new Gson().fromJson(basicProfileStr, LinkedinUserProfileResponse.class);
 			String profileLink = (String) profileData.getSiteStandardProfileRequest().getUrl();
 
@@ -714,14 +712,10 @@ public class SocialManagementController {
 				accessToken = tokenData.get("access_token").toString();
 				refreshToken = tokenData.get("refresh_token").toString();
 			}
-			LOG.info("Token: " + accessToken);
-			LOG.info("Token: " + refreshToken);
-			
-			String googleAccessUri = googleProfileUri;
-			googleAccessUri += accessToken;
+			LOG.info("Access Token: " + accessToken + ", Refresh Token: " + refreshToken);
 			
 			HttpClient httpclient = HttpClientBuilder.create().build();
-			HttpGet httpGet = new HttpGet(googleAccessUri);
+			HttpGet httpGet = new HttpGet(googleProfileUri + accessToken);
 			String basicProfileStr = httpclient.execute(httpGet, new BasicResponseHandler());
 			Map<String, Object> profileData = new Gson().fromJson(basicProfileStr, new TypeToken<Map<String, String>>() {}.getType());
 			String profileLink = null;
@@ -847,7 +841,6 @@ public class SocialManagementController {
 
 		User user = sessionHelper.getCurrentUser();
 		List<OrganizationUnitSettings> settings = socialManagementService.getBranchAndRegionSettingsForUser(user.getUserId());
-		rating = Math.round(rating * 100) / 100;
 
 		String agentProfileLink = "";
 		AgentSettings agentSettings;
@@ -918,7 +911,6 @@ public class SocialManagementController {
 			
 			User user = sessionHelper.getCurrentUser();
 			List<OrganizationUnitSettings> settings = socialManagementService.getBranchAndRegionSettingsForUser(user.getUserId());
-			rating = Math.round(rating * 100) / 100;
 			String twitterMessage = rating + "-Star Survey Response from " + custFirstName + custLastName + " for " + agentName
 					+ " on @SocialSurvey - view at " + applicationBaseUrl + CommonConstants.AGENT_PROFILE_FIXED_URL + agentProfileLink;
 			twitterMessage = twitterMessage.replaceAll("null", "");
@@ -982,7 +974,6 @@ public class SocialManagementController {
 
 		User user = sessionHelper.getCurrentUser();
 		List<OrganizationUnitSettings> settings = socialManagementService.getBranchAndRegionSettingsForUser(user.getUserId());
-		rating = Math.round(rating * 100) / 100;
 		String message = rating + "-Star Survey Response from " + custFirstName + custLastName + " for " + agentName + " on SocialSurvey - view at "
 				+ applicationBaseUrl + CommonConstants.AGENT_PROFILE_FIXED_URL + agentProfileLink;
 		message = message.replaceAll("null", "");

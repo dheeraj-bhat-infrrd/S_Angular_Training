@@ -91,6 +91,12 @@ public class DashboardController {
 
 	@Value("${ENABLE_KAFKA}")
 	private String enableKafka;
+	
+	@Value("${APPLICATION_ADMIN_EMAIL}")
+	private String applicationAdminEmail;
+	
+	@Value("${APPLICATION_ADMIN_NAME}")
+	private String applicationAdminName;
 
 	private final String EXCEL_FORMAT = "application/vnd.ms-excel";
 	private final String CONTENT_DISPOSITION_HEADER = "Content-Disposition";
@@ -216,14 +222,20 @@ public class DashboardController {
 			throw e;
 		}
 
-		int surveyScore = (int) Math.round(dashboardService.getSurveyScore(columnName, columnValue, numberOfDays));
+		double surveyScore = (double) Math.round(dashboardService.getSurveyScore(columnName, columnValue, numberOfDays)*1000.0)/1000.0;
 		int sentSurveyCount = (int) dashboardService.getAllSurveyCountForPastNdays(columnName, columnValue, numberOfDays);
 		int socialPostsCount = (int) dashboardService.getSocialPostsForPastNdays(columnName, columnValue, numberOfDays);
 		int profileCompleteness = dashboardService.getProfileCompletionPercentage(user, columnName, columnValue, userSettings);
 
 		model.addAttribute("socialScore", surveyScore);
-		model.addAttribute("surveyCount", sentSurveyCount);
-		model.addAttribute("socialPosts", socialPostsCount);
+		if(sentSurveyCount>999)
+			model.addAttribute("surveyCount", "1K+");
+		else
+			model.addAttribute("surveyCount", sentSurveyCount);
+		if(socialPostsCount>999)
+			model.addAttribute("socialPosts", "1K+");
+		else
+			model.addAttribute("socialPosts", socialPostsCount);
 		model.addAttribute("profileCompleteness", profileCompleteness);
 		model.addAttribute("badges", dashboardService.getBadges(surveyScore, sentSurveyCount, socialPostsCount, profileCompleteness));
 
@@ -1096,6 +1108,9 @@ public class DashboardController {
 		return CommonConstants.SUCCESS_ATTRIBUTE;
 	}
 	
+	/*
+	 * Method to mark a particular survey as editable and re-send the link to a customer. 
+	 */
 	@ResponseBody
 	@RequestMapping(value = "/restartsurvey")
 	public void restartSurvey(HttpServletRequest request) {
@@ -1112,6 +1127,47 @@ public class DashboardController {
 			SurveyDetails survey = surveyHandler.getSurveyDetails(agentId, customerEmail);
 			User user = sessionHelper.getCurrentUser();
 			surveyHandler.sendSurveyRestartMail(firstName, lastName, customerEmail, survey.getCustRelationWithAgent(), user, survey.getUrl());
+		}
+		catch (NonFatalException e) {
+			LOG.error("NonfatalException caught in makeSurveyEditable(). Nested exception is ", e);
+		}
+	}
+	
+	// Method to report a feedback of customer as abusive.
+	// Anybody in the hierarchy can report a feedback from dash board. 
+	
+	@ResponseBody
+	@RequestMapping(value = "/reportabuse")
+	public void reportAbuse(HttpServletRequest request) {
+		String agentIdStr = request.getParameter("agentId");
+		String customerEmail = request.getParameter("customerEmail");
+		String firstName = request.getParameter("firstName");
+		String lastName = request.getParameter("lastName");
+		String review = request.getParameter("review");
+		try {
+			if (agentIdStr == null || agentIdStr.isEmpty()) {
+				throw new InvalidInputException("Invalid value (Null/Empty) found for agentId.");
+			}
+			long agentId = 0;
+			try{
+				 agentId = Long.parseLong(agentIdStr);
+			}
+			catch (NumberFormatException e) {
+				LOG.error("NumberFormatException caught in reportAbuse() while converting agentId.");
+				throw e;
+			}
+			String customerName = firstName + lastName;
+			String agentName = "";
+			try{
+				agentName = solrSearchService.getUserDisplayNameById(agentId);
+			}
+			catch(SolrException e){
+				LOG.info("Solr Exception occured while fetching agent name. Nested exception is ", e);
+				throw e;
+			}
+			
+			// Calling email services method to send mail to the Application level admin.
+			emailServices.sendReportAbuseMail(applicationAdminEmail, applicationAdminName, agentName, customerName.replaceAll("null", ""), customerEmail, review);
 		}
 		catch (NonFatalException e) {
 			LOG.error("NonfatalException caught in makeSurveyEditable(). Nested exception is ", e);

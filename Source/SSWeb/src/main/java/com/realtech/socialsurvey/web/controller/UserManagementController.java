@@ -9,7 +9,6 @@ import java.util.List;
 import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
-import org.apache.solr.client.solrj.SolrServerException;
 import org.noggit.JSONUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -328,9 +327,9 @@ public class UserManagementController {
 				Type searchedUser = new TypeToken<UserFromSearch>() {}.getType();
 				adminUser = new Gson().fromJson(adminUserDoc.toString(), searchedUser);
 			}
-			catch (SolrServerException e) {
-				LOG.error("SolrServerException while searching for user id. Reason : " + e.getMessage(), e);
-				throw new NonFatalException("SolrServerException while searching for user id.", e);
+			catch (SolrException e) {
+				LOG.error("SolrException while searching for user id. Reason : " + e.getMessage(), e);
+				throw new NonFatalException("SolrException while searching for user id.", e);
 			}
 
 			// fetching users from solr
@@ -423,8 +422,8 @@ public class UserManagementController {
 				Type searchedUser = new TypeToken<UserFromSearch>() {}.getType();
 				adminUser = new Gson().fromJson(adminUserDoc.toString(), searchedUser);
 			}
-			catch (SolrServerException e) {
-				throw new NonFatalException("SolrServerException while searching for user id.Reason:" + e.getMessage(),
+			catch (SolrException e) {
+				throw new NonFatalException("SolrException while searching for user id.Reason:" + e.getMessage(),
 						DisplayMessageConstants.GENERAL_ERROR, e);
 			}
 			Type searchedUsersList = new TypeToken<List<UserFromSearch>>() {}.getType();

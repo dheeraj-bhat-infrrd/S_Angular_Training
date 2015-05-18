@@ -665,7 +665,7 @@ public class SolrSearchServiceImpl implements SolrSearchService {
 	 * Method to fetch display name of a user from solr based upon user id provided.
 	 */
 	@Override
-	public String getUserDisplayNameById(long userId) throws InvalidInputException, NoRecordsFetchedException, SolrServerException {
+	public String getUserDisplayNameById(long userId) throws InvalidInputException, NoRecordsFetchedException, SolrException {
 		LOG.info("Method to fetch user from solr based upon user id, searchUserById() started.");
 		SolrDocument solrDocument = getUserByUniqueId(userId);
 		if (solrDocument == null || solrDocument.isEmpty()) {
@@ -680,7 +680,7 @@ public class SolrSearchServiceImpl implements SolrSearchService {
 	 * Method to fetch user based on the userid provided
 	 */
 	@Override
-	public SolrDocument getUserByUniqueId(long userId) throws InvalidInputException, SolrServerException {
+	public SolrDocument getUserByUniqueId(long userId) throws InvalidInputException, SolrException {
 		LOG.info("Method getUserByUniqueId called for userId:" + userId);
 		if (userId <= 0l) {
 			throw new InvalidInputException("userId is invalid for getting user from solr");
@@ -692,6 +692,7 @@ public class SolrSearchServiceImpl implements SolrSearchService {
 		solrQuery.setQuery(CommonConstants.USER_ID_SOLR + ":" + userId);
 
 		LOG.debug("Querying solr for searching users");
+		try{
 		response = solrServer.query(solrQuery);
 		SolrDocumentList results = response.getResults();
 
@@ -700,6 +701,10 @@ public class SolrSearchServiceImpl implements SolrSearchService {
 		}
 		else {
 			LOG.debug("No user present in solr for the userId:" + userId);
+		}
+		}
+		catch(SolrServerException e){
+			throw new SolrException("SolrServerException caught in getUserByUniqueId().", e);
 		}
 		LOG.info("Method getUserByUniqueId executed succesfully. Returning :" + solrDocument);
 		return solrDocument;
