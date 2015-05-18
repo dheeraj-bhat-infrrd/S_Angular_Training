@@ -1120,7 +1120,7 @@ public class SocialManagementController {
 		String socialNetwork = request.getParameter("socialNetwork");
 		HttpSession session = request.getSession(false);
 		UserSettings usersettings = (UserSettings) session.getAttribute(CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION);
-		
+
 		String profileUrl = "";
 		if (socialNetwork.equalsIgnoreCase("facebook")) {
 			if (usersettings != null && usersettings.getAgentSettings() != null && usersettings.getAgentSettings().getSocialMediaTokens() != null
@@ -1150,6 +1150,7 @@ public class SocialManagementController {
 			}
 		}
 
+		LOG.info("Method getProfileUrl() finished from SocialManagementController");
 		return profileUrl;
 	}
 }
