@@ -105,55 +105,55 @@
 	<bean id="sitemapgeneratorcron"
 		class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
 		<property name="jobDetail" ref="sitemapjobdetail" />
-		<property name="cronExpression" value="0 0/1 * * * ?" />
+		<property name="cronExpression" value="0 15 7 * * ?" />
 	</bean>
 
 	<!-- setting cron for incomplete social post reminder -->
 	<bean id="incompletesocialpostcron"
 		class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
 		<property name="jobDetail" ref="incompletesocialpostjobdetail" />
-		<property name="cronExpression" value="0 0/1 * * * ?" />
+		<property name="cronExpression" value="0 0 6 * * ?" />
 	</bean>
 
 	<!-- setting cron for incomplete survey reminder -->
 	<bean id="incompletesurveycron"
 		class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
 		<property name="jobDetail" ref="incompletesurveyjobdetail" />
-		<property name="cronExpression" value="0 0/1 * * * ?" />
+		<property name="cronExpression" value="0 15 6 * * ?" />
 	</bean>
 
 	<!-- setting cron for update subscription price -->
 	<bean id="updatesubscriptionpricecron"
 		class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
 		<property name="jobDetail" ref="updatesubscriptionpricejobdetail" />
-		<property name="cronExpression" value="0 0/1 * * * ?" />
+		<property name="cronExpression" value="0 30 6 * * ?" />
 	</bean>
 
 	<!-- setting cron for social feed ingester -->
 	<bean id="socialfeedingestercron"
 		class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
 		<property name="jobDetail" ref="socialfeedingesterjobdetail" />
-		<property name="cronExpression" value="0 0/1 * * * ?" />
+		<property name="cronExpression" value="0 45 6 * * ?" />
 	</bean>
 
 	<!-- Scheduler factory -->
 	<bean class="org.springframework.scheduling.quartz.SchedulerFactoryBean">
 		<property name="jobDetails">
 			<list>
-				<!-- <ref bean="sitemapjobdetail" /> -->
-				<!-- <ref bean="incompletesocialpostjobdetail" /> -->
-				<!-- <ref bean="incompletesurveyjobdetail" /> -->
-				<!-- <ref bean="updatesubscriptionpricejobdetail" />  -->
+				<ref bean="sitemapjobdetail" />
+				<ref bean="incompletesocialpostjobdetail" />
+				<ref bean="incompletesurveyjobdetail" />
+				<ref bean="updatesubscriptionpricejobdetail" />
 				<ref bean="socialfeedingesterjobdetail" />
 			</list>
 		</property>
 
 		<property name="triggers">
 			<list>
-				<!-- <ref bean="sitemapgeneratorcron" /> -->
-				<!-- <ref bean="incompletesocialpostcron" /> -->
-				<!--<ref bean="incompletesurveycron" /> -->
-				<!-- <ref bean="updatesubscriptionpricecron" /> -->
+				<ref bean="sitemapgeneratorcron" />
+				<ref bean="incompletesocialpostcron" />
+				<ref bean="incompletesurveycron" />
+				<ref bean="updatesubscriptionpricecron" />
 				<ref bean="socialfeedingestercron" />
 			</list>
 		</property>
