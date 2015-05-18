@@ -1,10 +1,11 @@
 package com.realtech.socialsurvey.core.starter;
 
 import java.io.File;
+import org.quartz.JobDataMap;
+import org.quartz.JobExecutionContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
+import org.springframework.scheduling.quartz.QuartzJobBean;
 import org.springframework.stereotype.Component;
 import com.realtech.socialsurvey.core.exception.NonFatalException;
 import com.realtech.socialsurvey.core.services.upload.FileUploadService;
@@ -15,35 +16,27 @@ import com.realtech.socialsurvey.core.utils.sitemap.SiteMapGenerator;
  *
  */
 @Component("appsitemapgenerator")
-public class ApplicationSiteMapGenerator {
+public class ApplicationSiteMapGenerator extends QuartzJobBean{
 	
 	public static final Logger LOG = LoggerFactory.getLogger(ApplicationSiteMapGenerator.class);
 	
-	@Autowired
 	private SiteMapGenerator companySiteMapGenerator;
-	@Autowired
 	private SiteMapGenerator regionSiteMapGenerator;
-	@Autowired
 	private SiteMapGenerator branchSiteMapGenerator;
-	@Autowired
 	private SiteMapGenerator agentSiteMapGenerator;
-	@Autowired
 	private FileUploadService uploadService;
 	
-	@Value("${AMAZON_ENV_PREFIX}")
 	private String envPrefix;
 	
-	@Value("${COMPANY_SITEMAP_PATH}")
 	private String companySiteMapPath;
-	@Value("${REGION_SITEMAP_PATH}")
 	private String regionSiteMapPath;
-	@Value("${BRANCH_SITEMAP_PATH}")
 	private String branchSiteMapPath;
-	@Value("${INDIVIDUAL_SITEMAP_PATH}")
 	private String individualSiteMapPath;
 	
-	public void execute(){
+	@Override
+	protected void executeInternal(JobExecutionContext jobExecutionContext) {
 		LOG.info("Starting up the ApplicationSiteMapGenerator.");
+		initializeDependencies(jobExecutionContext.getMergedJobDataMap());
 		companySiteMapGenerator.setInterval(SiteMapGenerator.DAILY_CONTENT);
 		companySiteMapGenerator.setOrganizationUnit(SiteMapGenerator.ORG_COMPANY);
 		Thread companySiteMapGeneratorThread = new Thread(companySiteMapGenerator);
@@ -81,6 +74,19 @@ public class ApplicationSiteMapGenerator {
 			LOG.error("Could not upload file to amazon", e);
 		}
 		
+	}
+	
+	private void initializeDependencies(JobDataMap jobMap) {
+		companySiteMapGenerator = (SiteMapGenerator) jobMap.get("companySiteMapGenerator");
+		regionSiteMapGenerator = (SiteMapGenerator) jobMap.get("regionSiteMapGenerator");
+		branchSiteMapGenerator = (SiteMapGenerator) jobMap.get("branchSiteMapGenerator");
+		agentSiteMapGenerator = (SiteMapGenerator) jobMap.get("agentSiteMapGenerator");
+		uploadService = (FileUploadService) jobMap.get("uploadService");
+		envPrefix = (String) jobMap.get("envPrefix");
+		companySiteMapPath = (String) jobMap.get("companySiteMapPath");
+		regionSiteMapPath = (String) jobMap.get("regionSiteMapPath");
+		branchSiteMapPath = (String) jobMap.get("branchSiteMapPath");
+		individualSiteMapPath = (String) jobMap.get("individualSiteMapPath");
 	}
 	
 	public void uploadFile(String filePath, FileUploadService uploadService, String envPrefix) throws NonFatalException{
