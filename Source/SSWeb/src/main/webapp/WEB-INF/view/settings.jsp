@@ -196,22 +196,22 @@
 					<div class="soc-nw-wrapper clearfix">
 						<div class="soc-nw-icns-cont clearfix">
 							<div class="float-left soc-nw-icns cursor-pointer icn-wide-fb soc-nw-adj" onclick="openAuthPage('facebook');"></div>
-							<div class="float-left soc-nw-icn-link">www.facebook.com</div>
+							<div id="edt-prof-fb-lnk" class="float-left soc-nw-icn-link">${facebookLink}</div>
 						</div>
 						<!-- <div class="float-left soc-nw-icns cursor-pointer icn-wide-gplus" onclick="openAuthPage('google');"></div> -->
 						<div class="soc-nw-icns-cont clearfix">
 							<div class="float-left soc-nw-icns cursor-pointer icn-wide-twitter soc-nw-adj" onclick="openAuthPage('twitter');"></div>
-							<div class="float-left soc-nw-icn-link">www.twitter.com</div>
+							<div id="edt-prof-twt-lnk" class="float-left soc-nw-icn-link">${twitterLink}</div>
 						</div>
 						<!-- <div class="float-left soc-nw-icns cursor-pointer icn-wide-rss" onclick="openAuthPage('rss');"></div> -->
 						<div class="soc-nw-icns-cont clearfix">
 							<div class="float-left soc-nw-icns cursor-pointer icn-wide-linkedin soc-nw-adj" onclick="openAuthPage('linkedin');"></div>
-							<div class="float-left soc-nw-icn-link">www.linkedin.com</div>
+							<div id="edt-prof-linkedin-lnk" class="float-left soc-nw-icn-link">${linkedinLink}</div>
 						</div>
 						<!-- <div class="float-left soc-nw-icns cursor-pointer icn-wide-yelp" onclick="openAuthPage('yelp');"></div> -->
 						<div class="soc-nw-icns-cont clearfix">
 							<div class="float-left soc-nw-icns cursor-pointer icn-wide-gplus soc-nw-adj" onclick="openAuthPage('google');"></div>
-							<div class="float-left soc-nw-icn-link">plus.google.com</div>
+							<div id="edt-prof-ggl-lnk" class="float-left soc-nw-icn-link">${googleLink}</div>
 						</div>
 					</div>
 				</div>

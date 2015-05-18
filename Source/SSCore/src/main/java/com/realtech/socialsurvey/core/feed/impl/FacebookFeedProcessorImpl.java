@@ -70,12 +70,12 @@ public class FacebookFeedProcessorImpl implements SocialNetworkDataProcessor<Pos
 
 	@Override
 	@Transactional
-	public void preProcess(long iden, String organizationUnit, FacebookToken token) {
+	public void preProcess(long iden, String collection, FacebookToken token) {
 		List<FeedStatus> statuses = null;
 		Map<String, Object> queries = new HashMap<>();
 		queries.put(CommonConstants.FEED_SOURCE_COLUMN, FEED_SOURCE);
 
-		switch (organizationUnit) {
+		switch (collection) {
 			case MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION:
 				queries.put(CommonConstants.COMPANY_ID_COLUMN, iden);
 
@@ -157,8 +157,8 @@ public class FacebookFeedProcessorImpl implements SocialNetworkDataProcessor<Pos
 
 	@Override
 	@Transactional
-	public List<Post> fetchFeed(long iden, String organizationUnit, FacebookToken token) throws NonFatalException {
-		LOG.info("Getting posts for " + organizationUnit + " with id: " + iden);
+	public List<Post> fetchFeed(long iden, String collection, FacebookToken token) throws NonFatalException {
+		LOG.info("Getting posts for " + collection + " with id: " + iden);
 
 		// Settings Consumer and Access Tokens
 		Facebook facebook = new FacebookFactory().getInstance();
@@ -190,7 +190,7 @@ public class FacebookFeedProcessorImpl implements SocialNetworkDataProcessor<Pos
 			
 			// sending reminder mail and increasing counter
 			if (status.getRemindersSent() < socialConnectThreshold) {
-				OrganizationUnitSettings unitSettings = settingsDao.fetchOrganizationUnitSettingsById(iden, organizationUnit);
+				OrganizationUnitSettings unitSettings = settingsDao.fetchOrganizationUnitSettingsById(iden, collection);
 				
 				String userEmail = unitSettings.getContact_details().getMail_ids().getWork();
 				emailServices.sendSocialConnectMail(userEmail, unitSettings.getContact_details().getName(), userEmail, FEED_SOURCE);
@@ -205,8 +205,8 @@ public class FacebookFeedProcessorImpl implements SocialNetworkDataProcessor<Pos
 	}
 
 	@Override
-	public void processFeed(List<Post> posts, String organizationUnit) throws NonFatalException {
-		LOG.info("Process posts for organizationUnit " + organizationUnit);
+	public void processFeed(List<Post> posts, String collection) throws NonFatalException {
+		LOG.info("Process posts for organizationUnit " + collection);
 		if (lastFetchedTill == null) {
 			lastFetchedTill = posts.get(0).getUpdatedTime();
 		}
@@ -240,7 +240,7 @@ public class FacebookFeedProcessorImpl implements SocialNetworkDataProcessor<Pos
 			feed.setPostedBy(post.getFrom().getName());
 			feed.setTimeInMillis(post.getUpdatedTime().getTime());
 
-			switch (organizationUnit) {
+			switch (collection) {
 				case MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION:
 					feed.setCompanyId(profileId);
 					break;
@@ -267,7 +267,7 @@ public class FacebookFeedProcessorImpl implements SocialNetworkDataProcessor<Pos
 
 	@Override
 	@Transactional
-	public void postProcess(long iden, String organizationUnit) throws NonFatalException {
+	public void postProcess(long iden, String collection) throws NonFatalException {
 		status.setLastFetchedTill(new Timestamp(lastFetchedTill.getTime()));
 		status.setLastFetchedPostId(lastFetchedPostId);
 

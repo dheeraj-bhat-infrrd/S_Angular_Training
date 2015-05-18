@@ -110,7 +110,7 @@ function callAjaxFormSubmit(url, callBackFunction, formId) {
  * Generic function to be used for making form submission with ajax post
  */
 function redirectErrorpage(){
-	window.location = "errorpage.do";
+	window.open(window.location.origin + "/errorpage.do",'_self');
 }
 
 /**
@@ -419,6 +419,21 @@ function openAuthPage(socialNetwork) {
 }
 function openAuthPageRegistration(socialNetwork) {
 	window.open("./socialauth.do?social=" + socialNetwork + "&flow=registration", "Authorization Page", "width=600,height=600,scrollbars=yes");
+}
+
+function showProfileLinkInEditProfilePage(source, profileUrl){
+	if(source=='facebook'){
+		$('#edt-prof-fb-lnk').html(profileUrl);
+	}
+	else if(source=='twitter'){
+		$('#edt-prof-twt-lnk').html(profileUrl);
+	}
+	else if(source=='linkedin'){
+		$('#edt-prof-linkedin-lnk').html(profileUrl);
+	}
+	else if(source=='google'){
+		$('#edt-prof-ggl-lnk').html(profileUrl);
+	}
 }
 
 // Skip / Next buttons 

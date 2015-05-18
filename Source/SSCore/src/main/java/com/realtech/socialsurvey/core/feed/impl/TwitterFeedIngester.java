@@ -53,7 +53,7 @@ public class TwitterFeedIngester implements Runnable {
 			e.printStackTrace();
 		}
 		finally {
-			LOG.info("Done fetching tweets for " + collectionName + " with iden: " + iden);
+			LOG.info("Done fetching twitter tweets for " + collectionName + " with iden: " + iden);
 		}
 	}
 }

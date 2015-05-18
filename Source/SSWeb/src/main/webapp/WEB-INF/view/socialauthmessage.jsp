@@ -106,7 +106,6 @@ $(window).on('unload', function(){
 });
 
 function callAjaxWithPayload(payload){
-	alert('callAjaxWithPayload');
 	$.ajax({
 		url : './profileUrl.do',
 		type : "GET",
@@ -127,6 +126,7 @@ function authenticateCallBack(data){
 	if (window.opener != null && !window.opener.closed) {
 		parentWindow = window.opener;
 		parentWindow.showProfileLink("${socialNetwork}", data);
+		parentWindow.showProfileLinkInEditProfilePage("${socialNetwork}", data);
 	}
 }
 

@@ -91,12 +91,12 @@ public class GoogleFeedProcessorImpl implements SocialNetworkDataProcessor<Googl
 
 	@Override
 	@Transactional
-	public void preProcess(long iden, String organizationUnit, GoogleToken token) {
+	public void preProcess(long iden, String collection, GoogleToken token) {
 		List<FeedStatus> statuses = null;
 		Map<String, Object> queries = new HashMap<>();
 		queries.put(CommonConstants.FEED_SOURCE_COLUMN, FEED_SOURCE);
 
-		switch (organizationUnit) {
+		switch (collection) {
 			case MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION:
 				queries.put(CommonConstants.COMPANY_ID_COLUMN, iden);
 
@@ -179,8 +179,8 @@ public class GoogleFeedProcessorImpl implements SocialNetworkDataProcessor<Googl
 
 	@Override
 	@Transactional
-	public List<GooglePlusPost> fetchFeed(long iden, String organizationUnit, GoogleToken token) throws NonFatalException {
-		LOG.info("Getting google posts for " + organizationUnit + " with id: " + iden);
+	public List<GooglePlusPost> fetchFeed(long iden, String collection, GoogleToken token) throws NonFatalException {
+		LOG.info("Getting google posts for " + collection + " with id: " + iden);
 		List<GooglePlusPost> posts = new ArrayList<GooglePlusPost>();
 
 		try {
@@ -225,7 +225,7 @@ public class GoogleFeedProcessorImpl implements SocialNetworkDataProcessor<Googl
 			
 			// sending reminder mail and increasing counter
 			if (status.getRemindersSent() < socialConnectThreshold) {
-				OrganizationUnitSettings unitSettings = settingsDao.fetchOrganizationUnitSettingsById(iden, organizationUnit);
+				OrganizationUnitSettings unitSettings = settingsDao.fetchOrganizationUnitSettingsById(iden, collection);
 				
 				String userEmail = unitSettings.getContact_details().getMail_ids().getWork();
 				emailServices.sendSocialConnectMail(userEmail, unitSettings.getContact_details().getName(), userEmail, FEED_SOURCE);
@@ -252,11 +252,11 @@ public class GoogleFeedProcessorImpl implements SocialNetworkDataProcessor<Googl
 		return url.toString();
 	}
 
-	private Timestamp convertStringToDate(String str) throws NonFatalException {
+	private Timestamp convertStringToDate(String dateStr) throws NonFatalException {
 		Date date = null;
 		SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
 		try {
-			date = format.parse(str);
+			date = format.parse(dateStr);
 		}
 		catch (ParseException e) {
 			throw new NonFatalException("Unable to parse date : ", e.getMessage());
@@ -313,8 +313,8 @@ public class GoogleFeedProcessorImpl implements SocialNetworkDataProcessor<Googl
 	}
 
 	@Override
-	public void processFeed(List<GooglePlusPost> posts, String organizationUnit) throws NonFatalException {
-		LOG.info("Process tweets for organizationUnit " + organizationUnit);
+	public void processFeed(List<GooglePlusPost> posts, String collection) throws NonFatalException {
+		LOG.info("Process tweets for organizationUnit " + collection);
 		Date lastFetchedOn = null;
 
 		GooglePlusSocialPost socialPost = null;
@@ -344,7 +344,7 @@ public class GoogleFeedProcessorImpl implements SocialNetworkDataProcessor<Googl
 			if (socialPost == null)
 				break;
 
-			switch (organizationUnit) {
+			switch (collection) {
 				case MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION:
 					socialPost.setCompanyId(profileId);
 					break;
@@ -374,7 +374,7 @@ public class GoogleFeedProcessorImpl implements SocialNetworkDataProcessor<Googl
 
 	@Override
 	@Transactional
-	public void postProcess(long iden, String organizationUnit) throws NonFatalException {
+	public void postProcess(long iden, String collection) throws NonFatalException {
 		status.setLastFetchedTill(lastFetchedTill);
 		status.setLastFetchedPostId(lastFetchedPostId);
 		feedStatusDao.saveOrUpdate(status);
