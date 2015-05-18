@@ -364,19 +364,35 @@ function getReviewsCountAndShowReviews(columnName, columnValue) {
 				$("#review-desc").html("What people say about " + name.substring(1, name.length - 1));
 				
 				$("#dsh-cmp-dwnld").show();
+				
+				var startDate;
+				var fromEndDate = new Date();
+				var toEndDate = new Date();
 				$("#dsh-start-date").datepicker({
 					orientation: "bottom auto",
-					format: 'dd/mm/yyyy',
+					format: 'mm/dd/yyyy',
+					endDate: fromEndDate,
 					todayHighlight : true,
 					autoclose: true
-				});
+				})
+				.on('changeDate', function(selected){
+			        startDate = new Date(selected.date.valueOf());
+			        startDate.setDate(startDate.getDate(new Date(selected.date.valueOf())));
+			        $('#dsh-end-date').datepicker('setStartDate', startDate);
+			    });
+				
 				$("#dsh-end-date").datepicker({
 					orientation: "bottom auto",
-					format: 'dd/mm/yyyy',
+					format: 'mm/dd/yyyy',
 					todayHighlight : true,
-					autoclose: true,
-					endDate: new Date()
-				});
+					endDate: toEndDate,
+					autoclose: true
+				})
+				.on('changeDate', function(selected){
+			        fromEndDate = new Date(selected.date.valueOf());
+			        fromEndDate.setDate(fromEndDate.getDate(new Date(selected.date.valueOf())));
+			        $('#dsh-start-date').datepicker('setEndDate', fromEndDate);
+			    });
 			}
 		}, payload, false);
 		

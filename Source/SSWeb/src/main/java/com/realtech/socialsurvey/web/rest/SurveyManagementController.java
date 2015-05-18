@@ -198,14 +198,17 @@ public class SurveyManagementController {
 				
 				// Generate the text as in mail
 				String surveyDetail = generateSurveyTextForMail(customerName, mood, survey);
+				String surveyScore = String.valueOf(survey.getScore());
 				if (enableKafka.equals(CommonConstants.YES)) {
 					for (Entry<String, String> admin : emailIdsToSendMail.entrySet()) {
-						emailServices.queueSurveyCompletionMailToAdminsAndAgent(admin.getValue(), admin.getKey(), surveyDetail, customerName);
+						emailServices.queueSurveyCompletionMailToAdminsAndAgent(admin.getValue(), admin.getKey(), surveyDetail, customerName,
+								surveyScore);
 					}
 				}
 				else {
 					for (Entry<String, String> admin : emailIdsToSendMail.entrySet()) {
-						emailServices.sendSurveyCompletionMailToAdminsAndAgent(admin.getValue(), admin.getKey(), surveyDetail, customerName);
+						emailServices.sendSurveyCompletionMailToAdminsAndAgent(admin.getValue(), admin.getKey(), surveyDetail, customerName,
+								surveyScore);
 					}
 				}
 			}

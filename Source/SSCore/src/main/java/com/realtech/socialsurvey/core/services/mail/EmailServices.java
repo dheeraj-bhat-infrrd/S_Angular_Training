@@ -175,11 +175,11 @@ public interface EmailServices {
 	 * @param agentName
 	 * @throws InvalidInputException
 	 */
-	public void queueSurveyCompletionMailToAdminsAndAgent(String recipientName, String recipientMailId, String surveyDetail, String customerName)
-			throws InvalidInputException;
+	public void queueSurveyCompletionMailToAdminsAndAgent(String recipientName, String recipientMailId, String surveyDetail, String customerName,
+			String rating) throws InvalidInputException;
 
-	public void sendSurveyCompletionMailToAdminsAndAgent(String agentName, String recipientMailId, String surveyDetail, String customerName)
-			throws InvalidInputException, UndeliveredEmailException;
+	public void sendSurveyCompletionMailToAdminsAndAgent(String agentName, String recipientMailId, String surveyDetail, String customerName,
+			String rating) throws InvalidInputException, UndeliveredEmailException;
 
 	/**
 	 * Queues the social post reminder mail
