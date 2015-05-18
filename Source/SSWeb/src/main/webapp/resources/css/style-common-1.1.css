@@ -812,6 +812,11 @@ input#find-pro-submit{
     font-size: 14px;
 }
 
+.wc-connect-link {
+	margin-bottom: 20px;
+	font-family: 'opensanssemibold';
+}
+
 .wl-import-btn {
     background: #009FE0;
     color: #fff;

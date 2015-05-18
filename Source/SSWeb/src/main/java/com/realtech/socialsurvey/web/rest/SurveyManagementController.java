@@ -233,9 +233,9 @@ public class SurveyManagementController {
 			count ++;
 		}
 		surveyDetail.append("<br />");
-		surveyDetail.append("<br />").append("Customer Comments: ").append(survey.getReview());
 		surveyDetail.append("<br />").append("Overall Experience: ").append(mood);
 		
+		surveyDetail.append("<br />").append("Customer Comments: ").append(survey.getReview());
 		if (survey.getSharedOn() != null && !survey.getSharedOn().isEmpty()) {
 			surveyDetail.append("<br />").append("Share Checkbox: ").append("Yes");
 			surveyDetail.append("<br />").append("Shared on: ").append(StringUtils.join(survey.getSharedOn(), ", "));
