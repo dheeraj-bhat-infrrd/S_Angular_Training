@@ -6,11 +6,11 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import org.quartz.JobDataMap;
+import org.quartz.JobExecutionContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.support.ClassPathXmlApplicationContext;
+import org.springframework.scheduling.quartz.QuartzJobBean;
 import com.realtech.socialsurvey.core.entities.AgentSettings;
 import com.realtech.socialsurvey.core.entities.Company;
 import com.realtech.socialsurvey.core.entities.SurveyDetails;
@@ -22,29 +22,28 @@ import com.realtech.socialsurvey.core.services.organizationmanagement.Organizati
 import com.realtech.socialsurvey.core.services.organizationmanagement.UserManagementService;
 import com.realtech.socialsurvey.core.services.surveybuilder.SurveyHandler;
 
-public class IncompleteSocialPostReminderSender {
+public class IncompleteSocialPostReminderSender extends QuartzJobBean {
 
-	@Autowired
 	private URLGenerator urlGenerator;
 
-	@Autowired
 	private UserManagementService userManagementService;
 
-	@Autowired
 	private SurveyHandler surveyHandler;
+	
+	private EmailServices emailServices;
+	
+	private OrganizationManagementService organizationManagementService;
 
 	public static final Logger LOG = LoggerFactory.getLogger(IncompleteSocialPostReminderSender.class);
 
 	private static List<String> socialSites = new ArrayList<>();
 
-	public static void main(String[] args) {
-		@SuppressWarnings("resource") ApplicationContext context = new ClassPathXmlApplicationContext("ss-starter-config.xml");
-		SurveyHandler surveyHandler = (SurveyHandler) context.getBean("surveyHandler");
-		EmailServices emailServices = (EmailServices) context.getBean("emailServices");
+	@Override
+	 protected void executeInternal(JobExecutionContext jobExecutionContext){
+		LOG.info("Executing IncompleteSocialPostReminderSender");
+		initializeDependencies(jobExecutionContext.getMergedJobDataMap());
 		populateSocialSites();
 		IncompleteSocialPostReminderSender sender = new IncompleteSocialPostReminderSender();
-		OrganizationManagementService organizationManagementService = (OrganizationManagementService) context
-				.getBean("organizationManagementService");
 		StringBuilder links = new StringBuilder();
 		for (Company company : organizationManagementService.getAllCompanies()) {
 			List<SurveyDetails> incompleteSocialPostCustomers = surveyHandler.getIncompleteSocialPostSurveys(company.getCompanyId());
@@ -71,6 +70,15 @@ public class IncompleteSocialPostReminderSender {
 		}
 	}
 
+	private void initializeDependencies(JobDataMap jobMap) {
+		urlGenerator = (URLGenerator) jobMap.get("urlGenerator");
+		surveyHandler = (SurveyHandler) jobMap.get("surveyHandler");
+		emailServices = (EmailServices) jobMap.get("emailServices");
+		userManagementService = (UserManagementService) jobMap.get("userManagementService");
+		organizationManagementService = (OrganizationManagementService) jobMap.get("organizationManagementService");
+
+	}
+	
 	private static void populateSocialSites() {
 		socialSites.add("facebook");
 		socialSites.add("twitter");
