@@ -10,6 +10,7 @@ import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
@@ -42,6 +43,9 @@ public class SurveyBuilderImpl implements SurveyBuilder {
 	private static final Logger LOG = LoggerFactory.getLogger(SurveyBuilderImpl.class);
 
 	@Autowired
+	private UserDao userDao;
+	
+	@Autowired
 	private GenericDao<Survey, Long> surveyDao;
 
 	@Autowired
@@ -57,15 +61,14 @@ public class SurveyBuilderImpl implements SurveyBuilder {
 	private GenericDao<SurveyCompanyMapping, Long> surveyCompanyMappingDao;
 
 	@Autowired
-	private UserDao userDao;
-	
-	@Autowired
 	private GenericDao<VerticalsMaster, Integer> verticalsMasterDao;
 
 	@Autowired
 	private OrganizationUnitSettingsDao organizationUnitSettingsDao;
 
-
+	@Value("${GATEWAY_QUESTION}")
+	private String gatewayQuestion;
+	
 	@Override
 	@Transactional
 	public Survey getSurvey(long surveyId) throws InvalidInputException {
@@ -307,7 +310,7 @@ public class SurveyBuilderImpl implements SurveyBuilder {
 		// TODO Add the default question which will be shown at the end of survey.
 		SurveyQuestionDetails surveyQuestionDetails = new SurveyQuestionDetails();
 		surveyQuestionDetails.setIsRatingQuestion(CommonConstants.STATUS_ACTIVE);
-		surveyQuestionDetails.setQuestion("How would you rate your overall experience??");
+		surveyQuestionDetails.setQuestion(gatewayQuestion);
 		surveyQuestionDetails.setIsRatingQuestion(CommonConstants.YES);
 		surveyQuestionDetails.setQuestionType("sb-master");
 		surveyQuestions.add(surveyQuestionDetails);
