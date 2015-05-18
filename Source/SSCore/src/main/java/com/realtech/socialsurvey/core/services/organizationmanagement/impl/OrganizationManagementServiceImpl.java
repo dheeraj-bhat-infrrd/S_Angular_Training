@@ -3042,14 +3042,19 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 	/*
 	 * Method to fetch the list of states in US
 	 */
-	public String getUsStateList() {
+	@Override
+	@Transactional
+	public List<StateLookup> getUsStateList() {
 		LOG.debug("Method getUSStateList called to fetch the list of states in US");
-		return new Gson().toJson(stateLookupDao.findAll(StateLookup.class));
+		List<StateLookup> lookups = stateLookupDao.findAll(StateLookup.class);
+		return lookups;
     }
 	
 	/*
 	 *  Method to fetch the list of cities and zipcodes in the state
 	 */
+	@Override
+	@Transactional
 	public String getZipCodesByStateId(int stateId) {
 	    LOG.debug("Method getZipCodesByStateId called to fetch the list of cities and zipcodes in the state");
 		List<ZipCodeLookup> zipCodes = (List<ZipCodeLookup>) zipCodeLookupDao.findByColumn(ZipCodeLookup.class, "stateId", stateId);

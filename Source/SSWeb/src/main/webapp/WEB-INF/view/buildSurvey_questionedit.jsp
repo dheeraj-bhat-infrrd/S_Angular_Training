@@ -48,7 +48,7 @@
 				<div class="bd-ans-type-rating bd-ans-type-item ${ratingclass}">
 					<div class="bd-and-tier2"><spring:message code="label.customer.answer.key" /></div>
 					<div class="row clearfix bd-ans-type bd-ans-type-rating-adj">
-						<div class="col-lg-4 col-md-4 col-sm-4 col-xs-12">
+						<div class="col-lg-4 col-md-4 col-sm-4 col-xs-6">
 							<div data-id="sb-range-smiles" class="bd-ans-img-wrapper">
 								<c:choose>
 									<c:when test="${questionType != 'sb-range-smiles'}">
@@ -62,7 +62,7 @@
 								</c:choose>
 							</div>
 						</div>
-						<div class="col-lg-4 col-md-4 col-sm-4 col-xs-12">
+						<div class="col-lg-4 col-md-4 col-sm-4 col-xs-6">
 							<div data-id="sb-range-star" class="bd-ans-img-wrapper">
 								<c:choose>
 									<c:when test="${questionType != 'sb-range-star'}">
