@@ -420,6 +420,13 @@ function openAuthPage(socialNetwork) {
 function openAuthPageRegistration(socialNetwork) {
 	window.open("./socialauth.do?social=" + socialNetwork + "&flow=registration", "Authorization Page", "width=600,height=600,scrollbars=yes");
 }
+function postOnSocialNetworkOnce(socialNetwork, firstName, lastName, agentName, rating, review) {
+	window.open("./social/socialauthinsession?social=" + socialNetwork
+			+ "&firstName=" + firstName + "&lastName=" + lastName
+			+ "&agentName=" + agentName + "&rating=" + rating + "&review="
+			+ review, "Authorization Page",
+			"width=800,height=600,scrollbars=yes");
+}
 
 function showProfileLinkInEditProfilePage(source, profileUrl){
 	if(source=='facebook'){

@@ -91,28 +91,31 @@ $(document).ready(function() {
 });
 
 $(window).on('unload', function(){
+
 	var parentWindow = null;
 	if (window.opener != null && !window.opener.closed) {
 		parentWindow = window.opener;
 	}
-	
+	var restful = "${restful}";
 	var flow = "${socialFlow}";
-	if (flow == "registration") {
-		var payload = {
-			'socialNetwork' : "linkedin"
-		};
-		fetchSocialProfileUrl(payload, function(data) {
-			parentWindow.showLinkedInProfileUrl(data);
-		});
-	}
-	else {
-		var payload = {
-			'socialNetwork' : "${socialNetwork}"
-		};
-		fetchSocialProfileUrl(payload, function(data) {
-			parentWindow.showProfileLink("${socialNetwork}", data);
-			parentWindow.showProfileLinkInEditProfilePage("${socialNetwork}", data);
-		});
+	if(restful != "1"){
+		if (flow == "registration") {
+			var payload = {
+				'socialNetwork' : "linkedin"
+			};
+			fetchSocialProfileUrl(payload, function(data) {
+				parentWindow.showLinkedInProfileUrl(data);
+			});
+		}
+		else {
+			var payload = {
+				'socialNetwork' : "${socialNetwork}"
+			};
+			fetchSocialProfileUrl(payload, function(data) {
+				parentWindow.showProfileLink("${socialNetwork}", data);
+				parentWindow.showProfileLinkInEditProfilePage("${socialNetwork}", data);
+			});
+		}
 	}
 });
 

@@ -417,7 +417,10 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 		CompanyProfileData companyProfileData = new CompanyProfileData();
 		companyProfileData.setName(companySettings.getContact_details().getName());
 		companyProfileData.setCompanyLogo(companySettings.getLogo());
-		companyProfileData.setAddress(companySettings.getContact_details().getAddress());
+		companyProfileData.setAddress1(companySettings.getContact_details().getAddress1());
+		companyProfileData.setAddress2(companySettings.getContact_details().getAddress2());
+		companyProfileData.setCity(companySettings.getContact_details().getCity());
+		companyProfileData.setState(companySettings.getContact_details().getState());
 		companyProfileData.setCountry(companySettings.getContact_details().getCountry());
 		companyProfileData.setZipcode(companySettings.getContact_details().getZipcode());
 		if (agentSettingsType != null) {
