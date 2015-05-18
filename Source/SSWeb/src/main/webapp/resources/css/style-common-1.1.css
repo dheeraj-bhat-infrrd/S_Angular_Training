@@ -155,7 +155,6 @@ a, a:hover, a:visited{
 }
 
 .hero-txt-wrapper {
-    text-transform: capitalize;
     font-size: 30px;
     width: 705px;
     margin: 2px auto;
@@ -622,7 +621,7 @@ input#find-pro-submit{
 .c-panel-txt-bot {
     position: relative;
     z-index: 99;
-    font-size: 13px;
+    font-size: 15px;
     line-height: 22px;
     width: 428px;
     padding-top: 5px;
