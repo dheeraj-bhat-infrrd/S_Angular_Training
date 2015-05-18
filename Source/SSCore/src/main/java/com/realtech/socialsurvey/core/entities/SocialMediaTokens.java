@@ -3,11 +3,11 @@ package com.realtech.socialsurvey.core.entities;
 public class SocialMediaTokens {
 
 	private FacebookToken facebookToken;
-	private TwitterToken twitterToken;
-	private LinkedInToken linkedInToken;
-	private YelpToken yelpToken;
 	private GoogleToken googleToken;
+	private LinkedInToken linkedInToken;
 	private SocialProfileToken rssToken;
+	private TwitterToken twitterToken;
+	private YelpToken yelpToken;
 
 	public FacebookToken getFacebookToken() {
 		return facebookToken;

@@ -860,8 +860,8 @@ public class EmailServicesImpl implements EmailServices {
 
 	@Async
 	@Override
-	public void queueSurveyCompletionMailToAdminsAndAgent(String recipientName, String recipientMailId, String surveyDetail, String customerName)
-			throws InvalidInputException {
+	public void queueSurveyCompletionMailToAdminsAndAgent(String recipientName, String recipientMailId, String surveyDetail, String customerName,
+			String rating) throws InvalidInputException {
 		if (recipientMailId == null || recipientMailId.isEmpty()) {
 			LOG.error("Recipient email Id is empty or null for sending survey completion mail ");
 			throw new InvalidInputException("Recipient email Id is empty or null for sending survey completion mail ");
@@ -880,6 +880,7 @@ public class EmailServicesImpl implements EmailServices {
 		contentBuilder.append(CommonConstants.ELEMENTS_DELIMITER).append(CommonConstants.SURVEYDETAIL_MARKER).append(surveyDetail);
 		contentBuilder.append(CommonConstants.ELEMENTS_DELIMITER).append(CommonConstants.RECIPIENT_NAME_MARKER).append(recipientName);
 		contentBuilder.append(CommonConstants.ELEMENTS_DELIMITER).append(CommonConstants.CUSTOMER_NAME_MARKER).append(customerName);
+		contentBuilder.append(CommonConstants.ELEMENTS_DELIMITER).append(CommonConstants.CUSTOMER_RATING_MARKER).append(rating);
 
 		LOG.debug("queueing content: " + contentBuilder.toString());
 		queueProducer.queueEmail(EmailHeader.SURVEY_COMPLETION_ADMIN, contentBuilder.toString());
@@ -888,8 +889,8 @@ public class EmailServicesImpl implements EmailServices {
 
 	@Async
 	@Override
-	public void sendSurveyCompletionMailToAdminsAndAgent(String recipientName, String recipientMailId, String surveyDetail, String customerName)
-			throws InvalidInputException, UndeliveredEmailException {
+	public void sendSurveyCompletionMailToAdminsAndAgent(String recipientName, String recipientMailId, String surveyDetail, String customerName,
+			String rating) throws InvalidInputException, UndeliveredEmailException {
 		if (recipientMailId == null || recipientMailId.isEmpty()) {
 			LOG.error("Recipient email Id is empty or null for sending survey completion mail ");
 			throw new InvalidInputException("Recipient email Id is empty or null for sending survey completion mail ");
@@ -904,7 +905,7 @@ public class EmailServicesImpl implements EmailServices {
 		
 		FileContentReplacements subjectReplacements = new FileContentReplacements();
 		subjectReplacements.setFileName(EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER + EmailTemplateConstants.SURVEY_COMPLETION_ADMINS_MAIL_SUBJECT);
-		subjectReplacements.setReplacementArgs(Arrays.asList(customerName));
+		subjectReplacements.setReplacementArgs(Arrays.asList(rating, customerName));
 
 		FileContentReplacements messageBodyReplacements = new FileContentReplacements();
 		messageBodyReplacements
