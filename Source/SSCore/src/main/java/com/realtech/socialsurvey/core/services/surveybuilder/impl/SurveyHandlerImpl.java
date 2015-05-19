@@ -3,6 +3,7 @@ package com.realtech.socialsurvey.core.services.surveybuilder.impl;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -21,6 +22,7 @@ import com.google.gson.Gson;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.dao.OrganizationUnitSettingsDao;
 import com.realtech.socialsurvey.core.dao.SurveyDetailsDao;
+import com.realtech.socialsurvey.core.dao.SurveyPreInitiationDao;
 import com.realtech.socialsurvey.core.dao.UserDao;
 import com.realtech.socialsurvey.core.dao.UserProfileDao;
 import com.realtech.socialsurvey.core.dao.impl.MongoOrganizationUnitSettingDaoImpl;
@@ -28,6 +30,7 @@ import com.realtech.socialsurvey.core.entities.AgentSettings;
 import com.realtech.socialsurvey.core.entities.MailContent;
 import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
 import com.realtech.socialsurvey.core.entities.SurveyDetails;
+import com.realtech.socialsurvey.core.entities.SurveyPreInitiation;
 import com.realtech.socialsurvey.core.entities.SurveyResponse;
 import com.realtech.socialsurvey.core.entities.SurveySettings;
 import com.realtech.socialsurvey.core.entities.User;
@@ -78,6 +81,9 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean {
 
 	@Autowired
 	private OrganizationManagementService organizationManagementService;
+	
+	@Autowired
+	SurveyPreInitiationDao surveyPreInitiationDao;
 
 	@Autowired
 	private EmailServices emailServices;
@@ -405,7 +411,7 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean {
 	@Override
 	@Transactional
 	public void sendSurveyInvitationMail(String custFirstName, String custLastName, String custEmail, String custRelationWithAgent, User user,
-			boolean isAgent) throws InvalidInputException, SolrException, NoRecordsFetchedException, UndeliveredEmailException {
+			boolean isAgent, String source) throws InvalidInputException, SolrException, NoRecordsFetchedException, UndeliveredEmailException {
 		LOG.debug("Method sendSurveyInvitationMail() called from DashboardController.");
 		if (custFirstName == null || custFirstName.isEmpty()) {
 			LOG.error("Null/Empty value found for customer's first name.");
@@ -420,7 +426,8 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean {
 		}
 
 		String link = composeLink(user.getUserId(), custEmail);
-		storeInitialSurveyDetails(user.getUserId(), custEmail, custFirstName, custLastName, 0, custRelationWithAgent, link);
+		preInitiateSurvey(user, custEmail, custFirstName, custLastName, 0, custRelationWithAgent, source);
+//		storeInitialSurveyDetails(user.getUserId(), custEmail, custFirstName, custLastName, 0, custRelationWithAgent, link);
 		
 		if (isAgent)
 			sendInvitationMailByAgent(user, custFirstName, custLastName, custEmail, link);
@@ -481,17 +488,55 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean {
 		}
 		LOG.info("sendSurveyRestartMail() finished.");
 	}
+	
+	// Method to fetch initial survey details from MySQL based upn agent id and customer email.
+	@Override
+	@Transactional
+	public SurveyPreInitiation getPreInitiatedSurvey(long agentId, String customerEmail) throws NoRecordsFetchedException {
+		LOG.info("Method getSurveyByAgentIdAndCutomerEmail() started. ");
+		Map<String, Object> queries = new HashMap<>();
+		queries.put(CommonConstants.AGENT_ID_COLUMN, agentId);
+		queries.put("customerEmailId", customerEmail);
+		List<SurveyPreInitiation> surveyPreInitiations = surveyPreInitiationDao.findByKeyValue(SurveyPreInitiation.class, queries);
+		LOG.info("Method getSurveyByAgentIdAndCutomerEmail() finished. ");
+		if(surveyPreInitiations!=null && !surveyPreInitiations.isEmpty()){
+			return surveyPreInitiations.get(CommonConstants.INITIAL_INDEX);
+		}
+		return null;
+	}
+	
+
+	// MEthod to delete survey pre initiation record from MySQL after making an entry into Mongo.
+	@Override
+	@Transactional
+	public void deleteSurveyPreInitiationDetailsPermanently(SurveyPreInitiation surveyPreInitiation) {
+		LOG.info("Method deleteSurveyPreInitiationDetailsPermanently() started.");
+		surveyPreInitiationDao.delete(surveyPreInitiation);
+		LOG.info("Method deleteSurveyPreInitiationDetailsPermanently() finished.");
+	}
+
 
 	/*
 	 * Method to compose link for sending to a user to start survey started.
 	 */
-	private String composeLink(long userId, String custEmail) throws InvalidInputException {
+	@Override
+	public String composeLink(long userId, String custEmail) throws InvalidInputException {
 		LOG.debug("Method composeLink() started");
 		Map<String, String> urlParams = new HashMap<>();
 		urlParams.put(CommonConstants.AGENT_ID_COLUMN, userId + "");
 		urlParams.put(CommonConstants.CUSTOMER_EMAIL_COLUMN, custEmail);
 		LOG.debug("Method composeLink() finished");
 		return urlGenerator.generateUrl(urlParams, getApplicationBaseUrl() + "rest/survey/showsurveypageforurl");
+	}
+	
+	// Method to update status of the survey to started.
+	@Override
+	@Transactional
+	public void markSurveyAsStarted(SurveyPreInitiation surveyPreInitiation){
+		LOG.info("Method markSurveyAsStarted() started.");
+		surveyPreInitiation.setStatus(CommonConstants.SURVEY_STATUS_INITIATED);
+		surveyPreInitiationDao.update(surveyPreInitiation);
+		LOG.info("Method markSurveyAsStarted() finished.");
 	}
 
 	/*
@@ -585,5 +630,28 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean {
 		}
 		LOG.debug("sendInvitationMailByCustomer() finished.");
 	}
+	
+	// Method to store details of a customer in mysql at the time of  sending invite.
+	private void preInitiateSurvey(User user, String custEmail, String custFirstName, String custLastName, int i, String custRelationWithAgent, String source) {
+		LOG.debug("Method preInitiateSurvey() started to store details of a customer in mysql at the time of  sending invite");
+		
+		SurveyPreInitiation surveyPreInitiation = new SurveyPreInitiation();
+		surveyPreInitiation.setAgentId(user.getUserId());
+		surveyPreInitiation.setCompanyId(user.getCompany().getCompanyId());
+		surveyPreInitiation.setCreatedOn(new Timestamp(System.currentTimeMillis()));
+		surveyPreInitiation.setCustomerEmailId(custEmail);
+		surveyPreInitiation.setCustomerFirstName(custFirstName);
+		surveyPreInitiation.setCustomerLastName(custLastName);
+		surveyPreInitiation.setEngagementClosedTime(new Timestamp(System.currentTimeMillis()));
+		surveyPreInitiation.setLastReminderTime(new Timestamp(System.currentTimeMillis()));
+		surveyPreInitiation.setModifiedOn(new Timestamp(System.currentTimeMillis()));
+		surveyPreInitiation.setReminderCounts(0);
+		surveyPreInitiation.setStatus(CommonConstants.SURVEY_STATUS_PRE_INITIATED);
+		surveyPreInitiation.setSurveySource(source);
+		surveyPreInitiationDao.save(surveyPreInitiation);
+		
+		LOG.debug("Method preInitiateSurvey() finished.");
+	}
+
 }
 // JIRA SS-119 by RM-05:EOC

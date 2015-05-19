@@ -27,6 +27,7 @@ import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.entities.AgentSettings;
 import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
 import com.realtech.socialsurvey.core.entities.SurveyDetails;
+import com.realtech.socialsurvey.core.entities.SurveyPreInitiation;
 import com.realtech.socialsurvey.core.entities.SurveyQuestionDetails;
 import com.realtech.socialsurvey.core.entities.SurveyResponse;
 import com.realtech.socialsurvey.core.entities.SurveySettings;
@@ -125,7 +126,7 @@ public class SurveyManagementController {
 	 */
 	@ResponseBody
 	@RequestMapping(value = "/data/storeFeedback")
-	public String storeFeedback(HttpServletRequest request) {
+	public String storeFeedbackAndCloseSurvey(HttpServletRequest request) {
 		LOG.info("Method storeFeedback() started to store response of customer.");
 		
 		// To store final feedback provided by customer in mongoDB.
@@ -150,6 +151,8 @@ public class SurveyManagementController {
 			boolean isAbusive = Boolean.parseBoolean(request.getParameter("isAbusive"));
 			surveyHandler.updateGatewayQuestionResponseAndScore(agentId, customerEmail, mood, feedback, isAbusive);
 			surveyHandler.increaseSurveyCountForAgent(agentId);
+			SurveyPreInitiation surveyPreInitiation = surveyHandler.getPreInitiatedSurvey(agentId, customerEmail);
+			surveyHandler.deleteSurveyPreInitiationDetailsPermanently(surveyPreInitiation);
 
 			// TODO Search Engine Optimization
 			if (mood == null || mood.isEmpty()) {
@@ -327,10 +330,12 @@ public class SurveyManagementController {
 		String lastName;
 		String custRelationWithAgent;
 		String agentName;
+		String source;
 		customerEmail = request.getParameter(CommonConstants.CUSTOMER_EMAIL_COLUMN);
 		firstName = request.getParameter("firstName");
 		lastName = request.getParameter("lastName");
 		agentName = request.getParameter("agentName");
+		source = "customer";
 		//custRelationWithAgent = request.getParameter("relationship");
 		//TODO:remove customer relation with agent
 		custRelationWithAgent = "transacted";
@@ -358,15 +363,25 @@ public class SurveyManagementController {
 			model.addAttribute("lastName", lastName);
 			model.addAttribute("customerEmail", customerEmail);
 			model.addAttribute("relation", custRelationWithAgent);
+			model.addAttribute("source", source);
 			
 			User user = userManagementService.getUserByUserId(agentId);
+			SurveyPreInitiation preInitiatedSurvey = surveyHandler.getPreInitiatedSurvey(agentId, customerEmail);
 			SurveyDetails survey = surveyHandler.getSurveyDetails(agentId, customerEmail);
-			if(survey!=null){
+			
+			// Code to be executed when survey has already been taken.
+			if(preInitiatedSurvey == null && survey.getStage()==-1){
 				model.addAttribute("surveyCompleted", "yes");
-				model.addAttribute("agentName", survey.getAgentName());
+				model.addAttribute("agentName", agentName);
 				return JspResolver.SURVEY_INVITE_SUCCESSFUL;
 			}
-			surveyHandler.sendSurveyInvitationMail(firstName, lastName, customerEmail, custRelationWithAgent, user, false);
+			// Code to be executed when survey request has already been sent but survey is not completed.
+			else if(preInitiatedSurvey != null){
+				model.addAttribute("surveyRequestSent", "yes");
+				model.addAttribute("agentName", agentName);
+				return JspResolver.SURVEY_INVITE_SUCCESSFUL;
+			}
+			surveyHandler.sendSurveyInvitationMail(firstName, lastName, customerEmail, custRelationWithAgent, user, false, source);
 			
 		}
 		catch (NonFatalException e) {
@@ -395,7 +410,11 @@ public class SurveyManagementController {
 			Map<String, String> urlParams = urlGenerator.decryptParameters(url);
 			if (urlParams != null) {
 				long agentId = Long.parseLong(urlParams.get(CommonConstants.AGENT_ID_COLUMN));
-				surveyAndStage = getSurvey(agentId, urlParams.get(CommonConstants.CUSTOMER_EMAIL_COLUMN), null, null, 0, null, url);
+				String customerEmail = urlParams.get(CommonConstants.CUSTOMER_EMAIL_COLUMN);
+				SurveyPreInitiation surveyPreInitiation = surveyHandler.getPreInitiatedSurvey(agentId, customerEmail);
+				surveyAndStage = getSurvey(agentId, urlParams.get(CommonConstants.CUSTOMER_EMAIL_COLUMN), surveyPreInitiation.getCustomerFirstName(), 
+						surveyPreInitiation.getCustomerLastName(), surveyPreInitiation.getReminderCounts(), surveyPreInitiation.getCustomerInteractionDetails(), url);
+				surveyHandler.markSurveyAsStarted(surveyPreInitiation);
 			}
 		}
 		catch (NonFatalException e) {
@@ -833,9 +852,9 @@ public class SurveyManagementController {
 				throw new InvalidInputException("Invalid value (Null/Empty) found for agentId.");
 			}
 			long agentId = Long.parseLong(agentIdStr);
-			SurveyDetails survey = surveyHandler.getSurveyDetails(agentId, customerEmail);
+			SurveyPreInitiation survey = surveyHandler.getPreInitiatedSurvey(agentId, customerEmail);
 			User user = userManagementService.getUserByUserId(agentId);
-			surveyHandler.sendSurveyRestartMail(firstName, lastName, customerEmail, survey.getCustRelationWithAgent(), user, survey.getUrl());
+			surveyHandler.sendSurveyRestartMail(firstName, lastName, customerEmail, survey.getCustomerInteractionDetails(), user, surveyHandler.composeLink(agentId, customerEmail));
 		}
 		catch (NonFatalException e) {
 			LOG.error("NonfatalException caught in makeSurveyEditable(). Nested exception is ", e);
@@ -865,13 +884,14 @@ public class SurveyManagementController {
 		try {
 			SurveyDetails survey = storeInitialSurveyDetails(agentId, customerEmail, firstName, lastName, reminderCount, custRelationWithAgent, url);
 			surveyHandler.updateSurveyAsClicked(agentId, customerEmail);
+			
 			if (survey != null) {
 				stage = survey.getStage();
 				editable = survey.getEditable();
 				surveyAndStage.put("agentName", survey.getAgentName());
-				surveyAndStage.put("customerEmail", customerEmail);
 				surveyAndStage.put("customerFirstName", survey.getCustomerFirstName());
 				surveyAndStage.put("customerLastName", survey.getCustomerLastName());
+				surveyAndStage.put("customerEmail", survey.getCustomerEmail());
 				for (SurveyQuestionDetails surveyDetails : surveyQuestionDetails) {
 					for (SurveyResponse surveyResponse : survey.getSurveyResponse()) {
 						if (surveyDetails.getQuestion().trim().equalsIgnoreCase(surveyResponse.getQuestion())) {
@@ -879,6 +899,12 @@ public class SurveyManagementController {
 						}
 					}
 				}
+			}
+			else{
+				surveyAndStage.put("agentName", solrSearchService.getUserDisplayNameById(agentId));
+				surveyAndStage.put("customerEmail", customerEmail);
+				surveyAndStage.put("customerFirstName", firstName);
+				surveyAndStage.put("customerLastName", lastName);
 			}
 		}
 		catch (SolrException e) {
