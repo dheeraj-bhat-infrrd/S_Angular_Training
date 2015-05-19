@@ -8,6 +8,11 @@ public class RegionUploadVO {
 	private String regionName;
 	private String regionAddress1;
 	private String regionAddress2;
+	private String regionCountry;
+	private String regionCountryCode;
+	private String regionState;
+	private String regionCity;
+	private String regionZipcode;
 
 	public String getRegionName() {
 		return regionName;
@@ -31,6 +36,46 @@ public class RegionUploadVO {
 
 	public void setRegionAddress2(String regionAddress2) {
 		this.regionAddress2 = regionAddress2;
+	}
+
+	public String getRegionCountry() {
+		return regionCountry;
+	}
+
+	public void setRegionCountry(String regionCountry) {
+		this.regionCountry = regionCountry;
+	}
+
+	public String getRegionCountryCode() {
+		return regionCountryCode;
+	}
+
+	public void setRegionCountryCode(String regionCountryCode) {
+		this.regionCountryCode = regionCountryCode;
+	}
+
+	public String getRegionCity() {
+		return regionCity;
+	}
+
+	public void setRegionCity(String regionCity) {
+		this.regionCity = regionCity;
+	}
+
+	public String getRegionState() {
+		return regionState;
+	}
+
+	public void setRegionState(String regionState) {
+		this.regionState = regionState;
+	}
+
+	public String getRegionZipcode() {
+		return regionZipcode;
+	}
+
+	public void setRegionZipcode(String regionZipcode) {
+		this.regionZipcode = regionZipcode;
 	}
 
 }

@@ -222,14 +222,15 @@ $(document).ready(function() {
 					break;
 				}
 			}
-			/* if(ui.item.code=="US"){
+			if(ui.item.code=="US"){
 				$('#state-city-row').show();
-				callAjaxGET("", function(data){
+				/* callAjaxGET("", function(data){
 					
-				}, true);
+				}, true); */
 			}else{
 				$('#state-city-row').hide();
-			} */
+				$('#state-city-row input').val('');
+			}
 			return false;
 		},
 		close: function(event, ui) {},
