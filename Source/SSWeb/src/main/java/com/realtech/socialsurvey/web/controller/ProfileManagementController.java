@@ -3,6 +3,7 @@ package com.realtech.socialsurvey.web.controller;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.util.ArrayList;
@@ -73,6 +74,7 @@ import com.realtech.socialsurvey.core.services.organizationmanagement.ProfileMan
 import com.realtech.socialsurvey.core.services.organizationmanagement.UserManagementService;
 import com.realtech.socialsurvey.core.services.search.SolrSearchService;
 import com.realtech.socialsurvey.core.services.upload.FileUploadService;
+import com.realtech.socialsurvey.core.services.upload.impl.UploadUtils;
 import com.realtech.socialsurvey.core.utils.DisplayMessageConstants;
 import com.realtech.socialsurvey.core.utils.MessageUtils;
 import com.realtech.socialsurvey.core.utils.UrlValidationHelper;
@@ -89,6 +91,9 @@ public class ProfileManagementController {
 	// JIRA SS-97 by RM-06 : BOC
 	@Autowired
 	private MessageUtils messageUtils;
+
+	@Autowired
+	private UploadUtils uploadUtils;
 
 	@Autowired
 	private SessionHelper sessionHelper;
@@ -740,7 +745,6 @@ public class ProfileManagementController {
 		return contactDetailsSettings;
 	}
 
-	// TODO
 	@RequestMapping(value = "/editcompanyinformation", method = RequestMethod.POST)
 	public String editCompanyInformation(Model model, HttpServletRequest request) {
 		LOG.info("Method editCompanyInformation of ProfileManagementController called");
@@ -1094,27 +1098,52 @@ public class ProfileManagementController {
 				throw new InvalidInputException("No user settings found in session");
 			}
 
-			String imageBase64 = request.getParameter("imageBase64");
-			String imageFileName = request.getParameter("imageFileName");
-
 			try {
-				if (imageFileName == null || imageFileName.isEmpty()) {
-					throw new InvalidInputException("Logo passed is null or empty");
-				}
-				if (imageBase64 == null || imageBase64.isEmpty()) {
-					throw new InvalidInputException("Logo passed is null or empty");
-				}
-
-				BASE64Decoder decoder = new BASE64Decoder();
-				byte[] decodedBytes = decoder.decodeBuffer(imageBase64.substring("data:image/png;base64,".length()));
-				BufferedImage image = ImageIO.read(new ByteArrayInputStream(decodedBytes));
-				if (image == null) {
-					LOG.error("Buffered Image is null");
-				}
+				int selectedX = Integer.parseInt(request.getParameter("selected_x"));
+				int selectedY = Integer.parseInt(request.getParameter("selected_y"));
+				int selectedW = Integer.parseInt(request.getParameter("selected_w"));
+				int selectedH = Integer.parseInt(request.getParameter("selected_h"));
+				int resizeWidth = Integer.parseInt(request.getParameter("width"));
+				int resizeHeight = Integer.parseInt(request.getParameter("height"));
 				
-				File fileLocal = new File(CommonConstants.IMAGE_NAME);
-				ImageIO.write(image, CommonConstants.IMAGE_FORMAT_PNG, fileLocal);
+				String imageBase64 = request.getParameter("imageBase64");
+				String imageFileName = request.getParameter("imageFileName");
+				if (imageBase64 == null || imageBase64.isEmpty()) {
+					throw new InvalidInputException("image passed is null or empty");
+				}
+				if (imageFileName == null || imageFileName.isEmpty()) {
+					throw new InvalidInputException("image passed is null or empty");
+				}
 
+				// reading image
+				File dir = new File(CommonConstants.IMAGE_DIR);
+				if (!dir.exists()) {
+					dir.mkdirs();
+				}
+				String filePath = dir.getAbsolutePath() + File.separator + CommonConstants.IMAGE_NAME;
+				
+				BASE64Decoder decoder = new BASE64Decoder();
+				byte[] decodedBytes = decoder.decodeBuffer(imageBase64.split(",")[1]);
+				ByteArrayInputStream bis = new ByteArrayInputStream(decodedBytes);
+				
+				// resizing image
+				LOG.debug("Dimensions for resizing: resizeWidth: " + resizeWidth + " resizeHeight: " + resizeHeight);
+				BufferedImage bufferedImage = ImageIO.read(bis);
+				FileOutputStream fileOuputStream = new FileOutputStream(filePath);
+				ImageIO.write(bufferedImage, CommonConstants.IMAGE_FORMAT_PNG, fileOuputStream);
+				fileOuputStream.close();
+				uploadUtils.resizeImage(filePath, filePath, resizeWidth, resizeHeight);
+				
+				// cropping image
+				LOG.debug("Co-ordinates for cropping: x: " + selectedX + " y: " + selectedY + " h: " + selectedH + " w: " + selectedW);
+				BufferedImage resized = ImageIO.read(new File(filePath));
+				BufferedImage croppedImage = uploadUtils.cropImage(resized, selectedW, selectedH, selectedX, selectedY);
+				fileOuputStream = new FileOutputStream(filePath);
+				ImageIO.write(croppedImage, CommonConstants.IMAGE_FORMAT_PNG, fileOuputStream);
+				fileOuputStream.close();
+
+				// uploading image
+				File fileLocal = new File(filePath);
 				profileImageUrl = fileUploadService.fileUploadHandler(fileLocal, imageFileName);
 				profileImageUrl = endpoint + "/" + bucket + "/" + profileImageUrl;
 			}
@@ -1124,7 +1153,9 @@ public class ProfileManagementController {
 				return JspResolver.MESSAGE_HEADER;
 			}
 			catch (IOException e) {
-				e.printStackTrace();
+				LOG.error("IOException while uploading Profile Image. Reason :" + e.getMessage(), e);
+				model.addAttribute("message", "Unable to upload profile image");
+				return JspResolver.MESSAGE_HEADER;
 			}
 
 			int profilesMaster = selectedProfile.getProfilesMaster().getProfileId();
