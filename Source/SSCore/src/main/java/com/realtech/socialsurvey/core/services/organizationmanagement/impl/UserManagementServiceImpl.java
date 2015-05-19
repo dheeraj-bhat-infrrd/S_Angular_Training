@@ -1983,59 +1983,57 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 
 		AbridgedUserProfile profileAbridged = null;
 		for (UserProfile profile : profiles) {
-			if (profile.getStatus() == CommonConstants.STATUS_ACTIVE) {
-				profileAbridged = new AbridgedUserProfile();
+			profileAbridged = new AbridgedUserProfile();
 
-				profileMap.put(profile.getUserProfileId(), profile);
+			profileMap.put(profile.getUserProfileId(), profile);
 
-				// updating display name for drop down
-				int profileMasterId = profile.getProfilesMaster().getProfileId();
-				switch (profileMasterId) {
-					case CommonConstants.PROFILES_MASTER_COMPANY_ADMIN_PROFILE_ID:
-						profileAbridged = getAbridgedUserProfile(profileAbridged, profile.getUserProfileId(), user.getCompany().getCompany(), user
-								.getCompany().getCompanyId(), CommonConstants.COMPANY_ID_COLUMN,
-								CommonConstants.PROFILES_MASTER_COMPANY_ADMIN_PROFILE_ID);
+			// updating display name for drop down
+			int profileMasterId = profile.getProfilesMaster().getProfileId();
+			switch (profileMasterId) {
+				case CommonConstants.PROFILES_MASTER_COMPANY_ADMIN_PROFILE_ID:
+					profileAbridged = getAbridgedUserProfile(profileAbridged, profile.getUserProfileId(), user.getCompany().getCompany(), user
+							.getCompany().getCompanyId(), CommonConstants.COMPANY_ID_COLUMN,
+							CommonConstants.PROFILES_MASTER_COMPANY_ADMIN_PROFILE_ID);
+					abridgedUserProfileMap.put(profile.getUserProfileId(), profileAbridged);
+					break;
+
+				case CommonConstants.PROFILES_MASTER_REGION_ADMIN_PROFILE_ID:
+					regionId = profile.getRegionId();
+					if (regionId != 0l) {
+						region = regions.get(regionId);
+					}
+					if (region.getIsDefaultBySystem() != 1) {
+						profileAbridged = getAbridgedUserProfile(profileAbridged, profile.getUserProfileId(), region.getRegionName(), regionId,
+								CommonConstants.REGION_ID_COLUMN, CommonConstants.PROFILES_MASTER_REGION_ADMIN_PROFILE_ID);
 						abridgedUserProfileMap.put(profile.getUserProfileId(), profileAbridged);
-						break;
+					}
+					regionId = 0;
+					break;
 
-					case CommonConstants.PROFILES_MASTER_REGION_ADMIN_PROFILE_ID:
-						regionId = profile.getRegionId();
-						if (regionId != 0l) {
-							region = regions.get(regionId);
-						}
-						if (region.getIsDefaultBySystem() != 1) {
-							profileAbridged = getAbridgedUserProfile(profileAbridged, profile.getUserProfileId(), region.getRegionName(), regionId,
-									CommonConstants.REGION_ID_COLUMN, CommonConstants.PROFILES_MASTER_REGION_ADMIN_PROFILE_ID);
-							abridgedUserProfileMap.put(profile.getUserProfileId(), profileAbridged);
-						}
-						regionId = 0;
-						break;
+				case CommonConstants.PROFILES_MASTER_BRANCH_ADMIN_PROFILE_ID:
+					branchId = profile.getBranchId();
+					if (branchId != 0l) {
+						branch = branches.get(branchId);
+					}
+					if (branch.getIsDefaultBySystem() != 1) {
+						profileAbridged = getAbridgedUserProfile(profileAbridged, profile.getUserProfileId(), branch.getBranchName(), branchId,
+								CommonConstants.BRANCH_ID_COLUMN, CommonConstants.PROFILES_MASTER_BRANCH_ADMIN_PROFILE_ID);
+						abridgedUserProfileMap.put(profile.getUserProfileId(), profileAbridged);
+					}
+					branchId = 0;
+					break;
 
-					case CommonConstants.PROFILES_MASTER_BRANCH_ADMIN_PROFILE_ID:
-						branchId = profile.getBranchId();
-						if (branchId != 0l) {
-							branch = branches.get(branchId);
-						}
-						if (branch.getIsDefaultBySystem() != 1) {
-							profileAbridged = getAbridgedUserProfile(profileAbridged, profile.getUserProfileId(), branch.getBranchName(), branchId,
-									CommonConstants.BRANCH_ID_COLUMN, CommonConstants.PROFILES_MASTER_BRANCH_ADMIN_PROFILE_ID);
-							abridgedUserProfileMap.put(profile.getUserProfileId(), profileAbridged);
-						}
-						branchId = 0;
-						break;
+				case CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID:
+					if (!agentAdded) {
+						profileAbridged = getAbridgedUserProfile(profileAbridged, profile.getUserProfileId(), CommonConstants.PROFILE_AGENT_VIEW,
+								user.getUserId(), CommonConstants.AGENT_ID_COLUMN, CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID);
+						abridgedUserProfileMap.put(profile.getUserProfileId(), profileAbridged);
+						agentAdded = true;
+					}
+					break;
 
-					case CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID:
-						if (!agentAdded) {
-							profileAbridged = getAbridgedUserProfile(profileAbridged, profile.getUserProfileId(), CommonConstants.PROFILE_AGENT_VIEW,
-									user.getUserId(), CommonConstants.AGENT_ID_COLUMN, CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID);
-							abridgedUserProfileMap.put(profile.getUserProfileId(), profileAbridged);
-							agentAdded = true;
-						}
-						break;
-
-					default:
-						continue;
-				}
+				default:
+					continue;
 			}
 		}
 		switch (accountType) {
