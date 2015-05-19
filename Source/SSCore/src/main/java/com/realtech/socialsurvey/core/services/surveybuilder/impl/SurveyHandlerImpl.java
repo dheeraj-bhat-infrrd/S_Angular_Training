@@ -508,6 +508,7 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean {
 
 	// MEthod to delete survey pre initiation record from MySQL after making an entry into Mongo.
 	@Override
+	@Transactional
 	public void deleteSurveyPreInitiationDetailsPermanently(SurveyPreInitiation surveyPreInitiation) {
 		LOG.info("Method deleteSurveyPreInitiationDetailsPermanently() started.");
 		surveyPreInitiationDao.delete(surveyPreInitiation);
