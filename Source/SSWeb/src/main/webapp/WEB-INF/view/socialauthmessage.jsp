@@ -105,6 +105,7 @@ $(window).on('unload', function(){
 			};
 			fetchSocialProfileUrl(payload, function(data) {
 				parentWindow.showLinkedInProfileUrl(data);
+				parentWindow.showProfileLink("linkedin", data);
 			});
 		}
 		else {
