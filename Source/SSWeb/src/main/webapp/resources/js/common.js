@@ -532,7 +532,8 @@ $(document).on('click', '#wc-send-survey', function() {
 
 	receiversList = JSON.stringify(receiversList);
 	var payload = {
-		"receiversList" : receiversList
+		"receiversList" : receiversList,
+		"source" : 'agent'
 	};
 	callAjaxPostWithPayloadData("./sendmultiplesurveyinvites.do", function(data) {
 		$('#overlay-toast').html('Survey request sent successfully!');

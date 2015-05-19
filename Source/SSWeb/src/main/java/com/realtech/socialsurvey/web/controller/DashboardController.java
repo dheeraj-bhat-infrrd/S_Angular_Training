@@ -33,6 +33,7 @@ import com.realtech.socialsurvey.core.entities.AbridgedUserProfile;
 import com.realtech.socialsurvey.core.entities.AgentSettings;
 import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
 import com.realtech.socialsurvey.core.entities.SurveyDetails;
+import com.realtech.socialsurvey.core.entities.SurveyPreInitiation;
 import com.realtech.socialsurvey.core.entities.SurveyRecipient;
 import com.realtech.socialsurvey.core.entities.User;
 import com.realtech.socialsurvey.core.entities.UserProfile;
@@ -509,7 +510,7 @@ public class DashboardController {
 	@RequestMapping(value = "/fetchdashboardincompletesurvey")
 	public String getIncompleteSurvey(Model model, HttpServletRequest request) {
 		LOG.info("Method to get reviews of company, region, branch, agent getReviews() started.");
-		List<SurveyDetails> surveyDetails;
+		List<SurveyPreInitiation> surveyDetails;
 		User user = sessionHelper.getCurrentUser();
 
 		try {
@@ -532,7 +533,7 @@ public class DashboardController {
 	@RequestMapping(value = "/fetchdashboardincompletesurveycount")
 	public String getIncompleteSurveyCount(Model model, HttpServletRequest request) {
 		LOG.info("Method to get reviews of company, region, branch, agent getReviews() started.");
-		List<SurveyDetails> surveyDetails;
+		List<SurveyPreInitiation> surveyDetails;
 		User user = sessionHelper.getCurrentUser();
 
 		try {
@@ -560,9 +561,9 @@ public class DashboardController {
 	 * Fetches incomplete surveys based upon the criteria. Criteria can be startIndex and/or
 	 * batchSize.
 	 */
-	private List<SurveyDetails> fetchIncompleteSurveys(HttpServletRequest request, User user) throws InvalidInputException {
+	private List<SurveyPreInitiation> fetchIncompleteSurveys(HttpServletRequest request, User user) throws InvalidInputException {
 		LOG.debug("Method fetchIncompleteSurveys() started");
-		List<SurveyDetails> surveyDetails;
+		List<SurveyPreInitiation> surveyDetails;
 		String startIndexStr = request.getParameter("startIndex");
 		String batchSizeStr = request.getParameter("batchSize");
 		int startIndex = Integer.parseInt(startIndexStr);
@@ -717,9 +718,9 @@ public class DashboardController {
 			}
 			
 			String surveyLink = "";
-			SurveyDetails survey = surveyHandler.getSurveyDetails(agentId, customerEmail);
+			SurveyPreInitiation survey = surveyHandler.getPreInitiatedSurvey(agentId, customerEmail);
 			if (survey != null) {
-				surveyLink = survey.getUrl();
+				surveyLink = surveyHandler.getSurveyUrl(agentId, customerEmail, surveyHandler.composeLink(agentId, customerEmail));
 			}
 
 			try {
@@ -870,7 +871,7 @@ public class DashboardController {
 	@RequestMapping(value = "/downloaddashboardincompletesurvey")
 	public void getIncompleteSurveyFile(Model model, HttpServletRequest request, HttpServletResponse response) {
 		LOG.info("Method to get file containg incomplete surveys list getIncompleteSurveyFile() started.");
-		List<SurveyDetails> surveyDetails = new ArrayList<>();
+		List<SurveyPreInitiation> surveyDetails = new ArrayList<>();
 		try {
 			String columnName = request.getParameter("columnName");
 			if (columnName == null || columnName.isEmpty()) {
@@ -978,7 +979,7 @@ public class DashboardController {
 		User user = sessionHelper.getCurrentUser();
 
 		try {
-			surveyHandler.sendSurveyInvitationMail(custFirstName, custLastName, custEmail, custRelationWithAgent, user, true);
+			surveyHandler.sendSurveyInvitationMail(custFirstName, custLastName, custEmail, custRelationWithAgent, user, true, "customer");
 		}
 		catch (NonFatalException e) {
 			LOG.error("NonFatalException caught in sendSurveyInvitation(). Nested exception is ", e);
@@ -996,6 +997,7 @@ public class DashboardController {
 		List<SurveyRecipient> surveyRecipients = null;
 
 		try {
+			String source = request.getParameter("source");
 			String payload = request.getParameter("receiversList");
 			try {
 				if (payload == null) {
@@ -1011,8 +1013,9 @@ public class DashboardController {
 			// sending mails on traversing the list
 			if (!surveyRecipients.isEmpty()) {
 				for (SurveyRecipient recipient : surveyRecipients) {
-					surveyHandler.sendSurveyInvitationMail(recipient.getFirstname(), recipient.getLastname(), recipient.getEmailId(), null, user,
-							true);
+					if (surveyHandler.getPreInitiatedSurvey(user.getUserId(), recipient.getEmailId()) == null)
+						surveyHandler.sendSurveyInvitationMail(recipient.getFirstname(), recipient.getLastname(), recipient.getEmailId(), null, user,
+							true, source);
 				}
 			}
 		}
