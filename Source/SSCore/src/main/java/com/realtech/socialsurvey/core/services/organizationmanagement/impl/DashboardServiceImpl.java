@@ -26,10 +26,13 @@ import com.realtech.socialsurvey.core.dao.OrganizationUnitSettingsDao;
 import com.realtech.socialsurvey.core.dao.SurveyDetailsDao;
 import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
 import com.realtech.socialsurvey.core.entities.SurveyDetails;
+import com.realtech.socialsurvey.core.entities.SurveyPreInitiation;
 import com.realtech.socialsurvey.core.entities.SurveyResponse;
 import com.realtech.socialsurvey.core.entities.User;
 import com.realtech.socialsurvey.core.entities.UserSettings;
+import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.services.organizationmanagement.DashboardService;
+import com.realtech.socialsurvey.core.services.surveybuilder.SurveyHandler;
 
 // JIRA SS-137 BY RM05:BOC
 /**
@@ -47,6 +50,9 @@ public class DashboardServiceImpl implements DashboardService, InitializingBean 
 
 	@Autowired
 	private OrganizationUnitSettingsDao organizationUnitSettingsDao;
+	
+	@Autowired
+	private SurveyHandler surveyHandler;
 
 	@Override
 	public long getAllSurveyCountForPastNdays(String columnName, long columnValue, int numberOfDays) {
@@ -260,7 +266,7 @@ public class DashboardServiceImpl implements DashboardService, InitializingBean 
 	 * Method to create excel file from all the incomplete survey data.
 	 */
 	@Override
-	public XSSFWorkbook downloadIncompleteSurveyData(List<SurveyDetails> surveyDetails, String fileLocation) throws IOException {
+	public XSSFWorkbook downloadIncompleteSurveyData(List<SurveyPreInitiation> surveyDetails, String fileLocation) throws IOException {
 		// Blank workbook
 		XSSFWorkbook workbook = new XSSFWorkbook();
 
@@ -275,14 +281,19 @@ public class DashboardServiceImpl implements DashboardService, InitializingBean 
 		// This data needs to be written (List<Object>)
 		Map<String, List<Object>> data = new TreeMap<>();
 		List<Object> surveyDetailsToPopulate = new ArrayList<>();
-		for (SurveyDetails survey : surveyDetails) {
+		for (SurveyPreInitiation survey : surveyDetails) {
 			internalMax = 0;
 			surveyDetailsToPopulate.add(survey.getCustomerFirstName());
 			surveyDetailsToPopulate.add(survey.getCustomerLastName());
-			surveyDetailsToPopulate.add(survey.getCustomerEmail());
+			surveyDetailsToPopulate.add(survey.getCustomerEmailId());
 			surveyDetailsToPopulate.add(survey.getCreatedOn());
 			surveyDetailsToPopulate.add(survey.getModifiedOn());
-			surveyDetailsToPopulate.add(survey.getUrl());
+			try {
+				surveyDetailsToPopulate.add(surveyHandler.composeLink(survey.getAgentId(), survey.getCustomerEmailId()));
+			}
+			catch (InvalidInputException e) {
+				LOG.error("Invalid input exception caught in downloadIncompleteSurveyData(). Nested exception is ", e);
+			}
 			data.put((++counter).toString(), surveyDetailsToPopulate);
 			surveyDetailsToPopulate = new ArrayList<>();
 			if (internalMax > max)
