@@ -44,7 +44,7 @@
 						</div>
 						<div class="float-left h-login-btn-wrapper">
 							<div id="login-submit" class="h-btn-login">
-								<span class="h-btn-login-txt">Sign In</span>
+								<span class="h-btn-login-txt">Login</span>
 							</div>
 						</div>
 					</form>

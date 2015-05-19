@@ -254,12 +254,27 @@
 					<div class="sq-rat-wrapper">
 						<textarea id="text-area" class="sq-txt-area"></textarea>
 						<div id="smiles-final" class="sq-happy-wrapper clearfix">
-							<div id="sad-smile" star-no="3"
-								class="sq-smile-icn-wrapper sq-sad-smile"></div>
-							<div id="neutral-smile" star-no="2"
-								class="sq-smile-icn-wrapper sq-neutral-smile"></div>
-							<div id="happy-smile" star-no="1"
-								class="sq-smile-icn-wrapper sq-happy-smile"></div>
+							<div id="sq-happy-smile" class="sq-smile-icn-container">
+								<div id="happy-smile" star-no="1"
+									class="sq-smile-icn-wrapper sq-happy-smile"></div>
+								<div class="sq-smile-icn-text sq-smile-happy-text float-left">
+									<spring:message code="label.smile.happy.text"/>
+								</div>
+							</div>
+							<div id="sq-neutral-smile" class="sq-smile-icn-container">
+								<div id="neutral-smile" star-no="2"
+									class="sq-smile-icn-wrapper sq-neutral-smile"></div>
+								<div class="sq-smile-icn-text sq-smile-neutral-text float-left">
+									<spring:message code="label.smile.neutral.text"/>
+								</div>
+							</div>
+							<div id="sq-sad-smile" class="sq-smile-icn-container">
+								<div id="sad-smile" star-no="3"
+									class="sq-smile-icn-wrapper sq-sad-smile"></div>
+								<div class="sq-smile-icn-text sq-smile-sad-text float-left">
+									<spring:message code="label.smile.sad.text"/>
+								</div>
+							</div>
 						</div>
 						<div id="pst-srvy-div" class="pst-srvy">
 							<div id="shr-post-chk-box" class="float-left bd-check-img"></div>
