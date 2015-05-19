@@ -1123,7 +1123,7 @@ button.paypal.is-active {
 }
 
 .st-score-rt {
-	width: 50%;
+	/* width: 50%; */
 }
 
 .score-rt-post {
@@ -4160,9 +4160,9 @@ button.paypal.is-active {
 	position: absolute;
 	top: 200px;
 	line-height: 25px;
-	left: -210px;
+	left: -215px;
 	font-size: 13px;
-	width: 193px;
+	width: 200px;
 	text-align: right;
 }
 
@@ -5358,7 +5358,7 @@ tr.u-tbl-header td {
 }
 
 .soc-nw-adj {
-	margin-right: 100px;
+	margin-right: 20px;
 }
 
 .soc-nw-wrapper {
@@ -6379,4 +6379,18 @@ tr.u-tbl-header td {
 
 .btn-add-ques-bottom-row{
 	margin-top: 5px;
+}
+
+.soc-nw-icn-link {
+	width: 260px;
+	line-height: 30px;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+
+.st-social-score {
+  min-height: 110px;
+  line-height: 26px;
+  border-right: 1px solid #dcdcdc;
 }
