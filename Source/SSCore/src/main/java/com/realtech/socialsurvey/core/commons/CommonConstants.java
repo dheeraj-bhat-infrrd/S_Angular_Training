@@ -100,6 +100,8 @@ public interface CommonConstants {
 	public static final double MAX_RATING_SCORE = 5;
 	public static final String YES_STRING = "Y";
 	public static final String NO_STRING = "N";
+	public static final int SURVEY_STATUS_PRE_INITIATED = 1;
+	public static final int SURVEY_STATUS_INITIATED = 2;
 
 	/**
 	 * Hibernate entities and column name constants
