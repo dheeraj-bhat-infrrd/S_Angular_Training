@@ -2,6 +2,7 @@ package com.realtech.socialsurvey.core.dao;
 
 import java.sql.Timestamp;
 import java.util.List;
+import java.util.Set;
 import com.realtech.socialsurvey.core.entities.SurveyPreInitiation;
 import com.realtech.socialsurvey.core.entities.integration.EngagementProcessingStatus;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
@@ -24,5 +25,7 @@ public interface SurveyPreInitiationDao extends GenericDao<SurveyPreInitiation, 
 	 * @throws InvalidInputException
 	 */
 	public List<EngagementProcessingStatus> getProcessedIds(String source, Timestamp timestamp) throws InvalidInputException;
+
+	public List<SurveyPreInitiation> getIncompleteSurvey(Timestamp startTime, Timestamp endTime, int start, int row, Set<Long> agentIds) throws InvalidInputException;
 
 }

@@ -8,8 +8,8 @@
 				<div class="font-11 opensanslight">${survey.modifiedOn}</div>
 			</div>
 			<div data-custname="${survey.customerFirstName} ${survey.customerLastName}"
-				data-agentid="${survey.agentId}" data-agentname="${survey.agentName}"
-				data-custemail="${survey.customerEmail}" class="float-right dash-lp-rt-img cursor-pointer"></div>
+				data-agentid="${survey.agentId}" data-agentname="${agentName}"
+				data-custemail="${survey.customerEmailId}" class="float-right dash-lp-rt-img cursor-pointer"></div>
 		</div>
 	</c:forEach>
 </c:if>

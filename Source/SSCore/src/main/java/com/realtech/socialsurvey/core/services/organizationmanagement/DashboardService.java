@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import com.realtech.socialsurvey.core.entities.SurveyDetails;
+import com.realtech.socialsurvey.core.entities.SurveyPreInitiation;
 import com.realtech.socialsurvey.core.entities.User;
 import com.realtech.socialsurvey.core.entities.UserSettings;
 
@@ -31,7 +32,7 @@ public interface DashboardService {
 
 	public XSSFWorkbook downloadCompleteSurveyData(List<SurveyDetails> surveyDetails, String fileLocation) throws IOException;
 
-	public XSSFWorkbook downloadIncompleteSurveyData(List<SurveyDetails> surveyDetails, String fileLocation) throws IOException;
+	public XSSFWorkbook downloadIncompleteSurveyData(List<SurveyPreInitiation> surveyDetails, String fileLocation) throws IOException;
 
 	public Map<String, Map<String, Long>> getSurveyDetailsForGraph(String columnName, long columnValue, String reportType) throws ParseException;
 
