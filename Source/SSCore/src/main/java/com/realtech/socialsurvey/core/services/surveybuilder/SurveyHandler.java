@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Map;
 import org.apache.solr.client.solrj.SolrServerException;
 import com.realtech.socialsurvey.core.entities.SurveyDetails;
+import com.realtech.socialsurvey.core.entities.SurveyPreInitiation;
 import com.realtech.socialsurvey.core.entities.User;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.exception.NoRecordsFetchedException;
@@ -79,8 +80,16 @@ public interface SurveyHandler {
 	public void changeStatusOfSurvey(long agentId, String customerEmail, boolean editable);
 
 	public void sendSurveyInvitationMail(String custFirstName, String custLastName, String custEmail, String custRelationWithAgent, User user,
-			boolean isAgent) throws InvalidInputException, SolrException, NoRecordsFetchedException, UndeliveredEmailException;
+			boolean isAgent, String source) throws InvalidInputException, SolrException, NoRecordsFetchedException, UndeliveredEmailException;
 
 	public void sendSurveyRestartMail(String custFirstName, String custLastName, String custEmail, String custRelationWithAgent, User user, String link)
 			throws InvalidInputException, UndeliveredEmailException;
+
+	public SurveyPreInitiation getPreInitiatedSurvey(long agentId, String customerEmail) throws NoRecordsFetchedException;
+
+	public void deleteSurveyPreInitiationDetailsPermanently(SurveyPreInitiation surveyPreInitiation);
+
+	public String composeLink(long userId, String custEmail) throws InvalidInputException;
+
+	public void markSurveyAsStarted(SurveyPreInitiation surveyPreInitiation);
 }
