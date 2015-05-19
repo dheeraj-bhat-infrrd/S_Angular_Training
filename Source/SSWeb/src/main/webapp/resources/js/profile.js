@@ -142,8 +142,18 @@ function paintProfilePage(result) {
                 if(contactDetails.address2 != undefined){
                 	addressHtml = addressHtml + '<div class="prof-user-addline2">'+contactDetails.address2+'</div>';
                 }
-                if(contactDetails.country != undefined) {
-                	addressHtml = addressHtml + '<div class="prof-user-addline2">'+contactDetails.country+'</div>';
+                if(contactDetails.zipcode != undefined || contactDetails.state != undefined || contactDetails.city != undefined) {
+                	addressHtml = addressHtml + '<div class="prof-user-addline2">';
+                	if(contactDetails.city != undefined){
+                		addressHtml += contactDetails.city + ', ';	
+                	}
+                	if(contactDetails.state != undefined){
+                		addressHtml += contactDetails.state + ', ';	
+                	}
+                	if(contactDetails.zipcode != undefined){
+                		addressHtml += contactDetails.zipcode;	
+                	}
+                	addressHtml += '</div>';
                 }
     		}
             

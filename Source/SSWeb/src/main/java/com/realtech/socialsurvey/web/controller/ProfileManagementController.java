@@ -625,6 +625,7 @@ public class ProfileManagementController {
 			String state = request.getParameter(CommonConstants.STATE);
 			String city = request.getParameter(CommonConstants.CITY);
 			String country = request.getParameter(CommonConstants.COUNTRY);
+			String countryCode = request.getParameter(CommonConstants.COUNTRY_CODE);
 			String zipcode = request.getParameter(CommonConstants.ZIPCODE);
 			if (name == null || name.isEmpty()) {
 				throw new InvalidInputException("Name passed can not be null or empty", DisplayMessageConstants.GENERAL_ERROR);
@@ -646,7 +647,7 @@ public class ProfileManagementController {
 					throw new InvalidInputException("No company settings found in current session");
 				}
 				contactDetailsSettings = companySettings.getContact_details();
-				contactDetailsSettings = updateAddressDetail(contactDetailsSettings, name, address1, address2, country, 
+				contactDetailsSettings = updateAddressDetail(contactDetailsSettings, name, address1, address2, country, countryCode,
 						state, city, zipcode);
 				contactDetailsSettings = profileManagementService.updateContactDetails(
 						MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION, companySettings, contactDetailsSettings);
@@ -660,7 +661,7 @@ public class ProfileManagementController {
 					throw new InvalidInputException("No Region settings found in current session");
 				}
 				contactDetailsSettings = regionSettings.getContact_details();
-				contactDetailsSettings = updateAddressDetail(contactDetailsSettings, name, address1, address2, country, 
+				contactDetailsSettings = updateAddressDetail(contactDetailsSettings, name, address1, address2, country, countryCode, 
 						state, city, zipcode);
 				contactDetailsSettings = profileManagementService.updateContactDetails(
 						MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION, regionSettings, contactDetailsSettings);
@@ -674,7 +675,7 @@ public class ProfileManagementController {
 					throw new InvalidInputException("No Branch settings found in current session");
 				}
 				contactDetailsSettings = branchSettings.getContact_details();
-				contactDetailsSettings = updateAddressDetail(contactDetailsSettings, name, address1, address2, country, 
+				contactDetailsSettings = updateAddressDetail(contactDetailsSettings, name, address1, address2, country, countryCode,
 						state, city, zipcode);
 				contactDetailsSettings = profileManagementService.updateContactDetails(
 						MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION, branchSettings, contactDetailsSettings);
@@ -687,7 +688,7 @@ public class ProfileManagementController {
 					throw new InvalidInputException("No Agent settings found in current session");
 				}
 				contactDetailsSettings = agentSettings.getContact_details();
-				contactDetailsSettings = updateAddressDetail(contactDetailsSettings, name, address1, address2, country, 
+				contactDetailsSettings = updateAddressDetail(contactDetailsSettings, name, address1, address2, country, countryCode,
 						state, city, zipcode);
 				contactDetailsSettings = profileManagementService.updateAgentContactDetails(
 						MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION, agentSettings, contactDetailsSettings);
@@ -726,13 +727,14 @@ public class ProfileManagementController {
 
 	// Update address details
 	private ContactDetailsSettings updateAddressDetail(ContactDetailsSettings contactDetailsSettings, String name, String address1, String address2,
-			String country, String state, String city, String zipcode) {
+			String country, String countryCode, String state, String city, String zipcode) {
 		LOG.debug("Method updateAddressDetail() called from ProfileManagementController");
 		contactDetailsSettings.setName(name);
 		contactDetailsSettings.setAddress(address1 + ", " + address2);
 		contactDetailsSettings.setAddress1(address1);
 		contactDetailsSettings.setAddress2(address2);
 		contactDetailsSettings.setCountry(country);
+		contactDetailsSettings.setCountryCode(countryCode);
 		contactDetailsSettings.setState(state);
 		contactDetailsSettings.setCity(city);
 		contactDetailsSettings.setZipcode(zipcode);

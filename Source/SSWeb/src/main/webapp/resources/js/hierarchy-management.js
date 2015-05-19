@@ -520,6 +520,7 @@ function addRegion(formId) {
 function addRegionCallBack(data) {
 	hideOverlay();
 	displayMessage(data);
+	$('#region-state-city-row').hide();
 	resetInputFields("edit-region-form");
 	fetchCompleteHierarchy();
 }
@@ -684,6 +685,7 @@ function addOffice(formId) {
 function addOfficeCallBack(data) {
 	hideOverlay();
 	displayMessage(data);
+	$('#office-state-city-row').hide();
 	resetInputFields("edit-office-form");
 	fetchCompleteHierarchy();
 }
