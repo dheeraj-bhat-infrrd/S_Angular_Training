@@ -178,7 +178,7 @@
 	cursor: pointer;
 }
 </style>
-<link rel="stylesheet" href="${pageContext.request.contextPath}/resources/css/datepicker3.css">
+<link rel="stylesheet" href="${initParam.resourcesPath}/resources/css/datepicker3.css">
 
 <script>
 $(document).ready(function() {

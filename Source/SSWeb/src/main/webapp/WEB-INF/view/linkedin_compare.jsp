@@ -132,9 +132,9 @@
 	</div>
 </div>
 
-<link rel="stylesheet" href="${pageContext.request.contextPath}/resources/jcrop/jquery.Jcrop.min.css">
-<script src="${pageContext.request.contextPath}/resources/jcrop/jquery.Jcrop.min.js"></script>
-<script src="${pageContext.request.contextPath}/resources/js/jcrop.js"></script>
+<link rel="stylesheet" href="${initParam.resourcesPath}/resources/jcrop/jquery.Jcrop.min.css">
+<script src="${initParam.resourcesPath}/resources/jcrop/jquery.Jcrop.min.js"></script>
+<script src="${initParam.resourcesPath}/resources/js/jcrop.js"></script>
 <script>
 var selectedCountryRegEx = "";
 var profilemasterid = "${profilemasterid}";
