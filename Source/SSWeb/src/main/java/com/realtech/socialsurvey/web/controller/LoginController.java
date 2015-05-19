@@ -46,8 +46,7 @@ import com.realtech.socialsurvey.web.common.JspResolver;
 @Controller
 public class LoginController {
 
-	private static final Logger LOG = LoggerFactory
-			.getLogger(LoginController.class);
+	private static final Logger LOG = LoggerFactory.getLogger(LoginController.class);
 	private static final String STATUS_PARAM = "s";
 	private static final String AUTH_ERROR = "autherror";
 	private static final String SESSION_ERROR = "sessionerror";
