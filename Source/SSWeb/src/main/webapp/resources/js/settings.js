@@ -204,6 +204,7 @@ function showPaymentOptions() {
 function displayPopup(data){
 	console.log("display message called :data "+data);
 	$("#temp-div").html(data);
+	
 	var displayMessageDiv = $("#display-msg-div");
 	if($(displayMessageDiv).hasClass("message")) {
 		console.log("Error occured. Hiding Overlay");
@@ -226,7 +227,6 @@ function displayPopup(data){
 }
 
 function updateAutoPostSetting(isautopostenabled){
-	
 	var payload = {
 		"autopost" : isautopostenabled
 	};
