@@ -9,8 +9,6 @@ import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
 import javax.persistence.NamedQuery;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
@@ -43,16 +41,16 @@ public class Survey implements Serializable {
 
 	@Column(name = "STATUS")
 	private int status;
-	
+
 	@Column(name = "IS_SURVEY_BUILDING_COMPLETE")
 	private int isSurveyBuildingComplete;
 
 	@Column(name = "SURVEY_NAME")
 	private String surveyName;
-	
-	@ManyToOne
-	@JoinColumn(name="VERTICAL_ID")
-	private VerticalsMaster verticalsMaster;
+
+	// bi-directional many-to-one association to SurveyCompanyMapping
+	@OneToMany(mappedBy = "survey", fetch = FetchType.LAZY)
+	private List<SurveyVerticalMapping> surveyVerticalMappings;
 
 	// bi-directional many-to-one association to SurveyCompanyMapping
 	@OneToMany(mappedBy = "survey", fetch = FetchType.LAZY)
@@ -63,14 +61,6 @@ public class Survey implements Serializable {
 	private List<SurveyQuestionsMapping> surveyQuestionsMappings;
 
 	public Survey() {}
-	
-	public int getIsSurveyBuildingComplete() {
-		return isSurveyBuildingComplete;
-	}
-
-	public void setIsSurveyBuildingComplete(int isSurveyBuildingComplete) {
-		this.isSurveyBuildingComplete = isSurveyBuildingComplete;
-	}
 
 	public long getSurveyId() {
 		return this.surveyId;
@@ -128,6 +118,14 @@ public class Survey implements Serializable {
 		this.surveyName = surveyName;
 	}
 
+	public int getIsSurveyBuildingComplete() {
+		return isSurveyBuildingComplete;
+	}
+
+	public void setIsSurveyBuildingComplete(int isSurveyBuildingComplete) {
+		this.isSurveyBuildingComplete = isSurveyBuildingComplete;
+	}
+
 	public List<SurveyQuestionsMapping> getSurveyQuestionsMappings() {
 		return this.surveyQuestionsMappings;
 	}
@@ -171,13 +169,26 @@ public class Survey implements Serializable {
 
 		return surveyCompanyMapping;
 	}
-	
-	public VerticalsMaster getVerticalsMaster() {
-		return verticalsMaster;
+
+	public List<SurveyVerticalMapping> getSurveyVerticalMappings() {
+		return surveyVerticalMappings;
 	}
 
-	public void setVerticalsMaster(VerticalsMaster verticalsMaster) {
-		this.verticalsMaster = verticalsMaster;
+	public void setSurveyVerticalMappings(List<SurveyVerticalMapping> surveyVerticalMappings) {
+		this.surveyVerticalMappings = surveyVerticalMappings;
 	}
 
+	public SurveyVerticalMapping addSurveyVerticalMapping(SurveyVerticalMapping surveyVerticalMapping) {
+		getSurveyVerticalMappings().add(surveyVerticalMapping);
+		surveyVerticalMapping.setSurvey(this);
+
+		return surveyVerticalMapping;
+	}
+
+	public SurveyVerticalMapping removeSurveyVerticalMapping(SurveyVerticalMapping surveyVerticalMapping) {
+		getSurveyVerticalMappings().remove(surveyVerticalMapping);
+		surveyVerticalMapping.setSurvey(null);
+
+		return surveyVerticalMapping;
+	}
 }

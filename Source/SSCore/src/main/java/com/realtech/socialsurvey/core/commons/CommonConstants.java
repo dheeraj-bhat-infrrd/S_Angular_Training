@@ -299,7 +299,6 @@ public interface CommonConstants {
 	public static final String LIST_LOGO_FORMATS = "LIST_LOGO_FORMATS";
 	public static final String LOGO_HOME_DIRECTORY = "LOGO_HOME_DIRECTORY";
 	public static final String LOGO_NAME = "logoName";
-	public static final String IMAGE_DIR = "imageupload";
 	public static final String IMAGE_NAME = "image.png";
 	public static final String IMAGE_FORMAT_PNG = "png";
 
