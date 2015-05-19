@@ -980,8 +980,7 @@ public class BrainTreePaymentImpl implements Payment, InitializingBean {
 		}
 
 		LOG.debug("Creating the subscription request object");
-		SubscriptionRequest updateRequest = new SubscriptionRequest().price(new BigDecimal(String.valueOf(amount))).planId(braintreePlanId).options()
-				.prorateCharges(true).revertSubscriptionOnProrationFailure(false).done();
+		SubscriptionRequest updateRequest = new SubscriptionRequest().price(new BigDecimal(String.valueOf(amount)));
 
 		Result<Subscription> result = null;
 		try {
