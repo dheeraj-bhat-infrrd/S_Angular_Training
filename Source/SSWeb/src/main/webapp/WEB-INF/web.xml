@@ -40,7 +40,6 @@
 		<filter-name>springSecurityFilterChain</filter-name>
 		<url-pattern>/*</url-pattern>
 	</filter-mapping>
-
 	<!-- - Servlet that dispatches request to registered handlers (Controller 
 		implementations). -->
 	<servlet>
@@ -72,7 +71,7 @@
 		</init-param>
 		<load-on-startup>1</load-on-startup>
 	</servlet>
-	
+
 	<servlet-mapping>
 		<servlet-name>sswebapp</servlet-name>
 		<url-pattern>*.do</url-pattern>
@@ -82,7 +81,7 @@
 		<servlet-name>rest</servlet-name>
 		<url-pattern>/rest/*</url-pattern>
 	</servlet-mapping>
-	
+
 	<servlet-mapping>
 		<servlet-name>profile</servlet-name>
 		<url-pattern>/pages/*</url-pattern>
