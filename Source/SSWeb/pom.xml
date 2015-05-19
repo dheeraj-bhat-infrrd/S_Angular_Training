@@ -215,12 +215,49 @@
 	    <profile>
 	        <id>dev</id>
 	        <build>
+	            <filters>
+					<filter>src/main/resources/web.filler.dev.properties</filter>
+				</filters>
 				<plugins>
 					<plugin>
 						<groupId>org.apache.maven.plugins</groupId>
 						<artifactId>maven-war-plugin</artifactId>
 						<configuration>
+						    <webResources>
+						        <resource>
+						            <filtering>true</filtering>
+						            <directory>src/main/webapp</directory>
+						            <includes>
+						                <include>**/web.xml</include>
+						            </includes>
+						        </resource>
+						    </webResources>
 							<outputDirectory>${dev.deployment.path}</outputDirectory>
+						</configuration>
+					</plugin>
+				</plugins>
+			</build>
+	    </profile>
+	    <profile>
+	        <id>test</id>
+	        <build>
+	            <filters>
+					<filter>src/main/resources/web.filler.test.properties</filter>
+				</filters>
+				<plugins>
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-war-plugin</artifactId>
+						<configuration>
+						    <webResources>
+						        <resource>
+						            <filtering>true</filtering>
+						            <directory>src/main/webapp</directory>
+						            <includes>
+						                <include>**/web.xml</include>
+						            </includes>
+						        </resource>
+						    </webResources>
 						</configuration>
 					</plugin>
 				</plugins>
@@ -229,15 +266,6 @@
 	</profiles>
 	<build>
 		<plugins>
-			<!-- 
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-war-plugin</artifactId>
-				<configuration>
-					<outputDirectory>${dev.deployment.path}</outputDirectory>
-				</configuration>
-			</plugin> 
-			-->
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-compiler-plugin</artifactId>
