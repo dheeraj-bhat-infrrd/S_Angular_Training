@@ -87,7 +87,9 @@ public class SurveyPreInitiationDaoImpl extends GenericDaoImpl<SurveyPreInitiati
 				criteria.setMaxResults(row);
 			if (start > 0)
 				criteria.setFirstResult(start);
-			criteria.add(Restrictions.in(CommonConstants.AGENT_ID_COLUMN, agentIds));
+			if (agentIds.size() > 0)
+				criteria.add(Restrictions.in(CommonConstants.AGENT_ID_COLUMN, agentIds));
+			
 			criteria.addOrder(Order.desc(CommonConstants.MODIFIED_ON_COLUMN));
 			return criteria.list();
 		}
