@@ -220,7 +220,8 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 		LOG.debug("Method createDefaultHierarchy started for user : " + user.getLoginName());
 
 		LOG.debug("Adding the default region");
-		Region region = addNewRegion(user, CommonConstants.DEFAULT_REGION_NAME, CommonConstants.YES, CommonConstants.DEFAULT_ADDRESS, null);
+		//TODO:adding default comapany,state,city,zipcode as null
+		Region region = addNewRegion(user, CommonConstants.DEFAULT_REGION_NAME, CommonConstants.YES, CommonConstants.DEFAULT_ADDRESS, null,null,null,null,null,null);
 		ProfilesMaster profilesMaster = userManagementService.getProfilesMasterById(CommonConstants.PROFILES_MASTER_REGION_ADMIN_PROFILE_ID);
 
 		LOG.debug("Creating user profile for region admin");
@@ -231,8 +232,9 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 		userProfileDao.save(userProfileRegionAdmin);
 
 		LOG.debug("Adding the default branch");
+		//TODO:setting default country,state,city,zipcode null
 		Branch branch = addNewBranch(user, region.getRegionId(), CommonConstants.YES, CommonConstants.DEFAULT_BRANCH_NAME,
-				CommonConstants.DEFAULT_ADDRESS, null);
+				CommonConstants.DEFAULT_ADDRESS, null,null,null,null,null,null);
 		profilesMaster = userManagementService.getProfilesMasterById(CommonConstants.PROFILES_MASTER_BRANCH_ADMIN_PROFILE_ID);
 
 		LOG.debug("Creating user profile for branch admin");
@@ -376,6 +378,8 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 		contactDetailSettings.setZipcode(organizationalDetails.get(CommonConstants.ZIPCODE));
 		contactDetailSettings.setCountry(organizationalDetails.get(CommonConstants.COUNTRY));
 		contactDetailSettings.setCountryCode(organizationalDetails.get(CommonConstants.COUNTRY_CODE));
+		contactDetailSettings.setState(organizationalDetails.get(CommonConstants.STATE));
+		contactDetailSettings.setCity(organizationalDetails.get(CommonConstants.CITY));
 		
 		// Add work phone number in contact details
 		ContactNumberSettings contactNumberSettings = new ContactNumberSettings();
@@ -1493,15 +1497,15 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 	 */
 	@Override
 	@Transactional
-	public Region addNewRegionWithUser(User user, String regionName, int isDefaultBySystem, String address1, String address2, long selectedUserId,
+	public Region addNewRegionWithUser(User user, String regionName, int isDefaultBySystem, String address1, String address2, String country, String countryCode, String state, String city, String zipcode, long selectedUserId,
 			String[] emailIdsArray, boolean isAdmin) throws InvalidInputException, SolrException, NoRecordsFetchedException, UserAssignmentException {
 		LOG.info("Method addNewRegionWithUser called for user:" + user + " regionName:" + regionName + " isDefaultBySystem:" + isDefaultBySystem
 				+ " selectedUserId:" + selectedUserId + " emailIdsArray:" + emailIdsArray + " isAdmin:" + isAdmin);
 
-		Region region = addNewRegion(user, regionName, isDefaultBySystem, address1, address2);
+		Region region = addNewRegion(user, regionName, isDefaultBySystem, address1, address2,country,countryCode,state,city,zipcode);
 
 		LOG.debug("Adding default branch for the new region created");
-		addNewBranch(user, region.getRegionId(), CommonConstants.YES, CommonConstants.DEFAULT_BRANCH_NAME, CommonConstants.DEFAULT_ADDRESS, null);
+		addNewBranch(user, region.getRegionId(), CommonConstants.YES, CommonConstants.DEFAULT_BRANCH_NAME, CommonConstants.DEFAULT_ADDRESS, null,null,null,null,null,null);
 
 		/**
 		 * If userId or email is provided, call the service for adding and assigning user to the
@@ -1652,14 +1656,14 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 	 */
 	@Override
 	@Transactional
-	public Branch addNewBranchWithUser(User user, String branchName, long regionId, int isDefaultBySystem, String address1, String address2,
+	public Branch addNewBranchWithUser(User user, String branchName, long regionId, int isDefaultBySystem, String address1, String address2, String country, String countryCode, String state, String city, String zipcode,
 			long selectedUserId, String[] emailIdsArray, boolean isAdmin) throws InvalidInputException, SolrException, NoRecordsFetchedException,
 			UserAssignmentException {
 		LOG.info("Method addNewBranchWithUser called for user:" + user + " branchName:" + branchName + "regionId: " + regionId
 				+ " isDefaultBySystem:" + isDefaultBySystem + " selectedUserId:" + selectedUserId + " emailIdsArray:" + emailIdsArray + " isAdmin:"
 				+ isAdmin);
 
-		Branch branch = addNewBranch(user, regionId, isDefaultBySystem, branchName, address1, address2);
+		Branch branch = addNewBranch(user, regionId, isDefaultBySystem, branchName, address1, address2,country,countryCode,state,city,zipcode);
 
 		/**
 		 * If userId or email is provided, call the service for adding and assigning user to the
@@ -2205,7 +2209,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 	 */
 	@Override
 	@Transactional
-	public Branch addNewBranch(User user, long regionId, int isDefaultBySystem, String branchName, String branchAddress1, String branchAddress2)
+	public Branch addNewBranch(User user, long regionId, int isDefaultBySystem, String branchName, String branchAddress1, String branchAddress2, String branchCountry, String branchCountryCode, String branchState, String branchCity, String branchZipcode)
 			throws InvalidInputException, SolrException {
 		if (user == null) {
 			throw new InvalidInputException("User is null in addNewBranch");
@@ -2245,6 +2249,11 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 		Branch branch = addBranch(user, region, branchName, isDefaultBySystem);
 		branch.setAddress1(branchAddress1);
 		branch.setAddress2(branchAddress2);
+		branch.setCountry(branchCountry);
+		branch.setState(branchState);
+		branch.setCity(branchCity);
+		branch.setZipcode(branchZipcode);
+		branch.setCountryCode(branchCountryCode);
 
 		LOG.debug("Adding new branch into mongo");
 		insertBranchSettings(branch);
@@ -2339,6 +2348,26 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 			contactSettings.setAddress(branch.getAddress1());
 		}
 
+		if (branch.getCountry() != null && !branch.getCountry().isEmpty()) {
+			contactSettings.setCountry(branch.getCountry());
+		}
+		
+		if (branch.getCountryCode() != null && !branch.getCountryCode().isEmpty()) {
+			contactSettings.setCountryCode(branch.getCountryCode());
+		}
+		
+		if (branch.getState() != null && !branch.getState().isEmpty()) {
+			contactSettings.setState(branch.getState());
+		}
+		
+		if (branch.getCity() != null && !branch.getCity().isEmpty()) {
+			contactSettings.setCity(branch.getCity());
+		}
+		
+		if (branch.getZipcode() != null && !branch.getZipcode().isEmpty()) {
+			contactSettings.setZipcode(branch.getZipcode());
+		}
+		
 		LOG.debug("Method getContactDetailsSettingsFromBranch finished.Returning :" + contactSettings);
 		return contactSettings;
 	}
@@ -2362,6 +2391,27 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 		else {
 			contactSettings.setAddress(region.getAddress1());
 		}
+		
+		if (region.getCountry() != null && !region.getCountry().isEmpty()) {
+			contactSettings.setCountry(region.getCountry());
+		}
+		
+		if (region.getCountryCode() != null && !region.getCountryCode().isEmpty()) {
+			contactSettings.setCountryCode(region.getCountryCode());
+		}
+		
+		if (region.getState() != null && !region.getState().isEmpty()) {
+			contactSettings.setState(region.getState());
+		}
+		
+		if (region.getCity() != null && !region.getCity().isEmpty()) {
+			contactSettings.setCity(region.getCity());
+		}
+		
+		if (region.getZipcode() != null && !region.getZipcode().isEmpty()) {
+			contactSettings.setZipcode(region.getZipcode());
+		}
+		
 
 		LOG.debug("Method getContactDetailsSettingsFromRegion finished.Returning :" + contactSettings);
 		return contactSettings;
@@ -2380,7 +2430,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 	 */
 	@Override
 	@Transactional
-	public Region addNewRegion(User user, String regionName, int isDefaultBySystem, String address1, String address2) throws InvalidInputException,
+	public Region addNewRegion(User user, String regionName, int isDefaultBySystem, String address1, String address2, String country, String countryCode, String state, String city, String zipcode) throws InvalidInputException,
 			SolrException {
 		if (user == null) {
 			throw new InvalidInputException("User is null in addNewRegion");
@@ -2393,6 +2443,11 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 		Region region = addRegion(user, isDefaultBySystem, regionName);
 		region.setAddress1(address1);
 		region.setAddress2(address2);
+		region.setCountry(country);
+		region.setCountryCode(countryCode);
+		region.setState(state);
+		region.setCity(city);
+		region.setZipcode(zipcode);
 
 		LOG.debug("Calling method to insert region settings");
 		insertRegionSettings(region);
@@ -2788,7 +2843,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 	 */
 	@Override
 	@Transactional
-	public Region updateRegion(User user, long regionId, String regionName, String address1, String address2, long selectedUserId,
+	public Region updateRegion(User user, long regionId, String regionName, String address1, String address2, String country, String countryCode, String state, String city, String zipcode, long selectedUserId,
 			String[] emailIdsArray, boolean isAdmin) throws InvalidInputException, SolrException, NoRecordsFetchedException, UserAssignmentException {
 		if (user == null) {
 			throw new InvalidInputException("User is null in update region");
@@ -2809,6 +2864,11 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 		region.setModifiedBy(String.valueOf(user.getUserId()));
 		region.setAddress1(address1);
 		region.setAddress2(address2);
+		region.setCountry(country);
+		region.setCountryCode(countryCode);
+		region.setState(state);
+		region.setCity(city);
+		region.setZipcode(zipcode);
 		regionDao.update(region);
 
 		LOG.debug("Updating region in mongo");
@@ -2922,7 +2982,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 	 */
 	@Override
 	@Transactional
-	public Branch updateBranch(User user, long branchId, long regionId, String branchName, String address1, String address2, long selectedUserId,
+	public Branch updateBranch(User user, long branchId, long regionId, String branchName, String address1, String address2, String country, String countryCode, String state, String city, String zipcode, long selectedUserId,
 			String[] emailIdsArray, boolean isAdmin) throws InvalidInputException, SolrException, NoRecordsFetchedException, UserAssignmentException {
 		LOG.info("Method updateBranch called for branchId:" + branchId + " regionId:" + regionId + " branchName:" + branchName);
 		if (user == null) {
@@ -2968,6 +3028,11 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 		branch.setBranch(branchName);
 		branch.setAddress1(address1);
 		branch.setAddress2(address2);
+		branch.setCountry(country);
+		branch.setCountryCode(countryCode);
+		branch.setState(state);
+		branch.setCity(city);
+		branch.setZipcode(zipcode);
 		branch.setModifiedBy(String.valueOf(user.getUserId()));
 		branch.setModifiedOn(new Timestamp(System.currentTimeMillis()));
 		branchDao.update(branch);

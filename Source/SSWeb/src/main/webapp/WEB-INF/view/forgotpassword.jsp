@@ -46,7 +46,7 @@
 						<div class="float-left rfr_txt">
 							<div class="rfr_icn icn-mail"></div>
 							<div class="rfr_txt_fld">
-								<input class="rfr_input_fld" id="login-user-id" data-non-empty="true" data-email=""
+								<input type="email" class="rfr_input_fld" id="login-user-id" data-non-empty="true" data-email=""
 									name="emailId" placeholder='<spring:message code="label.emailid.key"/>'>
 							</div>
 						</div>
