@@ -727,6 +727,10 @@
     .sq-txt-area{
         width: 100%;
     }
+    .pst-srvy{
+    	max-width: 100%;
+    	padding: 0 10px;
+    }
     .sq-smile{
         /* width: 50px; */
     }

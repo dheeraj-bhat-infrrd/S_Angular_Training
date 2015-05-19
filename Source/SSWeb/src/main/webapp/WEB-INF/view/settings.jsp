@@ -112,7 +112,7 @@
 						<div class="float-left score-rt-post score-rt-post-OR score-rt-min">
 							<div class="st-score-rt-top"><spring:message code="label.scorepost.min.key" /></div>
 							<div class="st-score-rt-line2 clearfix">
-								<div class="st-rating-wrapper float-left clearfix" id="rating-min-post-parent">
+								<div class="st-rating-wrapper settings-rating-wrapper float-left clearfix" id="rating-min-post-parent">
 									<div class="rating-star icn-full-star"></div>
 									<div class="rating-star icn-full-star"></div>
 									<div class="rating-star icn-half-star"></div>

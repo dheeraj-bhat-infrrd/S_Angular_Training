@@ -76,7 +76,7 @@ function paintProfilePage(result) {
 		
 		if(contactDetails != undefined){
 			
-			$('#social-connect-txt').text("Contact "+contactDetails.name+" using :");
+			$('#social-connect-txt').text("Connect with "+contactDetails.name+" :");
 			$('#prof-header-url').text(location.href);
 			$('#prof-contact-hdr').text("Contact "+contactDetails.name);
 			$('#agent-desc').html(contactDetails.name+" - Reviews And Ratings");

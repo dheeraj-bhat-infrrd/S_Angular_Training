@@ -2591,10 +2591,39 @@ button.paypal.is-active {
 }
 
 .sq-smile-icn-wrapper {
-	float: left;
+	float:left;
 	cursor: pointer;
 	width: 62px;
 	height: 62px;
+}
+
+.sq-smile-icn-container {
+    width: 100%;
+    height: 62px;
+    line-height: 62px;
+    margin-bottom: 10px;
+    cursor:pointer;
+}
+
+.sq-smile-icn-text {
+    margin-left: 0px;
+    width: 235px;
+    text-align: center;
+    border-radius: 3px;
+    color: #fff;
+    font-size: 18px;
+}
+
+.sq-smile-happy-text {
+    background: #77B001;
+}
+
+.sq-smile-neutral-text {
+    background: #F9C42A;
+}
+
+.sq-smile-sad-text {
+    background: #FF3400;
 }
 
 .sq-happy-smile {
@@ -2678,7 +2707,7 @@ button.paypal.is-active {
 }
 
 .sq-happy-wrapper {
-	width: 190px;
+	width: 300px;
 	margin: 0 auto;
 }
 
@@ -2703,7 +2732,7 @@ button.paypal.is-active {
 .sq-np-wrapper {
 	width: 260px;
 	height: 40px;
-	background-color: #5CC7EF;
+	/* background-color: #5CC7EF; */
 	border-radius: 20px;
 	line-height: 40px;
 	margin: 30px auto;
@@ -4710,9 +4739,16 @@ select.rfr_txt_fld,select.rfr_input_fld{
 }
 
 .bd-check-txt {
-	line-height: 50px;
+	width: 88%;
+	display: flex;
 	font-family: opensanslight;
 	font-weight: bold !important;
+	justify-content: flex-start;
+	padding-top: 16px;
+	height: 62px;
+	line-height: 16px;
+	flex-direction: column;
+	text-align: left;
 }
 
 .bd-btn-save {
@@ -6013,6 +6049,14 @@ tr.u-tbl-header td {
 	line-height: 30px;
 }
 
+.settings-rating-wrapper .rating-image {
+	height: 50px;
+}
+
+.settings-rating-wrapper .rating-rounded {
+	line-height: 50px;
+}
+
 .smiley-rat-1{
 	background: url(../images/smiley-rat-1.png) no-repeat center;
 }
@@ -6360,12 +6404,14 @@ tr.u-tbl-header td {
 }
 
 .pst-srvy {
-  width: 380px;
-  height:50px;
-  margin: 0 auto;
- }
- 
- .icn-restart-survey-mail {
+	width: 490px;
+	max-width: 50%;
+	height: 50px;
+	margin: 0 auto;
+	padding: 0 10px;
+}
+
+.icn-restart-survey-mail {
 	background: url(../images/resend.png) no-repeat center;
  }
  
