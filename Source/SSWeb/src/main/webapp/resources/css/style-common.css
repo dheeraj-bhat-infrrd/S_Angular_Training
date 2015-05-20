@@ -47,6 +47,10 @@ input:-webkit-autofill {
 	-webkit-box-shadow: 0 0 0 1000px white inset !important;
 }
 
+select:focus{
+	outline:none;
+}
+
 .input-error {
 	border: 1px solid red !important;
 	margin-top: -1px !important;
@@ -539,6 +543,7 @@ html.is-modern.card-root.js.no-touch.csstransitions.svg.inlinesvg.placeholder
 	line-height: 100px;
 	height: 78px;
 	padding: 0 15px;
+	cursor: pointer;
 }
 
 .margin-left-10 {
@@ -4732,6 +4737,10 @@ select.rfr_txt_fld,select.rfr_input_fld{
 	background: url(../images/checks.png) no-repeat;
 	background-position: left center;
 	cursor: pointer;
+}
+
+.bd-frm-check-wrapper{
+	width: 270px;
 }
 
 .bd-check-img-checked {

@@ -391,24 +391,24 @@ public class SocialManagementController {
 			// Getting Oauth accesstoken for Twitter
 			AccessToken accessToken = null;
 			String profileLink = null;
-			while (null == accessToken) {
-				Twitter twitter = socialManagementService.getTwitterInstance();
-				String oauthVerifier = request.getParameter("oauth_verifier");
-				RequestToken requestToken = (RequestToken) session.getAttribute(CommonConstants.SOCIAL_REQUEST_TOKEN);
-				try {
-					accessToken = twitter.getOAuthAccessToken(requestToken, oauthVerifier);
-					twitter4j.User user = twitter.showUser(twitter.getId());
-					if (user != null && user.getScreenName() != null)
-						profileLink = CommonConstants.TWITTER_BASE_URL + user.getScreenName();
+			Twitter twitter = socialManagementService.getTwitterInstance();
+			String oauthVerifier = request.getParameter("oauth_verifier");
+			RequestToken requestToken = (RequestToken) session.getAttribute(CommonConstants.SOCIAL_REQUEST_TOKEN);
+			try {
+				accessToken = twitter.getOAuthAccessToken(requestToken, oauthVerifier);
+				twitter4j.User user = twitter.showUser(twitter.getId());
+				if (user != null && user.getScreenName() != null)
+					profileLink = CommonConstants.TWITTER_BASE_URL + user.getScreenName();
+			}
+			catch (TwitterException te) {
+				if (TwitterException.UNAUTHORIZED == te.getStatusCode()) {
+					LOG.error("Unable to get the access token. Reason: UNAUTHORISED");
 				}
-				catch (TwitterException te) {
-					if (TwitterException.UNAUTHORIZED == te.getStatusCode()) {
-						LOG.info("Unable to get the access token. Reason: UNAUTHORISED");
-					}
-					else {
-						LOG.error(te.getErrorMessage());
-					}
+				else {
+					LOG.error(te.getErrorMessage());
 				}
+				
+				throw new NonFatalException("Unable to procure twitter access token");
 			}
 
 			// Storing token

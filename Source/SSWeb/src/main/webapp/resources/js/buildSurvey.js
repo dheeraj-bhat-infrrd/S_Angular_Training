@@ -398,7 +398,7 @@ $(document).on('click', '.bd-mcq-close', function(){
 	$(this).parent().remove();
 
 	// disable remove button
-	if (parentDiv.children().length <= 2) {
+	if (parentDiv.children().length <= 3) {
 		$('.bd-mcq-close').addClass('hide');
 	}
 	
