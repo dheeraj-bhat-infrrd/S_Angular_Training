@@ -824,16 +824,19 @@ public class EmailServicesImpl implements EmailServices {
 
 		LOG.info("Sending survey reminder email to : " + recipientMailId);
 		EmailEntity emailEntity = prepareEmailEntityForSendingEmail(recipientMailId);
-		String subjectFileName = EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER + EmailTemplateConstants.SURVEY_REMINDER_MAIL_SUBJECT;
 
 		String agentSignature = emailFormatHelper.buildAgentSignature(agentPhone, agentTitle, companyName);
-
+		
+		FileContentReplacements subjectReplacements = new FileContentReplacements();
+		subjectReplacements.setFileName(EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER + EmailTemplateConstants.SURVEY_REMINDER_MAIL_SUBJECT);
+		subjectReplacements.setReplacementArgs(Arrays.asList(agentName));
+		
 		FileContentReplacements messageBodyReplacements = new FileContentReplacements();
 		messageBodyReplacements.setFileName(EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER + EmailTemplateConstants.SURVEY_REMINDER_MAIL_BODY);
-		messageBodyReplacements.setReplacementArgs(Arrays.asList(appLogoUrl, displayName, link, link, link, agentName, agentSignature, appBaseUrl));
+		messageBodyReplacements.setReplacementArgs(Arrays.asList(appLogoUrl, displayName, link, link, agentName, agentSignature, appBaseUrl));
 
 		LOG.debug("Calling email sender to send mail");
-		emailSender.sendEmailWithBodyReplacements(emailEntity, subjectFileName, messageBodyReplacements);
+		emailSender.sendEmailWithSubjectAndBodyReplacements(emailEntity, subjectReplacements, messageBodyReplacements);
 		LOG.info("Successfully sent survey completion mail");
 	}
 
