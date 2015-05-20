@@ -48,30 +48,13 @@ public class VerticalsMaster implements Serializable {
 	
 	//bi-directional many-to-one association to Survey
 	@OneToMany(mappedBy="verticalsMaster")
-	private List<Survey> surveys;
+	private List<SurveyVerticalMapping> surveys;
 
 	//bi-directional many-to-one association to Survey
 	@OneToMany(mappedBy="verticalsMaster")
-	private List<Survey> companies;
+	private List<Company> companies;
 	
-	public List<Survey> getCompanies() {
-		return companies;
-	}
-
-	public void setCompanies(List<Survey> companies) {
-		this.companies = companies;
-	}
-
-	public List<Survey> getSurveys() {
-		return surveys;
-	}
-
-	public void setSurveys(List<Survey> surveys) {
-		this.surveys = surveys;
-	}
-
-	public VerticalsMaster() {
-	}
+	public VerticalsMaster() {}
 
 	public int getVerticalsMasterId() {
 		return this.verticalsMasterId;
@@ -151,4 +134,19 @@ public class VerticalsMaster implements Serializable {
 		return verticalCrmMapping;
 	}
 
+	public List<Company> getCompanies() {
+		return companies;
+	}
+
+	public void setCompanies(List<Company> companies) {
+		this.companies = companies;
+	}
+
+	public List<SurveyVerticalMapping> getSurveys() {
+		return surveys;
+	}
+
+	public void setSurveys(List<SurveyVerticalMapping> surveys) {
+		this.surveys = surveys;
+	}
 }

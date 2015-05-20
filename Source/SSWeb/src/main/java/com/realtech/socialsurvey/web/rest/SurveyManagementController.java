@@ -371,7 +371,7 @@ public class SurveyManagementController {
 			SurveyDetails survey = surveyHandler.getSurveyDetails(agentId, customerEmail);
 
 			// Code to be executed when survey has already been taken.
-			if (preInitiatedSurvey == null && survey.getStage() == -1) {
+			if (preInitiatedSurvey == null && survey!=null && survey.getStage() == -1) {
 				model.addAttribute("surveyCompleted", "yes");
 				model.addAttribute("agentName", agentName);
 				return JspResolver.SURVEY_INVITE_SUCCESSFUL;
