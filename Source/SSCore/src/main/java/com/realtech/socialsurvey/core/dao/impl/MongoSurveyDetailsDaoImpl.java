@@ -1078,7 +1078,7 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao {
 		query.addCriteria(Criteria.where(CommonConstants.AGENT_ID_COLUMN).is(agentId));
 		query.addCriteria(Criteria.where(CommonConstants.CUSTOMER_EMAIL_COLUMN).is(customerEmail));
 		Update update = new Update();
-		update.pushAll(CommonConstants.SHARED_ON_COLUMN, socialSites.toArray());
+		update.addToSet(CommonConstants.SHARED_ON_COLUMN, socialSites.toArray());
 		update.set(CommonConstants.MODIFIED_ON_COLUMN, new Date());
 		mongoTemplate.updateMulti(query, update, SURVEY_DETAILS_COLLECTION);
 		LOG.info("updateSharedOn() finished.");

@@ -516,6 +516,9 @@ public class DashboardController {
 		try {
 			surveyDetails = fetchIncompleteSurveys(request, user);
 			model.addAttribute("incompleteSurveys", surveyDetails);
+			String agentName = user.getFirstName()+" "+user.getLastName();
+			agentName = agentName.replaceAll("null", "");
+			model.addAttribute("agentName", agentName);
 		}
 		catch (NonFatalException e) {
 			LOG.error("Non fatal exception caught in getReviews() while fetching reviews. Nested exception is ", e);
