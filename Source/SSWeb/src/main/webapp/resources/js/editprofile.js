@@ -382,13 +382,14 @@ function callBackEditAddressDetails(data) {
 		}
 
 		delay(function() {
-			var payload = {
+			/*var payload = {
 				"profName" : profName,
 				"address1" : profAddress1,
 				"address2" : profAddress2,
 				"country" : country,
 				"zipCode" : zipCode
-			};
+			};*/
+			payload = $('#prof-edit-address-form').serialize();
 			callAjaxPostWithPayloadData("./updateprofileaddress.do", callBackUpdateAddressDetails, payload);
 		}, 0);
 
@@ -401,6 +402,7 @@ function callBackEditAddressDetails(data) {
 }
 
 function callBackUpdateAddressDetails(data) {
+	$('body').css('overflow','auto');
 	$('#prof-message-header').html(data);
 	callAjaxGET("./fetchbasicdetails.do", callBackShowBasicDetails);
 	callAjaxGET("./fetchaddressdetails.do", callBackShowAddressDetails);
@@ -413,6 +415,7 @@ function callBackUpdateAddressDetails(data) {
 
 $('#overlay-cancel').click(function() {
 	$('#overlay-continue').unbind('click');
+	$('body').css('overflow','auto');
 	overlayRevert();
 });
 

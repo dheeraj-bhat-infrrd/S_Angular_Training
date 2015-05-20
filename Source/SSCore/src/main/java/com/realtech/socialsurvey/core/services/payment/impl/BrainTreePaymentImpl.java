@@ -980,8 +980,7 @@ public class BrainTreePaymentImpl implements Payment, InitializingBean {
 		}
 
 		LOG.debug("Creating the subscription request object");
-		SubscriptionRequest updateRequest = new SubscriptionRequest().price(new BigDecimal(String.valueOf(amount))).planId(braintreePlanId).options()
-				.prorateCharges(true).revertSubscriptionOnProrationFailure(false).done();
+		SubscriptionRequest updateRequest = new SubscriptionRequest().price(new BigDecimal(String.valueOf(amount)));
 
 		Result<Subscription> result = null;
 		try {
@@ -1682,6 +1681,7 @@ public class BrainTreePaymentImpl implements Payment, InitializingBean {
 		double amount = company.getLicenseDetails().get(CommonConstants.INITIAL_INDEX).getAccountsMaster().getAmount() * numOfUsers;
 		// get the current price
 		double previousAmount = getSubscriptionPriceFromBraintree(company);
+		LOG.debug("Previous amount: "+previousAmount+"\t Revised amount: "+amount+" for company "+company.getCompanyId());
 		if (previousAmount != amount) {
 			priceChanged = true;
 			LOG.debug("Upgrading the account for " + company.getCompany() + " with by " + numOfUsers + " users for an amount of " + amount);

@@ -20,6 +20,33 @@
 	     </div>
 	 </div>
 	 <div class="bd-hr-form-item clearfix">
+	     <div class="float-left bd-frm-left"><spring:message code="label.country.key"/></div>
+	     <div class="float-left bd-frm-right">
+	         <input class="bd-frm-rt-txt" id="region-country" name="regionCountry" value="${region.country}">
+	         <input type="hidden" value="${region.countryCode}" name="regionCountrycode" id="region-country-code">
+	     </div>
+	 </div>
+	 <div id="region-state-city-row" class="hide">
+		 <div class="bd-hr-form-item clearfix">
+		     <div class="float-left bd-frm-left"><spring:message code="label.state.key"/></div>
+		     <div class="float-left bd-frm-right">
+		         <input class="bd-frm-rt-txt" id="region-state-txt" name="regionState" value="${region.state}">
+		     </div>
+		 </div>
+		 <div class="bd-hr-form-item clearfix">
+		     <div class="float-left bd-frm-left"><spring:message code="label.city.key"/></div>
+		     <div class="float-left bd-frm-right">
+		         <input class="bd-frm-rt-txt" id="region-city-txt" name="regionCity" value="${region.city}">
+		     </div>
+		 </div>
+	 </div>
+	 <div class="bd-hr-form-item clearfix">
+	     <div class="float-left bd-frm-left"><spring:message code="label.zipcode.key"/></div>
+	     <div class="float-left bd-frm-right">
+	         <input class="bd-frm-rt-txt" id="region-zipcode-txt" name="regionZipcode" value="${region.zipcode}">
+	     </div>
+	 </div>
+	 <div class="bd-hr-form-item clearfix">
 	     <div class="float-left bd-frm-left"></div>
 	     <div class="float-left bd-frm-right">
 	         <div class="bd-frm-rad-wrapper clearfix">
@@ -92,5 +119,44 @@
 			$(this).next("#is-admin-chk").val("true");
 		 }
    });
+	 $("#region-country").autocomplete({
+			minLength: 1,
+			source: countryData,
+			delay : 0,
+			open : function(event, ui) {
+				$( "#region-country-code" ).val("");
+			},
+			focus: function(event, ui) {
+				$( "#region-country" ).val(ui.item.label);
+				return false;
+			},
+			select: function(event, ui) {
+				$("#region-country").val(ui.item.label);
+				$("#region-country-code").val(ui.item.code);
+				for (var i = 0; i < postCodeRegex.length; i++) {
+					if (postCodeRegex[i].code == ui.item.code) {
+						selectedCountryRegEx = "^" + postCodeRegex[i].regex + "$";
+						selectedCountryRegEx = new RegExp(selectedCountryRegEx);
+						break;
+					}
+				}
+				if(ui.item.code=="US"){
+					$('#region-state-city-row').show();
+					/* callAjaxGET("", function(data){
+						
+					}, true); */
+				}else{
+					$('#region-state-city-row').hide();
+					$('#region-state-city-row input').val('');
+				}
+				return false;
+			},
+			close: function(event, ui) {},
+			create: function(event, ui) {
+		        $('.ui-helper-hidden-accessible').remove();
+			}
+		}).autocomplete("instance")._renderItem = function(ul, item) {
+			return $("<li>").append(item.label).appendTo(ul);
+	  	};
 });
 </script>

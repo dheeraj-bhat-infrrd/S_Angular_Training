@@ -12,7 +12,6 @@
         http://www.springframework.org/schema/tx
         http://www.springframework.org/schema/tx/spring-tx.xsd">
 
-
 	<!-- Data source details. It is pointing to jndi which is currently configured 
 		in JBoss -->
     
@@ -21,7 +20,6 @@
 		 <value>${JNDI_NAME}</value>
 		 </property>
 	</bean> -->
-
 
 	<bean id="sessionFactory"
 		class="org.springframework.orm.hibernate4.LocalSessionFactoryBean">
@@ -43,29 +41,22 @@
 		</property>
 		<property name="annotatedClasses">
 			<list>
-				<value>com.realtech.socialsurvey.core.entities.AccountsMaster
-				</value>
+				<value>com.realtech.socialsurvey.core.entities.AccountsMaster</value>
 				<value>com.realtech.socialsurvey.core.entities.Branch</value>
 				<value>com.realtech.socialsurvey.core.entities.Company</value>
-				<value>com.realtech.socialsurvey.core.entities.CompanyInvitationLicenseKey
-				</value>
+				<value>com.realtech.socialsurvey.core.entities.CompanyInvitationLicenseKey</value>
 				<value>com.realtech.socialsurvey.core.entities.DisabledAccount</value>
 				<value>com.realtech.socialsurvey.core.entities.LicenseDetail</value>
-				<value>com.realtech.socialsurvey.core.entities.OrganizationLevelSetting
-				</value>
-				<value>com.realtech.socialsurvey.core.entities.ProfilesMaster
-				</value>
+				<value>com.realtech.socialsurvey.core.entities.OrganizationLevelSetting</value>
+				<value>com.realtech.socialsurvey.core.entities.ProfilesMaster</value>
 				<value>com.realtech.socialsurvey.core.entities.Region</value>
-				<value>com.realtech.socialsurvey.core.entities.RetriedTransaction
-				</value>
+				<value>com.realtech.socialsurvey.core.entities.RetriedTransaction</value>
 				<value>com.realtech.socialsurvey.core.entities.Survey</value>
 				<value>com.realtech.socialsurvey.core.entities.SurveyCompanyMapping</value>
-				<value>com.realtech.socialsurvey.core.entities.SurveyQuestion
-				</value>
-				<value>com.realtech.socialsurvey.core.entities.SurveyQuestionsAnswerOption
-				</value>
-				<value>com.realtech.socialsurvey.core.entities.SurveyQuestionsMapping
-				</value>
+				<value>com.realtech.socialsurvey.core.entities.SurveyQuestion</value>
+				<value>com.realtech.socialsurvey.core.entities.SurveyQuestionsAnswerOption</value>
+				<value>com.realtech.socialsurvey.core.entities.SurveyQuestionsMapping</value>
+				<value>com.realtech.socialsurvey.core.entities.SurveyVerticalMapping</value>
 				<value>com.realtech.socialsurvey.core.entities.User</value>
 				<value>com.realtech.socialsurvey.core.entities.UserInvite</value>
 				<value>com.realtech.socialsurvey.core.entities.UserProfile</value>
