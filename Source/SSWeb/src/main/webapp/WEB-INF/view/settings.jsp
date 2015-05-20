@@ -343,7 +343,7 @@
 	}
 </style>
 
-<script src="${pageContext.request.contextPath}/resources/js/settings.js"></script>
+<script src="${initParam.resourcesPath}/resources/js/settings.js"></script>
 <script>
 $(document).ready(function() {
 	hideOverlay();

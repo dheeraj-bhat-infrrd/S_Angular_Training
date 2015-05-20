@@ -10,6 +10,6 @@ import org.springframework.context.support.ClassPathXmlApplicationContext;
 public class BatchStarter {
 
 	public static void main(String[] args){
-		@SuppressWarnings("unused") ApplicationContext context = new ClassPathXmlApplicationContext("ss-starter-config.xml");
+		@SuppressWarnings({ "unused", "resource" }) ApplicationContext context = new ClassPathXmlApplicationContext("ss-starter-config.xml");
 	}
 }

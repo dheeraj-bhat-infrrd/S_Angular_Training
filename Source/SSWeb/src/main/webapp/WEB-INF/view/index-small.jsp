@@ -7,14 +7,14 @@
     <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Home Page</title>
-    <link rel="shortcut icon" href="${pageContext.request.contextPath}/favicon.ico" sizes="16x16">
-    <link rel="stylesheet" href="${pageContext.request.contextPath}/resources/css/bootstrap.min.css">
+    <link rel="shortcut icon" href="${initParam.resourcesPath}/favicon.ico" sizes="16x16">
+    <link rel="stylesheet" href="${initParam.resourcesPath}/resources/css/bootstrap.min.css">
 <!--
-    <link rel="stylesheet" href="${pageContext.request.contextPath}/resources/css/style-common-1.1.css">
-    <link rel="stylesheet" href="${pageContext.request.contextPath}/resources/css/style-resp-1.1.css">
+    <link rel="stylesheet" href="${initParam.resourcesPath}/resources/css/style-common-1.1.css">
+    <link rel="stylesheet" href="${initParam.resourcesPath}/resources/css/style-resp-1.1.css">
 -->
-    <link rel="stylesheet" href="${pageContext.request.contextPath}/resources/css/style-common-1.1-small.css">
-    <link rel="stylesheet" href="${pageContext.request.contextPath}/resources/css/style-resp-1.1-small.css">
+    <link rel="stylesheet" href="${initParam.resourcesPath}/resources/css/style-common-1.1-small.css">
+    <link rel="stylesheet" href="${initParam.resourcesPath}/resources/css/style-resp-1.1-small.css">
 </head>
 <body class="index-body">
     
@@ -141,12 +141,12 @@
 
     </div>
     
-    <script src="${pageContext.request.contextPath}/resources/js/jquery-2.1.1.min.js"></script>
-    <script src="${pageContext.request.contextPath}/resources/js/bootstrap.min.js"></script>
-    <script src="${pageContext.request.contextPath}/resources/js/script-1.1.js"></script>
-    <script src="${pageContext.request.contextPath}/resources/js/common.js"></script>
-    <script src="${pageContext.request.contextPath}/resources/js/script.js"></script>
-    <script src="${pageContext.request.contextPath}/resources/js/index.js"></script>
+    <script src="${initParam.resourcesPath}/resources/js/jquery-2.1.1.min.js"></script>
+    <script src="${initParam.resourcesPath}/resources/js/bootstrap.min.js"></script>
+    <script src="${initParam.resourcesPath}/resources/js/script-1.1.js"></script>
+    <script src="${initParam.resourcesPath}/resources/js/common.js"></script>
+    <script src="${initParam.resourcesPath}/resources/js/script.js"></script>
+    <script src="${initParam.resourcesPath}/resources/js/index.js"></script>
     <script>
         $(document).ready(function(){
             resizeFunc();
