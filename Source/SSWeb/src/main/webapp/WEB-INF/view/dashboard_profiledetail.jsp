@@ -11,7 +11,7 @@
 		<div class="dsh-g-wrap dsh-g-wrap-1">
 			<div class="dsh-graph-item dsh-graph-item-1">
 				<div id="dg-img-1" class="dsh-graph-img"></div>
-				<div id="srv-scr" class="dsh-graph-num">${socialScore}/5</div>
+				<div id="srv-scr" class="dsh-graph-num">${socialScore}</div>
 				<div class="dsh-graph-txt dsh-graph-txt-1"><spring:message code="label.surveyscore.key" /></div>
 			</div>
 		</div>
