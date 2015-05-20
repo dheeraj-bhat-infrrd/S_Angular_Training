@@ -273,8 +273,8 @@ $(document).ready(function(){
   	function hideStateCityRow() {
   		$('#office-state-city-row').hide();
   		$('#office-state-city-row input').val('');
-  		$('#office-state-txt').prop('selected', function() {
-  	        return this.defaultSelected;
+  		$('#office-state-txt').val(function() {
+  			return $(this).find('option[selected]').text();
   	    });
   	}
 });

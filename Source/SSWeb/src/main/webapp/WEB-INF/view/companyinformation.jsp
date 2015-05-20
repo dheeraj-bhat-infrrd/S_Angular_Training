@@ -319,8 +319,8 @@ function showStateCityRow() {
 function hideStateCityRow() {
 	$('#state-city-row').hide();
 	$('#com-city').val('');
-	$('#com-state').prop('selected', function() {
-        return this.defaultSelected;
+	$('#com-state').val(function() {
+		return $(this).find('option[selected]').text();
     });
 }
 
