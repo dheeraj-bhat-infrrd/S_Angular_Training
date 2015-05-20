@@ -128,8 +128,8 @@ $(document).ready(function(){
   	function hideStateCityRow() {
   		$('#prof-state').hide().val('');
 		$('#prof-city').hide();
-  		$('#prof-state').prop('selected', function() {
-  	        return this.defaultSelected;
+  		$('#prof-state').val(function() {
+  			return $(this).find('option[selected]').text();
   	    });
   	}
 });

@@ -225,9 +225,9 @@
   	function hideStateCityRow() {
   		$('#region-state-city-row').hide();
   		$('#region-state-city-row input').val('');
-  		$('#region-state-txt').prop('selected', function() {
-  	        return this.defaultSelected;
-  	    });
+  		$('#region-state-txt').val(function() {
+  			return $(this).find('option[selected]').text();	
+		});
   	}
 });
 </script>
