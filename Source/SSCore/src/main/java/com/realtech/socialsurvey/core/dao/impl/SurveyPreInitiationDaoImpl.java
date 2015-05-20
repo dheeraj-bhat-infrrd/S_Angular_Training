@@ -1,6 +1,7 @@
 package com.realtech.socialsurvey.core.dao.impl;
 
 import java.sql.Timestamp;
+import java.util.Date;
 import java.util.List;
 import java.util.Set;
 import org.hibernate.Criteria;
@@ -73,11 +74,11 @@ public class SurveyPreInitiationDaoImpl extends GenericDaoImpl<SurveyPreInitiati
 		return processedRecords;
 	}
 
+	// Method to get list of incomplete surveys to display in Dash board and profile page.
 	@SuppressWarnings("unchecked")
 	@Override
-	public List<SurveyPreInitiation> getIncompleteSurvey(Timestamp startDate, Timestamp endDate, int start, int row, Set<Long> agentIds, 
-			boolean isCompanyAdmin, long companyId)
-			throws DatabaseException {
+	public List<SurveyPreInitiation> getIncompleteSurvey(Timestamp startDate, Timestamp endDate, int start, int row, Set<Long> agentIds,
+			boolean isCompanyAdmin, long companyId) throws DatabaseException {
 		Criteria criteria = getSession().createCriteria(SurveyPreInitiation.class);
 		try {
 			if (startDate != null)
@@ -89,9 +90,9 @@ public class SurveyPreInitiationDaoImpl extends GenericDaoImpl<SurveyPreInitiati
 			if (start > 0)
 				criteria.setFirstResult(start);
 
-			if(!isCompanyAdmin && agentIds.size() > 0)
+			if (!isCompanyAdmin && agentIds.size() > 0)
 				criteria.add(Restrictions.in(CommonConstants.AGENT_ID_COLUMN, agentIds));
-			else{
+			else {
 				criteria.add(Restrictions.eq(CommonConstants.COMPANY_ID_COLUMN, companyId));
 			}
 
@@ -101,6 +102,26 @@ public class SurveyPreInitiationDaoImpl extends GenericDaoImpl<SurveyPreInitiati
 		catch (HibernateException e) {
 			LOG.error("Exception caught in getIncompleteSurvey() ", e);
 			throw new DatabaseException("Exception caught in getIncompleteSurvey() ", e);
+		}
+	}
+
+	// Method to get incomplete survey list for sending reminder mail.
+	@SuppressWarnings("unchecked")
+	@Override
+	public List<SurveyPreInitiation> getIncompleteSurveyForReminder(long companyId, int surveyReminderInterval, int maxReminders) {
+		LOG.info("Method getIncompleteSurveyForReminder() started.");
+		Criteria criteria = getSession().createCriteria(SurveyPreInitiation.class);
+		try {
+			criteria.add(Restrictions.eq(CommonConstants.COMPANY_ID_COLUMN, companyId));
+			criteria.add(Restrictions.le("lastReminderTime", new Timestamp(new Date().getTime() - surveyReminderInterval * 24 * 60 * 60 * 1000)));
+			if(maxReminders > 0)
+				criteria.add(Restrictions.lt("reminderCounts", maxReminders));
+			LOG.info("Method getIncompleteSurveyForReminder() finished.");
+			return criteria.list();
+		}
+		catch (HibernateException e) {
+			LOG.error("Exception caught in getIncompleteSurveyForReminder() ", e);
+			throw new DatabaseException("Exception caught in getIncompleteSurveyForReminder() ", e);
 		}
 	}
 }
