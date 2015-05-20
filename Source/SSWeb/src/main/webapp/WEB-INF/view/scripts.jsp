@@ -26,6 +26,7 @@
 <script src="${pageContext.request.contextPath}/resources/ckeditor/ckeditor.js"></script>
 <script src="${pageContext.request.contextPath}/resources/ckeditor/adapters/jquery.js"></script>
 <script src="${pageContext.request.contextPath}/resources/js/editprofiledropdown.js"></script>
+<script src="${pageContext.request.contextPath}/resources/js/settingsdropdown.js"></script>
 <script src="${pageContext.request.contextPath}/resources/js/linkedin_import.js"></script>
 <script src="${pageContext.request.contextPath}/resources/js/bootstrap-datepicker.js"></script>
 <script>

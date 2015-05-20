@@ -2,6 +2,7 @@ package com.realtech.socialsurvey.core.entities;
 
 import java.io.Serializable;
 import java.sql.Timestamp;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -60,6 +61,22 @@ public class Branch implements Serializable {
 
 	@Transient
 	private String address2;
+	
+	@Transient
+	private String country;
+	
+	@Transient
+	private String countryCode;
+	
+	@Transient
+	private String state;
+	
+	@Transient
+	private String city;
+	
+	@Transient
+	private String zipcode;
+
 
 	// bi-directional many-to-one association to Company
 	@ManyToOne(fetch = FetchType.LAZY)
@@ -167,6 +184,50 @@ public class Branch implements Serializable {
 
 	public void setAddress2(String address2) {
 		this.address2 = address2;
+	}
+	
+	public String getCountry() {
+		return country;
+	}
+
+	public void setCountry(String country) {
+		this.country = country;
+	}
+
+	public String getCountryCode() {
+		return countryCode;
+	}
+
+	public void setCountryCode(String countryCode) {
+		this.countryCode = countryCode;
+	}
+
+	public String getState() {
+		return state;
+	}
+
+	public void setState(String state) {
+		this.state = state;
+	}
+
+	public String getCity() {
+		return city;
+	}
+
+	public void setCity(String city) {
+		this.city = city;
+	}
+
+	public String getZipcode() {
+		return zipcode;
+	}
+
+	public void setZipcode(String zipcode) {
+		this.zipcode = zipcode;
+	}
+
+	public static long getSerialversionuid() {
+		return serialVersionUID;
 	}
 
 	public String getProfileName() {

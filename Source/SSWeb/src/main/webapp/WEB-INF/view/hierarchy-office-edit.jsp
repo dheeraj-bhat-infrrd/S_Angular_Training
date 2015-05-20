@@ -65,6 +65,33 @@
     </div>
 </div>
 <div class="bd-hr-form-item clearfix">
+    <div class="float-left bd-frm-left"><spring:message code="label.country.key"/></div>
+    <div class="float-left bd-frm-right">
+        <input class="bd-frm-rt-txt" id="office-country" name="officeCountry" value="${branch.country}"/>
+        <input type="hidden" value="${branch.countryCode}" name="officeCountrycode" id="office-country-code">
+    </div>
+</div>
+<div id="office-state-city-row" class="hide">
+	<div class="bd-hr-form-item clearfix">
+	    <div class="float-left bd-frm-left"><spring:message code="label.state.key"/></div>
+	    <div class="float-left bd-frm-right">
+	        <input class="bd-frm-rt-txt" name="officeState" value="${branch.state}"/>
+	    </div>
+	</div>
+	<div class="bd-hr-form-item clearfix">
+	    <div class="float-left bd-frm-left"><spring:message code="label.city.key"/></div>
+	    <div class="float-left bd-frm-right">
+	        <input class="bd-frm-rt-txt" name="officeCity" value="${branch.city}"/>
+	    </div>
+	</div>
+</div>
+<div class="bd-hr-form-item clearfix">
+    <div class="float-left bd-frm-left"><spring:message code="label.zipcode.key"/></div>
+    <div class="float-left bd-frm-right">
+        <input class="bd-frm-rt-txt" name="officeZipcode" value="${branch.zipcode}"/>
+    </div>
+</div>
+<div class="bd-hr-form-item clearfix">
     <div class="float-left bd-frm-left"></div>
     <div class="float-left bd-frm-right">
         <div class="bd-frm-rad-wrapper clearfix">
@@ -137,5 +164,44 @@ $(document).ready(function(){
 			$(this).next("#is-admin-chk").val("true");
 		 }
    });
+	 $("#office-country").autocomplete({
+			minLength: 1,
+			source: countryData,
+			delay : 0,
+			open : function(event, ui) {
+				$( "#office-country-code" ).val("");
+			},
+			focus: function(event, ui) {
+				$( "#office-country" ).val(ui.item.label);
+				return false;
+			},
+			select: function(event, ui) {
+				$("#office-country").val(ui.item.label);
+				$("#office-country-code").val(ui.item.code);
+				for (var i = 0; i < postCodeRegex.length; i++) {
+					if (postCodeRegex[i].code == ui.item.code) {
+						selectedCountryRegEx = "^" + postCodeRegex[i].regex + "$";
+						selectedCountryRegEx = new RegExp(selectedCountryRegEx);
+						break;
+					}
+				}
+				if(ui.item.code=="US"){
+					$('#office-state-city-row').show();
+					/* callAjaxGET("", function(data){
+						
+					}, true); */
+				}else{
+					$('#office-state-city-row').hide();
+					$('#office-state-city-row input').val('');
+				}
+				return false;
+			},
+			close: function(event, ui) {},
+			create: function(event, ui) {
+		        $('.ui-helper-hidden-accessible').remove();
+			}
+		}).autocomplete("instance")._renderItem = function(ul, item) {
+			return $("<li>").append(item.label).appendTo(ul);
+	  	};
 });
 </script>

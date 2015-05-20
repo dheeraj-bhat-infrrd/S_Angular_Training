@@ -293,7 +293,6 @@
         padding: 0 !important;
     }
     .st-score-txt, .st-score-rt{
-        width: 100%;
         padding: 10px;
     }
     .st-score-txt{
@@ -728,6 +727,10 @@
     .sq-txt-area{
         width: 100%;
     }
+    .pst-srvy{
+    	max-width: 100%;
+    	padding: 0 10px;
+    }
     .sq-smile{
         /* width: 50px; */
     }
@@ -1123,12 +1126,21 @@
     .soc-nw-wrapper {
         padding: 10px;
         margin: 0 auto;
-        width: 200px;
+        width: 100%;
     }
-    .soc-nw-adj {
-        margin-right: 0;
-    }
-    .float-right.header-right.clearfix.hr-dsh-adj-rt{
+    .st-social-score {
+		min-height: 80px;
+	}
+	.soc-nw-adj {
+		margin: 0 auto 5px auto;
+		float: none;
+	}
+	.soc-nw-icn-link {
+		width: 100%;
+		text-align: center;
+		float: none !important;
+	}
+	.float-right.header-right.clearfix.hr-dsh-adj-rt{
         margin-top: 0;
     }
     .row.row-dash-top-adj {
@@ -1469,7 +1481,7 @@
     .hm-sub-header-left{
         font-size: 18px;
     }
-    .st-score-txt, .st-score-rt{
+    .st-score-txt{
         width: 100%;
         border-right: 0;
     }
@@ -1616,10 +1628,13 @@
         margin-top: 15px;
     }
     .soc-nw-wrapper {
-        padding: 0px 130px 0;
+        padding: 0px 20px 0;
+    }
+    .soc-nw-icn-link{
+    	width: 230px;
     }
     .soc-nw-adj {
-        margin-right: 100px;
+        margin-right: 10px;
     }
     .score-rt-post{
         width: 290px;
@@ -1814,7 +1829,7 @@
         padding: 10px 35px 0px;
     }
     .soc-nw-adj {
-        margin-right: 40px;
+        margin-right: 20px;
     }
     .srv-tbl-txt{
         width: 680px !important;
