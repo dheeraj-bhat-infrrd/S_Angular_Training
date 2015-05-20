@@ -38,7 +38,7 @@
 					<div class="wc-div-txt float-left"><spring:message code="label.or.key" /></div>
 					<div class="wc-edit-photo-cont-col float-left">
 						<div class="float-left">
-							<div id="wc-photo-upload" class="wc-photo-upload cursor-pointer"></div>
+							<div id="wc-photo-upload" class="wc-photo-upload"></div>
 							<form class="hide" enctype="multipart/form-data">
 								<input type='file' id="prof-image" />
 							</form>
