@@ -261,27 +261,37 @@ public class SessionHelper {
 	 * Method to update user profiles in session
 	 * @throws NonFatalException 
 	 */
+	@SuppressWarnings("unchecked")
 	public void updateProcessedUserProfiles(HttpSession session, User user) throws NonFatalException {
 		LOG.info("Method updateProcessedUserProfiles() called from SessionHelper");
+
+		UserProfile selectedProfile = (UserProfile) session.getAttribute(CommonConstants.USER_PROFILE);
 		AccountType accountType = (AccountType) session.getAttribute(CommonConstants.ACCOUNT_TYPE_IN_SESSION);
+		Map<Long, AbridgedUserProfile> profileAbridgedMap = (Map<Long, AbridgedUserProfile>) session.getAttribute(CommonConstants.USER_PROFILE_LIST);
+		Map<Long, UserProfile> profileMap = (Map<Long, UserProfile>) session.getAttribute(CommonConstants.USER_PROFILE_MAP);
+		
+		if (profileMap == null) {
+			profileMap = new HashMap<Long, UserProfile>();
+		}
 
 		List<UserProfile> profiles = userManagementService.getAllUserProfilesForUser(user);
-		UserProfile selectedProfile = profiles.get(CommonConstants.INITIAL_INDEX);
-		for (UserProfile profile : profiles) {
-			if (profile.getProfilesMaster().getProfileId() == CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID) {
-				selectedProfile = profile;
-				break;
+		if (selectedProfile == null) {
+			selectedProfile = profiles.get(CommonConstants.INITIAL_INDEX);
+			for (UserProfile profile : profiles) {
+				if (profile.getProfilesMaster().getProfileId() == CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID) {
+					selectedProfile = profile;
+					break;
+				}
 			}
+			session.setAttribute(CommonConstants.USER_PROFILE, selectedProfile);
 		}
-		Map<Long, UserProfile> profileMap = new HashMap<Long, UserProfile>();
-		Map<Long, AbridgedUserProfile> profileAbridgedMap = userManagementService.processedUserProfiles(user, accountType, profileMap, profiles);
 
 		// updating session with aggregated user profiles, if not set
+		profileAbridgedMap = userManagementService.processedUserProfiles(user, accountType, profileMap, profiles);
 		if (profileAbridgedMap.size() > 0) {
 			session.setAttribute(CommonConstants.USER_PROFILE_LIST, profileAbridgedMap);
 			session.setAttribute(CommonConstants.PROFILE_NAME_COLUMN, profileAbridgedMap.get(selectedProfile.getUserProfileId()).getUserProfileName());
 		}
-		session.setAttribute(CommonConstants.USER_PROFILE, selectedProfile);
 		session.setAttribute(CommonConstants.USER_PROFILE_MAP, profileMap);
 
 		LOG.info("Method updateProcessedUserProfiles() finished from SessionHelper");
