@@ -27,6 +27,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.commons.ProfileCompletionList;
@@ -77,6 +78,7 @@ import com.realtech.socialsurvey.core.services.search.exception.SolrException;
 import com.realtech.socialsurvey.core.utils.DisplayMessageConstants;
 import com.realtech.socialsurvey.core.utils.EmailFormatHelper;
 import com.realtech.socialsurvey.core.utils.EncryptionHelper;
+import com.realtech.socialsurvey.core.utils.ZipCodeExclusionStrategy;
 
 @DependsOn("generic")
 @Component
@@ -3122,8 +3124,13 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 	@Transactional
 	public String getZipCodesByStateId(int stateId) {
 	    LOG.debug("Method getZipCodesByStateId called to fetch the list of cities and zipcodes in the state");
-		List<ZipCodeLookup> zipCodes = (List<ZipCodeLookup>) zipCodeLookupDao.findByColumn(ZipCodeLookup.class, "stateId", stateId);
-		return new Gson().toJson(zipCodes);
+	    StateLookup state = stateLookupDao.findById(StateLookup.class, stateId);
+		List<ZipCodeLookup> zipCodes = (List<ZipCodeLookup>) zipCodeLookupDao.findByColumn(ZipCodeLookup.class, "stateLookup", state);
+		Gson gson = new GsonBuilder().setExclusionStrategies(new ZipCodeExclusionStrategy()).create();
+		for(ZipCodeLookup s : zipCodes){
+			gson.toJson(s);
+		}
+		return gson.toJson(zipCodes);
     }
 
 }

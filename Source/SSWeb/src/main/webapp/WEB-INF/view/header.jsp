@@ -15,6 +15,7 @@
 	<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<title><spring:message code="label.login.title.key" /></title>
+
 	<link rel="shortcut icon" href="${initParam.resourcesPath}/favicon.ico" sizes="16x16">
 	<link rel="stylesheet" href="${initParam.resourcesPath}/resources/css/bootstrap.min.css">
 	<link rel="stylesheet" href="${initParam.resourcesPath}/resources/jcrop/jquery.Jcrop.min.css">
@@ -24,7 +25,6 @@
 	<link rel="stylesheet" href="${initParam.resourcesPath}/resources/css/style-common-1.1.css">
 	<link rel="stylesheet" href="${initParam.resourcesPath}/resources/css/style-resp.css">
 	<link rel="stylesheet" href="${initParam.resourcesPath}/resources/css/style-resp-1.1.css">
-	<link rel="stylesheet" href="${initParam.resourcesPath}/resources/css/perfect-scrollbar.css">
 	<link rel="stylesheet" href="${initParam.resourcesPath}/resources/css/perfect-scrollbar.min.css">
 </head>
 <body>
@@ -176,3 +176,10 @@
 			<div id="header-menu-icn" class="header-menu-icn icn-menu hide float-right"></div>
 		</div>
 	</div>
+	<script>
+		$(document).ready(function(){
+			$('.header-links-item').on('click',function(){
+				 window.location.href = $(this).find('a').attr('href');
+			});
+		});
+	</script>
