@@ -10,14 +10,14 @@
 	<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<title><spring:message code="label.survey.title.key" /></title>
-	<link rel="shortcut icon" href="${pageContext.request.contextPath}/favicon.ico" sizes="16x16">
-	<link rel="stylesheet" href="${pageContext.request.contextPath}/resources/css/bootstrap.min.css">
-	<link rel="stylesheet" href="${pageContext.request.contextPath}/resources/css/style.css">
-	<link rel="stylesheet" href="${pageContext.request.contextPath}/resources/css/style-common.css">
-	<link rel="stylesheet" href="${pageContext.request.contextPath}/resources/css/style-resp.css">
-	<link rel="stylesheet" href="${pageContext.request.contextPath}/resources/css/rangeslider.css">
-	<link rel="stylesheet" href="${pageContext.request.contextPath}/resources/css/style-common-1.1.css">
-	<link rel="stylesheet" href="${pageContext.request.contextPath}/resources/css/style-resp-1.1.css">
+	<link rel="shortcut icon" href="${initParam.resourcesPath}/favicon.ico" sizes="16x16">
+	<link rel="stylesheet" href="${initParam.resourcesPath}/resources/css/bootstrap.min.css">
+	<link rel="stylesheet" href="${initParam.resourcesPath}/resources/css/style.css">
+	<link rel="stylesheet" href="${initParam.resourcesPath}/resources/css/style-common.css">
+	<link rel="stylesheet" href="${initParam.resourcesPath}/resources/css/style-resp.css">
+	<link rel="stylesheet" href="${initParam.resourcesPath}/resources/css/rangeslider.css">
+	<link rel="stylesheet" href="${initParam.resourcesPath}/resources/css/style-common-1.1.css">
+	<link rel="stylesheet" href="${initParam.resourcesPath}/resources/css/style-resp-1.1.css">
 	<script src='//www.google.com/recaptcha/api.js'></script>
 </head>
 
@@ -91,7 +91,7 @@
 						<span class="err-new-close"></span><span id="err-nw-txt"></span>
 					</div>
 					<div class="sq-rat-wrapper">
-						<form id="survey-request-form" action="${pageContext.request.contextPath}/rest/survey/triggersurvey">
+						<form id="survey-request-form" action="${initParam.resourcesPath}/rest/survey/triggersurvey">
 							<div
 								class="sq-star-wrapper sq-i-container clearfix ques-wrapper-adj">
 								<div class="clearfix sq-info-wrapper">
@@ -349,24 +349,24 @@
 	<script src="https://www.google.com/recaptcha/api/challenge?k=6LdlHOsSAAAAAM8ypy8W2KXvgMtY2dFsiQT3HVq-"></script>
 </div>
  -->
-<script src="${pageContext.request.contextPath}/resources/js/jquery-2.1.1.min.js"></script>
-<script src="${pageContext.request.contextPath}/resources/js/bootstrap.min.js"></script>
-<script src="${pageContext.request.contextPath}/resources/js/common.js"></script>
+<script src="${initParam.resourcesPath}/resources/js/jquery-2.1.1.min.js"></script>
+<script src="${initParam.resourcesPath}/resources/js/bootstrap.min.js"></script>
+<script src="${initParam.resourcesPath}/resources/js/common.js"></script>
 <script src="https://www.google.com/jsapi?autoload={'modules':[{'name':'visualization','version':'1','packages':['corechart']}]}"></script>
-<script src="${pageContext.request.contextPath}/resources/js/common.js"></script>
-<script src="${pageContext.request.contextPath}/resources/js/script.js"></script>
-<script src="${pageContext.request.contextPath}/resources/js/usermanagement.js"></script>
+<script src="${initParam.resourcesPath}/resources/js/common.js"></script>
+<script src="${initParam.resourcesPath}/resources/js/script.js"></script>
+<script src="${initParam.resourcesPath}/resources/js/usermanagement.js"></script>
 <script src="https://js.braintreegateway.com/v2/braintree.js"></script>
-<script src="${pageContext.request.contextPath}/resources/js/rangeslider.min.js"></script>
-<script src="${pageContext.request.contextPath}/resources/js/proList.js"></script>
-<script src="${pageContext.request.contextPath}/resources/js/rangeslider.min.js"></script>
-<script src="${pageContext.request.contextPath}/resources/js/surveyQuestion.js"></script>
-<script src="${pageContext.request.contextPath}/resources/js/progressbar.min.js"></script>
-<script src="${pageContext.request.contextPath}/resources/js/editprofile.js"></script>
-<script src="${pageContext.request.contextPath}/resources/js/dashboard.js"></script>
-<script src="${pageContext.request.contextPath}/resources/js/editprofile.js"></script>
-<script src="${pageContext.request.contextPath}/resources/js/hierarchy-management.js"></script>
-<script src="${pageContext.request.contextPath}/resources/js/googletracking.js"></script>
+<script src="${initParam.resourcesPath}/resources/js/rangeslider.min.js"></script>
+<script src="${initParam.resourcesPath}/resources/js/proList.js"></script>
+<script src="${initParam.resourcesPath}/resources/js/rangeslider.min.js"></script>
+<script src="${initParam.resourcesPath}/resources/js/surveyQuestion.js"></script>
+<script src="${initParam.resourcesPath}/resources/js/progressbar.min.js"></script>
+<script src="${initParam.resourcesPath}/resources/js/editprofile.js"></script>
+<script src="${initParam.resourcesPath}/resources/js/dashboard.js"></script>
+<script src="${initParam.resourcesPath}/resources/js/editprofile.js"></script>
+<script src="${initParam.resourcesPath}/resources/js/hierarchy-management.js"></script>
+<script src="${initParam.resourcesPath}/resources/js/googletracking.js"></script>
 <script>
 $(document).ready(function() {
 	$("div[data-ques-type]").hide();

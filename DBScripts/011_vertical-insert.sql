@@ -1,3 +1,4 @@
+use ss_user;
 #Verticals insert statements
 INSERT INTO `ss_user`.`VERTICALS_MASTER` VALUES (2,'ACCOUNTING',1,NOW(),'1',NOW(),'1');
 INSERT INTO `ss_user`.`VERTICALS_MASTER` VALUES (3,'AVIATION',1,NOW(),'1',NOW(),'1');

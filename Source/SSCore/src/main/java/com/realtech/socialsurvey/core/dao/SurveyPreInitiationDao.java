@@ -29,4 +29,6 @@ public interface SurveyPreInitiationDao extends GenericDao<SurveyPreInitiation, 
 	public List<SurveyPreInitiation> getIncompleteSurvey(Timestamp startTime, Timestamp endTime, int start, int row, Set<Long> agentIds,
 			boolean isCompanyAdmin, long companyId) throws InvalidInputException;
 
+	public List<SurveyPreInitiation> getIncompleteSurveyForReminder(long companyId, int surveyReminderInterval, int maxReminders);
+
 }
