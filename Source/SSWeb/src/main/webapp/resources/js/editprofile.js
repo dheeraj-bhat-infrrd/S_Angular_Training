@@ -417,6 +417,7 @@ $('#overlay-cancel').click(function() {
 	$('#overlay-continue').unbind('click');
 	$('body').css('overflow','auto');
 	overlayRevert();
+	$('#prof-image').val('');
 });
 
 function createEditAddressPopup(header, body) {
@@ -525,10 +526,6 @@ $(document).on('change', '#prof-logo', function() {
 });
 
 // Function to crop and upload profile image
-$(document).on('change', '#prof-image', function() {
-	initiateJcrop(this);
-});
-
 function callBackOnProfileImageUpload(data) {
 	$('#prof-message-header').html(data);
 

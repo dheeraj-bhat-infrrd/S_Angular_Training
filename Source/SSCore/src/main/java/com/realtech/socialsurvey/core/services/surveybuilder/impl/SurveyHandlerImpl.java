@@ -309,11 +309,12 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean {
 	 * been passed since the last mail was sent.
 	 */
 	@Override
-	public List<SurveyDetails> getIncompleteSurveyCustomersEmail(long companyId) {
+	@Transactional
+	public List<SurveyPreInitiation> getIncompleteSurveyCustomersEmail(long companyId) {
 		LOG.info("started.");
 		int surveyReminderInterval = 0;
 		int maxReminders = 0;
-		List<SurveyDetails> incompleteSurveyCustomers = new ArrayList<>();
+		List<SurveyPreInitiation> incompleteSurveyCustomers = new ArrayList<>();
 		OrganizationUnitSettings organizationUnitSettings = organizationUnitSettingsDao.fetchOrganizationUnitSettingsById(companyId,
 				MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION);
 		// Fetching surveyReminderInterval and max number of reminders for a company.
@@ -326,7 +327,9 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean {
 				}
 			}
 		}
-		incompleteSurveyCustomers = surveyDetailsDao.getIncompleteSurveyCustomers(companyId, surveyReminderInterval, maxReminders);
+//		incompleteSurveyCustomers = surveyDetailsDao.getIncompleteSurveyCustomers(companyId, surveyReminderInterval, maxReminders);
+		incompleteSurveyCustomers = surveyPreInitiationDao.getIncompleteSurveyForReminder(companyId, surveyReminderInterval, maxReminders);
+		// TODO do above code using mysql...should be simple
 		LOG.info("finished.");
 		return incompleteSurveyCustomers;
 	}
