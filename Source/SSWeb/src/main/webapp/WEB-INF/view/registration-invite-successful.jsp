@@ -10,21 +10,21 @@
 <title><spring:message
 		code="label.registrationinvitesuccessful.title.key" /></title>
 <link rel="shortcut icon"
-	href="${pageContext.request.contextPath}/favicon.ico" sizes="16x16">
+	href="${initParam.resourcesPath}/favicon.ico" sizes="16x16">
 <link rel="stylesheet"
-	href="${pageContext.request.contextPath}/resources/css/bootstrap.min.css">
+	href="${initParam.resourcesPath}/resources/css/bootstrap.min.css">
 <link rel="stylesheet"
-	href="${pageContext.request.contextPath}/resources/css/style.css">
+	href="${initParam.resourcesPath}/resources/css/style.css">
 <link rel="stylesheet"
-	href="${pageContext.request.contextPath}/resources/css/style-common.css">
+	href="${initParam.resourcesPath}/resources/css/style-common.css">
 <link rel="stylesheet"
-	href="${pageContext.request.contextPath}/resources/css/style-resp.css">
+	href="${initParam.resourcesPath}/resources/css/style-resp.css">
 <link rel="stylesheet"
-	href="${pageContext.request.contextPath}/resources/css/rangeslider.css">
+	href="${initParam.resourcesPath}/resources/css/rangeslider.css">
 <link rel="stylesheet"
-	href="${pageContext.request.contextPath}/resources/css/style-common-1.1.css">
+	href="${initParam.resourcesPath}/resources/css/style-common-1.1.css">
 <link rel="stylesheet"
-	href="${pageContext.request.contextPath}/resources/css/style-resp-1.1.css">
+	href="${initParam.resourcesPath}/resources/css/style-resp-1.1.css">
 </head>
 <body>
 	<div id="toast-container" class="toast-container">
@@ -73,10 +73,10 @@
 		src="//ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
 	<script>
 		if (!window.jQuery) {
-			document.write('<script src="${pageContext.request.contextPath}/resources/js/jquery-2.1.1.min.js""><\/script>');
+			document.write('<script src="${initParam.resourcesPath}/resources/js/jquery-2.1.1.min.js""><\/script>');
 		}
 	</script>
-	<script src="${pageContext.request.contextPath}/resources/js/script.js"></script>
+	<script src="${initParam.resourcesPath}/resources/js/script.js"></script>
 	<script type="text/javascript">
 		$(document).ready(function(){
 			
