@@ -417,6 +417,7 @@ $('#overlay-cancel').click(function() {
 	$('#overlay-continue').unbind('click');
 	$('body').css('overflow','auto');
 	overlayRevert();
+	$('#prof-image').val('');
 });
 
 function createEditAddressPopup(header, body) {
@@ -523,6 +524,25 @@ $(document).on('change', '#prof-logo', function() {
 		}, false, formData);
 	}, 1000);
 });
+
+// Function to crop and upload profile image
+function callBackOnProfileImageUpload(data) {
+	$('#prof-message-header').html(data);
+
+	callAjaxGET("./fetchprofileimage.do", function(data) {
+		$('#prof-img-container').html(data);
+		var profileImageUrl = $('#prof-image-edit').css("background-image");
+		if (profileImageUrl == undefined || profileImageUrl == "none") {
+			return;
+		}
+		adjustImage();
+		hideOverlay();
+	});
+
+	$('#overlay-toast').html($('#display-msg-div').text().trim());
+	showToast();
+	loadDisplayPicture();
+}
 
 // Agent details
 $(document).on('focus', '.prof-edditable-sin-agent', function() {
