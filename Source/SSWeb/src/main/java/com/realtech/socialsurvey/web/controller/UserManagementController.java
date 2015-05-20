@@ -24,7 +24,6 @@ import com.amazonaws.util.json.JSONObject;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
-import com.realtech.socialsurvey.core.entities.AbridgedUserProfile;
 import com.realtech.socialsurvey.core.entities.AgentSettings;
 import com.realtech.socialsurvey.core.entities.Branch;
 import com.realtech.socialsurvey.core.entities.BranchFromSearch;
@@ -998,18 +997,13 @@ public class UserManagementController {
 				session.setAttribute(CommonConstants.POPUP_FLAG_IN_SESSION, CommonConstants.NO_STRING);
 			}
 
-			// updating session with selected user profile if not set
+			// updating session with signup path params
 			LOG.debug("Updating session with selected user profile if not set");
 			boolean showLinkedInPopup = false;
 			boolean showSendSurveyPopup = false;
-			Map<Long, UserProfile> profileMap = new HashMap<Long, UserProfile>();
 			List<UserProfile> profiles = userManagementService.getAllUserProfilesForUser(user);
-			UserProfile selectedProfile = profiles.get(CommonConstants.INITIAL_INDEX);
 			for (UserProfile profile : profiles) {
 				if (profile.getProfilesMaster().getProfileId() == CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID) {
-					selectedProfile = profile;
-
-					// setting linkedin popup attribute
 					showLinkedInPopup = true;
 					showSendSurveyPopup = true;
 					break;
@@ -1017,18 +1011,9 @@ public class UserManagementController {
 			}
 			model.addAttribute("showLinkedInPopup", String.valueOf(showLinkedInPopup));
 			model.addAttribute("showSendSurveyPopup", String.valueOf(showSendSurveyPopup));
-			session.setAttribute(CommonConstants.USER_PROFILE, selectedProfile);
 
 			// updating session with aggregated user profiles, if not set
-			LOG.debug("Updating session with aggregated user profiles, if not set");
-			Map<Long, AbridgedUserProfile> profileAbridgedMap = userManagementService.processedUserProfiles(user, accountType, profileMap,
-					user.getUserProfiles());
-			if (profileAbridgedMap.size() > 0) {
-				session.setAttribute(CommonConstants.USER_PROFILE_LIST, profileAbridgedMap);
-				session.setAttribute(CommonConstants.PROFILE_NAME_COLUMN, profileAbridgedMap.get(selectedProfile.getUserProfileId())
-						.getUserProfileName());
-			}
-			session.setAttribute(CommonConstants.USER_PROFILE_MAP, profileMap);
+			sessionHelper.updateProcessedUserProfiles(session, user);
 
 			// update the last login time and number of logins
 			userManagementService.updateUserLoginTimeAndNum(user);

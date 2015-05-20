@@ -1217,17 +1217,22 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 		if (iden <= 0l) {
 			throw new InvalidInputException("iden is invalid while fetching incomplete reviews");
 		}
-		// String idenColumnName = getIdenColumnNameFromProfileLevel(profileLevel);
-		Set<Long> agentIds = getAgentIdsByProfileLevel(profileLevel, iden);
+		boolean isCompanyAdmin = false;
+		Set<Long> agentIds = new HashSet<>();
+		if (profileLevel.equalsIgnoreCase(CommonConstants.PROFILE_LEVEL_COMPANY)) {
+			isCompanyAdmin = true;
+		}
+		else {
+			agentIds = getAgentIdsByProfileLevel(profileLevel, iden);
+		}
 		Timestamp startTime = null;
 		Timestamp endTime = null;
 		if (startDate != null)
 			startTime = new Timestamp(startDate.getTime());
 		if (endDate != null)
 			endTime = new Timestamp(endDate.getTime());
-		List<SurveyPreInitiation> surveys = surveyPreInitiationDao.getIncompleteSurvey(startTime, endTime, startIndex, numOfRows, agentIds);
-		// surveyDetails = surveyDetailsDao.getIncompleteSurvey(idenColumnName, iden, startIndex,
-		// numOfRows, startScore, limitScore, startDate, endDate);
+		List<SurveyPreInitiation> surveys = surveyPreInitiationDao.getIncompleteSurvey(startTime, endTime, startIndex, numOfRows, agentIds,
+				isCompanyAdmin, iden);
 		return surveys;
 	}
 
@@ -1479,21 +1484,18 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 		}
 		Map<String, Object> queries = new HashMap<>();
 		queries.put(CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_ACTIVE);
-		List<User> users = null;
+		List<UserProfile> users = null;
 		Set<Long> userIds = new HashSet<>();
 		switch (profileLevel) {
-			case CommonConstants.PROFILE_LEVEL_COMPANY:
-				Company company = companyDao.findById(Company.class, iden);
-				queries.put(CommonConstants.COMPANY_COLUMN, company);
-				users = userDao.findByKeyValue(User.class, queries);
-				break;
 			case CommonConstants.PROFILE_LEVEL_REGION:
-				queries.put("userprofile.regionId", iden);
-				users = userDao.findByKeyValue(User.class, queries);
+				queries.put("regionId", iden);
+				queries.put("profilesMaster", userManagementService.getProfilesMasterById(CommonConstants.PROFILES_MASTER_REGION_ADMIN_PROFILE_ID));
+				users = userProfileDao.findByKeyValue(UserProfile.class, queries);
 				break;
 			case CommonConstants.PROFILE_LEVEL_BRANCH:
-				queries.put("userprofile.branchId", iden);
-				users = userDao.findByKeyValue(User.class, queries);
+				queries.put("branchId", iden);
+				queries.put("profilesMaster", userManagementService.getProfilesMasterById(CommonConstants.PROFILES_MASTER_BRANCH_ADMIN_PROFILE_ID));
+				users = userProfileDao.findByKeyValue(UserProfile.class, queries);
 				break;
 			case CommonConstants.PROFILE_LEVEL_INDIVIDUAL:
 				userIds.add(iden);
@@ -1501,11 +1503,8 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 			default:
 				throw new InvalidInputException("Invalid profile level while getting iden column name");
 		}
-		for (User user : users) {
-			for (UserProfile profile : user.getUserProfiles()) {
-				if (profile.getProfilesMaster().getProfileId() == CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID)
-					userIds.add(user.getUserId());
-			}
+		for (UserProfile user : users) {
+			userIds.add(user.getUser().getUserId());
 		}
 		return userIds;
 	}

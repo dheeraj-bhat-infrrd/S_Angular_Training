@@ -26,6 +26,7 @@ public interface SurveyPreInitiationDao extends GenericDao<SurveyPreInitiation, 
 	 */
 	public List<EngagementProcessingStatus> getProcessedIds(String source, Timestamp timestamp) throws InvalidInputException;
 
-	public List<SurveyPreInitiation> getIncompleteSurvey(Timestamp startTime, Timestamp endTime, int start, int row, Set<Long> agentIds) throws InvalidInputException;
+	public List<SurveyPreInitiation> getIncompleteSurvey(Timestamp startTime, Timestamp endTime, int start, int row, Set<Long> agentIds,
+			boolean isCompanyAdmin, long companyId) throws InvalidInputException;
 
 }
