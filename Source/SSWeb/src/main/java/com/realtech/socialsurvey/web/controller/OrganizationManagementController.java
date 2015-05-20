@@ -24,6 +24,7 @@ import org.springframework.web.multipart.MultipartFile;
 import com.amazonaws.util.json.JSONException;
 import com.amazonaws.util.json.JSONObject;
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.entities.AbridgedUserProfile;
 import com.realtech.socialsurvey.core.entities.AccountsMaster;
@@ -59,6 +60,7 @@ import com.realtech.socialsurvey.core.utils.DisplayMessageConstants;
 import com.realtech.socialsurvey.core.utils.EmailFormatHelper;
 import com.realtech.socialsurvey.core.utils.EncryptionHelper;
 import com.realtech.socialsurvey.core.utils.MessageUtils;
+import com.realtech.socialsurvey.core.utils.StateLookupExclusionStrategy;
 import com.realtech.socialsurvey.web.common.JspResolver;
 
 // JIRA: SS-24 BY RM02 BOC
@@ -186,6 +188,7 @@ public class OrganizationManagementController {
 					model.addAttribute("zipCode", zipCode);
 					model.addAttribute("state", state);
 					model.addAttribute("city", city);
+					model.addAttribute("vertical", vertical);
 					model.addAttribute("companyContactNo", companyContactNo);
 					model.addAttribute("isDirectRegistration", strIsDirectRegistration);
 				}
@@ -1247,7 +1250,11 @@ public class OrganizationManagementController {
 	@RequestMapping(value = "/getusstatelist", method = RequestMethod.GET)
 	public String getUsStateList(HttpServletRequest request) {
 		List<StateLookup> lookups = organizationManagementService.getUsStateList();
-		String usStateList = new Gson().toJson(lookups);
+		Gson gson = new GsonBuilder().setExclusionStrategies(new StateLookupExclusionStrategy()).create();
+		for(StateLookup s : lookups){
+			gson.toJson(s);
+		}
+		String usStateList = gson.toJson(lookups);
 		return usStateList;
 	}
 	

@@ -24,7 +24,6 @@
 	<link rel="stylesheet" href="${pageContext.request.contextPath}/resources/css/style-common-1.1.css">
 	<link rel="stylesheet" href="${pageContext.request.contextPath}/resources/css/style-resp.css">
 	<link rel="stylesheet" href="${pageContext.request.contextPath}/resources/css/style-resp-1.1.css">
-	<link rel="stylesheet" href="${pageContext.request.contextPath}/resources/css/perfect-scrollbar.css">
 	<link rel="stylesheet" href="${pageContext.request.contextPath}/resources/css/perfect-scrollbar.min.css">
 </head>
 <body>
@@ -176,3 +175,10 @@
 			<div id="header-menu-icn" class="header-menu-icn icn-menu hide float-right"></div>
 		</div>
 	</div>
+	<script>
+		$(document).ready(function(){
+			$('.header-links-item').on('click',function(){
+				 window.location.href = $(this).find('a').attr('href');
+			});
+		});
+	</script>
