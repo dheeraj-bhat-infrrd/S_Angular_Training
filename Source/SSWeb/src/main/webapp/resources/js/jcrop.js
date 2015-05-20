@@ -27,8 +27,20 @@ function initiateJcrop(input) {
 		reader.onload = function(e) {
 			var myImage = new Image();
 			myImage.src = e.target.result;
-			$('#target').width(imageMaxWidth);
-			$('#target').height(imageMaxHeight);
+			
+			if (myImage.width > myImage.height && myImage.width > imageMaxWidth) {
+				// landscape image
+				$('#target').width(imageMaxWidth);
+			}
+			else if (myImage.width <= myImage.height && myImage.height > imageMaxHeight) {
+				// portrait image
+				$('#target').height(imageMaxHeight);
+			}
+			else {
+				$('#target').width(imageMaxWidth);
+				$('#target').height(imageMaxHeight);
+			}
+			
 			$('#target').attr('src', e.target.result);
 			$('#target').removeClass('hide');
 			
@@ -36,7 +48,7 @@ function initiateJcrop(input) {
 
 			$('#target').Jcrop({
 				aspectRatio : 1,
-				setSelect : [ 50, 0, 200, 200 ],
+				setSelect : [ 50, 50, 200, 200 ],
 				onSelect : updatePreview,
 				onChange : updatePreview,
 				trackDocument : true
