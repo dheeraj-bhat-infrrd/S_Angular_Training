@@ -77,6 +77,10 @@ public class ProfileViewController {
 			model.addAttribute("message", message);
 			return JspResolver.MESSAGE_HEADER;
 		}
+		
+		// making case insensitive
+		profileName = profileName.toLowerCase();
+		
 		model.addAttribute("companyProfileName", profileName);
 		model.addAttribute("profileLevel", CommonConstants.PROFILE_LEVEL_COMPANY);
 		LOG.info("Service to initiate company profile page executed successfully");
@@ -108,6 +112,11 @@ public class ProfileViewController {
 			model.addAttribute("message", message);
 			return JspResolver.MESSAGE_HEADER;
 		}
+		
+		// making case insensitive
+		companyProfileName = companyProfileName.toLowerCase();
+		regionProfileName = regionProfileName.toLowerCase();
+
 		model.addAttribute("companyProfileName", companyProfileName);
 		model.addAttribute("regionProfileName", regionProfileName);
 		model.addAttribute("profileLevel", CommonConstants.PROFILE_LEVEL_REGION);
@@ -139,6 +148,11 @@ public class ProfileViewController {
 			model.addAttribute("message", message);
 			return JspResolver.MESSAGE_HEADER;
 		}
+		
+		// making case insensitive
+		companyProfileName = companyProfileName.toLowerCase();
+		branchProfileName = branchProfileName.toLowerCase();
+		
 		model.addAttribute("companyProfileName", companyProfileName);
 		model.addAttribute("branchProfileName", branchProfileName);
 		model.addAttribute("profileLevel", CommonConstants.PROFILE_LEVEL_BRANCH);
@@ -164,6 +178,9 @@ public class ProfileViewController {
 			model.addAttribute("message", message);
 			return JspResolver.MESSAGE_HEADER;
 		}
+		
+		// making case insensitive
+		agentProfileName = agentProfileName.toLowerCase();
 		
 		// check for profiles and redirect to company if admin only
 		try {

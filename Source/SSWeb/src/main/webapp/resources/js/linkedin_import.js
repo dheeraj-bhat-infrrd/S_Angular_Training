@@ -5,7 +5,7 @@ function showLinkedInProfileUrl(data) {
 	
 	$('#wl-import-btn').remove();
 	$('#wl-import-btn-msg').removeClass('hide');
-	$('#wc-connect-link').html('LinkedIn Profile <u><a href=' + data + '>' + data + '</a></u>');
+	$('#wc-connect-link').html('LinkedIn Profile <u><a href=' + data + ' target="_blank">' + data + '</a></u>');
 }
 
 function authenticate(socialNetwork) {

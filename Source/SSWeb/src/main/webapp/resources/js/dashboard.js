@@ -372,7 +372,8 @@ function getReviewsCountAndShowReviews(columnName, columnValue) {
 					orientation: "bottom auto",
 					format: 'mm/dd/yyyy',
 					endDate: fromEndDate,
-					todayHighlight : true,
+					todayHighlight: true,
+					clearBtn: true,
 					autoclose: true
 				})
 				.on('changeDate', function(selected){
@@ -384,8 +385,9 @@ function getReviewsCountAndShowReviews(columnName, columnValue) {
 				$("#dsh-end-date").datepicker({
 					orientation: "bottom auto",
 					format: 'mm/dd/yyyy',
-					todayHighlight : true,
 					endDate: toEndDate,
+					todayHighlight: true,
+					clearBtn: true,
 					autoclose: true
 				})
 				.on('changeDate', function(selected){
