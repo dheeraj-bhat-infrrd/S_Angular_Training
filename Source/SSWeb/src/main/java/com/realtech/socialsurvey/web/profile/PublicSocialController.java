@@ -27,6 +27,7 @@ import twitter4j.auth.RequestToken;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
+import com.realtech.socialsurvey.core.exception.NonFatalException;
 import com.realtech.socialsurvey.core.services.social.SocialManagementService;
 import com.realtech.socialsurvey.web.common.JspResolver;
 import facebook4j.Facebook;
@@ -270,21 +271,21 @@ public class PublicSocialController {
 			// Getting Oauth accesstoken for Twitter
 			twitter4j.auth.AccessToken accessToken = null;
 			Twitter twitter = socialManagementService.getTwitterInstance();
-			while (null == accessToken) {
-				String oauthVerifier = request.getParameter("oauth_verifier");
-				RequestToken requestToken = (RequestToken) session.getAttribute(CommonConstants.SOCIAL_REQUEST_TOKEN);
-				try {
-					accessToken = twitter.getOAuthAccessToken(requestToken, oauthVerifier);
-				}
-				catch (TwitterException te) {
-					if (TwitterException.UNAUTHORIZED == te.getStatusCode()) {
-						LOG.info("Unable to get the access token. Reason: UNAUTHORISED");
-					}
-					else {
-						LOG.error(te.getErrorMessage());
-					}
-				}
+			String oauthVerifier = request.getParameter("oauth_verifier");
+			RequestToken requestToken = (RequestToken) session.getAttribute(CommonConstants.SOCIAL_REQUEST_TOKEN);
+			try {
+				accessToken = twitter.getOAuthAccessToken(requestToken, oauthVerifier);
 			}
+			catch (TwitterException te) {
+				if (TwitterException.UNAUTHORIZED == te.getStatusCode()) {
+					LOG.error("Unable to get the access token. Reason: UNAUTHORISED");
+				}
+				else {
+					LOG.error(te.getErrorMessage());
+				}
+				throw new NonFatalException("Unable to procure twitter access token");
+			}
+			
 			// Tweeting
 			String twitterMessage = session.getAttribute("rating") + "-Star Survey Response from " + session.getAttribute("firstName") + " "
 					+ session.getAttribute("lastName") + " for " + session.getAttribute("agentName")
