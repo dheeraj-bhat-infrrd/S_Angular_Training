@@ -30,7 +30,9 @@
 		 <div class="bd-hr-form-item clearfix">
 		     <div class="float-left bd-frm-left"><spring:message code="label.state.key"/></div>
 		     <div class="float-left bd-frm-right">
-		         <input class="bd-frm-rt-txt" id="region-state-txt" name="regionState" value="${region.state}">
+		         <select class="bd-frm-rt-txt" id="region-state-txt" name="regionState" data-value="${region.state}">
+		         	<option disabled selected><spring:message code="label.select.state.key"/></option>
+		         </select>
 		     </div>
 		 </div>
 		 <div class="bd-hr-form-item clearfix">
@@ -106,6 +108,15 @@
  </form>
  <script>
  $(document).ready(function(){
+	 var stateList;
+	 var cityLookupList;
+	 var countryCode = $('#region-country-code').val();
+	 if(countryCode == "US"){
+	 	showStateCityRow();
+	 }else{
+		 hideStateCityRow();
+	 }
+	 
 	 $('.bd-check-img').click(function(e) {
 		 $(this).toggleClass('bd-check-img-checked');
 		/**
@@ -120,43 +131,103 @@
 		 }
    });
 	 $("#region-country").autocomplete({
-			minLength: 1,
-			source: countryData,
-			delay : 0,
-			open : function(event, ui) {
-				$( "#region-country-code" ).val("");
-			},
-			focus: function(event, ui) {
-				$( "#region-country" ).val(ui.item.label);
-				return false;
-			},
-			select: function(event, ui) {
-				$("#region-country").val(ui.item.label);
-				$("#region-country-code").val(ui.item.code);
-				for (var i = 0; i < postCodeRegex.length; i++) {
-					if (postCodeRegex[i].code == ui.item.code) {
-						selectedCountryRegEx = "^" + postCodeRegex[i].regex + "$";
-						selectedCountryRegEx = new RegExp(selectedCountryRegEx);
-						break;
-					}
+		minLength: 1,
+		source: countryData,
+		delay : 0,
+		open : function(event, ui) {
+			$( "#region-country-code" ).val("");
+		},
+		focus: function(event, ui) {
+			$( "#region-country" ).val(ui.item.label);
+			return false;
+		},
+		select: function(event, ui) {
+			$("#region-country").val(ui.item.label);
+			$("#region-country-code").val(ui.item.code);
+			for (var i = 0; i < postCodeRegex.length; i++) {
+				if (postCodeRegex[i].code == ui.item.code) {
+					selectedCountryRegEx = "^" + postCodeRegex[i].regex + "$";
+					selectedCountryRegEx = new RegExp(selectedCountryRegEx);
+					break;
 				}
-				if(ui.item.code=="US"){
-					$('#region-state-city-row').show();
-					/* callAjaxGET("", function(data){
-						
-					}, true); */
-				}else{
-					$('#region-state-city-row').hide();
-					$('#region-state-city-row input').val('');
-				}
-				return false;
-			},
-			close: function(event, ui) {},
-			create: function(event, ui) {
-		        $('.ui-helper-hidden-accessible').remove();
 			}
-		}).autocomplete("instance")._renderItem = function(ul, item) {
-			return $("<li>").append(item.label).appendTo(ul);
-	  	};
+			if(ui.item.code=="US"){
+				showStateCityRow();
+			}else{
+				hideStateCityRow();
+			}
+			return false;
+		},
+		close: function(event, ui) {},
+		create: function(event, ui) {
+	        $('.ui-helper-hidden-accessible').remove();
+		}
+	}).autocomplete("instance")._renderItem = function(ul, item) {
+		return $("<li>").append(item.label).appendTo(ul);
+  	};
+  	$('#region-state-txt').on('change',function(e){
+  		$('#region-city-txt').val('');
+  		var stateId = $(this).find(":selected").attr('data-stateid');
+  		callAjaxGET("./getzipcodesbystateid.do?stateId="+stateId, function(data){
+  			cityLookupList = JSON.parse(data);
+  			var searchData = [];
+  			for(var i=0; i<cityLookupList.length; i++){
+  				searchData[i] = cityLookupList[i].cityname;
+  			}
+  			
+  			var uniqueSearchData = searchData.filter(function(itm,i,a){
+  			    return i==a.indexOf(itm);
+  			});
+  			initializeCityLookup(uniqueSearchData);
+  		}, true);
+  	});
+
+  	$('#region-city-txt').bind('focus', function(){ 
+  		if($('#region-state-txt').val() &&  $('#region-state-txt').val() != ""){
+  			$(this).trigger('keydown');
+  			$(this).autocomplete("search");		
+  		}
+  	});
+  	function initializeCityLookup(searchData){
+  		$('#region-city-txt').autocomplete({
+  			minLength : 0,
+  			source : searchData,
+  			focus : function(event, ui) {
+  				event.stopPropagation();
+  			},
+  			select : function(event, ui) {
+  				event.stopPropagation();
+  			},
+  			open : function() {
+  				$('.ui-autocomplete').perfectScrollbar({
+  					suppressScrollX : true
+  				});
+  				$('.ui-autocomplete').perfectScrollbar('update');
+  			}
+  		});
+  		
+  	}
+  	function showStateCityRow() {
+  		$('#region-state-city-row').show();
+  		if(!stateList){
+  			callAjaxGET("./getusstatelist.do", function(data){
+  				stateList = JSON.parse(data);
+  				for(var i=0; i<stateList.length; i++){
+  					$('#region-state-txt').append('<option data-stateid='+stateList[i].id+'>'+stateList[i].statecode+'</option>');
+  				}
+  			}, true);
+  			var stateVal = $('#region-state-txt').attr('data-value');
+  			 if(stateVal && stateVal != ""){
+  			 	$('#com-state').val(stateVal);
+  			 }
+  		}
+  	}
+  	function hideStateCityRow() {
+  		$('#region-state-city-row').hide();
+  		$('#region-state-city-row input').val('');
+  		$('#region-state-txt').val(function() {
+  			return $(this).find('option[selected]').text();	
+		});
+  	}
 });
 </script>
