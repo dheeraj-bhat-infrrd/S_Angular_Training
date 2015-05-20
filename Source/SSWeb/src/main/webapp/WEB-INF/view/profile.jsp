@@ -8,15 +8,15 @@
     <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title><spring:message code="label.profile.title.key"/></title>
-    <link rel="shortcut icon" href="${pageContext.request.contextPath}/favicon.ico" sizes="16x16">
-    <link rel="stylesheet" href="${pageContext.request.contextPath}/resources/css/perfect-scrollbar.min.css">
-    <link rel="stylesheet" href="${pageContext.request.contextPath}/resources/css/bootstrap.min.css">
-    <link rel="stylesheet" href="${pageContext.request.contextPath}/resources/css/style.css">
-    <link rel="stylesheet" href="${pageContext.request.contextPath}/resources/css/style-common.css">
-    <link rel="stylesheet" href="${pageContext.request.contextPath}/resources/css/style-resp.css">
-    <link rel="stylesheet" href="${pageContext.request.contextPath}/resources/css/rangeslider.css">
-    <link rel="stylesheet" href="${pageContext.request.contextPath}/resources/css/style-common-1.1.css">
-    <link rel="stylesheet" href="${pageContext.request.contextPath}/resources/css/style-resp-1.1.css">
+    <link rel="shortcut icon" href="${initParam.resourcesPath}/favicon.ico" sizes="16x16">
+    <link rel="stylesheet" href="${initParam.resourcesPath}/resources/css/perfect-scrollbar.min.css">
+    <link rel="stylesheet" href="${initParam.resourcesPath}/resources/css/bootstrap.min.css">
+    <link rel="stylesheet" href="${initParam.resourcesPath}/resources/css/style.css">
+    <link rel="stylesheet" href="${initParam.resourcesPath}/resources/css/style-common.css">
+    <link rel="stylesheet" href="${initParam.resourcesPath}/resources/css/style-resp.css">
+    <link rel="stylesheet" href="${initParam.resourcesPath}/resources/css/rangeslider.css">
+    <link rel="stylesheet" href="${initParam.resourcesPath}/resources/css/style-common-1.1.css">
+    <link rel="stylesheet" href="${initParam.resourcesPath}/resources/css/style-resp-1.1.css">
     <script src='//www.google.com/recaptcha/api.js'></script>
 </head>
 <body>
@@ -63,7 +63,7 @@
         <div class="hm-header-row hm-header-row-main clearfix">
             <div class="float-left hm-header-row-left padding-10"><spring:message code="label.readwritesharereviews.key"/></div>
             <div class="float-right hm-find-pro-right clearfix">
-            	<form id="find-pro-form" method="POST" action="${pageContext.request.contextPath}/findapro.do">
+            	<form id="find-pro-form" method="POST" action="${initParam.resourcesPath}/findapro.do">
 		           	<div class="float-left prof-input-header">Find a professional</div>
 		           	<div class="float-left prof-input-cont">
 		           		<input id="find-pro-first-name" name="find-pro-first-name" type="text" placeholder="First Name">
@@ -324,17 +324,17 @@
 </div>
 <!-- EOC -->
 
-<script src="${pageContext.request.contextPath}/resources/js/jquery-2.1.1.min.js"></script>
-<script src="${pageContext.request.contextPath}/resources/js/bootstrap.min.js"></script>
-<script src="${pageContext.request.contextPath}/resources/js/date.js"></script>
-<script src="${pageContext.request.contextPath}/resources/js/script.js"></script>
-<script src="${pageContext.request.contextPath}/resources/js/index.js"></script>
-<script src="${pageContext.request.contextPath}/resources/js/common.js"></script>
-<script src="${pageContext.request.contextPath}/resources/js/profile_common.js"></script>
-<script src="${pageContext.request.contextPath}/resources/js/profile.js"></script>
-<script src="${pageContext.request.contextPath}/resources/js/googletracking.js"></script>
-<script src="${pageContext.request.contextPath}/resources/js/googlemaps.js"></script>
-<script src="${pageContext.request.contextPath}/resources/js/perfect-scrollbar.jquery.min.js"></script>
+<script src="${initParam.resourcesPath}/resources/js/jquery-2.1.1.min.js"></script>
+<script src="${initParam.resourcesPath}/resources/js/bootstrap.min.js"></script>
+<script src="${initParam.resourcesPath}/resources/js/date.js"></script>
+<script src="${initParam.resourcesPath}/resources/js/script.js"></script>
+<script src="${initParam.resourcesPath}/resources/js/index.js"></script>
+<script src="${initParam.resourcesPath}/resources/js/common.js"></script>
+<script src="${initParam.resourcesPath}/resources/js/profile_common.js"></script>
+<script src="${initParam.resourcesPath}/resources/js/profile.js"></script>
+<script src="${initParam.resourcesPath}/resources/js/googletracking.js"></script>
+<script src="${initParam.resourcesPath}/resources/js/googlemaps.js"></script>
+<script src="${initParam.resourcesPath}/resources/js/perfect-scrollbar.jquery.min.js"></script>
 <script>
     $(document).ready(function(){
         adjustImage();

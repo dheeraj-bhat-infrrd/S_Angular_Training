@@ -9,15 +9,15 @@
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
 <title><spring:message code="label.title.invitation.key" /></title>
-<link rel="shortcut icon" href="${pageContext.request.contextPath}/favicon.ico" sizes="16x16">
+<link rel="shortcut icon" href="${initParam.resourcesPath}/favicon.ico" sizes="16x16">
 <link rel="stylesheet"
-	href="${pageContext.request.contextPath}/resources/css/bootstrap.min.css">
+	href="${initParam.resourcesPath}/resources/css/bootstrap.min.css">
 <link rel="stylesheet"
-	href="${pageContext.request.contextPath}/resources/css/style.css">
+	href="${initParam.resourcesPath}/resources/css/style.css">
 <link rel="stylesheet"
-	href="${pageContext.request.contextPath}/resources/css/style-common.css">
+	href="${initParam.resourcesPath}/resources/css/style-common.css">
 <link rel="stylesheet"
-	href="${pageContext.request.contextPath}/resources/css/style-resp.css">
+	href="${initParam.resourcesPath}/resources/css/style-resp.css">
 </head>
 <body>
 	<div id="overlay-toast" class="overlay-toast">Sample error
@@ -112,12 +112,12 @@
 	</div>
 
 	<script
-		src="${pageContext.request.contextPath}/resources/js/jquery-2.1.1.min.js"></script>
+		src="${initParam.resourcesPath}/resources/js/jquery-2.1.1.min.js"></script>
 	<script
-		src="${pageContext.request.contextPath}/resources/js/bootstrap.min.js"></script>
+		src="${initParam.resourcesPath}/resources/js/bootstrap.min.js"></script>
 	<script type="text/javascript"
-		src="${pageContext.request.contextPath}/resources/js/common.js"></script>
-	<script src="${pageContext.request.contextPath}/resources/js/script.js"></script>
+		src="${initParam.resourcesPath}/resources/js/common.js"></script>
+	<script src="${initParam.resourcesPath}/resources/js/script.js"></script>
 
 	<script>
 		$(document)
