@@ -11,7 +11,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 import com.amazonaws.AmazonClientException;
-import com.amazonaws.auth.AWSCredentials;
 import com.amazonaws.auth.BasicAWSCredentials;
 import com.amazonaws.regions.Region;
 import com.amazonaws.regions.Regions;
@@ -204,7 +203,7 @@ public class CloudUploadServiceImpl implements FileUploadService {
 	 */
 	public AmazonS3 createAmazonClient(String endpoint, String bucket) {
 		LOG.debug("Creating Amazon S3 Client");
-		AWSCredentials credentials = new BasicAWSCredentials(accessKey, secretKey);
+		BasicAWSCredentials credentials = new BasicAWSCredentials(accessKey, secretKey);
 		Region region = Region.getRegion(Regions.US_WEST_1);
 
 		AmazonS3 s3Client = new AmazonS3Client(credentials);

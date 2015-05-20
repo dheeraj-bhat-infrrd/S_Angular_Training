@@ -1,10 +1,5 @@
 package com.realtech.socialsurvey.core.services.upload.impl;
 
-import java.awt.Dimension;
-import java.awt.Graphics2D;
-import java.awt.Rectangle;
-import java.awt.image.BufferedImage;
-import java.awt.image.RasterFormatException;
 import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
@@ -40,25 +35,27 @@ public final class UploadUtils {
 	String imageFormats;
 
 	/**
-	 * Method to validate image
+	 * Method to validate File
 	 */
 	public void validateFile(File convFile) throws InvalidInputException {
 		LOG.debug("Validating uploaded image");
 		if (!imageFormat(convFile)) {
-			throw new InvalidInputException("Upload failed: Not valid Format", DisplayMessageConstants.INVALID_LOGO_FORMAT + "(" + imageFormats + ")");
+			throw new InvalidInputException("Upload failed: Not valid Format", DisplayMessageConstants.INVALID_LOGO_FORMAT
+					+ "(" + imageFormats + ")");
 		}
 		if (!imageSize(convFile)) {
-			throw new InvalidInputException("Upload Failed: MAX size exceeded", DisplayMessageConstants.INVALID_LOGO_SIZE + "(" + maxBytes + "bytes)");
+			throw new InvalidInputException("Upload Failed: MAX size exceeded", DisplayMessageConstants.INVALID_LOGO_SIZE
+					+ "(" + maxBytes + "bytes)");
 		}
 		if (!imageDimension(convFile)) {
-			throw new InvalidInputException("Upload Failed: MAX dimensions exceeded", DisplayMessageConstants.INVALID_LOGO_DIMENSIONS + "("
-					+ maxWidth + " x " + maxHeight + " pixels)");
+			throw new InvalidInputException("Upload Failed: MAX dimensions exceeded", DisplayMessageConstants.INVALID_LOGO_DIMENSIONS
+					+ "(" + maxWidth + " x " + maxHeight + " pixels)");
 		}
 		LOG.debug("Validated uploaded image");
 	}
-
+	
 	/**
-	 * Method to validate image size
+	 * Method to validate logo image size for a company
 	 */
 	public boolean imageSize(File logo) {
 		LOG.debug("Validation imageSize method inside ImageUploadServiceImpl called");
@@ -66,13 +63,12 @@ public final class UploadUtils {
 	}
 
 	/**
-	 * Method to validate image format
+	 * Method to validate logo image format for a company
 	 */
 	public boolean imageFormat(File logo) {
 		LOG.debug("Validation imageFormat method inside ImageUploadServiceImpl called");
 		ImageInputStream imageStream = null;
 		ImageReader reader = null;
-		
 		try {
 			imageStream = ImageIO.createImageInputStream(logo);
 			Iterator<ImageReader> readers = ImageIO.getImageReaders(imageStream);
@@ -81,9 +77,9 @@ public final class UploadUtils {
 				reader = readers.next();
 				reader.setInput(imageStream, true, true);
 
-				// Find the format of the image and match with allowed extensions
+				// Find the format of the image and converting to upper to match with allowed extensions
 				String formatName = reader.getFormatName().toUpperCase();
-				LOG.debug("Format of the file: " + formatName);
+				LOG.debug("Format of the file: "+formatName);
 				String[] listFormats = imageFormats.split(",");
 				Set<String> setFormats = new HashSet<String>(Arrays.asList(listFormats));
 
@@ -92,7 +88,6 @@ public final class UploadUtils {
 					return true;
 				}
 			}
-			
 			LOG.debug("Validation imageFormat method inside ImageUploadServiceImpl completed successfully");
 			return false;
 		}
@@ -116,14 +111,13 @@ public final class UploadUtils {
 	}
 
 	/**
-	 * Method to validate image dimension
+	 * Method to validate logo image dimension for a company
 	 */
 	public boolean imageDimension(File logo) {
 		LOG.debug("Validation imageDimension method inside ImageUploadServiceImpl called");
 		ImageInputStream imageStream = null;
 		ImageReader reader = null;
-		
-		if (maxWidth == -1 && maxHeight == -1) {
+		if(maxWidth == -1 && maxHeight == -1) {
 			return true;
 		}
 		try {
@@ -160,97 +154,5 @@ public final class UploadUtils {
 				LOG.error("IOException occured while closing the ImageReader/ImageInputStream. Reason : " + e.getMessage(), e);
 			}
 		}
-	}
-
-	/**
-	 * Method to resize image to given dimensions
-	 */
-	public void resizeImage(String inputImagePath, String outputImagePath, int scaledWidth, int scaledHeight) throws IOException {
-		LOG.debug("Method resizeImage() called from UploadUtils");
-		// reads input image
-		File inputFile = new File(inputImagePath);
-		BufferedImage inputImage = ImageIO.read(inputFile);
-
-		// creates output image
-		BufferedImage outputImage = new BufferedImage(scaledWidth, scaledHeight, inputImage.getType());
-
-		// scales the input image to the output image
-		Graphics2D g2d = outputImage.createGraphics();
-		g2d.drawImage(inputImage, 0, 0, scaledWidth, scaledHeight, null);
-		g2d.dispose();
-
-		// extracts extension of output file
-		String formatName = outputImagePath.substring(outputImagePath.lastIndexOf(".") + 1);
-
-		// writes to output file
-		ImageIO.write(outputImage, formatName, new File(outputImagePath));
-		LOG.debug("Method resizeImage() called from UploadUtils");
-	}
-
-	/**
-	 * Method to crop image to given co-ordinates
-	 */
-	public BufferedImage cropImage(BufferedImage img, int cropWidth, int cropHeight, int cropStartX, int cropStartY) {
-		LOG.debug("Method cropImage() called from UploadUtils");
-
-		Rectangle clip;
-		BufferedImage clipped = null;
-		boolean isClipAreaAdjusted = false;
-		Dimension size = new Dimension(cropWidth, cropHeight);
-
-		// Checking for negative X Co-ordinate
-		if (cropStartX < 0) {
-			cropStartX = 0;
-			isClipAreaAdjusted = true;
-		}
-		// Checking for negative Y Co-ordinate
-		if (cropStartY < 0) {
-			cropStartY = 0;
-			isClipAreaAdjusted = true;
-		}
-
-		// Checking if the clip area lies outside rectangle
-		if ((size.width + cropStartX) <= img.getWidth() && (size.height + cropStartY) <= img.getHeight()) {
-			// Setting up a clip rectangle when clip area lies within the image.
-			clip = new Rectangle(size);
-			clip.x = cropStartX;
-			clip.y = cropStartY;
-		}
-		else {
-			// Checking if the width of the clip area lies outside the image.
-			// If so, making the image width boundary as the clip width.
-			if ((size.width + cropStartX) > img.getWidth())
-				size.width = img.getWidth() - cropStartX;
-
-			// Checking if the height of the clip area lies outside the image.
-			// If so, making the image height boundary as the clip height.
-			if ((size.height + cropStartY) > img.getHeight())
-				size.height = img.getHeight() - cropStartY;
-
-			// Setting up the clip are based on our clip area size adjustment
-			clip = new Rectangle(size);
-			clip.x = cropStartX;
-			clip.y = cropStartY;
-
-			isClipAreaAdjusted = true;
-		}
-
-		if (isClipAreaAdjusted)
-			LOG.info("Crop Area Lied Outside The Image. Adjusted The Clip Rectangle\n");
-
-		try {
-			int w = clip.width;
-			int h = clip.height;
-
-			clipped = img.getSubimage(clip.x, clip.y, w, h);
-			LOG.info("Image Cropped. New Image Dimension: " + clipped.getWidth() + "w X " + clipped.getHeight() + "h");
-		}
-		catch (RasterFormatException rfe) {
-			LOG.error("Raster format error: " + rfe.getMessage());
-			return null;
-		}
-
-		LOG.debug("Method cropImage() finished from UploadUtils");
-		return clipped;
 	}
 }
