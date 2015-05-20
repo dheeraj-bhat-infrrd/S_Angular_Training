@@ -75,7 +75,8 @@ public class SurveyPreInitiationDaoImpl extends GenericDaoImpl<SurveyPreInitiati
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public List<SurveyPreInitiation> getIncompleteSurvey(Timestamp startDate, Timestamp endDate, int start, int row, Set<Long> agentIds)
+	public List<SurveyPreInitiation> getIncompleteSurvey(Timestamp startDate, Timestamp endDate, int start, int row, Set<Long> agentIds, 
+			boolean isCompanyAdmin, long companyId)
 			throws DatabaseException {
 		Criteria criteria = getSession().createCriteria(SurveyPreInitiation.class);
 		try {
@@ -87,9 +88,13 @@ public class SurveyPreInitiationDaoImpl extends GenericDaoImpl<SurveyPreInitiati
 				criteria.setMaxResults(row);
 			if (start > 0)
 				criteria.setFirstResult(start);
-			if (agentIds.size() > 0)
+
+			if(!isCompanyAdmin && agentIds.size() > 0)
 				criteria.add(Restrictions.in(CommonConstants.AGENT_ID_COLUMN, agentIds));
-			
+			else{
+				criteria.add(Restrictions.eq(CommonConstants.COMPANY_ID_COLUMN, companyId));
+			}
+
 			criteria.addOrder(Order.desc(CommonConstants.MODIFIED_ON_COLUMN));
 			return criteria.list();
 		}
