@@ -1,6 +1,5 @@
 package com.realtech.socialsurvey.core.services.organizationmanagement.impl;
 
-import java.net.MalformedURLException;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -27,10 +26,8 @@ import com.realtech.socialsurvey.core.dao.UserDao;
 import com.realtech.socialsurvey.core.dao.UserInviteDao;
 import com.realtech.socialsurvey.core.dao.UserProfileDao;
 import com.realtech.socialsurvey.core.dao.impl.MongoOrganizationUnitSettingDaoImpl;
-import com.realtech.socialsurvey.core.entities.AbridgedUserProfile;
 import com.realtech.socialsurvey.core.entities.AgentSettings;
 import com.realtech.socialsurvey.core.entities.Branch;
-import com.realtech.socialsurvey.core.entities.BranchFromSearch;
 import com.realtech.socialsurvey.core.entities.BranchSettings;
 import com.realtech.socialsurvey.core.entities.Company;
 import com.realtech.socialsurvey.core.entities.ContactDetailsSettings;
@@ -40,7 +37,6 @@ import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
 import com.realtech.socialsurvey.core.entities.ProListUser;
 import com.realtech.socialsurvey.core.entities.ProfilesMaster;
 import com.realtech.socialsurvey.core.entities.Region;
-import com.realtech.socialsurvey.core.entities.RegionFromSearch;
 import com.realtech.socialsurvey.core.entities.RemovedUser;
 import com.realtech.socialsurvey.core.entities.User;
 import com.realtech.socialsurvey.core.entities.UserApiKey;
@@ -1954,109 +1950,6 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 		LOG.info("Method updateUserOnCompleteRegistration executed successfully");
 
 		return user;
-	}
-
-	@Override
-	public Map<Long, AbridgedUserProfile> processedUserProfiles(User user, AccountType accountType, Map<Long, UserProfile> profileMap,
-			List<UserProfile> profiles) throws NonFatalException {
-		LOG.debug("Method processedUserProfiles() called from UserManagementService");
-
-		// Fetch Regions and Branches from Solr
-		long companyId = user.getCompany().getCompanyId();
-		Map<Long, RegionFromSearch> regions;
-		Map<Long, BranchFromSearch> branches;
-		try {
-			regions = organizationManagementService.fetchRegionsMapByCompany(companyId);
-			branches = organizationManagementService.fetchBranchesMapByCompany(companyId);
-		}
-		catch (InvalidInputException | SolrException | MalformedURLException e) {
-			LOG.error("Exception while fetching regions and branches from solr. Reason : " + e.getMessage(), e);
-			throw new NonFatalException("Exception while fetching regions and branches from solr", e);
-		}
-
-		long branchId = 0;
-		long regionId = 0;
-		boolean agentAdded = false;
-		RegionFromSearch region = null;
-		BranchFromSearch branch = null;
-		Map<Long, AbridgedUserProfile> abridgedUserProfileMap = new HashMap<Long, AbridgedUserProfile>();
-
-		AbridgedUserProfile profileAbridged = null;
-		for (UserProfile profile : profiles) {
-			profileAbridged = new AbridgedUserProfile();
-
-			profileMap.put(profile.getUserProfileId(), profile);
-
-			// updating display name for drop down
-			int profileMasterId = profile.getProfilesMaster().getProfileId();
-			switch (profileMasterId) {
-				case CommonConstants.PROFILES_MASTER_COMPANY_ADMIN_PROFILE_ID:
-					profileAbridged = getAbridgedUserProfile(profileAbridged, profile.getUserProfileId(), user.getCompany().getCompany(), user
-							.getCompany().getCompanyId(), CommonConstants.COMPANY_ID_COLUMN,
-							CommonConstants.PROFILES_MASTER_COMPANY_ADMIN_PROFILE_ID);
-					abridgedUserProfileMap.put(profile.getUserProfileId(), profileAbridged);
-					break;
-
-				case CommonConstants.PROFILES_MASTER_REGION_ADMIN_PROFILE_ID:
-					regionId = profile.getRegionId();
-					if (regionId != 0l) {
-						region = regions.get(regionId);
-					}
-					if (region.getIsDefaultBySystem() != 1) {
-						profileAbridged = getAbridgedUserProfile(profileAbridged, profile.getUserProfileId(), region.getRegionName(), regionId,
-								CommonConstants.REGION_ID_COLUMN, CommonConstants.PROFILES_MASTER_REGION_ADMIN_PROFILE_ID);
-						abridgedUserProfileMap.put(profile.getUserProfileId(), profileAbridged);
-					}
-					regionId = 0;
-					break;
-
-				case CommonConstants.PROFILES_MASTER_BRANCH_ADMIN_PROFILE_ID:
-					branchId = profile.getBranchId();
-					if (branchId != 0l) {
-						branch = branches.get(branchId);
-					}
-					if (branch.getIsDefaultBySystem() != 1) {
-						profileAbridged = getAbridgedUserProfile(profileAbridged, profile.getUserProfileId(), branch.getBranchName(), branchId,
-								CommonConstants.BRANCH_ID_COLUMN, CommonConstants.PROFILES_MASTER_BRANCH_ADMIN_PROFILE_ID);
-						abridgedUserProfileMap.put(profile.getUserProfileId(), profileAbridged);
-					}
-					branchId = 0;
-					break;
-
-				case CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID:
-					if (!agentAdded) {
-						profileAbridged = getAbridgedUserProfile(profileAbridged, profile.getUserProfileId(), CommonConstants.PROFILE_AGENT_VIEW,
-								user.getUserId(), CommonConstants.AGENT_ID_COLUMN, CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID);
-						abridgedUserProfileMap.put(profile.getUserProfileId(), profileAbridged);
-						agentAdded = true;
-					}
-					break;
-
-				default:
-					continue;
-			}
-		}
-		switch (accountType) {
-			case COMPANY:
-			case ENTERPRISE:
-				return abridgedUserProfileMap;
-
-			default:
-		}
-
-		LOG.debug("Method processedUserProfiles() finished from UserManagementService");
-		return new HashMap<Long, AbridgedUserProfile>();
-	}
-
-	private AbridgedUserProfile getAbridgedUserProfile(AbridgedUserProfile profileAbridged, long userProfileId, String userProfileName,
-			long profileId, String profileType, int profileMasterId) {
-		profileAbridged.setUserProfileId(userProfileId);
-		profileAbridged.setUserProfileName(userProfileName);
-		profileAbridged.setProfileName(profileType);
-		profileAbridged.setProfileValue(profileId);
-		profileAbridged.setProfilesMasterId(profileMasterId);
-
-		return profileAbridged;
 	}
 
 	@Override
