@@ -9,6 +9,7 @@
 	<title><spring:message code="label.title.information.key" /></title>
 	<link rel="shortcut icon" href="${pageContext.request.contextPath}/favicon.ico" sizes="16x16">
 	<link rel="stylesheet" href="${pageContext.request.contextPath}/resources/css/bootstrap.min.css">
+	<link rel="stylesheet" href="${pageContext.request.contextPath}/resources/css/perfect-scrollbar.min.css">
 	<link rel="stylesheet" href="${pageContext.request.contextPath}/resources/css/style.css">
 	<link rel="stylesheet" href="${pageContext.request.contextPath}/resources/css/style-common.css">
 	<link rel="stylesheet" href="${pageContext.request.contextPath}/resources/css/style-resp.css">
@@ -100,10 +101,10 @@
 						<div class="float-left rfr_lbl" style="visibility:hidden;"><spring:message code="label.address.key" /></div>
 						<div class="float-left rfr_txt">
 							<div class="rfr_icn icn-state"></div>
-							<div class="rfr_txt_fld">
-							<input class="rfr_input_fld" id="com-state" data-non-empty="true"
-								name="state" value="${state}" placeholder='<spring:message code="label.state.key"/>'>
-								</div>
+							<select class="rfr_txt_fld" id="com-state" data-non-empty="true"
+								name="state" data-value="${state}">
+								<option disabled selected><spring:message code="label.select.state.key"/></option>
+							</select>
 						</div>
 						<div class="float-left rfr_txt">
 							<div class="rfr_icn icn-city"></div>
@@ -128,7 +129,7 @@
 						<div class="float-left rfr_txt">
 							<div class="rfr_icn"></div>
 							<c:if test="${not empty verticals}">
-								<select name="vertical" id="select-vertical" class="rfr_txt_fld">
+								<select name="vertical" id="select-vertical" class="rfr_txt_fld" data-value="${vertical}">
 									<option disabled selected><spring:message code="label.vertical.key"/></option>
 									<c:forEach items="${verticals}" var="vertical">
 										<c:if test="${vertical.verticalsMasterId > 0}">
@@ -153,21 +154,32 @@
 		</div>
 	</div>
 
-<script src="${pageContext.request.contextPath}/resources/js/jquery-2.1.1.min.js"></script>
+<script src="//code.jquery.com/jquery-2.1.1.min.js"></script>
+<script src="//code.jquery.com/ui/1.11.2/jquery-ui.min.js"></script>
 <script src="${pageContext.request.contextPath}/resources/js/bootstrap.min.js"></script>
+<script src="${pageContext.request.contextPath}/resources/js/perfect-scrollbar.jquery.js"></script>
 <script src="${pageContext.request.contextPath}/resources/js/common.js"></script>
 <script src="${pageContext.request.contextPath}/resources/js/script.js"></script>
 <script src="${pageContext.request.contextPath}/resources/js/countrydata.js"></script>
 <script src="${pageContext.request.contextPath}/resources/js/zipcoderegex.js"></script>
-<script src="//code.jquery.com/jquery-1.10.2.js"></script>
-<script src="//code.jquery.com/ui/1.11.2/jquery-ui.js"></script>
 <script>
 var isCompanyInfoPageValid;
 var selectedCountryRegEx = "";
 var stateList;
+var cityLookupList;
 $(document).ready(function() {
 	isCompanyInfoPageValid = false;
 
+	var verticalVal = $('#select-vertical').attr('data-value');
+	if(verticalVal && verticalVal != ""){
+		$('#select-vertical').val(verticalVal);
+	}
+	
+	var countryCode = $('#country-code').val();
+	if(countryCode == "US"){
+		showStateCityRow();
+	}
+	
 	if ($('#message').val() != "") {
 		if ($('#message').attr('data-status') == 'ERROR_MESSAGE') {
 			showError($('#message').val());
@@ -223,13 +235,9 @@ $(document).ready(function() {
 				}
 			}
 			if(ui.item.code=="US"){
-				$('#state-city-row').show();
-				/* callAjaxGET("", function(data){
-					
-				}, true); */
+				showStateCityRow();
 			}else{
-				$('#state-city-row').hide();
-				$('#state-city-row input').val('');
+				hideStateCityRow();
 			}
 			return false;
 		},
@@ -247,6 +255,74 @@ $('#com-company').blur(function() {
 		hideError();
 	}
 });
+
+$('#com-state').on('change',function(e){
+	$('#com-city').val('');
+	var stateId = $(this).find(":selected").attr('data-stateid');
+	callAjaxGET("./getzipcodesbystateid.do?stateId="+stateId, function(data){
+		cityLookupList = JSON.parse(data);
+		var searchData = [];
+		for(var i=0; i<cityLookupList.length; i++){
+			searchData[i] = cityLookupList[i].cityname;
+		}
+		
+		var uniqueSearchData = searchData.filter(function(itm,i,a){
+		    return i==a.indexOf(itm);
+		});
+		initializeCityLookup(uniqueSearchData);
+	}, true);
+});
+
+$('#com-city').bind('focus', function(){ 
+	if($('#com-state').val() &&  $('#com-state').val() != ""){
+		$(this).trigger('keydown');
+		$(this).autocomplete("search");		
+	}
+});
+
+function initializeCityLookup(searchData){
+	$('#com-city').autocomplete({
+		minLength : 0,
+		source : searchData,
+		focus : function(event, ui) {
+			event.stopPropagation();
+		},
+		select : function(event, ui) {
+			event.stopPropagation();
+		},
+		open : function() {
+			$('.ui-autocomplete').perfectScrollbar({
+				suppressScrollX : true
+			});
+			$('.ui-autocomplete').perfectScrollbar('update');
+		}
+	});
+	
+}
+
+function showStateCityRow() {
+	$('#state-city-row').show();
+	if(!stateList){
+		callAjaxGET("./getusstatelist.do", function(data){
+			stateList = JSON.parse(data);
+			for(var i=0; i<stateList.length; i++){
+				$('#com-state').append('<option data-stateid='+stateList[i].id+'>'+stateList[i].statecode+'</option>');
+			}
+			var stateVal = $('#com-state').attr('data-value');
+			if(stateVal && stateVal != ""){
+				$('#com-state').val(stateVal);
+			}
+		}, true);
+	}
+}
+
+function hideStateCityRow() {
+	$('#state-city-row').hide();
+	$('#com-city').val('');
+	$('#com-state').prop('selected', function() {
+        return this.defaultSelected;
+    });
+}
 
 function submitCompanyInfoForm() {
 	console.log("submitting company information form");
