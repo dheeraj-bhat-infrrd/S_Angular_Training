@@ -197,10 +197,6 @@ $(document).on('click', '#prof-image-upload-btn', function() {
 	$('#prof-image').trigger('click');
 });
 
-$(document).on('change', '#prof-image', function() {
-	initiateJcrop(this);
-});
-
 function callBackOnProfileImageUpload(data) {
 	$('#message-header').html(data);
 	callAjaxGET("./fetchuploadedprofileimage.do", function(profileImageUrl) {

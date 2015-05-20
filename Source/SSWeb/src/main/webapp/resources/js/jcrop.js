@@ -4,6 +4,7 @@ var imageMaxHeight = 470;
 var ratio = 1;
 
 $(document).on('change', '#prof-image', function() {
+	overlayRevert();
 	createPopupCanvas();
 	initiateJcrop(this);
 });
@@ -26,12 +27,8 @@ function initiateJcrop(input) {
 		reader.onload = function(e) {
 			var myImage = new Image();
 			myImage.src = e.target.result;
-			if (myImage.width > myImage.height) {
-				$('#target').width(imageMaxWidth);
-			} else {
-				$('#target').width(imageMaxWidth);
-				$('#target').height(imageMaxHeight);
-			}
+			$('#target').width(imageMaxWidth);
+			$('#target').height(imageMaxHeight);
 			$('#target').attr('src', e.target.result);
 			$('#target').removeClass('hide');
 			
@@ -83,24 +80,10 @@ function initiateJcrop(input) {
 				processData : false,
 				cache : false,
 				data : formData,
-				success : function(data) {
-					$('#prof-message-header').html(data);
-
-					callAjaxGET("./fetchprofileimage.do", function(data) {
-						$('#prof-img-container').html(data);
-						var profileImageUrl = $('#prof-image-edit').css("background-image");
-						if (profileImageUrl == undefined || profileImageUrl == "none") {
-							return;
-						}
-						adjustImage();
-					});
-
-					$('#overlay-toast').html($('#display-msg-div').text().trim());
-					showToast();
-					loadDisplayPicture();
-				},
+				success : callBackOnProfileImageUpload,
 				complete : function() {
 					hideOverlay();
+					$('#prof-image').val('');
 				}
 			});
 		});
