@@ -59,7 +59,7 @@ public interface SurveyHandler {
 
 	public Map<String, String> getEmailIdsOfAdminsInHierarchy(long agentId) throws InvalidInputException;
 
-	public List<SurveyDetails> getIncompleteSurveyCustomersEmail(long companyId);
+	public List<SurveyPreInitiation> getIncompleteSurveyCustomersEmail(long companyId);
 
 	public void updateReminderCount(List<Long> agents, List<String> customers);
 
