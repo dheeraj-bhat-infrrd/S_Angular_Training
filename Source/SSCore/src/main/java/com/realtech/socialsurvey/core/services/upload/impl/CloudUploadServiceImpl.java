@@ -114,7 +114,7 @@ public class CloudUploadServiceImpl implements FileUploadService {
 	@Override
 	public void uploadFile(File file, String fileName) throws NonFatalException {
 		LOG.info("Uploading file: " + fileName + " to Amazon S3");
-		if (file == null || fileName == null || fileName.isEmpty()) {
+		if (file == null || !file.exists() || fileName == null || fileName.isEmpty()) {
 			throw new InvalidInputException("Either file or file name is not present");
 		}
 
