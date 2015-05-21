@@ -1203,4 +1203,32 @@ public class SolrSearchServiceImpl implements SolrSearchService {
 		}
 		LOG.info("Method to increase completed survey count updateCompletedSurveyCountForUserInSolr() finished.");
 	}
+	
+	@Override
+	public Map<String, String> getCompanyAdmin(long companyId) throws SolrException{
+		LOG.info("Method getEmailIdOfCompanyAdmin() started");
+		try{SolrServer solrServer;
+		solrServer = new HttpSolrServer(solrUserUrl);
+		SolrQuery solrQuery = new SolrQuery();
+		solrQuery.setQuery(CommonConstants.COMPANY_ID_SOLR + ":" + companyId);
+		solrQuery.addFilterQuery("isOwner" + ":" + "1");
+		QueryResponse response = solrServer.query(solrQuery);
+		SolrDocumentList results = response.getResults();
+		LOG.info("Method getEmailIdOfCompanyAdmin() finished");
+		if (results != null && !results.isEmpty()) {
+			SolrDocument solrDocument = results.get(CommonConstants.INITIAL_INDEX);
+			if(solrDocument != null){
+				Map<String, String> companyAdmin = new HashMap<>();
+				companyAdmin.put("displayName", (String)solrDocument.get("displayName"));
+				companyAdmin.put("loginName", (String)solrDocument.get("loginName"));
+				companyAdmin.put("emailId", (String)solrDocument.get("emailId"));
+				return companyAdmin;
+			}
+		}
+		}catch(SolrServerException e){
+			LOG.error("SolrServerException caught in getEmailIdOfCompanyAdmin(). Nested exception is ", e);
+			throw new SolrException("SolrServerException caught in getEmailIdOfCompanyAdmin(). Nested exception is", e);
+		}
+		return null;
+	}
 }

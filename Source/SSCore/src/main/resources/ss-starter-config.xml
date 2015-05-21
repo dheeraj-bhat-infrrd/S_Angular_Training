@@ -104,6 +104,21 @@
 		</property>
 		<property name="durability" value="true" />
 	</bean>
+	
+	<!-- Setting social feed ingester job detail -->
+	<bean id="deactivatedaccountpurgerjobdetail"
+		class="org.springframework.scheduling.quartz.JobDetailFactoryBean">
+		<property name="jobClass"
+			value="com.realtech.socialsurvey.core.starter.DeactivatedAccountPurger" />
+		<property name="jobDataAsMap">
+			<map>
+				<entry key="organizationManagementService" value-ref="organizationManagementService" />
+				<entry key="solrSearchService" value-ref="solrSearchService" />
+				<entry key="emailServices" value-ref="emailServices" />
+			</map>
+		</property>
+		<property name="durability" value="true" />
+	</bean>
 
 	<!-- setting cron for site map generator -->
 	<bean id="sitemapgeneratorcron"
@@ -139,6 +154,13 @@
 		<property name="jobDetail" ref="socialfeedingesterjobdetail" />
 		<property name="cronExpression" value="0 45 6 * * ?" />
 	</bean>
+	
+	<!-- setting cron for deactivated account purger -->
+	<bean id="deactivatedaccountpurgercron"
+		class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
+		<property name="jobDetail" ref="deactivatedaccountpurgerjobdetail" />
+		<property name="cronExpression" value="* 0/1 * * * ?" />
+	</bean>
 
 	<!-- Scheduler factory -->
 	<bean class="org.springframework.scheduling.quartz.SchedulerFactoryBean">
@@ -149,6 +171,7 @@
 				<ref bean="incompletesurveyjobdetail" />
 				<ref bean="updatesubscriptionpricejobdetail" />
 				<ref bean="socialfeedingesterjobdetail" />
+				<ref bean="deactivatedaccountpurgerjobdetail" />
 			</list>
 		</property>
 
@@ -159,6 +182,7 @@
 				<ref bean="incompletesurveycron" />
 				<ref bean="updatesubscriptionpricecron" />
 				<ref bean="socialfeedingestercron" />
+				<ref bean="deactivatedaccountpurgercron" />
 			</list>
 		</property>
 		<property name="quartzProperties">

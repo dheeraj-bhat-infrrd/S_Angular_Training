@@ -9,12 +9,12 @@ import java.net.MalformedURLException;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
 import org.apache.solr.common.SolrDocumentList;
 import org.noggit.JSONUtil;
 import org.slf4j.Logger;
@@ -25,13 +25,13 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.DependsOn;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
-
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.commons.ProfileCompletionList;
 import com.realtech.socialsurvey.core.commons.Utils;
+import com.realtech.socialsurvey.core.dao.DisabledAccountDao;
 import com.realtech.socialsurvey.core.dao.GenericDao;
 import com.realtech.socialsurvey.core.dao.OrganizationUnitSettingsDao;
 import com.realtech.socialsurvey.core.dao.impl.MongoOrganizationUnitSettingDaoImpl;
@@ -61,6 +61,7 @@ import com.realtech.socialsurvey.core.entities.UserProfile;
 import com.realtech.socialsurvey.core.entities.VerticalsMaster;
 import com.realtech.socialsurvey.core.entities.ZipCodeLookup;
 import com.realtech.socialsurvey.core.enums.AccountType;
+import com.realtech.socialsurvey.core.exception.DatabaseException;
 import com.realtech.socialsurvey.core.exception.FatalException;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.exception.NoRecordsFetchedException;
@@ -106,14 +107,14 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 	private UserManagementService userManagementService;
 
 	@Autowired
-	private GenericDao<DisabledAccount, Long> disabledAccountDao;
+	private GenericDao<StateLookup, Integer> stateLookupDao;
 
 	@Autowired
-	private GenericDao<StateLookup, Integer> stateLookupDao;
-	
-	@Autowired
 	private GenericDao<ZipCodeLookup, Integer> zipCodeLookupDao;
-	
+
+	@Autowired
+	private DisabledAccountDao disabledAccountDao;
+
 	@Autowired
 	private Payment gateway;
 
@@ -132,7 +133,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 	private String neutralText;
 	@Value("${SAD_TEXT}")
 	private String sadText;
-	
+
 	@Value("${HAPPY_TEXT_COMPLETE}")
 	private String happyTextComplete;
 	@Value("${NEUTRAL_TEXT_COMPLETE}")
@@ -205,7 +206,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 		user = userManagementService.getUserByUserId(user.getUserId());
 		userManagementService.setProfilesOfUser(user);
 		solrSearchService.addUserToSolr(user);
-		
+
 		LOG.info("Method addAccountTypeForCompany finished.");
 		return accountType;
 	}
@@ -222,8 +223,9 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 		LOG.debug("Method createDefaultHierarchy started for user : " + user.getLoginName());
 
 		LOG.debug("Adding the default region");
-		//TODO:adding default comapany,state,city,zipcode as null
-		Region region = addNewRegion(user, CommonConstants.DEFAULT_REGION_NAME, CommonConstants.YES, CommonConstants.DEFAULT_ADDRESS, null,null,null,null,null,null);
+		// TODO:adding default comapany,state,city,zipcode as null
+		Region region = addNewRegion(user, CommonConstants.DEFAULT_REGION_NAME, CommonConstants.YES, CommonConstants.DEFAULT_ADDRESS, null, null,
+				null, null, null, null);
 		ProfilesMaster profilesMaster = userManagementService.getProfilesMasterById(CommonConstants.PROFILES_MASTER_REGION_ADMIN_PROFILE_ID);
 
 		LOG.debug("Creating user profile for region admin");
@@ -234,9 +236,9 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 		userProfileDao.save(userProfileRegionAdmin);
 
 		LOG.debug("Adding the default branch");
-		//TODO:setting default country,state,city,zipcode null
+		// TODO:setting default country,state,city,zipcode null
 		Branch branch = addNewBranch(user, region.getRegionId(), CommonConstants.YES, CommonConstants.DEFAULT_BRANCH_NAME,
-				CommonConstants.DEFAULT_ADDRESS, null,null,null,null,null,null);
+				CommonConstants.DEFAULT_ADDRESS, null, null, null, null, null, null);
 		profilesMaster = userManagementService.getProfilesMasterById(CommonConstants.PROFILES_MASTER_BRANCH_ADMIN_PROFILE_ID);
 
 		LOG.debug("Creating user profile for branch admin");
@@ -249,7 +251,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 		/**
 		 * For an individual, a default agent profile is created
 		 */
-		if (accountType == AccountType.INDIVIDUAL || accountType  == AccountType.FREE) {
+		if (accountType == AccountType.INDIVIDUAL || accountType == AccountType.FREE) {
 			profilesMaster = userManagementService.getProfilesMasterById(CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID);
 
 			LOG.debug("Creating user profile for agent");
@@ -266,6 +268,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 
 		LOG.debug("Method createDefaultHierarchy finished.");
 	}
+
 	// JIRA: SS-28: By RM05: EOC
 
 	/**
@@ -364,14 +367,14 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 	 */
 	private void addOrganizationalDetails(User user, Company company, Map<String, String> organizationalDetails) throws InvalidInputException {
 		LOG.debug("Method addOrganizationalDetails called.");
-		
+
 		// create a organization settings object
 		OrganizationUnitSettings companySettings = new OrganizationUnitSettings();
 		companySettings.setIden(company.getCompanyId());
 		if (organizationalDetails.get(CommonConstants.LOGO_NAME) != null) {
 			companySettings.setLogo(organizationalDetails.get(CommonConstants.LOGO_NAME));
 		}
-		
+
 		ContactDetailsSettings contactDetailSettings = new ContactDetailsSettings();
 		contactDetailSettings.setName(company.getCompany());
 		contactDetailSettings.setAddress(organizationalDetails.get(CommonConstants.ADDRESS));
@@ -382,17 +385,17 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 		contactDetailSettings.setCountryCode(organizationalDetails.get(CommonConstants.COUNTRY_CODE));
 		contactDetailSettings.setState(organizationalDetails.get(CommonConstants.STATE));
 		contactDetailSettings.setCity(organizationalDetails.get(CommonConstants.CITY));
-		
+
 		// Add work phone number in contact details
 		ContactNumberSettings contactNumberSettings = new ContactNumberSettings();
 		contactNumberSettings.setWork(organizationalDetails.get(CommonConstants.COMPANY_CONTACT_NUMBER));
 		contactDetailSettings.setContact_numbers(contactNumberSettings);
-		
+
 		// Add work Mail id in contact details
 		MailIdSettings mailIdSettings = new MailIdSettings();
 		mailIdSettings.setWork(user.getEmailId());
 		contactDetailSettings.setMail_ids(mailIdSettings);
-		
+
 		companySettings.setVertical(organizationalDetails.get(CommonConstants.VERTICAL));
 		companySettings.setContact_details(contactDetailSettings);
 		companySettings.setProfileName(generateProfileNameForCompany(company.getCompany(), company.getCompanyId()));
@@ -415,13 +418,13 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 		surveySettings.setShow_survey_above_score(CommonConstants.DEFAULT_AUTOPOST_SCORE);
 		surveySettings.setSurvey_reminder_interval_in_days(CommonConstants.DEFAULT_REMINDERMAIL_INTERVAL);
 		companySettings.setSurvey_settings(surveySettings);
-		
+
 		// set seo content flag
 		companySettings.setSeoContentModified(true);
-		
+
 		// set default profile stages.
-		companySettings.setProfileStages(profileCompletionList.getDefaultProfileCompletionList());	
-		
+		companySettings.setProfileStages(profileCompletionList.getDefaultProfileCompletionList());
+
 		// Setting default values for mail content in Mail content settings of company settings.
 		String takeSurveyMail = "";
 		String takeSurveyReminderMail = "";
@@ -432,27 +435,27 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 			takeSurveyReminderMail = readMailContentFromFile(CommonConstants.SURVEY_REMINDER_MAIL_FILENAME);
 		}
 		catch (IOException e) {
-			LOG.error("IOException occured in addOrganizationalDetails while copying default Email content. Nested exception is ",e);
+			LOG.error("IOException occured in addOrganizationalDetails while copying default Email content. Nested exception is ", e);
 		}
-		
+
 		MailContentSettings mailContentSettings = new MailContentSettings();
 		MailContent mailContent = new MailContent();
 		mailContent.setMail_body(takeSurveyMail);
 		mailContent.setParam_order(new ArrayList<String>(Arrays.asList(paramOrderTakeSurvey.split(","))));
 		mailContentSettings.setTake_survey_mail(mailContent);
-		
+
 		mailContent = new MailContent();
 		mailContent.setMail_body(takeSurveyByCustomerMail);
 		mailContent.setParam_order(new ArrayList<String>(Arrays.asList(paramOrderTakeSurveyCustomer.split(","))));
 		mailContentSettings.setTake_survey_mail_customer(mailContent);
-		
+
 		mailContent = new MailContent();
 		mailContent.setMail_body(takeSurveyReminderMail);
 		mailContent.setParam_order(new ArrayList<String>(Arrays.asList(paramOrderTakeSurveyReminder.split(","))));
 		mailContentSettings.setTake_survey_reminder_mail(mailContent);
-		
+
 		companySettings.setMail_content(mailContentSettings);
-				
+
 		LOG.debug("Inserting company settings.");
 		organizationUnitSettingsDao.insertOrganizationUnitSettings(companySettings, MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION);
 
@@ -473,7 +476,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 		if (companyName == null || companyName.isEmpty()) {
 			throw new InvalidInputException("Company name is null or empty while generating profile name");
 		}
-		//profileName = companyName.replaceAll(" ", "-").toLowerCase();
+		// profileName = companyName.replaceAll(" ", "-").toLowerCase();
 		profileName = utils.prepareProfileName(companyName);
 
 		LOG.debug("Checking uniqueness of profile name generated : " + profileName + " by querying mongo");
@@ -566,12 +569,11 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 		OrganizationUnitSettings companySettings = organizationUnitSettingsDao.fetchOrganizationUnitSettingsById(companyId,
 				MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION);
 
-		
-		//Filter profile stages.
+		// Filter profile stages.
 		if (companySettings != null && companySettings.getProfileStages() != null) {
 			companySettings.setProfileStages(profileCompletionList.getProfileCompletionList(companySettings.getProfileStages()));
 		}
-				
+
 		// Decrypting the encompass password
 		if (companySettings != null && companySettings.getCrm_info() != null
 				&& companySettings.getCrm_info().getCrm_source().equalsIgnoreCase(CommonConstants.CRM_SOURCE_ENCOMPASS)) {
@@ -584,16 +586,16 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 		}
 		return companySettings;
 	}
-	
+
 	@Override
 	public OrganizationUnitSettings getCompanySettings(long companyId) throws InvalidInputException {
-		
+
 		LOG.info("Get company settings for the companyId: " + companyId);
-		
+
 		OrganizationUnitSettings companySettings = organizationUnitSettingsDao.fetchOrganizationUnitSettingsById(companyId,
 				MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION);
-		
-		//Filter profile stages.
+
+		// Filter profile stages.
 		if (companySettings != null && companySettings.getProfileStages() != null) {
 			companySettings.setProfileStages(profileCompletionList.getProfileCompletionList(companySettings.getProfileStages()));
 		}
@@ -675,12 +677,12 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 		LOG.info("Get the region settings for region id: " + regionId);
 		regionSettings = organizationUnitSettingsDao.fetchOrganizationUnitSettingsById(regionId,
 				MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION);
-		
-		//Filter profile stages.
+
+		// Filter profile stages.
 		if (regionSettings != null && regionSettings.getProfileStages() != null) {
 			regionSettings.setProfileStages(profileCompletionList.getProfileCompletionList(regionSettings.getProfileStages()));
 		}
-				
+
 		return regionSettings;
 	}
 
@@ -700,11 +702,11 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 		organizationUnitSettings = organizationUnitSettingsDao.fetchOrganizationUnitSettingsById(branchId,
 				MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION);
 
-		//Filter profile stages.
+		// Filter profile stages.
 		if (organizationUnitSettings != null && organizationUnitSettings.getProfileStages() != null) {
 			organizationUnitSettings.setProfileStages(profileCompletionList.getProfileCompletionList(organizationUnitSettings.getProfileStages()));
 		}
-		
+
 		branchSettings = new BranchSettings();
 		branchSettings.setOrganizationUnitSettings(organizationUnitSettings);
 
@@ -798,14 +800,14 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 			throw new InvalidInputException("Invalid mail category.");
 		}
 		LOG.debug("Updating " + mailCategory + " for settings: " + companySettings.toString() + " with mail body: " + mailBody);
-		
+
 		// updating mail body
 		List<String> paramOrder = new ArrayList<String>();
 		mailBody = emailFormatHelper.replaceEmailBodyParamsWithDefaultValue(mailBody, paramOrder);
 		MailContent mailContent = new MailContent();
 		mailContent.setMail_body(mailBody);
 		mailContent.setParam_order(paramOrder);
-		
+
 		MailContentSettings originalContentSettings = companySettings.getMail_content();
 		if (mailCategory.equals(CommonConstants.SURVEY_MAIL_BODY_CATEGORY)) {
 			originalContentSettings.setTake_survey_mail(mailContent);
@@ -816,12 +818,12 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 		else {
 			throw new InvalidInputException("Invalid mail category");
 		}
-		
+
 		LOG.info("Updating company settings mail content");
 		organizationUnitSettingsDao.updateParticularKeyOrganizationUnitSettings(MongoOrganizationUnitSettingDaoImpl.KEY_MAIL_CONTENT,
 				originalContentSettings, companySettings, MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION);
 		LOG.info("Updated company settings mail content");
-		
+
 		return originalContentSettings;
 	}
 
@@ -1499,15 +1501,17 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 	 */
 	@Override
 	@Transactional
-	public Region addNewRegionWithUser(User user, String regionName, int isDefaultBySystem, String address1, String address2, String country, String countryCode, String state, String city, String zipcode, long selectedUserId,
-			String[] emailIdsArray, boolean isAdmin) throws InvalidInputException, SolrException, NoRecordsFetchedException, UserAssignmentException {
+	public Region addNewRegionWithUser(User user, String regionName, int isDefaultBySystem, String address1, String address2, String country,
+			String countryCode, String state, String city, String zipcode, long selectedUserId, String[] emailIdsArray, boolean isAdmin)
+			throws InvalidInputException, SolrException, NoRecordsFetchedException, UserAssignmentException {
 		LOG.info("Method addNewRegionWithUser called for user:" + user + " regionName:" + regionName + " isDefaultBySystem:" + isDefaultBySystem
 				+ " selectedUserId:" + selectedUserId + " emailIdsArray:" + emailIdsArray + " isAdmin:" + isAdmin);
 
-		Region region = addNewRegion(user, regionName, isDefaultBySystem, address1, address2,country,countryCode,state,city,zipcode);
+		Region region = addNewRegion(user, regionName, isDefaultBySystem, address1, address2, country, countryCode, state, city, zipcode);
 
 		LOG.debug("Adding default branch for the new region created");
-		addNewBranch(user, region.getRegionId(), CommonConstants.YES, CommonConstants.DEFAULT_BRANCH_NAME, CommonConstants.DEFAULT_ADDRESS, null,null,null,null,null,null);
+		addNewBranch(user, region.getRegionId(), CommonConstants.YES, CommonConstants.DEFAULT_BRANCH_NAME, CommonConstants.DEFAULT_ADDRESS, null,
+				null, null, null, null, null);
 
 		/**
 		 * If userId or email is provided, call the service for adding and assigning user to the
@@ -1658,14 +1662,14 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 	 */
 	@Override
 	@Transactional
-	public Branch addNewBranchWithUser(User user, String branchName, long regionId, int isDefaultBySystem, String address1, String address2, String country, String countryCode, String state, String city, String zipcode,
-			long selectedUserId, String[] emailIdsArray, boolean isAdmin) throws InvalidInputException, SolrException, NoRecordsFetchedException,
-			UserAssignmentException {
+	public Branch addNewBranchWithUser(User user, String branchName, long regionId, int isDefaultBySystem, String address1, String address2,
+			String country, String countryCode, String state, String city, String zipcode, long selectedUserId, String[] emailIdsArray,
+			boolean isAdmin) throws InvalidInputException, SolrException, NoRecordsFetchedException, UserAssignmentException {
 		LOG.info("Method addNewBranchWithUser called for user:" + user + " branchName:" + branchName + "regionId: " + regionId
 				+ " isDefaultBySystem:" + isDefaultBySystem + " selectedUserId:" + selectedUserId + " emailIdsArray:" + emailIdsArray + " isAdmin:"
 				+ isAdmin);
 
-		Branch branch = addNewBranch(user, regionId, isDefaultBySystem, branchName, address1, address2,country,countryCode,state,city,zipcode);
+		Branch branch = addNewBranch(user, regionId, isDefaultBySystem, branchName, address1, address2, country, countryCode, state, city, zipcode);
 
 		/**
 		 * If userId or email is provided, call the service for adding and assigning user to the
@@ -2211,7 +2215,8 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 	 */
 	@Override
 	@Transactional
-	public Branch addNewBranch(User user, long regionId, int isDefaultBySystem, String branchName, String branchAddress1, String branchAddress2, String branchCountry, String branchCountryCode, String branchState, String branchCity, String branchZipcode)
+	public Branch addNewBranch(User user, long regionId, int isDefaultBySystem, String branchName, String branchAddress1, String branchAddress2,
+			String branchCountry, String branchCountryCode, String branchState, String branchCity, String branchZipcode)
 			throws InvalidInputException, SolrException {
 		if (user == null) {
 			throw new InvalidInputException("User is null in addNewBranch");
@@ -2312,7 +2317,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 			 */
 			if (branchSettings != null) {
 				LOG.debug("Profile name was not unique hence appending id to it to get a unique one");
-				//branchProfileName = branchProfileName + "-" + branch.getBranchId();
+				// branchProfileName = branchProfileName + "-" + branch.getBranchId();
 				branchProfileName = utils.appendIdenToProfileName(branchProfileName, branch.getBranchId());
 				branchProfileUrl = utils.generateBranchProfileUrl(companyProfileName, branchProfileName);
 			}
@@ -2353,23 +2358,23 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 		if (branch.getCountry() != null && !branch.getCountry().isEmpty()) {
 			contactSettings.setCountry(branch.getCountry());
 		}
-		
+
 		if (branch.getCountryCode() != null && !branch.getCountryCode().isEmpty()) {
 			contactSettings.setCountryCode(branch.getCountryCode());
 		}
-		
+
 		if (branch.getState() != null && !branch.getState().isEmpty()) {
 			contactSettings.setState(branch.getState());
 		}
-		
+
 		if (branch.getCity() != null && !branch.getCity().isEmpty()) {
 			contactSettings.setCity(branch.getCity());
 		}
-		
+
 		if (branch.getZipcode() != null && !branch.getZipcode().isEmpty()) {
 			contactSettings.setZipcode(branch.getZipcode());
 		}
-		
+
 		LOG.debug("Method getContactDetailsSettingsFromBranch finished.Returning :" + contactSettings);
 		return contactSettings;
 	}
@@ -2393,27 +2398,26 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 		else {
 			contactSettings.setAddress(region.getAddress1());
 		}
-		
+
 		if (region.getCountry() != null && !region.getCountry().isEmpty()) {
 			contactSettings.setCountry(region.getCountry());
 		}
-		
+
 		if (region.getCountryCode() != null && !region.getCountryCode().isEmpty()) {
 			contactSettings.setCountryCode(region.getCountryCode());
 		}
-		
+
 		if (region.getState() != null && !region.getState().isEmpty()) {
 			contactSettings.setState(region.getState());
 		}
-		
+
 		if (region.getCity() != null && !region.getCity().isEmpty()) {
 			contactSettings.setCity(region.getCity());
 		}
-		
+
 		if (region.getZipcode() != null && !region.getZipcode().isEmpty()) {
 			contactSettings.setZipcode(region.getZipcode());
 		}
-		
 
 		LOG.debug("Method getContactDetailsSettingsFromRegion finished.Returning :" + contactSettings);
 		return contactSettings;
@@ -2432,8 +2436,8 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 	 */
 	@Override
 	@Transactional
-	public Region addNewRegion(User user, String regionName, int isDefaultBySystem, String address1, String address2, String country, String countryCode, String state, String city, String zipcode) throws InvalidInputException,
-			SolrException {
+	public Region addNewRegion(User user, String regionName, int isDefaultBySystem, String address1, String address2, String country,
+			String countryCode, String state, String city, String zipcode) throws InvalidInputException, SolrException {
 		if (user == null) {
 			throw new InvalidInputException("User is null in addNewRegion");
 		}
@@ -2482,7 +2486,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 			throw new InvalidInputException("Region name is null or empty in generateAndSetRegionProfileNameAndUrl");
 		}
 
-		//regionProfileName = regionName.trim().replaceAll(" ", "-").toLowerCase();
+		// regionProfileName = regionName.trim().replaceAll(" ", "-").toLowerCase();
 		regionProfileName = utils.prepareProfileName(regionName);
 		LOG.debug("Checking if profileName:" + regionProfileName + " is already taken by a region in the company :" + region.getCompany());
 
@@ -2504,7 +2508,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 			 */
 			if (regionSettings != null) {
 				LOG.debug("Profile name was not unique hence appending id to it to get a unique one");
-				//regionProfileName = regionProfileName + "-" + region.getRegionId();
+				// regionProfileName = regionProfileName + "-" + region.getRegionId();
 				regionProfileName = utils.appendIdenToProfileName(regionProfileName, region.getRegionId());
 				regionProfileUrl = utils.generateRegionProfileUrl(companyProfileName, regionProfileName);
 			}
@@ -2594,7 +2598,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 		ContactDetailsSettings contactSettings = getContactDetailsSettingsFromRegion(region);
 		organizationSettings.setContact_details(contactSettings);
 		organizationSettings.setLockSettings(new LockSettings());
-		
+
 		// set default profile stages.
 		organizationSettings.setProfileStages(profileCompletionList.getDefaultProfileCompletionList());
 
@@ -2632,7 +2636,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 		ContactDetailsSettings contactSettings = getContactDetailsSettingsFromBranch(branch);
 		organizationSettings.setContact_details(contactSettings);
 		organizationSettings.setLockSettings(new LockSettings());
-		
+
 		// set default profile stages.
 		organizationSettings.setProfileStages(profileCompletionList.getDefaultProfileCompletionList());
 
@@ -2845,8 +2849,9 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 	 */
 	@Override
 	@Transactional
-	public Region updateRegion(User user, long regionId, String regionName, String address1, String address2, String country, String countryCode, String state, String city, String zipcode, long selectedUserId,
-			String[] emailIdsArray, boolean isAdmin) throws InvalidInputException, SolrException, NoRecordsFetchedException, UserAssignmentException {
+	public Region updateRegion(User user, long regionId, String regionName, String address1, String address2, String country, String countryCode,
+			String state, String city, String zipcode, long selectedUserId, String[] emailIdsArray, boolean isAdmin) throws InvalidInputException,
+			SolrException, NoRecordsFetchedException, UserAssignmentException {
 		if (user == null) {
 			throw new InvalidInputException("User is null in update region");
 		}
@@ -2984,8 +2989,9 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 	 */
 	@Override
 	@Transactional
-	public Branch updateBranch(User user, long branchId, long regionId, String branchName, String address1, String address2, String country, String countryCode, String state, String city, String zipcode, long selectedUserId,
-			String[] emailIdsArray, boolean isAdmin) throws InvalidInputException, SolrException, NoRecordsFetchedException, UserAssignmentException {
+	public Branch updateBranch(User user, long branchId, long regionId, String branchName, String address1, String address2, String country,
+			String countryCode, String state, String city, String zipcode, long selectedUserId, String[] emailIdsArray, boolean isAdmin)
+			throws InvalidInputException, SolrException, NoRecordsFetchedException, UserAssignmentException {
 		LOG.info("Method updateBranch called for branchId:" + branchId + " regionId:" + regionId + " branchName:" + branchName);
 		if (user == null) {
 			throw new InvalidInputException("User is null in update branch");
@@ -3085,21 +3091,23 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 		LOG.info("Method to update branch completed successfully");
 		return branch;
 	}
-	
+
 	/*
-	 * Method to read default survey mail content from EmailTemplate which will be store into the Company Settings.
+	 * Method to read default survey mail content from EmailTemplate which will be store into the
+	 * Company Settings.
 	 */
 	private String readMailContentFromFile(String fileName) throws IOException {
 		LOG.debug("readSurveyReminderMailContentFromFile() started");
 		BufferedReader reader = new BufferedReader(new InputStreamReader(this.getClass().getClassLoader().getResourceAsStream(fileName)));
 		StringBuilder content = new StringBuilder();
 		String line = reader.readLine();
-		try{
-			while(line!=null){
-			content.append(line);
-			line = reader.readLine();
+		try {
+			while (line != null) {
+				content.append(line);
+				line = reader.readLine();
+			}
 		}
-		}finally{
+		finally {
 			reader.close();
 		}
 		LOG.debug("readSurveyReminderMailContentFromFile() finished");
@@ -3115,23 +3123,37 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 		LOG.debug("Method getUSStateList called to fetch the list of states in US");
 		List<StateLookup> lookups = stateLookupDao.findAll(StateLookup.class);
 		return lookups;
-    }
-	
+	}
+
 	/*
-	 *  Method to fetch the list of cities and zipcodes in the state
+	 * Method to fetch the list of cities and zipcodes in the state
 	 */
 	@Override
 	@Transactional
 	public String getZipCodesByStateId(int stateId) {
-	    LOG.debug("Method getZipCodesByStateId called to fetch the list of cities and zipcodes in the state");
-	    StateLookup state = stateLookupDao.findById(StateLookup.class, stateId);
+		LOG.debug("Method getZipCodesByStateId called to fetch the list of cities and zipcodes in the state");
+		StateLookup state = stateLookupDao.findById(StateLookup.class, stateId);
 		List<ZipCodeLookup> zipCodes = (List<ZipCodeLookup>) zipCodeLookupDao.findByColumn(ZipCodeLookup.class, "stateLookup", state);
 		Gson gson = new GsonBuilder().setExclusionStrategies(new ZipCodeExclusionStrategy()).create();
-		for(ZipCodeLookup s : zipCodes){
+		for (ZipCodeLookup s : zipCodes) {
 			gson.toJson(s);
 		}
 		return gson.toJson(zipCodes);
-    }
+	}
+
+	@Override
+	@Transactional
+	public List<DisabledAccount> disableAccounts(Date maxDisableDate) {
+		LOG.info("Method getDisabledAccounts started.");
+		try {
+			LOG.info("Method getDisabledAccounts finished.");
+			return disabledAccountDao.disableAccounts(maxDisableDate);
+		}
+		catch (DatabaseException e) {
+			LOG.error("Database exception caught in getDisabledAccounts(). Nested exception is ", e);
+			throw e;
+		}
+	}
 
 }
 // JIRA: SS-27: By RM05: EOC
