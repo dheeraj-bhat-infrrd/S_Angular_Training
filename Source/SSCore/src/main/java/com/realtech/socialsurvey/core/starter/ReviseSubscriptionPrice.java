@@ -68,7 +68,7 @@ public class ReviseSubscriptionPrice {
 		if(subscriptionStatus){
 			LOG.debug("Sending subscription price revision mail");
 			sendNotificationMail(userModificationRecord.getCompany(), subscriptionResult);
-			LOG.debug("S=ubscription price revision mail sent");
+			LOG.debug("Subscription price revision mail sent");
 		}
 		deleteUserCountNotificationTable(userModificationRecord);
 	}
