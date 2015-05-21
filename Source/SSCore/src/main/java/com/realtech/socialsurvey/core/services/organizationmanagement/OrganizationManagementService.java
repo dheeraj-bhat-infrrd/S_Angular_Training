@@ -1,15 +1,16 @@
 package com.realtech.socialsurvey.core.services.organizationmanagement;
 
 import java.net.MalformedURLException;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
 import com.realtech.socialsurvey.core.entities.Branch;
 import com.realtech.socialsurvey.core.entities.BranchFromSearch;
 import com.realtech.socialsurvey.core.entities.BranchSettings;
 import com.realtech.socialsurvey.core.entities.CRMInfo;
 import com.realtech.socialsurvey.core.entities.Company;
+import com.realtech.socialsurvey.core.entities.DisabledAccount;
 import com.realtech.socialsurvey.core.entities.MailContentSettings;
 import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
 import com.realtech.socialsurvey.core.entities.Region;
@@ -691,4 +692,6 @@ public interface OrganizationManagementService {
 	public List<StateLookup> getUsStateList();
 	
 	public String getZipCodesByStateId(int stateId);
+	
+	public List<DisabledAccount> disableAccounts(Date maxDisableDate);
 }
