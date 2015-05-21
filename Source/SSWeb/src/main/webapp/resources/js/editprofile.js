@@ -1308,6 +1308,9 @@ function paintReviewCount(reviewCount) {
 	if (reviewCount != undefined) {
 		if (reviewCount > 0) {
 			$("#prof-company-review-count").click(function() {
+				if(window.innerWidth < 768){
+					$('.icn-star-smile').click();					
+				}
 				$(window).scrollTop($('#reviews-container').offset().top);
 			});
 		}

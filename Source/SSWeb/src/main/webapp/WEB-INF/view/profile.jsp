@@ -8,6 +8,7 @@
     <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title><spring:message code="label.profile.title.key"/></title>
+    <meta charset="utf-8">
     <link rel="shortcut icon" href="${initParam.resourcesPath}/favicon.ico" sizes="16x16">
     <link rel="stylesheet" href="${initParam.resourcesPath}/resources/css/perfect-scrollbar.min.css">
     <link rel="stylesheet" href="${initParam.resourcesPath}/resources/css/bootstrap.min.css">
@@ -109,7 +110,7 @@
                         <div id="mob-review-btn" class="mob-prof-contact-btn float-left">Write a review</div>
                     </div>
                 </div>
-                <div class="vcard-download cursor-pointer">Download Contact</div>
+                <!-- <div class="vcard-download cursor-pointer">Download Contact</div> -->
             </div>
         </div>
         </div>
