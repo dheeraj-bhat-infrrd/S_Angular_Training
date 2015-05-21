@@ -105,7 +105,7 @@
 		<property name="durability" value="true" />
 	</bean>
 	
-	<!-- Setting social feed ingester job detail -->
+	<!-- Setting deactivated account purger job detail -->
 	<bean id="deactivatedaccountpurgerjobdetail"
 		class="org.springframework.scheduling.quartz.JobDetailFactoryBean">
 		<property name="jobClass"
