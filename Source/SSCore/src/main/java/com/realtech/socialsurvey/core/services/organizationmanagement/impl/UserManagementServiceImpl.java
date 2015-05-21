@@ -1763,7 +1763,7 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 		agentSettings.setCreatedOn(System.currentTimeMillis());
 		agentSettings.setModifiedBy(user.getModifiedBy());
 		agentSettings.setModifiedOn(System.currentTimeMillis());
-
+		agentSettings.setVertical(user.getCompany().getVerticalsMaster().getVerticalName());
 		MailIdSettings mail_ids = new MailIdSettings();
 		mail_ids.setWork(user.getEmailId());
 

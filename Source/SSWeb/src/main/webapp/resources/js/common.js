@@ -445,13 +445,13 @@ function showProfileLinkInEditProfilePage(source, profileUrl){
 
 // Skip / Next buttons 
 $('body').on('click', '.wc-skip-btn, .wc-sub-btn', function() {
-	if ($(this).closest('.wc-btn-row').attr('data-page') == 'one') {
+	if ($(this).closest('.welcome-popup-wrapper').attr('data-page') == 'one') {
 		callAjaxGET("./showlinkedindatacompare.do", function(data) {
 			$('#welocome-step2').html(data);
 		}, false);
 	}
 	
-	if ($(this).closest('.wc-btn-row').attr('data-page') == 'two') {
+	if ($(this).closest('.welcome-popup-wrapper').attr('data-page') == 'two') {
 		callAjaxGET("./finalizeprofileimage.do", function(data) {
 			console.log(data);
 		}, false);

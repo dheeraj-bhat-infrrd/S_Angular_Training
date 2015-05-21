@@ -111,8 +111,8 @@
 					</div>
 					
 			   		<form id="registration-form" class="registration-form-cls" method="POST" action="./registration.do">
-						<div class="reg-txt-top1">Professionals: Take Control of Your Social Reputation NOW!</div>
-						<div class="reg-txt-top2">Sign up for a FREE account. It takes less than 2 minutes</div>
+						<div class="reg-txt-top1">Start Your Free Trial.</div>
+						<div class="reg-txt-top2">Sign up Now. It takes less than 2 minutes.</div>
 						<div class="clearfix reg-item reg-item-bord-top">
 							<div class="m-inp-img-fname m-inp-img"></div>
 							<div class="m-inp-img-lname m-inp-img m-inp-img-adj"></div>
@@ -240,12 +240,12 @@ $(document).ready(function(){
 		loginUser();
 	});
    
-	$('#login-user-id').blur(function() {
+	/* $('#login-user-id').blur(function() {
 		validateUserId(this.id);
 	});
 	$('#login-pwd').blur(function(){
 		validateLoginPassword(this.id);
-	});
+	}); */
 	
 	function loginUser() {
 		console.log("submitting login form");
@@ -272,7 +272,7 @@ $(document).ready(function(){
 		}
 	});
 	
-	$('#reg-fname').blur(function() {
+	/* $('#reg-fname').blur(function() {
 		if (validateRegFirstName(this.id)) {
 			hideRegErr();
 		}
@@ -288,7 +288,7 @@ $(document).ready(function(){
 		if (validateRegEmailId(this.id)) {
 			hideRegErr();
 		}
-	});
+	}); */
 	
 	function submitRegistrationForm() {
 		if (validatePreRegistrationForm('reg-form')) {
