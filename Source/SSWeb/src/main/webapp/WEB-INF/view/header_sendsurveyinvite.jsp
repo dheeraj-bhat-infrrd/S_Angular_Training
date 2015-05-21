@@ -3,6 +3,7 @@
 <div id="welcome-popup-invite" class="welcome-popup-wrapper">
 	<div class="welcome-popup-hdr-wrapper clearfix">
 		<div class="float-left wc-hdr-txt"><spring:message code="label.sendsurvey.key" /></div>
+		<div class="float-right popup-close-icn wc-skip-btn wc-final-skip"></div>
 	</div>
 	<div class="welcome-popup-body-wrapper clearfix">
 		<div class="wc-popup-body-hdr"><spring:message code="label.happyreviews.key" /></div>
