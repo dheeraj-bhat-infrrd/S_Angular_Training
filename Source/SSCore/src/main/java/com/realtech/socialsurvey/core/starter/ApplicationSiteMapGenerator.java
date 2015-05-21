@@ -66,12 +66,26 @@ public class ApplicationSiteMapGenerator extends QuartzJobBean{
 		// upload company sitemap
 		try {
 			uploadFile(companySiteMapPath, uploadService, envPrefix);
-			uploadFile(regionSiteMapPath, uploadService, envPrefix);
-			uploadFile(branchSiteMapPath, uploadService, envPrefix);
+		}catch (NonFatalException e) {
+			LOG.error("Could not upload company sitemap to amazon", e);
+		}
+			try {
+				uploadFile(regionSiteMapPath, uploadService, envPrefix);
+			}
+			catch (NonFatalException e) {
+				LOG.error("Could not upload region sitemap to amazon", e);
+			}
+			try {
+				uploadFile(branchSiteMapPath, uploadService, envPrefix);
+			}
+			catch (NonFatalException e) {
+				LOG.error("Could not upload office sitemap to amazon", e);
+			}
+		try{
 			uploadFile(individualSiteMapPath, uploadService, envPrefix);
 		}
 		catch (NonFatalException e) {
-			LOG.error("Could not upload file to amazon", e);
+			LOG.error("Could not upload individual sitemap to amazon", e);
 		}
 		
 	}
