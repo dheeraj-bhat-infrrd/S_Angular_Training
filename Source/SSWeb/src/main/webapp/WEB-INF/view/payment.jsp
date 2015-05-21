@@ -57,6 +57,7 @@
 </c:choose>
     <div class="payment-details-wrapper">
     	<div id="acc-type-payment" class="acc-type-payment">
+    	<div><div class="float-right popup-close-icn payment-close"></div></div>
     	<c:choose>
     	<c:when test="${ paymentChange == 1 }">
     		  <div class="login-txt text-center font-24 margin-bot-20"><spring:message code="label.paymentupgrade.key"/></div>
@@ -144,6 +145,12 @@
     <script type="text/javascript">
            
 	   $(document).ready(function() {
+		   
+		   //attach click event to close btn
+		   $('.payment-close').click(function(){
+			   $("#cancel-payment").click();
+		   });
+		   
 		   console.log("pageInitialized : " + pageInitialized);
 		   if(pageInitialized){
 			   console.log("Not executing ready function!");

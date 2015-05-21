@@ -98,28 +98,28 @@
 									<div class="sq-i-lbl float-left">First Name</div>
 									<div class="sq-i-txt float-left">
 										<div class="hide sq-img-adj icn-fname"></div>
-										<input id="firstName" class="sq-i-txt-fld" name="firstName" value="${firstName }">
+										<input id="firstName" class="sq-i-txt-fld" name="firstName" value="${firstName }" placeholder='<spring:message code="label.firstname.key"/>'>
 									</div>
 								</div>
 								<div class="clearfix sq-info-wrapper">
 									<div class="sq-i-lbl float-left">Last Name</div>
 									<div class="sq-i-txt float-left">
 										<div class="hide sq-img-adj icn-lname"></div>
-										<input id="lastName" class="sq-i-txt-fld" name="lastName" value="${lastName }">
+										<input id="lastName" class="sq-i-txt-fld" name="lastName" value="${lastName }" placeholder='<spring:message code="label.lastname.key"/>'>
 									</div>
 								</div>
 								<div class="clearfix sq-info-wrapper">
 									<div class="sq-i-lbl float-left">Email</div>
 									<div class="sq-i-txt float-left">
 										<div class="hide sq-img-adj icn-email"></div>
-										<input id="email" class="sq-i-txt-fld" name="customerEmail" value="${customerEmail}">
+										<input id="email" class="sq-i-txt-fld" name="customerEmail" value="${customerEmail}" placeholder='<spring:message code="label.emailid.key"/>'>
 									</div>
 								</div>
 								<div class="clearfix sq-info-wrapper">
-									<div class="sq-i-lbl float-left">
+									<div class="sq-i-lbl float-left sq-i-checkbox">
 										<div id="cust-agent-verify" class="bd-check-img bd-check-img-checked float-right sq-checkbox"></div>
 									</div>
-									<div class="sq-i-txt float-left">
+									<div class="sq-i-txt float-left sq-i-checkbox-txt">
 										<div class="sq-i-check-txt">I verify that I have done business with ${agentName}</div>
 										<!-- <select id="cust-agnt-rel" class="sq-i-txt-fld"></select> -->
 									</div>

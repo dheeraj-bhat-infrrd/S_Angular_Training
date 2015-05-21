@@ -787,6 +787,9 @@ function paintAllReviewsCount(data) {
 		$("#prof-schema-reviews").html(reviewsSizeHtml);
 		if(responseJson.entity > 0){
 			$("#prof-company-review-count").click(function(){
+				if(window.innerWidth < 768){
+					$('.icn-star-smile').click();					
+				}
 				$('html, body').animate({
 					scrollTop : $('#reviews-container').offset().top
 				},500);
