@@ -76,7 +76,6 @@ public class MongoSocialPostDaoImpl implements SocialPostDao {
 		long priorTimeInMilliSecs = currentTimeInMilliSecs - timeSpanInMilliSecs;
 
 		Query query = new Query(Criteria.where(KEY_SOURCE).ne(KEY_SOURCE_SS).and(KEY_TIME_IN_MILLIS).lte(priorTimeInMilliSecs));
-
 		mongoTemplate.remove(query, SocialPost.class, CommonConstants.SOCIAL_POST_COLLECTION);
 	}
 }
