@@ -2,7 +2,6 @@ package com.realtech.socialsurvey.core.services.organizationmanagement;
 
 import java.util.List;
 import java.util.Map;
-import com.realtech.socialsurvey.core.entities.AbridgedUserProfile;
 import com.realtech.socialsurvey.core.entities.AgentSettings;
 import com.realtech.socialsurvey.core.entities.Branch;
 import com.realtech.socialsurvey.core.entities.Company;
@@ -263,17 +262,6 @@ public interface UserManagementService {
 	 */
 	public User updateUserOnCompleteRegistration(User existingUser, String emailId, long companyId, String firstName, String lastName, String password)
 			throws InvalidInputException, SolrException;
-
-	/**
-	 * Method to user profiles data in session and return selected profile
-	 * 
-	 * @param user
-	 * @param session
-	 * @return
-	 * @throws NonFatalException
-	 */
-	public Map<Long, AbridgedUserProfile> processedUserProfiles(User user, AccountType accountType, Map<Long, UserProfile> profileMap,
-			List<UserProfile> profiles) throws NonFatalException;
 
 	public UserProfile updateSelectedProfile(User user, AccountType accountType, Map<Long, UserProfile> profileMap, String profileIdStr);
 

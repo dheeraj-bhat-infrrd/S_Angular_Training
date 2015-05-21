@@ -12,8 +12,8 @@ public class Utils {
 	private final String REGION_PROFILE_URL_PATTERN = "/region/%s/%s";
 	private final String BRANCH_PROFILE_URL_PATTERN = "/office/%s/%s";
 	private final String AGENT_PROFILE_URL_PATTERN = "/%s";
-	private static final String PROFILE_REGEX="[^\\w]{1,}";
-	private static final String PROFILE_REGEX_REPLACEMENT="-";
+	private static final String PROFILE_REGEX = "[^\\w]{1,}";
+	private static final String PROFILE_REGEX_REPLACEMENT = "-";
 	private static final Pattern PATTERN = Pattern.compile(PROFILE_REGEX);
 	private static final Logger LOG = LoggerFactory.getLogger(Utils.class);
 
