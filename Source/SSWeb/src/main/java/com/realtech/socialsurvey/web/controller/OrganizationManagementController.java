@@ -1103,10 +1103,6 @@ public class OrganizationManagementController {
 		User user = sessionHelper.getCurrentUser();
 
 		try {
-			if (user == null) {
-				LOG.error("createDefaultBranchesAndRegions : user not found in session!");
-				throw new InvalidInputException("createDefaultBranchesAndRegions : user not found in session!");
-			}
 			LicenseDetail currentLicenseDetail = user.getCompany().getLicenseDetails().get(CommonConstants.INITIAL_INDEX);
 			HttpSession session = request.getSession(false);
 			AccountType accountType = null;
@@ -1165,7 +1161,7 @@ public class OrganizationManagementController {
 			else if (popupStatus.equals(CommonConstants.YES_STRING)) {
 				session.setAttribute(CommonConstants.POPUP_FLAG_IN_SESSION, CommonConstants.NO_STRING);
 			}
-			
+
 			// setting popup attributes
 			boolean showLinkedInPopup = false;
 			boolean showSendSurveyPopup = false;
