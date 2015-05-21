@@ -2587,7 +2587,8 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 		organizationSettings.setCreatedOn(System.currentTimeMillis());
 		organizationSettings.setModifiedBy(region.getModifiedBy());
 		organizationSettings.setModifiedOn(System.currentTimeMillis());
-
+		organizationSettings.setVertical(region.getCompany().getVerticalsMaster().getVerticalName());
+		
 		// Calling method to generate and set region profile name and url
 		generateAndSetRegionProfileNameAndUrl(region, organizationSettings);
 
@@ -2625,7 +2626,8 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 		organizationSettings.setCreatedOn(System.currentTimeMillis());
 		organizationSettings.setModifiedBy(branch.getModifiedBy());
 		organizationSettings.setModifiedOn(System.currentTimeMillis());
-
+		organizationSettings.setVertical(branch.getCompany().getVerticalsMaster().getVerticalName());
+		
 		// Calling method to generate and set profile name and profile url
 		generateAndSetBranchProfileNameAndUrl(branch, organizationSettings);
 

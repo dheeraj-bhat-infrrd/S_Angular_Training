@@ -4876,6 +4876,7 @@ select.rfr_txt_fld,select.rfr_input_fld{
 .hm-header-right {
 	background-color: #009FE0;
 	color: #fff;
+	margin-left:10px;
 	padding: 0 20px;
 	font-size: 13px;
 	line-height: 40px;
