@@ -3,7 +3,9 @@ package com.realtech.socialsurvey.core.services.payment.impl;
 // JIRA: SS-15: By RM03
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.sql.Timestamp;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
@@ -113,6 +115,8 @@ public class BrainTreePaymentImpl implements Payment, InitializingBean {
 	private String enableKafka;
 
 	private static final Logger LOG = LoggerFactory.getLogger(BrainTreePaymentImpl.class);
+	
+	private static final DecimalFormat AMOUNT_FORMAT = new DecimalFormat("###.##"); 
 
 	private BraintreeGateway gateway = null;
 
@@ -140,6 +144,9 @@ public class BrainTreePaymentImpl implements Payment, InitializingBean {
 				gateway = new BraintreeGateway(Environment.PRODUCTION, merchantId, publicKey, privateKey);
 			}
 		}
+		
+		// set rounding mode
+		AMOUNT_FORMAT.setRoundingMode(RoundingMode.HALF_EVEN);
 	}
 
 	private void cancelSubscription(String subscriptionId) throws NoRecordsFetchedException, PaymentException {
@@ -978,9 +985,9 @@ public class BrainTreePaymentImpl implements Payment, InitializingBean {
 			LOG.error("upgradeSubscription : braintreePlanId parameter is null or empty");
 			throw new InvalidInputException("upgradeSubscription : braintreePlanId parameter is null or empty");
 		}
-
+		String sAmount = AMOUNT_FORMAT.format(amount);
 		LOG.debug("Creating the subscription request object");
-		SubscriptionRequest updateRequest = new SubscriptionRequest().price(new BigDecimal(String.valueOf(amount)));
+		SubscriptionRequest updateRequest = new SubscriptionRequest().price(new BigDecimal(sAmount));
 
 		Result<Subscription> result = null;
 		try {
@@ -1679,16 +1686,17 @@ public class BrainTreePaymentImpl implements Payment, InitializingBean {
 		long numOfUsers = findNumberOfUsersForCompany(company);
 		// get the current accounts master account linked with the company
 		double amount = company.getLicenseDetails().get(CommonConstants.INITIAL_INDEX).getAccountsMaster().getAmount() * numOfUsers;
+		String sAmount = AMOUNT_FORMAT.format(amount);
 		// get the current price
 		double previousAmount = getSubscriptionPriceFromBraintree(company);
-		LOG.debug("Previous amount: "+previousAmount+"\t Revised amount: "+amount+" for company "+company.getCompanyId());
-		if (previousAmount != amount) {
+		LOG.debug("Previous amount: "+previousAmount+"\t Revised amount: "+sAmount+" for company "+company.getCompanyId());
+		if (previousAmount != Double.parseDouble(sAmount)) {
 			priceChanged = true;
 			LOG.debug("Upgrading the account for " + company.getCompany() + " with by " + numOfUsers + " users for an amount of " + amount);
 			// Calling braintree for updating the amount
 			LOG.debug("Calling braintree for updating the amount");
 			// proration is not required
-			SubscriptionRequest updateRequest = new SubscriptionRequest().price(new BigDecimal(String.valueOf(amount)));
+			SubscriptionRequest updateRequest = new SubscriptionRequest().price(new BigDecimal(sAmount));
 
 			Result<Subscription> result = null;
 			try {
@@ -1733,7 +1741,7 @@ public class BrainTreePaymentImpl implements Payment, InitializingBean {
 		}
 		resultMap.put(CommonConstants.SUBSCRIPTION_PRICE_CHANGED, priceChanged);
 		resultMap.put(CommonConstants.SUBSCRIPTION_OLD_PRICE, previousAmount);
-		resultMap.put(CommonConstants.SUBSCRIPTION_REVISED_PRICE, amount);
+		resultMap.put(CommonConstants.SUBSCRIPTION_REVISED_PRICE, sAmount);
 		resultMap.put(CommonConstants.SUBSCRIPTION_REVISED_NUMOFUSERS, numOfUsers);
 		return resultMap;
 	}
