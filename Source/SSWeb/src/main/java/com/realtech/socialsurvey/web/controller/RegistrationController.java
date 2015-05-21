@@ -176,7 +176,7 @@ public class RegistrationController {
 			}
 			
 			if (invitedUser != null) {
-				model.addAttribute("status", DisplayMessageType.SUCCESS_MESSAGE);
+				model.addAttribute("status", DisplayMessageType.ERROR_MESSAGE);
 				model.addAttribute("message",
 						messageUtils.getDisplayMessage(DisplayMessageConstants.INVALID_REGISTRATION_INVITE, DisplayMessageType.ERROR_MESSAGE));
 				return JspResolver.LOGIN;
