@@ -463,6 +463,13 @@
 	    		showInfoMobileAndWeb(jsonData["message"]);
         		console.log("Finished showing the toast");
     			$(".reg-cap-reload").click();
+    			
+    			// resetting contact form and captcha
+    			$('#prof-contact-form')[0].reset();
+    			var recaptchaframe = $('.g-recaptcha iframe');
+    	        var recaptchaSoure = recaptchaframe[0].src;
+    	        recaptchaframe[0].src = '';
+    	        setInterval(function () { recaptchaframe[0].src = recaptchaSoure; }, 500);
         	}
         	else{
         		console.error("Error occured while sending contact us message. ");
@@ -553,7 +560,6 @@
     	});
     	
     	// Contact us form validation functions
-    	
     	function validateMessage(elementId) {
     		if ($('#'+elementId).val() != "") {
     			return true;

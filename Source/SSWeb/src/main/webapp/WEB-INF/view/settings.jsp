@@ -225,7 +225,15 @@
 					<input type="hidden" name="mailcategory" id="mailcategory">
 					<div class="um-header margin-top-25"><spring:message code="label.header.email.configuration.key" /></div>
 					<div class="clearfix st-bottom-wrapper margin-top-50">
-					<div class="clearfix">Legends:&nbsp&nbsp&nbsp&nbsp[Name]:Customer's Name,&nbsp&nbsp&nbsp&nbsp[AgentName] : Agent's Name,&nbsp&nbsp&nbsp&nbsp[Link] : Url of the survey</div>
+						<div class="clearfix">Legends: <br />
+							&nbsp&nbsp&nbsp&nbsp[BaseUrl] : Url of the SocialSurvey,
+							&nbsp&nbsp&nbsp&nbsp[LogoUrl] : Url of the SocialSurvey Logo,
+							&nbsp&nbsp&nbsp&nbsp[Link] : Url of the survey,
+							<br />
+							&nbsp&nbsp&nbsp&nbsp[Name] : Customer's Name,
+							&nbsp&nbsp&nbsp&nbsp[AgentName] : Agent's Name,
+							&nbsp&nbsp&nbsp&nbsp[AgentSignature] : Agent's Signature
+						</div>
 						<div class="st-header-txt-lft-rt clearfix margin-top-25">
 							<div class="float-left st-header-txt-lft"><spring:message code="label.header.mailer.content.key" /></div>
 							<div class="float-right clearfix st-header-txt-rt">
