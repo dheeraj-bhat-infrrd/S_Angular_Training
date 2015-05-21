@@ -14,7 +14,8 @@
 
 <div class="welcome-popup-hdr-wrapper clearfix">
 	<div class="float-left wc-hdr-txt"><spring:message code="label.aboutbusiness.key" /></div>
-	<div class="float-right wc-hdr-step"><spring:message code="label.step.two.key" /></div>
+	<div class="float-right popup-close-icn wc-skip-btn"></div>
+	<%-- <div class="float-right wc-hdr-step"><spring:message code="label.step.two.key" /></div> --%>
 </div>
 <div class="welcome-popup-body-wrapper clearfix">
 	<div class="wc-popup-body-hdr"><spring:message code="label.linkedin.imported.key" />
@@ -123,7 +124,7 @@
 		</div>
 	</div>
 </div>
-<div class="wc-btn-row clearfix" data-page="two">
+<div class="wc-btn-row clearfix">
 	<div class="wc-btn-col float-left">
 		<div class="wc-skip-btn float-right"><spring:message code="label.skipthisstep.key" /></div>
 	</div>

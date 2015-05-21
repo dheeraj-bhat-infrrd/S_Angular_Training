@@ -333,11 +333,11 @@ function bindAdminCheckBoxClick(){
 		 */
 		 if($(this).hasClass('bd-check-img-checked') ){
 			$(this).removeClass('bd-check-img-checked');
-			$(this).next("#is-admin-chk").val("false");
+			$(this).next("#is-admin-chk").val("true");
 		 }
 		 else {
 			$(this).addClass('bd-check-img-checked');
-			$(this).next("#is-admin-chk").val("true");
+			$(this).next("#is-admin-chk").val("false");
 		 }
 	});
 }
