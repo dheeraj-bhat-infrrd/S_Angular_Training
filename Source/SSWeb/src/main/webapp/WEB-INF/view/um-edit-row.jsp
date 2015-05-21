@@ -90,8 +90,8 @@
 					<div class="float-left v-ed-lbl" style="color: transparent;">'</div>
 					<div class="float-left v-ed-txt pos-relative">
 						<div class="bd-frm-check-wrapper clearfix">
-							<div class="float-left bd-check-img"></div>
-							<input type="hidden" name="isAdmin" value="true" id="is-admin-chk">
+							<div class="float-left bd-check-img bd-check-img-checked"></div>
+							<input type="hidden" name="isAdmin" value="false" id="is-admin-chk">
 			            	<div class="float-left bd-check-txt"><spring:message code="label.grantadminprivileges.key"/></div>
 						</div>
 					</div>
