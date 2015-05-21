@@ -1,11 +1,10 @@
 package com.realtech.socialsurvey.core.dao;
 
 import java.util.List;
-
 import com.realtech.socialsurvey.core.entities.SocialPost;
 
-/*
- * This interface contains methods to interact 
+/**
+ * This interface contains methods to interact
  */
 public interface SocialPostDao {
 
@@ -14,6 +13,7 @@ public interface SocialPostDao {
 
 	/**
 	 * Gets the social posts
+	 * 
 	 * @param iden
 	 * @param key
 	 * @param skip
@@ -22,6 +22,9 @@ public interface SocialPostDao {
 	 */
 	public List<SocialPost> getSocialPosts(long iden, String key, int skip, int limit);
 
+	// Method to get posts count for user
 	public long getPostsCountByUserId(long userId);
-	
+
+	// Method to purge older social posts
+	public void purgeOlderSocialPosts(long timeSpanInMilliSecs);
 }

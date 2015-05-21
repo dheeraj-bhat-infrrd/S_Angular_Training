@@ -1,13 +1,16 @@
 package com.realtech.socialsurvey.core.feed.impl;
 
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import com.realtech.socialsurvey.core.dao.OrganizationUnitSettingsDao;
+import com.realtech.socialsurvey.core.dao.SocialPostDao;
 import com.realtech.socialsurvey.core.dao.impl.MongoOrganizationUnitSettingDaoImpl;
 import com.realtech.socialsurvey.core.entities.FeedIngestionEntity;
 import com.realtech.socialsurvey.core.entities.SocialMediaTokens;
@@ -26,25 +29,41 @@ public class SocialFeedIngestionKickStarter {
 	private OrganizationUnitSettingsDao settingsDao;
 
 	@Autowired
+	private SocialPostDao socialPostDao;
+	
+	@Autowired
 	private SocialFeedExecutors executors;
 
 	@Autowired
 	private ApplicationContext context;
 
-
+	@Value("${SOCIALPOST_SPAN_DAYS}")
+	private long socialPostSpanDays;
+	
 	@Transactional
 	public void startFeedIngestion() {
 		LOG.info("Starting feed ingestion.");
 		executors.setContext(context);
 
+		// Fetching New posts
 		startFeedIngestion(MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION);
 		startFeedIngestion(MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION);
 		startFeedIngestion(MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION);
 		startFeedIngestion(MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION);
 
 		executors.shutDownExecutors();
+
+		// Deleting older posts
+		startOlderFeedPurging();
 	}
 
+	@Transactional
+	public void startOlderFeedPurging() {
+		LOG.info("Kick starting older feed Purging");
+		long timeSpanInMilliSecs = TimeUnit.MILLISECONDS.convert(socialPostSpanDays, TimeUnit.DAYS);
+		socialPostDao.purgeOlderSocialPosts(timeSpanInMilliSecs);
+	}
+	
 	/**
 	 * Fetches company feed
 	 */
@@ -65,12 +84,14 @@ public class SocialFeedIngestionKickStarter {
 				LOG.debug("Found " + (currentBatch + tokens.size()) + " tokens for " + collectionName + " till now.");
 				// get individual entity
 				for (FeedIngestionEntity ingestionEntity : tokens) {
-					try{
+					try {
 						fetchFeedFromIndividualSocialMediaTokens(ingestionEntity, collectionName);
-					}catch(Exception e){
-						LOG.warn("Exception for "+collectionName+" and "+ingestionEntity.getIden());
+					}
+					catch (Exception e) {
+						LOG.warn("Exception for " + collectionName + " and " + ingestionEntity.getIden());
 					}
 				}
+
 				if (tokens.size() < BATCH_SIZE) {
 					LOG.debug("No more tokens left for " + collectionName + ". Breaking from loop.");
 					break;
@@ -89,7 +110,7 @@ public class SocialFeedIngestionKickStarter {
 			LOG.debug("Starting to fetch the feed.");
 
 			try {
-				// check for facebook entry
+				// check for facebook token
 				SocialMediaTokens token = ingestionEntity.getSocialMediaTokens();
 				if (token.getFacebookToken() != null) {
 					LOG.info("Processing facebook posts for " + collectionName + " with iden: " + ingestionEntity.getIden());
@@ -99,7 +120,7 @@ public class SocialFeedIngestionKickStarter {
 					LOG.warn("No facebook token found for " + collectionName + " with iden: " + ingestionEntity.getIden());
 				}
 
-				// check for google entry
+				// check for google token
 				if (token.getGoogleToken() != null) {
 					LOG.info("Processing google plus activities for " + collectionName + " with iden: " + ingestionEntity.getIden());
 					executors.addGoogleProcessorToPool(ingestionEntity, collectionName);
@@ -108,7 +129,7 @@ public class SocialFeedIngestionKickStarter {
 					LOG.warn("No google+ token found for " + collectionName + " with iden: " + ingestionEntity.getIden());
 				}
 
-				// check for linkedin entry
+				// check for linkedin token
 				if (token.getLinkedInToken() != null) {
 					// TODO
 				}
@@ -116,15 +137,15 @@ public class SocialFeedIngestionKickStarter {
 					LOG.warn("No linkedin token found for " + collectionName + " with iden: " + ingestionEntity.getIden());
 				}
 
-				// check for rss entry
+				// check for rss token
 				if (token.getRssToken() != null) {
 					// TODO
 				}
 				else {
 					LOG.warn("No rss token found for " + collectionName + " with iden: " + ingestionEntity.getIden());
 				}
-				
-				// check for twitter entry
+
+				// check for twitter token
 				if (token.getTwitterToken() != null) {
 					LOG.info("Processing twitter tweets for " + collectionName + " with iden: " + ingestionEntity.getIden());
 					executors.addTwitterProcessorToPool(ingestionEntity, collectionName);
@@ -132,8 +153,8 @@ public class SocialFeedIngestionKickStarter {
 				else {
 					LOG.warn("No twitter token found for " + collectionName + " with iden: " + ingestionEntity.getIden());
 				}
-				
-				// check for yelp entry
+
+				// check for yelp token
 				if (token.getYelpToken() != null) {
 					// TODO
 				}
