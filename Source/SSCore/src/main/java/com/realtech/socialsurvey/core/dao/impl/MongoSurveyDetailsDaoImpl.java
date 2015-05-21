@@ -1063,9 +1063,15 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao {
 		LOG.info("Method to get list of customers who have not yet shared their survey on all the social networking sites, getIncompleteSocialPostCustomersEmail() started.");
 		Date cutOffDate = getNdaysBackDate(surveyReminderInterval);
 		Query query = new Query();
-		query.addCriteria(new Criteria().andOperator(Criteria.where(CommonConstants.COMPANY_ID_COLUMN).is(companyId),
-				Criteria.where(CommonConstants.LAST_REMINDER_FOR_SOCIAL_POST).lte(cutOffDate),
-				Criteria.where(CommonConstants.SCORE_COLUMN).gte(autopostScore), Criteria.where("socialPostsReminder").lt(maxReminders)));
+		if(maxReminders > 0)
+			query.addCriteria(new Criteria().andOperator(Criteria.where(CommonConstants.COMPANY_ID_COLUMN).is(companyId),
+					new Criteria().orOperator(Criteria.where(CommonConstants.LAST_REMINDER_FOR_SOCIAL_POST).lte(cutOffDate),
+							Criteria.where(CommonConstants.LAST_REMINDER_FOR_SOCIAL_POST).exists(false)),
+					Criteria.where(CommonConstants.SCORE_COLUMN).gte(autopostScore), Criteria.where("socialPostsReminder").lt(maxReminders)));
+		else
+			query.addCriteria(new Criteria().andOperator(Criteria.where(CommonConstants.COMPANY_ID_COLUMN).is(companyId),
+					new Criteria().orOperator(Criteria.where(CommonConstants.LAST_REMINDER_FOR_SOCIAL_POST).lte(cutOffDate),
+							Criteria.where(CommonConstants.LAST_REMINDER_FOR_SOCIAL_POST).exists(false))));
 		List<SurveyDetails> surveys = mongoTemplate.find(query, SurveyDetails.class, SURVEY_DETAILS_COLLECTION);
 		LOG.info("Method to get list of customers who have not yet completed their survey on all the social networking sites, getIncompleteSocialPostCustomersEmail() finished.");
 		return surveys;
