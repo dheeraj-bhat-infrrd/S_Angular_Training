@@ -18,9 +18,9 @@ import com.realtech.socialsurvey.core.services.organizationmanagement.Organizati
 import com.realtech.socialsurvey.core.services.search.SolrSearchService;
 import com.realtech.socialsurvey.core.services.search.exception.SolrException;
 
-public class DeactivatedAccountPurger extends QuartzJobBean {
+public class AccountDeactivator extends QuartzJobBean {
 
-	public static final Logger LOG = LoggerFactory.getLogger(DeactivatedAccountPurger.class);
+	public static final Logger LOG = LoggerFactory.getLogger(AccountDeactivator.class);
 	
 	private OrganizationManagementService organizationManagementService;
 	private SolrSearchService solrSearchService;
@@ -28,7 +28,7 @@ public class DeactivatedAccountPurger extends QuartzJobBean {
 	
 	@Override
 	protected void executeInternal(JobExecutionContext jobExecutionContext) {
-		LOG.info("Executing DeactivatedAccountPurger");
+		LOG.info("Executing AccountDeactivator");
 		// initialize the dependencies
 		initializeDependencies(jobExecutionContext.getMergedJobDataMap());
 		List<DisabledAccount> disabledAccounts = organizationManagementService.disableAccounts(new Date());
@@ -40,7 +40,7 @@ public class DeactivatedAccountPurger extends QuartzJobBean {
 				LOG.error("Invalid Input Exception caught while sending email to the company admin. Nested exception is ", e);
 			}
 		}
-		LOG.info("Completed DeactivatedAccountPurger");
+		LOG.info("Completed AccountDeactivator");
 	}
 
 	private void initializeDependencies(JobDataMap jobMap) {
