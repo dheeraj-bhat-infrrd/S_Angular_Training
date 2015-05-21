@@ -43,14 +43,19 @@ public class IncompleteSocialPostReminderSender extends QuartzJobBean {
 		LOG.info("Executing IncompleteSocialPostReminderSender");
 		initializeDependencies(jobExecutionContext.getMergedJobDataMap());
 		populateSocialSites();
-		IncompleteSocialPostReminderSender sender = new IncompleteSocialPostReminderSender();
+//		IncompleteSocialPostReminderSender sender = new IncompleteSocialPostReminderSender();
 		StringBuilder links = new StringBuilder();
+		Set<String> socialPosts;
 		for (Company company : organizationManagementService.getAllCompanies()) {
 			List<SurveyDetails> incompleteSocialPostCustomers = surveyHandler.getIncompleteSocialPostSurveys(company.getCompanyId());
 			for (SurveyDetails survey : incompleteSocialPostCustomers) {
-				for (String site : getRemainingSites(new HashSet<String>(survey.getSharedOn()))) {
+				if(survey.getSharedOn() == null)
+					socialPosts = new HashSet<>();
+				else
+					socialPosts = new HashSet<String>(survey.getSharedOn());
+				for (String site : getRemainingSites(socialPosts)) {
 					try {
-						links.append("\nFor ").append(site).append(" : ").append(sender.generateQueryParams(survey, site));
+						links.append("\nFor ").append(site).append(" : ").append(generateQueryParams(survey, site));
 					}
 					catch (InvalidInputException e) {
 						LOG.error("InvalidInputException occured while generating URL for " + site + ". Nested exception is ", e);
@@ -90,22 +95,22 @@ public class IncompleteSocialPostReminderSender extends QuartzJobBean {
 	private String generateQueryParams(SurveyDetails survey, String socialSite) throws InvalidInputException {
 		LOG.debug("Method to generate URL parameters for Facebook, generateUrlParamsForFacebook() started.");
 		Map<String, String> params = new HashMap<>();
-		String subUrl = "";
+		String subUrl = "rest/survey/";
 		switch (socialSite) {
 			case "facebook":
-				subUrl = "posttofacebook";
+				subUrl += "posttofacebook";
 				break;
 			case "twitter":
-				subUrl = "posttotwitter";
+				subUrl += "posttotwitter";
 				break;
 			case "linkedin":
-				subUrl = "posttolinkedin";
+				subUrl += "posttolinkedin";
 				break;
 			case "yelp":
-				subUrl = "getyelplinkrest";
+				subUrl += "getyelplinkrest";
 				break;
 			case "google":
-				subUrl = "getgooglepluslinkrest";
+				subUrl += "getgooglepluslinkrest";
 				break;
 		}
 
