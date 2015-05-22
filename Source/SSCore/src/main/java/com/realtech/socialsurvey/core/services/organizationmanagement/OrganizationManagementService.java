@@ -694,4 +694,8 @@ public interface OrganizationManagementService {
 	public String getZipCodesByStateId(int stateId);
 	
 	public List<DisabledAccount> disableAccounts(Date maxDisableDate);
+
+	public List<DisabledAccount> getAccountsForPurge(int graceSpan);
+
+	public void purgeCompany(Company company) throws InvalidInputException, SolrException;
 }

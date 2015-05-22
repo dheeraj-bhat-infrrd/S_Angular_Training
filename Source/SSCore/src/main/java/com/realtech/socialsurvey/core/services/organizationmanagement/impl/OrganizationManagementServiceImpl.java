@@ -15,12 +15,14 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import javax.annotation.Resource;
 import org.apache.solr.common.SolrDocumentList;
 import org.noggit.JSONUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.DependsOn;
 import org.springframework.stereotype.Component;
@@ -31,9 +33,13 @@ import com.google.gson.reflect.TypeToken;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.commons.ProfileCompletionList;
 import com.realtech.socialsurvey.core.commons.Utils;
+import com.realtech.socialsurvey.core.dao.BranchDao;
 import com.realtech.socialsurvey.core.dao.DisabledAccountDao;
 import com.realtech.socialsurvey.core.dao.GenericDao;
 import com.realtech.socialsurvey.core.dao.OrganizationUnitSettingsDao;
+import com.realtech.socialsurvey.core.dao.RegionDao;
+import com.realtech.socialsurvey.core.dao.UserDao;
+import com.realtech.socialsurvey.core.dao.UserProfileDao;
 import com.realtech.socialsurvey.core.dao.impl.MongoOrganizationUnitSettingDaoImpl;
 import com.realtech.socialsurvey.core.entities.Branch;
 import com.realtech.socialsurvey.core.entities.BranchFromSearch;
@@ -92,7 +98,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 	private GenericDao<Company, Long> companyDao;
 
 	@Autowired
-	private GenericDao<User, Long> userDao;
+	private UserDao userDao;
 
 	@Autowired
 	private GenericDao<LicenseDetail, Long> licenceDetailDao;
@@ -114,6 +120,25 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 
 	@Autowired
 	private DisabledAccountDao disabledAccountDao;
+	
+	@Resource
+	@Qualifier("branch")
+	private BranchDao branchDao;
+
+	@Autowired
+	private OrganizationUnitSettingsDao organizationUnitSettingsDao;
+
+	@Autowired
+	private RegionDao regionDao;
+
+	@Autowired
+	private UserProfileDao userProfileDao;
+
+	@Autowired
+	private SolrSearchService solrSearchService;
+
+	@Autowired
+	private Utils utils;
 
 	@Autowired
 	private Payment gateway;
@@ -1836,24 +1861,6 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 		LOG.info("Method addNewIndividual executed successfully");
 	}
 
-	@Autowired
-	private GenericDao<Branch, Long> branchDao;
-
-	@Autowired
-	private OrganizationUnitSettingsDao organizationUnitSettingsDao;
-
-	@Autowired
-	private GenericDao<Region, Long> regionDao;
-
-	@Autowired
-	private GenericDao<UserProfile, Long> userProfileDao;
-
-	@Autowired
-	private SolrSearchService solrSearchService;
-
-	@Autowired
-	private Utils utils;
-
 	/**
 	 * Fetch list of branches in a company
 	 * 
@@ -3141,6 +3148,9 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 		return gson.toJson(zipCodes);
 	}
 
+	/*
+	 * Method to disable accounts who have exceeded their billing cycle and return their list.
+	 */
 	@Override
 	@Transactional
 	public List<DisabledAccount> disableAccounts(Date maxDisableDate) {
@@ -3151,6 +3161,72 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 		}
 		catch (DatabaseException e) {
 			LOG.error("Database exception caught in getDisabledAccounts(). Nested exception is ", e);
+			throw e;
+		}
+	}
+	
+	/*
+	 * Method to disable accounts who have exceeded their billing cycle and return their list.
+	 */
+	@Override
+	@Transactional
+	public List<DisabledAccount> getAccountsForPurge(int graceSpan) {
+		LOG.info("Method getAccountsForPurge started.");
+		try {
+			LOG.info("Method getAccountsForPurge finished.");
+			List<DisabledAccount> disabledAccounts = disabledAccountDao.getAccountsForPurge(graceSpan);
+			return disabledAccounts;
+		}
+		catch (DatabaseException e) {
+			LOG.error("Database exception caught in getAccountsForPurge(). Nested exception is ", e);
+			throw e;
+		}
+	}
+	
+	/*
+	 * Method to purge all the details of the given company(Not recoverable).
+	 */
+	@Override
+	@Transactional
+	public void purgeCompany(Company company) throws InvalidInputException, SolrException{
+		LOG.info("Method getAccountsForPurge started.");
+		try {
+			LOG.info("Method getAccountsForPurge finished.");
+			
+			if(company == null){
+				LOG.error("Null value passed for company in purgeCompany(). Returning...");
+				throw new InvalidInputException("Null value passed for company in purgeCompany().");
+			}
+			
+			List<Long> agentIds = solrSearchService.searchUserIdsByCompany(company.getCompanyId());
+			organizationUnitSettingsDao.removeOganizationUnitSettings(agentIds, CommonConstants.AGENT_SETTINGS_COLLECTION);
+			solrSearchService.removeUsersFromSolr(agentIds);
+			// Deleting all the users of company from MySQL
+			userProfileDao.deleteUserProfilesByCompany(company.getCompanyId());
+			// TODO Delete foreign key references from Removed users.
+			userDao.deleteUsersByCompanyId(company.getCompanyId());
+			
+			List<Long> branchIds = solrSearchService.searchBranchIdsByCompany(company.getCompanyId());
+			organizationUnitSettingsDao.removeOganizationUnitSettings(branchIds, CommonConstants.BRANCH_SETTINGS_COLLECTION);
+			solrSearchService.removeBranchesFromSolr(branchIds);
+			// Deleting all the branches of company from MySQL
+			branchDao.deleteBranchesByCompanyId(company.getCompanyId());
+			
+			List<Long> regionIds = solrSearchService.searchRegionIdsByCompany(company.getCompanyId());
+			organizationUnitSettingsDao.removeOganizationUnitSettings(regionIds, CommonConstants.REGION_SETTINGS_COLLECTION);
+			solrSearchService.removeRegionsFromSolr(regionIds);
+			// Deleting all the regions of company from MySQL
+			regionDao.deleteRegionsByCompanyId(company.getCompanyId());
+			
+			List<Long> companyIds = new ArrayList<>();
+			companyIds.add(company.getCompanyId());
+			organizationUnitSettingsDao.removeOganizationUnitSettings(companyIds, CommonConstants.COMPANY_SETTINGS_COLLECTION);
+			// Deleting company from MySQL
+			companyDao.delete(company);
+
+		}
+		catch (DatabaseException e) {
+			LOG.error("Database exception caught in getAccountsForPurge(). Nested exception is ", e);
 			throw e;
 		}
 	}

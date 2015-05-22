@@ -1233,4 +1233,173 @@ public class SolrSearchServiceImpl implements SolrSearchService {
 		}
 		return null;
 	}
+
+	/**
+	 * Method to perform search of User Ids from solr based on the company.
+	 * 
+	 * @throws InvalidInputException
+	 * @throws SolrException
+	 * @throws MalformedURLException
+	 */
+	@Override
+	public List<Long> searchUserIdsByCompany(long companyId) throws InvalidInputException, SolrException {
+		if (companyId < 0) {
+			throw new InvalidInputException("Pattern is null or empty while searching for Users");
+		}
+		LOG.info("Method searchUsersByCompanyId() called for company id : " + companyId);
+		String usersResult = null;
+		QueryResponse response = null;
+		List<Long> userIds = new ArrayList<>();
+		try {
+			SolrServer solrServer = new HttpSolrServer(solrUserUrl);
+			SolrQuery solrQuery = new SolrQuery();
+			solrQuery.setQuery(CommonConstants.COMPANY_ID_SOLR + ":" + companyId);
+			LOG.debug("Querying solr for searching users");
+			response = solrServer.query(solrQuery);
+			SolrDocumentList results = response.getResults();
+			if (results != null) {
+				for (SolrDocument user : results) {
+					userIds.add((Long) user.get(CommonConstants.USER_ID_SOLR));
+				}
+			}
+			LOG.debug("User search result is : " + usersResult);
+		}
+		catch (SolrServerException e) {
+			LOG.error("SolrServerException while performing User search");
+			throw new SolrException("Exception while performing search for user. Reason : " + e.getMessage(), e);
+		}
+
+		LOG.info("Method searchUsersByCompanyId() finished for company id : " + companyId);
+		return userIds;
+	}
+
+	/*
+	 * Method to remove all the users from Solr based upon the list of ids provided.
+	 */
+	@Override
+	public void removeUsersFromSolr(List<Long> agentIds) throws SolrException {
+		SolrServer solrServer = new HttpSolrServer(solrUserUrl);
+		if (agentIds != null && !agentIds.isEmpty()) {
+			String agentIdsStr = getSpaceSeparatedStringFromIds(new HashSet<>(agentIds));
+			String solrQuery = CommonConstants.USER_ID_SOLR + ":(" + agentIdsStr + ")";
+			try {
+				solrServer.deleteByQuery(solrQuery);
+				solrServer.commit();
+			}
+			catch (SolrServerException | IOException e) {
+				LOG.error("SolrServerException while deleting Users");
+				throw new SolrException("Exception while removing multiple users. Reason : " + e.getMessage(), e);
+			}
+		}
+	}
+
+	/**
+	 * Method to perform search of Branch Ids from solr based on the company.
+	 * 
+	 * @throws InvalidInputException
+	 * @throws SolrException
+	 * @throws MalformedURLException
+	 */
+	@Override
+	public List<Long> searchBranchIdsByCompany(long companyId) throws InvalidInputException, SolrException {
+		if (companyId < 0) {
+			throw new InvalidInputException("Company ID is null while searching for branches.");
+		}
+		LOG.info("Method searchBranchIdsByCompany() called for company id : " + companyId);
+		QueryResponse response = null;
+		List<Long> branchIds = new ArrayList<>();
+		try {
+			SolrServer solrServer = new HttpSolrServer(solrBranchUrl);
+			SolrQuery solrQuery = new SolrQuery();
+			solrQuery.setQuery(CommonConstants.COMPANY_ID_SOLR + ":" + companyId);
+			LOG.debug("Querying solr for searching branches");
+			response = solrServer.query(solrQuery);
+			SolrDocumentList results = response.getResults();
+			if (results != null) {
+				for (SolrDocument user : results) {
+					branchIds.add((Long) user.get(CommonConstants.BRANCH_ID_SOLR));
+				}
+			}
+			LOG.debug("Branches search result is : " + branchIds);
+		}
+		catch (SolrServerException e) {
+			LOG.error("SolrServerException while performing branch search");
+			throw new SolrException("Exception while performing search for branches. Reason : " + e.getMessage(), e);
+		}
+
+		LOG.info("Method searchBranchIdsByCompany() finished for company id : " + companyId);
+		return branchIds;
+	}
+
+	@Override
+	public void removeBranchesFromSolr(List<Long> branchIds) throws SolrException {
+		SolrServer solrServer = new HttpSolrServer(solrBranchUrl);
+		if (branchIds != null && !branchIds.isEmpty()) {
+			String branchIdsStr = getSpaceSeparatedStringFromIds(new HashSet<>(branchIds));
+			String solrQuery = CommonConstants.BRANCH_ID_SOLR + ":(" + branchIdsStr + ")";
+			try {
+				solrServer.deleteByQuery(solrQuery);
+				solrServer.commit();
+			}
+			catch (SolrServerException | IOException e) {
+				LOG.error("SolrServerException while deleting Branches");
+				throw new SolrException("Exception while removing multiple branches. Reason : " + e.getMessage(), e);
+			}
+		}
+	}
+	
+	/**
+	 * Method to perform search of Region Ids from solr based on the company.
+	 * 
+	 * @throws InvalidInputException
+	 * @throws SolrException
+	 * @throws MalformedURLException
+	 */
+	@Override
+	public List<Long> searchRegionIdsByCompany(long companyId) throws InvalidInputException, SolrException {
+		if (companyId < 0) {
+			throw new InvalidInputException("Company ID is null while searching for regions.");
+		}
+		LOG.info("Method searchBranchIdsByCompany() called for company id : " + companyId);
+		QueryResponse response = null;
+		List<Long> regionIds = new ArrayList<>();
+		try {
+			SolrServer solrServer = new HttpSolrServer(solrRegionUrl);
+			SolrQuery solrQuery = new SolrQuery();
+			solrQuery.setQuery(CommonConstants.COMPANY_ID_SOLR + ":" + companyId);
+			LOG.debug("Querying solr for searching regions");
+			response = solrServer.query(solrQuery);
+			SolrDocumentList results = response.getResults();
+			if (results != null) {
+				for (SolrDocument user : results) {
+					regionIds.add((Long) user.get(CommonConstants.REGION_ID_SOLR));
+				}
+			}
+			LOG.debug("Regions search result is : " + regionIds);
+		}
+		catch (SolrServerException e) {
+			LOG.error("SolrServerException while performing region search");
+			throw new SolrException("Exception while performing search for regions. Reason : " + e.getMessage(), e);
+		}
+
+		LOG.info("Method searchRegionIdsByCompany() finished for company id : " + companyId);
+		return regionIds;
+	}
+
+	@Override
+	public void removeRegionsFromSolr(List<Long> regionIds) throws SolrException {
+		SolrServer solrServer = new HttpSolrServer(solrRegionUrl);
+		if (regionIds != null && !regionIds.isEmpty()) {
+			String regionIdsStr = getSpaceSeparatedStringFromIds(new HashSet<>(regionIds));
+			String solrQuery = CommonConstants.REGION_ID_SOLR + ":(" + regionIdsStr + ")";
+			try {
+				solrServer.deleteByQuery(solrQuery);
+				solrServer.commit();
+			}
+			catch (SolrServerException | IOException e) {
+				LOG.error("SolrServerException while deleting Regions");
+				throw new SolrException("Exception while removing multiple regions. Reason : " + e.getMessage(), e);
+			}
+		}
+	}
 }
