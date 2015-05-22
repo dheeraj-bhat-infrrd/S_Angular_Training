@@ -15,7 +15,21 @@
 	<div class="hm-header-main-wrapper">
 		<div class="container">
 			<div class="hm-header-row hm-header-row-main clearfix">
-				<div class="float-left hm-header-row-left text-center"><spring:message code="label.header.usermanagement.key" /></div>
+				<div class="float-left hm-header-row-left text-center">
+					<spring:message code="label.header.usermanagement.key" />
+				</div>
+				<div class="float-right hm-header-right text-center"
+					onclick="javascript:showViewHierarchyPage()">
+					<spring:message code="label.viewcompanyhierachy.key" />
+				</div>
+				<div class="float-right hm-header-right text-center"
+					onclick="javascript:showMainContent('./showusermangementpage.do')">
+					<spring:message code="label.header.editteam.key" />
+				</div>
+				<div class="float-right hm-header-right text-center"
+					onclick="javascript:showMainContent('./showbuildhierarchypage.do')">
+					<spring:message code="label.header.buildhierarchy.key" />
+				</div>
 			</div>
 		</div>
 	</div>

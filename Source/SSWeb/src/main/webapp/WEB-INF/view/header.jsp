@@ -121,31 +121,36 @@
 				<div class="hdr-link-item hdr-link-active">
 					<a id="dashboard-link" href="javascript:showMainContent('./dashboard.do')" onclick="showOverlay();"><spring:message code="label.header.dashboard.key" /></a>
 				</div>
-				<c:if test="${(accountMasterId == 2 || accountMasterId == 3 || accountMasterId == 4) && (highestrole == 1 || highestrole == 2 || highestrole == 3)}">
-					<div class="hdr-link-item">
-						<a href="javascript:showMainContent('./showbuildhierarchypage.do')" onclick="showOverlay();"><spring:message code="label.header.buildhierarchy.key" /></a>
-					</div>
-				</c:if>
-				<c:if test="${highestrole == 1 && accountMasterId != 5}">
-					<div class="hdr-link-item">
-						<a href="javascript:showMainContent('./showbuildsurveypage.do')" onclick="showOverlay();"><spring:message code="label.header.buildsurvey.key" /></a>
-					</div>
-				</c:if>
 				<c:if test="${accountMasterId > 1 && accountMasterId < 5 && highestrole != 4 }">
 					<div class="hdr-link-item">
 						<a href="javascript:showMainContent('./showusermangementpage.do')" onclick="showOverlay();"><spring:message code="label.header.usermanagement.key" /></a>
 					</div>
 				</c:if>
+				<%-- <c:if test="${(accountMasterId == 2 || accountMasterId == 3 || accountMasterId == 4) && (highestrole == 1 || highestrole == 2 || highestrole == 3)}">
+					<div class="hdr-link-item">
+						<a href="javascript:showMainContent('./showbuildhierarchypage.do')" onclick="showOverlay();"><spring:message code="label.header.buildhierarchy.key" /></a>
+					</div>
+				</c:if> --%>
+				<c:if test="${highestrole == 1 && accountMasterId != 5}">
+					<div class="hdr-link-item">
+						<a href="javascript:showMainContent('./showbuildsurveypage.do')" onclick="showOverlay();"><spring:message code="label.header.buildsurvey.key" /></a>
+					</div>
+				</c:if>
+				<c:if test="${accountMasterId != 5}">
+					<div class="hdr-link-item">
+						<a href="javascript:showMainContent('./showcompanysettings.do')" onclick="showOverlay();"><spring:message code="label.editsettings.key" /></a>
+					</div>
+				</c:if>
 			</div>
 			<div id="header-user-info" class="header-user-info float-right clearfix">
-				<div id="hdr-usr-img" class="float-left user-info-initial">
+				<div id="hdr-usr-img" class="float-right user-info-initial">
 					<span id="usr-initl">${fn:substring(user.firstName, 0, 1)}</span>
 					<div class="initial-dd-wrapper hide blue-arrow-bot text-normal">
-						<c:if test="${accountMasterId != 5}">
+						<%-- <c:if test="${accountMasterId != 5}">
 							<div class="initial-dd-item" id="company-setting" onclick="showMainContent('./showcompanysettings.do'); showOverlay();">
 								<spring:message code="label.editsettings.key" />
 							</div>
-						</c:if>
+						</c:if> --%>
 						<div class="initial-dd-item" id="profile-setting" onclick="showMainContent('./showprofilepage.do'); showOverlay();">
 							<spring:message code="label.editprofile.key" />
 						</div>
@@ -162,12 +167,12 @@
 								<spring:message	code="label.header.upgrade.key" />
 							</div>
 						</c:if>
+						<div class="initial-dd-item" onclick="userLogout();">
+							<spring:message code="label.logout.key" /></a>
+						</div>
 					</div>
 				</div>
-                <div class="float-left user-info-sing-out">
-                    <a class="" href="j_spring_security_logout"><spring:message code="label.logout.key" /></a>
-                </div>
-				<c:if test="${displaylogo != null}">
+                <c:if test="${displaylogo != null}">
 					<div class="float-left user-info-seperator"></div>
 					<div class="float-left user-info-logo"
 						style="background: url(${displaylogo}) no-repeat center; background-size: contain;"></div>
@@ -182,4 +187,7 @@
 				 window.location.href = $(this).find('a').attr('href');
 			});
 		});
+		function userLogout(){
+			window.location.href = 'j_spring_security_logout';
+		}
 	</script>

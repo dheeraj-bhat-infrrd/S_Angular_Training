@@ -48,6 +48,29 @@ function fetchCompanyProfileCallBack(data) {
 			return false;
 		}
 		var result = $.parseJSON(response.entity);
+		
+		//Add title and meta data
+        var title;
+        var name = result.contact_details.name;
+        if(name){
+        	title = '['+name+'] Ratings & Reviews';
+        }
+        if(result.vertical){
+        	title += ' - [' + result.vertical + '] Reviews';
+        }
+        if(title){
+        	$('title').html(title);	
+        }
+		
+        if(result.completeProfileUrl){
+        	$('head').append('<link href="'+result.completeProfileUrl+'" rel="canonical">');
+        }
+        
+        if(name){
+        	$('head').append('<meta name="description" content="Use SocialSurvey Ratings & Reviews to find out how customers have rated ['+ name + '].">');
+        	$('head').append('<meta name="keywords" content="['+name+'],['+name+'] ratings,['+name+'] reviews,['+name+'] scorecard,['+name+'] ratings and reviews">');
+        }
+		
 		paintProfilePage(result);
 		fetchAverageRatings(result.iden);
 		fetchCompanyRegions();
@@ -122,19 +145,23 @@ function paintProfilePage(result) {
             if(profileLevel == 'INDIVIDUAL' && result.companyProfileData){
             	var companyProfileData = result.companyProfileData;
             	
-            	if(companyProfileData.name != undefined){
-                	addressHtml = addressHtml +'<div class="prof-user-addline1">'+companyProfileData.name+'</div>';
+            	if(companyProfileData.address1 != undefined){
+                	addressHtml = addressHtml +'<div class="prof-user-addline1">'+companyProfileData.address1+'</div>';
                 }
-                if(companyProfileData.address != undefined){
-                	addressHtml = addressHtml + '<div class="prof-user-addline2">'+companyProfileData.address+'</div>';
+                if(companyProfileData.address2 != undefined){
+                	addressHtml = addressHtml + '<div class="prof-user-addline2">'+companyProfileData.address2+'</div>';
                 }
-                if(companyProfileData.country != undefined) {
-                	addressHtml = addressHtml + '<div class="prof-user-addline2">'+companyProfileData.country;
-                	if(companyProfileData.zipcode){
-                		addressHtml += ' , '+companyProfileData.zipcode;
+                if(companyProfileData.zipcode != undefined) {
+                	addressHtml = addressHtml + '<div class="prof-user-addline2">';
+                	if(companyProfileData.city){
+                		addressHtml += companyProfileData.city + ', ';
                 	}
-                	addressHtml += '</div>';
+                	if(companyProfileData.state){
+                		addressHtml += companyProfileData.state + ', ';
+                	}
+                	addressHtml += companyProfileData.zipcode + '</div>';
                 }
+                
     		}else{
     			if(contactDetails.address1 != undefined){
                 	addressHtml = addressHtml +'<div class="prof-user-addline1">'+contactDetails.address1+'</div>';
@@ -228,7 +255,7 @@ function paintProfilePage(result) {
             	 $("#prof-company-intro").html(companyIntroHtml).show();
             }
             
-            var reviewsHeaderHtml = '<span class="ppl-say-txt-st">What people say</span> about '+contactDetails.name;
+            var reviewsHeaderHtml = '<span class="ppl-say-txt-st">What people say</span> About '+contactDetails.name;
             $("#prof-reviews-header").html(reviewsHeaderHtml);
             
             var contactInfoHtml = "";
@@ -871,6 +898,29 @@ function fetchRegionProfileCallBack(data) {
 			return false;
 		}
 		var result = $.parseJSON(response.entity);
+
+		//Add title and meta data
+        var title;
+        var name = result.contact_details.name;
+        if(name){
+        	title = '['+name+'] Ratings & Reviews';
+        }
+        if(result.vertical){
+        	title += ' - [' + result.vertical + '] Reviews';
+        }
+        if(title){
+        	$('title').html(title);	
+        }
+		
+        if(result.completeProfileUrl){
+        	$('head').append('<link href="'+result.completeProfileUrl+'" rel="canonical">');
+        }
+        
+        if(name){
+        	$('head').append('<meta name="description" content="Use SocialSurvey Ratings & Reviews to find out how customers have rated ['+name+'].">');
+        	$('head').append('<meta name="keywords" content="['+name+'],['+name+'] ratings,['+name+'] reviews,['+name+'] scorecard,['+name+'] ratings and reviews">');
+        }
+		
 		paintProfilePage(result);
 		fetchAverageRatingsForRegion(result.iden);
 		fetchBranchesForRegion(result.iden);
@@ -987,6 +1037,29 @@ function fetchBranchProfileCallBack(data) {
 			return false;
 		}
 		var result = $.parseJSON(response.entity);
+		
+		//Add title and meta data
+        var title;
+        var name = result.contact_details.name;
+        if(name){
+        	title = '['+name+'] Ratings & Reviews';
+        }
+        if(result.vertical){
+        	title += ' - [' + result.vertical + '] Reviews';
+        }
+        if(title){
+        	$('title').html(title);	
+        }
+		
+        if(result.completeProfileUrl){
+        	$('head').append('<link href="'+result.completeProfileUrl+'" rel="canonical">');
+        }
+        
+        if(name){
+        	$('head').append('<meta name="description" content="Use SocialSurvey Ratings & Reviews to find out how customers have rated ['+name+'].">');
+        	$('head').append('<meta name="keywords" content="['+name+'],['+name+'] ratings,['+name+'] reviews,['+name+'] scorecard,['+name+'] ratings and reviews">');
+        }
+		
 		paintProfilePage(result);
 		fetchAverageRatingsForBranch(result.iden);
 		fetchIndividualsForBranch(result.iden);
@@ -1172,6 +1245,29 @@ function fetchAgentProfileCallBack(data) {
 			return false;
 		}
 		var result = $.parseJSON(response.entity);
+		
+		//Add title and meta data
+        var title;
+        var name = result.contact_details.name;
+        if(name){
+        	title = '['+name+'] Ratings & Reviews';
+        }
+        if(result.vertical){
+        	title += ' - [' + result.vertical + '] Reviews';
+        }
+        if(title){
+        	$('title').html(title);	
+        }
+		
+        if(result.completeProfileUrl){
+        	$('head').append('<link href="'+result.completeProfileUrl+'" rel="canonical">');
+        }
+        
+        if(name){
+        	$('head').append('<meta name="description" content="Use SocialSurvey Ratings & Reviews to find out how customers have rated ['+name+'].">');
+        	$('head').append('<meta name="keywords" content="['+name+'],['+name+'] ratings,['+name+'] reviews,['+name+'] scorecard,['+name+'] ratings and reviews">');
+        }
+		
 		paintProfilePage(result);
 		paintIndividualDetails(result);
 		fetchAverageRatingsForAgent(result.iden);
