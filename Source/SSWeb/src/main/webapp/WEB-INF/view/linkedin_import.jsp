@@ -71,13 +71,14 @@
 				<div class="wc-social-icn float-left i-gplus" onclick="authenticate('google');"></div>
 				<div id="ggl-profile-url" class="wc-icn-txt float-left">${googleProfileUrl}</div>
 			</div>
+			<div class="wc-social-icn-row clearfix">
+				<div class="wc-social-icn i-yelp float-left" onclick="showYelpInput();"></div>
+				<input id="yelp-profile-url" class="wc-icn-txt float-left wc-form-input hide">
+				<div id="yelp-profile-url-display" class="wc-icn-txt float-left"></div>
+			</div>
 			<!-- <div class="wc-social-icn-row clearfix">
 				<div class="wc-social-icn i-rss float-left"></div>
-				<div class="wc-icn-txt float-left">blogs.scott-harris.com</div>
-			</div>
-			<div class="wc-social-icn-row clearfix">
-				<div class="wc-social-icn i-yelp float-left"></div>
-				<div class="wc-icn-txt float-left">www.Yelp.com/scott-harris</div>
+				<div class="wc-icn-txt float-left"></div>
 			</div> -->
 		</div>
 	</div>
