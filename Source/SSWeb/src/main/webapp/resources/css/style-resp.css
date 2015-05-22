@@ -217,6 +217,7 @@
     .hm-item-row-txt, .um-item-row-txt{
         width: 100%;
         box-shadow: none;
+        margin-left: 0;
         border-radius: 0;
         border-left: 0;
         border-right: 0;
@@ -275,12 +276,16 @@
         border-bottom: 1px solid #dcdcdc;
         margin-bottom: -1px;
     }
-    .um-item-row-icon{
-        position: absolute;
-        right: 0;
-        margin-right: 0;
-    }
-    .um-top-tag-wrapper{
+    .um-item-row-icon {
+		position: absolute;
+		top: 4px;
+		right: 0;
+		height: 30px;
+		width: 30px;
+		margin-right: 2px;
+		background-size: contain;
+	}
+	.um-top-tag-wrapper{
         margin-top: 25px;
     }
     .um-top-status-title{
@@ -295,11 +300,14 @@
     .st-score-txt, .st-score-rt{
         padding: 10px;
     }
-    .st-score-txt{
-        height: auto;
-        margin-bottom: 20px;
-    }
-    .score-rt-post {
+    .st-score-txt {
+		height: auto;
+		margin-bottom: 20px;
+		float: none;
+		width: 100%;
+		border-right: none;
+	}
+	.score-rt-post {
         width: 260px;
         height: 110px;
         padding: 0 !important;
@@ -828,7 +836,7 @@
         width: 310px;
     }
     .sq-ques-wrapper{
-        margin: 0 -15px;
+        margin: 10px -15px;
     }
     .ques-wrapper-adj, .reg-cap-nw-adj .reg-cap-nw-adj-container, .reg-cap-nw-adj .reg-captcha-img{
         width: 100%;
@@ -1440,6 +1448,12 @@
 	.tweet-panel-left-adj {
 		margin-bottom: 0;
 	}
+	.um-top-container {
+		border-bottom: 0;
+	}
+	.st-score-rt {
+		float: none !important;
+	}
 }
 
 
@@ -1475,7 +1489,7 @@
         width: 100%
     }
     .item-row-OR{
-        width: 375px;
+        width: 100%;
     }
     .overflow-hidden {
         overflow: hidden;
@@ -1485,7 +1499,7 @@
         font-size: 13px;
     }
     .um-item-row-left{
-        width: 100%;
+        width: 120px;
         font-size: 13px;
     }
     .hm-item-row-txt{
@@ -1493,7 +1507,7 @@
         font-size: 13px;
     }
     .um-item-row-txt{
-        width: 165px;
+        width: 280px;
         font-size: 13px;
     }
     .hm-left-item{
@@ -1735,6 +1749,9 @@
 	.welcome-popup-wrapper{
 		width: 95%;
 	}
+	.hm-item-height-adj {
+		min-height: 50px;
+	}
 }
 
 /* ============== MEDIUM SIZED SCREENS ==============*/
@@ -1746,13 +1763,13 @@
         width: 100%
     }
     .item-row-OR{
-        width: 465px;
+        width: auto;
     }
     .hm-item-row-txt, .hm-dd-wrapper, .um-item-row-txt{
         width: 260px;
     }
     .um-item-row-txt-OR{
-        width: 240px;
+        width: 200px;
     }
     .st-score-txt{
         width: 50%;
