@@ -14,7 +14,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
 import org.apache.solr.common.SolrDocumentList;
 import org.noggit.JSONUtil;
 import org.slf4j.Logger;
@@ -25,7 +24,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.DependsOn;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
-
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
@@ -35,6 +33,7 @@ import com.realtech.socialsurvey.core.commons.Utils;
 import com.realtech.socialsurvey.core.dao.GenericDao;
 import com.realtech.socialsurvey.core.dao.OrganizationUnitSettingsDao;
 import com.realtech.socialsurvey.core.dao.impl.MongoOrganizationUnitSettingDaoImpl;
+import com.realtech.socialsurvey.core.entities.AgentSettings;
 import com.realtech.socialsurvey.core.entities.Branch;
 import com.realtech.socialsurvey.core.entities.BranchFromSearch;
 import com.realtech.socialsurvey.core.entities.BranchSettings;
@@ -115,6 +114,24 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 	private GenericDao<ZipCodeLookup, Integer> zipCodeLookupDao;
 	
 	@Autowired
+	private GenericDao<Branch, Long> branchDao;
+
+	@Autowired
+	private OrganizationUnitSettingsDao organizationUnitSettingsDao;
+
+	@Autowired
+	private GenericDao<Region, Long> regionDao;
+
+	@Autowired
+	private GenericDao<UserProfile, Long> userProfileDao;
+
+	@Autowired
+	private SolrSearchService solrSearchService;
+
+	@Autowired
+	private Utils utils;
+
+	@Autowired
 	private Payment gateway;
 
 	@Autowired
@@ -172,6 +189,11 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 
 		LOG.debug("Calling method for adding organizational details");
 		addOrganizationalDetails(user, company, organizationalDetails);
+		
+		// update vertical in mongo
+		AgentSettings agentSettings = organizationUnitSettingsDao.fetchAgentSettingsById(user.getUserId());
+		organizationUnitSettingsDao.updateParticularKeyAgentSettings(MongoOrganizationUnitSettingDaoImpl.KEY_VERTICAL,
+				organizationalDetails.get(CommonConstants.VERTICAL), agentSettings);
 
 		LOG.info("Method addCompanyInformation finished for user " + user.getLoginName());
 		return user;
@@ -1646,7 +1668,12 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 		assigneeUser.setUserProfiles(userProfiles);
 
 		userManagementService.setProfilesOfUser(assigneeUser);
+		
+		AgentSettings agentSettings = organizationUnitSettingsDao.fetchAgentSettingsById(assigneeUser.getUserId());
+		assigneeUser.setProfileName(agentSettings.getProfileName());
+		assigneeUser.setProfileUrl(agentSettings.getProfileUrl());
 		solrSearchService.addUserToSolr(assigneeUser);
+		
 		LOG.info("Method to assignRegionToUser finished for regionId : " + regionId + " and userId : " + assigneeUser.getUserId());
 	}
 
@@ -1766,6 +1793,10 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 		assigneeUser.setUserProfiles(userProfiles);
 
 		userManagementService.setProfilesOfUser(assigneeUser);
+		
+		AgentSettings agentSettings = organizationUnitSettingsDao.fetchAgentSettingsById(assigneeUser.getUserId());
+		assigneeUser.setProfileName(agentSettings.getProfileName());
+		assigneeUser.setProfileUrl(agentSettings.getProfileUrl());
 		solrSearchService.addUserToSolr(assigneeUser);
 
 		LOG.info("Method assignBranchToUser executed successfully");
@@ -1782,6 +1813,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 			throws InvalidInputException, NoRecordsFetchedException, SolrException, UserAssignmentException {
 		LOG.info("Method addIndividual called for adminUser:" + adminUser + " branchId:" + branchId + " regionId:" + regionId + " isAdmin:" + isAdmin);
 		List<User> assigneeUsers = null;
+		
 		if (selectedUserId > 0l) {
 			LOG.debug("Fetching user for selectedUserId " + selectedUserId);
 			User assigneeUser = userDao.findById(User.class, selectedUserId);
@@ -1795,6 +1827,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 			LOG.debug("Fetching users list for the email addresses provided");
 			assigneeUsers = getUsersFromEmailIds(emailIdsArray, adminUser);
 		}
+		
 		if (assigneeUsers != null && !assigneeUsers.isEmpty()) {
 			/**
 			 * if branchId is provided, add the individual to specified branch
@@ -1831,24 +1864,6 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 		}
 		LOG.info("Method addNewIndividual executed successfully");
 	}
-
-	@Autowired
-	private GenericDao<Branch, Long> branchDao;
-
-	@Autowired
-	private OrganizationUnitSettingsDao organizationUnitSettingsDao;
-
-	@Autowired
-	private GenericDao<Region, Long> regionDao;
-
-	@Autowired
-	private GenericDao<UserProfile, Long> userProfileDao;
-
-	@Autowired
-	private SolrSearchService solrSearchService;
-
-	@Autowired
-	private Utils utils;
 
 	/**
 	 * Fetch list of branches in a company
@@ -2587,6 +2602,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 		organizationSettings.setCreatedOn(System.currentTimeMillis());
 		organizationSettings.setModifiedBy(region.getModifiedBy());
 		organizationSettings.setModifiedOn(System.currentTimeMillis());
+		organizationSettings.setVertical(region.getCompany().getVerticalsMaster().getVerticalName());
 
 		// Calling method to generate and set region profile name and url
 		generateAndSetRegionProfileNameAndUrl(region, organizationSettings);
@@ -2625,6 +2641,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 		organizationSettings.setCreatedOn(System.currentTimeMillis());
 		organizationSettings.setModifiedBy(branch.getModifiedBy());
 		organizationSettings.setModifiedOn(System.currentTimeMillis());
+		organizationSettings.setVertical(branch.getCompany().getVerticalsMaster().getVerticalName());
 
 		// Calling method to generate and set profile name and profile url
 		generateAndSetBranchProfileNameAndUrl(branch, organizationSettings);
