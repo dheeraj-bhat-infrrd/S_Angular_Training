@@ -576,6 +576,7 @@ html.is-modern.card-root.js.no-touch.csstransitions.svg.inlinesvg.placeholder
 	text-align: center;
 	line-height: 40px;
 	margin-top: 10px;
+	margin-left: 10px;
 	position: relative;
 	color: #fff;
 	text-transform: uppercase;
@@ -881,10 +882,10 @@ html.is-modern.card-root.js.no-touch.csstransitions.svg.inlinesvg.placeholder
 
 .um-item-row-icon {
 	float: right;
-	height: 50px;
-	width: 50px;
-	margin-left: 10px;
-	margin-right: 10px;
+	height: 40px;
+	width: 40px;
+	margin-left: 5px;
+	margin-right: 5px;
 }
 
 .um-item-row-left {
@@ -901,7 +902,7 @@ html.is-modern.card-root.js.no-touch.csstransitions.svg.inlinesvg.placeholder
 	outline: none;
 	box-shadow: none;
 	border: 1px solid #dcdcdc;
-	margin-right: 30px;
+	margin-left: 30px;
 	font-size: 12px;
 }
 
