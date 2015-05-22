@@ -943,6 +943,7 @@ public class SurveyManagementController {
 		catch (NullPointerException e) {
 			surveyAndStage.put("yelpEnabled", false);
 		}
+		
 		try {
 			if (agentSettings.getSocialMediaTokens().getGoogleToken().getProfileLink() != null)
 				surveyAndStage.put("googleEnabled", true);
@@ -952,6 +953,8 @@ public class SurveyManagementController {
 		catch (NullPointerException e) {
 			surveyAndStage.put("googleEnabled", false);
 		}
+		
+		surveyAndStage.put("agentFullProfileLink", getApplicationBaseUrl() + CommonConstants.AGENT_PROFILE_FIXED_URL + agentSettings.getProfileUrl());
 		surveyAndStage.put("agentProfileLink", agentSettings.getProfileUrl());
 		surveyAndStage.put("stage", stage);
 		surveyAndStage.put("survey", surveyQuestionDetails);

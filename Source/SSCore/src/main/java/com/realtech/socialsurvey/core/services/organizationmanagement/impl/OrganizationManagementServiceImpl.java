@@ -44,6 +44,7 @@ import com.realtech.socialsurvey.core.dao.UserInviteDao;
 import com.realtech.socialsurvey.core.dao.UserProfileDao;
 import com.realtech.socialsurvey.core.dao.UsercountModificationNotificationDao;
 import com.realtech.socialsurvey.core.dao.impl.MongoOrganizationUnitSettingDaoImpl;
+import com.realtech.socialsurvey.core.entities.AgentSettings;
 import com.realtech.socialsurvey.core.entities.Branch;
 import com.realtech.socialsurvey.core.entities.BranchFromSearch;
 import com.realtech.socialsurvey.core.entities.BranchSettings;
@@ -221,6 +222,11 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 
 		LOG.debug("Calling method for adding organizational details");
 		addOrganizationalDetails(user, company, organizationalDetails);
+		
+		// update vertical in mongo
+		AgentSettings agentSettings = organizationUnitSettingsDao.fetchAgentSettingsById(user.getUserId());
+		organizationUnitSettingsDao.updateParticularKeyAgentSettings(MongoOrganizationUnitSettingDaoImpl.KEY_VERTICAL,
+				organizationalDetails.get(CommonConstants.VERTICAL), agentSettings);
 
 		LOG.info("Method addCompanyInformation finished for user " + user.getLoginName());
 		return user;
@@ -1698,7 +1704,12 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 		assigneeUser.setUserProfiles(userProfiles);
 
 		userManagementService.setProfilesOfUser(assigneeUser);
+		
+		AgentSettings agentSettings = organizationUnitSettingsDao.fetchAgentSettingsById(assigneeUser.getUserId());
+		assigneeUser.setProfileName(agentSettings.getProfileName());
+		assigneeUser.setProfileUrl(agentSettings.getProfileUrl());
 		solrSearchService.addUserToSolr(assigneeUser);
+		
 		LOG.info("Method to assignRegionToUser finished for regionId : " + regionId + " and userId : " + assigneeUser.getUserId());
 	}
 
@@ -1818,6 +1829,10 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 		assigneeUser.setUserProfiles(userProfiles);
 
 		userManagementService.setProfilesOfUser(assigneeUser);
+		
+		AgentSettings agentSettings = organizationUnitSettingsDao.fetchAgentSettingsById(assigneeUser.getUserId());
+		assigneeUser.setProfileName(agentSettings.getProfileName());
+		assigneeUser.setProfileUrl(agentSettings.getProfileUrl());
 		solrSearchService.addUserToSolr(assigneeUser);
 
 		LOG.info("Method assignBranchToUser executed successfully");
@@ -1834,6 +1849,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 			throws InvalidInputException, NoRecordsFetchedException, SolrException, UserAssignmentException {
 		LOG.info("Method addIndividual called for adminUser:" + adminUser + " branchId:" + branchId + " regionId:" + regionId + " isAdmin:" + isAdmin);
 		List<User> assigneeUsers = null;
+		
 		if (selectedUserId > 0l) {
 			LOG.debug("Fetching user for selectedUserId " + selectedUserId);
 			User assigneeUser = userDao.findById(User.class, selectedUserId);
@@ -1847,6 +1863,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 			LOG.debug("Fetching users list for the email addresses provided");
 			assigneeUsers = getUsersFromEmailIds(emailIdsArray, adminUser);
 		}
+		
 		if (assigneeUsers != null && !assigneeUsers.isEmpty()) {
 			/**
 			 * if branchId is provided, add the individual to specified branch
@@ -2622,7 +2639,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 		organizationSettings.setModifiedBy(region.getModifiedBy());
 		organizationSettings.setModifiedOn(System.currentTimeMillis());
 		organizationSettings.setVertical(region.getCompany().getVerticalsMaster().getVerticalName());
-		
+
 		// Calling method to generate and set region profile name and url
 		generateAndSetRegionProfileNameAndUrl(region, organizationSettings);
 
@@ -2661,7 +2678,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 		organizationSettings.setModifiedBy(branch.getModifiedBy());
 		organizationSettings.setModifiedOn(System.currentTimeMillis());
 		organizationSettings.setVertical(branch.getCompany().getVerticalsMaster().getVerticalName());
-		
+
 		// Calling method to generate and set profile name and profile url
 		generateAndSetBranchProfileNameAndUrl(branch, organizationSettings);
 
