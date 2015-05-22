@@ -1766,11 +1766,12 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 		agentSettings.setModifiedBy(user.getModifiedBy());
 		agentSettings.setModifiedOn(System.currentTimeMillis());
 		agentSettings.setVertical(user.getCompany().getVerticalsMaster().getVerticalName());
-		MailIdSettings mail_ids = new MailIdSettings();
-		mail_ids.setWork(user.getEmailId());
 
+		// set the seo flag to true
+		agentSettings.setSeoContentModified(true);
+		agentSettings.setReviewCount(0);
+		
 		ContactDetailsSettings contactSettings = new ContactDetailsSettings();
-
 		if (user.getLastName() != null) {
 			contactSettings.setName(user.getFirstName() + " " + user.getLastName());
 		}
@@ -1778,11 +1779,15 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 			contactSettings.setName(user.getFirstName());
 		}
 
+		MailIdSettings mail_ids = new MailIdSettings();
+		mail_ids.setWork(user.getEmailId());
 		contactSettings.setMail_ids(mail_ids);
+		
 		agentSettings.setContact_details(contactSettings);
 
 		String profileName = generateIndividualProfileName(user.getUserId(), contactSettings.getName(), user.getEmailId());
 		agentSettings.setProfileName(profileName);
+		
 		String profileUrl = utils.generateAgentProfileUrl(profileName);
 		agentSettings.setProfileUrl(profileUrl);
 
@@ -1791,10 +1796,6 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 		 */
 		user.setProfileName(profileName);
 		user.setProfileUrl(profileUrl);
-
-		// set the seo flag to true
-		agentSettings.setSeoContentModified(true);
-		agentSettings.setReviewCount(0);
 
 		// Set default profile stages.
 		agentSettings.setProfileStages(profileCompletionList.getDefaultProfileCompletionList());
