@@ -9,7 +9,7 @@ import com.realtech.socialsurvey.core.exception.NoRecordsFetchedException;
 /*
  * This interface contains methods which are required for Solr import
  */
-public interface SolrImportDao extends GenericDao<Branch, Long> {
+public interface SolrImportDao extends BranchDao {
 
 	public List<Region> fetchRegionsPage(int offset, int pageSize) throws NoRecordsFetchedException;
 

@@ -6,6 +6,7 @@ package com.realtech.socialsurvey.core.services.search;
 import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrDocumentList;
@@ -228,5 +229,19 @@ public interface SolrSearchService {
 	public void addUsersToSolr(List<User> users) throws SolrException;
 
 	public void updateCompletedSurveyCountForUserInSolr(long agentId) throws SolrException;
+
+	public Map<String, String> getCompanyAdmin(long companyId) throws SolrException;
+
+	public List<Long> searchUserIdsByCompany(long companyId) throws InvalidInputException, SolrException;
+
+	public void removeUsersFromSolr(List<Long> agentIds) throws SolrException;
+
+	public List<Long> searchBranchIdsByCompany(long companyId) throws SolrException, InvalidInputException;
+
+	public void removeBranchesFromSolr(List<Long> branchIds) throws SolrException;
+
+	public List<Long> searchRegionIdsByCompany(long companyId) throws InvalidInputException, SolrException;
+
+	public void removeRegionsFromSolr(List<Long> regionIds) throws SolrException;
 }
 // JIRA:SS-62 BY RM 02 EOC
