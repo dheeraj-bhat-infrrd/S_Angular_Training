@@ -98,19 +98,15 @@
         /* background: #fff; */
         color: #3e3e3e;
     }
-    .reg-txt-top1{
-        font-size: 16px;
-        text-align: center;
-        margin-top: 5px;
-    
-        color: #fff;
-}
-    .reg-txt-top2{
-        text-align: center;
-    
-        color: #fff;
-}
-    .reg-inp{
+    .reg-txt-top1 {
+		font-size: 16px;
+		margin-top: 5px;
+		color: #fff;
+	}
+	.reg-txt-top2 {
+		color: #fff;
+	}
+	.reg-inp{
         width: 49%;
         /* border-radius: 0; */
         margin: 0;
