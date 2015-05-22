@@ -672,6 +672,32 @@ public class EmailServicesImpl implements EmailServices {
 		emailSender.sendEmailWithBodyReplacements(emailEntity, subjectFileName, messageBodyReplacements);
 		LOG.info("Successfully sent account disabled mail");
 	}
+	
+	@Async
+	@Override
+	public void sendAccountDeletionMail(String recipientMailId, String displayName, String loginName) throws InvalidInputException,
+			UndeliveredEmailException {
+		if (recipientMailId == null || recipientMailId.isEmpty()) {
+			LOG.error("Recipient email Id is empty or null for sending account deletion mail ");
+			throw new InvalidInputException("Recipient email Id is empty or null for sending account deletion mail ");
+		}
+		if (displayName == null || displayName.isEmpty()) {
+			LOG.error("displayName parameter is empty or null for sending account deletion mail ");
+			throw new InvalidInputException("displayName parameter is empty or null for sending account deletion mail ");
+		}
+
+		LOG.info("Sending account deletion email to : " + recipientMailId);
+		EmailEntity emailEntity = prepareEmailEntityForSendingEmail(recipientMailId);
+		String subjectFileName = EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER + EmailTemplateConstants.ACCOUNT_DELETED_MAIL_SUBJECT;
+
+		FileContentReplacements messageBodyReplacements = new FileContentReplacements();
+		messageBodyReplacements.setFileName(EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER + EmailTemplateConstants.ACCOUNT_DELETED_MAIL_BODY);
+		messageBodyReplacements.setReplacementArgs(Arrays.asList(appLogoUrl, displayName, loginName, appBaseUrl));
+
+		LOG.debug("Calling email sender to send mail");
+		emailSender.sendEmailWithBodyReplacements(emailEntity, subjectFileName, messageBodyReplacements);
+		LOG.info("Successfully sent account disabled mail");
+	}
 
 	@Async
 	@Override
