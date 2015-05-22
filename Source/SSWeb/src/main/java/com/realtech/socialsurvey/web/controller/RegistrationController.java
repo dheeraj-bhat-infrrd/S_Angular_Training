@@ -165,9 +165,26 @@ public class RegistrationController {
 			if (urlParams == null || urlParams.isEmpty()) {
 				throw new InvalidInputException("Url params are null or empty in showRegistrationPage");
 			}
+			
+			String emailAddress = urlParams.get(CommonConstants.EMAIL_ID);
+			User invitedUser = null;
+			try {
+				invitedUser = userManagementService.getUserByEmail(emailAddress);
+			}
+			catch (NoRecordsFetchedException e) {
+				LOG.warn("NonFatalException while showing registration page. Reason : " + e.getMessage(), e);
+			}
+			
+			if (invitedUser != null) {
+				model.addAttribute("status", DisplayMessageType.ERROR_MESSAGE);
+				model.addAttribute("message",
+						messageUtils.getDisplayMessage(DisplayMessageConstants.INVALID_REGISTRATION_INVITE, DisplayMessageType.ERROR_MESSAGE));
+				return JspResolver.LOGIN;
+			}
+			
 			model.addAttribute("firstname", urlParams.get(CommonConstants.FIRST_NAME));
 			model.addAttribute("lastname", urlParams.get(CommonConstants.LAST_NAME));
-			model.addAttribute("emailid", urlParams.get(CommonConstants.EMAIL_ID));
+			model.addAttribute("emailid", emailAddress);
 			model.addAttribute("isDirectRegistration", true);
 
 			LOG.debug("Validation of url completed. Service returning params to be prepopulated in registration page");
