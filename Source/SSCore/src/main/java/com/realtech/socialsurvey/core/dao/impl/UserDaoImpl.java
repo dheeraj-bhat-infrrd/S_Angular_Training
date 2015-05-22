@@ -3,6 +3,7 @@ package com.realtech.socialsurvey.core.dao.impl;
 import java.util.List;
 import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
+import org.hibernate.Query;
 import org.hibernate.criterion.Criterion;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Projections;
@@ -143,6 +144,24 @@ public class UserDaoImpl extends GenericDaoImpl<User, Long> implements UserDao {
 		LOG.info("Method to fetch all the users by email id, fetchUsersBySimilarEmailId() finished.");
 
 		return (List<User>) criteria.list();
+	}
+
+	/*
+	 * Method to delete all the users of a company.
+	 */
+	@Override
+	public void deleteUsersByCompanyId(long companyId) {
+		LOG.info("Method to delete all the users by company id,deleteUsersByCompanyId() started.");
+		try {
+			Query query = getSession().createQuery("delete from User where company.companyId=?");
+			query.setParameter(0, companyId);
+			query.executeUpdate();
+		}
+		catch (HibernateException hibernateException) {
+			LOG.error("Exception caught in deleteUsersByCompanyId() ", hibernateException);
+			throw new DatabaseException("Exception caught in deleteUsersByCompanyId() ", hibernateException);
+		}
+		LOG.info("Method to fetch all the users by email id, deleteUsersByCompanyId() finished.");
 	}
 }
 // JIRA SS-42 By RM-05 EOC

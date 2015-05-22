@@ -19,6 +19,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.commons.ProfileCompletionList;
 import com.realtech.socialsurvey.core.commons.Utils;
+import com.realtech.socialsurvey.core.dao.BranchDao;
 import com.realtech.socialsurvey.core.dao.GenericDao;
 import com.realtech.socialsurvey.core.dao.OrganizationUnitSettingsDao;
 import com.realtech.socialsurvey.core.dao.SurveyDetailsDao;
@@ -114,8 +115,9 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 	@Autowired
 	private GenericDao<LicenseDetail, Long> licenseDetailsDao;
 
-	@Autowired
-	private GenericDao<Branch, Long> branchDao;
+	@Resource
+	@Qualifier("branch")
+	private BranchDao branchDao;
 
 	@Autowired
 	private GenericDao<Region, Long> regionDao;
