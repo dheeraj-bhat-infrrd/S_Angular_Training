@@ -57,8 +57,8 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
 	public static final String KEY_LICENCES = "licenses";
 	public static final String KEY_SOCIAL_MEDIA_TOKENS = "socialMediaTokens";
 	public static final String KEY_COMPANY_POSITIONS = "positions";
-
 	public static final String KEY_IDENTIFIER = "iden";
+	public static final String KEY_VERTICAL = "vertical";
 
 	private static final Logger LOG = LoggerFactory.getLogger(MongoOrganizationUnitSettingDaoImpl.class);
 
