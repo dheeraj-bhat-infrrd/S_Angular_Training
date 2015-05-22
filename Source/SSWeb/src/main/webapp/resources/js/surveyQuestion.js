@@ -28,6 +28,7 @@ var editable;
 var yelpEnabled;
 var googleEnabled;
 var agentProfileLink;
+var agentFullProfileLink;
 
 $(document).on('click', '.sq-np-item-next', function() {
 });
@@ -36,8 +37,7 @@ $(document).on('click', '.sq-np-item-next', function() {
  * Function to initiate survey. It hits controller to get list of all the
  * questions which are shown one after one to the customer.
  */
-function initSurvey(firstName, lastName, email, agentId, agentName,
-		grecaptcharesponse) {
+function initSurvey(firstName, lastName, email, agentId, agentName, grecaptcharesponse) {
 	this.agentId = agentId;
 	this.agentName = agentName;
 	customerEmail = email;
@@ -164,6 +164,8 @@ function paintSurveyPage(jsonData) {
 	yelpEnabled = Boolean(jsonData.responseJSON.yelpEnabled);
 	googleEnabled = Boolean(jsonData.responseJSON.googleEnabled);
 	agentProfileLink = jsonData.responseJSON.agentProfileLink;
+	agentFullProfileLink = jsonData.responseJSON.agentFullProfileLink;
+	
 	if (stage != undefined)
 		qno = stage;
 	paintSurveyPageFromJson();
@@ -490,24 +492,31 @@ function showMasterQuestionPage(){
 		//if ($('#pst-srvy-div').is(':visible'))
 		//	autoPost = $('#post-survey').is(":checked");
 		var feedback = $("#text-area").val();
-		if($('#shr-post-chk-box').hasClass('bd-check-img') && (rating >= autoPostScore) && (Boolean(autoPost) == true)){
+		if (feedback == null || feedback == "") {
+			$('#overlay-toast').html('Please enter feedback to continue');
+			showToast();
+			return;
+		}
+		if ($('#shr-post-chk-box').hasClass('bd-check-img') && (rating >= autoPostScore) && (Boolean(autoPost) == true)) {
 			postToSocialMedia(feedback);
 			$('#social-post-lnk').show();
-			if(yelpEnabled && (mood=='Great'))
+			if (yelpEnabled && (mood=='Great'))
 				$('#ylp-btn').show();
 			else
 				$('#ylp-btn').hide();
-			if(googleEnabled && (mood=='Great'))
+			
+			if (googleEnabled && (mood=='Great'))
 				$('#ggl-btn').show();
 			else
 				$('#ggl-btn').hide();
 		}
+		
 		updateCustomerResponse(feedback);
 		$("div[data-ques-type]").hide();
 		$("div[data-ques-type='error']").show();
+		$('#profile-link').html('View ' + agentName + '\'s profile at <a href="' + agentFullProfileLink + '" target="_blank">' + agentFullProfileLink + '</a>');
 		$('#content-head').html('Survey Completed');
-		$('#content').html("Congratulations! You have completed survey for "
-			+ agentName+ ".\nThanks for your participation.");
+		$('#content').html("Congratulations! You have completed survey for " + agentName+ ".\nThanks for your participation.");
 	}
 	return;
 }
@@ -905,7 +914,7 @@ $('#start-btn').click(function() {
 	
 	var agentId = $('#prof-container').attr("data-agentId");
 	var agentName = $('#prof-container').attr("data-agentName");
-	var e = document.getElementById("cust-agnt-rel");
+	//var e = document.getElementById("cust-agnt-rel");
 	//var relationship = e.options[e.selectedIndex].value;
 	initSurvey(firstName, lastName, email, agentId, agentName,
 			grecaptcharesponse);
