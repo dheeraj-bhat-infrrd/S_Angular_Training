@@ -709,11 +709,9 @@ public class SocialManagementController {
 			String refreshToken = "";
 			Map<String, Object> tokenData = new Gson().fromJson(tokenResponse.getBody(), new TypeToken<Map<String, String>>() {}.getType());
 			if (tokenData != null) {
-				LOG.info("Google access token: " + tokenData.get("access_token") + ", Refresh Token: " + tokenData.get("refresh_token"));
-				if(tokenData.get("access_token") != null && tokenData.get("refresh_token") != null){
-					accessToken = tokenData.get("access_token").toString();
-					refreshToken = tokenData.get("refresh_token").toString();
-				}
+				LOG.debug("Google access token: " + tokenData.get("access_token") + ", Refresh Token: " + tokenData.get("refresh_token"));
+				accessToken = tokenData.get("access_token").toString();
+				refreshToken = tokenData.get("refresh_token").toString();
 			}
 			LOG.info("Access Token: " + accessToken + ", Refresh Token: " + refreshToken);
 			
