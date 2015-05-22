@@ -14,6 +14,9 @@ public final class EmailTemplateConstants {
 
 	public static final String ACCOUNT_DISABLED_MAIL_BODY = "AccountDisabledMailBody.html";
 	public static final String ACCOUNT_DISABLED_MAIL_SUBJECT = "AccountDisabledMailSubject.txt";
+	
+	public static final String ACCOUNT_DELETED_MAIL_BODY = "AccountDeletedMailBody.html";
+	public static final String ACCOUNT_DELETED_MAIL_SUBJECT = "AccountDeletedMailSubject.txt";
 
 	public static final String ACCOUNT_REACTIVATION_MAIL_BODY = "AccountReactivationMailBody.html";
 	public static final String ACCOUNT_REACTIVATION_MAIL_SUBJECT = "AccountReactivationMailSubject.txt";
