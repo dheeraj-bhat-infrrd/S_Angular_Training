@@ -182,31 +182,31 @@
 	<bean id="deactivatedaccountpurgercron"
 		class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
 		<property name="jobDetail" ref="deactivatedaccountpurgerjobdetail" />
-		<property name="cronExpression" value="* 15 7 * * ?" />
+		<property name="cronExpression" value="* 0/1 * * * ?" />
 	</bean>
 
 	<!-- Scheduler factory -->
 	<bean class="org.springframework.scheduling.quartz.SchedulerFactoryBean">
 		<property name="jobDetails">
 			<list>
-				<ref bean="sitemapjobdetail" />
+				<!-- <ref bean="sitemapjobdetail" />
 				<ref bean="incompletesocialpostjobdetail" />
 				<ref bean="incompletesurveyjobdetail" />
 				<ref bean="updatesubscriptionpricejobdetail" />
 				<ref bean="socialfeedingesterjobdetail" />
-				<ref bean="accountdeactivatorjobdetail" />
+				<ref bean="accountdeactivatorjobdetail" /> -->
 				<ref bean="deactivatedaccountpurgerjobdetail" />
 			</list>
 		</property>
 
 		<property name="triggers">
 			<list>
-				<ref bean="sitemapgeneratorcron" />
+				<!-- <ref bean="sitemapgeneratorcron" />
 				<ref bean="incompletesocialpostcron" />
 				<ref bean="incompletesurveycron" />
 				<ref bean="updatesubscriptionpricecron" />
 				<ref bean="socialfeedingestercron" />
-				<ref bean="accountdeactivatorcron" />
+				<ref bean="accountdeactivatorcron" /> -->
 				<ref bean="deactivatedaccountpurgercron" />
 			</list>
 		</property>

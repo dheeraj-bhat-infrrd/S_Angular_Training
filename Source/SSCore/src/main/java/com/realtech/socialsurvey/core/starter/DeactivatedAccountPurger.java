@@ -35,7 +35,7 @@ public class DeactivatedAccountPurger extends QuartzJobBean {
 		List<DisabledAccount> disabledAccounts = organizationManagementService.getAccountsForPurge(maxDaysToPurgeAccount);
 		for(DisabledAccount account : disabledAccounts){
 			try {
-				sendAccountDisabledNotificationMail(account);
+				sendAccountDeletedNotificationMail(account);
 				purgeCompany(account.getCompany());
 			}
 			catch (InvalidInputException e) {
@@ -72,7 +72,7 @@ public class DeactivatedAccountPurger extends QuartzJobBean {
 		LOG.debug("Method to delete all the company details purgeCompany() finished.");
 	}
 	
-	private void sendAccountDisabledNotificationMail(DisabledAccount disabledAccount) throws InvalidInputException {
+	private void sendAccountDeletedNotificationMail(DisabledAccount disabledAccount) throws InvalidInputException {
 		// Send email to notify each company admin that the company account will be deactivated after 30 days so that they can take required steps.
 		Company company = disabledAccount.getCompany();
 		Map<String, String> companyAdmin = new HashMap<String, String>();
@@ -80,11 +80,11 @@ public class DeactivatedAccountPurger extends QuartzJobBean {
 			companyAdmin = solrSearchService.getCompanyAdmin(company.getCompanyId());
 		}
 		catch (SolrException e1) {
-			LOG.error("SolrException caught in sendAccountDisabledNotificationMail() while trying to send mail to the company admin .");
+			LOG.error("SolrException caught in sendAccountDeletedNotificationMail() while trying to send mail to the company admin .");
 		}
 		try {
 			if(companyAdmin != null && companyAdmin.get("emailId")!=null)
-				emailServices.sendAccountDisabledMail(companyAdmin.get("emailId"), companyAdmin.get("displayName"), companyAdmin.get("loginName"));
+				emailServices.sendAccountDeletionMail(companyAdmin.get("emailId"), companyAdmin.get("displayName"), companyAdmin.get("loginName"));
 		}
 		catch (InvalidInputException|UndeliveredEmailException e) {
 			LOG.error("Exception caught while sending mail to " + companyAdmin.get("displayName") + " .Nested exception is ", e);

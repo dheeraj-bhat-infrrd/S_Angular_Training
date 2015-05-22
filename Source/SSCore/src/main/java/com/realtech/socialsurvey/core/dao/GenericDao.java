@@ -51,5 +51,7 @@ public interface GenericDao<T, ID extends Serializable> {
 	public List<T> findProjectionsByKeyValue(Class<T> dataClass,List<String> columnNames,Map<String, Object> queries);
 
 	public List<T> findByKeyValueAscending(Class<T> dataClass, Map<String, Object> queries, String ascendingColumn);
+
+	public void deleteByCondition(String entity, List<String> conditions);
 }
 // JIRA: SS-8: By RM05: EOC

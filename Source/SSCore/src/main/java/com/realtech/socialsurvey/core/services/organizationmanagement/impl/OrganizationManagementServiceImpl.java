@@ -38,8 +38,11 @@ import com.realtech.socialsurvey.core.dao.DisabledAccountDao;
 import com.realtech.socialsurvey.core.dao.GenericDao;
 import com.realtech.socialsurvey.core.dao.OrganizationUnitSettingsDao;
 import com.realtech.socialsurvey.core.dao.RegionDao;
+import com.realtech.socialsurvey.core.dao.RemovedUserDao;
 import com.realtech.socialsurvey.core.dao.UserDao;
+import com.realtech.socialsurvey.core.dao.UserInviteDao;
 import com.realtech.socialsurvey.core.dao.UserProfileDao;
+import com.realtech.socialsurvey.core.dao.UsercountModificationNotificationDao;
 import com.realtech.socialsurvey.core.dao.impl.MongoOrganizationUnitSettingDaoImpl;
 import com.realtech.socialsurvey.core.entities.Branch;
 import com.realtech.socialsurvey.core.entities.BranchFromSearch;
@@ -59,7 +62,9 @@ import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
 import com.realtech.socialsurvey.core.entities.ProfilesMaster;
 import com.realtech.socialsurvey.core.entities.Region;
 import com.realtech.socialsurvey.core.entities.RegionFromSearch;
+import com.realtech.socialsurvey.core.entities.RetriedTransaction;
 import com.realtech.socialsurvey.core.entities.StateLookup;
+import com.realtech.socialsurvey.core.entities.SurveyCompanyMapping;
 import com.realtech.socialsurvey.core.entities.SurveySettings;
 import com.realtech.socialsurvey.core.entities.User;
 import com.realtech.socialsurvey.core.entities.UserFromSearch;
@@ -136,6 +141,18 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 
 	@Autowired
 	private SolrSearchService solrSearchService;
+	
+	@Autowired
+	private RemovedUserDao removedUserDao;
+	
+	@Autowired
+	private UserInviteDao userInviteDao;
+	
+	@Autowired
+	private GenericDao<SurveyCompanyMapping, Long> surveyCompanyMappingDao;
+	
+	@Autowired
+	private UsercountModificationNotificationDao usercountModificationNotificationDao;
 
 	@Autowired
 	private Utils utils;
@@ -151,6 +168,12 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 
 	@Autowired
 	private ProfileManagementService profileManagementService;
+	
+	@Autowired
+	private GenericDao<LicenseDetail, Long> licenseDetailDao;
+	
+	@Autowired
+	private GenericDao<RetriedTransaction, Long> retriedTransactionDao;
 
 	@Value("${HAPPY_TEXT}")
 	private String happyText;
@@ -3205,7 +3228,8 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 			solrSearchService.removeUsersFromSolr(agentIds);
 			// Deleting all the users of company from MySQL
 			userProfileDao.deleteUserProfilesByCompany(company.getCompanyId());
-			// TODO Delete foreign key references from Removed users.
+			// Delete foreign key references from Removed users.
+			removedUserDao.deleteRemovedUsersByCompany(company.getCompanyId());
 			userDao.deleteUsersByCompanyId(company.getCompanyId());
 			
 			List<Long> branchIds = solrSearchService.searchBranchIdsByCompany(company.getCompanyId());
@@ -3223,6 +3247,8 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 			List<Long> companyIds = new ArrayList<>();
 			companyIds.add(company.getCompanyId());
 			organizationUnitSettingsDao.removeOganizationUnitSettings(companyIds, CommonConstants.COMPANY_SETTINGS_COLLECTION);
+			// Delete all the details from tables which are related to current company.
+			performPreCompanyDeletions(company.getCompanyId());
 			// Deleting company from MySQL
 			companyDao.delete(company);
 
@@ -3231,6 +3257,38 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 			LOG.error("Database exception caught in getAccountsForPurge(). Nested exception is ", e);
 			throw e;
 		}
+	}
+
+	private void performPreCompanyDeletions(long companyId) {
+		Map<String, Object> queries = new HashMap<>();
+		queries.put(CommonConstants.COMPANY_ID_COLUMN, companyId);
+		List<LicenseDetail> licenseDetails = licenseDetailDao.findByColumn(LicenseDetail.class, "company.companyId", companyId);
+		// Delete from PaymentRetry table
+		List<String> conditions = new ArrayList<>();
+		StringBuilder licenseIds = new StringBuilder("(");
+		for(LicenseDetail license : licenseDetails){
+			licenseIds.append(license.getLicenseId()).append(",");
+		}
+		int commaIndex = licenseIds.lastIndexOf(",");
+		if(commaIndex != -1){
+			licenseIds = new StringBuilder(licenseIds.substring(0, commaIndex));
+			licenseIds.append(")");
+		}
+		conditions.add("licenseDetail.licenseId in " + licenseIds);
+		retriedTransactionDao.deleteByCondition("RetriedTransaction", conditions);
+		conditions.clear();
+		
+		conditions.add("company.companyId = " + companyId);
+		
+		disabledAccountDao.deleteByCondition("DisabledAccount", conditions);
+		
+		licenseDetailDao.deleteByCondition("LicenseDetail", conditions);
+		
+		userInviteDao.deleteByCondition("UserInvite", conditions);
+		
+		usercountModificationNotificationDao.deleteByCondition("UsercountModificationNotification", conditions);
+		
+		surveyCompanyMappingDao.deleteByCondition("SurveyCompanyMapping", conditions);
 	}
 
 }
