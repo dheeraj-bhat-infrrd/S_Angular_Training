@@ -231,5 +231,17 @@ public interface SolrSearchService {
 	public void updateCompletedSurveyCountForUserInSolr(long agentId) throws SolrException;
 
 	public Map<String, String> getCompanyAdmin(long companyId) throws SolrException;
+
+	public List<Long> searchUserIdsByCompany(long companyId) throws InvalidInputException, SolrException;
+
+	public void removeUsersFromSolr(List<Long> agentIds) throws SolrException;
+
+	public List<Long> searchBranchIdsByCompany(long companyId) throws SolrException, InvalidInputException;
+
+	public void removeBranchesFromSolr(List<Long> branchIds) throws SolrException;
+
+	public List<Long> searchRegionIdsByCompany(long companyId) throws InvalidInputException, SolrException;
+
+	public void removeRegionsFromSolr(List<Long> regionIds) throws SolrException;
 }
 // JIRA:SS-62 BY RM 02 EOC

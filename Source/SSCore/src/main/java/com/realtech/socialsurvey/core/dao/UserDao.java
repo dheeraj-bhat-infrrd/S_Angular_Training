@@ -22,6 +22,8 @@ public interface UserDao extends GenericDao<User, Long> {
 
 	public List<User> fetchUsersByEmailId(List<String> emailIds);
 
+	public void deleteUsersByCompanyId(long companyId);
+
 	// JIRA SS-76 by RM-06 : EOC
 
 }

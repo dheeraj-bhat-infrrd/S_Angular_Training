@@ -19,4 +19,6 @@ public interface UserProfileDao extends GenericDao<UserProfile, Long> {
 	public List<Long> getBranchIdsForUser(User user);
 
 	public List<Long> getBranchesForAdmin(User user, List<ProfilesMaster> profilesMasters);
+
+	public void deleteUserProfilesByCompany(long companyId);
 }

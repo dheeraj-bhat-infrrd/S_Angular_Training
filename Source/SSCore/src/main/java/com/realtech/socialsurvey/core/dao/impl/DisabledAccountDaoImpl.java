@@ -1,5 +1,6 @@
 package com.realtech.socialsurvey.core.dao.impl;
 
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import org.hibernate.Criteria;
@@ -18,6 +19,10 @@ import com.realtech.socialsurvey.core.exception.DatabaseException;
 @Component("disabledAccount")
 public class DisabledAccountDaoImpl extends GenericDaoImpl<DisabledAccount, Long> implements DisabledAccountDao {
 
+	/*
+	 * Method to disable accounts whose DisableDate (Last date of billing cycle) has passed.
+	 * Returns list of all the accounts disabled.
+	 */
 	@SuppressWarnings("unchecked")
 	@Override
 	public List<DisabledAccount> disableAccounts(Date maxDisableDate) {
@@ -38,5 +43,32 @@ public class DisabledAccountDaoImpl extends GenericDaoImpl<DisabledAccount, Long
 			throw new DatabaseException("HibernateException caught in disableAccounts(). Nested exception is ", e);
 		}
 	}
+	
+	/*
+	 * Method to get accounts which were disabled before grace span.
+	 */
+	@SuppressWarnings("unchecked")
+	@Override
+	public List<DisabledAccount> getAccountsForPurge(int graceSpan){
+		try{
+			Criteria criteria = getSession().createCriteria(DisabledAccount.class);
+			Date maxDateForPurge = getNdaysBackDate(graceSpan);
+			
+			criteria.add(Restrictions.lt(CommonConstants.MODIFIED_ON_COLUMN, maxDateForPurge));
+			criteria.add(Restrictions.eq(CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_INACTIVE));
+			// Adding criteria to check for disable date for safer side.
+			criteria.add(Restrictions.lt("disableDate", maxDateForPurge));
+			return criteria.list();
+		}
+		catch(HibernateException e){
+			throw new DatabaseException("HibernateException caught in getAccountsForPurge(). Nested exception is ", e);
+		}
+	}
 
+	private Date getNdaysBackDate(int noOfDays) {
+		Calendar calendar = Calendar.getInstance();
+		calendar.add(Calendar.DATE, noOfDays * (-1));
+		Date startDate = calendar.getTime();
+		return startDate;
+	}
 }
