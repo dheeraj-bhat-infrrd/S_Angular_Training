@@ -182,11 +182,6 @@
 		</div>
 	</div>
 	<script>
-		$(document).ready(function(){
-			$('.header-links-item').on('click',function(){
-				 window.location.href = $(this).find('a').attr('href');
-			});
-		});
 		function userLogout(){
 			window.location.href = 'j_spring_security_logout';
 		}

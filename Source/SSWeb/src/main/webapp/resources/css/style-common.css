@@ -3713,7 +3713,7 @@ button.paypal.is-active {
 
 .hr-txt1,.hr-txt2 {
 	height: 60px;
-	line-height: 55px;
+	line-height: 60px;
 }
 
 .hr-txt2 {
@@ -4264,7 +4264,7 @@ button.paypal.is-active {
 }
 
 .rfr_txt_fld {
-	width: 275px;
+	width: 270px;
 	height: 40px;
 	border-radius: 3px;
 	outline: none;
@@ -4821,6 +4821,7 @@ select.rfr_txt_fld,select.rfr_input_fld{
 .ui-autocomplete li {
 	line-height: 24px;
 	list-style: none;
+	cursor: pointer;
 }
 
 .btn_reg_lin {
