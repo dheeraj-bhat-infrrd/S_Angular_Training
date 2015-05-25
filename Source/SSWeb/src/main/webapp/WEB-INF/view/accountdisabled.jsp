@@ -60,6 +60,6 @@
 <script src="${initParam.resourcesPath}/resources/js/bootstrap.min.js"></script>
 <script src="${initParam.resourcesPath}/resources/js/script.js"></script>
 <script src="${initParam.resourcesPath}/resources/js/common.js"></script>
-<script src="${initParam.resourcesPath}/resources/js/settings.js"></script>
+<script src="${initParam.resourcesPath}/resources/js/application.js"></script>
 </body>
 </html>
