@@ -53,6 +53,7 @@
 				<entry key="surveyHandler" value-ref="surveyHandler" />
 				<entry key="emailServices" value-ref="emailServices" />
 				<entry key="userManagementService" value-ref="userManagementService" />
+				<entry key="socialManagementService" value-ref="socialManagementService" />
 				<entry key="organizationManagementService" value-ref="organizationManagementService" />
 			</map>
 		</property>
@@ -253,6 +254,8 @@
 		class="com.realtech.socialsurvey.core.dummy.generator.SurveyGenerationServiceImpl" />
 	<bean id="surveyBuilder"
 		class="com.realtech.socialsurvey.core.services.surveybuilder.impl.SurveyBuilderImpl" />
+	<bean id="socialManagementService"
+		class="com.realtech.socialsurvey.core.services.social.impl.SocialManagementServiceImpl" />
 
 	<bean id="regionsFullImport"
 		class="com.realtech.socialsurvey.core.utils.solr.RegionsFullImport" />
@@ -260,6 +263,7 @@
 		class="com.realtech.socialsurvey.core.utils.solr.BranchesFullImport" />
 	<bean id="usersFullImport"
 		class="com.realtech.socialsurvey.core.utils.solr.UsersFullImport" />
+
 
 	<!-- Posts to wall -->
 	<bean id="postToWall" class="com.realtech.socialsurvey.core.utils.mongo.PostToWall" />

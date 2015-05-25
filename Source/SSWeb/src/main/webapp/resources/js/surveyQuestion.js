@@ -398,7 +398,7 @@ function showFeedbackPage(mood) {
 			}
 		}
 		rating = currResponse/(counter);
-		rating = parseFloat(rating).toFixed(2);
+		rating = parseFloat(rating).toFixed(3);
 		if((rating >= autoPostScore) && (Boolean(autoPost) == true))
 			$("#pst-srvy-div").show();
 		break;

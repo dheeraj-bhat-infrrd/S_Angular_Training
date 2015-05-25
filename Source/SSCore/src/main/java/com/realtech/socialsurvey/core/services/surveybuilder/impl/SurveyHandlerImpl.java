@@ -102,7 +102,20 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean {
 
 	@Value("${APPLICATION_LOGO_URL}")
 	private String appLogoUrl;
+	
+	@Value("${MAX_SURVEY_REMINDERS}")
+	private int maxSurveyReminders;
 
+	@Value("${MAX_SOCIAL_POST_REMINDERS}")
+	private int maxSocialpostReminders;
+
+	@Value("${SURVEY_REMINDER_INTERVAL}")
+	private int surveyReminderInterval;
+
+	@Value("${SOCIAL_POST_REMINDER_INTERVAL}")
+	private int socialPostReminderInterval;
+
+	
 	/**
 	 * Method to store question and answer format into mongo.
 	 * 
@@ -312,7 +325,7 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean {
 	@Transactional
 	public List<SurveyPreInitiation> getIncompleteSurveyCustomersEmail(long companyId) {
 		LOG.info("started.");
-		int surveyReminderInterval = 0;
+		int reminderInterval = 0;
 		int maxReminders = 0;
 		List<SurveyPreInitiation> incompleteSurveyCustomers = new ArrayList<>();
 		OrganizationUnitSettings organizationUnitSettings = organizationUnitSettingsDao.fetchOrganizationUnitSettingsById(companyId,
@@ -322,13 +335,20 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean {
 			SurveySettings surveySettings = organizationUnitSettings.getSurvey_settings();
 			if (surveySettings != null) {
 				if (!surveySettings.getIsReminderDisabled() && surveySettings.getSurvey_reminder_interval_in_days() > 0) {
-					surveyReminderInterval = surveySettings.getSurvey_reminder_interval_in_days();
+					reminderInterval = surveySettings.getSurvey_reminder_interval_in_days();
 					maxReminders = surveySettings.getMax_number_of_survey_reminders();
 				}
 			}
 		}
+		// Setting default values for Max number of survey reminders and survey reminder interval. 
+		if(maxReminders == 0){
+			maxReminders = maxSurveyReminders;
+		}
+		if(reminderInterval == 0){
+			reminderInterval = surveyReminderInterval;
+		}
 //		incompleteSurveyCustomers = surveyDetailsDao.getIncompleteSurveyCustomers(companyId, surveyReminderInterval, maxReminders);
-		incompleteSurveyCustomers = surveyPreInitiationDao.getIncompleteSurveyForReminder(companyId, surveyReminderInterval, maxReminders);
+		incompleteSurveyCustomers = surveyPreInitiationDao.getIncompleteSurveyForReminder(companyId, reminderInterval, maxReminders);
 		// TODO do above code using mysql...should be simple
 		LOG.info("finished.");
 		return incompleteSurveyCustomers;
@@ -347,7 +367,7 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean {
 	@Override
 	public List<SurveyDetails> getIncompleteSocialPostSurveys(long companyId) {
 		LOG.info("started.");
-		int surveyReminderInterval = 0;
+		int reminderInterval = 0;
 		int maxReminders = 0;
 		float autopostScore = 0;
 		List<SurveyDetails> incompleteSocialPostCustomers = new ArrayList<>();
@@ -358,13 +378,19 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean {
 			SurveySettings surveySettings = organizationUnitSettings.getSurvey_settings();
 			if (surveySettings != null) {
 				if (!surveySettings.getIsReminderDisabled() && surveySettings.getSurvey_reminder_interval_in_days() > 0) {
-					surveyReminderInterval = surveySettings.getSurvey_reminder_interval_in_days();
+					reminderInterval = surveySettings.getSurvey_reminder_interval_in_days();
 					maxReminders = surveySettings.getMax_number_of_survey_reminders();
 					autopostScore = surveySettings.getShow_survey_above_score();
 				}
 			}
 		}
-		incompleteSocialPostCustomers = surveyDetailsDao.getIncompleteSocialPostCustomersEmail(companyId, surveyReminderInterval, maxReminders,
+		if(maxReminders == 0){
+			maxReminders = maxSocialpostReminders;
+		}
+		if(reminderInterval == 0){
+			reminderInterval = socialPostReminderInterval;
+		}
+		incompleteSocialPostCustomers = surveyDetailsDao.getIncompleteSocialPostCustomersEmail(companyId, reminderInterval, maxReminders,
 				autopostScore);
 		LOG.info("finished.");
 		return incompleteSocialPostCustomers;
@@ -394,9 +420,9 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean {
 	}
 
 	@Override
-	public void updateSharedOn(List<String> socialSites, long agentId, String customerEmail) {
+	public void updateSharedOn(String socialSite, long agentId, String customerEmail) {
 		LOG.info("Method to update sharedOn in SurveyDetails collection, updateSharedOn() started.");
-		surveyDetailsDao.updateSharedOn(socialSites, agentId, customerEmail);
+		surveyDetailsDao.updateSharedOn(socialSite, agentId, customerEmail);
 		LOG.info("Method to update sharedOn in SurveyDetails collection, updateSharedOn() finished.");
 	}
 
