@@ -9,12 +9,15 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import javax.annotation.Resource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
+import com.realtech.socialsurvey.core.dao.BranchDao;
 import com.realtech.socialsurvey.core.dao.GenericDao;
 import com.realtech.socialsurvey.core.dao.UserDao;
 import com.realtech.socialsurvey.core.entities.Branch;
@@ -49,8 +52,9 @@ public class CsvUploadServiceImpl implements CsvUploadService {
 	@Autowired
 	private UserDao userDao;
 
-	@Autowired
-	private GenericDao<Branch, Long> branchDao;
+	@Resource
+	@Qualifier("branch")
+	private BranchDao branchDao;
 
 	@Autowired
 	private GenericDao<Region, Long> regionDao;

@@ -125,4 +125,13 @@ public class UserProfileDaoImpl extends GenericDaoImpl<UserProfile, Long> implem
 		LOG.info("Method getBranchesForAdmin() finished to fetch branches assigned to user : " + user.getFirstName());
 		return branchIds;
 	}
+	
+	@Override
+	public void deleteUserProfilesByCompany(long companyId) {
+		LOG.info("Method deleteUserProfilesByCompany() called to delete profiles of company id : " + companyId);
+		Query query = getSession().createQuery("delete from UserProfile where company.companyId=?");
+		query.setParameter(0, companyId);
+		query.executeUpdate();
+		LOG.info("Method deleteUserProfilesByCompany() finished.");
+	}
 }

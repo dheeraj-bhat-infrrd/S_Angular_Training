@@ -377,9 +377,9 @@
         $('.icn-person').click(function() {
             $('.mob-icn').removeClass('mob-icn-active');
             $(this).addClass('mob-icn-active');
-            $('#contact-info').show();
+            $('#prof-company-intro').show();
+            $('#contact-info').hide();
             $('#prof-agent-container').hide();
-            $('#prof-company-intro').hide();
             $('#reviews-container').hide();
             $('#recent-post-container').hide();
         });

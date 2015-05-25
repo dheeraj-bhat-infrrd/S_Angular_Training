@@ -295,4 +295,7 @@ public interface EmailServices {
 
 	public void sendReportAbuseMail(String recipientMailId, String displayName, String agentName, String customerName, String customerEmail,
 			String review) throws InvalidInputException, UndeliveredEmailException;
+
+	public void sendAccountDeletionMail(String recipientMailId, String displayName, String loginName) throws InvalidInputException,
+			UndeliveredEmailException;
 }
