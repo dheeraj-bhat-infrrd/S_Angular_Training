@@ -334,7 +334,18 @@
 	<script src="https://www.google.com/recaptcha/api/challenge?k=6LdlHOsSAAAAAM8ypy8W2KXvgMtY2dFsiQT3HVq-"></script>
 </div>
  -->
-<jsp:include page="scripts.jsp"></jsp:include>
+<script src="${initParam.resourcesPath}/resources/js/jquery-2.1.1.min.js"></script>
+<script src="${initParam.resourcesPath}/resources/js/bootstrap.min.js"></script>
+<script src="${initParam.resourcesPath}/resources/js/common.js"></script>
+<script src="https://www.google.com/jsapi?autoload={'modules':[{'name':'visualization','version':'1','packages':['corechart']}]}"></script>
+<script src="${initParam.resourcesPath}/resources/js/common.js"></script>
+<script src="${initParam.resourcesPath}/resources/js/script.js"></script>
+<script src="${initParam.resourcesPath}/resources/js/usermanagement.js"></script>
+<script src="https://js.braintreegateway.com/v2/braintree.js"></script>
+<script src="${initParam.resourcesPath}/resources/js/progressbar.min.js"></script>
+<script src="${initParam.resourcesPath}/resources/js/rangeslider.min.js"></script>
+<script src="${initParam.resourcesPath}/resources/js/application.js"></script>
+<script src="${initParam.resourcesPath}/resources/js/googletracking.js"></script>
 <script>
 $(document).ready(function() {
 	$("div[data-ques-type]").hide();
