@@ -18,7 +18,7 @@ public class GenericController {
 
 	@Value("${GOOGLE_ANALYTICS_ID}")
 	private String googleAnalyticsTrackingId;
-	
+
 	@Value("${GOOGLE_MAP_API_KEY}")
 	private String googleMapAPIKey;
 
@@ -37,18 +37,17 @@ public class GenericController {
 	@ResponseBody
 	@RequestMapping(value = "/fetchgatrackingid")
 	public String fetchGoogleAnalyticsTrackingId() {
-		LOG.warn("Method fetchGoogleAnalyticsTrackingId() called from GenericController");
+		LOG.info("Method fetchGoogleAnalyticsTrackingId() called from GenericController");
 		return googleAnalyticsTrackingId;
 	}
-	
+
 	/**
 	 * Method to return google maps API Key
-	 * 
 	 */
 	@ResponseBody
 	@RequestMapping(value = "/fetchgooglemapapikey")
 	public String fetchGoogleMapAPIKey() {
-		LOG.warn("Method fetchGoogleMapAPIKey() called from GenericController");
+		LOG.info("Method fetchGoogleMapAPIKey() called from GenericController");
 		return googleMapAPIKey;
 	}
 }

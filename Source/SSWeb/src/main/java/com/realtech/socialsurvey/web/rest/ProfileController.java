@@ -3,12 +3,10 @@ package com.realtech.socialsurvey.web.rest;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.List;
-
 import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
-
 import org.apache.solr.common.SolrDocumentList;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -18,7 +16,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
-
 import com.google.gson.Gson;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.entities.AgentSettings;
@@ -28,6 +25,7 @@ import com.realtech.socialsurvey.core.entities.ContactDetailsSettings;
 import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
 import com.realtech.socialsurvey.core.entities.ProfilesMaster;
 import com.realtech.socialsurvey.core.entities.Region;
+import com.realtech.socialsurvey.core.entities.SocialMediaTokens;
 import com.realtech.socialsurvey.core.entities.SocialPost;
 import com.realtech.socialsurvey.core.entities.SurveyDetails;
 import com.realtech.socialsurvey.core.entities.UserProfile;
@@ -42,7 +40,6 @@ import com.realtech.socialsurvey.core.exception.RestErrorResponse;
 import com.realtech.socialsurvey.core.services.organizationmanagement.OrganizationManagementService;
 import com.realtech.socialsurvey.core.services.organizationmanagement.ProfileManagementService;
 import com.realtech.socialsurvey.core.services.search.exception.SolrException;
-
 import ezvcard.Ezvcard;
 import ezvcard.VCard;
 import ezvcard.VCardVersion;
@@ -125,11 +122,16 @@ public class ProfileController {
 			OrganizationUnitSettings regionProfile = null;
 			try {
 				regionProfile = profileManagementService.getRegionByProfileName(companyProfileName, regionProfileName);
+				
+				// aggregated social profile urls
+				SocialMediaTokens agentTokens = profileManagementService.aggregateSocialProfiles(regionProfile, CommonConstants.REGION_ID);
+				regionProfile.setSocialMediaTokens(agentTokens);
+				
 				String json = new Gson().toJson(regionProfile);
 				LOG.debug("regionProfile json : " + json);
 				response = Response.ok(json).build();
 			}
-			catch (InvalidInputException e) {
+			catch (InvalidInputException | NoRecordsFetchedException e) {
 				throw new InternalServerException(new ProfileServiceErrorCode(CommonConstants.ERROR_CODE_REGION_PROFILE_SERVICE_FAILURE,
 						CommonConstants.SERVICE_CODE_REGION_PROFILE, "Error occured while fetching region profile"), e.getMessage());
 			}
@@ -165,11 +167,16 @@ public class ProfileController {
 			OrganizationUnitSettings branchProfile = null;
 			try {
 				branchProfile = profileManagementService.getBranchByProfileName(companyProfileName, branchProfileName);
+				
+				// aggregated social profile urls
+				SocialMediaTokens agentTokens = profileManagementService.aggregateSocialProfiles(branchProfile, CommonConstants.BRANCH_ID);
+				branchProfile.setSocialMediaTokens(agentTokens);
+				
 				String json = new Gson().toJson(branchProfile);
 				LOG.debug("branchProfile json : " + json);
 				response = Response.ok(json).build();
 			}
-			catch (InvalidInputException e) {
+			catch (InvalidInputException | NoRecordsFetchedException e) {
 				throw new InternalServerException(new ProfileServiceErrorCode(CommonConstants.ERROR_CODE_BRANCH_PROFILE_SERVICE_FAILURE,
 						CommonConstants.SERVICE_CODE_BRANCH_PROFILE, "Error occured while fetching branch profile"), e.getMessage());
 			}
@@ -202,6 +209,11 @@ public class ProfileController {
 			OrganizationUnitSettings individualProfile = null;
 			try {
 				individualProfile = profileManagementService.getIndividualByProfileName(individualProfileName);
+				
+				// aggregated social profile urls
+				SocialMediaTokens agentTokens = profileManagementService.aggregateSocialProfiles(individualProfile, CommonConstants.AGENT_ID);
+				individualProfile.setSocialMediaTokens(agentTokens);
+				
 				String json = new Gson().toJson(individualProfile);
 				LOG.debug("individualProfile json : " + json);
 				response = Response.ok(json).build();
