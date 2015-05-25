@@ -474,33 +474,36 @@ public class SurveyManagementController {
 			String linkedinMessage = rating + "-Star Survey Response from " + custFirstName + " " + custLastName + " for " + agentName
 					+ " on SocialSurvey - view at " + getApplicationBaseUrl() + CommonConstants.AGENT_PROFILE_FIXED_URL + agentProfileLink;
 			try {
-				socialManagementService.updateStatusIntoFacebookPage(agentSettings, facebookMessage);
-				List<String> socialSites = new ArrayList<>();
-				socialSites.add(CommonConstants.FACEBOOK_SOCIAL_SITE);
-				socialSites.add(CommonConstants.TWITTER_SOCIAL_SITE);
-				socialSites.add(CommonConstants.LINKEDIN_SOCIAL_SITE);
-				surveyHandler.updateSharedOn(socialSites, agentId, customerEmail);
+				if(!socialManagementService.updateStatusIntoFacebookPage(agentSettings, facebookMessage)){
+					surveyHandler.updateSharedOn(CommonConstants.FACEBOOK_SOCIAL_SITE, agentId, customerEmail);
+				}
 			}
 			catch (FacebookException e) {
 				LOG.error("FacebookException caught in postToSocialMedia() while trying to post to facebook. Nested excption is ", e);
 			}
 			for (OrganizationUnitSettings setting : settings) {
 				try {
-					socialManagementService.updateStatusIntoFacebookPage(setting, facebookMessage);
+					if(!socialManagementService.updateStatusIntoFacebookPage(setting, facebookMessage)){
+						surveyHandler.updateSharedOn(CommonConstants.FACEBOOK_SOCIAL_SITE, agentId, customerEmail);
+					}
 				}
 				catch (FacebookException e) {
 					LOG.error("FacebookException caught in postToSocialMedia() while trying to post to facebook. Nested excption is ", e);
 				}
 			}
 			try {
-				socialManagementService.tweet(agentSettings, twitterMessage);
+				if(!socialManagementService.tweet(agentSettings, twitterMessage)){
+					surveyHandler.updateSharedOn(CommonConstants.TWITTER_SOCIAL_SITE, agentId, customerEmail);
+				}
 			}
 			catch (TwitterException e) {
 				LOG.error("TwitterException caught in postToSocialMedia() while trying to post to twitter. Nested excption is ", e);
 			}
 			for (OrganizationUnitSettings setting : settings) {
 				try {
-					socialManagementService.tweet(setting, twitterMessage);
+					if(!socialManagementService.tweet(setting, twitterMessage)){
+						surveyHandler.updateSharedOn(CommonConstants.LINKEDIN_SOCIAL_SITE, agentId, customerEmail);
+					}
 				}
 				catch (TwitterException e) {
 					LOG.error("TwitterException caught in postToSocialMedia() while trying to post to twitter. Nested excption is ", e);
@@ -509,7 +512,9 @@ public class SurveyManagementController {
 
 			socialManagementService.updateLinkedin(agentSettings, linkedinMessage);
 			for (OrganizationUnitSettings setting : settings) {
-				socialManagementService.updateLinkedin(setting, linkedinMessage);
+				if(!socialManagementService.updateLinkedin(setting, linkedinMessage)){
+					surveyHandler.updateSharedOn(CommonConstants.LINKEDIN_SOCIAL_SITE, agentId, customerEmail);
+				}
 			}
 		}
 		catch (NonFatalException e) {
@@ -550,9 +555,7 @@ public class SurveyManagementController {
 					+ " on Social Survey - view at " + getApplicationBaseUrl() + CommonConstants.AGENT_PROFILE_FIXED_URL + agentProfileLink;
 			try {
 				socialManagementService.updateStatusIntoFacebookPage(agentSettings, facebookMessage);
-				List<String> socialSites = new ArrayList<>();
-				socialSites.add(CommonConstants.FACEBOOK_SOCIAL_SITE);
-				surveyHandler.updateSharedOn(socialSites, agentId, customerEmail);
+				surveyHandler.updateSharedOn(CommonConstants.FACEBOOK_SOCIAL_SITE, agentId, customerEmail);
 			}
 			catch (FacebookException e) {
 				LOG.error("FacebookException caught in postToSocialMedia() while trying to post to facebook. Nested excption is ", e);
@@ -603,9 +606,7 @@ public class SurveyManagementController {
 					+ " on @SocialSurvey - view at " + getApplicationBaseUrl() + CommonConstants.AGENT_PROFILE_FIXED_URL + agentProfileLink;
 			try {
 				socialManagementService.tweet(agentSettings, twitterMessage);
-				List<String> socialSites = new ArrayList<>();
-				socialSites.add(CommonConstants.TWITTER_SOCIAL_SITE);
-				surveyHandler.updateSharedOn(socialSites, agentId, customerEmail);
+				surveyHandler.updateSharedOn(CommonConstants.TWITTER_SOCIAL_SITE, agentId, customerEmail);
 			}
 			catch (TwitterException e) {
 				LOG.error("TwitterException caught in postToTwitter() while trying to post to twitter. Nested excption is ", e);
@@ -658,9 +659,7 @@ public class SurveyManagementController {
 			for (OrganizationUnitSettings setting : settings) {
 				socialManagementService.updateLinkedin(setting, message);
 			}
-			List<String> socialSites = new ArrayList<>();
-			socialSites.add(CommonConstants.TWITTER_SOCIAL_SITE);
-			surveyHandler.updateSharedOn(socialSites, agentId, customerEmail);
+			surveyHandler.updateSharedOn(CommonConstants.LINKEDIN_SOCIAL_SITE, agentId, customerEmail);
 		}
 		catch (NonFatalException e) {
 			LOG.error("NonFatalException caught in postToTwitter(). Nested exception is ", e);
@@ -808,9 +807,7 @@ public class SurveyManagementController {
 				LOG.error("NumberFormatException caught while trying to convert agentId in getYelpLink(). Nested exception is ", e);
 				throw e;
 			}
-			List<String> socialSites = new ArrayList<>();
-			socialSites.add(socialSite);
-			surveyHandler.updateSharedOn(socialSites, agentId, customerEmail);
+			surveyHandler.updateSharedOn(socialSite, agentId, customerEmail);
 
 		}
 		catch (NonFatalException e) {

@@ -69,7 +69,7 @@ public interface SurveyHandler {
 
 	public void increaseSurveyCountForAgent(long agentId) throws SolrException;
 
-	public void updateSharedOn(List<String> socialSites, long agentId, String customerEmail);
+	public void updateSharedOn(String socialSite, long agentId, String customerEmail);
 
 	public String getGoogleShareUri();
 	

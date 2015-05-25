@@ -13,6 +13,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.quartz.QuartzJobBean;
 import com.realtech.socialsurvey.core.entities.AgentSettings;
 import com.realtech.socialsurvey.core.entities.Company;
+import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
 import com.realtech.socialsurvey.core.entities.SurveyDetails;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.services.generator.URLGenerator;
@@ -20,6 +21,7 @@ import com.realtech.socialsurvey.core.services.mail.EmailServices;
 import com.realtech.socialsurvey.core.services.mail.UndeliveredEmailException;
 import com.realtech.socialsurvey.core.services.organizationmanagement.OrganizationManagementService;
 import com.realtech.socialsurvey.core.services.organizationmanagement.UserManagementService;
+import com.realtech.socialsurvey.core.services.social.SocialManagementService;
 import com.realtech.socialsurvey.core.services.surveybuilder.SurveyHandler;
 
 public class IncompleteSocialPostReminderSender extends QuartzJobBean {
@@ -29,31 +31,43 @@ public class IncompleteSocialPostReminderSender extends QuartzJobBean {
 	private UserManagementService userManagementService;
 
 	private SurveyHandler surveyHandler;
-	
+
 	private EmailServices emailServices;
-	
+
 	private OrganizationManagementService organizationManagementService;
+
+	private SocialManagementService socialManagementService;
 
 	public static final Logger LOG = LoggerFactory.getLogger(IncompleteSocialPostReminderSender.class);
 
 	private static List<String> socialSites = new ArrayList<>();
 
 	@Override
-	 protected void executeInternal(JobExecutionContext jobExecutionContext){
+	protected void executeInternal(JobExecutionContext jobExecutionContext) {
 		LOG.info("Executing IncompleteSocialPostReminderSender");
 		initializeDependencies(jobExecutionContext.getMergedJobDataMap());
 		populateSocialSites();
-//		IncompleteSocialPostReminderSender sender = new IncompleteSocialPostReminderSender();
+		// IncompleteSocialPostReminderSender sender = new IncompleteSocialPostReminderSender();
 		StringBuilder links = new StringBuilder();
 		Set<String> socialPosts;
 		for (Company company : organizationManagementService.getAllCompanies()) {
 			List<SurveyDetails> incompleteSocialPostCustomers = surveyHandler.getIncompleteSocialPostSurveys(company.getCompanyId());
 			for (SurveyDetails survey : incompleteSocialPostCustomers) {
-				if(survey.getSharedOn() == null)
+
+				// To fetch settings of Agent and admins in the hierarchy
+				Set<String> socialSitesWithSettings = new HashSet<>();
+				try {
+					 socialSitesWithSettings = getSocialSitesWithSettingsConfigured(survey.getAgentId());
+				}
+				catch (InvalidInputException e) {
+					LOG.error("InvalidInputException caught in executeInternal() for SocialpostReminderMail");
+				}
+
+				if (survey.getSharedOn() == null)
 					socialPosts = new HashSet<>();
 				else
 					socialPosts = new HashSet<String>(survey.getSharedOn());
-				for (String site : getRemainingSites(socialPosts)) {
+				for (String site : getRemainingSites(socialPosts, socialSitesWithSettings)) {
 					try {
 						links.append("\nFor ").append(site).append(" : ").append(generateQueryParams(survey, site));
 					}
@@ -80,10 +94,11 @@ public class IncompleteSocialPostReminderSender extends QuartzJobBean {
 		surveyHandler = (SurveyHandler) jobMap.get("surveyHandler");
 		emailServices = (EmailServices) jobMap.get("emailServices");
 		userManagementService = (UserManagementService) jobMap.get("userManagementService");
+		socialManagementService = (SocialManagementService) jobMap.get("socialManagementService");
 		organizationManagementService = (OrganizationManagementService) jobMap.get("organizationManagementService");
 
 	}
-	
+
 	private static void populateSocialSites() {
 		socialSites.add("facebook");
 		socialSites.add("twitter");
@@ -127,10 +142,52 @@ public class IncompleteSocialPostReminderSender extends QuartzJobBean {
 		return urlGenerator.generateUrl(params, surveyHandler.getApplicationBaseUrl() + subUrl);
 	}
 
-	private static List<String> getRemainingSites(Set<String> sharedOn) {
+	private static List<String> getRemainingSites(Set<String> sharedOn, Set<String> socialSitesWithSettings) {
 		List<String> allElems = new ArrayList<String>(socialSites);
 		allElems.removeAll(sharedOn);
+		allElems.retainAll(socialSitesWithSettings);
 		return allElems;
 	}
 
+	private Set<String> getSocialSitesWithSettingsConfigured(long agentId) throws InvalidInputException {
+		LOG.debug("Method to get settings of agent and admins in the hierarchy getSocialSitesWithSettingsConfigured() started.");
+		OrganizationUnitSettings agentSettings = userManagementService.getUserSettings(agentId);
+		List<OrganizationUnitSettings> hierarchySettings = socialManagementService.getSettingsForBranchesAndRegionsInHierarchy(agentId);
+		List<OrganizationUnitSettings> settings;
+		if(hierarchySettings!=null){
+			settings = new ArrayList<>(hierarchySettings);
+		}
+		else{
+			settings = new ArrayList<>();
+		}
+		Set<String> socialSitesWithSettings = new HashSet<>();
+		
+		// Enabling Google+ and Yelp only if agent has configured it.
+		if (agentSettings != null){
+			settings.add(agentSettings);
+			if(agentSettings.getSocialMediaTokens().getGoogleToken() != null){
+				socialSitesWithSettings.add("google");
+			}
+			if(agentSettings.getSocialMediaTokens().getYelpToken() != null){
+				socialSitesWithSettings.add("yelp");
+			}
+		}
+		
+		// Enabling Facebook / Linkedin / Twitter if agent or anybody in the hierarchy has configured in settings.
+		for (OrganizationUnitSettings setting : settings) {
+			if (setting.getSocialMediaTokens() != null) {
+				if (setting.getSocialMediaTokens() != null && setting.getSocialMediaTokens().getFacebookToken() != null) {
+					socialSitesWithSettings.add("facebook");
+				}
+				if (setting.getSocialMediaTokens().getTwitterToken() != null) {
+					socialSitesWithSettings.add("twitter");
+				}
+				if(setting.getSocialMediaTokens().getLinkedInToken() != null){
+					socialSitesWithSettings.add("linkedin");
+				}
+			}
+		}
+		LOG.debug("Method getSocialSitesWithSettingsConfigured() finished");
+		return socialSitesWithSettings;
+	}
 }

@@ -671,7 +671,7 @@ function paintReviews(result){
 		if (i == resultSize - 1) {
 			lastItemClass = "ppl-review-item-last";
         }
-		reviewsHtml=  reviewsHtml+'<div class="' + lastItemClass + '" data-cust-first-name='+ reviewItem.customerFirstName +' data-cust-last-name='+reviewItem.customerLastName+' data-agent-name='+reviewItem.agentName+' data-rating='+reviewItem.score+' data-review='+reviewItem.review+'>';
+		reviewsHtml=  reviewsHtml+'<div class="' + lastItemClass + '" data-cust-first-name='+ reviewItem.customerFirstName +' data-cust-last-name='+reviewItem.customerLastName+' data-agent-name='+reviewItem.agentName+' data-rating='+reviewItem.score+' data-review="'+reviewItem.review+'">';
 		reviewsHtml=  reviewsHtml+'	<div class="ppl-header-wrapper clearfix">';
 		reviewsHtml=  reviewsHtml+'		<div class="float-left ppl-header-left">';    
 		reviewsHtml=  reviewsHtml+'			<div class="ppl-head-1">'+reviewItem.customerFirstName+' '+reviewItem.customerLastName+'</div>';
