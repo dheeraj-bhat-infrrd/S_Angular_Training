@@ -248,6 +248,9 @@ public interface ProfileManagementService {
 	 */
 	public OrganizationUnitSettings getIndividualByProfileName(String profileName) throws InvalidInputException, NoRecordsFetchedException;
 
+	public SocialMediaTokens aggregateSocialProfiles(OrganizationUnitSettings unitSettings, String entity) throws InvalidInputException,
+		NoRecordsFetchedException;
+	
 	public User getUserByProfileName(String profileName) throws InvalidInputException, NoRecordsFetchedException;
 
 	/**
