@@ -53,10 +53,10 @@ function fetchCompanyProfileCallBack(data) {
         var title;
         var name = result.contact_details.name;
         if(name){
-        	title = '['+name+'] Ratings & Reviews';
+        	title = name+' Ratings & Reviews';
         }
         if(result.vertical){
-        	title += ' - [' + result.vertical + '] Reviews';
+        	title += ' - ' + result.vertical + ' Reviews';
         }
         if(title){
         	$('title').html(title);	
@@ -67,8 +67,8 @@ function fetchCompanyProfileCallBack(data) {
         }
         
         if(name){
-        	$('head').append('<meta name="description" content="Use SocialSurvey Ratings & Reviews to find out how customers have rated ['+ name + '].">');
-        	$('head').append('<meta name="keywords" content="['+name+'],['+name+'] ratings,['+name+'] reviews,['+name+'] scorecard,['+name+'] ratings and reviews">');
+        	$('head').append('<meta name="description" content="Use SocialSurvey Ratings & Reviews to find out how customers have rated '+ name + '.">');
+        	$('head').append('<meta name="keywords" content="'+name+', '+name+' ratings,'+name+' reviews,'+name+' scorecard, '+name+' ratings and reviews">');
         }
 		
 		paintProfilePage(result);
@@ -903,10 +903,10 @@ function fetchRegionProfileCallBack(data) {
         var title;
         var name = result.contact_details.name;
         if(name){
-        	title = '['+name+'] Ratings & Reviews';
+        	title = name+' Ratings & Reviews';
         }
         if(result.vertical){
-        	title += ' - [' + result.vertical + '] Reviews';
+        	title += ' - ' + result.vertical + ' Reviews';
         }
         if(title){
         	$('title').html(title);	
@@ -917,8 +917,8 @@ function fetchRegionProfileCallBack(data) {
         }
         
         if(name){
-        	$('head').append('<meta name="description" content="Use SocialSurvey Ratings & Reviews to find out how customers have rated ['+name+'].">');
-        	$('head').append('<meta name="keywords" content="['+name+'],['+name+'] ratings,['+name+'] reviews,['+name+'] scorecard,['+name+'] ratings and reviews">');
+        	$('head').append('<meta name="description" content="Use SocialSurvey Ratings & Reviews to find out how customers have rated '+name+'.">');
+        	$('head').append('<meta name="keywords" content="'+name+', '+name+'] ratings, '+name+' reviews, '+name+' scorecard, '+name+' ratings and reviews">');
         }
 		
 		paintProfilePage(result);
@@ -1042,10 +1042,10 @@ function fetchBranchProfileCallBack(data) {
         var title;
         var name = result.contact_details.name;
         if(name){
-        	title = '['+name+'] Ratings & Reviews';
+        	title = name+' Ratings & Reviews';
         }
         if(result.vertical){
-        	title += ' - [' + result.vertical + '] Reviews';
+        	title += ' - ' + result.vertical + ' Reviews';
         }
         if(title){
         	$('title').html(title);	
@@ -1056,8 +1056,8 @@ function fetchBranchProfileCallBack(data) {
         }
         
         if(name){
-        	$('head').append('<meta name="description" content="Use SocialSurvey Ratings & Reviews to find out how customers have rated ['+name+'].">');
-        	$('head').append('<meta name="keywords" content="['+name+'],['+name+'] ratings,['+name+'] reviews,['+name+'] scorecard,['+name+'] ratings and reviews">');
+        	$('head').append('<meta name="description" content="Use SocialSurvey Ratings & Reviews to find out how customers have rated '+name+'.">');
+        	$('head').append('<meta name="keywords" content="'+name+', '+name+' ratings, '+name+' reviews,'+name+' scorecard, '+name+' ratings and reviews">');
         }
 		
 		paintProfilePage(result);
@@ -1250,10 +1250,10 @@ function fetchAgentProfileCallBack(data) {
         var title;
         var name = result.contact_details.name;
         if(name){
-        	title = '['+name+'] Ratings & Reviews';
+        	title = name+' Ratings & Reviews';
         }
         if(result.vertical){
-        	title += ' - [' + result.vertical + '] Reviews';
+        	title += ' - ' + result.vertical + ' Reviews';
         }
         if(title){
         	$('title').html(title);	
@@ -1264,8 +1264,8 @@ function fetchAgentProfileCallBack(data) {
         }
         
         if(name){
-        	$('head').append('<meta name="description" content="Use SocialSurvey Ratings & Reviews to find out how customers have rated ['+name+'].">');
-        	$('head').append('<meta name="keywords" content="['+name+'],['+name+'] ratings,['+name+'] reviews,['+name+'] scorecard,['+name+'] ratings and reviews">');
+        	$('head').append('<meta name="description" content="Use SocialSurvey Ratings & Reviews to find out how customers have rated '+name+'.">');
+        	$('head').append('<meta name="keywords" content="'+name+', '+name+' ratings, '+name+' reviews, '+name+' scorecard, '+name+' ratings and reviews">');
         }
 		
 		paintProfilePage(result);

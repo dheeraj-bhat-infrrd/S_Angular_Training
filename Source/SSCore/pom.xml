@@ -401,6 +401,14 @@
 				</filters>
 			</build>
 		</profile>
+		<profile>
+			<id>prod</id>
+			<build>
+				<filters>
+					<filter>src/main/resources/filler.prod.properties</filter>
+				</filters>
+			</build>
+		</profile>
 	</profiles>
 
 	<pluginRepositories>
