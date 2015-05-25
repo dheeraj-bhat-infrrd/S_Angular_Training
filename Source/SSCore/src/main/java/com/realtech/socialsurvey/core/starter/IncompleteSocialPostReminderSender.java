@@ -53,7 +53,6 @@ public class IncompleteSocialPostReminderSender extends QuartzJobBean {
 		for (Company company : organizationManagementService.getAllCompanies()) {
 			List<SurveyDetails> incompleteSocialPostCustomers = surveyHandler.getIncompleteSocialPostSurveys(company.getCompanyId());
 			for (SurveyDetails survey : incompleteSocialPostCustomers) {
-
 				// To fetch settings of Agent and admins in the hierarchy
 				Set<String> socialSitesWithSettings = new HashSet<>();
 				try {
@@ -67,6 +66,7 @@ public class IncompleteSocialPostReminderSender extends QuartzJobBean {
 					socialPosts = new HashSet<>();
 				else
 					socialPosts = new HashSet<String>(survey.getSharedOn());
+				links = new StringBuilder();
 				for (String site : getRemainingSites(socialPosts, socialSitesWithSettings)) {
 					try {
 						links.append("\nFor ").append(site).append(" : ").append(generateQueryParams(survey, site));
@@ -142,8 +142,8 @@ public class IncompleteSocialPostReminderSender extends QuartzJobBean {
 		return urlGenerator.generateUrl(params, surveyHandler.getApplicationBaseUrl() + subUrl);
 	}
 
-	private static List<String> getRemainingSites(Set<String> sharedOn, Set<String> socialSitesWithSettings) {
-		List<String> allElems = new ArrayList<String>(socialSites);
+	private static Set<String> getRemainingSites(Set<String> sharedOn, Set<String> socialSitesWithSettings) {
+		Set<String> allElems = new HashSet<String>(socialSites);
 		allElems.removeAll(sharedOn);
 		allElems.retainAll(socialSitesWithSettings);
 		return allElems;
