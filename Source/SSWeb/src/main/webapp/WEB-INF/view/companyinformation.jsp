@@ -119,9 +119,12 @@
 						<div class="float-left rfr_txt">
 							<div class="rfr_icn icn-mbl"></div>
 							<div class="rfr_txt_fld">
-							<input class="rfr_input_fld" id="com-contactno" data-non-empty="true" data-phone="true"
-								name="contactno" value="${companyContactNo}" placeholder="<spring:message code="label.phoneno.key" />">
-								</div>
+								<input type="tel" class="rfr_input_fld" id="com-contactno"
+									data-non-empty="true" data-phone="true" name="contactno"
+									value="${companyContactNo}"
+									placeholder="<spring:message code="label.phoneno.key" />">
+								<input type="hidden" id="com-phone-format" name="phoneFormat" value="${phoneFormat}">
+							</div>
 						</div>
 					</div>
 					<div class="reg_form_row clearfix">
@@ -157,16 +160,19 @@
 <script src="//code.jquery.com/jquery-2.1.1.min.js"></script>
 <script src="//code.jquery.com/ui/1.11.2/jquery-ui.min.js"></script>
 <script src="${initParam.resourcesPath}/resources/js/bootstrap.min.js"></script>
-<script src="${initParam.resourcesPath}/resources/js/perfect-scrollbar.jquery.js"></script>
+<script src="${initParam.resourcesPath}/resources/js/perfect-scrollbar.jquery.min.js"></script>
 <script src="${initParam.resourcesPath}/resources/js/common.js"></script>
 <script src="${initParam.resourcesPath}/resources/js/script.js"></script>
 <script src="${initParam.resourcesPath}/resources/js/countrydata.js"></script>
 <script src="${initParam.resourcesPath}/resources/js/zipcoderegex.js"></script>
+<script src="${initParam.resourcesPath}/resources/js/phoneFormat.js"></script>
+<script src="${initParam.resourcesPath}/resources/js/jquery.mask.js"></script>
 <script>
 var isCompanyInfoPageValid;
 var selectedCountryRegEx = "";
 var stateList;
 var cityLookupList;
+var phoneFormat = 'dddddddddd';
 $(document).ready(function() {
 	isCompanyInfoPageValid = false;
 
@@ -187,6 +193,14 @@ $(document).ready(function() {
 			showInfo($('#message').val());
 		}
 	}
+	
+	//Mask phone number
+	
+	if($('#com-phone-format').val() || $('#com-phone-format').val() != ''){
+		phoneFormat = $('#com-phone-format').val();
+	}
+	
+	$('#com-contactno').mask(phoneFormat, {'translation': {d: {pattern: /[0-9*]/}}});
 	
 	if ($('#com-country').val() != "" && $('#country-code').val() != "") {
 		var countryCode = $('#country-code').val();
@@ -239,6 +253,11 @@ $(document).ready(function() {
 			}else{
 				hideStateCityRow();
 			}
+			
+			$('#com-contactno').unmask();
+			phoneFormat = phoneFormatList[ui.item.code];
+			$('#com-contactno').mask(phoneFormat, {'translation': {d: {pattern: /[0-9*]/}}});
+			
 			return false;
 		},
 		close: function(event, ui) {},
@@ -248,12 +267,6 @@ $(document).ready(function() {
 	}).autocomplete("instance")._renderItem = function(ul, item) {
 		return $("<li>").append(item.label).appendTo(ul);
   	};
-});
-
-$('#com-company').blur(function() {
-	if (validateCompany(this.id)) {
-		hideError();
-	}
 });
 
 $('#com-state').on('change',function(e){
@@ -358,8 +371,7 @@ function uploadImageSuccessCallback(response) {
 	}
 }
 
-// Validate Country
-$('#com-address1').blur(function() {
+/* $('#com-address1').blur(function() {
 	if (validateAddress1(this.id)) {
 		hideError();
 	}
@@ -379,7 +391,7 @@ $('#com-contactno').blur(function() {
 	if (validatePhoneNumber(this.id)) {
 		hideError();
 	}
-});
+}); */
 
 function validateCountry() {
 	var country = $.trim($('#com-country').val());
@@ -411,9 +423,7 @@ function validateCompanyInformationForm(elementId) {
 			$('#com-company').focus();
 			isFocussed=true;
 		}
-		if(isSmallScreen){
-			return isCompanyInfoPageValid;
-		}
+		return isCompanyInfoPageValid;
 	}
 	if(!validateAddress1('com-address1')){
 		isCompanyInfoPageValid = false;
@@ -421,9 +431,7 @@ function validateCompanyInformationForm(elementId) {
 			$('#com-address1').focus();
 			isFocussed=true;
 		}
-		if(isSmallScreen){
-			return isCompanyInfoPageValid;
-		}
+		return isCompanyInfoPageValid;
 	}
 	if(!validateAddress2('com-address2')){
 		isCompanyInfoPageValid = false;
@@ -431,9 +439,7 @@ function validateCompanyInformationForm(elementId) {
 			$('#com-address2').focus();
 			isFocussed=true;
 		}
-		if(isSmallScreen){
-			return isCompanyInfoPageValid;
-		}
+		return isCompanyInfoPageValid;
 	}
 	if(!validateCountry('com-country')){
 		isCompanyInfoPageValid = false;
@@ -441,9 +447,7 @@ function validateCompanyInformationForm(elementId) {
 			$('#com-country').focus();
 			isFocussed=true;
 		}
-		if(isSmallScreen){
-			return isCompanyInfoPageValid;
-		}
+		return isCompanyInfoPageValid;
 	}
 	if(!validateCountryZipcode('com-zipcode')){
 		isCompanyInfoPageValid = false;
@@ -451,9 +455,7 @@ function validateCompanyInformationForm(elementId) {
 			$('#com-zipcode').focus();
 			isFocussed=true;
 		}
-		if(isSmallScreen){
-			return isCompanyInfoPageValid;
-		}
+		return isCompanyInfoPageValid;
 	}
 	if(!validatePhoneNumber('com-contactno')){
 		isCompanyInfoPageValid = false;
@@ -461,9 +463,7 @@ function validateCompanyInformationForm(elementId) {
 			$('#com-contactno').focus();
 			isFocussed=true;
 		}
-		if(isSmallScreen){
-			return isCompanyInfoPageValid;
-		}
+		return isCompanyInfoPageValid;
 	}
 	return isCompanyInfoPageValid;
 }

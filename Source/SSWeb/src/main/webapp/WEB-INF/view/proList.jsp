@@ -101,7 +101,7 @@
     <script src="${initParam.resourcesPath}/resources/js/script.js"></script>
 	<script src="${initParam.resourcesPath}/resources/js/common.js"></script>
 	<script src="${initParam.resourcesPath}/resources/js/profile_common.js"></script>
-	<script src="${initParam.resourcesPath}/resources/js/proList.js"></script>
+	<script src="${initParam.resourcesPath}/resources/js/application.js"></script>
 	<script>
 	$(document).ready(function() {
 		$('#fp-users-size').val(0);
