@@ -486,13 +486,16 @@
         });
         
     	// Google analytics for reviews
-    	ga('send', {
-    		'hitType': 'event',
-    		'eventCategory': 'review',
-    		'eventAction': 'click',
-    		'eventLabel': gaLabel,
-    		'eventValue': gaName
-    	});
+    	setTimeout(function() {
+    		ga('send', {
+        		'hitType': 'event',
+        		'eventCategory': 'review',
+        		'eventAction': 'click',
+        		'eventLabel': gaLabel,
+        		'eventValue': gaName
+        	});
+		}, 2000);
+    	
     	
     	
     	// Find a pro
