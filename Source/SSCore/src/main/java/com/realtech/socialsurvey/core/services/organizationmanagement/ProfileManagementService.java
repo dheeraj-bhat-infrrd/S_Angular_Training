@@ -248,6 +248,9 @@ public interface ProfileManagementService {
 	 */
 	public OrganizationUnitSettings getIndividualByProfileName(String profileName) throws InvalidInputException, NoRecordsFetchedException;
 
+	public SocialMediaTokens aggregateSocialProfiles(OrganizationUnitSettings unitSettings, String entity) throws InvalidInputException,
+			NoRecordsFetchedException;
+
 	public User getUserByProfileName(String profileName) throws InvalidInputException, NoRecordsFetchedException;
 
 	/**
@@ -334,11 +337,12 @@ public interface ProfileManagementService {
 	 * @return
 	 * @throws InvalidInputException
 	 */
-	public List<SurveyPreInitiation> getIncompleteSurvey(long iden, double startScore, double limitScore, int startIndex, int numOfRows, String profileLevel,
-			Date startDate, Date endDate) throws InvalidInputException;
-	
+	public List<SurveyPreInitiation> getIncompleteSurvey(long iden, double startScore, double limitScore, int startIndex, int numOfRows,
+			String profileLevel, Date startDate, Date endDate) throws InvalidInputException;
+
 	/**
 	 * Method that mails the contact us message to the respective individual,branch,region,company
+	 * 
 	 * @param agentProfileName
 	 * @param message
 	 * @param senderMailId
@@ -347,41 +351,47 @@ public interface ProfileManagementService {
 	 * @throws NoRecordsFetchedException
 	 * @throws UndeliveredEmailException
 	 */
-	public void findProfileMailIdAndSendMail(String agentProfileName,String message, String senderName, String senderMailId, String profileType) throws InvalidInputException, NoRecordsFetchedException, UndeliveredEmailException;
+	public void findProfileMailIdAndSendMail(String agentProfileName, String message, String senderName, String senderMailId, String profileType)
+			throws InvalidInputException, NoRecordsFetchedException, UndeliveredEmailException;
 
 	public void addSocialPosts(UserProfile selectedProfile, String postText) throws InvalidInputException;
 
-	public List<SocialPost> getSocialPosts(UserProfile selectedProfile, int startIndex, int batchSize) throws InvalidInputException ;
+	public List<SocialPost> getSocialPosts(UserProfile selectedProfile, int startIndex, int batchSize) throws InvalidInputException;
 
 	public long getPostsCountForUser(long userId);
-	
+
 	/**
 	 * Updates linkedin profile data to collection
+	 * 
 	 * @param collectionName
 	 * @param organizationUnitSettings
 	 * @param linkedInProfileData
 	 * @throws InvalidInputException
 	 */
-	public void updateLinkedInProfileData(String collectionName, OrganizationUnitSettings organizationUnitSettings, LinkedInProfileData linkedInProfileData) throws InvalidInputException;
-	
+	public void updateLinkedInProfileData(String collectionName, OrganizationUnitSettings organizationUnitSettings,
+			LinkedInProfileData linkedInProfileData) throws InvalidInputException;
+
 	/**
 	 * Updates the expertise for agent
+	 * 
 	 * @param agentSettings
 	 * @param expertise
 	 * @throws InvalidInputException
 	 */
 	public void updateAgentExpertise(AgentSettings agentSettings, List<String> expertise) throws InvalidInputException;
-	
+
 	/**
 	 * Updates the agents hobbies
+	 * 
 	 * @param agentSettings
 	 * @param hobbies
 	 * @throws InvalidInputException
 	 */
 	public void updateAgentHobbies(AgentSettings agentSettings, List<String> hobbies) throws InvalidInputException;
-	
+
 	/**
 	 * Updates the company positions for an agent
+	 * 
 	 * @param agentSettings
 	 * @param companyPositions
 	 * @throws InvalidInputException
