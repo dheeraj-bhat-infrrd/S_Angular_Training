@@ -57,12 +57,12 @@
 		<div class="container hdr-container clearfix">
 			<div class="float-left hdr-logo"></div>
 			<div class="float-right clearfix hdr-btns-wrapper">
-					<div class="float-left hdr-log-btn hdr-log-reg-btn">
-						<spring:message code="label.signin.key" />
-					</div>
-					<div class="float-left hdr-reg-btn hdr-log-reg-btn">
-						<spring:message code="label.joinus.key" />
-					</div>
+				<div class="float-left hdr-log-btn hdr-log-reg-btn">
+					<spring:message code="label.signin.key" />
+				</div>
+				<div class="float-left hdr-reg-btn hdr-log-reg-btn">
+					<spring:message code="label.joinus.key" />
+				</div>
 			</div>
 			<div id="header-user-info" class="header-user-info float-right clearfix">
 				<c:if test="${displaylogo != null}">
@@ -83,7 +83,10 @@
 					<!-- <div id="agnt-img" cust-agnt-rel class="sq-top-img"></div> -->
 					<!-- <div class="sq-main-txt">Survey Question</div> -->
 					<div class="sq-ques">
-						<i><span class="sq-ques-txt"><spring:message code="label.surveyquestion.header.key" /><br><span class="semibold">${agentName}</span></span></i>
+						<i><span class="sq-ques-txt">
+							<spring:message code="label.surveyquestion.header.key" /><br>
+							<span class="semibold">${agentName}</span>
+						</span></i>
 					</div>
 					<div class="sq-bord-bot-sm"></div>
 					<input type="hidden" value="${message}" data-status="${status}" name="message" id="message"/>
@@ -92,27 +95,29 @@
 					</div>
 					<div class="sq-rat-wrapper">
 						<form id="survey-request-form" action="${initParam.resourcesPath}/rest/survey/triggersurvey">
-							<div
-								class="sq-star-wrapper sq-i-container clearfix ques-wrapper-adj">
+							<div class="sq-star-wrapper sq-i-container clearfix ques-wrapper-adj">
 								<div class="clearfix sq-info-wrapper">
 									<div class="sq-i-lbl float-left">First Name</div>
 									<div class="sq-i-txt float-left">
 										<div class="hide sq-img-adj icn-fname"></div>
-										<input id="firstName" class="sq-i-txt-fld" name="firstName" value="${firstName }" placeholder='<spring:message code="label.firstname.key"/>'>
+										<input id="firstName" class="sq-i-txt-fld" name="firstName" value="${firstName}"
+											placeholder='<spring:message code="label.firstname.key"/>'>
 									</div>
 								</div>
 								<div class="clearfix sq-info-wrapper">
 									<div class="sq-i-lbl float-left">Last Name</div>
 									<div class="sq-i-txt float-left">
 										<div class="hide sq-img-adj icn-lname"></div>
-										<input id="lastName" class="sq-i-txt-fld" name="lastName" value="${lastName }" placeholder='<spring:message code="label.lastname.key"/>'>
+										<input id="lastName" class="sq-i-txt-fld" name="lastName" value="${lastName}"
+											placeholder='<spring:message code="label.lastname.key"/>'>
 									</div>
 								</div>
 								<div class="clearfix sq-info-wrapper">
 									<div class="sq-i-lbl float-left">Email</div>
 									<div class="sq-i-txt float-left">
 										<div class="hide sq-img-adj icn-email"></div>
-										<input id="email" class="sq-i-txt-fld" name="customerEmail" value="${customerEmail}" placeholder='<spring:message code="label.emailid.key"/>'>
+										<input id="email" class="sq-i-txt-fld" name="customerEmail" value="${customerEmail}"
+											placeholder='<spring:message code="label.emailid.key"/>'>
 									</div>
 								</div>
 								<div class="clearfix sq-info-wrapper">
@@ -127,8 +132,7 @@
 								<div class="clearfix reg-captcha-wrapper reg-item reg-cap-nw-adj">
 									<div class="reg-cap-nw-adj-container">
 										<div class="g-recaptcha" data-sitekey="6Le2wQYTAAAAAAacBUn0Dia5zMMyHfMXhoOh5A7K"></div>
-										<!-- 
-										<div class="reg-captcha-img"></div>
+										<!-- <div class="reg-captcha-img"></div>
 										<div class="reg-captcha-btns clearfix">
 											<input id="captcha-text" class="float-left reg-cap-txt"
 												name="captchaResponse" placeholder="Type the above text"
@@ -138,20 +142,18 @@
 												<div class="float-left reg-cap-img reg-cap-sound"></div>
 												<div class="float-left reg-cap-img reg-cap-info"></div>
 											</div>
-										</div>
-										 -->
+										</div> -->
 									</div>
 								</div>
 								<!-- <div id="outer_captcha" style="display: none;">
 									<div id="recaptcha"></div>
+								</div> -->
+								<div style="display: none">
+									<input type="hidden" name="agentId" value="${agentId}">
+									<input type="hidden" name="agentName" value="${agentName}">
+									<input type="hidden" name="relationship">
+									<input type="hidden" name="g-recaptcha-response">
 								</div>
-								 -->
-								 <div style="display: none">
-								 	<input type="hidden" name="agentId" value="${agentId}">
-								 	<input type="hidden" name="agentName" value="${agentName}">
-								 	<input type="hidden" name="relationship">
-								 	<input type="hidden" name="g-recaptcha-response">
-								 </div>
 								<div class="sq-btn-wrapper">
 									<div id="start-btn" class="sq-btn-continue">Start</div>
 								</div>
@@ -178,16 +180,13 @@
 						</div>
 					</div>
 					<div class="sq-np-wrapper clearfix">
-						<div id="prev-star"
-							class="float-left sq-np-item sq-np-item-prev btn-com">Previous</div>
-						<div id="next-star"
-							class="float-left sq-np-item sq-np-item-next btn-com">Next</div>
+						<div id="prev-star" class="float-left sq-np-item sq-np-item-prev btn-com">Previous</div>
+						<div id="next-star" class="float-left sq-np-item sq-np-item-next btn-com">Next</div>
 					</div>
 				</div>
 				<div data-ques-type="smiley" class="sq-quest-item hide">
 					<!-- <div class="sq-top-img"></div> -->
-					<div class="sq-main-txt">lorema ipsum lorema ipsum lorema
-						ipsum</div>
+					<div class="sq-main-txt">lorema ipsum lorema ipsum lorema ipsum</div>
 					<div class="sq-ques">
 						<i><span id="ques-text-smiley" class="sq-ques-txt"></span></i>
 					</div>
@@ -202,10 +201,8 @@
 						</div>
 					</div>
 					<div class="sq-np-wrapper clearfix">
-						<div id="prev-smile"
-							class="float-left sq-np-item sq-np-item-prev btn-com">Previous</div>
-						<div id="next-smile"
-							class="float-left sq-np-item sq-np-item-next btn-com">Next</div>
+						<div id="prev-smile" class="float-left sq-np-item sq-np-item-prev btn-com">Previous</div>
+						<div id="next-smile" class="float-left sq-np-item sq-np-item-next btn-com">Next</div>
 					</div>
 				</div>
 
@@ -220,11 +217,9 @@
 					<div class="sq-rat-wrapper mgn-bot-40">
 						<div class="sq-slider-wrapper pts-wrap-adj clearfix">
 							<div class="sq-pts-item-hover pts-hover-1 pts-arr-bot">Poor</div>
-							<div class="sq-pts-item-hover pts-hover-2 pts-arr-bot">Not
-								Bad</div>
+							<div class="sq-pts-item-hover pts-hover-2 pts-arr-bot">Not Bad</div>
 							<div class="sq-pts-item-hover pts-hover-3 pts-arr-bot">Good</div>
-							<div class="sq-pts-item-hover pts-hover-4 pts-arr-bot">V
-								Good</div>
+							<div class="sq-pts-item-hover pts-hover-4 pts-arr-bot">V Good</div>
 							<div class="sq-pts-item-hover pts-hover-5 pts-arr-bot">Excellent</div>
 						</div>
 						<div class="sq-slider-wrapper clearfix">
@@ -236,10 +231,8 @@
 						</div>
 					</div>
 					<div class="sq-np-wrapper clearfix">
-						<div id="prev-scale"
-							class="float-left sq-np-item sq-np-item-prev btn-com">Previous</div>
-						<div id="next-scale"
-							class="float-left sq-np-item sq-np-item-next btn-com">Next</div>
+						<div id="prev-scale" class="float-left sq-np-item sq-np-item-prev btn-com">Previous</div>
+						<div id="next-scale" class="float-left sq-np-item sq-np-item-next btn-com">Next</div>
 					</div>
 				</div>
 
@@ -255,22 +248,19 @@
 						<textarea id="text-area" class="sq-txt-area"></textarea>
 						<div id="smiles-final" class="sq-happy-wrapper clearfix">
 							<div id="sq-happy-smile" class="sq-smile-icn-container">
-								<div id="happy-smile" star-no="1"
-									class="sq-smile-icn-wrapper sq-happy-smile"></div>
+								<div id="happy-smile" star-no="1" class="sq-smile-icn-wrapper sq-happy-smile"></div>
 								<div class="sq-smile-icn-text sq-smile-happy-text float-left">
 									<spring:message code="label.smile.happy.text"/>
 								</div>
 							</div>
 							<div id="sq-neutral-smile" class="sq-smile-icn-container">
-								<div id="neutral-smile" star-no="2"
-									class="sq-smile-icn-wrapper sq-neutral-smile"></div>
+								<div id="neutral-smile" star-no="2" class="sq-smile-icn-wrapper sq-neutral-smile"></div>
 								<div class="sq-smile-icn-text sq-smile-neutral-text float-left">
 									<spring:message code="label.smile.neutral.text"/>
 								</div>
 							</div>
 							<div id="sq-sad-smile" class="sq-smile-icn-container">
-								<div id="sad-smile" star-no="3"
-									class="sq-smile-icn-wrapper sq-sad-smile"></div>
+								<div id="sad-smile" star-no="3" class="sq-smile-icn-wrapper sq-sad-smile"></div>
 								<div class="sq-smile-icn-text sq-smile-sad-text float-left">
 									<spring:message code="label.smile.sad.text"/>
 								</div>
@@ -282,10 +272,8 @@
 							<div class="float-left bd-check-txt"><spring:message code="label.survey.authorize.key"/></div>
 						</div>
 						<div class="sq-np-wrapper clearfix">
-							<div id="prev-textarea-smiley"
-								class="float-left sq-np-item sq-np-item-prev btn-com">Previous</div>
-							<div id="next-textarea-smiley"
-								class="float-left sq-np-item sq-np-item-next btn-com">Next</div>
+							<div id="prev-textarea-smiley" class="float-left sq-np-item sq-np-item-prev btn-com">Previous</div>
+							<div id="next-textarea-smiley" class="float-left sq-np-item sq-np-item-next btn-com">Next</div>
 						</div>
 						<!-- <div class="sq-btn-wrapper">
 							<div id="submit" class="sq-btn-continue hide">Submit</div>
@@ -296,8 +284,7 @@
 				<!-- Div for MC type questions -->
 				<div data-ques-type="mcq" class="sq-quest-item hide">
 					<!-- <div class="sq-top-img"></div> -->
-					<div class="sq-main-txt">lorema ipsum lorema ipsum lorema
-						ipsum</div>
+					<div class="sq-main-txt">lorema ipsum lorema ipsum lorema ipsum</div>
 					<div class="sq-ques">
 						<i><span id="mcq-ques-text" class="sq-ques-txt">lorem
 								ipsum dore it ler. lorem ipsum dore it ler. lorem ipsum dore it
@@ -309,16 +296,14 @@
 						<div id="answer-options" class="sq-mcq-wrapper"></div>
 					</div>
 					<div class="sq-np-wrapper clearfix">
-						<div id="prev-mcq"
-							class="float-left sq-np-item sq-np-item-prev btn-com">Previous</div>
-						<div id="next-mcq"
-							class="float-left sq-np-item sq-np-item-next btn-com">Next</div>
+						<div id="prev-mcq" class="float-left sq-np-item sq-np-item-prev btn-com">Previous</div>
+						<div id="next-mcq" class="float-left sq-np-item sq-np-item-next btn-com">Next</div>
 					</div>
 				</div>
 
 				<!-- Div for Error Messages -->
 				<div data-ques-type="error" class="sq-quest-item hide">
-					<!-- <div class="sq-top-img"></div> -->
+					<div id="profile-link" class="sq-main-link"></div>
 					<div id="content-head" class="sq-main-txt">Error</div>
 					<div class="sq-ques">
 						<i><span id="content" class="sq-ques-txt"></span></i>

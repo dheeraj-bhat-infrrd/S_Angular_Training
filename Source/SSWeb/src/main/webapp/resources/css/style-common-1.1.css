@@ -345,14 +345,12 @@ a, a:hover, a:visited{
     font-size: 18px;
     margin-top: -14px;
     font-weight: bold;
-    text-align: center;
 }
 
 .reg-txt-top2 {
     margin-bottom: 10px;
     text-transform: capitalize;
     font-size: 13px;
-    text-align: center;
 }
 
 .pic-bot-txt-top {
@@ -982,6 +980,7 @@ span.txt-highlight {
 	height:40px;
 	background: url(../images/close_srv.png) no-repeat center;
 	cursor: pointer;
+	background-size: contain;
 }
 
 .wc-form-txt {

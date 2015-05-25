@@ -6,6 +6,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
+import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.criterion.Criterion;
@@ -148,6 +149,26 @@ public class GenericDaoImpl<T, ID extends Serializable> implements GenericDao<T,
 		catch (HibernateException hibernateException) {
 			LOG.error("HibernateException caught in delete(). ", hibernateException);
 			throw new DatabaseException("HibernateException caught in delete(). ", hibernateException);
+		}
+	}
+
+	@Override
+	public void deleteByCondition(String entity, List<String> conditions) {
+		String deleteQuery = "delete from " + entity + " where ";
+		for (String condition : conditions) {
+			deleteQuery += condition;
+			deleteQuery += " and ";
+		}
+		int index = deleteQuery.lastIndexOf("and");
+		if(index!=-1)
+		deleteQuery = deleteQuery.substring(0, index);
+		try {
+			Query query = getSession().createQuery(deleteQuery);
+			query.executeUpdate();
+		}
+		catch (HibernateException hibernateException) {
+			LOG.error("HibernateException caught in findByCriteria().", hibernateException);
+			throw new DatabaseException("HibernateException caught in findByCriteria().", hibernateException);
 		}
 	}
 

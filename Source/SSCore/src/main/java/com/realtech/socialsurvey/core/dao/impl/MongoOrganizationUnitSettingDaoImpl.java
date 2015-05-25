@@ -2,7 +2,6 @@ package com.realtech.socialsurvey.core.dao.impl;
 
 import java.util.ArrayList;
 import java.util.List;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
@@ -16,7 +15,6 @@ import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Repository;
-
 import com.mongodb.BasicDBObject;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.dao.OrganizationUnitSettingsDao;
@@ -57,8 +55,8 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
 	public static final String KEY_LICENCES = "licenses";
 	public static final String KEY_SOCIAL_MEDIA_TOKENS = "socialMediaTokens";
 	public static final String KEY_COMPANY_POSITIONS = "positions";
-
 	public static final String KEY_IDENTIFIER = "iden";
+	public static final String KEY_VERTICAL = "vertical";
 
 	private static final Logger LOG = LoggerFactory.getLogger(MongoOrganizationUnitSettingDaoImpl.class);
 
@@ -294,6 +292,17 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
 		tokens = mongoTemplate.find(query, FeedIngestionEntity.class, collectionName);
 		LOG.info("Fetched " + (tokens != null ? tokens.size() : "none") + " items with social media tokens from " + collectionName);
 		return tokens;
+	}
+	
+	/*
+	 * Method to delete Organization unit settings for list of idens.
+	 */
+	public void removeOganizationUnitSettings(List<Long> agentIds, String collectionName){
+		LOG.info("Method removeOganizationUnitSettings() started.");
+		Query query = new Query();
+		query.addCriteria(Criteria.where("iden").in(agentIds));
+		mongoTemplate.remove(query, collectionName);
+		LOG.info("Method removeOganizationUnitSettings() finished.");
 	}
 
 	/*

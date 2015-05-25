@@ -12,7 +12,7 @@ import com.realtech.socialsurvey.core.entities.User;
 import com.realtech.socialsurvey.core.exception.NoRecordsFetchedException;
 
 @Component("solrimport")
-public class SolrImportDaoImpl extends GenericDaoImpl<Branch, Long> implements SolrImportDao {
+public class SolrImportDaoImpl extends BranchDaoImpl implements SolrImportDao {
 
 	private static final Logger LOG = LoggerFactory.getLogger(SolrImportDaoImpl.class);
 
@@ -21,6 +21,7 @@ public class SolrImportDaoImpl extends GenericDaoImpl<Branch, Long> implements S
 		LOG.info("Fetching paginated region results");
 
 		Query query = createHibernateQuery(offset, pageSize, "FROM Region R ORDER BY R.regionId ASC");
+		@SuppressWarnings("unchecked")
 		List<Region> regions = query.list();
 
 		LOG.info("Fetched paginated Region results (" + regions.size() + ") from offset: " + offset);
@@ -32,6 +33,7 @@ public class SolrImportDaoImpl extends GenericDaoImpl<Branch, Long> implements S
 		LOG.info("Fetching paginated branch results");
 
 		Query query = createHibernateQuery(offset, pageSize, "FROM Branch B ORDER BY B.branchId ASC");
+		@SuppressWarnings("unchecked")
 		List<Branch> branches = query.list();
 
 		LOG.info("Fetched paginated Branch results (" + branches.size() + ") from offset: " + offset);
@@ -43,6 +45,7 @@ public class SolrImportDaoImpl extends GenericDaoImpl<Branch, Long> implements S
 		LOG.info("Fetching paginated user results");
 
 		Query query = createHibernateQuery(offset, pageSize, "FROM User U ORDER BY U.userId ASC");
+		@SuppressWarnings("unchecked")
 		List<User> users = query.list();
 
 		LOG.info("Fetched paginated User results (" + users.size() + ") from offset: " + offset);

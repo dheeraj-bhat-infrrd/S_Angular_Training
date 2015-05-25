@@ -1,7 +1,6 @@
 package com.realtech.socialsurvey.core.dao;
 
 import java.util.List;
-
 import com.realtech.socialsurvey.core.entities.AgentSettings;
 import com.realtech.socialsurvey.core.entities.FeedIngestionEntity;
 import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
@@ -134,5 +133,7 @@ public interface OrganizationUnitSettingsDao {
 	 * @return
 	 */
 	public List<FeedIngestionEntity> fetchSocialMediaTokens(String collectionName, int skipCount, int numOfRecords);
+
+	public void removeOganizationUnitSettings(List<Long> agentIds, String agentSettingsCollection);
 	
 }

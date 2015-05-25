@@ -104,8 +104,39 @@
 		</property>
 		<property name="durability" value="true" />
 	</bean>
+	
+	<!-- Account Deactivator job detail -->
+	<bean id="accountdeactivatorjobdetail"
+		class="org.springframework.scheduling.quartz.JobDetailFactoryBean">
+		<property name="jobClass"
+			value="com.realtech.socialsurvey.core.starter.AccountDeactivator" />
+		<property name="jobDataAsMap">
+			<map>
+				<entry key="organizationManagementService" value-ref="organizationManagementService" />
+				<entry key="solrSearchService" value-ref="solrSearchService" />
+				<entry key="emailServices" value-ref="emailServices" />
+			</map>
+		</property>
+		<property name="durability" value="true" />
+	</bean>
+	
+	<!-- Deactivated Account Purger job detail -->
+	<bean id="deactivatedaccountpurgerjobdetail"
+		class="org.springframework.scheduling.quartz.JobDetailFactoryBean">
+		<property name="jobClass"
+			value="com.realtech.socialsurvey.core.starter.DeactivatedAccountPurger" />
+		<property name="jobDataAsMap">
+			<map>
+				<entry key="organizationManagementService" value-ref="organizationManagementService" />
+				<entry key="emailServices" value-ref="emailServices" />
+				<entry key="solrSearchService" value-ref="solrSearchService" />
+				<entry key="accountPermDeleteSpan" value="${ACCOUNT_PERM_DELETE_SPAN}" />
+			</map>
+		</property>
+		<property name="durability" value="true" />
+	</bean>
 
-	<!-- setting cron for site map generator -->
+	<!-- setting cron for Account deactivator -->
 	<bean id="sitemapgeneratorcron"
 		class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
 		<property name="jobDetail" ref="sitemapjobdetail" />
@@ -139,6 +170,20 @@
 		<property name="jobDetail" ref="socialfeedingesterjobdetail" />
 		<property name="cronExpression" value="0 45 6 * * ?" />
 	</bean>
+	
+	<!-- setting cron for account deactivator -->
+	<bean id="accountdeactivatorcron"
+		class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
+		<property name="jobDetail" ref="accountdeactivatorjobdetail" />
+		<property name="cronExpression" value="0 0 7 * * ?" />
+	</bean>
+	
+	<!-- setting cron for deactivated account purger -->
+	<bean id="deactivatedaccountpurgercron"
+		class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
+		<property name="jobDetail" ref="deactivatedaccountpurgerjobdetail" />
+		<property name="cronExpression" value="* 15 7 * * ?" />
+	</bean>
 
 	<!-- Scheduler factory -->
 	<bean class="org.springframework.scheduling.quartz.SchedulerFactoryBean">
@@ -149,6 +194,8 @@
 				<ref bean="incompletesurveyjobdetail" />
 				<ref bean="updatesubscriptionpricejobdetail" />
 				<ref bean="socialfeedingesterjobdetail" />
+				<ref bean="accountdeactivatorjobdetail" />
+				<ref bean="deactivatedaccountpurgerjobdetail" />
 			</list>
 		</property>
 
@@ -159,6 +206,8 @@
 				<ref bean="incompletesurveycron" />
 				<ref bean="updatesubscriptionpricecron" />
 				<ref bean="socialfeedingestercron" />
+				<ref bean="accountdeactivatorcron" />
+				<ref bean="deactivatedaccountpurgercron" />
 			</list>
 		</property>
 		<property name="quartzProperties">
