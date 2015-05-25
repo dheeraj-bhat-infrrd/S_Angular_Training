@@ -39,20 +39,26 @@ import com.realtech.socialsurvey.core.entities.CompanyPositions;
 import com.realtech.socialsurvey.core.entities.CompanyProfileData;
 import com.realtech.socialsurvey.core.entities.ContactDetailsSettings;
 import com.realtech.socialsurvey.core.entities.ContactNumberSettings;
+import com.realtech.socialsurvey.core.entities.FacebookToken;
+import com.realtech.socialsurvey.core.entities.GoogleToken;
 import com.realtech.socialsurvey.core.entities.Licenses;
 import com.realtech.socialsurvey.core.entities.LinkedInProfileData;
+import com.realtech.socialsurvey.core.entities.LinkedInToken;
 import com.realtech.socialsurvey.core.entities.LockSettings;
 import com.realtech.socialsurvey.core.entities.MailIdSettings;
 import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
 import com.realtech.socialsurvey.core.entities.Region;
 import com.realtech.socialsurvey.core.entities.SocialMediaTokens;
 import com.realtech.socialsurvey.core.entities.SocialPost;
+import com.realtech.socialsurvey.core.entities.SocialProfileToken;
 import com.realtech.socialsurvey.core.entities.SurveyDetails;
 import com.realtech.socialsurvey.core.entities.SurveyPreInitiation;
+import com.realtech.socialsurvey.core.entities.TwitterToken;
 import com.realtech.socialsurvey.core.entities.User;
 import com.realtech.socialsurvey.core.entities.UserProfile;
 import com.realtech.socialsurvey.core.entities.UserSettings;
 import com.realtech.socialsurvey.core.entities.WebAddressSettings;
+import com.realtech.socialsurvey.core.entities.YelpToken;
 import com.realtech.socialsurvey.core.enums.AccountType;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.exception.NoRecordsFetchedException;
@@ -83,6 +89,9 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 	@Autowired
 	private GenericDao<Company, Long> companyDao;
 
+	@Autowired
+	private GenericDao<Region, Long> regionDao;
+	
 	@Resource
 	@Qualifier("branch")
 	private BranchDao branchDao;
@@ -415,13 +424,13 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 		// Aggregate Company Profile settings
 		LockSettings userLock = new LockSettings();
 		agentSettings = (AgentSettings) aggregateProfileData(companySettings, agentSettings, userLock);
+		
 		AgentSettings agentSettingsType = null;
 		if (agentSettings instanceof AgentSettings) {
 			agentSettingsType = (AgentSettings) agentSettings;
 			// sort the company positions. since we are type casting the settings here, we are
 			// sorting the same here
 			sortCompanyPositions(agentSettingsType.getPositions());
-
 		}
 
 		// add the company profile data into agent settings
@@ -920,6 +929,99 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 		agentSettings = aggregateAgentProfile(companySettings, regionSettings, branchSettings, agentSettings);
 		LOG.info("Method getIndividualByProfileName executed successfully");
 		return agentSettings;
+	}
+	
+	@Override
+	@Transactional
+	public SocialMediaTokens aggregateSocialProfiles(OrganizationUnitSettings unitSettings, String entity) throws InvalidInputException,
+			NoRecordsFetchedException {
+		LOG.info("Method aggregateSocialProfiles called for agentProfileName:" + unitSettings.getProfileName());
+
+		long companyId = 0l;
+		if (entity.equals(CommonConstants.AGENT_ID)) {
+			User user = userDao.findById(User.class, unitSettings.getIden());
+			companyId = user.getCompany().getCompanyId();
+		}
+		else if (entity.equals(CommonConstants.BRANCH_ID)) {
+			Branch branch = branchDao.findById(Branch.class, unitSettings.getIden());
+			companyId = branch.getCompany().getCompanyId();
+		}
+		else if (entity.equals(CommonConstants.REGION_ID)) {
+			Region region = regionDao.findById(Region.class, unitSettings.getIden());
+			companyId = region.getCompany().getCompanyId();
+		}
+
+		LOG.debug("Fetching company settings for companyId: " + companyId);
+		OrganizationUnitSettings companySettings = organizationUnitSettingsDao.fetchOrganizationUnitSettingsById(companyId,
+				MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION);
+
+		// Aggregate urls
+		SocialMediaTokens entityTokens = validateSocialMediaTokens(unitSettings);
+		
+		if (companySettings.getSocialMediaTokens() != null) {
+			SocialMediaTokens companyTokens = validateSocialMediaTokens(companySettings);
+
+			if ((entityTokens.getFacebookToken().getFacebookPageLink() == null || entityTokens.getFacebookToken().getFacebookPageLink().equals(""))
+					&& companyTokens.getFacebookToken().getFacebookPageLink() != null
+					&& !companyTokens.getFacebookToken().getFacebookPageLink().equals("")) {
+				entityTokens.getFacebookToken().setFacebookPageLink(companyTokens.getFacebookToken().getFacebookPageLink());
+			}
+			if ((entityTokens.getGoogleToken().getProfileLink() == null || entityTokens.getGoogleToken().getProfileLink().equals(""))
+					&& companyTokens.getGoogleToken().getProfileLink() != null && !companyTokens.getGoogleToken().getProfileLink().equals("")) {
+				entityTokens.getGoogleToken().setProfileLink(companyTokens.getGoogleToken().getProfileLink());
+			}
+			if ((entityTokens.getLinkedInToken().getLinkedInPageLink() == null || entityTokens.getLinkedInToken().getLinkedInPageLink().equals(""))
+					&& companyTokens.getLinkedInToken().getLinkedInPageLink() != null
+					&& !companyTokens.getLinkedInToken().getLinkedInPageLink().equals("")) {
+				entityTokens.getLinkedInToken().setLinkedInPageLink(companyTokens.getLinkedInToken().getLinkedInPageLink());
+			}
+			if ((entityTokens.getRssToken().getProfileLink() == null || entityTokens.getRssToken().getProfileLink().equals(""))
+					&& companyTokens.getRssToken().getProfileLink() != null && !companyTokens.getRssToken().getProfileLink().equals("")) {
+				entityTokens.getRssToken().setProfileLink(companyTokens.getRssToken().getProfileLink());
+			}
+			if ((entityTokens.getTwitterToken().getTwitterPageLink() == null || entityTokens.getTwitterToken().getTwitterPageLink().equals(""))
+					&& companyTokens.getTwitterToken().getTwitterPageLink() != null
+					&& !companyTokens.getTwitterToken().getTwitterPageLink().equals("")) {
+				entityTokens.getTwitterToken().setTwitterPageLink(companyTokens.getTwitterToken().getTwitterPageLink());
+			}
+			if ((entityTokens.getYelpToken().getYelpPageLink() == null || entityTokens.getYelpToken().getYelpPageLink().equals(""))
+					&& companyTokens.getYelpToken().getYelpPageLink() != null && !companyTokens.getYelpToken().getYelpPageLink().equals("")) {
+				entityTokens.getYelpToken().setYelpPageLink(companyTokens.getYelpToken().getYelpPageLink());
+			}
+		}
+
+		LOG.info("Method aggregateSocialProfiles executed successfully: " + entityTokens.toString());
+		return entityTokens;
+	}
+
+	private SocialMediaTokens validateSocialMediaTokens(OrganizationUnitSettings unitSettings) {
+		SocialMediaTokens mediaTokens;
+		if (unitSettings.getSocialMediaTokens() == null) {
+			mediaTokens = new SocialMediaTokens();
+		}
+		else {
+			mediaTokens = unitSettings.getSocialMediaTokens();
+		}
+
+		if (mediaTokens.getFacebookToken() == null) {
+			mediaTokens.setFacebookToken(new FacebookToken());
+		}
+		if (mediaTokens.getGoogleToken() == null) {
+			mediaTokens.setGoogleToken(new GoogleToken());
+		}
+		if (mediaTokens.getLinkedInToken() == null) {
+			mediaTokens.setLinkedInToken(new LinkedInToken());
+		}
+		if (mediaTokens.getRssToken() == null) {
+			mediaTokens.setRssToken(new SocialProfileToken());
+		}
+		if (mediaTokens.getTwitterToken() == null) {
+			mediaTokens.setTwitterToken(new TwitterToken());
+		}
+		if (mediaTokens.getYelpToken() == null) {
+			mediaTokens.setYelpToken(new YelpToken());
+		}
+		return mediaTokens;
 	}
 
 	/**
