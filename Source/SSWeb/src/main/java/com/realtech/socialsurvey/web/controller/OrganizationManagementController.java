@@ -167,6 +167,7 @@ public class OrganizationManagementController {
 		String city = request.getParameter("city");
 		String companyContactNo = request.getParameter("contactno");
 		String vertical = request.getParameter("vertical");
+		String phoneFormat = request.getParameter("phoneFormat");
 		// JIRA SS-536: Added for manual registration via invitation
 		String strIsDirectRegistration = request.getParameter("isDirectRegistration");
 
@@ -190,6 +191,7 @@ public class OrganizationManagementController {
 					model.addAttribute("city", city);
 					model.addAttribute("vertical", vertical);
 					model.addAttribute("companyContactNo", companyContactNo);
+					model.addAttribute("phoneFormat", phoneFormat);
 					model.addAttribute("isDirectRegistration", strIsDirectRegistration);
 				}
 				catch (InvalidInputException e1) {
@@ -287,7 +289,7 @@ public class OrganizationManagementController {
 			throw new InvalidInputException("Zipcode is not valid while adding company information", DisplayMessageConstants.INVALID_ZIPCODE);
 		}
 
-		if (companyContactNo == null || companyContactNo.isEmpty() || !companyContactNo.matches(CommonConstants.PHONENUMBER_REGEX)) {
+		if (companyContactNo == null || companyContactNo.isEmpty()) {
 			throw new InvalidInputException("Company contact number is not valid while adding company information",
 					DisplayMessageConstants.INVALID_COMPANY_PHONEN0);
 		}

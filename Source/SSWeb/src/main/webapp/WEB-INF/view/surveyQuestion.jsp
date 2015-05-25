@@ -342,15 +342,9 @@
 <script src="${initParam.resourcesPath}/resources/js/script.js"></script>
 <script src="${initParam.resourcesPath}/resources/js/usermanagement.js"></script>
 <script src="https://js.braintreegateway.com/v2/braintree.js"></script>
-<script src="${initParam.resourcesPath}/resources/js/rangeslider.min.js"></script>
-<script src="${initParam.resourcesPath}/resources/js/proList.js"></script>
-<script src="${initParam.resourcesPath}/resources/js/rangeslider.min.js"></script>
-<script src="${initParam.resourcesPath}/resources/js/surveyQuestion.js"></script>
 <script src="${initParam.resourcesPath}/resources/js/progressbar.min.js"></script>
-<script src="${initParam.resourcesPath}/resources/js/editprofile.js"></script>
-<script src="${initParam.resourcesPath}/resources/js/dashboard.js"></script>
-<script src="${initParam.resourcesPath}/resources/js/editprofile.js"></script>
-<script src="${initParam.resourcesPath}/resources/js/hierarchy-management.js"></script>
+<script src="${initParam.resourcesPath}/resources/js/rangeslider.min.js"></script>
+<script src="${initParam.resourcesPath}/resources/js/application.js"></script>
 <script src="${initParam.resourcesPath}/resources/js/googletracking.js"></script>
 <script>
 $(document).ready(function() {
