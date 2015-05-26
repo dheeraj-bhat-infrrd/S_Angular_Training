@@ -625,6 +625,7 @@ function loadDisplayPicture(profileMasterId){
 	});
 }
 function displayPicCallback(data){
+	$("#hdr-usr-img").css("background", "");
 	$("#usr-initl").html(data);
 }
 
