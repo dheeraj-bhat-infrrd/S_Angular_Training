@@ -1197,6 +1197,11 @@ span.wc-highlight {
     cursor: pointer;
 }
 
+.privacy-policy-disclaimer {
+    color: #3e3e3e;
+	text-align: center;
+}
+
 .take-sur-link {
 	margin: 0px 0px 0px 80px;
 }
