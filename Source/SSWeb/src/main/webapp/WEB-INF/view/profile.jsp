@@ -200,7 +200,7 @@
                     	<div class="left-contact-wrapper">
                     		<div id="prof-contact-hdr" class="left-panel-header prof-contact-hdr"></div>
                     		<div class="left-panel-content">
-                    		<form id="prof-contact-form" action="">
+                    			<form id="prof-contact-form" action="">
 	                    			<div class="lp-row">
 	                    				<div class="lp-input-cont">
 	                    					<div class="float-left lp-username-icn lp-input-icn"></div>
@@ -216,14 +216,14 @@
 	                    			<div class="lp-row">
 	                    				<div class="lp-input-cont lp-textarea-cont">
 	                    					<div class="float-left lp-textarea-icn lp-input-icn"></div>
-	                    					<textarea id="lp-input-message" type="email" class="lp-input" placeholder="I'd like to get in contact with you about.."></textarea>
+	                    					<textarea id="lp-input-message" type="email" class="lp-input"
+	                    						placeholder="I'd like to get in contact with you about.."></textarea>
 	                    				</div>
 	                    			</div>
 	                    			<div class="lp-row">
 		                    			<div class="prof-captcha-cont">
 		                    			<div class="g-recaptcha" data-sitekey="6Le2wQYTAAAAAAacBUn0Dia5zMMyHfMXhoOh5A7K"></div>
-		                    				<!-- 
-											<div id="prof-captcha-img" class="prof-captcha-img"></div>
+		                    				<!-- <div id="prof-captcha-img" class="prof-captcha-img"></div>
 											<div class="reg-captcha-btns clearfix">
 												<input id="captcha-text" class="float-left prof-cap-txt"
 													name="captchaResponse" placeholder="Type the above text"
@@ -233,12 +233,14 @@
 													<div class="float-left reg-cap-img reg-cap-sound"></div>
 													<div class="float-left reg-cap-img reg-cap-info"></div>
 												</div>
-											</div>
-											-->
+											</div> -->
 										</div>
 	                    			</div>
 	                    			<div class="lp-row">
 	                    				<div class="lp-button">Submit Your message</div>
+	                    			</div>
+	                    			<div class="privacy-policy-disclaimer">
+	                    				We will only use information you provide on this form to send your message to this professional.
 	                    			</div>
 	                    			<div id="privacy-policy-link" class="privacy-policy-link">Privacy Policy</div>
                     			</form>
@@ -246,8 +248,8 @@
                     	</div>
                     </div>  
                 </div>
-                    
             </div>
+            
             <div class="row prof-right-panel-wrapper col-lg-8 col-md-8 col-sm-8 col-xs-12">
                 <div class="intro-wrapper rt-content-main bord-bot-dc hide" id="prof-company-intro">
                     <!-- about me comes here  -->
@@ -256,22 +258,7 @@
                     <div class="float-left panel-tweet-wrapper">
                         <div class="main-con-header">Recent Posts</div>
                         <div class="tweet-panel tweet-panel-left tweet-panel-left-adj" id="prof-posts">
-                            <!-- <div class="tweet-panel-item bord-bot-dc clearfix">
-                                <div class="tweet-icn icn-tweet float-left"></div>
-                                <div class="tweet-txt float-left">
-                                    <div class="tweet-text-main">Lorem ipsunmm dore tit sre leru Lorem ipsunmm dore tit sre leru Lorem ipsunmm dore tit sre leru Lorem ipsunmm dore tit </div>
-                                    <div class="tweet-text-link"><em>http://abblk.com</em></div>
-                                    <div class="tweet-text-time"><em>24 minutes ago</em></div>
-                                </div>
-                            </div>
-                            <div class="tweet-panel-item bord-bot-dc clearfix">
-                                <div class="tweet-icn icn-tweet float-left"></div>
-                                <div class="tweet-txt float-left">
-                                    <div class="tweet-text-main">Lorem ipsunmm dore tit sre leru Lorem ipsunmm dore tit sre leru Lorem ipsunmm dore tit sre leru Lorem ipsunmm dore tit </div>
-                                    <div class="tweet-text-link"><em>http://abblk.com</em></div>
-                                    <div class="tweet-text-time"><em>24 minutes ago</em></div>
-                                </div>
-                            </div> -->
+                            <!--  latest posts get populated here -->
                         </div>
                     </div>
                 </div>
@@ -287,10 +274,10 @@
                     </div>
                     
                     <div id="prof-review-item" class="prof-reviews">
-	                   <!--  reviews get populated here --> 
+	                   <!--  reviews get populated here -->
                     </div>
                     <div id="prof-hidden-review-count" class="prof-hidden-review-link">
-	                   <!--  count of hidden reviews get populated here --> 
+	                   <!--  count of hidden reviews get populated here -->
                     </div>
                 </div>
             </div>
@@ -301,8 +288,7 @@
 
 <!-- <div id="outer_captcha" style="display: none;">
 	<div id="recaptcha"></div>
-</div>
- -->
+</div> -->
 
 <div class="mobile-tabs hide clearfix">
     <div class="float-left mob-icn mob-icn-active icn-person"></div>
@@ -312,15 +298,15 @@
 </div>
 <!-- <div style="display: none">
 	<script src="https://www.google.com/recaptcha/api/challenge?k=6LdlHOsSAAAAAM8ypy8W2KXvgMtY2dFsiQT3HVq-"></script>
-</div>
- -->
-<!-- Code snippet to show aggregated ratings for agent in Google results : BOC-->
+</div> -->
 
+<!-- Code snippet to show aggregated ratings for agent in Google results : BOC-->
 <div class="hide" itemscope itemtype="http://schema.org/Product">
-   <span itemprop="name">Social Survey</span>
-   <span id="agent-desc" itemprop="title"></span>
-   <div itemprop="aggregateRating" itemscope itemtype="http://schema.org/AggregateRating">Rated 
-		<span id="prof-schema-agent-rating" itemprop="ratingValue"></span>/5 based on <span id="prof-schema-reviews" itemprop="reviewCount"></span> reviews
+	<span itemprop="name">Social Survey</span>
+	<span id="agent-desc" itemprop="title"></span>
+	<div itemprop="aggregateRating" itemscope itemtype="http://schema.org/AggregateRating">Rated 
+		<span id="prof-schema-agent-rating" itemprop="ratingValue"></span>/5 based on 
+		<span id="prof-schema-reviews" itemprop="reviewCount"></span> reviews
 	</div>
 </div>
 <!-- EOC -->
@@ -369,10 +355,8 @@
         	gaLabel = 'company';
         	gaName = companyProfileName;
         }
-        
        
         $(window).resize(adjustImage);
-        
         
         $('.icn-person').click(function() {
             $('.mob-icn').removeClass('mob-icn-active');

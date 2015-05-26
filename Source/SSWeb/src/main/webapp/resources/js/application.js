@@ -4458,12 +4458,14 @@ function paintSurveyPageFromJson() {
 		$("div[data-ques-type='smiley-text-final']").show();
 		$("#ques-text-textarea").html(question);
 		$("#text-area").show();
+		$('#text-box-disclaimer').show();
 		$("#smiles-final").hide();
 		if(questionDetails.customerResponse!=undefined)
 			$("#text-area").html(questionDetails.customerResponse);
 	} else if (questionType == "sb-master") {
 		$("div[data-ques-type='smiley-text-final']").show();
 		$("#text-area").hide();
+		$('#text-box-disclaimer').hide();
 		$("#smiles-final").show();
 		$("#ques-text-textarea").html(question);
 	}
@@ -4587,10 +4589,11 @@ function updateCustomerResponse(feedback) {
 function showFeedbackPage(mood) {
 	$("div[data-ques-type]").hide();
 	$("div[data-ques-type='smiley-text-final']").show();
+	$('#text-box-disclaimer').show();
 	$("#text-area").show();
 	$("#text-area").val("");
 	$("#smiles-final").hide();
-	$("#next-textarea-smiley").html("Finish");
+	$("#next-textarea-smiley").html("Post My Review");
 	$("#next-textarea-smiley").removeClass("btn-com-disabled");
 	isSmileTypeQuestion = false;
 	switch (mood) {
