@@ -92,4 +92,6 @@ public interface SurveyHandler {
 	public String composeLink(long userId, String custEmail) throws InvalidInputException;
 
 	public void markSurveyAsStarted(SurveyPreInitiation surveyPreInitiation);
+
+	public void updateReminderCountForSocialPosts(Long agentId, String customerEmail);
 }
