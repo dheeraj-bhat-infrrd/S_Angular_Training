@@ -191,7 +191,7 @@ public interface EmailServices {
 	 */
 	public void queueSocialPostReminderMail(String recipientMailId, String displayName, String agentName, String links) throws InvalidInputException;
 
-	public void sendSocialPostReminderMail(String recipientMailId, String displayName, String agentName, String links) throws InvalidInputException,
+	public void sendSocialPostReminderMail(String recipientMailId, String agentPhone, String agentTitle, String companyName, String displayName, String agentName, String links) throws InvalidInputException,
 			UndeliveredEmailException;
 
 	/**
