@@ -2,7 +2,6 @@ package com.realtech.socialsurvey.core.services.mail.impl;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Calendar;
 import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -1052,7 +1051,7 @@ public class EmailServicesImpl implements EmailServices {
 	@Async
 	@Override
 	public void sendDefaultSurveyInvitationMail(String recipientMailId, String displayName, String agentName, String link, String agentEmailId,
-			String agentSignature, String companyName, String surveyInitiatedOn, String fullAddress) throws InvalidInputException,
+			String agentSignature, String companyName, String surveyInitiatedOn, String currentYear, String fullAddress) throws InvalidInputException,
 			UndeliveredEmailException {
 		if (recipientMailId == null || recipientMailId.isEmpty()) {
 			LOG.error("Recipient email Id is empty or null for sending survey completion mail ");
@@ -1062,8 +1061,6 @@ public class EmailServicesImpl implements EmailServices {
 			LOG.error("displayName parameter is empty or null for sending account upgrade mail ");
 			throw new InvalidInputException("displayName parameter is empty or null for sending survey completion mail ");
 		}
-
-		String currentYear = String.valueOf(Calendar.getInstance().get(Calendar.YEAR));
 
 		LOG.info("Sending survey reminder email to : " + recipientMailId);
 		EmailEntity emailEntity = prepareEmailEntityForSendingEmail(recipientMailId, agentEmailId, agentName);
