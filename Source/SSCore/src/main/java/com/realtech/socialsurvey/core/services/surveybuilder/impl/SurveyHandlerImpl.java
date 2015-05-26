@@ -361,6 +361,13 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean {
 		LOG.info("Method to increase reminder count by 1, updateReminderCount() finished.");
 	}
 
+	@Override
+	public void updateReminderCountForSocialPosts(Long agentId, String customerEmail) {
+		LOG.info("Method to increase reminder count by 1, updateReminderCountForSocialPosts() started.");
+		surveyDetailsDao.updateReminderCountForSocialPost(agentId, customerEmail);
+		LOG.info("Method to increase reminder count by 1, updateReminderCountForSocialPosts() finished.");
+	}
+	
 	/*
 	 * Method to get surveys
 	 */

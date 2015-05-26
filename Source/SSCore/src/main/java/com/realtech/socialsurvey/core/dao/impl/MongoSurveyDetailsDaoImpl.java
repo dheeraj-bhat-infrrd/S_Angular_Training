@@ -10,6 +10,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.ListIterator;
 import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -1057,6 +1058,22 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao {
 		mongoTemplate.updateMulti(query, update, SURVEY_DETAILS_COLLECTION);
 		LOG.info("Method to increase reminder count by 1, updateReminderCount() finished.");
 	}
+	
+	@Override
+	public void updateReminderCountForSocialPost(Long agentId, String customerEmail) {
+		LOG.info("Method to increase reminder count by 1, updateReminderCountForSocialPost() started.");
+		Query query = new Query();
+		query.addCriteria(Criteria.where(CommonConstants.AGENT_ID_COLUMN).is(agentId));
+		query.addCriteria(Criteria.where(CommonConstants.CUSTOMER_EMAIL_COLUMN).is(customerEmail));
+		Update update = new Update();
+		update.inc(CommonConstants.REMINDER_COUNT_COLUMN, 1);
+		Date date = new Date();
+		update.set(CommonConstants.MODIFIED_ON_COLUMN, date);
+		update.set(CommonConstants.LAST_REMINDER_FOR_SOCIAL_POST, date);
+		update.push(CommonConstants.REMINDERS_FOR_SOCIAL_POSTS, date);
+		mongoTemplate.updateMulti(query, update, SURVEY_DETAILS_COLLECTION);
+		LOG.info("Method to increase reminder count by 1, updateReminderCountForSocialPost() finished.");
+	}
 
 	@Override
 	public List<SurveyDetails> getIncompleteSocialPostCustomersEmail(long companyId, int surveyReminderInterval, int maxReminders, float autopostScore) {
@@ -1067,12 +1084,19 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao {
 			query.addCriteria(new Criteria().andOperator(Criteria.where(CommonConstants.COMPANY_ID_COLUMN).is(companyId),
 					new Criteria().orOperator(Criteria.where(CommonConstants.LAST_REMINDER_FOR_SOCIAL_POST).lte(cutOffDate),
 							Criteria.where(CommonConstants.LAST_REMINDER_FOR_SOCIAL_POST).exists(false)),
-					Criteria.where(CommonConstants.SCORE_COLUMN).gte(autopostScore), Criteria.where("socialPostsReminder").lt(maxReminders)));
+					Criteria.where(CommonConstants.SCORE_COLUMN).gte(autopostScore)));
 		else
 			query.addCriteria(new Criteria().andOperator(Criteria.where(CommonConstants.COMPANY_ID_COLUMN).is(companyId),
 					new Criteria().orOperator(Criteria.where(CommonConstants.LAST_REMINDER_FOR_SOCIAL_POST).lte(cutOffDate),
 							Criteria.where(CommonConstants.LAST_REMINDER_FOR_SOCIAL_POST).exists(false))));
 		List<SurveyDetails> surveys = mongoTemplate.find(query, SurveyDetails.class, SURVEY_DETAILS_COLLECTION);
+		ListIterator<SurveyDetails> surveyIterator = surveys.listIterator();
+		while(surveyIterator.hasNext()){
+			if(surveyIterator.next().getRemindersForSocialPosts() != null && 
+					surveyIterator.next().getRemindersForSocialPosts().size() >= maxReminders){
+				surveyIterator.remove();
+			}
+		}
 		LOG.info("Method to get list of customers who have not yet completed their survey on all the social networking sites, getIncompleteSocialPostCustomersEmail() finished.");
 		return surveys;
 	}
