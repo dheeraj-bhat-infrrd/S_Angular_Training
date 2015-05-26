@@ -4,7 +4,10 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.sql.Timestamp;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -497,6 +500,10 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean {
 			agentName = user.getFirstName() + " " + user.getLastName();
 		}
 		String agentSignature = emailFormatHelper.buildAgentSignature(agentPhone, agentTitle, companyName);
+		String currentYear = String.valueOf(Calendar.getInstance().get(Calendar.YEAR));
+		DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd");
+		// TODO add address for mail footer
+		String fullAddress = "";
 
 		OrganizationUnitSettings companySettings = organizationManagementService.getCompanySettings(user.getCompany().getCompanyId());
 		if (companySettings != null && companySettings.getMail_content() != null && companySettings.getMail_content().getRestart_survey_mail() != null) {
@@ -507,6 +514,12 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean {
 			mailBody = mailBody.replaceAll("\\[Name\\]", custFirstName + " " + custLastName);
 			mailBody = mailBody.replaceAll("\\[Link\\]", link);
 			mailBody = mailBody.replaceAll("\\[AgentSignature\\]", agentSignature);
+			mailBody = mailBody.replaceAll("\\[RecipientEmail\\]", custEmail);
+			mailBody = mailBody.replaceAll("\\[CompanyName\\]", companyName);
+			mailBody = mailBody.replaceAll("\\[InitiatedDate\\]", dateFormat.format(new Date()));
+			mailBody = mailBody.replaceAll("\\[SenderEmail\\]", user.getEmailId());
+			mailBody = mailBody.replaceAll("\\[CurrentYear\\]", currentYear);
+			mailBody = mailBody.replaceAll("\\[FullAddress\\]", fullAddress);
 			mailBody = mailBody.replaceAll("null", "");
 
 			String mailSubject = CommonConstants.SURVEY_MAIL_SUBJECT + agentName;
@@ -520,7 +533,8 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean {
 		}
 		else {
 			emailServices.sendDefaultSurveyInvitationMail(custEmail, custFirstName + " " + custLastName, user.getFirstName()
-					+ (user.getLastName() != null ? " " + user.getLastName() : ""), link, user.getEmailId(), agentSignature);
+					+ (user.getLastName() != null ? " " + user.getLastName() : ""), link, user.getEmailId(), agentSignature, companyName,
+					dateFormat.format(new Date()), currentYear, fullAddress);
 		}
 		LOG.info("sendSurveyRestartMail() finished.");
 	}
@@ -600,19 +614,31 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean {
 		if (user.getLastName() != null && !user.getLastName().isEmpty()) {
 			agentName = user.getFirstName() + " " + user.getLastName();
 		}
+		
 		String agentSignature = emailFormatHelper.buildAgentSignature(agentPhone, agentTitle, companyName);
-
+		String currentYear = String.valueOf(Calendar.getInstance().get(Calendar.YEAR));
+		DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd");
+		// TODO add address for mail footer
+		String fullAddress = "";
+		
 		OrganizationUnitSettings companySettings = organizationManagementService.getCompanySettings(user.getCompany().getCompanyId());
 		if (companySettings != null && companySettings.getMail_content() != null && companySettings.getMail_content().getTake_survey_mail() != null) {
 
 			MailContent takeSurvey = companySettings.getMail_content().getTake_survey_mail();
 			String mailBody = emailFormatHelper.replaceEmailBodyWithParams(takeSurvey.getMail_body(), takeSurvey.getParam_order());
+			
 			mailBody = mailBody.replaceAll("\\[LogoUrl\\]", appLogoUrl);
 			mailBody = mailBody.replaceAll("\\[BaseUrl\\]", applicationBaseUrl);
 			mailBody = mailBody.replaceAll("\\[AgentName\\]", agentName);
 			mailBody = mailBody.replaceAll("\\[Name\\]", custFirstName + " " + custLastName);
 			mailBody = mailBody.replaceAll("\\[Link\\]", link);
 			mailBody = mailBody.replaceAll("\\[AgentSignature\\]", agentSignature);
+			mailBody = mailBody.replaceAll("\\[RecipientEmail\\]", custEmail);
+			mailBody = mailBody.replaceAll("\\[CompanyName\\]", companyName);
+			mailBody = mailBody.replaceAll("\\[InitiatedDate\\]", dateFormat.format(new Date()));
+			mailBody = mailBody.replaceAll("\\[SenderEmail\\]", user.getEmailId());
+			mailBody = mailBody.replaceAll("\\[CurrentYear\\]", currentYear);
+			mailBody = mailBody.replaceAll("\\[FullAddress\\]", fullAddress);
 			mailBody = mailBody.replaceAll("null", "");
 
 			String mailSubject = CommonConstants.SURVEY_MAIL_SUBJECT + agentName;
@@ -626,7 +652,8 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean {
 		}
 		else {
 			emailServices.sendDefaultSurveyInvitationMail(custEmail, custFirstName + " " + custLastName, user.getFirstName()
-					+ (user.getLastName() != null ? " " + user.getLastName() : ""), link, user.getEmailId(), agentSignature);
+					+ (user.getLastName() != null ? " " + user.getLastName() : ""), link, user.getEmailId(), agentSignature, companyName,
+					dateFormat.format(new Date()), currentYear, fullAddress);
 		}
 		LOG.debug("sendInvitationMailByAgent() finished.");
 	}

@@ -2742,7 +2742,7 @@ button.paypal.is-active {
 }
 
 .sq-np-wrapper {
-	width: 260px;
+	width: 290px;
 	height: 40px;
 	/* background-color: #5CC7EF; */
 	border-radius: 20px;
@@ -2763,12 +2763,12 @@ button.paypal.is-active {
 }
 
 .sq-np-item-next {
-	position:relative;
-	padding: 0 50px 0 40px;
+	position: relative;
+	padding: 0 40px 0 10px;
 	border-radius: 0 20px 20px 0;
 	background-image: url(../images/right-arw.png);
 	background-repeat: no-repeat;
-	background-position: 95px center;
+	background-position: 109px center;
 }
 
 .sq-np-item-next:before{
@@ -2814,7 +2814,8 @@ button.paypal.is-active {
 
 .sq-np-item-prev {
 	border-radius: 20px 0 0 20px;
-	text-align: left;
+	text-align: right;
+	padding-right: 10px;
 	width: 130px;
 }
 
@@ -4766,6 +4767,16 @@ select.rfr_txt_fld,select.rfr_input_fld{
 	line-height: 16px;
 	flex-direction: column;
 	text-align: left;
+}
+
+.bd-check-txt-disclaimer {
+	display: flex;
+	font-family: opensanslight;
+	justify-content: flex-start;
+	height: 32px;
+	line-height: 16px;
+	flex-direction: column;
+	text-align: center;
 }
 
 .bd-btn-save {
