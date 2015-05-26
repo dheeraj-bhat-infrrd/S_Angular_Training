@@ -19,11 +19,3 @@
 <script src="${initParam.resourcesPath}/resources/js/countrydata.js"></script>
 <script src="${initParam.resourcesPath}/resources/js/zipcoderegex.js"></script>
 <script src="${initParam.resourcesPath}/resources/js/application.js"></script>
-<script>
-	$(document).ready(function() {
-		$('.header-links-item').on('click',function(){
-			 window.location.href = $(this).find('a').attr('href');
-		});
-		loadDisplayPicture();
-	});
-</script>
