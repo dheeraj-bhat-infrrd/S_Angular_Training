@@ -5,9 +5,12 @@ package com.realtech.socialsurvey.web.profile;
 
 import java.io.IOException;
 import java.util.List;
+
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
+import org.apache.solr.common.SolrDocument;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,19 +22,26 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
+
 import com.amazonaws.util.json.JSONException;
 import com.amazonaws.util.json.JSONObject;
+import com.google.gson.Gson;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
 import com.realtech.socialsurvey.core.entities.User;
 import com.realtech.socialsurvey.core.entities.UserProfile;
 import com.realtech.socialsurvey.core.enums.DisplayMessageType;
+import com.realtech.socialsurvey.core.exception.InternalServerException;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.exception.NoRecordsFetchedException;
+import com.realtech.socialsurvey.core.exception.NonFatalException;
+import com.realtech.socialsurvey.core.exception.ProfileServiceErrorCode;
 import com.realtech.socialsurvey.core.services.authentication.CaptchaValidation;
 import com.realtech.socialsurvey.core.services.mail.UndeliveredEmailException;
 import com.realtech.socialsurvey.core.services.organizationmanagement.OrganizationManagementService;
 import com.realtech.socialsurvey.core.services.organizationmanagement.ProfileManagementService;
+import com.realtech.socialsurvey.core.services.search.SolrSearchService;
+import com.realtech.socialsurvey.core.services.search.exception.SolrException;
 import com.realtech.socialsurvey.core.utils.DisplayMessageConstants;
 import com.realtech.socialsurvey.core.utils.MessageUtils;
 import com.realtech.socialsurvey.web.common.JspResolver;
@@ -53,6 +63,9 @@ public class ProfileViewController {
 	
 	@Autowired
 	private OrganizationManagementService organizationManagementService;
+	
+	@Autowired
+	private SolrSearchService solrSearchService;
 	
 	@Value("${VALIDATE_CAPTCHA}")
 	private String validateCaptcha;
@@ -81,6 +94,17 @@ public class ProfileViewController {
 		// making case insensitive
 		profileName = profileName.toLowerCase();
 		
+		OrganizationUnitSettings companyProfile = null;
+		try {
+			companyProfile = profileManagementService.getCompanyProfileByProfileName(profileName);
+			String json = new Gson().toJson(companyProfile);
+			model.addAttribute("profileJson",json);
+		}
+		catch (InvalidInputException e) {
+			throw new InternalServerException(new ProfileServiceErrorCode(CommonConstants.ERROR_CODE_COMPANY_PROFILE_SERVICE_FAILURE,
+					CommonConstants.SERVICE_CODE_COMPANY_PROFILE, "Error occured while fetching company profile"), e.getMessage());
+		}
+		model.addAttribute("profile", companyProfile);
 		model.addAttribute("companyProfileName", profileName);
 		model.addAttribute("profileLevel", CommonConstants.PROFILE_LEVEL_COMPANY);
 		LOG.info("Service to initiate company profile page executed successfully");
@@ -117,6 +141,17 @@ public class ProfileViewController {
 		companyProfileName = companyProfileName.toLowerCase();
 		regionProfileName = regionProfileName.toLowerCase();
 
+		OrganizationUnitSettings regionProfile = null;
+		try {
+			regionProfile = profileManagementService.getRegionByProfileName(companyProfileName, regionProfileName);
+			String json = new Gson().toJson(regionProfile);
+			model.addAttribute("profileJson",json);
+		}
+		catch (InvalidInputException e) {
+			throw new InternalServerException(new ProfileServiceErrorCode(CommonConstants.ERROR_CODE_REGION_PROFILE_SERVICE_FAILURE,
+					CommonConstants.SERVICE_CODE_REGION_PROFILE, "Error occured while fetching region profile"), e.getMessage());
+		}
+		model.addAttribute("profile", regionProfile);
 		model.addAttribute("companyProfileName", companyProfileName);
 		model.addAttribute("regionProfileName", regionProfileName);
 		model.addAttribute("profileLevel", CommonConstants.PROFILE_LEVEL_REGION);
@@ -153,6 +188,17 @@ public class ProfileViewController {
 		companyProfileName = companyProfileName.toLowerCase();
 		branchProfileName = branchProfileName.toLowerCase();
 		
+		OrganizationUnitSettings branchProfile = null;
+		try {
+			branchProfile = profileManagementService.getBranchByProfileName(companyProfileName, branchProfileName);
+			String json = new Gson().toJson(branchProfile);
+			model.addAttribute("profileJson",json);
+		}
+		catch (InvalidInputException e) {
+			throw new InternalServerException(new ProfileServiceErrorCode(CommonConstants.ERROR_CODE_BRANCH_PROFILE_SERVICE_FAILURE,
+					CommonConstants.SERVICE_CODE_BRANCH_PROFILE, "Error occured while fetching branch profile"), e.getMessage());
+		}
+		model.addAttribute("profile",branchProfile);
 		model.addAttribute("companyProfileName", companyProfileName);
 		model.addAttribute("branchProfileName", branchProfileName);
 		model.addAttribute("profileLevel", CommonConstants.PROFILE_LEVEL_BRANCH);
@@ -213,6 +259,29 @@ public class ProfileViewController {
 					return JspResolver.MESSAGE_HEADER;
 				}
 			}
+			OrganizationUnitSettings individualProfile = null;
+			try {
+				individualProfile = profileManagementService.getIndividualByProfileName(agentProfileName);
+				String json = new Gson().toJson(individualProfile);
+				model.addAttribute("profileJson",json);
+				SolrDocument solrDocument;
+	            try {
+		            solrDocument = solrSearchService.getUserByUniqueId(individualProfile.getIden());
+		            if (solrDocument == null || solrDocument.isEmpty()) {
+						throw new NoRecordsFetchedException("No document found in solr for userId:" + individualProfile.getIden());
+					}
+					String firstName = solrDocument.get(CommonConstants.USER_FIRST_NAME_SOLR).toString();
+					model.addAttribute("agentFirstName",firstName);
+	            } catch (SolrException e) {
+	            	LOG.error("SolrException while searching for user id. Reason : " + e.getMessage(), e);
+					throw new NonFatalException("SolrException while searching for user id.", DisplayMessageConstants.GENERAL_ERROR, e);
+	            }
+				model.addAttribute("profile",individualProfile);
+			}
+			catch (InvalidInputException | NoRecordsFetchedException e) {
+				throw new InternalServerException(new ProfileServiceErrorCode(CommonConstants.ERROR_CODE_INDIVIDUAL_PROFILE_SERVICE_FAILURE,
+						CommonConstants.SERVICE_CODE_INDIVIDUAL_PROFILE, "Profile name for individual is invalid"), e.getMessage());
+			}
 		}
 		catch (InvalidInputException e) {
 			LOG.error("InvalidInputException : message : " + e.getMessage(),e);
@@ -223,6 +292,12 @@ public class ProfileViewController {
 		catch (NoRecordsFetchedException e) {
 			LOG.error("NoRecordsFetchedException : message : " + e.getMessage(),e);
 			message = messageUtils.getDisplayMessage(DisplayMessageConstants.INVALID_INDIVIDUAL_PROFILENAME, DisplayMessageType.ERROR_MESSAGE).getMessage();
+			model.addAttribute("message", message);
+			return JspResolver.MESSAGE_HEADER;
+		}
+		catch (NonFatalException e){
+			LOG.error("NonFatalException : message : " + e.getMessage(),e);
+			message = messageUtils.getDisplayMessage(DisplayMessageConstants.GENERAL_ERROR, DisplayMessageType.ERROR_MESSAGE).getMessage();
 			model.addAttribute("message", message);
 			return JspResolver.MESSAGE_HEADER;
 		}

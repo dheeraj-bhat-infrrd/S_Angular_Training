@@ -1129,7 +1129,7 @@ button.paypal.is-active {
 }
 
 .st-score-rt {
-	/* width: 50%; */
+	width: 50%;
 }
 
 .score-rt-post {
@@ -1444,6 +1444,7 @@ button.paypal.is-active {
 	height: 200px;
 	max-height: 200px;
 	background-color: #f1f1f1;
+	background-size : contain;
 }
 
 .prof-download-contact {
@@ -3459,7 +3460,7 @@ button.paypal.is-active {
 }
 
 .prof-name-txt {
-	width: 79%;
+	width: 100%;
 	float: left;
 }
 

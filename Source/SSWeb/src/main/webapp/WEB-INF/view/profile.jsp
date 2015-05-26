@@ -7,7 +7,6 @@
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title><spring:message code="label.profile.title.key"/></title>
     <meta charset="utf-8">
     <link rel="shortcut icon" href="${initParam.resourcesPath}/favicon.ico" sizes="16x16">
     <link rel="stylesheet" href="${initParam.resourcesPath}/resources/css/perfect-scrollbar.min.css">
@@ -19,6 +18,30 @@
     <link rel="stylesheet" href="${initParam.resourcesPath}/resources/css/style-common-1.1.css">
     <link rel="stylesheet" href="${initParam.resourcesPath}/resources/css/style-resp-1.1.css">
     <script src='//www.google.com/recaptcha/api.js'></script>
+    <c:if test="${not empty profile}">
+    	<c:if test="${not empty profile.contact_details && not empty profile.contact_details.name }">
+    		<c:set var="profName" value="${profile.contact_details.name }"></c:set>
+    	</c:if>
+	    <c:choose>
+	    	<c:when test="${not empty profile.contact_details && not empty profile.contact_details.name}">
+	    		<title>${profName} Ratings & Reviews
+	    			<c:if test="${not empty profile.vertical }">
+	    				 - [${profile.vertical }] Reviews
+	    			</c:if>
+	    		</title>	
+	    	</c:when>
+			<c:otherwise>
+				<title><spring:message code="label.profile.title.key" /></title>
+			</c:otherwise>
+		</c:choose>
+    	<c:if test="${not empty profile.completeProfileUrl }">
+    		<link rel="canonical" href="${profile.completeProfileUrl}">
+    	</c:if>
+    	<c:if test="${not empty profile.contact_details && not empty profile.contact_details.name }">
+    		<meta name="desciption" content="Use SocialSurvey Ratings & Reviews to find out how customers have rated ${profName }.">
+    		<meta name="keywords" content="${profName }, ${profName } ratings, ${profName } reviews, ${profName } scorecard, ${profName } ratings and reviews">
+    	</c:if>
+    </c:if>
 </head>
 <body>
     
@@ -85,18 +108,46 @@
     <div class="">
     	<div class="container">
         <div class="row prof-pic-name-wrapper">
-            <div id="prog-img-container" class="col-lg-4 col-md-4 col-sm-4 col-xs-6 prof-wrapper prof-img-wrapper hide">
-                <div class="prog-img-container">
-                    <div id="prof-image" class="prof-image pos-relative"></div>
-                </div>
-            </div>
+			<c:if test="${not empty profile.profileImageUrl }">
+				<div id="prog-img-container" class="col-lg-4 col-md-4 col-sm-4 col-xs-6 prof-wrapper prof-img-wrapper">
+		            <div id="prof-image" class="prof-image pos-relative" style="background: url(${profile.profileImageUrl}) no-repeat center;"></div>
+	            </div>
+			</c:if>
             <div class="col-lg-4 col-md-4 col-sm-4 col-xs-6 prof-wrapper pos-relative prof-name-wrapper">
                 <div class="prof-name-container" id="prof-company-head-content">
-                    <!-- name comes here -->
-                </div>
+                	<div class="prof-name">${profName}</div>
+                	<div class="prof-address">
+                		<c:if test="${not empty profile.vertical}">
+                			<div class="prof-addline1">${profile.vertical}</div>
+                		</c:if>
+                		<c:if test="${not empty profile.contact_details &&  not empty profile.contact_details.title}">
+                			<div class="prof-addline2">${profile.contact_details.title}</div>
+                		</c:if>
+                	</div>
+					<div class="prof-rating clearfix">
+						<div class="prof-rating-wrapper maring-0 clearfix float-left" id="rating-avg-comp"></div>
+						<div class="float-left review-count-left cursor-pointer" id="prof-company-review-count"></div>
+					</div>
+					<div class="prof-btn-wrapper clearfix">
+						<div class="prof-btn-contact float-left" onclick="focusOnContact()" >Contact
+						<c:choose>
+							<c:when test="${not empty agentFirstName}"> ${agentFirstName}</c:when>
+							<c:otherwise> ${profName}</c:otherwise>
+						</c:choose>
+						</div>
+						<div class="prof-btn-survey float-left" id="read-write-share-btn">Write a Review</div>
+					</div>
+            	</div>
             </div>
             <div class="col-lg-4 col-md-4 col-sm-4 prof-wrapper prof-map-wrapper float-right">
-                <div class="prof-user-logo" id="prof-company-logo"></div>
+            	<c:choose>
+            		<c:when test="${not empty profile.logo }">
+            			<div class="prof-user-logo" id="prof-company-logo" style="background: url(${profile.logo}) no-repeat center; background-size: 100% auto;"></div>
+            		</c:when>
+            		<c:otherwise>
+            			<div class="prof-user-logo" id="prof-company-logo"></div>
+            		</c:otherwise>
+            	</c:choose>
                 <div class="prof-user-address" id="prof-company-address">
                     <!-- address comes here -->
                 </div>
@@ -104,7 +155,12 @@
             <div class="mob-contact-btn-wrapper">
                 <div class="mob-contact-btn-row clearfix">
                     <div class="mob-contact-btn float-left">
-                        <div id="mob-contact-btn" class="mob-prof-contact-btn float-right" onclick="focusOnContact()"></div>
+                        <div id="mob-contact-btn" class="mob-prof-contact-btn float-right" onclick="focusOnContact()">Contact
+	                        <c:choose>
+								<c:when test="${not empty agentFirstName}"> ${agentFirstName}</c:when>
+								<c:otherwise> ${profName}</c:otherwise>
+							</c:choose>
+						</div>
                     </div>
                     <div class="mob-contact-btn float-left">
                         <div id="mob-review-btn" class="mob-prof-contact-btn float-left">Write a review</div>
@@ -120,19 +176,35 @@
 				<div class="prof-details-header-row clearfix">
 					<div class="prof-link-header float-left clearfix">
 						<div id="prof-header-rating" class="rating-image float-left smiley-rat-5"></div>
-						<div id="prof-header-url" class="rating-image-txt float-left"></div>
+						<div id="prof-header-url" class="rating-image-txt float-left">
+							<c:if test="${not empty profile.completeProfileUrl}">${profile.completeProfileUrl}</c:if>
+						</div>
 					</div>
-					<div id="web-addr-header" class="web-addr-header float-left clearfix hide">
-						<div class="web-address-img float-left"></div>
-						<div id="web-address-txt" class="web-address-txt float-left"></div>
-					</div>
+					<c:if test="${not empty profile.contact_details && not empty profile.contact_details.web_addresses && not empty profile.contact_details.web_addresses.work}">
+						<div id="web-addr-header" class="web-addr-header float-left clearfix">
+							<div class="web-address-img float-left"></div>
+							<div id="web-address-txt" class="web-address-txt float-left web-address-link" data-link="${profile.contact_details.web_addresses.work}">${profile.contact_details.web_addresses.work}</div>
+						</div>
+					</c:if>
 					<div class="float-right hm-hr-row-right clearfix">
-						<div id="social-connect-txt" class="float-left social-connect-txt"></div>
-						<div id="icn-fb" class="float-left social-item-icon icn-fb"></div>
-						<div id="icn-twit" class="float-left social-item-icon icn-twit"></div>
-						<div id="icn-lin" class="float-left social-item-icon icn-lin"></div>
-						<div id="icn-yelp" class="float-left social-item-icon icn-yelp"></div>
-                        <div id="icn-gplus" class="float-left social-item-icon icn-gplus"></div>
+						<c:if test="${not empty profile.socialMediaTokens}">
+							<div id="social-connect-txt" class="float-left social-connect-txt">Connect with ${profName }:</div>
+							<c:if test="${not empty profile.socialMediaTokens.facebookToken && not empty profile.socialMediaTokens.facebookToken.facebookPageLink}">
+								<div id="icn-fb" class="float-left social-item-icon icn-fb" data-link="${profile.socialMediaTokens.facebookToken.facebookPageLink }"></div>
+							</c:if>
+							<c:if test="${not empty profile.socialMediaTokens.twitterToken && not empty profile.socialMediaTokens.twitterToken.twitterPageLink}">
+								<div id="icn-twit" class="float-left social-item-icon icn-twit" data-link="${profile.socialMediaTokens.twitterToken.twitterPageLink }"></div>
+							</c:if>
+							<c:if test="${not empty profile.socialMediaTokens.linkedInToken && not empty profile.socialMediaTokens.linkedInToken.linkedInPageLink}">
+								<div id="icn-lin" class="float-left social-item-icon icn-lin" data-link="${profile.socialMediaTokens.linkedInToken.linkedInPageLink }"></div>
+							</c:if>
+							<c:if test="${not empty profile.socialMediaTokens.yelpToken && not empty profile.socialMediaTokens.yelpToken.yelpPageLink}">
+								<div id="icn-yelp" class="float-left social-item-icon icn-yelp" data-link="${profile.socialMediaTokens.yelpToken.yelpPageLink }"></div>
+							</c:if>
+							<c:if test="${not empty profile.socialMediaTokens.googleToken && not empty profile.socialMediaTokens.googleToken.profileLink}">
+								<div id="icn-gplus" class="float-left social-item-icon icn-gplus" data-link="${profile.socialMediaTokens.googleToken.profileLink }"></div>
+							</c:if>
+						</c:if>
 					</div>
 				</div>
 			</div>
@@ -147,14 +219,32 @@
                         <div class="left-panel-header cursor-pointer vcard-download">Download VCard</div>
                     </div>
                 </div> -->
-                <div id="contact-info" class="prof-left-row prof-left-info bord-bot-dc prof-contact-info hide">
-                    <div class="left-contact-wrapper">
-                        <div class="left-panel-header"><spring:message code="label.contactinformation.key"/></div>
-                        <div class="left-panel-content" id="prof-contact-information">
-                            <!--contact info comes here  -->
-                        </div>
-                    </div>
-                </div>
+                <c:if test="${not empty profile.contact_details }">
+                	<c:if test="${not empty profile.contact_details.web_addresses || not empty profile.contact_details.contact_numbers}">
+						<div id="contact-info" class="prof-left-row prof-left-info bord-bot-dc prof-contact-info">
+							<div class="left-contact-wrapper">
+								<div class="left-panel-header">
+									<spring:message code="label.contactinformation.key" />
+								</div>
+								<div class="left-panel-content" id="prof-contact-information">
+									<c:if test="${not empty profile.contact_details.web_addresses && not empty profile.contact_details.web_addresses.work}">
+										<div class="lp-con-row lp-row clearfix">
+											<div class="float-left lp-con-icn icn-web"></div>
+											<div id="web-addr-link-lp" class="float-left lp-con-row-item blue-text web-address-link" data-link="${profile.contact_details.web_addresses.work}">
+											</div>
+										</div>
+									</c:if>
+									<c:if test="${not empty profile.contact_details.contact_numbers && not empty profile.contact_details.contact_numbers.work}">
+										<div class="lp-con-row lp-row clearfix">
+											<div class="float-left lp-con-icn icn-phone"></div>
+											<div class="float-left lp-con-row-item">${profile.contact_details.contact_numbers.work}</div>
+										</div>
+									</c:if>
+								</div>
+							</div>
+						</div>
+					</c:if>
+                </c:if>
                 <div id="prof-agent-container">
                  	<c:choose>
                    		<c:when test="${not empty branchProfileName}">
@@ -198,7 +288,7 @@
               		</c:choose>
                     <div class="prof-left-row prof-left-assoc bord-bot-dc">
                     	<div class="left-contact-wrapper">
-                    		<div id="prof-contact-hdr" class="left-panel-header prof-contact-hdr"></div>
+                    		<div id="prof-contact-hdr" class="left-panel-header prof-contact-hdr">Contact ${profName }</div>
                     		<div class="left-panel-content">
                     		<form id="prof-contact-form" action="">
 	                    			<div class="lp-row">
@@ -249,9 +339,12 @@
                     
             </div>
             <div class="row prof-right-panel-wrapper col-lg-8 col-md-8 col-sm-8 col-xs-12">
-                <div class="intro-wrapper rt-content-main bord-bot-dc hide" id="prof-company-intro">
-                    <!-- about me comes here  -->
-                </div>
+            	<c:if test="${not empty profile.contact_details && not empty profile.contact_details.about_me }">
+	                <div class="intro-wrapper rt-content-main bord-bot-dc hide" id="prof-company-intro">
+	                    <div class="main-con-header">About ${profName}</div>
+	                    <div class="pe-whitespace intro-body">${profile.contact_details.about_me}</div>
+	                </div>
+                </c:if>
                 <div class="rt-content-main bord-bot-dc clearfix hide" id="recent-post-container">
                     <div class="float-left panel-tweet-wrapper">
                         <div class="main-con-header">Recent Posts</div>
@@ -277,7 +370,9 @@
                 </div>
                 <div class="people-say-wrapper rt-content-main hide" id="reviews-container">
                 	<div class="clearfix hide">
-	                    <div class="main-con-header float-left" id="prof-reviews-header"></div>
+	                    <div class="main-con-header float-left" id="prof-reviews-header">
+	                    	<span class="ppl-say-txt-st">What people say</span> about ${profName }
+	                    </div>
 	                    
 	                    <div id="prof-reviews-sort" class="prof-reviews-sort clearfix float-right hide">
 	                    	<div id="sort-by-feature" class="prof-review-sort-link float-left">Sort by Feature</div>
@@ -318,7 +413,7 @@
 
 <div class="hide" itemscope itemtype="http://schema.org/Product">
    <span itemprop="name">Social Survey</span>
-   <span id="agent-desc" itemprop="title"></span>
+   <span id="agent-desc" itemprop="title">${profName} - Reviews And Ratings</span>
    <div itemprop="aggregateRating" itemscope itemtype="http://schema.org/AggregateRating">Rated 
 		<span id="prof-schema-agent-rating" itemprop="ratingValue"></span>/5 based on <span id="prof-schema-reviews" itemprop="reviewCount"></span> reviews
 	</div>
@@ -338,6 +433,7 @@
 <script src="${initParam.resourcesPath}/resources/js/perfect-scrollbar.jquery.min.js"></script>
 <script>
     $(document).ready(function(){
+    	profileJson = ${profileJson};
         adjustImage();
         var gaLabel;
         var gaName;
@@ -497,8 +593,11 @@
 		}, 2000);
     	
     	
-    	
     	// Find a pro
+    	$('#find-pro-form input').keyup(function(e) {
+    		submitFindProForm();
+		});
+    	
     	$('#find-pro-submit').click(function(e) {
     		e.preventDefault();
     		submitFindProForm();
@@ -587,31 +686,6 @@
     		}
     	}
     	
-    	/* $('#lp-input-name').blur(function() {
-    		if (validateName(this.id)) {
-    			hideError();
-    		}
-    	});
-    	
-    	$('#lp-input-email').blur(function() {
-    		if (validateEmailId(this.id)) {
-    			hideError();
-    		}
-    	});
-    	
-    	$('#lp-input-message').blur(function() {
-    		if (validateMessage(this.id)) {
-    			hideError();
-    		}
-    	});
-    	
-    	$('#captcha-text').blur(function() {
-    		if (validateMessage(this.id)) {
-    			hideError();
-    		}
-    	}); */
-    	
-    	
     	function validateContactUsForm() {
         	isContactUsFormValid = true;
 
@@ -628,9 +702,7 @@
         			$('#lp-input-name').focus();
         			isFocussed=true;
         		}
-        		if (isSmallScreen) {
-        			return isContactUsFormValid;
-        		}
+        		return isContactUsFormValid;
     		}
         	
     		if (!validateEmailId('lp-input-email')) {
@@ -639,9 +711,7 @@
         			$('#lp-input-email').focus();
         			isFocussed=true;
         		}
-        		if (isSmallScreen) {
-        			return isContactUsFormValid;
-        		}
+        		return isContactUsFormValid;
     		}
     		
     		if (!validateMessage('lp-input-message')) {
@@ -650,9 +720,7 @@
         			$('#lp-input-message').focus();
         			isFocussed=true;
         		}
-        		if (isSmallScreen) {
-        			return isContactUsFormValid;
-        		}
+        		return isContactUsFormValid;
     		}
     		
     		if (!validateMessage('captcha-text')) {
@@ -661,9 +729,7 @@
         			$('#captcha-text').focus();
         			isFocussed=true;
         		}
-        		if (isSmallScreen) {
-        			return isContactUsFormValid;
-        		}
+        		return isContactUsFormValid;
     		}
     		
         	return isContactUsFormValid;

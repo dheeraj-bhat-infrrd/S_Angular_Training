@@ -11,6 +11,7 @@ var reviewsSortBy = 'feature';
 var showAllReviews = false;
 var monthNames = [ "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug",
 		"Sep", "Oct", "Nov", "Dec" ];
+var profileJson;
 
 $(document).ajaxStop(function() {
 	adjustImage();
@@ -36,57 +37,30 @@ function adjustImage(){
 
 function fetchCompanyProfile() {
 	startIndex = 0;
-	var url = window.location.origin +'/rest/profile/'+companyProfileName;
-	callAjaxGET(url, fetchCompanyProfileCallBack, true);
+	fetchCompanyProfileCallBack();
+	/*var url = window.location.origin +'/rest/profile/'+companyProfileName;
+	callAjaxGET(url, fetchCompanyProfileCallBack, true);*/
 }
 
 function fetchCompanyProfileCallBack(data) {
-	var response= $.parseJSON(data);
-	if(response != undefined) {
-		if(response.entity == "" || response.status == 500) {
-			redirectTo404ErrorPage();
-			return false;
-		}
-		var result = $.parseJSON(response.entity);
-		
-		//Add title and meta data
-        var title;
-        var name = result.contact_details.name;
-        if(name){
-        	title = name+' Ratings & Reviews';
-        }
-        if(result.vertical){
-        	title += ' - ' + result.vertical + ' Reviews';
-        }
-        if(title){
-        	$('title').html(title);	
-        }
-		
-        if(result.completeProfileUrl){
-        	$('head').append('<link href="'+result.completeProfileUrl+'" rel="canonical">');
-        }
-        
-        if(name){
-        	$('head').append('<meta name="description" content="Use SocialSurvey Ratings & Reviews to find out how customers have rated '+ name + '.">');
-        	$('head').append('<meta name="keywords" content="'+name+', '+name+' ratings,'+name+' reviews,'+name+' scorecard, '+name+' ratings and reviews">');
-        }
-		
-		paintProfilePage(result);
-		fetchAverageRatings(result.iden);
-		fetchCompanyRegions();
-		fetchCompanyBranches();
-		fetchCompanyIndividuals();
-		minScore = 0;
-		if(result.survey_settings != undefined && result.survey_settings.show_survey_above_score != undefined) {
-			minScore = result.survey_settings.show_survey_above_score;
-		}
-		fetchReviewsCountForCompany(result.iden, paintAllReviewsCount);
-		$("#profile-fetch-info").attr("fetch-all-reviews","false");
-		fetchReviewsForCompany(result.iden,startIndex,numOfRows,minScore);	
+	var result = profileJson;
+	
+	paintProfilePage(result);
+	fetchAverageRatings(result.iden);
+	fetchCompanyRegions();
+	fetchCompanyBranches();
+	fetchCompanyIndividuals();
+	minScore = 0;
+	if(result.survey_settings != undefined && result.survey_settings.show_survey_above_score != undefined) {
+		minScore = result.survey_settings.show_survey_above_score;
 	}
+	fetchReviewsCountForCompany(result.iden, paintAllReviewsCount);
+	$("#profile-fetch-info").attr("fetch-all-reviews","false");
+	fetchReviewsForCompany(result.iden,startIndex,numOfRows,minScore);	
 }
 
 function paintProfilePage(result) {
+	//TODO : Remove all the js iteration for profileJson
 	if(result != undefined && result != "") {
 		currentProfileIden = result.iden;
 		var contactDetails = result.contact_details;
@@ -98,46 +72,6 @@ function paintProfilePage(result) {
 		paintPublicPosts();
 		
 		if(contactDetails != undefined){
-			
-			$('#social-connect-txt').text("Connect with "+contactDetails.name+" :");
-			$('#prof-header-url').text(location.href);
-			$('#prof-contact-hdr').text("Contact "+contactDetails.name);
-			$('#agent-desc').html(contactDetails.name+" - Reviews And Ratings");
-			headContentHtml = headContentHtml +'<div class="prof-name">'+contactDetails.name+'</div>';
-			if(result.vertical != undefined) {
-				headContentHtml = headContentHtml +' <div class="prof-address"><div class="prof-addline1">'+result.vertical+'</div>';
-			}
-            if(contactDetails.title != undefined) {
-            	headContentHtml = headContentHtml +' <div class="prof-addline2">'+contactDetails.title+'</div>';
-            }
-            if(contactDetails.location != undefined) {
-            	headContentHtml = headContentHtml +' <div class="prof-addline2">'+contactDetails.location;
-            	if(contactDetails.industry != undefined){
-            		headContentHtml += " | "+ contactDetails.industry;
-            	}
-            	headContentHtml += "</div>";
-            }
-            headContentHtml = headContentHtml +' </div>';
-            headContentHtml = headContentHtml +' <div class="prof-rating clearfix">';
-            headContentHtml = headContentHtml + '	<div class="prof-rating-wrapper maring-0 clearfix float-left" id="rating-avg-comp"></div>';
-            /*headContentHtml = headContentHtml +  '  	<div class="rating-star icn-full-star"></div>';
-            headContentHtml = headContentHtml +  '  	<div class="rating-star icn-full-star"></div>';
-            headContentHtml = headContentHtml +  '  	<div class="rating-star icn-half-star"></div>';
-            headContentHtml = headContentHtml +  '  	<div class="rating-star icn-no-star"></div>';
-            headContentHtml = headContentHtml +  '  	<div class="rating-star icn-no-star"></div>	</div>';*/
-            headContentHtml = headContentHtml +'	<div class="float-left review-count-left cursor-pointer" id="prof-company-review-count"></div>';
-            headContentHtml = headContentHtml +'	</div>';
-            headContentHtml = headContentHtml +'	<div class="prof-btn-wrapper clearfix">';
-            
-            var firstName = contactDetails.name.split(" ")[0];
-            
-            headContentHtml = headContentHtml +'		<div class="prof-btn-contact float-left" id="" onclick="focusOnContact()" >Contact '+firstName+'</div>';
-            headContentHtml = headContentHtml +'		<div class="prof-btn-survey float-left" id="read-write-share-btn">Write a Review</div>';
-            headContentHtml = headContentHtml +'	</div>';            
-            $("#prof-company-head-content").html(headContentHtml);
-            
-            $('#mob-contact-btn').html('Contact '+firstName);
-            
             var addressHtml ="";
             
             
@@ -171,41 +105,36 @@ function paintProfilePage(result) {
                 }
                 if(contactDetails.zipcode != undefined || contactDetails.state != undefined || contactDetails.city != undefined) {
                 	addressHtml = addressHtml + '<div class="prof-user-addline2">';
-                	if(contactDetails.city != undefined){
+                	if(contactDetails.city && contactDetails.city != ""){
                 		addressHtml += contactDetails.city + ', ';	
                 	}
-                	if(contactDetails.state != undefined){
+                	if(contactDetails.state && contactDetails.state != ""){
                 		addressHtml += contactDetails.state + ', ';	
                 	}
-                	if(contactDetails.zipcode != undefined){
+                	if(contactDetails.zipcode && contactDetails.zipcode != ""){
                 		addressHtml += contactDetails.zipcode;	
                 	}
                 	addressHtml += '</div>';
                 }
     		}
             
-            
-            
             $("#prof-company-address").html(addressHtml);
-            if(result.logo != undefined) {
-            	$("#prof-company-logo").css("background", "url("+result.logo+") no-repeat center");
-            	$("#prof-company-logo").css("background-size","100% auto");
-            }else{
+            
+            if(result.logo == undefined) {
             	var address;
-            	
             	if(profileLevel == 'INDIVIDUAL'){
             		address = '';
-            		
-            		if(companyProfileData.name != undefined){
+            		var companyProfileData = result.companyProfileData;
+            		if(companyProfileData.name && companyProfileData.name != ""){
                     	address = address + companyProfileData.name;
                     }
-            		if(companyProfileData.address != undefined){
+            		if(companyProfileData.address && companyProfileData.address != ""){
                     	address = address + ' ' + companyProfileData.address;
                     }
-                    if(companyProfileData.country != undefined) {
+                    if(companyProfileData.country && companyProfileData.country != "") {
                     	address = address + ' ' + companyProfileData.country;
                     }
-                    if(companyProfileData.zipcode != undefined) {
+                    if(companyProfileData.zipcode && companyProfileData.zipcode != "") {
                     	address = address + ' ' + companyProfileData.zipcode;
                     }
                     
@@ -226,152 +155,31 @@ function paintProfilePage(result) {
                     }
             	}
             	address=address.replace(/,/g,"");
-            	//address=address.replace(/ /g,"+");
             	$("#prof-company-logo").html('<iframe src="https://www.google.com/maps/embed/v1/place?key='+apikey+'&q='+address+'"></iframe>');
             }
-            
-            if(result.profileImageUrl != "" && result.profileImageUrl != undefined) {
-            	 $("#prof-image").css("background", "url("+result.profileImageUrl+") no-repeat center");
-            	 $("#prof-image").css("background-size","contain");
-            	 $('#prog-img-container').show();
-                $('.prof-name-wrapper').attr("style","width: 50%");
-            }else {
-            	if(profileLevel == 'COMPANY'){
-            		$("#prof-image").addClass("comp-default-img");
-        		}
-        		else if(profileLevel == 'REGION'){
-        			$("#prof-image").addClass("region-default-img");
-        		}
-        		else if(profileLevel == 'BRANCH') {
-        			$("#prof-image").addClass("office-default-img");
-        		}
-        		else if(profileLevel == 'INDIVIDUAL'){
-        			$("#prof-image").addClass("pers-default-big");
-        		}
-            }
-            if(contactDetails.about_me != undefined) {
-            	var companyIntroHtml = '<div class="main-con-header">About '+ contactDetails.name+'</div>';
-            	companyIntroHtml = companyIntroHtml + '<div class="pe-whitespace intro-body">'+contactDetails.about_me+'</div>';
-            	 $("#prof-company-intro").html(companyIntroHtml).show();
-            }
-            
-            var reviewsHeaderHtml = '<span class="ppl-say-txt-st">What people say</span> About '+contactDetails.name;
-            $("#prof-reviews-header").html(reviewsHeaderHtml);
-            
-            var contactInfoHtml = "";
-            /*var mailIds = contactDetails.mail_ids;
-            if(mailIds != undefined) {
-            	contactInfoHtml =	contactInfoHtml+'<div class="lp-con-row lp-row clearfix">';
-                contactInfoHtml =	contactInfoHtml+'	<div class="float-left lp-con-icn icn-mail"></div>';	            
-                contactInfoHtml =	contactInfoHtml+'	<div class="float-left lp-con-row-item bd-q-contact-us" data-mailid = "'+mailIds.work+'">Contact Us</div></div>';
-            }*/
-            
-            var webAddresses = contactDetails.web_addresses;
-            if (webAddresses != undefined) {
-            	if (webAddresses.work != undefined) {
-            		var validWebAddress = returnValidWebAddress(webAddresses.work);
-            		
-            		$('#web-addr-header').show();
-            		$('#web-address-txt').html('<a href="' + validWebAddress + '" target="_blank">' + webAddresses.work + '</a>');
-            		
-            		contactInfoHtml =	contactInfoHtml+'<div class="lp-con-row lp-row clearfix">';		        
-                    contactInfoHtml =	contactInfoHtml+'<div class="float-left lp-con-icn icn-web"></div>';		            
-                    contactInfoHtml =	contactInfoHtml+'<div class="float-left lp-con-row-item blue-text"><a href="' + validWebAddress + '" target="_blank">Our Website</a></div></div>';		            
-            	}
-            	if (webAddresses.blogs != undefined) {
-            		var validBlogAddress = returnValidWebAddress(webAddresses.blogs);
-                    contactInfoHtml =	contactInfoHtml+'<div class="lp-con-row lp-row clearfix">';		        
-                    contactInfoHtml =	contactInfoHtml+'<div class="float-left lp-con-icn icn-blog"></div>';		            
-                    contactInfoHtml =	contactInfoHtml+'<div class="float-left lp-con-row-item blue-text"><a href="' + validBlogAddress + '" target="_blank">Our Blogs</a></div></div>';	            
-            	}
-            }
-            
-            var contactNumbers	 = contactDetails.contact_numbers;
-            if (contactNumbers != undefined) {
-            	if (contactNumbers.personal != undefined) {
-            		contactInfoHtml =	contactInfoHtml+'<div class="lp-con-row lp-row clearfix">';		        
-	                contactInfoHtml =	contactInfoHtml+'	<div class="float-left lp-con-icn icn-mbl"></div>';		            
-	                contactInfoHtml =	contactInfoHtml+'	<div class="float-left lp-con-row-item">'+contactNumbers.personal+'</div></div>';		            
-            	}
-            	if (contactNumbers.work != undefined) {
-            		contactInfoHtml =	contactInfoHtml+'<div class="lp-con-row lp-row clearfix">';		        
-  	                contactInfoHtml =	contactInfoHtml+'	<div class="float-left lp-con-icn icn-phone"></div>';		            
-  	                contactInfoHtml =	contactInfoHtml+'	<div class="float-left lp-con-row-item">'+contactNumbers.work+'</div></div>';		            
-  	               
-            	}
-            	if (contactNumbers.fax != undefined) {
-            		contactInfoHtml =	contactInfoHtml+'<div class="lp-con-row lp-row clearfix">';		        
-            		contactInfoHtml =	contactInfoHtml+'	<div class="float-left lp-con-icn icn-fax"></div>'	;	            
-            		contactInfoHtml =	contactInfoHtml+'	<div class="float-left lp-con-row-item">'+contactNumbers.fax+'</div></div>';
-            	}
-            }
-            if(contactInfoHtml != "") {
-            	$("#contact-info").show();
-            	$("#prof-contact-information").html(contactInfoHtml);
-            }
-            $("#read-write-share-btn").click(function(e){
-            	e.stopPropagation();
-            	findProList(result.iden,result.contact_details.name);
-            	
-            });
-            
-            $('#mob-review-btn').click(function(e) {
-            	e.stopPropagation();
-            	findProList(result.iden,result.contact_details.name);
-            });
-            
-            
-            // Add social links
-            if (result.socialMediaTokens) {
-            	var socialToken = result.socialMediaTokens;
-            	if (socialToken.facebookToken && socialToken.facebookToken.facebookPageLink) {
-            		$('#icn-fb').data('link', socialToken.facebookToken.facebookPageLink);
-            	}
-            	else{
-            		$('#icn-fb').hide();
-            	}
-            	if (socialToken.twitterToken && socialToken.twitterToken.twitterPageLink) {
-            		$('#icn-twit').data('link', socialToken.twitterToken.twitterPageLink);
-            	}
-            	else{
-        			$('#icn-twit').hide();
-            	}
-            	if (socialToken.linkedInToken && socialToken.linkedInToken.linkedInPageLink) {
-            		$('#icn-lin').data('link', socialToken.linkedInToken.linkedInPageLink);
-            	}
-            	else{
-        			$('#icn-lin').hide();
-            	}
-            	if (socialToken.yelpToken && socialToken.yelpToken.yelpPageLink) {
-            		$('#icn-yelp').data('link', socialToken.yelpToken.yelpPageLink);            		
-            	}
-            	else{
-            		$('#icn-yelp').hide();
-            	}
-            	if (socialToken.googleToken && socialToken.googleToken.profileLink) {
-            		$('#icn-gplus').data('link', socialToken.googleToken.profileLink);            		
-            	}
-            	else{
-            		$('#icn-gplus').hide();
-            	}
-            	
-            	$('.social-item-icon').bind('click', function() {
-            		var link = $(this).data('link');
-            		if (link == undefined || link == "") {
-            			return false;
-            		}
-            		window.open(returnValidWebAddress(link), '_blank');
-            	});
-            }
-            else{
-            	$('#icn-fb').hide();
-            	$('#icn-twit').hide();
-            	$('#icn-lin').hide();
-            	$('#icn-yelp').hide();
-            	$('#icn-gplus').hide();
-            	$('#prof-contact-hdr').hide();
-            }
-		}         
+		}    
+		var dataLink = $('.web-address-link').attr('data-link');
+		var link = returnValidWebAddress(dataLink);
+		$('#web-address-txt').html('<a href="'+link+'" target="_blank">'+dataLink+'</a>');
+		$('#web-addr-link-lp').html('<a href="'+link+'" target="_blank">Our Website</a>');
+		
+		$('.social-item-icon').bind('click', function() {
+    		var link = $(this).attr('data-link');
+    		if (link == undefined || link == "") {
+    			return false;
+    		}
+    		window.open(returnValidWebAddress(link), '_blank');
+    	});
+    	
+    	$("#read-write-share-btn").click(function(e){
+        	e.stopPropagation();
+        	findProList(result.iden,result.contact_details.name);
+        });
+        
+        $('#mob-review-btn').click(function(e) {
+        	e.stopPropagation();
+        	findProList(result.iden,result.contact_details.name);
+        });
 	}
 }
 
@@ -886,52 +694,24 @@ function paintHiddenReviewsCount(data) {
 }
 
 function fetchRegionProfile(regionProfileName) {
-	var url = window.location.origin +"/rest/profile/"+companyProfileName+"/region/"+regionProfileName;
-	callAjaxGET(url, fetchRegionProfileCallBack, true);
+	fetchRegionProfileCallBack();
+	/*var url = window.location.origin +"/rest/profile/"+companyProfileName+"/region/"+regionProfileName;
+	callAjaxGET(url, fetchRegionProfileCallBack, true);*/
 }
 
 function fetchRegionProfileCallBack(data) {
-	var response= $.parseJSON(data);
-	if(response != undefined) {
-		if(response.entity == "" || response.status == 500) {
-			redirectTo404ErrorPage();
-			return false;
-		}
-		var result = $.parseJSON(response.entity);
+	var result = profileJson;
 
-		//Add title and meta data
-        var title;
-        var name = result.contact_details.name;
-        if(name){
-        	title = name+' Ratings & Reviews';
-        }
-        if(result.vertical){
-        	title += ' - ' + result.vertical + ' Reviews';
-        }
-        if(title){
-        	$('title').html(title);	
-        }
-		
-        if(result.completeProfileUrl){
-        	$('head').append('<link href="'+result.completeProfileUrl+'" rel="canonical">');
-        }
-        
-        if(name){
-        	$('head').append('<meta name="description" content="Use SocialSurvey Ratings & Reviews to find out how customers have rated '+name+'.">');
-        	$('head').append('<meta name="keywords" content="'+name+', '+name+'] ratings, '+name+' reviews, '+name+' scorecard, '+name+' ratings and reviews">');
-        }
-		
-		paintProfilePage(result);
-		fetchAverageRatingsForRegion(result.iden);
-		fetchBranchesForRegion(result.iden);
-		fetchIndividualsForRegion(result.iden);
-		if(result.survey_settings != undefined && result.survey_settings.show_survey_above_score != undefined) {
-			minScore = result.survey_settings.show_survey_above_score;
-		}
-		startIndex = 0;
-		fetchReviewsForRegion(result.iden,startIndex,numOfRows,minScore);
-		fetchReviewsCountForRegion(result.iden, paintAllReviewsCount);
+	paintProfilePage(result);
+	fetchAverageRatingsForRegion(result.iden);
+	fetchBranchesForRegion(result.iden);
+	fetchIndividualsForRegion(result.iden);
+	if(result.survey_settings != undefined && result.survey_settings.show_survey_above_score != undefined) {
+		minScore = result.survey_settings.show_survey_above_score;
 	}
+	startIndex = 0;
+	fetchReviewsForRegion(result.iden,startIndex,numOfRows,minScore);
+	fetchReviewsCountForRegion(result.iden, paintAllReviewsCount);
 }
 
 function fetchAverageRatingsForRegion(regionId){
@@ -1025,51 +805,23 @@ function fetchReviewsCountForBranch(branchId,callBackFunction,maxScore) {
 }
 
 function fetchBranchProfile(branchProfileName) {
-	var url = window.location.origin +"/rest/profile/"+companyProfileName+"/branch/"+branchProfileName;
-	callAjaxGET(url, fetchBranchProfileCallBack, true);
+	fetchBranchProfileCallBack();
+	/*var url = window.location.origin +"/rest/profile/"+companyProfileName+"/branch/"+branchProfileName;
+	callAjaxGET(url, fetchBranchProfileCallBack, true);*/
 }
 
 function fetchBranchProfileCallBack(data) {
-	var response= $.parseJSON(data);
-	if(response != undefined) {
-		if(response.entity == "" || response.status == 500) {
-			redirectTo404ErrorPage();
-			return false;
-		}
-		var result = $.parseJSON(response.entity);
-		
-		//Add title and meta data
-        var title;
-        var name = result.contact_details.name;
-        if(name){
-        	title = name+' Ratings & Reviews';
-        }
-        if(result.vertical){
-        	title += ' - ' + result.vertical + ' Reviews';
-        }
-        if(title){
-        	$('title').html(title);	
-        }
-		
-        if(result.completeProfileUrl){
-        	$('head').append('<link href="'+result.completeProfileUrl+'" rel="canonical">');
-        }
-        
-        if(name){
-        	$('head').append('<meta name="description" content="Use SocialSurvey Ratings & Reviews to find out how customers have rated '+name+'.">');
-        	$('head').append('<meta name="keywords" content="'+name+', '+name+' ratings, '+name+' reviews,'+name+' scorecard, '+name+' ratings and reviews">');
-        }
-		
-		paintProfilePage(result);
-		fetchAverageRatingsForBranch(result.iden);
-		fetchIndividualsForBranch(result.iden);
-		if(result.survey_settings != undefined && result.survey_settings.show_survey_above_score != undefined) {
-			minScore = result.survey_settings.show_survey_above_score;
-		}
-		startIndex = 0;
-		fetchReviewsForBranch(result.iden,startIndex,numOfRows,minScore);
-		fetchReviewsCountForBranch(result.iden, paintAllReviewsCount);
+	var result = profileJson;
+	
+	paintProfilePage(result);
+	fetchAverageRatingsForBranch(result.iden);
+	fetchIndividualsForBranch(result.iden);
+	if(result.survey_settings != undefined && result.survey_settings.show_survey_above_score != undefined) {
+		minScore = result.survey_settings.show_survey_above_score;
 	}
+	startIndex = 0;
+	fetchReviewsForBranch(result.iden,startIndex,numOfRows,minScore);
+	fetchReviewsCountForBranch(result.iden, paintAllReviewsCount);
 }
 
 function fetchAverageRatingsForAgent(agentId){
@@ -1233,51 +985,22 @@ function paintIndividualDetails(result) {
 }
 
 function fetchAgentProfile(agentProfileName){
-	var url = window.location.origin+"/rest/profile/individual/"+agentProfileName;
-	callAjaxGET(url, fetchAgentProfileCallBack, true);
+	fetchAgentProfileCallBack();
+	/*var url = window.location.origin+"/rest/profile/individual/"+agentProfileName;
+	callAjaxGET(url, fetchAgentProfileCallBack, true);*/
 }
 
 function fetchAgentProfileCallBack(data) {
-	var response= $.parseJSON(data);
-	if(response != undefined) {
-		if(response.entity == "" || response.status == 500) {
-			redirectTo404ErrorPage();
-			return false;
-		}
-		var result = $.parseJSON(response.entity);
-		
-		//Add title and meta data
-        var title;
-        var name = result.contact_details.name;
-        if(name){
-        	title = name+' Ratings & Reviews';
-        }
-        if(result.vertical){
-        	title += ' - ' + result.vertical + ' Reviews';
-        }
-        if(title){
-        	$('title').html(title);	
-        }
-		
-        if(result.completeProfileUrl){
-        	$('head').append('<link href="'+result.completeProfileUrl+'" rel="canonical">');
-        }
-        
-        if(name){
-        	$('head').append('<meta name="description" content="Use SocialSurvey Ratings & Reviews to find out how customers have rated '+name+'.">');
-        	$('head').append('<meta name="keywords" content="'+name+', '+name+' ratings, '+name+' reviews, '+name+' scorecard, '+name+' ratings and reviews">');
-        }
-		
-		paintProfilePage(result);
-		paintIndividualDetails(result);
-		fetchAverageRatingsForAgent(result.iden);
-		if(result.survey_settings != undefined && result.survey_settings.show_survey_above_score != undefined) {
-			minScore = result.survey_settings.show_survey_above_score;
-		}
-		startIndex = 0;
-		fetchReviewsForAgent(result.iden,startIndex,numOfRows,minScore);
-		fetchReviewsCountForAgent(result.iden, paintAllReviewsCount);
+	var result = profileJson;
+	paintProfilePage(result);
+	paintIndividualDetails(result);
+	fetchAverageRatingsForAgent(result.iden);
+	if(result.survey_settings != undefined && result.survey_settings.show_survey_above_score != undefined) {
+		minScore = result.survey_settings.show_survey_above_score;
 	}
+	startIndex = 0;
+	fetchReviewsForAgent(result.iden,startIndex,numOfRows,minScore);
+	fetchReviewsCountForAgent(result.iden, paintAllReviewsCount);
 }
 
 function findProList(iden,searchcritrianame){
@@ -1367,6 +1090,8 @@ function callBackPaintPublicPosts(data) {
 	if (publicPostStartIndex == 0){
 		if(posts.length > 0){
 			$('#recent-post-container').show();
+		}else{
+			$('#recent-post-container').remove();
 		}
 		$('#prof-posts').html(divToPopulate);
 		$('#prof-posts').perfectScrollbar();
