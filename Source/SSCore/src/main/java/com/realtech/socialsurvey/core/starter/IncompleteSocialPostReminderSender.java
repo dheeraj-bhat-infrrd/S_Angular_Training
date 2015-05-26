@@ -11,6 +11,7 @@ import org.quartz.JobExecutionContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.quartz.QuartzJobBean;
+import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.entities.AgentSettings;
 import com.realtech.socialsurvey.core.entities.Company;
 import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
@@ -50,6 +51,7 @@ public class IncompleteSocialPostReminderSender extends QuartzJobBean {
 		// IncompleteSocialPostReminderSender sender = new IncompleteSocialPostReminderSender();
 		StringBuilder links = new StringBuilder();
 		Set<String> socialPosts;
+		AgentSettings agentSettings = null;
 		for (Company company : organizationManagementService.getAllCompanies()) {
 			List<SurveyDetails> incompleteSocialPostCustomers = surveyHandler.getIncompleteSocialPostSurveys(company.getCompanyId());
 			for (SurveyDetails survey : incompleteSocialPostCustomers) {
@@ -60,6 +62,7 @@ public class IncompleteSocialPostReminderSender extends QuartzJobBean {
 				}
 				catch (InvalidInputException e) {
 					LOG.error("InvalidInputException caught in executeInternal() for SocialpostReminderMail");
+					continue;
 				}
 
 				if (survey.getSharedOn() == null)
@@ -69,15 +72,31 @@ public class IncompleteSocialPostReminderSender extends QuartzJobBean {
 				links = new StringBuilder();
 				for (String site : getRemainingSites(socialPosts, socialSitesWithSettings)) {
 					try {
-						links.append("\nFor ").append(site).append(" : ").append(generateQueryParams(survey, site));
+						links.append("<br/>For ").append(site).append(" : ").append("<a href="+generateQueryParams(survey, site)+">Click here</a>");
+						agentSettings = userManagementService.getUserSettings(survey.getAgentId());
 					}
 					catch (InvalidInputException e) {
 						LOG.error("InvalidInputException occured while generating URL for " + site + ". Nested exception is ", e);
+						continue;
 					}
 				}
 				// Send email to complete social post for survey to each customer.
 				try {
-					emailServices.sendSocialPostReminderMail(survey.getCustomerEmail(),
+					String title = "";
+					String phoneNo = "";
+					String companyName = "";
+					if(agentSettings!=null && agentSettings.getContact_details() !=null){
+						if(agentSettings.getContact_details().getTitle() != null){
+							title = agentSettings.getContact_details().getTitle();
+						}
+						if(agentSettings.getContact_details().getContact_numbers() != null && agentSettings.getContact_details().getContact_numbers().getWork() != null){
+							phoneNo = agentSettings.getContact_details().getContact_numbers().getWork();
+						}
+						if(company.getCompany()!=null){
+							companyName = company.getCompany();
+						}
+					}
+					emailServices.sendSocialPostReminderMail(survey.getCustomerEmail(), phoneNo, title, companyName,
 							survey.getCustomerFirstName() + " " + survey.getCustomerLastName(), survey.getAgentName(), links.toString());
 					surveyHandler.updateReminderCountForSocialPosts(survey.getAgentId(), survey.getCustomerEmail());
 				}
@@ -85,6 +104,7 @@ public class IncompleteSocialPostReminderSender extends QuartzJobBean {
 					LOG.error(
 							"Exception caught in IncompleteSurveyReminderSender.main while trying to send reminder mail to "
 									+ survey.getCustomerFirstName() + " for completion of survey. Nested exception is ", e);
+					continue;
 				}
 			}
 		}
@@ -101,11 +121,11 @@ public class IncompleteSocialPostReminderSender extends QuartzJobBean {
 	}
 
 	private static void populateSocialSites() {
-		socialSites.add("facebook");
-		socialSites.add("twitter");
-		socialSites.add("yelp");
-		socialSites.add("google");
-		socialSites.add("linkedin");
+		socialSites.add(CommonConstants.FACEBOOK_SOCIAL_SITE);
+		socialSites.add(CommonConstants.TWITTER_SOCIAL_SITE);
+		socialSites.add(CommonConstants.YELP_SOCIAL_SITE);
+		socialSites.add(CommonConstants.GOOGLE_SOCIAL_SITE);
+		socialSites.add(CommonConstants.LINKEDIN_SOCIAL_SITE);
 	}
 
 	private String generateQueryParams(SurveyDetails survey, String socialSite) throws InvalidInputException {
