@@ -246,6 +246,9 @@
 					<div class="sq-bord-bot-sm"></div>
 					<div class="sq-rat-wrapper">
 						<textarea id="text-area" class="sq-txt-area"></textarea>
+						<div id="text-box-disclaimer" class="bd-check-txt-disclaimer">
+							<spring:message code="label.survey.disclaimer.key"/>
+						</div>
 						<div id="smiles-final" class="sq-happy-wrapper clearfix">
 							<div id="sq-happy-smile" class="sq-smile-icn-container">
 								<div id="happy-smile" star-no="1" class="sq-smile-icn-wrapper sq-happy-smile"></div>

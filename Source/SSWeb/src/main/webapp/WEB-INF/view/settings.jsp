@@ -230,9 +230,17 @@
 							&nbsp&nbsp&nbsp&nbsp[LogoUrl] : Url of the SocialSurvey Logo,
 							&nbsp&nbsp&nbsp&nbsp[Link] : Url of the survey,
 							<br />
-							&nbsp&nbsp&nbsp&nbsp[Name] : Customer's Name,
-							&nbsp&nbsp&nbsp&nbsp[AgentName] : Agent's Name,
-							&nbsp&nbsp&nbsp&nbsp[AgentSignature] : Agent's Signature
+							&nbsp&nbsp&nbsp&nbsp[Name] : Customer Name,
+							&nbsp&nbsp&nbsp&nbsp[AgentName] : Agent Name,
+							&nbsp&nbsp&nbsp&nbsp[AgentSignature] : Agent's Signature,
+							<br />
+							&nbsp&nbsp&nbsp&nbsp[RecipientEmail] : Receipient's Email,
+							&nbsp&nbsp&nbsp&nbsp[SenderEmail] : Sender's Email,
+							&nbsp&nbsp&nbsp&nbsp[CompanyName] : Company Name,
+							<br />
+							&nbsp&nbsp&nbsp&nbsp[InitiatedDate] : Survey Initiated On,
+							&nbsp&nbsp&nbsp&nbsp[CurrentYear] : Current Year,
+							&nbsp&nbsp&nbsp&nbsp[FullAddress] : Address of SocialSurvey
 						</div>
 						<div class="st-header-txt-lft-rt clearfix margin-top-25">
 							<div class="float-left st-header-txt-lft"><spring:message code="label.header.mailer.content.key" /></div>

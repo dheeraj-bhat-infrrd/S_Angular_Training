@@ -168,7 +168,7 @@
 							</div>
 						</c:if>
 						<div class="initial-dd-item" onclick="userLogout();">
-							<spring:message code="label.logout.key" /></a>
+							<spring:message code="label.logout.key" />
 						</div>
 					</div>
 				</div>
