@@ -274,7 +274,8 @@ public interface EmailServices {
 			UndeliveredEmailException;
 
 	public void sendDefaultSurveyInvitationMail(String recipientMailId, String displayName, String agentName, String link, String agentEmailId,
-			String agentSignature) throws InvalidInputException, UndeliveredEmailException;
+			String agentSignature, String companyName, String surveyInitiatedOn, String fullAddress) throws InvalidInputException,
+			UndeliveredEmailException;
 
 	public void sendDefaultSurveyInvitationMailByCustomer(String recipientMailId, String displayName, String agentName, String link,
 			String agentEmailId) throws InvalidInputException, UndeliveredEmailException;
