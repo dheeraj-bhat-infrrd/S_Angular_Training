@@ -534,7 +534,7 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean {
 		else {
 			emailServices.sendDefaultSurveyInvitationMail(custEmail, custFirstName + " " + custLastName, user.getFirstName()
 					+ (user.getLastName() != null ? " " + user.getLastName() : ""), link, user.getEmailId(), agentSignature, companyName,
-					dateFormat.format(new Date()), fullAddress);
+					dateFormat.format(new Date()), currentYear, fullAddress);
 		}
 		LOG.info("sendSurveyRestartMail() finished.");
 	}
@@ -653,7 +653,7 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean {
 		else {
 			emailServices.sendDefaultSurveyInvitationMail(custEmail, custFirstName + " " + custLastName, user.getFirstName()
 					+ (user.getLastName() != null ? " " + user.getLastName() : ""), link, user.getEmailId(), agentSignature, companyName,
-					dateFormat.format(new Date()), fullAddress);
+					dateFormat.format(new Date()), currentYear, fullAddress);
 		}
 		LOG.debug("sendInvitationMailByAgent() finished.");
 	}
