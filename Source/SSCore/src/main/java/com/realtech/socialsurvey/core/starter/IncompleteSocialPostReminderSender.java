@@ -79,6 +79,7 @@ public class IncompleteSocialPostReminderSender extends QuartzJobBean {
 				try {
 					emailServices.sendSocialPostReminderMail(survey.getCustomerEmail(),
 							survey.getCustomerFirstName() + " " + survey.getCustomerLastName(), survey.getAgentName(), links.toString());
+					surveyHandler.updateReminderCountForSocialPosts(survey.getAgentId(), survey.getCustomerEmail());
 				}
 				catch (InvalidInputException | UndeliveredEmailException e) {
 					LOG.error(

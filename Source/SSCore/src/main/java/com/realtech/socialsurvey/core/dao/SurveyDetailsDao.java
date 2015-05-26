@@ -72,4 +72,6 @@ public interface SurveyDetailsDao {
 
 	public void changeStatusOfSurvey(long agentId, String customerEmail, boolean editable);
 
+	public void updateReminderCountForSocialPost(Long agentId, String customerEmail);
+
 }

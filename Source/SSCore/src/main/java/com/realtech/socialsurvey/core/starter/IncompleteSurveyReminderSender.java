@@ -1,6 +1,5 @@
 package com.realtech.socialsurvey.core.starter;
 
-import java.util.ArrayList;
 import java.util.List;
 import org.quartz.JobDataMap;
 import org.quartz.JobExecutionContext;
@@ -52,19 +51,20 @@ public class IncompleteSurveyReminderSender extends QuartzJobBean {
 		initializeDependencies(jobExecutionContext.getMergedJobDataMap());
 		for (Company company : organizationManagementService.getAllCompanies()) {
 			List<SurveyPreInitiation> incompleteSurveyCustomers = surveyHandler.getIncompleteSurveyCustomersEmail(company.getCompanyId());
-			List<Long> agents = new ArrayList<>();
-			List<String> customers = new ArrayList<>();
+//			List<Long> agents = new ArrayList<>();
+//			List<String> customers = new ArrayList<>();
 			for (SurveyPreInitiation survey : incompleteSurveyCustomers) {
 				try {
 					sendEmail(emailServices, organizationManagementService, userManagementService, survey, company.getCompanyId());
+					surveyHandler.updateReminderCount(survey.getAgentId(), survey.getCustomerEmailId());
 				}
 				catch (InvalidInputException e) {
-					e.printStackTrace();
+					LOG.error("InvalidInputException caught in executeInternal() method of IncompleteSurveyReminderSender class. Nested exception is ", e);
 				}
-				agents.add(survey.getAgentId());
-				customers.add(survey.getCustomerEmailId());
+//				agents.add(survey.getAgentId());
+//				customers.add(survey.getCustomerEmailId());
 			}
-			surveyHandler.updateReminderCount(agents, customers);
+//			surveyHandler.updateReminderCount(agents, customers);
 		}
 		LOG.info("Completed IncompleteSurveyReminderSender");
 	}
