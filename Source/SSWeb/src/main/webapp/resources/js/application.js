@@ -1806,7 +1806,7 @@ function validateRegionName(elementId){
 function validateUserEmailTextArea(elementId) {
 	var emailIds = $('#'+elementId).val();
 	if (emailIds != "") {
-		var emailIdsArray = emailIds.split(",");
+		var emailIdsArray = emailIds.split(/[\;,\s\n]/);
 		for(var i = 0; i < emailIdsArray.length; i++) {
 			var emailId = emailIdsArray[i].trim();
 			if(emailRegex.test(emailId) == true){
