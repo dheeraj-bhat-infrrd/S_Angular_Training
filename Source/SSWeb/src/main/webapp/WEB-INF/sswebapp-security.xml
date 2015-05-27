@@ -39,6 +39,7 @@
 		<intercept-url pattern="/resendRegistrationMail.do" access="permitAll" />
 
 		<intercept-url pattern="/testpage.do" access="permitAll" />	
+		<intercept-url pattern="/errorpage.do" access="permitAll" />	
 		<intercept-url pattern="/*.do" access="isAuthenticated()" />
 
 		<form-login login-page="/"

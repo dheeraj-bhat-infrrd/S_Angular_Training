@@ -1,11 +1,13 @@
 package com.realtech.socialsurvey.web.controller;
 
 import java.lang.reflect.Type;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.StringTokenizer;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import org.apache.solr.common.SolrDocumentList;
@@ -165,118 +167,83 @@ public class HierarchyManagementController {
 	 * @param request
 	 * @return
 	 */
-	/*@RequestMapping(value = "/fetchallbranches", method = RequestMethod.GET)
-	public String fetchAllBranches(Model model, HttpServletRequest request) {
-
-		LOG.info("Fetching all the branches for current user");
-		HttpSession session = request.getSession(false);
-		User user = sessionHelper.getCurrentUser();
-		AccountType accountType = (AccountType) session.getAttribute(CommonConstants.ACCOUNT_TYPE_IN_SESSION);
-		String jspToReturn = null;
-
-		try {
-			try {
-				LOG.debug("Calling service to get the list of branches in company");
-				List<Branch> branches = organizationManagementService.getAllBranchesForCompany(user.getCompany());
-				LOG.debug("Successfully executed service to get the list of branches in company : " + branches);
-
-				model.addAttribute("branches", branches);
-				*//**
-				 * UI for enterprise branches and regions is different hence deciding which jsp to
-				 * return
-				 *//*
-				if (accountType == AccountType.ENTERPRISE) {
-					jspToReturn = JspResolver.EXISTING_ENTERPRISE_BRANCHES;
-				}
-				else {
-					jspToReturn = JspResolver.EXISTING_BRANCHES;
-				}
-			}
-			catch (InvalidInputException e) {
-				LOG.error("Error occurred while fetching the branch list in method getAllBranchesForCompany");
-				throw new InvalidInputException("Error occurred while fetching the branch list in method getAllBranchesForCompany",
-						DisplayMessageConstants.GENERAL_ERROR, e);
-			}
-		}
-		catch (NonFatalException e) {
-			LOG.error("NonFatalException while fetching all branches. Reason : " + e.getMessage(), e);
-			model.addAttribute("message", messageUtils.getDisplayMessage(e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE));
-			return JspResolver.MESSAGE_HEADER;
-		}
-		return jspToReturn;
-	}
-
-	*//**
+	/*
+	 * @RequestMapping(value = "/fetchallbranches", method = RequestMethod.GET) public String
+	 * fetchAllBranches(Model model, HttpServletRequest request) {
+	 * LOG.info("Fetching all the branches for current user"); HttpSession session =
+	 * request.getSession(false); User user = sessionHelper.getCurrentUser(); AccountType
+	 * accountType = (AccountType) session.getAttribute(CommonConstants.ACCOUNT_TYPE_IN_SESSION);
+	 * String jspToReturn = null; try { try {
+	 * LOG.debug("Calling service to get the list of branches in company"); List<Branch> branches =
+	 * organizationManagementService.getAllBranchesForCompany(user.getCompany());
+	 * LOG.debug("Successfully executed service to get the list of branches in company : " +
+	 * branches); model.addAttribute("branches", branches);
+	 *//**
+	 * UI for enterprise branches and regions is different hence deciding which jsp to return
+	 */
+	/*
+	 * if (accountType == AccountType.ENTERPRISE) { jspToReturn =
+	 * JspResolver.EXISTING_ENTERPRISE_BRANCHES; } else { jspToReturn =
+	 * JspResolver.EXISTING_BRANCHES; } } catch (InvalidInputException e) {
+	 * LOG.error("Error occurred while fetching the branch list in method getAllBranchesForCompany"
+	 * ); throw new InvalidInputException(
+	 * "Error occurred while fetching the branch list in method getAllBranchesForCompany",
+	 * DisplayMessageConstants.GENERAL_ERROR, e); } } catch (NonFatalException e) {
+	 * LOG.error("NonFatalException while fetching all branches. Reason : " + e.getMessage(), e);
+	 * model.addAttribute("message", messageUtils.getDisplayMessage(e.getErrorCode(),
+	 * DisplayMessageType.ERROR_MESSAGE)); return JspResolver.MESSAGE_HEADER; } return jspToReturn;
+	 * }
+	 *//**
 	 * Fetch the list of regions for the company
 	 * 
 	 * @param model
 	 * @param request
 	 * @return
-	 *//*
-	@RequestMapping(value = "/fetchallregions", method = RequestMethod.GET)
-	public String fetchAllRegions(Model model, HttpServletRequest request) {
-
-		LOG.info("Fetching all the regions for current user");
-		User user = sessionHelper.getCurrentUser();
-
-		try {
-			try {
-				LOG.debug("Calling service to get the list of regions in company");
-				List<Region> regions = organizationManagementService.getAllRegionsForCompany(user.getCompany());
-				LOG.debug("Sucessfully executed service to get the list of regions in company : " + regions);
-
-				model.addAttribute("regions", regions);
-			}
-			catch (InvalidInputException e) {
-				LOG.error("Error occurred while fetching the regions list in method getAllRegionsForCompany");
-				throw new InvalidInputException("Error occurred while fetching the region list in method getAllRegionsForCompany",
-						DisplayMessageConstants.GENERAL_ERROR, e);
-			}
-		}
-		catch (NonFatalException e) {
-			LOG.error("NonFatalException while fetching all regions. Reason : " + e.getMessage(), e);
-			model.addAttribute("message", messageUtils.getDisplayMessage(e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE));
-			return JspResolver.MESSAGE_HEADER;
-		}
-		LOG.info("Successfully fetched the list of regions");
-		return JspResolver.EXISTING_ENTERPRISE_REGIONS;
-	}
-
-	*//**
+	 */
+	/*
+	 * @RequestMapping(value = "/fetchallregions", method = RequestMethod.GET) public String
+	 * fetchAllRegions(Model model, HttpServletRequest request) {
+	 * LOG.info("Fetching all the regions for current user"); User user =
+	 * sessionHelper.getCurrentUser(); try { try {
+	 * LOG.debug("Calling service to get the list of regions in company"); List<Region> regions =
+	 * organizationManagementService.getAllRegionsForCompany(user.getCompany());
+	 * LOG.debug("Sucessfully executed service to get the list of regions in company : " + regions);
+	 * model.addAttribute("regions", regions); } catch (InvalidInputException e) {
+	 * LOG.error("Error occurred while fetching the regions list in method getAllRegionsForCompany"
+	 * ); throw new InvalidInputException(
+	 * "Error occurred while fetching the region list in method getAllRegionsForCompany",
+	 * DisplayMessageConstants.GENERAL_ERROR, e); } } catch (NonFatalException e) {
+	 * LOG.error("NonFatalException while fetching all regions. Reason : " + e.getMessage(), e);
+	 * model.addAttribute("message", messageUtils.getDisplayMessage(e.getErrorCode(),
+	 * DisplayMessageType.ERROR_MESSAGE)); return JspResolver.MESSAGE_HEADER; }
+	 * LOG.info("Successfully fetched the list of regions"); return
+	 * JspResolver.EXISTING_ENTERPRISE_REGIONS; }
+	 *//**
 	 * Method to fetch all regions for selector
 	 * 
 	 * @param model
 	 * @param request
 	 * @return
-	 *//*
-	@RequestMapping(value = "/fetchregionsselector", method = RequestMethod.GET)
-	public String fetchRegionsSelector(Model model, HttpServletRequest request) {
-		LOG.info("Method fetchRegionsSelector called in HierarchyManagementController ");
-		User user = sessionHelper.getCurrentUser();
-
-		try {
-			try {
-				LOG.debug("Calling service to get the list of regions in company");
-				List<Region> regions = organizationManagementService.getAllRegionsForCompany(user.getCompany());
-				LOG.debug("Sucessfully executed service to get the list of regions in company : " + regions);
-
-				model.addAttribute("regions", regions);
-
-			}
-			catch (InvalidInputException e) {
-				LOG.error("Error occurred while fetching the regions list in method fetchRegionsSelector");
-				throw new InvalidInputException("Error occurred while fetching the region list in method fetchRegionsSelector",
-						DisplayMessageConstants.GENERAL_ERROR, e);
-			}
-		}
-		catch (NonFatalException e) {
-			LOG.error("NonFatalException while fetchRegionsSelector. Reason : " + e.getMessage(), e);
-			model.addAttribute("message", messageUtils.getDisplayMessage(e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE));
-			return JspResolver.MESSAGE_HEADER;
-		}
-		LOG.info("Successfully fetched the list of regions");
-		return JspResolver.REGIONS_AUTOCOMPLETE;
-	}*/
+	 */
+	/*
+	 * @RequestMapping(value = "/fetchregionsselector", method = RequestMethod.GET) public String
+	 * fetchRegionsSelector(Model model, HttpServletRequest request) {
+	 * LOG.info("Method fetchRegionsSelector called in HierarchyManagementController "); User user =
+	 * sessionHelper.getCurrentUser(); try { try {
+	 * LOG.debug("Calling service to get the list of regions in company"); List<Region> regions =
+	 * organizationManagementService.getAllRegionsForCompany(user.getCompany());
+	 * LOG.debug("Sucessfully executed service to get the list of regions in company : " + regions);
+	 * model.addAttribute("regions", regions); } catch (InvalidInputException e) {
+	 * LOG.error("Error occurred while fetching the regions list in method fetchRegionsSelector");
+	 * throw new InvalidInputException(
+	 * "Error occurred while fetching the region list in method fetchRegionsSelector",
+	 * DisplayMessageConstants.GENERAL_ERROR, e); } } catch (NonFatalException e) {
+	 * LOG.error("NonFatalException while fetchRegionsSelector. Reason : " + e.getMessage(), e);
+	 * model.addAttribute("message", messageUtils.getDisplayMessage(e.getErrorCode(),
+	 * DisplayMessageType.ERROR_MESSAGE)); return JspResolver.MESSAGE_HEADER; }
+	 * LOG.info("Successfully fetched the list of regions"); return
+	 * JspResolver.REGIONS_AUTOCOMPLETE; }
+	 */
 
 	/**
 	 * Deactivates a region status
@@ -461,7 +428,7 @@ public class HierarchyManagementController {
 	public String addRegion(Model model, HttpServletRequest request) {
 		LOG.info("Method to add a region called in controller");
 		HttpSession session = request.getSession(false);
-		
+
 		try {
 			String regionName = request.getParameter("regionName");
 			String regionAddress1 = request.getParameter("regionAddress1");
@@ -473,7 +440,7 @@ public class HierarchyManagementController {
 			String regionZipcode = request.getParameter("regionZipcode");
 			String selectedUserIdStr = request.getParameter("selectedUserId");
 			String userSelectionType = request.getParameter("userSelectionType");
-			
+
 			String selectedUserEmail = "";
 			if (userSelectionType != null) {
 				if (userSelectionType.equalsIgnoreCase(CommonConstants.USER_SELECTION_TYPE_SINGLE)) {
@@ -494,23 +461,24 @@ public class HierarchyManagementController {
 							DisplayMessageConstants.INVALID_USER_SELECTED);
 				}
 			}
-			
+
 			boolean isAdmin = false;
 			String isAdminStr = request.getParameter("isAdmin");
 			if (isAdminStr != null && !isAdminStr.isEmpty()) {
 				isAdmin = Boolean.parseBoolean(isAdminStr);
 			}
 			validateRegionForm(regionName);
-			
+
 			// To replace all the white spaces present in the string.
-			selectedUserEmail = selectedUserEmail.replaceAll("\\s","");
+			selectedUserEmail = selectedUserEmail.replaceAll("[ \t\\x0B\f\r]+", "");
 			String[] assigneeEmailIds = validateAndParseEmailIds(selectedUserId, selectedUserEmail);
 
 			User loggedInUser = sessionHelper.getCurrentUser();
 			LOG.debug("Calling service to add a new region and assigning user to it if specified");
 			try {
 				Region region = organizationManagementService.addNewRegionWithUser(loggedInUser, regionName.trim(), CommonConstants.NO,
-						regionAddress1, regionAddress2, regionCountry, regionCountryCode, regionState, regionCity, regionZipcode, selectedUserId, assigneeEmailIds, isAdmin);
+						regionAddress1, regionAddress2, regionCountry, regionCountryCode, regionState, regionCity, regionZipcode, selectedUserId,
+						assigneeEmailIds, isAdmin);
 				addOrUpdateRegionInSession(region, session);
 
 				model.addAttribute("message",
@@ -523,14 +491,14 @@ public class HierarchyManagementController {
 				throw new InvalidInputException("Exception occured while adding new region.Reason : " + e.getMessage(),
 						DisplayMessageConstants.GENERAL_ERROR, e);
 			}
-			
+
 			updateProcessedProfilesInSession(session, loggedInUser, assigneeEmailIds);
 		}
 		catch (NonFatalException e) {
 			LOG.error("NonFatalException while adding a region. Reason : " + e.getMessage(), e);
 			model.addAttribute("message", messageUtils.getDisplayMessage(e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE));
 		}
-		
+
 		LOG.info("Successfully completed method to add a region in controller");
 		return JspResolver.MESSAGE_HEADER;
 	}
@@ -546,7 +514,7 @@ public class HierarchyManagementController {
 	public String addBranch(Model model, HttpServletRequest request) {
 		LOG.info("Method to add a branch called in controller");
 		HttpSession session = request.getSession(false);
-		
+
 		try {
 			String branchName = request.getParameter("officeName");
 			String branchAddress1 = request.getParameter("officeAddress1");
@@ -559,7 +527,7 @@ public class HierarchyManagementController {
 			String strRegionId = request.getParameter("regionId");
 			String selectedUserIdStr = request.getParameter("selectedUserId");
 			String userSelectionType = request.getParameter("userSelectionType");
-			
+
 			String selectedUserEmail = "";
 			if (userSelectionType != null) {
 				if (userSelectionType.equalsIgnoreCase(CommonConstants.USER_SELECTION_TYPE_SINGLE)) {
@@ -586,9 +554,9 @@ public class HierarchyManagementController {
 			if (isAdminStr != null && !isAdminStr.isEmpty()) {
 				isAdmin = Boolean.parseBoolean(isAdminStr);
 			}
-			
+
 			// To replace all the white spaces present in the string.
-			selectedUserEmail = selectedUserEmail.replaceAll("\\s","");
+			selectedUserEmail = selectedUserEmail.replaceAll("[ \t\\x0B\f\r]+", "");
 			validateBranchForm(branchName, branchAddress1);
 			String[] assigneeEmailIds = validateAndParseEmailIds(selectedUserId, selectedUserEmail);
 
@@ -610,7 +578,8 @@ public class HierarchyManagementController {
 			try {
 				LOG.debug("Calling service to add a new branch");
 				Branch branch = organizationManagementService.addNewBranchWithUser(user, branchName.trim(), regionId, CommonConstants.NO,
-						branchAddress1, branchAddress2, branchCountry,branchCountryCode, branchState, branchCity, branchZipcode, selectedUserId, assigneeEmailIds, isAdmin);
+						branchAddress1, branchAddress2, branchCountry, branchCountryCode, branchState, branchCity, branchZipcode, selectedUserId,
+						assigneeEmailIds, isAdmin);
 				LOG.debug("Successfully executed service to add a new branch");
 
 				addOrUpdateBranchInSession(branch, session);
@@ -625,7 +594,7 @@ public class HierarchyManagementController {
 				throw new InvalidInputException("Exception occured while adding new branch.REason : " + e.getMessage(),
 						DisplayMessageConstants.GENERAL_ERROR, e);
 			}
-			
+
 			updateProcessedProfilesInSession(session, user, assigneeEmailIds);
 		}
 		catch (NonFatalException e) {
@@ -654,7 +623,7 @@ public class HierarchyManagementController {
 			String selectedUserIdStr = request.getParameter("selectedUserId");
 			String isAdminStr = request.getParameter("isAdmin");
 			String userSelectionType = request.getParameter("userSelectionType");
-			
+
 			String selectedUserEmail = "";
 			if (userSelectionType != null) {
 				if (userSelectionType.equalsIgnoreCase(CommonConstants.USER_SELECTION_TYPE_SINGLE)) {
@@ -682,7 +651,7 @@ public class HierarchyManagementController {
 			}
 
 			// To replace all the white spaces present in the string.
-			selectedUserEmail = selectedUserEmail.replaceAll("\\s","");
+			selectedUserEmail = selectedUserEmail.replaceAll("[ \t\\x0B\f\r]+", "");
 			String[] assigneeEmailIds = validateAndParseEmailIds(selectedUserId, selectedUserEmail);
 
 			long regionId = 0l;
@@ -718,7 +687,7 @@ public class HierarchyManagementController {
 				LOG.debug("Calling service to add/assign invidual(s)");
 				organizationManagementService.addIndividual(user, selectedUserId, branchId, regionId, assigneeEmailIds, isAdmin);
 				LOG.debug("Successfully executed service to add/assign an invidual(s)");
-				
+
 				DisplayMessage message = null;
 				if (selectedUserId > 0l) {
 					message = messageUtils.getDisplayMessage(DisplayMessageConstants.INDIVIDUAL_ADDITION_SUCCESSFUL,
@@ -742,7 +711,7 @@ public class HierarchyManagementController {
 				sessionHelper.getCanonicalSettings(session);
 				sessionHelper.updateProcessedUserProfiles(session, user);
 			}
-			
+
 			updateProcessedProfilesInSession(session, user, assigneeEmailIds);
 		}
 		catch (NonFatalException e) {
@@ -764,7 +733,7 @@ public class HierarchyManagementController {
 	@RequestMapping(value = "/updatebranch", method = RequestMethod.POST)
 	public String updateBranch(Model model, HttpServletRequest request) {
 		LOG.info("Method updateBranch called in HierarchyManagementController");
-		
+
 		try {
 			String strBranchId = request.getParameter("branchId");
 			String branchName = request.getParameter("officeName");
@@ -778,7 +747,7 @@ public class HierarchyManagementController {
 			String strRegionId = request.getParameter("regionId");
 			String selectedUserIdStr = request.getParameter("selectedUserId");
 			String userSelectionType = request.getParameter("userSelectionType");
-			
+
 			String selectedUserEmail = "";
 			if (userSelectionType != null) {
 				if (userSelectionType.equalsIgnoreCase(CommonConstants.USER_SELECTION_TYPE_SINGLE)) {
@@ -799,18 +768,18 @@ public class HierarchyManagementController {
 							DisplayMessageConstants.INVALID_USER_SELECTED);
 				}
 			}
-			
+
 			boolean isAdmin = false;
 			String isAdminStr = request.getParameter("isAdmin");
 			if (isAdminStr != null && !isAdminStr.isEmpty()) {
 				isAdmin = Boolean.parseBoolean(isAdminStr);
 			}
-			
+
 			// To replace all the white spaces present in the string.
-			selectedUserEmail = selectedUserEmail.replaceAll("\\s","");
+			selectedUserEmail = selectedUserEmail.replaceAll("[ \t\\x0B\f\r]+", "");
 			validateBranchForm(branchName, branchAddress1);
 			String[] assigneeEmailIds = validateAndParseEmailIds(selectedUserId, selectedUserEmail);
-			
+
 			long regionId = 0l;
 			try {
 				/**
@@ -850,7 +819,7 @@ public class HierarchyManagementController {
 				throw new InvalidInputException("InvalidInputException occured while updating branch.Reason : " + e.getMessage(),
 						DisplayMessageConstants.GENERAL_ERROR, e);
 			}
-			
+
 			updateProcessedProfilesInSession(session, user, assigneeEmailIds);
 		}
 		catch (NonFatalException e) {
@@ -952,7 +921,7 @@ public class HierarchyManagementController {
 		String regionZipcode = request.getParameter("regionZipcode");
 		String selectedUserIdStr = request.getParameter("selectedUserId");
 		String userSelectionType = request.getParameter("userSelectionType");
-		
+
 		String selectedUserEmail = "";
 		if (userSelectionType != null) {
 			if (userSelectionType.equalsIgnoreCase(CommonConstants.USER_SELECTION_TYPE_SINGLE)) {
@@ -962,7 +931,7 @@ public class HierarchyManagementController {
 				selectedUserEmail = request.getParameter("selectedUserEmailArray");
 			}
 		}
-		
+
 		long selectedUserId = 0l;
 		try {
 			long regionId = 0l;
@@ -973,7 +942,7 @@ public class HierarchyManagementController {
 				throw new InvalidInputException("regionid is invalid in update region. Reason:" + e.getMessage(),
 						DisplayMessageConstants.GENERAL_ERROR, e);
 			}
-			
+
 			if (selectedUserIdStr != null && !selectedUserIdStr.isEmpty()) {
 				try {
 					selectedUserId = Long.parseLong(selectedUserIdStr);
@@ -990,17 +959,17 @@ public class HierarchyManagementController {
 				isAdmin = Boolean.parseBoolean(isAdminStr);
 			}
 			validateRegionForm(regionName);
-			
+
 			// To replace all the white spaces present in the string.
-			selectedUserEmail = selectedUserEmail.replaceAll("\\s","");
+			selectedUserEmail = selectedUserEmail.replaceAll("[ \t\\x0B\f\r]+", "");
 			String[] assigneeEmailIds = validateAndParseEmailIds(selectedUserId, selectedUserEmail);
-			
+
 			User user = sessionHelper.getCurrentUser();
 			HttpSession session = request.getSession(false);
 			try {
 				LOG.debug("Calling service to update region with Id : " + regionId);
-				Region region = organizationManagementService.updateRegion(user, regionId, regionName, regionAddress1, regionAddress2,regionCountry,regionCountryCode,regionState,regionCity,regionZipcode,
-						selectedUserId, assigneeEmailIds, isAdmin);
+				Region region = organizationManagementService.updateRegion(user, regionId, regionName, regionAddress1, regionAddress2, regionCountry,
+						regionCountryCode, regionState, regionCity, regionZipcode, selectedUserId, assigneeEmailIds, isAdmin);
 				addOrUpdateRegionInSession(region, session);
 
 				LOG.debug("Successfully executed service to update a region");
@@ -1700,22 +1669,27 @@ public class HierarchyManagementController {
 	 */
 	private String[] validateAndParseEmailIds(long selectedUserId, String selectedUserEmail) throws InvalidInputException {
 		LOG.info("Method validateAndParseEmailIds called for selectedUserIdStr:" + selectedUserId + " selectedUserEmail:" + selectedUserEmail);
-		String[] emailIdsArray = null;
+		List<String> emailIds = new ArrayList<>();
 		if (selectedUserId <= 0l && selectedUserEmail != null && !selectedUserEmail.isEmpty()) {
-			emailIdsArray = selectedUserEmail.split(",");
-			if (emailIdsArray != null && emailIdsArray.length > 0) {
-				for (String emailId : emailIdsArray) {
-					if (emailId == null || emailId.trim().isEmpty() || !emailId.trim().matches(CommonConstants.EMAIL_REGEX)) {
-						throw new InvalidInputException("Email address" + emailId + " is invalid", DisplayMessageConstants.INVALID_EMAILID);
-					}
-					emailId = emailId.trim();
+			StringTokenizer tokenizer = new StringTokenizer(selectedUserEmail, ",|;|\\n");
+			while (tokenizer.hasMoreTokens()) {
+				String emailId = tokenizer.nextToken();
+				if (tokenizer.countTokens() == 1 && (emailId == null || emailId.isEmpty())) {
+					throw new InvalidInputException("Email address" + emailId + " is invalid", DisplayMessageConstants.INVALID_EMAILID);
 				}
+				if (!emailId.trim().matches(CommonConstants.EMAIL_REGEX)) {
+					throw new InvalidInputException("Email address" + emailId + " is invalid", DisplayMessageConstants.INVALID_EMAILID);
+				}
+				emailId = emailId.trim();
+				emailIds.add(emailId);
 			}
 		}
+		String[] emailIdsArray = new String[emailIds.size()];
+		emailIdsArray = emailIds.toArray(emailIdsArray);
 		LOG.info("Method validateAndParseEmailIds finished.Returning emailIdsArray:" + emailIdsArray);
 		return emailIdsArray;
 	}
-	
+
 	// update user profiles in session if current user is updated
 	private void updateProcessedProfilesInSession(HttpSession session, User user, String[] assigneeEmailIds) {
 		List<String> usersEmailIds;
@@ -1725,7 +1699,7 @@ public class HierarchyManagementController {
 		else {
 			return;
 		}
-		
+
 		for (String userEmail : usersEmailIds) {
 			if (user.getEmailId().equalsIgnoreCase(userEmail)) {
 				try {
