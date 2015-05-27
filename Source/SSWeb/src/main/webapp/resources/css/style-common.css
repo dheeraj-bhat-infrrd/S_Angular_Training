@@ -3113,7 +3113,7 @@ button.paypal.is-active {
 
 .prof-user-logo {
 	height: 150px;
-	background-size: 130px auto;
+	background-size: contain !important;
 	background-color: #f1f1f1;
 }
 
