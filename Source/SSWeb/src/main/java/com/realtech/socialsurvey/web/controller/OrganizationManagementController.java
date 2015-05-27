@@ -432,25 +432,9 @@ public class OrganizationManagementController {
 		if (profileMasterId == CommonConstants.PROFILES_MASTER_COMPANY_ADMIN_PROFILE_ID
 				|| accountMasterId == CommonConstants.ACCOUNTS_MASTER_INDIVIDUAL) {
 			unitSettings = userSettings.getCompanySettings();
-			if(unitSettings != null && unitSettings.getSocialMediaTokens() != null && 
-					unitSettings.getSocialMediaTokens().getFacebookToken()!= null && 
-					unitSettings.getSocialMediaTokens().getFacebookToken().getFacebookPageLink() != null){
-				model.addAttribute("facebookLink", unitSettings.getSocialMediaTokens().getFacebookToken().getFacebookPageLink());
-			}
-			else{
-				model.addAttribute("facebookLink", "");
-			}
 		}
 		else if (profileMasterId == CommonConstants.PROFILES_MASTER_REGION_ADMIN_PROFILE_ID) {
 			unitSettings = userSettings.getRegionSettings().get(selectedProfile.getRegionId());
-			if(unitSettings != null && unitSettings.getSocialMediaTokens() != null && 
-					unitSettings.getSocialMediaTokens().getTwitterToken()!= null && 
-					unitSettings.getSocialMediaTokens().getTwitterToken().getTwitterPageLink() != null){
-				model.addAttribute("twitterLink", unitSettings.getSocialMediaTokens().getTwitterToken().getTwitterPageLink());
-			}
-			else{
-				model.addAttribute("twitterLink", "");
-			}
 		}
 		else if (profileMasterId == CommonConstants.PROFILES_MASTER_BRANCH_ADMIN_PROFILE_ID) {
 			unitSettings = userSettings.getBranchSettings().get(selectedProfile.getBranchId());

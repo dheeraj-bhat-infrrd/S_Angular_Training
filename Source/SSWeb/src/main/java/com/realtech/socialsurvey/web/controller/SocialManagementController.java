@@ -45,6 +45,7 @@ import com.realtech.socialsurvey.core.entities.TwitterToken;
 import com.realtech.socialsurvey.core.entities.User;
 import com.realtech.socialsurvey.core.entities.UserProfile;
 import com.realtech.socialsurvey.core.entities.UserSettings;
+import com.realtech.socialsurvey.core.enums.AccountType;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.exception.NoRecordsFetchedException;
 import com.realtech.socialsurvey.core.exception.NonFatalException;
@@ -198,6 +199,7 @@ public class SocialManagementController {
 				googleAuth.append("&redirect_uri=").append(googleApiRedirectUri);
 				googleAuth.append("&client_id=").append(googleApiKey);
 				googleAuth.append("&access_type=").append("offline");
+				googleAuth.append("&approval_prompt=").append("force");
 				
 				model.addAttribute(CommonConstants.SOCIAL_AUTH_URL, googleAuth.toString());
 
@@ -231,6 +233,7 @@ public class SocialManagementController {
 	public String authenticateFacebookAccess(Model model, HttpServletRequest request) {
 		LOG.info("Facebook authentication url requested");
 		HttpSession session = request.getSession(false);
+		AccountType accountType = (AccountType) session.getAttribute(CommonConstants.ACCOUNT_TYPE_IN_SESSION);
 
 		try {
 			UserSettings userSettings = (UserSettings) session.getAttribute(CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION);
@@ -265,8 +268,10 @@ public class SocialManagementController {
 
 			// Storing token
 			SocialMediaTokens mediaTokens;
+			int accountMasterId = accountType.getValue();
 			int profilesMaster = selectedProfile.getProfilesMaster().getProfileId();
-			if (profilesMaster == CommonConstants.PROFILES_MASTER_COMPANY_ADMIN_PROFILE_ID) {
+			if (profilesMaster == CommonConstants.PROFILES_MASTER_COMPANY_ADMIN_PROFILE_ID
+					|| accountMasterId == CommonConstants.ACCOUNTS_MASTER_INDIVIDUAL) {
 				OrganizationUnitSettings companySettings = userSettings.getCompanySettings();
 				if (companySettings == null) {
 					throw new InvalidInputException("No company settings found in current session");
@@ -304,7 +309,7 @@ public class SocialManagementController {
 				branchSettings.setSocialMediaTokens(mediaTokens);
 				userSettings.getBranchSettings().put(branchId, branchSettings);
 			}
-			else if (profilesMaster == CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID) {
+			if (profilesMaster == CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID) {
 				AgentSettings agentSettings = userSettings.getAgentSettings();
 				if (agentSettings == null) {
 					throw new InvalidInputException("No Agent settings found in current session");
@@ -371,6 +376,7 @@ public class SocialManagementController {
 	public String authenticateTwitterAccess(Model model, HttpServletRequest request) {
 		LOG.info("Twitter authentication url requested");
 		HttpSession session = request.getSession(false);
+		AccountType accountType = (AccountType) session.getAttribute(CommonConstants.ACCOUNT_TYPE_IN_SESSION);
 
 		try {
 			UserSettings userSettings = (UserSettings) session.getAttribute(CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION);
@@ -413,8 +419,10 @@ public class SocialManagementController {
 
 			// Storing token
 			SocialMediaTokens mediaTokens;
+			int accountMasterId = accountType.getValue();
 			int profilesMaster = selectedProfile.getProfilesMaster().getProfileId();
-			if (profilesMaster == CommonConstants.PROFILES_MASTER_COMPANY_ADMIN_PROFILE_ID) {
+			if (profilesMaster == CommonConstants.PROFILES_MASTER_COMPANY_ADMIN_PROFILE_ID
+					|| accountMasterId == CommonConstants.ACCOUNTS_MASTER_INDIVIDUAL) {
 				OrganizationUnitSettings companySettings = userSettings.getCompanySettings();
 				if (companySettings == null) {
 					throw new InvalidInputException("No company settings found in current session");
@@ -452,7 +460,7 @@ public class SocialManagementController {
 				branchSettings.setSocialMediaTokens(mediaTokens);
 				userSettings.getBranchSettings().put(branchId, branchSettings);
 			}
-			else if (profilesMaster == CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID) {
+			if (profilesMaster == CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID) {
 				AgentSettings agentSettings = userSettings.getAgentSettings();
 				if (agentSettings == null) {
 					throw new InvalidInputException("No Agent settings found in current session");
@@ -519,6 +527,7 @@ public class SocialManagementController {
 	public String authenticateLinkedInAccess(Model model, HttpServletRequest request) {
 		LOG.info("Method authenticateLinkedInAccess() called from SocialManagementController");
 		HttpSession session = request.getSession(false);
+		AccountType accountType = (AccountType) session.getAttribute(CommonConstants.ACCOUNT_TYPE_IN_SESSION);
 
 		try {
 			UserSettings userSettings = (UserSettings) session.getAttribute(CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION);
@@ -560,8 +569,10 @@ public class SocialManagementController {
 			String profileLink = (String) profileData.getSiteStandardProfileRequest().getUrl();
 
 			SocialMediaTokens mediaTokens;
+			int accountMasterId = accountType.getValue();
 			int profilesMaster = selectedProfile.getProfilesMaster().getProfileId();
-			if (profilesMaster == CommonConstants.PROFILES_MASTER_COMPANY_ADMIN_PROFILE_ID) {
+			if (profilesMaster == CommonConstants.PROFILES_MASTER_COMPANY_ADMIN_PROFILE_ID
+					|| accountMasterId == CommonConstants.ACCOUNTS_MASTER_INDIVIDUAL) {
 				OrganizationUnitSettings companySettings = userSettings.getCompanySettings();
 				if (companySettings == null) {
 					throw new InvalidInputException("No company settings found in current session");
@@ -599,7 +610,7 @@ public class SocialManagementController {
 				branchSettings.setSocialMediaTokens(mediaTokens);
 				userSettings.getBranchSettings().put(branchId, branchSettings);
 			}
-			else if (profilesMaster == CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID) {
+			if (profilesMaster == CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID) {
 				AgentSettings agentSettings = userSettings.getAgentSettings();
 				if (agentSettings == null) {
 					throw new InvalidInputException("No Agent settings found in current session");
@@ -677,7 +688,7 @@ public class SocialManagementController {
 	public String authenticateGoogleAccess(Model model, HttpServletRequest request) {
 		LOG.info("Method authenticateGoogleAccess() called from SocialManagementController");
 		HttpSession session = request.getSession(false);
-
+		AccountType accountType = (AccountType) session.getAttribute(CommonConstants.ACCOUNT_TYPE_IN_SESSION);
 		try {
 			UserSettings userSettings = (UserSettings) session.getAttribute(CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION);
 			UserProfile selectedProfile = (UserProfile) session.getAttribute(CommonConstants.USER_PROFILE);
@@ -726,8 +737,10 @@ public class SocialManagementController {
 			
 			// Storing access token
 			SocialMediaTokens mediaTokens;
+			int accountMasterId = accountType.getValue();
 			int profilesMaster = selectedProfile.getProfilesMaster().getProfileId();
-			if (profilesMaster == CommonConstants.PROFILES_MASTER_COMPANY_ADMIN_PROFILE_ID) {
+			if (profilesMaster == CommonConstants.PROFILES_MASTER_COMPANY_ADMIN_PROFILE_ID
+					|| accountMasterId == CommonConstants.ACCOUNTS_MASTER_INDIVIDUAL) {
 				OrganizationUnitSettings companySettings = userSettings.getCompanySettings();
 				if (companySettings == null) {
 					throw new InvalidInputException("No company settings found in current session");
@@ -765,7 +778,7 @@ public class SocialManagementController {
 				branchSettings.setSocialMediaTokens(mediaTokens);
 				userSettings.getBranchSettings().put(branchId, branchSettings);
 			}
-			else if (profilesMaster == CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID) {
+			if (profilesMaster == CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID) {
 				AgentSettings agentSettings = userSettings.getAgentSettings();
 				if (agentSettings == null) {
 					throw new InvalidInputException("No Agent settings found in current session");
