@@ -3582,7 +3582,7 @@ function searchUsersByNameEmailLoginIdCallBack(data) {
 	$('#user-list').html(data);
 }
 
-function paintUsersList(data) {
+/*function paintUsersList(data) {
 	if (userStartIndex == 0) {
 		$('#um-user-list').find('tbody').html("");
 	}
@@ -3648,7 +3648,7 @@ function paintUsersList(data) {
 			$('#um-user-list').find('tbody').append("No results found");
 		}
 	}
-}
+}*/
 
 function paginateUsersList() {
 	if (!doStopAjaxRequestForUsersList) {
