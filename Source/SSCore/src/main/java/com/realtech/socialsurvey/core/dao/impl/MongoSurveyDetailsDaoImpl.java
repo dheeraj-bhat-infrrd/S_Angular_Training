@@ -552,8 +552,10 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao {
 
 		if(sortCriteria != null && sortCriteria.equalsIgnoreCase(CommonConstants.REVIEWS_SORT_CRITERIA_DATE))
 			query.with(new Sort(Sort.Direction.DESC, CommonConstants.MODIFIED_ON_COLUMN));
-		else if(sortCriteria != null && sortCriteria.equalsIgnoreCase(CommonConstants.REVIEWS_SORT_CRITERIA_FEATURE))
+		else if(sortCriteria != null && sortCriteria.equalsIgnoreCase(CommonConstants.REVIEWS_SORT_CRITERIA_FEATURE)){
 			query.with(new Sort(Sort.Direction.DESC, CommonConstants.SCORE_COLUMN));
+			query.with(new Sort(Sort.Direction.DESC, CommonConstants.MODIFIED_ON_COLUMN));
+		}
 		else{
 			query.with(new Sort(Sort.Direction.DESC, CommonConstants.MODIFIED_ON_COLUMN));
 			query.with(new Sort(Sort.Direction.DESC, CommonConstants.SCORE_COLUMN));
