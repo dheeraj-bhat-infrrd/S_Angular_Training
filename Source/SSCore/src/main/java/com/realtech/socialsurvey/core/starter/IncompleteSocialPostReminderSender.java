@@ -58,7 +58,7 @@ public class IncompleteSocialPostReminderSender extends QuartzJobBean {
 				// To fetch settings of Agent and admins in the hierarchy
 				Set<String> socialSitesWithSettings = new HashSet<>();
 				try {
-					 socialSitesWithSettings = getSocialSitesWithSettingsConfigured(survey.getAgentId());
+					socialSitesWithSettings = getSocialSitesWithSettingsConfigured(survey.getAgentId());
 				}
 				catch (InvalidInputException e) {
 					LOG.error("InvalidInputException caught in executeInternal() for SocialpostReminderMail");
@@ -72,7 +72,8 @@ public class IncompleteSocialPostReminderSender extends QuartzJobBean {
 				links = new StringBuilder();
 				for (String site : getRemainingSites(socialPosts, socialSitesWithSettings)) {
 					try {
-						links.append("<br/>For ").append(site).append(" : ").append("<a href="+generateQueryParams(survey, site)+">Click here</a>");
+						links.append("<br/>For ").append(site).append(" : ")
+								.append("<a href=" + generateQueryParams(survey, site) + ">Click here</a>");
 						agentSettings = userManagementService.getUserSettings(survey.getAgentId());
 					}
 					catch (InvalidInputException e) {
@@ -81,30 +82,33 @@ public class IncompleteSocialPostReminderSender extends QuartzJobBean {
 					}
 				}
 				// Send email to complete social post for survey to each customer.
-				try {
-					String title = "";
-					String phoneNo = "";
-					String companyName = "";
-					if(agentSettings!=null && agentSettings.getContact_details() !=null){
-						if(agentSettings.getContact_details().getTitle() != null){
-							title = agentSettings.getContact_details().getTitle();
+				if (!links.toString().isEmpty()) {
+					try {
+						String title = "";
+						String phoneNo = "";
+						String companyName = "";
+						if (agentSettings != null && agentSettings.getContact_details() != null) {
+							if (agentSettings.getContact_details().getTitle() != null) {
+								title = agentSettings.getContact_details().getTitle();
+							}
+							if (agentSettings.getContact_details().getContact_numbers() != null
+									&& agentSettings.getContact_details().getContact_numbers().getWork() != null) {
+								phoneNo = agentSettings.getContact_details().getContact_numbers().getWork();
+							}
+							if (company.getCompany() != null) {
+								companyName = company.getCompany();
+							}
 						}
-						if(agentSettings.getContact_details().getContact_numbers() != null && agentSettings.getContact_details().getContact_numbers().getWork() != null){
-							phoneNo = agentSettings.getContact_details().getContact_numbers().getWork();
-						}
-						if(company.getCompany()!=null){
-							companyName = company.getCompany();
-						}
+						emailServices.sendSocialPostReminderMail(survey.getCustomerEmail(), phoneNo, title, companyName,
+								survey.getCustomerFirstName() + " " + survey.getCustomerLastName(), survey.getAgentName(), links.toString());
+						surveyHandler.updateReminderCountForSocialPosts(survey.getAgentId(), survey.getCustomerEmail());
 					}
-					emailServices.sendSocialPostReminderMail(survey.getCustomerEmail(), phoneNo, title, companyName,
-							survey.getCustomerFirstName() + " " + survey.getCustomerLastName(), survey.getAgentName(), links.toString());
-					surveyHandler.updateReminderCountForSocialPosts(survey.getAgentId(), survey.getCustomerEmail());
-				}
-				catch (InvalidInputException | UndeliveredEmailException e) {
-					LOG.error(
-							"Exception caught in IncompleteSurveyReminderSender.main while trying to send reminder mail to "
-									+ survey.getCustomerFirstName() + " for completion of survey. Nested exception is ", e);
-					continue;
+					catch (InvalidInputException | UndeliveredEmailException e) {
+						LOG.error(
+								"Exception caught in IncompleteSurveyReminderSender.main while trying to send reminder mail to "
+										+ survey.getCustomerFirstName() + " for completion of survey. Nested exception is ", e);
+						continue;
+					}
 				}
 			}
 		}
@@ -175,26 +179,27 @@ public class IncompleteSocialPostReminderSender extends QuartzJobBean {
 		OrganizationUnitSettings agentSettings = userManagementService.getUserSettings(agentId);
 		List<OrganizationUnitSettings> hierarchySettings = socialManagementService.getSettingsForBranchesAndRegionsInHierarchy(agentId);
 		List<OrganizationUnitSettings> settings;
-		if(hierarchySettings!=null){
+		if (hierarchySettings != null) {
 			settings = new ArrayList<>(hierarchySettings);
 		}
-		else{
+		else {
 			settings = new ArrayList<>();
 		}
 		Set<String> socialSitesWithSettings = new HashSet<>();
-		
+
 		// Enabling Google+ and Yelp only if agent has configured it.
-		if (agentSettings != null){
+		if (agentSettings != null) {
 			settings.add(agentSettings);
-			if(agentSettings.getSocialMediaTokens().getGoogleToken() != null){
+			if (agentSettings.getSocialMediaTokens().getGoogleToken() != null) {
 				socialSitesWithSettings.add("google");
 			}
-			if(agentSettings.getSocialMediaTokens().getYelpToken() != null){
+			if (agentSettings.getSocialMediaTokens().getYelpToken() != null) {
 				socialSitesWithSettings.add("yelp");
 			}
 		}
-		
-		// Enabling Facebook / Linkedin / Twitter if agent or anybody in the hierarchy has configured in settings.
+
+		// Enabling Facebook / Linkedin / Twitter if agent or anybody in the hierarchy has
+		// configured in settings.
 		for (OrganizationUnitSettings setting : settings) {
 			if (setting.getSocialMediaTokens() != null) {
 				if (setting.getSocialMediaTokens() != null && setting.getSocialMediaTokens().getFacebookToken() != null) {
@@ -203,7 +208,7 @@ public class IncompleteSocialPostReminderSender extends QuartzJobBean {
 				if (setting.getSocialMediaTokens().getTwitterToken() != null) {
 					socialSitesWithSettings.add("twitter");
 				}
-				if(setting.getSocialMediaTokens().getLinkedInToken() != null){
+				if (setting.getSocialMediaTokens().getLinkedInToken() != null) {
 					socialSitesWithSettings.add("linkedin");
 				}
 			}
