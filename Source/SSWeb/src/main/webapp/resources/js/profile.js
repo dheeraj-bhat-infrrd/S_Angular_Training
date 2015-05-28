@@ -155,6 +155,9 @@ function paintProfilePage(result) {
                     }
             	}
             	address=address.replace(/,/g,"");
+            	if(apikey == undefined){
+            		fetchGoogleMapApi();
+            	}
             	$("#prof-company-logo").html('<iframe src="https://www.google.com/maps/embed/v1/place?key='+apikey+'&q='+address+'"></iframe>');
             }
 		}    
