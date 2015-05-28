@@ -477,7 +477,7 @@ function paintReviews(result){
 	var resultSize = result.length;
 	$('.ppl-review-item-last').removeClass('ppl-review-item-last').addClass('ppl-review-item');
 	$.each(result, function(i, reviewItem) {
-		var date = Date.parse(reviewItem.updatedOn);
+		var date = Date.parse(reviewItem.modifiedOn);
 		var lastItemClass = "ppl-review-item";
 		if (i == resultSize - 1) {
 			lastItemClass = "ppl-review-item-last";
