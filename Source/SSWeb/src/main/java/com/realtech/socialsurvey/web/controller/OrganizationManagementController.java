@@ -4,11 +4,9 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,7 +18,6 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
-
 import com.amazonaws.util.json.JSONException;
 import com.amazonaws.util.json.JSONObject;
 import com.google.gson.Gson;
@@ -100,7 +97,7 @@ public class OrganizationManagementController {
 
 	@Autowired
 	private SurveyBuilder surveyBuilder;
-	
+
 	@Autowired
 	private Payment payment;
 
@@ -230,11 +227,11 @@ public class OrganizationManagementController {
 			// JIRA SS-536: Added for manual registration via invitation
 			if (strIsDirectRegistration.equalsIgnoreCase("false")) {
 				companyDetails.put(CommonConstants.BILLING_MODE_COLUMN, CommonConstants.BILLING_MODE_INVOICE);
-				model.addAttribute("skippayment","true");
+				model.addAttribute("skippayment", "true");
 			}
 			else {
 				companyDetails.put(CommonConstants.BILLING_MODE_COLUMN, CommonConstants.BILLING_MODE_AUTO);
-				model.addAttribute("skippayment","false");
+				model.addAttribute("skippayment", "false");
 			}
 
 			LOG.debug("Calling services to add company details");
@@ -341,13 +338,13 @@ public class OrganizationManagementController {
 			User user = sessionHelper.getCurrentUser();
 
 			// JIRA - SS-536
-			
+
 			// We check if there is mapped survey for the company and add a default survey if
 			// not.
 			if (surveyBuilder.checkForExistingSurvey(user) == null) {
 				surveyBuilder.addDefaultSurveyToCompany(user);
 			}
-			
+
 			// check the company and see if manual registaration. Skip payment in that case
 			if (user.getCompany().getBillingMode().equals(CommonConstants.BILLING_MODE_INVOICE)) {
 				// do what is done after payment
@@ -442,33 +439,32 @@ public class OrganizationManagementController {
 		else if (profileMasterId == CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID) {
 			unitSettings = userSettings.getAgentSettings();
 		}
-		
+
 		model.addAttribute("facebookLink", "");
 		model.addAttribute("twitterLink", "");
 		model.addAttribute("linkedinLink", "");
 		model.addAttribute("googleLink", "");
-		
-		if(unitSettings != null && unitSettings.getSocialMediaTokens() != null) {
-			
-			if( unitSettings.getSocialMediaTokens().getFacebookToken()!= null && 
-					unitSettings.getSocialMediaTokens().getFacebookToken().getFacebookPageLink() != null){
+
+		if (unitSettings != null && unitSettings.getSocialMediaTokens() != null) {
+
+			if (unitSettings.getSocialMediaTokens().getFacebookToken() != null
+					&& unitSettings.getSocialMediaTokens().getFacebookToken().getFacebookPageLink() != null) {
 				model.addAttribute("facebookLink", unitSettings.getSocialMediaTokens().getFacebookToken().getFacebookPageLink());
 			}
-			if( unitSettings.getSocialMediaTokens().getTwitterToken()!= null && 
-					unitSettings.getSocialMediaTokens().getTwitterToken().getTwitterPageLink() != null){
+			if (unitSettings.getSocialMediaTokens().getTwitterToken() != null
+					&& unitSettings.getSocialMediaTokens().getTwitterToken().getTwitterPageLink() != null) {
 				model.addAttribute("twitterLink", unitSettings.getSocialMediaTokens().getTwitterToken().getTwitterPageLink());
 			}
-			if( unitSettings.getSocialMediaTokens().getLinkedInToken()!= null && 
-					unitSettings.getSocialMediaTokens().getLinkedInToken().getLinkedInPageLink() != null){
+			if (unitSettings.getSocialMediaTokens().getLinkedInToken() != null
+					&& unitSettings.getSocialMediaTokens().getLinkedInToken().getLinkedInPageLink() != null) {
 				model.addAttribute("linkedinLink", unitSettings.getSocialMediaTokens().getLinkedInToken().getLinkedInPageLink());
 			}
-			if( unitSettings.getSocialMediaTokens().getGoogleToken()!= null && 
-					unitSettings.getSocialMediaTokens().getGoogleToken().getProfileLink() != null){
+			if (unitSettings.getSocialMediaTokens().getGoogleToken() != null
+					&& unitSettings.getSocialMediaTokens().getGoogleToken().getProfileLink() != null) {
 				model.addAttribute("googleLink", unitSettings.getSocialMediaTokens().getGoogleToken().getProfileLink());
 			}
 		}
-		
-		
+
 		session.setAttribute(CommonConstants.USER_ACCOUNT_SETTINGS, unitSettings);
 		return JspResolver.EDIT_SETTINGS;
 	}
@@ -1201,9 +1197,9 @@ public class OrganizationManagementController {
 				LOG.error("Null or empty value found in storeTextForFlow() for mood.");
 				throw new InvalidInputException("Null or empty value found in storeTextForFlow() for mood.");
 			}
-			
+
 			OrganizationUnitSettings companySettings = organizationManagementService.getCompanySettings(user);
-			
+
 			SurveySettings surveySettings = companySettings.getSurvey_settings();
 			if (mood.equalsIgnoreCase("happy"))
 				surveySettings.setHappyText(text);
@@ -1224,35 +1220,55 @@ public class OrganizationManagementController {
 		catch (NonFatalException e) {
 			LOG.error("Non fatal exception caught in storeTextForFlow(). Nested exception is ", e);
 		}
-		
+
 		LOG.info("Method to store text to be displayed to a customer after choosing the flow, storeTextForFlow() finished.");
 		return status;
 	}
+
 	@ResponseBody
 	@RequestMapping(value = "/getusstatelist", method = RequestMethod.GET)
 	public String getUsStateList(HttpServletRequest request) {
 		List<StateLookup> lookups = organizationManagementService.getUsStateList();
 		Gson gson = new GsonBuilder().setExclusionStrategies(new StateLookupExclusionStrategy()).create();
-		for(StateLookup s : lookups){
+		for (StateLookup s : lookups) {
 			gson.toJson(s);
 		}
 		String usStateList = gson.toJson(lookups);
 		return usStateList;
 	}
-	
+
 	@ResponseBody
 	@RequestMapping(value = "/getzipcodesbystateid", method = RequestMethod.GET)
 	public String getZipCodesByStateId(HttpServletRequest request) {
-		
+
 		String stateIdStr = request.getParameter("stateId");
 		int stateId = 0;
-		try{
+		try {
 			stateId = Integer.parseInt(stateIdStr);
-		}catch(NumberFormatException e){
+		}
+		catch (NumberFormatException e) {
 			LOG.error("Error occurred while parsing state Id");
 		}
 		String usStateZipcodeList = organizationManagementService.getZipCodesByStateId(stateId);
 		return usStateZipcodeList;
+	}
+
+
+	// Method to delete all the records of a company.
+	@RequestMapping(value = "/deletecompany", method = RequestMethod.GET)
+	public void deleteCompany(HttpServletRequest request) {
+		try {
+			User user = sessionHelper.getCurrentUser();
+			if(user != null){
+				organizationManagementService.purgeCompany(user.getCompany());
+			}
+		}
+		catch (InvalidInputException e) {
+			LOG.error("InvalidInputException caught in purgeCompany(). Nested exception is ", e);
+		}
+		catch (SolrException e) {
+			LOG.error("SolrException caught in purgeCompany(). Nested exception is ", e);
+		}
 	}
 }
 // JIRA: SS-24 BY RM02 EOC
