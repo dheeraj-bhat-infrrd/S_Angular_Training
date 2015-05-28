@@ -3198,8 +3198,15 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 	public List<DisabledAccount> disableAccounts(Date maxDisableDate) {
 		LOG.info("Method getDisabledAccounts started.");
 		try {
+			
+			List<DisabledAccount> disabledAccounts = disabledAccountDao.disableAccounts(maxDisableDate);
+			for(DisabledAccount account : disabledAccounts){
+				Company company = companyDao.findById(Company.class,account.getCompany().getCompanyId());
+				company.setStatus(CommonConstants.STATUS_INACTIVE);
+				companyDao.update(company);
+			}
 			LOG.info("Method getDisabledAccounts finished.");
-			return disabledAccountDao.disableAccounts(maxDisableDate);
+			return disabledAccounts;
 		}
 		catch (DatabaseException e) {
 			LOG.error("Database exception caught in getDisabledAccounts(). Nested exception is ", e);
