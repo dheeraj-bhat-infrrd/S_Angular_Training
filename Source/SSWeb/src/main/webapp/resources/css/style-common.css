@@ -6492,3 +6492,22 @@ tr.u-tbl-header td {
 	height: 27px;
 	margin-top: -35px;
 }
+
+span.review-more-button {
+    color: #009FE0;        
+    cursor: pointer;
+    margin: 0 2px;
+}
+
+span.review-less-text:after {
+    content:"...";
+}
+
+span.review-complete-txt{
+	display: none;
+}
+
+.settings-btn-text {
+    width: 35px;
+    text-align: center;
+}

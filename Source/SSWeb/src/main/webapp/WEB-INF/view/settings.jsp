@@ -245,11 +245,21 @@
 						<div class="st-header-txt-lft-rt clearfix margin-top-25">
 							<div class="float-left st-header-txt-lft"><spring:message code="label.header.mailer.content.key" /></div>
 							<div class="float-right clearfix st-header-txt-rt">
-								<div id="edit-participation-mail-content" class="float-left st-header-txt-rt-icn icn-pen cursor-pointer icn-pen-blue"></div>
-								<div id="edit-participation-mail-content-disabled" class="float-left st-header-txt-rt-icn icn-pen hide"></div>
-								
-								<div id="save-participation-mail-content" class="float-left st-header-txt-rt-icn icn-blue-tick margin-left-20 cursor-pointer hide"></div>
-								<div id="save-participation-mail-content-disabled" class="float-left st-header-txt-rt-icn margin-left-20 icn-grey-tick"></div>
+								<div class="clearfix">
+									<div id="edit-participation-mail-content"
+										class="float-left st-header-txt-rt-icn icn-pen cursor-pointer icn-pen-blue"></div>
+									<div id="edit-participation-mail-content-disabled"
+										class="float-left st-header-txt-rt-icn icn-pen hide"></div>
+
+									<div id="save-participation-mail-content"
+										class="float-left st-header-txt-rt-icn icn-blue-tick margin-left-20 cursor-pointer hide"></div>
+									<div id="save-participation-mail-content-disabled"
+										class="float-left st-header-txt-rt-icn margin-left-20 icn-grey-tick"></div>
+								</div>
+								<div class="clearfix">
+									<div class="float-left settings-btn-text">Edit</div>
+									<div class="float-right settings-btn-text">Save</div>
+								</div>
 							</div>
 						</div>
 						<div class="st-header-txt-wrapper">
@@ -260,11 +270,20 @@
 						<div class="st-header-txt-lft-rt clearfix margin-top-25">
 							<div class="float-left st-header-txt-lft"><spring:message code="label.header.reminder.mailer.content.key" /></div>
 							<div class="float-right clearfix st-header-txt-rt">
-								<div id="edit-participation-reminder-mail-content" class="float-left st-header-txt-rt-icn icn-pen cursor-pointer icn-pen-blue"></div>
-								<div id="edit-participation-reminder-mail-content-disabled" class="float-left st-header-txt-rt-icn icn-pen hide"></div>
-								
-								<div id="save-participation-reminder-mail-content" class="float-left st-header-txt-rt-icn icn-blue-tick margin-left-20 cursor-pointer hide"></div>
-								<div id="save-participation-reminder-mail-content-disabled" class="float-left st-header-txt-rt-icn margin-left-20 icn-grey-tick"></div>
+								<div class="clearfix">
+									<div id="edit-participation-reminder-mail-content"
+										class="float-left st-header-txt-rt-icn icn-pen cursor-pointer icn-pen-blue"></div>
+									<div id="edit-participation-reminder-mail-content-disabled"
+										class="float-left st-header-txt-rt-icn icn-pen hide"></div>
+									<div id="save-participation-reminder-mail-content"
+										class="float-left st-header-txt-rt-icn icn-blue-tick margin-left-20 cursor-pointer hide"></div>
+									<div id="save-participation-reminder-mail-content-disabled"
+										class="float-left st-header-txt-rt-icn margin-left-20 icn-grey-tick"></div>
+								</div>
+								<div class="clearfix">
+									<div class="float-left settings-btn-text">Edit</div>
+									<div class="float-right settings-btn-text">Save</div>
+								</div>
 							</div>
 						</div>
 						<div class="st-header-txt-wrapper">
