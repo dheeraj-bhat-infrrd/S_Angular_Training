@@ -842,7 +842,7 @@ public class OrganizationManagementController {
 				// Calling services to update DB
 				organizationManagementService.updateAccountDisabled(companySettings, isAccountDisabled);
 				if (isAccountDisabled) {
-					organizationManagementService.addDisabledAccount(companySettings.getIden());
+					organizationManagementService.addDisabledAccount(companySettings.getIden(), false);
 				}
 				else {
 					organizationManagementService.deleteDisabledAccount(companySettings.getIden());
@@ -1256,19 +1256,40 @@ public class OrganizationManagementController {
 
 	// Method to delete all the records of a company.
 	@RequestMapping(value = "/deletecompany", method = RequestMethod.GET)
-	public void deleteCompany(HttpServletRequest request) {
+	public String deleteCompany(HttpServletRequest request, Model model) throws NonFatalException {
 		try {
 			User user = sessionHelper.getCurrentUser();
 			if(user != null){
-				organizationManagementService.purgeCompany(user.getCompany());
+				if(user.isCompanyAdmin()){
+					// Add an entry into Disabled_Accounts table with disable_date as current date and status as inactive.
+					try {
+						organizationManagementService.addDisabledAccount(user.getCompany().getCompanyId(), true);
+					}
+					catch (NoRecordsFetchedException | PaymentException e) {
+						LOG.error("Exception caught in deleteCompany() of OrganizationManagementController. Nested exception is ", e);
+						throw e;
+					}
+					
+					// Modify the company status to inactive.
+					user.getCompany().setStatus(CommonConstants.STATUS_INACTIVE);
+					organizationManagementService.updateCompany(user.getCompany());
+					
+					LOG.info("Company deactivated successfully, logging out now.");
+					request.getSession(false).invalidate();
+					model.addAttribute("message", messageUtils.getDisplayMessage(
+							DisplayMessageConstants.ACCOUNT_DELETION_SUCCESSFUL,
+							DisplayMessageType.SUCCESS_MESSAGE));
+					return JspResolver.LOGIN;
+				}
 			}
 		}
 		catch (InvalidInputException e) {
 			LOG.error("InvalidInputException caught in purgeCompany(). Nested exception is ", e);
 		}
-		catch (SolrException e) {
-			LOG.error("SolrException caught in purgeCompany(). Nested exception is ", e);
-		}
+		model.addAttribute("message", messageUtils.getDisplayMessage(
+				DisplayMessageConstants.ACCOUNT_DELETION_UNSUCCESSFUL,
+				DisplayMessageType.ERROR_MESSAGE));
+		return JspResolver.LOGIN;
 	}
 }
 // JIRA: SS-24 BY RM02 EOC
