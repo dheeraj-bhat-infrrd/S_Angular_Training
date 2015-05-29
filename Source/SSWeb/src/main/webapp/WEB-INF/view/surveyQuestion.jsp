@@ -73,7 +73,10 @@
 			<!-- <div id="header-menu-icn" class="header-menu-icn icn-menu hide float-right"></div> -->
 		</div>
 	</div>
-
+	<div id="err-nw-wrapper" class="err-nw-wrapper"
+		style="margin-bottom: 10px;">
+		<span class="err-new-close"></span><span id="err-nw-txt"></span>
+	</div>
 	<div id="prof-container" data-q="${q}" data-agentid="${agentId}" data-agentName="${agentName}" data-agent-email="${agentEmail}"
 		 class="prof-main-content-wrapper margin-top-25 margin-bottom-25 min-height-container">
 		<div class="container">
@@ -85,14 +88,12 @@
 					<div class="sq-ques">
 						<i><span class="sq-ques-txt">
 							<spring:message code="label.surveyquestion.header.key" /><br>
+							<spring:message code="label.surveyquestion.header2.key" /><br>
 							<span class="semibold">${agentName}</span>
 						</span></i>
 					</div>
 					<div class="sq-bord-bot-sm"></div>
 					<input type="hidden" value="${message}" data-status="${status}" name="message" id="message"/>
-					<div id="err-nw-wrapper" class="err-nw-wrapper" style="margin-bottom: 10px;">
-						<span class="err-new-close"></span><span id="err-nw-txt"></span>
-					</div>
 					<div class="sq-rat-wrapper">
 						<form id="survey-request-form" action="${initParam.resourcesPath}/rest/survey/triggersurvey">
 							<div class="sq-star-wrapper sq-i-container clearfix ques-wrapper-adj">

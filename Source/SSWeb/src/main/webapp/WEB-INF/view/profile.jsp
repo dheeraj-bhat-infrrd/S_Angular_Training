@@ -327,7 +327,7 @@
 										</div>
 	                    			</div>
 	                    			<div class="lp-row">
-	                    				<div class="lp-button">Submit Your message</div>
+	                    				<div class="lp-button">Submit Your Message</div>
 	                    			</div>
 	                    			<div class="privacy-policy-disclaimer">
 	                    				We will only use information you provide on this form to send your message to this professional.
