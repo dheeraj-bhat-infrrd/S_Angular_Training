@@ -51,10 +51,10 @@
 		
 				<!-- If status is 2, then user has not acted on invitation -->
 				<c:set var="regstatustickclass" value=""/>
-				<c:set var="userstatustickclass" value="v-icn-onl"/>
+				<c:set var="userstatustickclass" value="v-icn-verified"/>
 				<c:if test="${userfromsearch.status == 2}">
 					<c:set var="regstatustickclass" value="v-icn-fmail"/>
-					<c:set var="userstatustickclass" value="v-icn-off"/>
+					<c:set var="userstatustickclass" value="v-icn-notverified"/>
 				</c:if>
 				
 				<!-- if admin can edit -->
@@ -83,10 +83,10 @@
 					</c:choose>
 					<c:choose>
 						<c:when test="${userfromsearch.status == 2}">
-							<td class="v-tbl-online v-tbl-icn ${userstatustickclass} v-icn-onl-off" title="<spring:message code="label.inactive.key" />"></td>
+							<td class="v-tbl-online v-tbl-icn ${userstatustickclass}" title="<spring:message code="label.notverified.key" />"></td>
 						</c:when>
 						<c:otherwise>
-							<td class="v-tbl-online v-tbl-icn ${userstatustickclass} v-icn-onl-off" title="<spring:message code="label.active.key" />"></td>
+							<td class="v-tbl-online v-tbl-icn ${userstatustickclass}" title="<spring:message code="label.verified.key" />"></td>
 						</c:otherwise>
 					</c:choose>
 					<td class="v-tbl-rem ${admincaneditclass} v-icn-rem-user" title="<spring:message code="label.remove.key" />"></td>
