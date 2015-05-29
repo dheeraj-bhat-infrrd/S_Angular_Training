@@ -608,7 +608,7 @@ html.is-modern.card-root.js.no-touch.csstransitions.svg.inlinesvg.placeholder
 
 .hm-header-row-left {
 	font-size: 16px;
-	line-height: 55px;
+	line-height: 45px;
 	font-family: OpenSansBold;
 	/*    font-weight: bold !important;*/
 }
@@ -3339,6 +3339,7 @@ button.paypal.is-active {
 	border-radius: 3px;
 	padding: 10px;
 	margin-bottom: 10px;
+	font-size: 14px;
 }
 
 .pts-hover-1 {
@@ -3508,8 +3509,8 @@ button.paypal.is-active {
 
 .prof-img-lock-item {
 	position: absolute;
-	bottom: 20px;
-	right: 20px;
+	top: 0;
+	right: 0;
 	width: 46px;
 	height: 46px;
 	background-color: rgba(255, 255, 255, 0.6);
