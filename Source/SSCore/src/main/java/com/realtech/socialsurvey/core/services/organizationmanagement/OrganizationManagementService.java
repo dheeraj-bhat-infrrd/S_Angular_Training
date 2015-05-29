@@ -22,6 +22,7 @@ import com.realtech.socialsurvey.core.entities.UserFromSearch;
 import com.realtech.socialsurvey.core.entities.UserProfile;
 import com.realtech.socialsurvey.core.entities.VerticalsMaster;
 import com.realtech.socialsurvey.core.enums.AccountType;
+import com.realtech.socialsurvey.core.exception.DatabaseException;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.exception.NoRecordsFetchedException;
 import com.realtech.socialsurvey.core.services.payment.exception.PaymentException;
@@ -157,7 +158,7 @@ public interface OrganizationManagementService {
 	 * @throws NoRecordsFetchedException
 	 * @throws PaymentException
 	 */
-	public void addDisabledAccount(long companyId) throws InvalidInputException, NoRecordsFetchedException, PaymentException;
+	public void addDisabledAccount(long companyId, boolean forceDisable) throws InvalidInputException, NoRecordsFetchedException, PaymentException;
 
 	/**
 	 * Soft deletes a Disabled Account record in the database
@@ -698,4 +699,6 @@ public interface OrganizationManagementService {
 	public List<DisabledAccount> getAccountsForPurge(int graceSpan);
 
 	public void purgeCompany(Company company) throws InvalidInputException, SolrException;
+
+	public void updateCompany(Company company) throws DatabaseException;
 }

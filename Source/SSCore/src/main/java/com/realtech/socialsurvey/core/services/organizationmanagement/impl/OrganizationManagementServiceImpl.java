@@ -883,7 +883,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 
 	@Override
 	@Transactional
-	public void addDisabledAccount(long companyId) throws InvalidInputException, NoRecordsFetchedException, PaymentException {
+	public void addDisabledAccount(long companyId, boolean forceDisable) throws InvalidInputException, NoRecordsFetchedException, PaymentException {
 		LOG.info("Adding the disabled account to the database for company id : " + companyId);
 		if (companyId <= 0) {
 			LOG.error("addDisabledAccount : Invalid companyId has been given.");
@@ -912,8 +912,14 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 		DisabledAccount disabledAccount = new DisabledAccount();
 		disabledAccount.setCompany(company);
 		disabledAccount.setLicenseDetail(licenseDetail);
-		disabledAccount.setDisableDate(gateway.getDateForCompanyDeactivation(licenseDetail.getSubscriptionId()));
-		disabledAccount.setStatus(CommonConstants.STATUS_ACTIVE);
+		if(forceDisable){
+			disabledAccount.setDisableDate(new Timestamp(System.currentTimeMillis()));
+			disabledAccount.setStatus(CommonConstants.STATUS_INACTIVE);
+		}
+		else{
+			disabledAccount.setDisableDate(gateway.getDateForCompanyDeactivation(licenseDetail.getSubscriptionId()));
+			disabledAccount.setStatus(CommonConstants.STATUS_ACTIVE);
+		}
 		disabledAccount.setCreatedBy(CommonConstants.ADMIN_USER_NAME);
 		disabledAccount.setCreatedOn(new Timestamp(System.currentTimeMillis()));
 		disabledAccount.setModifiedBy(CommonConstants.ADMIN_USER_NAME);
@@ -3281,6 +3287,15 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 			LOG.error("Database exception caught in getAccountsForPurge(). Nested exception is ", e);
 			throw e;
 		}
+	}
+	
+
+	// Method to update an existing company details.
+	@Override
+	public void updateCompany(Company company) throws DatabaseException {
+		LOG.info("Method to change company details updateCompany() started.");
+		companyDao.merge(company);
+		LOG.info("Method to change company details updateCompany() finished.");
 	}
 
 	private void performPreCompanyDeletions(long companyId) {
