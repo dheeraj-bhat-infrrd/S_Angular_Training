@@ -86,7 +86,7 @@
 	     <div class="float-left bd-frm-right">
 	         <div class="bd-frm-check-wrapper clearfix">
 	             <div class="float-left bd-check-img bd-check-img-checked"></div>
-	             <input type="hidden" name="isAdmin" value="true" id="false" class="ignore-clear">
+	             <input type="hidden" name="isAdmin" value="false" id="is-admin-chk" class="ignore-clear">
 	             <div class="float-left bd-check-txt"><spring:message code="label.grantadminprivileges.key"/></div>
 	         </div>
 	     </div>
@@ -124,10 +124,12 @@
 		 * hence setting the hidden value as false
 		 */
 		 if($(this).hasClass('bd-check-img-checked') ){
-			$(this).next("#is-admin-chk").val("false");
+			$(this).removeClass('bd-check-img-checked');
+			$(this).next(".isAdmin").val("true");
 		 }
 		 else {
-			$(this).next("#is-admin-chk").val("true");
+			$(this).addClass('bd-check-img-checked');
+			$(this).next(".isAdmin").val("false");
 		 }
    });
 	 $("#region-country").autocomplete({

@@ -1444,7 +1444,7 @@ button.paypal.is-active {
 	height: 200px;
 	max-height: 200px;
 	background-color: #f1f1f1;
-	background-size : contain;
+	background-size : contain !important;
 }
 
 .prof-download-contact {
@@ -5185,6 +5185,14 @@ tr.u-tbl-header td {
 
 .v-icn-onl-off {
 	background: url(../images/onl-off.png) no-repeat;
+}
+
+.v-icn-verified{
+	background: url(../images/verified.png) no-repeat center;
+}
+
+.v-icn-notverified{
+	background: url(../images/nonverified.png) no-repeat center;
 }
 
 .v-icn-onl {

@@ -245,7 +245,7 @@
 					</div>
 					<div class="sq-bord-bot-sm"></div>
 					<div class="sq-rat-wrapper">
-						<textarea id="text-area" class="sq-txt-area"></textarea>
+						<textarea id="text-area" class="sq-txt-area" maxlength="500" onkeydown="checkCharacterLimit(this);"></textarea>
 						<div id="text-box-disclaimer" class="bd-check-txt-disclaimer">
 							<spring:message code="label.survey.disclaimer.key"/>
 						</div>
@@ -496,5 +496,12 @@ $(document).ready(function() {
 		}
 	});
 });
+function checkCharacterLimit(element) {
+	$('#toast-container').hide();
+	if(element.value.length >= 500){
+		$('#overlay-toast').html('Maximum charter limit 500');
+		showToast();		
+	}
+}
 </script>
 <jsp:include page="footer.jsp" />
