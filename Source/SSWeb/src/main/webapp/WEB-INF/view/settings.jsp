@@ -315,7 +315,6 @@
 									</c:if>
 									<input type="hidden" name="other-location" id="other-location" value="${islocationenabled}">
 									<div id="st-delete-account" class="st-checkbox st-settings-checkbox st-checkbox-off"></div>
-									<div style="display: none"><form id='deleteAccountForm' action="./deletecompany"></form></div>
 									<!-- <div id="st-settings-location-on" class="st-checkbox st-settings-checkbox st-checkbox-on"></div>
 									<div id="st-settings-location-off" class="st-checkbox st-settings-checkbox st-checkbox-off hide"></div> -->
 								</div>
@@ -354,7 +353,7 @@
 		
 	</div>
 </div>
-
+<div style="display: none"><form id='deleteAccountForm' action="./deletecompany.do" method="get"></form></div>
 <style>
 	.body-no-scroll{
 			overflow: hidden;

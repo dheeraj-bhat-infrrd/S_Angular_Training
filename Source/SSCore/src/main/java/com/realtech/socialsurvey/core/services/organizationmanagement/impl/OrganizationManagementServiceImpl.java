@@ -3292,6 +3292,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 
 	// Method to update an existing company details.
 	@Override
+	@Transactional
 	public void updateCompany(Company company) throws DatabaseException {
 		LOG.info("Method to change company details updateCompany() started.");
 		companyDao.merge(company);
