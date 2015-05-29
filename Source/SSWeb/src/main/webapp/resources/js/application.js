@@ -1364,13 +1364,13 @@ function createPopupConfirm(header, text, ok, cancel) {
 
 	$('#overlay-main').show();
 }
-function overlayRevert() {
+/*function overlayRevert() {
 	$('#overlay-main').hide();
 	$("#overlay-header").html('');
 	$("#overlay-text").html('');
 	$('#overlay-continue').html('');
 	$('#overlay-cancel').html('');
-}
+}*/
 
 // Progress Bar
 function hideProgress(formId) {
@@ -2446,6 +2446,7 @@ function showRegionEditCallBack(data,regionId) {
 	$("#td-region-edit-"+regionId).parent(".tr-region-edit").slideDown(200);
 	$("#td-region-edit-"+regionId).html(data).slideDown(200);
 	bindSingleMultipleSelection();
+	bindAdminCheckBoxClick();
 	bindUserSelector();
 	var assignToOption = $("#assign-to-txt").attr('data-assignto');
 	showSelectorsByAssignToOption(assignToOption);
@@ -2665,7 +2666,7 @@ function createPopupInfo(header) {
 	
    	$('#overlay-main').show();
 }
-function overlayRevert() {
+/*function overlayRevert() {
 	$('#overlay-main').hide();
 	if ($('#overlay-continue').attr("disabled") == "disabled") {
 		$('#overlay-continue').removeAttr("disabled");
@@ -2674,7 +2675,7 @@ function overlayRevert() {
 	$("#overlay-text").html('');
 	$('#overlay-continue').html('');
 	$('#overlay-cancel').html('');
-}
+}*/
 
 /**
  * Function to delete a region
@@ -2928,6 +2929,23 @@ function overlayAccount(){
 	});
 }
 
+function overlayDeleteAccount(){
+	$('#othercategory').val('other-account');
+
+	$('#overlay-continue').click(function(){
+		overlayRevert();
+		confirmDeleteAccount();
+		$('#overlay-continue').unbind('click');
+	});
+	$('#overlay-cancel').click(function(){
+		overlayRevert();
+	});
+}
+
+function confirmDeleteAccount() {
+	$('#deleteAccountForm').submit();
+}
+
 function createPopupConfirm(header, body) {
 	$('#overlay-header').html(header);
 	$('#overlay-text').html(body);
@@ -2936,7 +2954,7 @@ function createPopupConfirm(header, body) {
 
 	$('#overlay-main').show();
 }
-function overlayRevert() {
+/*function overlayRevert() {
 	$('#overlay-main').hide();
 	if ($('#overlay-continue').attr("disabled") == "disabled") {
 		$('#overlay-continue').removeAttr("disabled");
@@ -2945,7 +2963,7 @@ function overlayRevert() {
 	$("#overlay-text").html('');
 	$('#overlay-continue').html('');
 	$('#overlay-cancel').html('');
-}
+}*/
 
 function showPaymentOptions() {
 	console.log("Calling payment controller for payment upgrade page");	
@@ -3582,7 +3600,7 @@ function searchUsersByNameEmailLoginIdCallBack(data) {
 	$('#user-list').html(data);
 }
 
-function paintUsersList(data) {
+/*function paintUsersList(data) {
 	if (userStartIndex == 0) {
 		$('#um-user-list').find('tbody').html("");
 	}
@@ -3648,7 +3666,7 @@ function paintUsersList(data) {
 			$('#um-user-list').find('tbody').append("No results found");
 		}
 	}
-}
+}*/
 
 function paginateUsersList() {
 	if (!doStopAjaxRequestForUsersList) {
