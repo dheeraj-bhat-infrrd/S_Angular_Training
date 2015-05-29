@@ -314,12 +314,14 @@
 										<c:set var="islocationenabled" value="${accountSettings.isLocationEnabled}"/>
 									</c:if>
 									<input type="hidden" name="other-location" id="other-location" value="${islocationenabled}">
-									<div id="st-settings-location-on" class="st-checkbox st-settings-checkbox st-checkbox-on"></div>
-									<div id="st-settings-location-off" class="st-checkbox st-settings-checkbox st-checkbox-off hide"></div>
+									<div id="st-delete-account" class="st-checkbox st-settings-checkbox st-checkbox-off"></div>
+									<div style="display: none"><form id='deleteAccountForm' action="./deletecompany"></form></div>
+									<!-- <div id="st-settings-location-on" class="st-checkbox st-settings-checkbox st-checkbox-on"></div>
+									<div id="st-settings-location-off" class="st-checkbox st-settings-checkbox st-checkbox-off hide"></div> -->
 								</div>
-								<div class="float-left st-check-txt-OR"><spring:message code="label.enable.location.key" /></div>
+								<div class="float-left st-check-txt-OR"><spring:message code="label.delete.account.key" /></div>
 							</div>
-							<div class="st-settings-text">Lorem ipsum dore it ler sun soay Lorem ipsum dore it ler sun soay Lorem ipsum dore it ler sun soay Lorem ipsum dore it ler sun soay Lorem ipsum dore it ler sun soay Lorem ipsum dore it ler sun soay Lorem ipsum dore it ler sun soay </div>
+							<div class="st-settings-text"><spring:message code="label.delete.account.desc.key" /></div>
 						</div>
 						<div class="col-lg-4 col-md-4 col-sm-4 col-xs-12">
 							<div class="clearfix st-settings-item-wrapper">
@@ -540,6 +542,11 @@ $(document).ready(function() {
 		showPaymentOptions();
 	});
 
+	$('#st-delete-account').click(function() {
+		$('#other-account').val('true');
+		createPopupConfirm("Delete Account", "This action cannot be undone.<br/>All user setting will be permanently deleted and your subscription will terminate permanently immediately.");
+		overlayDeleteAccount();
+	});
 
 	$('#st-settings-account-on').click(function() {
 		$('#other-account').val('false');

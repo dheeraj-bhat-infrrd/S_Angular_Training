@@ -326,10 +326,10 @@
     box-shadow: none !important;
 }
 
-.body-no-scroll{
+/* .body-no-scroll{
     position: fixed;
     top: 0;
-}
+} */
 .st-score-txt {
     height: 110px;
     line-height: 26px;
