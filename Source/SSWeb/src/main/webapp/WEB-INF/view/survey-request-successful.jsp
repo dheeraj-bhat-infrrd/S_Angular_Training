@@ -59,7 +59,7 @@
 		<div class="container">
 			<div class="inv-succ-text1 text-center">GREAT!</div>
 			<div class="inv-succ-text2 text-center">Now, check your email</div>
-			<div class="inv-succ-email text-center">sent to:${customerEmail}</div>
+			<div class="inv-succ-email text-center">sent to: ${customerEmail}</div>
 			<div class="inv-succ-text3">We just sent you a link to access the requested survey.</div>
 			<div class="inv-succ-link" onclick="resendSurveyActivationLink();">Resend access link</div>
 		</div>

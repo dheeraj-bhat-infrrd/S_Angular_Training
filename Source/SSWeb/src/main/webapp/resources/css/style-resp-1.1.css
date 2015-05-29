@@ -176,7 +176,7 @@
 	.hdr-logo {
 		height: 60px;
 		width: 120px;
-		background-size: 108px 36px;
+		background-size: 100% auto;
 	}
 	.hdr-wrapper {
 		height: 60px;
