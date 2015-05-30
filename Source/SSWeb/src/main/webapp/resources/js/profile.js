@@ -492,15 +492,14 @@ function paintReviews(result){
 		reviewsHtml=  reviewsHtml+'    </div>';
 		reviewsHtml=  reviewsHtml+'    <div class="float-right ppl-header-right">';
 		reviewsHtml=  reviewsHtml+'        <div class="st-rating-wrapper maring-0 clearfix review-ratings" data-rating="'+reviewItem.score+'">';
-		/*reviewsHtml=  reviewsHtml+'           <div class="rating-star icn-full-star"></div>';
-		reviewsHtml=  reviewsHtml+'           <div class="rating-star icn-full-star"></div>';
-		reviewsHtml=  reviewsHtml+'           <div class="rating-star icn-half-star"></div>';
-		reviewsHtml=  reviewsHtml+'           <div class="rating-star icn-no-star"></div>';
-		reviewsHtml=  reviewsHtml+'           <div class="rating-star icn-no-star"></div>';*/
 		reviewsHtml=  reviewsHtml+'       </div>';
 		reviewsHtml=  reviewsHtml+'   </div>';
 		reviewsHtml=  reviewsHtml+'	</div>';
-		reviewsHtml=  reviewsHtml+'	<div class="ppl-content">'+reviewItem.review +'</div>';
+		if(reviewItem.review.length > 250){
+			reviewsHtml=  reviewsHtml+'	<div class="ppl-content"><span class="review-complete-txt">'+reviewItem.review+'</span><span class="review-less-text">'+reviewItem.review.substr(0,250) +'</span><span class="review-more-button">More</span></div>';			
+		}else{
+			reviewsHtml=  reviewsHtml+'	<div class="ppl-content">'+reviewItem.review +'</div>';
+		}
 		reviewsHtml=  reviewsHtml+'		<div class="ppl-share-wrapper clearfix">';
 		reviewsHtml=  reviewsHtml+'    		<div class="float-left blue-text ppl-share-shr-txt">Share</div>';
 		reviewsHtml=  reviewsHtml+'    		<div class="float-left icn-share icn-plus-open"></div>';
@@ -573,8 +572,13 @@ function paintReviews(result){
     });
     
     $('.icn-gplus-pp').href = "http://localhost:8080";
-
 }
+
+$(document).on('click','.review-more-button',function(){
+	$(this).parent().find('.review-less-text').hide();
+	$(this).parent().find('.review-complete-txt').show();
+	$(this).hide();
+});
 
 $(document).scroll(function(){
 	var totalReviews = parseInt($("#profile-fetch-info").attr("total-reviews"));
