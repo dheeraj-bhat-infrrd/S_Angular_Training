@@ -109,7 +109,7 @@ public interface OrganizationManagementService {
 	 * @param crmInfo
 	 * @throws InvalidInputException
 	 */
-	public void updateCRMDetails(OrganizationUnitSettings companySettings, CRMInfo crmInfo) throws InvalidInputException;
+	public void updateCRMDetails(OrganizationUnitSettings companySettings, CRMInfo crmInfo, String fullyQualifiedClass) throws InvalidInputException;
 
 	/**
 	 * Updates the SurveySettings in the UserSettings
