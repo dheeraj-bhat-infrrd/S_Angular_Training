@@ -463,13 +463,26 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao {
 		LOG.info("Method to count number of social posts by customers, getSocialPostsCount() started.");
 		Date endDate = Calendar.getInstance().getTime();
 		Date startDate = getNdaysBackDate(numberOfDays);
-		Query query = new Query(Criteria.where("sharedOn").exists(true));
-		if (columnName != null) {
-			query.addCriteria(Criteria.where(columnName).is(columnValue));
+		TypedAggregation<SurveyDetails> aggregation;
+		if (columnName == null) {
+			aggregation = new TypedAggregation<SurveyDetails>(SurveyDetails.class, Aggregation.match(Criteria
+					.where(CommonConstants.MODIFIED_ON_COLUMN).gte(startDate).lte(endDate)), Aggregation.unwind("sharedOn"), Aggregation
+					.group("sharedOn").count().as("count"));
 		}
-		query.addCriteria(Criteria.where(CommonConstants.MODIFIED_ON_COLUMN).gte(startDate).lte(endDate));
-		LOG.info("Method to count number of social posts by customers, getSocialPostsCount() finished.");
-		return mongoTemplate.count(query, SURVEY_DETAILS_COLLECTION);
+		else {
+			aggregation = new TypedAggregation<SurveyDetails>(SurveyDetails.class, Aggregation.match(Criteria.where(columnName).is(columnValue)),
+					Aggregation.match(Criteria.where(CommonConstants.MODIFIED_ON_COLUMN).gte(startDate).lte(endDate)),
+					Aggregation.unwind("sharedOn"), Aggregation.group().count().as("count"));
+		}
+		AggregationResults<SurveyDetails> result = mongoTemplate.aggregate(aggregation, SURVEY_DETAILS_COLLECTION, SurveyDetails.class);
+
+		@SuppressWarnings("unchecked")
+		List<BasicDBObject> shares = (List<BasicDBObject>) result.getRawResults().get("result");
+		long socialPostCount = 0;
+		if (shares != null) {
+			socialPostCount = (int) shares.get(CommonConstants.INITIAL_INDEX).get("count");
+		}
+		return socialPostCount;
 	}
 
 	// Method to get count of surveys initiated by customers and agents separately.
