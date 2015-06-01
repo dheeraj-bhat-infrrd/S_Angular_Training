@@ -790,7 +790,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 	}
 
 	@Override
-	public void updateCRMDetails(OrganizationUnitSettings companySettings, CRMInfo crmInfo) throws InvalidInputException {
+	public void updateCRMDetails(OrganizationUnitSettings companySettings, CRMInfo crmInfo, String fullyQualifiedClass) throws InvalidInputException {
 		if (companySettings == null) {
 			throw new InvalidInputException("Company settings cannot be null.");
 		}
@@ -799,6 +799,8 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 		}
 		LOG.info("Updating comapnySettings: " + companySettings + " with crm info: " + crmInfo);
 		organizationUnitSettingsDao.updateParticularKeyOrganizationUnitSettings(MongoOrganizationUnitSettingDaoImpl.KEY_CRM_INFO, crmInfo,
+				companySettings, MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION);
+		organizationUnitSettingsDao.updateParticularKeyOrganizationUnitSettings(MongoOrganizationUnitSettingDaoImpl.KEY_CRM_INFO_CLASS, fullyQualifiedClass,
 				companySettings, MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION);
 		LOG.info("Updated the record successfully");
 	}

@@ -499,7 +499,7 @@ public class OrganizationManagementController {
 			encompassCrmInfo.setConnection_successful(true);
 			OrganizationUnitSettings companySettings = ((UserSettings) session.getAttribute(CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION))
 					.getCompanySettings();
-			organizationManagementService.updateCRMDetails(companySettings, encompassCrmInfo);
+			organizationManagementService.updateCRMDetails(companySettings, encompassCrmInfo, "com.realtech.socialsurvey.core.entities.EncompassCrmInfo");
 
 			// set the updated settings value in session with plain password
 			encompassCrmInfo.setCrm_password(plainPassword);
