@@ -7,6 +7,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
@@ -246,7 +247,8 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
 
 						post.setEntity(entity);
 						try {
-							client.execute(post);
+							HttpResponse response = client.execute(post);
+							LOG.info("Server response while posting on linkedin : " + response.toString());
 						}
 						catch (RuntimeException e) {
 							LOG.error("Runtime exception caught while trying to add an update on linkedin. Nested exception is ", e);
