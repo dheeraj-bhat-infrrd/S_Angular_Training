@@ -3210,7 +3210,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 			List<DisabledAccount> disabledAccounts = disabledAccountDao.disableAccounts(maxDisableDate);
 			for(DisabledAccount account : disabledAccounts){
 				Company company = companyDao.findById(Company.class,account.getCompany().getCompanyId());
-				company.setStatus(CommonConstants.STATUS_INACTIVE);
+				company.setStatus(CommonConstants.STATUS_COMPANY_DISABLED);
 				companyDao.update(company);
 			}
 			LOG.info("Method getDisabledAccounts finished.");
