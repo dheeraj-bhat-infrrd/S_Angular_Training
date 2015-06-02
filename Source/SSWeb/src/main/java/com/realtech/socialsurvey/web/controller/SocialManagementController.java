@@ -960,6 +960,7 @@ public class SocialManagementController {
 		String custFirstName = request.getParameter("firstName");
 		String custLastName = request.getParameter("lastName");
 		String agentIdStr = request.getParameter("agentId");
+		String feedback = request.getParameter("review");
 		boolean linkedinNotSetup = true;
 
 		double rating = 0;
@@ -988,14 +989,14 @@ public class SocialManagementController {
 
 		User user = sessionHelper.getCurrentUser();
 		List<OrganizationUnitSettings> settings = socialManagementService.getBranchAndRegionSettingsForUser(user.getUserId());
-		String message = rating + "-Star Survey Response from " + custFirstName + custLastName + " for " + agentName + " on SocialSurvey - view at "
-				+ applicationBaseUrl + CommonConstants.AGENT_PROFILE_FIXED_URL + agentProfileLink;
+		String message = rating + "-Star Survey Response from " + custFirstName + custLastName + " for " + agentName + " on SocialSurvey - view at ";
 		message = message.replaceAll("null", "");
-
+		String linkedinProfileUrl = applicationBaseUrl + CommonConstants.AGENT_PROFILE_FIXED_URL + agentProfileLink;
+		String linkedinMessageFeedback = "From : " + custFirstName + " " + custLastName + " "+ feedback;
 		for (OrganizationUnitSettings setting : settings) {
 			try {
 				if (setting != null)
-					if(!socialManagementService.updateLinkedin(setting, message))
+					if(!socialManagementService.updateLinkedin(setting, message, linkedinProfileUrl, linkedinMessageFeedback))
 						linkedinNotSetup = false;
 			}
 			catch (NonFatalException e) {

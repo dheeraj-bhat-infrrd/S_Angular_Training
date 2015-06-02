@@ -451,6 +451,7 @@ public class SurveyManagementController {
 			String agentIdStr = request.getParameter("agentId");
 			String ratingStr = request.getParameter("rating");
 			String customerEmail = request.getParameter("customerEmail");
+			String feedback = request.getParameter("feedback");
 			long agentId = 0;
 			double rating = 0;
 			try {
@@ -472,7 +473,9 @@ public class SurveyManagementController {
 					+ " on @SocialSurvey - view at " + getApplicationBaseUrl() + CommonConstants.AGENT_PROFILE_FIXED_URL + agentProfileLink;
 
 			String linkedinMessage = rating + "-Star Survey Response from " + custFirstName + " " + custLastName + " for " + agentName
-					+ " on SocialSurvey - view at " + getApplicationBaseUrl() + CommonConstants.AGENT_PROFILE_FIXED_URL + agentProfileLink;
+					+ " on SocialSurvey - view at ";
+			String linkedinProfileUrl = getApplicationBaseUrl() + CommonConstants.AGENT_PROFILE_FIXED_URL + agentProfileLink;
+			String linkedinMessageFeedback = "From : " + custFirstName + " " + custLastName + " "+ feedback;
 			try {
 				if(!socialManagementService.updateStatusIntoFacebookPage(agentSettings, facebookMessage)){
 					surveyHandler.updateSharedOn(CommonConstants.FACEBOOK_SOCIAL_SITE, agentId, customerEmail);
@@ -510,9 +513,9 @@ public class SurveyManagementController {
 				}
 			}
 
-			socialManagementService.updateLinkedin(agentSettings, linkedinMessage);
+			socialManagementService.updateLinkedin(agentSettings, linkedinMessage, linkedinProfileUrl, linkedinMessageFeedback);
 			for (OrganizationUnitSettings setting : settings) {
-				if(!socialManagementService.updateLinkedin(setting, linkedinMessage)){
+				if(!socialManagementService.updateLinkedin(setting, linkedinMessage, linkedinProfileUrl, linkedinMessageFeedback)){
 					surveyHandler.updateSharedOn(CommonConstants.LINKEDIN_SOCIAL_SITE, agentId, customerEmail);
 				}
 			}
@@ -641,6 +644,7 @@ public class SurveyManagementController {
 			String ratingStr = linkedinDetails.get("rating");
 			String customerEmail = linkedinDetails.get("customerEmail");
 			String agentProfileLink = linkedinDetails.get("agentProfileLink");
+			String feedback = linkedinDetails.get("feedback");
 			long agentId = 0;
 			double rating = 0;
 			try {
@@ -654,10 +658,12 @@ public class SurveyManagementController {
 			List<OrganizationUnitSettings> settings = socialManagementService.getSettingsForBranchesAndRegionsInHierarchy(agentId);
 			AgentSettings agentSettings = userManagementService.getUserSettings(agentId);
 			String message = rating + "-Star Survey Response from " + custFirstName + custLastName + " for " + agentName
-					+ " on SocialSurvey - view at " + getApplicationBaseUrl() + CommonConstants.AGENT_PROFILE_FIXED_URL + agentProfileLink;
-			socialManagementService.updateLinkedin(agentSettings, message);
+					+ " on SocialSurvey - view at ";
+			String linkedinProfileUrl = getApplicationBaseUrl() + CommonConstants.AGENT_PROFILE_FIXED_URL + agentProfileLink;
+			String linkedinMessageFeedback = "From : " + custFirstName + " " + custLastName + " "+ feedback;
+			socialManagementService.updateLinkedin(agentSettings, message, linkedinProfileUrl, linkedinMessageFeedback);
 			for (OrganizationUnitSettings setting : settings) {
-				socialManagementService.updateLinkedin(setting, message);
+				socialManagementService.updateLinkedin(setting, message, linkedinProfileUrl, linkedinMessageFeedback);
 			}
 			surveyHandler.updateSharedOn(CommonConstants.LINKEDIN_SOCIAL_SITE, agentId, customerEmail);
 		}

@@ -73,6 +73,7 @@ import com.realtech.socialsurvey.core.services.organizationmanagement.Organizati
 import com.realtech.socialsurvey.core.services.organizationmanagement.ProfileManagementService;
 import com.realtech.socialsurvey.core.services.organizationmanagement.UserManagementService;
 import com.realtech.socialsurvey.core.services.search.SolrSearchService;
+import com.realtech.socialsurvey.core.services.search.exception.SolrException;
 import com.realtech.socialsurvey.core.services.upload.FileUploadService;
 import com.realtech.socialsurvey.core.services.upload.impl.UploadUtils;
 import com.realtech.socialsurvey.core.utils.DisplayMessageConstants;
@@ -3131,7 +3132,11 @@ public class ProfileManagementController {
 						CommonConstants.PROFILE_LEVEL_INDIVIDUAL, fetchAbusive, null, null, null);
 			}
 
+			// Setting agent's profile URL in each of the review.
+			setAgentProfileUrlForReview(reviewItems);
+			
 			model.addAttribute("reviewItems", reviewItems);
+			
 		}
 		catch (InvalidInputException e) {
 			throw new InternalServerException(new ProfileServiceErrorCode(CommonConstants.ERROR_CODE_COMPANY_REVIEWS_FETCH_FAILURE,
@@ -3354,5 +3359,22 @@ public class ProfileManagementController {
 		long count = profileManagementService.getPostsCountForUser(user.getUserId());
 		LOG.info("Method to get posts for the user, getPostsCountForUser() finished");
 		return count+"";
+	}
+	
+	private void setAgentProfileUrlForReview(List<SurveyDetails> reviews) {
+		String profileUrl;
+		String baseProfileUrl = applicationBaseUrl + CommonConstants.AGENT_PROFILE_FIXED_URL;
+		for (SurveyDetails review : reviews) {
+			try {
+				SolrDocumentList documents = solrSearchService.searchUsersByIden(review.getAgentId(), CommonConstants.USER_ID_SOLR, true, 0, 1);
+				if (documents != null && !documents.isEmpty()) {
+					profileUrl = (String) documents.get(CommonConstants.INITIAL_INDEX).getFieldValue(CommonConstants.PROFILE_URL_SOLR);
+					review.setCompleteProfileUrl(baseProfileUrl + profileUrl);
+				}
+			}
+			catch (InvalidInputException | SolrException e) {
+				LOG.error("Exception caught in setAgentProfileUrlForReview() for agent : " + review.getAgentName() + " Nested exception is ", e);
+			}
+		}
 	}
 }

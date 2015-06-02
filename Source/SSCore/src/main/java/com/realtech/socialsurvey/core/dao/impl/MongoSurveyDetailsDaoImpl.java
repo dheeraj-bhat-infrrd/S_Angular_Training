@@ -479,7 +479,7 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao {
 		@SuppressWarnings("unchecked")
 		List<BasicDBObject> shares = (List<BasicDBObject>) result.getRawResults().get("result");
 		long socialPostCount = 0;
-		if (shares != null) {
+		if (shares != null && shares.size() != 0) {
 			socialPostCount = (int) shares.get(CommonConstants.INITIAL_INDEX).get("count");
 		}
 		return socialPostCount;

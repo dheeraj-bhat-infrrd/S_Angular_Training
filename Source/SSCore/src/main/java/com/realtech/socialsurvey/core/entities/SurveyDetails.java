@@ -31,6 +31,7 @@ public class SurveyDetails {
 	private String url;
 	private List<SurveyResponse> surveyResponse;
 	private boolean editable;
+	private String completeProfileUrl;
 	
 	public long getAgentId() {
 		return agentId;
@@ -187,5 +188,11 @@ public class SurveyDetails {
 	}
 	public void setEditable(boolean editable) {
 		this.editable = editable;
+	}
+	public String getCompleteProfileUrl() {
+		return completeProfileUrl;
+	}
+	public void setCompleteProfileUrl(String completeProfileUrl) {
+		this.completeProfileUrl = completeProfileUrl;
 	}
 }
