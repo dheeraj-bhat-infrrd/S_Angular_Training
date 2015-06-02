@@ -571,7 +571,9 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean {
 	@Transactional
 	public void deleteSurveyPreInitiationDetailsPermanently(SurveyPreInitiation surveyPreInitiation) {
 		LOG.info("Method deleteSurveyPreInitiationDetailsPermanently() started.");
-		surveyPreInitiationDao.delete(surveyPreInitiation);
+		surveyPreInitiation = surveyPreInitiationDao.findById(SurveyPreInitiation.class, surveyPreInitiation.getSurveyPreIntitiationId());
+		if(surveyPreInitiation != null)
+			surveyPreInitiationDao.delete(surveyPreInitiation);
 		LOG.info("Method deleteSurveyPreInitiationDetailsPermanently() finished.");
 	}
 

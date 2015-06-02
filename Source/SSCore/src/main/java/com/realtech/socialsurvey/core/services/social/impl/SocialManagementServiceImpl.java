@@ -91,6 +91,12 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
 	// Yelp
 	@Value("${YELP_REDIRECT_URI}")
 	private String yelpRedirectUri;
+	
+	@Value("${APPLICATION_BASE_URL}")
+	private String applicationBaseUrl;
+	
+	@Value("${APPLICATION_LOGO_URL}")
+	private String applicationLogoUrl;
 
 	/**
 	 * Returns the Twitter request token for a particular URL
@@ -222,7 +228,7 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
 	}
 
 	@Override
-	public boolean updateLinkedin(OrganizationUnitSettings agentSettings, String message) throws NonFatalException {
+	public boolean updateLinkedin(OrganizationUnitSettings agentSettings, String message, String linkedinProfileUrl, String linkedinMessageFeedback) throws NonFatalException {
 		if (agentSettings == null) {
 			throw new InvalidInputException("AgentSettings can not be null");
 		}
@@ -242,9 +248,13 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
 
 						// add header
 						post.setHeader("Content-Type", "application/json");
-
-						StringEntity entity = new StringEntity("{\"comment\": \"" + message + "\",\"visibility\": {\"code\": \"anyone\"}}");
-
+						String a="{\"comment\": \"\",\"content\": {"
+								  +  "\"title\": \"" + message + "\","
+								  +  "\"description\": \"" + linkedinMessageFeedback + "\","
+								  +  "\"submitted-url\": \"" + linkedinProfileUrl + "\",  "
+								  +  "\"submitted-image-url\": \"" + applicationLogoUrl + "\"},"
+								  +  "\"visibility\": {\"code\": \"anyone\" }}";
+						StringEntity entity = new StringEntity(a);
 						post.setEntity(entity);
 						try {
 							HttpResponse response = client.execute(post);
