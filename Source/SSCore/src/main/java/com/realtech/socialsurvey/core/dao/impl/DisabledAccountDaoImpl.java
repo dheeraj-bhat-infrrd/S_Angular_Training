@@ -29,14 +29,14 @@ public class DisabledAccountDaoImpl extends GenericDaoImpl<DisabledAccount, Long
 		try {
 			Date currentDate = new Date();
 			Query query = getSession().createQuery("update DisabledAccount set status=?, modifiedOn=? where disableDate<? and status=?");
-			query.setParameter(0, CommonConstants.STATUS_INACTIVE);
+			query.setParameter(0, CommonConstants.STATUS_ACCOUNT_DISABLED);
 			query.setParameter(1, currentDate);
 			query.setParameter(2, maxDisableDate);
 			query.setParameter(3, CommonConstants.STATUS_ACTIVE);
 			query.executeUpdate();
 			Criteria criteria = getSession().createCriteria(DisabledAccount.class);
 			criteria.add(Restrictions.eq(CommonConstants.MODIFIED_ON_COLUMN, currentDate));
-			criteria.add(Restrictions.eq(CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_INACTIVE));
+			criteria.add(Restrictions.eq(CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_ACCOUNT_DISABLED));
 			return criteria.list();
 		}
 		catch (HibernateException e) {
