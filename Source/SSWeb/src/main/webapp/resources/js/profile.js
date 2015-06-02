@@ -46,7 +46,8 @@ function fetchCompanyProfileCallBack(data) {
 	var result = profileJson;
 	
 	paintProfilePage(result);
-	fetchAverageRatings(result.iden);
+	//fetchAverageRatings(result.iden);
+	paintAverageRatings();
 	fetchCompanyRegions();
 	fetchCompanyBranches();
 	fetchCompanyIndividuals();
@@ -66,7 +67,7 @@ function paintProfilePage(result) {
 		var contactDetails = result.contact_details;
 		var headContentHtml = "";
 		var profileLevel = $("#profile-fetch-info").attr("profile-level");
-		$("#profile-main-content").show();
+		//$("#profile-main-content").show();
 		currentProfileName = result.profileName;
 		//paint public  posts
 		paintPublicPosts();
@@ -206,13 +207,12 @@ function fetchAverageRatings(companyId) {
 	callAjaxGET(url, paintAverageRatings, true);
 }
 
-function paintAverageRatings(data) {
-	var responseJson = $.parseJSON(data);
-	if(responseJson != undefined) {
-		var rating = $.parseJSON(responseJson.entity);
+function paintAverageRatings() {
+	/*var responseJson = $.parseJSON(data);
+	if(responseJson != undefined) {*/
+		var rating = $('input[name="averageRatings"]').val();
 		changeRatingPattern(rating,$("#rating-avg-comp"),true);
-		$('#prof-schema-agent-rating').html(parseFloat(rating).toFixed(2));
-	}
+		//$('#prof-schema-agent-rating').html(parseFloat(rating).toFixed(2));
 }
 
 function fetchCompanyRegions() {
@@ -625,9 +625,9 @@ function paintAllReviewsCount(data) {
 		var reviewsSizeHtml = responseJson.entity;
 		$("#profile-fetch-info").attr("total-reviews",responseJson.entity);
 		reviewsSizeHtml = reviewsSizeHtml +' Review(s)';
-		$("#prof-company-review-count").html(reviewsSizeHtml);
-		$("#prof-schema-reviews").html(reviewsSizeHtml);
-		if(responseJson.entity > 0){
+		//$("#prof-company-review-count").html(reviewsSizeHtml);
+		//$("#prof-schema-reviews").html(reviewsSizeHtml);
+		/*if(responseJson.entity > 0){
 			$("#prof-company-review-count").click(function(){
 				if(window.innerWidth < 768){
 					$('.icn-star-smile').click();					
@@ -636,7 +636,7 @@ function paintAllReviewsCount(data) {
 					scrollTop : $('#reviews-container').offset().top
 				},500);
 			});
-		}
+		}*/
 	}
 }
 
@@ -710,7 +710,8 @@ function fetchRegionProfileCallBack(data) {
 	var result = profileJson;
 
 	paintProfilePage(result);
-	fetchAverageRatingsForRegion(result.iden);
+	//fetchAverageRatingsForRegion(result.iden);
+	paintAverageRatings();
 	fetchBranchesForRegion(result.iden);
 	fetchIndividualsForRegion(result.iden);
 	if(result.survey_settings != undefined && result.survey_settings.show_survey_above_score != undefined) {
@@ -718,7 +719,7 @@ function fetchRegionProfileCallBack(data) {
 	}
 	startIndex = 0;
 	fetchReviewsForRegion(result.iden,startIndex,numOfRows,minScore);
-	fetchReviewsCountForRegion(result.iden, paintAllReviewsCount);
+	//fetchReviewsCountForRegion(result.iden, paintAllReviewsCount);
 }
 
 function fetchAverageRatingsForRegion(regionId){
@@ -821,7 +822,8 @@ function fetchBranchProfileCallBack(data) {
 	var result = profileJson;
 	
 	paintProfilePage(result);
-	fetchAverageRatingsForBranch(result.iden);
+	//fetchAverageRatingsForBranch(result.iden);
+	paintAverageRatings();
 	fetchIndividualsForBranch(result.iden);
 	if(result.survey_settings != undefined && result.survey_settings.show_survey_above_score != undefined) {
 		minScore = result.survey_settings.show_survey_above_score;
@@ -985,7 +987,12 @@ function paintIndividualDetails(result) {
 
 	$("#individual-details").html(individualDetailsHtml);
 	$('.lph-dd').click(function() {
-		$(this).next('.lph-dd-content').slideToggle(200);
+		if($(this).next('.lph-dd-content').is(':visible')){
+			$(this).next('.lph-dd-content').slideToggle(200);
+		}else{
+			$('.lph-dd-content').hide();
+			$(this).next('.lph-dd-content').slideToggle(200);
+		}
 	});
 
 	$('.lph-dd:nth(0)').trigger('click');
@@ -1001,7 +1008,8 @@ function fetchAgentProfileCallBack(data) {
 	var result = profileJson;
 	paintProfilePage(result);
 	paintIndividualDetails(result);
-	fetchAverageRatingsForAgent(result.iden);
+	//fetchAverageRatingsForAgent(result.iden);
+	paintAverageRatings();
 	if(result.survey_settings != undefined && result.survey_settings.show_survey_above_score != undefined) {
 		minScore = result.survey_settings.show_survey_above_score;
 	}
