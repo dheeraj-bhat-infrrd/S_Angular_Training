@@ -6511,3 +6511,7 @@ span.review-complete-txt{
     width: 35px;
     text-align: center;
 }
+
+.intro-body {
+  padding: 10px;
+}
