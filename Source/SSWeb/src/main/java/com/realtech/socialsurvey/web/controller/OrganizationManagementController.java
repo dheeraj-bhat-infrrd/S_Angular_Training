@@ -101,11 +101,9 @@ public class OrganizationManagementController {
 	@Autowired
 	private Payment payment;
 
-	@Value("${AMAZON_ENDPOINT}")
+	@Value("${CDN_PATH}")
 	private String endpoint;
 
-	@Value("${AMAZON_BUCKET}")
-	private String bucket;
 
 	/**
 	 * Method to upload logo image for a company
@@ -129,7 +127,7 @@ public class OrganizationManagementController {
 		try {
 			logoName = fileUploadService.fileUploadHandler(fileLocal, request.getParameter("logo_name"));
 			// Setting the complete logo url in session
-			logoName = endpoint + "/" + bucket + "/" + logoName;
+			logoName = endpoint + "/" + logoName;
 
 			LOG.debug("Setting Logo image name to Session");
 			request.getSession(false).setAttribute(CommonConstants.LOGO_NAME, logoName);
