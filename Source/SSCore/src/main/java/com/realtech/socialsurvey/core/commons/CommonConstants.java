@@ -79,6 +79,8 @@ public interface CommonConstants {
 	public static final int STATUS_SURVEY_TEMPLATE = 2;
 	public static final int STATUS_NOT_VERIFIED = 2;
 	public static final int STATUS_UNDER_PROCESSING = 2;
+	public static final int STATUS_ACCOUNT_DISABLED = 2;
+	public static final int STATUS_COMPANY_DISABLED = 2;
 	public static final int STATUS_TEMPORARILY_INACTIVE = 3;
 	public static final int PROCESS_COMPLETE = 1;
 	public static final int PROCESS_NOT_STARTED = 0;
