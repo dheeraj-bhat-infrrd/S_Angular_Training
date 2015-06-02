@@ -9,7 +9,6 @@
     <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta charset="utf-8">
-    <noscript><meta http-equiv="refresh" content="0; URL=?no_script=true" /></noscript>
     <link rel="shortcut icon" href="${initParam.resourcesPath}/favicon.ico" sizes="16x16">
     <link rel="stylesheet" href="${initParam.resourcesPath}/resources/css/perfect-scrollbar.min.css">
     <link rel="stylesheet" href="${initParam.resourcesPath}/resources/css/bootstrap.min.css">
@@ -46,9 +45,10 @@
     	<c:if test="${not empty averageRating}">
     		<fmt:formatNumber var="floatingAverageRating" type="number" value="${averageRating}" maxFractionDigits="2" minFractionDigits="2"/>
     		<fmt:formatNumber var="integerAverageRating" type="number" value="${averageRating}" maxFractionDigits="0"/>
-    		<c:if test="${integerAverageRating == 6}">
+    		<c:set var="integerAverageRating" value="${integerAverageRating}"></c:set>
+    		<%-- <c:if test="${integerAverageRating == 6}">
     			<c:set var="integerAverageRating" value="5"></c:set>
-    		</c:if>
+    		</c:if> --%>
     	</c:if>
     </c:if>
 </head>
@@ -140,7 +140,7 @@
 					<div class="prof-rating clearfix">
 						<div class="prof-rating-wrapper maring-0 clearfix float-left" id="rating-avg-comp">
 							<div class='rating-image float-left smiley-rat-${integerAverageRating }'></div>
-							<div class='rating-rounded float-left'>${floatingAverageRating}</div>
+							<div class='rating-rounded float-left'>${floatingAverageRating} - </div>
 						</div>
 						<div class="float-left review-count-left cursor-pointer" id="prof-company-review-count">${reviewsCount } Reviews(s)</div>
 					</div>
@@ -230,12 +230,7 @@
 			<div class="row margin-top-10">
             <div class="prof-left-panel-wrapper col-lg-4 col-md-4 col-sm-4 col-xs-12">
                 
-                <!-- <div class="prof-left-row prof-left-info bord-bot-dc">
-                    <div class="left-contact-wrapper">
-                        <div class="left-panel-header cursor-pointer vcard-download">Download VCard</div>
-                    </div>
-                </div> -->
-                <c:if test="${not empty profile.contact_details }">
+               <c:if test="${not empty profile.contact_details }">
                 	<c:if test="${not empty profile.contact_details.web_addresses || not empty profile.contact_details.contact_numbers}">
 						<div id="contact-info" class="prof-left-row prof-left-info bord-bot-dc prof-contact-info">
 							<div class="left-contact-wrapper">
@@ -363,21 +358,52 @@
 	                    <div class="pe-whitespace intro-body">${profile.contact_details.about_me}</div>
 	                </div>
                 </c:if>
-                <div class="rt-content-main bord-bot-dc clearfix hide" id="recent-post-container">
+                <c:if test="${not empty posts}">
+                <div class="rt-content-main bord-bot-dc clearfix" id="recent-post-container">
                     <div class="float-left panel-tweet-wrapper">
                         <div class="main-con-header">Recent Posts</div>
                         <div class="tweet-panel tweet-panel-left tweet-panel-left-adj" id="prof-posts">
-                            <!--  latest posts get populated here -->
+                        	<c:forEach var="postItem" items="${posts}">
+                        	<c:choose>
+                        		<c:when test="${postItem.source == 'google' }">
+                        			<c:set var="iconClass" value="icn-gplus"></c:set>
+                        		</c:when>
+                        		<c:when test="${postItem.source == 'SocialSurvey' }">
+                        			<c:set var="iconClass" value="icn-ss"></c:set>
+                        		</c:when>
+                        		<c:when test="${postItem.source == 'facebook' }">
+                        			<c:set var="iconClass" value="icn-fb"></c:set>
+                        		</c:when>
+                        		<c:when test="${postItem.source == 'twitter' }">
+                        			<c:set var="iconClass" value="icn-twit"></c:set>
+                        		</c:when>
+                        		<c:when test="${postItem.source == 'linkedin' }">
+                        			<c:set var="iconClass" value="icn-lin"></c:set>
+                        		</c:when>
+                        	</c:choose>
+                        	<jsp:useBean id="postDate" class="java.util.Date"/> 
+                        	<c:set target="${postDate}" property="time" value="${postItem.timeInMillis}"/>
+                        	<div class="tweet-panel-item bord-bot-dc clearfix">
+                        		<div class="tweet-icn float-left ${iconClass}"></div>
+                        		<div class="tweet-txt float-left">
+                        			<div class="tweet-text-main">${postItem.postText }</div>
+                        			<div class="tweet-text-link"><em>${postItem.postedBy }</em></div>
+                        			<div class="tweet-text-time"><em><fmt:formatDate value="${postDate}" type="both" dateStyle="medium" timeStyle="long"/></em></div>
+                        		</div>
+                        	</div>
+                        	</c:forEach>
                         </div>
                     </div>
                 </div>
-                <div class="people-say-wrapper rt-content-main hide" id="reviews-container">
-                	<div class="clearfix hide">
+                </c:if>
+                <c:if test="${not empty reviews}">
+                <div class="people-say-wrapper rt-content-main" id="reviews-container">
+                	<div class="clearfix">
 	                    <div class="main-con-header float-left" id="prof-reviews-header">
 	                    	<span class="ppl-say-txt-st">What people say</span> about ${profName }
 	                    </div>
 	                    
-	                    <div id="prof-reviews-sort" class="prof-reviews-sort clearfix float-right hide">
+	                    <div id="prof-reviews-sort" class="prof-reviews-sort clearfix float-right">
 	                    	<div id="sort-by-feature" class="prof-review-sort-link float-left">Sort by Feature</div>
 	                    	<div class="prof-reviews-sort-divider float-left">|</div>
 	                    	<div id="sort-by-date" class="prof-review-sort-link float-right">Sort by Date</div>
@@ -385,21 +411,47 @@
                     </div>
                     
                     <div id="prof-review-item" class="prof-reviews">
-	                   <!--  reviews get populated here -->
-                    </div>
+                    		<c:forEach items="${reviews }" var="reviewItem">
+                    			<fmt:formatNumber var="integerRating" value="${reviewItem.score }" maxFractionDigits="0"/>
+								<div class="ppl-review-item" data-cust-first-name="${reviewItem.customerFirstName }"
+									data-cust-last-name="${reviewItem.customerLastName }" data-agent-name="${reviewItem.agentName }"
+									data-rating="${reviewItem.score }" data-review="${reviewItem.review}">
+									<div class="ppl-header-wrapper clearfix">
+										<div class="float-left ppl-header-left">
+											<div class="ppl-head-1">${reviewItem.customerFirstName } ${reviewItem.customerLastName }</div>
+											<div class="ppl-head-2"><fmt:formatDate value="${reviewItem.modifiedOn}" pattern="d MMM yyyy"/></div>
+										</div>
+										<div class="float-right ppl-header-right">
+											<div class="st-rating-wrapper maring-0 clearfix review-ratings" data-rating="${reviewItem.score}">
+												<div class="rating-image float-left smiley-rat-${integerRating}"></div>
+												<div class="rating-rounded float-left"><fmt:formatNumber maxFractionDigits="2" minFractionDigits="2" value="${reviewItem.score}"/></div>
+											</div>
+										</div>
+									</div>
+									<div class="ppl-content">${reviewItem.review }</div>
+									<div class="ppl-share-wrapper clearfix">
+										<div class="float-left blue-text ppl-share-shr-txt">Share</div>
+										<div class="float-left clearfix ppl-share-social">
+											<div class="float-left ppl-share-icns icn-fb icn-fb-pp"></div>
+											<div class="float-left ppl-share-icns icn-twit icn-twit-pp"></div>
+											<div class="float-left ppl-share-icns icn-lin icn-lin-pp"></div>
+											<div class="float-left ppl-share-icns icn-gplus"></div>
+											<div class="float-left ppl-share-icns icn-yelp"></div>
+										</div>
+									</div>
+								</div>
+							</c:forEach>
+					</div>
                     <div id="prof-hidden-review-count" class="prof-hidden-review-link">
 	                   <!--  count of hidden reviews get populated here -->
                     </div>
                 </div>
+                </c:if>
             </div>
         </div>
         </div>
     </div>
 </div>
-
-<!-- <div id="outer_captcha" style="display: none;">
-	<div id="recaptcha"></div>
-</div> -->
 
 <div class="mobile-tabs hide clearfix">
     <div class="float-left mob-icn mob-icn-active icn-person"></div>
@@ -407,11 +459,6 @@
     <div class="float-left mob-icn icn-star-smile"></div>
     <div class="float-left mob-icn inc-more"></div>
 </div>
-<!-- <div style="display: none">
-	<script src="https://www.google.com/recaptcha/api/challenge?k=6LdlHOsSAAAAAM8ypy8W2KXvgMtY2dFsiQT3HVq-"></script>
-</div> -->
-
-<!-- Code snippet to show aggregated ratings for agent in Google results : BOC-->
 <div class="hide" itemscope itemtype="http://schema.org/Product">
 	<span itemprop="name">Social Survey</span>
 	<span id="agent-desc" itemprop="title"></span>
@@ -421,329 +468,5 @@
 	</div>
 </div>
 <!-- EOC -->
-
-<script src="${initParam.resourcesPath}/resources/js/jquery-2.1.1.min.js"></script>
-<script src="${initParam.resourcesPath}/resources/js/bootstrap.min.js"></script>
-<script src="${initParam.resourcesPath}/resources/js/date.js"></script>
-<script src="${initParam.resourcesPath}/resources/js/script.js"></script>
-<script src="${initParam.resourcesPath}/resources/js/index.js"></script>
-<script src="${initParam.resourcesPath}/resources/js/common.js"></script>
-<script src="${initParam.resourcesPath}/resources/js/profile_common.js"></script>
-<script src="${initParam.resourcesPath}/resources/js/profile.js"></script>
-<script src="${initParam.resourcesPath}/resources/js/googletracking.js"></script>
-<script src="${initParam.resourcesPath}/resources/js/googlemaps.js"></script>
-<script src="${initParam.resourcesPath}/resources/js/perfect-scrollbar.jquery.min.js"></script>
-<script>
-    $(document).ready(function(){
-    	profileJson = ${profileJson};
-        adjustImage();
-        var gaLabel;
-        var gaName;
-        
-        /**
-	    	If region profile name is mentioned, fetch the region profile 
-    		since this would be a call to fetch region profile page 
-	    */
-        var regionProfileName = $("#region-profile-name").val();
-        var branchProfileName = $("#branch-profile-name").val();
-        var agentProfileName = $("#agent-profile-name").val();
-        if(regionProfileName.length > 0) {
-        	fetchRegionProfile(regionProfileName);
-        	gaLabel = 'region';
-        	gaName = regionProfileName;
-        }
-        else if(branchProfileName.length > 0){
-        	fetchBranchProfile(branchProfileName);
-        	gaLabel = 'office';
-        	gaName = branchProfileName;
-        }
-        else if(agentProfileName.length > 0){
-        	fetchAgentProfile(agentProfileName);
-        	gaLabel = 'individual';
-        	gaName = agentProfileName;
-        } 
-        else{
-        	fetchCompanyProfile();
-        	gaLabel = 'company';
-        	gaName = companyProfileName;
-        }
-       
-        $(window).resize(adjustImage);
-        
-        $('.icn-person').click(function() {
-            $('.mob-icn').removeClass('mob-icn-active');
-            $(this).addClass('mob-icn-active');
-            $('#prof-company-intro').show();
-            $('#contact-info').hide();
-            $('#prof-agent-container').hide();
-            $('#reviews-container').hide();
-            $('#recent-post-container').hide();
-        });
-
-        $('.icn-ppl').click(function() {
-            $('.mob-icn').removeClass('mob-icn-active');
-            $(this).addClass('mob-icn-active');
-            $('#recent-post-container').show();
-            $('#contact-info').hide();
-            $('#prof-agent-container').hide();
-            $('#prof-company-intro').hide();
-            $('#reviews-container').hide();
-        });
-
-        $('.icn-star-smile').click(function() {
-            $('.mob-icn').removeClass('mob-icn-active');
-            $(this).addClass('mob-icn-active');
-            $('#reviews-container').show();
-            $('#contact-info').hide();
-            $('#prof-agent-container').hide();
-            $('#prof-company-intro').hide();
-            $('#recent-post-container').hide();
-        });
-
-        $('.inc-more').click(function() {
-            $('.mob-icn').removeClass('mob-icn-active');
-            $(this).addClass('mob-icn-active');
-            $('#prof-agent-container').show();
-            $('#prof-company-intro').hide();
-            $('#contact-info').hide();
-            $('#reviews-container').hide();
-            $('#recent-post-container').hide();
-        });
-        
-        $(document).on('click','.bd-q-contact-us',function(){
-            $('#contact-us-pu-wrapper').show();
-            $('body').addClass('body-no-scroll-y');
-        });
-        
-        $(document).on('click','.bd-q-btn-cancel',function(){
-            $('#contact-us-pu-wrapper').hide();
-            $('body').removeClass('body-no-scroll-y');
-        });
-        
-        $('.lp-button').click(function(event){
-        	
-        	if(validateContactUsForm()){
-        		url = window.location.origin + "/pages/profile/sendmail.do";
-    			data = "";
-    			if($("#agent-profile-name").val() != ""){
-    				data += "profilename=" + $("#agent-profile-name").val();
-    				data += "&profiletype=" + $("#profile-fetch-info").attr("profile-level");
-    			}
-    			else if($("#company-profile-name").val() != ""){
-    				data += "profilename=" + $("#company-profile-name").val();
-    				data += "&profiletype=" + $("#profile-fetch-info").attr("profile-level");
-    			}
-    			else if($("#region-profile-name").val() != ""){
-    				data += "profilename=" + $("#region-profile-name").val();
-    				data += "&profiletype=" + $("#profile-fetch-info").attr("profile-level");
-    			}
-    			else if($("#branch-profile-name").val() != ""){
-    				data += "profilename=" + $("#branch-profile-name").val();
-    				data += "&profiletype=" + $("#profile-fetch-info").attr("profile-level");
-    			}
-    			
-    			data += "&name=" + $('#lp-input-name').val();
-    			data += "&email=" + $('#lp-input-email').val();
-    			data += "&message=" + $('#lp-input-message').val();
-    			data += "&g-recaptcha-response=" + $('#g-recaptcha-response').val();
-    			//data += "&recaptcha_input=" + $('#captcha-text').val();
-    			showOverlay();
-    			callAjaxPostWithPayloadData(url,showMessage,data,true);
-        	}			
-		});
-        
-        function showMessage(data){
-        	var jsonData = JSON.parse(data);
-        	console.log("Data recieved : " + jsonData);
-        	if(jsonData["success"] == 1){
-        		console.log("Added toast message. Showing it now");
-	    		showInfoMobileAndWeb(jsonData["message"]);
-        		console.log("Finished showing the toast");
-    			$(".reg-cap-reload").click();
-    			
-    			// resetting contact form and captcha
-    			$('#prof-contact-form')[0].reset();
-    			var recaptchaframe = $('.g-recaptcha iframe');
-    	        var recaptchaSoure = recaptchaframe[0].src;
-    	        recaptchaframe[0].src = '';
-    	        setInterval(function () { recaptchaframe[0].src = recaptchaSoure; }, 500);
-        	}
-        	else{
-        		console.error("Error occured while sending contact us message. ");
-        		showErrorMobileAndWeb(jsonData["message"]);
-        		console.log("Finished showing the toast");
-    			$(".reg-cap-reload").click();
-        	}
-        }
-        
-        $(document).on('click','.vcard-download', function(){
-        	var agentName = $("#agent-profile-name").val();
-        	downloadVCard(agentName);
-        });
-        
-    	// Google analytics for reviews
-    	setTimeout(function() {
-    		ga('send', {
-        		'hitType': 'event',
-        		'eventCategory': 'review',
-        		'eventAction': 'click',
-        		'eventLabel': gaLabel,
-        		'eventValue': gaName
-        	});
-		}, 2000);
-    	
-    	
-    	// Find a pro
-    	$('#find-pro-form input').keyup(function(e) {
-    		if(e.which == 13)
-    			submitFindProForm();
-		});
-    	
-    	$('#find-pro-submit').click(function(e) {
-    		e.preventDefault();
-    		submitFindProForm();
-    	});
-    	
-    	function submitFindProForm() {
-    		console.log("Submitting Find a Profile form");
-			$('#find-pro-form').submit();
-    		showOverlay();
-    	}
-    	
-    	
-    	
-    	var captchaText = true;
-    	/**try {
-    		
-    		Recaptcha.create('6LdlHOsSAAAAAM8ypy8W2KXvgMtY2dFsiQT3HVq-',
-    				'recaptcha', {
-    					theme : 'white',
-    					callback : captchaLoaded
-    				});
-    		console.log("Captcha loaded");
-    	} catch (error) {
-    		console.log("Could not load captcha");
-    	}*/
-    	
-    	function captchaLoaded() {
-    		var imgData = $(".recaptcha_image_cell").html();
-    		console.log("Captcha image data : " + imgData);
-    		var challenge = Recaptcha.get_challenge('6LdlHOsSAAAAAM8ypy8W2KXvgMtY2dFsiQT3HVq-');
-    		if(challenge == undefined){
-    			$(".reg-cap-reload").trigger('click');
-    		}else{
-    			$("#prof-captcha-img").html(imgData);
-    		}
-    	}
-
-    	$(".reg-cap-reload").click(function() {
-    		console.log("Captcha reload button clicked");
-    		Recaptcha.reload();
-    		console.log("Initiated the click of hidden reload");
-    	});
-
-    	$(".reg-cap-sound").click(function() {
-    		if (captchaText == true) {
-    			console.log("Captcha sound button clicked");
-    			$("#recaptcha_switch_audio").click();
-    			console.log("Initiated the click of hidden sound");
-    			captchaText = false;
-    			$(this).addClass('reg-cap-text');
-    		} else {
-    			console.log("Captcha text button clicked");
-    			$("#recaptcha_switch_img").click();
-    			console.log("Initiated the click of hidden text");
-    			captchaText = true;
-    			$(this).removeClass('reg-cap-text');
-    		}
-    	});
-
-    	$(".reg-cap-info").click(function() {
-    		console.log("Info button clicked");
-    		$("#recaptcha_whatsthis").click();
-    	});
-    	
-    	// Contact us form validation functions
-    	function validateMessage(elementId) {
-    		if ($('#'+elementId).val() != "") {
-    			return true;
-	    	} else {
-	    		showErrorMobileAndWeb('Please enter your message!');
-	    		return false;
-	    	}
-    	}
-    	
-    	function validateName(elementId){
-    		if ($('#'+elementId).val() != "") {
-    			if (nameRegex.test($('#'+elementId).val()) == true) {
-    				return true;
-    			} else {
-    				showErrorMobileAndWeb('Please enter your valid name!');
-    				return false;
-    			}
-    		} else {
-    			showErrorMobileAndWeb('Please enter your valid name!');
-    			return false;
-    		}
-    	}
-    	
-    	function validateContactUsForm() {
-        	isContactUsFormValid = true;
-
-        	var isFocussed = false;
-        	var isSmallScreen = false;
-        	if($(window).width() < 768){
-        		isSmallScreen = true;
-        	}
-        	
-        	// Validate form input elements
-    		if (!validateName('lp-input-name')) {
-    			isContactUsFormValid = false;
-    			if (!isFocussed) {
-        			$('#lp-input-name').focus();
-        			isFocussed=true;
-        		}
-        		return isContactUsFormValid;
-    		}
-        	
-    		if (!validateEmailId('lp-input-email')) {
-    			isContactUsFormValid = false;
-    			if (!isFocussed) {
-        			$('#lp-input-email').focus();
-        			isFocussed=true;
-        		}
-        		return isContactUsFormValid;
-    		}
-    		
-    		if (!validateMessage('lp-input-message')) {
-    			isContactUsFormValid = false;
-    			if (!isFocussed) {
-        			$('#lp-input-message').focus();
-        			isFocussed=true;
-        		}
-        		return isContactUsFormValid;
-    		}
-    		
-    		if (!validateMessage('captcha-text')) {
-    			isContactUsFormValid = false;
-    			if (!isFocussed) {
-        			$('#captcha-text').focus();
-        			isFocussed=true;
-        		}
-        		return isContactUsFormValid;
-    		}
-    		
-        	return isContactUsFormValid;
-    	}    	
-		$("#prof-company-review-count").click(function(){
-			if(window.innerWidth < 768){
-				$('.icn-star-smile').click();					
-			}
-			$('html, body').animate({
-				scrollTop : $('#reviews-container').offset().top
-			},500);
-		});
-    });
-</script>
 </body>
 </html>

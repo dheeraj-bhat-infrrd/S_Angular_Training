@@ -54,7 +54,7 @@ public interface SocialManagementService {
 	
 	public List<OrganizationUnitSettings> getBranchAndRegionSettingsForUser(long userId);
 	
-	public boolean updateLinkedin(OrganizationUnitSettings agentSettings, String message) throws NonFatalException;
+	public boolean updateLinkedin(OrganizationUnitSettings agentSettings, String message, String linkedinProfileUrl, String linkedinMessageFeedback) throws NonFatalException;
 
 }
 // JIRA SS-34 BY RM02 BOC
