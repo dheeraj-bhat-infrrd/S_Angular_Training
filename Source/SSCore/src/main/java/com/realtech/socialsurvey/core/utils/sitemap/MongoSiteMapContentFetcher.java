@@ -94,7 +94,7 @@ public class MongoSiteMapContentFetcher implements SitemapContentFecher {
 		// check the collection name and generate location accordingly
 		LOG.debug("Generating location url for " + profileUrl + " for collection " + collectionName);
 		if (collectionName.equals(MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION)) {
-			return applicationUrl + "pages/company/" + profileUrl;
+			return applicationUrl + "pages/company" + profileUrl;
 		}
 		else if (collectionName.equals(MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION)
 				|| collectionName.equals(MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION)
