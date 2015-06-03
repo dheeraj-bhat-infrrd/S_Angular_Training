@@ -9,6 +9,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 import com.realtech.socialsurvey.core.entities.ProfileStage;
+import com.realtech.socialsurvey.core.enums.ProfileStages;
 
 /**
  * @author Kalmeshwar
@@ -31,6 +32,12 @@ public class ProfileCompletionList {
 		List<ProfileStage> profileStages = new ArrayList<ProfileStage>();
 		ProfileStage profileStage = null;
 
+		profileStage = new ProfileStage();
+		profileStage.setOrder(ProfileStages.LINKEDIN_PRF.getOrder());
+		profileStage.setProfileStageKey(ProfileStages.LINKEDIN_PRF.name());
+		profileStage.setStatus(CommonConstants.STATUS_ACTIVE);
+		profileStages.add(profileStage);
+		
 		profileStage = new ProfileStage();
 		profileStage.setOrder(ProfileStages.FACEBOOK_PRF.getOrder());
 		profileStage.setProfileStageKey(ProfileStages.FACEBOOK_PRF.name());
@@ -69,7 +76,7 @@ public class ProfileCompletionList {
 
 		List<ProfileStage> profilestages = new ArrayList<ProfileStage>();
 		for (ProfileStage profileStage : curProfileStages) {
-			if (profileStage.getStatus() == CommonConstants.STATUS_INACTIVE) {
+			if (profileStage.getStatus() == CommonConstants.STATUS_ACTIVE) {
 				LOG.info("Profile stage " + profileStage.getProfileStageKey() + " completed with status " + profileStage.getStatus());
 				profilestages.add(profileStage);
 			}

@@ -58,6 +58,7 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
 	public static final String KEY_COMPANY_POSITIONS = "positions";
 	public static final String KEY_IDENTIFIER = "iden";
 	public static final String KEY_VERTICAL = "vertical";
+	public static final String KEY_PROFILE_STAGES = "profileStages";
 
 	private static final Logger LOG = LoggerFactory.getLogger(MongoOrganizationUnitSettingDaoImpl.class);
 

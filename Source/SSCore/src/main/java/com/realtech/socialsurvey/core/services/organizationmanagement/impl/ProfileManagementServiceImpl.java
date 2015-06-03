@@ -47,6 +47,7 @@ import com.realtech.socialsurvey.core.entities.LinkedInToken;
 import com.realtech.socialsurvey.core.entities.LockSettings;
 import com.realtech.socialsurvey.core.entities.MailIdSettings;
 import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
+import com.realtech.socialsurvey.core.entities.ProfileStage;
 import com.realtech.socialsurvey.core.entities.Region;
 import com.realtech.socialsurvey.core.entities.SocialMediaTokens;
 import com.realtech.socialsurvey.core.entities.SocialPost;
@@ -1575,6 +1576,13 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 				agentSettings);
 		LOG.info("Updated company positions.");
 	}
+	
+	@Override
+	public void updateProfileStages(List<ProfileStage> profileStages, OrganizationUnitSettings settings, String collectionName){
+		LOG.info("Method to update profile stages started.");
+		organizationUnitSettingsDao.updateParticularKeyOrganizationUnitSettings(MongoOrganizationUnitSettingDaoImpl.KEY_PROFILE_STAGES, profileStages, settings, collectionName);
+		LOG.info("Method to update profile stages finished.");
+	}
 
 	private List<CompanyPositions> sortCompanyPositions(List<CompanyPositions> positions) {
 		LOG.debug("Sorting company positions");
@@ -1614,5 +1622,4 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 		}
 		return userIds;
 	}
-
 }

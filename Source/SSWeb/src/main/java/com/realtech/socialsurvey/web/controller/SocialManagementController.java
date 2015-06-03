@@ -40,6 +40,7 @@ import com.realtech.socialsurvey.core.entities.GoogleToken;
 import com.realtech.socialsurvey.core.entities.LinkedInToken;
 import com.realtech.socialsurvey.core.entities.LinkedinUserProfileResponse;
 import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
+import com.realtech.socialsurvey.core.entities.ProfileStage;
 import com.realtech.socialsurvey.core.entities.SocialMediaTokens;
 import com.realtech.socialsurvey.core.entities.TwitterToken;
 import com.realtech.socialsurvey.core.entities.User;
@@ -49,6 +50,7 @@ import com.realtech.socialsurvey.core.enums.AccountType;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.exception.NoRecordsFetchedException;
 import com.realtech.socialsurvey.core.exception.NonFatalException;
+import com.realtech.socialsurvey.core.services.organizationmanagement.ProfileManagementService;
 import com.realtech.socialsurvey.core.services.organizationmanagement.UserManagementService;
 import com.realtech.socialsurvey.core.services.social.SocialAsyncService;
 import com.realtech.socialsurvey.core.services.social.SocialManagementService;
@@ -77,6 +79,9 @@ public class SocialManagementController {
 
 	@Autowired
 	private UserManagementService userManagementService;
+	
+	@Autowired
+	private ProfileManagementService profileManagementService;
 
 	@Value("${APPLICATION_BASE_URL}")
 	private String applicationBaseUrl;
@@ -140,6 +145,14 @@ public class SocialManagementController {
 		String socialNetwork = request.getParameter("social");
 		String socialFlow = request.getParameter("flow");
 
+		String columnName = request.getParameter("columnName");
+		if(columnName != null){
+			String columnValue = request.getParameter("columnValue");
+			model.addAttribute("fromDashboard", 1);
+			session.setAttribute("columnName", columnName);
+			session.setAttribute("columnValue", columnValue);
+		}
+		
 		session.removeAttribute(CommonConstants.SOCIAL_FLOW);
 		switch (socialNetwork) {
 
@@ -234,6 +247,15 @@ public class SocialManagementController {
 		LOG.info("Facebook authentication url requested");
 		HttpSession session = request.getSession(false);
 		AccountType accountType = (AccountType) session.getAttribute(CommonConstants.ACCOUNT_TYPE_IN_SESSION);
+		if(session.getAttribute("columnName")!=null){
+			String columnName = (String) session.getAttribute("columnName");
+			String columnValue = (String) session.getAttribute("columnValue");
+			session.removeAttribute("columnName");
+			session.removeAttribute("columnValue");
+			model.addAttribute("columnName", columnName);
+			model.addAttribute("columnValue", columnValue);
+			model.addAttribute("fromDashboard", 1);
+		}
 
 		try {
 			UserSettings userSettings = (UserSettings) session.getAttribute(CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION);
@@ -281,6 +303,12 @@ public class SocialManagementController {
 				mediaTokens = socialManagementService.updateSocialMediaTokens(MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION,
 						companySettings, mediaTokens);
 				companySettings.setSocialMediaTokens(mediaTokens);
+				for(ProfileStage stage : companySettings.getProfileStages()){
+					if(stage.getProfileStageKey().equalsIgnoreCase("FACEBOOK_PRF")){
+						stage.setStatus(CommonConstants.STATUS_INACTIVE);
+					}
+				}
+				profileManagementService.updateProfileStages(companySettings.getProfileStages(), companySettings, MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION);
 				userSettings.setCompanySettings(companySettings);
 			}
 			else if (profilesMaster == CommonConstants.PROFILES_MASTER_REGION_ADMIN_PROFILE_ID) {
@@ -294,6 +322,12 @@ public class SocialManagementController {
 				mediaTokens = socialManagementService.updateSocialMediaTokens(MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION,
 						regionSettings, mediaTokens);
 				regionSettings.setSocialMediaTokens(mediaTokens);
+				for(ProfileStage stage : regionSettings.getProfileStages()){
+					if(stage.getProfileStageKey().equalsIgnoreCase("FACEBOOK_PRF")){
+						stage.setStatus(CommonConstants.STATUS_INACTIVE);
+					}
+				}
+				profileManagementService.updateProfileStages(regionSettings.getProfileStages(), regionSettings, MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION);
 				userSettings.getRegionSettings().put(regionId, regionSettings);
 			}
 			else if (profilesMaster == CommonConstants.PROFILES_MASTER_BRANCH_ADMIN_PROFILE_ID) {
@@ -307,6 +341,12 @@ public class SocialManagementController {
 				mediaTokens = socialManagementService.updateSocialMediaTokens(MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION,
 						branchSettings, mediaTokens);
 				branchSettings.setSocialMediaTokens(mediaTokens);
+				for(ProfileStage stage : branchSettings.getProfileStages()){
+					if(stage.getProfileStageKey().equalsIgnoreCase("FACEBOOK_PRF")){
+						stage.setStatus(CommonConstants.STATUS_INACTIVE);
+					}
+				}
+				profileManagementService.updateProfileStages(branchSettings.getProfileStages(), branchSettings, MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION);
 				userSettings.getBranchSettings().put(branchId, branchSettings);
 			}
 			if (profilesMaster == CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID) {
@@ -319,6 +359,12 @@ public class SocialManagementController {
 				mediaTokens = updateFacebookToken(accessToken, mediaTokens, profileLink);
 				mediaTokens = socialManagementService.updateAgentSocialMediaTokens(agentSettings, mediaTokens);
 				agentSettings.setSocialMediaTokens(mediaTokens);
+				for(ProfileStage stage : agentSettings.getProfileStages()){
+					if(stage.getProfileStageKey().equalsIgnoreCase("FACEBOOK_PRF")){
+						stage.setStatus(CommonConstants.STATUS_INACTIVE);
+					}
+				}
+				profileManagementService.updateProfileStages(agentSettings.getProfileStages(), agentSettings, MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION);
 				userSettings.setAgentSettings(agentSettings);
 			}
 			else {
@@ -377,7 +423,15 @@ public class SocialManagementController {
 		LOG.info("Twitter authentication url requested");
 		HttpSession session = request.getSession(false);
 		AccountType accountType = (AccountType) session.getAttribute(CommonConstants.ACCOUNT_TYPE_IN_SESSION);
-
+		if(session.getAttribute("columnName")!=null){
+			String columnName = (String) session.getAttribute("columnName");
+			String columnValue = (String) session.getAttribute("columnValue");
+			session.removeAttribute("columnName");
+			session.removeAttribute("columnValue");
+			model.addAttribute("columnName", columnName);
+			model.addAttribute("columnValue", columnValue);
+			model.addAttribute("fromDashboard", 1);
+		}
 		try {
 			UserSettings userSettings = (UserSettings) session.getAttribute(CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION);
 			UserProfile selectedProfile = (UserProfile) session.getAttribute(CommonConstants.USER_PROFILE);
@@ -432,6 +486,12 @@ public class SocialManagementController {
 				mediaTokens = socialManagementService.updateSocialMediaTokens(MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION,
 						companySettings, mediaTokens);
 				companySettings.setSocialMediaTokens(mediaTokens);
+				for(ProfileStage stage : companySettings.getProfileStages()){
+					if(stage.getProfileStageKey().equalsIgnoreCase("TWITTER_PRF")){
+						stage.setStatus(CommonConstants.STATUS_INACTIVE);
+					}
+				}
+				profileManagementService.updateProfileStages(companySettings.getProfileStages(), companySettings, MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION);
 				userSettings.setCompanySettings(companySettings);
 			}
 			else if (profilesMaster == CommonConstants.PROFILES_MASTER_REGION_ADMIN_PROFILE_ID) {
@@ -445,6 +505,12 @@ public class SocialManagementController {
 				mediaTokens = socialManagementService.updateSocialMediaTokens(MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION,
 						regionSettings, mediaTokens);
 				regionSettings.setSocialMediaTokens(mediaTokens);
+				for(ProfileStage stage : regionSettings.getProfileStages()){
+					if(stage.getProfileStageKey().equalsIgnoreCase("TWITTER_PRF")){
+						stage.setStatus(CommonConstants.STATUS_INACTIVE);
+					}
+				}
+				profileManagementService.updateProfileStages(regionSettings.getProfileStages(), regionSettings, MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION);
 				userSettings.getRegionSettings().put(regionId, regionSettings);
 			}
 			else if (profilesMaster == CommonConstants.PROFILES_MASTER_BRANCH_ADMIN_PROFILE_ID) {
@@ -458,6 +524,12 @@ public class SocialManagementController {
 				mediaTokens = socialManagementService.updateSocialMediaTokens(MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION,
 						branchSettings, mediaTokens);
 				branchSettings.setSocialMediaTokens(mediaTokens);
+				for(ProfileStage stage : branchSettings.getProfileStages()){
+					if(stage.getProfileStageKey().equalsIgnoreCase("TWITTER_PRF")){
+						stage.setStatus(CommonConstants.STATUS_INACTIVE);
+					}
+				}
+				profileManagementService.updateProfileStages(branchSettings.getProfileStages(), branchSettings, MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION);
 				userSettings.getBranchSettings().put(branchId, branchSettings);
 			}
 			if (profilesMaster == CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID) {
@@ -470,6 +542,12 @@ public class SocialManagementController {
 				mediaTokens = updateTwitterToken(accessToken, mediaTokens, profileLink);
 				mediaTokens = socialManagementService.updateAgentSocialMediaTokens(agentSettings, mediaTokens);
 				agentSettings.setSocialMediaTokens(mediaTokens);
+				for(ProfileStage stage : agentSettings.getProfileStages()){
+					if(stage.getProfileStageKey().equalsIgnoreCase("TWITTER_PRF")){
+						stage.setStatus(CommonConstants.STATUS_INACTIVE);
+					}
+				}
+				profileManagementService.updateProfileStages(agentSettings.getProfileStages(), agentSettings, MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION);
 				userSettings.setAgentSettings(agentSettings);
 			}
 			else {
@@ -528,7 +606,15 @@ public class SocialManagementController {
 		LOG.info("Method authenticateLinkedInAccess() called from SocialManagementController");
 		HttpSession session = request.getSession(false);
 		AccountType accountType = (AccountType) session.getAttribute(CommonConstants.ACCOUNT_TYPE_IN_SESSION);
-
+		if(session.getAttribute("columnName")!=null){
+			String columnName = (String) session.getAttribute("columnName");
+			String columnValue = (String) session.getAttribute("columnValue");
+			session.removeAttribute("columnName");
+			session.removeAttribute("columnValue");
+			model.addAttribute("columnName", columnName);
+			model.addAttribute("columnValue", columnValue);
+			model.addAttribute("fromDashboard", 1);
+		}
 		try {
 			UserSettings userSettings = (UserSettings) session.getAttribute(CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION);
 			UserProfile selectedProfile = (UserProfile) session.getAttribute(CommonConstants.USER_PROFILE);
@@ -582,6 +668,12 @@ public class SocialManagementController {
 				mediaTokens = socialManagementService.updateSocialMediaTokens(MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION,
 						companySettings, mediaTokens);
 				companySettings.setSocialMediaTokens(mediaTokens);
+				for(ProfileStage stage : companySettings.getProfileStages()){
+					if(stage.getProfileStageKey().equalsIgnoreCase("LINKEDIN_PRF")){
+						stage.setStatus(CommonConstants.STATUS_INACTIVE);
+					}
+				}
+				profileManagementService.updateProfileStages(companySettings.getProfileStages(), companySettings, MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION);
 				userSettings.setCompanySettings(companySettings);
 			}
 			else if (profilesMaster == CommonConstants.PROFILES_MASTER_REGION_ADMIN_PROFILE_ID) {
@@ -595,6 +687,12 @@ public class SocialManagementController {
 				mediaTokens = socialManagementService.updateSocialMediaTokens(MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION,
 						regionSettings, mediaTokens);
 				regionSettings.setSocialMediaTokens(mediaTokens);
+				for(ProfileStage stage : regionSettings.getProfileStages()){
+					if(stage.getProfileStageKey().equalsIgnoreCase("LINKEDIN_PRF")){
+						stage.setStatus(CommonConstants.STATUS_INACTIVE);
+					}
+				}
+				profileManagementService.updateProfileStages(regionSettings.getProfileStages(), regionSettings, MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION);
 				userSettings.getRegionSettings().put(regionId, regionSettings);
 			}
 			else if (profilesMaster == CommonConstants.PROFILES_MASTER_BRANCH_ADMIN_PROFILE_ID) {
@@ -608,6 +706,12 @@ public class SocialManagementController {
 				mediaTokens = socialManagementService.updateSocialMediaTokens(MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION,
 						branchSettings, mediaTokens);
 				branchSettings.setSocialMediaTokens(mediaTokens);
+				for(ProfileStage stage : branchSettings.getProfileStages()){
+					if(stage.getProfileStageKey().equalsIgnoreCase("LINKEDIN_PRF")){
+						stage.setStatus(CommonConstants.STATUS_INACTIVE);
+					}
+				}
+				profileManagementService.updateProfileStages(branchSettings.getProfileStages(), branchSettings, MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION);
 				userSettings.getBranchSettings().put(branchId, branchSettings);
 			}
 			if (profilesMaster == CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID) {
@@ -632,7 +736,12 @@ public class SocialManagementController {
 					socialAsyncService.linkedInDataUpdateAsync(MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION, agentSettings,
 							mediaTokens.getLinkedInToken());
 				}
-
+				for(ProfileStage stage : agentSettings.getProfileStages()){
+					if(stage.getProfileStageKey().equalsIgnoreCase("LINKEDIN_PRF")){
+						stage.setStatus(CommonConstants.STATUS_INACTIVE);
+					}
+				}
+				profileManagementService.updateProfileStages(agentSettings.getProfileStages(), agentSettings, MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION);
 				userSettings.setAgentSettings(agentSettings);
 			}
 			else {
@@ -689,6 +798,15 @@ public class SocialManagementController {
 		LOG.info("Method authenticateGoogleAccess() called from SocialManagementController");
 		HttpSession session = request.getSession(false);
 		AccountType accountType = (AccountType) session.getAttribute(CommonConstants.ACCOUNT_TYPE_IN_SESSION);
+		if(session.getAttribute("columnName")!=null){
+			String columnName = (String) session.getAttribute("columnName");
+			String columnValue = (String) session.getAttribute("columnValue");
+			session.removeAttribute("columnName");
+			session.removeAttribute("columnValue");
+			model.addAttribute("columnName", columnName);
+			model.addAttribute("columnValue", columnValue);
+			model.addAttribute("fromDashboard", 1);
+		}
 		try {
 			UserSettings userSettings = (UserSettings) session.getAttribute(CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION);
 			UserProfile selectedProfile = (UserProfile) session.getAttribute(CommonConstants.USER_PROFILE);
@@ -750,6 +868,12 @@ public class SocialManagementController {
 				mediaTokens = socialManagementService.updateSocialMediaTokens(MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION,
 						companySettings, mediaTokens);
 				companySettings.setSocialMediaTokens(mediaTokens);
+				for(ProfileStage stage : companySettings.getProfileStages()){
+					if(stage.getProfileStageKey().equalsIgnoreCase("GOOGLE_PRF")){
+						stage.setStatus(CommonConstants.STATUS_INACTIVE);
+					}
+				}
+				profileManagementService.updateProfileStages(companySettings.getProfileStages(), companySettings, MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION);
 				userSettings.setCompanySettings(companySettings);
 			}
 			else if (profilesMaster == CommonConstants.PROFILES_MASTER_REGION_ADMIN_PROFILE_ID) {
@@ -763,6 +887,12 @@ public class SocialManagementController {
 				mediaTokens = socialManagementService.updateSocialMediaTokens(MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION,
 						regionSettings, mediaTokens);
 				regionSettings.setSocialMediaTokens(mediaTokens);
+				for(ProfileStage stage : regionSettings.getProfileStages()){
+					if(stage.getProfileStageKey().equalsIgnoreCase("GOOGLE_PRF")){
+						stage.setStatus(CommonConstants.STATUS_INACTIVE);
+					}
+				}
+				profileManagementService.updateProfileStages(regionSettings.getProfileStages(), regionSettings, MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION);
 				userSettings.getRegionSettings().put(regionId, regionSettings);
 			}
 			else if (profilesMaster == CommonConstants.PROFILES_MASTER_BRANCH_ADMIN_PROFILE_ID) {
@@ -776,6 +906,12 @@ public class SocialManagementController {
 				mediaTokens = socialManagementService.updateSocialMediaTokens(MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION,
 						branchSettings, mediaTokens);
 				branchSettings.setSocialMediaTokens(mediaTokens);
+				for(ProfileStage stage : branchSettings.getProfileStages()){
+					if(stage.getProfileStageKey().equalsIgnoreCase("GOOGLE_PRF")){
+						stage.setStatus(CommonConstants.STATUS_INACTIVE);
+					}
+				}
+				profileManagementService.updateProfileStages(branchSettings.getProfileStages(), branchSettings, MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION);
 				userSettings.getBranchSettings().put(branchId, branchSettings);
 			}
 			if (profilesMaster == CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID) {
@@ -788,6 +924,12 @@ public class SocialManagementController {
 				mediaTokens = updateGoogleToken(accessToken, refreshToken, mediaTokens, profileLink);
 				mediaTokens = socialManagementService.updateAgentSocialMediaTokens(agentSettings, mediaTokens);
 				agentSettings.setSocialMediaTokens(mediaTokens);
+				for(ProfileStage stage : agentSettings.getProfileStages()){
+					if(stage.getProfileStageKey().equalsIgnoreCase("GOOGLE_PRF")){
+						stage.setStatus(CommonConstants.STATUS_INACTIVE);
+					}
+				}
+				profileManagementService.updateProfileStages(agentSettings.getProfileStages(), agentSettings, MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION);
 				userSettings.setAgentSettings(agentSettings);
 			}
 			else {
