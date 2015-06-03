@@ -12,21 +12,17 @@ import com.realtech.socialsurvey.core.entities.ProfileStage;
 import com.realtech.socialsurvey.core.enums.ProfileStages;
 
 /**
- * @author Kalmeshwar
- * 
- * Class contains methods which processes profile stages.
- *
+ * @author Kalmeshwar Class contains methods which processes profile stages.
  */
 @Component
 public class ProfileCompletionList {
 
-
 	private static final Logger LOG = LoggerFactory.getLogger(ProfileCompletionList.class);
-	
+
 	/**
 	 * @return Method returns default profile stages.
 	 */
-	public List<ProfileStage> getDefaultProfileCompletionList() {
+	public List<ProfileStage> getDefaultProfileCompletionList(boolean isAgent) {
 		LOG.info("Method getDefaultProfileCompletionList started");
 
 		List<ProfileStage> profileStages = new ArrayList<ProfileStage>();
@@ -37,7 +33,7 @@ public class ProfileCompletionList {
 		profileStage.setProfileStageKey(ProfileStages.LINKEDIN_PRF.name());
 		profileStage.setStatus(CommonConstants.STATUS_ACTIVE);
 		profileStages.add(profileStage);
-		
+
 		profileStage = new ProfileStage();
 		profileStage.setOrder(ProfileStages.FACEBOOK_PRF.getOrder());
 		profileStage.setProfileStageKey(ProfileStages.FACEBOOK_PRF.name());
@@ -61,6 +57,26 @@ public class ProfileCompletionList {
 		profileStage.setProfileStageKey(ProfileStages.YELP_PRF.name());
 		profileStage.setStatus(CommonConstants.STATUS_ACTIVE);
 		profileStages.add(profileStage);
+
+		if (isAgent) {
+			profileStage = new ProfileStage();
+			profileStage.setOrder(ProfileStages.LICENSE_PRF.getOrder());
+			profileStage.setProfileStageKey(ProfileStages.LICENSE_PRF.name());
+			profileStage.setStatus(CommonConstants.STATUS_ACTIVE);
+			profileStages.add(profileStage);
+
+			profileStage = new ProfileStage();
+			profileStage.setOrder(ProfileStages.HOBBIES_PRF.getOrder());
+			profileStage.setProfileStageKey(ProfileStages.HOBBIES_PRF.name());
+			profileStage.setStatus(CommonConstants.STATUS_ACTIVE);
+			profileStages.add(profileStage);
+
+			profileStage = new ProfileStage();
+			profileStage.setOrder(ProfileStages.ACHIEVEMENTS_PRF.getOrder());
+			profileStage.setProfileStageKey(ProfileStages.ACHIEVEMENTS_PRF.name());
+			profileStage.setStatus(CommonConstants.STATUS_ACTIVE);
+			profileStages.add(profileStage);
+		}
 		LOG.info("Method getDefaultProfileCompletionList ended");
 
 		return profileStages;

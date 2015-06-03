@@ -287,7 +287,7 @@ public class SocialManagementController {
 			catch (FacebookException e) {
 				LOG.error("Error while creating access token for facebook: " + e.getLocalizedMessage(), e);
 			}
-
+			boolean updated = false;
 			// Storing token
 			SocialMediaTokens mediaTokens;
 			int accountMasterId = accountType.getValue();
@@ -310,6 +310,7 @@ public class SocialManagementController {
 				}
 				profileManagementService.updateProfileStages(companySettings.getProfileStages(), companySettings, MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION);
 				userSettings.setCompanySettings(companySettings);
+				updated = true;
 			}
 			else if (profilesMaster == CommonConstants.PROFILES_MASTER_REGION_ADMIN_PROFILE_ID) {
 				long regionId = selectedProfile.getRegionId();
@@ -329,6 +330,7 @@ public class SocialManagementController {
 				}
 				profileManagementService.updateProfileStages(regionSettings.getProfileStages(), regionSettings, MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION);
 				userSettings.getRegionSettings().put(regionId, regionSettings);
+				updated = true;
 			}
 			else if (profilesMaster == CommonConstants.PROFILES_MASTER_BRANCH_ADMIN_PROFILE_ID) {
 				long branchId = selectedProfile.getBranchId();
@@ -348,6 +350,7 @@ public class SocialManagementController {
 				}
 				profileManagementService.updateProfileStages(branchSettings.getProfileStages(), branchSettings, MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION);
 				userSettings.getBranchSettings().put(branchId, branchSettings);
+				updated = true;
 			}
 			if (profilesMaster == CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID) {
 				AgentSettings agentSettings = userSettings.getAgentSettings();
@@ -366,8 +369,9 @@ public class SocialManagementController {
 				}
 				profileManagementService.updateProfileStages(agentSettings.getProfileStages(), agentSettings, MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION);
 				userSettings.setAgentSettings(agentSettings);
+				updated = true;
 			}
-			else {
+			if (!updated) {
 				throw new InvalidInputException("Invalid input exception occurred while creating access token for facebook",
 						DisplayMessageConstants.GENERAL_ERROR);
 			}
@@ -470,7 +474,7 @@ public class SocialManagementController {
 				
 				throw new NonFatalException("Unable to procure twitter access token");
 			}
-
+			boolean updated = false;
 			// Storing token
 			SocialMediaTokens mediaTokens;
 			int accountMasterId = accountType.getValue();
@@ -493,6 +497,7 @@ public class SocialManagementController {
 				}
 				profileManagementService.updateProfileStages(companySettings.getProfileStages(), companySettings, MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION);
 				userSettings.setCompanySettings(companySettings);
+				updated = true;
 			}
 			else if (profilesMaster == CommonConstants.PROFILES_MASTER_REGION_ADMIN_PROFILE_ID) {
 				long regionId = selectedProfile.getRegionId();
@@ -512,6 +517,7 @@ public class SocialManagementController {
 				}
 				profileManagementService.updateProfileStages(regionSettings.getProfileStages(), regionSettings, MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION);
 				userSettings.getRegionSettings().put(regionId, regionSettings);
+				updated = true;
 			}
 			else if (profilesMaster == CommonConstants.PROFILES_MASTER_BRANCH_ADMIN_PROFILE_ID) {
 				long branchId = selectedProfile.getBranchId();
@@ -531,6 +537,7 @@ public class SocialManagementController {
 				}
 				profileManagementService.updateProfileStages(branchSettings.getProfileStages(), branchSettings, MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION);
 				userSettings.getBranchSettings().put(branchId, branchSettings);
+				updated = true;
 			}
 			if (profilesMaster == CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID) {
 				AgentSettings agentSettings = userSettings.getAgentSettings();
@@ -549,8 +556,9 @@ public class SocialManagementController {
 				}
 				profileManagementService.updateProfileStages(agentSettings.getProfileStages(), agentSettings, MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION);
 				userSettings.setAgentSettings(agentSettings);
+				updated = true;
 			}
-			else {
+			if(!updated) {
 				throw new InvalidInputException("Invalid input exception occurred while creating access token for twitter",
 						DisplayMessageConstants.GENERAL_ERROR);
 			}
@@ -657,6 +665,7 @@ public class SocialManagementController {
 			SocialMediaTokens mediaTokens;
 			int accountMasterId = accountType.getValue();
 			int profilesMaster = selectedProfile.getProfilesMaster().getProfileId();
+			boolean updated = false;
 			if (profilesMaster == CommonConstants.PROFILES_MASTER_COMPANY_ADMIN_PROFILE_ID
 					|| accountMasterId == CommonConstants.ACCOUNTS_MASTER_INDIVIDUAL) {
 				OrganizationUnitSettings companySettings = userSettings.getCompanySettings();
@@ -675,6 +684,7 @@ public class SocialManagementController {
 				}
 				profileManagementService.updateProfileStages(companySettings.getProfileStages(), companySettings, MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION);
 				userSettings.setCompanySettings(companySettings);
+				updated = true;
 			}
 			else if (profilesMaster == CommonConstants.PROFILES_MASTER_REGION_ADMIN_PROFILE_ID) {
 				long regionId = selectedProfile.getRegionId();
@@ -694,6 +704,7 @@ public class SocialManagementController {
 				}
 				profileManagementService.updateProfileStages(regionSettings.getProfileStages(), regionSettings, MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION);
 				userSettings.getRegionSettings().put(regionId, regionSettings);
+				updated = true;
 			}
 			else if (profilesMaster == CommonConstants.PROFILES_MASTER_BRANCH_ADMIN_PROFILE_ID) {
 				long branchId = selectedProfile.getBranchId();
@@ -713,6 +724,7 @@ public class SocialManagementController {
 				}
 				profileManagementService.updateProfileStages(branchSettings.getProfileStages(), branchSettings, MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION);
 				userSettings.getBranchSettings().put(branchId, branchSettings);
+				updated = true;
 			}
 			if (profilesMaster == CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID) {
 				AgentSettings agentSettings = userSettings.getAgentSettings();
@@ -743,8 +755,9 @@ public class SocialManagementController {
 				}
 				profileManagementService.updateProfileStages(agentSettings.getProfileStages(), agentSettings, MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION);
 				userSettings.setAgentSettings(agentSettings);
+				updated = true;
 			}
-			else {
+			if(!updated) {
 				throw new InvalidInputException("Invalid input exception occurred while creating access token for linkedin",
 						DisplayMessageConstants.GENERAL_ERROR);
 			}
@@ -852,7 +865,7 @@ public class SocialManagementController {
 			if (profileData != null) {
 				profileLink = profileData.get("link").toString();
 			}
-			
+			boolean updated = false;
 			// Storing access token
 			SocialMediaTokens mediaTokens;
 			int accountMasterId = accountType.getValue();
@@ -875,6 +888,7 @@ public class SocialManagementController {
 				}
 				profileManagementService.updateProfileStages(companySettings.getProfileStages(), companySettings, MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION);
 				userSettings.setCompanySettings(companySettings);
+				updated = true;
 			}
 			else if (profilesMaster == CommonConstants.PROFILES_MASTER_REGION_ADMIN_PROFILE_ID) {
 				long regionId = selectedProfile.getRegionId();
@@ -894,6 +908,7 @@ public class SocialManagementController {
 				}
 				profileManagementService.updateProfileStages(regionSettings.getProfileStages(), regionSettings, MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION);
 				userSettings.getRegionSettings().put(regionId, regionSettings);
+				updated = true;
 			}
 			else if (profilesMaster == CommonConstants.PROFILES_MASTER_BRANCH_ADMIN_PROFILE_ID) {
 				long branchId = selectedProfile.getBranchId();
@@ -913,6 +928,7 @@ public class SocialManagementController {
 				}
 				profileManagementService.updateProfileStages(branchSettings.getProfileStages(), branchSettings, MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION);
 				userSettings.getBranchSettings().put(branchId, branchSettings);
+				updated = true;
 			}
 			if (profilesMaster == CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID) {
 				AgentSettings agentSettings = userSettings.getAgentSettings();
@@ -931,8 +947,9 @@ public class SocialManagementController {
 				}
 				profileManagementService.updateProfileStages(agentSettings.getProfileStages(), agentSettings, MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION);
 				userSettings.setAgentSettings(agentSettings);
+				updated = true;
 			}
-			else {
+			if(!updated) {
 				throw new InvalidInputException("Invalid input exception occurred while creating access token for google",
 						DisplayMessageConstants.GENERAL_ERROR);
 			}
