@@ -1047,19 +1047,19 @@ public class DashboardController {
 		if (userSettings != null) {
 			if (columnName.equalsIgnoreCase(CommonConstants.COMPANY_ID_COLUMN)) {
 				if (userSettings.getCompanySettings() != null)
-					stages = userSettings.getCompanySettings().getProfileStages();
+					stages = new ArrayList<>(userSettings.getCompanySettings().getProfileStages());
 			}
 			else if (columnName.equalsIgnoreCase(CommonConstants.REGION_ID_COLUMN)) {
 				if (userSettings.getRegionSettings() != null)
-					stages = userSettings.getRegionSettings().get(columnValue).getProfileStages();
+					stages = new ArrayList<>(userSettings.getRegionSettings().get(columnValue).getProfileStages());
 			}
 			else if (columnName.equalsIgnoreCase(CommonConstants.BRANCH_ID_COLUMN)) {
 				if (userSettings.getBranchSettings() != null)
-					stages = userSettings.getBranchSettings().get(columnValue).getProfileStages();
+					stages = new ArrayList<>(userSettings.getBranchSettings().get(columnValue).getProfileStages());
 			}
 			else if (columnName.equalsIgnoreCase(CommonConstants.AGENT_ID_COLUMN)) {
 				if (userSettings.getAgentSettings() != null)
-					stages = userSettings.getAgentSettings().getProfileStages();
+					stages = new ArrayList<>(userSettings.getAgentSettings().getProfileStages());
 			}
 		}
 		Collections.sort(stages);
