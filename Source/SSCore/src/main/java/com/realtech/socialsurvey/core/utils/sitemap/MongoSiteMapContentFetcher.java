@@ -1,5 +1,7 @@
 package com.realtech.socialsurvey.core.utils.sitemap;
 
+import java.sql.Timestamp;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 import org.slf4j.Logger;
@@ -19,6 +21,8 @@ import com.realtech.socialsurvey.core.entities.SiteMapEntry;
 public class MongoSiteMapContentFetcher implements SitemapContentFecher {
 
 	private static final Logger LOG = LoggerFactory.getLogger(MongoSiteMapContentFetcher.class);
+	
+	private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd");
 
 	private String collectionName;
 	private String interval;
@@ -115,6 +119,7 @@ public class MongoSiteMapContentFetcher implements SitemapContentFecher {
 			entry = new SiteMapEntry();
 			// generate location
 			entry.setLocation(generateLocation(profileUrl.getProfileUrl()));
+			entry.setLastModifiedDate(DATE_FORMAT.format(new Timestamp(profileUrl.getModifiedOn())));
 			entries.add(entry);
 		}
 		return entries;
