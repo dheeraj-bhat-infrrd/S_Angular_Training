@@ -18,7 +18,6 @@
     <link rel="stylesheet" href="${initParam.resourcesPath}/resources/css/rangeslider.css">
     <link rel="stylesheet" href="${initParam.resourcesPath}/resources/css/style-common-1.1.css">
     <link rel="stylesheet" href="${initParam.resourcesPath}/resources/css/style-resp-1.1.css">
-    <script src='//www.google.com/recaptcha/api.js'></script>
     <c:if test="${not empty profile}">
     	<c:if test="${not empty profile.contact_details && not empty profile.contact_details.name }">
     		<c:set var="profName" value="${profile.contact_details.name }"></c:set>
@@ -282,6 +281,67 @@
                   		 	<c:when test="${not empty agentProfileName}">
                   		 		<div id="individual-details">
                   		 			<!-- individual details like associations/hobbies/achievements come here -->
+                  		 			<c:if test="${not empty profile.licenses && not empty profile.licenses.authorized_in }">
+                  		 					<div class="prof-left-row prof-left-auth bord-bot-dc">
+                  		 						<div class="left-auth-wrapper">
+                  		 							<div class="left-panel-header lph-dd lph-dd-closed">Licenses</div>
+                  		 							<div class="left-panel-content">
+	                  		 							<c:forEach items="${profile.licenses.authorized_in }" var="licenseItem">
+	                  		 								<div class="lp-auth-row lp-row clearfix">${licenseItem}</div>
+	                  		 							</c:forEach>
+                  		 							</div>
+                  		 						</div>
+                  		 					</div>
+                  		 			</c:if>
+                  		 			<!-- TODO:add positions -->
+                  		 			<c:if test="${not empty profile.associations }">
+               		 					<div class="prof-left-row prof-left-auth bord-bot-dc">
+               		 						<div class="left-auth-wrapper">
+               		 							<div class="left-panel-header lph-dd lph-dd-closed">Memberships</div>
+               		 							<div class="left-panel-content">
+                		 							<c:forEach items="${profile.associations }" var="associationItem">
+                		 								<div class="lp-auth-row lp-row clearfix">${associationItem.name}</div>
+                		 							</c:forEach>
+               		 							</div>
+               		 						</div>
+               		 					</div>
+                  		 			</c:if>
+                  		 			<c:if test="${not empty profile.expertise }">
+               		 					<div class="prof-left-row prof-left-auth bord-bot-dc">
+               		 						<div class="left-auth-wrapper">
+               		 							<div class="left-panel-header lph-dd lph-dd-closed">Specialities</div>
+               		 							<div class="left-panel-content">
+                		 							<c:forEach items="${profile.expertise }" var="expertiseItem">
+                		 								<div class="lp-auth-row lp-row clearfix">${expertiseItem}</div>
+                		 							</c:forEach>
+               		 							</div>
+               		 						</div>
+               		 					</div>
+                  		 			</c:if>
+                  		 			<c:if test="${not empty profile.achievements }">
+               		 					<div class="prof-left-row prof-left-auth bord-bot-dc">
+               		 						<div class="left-auth-wrapper">
+               		 							<div class="left-panel-header lph-dd lph-dd-closed">Achievements</div>
+               		 							<div class="left-panel-content">
+                		 							<c:forEach items="${profile.achievements }" var="achievementItem">
+                		 								<div class="lp-auth-row lp-row clearfix">${achievementItem.achievement}</div>
+                		 							</c:forEach>
+               		 							</div>
+               		 						</div>
+               		 					</div>
+                  		 			</c:if>
+                  		 			<c:if test="${not empty profile.hobbies }">
+               		 					<div class="prof-left-row prof-left-auth bord-bot-dc">
+               		 						<div class="left-auth-wrapper">
+               		 							<div class="left-panel-header lph-dd lph-dd-closed">Hobbies</div>
+               		 							<div class="left-panel-content">
+                		 							<c:forEach items="${profile.hobbies }" var="hobbyItem">
+                		 								<div class="lp-auth-row lp-row clearfix">${hobbyItem}</div>
+                		 							</c:forEach>
+               		 							</div>
+               		 						</div>
+               		 					</div>
+                  		 			</c:if>
                   		 		</div>
                   		 	</c:when>
                   		 	<c:when test="${not empty companyProfileName}">
