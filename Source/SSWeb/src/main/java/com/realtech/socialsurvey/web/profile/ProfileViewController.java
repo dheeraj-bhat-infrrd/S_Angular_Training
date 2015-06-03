@@ -506,8 +506,10 @@ public class ProfileViewController implements InitializingBean{
 		String userAgent = request.getHeader("User-Agent");
 		LOG.debug("User header found : "+userAgent);
 		if(userAgent != null && listBots.contains(userAgent.trim())){
+			LOG.debug("Found a crawler: "+userAgent);
 			return true;
 		}else{
+			LOG.debug("Not a crawler: "+userAgent);
 			return false;
 		}
 	}
