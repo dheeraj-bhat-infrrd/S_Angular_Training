@@ -541,4 +541,8 @@ public interface CommonConstants {
 	public static final String CUSTOMER_NAME_MARKER = "CUSTOMERNAME^^";
 	public static final String CUSTOMER_RATING_MARKER = "CUSTOMERRATING^^";
 	public static final String AGENTEMAIL_MARKER = "AGENTEMAIL^^";
+	
+	//Constants for user agent profile page
+	public static final int USER_AGENT_NUMBER_REVIEWS = 100;
+	public static final int USER_AGENT_NUMBER_POST = 100;
 }

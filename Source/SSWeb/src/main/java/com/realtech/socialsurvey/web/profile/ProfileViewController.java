@@ -116,7 +116,7 @@ public class ProfileViewController implements InitializingBean{
 			model.addAttribute("reviewsCount",reviewsCount);
 			if(isBotRequest){
 				//TODO:remove hardcoding of start,end,minScore etc
-				List<SurveyDetails> reviews = profileManagementService.getReviews(companyId, -1, -1, -1, -1,
+				List<SurveyDetails> reviews = profileManagementService.getReviews(companyId, -1, -1, -1, CommonConstants.USER_AGENT_NUMBER_REVIEWS,
 					CommonConstants.PROFILE_LEVEL_COMPANY, false, null, null, CommonConstants.REVIEWS_SORT_CRITERIA_FEATURE);
 				model.addAttribute("reviews", reviews);
 				
@@ -130,7 +130,7 @@ public class ProfileViewController implements InitializingBean{
 				selectedProfile.setProfilesMaster(profilesMaster);
 				selectedProfile.setCompany(company);
 				
-				List<SocialPost> posts = profileManagementService.getSocialPosts(selectedProfile, -1, -1);
+				List<SocialPost> posts = profileManagementService.getSocialPosts(selectedProfile, -1, CommonConstants.USER_AGENT_NUMBER_POST);
 				model.addAttribute("posts", posts);
 			}
 		}
@@ -192,7 +192,7 @@ public class ProfileViewController implements InitializingBean{
 			model.addAttribute("reviewsCount",reviewsCount);
 			if(isBotRequest){
 				//TODO:remove hardcoding of start,end,minScore etc
-				List<SurveyDetails> reviews = profileManagementService.getReviews(regionId, -1, -1, -1, -1,
+				List<SurveyDetails> reviews = profileManagementService.getReviews(regionId, -1, -1, -1, CommonConstants.USER_AGENT_NUMBER_REVIEWS,
 					CommonConstants.PROFILE_LEVEL_REGION, false, null, null, CommonConstants.REVIEWS_SORT_CRITERIA_FEATURE);
 				model.addAttribute("reviews", reviews);
 				
@@ -202,7 +202,7 @@ public class ProfileViewController implements InitializingBean{
 				
 				selectedProfile.setProfilesMaster(profilesMaster);
 				selectedProfile.setRegionId(regionProfile.getIden());
-				List<SocialPost> posts = profileManagementService.getSocialPosts(selectedProfile, -1, -1);
+				List<SocialPost> posts = profileManagementService.getSocialPosts(selectedProfile, -1, CommonConstants.USER_AGENT_NUMBER_POST);
 				model.addAttribute("posts", posts);
 			}
 		}
@@ -264,7 +264,7 @@ public class ProfileViewController implements InitializingBean{
 			model.addAttribute("reviewsCount",reviewsCount);
 			if(isBotRequest){
 				//TODO:remove hardcoding of start,end,minScore etc
-				List<SurveyDetails> reviews = profileManagementService.getReviews(branchId, -1, -1, -1, -1,
+				List<SurveyDetails> reviews = profileManagementService.getReviews(branchId, -1, -1, -1, CommonConstants.USER_AGENT_NUMBER_REVIEWS,
 					CommonConstants.PROFILE_LEVEL_BRANCH, false, null, null, CommonConstants.REVIEWS_SORT_CRITERIA_FEATURE);
 				model.addAttribute("reviews", reviews);
 				
@@ -274,7 +274,7 @@ public class ProfileViewController implements InitializingBean{
 				
 				selectedProfile.setProfilesMaster(profilesMaster);
 				selectedProfile.setBranchId(branchProfile.getIden());
-				List<SocialPost> posts = profileManagementService.getSocialPosts(selectedProfile, -1, -1);
+				List<SocialPost> posts = profileManagementService.getSocialPosts(selectedProfile, -1, CommonConstants.USER_AGENT_NUMBER_POST);
 				model.addAttribute("posts", posts);
 			}
 		}
@@ -361,7 +361,7 @@ public class ProfileViewController implements InitializingBean{
 				
 				if(isBotRequest){
 					//TODO:remove hardcoding of start,end,minScore etc
-					List<SurveyDetails> reviews = profileManagementService.getReviews(agentId, -1, -1, -1, -1,
+					List<SurveyDetails> reviews = profileManagementService.getReviews(agentId, -1, -1, -1, CommonConstants.USER_AGENT_NUMBER_REVIEWS,
 						CommonConstants.PROFILE_LEVEL_INDIVIDUAL, false, null, null, CommonConstants.REVIEWS_SORT_CRITERIA_FEATURE);
 					model.addAttribute("reviews", reviews);
 					
@@ -371,7 +371,7 @@ public class ProfileViewController implements InitializingBean{
 					
 					selectedProfile.setProfilesMaster(profilesMaster);
 					selectedProfile.setAgentId(individualProfile.getIden());
-					List<SocialPost> posts = profileManagementService.getSocialPosts(selectedProfile, -1, -1);
+					List<SocialPost> posts = profileManagementService.getSocialPosts(selectedProfile, -1, CommonConstants.USER_AGENT_NUMBER_POST);
 					model.addAttribute("posts", posts);
 				}
 				SolrDocument solrDocument;
