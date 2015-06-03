@@ -59,6 +59,7 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
 	public static final String KEY_IDENTIFIER = "iden";
 	public static final String KEY_VERTICAL = "vertical";
 	public static final String KEY_PROFILE_STAGES = "profileStages";
+	public static final String KEY_MODIFIED_ON = "modifiedOn";
 
 	private static final Logger LOG = LoggerFactory.getLogger(MongoOrganizationUnitSettingDaoImpl.class);
 
@@ -248,7 +249,7 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
 		// Query query = new BasicQuery(new BasicDBObject(KEY_DEFAULT_BY_SYSTEM, false));
 		Query query = new Query();
 		query.addCriteria(Criteria.where(KEY_DEFAULT_BY_SYSTEM).is(false));
-		query.fields().include(KEY_PROFILE_URL).exclude("_id");
+		query.fields().include(KEY_PROFILE_URL).include(KEY_MODIFIED_ON).exclude("_id");
 		if (skipCount > 0) {
 			query.skip(skipCount);
 		}
