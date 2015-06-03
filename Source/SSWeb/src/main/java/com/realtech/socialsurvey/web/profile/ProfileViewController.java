@@ -4,15 +4,15 @@
 package com.realtech.socialsurvey.web.profile;
 
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.List;
-
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-
 import org.apache.solr.common.SolrDocument;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
@@ -22,7 +22,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
-
 import com.amazonaws.util.json.JSONException;
 import com.amazonaws.util.json.JSONObject;
 import com.google.gson.Gson;
@@ -51,7 +50,7 @@ import com.realtech.socialsurvey.core.utils.MessageUtils;
 import com.realtech.socialsurvey.web.common.JspResolver;
 
 @Controller
-public class ProfileViewController {
+public class ProfileViewController implements InitializingBean{
 	
 	private static final Logger LOG = LoggerFactory.getLogger(ProfileViewController.class);
 	
@@ -77,6 +76,11 @@ public class ProfileViewController {
 	@Value("${CAPTCHA_SECRET}")
 	private String captchaSecretKey;
 	
+	@Value("${BOTS_USER_AGENT_LIST}")
+	private String botUserAgentList;
+	
+	private List<String> listBots;
+	
 	/**
 	 * Method to return company profile page
 	 * 
@@ -88,11 +92,9 @@ public class ProfileViewController {
 	public String initCompanyProfilePage(@PathVariable String profileName, Model model, HttpServletRequest request) {
 		LOG.info("Service to initiate company profile page called");
 		String message = null;
-		String noScript = request.getParameter("no_script");
-		boolean isNoScript = false;
-		if(noScript != null && noScript.equalsIgnoreCase("true")){
-			isNoScript = true;
-		}
+		// check if the request is from bot
+		boolean isBotRequest = checkBotRequest(request);
+		
 		if (profileName == null || profileName.isEmpty()) {
 			message = messageUtils.getDisplayMessage(DisplayMessageConstants.INVALID_COMPANY_PROFILENAME, DisplayMessageType.ERROR_MESSAGE)
 					.getMessage();
@@ -113,7 +115,7 @@ public class ProfileViewController {
 			model.addAttribute("averageRating",averageRating);
 			long reviewsCount = profileManagementService.getReviewsCount(companyId, CommonConstants.MIN_RATING_SCORE, CommonConstants.MAX_RATING_SCORE, CommonConstants.PROFILE_LEVEL_COMPANY, false);
 			model.addAttribute("reviewsCount",reviewsCount);
-			if(isNoScript){
+			if(isBotRequest){
 				//TODO:remove hardcoding of start,end,minScore etc
 				List<SurveyDetails> reviews = profileManagementService.getReviews(companyId, -1, -1, -1, -1,
 					CommonConstants.PROFILE_LEVEL_COMPANY, false, null, null, CommonConstants.REVIEWS_SORT_CRITERIA_FEATURE);
@@ -141,7 +143,7 @@ public class ProfileViewController {
 		model.addAttribute("companyProfileName", profileName);
 		model.addAttribute("profileLevel", CommonConstants.PROFILE_LEVEL_COMPANY);
 		LOG.info("Service to initiate company profile page executed successfully");
-		if(isNoScript){
+		if(isBotRequest){
 			return JspResolver.PROFILE_PAGE_NOSCRIPT;			
 		}else{
 			return JspResolver.PROFILE_PAGE;
@@ -161,11 +163,7 @@ public class ProfileViewController {
 	public String initRegionProfilePage(@PathVariable String companyProfileName, @PathVariable String regionProfileName, Model model, HttpServletRequest request) {
 		LOG.info("Service to initiate region profile page called");
 		String message = null;
-		String noScript = request.getParameter("no_script");
-		boolean isNoScript = false;
-		if(noScript != null && noScript.equalsIgnoreCase("true")){
-			isNoScript = true;
-		}
+		boolean isBotRequest = checkBotRequest(request);
 		if (companyProfileName == null || companyProfileName.isEmpty()) {
 			message = messageUtils.getDisplayMessage(DisplayMessageConstants.INVALID_COMPANY_PROFILENAME, DisplayMessageType.ERROR_MESSAGE)
 					.getMessage();
@@ -193,7 +191,7 @@ public class ProfileViewController {
 			model.addAttribute("averageRating",averageRating);
 			long reviewsCount = profileManagementService.getReviewsCount(regionId, CommonConstants.MIN_RATING_SCORE, CommonConstants.MAX_RATING_SCORE, CommonConstants.PROFILE_LEVEL_REGION, false);
 			model.addAttribute("reviewsCount",reviewsCount);
-			if(isNoScript){
+			if(isBotRequest){
 				//TODO:remove hardcoding of start,end,minScore etc
 				List<SurveyDetails> reviews = profileManagementService.getReviews(regionId, -1, -1, -1, -1,
 					CommonConstants.PROFILE_LEVEL_REGION, false, null, null, CommonConstants.REVIEWS_SORT_CRITERIA_FEATURE);
@@ -218,7 +216,7 @@ public class ProfileViewController {
 		model.addAttribute("regionProfileName", regionProfileName);
 		model.addAttribute("profileLevel", CommonConstants.PROFILE_LEVEL_REGION);
 		LOG.info("Service to initiate region profile page executed successfully");
-		if(isNoScript){
+		if(isBotRequest){
 			return JspResolver.PROFILE_PAGE_NOSCRIPT;			
 		}else{
 			return JspResolver.PROFILE_PAGE;
@@ -237,11 +235,7 @@ public class ProfileViewController {
 	public String initBranchProfilePage(@PathVariable String companyProfileName, @PathVariable String branchProfileName, Model model, HttpServletRequest request) {
 		LOG.info("Service to initiate branch profile page called");
 		String message = null;
-		String noScript = request.getParameter("no_script");
-		boolean isNoScript = false;
-		if(noScript != null && noScript.equalsIgnoreCase("true")){
-			isNoScript = true;
-		}
+		boolean isBotRequest = checkBotRequest(request);
 		if (companyProfileName == null || companyProfileName.isEmpty()) {
 			message = messageUtils.getDisplayMessage(DisplayMessageConstants.INVALID_COMPANY_PROFILENAME, DisplayMessageType.ERROR_MESSAGE)
 					.getMessage();
@@ -269,7 +263,7 @@ public class ProfileViewController {
 			model.addAttribute("averageRating",averageRating);
 			long reviewsCount = profileManagementService.getReviewsCount(branchId, CommonConstants.MIN_RATING_SCORE, CommonConstants.MAX_RATING_SCORE, CommonConstants.PROFILE_LEVEL_BRANCH, false);
 			model.addAttribute("reviewsCount",reviewsCount);
-			if(isNoScript){
+			if(isBotRequest){
 				//TODO:remove hardcoding of start,end,minScore etc
 				List<SurveyDetails> reviews = profileManagementService.getReviews(branchId, -1, -1, -1, -1,
 					CommonConstants.PROFILE_LEVEL_BRANCH, false, null, null, CommonConstants.REVIEWS_SORT_CRITERIA_FEATURE);
@@ -294,7 +288,7 @@ public class ProfileViewController {
 		model.addAttribute("branchProfileName", branchProfileName);
 		model.addAttribute("profileLevel", CommonConstants.PROFILE_LEVEL_BRANCH);
 		LOG.info("Service to initiate branch profile page executed successfully");
-		if(isNoScript){
+		if(isBotRequest){
 			return JspResolver.PROFILE_PAGE_NOSCRIPT;			
 		}else{
 			return JspResolver.PROFILE_PAGE;
@@ -312,11 +306,7 @@ public class ProfileViewController {
 	public String initBranchProfilePage(@PathVariable String agentProfileName, Model model, HttpServletResponse response, HttpServletRequest request) {
 		LOG.info("Service to initiate agent profile page called");
 		String message = null;
-		String noScript = request.getParameter("no_script");
-		boolean isNoScript = false;
-		if(noScript != null && noScript.equalsIgnoreCase("true")){
-			isNoScript = true;
-		}
+		boolean isBotRequest = checkBotRequest(request);
 		if (agentProfileName == null || agentProfileName.isEmpty()) {
 			message = messageUtils.getDisplayMessage(DisplayMessageConstants.INVALID_INDIVIDUAL_PROFILENAME, DisplayMessageType.ERROR_MESSAGE)
 					.getMessage();
@@ -370,7 +360,7 @@ public class ProfileViewController {
 				long reviewsCount = profileManagementService.getReviewsCount(agentId, CommonConstants.MIN_RATING_SCORE, CommonConstants.MAX_RATING_SCORE, CommonConstants.PROFILE_LEVEL_INDIVIDUAL, false);
 				model.addAttribute("reviewsCount",reviewsCount);
 				
-				if(isNoScript){
+				if(isBotRequest){
 					//TODO:remove hardcoding of start,end,minScore etc
 					List<SurveyDetails> reviews = profileManagementService.getReviews(agentId, -1, -1, -1, -1,
 						CommonConstants.PROFILE_LEVEL_INDIVIDUAL, false, null, null, CommonConstants.REVIEWS_SORT_CRITERIA_FEATURE);
@@ -427,7 +417,7 @@ public class ProfileViewController {
 		model.addAttribute("profileLevel", CommonConstants.PROFILE_LEVEL_INDIVIDUAL);
 		
 		LOG.info("Service to initiate agent profile page executed successfully");
-		if(isNoScript){
+		if(isBotRequest){
 			return JspResolver.PROFILE_PAGE_NOSCRIPT;			
 		}else{
 			return JspResolver.PROFILE_PAGE;
@@ -509,6 +499,23 @@ public class ProfileViewController {
 		}
 		
 		return makeJsonMessage(CommonConstants.STATUS_ACTIVE, returnMessage);
+	}
+
+	private boolean checkBotRequest(HttpServletRequest request){
+		// Get the user agent. If its a bot, then return the no javascript page
+		String userAgent = request.getHeader("User-Agent");
+		LOG.debug("User header found : "+userAgent);
+		if(userAgent != null && listBots.contains(userAgent.trim())){
+			return true;
+		}else{
+			return false;
+		}
+	}
+
+	@Override
+	public void afterPropertiesSet() throws Exception {
+		LOG.info("Get the list of bots");
+		listBots = Arrays.asList(botUserAgentList.split(","));
 	}
 
 }
