@@ -27,6 +27,7 @@ import com.amazonaws.util.json.JSONException;
 import com.amazonaws.util.json.JSONObject;
 import com.google.gson.Gson;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
+import com.realtech.socialsurvey.core.entities.Company;
 import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
 import com.realtech.socialsurvey.core.entities.ProfilesMaster;
 import com.realtech.socialsurvey.core.entities.SocialPost;
@@ -112,6 +113,25 @@ public class ProfileViewController {
 			model.addAttribute("averageRating",averageRating);
 			long reviewsCount = profileManagementService.getReviewsCount(companyId, CommonConstants.MIN_RATING_SCORE, CommonConstants.MAX_RATING_SCORE, CommonConstants.PROFILE_LEVEL_COMPANY, false);
 			model.addAttribute("reviewsCount",reviewsCount);
+			if(isNoScript){
+				//TODO:remove hardcoding of start,end,minScore etc
+				List<SurveyDetails> reviews = profileManagementService.getReviews(companyId, -1, -1, -1, -1,
+					CommonConstants.PROFILE_LEVEL_COMPANY, false, null, null, CommonConstants.REVIEWS_SORT_CRITERIA_FEATURE);
+				model.addAttribute("reviews", reviews);
+				
+				UserProfile selectedProfile = new UserProfile();
+				ProfilesMaster profilesMaster = new ProfilesMaster();
+				profilesMaster.setProfileId(CommonConstants.PROFILES_MASTER_COMPANY_ADMIN_PROFILE_ID);
+				
+				Company company = new Company();
+				company.setCompanyId(companyProfile.getIden());
+				
+				selectedProfile.setProfilesMaster(profilesMaster);
+				selectedProfile.setCompany(company);
+				
+				List<SocialPost> posts = profileManagementService.getSocialPosts(selectedProfile, -1, -1);
+				model.addAttribute("posts", posts);
+			}
 		}
 		catch (InvalidInputException e) {
 			throw new InternalServerException(new ProfileServiceErrorCode(CommonConstants.ERROR_CODE_COMPANY_PROFILE_SERVICE_FAILURE,
@@ -173,6 +193,21 @@ public class ProfileViewController {
 			model.addAttribute("averageRating",averageRating);
 			long reviewsCount = profileManagementService.getReviewsCount(regionId, CommonConstants.MIN_RATING_SCORE, CommonConstants.MAX_RATING_SCORE, CommonConstants.PROFILE_LEVEL_REGION, false);
 			model.addAttribute("reviewsCount",reviewsCount);
+			if(isNoScript){
+				//TODO:remove hardcoding of start,end,minScore etc
+				List<SurveyDetails> reviews = profileManagementService.getReviews(regionId, -1, -1, -1, -1,
+					CommonConstants.PROFILE_LEVEL_REGION, false, null, null, CommonConstants.REVIEWS_SORT_CRITERIA_FEATURE);
+				model.addAttribute("reviews", reviews);
+				
+				UserProfile selectedProfile = new UserProfile();
+				ProfilesMaster profilesMaster = new ProfilesMaster();
+				profilesMaster.setProfileId(CommonConstants.PROFILES_MASTER_REGION_ADMIN_PROFILE_ID);
+				
+				selectedProfile.setProfilesMaster(profilesMaster);
+				selectedProfile.setRegionId(regionProfile.getIden());
+				List<SocialPost> posts = profileManagementService.getSocialPosts(selectedProfile, -1, -1);
+				model.addAttribute("posts", posts);
+			}
 		}
 		catch (InvalidInputException e) {
 			throw new InternalServerException(new ProfileServiceErrorCode(CommonConstants.ERROR_CODE_REGION_PROFILE_SERVICE_FAILURE,
@@ -234,6 +269,21 @@ public class ProfileViewController {
 			model.addAttribute("averageRating",averageRating);
 			long reviewsCount = profileManagementService.getReviewsCount(branchId, CommonConstants.MIN_RATING_SCORE, CommonConstants.MAX_RATING_SCORE, CommonConstants.PROFILE_LEVEL_BRANCH, false);
 			model.addAttribute("reviewsCount",reviewsCount);
+			if(isNoScript){
+				//TODO:remove hardcoding of start,end,minScore etc
+				List<SurveyDetails> reviews = profileManagementService.getReviews(branchId, -1, -1, -1, -1,
+					CommonConstants.PROFILE_LEVEL_BRANCH, false, null, null, CommonConstants.REVIEWS_SORT_CRITERIA_FEATURE);
+				model.addAttribute("reviews", reviews);
+				
+				UserProfile selectedProfile = new UserProfile();
+				ProfilesMaster profilesMaster = new ProfilesMaster();
+				profilesMaster.setProfileId(CommonConstants.PROFILES_MASTER_BRANCH_ADMIN_PROFILE_ID);
+				
+				selectedProfile.setProfilesMaster(profilesMaster);
+				selectedProfile.setBranchId(branchProfile.getIden());
+				List<SocialPost> posts = profileManagementService.getSocialPosts(selectedProfile, -1, -1);
+				model.addAttribute("posts", posts);
+			}
 		}
 		catch (InvalidInputException e) {
 			throw new InternalServerException(new ProfileServiceErrorCode(CommonConstants.ERROR_CODE_BRANCH_PROFILE_SERVICE_FAILURE,
