@@ -120,11 +120,8 @@ public class ProfileManagementController {
 	@Value("${APPLICATION_BASE_URL}")
 	private String applicationBaseUrl;
 
-	@Value("${AMAZON_ENDPOINT}")
+	@Value("${CDN_PATH}")
 	private String endpoint;
-
-	@Value("${AMAZON_BUCKET}")
-	private String bucket;
 
 	@SuppressWarnings("unchecked")
 	@RequestMapping(value = "/showprofilepage", method = RequestMethod.GET)
@@ -1019,7 +1016,7 @@ public class ProfileManagementController {
 					throw new InvalidInputException("Logo passed is null or empty");
 				}
 				logoUrl = fileUploadService.fileUploadHandler(fileLocal, logoFileName);
-				logoUrl = endpoint + "/" + bucket + "/" + logoUrl;
+				logoUrl = endpoint + "/" + logoUrl;
 			}
 			catch (NonFatalException e) {
 				LOG.error("NonFatalException while uploading Logo. Reason :" + e.getMessage(), e);
@@ -1148,7 +1145,7 @@ public class ProfileManagementController {
 				// uploading image
 				File fileLocal = new File(filePath);
 				profileImageUrl = fileUploadService.fileUploadHandler(fileLocal, imageFileName);
-				profileImageUrl = endpoint + "/" + bucket + "/" + profileImageUrl;
+				profileImageUrl = endpoint + "/" + profileImageUrl;
 			}
 			catch (NonFatalException e) {
 				LOG.error("NonFatalException while uploading Profile Image. Reason :" + e.getMessage(), e);

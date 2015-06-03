@@ -1159,11 +1159,11 @@ span.wc-highlight {
     margin-bottom: 40px;
     font-size: 18px;
     color: #000;
+    text-align: center;
 }
 
 .inv-succ-link {
-    float: left;
-    clear: both;
+	text-align: center;
     color: #009EE3;
     cursor: pointer;
 }
@@ -1204,4 +1204,23 @@ span.wc-highlight {
 
 .take-sur-link {
 	margin: 0px 0px 0px 80px;
+}
+
+.icn-report {
+    display: inline-block;
+    margin: 0 5px;
+    width: 20px;
+    height: 20px;
+    cursor: pointer;
+}
+
+.report-resend-icn-container {
+    clear: both;
+    margin: 3px -5px 0;
+}
+
+.report-txt {
+    display: inline;
+    margin: 0px 5px;
+    cursor: pointer;
 }

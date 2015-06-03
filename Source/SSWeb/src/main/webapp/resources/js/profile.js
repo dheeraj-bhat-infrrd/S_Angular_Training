@@ -46,7 +46,8 @@ function fetchCompanyProfileCallBack(data) {
 	var result = profileJson;
 	
 	paintProfilePage(result);
-	fetchAverageRatings(result.iden);
+	//fetchAverageRatings(result.iden);
+	paintAverageRatings();
 	fetchCompanyRegions();
 	fetchCompanyBranches();
 	fetchCompanyIndividuals();
@@ -66,7 +67,7 @@ function paintProfilePage(result) {
 		var contactDetails = result.contact_details;
 		var headContentHtml = "";
 		var profileLevel = $("#profile-fetch-info").attr("profile-level");
-		$("#profile-main-content").show();
+		//$("#profile-main-content").show();
 		currentProfileName = result.profileName;
 		//paint public  posts
 		paintPublicPosts();
@@ -206,13 +207,12 @@ function fetchAverageRatings(companyId) {
 	callAjaxGET(url, paintAverageRatings, true);
 }
 
-function paintAverageRatings(data) {
-	var responseJson = $.parseJSON(data);
-	if(responseJson != undefined) {
-		var rating = $.parseJSON(responseJson.entity);
+function paintAverageRatings() {
+	/*var responseJson = $.parseJSON(data);
+	if(responseJson != undefined) {*/
+		var rating = $('input[name="averageRatings"]').val();
 		changeRatingPattern(rating,$("#rating-avg-comp"),true);
-		$('#prof-schema-agent-rating').html(parseFloat(rating).toFixed(2));
-	}
+		//$('#prof-schema-agent-rating').html(parseFloat(rating).toFixed(2));
 }
 
 function fetchCompanyRegions() {
@@ -492,15 +492,14 @@ function paintReviews(result){
 		reviewsHtml=  reviewsHtml+'    </div>';
 		reviewsHtml=  reviewsHtml+'    <div class="float-right ppl-header-right">';
 		reviewsHtml=  reviewsHtml+'        <div class="st-rating-wrapper maring-0 clearfix review-ratings" data-rating="'+reviewItem.score+'">';
-		/*reviewsHtml=  reviewsHtml+'           <div class="rating-star icn-full-star"></div>';
-		reviewsHtml=  reviewsHtml+'           <div class="rating-star icn-full-star"></div>';
-		reviewsHtml=  reviewsHtml+'           <div class="rating-star icn-half-star"></div>';
-		reviewsHtml=  reviewsHtml+'           <div class="rating-star icn-no-star"></div>';
-		reviewsHtml=  reviewsHtml+'           <div class="rating-star icn-no-star"></div>';*/
 		reviewsHtml=  reviewsHtml+'       </div>';
 		reviewsHtml=  reviewsHtml+'   </div>';
 		reviewsHtml=  reviewsHtml+'	</div>';
-		reviewsHtml=  reviewsHtml+'	<div class="ppl-content">'+reviewItem.review +'</div>';
+		if(reviewItem.review.length > 250){
+			reviewsHtml=  reviewsHtml+'	<div class="ppl-content"><span class="review-complete-txt">'+reviewItem.review+'</span><span class="review-less-text">'+reviewItem.review.substr(0,250) +'</span><span class="review-more-button">More</span></div>';			
+		}else{
+			reviewsHtml=  reviewsHtml+'	<div class="ppl-content">'+reviewItem.review +'</div>';
+		}
 		reviewsHtml=  reviewsHtml+'		<div class="ppl-share-wrapper clearfix">';
 		reviewsHtml=  reviewsHtml+'    		<div class="float-left blue-text ppl-share-shr-txt">Share</div>';
 		reviewsHtml=  reviewsHtml+'    		<div class="float-left icn-share icn-plus-open"></div>';
@@ -573,8 +572,13 @@ function paintReviews(result){
     });
     
     $('.icn-gplus-pp').href = "http://localhost:8080";
-
 }
+
+$(document).on('click','.review-more-button',function(){
+	$(this).parent().find('.review-less-text').hide();
+	$(this).parent().find('.review-complete-txt').show();
+	$(this).hide();
+});
 
 $(document).scroll(function(){
 	var totalReviews = parseInt($("#profile-fetch-info").attr("total-reviews"));
@@ -621,9 +625,9 @@ function paintAllReviewsCount(data) {
 		var reviewsSizeHtml = responseJson.entity;
 		$("#profile-fetch-info").attr("total-reviews",responseJson.entity);
 		reviewsSizeHtml = reviewsSizeHtml +' Review(s)';
-		$("#prof-company-review-count").html(reviewsSizeHtml);
-		$("#prof-schema-reviews").html(reviewsSizeHtml);
-		if(responseJson.entity > 0){
+		//$("#prof-company-review-count").html(reviewsSizeHtml);
+		//$("#prof-schema-reviews").html(reviewsSizeHtml);
+		/*if(responseJson.entity > 0){
 			$("#prof-company-review-count").click(function(){
 				if(window.innerWidth < 768){
 					$('.icn-star-smile').click();					
@@ -632,7 +636,7 @@ function paintAllReviewsCount(data) {
 					scrollTop : $('#reviews-container').offset().top
 				},500);
 			});
-		}
+		}*/
 	}
 }
 
@@ -706,7 +710,8 @@ function fetchRegionProfileCallBack(data) {
 	var result = profileJson;
 
 	paintProfilePage(result);
-	fetchAverageRatingsForRegion(result.iden);
+	//fetchAverageRatingsForRegion(result.iden);
+	paintAverageRatings();
 	fetchBranchesForRegion(result.iden);
 	fetchIndividualsForRegion(result.iden);
 	if(result.survey_settings != undefined && result.survey_settings.show_survey_above_score != undefined) {
@@ -714,7 +719,7 @@ function fetchRegionProfileCallBack(data) {
 	}
 	startIndex = 0;
 	fetchReviewsForRegion(result.iden,startIndex,numOfRows,minScore);
-	fetchReviewsCountForRegion(result.iden, paintAllReviewsCount);
+	//fetchReviewsCountForRegion(result.iden, paintAllReviewsCount);
 }
 
 function fetchAverageRatingsForRegion(regionId){
@@ -817,7 +822,8 @@ function fetchBranchProfileCallBack(data) {
 	var result = profileJson;
 	
 	paintProfilePage(result);
-	fetchAverageRatingsForBranch(result.iden);
+	//fetchAverageRatingsForBranch(result.iden);
+	paintAverageRatings();
 	fetchIndividualsForBranch(result.iden);
 	if(result.survey_settings != undefined && result.survey_settings.show_survey_above_score != undefined) {
 		minScore = result.survey_settings.show_survey_above_score;
@@ -881,7 +887,7 @@ function paintIndividualDetails(result) {
 		if (licenses.authorized_in != undefined && licenses.authorized_in.length > 0) {
 			individualDetailsHtml = individualDetailsHtml + '<div class="prof-left-row prof-left-auth bord-bot-dc">';
 			individualDetailsHtml = individualDetailsHtml + '	<div class="left-auth-wrapper">';
-			individualDetailsHtml = individualDetailsHtml + '		<div class="left-panel-header lph-dd lph-dd-closed">Licenses</div>';
+			individualDetailsHtml = individualDetailsHtml + '		<div class="left-panel-header lph-dd lph-dd-closed cursor-pointer">Licenses</div>';
 			individualDetailsHtml = individualDetailsHtml + '		<div class="left-panel-content lph-dd-content">';
 			$.each(licenses.authorized_in, function(i, authorizedIn) {
 				individualDetailsHtml = individualDetailsHtml + '<div class="lp-auth-row lp-row clearfix">' + authorizedIn + '</div>';
@@ -897,7 +903,7 @@ function paintIndividualDetails(result) {
 	if (positions != undefined && positions.length > 0) {
 		individualDetailsHtml = individualDetailsHtml + '<div class="prof-left-row prof-left-assoc bord-bot-dc">';
 		individualDetailsHtml = individualDetailsHtml + '	<div class="left-postions-wrapper">';
-		individualDetailsHtml = individualDetailsHtml + '		<div class="left-panel-header lph-dd lph-dd-closed lph-dd-open">Positions</div>';
+		individualDetailsHtml = individualDetailsHtml + '		<div class="left-panel-header lph-dd lph-dd-closed lph-dd-open cursor-pointer">Positions</div>';
 		individualDetailsHtml = individualDetailsHtml + '		<div class="left-panel-content lph-dd-content">';
 
 		for (var i = 0; i < positions.length; i++) {
@@ -928,7 +934,7 @@ function paintIndividualDetails(result) {
 	if (result.associations != undefined && result.associations.length > 0) {
 		individualDetailsHtml = individualDetailsHtml + '<div class="prof-left-row prof-left-assoc bord-bot-dc">';
 		individualDetailsHtml = individualDetailsHtml + '	<div class="left-assoc-wrapper">';
-		individualDetailsHtml = individualDetailsHtml + '		<div class="left-panel-header lph-dd lph-dd-closed lph-dd-open">Memberships</div>';
+		individualDetailsHtml = individualDetailsHtml + '		<div class="left-panel-header lph-dd lph-dd-closed lph-dd-open cursor-pointer">Memberships</div>';
 		individualDetailsHtml = individualDetailsHtml + '		<div class="left-panel-content lph-dd-content">';
 		$.each(result.associations, function(i, associations) {
 			individualDetailsHtml = individualDetailsHtml + '<div class="lp-assoc-row lp-row clearfix">' + associations.name + '</div>';
@@ -942,7 +948,7 @@ function paintIndividualDetails(result) {
 	if (result.expertise != undefined && result.expertise.length > 0) {
 		individualDetailsHtml = individualDetailsHtml + '<div class="prof-left-row prof-left-ach bord-bot-dc">';
 		individualDetailsHtml = individualDetailsHtml + '	<div class="left-ach-wrapper">';
-		individualDetailsHtml = individualDetailsHtml + '		<div class="left-panel-header lph-dd lph-dd-closed">Specialities</div>';
+		individualDetailsHtml = individualDetailsHtml + '		<div class="left-panel-header lph-dd lph-dd-closed cursor-pointer">Specialities</div>';
 		individualDetailsHtml = individualDetailsHtml + '		<div class="left-panel-content lph-dd-content">';
 		for (var i = 0; i < result.expertise.length; i++) {
 			individualDetailsHtml = individualDetailsHtml + '<div class="lp-ach-row lp-row clearfix">' + result.expertise[i] + '</div>';
@@ -955,7 +961,7 @@ function paintIndividualDetails(result) {
 	if (result.achievements != undefined && result.achievements.length > 0) {
 		individualDetailsHtml = individualDetailsHtml + '<div class="prof-left-row prof-left-ach bord-bot-dc">';
 		individualDetailsHtml = individualDetailsHtml + '	<div class="left-ach-wrapper">';
-		individualDetailsHtml = individualDetailsHtml + '		<div class="left-panel-header lph-dd lph-dd-closed">Achievements</div>';
+		individualDetailsHtml = individualDetailsHtml + '		<div class="left-panel-header lph-dd lph-dd-closed cursor-pointer">Achievements</div>';
 		individualDetailsHtml = individualDetailsHtml + '		<div class="left-panel-content lph-dd-content">';
 		$.each(result.achievements, function(i, achievements) {
 			individualDetailsHtml = individualDetailsHtml + '<div class="lp-ach-row lp-row clearfix">' + achievements.achievement + '</div>';
@@ -969,7 +975,7 @@ function paintIndividualDetails(result) {
 	if (result.hobbies != undefined && result.hobbies.length > 0) {
 		individualDetailsHtml = individualDetailsHtml + '<div class="prof-left-row prof-left-ach bord-bot-dc">';
 		individualDetailsHtml = individualDetailsHtml + '	<div class="left-ach-wrapper">';
-		individualDetailsHtml = individualDetailsHtml + '		<div class="left-panel-header lph-dd lph-dd-closed">Hobbies</div>';
+		individualDetailsHtml = individualDetailsHtml + '		<div class="left-panel-header lph-dd lph-dd-closed cursor-pointer">Hobbies</div>';
 		individualDetailsHtml = individualDetailsHtml + '		<div class="left-panel-content lph-dd-content">';
 		for (var i = 0; i < result.hobbies.length; i++) {
 			individualDetailsHtml = individualDetailsHtml + '<div class="lp-ach-row lp-row clearfix">' + result.hobbies[i] + '</div>';
@@ -981,7 +987,12 @@ function paintIndividualDetails(result) {
 
 	$("#individual-details").html(individualDetailsHtml);
 	$('.lph-dd').click(function() {
-		$(this).next('.lph-dd-content').slideToggle(200);
+		if($(this).next('.lph-dd-content').is(':visible')){
+			$(this).next('.lph-dd-content').slideToggle(200);
+		}else{
+			$('.lph-dd-content').hide();
+			$(this).next('.lph-dd-content').slideToggle(200);
+		}
 	});
 
 	$('.lph-dd:nth(0)').trigger('click');
@@ -997,7 +1008,8 @@ function fetchAgentProfileCallBack(data) {
 	var result = profileJson;
 	paintProfilePage(result);
 	paintIndividualDetails(result);
-	fetchAverageRatingsForAgent(result.iden);
+	//fetchAverageRatingsForAgent(result.iden);
+	paintAverageRatings();
 	if(result.survey_settings != undefined && result.survey_settings.show_survey_above_score != undefined) {
 		minScore = result.survey_settings.show_survey_above_score;
 	}
