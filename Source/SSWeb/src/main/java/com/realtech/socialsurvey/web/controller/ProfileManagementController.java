@@ -2075,6 +2075,12 @@ public class ProfileManagementController {
 				socialMediaTokens = updateYelpLink(yelpLink, socialMediaTokens);
 				profileManagementService.updateSocialMediaTokens(MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION, companySettings,
 						socialMediaTokens);
+				for(ProfileStage stage : companySettings.getProfileStages()){
+					if(stage.getProfileStageKey().equalsIgnoreCase("YELP_PRF")){
+						stage.setStatus(CommonConstants.STATUS_INACTIVE);
+					}
+				}
+				profileManagementService.updateProfileStages(companySettings.getProfileStages(), companySettings, MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION);
 				companySettings.setSocialMediaTokens(socialMediaTokens);
 				userSettings.setCompanySettings(companySettings);
 			}
@@ -2088,6 +2094,12 @@ public class ProfileManagementController {
 				socialMediaTokens = updateYelpLink(yelpLink, socialMediaTokens);
 				profileManagementService.updateSocialMediaTokens(MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION, regionSettings,
 						socialMediaTokens);
+				for(ProfileStage stage : regionSettings.getProfileStages()){
+					if(stage.getProfileStageKey().equalsIgnoreCase("YELP_PRF")){
+						stage.setStatus(CommonConstants.STATUS_INACTIVE);
+					}
+				}
+				profileManagementService.updateProfileStages(regionSettings.getProfileStages(), regionSettings, MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION);
 				regionSettings.setSocialMediaTokens(socialMediaTokens);
 				userSettings.getRegionSettings().put(regionId, regionSettings);
 			}
@@ -2101,6 +2113,12 @@ public class ProfileManagementController {
 				socialMediaTokens = updateYelpLink(yelpLink, socialMediaTokens);
 				profileManagementService.updateSocialMediaTokens(MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION, branchSettings,
 						socialMediaTokens);
+				for(ProfileStage stage : branchSettings.getProfileStages()){
+					if(stage.getProfileStageKey().equalsIgnoreCase("YELP_PRF")){
+						stage.setStatus(CommonConstants.STATUS_INACTIVE);
+					}
+				}
+				profileManagementService.updateProfileStages(branchSettings.getProfileStages(), branchSettings, MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION);
 				branchSettings.setSocialMediaTokens(socialMediaTokens);
 				userSettings.getBranchSettings().put(branchId, branchSettings);
 			}
@@ -2113,6 +2131,12 @@ public class ProfileManagementController {
 				socialMediaTokens = updateYelpLink(yelpLink, socialMediaTokens);
 				profileManagementService.updateSocialMediaTokens(MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION, agentSettings,
 						socialMediaTokens);
+				for(ProfileStage stage : agentSettings.getProfileStages()){
+					if(stage.getProfileStageKey().equalsIgnoreCase("YELP_PRF")){
+						stage.setStatus(CommonConstants.STATUS_INACTIVE);
+					}
+				}
+				profileManagementService.updateProfileStages(agentSettings.getProfileStages(), agentSettings, MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION);
 				agentSettings.setSocialMediaTokens(socialMediaTokens);
 				userSettings.setAgentSettings(agentSettings);
 			}
