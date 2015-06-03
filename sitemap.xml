@@ -1,0 +1,27 @@
+<sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+	<sitemap>
+		<loc>
+			https://socialsurvey.me/explore/sitemap-index.xml
+		</loc>
+	</sitemap>
+	<sitemap>
+		<loc>
+			https://socialsurvey.me/explore/sitemap_companies.xml
+		</loc>
+	</sitemap>
+	<sitemap>
+		<loc>
+			https://socialsurvey.me/explore/sitemap_offices.xml
+		</loc>
+	</sitemap>
+	<sitemap>
+		<loc>
+			https://socialsurvey.me/explore/sitemap_regions.xml
+		</loc>
+	</sitemap>
+	<sitemap>
+		<loc>
+			https://socialsurvey.me/explore/sitemap_users.xml
+		</loc>
+	</sitemap>
+</sitemapindex>

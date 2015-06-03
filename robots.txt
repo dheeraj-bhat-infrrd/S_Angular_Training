@@ -1,0 +1,19 @@
+User-agent: Googlebot
+Disallow: 
+
+User-agent: Bingbot
+Disallow: 
+
+User-agent: msnbot
+Disallow: 
+
+User-agent: Slurp
+Disallow: 
+
+User-agent: teoma
+Disallow: 
+
+User-agent: teoma
+Disallow: /
+
+Sitemap: https://socialsurvey.me/explore/sitemap.xml
