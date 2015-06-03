@@ -8,7 +8,9 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collections;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
@@ -32,6 +34,7 @@ import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.entities.AbridgedUserProfile;
 import com.realtech.socialsurvey.core.entities.AgentSettings;
 import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
+import com.realtech.socialsurvey.core.entities.ProfileStage;
 import com.realtech.socialsurvey.core.entities.SurveyDetails;
 import com.realtech.socialsurvey.core.entities.SurveyPreInitiation;
 import com.realtech.socialsurvey.core.entities.SurveyRecipient;
@@ -223,7 +226,7 @@ public class DashboardController {
 			throw e;
 		}
 
-		double surveyScore = (double) Math.round(dashboardService.getSurveyScore(columnName, columnValue, numberOfDays)*1000.0)/1000.0;
+		double surveyScore = (double) Math.round(dashboardService.getSurveyScore(columnName, columnValue, numberOfDays) * 1000.0) / 1000.0;
 		int sentSurveyCount = (int) dashboardService.getAllSurveyCountForPastNdays(columnName, columnValue, numberOfDays);
 		int socialPostsCount = (int) dashboardService.getSocialPostsForPastNdays(columnName, columnValue, numberOfDays);
 		int profileCompleteness = dashboardService.getProfileCompletionPercentage(user, columnName, columnValue, userSettings);
@@ -239,7 +242,10 @@ public class DashboardController {
 			model.addAttribute("socialPosts", socialPostsCount);
 		model.addAttribute("profileCompleteness", profileCompleteness);
 		model.addAttribute("badges", dashboardService.getBadges(surveyScore, sentSurveyCount, socialPostsCount, profileCompleteness));
-
+		
+		model.addAttribute("columnName", columnName);
+		model.addAttribute("columnValue", columnValue);
+		
 		LOG.info("Method to get profile of company/region/branch/agent getProfileDetails() finished");
 		return JspResolver.DASHBOARD_PROFILEDETAIL;
 	}
@@ -1028,6 +1034,46 @@ public class DashboardController {
 
 		LOG.info("Method sendMultipleSurveyInvitations() finished from DashboardController.");
 		return "Success";
+	}
+	
+	@ResponseBody
+	@RequestMapping(value = "/dashboardbuttonsorder", method = RequestMethod.GET)
+	public String getDashboardButtonsOrder(HttpServletRequest request) {
+		LOG.info("Method sendMultipleSurveyInvitations() called from DashboardController.");
+		String columnName = request.getParameter("columnName");
+		String columnValue = request.getParameter("columnValue");
+		UserSettings userSettings = (UserSettings) request.getSession(false).getAttribute(CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION);
+		List<ProfileStage> stages = new ArrayList<>();
+		if (userSettings != null) {
+			if (columnName.equalsIgnoreCase(CommonConstants.COMPANY_ID_COLUMN)) {
+				if (userSettings.getCompanySettings() != null)
+					stages = userSettings.getCompanySettings().getProfileStages();
+			}
+			else if (columnName.equalsIgnoreCase(CommonConstants.REGION_ID_COLUMN)) {
+				if (userSettings.getRegionSettings() != null)
+					stages = userSettings.getRegionSettings().get(columnValue).getProfileStages();
+			}
+			else if (columnName.equalsIgnoreCase(CommonConstants.BRANCH_ID_COLUMN)) {
+				if (userSettings.getBranchSettings() != null)
+					stages = userSettings.getBranchSettings().get(columnValue).getProfileStages();
+			}
+			else if (columnName.equalsIgnoreCase(CommonConstants.AGENT_ID_COLUMN)) {
+				if (userSettings.getAgentSettings() != null)
+					stages = userSettings.getAgentSettings().getProfileStages();
+			}
+		}
+		Collections.sort(stages);
+		for (int index = stages.size() - 1; index >= 0; index--) {
+			if (stages.get(index).getStatus() == CommonConstants.STATUS_INACTIVE)
+				stages.remove(index);
+		}
+		Map<String, Object> stagesAndColumn = new HashMap<>(); 
+		stagesAndColumn.put("columnName", columnName);
+		stagesAndColumn.put("columnValue", columnValue);
+		stagesAndColumn.put("stages", stages);
+		String stagesJson = new Gson().toJson(stagesAndColumn);
+		LOG.info("Method sendMultipleSurveyInvitations() finished from DashboardController.");
+		return stagesJson;
 	}
 
 	// Method to return title for logged in user.
