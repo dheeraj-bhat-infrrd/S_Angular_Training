@@ -9,7 +9,6 @@
     <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta charset="utf-8">
-    <noscript><meta http-equiv="refresh" content="0; URL=?no_script=true" /></noscript>
     <link rel="shortcut icon" href="${initParam.resourcesPath}/favicon.ico" sizes="16x16">
     <link rel="stylesheet" href="${initParam.resourcesPath}/resources/css/perfect-scrollbar.min.css">
     <link rel="stylesheet" href="${initParam.resourcesPath}/resources/css/bootstrap.min.css">

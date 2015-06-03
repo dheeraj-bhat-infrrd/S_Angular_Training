@@ -4,7 +4,6 @@
 package com.realtech.socialsurvey.web.profile;
 
 import java.io.IOException;
-import java.util.Arrays;
 import java.util.List;
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
@@ -79,7 +78,7 @@ public class ProfileViewController implements InitializingBean{
 	@Value("${BOTS_USER_AGENT_LIST}")
 	private String botUserAgentList;
 	
-	private List<String> listBots;
+	private String[] listBots;
 	
 	/**
 	 * Method to return company profile page
@@ -503,21 +502,25 @@ public class ProfileViewController implements InitializingBean{
 
 	private boolean checkBotRequest(HttpServletRequest request){
 		// Get the user agent. If its a bot, then return the no javascript page
+		boolean isBotRequest = false;
 		String userAgent = request.getHeader("User-Agent");
 		LOG.debug("User header found : "+userAgent);
-		if(userAgent != null && listBots.contains(userAgent.trim())){
-			LOG.debug("Found a crawler: "+userAgent);
-			return true;
-		}else{
-			LOG.debug("Not a crawler: "+userAgent);
-			return false;
+		if(userAgent != null){
+			for(String bot : listBots){
+				if(userAgent.indexOf(bot) != -1){
+					LOG.debug("Found a crawler: "+bot);
+					isBotRequest = true;
+					break;
+				}
+			}
 		}
+		return isBotRequest;
 	}
 
 	@Override
 	public void afterPropertiesSet() throws Exception {
 		LOG.info("Get the list of bots");
-		listBots = Arrays.asList(botUserAgentList.split(","));
+		listBots = botUserAgentList.split(",");
 	}
 
 }
