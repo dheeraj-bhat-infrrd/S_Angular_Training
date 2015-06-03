@@ -6741,6 +6741,12 @@ function paintDashboardButtons(data){
 				contentToDisplay = 'Connect To Yelp';
 			} else if (stages[i].profileStageKey == 'LINKEDIN_PRF') {
 				contentToDisplay = 'Connect To Linkedin';
+			} else if (stages[i].profileStageKey == 'LICENSE_PRF') {
+				contentToDisplay = 'Enter license details';
+			} else if (stages[i].profileStageKey == 'HOBBIES_PRF') {
+				contentToDisplay = 'Enter hobbies';
+			} else if (stages[i].profileStageKey == 'ACHIEVEMENTS_PRF') {
+				contentToDisplay = 'Enter achievements';
 			}
 			if (i == 0) {
 				$('#dsh-btn2').data('social', stages[i].profileStageKey);
@@ -6774,12 +6780,21 @@ function dashboardButtonAction(buttonId, task, columnName, columnValue){
 		openAuthPageDashboard('google', columnName, columnValue);
 	}
 	else if(task=='YELP_PRF'){
-	//	openAuthPageDashboard(socialNetwork, columnName, columnValue);
+		showMainContent('./showprofilepage.do');
 	}
 	else if(task=='LINKEDIN_PRF'){
 		openAuthPageDashboard('linkedin', columnName, columnValue);
 	}
 	else if(task=='TWITTER_PRF'){
 		openAuthPageDashboard('twitter', columnName, columnValue);
+	}
+	else if(task=='LICENSE_PRF'){
+		showMainContent('./showprofilepage.do');
+	}
+	else if(task=='HOBBIES_PRF'){
+		showMainContent('./showprofilepage.do');
+	}
+	else if(task=='ACHIEVEMENTS_PRF'){
+		showMainContent('./showprofilepage.do');
 	}
 }
