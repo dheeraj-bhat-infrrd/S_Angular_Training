@@ -50,6 +50,7 @@ import com.realtech.socialsurvey.core.entities.MailIdSettings;
 import com.realtech.socialsurvey.core.entities.MiscValues;
 import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
 import com.realtech.socialsurvey.core.entities.ProListUser;
+import com.realtech.socialsurvey.core.entities.ProfileStage;
 import com.realtech.socialsurvey.core.entities.Region;
 import com.realtech.socialsurvey.core.entities.SocialMediaTokens;
 import com.realtech.socialsurvey.core.entities.SocialPost;
@@ -2338,6 +2339,13 @@ public class ProfileManagementController {
 						agentSettings, achievements);
 				agentSettings.setAchievements(achievements);
 				userSettings.setAgentSettings(agentSettings);
+				for(ProfileStage stage : agentSettings.getProfileStages()){
+					if(stage.getProfileStageKey().equalsIgnoreCase("ACHIEVEMENTS_PRF")){
+						stage.setStatus(CommonConstants.STATUS_INACTIVE);
+					}
+				}
+				profileManagementService.updateProfileStages(agentSettings.getProfileStages(), agentSettings, MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION);
+				
 			}
 			else {
 				throw new InvalidInputException("Invalid input exception occurred in adding achievements.", DisplayMessageConstants.GENERAL_ERROR);
@@ -2530,6 +2538,13 @@ public class ProfileManagementController {
 						authorisedIn);
 				agentSettings.setLicenses(licenses);
 				userSettings.setAgentSettings(agentSettings);
+				for(ProfileStage stage : agentSettings.getProfileStages()){
+					if(stage.getProfileStageKey().equalsIgnoreCase("LICENSE_PRF")){
+						stage.setStatus(CommonConstants.STATUS_INACTIVE);
+					}
+				}
+				profileManagementService.updateProfileStages(agentSettings.getProfileStages(), agentSettings, MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION);
+				
 			}
 			else {
 				throw new InvalidInputException("Invalid input exception occurred in adding associations.", DisplayMessageConstants.GENERAL_ERROR);
@@ -2639,6 +2654,12 @@ public class ProfileManagementController {
 					throw new InvalidInputException("No Agent settings found in current session");
 				}
 				profileManagementService.updateAgentHobbies(agentSettings, hobbiesList);
+				for(ProfileStage stage : agentSettings.getProfileStages()){
+					if(stage.getProfileStageKey().equalsIgnoreCase("HOBBIES_PRF")){
+						stage.setStatus(CommonConstants.STATUS_INACTIVE);
+					}
+				}
+				profileManagementService.updateProfileStages(agentSettings.getProfileStages(), agentSettings, MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION);
 				agentSettings.setHobbies(hobbiesList);
 				userSettings.setAgentSettings(agentSettings);
 			}

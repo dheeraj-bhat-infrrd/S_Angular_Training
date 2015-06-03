@@ -477,7 +477,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 		companySettings.setSeoContentModified(true);
 
 		// set default profile stages.
-		companySettings.setProfileStages(profileCompletionList.getDefaultProfileCompletionList());
+		companySettings.setProfileStages(profileCompletionList.getDefaultProfileCompletionList(false));
 
 		// Setting default values for mail content in Mail content settings of company settings.
 		String takeSurveyMail = "";
@@ -2656,7 +2656,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 		organizationSettings.setLockSettings(new LockSettings());
 
 		// set default profile stages.
-		organizationSettings.setProfileStages(profileCompletionList.getDefaultProfileCompletionList());
+		organizationSettings.setProfileStages(profileCompletionList.getDefaultProfileCompletionList(false));
 
 		organizationUnitSettingsDao.insertOrganizationUnitSettings(organizationSettings,
 				MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION);
@@ -2695,7 +2695,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 		organizationSettings.setLockSettings(new LockSettings());
 
 		// set default profile stages.
-		organizationSettings.setProfileStages(profileCompletionList.getDefaultProfileCompletionList());
+		organizationSettings.setProfileStages(profileCompletionList.getDefaultProfileCompletionList(false));
 
 		organizationUnitSettingsDao.insertOrganizationUnitSettings(organizationSettings,
 				MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION);
