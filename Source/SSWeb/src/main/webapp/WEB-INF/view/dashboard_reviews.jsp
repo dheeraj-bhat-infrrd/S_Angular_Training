@@ -19,12 +19,17 @@
 						<div class="ppl-head-2">${feedback.modifiedOn}</div>
 					</div>
 					<div class="float-right ppl-header-right">
-						<div class="st-rating-wrapper maring-0 clearfix review-ratings" data-rating="${feedback.score}">
+						<div class="st-rating-wrapper maring-0 clearfix review-ratings float-right" data-rating="${feedback.score}">
+							<!-- <div class="rating-star icn-full-star"></div>
 							<div class="rating-star icn-full-star"></div>
 							<div class="rating-star icn-full-star"></div>
 							<div class="rating-star icn-full-star"></div>
-							<div class="rating-star icn-full-star"></div>
-							<div class="rating-star icn-no-star"></div>
+							<div class="rating-star icn-no-star"></div> -->
+						</div>
+						<div class="report-resend-icn-container clearfix float-right">
+							<div class="report-abuse-txt report-txt">Report</div>
+							|
+							<div class="restart-survey-mail-txt report-txt">Resend</div>
 						</div>
 					</div>
 				</div>
@@ -38,8 +43,8 @@
 						<div class="float-left ppl-share-icns icn-lin"></div>
 						<div class="float-left ppl-share-icns icn-yelp"></div>
                         <div class="float-left ppl-share-icns icn-gplus"></div>
-                        <div id="restart-survey-mail" class="float-left ppl-share-icns icn-restart-survey-mail"></div>
-                        <div id="report-abuse" class="float-left ppl-share-icns icn-report-abuse"></div>
+                        <!-- <div id="restart-survey-mail" class="float-left ppl-share-icns icn-restart-survey-mail"></div>
+                        <div id="report-abuse" class="float-left ppl-share-icns icn-report-abuse"></div> -->
 					</div>
 					<div class="float-left icn-share icn-remove icn-rem-size hide" style="display: none;"></div>
 				</div>

@@ -111,13 +111,13 @@ $(document).on('click', '.hr-dd-item', function(e) {
 	e.stopPropagation();
 });
 
-$(document).on('click', '#restart-survey-mail', function(e) {
+$(document).on('click', '.restart-survey-mail-txt', function(e) {
 	
-	var firstName = $(this).parent().parent().parent().attr('data-firstname');
-	var lastName = $(this).parent().parent().parent().attr('data-lastname');
-	var agentName = $(this).parent().parent().parent().attr('data-agentname');
-	var customerEmail = $(this).parent().parent().parent().attr('data-customeremail');
-	var agentId = $(this).parent().parent().parent().attr('data-agentid');
+	var firstName = $(this).parent().parent().parent().parent().attr('data-firstname');
+	var lastName = $(this).parent().parent().parent().parent().attr('data-lastname');
+	var agentName = $(this).parent().parent().parent().parent().attr('data-agentname');
+	var customerEmail = $(this).parent().parent().parent().parent().attr('data-customeremail');
+	var agentId = $(this).parent().parent().parent().parent().attr('data-agentid');
 	var payload = {
 			"customerEmail" : customerEmail,
 			"agentId" : agentId,
@@ -130,14 +130,14 @@ $(document).on('click', '#restart-survey-mail', function(e) {
 	showToast();
 });
 
-$(document).on('click', '#report-abuse', function(e) {
+$(document).on('click', '.report-abuse-txt', function(e) {
 	
-	var firstName = $(this).parent().parent().parent().attr('data-firstname');
-	var lastName = $(this).parent().parent().parent().attr('data-lastname');
-	var agentName = $(this).parent().parent().parent().attr('data-agentname');
-	var customerEmail = $(this).parent().parent().parent().attr('data-customeremail');
-	var agentId = $(this).parent().parent().parent().attr('data-agentid');
-	var review = $(this).parent().parent().parent().attr('data-review');
+	var firstName = $(this).parent().parent().parent().parent().attr('data-firstname');
+	var lastName = $(this).parent().parent().parent().parent().attr('data-lastname');
+	var agentName = $(this).parent().parent().parent().parent().attr('data-agentname');
+	var customerEmail = $(this).parent().parent().parent().parent().attr('data-customeremail');
+	var agentId = $(this).parent().parent().parent().parent().attr('data-agentid');
+	var review = $(this).parent().parent().parent().parent().attr('data-review');
 	var payload = {
 			"customerEmail" : customerEmail,
 			"agentId" : agentId,

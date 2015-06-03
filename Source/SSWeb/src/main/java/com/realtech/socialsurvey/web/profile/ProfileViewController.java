@@ -5,14 +5,13 @@ package com.realtech.socialsurvey.web.profile;
 
 import java.io.IOException;
 import java.util.List;
-
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-
 import org.apache.solr.common.SolrDocument;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
@@ -22,12 +21,15 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
-
 import com.amazonaws.util.json.JSONException;
 import com.amazonaws.util.json.JSONObject;
 import com.google.gson.Gson;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
+import com.realtech.socialsurvey.core.entities.Company;
 import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
+import com.realtech.socialsurvey.core.entities.ProfilesMaster;
+import com.realtech.socialsurvey.core.entities.SocialPost;
+import com.realtech.socialsurvey.core.entities.SurveyDetails;
 import com.realtech.socialsurvey.core.entities.User;
 import com.realtech.socialsurvey.core.entities.UserProfile;
 import com.realtech.socialsurvey.core.enums.DisplayMessageType;
@@ -47,7 +49,7 @@ import com.realtech.socialsurvey.core.utils.MessageUtils;
 import com.realtech.socialsurvey.web.common.JspResolver;
 
 @Controller
-public class ProfileViewController {
+public class ProfileViewController implements InitializingBean{
 	
 	private static final Logger LOG = LoggerFactory.getLogger(ProfileViewController.class);
 	
@@ -73,6 +75,11 @@ public class ProfileViewController {
 	@Value("${CAPTCHA_SECRET}")
 	private String captchaSecretKey;
 	
+	@Value("${BOTS_USER_AGENT_LIST}")
+	private String botUserAgentList;
+	
+	private String[] listBots;
+	
 	/**
 	 * Method to return company profile page
 	 * 
@@ -81,9 +88,12 @@ public class ProfileViewController {
 	 * @return
 	 */
 	@RequestMapping(value = "/company/{profileName}", method = RequestMethod.GET)
-	public String initCompanyProfilePage(@PathVariable String profileName, Model model) {
+	public String initCompanyProfilePage(@PathVariable String profileName, Model model, HttpServletRequest request) {
 		LOG.info("Service to initiate company profile page called");
 		String message = null;
+		// check if the request is from bot
+		boolean isBotRequest = checkBotRequest(request);
+		
 		if (profileName == null || profileName.isEmpty()) {
 			message = messageUtils.getDisplayMessage(DisplayMessageConstants.INVALID_COMPANY_PROFILENAME, DisplayMessageType.ERROR_MESSAGE)
 					.getMessage();
@@ -99,6 +109,30 @@ public class ProfileViewController {
 			companyProfile = profileManagementService.getCompanyProfileByProfileName(profileName);
 			String json = new Gson().toJson(companyProfile);
 			model.addAttribute("profileJson",json);
+			Long companyId = companyProfile.getIden();
+			double averageRating = profileManagementService.getAverageRatings(companyId, CommonConstants.PROFILE_LEVEL_COMPANY, false);
+			model.addAttribute("averageRating",averageRating);
+			long reviewsCount = profileManagementService.getReviewsCount(companyId, CommonConstants.MIN_RATING_SCORE, CommonConstants.MAX_RATING_SCORE, CommonConstants.PROFILE_LEVEL_COMPANY, false);
+			model.addAttribute("reviewsCount",reviewsCount);
+			if(isBotRequest){
+				//TODO:remove hardcoding of start,end,minScore etc
+				List<SurveyDetails> reviews = profileManagementService.getReviews(companyId, -1, -1, -1, -1,
+					CommonConstants.PROFILE_LEVEL_COMPANY, false, null, null, CommonConstants.REVIEWS_SORT_CRITERIA_FEATURE);
+				model.addAttribute("reviews", reviews);
+				
+				UserProfile selectedProfile = new UserProfile();
+				ProfilesMaster profilesMaster = new ProfilesMaster();
+				profilesMaster.setProfileId(CommonConstants.PROFILES_MASTER_COMPANY_ADMIN_PROFILE_ID);
+				
+				Company company = new Company();
+				company.setCompanyId(companyProfile.getIden());
+				
+				selectedProfile.setProfilesMaster(profilesMaster);
+				selectedProfile.setCompany(company);
+				
+				List<SocialPost> posts = profileManagementService.getSocialPosts(selectedProfile, -1, -1);
+				model.addAttribute("posts", posts);
+			}
 		}
 		catch (InvalidInputException e) {
 			throw new InternalServerException(new ProfileServiceErrorCode(CommonConstants.ERROR_CODE_COMPANY_PROFILE_SERVICE_FAILURE,
@@ -108,7 +142,11 @@ public class ProfileViewController {
 		model.addAttribute("companyProfileName", profileName);
 		model.addAttribute("profileLevel", CommonConstants.PROFILE_LEVEL_COMPANY);
 		LOG.info("Service to initiate company profile page executed successfully");
-		return JspResolver.PROFILE_PAGE;
+		if(isBotRequest){
+			return JspResolver.PROFILE_PAGE_NOSCRIPT;			
+		}else{
+			return JspResolver.PROFILE_PAGE;
+		}
 	}
 	
 	
@@ -121,9 +159,10 @@ public class ProfileViewController {
 	 * @return
 	 */
 	@RequestMapping(value = "/region/{companyProfileName}/{regionProfileName}")
-	public String initRegionProfilePage(@PathVariable String companyProfileName, @PathVariable String regionProfileName, Model model) {
+	public String initRegionProfilePage(@PathVariable String companyProfileName, @PathVariable String regionProfileName, Model model, HttpServletRequest request) {
 		LOG.info("Service to initiate region profile page called");
 		String message = null;
+		boolean isBotRequest = checkBotRequest(request);
 		if (companyProfileName == null || companyProfileName.isEmpty()) {
 			message = messageUtils.getDisplayMessage(DisplayMessageConstants.INVALID_COMPANY_PROFILENAME, DisplayMessageType.ERROR_MESSAGE)
 					.getMessage();
@@ -146,6 +185,26 @@ public class ProfileViewController {
 			regionProfile = profileManagementService.getRegionByProfileName(companyProfileName, regionProfileName);
 			String json = new Gson().toJson(regionProfile);
 			model.addAttribute("profileJson",json);
+			Long regionId = regionProfile.getIden();
+			double averageRating = profileManagementService.getAverageRatings(regionId, CommonConstants.PROFILE_LEVEL_REGION, false);
+			model.addAttribute("averageRating",averageRating);
+			long reviewsCount = profileManagementService.getReviewsCount(regionId, CommonConstants.MIN_RATING_SCORE, CommonConstants.MAX_RATING_SCORE, CommonConstants.PROFILE_LEVEL_REGION, false);
+			model.addAttribute("reviewsCount",reviewsCount);
+			if(isBotRequest){
+				//TODO:remove hardcoding of start,end,minScore etc
+				List<SurveyDetails> reviews = profileManagementService.getReviews(regionId, -1, -1, -1, -1,
+					CommonConstants.PROFILE_LEVEL_REGION, false, null, null, CommonConstants.REVIEWS_SORT_CRITERIA_FEATURE);
+				model.addAttribute("reviews", reviews);
+				
+				UserProfile selectedProfile = new UserProfile();
+				ProfilesMaster profilesMaster = new ProfilesMaster();
+				profilesMaster.setProfileId(CommonConstants.PROFILES_MASTER_REGION_ADMIN_PROFILE_ID);
+				
+				selectedProfile.setProfilesMaster(profilesMaster);
+				selectedProfile.setRegionId(regionProfile.getIden());
+				List<SocialPost> posts = profileManagementService.getSocialPosts(selectedProfile, -1, -1);
+				model.addAttribute("posts", posts);
+			}
 		}
 		catch (InvalidInputException e) {
 			throw new InternalServerException(new ProfileServiceErrorCode(CommonConstants.ERROR_CODE_REGION_PROFILE_SERVICE_FAILURE,
@@ -156,7 +215,11 @@ public class ProfileViewController {
 		model.addAttribute("regionProfileName", regionProfileName);
 		model.addAttribute("profileLevel", CommonConstants.PROFILE_LEVEL_REGION);
 		LOG.info("Service to initiate region profile page executed successfully");
-		return JspResolver.PROFILE_PAGE;
+		if(isBotRequest){
+			return JspResolver.PROFILE_PAGE_NOSCRIPT;			
+		}else{
+			return JspResolver.PROFILE_PAGE;
+		}
 	}
 
 	/**
@@ -168,9 +231,10 @@ public class ProfileViewController {
 	 * @return
 	 */
 	@RequestMapping(value = "/office/{companyProfileName}/{branchProfileName}")
-	public String initBranchProfilePage(@PathVariable String companyProfileName, @PathVariable String branchProfileName, Model model) {
+	public String initBranchProfilePage(@PathVariable String companyProfileName, @PathVariable String branchProfileName, Model model, HttpServletRequest request) {
 		LOG.info("Service to initiate branch profile page called");
 		String message = null;
+		boolean isBotRequest = checkBotRequest(request);
 		if (companyProfileName == null || companyProfileName.isEmpty()) {
 			message = messageUtils.getDisplayMessage(DisplayMessageConstants.INVALID_COMPANY_PROFILENAME, DisplayMessageType.ERROR_MESSAGE)
 					.getMessage();
@@ -193,6 +257,26 @@ public class ProfileViewController {
 			branchProfile = profileManagementService.getBranchByProfileName(companyProfileName, branchProfileName);
 			String json = new Gson().toJson(branchProfile);
 			model.addAttribute("profileJson",json);
+			Long branchId = branchProfile.getIden();
+			double averageRating = profileManagementService.getAverageRatings(branchId, CommonConstants.PROFILE_LEVEL_BRANCH, false);
+			model.addAttribute("averageRating",averageRating);
+			long reviewsCount = profileManagementService.getReviewsCount(branchId, CommonConstants.MIN_RATING_SCORE, CommonConstants.MAX_RATING_SCORE, CommonConstants.PROFILE_LEVEL_BRANCH, false);
+			model.addAttribute("reviewsCount",reviewsCount);
+			if(isBotRequest){
+				//TODO:remove hardcoding of start,end,minScore etc
+				List<SurveyDetails> reviews = profileManagementService.getReviews(branchId, -1, -1, -1, -1,
+					CommonConstants.PROFILE_LEVEL_BRANCH, false, null, null, CommonConstants.REVIEWS_SORT_CRITERIA_FEATURE);
+				model.addAttribute("reviews", reviews);
+				
+				UserProfile selectedProfile = new UserProfile();
+				ProfilesMaster profilesMaster = new ProfilesMaster();
+				profilesMaster.setProfileId(CommonConstants.PROFILES_MASTER_BRANCH_ADMIN_PROFILE_ID);
+				
+				selectedProfile.setProfilesMaster(profilesMaster);
+				selectedProfile.setBranchId(branchProfile.getIden());
+				List<SocialPost> posts = profileManagementService.getSocialPosts(selectedProfile, -1, -1);
+				model.addAttribute("posts", posts);
+			}
 		}
 		catch (InvalidInputException e) {
 			throw new InternalServerException(new ProfileServiceErrorCode(CommonConstants.ERROR_CODE_BRANCH_PROFILE_SERVICE_FAILURE,
@@ -203,7 +287,11 @@ public class ProfileViewController {
 		model.addAttribute("branchProfileName", branchProfileName);
 		model.addAttribute("profileLevel", CommonConstants.PROFILE_LEVEL_BRANCH);
 		LOG.info("Service to initiate branch profile page executed successfully");
-		return JspResolver.PROFILE_PAGE;
+		if(isBotRequest){
+			return JspResolver.PROFILE_PAGE_NOSCRIPT;			
+		}else{
+			return JspResolver.PROFILE_PAGE;
+		}
 	}
 
 	/**
@@ -214,10 +302,10 @@ public class ProfileViewController {
 	 * @return
 	 */
 	@RequestMapping(value = "/{agentProfileName}")
-	public String initBranchProfilePage(@PathVariable String agentProfileName, Model model, HttpServletResponse response) {
+	public String initBranchProfilePage(@PathVariable String agentProfileName, Model model, HttpServletResponse response, HttpServletRequest request) {
 		LOG.info("Service to initiate agent profile page called");
 		String message = null;
-		
+		boolean isBotRequest = checkBotRequest(request);
 		if (agentProfileName == null || agentProfileName.isEmpty()) {
 			message = messageUtils.getDisplayMessage(DisplayMessageConstants.INVALID_INDIVIDUAL_PROFILENAME, DisplayMessageType.ERROR_MESSAGE)
 					.getMessage();
@@ -264,6 +352,28 @@ public class ProfileViewController {
 				individualProfile = profileManagementService.getIndividualByProfileName(agentProfileName);
 				String json = new Gson().toJson(individualProfile);
 				model.addAttribute("profileJson",json);
+				
+				Long agentId = user.getUserId();
+				double averageRating = profileManagementService.getAverageRatings(agentId, CommonConstants.PROFILE_LEVEL_INDIVIDUAL, false);
+				model.addAttribute("averageRating",averageRating);
+				long reviewsCount = profileManagementService.getReviewsCount(agentId, CommonConstants.MIN_RATING_SCORE, CommonConstants.MAX_RATING_SCORE, CommonConstants.PROFILE_LEVEL_INDIVIDUAL, false);
+				model.addAttribute("reviewsCount",reviewsCount);
+				
+				if(isBotRequest){
+					//TODO:remove hardcoding of start,end,minScore etc
+					List<SurveyDetails> reviews = profileManagementService.getReviews(agentId, -1, -1, -1, -1,
+						CommonConstants.PROFILE_LEVEL_INDIVIDUAL, false, null, null, CommonConstants.REVIEWS_SORT_CRITERIA_FEATURE);
+					model.addAttribute("reviews", reviews);
+					
+					UserProfile selectedProfile = new UserProfile();
+					ProfilesMaster profilesMaster = new ProfilesMaster();
+					profilesMaster.setProfileId(CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID);
+					
+					selectedProfile.setProfilesMaster(profilesMaster);
+					selectedProfile.setAgentId(individualProfile.getIden());
+					List<SocialPost> posts = profileManagementService.getSocialPosts(selectedProfile, -1, -1);
+					model.addAttribute("posts", posts);
+				}
 				SolrDocument solrDocument;
 	            try {
 		            solrDocument = solrSearchService.getUserByUniqueId(individualProfile.getIden());
@@ -306,7 +416,11 @@ public class ProfileViewController {
 		model.addAttribute("profileLevel", CommonConstants.PROFILE_LEVEL_INDIVIDUAL);
 		
 		LOG.info("Service to initiate agent profile page executed successfully");
-		return JspResolver.PROFILE_PAGE;
+		if(isBotRequest){
+			return JspResolver.PROFILE_PAGE_NOSCRIPT;			
+		}else{
+			return JspResolver.PROFILE_PAGE;
+		}
 	}
 	
 	private String makeJsonMessage(int status, String message) {
@@ -384,6 +498,29 @@ public class ProfileViewController {
 		}
 		
 		return makeJsonMessage(CommonConstants.STATUS_ACTIVE, returnMessage);
+	}
+
+	private boolean checkBotRequest(HttpServletRequest request){
+		// Get the user agent. If its a bot, then return the no javascript page
+		boolean isBotRequest = false;
+		String userAgent = request.getHeader("User-Agent");
+		LOG.debug("User header found : "+userAgent);
+		if(userAgent != null){
+			for(String bot : listBots){
+				if(userAgent.indexOf(bot) != -1){
+					LOG.debug("Found a crawler: "+bot);
+					isBotRequest = true;
+					break;
+				}
+			}
+		}
+		return isBotRequest;
+	}
+
+	@Override
+	public void afterPropertiesSet() throws Exception {
+		LOG.info("Get the list of bots");
+		listBots = botUserAgentList.split(",");
 	}
 
 }

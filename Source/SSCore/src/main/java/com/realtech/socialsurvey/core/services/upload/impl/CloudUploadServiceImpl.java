@@ -3,6 +3,7 @@ package com.realtech.socialsurvey.core.services.upload.impl;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -120,7 +121,8 @@ public class CloudUploadServiceImpl implements FileUploadService {
 
 		ObjectMetadata metadata = new ObjectMetadata();
 		metadata.setCacheControl(CACHE_PUBLIC);
-
+		// TODO: set expiration date properly later
+		metadata.setExpirationTime(new Date(System.currentTimeMillis()));
 		PutObjectRequest putObjectRequest = new PutObjectRequest(bucket, fileName, file);
 		putObjectRequest.setMetadata(metadata);
 		putObjectRequest.withCannedAcl(CannedAccessControlList.PublicRead);
