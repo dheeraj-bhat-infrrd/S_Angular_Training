@@ -45,9 +45,9 @@
     		<fmt:formatNumber var="floatingAverageRating" type="number" value="${averageRating}" maxFractionDigits="2" minFractionDigits="2"/>
     		<fmt:formatNumber var="integerAverageRating" type="number" value="${averageRating}" maxFractionDigits="0"/>
     		<c:set var="integerAverageRating" value="${integerAverageRating}"></c:set>
-    		<%-- <c:if test="${integerAverageRating == 6}">
-    			<c:set var="integerAverageRating" value="5"></c:set>
-    		</c:if> --%>
+    		<c:if test="${integerAverageRating == 0}">
+    			<c:set var="integerAverageRating" value="1"></c:set>
+    		</c:if>
     	</c:if>
     </c:if>
 </head>
@@ -268,15 +268,27 @@
               					</div>
                   		 	</c:when>
                   		 	<c:when test="${not empty regionProfileName}">
-                   		 	<div id="region-hierarchy" class="prof-left-row prof-left-assoc bord-bot-dc hide">
-                   				<div class="left-assoc-wrapper">
-		                   		 	<input type="hidden" id="branchid-hidden"/>
-		                   		 		<div class="left-panel-header"><spring:message code="label.ourregion.key"/></div>
-			                        	<div class="left-panel-content left-panel-content-adj" id="region-branches">
-			                            	<!--region hierarchy is displayed here  -->
-			                        	</div>
-			                    </div>
-			               </div>
+	                   		 	<div id="region-hierarchy" class="prof-left-row prof-left-assoc bord-bot-dc hide">
+	                   				<div class="left-assoc-wrapper">
+			                   		 	<input type="hidden" id="branchid-hidden"/>
+			                   		 		<div class="left-panel-header"><spring:message code="label.ourregion.key"/></div>
+				                        	<div class="left-panel-content left-panel-content-adj" id="region-branches">
+				                            	<!--region hierarchy is displayed here  -->
+				                        	</div>
+				                    </div>
+				               </div>
+                  		 	</c:when>
+    		 	            <c:when test="${not empty companyProfileName}">
+                                <div id="comp-hierarchy" class="prof-left-row prof-left-assoc bord-bot-dc hide">
+                  					<div class="left-assoc-wrapper">
+	                   		 			<input type="hidden" id="regionid-hidden"/>
+	                   		 			<input type="hidden" id="branchid-hidden"/>
+	                   		 			<div class="left-panel-header"><spring:message code="label.ourcompany.key"/></div>
+		                        		<div class="left-panel-content left-panel-content-adj" id="comp-regions-content">
+		                            		<!--company hierarchy is displayed here  -->
+		                        		</div>
+	                        		</div>
+		               			</div>
                   		 	</c:when>
                   		 	<c:when test="${not empty agentProfileName}">
                   		 		<div id="individual-details">
@@ -293,7 +305,41 @@
                   		 						</div>
                   		 					</div>
                   		 			</c:if>
-                  		 			<!-- TODO:add positions -->
+                  		 			<c:if test="${not empty profile.positions }">
+                  		 				<div class="prof-left-row prof-left-assoc bord-bot-dc">
+                  		 					<div class="left-postions-wrapper">
+                  		 						<div class="left-panel-header lph-dd lph-dd-closed lph-dd-open">Positions</div>
+                  		 						<div class="left-panel-content">
+                  		 							<c:forEach items="${profile.positions}" var="positionItem">
+                  		 								<div class="postions-content">
+                  		 									<c:if test="${not empty positionItem.name}">
+                  		 										<div class="lp-pos-row-1 lp-row clearfix">${positionItem.name}</div>
+                  		 									</c:if>
+                  		 									<c:if test="${not empty positionItem.title}">
+                  		 										<div class="lp-pos-row-2 lp-row clearfix">${positionItem.title}</div>
+                  		 									</c:if>
+                  		 									<c:choose>
+                  		 										<c:when test="${not positionItem.isCurrent}">
+                  		 											<c:if test="${not empty positionItem.startTime && not empty positionItem.endTime}">
+                  		 												<div class="lp-pos-row-3 lp-row clearfix">
+                  		 													${positionItem.startTime} - ${positionItem.endTime}
+                  		 												</div>
+                  		 											</c:if>
+                  		 										</c:when>
+                  		 										<c:otherwise>
+                  		 											<c:if test="${not empty positionItem.startTime}">
+	                  		 											<div class="lp-pos-row-3 lp-row clearfix">
+	                  		 												${positionItem.startTime} - Current
+	                  		 											</div>
+                  		 											</c:if>
+                  		 										</c:otherwise>
+                  		 									</c:choose>
+                  		 								</div>
+                  		 							</c:forEach>
+                  		 						</div>
+                  		 					</div>
+                  		 				</div>
+                  		 			</c:if>
                   		 			<c:if test="${not empty profile.associations }">
                		 					<div class="prof-left-row prof-left-auth bord-bot-dc">
                		 						<div class="left-auth-wrapper">
@@ -343,18 +389,6 @@
                		 					</div>
                   		 			</c:if>
                   		 		</div>
-                  		 	</c:when>
-                  		 	<c:when test="${not empty companyProfileName}">
-                                <div id="comp-hierarchy" class="prof-left-row prof-left-assoc bord-bot-dc hide">
-                  					<div class="left-assoc-wrapper">
-	                   		 			<input type="hidden" id="regionid-hidden"/>
-	                   		 			<input type="hidden" id="branchid-hidden"/>
-	                   		 			<div class="left-panel-header"><spring:message code="label.ourcompany.key"/></div>
-		                        		<div class="left-panel-content left-panel-content-adj" id="comp-regions-content">
-		                            		<!--company hierarchy is displayed here  -->
-		                        		</div>
-	                        		</div>
-		               			</div>
                   		 	</c:when>
               		</c:choose>
                     <div class="prof-left-row prof-left-assoc bord-bot-dc">
@@ -473,6 +507,9 @@
                     <div id="prof-review-item" class="prof-reviews">
                     		<c:forEach items="${reviews }" var="reviewItem">
                     			<fmt:formatNumber var="integerRating" value="${reviewItem.score }" maxFractionDigits="0"/>
+                    			<c:if test="${integerRating == 0}">
+					    			<c:set var="integerRating" value="1"></c:set>
+					    		</c:if>
 								<div class="ppl-review-item" data-cust-first-name="${reviewItem.customerFirstName }"
 									data-cust-last-name="${reviewItem.customerLastName }" data-agent-name="${reviewItem.agentName }"
 									data-rating="${reviewItem.score }" data-review="${reviewItem.review}">
@@ -520,7 +557,7 @@
     <div class="float-left mob-icn inc-more"></div>
 </div>
 <div class="hide" itemscope itemtype="http://schema.org/Product">
-	<span itemprop="name">Social Survey</span>
+	<span itemprop="name">${profName}</span>
 	<span id="agent-desc" itemprop="title"></span>
 	<div itemprop="aggregateRating" itemscope itemtype="http://schema.org/AggregateRating">Rated 
 		<span id="prof-schema-agent-rating" itemprop="ratingValue">${floatingAverageRating }</span>/5 based on 
