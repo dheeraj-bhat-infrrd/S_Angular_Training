@@ -15,6 +15,7 @@ import com.realtech.socialsurvey.core.entities.Licenses;
 import com.realtech.socialsurvey.core.entities.LinkedInProfileData;
 import com.realtech.socialsurvey.core.entities.LockSettings;
 import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
+import com.realtech.socialsurvey.core.entities.ProfileStage;
 import com.realtech.socialsurvey.core.entities.SocialMediaTokens;
 import com.realtech.socialsurvey.core.entities.SocialPost;
 import com.realtech.socialsurvey.core.entities.SurveyDetails;
@@ -390,5 +391,7 @@ public interface ProfileManagementService {
 	 * @throws InvalidInputException
 	 */
 	public void updateAgentCompanyPositions(AgentSettings agentSettings, List<CompanyPositions> companyPositions) throws InvalidInputException;
+
+	public void updateProfileStages(List<ProfileStage> profileStages, OrganizationUnitSettings settings, String collectionName);
 
 }

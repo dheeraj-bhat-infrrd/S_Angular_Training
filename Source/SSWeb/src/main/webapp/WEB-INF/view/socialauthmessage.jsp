@@ -96,9 +96,15 @@ $(window).on('unload', function(){
 	if (window.opener != null && !window.opener.closed) {
 		parentWindow = window.opener;
 	}
+	var fromDashboard = "${fromDashboard}";
 	var restful = "${restful}";
 	var flow = "${socialFlow}";
-	if(restful != "1"){
+	if(fromDashboard == 1){
+		var columnName = "${columnName}";
+		var columnValue = "${columnValue}";
+		parentWindow.showDashboardButtons(columnName, columnValue);
+	}
+	else if(restful != "1"){
 		if (flow == "registration") {
 			var payload = {
 				'socialNetwork' : "linkedin"
