@@ -55,9 +55,9 @@
 		<div id="pro-cmplt-stars" class="dsh-star-wrapper clearfix">
 			<%-- <div class="float-left dsh-star-item"></div>
 			<div id="profile-completed" class="float-left dsh-rating-item">${fn:substringBefore(profileCompleteness * 5 / 100, '.')}/5</div> --%>
-			<div class="dsh-btn-complete float-left" onclick="sendSurveyInvitation();"><spring:message code="label.sendsurvey.btn.key" /></div>
-			<div class="dsh-btn-complete dsh-btn-orange float-left">Connect to Linkedin</div>
-			<div class="dsh-btn-complete dsh-btn-green float-left">Connect to Twitter</div>
+			<div id="dsh-btn1" class="dsh-btn-complete float-left" onclick="sendSurveyInvitation();"><spring:message code="label.sendsurvey.btn.key" /></div>
+			<div id="dsh-btn2" class="dsh-btn-complete dsh-btn-orange float-left hide"></div>
+			<div id="dsh-btn3" class="dsh-btn-complete dsh-btn-green float-left hide"></div>
 			<%-- <c:choose>
 				<c:when test="${profilemasterid == 4}">
 					<div class="dsh-btn-complete float-left" onclick="sendSurveyInvitation();"><spring:message code="label.sendsurvey.btn.key" /></div>
@@ -159,5 +159,9 @@ $(document).ready(function() {
 	$('#srv-scr').click(function(){
 		showSurveyRequestPage();
 	});
+	
+	var columnName = "${columnName}";
+	var columnValue = "${columnValue}";
+	showDashboardButtons(columnName, columnValue);
 });
 </script>

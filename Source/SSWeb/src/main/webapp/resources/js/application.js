@@ -6706,3 +6706,80 @@ function paintPosts(posts) {
 		}
 	});
 }
+
+function showDashboardButtons(columnName, columnValue){
+	console.log(columnName);
+	console.log(columnValue);
+	var payload={
+			"columnName" : columnName,
+			"columnValue" : columnValue
+	};
+	callAjaxGetWithPayloadData('./dashboardbuttonsorder.do', paintDashboardButtons, payload, true);
+}
+
+function paintDashboardButtons(data){
+	data = $.parseJSON(data);
+	var columnName = data.columnName;
+	var columnValue = data.columnValue;
+	var stages = data.stages;
+	var max = 2;
+	if (stages != undefined && stages.length != 0) {
+		if (stages.length < max) {
+			$('#dsh-btn2').addClass('hide');
+			$('#dsh-btn3').addClass('hide');
+			max = stages.length;
+		}
+		for (var i = 0; i < max; i++) {
+			var contentToDisplay = '';
+			if (stages[i].profileStageKey == 'FACEBOOK_PRF') {
+				contentToDisplay = 'Connect To Facebook';
+			} else if (stages[i].profileStageKey == 'GOOGLE_PRF') {
+				contentToDisplay = 'Connect To Google';
+			} else if (stages[i].profileStageKey == 'TWITTER_PRF') {
+				contentToDisplay = 'Connect To Twitter';
+			} else if (stages[i].profileStageKey == 'YELP_PRF') {
+				contentToDisplay = 'Connect To Yelp';
+			} else if (stages[i].profileStageKey == 'LINKEDIN_PRF') {
+				contentToDisplay = 'Connect To Linkedin';
+			}
+			if (i == 0) {
+				$('#dsh-btn2').data('social', stages[i].profileStageKey);
+				$('#dsh-btn2').html(contentToDisplay);
+				$('#dsh-btn2').removeClass('hide');
+			}
+			if (i == 1) {
+				$('#dsh-btn3').data('social', stages[i].profileStageKey);
+				$('#dsh-btn3').html(contentToDisplay);
+				$('#dsh-btn3').removeClass('hide');
+			}
+		}
+	}
+	$('#dsh-btn2').click(function(){
+		var buttonId = 'dsh-btn2';
+		var task = $('#dsh-btn2').data('social');
+		dashboardButtonAction(buttonId, task, columnName, columnValue);
+	});
+	$('#dsh-btn3').click(function(){
+		var buttonId = 'dsh-btn3';
+		var task = $('#dsh-btn3').data('social');
+		dashboardButtonAction(buttonId, task, columnName, columnValue);
+	});
+}
+
+function dashboardButtonAction(buttonId, task, columnName, columnValue){
+	if(task=='FACEBOOK_PRF'){
+		openAuthPageDashboard('facebook', columnName, columnValue);
+	}
+	else if(task=='GOOGLE_PRF'){
+		openAuthPageDashboard('google', columnName, columnValue);
+	}
+	else if(task=='YELP_PRF'){
+	//	openAuthPageDashboard(socialNetwork, columnName, columnValue);
+	}
+	else if(task=='LINKEDIN_PRF'){
+		openAuthPageDashboard('linkedin', columnName, columnValue);
+	}
+	else if(task=='TWITTER_PRF'){
+		openAuthPageDashboard('twitter', columnName, columnValue);
+	}
+}

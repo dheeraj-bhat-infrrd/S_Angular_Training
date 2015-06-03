@@ -1,8 +1,8 @@
-package com.realtech.socialsurvey.core.commons;
+package com.realtech.socialsurvey.core.enums;
 
 public enum ProfileStages {
 
-	FACEBOOK_PRF(1), GOOGLE_PRF(2), TWITTER_PRF(3), YELP_PRF(4);
+	LINKEDIN_PRF(1), FACEBOOK_PRF(2), GOOGLE_PRF(3), TWITTER_PRF(4), YELP_PRF(5);
 
 	private final int order;
 
