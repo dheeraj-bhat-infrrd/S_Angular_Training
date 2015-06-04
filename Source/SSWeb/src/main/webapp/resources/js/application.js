@@ -6761,15 +6761,15 @@ function paintDashboardButtons(data){
 		for (var i = 0; i < max; i++) {
 			var contentToDisplay = '';
 			if (stages[i].profileStageKey == 'FACEBOOK_PRF') {
-				contentToDisplay = 'Connect To Facebook';
+				contentToDisplay = 'Connect to Facebook';
 			} else if (stages[i].profileStageKey == 'GOOGLE_PRF') {
-				contentToDisplay = 'Connect To Google+';
+				contentToDisplay = 'Connect to Google+';
 			} else if (stages[i].profileStageKey == 'TWITTER_PRF') {
-				contentToDisplay = 'Connect To Twitter';
+				contentToDisplay = 'Connect to Twitter';
 			} else if (stages[i].profileStageKey == 'YELP_PRF') {
-				contentToDisplay = 'Connect To Yelp';
+				contentToDisplay = 'Connect to Yelp';
 			} else if (stages[i].profileStageKey == 'LINKEDIN_PRF') {
-				contentToDisplay = 'Connect To Linkedin';
+				contentToDisplay = 'Connect to Linkedin';
 			} else if (stages[i].profileStageKey == 'LICENSE_PRF') {
 				contentToDisplay = 'Enter license details';
 			} else if (stages[i].profileStageKey == 'HOBBIES_PRF') {
