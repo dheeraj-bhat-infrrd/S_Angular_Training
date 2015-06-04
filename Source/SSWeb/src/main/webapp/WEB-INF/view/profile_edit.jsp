@@ -530,7 +530,7 @@
 			$('#intro-body-text').text($('#intro-body-text-edit').val().trim());
 		}
 		paintForProfile();
-		
+		focusOnElement();
 		$('.ppl-share-wrapper .icn-plus-open').click(function() {
 			$(this).hide();
 			$(this).parent().find('.ppl-share-social,.icn-remove').show();
