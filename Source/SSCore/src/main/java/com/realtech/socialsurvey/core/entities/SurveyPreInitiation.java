@@ -36,6 +36,12 @@ public class SurveyPreInitiation implements Serializable {
 
 	@Column(name = "AGENT_ID")
 	private long agentId;
+	
+	@Column(name = "AGENT_NAME")
+	private String agentName;
+	
+	@Column(name = "AGENT_EMAILID")
+	private String agentEmailId;
 
 	@Column(name = "CUSTOMER_FIRST_NAME")
 	private String customerFirstName;
@@ -105,6 +111,22 @@ public class SurveyPreInitiation implements Serializable {
 
 	public void setAgentId(long agentId) {
 		this.agentId = agentId;
+	}
+
+	public String getAgentName() {
+		return agentName;
+	}
+
+	public void setAgentName(String agentName) {
+		this.agentName = agentName;
+	}
+
+	public String getAgentEmailId() {
+		return agentEmailId;
+	}
+
+	public void setAgentEmailId(String agentEmailId) {
+		this.agentEmailId = agentEmailId;
 	}
 
 	public String getCustomerFirstName() {
