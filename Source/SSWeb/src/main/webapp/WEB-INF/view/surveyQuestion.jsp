@@ -95,7 +95,7 @@
 					<div class="sq-bord-bot-sm"></div>
 					<input type="hidden" value="${message}" data-status="${status}" name="message" id="message"/>
 					<div class="sq-rat-wrapper">
-						<form id="survey-request-form" action="${initParam.resourcesPath}/rest/survey/triggersurvey">
+						<form id="survey-request-form" action="/rest/survey/triggersurvey">
 							<div class="sq-star-wrapper sq-i-container clearfix ques-wrapper-adj">
 								<div class="clearfix sq-info-wrapper">
 									<div class="sq-i-lbl float-left">First Name</div>
