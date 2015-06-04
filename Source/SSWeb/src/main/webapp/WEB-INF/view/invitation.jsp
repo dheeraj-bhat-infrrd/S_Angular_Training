@@ -9,7 +9,7 @@
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
 <title><spring:message code="label.title.invitation.key" /></title>
-<link rel="shortcut icon" href="${initParam.resourcesPath}/favicon.ico" sizes="16x16">
+<link rel="shortcut icon" href="/favicon.ico" sizes="16x16">
 <link rel="stylesheet"
 	href="${initParam.resourcesPath}/resources/css/bootstrap.min.css">
 <link rel="stylesheet"
