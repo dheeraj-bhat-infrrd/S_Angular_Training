@@ -373,7 +373,7 @@
                 <div class="people-say-wrapper rt-content-main hide" id="reviews-container">
                 	<div class="clearfix hide">
 	                    <div class="main-con-header float-left" id="prof-reviews-header">
-	                    	<span class="ppl-say-txt-st">What people say</span> about ${profName }
+	                    	<span class="ppl-say-txt-st">What people are saying</span> about ${profName }
 	                    </div>
 	                    
 	                    <div id="prof-reviews-sort" class="prof-reviews-sort clearfix float-right hide">

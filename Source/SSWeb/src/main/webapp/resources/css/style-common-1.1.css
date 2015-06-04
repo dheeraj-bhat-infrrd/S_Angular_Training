@@ -836,7 +836,7 @@ input#find-pro-submit{
 }
 
 .wc-review-table-cont{
-	max-height: 250px;
+	max-height: 300px;
 	position: relative;
 }
 
@@ -1223,4 +1223,151 @@ span.wc-highlight {
     display: inline;
     margin: 0px 5px;
     cursor: pointer;
+}
+
+.payment-hdr-block {
+	text-align: center;
+}
+
+.payment-hdr-txt2 {
+	color: #999;
+}
+
+table.payment-pricing th strong {
+	color: #333;
+	font-size: 34px;
+	line-height: 34px;
+	font-weight: normal;
+}
+
+.payment-acc-type-txt {
+	font-size: 15px;
+	font-weight: 900;
+	color: #009fe0;
+	line-height: 0;
+	text-transform: uppercase;
+}
+
+table.payment-pricing {
+	width: 100%;
+	margin-bottom: 70px;
+	margin-top: 4px;
+}
+
+table.payment-pricing th {
+	padding: 10px 0 21px;
+	color: #999;
+	font: 300 1.154em/3em 'Open Sans', Helvetca, Arial, sans-serif;
+	text-align: center;
+}
+
+table.payment-pricing td {
+	font-size: 14px;
+	line-height: 22px;
+	color: #444;
+	text-align: center;
+	width: 20%;
+	padding: 14px 0;
+}
+
+table.payment-pricing td:first-child {
+	color: #999;
+	text-align: left;
+}
+
+table.payment-pricing td:nth-child(2n+2) {
+	background: #f4f4f4;
+}
+
+.payment-pricing tr {
+    border-bottom: 1px solid #E0E0E0;
+}
+
+.payment-button {
+	display: inline-block;
+	padding: 0 25px;
+	font-size: 14px;
+	font-weight: 400;
+	background: #70c14a;
+	color: #fff;
+	height: 34px !important;
+	padding: 0 31px;
+	text-transform: none !important;
+	line-height: 34px;
+	box-shadow: none;
+}
+
+.payment-button-disabled {
+	background-color: rgb(144, 130, 130);
+}
+
+.payment-container {
+	background:#FAFAFA; 
+}
+
+.payment-icn {
+    display: block;
+    width: 20px;
+    height: 20px;
+    margin: 0 auto;
+}
+
+.payment-tick-icn{
+	background: url(../images/p-tick.png) no-repeat center;
+}
+
+.payment-close-icn{
+	background: url(../images/p-cross.png) no-repeat center;
+}
+
+footer.login-footer {
+	background: #333;
+	margin-top: 20px;
+}
+
+footer.login-footer h3 {
+	font-weight: bold;
+	color: #aaa;
+	font-size: 14px;
+	letter-spacing: 0.015em;
+	line-height: 20px;
+	text-transform: uppercase;
+	margin-bottom: 25px;
+}
+
+.login-footer-container {
+	padding-top: 25px;
+}
+
+footer.login-footer * {
+  color: #999;
+}
+
+footer.login-footer ul.menu {
+    list-style: none;
+    padding: 0;
+}
+
+footer.login-footer li {
+	margin: 0 0 6px;
+	line-height: 18px;
+	letter-spacing: 0.005em;
+	overflow: hidden;
+}
+
+footer.login-footer a {
+    color: #ccc;
+}
+
+footer .bottom {
+	padding: 0 0 30px 0;
+	border-top: 1px solid #575757;
+	margin-top: 6px;
+}
+
+footer .bottom p {
+	margin: 13px 0 1em;
+	font-size: 11px;
+	letter-spacing: 0.005em;
+	line-height: 16px;
 }

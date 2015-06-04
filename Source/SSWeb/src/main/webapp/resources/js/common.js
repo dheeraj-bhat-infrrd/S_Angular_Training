@@ -488,8 +488,8 @@ $(document).on('input', '.wc-review-fname, .wc-review-lname, .wc-review-email', 
 		parentDiv.after(htmlData);
 		
 		// enable remove button
-		if (parentDiv.parent().children().length > 2) {
-			$('.wc-review-rmv-icn').removeClass('hide');
+		if ($('#wc-review-table-inner').children().length > 2) {
+			$('.wc-review-rmv-icn').show();
 		}
 		
 		// setting up perfect scrollbar
@@ -501,13 +501,13 @@ $(document).on('input', '.wc-review-fname, .wc-review-lname, .wc-review-email', 
 });
 
 $(document).on('click', '.wc-review-rmv-icn', function() {
-	var parentDiv = $(this).parent().parent();
+	var parentDiv = $('#wc-review-table-inner');
 	
 	// disable remove button
-	if (parentDiv.children().length <= 2) {
-		$('.wc-review-rmv-icn').addClass('hide');
+	if (parentDiv.children().length <= 3) {
+		$('.wc-review-rmv-icn').hide();
 	}
-	parentDiv.remove();
+	$(this).parent().parent().remove();
 
 	// setting up perfect scrollbar
 	setTimeout(function() {

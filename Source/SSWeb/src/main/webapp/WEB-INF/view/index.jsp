@@ -183,10 +183,13 @@
 			</div>
 		</div>
 	</div>
+	<%-- <jsp:include page="footer_new.jsp"></jsp:include> --%>
 <!-- <div style="display: none">
 	<script src="https://www.google.com/recaptcha/api/challenge?k=6LdlHOsSAAAAAM8ypy8W2KXvgMtY2dFsiQT3HVq-"></script>
 </div>
  -->
+ 
+ 
 <script src="//ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
 <script>
 	if (!window.jQuery) { document.write('<script src="${initParam.resourcesPath}/resources/js/jquery-2.1.1.min.js""><\/script>'); }
