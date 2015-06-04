@@ -75,7 +75,7 @@ $(document).ready(function() {
 	// Social Posts
 	$('#dg-img-1').find('svg').remove();
 	var socialPosts = "${socialPosts}";
-	var circle1 = new ProgressBar.Circle('#dg-img-1', {
+	var circle1 = new ProgressBar.Circle('#dg-img-3', {
 		color : '#7AB400',
 		fill : "rgba(249,249,251, 1)",
 		duration : 1500,
@@ -105,7 +105,7 @@ $(document).ready(function() {
 	// Social Score
 	$('#dg-img-3').find('svg').remove();
 	var socialScore = "${socialScore}";
-	var circle3 = new ProgressBar.Circle('#dg-img-3', {
+	var circle3 = new ProgressBar.Circle('#dg-img-1', {
 		color : '#5CC7EF',
 		fill : "rgba(249,249,251, 1)",
 		duration : 1500,
