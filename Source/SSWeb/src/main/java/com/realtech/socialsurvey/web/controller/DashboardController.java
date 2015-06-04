@@ -1041,7 +1041,8 @@ public class DashboardController {
 	public String getDashboardButtonsOrder(HttpServletRequest request) {
 		LOG.info("Method sendMultipleSurveyInvitations() called from DashboardController.");
 		String columnName = request.getParameter("columnName");
-		String columnValue = request.getParameter("columnValue");
+		String columnValueStr = request.getParameter("columnValue");
+		long columnValue = Long.parseLong(columnValueStr);
 		UserSettings userSettings = (UserSettings) request.getSession(false).getAttribute(CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION);
 		List<ProfileStage> stages = new ArrayList<>();
 		if (userSettings != null) {
