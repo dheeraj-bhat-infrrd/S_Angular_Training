@@ -1382,7 +1382,7 @@ public class EmailServicesImpl implements EmailServices {
 		
 		EmailEntity emailEntity = prepareEmailEntityForSendingEmail(recipientMailId);
 		String subjectFileName = EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER + EmailTemplateConstants.CORRUPT_PREINITIATION_RECORD_MAIL_SUBJECT;
-		String displayName = firstName + lastName;
+		String displayName = firstName + " " + lastName;
 		displayName.replaceAll("null", "");
 		FileContentReplacements messageBodyReplacements = new FileContentReplacements();
 		messageBodyReplacements.setFileName(EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER + 
