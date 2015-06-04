@@ -10,7 +10,7 @@
 <title><spring:message
 		code="label.registrationinvitesuccessful.title.key" /></title>
 <link rel="shortcut icon"
-	href="${initParam.resourcesPath}/favicon.ico" sizes="16x16">
+	href="/favicon.ico" sizes="16x16">
 <link rel="stylesheet"
 	href="${initParam.resourcesPath}/resources/css/bootstrap.min.css">
 <link rel="stylesheet"
