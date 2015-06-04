@@ -69,142 +69,301 @@
 	</div>
 </div>
 
-<div id="payment-form" class="acc-type-main-wrapper margin-top-25 margin-bottom-25" id="account-selection-popup">
-	<div id="acc-type-sel-options" class="acc-type-container container">	
-		<form id="account-type-selection-form">
-			<c:choose>
-				<%-- Payment options for upgrade --%>
-				<c:when test="${upgrade == 1}">
-					<%-- <div class="acc-type-item text-center" data-status="disabled">
-						<div class="act-header" id="account-type-1"><spring:message code="label.accounttype.individual.key"/></div>
-						<div class="act-price">
-							$35<sup>99</sup><span><spring:message code="label.permonth.key"/></span>
-						</div>
-						<div class="act-txt-1"><strong>1</strong> <spring:message code="label.accounttype.useraccounts.key"/></div>
-						<div class="act-txt-2">Lor em ip sum do ie aje lanjds Lor em ip sum do ie aje lanjds Lor em ip sum do ie aje lanjds Lor em ip sum do ie aje lanjds</div>
-						<div class="act-txt-3"><spring:message code="label.accounttype.select.key"/></div>
-					</div> --%>
-					<%-- <c:choose>
-						<c:when test="${currentplan < 2}"><div class="acc-type-item text-center" onclick="confirmUpgradation(2)"></c:when>
-						<c:otherwise><div class="acc-type-item text-center" data-status="disabled"></c:otherwise>
-					</c:choose>
-						<div class="act-header" id="account-type-2"><spring:message code="label.accounttype.team.key"/></div>
-						<div class="act-price">
-							$45<sup>99</sup><span><spring:message code="label.permonth.key"/></span>
-						</div>
-						<div class="act-txt-1"><strong>30</strong> <spring:message code="label.accounttype.useraccounts.key"/></div>
-						<div class="act-txt-2">Lor em ip sum do ie aje lanjds Lor em ip sum do ie aje lanjds Lor em ip sum do ie aje lanjds Lor em ip sum do ie aje lanjds</div>
-						<div class="act-txt-3"><spring:message code="label.accounttype.select.key"/></div>
-					</div>
-					
-					<c:choose>
-						<c:when test="${currentplan < 3}"><div class="acc-type-item text-center" onclick="confirmUpgradation(3)"></c:when>
-						<c:otherwise><div class="acc-type-item text-center" data-status="disabled"></c:otherwise>
-					</c:choose>
-						<div class="act-header" id="account-type-3"><spring:message code="label.accounttype.company.key"/></div>
-						<div class="act-price">
-							$65<sup>99</sup><span><spring:message code="label.permonth.key"/></span>
-						</div>
-						<div class="act-txt-1"><strong>60</strong> <spring:message code="label.accounttype.useraccounts.key"/></div>
-						<div class="act-txt-2">Lor em ip sum do ie aje lanjds Lor em ip sum do ie aje lanjds Lor em ip sum do ie aje lanjds Lor em ip sum do ie aje lanjds</div>
-						<div class="act-txt-3"><spring:message code="label.accounttype.select.key"/></div>
-					</div> --%>
-					
-					<c:choose>
-						<c:when test="${currentplan < 4}"><div class="acc-type-item text-center" onclick="confirmUpgradation(4)"></c:when>
-						<c:otherwise><div class="acc-type-item text-center" data-status="disabled"></c:otherwise>
-					</c:choose>
-						<div class="act-header" id="account-type-4"><spring:message code="label.accounttype.enterprise.key"/></div>
-						<div class="act-price">
-							$10<sup>95</sup><span><spring:message code="label.permonth.key"/></span>
-						</div>
-						<div class="act-txt-1"><strong>100</strong> <spring:message code="label.accounttype.useraccounts.key"/></div>
-						<div class="act-txt-2">Lor em ip sum do ie aje lanjds Lor em ip sum do ie aje lanjds Lor em ip sum do ie aje lanjds Lor em ip sum do ie aje lanjds</div>
-						<div class="act-txt-3"><spring:message code="label.accounttype.select.key"/></div>
-					</div>
-				</c:when>
-				
-				<%-- Payment options for new user --%>
-				<c:otherwise>
-					<c:if test="${ empty paidUpgrade }">
-						<%-- <div class="acc-type-item text-center"
-							onclick="javascript:selectAccountType(5, 'Free', ${skippayment})">
-							<div class="act-header" id="account-type-0">
-								<spring:message code="label.accounttype.freeaccount.key" />
-							</div>
-							<div class="act-price">
-								<spring:message code="label.free.key" />
-							</div>
-							<div class="act-txt-1">
-								<strong>1</strong>
-								<spring:message code="label.accounttype.useraccounts.key" />
-							</div>
-							<div class="act-txt-2">Lor em ip sum do ie aje lanjds Lor em ip
-								sum do ie aje lanjds Lor em ip sum do ie aje lanjds Lor em ip sum do
-								ie aje lanjds</div>
-							<div class="act-txt-3">
-								<spring:message code="label.accounttype.select.key" />
-							</div>
-						</div> --%>
-					</c:if>
-					<c:choose>
-						<c:when test="${ paidUpgrade == 1 }">
-							<div class="acc-type-item text-center"
-								onclick="javascript:makePaidUpgrade(1,'$35')">
-						</c:when>
-						<c:otherwise>
-							<div class="acc-type-item text-center"
-								onclick="javascript:selectAccountType(1, '$7.95', ${skippayment})">
-						</c:otherwise>
-					</c:choose>
-					<div class="act-header" id="account-type-1"><spring:message code="label.accounttype.individual.key"/></div>
-						<div class="act-price">
-							$7<sup>95</sup><span><spring:message code="label.permonth.key"/></span>
-						</div>
-						<div class="act-txt-1"><strong>1</strong> <spring:message code="label.accounttype.useraccounts.key"/></div>
-						<div class="act-txt-2">Lor em ip sum do ie aje lanjds Lor em ip sum do ie aje lanjds Lor em ip sum do ie aje lanjds Lor em ip sum do ie aje lanjds</div>
-						<div class="act-txt-3"><spring:message code="label.accounttype.select.key"/></div>
-					</div>
-					<%-- <c:choose>
-							<c:when test="${ paidUpgrade == 1 }"><div class="acc-type-item text-center" onclick="javascript:makePaidUpgrade(2,'$45')"></c:when>
-							<c:otherwise><div class="acc-type-item text-center" onclick="javascript:selectAccountType(2, '$45', ${skippayment})"></c:otherwise>
-					</c:choose>
-						<div class="act-header" id="account-type-2"><spring:message code="label.accounttype.team.key"/></div>
-						<div class="act-price">
-							$45<sup>99</sup><span><spring:message code="label.permonth.key"/></span>
-						</div>
-						<div class="act-txt-1"><strong>30</strong> <spring:message code="label.accounttype.useraccounts.key"/></div>
-						<div class="act-txt-2">Lor em ip sum do ie aje lanjds Lor em ip sum do ie aje lanjds Lor em ip sum do ie aje lanjds Lor em ip sum do ie aje lanjds</div>
-						<div class="act-txt-3"><spring:message code="label.accounttype.select.key"/></div>				
-					</div>
-					<c:choose>
-							<c:when test="${ paidUpgrade == 1 }"><div class="acc-type-item text-center" onclick="javascript:makePaidUpgrade(3, '$65')"></c:when>
-							<c:otherwise><div class="acc-type-item text-center" onclick="javascript:selectAccountType(3, '$65', ${skippayment})"></c:otherwise>
-					</c:choose>
-						<div class="act-header" id="account-type-3"><spring:message code="label.accounttype.company.key"/></div>
-						<div class="act-price">
-							$65<sup>99</sup><span><spring:message code="label.permonth.key"/></span>
-						</div>
-						<div class="act-txt-1"><strong>60</strong> <spring:message code="label.accounttype.useraccounts.key"/></div>
-						<div class="act-txt-2">Lor em ip sum do ie aje lanjds Lor em ip sum do ie aje lanjds Lor em ip sum do ie aje lanjds Lor em ip sum do ie aje lanjds</div>
-						<div class="act-txt-3"><spring:message code="label.accounttype.select.key"/></div>
-					</div> --%>
-					<c:choose>
-							<c:when test="${ paidUpgrade == 1 }"><div class="acc-type-item text-center" onclick="javascript:makePaidUpgrade(4, '$10.95')"></c:when>
-							<c:otherwise><div class="acc-type-item text-center" onclick="javascript:selectAccountType(4, '$10.95', ${skippayment})"></c:otherwise>
-					</c:choose>
-						<div class="act-header" id="account-type-4"><spring:message code="label.accounttype.enterprise.key"/></div>
-						<div class="act-price">
-							$10<sup>95</sup><span><spring:message code="label.permonth.key"/></span>
-						</div>
-						<div class="act-txt-1"><strong>100</strong> <spring:message code="label.accounttype.useraccounts.key"/></div>
-						<div class="act-txt-2">Lor em ip sum do ie aje lanjds Lor em ip sum do ie aje lanjds Lor em ip sum do ie aje lanjds Lor em ip sum do ie aje lanjds</div>
-						<div class="act-txt-3"><spring:message code="label.accounttype.select.key"/></div>					
-					</div>
-				</c:otherwise>	
-			</c:choose>
-			<input type="hidden" name="accounttype" id="account-type" />
-		</form>	
+<div id="payment-form" class="acc-type-main-wrapper margin-bottom-25 payment-container">
+	<div class="container">
+	<form id="account-type-selection-form">
+		<div class="payment-hdr-block">
+			<h2 class="payment-hdr-txt1">Plans built for individuals & teams.</h2>
+			<p class="payment-hdr-txt2">Start 30 days free.</p>
+		</div>
+		<div class="payment-table">
+			<table class="payment-pricing">
+				<tbody>
+					<tr>
+						<th></th>
+						<th><strong><span class="currency">$</span>9.95</strong> /
+							Month<div class="payment-acc-type-txt">Individual</div></th>
+						<th><strong><span class="currency">$</span>12.95</strong> /
+							User / Month<div class="payment-acc-type-txt">Enterprise</div></th>
+					</tr>
+					<tr>
+						<td>Special</td>
+						<td>Free 30-Day Trial</td>
+						<td>Free 30-Day Trial</td>
+					</tr>
+					<tr>
+						<td>Purpose</td>
+						<td>Single User</td>
+						<td>Multi-User</td>
+					</tr>
+					<tr>
+						<td>Users</td>
+						<td>1</td>
+						<td>Unlimited</td>
+					</tr>
+					<tr class="action">
+						<td></td>
+						<td>
+							<c:choose>
+							<c:when test="${ upgrade == 1 }">
+								<span class="payment-button payment-button-disabled">Start 30-Day Trial</span>
+							</c:when>
+							<c:otherwise>
+								<a class="payment-button" href="javascript:selectAccountType(1, '9.95', ${skippayment})">Start 30-Day Trial</a>
+							</c:otherwise>
+							</c:choose>
+						</td>
+						<td>
+							<c:choose>
+							<c:when test="${ upgrade == 1 }">
+								<a class="payment-button" href="javascript:makePaidUpgrade(4, '$12.95')">Upgrade</a>
+							</c:when>
+							<c:otherwise>
+								<a class="payment-button" href="javascript:selectAccountType(4, '$12.95', ${skippayment})">Start 30-Day Trial</a>
+							</c:otherwise>
+							</c:choose>
+						</td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
+		<div class="payment-table">
+			<table class="payment-pricing">
+				<tbody>
+					<tr>
+						<th><strong>Basic Features</strong></th>
+						<th><div class="payment-acc-type-txt">Individual</div></th>
+						<th><div class="payment-acc-type-txt">Enterprise</div></th>
+					</tr>
+					<tr>
+						<td>Free 30-Day Trial</td>
+						<td><span class="payment-icn payment-tick-icn"></span></td>
+						<td><span class="payment-icn payment-tick-icn"></span></td>
+					</tr>
+					<tr>
+						<td>Users</td>
+						<td>1</td>
+						<td>Unlimited</td>
+					</tr>
+					<tr>
+						<td>Find a Pro Public Search Page</td>
+						<td><span class="payment-icn payment-tick-icn"></span></td>
+						<td><span class="payment-icn payment-tick-icn"></span></td>
+					</tr>
+					<tr>
+						<td>Individual Public Profile Page</td>
+						<td><span class="payment-icn payment-tick-icn"></span></td>
+						<td><span class="payment-icn payment-tick-icn"></span></td>
+					</tr>
+					<tr>
+						<td>Company Public Profile Pages</td>
+						<td><span class="payment-icn payment-close-icn"></span></td>
+						<td><span class="payment-icn payment-tick-icn"></span></td>
+					</tr>
+					<tr>
+						<td>Mobile Ready Pages</td>
+						<td><span class="payment-icn payment-tick-icn"></span></td>
+						<td><span class="payment-icn payment-tick-icn"></span></td>
+					</tr>
+					<tr>
+						<td>Automated SEO with Star Rating</td>
+						<td><span class="payment-icn payment-tick-icn"></span></td>
+						<td><span class="payment-icn payment-tick-icn"></span></td>
+					</tr>
+					<tr>
+						<td>Feature Specific Reviews on Your Public Pages</td>
+						<td><span class="payment-icn payment-tick-icn"></span></td>
+						<td><span class="payment-icn payment-tick-icn"></span></td>
+					</tr>
+					<tr>
+						<td>Pre-Written Surveys for Your Business Vertical</td>
+						<td><span class="payment-icn payment-tick-icn"></span></td>
+						<td><span class="payment-icn payment-tick-icn"></span></td>
+					</tr>
+					<tr>
+						<td>Create your account by using your Linkedin ID</td>
+						<td><span class="payment-icn payment-tick-icn"></span></td>
+						<td><span class="payment-icn payment-tick-icn"></span></td>
+					</tr>
+					<tr>
+						<td>Unlimited Surveys</td>
+						<td><span class="payment-icn payment-tick-icn"></span></td>
+						<td><span class="payment-icn payment-tick-icn"></span></td>
+					</tr>
+					<tr>
+						<td>Unlimited Survey Questions</td>
+						<td><span class="payment-icn payment-tick-icn"></span></td>
+						<td><span class="payment-icn payment-tick-icn"></span></td>
+					</tr>
+					<tr>
+						<td>User Dashboard</td>
+						<td><span class="payment-icn payment-tick-icn"></span></td>
+						<td><span class="payment-icn payment-tick-icn"></span></td>
+					</tr>
+					<tr>
+						<td>User Scorecards</td>
+						<td><span class="payment-icn payment-tick-icn"></span></td>
+						<td><span class="payment-icn payment-tick-icn"></span></td>
+					</tr>
+					<tr>
+						<td>Office, Region and Company Scorecards</td>
+						<td><span class="payment-icn payment-close-icn"></span></td>
+						<td><span class="payment-icn payment-tick-icn"></span></td>
+					</tr>
+					<tr>
+						<td>Pre-Written Surveys for Your Business Vertical</td>
+						<td><span class="payment-icn payment-tick-icn"></span></td>
+						<td><span class="payment-icn payment-tick-icn"></span></td>
+					</tr>
+					<tr>
+						<td>Licensing and Compliance Integration</td>
+						<td><span class="payment-icn payment-tick-icn"></span></td>
+						<td><span class="payment-icn payment-tick-icn"></span></td>
+					</tr>
+					<tr>
+						<td>SSL Security</td>
+						<td><span class="payment-icn payment-tick-icn"></span></td>
+						<td><span class="payment-icn payment-tick-icn"></span></td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
+		<div class="payment-table">
+			<table class="payment-pricing">
+				<tbody>
+					<tr>
+						<th><strong>Advanced Workflow</strong></th>
+						<th><div class="payment-acc-type-txt">Individual</div></th>
+						<th><div class="payment-acc-type-txt">Enterprise</div></th>
+					</tr>
+					<tr>
+						<td>Create and Edit Survey Builder Tool</td>
+						<td><span class="payment-icn payment-tick-icn"></span></td>
+						<td><span class="payment-icn payment-tick-icn"></span></td>
+					</tr>
+					<tr>
+						<td>Automatically Send Requests from Your Point of Sale System</td>
+						<td><span class="payment-icn payment-close-icn"></span></td>
+						<td><span class="payment-icn payment-tick-icn"></span></td>
+					</tr>
+					<tr>
+						<td>Syndicate and Share Happy Customer Comments</td>
+						<td><span class="payment-icn payment-tick-icn"></span></td>
+						<td><span class="payment-icn payment-tick-icn"></span></td>
+					</tr>
+					<tr>
+						<td>Surveys are White Labeled</td>
+						<td><span class="payment-icn payment-tick-icn"></span></td>
+						<td><span class="payment-icn payment-tick-icn"></span></td>
+					</tr>
+					<tr>
+						<td>Multiple Survey Question Types</td>
+						<td><span class="payment-icn payment-tick-icn"></span></td>
+						<td><span class="payment-icn payment-tick-icn"></span></td>
+					</tr>
+					<tr>
+						<td>Collect Optional Customer Comments</td>
+						<td><span class="payment-icn payment-tick-icn"></span></td>
+						<td><span class="payment-icn payment-tick-icn"></span></td>
+					</tr>
+					<tr>
+						<td>Edit Outbound Emails and Workflow</td>
+						<td><span class="payment-icn payment-tick-icn"></span></td>
+						<td><span class="payment-icn payment-tick-icn"></span></td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
+		<div class="payment-table">
+			<table class="payment-pricing">
+				<tbody>
+					<tr>
+						<th><strong>Advanced Tools</strong></th>
+						<th><div class="payment-acc-type-txt">Individual</div></th>
+						<th><div class="payment-acc-type-txt">Enterprise</div></th>
+					</tr>
+					<tr>
+						<td>Easily Import thousands of Users in Your Enterprise
+							Hierarchy</td>
+						<td><span class="payment-icn payment-close-icn"></span></td>
+						<td><span class="payment-icn payment-tick-icn"></span></td>
+					</tr>
+					<tr>
+						<td>Import Leads</td>
+						<td><span class="payment-icn payment-tick-icn"></span></td>
+						<td><span class="payment-icn payment-tick-icn"></span></td>
+					</tr>
+					<tr>
+						<td>Development API</td>
+						<td><span class="payment-icn payment-close-icn"></span></td>
+						<td>Minimum 250 Users / Coming in Late 2015</td>
+					</tr>
+					<tr>
+						<td>Custom Development and Widgets</td>
+						<td><span class="payment-icn payment-close-icn"></span></td>
+						<td>Minimum 250 Users / Coming in Late 2015</td>
+					</tr>
+					<tr>
+						<td>Manage User Permissions and Workflow Within Your Hierarchy</td>
+						<td><span class="payment-icn payment-close-icn"></span></td>
+						<td><span class="payment-icn payment-tick-icn"></span></td>
+					</tr>
+					<tr>
+						<td>Export Survey Results</td>
+						<td><span class="payment-icn payment-tick-icn"></span></td>
+						<td><span class="payment-icn payment-tick-icn"></span></td>
+					</tr>
+					<tr>
+						<td>Support Ticket System</td>
+						<td><span class="payment-icn payment-tick-icn"></span></td>
+						<td><span class="payment-icn payment-tick-icn"></span></td>
+					</tr>
+					<tr>
+						<td>Advanced Reporting and Company Admin Access</td>
+						<td><span class="payment-icn payment-close-icn"></span></td>
+						<td><span class="payment-icn payment-tick-icn"></span></td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
+		<div class="payment-table">
+			<table class="payment-pricing">
+				<tbody>
+					<tr>
+						<th></th>
+						<th><strong><span class="currency">$</span>9.95</strong> /
+							Month<div class="payment-acc-type-txt">Individual</div></th>
+						<th><strong><span class="currency">$</span>12.95</strong> /
+							User / Month<div class="payment-acc-type-txt">Enterprise</div></th>
+					</tr>
+					<tr class="action">
+						<td></td>
+						<td>
+							<c:choose>
+							<c:when test="${ upgrade == 1 }">
+								<span class="payment-button payment-button-disabled">Start 30-Day Trial</span>
+							</c:when>
+							<c:otherwise>
+								<a class="payment-button" href="javascript:selectAccountType(1, '9.95', ${skippayment})">Start 30-Day Trial</a>
+							</c:otherwise>
+							</c:choose>
+						</td>
+						<td>
+							<c:choose>
+							<c:when test="${ upgrade == 1 }">
+								<a class="payment-button" href="javascript:makePaidUpgrade(4, '$12.95')">Upgrade</a>
+							</c:when>
+							<c:otherwise>
+								<a class="payment-button" href="javascript:selectAccountType(4, '$12.95', ${skippayment})">Start 30-Day Trial</a>
+							</c:otherwise>
+							</c:choose>
+						</td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
+		<input type="hidden" name="accounttype" id="account-type" />
+	</form>
 	</div>
 </div>
 
@@ -290,7 +449,7 @@ function makePaidUpgrade(accountType,paymentAmount){
 
 function selectAccountTypeCallBack(data,accountType,paymentAmount) {
 	console.log("callback for selectAccountType called");
-	var paidUpgrade = '<c:out value="${paidUpgrade}"/>';
+	var paidUpgrade = '<c:out value="${upgrade}"/>';
     if(accountType == 5 && data == ""){
     	console.log("Subscribing for a free account");
     	var url = "./subscribe.do";
@@ -313,11 +472,11 @@ function selectAccountTypeCallBack(data,accountType,paymentAmount) {
         hideOverlay();
     	 
     	if(paidUpgrade == 1){
-    		$("#account-selection-popup").css("display","none");
+    		$("#payment-form").css("display","none");
     	}
 
         /* Replace the contents of account selection with payment page with selected account type contents*/
-        $("#payment-section").html(data);		
+        $(".overlay-payment").html('<div class="payment-section">'+data+'</div>');		
         showPayment();
         var selectedAccountType = $("#account-type-"+accountType).html();
         $("#pu-acc-type-val").html(selectedAccountType);
@@ -334,7 +493,7 @@ function confirmUpgradation(accountType){
 	console.log("Returning the upgrade confirmation page");
 	data = "accounttype=" + String(accountType);
    	$('.overlay-payment').hide();
-	$('.overlay-payment').html("");
+	$('#payment-section').html("");
 
 	// show the progress icon
 	showOverlay();

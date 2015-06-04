@@ -21,6 +21,18 @@
 					<div class="wc-review-tc3 float-left"><input class="wc-review-input wc-review-email"></div>
 					<div class="wc-review-tc4 float-left"><div class="wc-review-rmv-icn hide"></div></div>
 				</div>
+				<div class="wc-review-tr clearfix">
+					<div class="wc-review-tc1 float-left"><input class="wc-review-input wc-review-fname"></div>
+					<div class="wc-review-tc2 float-left"><input class="wc-review-input wc-review-lname"></div>
+					<div class="wc-review-tc3 float-left"><input class="wc-review-input wc-review-email"></div>
+					<div class="wc-review-tc4 float-left"><div class="wc-review-rmv-icn"></div></div>
+				</div>
+				<div class="wc-review-tr clearfix">
+					<div class="wc-review-tc1 float-left"><input class="wc-review-input wc-review-fname"></div>
+					<div class="wc-review-tc2 float-left"><input class="wc-review-input wc-review-lname"></div>
+					<div class="wc-review-tc3 float-left"><input class="wc-review-input wc-review-email"></div>
+					<div class="wc-review-tc4 float-left"><div class="wc-review-rmv-icn"></div></div>
+				</div>
 			</div>
 		</div>
 	</div>
