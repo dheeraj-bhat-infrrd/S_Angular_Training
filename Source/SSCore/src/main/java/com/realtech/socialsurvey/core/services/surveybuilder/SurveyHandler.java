@@ -94,4 +94,6 @@ public interface SurveyHandler {
 	public void markSurveyAsStarted(SurveyPreInitiation surveyPreInitiation);
 
 	public void updateReminderCountForSocialPosts(Long agentId, String customerEmail);
+
+	public Map<String, Object> mapAgentsInSurveyPreInitiation();
 }
