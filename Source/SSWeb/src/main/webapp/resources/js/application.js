@@ -6763,7 +6763,7 @@ function paintDashboardButtons(data){
 			if (stages[i].profileStageKey == 'FACEBOOK_PRF') {
 				contentToDisplay = 'Connect To Facebook';
 			} else if (stages[i].profileStageKey == 'GOOGLE_PRF') {
-				contentToDisplay = 'Connect To Google';
+				contentToDisplay = 'Connect To Google+';
 			} else if (stages[i].profileStageKey == 'TWITTER_PRF') {
 				contentToDisplay = 'Connect To Twitter';
 			} else if (stages[i].profileStageKey == 'YELP_PRF') {
