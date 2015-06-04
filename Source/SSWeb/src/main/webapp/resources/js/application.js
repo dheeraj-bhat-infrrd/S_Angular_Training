@@ -64,6 +64,12 @@ var isAddUser = true;
 var rowSize = 10;
 var startIndex = 0;
 
+//Variables for editprofile page
+var editProfileForYelp = false;
+var editProfileForLicense = false;
+var editProfileForHobbies = false;
+var editProfileForAchievements = false;
+
 //Variables for survey question page
 var qno = 0;
 var questions;
@@ -6395,6 +6401,29 @@ function paintForProfile() {
 	fetchReviews(attrName, attrVal, minScore, startIndex, numOfRows);
 }
 
+function focusOnElement() {
+	if (editProfileForYelp) {
+		$('#social-token-text').show();
+		var link = $(this).attr("data-link");
+		$('#social-token-text').attr({
+			"placeholder" : "Add Yelp link",
+			"onblur" : "updateYelpLink(this.value);$('#social-token-text').hide();"
+		});
+		$('#social-token-text').val(link);
+		editProfileForYelp = false;
+	}
+	if (editProfileForLicense) {
+		addAuthorisedIn();
+		editProfileForLicense = false;
+	} else if (editProfileForHobbies) {
+		addHobby();
+		editProfileForHobbies = false;
+	} else if (editProfileForAchievements) {
+		addAnAchievement();
+		editProfileForAchievements = false;
+	}
+}
+
 // Hierarchy data population
 function fetchHierarchy(attrName, attrValue) {
 	var url = "./getadminhierarchy.do?" + attrName + "=" + attrValue;
@@ -6781,6 +6810,7 @@ function dashboardButtonAction(buttonId, task, columnName, columnValue){
 	}
 	else if(task=='YELP_PRF'){
 		showMainContent('./showprofilepage.do');
+		editProfileForYelp = true;
 	}
 	else if(task=='LINKEDIN_PRF'){
 		openAuthPageDashboard('linkedin', columnName, columnValue);
@@ -6790,11 +6820,14 @@ function dashboardButtonAction(buttonId, task, columnName, columnValue){
 	}
 	else if(task=='LICENSE_PRF'){
 		showMainContent('./showprofilepage.do');
+		editProfileForLicense = true;
 	}
 	else if(task=='HOBBIES_PRF'){
 		showMainContent('./showprofilepage.do');
+		editProfileForHobbies = true;
 	}
 	else if(task=='ACHIEVEMENTS_PRF'){
 		showMainContent('./showprofilepage.do');
+		editProfileForAchievements = true;
 	}
 }
