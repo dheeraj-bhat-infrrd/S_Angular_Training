@@ -136,6 +136,21 @@
 		</property>
 		<property name="durability" value="true" />
 	</bean>
+	
+	<!-- Deactivated Account Purger job detail -->
+	<bean id="crmdataagentidmapperjobdetail"
+		class="org.springframework.scheduling.quartz.JobDetailFactoryBean">
+		<property name="jobClass"
+			value="com.realtech.socialsurvey.core.starter.CrmDataAgentIdMapper" />
+		<property name="jobDataAsMap">
+			<map>
+				<entry key="emailServices" value-ref="emailServices" />
+				<entry key="surveyHandler" value-ref="surveyHandler" />
+				<entry key="userManagementService" value-ref="userManagementService" />
+			</map>
+		</property>
+		<property name="durability" value="true" />
+	</bean>
 
 	<!-- setting cron for Account deactivator -->
 	<bean id="sitemapgeneratorcron"
@@ -185,6 +200,13 @@
 		<property name="jobDetail" ref="deactivatedaccountpurgerjobdetail" />
 		<property name="cronExpression" value="* 15 7 * * ?" />
 	</bean>
+	
+	<!-- setting cron for mapping crm data agent id -->
+	<bean id="crmdataagentidmappercron"
+		class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
+		<property name="jobDetail" ref="crmdataagentidmapperjobdetail" />
+		<property name="cronExpression" value="* 30 7 * * ?" />
+	</bean>
 
 	<!-- Scheduler factory -->
 	<bean class="org.springframework.scheduling.quartz.SchedulerFactoryBean">
@@ -197,6 +219,7 @@
 				<ref bean="socialfeedingesterjobdetail" />
 				<ref bean="accountdeactivatorjobdetail" />
 				<ref bean="deactivatedaccountpurgerjobdetail" />
+				<ref bean="crmdataagentidmapperjobdetail" />
 			</list>
 		</property>
 
@@ -209,6 +232,7 @@
 				<ref bean="socialfeedingestercron" />
 				<ref bean="accountdeactivatorcron" />
 				<ref bean="deactivatedaccountpurgercron" />
+				<ref bean="crmdataagentidmappercron" />
 			</list>
 		</property>
 		<property name="quartzProperties">

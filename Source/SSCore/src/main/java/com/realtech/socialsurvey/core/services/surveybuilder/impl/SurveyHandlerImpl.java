@@ -10,8 +10,10 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
@@ -598,6 +600,55 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean {
 		surveyPreInitiation.setStatus(CommonConstants.SURVEY_STATUS_INITIATED);
 		surveyPreInitiationDao.update(surveyPreInitiation);
 		LOG.info("Method markSurveyAsStarted() finished.");
+	}
+	
+	// Method to update agentId in SurveyPreInitiation table for each of the unmapped agent.
+	@Override
+	@Transactional
+	public Map<String, Object> mapAgentsInSurveyPreInitiation(){
+		List<SurveyPreInitiation> surveys = surveyPreInitiationDao.findByColumn(SurveyPreInitiation.class, CommonConstants.STATUS_COLUMN,
+				CommonConstants.STATUS_SURVEYPREINITIATION_NOT_PROCESSED);
+		List<User> allUsers = userDao.findAll(User.class);
+		List<SurveyPreInitiation> unavailableAgents = new ArrayList<>();
+		List<SurveyPreInitiation> customersWithoutFirstName = new ArrayList<>();
+		List<SurveyPreInitiation> customersWithoutEmailId = new ArrayList<>();
+		Map<String, Long> userEmailAndId = new HashMap<>();
+		for (User user : allUsers) {
+			userEmailAndId.put(user.getEmailId(), user.getUserId());
+		}
+		allUsers = null;
+		Set<Long> companies = new HashSet<>();
+		for (SurveyPreInitiation survey : surveys) {
+			survey.setStatus(CommonConstants.STATUS_SURVEYPREINITIATION_PROCESSED);
+			survey.setModifiedOn(new Timestamp(System.currentTimeMillis()));
+			if (survey.getAgentEmailId() == null || survey.getAgentEmailId().isEmpty()) {
+				unavailableAgents.add(survey);
+				companies.add(survey.getCompanyId());
+			}
+			else if (survey.getCustomerFirstName() == null || survey.getCustomerFirstName().isEmpty()) {
+				customersWithoutFirstName.add(survey);
+				companies.add(survey.getCompanyId());
+			}
+			else if (survey.getCustomerEmailId() == null || survey.getCustomerEmailId().isEmpty()) {
+				customersWithoutEmailId.add(survey);
+				companies.add(survey.getCompanyId());
+			}
+			else if (userEmailAndId.containsKey(survey.getAgentEmailId())) {
+				survey.setAgentId(userEmailAndId.get(survey.getAgentEmailId()));
+				companies.add(survey.getCompanyId());
+			}
+			else{
+				unavailableAgents.add(survey);
+				companies.add(survey.getCompanyId());
+			}
+			surveyPreInitiationDao.merge(survey);
+		}
+		Map<String, Object> corruptRecords = new HashMap<>();
+		corruptRecords.put("unavailableAgents", unavailableAgents);
+		corruptRecords.put("customersWithoutFirstName", customersWithoutFirstName);
+		corruptRecords.put("customersWithoutEmailId", customersWithoutEmailId);
+		corruptRecords.put("companies", companies);
+		return corruptRecords;
 	}
 
 	/*

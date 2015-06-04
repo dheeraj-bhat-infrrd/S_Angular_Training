@@ -2059,4 +2059,27 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 		}
 		return isApiKeyValid;
 	}
+	
+	/*
+	 * Method to get company admin for the company given.
+	 */
+	@Transactional
+	@Override
+	public User getCompanyAdmin(long companyId) throws InvalidInputException{
+		Map<String, Object> queries = new HashMap<>();
+		try {
+			queries.put("company", companyDao.findById(Company.class, companyId));
+			queries.put(CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_ACTIVE);
+			queries.put("profilesMaster", getProfilesMasterById(CommonConstants.PROFILES_MASTER_COMPANY_ADMIN_PROFILE_ID));
+		}
+		catch (InvalidInputException e) {
+			LOG.error("InvalidInputException caught in getCompanyAdmin().");
+			throw e;
+		}
+		List<UserProfile> profiles = userProfileDao.findByKeyValue(UserProfile.class, queries);
+		if(profiles!=null && !profiles.isEmpty()){
+			return profiles.get(CommonConstants.INITIAL_INDEX).getUser();
+		}
+		return null;
+	}
 }

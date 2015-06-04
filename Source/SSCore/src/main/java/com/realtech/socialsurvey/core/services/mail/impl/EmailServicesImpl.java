@@ -1370,6 +1370,31 @@ public class EmailServicesImpl implements EmailServices {
 		emailSender.sendEmailWithBodyReplacements(emailEntity, subjectFileName, messageBodyReplacements);
 		LOG.info("Successfully sent social connect mail");
 	}
+	
+	@Override
+	public void sendCorruptDataFromCrmNotificationMail(String firstName, String lastName, String recipientMailId, String unavailableAgentsDetails, String customersWithoutFirstNameDetails,
+			String customersWithoutEmailIdDetails) throws InvalidInputException, UndeliveredEmailException{
+		LOG.info("Method sendCorruptDataFromCrmNotificationMail() started.");
+		if (recipientMailId == null || recipientMailId.isEmpty()) {
+			LOG.error("Recipient email Id is empty or null for sending corrupt CRM data notification mail ");
+			throw new InvalidInputException("Recipient email Id is empty or null for sending corrupt CRM data notification mail ");
+		}
+		
+		EmailEntity emailEntity = prepareEmailEntityForSendingEmail(recipientMailId);
+		String subjectFileName = EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER + EmailTemplateConstants.CORRUPT_PREINITIATION_RECORD_MAIL_SUBJECT;
+		String displayName = firstName + lastName;
+		displayName.replaceAll("null", "");
+		FileContentReplacements messageBodyReplacements = new FileContentReplacements();
+		messageBodyReplacements.setFileName(EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER + 
+				EmailTemplateConstants.CORRUPT_PREINITIATION_RECORD_MAIL_BODY);
+		messageBodyReplacements.setReplacementArgs(Arrays.asList(appLogoUrl, displayName, unavailableAgentsDetails, 
+				customersWithoutFirstNameDetails, customersWithoutEmailIdDetails, appBaseUrl));
+
+		LOG.debug("Calling email sender to send mail");
+		emailSender.sendEmailWithBodyReplacements(emailEntity, subjectFileName, messageBodyReplacements);
+		
+		LOG.info("Method sendCorruptDataFromCrmNotificationMail() finished.");
+	}
 	/**
 	 * Method to prepare email entity required to send email
 	 * 
