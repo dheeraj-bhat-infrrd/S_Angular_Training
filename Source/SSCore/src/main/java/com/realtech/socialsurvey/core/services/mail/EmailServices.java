@@ -299,4 +299,7 @@ public interface EmailServices {
 
 	public void sendAccountDeletionMail(String recipientMailId, String displayName, String loginName) throws InvalidInputException,
 			UndeliveredEmailException;
+	
+	public void sendCorruptDataFromCrmNotificationMail(String firstName, String lastName, String recipientEmail, String unavailableAgentsDetails, String customersWithoutFirstNameDetails,
+			String customersWithoutEmailIdDetails) throws InvalidInputException, UndeliveredEmailException;
 }
