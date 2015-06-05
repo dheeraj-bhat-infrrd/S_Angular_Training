@@ -1148,9 +1148,10 @@ public class SocialManagementController {
 
 		User user = sessionHelper.getCurrentUser();
 		List<OrganizationUnitSettings> settings = socialManagementService.getBranchAndRegionSettingsForUser(user.getUserId());
-		String message = rating + "-Star Survey Response from " + custFirstName + custLastName + " for " + agentName + " on SocialSurvey - view at ";
-		message = message.replaceAll("null", "");
+		String message = rating + "-Star Survey Response from " + custFirstName + custLastName + " for " + agentName + " on SocialSurvey ";
 		String linkedinProfileUrl = applicationBaseUrl + CommonConstants.AGENT_PROFILE_FIXED_URL + agentProfileLink;
+		message += linkedinProfileUrl;
+		message = message.replaceAll("null", "");
 		String linkedinMessageFeedback = "From : " + custFirstName + " " + custLastName + " "+ feedback;
 		for (OrganizationUnitSettings setting : settings) {
 			try {
