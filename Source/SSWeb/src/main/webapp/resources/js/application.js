@@ -6752,6 +6752,10 @@ function paintDashboardButtons(data){
 	var columnValue = data.columnValue;
 	var stages = data.stages;
 	var max = 2;
+	if(columnName != 'agentId'){
+		$('#dsh-btn1').addClass('hide');
+		max = 3;
+	}
 	if (stages != undefined && stages.length != 0) {
 		if (stages.length < max) {
 			$('#dsh-btn2').addClass('hide');
@@ -6778,17 +6782,46 @@ function paintDashboardButtons(data){
 				contentToDisplay = 'Enter achievements';
 			}
 			if (i == 0) {
-				$('#dsh-btn2').data('social', stages[i].profileStageKey);
-				$('#dsh-btn2').html(contentToDisplay);
-				$('#dsh-btn2').removeClass('hide');
+				if(columnName != 'agentId'){
+					$('#dsh-btn1').data('social', stages[i].profileStageKey);
+					$('#dsh-btn1').html(contentToDisplay);
+					$('#dsh-btn1').removeClass('hide');
+				}
+				else{
+					$('#dsh-btn2').data('social', stages[i].profileStageKey);
+					$('#dsh-btn2').html(contentToDisplay);
+					$('#dsh-btn2').removeClass('hide');
+				}
 			}
 			if (i == 1) {
+				if(columnName != 'agentId'){
+					$('#dsh-btn2').data('social', stages[i].profileStageKey);
+					$('#dsh-btn2').html(contentToDisplay);
+					$('#dsh-btn2').removeClass('hide');
+				}
+				else{
+					$('#dsh-btn3').data('social', stages[i].profileStageKey);
+					$('#dsh-btn3').html(contentToDisplay);
+					$('#dsh-btn3').removeClass('hide');
+				}
+			}
+			if(i == 2) {
 				$('#dsh-btn3').data('social', stages[i].profileStageKey);
 				$('#dsh-btn3').html(contentToDisplay);
 				$('#dsh-btn3').removeClass('hide');
 			}
 		}
 	}
+	$('#dsh-btn1').click(function(){
+		var buttonId = 'dsh-btn1';
+		var task = $('#dsh-btn1').data('social');
+		if(task == undefined){
+			sendSurveyInvitation();
+		}
+		else{
+			dashboardButtonAction(buttonId, task, columnName, columnValue);
+		}
+	});
 	$('#dsh-btn2').click(function(){
 		var buttonId = 'dsh-btn2';
 		var task = $('#dsh-btn2').data('social');
