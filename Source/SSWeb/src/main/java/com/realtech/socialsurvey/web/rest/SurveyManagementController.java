@@ -473,9 +473,9 @@ public class SurveyManagementController {
 					+ " on @SocialSurvey - view at " + getApplicationBaseUrl() + CommonConstants.AGENT_PROFILE_FIXED_URL + agentProfileLink;
 
 			String linkedinMessage = rating + "-Star Survey Response from " + custFirstName + " " + custLastName + " for " + agentName
-					+ " on SocialSurvey - view at ";
+					+ " on SocialSurvey ";
 			String linkedinProfileUrl = getApplicationBaseUrl() + CommonConstants.AGENT_PROFILE_FIXED_URL + agentProfileLink;
-			String linkedinMessageFeedback = "From : " + custFirstName + " " + custLastName + " "+ feedback;
+			String linkedinMessageFeedback = "From : " + custFirstName + " " + custLastName + " - "+ feedback;
 			try {
 				if(!socialManagementService.updateStatusIntoFacebookPage(agentSettings, facebookMessage)){
 					surveyHandler.updateSharedOn(CommonConstants.FACEBOOK_SOCIAL_SITE, agentId, customerEmail);
@@ -658,7 +658,7 @@ public class SurveyManagementController {
 			List<OrganizationUnitSettings> settings = socialManagementService.getSettingsForBranchesAndRegionsInHierarchy(agentId);
 			AgentSettings agentSettings = userManagementService.getUserSettings(agentId);
 			String message = rating + "-Star Survey Response from " + custFirstName + custLastName + " for " + agentName
-					+ " on SocialSurvey - view at ";
+					+ " on SocialSurvey ";
 			String linkedinProfileUrl = getApplicationBaseUrl() + CommonConstants.AGENT_PROFILE_FIXED_URL + agentProfileLink;
 			String linkedinMessageFeedback = "From : " + custFirstName + " " + custLastName + " "+ feedback;
 			socialManagementService.updateLinkedin(agentSettings, message, linkedinProfileUrl, linkedinMessageFeedback);
