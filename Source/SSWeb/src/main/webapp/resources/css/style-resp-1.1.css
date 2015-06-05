@@ -210,10 +210,12 @@
 		text-align: center;
 	}
 	.fp-inp{
+		display:block;
 		width: 100%;
 		margin-top: 10px;
 		margin-bottom: 10px;
 		border-radius: 0;
+		float: none !important;
 	}
 	.fp-row-wrapper{
 		width:100%;
