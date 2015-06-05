@@ -157,7 +157,7 @@
 					<div class="blue-ext-right blue-ext-right-adj hide"></div>
 					<div class="fp-txt-1">Find a Professional</div>
 				</div>
-				<form id="find-pro-form" method="POST" action="./findapro.do">
+				<form id="find-pro-form" method="GET" action="./findapro.do">
 					<div class="pro-right-wrapper clearfix float-left">
 						<div class="blue-ext-right"></div>
 						<div class="m-inp-img-fname m-inp-img"></div>
