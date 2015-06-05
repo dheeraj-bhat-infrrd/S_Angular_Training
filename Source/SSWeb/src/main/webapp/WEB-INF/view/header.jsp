@@ -88,7 +88,7 @@
 				</c:if>
 				<c:if test="${highestrole == 1 && accountMasterId != 5}">
 					<div class="header-links-item">
-						<a href="javascript:showViewHierarchyPage();"><spring:message code="label.viewcompanyhierachy.key" /></a>
+						<a href="javascript:showMainContent('./viewhierarchy.do');"><spring:message code="label.viewcompanyhierachy.key" /></a>
 					</div>
 				</c:if>
 				<c:if test="${accountMasterId > 1 && accountMasterId <5 && highestrole != 4}">

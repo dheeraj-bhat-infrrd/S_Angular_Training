@@ -8,6 +8,7 @@
  */
 function showMainContent(url) {
 	closeMoblieScreenMenu();
+	saveState(url);
 	callAjaxGET(url, showMainContentCallBack, true);
 }
 
