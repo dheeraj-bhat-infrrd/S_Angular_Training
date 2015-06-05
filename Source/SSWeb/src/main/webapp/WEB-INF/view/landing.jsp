@@ -10,6 +10,7 @@
 	});
 </script>
 <script src="${initParam.resourcesPath}/resources/js/landing.js"></script>
+<script src="${initParam.resourcesPath}/resources/js/historySupport.js"></script>
 <script type="text/javascript">
 $(document).ready(function() {
 	var popupStatus = "${popupStatus}";
@@ -22,6 +23,22 @@ $(document).ready(function() {
 	else if (showSendSurveyPopup == "true" && popupStatus == "Y") {
 		sendSurveyInvitation();
 	}
+	
+	onpopstate = function(event) {
+        console.log('history modified');
+        if(location.hash.trim()!=''){
+            historyCallback= true;
+            refreshSupport=true;
+        }
+        retrieveState();
+    };
+    
+	if(location.hash.trim()!='' ){
+        historyCallback= true;
+        refreshSupport=true;
+        retrieveState();
+        return;
+    }
 	
 	showMainContent('./dashboard.do');
 });
