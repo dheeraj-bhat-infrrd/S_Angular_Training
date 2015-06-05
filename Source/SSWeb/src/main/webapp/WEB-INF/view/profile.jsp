@@ -96,7 +96,7 @@
         <div class="hm-header-row hm-header-row-main clearfix">
             <div class="float-left hm-header-row-left padding-10"><spring:message code="label.readwritesharereviews.key"/></div>
             <div class="float-right hm-find-pro-right clearfix">
-            	<form id="find-pro-form" method="POST" action="/findapro.do">
+            	<form id="find-pro-form" method="GET" action="/findapro.do">
 		           	<div class="float-left prof-input-header">Find a professional</div>
 		           	<div class="float-left prof-input-cont">
 		           		<input id="find-pro-first-name" name="find-pro-first-name" type="text" placeholder="First Name">
@@ -104,8 +104,8 @@
 		           	<div class="float-left prof-input-cont">
 		           		<input id="find-pro-last-name" name="find-pro-last-name" type="text" placeholder="Last Name">
 		           	</div>
-		           	<input id="find-pro-start-index" name="find-pro-start-index" type="hidden" value="0">
-					<input id="find-pro-row-size" name="find-pro-row-size" type="hidden" value="10">
+		           	<!-- <input id="find-pro-start-index" name="find-pro-start-index" type="hidden" value="0">
+					<input id="find-pro-row-size" name="find-pro-row-size" type="hidden" value="10"> -->
 		           	<input id="find-pro-submit" type="button" class="float-left prof-submit-btn" value="Search">
             	</form>
             </div>

@@ -45,7 +45,7 @@
 					<div class="fp-row-wrapper clearfix">
 						<div class="float-left fp-left-item"><spring:message code="label.findapro.key" /></div>
 						<div class="float-left fp-right-item">
-							<form id="find-pro-form" method="POST" action="./findapro.do">
+							<form id="find-pro-form" method="GET" action="./findapro.do">
 								<div class="fp-wrapper clearfix">
 									<input id="find-pro-first-name" name="find-pro-first-name" value="${patternFirst}"
 										class="fp-inp" placeholder="First Name">
