@@ -19,7 +19,7 @@
 					<spring:message code="label.header.usermanagement.key" />
 				</div>
 				<div class="float-right hm-header-right text-center"
-					onclick="javascript:showViewHierarchyPage()">
+					onclick="javascript:showMainContent('./viewhierarchy.do');">
 					<spring:message code="label.viewcompanyhierachy.key" />
 				</div>
 				<div class="float-right hm-header-right text-center"
