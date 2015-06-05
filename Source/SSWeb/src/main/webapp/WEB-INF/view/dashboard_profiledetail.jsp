@@ -55,7 +55,7 @@
 		<div id="pro-cmplt-stars" class="dsh-star-wrapper clearfix">
 			<%-- <div class="float-left dsh-star-item"></div>
 			<div id="profile-completed" class="float-left dsh-rating-item">${fn:substringBefore(profileCompleteness * 5 / 100, '.')}/5</div> --%>
-			<div id="dsh-btn1" class="dsh-btn-complete float-left" onclick="sendSurveyInvitation();"><spring:message code="label.sendsurvey.btn.key" /></div>
+			<div id="dsh-btn1" class="dsh-btn-complete float-left"><spring:message code="label.sendsurvey.btn.key" /></div>
 			<div id="dsh-btn2" class="dsh-btn-complete dsh-btn-orange float-left hide"></div>
 			<div id="dsh-btn3" class="dsh-btn-complete dsh-btn-green float-left hide"></div>
 			<%-- <c:choose>
