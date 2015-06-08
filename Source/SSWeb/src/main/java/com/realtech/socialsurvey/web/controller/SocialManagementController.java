@@ -57,6 +57,7 @@ import com.realtech.socialsurvey.core.services.social.SocialManagementService;
 import com.realtech.socialsurvey.core.utils.DisplayMessageConstants;
 import com.realtech.socialsurvey.web.common.ErrorResponse;
 import com.realtech.socialsurvey.web.common.JspResolver;
+import com.realtech.socialsurvey.web.util.RequestUtils;
 import facebook4j.Facebook;
 import facebook4j.FacebookException;
 
@@ -82,6 +83,9 @@ public class SocialManagementController {
 	
 	@Autowired
 	private ProfileManagementService profileManagementService;
+	
+	@Autowired
+	private RequestUtils requestUtils;
 
 	@Value("${APPLICATION_BASE_URL}")
 	private String applicationBaseUrl;
@@ -154,24 +158,24 @@ public class SocialManagementController {
 		}
 		
 		session.removeAttribute(CommonConstants.SOCIAL_FLOW);
+		String serverBaseUrl = requestUtils.getRequestServerName(request);
 		switch (socialNetwork) {
 
 		// Building facebook authUrl
 			case "facebook":
-				Facebook facebook = socialManagementService.getFacebookInstance();
+				Facebook facebook = socialManagementService.getFacebookInstance(serverBaseUrl);
 
 				// Setting authUrl in model
 				session.setAttribute(CommonConstants.SOCIAL_REQUEST_TOKEN, facebook);
-				model.addAttribute(CommonConstants.SOCIAL_AUTH_URL, facebook.getOAuthAuthorizationURL(facebookRedirectUri));
+				model.addAttribute(CommonConstants.SOCIAL_AUTH_URL, facebook.getOAuthAuthorizationURL(serverBaseUrl+facebookRedirectUri));
 
-				LOG.info("Returning the facebook authUrl : " + facebook.getOAuthAuthorizationURL(facebookRedirectUri));
 				break;
 
 			// Building twitter authUrl
 			case "twitter":
 				RequestToken requestToken;
 				try {
-					requestToken = socialManagementService.getTwitterRequestToken();
+					requestToken = socialManagementService.getTwitterRequestToken(serverBaseUrl);
 				}
 				catch (Exception e) {
 					LOG.error("Exception while getting request token. Reason : " + e.getMessage(), e);
@@ -194,7 +198,7 @@ public class SocialManagementController {
 
 				StringBuilder linkedInAuth = new StringBuilder(linkedinAuthUri).append("?response_type=").append("code");
 				linkedInAuth.append("&client_id=").append(linkedInApiKey);
-				linkedInAuth.append("&redirect_uri=").append(linkedinRedirectUri);
+				linkedInAuth.append("&redirect_uri=").append(serverBaseUrl).append(linkedinRedirectUri);
 				linkedInAuth.append("&state=").append("SOCIALSURVEY");
 				linkedInAuth.append("&scope=").append(linkedinScope);
 
@@ -209,7 +213,7 @@ public class SocialManagementController {
 				googleAuth.append("?scope=").append(googleApiScope);
 				googleAuth.append("&state=").append("security_token");
 				googleAuth.append("&response_type=").append("code");
-				googleAuth.append("&redirect_uri=").append(googleApiRedirectUri);
+				googleAuth.append("&redirect_uri=").append(serverBaseUrl+googleApiRedirectUri);
 				googleAuth.append("&client_id=").append(googleApiKey);
 				googleAuth.append("&access_type=").append("offline");
 				googleAuth.append("&approval_prompt=").append("force");
@@ -279,7 +283,7 @@ public class SocialManagementController {
 			String profileLink = null;
 			facebook4j.auth.AccessToken accessToken = null;
 			try {
-				accessToken = facebook.getOAuthAccessToken(oauthCode, facebookRedirectUri);
+				accessToken = facebook.getOAuthAccessToken(oauthCode, requestUtils.getRequestServerName(request)+facebookRedirectUri);
 				facebook4j.User user = facebook.getUser(facebook.getId());
 				if (user != null)
 					profileLink = user.getLink().toString();
@@ -644,7 +648,7 @@ public class SocialManagementController {
 			List<NameValuePair> params = new ArrayList<NameValuePair>(2);
 			params.add(new BasicNameValuePair("grant_type", "authorization_code"));
 			params.add(new BasicNameValuePair("code", oauthCode));
-			params.add(new BasicNameValuePair("redirect_uri", linkedinRedirectUri));
+			params.add(new BasicNameValuePair("redirect_uri", requestUtils.getRequestServerName(request)+linkedinRedirectUri));
 			params.add(new BasicNameValuePair("client_id", linkedInApiKey));
 			params.add(new BasicNameValuePair("client_secret", linkedInApiSecret));
 
@@ -843,7 +847,7 @@ public class SocialManagementController {
 			googleAuth.addBodyParameter("code", OAuthCode);
 			googleAuth.addBodyParameter("client_id", googleApiKey);
 			googleAuth.addBodyParameter("client_secret", googleApiSecret);
-			googleAuth.addBodyParameter("redirect_uri", googleApiRedirectUri);
+			googleAuth.addBodyParameter("redirect_uri", requestUtils.getRequestServerName(request)+googleApiRedirectUri);
 			googleAuth.addBodyParameter("grant_type", "authorization_code");
 			Response tokenResponse = googleAuth.send();
 			
@@ -1034,7 +1038,7 @@ public class SocialManagementController {
 		for (OrganizationUnitSettings setting : settings) {
 			try {
 				if (setting != null)
-					if(!socialManagementService.updateStatusIntoFacebookPage(setting, facebookMessage))
+					if(!socialManagementService.updateStatusIntoFacebookPage(setting, facebookMessage, requestUtils.getRequestServerName(request)))
 						facebookNotSetup = false;
 			}
 			catch (FacebookException | InvalidInputException e) {
@@ -1148,9 +1152,10 @@ public class SocialManagementController {
 
 		User user = sessionHelper.getCurrentUser();
 		List<OrganizationUnitSettings> settings = socialManagementService.getBranchAndRegionSettingsForUser(user.getUserId());
-		String message = rating + "-Star Survey Response from " + custFirstName + custLastName + " for " + agentName + " on SocialSurvey - view at ";
-		message = message.replaceAll("null", "");
+		String message = rating + "-Star Survey Response from " + custFirstName + custLastName + " for " + agentName + " on SocialSurvey ";
 		String linkedinProfileUrl = applicationBaseUrl + CommonConstants.AGENT_PROFILE_FIXED_URL + agentProfileLink;
+		message += linkedinProfileUrl;
+		message = message.replaceAll("null", "");
 		String linkedinMessageFeedback = "From : " + custFirstName + " " + custLastName + " "+ feedback;
 		for (OrganizationUnitSettings setting : settings) {
 			try {
