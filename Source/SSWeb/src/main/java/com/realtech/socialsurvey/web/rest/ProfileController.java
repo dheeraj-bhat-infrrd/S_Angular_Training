@@ -1116,7 +1116,7 @@ public class ProfileController {
 			if (numRows == null) {
 				numRows = -1;
 			}
-			if(sortCriteria == null){
+			if(sortCriteria == null || sortCriteria.equalsIgnoreCase(CommonConstants.REVIEWS_SORT_CRITERIA_DEFAULT)){
 				sortCriteria = CommonConstants.REVIEWS_SORT_CRITERIA_DATE;
 			}
 			try {

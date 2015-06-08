@@ -436,9 +436,17 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean {
 	@Override
 	public void increaseSurveyCountForAgent(long agentId) throws SolrException {
 		LOG.info("Method to increase survey count for agent started.");
-		organizationUnitSettingsDao.updateCompletedSurveyCountForAgent(agentId);
-		solrSearchService.updateCompletedSurveyCountForUserInSolr(agentId);
+		organizationUnitSettingsDao.updateCompletedSurveyCountForAgent(agentId, 1);
+		solrSearchService.updateCompletedSurveyCountForUserInSolr(agentId, 1);
 		LOG.info("Method to increase survey count for agent finished.");
+	}
+	
+	@Override
+	public void decreaseSurveyCountForAgent(long agentId) throws SolrException {
+		LOG.info("Method to decrease survey count for agent started.");
+		organizationUnitSettingsDao.updateCompletedSurveyCountForAgent(agentId, -1);
+		solrSearchService.updateCompletedSurveyCountForUserInSolr(agentId, -1);
+		LOG.info("Method to decrease survey count for agent finished.");
 	}
 
 	@Override

@@ -7,7 +7,7 @@ var publicPostStartIndex = 0;
 var publicPostNumRows = 4;
 var currentProfileName;
 var doStopPublicPostPagination = false;
-var reviewsSortBy = 'feature';
+var reviewsSortBy = 'default';
 var showAllReviews = false;
 var monthNames = [ "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug",
 		"Sep", "Oct", "Nov", "Dec" ];
