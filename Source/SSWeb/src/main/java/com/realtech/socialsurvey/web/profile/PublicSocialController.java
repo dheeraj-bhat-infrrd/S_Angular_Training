@@ -30,6 +30,7 @@ import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.exception.NonFatalException;
 import com.realtech.socialsurvey.core.services.social.SocialManagementService;
 import com.realtech.socialsurvey.web.common.JspResolver;
+import com.realtech.socialsurvey.web.util.RequestUtils;
 import facebook4j.Facebook;
 import facebook4j.FacebookException;
 import facebook4j.auth.AccessToken;
@@ -84,6 +85,9 @@ public class PublicSocialController {
 
 	@Autowired
 	private SocialManagementService socialManagementService;
+	
+	@Autowired
+	private RequestUtils requestUtils;
 
 	/**
 	 * Returns the social authorization page
@@ -112,16 +116,16 @@ public class PublicSocialController {
 		session.setAttribute("review", request.getParameter("review"));
 		session.setAttribute("rating", request.getParameter("rating"));
 
+		String serverBaseUrl = requestUtils.getRequestServerName(request);
 		switch (socialNetwork) {
 
 		// Building facebook authUrl
 			case "facebook":
-				Facebook facebook = socialManagementService.getFacebookInstance();
+				Facebook facebook = socialManagementService.getFacebookInstance(serverBaseUrl);
 
 				// Setting authUrl in model
 				session.setAttribute(CommonConstants.SOCIAL_REQUEST_TOKEN, facebook);
-				model.addAttribute(CommonConstants.SOCIAL_AUTH_URL, facebook.getOAuthAuthorizationURL(facebookRedirectUriInSession));
-				LOG.info("Returning the facebook authUrl : " + facebook.getOAuthAuthorizationURL(facebookRedirectUriInSession));
+				model.addAttribute(CommonConstants.SOCIAL_AUTH_URL, facebook.getOAuthAuthorizationURL(serverBaseUrl+facebookRedirectUriInSession));
 				break;
 
 			// Building twitter authUrl
@@ -129,7 +133,7 @@ public class PublicSocialController {
 				RequestToken requestToken;
 				try {
 					Twitter twitter = socialManagementService.getTwitterInstance();
-					requestToken = twitter.getOAuthRequestToken(twitterRedirectUriInSession);
+					requestToken = twitter.getOAuthRequestToken(serverBaseUrl+twitterRedirectUriInSession);
 				}
 				catch (Exception e) {
 					LOG.error("Exception while getting request token. Reason : " + e.getMessage(), e);
@@ -152,7 +156,7 @@ public class PublicSocialController {
 
 				StringBuilder linkedInAuth = new StringBuilder(linkedinAuthUri).append("?response_type=").append("code");
 				linkedInAuth.append("&client_id=").append(linkedInApiKey);
-				linkedInAuth.append("&redirect_uri=").append(linkedinRedirectUriInSession);
+				linkedInAuth.append("&redirect_uri=").append(requestUtils.getRequestServerName(request)).append(linkedinRedirectUriInSession);
 				linkedInAuth.append("&state=").append("SOCIALSURVEY");
 				linkedInAuth.append("&scope=").append(linkedinScope);
 
@@ -167,7 +171,7 @@ public class PublicSocialController {
 				googleAuth.append("?scope=").append(googleApiScope);
 				googleAuth.append("&state=").append("security_token");
 				googleAuth.append("&response_type=").append("code");
-				googleAuth.append("&redirect_uri=").append(googleApiRedirectUriInSession);
+				googleAuth.append("&redirect_uri=").append(serverBaseUrl+googleApiRedirectUriInSession);
 				googleAuth.append("&client_id=").append(googleApiKey);
 				googleAuth.append("&access_type=").append("offline");
 
@@ -219,7 +223,7 @@ public class PublicSocialController {
 			Facebook facebook = (Facebook) session.getAttribute(CommonConstants.SOCIAL_REQUEST_TOKEN);
 			facebook4j.auth.AccessToken accessToken = null;
 			try {
-				accessToken = facebook.getOAuthAccessToken(oauthCode, facebookRedirectUriInSession);
+				accessToken = facebook.getOAuthAccessToken(oauthCode, requestUtils.getRequestServerName(request)+facebookRedirectUriInSession);
 			}
 			catch (FacebookException e) {
 				LOG.error("Error while creating access token for facebook: " + e.getLocalizedMessage(), e);
@@ -333,7 +337,7 @@ public class PublicSocialController {
 			List<NameValuePair> params = new ArrayList<NameValuePair>(2);
 			params.add(new BasicNameValuePair("grant_type", "authorization_code"));
 			params.add(new BasicNameValuePair("code", oauthCode));
-			params.add(new BasicNameValuePair("redirect_uri", linkedinRedirectUriInSession));
+			params.add(new BasicNameValuePair("redirect_uri", requestUtils.getRequestServerName(request)+linkedinRedirectUriInSession));
 			params.add(new BasicNameValuePair("client_id", linkedInApiKey));
 			params.add(new BasicNameValuePair("client_secret", linkedInApiSecret));
 

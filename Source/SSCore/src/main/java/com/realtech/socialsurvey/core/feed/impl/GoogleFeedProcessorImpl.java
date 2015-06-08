@@ -75,9 +75,6 @@ public class GoogleFeedProcessorImpl implements SocialNetworkDataProcessor<Googl
 	@Value("${GOOGLE_API_SECRET}")
 	private String googleApiSecretKey;
 
-	@Value("${GOOGLE_REDIRECT_URI}")
-	private String googleApiRedirectURL;
-
 	@Value("${GOOGLE_API_SCOPE}")
 	private String googleApiScope;
 

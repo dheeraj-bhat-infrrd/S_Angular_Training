@@ -26,10 +26,10 @@ public interface SocialManagementService {
 	public LinkedInOAuthService getLinkedInInstance();
 	public LinkedInApiClientFactory getLinkedInApiClientFactory();*/
 
-	public RequestToken getTwitterRequestToken() throws TwitterException;
+	public RequestToken getTwitterRequestToken(String serverBaseUrl) throws TwitterException;
 	public Twitter getTwitterInstance();
 
-	public Facebook getFacebookInstance();
+	public Facebook getFacebookInstance(String serverBaseUrl);
 
 	/**
 	 * Adds the SocialMedia access tokens to mongo
@@ -45,7 +45,7 @@ public interface SocialManagementService {
 	public SocialMediaTokens updateAgentSocialMediaTokens(AgentSettings agentSettings, SocialMediaTokens mediaTokens)
 			throws InvalidInputException;
 	
-	public boolean updateStatusIntoFacebookPage(OrganizationUnitSettings agentSettings, String message) throws InvalidInputException,
+	public boolean updateStatusIntoFacebookPage(OrganizationUnitSettings agentSettings, String message, String serverBaseUrl) throws InvalidInputException,
 			FacebookException;
 
 	public boolean tweet(OrganizationUnitSettings agentSettings, String message) throws InvalidInputException, TwitterException;
