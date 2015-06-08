@@ -1371,3 +1371,6 @@ footer .bottom p {
 	letter-spacing: 0.005em;
 	line-height: 16px;
 }
+a.payment-button:hover, a.payment-button:visited {
+	color: #fff;
+}
