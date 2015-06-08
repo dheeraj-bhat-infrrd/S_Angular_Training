@@ -1583,6 +1583,24 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 		organizationUnitSettingsDao.updateParticularKeyOrganizationUnitSettings(MongoOrganizationUnitSettingDaoImpl.KEY_PROFILE_STAGES, profileStages, settings, collectionName);
 		LOG.info("Method to update profile stages finished.");
 	}
+	
+	@Override
+	public void setAgentProfileUrlForReview(List<SurveyDetails> reviews) {
+		String profileUrl;
+		String baseProfileUrl = applicationBaseUrl + CommonConstants.AGENT_PROFILE_FIXED_URL;
+		for (SurveyDetails review : reviews) {
+			try {
+				SolrDocumentList documents = solrSearchService.searchUsersByIden(review.getAgentId(), CommonConstants.USER_ID_SOLR, true, 0, 1);
+				if (documents != null && !documents.isEmpty()) {
+					profileUrl = (String) documents.get(CommonConstants.INITIAL_INDEX).getFieldValue(CommonConstants.PROFILE_URL_SOLR);
+					review.setCompleteProfileUrl(baseProfileUrl + profileUrl);
+				}
+			}
+			catch (InvalidInputException | SolrException e) {
+				LOG.error("Exception caught in setAgentProfileUrlForReview() for agent : " + review.getAgentName() + " Nested exception is ", e);
+			}
+		}
+	}
 
 	private List<CompanyPositions> sortCompanyPositions(List<CompanyPositions> positions) {
 		LOG.debug("Sorting company positions");
@@ -1622,4 +1640,5 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 		}
 		return userIds;
 	}
+	
 }

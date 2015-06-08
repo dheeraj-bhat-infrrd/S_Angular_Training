@@ -628,6 +628,9 @@ public class HierarchyManagementController {
 			if (userSelectionType != null) {
 				if (userSelectionType.equalsIgnoreCase(CommonConstants.USER_SELECTION_TYPE_SINGLE)) {
 					selectedUserEmail = request.getParameter("selectedUserEmail");
+					if(selectedUserEmail != null){
+						selectedUserEmail.replaceAll("\\s", "");
+					}
 				}
 				else {
 					selectedUserEmail = request.getParameter("selectedUserEmailArray");
@@ -651,7 +654,7 @@ public class HierarchyManagementController {
 			}
 
 			// To replace all the white spaces present in the string.
-			selectedUserEmail = selectedUserEmail.replaceAll("[ \t\\x0B\f\r]+", "");
+//			selectedUserEmail = selectedUserEmail.replaceAll("[ \t\\x0B\f\r]+", "");
 			String[] assigneeEmailIds = validateAndParseEmailIds(selectedUserId, selectedUserEmail);
 
 			long regionId = 0l;

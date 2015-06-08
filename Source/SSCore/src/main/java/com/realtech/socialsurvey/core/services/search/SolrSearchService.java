@@ -228,7 +228,7 @@ public interface SolrSearchService {
 	 */
 	public void addUsersToSolr(List<User> users) throws SolrException;
 
-	public void updateCompletedSurveyCountForUserInSolr(long agentId) throws SolrException;
+	public void updateCompletedSurveyCountForUserInSolr(long agentId, int incrementCount) throws SolrException;
 
 	public Map<String, String> getCompanyAdmin(long companyId) throws SolrException;
 

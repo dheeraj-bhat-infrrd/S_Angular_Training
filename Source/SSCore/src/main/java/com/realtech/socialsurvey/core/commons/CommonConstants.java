@@ -286,6 +286,7 @@ public interface CommonConstants {
 	public static final String USER_SELECTION_TYPE_MULTIPLE = "multiple";
 	public static final String REVIEWS_SORT_CRITERIA_DATE = "date";
 	public static final String REVIEWS_SORT_CRITERIA_FEATURE = "feature";
+	public static final String REVIEWS_SORT_CRITERIA_DEFAULT = "default";
 	
 	/**
 	 * Email templates config
