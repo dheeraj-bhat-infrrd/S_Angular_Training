@@ -51,6 +51,7 @@ import com.realtech.socialsurvey.core.utils.MessageUtils;
 import com.realtech.socialsurvey.web.common.ErrorCodes;
 import com.realtech.socialsurvey.web.common.ErrorResponse;
 import com.realtech.socialsurvey.web.common.JspResolver;
+import com.realtech.socialsurvey.web.util.RequestUtils;
 import facebook4j.FacebookException;
 
 // JIRA SS-119 by RM-05 : BOC
@@ -86,6 +87,9 @@ public class SurveyManagementController {
 
 	@Autowired
 	private UserManagementService userManagementService;
+	
+	@Autowired
+	private RequestUtils requestUtils;
 
 	@Resource
 	@Qualifier("nocaptcha")
@@ -452,6 +456,7 @@ public class SurveyManagementController {
 			String ratingStr = request.getParameter("rating");
 			String customerEmail = request.getParameter("customerEmail");
 			String feedback = request.getParameter("feedback");
+			String serverBaseUrl = requestUtils.getRequestServerName(request);
 			long agentId = 0;
 			double rating = 0;
 			try {
@@ -473,11 +478,11 @@ public class SurveyManagementController {
 					+ " on @SocialSurvey - view at " + getApplicationBaseUrl() + CommonConstants.AGENT_PROFILE_FIXED_URL + agentProfileLink;
 
 			String linkedinMessage = rating + "-Star Survey Response from " + custFirstName + " " + custLastName + " for " + agentName
-					+ " on SocialSurvey - view at ";
+					+ " on SocialSurvey ";
 			String linkedinProfileUrl = getApplicationBaseUrl() + CommonConstants.AGENT_PROFILE_FIXED_URL + agentProfileLink;
-			String linkedinMessageFeedback = "From : " + custFirstName + " " + custLastName + " "+ feedback;
+			String linkedinMessageFeedback = "From : " + custFirstName + " " + custLastName + " - "+ feedback;
 			try {
-				if(!socialManagementService.updateStatusIntoFacebookPage(agentSettings, facebookMessage)){
+				if(!socialManagementService.updateStatusIntoFacebookPage(agentSettings, facebookMessage, serverBaseUrl)){
 					surveyHandler.updateSharedOn(CommonConstants.FACEBOOK_SOCIAL_SITE, agentId, customerEmail);
 				}
 			}
@@ -486,7 +491,7 @@ public class SurveyManagementController {
 			}
 			for (OrganizationUnitSettings setting : settings) {
 				try {
-					if(!socialManagementService.updateStatusIntoFacebookPage(setting, facebookMessage)){
+					if(!socialManagementService.updateStatusIntoFacebookPage(setting, facebookMessage, serverBaseUrl)){
 						surveyHandler.updateSharedOn(CommonConstants.FACEBOOK_SOCIAL_SITE, agentId, customerEmail);
 					}
 				}
@@ -542,6 +547,7 @@ public class SurveyManagementController {
 			String agentIdStr = facebookDetails.get("agentId");
 			String ratingStr = facebookDetails.get("rating");
 			String customerEmail = facebookDetails.get("customerEmail");
+			String serverBaseUrl = requestUtils.getRequestServerName(request);
 			long agentId = 0;
 			double rating = 0;
 			try {
@@ -557,7 +563,7 @@ public class SurveyManagementController {
 			String facebookMessage = rating + "-Star Survey Response from " + custFirstName + " " + custLastName + " for " + agentName
 					+ " on Social Survey - view at " + getApplicationBaseUrl() + CommonConstants.AGENT_PROFILE_FIXED_URL + agentProfileLink;
 			try {
-				socialManagementService.updateStatusIntoFacebookPage(agentSettings, facebookMessage);
+				socialManagementService.updateStatusIntoFacebookPage(agentSettings, facebookMessage, serverBaseUrl);
 				surveyHandler.updateSharedOn(CommonConstants.FACEBOOK_SOCIAL_SITE, agentId, customerEmail);
 			}
 			catch (FacebookException e) {
@@ -565,7 +571,7 @@ public class SurveyManagementController {
 			}
 			for (OrganizationUnitSettings setting : settings) {
 				try {
-					socialManagementService.updateStatusIntoFacebookPage(setting, facebookMessage);
+					socialManagementService.updateStatusIntoFacebookPage(setting, facebookMessage, serverBaseUrl);
 				}
 				catch (FacebookException e) {
 					LOG.error("FacebookException caught in postToSocialMedia() while trying to post to facebook. Nested excption is ", e);
@@ -658,7 +664,7 @@ public class SurveyManagementController {
 			List<OrganizationUnitSettings> settings = socialManagementService.getSettingsForBranchesAndRegionsInHierarchy(agentId);
 			AgentSettings agentSettings = userManagementService.getUserSettings(agentId);
 			String message = rating + "-Star Survey Response from " + custFirstName + custLastName + " for " + agentName
-					+ " on SocialSurvey - view at ";
+					+ " on SocialSurvey ";
 			String linkedinProfileUrl = getApplicationBaseUrl() + CommonConstants.AGENT_PROFILE_FIXED_URL + agentProfileLink;
 			String linkedinMessageFeedback = "From : " + custFirstName + " " + custLastName + " "+ feedback;
 			socialManagementService.updateLinkedin(agentSettings, message, linkedinProfileUrl, linkedinMessageFeedback);
