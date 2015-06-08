@@ -7,7 +7,7 @@ var publicPostStartIndex = 0;
 var publicPostNumRows = 4;
 var currentProfileName;
 var doStopPublicPostPagination = false;
-var reviewsSortBy = 'feature';
+var reviewsSortBy = 'default';
 var showAllReviews = false;
 var monthNames = [ "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug",
 		"Sep", "Oct", "Nov", "Dec" ];
@@ -504,11 +504,11 @@ function paintReviews(result){
 		reviewsHtml=  reviewsHtml+'    		<div class="float-left blue-text ppl-share-shr-txt">Share</div>';
 		reviewsHtml=  reviewsHtml+'    		<div class="float-left icn-share icn-plus-open"></div>';
 		reviewsHtml=  reviewsHtml+'    		<div class="float-left clearfix ppl-share-social hide">';
-		reviewsHtml=  reviewsHtml+'        	<div class="float-left ppl-share-icns icn-fb icn-fb-pp"></div>';
-		reviewsHtml=  reviewsHtml+'        	<div class="float-left ppl-share-icns icn-twit icn-twit-pp"></div>';
-		reviewsHtml=  reviewsHtml+'        	<div class="float-left ppl-share-icns icn-lin icn-lin-pp"></div>';
-		reviewsHtml=  reviewsHtml+'			<div class="float-left ppl-share-icns icn-gplus"></div>';
-		reviewsHtml=  reviewsHtml+'       	<div class="float-left ppl-share-icns icn-yelp"></div>';
+		reviewsHtml=  reviewsHtml+'        	<a href="https://www.facebook.com/sharer/sharer.php?u=' + reviewItem.completeProfileUrl + '" target="_blank"><span class="float-left ppl-share-icns icn-fb icn-fb-pp"></span></a>';
+		reviewsHtml=  reviewsHtml+'         <a href="https://twitter.com/home?status=' + reviewItem.completeProfileUrl + '" target="_blank"><span class="float-left ppl-share-icns icn-twit icn-twit-pp"></span></a>';
+		reviewsHtml=  reviewsHtml+'        	<a href="https://www.linkedin.com/shareArticle?mini=true&url=' + reviewItem.completeProfileUrl + '&title=&summary=&source=" target="_blank"><span class="float-left ppl-share-icns icn-lin icn-lin-pp"></span></a>';
+		reviewsHtml=  reviewsHtml+'			<a href="https://plus.google.com/share?url=' + reviewItem.completeProfileUrl + '" target="_blank"<span class="float-left ppl-share-icns icn-gplus"></span></a>';
+		reviewsHtml=  reviewsHtml+'       	<a href="https://yelp.com/biz" target="_blank"><span class="float-left ppl-share-icns icn-yelp"></span></a>';
 		reviewsHtml=  reviewsHtml+'    	</div>';
 		reviewsHtml=  reviewsHtml+'   <div class="float-left icn-share icn-remove icn-rem-size hide"></div>';
 		reviewsHtml=  reviewsHtml+'	</div>';
@@ -539,39 +539,6 @@ function paintReviews(result){
         $(this).parent().find('.ppl-share-social').hide();
         $(this).parent().find('.icn-plus-open').show();
     });
-    
-    $('.icn-fb-pp').click(function(){
-    	var firstName = $(this).parent().parent().parent().attr('data-cust-first-name');
-    	var lastName = $(this).parent().parent().parent().attr('data-cust-last-name');
-    	var agentName = $(this).parent().parent().parent().attr('data-agent-name');
-    	var rating = $(this).parent().parent().parent().attr('data-rating');
-    	var review = $(this).parent().parent().parent().attr('data-review');
-    	postOnSocialNetworkOnce('facebook', firstName, lastName, agentName, rating, review);
-    });
-    
-    $('.icn-twit-pp').click(function(){
-    	var firstName = $(this).parent().parent().parent().attr('data-cust-first-name');
-    	var lastName = $(this).parent().parent().parent().attr('data-cust-last-name');
-    	var agentName = $(this).parent().parent().parent().attr('data-agent-name');
-    	var rating = $(this).parent().parent().parent().attr('data-rating');
-    	var review = $(this).parent().parent().parent().attr('data-review');
-    	postOnSocialNetworkOnce('twitter', firstName, lastName, agentName, rating, review);
-    });
-    
-    $('.icn-lin-pp').click(function(){
-    	var firstName = $(this).parent().parent().parent().attr('data-cust-first-name');
-    	var lastName = $(this).parent().parent().parent().attr('data-cust-last-name');
-    	var agentName = $(this).parent().parent().parent().attr('data-agent-name');
-    	var rating = $(this).parent().parent().parent().attr('data-rating');
-    	var review = $(this).parent().parent().parent().attr('data-review');
-    	postOnSocialNetworkOnce('linkedin', firstName, lastName, agentName, rating, review);
-    });
-    
-    $('.icn-yelp-pp').click(function(){
-    	
-    });
-    
-    $('.icn-gplus-pp').href = "http://localhost:8080";
 }
 
 $(document).on('click','.review-more-button',function(){

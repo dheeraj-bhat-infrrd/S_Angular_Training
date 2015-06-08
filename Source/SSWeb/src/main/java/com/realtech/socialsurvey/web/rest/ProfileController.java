@@ -623,6 +623,7 @@ public class ProfileController {
 			try {
 				List<SurveyDetails> reviews = profileManagementService.getReviews(companyId, minScore, maxScore, start, numRows,
 						CommonConstants.PROFILE_LEVEL_COMPANY, false, null, null, sortCriteria);
+				profileManagementService.setAgentProfileUrlForReview(reviews);
 				String json = new Gson().toJson(reviews);
 				LOG.debug("reviews json : " + json);
 				response = Response.ok(json).build();
@@ -1116,12 +1117,13 @@ public class ProfileController {
 			if (numRows == null) {
 				numRows = -1;
 			}
-			if(sortCriteria == null){
+			if(sortCriteria == null || sortCriteria.equalsIgnoreCase(CommonConstants.REVIEWS_SORT_CRITERIA_DEFAULT)){
 				sortCriteria = CommonConstants.REVIEWS_SORT_CRITERIA_DATE;
 			}
 			try {
 				List<SurveyDetails> reviews = profileManagementService.getReviews(agentId, minScore, maxScore, start, numRows,
 						CommonConstants.PROFILE_LEVEL_INDIVIDUAL, false, null, null, sortCriteria);
+				profileManagementService.setAgentProfileUrlForReview(reviews);
 				String json = new Gson().toJson(reviews);
 				LOG.debug("reviews json : " + json);
 				response = Response.ok(json).build();
