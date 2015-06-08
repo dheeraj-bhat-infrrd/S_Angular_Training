@@ -109,7 +109,7 @@
 								<span class="payment-button payment-button-disabled">Start 30-Day Trial</span>
 							</c:when>
 							<c:otherwise>
-								<a class="payment-button" href="javascript:selectAccountType(1, '9.95', ${skippayment})">Start 30-Day Trial</a>
+								<a class="payment-button" href="javascript:selectAccountType(1, '$9.95', ${skippayment})">Start 30-Day Trial</a>
 							</c:otherwise>
 							</c:choose>
 						</td>
@@ -344,7 +344,7 @@
 								<span class="payment-button payment-button-disabled">Start 30-Day Trial</span>
 							</c:when>
 							<c:otherwise>
-								<a class="payment-button" href="javascript:selectAccountType(1, '9.95', ${skippayment})">Start 30-Day Trial</a>
+								<a class="payment-button" href="javascript:selectAccountType(1, '$9.95', ${skippayment})">Start 30-Day Trial</a>
 							</c:otherwise>
 							</c:choose>
 						</td>
