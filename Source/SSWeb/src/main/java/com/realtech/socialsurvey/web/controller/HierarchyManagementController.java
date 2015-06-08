@@ -1671,7 +1671,7 @@ public class HierarchyManagementController {
 		LOG.info("Method validateAndParseEmailIds called for selectedUserIdStr:" + selectedUserId + " selectedUserEmail:" + selectedUserEmail);
 		List<String> emailIds = new ArrayList<>();
 		if (selectedUserId <= 0l && selectedUserEmail != null && !selectedUserEmail.isEmpty()) {
-			StringTokenizer tokenizer = new StringTokenizer(selectedUserEmail, ",|;|\\n");
+			StringTokenizer tokenizer = new StringTokenizer(selectedUserEmail, ",|;|\n");
 			while (tokenizer.hasMoreTokens()) {
 				String emailId = tokenizer.nextToken();
 				if (tokenizer.countTokens() == 1 && (emailId == null || emailId.isEmpty())) {
