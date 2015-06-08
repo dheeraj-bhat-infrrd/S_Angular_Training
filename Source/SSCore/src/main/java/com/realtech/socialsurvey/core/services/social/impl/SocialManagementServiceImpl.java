@@ -105,9 +105,9 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
 	 * @throws TwitterException
 	 */
 	@Override
-	public RequestToken getTwitterRequestToken() throws TwitterException {
+	public RequestToken getTwitterRequestToken(String serverBaseUrl) throws TwitterException {
 		Twitter twitter = getTwitterInstance();
-		RequestToken requestToken = twitter.getOAuthRequestToken(twitterRedirectUri);
+		RequestToken requestToken = twitter.getOAuthRequestToken(serverBaseUrl+twitterRedirectUri);
 		return requestToken;
 	}
 
@@ -128,11 +128,11 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
 	 * @throws TwitterException
 	 */
 	@Override
-	public Facebook getFacebookInstance() {
+	public Facebook getFacebookInstance(String serverBaseUrl) {
 		facebook4j.conf.ConfigurationBuilder confBuilder = new facebook4j.conf.ConfigurationBuilder();
 		confBuilder.setOAuthAppId(facebookClientId);
 		confBuilder.setOAuthAppSecret(facebookAppSecret);
-		confBuilder.setOAuthCallbackURL(facebookRedirectUri);
+		confBuilder.setOAuthCallbackURL(serverBaseUrl+facebookRedirectUri);
 		confBuilder.setOAuthPermissions(facebookScope);
 		facebook4j.conf.Configuration configuration = confBuilder.build();
 
@@ -171,13 +171,13 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
 	}
 
 	@Override
-	public boolean updateStatusIntoFacebookPage(OrganizationUnitSettings agentSettings, String message) throws InvalidInputException, FacebookException {
+	public boolean updateStatusIntoFacebookPage(OrganizationUnitSettings agentSettings, String message, String serverBaseUrl) throws InvalidInputException, FacebookException {
 		if (agentSettings == null) {
 			throw new InvalidInputException("AgentSettings can not be null");
 		}
 		LOG.info("Updating Social Tokens information");
 		boolean facebookNotSetup = true;
-		Facebook facebook = getFacebookInstance();
+		Facebook facebook = getFacebookInstance(serverBaseUrl);
 		if (agentSettings != null) {
 			if (agentSettings.getSocialMediaTokens() != null) {
 				if (agentSettings.getSocialMediaTokens().getFacebookToken() != null &&
