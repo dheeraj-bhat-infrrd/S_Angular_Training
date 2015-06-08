@@ -588,13 +588,13 @@ $(document).ready(function() {
 	});
 
 	$('#happy-text-complete').blur(function() {
-		saveTextForMoodFlow($("#happy-text").val(), "happyComplete");
+		saveTextForMoodFlow($("#happy-text-complete").val(), "happyComplete");
 	});
 	$('#neutral-text-complete').blur(function() {
-		saveTextForMoodFlow($("#neutral-text").val(), "neutralComplete");
+		saveTextForMoodFlow($("#neutral-text-complete").val(), "neutralComplete");
 	});
 	$('#sad-text-complete').blur(function() {
-		saveTextForMoodFlow($("#sad-text").val(), "sadComplete");
+		saveTextForMoodFlow($("#sad-text-complete").val(), "sadComplete");
 	});
 
 	$('#atpst-chk-box').click(function() {

@@ -1214,6 +1214,12 @@ public class OrganizationManagementController {
 
 			organizationManagementService.updateSurveySettings(companySettings, surveySettings);
 			status = CommonConstants.SUCCESS_ATTRIBUTE;
+			
+			// Updating settings in session
+			HttpSession session = request.getSession();
+			UserSettings userSettings = (UserSettings) session.getAttribute(CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION);
+			if(userSettings != null)
+				userSettings.setCompanySettings(companySettings);			
 		}
 		catch (NonFatalException e) {
 			LOG.error("Non fatal exception caught in storeTextForFlow(). Nested exception is ", e);
