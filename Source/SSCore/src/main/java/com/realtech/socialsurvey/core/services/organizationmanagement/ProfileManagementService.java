@@ -394,4 +394,6 @@ public interface ProfileManagementService {
 
 	public void updateProfileStages(List<ProfileStage> profileStages, OrganizationUnitSettings settings, String collectionName);
 
+	public void setAgentProfileUrlForReview(List<SurveyDetails> reviews);
+
 }
