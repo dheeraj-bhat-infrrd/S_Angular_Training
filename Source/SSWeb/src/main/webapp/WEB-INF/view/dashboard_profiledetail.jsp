@@ -73,7 +73,7 @@
 <script>
 $(document).ready(function() {
 	// Social Posts
-	$('#dg-img-1').find('svg').remove();
+	$('#dg-img-3').find('svg').remove();
 	var socialPosts = "${socialPosts}";
 	var circle1 = new ProgressBar.Circle('#dg-img-3', {
 		color : '#7AB400',
@@ -82,11 +82,11 @@ $(document).ready(function() {
 		strokeWidth : 4,
 		easing : 'easeInOut'
 	});
-	if ((parseInt(socialPosts) / maxSocialPosts) > 1)
+	if ((parseFloat(socialPosts) / maxSocialPosts) > 1)
 		circle1.animate(1);
 	else
-		circle1.animate(parseInt(socialPosts) / maxSocialPosts);
-	
+		circle1.animate(parseFloat(socialPosts) / maxSocialPosts);
+
 	// Survey Count
 	$('#dg-img-2').find('svg').remove();
 	var surveyCount = "${surveyCount}";
@@ -103,7 +103,7 @@ $(document).ready(function() {
 		circle2.animate(parseInt(surveyCount) / maxSurveySent);
 	
 	// Social Score
-	$('#dg-img-3').find('svg').remove();
+	$('#dg-img-1').find('svg').remove();
 	var socialScore = "${socialScore}";
 	var circle3 = new ProgressBar.Circle('#dg-img-1', {
 		color : '#5CC7EF',
@@ -112,11 +112,11 @@ $(document).ready(function() {
 		strokeWidth : 4,
 		easing : 'easeInOut'
 	});
-	if ((parseInt(socialScore) / 5) > 1)
+	if ((parseFloat(socialScore) / 5) > 1)
 		circle3.animate(1);
 	else
-		circle3.animate(parseInt(socialScore) / 5);
-	
+		circle3.animate(parseFloat(socialScore) / 5);
+
 	// Profile completion
 	$('#dg-img-4').find('svg').remove();
 	var circle4 = new ProgressBar.Circle('#dg-img-4', {
