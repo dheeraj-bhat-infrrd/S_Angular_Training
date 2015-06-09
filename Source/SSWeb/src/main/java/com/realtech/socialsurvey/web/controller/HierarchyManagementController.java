@@ -40,6 +40,8 @@ import com.realtech.socialsurvey.core.enums.DisplayMessageType;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.exception.NoRecordsFetchedException;
 import com.realtech.socialsurvey.core.exception.NonFatalException;
+import com.realtech.socialsurvey.core.exception.UserAlreadyExistsException;
+import com.realtech.socialsurvey.core.services.mail.UndeliveredEmailException;
 import com.realtech.socialsurvey.core.services.organizationmanagement.OrganizationManagementService;
 import com.realtech.socialsurvey.core.services.organizationmanagement.UserAssignmentException;
 import com.realtech.socialsurvey.core.services.organizationmanagement.UserManagementService;
@@ -616,6 +618,7 @@ public class HierarchyManagementController {
 	public String addIndividual(Model model, HttpServletRequest request) {
 		LOG.info("Method to add an individual called in controller");
 		HttpSession session = request.getSession(false);
+		User user = sessionHelper.getCurrentUser();
 
 		try {
 			String strRegionId = request.getParameter("regionId");
@@ -653,9 +656,9 @@ public class HierarchyManagementController {
 				isAdmin = Boolean.parseBoolean(isAdminStr);
 			}
 
-			// To replace all the white spaces present in the string.
-//			selectedUserEmail = selectedUserEmail.replaceAll("[ \t\\x0B\f\r]+", "");
-			String[] assigneeEmailIds = validateAndParseEmailIds(selectedUserId, selectedUserEmail);
+			// TODO To replace all the white spaces present in the string.
+			// selectedUserEmail = selectedUserEmail.replaceAll("[ \t\\x0B\f\r]+", "");
+			String[] assigneeEmailIds = validateAndParseIndividualDetails(user, selectedUserId, selectedUserEmail);
 
 			long regionId = 0l;
 			try {
@@ -685,7 +688,6 @@ public class HierarchyManagementController {
 				throw new InvalidInputException("NumberFormatException while parsing branchId", DisplayMessageConstants.GENERAL_ERROR, e);
 			}
 
-			User user = sessionHelper.getCurrentUser();
 			try {
 				LOG.debug("Calling service to add/assign invidual(s)");
 				organizationManagementService.addIndividual(user, selectedUserId, branchId, regionId, assigneeEmailIds, isAdmin);
@@ -1672,8 +1674,10 @@ public class HierarchyManagementController {
 	 */
 	private String[] validateAndParseEmailIds(long selectedUserId, String selectedUserEmail) throws InvalidInputException {
 		LOG.info("Method validateAndParseEmailIds called for selectedUserIdStr:" + selectedUserId + " selectedUserEmail:" + selectedUserEmail);
+		
 		List<String> emailIds = new ArrayList<>();
 		if (selectedUserId <= 0l && selectedUserEmail != null && !selectedUserEmail.isEmpty()) {
+			
 			StringTokenizer tokenizer = new StringTokenizer(selectedUserEmail, ",|;|\n");
 			while (tokenizer.hasMoreTokens()) {
 				String emailId = tokenizer.nextToken();
@@ -1687,12 +1691,91 @@ public class HierarchyManagementController {
 				emailIds.add(emailId);
 			}
 		}
+		
 		String[] emailIdsArray = new String[emailIds.size()];
 		emailIdsArray = emailIds.toArray(emailIdsArray);
-		LOG.info("Method validateAndParseEmailIds finished.Returning emailIdsArray:" + emailIdsArray);
+		
+		LOG.info("Method validateAndParseEmailIds finished. Returning emailIdsArray:" + emailIdsArray);
 		return emailIdsArray;
 	}
 
+	/**
+	 * Method to validate single/multiple individual details provided for assigning a user to a
+	 * hierarchy level
+	 * 
+	 * @param admin
+	 * @param selectedUserId
+	 * @param selectedUserEmail
+	 * @return
+	 * @throws InvalidInputException
+	 */
+	private String[] validateAndParseIndividualDetails(User admin, long selectedUserId, String selectedUserEmail) throws InvalidInputException {
+		LOG.info("Method validateAndParseIndividualDetails called for selectedUserIdStr:" + selectedUserId + ", selectedUserEmail:"
+				+ selectedUserEmail);
+
+		List<String> emailIds = new ArrayList<String>();
+		if (selectedUserId <= 0l && selectedUserEmail != null && !selectedUserEmail.isEmpty()) {
+
+			// Tokenizing the string input
+			List<String> inputTokens = new ArrayList<String>();
+			StringTokenizer tokenizer = new StringTokenizer(selectedUserEmail, " ,|;|\n");
+			while (tokenizer.hasMoreTokens()) {
+				String inputToken = tokenizer.nextToken();
+				if (tokenizer.countTokens() == 1 && (inputToken == null || inputToken.isEmpty())) {
+					throw new InvalidInputException("Input token is invalid", DisplayMessageConstants.INVALID_EMAILID);
+				}
+
+				inputTokens.add(inputToken.trim());
+			}
+
+			// creating users
+			UserFromSearch userEntity = new UserFromSearch();
+			for (String inputStr : inputTokens) {
+				inputStr = inputStr.trim();
+
+				if (inputStr.trim().matches(CommonConstants.EMAIL_REGEX)) {
+					if (userEntity.getEmailId() == null || userEntity.getEmailId().isEmpty()) {
+						userEntity.setEmailId(inputStr);
+					}
+
+					// resetting user entity on creating new user
+					try {
+						String firstName = (userEntity.getFirstName() != null) ? userEntity.getFirstName() : userEntity.getEmailId().substring(0,
+								userEntity.getEmailId().indexOf("@"));
+						String lastName = (userEntity.getLastName() != null) ? userEntity.getLastName() : null;
+						userManagementService.inviteUserToRegister(admin, firstName, lastName, userEntity.getEmailId());
+						
+						userEntity = new UserFromSearch();
+					}
+					catch (UserAlreadyExistsException | UndeliveredEmailException e) {
+						LOG.debug("Exception in validateAndParseIndividualDetails while inviting a new user. Reason:" + e.getMessage(), e);
+					}
+					
+					// adding to email id's list
+					emailIds.add(inputStr);
+				}
+				else {
+					if (userEntity.getFirstName() == null || userEntity.getFirstName().isEmpty()) {
+						userEntity.setFirstName(inputStr);
+					}
+					else if (userEntity.getLastName() == null || userEntity.getLastName().isEmpty()) {
+						userEntity.setLastName((userEntity.getLastName() != null) ? userEntity.getLastName() : "" + " " + inputStr);
+					}
+				}
+			}
+		}
+
+		String[] emailIdsArray = new String[emailIds.size()];
+		emailIdsArray = emailIds.toArray(emailIdsArray);
+		
+		if (emailIds.isEmpty()) {
+			throw new InvalidInputException("Individual details entered are invalid", DisplayMessageConstants.INVALID_EMAILID);
+		}
+
+		LOG.info("Method validateAndParseIndividualDetails finished. Returning emailIdsArray:" + emailIdsArray);
+		return emailIdsArray;
+	}
+	
 	// update user profiles in session if current user is updated
 	private void updateProcessedProfilesInSession(HttpSession session, User user, String[] assigneeEmailIds) {
 		List<String> usersEmailIds;
