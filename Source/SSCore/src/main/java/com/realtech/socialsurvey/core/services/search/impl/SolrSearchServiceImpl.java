@@ -1169,12 +1169,12 @@ public class SolrSearchServiceImpl implements SolrSearchService {
 	}
 
 	@Override
-	public void updateCompletedSurveyCountForUserInSolr(long agentId) throws SolrException {
+	public void updateCompletedSurveyCountForUserInSolr(long agentId, int incrementCount) throws SolrException {
 		LOG.info("Method to increase completed survey count updateCompletedSurveyCountForUserInSolr() finished.");
 		SolrServer solrServer;
 		solrServer = new HttpSolrServer(solrUserUrl);
 		SolrQuery solrQuery = new SolrQuery();
-		solrQuery.setQuery(CommonConstants.USER_ID_SOLR + ":" + agentId);
+		solrQuery.setQuery(CommonConstants.USER_ID_SOLR + ":" + agentId); 
 		LOG.debug("Querying solr for searching user");
 		QueryResponse response;
 		try {
@@ -1184,7 +1184,7 @@ public class SolrSearchServiceImpl implements SolrSearchService {
 			}
 			SolrDocumentList results = response.getResults();
 			SolrDocument document = results.get(CommonConstants.INITIAL_INDEX);
-			Long value = Long.parseLong(document.getFieldValue(CommonConstants.REVIEW_COUNT_SOLR).toString()) + 1;
+			Long value = Long.parseLong(document.getFieldValue(CommonConstants.REVIEW_COUNT_SOLR).toString()) + incrementCount;
 
 			Map<String, Long> editKeyValues = new HashMap<String, Long>();
 			editKeyValues.put(SOLR_EDIT_REPLACE, value);

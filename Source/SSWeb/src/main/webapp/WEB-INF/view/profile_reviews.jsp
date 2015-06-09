@@ -15,7 +15,7 @@
 					<div class="float-left ppl-header-left">
 						<div class="ppl-head-1">${reviewItem.customerFirstName} ${reviewItem.customerLastName}</div>
 						<div class="ppl-head-2">
-							<fmt:formatDate type="date" pattern="dd MMM, yyyy" value="${reviewItem.modifiedOn}" />
+							<fmt:formatDate type="date" pattern="MMM dd, yyyy" value="${reviewItem.modifiedOn}" />
 						</div>
 					</div>
 					<div class="float-right ppl-header-right">
