@@ -705,6 +705,10 @@ function validateTextArea(elementId) {
 }
 
 function validateCountryZipcode(elementId) {
+	if(selectedCountryRegEx == ""){
+		selectedCountryRegEx = ".*";
+		selectedCountryRegEx = new RegExp(selectedCountryRegEx);
+	}
 	var zipcode = $('#' + elementId).val();
 	if ($(window).width() < 768) {
 		if (zipcode != "") {
