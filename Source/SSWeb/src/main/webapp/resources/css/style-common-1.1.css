@@ -1374,3 +1374,11 @@ footer .bottom p {
 a.payment-button:hover, a.payment-button:visited {
 	color: #fff;
 }
+
+span.footer-ul a {
+    color: #000;
+}
+
+span.footer-ul a:hover {
+    text-decoration:underline !important;
+}
