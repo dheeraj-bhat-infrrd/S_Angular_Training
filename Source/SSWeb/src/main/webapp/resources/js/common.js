@@ -497,10 +497,7 @@ $(document).on('click', '#wc-send-survey', function() {
 			var firstname = $(this).find('input.wc-review-fname').first().val();
 			var lastname = $(this).find('input.wc-review-lname').first().val();
 			var emailId = $(this).find('input.wc-review-email').first().val();
-			if(firstName == undefined || !nameRegex.test(firstName)){
-				$('#overlay-toast').html('Please enter valid firstname for ' + emailId);
-				return;
-			}
+			
 			if (nameRegex.test(firstname) && emailRegex.test(emailId)) {
 				var receiver = new Object();
 				receiver.firstname = firstname;
