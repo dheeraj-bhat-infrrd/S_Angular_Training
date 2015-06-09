@@ -172,18 +172,25 @@ var isCompanyInfoPageValid;
 var selectedCountryRegEx = "";
 var stateList;
 var cityLookupList;
-var phoneFormat = 'dddddddddd';
+var phoneFormat = '(ddd) ddd-dddd';
 $(document).ready(function() {
 	isCompanyInfoPageValid = false;
-
+	var countryCode = "US";
 	var verticalVal = $('#select-vertical').attr('data-value');
 	if(verticalVal && verticalVal != ""){
 		$('#select-vertical').val(verticalVal);
 	}
-	
-	var countryCode = $('#country-code').val();
+	if($('#country-code').val() && $('#country-code').val() != ""){
+		countryCode = $('#country-code').val();
+	}
 	if(countryCode == "US"){
 		showStateCityRow();
+		if( $('input[name="country"]').val() == null || $('input[name="country"]').val() == "" ){
+			$('input[name="country"]').val("United States");
+			$('#country-code').val(countryCode);
+		}
+		selectedCountryRegEx = "^" + "\\b\\d{5}\\b(?:[- ]{1}\\d{4})?" + "$";
+		selectedCountryRegEx = new RegExp(selectedCountryRegEx);
 	}
 	
 	if ($('#message').val() != "") {
