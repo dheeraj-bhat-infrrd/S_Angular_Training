@@ -270,11 +270,11 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
 	}
 
 	@Override
-	public void updateCompletedSurveyCountForAgent(long agentId) {
+	public void updateCompletedSurveyCountForAgent(long agentId, int incrementCount) {
 		LOG.info("Method to update completed survey count for agent started.");
 		Query query = new Query(Criteria.where("iden").is(agentId));
 		Update update = new Update();
-		update.inc(CommonConstants.REVIEW_COUNT_MONGO, 1);
+		update.inc(CommonConstants.REVIEW_COUNT_MONGO, incrementCount);
 		mongoTemplate.updateFirst(query, update, AgentSettings.class, CommonConstants.AGENT_SETTINGS_COLLECTION);
 		LOG.info("Method to update completed survey count for agent finished.");
 	}

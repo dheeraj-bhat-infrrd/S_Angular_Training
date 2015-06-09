@@ -628,6 +628,9 @@ public class HierarchyManagementController {
 			if (userSelectionType != null) {
 				if (userSelectionType.equalsIgnoreCase(CommonConstants.USER_SELECTION_TYPE_SINGLE)) {
 					selectedUserEmail = request.getParameter("selectedUserEmail");
+					if(selectedUserEmail != null){
+						selectedUserEmail.replaceAll("\\s", "");
+					}
 				}
 				else {
 					selectedUserEmail = request.getParameter("selectedUserEmailArray");
@@ -651,7 +654,7 @@ public class HierarchyManagementController {
 			}
 
 			// To replace all the white spaces present in the string.
-			selectedUserEmail = selectedUserEmail.replaceAll("[ \t\\x0B\f\r]+", "");
+//			selectedUserEmail = selectedUserEmail.replaceAll("[ \t\\x0B\f\r]+", "");
 			String[] assigneeEmailIds = validateAndParseEmailIds(selectedUserId, selectedUserEmail);
 
 			long regionId = 0l;
@@ -1671,7 +1674,7 @@ public class HierarchyManagementController {
 		LOG.info("Method validateAndParseEmailIds called for selectedUserIdStr:" + selectedUserId + " selectedUserEmail:" + selectedUserEmail);
 		List<String> emailIds = new ArrayList<>();
 		if (selectedUserId <= 0l && selectedUserEmail != null && !selectedUserEmail.isEmpty()) {
-			StringTokenizer tokenizer = new StringTokenizer(selectedUserEmail, ",|;|\\n");
+			StringTokenizer tokenizer = new StringTokenizer(selectedUserEmail, ",|;|\n");
 			while (tokenizer.hasMoreTokens()) {
 				String emailId = tokenizer.nextToken();
 				if (tokenizer.countTokens() == 1 && (emailId == null || emailId.isEmpty())) {
