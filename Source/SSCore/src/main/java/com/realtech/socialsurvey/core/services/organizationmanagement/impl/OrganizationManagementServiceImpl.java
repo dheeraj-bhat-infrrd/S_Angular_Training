@@ -3178,7 +3178,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 	@Transactional
 	public List<StateLookup> getUsStateList() {
 		LOG.debug("Method getUSStateList called to fetch the list of states in US");
-		List<StateLookup> lookups = stateLookupDao.findAll(StateLookup.class);
+		List<StateLookup> lookups = stateLookupDao.findByKeyValueAscending(StateLookup.class, new HashMap<String, Object>(), "statename");
 		return lookups;
 	}
 
