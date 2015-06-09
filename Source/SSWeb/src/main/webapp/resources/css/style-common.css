@@ -6515,3 +6515,21 @@ span.review-complete-txt{
 .intro-body {
   padding: 10px;
 }
+
+.rpa-btn {
+    margin: 10px 64px;
+    display: inline-block;
+}
+
+.rpa-overlay-btn-cont {
+    margin: 0 -30px;
+}
+
+textarea.report-abuse-txtbox {
+    width: 100%;
+    height: 140px;
+    line-height: 20px;
+    border: 1px solid #dcdcdc;
+    border-radius: 3px;
+    padding: 10px;
+}
