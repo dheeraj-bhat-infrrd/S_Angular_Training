@@ -4983,6 +4983,10 @@ tr.v-tbl-row {
 	width: 630px;
 }
 
+td.td-region-edit,td.td-branch-edit,td.td-user-edit {
+	cursor: auto;
+}
+
 .v-line-ind {
 	border-left: 3px solid #D7D7D7;
 	border-bottom: 1px solid #dcdcdc;
