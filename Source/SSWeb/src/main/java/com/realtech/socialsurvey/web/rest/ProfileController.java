@@ -3,19 +3,24 @@ package com.realtech.socialsurvey.web.rest;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.List;
+
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
+
 import org.apache.solr.common.SolrDocumentList;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
+
 import com.google.gson.Gson;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.entities.AgentSettings;
@@ -35,11 +40,15 @@ import com.realtech.socialsurvey.core.exception.InputValidationException;
 import com.realtech.socialsurvey.core.exception.InternalServerException;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.exception.NoRecordsFetchedException;
+import com.realtech.socialsurvey.core.exception.NonFatalException;
 import com.realtech.socialsurvey.core.exception.ProfileServiceErrorCode;
 import com.realtech.socialsurvey.core.exception.RestErrorResponse;
+import com.realtech.socialsurvey.core.services.mail.EmailServices;
 import com.realtech.socialsurvey.core.services.organizationmanagement.OrganizationManagementService;
 import com.realtech.socialsurvey.core.services.organizationmanagement.ProfileManagementService;
+import com.realtech.socialsurvey.core.services.search.SolrSearchService;
 import com.realtech.socialsurvey.core.services.search.exception.SolrException;
+
 import ezvcard.Ezvcard;
 import ezvcard.VCard;
 import ezvcard.VCardVersion;
@@ -61,6 +70,18 @@ public class ProfileController {
 
 	@Autowired
 	private ProfileManagementService profileManagementService;
+	
+	@Autowired
+	private SolrSearchService solrSearchService;
+
+	@Autowired
+	private EmailServices emailServices;
+	
+	@Value("${APPLICATION_ADMIN_EMAIL}")
+	private String applicationAdminEmail;
+	
+	@Value("${APPLICATION_ADMIN_NAME}")
+	private String applicationAdminName;
 
 	/**
 	 * Service to get company details along with all regions based on profile name
@@ -623,6 +644,7 @@ public class ProfileController {
 			try {
 				List<SurveyDetails> reviews = profileManagementService.getReviews(companyId, minScore, maxScore, start, numRows,
 						CommonConstants.PROFILE_LEVEL_COMPANY, false, null, null, sortCriteria);
+				profileManagementService.setAgentProfileUrlForReview(reviews);
 				String json = new Gson().toJson(reviews);
 				LOG.debug("reviews json : " + json);
 				response = Response.ok(json).build();
@@ -1116,12 +1138,13 @@ public class ProfileController {
 			if (numRows == null) {
 				numRows = -1;
 			}
-			if(sortCriteria == null){
+			if(sortCriteria == null || sortCriteria.equalsIgnoreCase(CommonConstants.REVIEWS_SORT_CRITERIA_DEFAULT)){
 				sortCriteria = CommonConstants.REVIEWS_SORT_CRITERIA_DATE;
 			}
 			try {
 				List<SurveyDetails> reviews = profileManagementService.getReviews(agentId, minScore, maxScore, start, numRows,
 						CommonConstants.PROFILE_LEVEL_INDIVIDUAL, false, null, null, sortCriteria);
+				profileManagementService.setAgentProfileUrlForReview(reviews);
 				String json = new Gson().toJson(reviews);
 				LOG.debug("reviews json : " + json);
 				response = Response.ok(json).build();
@@ -1511,6 +1534,44 @@ public class ProfileController {
 		}
 		LOG.info("Service to get posts of branch finished");
 		return response;
+	}
+	
+	@ResponseBody
+	@RequestMapping(value = "/surveyreportabuse")
+	public void reportAbuse(HttpServletRequest request) {
+		String agentIdStr = request.getParameter("agentId");
+		String customerEmail = request.getParameter("customerEmail");
+		String firstName = request.getParameter("firstName");
+		String lastName = request.getParameter("lastName");
+		String review = request.getParameter("review");
+		try {
+			if (agentIdStr == null || agentIdStr.isEmpty()) {
+				throw new InvalidInputException("Invalid value (Null/Empty) found for agentId.");
+			}
+			long agentId = 0;
+			try{
+				 agentId = Long.parseLong(agentIdStr);
+			}
+			catch (NumberFormatException e) {
+				LOG.error("NumberFormatException caught in reportAbuse() while converting agentId.");
+				throw e;
+			}
+			String customerName = firstName + lastName;
+			String agentName = "";
+			try{
+				agentName = solrSearchService.getUserDisplayNameById(agentId);
+			}
+			catch(SolrException e){
+				LOG.info("Solr Exception occured while fetching agent name. Nested exception is ", e);
+				throw e;
+			}
+			
+			// Calling email services method to send mail to the Application level admin.
+			emailServices.sendReportAbuseMail(applicationAdminEmail, applicationAdminName, agentName, customerName.replaceAll("null", ""), customerEmail, review);
+		}
+		catch (NonFatalException e) {
+			LOG.error("NonfatalException caught in makeSurveyEditable(). Nested exception is ", e);
+		}
 	}
 
 	/**
