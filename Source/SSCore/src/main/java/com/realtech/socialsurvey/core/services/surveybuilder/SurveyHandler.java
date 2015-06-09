@@ -69,6 +69,8 @@ public interface SurveyHandler {
 
 	public void increaseSurveyCountForAgent(long agentId) throws SolrException;
 
+	public void decreaseSurveyCountForAgent(long agentId) throws SolrException;
+	
 	public void updateSharedOn(String socialSite, long agentId, String customerEmail);
 
 	public String getGoogleShareUri();
@@ -96,4 +98,5 @@ public interface SurveyHandler {
 	public void updateReminderCountForSocialPosts(Long agentId, String customerEmail);
 
 	public Map<String, Object> mapAgentsInSurveyPreInitiation();
+
 }

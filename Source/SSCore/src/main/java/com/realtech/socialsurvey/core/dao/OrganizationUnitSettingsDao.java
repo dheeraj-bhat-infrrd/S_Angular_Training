@@ -123,7 +123,7 @@ public interface OrganizationUnitSettingsDao {
 	 */
 	public long fetchSEOOptimizedOrganizationUnitCount(String collectionName);
 
-	public void updateCompletedSurveyCountForAgent(long agentId);
+	public void updateCompletedSurveyCountForAgent(long agentId, int incrementCount);
 	
 	/**
 	 * Fetch list of social media tokens for particular collection
