@@ -361,7 +361,7 @@
 	                    			<div class="privacy-policy-disclaimer">
 	                    				We will only use information you provide on this form to send your message to this professional.
 	                    			</div>
-	                    			<div id="privacy-policy-link" class="privacy-policy-link">Privacy Policy</div>
+	                    			<div id="privacy-policy-link" class="privacy-policy-link"><a href="https://www.socialsurvey.me/survey/privacy-policy/">Privacy Policy</a></div>
                     			</form>
                     		</div>
                     	</div>
