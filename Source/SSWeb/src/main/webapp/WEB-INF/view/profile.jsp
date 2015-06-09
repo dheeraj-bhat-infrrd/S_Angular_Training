@@ -55,6 +55,18 @@
     <div id="toast-container" class="toast-container">
 	   <span id="overlay-toast" class="overlay-toast"></span>
     </div>
+    <div id="report-abuse-overlay" class="overlay-main hide">
+    	<div class="overlay-disable-wrapper">
+    		<div id="overlay-header" class="ol-header">Why do you want to report?</div>
+    		<div class="ol-content">
+    			<textarea id="report-abuse-txtbox" class="report-abuse-txtbox" placeholder="Type here on why do you want to report the review...."></textarea>
+    		</div>
+    		<div class="rpa-overlay-btn-cont clearfix">
+    			<div class="rpa-btn rpa-report-btn ol-btn cursor-pointer">Report</div>
+    			<div class="rpa-btn rpa-cancel-btn ol-btn cursor-pointer">Cancel</div>
+    		</div>
+    	</div>
+    </div>
     <div id="contact-us-pu-wrapper" class="bd-srv-pu hide">
         <div class="container cntct-us-container">
             <div class="contact-us-pu">

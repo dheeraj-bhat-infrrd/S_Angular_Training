@@ -577,11 +577,32 @@ $(document).on('click', '.prof-report-abuse-txt', function(e) {
 			"agentName" : agentName,
 			"review" : review
 	};
+	$("#report-abuse-txtbox").val('');
+	
+	//Unbind click events for button
+	$('.rpa-cancel-btn').off('click');
+	$('.rpa-report-btn').off('click');
+	
+	
+	$('#report-abuse-overlay').show();
+	
+	$('.rpa-cancel-btn').on('click',function(){
+		$('#report-abuse-overlay').hide();
+	});
+	$('.rpa-report-btn').on('click',function(){
+		var reportText = $("#report-abuse-txtbox").val();
+		payload.reportText = reportText;
+		confirmReportAbuse(payload);
+	});
+});
+
+function confirmReportAbuse(payload) {
 	callAjaxGetWithPayloadData('/rest/profile/surveyreportabuse', function() {
+		$('#report-abuse-overlay').hide();
 		$('#overlay-toast').html('Reported Successfully!');
 		showToast();
 	}, payload, true);
-});
+}
 
 $(document).scroll(function(){
 	var totalReviews = parseInt($("#profile-fetch-info").attr("total-reviews"));
