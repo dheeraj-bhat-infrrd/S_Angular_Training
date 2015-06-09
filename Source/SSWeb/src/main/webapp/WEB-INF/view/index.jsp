@@ -173,12 +173,12 @@
 				&copy; Copyright 2015. All Rights Reserved.<br/>
 				Created by BuyersRoad, Inc. in San Francisco 
 				<span class="footer-ul">
-					<span>&bull; Privacy Policy</span>
-					<span>&bull; Features & Pricing</span><br/>
-					<span>&bull; Report Bugs to support@socialsurvey.me</span>
-					<span>&bull; Press Inquiries: pr@socialsurvey.me</span><br/>
-					<span>&bull; Security</span>
-					<span>&bull; Terms of Service</span>
+					&bull; <a href="https://www.socialsurvey.me/survey/privacy-policy/">Privacy Policy</a>
+					&bull; <a href="https://www.socialsurvey.me/survey/pricing/">Features &amp; Pricing</a><br/>
+					&bull; Report Bugs to <a href="mailto:support@socialsurvey.me">support@socialsurvey.me</a>
+					&bull; Press Inquiries: <a href="mailto:pr@socialsurvey.me">pr@socialsurvey.me</a><br/>
+					&bull; <a>Security</a>
+					&bull; <a href="https://www.socialsurvey.me/survey/terms-of-use/">Terms of Service</a>
 				</span>
 			</div>
 		</div>

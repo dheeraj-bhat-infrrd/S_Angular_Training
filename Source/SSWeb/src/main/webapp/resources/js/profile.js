@@ -482,7 +482,17 @@ function paintReviews(result){
 		if (i == resultSize - 1) {
 			lastItemClass = "ppl-review-item-last";
         }
-		reviewsHtml=  reviewsHtml+'<div class="' + lastItemClass + '" data-cust-first-name='+ reviewItem.customerFirstName +' data-cust-last-name='+reviewItem.customerLastName+' data-agent-name='+reviewItem.agentName+' data-rating='+reviewItem.score+' data-review="'+reviewItem.review+'">';
+		reviewsHtml = reviewsHtml + '<div class="'
+				+ lastItemClass + '" data-cust-first-name='
+				+ reviewItem.customerFirstName
+				+ ' data-cust-last-name='
+				+ reviewItem.customerLastName
+				+ ' data-agent-name=' + reviewItem.agentName
+				+ ' data-rating=' + reviewItem.score
+				+ ' data-review="' + reviewItem.review
+				+ '" data-customeremail="'
+				+ reviewItem.customerEmail + '" data-agentid="'
+				+ reviewItem.agentId + '">';
 		reviewsHtml=  reviewsHtml+'	<div class="ppl-header-wrapper clearfix">';
 		reviewsHtml=  reviewsHtml+'		<div class="float-left ppl-header-left">';    
 		reviewsHtml=  reviewsHtml+'			<div class="ppl-head-1">'+reviewItem.customerFirstName+' '+reviewItem.customerLastName+'</div>';
@@ -493,6 +503,9 @@ function paintReviews(result){
 		reviewsHtml=  reviewsHtml+'    <div class="float-right ppl-header-right">';
 		reviewsHtml=  reviewsHtml+'        <div class="st-rating-wrapper maring-0 clearfix review-ratings" data-rating="'+reviewItem.score+'">';
 		reviewsHtml=  reviewsHtml+'       </div>';
+		reviewsHtml=  reviewsHtml+'<div class="report-resend-icn-container clearfix float-right">';
+		reviewsHtml=  reviewsHtml+'<div class="report-abuse-txt report-txt prof-report-abuse-txt">Report</div>';
+		reviewsHtml=  reviewsHtml+'   </div>';
 		reviewsHtml=  reviewsHtml+'   </div>';
 		reviewsHtml=  reviewsHtml+'	</div>';
 		if(reviewItem.review.length > 250){
@@ -545,6 +558,29 @@ $(document).on('click','.review-more-button',function(){
 	$(this).parent().find('.review-less-text').hide();
 	$(this).parent().find('.review-complete-txt').show();
 	$(this).hide();
+});
+
+//Report abuse click event.
+$(document).on('click', '.prof-report-abuse-txt', function(e) {
+	
+	var firstName = $(this).parent().parent().parent().parent().attr('data-cust-first-name');
+	var lastName = $(this).parent().parent().parent().parent().attr('data-cust-last-name');
+	var agentName = $(this).parent().parent().parent().parent().attr('data-agent-name');
+	var customerEmail = $(this).parent().parent().parent().parent().attr('data-customeremail');
+	var agentId = $(this).parent().parent().parent().parent().attr('data-agentid');
+	var review = $(this).parent().parent().parent().parent().attr('data-review');
+	var payload = {
+			"customerEmail" : customerEmail,
+			"agentId" : agentId,
+			"firstName" : firstName,
+			"lastName" : lastName,
+			"agentName" : agentName,
+			"review" : review
+	};
+	callAjaxGetWithPayloadData('/rest/profile/surveyreportabuse', function() {
+		$('#overlay-toast').html('Reported Successfully!');
+		showToast();
+	}, payload, true);
 });
 
 $(document).scroll(function(){
