@@ -1544,6 +1544,7 @@ public class ProfileController {
 		String firstName = request.getParameter("firstName");
 		String lastName = request.getParameter("lastName");
 		String review = request.getParameter("review");
+		String reason = request.getParameter("reportText");
 		try {
 			if (agentIdStr == null || agentIdStr.isEmpty()) {
 				throw new InvalidInputException("Invalid value (Null/Empty) found for agentId.");
@@ -1567,7 +1568,7 @@ public class ProfileController {
 			}
 			
 			// Calling email services method to send mail to the Application level admin.
-			emailServices.sendReportAbuseMail(applicationAdminEmail, applicationAdminName, agentName, customerName.replaceAll("null", ""), customerEmail, review);
+			emailServices.sendReportAbuseMail(applicationAdminEmail, applicationAdminName, agentName, customerName.replaceAll("null", ""), customerEmail, review, reason);
 		}
 		catch (NonFatalException e) {
 			LOG.error("NonfatalException caught in makeSurveyEditable(). Nested exception is ", e);
