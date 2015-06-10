@@ -94,7 +94,7 @@
 			</div>
 		</div>
 	</div>
-
+	<jsp:include page="footer_new.jsp"></jsp:include>
 	<script src="${initParam.resourcesPath}/resources/js/jquery-2.1.1.min.js"></script>
 	<script src="${initParam.resourcesPath}/resources/js/bootstrap.min.js"></script>
 	<script src="${initParam.resourcesPath}/resources/js/script-1.1.js"></script>
