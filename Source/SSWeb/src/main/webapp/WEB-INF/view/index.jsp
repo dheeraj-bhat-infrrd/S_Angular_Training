@@ -174,10 +174,10 @@
 				Created by BuyersRoad, Inc. in San Francisco 
 				<span class="footer-ul">
 					&bull; <a href="https://www.socialsurvey.me/survey/privacy-policy/">Privacy Policy</a>
-					&bull; <a href="https://www.socialsurvey.me/survey/pricing/">Features &amp; Pricing</a><br/>
+					&bull; <a href="https://www.socialsurvey.me/survey/pricing/">Pricing</a>
+					&bull; <a href="https://www.socialsurvey.me/survey/features/">Features</a><br/>
 					&bull; Report Bugs to <a href="mailto:support@socialsurvey.me">support@socialsurvey.me</a>
 					&bull; Press Inquiries: <a href="mailto:pr@socialsurvey.me">pr@socialsurvey.me</a><br/>
-					&bull; <a>Security</a>
 					&bull; <a href="https://www.socialsurvey.me/survey/terms-of-use/">Terms of Service</a>
 				</span>
 			</div>
