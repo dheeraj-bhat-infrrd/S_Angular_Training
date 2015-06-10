@@ -1697,6 +1697,11 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 			}
 			entitySetting = null;
 		}
+		
+		if (disclaimer.isEmpty()) {
+			entitySetting = organizationManagementService.getCompanySettings(user);
+			disclaimer = entitySetting.getDisclaimer();
+		}
 
 		LOG.info("Method aggregateDisclaimer() called from ProfileManagementService");
 		return disclaimer;

@@ -350,6 +350,11 @@ public class ProfileViewController implements InitializingBean{
 			OrganizationUnitSettings individualProfile = null;
 			try {
 				individualProfile = profileManagementService.getIndividualByProfileName(agentProfileName);
+				
+				// aggregated disclaimer
+				String disclaimer = profileManagementService.aggregateDisclaimer(individualProfile);
+				individualProfile.setDisclaimer(disclaimer);
+				
 				String json = new Gson().toJson(individualProfile);
 				model.addAttribute("profileJson",json);
 				
