@@ -179,19 +179,13 @@ public class LoginController {
 				model.addAttribute("skippayment", "false");
 			}
 			user = sessionHelper.getCurrentUser();
-			
-			HttpSession session = request.getSession(false);
-			if (session != null) {
-				session.invalidate();
-			}
-			session = request.getSession(true);
+			HttpSession session = request.getSession(true);
 
 			List<LicenseDetail> licenseDetails = user.getCompany().getLicenseDetails();
 			if (licenseDetails != null && !licenseDetails.isEmpty()) {
 
 				LicenseDetail licenseDetail = licenseDetails.get(0);
 				accountType = AccountType.getAccountType(licenseDetail.getAccountsMaster().getAccountsMasterId());
-				LOG.debug("Adding account type in session");
 				session.setAttribute(CommonConstants.ACCOUNT_TYPE_IN_SESSION, accountType);
 
 				LOG.debug("Checking if the account is disabled because of payment failure");
