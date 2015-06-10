@@ -179,7 +179,12 @@ public class LoginController {
 				model.addAttribute("skippayment", "false");
 			}
 			user = sessionHelper.getCurrentUser();
-			HttpSession session = request.getSession(true);
+			
+			HttpSession session = request.getSession(false);
+			if (session != null) {
+				session.invalidate();
+			}
+			session = request.getSession(true);
 
 			List<LicenseDetail> licenseDetails = user.getCompany().getLicenseDetails();
 			if (licenseDetails != null && !licenseDetails.isEmpty()) {
