@@ -948,11 +948,7 @@ public class UserManagementController {
 			}
 
 			AccountType accountType = null;
-			HttpSession session = request.getSession(false);
-			if (session != null) {
-				session.invalidate();
-			}
-			session = request.getSession(true);
+			HttpSession session = request.getSession(true);
 			
 			try {
 				// fetch user object with email Id
