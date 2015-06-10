@@ -953,6 +953,7 @@ public class UserManagementController {
 				session.invalidate();
 			}
 			session = request.getSession(true);
+			
 			try {
 				// fetch user object with email Id
 				user = authenticationService.getUserWithLoginNameAndCompanyId(emailId, companyId);
