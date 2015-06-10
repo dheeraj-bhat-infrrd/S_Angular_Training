@@ -39,6 +39,7 @@ public class OrganizationUnitSettings {
 	private long modifiedOn;
 	private String completeProfileUrl;
 	private List<ProfileStage> profileStages;
+	private String disclaimer;
 
 	public String getId() {
 		return id;
@@ -255,13 +256,21 @@ public class OrganizationUnitSettings {
 	public void setCompleteProfileUrl(String completeProfileUrl) {
 		this.completeProfileUrl = completeProfileUrl;
 	}
-	
+
 	public List<ProfileStage> getProfileStages() {
 		return profileStages;
 	}
 
 	public void setProfileStages(List<ProfileStage> profileStages) {
 		this.profileStages = profileStages;
+	}
+
+	public String getDisclaimer() {
+		return disclaimer;
+	}
+
+	public void setDisclaimer(String disclaimer) {
+		this.disclaimer = disclaimer;
 	}
 
 	@Override
@@ -271,7 +280,7 @@ public class OrganizationUnitSettings {
 				+ isLocationEnabled + ", isAccountDisabled=" + isAccountDisabled + ", contact_details=" + contact_details + ", vertical=" + vertical
 				+ ", crm_info=" + crm_info + ", mail_content=" + mail_content + ", licenses=" + licenses + ", associations=" + associations
 				+ ", achievements=" + achievements + ", survey_settings=" + survey_settings + ", socialMediaTokens=" + socialMediaTokens
-				+ ", lockSettings=" + lockSettings + ", createdBy=" + createdBy + ", modifiedBy=" + modifiedBy + ", createdOn=" + createdOn
-				+ ", modifiedOn=" + modifiedOn + "]";
+				+ ", lockSettings=" + lockSettings + ", disclaimer=" + disclaimer + ", createdBy=" + createdBy + ", modifiedBy=" + modifiedBy
+				+ ", createdOn=" + createdOn + ", modifiedOn=" + modifiedOn + "]";
 	}
 }

@@ -1387,28 +1387,32 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 		if (accountType == null) {
 			throw new InvalidInputException("Invalid account type.");
 		}
+		
 		UserSettings canonicalUserSettings = new UserSettings();
 		AgentSettings agentSettings = null;
 		Map<Long, OrganizationUnitSettings> branchesSettings = null;
 		Map<Long, OrganizationUnitSettings> regionsSettings = null;
 		LOG.info("Getting the canonical settings for the user: " + user.toString());
+		
 		// get the settings according to the profile and account type
 		LOG.info("Getting the company settings for the user");
 		OrganizationUnitSettings companySettings = organizationManagementService.getCompanySettings(user);
 		canonicalUserSettings.setCompanySettings(companySettings);
+		
 		/**
 		 * fetching all settings for all account types
 		 */
-
 		// get the agent settings. If the user is not an agent then there would agent
 		// settings would be null
 		LOG.debug("Gettings agent settings");
 		agentSettings = getAgentSettingsForUserProfiles(user.getUserId());
 		canonicalUserSettings.setAgentSettings(agentSettings);
+		
 		// get the branches profiles and then resolve the parent organization unit.
 		LOG.debug("Gettings branch settings for user profiles");
 		branchesSettings = getBranchesSettingsForUserProfile(user.getUserProfiles(), agentSettings);
 		canonicalUserSettings.setBranchSettings(branchesSettings);
+		
 		// get the regions profiles and then resolve the parent organization unit.
 		LOG.debug("Gettings region settings for user profiles");
 		regionsSettings = getRegionSettingsForUserProfile(user.getUserProfiles(), branchesSettings);

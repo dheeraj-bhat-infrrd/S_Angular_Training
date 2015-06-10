@@ -80,7 +80,6 @@ import com.realtech.socialsurvey.core.utils.DisplayMessageConstants;
 import com.realtech.socialsurvey.core.utils.MessageUtils;
 import com.realtech.socialsurvey.core.utils.UrlValidationHelper;
 import com.realtech.socialsurvey.web.common.ErrorCodes;
-import com.realtech.socialsurvey.web.common.ErrorMessages;
 import com.realtech.socialsurvey.web.common.ErrorResponse;
 import com.realtech.socialsurvey.web.common.JspResolver;
 
@@ -2707,32 +2706,21 @@ public class ProfileManagementController {
 	// JIRA SS-97 by RM-06 : EOC
 
 	/*
-	 * Method to find a user on the basis of email id provided.
+	 * Method to find a user on the basis of first and last names provided.
 	 */
 	@RequestMapping(value = "/findapro", method = RequestMethod.GET)
 	public String findAProfile(Model model, HttpServletRequest request) {
 		LOG.info("Method findAProfile called.");
-		String patternFirst;
-		String patternLast;
 
-		try {
-			patternFirst = request.getParameter("find-pro-first-name");
-			patternLast = request.getParameter("find-pro-last-name");
-			if (patternFirst == null && patternLast == null) {
-				LOG.error("Invalid search key passed in method findAProfile().");
-				throw new InvalidInputException(messageUtils.getDisplayMessage(DisplayMessageConstants.INVALID_FIRSTORLAST_NAME_PATTERN,
-						DisplayMessageType.ERROR_MESSAGE).getMessage());
-			}
+		String patternFirst = request.getParameter("find-pro-first-name");
+		String patternLast = request.getParameter("find-pro-last-name");
 
+		if (patternFirst == null && patternLast == null) {
+			LOG.error("Invalid search key passed in method findAProfile().");
+		}
+		else {
 			model.addAttribute("patternFirst", patternFirst.trim());
 			model.addAttribute("patternLast", patternLast.trim());
-		}
-		catch (NonFatalException nonFatalException) {
-			LOG.error("NonFatalException while searching in findAProfile(). Reason : " + nonFatalException.getMessage(), nonFatalException);
-			ErrorResponse errorResponse = new ErrorResponse();
-			errorResponse.setErrCode(ErrorCodes.REQUEST_FAILED);
-			errorResponse.setErrMessage(ErrorMessages.REQUEST_FAILED);
-			return new Gson().toJson(errorResponse);
 		}
 
 		LOG.info("Method findAProfile finished.");
@@ -2750,6 +2738,7 @@ public class ProfileManagementController {
 		try {
 			String patternFirst = request.getParameter("find-pro-first-name");
 			String patternLast = request.getParameter("find-pro-last-name");
+			
 			if (patternFirst == null && patternLast == null) {
 				LOG.error("Invalid search key passed in method findAProfileScroll().");
 				throw new InvalidInputException(messageUtils.getDisplayMessage(DisplayMessageConstants.INVALID_FIRSTORLAST_NAME_PATTERN,
@@ -3400,5 +3389,92 @@ public class ProfileManagementController {
 		long count = profileManagementService.getPostsCountForUser(user.getUserId());
 		LOG.info("Method to get posts for the user, getPostsCountForUser() finished");
 		return count+"";
+	}
+	
+	/**
+	 * Method to update about profile details
+	 * 
+	 * @param model
+	 * @param request
+	 */
+	@RequestMapping(value = "/updatedisclaimer", method = RequestMethod.POST)
+	public String updateDisclaimer(Model model, HttpServletRequest request) {
+		LOG.info("Method updateDisclaimer() called from ProfileManagementController");
+		HttpSession session = request.getSession(false);
+
+		try {
+			UserSettings userSettings = (UserSettings) session.getAttribute(CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION);
+			OrganizationUnitSettings profileSettings = (OrganizationUnitSettings) session.getAttribute(CommonConstants.USER_PROFILE_SETTINGS);
+			UserProfile selectedProfile = (UserProfile) request.getSession(false).getAttribute(CommonConstants.USER_PROFILE);
+			if (userSettings == null || profileSettings == null || selectedProfile == null) {
+				throw new InvalidInputException("No user settings found in session");
+			}
+
+			String disclaimer = request.getParameter("disclaimer");
+			if (disclaimer == null || disclaimer.isEmpty()) {
+				throw new InvalidInputException("Disclaimer can not be null or empty", DisplayMessageConstants.GENERAL_ERROR);
+			}
+
+			int profilesMaster = selectedProfile.getProfilesMaster().getProfileId();
+			if (profilesMaster == CommonConstants.PROFILES_MASTER_COMPANY_ADMIN_PROFILE_ID) {
+				OrganizationUnitSettings unitSettings = userSettings.getCompanySettings();
+				if (unitSettings == null) {
+					throw new InvalidInputException("No company settings found in current session");
+				}
+				unitSettings.setDisclaimer(disclaimer);
+				profileManagementService.updateDisclaimer(MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION, unitSettings, disclaimer);
+
+				userSettings.setCompanySettings(unitSettings);
+			}
+			else if (profilesMaster == CommonConstants.PROFILES_MASTER_REGION_ADMIN_PROFILE_ID) {
+				long regionId = selectedProfile.getRegionId();
+				OrganizationUnitSettings regionSettings = userSettings.getRegionSettings().get(regionId);
+				if (regionSettings == null) {
+					throw new InvalidInputException("No Region settings found in current session");
+				}
+				regionSettings.setDisclaimer(disclaimer);
+				profileManagementService.updateDisclaimer(MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION, regionSettings, disclaimer);
+
+				userSettings.getRegionSettings().put(regionId, regionSettings);
+			}
+			else if (profilesMaster == CommonConstants.PROFILES_MASTER_BRANCH_ADMIN_PROFILE_ID) {
+				long branchId = selectedProfile.getBranchId();
+				OrganizationUnitSettings branchSettings = userSettings.getBranchSettings().get(branchId);
+				if (branchSettings == null) {
+					throw new InvalidInputException("No Branch settings found in current session");
+				}
+				branchSettings.setDisclaimer(disclaimer);
+				profileManagementService.updateDisclaimer(MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION, branchSettings, disclaimer);
+
+				userSettings.getRegionSettings().put(branchId, branchSettings);
+			}
+			else if (profilesMaster == CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID) {
+				AgentSettings agentSettings = userSettings.getAgentSettings();
+				if (agentSettings == null) {
+					throw new InvalidInputException("No Agent settings found in current session");
+				}
+				agentSettings.setDisclaimer(disclaimer);
+				profileManagementService.updateDisclaimer(MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION, agentSettings, disclaimer);
+
+				userSettings.setAgentSettings(agentSettings);
+			}
+			else {
+				throw new InvalidInputException("Error occurred while updating Disclaimer", DisplayMessageConstants.GENERAL_ERROR);
+			}
+
+			profileSettings.setDisclaimer(disclaimer);
+
+			LOG.info("Disclaimer details updated successfully");
+			model.addAttribute("message",
+					messageUtils.getDisplayMessage(DisplayMessageConstants.DISCLAIMER_UPDATE_SUCCESSFUL, DisplayMessageType.SUCCESS_MESSAGE));
+		}
+		catch (NonFatalException nonFatalException) {
+			LOG.error("NonFatalException while updating Disclaimer details. Reason :" + nonFatalException.getMessage(), nonFatalException);
+			model.addAttribute("message",
+					messageUtils.getDisplayMessage(DisplayMessageConstants.DISCLAIMER_UPDATE_UNSUCCESSFUL, DisplayMessageType.ERROR_MESSAGE));
+		}
+
+		LOG.info("Method updateDisclaimer() finished from ProfileManagementController");
+		return JspResolver.MESSAGE_HEADER;
 	}
 }
