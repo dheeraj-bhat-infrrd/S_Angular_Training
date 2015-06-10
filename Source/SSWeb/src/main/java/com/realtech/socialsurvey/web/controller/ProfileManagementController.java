@@ -80,7 +80,6 @@ import com.realtech.socialsurvey.core.utils.DisplayMessageConstants;
 import com.realtech.socialsurvey.core.utils.MessageUtils;
 import com.realtech.socialsurvey.core.utils.UrlValidationHelper;
 import com.realtech.socialsurvey.web.common.ErrorCodes;
-import com.realtech.socialsurvey.web.common.ErrorMessages;
 import com.realtech.socialsurvey.web.common.ErrorResponse;
 import com.realtech.socialsurvey.web.common.JspResolver;
 
@@ -2707,32 +2706,21 @@ public class ProfileManagementController {
 	// JIRA SS-97 by RM-06 : EOC
 
 	/*
-	 * Method to find a user on the basis of email id provided.
+	 * Method to find a user on the basis of first and last names provided.
 	 */
 	@RequestMapping(value = "/findapro", method = RequestMethod.GET)
 	public String findAProfile(Model model, HttpServletRequest request) {
 		LOG.info("Method findAProfile called.");
-		String patternFirst;
-		String patternLast;
 
-		try {
-			patternFirst = request.getParameter("find-pro-first-name");
-			patternLast = request.getParameter("find-pro-last-name");
-			if (patternFirst == null && patternLast == null) {
-				LOG.error("Invalid search key passed in method findAProfile().");
-				throw new InvalidInputException(messageUtils.getDisplayMessage(DisplayMessageConstants.INVALID_FIRSTORLAST_NAME_PATTERN,
-						DisplayMessageType.ERROR_MESSAGE).getMessage());
-			}
+		String patternFirst = request.getParameter("find-pro-first-name");
+		String patternLast = request.getParameter("find-pro-last-name");
 
+		if (patternFirst == null && patternLast == null) {
+			LOG.error("Invalid search key passed in method findAProfile().");
+		}
+		else {
 			model.addAttribute("patternFirst", patternFirst.trim());
 			model.addAttribute("patternLast", patternLast.trim());
-		}
-		catch (NonFatalException nonFatalException) {
-			LOG.error("NonFatalException while searching in findAProfile(). Reason : " + nonFatalException.getMessage(), nonFatalException);
-			ErrorResponse errorResponse = new ErrorResponse();
-			errorResponse.setErrCode(ErrorCodes.REQUEST_FAILED);
-			errorResponse.setErrMessage(ErrorMessages.REQUEST_FAILED);
-			return new Gson().toJson(errorResponse);
 		}
 
 		LOG.info("Method findAProfile finished.");
@@ -2750,6 +2738,7 @@ public class ProfileManagementController {
 		try {
 			String patternFirst = request.getParameter("find-pro-first-name");
 			String patternLast = request.getParameter("find-pro-last-name");
+			
 			if (patternFirst == null && patternLast == null) {
 				LOG.error("Invalid search key passed in method findAProfileScroll().");
 				throw new InvalidInputException(messageUtils.getDisplayMessage(DisplayMessageConstants.INVALID_FIRSTORLAST_NAME_PATTERN,
