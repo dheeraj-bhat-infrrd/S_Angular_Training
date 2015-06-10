@@ -205,7 +205,7 @@ public class SurveyManagementController {
 				}
 
 				// Generate the text as in mail
-				String surveyDetail = generateSurveyTextForMail(customerName, mood, survey);
+				String surveyDetail = generateSurveyTextForMail(customerName, mood, survey, isAbusive);
 				String surveyScore = String.valueOf(survey.getScore());
 				if (enableKafka.equals(CommonConstants.YES)) {
 					for (Entry<String, String> admin : emailIdsToSendMail.entrySet()) {
@@ -233,7 +233,7 @@ public class SurveyManagementController {
 		return "Survey stored successfully";
 	}
 
-	private String generateSurveyTextForMail(String customerName, String mood, SurveyDetails survey) {
+	private String generateSurveyTextForMail(String customerName, String mood, SurveyDetails survey, boolean isAbusive) {
 		StringBuilder surveyDetail = new StringBuilder(customerName).append(" Complete Survey Response for ").append(survey.getAgentName());
 		surveyDetail.append("<br />").append("Date Sent: ").append(survey.getCreatedOn().toString());
 		surveyDetail.append("<br />").append("Date Completed: ").append(survey.getModifiedOn().toString());
@@ -259,6 +259,14 @@ public class SurveyManagementController {
 		}
 		else {
 			surveyDetail.append("<br />").append("Share Checkbox: ").append("No");
+		}
+		
+		surveyDetail.append("<br />");
+		if(isAbusive){
+			surveyDetail.append("<br />").append("Contains abusive words : ").append("Yes");
+		}
+		else{
+			surveyDetail.append("<br />").append("Contains abusive words: ").append("No");
 		}
 
 		// update survey details with values

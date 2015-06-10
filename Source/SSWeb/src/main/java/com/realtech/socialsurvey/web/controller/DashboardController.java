@@ -1221,7 +1221,7 @@ public class DashboardController {
 			}
 			
 			// Calling email services method to send mail to the Application level admin.
-			emailServices.sendReportAbuseMail(applicationAdminEmail, applicationAdminName, agentName, customerName.replaceAll("null", ""), customerEmail, review);
+			emailServices.sendReportAbuseMail(applicationAdminEmail, applicationAdminName, agentName, customerName.replaceAll("null", ""), customerEmail, review, "");
 		}
 		catch (NonFatalException e) {
 			LOG.error("NonfatalException caught in makeSurveyEditable(). Nested exception is ", e);
