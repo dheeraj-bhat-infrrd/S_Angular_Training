@@ -497,7 +497,7 @@ function paintReviews(result){
 		reviewsHtml=  reviewsHtml+'		<div class="float-left ppl-header-left">';    
 		reviewsHtml=  reviewsHtml+'			<div class="ppl-head-1">'+reviewItem.customerFirstName+' '+reviewItem.customerLastName+'</div>';
 		if(date != null){
-			reviewsHtml=  reviewsHtml+'			<div class="ppl-head-2">'+date.getDate() +" "+ date.getMonthName()+" "+date.getFullYear()+'</div>'; 
+			reviewsHtml=  reviewsHtml+'			<div class="ppl-head-2">'+ date.getMonthName() +" " + date.getDate() +" "+date.getFullYear()+'</div>'; 
 		}
 		reviewsHtml=  reviewsHtml+'    </div>';
 		reviewsHtml=  reviewsHtml+'    <div class="float-right ppl-header-right">';
@@ -578,6 +578,8 @@ $(document).on('click', '.prof-report-abuse-txt', function(e) {
 			"review" : review
 	};
 	$("#report-abuse-txtbox").val('');
+	$('#report-abuse-cus-name').val('');
+	$('#report-abuse-cus-email').val('');
 	
 	//Unbind click events for button
 	$('.rpa-cancel-btn').off('click');
@@ -591,7 +593,11 @@ $(document).on('click', '.prof-report-abuse-txt', function(e) {
 	});
 	$('.rpa-report-btn').on('click',function(){
 		var reportText = $("#report-abuse-txtbox").val();
+		var cusName = $('#report-abuse-cus-name').val();
+		var cusEmail = $('#report-abuse-cus-email').val();
 		payload.reportText = reportText;
+		payload.reporterName = cusName;
+		payload.reporterEmail = cusEmail;
 		confirmReportAbuse(payload);
 	});
 });

@@ -59,6 +59,7 @@ import com.realtech.socialsurvey.core.services.mail.UndeliveredEmailException;
 import com.realtech.socialsurvey.core.services.organizationmanagement.OrganizationManagementService;
 import com.realtech.socialsurvey.core.services.organizationmanagement.ProfileManagementService;
 import com.realtech.socialsurvey.core.services.organizationmanagement.UserManagementService;
+import com.realtech.socialsurvey.core.services.organizationmanagement.UtilityService;
 import com.realtech.socialsurvey.core.services.search.SolrSearchService;
 import com.realtech.socialsurvey.core.services.search.exception.SolrException;
 import com.realtech.socialsurvey.core.utils.EncryptionHelper;
@@ -145,6 +146,9 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 	
 	@Autowired
 	private SurveyDetailsDao surveyDetailsDao;
+	
+	@Autowired
+	private UtilityService utilityService;
 
 	/**
 	 * Method to get profile master based on profileId, gets the profile master from Map which is
@@ -555,23 +559,6 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 	// JIRA SS-42 BY RM05 EOC
 
 	/**
-	 * Method to fetch profile masters from db and store in the map
-	 */
-	private void populateProfileMastersMap() {
-		LOG.debug("Getting all profile masters from database and storing in map");
-		List<ProfilesMaster> profileMasterList = profilesMasterDao.findAllActive(ProfilesMaster.class);
-		if (profileMasterList != null && !profileMasterList.isEmpty()) {
-			for (ProfilesMaster profilesMaster : profileMasterList) {
-				profileMasters.put(profilesMaster.getProfileId(), profilesMaster);
-			}
-		}
-		else {
-			LOG.warn("No profile master found in database");
-		}
-		LOG.debug("Successfully populated profile masters from database into map");
-	}
-
-	/**
 	 * JIRA SS-42 BY RM05 BOC Method to remove profile of a branch admin.
 	 */
 	@Transactional
@@ -745,9 +732,12 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 	@Override
 	public void afterPropertiesSet() throws Exception {
 		LOG.info("afterPropertiesSet for UserManagementServiceImpl called");
-
+		Map<Integer, ProfilesMaster> profilesMap = new HashMap<>();
 		LOG.debug("Populating profile master from db into the hashMap");
-		populateProfileMastersMap();
+		profilesMap = utilityService.populateProfileMastersMap();
+		if(!profilesMap.isEmpty()){
+			profileMasters.putAll(profilesMap);
+		}
 		LOG.debug("Successfully populated profile master from db into the hashMap");
 
 		LOG.info("afterPropertiesSet for UserManagementServiceImpl completed");
