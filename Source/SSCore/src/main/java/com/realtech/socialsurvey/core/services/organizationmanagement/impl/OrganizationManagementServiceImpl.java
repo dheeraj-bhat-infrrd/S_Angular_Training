@@ -2780,6 +2780,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 	 * Method to get the list of all the company ids
 	 */
 	@Override
+	@Transactional
 	public Set<Company> getAllCompanies() {
 		LOG.info("Method to get list of all companies, getAllCompanies() started");
 		Set<Company> companies = new HashSet<Company>(companyDao.findAllActive(Company.class));
