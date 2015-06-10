@@ -578,6 +578,8 @@ $(document).on('click', '.prof-report-abuse-txt', function(e) {
 			"review" : review
 	};
 	$("#report-abuse-txtbox").val('');
+	$('#report-abuse-cus-name').val('');
+	$('#report-abuse-cus-email').val('');
 	
 	//Unbind click events for button
 	$('.rpa-cancel-btn').off('click');
@@ -591,7 +593,11 @@ $(document).on('click', '.prof-report-abuse-txt', function(e) {
 	});
 	$('.rpa-report-btn').on('click',function(){
 		var reportText = $("#report-abuse-txtbox").val();
+		var cusName = $('#report-abuse-cus-name').val();
+		var cusEmail = $('#report-abuse-cus-email').val();
 		payload.reportText = reportText;
+		payload.reporterName = cusName;
+		payload.reporterEmail = cusEmail;
 		confirmReportAbuse(payload);
 	});
 });
