@@ -494,7 +494,7 @@ function showReviews(columnName, columnValue) {
 		$(".review-ratings").each(function() {
 			changeRatingPattern($(this).data("rating"), $(this));
 		});
-		$('.icn-fb').unbind('click');
+		/*$('.icn-fb').unbind('click');
 		$(".icn-fb").click(function() {
 			var firstName = $(this).parent().parent().parent().attr('data-firstname');
 			var lastName = $(this).parent().parent().parent().attr('data-lastname');
@@ -533,7 +533,7 @@ function showReviews(columnName, columnValue) {
 		$(".icn-gplus").click(function() {
 			var agentId = $(this).parent().parent().parent().attr('data-agentid');
 			shareOnGooglePlus(agentId, window.location.origin+"/rest/survey/");
-		});
+		});*/
 		
 		startIndexCmp += batchSizeCmp;
 	}, payload, false);
@@ -5307,7 +5307,7 @@ $(document).on(
 			}
 		});
 
-$(document).on('click', '.fb-shr', function() {
+/*$(document).on('click', '.fb-shr', function() {
 	var firstName = $(this).parent().parent().parent().attr('data-firstname');
 	var lastName = $(this).parent().parent().parent().attr('data-lastname');
 	var agentName = $(this).parent().parent().parent().attr('data-agentname');
@@ -5332,7 +5332,7 @@ $(document).on('click', '.lnkdn-shr', function() {
 	var review = $(this).parent().parent().parent().attr('data-review');
 	var score = $(this).parent().parent().parent().attr('data-score');
 	shareOnLinkedin(firstName, lastName, agentName, review, score);
-});
+});*/
 
 // On hover for lock icons
 $(document).on('mouseover', '#prof-logo-container', function(e) {
