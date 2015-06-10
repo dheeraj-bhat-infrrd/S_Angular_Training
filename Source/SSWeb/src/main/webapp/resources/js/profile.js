@@ -65,7 +65,7 @@ function paintProfilePage(result) {
 	if(result != undefined && result != "") {
 		currentProfileIden = result.iden;
 		var contactDetails = result.contact_details;
-		var headContentHtml = "";
+		//var headContentHtml = "";
 		var profileLevel = $("#profile-fetch-info").attr("profile-level");
 		//$("#profile-main-content").show();
 		currentProfileName = result.profileName;
@@ -988,6 +988,7 @@ function paintIndividualDetails(result) {
 		individualDetailsHtml = individualDetailsHtml + '</div>';
 	}
 	
+	// paint achievements
 	if (result.achievements != undefined && result.achievements.length > 0) {
 		individualDetailsHtml = individualDetailsHtml + '<div class="prof-left-row prof-left-ach bord-bot-dc">';
 		individualDetailsHtml = individualDetailsHtml + '	<div class="left-ach-wrapper">';
@@ -1010,6 +1011,18 @@ function paintIndividualDetails(result) {
 		for (var i = 0; i < result.hobbies.length; i++) {
 			individualDetailsHtml = individualDetailsHtml + '<div class="lp-ach-row lp-row clearfix">' + result.hobbies[i] + '</div>';
 		}
+		individualDetailsHtml = individualDetailsHtml + '		</div>';
+		individualDetailsHtml = individualDetailsHtml + '	</div>';
+		individualDetailsHtml = individualDetailsHtml + '</div>';
+	}
+	
+	// paint disclaimer
+	if (result.disclaimer != undefined && result.disclaimer != "") {
+		individualDetailsHtml = individualDetailsHtml + '<div class="prof-left-row prof-left-ach bord-bot-dc">';
+		individualDetailsHtml = individualDetailsHtml + '	<div class="left-ach-wrapper">';
+		individualDetailsHtml = individualDetailsHtml + '		<div class="left-panel-header lph-dd lph-dd-closed cursor-pointer">Disclaimer</div>';
+		individualDetailsHtml = individualDetailsHtml + '		<div class="left-panel-content lph-dd-content">';
+		individualDetailsHtml = individualDetailsHtml + '<div class="lp-ach-row lp-row clearfix">' + result.disclaimer + '</div>';
 		individualDetailsHtml = individualDetailsHtml + '		</div>';
 		individualDetailsHtml = individualDetailsHtml + '	</div>';
 		individualDetailsHtml = individualDetailsHtml + '</div>';
