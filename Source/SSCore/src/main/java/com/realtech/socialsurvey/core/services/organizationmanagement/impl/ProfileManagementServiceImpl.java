@@ -726,6 +726,18 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 				mediaTokens, unitSettings, collection);
 		LOG.info("Successfully updated the social media tokens.");
 	}
+	
+	// Disclaimer
+	@Override
+	public void updateDisclaimer(String collection, OrganizationUnitSettings unitSettings, String disclaimer) throws InvalidInputException {
+		if (disclaimer == null || disclaimer.isEmpty()) {
+			throw new InvalidInputException("disclaimer passed can not be null or empty");
+		}
+		LOG.info("Updating disclaimer");
+		organizationUnitSettingsDao.updateParticularKeyOrganizationUnitSettings(MongoOrganizationUnitSettingDaoImpl.KEY_DISCLAIMER, disclaimer,
+				unitSettings, collection);
+		LOG.info("Disclaimer updated successfully");
+	}
 
 	/**
 	 * Method to fetch all users under the specified branch of specified company
@@ -1641,4 +1653,52 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 		return userIds;
 	}
 	
+	@Override
+	public String aggregateDisclaimer(OrganizationUnitSettings unitSettings) throws InvalidInputException {
+		LOG.info("Method aggregateDisclaimer() called from ProfileManagementService");
+		String disclaimer = "";
+
+		if (unitSettings.getDisclaimer() != null && !unitSettings.getDisclaimer().isEmpty()) {
+			return unitSettings.getDisclaimer();
+		}
+
+		User user = userManagementService.getUserByUserId(unitSettings.getIden());
+		OrganizationUnitSettings entitySetting = null;
+		for (UserProfile userProfile : user.getUserProfiles()) {
+			if (userProfile.getProfilesMaster().getProfileId() == CommonConstants.PROFILES_MASTER_BRANCH_ADMIN_PROFILE_ID) {
+				if (userProfile.getBranchId() > 0l) {
+					entitySetting = organizationUnitSettingsDao.fetchOrganizationUnitSettingsById(userProfile.getBranchId(),
+							MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION);
+				}
+				else {
+					LOG.warn("Not a valid branch id for branch profile: " + userProfile + ". Skipping the record");
+				}
+			}
+			if (userProfile.getProfilesMaster().getProfileId() == CommonConstants.PROFILES_MASTER_REGION_ADMIN_PROFILE_ID) {
+				if (userProfile.getRegionId() > 0l) {
+					entitySetting = organizationUnitSettingsDao.fetchOrganizationUnitSettingsById(userProfile.getRegionId(),
+							MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION);
+				}
+				else {
+					LOG.warn("Not a valid region id for region profile: " + userProfile + ". Skipping the record");
+				}
+			}
+			if (userProfile.getProfilesMaster().getProfileId() == CommonConstants.PROFILES_MASTER_COMPANY_ADMIN_PROFILE_ID) {
+				if (userProfile.getRegionId() > 0l) {
+					entitySetting = organizationManagementService.getCompanySettings(user);
+				}
+				else {
+					LOG.warn("Not a valid company");
+				}
+			}
+
+			if (entitySetting != null && entitySetting.getDisclaimer() != null && !entitySetting.getDisclaimer().isEmpty()) {
+				return entitySetting.getDisclaimer();
+			}
+			entitySetting = null;
+		}
+
+		LOG.info("Method aggregateDisclaimer() called from ProfileManagementService");
+		return disclaimer;
+	}
 }
