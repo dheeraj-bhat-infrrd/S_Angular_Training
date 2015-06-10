@@ -57,8 +57,10 @@
     </div>
     <div id="report-abuse-overlay" class="overlay-main hide">
     	<div class="overlay-disable-wrapper">
-    		<div id="overlay-header" class="ol-header">Why do you want to report?</div>
+    		<div id="overlay-header" class="ol-header">Why do you want to report the review?</div>
     		<div class="ol-content">
+    			<input type="text" id="report-abuse-cus-name" class="report-abuse-input" placeholder="Name">
+    			<input type="email" id="report-abuse-cus-email" class="report-abuse-input" placeholder="Email Address">
     			<textarea id="report-abuse-txtbox" class="report-abuse-txtbox" placeholder="Type here on why do you want to report the review...."></textarea>
     		</div>
     		<div class="rpa-overlay-btn-cont clearfix">
