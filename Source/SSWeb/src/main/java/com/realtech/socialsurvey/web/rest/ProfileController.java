@@ -231,9 +231,6 @@ public class ProfileController {
 				SocialMediaTokens agentTokens = profileManagementService.aggregateSocialProfiles(individualProfile, CommonConstants.AGENT_ID);
 				individualProfile.setSocialMediaTokens(agentTokens);
 				
-				String disclaimer = profileManagementService.aggregateDisclaimer(individualProfile);
-				individualProfile.setDisclaimer(disclaimer);
-				
 				String json = new Gson().toJson(individualProfile);
 				LOG.debug("individualProfile json : " + json);
 				response = Response.ok(json).build();

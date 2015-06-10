@@ -4153,7 +4153,9 @@ function fetchUsers(newIndex) {
 		formData.append("find-pro-last-name", $('#fp-last-name-pattern').val());
 		formData.append("find-pro-start-index", newIndex);
 		formData.append("find-pro-row-size", rowSize);
-		callAjaxPOSTWithTextData("./findaproscroll.do", infiniteScrollCallback, true, formData);
+		
+		if (!($('#find-pro-first-name').val() == "" && $('#find-pro-last-name').val() == ""))
+			callAjaxPOSTWithTextData("./findaproscroll.do", infiniteScrollCallback, true, formData);
 	}
 }
 
