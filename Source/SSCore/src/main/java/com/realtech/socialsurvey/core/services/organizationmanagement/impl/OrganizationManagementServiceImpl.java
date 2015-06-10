@@ -84,6 +84,7 @@ import com.realtech.socialsurvey.core.services.organizationmanagement.Organizati
 import com.realtech.socialsurvey.core.services.organizationmanagement.ProfileManagementService;
 import com.realtech.socialsurvey.core.services.organizationmanagement.UserAssignmentException;
 import com.realtech.socialsurvey.core.services.organizationmanagement.UserManagementService;
+import com.realtech.socialsurvey.core.services.organizationmanagement.UtilityService;
 import com.realtech.socialsurvey.core.services.payment.Payment;
 import com.realtech.socialsurvey.core.services.payment.exception.PaymentException;
 import com.realtech.socialsurvey.core.services.search.SolrSearchService;
@@ -199,6 +200,9 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 
 	@Autowired
 	private ProfileCompletionList profileCompletionList;
+	
+	@Autowired
+	private UtilityService utilityService;
 
 	/**
 	 * This method adds a new company and updates the same for current user and all its user
@@ -1381,23 +1385,13 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 	@Override
 	public void afterPropertiesSet() throws Exception {
 		LOG.info("afterPropertiesSet called for organization managemnet service");
+		Map<Integer, VerticalsMaster> verticalsMap = new HashMap<>();
 		// Populate the verticals master map
-		populateVerticalMastersMap();
+		verticalsMap = utilityService.populateVerticalMastersMap();
+		if(!verticalsMap.isEmpty())
+			verticalsMastersMap.putAll(verticalsMap);
 		LOG.info("afterPropertiesSet finished for organization managemnet service");
 
-	}
-
-	/**
-	 * Method to populate the vertical master map
-	 */
-	private void populateVerticalMastersMap() {
-		LOG.debug("Method called to populate vertical masters table");
-		List<VerticalsMaster> verticalsMasters = verticalMastersDao.findAllActive(VerticalsMaster.class);
-		if (verticalsMasters != null && !verticalsMasters.isEmpty()) {
-			for (VerticalsMaster verticalsMaster : verticalsMasters) {
-				verticalsMastersMap.put(verticalsMaster.getVerticalsMasterId(), verticalsMaster);
-			}
-		}
 	}
 
 	@Override

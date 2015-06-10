@@ -152,10 +152,33 @@ $(document).on('click', '.report-abuse-txt', function(e) {
 			"agentName" : agentName,
 			"review" : review
 	};
-	callAjaxGetWithPayloadData('./reportabuse.do', '', payload, true);
-	$('#overlay-toast').html('Reported Successfully!');
-	showToast();
+	
+	$("#report-abuse-txtbox").val('');
+	
+	//Unbind click events for button
+	$('.rpa-cancel-btn').off('click');
+	$('.rpa-report-btn').off('click');
+	
+	
+	$('#report-abuse-overlay').show();
+	
+	$('.rpa-cancel-btn').on('click',function(){
+		$('#report-abuse-overlay').hide();
+	});
+	$('.rpa-report-btn').on('click',function(){
+		var reportText = $("#report-abuse-txtbox").val();
+		payload.reportText = reportText;
+		confirmReportAbuse(payload);
+	});
 });
+
+function confirmUserReportAbuse(payload) {
+	callAjaxGetWithPayloadData('./reportabuse.do', function() {
+		$('#report-abuse-overlay').hide();
+		$('#overlay-toast').html('Reported Successfully!');
+		showToast();
+	}, payload, true);
+}
 
 $('body').click(function() {
 	$('#hr-dd-wrapper').slideUp(200);
@@ -494,7 +517,7 @@ function showReviews(columnName, columnValue) {
 		$(".review-ratings").each(function() {
 			changeRatingPattern($(this).data("rating"), $(this));
 		});
-		$('.icn-fb').unbind('click');
+		/*$('.icn-fb').unbind('click');
 		$(".icn-fb").click(function() {
 			var firstName = $(this).parent().parent().parent().attr('data-firstname');
 			var lastName = $(this).parent().parent().parent().attr('data-lastname');
@@ -533,7 +556,7 @@ function showReviews(columnName, columnValue) {
 		$(".icn-gplus").click(function() {
 			var agentId = $(this).parent().parent().parent().attr('data-agentid');
 			shareOnGooglePlus(agentId, window.location.origin+"/rest/survey/");
-		});
+		});*/
 		
 		startIndexCmp += batchSizeCmp;
 	}, payload, false);
@@ -5294,7 +5317,7 @@ $(document).on('blur', '.prof-edditable-sin', function() {
 	}
 });
 
-$(document).on('click', '.fb-shr', function() {
+/*$(document).on('click', '.fb-shr', function() {
 	var firstName = $(this).parent().parent().parent().attr('data-firstname');
 	var lastName = $(this).parent().parent().parent().attr('data-lastname');
 	var agentName = $(this).parent().parent().parent().attr('data-agentname');
@@ -5319,7 +5342,7 @@ $(document).on('click', '.lnkdn-shr', function() {
 	var review = $(this).parent().parent().parent().attr('data-review');
 	var score = $(this).parent().parent().parent().attr('data-score');
 	shareOnLinkedin(firstName, lastName, agentName, review, score);
-});
+});*/
 
 // On hover for lock icons
 $(document).on('mouseover', '#prof-logo-container', function(e) {
