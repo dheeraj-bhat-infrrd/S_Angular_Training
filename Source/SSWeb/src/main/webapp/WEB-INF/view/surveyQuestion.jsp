@@ -158,7 +158,7 @@
 								<div class="sq-btn-wrapper">
 									<div id="start-btn" class="sq-btn-continue">Start</div>
 								</div>
-								<div id="privacy-policy-link" class="privacy-policy-link take-sur-link">Privacy Policy</div>
+								<div id="privacy-policy-link" class="privacy-policy-link take-sur-link"><a href="https://www.socialsurvey.me/survey/privacy-policy/">Privacy Policy</a></div>
 							</div>
 						</form>
 					</div>

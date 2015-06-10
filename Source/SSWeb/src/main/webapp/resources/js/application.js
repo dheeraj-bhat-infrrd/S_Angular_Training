@@ -152,10 +152,33 @@ $(document).on('click', '.report-abuse-txt', function(e) {
 			"agentName" : agentName,
 			"review" : review
 	};
-	callAjaxGetWithPayloadData('./reportabuse.do', '', payload, true);
-	$('#overlay-toast').html('Reported Successfully!');
-	showToast();
+	
+	$("#report-abuse-txtbox").val('');
+	
+	//Unbind click events for button
+	$('.rpa-cancel-btn').off('click');
+	$('.rpa-report-btn').off('click');
+	
+	
+	$('#report-abuse-overlay').show();
+	
+	$('.rpa-cancel-btn').on('click',function(){
+		$('#report-abuse-overlay').hide();
+	});
+	$('.rpa-report-btn').on('click',function(){
+		var reportText = $("#report-abuse-txtbox").val();
+		payload.reportText = reportText;
+		confirmReportAbuse(payload);
+	});
 });
+
+function confirmUserReportAbuse(payload) {
+	callAjaxGetWithPayloadData('./reportabuse.do', function() {
+		$('#report-abuse-overlay').hide();
+		$('#overlay-toast').html('Reported Successfully!');
+		showToast();
+	}, payload, true);
+}
 
 $('body').click(function() {
 	$('#hr-dd-wrapper').slideUp(200);

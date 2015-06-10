@@ -6537,3 +6537,45 @@ textarea.report-abuse-txtbox {
     border-radius: 3px;
     padding: 10px;
 }
+
+.crm-settings-dropdown {
+	cursor: pointer;
+	padding-right: 30px;
+	background: url(../images/sb-dd-icn-pd.png) no-repeat right center;
+	position: relative;
+	float: left;
+	clear: both;
+}
+
+.crm-settings-dropdown-cont {
+	width: 200px;
+	right: auto;
+	top: 30px;
+}
+
+.crm-settings-dropdown-item {
+	cursor: pointer;
+	font-size: 14px;
+	line-height: 30px;
+	padding: 0 5px;
+	border-bottom: 1px solid #dcdcdc;
+}
+.crm-settings-dropdown-item:hover {
+	color: #fff;
+	background-color: #5cc7ef;
+	border-top: 1px solid #5cc7ef;
+}
+.crm-settings-dropdown-item:last-child {
+	border-bottom: 0;
+}
+
+input.report-abuse-input {
+    display: block;
+    width: 100%;
+    height: 40px;
+    margin: 10px 0;
+    padding: 10px 10px;
+    line-height: 20px;
+    border: 1px solid #dcdcdc;
+    border-radius: 3px;
+}
