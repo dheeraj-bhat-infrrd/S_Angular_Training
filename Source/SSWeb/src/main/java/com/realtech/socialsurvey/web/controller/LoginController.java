@@ -186,7 +186,6 @@ public class LoginController {
 
 				LicenseDetail licenseDetail = licenseDetails.get(0);
 				accountType = AccountType.getAccountType(licenseDetail.getAccountsMaster().getAccountsMasterId());
-				LOG.debug("Adding account type in session");
 				session.setAttribute(CommonConstants.ACCOUNT_TYPE_IN_SESSION, accountType);
 
 				LOG.debug("Checking if the account is disabled because of payment failure");

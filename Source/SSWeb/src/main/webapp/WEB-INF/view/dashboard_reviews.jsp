@@ -6,9 +6,6 @@
 	<c:when test="${not empty reviews}">
 		<c:forEach var="feedback" varStatus="loop" items="${reviews}">
 			<c:set value="ppl-review-item" var="reviewitemclass"></c:set>
-			<%-- <c:if test="${loop.last}">
-				<c:set value="ppl-review-item-last" var="reviewitemclass"></c:set>
-			</c:if> --%>
 			<div data-firstname="${feedback.customerFirstName}" data-lastname="${feedback.customerLastName}"
 				data-agentid="${feedback.agentId}" data-agentname="${feedback.agentName}" data-customeremail="${feedback.customerEmail}"
 				data-review="${feedback.review}" data-score="${feedback.score}" class="${reviewitemclass}">
@@ -20,11 +17,6 @@
 					</div>
 					<div class="float-right ppl-header-right">
 						<div class="st-rating-wrapper maring-0 clearfix review-ratings float-right" data-rating="${feedback.score}">
-							<!-- <div class="rating-star icn-full-star"></div>
-							<div class="rating-star icn-full-star"></div>
-							<div class="rating-star icn-full-star"></div>
-							<div class="rating-star icn-full-star"></div>
-							<div class="rating-star icn-no-star"></div> -->
 						</div>
 						<div class="report-resend-icn-container clearfix float-right">
 							<div class="report-abuse-txt report-txt">Report</div>
@@ -38,13 +30,11 @@
 					<div class="float-left blue-text ppl-share-shr-txt"><spring:message code="label.share.key" /></div>
 					<div class="float-left icn-share icn-plus-open" style="display: block;"></div>
 					<div class="float-left clearfix ppl-share-social hide" style="display: none;">
-						<div class="float-left ppl-share-icns icn-fb"></div>
-						<div class="float-left ppl-share-icns icn-twit"></div>
-						<div class="float-left ppl-share-icns icn-lin"></div>
-						<div class="float-left ppl-share-icns icn-yelp"></div>
-                        <div class="float-left ppl-share-icns icn-gplus"></div>
-                        <!-- <div id="restart-survey-mail" class="float-left ppl-share-icns icn-restart-survey-mail"></div>
-                        <div id="report-abuse" class="float-left ppl-share-icns icn-report-abuse"></div> -->
+						<a href="https://www.facebook.com/sharer/sharer.php?u=${feedback.completeProfileUrl}" target="_blank"><span class="float-left ppl-share-icns icn-fb"></span></a>
+						<a href="https://twitter.com/home?status=${feedback.completeProfileUrl}" target="_blank"><span class="float-left ppl-share-icns icn-twit"></span></a>
+						<a href="https://www.linkedin.com/shareArticle?mini=true&url=${feedback.completeProfileUrl} &title=&summary=${feedback.score}-star response from ${feedback.customerFirstName} ${feedback.customerLastName} for ${feedback.agentName} at SocialSurvey - ${feedback.review} + &source=" target="_blank"><span class="float-left ppl-share-icns icn-lin"></span></a>
+						<a href="https://yelp.com/biz" target="_blank"><span class="float-left ppl-share-icns icn-yelp"></span></a>
+                        <a href="https://plus.google.com/share?url=${feedback.completeProfileUrl}" target="_blank"><span class="float-left ppl-share-icns icn-gplus"></span></a>
 					</div>
 					<div class="float-left icn-share icn-remove icn-rem-size hide" style="display: none;"></div>
 				</div>
