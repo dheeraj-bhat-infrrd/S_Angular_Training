@@ -519,7 +519,7 @@ function paintReviews(result){
 		reviewsHtml=  reviewsHtml+'    		<div class="float-left clearfix ppl-share-social hide">';
 		reviewsHtml=  reviewsHtml+'        	<a href="https://www.facebook.com/sharer/sharer.php?u=' + reviewItem.completeProfileUrl + '" target="_blank"><span class="float-left ppl-share-icns icn-fb icn-fb-pp"></span></a>';
 		reviewsHtml=  reviewsHtml+'         <a href="https://twitter.com/home?status=' + reviewItem.completeProfileUrl + '" target="_blank"><span class="float-left ppl-share-icns icn-twit icn-twit-pp"></span></a>';
-		reviewsHtml=  reviewsHtml+'        	<a href="https://www.linkedin.com/shareArticle?mini=true&url=' + reviewItem.completeProfileUrl + '&title=&summary=&source=" target="_blank"><span class="float-left ppl-share-icns icn-lin icn-lin-pp"></span></a>';
+		reviewsHtml=  reviewsHtml+'        	<a href="https://www.linkedin.com/shareArticle?mini=true&url=' + reviewItem.completeProfileUrl + '&title=&summary=' + reviewItem.score + '-star response from ' + reviewItem.customerFirstName+' '+reviewItem.customerLastName + ' for ' + reviewItem.agentName +' at SocialSurvey - ' + reviewItem.review + '&source=" target="_blank"><span class="float-left ppl-share-icns icn-lin icn-lin-pp"></span></a>';
 		reviewsHtml=  reviewsHtml+'			<a href="https://plus.google.com/share?url=' + reviewItem.completeProfileUrl + '" target="_blank"<span class="float-left ppl-share-icns icn-gplus"></span></a>';
 		reviewsHtml=  reviewsHtml+'       	<a href="https://yelp.com/biz" target="_blank"><span class="float-left ppl-share-icns icn-yelp"></span></a>';
 		reviewsHtml=  reviewsHtml+'    	</div>';
@@ -578,6 +578,8 @@ $(document).on('click', '.prof-report-abuse-txt', function(e) {
 			"review" : review
 	};
 	$("#report-abuse-txtbox").val('');
+	$('#report-abuse-cus-name').val('');
+	$('#report-abuse-cus-email').val('');
 	
 	//Unbind click events for button
 	$('.rpa-cancel-btn').off('click');
@@ -591,7 +593,11 @@ $(document).on('click', '.prof-report-abuse-txt', function(e) {
 	});
 	$('.rpa-report-btn').on('click',function(){
 		var reportText = $("#report-abuse-txtbox").val();
+		var cusName = $('#report-abuse-cus-name').val();
+		var cusEmail = $('#report-abuse-cus-email').val();
 		payload.reportText = reportText;
+		payload.reporterName = cusName;
+		payload.reporterEmail = cusEmail;
 		confirmReportAbuse(payload);
 	});
 });

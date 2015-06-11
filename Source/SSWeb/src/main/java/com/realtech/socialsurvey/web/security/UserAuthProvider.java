@@ -10,6 +10,7 @@ import org.springframework.security.authentication.dao.DaoAuthenticationProvider
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
@@ -50,6 +51,9 @@ public class UserAuthProvider extends DaoAuthenticationProvider {
 
 			authenticationService.validateUser(user, password);
 			if (user != null) {
+				// Invalidate All other users in a browser
+				SecurityContextHolder.clearContext();
+
 				List<GrantedAuthority> grantedAuths = new ArrayList<GrantedAuthority>();
 				grantedAuths.add(new SimpleGrantedAuthority("ROLE_USER"));
 				Authentication auth = new UsernamePasswordAuthenticationToken(user, password, grantedAuths);

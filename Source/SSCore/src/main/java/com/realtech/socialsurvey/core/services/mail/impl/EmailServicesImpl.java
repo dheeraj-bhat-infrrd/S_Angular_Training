@@ -1348,7 +1348,7 @@ public class EmailServicesImpl implements EmailServices {
 	@Async
 	@Override
 	public void sendReportAbuseMail(String recipientMailId, String displayName, String agentName, String customerName, 
-			String customerEmail, String review) throws InvalidInputException, UndeliveredEmailException {
+			String customerEmail, String review, String reason) throws InvalidInputException, UndeliveredEmailException {
 		if (recipientMailId == null || recipientMailId.isEmpty()) {
 			LOG.error("Recipient email Id is empty or null for sending survey completion mail ");
 			throw new InvalidInputException("Recipient email Id is empty or null for sending report abuse mail ");
@@ -1364,7 +1364,7 @@ public class EmailServicesImpl implements EmailServices {
 
 		FileContentReplacements messageBodyReplacements = new FileContentReplacements();
 		messageBodyReplacements.setFileName(EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER + EmailTemplateConstants.REPORT_ABUSE_MAIL_BODY);
-		messageBodyReplacements.setReplacementArgs(Arrays.asList(appLogoUrl, displayName, agentName, customerName, customerEmail, review, appBaseUrl));
+		messageBodyReplacements.setReplacementArgs(Arrays.asList(appLogoUrl, displayName, agentName, customerName, customerEmail, review, reason, appBaseUrl));
 
 		LOG.debug("Calling email sender to send mail");
 		emailSender.sendEmailWithBodyReplacements(emailEntity, subjectFileName, messageBodyReplacements);

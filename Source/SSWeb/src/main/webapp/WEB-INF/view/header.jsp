@@ -65,6 +65,19 @@
 		</div>
 	</div>
 	
+	<div id="report-abuse-overlay" class="overlay-main hide">
+    	<div class="overlay-disable-wrapper">
+    		<div id="overlay-header" class="ol-header">Why do you want to report the review?</div>
+    		<div class="ol-content">
+    			<textarea id="report-abuse-txtbox" class="report-abuse-txtbox" placeholder="Type here on why do you want to report the review...."></textarea>
+    		</div>
+    		<div class="rpa-overlay-btn-cont clearfix">
+    			<div class="rpa-btn rpa-report-btn ol-btn cursor-pointer">Report</div>
+    			<div class="rpa-btn rpa-cancel-btn ol-btn cursor-pointer">Cancel</div>
+    		</div>
+    	</div>
+    </div>
+	
 	<div id="header-slider-wrapper" class="header-slider-wrapper">
 		<div class="header-slider">
 			<div id="header-links-slider" class="header-links header-links-slider float-left clearfix">
