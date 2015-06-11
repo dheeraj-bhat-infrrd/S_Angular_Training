@@ -35,12 +35,12 @@
 				<title><spring:message code="label.profile.title.key" /></title>
 			</c:otherwise>
 		</c:choose>
-    	<c:if test="${not empty profile.completeProfileUrl }">
+    	<c:if test="${not empty profile.completeProfileUrl}">
     		<link rel="canonical" href="${profile.completeProfileUrl}">
     	</c:if>
-    	<c:if test="${not empty profile.contact_details && not empty profile.contact_details.name }">
-    		<meta name="desciption" content="Use SocialSurvey Ratings & Reviews to find out how customers have rated ${profName }.">
-    		<meta name="keywords" content="${profName }, ${profName } ratings, ${profName } reviews, ${profName } scorecard, ${profName } ratings and reviews">
+    	<c:if test="${not empty profile.contact_details && not empty profile.contact_details.name}">
+    		<meta name="desciption" content="Use SocialSurvey Ratings & Reviews to find out how customers have rated ${profName}.">
+    		<meta name="keywords" content="${profName}, ${profName} ratings, ${profName} reviews, ${profName} scorecard, ${profName} ratings and reviews">
     	</c:if>
     	<c:if test="${not empty averageRating}">
     		<fmt:formatNumber var="floatingAverageRating" type="number" value="${averageRating}" maxFractionDigits="2" minFractionDigits="2"/>
@@ -133,23 +133,23 @@
     <div class="">
     	<div class="container">
         <div class="row prof-pic-name-wrapper">
-			<c:if test="${not empty profile.profileImageUrl }">
+			<c:if test="${not empty profile.profileImageUrl}">
 				<div id="prog-img-container" class="col-lg-4 col-md-4 col-sm-4 col-xs-6 prof-wrapper prof-img-wrapper">
 		            <div id="prof-image" class="prof-image pos-relative" style="background: url(${profile.profileImageUrl}) no-repeat center;"></div>
 	            </div>
 			</c:if>
-			<c:if test="${not empty profile.profileImageUrl }">
+			<c:if test="${not empty profile.profileImageUrl}">
 				<c:set var="profileNameClass" value="profile-name-img-wrapper"></c:set>
 			</c:if>
             <div class="col-lg-4 col-md-4 col-sm-4 col-xs-6 prof-wrapper pos-relative prof-name-wrapper ${profileNameClass}">
                 <div class="prof-name-container" id="prof-company-head-content">
                 	<div class="prof-name">${profName}</div>
                 	<div class="prof-address">
-                		<c:if test="${not empty profile.vertical}">
-                			<div class="prof-addline1">${profile.vertical}</div>
-                		</c:if>
                 		<c:if test="${not empty profile.contact_details &&  not empty profile.contact_details.title}">
                 			<div class="prof-addline2">${profile.contact_details.title}</div>
+                		</c:if>
+                		<c:if test="${not empty profile.vertical}">
+                			<div class="prof-addline1">${profile.vertical}</div>
                 		</c:if>
                 	</div>
 					<div class="prof-rating clearfix">
