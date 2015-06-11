@@ -949,6 +949,7 @@ public class UserManagementController {
 
 			AccountType accountType = null;
 			HttpSession session = request.getSession(true);
+			
 			try {
 				// fetch user object with email Id
 				user = authenticationService.getUserWithLoginNameAndCompanyId(emailId, companyId);

@@ -33,11 +33,11 @@
 					<div class="float-left blue-text ppl-share-shr-txt"><spring:message code="label.share.key"/></div>
 					<div class="float-left icn-share icn-plus-open"></div>
 					<div class="float-left clearfix ppl-share-social hide">
-						<div class="float-left ppl-share-icns icn-fb fb-shr"></div>
-						<div class="float-left ppl-share-icns icn-twit twt-shr"></div>
-						<div class="float-left ppl-share-icns icn-lin lnkdn-shr"></div>
-						<div class="float-left ppl-share-icns icn-yelp yelp-shr"></div>
-                        <div class="float-left ppl-share-icns icn-gplus yelp-shr"></div>
+						<a href="https://www.facebook.com/sharer/sharer.php?u=${reviewItem.completeProfileUrl}" target="_blank"><span class="float-left ppl-share-icns icn-fb fb-shr"></span></a>
+						<a href="https://twitter.com/home?status=${reviewItem.completeProfileUrl}" target="_blank"><span class="float-left ppl-share-icns icn-twit twt-shr"></span></a>
+						<a href="https://www.linkedin.com/shareArticle?mini=true&url=${reviewItem.completeProfileUrl} &title=&summary=${reviewItem.score}-star response from ${reviewItem.customerFirstName} ${reviewItem.customerLastName} for ${reviewItem.agentName} at SocialSurvey - ${reviewItem.review} + &source=" target="_blank"><span class="float-left ppl-share-icns icn-lin lnkdn-shr"></span></a>
+						<a href="https://yelp.com/biz" target="_blank"><span class="float-left ppl-share-icns icn-yelp yelp-shr"></span></a>
+                        <a href="https://plus.google.com/share?url=${reviewItem.completeProfileUrl}" target="_blank"><span class="float-left ppl-share-icns icn-gplus yelp-shr"></span></a>
 					</div>
 					<div class="float-left icn-share icn-remove icn-rem-size hide"></div>
 				</div>
