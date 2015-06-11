@@ -59,6 +59,7 @@ import com.realtech.socialsurvey.core.services.mail.UndeliveredEmailException;
 import com.realtech.socialsurvey.core.services.organizationmanagement.OrganizationManagementService;
 import com.realtech.socialsurvey.core.services.organizationmanagement.ProfileManagementService;
 import com.realtech.socialsurvey.core.services.organizationmanagement.UserManagementService;
+import com.realtech.socialsurvey.core.services.organizationmanagement.UtilityService;
 import com.realtech.socialsurvey.core.services.search.SolrSearchService;
 import com.realtech.socialsurvey.core.services.search.exception.SolrException;
 import com.realtech.socialsurvey.core.utils.EncryptionHelper;
@@ -145,6 +146,9 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 	
 	@Autowired
 	private SurveyDetailsDao surveyDetailsDao;
+	
+	@Autowired
+	private UtilityService utilityService;
 
 	/**
 	 * Method to get profile master based on profileId, gets the profile master from Map which is
@@ -555,23 +559,6 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 	// JIRA SS-42 BY RM05 EOC
 
 	/**
-	 * Method to fetch profile masters from db and store in the map
-	 */
-	private void populateProfileMastersMap() {
-		LOG.debug("Getting all profile masters from database and storing in map");
-		List<ProfilesMaster> profileMasterList = profilesMasterDao.findAllActive(ProfilesMaster.class);
-		if (profileMasterList != null && !profileMasterList.isEmpty()) {
-			for (ProfilesMaster profilesMaster : profileMasterList) {
-				profileMasters.put(profilesMaster.getProfileId(), profilesMaster);
-			}
-		}
-		else {
-			LOG.warn("No profile master found in database");
-		}
-		LOG.debug("Successfully populated profile masters from database into map");
-	}
-
-	/**
 	 * JIRA SS-42 BY RM05 BOC Method to remove profile of a branch admin.
 	 */
 	@Transactional
@@ -745,9 +732,12 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 	@Override
 	public void afterPropertiesSet() throws Exception {
 		LOG.info("afterPropertiesSet for UserManagementServiceImpl called");
-
+		Map<Integer, ProfilesMaster> profilesMap = new HashMap<>();
 		LOG.debug("Populating profile master from db into the hashMap");
-		populateProfileMastersMap();
+		profilesMap = utilityService.populateProfileMastersMap();
+		if(!profilesMap.isEmpty()){
+			profileMasters.putAll(profilesMap);
+		}
 		LOG.debug("Successfully populated profile master from db into the hashMap");
 
 		LOG.info("afterPropertiesSet for UserManagementServiceImpl completed");
@@ -1397,28 +1387,32 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 		if (accountType == null) {
 			throw new InvalidInputException("Invalid account type.");
 		}
+		
 		UserSettings canonicalUserSettings = new UserSettings();
 		AgentSettings agentSettings = null;
 		Map<Long, OrganizationUnitSettings> branchesSettings = null;
 		Map<Long, OrganizationUnitSettings> regionsSettings = null;
 		LOG.info("Getting the canonical settings for the user: " + user.toString());
+		
 		// get the settings according to the profile and account type
 		LOG.info("Getting the company settings for the user");
 		OrganizationUnitSettings companySettings = organizationManagementService.getCompanySettings(user);
 		canonicalUserSettings.setCompanySettings(companySettings);
+		
 		/**
 		 * fetching all settings for all account types
 		 */
-
 		// get the agent settings. If the user is not an agent then there would agent
 		// settings would be null
 		LOG.debug("Gettings agent settings");
 		agentSettings = getAgentSettingsForUserProfiles(user.getUserId());
 		canonicalUserSettings.setAgentSettings(agentSettings);
+		
 		// get the branches profiles and then resolve the parent organization unit.
 		LOG.debug("Gettings branch settings for user profiles");
 		branchesSettings = getBranchesSettingsForUserProfile(user.getUserProfiles(), agentSettings);
 		canonicalUserSettings.setBranchSettings(branchesSettings);
+		
 		// get the regions profiles and then resolve the parent organization unit.
 		LOG.debug("Gettings region settings for user profiles");
 		regionsSettings = getRegionSettingsForUserProfile(user.getUserProfiles(), branchesSettings);

@@ -51,7 +51,7 @@ public class UserAuthProvider extends DaoAuthenticationProvider {
 
 			authenticationService.validateUser(user, password);
 			if (user != null) {
-				// Invalidate All other users in a browser
+				// Invalidate all other users in a browser
 				SecurityContextHolder.clearContext();
 
 				List<GrantedAuthority> grantedAuths = new ArrayList<GrantedAuthority>();

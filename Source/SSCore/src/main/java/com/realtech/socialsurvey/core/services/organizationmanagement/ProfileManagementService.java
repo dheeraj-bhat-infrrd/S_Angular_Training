@@ -53,6 +53,8 @@ public interface ProfileManagementService {
 	public OrganizationUnitSettings aggregateUserProfile(User user, AccountType accountType, UserSettings settings, long branchId, long regionId,
 			int profilesMaster) throws InvalidInputException;
 
+	public String aggregateDisclaimer(OrganizationUnitSettings unitSettings) throws InvalidInputException;
+
 	// JIRA SS-97 by RM-06 : BOC
 	/**
 	 * Method to update logo of a company
@@ -66,6 +68,8 @@ public interface ProfileManagementService {
 
 	public void updateProfileImage(String collection, OrganizationUnitSettings companySettings, String logo) throws InvalidInputException;
 
+	public void updateDisclaimer(String collection, OrganizationUnitSettings unitSettings, String disclaimer) throws InvalidInputException;
+	
 	public LockSettings updateLockSettings(String collection, OrganizationUnitSettings unitSettings, LockSettings lockSettings)
 			throws InvalidInputException;
 
@@ -395,5 +399,4 @@ public interface ProfileManagementService {
 	public void updateProfileStages(List<ProfileStage> profileStages, OrganizationUnitSettings settings, String collectionName);
 
 	public void setAgentProfileUrlForReview(List<SurveyDetails> reviews);
-
 }
