@@ -621,7 +621,6 @@ public class ProfileManagementController {
 			}
 
 			// Get the profile address parameters
-			String name = request.getParameter("profName");
 			String address1 = request.getParameter(CommonConstants.ADDRESS1);
 			String address2 = request.getParameter(CommonConstants.ADDRESS2);
 			String state = request.getParameter(CommonConstants.STATE);
@@ -629,9 +628,6 @@ public class ProfileManagementController {
 			String country = request.getParameter(CommonConstants.COUNTRY);
 			String countryCode = request.getParameter(CommonConstants.COUNTRY_CODE);
 			String zipcode = request.getParameter(CommonConstants.ZIPCODE);
-			if (name == null || name.isEmpty()) {
-				throw new InvalidInputException("Name passed can not be null or empty", DisplayMessageConstants.GENERAL_ERROR);
-			}
 			if (address1 == null || address1.isEmpty()) {
 				throw new InvalidInputException("Address 1 passed can not be null or empty", DisplayMessageConstants.GENERAL_ERROR);
 			}
@@ -649,7 +645,7 @@ public class ProfileManagementController {
 					throw new InvalidInputException("No company settings found in current session");
 				}
 				contactDetailsSettings = companySettings.getContact_details();
-				contactDetailsSettings = updateAddressDetail(contactDetailsSettings, name, address1, address2, country, countryCode,
+				contactDetailsSettings = updateAddressDetail(contactDetailsSettings, address1, address2, country, countryCode,
 						state, city, zipcode);
 				contactDetailsSettings = profileManagementService.updateContactDetails(
 						MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION, companySettings, contactDetailsSettings);
@@ -663,7 +659,7 @@ public class ProfileManagementController {
 					throw new InvalidInputException("No Region settings found in current session");
 				}
 				contactDetailsSettings = regionSettings.getContact_details();
-				contactDetailsSettings = updateAddressDetail(contactDetailsSettings, name, address1, address2, country, countryCode, 
+				contactDetailsSettings = updateAddressDetail(contactDetailsSettings, address1, address2, country, countryCode, 
 						state, city, zipcode);
 				contactDetailsSettings = profileManagementService.updateContactDetails(
 						MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION, regionSettings, contactDetailsSettings);
@@ -677,7 +673,7 @@ public class ProfileManagementController {
 					throw new InvalidInputException("No Branch settings found in current session");
 				}
 				contactDetailsSettings = branchSettings.getContact_details();
-				contactDetailsSettings = updateAddressDetail(contactDetailsSettings, name, address1, address2, country, countryCode,
+				contactDetailsSettings = updateAddressDetail(contactDetailsSettings, address1, address2, country, countryCode,
 						state, city, zipcode);
 				contactDetailsSettings = profileManagementService.updateContactDetails(
 						MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION, branchSettings, contactDetailsSettings);
@@ -690,22 +686,12 @@ public class ProfileManagementController {
 					throw new InvalidInputException("No Agent settings found in current session");
 				}
 				contactDetailsSettings = agentSettings.getContact_details();
-				contactDetailsSettings = updateAddressDetail(contactDetailsSettings, name, address1, address2, country, countryCode,
+				contactDetailsSettings = updateAddressDetail(contactDetailsSettings, address1, address2, country, countryCode,
 						state, city, zipcode);
 				contactDetailsSettings = profileManagementService.updateAgentContactDetails(
 						MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION, agentSettings, contactDetailsSettings);
 				agentSettings.setContact_details(contactDetailsSettings);
 				userSettings.setAgentSettings(agentSettings);
-
-				// Modify Agent details in Solr
-				solrSearchService.editUserInSolr(agentSettings.getIden(), CommonConstants.USER_DISPLAY_NAME_SOLR, name);
-				if (name.indexOf(" ") != -1) {
-					solrSearchService.editUserInSolr(agentSettings.getIden(), CommonConstants.USER_FIRST_NAME_SOLR, name.substring(0, name.indexOf(' ')));
-					solrSearchService.editUserInSolr(agentSettings.getIden(), CommonConstants.USER_LAST_NAME_SOLR, name.substring(name.indexOf(' ') + 1));
-				}
-				else {
-					solrSearchService.editUserInSolr(agentSettings.getIden(), CommonConstants.USER_FIRST_NAME_SOLR, name);
-				}
 			}
 			else {
 				throw new InvalidInputException("Invalid input exception occurred in editing Address details.", DisplayMessageConstants.GENERAL_ERROR);
@@ -728,10 +714,9 @@ public class ProfileManagementController {
 	}
 
 	// Update address details
-	private ContactDetailsSettings updateAddressDetail(ContactDetailsSettings contactDetailsSettings, String name, String address1, String address2,
+	private ContactDetailsSettings updateAddressDetail(ContactDetailsSettings contactDetailsSettings, String address1, String address2,
 			String country, String countryCode, String state, String city, String zipcode) {
 		LOG.debug("Method updateAddressDetail() called from ProfileManagementController");
-		contactDetailsSettings.setName(name);
 		contactDetailsSettings.setAddress(address1 + ", " + address2);
 		contactDetailsSettings.setAddress1(address1);
 		contactDetailsSettings.setAddress2(address2);

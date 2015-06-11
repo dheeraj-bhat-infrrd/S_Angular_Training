@@ -1763,15 +1763,15 @@ public class HierarchyManagementController {
 					}
 				}
 			}
+			
+			if (emailIds.isEmpty()) {
+				throw new InvalidInputException("Individual details entered are invalid", DisplayMessageConstants.INVALID_EMAILID);
+			}
 		}
 
 		String[] emailIdsArray = new String[emailIds.size()];
 		emailIdsArray = emailIds.toArray(emailIdsArray);
 		
-		if (emailIds.isEmpty()) {
-			throw new InvalidInputException("Individual details entered are invalid", DisplayMessageConstants.INVALID_EMAILID);
-		}
-
 		LOG.info("Method validateAndParseIndividualDetails finished. Returning emailIdsArray:" + emailIdsArray);
 		return emailIdsArray;
 	}
