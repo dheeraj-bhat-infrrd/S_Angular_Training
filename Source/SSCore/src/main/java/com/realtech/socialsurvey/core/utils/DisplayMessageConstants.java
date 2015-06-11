@@ -105,6 +105,7 @@ public final class DisplayMessageConstants {
 	public static final String FETCH_SOCIAL_POSTS_UNSUCCESSFUL = "FETCH_SOCIAL_POSTS_UNSUCCESSFUL";
 	public static final String BANK_REJECTED = "BANK_REJECTED";
 	public static final String ACCOUNT_DELETION_UNSUCCESSFUL = "ACCOUNT_DELETION_UNSUCCESSFUL";
+	public static final String DISCLAIMER_UPDATE_UNSUCCESSFUL = "DISCLAIMER_UPDATE_UNSUCCESSFUL";
 
 	// success message constants
 	public static final String REGISTRATION_INVITE_SUCCESSFUL = "REGISTRATION_INVITE_SUCCESSFUL";
@@ -176,5 +177,6 @@ public final class DisplayMessageConstants {
 	public static final String ACHIEVEMENT_UPDATE_SUCCESSFUL = "ACHIEVEMENT_UPDATE_SUCCESSFUL";
 	public static final String LICENSES_UPDATE_SUCCESSFUL = "LICENSES_UPDATE_SUCCESSFUL";
 	public static final String CONTACT_US_MESSAGE_SENT = "CONTACT_US_MESSAGE_SENT";
+	public static final String DISCLAIMER_UPDATE_SUCCESSFUL = "DISCLAIMER_UPDATE_SUCCESSFUL";
 
 }
