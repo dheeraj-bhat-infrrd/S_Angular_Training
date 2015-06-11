@@ -23,7 +23,7 @@ public class VerticalCrmMapping implements Serializable {
 
 	@Id
 	@Column(name="VERTICAL_CRM_MAPPING_ID")
-	private int verticalCrmMappingId;
+	private long verticalCrmMappingId;
 
 	@Column(name="CREATED_BY")
 	private String createdBy;
@@ -52,11 +52,11 @@ public class VerticalCrmMapping implements Serializable {
 	public VerticalCrmMapping() {
 	}
 
-	public int getVerticalCrmMappingId() {
+	public long getVerticalCrmMappingId() {
 		return this.verticalCrmMappingId;
 	}
 
-	public void setVerticalCrmMappingId(int verticalCrmMappingId) {
+	public void setVerticalCrmMappingId(long verticalCrmMappingId) {
 		this.verticalCrmMappingId = verticalCrmMappingId;
 	}
 
