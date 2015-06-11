@@ -38,66 +38,46 @@
 	
 	<div class="container">
 
-		<!-- Starting code for Encompass details -->
+		<!-- Starting code for CRM details -->
 		<c:if test="${profilemasterid == 1 || accountMasterId == 1}">
-			<form id="encompass-form">
-				<div class="um-top-container">
-					<div class="um-header"><spring:message code="label.header.encompass.configuration.key" /></div>
-					<div class="clearfix um-panel-content">
-						<div class="row">
-							<div class="um-top-row cleafix">
-								<div class="clearfix um-top-form-wrapper">
-									<!-- set encompass details -->
-									<c:if test="${accountSettings != null && accountSettings.crm_info != null}">
-										<c:set var="encompassusername" value="${accountSettings.crm_info.crm_username}"/>
-										<c:set var="encompasspassword" value="${accountSettings.crm_info.crm_password}"/>
-										<c:set var="encompassurl" value="${accountSettings.crm_info.url}"/>
-									</c:if>
-									<div class="col-lg-6 col-md-6 col-sm-12 col-xs-12 um-panel-item">
-										<div class="hm-item-row item-row-OR clearfix float-left">
-											<div class="um-item-row-left text-right"><spring:message code="label.encompass.username.key" /></div>
-											<div class="clearfix float-right st-username-icons">
-												<div class="um-item-row-icon margin-left-0"></div>
-												<div class="um-item-row-icon margin-left-0"></div>
-											</div>
-											<div class="hm-item-row-right um-item-row-right margin-right-10 hm-item-height-adj float-left">
-												<input id="encompass-username" type="text" class="um-item-row-txt um-item-row-txt-OR" placeholder="Username" name="encompass-username" value="${encompassusername}">
-												<div id="encompass-username-error" class="hm-item-err-2"></div>
-											</div>
-										</div>
-									</div>
-									<div class="col-lg-6 col-md-6 col-sm-12 col-xs-12 um-panel-item overflow-hidden">
-										<div class="hm-item-row item-row-OR clearfix float-left">
-											<div class="um-item-row-left text-right"><spring:message code="label.encompass.password.key" /></div>
-											<div class="clearfix float-right st-password-icons">
-												<div class="um-item-row-icon margin-left-0"></div>
-												<div class="um-item-row-icon margin-left-0"></div>
-											</div>
-											<div class="hm-item-row-right um-item-row-right margin-right-10 hm-item-height-adj float-left">
-												<input id="encompass-password" type="password" class="um-item-row-txt um-item-row-txt-OR" placeholder="Password" name="encompass-password"  value="${encompasspassword}">
-												<div id="encompass-password-error" class="hm-item-err-2 hide"></div>
-											</div>
-										</div>
-									</div>
-									<div class="col-lg-6 col-md-6 col-sm-12 col-xs-12 um-panel-item">
-										<div class="hm-item-row item-row-OR clearfix float-left">
-											<div class="um-item-row-left text-right"><spring:message code="label.encompass.url.key" /></div>
-											<div class="hm-item-row-right um-item-row-right margin-right-10 hm-item-height-adj float-left">
-												<input id="encompass-url" type="text" class="encompass-url-adj um-item-row-txt um-item-row-txt-OR" placeholder="URL" name="encompass-url" value="${encompassurl}">
-												<div id="encompass-url-error" class="hm-item-err-2"></div>
-											</div>
-											<div class="clearfix float-left st-url-icons">
-												<div id="encompass-testconnection" class="encompass-testconnection-adj um-item-row-icon icn-spanner margin-left-0 cursor-pointer"></div>
-												<div id="encompass-save" class="um-item-row-icon icn-blue-tick margin-left-0 cursor-pointer"></div>
-											</div>
-										</div>
-									</div>
-								</div>
+			<!-- Select which CRM jsp to include -->
+			<c:if test="${not empty crmMappings }">
+				<form id="encompass-form">
+					<div class="um-top-container">
+						<c:choose>
+						<c:when test="${fn:length(crmMappings) gt 1}">
+							<div class="um-header crm-setting-hdr crm-settings-dropdown">
+								<span id="crm-settings-dropdown-sel-text">${crmMappings[0].crmMaster.crmName }</span> Settings</div>
+							<div class="hide crm-settings-dropdown-cont va-dd-wrapper">
+								<c:forEach items="${crmMappings }" var="mapping">
+									<div class="crm-settings-dropdown-item"
+										data-crm-type="${mapping.crmMaster.crmName }">${mapping.crmMaster.crmName }</div>
+								</c:forEach>
 							</div>
-						</div>
+						</c:when>
+						<c:otherwise>
+							<div class="um-header crm-setting-hdr">
+								${crmMappings[0].crmMaster.crmName } Settings</div>
+						</c:otherwise>
+						</c:choose>
+						<c:forEach items="${crmMappings }" var="mapping" varStatus="loop">
+							<c:choose>
+								<c:when test="${loop.index gt 0}">
+									<c:set var="hideClass" value="hide"></c:set>
+								</c:when>
+								<c:otherwise>
+									<c:set var="hideClass" value=""></c:set>
+								</c:otherwise>
+							</c:choose>
+							<div class="crm-setting-cont ${hideClass}" data-crm-type="${mapping.crmMaster.crmName }">
+								<c:if test="${mapping.crmMaster.crmName == 'Encompass'}">
+									<jsp:include page="encompass.jsp"></jsp:include>
+								</c:if>
+							</div>
+						</c:forEach>
 					</div>
-				</div>
-			</form>
+				</form>
+			</c:if>
 		</c:if>
 		
 		<!-- Starting code for Autopost Score -->
@@ -605,6 +585,19 @@ $(document).ready(function() {
 			$('#atpst-chk-box').addClass('bd-check-img-checked');
 			updateAutoPostSetting(false);
 		}
+	});
+	$('body').on('click',function(){
+		$('.crm-settings-dropdown-cont').slideUp(200);
+	});
+	$('.crm-settings-dropdown').on('click',function(e){
+		e.stopPropagation();
+		$('.crm-settings-dropdown-cont').slideToggle(200);
+	});
+	$('.crm-settings-dropdown-item').on('click',function(e){
+		var crmType = $(this).attr('data-crm-type');
+		$('#crm-settings-dropdown-sel-text').text(crmType);
+		$('.crm-setting-cont').hide();
+		$('.crm-setting-cont[data-crm-type="'+crmType+'"]').show();
 	});
 });
 </script>

@@ -15,7 +15,9 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
 import javax.annotation.Resource;
+
 import org.apache.solr.common.SolrDocumentList;
 import org.noggit.JSONUtil;
 import org.slf4j.Logger;
@@ -27,6 +29,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.DependsOn;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
+
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
@@ -70,6 +73,7 @@ import com.realtech.socialsurvey.core.entities.SurveySettings;
 import com.realtech.socialsurvey.core.entities.User;
 import com.realtech.socialsurvey.core.entities.UserFromSearch;
 import com.realtech.socialsurvey.core.entities.UserProfile;
+import com.realtech.socialsurvey.core.entities.VerticalCrmMapping;
 import com.realtech.socialsurvey.core.entities.VerticalsMaster;
 import com.realtech.socialsurvey.core.entities.ZipCodeLookup;
 import com.realtech.socialsurvey.core.enums.AccountType;
@@ -149,6 +153,9 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 	
 	@Autowired
 	private UserInviteDao userInviteDao;
+	
+	@Autowired
+	private GenericDao<VerticalCrmMapping, Long> verticalCrmMappingDo;
 	
 	@Autowired
 	private GenericDao<SurveyCompanyMapping, Long> surveyCompanyMappingDao;
@@ -3327,6 +3334,24 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 		
 		surveyCompanyMappingDao.deleteByCondition("SurveyCompanyMapping", conditions);
 	}
+
+	@Override
+	@Transactional
+    public List<VerticalCrmMapping> getCrmMapping(User user) {
+		user = userDao.findById(User.class, user.getUserId());
+		List<VerticalCrmMapping> mappings = user.getCompany().getVerticalsMaster().getVerticalCrmMappings();
+		
+		if(mappings == null || mappings.isEmpty()){
+			VerticalCrmMapping defaultMapping = verticalCrmMappingDo.findById(VerticalCrmMapping.class, CommonConstants.DEFAULT_VERTICAL_CRM_ID);
+			mappings.add(defaultMapping);
+		}
+		
+		for(VerticalCrmMapping mapping : mappings){
+			mapping.getCrmMaster().getCrmMasterId();
+			mapping.getCrmMaster().getCrmName();
+		}
+	    return mappings;
+    }
 
 }
 // JIRA: SS-27: By RM05: EOC
