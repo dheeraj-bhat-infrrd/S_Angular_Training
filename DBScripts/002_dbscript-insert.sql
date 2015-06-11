@@ -9,7 +9,7 @@ INSERT into ss_user.ACCOUNTS_MASTER values(4,"Enterprise",-1,365,10.95,1,NOW(),"
 INSERT into ss_user.ACCOUNTS_MASTER values(5,"Free Account",1,365,0.0,1,NOW(),"1",NOW(),"1");
 
 -- Insert verticals_master table data Feb-2-2015
-INSERT INTO `ss_user`.`VERTICALS_MASTER` VALUES (-1,'CUSTOM',1,NOW(),'1',NOW(),'1'),(1,'MORTGAGE',1,NOW(),'1',NOW(),'1');
+INSERT INTO `ss_user`.`VERTICALS_MASTER` VALUES (-1,'CUSTOM',1,NOW(),'1',NOW(),'1');
 
 -- Inserting default values into COMPANY
 INSERT INTO `ss_user`.`COMPANY` (`COMPANY_ID`, `COMPANY`,`VERTICAL_ID`,`IS_REGISTRATION_COMPLETE`, `STATUS`, `CREATED_ON`, `CREATED_BY`, `MODIFIED_ON`, `MODIFIED_BY`) VALUES ('1', 'Default',-1, 1, '1', NOW(), 'ADMIN', NOW(), 'ADMIN');
