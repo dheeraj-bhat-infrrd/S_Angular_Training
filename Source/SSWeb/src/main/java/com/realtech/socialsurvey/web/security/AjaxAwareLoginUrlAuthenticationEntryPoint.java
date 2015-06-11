@@ -10,6 +10,7 @@ import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.authentication.LoginUrlAuthenticationEntryPoint;
 import org.springframework.security.web.util.ELRequestMatcher;
 import org.springframework.security.web.util.RequestMatcher;
+import com.realtech.socialsurvey.core.exception.UserSessionInvalidateException;
 
 @SuppressWarnings("deprecation")
 public class AjaxAwareLoginUrlAuthenticationEntryPoint extends LoginUrlAuthenticationEntryPoint {
@@ -31,7 +32,16 @@ public class AjaxAwareLoginUrlAuthenticationEntryPoint extends LoginUrlAuthentic
 
 		if (requestMatcher.matches(request)) {
 			LOG.info("Redirecting to login.do");
-			response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Unauthorized");
+//			StringBuilder urlBuilder = new StringBuilder();
+//			urlBuilder.append(request.getScheme()).append("://").append(request.getServerName());
+//			// if port is other than 80 or 443, then append that to the url
+//			if(request.getServerPort() != 80 && request.getServerPort() != 443){
+//				urlBuilder.append(":").append(request.getServerPort());
+//			}
+//			RedirectStrategy redirectStrategy = new DefaultRedirectStrategy();
+//			redirectStrategy.sendRedirect(request, response, urlBuilder.toString());
+//			response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Unauthorized");
+			throw new UserSessionInvalidateException("User session is no longer available.");
 		}
 		else {
 			super.commence(request, response, authException);
