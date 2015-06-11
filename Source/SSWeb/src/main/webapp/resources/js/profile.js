@@ -93,7 +93,7 @@ function paintProfilePage(result) {
                 		addressHtml += companyProfileData.city + ', ';
                 	}
                 	if(companyProfileData.state){
-                		addressHtml += companyProfileData.state + ', ';
+                		addressHtml += companyProfileData.state + ' ';
                 	}
                 	addressHtml += companyProfileData.zipcode + '</div>';
                 }
@@ -111,7 +111,7 @@ function paintProfilePage(result) {
                 		addressHtml += contactDetails.city + ', ';	
                 	}
                 	if(contactDetails.state && contactDetails.state != ""){
-                		addressHtml += contactDetails.state + ', ';	
+                		addressHtml += contactDetails.state + ' ';	
                 	}
                 	if(contactDetails.zipcode && contactDetails.zipcode != ""){
                 		addressHtml += contactDetails.zipcode;	
