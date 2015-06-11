@@ -12,6 +12,7 @@ import com.realtech.socialsurvey.core.entities.FileContentReplacements;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.services.mail.EmailSender;
 import com.realtech.socialsurvey.core.services.mail.UndeliveredEmailException;
+import com.realtech.socialsurvey.core.utils.EmailFormatHelper;
 import com.realtech.socialsurvey.core.utils.FileOperations;
 import com.sendgrid.SendGrid;
 import com.sendgrid.SendGrid.Email;
@@ -45,6 +46,9 @@ public class SendGridEmailSenderImpl implements EmailSender, InitializingBean {
 
 	@Autowired
 	private FileOperations fileOperations;
+	
+	@Autowired
+	private EmailFormatHelper emailFormatHelper;
 
 	private SendGrid sendGrid;
 
@@ -75,6 +79,7 @@ public class SendGridEmailSenderImpl implements EmailSender, InitializingBean {
 		email.setFromName(emailEntity.getSenderName());
 		email.setSubject(emailEntity.getSubject());
 		email.setHtml(emailEntity.getBody());
+		email.setText(emailFormatHelper.getEmailTextFormat(emailEntity.getBody()));
 
 		Response response = null;
 		try {

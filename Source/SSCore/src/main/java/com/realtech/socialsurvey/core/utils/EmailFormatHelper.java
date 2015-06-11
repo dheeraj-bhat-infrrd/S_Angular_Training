@@ -3,6 +3,8 @@ package com.realtech.socialsurvey.core.utils;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -50,5 +52,19 @@ public class EmailFormatHelper {
 		}
 		mailBody = mailBody.replaceAll(PARAM_PATTERN_REGEX, PARAM_PATTERN);
 		return mailBody;
+	}
+	
+	/**
+	 * Converts email html format to txt format
+	 * @param htmlFormat
+	 */
+	public String getEmailTextFormat(String htmlFormat){
+		LOG.debug("Converting html to text format");
+		String textFormat = null;
+		if(htmlFormat != null && !htmlFormat.isEmpty()){
+			Document document = Jsoup.parse(htmlFormat);
+			textFormat = document.body().text();
+		}
+		return textFormat;
 	}
 }

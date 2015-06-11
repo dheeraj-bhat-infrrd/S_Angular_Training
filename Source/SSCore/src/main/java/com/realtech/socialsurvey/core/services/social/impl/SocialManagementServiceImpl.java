@@ -249,8 +249,8 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
 						// add header
 						post.setHeader("Content-Type", "application/json");
 						String a="{\"comment\": \"\",\"content\": {"
-								  +  "\"title\": \"" + message + "\","
-								  +  "\"description\": \"" + linkedinMessageFeedback + "\","
+								  +  "\"title\": \" \","
+								  +  "\"description\": \"" + message + "-" + linkedinMessageFeedback + "\","
 								  +  "\"submitted-url\": \"" + linkedinProfileUrl + "\",  "
 								  +  "\"submitted-image-url\": \"" + applicationLogoUrl + "\"},"
 								  +  "\"visibility\": {\"code\": \"anyone\" }}";
