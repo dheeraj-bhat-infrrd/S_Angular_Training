@@ -276,7 +276,11 @@
 						</div>
 					</c:if>
                 </c:if>
+                
                 <div id="prof-agent-container">
+          			<div id="individual-details">
+           				<!-- individual details like associations/hobbies/achievements come here -->
+           			</div>
                  	<c:choose>
                    		<c:when test="${not empty branchProfileName}">
                    			<div id="branch-hierarchy" class="prof-left-row prof-left-assoc bord-bot-dc hide">
@@ -286,40 +290,36 @@
                             			<!--branch hierarchy is displayed here  -->
                         			</div>
                         		</div>
-              					</div>
-                  		 	</c:when>
-                  		 	<c:when test="${not empty regionProfileName}">
-                   		 	<div id="region-hierarchy" class="prof-left-row prof-left-assoc bord-bot-dc hide">
-                   				<div class="left-assoc-wrapper">
-		                   		 	<input type="hidden" id="branchid-hidden"/>
-		                   		 		<div class="left-panel-header"><spring:message code="label.ourregion.key"/></div>
-			                        	<div class="left-panel-content left-panel-content-adj" id="region-branches">
-			                            	<!--region hierarchy is displayed here  -->
-			                        	</div>
-			                    </div>
-			               </div>
-                  		 	</c:when>
-                  		 	<c:when test="${not empty agentProfileName}">
-                  		 		<div id="individual-details">
-                  		 			<!-- individual details like associations/hobbies/achievements come here -->
-                  		 		</div>
-                  		 	</c:when>
-                  		 	<c:when test="${not empty companyProfileName}">
-                                <div id="comp-hierarchy" class="prof-left-row prof-left-assoc bord-bot-dc hide">
-                  					<div class="left-assoc-wrapper">
-	                   		 			<input type="hidden" id="regionid-hidden"/>
-	                   		 			<input type="hidden" id="branchid-hidden"/>
-	                   		 			<div class="left-panel-header"><spring:message code="label.ourcompany.key"/></div>
-		                        		<div class="left-panel-content left-panel-content-adj" id="comp-regions-content">
-		                            		<!--company hierarchy is displayed here  -->
-		                        		</div>
-	                        		</div>
-		               			</div>
-                  		 	</c:when>
+             				</div>
+                 		</c:when>
+                 		<c:when test="${not empty regionProfileName}">
+                  		 	<div id="region-hierarchy" class="prof-left-row prof-left-assoc bord-bot-dc hide">
+                  				<div class="left-assoc-wrapper">
+	                   		 	<input type="hidden" id="branchid-hidden"/>
+	                   		 		<div class="left-panel-header"><spring:message code="label.ourregion.key"/></div>
+		                        	<div class="left-panel-content left-panel-content-adj" id="region-branches">
+		                            	<!--region hierarchy is displayed here  -->
+		                        	</div>
+								</div>
+							</div>
+                 		</c:when>
+                 		<c:when test="${not empty companyProfileName}">
+                        	<div id="comp-hierarchy" class="prof-left-row prof-left-assoc bord-bot-dc hide">
+              					<div class="left-assoc-wrapper">
+                		 			<input type="hidden" id="regionid-hidden"/>
+                		 			<input type="hidden" id="branchid-hidden"/>
+                		 			<div class="left-panel-header"><spring:message code="label.ourcompany.key"/></div>
+                      				<div class="left-panel-content left-panel-content-adj" id="comp-regions-content">
+                          				<!--company hierarchy is displayed here  -->
+                      				</div>
+                     			</div>
+             				</div>
+              		 	</c:when>
               		</c:choose>
+              		
                     <div class="prof-left-row prof-left-assoc bord-bot-dc">
                     	<div class="left-contact-wrapper">
-                    		<div id="prof-contact-hdr" class="left-panel-header prof-contact-hdr">Contact ${profName }</div>
+                    		<div id="prof-contact-hdr" class="left-panel-header prof-contact-hdr">Contact ${profName}</div>
                     		<div class="left-panel-content">
                     			<form id="prof-contact-form" action="">
 	                    			<div class="lp-row">

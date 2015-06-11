@@ -423,7 +423,7 @@
 				
 				<c:choose>
 					<c:when	test="${profilemasterid != 4}">
-						<div class="bd-hr-left-panel">
+						<div class="clearfix bd-hr-left-panel">
 							<c:choose>
 								<c:when	test="${profilemasterid == 1}">
 									<div class="bd-hr-lp-header"><spring:message code="label.ourcompany.key"/></div>
@@ -435,7 +435,7 @@
 									<div class="bd-hr-lp-header"><spring:message code="label.ourbranch.key"/></div>
 								</c:when>
 							</c:choose>
-							<div id ="prof-hierarchy-container" class="hide">
+							<div id="prof-hierarchy-container" class="hide">
 								<!-- hierarchy structure comes here  -->
 							</div>
    						</div>
