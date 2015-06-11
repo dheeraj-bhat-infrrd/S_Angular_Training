@@ -7,7 +7,6 @@
 
 <div id="prof-address-edit-container" class="prof-user-address prof-edit-icn">
 	<form id="prof-edit-address-form">
-		<input id="prof-name" name="profName" class="pu-edit-fields" value="${contactdetail.name}" placeholder='<spring:message code="label.address.displayname.key"/>'>
 		<input id="prof-address1" name="address1" class="pu-edit-fields" value="${contactdetail.address1}" placeholder='<spring:message code="label.address.address1.key"/>'>
 		<input id="prof-address2" name="address2" class="pu-edit-fields" value="${contactdetail.address2}" placeholder='<spring:message code="label.address.address2.key"/>'>
 		<input id="prof-country" name="country" class="pu-edit-fields" value="${contactdetail.country}" placeholder='<spring:message code="label.address.country.key"/>'>
