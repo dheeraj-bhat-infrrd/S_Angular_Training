@@ -13,6 +13,6 @@
 </c:if>
 <div class="prof-user-addline3 prof-edditable prof-addr-center">
 	<c:if test="${not empty  contactdetail.city}">${contactdetail.city}, </c:if>
-	<c:if test="${not empty  contactdetail.state}">${contactdetail.state}, </c:if>
+	<c:if test="${not empty  contactdetail.state}">${contactdetail.state} </c:if>
 	<c:if test="${not empty contactdetail.zipcode}">${contactdetail.zipcode}</c:if>
 </div>
