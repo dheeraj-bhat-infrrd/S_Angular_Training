@@ -5,6 +5,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
 import com.realtech.socialsurvey.core.entities.Branch;
 import com.realtech.socialsurvey.core.entities.BranchFromSearch;
 import com.realtech.socialsurvey.core.entities.BranchSettings;
@@ -20,6 +21,7 @@ import com.realtech.socialsurvey.core.entities.SurveySettings;
 import com.realtech.socialsurvey.core.entities.User;
 import com.realtech.socialsurvey.core.entities.UserFromSearch;
 import com.realtech.socialsurvey.core.entities.UserProfile;
+import com.realtech.socialsurvey.core.entities.VerticalCrmMapping;
 import com.realtech.socialsurvey.core.entities.VerticalsMaster;
 import com.realtech.socialsurvey.core.enums.AccountType;
 import com.realtech.socialsurvey.core.exception.DatabaseException;
@@ -701,4 +703,6 @@ public interface OrganizationManagementService {
 	public void purgeCompany(Company company) throws InvalidInputException, SolrException;
 
 	public void updateCompany(Company company) throws DatabaseException;
+
+	public List<VerticalCrmMapping> getCrmMapping(User user);
 }
