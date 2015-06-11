@@ -2,6 +2,7 @@ package com.realtech.socialsurvey.core.dao.impl;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
@@ -93,6 +94,16 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
 		query.fields().exclude(KEY_LINKEDIN_PROFILEDATA);
 		OrganizationUnitSettings settings = mongoTemplate.findOne(query, OrganizationUnitSettings.class, collectionName);
 		setCompleteUrlForSettings(settings, collectionName);
+		return settings;
+	}
+	
+	@Override
+	public List<OrganizationUnitSettings> fetchOrganizationUnitSettingsForMultipleIds(Set<Long> identifiers, String collectionName) {
+		LOG.info("Fetch organization unit settings from " + collectionName + " for multiple ids.");
+		Query query = new Query();
+		query.addCriteria(Criteria.where(KEY_IDENTIFIER).in(identifiers));
+		query.fields().exclude(KEY_LINKEDIN_PROFILEDATA);
+		List<OrganizationUnitSettings> settings = mongoTemplate.find(query, OrganizationUnitSettings.class, collectionName);
 		return settings;
 	}
 

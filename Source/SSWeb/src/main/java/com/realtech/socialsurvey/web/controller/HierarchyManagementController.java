@@ -851,10 +851,13 @@ public class HierarchyManagementController {
 			BranchFromSearch branchInSession = branches.get(branch.getBranchId());
 			branchInSession.setBranchName(branch.getBranchName());
 			branchInSession.setAddress1(branch.getAddress1());
-			branchInSession.setBranchName(branch.getAddress2());
+			branchInSession.setAddress2(branch.getAddress2());
 			branchInSession.setRegionId(branch.getRegion().getRegionId());
 			branchInSession.setRegionName(branch.getRegion().getRegion());
 			branchInSession.setStatus(branch.getStatus());
+			branchInSession.setCountry(branch.getCountry());
+			branchInSession.setCountryCode(branch.getCountryCode());
+			branchInSession.setZipcode(branch.getZipcode());
 		}
 		else {
 			LOG.debug("Adding newly created branch to session");
@@ -864,10 +867,13 @@ public class HierarchyManagementController {
 			branchInSession.setIsDefaultBySystem(branch.getIsDefaultBySystem());
 			branchInSession.setBranchName(branch.getBranchName());
 			branchInSession.setAddress1(branch.getAddress1());
-			branchInSession.setBranchName(branch.getAddress2());
+			branchInSession.setAddress2(branch.getAddress2());
 			branchInSession.setRegionId(branch.getRegion().getRegionId());
 			branchInSession.setRegionName(branch.getRegion().getRegion());
 			branchInSession.setStatus(branch.getStatus());
+			branchInSession.setCountry(branch.getCountry());
+			branchInSession.setCountryCode(branch.getCountryCode());
+			branchInSession.setZipcode(branch.getZipcode());
 			branches.put(branch.getBranchId(), branchInSession);
 		}
 		LOG.info("Method addOrUpdateBranchInSession completed successfully");
