@@ -35,12 +35,12 @@
 				<title><spring:message code="label.profile.title.key" /></title>
 			</c:otherwise>
 		</c:choose>
-    	<c:if test="${not empty profile.completeProfileUrl }">
+    	<c:if test="${not empty profile.completeProfileUrl}">
     		<link rel="canonical" href="${profile.completeProfileUrl}">
     	</c:if>
-    	<c:if test="${not empty profile.contact_details && not empty profile.contact_details.name }">
-    		<meta name="desciption" content="Use SocialSurvey Ratings & Reviews to find out how customers have rated ${profName }.">
-    		<meta name="keywords" content="${profName }, ${profName } ratings, ${profName } reviews, ${profName } scorecard, ${profName } ratings and reviews">
+    	<c:if test="${not empty profile.contact_details && not empty profile.contact_details.name}">
+    		<meta name="desciption" content="Use SocialSurvey Ratings & Reviews to find out how customers have rated ${profName}.">
+    		<meta name="keywords" content="${profName}, ${profName} ratings, ${profName} reviews, ${profName} scorecard, ${profName} ratings and reviews">
     	</c:if>
     	<c:if test="${not empty averageRating}">
     		<fmt:formatNumber var="floatingAverageRating" type="number" value="${averageRating}" maxFractionDigits="2" minFractionDigits="2"/>
@@ -57,8 +57,10 @@
     </div>
     <div id="report-abuse-overlay" class="overlay-main hide">
     	<div class="overlay-disable-wrapper">
-    		<div id="overlay-header" class="ol-header">Why do you want to report?</div>
+    		<div id="overlay-header" class="ol-header">Why do you want to report the review?</div>
     		<div class="ol-content">
+    			<input type="text" id="report-abuse-cus-name" class="report-abuse-input" placeholder="Name">
+    			<input type="email" id="report-abuse-cus-email" class="report-abuse-input" placeholder="Email Address">
     			<textarea id="report-abuse-txtbox" class="report-abuse-txtbox" placeholder="Type here on why do you want to report the review...."></textarea>
     		</div>
     		<div class="rpa-overlay-btn-cont clearfix">
@@ -131,23 +133,23 @@
     <div class="">
     	<div class="container">
         <div class="row prof-pic-name-wrapper">
-			<c:if test="${not empty profile.profileImageUrl }">
+			<c:if test="${not empty profile.profileImageUrl}">
 				<div id="prog-img-container" class="col-lg-4 col-md-4 col-sm-4 col-xs-6 prof-wrapper prof-img-wrapper">
 		            <div id="prof-image" class="prof-image pos-relative" style="background: url(${profile.profileImageUrl}) no-repeat center;"></div>
 	            </div>
 			</c:if>
-			<c:if test="${not empty profile.profileImageUrl }">
+			<c:if test="${not empty profile.profileImageUrl}">
 				<c:set var="profileNameClass" value="profile-name-img-wrapper"></c:set>
 			</c:if>
             <div class="col-lg-4 col-md-4 col-sm-4 col-xs-6 prof-wrapper pos-relative prof-name-wrapper ${profileNameClass}">
                 <div class="prof-name-container" id="prof-company-head-content">
                 	<div class="prof-name">${profName}</div>
                 	<div class="prof-address">
-                		<c:if test="${not empty profile.vertical}">
-                			<div class="prof-addline1">${profile.vertical}</div>
-                		</c:if>
                 		<c:if test="${not empty profile.contact_details &&  not empty profile.contact_details.title}">
                 			<div class="prof-addline2">${profile.contact_details.title}</div>
+                		</c:if>
+                		<c:if test="${not empty profile.vertical}">
+                			<div class="prof-addline1">${profile.vertical}</div>
                 		</c:if>
                 	</div>
 					<div class="prof-rating clearfix">
@@ -274,7 +276,11 @@
 						</div>
 					</c:if>
                 </c:if>
+                
                 <div id="prof-agent-container">
+          			<div id="individual-details">
+           				<!-- individual details like associations/hobbies/achievements come here -->
+           			</div>
                  	<c:choose>
                    		<c:when test="${not empty branchProfileName}">
                    			<div id="branch-hierarchy" class="prof-left-row prof-left-assoc bord-bot-dc hide">
@@ -284,40 +290,36 @@
                             			<!--branch hierarchy is displayed here  -->
                         			</div>
                         		</div>
-              					</div>
-                  		 	</c:when>
-                  		 	<c:when test="${not empty regionProfileName}">
-                   		 	<div id="region-hierarchy" class="prof-left-row prof-left-assoc bord-bot-dc hide">
-                   				<div class="left-assoc-wrapper">
-		                   		 	<input type="hidden" id="branchid-hidden"/>
-		                   		 		<div class="left-panel-header"><spring:message code="label.ourregion.key"/></div>
-			                        	<div class="left-panel-content left-panel-content-adj" id="region-branches">
-			                            	<!--region hierarchy is displayed here  -->
-			                        	</div>
-			                    </div>
-			               </div>
-                  		 	</c:when>
-                  		 	<c:when test="${not empty agentProfileName}">
-                  		 		<div id="individual-details">
-                  		 			<!-- individual details like associations/hobbies/achievements come here -->
-                  		 		</div>
-                  		 	</c:when>
-                  		 	<c:when test="${not empty companyProfileName}">
-                                <div id="comp-hierarchy" class="prof-left-row prof-left-assoc bord-bot-dc hide">
-                  					<div class="left-assoc-wrapper">
-	                   		 			<input type="hidden" id="regionid-hidden"/>
-	                   		 			<input type="hidden" id="branchid-hidden"/>
-	                   		 			<div class="left-panel-header"><spring:message code="label.ourcompany.key"/></div>
-		                        		<div class="left-panel-content left-panel-content-adj" id="comp-regions-content">
-		                            		<!--company hierarchy is displayed here  -->
-		                        		</div>
-	                        		</div>
-		               			</div>
-                  		 	</c:when>
+             				</div>
+                 		</c:when>
+                 		<c:when test="${not empty regionProfileName}">
+                  		 	<div id="region-hierarchy" class="prof-left-row prof-left-assoc bord-bot-dc hide">
+                  				<div class="left-assoc-wrapper">
+	                   		 	<input type="hidden" id="branchid-hidden"/>
+	                   		 		<div class="left-panel-header"><spring:message code="label.ourregion.key"/></div>
+		                        	<div class="left-panel-content left-panel-content-adj" id="region-branches">
+		                            	<!--region hierarchy is displayed here  -->
+		                        	</div>
+								</div>
+							</div>
+                 		</c:when>
+                 		<c:when test="${not empty companyProfileName}">
+                        	<div id="comp-hierarchy" class="prof-left-row prof-left-assoc bord-bot-dc hide">
+              					<div class="left-assoc-wrapper">
+                		 			<input type="hidden" id="regionid-hidden"/>
+                		 			<input type="hidden" id="branchid-hidden"/>
+                		 			<div class="left-panel-header"><spring:message code="label.ourcompany.key"/></div>
+                      				<div class="left-panel-content left-panel-content-adj" id="comp-regions-content">
+                          				<!--company hierarchy is displayed here  -->
+                      				</div>
+                     			</div>
+             				</div>
+              		 	</c:when>
               		</c:choose>
+              		
                     <div class="prof-left-row prof-left-assoc bord-bot-dc">
                     	<div class="left-contact-wrapper">
-                    		<div id="prof-contact-hdr" class="left-panel-header prof-contact-hdr">Contact ${profName }</div>
+                    		<div id="prof-contact-hdr" class="left-panel-header prof-contact-hdr">Contact ${profName}</div>
                     		<div class="left-panel-content">
                     			<form id="prof-contact-form" action="">
 	                    			<div class="lp-row">
@@ -361,7 +363,7 @@
 	                    			<div class="privacy-policy-disclaimer">
 	                    				We will only use information you provide on this form to send your message to this professional.
 	                    			</div>
-	                    			<div id="privacy-policy-link" class="privacy-policy-link">Privacy Policy</div>
+	                    			<div id="privacy-policy-link" class="privacy-policy-link"><a href="https://www.socialsurvey.me/survey/privacy-policy/">Privacy Policy</a></div>
                     			</form>
                     		</div>
                     	</div>
