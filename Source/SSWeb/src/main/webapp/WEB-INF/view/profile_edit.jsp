@@ -17,6 +17,7 @@
 	<c:set value="${profileSettings.profileImageUrl}" var="profileimage"></c:set>
 	<c:set value="${profileSettings.contact_details}" var="contactdetail"></c:set>
 	<c:set value="${profileSettings.socialMediaTokens}" var="socialMediaTokens"></c:set>
+	<c:set value="${profileSettings.disclaimer}" var="disclaimer"></c:set>
 </c:if>
 <c:if test="${not empty contactdetail}">
 	<c:set value="${contactdetail.mail_ids}" var="mailIds"></c:set>
@@ -407,9 +408,22 @@
 						</c:otherwise>
 					</c:choose>
 				</div>
+				<div id="disclaimer-wrapper" class="prof-left-row prof-left-info main-rt-adj">
+					<div class="left-contact-wrapper">
+						<div class="clearfix">
+							<div class="float-left left-panel-header"><spring:message code="label.disclaimer.key" /></div>
+						</div>
+						<div class="left-panel-content" id="disclaimer-container">
+							<input id="disclaimer-text" class="float-left lp-con-row-item blue-text prof-editable-disclaimer"
+								value="${disclaimer}" placeholder='<spring:message code="label.disclaimer.placeholder.key"/>'>
+							<input id="disclaimer-default" type="hidden" value="${disclaimer}">
+						</div>
+					</div>
+				</div>
+				
 				<c:choose>
 					<c:when	test="${profilemasterid != 4}">
-						<div class="bd-hr-left-panel">
+						<div class="clearfix bd-hr-left-panel">
 							<c:choose>
 								<c:when	test="${profilemasterid == 1}">
 									<div class="bd-hr-lp-header"><spring:message code="label.ourcompany.key"/></div>
@@ -421,7 +435,7 @@
 									<div class="bd-hr-lp-header"><spring:message code="label.ourbranch.key"/></div>
 								</c:when>
 							</c:choose>
-							<div id ="prof-hierarchy-container" class="hide">
+							<div id="prof-hierarchy-container" class="hide">
 								<!-- hierarchy structure comes here  -->
 							</div>
    						</div>

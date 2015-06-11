@@ -152,10 +152,33 @@ $(document).on('click', '.report-abuse-txt', function(e) {
 			"agentName" : agentName,
 			"review" : review
 	};
-	callAjaxGetWithPayloadData('./reportabuse.do', '', payload, true);
-	$('#overlay-toast').html('Reported Successfully!');
-	showToast();
+	
+	$("#report-abuse-txtbox").val('');
+	
+	//Unbind click events for button
+	$('.rpa-cancel-btn').off('click');
+	$('.rpa-report-btn').off('click');
+	
+	
+	$('#report-abuse-overlay').show();
+	
+	$('.rpa-cancel-btn').on('click',function(){
+		$('#report-abuse-overlay').hide();
+	});
+	$('.rpa-report-btn').on('click',function(){
+		var reportText = $("#report-abuse-txtbox").val();
+		payload.reportText = reportText;
+		confirmReportAbuse(payload);
+	});
 });
+
+function confirmUserReportAbuse(payload) {
+	callAjaxGetWithPayloadData('./reportabuse.do', function() {
+		$('#report-abuse-overlay').hide();
+		$('#overlay-toast').html('Reported Successfully!');
+		showToast();
+	}, payload, true);
+}
 
 $('body').click(function() {
 	$('#hr-dd-wrapper').slideUp(200);
@@ -4110,7 +4133,8 @@ function submitFindAProForm() {
 		$('#find-pro-form').submit();
 		showOverlay();
 	} else {
-		showError("Please enter either a valid First Name or Last Name to search for");
+		if (!($('#find-pro-first-name').val() == "" && $('#find-pro-last-name').val() == ""))
+			showError("Please enter either a valid First Name or Last Name to search for");
 	}
 }
 
@@ -4152,7 +4176,9 @@ function fetchUsers(newIndex) {
 		formData.append("find-pro-last-name", $('#fp-last-name-pattern').val());
 		formData.append("find-pro-start-index", newIndex);
 		formData.append("find-pro-row-size", rowSize);
-		callAjaxPOSTWithTextData("./findaproscroll.do", infiniteScrollCallback, true, formData);
+		
+		if (!($('#find-pro-first-name').val() == "" && $('#find-pro-last-name').val() == ""))
+			callAjaxPOSTWithTextData("./findaproscroll.do", infiniteScrollCallback, true, formData);
 	}
 }
 
@@ -5257,55 +5283,39 @@ $(document).ajaxStop(function() {
 });
 
 // Toggle text editor
-$(document).on(
-		'focus',
-		'.prof-edditable',
-		function() {
-			var lockId = $(this).attr("id") + "-lock";
-			if ($('#' + lockId).attr('data-control') == 'user'
-					|| ($('#' + lockId).attr('data-state') == 'unlocked' && !$(
-							this).is('[readonly]'))) {
-				$(this).addClass('prof-name-edit');
-				$('#prof-all-lock').val('modified');
-			}
-		});
+$(document).on('focus', '.prof-edditable', function() {
+	var lockId = $(this).attr("id") + "-lock";
+	if ($('#' + lockId).attr('data-control') == 'user'
+			|| ($('#' + lockId).attr('data-state') == 'unlocked' && !$(this).is('[readonly]'))) {
+		$(this).addClass('prof-name-edit');
+		$('#prof-all-lock').val('modified');
+	}
+});
 
-$(document).on(
-		'blur',
-		'.prof-edditable',
-		function() {
-			var lockId = $(this).attr("id") + "-lock";
-			if ($('#' + lockId).attr('data-control') == 'user'
-					|| ($('#' + lockId).attr('data-state') == 'unlocked' && !$(
-							this).is('[readonly]'))) {
-				$(this).removeClass('prof-name-edit');
-			}
-		});
+$(document).on('blur', '.prof-edditable', function() {
+	var lockId = $(this).attr("id") + "-lock";
+	if ($('#' + lockId).attr('data-control') == 'user'
+			|| ($('#' + lockId).attr('data-state') == 'unlocked' && !$(this).is('[readonly]'))) {
+		$(this).removeClass('prof-name-edit');
+	}
+});
 
-$(document).on(
-		'focus',
-		'.prof-edditable-sin',
-		function() {
-			var lockId = $(this).attr("id") + "-lock";
-			if ($('#' + lockId).attr('data-control') == 'user'
-					|| ($('#' + lockId).attr('data-state') == 'unlocked' && !$(
-							this).is('[readonly]'))) {
-				$(this).addClass('prof-name-edit');
-				$('#prof-all-lock').val('modified');
-			}
-		});
+$(document).on('focus', '.prof-edditable-sin', function() {
+	var lockId = $(this).attr("id") + "-lock";
+	if ($('#' + lockId).attr('data-control') == 'user'
+			|| ($('#' + lockId).attr('data-state') == 'unlocked' && !$(this).is('[readonly]'))) {
+		$(this).addClass('prof-name-edit');
+		$('#prof-all-lock').val('modified');
+	}
+});
 
-$(document).on(
-		'blur',
-		'.prof-edditable-sin',
-		function() {
-			var lockId = $(this).attr("id") + "-lock";
-			if ($('#' + lockId).attr('data-control') == 'user'
-					|| ($('#' + lockId).attr('data-state') == 'unlocked' && !$(
-							this).is('[readonly]'))) {
-				$(this).removeClass('prof-name-edit');
-			}
-		});
+$(document).on('blur', '.prof-edditable-sin', function() {
+	var lockId = $(this).attr("id") + "-lock";
+	if ($('#' + lockId).attr('data-control') == 'user'
+			|| ($('#' + lockId).attr('data-state') == 'unlocked' && !$(this).is('[readonly]'))) {
+		$(this).removeClass('prof-name-edit');
+	}
+});
 
 /*$(document).on('click', '.fb-shr', function() {
 	var firstName = $(this).parent().parent().parent().attr('data-firstname');
@@ -5436,28 +5446,25 @@ $(document).on('click', '#intro-body-text', function() {
 	}
 });
 
-$(document).on(
-		'blur',
-		'#intro-body-text-edit',
-		function() {
-			if ($('#aboutme-lock').attr('data-state') == 'unlocked') {
+$(document).on('blur', '#intro-body-text-edit', function() {
+	if ($('#aboutme-lock').attr('data-state') == 'unlocked') {
 
-				var aboutMe = $('#intro-body-text-edit').val().trim();
-				if (aboutMe == undefined || aboutMe == "") {
-					$('#overlay-toast')
-							.html("Please add a few words about you");
-					showToast();
-					return;
-				}
-				delay(function() {
-					var payload = {
-						"aboutMe" : aboutMe
-					};
-					callAjaxPostWithPayloadData("./addorupdateaboutme.do",
-							callBackOnEditAdboutMeDetails, payload);
-				}, 0);
-			}
-		});
+		var aboutMe = $('#intro-body-text-edit').val().trim();
+		if (aboutMe == undefined || aboutMe == "") {
+			$('#overlay-toast')
+					.html("Please add a few words about you");
+			showToast();
+			return;
+		}
+		delay(function() {
+			var payload = {
+				"aboutMe" : aboutMe
+			};
+			callAjaxPostWithPayloadData("./addorupdateaboutme.do",
+					callBackOnEditAdboutMeDetails, payload);
+		}, 0);
+	}
+});
 
 function callBackOnEditAdboutMeDetails(data) {
 	$('#prof-message-header').html(data);
@@ -5609,7 +5616,7 @@ function callBackEditAddressDetails(data) {
 	$('#overlay-continue').click(function() {
 		var profName = $('#prof-name').val();
 		var profAddress1 = $('#prof-address1').val();
-		var profAddress2 = $('#prof-address2').val();
+		//var profAddress2 = $('#prof-address2').val();
 		var country = $('#prof-country').val();
 		var zipCode = $('#prof-zipcode').val();
 		if (!profName || !profAddress1 || !country || !zipCode) {
@@ -6864,3 +6871,35 @@ function dashboardButtonAction(buttonId, task, columnName, columnValue){
 		editProfileForAchievements = true;
 	}
 }
+
+// Update Disclaimer details
+$(document).on('click', '#disclaimer-text', function() {
+	$('#disclaimer-text').addClass('prof-name-edit');
+});
+
+$(document).on('blur', '#disclaimer-text', function() {
+	$('#disclaimer-text').removeClass('prof-name-edit');
+	
+	var disclaimer = $('#disclaimer-text').val().trim();
+	if (disclaimer == undefined || disclaimer == "") {
+		$('#overlay-toast').html("Please add disclaimer");
+		showToast();
+		return;
+	}
+	
+	if ($('#disclaimer-default').val() != disclaimer) {
+		var payload = {
+			"disclaimer" : disclaimer
+		};
+		
+		callAjaxPostWithPayloadData("./updatedisclaimer.do", function(data) {
+			$('#prof-message-header').html(data);
+			if ($('#prof-message-header #display-msg-div').hasClass('success-message')) {
+				$('#disclaimer-default').val(disclaimer);
+			}
+
+			$('#overlay-toast').html($('#display-msg-div').text().trim());
+			showToast();
+		}, payload);
+	}
+});

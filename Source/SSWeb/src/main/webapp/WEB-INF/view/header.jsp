@@ -65,6 +65,19 @@
 		</div>
 	</div>
 	
+	<div id="report-abuse-overlay" class="overlay-main hide">
+    	<div class="overlay-disable-wrapper">
+    		<div id="overlay-header" class="ol-header">Why do you want to report the review?</div>
+    		<div class="ol-content">
+    			<textarea id="report-abuse-txtbox" class="report-abuse-txtbox" placeholder="Type here on why do you want to report the review...."></textarea>
+    		</div>
+    		<div class="rpa-overlay-btn-cont clearfix">
+    			<div class="rpa-btn rpa-report-btn ol-btn cursor-pointer">Report</div>
+    			<div class="rpa-btn rpa-cancel-btn ol-btn cursor-pointer">Cancel</div>
+    		</div>
+    	</div>
+    </div>
+	
 	<div id="header-slider-wrapper" class="header-slider-wrapper">
 		<div class="header-slider">
 			<div id="header-links-slider" class="header-links header-links-slider float-left clearfix">
@@ -88,7 +101,7 @@
 				</c:if>
 				<c:if test="${highestrole == 1 && accountMasterId != 5}">
 					<div class="header-links-item">
-						<a href="javascript:showViewHierarchyPage();"><spring:message code="label.viewcompanyhierachy.key" /></a>
+						<a href="javascript:showMainContent('./viewhierarchy.do');"><spring:message code="label.viewcompanyhierachy.key" /></a>
 					</div>
 				</c:if>
 				<c:if test="${accountMasterId > 1 && accountMasterId <5 && highestrole != 4}">

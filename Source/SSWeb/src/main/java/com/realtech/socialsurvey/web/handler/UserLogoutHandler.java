@@ -5,6 +5,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.logout.LogoutHandler;
 
 public class UserLogoutHandler implements LogoutHandler {
@@ -13,8 +14,9 @@ public class UserLogoutHandler implements LogoutHandler {
 
 	public void logout(HttpServletRequest request, HttpServletResponse response, Authentication user) {
 		LOG.info("Inside logout method of MyLogoutHandler");
-		request.getSession().invalidate();
-	}
 
-	
+		// Invalidate session in browser
+		request.getSession().invalidate();
+		SecurityContextHolder.clearContext();
+	}
 }

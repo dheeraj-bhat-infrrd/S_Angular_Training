@@ -366,7 +366,11 @@
 	</form>
 	</div>
 </div>
-
+<!-- Account type -->
+<div class="hide">
+	<div id="account-type-1"><spring:message code="label.accounttype.individual.key"/></div>
+	<div id="account-type-4"><spring:message code="label.accounttype.enterprise.key"/></div>
+</div>
 <c:choose>
 	<c:when test="${upgrade == 1}"></c:when>
 	<c:when test="${ paidUpgrade == 1 }"></c:when>
