@@ -46,6 +46,7 @@ function fetchCompanyProfileCallBack(data) {
 	var result = profileJson;
 	
 	paintProfilePage(result);
+	paintIndividualDetails(result);
 	//fetchAverageRatings(result.iden);
 	paintAverageRatings();
 	fetchCompanyRegions();
@@ -236,7 +237,6 @@ function paintCompanyRegions(data) {
 			});
 			$("#comp-regions-content").html(regionsHtml);
 			$("#comp-hierarchy").show();
-			
 		}
 	}
 }
@@ -740,6 +740,7 @@ function fetchRegionProfileCallBack(data) {
 	var result = profileJson;
 
 	paintProfilePage(result);
+	paintIndividualDetails(result);
 	//fetchAverageRatingsForRegion(result.iden);
 	paintAverageRatings();
 	fetchBranchesForRegion(result.iden);
@@ -852,6 +853,7 @@ function fetchBranchProfileCallBack(data) {
 	var result = profileJson;
 	
 	paintProfilePage(result);
+	paintIndividualDetails(result);
 	//fetchAverageRatingsForBranch(result.iden);
 	paintAverageRatings();
 	fetchIndividualsForBranch(result.iden);
@@ -911,6 +913,7 @@ function fetchReviewsForAgentCallBack(data) {
 
 function paintIndividualDetails(result) {
 	var individualDetailsHtml = "";
+	
 	// Paint licenses
 	var licenses = result.licenses;
 	if (licenses != undefined) {

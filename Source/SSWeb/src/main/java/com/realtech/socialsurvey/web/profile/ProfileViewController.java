@@ -28,6 +28,7 @@ import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.entities.Company;
 import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
 import com.realtech.socialsurvey.core.entities.ProfilesMaster;
+import com.realtech.socialsurvey.core.entities.SocialMediaTokens;
 import com.realtech.socialsurvey.core.entities.SocialPost;
 import com.realtech.socialsurvey.core.entities.SurveyDetails;
 import com.realtech.socialsurvey.core.entities.User;
@@ -93,43 +94,47 @@ public class ProfileViewController implements InitializingBean{
 		String message = null;
 		// check if the request is from bot
 		boolean isBotRequest = checkBotRequest(request);
-		
+
 		if (profileName == null || profileName.isEmpty()) {
 			message = messageUtils.getDisplayMessage(DisplayMessageConstants.INVALID_COMPANY_PROFILENAME, DisplayMessageType.ERROR_MESSAGE)
 					.getMessage();
 			model.addAttribute("message", message);
 			return JspResolver.MESSAGE_HEADER;
 		}
-		
+
 		// making case insensitive
 		profileName = profileName.toLowerCase();
-		
+
 		OrganizationUnitSettings companyProfile = null;
 		try {
 			companyProfile = profileManagementService.getCompanyProfileByProfileName(profileName);
 			String json = new Gson().toJson(companyProfile);
-			model.addAttribute("profileJson",json);
+			model.addAttribute("profileJson", json);
+			
 			Long companyId = companyProfile.getIden();
 			double averageRating = profileManagementService.getAverageRatings(companyId, CommonConstants.PROFILE_LEVEL_COMPANY, false);
-			model.addAttribute("averageRating",averageRating);
-			long reviewsCount = profileManagementService.getReviewsCount(companyId, CommonConstants.MIN_RATING_SCORE, CommonConstants.MAX_RATING_SCORE, CommonConstants.PROFILE_LEVEL_COMPANY, false);
-			model.addAttribute("reviewsCount",reviewsCount);
-			if(isBotRequest){
-				//TODO:remove hardcoding of start,end,minScore etc
+			model.addAttribute("averageRating", averageRating);
+			
+			long reviewsCount = profileManagementService.getReviewsCount(companyId, CommonConstants.MIN_RATING_SCORE,
+					CommonConstants.MAX_RATING_SCORE, CommonConstants.PROFILE_LEVEL_COMPANY, false);
+			model.addAttribute("reviewsCount", reviewsCount);
+			
+			if (isBotRequest) {
+				// TODO:remove hardcoding of start,end,minScore etc
 				List<SurveyDetails> reviews = profileManagementService.getReviews(companyId, -1, -1, -1, CommonConstants.USER_AGENT_NUMBER_REVIEWS,
-					CommonConstants.PROFILE_LEVEL_COMPANY, false, null, null, CommonConstants.REVIEWS_SORT_CRITERIA_FEATURE);
+						CommonConstants.PROFILE_LEVEL_COMPANY, false, null, null, CommonConstants.REVIEWS_SORT_CRITERIA_FEATURE);
 				model.addAttribute("reviews", reviews);
-				
+
 				UserProfile selectedProfile = new UserProfile();
 				ProfilesMaster profilesMaster = new ProfilesMaster();
 				profilesMaster.setProfileId(CommonConstants.PROFILES_MASTER_COMPANY_ADMIN_PROFILE_ID);
-				
+
 				Company company = new Company();
 				company.setCompanyId(companyProfile.getIden());
-				
+
 				selectedProfile.setProfilesMaster(profilesMaster);
 				selectedProfile.setCompany(company);
-				
+
 				List<SocialPost> posts = profileManagementService.getSocialPosts(selectedProfile, -1, CommonConstants.USER_AGENT_NUMBER_POST);
 				model.addAttribute("posts", posts);
 			}
@@ -138,17 +143,19 @@ public class ProfileViewController implements InitializingBean{
 			throw new InternalServerException(new ProfileServiceErrorCode(CommonConstants.ERROR_CODE_COMPANY_PROFILE_SERVICE_FAILURE,
 					CommonConstants.SERVICE_CODE_COMPANY_PROFILE, "Error occured while fetching company profile"), e.getMessage());
 		}
+		
 		model.addAttribute("profile", companyProfile);
 		model.addAttribute("companyProfileName", profileName);
 		model.addAttribute("profileLevel", CommonConstants.PROFILE_LEVEL_COMPANY);
+		
 		LOG.info("Service to initiate company profile page executed successfully");
-		if(isBotRequest){
-			return JspResolver.PROFILE_PAGE_NOSCRIPT;			
-		}else{
+		if (isBotRequest) {
+			return JspResolver.PROFILE_PAGE_NOSCRIPT;
+		}
+		else {
 			return JspResolver.PROFILE_PAGE;
 		}
 	}
-	
 	
 	/**
 	 * Method to return region profile page
@@ -159,7 +166,8 @@ public class ProfileViewController implements InitializingBean{
 	 * @return
 	 */
 	@RequestMapping(value = "/region/{companyProfileName}/{regionProfileName}")
-	public String initRegionProfilePage(@PathVariable String companyProfileName, @PathVariable String regionProfileName, Model model, HttpServletRequest request) {
+	public String initRegionProfilePage(@PathVariable String companyProfileName, @PathVariable String regionProfileName, Model model,
+			HttpServletRequest request) {
 		LOG.info("Service to initiate region profile page called");
 		String message = null;
 		boolean isBotRequest = checkBotRequest(request);
@@ -175,7 +183,7 @@ public class ProfileViewController implements InitializingBean{
 			model.addAttribute("message", message);
 			return JspResolver.MESSAGE_HEADER;
 		}
-		
+
 		// making case insensitive
 		companyProfileName = companyProfileName.toLowerCase();
 		regionProfileName = regionProfileName.toLowerCase();
@@ -183,41 +191,57 @@ public class ProfileViewController implements InitializingBean{
 		OrganizationUnitSettings regionProfile = null;
 		try {
 			regionProfile = profileManagementService.getRegionByProfileName(companyProfileName, regionProfileName);
+			
+			// aggregated social profile urls
+			SocialMediaTokens regionTokens = profileManagementService.aggregateSocialProfiles(regionProfile, CommonConstants.REGION_ID);
+			regionProfile.setSocialMediaTokens(regionTokens);
+
+			// aggregated disclaimer
+			String disclaimer = profileManagementService.aggregateDisclaimer(regionProfile, CommonConstants.REGION_ID);
+			regionProfile.setDisclaimer(disclaimer);
+			
 			String json = new Gson().toJson(regionProfile);
-			model.addAttribute("profileJson",json);
+			model.addAttribute("profileJson", json);
+			
 			Long regionId = regionProfile.getIden();
 			double averageRating = profileManagementService.getAverageRatings(regionId, CommonConstants.PROFILE_LEVEL_REGION, false);
-			model.addAttribute("averageRating",averageRating);
-			long reviewsCount = profileManagementService.getReviewsCount(regionId, CommonConstants.MIN_RATING_SCORE, CommonConstants.MAX_RATING_SCORE, CommonConstants.PROFILE_LEVEL_REGION, false);
-			model.addAttribute("reviewsCount",reviewsCount);
-			if(isBotRequest){
-				//TODO:remove hardcoding of start,end,minScore etc
+			model.addAttribute("averageRating", averageRating);
+			
+			long reviewsCount = profileManagementService.getReviewsCount(regionId, CommonConstants.MIN_RATING_SCORE,
+					CommonConstants.MAX_RATING_SCORE, CommonConstants.PROFILE_LEVEL_REGION, false);
+			model.addAttribute("reviewsCount", reviewsCount);
+			
+			if (isBotRequest) {
+				// TODO:remove hardcoding of start,end,minScore etc
 				List<SurveyDetails> reviews = profileManagementService.getReviews(regionId, -1, -1, -1, CommonConstants.USER_AGENT_NUMBER_REVIEWS,
-					CommonConstants.PROFILE_LEVEL_REGION, false, null, null, CommonConstants.REVIEWS_SORT_CRITERIA_FEATURE);
+						CommonConstants.PROFILE_LEVEL_REGION, false, null, null, CommonConstants.REVIEWS_SORT_CRITERIA_FEATURE);
 				model.addAttribute("reviews", reviews);
-				
+
 				UserProfile selectedProfile = new UserProfile();
 				ProfilesMaster profilesMaster = new ProfilesMaster();
 				profilesMaster.setProfileId(CommonConstants.PROFILES_MASTER_REGION_ADMIN_PROFILE_ID);
-				
+
 				selectedProfile.setProfilesMaster(profilesMaster);
 				selectedProfile.setRegionId(regionProfile.getIden());
 				List<SocialPost> posts = profileManagementService.getSocialPosts(selectedProfile, -1, CommonConstants.USER_AGENT_NUMBER_POST);
 				model.addAttribute("posts", posts);
 			}
 		}
-		catch (InvalidInputException e) {
+		catch (InvalidInputException | NoRecordsFetchedException e) {
 			throw new InternalServerException(new ProfileServiceErrorCode(CommonConstants.ERROR_CODE_REGION_PROFILE_SERVICE_FAILURE,
 					CommonConstants.SERVICE_CODE_REGION_PROFILE, "Error occured while fetching region profile"), e.getMessage());
 		}
+		
 		model.addAttribute("profile", regionProfile);
 		model.addAttribute("companyProfileName", companyProfileName);
 		model.addAttribute("regionProfileName", regionProfileName);
 		model.addAttribute("profileLevel", CommonConstants.PROFILE_LEVEL_REGION);
+		
 		LOG.info("Service to initiate region profile page executed successfully");
-		if(isBotRequest){
-			return JspResolver.PROFILE_PAGE_NOSCRIPT;			
-		}else{
+		if (isBotRequest) {
+			return JspResolver.PROFILE_PAGE_NOSCRIPT;
+		}
+		else {
 			return JspResolver.PROFILE_PAGE;
 		}
 	}
@@ -231,7 +255,8 @@ public class ProfileViewController implements InitializingBean{
 	 * @return
 	 */
 	@RequestMapping(value = "/office/{companyProfileName}/{branchProfileName}")
-	public String initBranchProfilePage(@PathVariable String companyProfileName, @PathVariable String branchProfileName, Model model, HttpServletRequest request) {
+	public String initBranchProfilePage(@PathVariable String companyProfileName, @PathVariable String branchProfileName, Model model,
+			HttpServletRequest request) {
 		LOG.info("Service to initiate branch profile page called");
 		String message = null;
 		boolean isBotRequest = checkBotRequest(request);
@@ -247,49 +272,65 @@ public class ProfileViewController implements InitializingBean{
 			model.addAttribute("message", message);
 			return JspResolver.MESSAGE_HEADER;
 		}
-		
+
 		// making case insensitive
 		companyProfileName = companyProfileName.toLowerCase();
 		branchProfileName = branchProfileName.toLowerCase();
-		
+
 		OrganizationUnitSettings branchProfile = null;
 		try {
 			branchProfile = profileManagementService.getBranchByProfileName(companyProfileName, branchProfileName);
+			
+			// aggregated social profile urls
+			SocialMediaTokens branchTokens = profileManagementService.aggregateSocialProfiles(branchProfile, CommonConstants.BRANCH_ID);
+			branchProfile.setSocialMediaTokens(branchTokens);
+			
+			// aggregated disclaimer
+			String disclaimer = profileManagementService.aggregateDisclaimer(branchProfile, CommonConstants.BRANCH_ID);
+			branchProfile.setDisclaimer(disclaimer);
+			
 			String json = new Gson().toJson(branchProfile);
-			model.addAttribute("profileJson",json);
+			model.addAttribute("profileJson", json);
+
 			Long branchId = branchProfile.getIden();
 			double averageRating = profileManagementService.getAverageRatings(branchId, CommonConstants.PROFILE_LEVEL_BRANCH, false);
-			model.addAttribute("averageRating",averageRating);
-			long reviewsCount = profileManagementService.getReviewsCount(branchId, CommonConstants.MIN_RATING_SCORE, CommonConstants.MAX_RATING_SCORE, CommonConstants.PROFILE_LEVEL_BRANCH, false);
-			model.addAttribute("reviewsCount",reviewsCount);
-			if(isBotRequest){
-				//TODO:remove hardcoding of start,end,minScore etc
+			model.addAttribute("averageRating", averageRating);
+
+			long reviewsCount = profileManagementService.getReviewsCount(branchId, CommonConstants.MIN_RATING_SCORE,
+					CommonConstants.MAX_RATING_SCORE, CommonConstants.PROFILE_LEVEL_BRANCH, false);
+			model.addAttribute("reviewsCount", reviewsCount);
+
+			if (isBotRequest) {
+				// TODO:remove hardcoding of start,end,minScore etc
 				List<SurveyDetails> reviews = profileManagementService.getReviews(branchId, -1, -1, -1, CommonConstants.USER_AGENT_NUMBER_REVIEWS,
-					CommonConstants.PROFILE_LEVEL_BRANCH, false, null, null, CommonConstants.REVIEWS_SORT_CRITERIA_FEATURE);
+						CommonConstants.PROFILE_LEVEL_BRANCH, false, null, null, CommonConstants.REVIEWS_SORT_CRITERIA_FEATURE);
 				model.addAttribute("reviews", reviews);
-				
+
 				UserProfile selectedProfile = new UserProfile();
 				ProfilesMaster profilesMaster = new ProfilesMaster();
 				profilesMaster.setProfileId(CommonConstants.PROFILES_MASTER_BRANCH_ADMIN_PROFILE_ID);
-				
+
 				selectedProfile.setProfilesMaster(profilesMaster);
 				selectedProfile.setBranchId(branchProfile.getIden());
 				List<SocialPost> posts = profileManagementService.getSocialPosts(selectedProfile, -1, CommonConstants.USER_AGENT_NUMBER_POST);
 				model.addAttribute("posts", posts);
 			}
 		}
-		catch (InvalidInputException e) {
+		catch (InvalidInputException | NoRecordsFetchedException e) {
 			throw new InternalServerException(new ProfileServiceErrorCode(CommonConstants.ERROR_CODE_BRANCH_PROFILE_SERVICE_FAILURE,
 					CommonConstants.SERVICE_CODE_BRANCH_PROFILE, "Error occured while fetching branch profile"), e.getMessage());
 		}
-		model.addAttribute("profile",branchProfile);
+
+		model.addAttribute("profile", branchProfile);
 		model.addAttribute("companyProfileName", companyProfileName);
 		model.addAttribute("branchProfileName", branchProfileName);
 		model.addAttribute("profileLevel", CommonConstants.PROFILE_LEVEL_BRANCH);
+
 		LOG.info("Service to initiate branch profile page executed successfully");
-		if(isBotRequest){
-			return JspResolver.PROFILE_PAGE_NOSCRIPT;			
-		}else{
+		if (isBotRequest) {
+			return JspResolver.PROFILE_PAGE_NOSCRIPT;
+		}
+		else {
 			return JspResolver.PROFILE_PAGE;
 		}
 	}
@@ -302,7 +343,7 @@ public class ProfileViewController implements InitializingBean{
 	 * @return
 	 */
 	@RequestMapping(value = "/{agentProfileName}")
-	public String initBranchProfilePage(@PathVariable String agentProfileName, Model model, HttpServletResponse response, HttpServletRequest request) {
+	public String initAgentProfilePage(@PathVariable String agentProfileName, Model model, HttpServletResponse response, HttpServletRequest request) {
 		LOG.info("Service to initiate agent profile page called");
 		String message = null;
 		boolean isBotRequest = checkBotRequest(request);
@@ -347,12 +388,17 @@ public class ProfileViewController implements InitializingBean{
 					return JspResolver.MESSAGE_HEADER;
 				}
 			}
+			
 			OrganizationUnitSettings individualProfile = null;
 			try {
 				individualProfile = profileManagementService.getIndividualByProfileName(agentProfileName);
 				
+				// aggregated social profile urls
+				SocialMediaTokens agentTokens = profileManagementService.aggregateSocialProfiles(individualProfile, CommonConstants.AGENT_ID);
+				individualProfile.setSocialMediaTokens(agentTokens);
+				
 				// aggregated disclaimer
-				String disclaimer = profileManagementService.aggregateDisclaimer(individualProfile);
+				String disclaimer = profileManagementService.aggregateDisclaimer(individualProfile, CommonConstants.AGENT_ID);
 				individualProfile.setDisclaimer(disclaimer);
 				
 				String json = new Gson().toJson(individualProfile);

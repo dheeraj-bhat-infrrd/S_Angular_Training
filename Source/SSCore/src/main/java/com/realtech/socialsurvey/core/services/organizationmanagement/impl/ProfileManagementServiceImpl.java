@@ -1654,7 +1654,8 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 	}
 	
 	@Override
-	public String aggregateDisclaimer(OrganizationUnitSettings unitSettings) throws InvalidInputException {
+	@Transactional
+	public String aggregateDisclaimer(OrganizationUnitSettings unitSettings, String entity) throws InvalidInputException {
 		LOG.info("Method aggregateDisclaimer() called from ProfileManagementService");
 		String disclaimer = "";
 
@@ -1662,45 +1663,72 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 			return unitSettings.getDisclaimer();
 		}
 
-		User user = userManagementService.getUserByUserId(unitSettings.getIden());
 		OrganizationUnitSettings entitySetting = null;
-		for (UserProfile userProfile : user.getUserProfiles()) {
-			if (userProfile.getProfilesMaster().getProfileId() == CommonConstants.PROFILES_MASTER_BRANCH_ADMIN_PROFILE_ID) {
-				if (userProfile.getBranchId() > 0l) {
-					entitySetting = organizationUnitSettingsDao.fetchOrganizationUnitSettingsById(userProfile.getBranchId(),
-							MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION);
+		if (entity.equals(CommonConstants.AGENT_ID)) {
+			User user = userManagementService.getUserByUserId(unitSettings.getIden());
+
+			for (UserProfile userProfile : user.getUserProfiles()) {
+				if (userProfile.getProfilesMaster().getProfileId() == CommonConstants.PROFILES_MASTER_BRANCH_ADMIN_PROFILE_ID) {
+					if (userProfile.getBranchId() > 0l) {
+						entitySetting = organizationUnitSettingsDao.fetchOrganizationUnitSettingsById(userProfile.getBranchId(),
+								MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION);
+					}
+					else {
+						LOG.warn("Not a valid branch id for branch profile: " + userProfile + ". Skipping the record");
+					}
 				}
-				else {
-					LOG.warn("Not a valid branch id for branch profile: " + userProfile + ". Skipping the record");
+				if (userProfile.getProfilesMaster().getProfileId() == CommonConstants.PROFILES_MASTER_REGION_ADMIN_PROFILE_ID) {
+					if (userProfile.getRegionId() > 0l) {
+						entitySetting = organizationUnitSettingsDao.fetchOrganizationUnitSettingsById(userProfile.getRegionId(),
+								MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION);
+					}
+					else {
+						LOG.warn("Not a valid region id for region profile: " + userProfile + ". Skipping the record");
+					}
 				}
-			}
-			if (userProfile.getProfilesMaster().getProfileId() == CommonConstants.PROFILES_MASTER_REGION_ADMIN_PROFILE_ID) {
-				if (userProfile.getRegionId() > 0l) {
-					entitySetting = organizationUnitSettingsDao.fetchOrganizationUnitSettingsById(userProfile.getRegionId(),
-							MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION);
+				if (userProfile.getProfilesMaster().getProfileId() == CommonConstants.PROFILES_MASTER_COMPANY_ADMIN_PROFILE_ID) {
+					if (userProfile.getRegionId() > 0l) {
+						entitySetting = organizationManagementService.getCompanySettings(user);
+					}
+					else {
+						LOG.warn("Not a valid company");
+					}
 				}
-				else {
-					LOG.warn("Not a valid region id for region profile: " + userProfile + ". Skipping the record");
+
+				if (entitySetting != null && entitySetting.getDisclaimer() != null && !entitySetting.getDisclaimer().isEmpty()) {
+					return entitySetting.getDisclaimer();
 				}
-			}
-			if (userProfile.getProfilesMaster().getProfileId() == CommonConstants.PROFILES_MASTER_COMPANY_ADMIN_PROFILE_ID) {
-				if (userProfile.getRegionId() > 0l) {
-					entitySetting = organizationManagementService.getCompanySettings(user);
-				}
-				else {
-					LOG.warn("Not a valid company");
-				}
+				entitySetting = null;
 			}
 
+			if (disclaimer.isEmpty()) {
+				entitySetting = organizationManagementService.getCompanySettings(user);
+				disclaimer = entitySetting.getDisclaimer();
+			}
+		}
+		else if (entity.equals(CommonConstants.BRANCH_ID)) {
+			Branch branch = branchDao.findById(Branch.class, unitSettings.getIden());
+			
+			// check for region
+			entitySetting = organizationManagementService.getRegionSettings(branch.getRegion().getRegionId());
 			if (entitySetting != null && entitySetting.getDisclaimer() != null && !entitySetting.getDisclaimer().isEmpty()) {
 				return entitySetting.getDisclaimer();
 			}
-			entitySetting = null;
+			
+			// check for company
+			entitySetting = organizationManagementService.getCompanySettings(branch.getCompany().getCompanyId());
+			if (entitySetting != null && entitySetting.getDisclaimer() != null && !entitySetting.getDisclaimer().isEmpty()) {
+				return entitySetting.getDisclaimer();
+			}
 		}
-		
-		if (disclaimer.isEmpty()) {
-			entitySetting = organizationManagementService.getCompanySettings(user);
-			disclaimer = entitySetting.getDisclaimer();
+		else if (entity.equals(CommonConstants.REGION_ID)) {
+			Region region = regionDao.findById(Region.class, unitSettings.getIden());
+			
+			// check for company
+			entitySetting = organizationManagementService.getCompanySettings(region.getCompany().getCompanyId());
+			if (entitySetting != null && entitySetting.getDisclaimer() != null && !entitySetting.getDisclaimer().isEmpty()) {
+				return entitySetting.getDisclaimer();
+			}
 		}
 
 		LOG.info("Method aggregateDisclaimer() called from ProfileManagementService");
