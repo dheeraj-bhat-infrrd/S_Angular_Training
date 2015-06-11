@@ -53,7 +53,7 @@ public interface ProfileManagementService {
 	public OrganizationUnitSettings aggregateUserProfile(User user, AccountType accountType, UserSettings settings, long branchId, long regionId,
 			int profilesMaster) throws InvalidInputException;
 
-	public String aggregateDisclaimer(OrganizationUnitSettings unitSettings) throws InvalidInputException;
+	public String aggregateDisclaimer(OrganizationUnitSettings unitSettings, String entity) throws InvalidInputException;
 
 	// JIRA SS-97 by RM-06 : BOC
 	/**
