@@ -548,4 +548,7 @@ public interface CommonConstants {
 	//Constants for user agent profile page
 	public static final int USER_AGENT_NUMBER_REVIEWS = 100;
 	public static final int USER_AGENT_NUMBER_POST = 100;
+	
+	//Default vertcial crm mapping id
+	public static final long DEFAULT_VERTICAL_CRM_ID = -1;
 }
