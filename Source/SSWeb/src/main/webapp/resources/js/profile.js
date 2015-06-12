@@ -93,7 +93,7 @@ function paintProfilePage(result) {
                 		addressHtml += companyProfileData.city + ', ';
                 	}
                 	if(companyProfileData.state){
-                		addressHtml += companyProfileData.state + ', ';
+                		addressHtml += companyProfileData.state + ' ';
                 	}
                 	addressHtml += companyProfileData.zipcode + '</div>';
                 }
@@ -111,7 +111,7 @@ function paintProfilePage(result) {
                 		addressHtml += contactDetails.city + ', ';	
                 	}
                 	if(contactDetails.state && contactDetails.state != ""){
-                		addressHtml += contactDetails.state + ', ';	
+                		addressHtml += contactDetails.state + ' ';	
                 	}
                 	if(contactDetails.zipcode && contactDetails.zipcode != ""){
                 		addressHtml += contactDetails.zipcode;	
@@ -920,7 +920,7 @@ function paintIndividualDetails(result) {
 		if (licenses.authorized_in != undefined && licenses.authorized_in.length > 0) {
 			individualDetailsHtml = individualDetailsHtml + '<div class="prof-left-row prof-left-auth bord-bot-dc">';
 			individualDetailsHtml = individualDetailsHtml + '	<div class="left-auth-wrapper">';
-			individualDetailsHtml = individualDetailsHtml + '		<div class="left-panel-header lph-dd lph-dd-closed cursor-pointer">Licenses</div>';
+			individualDetailsHtml = individualDetailsHtml + '		<div class="left-panel-header lph-dd lph-dd-closed cursor-pointer lph-arrow-closed">Licenses</div>';
 			individualDetailsHtml = individualDetailsHtml + '		<div class="left-panel-content lph-dd-content">';
 			$.each(licenses.authorized_in, function(i, authorizedIn) {
 				individualDetailsHtml = individualDetailsHtml + '<div class="lp-auth-row lp-row clearfix">' + authorizedIn + '</div>';
@@ -981,7 +981,7 @@ function paintIndividualDetails(result) {
 	if (result.expertise != undefined && result.expertise.length > 0) {
 		individualDetailsHtml = individualDetailsHtml + '<div class="prof-left-row prof-left-ach bord-bot-dc">';
 		individualDetailsHtml = individualDetailsHtml + '	<div class="left-ach-wrapper">';
-		individualDetailsHtml = individualDetailsHtml + '		<div class="left-panel-header lph-dd lph-dd-closed cursor-pointer">Specialities</div>';
+		individualDetailsHtml = individualDetailsHtml + '		<div class="left-panel-header lph-dd lph-dd-closed cursor-pointer lph-arrow-closed">Specialities</div>';
 		individualDetailsHtml = individualDetailsHtml + '		<div class="left-panel-content lph-dd-content">';
 		for (var i = 0; i < result.expertise.length; i++) {
 			individualDetailsHtml = individualDetailsHtml + '<div class="lp-ach-row lp-row clearfix">' + result.expertise[i] + '</div>';
@@ -995,7 +995,7 @@ function paintIndividualDetails(result) {
 	if (result.achievements != undefined && result.achievements.length > 0) {
 		individualDetailsHtml = individualDetailsHtml + '<div class="prof-left-row prof-left-ach bord-bot-dc">';
 		individualDetailsHtml = individualDetailsHtml + '	<div class="left-ach-wrapper">';
-		individualDetailsHtml = individualDetailsHtml + '		<div class="left-panel-header lph-dd lph-dd-closed cursor-pointer">Achievements</div>';
+		individualDetailsHtml = individualDetailsHtml + '		<div class="left-panel-header lph-dd lph-dd-closed cursor-pointer lph-arrow-closed">Achievements</div>';
 		individualDetailsHtml = individualDetailsHtml + '		<div class="left-panel-content lph-dd-content">';
 		$.each(result.achievements, function(i, achievements) {
 			individualDetailsHtml = individualDetailsHtml + '<div class="lp-ach-row lp-row clearfix">' + achievements.achievement + '</div>';
@@ -1009,7 +1009,7 @@ function paintIndividualDetails(result) {
 	if (result.hobbies != undefined && result.hobbies.length > 0) {
 		individualDetailsHtml = individualDetailsHtml + '<div class="prof-left-row prof-left-ach bord-bot-dc">';
 		individualDetailsHtml = individualDetailsHtml + '	<div class="left-ach-wrapper">';
-		individualDetailsHtml = individualDetailsHtml + '		<div class="left-panel-header lph-dd lph-dd-closed cursor-pointer">Hobbies</div>';
+		individualDetailsHtml = individualDetailsHtml + '		<div class="left-panel-header lph-dd lph-dd-closed cursor-pointer lph-arrow-closed">Hobbies</div>';
 		individualDetailsHtml = individualDetailsHtml + '		<div class="left-panel-content lph-dd-content">';
 		for (var i = 0; i < result.hobbies.length; i++) {
 			individualDetailsHtml = individualDetailsHtml + '<div class="lp-ach-row lp-row clearfix">' + result.hobbies[i] + '</div>';
@@ -1023,7 +1023,7 @@ function paintIndividualDetails(result) {
 	if (result.disclaimer != undefined && result.disclaimer != "") {
 		individualDetailsHtml = individualDetailsHtml + '<div class="prof-left-row prof-left-ach bord-bot-dc">';
 		individualDetailsHtml = individualDetailsHtml + '	<div class="left-ach-wrapper">';
-		individualDetailsHtml = individualDetailsHtml + '		<div class="left-panel-header lph-dd lph-dd-closed cursor-pointer">Disclaimer</div>';
+		individualDetailsHtml = individualDetailsHtml + '		<div class="left-panel-header lph-dd lph-dd-closed cursor-pointer lph-arrow-closed">Disclaimer</div>';
 		individualDetailsHtml = individualDetailsHtml + '		<div class="left-panel-content lph-dd-content">';
 		individualDetailsHtml = individualDetailsHtml + '<div class="lp-ach-row lp-row clearfix">' + result.disclaimer + '</div>';
 		individualDetailsHtml = individualDetailsHtml + '		</div>';
@@ -1035,8 +1035,11 @@ function paintIndividualDetails(result) {
 	$('.lph-dd').click(function() {
 		if($(this).next('.lph-dd-content').is(':visible')){
 			$(this).next('.lph-dd-content').slideToggle(200);
+			$(this).addClass('lph-arrow-closed').removeClass('lph-arrow-open');
 		}else{
 			$('.lph-dd-content').hide();
+			$('.lph-dd').addClass('lph-arrow-closed').removeClass('lph-arrow-open');
+			$(this).removeClass('lph-arrow-closed').addClass('lph-arrow-open');
 			$(this).next('.lph-dd-content').slideToggle(200);
 		}
 	});

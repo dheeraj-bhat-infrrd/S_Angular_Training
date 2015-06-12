@@ -6586,3 +6586,13 @@ input.report-abuse-input {
     border: 1px solid #dcdcdc;
     border-radius: 3px;
 }
+
+.lph-arrow-closed {
+	padding-left: 15px;
+	background: url(../images/lph-arrow-closed.png) no-repeat left center;
+}
+
+.lph-arrow-open {
+	padding-left: 15px;
+	background: url(../images/lph-arrow-open.png) no-repeat left center;
+}
