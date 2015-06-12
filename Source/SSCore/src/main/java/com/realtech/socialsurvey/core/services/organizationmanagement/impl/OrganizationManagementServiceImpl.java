@@ -2317,6 +2317,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 		branch.setCity(branchCity);
 		branch.setZipcode(branchZipcode);
 		branch.setCountryCode(branchCountryCode);
+		branch.setBranchName(branchName);
 
 		LOG.debug("Adding new branch into mongo");
 		insertBranchSettings(branch);
@@ -2806,6 +2807,21 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 		Map<Long, BranchFromSearch> branches = new HashMap<Long, BranchFromSearch>();
 		for (BranchFromSearch branch : branchList) {
 			branches.put(branch.getBranchId(), branch);
+		}
+		
+		// Fetch all the branches' settings from Mongo
+		List<OrganizationUnitSettings> branchSettings = organizationUnitSettingsDao.fetchOrganizationUnitSettingsForMultipleIds(branches.keySet(), MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION);
+		for(OrganizationUnitSettings setting : branchSettings){
+			if(branches.containsKey(setting.getIden())){
+				BranchFromSearch branchFromSearch = branches.get(setting.getIden());
+				if(setting.getContact_details() != null){
+					branchFromSearch.setCity(setting.getContact_details().getCity());
+					branchFromSearch.setState(setting.getContact_details().getState());
+					branchFromSearch.setZipcode(setting.getContact_details().getZipcode());
+					branchFromSearch.setCountry(setting.getContact_details().getCountry());
+					branchFromSearch.setCountryCode(setting.getContact_details().getCountryCode());
+				}
+			}
 		}
 		return branches;
 	}
