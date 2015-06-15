@@ -503,9 +503,6 @@ function paintReviews(result){
 		reviewsHtml=  reviewsHtml+'    <div class="float-right ppl-header-right">';
 		reviewsHtml=  reviewsHtml+'        <div class="st-rating-wrapper maring-0 clearfix review-ratings" data-rating="'+reviewItem.score+'">';
 		reviewsHtml=  reviewsHtml+'       </div>';
-		reviewsHtml=  reviewsHtml+'<div class="report-resend-icn-container clearfix float-right">';
-		reviewsHtml=  reviewsHtml+'<div class="report-abuse-txt report-txt prof-report-abuse-txt">Report</div>';
-		reviewsHtml=  reviewsHtml+'   </div>';
 		reviewsHtml=  reviewsHtml+'   </div>';
 		reviewsHtml=  reviewsHtml+'	</div>';
 		if(reviewItem.review.length > 250){
@@ -523,6 +520,9 @@ function paintReviews(result){
 		reviewsHtml=  reviewsHtml+'			<a href="https://plus.google.com/share?url=' + reviewItem.completeProfileUrl + '" target="_blank"<span class="float-left ppl-share-icns icn-gplus"></span></a>';
 		reviewsHtml=  reviewsHtml+'       	<a href="https://yelp.com/biz" target="_blank"><span class="float-left ppl-share-icns icn-yelp"></span></a>';
 		reviewsHtml=  reviewsHtml+'    	</div>';
+		reviewsHtml=  reviewsHtml+'			<div class="float-right" style="margin: 0 -5px;">';
+		reviewsHtml=  reviewsHtml+'			<div class="report-abuse-txt report-txt prof-report-abuse-txt">Report Abuse</div>';
+		reviewsHtml=  reviewsHtml+'   		</div>';
 		reviewsHtml=  reviewsHtml+'   <div class="float-left icn-share icn-remove icn-rem-size hide"></div>';
 		reviewsHtml=  reviewsHtml+'	</div>';
 		reviewsHtml=  reviewsHtml+'</div>';
