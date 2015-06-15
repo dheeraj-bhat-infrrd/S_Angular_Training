@@ -573,6 +573,18 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 		LOG.info("Image updated successfully");
 	}
 
+	// vertical
+	@Override
+	public void updateVertical(String collection, OrganizationUnitSettings companySettings, String vertical) throws InvalidInputException {
+		if (vertical == null || vertical.isEmpty()) {
+			throw new InvalidInputException("vertical passed can not be null or empty");
+		}
+		LOG.info("Updating vertical");
+		organizationUnitSettingsDao.updateParticularKeyOrganizationUnitSettings(MongoOrganizationUnitSettingDaoImpl.KEY_VERTICAL, vertical,
+				companySettings, collection);
+		LOG.info("vertical updated successfully");
+	}
+	
 	// Associations
 	@Override
 	public List<Association> addAssociations(String collection, OrganizationUnitSettings unitSettings, List<Association> associations)

@@ -504,6 +504,7 @@ public class ProfileManagementController {
 			// Get the profile address parameters
 			String name = request.getParameter("profName");
 			String title = request.getParameter("profTitle");
+			String vertical = request.getParameter("profVertical");
 			if (name == null || name.isEmpty()) {
 				throw new InvalidInputException("Name passed can not be null or empty", DisplayMessageConstants.GENERAL_ERROR);
 			}
@@ -519,6 +520,10 @@ public class ProfileManagementController {
 				contactDetailsSettings = profileManagementService.updateContactDetails(
 						MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION, companySettings, contactDetailsSettings);
 				companySettings.setContact_details(contactDetailsSettings);
+				
+				companySettings.setVertical(vertical);
+				profileManagementService.updateVertical(MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION, companySettings, vertical);
+				
 				userSettings.setCompanySettings(companySettings);
 			}
 			else if (profilesMaster == CommonConstants.PROFILES_MASTER_REGION_ADMIN_PROFILE_ID) {
@@ -532,6 +537,10 @@ public class ProfileManagementController {
 				contactDetailsSettings = profileManagementService.updateContactDetails(
 						MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION, regionSettings, contactDetailsSettings);
 				regionSettings.setContact_details(contactDetailsSettings);
+				
+				regionSettings.setVertical(vertical);
+				profileManagementService.updateVertical(MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION, regionSettings, vertical);
+				
 				userSettings.getRegionSettings().put(regionId, regionSettings);
 			}
 			else if (profilesMaster == CommonConstants.PROFILES_MASTER_BRANCH_ADMIN_PROFILE_ID) {
@@ -545,6 +554,10 @@ public class ProfileManagementController {
 				contactDetailsSettings = profileManagementService.updateContactDetails(
 						MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION, branchSettings, contactDetailsSettings);
 				branchSettings.setContact_details(contactDetailsSettings);
+				
+				branchSettings.setVertical(vertical);
+				profileManagementService.updateVertical(MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION, branchSettings, vertical);
+				
 				userSettings.getBranchSettings().put(branchId, branchSettings);
 			}
 			else if (profilesMaster == CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID) {
@@ -557,6 +570,10 @@ public class ProfileManagementController {
 				contactDetailsSettings = profileManagementService.updateAgentContactDetails(
 						MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION, agentSettings, contactDetailsSettings);
 				agentSettings.setContact_details(contactDetailsSettings);
+				
+				agentSettings.setVertical(vertical);
+				profileManagementService.updateVertical(MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION, agentSettings, vertical);
+				
 				userSettings.setAgentSettings(agentSettings);
 
 				// Modify Agent details in Solr
