@@ -5285,8 +5285,11 @@ $(document).ajaxStop(function() {
 // Toggle text editor
 $(document).on('focus', '.prof-edditable', function() {
 	var lockId = $(this).attr("id") + "-lock";
+	if($('#'+lockId).length == 0){
+		$(this).addClass('prof-name-edit');
+	}
 	if ($('#' + lockId).attr('data-control') == 'user'
-			|| ($('#' + lockId).attr('data-state') == 'unlocked' && !$(this).is('[readonly]'))) {
+			|| ($('#' + lockId).attr('data-state') == 'unlocked' && !$(this).is('[readonly]')) ) {
 		$(this).addClass('prof-name-edit');
 		$('#prof-all-lock').val('modified');
 	}
@@ -5698,10 +5701,16 @@ $(document).on(
 		'blur',
 		'#prof-basic-container input',
 		function() {
-			if ($('#prof-all-lock').val() != 'modified' || !$(this).val()) {
-				return;
+			var lockId = $(this).attr("id") + "-lock";
+			if($('#'+lockId).length > 0){
+				if ($('#prof-all-lock').val() != 'modified' || !$(this).val()) {
+					return;
+				}
+			}else{
+				if(!$(this).val()){
+					return;
+				}
 			}
-
 			delay(function() {
 				var profName = $('#prof-name').val().trim();
 				var profTitle = $('#prof-title').val().trim();
