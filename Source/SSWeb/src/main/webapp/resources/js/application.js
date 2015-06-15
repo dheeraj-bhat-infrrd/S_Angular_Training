@@ -5694,25 +5694,24 @@ function callBackShowBasicDetails(response) {
 	fetchReviewCount(attrName, attrVal, minScore);
 }
 
-$(document).on(
-		'blur',
-		'#prof-basic-container input',
-		function() {
-			if ($('#prof-all-lock').val() != 'modified' || !$(this).val()) {
-				return;
-			}
+$(document).on('blur', '#prof-basic-container input', function() {
+	if ($('#prof-all-lock').val() != 'modified' || !$(this).val()) {
+		return;
+	}
 
-			delay(function() {
-				var profName = $('#prof-name').val().trim();
-				var profTitle = $('#prof-title').val().trim();
-				var payload = {
-					"profName" : profName,
-					"profTitle" : profTitle
-				};
-				callAjaxPostWithPayloadData("./updatebasicprofile.do",
-						callBackUpdateBasicDetails, payload);
-			}, 0);
-		});
+	delay(function() {
+		var profName = $('#prof-name').val().trim();
+		var profTitle = $('#prof-title').val().trim();
+		var profVertical = $('#prof-vertical').val().trim();
+		var payload = {
+			"profName" : profName,
+			"profTitle" : profTitle,
+			"profVertical" : profVertical
+		};
+		callAjaxPostWithPayloadData("./updatebasicprofile.do",
+				callBackUpdateBasicDetails, payload);
+	}, 0);
+});
 
 function callBackUpdateBasicDetails(data) {
 	$('#prof-all-lock').val('locked');
