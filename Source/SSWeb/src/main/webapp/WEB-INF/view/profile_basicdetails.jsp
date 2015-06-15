@@ -8,27 +8,27 @@
 	<c:set value="${profileSettings.lockSettings}" var="lock"></c:set>
 </c:if>
 
-<div class="float-left lp-edit-wrapper clearfix float-left">
+<div id="prof-name-container" class="float-left lp-edit-wrapper clearfix">
 	<c:choose>
 		<c:when	test="${parentLock.isDisplayNameLocked && profilemasterid != 4}">
 			<input id="prof-name" class="prof-name prof-name-txt prof-edditable" value="${contactdetail.name}" readonly>
-			<div id="prof-name-lock" data-state="locked" data-control="parent" class="lp-edit-locks float-left lp-edit-locks-locked"></div>
+			<!-- <div id="prof-name-lock" data-state="locked" data-control="parent" class="lp-edit-locks float-left lp-edit-locks-locked"></div> -->
 		</c:when>
 		<c:when	test="${parentLock.isDisplayNameLocked && profilemasterid == 4}">
 			<input id="prof-name" class="prof-name prof-name-txt prof-edditable" value="${contactdetail.name}" readonly>
-			<div id="prof-name-lock" data-state="locked" data-control="parent" class="float-left lp-edit-locks-locked"></div>
+			<!-- <div id="prof-name-lock" data-state="locked" data-control="parent" class="float-left lp-edit-locks-locked"></div> -->
 		</c:when>
 		<c:when	test="${not parentLock.isDisplayNameLocked && profilemasterid == 4}">
 			<input id="prof-name" class="prof-name prof-name-txt prof-edditable" value="${contactdetail.name}">
-			<div id="prof-name-lock" data-state="unlocked" data-control="user" class="float-left"></div>
+			<!-- <div id="prof-name-lock" data-state="unlocked" data-control="user" class="float-left"></div> -->
 		</c:when>
 		<c:when	test="${not parentLock.isDisplayNameLocked && lock.isDisplayNameLocked && profilemasterid != 4}">
 			<input id="prof-name" class="prof-name prof-name-txt prof-edditable" value="${contactdetail.name}">
-			<div id="prof-name-lock" data-state="unlocked" data-control="user" class="lp-edit-locks float-left lp-edit-locks-locked"></div>
+			<!-- <div id="prof-name-lock" data-state="unlocked" data-control="user" class="lp-edit-locks float-left lp-edit-locks-locked"></div> -->
 		</c:when>
 		<c:when	test="${not parentLock.isDisplayNameLocked && not lock.isDisplayNameLocked && profilemasterid != 4}">
 			<input id="prof-name" class="prof-name prof-name-txt prof-edditable" value="${contactdetail.name}">
-			<div id="prof-name-lock" data-state="unlocked" data-control="user" class="lp-edit-locks float-left"></div>
+			<!-- <div id="prof-name-lock" data-state="unlocked" data-control="user" class="lp-edit-locks float-left"></div> -->
 		</c:when>
 	</c:choose>
 </div>
@@ -43,12 +43,8 @@
 	<div id="prof-vertical-lock" data-state="unlocked" data-control="user" class="hide float-left"></div>
 </div>
 <div id="prof-rating-review-count" class="prof-rating clearfix">
-	<div class="st-rating-wrapper maring-0 clearfix float-left" id="rating-avg-comp">
-		<div class="rating-star icn-no-star"></div>
-		<div class="rating-star icn-no-star"></div>
-		<div class="rating-star icn-no-star"></div>
-		<div class="rating-star icn-no-star"></div>
-		<div class="rating-star icn-no-star"></div>
-	</div>
-	<div class="float-left review-count-left" id="prof-company-review-count"></div>
+	<div class="st-rating-wrapper maring-0 clearfix float-left"
+		id="rating-avg-comp"></div>
+	<div class="float-left review-count-left cursor-pointer"
+		id="prof-company-review-count"></div>
 </div>
