@@ -162,7 +162,8 @@
 							<input id="prof-title" class="prof-addline2 prof-edditable" value="${contactdetail.title}" placeholder='<spring:message code="label.profiletitle.placeholder.key"/>'>
 							<div id="prof-title-lock" data-state="unlocked" data-control="user" class="hide float-left"></div>
 						</c:if>
-						<div class="prof-addline1 prof-edditable">${profileSettings.vertical}</div>
+						<input id="prof-vertical" class="prof-addline2 prof-edditable" value="${profileSettings.vertical}" placeholder='<spring:message code="label.profilevertical.placeholder.key"/>'>
+						<div id="prof-vertical-lock" data-state="unlocked" data-control="user" class="hide float-left"></div>
 					</div>
 					
 					<div id="prof-rating-review-count" class="prof-rating clearfix">
