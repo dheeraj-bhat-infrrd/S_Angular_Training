@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <beans xmlns="http://www.springframework.org/schema/beans"
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"  xmlns:task="http://www.springframework.org/schema/task" 
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"  xmlns:task="http://www.springframework.org/schema/task" xmlns:mongo="http://www.springframework.org/schema/data/mongo" 
 	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/context
-	http://www.springframework.org/schema/context/spring-context.xsd http://www.springframework.org/schema/task http://www.springframework.org/schema/task/spring-task.xsd">
+	http://www.springframework.org/schema/context/spring-context.xsd http://www.springframework.org/schema/task http://www.springframework.org/schema/task/spring-task.xsd http://www.springframework.org/schema/data/mongo
+                    http://www.springframework.org/schema/data/mongo/spring-mongo-1.0.xsd">
 
 	<context:property-placeholder location="classpath*:config.properties" />
 	
@@ -27,15 +28,25 @@
 	<!-- Define the MongoTemplate which handles connectivity with MongoDB -->
 
 	<bean id="mongoTemplate" class="org.springframework.data.mongodb.core.MongoTemplate">
-		<constructor-arg name="mongo" ref="mongo" />
-		<constructor-arg name="databaseName" value="ss_db" />
+	     <constructor-arg name="mongoDbFactory" ref="mongoDbFactory" />
+		<!-- <constructor-arg ref="mongo" />
+		<constructor-arg name="databaseName" value="ss_db" />  -->
 		<property name="writeResultChecking" value="LOG"/>
 	</bean> <!-- Factory bean that creates the Mongo instance -->
 
-	<bean id="mongo" class="org.springframework.data.mongodb.core.MongoFactoryBean">
+	<bean id="mongoClient" class="com.mongodb.MongoClient">
+	    <constructor-arg ref="mongoClientURI"/>
+	</bean>
+	
+	<bean id="mongoClientURI" class="com.mongodb.MongoClientURI">
+	    <constructor-arg name="uri" value="${MONGO_CLIENT_URI}"/>
+	</bean>
+
+	<mongo:db-factory id="mongoDbFactory" dbname="ss_db" mongo-ref="mongoClient"/>
+	<!-- <bean id="mongo" class="org.springframework.data.mongodb.core.MongoFactoryBean">
 		<property name="host" value="${MONGO_HOST}" />
 		<property name="port" value="${MONGO_PORT}" />
-	</bean>
+	</bean>  -->
 
 	<!-- Use this post processor to translate any MongoExceptions thrown in 
 		@Repository annotated classes -->
