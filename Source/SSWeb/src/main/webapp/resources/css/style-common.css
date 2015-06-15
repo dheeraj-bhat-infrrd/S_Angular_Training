@@ -1975,7 +1975,7 @@ button.paypal.is-active {
 }
 
 .prof-edditable {
-	border: 0;
+	border: 1px solid transparent;
 	width: 100%;
 	text-overflow: ellipsis;
 	overflow: hidden;
@@ -6585,4 +6585,19 @@ input.report-abuse-input {
     line-height: 20px;
     border: 1px solid #dcdcdc;
     border-radius: 3px;
+}
+
+.lph-arrow-closed {
+	padding-left: 15px;
+	background: url(../images/lph-arrow-closed.png) no-repeat 5px center;
+}
+
+.lph-arrow-open {
+	padding-left: 15px;
+	background: url(../images/lph-arrow-open.png) no-repeat 5px center;
+}
+
+.prof-logo-edit{
+	background: url(../images/upload_logo.png) no-repeat center;
+	background-size: contain;
 }
