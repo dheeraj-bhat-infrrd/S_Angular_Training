@@ -5709,31 +5709,30 @@ function callBackShowBasicDetails(response) {
 	fetchReviewCount(attrName, attrVal, minScore);
 }
 
-$(document).on(
-		'blur',
-		'#prof-basic-container input',
-		function() {
-			var lockId = $(this).attr("id") + "-lock";
-			if($('#'+lockId).length > 0){
-				if ($('#prof-all-lock').val() != 'modified' || !$(this).val()) {
-					return;
-				}
-			}else{
-				if(!$(this).val()){
-					return;
-				}
-			}
-			delay(function() {
-				var profName = $('#prof-name').val().trim();
-				var profTitle = $('#prof-title').val().trim();
-				var payload = {
-					"profName" : profName,
-					"profTitle" : profTitle
-				};
-				callAjaxPostWithPayloadData("./updatebasicprofile.do",
-						callBackUpdateBasicDetails, payload);
-			}, 0);
-		});
+$(document).on('blur', '#prof-basic-container input', function() {
+	var lockId = $(this).attr("id") + "-lock";
+	if ($('#'+lockId).length > 0) {
+		if ($('#prof-all-lock').val() != 'modified' || !$(this).val()) {
+			return;
+		}
+	} else {
+		if (!$(this).val()) {
+			return;
+		}
+	}
+	
+	delay(function() {
+		var profName = $('#prof-name').val().trim();
+		var profTitle = $('#prof-title').val().trim();
+		var profVertical = $('#prof-vertical').val().trim();
+		var payload = {
+			"profName" : profName,
+			"profTitle" : profTitle,
+			"profVertical" : profVertical
+		};
+		callAjaxPostWithPayloadData("./updatebasicprofile.do", callBackUpdateBasicDetails, payload);
+	}, 0);
+});
 
 function callBackUpdateBasicDetails(data) {
 	$('#prof-all-lock').val('locked');

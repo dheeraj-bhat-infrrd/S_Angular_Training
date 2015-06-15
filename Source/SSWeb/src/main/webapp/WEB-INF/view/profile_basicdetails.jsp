@@ -41,7 +41,12 @@
 			<div class="prof-edit-field-icn hide"></div>
 		</div>
 	</c:if>
-	<div class="prof-addline1">${profileSettings.vertical}</div>
+	<div class="prof-edditable-cont">
+		<input id="prof-vertical" class="prof-addline2 prof-edditable" value="${profileSettings.vertical}"
+			placeholder='<spring:message code="label.profilevertical.placeholder.key"/>'>
+		<div id="prof-vertical-lock" data-state="unlocked" data-control="user" class="hide float-left"></div>
+		<div class="prof-edit-field-icn hide"></div>
+	</div>
 </div>
 <div id="prof-rating-review-count" class="prof-rating clearfix">
 	<div class="st-rating-wrapper maring-0 clearfix float-left"
