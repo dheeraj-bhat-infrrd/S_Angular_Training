@@ -6,12 +6,12 @@
 </c:if>
 
 <c:if test="${not empty contactdetail.address1}">
-	<div class="prof-user-addline1 prof-edditable prof-addr-center">${contactdetail.address1}</div>
+	<div class="prof-user-addline1 prof-addr-center">${contactdetail.address1}</div>
 </c:if>
 <c:if test="${not empty contactdetail.address2}">
-	<div class="prof-user-addline2 prof-edditable prof-addr-center">${contactdetail.address2}</div>
+	<div class="prof-user-addline2 prof-addr-center">${contactdetail.address2}</div>
 </c:if>
-<div class="prof-user-addline3 prof-edditable prof-addr-center">
+<div class="prof-user-addline3 prof-addr-center">
 	<c:if test="${not empty  contactdetail.city}">${contactdetail.city}, </c:if>
 	<c:if test="${not empty  contactdetail.state}">${contactdetail.state} </c:if>
 	<c:if test="${not empty contactdetail.zipcode}">${contactdetail.zipcode}</c:if>

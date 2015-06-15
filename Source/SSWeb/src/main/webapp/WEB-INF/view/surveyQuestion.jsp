@@ -344,7 +344,6 @@
 <script src="https://www.google.com/jsapi?autoload={'modules':[{'name':'visualization','version':'1','packages':['corechart']}]}"></script>
 <script src="${initParam.resourcesPath}/resources/js/common.js"></script>
 <script src="${initParam.resourcesPath}/resources/js/script.js"></script>
-<script src="${initParam.resourcesPath}/resources/js/usermanagement.js"></script>
 <script src="https://js.braintreegateway.com/v2/braintree.js"></script>
 <script src="${initParam.resourcesPath}/resources/js/progressbar.min.js"></script>
 <script src="${initParam.resourcesPath}/resources/js/rangeslider.min.js"></script>
