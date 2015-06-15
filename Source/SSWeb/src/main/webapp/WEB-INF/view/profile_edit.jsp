@@ -133,42 +133,7 @@
 			</div>
 			<div class="col-lg-4 col-md-4 col-sm-4 col-xs-6 prof-wrapper pos-relative prof-name-wrapper edit-prof-name-wrapper">
 				<div id="prof-basic-container" class="prof-name-container">
-					<div id="prof-name-container" class="float-left lp-edit-wrapper clearfix float-left">
-						<c:choose>
-							<c:when	test="${parentLock.isDisplayNameLocked && profilemasterid != 4}">
-								<input id="prof-name" class="prof-name prof-name-txt prof-edditable" value="${contactdetail.name}" readonly>
-								<div id="prof-name-lock" data-state="locked" data-control="parent" class="lp-edit-locks float-left lp-edit-locks-locked"></div>
-							</c:when>
-							<c:when	test="${parentLock.isDisplayNameLocked && profilemasterid == 4}">
-								<input id="prof-name" class="prof-name prof-name-txt prof-edditable" value="${contactdetail.name}" readonly>
-								<div id="prof-name-lock" data-state="locked" data-control="parent" class="float-left lp-edit-locks-locked"></div>
-							</c:when>
-							<c:when	test="${not parentLock.isDisplayNameLocked && profilemasterid == 4}">
-								<input id="prof-name" class="prof-name prof-name-txt prof-edditable" value="${contactdetail.name}">
-								<div id="prof-name-lock" data-state="unlocked" data-control="user" class="float-left"></div>
-							</c:when>
-							<c:when	test="${not parentLock.isDisplayNameLocked && lock.isDisplayNameLocked && profilemasterid != 4}">
-								<input id="prof-name" class="prof-name prof-name-txt prof-edditable" value="${contactdetail.name}">
-								<div id="prof-name-lock" data-state="unlocked" data-control="user" class="lp-edit-locks float-left lp-edit-locks-locked"></div>
-							</c:when>
-							<c:when	test="${not parentLock.isDisplayNameLocked && not lock.isDisplayNameLocked && profilemasterid != 4}">
-								<input id="prof-name" class="prof-name prof-name-txt prof-edditable" value="${contactdetail.name}">
-								<div id="prof-name-lock" data-state="unlocked" data-control="user" class="lp-edit-locks float-left"></div>
-							</c:when>
-						</c:choose>
-					</div>
-					<div class="prof-address">
-						<c:if test="${profilemasterid != 1}">
-							<input id="prof-title" class="prof-addline2 prof-edditable" value="${contactdetail.title}" placeholder='<spring:message code="label.profiletitle.placeholder.key"/>'>
-							<div id="prof-title-lock" data-state="unlocked" data-control="user" class="hide float-left"></div>
-						</c:if>
-						<div class="prof-addline1 prof-edditable">${profileSettings.vertical}</div>
-					</div>
-					
-					<div id="prof-rating-review-count" class="prof-rating clearfix">
-						<div class="st-rating-wrapper maring-0 clearfix float-left" id="rating-avg-comp"></div>
-						<div class="float-left review-count-left cursor-pointer" id="prof-company-review-count"></div>
-					</div>
+					<jsp:include page="profile_basicdetails.jsp"></jsp:include>
 				</div>
 			</div>
 			<div class="col-lg-4 col-md-4 col-sm-4 prof-wrapper prof-map-wrapper float-right">
@@ -215,7 +180,7 @@
 							</c:choose>
 						</c:when>
 						<c:otherwise>
-							<div id="prof-logo-edit" class="prof-image-rp prof-image-edit pos-relative cursor-pointer" style="background-image:initial; 50% 50% no-repeat; background: no-repeat center; background-size: cover;"></div>
+							<div id="prof-logo-edit" class="prof-image-rp prof-image-edit pos-relative cursor-pointer prof-logo-edit"></div>
 							<form class="form_contact_image" enctype="multipart/form-data">
 								<input type="file" id="prof-logo" class="con_img_inp_file">
 							</form>
