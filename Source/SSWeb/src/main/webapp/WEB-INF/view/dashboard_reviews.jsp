@@ -33,8 +33,13 @@
 						<a href="https://www.facebook.com/sharer/sharer.php?u=${feedback.completeProfileUrl}" target="_blank"><span class="float-left ppl-share-icns icn-fb"></span></a>
 						<a href="https://twitter.com/home?status=${feedback.completeProfileUrl}" target="_blank"><span class="float-left ppl-share-icns icn-twit"></span></a>
 						<a href="https://www.linkedin.com/shareArticle?mini=true&url=${feedback.completeProfileUrl} &title=&summary=${feedback.score}-star response from ${feedback.customerFirstName} ${feedback.customerLastName} for ${feedback.agentName} at SocialSurvey - ${feedback.review} + &source=" target="_blank"><span class="float-left ppl-share-icns icn-lin"></span></a>
-						<a href="https://yelp.com/biz" target="_blank"><span class="float-left ppl-share-icns icn-yelp"></span></a>
                         <a href="https://plus.google.com/share?url=${feedback.completeProfileUrl}" target="_blank"><span class="float-left ppl-share-icns icn-gplus"></span></a>
+						<c:if test="${not empty feedback.yelpProfileUrl}">
+							<a href="${feedback.yelpProfileUrl}" target="_blank"><span class="float-left ppl-share-icns icn-yelp"></span></a>
+						</c:if>
+						<c:if test="${not empty feedback.zillowProfileUrl}">
+							<a href="${feedback.zillowProfileUrl}" target="_blank"><span class="float-left ppl-share-icns icn-zillow"></span></a>
+						</c:if>
 					</div>
 					<div class="float-left icn-share icn-remove icn-rem-size hide" style="display: none;"></div>
 				</div>
