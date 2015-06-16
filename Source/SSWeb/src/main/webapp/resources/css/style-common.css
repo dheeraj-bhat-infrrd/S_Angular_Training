@@ -6605,3 +6605,37 @@ input.report-abuse-input {
 	background: url(../images/upload_logo.png) no-repeat center;
 	background-size: contain;
 }
+
+.prof-edditable-cont {
+	position: relative;
+}
+
+.prof-edit-field-icn {
+	position: absolute;
+	top: 0; right : -30px;
+	width: 30px;
+	height: 34px;
+	background: url(../images/edit.png) no-repeat center;
+	right: -30px;
+}
+
+a.sq-btn-post-social:hover, a.sq-btn-post-social:visited {
+	color: #fff;
+}
+
+.prof-report-abuse-txt {
+	font-size: 13px;
+	color: #777;
+}
+
+.payment-input-cont {
+    border-bottom: 1px solid #dedede;
+}
+
+.payment-input-cont input {
+    border: none;
+    height: 45px;
+    width: 100%;
+    line-height: 25px;
+    padding: 10px 0 10px 10px;
+}
