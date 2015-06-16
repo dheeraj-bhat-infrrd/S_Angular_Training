@@ -363,6 +363,7 @@
 			</table>
 		</div>
 		<input type="hidden" name="accounttype" id="account-type" />
+		<input type="hidden" name="skipPayment" value="${skippayment}" />
 	</form>
 	</div>
 </div>
