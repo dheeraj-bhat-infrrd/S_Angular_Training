@@ -476,56 +476,55 @@ function paintReviews(result){
 	var reviewsHtml = "";
 	var resultSize = result.length;
 	$('.ppl-review-item-last').removeClass('ppl-review-item-last').addClass('ppl-review-item');
+	
 	$.each(result, function(i, reviewItem) {
 		var date = Date.parse(reviewItem.modifiedOn);
 		var lastItemClass = "ppl-review-item";
 		if (i == resultSize - 1) {
 			lastItemClass = "ppl-review-item-last";
         }
-		reviewsHtml = reviewsHtml + '<div class="'
-				+ lastItemClass + '" data-cust-first-name='
-				+ reviewItem.customerFirstName
-				+ ' data-cust-last-name='
-				+ reviewItem.customerLastName
-				+ ' data-agent-name=' + reviewItem.agentName
-				+ ' data-rating=' + reviewItem.score
-				+ ' data-review="' + reviewItem.review
-				+ '" data-customeremail="'
-				+ reviewItem.customerEmail + '" data-agentid="'
-				+ reviewItem.agentId + '">';
-		reviewsHtml=  reviewsHtml+'	<div class="ppl-header-wrapper clearfix">';
-		reviewsHtml=  reviewsHtml+'		<div class="float-left ppl-header-left">';    
-		reviewsHtml=  reviewsHtml+'			<div class="ppl-head-1">'+reviewItem.customerFirstName+' '+reviewItem.customerLastName+'</div>';
-		if(date != null){
-			reviewsHtml=  reviewsHtml+'			<div class="ppl-head-2">'+ date.getMonthName() +" " + date.getDate() +" "+date.getFullYear()+'</div>'; 
+		reviewsHtml = reviewsHtml + '<div class="' + lastItemClass + '" data-cust-first-name=' + reviewItem.customerFirstName
+				+ ' data-cust-last-name=' + reviewItem.customerLastName + ' data-agent-name=' + reviewItem.agentName
+				+ ' data-rating=' + reviewItem.score + ' data-review="' + reviewItem.review + '" data-customeremail="'
+				+ reviewItem.customerEmail + '" data-agentid="' + reviewItem.agentId + '">';
+		reviewsHtml += '	<div class="ppl-header-wrapper clearfix">';
+		reviewsHtml += '		<div class="float-left ppl-header-left">';    
+		reviewsHtml += '			<div class="ppl-head-1">'+reviewItem.customerFirstName+' '+reviewItem.customerLastName+'</div>';
+		if (date != null) {
+			reviewsHtml += '		<div class="ppl-head-2">'+ date.getMonthName() +" " + date.getDate() +" "+date.getFullYear()+'</div>'; 
 		}
-		reviewsHtml=  reviewsHtml+'    </div>';
-		reviewsHtml=  reviewsHtml+'    <div class="float-right ppl-header-right">';
-		reviewsHtml=  reviewsHtml+'        <div class="st-rating-wrapper maring-0 clearfix review-ratings" data-rating="'+reviewItem.score+'">';
-		reviewsHtml=  reviewsHtml+'       </div>';
-		reviewsHtml=  reviewsHtml+'<div class="report-resend-icn-container clearfix float-right">';
-		reviewsHtml=  reviewsHtml+'<div class="report-abuse-txt report-txt prof-report-abuse-txt">Report</div>';
-		reviewsHtml=  reviewsHtml+'   </div>';
-		reviewsHtml=  reviewsHtml+'   </div>';
-		reviewsHtml=  reviewsHtml+'	</div>';
-		if(reviewItem.review.length > 250){
-			reviewsHtml=  reviewsHtml+'	<div class="ppl-content"><span class="review-complete-txt">'+reviewItem.review+'</span><span class="review-less-text">'+reviewItem.review.substr(0,250) +'</span><span class="review-more-button">More</span></div>';			
-		}else{
-			reviewsHtml=  reviewsHtml+'	<div class="ppl-content">'+reviewItem.review +'</div>';
+		reviewsHtml += '    </div>';
+		reviewsHtml += '    <div class="float-right ppl-header-right">';
+		reviewsHtml += '        <div class="st-rating-wrapper maring-0 clearfix review-ratings" data-rating="'+reviewItem.score+'"></div>';
+		reviewsHtml += '		<div class="report-resend-icn-container clearfix float-right">';
+		reviewsHtml += '			<div class="report-abuse-txt report-txt prof-report-abuse-txt">Report</div>';
+		reviewsHtml += '		</div>';
+		reviewsHtml += '	</div>';
+		reviewsHtml += '</div>';
+		if (reviewItem.review.length > 250) {
+			reviewsHtml += '<div class="ppl-content"><span class="review-complete-txt">'+reviewItem.review+'</span><span class="review-less-text">' + reviewItem.review.substr(0,250) + '</span><span class="review-more-button">More</span></div>';			
+		} else {
+			reviewsHtml += '<div class="ppl-content">'+reviewItem.review +'</div>';
 		}
-		reviewsHtml=  reviewsHtml+'		<div class="ppl-share-wrapper clearfix">';
-		reviewsHtml=  reviewsHtml+'    		<div class="float-left blue-text ppl-share-shr-txt">Share</div>';
-		reviewsHtml=  reviewsHtml+'    		<div class="float-left icn-share icn-plus-open"></div>';
-		reviewsHtml=  reviewsHtml+'    		<div class="float-left clearfix ppl-share-social hide">';
-		reviewsHtml=  reviewsHtml+'        	<a href="https://www.facebook.com/sharer/sharer.php?u=' + reviewItem.completeProfileUrl + '" target="_blank"><span class="float-left ppl-share-icns icn-fb icn-fb-pp"></span></a>';
-		reviewsHtml=  reviewsHtml+'         <a href="https://twitter.com/home?status=' + reviewItem.completeProfileUrl + '" target="_blank"><span class="float-left ppl-share-icns icn-twit icn-twit-pp"></span></a>';
-		reviewsHtml=  reviewsHtml+'        	<a href="https://www.linkedin.com/shareArticle?mini=true&url=' + reviewItem.completeProfileUrl + '&title=&summary=' + reviewItem.score + '-star response from ' + reviewItem.customerFirstName+' '+reviewItem.customerLastName + ' for ' + reviewItem.agentName +' at SocialSurvey - ' + reviewItem.review + '&source=" target="_blank"><span class="float-left ppl-share-icns icn-lin icn-lin-pp"></span></a>';
-		reviewsHtml=  reviewsHtml+'			<a href="https://plus.google.com/share?url=' + reviewItem.completeProfileUrl + '" target="_blank"<span class="float-left ppl-share-icns icn-gplus"></span></a>';
-		reviewsHtml=  reviewsHtml+'       	<a href="https://yelp.com/biz" target="_blank"><span class="float-left ppl-share-icns icn-yelp"></span></a>';
-		reviewsHtml=  reviewsHtml+'    	</div>';
-		reviewsHtml=  reviewsHtml+'   <div class="float-left icn-share icn-remove icn-rem-size hide"></div>';
-		reviewsHtml=  reviewsHtml+'	</div>';
-		reviewsHtml=  reviewsHtml+'</div>';
+		reviewsHtml += '	<div class="ppl-share-wrapper clearfix">';
+		reviewsHtml += '		<div class="float-left blue-text ppl-share-shr-txt">Share</div>';
+		reviewsHtml += '		<div class="float-left icn-share icn-plus-open"></div>';
+		reviewsHtml += '		<div class="float-left clearfix ppl-share-social hide">';
+		reviewsHtml += '			<a href="https://www.facebook.com/sharer/sharer.php?u=' + reviewItem.completeProfileUrl + '" target="_blank"><span class="float-left ppl-share-icns icn-fb icn-fb-pp"></span></a>';
+		reviewsHtml += '			<a href="https://twitter.com/home?status=' + reviewItem.completeProfileUrl + '" target="_blank"><span class="float-left ppl-share-icns icn-twit icn-twit-pp"></span></a>';
+		reviewsHtml += '			<a href="https://www.linkedin.com/shareArticle?mini=true&url=' + reviewItem.completeProfileUrl + '&title=&summary=' + reviewItem.score + '-star response from ' + reviewItem.customerFirstName+' '+reviewItem.customerLastName + ' for ' + reviewItem.agentName +' at SocialSurvey - ' + reviewItem.review + '&source=" target="_blank"><span class="float-left ppl-share-icns icn-lin icn-lin-pp"></span></a>';
+		reviewsHtml += '			<a href="https://plus.google.com/share?url=' + reviewItem.completeProfileUrl + '" target="_blank"<span class="float-left ppl-share-icns icn-gplus"></span></a>';
+		
+		if (reviewItem.yelpProfileUrl != null && reviewItem.yelpProfileUrl != "") {
+			reviewsHtml += '		<a href="' + reviewItem.yelpProfileUrl + '" target="_blank"><span class="float-left ppl-share-icns icn-yelp"></span></a>';
+		}
+		if (reviewItem.zillowProfileUrl != null && reviewItem.zillowProfileUrl != "") {
+			reviewsHtml += '		<a href="' + reviewItem.zillowProfileUrl + '" target="_blank"><span class="float-left ppl-share-icns icn-zillow"></span></a>';
+		}
+		reviewsHtml += '		</div>';
+		reviewsHtml += '		<div class="float-left icn-share icn-remove icn-rem-size hide"></div>';
+		reviewsHtml += '	</div>';
+		reviewsHtml += '</div>';
 	});
 	
 	
