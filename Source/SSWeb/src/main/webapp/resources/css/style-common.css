@@ -6627,3 +6627,15 @@ a.sq-btn-post-social:hover, a.sq-btn-post-social:visited {
 	font-size: 13px;
 	color: #777;
 }
+
+.payment-input-cont {
+    border-bottom: 1px solid #dedede;
+}
+
+.payment-input-cont input {
+    border: none;
+    height: 45px;
+    width: 100%;
+    line-height: 25px;
+    padding: 10px 0 10px 10px;
+}
