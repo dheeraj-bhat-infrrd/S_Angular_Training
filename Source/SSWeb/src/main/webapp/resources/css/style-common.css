@@ -1705,6 +1705,10 @@ button.paypal.is-active {
 	background: url(../images/yelp.png) no-repeat center;
 }
 
+.icn-zillow {
+	background: url(../images/zillow.png) no-repeat center;
+}
+
 .icn-gplus {
 	background: url(../images/gplus.png) no-repeat center;
 }
@@ -6622,4 +6626,16 @@ a.sq-btn-post-social:hover, a.sq-btn-post-social:visited {
 .prof-report-abuse-txt {
 	font-size: 13px;
 	color: #777;
+}
+
+.payment-input-cont {
+    border-bottom: 1px solid #dedede;
+}
+
+.payment-input-cont input {
+    border: none;
+    height: 45px;
+    width: 100%;
+    line-height: 25px;
+    padding: 10px 0 10px 10px;
 }

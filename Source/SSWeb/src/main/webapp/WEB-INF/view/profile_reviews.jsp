@@ -11,6 +11,7 @@
 			<div data-firstname="${reviewItem.customerFirstName}" data-lastname="${reviewItem.customerLastName}"
 				data-review="${reviewItem.review}" data-score="${reviewItem.score}"
 				data-agentname="${reviewItem.agentName}" class="${reviewitemclass}">
+				
 				<div class="ppl-header-wrapper clearfix">
 					<div class="float-left ppl-header-left">
 						<div class="ppl-head-1">${reviewItem.customerFirstName} ${reviewItem.customerLastName}</div>
@@ -36,8 +37,13 @@
 						<a href="https://www.facebook.com/sharer/sharer.php?u=${reviewItem.completeProfileUrl}" target="_blank"><span class="float-left ppl-share-icns icn-fb fb-shr"></span></a>
 						<a href="https://twitter.com/home?status=${reviewItem.completeProfileUrl}" target="_blank"><span class="float-left ppl-share-icns icn-twit twt-shr"></span></a>
 						<a href="https://www.linkedin.com/shareArticle?mini=true&url=${reviewItem.completeProfileUrl} &title=&summary=${reviewItem.score}-star response from ${reviewItem.customerFirstName} ${reviewItem.customerLastName} for ${reviewItem.agentName} at SocialSurvey - ${reviewItem.review} + &source=" target="_blank"><span class="float-left ppl-share-icns icn-lin lnkdn-shr"></span></a>
-						<a href="https://yelp.com/biz" target="_blank"><span class="float-left ppl-share-icns icn-yelp yelp-shr"></span></a>
                         <a href="https://plus.google.com/share?url=${reviewItem.completeProfileUrl}" target="_blank"><span class="float-left ppl-share-icns icn-gplus yelp-shr"></span></a>
+						<c:if test="${not empty reviewItem.yelpProfileUrl}">
+							<a href="${reviewItem.yelpProfileUrl}" target="_blank"><span class="float-left ppl-share-icns icn-yelp yelp-shr"></span></a>
+						</c:if>
+						<c:if test="${not empty reviewItem.zillowProfileUrl}">
+							<a href="${reviewItem.zillowProfileUrl}" target="_blank"><span class="float-left ppl-share-icns icn-zillow yelp-shr"></span></a>
+						</c:if>
 					</div>
 					<div class="float-left icn-share icn-remove icn-rem-size hide"></div>
 				</div>
