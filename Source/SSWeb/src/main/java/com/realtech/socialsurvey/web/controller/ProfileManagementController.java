@@ -62,6 +62,7 @@ import com.realtech.socialsurvey.core.entities.UserProfile;
 import com.realtech.socialsurvey.core.entities.UserSettings;
 import com.realtech.socialsurvey.core.entities.WebAddressSettings;
 import com.realtech.socialsurvey.core.entities.YelpToken;
+import com.realtech.socialsurvey.core.entities.ZillowToken;
 import com.realtech.socialsurvey.core.enums.AccountType;
 import com.realtech.socialsurvey.core.enums.DisplayMessageType;
 import com.realtech.socialsurvey.core.exception.InternalServerException;
@@ -2285,6 +2286,119 @@ public class ProfileManagementController {
 		googleToken.setProfileLink(gplusLink);
 		socialMediaTokens.setGoogleToken(googleToken);
 		LOG.debug("Method updateGoogleToken() finished from ProfileManagementController");
+		return socialMediaTokens;
+	}
+	
+	@RequestMapping(value = "/updatezillowlink", method = RequestMethod.POST)
+	public String updateZillowLink(Model model, HttpServletRequest request) {
+		LOG.info("Method updateZillowLink() called from ProfileManagementController");
+		HttpSession session = request.getSession(false);
+		SocialMediaTokens socialMediaTokens = null;
+
+		try {
+			UserSettings userSettings = (UserSettings) session.getAttribute(CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION);
+			OrganizationUnitSettings profileSettings = (OrganizationUnitSettings) session.getAttribute(CommonConstants.USER_PROFILE_SETTINGS);
+			UserProfile selectedProfile = (UserProfile) request.getSession(false).getAttribute(CommonConstants.USER_PROFILE);
+			if (userSettings == null || profileSettings == null || selectedProfile == null) {
+				throw new InvalidInputException("No user settings found in session", DisplayMessageConstants.GENERAL_ERROR);
+			}
+
+			String zillowlink = request.getParameter("zillowlink");
+			try {
+				if (zillowlink == null || zillowlink.isEmpty()) {
+					throw new InvalidInputException("Zillow link passed was null or empty", DisplayMessageConstants.GENERAL_ERROR);
+				}
+				urlValidationHelper.validateUrl(zillowlink);
+			}
+			catch (IOException ioException) {
+				throw new InvalidInputException("Zillow link passed was invalid", DisplayMessageConstants.GENERAL_ERROR, ioException);
+			}
+
+			int profilesMaster = selectedProfile.getProfilesMaster().getProfileId();
+			if (profilesMaster == CommonConstants.PROFILES_MASTER_COMPANY_ADMIN_PROFILE_ID) {
+				OrganizationUnitSettings companySettings = userSettings.getCompanySettings();
+				if (companySettings == null) {
+					throw new InvalidInputException("No company settings found in current session");
+				}
+				socialMediaTokens = companySettings.getSocialMediaTokens();
+				socialMediaTokens = updateZillowLink(zillowlink, socialMediaTokens);
+				profileManagementService.updateSocialMediaTokens(MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION, companySettings,
+						socialMediaTokens);
+				companySettings.setSocialMediaTokens(socialMediaTokens);
+				userSettings.setCompanySettings(companySettings);
+			}
+			else if (profilesMaster == CommonConstants.PROFILES_MASTER_REGION_ADMIN_PROFILE_ID) {
+				long regionId = selectedProfile.getRegionId();
+				OrganizationUnitSettings regionSettings = userSettings.getRegionSettings().get(regionId);
+				if (regionSettings == null) {
+					throw new InvalidInputException("No Region settings found in current session");
+				}
+				socialMediaTokens = regionSettings.getSocialMediaTokens();
+				socialMediaTokens = updateZillowLink(zillowlink, socialMediaTokens);
+				profileManagementService.updateSocialMediaTokens(MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION, regionSettings,
+						socialMediaTokens);
+				regionSettings.setSocialMediaTokens(socialMediaTokens);
+				userSettings.getRegionSettings().put(regionId, regionSettings);
+			}
+			else if (profilesMaster == CommonConstants.PROFILES_MASTER_BRANCH_ADMIN_PROFILE_ID) {
+				long branchId = selectedProfile.getBranchId();
+				OrganizationUnitSettings branchSettings = userSettings.getBranchSettings().get(branchId);
+				if (branchSettings == null) {
+					throw new InvalidInputException("No Branch settings found in current session");
+				}
+				socialMediaTokens = branchSettings.getSocialMediaTokens();
+				socialMediaTokens = updateZillowLink(zillowlink, socialMediaTokens);
+				profileManagementService.updateSocialMediaTokens(MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION, branchSettings,
+						socialMediaTokens);
+				branchSettings.setSocialMediaTokens(socialMediaTokens);
+				userSettings.getBranchSettings().put(branchId, branchSettings);
+			}
+			else if (profilesMaster == CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID) {
+				AgentSettings agentSettings = userSettings.getAgentSettings();
+				if (agentSettings == null) {
+					throw new InvalidInputException("No Agent settings found in current session");
+				}
+				socialMediaTokens = agentSettings.getSocialMediaTokens();
+				socialMediaTokens = updateZillowLink(zillowlink, socialMediaTokens);
+				profileManagementService.updateSocialMediaTokens(MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION, agentSettings,
+						socialMediaTokens);
+				agentSettings.setSocialMediaTokens(socialMediaTokens);
+				userSettings.setAgentSettings(agentSettings);
+			}
+			else {
+				throw new InvalidInputException("Invalid input exception occurred in updating zillow token.", DisplayMessageConstants.GENERAL_ERROR);
+			}
+
+			profileSettings.setSocialMediaTokens(socialMediaTokens);
+
+			LOG.info("ZillowLink updated successfully");
+			model.addAttribute("message",
+					messageUtils.getDisplayMessage(DisplayMessageConstants.ZILLOW_TOKEN_UPDATE_SUCCESSFUL, DisplayMessageType.SUCCESS_MESSAGE));
+		}
+		catch (NonFatalException nonFatalException) {
+			LOG.error("NonFatalException while updating ZillowLink in profile. Reason :" + nonFatalException.getMessage(), nonFatalException);
+			model.addAttribute("message",
+					messageUtils.getDisplayMessage(DisplayMessageConstants.ZILLOW_TOKEN_UPDATE_UNSUCCESSFUL, DisplayMessageType.ERROR_MESSAGE));
+		}
+
+		LOG.info("Method updateZillowLink() finished from ProfileManagementController");
+		return JspResolver.MESSAGE_HEADER;
+	}
+
+	private SocialMediaTokens updateZillowLink(String zillowLink, SocialMediaTokens socialMediaTokens) {
+		LOG.debug("Method updateZillowLink() called from ProfileManagementController");
+		if (socialMediaTokens == null) {
+			LOG.debug("No social media token in profile added");
+			socialMediaTokens = new SocialMediaTokens();
+		}
+		if (socialMediaTokens.getZillowToken() == null) {
+			socialMediaTokens.setZillowToken(new ZillowToken());
+		}
+		
+		ZillowToken zillowToken = socialMediaTokens.getZillowToken();
+		zillowToken.setZillowProfileLink(zillowLink);
+		socialMediaTokens.setZillowToken(zillowToken);
+		LOG.debug("Method updateZillowLink() finished from ProfileManagementController");
 		return socialMediaTokens;
 	}
 	
