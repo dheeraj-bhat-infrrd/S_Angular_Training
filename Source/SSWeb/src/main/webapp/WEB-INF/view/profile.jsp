@@ -221,19 +221,22 @@
 						<c:if test="${not empty profile.socialMediaTokens}">
 							<div id="social-connect-txt" class="float-left social-connect-txt">Connect with ${profName }:</div>
 							<c:if test="${not empty profile.socialMediaTokens.facebookToken && not empty profile.socialMediaTokens.facebookToken.facebookPageLink}">
-								<div id="icn-fb" class="float-left social-item-icon icn-fb" data-link="${profile.socialMediaTokens.facebookToken.facebookPageLink }"></div>
+								<div id="icn-fb" class="float-left social-item-icon icn-fb" data-link="${profile.socialMediaTokens.facebookToken.facebookPageLink}"></div>
 							</c:if>
 							<c:if test="${not empty profile.socialMediaTokens.twitterToken && not empty profile.socialMediaTokens.twitterToken.twitterPageLink}">
-								<div id="icn-twit" class="float-left social-item-icon icn-twit" data-link="${profile.socialMediaTokens.twitterToken.twitterPageLink }"></div>
+								<div id="icn-twit" class="float-left social-item-icon icn-twit" data-link="${profile.socialMediaTokens.twitterToken.twitterPageLink}"></div>
 							</c:if>
 							<c:if test="${not empty profile.socialMediaTokens.linkedInToken && not empty profile.socialMediaTokens.linkedInToken.linkedInPageLink}">
-								<div id="icn-lin" class="float-left social-item-icon icn-lin" data-link="${profile.socialMediaTokens.linkedInToken.linkedInPageLink }"></div>
-							</c:if>
-							<c:if test="${not empty profile.socialMediaTokens.yelpToken && not empty profile.socialMediaTokens.yelpToken.yelpPageLink}">
-								<div id="icn-yelp" class="float-left social-item-icon icn-yelp" data-link="${profile.socialMediaTokens.yelpToken.yelpPageLink }"></div>
+								<div id="icn-lin" class="float-left social-item-icon icn-lin" data-link="${profile.socialMediaTokens.linkedInToken.linkedInPageLink}"></div>
 							</c:if>
 							<c:if test="${not empty profile.socialMediaTokens.googleToken && not empty profile.socialMediaTokens.googleToken.profileLink}">
-								<div id="icn-gplus" class="float-left social-item-icon icn-gplus" data-link="${profile.socialMediaTokens.googleToken.profileLink }"></div>
+								<div id="icn-gplus" class="float-left social-item-icon icn-gplus" data-link="${profile.socialMediaTokens.googleToken.profileLink}"></div>
+							</c:if>
+							<c:if test="${not empty profile.socialMediaTokens.yelpToken && not empty profile.socialMediaTokens.yelpToken.yelpPageLink}">
+								<div id="icn-yelp" class="float-left social-item-icon icn-yelp" data-link="${profile.socialMediaTokens.yelpToken.yelpPageLink}"></div>
+							</c:if>
+							<c:if test="${not empty profile.socialMediaTokens.zillowToken && not empty profile.socialMediaTokens.zillowToken.zillowProfileLink}">
+								<div id="icn-zillow" class="float-left social-item-icon icn-zillow" data-link="${profile.socialMediaTokens.zillowToken.zillowProfileLink}"></div>
 							</c:if>
 						</c:if>
 					</div>

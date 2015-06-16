@@ -6288,6 +6288,30 @@ function updateLinkedInLink(link) {
 	}
 }
 
+// Update Social links - google plus
+$('body').on('click', '#prof-edit-social-link .icn-gplus', function() {
+	$('#social-token-text').show();
+	var link = $(this).attr("data-link");
+	$('#social-token-text').attr({
+		"placeholder" : "Add Google link",
+		"onblur" : "updateGoogleLink(this.value);$('#social-token-text').hide();"
+	});
+	$('#social-token-text').val(link);
+});
+
+function updateGoogleLink(link) {
+	var payload = {
+		"gpluslink" : link	
+	};
+	if (isValidUrl(link)) {
+        callAjaxPostWithPayloadData("./updategooglelink.do", callBackUpdateSocialLink, payload);
+        $('#icn-gplus').attr("data-link", link);
+	} else {
+		$('#overlay-toast').html("Enter a valid url");
+		showToast();
+	}
+}
+
 // Update Social links - yelp
 $('body').on('click', '#prof-edit-social-link .icn-yelp', function() {
 	$('#social-token-text').show();
@@ -6312,24 +6336,24 @@ function updateYelpLink(link) {
 	}
 }
 
-// Update Social links - google plus
-$('body').on('click', '#prof-edit-social-link .icn-gplus', function() {
+// TODO Update Social links - zillow
+$('body').on('click', '#prof-edit-social-link .icn-zillow', function() {
 	$('#social-token-text').show();
 	var link = $(this).attr("data-link");
 	$('#social-token-text').attr({
-		"placeholder" : "Add Google link",
-		"onblur" : "updateGoogleLink(this.value);$('#social-token-text').hide();"
+		"placeholder" : "Add Zillow link",
+		"onblur" : "updateZillowLink(this.value);$('#social-token-text').hide();"
 	});
 	$('#social-token-text').val(link);
 });
 
-function updateGoogleLink(link) {
+function updateZillowLink(link) {
 	var payload = {
-		"gpluslink" : link	
+		"zillowlink" : link	
 	};
 	if (isValidUrl(link)) {
-        callAjaxPostWithPayloadData("./updategooglelink.do", callBackUpdateSocialLink, payload);
-        $('#icn-gplus').attr("data-link", link);
+		callAjaxPostWithPayloadData("./updatezillowlink.do", callBackUpdateSocialLink, payload);
+        $('#icn-zillow').attr("data-link", link);
 	} else {
 		$('#overlay-toast').html("Enter a valid url");
 		showToast();
