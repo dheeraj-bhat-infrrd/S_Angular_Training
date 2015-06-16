@@ -587,5 +587,13 @@
 		$('#reviews-container').hide();
 		$('#ppl-post-cont').hide();
 	});
+	$('#prof-basic-container').on('mouseover',function(e){
+		$('#prof-basic-container .prof-edit-field-icn').show();
+		$('#prof-basic-container .prof-edditable').addClass('prof-name-edit');
+	});
+	$('#prof-basic-container').on('mouseleave',function(e){
+		$('#prof-basic-container .prof-edit-field-icn').hide();
+		$('#prof-basic-container .prof-edditable').removeClass('prof-name-edit');
+	});
 });
 </script>
