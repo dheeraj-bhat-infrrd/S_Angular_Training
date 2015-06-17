@@ -534,6 +534,16 @@ function sendSurveyInvitation() {
 	}, true);
 }
 
+function sendSurveyInvitationAdmin() {
+	callAjaxGET("./sendsurveyinvitationadmin.do", function(data) {
+		$('#overlay-send-survey').html(data);
+		if ($("#welcome-popup-invite").length) {
+			$('#overlay-send-survey').removeClass("hide");
+			$('#overlay-send-survey').show();
+		}
+	}, true);
+}
+
 function linkedInDataImport() {
 	callAjaxGET("./linkedindataimport.do", function(data) {
 		$('#overlay-linkedin-import').html(data);
