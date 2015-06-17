@@ -6336,7 +6336,7 @@ function updateYelpLink(link) {
 	}
 }
 
-// TODO Update Social links - zillow
+// Update Social links - zillow
 $('body').on('click', '#prof-edit-social-link .icn-zillow', function() {
 	$('#social-token-text').show();
 	var link = $(this).attr("data-link");
@@ -6354,6 +6354,30 @@ function updateZillowLink(link) {
 	if (isValidUrl(link)) {
 		callAjaxPostWithPayloadData("./updatezillowlink.do", callBackUpdateSocialLink, payload);
         $('#icn-zillow').attr("data-link", link);
+	} else {
+		$('#overlay-toast').html("Enter a valid url");
+		showToast();
+	}
+}
+
+// Update Social links - lendingTree
+$('body').on('click', '#prof-edit-social-link .icn-lendingtree', function() {
+	$('#social-token-text').show();
+	var link = $(this).attr("data-link");
+	$('#social-token-text').attr({
+		"placeholder" : "Add LendingTree link",
+		"onblur" : "updateLendingTreeLink(this.value);$('#social-token-text').hide();"
+	});
+	$('#social-token-text').val(link);
+});
+
+function updateLendingTreeLink(link) {
+	var payload = {
+		"lendingTreeLink" : link	
+	};
+	if (isValidUrl(link)) {
+		callAjaxPostWithPayloadData("./updatelendingtreelink.do", callBackUpdateSocialLink, payload);
+        $('#icn-lendingtree').attr("data-link", link);
 	} else {
 		$('#overlay-toast').html("Enter a valid url");
 		showToast();
