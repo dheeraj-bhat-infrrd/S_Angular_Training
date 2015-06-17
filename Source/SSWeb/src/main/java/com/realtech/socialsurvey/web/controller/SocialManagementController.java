@@ -1292,6 +1292,12 @@ public class SocialManagementController {
 		return JspResolver.HEADER_SURVEY_INVITE;
 	}
 	
+	@RequestMapping(value = "/sendsurveyinvitationadmin")
+	public String sendSurveyInviteAdmin() {
+		LOG.info("Method sendSurveyInvite() called from SocialManagementController");
+		return JspResolver.HEADER_SURVEY_INVITE_ADMIN;
+	}
+	
 	@ResponseBody
 	@RequestMapping(value = "/profileUrl")
 	public String getProfileUrl(HttpServletRequest request) {
