@@ -30,15 +30,18 @@
 					<div class="float-left blue-text ppl-share-shr-txt"><spring:message code="label.share.key" /></div>
 					<div class="float-left icn-share icn-plus-open" style="display: block;"></div>
 					<div class="float-left clearfix ppl-share-social hide" style="display: none;">
-						<a href="https://www.facebook.com/sharer/sharer.php?u=${feedback.completeProfileUrl}" target="_blank"><span class="float-left ppl-share-icns icn-fb"></span></a>
-						<a href="https://twitter.com/home?status=${feedback.completeProfileUrl}" target="_blank"><span class="float-left ppl-share-icns icn-twit"></span></a>
-						<a href="https://www.linkedin.com/shareArticle?mini=true&url=${feedback.completeProfileUrl} &title=&summary=${feedback.score}-star response from ${feedback.customerFirstName} ${feedback.customerLastName} for ${feedback.agentName} at SocialSurvey - ${feedback.review} + &source=" target="_blank"><span class="float-left ppl-share-icns icn-lin"></span></a>
-                        <a href="https://plus.google.com/share?url=${feedback.completeProfileUrl}" target="_blank"><span class="float-left ppl-share-icns icn-gplus"></span></a>
+						<a href="https://www.facebook.com/sharer/sharer.php?u=${feedback.completeProfileUrl}" target="_blank"><span class="float-left ppl-share-icns icn-fb" title="Facebook"></span></a>
+						<a href="https://twitter.com/home?status=${feedback.completeProfileUrl}" target="_blank"><span class="float-left ppl-share-icns icn-twit" title="Twitter"></span></a>
+						<a href="https://www.linkedin.com/shareArticle?mini=true&url=${feedback.completeProfileUrl} &title=&summary=${feedback.score}-star response from ${feedback.customerFirstName} ${feedback.customerLastName} for ${feedback.agentName} at SocialSurvey - ${feedback.review} + &source=" target="_blank"><span class="float-left ppl-share-icns icn-lin" title="LinkedIn"></span></a>
+                        <a href="https://plus.google.com/share?url=${feedback.completeProfileUrl}" target="_blank"><span class="float-left ppl-share-icns icn-gplus" title="Google+"></span></a>
 						<c:if test="${not empty feedback.yelpProfileUrl}">
-							<a href="${feedback.yelpProfileUrl}" target="_blank"><span class="float-left ppl-share-icns icn-yelp"></span></a>
+							<a href="${feedback.yelpProfileUrl}" target="_blank"><span class="float-left ppl-share-icns icn-yelp" title="Yelp"></span></a>
 						</c:if>
 						<c:if test="${not empty feedback.zillowProfileUrl}">
-							<a href="${feedback.zillowProfileUrl}" target="_blank"><span class="float-left ppl-share-icns icn-zillow"></span></a>
+							<a href="${feedback.zillowProfileUrl}" target="_blank"><span class="float-left ppl-share-icns icn-zillow" title="Zillow"></span></a>
+						</c:if>
+						<c:if test="${not empty feedback.lendingTreeProfileUrl}">
+							<a href="${feedback.lendingTreeProfileUrl}" target="_blank"><span class="float-left ppl-share-icns icn-lendingtree" title="LendingTree"></span></a>
 						</c:if>
 					</div>
 					<div class="float-left icn-share icn-remove icn-rem-size hide" style="display: none;"></div>
