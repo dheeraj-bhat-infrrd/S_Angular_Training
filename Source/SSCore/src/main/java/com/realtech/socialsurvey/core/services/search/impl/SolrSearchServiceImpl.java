@@ -4,11 +4,13 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrQuery.ORDER;
 import org.apache.solr.client.solrj.SolrServer;
@@ -19,21 +21,25 @@ import org.apache.solr.client.solrj.response.UpdateResponse;
 import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrDocumentList;
 import org.apache.solr.common.SolrInputDocument;
-import org.noggit.JSONUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
+
+import com.google.gson.Gson;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.dao.OrganizationUnitSettingsDao;
 import com.realtech.socialsurvey.core.dao.impl.MongoOrganizationUnitSettingDaoImpl;
 import com.realtech.socialsurvey.core.entities.AgentSettings;
 import com.realtech.socialsurvey.core.entities.Branch;
+import com.realtech.socialsurvey.core.entities.BranchFromSearch;
 import com.realtech.socialsurvey.core.entities.Company;
 import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
 import com.realtech.socialsurvey.core.entities.Region;
+import com.realtech.socialsurvey.core.entities.RegionFromSearch;
 import com.realtech.socialsurvey.core.entities.User;
+import com.realtech.socialsurvey.core.entities.UserFromSearch;
 import com.realtech.socialsurvey.core.entities.UserProfile;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.exception.NoRecordsFetchedException;
@@ -109,7 +115,8 @@ public class SolrSearchServiceImpl implements SolrSearchService {
 			LOG.debug("Querying solr for searching regions");
 			response = solrServer.query(solrQuery);
 			SolrDocumentList results = response.getResults();
-			regionResult = JSONUtil.toJSON(results);
+			Collection<RegionFromSearch> regions = getRegionsFromSolrDocuments(results);
+			regionResult = new Gson().toJson(regions);
 			LOG.debug("Region search result is : " + regionResult);
 
 		}
@@ -163,7 +170,10 @@ public class SolrSearchServiceImpl implements SolrSearchService {
 			LOG.debug("Querying solr for searching branches");
 			response = solrServer.query(query);
 			SolrDocumentList documentList = response.getResults();
-			branchResult = JSONUtil.toJSON(documentList);
+			
+			Collection<BranchFromSearch> branches = getBranchesFromSolrDocuments(documentList);
+			
+			branchResult = new Gson().toJson(branches);
 
 			LOG.debug("Results obtained from solr :" + branchResult);
 		}
@@ -205,7 +215,10 @@ public class SolrSearchServiceImpl implements SolrSearchService {
 			LOG.debug("Querying solr for searching branches");
 			response = solrServer.query(query);
 			SolrDocumentList documentList = response.getResults();
-			branchResult = JSONUtil.toJSON(documentList);
+			
+			Collection<BranchFromSearch> branches = getBranchesFromSolrDocuments(documentList);
+			
+			branchResult = new Gson().toJson(branches);
 
 			LOG.debug("Results obtained from solr :" + branchResult);
 		}
@@ -348,7 +361,8 @@ public class SolrSearchServiceImpl implements SolrSearchService {
 			LOG.debug("Querying solr for searching users");
 			response = solrServer.query(solrQuery);
 			SolrDocumentList results = response.getResults();
-			usersResult = JSONUtil.toJSON(results);
+			
+			usersResult = new Gson().toJson(getUsersFromSolrDocuments(results));
 			LOG.debug("User search result is : " + usersResult);
 
 		}
@@ -391,7 +405,7 @@ public class SolrSearchServiceImpl implements SolrSearchService {
 			LOG.debug("Querying solr for searching users");
 			response = solrServer.query(solrQuery);
 			SolrDocumentList results = response.getResults();
-			usersResult = JSONUtil.toJSON(results);
+			usersResult = new Gson().toJson(getUsersFromSolrDocuments(results));
 			LOG.debug("User search result is : " + usersResult);
 		}
 		catch (SolrServerException e) {
@@ -401,54 +415,6 @@ public class SolrSearchServiceImpl implements SolrSearchService {
 
 		LOG.info("Method searchUsersByLoginNameOrName finished for pattern :" + pattern + " returning : " + usersResult);
 		return usersResult;
-	}
-
-	@Override
-	public List<SolrDocument> searchUsersByFirstOrLastName(String patternFirst, String patternLast) throws InvalidInputException, SolrException,
-			MalformedURLException {
-		LOG.info("Method searchUsersByFirstOrLastName() called for pattern :" + patternFirst + ", " + patternLast);
-		if (patternFirst == null && patternLast == null) {
-			throw new InvalidInputException("Pattern is null or empty while searching for Users");
-		}
-
-		List<SolrDocument> users = new ArrayList<SolrDocument>();
-		QueryResponse response = null;
-		try {
-			SolrQuery solrQuery = new SolrQuery();
-			String[] fields = { CommonConstants.USER_FIRST_NAME_SOLR, CommonConstants.USER_LAST_NAME_SOLR, CommonConstants.USER_DISPLAY_NAME_SOLR,
-					CommonConstants.USER_EMAIL_ID_SOLR };
-			solrQuery.setFields(fields);
-
-			String query = "";
-			if (!patternFirst.equals("") && !patternLast.equals("")) {
-				query = CommonConstants.USER_FIRST_NAME_SOLR + ":" + patternFirst + "*" + " OR " + CommonConstants.USER_LAST_NAME_SOLR + ":"
-						+ patternLast + "*";
-			}
-			else if (!patternFirst.equals("") && patternLast.equals("")) {
-				query = CommonConstants.USER_FIRST_NAME_SOLR + ":" + patternFirst + "*";
-			}
-			else if (patternFirst.equals("") && !patternLast.equals("")) {
-				query = CommonConstants.USER_LAST_NAME_SOLR + ":" + patternLast + "*";
-			}
-			solrQuery.setQuery(query);
-
-			solrQuery.addFilterQuery(CommonConstants.IS_AGENT_SOLR + ":" + CommonConstants.IS_AGENT_TRUE_SOLR);
-
-			LOG.debug("Querying solr for searching users");
-			SolrServer solrServer = new HttpSolrServer(solrUserUrl);
-			response = solrServer.query(solrQuery);
-			SolrDocumentList results = response.getResults();
-			for (SolrDocument solrDocument : results) {
-				users.add(solrDocument);
-			}
-			LOG.debug("User search result size is : " + users.size());
-		}
-		catch (SolrServerException e) {
-			LOG.error("SolrServerException while performing User search");
-			throw new SolrException("Exception while performing search for user. Reason : " + e.getMessage(), e);
-		}
-		LOG.info("Method searchUsersByFirstOrLastName() called for parameter : " + patternFirst + ", " + patternLast + " returning : " + users);
-		return users;
 	}
 
 	@Override
@@ -524,7 +490,7 @@ public class SolrSearchServiceImpl implements SolrSearchService {
 			LOG.debug("Querying solr for searching users");
 			response = solrServer.query(solrQuery);
 			SolrDocumentList results = response.getResults();
-			usersResult = JSONUtil.toJSON(results);
+			usersResult = new Gson().toJson(getUsersFromSolrDocuments(results));
 			LOG.debug("User search result is : " + usersResult);
 		}
 		catch (SolrServerException e) {
@@ -740,7 +706,7 @@ public class SolrSearchServiceImpl implements SolrSearchService {
 	}
 
 	@Override
-	public SolrDocumentList searchUsersByIden(long iden, String idenFieldName, boolean isAgent, int startIndex, int noOfRows)
+	public Collection<UserFromSearch> searchUsersByIden(long iden, String idenFieldName, boolean isAgent, int startIndex, int noOfRows)
 			throws InvalidInputException, SolrException {
 		LOG.info("Method searchUsersByIden called for iden :" + iden + "idenFieldName:" + idenFieldName + " startIndex:" + startIndex + " noOfrows:"
 				+ noOfRows);
@@ -779,7 +745,7 @@ public class SolrSearchServiceImpl implements SolrSearchService {
 			throw new SolrException("Exception while performing search for user. Reason : " + e.getMessage(), e);
 		}
 		LOG.info("Method searchUsersByIden finished for iden : " + iden);
-		return results;
+		return getUsersFromSolrDocuments(results);
 	}
 
 	/**
@@ -929,7 +895,8 @@ public class SolrSearchServiceImpl implements SolrSearchService {
 			LOG.debug("Querying solr for searching regions");
 			response = solrServer.query(solrQuery);
 			SolrDocumentList results = response.getResults();
-			regionsResult = JSONUtil.toJSON(results);
+			Collection<RegionFromSearch> regions = getRegionsFromSolrDocuments(results);
+			regionsResult = new Gson().toJson(regions);
 		}
 		catch (SolrServerException e) {
 			LOG.error("SolrServerException while performing Regions search");
@@ -957,7 +924,7 @@ public class SolrSearchServiceImpl implements SolrSearchService {
 			LOG.debug("Querying solr for searching branches");
 			response = solrServer.query(solrQuery);
 			SolrDocumentList results = response.getResults();
-			branchesResult = JSONUtil.toJSON(results);
+			branchesResult = new Gson().toJson(getBranchesFromSolrDocuments(results));
 		}
 		catch (SolrServerException e) {
 			LOG.error("SolrServerException while performing Branches search");
@@ -1017,7 +984,7 @@ public class SolrSearchServiceImpl implements SolrSearchService {
 			LOG.debug("Querying solr for searching users under the branches");
 			response = solrServer.query(solrQuery);
 			SolrDocumentList results = response.getResults();
-			usersResult = JSONUtil.toJSON(results);
+			usersResult = new Gson().toJson(getUsersFromSolrDocuments(results));
 			LOG.debug("Users search result is : " + usersResult);
 		}
 		catch (SolrServerException e) {
@@ -1401,5 +1368,102 @@ public class SolrSearchServiceImpl implements SolrSearchService {
 				throw new SolrException("Exception while removing multiple regions. Reason : " + e.getMessage(), e);
 			}
 		}
+	}
+	
+	private Collection<BranchFromSearch> getBranchesFromSolrDocuments(SolrDocumentList documentList){
+		Map<Long, BranchFromSearch> matchedBranches = new HashMap<>();
+		for(SolrDocument document : documentList){
+			BranchFromSearch branch = new BranchFromSearch();
+
+			branch.setCompanyId(Long.parseLong(document.get(CommonConstants.COMPANY_ID_SOLR).toString()));
+			branch.setBranchName(document.get(CommonConstants.BRANCH_NAME_SOLR).toString());
+			branch.setRegionId(Long.parseLong(document.get(CommonConstants.REGION_ID_SOLR).toString()));
+			branch.setRegionName(document.get(CommonConstants.REGION_NAME_SOLR).toString());
+			branch.setStatus(Integer.parseInt(document.get(CommonConstants.STATUS_SOLR).toString()));
+			branch.setIsDefaultBySystem(Long.parseLong(document.get(CommonConstants.IS_DEFAULT_BY_SYSTEM_SOLR).toString()));
+			
+			matchedBranches.put(Long.parseLong(document.get(CommonConstants.BRANCH_ID_SOLR).toString()), branch);
+		}
+		List<OrganizationUnitSettings> branchSettings = organizationUnitSettingsDao.fetchOrganizationUnitSettingsForMultipleIds(matchedBranches.keySet(), MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION);
+		for(OrganizationUnitSettings setting : branchSettings){
+			BranchFromSearch branch = matchedBranches.get(setting.getIden());
+			branch.setAddress1(setting.getContact_details().getAddress1());
+			branch.setAddress2(setting.getContact_details().getAddress2());
+			branch.setBranchId(setting.getIden());
+			branch.setCity(setting.getContact_details().getCity());
+			branch.setCountry(setting.getContact_details().getCountry());
+			branch.setCountryCode(setting.getContact_details().getCountryCode());
+			branch.setState(setting.getContact_details().getState());
+			branch.setZipcode(setting.getContact_details().getZipcode());
+		}
+		
+		return matchedBranches.values();
+	}
+	
+	private Collection<RegionFromSearch> getRegionsFromSolrDocuments(SolrDocumentList documentList){
+		Map<Long, RegionFromSearch> matchedRegions = new HashMap<>();
+		for(SolrDocument document : documentList){
+			RegionFromSearch region = new RegionFromSearch();
+
+			region.setCompanyId(Long.parseLong(document.get(CommonConstants.COMPANY_ID_SOLR).toString()));
+			region.setRegionId(Long.parseLong(document.get(CommonConstants.REGION_ID_SOLR).toString()));
+			region.setRegionName(document.get(CommonConstants.REGION_NAME_SOLR).toString());
+			region.setStatus(Integer.parseInt(document.get(CommonConstants.STATUS_SOLR).toString()));
+			region.setIsDefaultBySystem(Long.parseLong(document.get(CommonConstants.IS_DEFAULT_BY_SYSTEM_SOLR).toString()));
+			
+			matchedRegions.put(Long.parseLong(document.get(CommonConstants.REGION_ID_SOLR).toString()), region);
+		}
+		List<OrganizationUnitSettings> branchSettings = organizationUnitSettingsDao.fetchOrganizationUnitSettingsForMultipleIds(matchedRegions.keySet(), MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION);
+		for(OrganizationUnitSettings setting : branchSettings){
+			RegionFromSearch region = matchedRegions.get(setting.getIden());
+			region.setAddress1(setting.getContact_details().getAddress1());
+			region.setAddress2(setting.getContact_details().getAddress2());
+			region.setCity(setting.getContact_details().getCity());
+			region.setCountry(setting.getContact_details().getCountry());
+			region.setCountryCode(setting.getContact_details().getCountryCode());
+			region.setState(setting.getContact_details().getState());
+			region.setZipcode(setting.getContact_details().getZipcode());
+		}
+		
+		return matchedRegions.values();
+	}
+	
+	@SuppressWarnings("unchecked")
+	private Collection<UserFromSearch> getUsersFromSolrDocuments(SolrDocumentList documentList) throws InvalidInputException{
+		Map<Long, UserFromSearch> matchedUsers = new HashMap<>();
+		for(SolrDocument document : documentList){
+			UserFromSearch user = new UserFromSearch();
+
+			user.setCompanyId(Long.parseLong(document.get(CommonConstants.COMPANY_ID_SOLR).toString()));
+			user.setAgent(Boolean.parseBoolean(document.get(CommonConstants.IS_AGENT_SOLR).toString()));
+			user.setStatus(Integer.parseInt(document.get(CommonConstants.STATUS_SOLR).toString()));
+			user.setIsOwner(Integer.parseInt(document.get(CommonConstants.IS_OWNER_COLUMN).toString()));
+			user.setBranchAdmin(Boolean.parseBoolean(document.get(CommonConstants.IS_BRANCH_ADMIN_SOLR).toString()));
+			user.setRegionAdmin(Boolean.parseBoolean(document.get(CommonConstants.IS_REGION_ADMIN_SOLR).toString()));
+			user.setRegions((List<Long>)document.get(CommonConstants.REGIONS_SOLR));
+			user.setBranches((List<Long>)document.get(CommonConstants.BRANCHES_SOLR));
+			user.setAgentIds((List<Long>)document.get("agentIds"));
+			
+			matchedUsers.put(Long.parseLong(document.get(CommonConstants.USER_ID_SOLR).toString()), user);
+		}
+		List<AgentSettings> agentSettings = organizationUnitSettingsDao.fetchMultipleAgentSettingsById(new ArrayList<Long>(matchedUsers.keySet()));
+		for(AgentSettings setting : agentSettings){
+			UserFromSearch user = matchedUsers.get(setting.getIden());
+			user.setUserId(setting.getIden());
+			user.setEmailId(setting.getContact_details().getMail_ids().getWork());
+			user.setFirstName(setting.getContact_details().getFirstName());
+			user.setDisplayName(setting.getContact_details().getName());
+			user.setLastName(setting.getContact_details().getLastName());
+			user.setLoginName(setting.getContact_details().getMail_ids().getWork());
+			user.setTitle(setting.getContact_details().getTitle());
+			user.setAboutMe(setting.getContact_details().getAbout_me());
+			user.setProfileImageUrl(setting.getProfileImageUrl());
+			user.setProfileName(setting.getProfileName());
+			user.setProfileUrl(setting.getProfileUrl());
+			user.setReviewCount(setting.getReviewCount());
+
+		}
+		
+		return matchedUsers.values();
 	}
 }

@@ -486,15 +486,17 @@ html.is-modern.card-root.js.no-touch.csstransitions.svg.inlinesvg.placeholder
 }
 
 .btn-payment {
+	display: block;
+	width: 150px;
+	margin: 0 auto;
+	line-height: 36px; 
+	border: 0;
 	border-radius: 3px;
 	color: #fff;
 	background-color: #5CC8EF;
 	font-size: 13px;
-	line-height: 36px;
 	text-align: center;
-	width: 150px;
 	box-shadow: none;
-	border: 0;
 }
 
 .btn-payment:hover {
@@ -1087,7 +1089,7 @@ button.paypal.is-active {
 .payment-section {
 	box-shadow: 0px 1px 20px 2px #7C7C7C;
 	background-color: #fff;
-	width: 500px;
+	width: 750px;
 	margin: 50px auto;
 	border-top: 5px solid #5cc7ef;
 	border-radius: 4px;
@@ -3055,6 +3057,8 @@ button.paypal.is-active {
 }
 
 .ov-payment-shadow {
+	width: 750px;
+	max-width: 100%;
 	float: none;
 	margin: 0 auto;
 	box-shadow: 0px 0px 13px 4px #CCC;
@@ -6608,4 +6612,26 @@ input.report-abuse-input {
 .prof-logo-edit{
 	background: url(../images/upload_logo.png) no-repeat center;
 	background-size: contain;
+}
+
+.prof-edditable-cont {
+	position: relative;
+}
+
+.prof-edit-field-icn {
+	position: absolute;
+	top: 0; right : -30px;
+	width: 30px;
+	height: 34px;
+	background: url(../images/edit.png) no-repeat center;
+	right: -30px;
+}
+
+a.sq-btn-post-social:hover, a.sq-btn-post-social:visited {
+	color: #fff;
+}
+
+.prof-report-abuse-txt {
+	font-size: 13px;
+	color: #777;
 }

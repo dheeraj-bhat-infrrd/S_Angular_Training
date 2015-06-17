@@ -1,11 +1,14 @@
 package com.realtech.socialsurvey.core.services.organizationmanagement;
 
 import java.net.MalformedURLException;
+import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
 import org.apache.solr.common.SolrDocumentList;
+
 import com.realtech.socialsurvey.core.entities.Achievement;
 import com.realtech.socialsurvey.core.entities.AgentSettings;
 import com.realtech.socialsurvey.core.entities.Association;
@@ -21,6 +24,7 @@ import com.realtech.socialsurvey.core.entities.SocialPost;
 import com.realtech.socialsurvey.core.entities.SurveyDetails;
 import com.realtech.socialsurvey.core.entities.SurveyPreInitiation;
 import com.realtech.socialsurvey.core.entities.User;
+import com.realtech.socialsurvey.core.entities.UserFromSearch;
 import com.realtech.socialsurvey.core.entities.UserProfile;
 import com.realtech.socialsurvey.core.entities.UserSettings;
 import com.realtech.socialsurvey.core.enums.AccountType;
@@ -321,7 +325,7 @@ public interface ProfileManagementService {
 	 * @throws MalformedURLException
 	 * @throws SolrException
 	 */
-	public SolrDocumentList getProListByProfileLevel(long iden, String profileLevel, int start, int numOfRows) throws InvalidInputException,
+	public Collection<UserFromSearch> getProListByProfileLevel(long iden, String profileLevel, int start, int numOfRows) throws InvalidInputException,
 			SolrException;
 
 	public void generateVerificationUrl(Map<String, String> urlParams, String applicationUrl, String recipientMailId, String recipientName)
