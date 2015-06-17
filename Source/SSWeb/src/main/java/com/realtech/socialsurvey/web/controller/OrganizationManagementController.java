@@ -167,6 +167,7 @@ public class OrganizationManagementController {
 		String companyContactNo = request.getParameter("contactno");
 		String vertical = request.getParameter("vertical");
 		String phoneFormat = request.getParameter("phoneFormat");
+		String logoDecoyName = request.getParameter("logoDecoyName");
 		// JIRA SS-536: Added for manual registration via invitation
 		String strIsDirectRegistration = request.getParameter("isDirectRegistration");
 
@@ -192,6 +193,7 @@ public class OrganizationManagementController {
 					model.addAttribute("companyContactNo", companyContactNo);
 					model.addAttribute("phoneFormat", phoneFormat);
 					model.addAttribute("isDirectRegistration", strIsDirectRegistration);
+					model.addAttribute("logoDecoyName",logoDecoyName);
 				}
 				catch (InvalidInputException e1) {
 					throw new InvalidInputException("Invalid Input exception occured in method getAllVerticalsMaster()",
@@ -201,7 +203,8 @@ public class OrganizationManagementController {
 				throw new InvalidInputException("Invalid input exception occured while validating form parameters", e.getErrorCode(), e);
 			}
 
-			HttpSession session = request.getSession(false);
+	//		request.getSession().invalidate();
+			HttpSession session = request.getSession(true);
 			User user = sessionHelper.getCurrentUser();
 			String logoName = null;
 			if (session.getAttribute(CommonConstants.LOGO_NAME) != null) {
@@ -1163,7 +1166,7 @@ public class OrganizationManagementController {
 			model.addAttribute("showSendSurveyPopup", String.valueOf(showSendSurveyPopup));
 
 			// update the last login time and number of logins
-			userManagementService.updateUserLoginTimeAndNum(user);
+//			userManagementService.updateUserLoginTimeAndNum(user);
 		}
 		catch (NonFatalException e) {
 			LOG.error("NonfatalException while adding account type. Reason: " + e.getMessage(), e);

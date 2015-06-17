@@ -3,14 +3,16 @@ package com.realtech.socialsurvey.web.controller;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.StringTokenizer;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
-import org.apache.solr.common.SolrDocumentList;
+
 import org.noggit.JSONUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -20,6 +22,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
+
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
@@ -1394,8 +1397,8 @@ public class HierarchyManagementController {
 						DisplayMessageConstants.GENERAL_ERROR, e);
 			}
 
-			SolrDocumentList usersResult = solrSearchService.searchUsersByIden(branchId, CommonConstants.BRANCHES_SOLR, false, start, rows);
-			String usersJson = JSONUtil.toJSON(usersResult);
+			Collection<UserFromSearch> usersResult = solrSearchService.searchUsersByIden(branchId, CommonConstants.BRANCHES_SOLR, false, start, rows);
+			String usersJson = new Gson().toJson(usersResult);
 			LOG.debug("Solr result returned for users of branch is:" + usersJson);
 			/**
 			 * convert users to Object

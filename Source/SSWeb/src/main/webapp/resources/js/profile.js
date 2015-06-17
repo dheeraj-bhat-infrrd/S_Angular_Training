@@ -493,7 +493,6 @@ function paintReviews(result){
 		if (date != null) {
 			reviewsHtml += '		<div class="ppl-head-2">'+ date.getMonthName() +" " + date.getDate() +" "+date.getFullYear()+'</div>'; 
 		}
-		reviewsHtml += '    </div>';
 		reviewsHtml += '    <div class="float-right ppl-header-right">';
 		reviewsHtml += '        <div class="st-rating-wrapper maring-0 clearfix review-ratings" data-rating="'+reviewItem.score+'"></div>';
 		reviewsHtml += '		<div class="report-resend-icn-container clearfix float-right">';
@@ -501,11 +500,13 @@ function paintReviews(result){
 		reviewsHtml += '		</div>';
 		reviewsHtml += '	</div>';
 		reviewsHtml += '</div>';
+		
 		if (reviewItem.review.length > 250) {
 			reviewsHtml += '<div class="ppl-content"><span class="review-complete-txt">'+reviewItem.review+'</span><span class="review-less-text">' + reviewItem.review.substr(0,250) + '</span><span class="review-more-button">More</span></div>';			
 		} else {
-			reviewsHtml += '<div class="ppl-content">'+reviewItem.review +'</div>';
+			reviewsHtml += '<div class="ppl-content">'+reviewItem.review+'</div>';
 		}
+		
 		reviewsHtml += '	<div class="ppl-share-wrapper clearfix">';
 		reviewsHtml += '		<div class="float-left blue-text ppl-share-shr-txt">Share</div>';
 		reviewsHtml += '		<div class="float-left icn-share icn-plus-open"></div>';
@@ -525,7 +526,10 @@ function paintReviews(result){
 			reviewsHtml += '		<a href="' + reviewItem.lendingTreeProfileUrl + '" target="_blank"><span class="float-left ppl-share-icns icn-lendingtree" title="LendingTree"></span></a>';
 		}
 		reviewsHtml += '		</div>';
-		reviewsHtml += '		<div class="float-left icn-share icn-remove icn-rem-size hide"></div>';
+		reviewsHtml += '		<div class="float-right" style="margin: 0 -5px;">';
+		reviewsHtml += '			<div class="report-abuse-txt report-txt prof-report-abuse-txt">Report Abuse</div>';
+		reviewsHtml += '		</div>';
+		reviewsHtml += '	<div class="float-left icn-share icn-remove icn-rem-size hide"></div>';
 		reviewsHtml += '	</div>';
 		reviewsHtml += '</div>';
 	});

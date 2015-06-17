@@ -4763,15 +4763,31 @@ function showMasterQuestionPage(){
 		if ($('#shr-post-chk-box').hasClass('bd-check-img') && (rating >= autoPostScore) && (Boolean(autoPost) == true)) {
 			postToSocialMedia(feedback);
 			$('#social-post-lnk').show();
-			if (yelpEnabled && (mood=='Great'))
+			if((mood == 'Great') && (yelpEnabled || googleEnabled) && !(yelpEnabled && googleEnabled)){
+				$('.sq-btn-social-wrapper').css({
+					"float" : "none",
+					"width" : "100%"
+				});
+				$('.sq-btn-post-social').css({
+					"float" : "none"
+				});
+			}
+			if (yelpEnabled && (mood == 'Great')){
 				$('#ylp-btn').show();
-			else
-				$('#ylp-btn').hide();
-			
-			if (googleEnabled && (mood=='Great'))
+				var yelpElement = document.getElementById('ylp-btn');
+				shareOnYelp(agentId, window.location.origin+"/rest/survey/", yelpElement);
+			}
+			else {
+				$('#ylp-btn').parent().remove();
+			}
+			if (googleEnabled && (mood == 'Great')){
 				$('#ggl-btn').show();
-			else
-				$('#ggl-btn').hide();
+				var googleElement = document.getElementById('ggl-btn');
+				shareOnGooglePlus(agentId, window.location.origin+"/rest/survey/", googleElement);
+			}
+			else {
+				$('#ggl-btn').parent().remove();
+			}
 		}
 		
 		updateCustomerResponse(feedback);
@@ -5254,15 +5270,11 @@ $('.sq-pts-dgreen').click(function() {
 
 $('#ylp-btn').click(function(e) {
 	//e.stopImmediatePropagation();
-	var yelpElement = document.getElementById('ylp-btn');
-	shareOnYelp(agentId, window.location.origin+"/rest/survey/", yelpElement);
 	updateSharedOn("yelp", agentId, customerEmail);
 });
 
 $('#ggl-btn').click(function(e) {
 	//e.stopImmediatePropagation();
-	var googleElement = document.getElementById('ggl-btn');
-	shareOnGooglePlus(agentId, window.location.origin+"/rest/survey/", googleElement);
 	updateSharedOn("google", agentId, customerEmail);
 });
 
