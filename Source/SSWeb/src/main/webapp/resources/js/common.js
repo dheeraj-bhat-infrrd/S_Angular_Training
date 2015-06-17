@@ -491,21 +491,51 @@ $(document).on('click', '.wc-review-rmv-icn', function() {
 
 $(document).on('click', '#wc-send-survey', function() {
 	var receiversList = [];
+	var agentId = undefined;
+	var columnName = undefined;
+	var firstname = undefined;
+	var lastname = undefined;
+	var idx=0;
 	$('#wc-review-table-inner').children().each(function() {
 		if (!$(this).hasClass('wc-review-hdr')) {
+			var dataName = $(this).find('input.wc-review-agentname').first().attr('data-name');
+			if(dataName=='agent-name'){
+				agentId = $(this).find('input.wc-review-agentname').first().attr('agent-id');
+				var name = $(this).find('input.wc-review-custname').first().val();
+				if(name!=undefined){
+					var nameParts = name.split(" ");
+					if(nameParts.length==1){
+						firstname = name;
+					}else{
+						for(var i=0;i<nameParts.length-1;i++){
+							firstname = firstname+nameParts[i];
+						}
+						lastName = nameParts[nameParts.length-1];
+					}
+				}
+				if(idx==0){
+					columnName = $(this).find('input.wc-review-agentname').first().attr('column-name');
+					idx++;
+				}
+			}
+			else{
+				firstname = $(this).find('input.wc-review-fname').first().val();
+				lastname = $(this).find('input.wc-review-lname').first().val();
+			}
 			
-			var firstname = $(this).find('input.wc-review-fname').first().val();
-			var lastname = $(this).find('input.wc-review-lname').first().val();
 			var emailId = $(this).find('input.wc-review-email').first().val();
 			
-			if (nameRegex.test(firstname) && emailRegex.test(emailId)) {
+			if (emailRegex.test(emailId)) {
 				var receiver = new Object();
 				receiver.firstname = firstname;
 				receiver.lastname = lastname;
 				receiver.emailId = emailId;
-
+				if(dataName=='agent-name'){
+					receiver.agentId = agentId;
+				}
 				receiversList.push(receiver);
 			}
+			
 		}
 	});
 
@@ -514,6 +544,13 @@ $(document).on('click', '#wc-send-survey', function() {
 		"receiversList" : receiversList,
 		"source" : 'agent'
 	};
+	if(columnName != undefined){
+		payload = {
+				"receiversList" : receiversList,
+				"source" : 'admin',
+				"columnName" : columnName,
+			};
+	}
 	callAjaxPostWithPayloadData("./sendmultiplesurveyinvites.do", function(data) {
 		$('#overlay-toast').html('Survey request sent successfully!');
 		showToast();
@@ -534,14 +571,18 @@ function sendSurveyInvitation() {
 	}, true);
 }
 
-function sendSurveyInvitationAdmin() {
-	callAjaxGET("./sendsurveyinvitationadmin.do", function(data) {
+function sendSurveyInvitationAdmin(columnName, columnValue) {
+	var payload = {
+			"columnName" : columnName,
+			"columnValue" : columnValue
+	};
+	callAjaxGetWithPayloadData("./sendsurveyinvitationadmin.do", function(data) {
 		$('#overlay-send-survey').html(data);
 		if ($("#welcome-popup-invite").length) {
 			$('#overlay-send-survey').removeClass("hide");
 			$('#overlay-send-survey').show();
 		}
-	}, true);
+	}, payload, true);
 }
 
 function linkedInDataImport() {
