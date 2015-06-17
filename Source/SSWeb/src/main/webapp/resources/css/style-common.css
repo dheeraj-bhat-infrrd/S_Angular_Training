@@ -1715,6 +1715,10 @@ button.paypal.is-active {
 	background: url(../images/zillow.png) no-repeat center;
 }
 
+.icn-lendingtree {
+	background: url(../images/lendingtree.png) no-repeat center;
+}
+
 .icn-gplus {
 	background: url(../images/gplus.png) no-repeat center;
 }

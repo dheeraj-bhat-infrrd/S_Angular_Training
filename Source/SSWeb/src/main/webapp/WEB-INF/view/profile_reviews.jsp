@@ -34,15 +34,18 @@
 					<div class="float-left blue-text ppl-share-shr-txt"><spring:message code="label.share.key"/></div>
 					<div class="float-left icn-share icn-plus-open"></div>
 					<div class="float-left clearfix ppl-share-social hide">
-						<a href="https://www.facebook.com/sharer/sharer.php?u=${reviewItem.completeProfileUrl}" target="_blank"><span class="float-left ppl-share-icns icn-fb fb-shr"></span></a>
-						<a href="https://twitter.com/home?status=${reviewItem.completeProfileUrl}" target="_blank"><span class="float-left ppl-share-icns icn-twit twt-shr"></span></a>
-						<a href="https://www.linkedin.com/shareArticle?mini=true&url=${reviewItem.completeProfileUrl} &title=&summary=${reviewItem.score}-star response from ${reviewItem.customerFirstName} ${reviewItem.customerLastName} for ${reviewItem.agentName} at SocialSurvey - ${reviewItem.review} + &source=" target="_blank"><span class="float-left ppl-share-icns icn-lin lnkdn-shr"></span></a>
-                        <a href="https://plus.google.com/share?url=${reviewItem.completeProfileUrl}" target="_blank"><span class="float-left ppl-share-icns icn-gplus yelp-shr"></span></a>
+						<a href="https://www.facebook.com/sharer/sharer.php?u=${reviewItem.completeProfileUrl}" target="_blank"><span class="float-left ppl-share-icns icn-fb fb-shr" title="Facebook"></span></a>
+						<a href="https://twitter.com/home?status=${reviewItem.completeProfileUrl}" target="_blank"><span class="float-left ppl-share-icns icn-twit twt-shr" title="Twitter"></span></a>
+						<a href="https://www.linkedin.com/shareArticle?mini=true&url=${reviewItem.completeProfileUrl} &title=&summary=${reviewItem.score}-star response from ${reviewItem.customerFirstName} ${reviewItem.customerLastName} for ${reviewItem.agentName} at SocialSurvey - ${reviewItem.review} + &source=" target="_blank"><span class="float-left ppl-share-icns icn-lin lnkdn-shr" title="LinkedIn"></span></a>
+                        <a href="https://plus.google.com/share?url=${reviewItem.completeProfileUrl}" target="_blank"><span class="float-left ppl-share-icns icn-gplus yelp-shr" title="Google+"></span></a>
 						<c:if test="${not empty reviewItem.yelpProfileUrl}">
-							<a href="${reviewItem.yelpProfileUrl}" target="_blank"><span class="float-left ppl-share-icns icn-yelp yelp-shr"></span></a>
+							<a href="${reviewItem.yelpProfileUrl}" target="_blank"><span class="float-left ppl-share-icns icn-yelp yelp-shr" title="Yelp"></span></a>
 						</c:if>
 						<c:if test="${not empty reviewItem.zillowProfileUrl}">
-							<a href="${reviewItem.zillowProfileUrl}" target="_blank"><span class="float-left ppl-share-icns icn-zillow yelp-shr"></span></a>
+							<a href="${reviewItem.zillowProfileUrl}" target="_blank"><span class="float-left ppl-share-icns icn-zillow yelp-shr" title="Zillow"></span></a>
+						</c:if>
+						<c:if test="${not empty reviewItem.lendingTreeProfileUrl}">
+							<a href="${reviewItem.lendingTreeProfileUrl}" target="_blank"><span class="float-left ppl-share-icns icn-lendingtree yelp-shr" title="LendingTree"></span></a>
 						</c:if>
 					</div>
 					<div class="float-left icn-share icn-remove icn-rem-size hide"></div>
