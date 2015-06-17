@@ -5,15 +5,19 @@ package com.realtech.socialsurvey.core.services.search;
 
 import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
 import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrDocumentList;
+
 import com.realtech.socialsurvey.core.entities.Branch;
 import com.realtech.socialsurvey.core.entities.Company;
 import com.realtech.socialsurvey.core.entities.Region;
 import com.realtech.socialsurvey.core.entities.User;
+import com.realtech.socialsurvey.core.entities.UserFromSearch;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.exception.NoRecordsFetchedException;
 import com.realtech.socialsurvey.core.services.search.exception.SolrException;
@@ -100,18 +104,6 @@ public interface SolrSearchService {
 	 * @throws MalformedURLException
 	 * @throws UnsupportedEncodingException
 	 */
-	public List<SolrDocument> searchUsersByFirstOrLastName(String patternFirst, String patternLast) throws InvalidInputException, SolrException,
-			MalformedURLException;
-
-	/**
-	 * Method to perform search of Users from solr based on the input pattern for firstname and last
-	 * name
-	 * 
-	 * @throws InvalidInputException
-	 * @throws SolrException
-	 * @throws MalformedURLException
-	 * @throws UnsupportedEncodingException
-	 */
 	public SolrDocumentList searchUsersByFirstOrLastName(String patternFirst, String patternLast, int startIndex, int noOfRows)
 			throws InvalidInputException, SolrException, MalformedURLException;
 
@@ -162,7 +154,7 @@ public interface SolrSearchService {
 	 * @throws InvalidInputException
 	 * @throws SolrException
 	 */
-	public SolrDocumentList searchUsersByIden(long iden, String idenFieldName, boolean isAgent, int startIndex, int noOfRows)
+	public Collection<UserFromSearch> searchUsersByIden(long iden, String idenFieldName, boolean isAgent, int startIndex, int noOfRows)
 			throws InvalidInputException, SolrException;
 
 	/**

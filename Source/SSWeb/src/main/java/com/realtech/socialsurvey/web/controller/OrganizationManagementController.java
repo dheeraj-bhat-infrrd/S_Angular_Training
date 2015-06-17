@@ -201,7 +201,7 @@ public class OrganizationManagementController {
 				throw new InvalidInputException("Invalid input exception occured while validating form parameters", e.getErrorCode(), e);
 			}
 
-			request.getSession().invalidate();
+	//		request.getSession().invalidate();
 			HttpSession session = request.getSession(true);
 			User user = sessionHelper.getCurrentUser();
 			String logoName = null;
