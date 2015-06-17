@@ -1174,16 +1174,21 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 		for (SurveyDetails review : surveyDetails) {
 			OrganizationUnitSettings agentSettings = organizationUnitSettingsDao.fetchAgentSettingsById(review.getAgentId());
 			if (agentSettings != null && agentSettings.getSocialMediaTokens() != null) {
+				SocialMediaTokens mediaTokens = agentSettings.getSocialMediaTokens();
+
 				// adding yelpUrl
-				if (agentSettings.getSocialMediaTokens().getYelpToken() != null
-						&& agentSettings.getSocialMediaTokens().getYelpToken().getYelpPageLink() != null) {
-					review.setYelpProfileUrl(agentSettings.getSocialMediaTokens().getYelpToken().getYelpPageLink());
+				if (mediaTokens.getYelpToken() != null && mediaTokens.getYelpToken().getYelpPageLink() != null) {
+					review.setYelpProfileUrl(mediaTokens.getYelpToken().getYelpPageLink());
 				}
 
 				// adding zillowUrl
-				if (agentSettings.getSocialMediaTokens().getZillowToken() != null
-						&& agentSettings.getSocialMediaTokens().getZillowToken().getZillowProfileLink() != null) {
-					review.setZillowProfileUrl(agentSettings.getSocialMediaTokens().getZillowToken().getZillowProfileLink());
+				if (mediaTokens.getZillowToken() != null && mediaTokens.getZillowToken().getZillowProfileLink() != null) {
+					review.setZillowProfileUrl(mediaTokens.getZillowToken().getZillowProfileLink());
+				}
+
+				// adding lendingTreeUrl
+				if (mediaTokens.getLendingTreeToken() != null && mediaTokens.getLendingTreeToken().getLendingTreeProfileLink() != null) {
+					review.setLendingTreeProfileUrl(mediaTokens.getLendingTreeToken().getLendingTreeProfileLink());
 				}
 			}
 		}
@@ -1649,16 +1654,21 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 			
 			OrganizationUnitSettings agentSettings = organizationUnitSettingsDao.fetchAgentSettingsById(review.getAgentId());
 			if (agentSettings != null && agentSettings.getSocialMediaTokens() != null) {
+				SocialMediaTokens mediaTokens = agentSettings.getSocialMediaTokens();
+
 				// adding yelpUrl
-				if (agentSettings.getSocialMediaTokens().getYelpToken() != null
-						&& agentSettings.getSocialMediaTokens().getYelpToken().getYelpPageLink() != null) {
-					review.setYelpProfileUrl(agentSettings.getSocialMediaTokens().getYelpToken().getYelpPageLink());
+				if (mediaTokens.getYelpToken() != null && mediaTokens.getYelpToken().getYelpPageLink() != null) {
+					review.setYelpProfileUrl(mediaTokens.getYelpToken().getYelpPageLink());
 				}
 
 				// adding zillowUrl
-				if (agentSettings.getSocialMediaTokens().getZillowToken() != null
-						&& agentSettings.getSocialMediaTokens().getZillowToken().getZillowProfileLink() != null) {
-					review.setZillowProfileUrl(agentSettings.getSocialMediaTokens().getZillowToken().getZillowProfileLink());
+				if (mediaTokens.getZillowToken() != null && mediaTokens.getZillowToken().getZillowProfileLink() != null) {
+					review.setZillowProfileUrl(mediaTokens.getZillowToken().getZillowProfileLink());
+				}
+
+				// adding lendingTreeUrl
+				if (mediaTokens.getLendingTreeToken() != null && mediaTokens.getLendingTreeToken().getLendingTreeProfileLink() != null) {
+					review.setLendingTreeProfileUrl(mediaTokens.getLendingTreeToken().getLendingTreeProfileLink());
 				}
 			}
 		}
