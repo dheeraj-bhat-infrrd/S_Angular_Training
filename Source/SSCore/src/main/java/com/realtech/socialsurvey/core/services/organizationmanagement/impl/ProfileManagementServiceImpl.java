@@ -3,6 +3,7 @@ package com.realtech.socialsurvey.core.services.organizationmanagement.impl;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
@@ -10,8 +11,9 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
 import javax.annotation.Resource;
-import org.apache.solr.common.SolrDocumentList;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
@@ -21,6 +23,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.DependsOn;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
+
 import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.commons.Utils;
 import com.realtech.socialsurvey.core.dao.BranchDao;
@@ -56,6 +59,7 @@ import com.realtech.socialsurvey.core.entities.SurveyDetails;
 import com.realtech.socialsurvey.core.entities.SurveyPreInitiation;
 import com.realtech.socialsurvey.core.entities.TwitterToken;
 import com.realtech.socialsurvey.core.entities.User;
+import com.realtech.socialsurvey.core.entities.UserFromSearch;
 import com.realtech.socialsurvey.core.entities.UserProfile;
 import com.realtech.socialsurvey.core.entities.UserSettings;
 import com.realtech.socialsurvey.core.entities.WebAddressSettings;
@@ -1268,7 +1272,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 	 * @throws SolrException
 	 */
 	@Override
-	public SolrDocumentList getProListByProfileLevel(long iden, String profileLevel, int start, int numOfRows) throws InvalidInputException,
+	public Collection<UserFromSearch> getProListByProfileLevel(long iden, String profileLevel, int start, int numOfRows) throws InvalidInputException,
 			SolrException {
 		LOG.info("Method getProListByProfileLevel called for iden: " + iden + " profileLevel:" + profileLevel + " start:" + start + " numOfRows:"
 				+ numOfRows);
@@ -1279,7 +1283,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 			throw new InvalidInputException("profile level is null in getProListByProfileLevel");
 		}
 		String idenFieldName = null;
-		SolrDocumentList solrSearchResult = null;
+		Collection<UserFromSearch> solrSearchResult = null;
 		switch (profileLevel) {
 			case CommonConstants.PROFILE_LEVEL_COMPANY:
 				idenFieldName = CommonConstants.COMPANY_ID_SOLR;
@@ -1637,9 +1641,9 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 			
 			// adding completeProfileUrl
 			try {
-				SolrDocumentList documents = solrSearchService.searchUsersByIden(review.getAgentId(), CommonConstants.USER_ID_SOLR, true, 0, 1);
+				Collection<UserFromSearch> documents = solrSearchService.searchUsersByIden(review.getAgentId(), CommonConstants.USER_ID_SOLR, true, 0, 1);
 				if (documents != null && !documents.isEmpty()) {
-					profileUrl = (String) documents.get(CommonConstants.INITIAL_INDEX).getFieldValue(CommonConstants.PROFILE_URL_SOLR);
+					profileUrl = (String) documents.iterator().next().getProfileUrl();
 					review.setCompleteProfileUrl(baseProfileUrl + profileUrl);
 				}
 			}
