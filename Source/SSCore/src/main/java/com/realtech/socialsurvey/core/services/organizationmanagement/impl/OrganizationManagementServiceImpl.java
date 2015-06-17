@@ -9,6 +9,7 @@ import java.net.MalformedURLException;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -18,8 +19,6 @@ import java.util.Set;
 
 import javax.annotation.Resource;
 
-import org.apache.solr.common.SolrDocumentList;
-import org.noggit.JSONUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
@@ -2881,9 +2880,9 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 		List<UserFromSearch> users = null;
 		Region defaultRegion = getDefaultRegionForCompany(company);
 		Branch defaultBranch = getDefaultBranchForRegion(defaultRegion.getRegionId());
-		SolrDocumentList usersResult = solrSearchService.searchUsersByIden(defaultBranch.getBranchId(), CommonConstants.BRANCHES_SOLR, false, start,
+		Collection<UserFromSearch> usersResult = solrSearchService.searchUsersByIden(defaultBranch.getBranchId(), CommonConstants.BRANCHES_SOLR, false, start,
 				rows);
-		String usersJson = JSONUtil.toJSON(usersResult);
+		String usersJson = new Gson().toJson(usersResult);
 		LOG.debug("Solr result returned for users of company is:" + usersJson);
 		/**
 		 * convert users to Object
