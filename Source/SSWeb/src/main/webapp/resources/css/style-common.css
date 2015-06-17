@@ -103,6 +103,10 @@ a,a:hover,a:visited {
 	margin: 0 auto;
 }
 
+.pos-relative{
+	position: relative;
+}
+
 .logo {
 	background: url(../images/logo.png) no-repeat center;
 }
@@ -6634,4 +6638,29 @@ a.sq-btn-post-social:hover, a.sq-btn-post-social:visited {
 .prof-report-abuse-txt {
 	font-size: 13px;
 	color: #777;
+}
+
+.agent-dropdown-wrapper {
+    position: absolute;
+    top: 39px;
+    left: 5px;
+    padding-right: 10px;
+    width: 100%;
+    z-index: 9;
+}
+
+.agent-dropdown-cont {
+	border: 1px solid #dcdcdc;
+}
+
+.agent-dropdown-item {
+    line-height: 40px;
+    padding-left: 10px;
+    background-color: #fff;
+    cursor: pointer;
+}
+
+.agent-dropdown-item:hover {
+    color:#fff;
+    background-color: #5cc7ef;
 }
