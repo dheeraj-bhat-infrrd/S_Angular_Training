@@ -48,6 +48,7 @@ import com.realtech.socialsurvey.core.entities.ContactNumberSettings;
 import com.realtech.socialsurvey.core.entities.DisplayMessage;
 import com.realtech.socialsurvey.core.entities.FacebookToken;
 import com.realtech.socialsurvey.core.entities.GoogleToken;
+import com.realtech.socialsurvey.core.entities.LendingTreeToken;
 import com.realtech.socialsurvey.core.entities.Licenses;
 import com.realtech.socialsurvey.core.entities.LinkedInToken;
 import com.realtech.socialsurvey.core.entities.LockSettings;
@@ -2405,6 +2406,120 @@ public class ProfileManagementController {
 		zillowToken.setZillowProfileLink(zillowLink);
 		socialMediaTokens.setZillowToken(zillowToken);
 		LOG.debug("Method updateZillowLink() finished from ProfileManagementController");
+		return socialMediaTokens;
+	}
+	
+	@RequestMapping(value = "/updatelendingtreelink", method = RequestMethod.POST)
+	public String updateLendingTreeLink(Model model, HttpServletRequest request) {
+		LOG.info("Method updateLendingTreeLink() called from ProfileManagementController");
+		HttpSession session = request.getSession(false);
+		SocialMediaTokens socialMediaTokens = null;
+
+		try {
+			UserSettings userSettings = (UserSettings) session.getAttribute(CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION);
+			OrganizationUnitSettings profileSettings = (OrganizationUnitSettings) session.getAttribute(CommonConstants.USER_PROFILE_SETTINGS);
+			UserProfile selectedProfile = (UserProfile) request.getSession(false).getAttribute(CommonConstants.USER_PROFILE);
+			if (userSettings == null || profileSettings == null || selectedProfile == null) {
+				throw new InvalidInputException("No user settings found in session", DisplayMessageConstants.GENERAL_ERROR);
+			}
+
+			String lendingTreeLink = request.getParameter("lendingTreeLink");
+			try {
+				if (lendingTreeLink == null || lendingTreeLink.isEmpty()) {
+					throw new InvalidInputException("lendingTreeLink passed was null or empty", DisplayMessageConstants.GENERAL_ERROR);
+				}
+				urlValidationHelper.validateUrl(lendingTreeLink);
+			}
+			catch (IOException ioException) {
+				throw new InvalidInputException("lendingTreeLink passed was invalid", DisplayMessageConstants.GENERAL_ERROR, ioException);
+			}
+
+			int profilesMaster = selectedProfile.getProfilesMaster().getProfileId();
+			if (profilesMaster == CommonConstants.PROFILES_MASTER_COMPANY_ADMIN_PROFILE_ID) {
+				OrganizationUnitSettings companySettings = userSettings.getCompanySettings();
+				if (companySettings == null) {
+					throw new InvalidInputException("No company settings found in current session");
+				}
+				socialMediaTokens = companySettings.getSocialMediaTokens();
+				socialMediaTokens = updateLendingTreeLink(lendingTreeLink, socialMediaTokens);
+				profileManagementService.updateSocialMediaTokens(MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION, companySettings,
+						socialMediaTokens);
+				companySettings.setSocialMediaTokens(socialMediaTokens);
+				userSettings.setCompanySettings(companySettings);
+			}
+			else if (profilesMaster == CommonConstants.PROFILES_MASTER_REGION_ADMIN_PROFILE_ID) {
+				long regionId = selectedProfile.getRegionId();
+				OrganizationUnitSettings regionSettings = userSettings.getRegionSettings().get(regionId);
+				if (regionSettings == null) {
+					throw new InvalidInputException("No Region settings found in current session");
+				}
+				socialMediaTokens = regionSettings.getSocialMediaTokens();
+				socialMediaTokens = updateLendingTreeLink(lendingTreeLink, socialMediaTokens);
+				profileManagementService.updateSocialMediaTokens(MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION, regionSettings,
+						socialMediaTokens);
+				regionSettings.setSocialMediaTokens(socialMediaTokens);
+				userSettings.getRegionSettings().put(regionId, regionSettings);
+			}
+			else if (profilesMaster == CommonConstants.PROFILES_MASTER_BRANCH_ADMIN_PROFILE_ID) {
+				long branchId = selectedProfile.getBranchId();
+				OrganizationUnitSettings branchSettings = userSettings.getBranchSettings().get(branchId);
+				if (branchSettings == null) {
+					throw new InvalidInputException("No Branch settings found in current session");
+				}
+				socialMediaTokens = branchSettings.getSocialMediaTokens();
+				socialMediaTokens = updateLendingTreeLink(lendingTreeLink, socialMediaTokens);
+				profileManagementService.updateSocialMediaTokens(MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION, branchSettings,
+						socialMediaTokens);
+				branchSettings.setSocialMediaTokens(socialMediaTokens);
+				userSettings.getBranchSettings().put(branchId, branchSettings);
+			}
+			else if (profilesMaster == CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID) {
+				AgentSettings agentSettings = userSettings.getAgentSettings();
+				if (agentSettings == null) {
+					throw new InvalidInputException("No Agent settings found in current session");
+				}
+				socialMediaTokens = agentSettings.getSocialMediaTokens();
+				socialMediaTokens = updateLendingTreeLink(lendingTreeLink, socialMediaTokens);
+				profileManagementService.updateSocialMediaTokens(MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION, agentSettings,
+						socialMediaTokens);
+				agentSettings.setSocialMediaTokens(socialMediaTokens);
+				userSettings.setAgentSettings(agentSettings);
+			}
+			else {
+				throw new InvalidInputException("Invalid input exception occurred in updating lendingTree token.",
+						DisplayMessageConstants.GENERAL_ERROR);
+			}
+
+			profileSettings.setSocialMediaTokens(socialMediaTokens);
+
+			LOG.info("lendingTree updated successfully");
+			model.addAttribute("message",
+					messageUtils.getDisplayMessage(DisplayMessageConstants.LENDINGTREE_TOKEN_UPDATE_SUCCESSFUL, DisplayMessageType.SUCCESS_MESSAGE));
+		}
+		catch (NonFatalException nonFatalException) {
+			LOG.error("NonFatalException while updating ZillowLink in profile. Reason :" + nonFatalException.getMessage(), nonFatalException);
+			model.addAttribute("message",
+					messageUtils.getDisplayMessage(DisplayMessageConstants.LENDINGTREE_TOKEN_UPDATE_UNSUCCESSFUL, DisplayMessageType.ERROR_MESSAGE));
+		}
+
+		LOG.info("Method updateLendingTreeLink() finished from ProfileManagementController");
+		return JspResolver.MESSAGE_HEADER;
+	}
+
+	private SocialMediaTokens updateLendingTreeLink(String lendingTreeLink, SocialMediaTokens socialMediaTokens) {
+		LOG.debug("Method updateLendingTreeLink() called from ProfileManagementController");
+		if (socialMediaTokens == null) {
+			LOG.debug("No social media token in profile added");
+			socialMediaTokens = new SocialMediaTokens();
+		}
+		if (socialMediaTokens.getLendingTreeToken() == null) {
+			socialMediaTokens.setLendingTreeToken(new LendingTreeToken());
+		}
+		
+		LendingTreeToken lendingTreeToken = socialMediaTokens.getLendingTreeToken();
+		lendingTreeToken.setLendingTreeProfileLink(lendingTreeLink);
+		socialMediaTokens.setLendingTreeToken(lendingTreeToken);
+		LOG.debug("Method updateLendingTreeLink() finished from ProfileManagementController");
 		return socialMediaTokens;
 	}
 	
