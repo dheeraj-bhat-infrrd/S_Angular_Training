@@ -28,8 +28,9 @@
 	<c:set value="${socialMediaTokens.facebookToken}" var="facebookToken"></c:set>
 	<c:set value="${socialMediaTokens.twitterToken}" var="twitterToken"></c:set>
 	<c:set value="${socialMediaTokens.linkedInToken}" var="linkedInToken"></c:set>
-	<c:set value="${socialMediaTokens.yelpToken}" var="yelpToken"></c:set>
 	<c:set value="${socialMediaTokens.googleToken}" var="googleToken"></c:set>
+	<c:set value="${socialMediaTokens.yelpToken}" var="yelpToken"></c:set>
+	<c:set value="${socialMediaTokens.zillowToken}" var="zillowToken"></c:set>
 </c:if>
 
 <!-- Setting agent page variables -->
@@ -214,13 +215,13 @@
 					</c:if>
 
 					<c:if test="${accountMasterId != 5}">
-						<div id="prof-edit-social-link"
-							class="prof-edit-social-link float-right hm-hr-row-right clearfix">
+						<div id="prof-edit-social-link" class="prof-edit-social-link float-right hm-hr-row-right clearfix">
 							<div id="icn-fb" class="float-left social-item-icon icn-fb" data-link="${facebookToken.facebookPageLink}"></div>
 							<div id="icn-twit" class="float-left social-item-icon icn-twit" data-link="${twitterToken.twitterPageLink}"></div>
 							<div id="icn-lin" class="float-left social-item-icon icn-lin" data-link="${linkedInToken.linkedInPageLink}"></div>
-							<div id="icn-yelp" class="float-left social-item-icon icn-yelp" data-link="${yelpToken.yelpPageLink}"></div>
                             <div id="icn-gplus" class="float-left social-item-icon icn-gplus" data-link="${googleToken.profileLink}"></div>
+							<div id="icn-yelp" class="float-left social-item-icon icn-yelp" data-link="${yelpToken.yelpPageLink}"></div>
+							<div id="icn-zillow" class="float-left social-item-icon icn-zillow" data-link="${zillowToken.zillowProfileLink}"></div>
 							<input id="social-token-text" type="text" class="social-token-text hide"
 								placeholder='<spring:message code="label.socialpage.placeholder.key"/>'>
 						</div>
@@ -585,6 +586,14 @@
 		$('#contact-wrapper').hide();
 		$('#reviews-container').hide();
 		$('#ppl-post-cont').hide();
+	});
+	$('#prof-basic-container').on('mouseover',function(e){
+		$('#prof-basic-container .prof-edit-field-icn').show();
+		$('#prof-basic-container .prof-edditable').addClass('prof-name-edit');
+	});
+	$('#prof-basic-container').on('mouseleave',function(e){
+		$('#prof-basic-container .prof-edit-field-icn').hide();
+		$('#prof-basic-container .prof-edditable').removeClass('prof-name-edit');
 	});
 });
 </script>

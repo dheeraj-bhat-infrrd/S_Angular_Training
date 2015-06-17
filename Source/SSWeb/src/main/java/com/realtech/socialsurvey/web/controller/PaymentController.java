@@ -102,6 +102,7 @@ public class PaymentController {
 	public String subscribeForPlan(Model model, HttpServletRequest request, HttpServletResponse response) {
 
 		LOG.info("Payment controller called for plan subscribal");
+		String skipPayment = request.getParameter("skipPayment");
 		try {
 			
 			String strAccountType = request.getParameter(CommonConstants.ACCOUNT_TYPE_IN_SESSION);
@@ -167,6 +168,7 @@ public class PaymentController {
 		}
 		catch (NonFatalException e) {
 			LOG.error("NonfatalException while adding account type. Reason: " + e.getMessage(), e);
+			model.addAttribute("skipPayment", skipPayment);
 			model.addAttribute("message", messageUtils.getDisplayMessage(e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE));
 			return JspResolver.ACCOUNT_TYPE_SELECTION;
 		}

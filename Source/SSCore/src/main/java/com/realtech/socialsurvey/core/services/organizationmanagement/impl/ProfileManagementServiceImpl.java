@@ -1158,6 +1158,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 		if (iden <= 0l) {
 			throw new InvalidInputException("iden is invalid while fetching reviews");
 		}
+		
 		Calendar calendar = Calendar.getInstance();
 		if (startDate != null) {
 			calendar.setTime(startDate);
@@ -1169,9 +1170,28 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 			calendar.add(Calendar.DATE, 1);
 			endDate = calendar.getTime();
 		}
+		
 		String idenColumnName = getIdenColumnNameFromProfileLevel(profileLevel);
 		surveyDetails = surveyDetailsDao.getFeedbacks(idenColumnName, iden, startIndex, numOfRows, startScore, limitScore, fetchAbusive, startDate,
 				endDate, sortCriteria);
+		
+		for (SurveyDetails review : surveyDetails) {
+			OrganizationUnitSettings agentSettings = organizationUnitSettingsDao.fetchAgentSettingsById(review.getAgentId());
+			if (agentSettings != null && agentSettings.getSocialMediaTokens() != null) {
+				// adding yelpUrl
+				if (agentSettings.getSocialMediaTokens().getYelpToken() != null
+						&& agentSettings.getSocialMediaTokens().getYelpToken().getYelpPageLink() != null) {
+					review.setYelpProfileUrl(agentSettings.getSocialMediaTokens().getYelpToken().getYelpPageLink());
+				}
+
+				// adding zillowUrl
+				if (agentSettings.getSocialMediaTokens().getZillowToken() != null
+						&& agentSettings.getSocialMediaTokens().getZillowToken().getZillowProfileLink() != null) {
+					review.setZillowProfileUrl(agentSettings.getSocialMediaTokens().getZillowToken().getZillowProfileLink());
+				}
+			}
+		}
+		
 		return surveyDetails;
 	}
 
@@ -1608,7 +1628,8 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 	@Override
 	public void updateProfileStages(List<ProfileStage> profileStages, OrganizationUnitSettings settings, String collectionName){
 		LOG.info("Method to update profile stages started.");
-		organizationUnitSettingsDao.updateParticularKeyOrganizationUnitSettings(MongoOrganizationUnitSettingDaoImpl.KEY_PROFILE_STAGES, profileStages, settings, collectionName);
+		organizationUnitSettingsDao.updateParticularKeyOrganizationUnitSettings(MongoOrganizationUnitSettingDaoImpl.KEY_PROFILE_STAGES,
+				profileStages, settings, collectionName);
 		LOG.info("Method to update profile stages finished.");
 	}
 	
@@ -1617,6 +1638,8 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 		String profileUrl;
 		String baseProfileUrl = applicationBaseUrl + CommonConstants.AGENT_PROFILE_FIXED_URL;
 		for (SurveyDetails review : reviews) {
+			
+			// adding completeProfileUrl
 			try {
 				Collection<UserFromSearch> documents = solrSearchService.searchUsersByIden(review.getAgentId(), CommonConstants.USER_ID_SOLR, true, 0, 1);
 				if (documents != null && !documents.isEmpty()) {
@@ -1626,6 +1649,21 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 			}
 			catch (InvalidInputException | SolrException e) {
 				LOG.error("Exception caught in setAgentProfileUrlForReview() for agent : " + review.getAgentName() + " Nested exception is ", e);
+			}
+			
+			OrganizationUnitSettings agentSettings = organizationUnitSettingsDao.fetchAgentSettingsById(review.getAgentId());
+			if (agentSettings != null && agentSettings.getSocialMediaTokens() != null) {
+				// adding yelpUrl
+				if (agentSettings.getSocialMediaTokens().getYelpToken() != null
+						&& agentSettings.getSocialMediaTokens().getYelpToken().getYelpPageLink() != null) {
+					review.setYelpProfileUrl(agentSettings.getSocialMediaTokens().getYelpToken().getYelpPageLink());
+				}
+
+				// adding zillowUrl
+				if (agentSettings.getSocialMediaTokens().getZillowToken() != null
+						&& agentSettings.getSocialMediaTokens().getZillowToken().getZillowProfileLink() != null) {
+					review.setZillowProfileUrl(agentSettings.getSocialMediaTokens().getZillowToken().getZillowProfileLink());
+				}
 			}
 		}
 	}
