@@ -510,16 +510,19 @@ function paintReviews(result){
 		reviewsHtml += '		<div class="float-left blue-text ppl-share-shr-txt">Share</div>';
 		reviewsHtml += '		<div class="float-left icn-share icn-plus-open"></div>';
 		reviewsHtml += '		<div class="float-left clearfix ppl-share-social hide">';
-		reviewsHtml += '			<a href="https://www.facebook.com/sharer/sharer.php?u=' + reviewItem.completeProfileUrl + '" target="_blank"><span class="float-left ppl-share-icns icn-fb icn-fb-pp"></span></a>';
-		reviewsHtml += '			<a href="https://twitter.com/home?status=' + reviewItem.completeProfileUrl + '" target="_blank"><span class="float-left ppl-share-icns icn-twit icn-twit-pp"></span></a>';
-		reviewsHtml += '			<a href="https://www.linkedin.com/shareArticle?mini=true&url=' + reviewItem.completeProfileUrl + '&title=&summary=' + reviewItem.score + '-star response from ' + reviewItem.customerFirstName+' '+reviewItem.customerLastName + ' for ' + reviewItem.agentName +' at SocialSurvey - ' + reviewItem.review + '&source=" target="_blank"><span class="float-left ppl-share-icns icn-lin icn-lin-pp"></span></a>';
-		reviewsHtml += '			<a href="https://plus.google.com/share?url=' + reviewItem.completeProfileUrl + '" target="_blank"<span class="float-left ppl-share-icns icn-gplus"></span></a>';
+		reviewsHtml += '			<a href="https://www.facebook.com/sharer/sharer.php?u=' + reviewItem.completeProfileUrl + '" target="_blank"><span class="float-left ppl-share-icns icn-fb icn-fb-pp" title="Facebook"></span></a>';
+		reviewsHtml += '			<a href="https://twitter.com/home?status=' + reviewItem.completeProfileUrl + '" target="_blank"><span class="float-left ppl-share-icns icn-twit icn-twit-pp" title="Twitter"></span></a>';
+		reviewsHtml += '			<a href="https://www.linkedin.com/shareArticle?mini=true&url=' + reviewItem.completeProfileUrl + '&title=&summary=' + reviewItem.score + '-star response from ' + reviewItem.customerFirstName+' '+reviewItem.customerLastName + ' for ' + reviewItem.agentName +' at SocialSurvey - ' + reviewItem.review + '&source=" target="_blank"><span class="float-left ppl-share-icns icn-lin icn-lin-pp" title="LinkedIn"></span></a>';
+		reviewsHtml += '			<a href="https://plus.google.com/share?url=' + reviewItem.completeProfileUrl + '" target="_blank"<span class="float-left ppl-share-icns icn-gplus" title="Google+"></span></a>';
 		
 		if (reviewItem.yelpProfileUrl != null && reviewItem.yelpProfileUrl != "") {
-			reviewsHtml += '		<a href="' + reviewItem.yelpProfileUrl + '" target="_blank"><span class="float-left ppl-share-icns icn-yelp"></span></a>';
+			reviewsHtml += '		<a href="' + reviewItem.yelpProfileUrl + '" target="_blank"><span class="float-left ppl-share-icns icn-yelp" title="Yelp"></span></a>';
 		}
 		if (reviewItem.zillowProfileUrl != null && reviewItem.zillowProfileUrl != "") {
-			reviewsHtml += '		<a href="' + reviewItem.zillowProfileUrl + '" target="_blank"><span class="float-left ppl-share-icns icn-zillow"></span></a>';
+			reviewsHtml += '		<a href="' + reviewItem.zillowProfileUrl + '" target="_blank"><span class="float-left ppl-share-icns icn-zillow" title="Zillow"></span></a>';
+		}
+		if (reviewItem.lendingTreeProfileUrl != null && reviewItem.lendingTreeProfileUrl != "") {
+			reviewsHtml += '		<a href="' + reviewItem.lendingTreeProfileUrl + '" target="_blank"><span class="float-left ppl-share-icns icn-lendingtree" title="LendingTree"></span></a>';
 		}
 		reviewsHtml += '		</div>';
 		reviewsHtml += '		<div class="float-left icn-share icn-remove icn-rem-size hide"></div>';

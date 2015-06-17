@@ -33,6 +33,7 @@ public class SurveyDetails {
 	private String completeProfileUrl;
 	private String yelpProfileUrl;
 	private String zillowProfileUrl;
+	private String lendingTreeProfileUrl;
 
 	public long getAgentId() {
 		return agentId;
@@ -264,5 +265,13 @@ public class SurveyDetails {
 
 	public void setZillowProfileUrl(String zillowProfileUrl) {
 		this.zillowProfileUrl = zillowProfileUrl;
+	}
+
+	public String getLendingTreeProfileUrl() {
+		return lendingTreeProfileUrl;
+	}
+
+	public void setLendingTreeProfileUrl(String lendingTreeProfileUrl) {
+		this.lendingTreeProfileUrl = lendingTreeProfileUrl;
 	}
 }
