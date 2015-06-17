@@ -948,7 +948,7 @@ public class UserManagementController {
 			}
 
 			AccountType accountType = null;
-			request.getSession().invalidate();
+//			request.getSession().invalidate();
 			HttpSession session = request.getSession(true);
 			
 			try {
