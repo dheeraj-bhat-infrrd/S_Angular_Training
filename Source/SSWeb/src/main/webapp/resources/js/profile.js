@@ -473,17 +473,19 @@ function fetchReviewsForCompanyCallBack(data) {
 }
 
 function paintReviews(result){
-	var reviewsHtml = "";
 	var resultSize = result.length;
 	$('.ppl-review-item-last').removeClass('ppl-review-item-last').addClass('ppl-review-item');
 	
+	var reviewsHtml = "";
 	$.each(result, function(i, reviewItem) {
 		var date = Date.parse(reviewItem.modifiedOn);
 		var lastItemClass = "ppl-review-item";
 		if (i == resultSize - 1) {
 			lastItemClass = "ppl-review-item-last";
         }
-		reviewsHtml = reviewsHtml + '<div class="' + lastItemClass + '" data-cust-first-name=' + reviewItem.customerFirstName
+		
+		reviewsHtml = reviewsHtml +
+			'<div class="' + lastItemClass + '" data-cust-first-name=' + reviewItem.customerFirstName
 				+ ' data-cust-last-name=' + reviewItem.customerLastName + ' data-agent-name=' + reviewItem.agentName
 				+ ' data-rating=' + reviewItem.score + ' data-review="' + reviewItem.review + '" data-customeremail="'
 				+ reviewItem.customerEmail + '" data-agentid="' + reviewItem.agentId + '">';
@@ -493,13 +495,11 @@ function paintReviews(result){
 		if (date != null) {
 			reviewsHtml += '		<div class="ppl-head-2">'+ date.getMonthName() +" " + date.getDate() +" "+date.getFullYear()+'</div>'; 
 		}
-		reviewsHtml += '    <div class="float-right ppl-header-right">';
-		reviewsHtml += '        <div class="st-rating-wrapper maring-0 clearfix review-ratings" data-rating="'+reviewItem.score+'"></div>';
-		reviewsHtml += '		<div class="report-resend-icn-container clearfix float-right">';
-		reviewsHtml += '			<div class="report-abuse-txt report-txt prof-report-abuse-txt">Report</div>';
+		reviewsHtml += '		</div>';
+		reviewsHtml += '    	<div class="float-right ppl-header-right">';
+		reviewsHtml += '    	    <div class="st-rating-wrapper maring-0 clearfix review-ratings" data-rating="'+reviewItem.score+'"></div>';
 		reviewsHtml += '		</div>';
 		reviewsHtml += '	</div>';
-		reviewsHtml += '</div>';
 		
 		if (reviewItem.review.length > 250) {
 			reviewsHtml += '<div class="ppl-content"><span class="review-complete-txt">'+reviewItem.review+'</span><span class="review-less-text">' + reviewItem.review.substr(0,250) + '</span><span class="review-more-button">More</span></div>';			
@@ -529,7 +529,7 @@ function paintReviews(result){
 		reviewsHtml += '		<div class="float-right" style="margin: 0 -5px;">';
 		reviewsHtml += '			<div class="report-abuse-txt report-txt prof-report-abuse-txt">Report Abuse</div>';
 		reviewsHtml += '		</div>';
-		reviewsHtml += '	<div class="float-left icn-share icn-remove icn-rem-size hide"></div>';
+		reviewsHtml += '		<div class="float-left icn-share icn-remove icn-rem-size hide"></div>';
 		reviewsHtml += '	</div>';
 		reviewsHtml += '</div>';
 	});
