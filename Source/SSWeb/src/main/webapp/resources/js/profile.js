@@ -476,36 +476,27 @@ function paintReviews(result){
 	var reviewsHtml = "";
 	var resultSize = result.length;
 	$('.ppl-review-item-last').removeClass('ppl-review-item-last').addClass('ppl-review-item');
+	
 	$.each(result, function(i, reviewItem) {
 		var date = Date.parse(reviewItem.modifiedOn);
 		var lastItemClass = "ppl-review-item";
 		if (i == resultSize - 1) {
 			lastItemClass = "ppl-review-item-last";
         }
-		reviewsHtml = reviewsHtml + '<div class="'
-				+ lastItemClass + '" data-cust-first-name='
-				+ reviewItem.customerFirstName
-				+ ' data-cust-last-name='
-				+ reviewItem.customerLastName
-				+ ' data-agent-name=' + reviewItem.agentName
-				+ ' data-rating=' + reviewItem.score
-				+ ' data-review="' + reviewItem.review
-				+ '" data-customeremail="'
-				+ reviewItem.customerEmail + '" data-agentid="'
-				+ reviewItem.agentId + '">';
-		reviewsHtml=  reviewsHtml+'	<div class="ppl-header-wrapper clearfix">';
-		reviewsHtml=  reviewsHtml+'		<div class="float-left ppl-header-left">';    
-		reviewsHtml=  reviewsHtml+'			<div class="ppl-head-1">'+reviewItem.customerFirstName+' '+reviewItem.customerLastName+'</div>';
-		if(date != null){
-			reviewsHtml=  reviewsHtml+'			<div class="ppl-head-2">'+ date.getMonthName() +" " + date.getDate() +" "+date.getFullYear()+'</div>'; 
+		reviewsHtml = reviewsHtml + '<div class="' + lastItemClass + '" data-cust-first-name=' + reviewItem.customerFirstName
+				+ ' data-cust-last-name=' + reviewItem.customerLastName + ' data-agent-name=' + reviewItem.agentName
+				+ ' data-rating=' + reviewItem.score + ' data-review="' + reviewItem.review + '" data-customeremail="'
+				+ reviewItem.customerEmail + '" data-agentid="' + reviewItem.agentId + '">';
+		reviewsHtml += '	<div class="ppl-header-wrapper clearfix">';
+		reviewsHtml += '		<div class="float-left ppl-header-left">';    
+		reviewsHtml += '			<div class="ppl-head-1">'+reviewItem.customerFirstName+' '+reviewItem.customerLastName+'</div>';
+		if (date != null) {
+			reviewsHtml += '		<div class="ppl-head-2">'+ date.getMonthName() +" " + date.getDate() +" "+date.getFullYear()+'</div>'; 
 		}
 		reviewsHtml=  reviewsHtml+'    </div>';
 		reviewsHtml=  reviewsHtml+'    <div class="float-right ppl-header-right">';
 		reviewsHtml=  reviewsHtml+'        <div class="st-rating-wrapper maring-0 clearfix review-ratings" data-rating="'+reviewItem.score+'">';
 		reviewsHtml=  reviewsHtml+'       </div>';
-		reviewsHtml=  reviewsHtml+'<div class="report-resend-icn-container clearfix float-right">';
-		reviewsHtml=  reviewsHtml+'<div class="report-abuse-txt report-txt prof-report-abuse-txt">Report</div>';
-		reviewsHtml=  reviewsHtml+'   </div>';
 		reviewsHtml=  reviewsHtml+'   </div>';
 		reviewsHtml=  reviewsHtml+'	</div>';
 		if(reviewItem.review.length > 250){
@@ -523,6 +514,9 @@ function paintReviews(result){
 		reviewsHtml=  reviewsHtml+'			<a href="https://plus.google.com/share?url=' + reviewItem.completeProfileUrl + '" target="_blank"<span class="float-left ppl-share-icns icn-gplus"></span></a>';
 		reviewsHtml=  reviewsHtml+'       	<a href="https://yelp.com/biz" target="_blank"><span class="float-left ppl-share-icns icn-yelp"></span></a>';
 		reviewsHtml=  reviewsHtml+'    	</div>';
+		reviewsHtml=  reviewsHtml+'			<div class="float-right" style="margin: 0 -5px;">';
+		reviewsHtml=  reviewsHtml+'			<div class="report-abuse-txt report-txt prof-report-abuse-txt">Report Abuse</div>';
+		reviewsHtml=  reviewsHtml+'   		</div>';
 		reviewsHtml=  reviewsHtml+'   <div class="float-left icn-share icn-remove icn-rem-size hide"></div>';
 		reviewsHtml=  reviewsHtml+'	</div>';
 		reviewsHtml=  reviewsHtml+'</div>';

@@ -193,8 +193,10 @@ public class ProfileViewController implements InitializingBean{
 			regionProfile = profileManagementService.getRegionByProfileName(companyProfileName, regionProfileName);
 			
 			// aggregated social profile urls
-			SocialMediaTokens regionTokens = profileManagementService.aggregateSocialProfiles(regionProfile, CommonConstants.REGION_ID);
-			regionProfile.setSocialMediaTokens(regionTokens);
+			if(regionProfile.getSocialMediaTokens() != null){
+				SocialMediaTokens regionTokens = profileManagementService.aggregateSocialProfiles(regionProfile, CommonConstants.REGION_ID);
+				regionProfile.setSocialMediaTokens(regionTokens);				
+			}
 
 			// aggregated disclaimer
 			String disclaimer = profileManagementService.aggregateDisclaimer(regionProfile, CommonConstants.REGION_ID);
@@ -282,8 +284,10 @@ public class ProfileViewController implements InitializingBean{
 			branchProfile = profileManagementService.getBranchByProfileName(companyProfileName, branchProfileName);
 			
 			// aggregated social profile urls
-			SocialMediaTokens branchTokens = profileManagementService.aggregateSocialProfiles(branchProfile, CommonConstants.BRANCH_ID);
-			branchProfile.setSocialMediaTokens(branchTokens);
+			if(branchProfile.getSocialMediaTokens() != null){
+				SocialMediaTokens branchTokens = profileManagementService.aggregateSocialProfiles(branchProfile, CommonConstants.BRANCH_ID);
+				branchProfile.setSocialMediaTokens(branchTokens);				
+			}
 			
 			// aggregated disclaimer
 			String disclaimer = profileManagementService.aggregateDisclaimer(branchProfile, CommonConstants.BRANCH_ID);
@@ -394,8 +398,10 @@ public class ProfileViewController implements InitializingBean{
 				individualProfile = profileManagementService.getIndividualByProfileName(agentProfileName);
 				
 				// aggregated social profile urls
-				SocialMediaTokens agentTokens = profileManagementService.aggregateSocialProfiles(individualProfile, CommonConstants.AGENT_ID);
-				individualProfile.setSocialMediaTokens(agentTokens);
+				if(individualProfile.getSocialMediaTokens() != null){
+					SocialMediaTokens agentTokens = profileManagementService.aggregateSocialProfiles(individualProfile, CommonConstants.AGENT_ID);
+					individualProfile.setSocialMediaTokens(agentTokens);	
+				}
 				
 				// aggregated disclaimer
 				String disclaimer = profileManagementService.aggregateDisclaimer(individualProfile, CommonConstants.AGENT_ID);

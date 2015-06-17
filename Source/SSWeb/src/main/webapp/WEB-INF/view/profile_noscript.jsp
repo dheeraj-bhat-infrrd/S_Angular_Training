@@ -525,7 +525,7 @@
 											</div>
 										</div>
 									</div>
-									<div class="ppl-content">${reviewItem.review }</div>
+									<div class="ppl-content">${reviewItem.review}</div>
 									<div class="ppl-share-wrapper clearfix">
 										<div class="float-left blue-text ppl-share-shr-txt">Share</div>
 										<div class="float-left clearfix ppl-share-social">
