@@ -1,5 +1,6 @@
 package com.realtech.socialsurvey.web.controller;
 
+import java.io.IOException;
 import java.net.MalformedURLException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -7,12 +8,15 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -40,6 +44,7 @@ import com.realtech.socialsurvey.core.utils.EmailFormatHelper;
 import com.realtech.socialsurvey.core.utils.EncryptionHelper;
 import com.realtech.socialsurvey.core.utils.FileOperations;
 import com.realtech.socialsurvey.core.utils.PropertyFileReader;
+import com.realtech.socialsurvey.web.common.JspResolver;
 import com.realtech.socialsurvey.web.security.UserAuthProvider;
 
 /**
@@ -400,5 +405,29 @@ public class SessionHelper {
 		profileAbridged.setProfilesMasterId(profileMasterId);
 
 		return profileAbridged;
+	}
+	
+	// Redirects user to Landing Page if session is active
+	public void redirectToUserSessionIfExists(HttpServletResponse response) {
+		LOG.debug("Checking for state of principal session");
+		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+		if (!(auth instanceof AnonymousAuthenticationToken)) {
+			try {
+				response.sendRedirect("./" + JspResolver.LANDING + ".do");
+			}
+			catch (IOException e) {
+				LOG.error("IOException while redirecting logged in user. Reason : " + e.getMessage(), e);
+			}
+		}
+	}
+	
+	// Redirects user to Landing Page and requests user to logout from previous session if active
+	public boolean isUserActiveSessionExists() {
+		LOG.debug("Checking for state of principal session");
+		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+		if (!(auth instanceof AnonymousAuthenticationToken)) {
+			return true;
+		}
+		return false;
 	}
 }

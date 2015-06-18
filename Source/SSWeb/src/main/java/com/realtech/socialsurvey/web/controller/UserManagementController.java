@@ -843,6 +843,14 @@ public class UserManagementController {
 	public String showCompleteRegistrationPage(@RequestParam("q") String encryptedUrlParams, Model model) {
 		LOG.info("Method showCompleteRegistrationPage() to complete registration of user started.");
 
+		// Check for existing session
+		if (sessionHelper.isUserActiveSessionExists()) {
+			LOG.info("Existing Active Session detected");
+			
+			model.addAttribute(CommonConstants.ACTIVE_SESSIONS_FOUND, "true");
+			return JspResolver.LANDING;
+		}
+		
 		try {
 			Map<String, String> urlParams = null;
 			try {

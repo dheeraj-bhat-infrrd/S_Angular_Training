@@ -201,6 +201,21 @@
 <script src="${initParam.resourcesPath}/resources/js/index.js"></script>
 <script>
 $(document).ready(function(){
+	$.ajax({
+		url : "./redirectifexistsactivesession.do",
+		type : "GET",
+		dataType : "html",
+		async : false,
+		success : function(activeSessionFound){
+			if (activeSessionFound == "true") {
+				window.location.href = "./landing.do";
+			}
+		},
+		error : function(e) {
+			redirectErrorpage();
+		}
+	});
+	
 	var captchaText=true;
 	resizeFunc();
 	$(window).resize(resizeFunc);
