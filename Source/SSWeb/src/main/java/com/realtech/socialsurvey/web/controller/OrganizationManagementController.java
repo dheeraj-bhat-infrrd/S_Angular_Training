@@ -644,7 +644,6 @@ public class OrganizationManagementController {
 		String ratingCategory = request.getParameter("ratingcategory");
 		String autopost = request.getParameter("autopost");
 		SurveySettings originalSurveySettings = null;
-		SurveySettings surveySettings = null;
 		String message = "";
 
 		try {
@@ -660,14 +659,9 @@ public class OrganizationManagementController {
 				}
 
 				originalSurveySettings = companySettings.getSurvey_settings();
-				surveySettings = new SurveySettings();
-				surveySettings.setAuto_post_score((float) autopostRating);
 				if (originalSurveySettings != null) {
-					surveySettings.setAutoPostEnabled(isAutopostEnabled);
-					surveySettings.setShow_survey_above_score(originalSurveySettings.getShow_survey_above_score());
-					surveySettings.setMax_number_of_survey_reminders(originalSurveySettings.getMax_number_of_survey_reminders());
-					surveySettings.setSurvey_reminder_interval_in_days(originalSurveySettings.getSurvey_reminder_interval_in_days());
-					surveySettings.setReminderDisabled(originalSurveySettings.getIsReminderDisabled());
+					originalSurveySettings.setAutoPostEnabled(isAutopostEnabled);
+					originalSurveySettings.setAuto_post_score((float) autopostRating);
 				}
 				LOG.info("Updating Survey Settings Post score");
 				message = messageUtils.getDisplayMessage(DisplayMessageConstants.SURVEY_AUTO_POST_SCORE_UPDATE_SUCCESSFUL,
@@ -682,22 +676,17 @@ public class OrganizationManagementController {
 				}
 
 				originalSurveySettings = companySettings.getSurvey_settings();
-				surveySettings = new SurveySettings();
-				surveySettings.setShow_survey_above_score((float) minPostRating);
 				if (originalSurveySettings != null) {
-					surveySettings.setAutoPostEnabled(isAutopostEnabled);
-					surveySettings.setAuto_post_score(originalSurveySettings.getAuto_post_score());
-					surveySettings.setMax_number_of_survey_reminders(originalSurveySettings.getMax_number_of_survey_reminders());
-					surveySettings.setSurvey_reminder_interval_in_days(originalSurveySettings.getSurvey_reminder_interval_in_days());
-					surveySettings.setReminderDisabled(originalSurveySettings.getIsReminderDisabled());
+					originalSurveySettings.setAutoPostEnabled(isAutopostEnabled);
+					originalSurveySettings.setShow_survey_above_score((float) minPostRating);
 				}
 				LOG.info("Updating Survey Settings Min score");
 				message = messageUtils.getDisplayMessage(DisplayMessageConstants.SURVEY_MIN_POST_SCORE_UPDATE_SUCCESSFUL,
 						DisplayMessageType.SUCCESS_MESSAGE).getMessage();
 			}
 
-			if (organizationManagementService.updateSurveySettings(companySettings, surveySettings)) {
-				companySettings.setSurvey_settings(surveySettings);
+			if (organizationManagementService.updateSurveySettings(companySettings, originalSurveySettings)) {
+				companySettings.setSurvey_settings(originalSurveySettings);
 				LOG.info("Updated Survey Settings");
 			}
 		}
