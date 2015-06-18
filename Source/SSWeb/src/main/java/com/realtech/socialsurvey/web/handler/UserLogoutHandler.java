@@ -16,7 +16,7 @@ public class UserLogoutHandler implements LogoutHandler {
 		LOG.info("Inside logout method of MyLogoutHandler");
 
 		// Invalidate session in browser
-		request.getSession(false).invalidate();
+		request.getSession().invalidate();
 		SecurityContextHolder.clearContext();
 	}
 }
