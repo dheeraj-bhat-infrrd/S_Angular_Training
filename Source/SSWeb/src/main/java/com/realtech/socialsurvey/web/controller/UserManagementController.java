@@ -880,15 +880,17 @@ public class UserManagementController {
 				model.addAttribute(CommonConstants.COMPANY, urlParams.get(CommonConstants.COMPANY));
 				model.addAttribute(CommonConstants.FIRST_NAME, urlParams.get(CommonConstants.FIRST_NAME));
 				model.addAttribute(CommonConstants.EMAIL_ID, emailId);
+				
 				User user = userManagementService.getUserByEmail(emailId);
 				AgentSettings agentSettings = userManagementService.getAgentSettingsForUserProfiles(user.getUserId());
 				if (agentSettings == null) {
 					throw new InvalidInputException("Settings not found for the given user.");
 				}
 				model.addAttribute("profileUrl", agentSettings.getCompleteProfileUrl());
+				
 				String lastName = urlParams.get(CommonConstants.LAST_NAME);
 				if (lastName != null && !lastName.isEmpty()) {
-					model.addAttribute(CommonConstants.LAST_NAME, urlParams.get(CommonConstants.LAST_NAME));
+					model.addAttribute(CommonConstants.LAST_NAME, lastName);
 				}
 				LOG.debug("Validation of url completed. Service returning params to be prepopulated in registration page");
 			}
