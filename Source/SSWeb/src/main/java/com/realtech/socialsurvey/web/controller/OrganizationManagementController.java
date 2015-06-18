@@ -758,10 +758,7 @@ public class OrganizationManagementController {
 				surveySettings = new SurveySettings();
 				surveySettings.setSurvey_reminder_interval_in_days(reminderInterval);
 				if (originalSurveySettings != null) {
-					surveySettings.setAuto_post_score(originalSurveySettings.getAuto_post_score());
-					surveySettings.setMax_number_of_survey_reminders(originalSurveySettings.getMax_number_of_survey_reminders());
-					surveySettings.setShow_survey_above_score(originalSurveySettings.getShow_survey_above_score());
-					surveySettings.setReminderDisabled(originalSurveySettings.getIsReminderDisabled());
+					originalSurveySettings.setSurvey_reminder_interval_in_days(reminderInterval);
 				}
 				LOG.info("Updating Survey Settings Reminder Interval");
 				message = messageUtils.getDisplayMessage(DisplayMessageConstants.SURVEY_REMINDER_INTERVAL_UPDATE_SUCCESSFUL,
@@ -775,10 +772,7 @@ public class OrganizationManagementController {
 				surveySettings = new SurveySettings();
 				surveySettings.setReminderDisabled(isReminderDisabled);
 				if (originalSurveySettings != null) {
-					surveySettings.setAuto_post_score(originalSurveySettings.getAuto_post_score());
-					surveySettings.setMax_number_of_survey_reminders(originalSurveySettings.getMax_number_of_survey_reminders());
-					surveySettings.setShow_survey_above_score(originalSurveySettings.getShow_survey_above_score());
-					surveySettings.setSurvey_reminder_interval_in_days(originalSurveySettings.getSurvey_reminder_interval_in_days());
+					originalSurveySettings.setReminderDisabled(isReminderDisabled);
 				}
 				LOG.info("Updating Survey Settings Reminder Needed");
 				message = messageUtils.getDisplayMessage(DisplayMessageConstants.SURVEY_REMINDER_ENABLED_UPDATE_SUCCESSFUL,
