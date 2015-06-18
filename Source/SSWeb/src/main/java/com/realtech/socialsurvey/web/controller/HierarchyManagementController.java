@@ -1725,12 +1725,12 @@ public class HierarchyManagementController {
 		List<String> emailIds = new ArrayList<String>();
 		if (selectedUserId <= 0l && selectedUserEmail != null && !selectedUserEmail.isEmpty()) {
 
-			// Tokenizing the string input
+			// Tokenizing the string input per individual
 			List<String> inputTokens = new ArrayList<String>();
-			StringTokenizer tokenizer = new StringTokenizer(selectedUserEmail, " ,|;|\n");
-			while (tokenizer.hasMoreTokens()) {
-				String inputToken = tokenizer.nextToken();
-				if (tokenizer.countTokens() == 1 && (inputToken == null || inputToken.isEmpty())) {
+			StringTokenizer tokenizerIndiv = new StringTokenizer(selectedUserEmail, ",|;|\n");
+			while (tokenizerIndiv.hasMoreTokens()) {
+				String inputToken = tokenizerIndiv.nextToken();
+				if (tokenizerIndiv.countTokens() == 1 && (inputToken == null || inputToken.isEmpty())) {
 					throw new InvalidInputException("Input token is invalid", DisplayMessageConstants.INVALID_EMAILID);
 				}
 
@@ -1739,40 +1739,76 @@ public class HierarchyManagementController {
 
 			// creating users
 			UserFromSearch userEntity = new UserFromSearch();
+			List<String> inputTokensIndivDetail = null;
 			for (String inputStr : inputTokens) {
 				inputStr = inputStr.trim();
+				inputTokensIndivDetail = new ArrayList<String>();
 
-				if (inputStr.trim().matches(CommonConstants.EMAIL_REGEX)) {
-					if (userEntity.getEmailId() == null || userEntity.getEmailId().isEmpty()) {
-						userEntity.setEmailId(inputStr);
+				// Tokenize individual details
+				StringTokenizer tokenizerIndivDetail = new StringTokenizer(inputStr, " <|>");
+				while (tokenizerIndivDetail.hasMoreTokens()) {
+					String inputToken = tokenizerIndivDetail.nextToken();
+					if (tokenizerIndivDetail.countTokens() == 1 && (inputToken == null || inputToken.isEmpty())) {
+						throw new InvalidInputException("Input token is invalid", DisplayMessageConstants.INVALID_EMAILID);
 					}
 
-					// resetting user entity on creating new user
-					try {
-						String firstName = (userEntity.getFirstName() != null) ? userEntity.getFirstName() : userEntity.getEmailId().substring(0,
-								userEntity.getEmailId().indexOf("@"));
-						String lastName = (userEntity.getLastName() != null) ? userEntity.getLastName() : null;
-						userManagementService.inviteUserToRegister(admin, firstName, lastName, userEntity.getEmailId());
-						
-						userEntity = new UserFromSearch();
+					inputTokensIndivDetail.add(inputToken.trim());
+				}
+
+				if (inputStr.contains("<") && inputStr.contains(">") && inputTokensIndivDetail.size() > 0) {
+
+					String indivName = "";
+					for (String inputStrIndiv : inputTokensIndivDetail) {
+
+						if (inputStrIndiv.trim().matches(CommonConstants.EMAIL_REGEX)) {
+							// Setting EmailId
+							if (userEntity.getEmailId() == null || userEntity.getEmailId().isEmpty()) {
+								userEntity.setEmailId(inputStrIndiv);
+							}
+
+							// Setting First/Last names
+							if (indivName != null && !indivName.isEmpty()) {
+								indivName = indivName.trim();
+								if (indivName.contains(" ")) {
+									userEntity.setFirstName(indivName.substring(0, indivName.lastIndexOf(" ")));
+									userEntity.setLastName(indivName.substring(indivName.lastIndexOf(" ") + 1));
+								}
+								else {
+									userEntity.setFirstName(indivName);
+								}
+								
+								indivName = "";
+							}
+
+							// resetting user entity on creating new user
+							try {
+								String firstName = (userEntity.getFirstName() != null) ? userEntity.getFirstName() : userEntity.getEmailId()
+										.substring(0, userEntity.getEmailId().indexOf("@"));
+								String lastName = (userEntity.getLastName() != null) ? userEntity.getLastName() : null;
+								userManagementService.inviteUserToRegister(admin, firstName, lastName, userEntity.getEmailId());
+
+								userEntity = new UserFromSearch();
+							}
+							catch (UserAlreadyExistsException | UndeliveredEmailException e) {
+								LOG.debug("Exception in validateAndParseIndividualDetails while inviting a new user. Reason:" + e.getMessage(), e);
+							}
+
+							// adding to email id's list
+							emailIds.add(inputStrIndiv);
+						}
+						else {
+							indivName = indivName + " " + inputStrIndiv;
+						}
 					}
-					catch (UserAlreadyExistsException | UndeliveredEmailException e) {
-						LOG.debug("Exception in validateAndParseIndividualDetails while inviting a new user. Reason:" + e.getMessage(), e);
-					}
-					
-					// adding to email id's list
+				}
+				else if (!inputStr.contains("<") && !inputStr.contains(">") && inputTokensIndivDetail.size() > 0) {
 					emailIds.add(inputStr);
 				}
 				else {
-					if (userEntity.getFirstName() == null || userEntity.getFirstName().isEmpty()) {
-						userEntity.setFirstName(inputStr);
-					}
-					else if (userEntity.getLastName() == null || userEntity.getLastName().isEmpty()) {
-						userEntity.setLastName((userEntity.getLastName() != null) ? userEntity.getLastName() : "" + " " + inputStr);
-					}
+					throw new InvalidInputException("Individual details entered are invalid", DisplayMessageConstants.INVALID_EMAILID);
 				}
 			}
-			
+
 			if (emailIds.isEmpty()) {
 				throw new InvalidInputException("Individual details entered are invalid", DisplayMessageConstants.INVALID_EMAILID);
 			}
@@ -1780,7 +1816,7 @@ public class HierarchyManagementController {
 
 		String[] emailIdsArray = new String[emailIds.size()];
 		emailIdsArray = emailIds.toArray(emailIdsArray);
-		
+
 		LOG.info("Method validateAndParseIndividualDetails finished. Returning emailIdsArray:" + emailIdsArray);
 		return emailIdsArray;
 	}

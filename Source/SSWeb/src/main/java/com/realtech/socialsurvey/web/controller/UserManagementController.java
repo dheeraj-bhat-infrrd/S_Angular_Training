@@ -13,6 +13,7 @@ import org.noggit.JSONUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -840,9 +841,18 @@ public class UserManagementController {
 	 * @throws InvalidInputException
 	 */
 	@RequestMapping(value = "/showcompleteregistrationpage", method = RequestMethod.GET)
-	public String showCompleteRegistrationPage(@RequestParam("q") String encryptedUrlParams, Model model) {
+	public String showCompleteRegistrationPage(HttpServletRequest request, @RequestParam("q") String encryptedUrlParams, Model model) {
 		LOG.info("Method showCompleteRegistrationPage() to complete registration of user started.");
 
+		// Check for existing session
+		if (sessionHelper.isUserActiveSessionExists()) {
+			LOG.info("Existing Active Session detected");
+			
+			// Invalidate session in browser
+			request.getSession(false).invalidate();
+			SecurityContextHolder.clearContext();
+		}
+		
 		try {
 			Map<String, String> urlParams = null;
 			try {
@@ -947,10 +957,6 @@ public class UserManagementController {
 						DisplayMessageConstants.GENERAL_ERROR, e);
 			}
 
-			AccountType accountType = null;
-//			request.getSession().invalidate();
-			HttpSession session = request.getSession(true);
-			
 			try {
 				// fetch user object with email Id
 				user = authenticationService.getUserWithLoginNameAndCompanyId(emailId, companyId);
@@ -966,6 +972,8 @@ public class UserManagementController {
 			sessionHelper.loginOnRegistration(emailId, password);
 			LOG.debug("Successfully added registered user to principal session");
 
+			AccountType accountType = null;
+			HttpSession session = request.getSession(true);
 			List<LicenseDetail> licenseDetails = user.getCompany().getLicenseDetails();
 			if (licenseDetails != null && !licenseDetails.isEmpty()) {
 				LicenseDetail licenseDetail = licenseDetails.get(0);
