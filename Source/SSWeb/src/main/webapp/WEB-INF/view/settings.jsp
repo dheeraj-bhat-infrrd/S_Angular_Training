@@ -200,7 +200,7 @@
 		
 		<!-- Starting code for Mail text -->
 		<c:if test="${profilemasterid == 1 || accountMasterId == 1}">
-			<div class="um-top-container">
+			<div class="um-top-container" style="padding-bottom: 0">
 				<form id="mail-body-settings-form">
 					<input type="hidden" name="mailcategory" id="mailcategory">
 					<div class="um-header margin-top-25"><spring:message code="label.header.email.configuration.key" /></div>
@@ -301,7 +301,7 @@
 		<!-- Starting code for Other settings -->
 		<c:if test="${profilemasterid == 1 || accountMasterId == 1}">
 			<div class="um-top-container border-0">
-				<div class="um-header margin-top-25"><spring:message code="label.othersettings.key" /></div>
+				<div class="um-header margin-top-10"><spring:message code="label.othersettings.key" /></div>
 				<form id="other-settings-form">
 					<div class="st-others-wrapper clearfix">
 						<input type="hidden" name="othercategory" id="othercategory">
