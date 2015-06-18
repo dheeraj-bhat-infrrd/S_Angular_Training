@@ -237,6 +237,7 @@ public interface CommonConstants {
 	public static final String AGENT_ID = "agentId";
 	public static final String FLOW_REGISTRATION = "registration";
 	public static final String POPUP_FLAG_IN_SESSION = "popupStatus";
+	public static final String ACTIVE_SESSIONS_FOUND = "activeSessionFound";
 
 	/**
 	 * Batch Constants

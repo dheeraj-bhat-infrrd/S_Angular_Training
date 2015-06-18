@@ -1,7 +1,6 @@
 package com.realtech.socialsurvey.web.controller;
 
 // JIRA SS-21 : by RM-06 : BOC
-import java.io.IOException;
 import java.net.MalformedURLException;
 import java.util.List;
 import java.util.Map;
@@ -11,9 +10,6 @@ import javax.servlet.http.HttpSession;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.authentication.AnonymousAuthenticationToken;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -46,77 +42,72 @@ import com.realtech.socialsurvey.web.common.JspResolver;
 @Controller
 public class LoginController {
 
-	private static final Logger LOG = LoggerFactory
-			.getLogger(LoginController.class);
+	private static final Logger LOG = LoggerFactory.getLogger(LoginController.class);
 	private static final String STATUS_PARAM = "s";
 	private static final String AUTH_ERROR = "autherror";
 	private static final String SESSION_ERROR = "sessionerror";
 	private static final String LOGOUT = "logout";
 
 	@Autowired
-	private AuthenticationService authenticationService;
-	@Autowired
 	private MessageUtils messageUtils;
 	@Autowired
 	private URLGenerator urlGenerator;
 	@Autowired
-	private OrganizationManagementService organizationManagementService;
-	@Autowired
-	private UserManagementService userManagementService;
-	@Autowired
 	private SessionHelper sessionHelper;
 	@Autowired
 	private SolrSearchService solrSearchService;
+	@Autowired
+	private UserManagementService userManagementService;
+	@Autowired
+	private AuthenticationService authenticationService;
+	@Autowired
+	private OrganizationManagementService organizationManagementService;
 
+	// Redirects user to Landing Page if session is active
+	@ResponseBody
+	@RequestMapping(value = "/redirectifexistsactivesession")
+	public String redirectToUserHomeIfSessionExists(HttpServletResponse response) {
+		LOG.info("Method redirectToUserHomeIfSessionExists() called from LoginController");
+		return String.valueOf(sessionHelper.isUserActiveSessionExists());
+	}
+	
+	// Redirects user to Landing Page if session is active, else to index page
 	@RequestMapping(value = "/home")
-	public String initHomePage(HttpServletResponse response, Model model,
-			@RequestParam(value = STATUS_PARAM, required = false) String status) {
+	public String initHomePage(HttpServletResponse response) {
 		LOG.info("Method initHomePage() called from LoginController");
-		redirectOnClickLogo(response);
+		sessionHelper.redirectToUserSessionIfExists(response);
 		return JspResolver.INDEX;
 	}
 
-	private void redirectOnClickLogo(HttpServletResponse response) {
-		LOG.debug("Checking for state of principal session");
-		Authentication auth = SecurityContextHolder.getContext()
-				.getAuthentication();
-		if (!(auth instanceof AnonymousAuthenticationToken)) {
-			try {
-				response.sendRedirect("./" + JspResolver.LANDING + ".do");
-			} catch (IOException e) {
-				LOG.error(
-						"IOException while redirecting logged in user. Reason : "
-								+ e.getMessage(), e);
-			}
-		}
-	}
-
 	@RequestMapping(value = "/login")
-	public String initLoginPage(HttpServletResponse response, Model model,
-			@RequestParam(value = STATUS_PARAM, required = false) String status) {
+	public String initLoginPage(HttpServletResponse response, Model model, @RequestParam(value = STATUS_PARAM, required = false) String status) {
 		LOG.info("Inside initLoginPage() of LoginController");
-		redirectOnClickLogo(response);
+		
+		// Check for existing session
+		if (sessionHelper.isUserActiveSessionExists()) {
+			LOG.info("Existing Active Session detected");
+			
+			model.addAttribute(CommonConstants.ACTIVE_SESSIONS_FOUND, "true");
+			return JspResolver.LANDING;
+		}
 
 		if (status != null) {
 			switch (status) {
-			case AUTH_ERROR:
-				model.addAttribute("status", DisplayMessageType.ERROR_MESSAGE);
-				model.addAttribute("message", messageUtils.getDisplayMessage(
-						DisplayMessageConstants.INVALID_USER_CREDENTIALS,
-						DisplayMessageType.ERROR_MESSAGE));
-				break;
-			case SESSION_ERROR:
-				model.addAttribute("status", DisplayMessageType.ERROR_MESSAGE);
-				model.addAttribute("message", messageUtils.getDisplayMessage(
-						DisplayMessageConstants.SESSION_EXPIRED,
-						DisplayMessageType.ERROR_MESSAGE));
-				break;
-			case LOGOUT:
-				model.addAttribute("status", DisplayMessageType.SUCCESS_MESSAGE);
-				model.addAttribute("message", messageUtils.getDisplayMessage(
-						DisplayMessageConstants.USER_LOGOUT_SUCCESSFUL,
-						DisplayMessageType.SUCCESS_MESSAGE));
-				break;
+				case AUTH_ERROR:
+					model.addAttribute("status", DisplayMessageType.ERROR_MESSAGE);
+					model.addAttribute("message",
+							messageUtils.getDisplayMessage(DisplayMessageConstants.INVALID_USER_CREDENTIALS, DisplayMessageType.ERROR_MESSAGE));
+					break;
+				case SESSION_ERROR:
+					model.addAttribute("status", DisplayMessageType.ERROR_MESSAGE);
+					model.addAttribute("message",
+							messageUtils.getDisplayMessage(DisplayMessageConstants.SESSION_EXPIRED, DisplayMessageType.ERROR_MESSAGE));
+					break;
+				case LOGOUT:
+					model.addAttribute("status", DisplayMessageType.SUCCESS_MESSAGE);
+					model.addAttribute("message",
+							messageUtils.getDisplayMessage(DisplayMessageConstants.USER_LOGOUT_SUCCESSFUL, DisplayMessageType.SUCCESS_MESSAGE));
+					break;
 			}
 		}
 		return JspResolver.LOGIN;
@@ -134,8 +125,7 @@ public class LoginController {
 		return JspResolver.FORGOT_PASSWORD;
 	}
 
-	private void setSession(HttpSession session) throws InvalidInputException,
-			NoRecordsFetchedException {
+	private void setSession(HttpSession session) throws InvalidInputException, NoRecordsFetchedException {
 		// get the user's canonical settings
 		LOG.info("Fetching the user's canonical settings and setting it in session");
 		sessionHelper.getCanonicalSettings(session);
@@ -179,7 +169,7 @@ public class LoginController {
 				model.addAttribute("skippayment", "false");
 			}
 			user = sessionHelper.getCurrentUser();
-//			request.getSession().invalidate();
+			// request.getSession().invalidate();
 			HttpSession session = request.getSession(true);
 
 			List<LicenseDetail> licenseDetails = user.getCompany().getLicenseDetails();
@@ -269,8 +259,9 @@ public class LoginController {
 
 					if (redirectTo.equals(JspResolver.LANDING)) {
 						setSession(session);
-						
-						// Setting session variable to show linkedin signup and sendsurvey popups only once
+
+						// Setting session variable to show linkedin signup and sendsurvey popups
+						// only once
 						String popupStatus = (String) session.getAttribute(CommonConstants.POPUP_FLAG_IN_SESSION);
 						if (popupStatus == null) {
 							session.setAttribute(CommonConstants.POPUP_FLAG_IN_SESSION, CommonConstants.YES_STRING);
@@ -354,47 +345,38 @@ public class LoginController {
 		User user = null;
 		try {
 			String emailId = request.getParameter("emailId");
-			if (emailId == null || emailId.isEmpty()
-					|| !emailId.matches(CommonConstants.EMAIL_REGEX)) {
+			if (emailId == null || emailId.isEmpty() || !emailId.matches(CommonConstants.EMAIL_REGEX)) {
 				LOG.error("Invalid email id passed");
-				throw new InvalidInputException("Invalid email id passed",
-						DisplayMessageConstants.INVALID_EMAILID);
+				throw new InvalidInputException("Invalid email id passed", DisplayMessageConstants.INVALID_EMAILID);
 			}
 
 			try {
 				// verify if the user exists with the registered emailId
 				user = authenticationService.verifyRegisteredUser(emailId);
-			} catch (InvalidInputException e) {
-				LOG.error(
-						"Invalid Input exception in verifying registered user. Reason "
-								+ e.getMessage(), e);
-				throw new InvalidInputException(e.getMessage(),
-						DisplayMessageConstants.USER_NOT_PRESENT, e);
+			}
+			catch (InvalidInputException e) {
+				LOG.error("Invalid Input exception in verifying registered user. Reason " + e.getMessage(), e);
+				throw new InvalidInputException(e.getMessage(), DisplayMessageConstants.USER_NOT_PRESENT, e);
 			}
 
 			// Send reset password link
 			try {
 				authenticationService.sendResetPasswordLink(emailId, user.getFirstName() + " " + user.getLastName(),
 						user.getCompany().getCompanyId(), user.getLoginName());
-			} catch (InvalidInputException e) {
-				LOG.error(
-						"Invalid Input exception in sending reset password link. Reason "
-								+ e.getMessage(), e);
-				throw new InvalidInputException(e.getMessage(),
-						DisplayMessageConstants.GENERAL_ERROR, e);
+			}
+			catch (InvalidInputException e) {
+				LOG.error("Invalid Input exception in sending reset password link. Reason " + e.getMessage(), e);
+				throw new InvalidInputException(e.getMessage(), DisplayMessageConstants.GENERAL_ERROR, e);
 			}
 
 			model.addAttribute("status", DisplayMessageType.SUCCESS_MESSAGE);
-			model.addAttribute("message", messageUtils.getDisplayMessage(
-					DisplayMessageConstants.PASSWORD_RESET_LINK_SUCCESSFUL,
-					DisplayMessageType.SUCCESS_MESSAGE));
-		} catch (NonFatalException e) {
-			LOG.error(
-					"NonFatalException while sending the reset password link. Reason : "
-							+ e.getStackTrace(), e);
+			model.addAttribute("message",
+					messageUtils.getDisplayMessage(DisplayMessageConstants.PASSWORD_RESET_LINK_SUCCESSFUL, DisplayMessageType.SUCCESS_MESSAGE));
+		}
+		catch (NonFatalException e) {
+			LOG.error("NonFatalException while sending the reset password link. Reason : " + e.getStackTrace(), e);
 			model.addAttribute("status", DisplayMessageType.ERROR_MESSAGE);
-			model.addAttribute("message", messageUtils.getDisplayMessage(
-					e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE));
+			model.addAttribute("message", messageUtils.getDisplayMessage(e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE));
 		}
 
 		return JspResolver.FORGOT_PASSWORD;
@@ -405,28 +387,21 @@ public class LoginController {
 	 * Controller method to display the reset password page
 	 */
 	@RequestMapping(value = "/resetpassword")
-	public String showResetPasswordPage(
-			@RequestParam("q") String encryptedUrlParams, Model model) {
-		LOG.info("Forgot Password Page started with encrypter url : "
-				+ encryptedUrlParams);
+	public String showResetPasswordPage(@RequestParam("q") String encryptedUrlParams, Model model) {
+		LOG.info("Forgot Password Page started with encrypter url : " + encryptedUrlParams);
 		try {
 			try {
-				Map<String, String> urlParams = urlGenerator
-						.decryptParameters(encryptedUrlParams);
-				model.addAttribute(CommonConstants.EMAIL_ID,
-						urlParams.get(CommonConstants.EMAIL_ID));
-			} catch (InvalidInputException e) {
-				LOG.error(
-						"Invalid Input exception in decrypting url parameters. Reason "
-								+ e.getMessage(), e);
-				throw new InvalidInputException(e.getMessage(),
-						DisplayMessageConstants.GENERAL_ERROR, e);
+				Map<String, String> urlParams = urlGenerator.decryptParameters(encryptedUrlParams);
+				model.addAttribute(CommonConstants.EMAIL_ID, urlParams.get(CommonConstants.EMAIL_ID));
 			}
-		} catch (NonFatalException e) {
-			LOG.error("NonFatalException while setting new Password. Reason : "
-					+ e.getMessage(), e);
-			model.addAttribute("message", messageUtils.getDisplayMessage(
-					e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE));
+			catch (InvalidInputException e) {
+				LOG.error("Invalid Input exception in decrypting url parameters. Reason " + e.getMessage(), e);
+				throw new InvalidInputException(e.getMessage(), DisplayMessageConstants.GENERAL_ERROR, e);
+			}
+		}
+		catch (NonFatalException e) {
+			LOG.error("NonFatalException while setting new Password. Reason : " + e.getMessage(), e);
+			model.addAttribute("message", messageUtils.getDisplayMessage(e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE));
 			return JspResolver.MESSAGE_HEADER;
 		}
 		return JspResolver.RESET_PASSWORD;
@@ -451,83 +426,67 @@ public class LoginController {
 			String confirmPassword = request.getParameter("confirmPassword");
 
 			// Checking if any of the form parameters are null or empty
-			validateResetPasswordFormParameters(emailId, password,
-					confirmPassword);
+			validateResetPasswordFormParameters(emailId, password, confirmPassword);
 
 			// Decrypt Url parameters
 			encryptedUrlParameters = request.getParameter("q");
 			try {
-				urlParams = urlGenerator
-						.decryptParameters(encryptedUrlParameters);
-			} catch (InvalidInputException e) {
-				LOG.error("Invalid Input exception in decrypting Url. Reason "
-						+ e.getMessage(), e);
-				throw new InvalidInputException(e.getMessage(),
-						DisplayMessageConstants.GENERAL_ERROR, e);
+				urlParams = urlGenerator.decryptParameters(encryptedUrlParameters);
+			}
+			catch (InvalidInputException e) {
+				LOG.error("Invalid Input exception in decrypting Url. Reason " + e.getMessage(), e);
+				throw new InvalidInputException(e.getMessage(), DisplayMessageConstants.GENERAL_ERROR, e);
 			}
 
 			// check if email ID entered matches with the one in the encrypted
 			// url
 			if (!urlParams.get("emailId").equals(emailId)) {
 				LOG.error("Invalid Input exception. Reason emailId entered does not match with the one to which the mail was sent");
-				throw new InvalidInputException("Invalid Input exception",
-						DisplayMessageConstants.INVALID_EMAILID);
+				throw new InvalidInputException("Invalid Input exception", DisplayMessageConstants.INVALID_EMAILID);
 			}
 
 			long companyId = 0;
 			try {
-				companyId = Long.parseLong(urlParams
-						.get(CommonConstants.COMPANY));
-			} catch (NumberFormatException | NullPointerException e) {
-				LOG.error("Invalid company id found in URL parameters. Reason "
-						+ e.getMessage(), e);
-				throw new InvalidInputException(e.getMessage(),
-						DisplayMessageConstants.GENERAL_ERROR, e);
+				companyId = Long.parseLong(urlParams.get(CommonConstants.COMPANY));
+			}
+			catch (NumberFormatException | NullPointerException e) {
+				LOG.error("Invalid company id found in URL parameters. Reason " + e.getMessage(), e);
+				throw new InvalidInputException(e.getMessage(), DisplayMessageConstants.GENERAL_ERROR, e);
 			}
 
 			// fetch user object with email Id
 			try {
-				user = authenticationService.getUserWithLoginNameAndCompanyId(
-						emailId, companyId);
-			} catch (InvalidInputException e) {
-				LOG.error(
-						"Invalid Input exception in fetching user object. Reason "
-								+ e.getMessage(), e);
-				throw new InvalidInputException(e.getMessage(),
-						DisplayMessageConstants.USER_NOT_PRESENT, e);
+				user = authenticationService.getUserWithLoginNameAndCompanyId(emailId, companyId);
+			}
+			catch (InvalidInputException e) {
+				LOG.error("Invalid Input exception in fetching user object. Reason " + e.getMessage(), e);
+				throw new InvalidInputException(e.getMessage(), DisplayMessageConstants.USER_NOT_PRESENT, e);
 			}
 
-			if (user.getStatus() == CommonConstants.STATUS_NOT_VERIFIED
-					|| user.getStatus() == CommonConstants.STATUS_INACTIVE) {
+			if (user.getStatus() == CommonConstants.STATUS_NOT_VERIFIED || user.getStatus() == CommonConstants.STATUS_INACTIVE) {
 				LOG.error("Account with EmailId entered is either inactive or not verified");
-				throw new InvalidInputException(
-						"Your Account is either inactive or not verified",
-						DisplayMessageConstants.INVALID_ACCOUNT);
+				throw new InvalidInputException("Your Account is either inactive or not verified", DisplayMessageConstants.INVALID_ACCOUNT);
 			}
 
 			// change user's password
 			try {
 				authenticationService.changePassword(user, password);
-			} catch (InvalidInputException e) {
-				LOG.error(
-						"Invalid Input exception in changing the user's password. Reason "
-								+ e.getMessage(), e);
-				throw new InvalidInputException(e.getMessage(),
-						DisplayMessageConstants.GENERAL_ERROR, e);
+			}
+			catch (InvalidInputException e) {
+				LOG.error("Invalid Input exception in changing the user's password. Reason " + e.getMessage(), e);
+				throw new InvalidInputException(e.getMessage(), DisplayMessageConstants.GENERAL_ERROR, e);
 			}
 
 			LOG.info("Reset user password executed successfully");
 			model.addAttribute("status", DisplayMessageType.SUCCESS_MESSAGE);
-			model.addAttribute("message", messageUtils.getDisplayMessage(
-					DisplayMessageConstants.PASSWORD_CHANGE_SUCCESSFUL,
-					DisplayMessageType.SUCCESS_MESSAGE));
-		} catch (NonFatalException e) {
-			LOG.error("NonFatalException while setting new Password. Reason : "
-					+ e.getMessage(), e);
+			model.addAttribute("message",
+					messageUtils.getDisplayMessage(DisplayMessageConstants.PASSWORD_CHANGE_SUCCESSFUL, DisplayMessageType.SUCCESS_MESSAGE));
+		}
+		catch (NonFatalException e) {
+			LOG.error("NonFatalException while setting new Password. Reason : " + e.getMessage(), e);
 			model.addAttribute("emailId", emailId);
 			model.addAttribute("status", DisplayMessageType.ERROR_MESSAGE);
-			model.addAttribute("message", messageUtils.getDisplayMessage(
-					e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE));
+			model.addAttribute("message", messageUtils.getDisplayMessage(e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE));
 			return JspResolver.RESET_PASSWORD;
 		}
 
@@ -543,13 +502,11 @@ public class LoginController {
 	 * @return
 	 */
 	@RequestMapping(value = "/logout")
-	public String initLogoutPage(Model model, HttpServletRequest request,
-			HttpServletResponse response) {
+	public String initLogoutPage(Model model, HttpServletRequest request, HttpServletResponse response) {
 		LOG.info("logging out");
 		request.getSession(false).invalidate();
-		model.addAttribute("message", messageUtils.getDisplayMessage(
-				DisplayMessageConstants.USER_LOGOUT_SUCCESSFUL,
-				DisplayMessageType.SUCCESS_MESSAGE));
+		model.addAttribute("message",
+				messageUtils.getDisplayMessage(DisplayMessageConstants.USER_LOGOUT_SUCCESSFUL, DisplayMessageType.SUCCESS_MESSAGE));
 		return JspResolver.LOGIN;
 	}
 
@@ -563,8 +520,7 @@ public class LoginController {
 	 */
 	@ResponseBody
 	@RequestMapping(value = "/getdisplaypiclocation")
-	public String getDisplayPictureLocation(Model model,
-			HttpServletRequest request, HttpServletResponse response) {
+	public String getDisplayPictureLocation(Model model, HttpServletRequest request, HttpServletResponse response) {
 		LOG.info("fetching display picture");
 		HttpSession session = request.getSession(false);
 		User user = sessionHelper.getCurrentUser();
@@ -572,11 +528,9 @@ public class LoginController {
 		String profileMasterIdStr = request.getParameter("profileMasterId");
 		try {
 			user = userManagementService.getUserByUserId(user.getUserId());
-			UserProfile currentProfile = (UserProfile) session
-					.getAttribute(CommonConstants.USER_PROFILE);
+			UserProfile currentProfile = (UserProfile) session.getAttribute(CommonConstants.USER_PROFILE);
 			if (currentProfile == null) {
-				currentProfile = user.getUserProfiles().get(
-						CommonConstants.INITIAL_INDEX);
+				currentProfile = user.getUserProfiles().get(CommonConstants.INITIAL_INDEX);
 				for (UserProfile profile : user.getUserProfiles()) {
 					if (profile.getProfilesMaster().getProfileId() == CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID) {
 						currentProfile = profile;
@@ -584,44 +538,41 @@ public class LoginController {
 					}
 				}
 			}
-			UserSettings userSettings = (UserSettings) session
-					.getAttribute(CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION);
+			UserSettings userSettings = (UserSettings) session.getAttribute(CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION);
 			if (userSettings == null || currentProfile == null) {
-				throw new InvalidInputException(
-						"No user settings found in session");
+				throw new InvalidInputException("No user settings found in session");
 			}
 
-			int profileMasterId = currentProfile.getProfilesMaster()
-					.getProfileId();
-			
-			if(profileMasterIdStr!=null && !profileMasterIdStr.isEmpty()){
-				try{
+			int profileMasterId = currentProfile.getProfilesMaster().getProfileId();
+
+			if (profileMasterIdStr != null && !profileMasterIdStr.isEmpty()) {
+				try {
 					profileMasterId = Integer.parseInt(profileMasterIdStr);
-				}catch(NumberFormatException e){
+				}
+				catch (NumberFormatException e) {
 					LOG.error("Error occured while parsing provided profileMasterId as parameter. Proceeding with default id.");
 				}
 			}
-			
+
 			if (profileMasterId == CommonConstants.PROFILES_MASTER_COMPANY_ADMIN_PROFILE_ID) {
-				imageUrl = userSettings.getCompanySettings()
-						.getProfileImageUrl();
-			} else if (profileMasterId == CommonConstants.PROFILES_MASTER_REGION_ADMIN_PROFILE_ID) {
+				imageUrl = userSettings.getCompanySettings().getProfileImageUrl();
+			}
+			else if (profileMasterId == CommonConstants.PROFILES_MASTER_REGION_ADMIN_PROFILE_ID) {
 				long regionId = currentProfile.getRegionId();
 				if (regionId != 0)
-					imageUrl = userSettings.getRegionSettings().get(regionId)
-							.getProfileImageUrl();
-			} else if (profileMasterId == CommonConstants.PROFILES_MASTER_BRANCH_ADMIN_PROFILE_ID) {
+					imageUrl = userSettings.getRegionSettings().get(regionId).getProfileImageUrl();
+			}
+			else if (profileMasterId == CommonConstants.PROFILES_MASTER_BRANCH_ADMIN_PROFILE_ID) {
 				long branchId = currentProfile.getBranchId();
 				if (branchId != 0)
-					imageUrl = userSettings.getBranchSettings().get(branchId)
-							.getProfileImageUrl();
-			} else if (profileMasterId == CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID) {
+					imageUrl = userSettings.getBranchSettings().get(branchId).getProfileImageUrl();
+			}
+			else if (profileMasterId == CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID) {
 				imageUrl = userSettings.getAgentSettings().getProfileImageUrl();
 			}
-		} catch (NonFatalException e) {
-			LOG.error(
-					"Non fatal Exception occurred in getDisplayPictureLocation(). Nested exception is ",
-					e);
+		}
+		catch (NonFatalException e) {
+			LOG.error("Non fatal Exception occurred in getDisplayPictureLocation(). Nested exception is ", e);
 			return e.getMessage();
 		}
 		return new Gson().toJson(imageUrl);
@@ -635,35 +586,25 @@ public class LoginController {
 	 * @param confirmPassword
 	 * @throws InvalidInputException
 	 */
-	private void validateResetPasswordFormParameters(String emailId,
-			String password, String confirmPassword)
-			throws InvalidInputException {
+	private void validateResetPasswordFormParameters(String emailId, String password, String confirmPassword) throws InvalidInputException {
 		LOG.debug("Validating reset password form paramters");
-		if (emailId == null || emailId.isEmpty()
-				|| !emailId.matches(CommonConstants.EMAIL_REGEX)) {
+		if (emailId == null || emailId.isEmpty() || !emailId.matches(CommonConstants.EMAIL_REGEX)) {
 			LOG.error("Invalid email id passed");
-			throw new InvalidInputException("Invalid email id passed",
-					DisplayMessageConstants.INVALID_EMAILID);
+			throw new InvalidInputException("Invalid email id passed", DisplayMessageConstants.INVALID_EMAILID);
 		}
-		if (password == null || password.isEmpty()
-				|| password.length() < CommonConstants.PASSWORD_LENGTH) {
+		if (password == null || password.isEmpty() || password.length() < CommonConstants.PASSWORD_LENGTH) {
 			LOG.error("Invalid password");
-			throw new InvalidInputException("Invalid password",
-					DisplayMessageConstants.INVALID_PASSWORD);
+			throw new InvalidInputException("Invalid password", DisplayMessageConstants.INVALID_PASSWORD);
 		}
 		if (confirmPassword == null || confirmPassword.isEmpty()) {
 			LOG.error("Confirm Password can not be null or empty");
-			throw new InvalidInputException(
-					"Confirm Password can not be null or empty",
-					DisplayMessageConstants.INVALID_PASSWORD);
+			throw new InvalidInputException("Confirm Password can not be null or empty", DisplayMessageConstants.INVALID_PASSWORD);
 		}
 
 		// check if password and confirm password field match
 		if (!password.equals(confirmPassword)) {
 			LOG.error("Password and confirm password fields do not match");
-			throw new InvalidInputException(
-					"Password and confirm password fields do not match",
-					DisplayMessageConstants.PASSWORDS_MISMATCH);
+			throw new InvalidInputException("Password and confirm password fields do not match", DisplayMessageConstants.PASSWORDS_MISMATCH);
 		}
 		LOG.debug("Reset password form parameters validated successfully");
 	}
@@ -675,33 +616,27 @@ public class LoginController {
 	 * @return
 	 * @throws InvalidInputException
 	 */
-	private String getRedirectionFromProfileCompletionStage(
-			String profileCompletionStage) throws InvalidInputException {
-		LOG.debug("Method getRedirectionFromProfileCompletionStage called for profileCompletionStage: "
-				+ profileCompletionStage);
+	private String getRedirectionFromProfileCompletionStage(String profileCompletionStage) throws InvalidInputException {
+		LOG.debug("Method getRedirectionFromProfileCompletionStage called for profileCompletionStage: " + profileCompletionStage);
 		String redirectTo = null;
 		switch (profileCompletionStage) {
-		case CommonConstants.ADD_COMPANY_STAGE:
-			redirectTo = JspResolver.COMPANY_INFORMATION;
-			break;
-		case CommonConstants.ADD_ACCOUNT_TYPE_STAGE:
-			redirectTo = JspResolver.ACCOUNT_TYPE_SELECTION;
-			break;
-		case CommonConstants.PRE_PROCESSING_BEFORE_LOGIN_STAGE:
-			redirectTo = "redirect:./"
-					+ CommonConstants.PRE_PROCESSING_BEFORE_LOGIN_STAGE;
-			break;
-		case CommonConstants.DASHBOARD_STAGE:
-			redirectTo = JspResolver.LANDING;
-			break;
-		default:
-			throw new InvalidInputException(
-					"Profile completion stage is invalid",
-					DisplayMessageConstants.GENERAL_ERROR);
+			case CommonConstants.ADD_COMPANY_STAGE:
+				redirectTo = JspResolver.COMPANY_INFORMATION;
+				break;
+			case CommonConstants.ADD_ACCOUNT_TYPE_STAGE:
+				redirectTo = JspResolver.ACCOUNT_TYPE_SELECTION;
+				break;
+			case CommonConstants.PRE_PROCESSING_BEFORE_LOGIN_STAGE:
+				redirectTo = "redirect:./" + CommonConstants.PRE_PROCESSING_BEFORE_LOGIN_STAGE;
+				break;
+			case CommonConstants.DASHBOARD_STAGE:
+				redirectTo = JspResolver.LANDING;
+				break;
+			default:
+				throw new InvalidInputException("Profile completion stage is invalid", DisplayMessageConstants.GENERAL_ERROR);
 		}
 
-		LOG.debug("Method getRedirectionFromProfileCompletionStage finished. Returning : "
-				+ redirectTo);
+		LOG.debug("Method getRedirectionFromProfileCompletionStage finished. Returning : " + redirectTo);
 		return redirectTo;
 	}
 }
