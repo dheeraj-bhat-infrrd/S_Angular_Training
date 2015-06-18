@@ -1,6 +1,8 @@
 package com.realtech.socialsurvey.core.entities;
 
 public class SurveyRecipient {
+	private long agentId;
+	private String agentName;
 	private String firstname;
 	private String lastname;
 	private String emailId;
@@ -27,6 +29,22 @@ public class SurveyRecipient {
 
 	public void setEmailId(String emailId) {
 		this.emailId = emailId;
+	}
+
+	public long getAgentId() {
+		return agentId;
+	}
+
+	public void setAgentId(long agentId) {
+		this.agentId = agentId;
+	}
+
+	public String getAgentName() {
+		return agentName;
+	}
+
+	public void setAgentName(String agentName) {
+		this.agentName = agentName;
 	}
 
 	@Override

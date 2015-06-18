@@ -53,14 +53,44 @@
 		$('input[data-name="agent-name"]').bind('click',function(e){
 			e.stopPropagation();
 			$('.agent-dropdown-cont').remove();
-			appendAgentDropDown(this);
+			fillAgents(this);
 		});
+		debugger;
+		function fillAgents(element){
+			var columnName = '${columnName}';
+			var columnValue = '${columnValue}';
+			var payload = {
+				"columnName" : columnName,
+				"columnValue" : columnValue
+			};
+			var success = false;
+			$.ajax({
+				url : './fetchagentsforadmin.do',
+				type : "GET",
+				data : payload,
+				dataType : 'JSON',
+				async : true,
+				success : function(){
+					success = true;
+				},
+				complete: function(data){
+					if(success){
+						appendAgentDropDown(data.responseJSON, element, columnName);
+					}
+				},
+				error : function(e) {
+					redirectErrorpage();
+				}
+			});
+		}
 		
-		function appendAgentDropDown(element,data) {
+		function appendAgentDropDown(data, element, columnName) {
 			var htmlData = '<div class="agent-dropdown-wrapper">';
 			htmlData += '<div class="agent-dropdown-cont">';
-			htmlData += '<div class="agent-dropdown-item">Agent One</div>';
-			htmlData += '<div>';
+			for(var index=0; index<data.length;index++){
+				htmlData += '<div column-name="' + columnName + '" attr="' + data[index].userId + '" class="agent-dropdown-item">' + data[index].displayName + '</div>';
+			}
+			htmlData += '</div>';
 			htmlData += '<div>';
 			$(element).parent().append(htmlData);
 		}
@@ -68,6 +98,8 @@
 		$(document).on('click','.agent-dropdown-item',function(e){
 			e.stopPropagation();
 			$(this).parent().parent().parent().find('input[data-name="agent-name"]').val($(this).text());
+			$(this).parent().parent().parent().find('input[data-name="agent-name"]').attr('agent-id', $(this).attr('attr'));
+			$(this).parent().parent().parent().find('input[data-name="agent-name"]').attr('column-name', $(this).attr('column-name'));
 			$('.agent-dropdown-cont').remove();
 		})
 		

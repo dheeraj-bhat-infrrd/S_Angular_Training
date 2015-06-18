@@ -195,6 +195,9 @@
 		</div>
 	</div>
 	<script>
+	var a = "${user.company.licenseDetails[0].accountsMaster.accountsMasterId}";
+	debugger;
+	console.log("ritwik" + a);
 		function userLogout(){
 			window.location.href = 'j_spring_security_logout';
 		}
