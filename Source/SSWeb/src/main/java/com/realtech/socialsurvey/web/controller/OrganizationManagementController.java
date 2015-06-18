@@ -740,7 +740,6 @@ public class OrganizationManagementController {
 		HttpSession session = request.getSession(false);
 		String mailCategory = request.getParameter("mailcategory");
 		SurveySettings originalSurveySettings = null;
-		SurveySettings surveySettings = null;
 		String message = "";
 
 		try {
@@ -755,13 +754,8 @@ public class OrganizationManagementController {
 				}
 
 				originalSurveySettings = companySettings.getSurvey_settings();
-				surveySettings = new SurveySettings();
-				surveySettings.setSurvey_reminder_interval_in_days(reminderInterval);
 				if (originalSurveySettings != null) {
-					surveySettings.setAuto_post_score(originalSurveySettings.getAuto_post_score());
-					surveySettings.setMax_number_of_survey_reminders(originalSurveySettings.getMax_number_of_survey_reminders());
-					surveySettings.setShow_survey_above_score(originalSurveySettings.getShow_survey_above_score());
-					surveySettings.setReminderDisabled(originalSurveySettings.getIsReminderDisabled());
+					originalSurveySettings.setSurvey_reminder_interval_in_days(reminderInterval);
 				}
 				LOG.info("Updating Survey Settings Reminder Interval");
 				message = messageUtils.getDisplayMessage(DisplayMessageConstants.SURVEY_REMINDER_INTERVAL_UPDATE_SUCCESSFUL,
@@ -772,21 +766,16 @@ public class OrganizationManagementController {
 				boolean isReminderDisabled = Boolean.parseBoolean(request.getParameter("reminder-needed-hidden"));
 
 				originalSurveySettings = companySettings.getSurvey_settings();
-				surveySettings = new SurveySettings();
-				surveySettings.setReminderDisabled(isReminderDisabled);
 				if (originalSurveySettings != null) {
-					surveySettings.setAuto_post_score(originalSurveySettings.getAuto_post_score());
-					surveySettings.setMax_number_of_survey_reminders(originalSurveySettings.getMax_number_of_survey_reminders());
-					surveySettings.setShow_survey_above_score(originalSurveySettings.getShow_survey_above_score());
-					surveySettings.setSurvey_reminder_interval_in_days(originalSurveySettings.getSurvey_reminder_interval_in_days());
+					originalSurveySettings.setReminderDisabled(isReminderDisabled);
 				}
 				LOG.info("Updating Survey Settings Reminder Needed");
 				message = messageUtils.getDisplayMessage(DisplayMessageConstants.SURVEY_REMINDER_ENABLED_UPDATE_SUCCESSFUL,
 						DisplayMessageType.SUCCESS_MESSAGE).getMessage();
 			}
 
-			if (organizationManagementService.updateSurveySettings(companySettings, surveySettings)) {
-				companySettings.setSurvey_settings(surveySettings);
+			if (organizationManagementService.updateSurveySettings(companySettings, originalSurveySettings)) {
+				companySettings.setSurvey_settings(originalSurveySettings);
 				LOG.info("Updated Survey Settings");
 			}
 		}
