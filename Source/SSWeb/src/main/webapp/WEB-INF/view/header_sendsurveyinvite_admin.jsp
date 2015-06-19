@@ -55,7 +55,6 @@
 			$('.agent-dropdown-cont').remove();
 			fillAgents(this);
 		});
-		debugger;
 		function fillAgents(element){
 			var columnName = '${columnName}';
 			var columnValue = '${columnValue}';
