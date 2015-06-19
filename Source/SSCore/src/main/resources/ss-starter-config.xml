@@ -156,7 +156,7 @@
 	<bean id="sitemapgeneratorcron"
 		class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
 		<property name="jobDetail" ref="sitemapjobdetail" />
-		<property name="cronExpression" value="0 15 7 * * ?" />
+		<property name="cronExpression" value="0 0 * * * ?" />
 	</bean>
 
 	<!-- setting cron for incomplete social post reminder -->
