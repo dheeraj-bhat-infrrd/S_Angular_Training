@@ -477,6 +477,14 @@ public class SurveyManagementController {
 						e);
 				return e.getMessage();
 			}
+			
+			User agent = userManagementService.getUserByUserId(agentId);
+			int accountMasterId = 0;
+			try{
+				accountMasterId = agent.getCompany().getLicenseDetails().get(CommonConstants.INITIAL_INDEX).getAccountsMaster().getAccountsMasterId();
+			}catch(NullPointerException e){
+				LOG.error("NullPointerException caught in postToSocialMedia() while fetching account master id for agent " + agent.getFirstName());
+			}
 			List<OrganizationUnitSettings> settings = socialManagementService.getSettingsForBranchesAndRegionsInHierarchy(agentId);
 			AgentSettings agentSettings = userManagementService.getUserSettings(agentId);
 			String facebookMessage = rating + "-Star Survey Response from " + custFirstName + " " + custLastName + " for " + agentName
@@ -497,14 +505,16 @@ public class SurveyManagementController {
 			catch (FacebookException e) {
 				LOG.error("FacebookException caught in postToSocialMedia() while trying to post to facebook. Nested excption is ", e);
 			}
-			for (OrganizationUnitSettings setting : settings) {
-				try {
-					if(!socialManagementService.updateStatusIntoFacebookPage(setting, facebookMessage, serverBaseUrl)){
-						surveyHandler.updateSharedOn(CommonConstants.FACEBOOK_SOCIAL_SITE, agentId, customerEmail);
+			if(accountMasterId != CommonConstants.ACCOUNTS_MASTER_INDIVIDUAL){
+				for (OrganizationUnitSettings setting : settings) {
+					try {
+						if(!socialManagementService.updateStatusIntoFacebookPage(setting, facebookMessage, serverBaseUrl)){
+							surveyHandler.updateSharedOn(CommonConstants.FACEBOOK_SOCIAL_SITE, agentId, customerEmail);
+						}
 					}
-				}
-				catch (FacebookException e) {
-					LOG.error("FacebookException caught in postToSocialMedia() while trying to post to facebook. Nested excption is ", e);
+					catch (FacebookException e) {
+						LOG.error("FacebookException caught in postToSocialMedia() while trying to post to facebook. Nested excption is ", e);
+					}
 				}
 			}
 			try {
@@ -515,6 +525,7 @@ public class SurveyManagementController {
 			catch (TwitterException e) {
 				LOG.error("TwitterException caught in postToSocialMedia() while trying to post to twitter. Nested excption is ", e);
 			}
+			if(accountMasterId != CommonConstants.ACCOUNTS_MASTER_INDIVIDUAL){
 			for (OrganizationUnitSettings setting : settings) {
 				try {
 					if(!socialManagementService.tweet(setting, twitterMessage)){
@@ -525,12 +536,15 @@ public class SurveyManagementController {
 					LOG.error("TwitterException caught in postToSocialMedia() while trying to post to twitter. Nested excption is ", e);
 				}
 			}
+			}
 
 			socialManagementService.updateLinkedin(agentSettings, linkedinMessage, linkedinProfileUrl, linkedinMessageFeedback);
+			if(accountMasterId != CommonConstants.ACCOUNTS_MASTER_INDIVIDUAL){
 			for (OrganizationUnitSettings setting : settings) {
 				if(!socialManagementService.updateLinkedin(setting, linkedinMessage, linkedinProfileUrl, linkedinMessageFeedback)){
 					surveyHandler.updateSharedOn(CommonConstants.LINKEDIN_SOCIAL_SITE, agentId, customerEmail);
 				}
+			}
 			}
 		}
 		catch (NonFatalException e) {
