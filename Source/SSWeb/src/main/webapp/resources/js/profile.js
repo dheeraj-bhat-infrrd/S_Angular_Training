@@ -65,104 +65,112 @@ function paintProfilePage(result) {
 	//TODO : Remove all the js iteration for profileJson
 	if(result != undefined && result != "") {
 		currentProfileIden = result.iden;
-		var contactDetails = result.contact_details;
-		//var headContentHtml = "";
-		var profileLevel = $("#profile-fetch-info").attr("profile-level");
-		//$("#profile-main-content").show();
 		currentProfileName = result.profileName;
-		//paint public  posts
+		var contactDetails = result.contact_details;
+		var profileLevel = $("#profile-fetch-info").attr("profile-level");
+		
+		// paint public  posts
 		paintPublicPosts();
 		
-		if(contactDetails != undefined){
+		if (contactDetails != undefined) {
             var addressHtml ="";
             
-            
             // Company profile address
-            if(profileLevel == 'INDIVIDUAL' && result.companyProfileData){
-            	var companyProfileData = result.companyProfileData;
-            	
-            	if(companyProfileData.address1 != undefined){
-                	addressHtml = addressHtml +'<div class="prof-user-addline1">'+companyProfileData.address1+'</div>';
-                }
-                if(companyProfileData.address2 != undefined){
-                	addressHtml = addressHtml + '<div class="prof-user-addline2">'+companyProfileData.address2+'</div>';
-                }
-                if(companyProfileData.zipcode != undefined) {
-                	addressHtml = addressHtml + '<div class="prof-user-addline2">';
-                	if(companyProfileData.city){
-                		addressHtml += companyProfileData.city + ', ';
-                	}
-                	if(companyProfileData.state){
-                		addressHtml += companyProfileData.state + ' ';
-                	}
-                	addressHtml += companyProfileData.zipcode + '</div>';
-                }
-                
-    		}else{
-    			if(contactDetails.address1 != undefined){
-                	addressHtml = addressHtml +'<div class="prof-user-addline1">'+contactDetails.address1+'</div>';
-                }
-                if(contactDetails.address2 != undefined){
-                	addressHtml = addressHtml + '<div class="prof-user-addline2">'+contactDetails.address2+'</div>';
-                }
-                if(contactDetails.zipcode != undefined || contactDetails.state != undefined || contactDetails.city != undefined) {
-                	addressHtml = addressHtml + '<div class="prof-user-addline2">';
-                	if(contactDetails.city && contactDetails.city != ""){
-                		addressHtml += contactDetails.city + ', ';	
-                	}
-                	if(contactDetails.state && contactDetails.state != ""){
-                		addressHtml += contactDetails.state + ' ';	
-                	}
-                	if(contactDetails.zipcode && contactDetails.zipcode != ""){
-                		addressHtml += contactDetails.zipcode;	
-                	}
-                	addressHtml += '</div>';
-                }
-    		}
-            
+			if (profileLevel == 'INDIVIDUAL') {
+				var addressData = contactDetails;
+				if (!addressData && result.companyProfileData) {
+					addressData = result.companyProfileData;
+				}
+
+				if (addressData.address1 != undefined) {
+					addressHtml += '<div class="prof-user-addline1">' + addressData.address1 + '</div>';
+				}
+				if (addressData.address2 != undefined) {
+					addressHtml += '<div class="prof-user-addline2">' + addressData.address2 + '</div>';
+				}
+				if (addressData.zipcode != undefined) {
+					addressHtml += '<div class="prof-user-addline2">';
+					if (addressData.city && addressData.city != "") {
+						addressHtml += addressData.city + ', ';
+					}
+					if (addressData.state && addressData.state != "") {
+						addressHtml += addressData.state + ' ';
+					}
+					if (addressData.zipcode && addressData.zipcode != "") {
+						addressHtml += contactDetails.zipcode;
+					}
+					addressHtml += '</div>';
+				}
+
+			} else {
+				if (contactDetails.address1 != undefined) {
+					addressHtml += '<div class="prof-user-addline1">' + contactDetails.address1 + '</div>';
+				}
+				if (contactDetails.address2 != undefined) {
+					addressHtml += '<div class="prof-user-addline2">' + contactDetails.address2 + '</div>';
+				}
+				if (contactDetails.zipcode != undefined || contactDetails.state != undefined || contactDetails.city != undefined) {
+					addressHtml += '<div class="prof-user-addline2">';
+					if (contactDetails.city && contactDetails.city != "") {
+						addressHtml += contactDetails.city + ', ';
+					}
+					if (contactDetails.state && contactDetails.state != "") {
+						addressHtml += contactDetails.state + ' ';
+					}
+					if (contactDetails.zipcode && contactDetails.zipcode != "") {
+						addressHtml += contactDetails.zipcode;
+					}
+					addressHtml += '</div>';
+				}
+			}
             $("#prof-company-address").html(addressHtml);
-            
-            if(result.logo == undefined) {
-            	var address;
-            	if(profileLevel == 'INDIVIDUAL'){
-            		address = '';
-            		var companyProfileData = result.companyProfileData;
-            		if(companyProfileData.name && companyProfileData.name != ""){
-                    	address = address + companyProfileData.name;
-                    }
-            		if(companyProfileData.address && companyProfileData.address != ""){
-                    	address = address + ' ' + companyProfileData.address;
-                    }
-                    if(companyProfileData.country && companyProfileData.country != "") {
-                    	address = address + ' ' + companyProfileData.country;
-                    }
-                    if(companyProfileData.zipcode && companyProfileData.zipcode != "") {
-                    	address = address + ' ' + companyProfileData.zipcode;
-                    }
-                    
-            	}else{
-            		address = contactDetails.name;
-            		
-            		if(contactDetails.address1 != undefined){
-                    	address = address + ' ' + contactDetails.address1;
-                    }
-            		if(contactDetails.address2 != undefined){
-                    	address = address + ' ' + contactDetails.address2;
-                    }
-                    if(contactDetails.country != undefined) {
-                    	address = address + ' ' + contactDetails.country;
-                    }
-                    if(contactDetails.zipcode != undefined) {
-                    	address = address + ' ' + contactDetails.zipcode;
-                    }
-            	}
+
+            if (result.logo == undefined) {
+				var address;
+				if (profileLevel == 'INDIVIDUAL') {
+					var addressData = contactDetails;
+					if (!addressData && result.companyProfileData) {
+						addressData = result.companyProfileData;
+					}
+					
+					address = '';
+					if (addressData.name && addressData.name != "") {
+						address += addressData.name;
+					}
+					if (addressData.address && addressData.address != "") {
+						address += ' ' + addressData.address;
+					}
+					if (addressData.country && addressData.country != "") {
+						address += ' ' + addressData.country;
+					}
+					if (addressData.zipcode && addressData.zipcode != "") {
+						address += ' ' + addressData.zipcode;
+					}
+				} else {
+					address = contactDetails.name;
+
+					if (contactDetails.address1 != undefined) {
+						address = address + ' ' + contactDetails.address1;
+					}
+					if (contactDetails.address2 != undefined) {
+						address = address + ' ' + contactDetails.address2;
+					}
+					if (contactDetails.country != undefined) {
+						address = address + ' ' + contactDetails.country;
+					}
+					if (contactDetails.zipcode != undefined) {
+						address = address + ' ' + contactDetails.zipcode;
+					}
+				}
             	address=address.replace(/,/g,"");
-            	if(apikey == undefined){
+            	
+            	if (apikey == undefined) {
             		fetchGoogleMapApi();
             	}
             	$("#prof-company-logo").html('<iframe src="https://www.google.com/maps/embed/v1/place?key='+apikey+'&q='+address+'"></iframe>');
             }
-		}    
+		}
+		
 		var dataLink = $('.web-address-link').attr('data-link');
 		var link = returnValidWebAddress(dataLink);
 		$('#web-address-txt').html('<a href="'+link+'" target="_blank">'+dataLink+'</a>');
