@@ -10,7 +10,7 @@ namespace EncompassSocialSurvey.Service
     {
         public bool InsertLoans(List<LoanViewModel> loansVM)
         {
-            Logger.Info("Entering the method LoanService.InsertLoans(List<>)");
+            Logger.Info("Entering the method LoanService.InsertLoans(List<>):");
             bool returnValue = false;
 
             try
