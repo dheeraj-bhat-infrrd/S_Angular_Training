@@ -81,6 +81,7 @@
     <Compile Include="CommonUtility.cs" />
     <Compile Include="DAL\EncompassSocialSurveryContext.cs" />
     <Compile Include="DAL\LoanRepository.cs" />
+    <Compile Include="DAL\TestDBConnection.cs" />
     <Compile Include="EncompassGlobal.cs" />
     <Compile Include="EncompassSocialSurverConstant.cs" />
     <Compile Include="Entity\CompanyCredentials.cs" />

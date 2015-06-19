@@ -1,4 +1,5 @@
-﻿using EncompassSocialSurvey.Entity;
+﻿using EncompassSocialSurvey.DAL;
+using EncompassSocialSurvey.Entity;
 using EncompassSocialSurvey.Service;
 using System.Collections;
 using System.Collections.Generic;
@@ -20,6 +21,9 @@ namespace EncompassSocialSurvey
                 CompanyCredentialService _ccService = new CompanyCredentialService();
                 var companyCredentials = _ccService.GetCompanyCredentials();
 
+                // it
+                Logger.Info("Company credentials count from mongodb: " + companyCredentials.Count);
+
                 // now process encompass loans
                 ProcessLoanForCompanies(companyCredentials);
             }
@@ -35,6 +39,11 @@ namespace EncompassSocialSurvey
             Logger.Info("Entering the method ProcessLoanForCompanies.ProcessLoanForCompanies()");
             foreach (var forCompCredential in companyCredentials)
             {
+
+                Logger.Info("Strating loan processing for company: "
+                    + " companyId: " + forCompCredential.CompanyId
+                    + " : companyUserName : " + forCompCredential.UserName
+                    + " : companyURL : " + forCompCredential.EncompassUrl);
                 try
                 {
                     // do the login & create the login session 
@@ -47,6 +56,10 @@ namespace EncompassSocialSurvey
                     // process loan for each loan folder
                     foreach (string folderName in loanFolder)
                     {
+                        Logger.Info("Strating loan Folder:  : "
+                   + " companyId: " + forCompCredential.CompanyId
+                   + " : companyUserName : " + forCompCredential.UserName
+                    + " : folderName : " + folderName);
                         try
                         {
                             // 1st Get loan VM
@@ -67,6 +80,11 @@ namespace EncompassSocialSurvey
                             Logger.Error("Caught an exception, loanFolder: Program.ProcessLoanForCompanies():", ex);
                             // TODO: Log the exception
                         }
+
+                        Logger.Info("Done loan Folder:  : "
+                + " companyId: " + forCompCredential.CompanyId
+                + " : companyUserName : " + forCompCredential.UserName
+                 + " : folderName : " + folderName);
                     }
                 }
                 catch (System.Exception ex)
@@ -81,6 +99,10 @@ namespace EncompassSocialSurvey
                     if (null != EncompassGlobal.EncompassLoginSession)
                         EncompassGlobal.EncompassLoginSession.End();
                 }
+                Logger.Info("Done loan processing for company: "
+                      + " companyId: " + forCompCredential.CompanyId
+                      + " : companyUserName : " + forCompCredential.UserName
+                      + " : companyURL : " + forCompCredential.EncompassUrl);
             }
 
             //
