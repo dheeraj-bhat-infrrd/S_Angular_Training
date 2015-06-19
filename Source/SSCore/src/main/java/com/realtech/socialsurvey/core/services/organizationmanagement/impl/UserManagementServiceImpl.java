@@ -1770,9 +1770,12 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 		ContactDetailsSettings contactSettings = new ContactDetailsSettings();
 		if (user.getLastName() != null) {
 			contactSettings.setName(user.getFirstName() + " " + user.getLastName());
+			contactSettings.setFirstName(user.getFirstName());
+			contactSettings.setLastName(user.getLastName());
 		}
 		else {
 			contactSettings.setName(user.getFirstName());
+			contactSettings.setFirstName(user.getFirstName());
 		}
 
 		MailIdSettings mail_ids = new MailIdSettings();
@@ -1917,6 +1920,8 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 
 		String name = user.getFirstName() + " " + (user.getLastName() != null ? user.getLastName() : "");
 		contactDetails.setName(name);
+		contactDetails.setFirstName(firstName);
+		contactDetails.setLastName(lastName);
 
 		String profileName = generateIndividualProfileName(user.getUserId(), name, emailId);
 		String profileUrl = utils.generateAgentProfileUrl(profileName);
