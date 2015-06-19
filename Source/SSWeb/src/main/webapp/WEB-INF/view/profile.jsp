@@ -157,7 +157,7 @@
 							<div class='rating-image float-left smiley-rat-${integerAverageRating }'></div>
 							<div class='rating-rounded float-left'>${floatingAverageRating}</div>
 						</div>
-						<div class="float-left review-count-left cursor-pointer" id="prof-company-review-count">${reviewsCount } Reviews(s)</div>
+						<div class="float-left review-count-left cursor-pointer" id="prof-company-review-count">${reviewsCount } Review(s)</div>
 					</div>
 					<div class="prof-btn-wrapper clearfix">
 						<div class="prof-btn-contact float-left" onclick="focusOnContact()" >Contact
