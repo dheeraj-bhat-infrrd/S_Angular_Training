@@ -491,7 +491,7 @@ public class SurveyManagementController {
 					+ " on Social Survey - view at " + getApplicationBaseUrl() + CommonConstants.AGENT_PROFILE_FIXED_URL + agentProfileLink;
 
 			String twitterMessage = rating + "-Star Survey Response from " + custFirstName + " " + custLastName + " for " + agentName
-					+ " on @SocialSurvey - view at " + getApplicationBaseUrl() + CommonConstants.AGENT_PROFILE_FIXED_URL + agentProfileLink;
+					+ " on @SocialSurveyMe - view at " + getApplicationBaseUrl() + CommonConstants.AGENT_PROFILE_FIXED_URL + agentProfileLink;
 
 			String linkedinMessage = rating + "-Star Survey Response from " + custFirstName + " " + custLastName + " for " + agentName
 					+ " on SocialSurvey ";
@@ -634,7 +634,7 @@ public class SurveyManagementController {
 			List<OrganizationUnitSettings> settings = socialManagementService.getSettingsForBranchesAndRegionsInHierarchy(agentId);
 			AgentSettings agentSettings = userManagementService.getUserSettings(agentId);
 			String twitterMessage = rating + "-Star Survey Response from " + custFirstName + custLastName + " for " + agentName
-					+ " on @SocialSurvey - view at " + getApplicationBaseUrl() + CommonConstants.AGENT_PROFILE_FIXED_URL + agentProfileLink;
+					+ " on @SocialSurveyMe - view at " + getApplicationBaseUrl() + CommonConstants.AGENT_PROFILE_FIXED_URL + agentProfileLink;
 			try {
 				socialManagementService.tweet(agentSettings, twitterMessage);
 				surveyHandler.updateSharedOn(CommonConstants.TWITTER_SOCIAL_SITE, agentId, customerEmail);

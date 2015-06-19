@@ -152,6 +152,14 @@ public class RegistrationController {
 	public String showRegistrationPage(@RequestParam("q") String encryptedUrlParams, HttpServletRequest request, Model model) {
 		LOG.info("Method showRegistrationPage of Registration Controller called with encryptedUrl : " + encryptedUrlParams);
 
+		// Check for existing session
+		if (sessionHelper.isUserActiveSessionExists()) {
+			LOG.info("Existing Active Session detected");
+			
+			model.addAttribute(CommonConstants.ACTIVE_SESSIONS_FOUND, "true");
+			return JspResolver.LANDING;
+		}
+
 		try {
 			LOG.debug("Calling registration service for validating registration url and extracting parameters from it");
 			Map<String, String> urlParams = null;

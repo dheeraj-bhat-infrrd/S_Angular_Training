@@ -11,8 +11,19 @@
 </script>
 <script src="${initParam.resourcesPath}/resources/js/landing.js"></script>
 <script src="${initParam.resourcesPath}/resources/js/historySupport.js"></script>
+<script src="${initParam.resourcesPath}/resources/js/activesession.js"></script>
 <script type="text/javascript">
 $(document).ready(function() {
+	// Show popup if any active session found
+	var activeSessionFound = "${activeSessionFound}";
+	if (activeSessionFound == "true") {
+		showActiveUserLogoutOverlay();
+	} else {
+		landingFlow();
+	}
+});
+
+function landingFlow() {
 	var popupStatus = "${popupStatus}";
 	var showLinkedInPopup = "${showLinkedInPopup}";
 	var showSendSurveyPopup = "${showSendSurveyPopup}";
@@ -68,6 +79,6 @@ $(document).ready(function() {
     }
 	
 	showMainContent('./dashboard.do');
-});
+}
 </script>
 <jsp:include page="footer.jsp" />

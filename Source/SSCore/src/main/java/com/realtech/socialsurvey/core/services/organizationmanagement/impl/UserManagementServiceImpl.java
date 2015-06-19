@@ -1040,7 +1040,9 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 		Map<String, String> urlParams = new HashMap<String, String>();
 		urlParams.put(CommonConstants.EMAIL_ID, emailId);
 		urlParams.put(CommonConstants.FIRST_NAME, firstName);
-		urlParams.put(CommonConstants.LAST_NAME, lastName);
+		if (lastName != null && !lastName.isEmpty()) {
+			urlParams.put(CommonConstants.LAST_NAME, lastName);
+		}
 		urlParams.put(CommonConstants.COMPANY, String.valueOf(companyId));
 
 		LOG.info("Generating URL");

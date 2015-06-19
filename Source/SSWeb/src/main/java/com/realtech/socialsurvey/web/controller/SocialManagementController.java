@@ -1094,7 +1094,7 @@ public class SocialManagementController {
 			User user = sessionHelper.getCurrentUser();
 			List<OrganizationUnitSettings> settings = socialManagementService.getBranchAndRegionSettingsForUser(user.getUserId());
 			String twitterMessage = rating + "-Star Survey Response from " + custFirstName + custLastName + " for " + agentName
-					+ " on @SocialSurvey - view at " + applicationBaseUrl + CommonConstants.AGENT_PROFILE_FIXED_URL + agentProfileLink;
+					+ " on @SocialSurveyMe - view at " + applicationBaseUrl + CommonConstants.AGENT_PROFILE_FIXED_URL + agentProfileLink;
 			twitterMessage = twitterMessage.replaceAll("null", "");
 
 			for (OrganizationUnitSettings setting : settings) {
