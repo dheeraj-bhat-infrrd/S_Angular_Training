@@ -889,10 +889,9 @@ public class UserManagementController {
 				model.addAttribute("profileUrl", agentSettings.getCompleteProfileUrl());
 				
 				String lastName = urlParams.get(CommonConstants.LAST_NAME);
-				if (lastName == null || lastName.isEmpty()) {
-					lastName = "";
+				if (lastName != null && !lastName.isEmpty()) {
+					model.addAttribute(CommonConstants.LAST_NAME, lastName);
 				}
-				model.addAttribute(CommonConstants.LAST_NAME, lastName);
 				LOG.debug("Validation of url completed. Service returning params to be prepopulated in registration page");
 			}
 			else {
