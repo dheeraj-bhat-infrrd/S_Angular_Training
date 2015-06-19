@@ -13,7 +13,9 @@ namespace EncompassSocialSurvey.DAL
         EncompassSocialSurveryContext _socialSurveryContext = new EncompassSocialSurveryContext();
 
 
-        private const string SELECT_QUERY = @"SELECT spi.SURVEY_PRE_INITIATION_ID, spi.SURVEY_SOURCE_ID FROM SURVEY_PRE_INITIATION as  spi WHERE spi.SURVEY_SOURCE_ID = ?SURVEY_SOURCE_ID";
+        // select spi.SURVEY_SOURCE_ID, spi.CUSTOMER_EMAIL_ID, spi.CUSTOMER_FIRST_NAME from survey_pre_initiation as spi
+        private const string SELECT_QUERY = @"SELECT spi.SURVEY_PRE_INITIATION_ID, spi.SURVEY_SOURCE_ID FROM SURVEY_PRE_INITIATION as  spi
+                                        WHERE spi.SURVEY_SOURCE_ID = ?SURVEY_SOURCE_ID AND spi.CUSTOMER_EMAIL_ID = ?CUSTOMER_EMAIL_ID AND spi.CUSTOMER_FIRST_NAME = ?CUSTOMER_FIRST_NAME ;";
 
 
         private const string INSERT_QUERY = @"INSERT INTO SURVEY_PRE_INITIATION(  
@@ -49,11 +51,11 @@ namespace EncompassSocialSurvey.DAL
                                         , ?LAST_REMINDER_TIME
                                         , ?STATUS
                                         , ?CREATED_ON
-                                        )";
+                                        ) ;";
 
         public bool InsertLoan(LoanEntity loan, MySqlConnection mySqlDbConnection)
         {
-            Logger.Info("Entering the method LoanRepository.InsertLoan()");
+            Logger.Info("Entering the method LoanRepository.InsertLoan(): LoanId:" + loan.SurveySourceId + " : CustomerEmailId : " + loan.CustomerEmailId);
             bool returnValue = false;
 
             string insertQuery = INSERT_QUERY;
@@ -62,7 +64,7 @@ namespace EncompassSocialSurvey.DAL
             try
             {
                 // if loand not present then and only then insert
-                if (false == IsSurveySourceIdExists(loan.SurveySourceId, mySqlDbConnection))
+                if (false == IsSurveySourceIdExists(loan, mySqlDbConnection))
                 {
                     //
                     commandToInsert = new MySqlCommand(insertQuery, mySqlDbConnection);
@@ -99,7 +101,7 @@ namespace EncompassSocialSurvey.DAL
                 if (null != commandToInsert) { commandToInsert.Dispose(); }
             }
 
-            Logger.Info("Exiting the method LoanRepository.InsertLoan()");
+            Logger.Info("Exiting the method LoanRepository.InsertLoan(): LoanId:" + loan.SurveySourceId + " : CustomerEmailId : " + loan.CustomerEmailId);
             return returnValue;
         }
 
@@ -137,7 +139,7 @@ namespace EncompassSocialSurvey.DAL
             return returnValue;
         }
 
-        public bool IsSurveySourceIdExists(string surveySourceId, MySqlConnection mySqlDbConnection)
+        public bool IsSurveySourceIdExists(LoanEntity loan, MySqlConnection mySqlDbConnection)
         {
             Logger.Info("Entering the method LoanRepository.IsSurveySourceIdExists()");
             bool returnValue = false;
@@ -149,8 +151,11 @@ namespace EncompassSocialSurvey.DAL
 
             try
             {
+                // select spi.Survey_source_id, spi.CUSTOMER_EMAIL_ID, spi.CUSTOMER_FIRST_NAME from survey_pre_initiation as spi
                 commandToSelect = new MySqlCommand(sqlQuery, mySqlDbConnection);
-                commandToSelect.Parameters.Add("?SURVEY_SOURCE_ID", MySqlDbType.VarChar, 250).Value = surveySourceId;
+                commandToSelect.Parameters.Add("?SURVEY_SOURCE_ID", MySqlDbType.VarChar, 250).Value = loan.SurveySourceId;
+                commandToSelect.Parameters.Add("?CUSTOMER_EMAIL_ID", MySqlDbType.VarChar, 250).Value = loan.CustomerEmailId;
+                commandToSelect.Parameters.Add("?CUSTOMER_FIRST_NAME", MySqlDbType.VarChar, 100).Value = loan.CustomerFirstName;
 
                 dataReader = commandToSelect.ExecuteReader();
                 while (dataReader.Read())
