@@ -724,7 +724,7 @@ public class HierarchyManagementController {
 		}
 		catch (NonFatalException e) {
 			LOG.error("NonFatalException while adding an individual. Reason : " + e.getMessage(), e);
-			model.addAttribute("message", e.getMessage());
+			model.addAttribute("message", messageUtils.getDisplayMessage(e.getMessage(), DisplayMessageType.ERROR_MESSAGE));
 		}
 
 		LOG.info("Successfully completed controller to add an individual");
