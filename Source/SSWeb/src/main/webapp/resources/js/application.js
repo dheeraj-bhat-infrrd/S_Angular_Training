@@ -3034,7 +3034,7 @@ function updateAutoPostSetting(isautopostenabled){
 	var success = false;
 	$.ajax({
 		url : "./updateautopostforsurvey.do",
-		type : "GET",
+		type : "POST",
 		data : payload,
 		success : function(data) {
 			if (data.errCode == undefined)
