@@ -110,7 +110,7 @@
 							</div>
 							<div>
 								<div id="atpst-chk-box" class="float-left bd-check-img"></div>
-								<input type="hidden" id="at-pst-cb" name="autopost" value="true">
+								<input type="hidden" id="at-pst-cb" name="autopost" value="${autoPostEnabled}">
 								<div class="float-left bd-check-txt">Allow user to autopost</div>
 							</div>
 						</div>
@@ -363,6 +363,10 @@
 $(document).ready(function() {
 	hideOverlay();
 	$(document).attr("title", "Edit Settings");
+	
+	if("${autoPostEnabled}" == "false"){
+		$('#atpst-chk-box').addClass('bd-check-img-checked');
+	}
 	
 	var profileMasterId = "${profilemasterid}";
 	var accountMasterId = "${accountMasterId}";
