@@ -470,7 +470,10 @@ public class OrganizationManagementController {
 				model.addAttribute("googleLink", unitSettings.getSocialMediaTokens().getGoogleToken().getProfileLink());
 			}
 		}
-
+		model.addAttribute("autoPostEnabled", false);
+		if (unitSettings != null && unitSettings.getSurvey_settings() != null) {
+			model.addAttribute("autoPostEnabled", unitSettings.getSurvey_settings().isAutoPostEnabled());
+		}
 		session.setAttribute(CommonConstants.USER_ACCOUNT_SETTINGS, unitSettings);
 		return JspResolver.EDIT_SETTINGS;
 	}
