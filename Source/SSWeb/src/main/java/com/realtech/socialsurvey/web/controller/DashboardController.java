@@ -140,14 +140,17 @@ public class DashboardController {
 						CommonConstants.COMPANY_ID_COLUMN);
 				model.addAttribute("columnValue", user.getCompany()
 						.getCompanyId());
+				model.addAttribute("showSendSurveyPopupAdmin", String.valueOf(true));
 			} else if (profileMasterId == CommonConstants.PROFILES_MASTER_REGION_ADMIN_PROFILE_ID) {
 				model.addAttribute("columnName",
 						CommonConstants.REGION_ID_COLUMN);
 				model.addAttribute("columnValue", selectedProfile.getRegionId());
+				model.addAttribute("showSendSurveyPopupAdmin", String.valueOf(true));
 			} else if (profileMasterId == CommonConstants.PROFILES_MASTER_BRANCH_ADMIN_PROFILE_ID) {
 				model.addAttribute("columnName",
 						CommonConstants.BRANCH_ID_COLUMN);
 				model.addAttribute("columnValue", selectedProfile.getBranchId());
+				model.addAttribute("showSendSurveyPopupAdmin", String.valueOf(true));
 			} else if (profileMasterId == CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID) {
 				model.addAttribute("columnName",
 						CommonConstants.AGENT_ID_COLUMN);
