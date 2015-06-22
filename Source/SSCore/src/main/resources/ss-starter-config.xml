@@ -184,7 +184,7 @@
 	<bean id="socialfeedingestercron"
 		class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
 		<property name="jobDetail" ref="socialfeedingesterjobdetail" />
-		<property name="cronExpression" value="0 45 6 * * ?" />
+		<property name="cronExpression" value="0 0 19,20,21,22,23,0,1,2,3,4,5,6,7 * * ?" />
 	</bean>
 	
 	<!-- setting cron for account deactivator -->
