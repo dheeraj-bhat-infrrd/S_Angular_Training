@@ -400,6 +400,12 @@
         margin-left: 5px;
         padding-left: 5px;
     }
+    .wc-form-txt {
+    	width: 80px;
+    }
+    .wc-form-input {
+    	width:  210px;
+    }
 }
 
 

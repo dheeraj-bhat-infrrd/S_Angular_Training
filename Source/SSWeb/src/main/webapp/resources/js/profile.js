@@ -78,7 +78,7 @@ function paintProfilePage(result) {
             // Company profile address
 			if (profileLevel == 'INDIVIDUAL') {
 				var addressData = contactDetails;
-				if (!addressData && result.companyProfileData) {
+				if (result.companyProfileData) {
 					addressData = result.companyProfileData;
 				}
 
@@ -88,7 +88,7 @@ function paintProfilePage(result) {
 				if (addressData.address2 != undefined) {
 					addressHtml += '<div class="prof-user-addline2">' + addressData.address2 + '</div>';
 				}
-				if (addressData.zipcode != undefined) {
+				if (addressData.zipcode != undefined || addressData.city != undefined || addressData.state != undefined) {
 					addressHtml += '<div class="prof-user-addline2">';
 					if (addressData.city && addressData.city != "") {
 						addressHtml += addressData.city + ', ';
@@ -97,7 +97,7 @@ function paintProfilePage(result) {
 						addressHtml += addressData.state + ' ';
 					}
 					if (addressData.zipcode && addressData.zipcode != "") {
-						addressHtml += contactDetails.zipcode;
+						addressHtml += addressData.zipcode;
 					}
 					addressHtml += '</div>';
 				}
