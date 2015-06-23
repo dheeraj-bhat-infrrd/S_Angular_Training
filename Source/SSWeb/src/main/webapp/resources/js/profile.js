@@ -73,12 +73,12 @@ function paintProfilePage(result) {
 		paintPublicPosts();
 		
 		if (contactDetails != undefined) {
-            var addressHtml ="";
+            var addressHtml = "";
             
             // Company profile address
 			if (profileLevel == 'INDIVIDUAL') {
 				var addressData = contactDetails;
-				if (!addressData && result.companyProfileData) {
+				if (!addressData.address1 && result.companyProfileData) {
 					addressData = result.companyProfileData;
 				}
 
@@ -88,7 +88,7 @@ function paintProfilePage(result) {
 				if (addressData.address2 != undefined) {
 					addressHtml += '<div class="prof-user-addline2">' + addressData.address2 + '</div>';
 				}
-				if (addressData.zipcode != undefined) {
+				if (addressData.zipcode != undefined || addressData.state != undefined || addressData.city != undefined) {
 					addressHtml += '<div class="prof-user-addline2">';
 					if (addressData.city && addressData.city != "") {
 						addressHtml += addressData.city + ', ';
@@ -97,11 +97,10 @@ function paintProfilePage(result) {
 						addressHtml += addressData.state + ' ';
 					}
 					if (addressData.zipcode && addressData.zipcode != "") {
-						addressHtml += contactDetails.zipcode;
+						addressHtml += addressData.zipcode;
 					}
 					addressHtml += '</div>';
 				}
-
 			} else {
 				if (contactDetails.address1 != undefined) {
 					addressHtml += '<div class="prof-user-addline1">' + contactDetails.address1 + '</div>';
@@ -129,7 +128,7 @@ function paintProfilePage(result) {
 				var address;
 				if (profileLevel == 'INDIVIDUAL') {
 					var addressData = contactDetails;
-					if (!addressData && result.companyProfileData) {
+					if (!addressData.address1 && result.companyProfileData) {
 						addressData = result.companyProfileData;
 					}
 					
@@ -137,8 +136,11 @@ function paintProfilePage(result) {
 					if (addressData.name && addressData.name != "") {
 						address += addressData.name;
 					}
-					if (addressData.address && addressData.address != "") {
-						address += ' ' + addressData.address;
+					if (addressData.address1 && addressData.address1 != "") {
+						address += ' ' + addressData.address1;
+					}
+					if (addressData.address2 && addressData.address2 != "") {
+						address += ' ' + addressData.address2;
 					}
 					if (addressData.country && addressData.country != "") {
 						address += ' ' + addressData.country;
@@ -150,16 +152,16 @@ function paintProfilePage(result) {
 					address = contactDetails.name;
 
 					if (contactDetails.address1 != undefined) {
-						address = address + ' ' + contactDetails.address1;
+						address += ' ' + contactDetails.address1;
 					}
 					if (contactDetails.address2 != undefined) {
-						address = address + ' ' + contactDetails.address2;
+						address += ' ' + contactDetails.address2;
 					}
 					if (contactDetails.country != undefined) {
-						address = address + ' ' + contactDetails.country;
+						address += ' ' + contactDetails.country;
 					}
 					if (contactDetails.zipcode != undefined) {
-						address = address + ' ' + contactDetails.zipcode;
+						address += ' ' + contactDetails.zipcode;
 					}
 				}
             	address=address.replace(/,/g,"");
@@ -501,8 +503,10 @@ function paintReviews(result){
 		reviewsHtml += '		<div class="float-left ppl-header-left">';    
 		reviewsHtml += '			<div class="ppl-head-1">'+reviewItem.customerFirstName+' '+reviewItem.customerLastName+'</div>';
 		if (date != null) {
-			reviewsHtml += '		<div class="ppl-head-2">'+ date.getMonthName() +" " + date.getDate() +" "+date.getFullYear()+'</div>'; 
+			date = convertUTCToUserDate(date);
+			reviewsHtml += '		<div class="ppl-head-2">' + date.getMonthName() + " " + date.getDate() + ", " + date.getFullYear() + '</div>'; 
 		}
+		
 		reviewsHtml += '		</div>';
 		reviewsHtml += '    	<div class="float-right ppl-header-right">';
 		reviewsHtml += '    	    <div class="st-rating-wrapper maring-0 clearfix review-ratings" data-rating="'+reviewItem.score+'"></div>';
@@ -1135,53 +1139,48 @@ function paintPublicPosts() {
 }
 
 function callBackPaintPublicPosts(data) {
-	
 	var posts = $.parseJSON(data);
-	
 	posts = $.parseJSON(posts.entity);
 	
 	var divToPopulate = "";
 	$.each(posts, function(i, post) {
-		
 		var iconClass = "";
-		if(post.source == "google")
+		if (post.source == "google")
 			iconClass = "icn-gplus";
-		else if(post.source == "SocialSurvey")
+		else if (post.source == "SocialSurvey")
 			iconClass = "icn-ss";
-		else if(post.source == "facebook")
+		else if (post.source == "facebook")
 			iconClass = "icn-fb";
-		else if(post.source == "twitter")
+		else if (post.source == "twitter")
 			iconClass = "icn-twit";
-		else if(post.source == "linkedin")
+		else if (post.source == "linkedin")
 			iconClass = "icn-lin";
 		
 		divToPopulate += '<div class="tweet-panel-item bord-bot-dc clearfix">'
-				+ '<div class="tweet-icn '+ iconClass +' float-left"></div>'
-				+ '<div class="tweet-txt float-left">'
+			+ '<div class="tweet-icn '+ iconClass +' float-left"></div>'
+			+ '<div class="tweet-txt float-left">'
 				+ '<div class="tweet-text-main">' + post.postText + '</div>'
-				+ '<div class="tweet-text-link"><em>' + post.postedBy
-				+ '</em></div>' + '<div class="tweet-text-time"><em>'
-				+ new Date(post.timeInMillis).toUTCString() + '</em></div>'
-				+ '	</div>' + '</div>';
+				+ '<div class="tweet-text-link"><em>' + post.postedBy + '</em></div>'
+				+ '<div class="tweet-text-time"><em>' + new Date(post.timeInMillis).toUTCString() + '</em></div>'
+			+ '	</div>'
+		+ '</div>';
 	});
 	
-	if (publicPostStartIndex == 0){
-		if(posts.length > 0){
+
+	if (publicPostStartIndex == 0) {
+		if (posts.length > 0) {
 			$('#recent-post-container').show();
-		}else{
+		} else {
 			$('#recent-post-container').remove();
 		}
 		$('#prof-posts').html(divToPopulate);
 		$('#prof-posts').perfectScrollbar();
-	}
-	else{
+	} else {
 		$('#prof-posts').append(divToPopulate);
 		$('#prof-posts').perfectScrollbar('update');
 	}
-
 	
 	publicPostStartIndex += posts.length;
-
 	if (publicPostStartIndex < publicPostNumRows || posts.length < publicPostNumRows){
 		doStopPublicPostPagination = true;
 	}
@@ -1190,10 +1189,9 @@ function callBackPaintPublicPosts(data) {
 		var scrollContainer = this;
 		if (scrollContainer.scrollTop === scrollContainer.scrollHeight
 					- scrollContainer.clientHeight) {
-				if (!doStopPublicPostPagination) {
-					paintPublicPosts();					
-				}
-					
+			if (!doStopPublicPostPagination) {
+				paintPublicPosts();					
+			}
 		}
 	});
 }
