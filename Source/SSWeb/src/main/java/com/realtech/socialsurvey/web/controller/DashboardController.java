@@ -1440,7 +1440,7 @@ public class DashboardController {
 			surveyHandler.changeStatusOfSurvey(agentId, customerEmail, true);
 			SurveyDetails survey = surveyHandler.getSurveyDetails(agentId,
 					customerEmail);
-			User user = sessionHelper.getCurrentUser();
+			User user = userManagementService.getUserByUserId(agentId);
 			surveyHandler.decreaseSurveyCountForAgent(agentId);
 			surveyHandler.sendSurveyRestartMail(firstName, lastName,
 					customerEmail, survey.getCustRelationWithAgent(), user,
