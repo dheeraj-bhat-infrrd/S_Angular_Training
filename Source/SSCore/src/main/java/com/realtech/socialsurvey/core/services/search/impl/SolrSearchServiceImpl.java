@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -446,6 +447,7 @@ public class SolrSearchServiceImpl implements SolrSearchService {
 			}
 			solrQuery.setQuery(query);
 			solrQuery.addFilterQuery(CommonConstants.IS_AGENT_SOLR + ":" + CommonConstants.IS_AGENT_TRUE_SOLR);
+			solrQuery.addFilterQuery(CommonConstants.STATUS_SOLR + ":" + CommonConstants.STATUS_ACTIVE);
 			solrQuery.setStart(startIndex);
 			solrQuery.setRows(noOfRows);
 
@@ -1430,7 +1432,7 @@ public class SolrSearchServiceImpl implements SolrSearchService {
 	
 	@SuppressWarnings("unchecked")
 	private Collection<UserFromSearch> getUsersFromSolrDocuments(SolrDocumentList documentList) throws InvalidInputException{
-		Map<Long, UserFromSearch> matchedUsers = new HashMap<>();
+		Map<Long, UserFromSearch> matchedUsers = new LinkedHashMap<>();
 		for(SolrDocument document : documentList){
 			UserFromSearch user = new UserFromSearch();
 

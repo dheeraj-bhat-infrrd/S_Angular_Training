@@ -321,6 +321,25 @@ public class GenericDaoImpl<T, ID extends Serializable> implements GenericDao<T,
 		}
 		return criteria.list();
 	}
+	
+	@Override
+	@SuppressWarnings("unchecked")
+	public List<T> findByKeyValueAscendingWithAlias(Class<T> dataClass,
+			Map<String, Object> queries, String ascendingColumn, String alias) {
+		Criteria criteria = getSession().createCriteria(dataClass);
+		try {
+			for (Entry<String, Object> query : queries.entrySet()) {
+				criteria.add(Restrictions.eq(query.getKey(), query.getValue()));
+			}
+			criteria.createAlias(alias, "alias");
+			criteria.addOrder(Order.asc("alias." + ascendingColumn));
+		} catch (HibernateException hibernateException) {
+			LOG.error("HibernateException caught in findByKeyValueAscendingWithAlias().",hibernateException);
+			throw new DatabaseException("HibernateException caught in findByKeyValueAscendingWithAlias().",
+					hibernateException);
+		}
+		return criteria.list();
+	}
 
 	@SuppressWarnings("unchecked")
 	@Override

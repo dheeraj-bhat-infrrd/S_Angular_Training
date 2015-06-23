@@ -761,7 +761,7 @@ input#find-pro-submit{
     position: relative;
     top: 75px;
     width: 900px;
-    margin: 0 auto;
+    margin: 0 auto 20px;
     background: #fff;
     border: 1px solid #dcdcdc;
     border-radius: 3px;
@@ -996,7 +996,7 @@ span.txt-highlight {
 	position: relative;
 }
 
-input.wc-form-input {
+.wc-form-input {
 	width: 275px;
 	height: 40px;
 	padding: 0 10px;
