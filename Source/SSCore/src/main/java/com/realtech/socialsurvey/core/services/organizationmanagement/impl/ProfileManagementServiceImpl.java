@@ -447,6 +447,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 		companyProfileData.setCity(companySettings.getContact_details().getCity());
 		companyProfileData.setState(companySettings.getContact_details().getState());
 		companyProfileData.setCountry(companySettings.getContact_details().getCountry());
+		companyProfileData.setCountryCode(companySettings.getContact_details().getCountryCode());
 		companyProfileData.setZipcode(companySettings.getContact_details().getZipcode());
 		if (agentSettingsType != null) {
 			agentSettingsType.setCompanyProfileData(companyProfileData);
@@ -1075,6 +1076,9 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 		}
 
 		User user = userDao.findById(User.class, agentSettings.getIden());
+		if(user.getStatus()!=CommonConstants.STATUS_ACTIVE){
+			throw new NoRecordsFetchedException("No active agent found.");
+		}
 
 		LOG.info("Method getUserProfilesByProfileName executed successfully");
 		return user;
@@ -1090,7 +1094,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 		queries.put(CommonConstants.BRANCH_ID_COLUMN, branchId);
 		queries.put(CommonConstants.PROFILE_MASTER_COLUMN,
 				userManagementService.getProfilesMasterById(CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID));
-		List<UserProfile> userProfiles = userProfileDao.findByKeyValue(UserProfile.class, queries);
+		List<UserProfile> userProfiles = userProfileDao.findByKeyValueAscendingWithAlias(UserProfile.class, queries, "firstName", "user");
 		if (userProfiles != null && !userProfiles.isEmpty()) {
 			users = new ArrayList<AgentSettings>();
 			for (UserProfile userProfile : userProfiles) {
