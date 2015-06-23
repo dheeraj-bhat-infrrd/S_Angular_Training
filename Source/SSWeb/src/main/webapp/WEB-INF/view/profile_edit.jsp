@@ -365,43 +365,7 @@
 			
 			<div class="row prof-right-panel-wrapper margin-top-25 col-lg-8 col-md-8 col-sm-8 col-xs-12">
 				<div id="intro-about-me" class="intro-wrapper rt-content-main bord-bot-dc main-rt-adj">
-					<div class="main-con-header main-con-header-adj clearfix">
-						<div class="float-left">
-							<spring:message code="label.about.key" /> ${contactdetail.name}
-						</div>
-						<div class="float-left">
-							<c:choose>
-								<c:when	test="${parentLock.isAboutMeLocked && profilemasterid != 4}">
-									<div id="aboutme-lock" data-state="locked" data-control="parent" class="lp-edit-locks float-left lp-edit-locks-locked"></div>
-								</c:when>
-								<c:when	test="${parentLock.isAboutMeLocked && profilemasterid == 4}">
-									<div id="aboutme-lock" data-state="locked" data-control="parent" class="hide lp-edit-locks float-left lp-edit-locks-locked"></div>
-								</c:when>
-								<c:when	test="${not parentLock.isAboutMeLocked && profilemasterid == 4}">
-									<div id="aboutme-lock" data-state="unlocked" data-control="user" class="hide lp-edit-locks float-left lp-edit-locks-locked"></div>
-								</c:when>
-								<c:when	test="${not parentLock.isAboutMeLocked && lock.isAboutMeLocked && profilemasterid != 4}">
-									<div id="aboutme-lock" data-state="unlocked" data-control="user" class="lp-edit-locks float-left lp-edit-locks-locked"></div>
-								</c:when>
-								<c:when	test="${not parentLock.isAboutMeLocked && not lock.isAboutMeLocked && profilemasterid != 4}">
-									<div id="aboutme-lock" data-state="unlocked" data-control="user" class="lp-edit-locks float-left"></div>
-								</c:when>
-							</c:choose>
-						</div>
-					</div>
-					<c:choose>
-						<c:when	test="${not empty contactdetail.about_me && not empty fn:trim(contactdetail.about_me)}">
-							<div class="pe-whitespace intro-body" id="intro-body-text">${fn:trim(contactdetail.about_me)}</div>
-							<textarea class="pe-whitespace sb-txtarea hide" id="intro-body-text-edit">${fn:trim(contactdetail.about_me)}</textarea>
-						</c:when>
-						<c:otherwise>
-							<div class="intro-body" id="intro-body-text">
-								<spring:message code="label.aboutcompany.empty.key" />
-							</div>
-							<input type="hidden" id="aboutme-status" value="new"/>
-							<textarea class="pe-whitespace sb-txtarea hide" id="intro-body-text-edit"></textarea>
-						</c:otherwise>
-					</c:choose>
+					<jsp:include page="profile_aboutme.jsp"></jsp:include>
 				</div>
 				
 				<div id="ppl-post-cont" class="rt-content-main bord-bot-dc clearfix">
@@ -412,22 +376,7 @@
 					<div class="float-left panel-tweet-wrapper">
 						<div class="main-con-header"><spring:message code="label.latestposts.key"/></div>
 						<div id="prof-posts" class="tweet-panel tweet-panel-left">
-							<div class="tweet-panel-item bord-bot-dc clearfix">
-								<div class="tweet-icn icn-tweet float-left"></div>
-								<div class="tweet-txt float-left">
-									<div class="tweet-text-main">Lorem ipsunmm dore tit sre leru Lorem ipsunmm dore tit sre leru Lorem ipsunmm dore tit sre leru Lorem ipsunmm dore tit </div>
-									<div class="tweet-text-link"><em>http://abblk.com</em></div>
-									<div class="tweet-text-time"><em>24 minutes ago</em></div>
-								</div>
-							</div>
-							<div class="tweet-panel-item bord-bot-dc clearfix">
-								<div class="tweet-icn icn-tweet float-left"></div>
-								<div class="tweet-txt float-left">
-									<div class="tweet-text-main">Lorem ipsunmm dore tit sre leru Lorem ipsunmm dore tit sre leru Lorem ipsunmm dore tit sre leru Lorem ipsunmm dore tit </div>
-									<div class="tweet-text-link"><em>http://abblk.com</em></div>
-									<div class="tweet-text-time"><em>24 minutes ago</em></div>
-								</div>
-							</div>
+							<!--  latest posts get populated here --> 
 						</div>
 					</div>
 				</div>
@@ -437,7 +386,7 @@
 						<span class="ppl-say-txt-st"><spring:message code="label.peoplesayabout.key"/></span>${contactdetail.name}
 					</div>
 					<div id="prof-review-item" class="prof-reviews">
-						<!--  reviews get populated here --> 
+						<!--  reviews get populated here -->
 					</div>
 			   	</div>
 			</div>
