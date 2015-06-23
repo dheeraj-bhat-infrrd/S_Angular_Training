@@ -949,7 +949,7 @@ function loadActiveSurveyQuestions() {
 }
 
 function resizeAdjBuildSurvey(){
-	var winW = $(window).width();
+	var winW = window.innerWidth;
 	if (winW < 768) {
 		var txtW = winW - 118;
 		$('.srv-tbl-txt').width(txtW);
@@ -6403,7 +6403,7 @@ function isValidUrl(url){
 
 // Adjust image
 function adjustImage() {
-	var windW = $(window).width();
+	var windW = window.innerWidth;
 	if (windW < 768) {
 		$('.mobile-tabs').children('.mob-icn-active').click();
 		var imgW = $('#prof-image').width();
