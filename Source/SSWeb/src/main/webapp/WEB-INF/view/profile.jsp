@@ -453,6 +453,7 @@
 <script src="${initParam.resourcesPath}/resources/js/profile.js"></script>
 <script src="${initParam.resourcesPath}/resources/js/googletracking.js"></script>
 <script src="${initParam.resourcesPath}/resources/js/googlemaps.js"></script>
+<script src="${initParam.resourcesPath}/resources/js/timezones.js"></script>
 <script src="${initParam.resourcesPath}/resources/js/perfect-scrollbar.jquery.min.js"></script>
 <script>
     $(document).ready(function(){
