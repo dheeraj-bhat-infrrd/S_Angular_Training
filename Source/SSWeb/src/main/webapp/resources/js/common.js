@@ -493,8 +493,8 @@ $(document).on('click', '#wc-send-survey', function() {
 	var receiversList = [];
 	var agentId = undefined;
 	var columnName = undefined;
-	var firstname = undefined;
-	var lastname = undefined;
+	var firstname = "";
+	var lastname = "";
 	var idx=0;
 	$('#wc-review-table-inner').children().each(function() {
 		if (!$(this).hasClass('wc-review-hdr')) {
@@ -510,7 +510,7 @@ $(document).on('click', '#wc-send-survey', function() {
 						for(var i=0;i<nameParts.length-1;i++){
 							firstname = firstname+nameParts[i];
 						}
-						lastName = nameParts[nameParts.length-1];
+						lastname = nameParts[nameParts.length-1];
 					}
 				}
 				if(idx==0){

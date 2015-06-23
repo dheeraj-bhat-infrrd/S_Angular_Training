@@ -78,6 +78,9 @@ public class SessionHelper {
 
 	@Autowired
 	private EmailFormatHelper emailFormatHelper;
+	
+	@Value("${APPLICATION_LOGO_URL}")
+	private String applicationLogoUrl;
 
 	@Value("${PARAM_ORDER_TAKE_SURVEY_REMINDER}")
 	String paramOrderTakeSurveyReminder;
@@ -162,7 +165,7 @@ public class SessionHelper {
 				List<String> paramOrder = new ArrayList<String>(Arrays.asList(paramOrderTakeSurveyReminder.split(",")));
 				body = fileOperations.replaceFileContents(replacements);
 				body = emailFormatHelper.replaceEmailBodyWithParams(body, paramOrder);
-				
+				body = body.replaceAll("\\[LogoUrl\\]", applicationLogoUrl);
 				session.setAttribute(CommonConstants.SURVEY_PARTICIPATION_MAIL_BODY_IN_SESSION, body);
 				session.setAttribute(CommonConstants.SURVEY_PARTICIPATION_REMINDER_MAIL_BODY_IN_SESSION, body);
 			}
@@ -177,7 +180,7 @@ public class SessionHelper {
 			if (userSettings.getCompanySettings().getMail_content().getTake_survey_mail() != null) {
 				MailContent mailContent = mailSettings.getTake_survey_mail();
 				String mailBody = emailFormatHelper.replaceEmailBodyWithParams(mailContent.getMail_body(), mailContent.getParam_order());
-				
+				mailBody = mailBody.replaceAll("\\[LogoUrl\\]", applicationLogoUrl);
 				mailSettings.getTake_survey_mail().setMail_body(mailBody);
 				session.setAttribute(CommonConstants.SURVEY_PARTICIPATION_MAIL_BODY_IN_SESSION, mailBody);
 			}
@@ -186,7 +189,7 @@ public class SessionHelper {
 					List<String> paramOrder = new ArrayList<String>(Arrays.asList(paramOrderTakeSurveyReminder.split(",")));
 					body = fileOperations.replaceFileContents(replacements);
 					body = emailFormatHelper.replaceEmailBodyWithParams(body, paramOrder);
-					
+					body = body.replaceAll("\\[LogoUrl\\]", applicationLogoUrl);
 					session.setAttribute(CommonConstants.SURVEY_PARTICIPATION_MAIL_BODY_IN_SESSION, body);
 				}
 				catch (InvalidInputException e) {
@@ -197,7 +200,7 @@ public class SessionHelper {
 			if (userSettings.getCompanySettings().getMail_content().getTake_survey_reminder_mail() != null) {
 				MailContent mailContent = mailSettings.getTake_survey_reminder_mail();
 				String mailBody = emailFormatHelper.replaceEmailBodyWithParams(mailContent.getMail_body(), mailContent.getParam_order());
-				
+				mailBody = mailBody.replaceAll("\\[LogoUrl\\]", applicationLogoUrl);
 				mailSettings.getTake_survey_reminder_mail().setMail_body(mailBody);
 				session.setAttribute(CommonConstants.SURVEY_PARTICIPATION_REMINDER_MAIL_BODY_IN_SESSION, mailBody);
 			}
@@ -206,7 +209,7 @@ public class SessionHelper {
 					List<String> paramOrder = new ArrayList<String>(Arrays.asList(paramOrderTakeSurveyReminder.split(",")));
 					body = fileOperations.replaceFileContents(replacements);
 					body = emailFormatHelper.replaceEmailBodyWithParams(body, paramOrder);
-					
+					body = body.replaceAll("\\[LogoUrl\\]", applicationLogoUrl);
 					session.setAttribute(CommonConstants.SURVEY_PARTICIPATION_REMINDER_MAIL_BODY_IN_SESSION, body);
 				}
 				catch (InvalidInputException e) {

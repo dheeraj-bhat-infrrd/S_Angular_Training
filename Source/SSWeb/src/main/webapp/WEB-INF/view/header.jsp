@@ -154,6 +154,9 @@
 						<a href="javascript:showMainContent('./showcompanysettings.do')" onclick="showOverlay();"><spring:message code="label.editsettings.key" /></a>
 					</div>
 				</c:if>
+				<div class="hdr-link-item">
+					<a href="javascript:showMainContent('./showprofilepage.do')" onclick="showOverlay();"><spring:message code="label.editprofile.key" /></a>
+				</div>
 			</div>
 			<div id="header-user-info" class="header-user-info float-right clearfix">
 				<div id="hdr-usr-img" class="float-right user-info-initial">
@@ -164,9 +167,9 @@
 								<spring:message code="label.editsettings.key" />
 							</div>
 						</c:if> --%>
-						<div class="initial-dd-item" id="profile-setting" onclick="showMainContent('./showprofilepage.do'); showOverlay();">
+						<%-- <div class="initial-dd-item" id="profile-setting" onclick="showMainContent('./showprofilepage.do'); showOverlay();">
 							<spring:message code="label.editprofile.key" />
-						</div>
+						</div> --%>
 						<div class="initial-dd-item" id="change-password" onclick="showMainContent('./showchangepasswordpage.do'); showOverlay();">
 							<spring:message code="label.changepassword.key"/>
 						</div>

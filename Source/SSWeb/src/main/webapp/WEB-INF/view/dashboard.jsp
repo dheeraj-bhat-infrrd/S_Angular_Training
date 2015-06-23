@@ -189,6 +189,14 @@ $(document).ready(function() {
 	var currentProfileName = $('#prof-container').attr('data-column-name');
 	var currentProfileValue = $('#prof-container').attr('data-column-value');
 	var accountType = $('#prof-container').attr('data-account-type');
+	
+	var popupStatus = "${popupStatus}";
+	var showSendSurveyPopupAdmin = "${showSendSurveyPopupAdmin}";
+
+	if (showSendSurveyPopupAdmin == "true" && popupStatus == "Y") {
+		sendSurveyInvitationAdmin(currentProfileName, currentProfileValue);
+	}
+	
 
 	paintDashboard(profileMasterId, currentProfileName, currentProfileValue, accountType);
 });
