@@ -1,6 +1,5 @@
-<%@ page language="java" contentType="text/html; charset=ISO-8859-1"
-	pageEncoding="UTF-8"%>
-<%@taglib uri="http://www.springframework.org/tags" prefix="spring"%>
+<%@ page language="java" contentType="text/html; charset=ISO-8859-1" pageEncoding="UTF-8"%>
+<%@ taglib prefix="spring" uri="http://www.springframework.org/tags"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <!DOCTYPE">
@@ -94,7 +93,7 @@
 <input type="hidden" value="${regionProfileName}" id="region-profile-name">
 <input type="hidden" value="${branchProfileName}" id="branch-profile-name">
 <input type="hidden" value="${agentProfileName}" id="agent-profile-name">
-<input type="hidden" id="profile-fetch-info" fetch-all-reviews="false" total-reviews="${reviewsCount }" profile-level="${profileLevel}"/>
+<input type="hidden" id="profile-fetch-info" fetch-all-reviews="false" total-reviews="${reviewsCount}" profile-level="${profileLevel}"/>
 <div class="hdr-wrapper">
     <div class="container hdr-container clearfix">
         <div class="float-left hdr-logo"></div>
