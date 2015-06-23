@@ -792,7 +792,7 @@ public class ProfileManagementController {
 				throw new InvalidInputException("Zipcode is not valid while adding company information", DisplayMessageConstants.INVALID_ZIPCODE);
 			}
 
-			if (companyContactNo == null || companyContactNo.isEmpty() || !companyContactNo.matches(CommonConstants.PHONENUMBER_REGEX)) {
+			if (companyContactNo == null || companyContactNo.isEmpty()) {
 				throw new InvalidInputException("Company contact number is not valid while adding company information",
 						DisplayMessageConstants.INVALID_COMPANY_PHONEN0);
 			}
