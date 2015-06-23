@@ -15,9 +15,8 @@
 				<div class="ppl-header-wrapper clearfix">
 					<div class="float-left ppl-header-left">
 						<div class="ppl-head-1">${reviewItem.customerFirstName} ${reviewItem.customerLastName}</div>
-						<div class="ppl-head-2">
-							<fmt:formatDate type="date" pattern="MMM dd, yyyy" value="${reviewItem.modifiedOn}" />
-						</div>
+						<div class="ppl-head-2" data-modifiedon="<fmt:formatDate type="date" pattern="yyyy-MM-dd-hh-mm-ss"
+							value="${reviewItem.modifiedOn}" />"></div>
 					</div>
 					<div class="float-right ppl-header-right">
 						<div class="st-rating-wrapper maring-0 clearfix review-ratings" data-rating="${reviewItem.score}">
@@ -57,3 +56,13 @@
 		<spring:message code="label.noreviews.key"/>
 	</c:otherwise>
 </c:choose>
+<script src="${initParam.resourcesPath}/resources/js/timezones.js"></script>
+<script>
+$(document).ready(function(){
+	$('.ppl-head-2').each(function(index, currentElement) {
+		var dateSplit = $(this).attr('data-modifiedon').split('-');
+		var date = convertUTCToUserDate(new Date(dateSplit[0], dateSplit[1], dateSplit[2], dateSplit[3], dateSplit[4], dateSplit[5]));
+		$(this).html(date.toDateString());
+	});
+});
+</script>
