@@ -383,49 +383,46 @@ function validateZipcode(elementId){
 }
 
 //Function to validate the phone number
-function validatePhoneNumber(elementId) {
-	if ($(window).width()<768) {
-		if ($('#'+elementId).val() != "") {
-			if (phoneRegex.test($('#'+elementId).val()) == true) {
-				return true;
-			} else {
-				// $('#overlay-toast').html('Please enter a valid phone number.');
-				// showToast();
-				showError('Please enter a valid phone number');
-				return false;
-			}
+function validatePhoneNumber(elementId, isOnlyShowToast) {
+	if ($('#' + elementId).val() != "") {
+		if (phoneRegex.test($('#' + elementId).val()) == true) {
+			return true;
 		} else {
-			// $('#overlay-toast').html('Please enter phone number.');
-			// showToast();
-			showError('Please enter phone number');
+			var msg = 'Please enter a valid phone number';
+			if(isOnlyShowToast){
+				$('#overlay-toast').html(msg);
+				showToast();			
+			} else {
+				showErrorMobileAndWeb(msg);			
+			}
 			return false;
 		}
 	} else {
-    	if ($('#'+elementId).val() != "") {
-			if (phoneRegex.test($('#'+elementId).val()) == true) {
-				// $('#'+elementId).parent().next('.login-reg-err').hide();
-				return true;
-			} else {
-				// $('#'+elementId).parent().next('.login-reg-err').html('Please enter a valid phone number.');
-				// $('#'+elementId).parent().next('.login-reg-err').show();
-				showError('Please enter a valid phone number');
-				return false;
-			}
+		var msg = 'Please enter phone number';
+		if(isOnlyShowToast){
+			$('#overlay-toast').html(msg);
+			showToast();			
 		} else {
-			// $('#'+elementId).parent().next('.login-reg-err').html('Please enter phone number.');
-			// $('#'+elementId).parent().next('.login-reg-err').show();
-			showError('Please enter phone number');
-			return false;
+			showErrorMobileAndWeb(msg);			
 		}
+		return false;
 	}
 }
 
 //Function to validate Address 1
-function validateAddress1(elementId){
+function validateAddress1(elementId ,isOnlyShowToast){
 	if ($('#'+elementId).val() != "") {
 			return true;
 	} else {
-		showErrorMobileAndWeb('Please enter address');
+		var msg = 'Please enter address';
+		
+		if(isOnlyShowToast){
+			$('#overlay-toast').html(msg);
+			showToast();			
+		} else {
+			showErrorMobileAndWeb(msg);			
+		}
+		
 		return false;
 	}
 }
@@ -704,35 +701,34 @@ function validateTextArea(elementId) {
 	}
 }
 
-function validateCountryZipcode(elementId) {
+function validateCountryZipcode(elementId, isOnlyShowToast) {
 	if(selectedCountryRegEx == ""){
 		selectedCountryRegEx = ".*";
 		selectedCountryRegEx = new RegExp(selectedCountryRegEx);
 	}
+	
 	var zipcode = $('#' + elementId).val();
-	if ($(window).width() < 768) {
-		if (zipcode != "") {
-			if (selectedCountryRegEx.test(zipcode) == true) {
-				return true;
-			} else {
-				showError('Please enter a valid zipcode');
-				return false;
-			}
+	if (zipcode != "") {
+		if (selectedCountryRegEx.test(zipcode) == true) {
+			return true;
 		} else {
-			showError('Please enter zipcode');
+			var msg = 'Please enter a valid zipcode';
+			if(isOnlyShowToast){
+				$('#overlay-toast').html(msg);
+				showToast();			
+			} else {
+				showErrorMobileAndWeb(msg);			
+			}
 			return false;
 		}
 	} else {
-		if (zipcode != "") {
-			if (selectedCountryRegEx.test(zipcode) == true) {
-				return true;
-			} else {
-				showError('Please enter a valid zipcode');
-				return false;
-			}
+		var msg = 'Please enter a valid zipcode';
+		if(isOnlyShowToast){
+			$('#overlay-toast').html(msg);
+			showToast();			
 		} else {
-			showError('Please enter zipcode');
-			return false;
+			showErrorMobileAndWeb(msg);			
 		}
+		return false;
 	}
 }

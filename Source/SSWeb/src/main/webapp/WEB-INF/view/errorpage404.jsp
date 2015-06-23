@@ -57,7 +57,7 @@
             function adjustMinHeight(){
                 var winH = $(window).height();
                 var minH = "";
-                if ($(window).width() < 768) {
+                if (window.innerWidth < 768) {
                     minH = winH - 50 - 50 - 5 - 1;
                 } else {
                     minH = winH - 83 - 78 - 78 -1;
