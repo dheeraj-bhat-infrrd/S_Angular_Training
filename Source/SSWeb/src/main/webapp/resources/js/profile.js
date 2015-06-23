@@ -73,12 +73,12 @@ function paintProfilePage(result) {
 		paintPublicPosts();
 		
 		if (contactDetails != undefined) {
-            var addressHtml ="";
+            var addressHtml = "";
             
             // Company profile address
 			if (profileLevel == 'INDIVIDUAL') {
 				var addressData = contactDetails;
-				if (!addressData && result.companyProfileData) {
+				if (!addressData.address1 && result.companyProfileData) {
 					addressData = result.companyProfileData;
 				}
 
@@ -88,7 +88,7 @@ function paintProfilePage(result) {
 				if (addressData.address2 != undefined) {
 					addressHtml += '<div class="prof-user-addline2">' + addressData.address2 + '</div>';
 				}
-				if (addressData.zipcode != undefined) {
+				if (addressData.zipcode != undefined || addressData.state != undefined || addressData.city != undefined) {
 					addressHtml += '<div class="prof-user-addline2">';
 					if (addressData.city && addressData.city != "") {
 						addressHtml += addressData.city + ', ';
@@ -97,11 +97,10 @@ function paintProfilePage(result) {
 						addressHtml += addressData.state + ' ';
 					}
 					if (addressData.zipcode && addressData.zipcode != "") {
-						addressHtml += contactDetails.zipcode;
+						addressHtml += addressData.zipcode;
 					}
 					addressHtml += '</div>';
 				}
-
 			} else {
 				if (contactDetails.address1 != undefined) {
 					addressHtml += '<div class="prof-user-addline1">' + contactDetails.address1 + '</div>';
@@ -129,7 +128,7 @@ function paintProfilePage(result) {
 				var address;
 				if (profileLevel == 'INDIVIDUAL') {
 					var addressData = contactDetails;
-					if (!addressData && result.companyProfileData) {
+					if (!addressData.address1 && result.companyProfileData) {
 						addressData = result.companyProfileData;
 					}
 					
@@ -137,8 +136,11 @@ function paintProfilePage(result) {
 					if (addressData.name && addressData.name != "") {
 						address += addressData.name;
 					}
-					if (addressData.address && addressData.address != "") {
-						address += ' ' + addressData.address;
+					if (addressData.address1 && addressData.address1 != "") {
+						address += ' ' + addressData.address1;
+					}
+					if (addressData.address2 && addressData.address2 != "") {
+						address += ' ' + addressData.address2;
 					}
 					if (addressData.country && addressData.country != "") {
 						address += ' ' + addressData.country;
@@ -150,16 +152,16 @@ function paintProfilePage(result) {
 					address = contactDetails.name;
 
 					if (contactDetails.address1 != undefined) {
-						address = address + ' ' + contactDetails.address1;
+						address += ' ' + contactDetails.address1;
 					}
 					if (contactDetails.address2 != undefined) {
-						address = address + ' ' + contactDetails.address2;
+						address += ' ' + contactDetails.address2;
 					}
 					if (contactDetails.country != undefined) {
-						address = address + ' ' + contactDetails.country;
+						address += ' ' + contactDetails.country;
 					}
 					if (contactDetails.zipcode != undefined) {
-						address = address + ' ' + contactDetails.zipcode;
+						address += ' ' + contactDetails.zipcode;
 					}
 				}
             	address=address.replace(/,/g,"");
