@@ -201,7 +201,7 @@ public class DashboardController {
 		long columnValue = 0;
 		if (columnName.equalsIgnoreCase(CommonConstants.COMPANY_ID_COLUMN)) {
 			columnValue = user.getCompany().getCompanyId();
-			model.addAttribute("name", user.getCompany().getCompany());
+			model.addAttribute("name", userSettings.getCompanySettings().getContact_details().getName());
 			model.addAttribute("title",
 					getTitle(request, columnName, columnValue, user));
 		} else if (columnName

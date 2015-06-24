@@ -6,9 +6,6 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
-import org.apache.solr.common.SolrDocumentList;
-
 import com.realtech.socialsurvey.core.entities.Achievement;
 import com.realtech.socialsurvey.core.entities.AgentSettings;
 import com.realtech.socialsurvey.core.entities.Association;
@@ -405,4 +402,6 @@ public interface ProfileManagementService {
 	public void setAgentProfileUrlForReview(List<SurveyDetails> reviews);
 	
 	public void updateVertical(String collection, OrganizationUnitSettings companySettings, String vertical) throws InvalidInputException;
+	
+	public void updateCompanyName(long userId, long companyId, String companyName) throws InvalidInputException;
 }
