@@ -522,12 +522,13 @@ $(document).on('click', '#wc-send-survey', function() {
 	var firstname = "";
 	var lastname = "";
 	var idx=0;
+	var exit = false;
 	$('#wc-review-table-inner').children().each(function() {
 		if (!$(this).hasClass('wc-review-hdr')) {
 			var dataName = $(this).find('input.wc-review-agentname').first().attr('data-name');
 			if(dataName=='agent-name'){
 				agentId = $(this).find('input.wc-review-agentname').first().attr('agent-id');
-				var name = $(this).find('input.wc-review-custname').first().val();
+				/*var name = $(this).find('input.wc-review-custname').first().val();
 				if(name!=undefined){
 					var nameParts = name.split(" ");
 					if(nameParts.length==1){
@@ -538,18 +539,24 @@ $(document).on('click', '#wc-send-survey', function() {
 						}
 						lastname = nameParts[nameParts.length-1];
 					}
-				}
+				}*/
 				if(idx==0){
 					columnName = $(this).find('input.wc-review-agentname').first().attr('column-name');
 					idx++;
 				}
 			}
-			else{
-				firstname = $(this).find('input.wc-review-fname').first().val();
-				lastname = $(this).find('input.wc-review-lname').first().val();
-			}
+			
+			firstname = $(this).find('input.wc-review-fname').first().val();
+			lastname = $(this).find('input.wc-review-lname').first().val();
 			
 			var emailId = $(this).find('input.wc-review-email').first().val();
+			
+			if(firstname == "" && emailId != ""){
+				$('#overlay-toast').html('Please enter Firstname for all the customer');
+				showToast();
+				exit = true;
+				return false;
+			}
 			
 			if (emailRegex.test(emailId)) {
 				var receiver = new Object();
@@ -561,10 +568,20 @@ $(document).on('click', '#wc-send-survey', function() {
 				}
 				receiversList.push(receiver);
 			}
-			
+			else if(firstname != ""){
+				$('#overlay-toast').html('Please enter valid email for ' + firstname);
+				showToast();
+				exit = true;
+				return false;
+			}
 		}
 	});
 
+	if(exit){
+		exit = false;
+		return false;
+	}
+	
 	receiversList = JSON.stringify(receiversList);
 	var payload = {
 		"receiversList" : receiversList,
@@ -577,6 +594,11 @@ $(document).on('click', '#wc-send-survey', function() {
 				"columnName" : columnName,
 			};
 	}
+
+	loadDisplayPicture();
+	$(this).closest('.overlay-login').hide();
+	showDisplayPic();
+	
 	callAjaxPostWithPayloadData("./sendmultiplesurveyinvites.do", function(data) {
 		$('#overlay-toast').html('Survey request sent successfully!');
 		showToast();
