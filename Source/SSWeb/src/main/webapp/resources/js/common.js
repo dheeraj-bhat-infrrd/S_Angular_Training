@@ -448,8 +448,8 @@ function showProfileLinkInEditProfilePage(source, profileUrl){
 	}
 }
 
-// Send Survey
-$(document).on('input', '.wc-review-fname, .wc-review-lname, .wc-review-email', function() {
+// Send Survey Agent
+$(document).on('input', '#wc-review-table-inner[data-role="agent"] input', function() {
 	var parentDiv = $(this).parent().parent();
 	if (parentDiv.is(':last-child')) {
 		var htmlData = '<div class="wc-review-tr clearfix">'
@@ -457,6 +457,32 @@ $(document).on('input', '.wc-review-fname, .wc-review-lname, .wc-review-email', 
 			+ '<div class="wc-review-tc2 float-left"><input class="wc-review-input wc-review-lname"></div>'
 			+ '<div class="wc-review-tc3 float-left"><input class="wc-review-input wc-review-email"></div>'
 			+ '<div class="wc-review-tc4 float-left"><div class="wc-review-rmv-icn hide"></div></div>'
+		+ '</div>';
+		parentDiv.after(htmlData);
+		
+		// enable remove button
+		if ($('#wc-review-table-inner').children().length > 2) {
+			$('.wc-review-rmv-icn').show();
+		}
+		
+		// setting up perfect scrollbar
+		setTimeout(function() {
+			$('#wc-review-table').perfectScrollbar();
+			$('#wc-review-table').perfectScrollbar('update');
+		}, 1000);
+	}
+});
+
+//Send Survey Admin
+$(document).on('input', '#wc-review-table-inner[data-role="admin"] input', function() {
+	var parentDiv = $(this).parent().parent();
+	if (parentDiv.is(':last-child')) {
+		var htmlData = '<div class="wc-review-tr clearfix">'
+			+ '<div class="wc-review-tc1 float-left pos-relative"><input data-name="agent-name" class="wc-review-input wc-review-agentname"></div>'
+			+ '<div class="wc-review-tc2 float-left"><input class="wc-review-input wc-review-fname"></div>'
+			+ '<div class="wc-review-tc3 float-left"><input class="wc-review-input wc-review-lname"></div>'
+			+ '<div class="wc-review-tc4 float-left"><input class="wc-review-input wc-review-email"></div>'
+			+ '<div class="wc-review-tc5 float-left"><div class="wc-review-rmv-icn hide"></div></div>'
 		+ '</div>';
 		parentDiv.after(htmlData);
 		
