@@ -3933,14 +3933,14 @@ function bindEditUserClick(){
 	});
 }
 
-$(document).on('click', '#page-previous', function(){
+$(document).on('click', '#page-previous.paginate-button', function(){
 	var newIndex = userStartIndex - userBatchSize;
 	if (newIndex < $('#users-count').val()) {
 		paintUserListInUserManagement(newIndex);
 	}
 });
 
-$(document).on('click', '#page-next', function(){
+$(document).on('click', '#page-next.paginate-button', function(){
 	var newIndex = userStartIndex + userBatchSize;
 	if (newIndex < $('#users-count').val()) {
 		paintUserListInUserManagement(newIndex);
