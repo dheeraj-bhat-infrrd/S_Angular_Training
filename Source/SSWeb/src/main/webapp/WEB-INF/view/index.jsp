@@ -361,7 +361,6 @@ $(document).ready(function(){
 	});
 	
 	// Find a pro
-	
 	$('#find-pro-submit').click(function(e) {
 		e.preventDefault();
 		submitFindProForm();
@@ -373,15 +372,16 @@ $(document).ready(function(){
 		showOverlay();
 	}
 
-	
 	$('#find-pro-form input').on('keyup',function(e){
 		if(e.which == 13){
 			$('#find-pro-submit').trigger('click');
 		}
 	});
+	
 	$('#header-search-icn').click(function(e) {
 		$('#pro-wrapper-top').slideToggle(200);
 	});
+	
 	$('iframe').load( function() {
 	    $('iframe').contents().find("head")
 	      .append($("<style type='text/css'>  .rc-anchor-item:last-child{float: right;margin-right: 10px;}.rc-anchor.rc-anchor-standard{width: 100%}  </style>"));

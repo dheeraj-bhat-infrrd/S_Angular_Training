@@ -11,9 +11,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
 import javax.annotation.Resource;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
@@ -23,7 +21,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.DependsOn;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
-
 import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.commons.Utils;
 import com.realtech.socialsurvey.core.dao.BranchDao;
@@ -1801,5 +1798,22 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 
 		LOG.info("Method aggregateDisclaimer() called from ProfileManagementService");
 		return disclaimer;
+	}
+	
+	@Override
+	@Transactional
+	public void updateCompanyName(long userId, long companyId, String companyName) throws InvalidInputException {
+		LOG.info("Method updateCompanyName of profileManagementService called for companyId : " + companyId);
+		
+		Company company = companyDao.findById(Company.class, companyId);
+		if (company == null) {
+			throw new InvalidInputException("No company present for the specified companyId");
+		}
+		company.setCompany(companyName);
+		company.setModifiedBy(String.valueOf(userId));
+		company.setModifiedOn(new Timestamp(System.currentTimeMillis()));
+		companyDao.update(company);
+
+		LOG.info("Successfully completed method to update company status");
 	}
 }

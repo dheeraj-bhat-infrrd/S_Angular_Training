@@ -314,17 +314,23 @@ function paintIndividualForBranch(data) {
 	var responseJson = $.parseJSON(data);
 	var individualsHtml = "";
 	var branchId = $("#branchid-hidden").val();
-	if(responseJson != undefined && responseJson.entity != "") {
+	if (responseJson != undefined && responseJson.entity != "") {
 		var result = $.parseJSON(responseJson.entity);
-		if(result != undefined && result.length > 0) {
-			$.each(result,function(i,individual) {
-				if(individual.contact_details != undefined){
-					individualsHtml = individualsHtml+'<div class="bd-hr-item-l3 comp-individual" data-agentid = '+individual.iden+'>';
-					individualsHtml = individualsHtml+'	<div class="bd-hr-item bd-lt-l3 clearfix">';
-					individualsHtml = individualsHtml+'    <div class="float-left bd-hr-img pers-default-img comp-individual-prof-image" data-imageurl = "'+individual.profileImageUrl+'"></div>';
-					individualsHtml = individualsHtml+'    <div class="bd-hr-txt cursor-pointer individual-link" data-profilename="'+individual.profileName+'">'+individual.contact_details.name+'</div>';
-					individualsHtml = individualsHtml+'	</div>';
-					individualsHtml = individualsHtml+'</div>';
+		if (result != undefined && result.length > 0) {
+			$.each(result, function(i, individual) {
+				if (individual.contact_details != undefined) {
+					individualsHtml += '<div class="bd-hr-item-l3 comp-individual" data-agentid=' + individual.iden + '>';
+					individualsHtml += '	<div class="bd-hr-item bd-lt-l3 clearfix">';
+					if (individual.profileImageUrl != undefined) {
+						individualsHtml += '	<div class="float-left bd-hr-img pers-default-img comp-individual-prof-image"'
+							+ 'style="background: url(' + individual.profileImageUrl + ') 50% 50% / 100% no-repeat;"></div>';
+					} else {
+						individualsHtml += '	<div class="float-left bd-hr-img pers-default-img comp-individual-prof-image"></div>';
+					}
+					individualsHtml += '		<div class="bd-hr-txt cursor-pointer individual-link" data-profilename="'
+						+ individual.profileName + '">' + individual.contact_details.name + '</div>';
+					individualsHtml += '	</div>';
+					individualsHtml += '</div>';
 				}
 			});
 			$("#branch-hierarchy").show();
@@ -335,8 +341,8 @@ function paintIndividualForBranch(data) {
 				$("#comp-branch-individuals-"+branchId).html(individualsHtml).slideDown(200);
 			}
 			
-			paintProfileImage("individual-prof-image");
-			//bindClickToFetchIndividualProfile("branch-individual");
+			// paintProfileImage("comp-individual-prof-image");
+			// bindClickToFetchIndividualProfile("branch-individual");
 		}
 	}
 }
@@ -360,17 +366,23 @@ function paintIndividualsForRegion(data) {
 	var responseJson = $.parseJSON(data);
 	var individualsHtml = "";
 	var regionId = $("#regionid-hidden").val();
-	if(responseJson != undefined && responseJson.entity != "") {
+	if (responseJson != undefined && responseJson.entity != "") {
 			var result = $.parseJSON(responseJson.entity);
-			if(result != undefined && result.length > 0) {
-				$.each(result,function(i,individual) {
-					if(individual.contact_details != undefined){
-						individualsHtml = individualsHtml+'<div class="bd-hr-item-l2 comp-region-individual" data-agentid = '+individual.iden+'>';
-						individualsHtml = individualsHtml+'	<div class="bd-hr-item bd-lt-l3 clearfix">';
-						individualsHtml = individualsHtml+'    <div class="float-left bd-hr-img pers-default-img comp-individual-prof-image" data-imageurl = "'+individual.profileImageUrl+'"></div>';
-						individualsHtml = individualsHtml+'    <div class="bd-hr-txt cursor-pointer individual-link" data-profilename="'+individual.profileName+'">'+individual.contact_details.name+'</div>';
-						individualsHtml = individualsHtml+'	</div>';
-						individualsHtml = individualsHtml+'</div>';
+			if (result != undefined && result.length > 0) {
+				$.each(result, function(i, individual) {
+					if (individual.contact_details != undefined){
+						individualsHtml += '<div class="bd-hr-item-l2 comp-region-individual" data-agentid=' + individual.iden + '>';
+						individualsHtml += '	<div class="bd-hr-item bd-lt-l3 clearfix">';
+						if (individual.profileImageUrl != undefined) {
+							individualsHtml += '	<div class="float-left bd-hr-img pers-default-img comp-individual-prof-image"'
+								+ 'style="background: url(' + individual.profileImageUrl + ') 50% 50% / 100% no-repeat;"></div>';
+						} else {
+							individualsHtml += '	<div class="float-left bd-hr-img pers-default-img comp-individual-prof-image"></div>';
+						}
+						individualsHtml += '	<div class="bd-hr-txt cursor-pointer individual-link" data-profilename="'
+							+ individual.profileName + '">' + individual.contact_details.name + '</div>';
+						individualsHtml += '	</div>';
+						individualsHtml += '</div>';
 					}
 				});
 				$("#region-hierarchy").show();
@@ -381,19 +393,20 @@ function paintIndividualsForRegion(data) {
 					$("#comp-region-branches-"+regionId).append(individualsHtml).slideDown(200);
 				}
 				
-				paintProfileImage("individual-prof-image");
-				//bindClickToFetchIndividualProfile("region-individual");
+				// paintProfileImage("comp-individual-prof-image");
+				// bindClickToFetchIndividualProfile("region-individual");
 		}
 	}
 }
 
 
 function paintProfileImage(imgDivClass) {
-	$("."+imgDivClass).each(function(){
+	$("." + imgDivClass).each(function() {
 		var imageUrl = $(this).attr('data-imageurl');
-		if(imageUrl == "" || imageUrl == undefined) {
-			$(this).css("background", "url("+imageUrl+") no-repeat center");
-		}		
+		if (imageUrl != undefined && imageUrl != "") {
+			console.log(imageUrl);
+			$(this).css("background", "url(" + imageUrl + ") 50% 50% / 100% no-repeat;");
+		}
 	});
 }
 
@@ -404,25 +417,32 @@ function fetchCompanyIndividuals() {
 
 function paintCompanyIndividuals(data) {
 	var response= $.parseJSON(data);
-	if(response != undefined) {
+	if (response != undefined) {
 		var result = $.parseJSON(response.entity);
-		if(result != undefined && result.length > 0) {
+		if (result != undefined && result.length > 0) {
 			var compIndividualsHtml = "";
-			$.each(result,function(i, compIndividual) {
-				if(compIndividual.contact_details != undefined){
-					compIndividualsHtml = compIndividualsHtml+'<div class="bd-hr-item-l1 comp-individual" data-agentid = '+compIndividual.iden+'>';
-					compIndividualsHtml = compIndividualsHtml+'	<div class="bd-hr-item bd-lt-l3 clearfix">';
-					compIndividualsHtml = compIndividualsHtml+'    <div class="float-left bd-hr-img pers-default-img comp-individual-prof-image" data-imageurl = "'+compIndividual.profileImageUrl+'"></div>';
-					compIndividualsHtml = compIndividualsHtml+'    <div class="bd-hr-txt cursor-pointer individual-link" data-profilename="'+compIndividual.profileName+'">'+compIndividual.contact_details.name+'</div>';
-					compIndividualsHtml = compIndividualsHtml+'	</div>';
-					compIndividualsHtml = compIndividualsHtml+'</div>';
+			$.each(result, function(i, compIndividual) {
+				if (compIndividual.contact_details != undefined) {
+					compIndividualsHtml += '<div class="bd-hr-item-l1 comp-individual" data-agentid=' + compIndividual.iden + '>';
+					compIndividualsHtml += '	<div class="bd-hr-item bd-lt-l3 clearfix">';
+					
+					if (compIndividual.profileImageUrl != undefined) {
+						compIndividualsHtml += '	<div class="float-left bd-hr-img pers-default-img comp-individual-prof-image"'
+							+ 'style="background: url(' + compIndividual.profileImageUrl + ') 50% 50% / 100% no-repeat;"></div>';
+					} else {
+						compIndividualsHtml += '	<div class="float-left bd-hr-img pers-default-img comp-individual-prof-image"></div>';
+					}
+					compIndividualsHtml += '		<div class="bd-hr-txt cursor-pointer individual-link" data-profilename="'
+						+ compIndividual.profileName + '">' + compIndividual.contact_details.name + '</div>';
+					compIndividualsHtml += '	</div>';
+					compIndividualsHtml += '</div>';
 				}
 			});
 			$("#comp-regions-content").append(compIndividualsHtml);
 			$("#comp-hierarchy").show();
 			
-			paintProfileImage("comp-individual-prof-image");
-			//bindClickToFetchIndividualProfile("comp-individual");
+			// paintProfileImage("comp-individual-prof-image");
+			// bindClickToFetchIndividualProfile("comp-individual");
 		}
 	}
 }
