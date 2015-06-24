@@ -962,6 +962,26 @@ span.txt-highlight {
     width: 10%;
 }
 
+.wc-admin-table .wc-review-th1,.wc-admin-table  .wc-review-tc1{
+	width: 22.5%;
+}
+
+.wc-admin-table .wc-review-th2,.wc-admin-table  .wc-review-tc2{
+	width: 22.5%;
+}
+
+.wc-admin-table .wc-review-th3,.wc-admin-table  .wc-review-tc3{
+	width: 22.5%;
+}
+
+.wc-admin-table .wc-review-th4,.wc-admin-table  .wc-review-tc4{
+	width: 22.5%;
+}
+
+.wc-admin-table .wc-review-th5,.wc-admin-table  .wc-review-tc5{
+	width: 10%;
+}
+
 .wc-review-input{
 	width: 100%;
 	height: 40px;

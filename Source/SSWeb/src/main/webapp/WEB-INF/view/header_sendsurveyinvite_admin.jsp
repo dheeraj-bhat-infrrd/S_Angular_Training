@@ -7,31 +7,35 @@
 	</div>
 	<div class="welcome-popup-body-wrapper clearfix">
 		<div class="wc-popup-body-hdr"><spring:message code="label.happyreviews.key" /></div>
-		<div id="wc-review-table" class="wc-popup-body-cont wc-review-table-cont">
-			<div id="wc-review-table-inner" class="wc-review-table">
+		<div id="wc-review-table" class="wc-popup-body-cont wc-review-table-cont wc-admin-table">
+			<div id="wc-review-table-inner" class="wc-review-table" data-role="admin">
 				<div class="wc-review-tr wc-review-hdr clearfix">
 					<div class="wc-review-th1 float-left"><spring:message code="label.agentname.key" /></div>
-					<div class="wc-review-th2 float-left"><spring:message code="label.custname.key" /></div>
-					<div class="wc-review-th3 float-left"><spring:message code="label.emailid.key" /></div>
-					<div class="wc-review-th4 float-left"></div>
+					<div class="wc-review-th2 float-left"><spring:message code="label.firstname.key" /></div>
+					<div class="wc-review-th3 float-left"><spring:message code="label.lastname.key" /></div>
+					<div class="wc-review-th4 float-left"><spring:message code="label.emailid.key" /></div>
+					<div class="wc-review-th5 float-left"></div>
 				</div>
 				<div class="wc-review-tr clearfix">
 					<div class="wc-review-tc1 float-left pos-relative"><input data-name="agent-name" class="wc-review-input wc-review-agentname"></div>
-					<div class="wc-review-tc2 float-left"><input class="wc-review-input wc-review-custname"></div>
-					<div class="wc-review-tc3 float-left"><input class="wc-review-input wc-review-email"></div>
-					<div class="wc-review-tc4 float-left"><div class="wc-review-rmv-icn hide"></div></div>
+					<div class="wc-review-tc2 float-left"><input class="wc-review-input wc-review-fname"></div>
+					<div class="wc-review-tc3 float-left"><input class="wc-review-input wc-review-lname"></div>
+					<div class="wc-review-tc4 float-left"><input class="wc-review-input wc-review-email"></div>
+					<div class="wc-review-tc5 float-left"><div class="wc-review-rmv-icn hide"></div></div>
 				</div>
 				<div class="wc-review-tr clearfix">
 					<div class="wc-review-tc1 float-left pos-relative"><input data-name="agent-name" class="wc-review-input wc-review-agentname"></div>
-					<div class="wc-review-tc2 float-left"><input class="wc-review-input wc-review-custname"></div>
-					<div class="wc-review-tc3 float-left"><input class="wc-review-input wc-review-email"></div>
-					<div class="wc-review-tc4 float-left"><div class="wc-review-rmv-icn"></div></div>
+					<div class="wc-review-tc2 float-left"><input class="wc-review-input wc-review-fname"></div>
+					<div class="wc-review-tc3 float-left"><input class="wc-review-input wc-review-lname"></div>
+					<div class="wc-review-tc4 float-left"><input class="wc-review-input wc-review-email"></div>
+					<div class="wc-review-tc5 float-left"><div class="wc-review-rmv-icn"></div></div>
 				</div>
 				<div class="wc-review-tr clearfix">
 					<div class="wc-review-tc1 float-left pos-relative"><input data-name="agent-name" class="wc-review-input wc-review-agentname"></div>
-					<div class="wc-review-tc2 float-left"><input class="wc-review-input wc-review-custname"></div>
-					<div class="wc-review-tc3 float-left"><input class="wc-review-input wc-review-email"></div>
-					<div class="wc-review-tc4 float-left"><div class="wc-review-rmv-icn"></div></div>
+					<div class="wc-review-tc2 float-left"><input class="wc-review-input wc-review-fname"></div>
+					<div class="wc-review-tc3 float-left"><input class="wc-review-input wc-review-lname"></div>
+					<div class="wc-review-tc4 float-left"><input class="wc-review-input wc-review-email"></div>
+					<div class="wc-review-tc5 float-left"><div class="wc-review-rmv-icn"></div></div>
 				</div>
 			</div>
 		</div>
@@ -50,11 +54,12 @@
 		$('#wc-review-table').perfectScrollbar();
 		$('#wc-review-table').perfectScrollbar('update');
 		
-		$('input[data-name="agent-name"]').bind('click',function(e){
+		$(document).on('click','input[data-name="agent-name"]',function(e){
 			e.stopPropagation();
 			$('.agent-dropdown-cont').remove();
-			fillAgents(this);
+			fillAgents(e.target);
 		});
+		
 		function fillAgents(element){
 			var columnName = '${columnName}';
 			var columnValue = '${columnValue}';
