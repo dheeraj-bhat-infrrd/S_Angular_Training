@@ -17,21 +17,27 @@
 					<div class="wc-review-th5 float-left"></div>
 				</div>
 				<div class="wc-review-tr clearfix">
-					<div class="wc-review-tc1 float-left pos-relative"><input data-name="agent-name" class="wc-review-input wc-review-agentname"></div>
+					<div class="wc-review-tc1 float-left pos-relative">
+						<input data-name="agent-name" class="wc-review-input wc-review-agentname">
+					</div>
 					<div class="wc-review-tc2 float-left"><input class="wc-review-input wc-review-fname"></div>
 					<div class="wc-review-tc3 float-left"><input class="wc-review-input wc-review-lname"></div>
 					<div class="wc-review-tc4 float-left"><input class="wc-review-input wc-review-email"></div>
 					<div class="wc-review-tc5 float-left"><div class="wc-review-rmv-icn hide"></div></div>
 				</div>
 				<div class="wc-review-tr clearfix">
-					<div class="wc-review-tc1 float-left pos-relative"><input data-name="agent-name" class="wc-review-input wc-review-agentname"></div>
+					<div class="wc-review-tc1 float-left pos-relative">
+						<input data-name="agent-name" class="wc-review-input wc-review-agentname">
+					</div>
 					<div class="wc-review-tc2 float-left"><input class="wc-review-input wc-review-fname"></div>
 					<div class="wc-review-tc3 float-left"><input class="wc-review-input wc-review-lname"></div>
 					<div class="wc-review-tc4 float-left"><input class="wc-review-input wc-review-email"></div>
 					<div class="wc-review-tc5 float-left"><div class="wc-review-rmv-icn"></div></div>
 				</div>
 				<div class="wc-review-tr clearfix">
-					<div class="wc-review-tc1 float-left pos-relative"><input data-name="agent-name" class="wc-review-input wc-review-agentname"></div>
+					<div class="wc-review-tc1 float-left pos-relative">
+						<input data-name="agent-name" class="wc-review-input wc-review-agentname">
+					</div>
 					<div class="wc-review-tc2 float-left"><input class="wc-review-input wc-review-fname"></div>
 					<div class="wc-review-tc3 float-left"><input class="wc-review-input wc-review-lname"></div>
 					<div class="wc-review-tc4 float-left"><input class="wc-review-input wc-review-email"></div>
@@ -49,66 +55,73 @@
 		</div>
 	</div>
 </div>
+
 <script>
-	$(document).ready(function(){
-		$('#wc-review-table').perfectScrollbar();
-		$('#wc-review-table').perfectScrollbar('update');
-		
-		$(document).on('click','input[data-name="agent-name"]',function(e){
-			e.stopPropagation();
-			$('.agent-dropdown-cont').remove();
-			fillAgents(e.target);
-		});
-		
-		function fillAgents(element){
-			var columnName = '${columnName}';
-			var columnValue = '${columnValue}';
-			var payload = {
-				"columnName" : columnName,
-				"columnValue" : columnValue
-			};
-			var success = false;
-			$.ajax({
-				url : './fetchagentsforadmin.do',
-				type : "GET",
-				data : payload,
-				dataType : 'JSON',
-				async : true,
-				success : function(){
-					success = true;
-				},
-				complete: function(data){
-					if(success){
-						appendAgentDropDown(data.responseJSON, element, columnName);
-					}
-				},
-				error : function(e) {
-					redirectErrorpage();
-				}
-			});
-		}
-		
-		function appendAgentDropDown(data, element, columnName) {
-			var htmlData = '<div class="agent-dropdown-wrapper">';
-			htmlData += '<div class="agent-dropdown-cont">';
-			for(var index=0; index<data.length;index++){
-				htmlData += '<div column-name="' + columnName + '" attr="' + data[index].userId + '" class="agent-dropdown-item">' + data[index].displayName + '</div>';
-			}
-			htmlData += '</div>';
-			htmlData += '<div>';
-			$(element).parent().append(htmlData);
-		}
-		
-		$(document).on('click','.agent-dropdown-item',function(e){
-			e.stopPropagation();
-			$(this).parent().parent().parent().find('input[data-name="agent-name"]').val($(this).text());
-			$(this).parent().parent().parent().find('input[data-name="agent-name"]').attr('agent-id', $(this).attr('attr'));
-			$(this).parent().parent().parent().find('input[data-name="agent-name"]').attr('column-name', $(this).attr('column-name'));
-			$('.agent-dropdown-cont').remove();
-		})
-		
-		$(document).click(function(){
-			$('.agent-dropdown-cont').remove();
-		});
+$(document).ready(function(){
+	$('#wc-review-table').perfectScrollbar();
+	$('#wc-review-table').perfectScrollbar('update');
+	
+	$(document).on('keyup', 'input[data-name="agent-name"]', function(e) {
+		e.stopPropagation();
+		$('.agent-dropdown-cont').remove();
+		fillAgents(e.target, $(this).val());
 	});
+	
+	function fillAgents(element, searchKey) {
+		if (searchKey == undefined || searchKey == "") {
+			return;
+		}
+		var columnName = '${columnName}';
+		var columnValue = '${columnValue}';
+		var payload = {
+			"searchKey" : searchKey,
+			"columnName" : columnName,
+			"columnValue" : columnValue
+		};
+		
+		var success = false;
+		$.ajax({
+			url : './fetchagentsforadmin.do',
+			type : "GET",
+			data : payload,
+			dataType : 'JSON',
+			async : true,
+			success : function() {
+				success = true;
+			},
+			complete: function(data) {
+				if (success) {
+					appendAgentDropDown(data.responseJSON, element, columnName);
+				}
+			},
+			error : function(e) {
+				redirectErrorpage();
+			}
+		});
+	}
+	
+	function appendAgentDropDown(data, element, columnName) {
+		var htmlData = '<div class="agent-dropdown-wrapper">';
+		htmlData += '<div class="agent-dropdown-cont">';
+		for (var index = 0; index < data.length; index++) {
+			htmlData += '<div column-name="' + columnName + '" attr="' + data[index].userId
+				+ '" class="agent-dropdown-item">' + data[index].displayName + ' &lt;' + data[index].emailId + '&gt;</div>';
+		}
+		htmlData += '</div></div>';
+		$(element).parent().append(htmlData);
+	}
+	
+	$(document).on('click', '.agent-dropdown-item', function(e) {
+		e.stopPropagation();
+		var element = $(this).parent().parent().parent().find('input[data-name="agent-name"]');
+		element.val($(this).text());
+		element.attr('agent-id', $(this).attr('attr'));
+		element.attr('column-name', $(this).attr('column-name'));
+		$('.agent-dropdown-cont').remove();
+	});
+	
+	$(document).click(function(){
+		$('.agent-dropdown-cont').remove();
+	});
+});
 </script>

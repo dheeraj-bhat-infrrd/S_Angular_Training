@@ -525,43 +525,45 @@ $(document).on('click', '#wc-send-survey', function() {
 	$('#wc-review-table-inner').children().each(function() {
 		if (!$(this).hasClass('wc-review-hdr')) {
 			var dataName = $(this).find('input.wc-review-agentname').first().attr('data-name');
-			if(dataName=='agent-name'){
+			if (dataName == 'agent-name') {
 				agentId = $(this).find('input.wc-review-agentname').first().attr('agent-id');
 				var name = $(this).find('input.wc-review-custname').first().val();
-				if(name!=undefined){
+				if (name != undefined) {
 					var nameParts = name.split(" ");
-					if(nameParts.length==1){
+					if (nameParts.length == 1) {
 						firstname = name;
-					}else{
-						for(var i=0;i<nameParts.length-1;i++){
-							firstname = firstname+nameParts[i];
+					} else {
+						for (var i = 0; i < nameParts.length-1; i++) {
+							firstname = firstname + nameParts[i];
 						}
-						lastname = nameParts[nameParts.length-1];
+						lastname = nameParts[nameParts.length - 1];
 					}
 				}
-				if(idx==0){
+				if (firstname == "") {
+					firstname = $(this).find('input.wc-review-fname').first().val();
+					lastname = $(this).find('input.wc-review-lname').first().val();
+				}
+				if (idx == 0) {
 					columnName = $(this).find('input.wc-review-agentname').first().attr('column-name');
-					idx++;
+					idx ++;
 				}
 			}
-			else{
+			else {
 				firstname = $(this).find('input.wc-review-fname').first().val();
 				lastname = $(this).find('input.wc-review-lname').first().val();
 			}
 			
 			var emailId = $(this).find('input.wc-review-email').first().val();
-			
 			if (emailRegex.test(emailId)) {
 				var receiver = new Object();
 				receiver.firstname = firstname;
 				receiver.lastname = lastname;
 				receiver.emailId = emailId;
-				if(dataName=='agent-name'){
+				if (dataName == 'agent-name') {
 					receiver.agentId = agentId;
 				}
 				receiversList.push(receiver);
 			}
-			
 		}
 	});
 
@@ -570,12 +572,12 @@ $(document).on('click', '#wc-send-survey', function() {
 		"receiversList" : receiversList,
 		"source" : 'agent'
 	};
-	if(columnName != undefined){
+	if (columnName != undefined) {
 		payload = {
-				"receiversList" : receiversList,
-				"source" : 'admin',
-				"columnName" : columnName,
-			};
+			"receiversList" : receiversList,
+			"source" : 'admin',
+			"columnName" : columnName,
+		};
 	}
 	callAjaxPostWithPayloadData("./sendmultiplesurveyinvites.do", function(data) {
 		$('#overlay-toast').html('Survey request sent successfully!');

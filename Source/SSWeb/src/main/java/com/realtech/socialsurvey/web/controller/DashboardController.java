@@ -8,17 +8,14 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
-
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.apache.solr.common.SolrDocument;
 import org.slf4j.Logger;
@@ -30,7 +27,6 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
-
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.type.TypeFactory;
 import com.google.gson.Gson;
@@ -43,7 +39,6 @@ import com.realtech.socialsurvey.core.entities.SurveyDetails;
 import com.realtech.socialsurvey.core.entities.SurveyPreInitiation;
 import com.realtech.socialsurvey.core.entities.SurveyRecipient;
 import com.realtech.socialsurvey.core.entities.User;
-import com.realtech.socialsurvey.core.entities.UserFromSearch;
 import com.realtech.socialsurvey.core.entities.UserProfile;
 import com.realtech.socialsurvey.core.entities.UserSettings;
 import com.realtech.socialsurvey.core.enums.AccountType;
@@ -642,74 +637,72 @@ public class DashboardController {
 	public String fetchAgentsForAdmin(Model model, HttpServletRequest request) {
 		LOG.info("Method fetchAgentsForAdmin() started.");
 		User user = sessionHelper.getCurrentUser();
-		Collection<UserFromSearch> agentsForAdmin = new ArrayList<>();
+		
+		List<SolrDocument> solrDocuments = null;
 		try {
 			String columnName = request.getParameter("columnName");
 			if (columnName == null || columnName.isEmpty()) {
 				LOG.error("Invalid value (null/empty) passed for profile level.");
-				throw new InvalidInputException(
-						"Invalid value (null/empty) passed for profile level.");
+				throw new InvalidInputException("Invalid value (null/empty) passed for profile level.");
 			}
-			String profileLevel = getProfileLevel(columnName);
+			
 			String idenFieldName = "";
+			String profileLevel = getProfileLevel(columnName);
 			switch (profileLevel) {
-			case CommonConstants.PROFILE_LEVEL_COMPANY:
-				idenFieldName = CommonConstants.COMPANY_ID_SOLR;
-				break;
-			case CommonConstants.PROFILE_LEVEL_REGION:
-				idenFieldName = CommonConstants.REGIONS_SOLR;
-				break;
-			case CommonConstants.PROFILE_LEVEL_BRANCH:
-				idenFieldName = CommonConstants.BRANCHES_SOLR;
-				break;
-			default:
-				throw new InvalidInputException(
-						"profile level is invalid in getProListByProfileLevel");
+				case CommonConstants.PROFILE_LEVEL_COMPANY:
+					idenFieldName = CommonConstants.COMPANY_ID_SOLR;
+					break;
+				case CommonConstants.PROFILE_LEVEL_REGION:
+					idenFieldName = CommonConstants.REGION_ID_COLUMN;
+					break;
+				case CommonConstants.PROFILE_LEVEL_BRANCH:
+					idenFieldName = CommonConstants.BRANCH_ID_COLUMN;
+					break;
+				default:
+					throw new InvalidInputException("profile level is invalid in getProListByProfileLevel");
 			}
 
 			long iden = 0;
 			if (profileLevel.equals(CommonConstants.PROFILE_LEVEL_COMPANY)) {
 				iden = user.getCompany().getCompanyId();
-			} else if (profileLevel
-					.equals(CommonConstants.PROFILE_LEVEL_INDIVIDUAL)) {
+			}
+			else if (profileLevel.equals(CommonConstants.PROFILE_LEVEL_INDIVIDUAL)) {
 				iden = user.getUserId();
-			} else {
+			}
+			else {
 				String columnValue = request.getParameter("columnValue");
 				if (columnValue == null || columnValue.isEmpty()) {
 					LOG.error("Null or empty value passed for Region/BranchId. Please pass valid value.");
-					throw new InvalidInputException(
-							"Null or empty value passed for Region/BranchId. Please pass valid value.");
+					throw new InvalidInputException("Null or empty value passed for Region/BranchId. Please pass valid value.");
 				}
 
 				try {
 					iden = Long.parseLong(columnValue);
-				} catch (NumberFormatException e) {
-					LOG.error(
-							"NumberFormatException caught while parsing columnValue in getReviews(). Nested exception is ",
-							e);
+				}
+				catch (NumberFormatException e) {
+					LOG.error("NumberFormatException caught while parsing columnValue in getReviews(). Nested exception is ", e);
 					throw e;
 				}
 			}
 
-			agentsForAdmin = solrSearchService.searchUsersByIden(iden,
-					idenFieldName, true, -1, -1);
-
-		} catch (NonFatalException e) {
-			LOG.error(
-					"NonFatal exception caught in fetchAgentsForAdmin(). Nested exception is ",
-					e);
+			// Searching based on searchKey
+			String searchKey = request.getParameter("searchKey");
+			solrDocuments = solrSearchService.searchBranchRegionOrAgentByName(CommonConstants.USER_DISPLAY_NAME_SOLR, searchKey, idenFieldName, iden);
+		}
+		catch (NonFatalException e) {
+			LOG.error("NonFatal exception caught in fetchAgentsForAdmin(). Nested exception is ", e);
 			return "";
 		}
+		
 		LOG.info("Method fetchAgentsForAdmin() finished.");
-		return new Gson().toJson(agentsForAdmin);
+		return new Gson().toJson(solrDocuments);
 	}
 
 	/*
 	 * Fetches incomplete surveys based upon the criteria. Criteria can be
 	 * startIndex and/or batchSize.
 	 */
-	private List<SurveyPreInitiation> fetchIncompleteSurveys(
-			HttpServletRequest request, User user) throws InvalidInputException {
+	private List<SurveyPreInitiation> fetchIncompleteSurveys(HttpServletRequest request, User user) throws InvalidInputException {
 		LOG.debug("Method fetchIncompleteSurveys() started");
 		List<SurveyPreInitiation> surveyDetails;
 		String startIndexStr = request.getParameter("startIndex");
@@ -1188,12 +1181,10 @@ public class DashboardController {
 		User user = sessionHelper.getCurrentUser();
 
 		try {
-			surveyHandler.sendSurveyInvitationMail(custFirstName, custLastName,
-					custEmail, custRelationWithAgent, user, true, "customer");
-		} catch (NonFatalException e) {
-			LOG.error(
-					"NonFatalException caught in sendSurveyInvitation(). Nested exception is ",
-					e);
+			surveyHandler.sendSurveyInvitationMail(custFirstName, custLastName, custEmail, custRelationWithAgent, user, true, "customer");
+		}
+		catch (NonFatalException e) {
+			LOG.error("NonFatalException caught in sendSurveyInvitation(). Nested exception is ", e);
 		}
 
 		LOG.info("Method sendSurveyInvitation() finished from DashboardController.");
@@ -1207,30 +1198,25 @@ public class DashboardController {
 		User user = sessionHelper.getCurrentUser();
 		List<SurveyRecipient> surveyRecipients = null;
 		long agentId = 0;
+		
 		try {
 			String source = request.getParameter("source");
 			String payload = request.getParameter("receiversList");
 			String columnName = request.getParameter("columnName");
 			try {
 				if (payload == null) {
-					throw new InvalidInputException(
-							"SurveyRecipients passed was null or empty");
+					throw new InvalidInputException("SurveyRecipients passed was null or empty");
 				}
-				surveyRecipients = new ObjectMapper().readValue(
-						payload,
-						TypeFactory.defaultInstance().constructCollectionType(
-								List.class, SurveyRecipient.class));
-			} catch (IOException ioException) {
-				throw new NonFatalException(
-						"Error occurred while parsing the Json.",
-						DisplayMessageConstants.GENERAL_ERROR, ioException);
+				surveyRecipients = new ObjectMapper().readValue(payload,
+						TypeFactory.defaultInstance().constructCollectionType(List.class, SurveyRecipient.class));
+			}
+			catch (IOException ioException) {
+				throw new NonFatalException("Error occurred while parsing the Json.", DisplayMessageConstants.GENERAL_ERROR, ioException);
 			}
 
 			if (columnName != null) {
 				String profileLevel = getProfileLevel(columnName);
-				if (profileLevel
-						.equalsIgnoreCase(CommonConstants.PROFILE_LEVEL_INDIVIDUAL)
-						|| user.isAgent()) {
+				if (profileLevel.equalsIgnoreCase(CommonConstants.PROFILE_LEVEL_INDIVIDUAL) || user.isAgent()) {
 					agentId = user.getUserId();
 				}
 			}
@@ -1241,19 +1227,14 @@ public class DashboardController {
 					if (agentId == 0) {
 						agentId = recipient.getAgentId();
 					}
-					if (surveyHandler.getPreInitiatedSurvey(agentId,
-							recipient.getEmailId()) == null)
-						surveyHandler.sendSurveyInvitationMail(
-								recipient.getFirstname(),
-								recipient.getLastname(),
-								recipient.getEmailId(), null, user, true,
-								source);
+					if (surveyHandler.getPreInitiatedSurvey(agentId, recipient.getEmailId()) == null)
+						surveyHandler.sendSurveyInvitationMail(recipient.getFirstname(), recipient.getLastname(), recipient.getEmailId(), null, user,
+								true, source);
 				}
 			}
-		} catch (NonFatalException e) {
-			LOG.error(
-					"NonFatalException caught in sendMultipleSurveyInvitations(). Nested exception is ",
-					e);
+		}
+		catch (NonFatalException e) {
+			LOG.error("NonFatalException caught in sendMultipleSurveyInvitations(). Nested exception is ", e);
 		}
 
 		LOG.info("Method sendMultipleSurveyInvitations() finished from DashboardController.");
