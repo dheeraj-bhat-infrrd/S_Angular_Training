@@ -834,6 +834,7 @@ public class SolrSearchServiceImpl implements SolrSearchService {
 		List<SolrDocument> results = new ArrayList<SolrDocument>();
 		QueryResponse response = null;
 		searchKey = searchKey + "*";
+		
 		SolrQuery query = new SolrQuery();
 		try {
 			SolrServer solrServer;
@@ -876,6 +877,7 @@ public class SolrSearchServiceImpl implements SolrSearchService {
 			LOG.error("SolrServerException while performing region, branch or agent search");
 			throw new SolrException("Exception while performing search. Reason : " + e.getMessage(), e);
 		}
+		
 		LOG.info("Method searchBranchRegionOrAgentByNameAndCompany() to search regions, branches, agent in a company finished");
 		return results;
 	}
@@ -1431,9 +1433,9 @@ public class SolrSearchServiceImpl implements SolrSearchService {
 	}
 	
 	@SuppressWarnings("unchecked")
-	private Collection<UserFromSearch> getUsersFromSolrDocuments(SolrDocumentList documentList) throws InvalidInputException{
+	private Collection<UserFromSearch> getUsersFromSolrDocuments(SolrDocumentList documentList) throws InvalidInputException {
 		Map<Long, UserFromSearch> matchedUsers = new LinkedHashMap<>();
-		for(SolrDocument document : documentList){
+		for (SolrDocument document : documentList) {
 			UserFromSearch user = new UserFromSearch();
 
 			user.setCompanyId(Long.parseLong(document.get(CommonConstants.COMPANY_ID_SOLR).toString()));
@@ -1442,14 +1444,15 @@ public class SolrSearchServiceImpl implements SolrSearchService {
 			user.setIsOwner(Integer.parseInt(document.get(CommonConstants.IS_OWNER_COLUMN).toString()));
 			user.setBranchAdmin(Boolean.parseBoolean(document.get(CommonConstants.IS_BRANCH_ADMIN_SOLR).toString()));
 			user.setRegionAdmin(Boolean.parseBoolean(document.get(CommonConstants.IS_REGION_ADMIN_SOLR).toString()));
-			user.setRegions((List<Long>)document.get(CommonConstants.REGIONS_SOLR));
-			user.setBranches((List<Long>)document.get(CommonConstants.BRANCHES_SOLR));
-			user.setAgentIds((List<Long>)document.get("agentIds"));
-			
+			user.setRegions((List<Long>) document.get(CommonConstants.REGIONS_SOLR));
+			user.setBranches((List<Long>) document.get(CommonConstants.BRANCHES_SOLR));
+			user.setAgentIds((List<Long>) document.get("agentIds"));
+
 			matchedUsers.put(Long.parseLong(document.get(CommonConstants.USER_ID_SOLR).toString()), user);
 		}
+
 		List<AgentSettings> agentSettings = organizationUnitSettingsDao.fetchMultipleAgentSettingsById(new ArrayList<Long>(matchedUsers.keySet()));
-		for(AgentSettings setting : agentSettings){
+		for (AgentSettings setting : agentSettings) {
 			UserFromSearch user = matchedUsers.get(setting.getIden());
 			user.setUserId(setting.getIden());
 			user.setEmailId(setting.getContact_details().getMail_ids().getWork());
@@ -1463,9 +1466,8 @@ public class SolrSearchServiceImpl implements SolrSearchService {
 			user.setProfileName(setting.getProfileName());
 			user.setProfileUrl(setting.getProfileUrl());
 			user.setReviewCount(setting.getReviewCount());
-
 		}
-		
+
 		return matchedUsers.values();
 	}
 }
