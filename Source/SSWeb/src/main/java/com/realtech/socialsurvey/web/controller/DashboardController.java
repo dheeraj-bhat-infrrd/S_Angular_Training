@@ -192,59 +192,58 @@ public class DashboardController {
 	public String getProfileDetails(Model model, HttpServletRequest request) {
 		LOG.info("Method to get profile of company/region/branch/agent getProfileDetails() started");
 		User user = sessionHelper.getCurrentUser();
-		UserSettings userSettings = (UserSettings) request
-				.getSession(false)
-				.getAttribute(CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION);
+		UserSettings userSettings = (UserSettings) request.getSession(false).getAttribute(CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION);
 
 		// settings profile details
 		String columnName = request.getParameter("columnName");
+
+		OrganizationUnitSettings unitSettings;
 		long columnValue = 0;
 		if (columnName.equalsIgnoreCase(CommonConstants.COMPANY_ID_COLUMN)) {
 			columnValue = user.getCompany().getCompanyId();
-			model.addAttribute("name", user.getCompany().getCompany());
-			model.addAttribute("title",
-					getTitle(request, columnName, columnValue, user));
-		} else if (columnName
-				.equalsIgnoreCase(CommonConstants.REGION_ID_COLUMN)) {
+
+			unitSettings = userSettings.getCompanySettings();
+			if (unitSettings.getContact_details() != null && unitSettings.getContact_details().getName() != null) {
+				model.addAttribute("name", unitSettings.getContact_details().getName());
+			}
+			model.addAttribute("title", getTitle(request, columnName, columnValue, user));
+		}
+		else if (columnName.equalsIgnoreCase(CommonConstants.REGION_ID_COLUMN)) {
 			try {
-				columnValue = Long.parseLong(request
-						.getParameter("columnValue"));
-			} catch (NumberFormatException e) {
+				columnValue = Long.parseLong(request.getParameter("columnValue"));
+			}
+			catch (NumberFormatException e) {
 				LOG.error("NumberFormatException caught in getProfileDetails() while converting columnValue for regionId/branchId/agentId.");
 				throw e;
 			}
 
-			model.addAttribute("name",
-					userSettings.getRegionSettings().get(columnValue)
-							.getContact_details().getName());
-			model.addAttribute("title",
-					getTitle(request, columnName, columnValue, user));
+			unitSettings = userSettings.getRegionSettings().get(columnValue);
+			if (unitSettings.getContact_details() != null && unitSettings.getContact_details().getName() != null) {
+				model.addAttribute("name", unitSettings.getContact_details().getName());
+			}
+			model.addAttribute("title", getTitle(request, columnName, columnValue, user));
 			model.addAttribute("company", user.getCompany().getCompany());
-		} else if (columnName
-				.equalsIgnoreCase(CommonConstants.BRANCH_ID_COLUMN)) {
+		}
+		else if (columnName.equalsIgnoreCase(CommonConstants.BRANCH_ID_COLUMN)) {
 			try {
-				columnValue = Long.parseLong(request
-						.getParameter("columnValue"));
-			} catch (NumberFormatException e) {
+				columnValue = Long.parseLong(request.getParameter("columnValue"));
+			}
+			catch (NumberFormatException e) {
 				LOG.error("NumberFormatException caught in getProfileDetails() while converting columnValue for regionId/branchId/agentId.");
 				throw e;
 			}
 
-			model.addAttribute("name",
-					userSettings.getBranchSettings().get(columnValue)
-							.getContact_details().getName());
-			model.addAttribute("title",
-					getTitle(request, columnName, columnValue, user));
+			unitSettings = userSettings.getBranchSettings().get(columnValue);
+			if (unitSettings.getContact_details() != null && unitSettings.getContact_details().getName() != null) {
+				model.addAttribute("name", unitSettings.getContact_details().getName());
+			}
+			model.addAttribute("title", getTitle(request, columnName, columnValue, user));
 			model.addAttribute("company", user.getCompany().getCompany());
-		} else if (columnName.equalsIgnoreCase(CommonConstants.AGENT_ID_COLUMN)) {
+		}
+		else if (columnName.equalsIgnoreCase(CommonConstants.AGENT_ID_COLUMN)) {
 			columnValue = user.getUserId();
-			model.addAttribute("name",
-					user.getFirstName()
-							+ " "
-							+ (user.getLastName() != null ? user.getLastName()
-									: ""));
-			model.addAttribute("title",
-					getTitle(request, columnName, columnValue, user));
+			model.addAttribute("name", user.getFirstName() + " " + (user.getLastName() != null ? user.getLastName() : ""));
+			model.addAttribute("title", getTitle(request, columnName, columnValue, user));
 			model.addAttribute("company", user.getCompany().getCompany());
 		}
 
@@ -252,39 +251,32 @@ public class DashboardController {
 		int numberOfDays = 30;
 		try {
 			if (request.getParameter("numberOfDays") != null) {
-				numberOfDays = Integer.parseInt(request
-						.getParameter("numberOfDays"));
+				numberOfDays = Integer.parseInt(request.getParameter("numberOfDays"));
 			}
-		} catch (NumberFormatException e) {
+		}
+		catch (NumberFormatException e) {
 			LOG.error("NumberFormatException caught in getProfileDetails() while converting numberOfDays.");
 			throw e;
 		}
 
-		double surveyScore = (double) Math
-				.round(dashboardService.getSurveyScore(columnName, columnValue,
-						numberOfDays) * 1000.0) / 1000.0;
-		int sentSurveyCount = (int) dashboardService
-				.getAllSurveyCountForPastNdays(columnName, columnValue,
-						numberOfDays);
-		int socialPostsCount = (int) dashboardService
-				.getSocialPostsForPastNdays(columnName, columnValue,
-						numberOfDays);
-		int profileCompleteness = dashboardService
-				.getProfileCompletionPercentage(user, columnName, columnValue,
-						userSettings);
+		double surveyScore = (double) Math.round(dashboardService.getSurveyScore(columnName, columnValue, numberOfDays) * 1000.0) / 1000.0;
+		int sentSurveyCount = (int) dashboardService.getAllSurveyCountForPastNdays(columnName, columnValue, numberOfDays);
+		int socialPostsCount = (int) dashboardService.getSocialPostsForPastNdays(columnName, columnValue, numberOfDays);
+		int profileCompleteness = dashboardService.getProfileCompletionPercentage(user, columnName, columnValue, userSettings);
 
 		model.addAttribute("socialScore", surveyScore);
 		if (sentSurveyCount > 999)
 			model.addAttribute("surveyCount", "1K+");
 		else
 			model.addAttribute("surveyCount", sentSurveyCount);
+
 		if (socialPostsCount > 999)
 			model.addAttribute("socialPosts", "1K+");
 		else
 			model.addAttribute("socialPosts", socialPostsCount);
+
 		model.addAttribute("profileCompleteness", profileCompleteness);
-		model.addAttribute("badges", dashboardService.getBadges(surveyScore,
-				sentSurveyCount, socialPostsCount, profileCompleteness));
+		model.addAttribute("badges", dashboardService.getBadges(surveyScore, sentSurveyCount, socialPostsCount, profileCompleteness));
 
 		model.addAttribute("columnName", columnName);
 		model.addAttribute("columnValue", columnValue);

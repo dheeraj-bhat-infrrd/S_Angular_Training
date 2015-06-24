@@ -3616,6 +3616,14 @@ function validateAssignToBranchName() {
 	}
 }
 
+$(document).on('keyup', '#search-users-key', function(e) {
+	// detect enter
+	if (e.keyCode == 13) {
+		console.log("Enter");
+		searchUsersByNameEmailLoginId($(this).val());
+	}
+});
+
 function searchUsersByNameEmailLoginId(searchKey) {
 	userStartIndex = 0;
 	var url = "./findusers.do";
