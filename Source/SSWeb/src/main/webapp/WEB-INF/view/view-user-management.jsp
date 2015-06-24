@@ -38,7 +38,7 @@
 		<div class="v-um-header clearfix">
 			<div class="v-um-hdr-left float-left"><spring:message code="label.usermanagement.head.browseruser.key" /></div>
 			<div class="v-um-hdr-right float-right">
-				<input class="v-um-inp" placeholder="<spring:message code="label.searchuser.key" />" onkeyup="searchUsersByNameEmailLoginId(this.value)">
+				<input id="search-users-key" class="v-um-inp" placeholder="<spring:message code="label.searchuser.key" />">
 				<input type="hidden" id="users-count" value="${usersCount}">
 			</div>
 		</div>
@@ -50,58 +50,57 @@
 			<div id="page-next" class="float-right paginate-button"><spring:message code="label.next.key" /></div>
 		</div>
 	</div>
-<div id="temp-message" class="hide"></div>
+	<div id="temp-message" class="hide"></div>
 <script>
-    $(document).ready(function() {
-		hideOverlay();
-        $(document).attr("title", "User Management");
-        initUserManagementPage();		
+$(document).ready(function() {
+	hideOverlay();
+    $(document).attr("title", "User Management");
+    initUserManagementPage();		
 
-        doStopAjaxRequestForUsersList = false;
-        if($('#server-message>div').hasClass("error-message")){
-            isUserManagementAuthorized = false;
-            $('#server-message').show();
-            //var errorMessage = $('#server-message p').text();
-        }
+    doStopAjaxRequestForUsersList = false;
+    if($('#server-message>div').hasClass("error-message")){
+        isUserManagementAuthorized = false;
+        $('#server-message').show();
+        //var errorMessage = $('#server-message p').text();
+    }
 
-        $(document).on('click', '.v-tbl-icn', function(e){
-            e.stopPropagation();
-        });
-
-        $(document).on('click', '.v-ed-txt-dd', function(){
-            $(this).next('.v-ed-dd-wrapper').slideToggle(200);
-        });
-
-        $(document).on('click', '.v-ed-dd-item', function(e){
-            e.stopPropagation();
-            $(this).parent().prev('.v-ed-txt-dd').val($(this).html());
-            $(this).parent().slideToggle(200);
-        });
-
-        // remove user
-        $(document).on('click', '.v-icn-rem-user', function(){
-        	if ($(this).hasClass('v-tbl-icn-disabled')) {
-        		return;
-        	}
-
-        	var userId = $(this).parent().find('.fetch-name').attr('data-user-id');
-            var adminId = '${user.userId}';
-            confirmDeleteUser(userId, adminId);
-        });
-
-        // resend verification mail
-        $(document).on('click', '.v-icn-fmail', function(){
-        	if ($(this).hasClass('v-tbl-icn-disabled')) {
-        		return;
-        	}
-
-        	var firstName = $(this).parent().find('.fetch-name').attr('data-first-name');
-            var lastName = $(this).parent().find('.fetch-name').attr('data-last-name');
-            var emailId = $(this).parent().find('.fetch-email').html();
-            reinviteUser(firstName, lastName, emailId);
-        });
+    $(document).on('click', '.v-tbl-icn', function(e){
+        e.stopPropagation();
     });
-</script>
 
+    $(document).on('click', '.v-ed-txt-dd', function(){
+        $(this).next('.v-ed-dd-wrapper').slideToggle(200);
+    });
+
+    $(document).on('click', '.v-ed-dd-item', function(e){
+        e.stopPropagation();
+        $(this).parent().prev('.v-ed-txt-dd').val($(this).html());
+        $(this).parent().slideToggle(200);
+    });
+
+    // remove user
+    $(document).on('click', '.v-icn-rem-user', function(){
+    	if ($(this).hasClass('v-tbl-icn-disabled')) {
+    		return;
+    	}
+
+    	var userId = $(this).parent().find('.fetch-name').attr('data-user-id');
+        var adminId = '${user.userId}';
+        confirmDeleteUser(userId, adminId);
+    });
+
+    // resend verification mail
+    $(document).on('click', '.v-icn-fmail', function(){
+    	if ($(this).hasClass('v-tbl-icn-disabled')) {
+    		return;
+    	}
+
+    	var firstName = $(this).parent().find('.fetch-name').attr('data-first-name');
+        var lastName = $(this).parent().find('.fetch-name').attr('data-last-name');
+        var emailId = $(this).parent().find('.fetch-email').html();
+        reinviteUser(firstName, lastName, emailId);
+    });
+});
+</script>
 </body>
 </html>
