@@ -502,6 +502,7 @@ public class ProfileManagementController {
 		ContactDetailsSettings contactDetailsSettings = null;
 
 		try {
+			User user = sessionHelper.getCurrentUser();
 			UserSettings userSettings = (UserSettings) session.getAttribute(CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION);
 			OrganizationUnitSettings profileSettings = (OrganizationUnitSettings) session.getAttribute(CommonConstants.USER_PROFILE_SETTINGS);
 			UserProfile selectedProfile = (UserProfile) request.getSession(false).getAttribute(CommonConstants.USER_PROFILE);
@@ -529,8 +530,12 @@ public class ProfileManagementController {
 						MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION, companySettings, contactDetailsSettings);
 				companySettings.setContact_details(contactDetailsSettings);
 				
+				// update company name
+				profileManagementService.updateCompanyName(user.getUserId(), companySettings.getIden(), name);
+				
 				companySettings.setVertical(vertical);
 				profileManagementService.updateVertical(MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION, companySettings, vertical);
+				
 				
 				userSettings.setCompanySettings(companySettings);
 			}
