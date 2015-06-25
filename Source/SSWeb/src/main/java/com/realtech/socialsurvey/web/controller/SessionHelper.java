@@ -38,6 +38,7 @@ import com.realtech.socialsurvey.core.enums.AccountType;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.exception.NoRecordsFetchedException;
 import com.realtech.socialsurvey.core.exception.NonFatalException;
+import com.realtech.socialsurvey.core.exception.UserSessionInvalidateException;
 import com.realtech.socialsurvey.core.services.organizationmanagement.OrganizationManagementService;
 import com.realtech.socialsurvey.core.services.organizationmanagement.UserManagementService;
 import com.realtech.socialsurvey.core.utils.EmailFormatHelper;
@@ -268,6 +269,10 @@ public class SessionHelper {
 		User user = null;
 		if (sessionUser instanceof User) {
 			user = (User) sessionUser;
+		}
+		
+		if (user == null) {
+			throw new UserSessionInvalidateException("User session is no longer available.");
 		}
 		return user;
 	}

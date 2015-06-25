@@ -705,6 +705,7 @@ public class HierarchyManagementController {
 					message = messageUtils.getDisplayMessage(DisplayMessageConstants.INDIVIDUAL_MULTIPLE_ADDITION_SUCCESSFUL,
 							DisplayMessageType.SUCCESS_MESSAGE);
 				}
+				
 				model.addAttribute("message", message);
 			}
 			catch (UserAssignmentException e) {

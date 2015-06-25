@@ -289,7 +289,8 @@ function validateLastName(elementId){
 			return false;
 		}
 	} else {
-		return true;
+		showErrorMobileAndWeb('Please enter a valid last name');
+		return false;
 	}
 }
 

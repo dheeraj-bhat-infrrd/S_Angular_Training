@@ -66,7 +66,7 @@ public class LoginController {
 	// Redirects user to Landing Page if session is active
 	@ResponseBody
 	@RequestMapping(value = "/redirectifexistsactivesession")
-	public String redirectToUserHomeIfSessionExists(HttpServletResponse response) {
+	public String redirectToUserHomeIfSessionExists() {
 		LOG.info("Method redirectToUserHomeIfSessionExists() called from LoginController");
 		return String.valueOf(sessionHelper.isUserActiveSessionExists());
 	}
@@ -80,7 +80,7 @@ public class LoginController {
 	}
 
 	@RequestMapping(value = "/login")
-	public String initLoginPage(HttpServletResponse response, Model model, @RequestParam(value = STATUS_PARAM, required = false) String status) {
+	public String initLoginPage(Model model, @RequestParam(value = STATUS_PARAM, required = false) String status) {
 		LOG.info("Inside initLoginPage() of LoginController");
 		
 		// Check for existing session
