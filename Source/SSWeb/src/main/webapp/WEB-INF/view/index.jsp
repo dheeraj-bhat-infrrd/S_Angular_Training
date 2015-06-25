@@ -248,7 +248,6 @@ $(document).ready(function(){
   	}*/
 	
   	// Login form
-  	
   	$('#login-form input').on('keyup',function(e){
 		  if(e.which == 13){
 			  $('#login-submit').trigger('click');
