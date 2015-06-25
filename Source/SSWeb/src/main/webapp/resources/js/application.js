@@ -97,6 +97,7 @@ var yelpEnabled;
 var googleEnabled;
 var agentProfileLink;
 var agentFullProfileLink;
+var companyLogo;
 $(document).on('click', '.icn-plus-open', function() {
 	$(this).hide();
 	$(this).parent().find('.ppl-share-social,.icn-remove').show();
@@ -4456,6 +4457,7 @@ function paintSurveyPage(jsonData) {
 	googleEnabled = Boolean(jsonData.responseJSON.googleEnabled);
 	agentProfileLink = jsonData.responseJSON.agentProfileLink;
 	agentFullProfileLink = jsonData.responseJSON.agentFullProfileLink;
+	companyLogo = jsonData.responseJSON.companyLogo;
 	
 	if (stage != undefined)
 		qno = stage;
@@ -4559,6 +4561,13 @@ function paintSurveyPageFromJson() {
 		$("#skip-ques-mcq").hide();
 	}
 	$(".sq-main-txt").html("Survey for " + agentName);
+	
+	if (companyLogo != undefined && companyLogo != "") {
+		var companylogoHtml = '<div class="float-left user-info-seperator"></div>';
+		companylogoHtml += '<div class="float-left user-info-logo" style="background: url('
+			+ companyLogo + ') no-repeat center; background-size: 100% auto;"></div>';
+		$('#header-user-info').html(companylogoHtml);
+	}
 }
 
 function togglePrevAndNext(){
