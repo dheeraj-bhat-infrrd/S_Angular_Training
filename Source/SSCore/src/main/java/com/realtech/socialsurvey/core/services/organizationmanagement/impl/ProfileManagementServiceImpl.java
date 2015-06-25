@@ -264,9 +264,6 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 			if (higherLock.getIsLogoLocked()) {
 				parentLock.setLogoLocked(true);
 			}
-			if (higherLock.getIsDisplayNameLocked()) {
-				parentLock.setDisplayNameLocked(true);
-			}
 			if (higherLock.getIsWebAddressLocked()) {
 				parentLock.setWebAddressLocked(true);
 			}
@@ -503,10 +500,6 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 
 			// Basic Contact details
 			if (parentProfile.getContact_details() != null) {
-				if (parentLock.getIsDisplayNameLocked() && !userLock.getIsDisplayNameLocked() && parentProfile.getContact_details().getName() != null) {
-					userProfile.getContact_details().setName(parentProfile.getContact_details().getName());
-					userLock.setDisplayNameLocked(true);
-				}
 				if (parentLock.getIsAboutMeLocked() && !userLock.getIsAboutMeLocked() && parentProfile.getContact_details().getAbout_me() != null) {
 					userProfile.getContact_details().setAbout_me(parentProfile.getContact_details().getAbout_me());
 					userLock.setAboutMeLocked(true);
