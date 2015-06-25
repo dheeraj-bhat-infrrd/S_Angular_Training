@@ -838,6 +838,7 @@ input#find-pro-submit{
 .wc-review-table-cont{
 	max-height: 300px;
 	position: relative;
+	padding: 20px 0px;
 }
 
 span.txt-highlight {
