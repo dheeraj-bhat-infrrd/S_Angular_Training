@@ -1670,6 +1670,12 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 		}
 		LOG.info("Method to assignRegionToUser called for regionId : " + regionId + " and assigneeUser : " + assigneeUser.getUserId() + " isAdmin:"
 				+ isAdmin);
+		
+		List<UserProfile> userProfiles = assigneeUser.getUserProfiles();
+		if (userProfiles == null || userProfiles.isEmpty()) {
+			userProfiles = new ArrayList<UserProfile>();
+		}
+		
 		int profileMasterId = 0;
 		if (isAdmin) {
 			profileMasterId = CommonConstants.PROFILES_MASTER_REGION_ADMIN_PROFILE_ID;
@@ -1677,40 +1683,50 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 		else {
 			profileMasterId = CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID;
 		}
+		
 		LOG.debug("Fetching default branch for region : " + regionId);
 		Branch defaultBranch = getDefaultBranchForRegion(regionId);
 
-		UserProfile userProfile = userManagementService.createUserProfile(assigneeUser, adminUser.getCompany(), assigneeUser.getEmailId(),
+		UserProfile userProfileNew = userManagementService.createUserProfile(assigneeUser, adminUser.getCompany(), assigneeUser.getEmailId(),
 				assigneeUser.getUserId(), defaultBranch.getBranchId(), regionId, profileMasterId, CommonConstants.DASHBOARD_STAGE,
 				CommonConstants.STATUS_ACTIVE, String.valueOf(adminUser.getUserId()), String.valueOf(adminUser.getUserId()));
 
 		// check if user profile already exists
-		if (assigneeUser.getUserProfiles() != null && !assigneeUser.getUserProfiles().isEmpty()) {
-			for (UserProfile profile : assigneeUser.getUserProfiles()) {
-				if (profile.getRegionId() == userProfile.getRegionId() && profile.getBranchId() == userProfile.getBranchId()
-						&& profile.getProfilesMaster() == userProfile.getProfilesMaster() && profile.getStatus() == CommonConstants.STATUS_ACTIVE) {
+		int indexToRemove = -1;
+		if (userProfiles != null && !userProfiles.isEmpty()) {
+			for (UserProfile profile : userProfiles) {
+				if (profile.getRegionId() == userProfileNew.getRegionId() && profile.getBranchId() == userProfileNew.getBranchId()
+						&& profile.getProfilesMaster() == userProfileNew.getProfilesMaster() && profile.getStatus() == CommonConstants.STATUS_ACTIVE) {
 					throw new InvalidInputException(DisplayMessageConstants.USER_ASSIGNMENT_ALREADY_EXISTS);
+				}
+				
+				// Updating existing assignment
+				else if (profile.getRegionId() == userProfileNew.getRegionId() && profile.getBranchId() == userProfileNew.getBranchId()
+						&& profile.getProfilesMaster() == userProfileNew.getProfilesMaster()
+						&& profile.getStatus() == CommonConstants.STATUS_INACTIVE) {
+					indexToRemove = userProfiles.indexOf(profile);
+					profile.setStatus(CommonConstants.STATUS_ACTIVE);
+					userProfileNew = profile;
 				}
 			}
 		}
+		// Remove if the profile from list
+		if (indexToRemove != -1) {
+			userProfiles.remove(indexToRemove);
+		}
 
-		userProfileDao.save(userProfile);
-
+		userProfileDao.save(userProfileNew);
 		if (assigneeUser.getIsAtleastOneUserprofileComplete() == CommonConstants.STATUS_INACTIVE) {
 			LOG.debug("Updating isAtleastOneProfileComplete as active for user : " + assigneeUser.getUserId());
 			assigneeUser.setIsAtleastOneUserprofileComplete(CommonConstants.STATUS_ACTIVE);
 			userDao.update(assigneeUser);
 		}
+		
 		/**
 		 * add newly created user profile to the list of user profiles in user object
 		 */
-		List<UserProfile> userProfiles = assigneeUser.getUserProfiles();
-		if (userProfiles == null || userProfiles.isEmpty()) {
-			userProfiles = new ArrayList<UserProfile>();
-		}
-		userProfiles.add(userProfile);
+		userProfiles.add(userProfileNew);
 		assigneeUser.setUserProfiles(userProfiles);
-
 		userManagementService.setProfilesOfUser(assigneeUser);
 		
 		AgentSettings agentSettings = organizationUnitSettingsDao.fetchAgentSettingsById(assigneeUser.getUserId());
@@ -1797,6 +1813,12 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 		}
 		LOG.info("Method assignBranchToUser called for adminUser:" + adminUser + " branchId:" + branchId + " regionId" + regionId + "assigneeUser:"
 				+ assigneeUser + " isAdmin:" + isAdmin);
+		
+		List<UserProfile> userProfiles = assigneeUser.getUserProfiles();
+		if (userProfiles == null || userProfiles.isEmpty()) {
+			userProfiles = new ArrayList<UserProfile>();
+		}
+		
 		int profileMasterId = 0;
 		if (isAdmin) {
 			profileMasterId = CommonConstants.PROFILES_MASTER_BRANCH_ADMIN_PROFILE_ID;
@@ -1805,37 +1827,45 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 			profileMasterId = CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID;
 		}
 
-		UserProfile userProfile = userManagementService.createUserProfile(assigneeUser, adminUser.getCompany(), assigneeUser.getEmailId(),
+		UserProfile userProfileNew = userManagementService.createUserProfile(assigneeUser, adminUser.getCompany(), assigneeUser.getEmailId(),
 				assigneeUser.getUserId(), branchId, regionId, profileMasterId, CommonConstants.DASHBOARD_STAGE, CommonConstants.STATUS_ACTIVE,
 				String.valueOf(adminUser.getUserId()), String.valueOf(adminUser.getUserId()));
 
 		// check if user profile already exists
-		if (assigneeUser.getUserProfiles() != null && !assigneeUser.getUserProfiles().isEmpty()) {
-			for (UserProfile profile : assigneeUser.getUserProfiles()) {
-				if (profile.getBranchId() == userProfile.getBranchId() && profile.getProfilesMaster() == userProfile.getProfilesMaster()
+		int indexToRemove = -1;
+		if (userProfiles != null && !userProfiles.isEmpty()) {
+			for (UserProfile profile : userProfiles) {
+				if (profile.getBranchId() == userProfileNew.getBranchId() && profile.getProfilesMaster() == userProfileNew.getProfilesMaster()
 						&& profile.getStatus() == CommonConstants.STATUS_ACTIVE) {
 					throw new InvalidInputException(DisplayMessageConstants.USER_ASSIGNMENT_ALREADY_EXISTS);
 				}
+				
+				// Updating existing assignment
+				else if (profile.getBranchId() == userProfileNew.getBranchId() && profile.getProfilesMaster() == userProfileNew.getProfilesMaster()
+						&& profile.getStatus() == CommonConstants.STATUS_INACTIVE) {
+					indexToRemove = userProfiles.indexOf(profile);
+					profile.setStatus(CommonConstants.STATUS_ACTIVE);
+					userProfileNew = profile;
+				}
 			}
 		}
-
-		userProfileDao.save(userProfile);
+		// Remove if the profile from list
+		if (indexToRemove != -1) {
+			userProfiles.remove(indexToRemove);
+		}
+		userProfileDao.save(userProfileNew);
 
 		if (assigneeUser.getIsAtleastOneUserprofileComplete() == CommonConstants.STATUS_INACTIVE) {
 			LOG.debug("Updating isAtleastOneProfileComplete as active for user : " + assigneeUser.getUserId());
 			assigneeUser.setIsAtleastOneUserprofileComplete(CommonConstants.STATUS_ACTIVE);
 			userDao.update(assigneeUser);
 		}
+		
 		/**
 		 * add newly created user profile to the list of user profiles in user object
 		 */
-		List<UserProfile> userProfiles = assigneeUser.getUserProfiles();
-		if (userProfiles == null || userProfiles.isEmpty()) {
-			userProfiles = new ArrayList<UserProfile>();
-		}
-		userProfiles.add(userProfile);
+		userProfiles.add(userProfileNew);
 		assigneeUser.setUserProfiles(userProfiles);
-
 		userManagementService.setProfilesOfUser(assigneeUser);
 		
 		AgentSettings agentSettings = organizationUnitSettingsDao.fetchAgentSettingsById(assigneeUser.getUserId());
