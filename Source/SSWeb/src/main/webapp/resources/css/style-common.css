@@ -4935,7 +4935,36 @@ tr.v-tbl-header {
 }
 
 .v-tbl-row {
+	/* cursor: pointer; */
+}
+
+.branch-row, .region-row{
 	cursor: pointer;
+}
+
+.branch-row .v-line-brnch, .region-row .v-line-rgn{
+	background-image: url(../images/hm-arrow-closed.png);
+	background-position: 10px center;
+	background-repeat: no-repeat;
+}
+
+.branch-row[clicked="true"]  .v-line-brnch, .region-row[clicked="true"] .v-line-rgn{
+	background-image: url(../images/hm-arrow-open.png);
+}
+
+.bd-hr-item-l1>.bd-lt-l1, 
+.bd-hr-item-l2>.bd-lt-l2, 
+.bd-hr-item-l1>.bd-lt-l2 {
+	background-image: url(../images/hm-arrow-closed.png);
+	background-position: 5px center;
+	background-repeat: no-repeat;
+}
+
+.bd-hr-item-l1[data-openstatus="open"]>.bd-lt-l1,
+.bd-hr-item-l2[data-openstatus="open"]>.bd-lt-l2, 
+.bd-hr-item-l1[data-openstatus="open"]>.bd-lt-l2 {
+	background-image: url(../images/hm-arrow-open.png);
+	background-position: 3px center;
 }
 
 .v-hr-tbl tr.v-tbl-row td {
@@ -6663,4 +6692,8 @@ a.sq-btn-post-social:hover, a.sq-btn-post-social:visited {
 .agent-dropdown-item:hover {
     color:#fff;
     background-color: #5cc7ef;
+}
+
+.st-settings-text {
+	line-height: normal;
 }
