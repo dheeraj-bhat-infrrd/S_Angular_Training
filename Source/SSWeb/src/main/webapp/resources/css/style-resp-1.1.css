@@ -372,12 +372,12 @@
     .fp-inp{
     	width:150px;
     }
-    .hdr-logo{
-        width: 110px;
-        background: url(../images/ss-logo.png) no-repeat left center;
-        background-size: 90%;
-    }
-    .hdr-link-item{
+    .hdr-logo {
+		width: 100px;
+		background: url(../images/ss-logo.png) no-repeat left 28px;
+		background-size: 90%;
+	}
+	.hdr-link-item{
         padding: 0 6px;
         font-size: 13px;
     }
@@ -514,4 +514,7 @@
     .dash-btn-dl-sd *{
     	font-size: 11px;
     }
+    .user-info-logo, .hdr-logo {
+		width: 100px;
+	}
 }
