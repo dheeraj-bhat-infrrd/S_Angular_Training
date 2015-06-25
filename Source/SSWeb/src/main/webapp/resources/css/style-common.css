@@ -6671,10 +6671,10 @@ a.sq-btn-post-social:hover, a.sq-btn-post-social:visited {
 
 .agent-dropdown-wrapper {
     position: absolute;
-    top: 39px;
+    top: 40px;
     left: 5px;
     padding-right: 10px;
-    width: 100%;
+    width: 350px;
     z-index: 9;
 }
 
@@ -6696,4 +6696,27 @@ a.sq-btn-post-social:hover, a.sq-btn-post-social:visited {
 
 .st-settings-text {
 	line-height: normal;
+}
+
+.st-subject-cont {
+    margin: 0px 0 30px;
+    line-height: 40px;
+}
+
+.st-subject-label {
+    width: 25%;
+    font-size: 15px;
+}
+
+.st-subject-input-cont {
+    width: 75%;
+}
+
+.st-subject-input {
+    width: 250px;
+    height: 40px;
+    line-height: 20px;
+    padding: 10px;
+    border: 1px solid #dcdcdc;
+    border-radius: 3px;
 }
