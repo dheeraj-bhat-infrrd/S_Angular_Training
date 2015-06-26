@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import com.realtech.socialsurvey.core.enums.DisplayMessageType;
 import com.realtech.socialsurvey.core.exception.FatalException;
+import com.realtech.socialsurvey.core.exception.NoRecordsFetchedException;
 import com.realtech.socialsurvey.core.exception.UserSessionInvalidateException;
 import com.realtech.socialsurvey.core.utils.DisplayMessageConstants;
 import com.realtech.socialsurvey.core.utils.MessageUtils;
@@ -36,6 +37,12 @@ public class GlobalErrorController {
 	@ResponseStatus(value = HttpStatus.INTERNAL_SERVER_ERROR, reason = "Fatal Exception")
 	public void handleFatalException(FatalException fe) {
 		LOG.error("=====> FATAL ERROR: " + fe.getMessage(), fe);
+	}
+
+	@ExceptionHandler(NoRecordsFetchedException.class)
+	@ResponseStatus(value = HttpStatus.NOT_FOUND, reason = "Resource Not Found")
+	public void handleNotFound(NoRecordsFetchedException e) {
+		LOG.error("=====> RESOURCE NOT FOUND: " + e.getMessage(), e);
 	}
 
 	@ExceptionHandler(value = UserSessionInvalidateException.class)

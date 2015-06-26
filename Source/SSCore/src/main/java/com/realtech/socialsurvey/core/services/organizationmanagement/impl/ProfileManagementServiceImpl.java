@@ -1066,7 +1066,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 		}
 
 		User user = userDao.findById(User.class, agentSettings.getIden());
-		if(user.getStatus()!=CommonConstants.STATUS_ACTIVE){
+		if (user.getStatus() != CommonConstants.STATUS_ACTIVE) {
 			throw new NoRecordsFetchedException("No active agent found.");
 		}
 
