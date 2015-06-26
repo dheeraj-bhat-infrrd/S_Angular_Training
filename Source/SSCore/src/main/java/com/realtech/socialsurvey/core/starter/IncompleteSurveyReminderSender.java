@@ -29,19 +29,12 @@ public class IncompleteSurveyReminderSender extends QuartzJobBean {
 	public static final Logger LOG = LoggerFactory.getLogger(IncompleteSurveyReminderSender.class);
 
 	private SurveyHandler surveyHandler;
-
 	private EmailServices emailServices;
-
 	private UserManagementService userManagementService;
-
 	private OrganizationManagementService organizationManagementService;
-	
 	private SolrSearchService solrSearchService;
-	
 	private EmailFormatHelper emailFormatHelper;
-	
 	private String applicationBaseUrl;
-	
 	private String applicationLogoUrl;
 
 	@Override
@@ -51,20 +44,22 @@ public class IncompleteSurveyReminderSender extends QuartzJobBean {
 		initializeDependencies(jobExecutionContext.getMergedJobDataMap());
 		for (Company company : organizationManagementService.getAllCompanies()) {
 			List<SurveyPreInitiation> incompleteSurveyCustomers = surveyHandler.getIncompleteSurveyCustomersEmail(company.getCompanyId());
-//			List<Long> agents = new ArrayList<>();
-//			List<String> customers = new ArrayList<>();
+			// List<Long> agents = new ArrayList<>();
+			// List<String> customers = new ArrayList<>();
 			for (SurveyPreInitiation survey : incompleteSurveyCustomers) {
 				try {
 					sendEmail(emailServices, organizationManagementService, userManagementService, survey, company.getCompanyId());
 					surveyHandler.updateReminderCount(survey.getAgentId(), survey.getCustomerEmailId());
 				}
 				catch (InvalidInputException e) {
-					LOG.error("InvalidInputException caught in executeInternal() method of IncompleteSurveyReminderSender class. Nested exception is ", e);
+					LOG.error(
+							"InvalidInputException caught in executeInternal() method of IncompleteSurveyReminderSender class. Nested exception is ",
+							e);
 				}
-//				agents.add(survey.getAgentId());
-//				customers.add(survey.getCustomerEmailId());
+				// agents.add(survey.getAgentId());
+				// customers.add(survey.getCustomerEmailId());
 			}
-//			surveyHandler.updateReminderCount(agents, customers);
+			// surveyHandler.updateReminderCount(agents, customers);
 		}
 		LOG.info("Completed IncompleteSurveyReminderSender");
 	}
@@ -91,6 +86,7 @@ public class IncompleteSurveyReminderSender extends QuartzJobBean {
 		catch (NoRecordsFetchedException | SolrException e1) {
 			LOG.error("EXception caught in sendEmail(). Nested exception is ", e1);
 		}
+
 		String surveyLink = surveyHandler.composeLink(survey.getAgentId(), survey.getCustomerEmailId());
 		try {
 			companySettings = organizationManagementService.getCompanySettings(companyId);
@@ -114,21 +110,27 @@ public class IncompleteSurveyReminderSender extends QuartzJobBean {
 
 		User user = userManagementService.getUserByUserId(survey.getAgentId());
 		String companyName = user.getCompany().getCompany();
-		
+
 		// Null check
 		if (companySettings != null && companySettings.getMail_content() != null
 				&& companySettings.getMail_content().getTake_survey_reminder_mail() != null) {
 			MailContent mailContent = companySettings.getMail_content().getTake_survey_reminder_mail();
 			String mailBody = emailFormatHelper.replaceEmailBodyWithParams(mailContent.getMail_body(), mailContent.getParam_order());
-			
+			String agentSignature = emailFormatHelper.buildAgentSignature(agentPhone, agentTitle, companyName);
+
 			mailBody = mailBody.replaceAll("\\[LogoUrl\\]", applicationLogoUrl);
 			mailBody = mailBody.replaceAll("\\[BaseUrl\\]", applicationBaseUrl);
 			mailBody = mailBody.replaceAll("\\[AgentName\\]", agentName);
 			mailBody = mailBody.replaceAll("\\[Name\\]", survey.getCustomerFirstName() + " " + survey.getCustomerLastName());
 			mailBody = mailBody.replaceAll("\\[Link\\]", surveyLink);
-			String agentSignature = emailFormatHelper.buildAgentSignature(agentPhone, agentTitle, companyName);
 			mailBody = mailBody.replaceAll("\\[AgentSignature\\]", agentSignature);
+
 			String mailSubject = CommonConstants.REMINDER_MAIL_SUBJECT + agentName;
+			if (mailContent.getMail_subject() != null && !mailContent.getMail_subject().isEmpty()) {
+				mailSubject = mailContent.getMail_subject();
+				mailSubject = mailSubject.replaceAll("\\[AgentName\\]", agentName);
+			}
+
 			try {
 				emailServices.sendSurveyReminderMail(survey.getCustomerEmailId(), mailSubject, mailBody);
 			}
@@ -139,8 +141,8 @@ public class IncompleteSurveyReminderSender extends QuartzJobBean {
 		else {
 			try {
 				emailServices.sendDefaultSurveyReminderMail(survey.getCustomerEmailId(),
-						survey.getCustomerFirstName() + " " + survey.getCustomerLastName(), agentName, surveyLink, agentPhone,
-						agentTitle, companyName);
+						survey.getCustomerFirstName() + " " + survey.getCustomerLastName(), agentName, surveyLink, agentPhone, agentTitle,
+						companyName);
 			}
 			catch (InvalidInputException | UndeliveredEmailException e) {
 				LOG.error(
