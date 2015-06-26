@@ -224,6 +224,8 @@
 							&nbsp&nbsp&nbsp&nbsp[InitiatedDate] : Survey Initiated On,
 							&nbsp&nbsp&nbsp&nbsp[CurrentYear] : Current Year,
 							&nbsp&nbsp&nbsp&nbsp[FullAddress] : Address of SocialSurvey
+							<br />
+							&nbsp&nbsp&nbsp&nbspNote: Only [AgentName] is allowed in Mail Subject
 						</div>
 						<div class="st-header-txt-lft-rt clearfix margin-top-25">
 							<div class="float-left st-header-txt-lft"><spring:message code="label.header.mailer.content.key" /></div>
@@ -249,7 +251,7 @@
 							<div class="st-subject-label float-left"><spring:message code="label.subject.mailer.text" /></div>
 							<div class="st-subject-input-cont float-left">
 								<input type="text" id="survey-mailcontent-subject" name="survey-mailcontent-subject"
-									class="st-subject-input" readonly>
+									class="st-subject-input" value="${surveymailsubject}" readonly>
 							</div>
 						</div>
 						<div class="st-header-txt-wrapper">
@@ -282,7 +284,7 @@
 							<div class="st-subject-label float-left"><spring:message code="label.subject.reminder.text" /></div>
 							<div class="st-subject-input-cont float-left">
 								<input type="text" id="survey-mailreminder-subject" name="survey-mailreminder-subject"
-									class="st-subject-input" readonly>
+									class="st-subject-input" value="${surveyremindermailsubject}" readonly>
 							</div>
 						</div>
 						<div class="st-header-txt-wrapper">

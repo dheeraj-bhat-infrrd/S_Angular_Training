@@ -714,7 +714,13 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean {
 			mailBody = mailBody.replaceAll("\\[FullAddress\\]", fullAddress);
 			mailBody = mailBody.replaceAll("null", "");
 
+			// Adding mail subject
 			String mailSubject = CommonConstants.SURVEY_MAIL_SUBJECT + agentName;
+			if (takeSurvey.getMail_subject() != null && !takeSurvey.getMail_subject().isEmpty()) {
+				mailSubject = takeSurvey.getMail_subject();
+				mailSubject = mailSubject.replaceAll("\\[AgentName\\]", agentName);
+			}
+			
 			try {
 				emailServices.sendSurveyInvitationMail(custEmail, mailSubject, mailBody, user.getEmailId(), user.getFirstName()
 						+ (user.getLastName() != null ? " " + user.getLastName() : ""));
@@ -788,6 +794,5 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean {
 		
 		LOG.debug("Method preInitiateSurvey() finished.");
 	}
-
 }
 // JIRA SS-119 by RM-05:EOC
