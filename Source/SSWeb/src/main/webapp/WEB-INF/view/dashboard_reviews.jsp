@@ -55,7 +55,6 @@
 		<div class="dash-lp-header" id="incomplete-survey-header"><spring:message code="label.noincompletesurveys.key" /></div>
 	</c:otherwise>
 </c:choose>
-<script src="${initParam.resourcesPath}/resources/js/timezones.js"></script>
 <script>
 $(document).ready(function(){
 	$('.ppl-head-2').each(function(index, currentElement) {
