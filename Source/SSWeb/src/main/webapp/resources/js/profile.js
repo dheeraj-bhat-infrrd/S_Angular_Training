@@ -1265,11 +1265,11 @@ $('body').on("click",".comp-region",function(){
 
 function constructDate(dateStr) {
 	var dateDisplay = "";
-	if (typeof dateStr[0] != 'undefined' && typeof dateStr[1] != 'undefined') {
+	if (typeof dateStr[0] != 'undefined' && dateStr[0] != '0' && typeof dateStr[1] != 'undefined'  && dateStr[1] != '0') {
 		dateDisplay = monthNames[dateStr[0] - 1] + " " + dateStr[1];
-	} else if (typeof dateStr[0] != 'undefined') {
+	} else if (typeof dateStr[0] != 'undefined' && dateStr[0] != '0') {
 		dateDisplay = monthNames[dateStr[0] - 1];
-	} else if (typeof dateStr[1] != 'undefined') {
+	} else if (typeof dateStr[1] != 'undefined'  && dateStr[1] != '0') {
 		dateDisplay = dateStr[1];
 	}
 	
