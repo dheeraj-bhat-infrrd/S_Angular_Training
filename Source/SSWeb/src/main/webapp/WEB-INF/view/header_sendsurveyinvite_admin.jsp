@@ -101,6 +101,7 @@ $(document).ready(function(){
 	}
 	
 	function appendAgentDropDown(data, element, columnName) {
+		$('.agent-dropdown-wrapper').remove();
 		var htmlData = '<div class="agent-dropdown-wrapper">';
 		htmlData += '<div class="agent-dropdown-cont">';
 		for (var index = 0; index < data.length; index++) {
