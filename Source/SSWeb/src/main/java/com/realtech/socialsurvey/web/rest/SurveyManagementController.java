@@ -425,6 +425,7 @@ public class SurveyManagementController {
 			if (urlParams != null) {
 				long agentId = Long.parseLong(urlParams.get(CommonConstants.AGENT_ID_COLUMN));
 				String customerEmail = urlParams.get(CommonConstants.CUSTOMER_EMAIL_COLUMN);
+				
 				SurveyPreInitiation surveyPreInitiation = surveyHandler.getPreInitiatedSurvey(agentId, customerEmail);
 				if (surveyPreInitiation == null) {
 					surveyAndStage = getSurvey(agentId, urlParams.get(CommonConstants.CUSTOMER_EMAIL_COLUMN), null, null, 0, null,
@@ -436,6 +437,13 @@ public class SurveyManagementController {
 							surveyPreInitiation.getReminderCounts(), surveyPreInitiation.getCustomerInteractionDetails(),
 							surveyHandler.composeLink(agentId, customerEmail));
 					surveyHandler.markSurveyAsStarted(surveyPreInitiation);
+				}
+				
+				// fetching company logo
+				User user = userManagementService.getUserByUserId(agentId);
+				OrganizationUnitSettings companySettings = organizationManagementService.getCompanySettings(user);
+				if (companySettings != null && companySettings.getLogo() != null){
+					surveyAndStage.put("companyLogo", companySettings.getLogo());
 				}
 			}
 		}

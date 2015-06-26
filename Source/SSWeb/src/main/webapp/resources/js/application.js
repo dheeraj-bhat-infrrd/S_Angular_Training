@@ -97,6 +97,7 @@ var yelpEnabled;
 var googleEnabled;
 var agentProfileLink;
 var agentFullProfileLink;
+var companyLogo;
 $(document).on('click', '.icn-plus-open', function() {
 	$(this).hide();
 	$(this).parent().find('.ppl-share-social,.icn-remove').show();
@@ -3835,6 +3836,29 @@ function saveUserAssignmentCallBack(data) {
 	displayMessage(data);
 }
 
+// remove user
+$(document).on('click', '.v-icn-rem-user', function() {
+	if ($(this).hasClass('v-tbl-icn-disabled')) {
+		return;
+	}
+
+	var userId = $(this).parent().find('.fetch-name').attr('data-user-id');
+    var adminId = '${user.userId}';
+    confirmDeleteUser(userId, adminId);
+});
+
+// resend verification mail
+$(document).on('click', '.v-icn-fmail', function() {
+	if ($(this).hasClass('v-tbl-icn-disabled')) {
+		return;
+	}
+
+	var firstName = $(this).parent().find('.fetch-name').attr('data-first-name');
+    var lastName = $(this).parent().find('.fetch-name').attr('data-last-name');
+    var emailId = $(this).parent().find('.fetch-email').html();
+    reinviteUser(firstName, lastName, emailId);
+});
+
 /**
  * Method to send invite link
  */
@@ -4433,6 +4457,7 @@ function paintSurveyPage(jsonData) {
 	googleEnabled = Boolean(jsonData.responseJSON.googleEnabled);
 	agentProfileLink = jsonData.responseJSON.agentProfileLink;
 	agentFullProfileLink = jsonData.responseJSON.agentFullProfileLink;
+	companyLogo = jsonData.responseJSON.companyLogo;
 	
 	if (stage != undefined)
 		qno = stage;
@@ -4536,6 +4561,13 @@ function paintSurveyPageFromJson() {
 		$("#skip-ques-mcq").hide();
 	}
 	$(".sq-main-txt").html("Survey for " + agentName);
+	
+	if (companyLogo != undefined && companyLogo != "") {
+		var companylogoHtml = '<div class="float-left user-info-seperator"></div>';
+		companylogoHtml += '<div class="float-left user-info-logo" style="background: url('
+			+ companyLogo + ') no-repeat center; background-size: 100% auto;"></div>';
+		$('#header-user-info').html(companylogoHtml);
+	}
 }
 
 function togglePrevAndNext(){

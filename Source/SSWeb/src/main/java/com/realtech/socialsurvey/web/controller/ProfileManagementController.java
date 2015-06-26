@@ -314,7 +314,6 @@ public class ProfileManagementController {
 				lockSettings = updateLockSettings(lockSettings, parentLock, fieldId, fieldState);
 				lockSettings = profileManagementService.updateLockSettings(MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION,
 						branchSettings, lockSettings);
-				LOG.info(lockSettings.getIsDisplayNameLocked() + "");
 				branchSettings.setLockSettings(lockSettings);
 				userSettings.getBranchSettings().put(branchId, branchSettings);
 			}
@@ -344,11 +343,6 @@ public class ProfileManagementController {
 
 		// Checking if locked by parent, if not updating lock settings
 		switch (fieldId) {
-			case "prof-name-lock":
-				if (!parentLock.getIsDisplayNameLocked()) {
-					lockSettings.setDisplayNameLocked(status);
-				}
-				break;
 			case "prof-logo-lock":
 				if (!parentLock.getIsLogoLocked()) {
 					lockSettings.setLogoLocked(status);

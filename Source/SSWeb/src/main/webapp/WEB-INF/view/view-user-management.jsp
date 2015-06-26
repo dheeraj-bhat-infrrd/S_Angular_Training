@@ -77,29 +77,6 @@ $(document).ready(function() {
         $(this).parent().prev('.v-ed-txt-dd').val($(this).html());
         $(this).parent().slideToggle(200);
     });
-
-    // remove user
-    $(document).on('click', '.v-icn-rem-user', function(){
-    	if ($(this).hasClass('v-tbl-icn-disabled')) {
-    		return;
-    	}
-
-    	var userId = $(this).parent().find('.fetch-name').attr('data-user-id');
-        var adminId = '${user.userId}';
-        confirmDeleteUser(userId, adminId);
-    });
-
-    // resend verification mail
-    $(document).on('click', '.v-icn-fmail', function(){
-    	if ($(this).hasClass('v-tbl-icn-disabled')) {
-    		return;
-    	}
-
-    	var firstName = $(this).parent().find('.fetch-name').attr('data-first-name');
-        var lastName = $(this).parent().find('.fetch-name').attr('data-last-name');
-        var emailId = $(this).parent().find('.fetch-email').html();
-        reinviteUser(firstName, lastName, emailId);
-    });
 });
 </script>
 </body>
