@@ -225,7 +225,8 @@
 							&nbsp&nbsp&nbsp&nbsp[CurrentYear] : Current Year,
 							&nbsp&nbsp&nbsp&nbsp[FullAddress] : Address of SocialSurvey
 							<br />
-							&nbsp&nbsp&nbsp&nbspNote: Only [AgentName] is allowed in Mail Subject
+							<br />
+							Note: Only [AgentName] is allowed in Mail Subject
 						</div>
 						<div class="st-header-txt-lft-rt clearfix margin-top-25">
 							<div class="float-left st-header-txt-lft"><spring:message code="label.header.mailer.content.key" /></div>
