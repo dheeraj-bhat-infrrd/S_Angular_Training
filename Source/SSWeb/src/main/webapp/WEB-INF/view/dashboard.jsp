@@ -44,7 +44,7 @@
 				</div>
 				<div id="dsh-srch-survey-div" class="clearfix dash-sel-wrapper">
 					<div class="float-left dash-sel-lbl"><spring:message code="label.choose.key" /></div>
-					<div class="dsh-inp-wrapper">
+					<div class="dsh-inp-wrapper float-left">
 						<input id="dsh-sel-item" class="dash-sel-item" type="text" placeholder="<spring:message code="label.starttyping.key" />"
 							onkeyup="searchBranchRegionOrAgent(this.value, 'icons')">
 						<div id="dsh-srch-res"></div>
@@ -74,7 +74,7 @@
 				</div>
 				<div id="dsh-grph-srch-survey-div" class="clearfix dash-sel-wrapper">
 					<div class="float-left dash-sel-lbl"><spring:message code="label.choose.key" /></div>
-					<div class="dsh-inp-wrapper">
+					<div class="dsh-inp-wrapper float-left">
 						<input id="dsh-grph-sel-item" class="dash-sel-item" type="text" placeholder="<spring:message code="label.starttyping.key" />"
 							onkeyup="searchBranchRegionOrAgent(this.value, 'graph')">
 						<div id="dsh-grph-srch-res"></div>
@@ -145,39 +145,6 @@
 		</div>
 	</div>
 </div>
-
-<style>
-.dsh-dd-wrapper {
-	width: 300px;
-	background-color: #fff;
-	padding: 8px;
-	border: 1px solid #dcdcdc;
-}
-
-.dsh-rgn-brnch-agnt-list {
-	position: absolute;
-}
-
-.dsh-sb-dd {
-	position: absolute;
-  	background-color: white;
-  	top: 36px;
-  	width: 215px;
-  	right: 35px;
-  	display: block;
-  	border: 1px solid #dcdcdc;
-  	line-height: 32px;
-}
-
-.dsh-inp-wrapper {
-	position: relative;
-}
-
-.dsh-res-display {
-	padding: 0 10px;
-	cursor: pointer;
-}
-</style>
 <link rel="stylesheet" href="${initParam.resourcesPath}/resources/css/datepicker3.css">
 
 <script>

@@ -5101,11 +5101,11 @@ td.v-tbl-spacer {
 }
 
 .v-icn-close {
-	background: url('../images/close_hr.png') no-repeat center;
+	background: url('../images/delete.png') no-repeat center;
 }
 
 .v-icn-edit {
-	background: url('../images/edit_hr.png') no-repeat center;
+	background: url('../images/edit-1.png') no-repeat center;
 }
 
 .user-info-sing-out {
@@ -6719,4 +6719,34 @@ a.sq-btn-post-social:hover, a.sq-btn-post-social:visited {
     padding: 10px;
     border: 1px solid #dcdcdc;
     border-radius: 3px;
+}
+.dsh-dd-wrapper {
+	width: 300px;
+	background-color: #fff;
+	padding: 8px;
+	border: 1px solid #dcdcdc;
+}
+
+.dsh-rgn-brnch-agnt-list {
+	position: absolute;
+}
+
+.dsh-sb-dd {
+	position: absolute;
+  	background-color: white;
+  	top: 36px;
+  	width: 215px;
+  	right: 35px;
+  	display: block;
+  	border: 1px solid #dcdcdc;
+  	line-height: 32px;
+}
+
+.dsh-inp-wrapper {
+	position: relative;
+}
+
+.dsh-res-display {
+	padding: 0 10px;
+	cursor: pointer;
 }

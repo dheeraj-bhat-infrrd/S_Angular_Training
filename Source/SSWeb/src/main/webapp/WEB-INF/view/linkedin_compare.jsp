@@ -190,6 +190,7 @@ $(document).ready(function() {
 	}
 	
 	$('#com-contactno').mask(phoneFormat, {'translation': {d: {pattern: /[0-9*]/}}});
+	currentPhoneRegEx = phoneFormat;
 	// update default image
 	if (profilemasterid == 4) {
 		$("#wc-photo-upload").addClass('dsh-pers-default-img');
@@ -227,6 +228,7 @@ $(document).ready(function() {
 			}
 			$('#com-contactno').unmask();
 			phoneFormat = phoneFormatList[ui.item.code];
+			currentPhoneRegEx = phoneFormat;
 			$('#com-contactno').mask(phoneFormat, {'translation': {d: {pattern: /[0-9*]/}}});
 			return false;
 		},
@@ -343,7 +345,9 @@ $(document).on('click', '#wc-address-submit', function() {
 			"country" : $('#com-country').val(),
 			"countrycode" : $('#country-code').val(),
 			"zipcode" : $('#com-zipcode').val(),
-			"contactno" : $('#com-contactno').val()
+			"contactno" : $('#com-contactno').val(),
+			"state" : $('select[name="state"]').val(),
+			"city" : $('input[name="city"]').val()
 		};
 		callAjaxPostWithPayloadData("./editcompanyinformation.do", function(data) {
 			$('#message-header').html(data);
