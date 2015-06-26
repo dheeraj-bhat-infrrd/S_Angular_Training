@@ -1400,7 +1400,7 @@ public class UserManagementController {
 			User invitedUser = userManagementService.getUserByEmail(emailId);
 			String profileName = userManagementService.getUserSettings(invitedUser.getUserId()).getProfileName();
 			userManagementService.sendRegistrationCompletionLink(emailId, firstName, lastName, user.getCompany().getCompanyId(), profileName,
-					user.getLoginName());
+					invitedUser.getLoginName());
 
 			message = messageUtils.getDisplayMessage(DisplayMessageConstants.INVITATION_RESEND_SUCCESSFUL, DisplayMessageType.SUCCESS_MESSAGE)
 					.getMessage();

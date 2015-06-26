@@ -56,7 +56,7 @@ function landingFlow() {
 		parent.next('.welcome-popup-wrapper').show();
 	});
 
-	$('body').on('click', '.wc-final-skip, .wc-final-submit', function(){
+	$('body').on('click', '.wc-final-skip', function(){
 		loadDisplayPicture();
 		$(this).closest('.overlay-login').hide();
 		showDisplayPic();
