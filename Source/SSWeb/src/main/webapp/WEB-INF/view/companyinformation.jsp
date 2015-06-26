@@ -207,6 +207,8 @@ $(document).ready(function() {
 		phoneFormat = $('#com-phone-format').val();
 	}
 	
+	currentPhoneRegEx = phoneFormat; 
+	
 	$('#com-contactno').mask(phoneFormat, {'translation': {d: {pattern: /[0-9*]/}}});
 	
 	if ($('#com-country').val() != "" && $('#country-code').val() != "") {
@@ -214,7 +216,7 @@ $(document).ready(function() {
 		for (var i = 0; i < postCodeRegex.length; i++) {
 			if (postCodeRegex[i].code == countryCode) {
 				selectedCountryRegEx = "^" + postCodeRegex[i].regex + "$";
-				selectedCountryRegEx = new RegExp(selectedCountryRegEx);
+				selectedCountryRegEx = new RegExp(selectedCountryRegEx);					
 				break;
 			}
 		}
@@ -260,6 +262,7 @@ $(document).ready(function() {
 			
 			$('#com-contactno').unmask();
 			phoneFormat = phoneFormatList[ui.item.code];
+			currentPhoneRegEx = phoneFormat;
 			$('#com-contactno').mask(phoneFormat, {'translation': {d: {pattern: /[0-9*]/}}});
 			
 			return false;

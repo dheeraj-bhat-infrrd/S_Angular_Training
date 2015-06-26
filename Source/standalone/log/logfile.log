@@ -1,0 +1,140 @@
+15:08:31.804 [main] INFO  c.r.s.core.commons.InitializeJNDI - Initializing JNDI
+15:08:31.866 [main] INFO  c.r.s.core.commons.InitializeJNDI - JNDI initialized
+15:08:33.318 [main] INFO  c.r.s.c.s.mq.impl.KafkaProducerImpl - Setting producers for topics
+15:08:33.319 [main] DEBUG c.r.s.c.s.mq.impl.KafkaProducerImpl - Setting producer config for eamil topic
+15:08:33.785 [main] DEBUG c.r.s.c.s.mq.impl.KafkaProducerImpl - Setting producer config for eamil topic completed
+15:08:33.785 [main] INFO  c.r.s.c.s.mq.impl.KafkaProducerImpl - Setting producers for topics completed
+15:08:33.801 [main] INFO  c.r.s.c.s.m.i.SendGridEmailSenderImpl - Settings Up sendGrid gateway
+15:08:33.801 [main] INFO  c.r.s.c.s.m.i.SendGridEmailSenderImpl - Initialising Sendgrid gateway with bhumikamishra and socialsurvey360!
+15:08:34.066 [main] INFO  c.r.s.c.s.m.i.SendGridEmailSenderImpl - Sendgrid gateway initialised!
+15:08:34.160 [main] INFO  c.r.s.c.s.mq.impl.KafkaProducerImpl - Closing the producers
+15:08:34.768 [main] INFO  c.r.s.c.s.mq.impl.KafkaProducerImpl - Setting producers for topics
+15:08:34.768 [main] DEBUG c.r.s.c.s.mq.impl.KafkaProducerImpl - Setting producer config for eamil topic
+15:08:34.770 [main] DEBUG c.r.s.c.s.mq.impl.KafkaProducerImpl - Setting producer config for eamil topic completed
+15:08:34.771 [main] INFO  c.r.s.c.s.mq.impl.KafkaProducerImpl - Setting producers for topics completed
+15:08:34.788 [main] INFO  c.r.s.c.s.m.i.SendGridEmailSenderImpl - Settings Up sendGrid gateway
+15:08:34.788 [main] INFO  c.r.s.c.s.m.i.SendGridEmailSenderImpl - Initialising Sendgrid gateway with bhumikamishra and socialsurvey360!
+15:08:34.806 [main] INFO  c.r.s.c.s.m.i.SendGridEmailSenderImpl - Sendgrid gateway initialised!
+15:08:34.842 [main] INFO  c.r.s.c.s.mq.impl.KafkaProducerImpl - Closing the producers
+15:08:35.305 [main] INFO  c.r.s.c.s.mq.impl.KafkaProducerImpl - Setting producers for topics
+15:08:35.305 [main] DEBUG c.r.s.c.s.mq.impl.KafkaProducerImpl - Setting producer config for eamil topic
+15:08:35.321 [main] DEBUG c.r.s.c.s.mq.impl.KafkaProducerImpl - Setting producer config for eamil topic completed
+15:08:35.321 [main] INFO  c.r.s.c.s.mq.impl.KafkaProducerImpl - Setting producers for topics completed
+15:08:35.321 [main] INFO  c.r.s.c.s.m.i.SendGridEmailSenderImpl - Settings Up sendGrid gateway
+15:08:35.321 [main] INFO  c.r.s.c.s.m.i.SendGridEmailSenderImpl - Initialising Sendgrid gateway with bhumikamishra and socialsurvey360!
+15:08:35.336 [main] INFO  c.r.s.c.s.m.i.SendGridEmailSenderImpl - Sendgrid gateway initialised!
+15:08:35.352 [main] INFO  c.r.s.c.s.mq.impl.KafkaProducerImpl - Closing the producers
+15:08:35.711 [main] INFO  c.r.s.c.s.mq.impl.KafkaProducerImpl - Setting producers for topics
+15:08:35.711 [main] DEBUG c.r.s.c.s.mq.impl.KafkaProducerImpl - Setting producer config for eamil topic
+15:08:35.711 [main] DEBUG c.r.s.c.s.mq.impl.KafkaProducerImpl - Setting producer config for eamil topic completed
+15:08:35.711 [main] INFO  c.r.s.c.s.mq.impl.KafkaProducerImpl - Setting producers for topics completed
+15:08:35.727 [main] INFO  c.r.s.c.s.m.i.SendGridEmailSenderImpl - Settings Up sendGrid gateway
+15:08:35.727 [main] INFO  c.r.s.c.s.m.i.SendGridEmailSenderImpl - Initialising Sendgrid gateway with bhumikamishra and socialsurvey360!
+15:08:35.743 [main] INFO  c.r.s.c.s.m.i.SendGridEmailSenderImpl - Sendgrid gateway initialised!
+15:08:35.758 [main] INFO  c.r.s.c.s.mq.impl.KafkaProducerImpl - Closing the producers
+15:08:36.058 [main] INFO  c.r.s.c.s.mq.impl.KafkaProducerImpl - Setting producers for topics
+15:08:36.058 [main] DEBUG c.r.s.c.s.mq.impl.KafkaProducerImpl - Setting producer config for eamil topic
+15:08:36.058 [main] DEBUG c.r.s.c.s.mq.impl.KafkaProducerImpl - Setting producer config for eamil topic completed
+15:08:36.058 [main] INFO  c.r.s.c.s.mq.impl.KafkaProducerImpl - Setting producers for topics completed
+15:08:36.058 [main] INFO  c.r.s.c.s.m.i.SendGridEmailSenderImpl - Settings Up sendGrid gateway
+15:08:36.058 [main] INFO  c.r.s.c.s.m.i.SendGridEmailSenderImpl - Initialising Sendgrid gateway with bhumikamishra and socialsurvey360!
+15:08:36.073 [main] INFO  c.r.s.c.s.m.i.SendGridEmailSenderImpl - Sendgrid gateway initialised!
+15:08:36.089 [main] INFO  c.r.s.c.s.mq.impl.KafkaProducerImpl - Closing the producers
+15:08:36.386 [main] INFO  c.r.s.c.s.mq.impl.KafkaProducerImpl - Setting producers for topics
+15:08:36.386 [main] DEBUG c.r.s.c.s.mq.impl.KafkaProducerImpl - Setting producer config for eamil topic
+15:08:36.386 [main] DEBUG c.r.s.c.s.mq.impl.KafkaProducerImpl - Setting producer config for eamil topic completed
+15:08:36.386 [main] INFO  c.r.s.c.s.mq.impl.KafkaProducerImpl - Setting producers for topics completed
+15:08:36.401 [main] INFO  c.r.s.c.s.m.i.SendGridEmailSenderImpl - Settings Up sendGrid gateway
+15:08:36.401 [main] INFO  c.r.s.c.s.m.i.SendGridEmailSenderImpl - Initialising Sendgrid gateway with bhumikamishra and socialsurvey360!
+15:08:36.417 [main] INFO  c.r.s.c.s.m.i.SendGridEmailSenderImpl - Sendgrid gateway initialised!
+15:08:36.433 [main] INFO  c.r.s.c.s.mq.impl.KafkaProducerImpl - Closing the producers
+15:08:36.730 [main] INFO  c.r.s.c.s.mq.impl.KafkaProducerImpl - Setting producers for topics
+15:08:36.730 [main] DEBUG c.r.s.c.s.mq.impl.KafkaProducerImpl - Setting producer config for eamil topic
+15:08:36.730 [main] DEBUG c.r.s.c.s.mq.impl.KafkaProducerImpl - Setting producer config for eamil topic completed
+15:08:36.730 [main] INFO  c.r.s.c.s.mq.impl.KafkaProducerImpl - Setting producers for topics completed
+15:08:36.730 [main] INFO  c.r.s.c.s.m.i.SendGridEmailSenderImpl - Settings Up sendGrid gateway
+15:08:36.730 [main] INFO  c.r.s.c.s.m.i.SendGridEmailSenderImpl - Initialising Sendgrid gateway with bhumikamishra and socialsurvey360!
+15:08:36.745 [main] INFO  c.r.s.c.s.m.i.SendGridEmailSenderImpl - Sendgrid gateway initialised!
+15:08:36.776 [main] INFO  c.r.s.c.s.mq.impl.KafkaProducerImpl - Closing the producers
+15:08:37.123 [main] INFO  c.r.s.c.s.mq.impl.KafkaProducerImpl - Setting producers for topics
+15:08:37.123 [main] DEBUG c.r.s.c.s.mq.impl.KafkaProducerImpl - Setting producer config for eamil topic
+15:08:37.123 [main] DEBUG c.r.s.c.s.mq.impl.KafkaProducerImpl - Setting producer config for eamil topic completed
+15:08:37.123 [main] INFO  c.r.s.c.s.mq.impl.KafkaProducerImpl - Setting producers for topics completed
+15:08:37.139 [main] INFO  c.r.s.c.s.m.i.SendGridEmailSenderImpl - Settings Up sendGrid gateway
+15:08:37.139 [main] INFO  c.r.s.c.s.m.i.SendGridEmailSenderImpl - Initialising Sendgrid gateway with bhumikamishra and socialsurvey360!
+15:08:37.154 [main] INFO  c.r.s.c.s.m.i.SendGridEmailSenderImpl - Sendgrid gateway initialised!
+15:08:37.170 [main] INFO  c.r.s.c.s.mq.impl.KafkaProducerImpl - Closing the producers
+15:08:37.483 [main] INFO  c.r.s.c.s.mq.impl.KafkaProducerImpl - Setting producers for topics
+15:08:37.483 [main] DEBUG c.r.s.c.s.mq.impl.KafkaProducerImpl - Setting producer config for eamil topic
+15:08:37.483 [main] DEBUG c.r.s.c.s.mq.impl.KafkaProducerImpl - Setting producer config for eamil topic completed
+15:08:37.483 [main] INFO  c.r.s.c.s.mq.impl.KafkaProducerImpl - Setting producers for topics completed
+15:08:37.483 [main] INFO  c.r.s.c.s.m.i.SendGridEmailSenderImpl - Settings Up sendGrid gateway
+15:08:37.483 [main] INFO  c.r.s.c.s.m.i.SendGridEmailSenderImpl - Initialising Sendgrid gateway with bhumikamishra and socialsurvey360!
+15:08:37.498 [main] INFO  c.r.s.c.s.m.i.SendGridEmailSenderImpl - Sendgrid gateway initialised!
+15:08:37.514 [main] INFO  c.r.s.c.s.mq.impl.KafkaProducerImpl - Closing the producers
+15:08:37.764 [main] INFO  c.r.s.c.s.mq.impl.KafkaProducerImpl - Setting producers for topics
+15:08:37.764 [main] DEBUG c.r.s.c.s.mq.impl.KafkaProducerImpl - Setting producer config for eamil topic
+15:08:37.764 [main] DEBUG c.r.s.c.s.mq.impl.KafkaProducerImpl - Setting producer config for eamil topic completed
+15:08:37.764 [main] INFO  c.r.s.c.s.mq.impl.KafkaProducerImpl - Setting producers for topics completed
+15:08:37.764 [main] INFO  c.r.s.c.s.m.i.SendGridEmailSenderImpl - Settings Up sendGrid gateway
+15:08:37.764 [main] INFO  c.r.s.c.s.m.i.SendGridEmailSenderImpl - Initialising Sendgrid gateway with bhumikamishra and socialsurvey360!
+15:08:37.780 [main] INFO  c.r.s.c.s.m.i.SendGridEmailSenderImpl - Sendgrid gateway initialised!
+15:08:37.785 [main] INFO  c.r.s.c.s.mq.impl.KafkaProducerImpl - Closing the producers
+15:08:38.003 [main] INFO  c.r.s.c.s.mq.impl.KafkaProducerImpl - Setting producers for topics
+15:08:38.003 [main] DEBUG c.r.s.c.s.mq.impl.KafkaProducerImpl - Setting producer config for eamil topic
+15:08:38.003 [main] DEBUG c.r.s.c.s.mq.impl.KafkaProducerImpl - Setting producer config for eamil topic completed
+15:08:38.003 [main] INFO  c.r.s.c.s.mq.impl.KafkaProducerImpl - Setting producers for topics completed
+15:08:38.003 [main] INFO  c.r.s.c.s.m.i.SendGridEmailSenderImpl - Settings Up sendGrid gateway
+15:08:38.003 [main] INFO  c.r.s.c.s.m.i.SendGridEmailSenderImpl - Initialising Sendgrid gateway with bhumikamishra and socialsurvey360!
+15:08:38.019 [main] INFO  c.r.s.c.s.m.i.SendGridEmailSenderImpl - Sendgrid gateway initialised!
+15:08:38.019 [main] INFO  c.r.s.c.s.mq.impl.KafkaProducerImpl - Closing the producers
+15:08:38.269 [main] INFO  c.r.s.c.s.mq.impl.KafkaProducerImpl - Setting producers for topics
+15:08:38.269 [main] DEBUG c.r.s.c.s.mq.impl.KafkaProducerImpl - Setting producer config for eamil topic
+15:08:38.269 [main] DEBUG c.r.s.c.s.mq.impl.KafkaProducerImpl - Setting producer config for eamil topic completed
+15:08:38.269 [main] INFO  c.r.s.c.s.mq.impl.KafkaProducerImpl - Setting producers for topics completed
+15:08:38.269 [main] INFO  c.r.s.c.s.m.i.SendGridEmailSenderImpl - Settings Up sendGrid gateway
+15:08:38.269 [main] INFO  c.r.s.c.s.m.i.SendGridEmailSenderImpl - Initialising Sendgrid gateway with bhumikamishra and socialsurvey360!
+15:08:38.285 [main] INFO  c.r.s.c.s.m.i.SendGridEmailSenderImpl - Sendgrid gateway initialised!
+15:08:38.300 [main] INFO  c.r.s.c.s.mq.impl.KafkaProducerImpl - Closing the producers
+15:08:38.540 [main] INFO  c.r.s.c.s.mq.impl.KafkaProducerImpl - Setting producers for topics
+15:08:38.540 [main] DEBUG c.r.s.c.s.mq.impl.KafkaProducerImpl - Setting producer config for eamil topic
+15:08:38.556 [main] DEBUG c.r.s.c.s.mq.impl.KafkaProducerImpl - Setting producer config for eamil topic completed
+15:08:38.556 [main] INFO  c.r.s.c.s.mq.impl.KafkaProducerImpl - Setting producers for topics completed
+15:08:38.556 [main] INFO  c.r.s.c.s.m.i.SendGridEmailSenderImpl - Settings Up sendGrid gateway
+15:08:38.556 [main] INFO  c.r.s.c.s.m.i.SendGridEmailSenderImpl - Initialising Sendgrid gateway with bhumikamishra and socialsurvey360!
+15:08:38.556 [main] INFO  c.r.s.c.s.m.i.SendGridEmailSenderImpl - Sendgrid gateway initialised!
+15:08:38.571 [main] INFO  c.r.s.c.s.mq.impl.KafkaProducerImpl - Closing the producers
+15:08:38.774 [main] INFO  c.r.s.c.s.mq.impl.KafkaProducerImpl - Setting producers for topics
+15:08:38.774 [main] DEBUG c.r.s.c.s.mq.impl.KafkaProducerImpl - Setting producer config for eamil topic
+15:08:38.774 [main] DEBUG c.r.s.c.s.mq.impl.KafkaProducerImpl - Setting producer config for eamil topic completed
+15:08:38.774 [main] INFO  c.r.s.c.s.mq.impl.KafkaProducerImpl - Setting producers for topics completed
+15:08:38.774 [main] INFO  c.r.s.c.s.m.i.SendGridEmailSenderImpl - Settings Up sendGrid gateway
+15:08:38.774 [main] INFO  c.r.s.c.s.m.i.SendGridEmailSenderImpl - Initialising Sendgrid gateway with bhumikamishra and socialsurvey360!
+15:08:38.791 [main] INFO  c.r.s.c.s.m.i.SendGridEmailSenderImpl - Sendgrid gateway initialised!
+15:08:38.791 [main] INFO  c.r.s.c.s.mq.impl.KafkaProducerImpl - Closing the producers
+15:08:38.807 [main] ERROR c.r.s.c.s.g.impl.UrlGeneratorImpl - Null parameter passed as first argument to encryptAES of EncryptionHelper!
+15:08:38.807 [main] INFO  c.r.s.c.s.g.impl.UrlGeneratorImpl - encryptAES() input parameters : 8d0f69ecdc877159750932044ffb68762c7e1c869bc2aab6fd7b7dc9c8df673d 
+15:08:38.807 [main] INFO  c.r.s.c.s.g.impl.UrlGeneratorImpl -  hexStringToByteArray() : input parameter : 8d0f69ecdc877159750932044ffb68762c7e1c869bc2aab6fd7b7dc9c8df673d
+15:08:38.807 [main] INFO  c.r.s.c.s.g.impl.UrlGeneratorImpl -  hexStringToByteArray() : output : [B@52d799b
+15:08:38.807 [main] INFO  c.r.s.c.s.g.impl.UrlGeneratorImpl - generateAES256Key() :  input parameter : 
+15:08:38.932 [main] INFO  c.r.s.c.s.g.impl.UrlGeneratorImpl - decryptAES() output : lname=Srivatsa&fname=Karthik
+15:08:38.947 [main] ERROR c.r.s.c.s.g.impl.UrlGeneratorImpl - Null parameter passed as first argument to encryptAES of EncryptionHelper!
+15:08:38.947 [main] ERROR c.r.s.c.s.g.impl.UrlGeneratorImpl - Null parameter passed to byteArrayToHexString of EncryptionHelper!
+15:08:38.947 [main] INFO  c.r.s.c.s.g.impl.UrlGeneratorImpl - encryptAES() input parameters : lname=Srivatsa&fname=Karthik 
+15:08:38.947 [main] INFO  c.r.s.c.s.g.impl.UrlGeneratorImpl - generateAES256Key() :  input parameter : 
+15:08:38.947 [main] INFO  c.r.s.c.s.g.impl.UrlGeneratorImpl - byteArrayToHexString() Output : 8d0f69ecdc877159750932044ffb68762c7e1c869bc2aab6fd7b7dc9c8df673d
+15:08:38.947 [main] INFO  c.r.s.c.s.g.impl.UrlGeneratorImpl - encryptAES() output : 8d0f69ecdc877159750932044ffb68762c7e1c869bc2aab6fd7b7dc9c8df673d
+15:08:38.947 [main] INFO  c.r.s.c.s.g.impl.UrlGeneratorImpl -  hexStringToByteArray() : input parameter : 8d0f69ecdc877159750932044ffb68762c7e1c869bc2aab6fd7b7dc9c8df673d
+15:08:38.947 [main] INFO  c.r.s.c.s.g.impl.UrlGeneratorImpl -  hexStringToByteArray() : output : [B@2298c2ad
+15:08:38.947 [main] INFO  c.r.s.c.s.g.impl.UrlGeneratorImpl - byteArrayToHexString() Output : 8d0f69ecdc877159750932044ffb68762c7e1c869bc2aab6fd7b7dc9c8df673d
+15:08:38.947 [main] ERROR c.r.s.c.s.g.impl.UrlGeneratorImpl - Null parameter passed to hexStringToByteArray of EncryptionHelper!
+15:08:38.947 [main] DEBUG c.r.s.c.s.g.impl.UrlGeneratorImpl - encryptSHA512 called
+15:08:38.947 [main] DEBUG c.r.s.c.s.g.impl.UrlGeneratorImpl - Method encryptSHA512Bytes called for plainText
+15:08:38.947 [main] DEBUG c.r.s.c.s.g.impl.UrlGeneratorImpl - Method encryptSHA512Bytes finished.Returning byte array
+15:08:38.947 [main] DEBUG c.r.s.c.s.g.impl.UrlGeneratorImpl - encryptSHA512 finished.Returning encrypted string
+15:08:38.947 [main] INFO  c.r.s.c.s.g.impl.UrlGeneratorImpl - byteArrayToHexString() Output : ee26b0dd4af7e749aa1a8ee3c10ae9923f618980772e473f8819a5d4940e0db27ac185f8a0e1d5f84f88bc887fd67b143732c304cc5fa9ad8e6f57f50028a8ff
+15:08:38.947 [main] ERROR c.r.s.c.s.g.impl.UrlGeneratorImpl - Null parameter passed as second argument encryptAES of EncryptionHelper!
+15:08:38.947 [main] INFO  c.r.s.c.s.g.impl.UrlGeneratorImpl -  hexStringToByteArray() : input parameter : 8d0f69ecdc877159750932044ffb68762c7e1c869bc2aab6fd7b7dc9c8df673d
+15:08:38.947 [main] INFO  c.r.s.c.s.g.impl.UrlGeneratorImpl -  hexStringToByteArray() : output : [B@d279be9
+15:08:38.947 [main] INFO  c.r.s.c.s.g.impl.UrlGeneratorImpl - byteArrayToHexString() Output : 8d0f69ecdc877159750932044ffb68762c7e1c869bc2aab6fd7b7dc9c8df673d
+15:08:38.963 [main] ERROR c.r.s.c.s.g.impl.UrlGeneratorImpl - Null parameter passed as second argument encryptAES of EncryptionHelper!
