@@ -147,7 +147,13 @@
         line-height: 50px;
         border-bottom: 1px solid #dcdcdc;
     }
-    .header-user-info, .hm-header-row-right{
+    /* .header-user-info {
+        display: none;
+    } */
+    #hdr-usr-img{
+        display: none;
+    }
+    .hm-header-row-right{
         display: none;
     }
     .header-menu-icn{
