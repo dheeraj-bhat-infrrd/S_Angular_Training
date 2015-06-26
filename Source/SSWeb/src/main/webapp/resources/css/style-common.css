@@ -5101,11 +5101,11 @@ td.v-tbl-spacer {
 }
 
 .v-icn-close {
-	background: url('../images/close_hr.png') no-repeat center;
+	background: url('../images/delete.png') no-repeat center;
 }
 
 .v-icn-edit {
-	background: url('../images/edit_hr.png') no-repeat center;
+	background: url('../images/edit-1.png') no-repeat center;
 }
 
 .user-info-sing-out {

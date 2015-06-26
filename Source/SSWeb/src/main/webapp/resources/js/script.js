@@ -16,6 +16,7 @@ var maxPwdLength = 15;
 var firstNamePatternRegex = /^[a-zA-Z]{2,}$/;
 var lastNamePatternRegEx = /^[a-zA-Z]{2,}$/;
 var pageInitialized = false;
+var currentPhoneRegEx; //Vary the phone regex according to masking
 
 function buildMessageDiv(){
 	if($('.err-nw-wrapper').length == 0){
@@ -383,10 +384,21 @@ function validateZipcode(elementId){
 	}
 }
 
+function escapeRegExp(str) {
+	return str.replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, "\\$&");
+}
+
 //Function to validate the phone number
 function validatePhoneNumber(elementId, isOnlyShowToast) {
+	var regExToTest = phoneRegex;
+	if(currentPhoneRegEx && currentPhoneRegEx != ""){
+		var regExToTestStr = currentPhoneRegEx;
+		regExToTestStr = escapeRegExp(currentPhoneRegEx);
+		regExToTestStr = regExToTestStr.replace(/d/g,'\\d');
+		regExToTest = new RegExp(regExToTestStr);
+	}
 	if ($('#' + elementId).val() != "") {
-		if (phoneRegex.test($('#' + elementId).val()) == true) {
+		if (regExToTest.test($('#' + elementId).val()) == true) {
 			return true;
 		} else {
 			var msg = 'Please enter a valid phone number';
@@ -703,7 +715,7 @@ function validateTextArea(elementId) {
 }
 
 function validateCountryZipcode(elementId, isOnlyShowToast) {
-	if(selectedCountryRegEx == ""){
+	if(selectedCountryRegEx == "" || selectedCountryRegEx == '/^$/'){
 		selectedCountryRegEx = ".*";
 		selectedCountryRegEx = new RegExp(selectedCountryRegEx);
 	}

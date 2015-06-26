@@ -1751,6 +1751,9 @@
     	padding: 0 5px 20px 5px;
     }
     .bd-hr-item {
+		padding-left: 15px;
+	}
+	.bd-hr-item.bd-lt-l3 {
 		padding-left: 5px;
 	}
 	.bd-hr-img{
