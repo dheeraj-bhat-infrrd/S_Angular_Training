@@ -1464,6 +1464,9 @@
 	.st-score-rt {
 		float: none !important;
 	}
+	.dsh-sb-dd {
+		right: 0;
+	}
 }
 
 
@@ -1764,6 +1767,10 @@
 	}
 	.hm-item-height-adj {
 		min-height: 50px;
+	}
+	.dsh-sb-dd {
+		width: 250px;
+		left: 10px;
 	}
 }
 
