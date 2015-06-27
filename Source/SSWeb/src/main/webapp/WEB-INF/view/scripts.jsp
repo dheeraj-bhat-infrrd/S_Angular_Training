@@ -2,6 +2,7 @@
 
 <script src="${initParam.resourcesPath}/resources/js/jquery-2.1.1.min.js"></script>
 <script src="//code.jquery.com/ui/1.11.2/jquery-ui.js"></script>
+<script src="${initParam.resourcesPath}/resources/js/jquery.mask.js"></script>
 <script src="${initParam.resourcesPath}/resources/js/perfect-scrollbar.jquery.min.js"></script>
 <script src="${initParam.resourcesPath}/resources/js/bootstrap.min.js"></script>
 <script src="${initParam.resourcesPath}/resources/js/jcrop.js"></script>
@@ -19,3 +20,5 @@
 <script src="${initParam.resourcesPath}/resources/js/countrydata.js"></script>
 <script src="${initParam.resourcesPath}/resources/js/zipcoderegex.js"></script>
 <script src="${initParam.resourcesPath}/resources/js/application.js"></script>
+<script src="${initParam.resourcesPath}/resources/js/phoneFormat.js"></script>
+<script src="${initParam.resourcesPath}/resources/js/timezones.js"></script>

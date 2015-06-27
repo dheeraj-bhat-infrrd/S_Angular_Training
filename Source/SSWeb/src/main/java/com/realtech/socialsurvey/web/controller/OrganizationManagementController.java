@@ -167,6 +167,7 @@ public class OrganizationManagementController {
 		String companyContactNo = request.getParameter("contactno");
 		String vertical = request.getParameter("vertical");
 		String phoneFormat = request.getParameter("phoneFormat");
+		String logoDecoyName = request.getParameter("logoDecoyName");
 		// JIRA SS-536: Added for manual registration via invitation
 		String strIsDirectRegistration = request.getParameter("isDirectRegistration");
 
@@ -192,6 +193,7 @@ public class OrganizationManagementController {
 					model.addAttribute("companyContactNo", companyContactNo);
 					model.addAttribute("phoneFormat", phoneFormat);
 					model.addAttribute("isDirectRegistration", strIsDirectRegistration);
+					model.addAttribute("logoDecoyName",logoDecoyName);
 				}
 				catch (InvalidInputException e1) {
 					throw new InvalidInputException("Invalid Input exception occured in method getAllVerticalsMaster()",
@@ -201,7 +203,7 @@ public class OrganizationManagementController {
 				throw new InvalidInputException("Invalid input exception occured while validating form parameters", e.getErrorCode(), e);
 			}
 
-			HttpSession session = request.getSession(false);
+			HttpSession session = request.getSession(true);
 			User user = sessionHelper.getCurrentUser();
 			String logoName = null;
 			if (session.getAttribute(CommonConstants.LOGO_NAME) != null) {
@@ -468,7 +470,10 @@ public class OrganizationManagementController {
 				model.addAttribute("googleLink", unitSettings.getSocialMediaTokens().getGoogleToken().getProfileLink());
 			}
 		}
-
+		model.addAttribute("autoPostEnabled", false);
+		if (unitSettings != null && unitSettings.getSurvey_settings() != null) {
+			model.addAttribute("autoPostEnabled", unitSettings.getSurvey_settings().isAutoPostEnabled());
+		}
 		session.setAttribute(CommonConstants.USER_ACCOUNT_SETTINGS, unitSettings);
 		return JspResolver.EDIT_SETTINGS;
 	}
@@ -641,7 +646,6 @@ public class OrganizationManagementController {
 		String ratingCategory = request.getParameter("ratingcategory");
 		String autopost = request.getParameter("autopost");
 		SurveySettings originalSurveySettings = null;
-		SurveySettings surveySettings = null;
 		String message = "";
 
 		try {
@@ -657,14 +661,9 @@ public class OrganizationManagementController {
 				}
 
 				originalSurveySettings = companySettings.getSurvey_settings();
-				surveySettings = new SurveySettings();
-				surveySettings.setAuto_post_score((float) autopostRating);
 				if (originalSurveySettings != null) {
-					surveySettings.setAutoPostEnabled(isAutopostEnabled);
-					surveySettings.setShow_survey_above_score(originalSurveySettings.getShow_survey_above_score());
-					surveySettings.setMax_number_of_survey_reminders(originalSurveySettings.getMax_number_of_survey_reminders());
-					surveySettings.setSurvey_reminder_interval_in_days(originalSurveySettings.getSurvey_reminder_interval_in_days());
-					surveySettings.setReminderDisabled(originalSurveySettings.getIsReminderDisabled());
+					originalSurveySettings.setAutoPostEnabled(isAutopostEnabled);
+					originalSurveySettings.setAuto_post_score((float) autopostRating);
 				}
 				LOG.info("Updating Survey Settings Post score");
 				message = messageUtils.getDisplayMessage(DisplayMessageConstants.SURVEY_AUTO_POST_SCORE_UPDATE_SUCCESSFUL,
@@ -679,22 +678,17 @@ public class OrganizationManagementController {
 				}
 
 				originalSurveySettings = companySettings.getSurvey_settings();
-				surveySettings = new SurveySettings();
-				surveySettings.setShow_survey_above_score((float) minPostRating);
 				if (originalSurveySettings != null) {
-					surveySettings.setAutoPostEnabled(isAutopostEnabled);
-					surveySettings.setAuto_post_score(originalSurveySettings.getAuto_post_score());
-					surveySettings.setMax_number_of_survey_reminders(originalSurveySettings.getMax_number_of_survey_reminders());
-					surveySettings.setSurvey_reminder_interval_in_days(originalSurveySettings.getSurvey_reminder_interval_in_days());
-					surveySettings.setReminderDisabled(originalSurveySettings.getIsReminderDisabled());
+					originalSurveySettings.setAutoPostEnabled(isAutopostEnabled);
+					originalSurveySettings.setShow_survey_above_score((float) minPostRating);
 				}
 				LOG.info("Updating Survey Settings Min score");
 				message = messageUtils.getDisplayMessage(DisplayMessageConstants.SURVEY_MIN_POST_SCORE_UPDATE_SUCCESSFUL,
 						DisplayMessageType.SUCCESS_MESSAGE).getMessage();
 			}
 
-			if (organizationManagementService.updateSurveySettings(companySettings, surveySettings)) {
-				companySettings.setSurvey_settings(surveySettings);
+			if (organizationManagementService.updateSurveySettings(companySettings, originalSurveySettings)) {
+				companySettings.setSurvey_settings(originalSurveySettings);
 				LOG.info("Updated Survey Settings");
 			}
 		}
@@ -748,7 +742,6 @@ public class OrganizationManagementController {
 		HttpSession session = request.getSession(false);
 		String mailCategory = request.getParameter("mailcategory");
 		SurveySettings originalSurveySettings = null;
-		SurveySettings surveySettings = null;
 		String message = "";
 
 		try {
@@ -763,13 +756,8 @@ public class OrganizationManagementController {
 				}
 
 				originalSurveySettings = companySettings.getSurvey_settings();
-				surveySettings = new SurveySettings();
-				surveySettings.setSurvey_reminder_interval_in_days(reminderInterval);
 				if (originalSurveySettings != null) {
-					surveySettings.setAuto_post_score(originalSurveySettings.getAuto_post_score());
-					surveySettings.setMax_number_of_survey_reminders(originalSurveySettings.getMax_number_of_survey_reminders());
-					surveySettings.setShow_survey_above_score(originalSurveySettings.getShow_survey_above_score());
-					surveySettings.setReminderDisabled(originalSurveySettings.getIsReminderDisabled());
+					originalSurveySettings.setSurvey_reminder_interval_in_days(reminderInterval);
 				}
 				LOG.info("Updating Survey Settings Reminder Interval");
 				message = messageUtils.getDisplayMessage(DisplayMessageConstants.SURVEY_REMINDER_INTERVAL_UPDATE_SUCCESSFUL,
@@ -780,21 +768,16 @@ public class OrganizationManagementController {
 				boolean isReminderDisabled = Boolean.parseBoolean(request.getParameter("reminder-needed-hidden"));
 
 				originalSurveySettings = companySettings.getSurvey_settings();
-				surveySettings = new SurveySettings();
-				surveySettings.setReminderDisabled(isReminderDisabled);
 				if (originalSurveySettings != null) {
-					surveySettings.setAuto_post_score(originalSurveySettings.getAuto_post_score());
-					surveySettings.setMax_number_of_survey_reminders(originalSurveySettings.getMax_number_of_survey_reminders());
-					surveySettings.setShow_survey_above_score(originalSurveySettings.getShow_survey_above_score());
-					surveySettings.setSurvey_reminder_interval_in_days(originalSurveySettings.getSurvey_reminder_interval_in_days());
+					originalSurveySettings.setReminderDisabled(isReminderDisabled);
 				}
 				LOG.info("Updating Survey Settings Reminder Needed");
 				message = messageUtils.getDisplayMessage(DisplayMessageConstants.SURVEY_REMINDER_ENABLED_UPDATE_SUCCESSFUL,
 						DisplayMessageType.SUCCESS_MESSAGE).getMessage();
 			}
 
-			if (organizationManagementService.updateSurveySettings(companySettings, surveySettings)) {
-				companySettings.setSurvey_settings(surveySettings);
+			if (organizationManagementService.updateSurveySettings(companySettings, originalSurveySettings)) {
+				companySettings.setSurvey_settings(originalSurveySettings);
 				LOG.info("Updated Survey Settings");
 			}
 		}
@@ -1163,7 +1146,7 @@ public class OrganizationManagementController {
 			model.addAttribute("showSendSurveyPopup", String.valueOf(showSendSurveyPopup));
 
 			// update the last login time and number of logins
-			userManagementService.updateUserLoginTimeAndNum(user);
+//			userManagementService.updateUserLoginTimeAndNum(user);
 		}
 		catch (NonFatalException e) {
 			LOG.error("NonfatalException while adding account type. Reason: " + e.getMessage(), e);

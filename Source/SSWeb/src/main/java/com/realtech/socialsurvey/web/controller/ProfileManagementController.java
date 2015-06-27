@@ -7,13 +7,16 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
 import javax.imageio.ImageIO;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import javax.ws.rs.QueryParam;
+
 import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrDocumentList;
 import org.slf4j.Logger;
@@ -27,7 +30,9 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
+
 import sun.misc.BASE64Decoder;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.type.TypeFactory;
 import com.google.gson.Gson;
@@ -43,6 +48,7 @@ import com.realtech.socialsurvey.core.entities.ContactNumberSettings;
 import com.realtech.socialsurvey.core.entities.DisplayMessage;
 import com.realtech.socialsurvey.core.entities.FacebookToken;
 import com.realtech.socialsurvey.core.entities.GoogleToken;
+import com.realtech.socialsurvey.core.entities.LendingTreeToken;
 import com.realtech.socialsurvey.core.entities.Licenses;
 import com.realtech.socialsurvey.core.entities.LinkedInToken;
 import com.realtech.socialsurvey.core.entities.LockSettings;
@@ -57,11 +63,13 @@ import com.realtech.socialsurvey.core.entities.SocialPost;
 import com.realtech.socialsurvey.core.entities.SurveyDetails;
 import com.realtech.socialsurvey.core.entities.TwitterToken;
 import com.realtech.socialsurvey.core.entities.User;
+import com.realtech.socialsurvey.core.entities.UserFromSearch;
 import com.realtech.socialsurvey.core.entities.UserListFromSearch;
 import com.realtech.socialsurvey.core.entities.UserProfile;
 import com.realtech.socialsurvey.core.entities.UserSettings;
 import com.realtech.socialsurvey.core.entities.WebAddressSettings;
 import com.realtech.socialsurvey.core.entities.YelpToken;
+import com.realtech.socialsurvey.core.entities.ZillowToken;
 import com.realtech.socialsurvey.core.enums.AccountType;
 import com.realtech.socialsurvey.core.enums.DisplayMessageType;
 import com.realtech.socialsurvey.core.exception.InternalServerException;
@@ -306,7 +314,6 @@ public class ProfileManagementController {
 				lockSettings = updateLockSettings(lockSettings, parentLock, fieldId, fieldState);
 				lockSettings = profileManagementService.updateLockSettings(MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION,
 						branchSettings, lockSettings);
-				LOG.info(lockSettings.getIsDisplayNameLocked() + "");
 				branchSettings.setLockSettings(lockSettings);
 				userSettings.getBranchSettings().put(branchId, branchSettings);
 			}
@@ -336,11 +343,6 @@ public class ProfileManagementController {
 
 		// Checking if locked by parent, if not updating lock settings
 		switch (fieldId) {
-			case "prof-name-lock":
-				if (!parentLock.getIsDisplayNameLocked()) {
-					lockSettings.setDisplayNameLocked(status);
-				}
-				break;
 			case "prof-logo-lock":
 				if (!parentLock.getIsLogoLocked()) {
 					lockSettings.setLogoLocked(status);
@@ -494,6 +496,7 @@ public class ProfileManagementController {
 		ContactDetailsSettings contactDetailsSettings = null;
 
 		try {
+			User user = sessionHelper.getCurrentUser();
 			UserSettings userSettings = (UserSettings) session.getAttribute(CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION);
 			OrganizationUnitSettings profileSettings = (OrganizationUnitSettings) session.getAttribute(CommonConstants.USER_PROFILE_SETTINGS);
 			UserProfile selectedProfile = (UserProfile) request.getSession(false).getAttribute(CommonConstants.USER_PROFILE);
@@ -504,6 +507,7 @@ public class ProfileManagementController {
 			// Get the profile address parameters
 			String name = request.getParameter("profName");
 			String title = request.getParameter("profTitle");
+			String vertical = request.getParameter("profVertical");
 			if (name == null || name.isEmpty()) {
 				throw new InvalidInputException("Name passed can not be null or empty", DisplayMessageConstants.GENERAL_ERROR);
 			}
@@ -519,6 +523,14 @@ public class ProfileManagementController {
 				contactDetailsSettings = profileManagementService.updateContactDetails(
 						MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION, companySettings, contactDetailsSettings);
 				companySettings.setContact_details(contactDetailsSettings);
+				
+				// update company name
+				profileManagementService.updateCompanyName(user.getUserId(), companySettings.getIden(), name);
+				
+				companySettings.setVertical(vertical);
+				profileManagementService.updateVertical(MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION, companySettings, vertical);
+				
+				
 				userSettings.setCompanySettings(companySettings);
 			}
 			else if (profilesMaster == CommonConstants.PROFILES_MASTER_REGION_ADMIN_PROFILE_ID) {
@@ -532,6 +544,10 @@ public class ProfileManagementController {
 				contactDetailsSettings = profileManagementService.updateContactDetails(
 						MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION, regionSettings, contactDetailsSettings);
 				regionSettings.setContact_details(contactDetailsSettings);
+				
+				regionSettings.setVertical(vertical);
+				profileManagementService.updateVertical(MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION, regionSettings, vertical);
+				
 				userSettings.getRegionSettings().put(regionId, regionSettings);
 			}
 			else if (profilesMaster == CommonConstants.PROFILES_MASTER_BRANCH_ADMIN_PROFILE_ID) {
@@ -545,6 +561,10 @@ public class ProfileManagementController {
 				contactDetailsSettings = profileManagementService.updateContactDetails(
 						MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION, branchSettings, contactDetailsSettings);
 				branchSettings.setContact_details(contactDetailsSettings);
+				
+				branchSettings.setVertical(vertical);
+				profileManagementService.updateVertical(MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION, branchSettings, vertical);
+				
 				userSettings.getBranchSettings().put(branchId, branchSettings);
 			}
 			else if (profilesMaster == CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID) {
@@ -557,6 +577,10 @@ public class ProfileManagementController {
 				contactDetailsSettings = profileManagementService.updateAgentContactDetails(
 						MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION, agentSettings, contactDetailsSettings);
 				agentSettings.setContact_details(contactDetailsSettings);
+				
+				agentSettings.setVertical(vertical);
+				profileManagementService.updateVertical(MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION, agentSettings, vertical);
+				
 				userSettings.setAgentSettings(agentSettings);
 
 				// Modify Agent details in Solr
@@ -767,7 +791,7 @@ public class ProfileManagementController {
 				throw new InvalidInputException("Zipcode is not valid while adding company information", DisplayMessageConstants.INVALID_ZIPCODE);
 			}
 
-			if (companyContactNo == null || companyContactNo.isEmpty() || !companyContactNo.matches(CommonConstants.PHONENUMBER_REGEX)) {
+			if (companyContactNo == null || companyContactNo.isEmpty()) {
 				throw new InvalidInputException("Company contact number is not valid while adding company information",
 						DisplayMessageConstants.INVALID_COMPANY_PHONEN0);
 			}
@@ -2271,6 +2295,233 @@ public class ProfileManagementController {
 		return socialMediaTokens;
 	}
 	
+	@RequestMapping(value = "/updatezillowlink", method = RequestMethod.POST)
+	public String updateZillowLink(Model model, HttpServletRequest request) {
+		LOG.info("Method updateZillowLink() called from ProfileManagementController");
+		HttpSession session = request.getSession(false);
+		SocialMediaTokens socialMediaTokens = null;
+
+		try {
+			UserSettings userSettings = (UserSettings) session.getAttribute(CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION);
+			OrganizationUnitSettings profileSettings = (OrganizationUnitSettings) session.getAttribute(CommonConstants.USER_PROFILE_SETTINGS);
+			UserProfile selectedProfile = (UserProfile) request.getSession(false).getAttribute(CommonConstants.USER_PROFILE);
+			if (userSettings == null || profileSettings == null || selectedProfile == null) {
+				throw new InvalidInputException("No user settings found in session", DisplayMessageConstants.GENERAL_ERROR);
+			}
+
+			String zillowlink = request.getParameter("zillowlink");
+			try {
+				if (zillowlink == null || zillowlink.isEmpty()) {
+					throw new InvalidInputException("Zillow link passed was null or empty", DisplayMessageConstants.GENERAL_ERROR);
+				}
+				urlValidationHelper.validateUrl(zillowlink);
+			}
+			catch (IOException ioException) {
+				throw new InvalidInputException("Zillow link passed was invalid", DisplayMessageConstants.GENERAL_ERROR, ioException);
+			}
+
+			int profilesMaster = selectedProfile.getProfilesMaster().getProfileId();
+			if (profilesMaster == CommonConstants.PROFILES_MASTER_COMPANY_ADMIN_PROFILE_ID) {
+				OrganizationUnitSettings companySettings = userSettings.getCompanySettings();
+				if (companySettings == null) {
+					throw new InvalidInputException("No company settings found in current session");
+				}
+				socialMediaTokens = companySettings.getSocialMediaTokens();
+				socialMediaTokens = updateZillowLink(zillowlink, socialMediaTokens);
+				profileManagementService.updateSocialMediaTokens(MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION, companySettings,
+						socialMediaTokens);
+				companySettings.setSocialMediaTokens(socialMediaTokens);
+				userSettings.setCompanySettings(companySettings);
+			}
+			else if (profilesMaster == CommonConstants.PROFILES_MASTER_REGION_ADMIN_PROFILE_ID) {
+				long regionId = selectedProfile.getRegionId();
+				OrganizationUnitSettings regionSettings = userSettings.getRegionSettings().get(regionId);
+				if (regionSettings == null) {
+					throw new InvalidInputException("No Region settings found in current session");
+				}
+				socialMediaTokens = regionSettings.getSocialMediaTokens();
+				socialMediaTokens = updateZillowLink(zillowlink, socialMediaTokens);
+				profileManagementService.updateSocialMediaTokens(MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION, regionSettings,
+						socialMediaTokens);
+				regionSettings.setSocialMediaTokens(socialMediaTokens);
+				userSettings.getRegionSettings().put(regionId, regionSettings);
+			}
+			else if (profilesMaster == CommonConstants.PROFILES_MASTER_BRANCH_ADMIN_PROFILE_ID) {
+				long branchId = selectedProfile.getBranchId();
+				OrganizationUnitSettings branchSettings = userSettings.getBranchSettings().get(branchId);
+				if (branchSettings == null) {
+					throw new InvalidInputException("No Branch settings found in current session");
+				}
+				socialMediaTokens = branchSettings.getSocialMediaTokens();
+				socialMediaTokens = updateZillowLink(zillowlink, socialMediaTokens);
+				profileManagementService.updateSocialMediaTokens(MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION, branchSettings,
+						socialMediaTokens);
+				branchSettings.setSocialMediaTokens(socialMediaTokens);
+				userSettings.getBranchSettings().put(branchId, branchSettings);
+			}
+			else if (profilesMaster == CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID) {
+				AgentSettings agentSettings = userSettings.getAgentSettings();
+				if (agentSettings == null) {
+					throw new InvalidInputException("No Agent settings found in current session");
+				}
+				socialMediaTokens = agentSettings.getSocialMediaTokens();
+				socialMediaTokens = updateZillowLink(zillowlink, socialMediaTokens);
+				profileManagementService.updateSocialMediaTokens(MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION, agentSettings,
+						socialMediaTokens);
+				agentSettings.setSocialMediaTokens(socialMediaTokens);
+				userSettings.setAgentSettings(agentSettings);
+			}
+			else {
+				throw new InvalidInputException("Invalid input exception occurred in updating zillow token.", DisplayMessageConstants.GENERAL_ERROR);
+			}
+
+			profileSettings.setSocialMediaTokens(socialMediaTokens);
+
+			LOG.info("ZillowLink updated successfully");
+			model.addAttribute("message",
+					messageUtils.getDisplayMessage(DisplayMessageConstants.ZILLOW_TOKEN_UPDATE_SUCCESSFUL, DisplayMessageType.SUCCESS_MESSAGE));
+		}
+		catch (NonFatalException nonFatalException) {
+			LOG.error("NonFatalException while updating ZillowLink in profile. Reason :" + nonFatalException.getMessage(), nonFatalException);
+			model.addAttribute("message",
+					messageUtils.getDisplayMessage(DisplayMessageConstants.ZILLOW_TOKEN_UPDATE_UNSUCCESSFUL, DisplayMessageType.ERROR_MESSAGE));
+		}
+
+		LOG.info("Method updateZillowLink() finished from ProfileManagementController");
+		return JspResolver.MESSAGE_HEADER;
+	}
+
+	private SocialMediaTokens updateZillowLink(String zillowLink, SocialMediaTokens socialMediaTokens) {
+		LOG.debug("Method updateZillowLink() called from ProfileManagementController");
+		if (socialMediaTokens == null) {
+			LOG.debug("No social media token in profile added");
+			socialMediaTokens = new SocialMediaTokens();
+		}
+		if (socialMediaTokens.getZillowToken() == null) {
+			socialMediaTokens.setZillowToken(new ZillowToken());
+		}
+		
+		ZillowToken zillowToken = socialMediaTokens.getZillowToken();
+		zillowToken.setZillowProfileLink(zillowLink);
+		socialMediaTokens.setZillowToken(zillowToken);
+		LOG.debug("Method updateZillowLink() finished from ProfileManagementController");
+		return socialMediaTokens;
+	}
+	
+	@RequestMapping(value = "/updatelendingtreelink", method = RequestMethod.POST)
+	public String updateLendingTreeLink(Model model, HttpServletRequest request) {
+		LOG.info("Method updateLendingTreeLink() called from ProfileManagementController");
+		HttpSession session = request.getSession(false);
+		SocialMediaTokens socialMediaTokens = null;
+
+		try {
+			UserSettings userSettings = (UserSettings) session.getAttribute(CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION);
+			OrganizationUnitSettings profileSettings = (OrganizationUnitSettings) session.getAttribute(CommonConstants.USER_PROFILE_SETTINGS);
+			UserProfile selectedProfile = (UserProfile) request.getSession(false).getAttribute(CommonConstants.USER_PROFILE);
+			if (userSettings == null || profileSettings == null || selectedProfile == null) {
+				throw new InvalidInputException("No user settings found in session", DisplayMessageConstants.GENERAL_ERROR);
+			}
+
+			String lendingTreeLink = request.getParameter("lendingTreeLink");
+			try {
+				if (lendingTreeLink == null || lendingTreeLink.isEmpty()) {
+					throw new InvalidInputException("lendingTreeLink passed was null or empty", DisplayMessageConstants.GENERAL_ERROR);
+				}
+				urlValidationHelper.validateUrl(lendingTreeLink);
+			}
+			catch (IOException ioException) {
+				throw new InvalidInputException("lendingTreeLink passed was invalid", DisplayMessageConstants.GENERAL_ERROR, ioException);
+			}
+
+			int profilesMaster = selectedProfile.getProfilesMaster().getProfileId();
+			if (profilesMaster == CommonConstants.PROFILES_MASTER_COMPANY_ADMIN_PROFILE_ID) {
+				OrganizationUnitSettings companySettings = userSettings.getCompanySettings();
+				if (companySettings == null) {
+					throw new InvalidInputException("No company settings found in current session");
+				}
+				socialMediaTokens = companySettings.getSocialMediaTokens();
+				socialMediaTokens = updateLendingTreeLink(lendingTreeLink, socialMediaTokens);
+				profileManagementService.updateSocialMediaTokens(MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION, companySettings,
+						socialMediaTokens);
+				companySettings.setSocialMediaTokens(socialMediaTokens);
+				userSettings.setCompanySettings(companySettings);
+			}
+			else if (profilesMaster == CommonConstants.PROFILES_MASTER_REGION_ADMIN_PROFILE_ID) {
+				long regionId = selectedProfile.getRegionId();
+				OrganizationUnitSettings regionSettings = userSettings.getRegionSettings().get(regionId);
+				if (regionSettings == null) {
+					throw new InvalidInputException("No Region settings found in current session");
+				}
+				socialMediaTokens = regionSettings.getSocialMediaTokens();
+				socialMediaTokens = updateLendingTreeLink(lendingTreeLink, socialMediaTokens);
+				profileManagementService.updateSocialMediaTokens(MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION, regionSettings,
+						socialMediaTokens);
+				regionSettings.setSocialMediaTokens(socialMediaTokens);
+				userSettings.getRegionSettings().put(regionId, regionSettings);
+			}
+			else if (profilesMaster == CommonConstants.PROFILES_MASTER_BRANCH_ADMIN_PROFILE_ID) {
+				long branchId = selectedProfile.getBranchId();
+				OrganizationUnitSettings branchSettings = userSettings.getBranchSettings().get(branchId);
+				if (branchSettings == null) {
+					throw new InvalidInputException("No Branch settings found in current session");
+				}
+				socialMediaTokens = branchSettings.getSocialMediaTokens();
+				socialMediaTokens = updateLendingTreeLink(lendingTreeLink, socialMediaTokens);
+				profileManagementService.updateSocialMediaTokens(MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION, branchSettings,
+						socialMediaTokens);
+				branchSettings.setSocialMediaTokens(socialMediaTokens);
+				userSettings.getBranchSettings().put(branchId, branchSettings);
+			}
+			else if (profilesMaster == CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID) {
+				AgentSettings agentSettings = userSettings.getAgentSettings();
+				if (agentSettings == null) {
+					throw new InvalidInputException("No Agent settings found in current session");
+				}
+				socialMediaTokens = agentSettings.getSocialMediaTokens();
+				socialMediaTokens = updateLendingTreeLink(lendingTreeLink, socialMediaTokens);
+				profileManagementService.updateSocialMediaTokens(MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION, agentSettings,
+						socialMediaTokens);
+				agentSettings.setSocialMediaTokens(socialMediaTokens);
+				userSettings.setAgentSettings(agentSettings);
+			}
+			else {
+				throw new InvalidInputException("Invalid input exception occurred in updating lendingTree token.",
+						DisplayMessageConstants.GENERAL_ERROR);
+			}
+
+			profileSettings.setSocialMediaTokens(socialMediaTokens);
+
+			LOG.info("lendingTree updated successfully");
+			model.addAttribute("message",
+					messageUtils.getDisplayMessage(DisplayMessageConstants.LENDINGTREE_TOKEN_UPDATE_SUCCESSFUL, DisplayMessageType.SUCCESS_MESSAGE));
+		}
+		catch (NonFatalException nonFatalException) {
+			LOG.error("NonFatalException while updating ZillowLink in profile. Reason :" + nonFatalException.getMessage(), nonFatalException);
+			model.addAttribute("message",
+					messageUtils.getDisplayMessage(DisplayMessageConstants.LENDINGTREE_TOKEN_UPDATE_UNSUCCESSFUL, DisplayMessageType.ERROR_MESSAGE));
+		}
+
+		LOG.info("Method updateLendingTreeLink() finished from ProfileManagementController");
+		return JspResolver.MESSAGE_HEADER;
+	}
+
+	private SocialMediaTokens updateLendingTreeLink(String lendingTreeLink, SocialMediaTokens socialMediaTokens) {
+		LOG.debug("Method updateLendingTreeLink() called from ProfileManagementController");
+		if (socialMediaTokens == null) {
+			LOG.debug("No social media token in profile added");
+			socialMediaTokens = new SocialMediaTokens();
+		}
+		if (socialMediaTokens.getLendingTreeToken() == null) {
+			socialMediaTokens.setLendingTreeToken(new LendingTreeToken());
+		}
+		
+		LendingTreeToken lendingTreeToken = socialMediaTokens.getLendingTreeToken();
+		lendingTreeToken.setLendingTreeProfileLink(lendingTreeLink);
+		socialMediaTokens.setLendingTreeToken(lendingTreeToken);
+		LOG.debug("Method updateLendingTreeLink() finished from ProfileManagementController");
+		return socialMediaTokens;
+	}
+	
 	/**
 	 * Method to update achievements in profile
 	 * 
@@ -2801,9 +3052,9 @@ public class ProfileManagementController {
 			if (iden == null || iden <= 0l) {
 				throw new InvalidInputException("iden is invalid in initProListByProfileLevelPage", DisplayMessageConstants.GENERAL_ERROR);
 			}
-			SolrDocumentList solrResult = profileManagementService.getProListByProfileLevel(iden, profileLevel, 0, 0);
+			Collection<UserFromSearch> solrResult = profileManagementService.getProListByProfileLevel(iden, profileLevel, 0, 0);
 			if (solrResult != null) {
-				model.addAttribute("numfound", solrResult.getNumFound());
+				model.addAttribute("numfound", solrResult.size());
 			}
 			model.addAttribute("profileLevel", profileLevel);
 			model.addAttribute("iden", iden);

@@ -8,7 +8,8 @@
 </c:if>
 <c:choose>
 	<c:when test="${not empty profilelogo}">
-		<div id="prof-logo-edit" class="prof-image-rp prof-image-edit pos-relative cursor-pointer" style="background: url(${profilelogo}) no-repeat center; 50% 50% no-repeat; background-size: contain;"></div>
+		<div id="prof-logo-edit" class="prof-image-rp prof-image-edit pos-relative cursor-pointer"
+			style="background: url(${profilelogo}) no-repeat center; 50% 50% no-repeat; background-size: contain;"></div>
 		<c:choose>
 			<c:when test="${accountMasterId == 1 || accountMasterId == 5}">
 				<form class="form_contact_image" enctype="multipart/form-data">
@@ -48,7 +49,7 @@
 		</c:choose>
 	</c:when>
 	<c:otherwise>
-		<div id="prof-logo-edit" class="prof-image-rp prof-image-edit pos-relative cursor-pointer" style="background-image:initial; 50% 50% no-repeat; background: no-repeat center; background-size: cover;"></div>
+		<div id="prof-logo-edit" class="prof-logo-edit prof-image-rp prof-image-edit pos-relative cursor-pointer"></div>
 		<form class="form_contact_image" enctype="multipart/form-data">
 			<input type="file" id="prof-logo" class="con_img_inp_file">
 		</form>

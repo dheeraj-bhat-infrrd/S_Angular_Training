@@ -3,6 +3,7 @@ package com.realtech.socialsurvey.core.services.organizationmanagement.impl;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
@@ -11,7 +12,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import javax.annotation.Resource;
-import org.apache.solr.common.SolrDocumentList;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
@@ -56,6 +56,7 @@ import com.realtech.socialsurvey.core.entities.SurveyDetails;
 import com.realtech.socialsurvey.core.entities.SurveyPreInitiation;
 import com.realtech.socialsurvey.core.entities.TwitterToken;
 import com.realtech.socialsurvey.core.entities.User;
+import com.realtech.socialsurvey.core.entities.UserFromSearch;
 import com.realtech.socialsurvey.core.entities.UserProfile;
 import com.realtech.socialsurvey.core.entities.UserSettings;
 import com.realtech.socialsurvey.core.entities.WebAddressSettings;
@@ -263,9 +264,6 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 			if (higherLock.getIsLogoLocked()) {
 				parentLock.setLogoLocked(true);
 			}
-			if (higherLock.getIsDisplayNameLocked()) {
-				parentLock.setDisplayNameLocked(true);
-			}
 			if (higherLock.getIsWebAddressLocked()) {
 				parentLock.setWebAddressLocked(true);
 			}
@@ -443,6 +441,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 		companyProfileData.setCity(companySettings.getContact_details().getCity());
 		companyProfileData.setState(companySettings.getContact_details().getState());
 		companyProfileData.setCountry(companySettings.getContact_details().getCountry());
+		companyProfileData.setCountryCode(companySettings.getContact_details().getCountryCode());
 		companyProfileData.setZipcode(companySettings.getContact_details().getZipcode());
 		if (agentSettingsType != null) {
 			agentSettingsType.setCompanyProfileData(companyProfileData);
@@ -501,10 +500,6 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 
 			// Basic Contact details
 			if (parentProfile.getContact_details() != null) {
-				if (parentLock.getIsDisplayNameLocked() && !userLock.getIsDisplayNameLocked() && parentProfile.getContact_details().getName() != null) {
-					userProfile.getContact_details().setName(parentProfile.getContact_details().getName());
-					userLock.setDisplayNameLocked(true);
-				}
 				if (parentLock.getIsAboutMeLocked() && !userLock.getIsAboutMeLocked() && parentProfile.getContact_details().getAbout_me() != null) {
 					userProfile.getContact_details().setAbout_me(parentProfile.getContact_details().getAbout_me());
 					userLock.setAboutMeLocked(true);
@@ -573,6 +568,18 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 		LOG.info("Image updated successfully");
 	}
 
+	// vertical
+	@Override
+	public void updateVertical(String collection, OrganizationUnitSettings companySettings, String vertical) throws InvalidInputException {
+		if (vertical == null || vertical.isEmpty()) {
+			throw new InvalidInputException("vertical passed can not be null or empty");
+		}
+		LOG.info("Updating vertical");
+		organizationUnitSettingsDao.updateParticularKeyOrganizationUnitSettings(MongoOrganizationUnitSettingDaoImpl.KEY_VERTICAL, vertical,
+				companySettings, collection);
+		LOG.info("vertical updated successfully");
+	}
+	
 	// Associations
 	@Override
 	public List<Association> addAssociations(String collection, OrganizationUnitSettings unitSettings, List<Association> associations)
@@ -1059,6 +1066,9 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 		}
 
 		User user = userDao.findById(User.class, agentSettings.getIden());
+		if (user.getStatus() != CommonConstants.STATUS_ACTIVE) {
+			throw new NoRecordsFetchedException("No active agent found.");
+		}
 
 		LOG.info("Method getUserProfilesByProfileName executed successfully");
 		return user;
@@ -1074,7 +1084,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 		queries.put(CommonConstants.BRANCH_ID_COLUMN, branchId);
 		queries.put(CommonConstants.PROFILE_MASTER_COLUMN,
 				userManagementService.getProfilesMasterById(CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID));
-		List<UserProfile> userProfiles = userProfileDao.findByKeyValue(UserProfile.class, queries);
+		List<UserProfile> userProfiles = userProfileDao.findByKeyValueAscendingWithAlias(UserProfile.class, queries, "firstName", "user");
 		if (userProfiles != null && !userProfiles.isEmpty()) {
 			users = new ArrayList<AgentSettings>();
 			for (UserProfile userProfile : userProfiles) {
@@ -1142,6 +1152,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 		if (iden <= 0l) {
 			throw new InvalidInputException("iden is invalid while fetching reviews");
 		}
+		
 		Calendar calendar = Calendar.getInstance();
 		if (startDate != null) {
 			calendar.setTime(startDate);
@@ -1153,9 +1164,33 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 			calendar.add(Calendar.DATE, 1);
 			endDate = calendar.getTime();
 		}
+		
 		String idenColumnName = getIdenColumnNameFromProfileLevel(profileLevel);
 		surveyDetails = surveyDetailsDao.getFeedbacks(idenColumnName, iden, startIndex, numOfRows, startScore, limitScore, fetchAbusive, startDate,
 				endDate, sortCriteria);
+		
+		for (SurveyDetails review : surveyDetails) {
+			OrganizationUnitSettings agentSettings = organizationUnitSettingsDao.fetchAgentSettingsById(review.getAgentId());
+			if (agentSettings != null && agentSettings.getSocialMediaTokens() != null) {
+				SocialMediaTokens mediaTokens = agentSettings.getSocialMediaTokens();
+
+				// adding yelpUrl
+				if (mediaTokens.getYelpToken() != null && mediaTokens.getYelpToken().getYelpPageLink() != null) {
+					review.setYelpProfileUrl(mediaTokens.getYelpToken().getYelpPageLink());
+				}
+
+				// adding zillowUrl
+				if (mediaTokens.getZillowToken() != null && mediaTokens.getZillowToken().getZillowProfileLink() != null) {
+					review.setZillowProfileUrl(mediaTokens.getZillowToken().getZillowProfileLink());
+				}
+
+				// adding lendingTreeUrl
+				if (mediaTokens.getLendingTreeToken() != null && mediaTokens.getLendingTreeToken().getLendingTreeProfileLink() != null) {
+					review.setLendingTreeProfileUrl(mediaTokens.getLendingTreeToken().getLendingTreeProfileLink());
+				}
+			}
+		}
+		
 		return surveyDetails;
 	}
 
@@ -1236,7 +1271,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 	 * @throws SolrException
 	 */
 	@Override
-	public SolrDocumentList getProListByProfileLevel(long iden, String profileLevel, int start, int numOfRows) throws InvalidInputException,
+	public Collection<UserFromSearch> getProListByProfileLevel(long iden, String profileLevel, int start, int numOfRows) throws InvalidInputException,
 			SolrException {
 		LOG.info("Method getProListByProfileLevel called for iden: " + iden + " profileLevel:" + profileLevel + " start:" + start + " numOfRows:"
 				+ numOfRows);
@@ -1247,7 +1282,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 			throw new InvalidInputException("profile level is null in getProListByProfileLevel");
 		}
 		String idenFieldName = null;
-		SolrDocumentList solrSearchResult = null;
+		Collection<UserFromSearch> solrSearchResult = null;
 		switch (profileLevel) {
 			case CommonConstants.PROFILE_LEVEL_COMPANY:
 				idenFieldName = CommonConstants.COMPANY_ID_SOLR;
@@ -1592,7 +1627,8 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 	@Override
 	public void updateProfileStages(List<ProfileStage> profileStages, OrganizationUnitSettings settings, String collectionName){
 		LOG.info("Method to update profile stages started.");
-		organizationUnitSettingsDao.updateParticularKeyOrganizationUnitSettings(MongoOrganizationUnitSettingDaoImpl.KEY_PROFILE_STAGES, profileStages, settings, collectionName);
+		organizationUnitSettingsDao.updateParticularKeyOrganizationUnitSettings(MongoOrganizationUnitSettingDaoImpl.KEY_PROFILE_STAGES,
+				profileStages, settings, collectionName);
 		LOG.info("Method to update profile stages finished.");
 	}
 	
@@ -1601,15 +1637,37 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 		String profileUrl;
 		String baseProfileUrl = applicationBaseUrl + CommonConstants.AGENT_PROFILE_FIXED_URL;
 		for (SurveyDetails review : reviews) {
+			
+			// adding completeProfileUrl
 			try {
-				SolrDocumentList documents = solrSearchService.searchUsersByIden(review.getAgentId(), CommonConstants.USER_ID_SOLR, true, 0, 1);
+				Collection<UserFromSearch> documents = solrSearchService.searchUsersByIden(review.getAgentId(), CommonConstants.USER_ID_SOLR, true, 0, 1);
 				if (documents != null && !documents.isEmpty()) {
-					profileUrl = (String) documents.get(CommonConstants.INITIAL_INDEX).getFieldValue(CommonConstants.PROFILE_URL_SOLR);
+					profileUrl = (String) documents.iterator().next().getProfileUrl();
 					review.setCompleteProfileUrl(baseProfileUrl + profileUrl);
 				}
 			}
 			catch (InvalidInputException | SolrException e) {
 				LOG.error("Exception caught in setAgentProfileUrlForReview() for agent : " + review.getAgentName() + " Nested exception is ", e);
+			}
+			
+			OrganizationUnitSettings agentSettings = organizationUnitSettingsDao.fetchAgentSettingsById(review.getAgentId());
+			if (agentSettings != null && agentSettings.getSocialMediaTokens() != null) {
+				SocialMediaTokens mediaTokens = agentSettings.getSocialMediaTokens();
+
+				// adding yelpUrl
+				if (mediaTokens.getYelpToken() != null && mediaTokens.getYelpToken().getYelpPageLink() != null) {
+					review.setYelpProfileUrl(mediaTokens.getYelpToken().getYelpPageLink());
+				}
+
+				// adding zillowUrl
+				if (mediaTokens.getZillowToken() != null && mediaTokens.getZillowToken().getZillowProfileLink() != null) {
+					review.setZillowProfileUrl(mediaTokens.getZillowToken().getZillowProfileLink());
+				}
+
+				// adding lendingTreeUrl
+				if (mediaTokens.getLendingTreeToken() != null && mediaTokens.getLendingTreeToken().getLendingTreeProfileLink() != null) {
+					review.setLendingTreeProfileUrl(mediaTokens.getLendingTreeToken().getLendingTreeProfileLink());
+				}
 			}
 		}
 	}
@@ -1733,5 +1791,22 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 
 		LOG.info("Method aggregateDisclaimer() called from ProfileManagementService");
 		return disclaimer;
+	}
+	
+	@Override
+	@Transactional
+	public void updateCompanyName(long userId, long companyId, String companyName) throws InvalidInputException {
+		LOG.info("Method updateCompanyName of profileManagementService called for companyId : " + companyId);
+		
+		Company company = companyDao.findById(Company.class, companyId);
+		if (company == null) {
+			throw new InvalidInputException("No company present for the specified companyId");
+		}
+		company.setCompany(companyName);
+		company.setModifiedBy(String.valueOf(userId));
+		company.setModifiedOn(new Timestamp(System.currentTimeMillis()));
+		companyDao.update(company);
+
+		LOG.info("Successfully completed method to update company status");
 	}
 }

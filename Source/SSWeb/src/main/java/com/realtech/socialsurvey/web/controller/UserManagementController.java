@@ -13,6 +13,7 @@ import org.noggit.JSONUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -840,9 +841,18 @@ public class UserManagementController {
 	 * @throws InvalidInputException
 	 */
 	@RequestMapping(value = "/showcompleteregistrationpage", method = RequestMethod.GET)
-	public String showCompleteRegistrationPage(@RequestParam("q") String encryptedUrlParams, Model model) {
+	public String showCompleteRegistrationPage(HttpServletRequest request, @RequestParam("q") String encryptedUrlParams, Model model) {
 		LOG.info("Method showCompleteRegistrationPage() to complete registration of user started.");
 
+		// Check for existing session
+		if (sessionHelper.isUserActiveSessionExists()) {
+			LOG.info("Existing Active Session detected");
+			
+			// Invalidate session in browser
+			request.getSession(false).invalidate();
+			SecurityContextHolder.clearContext();
+		}
+		
 		try {
 			Map<String, String> urlParams = null;
 			try {
@@ -870,15 +880,17 @@ public class UserManagementController {
 				model.addAttribute(CommonConstants.COMPANY, urlParams.get(CommonConstants.COMPANY));
 				model.addAttribute(CommonConstants.FIRST_NAME, urlParams.get(CommonConstants.FIRST_NAME));
 				model.addAttribute(CommonConstants.EMAIL_ID, emailId);
+				
 				User user = userManagementService.getUserByEmail(emailId);
 				AgentSettings agentSettings = userManagementService.getAgentSettingsForUserProfiles(user.getUserId());
 				if (agentSettings == null) {
 					throw new InvalidInputException("Settings not found for the given user.");
 				}
 				model.addAttribute("profileUrl", agentSettings.getCompleteProfileUrl());
+				
 				String lastName = urlParams.get(CommonConstants.LAST_NAME);
 				if (lastName != null && !lastName.isEmpty()) {
-					model.addAttribute(CommonConstants.LAST_NAME, urlParams.get(CommonConstants.LAST_NAME));
+					model.addAttribute(CommonConstants.LAST_NAME, lastName);
 				}
 				LOG.debug("Validation of url completed. Service returning params to be prepopulated in registration page");
 			}
@@ -947,9 +959,6 @@ public class UserManagementController {
 						DisplayMessageConstants.GENERAL_ERROR, e);
 			}
 
-			AccountType accountType = null;
-			HttpSession session = request.getSession(true);
-			
 			try {
 				// fetch user object with email Id
 				user = authenticationService.getUserWithLoginNameAndCompanyId(emailId, companyId);
@@ -965,6 +974,8 @@ public class UserManagementController {
 			sessionHelper.loginOnRegistration(emailId, password);
 			LOG.debug("Successfully added registered user to principal session");
 
+			AccountType accountType = null;
+			HttpSession session = request.getSession(true);
 			List<LicenseDetail> licenseDetails = user.getCompany().getLicenseDetails();
 			if (licenseDetails != null && !licenseDetails.isEmpty()) {
 				LicenseDetail licenseDetail = licenseDetails.get(0);
@@ -1389,7 +1400,7 @@ public class UserManagementController {
 			User invitedUser = userManagementService.getUserByEmail(emailId);
 			String profileName = userManagementService.getUserSettings(invitedUser.getUserId()).getProfileName();
 			userManagementService.sendRegistrationCompletionLink(emailId, firstName, lastName, user.getCompany().getCompanyId(), profileName,
-					user.getLoginName());
+					invitedUser.getLoginName());
 
 			message = messageUtils.getDisplayMessage(DisplayMessageConstants.INVITATION_RESEND_SUCCESSFUL, DisplayMessageType.SUCCESS_MESSAGE)
 					.getMessage();

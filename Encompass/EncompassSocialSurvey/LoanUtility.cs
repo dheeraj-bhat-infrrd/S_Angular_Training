@@ -176,7 +176,7 @@ namespace EncompassSocialSurvey
 
         public List<LoanViewModel> LopulateLoanList(LoanFolder parentFolder, int runningCompanyId)
         {
-            Logger.Info("Entering the method LoanUtility.LopopulateLoanList()");
+            Logger.Info("Entering the method LoanUtility.LopopulateLoanList(): FolderName: " + parentFolder.DisplayName);
 
             // Get the contents of the folder
             LoanIdentityList loans = parentFolder.GetContents();
@@ -278,7 +278,7 @@ namespace EncompassSocialSurvey
                     {
                         LoanViewModel forLoanVM_Co_Borrower = new LoanViewModel();
                         forLoanVM_Co_Borrower.SurveySource = surveySource;
-                        forLoanVM_Co_Borrower.SurveySourceId = id.Guid;
+                        forLoanVM_Co_Borrower.SurveySourceId = id.Guid.ToString().Replace("{", "").Replace("}", "");
                         forLoanVM_Co_Borrower.CompanyId = companyId;
 
                         // TODO: not getting any field for agent id: keeping loan number as agent id

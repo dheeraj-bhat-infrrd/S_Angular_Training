@@ -97,6 +97,7 @@ var yelpEnabled;
 var googleEnabled;
 var agentProfileLink;
 var agentFullProfileLink;
+var companyLogo;
 $(document).on('click', '.icn-plus-open', function() {
 	$(this).hide();
 	$(this).parent().find('.ppl-share-social,.icn-remove').show();
@@ -949,7 +950,7 @@ function loadActiveSurveyQuestions() {
 }
 
 function resizeAdjBuildSurvey(){
-	var winW = $(window).width();
+	var winW = window.innerWidth;
 	if (winW < 768) {
 		var txtW = winW - 118;
 		$('.srv-tbl-txt').width(txtW);
@@ -3034,7 +3035,7 @@ function updateAutoPostSetting(isautopostenabled){
 	var success = false;
 	$.ajax({
 		url : "./updateautopostforsurvey.do",
-		type : "GET",
+		type : "POST",
 		data : payload,
 		success : function(data) {
 			if (data.errCode == undefined)
@@ -3616,6 +3617,14 @@ function validateAssignToBranchName() {
 	}
 }
 
+$(document).on('keyup', '#search-users-key', function(e) {
+	// detect enter
+	if (e.keyCode == 13) {
+		console.log("Enter");
+		searchUsersByNameEmailLoginId($(this).val());
+	}
+});
+
 function searchUsersByNameEmailLoginId(searchKey) {
 	userStartIndex = 0;
 	var url = "./findusers.do";
@@ -3827,6 +3836,29 @@ function saveUserAssignmentCallBack(data) {
 	displayMessage(data);
 }
 
+// remove user
+$(document).on('click', '.v-icn-rem-user', function() {
+	if ($(this).hasClass('v-tbl-icn-disabled')) {
+		return;
+	}
+
+	var userId = $(this).parent().find('.fetch-name').attr('data-user-id');
+    var adminId = '${user.userId}';
+    confirmDeleteUser(userId, adminId);
+});
+
+// resend verification mail
+$(document).on('click', '.v-icn-fmail', function() {
+	if ($(this).hasClass('v-tbl-icn-disabled')) {
+		return;
+	}
+
+	var firstName = $(this).parent().find('.fetch-name').attr('data-first-name');
+    var lastName = $(this).parent().find('.fetch-name').attr('data-last-name');
+    var emailId = $(this).parent().find('.fetch-email').html();
+    reinviteUser(firstName, lastName, emailId);
+});
+
 /**
  * Method to send invite link
  */
@@ -3933,14 +3965,14 @@ function bindEditUserClick(){
 	});
 }
 
-$(document).on('click', '#page-previous', function(){
+$(document).on('click', '#page-previous.paginate-button', function(){
 	var newIndex = userStartIndex - userBatchSize;
 	if (newIndex < $('#users-count').val()) {
 		paintUserListInUserManagement(newIndex);
 	}
 });
 
-$(document).on('click', '#page-next', function(){
+$(document).on('click', '#page-next.paginate-button', function(){
 	var newIndex = userStartIndex + userBatchSize;
 	if (newIndex < $('#users-count').val()) {
 		paintUserListInUserManagement(newIndex);
@@ -4425,6 +4457,7 @@ function paintSurveyPage(jsonData) {
 	googleEnabled = Boolean(jsonData.responseJSON.googleEnabled);
 	agentProfileLink = jsonData.responseJSON.agentProfileLink;
 	agentFullProfileLink = jsonData.responseJSON.agentFullProfileLink;
+	companyLogo = jsonData.responseJSON.companyLogo;
 	
 	if (stage != undefined)
 		qno = stage;
@@ -4528,6 +4561,13 @@ function paintSurveyPageFromJson() {
 		$("#skip-ques-mcq").hide();
 	}
 	$(".sq-main-txt").html("Survey for " + agentName);
+	
+	if (companyLogo != undefined && companyLogo != "") {
+		var companylogoHtml = '<div class="float-left user-info-seperator"></div>';
+		companylogoHtml += '<div class="float-left user-info-logo" style="background: url('
+			+ companyLogo + ') no-repeat center; background-size: 100% auto;"></div>';
+		$('#header-user-info').html(companylogoHtml);
+	}
 }
 
 function togglePrevAndNext(){
@@ -4763,15 +4803,31 @@ function showMasterQuestionPage(){
 		if ($('#shr-post-chk-box').hasClass('bd-check-img') && (rating >= autoPostScore) && (Boolean(autoPost) == true)) {
 			postToSocialMedia(feedback);
 			$('#social-post-lnk').show();
-			if (yelpEnabled && (mood=='Great'))
+			if((mood == 'Great') && (yelpEnabled || googleEnabled) && !(yelpEnabled && googleEnabled)){
+				$('.sq-btn-social-wrapper').css({
+					"float" : "none",
+					"width" : "100%"
+				});
+				$('.sq-btn-post-social').css({
+					"float" : "none"
+				});
+			}
+			if (yelpEnabled && (mood == 'Great')){
 				$('#ylp-btn').show();
-			else
-				$('#ylp-btn').hide();
-			
-			if (googleEnabled && (mood=='Great'))
+				var yelpElement = document.getElementById('ylp-btn');
+				shareOnYelp(agentId, window.location.origin+"/rest/survey/", yelpElement);
+			}
+			else {
+				$('#ylp-btn').parent().remove();
+			}
+			if (googleEnabled && (mood == 'Great')){
 				$('#ggl-btn').show();
-			else
-				$('#ggl-btn').hide();
+				var googleElement = document.getElementById('ggl-btn');
+				shareOnGooglePlus(agentId, window.location.origin+"/rest/survey/", googleElement);
+			}
+			else {
+				$('#ggl-btn').parent().remove();
+			}
 		}
 		
 		updateCustomerResponse(feedback);
@@ -5254,15 +5310,11 @@ $('.sq-pts-dgreen').click(function() {
 
 $('#ylp-btn').click(function(e) {
 	//e.stopImmediatePropagation();
-	var yelpElement = document.getElementById('ylp-btn');
-	shareOnYelp(agentId, window.location.origin+"/rest/survey/", yelpElement);
 	updateSharedOn("yelp", agentId, customerEmail);
 });
 
 $('#ggl-btn').click(function(e) {
 	//e.stopImmediatePropagation();
-	var googleElement = document.getElementById('ggl-btn');
-	shareOnGooglePlus(agentId, window.location.origin+"/rest/survey/", googleElement);
 	updateSharedOn("google", agentId, customerEmail);
 });
 
@@ -5697,31 +5749,30 @@ function callBackShowBasicDetails(response) {
 	fetchReviewCount(attrName, attrVal, minScore);
 }
 
-$(document).on(
-		'blur',
-		'#prof-basic-container input',
-		function() {
-			var lockId = $(this).attr("id") + "-lock";
-			if($('#'+lockId).length > 0){
-				if ($('#prof-all-lock').val() != 'modified' || !$(this).val()) {
-					return;
-				}
-			}else{
-				if(!$(this).val()){
-					return;
-				}
-			}
-			delay(function() {
-				var profName = $('#prof-name').val().trim();
-				var profTitle = $('#prof-title').val().trim();
-				var payload = {
-					"profName" : profName,
-					"profTitle" : profTitle
-				};
-				callAjaxPostWithPayloadData("./updatebasicprofile.do",
-						callBackUpdateBasicDetails, payload);
-			}, 0);
-		});
+$(document).on('blur', '#prof-basic-container input', function() {
+	var lockId = $(this).attr("id") + "-lock";
+	if ($('#'+lockId).length > 0) {
+		if ($('#prof-all-lock').val() != 'modified' || !$(this).val()) {
+			return;
+		}
+	} else {
+		if (!$(this).val()) {
+			return;
+		}
+	}
+	
+	delay(function() {
+		var profName = $('#prof-name').val().trim();
+		var profTitle = $('#prof-title').val().trim();
+		var profVertical = $('#prof-vertical').val().trim();
+		var payload = {
+			"profName" : profName,
+			"profTitle" : profTitle,
+			"profVertical" : profVertical
+		};
+		callAjaxPostWithPayloadData("./updatebasicprofile.do", callBackUpdateBasicDetails, payload);
+	}, 0);
+});
 
 function callBackUpdateBasicDetails(data) {
 	$('#prof-all-lock').val('locked');
@@ -6277,6 +6328,30 @@ function updateLinkedInLink(link) {
 	}
 }
 
+// Update Social links - google plus
+$('body').on('click', '#prof-edit-social-link .icn-gplus', function() {
+	$('#social-token-text').show();
+	var link = $(this).attr("data-link");
+	$('#social-token-text').attr({
+		"placeholder" : "Add Google link",
+		"onblur" : "updateGoogleLink(this.value);$('#social-token-text').hide();"
+	});
+	$('#social-token-text').val(link);
+});
+
+function updateGoogleLink(link) {
+	var payload = {
+		"gpluslink" : link	
+	};
+	if (isValidUrl(link)) {
+        callAjaxPostWithPayloadData("./updategooglelink.do", callBackUpdateSocialLink, payload);
+        $('#icn-gplus').attr("data-link", link);
+	} else {
+		$('#overlay-toast').html("Enter a valid url");
+		showToast();
+	}
+}
+
 // Update Social links - yelp
 $('body').on('click', '#prof-edit-social-link .icn-yelp', function() {
 	$('#social-token-text').show();
@@ -6301,24 +6376,48 @@ function updateYelpLink(link) {
 	}
 }
 
-// Update Social links - google plus
-$('body').on('click', '#prof-edit-social-link .icn-gplus', function() {
+// Update Social links - zillow
+$('body').on('click', '#prof-edit-social-link .icn-zillow', function() {
 	$('#social-token-text').show();
 	var link = $(this).attr("data-link");
 	$('#social-token-text').attr({
-		"placeholder" : "Add Google link",
-		"onblur" : "updateGoogleLink(this.value);$('#social-token-text').hide();"
+		"placeholder" : "Add Zillow link",
+		"onblur" : "updateZillowLink(this.value);$('#social-token-text').hide();"
 	});
 	$('#social-token-text').val(link);
 });
 
-function updateGoogleLink(link) {
+function updateZillowLink(link) {
 	var payload = {
-		"gpluslink" : link	
+		"zillowlink" : link	
 	};
 	if (isValidUrl(link)) {
-        callAjaxPostWithPayloadData("./updategooglelink.do", callBackUpdateSocialLink, payload);
-        $('#icn-gplus').attr("data-link", link);
+		callAjaxPostWithPayloadData("./updatezillowlink.do", callBackUpdateSocialLink, payload);
+        $('#icn-zillow').attr("data-link", link);
+	} else {
+		$('#overlay-toast').html("Enter a valid url");
+		showToast();
+	}
+}
+
+// Update Social links - lendingTree
+$('body').on('click', '#prof-edit-social-link .icn-lendingtree', function() {
+	$('#social-token-text').show();
+	var link = $(this).attr("data-link");
+	$('#social-token-text').attr({
+		"placeholder" : "Add LendingTree link",
+		"onblur" : "updateLendingTreeLink(this.value);$('#social-token-text').hide();"
+	});
+	$('#social-token-text').val(link);
+});
+
+function updateLendingTreeLink(link) {
+	var payload = {
+		"lendingTreeLink" : link	
+	};
+	if (isValidUrl(link)) {
+		callAjaxPostWithPayloadData("./updatelendingtreelink.do", callBackUpdateSocialLink, payload);
+        $('#icn-lendingtree').attr("data-link", link);
 	} else {
 		$('#overlay-toast').html("Enter a valid url");
 		showToast();
@@ -6344,7 +6443,7 @@ function isValidUrl(url){
 
 // Adjust image
 function adjustImage() {
-	var windW = $(window).width();
+	var windW = window.innerWidth;
 	if (windW < 768) {
 		$('.mobile-tabs').children('.mob-icn-active').click();
 		var imgW = $('#prof-image').width();
@@ -6768,10 +6867,6 @@ function paintDashboardButtons(data){
 	var columnValue = data.columnValue;
 	var stages = data.stages;
 	var max = 2;
-	if(columnName != 'agentId'){
-		$('#dsh-btn1').addClass('hide');
-		max = 3;
-	}
 	if (stages != undefined && stages.length != 0) {
 		if (stages.length < max) {
 			$('#dsh-btn2').addClass('hide');
@@ -6798,30 +6893,11 @@ function paintDashboardButtons(data){
 				contentToDisplay = 'Enter achievements';
 			}
 			if (i == 0) {
-				if(columnName != 'agentId'){
-					$('#dsh-btn1').data('social', stages[i].profileStageKey);
-					$('#dsh-btn1').html(contentToDisplay);
-					$('#dsh-btn1').removeClass('hide');
-				}
-				else{
-					$('#dsh-btn2').data('social', stages[i].profileStageKey);
-					$('#dsh-btn2').html(contentToDisplay);
-					$('#dsh-btn2').removeClass('hide');
-				}
+				$('#dsh-btn2').data('social', stages[i].profileStageKey);
+				$('#dsh-btn2').html(contentToDisplay);
+				$('#dsh-btn2').removeClass('hide');
 			}
 			if (i == 1) {
-				if(columnName != 'agentId'){
-					$('#dsh-btn2').data('social', stages[i].profileStageKey);
-					$('#dsh-btn2').html(contentToDisplay);
-					$('#dsh-btn2').removeClass('hide');
-				}
-				else{
-					$('#dsh-btn3').data('social', stages[i].profileStageKey);
-					$('#dsh-btn3').html(contentToDisplay);
-					$('#dsh-btn3').removeClass('hide');
-				}
-			}
-			if(i == 2) {
 				$('#dsh-btn3').data('social', stages[i].profileStageKey);
 				$('#dsh-btn3').html(contentToDisplay);
 				$('#dsh-btn3').removeClass('hide');
@@ -6831,11 +6907,11 @@ function paintDashboardButtons(data){
 	$('#dsh-btn1').click(function(){
 		var buttonId = 'dsh-btn1';
 		var task = $('#dsh-btn1').data('social');
-		if(task == undefined){
+		if(columnName == 'agentId'){
 			sendSurveyInvitation();
 		}
 		else{
-			dashboardButtonAction(buttonId, task, columnName, columnValue);
+			sendSurveyInvitationAdmin(columnName, columnValue);
 		}
 	});
 	$('#dsh-btn2').click(function(){
