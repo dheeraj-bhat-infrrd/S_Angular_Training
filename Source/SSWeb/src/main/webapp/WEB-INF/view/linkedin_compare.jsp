@@ -77,6 +77,19 @@
 									value="${contactdetail.zipcode}" placeholder='<spring:message code="label.zipcode.key"/>'>
 							</div>
 						</div>
+						<div id="state-city-row" class="wc-form-row clearfix hide">
+							<div class="float-left wc-form-txt"></div>
+							<div class="float-left wc-form-input-cont">
+								<select class="wc-form-input" id="com-state" data-non-empty="true" name="state"
+									data-value="${contactdetail.state}">
+									<option disabled selected><spring:message code="label.select.state.key"/></option>
+								</select>
+							</div>
+							<div class="float-left wc-form-input-cont">
+								<input class="wc-form-input" id="com-city" data-non-empty="true" data-zipcode="true" name="city"
+									value="${contactdetail.city}" placeholder='<spring:message code="label.city.key"/>'>
+							</div>
+						</div>
 						<div class="wc-form-row clearfix">
 							<div class="float-left wc-form-txt"><spring:message code="label.phoneno.key" /></div>
 							<div class="float-left wc-form-input-cont">
@@ -138,9 +151,34 @@
 <script src="${initParam.resourcesPath}/resources/js/jcrop.js"></script>
 <script>
 var selectedCountryRegEx = "";
+var phoneFormat = '(ddd) ddd-dddd';
+var stateList;
+var cityLookupList;
 var profilemasterid = "${profilemasterid}";
 $(document).ready(function() {
+	var countryCode = $('#country-code').val();
 	if ($('#com-country').val() != "" && $('#country-code').val() != "") {
+		for (var i = 0; i < postCodeRegex.length; i++) {
+			if (postCodeRegex[i].code == countryCode) {
+				selectedCountryRegEx = "^" + postCodeRegex[i].regex + "$";
+				selectedCountryRegEx = new RegExp(selectedCountryRegEx);
+				break;
+			}
+		}
+	}
+	
+	if(countryCode == "US"){
+		showStateCityRow();
+		if( $('input[name="country"]').val() == null || $('input[name="country"]').val() == "" ){
+			$('input[name="country"]').val("United States");
+			$('#country-code').val(countryCode);
+		}
+		selectedCountryRegEx = "^" + "\\b\\d{5}\\b(?:[- ]{1}\\d{4})?" + "$";
+		selectedCountryRegEx = new RegExp(selectedCountryRegEx);
+	}
+	
+	if(countryCode && countryCode != ""){
+		phoneFormat = phoneFormatList[$('#country-code').val()];
 		var countryCode = $('#country-code').val();
 		for (var i = 0; i < postCodeRegex.length; i++) {
 			if (postCodeRegex[i].code == countryCode) {
@@ -151,6 +189,8 @@ $(document).ready(function() {
 		}
 	}
 	
+	$('#com-contactno').mask(phoneFormat, {'translation': {d: {pattern: /[0-9*]/}}});
+	currentPhoneRegEx = phoneFormat;
 	// update default image
 	if (profilemasterid == 4) {
 		$("#wc-photo-upload").addClass('dsh-pers-default-img');
@@ -167,12 +207,9 @@ $(document).ready(function() {
 		minLength : 1,
 		source : countryData,
 		delay : 0,
+		autoFocus : true,
 		open : function(event, ui) {
 			$("#country-code").val("");
-		},
-		focus : function(event, ui) {
-			$("#com-country").val(ui.item.label);
-			return false;
 		},
 		select : function(event, ui) {
 			$("#com-country").val(ui.item.label);
@@ -184,6 +221,15 @@ $(document).ready(function() {
 					break;
 				}
 			}
+			if(ui.item.code=="US"){
+				showStateCityRow();
+			}else{
+				hideStateCityRow();
+			}
+			$('#com-contactno').unmask();
+			phoneFormat = phoneFormatList[ui.item.code];
+			currentPhoneRegEx = phoneFormat;
+			$('#com-contactno').mask(phoneFormat, {'translation': {d: {pattern: /[0-9*]/}}});
 			return false;
 		},
 		close : function(event, ui) {
@@ -191,6 +237,15 @@ $(document).ready(function() {
 	}).autocomplete("instance")._renderItem = function(ul, item) {
 		return $("<li>").append(item.label).appendTo(ul);
 	};
+	$("#com-country").keydown(function(e){
+ 	   if( e.keyCode != $.ui.keyCode.TAB) return; 
+ 	    
+   	   e.keyCode = $.ui.keyCode.DOWN;
+   	   $(this).trigger(e);
+
+   	   e.keyCode = $.ui.keyCode.ENTER;
+   	   $(this).trigger(e);
+   	});
 });
 
 // Profile image upload
@@ -225,7 +280,7 @@ function validateCompanyInformationForm(elementId) {
 	var isCompanyInfoPageValid = true;
 	var isFocussed = false;
 
-	if (!validateAddress1('com-address1')) {
+	if (!validateAddress1('com-address1', true)) {
 		isCompanyInfoPageValid = false;
 		if (!isFocussed) {
 			$('#com-address1').focus();
@@ -249,7 +304,7 @@ function validateCompanyInformationForm(elementId) {
 		}
 		return isCompanyInfoPageValid;
 	}
-	if (!validateCountryZipcode('com-zipcode')) {
+	if (!validateCountryZipcode('com-zipcode', true)) {
 		isCompanyInfoPageValid = false;
 		if (!isFocussed) {
 			$('#com-zipcode').focus();
@@ -257,7 +312,7 @@ function validateCompanyInformationForm(elementId) {
 		}
 		return isCompanyInfoPageValid;
 	}
-	if (!validatePhoneNumber('com-contactno')) {
+	if (!validatePhoneNumber('com-contactno', true)) {
 		isCompanyInfoPageValid = false;
 		if (!isFocussed) {
 			$('#com-contactno').focus();
@@ -290,7 +345,9 @@ $(document).on('click', '#wc-address-submit', function() {
 			"country" : $('#com-country').val(),
 			"countrycode" : $('#country-code').val(),
 			"zipcode" : $('#com-zipcode').val(),
-			"contactno" : $('#com-contactno').val()
+			"contactno" : $('#com-contactno').val(),
+			"state" : $('select[name="state"]').val(),
+			"city" : $('input[name="city"]').val()
 		};
 		callAjaxPostWithPayloadData("./editcompanyinformation.do", function(data) {
 			$('#message-header').html(data);
@@ -341,6 +398,30 @@ function validateSummaryForm() {
 	return isFormValid;
 }
 
+function showStateCityRow() {
+	$('#state-city-row').show();
+	if(!stateList){
+		callAjaxGET("./getusstatelist.do", function(data){
+			stateList = JSON.parse(data);
+			for(var i=0; i<stateList.length; i++){
+				$('#com-state').append('<option data-stateid='+stateList[i].id+'>'+stateList[i].statecode+'</option>');
+			}
+			var stateVal = $('#com-state').attr('data-value');
+			if(stateVal && stateVal != ""){
+				$('#com-state').val(stateVal);
+			}
+		}, true);
+	}
+}
+
+function hideStateCityRow() {
+	$('#state-city-row').hide();
+	$('#com-city').val('');
+	$('#com-state').val(function() {
+		return $(this).find('option[selected]').text();
+    });
+}
+
 $(document).on('click', '#wc-summary-submit', function() {
 	if (validateSummaryForm()) {
 		var payload = {
@@ -355,4 +436,54 @@ $(document).on('click', '#wc-summary-submit', function() {
 		}, payload, false);
 	}
 });
+$('#com-state').on('change',function(e){
+	$('#com-city').val('');
+	var stateId = $(this).find(":selected").attr('data-stateid');
+	callAjaxGET("./getzipcodesbystateid.do?stateId="+stateId, function(data){
+		cityLookupList = JSON.parse(data);
+		var searchData = [];
+		for(var i=0; i<cityLookupList.length; i++){
+			searchData[i] = cityLookupList[i].cityname;
+		}
+		
+		var uniqueSearchData = searchData.filter(function(itm,i,a){
+		    return i==a.indexOf(itm);
+		});
+		initializeCityLookup(uniqueSearchData);
+	}, true);
+});
+
+$('#com-city').bind('focus', function(){ 
+	if($('#com-state').val() &&  $('#com-state').val() != ""){
+		$(this).trigger('keydown');
+		$(this).autocomplete("search");		
+	}
+});
+function initializeCityLookup(searchData){
+	$('#com-city').autocomplete({
+		minLength : 0,
+		source : searchData,
+		focus : function(event, ui) {
+			event.stopPropagation();
+		},
+		select : function(event, ui) {
+			event.stopPropagation();
+		},
+		open : function() {
+			$('.ui-autocomplete').perfectScrollbar({
+				suppressScrollX : true
+			});
+			$('.ui-autocomplete').perfectScrollbar('update');
+		}
+	}).keydown(function(e){
+  	    if( e.keyCode != $.ui.keyCode.TAB) return; 
+  	    
+   	   e.keyCode = $.ui.keyCode.DOWN;
+   	   $(this).trigger(e);
+
+   	   e.keyCode = $.ui.keyCode.ENTER;
+   	   $(this).trigger(e);
+   	});
+	
+}
 </script>

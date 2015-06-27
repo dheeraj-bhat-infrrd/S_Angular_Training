@@ -425,6 +425,7 @@ public class SurveyManagementController {
 			if (urlParams != null) {
 				long agentId = Long.parseLong(urlParams.get(CommonConstants.AGENT_ID_COLUMN));
 				String customerEmail = urlParams.get(CommonConstants.CUSTOMER_EMAIL_COLUMN);
+				
 				SurveyPreInitiation surveyPreInitiation = surveyHandler.getPreInitiatedSurvey(agentId, customerEmail);
 				if (surveyPreInitiation == null) {
 					surveyAndStage = getSurvey(agentId, urlParams.get(CommonConstants.CUSTOMER_EMAIL_COLUMN), null, null, 0, null,
@@ -436,6 +437,13 @@ public class SurveyManagementController {
 							surveyPreInitiation.getReminderCounts(), surveyPreInitiation.getCustomerInteractionDetails(),
 							surveyHandler.composeLink(agentId, customerEmail));
 					surveyHandler.markSurveyAsStarted(surveyPreInitiation);
+				}
+				
+				// fetching company logo
+				User user = userManagementService.getUserByUserId(agentId);
+				OrganizationUnitSettings companySettings = organizationManagementService.getCompanySettings(user);
+				if (companySettings != null && companySettings.getLogo() != null){
+					surveyAndStage.put("companyLogo", companySettings.getLogo());
 				}
 			}
 		}
@@ -477,13 +485,21 @@ public class SurveyManagementController {
 						e);
 				return e.getMessage();
 			}
+			
+			User agent = userManagementService.getUserByUserId(agentId);
+			int accountMasterId = 0;
+			try{
+				accountMasterId = agent.getCompany().getLicenseDetails().get(CommonConstants.INITIAL_INDEX).getAccountsMaster().getAccountsMasterId();
+			}catch(NullPointerException e){
+				LOG.error("NullPointerException caught in postToSocialMedia() while fetching account master id for agent " + agent.getFirstName());
+			}
 			List<OrganizationUnitSettings> settings = socialManagementService.getSettingsForBranchesAndRegionsInHierarchy(agentId);
 			AgentSettings agentSettings = userManagementService.getUserSettings(agentId);
 			String facebookMessage = rating + "-Star Survey Response from " + custFirstName + " " + custLastName + " for " + agentName
 					+ " on Social Survey - view at " + getApplicationBaseUrl() + CommonConstants.AGENT_PROFILE_FIXED_URL + agentProfileLink;
 
 			String twitterMessage = rating + "-Star Survey Response from " + custFirstName + " " + custLastName + " for " + agentName
-					+ " on @SocialSurvey - view at " + getApplicationBaseUrl() + CommonConstants.AGENT_PROFILE_FIXED_URL + agentProfileLink;
+					+ " on @SocialSurveyMe - view at " + getApplicationBaseUrl() + CommonConstants.AGENT_PROFILE_FIXED_URL + agentProfileLink;
 
 			String linkedinMessage = rating + "-Star Survey Response from " + custFirstName + " " + custLastName + " for " + agentName
 					+ " on SocialSurvey ";
@@ -497,14 +513,16 @@ public class SurveyManagementController {
 			catch (FacebookException e) {
 				LOG.error("FacebookException caught in postToSocialMedia() while trying to post to facebook. Nested excption is ", e);
 			}
-			for (OrganizationUnitSettings setting : settings) {
-				try {
-					if(!socialManagementService.updateStatusIntoFacebookPage(setting, facebookMessage, serverBaseUrl)){
-						surveyHandler.updateSharedOn(CommonConstants.FACEBOOK_SOCIAL_SITE, agentId, customerEmail);
+			if(accountMasterId != CommonConstants.ACCOUNTS_MASTER_INDIVIDUAL){
+				for (OrganizationUnitSettings setting : settings) {
+					try {
+						if(!socialManagementService.updateStatusIntoFacebookPage(setting, facebookMessage, serverBaseUrl)){
+							surveyHandler.updateSharedOn(CommonConstants.FACEBOOK_SOCIAL_SITE, agentId, customerEmail);
+						}
 					}
-				}
-				catch (FacebookException e) {
-					LOG.error("FacebookException caught in postToSocialMedia() while trying to post to facebook. Nested excption is ", e);
+					catch (FacebookException e) {
+						LOG.error("FacebookException caught in postToSocialMedia() while trying to post to facebook. Nested excption is ", e);
+					}
 				}
 			}
 			try {
@@ -515,6 +533,7 @@ public class SurveyManagementController {
 			catch (TwitterException e) {
 				LOG.error("TwitterException caught in postToSocialMedia() while trying to post to twitter. Nested excption is ", e);
 			}
+			if(accountMasterId != CommonConstants.ACCOUNTS_MASTER_INDIVIDUAL){
 			for (OrganizationUnitSettings setting : settings) {
 				try {
 					if(!socialManagementService.tweet(setting, twitterMessage)){
@@ -525,12 +544,15 @@ public class SurveyManagementController {
 					LOG.error("TwitterException caught in postToSocialMedia() while trying to post to twitter. Nested excption is ", e);
 				}
 			}
+			}
 
 			socialManagementService.updateLinkedin(agentSettings, linkedinMessage, linkedinProfileUrl, linkedinMessageFeedback);
+			if(accountMasterId != CommonConstants.ACCOUNTS_MASTER_INDIVIDUAL){
 			for (OrganizationUnitSettings setting : settings) {
 				if(!socialManagementService.updateLinkedin(setting, linkedinMessage, linkedinProfileUrl, linkedinMessageFeedback)){
 					surveyHandler.updateSharedOn(CommonConstants.LINKEDIN_SOCIAL_SITE, agentId, customerEmail);
 				}
+			}
 			}
 		}
 		catch (NonFatalException e) {
@@ -620,7 +642,7 @@ public class SurveyManagementController {
 			List<OrganizationUnitSettings> settings = socialManagementService.getSettingsForBranchesAndRegionsInHierarchy(agentId);
 			AgentSettings agentSettings = userManagementService.getUserSettings(agentId);
 			String twitterMessage = rating + "-Star Survey Response from " + custFirstName + custLastName + " for " + agentName
-					+ " on @SocialSurvey - view at " + getApplicationBaseUrl() + CommonConstants.AGENT_PROFILE_FIXED_URL + agentProfileLink;
+					+ " on @SocialSurveyMe - view at " + getApplicationBaseUrl() + CommonConstants.AGENT_PROFILE_FIXED_URL + agentProfileLink;
 			try {
 				socialManagementService.tweet(agentSettings, twitterMessage);
 				surveyHandler.updateSharedOn(CommonConstants.TWITTER_SOCIAL_SITE, agentId, customerEmail);

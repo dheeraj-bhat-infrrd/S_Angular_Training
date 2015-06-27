@@ -87,7 +87,7 @@
 			<div class="wc-skip-btn float-right wc-final-skip"><spring:message code="label.skip.key" /></div>
 		</div>
 		<div class="wc-btn-col float-left">
-			<div class="wc-sub-btn float-left wc-final-submit"><spring:message code="label.done.key" /></div>
+			<div class="wc-sub-btn float-left wc-final-skip wc-final-submit"><spring:message code="label.done.key" /></div>
 		</div>
 	</div>
 </div>

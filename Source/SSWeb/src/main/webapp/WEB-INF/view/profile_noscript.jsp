@@ -38,7 +38,7 @@
     		<link rel="canonical" href="${profile.completeProfileUrl}">
     	</c:if>
     	<c:if test="${not empty profile.contact_details && not empty profile.contact_details.name }">
-    		<meta name="desciption" content="Use SocialSurvey Ratings & Reviews to find out how customers have rated ${profName }.">
+    		<meta name="description" content="Use SocialSurvey Ratings & Reviews to find out how customers have rated ${profName }.">
     		<meta name="keywords" content="${profName }, ${profName } ratings, ${profName } reviews, ${profName } scorecard, ${profName } ratings and reviews">
     	</c:if>
     	<c:if test="${not empty averageRating}">
@@ -525,7 +525,7 @@
 											</div>
 										</div>
 									</div>
-									<div class="ppl-content">${reviewItem.review }</div>
+									<div class="ppl-content">${reviewItem.review}</div>
 									<div class="ppl-share-wrapper clearfix">
 										<div class="float-left blue-text ppl-share-shr-txt">Share</div>
 										<div class="float-left clearfix ppl-share-social">

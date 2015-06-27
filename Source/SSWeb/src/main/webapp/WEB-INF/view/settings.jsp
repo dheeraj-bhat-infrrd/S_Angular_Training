@@ -110,7 +110,7 @@
 							</div>
 							<div>
 								<div id="atpst-chk-box" class="float-left bd-check-img"></div>
-								<input type="hidden" id="at-pst-cb" name="autopost" value="true">
+								<input type="hidden" id="at-pst-cb" name="autopost" value="${autoPostEnabled}">
 								<div class="float-left bd-check-txt">Allow user to autopost</div>
 							</div>
 						</div>
@@ -200,7 +200,7 @@
 		
 		<!-- Starting code for Mail text -->
 		<c:if test="${profilemasterid == 1 || accountMasterId == 1}">
-			<div class="um-top-container">
+			<div class="um-top-container" style="padding-bottom: 0">
 				<form id="mail-body-settings-form">
 					<input type="hidden" name="mailcategory" id="mailcategory">
 					<div class="um-header margin-top-25"><spring:message code="label.header.email.configuration.key" /></div>
@@ -242,6 +242,12 @@
 								</div>
 							</div>
 						</div>
+						<div class="st-subject-cont clearfix">
+							<div class="st-subject-label float-left">Survey Request Subject</div>
+							<div class="st-subject-input-cont float-left">
+								<input type="text" class="st-subject-input" name="surveyRequestSubject">
+							</div>
+						</div>
 						<div class="st-header-txt-wrapper">
 							<textarea id="survey-participation-mailcontent" name="survey-participation-mailcontent" class="st-header-txt-input">${surveymailbody}</textarea>
 						</div>
@@ -264,6 +270,12 @@
 									<div class="float-left settings-btn-text">Edit</div>
 									<div class="float-right settings-btn-text">Save</div>
 								</div>
+							</div>
+						</div>
+						<div class="st-subject-cont clearfix">
+							<div class="st-subject-label float-left">Survey Reminder Subject</div>
+							<div class="st-subject-input-cont float-left">
+								<input type="text" class="st-subject-input" name="surveyReminderSubject">
 							</div>
 						</div>
 						<div class="st-header-txt-wrapper">
@@ -301,7 +313,7 @@
 		<!-- Starting code for Other settings -->
 		<c:if test="${profilemasterid == 1 || accountMasterId == 1}">
 			<div class="um-top-container border-0">
-				<div class="um-header margin-top-25"><spring:message code="label.othersettings.key" /></div>
+				<div class="um-header margin-top-10"><spring:message code="label.othersettings.key" /></div>
 				<form id="other-settings-form">
 					<div class="st-others-wrapper clearfix">
 						<input type="hidden" name="othercategory" id="othercategory">
@@ -364,15 +376,22 @@ $(document).ready(function() {
 	hideOverlay();
 	$(document).attr("title", "Edit Settings");
 	
+	if("${autoPostEnabled}" == "false"){
+		$('#atpst-chk-box').addClass('bd-check-img-checked');
+	}
+	
 	var profileMasterId = "${profilemasterid}";
 	var accountMasterId = "${accountMasterId}";
 	if (profileMasterId == 1 || accountMasterId == 1) {
-		$('#survey-participation-mailcontent').ckeditor();
-		$('#survey-participation-mailcontent').ckeditorGet().config.readOnly = true;
-		
-		$('#survey-participation-reminder-mailcontent').ckeditor();
-		$('#survey-participation-reminder-mailcontent').ckeditorGet().config.readOnly = true;
-		
+		try{
+			$('#survey-participation-mailcontent').ckeditor();
+			$('#survey-participation-mailcontent').ckeditorGet().config.readOnly = true;
+			
+			$('#survey-participation-reminder-mailcontent').ckeditor();
+			$('#survey-participation-reminder-mailcontent').ckeditorGet().config.readOnly = true;
+		}catch (e) {
+			console.log("ckeditor not supported for the environment");
+		}
 		autoAppendRatingDropdown('#st-dd-wrapper-min-post', "st-dd-item st-dd-item-min-post");
 		changeRatingPattern($('#rating-min-post').val(), $('#rating-min-post-parent'));
 		$('#rating-min-post').click(function(){
@@ -438,8 +457,11 @@ $(document).ready(function() {
 	});
 
 	$('#edit-participation-mail-content').click(function() {
-		$('#survey-participation-mailcontent').ckeditorGet().setReadOnly(false);
-		
+		try{
+			$('#survey-participation-mailcontent').ckeditorGet().setReadOnly(false);
+		} catch (e) {
+			console.log("ckeditor not supported for the environment");
+		}
 		$('#save-participation-mail-content').show();
 		$('#save-participation-mail-content-disabled').hide();
 		
@@ -449,8 +471,11 @@ $(document).ready(function() {
 	$('#save-participation-mail-content').click(function() {
 		$('#mailcategory').val('participationmail');
 		updateMailContent("mail-body-settings-form");
-		$('#survey-participation-mailcontent').ckeditorGet().setReadOnly(true);
-		
+		try{
+			$('#survey-participation-mailcontent').ckeditorGet().setReadOnly(true);
+		} catch (e) {
+			console.log("ckeditor not supported for the environment");
+		}
 		$(this).hide();
 		$('#save-participation-mail-content-disabled').show();
 
@@ -460,8 +485,11 @@ $(document).ready(function() {
 
 
 	$('#edit-participation-reminder-mail-content').click(function() {
-		$('#survey-participation-reminder-mailcontent').ckeditorGet().setReadOnly(false);
-		
+		try{
+			$('#survey-participation-reminder-mailcontent').ckeditorGet().setReadOnly(false);
+		} catch (e) {
+			console.log("ckeditor not supported for the environment");
+		}
 		$('#save-participation-reminder-mail-content').show();
 		$('#save-participation-reminder-mail-content-disabled').hide();
 		
@@ -471,8 +499,11 @@ $(document).ready(function() {
 	$('#save-participation-reminder-mail-content').click(function() {
 		$('#mailcategory').val('participationremindermail');
 		updateMailContent("mail-body-settings-form");
-		$('#survey-participation-reminder-mailcontent').ckeditorGet().setReadOnly(true);
-		
+		try { 
+			$('#survey-participation-reminder-mailcontent').ckeditorGet().setReadOnly(true);
+		} catch (e) {
+			console.log("ckeditor not supported for the environment");
+		}
 		$(this).hide();
 		$('#save-participation-reminder-mail-content-disabled').show();
 

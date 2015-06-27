@@ -448,8 +448,8 @@ function showProfileLinkInEditProfilePage(source, profileUrl){
 	}
 }
 
-// Send Survey
-$(document).on('input', '.wc-review-fname, .wc-review-lname, .wc-review-email', function() {
+// Send Survey Agent
+$(document).on('input', '#wc-review-table-inner[data-role="agent"] input', function() {
 	var parentDiv = $(this).parent().parent();
 	if (parentDiv.is(':last-child')) {
 		var htmlData = '<div class="wc-review-tr clearfix">'
@@ -457,6 +457,32 @@ $(document).on('input', '.wc-review-fname, .wc-review-lname, .wc-review-email', 
 			+ '<div class="wc-review-tc2 float-left"><input class="wc-review-input wc-review-lname"></div>'
 			+ '<div class="wc-review-tc3 float-left"><input class="wc-review-input wc-review-email"></div>'
 			+ '<div class="wc-review-tc4 float-left"><div class="wc-review-rmv-icn hide"></div></div>'
+		+ '</div>';
+		parentDiv.after(htmlData);
+		
+		// enable remove button
+		if ($('#wc-review-table-inner').children().length > 2) {
+			$('.wc-review-rmv-icn').show();
+		}
+		
+		// setting up perfect scrollbar
+		setTimeout(function() {
+			$('#wc-review-table').perfectScrollbar();
+			$('#wc-review-table').perfectScrollbar('update');
+		}, 1000);
+	}
+});
+
+//Send Survey Admin
+$(document).on('input', '#wc-review-table-inner[data-role="admin"] input', function() {
+	var parentDiv = $(this).parent().parent();
+	if (parentDiv.is(':last-child')) {
+		var htmlData = '<div class="wc-review-tr clearfix">'
+			+ '<div class="wc-review-tc1 float-left pos-relative"><input data-name="agent-name" class="wc-review-input wc-review-agentname"></div>'
+			+ '<div class="wc-review-tc2 float-left"><input class="wc-review-input wc-review-fname"></div>'
+			+ '<div class="wc-review-tc3 float-left"><input class="wc-review-input wc-review-lname"></div>'
+			+ '<div class="wc-review-tc4 float-left"><input class="wc-review-input wc-review-email"></div>'
+			+ '<div class="wc-review-tc5 float-left"><div class="wc-review-rmv-icn hide"></div></div>'
 		+ '</div>';
 		parentDiv.after(htmlData);
 		
@@ -491,29 +517,90 @@ $(document).on('click', '.wc-review-rmv-icn', function() {
 
 $(document).on('click', '#wc-send-survey', function() {
 	var receiversList = [];
+	var agentId = undefined;
+	var columnName = undefined;
+	var firstname = "";
+	var lastname = "";
+	var idx=0;
+	var exit = false;
 	$('#wc-review-table-inner').children().each(function() {
 		if (!$(this).hasClass('wc-review-hdr')) {
+			var dataName = $(this).find('input.wc-review-agentname').first().attr('data-name');
+			if (dataName == 'agent-name') {
+				agentId = $(this).find('input.wc-review-agentname').first().attr('agent-id');
+
+				/*var name = $(this).find('input.wc-review-custname').first().val();
+				if(name!=undefined){
+				var name = $(this).find('input.wc-review-custname').first().val();
+				if (name != undefined) {
+					var nameParts = name.split(" ");
+					if (nameParts.length == 1) {
+						firstname = name;
+					} else {
+						for (var i = 0; i < nameParts.length-1; i++) {
+							firstname = firstname + nameParts[i];
+						}
+						lastname = nameParts[nameParts.length - 1];
+					}
+				}*/
+				if (idx == 0) {
+					columnName = $(this).find('input.wc-review-agentname').first().attr('column-name');
+					idx ++;
+				}
+			}
 			
-			var firstname = $(this).find('input.wc-review-fname').first().val();
-			var lastname = $(this).find('input.wc-review-lname').first().val();
+			firstname = $(this).find('input.wc-review-fname').first().val();
+			lastname = $(this).find('input.wc-review-lname').first().val();
+			
 			var emailId = $(this).find('input.wc-review-email').first().val();
 			
-			if (nameRegex.test(firstname) && emailRegex.test(emailId)) {
+			if(firstname == "" && emailId != ""){
+				$('#overlay-toast').html('Please enter Firstname for all the customer');
+				showToast();
+				exit = true;
+				return false;
+			}
+			if (emailRegex.test(emailId)) {
 				var receiver = new Object();
 				receiver.firstname = firstname;
 				receiver.lastname = lastname;
 				receiver.emailId = emailId;
-
+				if (dataName == 'agent-name') {
+					receiver.agentId = agentId;
+				}
 				receiversList.push(receiver);
+			}
+			else if(firstname != ""){
+				$('#overlay-toast').html('Please enter valid email for ' + firstname);
+				showToast();
+				exit = true;
+				return false;
 			}
 		}
 	});
 
+	if(exit){
+		exit = false;
+		return false;
+	}
+	
 	receiversList = JSON.stringify(receiversList);
 	var payload = {
 		"receiversList" : receiversList,
 		"source" : 'agent'
 	};
+	if (columnName != undefined) {
+		payload = {
+			"receiversList" : receiversList,
+			"source" : 'admin',
+			"columnName" : columnName,
+		};
+	}
+
+	loadDisplayPicture();
+	$(this).closest('.overlay-login').hide();
+	showDisplayPic();
+	
 	callAjaxPostWithPayloadData("./sendmultiplesurveyinvites.do", function(data) {
 		$('#overlay-toast').html('Survey request sent successfully!');
 		showToast();
@@ -532,6 +619,20 @@ function sendSurveyInvitation() {
 			$('#overlay-send-survey').show();
 		}
 	}, true);
+}
+
+function sendSurveyInvitationAdmin(columnName, columnValue) {
+	var payload = {
+			"columnName" : columnName,
+			"columnValue" : columnValue
+	};
+	callAjaxGetWithPayloadData("./sendsurveyinvitationadmin.do", function(data) {
+		$('#overlay-send-survey').html(data);
+		if ($("#welcome-popup-invite").length) {
+			$('#overlay-send-survey').removeClass("hide");
+			$('#overlay-send-survey').show();
+		}
+	}, payload, true);
 }
 
 function linkedInDataImport() {

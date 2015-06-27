@@ -4,8 +4,10 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
+
 import org.apache.http.NameValuePair;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
@@ -26,10 +28,12 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
+
 import twitter4j.Twitter;
 import twitter4j.TwitterException;
 import twitter4j.auth.AccessToken;
 import twitter4j.auth.RequestToken;
+
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
@@ -58,6 +62,7 @@ import com.realtech.socialsurvey.core.utils.DisplayMessageConstants;
 import com.realtech.socialsurvey.web.common.ErrorResponse;
 import com.realtech.socialsurvey.web.common.JspResolver;
 import com.realtech.socialsurvey.web.util.RequestUtils;
+
 import facebook4j.Facebook;
 import facebook4j.FacebookException;
 
@@ -1089,7 +1094,7 @@ public class SocialManagementController {
 			User user = sessionHelper.getCurrentUser();
 			List<OrganizationUnitSettings> settings = socialManagementService.getBranchAndRegionSettingsForUser(user.getUserId());
 			String twitterMessage = rating + "-Star Survey Response from " + custFirstName + custLastName + " for " + agentName
-					+ " on @SocialSurvey - view at " + applicationBaseUrl + CommonConstants.AGENT_PROFILE_FIXED_URL + agentProfileLink;
+					+ " on @SocialSurveyMe - view at " + applicationBaseUrl + CommonConstants.AGENT_PROFILE_FIXED_URL + agentProfileLink;
 			twitterMessage = twitterMessage.replaceAll("null", "");
 
 			for (OrganizationUnitSettings setting : settings) {
@@ -1290,6 +1295,14 @@ public class SocialManagementController {
 	public String sendSurveyInvite() {
 		LOG.info("Method sendSurveyInvite() called from SocialManagementController");
 		return JspResolver.HEADER_SURVEY_INVITE;
+	}
+	
+	@RequestMapping(value = "/sendsurveyinvitationadmin")
+	public String sendSurveyInviteAdmin(Model model, HttpServletRequest request) {
+		LOG.info("Method sendSurveyInvite() called from SocialManagementController");
+		model.addAttribute("columnName", request.getParameter("columnName"));
+		model.addAttribute("columnValue", request.getParameter("columnValue"));
+		return JspResolver.HEADER_SURVEY_INVITE_ADMIN;
 	}
 	
 	@ResponseBody

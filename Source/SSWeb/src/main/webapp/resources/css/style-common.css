@@ -103,6 +103,10 @@ a,a:hover,a:visited {
 	margin: 0 auto;
 }
 
+.pos-relative{
+	position: relative;
+}
+
 .logo {
 	background: url(../images/logo.png) no-repeat center;
 }
@@ -486,15 +490,17 @@ html.is-modern.card-root.js.no-touch.csstransitions.svg.inlinesvg.placeholder
 }
 
 .btn-payment {
+	display: block;
+	width: 150px;
+	margin: 0 auto;
+	line-height: 36px; 
+	border: 0;
 	border-radius: 3px;
 	color: #fff;
 	background-color: #5CC8EF;
 	font-size: 13px;
-	line-height: 36px;
 	text-align: center;
-	width: 150px;
 	box-shadow: none;
-	border: 0;
 }
 
 .btn-payment:hover {
@@ -1087,7 +1093,7 @@ button.paypal.is-active {
 .payment-section {
 	box-shadow: 0px 1px 20px 2px #7C7C7C;
 	background-color: #fff;
-	width: 500px;
+	width: 750px;
 	margin: 50px auto;
 	border-top: 5px solid #5cc7ef;
 	border-radius: 4px;
@@ -1703,6 +1709,14 @@ button.paypal.is-active {
 
 .icn-yelp {
 	background: url(../images/yelp.png) no-repeat center;
+}
+
+.icn-zillow {
+	background: url(../images/zillow.png) no-repeat center;
+}
+
+.icn-lendingtree {
+	background: url(../images/lendingtree.png) no-repeat center;
 }
 
 .icn-gplus {
@@ -3047,6 +3061,8 @@ button.paypal.is-active {
 }
 
 .ov-payment-shadow {
+	width: 750px;
+	max-width: 100%;
 	float: none;
 	margin: 0 auto;
 	box-shadow: 0px 0px 13px 4px #CCC;
@@ -4919,7 +4935,36 @@ tr.v-tbl-header {
 }
 
 .v-tbl-row {
+	/* cursor: pointer; */
+}
+
+.branch-row, .region-row{
 	cursor: pointer;
+}
+
+.branch-row .v-line-brnch, .region-row .v-line-rgn{
+	background-image: url(../images/hm-arrow-closed.png);
+	background-position: 10px center;
+	background-repeat: no-repeat;
+}
+
+.branch-row[clicked="true"]  .v-line-brnch, .region-row[clicked="true"] .v-line-rgn{
+	background-image: url(../images/hm-arrow-open.png);
+}
+
+.bd-hr-item-l1>.bd-lt-l1, 
+.bd-hr-item-l2>.bd-lt-l2, 
+.bd-hr-item-l1>.bd-lt-l2 {
+	background-image: url(../images/hm-arrow-closed.png);
+	background-position: 5px center;
+	background-repeat: no-repeat;
+}
+
+.bd-hr-item-l1[data-openstatus="open"]>.bd-lt-l1,
+.bd-hr-item-l2[data-openstatus="open"]>.bd-lt-l2, 
+.bd-hr-item-l1[data-openstatus="open"]>.bd-lt-l2 {
+	background-image: url(../images/hm-arrow-open.png);
+	background-position: 3px center;
 }
 
 .v-hr-tbl tr.v-tbl-row td {
@@ -5056,11 +5101,11 @@ td.v-tbl-spacer {
 }
 
 .v-icn-close {
-	background: url('../images/close_hr.png') no-repeat center;
+	background: url('../images/delete.png') no-repeat center;
 }
 
 .v-icn-edit {
-	background: url('../images/edit_hr.png') no-repeat center;
+	background: url('../images/edit-1.png') no-repeat center;
 }
 
 .user-info-sing-out {
@@ -6600,4 +6645,108 @@ input.report-abuse-input {
 .prof-logo-edit{
 	background: url(../images/upload_logo.png) no-repeat center;
 	background-size: contain;
+}
+
+.prof-edditable-cont {
+	position: relative;
+}
+
+.prof-edit-field-icn {
+	position: absolute;
+	top: 0; right : -30px;
+	width: 30px;
+	height: 34px;
+	background: url(../images/edit.png) no-repeat center;
+	right: -30px;
+}
+
+a.sq-btn-post-social:hover, a.sq-btn-post-social:visited {
+	color: #fff;
+}
+
+.prof-report-abuse-txt {
+	font-size: 13px;
+	color: #777;
+}
+
+.agent-dropdown-wrapper {
+    position: absolute;
+    top: 40px;
+    left: 5px;
+    padding-right: 10px;
+    width: 350px;
+    z-index: 9;
+}
+
+.agent-dropdown-cont {
+	border: 1px solid #dcdcdc;
+}
+
+.agent-dropdown-item {
+    line-height: 40px;
+    padding-left: 10px;
+    background-color: #fff;
+    cursor: pointer;
+}
+
+.agent-dropdown-item:hover {
+    color:#fff;
+    background-color: #5cc7ef;
+}
+
+.st-settings-text {
+	line-height: normal;
+}
+
+.st-subject-cont {
+    margin: 0px 0 30px;
+    line-height: 40px;
+}
+
+.st-subject-label {
+    width: 25%;
+    font-size: 15px;
+}
+
+.st-subject-input-cont {
+    width: 75%;
+}
+
+.st-subject-input {
+    width: 250px;
+    height: 40px;
+    line-height: 20px;
+    padding: 10px;
+    border: 1px solid #dcdcdc;
+    border-radius: 3px;
+}
+.dsh-dd-wrapper {
+	width: 300px;
+	background-color: #fff;
+	padding: 8px;
+	border: 1px solid #dcdcdc;
+}
+
+.dsh-rgn-brnch-agnt-list {
+	position: absolute;
+}
+
+.dsh-sb-dd {
+	position: absolute;
+  	background-color: white;
+  	top: 36px;
+  	width: 215px;
+  	right: 35px;
+  	display: block;
+  	border: 1px solid #dcdcdc;
+  	line-height: 32px;
+}
+
+.dsh-inp-wrapper {
+	position: relative;
+}
+
+.dsh-res-display {
+	padding: 0 10px;
+	cursor: pointer;
 }

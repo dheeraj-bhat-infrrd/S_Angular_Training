@@ -1040,7 +1040,9 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 		Map<String, String> urlParams = new HashMap<String, String>();
 		urlParams.put(CommonConstants.EMAIL_ID, emailId);
 		urlParams.put(CommonConstants.FIRST_NAME, firstName);
-		urlParams.put(CommonConstants.LAST_NAME, lastName);
+		if (lastName != null && !lastName.isEmpty()) {
+			urlParams.put(CommonConstants.LAST_NAME, lastName);
+		}
 		urlParams.put(CommonConstants.COMPANY, String.valueOf(companyId));
 
 		LOG.info("Generating URL");
@@ -1768,9 +1770,12 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 		ContactDetailsSettings contactSettings = new ContactDetailsSettings();
 		if (user.getLastName() != null) {
 			contactSettings.setName(user.getFirstName() + " " + user.getLastName());
+			contactSettings.setFirstName(user.getFirstName());
+			contactSettings.setLastName(user.getLastName());
 		}
 		else {
 			contactSettings.setName(user.getFirstName());
+			contactSettings.setFirstName(user.getFirstName());
 		}
 
 		MailIdSettings mail_ids = new MailIdSettings();
@@ -1915,6 +1920,8 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 
 		String name = user.getFirstName() + " " + (user.getLastName() != null ? user.getLastName() : "");
 		contactDetails.setName(name);
+		contactDetails.setFirstName(firstName);
+		contactDetails.setLastName(lastName);
 
 		String profileName = generateIndividualProfileName(user.getUserId(), name, emailId);
 		String profileUrl = utils.generateAgentProfileUrl(profileName);

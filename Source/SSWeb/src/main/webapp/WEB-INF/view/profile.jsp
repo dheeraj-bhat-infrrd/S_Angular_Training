@@ -1,6 +1,5 @@
-<%@ page language="java" contentType="text/html; charset=ISO-8859-1"
-	pageEncoding="UTF-8"%>
-<%@taglib uri="http://www.springframework.org/tags" prefix="spring"%>
+<%@ page language="java" contentType="text/html; charset=ISO-8859-1" pageEncoding="UTF-8"%>
+<%@ taglib prefix="spring" uri="http://www.springframework.org/tags"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <!DOCTYPE">
@@ -39,7 +38,7 @@
     		<link rel="canonical" href="${profile.completeProfileUrl}">
     	</c:if>
     	<c:if test="${not empty profile.contact_details && not empty profile.contact_details.name}">
-    		<meta name="desciption" content="Use SocialSurvey Ratings & Reviews to find out how customers have rated ${profName}.">
+    		<meta name="description" content="Use SocialSurvey Ratings & Reviews to find out how customers have rated ${profName}.">
     		<meta name="keywords" content="${profName}, ${profName} ratings, ${profName} reviews, ${profName} scorecard, ${profName} ratings and reviews">
     	</c:if>
     	<c:if test="${not empty averageRating}">
@@ -57,11 +56,11 @@
     </div>
     <div id="report-abuse-overlay" class="overlay-main hide">
     	<div class="overlay-disable-wrapper">
-    		<div id="overlay-header" class="ol-header">Why do you want to report the review?</div>
+    		<div id="overlay-header" class="ol-header"><spring:message code="label.publicprofile.reportabuse.title.key"/></div>
     		<div class="ol-content">
     			<input type="text" id="report-abuse-cus-name" class="report-abuse-input" placeholder="Name">
     			<input type="email" id="report-abuse-cus-email" class="report-abuse-input" placeholder="Email Address">
-    			<textarea id="report-abuse-txtbox" class="report-abuse-txtbox" placeholder="Type here on why do you want to report the review...."></textarea>
+    			<textarea id="report-abuse-txtbox" class="report-abuse-txtbox" placeholder='<spring:message code="label.publicprofile.reportabuse.key"/>'></textarea>
     		</div>
     		<div class="rpa-overlay-btn-cont clearfix">
     			<div class="rpa-btn rpa-report-btn ol-btn cursor-pointer">Report</div>
@@ -94,7 +93,7 @@
 <input type="hidden" value="${regionProfileName}" id="region-profile-name">
 <input type="hidden" value="${branchProfileName}" id="branch-profile-name">
 <input type="hidden" value="${agentProfileName}" id="agent-profile-name">
-<input type="hidden" id="profile-fetch-info" fetch-all-reviews="false" total-reviews="${reviewsCount }" profile-level="${profileLevel}"/>
+<input type="hidden" id="profile-fetch-info" fetch-all-reviews="false" total-reviews="${reviewsCount}" profile-level="${profileLevel}"/>
 <div class="hdr-wrapper">
     <div class="container hdr-container clearfix">
         <div class="float-left hdr-logo"></div>
@@ -157,7 +156,7 @@
 							<div class='rating-image float-left smiley-rat-${integerAverageRating }'></div>
 							<div class='rating-rounded float-left'>${floatingAverageRating}</div>
 						</div>
-						<div class="float-left review-count-left cursor-pointer" id="prof-company-review-count">${reviewsCount } Reviews(s)</div>
+						<div class="float-left review-count-left cursor-pointer" id="prof-company-review-count">${reviewsCount } Review(s)</div>
 					</div>
 					<div class="prof-btn-wrapper clearfix">
 						<div class="prof-btn-contact float-left" onclick="focusOnContact()" >Contact
@@ -221,19 +220,25 @@
 						<c:if test="${not empty profile.socialMediaTokens}">
 							<div id="social-connect-txt" class="float-left social-connect-txt">Connect with ${profName }:</div>
 							<c:if test="${not empty profile.socialMediaTokens.facebookToken && not empty profile.socialMediaTokens.facebookToken.facebookPageLink}">
-								<div id="icn-fb" class="float-left social-item-icon icn-fb" data-link="${profile.socialMediaTokens.facebookToken.facebookPageLink }"></div>
+								<div id="icn-fb" class="float-left social-item-icon icn-fb" data-link="${profile.socialMediaTokens.facebookToken.facebookPageLink}" title="Facebook"></div>
 							</c:if>
 							<c:if test="${not empty profile.socialMediaTokens.twitterToken && not empty profile.socialMediaTokens.twitterToken.twitterPageLink}">
-								<div id="icn-twit" class="float-left social-item-icon icn-twit" data-link="${profile.socialMediaTokens.twitterToken.twitterPageLink }"></div>
+								<div id="icn-twit" class="float-left social-item-icon icn-twit" data-link="${profile.socialMediaTokens.twitterToken.twitterPageLink}" title="Twitter"></div>
 							</c:if>
 							<c:if test="${not empty profile.socialMediaTokens.linkedInToken && not empty profile.socialMediaTokens.linkedInToken.linkedInPageLink}">
-								<div id="icn-lin" class="float-left social-item-icon icn-lin" data-link="${profile.socialMediaTokens.linkedInToken.linkedInPageLink }"></div>
-							</c:if>
-							<c:if test="${not empty profile.socialMediaTokens.yelpToken && not empty profile.socialMediaTokens.yelpToken.yelpPageLink}">
-								<div id="icn-yelp" class="float-left social-item-icon icn-yelp" data-link="${profile.socialMediaTokens.yelpToken.yelpPageLink }"></div>
+								<div id="icn-lin" class="float-left social-item-icon icn-lin" data-link="${profile.socialMediaTokens.linkedInToken.linkedInPageLink}" title="LinkedIn"></div>
 							</c:if>
 							<c:if test="${not empty profile.socialMediaTokens.googleToken && not empty profile.socialMediaTokens.googleToken.profileLink}">
-								<div id="icn-gplus" class="float-left social-item-icon icn-gplus" data-link="${profile.socialMediaTokens.googleToken.profileLink }"></div>
+								<div id="icn-gplus" class="float-left social-item-icon icn-gplus" data-link="${profile.socialMediaTokens.googleToken.profileLink}" title="Google+"></div>
+							</c:if>
+							<c:if test="${not empty profile.socialMediaTokens.yelpToken && not empty profile.socialMediaTokens.yelpToken.yelpPageLink}">
+								<div id="icn-yelp" class="float-left social-item-icon icn-yelp" data-link="${profile.socialMediaTokens.yelpToken.yelpPageLink}" title="Yelp"></div>
+							</c:if>
+							<c:if test="${not empty profile.socialMediaTokens.zillowToken && not empty profile.socialMediaTokens.zillowToken.zillowProfileLink}">
+								<div id="icn-zillow" class="float-left social-item-icon icn-zillow" data-link="${profile.socialMediaTokens.zillowToken.zillowProfileLink}" title="Zillow"></div>
+							</c:if>
+							<c:if test="${not empty profile.socialMediaTokens.lendingTreeToken && not empty profile.socialMediaTokens.lendingTreeToken.lendingTreeProfileLink}">
+								<div id="icn-lendingtree" class="float-left social-item-icon icn-lendingtree" data-link="${profile.socialMediaTokens.lendingTreeToken.lendingTreeProfileLink}" title="LendingTree"></div>
 							</c:if>
 						</c:if>
 					</div>
@@ -447,6 +452,7 @@
 <script src="${initParam.resourcesPath}/resources/js/profile.js"></script>
 <script src="${initParam.resourcesPath}/resources/js/googletracking.js"></script>
 <script src="${initParam.resourcesPath}/resources/js/googlemaps.js"></script>
+<script src="${initParam.resourcesPath}/resources/js/timezones.js"></script>
 <script src="${initParam.resourcesPath}/resources/js/perfect-scrollbar.jquery.min.js"></script>
 <script>
     $(document).ready(function(){
