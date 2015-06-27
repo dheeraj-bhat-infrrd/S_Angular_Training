@@ -2083,4 +2083,12 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 		}
 		return null;
 	}
+
+	@Override
+	@Transactional
+    public void updateUser(User user) {
+	    LOG.info("Method updateUser() started to update user.");
+	    userDao.merge(user);
+	    LOG.info("Method updateUser() finished to update user.");
+    }
 }
