@@ -295,5 +295,7 @@ public interface UserManagementService {
 	public boolean isValidApiKey(String apiSecret, String apiKey) throws InvalidInputException, NoRecordsFetchedException;
 
 	public User getCompanyAdmin(long companyId) throws InvalidInputException;
+
+	public void updateUser(User user);
 }
 // JIRA SS-34 BY RM02 BOC

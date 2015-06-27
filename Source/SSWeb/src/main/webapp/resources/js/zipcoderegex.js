@@ -761,7 +761,7 @@ var postCodeRegex = [
 			"regex" : ""
 		}, {
 			"code" : "GB",
-			"regex" : "[A-Za-z]{1,2}\\d([A-Za-z]|\\d)\\d[A-Za-z]{2}"
+			"regex" : "[A-Za-z]{1,2}\\d{1}[A-Za-z0-9]{0,1} *\\d{1}[A-Za-z]{2}"
 		}, {
 			"code" : "US",
 			"regex" : "\\b\\d{5}\\b(?:[- ]{1}\\d{4})?"
