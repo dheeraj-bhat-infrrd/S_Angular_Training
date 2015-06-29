@@ -587,6 +587,7 @@ public class OrganizationManagementController {
 		LOG.info("Saving survey participation mail body");
 		HttpSession session = request.getSession(false);
 		String mailCategory = request.getParameter("mailcategory");
+		String mailSubject = null;
 		String mailBody = null;
 		String message = "";
 
@@ -595,13 +596,21 @@ public class OrganizationManagementController {
 					.getCompanySettings();
 			MailContentSettings updatedMailContentSettings = null;
 			if (mailCategory != null && mailCategory.equals("participationmail")) {
+				mailSubject = request.getParameter("survey-mailcontent-subject");
+				if (mailSubject == null || mailSubject.isEmpty()) {
+					LOG.warn("Survey participation mail Subject is blank.");
+					throw new InvalidInputException("Survey participation mail subject is blank.", DisplayMessageConstants.GENERAL_ERROR);
+				}
+
 				mailBody = request.getParameter("survey-participation-mailcontent");
 				if (mailBody == null || mailBody.isEmpty()) {
 					LOG.warn("Survey participation mail body is blank.");
 					throw new InvalidInputException("Survey participation mail body is blank.", DisplayMessageConstants.GENERAL_ERROR);
 				}
-				updatedMailContentSettings = organizationManagementService.updateSurveyParticipationMailBody(companySettings, mailBody,
+				
+				updatedMailContentSettings = organizationManagementService.updateSurveyParticipationMailBody(companySettings, mailSubject, mailBody,
 						CommonConstants.SURVEY_MAIL_BODY_CATEGORY);
+				
 				// set the value back in session
 				session.setAttribute(CommonConstants.SURVEY_PARTICIPATION_MAIL_BODY_IN_SESSION, mailBody);
 				message = messageUtils.getDisplayMessage(DisplayMessageConstants.SURVEY_PARTICIPATION_MAILBODY_UPDATE_SUCCESSFUL,
@@ -609,18 +618,27 @@ public class OrganizationManagementController {
 			}
 
 			else if (mailCategory != null && mailCategory.equals("participationremindermail")) {
+				mailSubject = request.getParameter("survey-mailreminder-subject");
+				if (mailSubject == null || mailSubject.isEmpty()) {
+					LOG.warn("Survey participation reminder mail Subject is blank.");
+					throw new InvalidInputException("Survey participation reminder mail subject is blank.", DisplayMessageConstants.GENERAL_ERROR);
+				}
+
 				mailBody = request.getParameter("survey-participation-reminder-mailcontent");
 				if (mailBody == null || mailBody.isEmpty()) {
 					LOG.warn("Survey participation reminder mail body is blank.");
-					throw new InvalidInputException("Survey participation mail body is blank.", DisplayMessageConstants.GENERAL_ERROR);
+					throw new InvalidInputException("Survey participation reminder mail body is blank.", DisplayMessageConstants.GENERAL_ERROR);
 				}
-				updatedMailContentSettings = organizationManagementService.updateSurveyParticipationMailBody(companySettings, mailBody,
+				
+				updatedMailContentSettings = organizationManagementService.updateSurveyParticipationMailBody(companySettings, mailSubject, mailBody,
 						CommonConstants.SURVEY_REMINDER_MAIL_BODY_CATEGORY);
+				
 				// set the value back in session
 				session.setAttribute(CommonConstants.SURVEY_PARTICIPATION_REMINDER_MAIL_BODY_IN_SESSION, mailBody);
 				message = messageUtils.getDisplayMessage(DisplayMessageConstants.SURVEY_PARTICIPATION_REMINDERMAILBODY_UPDATE_SUCCESSFUL,
 						DisplayMessageType.SUCCESS_MESSAGE).getMessage();
 			}
+			
 			// update the mail content settings in session
 			companySettings.setMail_content(updatedMailContentSettings);
 		}
@@ -628,6 +646,7 @@ public class OrganizationManagementController {
 			LOG.error("NonFatalException while saving survey participation mail body. Reason : " + e.getMessage(), e);
 			message = messageUtils.getDisplayMessage(e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE).getMessage();
 		}
+		
 		return message;
 	}
 
