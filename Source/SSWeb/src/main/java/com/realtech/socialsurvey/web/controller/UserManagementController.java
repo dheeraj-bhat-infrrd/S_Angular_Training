@@ -1364,7 +1364,16 @@ public class UserManagementController {
 			user.setFirstName(firstName);
 			user.setLastName(lastName);
 			user.setEmailId(emailId);
-			userManagementService.updateUser(user);
+			user.setLoginName(emailId);
+			
+			//update in solr
+			Map<String, Object> userMap = new HashMap<>();
+			userMap.put(CommonConstants.USER_DISPLAY_NAME_SOLR, fullName);
+		    userMap.put(CommonConstants.USER_FIRST_NAME_SOLR, firstName);
+		    userMap.put(CommonConstants.USER_LAST_NAME_SOLR, lastName);
+		    userMap.put(CommonConstants.USER_EMAIL_ID_SOLR, emailId);
+		    userMap.put(CommonConstants.USER_LOGIN_NAME_SOLR, emailId);
+			userManagementService.updateUser(user, userMap);
 
 			// Update AgentSetting in MongoDB
 			AgentSettings agentSettings = userManagementService
@@ -1375,14 +1384,10 @@ public class UserManagementController {
 			contactDetails.setLastName(lastName);
 			contactDetails.setName(fullName);
 			contactDetails.getMail_ids().setWork(emailId);
-			profileManagementService
-			        .updateContactDetails(
-			                MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION,
+			profileManagementService.updateContactDetails(MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION,
 			                agentSettings, contactDetails);
 		} catch (NonFatalException e) {
-			LOG.error(
-			        "NonFatalException caught in updateUserByAdmin(). Nested exception is ",
-			        e);
+			LOG.error("NonFatalException caught in updateUserByAdmin(). Nested exception is ", e);
 			return e.getMessage();
 		}
 		LOG.info("Method updateUserByAdmin() finished from UserManagementController");
