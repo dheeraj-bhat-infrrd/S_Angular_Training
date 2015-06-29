@@ -7,8 +7,10 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
+
 import org.noggit.JSONUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -20,14 +22,17 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
+
 import com.amazonaws.util.json.JSONException;
 import com.amazonaws.util.json.JSONObject;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
+import com.realtech.socialsurvey.core.dao.impl.MongoOrganizationUnitSettingDaoImpl;
 import com.realtech.socialsurvey.core.entities.AgentSettings;
 import com.realtech.socialsurvey.core.entities.Branch;
 import com.realtech.socialsurvey.core.entities.BranchFromSearch;
+import com.realtech.socialsurvey.core.entities.ContactDetailsSettings;
 import com.realtech.socialsurvey.core.entities.LicenseDetail;
 import com.realtech.socialsurvey.core.entities.LockSettings;
 import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
@@ -1311,6 +1316,7 @@ public class UserManagementController {
 			model.addAttribute("lastName", user.getLastName());
 			model.addAttribute("emailId", user.getEmailId());
 			model.addAttribute("userId", user.getUserId());
+			model.addAttribute("status", user.getStatus());
 
 			// returning in descending order
 			Collections.reverse(userAssignments);
@@ -1326,6 +1332,68 @@ public class UserManagementController {
 		return JspResolver.USER_MANAGEMENT_EDIT_USER_DETAILS;
 	}
 
+	@ResponseBody
+	@RequestMapping(value = "/updateuserbyadmin", method = RequestMethod.POST)
+	public String updateUserByAdmin(Model model, HttpServletRequest request) {
+		LOG.info("Method updateUserByAdmin() called from UserManagementController");
+		String userIdStr = request.getParameter("userId");
+		String firstName = request.getParameter("firstName");
+		String lastName = request.getParameter("lastName");
+		String emailId = request.getParameter("emailId");
+		
+		String fullName = "";
+		
+		fullName = firstName;
+		
+		if(lastName != null && lastName != ""){
+			fullName += " " + lastName;
+		}
+		
+		long userId = 0;
+		try {
+			try {
+				userId = Long.parseLong(userIdStr);
+			} catch (NumberFormatException e) {
+				LOG.error(
+				        "NumberFormatException while parsing user id. Reason : "
+				                + e.getMessage(), e);
+				throw e;
+			}
+			// Update AgentSetting in MySQL
+			User user = userManagementService.getUserByUserId(userId);
+			user.setFirstName(firstName);
+			user.setLastName(lastName);
+			user.setEmailId(emailId);
+			user.setLoginName(emailId);
+			
+			//update in solr
+			Map<String, Object> userMap = new HashMap<>();
+			userMap.put(CommonConstants.USER_DISPLAY_NAME_SOLR, fullName);
+		    userMap.put(CommonConstants.USER_FIRST_NAME_SOLR, firstName);
+		    userMap.put(CommonConstants.USER_LAST_NAME_SOLR, lastName);
+		    userMap.put(CommonConstants.USER_EMAIL_ID_SOLR, emailId);
+		    userMap.put(CommonConstants.USER_LOGIN_NAME_SOLR, emailId);
+			userManagementService.updateUser(user, userMap);
+
+			// Update AgentSetting in MongoDB
+			AgentSettings agentSettings = userManagementService
+			        .getAgentSettingsForUserProfiles(user.getUserId());
+			ContactDetailsSettings contactDetails = agentSettings
+			        .getContact_details();
+			contactDetails.setFirstName(firstName);
+			contactDetails.setLastName(lastName);
+			contactDetails.setName(fullName);
+			contactDetails.getMail_ids().setWork(emailId);
+			profileManagementService.updateContactDetails(MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION,
+			                agentSettings, contactDetails);
+		} catch (NonFatalException e) {
+			LOG.error("NonFatalException caught in updateUserByAdmin(). Nested exception is ", e);
+			return e.getMessage();
+		}
+		LOG.info("Method updateUserByAdmin() finished from UserManagementController");
+		return "User details updated successfully";
+	}
+	
 	@ResponseBody
 	@RequestMapping(value = "/updateuserprofile", method = RequestMethod.POST)
 	public String updateUserProfile(Model model, HttpServletRequest request) {
