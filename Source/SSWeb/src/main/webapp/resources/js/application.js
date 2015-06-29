@@ -97,6 +97,7 @@ var yelpEnabled;
 var googleEnabled;
 var agentProfileLink;
 var agentFullProfileLink;
+var companyLogo;
 $(document).on('click', '.icn-plus-open', function() {
 	$(this).hide();
 	$(this).parent().find('.ppl-share-social,.icn-remove').show();
@@ -3616,6 +3617,14 @@ function validateAssignToBranchName() {
 	}
 }
 
+$(document).on('keyup', '#search-users-key', function(e) {
+	// detect enter
+	if (e.keyCode == 13) {
+		console.log("Enter");
+		searchUsersByNameEmailLoginId($(this).val());
+	}
+});
+
 function searchUsersByNameEmailLoginId(searchKey) {
 	userStartIndex = 0;
 	var url = "./findusers.do";
@@ -3787,17 +3796,6 @@ function getUserAssignments(userId) {
             updateUserProfile(profileId, 1);
         });
 		
-		$("#btn-save-user-assignment").click(function(e){
-			if(validateIndividualForm()){
-				saveUserAssignment("user-assignment-form");
-				
-				// refreshing right section after assignment
-				setTimeout(function() {
-					getUserAssignments(userId);
-				}, 2000);
-			}
-		});
-		
 		setTimeout(function() {
 			$('#profile-tbl-wrapper-' + userId).perfectScrollbar();
 		}, 1000);
@@ -3806,6 +3804,91 @@ function getUserAssignments(userId) {
             $('.dd-droplist').slideUp(200);
         });
 	} , true);
+}
+
+$(document).on('click','#user-edit-btn',function(e){
+	
+	$('#user-edit-btn-row').hide();
+	$('form input[data-editable="true"]').removeAttr("readonly");
+	$('#btn-save-user-assignment').show();
+	
+	$("#btn-save-user-assignment").off('click');
+	$("#btn-save-user-assignment").on('click',function(e){
+		if(validateUserDetailsUserManagement()){
+			saveUserDetailsByAdmin();
+			
+			// refreshing right section after assignment
+			setTimeout(function() {
+				getUserAssignments($('#selected-userid-hidden').val());
+			}, 2000);
+		}
+	});
+});
+
+$(document).on('click','#user-assign-btn',function(e){
+	
+	$('#user-edit-btn-row').hide();
+	$('#user-assignment-cont').show();
+	$('#btn-save-user-assignment').show();
+	
+	$("#btn-save-user-assignment").off('click');
+	$("#btn-save-user-assignment").on('click',function(e){
+		if(validateIndividualForm()){
+			saveUserAssignment("user-assignment-form");
+			
+			// refreshing right section after assignment
+			setTimeout(function() {
+				getUserAssignments($('#selected-userid-hidden').val());
+			}, 2000);
+		}
+	});
+});
+
+function validateUserDetailsUserManagement() {
+	
+	var isUserDetailsFormValid = true;
+	
+	
+	return isUserDetailsFormValid;
+}
+
+/**
+ * Method to update user details edited by admin
+ * @param formId
+ */
+function saveUserDetailsByAdmin() {
+	var url = "./updateuserbyadmin.do";
+	var userId = $('#selected-userid-hidden').val();
+	var firstName = $('#um-user-first-name').val();
+	var lastName = $('#um-user-last-name').val();
+	var emailID = $('#selected-user-txt').val();
+	var name = firstName;
+	if(lastName && lastName != ""){
+		name += " " + lastName;
+	}
+	var payload = {
+			"userId" : userId,
+			"name" : name,
+			"firstName" : firstName,
+			"lastName" : lastName,
+			"emailId" : emailID
+	};
+	
+	showOverlay();
+	callAjaxPostWithPayloadData(url, function(data) {
+		hideOverlay();
+
+		//view hierarchy page
+		$('.v-tbl-row[data-userid="'+userId+'"]').find('.v-tbl-name').text(name);
+		$('.v-tbl-row[data-userid="'+userId+'"]').find('.v-tbl-add').text(emailID);
+		
+		//user management page
+		$('td[data-user-id="'+userId+'"]').text(name).attr("data-first-name",firstName).attr("data-last-name",lastName);
+		$('td[data-user-id="'+userId+'"]').parent().find('.v-tbl-email').text(emailID);
+		
+		$('#overlay-toast').html(data);
+		showToast();
+	}, payload, true);
 }
 
 /**
@@ -3826,6 +3909,29 @@ function saveUserAssignmentCallBack(data) {
 	hideOverlay();
 	displayMessage(data);
 }
+
+// remove user
+$(document).on('click', '.v-icn-rem-user', function() {
+	if ($(this).hasClass('v-tbl-icn-disabled')) {
+		return;
+	}
+
+	var userId = $(this).parent().find('.fetch-name').attr('data-user-id');
+    var adminId = '${user.userId}';
+    confirmDeleteUser(userId, adminId);
+});
+
+// resend verification mail
+$(document).on('click', '.v-icn-fmail', function() {
+	if ($(this).hasClass('v-tbl-icn-disabled')) {
+		return;
+	}
+
+	var firstName = $(this).parent().find('.fetch-name').attr('data-first-name');
+    var lastName = $(this).parent().find('.fetch-name').attr('data-last-name');
+    var emailId = $(this).parent().find('.fetch-email').html();
+    reinviteUser(firstName, lastName, emailId);
+});
 
 /**
  * Method to send invite link
@@ -3933,14 +4039,14 @@ function bindEditUserClick(){
 	});
 }
 
-$(document).on('click', '#page-previous', function(){
+$(document).on('click', '#page-previous.paginate-button', function(){
 	var newIndex = userStartIndex - userBatchSize;
 	if (newIndex < $('#users-count').val()) {
 		paintUserListInUserManagement(newIndex);
 	}
 });
 
-$(document).on('click', '#page-next', function(){
+$(document).on('click', '#page-next.paginate-button', function(){
 	var newIndex = userStartIndex + userBatchSize;
 	if (newIndex < $('#users-count').val()) {
 		paintUserListInUserManagement(newIndex);
@@ -4425,6 +4531,7 @@ function paintSurveyPage(jsonData) {
 	googleEnabled = Boolean(jsonData.responseJSON.googleEnabled);
 	agentProfileLink = jsonData.responseJSON.agentProfileLink;
 	agentFullProfileLink = jsonData.responseJSON.agentFullProfileLink;
+	companyLogo = jsonData.responseJSON.companyLogo;
 	
 	if (stage != undefined)
 		qno = stage;
@@ -4528,6 +4635,13 @@ function paintSurveyPageFromJson() {
 		$("#skip-ques-mcq").hide();
 	}
 	$(".sq-main-txt").html("Survey for " + agentName);
+	
+	if (companyLogo != undefined && companyLogo != "") {
+		var companylogoHtml = '<div class="float-left user-info-seperator"></div>';
+		companylogoHtml += '<div class="float-left user-info-logo" style="background: url('
+			+ companyLogo + ') no-repeat center; background-size: 100% auto;"></div>';
+		$('#header-user-info').html(companylogoHtml);
+	}
 }
 
 function togglePrevAndNext(){

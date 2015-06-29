@@ -38,7 +38,7 @@
     		<link rel="canonical" href="${profile.completeProfileUrl}">
     	</c:if>
     	<c:if test="${not empty profile.contact_details && not empty profile.contact_details.name}">
-    		<meta name="desciption" content="Use SocialSurvey Ratings & Reviews to find out how customers have rated ${profName}.">
+    		<meta name="description" content="Use SocialSurvey Ratings & Reviews to find out how customers have rated ${profName}.">
     		<meta name="keywords" content="${profName}, ${profName} ratings, ${profName} reviews, ${profName} scorecard, ${profName} ratings and reviews">
     	</c:if>
     	<c:if test="${not empty averageRating}">
@@ -147,9 +147,24 @@
                 		<c:if test="${not empty profile.contact_details &&  not empty profile.contact_details.title}">
                 			<div class="prof-addline2">${profile.contact_details.title}</div>
                 		</c:if>
-                		<c:if test="${not empty profile.vertical}">
-                			<div class="prof-addline1">${profile.vertical}</div>
-                		</c:if>
+                		<div class="prof-addline1">
+                			<c:if test="${ not empty profile.contact_details && not empty profile.contact_details.location }">
+                				${profile.contact_details.location}
+                				<c:set var="isLocationTrue" value="yes"></c:set>
+                			</c:if>
+	                		<c:choose>
+	                			<c:when test="${ not empty profile.contact_details && not empty profile.contact_details.industry }">
+	                				<c:if test="${isLocationTrue == 'yes' }"> | </c:if>
+	                				${profile.contact_details.industry}
+	                			</c:when>
+	                			<c:otherwise>
+		                			<c:if test="${not empty profile.vertical}">
+		                				<c:if test="${isLocationTrue == 'yes' }"> | </c:if>
+			                			${profile.vertical}
+			                		</c:if>
+	                			</c:otherwise>
+	                		</c:choose>
+                		</div>
                 	</div>
 					<div class="prof-rating clearfix">
 						<div class="prof-rating-wrapper maring-0 clearfix float-left" id="rating-avg-comp">

@@ -314,7 +314,6 @@ public class ProfileManagementController {
 				lockSettings = updateLockSettings(lockSettings, parentLock, fieldId, fieldState);
 				lockSettings = profileManagementService.updateLockSettings(MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION,
 						branchSettings, lockSettings);
-				LOG.info(lockSettings.getIsDisplayNameLocked() + "");
 				branchSettings.setLockSettings(lockSettings);
 				userSettings.getBranchSettings().put(branchId, branchSettings);
 			}
@@ -344,11 +343,6 @@ public class ProfileManagementController {
 
 		// Checking if locked by parent, if not updating lock settings
 		switch (fieldId) {
-			case "prof-name-lock":
-				if (!parentLock.getIsDisplayNameLocked()) {
-					lockSettings.setDisplayNameLocked(status);
-				}
-				break;
 			case "prof-logo-lock":
 				if (!parentLock.getIsLogoLocked()) {
 					lockSettings.setLogoLocked(status);
@@ -502,6 +496,7 @@ public class ProfileManagementController {
 		ContactDetailsSettings contactDetailsSettings = null;
 
 		try {
+			User user = sessionHelper.getCurrentUser();
 			UserSettings userSettings = (UserSettings) session.getAttribute(CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION);
 			OrganizationUnitSettings profileSettings = (OrganizationUnitSettings) session.getAttribute(CommonConstants.USER_PROFILE_SETTINGS);
 			UserProfile selectedProfile = (UserProfile) request.getSession(false).getAttribute(CommonConstants.USER_PROFILE);
@@ -529,8 +524,12 @@ public class ProfileManagementController {
 						MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION, companySettings, contactDetailsSettings);
 				companySettings.setContact_details(contactDetailsSettings);
 				
+				// update company name
+				profileManagementService.updateCompanyName(user.getUserId(), companySettings.getIden(), name);
+				
 				companySettings.setVertical(vertical);
 				profileManagementService.updateVertical(MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION, companySettings, vertical);
+				
 				
 				userSettings.setCompanySettings(companySettings);
 			}
@@ -584,16 +583,26 @@ public class ProfileManagementController {
 				
 				userSettings.setAgentSettings(agentSettings);
 
+				Map<String, Object> userMap = new HashMap<>();
+				
 				// Modify Agent details in Solr
-				solrSearchService.editUserInSolr(agentSettings.getIden(), CommonConstants.USER_DISPLAY_NAME_SOLR, name);
-				solrSearchService.editUserInSolr(agentSettings.getIden(), CommonConstants.TITLE_SOLR, title);
+				//	solrSearchService.editUserInSolr(agentSettings.getIden(), CommonConstants.USER_DISPLAY_NAME_SOLR, name);
+				//	solrSearchService.editUserInSolr(agentSettings.getIden(), CommonConstants.TITLE_SOLR, title);
+				userMap.put(CommonConstants.USER_DISPLAY_NAME_SOLR, name);
+				userMap.put(CommonConstants.TITLE_SOLR, title);
 				if (name.indexOf(" ") != -1) {
-					solrSearchService.editUserInSolr(agentSettings.getIden(), CommonConstants.USER_FIRST_NAME_SOLR, name.substring(0, name.indexOf(' ')));
-					solrSearchService.editUserInSolr(agentSettings.getIden(), CommonConstants.USER_LAST_NAME_SOLR, name.substring(name.indexOf(' ') + 1));
+					//solrSearchService.editUserInSolr(agentSettings.getIden(), CommonConstants.USER_FIRST_NAME_SOLR, name.substring(0, name.indexOf(' ')));
+					//solrSearchService.editUserInSolr(agentSettings.getIden(), CommonConstants.USER_LAST_NAME_SOLR, name.substring(name.indexOf(' ') + 1));
+					userMap.put(CommonConstants.USER_FIRST_NAME_SOLR, name.substring(0, name.indexOf(' ')));
+				    userMap.put(CommonConstants.USER_LAST_NAME_SOLR, name.substring(name.indexOf(' ') + 1));
+				    user.setFirstName(name.substring(0, name.indexOf(' ')));
+				    user.setLastName(name.substring(0, name.indexOf(' ')));
 				}
 				else {
-					solrSearchService.editUserInSolr(agentSettings.getIden(), CommonConstants.USER_FIRST_NAME_SOLR, name);
+					//solrSearchService.editUserInSolr(agentSettings.getIden(), CommonConstants.USER_FIRST_NAME_SOLR, name);
+					userMap.put(CommonConstants.USER_FIRST_NAME_SOLR, name);
 				}
+				userManagementService.updateUser(user, userMap);
 			}
 			else {
 				throw new InvalidInputException("Invalid input exception occurred in upadting Basic details.", DisplayMessageConstants.GENERAL_ERROR);

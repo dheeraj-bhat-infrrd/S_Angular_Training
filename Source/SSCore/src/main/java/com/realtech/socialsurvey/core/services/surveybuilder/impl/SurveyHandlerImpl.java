@@ -500,7 +500,7 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean {
 	 */
 	@Override
 	public void sendSurveyRestartMail(String custFirstName, String custLastName, String custEmail, String custRelationWithAgent, User user,
-			String link) throws InvalidInputException, UndeliveredEmailException{
+			String surveyUrl) throws InvalidInputException, UndeliveredEmailException{
 		LOG.info("sendSurveyRestartMail() started.");
 		AgentSettings agentSettings = userManagementService.getUserSettings(user.getUserId());
 		String companyName = user.getCompany().getCompany();
@@ -530,18 +530,21 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean {
 
 			MailContent restartSurvey = companySettings.getMail_content().getRestart_survey_mail();
 			String mailBody = emailFormatHelper.replaceEmailBodyWithParams(restartSurvey.getMail_body(), restartSurvey.getParam_order());
-			mailBody = mailBody.replaceAll("\\[AgentName\\]", agentName);
+			
+			mailBody = mailBody.replaceAll("\\[BaseUrl\\]", applicationBaseUrl);
+			mailBody = mailBody.replaceAll("\\[LogoUrl\\]", appLogoUrl);
+			mailBody = mailBody.replaceAll("\\[Link\\]", surveyUrl);
 			mailBody = mailBody.replaceAll("\\[Name\\]", custFirstName + " " + custLastName);
-			mailBody = mailBody.replaceAll("\\[Link\\]", link);
+			mailBody = mailBody.replaceAll("\\[AgentName\\]", agentName);
 			mailBody = mailBody.replaceAll("\\[AgentSignature\\]", agentSignature);
 			mailBody = mailBody.replaceAll("\\[RecipientEmail\\]", custEmail);
+			mailBody = mailBody.replaceAll("\\[SenderEmail\\]", user.getEmailId());
 			mailBody = mailBody.replaceAll("\\[CompanyName\\]", companyName);
 			mailBody = mailBody.replaceAll("\\[InitiatedDate\\]", dateFormat.format(new Date()));
-			mailBody = mailBody.replaceAll("\\[SenderEmail\\]", user.getEmailId());
 			mailBody = mailBody.replaceAll("\\[CurrentYear\\]", currentYear);
 			mailBody = mailBody.replaceAll("\\[FullAddress\\]", fullAddress);
 			mailBody = mailBody.replaceAll("null", "");
-
+			
 			String mailSubject = CommonConstants.SURVEY_MAIL_SUBJECT + agentName;
 			try {
 				emailServices.sendSurveyInvitationMail(custEmail, mailSubject, mailBody, user.getEmailId(), user.getFirstName()
@@ -553,7 +556,7 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean {
 		}
 		else {
 			emailServices.sendDefaultSurveyInvitationMail(custEmail, custFirstName + " " + custLastName, user.getFirstName()
-					+ (user.getLastName() != null ? " " + user.getLastName() : ""), link, user.getEmailId(), agentSignature, companyName,
+					+ (user.getLastName() != null ? " " + user.getLastName() : ""), surveyUrl, user.getEmailId(), agentSignature, companyName,
 					dateFormat.format(new Date()), currentYear, fullAddress);
 		}
 		LOG.info("sendSurveyRestartMail() finished.");
@@ -662,7 +665,7 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean {
 	/*
 	 * Method to send email by agent to initiate survey.
 	 */
-	private void sendInvitationMailByAgent(User user, String custFirstName, String custLastName, String custEmail, String link)
+	private void sendInvitationMailByAgent(User user, String custFirstName, String custLastName, String custEmail, String surveyUrl)
 			throws InvalidInputException, UndeliveredEmailException {
 		LOG.debug("sendInvitationMailByAgent() started.");
 
@@ -697,21 +700,27 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean {
 			MailContent takeSurvey = companySettings.getMail_content().getTake_survey_mail();
 			String mailBody = emailFormatHelper.replaceEmailBodyWithParams(takeSurvey.getMail_body(), takeSurvey.getParam_order());
 			
-			mailBody = mailBody.replaceAll("\\[LogoUrl\\]", appLogoUrl);
 			mailBody = mailBody.replaceAll("\\[BaseUrl\\]", applicationBaseUrl);
-			mailBody = mailBody.replaceAll("\\[AgentName\\]", agentName);
+			mailBody = mailBody.replaceAll("\\[LogoUrl\\]", appLogoUrl);
+			mailBody = mailBody.replaceAll("\\[Link\\]", surveyUrl);
 			mailBody = mailBody.replaceAll("\\[Name\\]", custFirstName + " " + custLastName);
-			mailBody = mailBody.replaceAll("\\[Link\\]", link);
+			mailBody = mailBody.replaceAll("\\[AgentName\\]", agentName);
 			mailBody = mailBody.replaceAll("\\[AgentSignature\\]", agentSignature);
 			mailBody = mailBody.replaceAll("\\[RecipientEmail\\]", custEmail);
+			mailBody = mailBody.replaceAll("\\[SenderEmail\\]", user.getEmailId());
 			mailBody = mailBody.replaceAll("\\[CompanyName\\]", companyName);
 			mailBody = mailBody.replaceAll("\\[InitiatedDate\\]", dateFormat.format(new Date()));
-			mailBody = mailBody.replaceAll("\\[SenderEmail\\]", user.getEmailId());
 			mailBody = mailBody.replaceAll("\\[CurrentYear\\]", currentYear);
 			mailBody = mailBody.replaceAll("\\[FullAddress\\]", fullAddress);
 			mailBody = mailBody.replaceAll("null", "");
 
+			// Adding mail subject
 			String mailSubject = CommonConstants.SURVEY_MAIL_SUBJECT + agentName;
+			if (takeSurvey.getMail_subject() != null && !takeSurvey.getMail_subject().isEmpty()) {
+				mailSubject = takeSurvey.getMail_subject();
+				mailSubject = mailSubject.replaceAll("\\[AgentName\\]", agentName);
+			}
+			
 			try {
 				emailServices.sendSurveyInvitationMail(custEmail, mailSubject, mailBody, user.getEmailId(), user.getFirstName()
 						+ (user.getLastName() != null ? " " + user.getLastName() : ""));
@@ -722,7 +731,7 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean {
 		}
 		else {
 			emailServices.sendDefaultSurveyInvitationMail(custEmail, custFirstName + " " + custLastName, user.getFirstName()
-					+ (user.getLastName() != null ? " " + user.getLastName() : ""), link, user.getEmailId(), agentSignature, companyName,
+					+ (user.getLastName() != null ? " " + user.getLastName() : ""), surveyUrl, user.getEmailId(), agentSignature, companyName,
 					dateFormat.format(new Date()), currentYear, fullAddress);
 		}
 		LOG.debug("sendInvitationMailByAgent() finished.");
@@ -785,6 +794,5 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean {
 		
 		LOG.debug("Method preInitiateSurvey() finished.");
 	}
-
 }
 // JIRA SS-119 by RM-05:EOC

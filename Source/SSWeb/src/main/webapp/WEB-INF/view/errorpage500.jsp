@@ -30,7 +30,7 @@
         <div class="hm-header-main-wrapper">
             <div class="container">
                 <div class="hm-header-row hm-header-row-main clearfix">
-                    <div class="text-center err-header-row">404 - Page Not Found</div>
+                    <div class="text-center err-header-row">500 - Internal Error</div>
                 </div>
             </div>
         </div>
