@@ -89,7 +89,7 @@
 						
 						<div id="ctnt-list-wrapper" class="ctnt-list-wrapper"></div>
 					</div>
-					<div class="ctnt-right-item col-lg-3 col-md-3 col-sm-3 col-xs-12 ads-container"></div>
+					<div class="ctnt-right-item col-lg-3 col-md-3 col-sm-3 col-xs-12 ads-container" style="background: rgb(225, 225, 225); margin-top: 50px;"></div>
 				</div>
 			</div>
 		</div>
