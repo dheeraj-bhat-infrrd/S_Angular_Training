@@ -173,7 +173,7 @@ public class FacebookFeedProcessorImpl implements SocialNetworkDataProcessor<Pos
 			if (lastFetchedTill != null) {
 				Calendar calender = Calendar.getInstance();
 			    calender.setTimeInMillis(lastFetchedTill.getTime());
-			    calender.add(Calendar.SECOND, 600);
+			    calender.add(Calendar.SECOND, 1);
 			    Date lastFetchedTillWithoneSecChange=calender.getTime();
 				resultList = facebook.getStatuses(new Reading().limit(PAGE_SIZE).since(lastFetchedTillWithoneSecChange));
 			}
