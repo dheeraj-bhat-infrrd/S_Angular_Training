@@ -3796,17 +3796,6 @@ function getUserAssignments(userId) {
             updateUserProfile(profileId, 1);
         });
 		
-		$("#btn-save-user-assignment").click(function(e){
-			if(validateIndividualForm()){
-				saveUserAssignment("user-assignment-form");
-				
-				// refreshing right section after assignment
-				setTimeout(function() {
-					getUserAssignments(userId);
-				}, 2000);
-			}
-		});
-		
 		setTimeout(function() {
 			$('#profile-tbl-wrapper-' + userId).perfectScrollbar();
 		}, 1000);
@@ -3815,6 +3804,91 @@ function getUserAssignments(userId) {
             $('.dd-droplist').slideUp(200);
         });
 	} , true);
+}
+
+$(document).on('click','#user-edit-btn',function(e){
+	
+	$('#user-edit-btn-row').hide();
+	$('form input[data-editable="true"]').removeAttr("readonly");
+	$('#btn-save-user-assignment').show();
+	
+	$("#btn-save-user-assignment").off('click');
+	$("#btn-save-user-assignment").on('click',function(e){
+		if(validateUserDetailsUserManagement()){
+			saveUserDetailsByAdmin();
+			
+			// refreshing right section after assignment
+			setTimeout(function() {
+				getUserAssignments($('#selected-userid-hidden').val());
+			}, 2000);
+		}
+	});
+});
+
+$(document).on('click','#user-assign-btn',function(e){
+	
+	$('#user-edit-btn-row').hide();
+	$('#user-assignment-cont').show();
+	$('#btn-save-user-assignment').show();
+	
+	$("#btn-save-user-assignment").off('click');
+	$("#btn-save-user-assignment").on('click',function(e){
+		if(validateIndividualForm()){
+			saveUserAssignment("user-assignment-form");
+			
+			// refreshing right section after assignment
+			setTimeout(function() {
+				getUserAssignments($('#selected-userid-hidden').val());
+			}, 2000);
+		}
+	});
+});
+
+function validateUserDetailsUserManagement() {
+	
+	var isUserDetailsFormValid = true;
+	
+	
+	return isUserDetailsFormValid;
+}
+
+/**
+ * Method to update user details edited by admin
+ * @param formId
+ */
+function saveUserDetailsByAdmin() {
+	var url = "./updateuserbyadmin.do";
+	var userId = $('#selected-userid-hidden').val();
+	var firstName = $('#um-user-first-name').val();
+	var lastName = $('#um-user-last-name').val();
+	var emailID = $('#selected-user-txt').val();
+	var name = firstName;
+	if(lastName && lastName != ""){
+		name += " " + lastName;
+	}
+	var payload = {
+			"userId" : userId,
+			"name" : name,
+			"firstName" : firstName,
+			"lastName" : lastName,
+			"emailId" : emailID
+	};
+	
+	showOverlay();
+	callAjaxPostWithPayloadData(url, function(data) {
+		hideOverlay();
+
+		//view hierarchy page
+		$('.v-tbl-row[data-userid="'+userId+'"]').find('.v-tbl-name').text(name);
+		$('.v-tbl-row[data-userid="'+userId+'"]').find('.v-tbl-add').text(emailID);
+		
+		//user management page
+		$('td[data-user-id="'+userId+'"]').text(name).attr("data-first-name",firstName).attr("data-last-name",lastName);
+		$('td[data-user-id="'+userId+'"]').parent().find('.v-tbl-email').text(emailID);
+		
+		$('#overlay-toast').html(data);
+		showToast();
+	}, payload, true);
 }
 
 /**
