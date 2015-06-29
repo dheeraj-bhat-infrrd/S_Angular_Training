@@ -644,7 +644,7 @@ input#find-pro-submit{
     background: url('../images/temp_ad.png') no-repeat center;
     height: 1000px;
     background-size: 100% auto;
-    background-position: center 70px;
+    background-position: center 53px;
 }
 
 .fp-txt-1 {
@@ -838,6 +838,7 @@ input#find-pro-submit{
 .wc-review-table-cont{
 	max-height: 300px;
 	position: relative;
+	padding: 20px 0px;
 }
 
 span.txt-highlight {
@@ -960,6 +961,26 @@ span.txt-highlight {
 
 .wc-review-th4,.wc-review-tc4 {
     width: 10%;
+}
+
+.wc-admin-table .wc-review-th1,.wc-admin-table  .wc-review-tc1{
+	width: 22.5%;
+}
+
+.wc-admin-table .wc-review-th2,.wc-admin-table  .wc-review-tc2{
+	width: 22.5%;
+}
+
+.wc-admin-table .wc-review-th3,.wc-admin-table  .wc-review-tc3{
+	width: 22.5%;
+}
+
+.wc-admin-table .wc-review-th4,.wc-admin-table  .wc-review-tc4{
+	width: 22.5%;
+}
+
+.wc-admin-table .wc-review-th5,.wc-admin-table  .wc-review-tc5{
+	width: 10%;
 }
 
 .wc-review-input{

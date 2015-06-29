@@ -158,6 +158,7 @@
 					<a href="javascript:showMainContent('./showprofilepage.do')" onclick="showOverlay();"><spring:message code="label.editprofile.key" /></a>
 				</div>
 			</div>
+			<div id="header-menu-icn" class="header-menu-icn icn-menu hide float-right"></div>
 			<div id="header-user-info" class="header-user-info float-right clearfix">
 				<div id="hdr-usr-img" class="float-right user-info-initial">
 					<span id="usr-initl">${fn:substring(user.firstName, 0, 1)}</span>
@@ -194,7 +195,6 @@
 						style="background: url(${displaylogo}) no-repeat center; background-size: contain;"></div>
 				</c:if>
 			</div>
-			<div id="header-menu-icn" class="header-menu-icn icn-menu hide float-right"></div>
 		</div>
 	</div>
 	<script>

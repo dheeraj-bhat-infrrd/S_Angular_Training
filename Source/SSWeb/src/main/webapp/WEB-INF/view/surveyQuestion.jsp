@@ -65,17 +65,16 @@
 				</div>
 			</div>
 			<div id="header-user-info" class="header-user-info float-right clearfix">
-				<c:if test="${displaylogo != null}">
+				<c:if test="${companyLogo != null}">
 					<div class="float-left user-info-seperator"></div>
-					<div class="float-left user-info-logo" style="background: url(${displaylogo}) no-repeat center; background-size: 100% auto;"></div>
+					<div class="float-left user-info-logo" style="background: url(${companyLogo}) no-repeat center; background-size: 100% auto;"></div>
 				</c:if>
 			</div>
-			<!-- <div id="header-menu-icn" class="header-menu-icn icn-menu hide float-right"></div> -->
 		</div>
 	</div>
-	<div id="err-nw-wrapper" class="err-nw-wrapper"
-		style="margin-bottom: 10px;">
-		<span class="err-new-close"></span><span id="err-nw-txt"></span>
+	<div id="err-nw-wrapper" class="err-nw-wrapper" style="margin-bottom: 10px;">
+		<span class="err-new-close"></span>
+		<span id="err-nw-txt"></span>
 	</div>
 	<div id="prof-container" data-q="${q}" data-agentid="${agentId}" data-agentName="${agentName}" data-agent-email="${agentEmail}"
 		 class="prof-main-content-wrapper margin-top-25 margin-bottom-25 min-height-container">
@@ -360,7 +359,6 @@ $(document).ready(function() {
 		}
 	}
 	var q = $('#prof-container').attr("data-q");
-	console.log(q);
 	/**console.log("Loading captcha");
 	try {
 		Recaptcha.create('6LdlHOsSAAAAAM8ypy8W2KXvgMtY2dFsiQT3HVq-',

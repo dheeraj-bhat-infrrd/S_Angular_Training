@@ -5,7 +5,6 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
 import com.realtech.socialsurvey.core.entities.Branch;
 import com.realtech.socialsurvey.core.entities.BranchFromSearch;
 import com.realtech.socialsurvey.core.entities.BranchSettings;
@@ -144,13 +143,14 @@ public interface OrganizationManagementService {
 	 * Updates the mail body content for company settings
 	 * 
 	 * @param companySettings
+	 * @param mailSubject
 	 * @param mailBody
 	 * @param mailCategory
 	 * @return
 	 * @throws InvalidInputException
 	 */
-	public MailContentSettings updateSurveyParticipationMailBody(OrganizationUnitSettings companySettings, String mailBody, String mailCategory)
-			throws InvalidInputException;
+	public MailContentSettings updateSurveyParticipationMailBody(OrganizationUnitSettings companySettings, String mailSubject, String mailBody,
+			String mailCategory) throws InvalidInputException;
 
 	/**
 	 * Adds a Disabled Account record in the database

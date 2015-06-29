@@ -38,6 +38,7 @@ import com.realtech.socialsurvey.core.enums.AccountType;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.exception.NoRecordsFetchedException;
 import com.realtech.socialsurvey.core.exception.NonFatalException;
+import com.realtech.socialsurvey.core.exception.UserSessionInvalidateException;
 import com.realtech.socialsurvey.core.services.organizationmanagement.OrganizationManagementService;
 import com.realtech.socialsurvey.core.services.organizationmanagement.UserManagementService;
 import com.realtech.socialsurvey.core.utils.EmailFormatHelper;
@@ -167,7 +168,12 @@ public class SessionHelper {
 				body = emailFormatHelper.replaceEmailBodyWithParams(body, paramOrder);
 				body = body.replaceAll("\\[LogoUrl\\]", applicationLogoUrl);
 				session.setAttribute(CommonConstants.SURVEY_PARTICIPATION_MAIL_BODY_IN_SESSION, body);
+				session.setAttribute(CommonConstants.SURVEY_PARTICIPATION_MAIL_SUBJECT_IN_SESSION, CommonConstants.SURVEY_MAIL_SUBJECT
+						+ "[AgentName]");
+				
 				session.setAttribute(CommonConstants.SURVEY_PARTICIPATION_REMINDER_MAIL_BODY_IN_SESSION, body);
+				session.setAttribute(CommonConstants.SURVEY_PARTICIPATION_REMINDER_MAIL_SUBJECT_IN_SESSION, CommonConstants.SURVEY_MAIL_SUBJECT
+						+ "[AgentName]");
 			}
 			catch (InvalidInputException e) {
 				LOG.warn("Could not set mail content for survey participation");
@@ -183,6 +189,7 @@ public class SessionHelper {
 				mailBody = mailBody.replaceAll("\\[LogoUrl\\]", applicationLogoUrl);
 				mailSettings.getTake_survey_mail().setMail_body(mailBody);
 				session.setAttribute(CommonConstants.SURVEY_PARTICIPATION_MAIL_BODY_IN_SESSION, mailBody);
+				session.setAttribute(CommonConstants.SURVEY_PARTICIPATION_MAIL_SUBJECT_IN_SESSION, mailContent.getMail_subject());
 			}
 			else {
 				try {
@@ -191,6 +198,8 @@ public class SessionHelper {
 					body = emailFormatHelper.replaceEmailBodyWithParams(body, paramOrder);
 					body = body.replaceAll("\\[LogoUrl\\]", applicationLogoUrl);
 					session.setAttribute(CommonConstants.SURVEY_PARTICIPATION_MAIL_BODY_IN_SESSION, body);
+					session.setAttribute(CommonConstants.SURVEY_PARTICIPATION_MAIL_SUBJECT_IN_SESSION, CommonConstants.SURVEY_MAIL_SUBJECT
+							+ "[AgentName]");
 				}
 				catch (InvalidInputException e) {
 					LOG.warn("Could not set mail content for survey participation");
@@ -203,6 +212,7 @@ public class SessionHelper {
 				mailBody = mailBody.replaceAll("\\[LogoUrl\\]", applicationLogoUrl);
 				mailSettings.getTake_survey_reminder_mail().setMail_body(mailBody);
 				session.setAttribute(CommonConstants.SURVEY_PARTICIPATION_REMINDER_MAIL_BODY_IN_SESSION, mailBody);
+				session.setAttribute(CommonConstants.SURVEY_PARTICIPATION_REMINDER_MAIL_SUBJECT_IN_SESSION, mailContent.getMail_subject());
 			}
 			else {
 				try {
@@ -211,6 +221,8 @@ public class SessionHelper {
 					body = emailFormatHelper.replaceEmailBodyWithParams(body, paramOrder);
 					body = body.replaceAll("\\[LogoUrl\\]", applicationLogoUrl);
 					session.setAttribute(CommonConstants.SURVEY_PARTICIPATION_REMINDER_MAIL_BODY_IN_SESSION, body);
+					session.setAttribute(CommonConstants.SURVEY_PARTICIPATION_REMINDER_MAIL_SUBJECT_IN_SESSION, CommonConstants.SURVEY_MAIL_SUBJECT
+							+ "[AgentName]");
 				}
 				catch (InvalidInputException e) {
 					LOG.warn("Could not set mail content for survey participation reminder");
@@ -268,6 +280,10 @@ public class SessionHelper {
 		User user = null;
 		if (sessionUser instanceof User) {
 			user = (User) sessionUser;
+		}
+		
+		if (user == null) {
+			throw new UserSessionInvalidateException("User session is no longer available.");
 		}
 		return user;
 	}

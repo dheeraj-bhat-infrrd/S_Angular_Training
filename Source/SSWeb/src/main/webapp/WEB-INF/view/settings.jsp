@@ -101,7 +101,8 @@
 								</div>
 								<div class="st-rating-txt float-left">
 									<!-- set the min rating -->
-									<c:if test="${accountSettings != null && accountSettings.survey_settings!= null && accountSettings.survey_settings.show_survey_above_score != null}">
+									<c:if test="${accountSettings != null && accountSettings.survey_settings!= null
+										&& accountSettings.survey_settings.show_survey_above_score != null}">
 										<c:set var="minpostscore" value="${accountSettings.survey_settings.show_survey_above_score}"/>
 									</c:if>
 									<input type="text" name="rating-min-post" id="rating-min-post" class="st-item-row-txt cursor-pointer dd-arrow-dn" autocomplete="off" value="${minpostscore}">
@@ -170,7 +171,9 @@
 		<div class="${containerclass}">
 			<div class="um-header margin-top-25"><spring:message code="label.socialconnect.key" /></div>
 			<div class="clearfix st-score-wrapper">
-				<div class="float-left st-social-score col-lg-4 col-md-4 col-sm-4 col-xs-12"><spring:message code="label.socialconnect.desc.key" /></div>
+				<div class="float-left st-social-score col-lg-4 col-md-4 col-sm-4 col-xs-12">
+					<spring:message code="label.socialconnect.desc.key" />
+				</div>
 				<input type="hidden" name="ratingcategory" id="ratingcategory">
 				<div class="clearfix float-right col-lg-8 col-md-8 col-sm-8 col-xs-12">
 					<div class="soc-nw-wrapper clearfix">
@@ -221,6 +224,9 @@
 							&nbsp&nbsp&nbsp&nbsp[InitiatedDate] : Survey Initiated On,
 							&nbsp&nbsp&nbsp&nbsp[CurrentYear] : Current Year,
 							&nbsp&nbsp&nbsp&nbsp[FullAddress] : Address of SocialSurvey
+							<br />
+							<br />
+							Note: Only [AgentName] is allowed in Mail Subject
 						</div>
 						<div class="st-header-txt-lft-rt clearfix margin-top-25">
 							<div class="float-left st-header-txt-lft"><spring:message code="label.header.mailer.content.key" /></div>
@@ -242,8 +248,16 @@
 								</div>
 							</div>
 						</div>
+						<div class="st-subject-cont clearfix">
+							<div class="st-subject-label float-left"><spring:message code="label.subject.mailer.text" /></div>
+							<div class="st-subject-input-cont float-left">
+								<input type="text" id="survey-mailcontent-subject" name="survey-mailcontent-subject"
+									class="st-subject-input" value="${surveymailsubject}" readonly>
+							</div>
+						</div>
 						<div class="st-header-txt-wrapper">
-							<textarea id="survey-participation-mailcontent" name="survey-participation-mailcontent" class="st-header-txt-input">${surveymailbody}</textarea>
+							<textarea id="survey-participation-mailcontent" name="survey-participation-mailcontent"
+								class="st-header-txt-input">${surveymailbody}</textarea>
 						</div>
 					</div>
 					<div class="clearfix st-bottom-wrapper margin-top-50">
@@ -255,6 +269,7 @@
 										class="float-left st-header-txt-rt-icn icn-pen cursor-pointer icn-pen-blue"></div>
 									<div id="edit-participation-reminder-mail-content-disabled"
 										class="float-left st-header-txt-rt-icn icn-pen hide"></div>
+
 									<div id="save-participation-reminder-mail-content"
 										class="float-left st-header-txt-rt-icn icn-blue-tick margin-left-20 cursor-pointer hide"></div>
 									<div id="save-participation-reminder-mail-content-disabled"
@@ -266,8 +281,16 @@
 								</div>
 							</div>
 						</div>
+						<div class="st-subject-cont clearfix">
+							<div class="st-subject-label float-left"><spring:message code="label.subject.reminder.text" /></div>
+							<div class="st-subject-input-cont float-left">
+								<input type="text" id="survey-mailreminder-subject" name="survey-mailreminder-subject"
+									class="st-subject-input" value="${surveyremindermailsubject}" readonly>
+							</div>
+						</div>
 						<div class="st-header-txt-wrapper">
-							<textarea id="survey-participation-reminder-mailcontent" name="survey-participation-reminder-mailcontent" class="st-header-txt-input">${surveyremindermailbody}</textarea>
+							<textarea id="survey-participation-reminder-mailcontent" name="survey-participation-reminder-mailcontent"
+								class="st-header-txt-input">${surveyremindermailbody}</textarea>
 						</div>
 					</div>
 					
@@ -341,7 +364,9 @@
 									<div id="st-settings-payment-on" class="st-checkbox st-settings-checkbox st-checkbox-on hide"></div>
 									<div id="st-settings-payment-off" class="st-checkbox st-settings-checkbox st-checkbox-off"></div>
 								</div>
-								<div class="float-left st-check-txt-OR" id="st-chg-payment-info"><spring:message code="label.change.payment.key" /></div>
+								<div class="float-left st-check-txt-OR" id="st-chg-payment-info">
+									<spring:message code="label.change.payment.key" />
+								</div>
 							</div>
 							<div class="st-settings-text"><spring:message code="label.change.payment.desc.key" /></div>
 						</div>
@@ -371,11 +396,15 @@ $(document).ready(function() {
 	var profileMasterId = "${profilemasterid}";
 	var accountMasterId = "${accountMasterId}";
 	if (profileMasterId == 1 || accountMasterId == 1) {
-		$('#survey-participation-mailcontent').ckeditor();
-		$('#survey-participation-mailcontent').ckeditorGet().config.readOnly = true;
-		
-		$('#survey-participation-reminder-mailcontent').ckeditor();
-		$('#survey-participation-reminder-mailcontent').ckeditorGet().config.readOnly = true;
+		try {
+			$('#survey-participation-mailcontent').ckeditor();
+			$('#survey-participation-mailcontent').ckeditorGet().config.readOnly = true;
+			
+			$('#survey-participation-reminder-mailcontent').ckeditor();
+			$('#survey-participation-reminder-mailcontent').ckeditorGet().config.readOnly = true;
+		} catch(e) {
+			console.log("ckeditor not supported for the environment");
+		}
 		
 		autoAppendRatingDropdown('#st-dd-wrapper-min-post', "st-dd-item st-dd-item-min-post");
 		changeRatingPattern($('#rating-min-post').val(), $('#rating-min-post-parent'));
@@ -441,8 +470,14 @@ $(document).ready(function() {
 		updatePostScore("rating-settings-form");
 	});
 
+	
 	$('#edit-participation-mail-content').click(function() {
-		$('#survey-participation-mailcontent').ckeditorGet().setReadOnly(false);
+		try {
+			$('#survey-participation-mailcontent').ckeditorGet().setReadOnly(false);
+		} catch(e) {
+			console.log("ckeditor not supported for the environment");
+		}
+		$('#survey-mailcontent-subject').attr("readonly", false);
 		
 		$('#save-participation-mail-content').show();
 		$('#save-participation-mail-content-disabled').hide();
@@ -453,7 +488,13 @@ $(document).ready(function() {
 	$('#save-participation-mail-content').click(function() {
 		$('#mailcategory').val('participationmail');
 		updateMailContent("mail-body-settings-form");
-		$('#survey-participation-mailcontent').ckeditorGet().setReadOnly(true);
+		
+		try {
+			$('#survey-participation-mailcontent').ckeditorGet().setReadOnly(true);
+		} catch(e) {
+			console.log("ckeditor not supported for the environment");
+		}
+		$('#survey-mailcontent-subject').attr("readonly", true);
 		
 		$(this).hide();
 		$('#save-participation-mail-content-disabled').show();
@@ -462,9 +503,13 @@ $(document).ready(function() {
 		$('#edit-participation-mail-content-disabled').hide();
 	});
 
-
 	$('#edit-participation-reminder-mail-content').click(function() {
-		$('#survey-participation-reminder-mailcontent').ckeditorGet().setReadOnly(false);
+		try {
+			$('#survey-participation-reminder-mailcontent').ckeditorGet().setReadOnly(false);
+		} catch(e) {
+			console.log("ckeditor not supported for the environment");
+		}
+		$('#survey-mailcontent-subject').attr("readonly", false);
 		
 		$('#save-participation-reminder-mail-content').show();
 		$('#save-participation-reminder-mail-content-disabled').hide();
@@ -475,7 +520,13 @@ $(document).ready(function() {
 	$('#save-participation-reminder-mail-content').click(function() {
 		$('#mailcategory').val('participationremindermail');
 		updateMailContent("mail-body-settings-form");
-		$('#survey-participation-reminder-mailcontent').ckeditorGet().setReadOnly(true);
+		
+		try { 
+			$('#survey-participation-reminder-mailcontent').ckeditorGet().setReadOnly(true);
+		} catch(e) {
+			console.log("ckeditor not supported for the environment");
+		}
+		$('#survey-mailcontent-subject').attr("readonly", true);
 		
 		$(this).hide();
 		$('#save-participation-reminder-mail-content-disabled').show();
@@ -546,7 +597,8 @@ $(document).ready(function() {
 
 	$('#st-delete-account').click(function() {
 		$('#other-account').val('true');
-		createPopupConfirm("Delete Account", "This action cannot be undone.<br/>All user setting will be permanently deleted and your subscription will terminate permanently immediately.");
+		createPopupConfirm("Delete Account",
+			"This action cannot be undone.<br/>All user setting will be permanently deleted and your subscription will terminate permanently immediately.");
 		overlayDeleteAccount();
 	});
 
