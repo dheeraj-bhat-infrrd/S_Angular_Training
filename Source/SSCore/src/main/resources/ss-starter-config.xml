@@ -229,7 +229,7 @@
 	<bean id="imageloadercron"
 		class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
 		<property name="jobDetail" ref="imageloaderjobdetail" />
-		<property name="cronExpression" value="* 0/1 * * * ?" />
+		<property name="cronExpression" value="* 45 7 * * ?" />
 	</bean>
 
 	<!-- Scheduler factory -->
