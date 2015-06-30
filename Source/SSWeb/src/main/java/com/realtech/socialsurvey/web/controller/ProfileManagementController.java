@@ -129,7 +129,7 @@ public class ProfileManagementController
     @Value ( "${APPLICATION_BASE_URL}")
     private String applicationBaseUrl;
 
-    @Value ( "${AMAZON_ENDPOINT}")
+    @Value ( "${CDN_PATH}")
     private String amazonEndpoint;
 
     @Value ( "${AMAZON_IMAGE_BUCKET}")
