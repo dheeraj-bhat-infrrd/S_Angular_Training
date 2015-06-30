@@ -1,16 +1,17 @@
 package com.realtech.socialsurvey.web.security;
 
 import java.io.IOException;
+
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.authentication.LoginUrlAuthenticationEntryPoint;
 import org.springframework.security.web.util.ELRequestMatcher;
 import org.springframework.security.web.util.RequestMatcher;
-import com.realtech.socialsurvey.core.exception.UserSessionInvalidateException;
 
 @SuppressWarnings("deprecation")
 public class AjaxAwareLoginUrlAuthenticationEntryPoint extends LoginUrlAuthenticationEntryPoint {
@@ -41,7 +42,9 @@ public class AjaxAwareLoginUrlAuthenticationEntryPoint extends LoginUrlAuthentic
 //			RedirectStrategy redirectStrategy = new DefaultRedirectStrategy();
 //			redirectStrategy.sendRedirect(request, response, urlBuilder.toString());
 //			response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Unauthorized");
-			throw new UserSessionInvalidateException("User session is no longer available.");
+			//throw new UserSessionInvalidateException("User session is no longer available.");
+			
+			response.setStatus(HttpServletResponse.SC_GATEWAY_TIMEOUT);
 		}
 		else {
 			super.commence(request, response, authException);

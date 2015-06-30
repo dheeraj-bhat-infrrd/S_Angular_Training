@@ -142,8 +142,8 @@ $(document).ready(function(){
   		}
   	}
   	function hideStateCityRow() {
-  		$('#prof-state').hide().val('');
-		$('#prof-city').hide();
+  		$('#prof-state').hide();
+		$('#prof-city').hide().val('');
   		$('#prof-state').val(function() {
   			return $(this).find('option[selected]').text();
   	    });

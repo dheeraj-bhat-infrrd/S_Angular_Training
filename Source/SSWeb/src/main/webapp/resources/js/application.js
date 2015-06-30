@@ -98,6 +98,71 @@ var googleEnabled;
 var agentProfileLink;
 var agentFullProfileLink;
 var companyLogo;
+
+
+/**
+ * js functions for landing page
+ */
+/**
+ * function to change the content of page through ajax
+ * 
+ * @param url
+ */
+function showMainContent(url) {
+	closeMoblieScreenMenu();
+	saveState(url);
+	callAjaxGET(url, showMainContentCallBack, true);
+}
+
+/**
+ * Callback for showMainContent, displays data in the main content section
+ * 
+ * @param data
+ */
+function showMainContentCallBack(data) {
+	$("#main-content").html(data);
+}
+
+
+/*
+ * This module helps in browser navigation support to give a single page app
+ * 
+ * Functions for history support
+ */
+
+var historyCallback = false;
+var refreshSupport = true;
+
+function getRandomID() {
+	return (Math.floor(Math.random() * 10000) + Math
+			.floor(Math.random() * 10000));
+}
+
+function saveState(url) {
+
+	var hashUrl = "";
+	hashUrl = url.substring(2, url.length - 3);
+	if (!historyCallback) {
+		history.pushState(getRandomID(), null, "#" + hashUrl);
+
+	}
+	historyCallback = false;
+}
+
+function retrieveState() {
+	if (!refreshSupport) {
+		console.log('refresh not supported');
+		return;
+	}
+	var newLocation = window.location.hash.substring(1);
+	if (newLocation) {
+		showMainContent("/"+newLocation+".do");
+	}
+}
+/*End of functions for history support*/
+
+
+
 $(document).on('click', '.icn-plus-open', function() {
 	$(this).hide();
 	$(this).parent().find('.ppl-share-social,.icn-remove').show();
@@ -596,6 +661,10 @@ function showSurveyGraph(columnName, columnValue, format) {
 			}
 		},
 		error : function(e) {
+			if(e.status == 504) {
+				redirectToLoginPageOnSessionTimeOut(e.status);
+				return;
+			}
 			console.error("error : " + e.responseText);
 			$('#overlay-toast').html(e.responseText);
 			showToast();
@@ -817,6 +886,10 @@ function sendSurveyReminderMail(agentId, agentName, customerEmail, customerName)
 			}
 		},
 		error : function(e) {
+			if(e.status == 504) {
+				redirectToLoginPageOnSessionTimeOut(e.status);
+				return;
+			}
 			console.error("error : " + e.responseText);
 			$('#overlay-toast').html('Something went wrong while sending mail. Please try again after sometime.');
 			showToast();
@@ -868,7 +941,11 @@ function showDisplayPic() {
 				return data.responseJSON;
 			}
 		},
-		error : function() {
+		error : function(e) {
+			if(e.status == 504) {
+				redirectToLoginPageOnSessionTimeOut(e.status);
+				return;
+			}
 			console.log("Logged in id as : "+colName);
 			$("#dsh-prsn-img").removeClass('person-img');
 			if (colName == 'agentId') {
@@ -2773,6 +2850,10 @@ function resendVerificationMail(){
 			}
 		},
 		error : function(e) {
+			if(e.status == 504) {
+				redirectToLoginPageOnSessionTimeOut(e.status);
+				return;
+			}
 			console.error("error : " + e.responseText);
 			$('#overlay-toast').html(e.responseText);
 			showToast();
@@ -3046,7 +3127,11 @@ function updateAutoPostSetting(isautopostenabled){
 				$('#overlay-toast').html("Content added successfully!");
 			}
 		},
-		error : function() {
+		error : function(e) {
+			if(e.status == 504) {
+				redirectToLoginPageOnSessionTimeOut(e.status);
+				return;
+			}
 			$('#overlay-toast').html(
 					"Oops! Something went wrong. Please try again later.");
 		}
@@ -3197,6 +3282,10 @@ function assignUserToBranch(userId, branchId) {
 			hideOverlay();
 		},
 		error : function(e) {
+			if(e.status == 504) {
+				redirectToLoginPageOnSessionTimeOut(e.status);
+				return;
+			}
 			console.error("error : " + e);
 		}
 	});
@@ -3243,6 +3332,10 @@ function unassignUserFromBranch(userId, branchId) {
 			}
 		},
 		error : function(e) {
+			if(e.status == 504) {
+				redirectToLoginPageOnSessionTimeOut(e.status);
+				return;
+			}
 			console.error("error : " + e);
 		}
 	});
@@ -3290,6 +3383,10 @@ function inviteUser() {
 			hideOverlay();
 		},
 		error : function(e) {
+			if(e.status == 504) {
+				redirectToLoginPageOnSessionTimeOut(e.status);
+				return;
+			}
 			console.error("error : " + e);
 		}
 	});
@@ -3360,6 +3457,10 @@ function deleteUser(userId) {
 			hideOverlay();
 		},
 		error : function(e) {
+			if(e.status == 504) {
+				redirectToLoginPageOnSessionTimeOut(e.status);
+				return;
+			}
 			console.error("error : " + e);
 		}
 	});
@@ -3386,6 +3487,10 @@ function paintUserDetailsForm(userId) {
 			}
 		},
 		error : function(e) {
+			if(e.status == 504) {
+				redirectToLoginPageOnSessionTimeOut(e.status);
+				return;
+			}
 			console.error("error : " + e);
 		}
 	});
@@ -3412,6 +3517,10 @@ function paintUserListInUserManagement(startIndex) {
 			bindEditUserClick();
 		},
 		error : function(e) {
+			if(e.status == 504) {
+				redirectToLoginPageOnSessionTimeOut(e.status);
+				return;
+			}
 			console.error("error : " + e);
 		}
 	});
@@ -3460,6 +3569,10 @@ function activateOrDeactivateUser(isActive, userId) {
 			}
 		},
 		error : function(e) {
+			if(e.status == 504) {
+				redirectToLoginPageOnSessionTimeOut(e.status);
+				return;
+			}
 			console.error("error : " + e);
 		}
 	});
@@ -3625,6 +3738,10 @@ $(document).on('keyup', '#search-users-key', function(e) {
 	}
 });
 
+$(document).on('click', '#um-search-icn', function(e) {
+	searchUsersByNameEmailLoginId($('#search-users-key').val());
+});
+
 function searchUsersByNameEmailLoginId(searchKey) {
 	userStartIndex = 0;
 	var url = "./findusers.do";
@@ -3736,8 +3853,11 @@ function searchBranchesForUser(branchPattern) {
 				searchBranchesForUserCallBack(data.responseJSON);
 			}
 		},
-		error : function() {
-
+		error : function(e) {
+			if(e.status == 504) {
+				redirectToLoginPageOnSessionTimeOut(e.status);
+				return;
+			}
 		}
 	});
 }
@@ -4479,6 +4599,10 @@ function initSurveyWithUrl(q) {
 			}
 		},
 		error : function(e) {
+			if(e.status == 504) {
+				redirectToLoginPageOnSessionTimeOut(e.status);
+				return;
+			}
 			showPageNotFoundError();
 		}
 	});
@@ -4512,6 +4636,10 @@ function loadAgentPic(agentId){
 			}
 		},
 		error : function(e) {
+			if(e.status == 504) {
+				redirectToLoginPageOnSessionTimeOut(e.status);
+				return;
+			}
 			console.error("error : " + e.responseText);
 		}
 	});
@@ -4708,6 +4836,10 @@ function storeCustomerAnswer(customerResponse) {
 			}
 		},
 		error : function(e) {
+			if(e.status == 504) {
+				redirectToLoginPageOnSessionTimeOut(e.status);
+				return;
+			}
 			console.error("error : ");
 		}
 	});
@@ -4745,6 +4877,10 @@ function updateCustomerResponse(feedback) {
 			}
 		},
 		error : function(e) {
+			if(e.status == 504) {
+				redirectToLoginPageOnSessionTimeOut(e.status);
+				return;
+			}
 			console.error("error : "+e);
 		}
 	});
@@ -4940,6 +5076,10 @@ function postToSocialMedia(feedback){
 			}
 		},
 		error : function(e) {
+			if(e.status == 504) {
+				redirectToLoginPageOnSessionTimeOut(e.status);
+				return;
+			}
 			console.error("error : " + e.responseText);
 			$('#overlay-toast').html(e.responseText);
 			showToast();
@@ -4968,6 +5108,10 @@ function updateSharedOn(socialSite, agentId, customerEmail){
 			}
 		},
 		error : function(e) {
+			if(e.status == 504) {
+				redirectToLoginPageOnSessionTimeOut(e.status);
+				return;
+			}
 			console.error("error : " + e.responseText);
 			$('#overlay-toast').html(e.responseText);
 			showToast();
@@ -6843,6 +6987,10 @@ function countPosts() {
 			}
 		},
 		error : function(e) {
+			if(e.status == 504) {
+				redirectToLoginPageOnSessionTimeOut(e.status);
+				return;
+			}
 			console.error(e.responseText);
 		}
 	});
@@ -6875,7 +7023,10 @@ function showPosts(fromStart) {
 			}
 		},
 		error : function(e) {
-
+			if(e.status == 504) {
+				redirectToLoginPageOnSessionTimeOut(e.status);
+				return;
+			}
 		}
 	});
 }
