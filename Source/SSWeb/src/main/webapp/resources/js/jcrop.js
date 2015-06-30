@@ -96,6 +96,13 @@ function initiateJcrop(input) {
 				complete : function() {
 					hideOverlay();
 					$('#prof-image').val('');
+				},
+				error : function(e) {
+					if(e.status == 504) {
+						redirectToLoginPageOnSessionTimeOut(e.status);
+						return;
+					}
+					redirectErrorpage();
 				}
 			});
 		});

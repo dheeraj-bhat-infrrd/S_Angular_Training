@@ -134,6 +134,10 @@ function fetchSocialProfileUrl(payload, callBackFunction){
 		async : false,
 		success : callBackFunction,
 		error : function(e) {
+			if(e.status == 504) {
+				redirectToLoginPageOnSessionTimeOut(e.status);
+				return;
+			}
 			redirectErrorpage();
 		}
 	});

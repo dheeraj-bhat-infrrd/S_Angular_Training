@@ -1316,10 +1316,12 @@ table.payment-pricing td:nth-child(2n+2) {
 	text-transform: none !important;
 	line-height: 34px;
 	box-shadow: none;
+	cursor: pointer;
 }
 
 .payment-button-disabled {
 	background-color: rgb(144, 130, 130);
+	cursor: auto;
 }
 
 .payment-container {

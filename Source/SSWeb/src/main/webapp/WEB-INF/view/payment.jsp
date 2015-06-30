@@ -38,7 +38,7 @@
 </c:when>
 <c:when test="${ paidUpgrade == 1 }"></c:when>
 <c:otherwise>
-	<!DOCTYPE">
+	<%-- <!DOCTYPE">
 	<html>
 	<head>
 	    <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
@@ -50,7 +50,7 @@
 	    <script type="text/javascript" src="${initParam.resourcesPath}/resources/js/common.js"></script>
 	</head>
 	    
-	<body>
+	<body> --%>
 </c:otherwise>
 </c:choose>
     <div class="payment-details-wrapper">
@@ -138,9 +138,6 @@
            
 	   $(document).ready(function() {
 		   
-		   $('#card-number').mask('dddd dddd dddd dddd', {'translation': {d: {pattern: /[0-9*]/}}});
-		   $('#exp-date').mask('dd/dd', {'translation': {d: {pattern: /[0-9*]/}}});
-		   
 		   //attach click event to close btn
 		   $('.payment-close').click(function(){
 			   $('body').removeClass('body-no-scroll');
@@ -218,15 +215,8 @@
 		   console.log(data);
 
 		   var url = "./upgradeplan.do";
-		   $.ajax({
-			  url : url,
-			  type : "POST",
-			  data : data,
-			  success : showMessage,
-			  error : function(e) {
-					redirectErrorpage();
-				}
-		   });
+		   
+		   callAjaxPostWithPayloadData(url, showMessage, data, false);
 	   }
 	   
 	   function showMessage(data){
@@ -257,15 +247,8 @@
 		   showOverlay();
 		   var data = "payment_method_nonce=" + nonce;
 		   var url = "./paymentupgrade.do";
-		   $.ajax({
-			  url : url,
-			  type : "POST",
-			  data : data,
-			  success : displayToast,
-			  error : function(e) {
-					redirectErrorpage();
-				}
-		   });
+		   
+		   callAjaxGetWithPayloadData(url, displayToast, data, false);
 	   }
 	   
 	   function displayToast(data){
@@ -288,8 +271,8 @@
    <c:when test="${ paymentChange == 1 }"></c:when>
    <c:when test="${ paidUpgrade == 1 }"></c:when>
    <c:otherwise>
-	    <script src="${initParam.resourcesPath}/resources/js/bootstrap.min.js"></script>
-	    <script src="${initParam.resourcesPath}/resources/js/script.js"></script>
+	    <%-- <script src="${initParam.resourcesPath}/resources/js/bootstrap.min.js"></script>
+	    <script src="${initParam.resourcesPath}/resources/js/script.js"></script> --%>
    </c:otherwise>
    </c:choose>
 

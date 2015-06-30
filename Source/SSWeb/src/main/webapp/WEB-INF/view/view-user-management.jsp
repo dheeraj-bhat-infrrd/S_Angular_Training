@@ -39,6 +39,7 @@
 			<div class="v-um-hdr-left float-left"><spring:message code="label.usermanagement.head.browseruser.key" /></div>
 			<div class="v-um-hdr-right float-right">
 				<input id="search-users-key" class="v-um-inp" placeholder="<spring:message code="label.searchuser.key" />">
+				<span id="um-search-icn" class="um-search-icn"></span>
 				<input type="hidden" id="users-count" value="${usersCount}">
 			</div>
 		</div>
