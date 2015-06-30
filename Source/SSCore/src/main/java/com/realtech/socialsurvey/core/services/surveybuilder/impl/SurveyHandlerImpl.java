@@ -488,10 +488,10 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean {
 		preInitiateSurvey(user, custEmail, custFirstName, custLastName, 0, custRelationWithAgent, source);
 //		storeInitialSurveyDetails(user.getUserId(), custEmail, custFirstName, custLastName, 0, custRelationWithAgent, link);
 		
-		if (isAgent)
+//		if (isAgent)
 			sendInvitationMailByAgent(user, custFirstName, custLastName, custEmail, link);
-		else
-			sendInvitationMailByCustomer(user, custFirstName, custLastName, custEmail, link);
+//		else
+//			sendInvitationMailByCustomer(user, custFirstName, custLastName, custEmail, link);
 		LOG.debug("Method sendSurveyInvitationMail() finished from DashboardController.");
 	}
 	
@@ -740,7 +740,8 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean {
 	/*
 	 * Method to send email by customer to initiate survey.
 	 */
-	private void sendInvitationMailByCustomer(User user, String custFirstName, String custLastName, String custEmail, String link)
+	@SuppressWarnings ( "unused")
+    private void sendInvitationMailByCustomer(User user, String custFirstName, String custLastName, String custEmail, String link)
 			throws InvalidInputException, UndeliveredEmailException {
 		LOG.debug("sendInvitationMailByCustomer() started.");
 
