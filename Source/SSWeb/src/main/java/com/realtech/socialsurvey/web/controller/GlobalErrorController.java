@@ -19,7 +19,6 @@ import com.realtech.socialsurvey.web.common.JspResolver;
 /**
  * Global error handler
  */
-
 @ControllerAdvice
 public class GlobalErrorController {
 
@@ -29,7 +28,7 @@ public class GlobalErrorController {
 	private MessageUtils messageUtils;
 
 	/**
-	 * Returns 500 ISE in case of fatal exception
+	 * Returns 500 ISE in case of FatalException
 	 * 
 	 * @param fe
 	 */
@@ -39,14 +38,25 @@ public class GlobalErrorController {
 		LOG.error("=====> FATAL ERROR: " + fe.getMessage(), fe);
 	}
 
+	/**
+	 * Returns 404 Not Found in case of NoRecordsFetchedException
+	 * 
+	 * @param e
+	 */
 	@ExceptionHandler(NoRecordsFetchedException.class)
 	@ResponseStatus(value = HttpStatus.NOT_FOUND, reason = "Resource Not Found")
 	public void handleNotFound(NoRecordsFetchedException e) {
 		LOG.error("=====> RESOURCE NOT FOUND: " + e.getMessage(), e);
 	}
 
+	/**
+	 * Returns 401 UnAuthorised in case of UserSessionInvalidateException
+	 * 
+	 * @param ex
+	 */
 	@ExceptionHandler(value = UserSessionInvalidateException.class)
 	public String handleUserInvalidateSession(UserSessionInvalidateException ex, Model model) {
+		LOG.error("=====> UN-AUTHORISED ACCESS: " + ex.getMessage(), ex);
 		model.addAttribute("message",
 				messageUtils.getDisplayMessage(DisplayMessageConstants.INVALID_USER_CREDENTIALS, DisplayMessageType.ERROR_MESSAGE));
 		return JspResolver.LOGIN;

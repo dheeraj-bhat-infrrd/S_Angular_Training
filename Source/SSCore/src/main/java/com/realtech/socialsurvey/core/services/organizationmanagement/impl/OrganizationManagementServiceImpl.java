@@ -854,10 +854,13 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 	}
 
 	@Override
-	public MailContentSettings updateSurveyParticipationMailBody(OrganizationUnitSettings companySettings, String mailBody, String mailCategory)
-			throws InvalidInputException {
+	public MailContentSettings updateSurveyParticipationMailBody(OrganizationUnitSettings companySettings, String mailSubject, String mailBody,
+			String mailCategory) throws InvalidInputException {
 		if (companySettings == null) {
 			throw new InvalidInputException("Company settings cannot be null.");
+		}
+		if (mailSubject == null || mailSubject.isEmpty()) {
+			throw new InvalidInputException("Mail Subject cannot be empty.");
 		}
 		if (mailBody == null || mailBody.isEmpty()) {
 			throw new InvalidInputException("Mail body cannot be empty.");
@@ -867,10 +870,12 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 		}
 		LOG.debug("Updating " + mailCategory + " for settings: " + companySettings.toString() + " with mail body: " + mailBody);
 
-		// updating mail body
+		// updating mail details
 		List<String> paramOrder = new ArrayList<String>();
 		mailBody = emailFormatHelper.replaceEmailBodyParamsWithDefaultValue(mailBody, paramOrder);
+		
 		MailContent mailContent = new MailContent();
+		mailContent.setMail_subject(mailSubject);
 		mailContent.setMail_body(mailBody);
 		mailContent.setParam_order(paramOrder);
 

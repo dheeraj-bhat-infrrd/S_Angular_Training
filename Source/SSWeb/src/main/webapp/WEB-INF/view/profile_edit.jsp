@@ -440,6 +440,13 @@
 					if (success) {
 						showPosts(true);
 					}
+				},
+				error : function(e) {
+					if(e.status == 504) {
+						redirectToLoginPageOnSessionTimeOut(e.status);
+						return;
+					}
+					redirectErrorpage();
 				}
 			});
 		});

@@ -56,7 +56,6 @@
 		<spring:message code="label.noreviews.key"/>
 	</c:otherwise>
 </c:choose>
-<script src="${initParam.resourcesPath}/resources/js/timezones.js"></script>
 <script>
 $(document).ready(function(){
 	$('.ppl-head-2').each(function(index, currentElement) {

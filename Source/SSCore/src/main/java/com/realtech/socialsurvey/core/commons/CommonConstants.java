@@ -189,7 +189,9 @@ public interface CommonConstants {
 	public static final String LOGO_DISPLAY_IN_SESSION = "displaylogo";
 	public static final String IMAGE_DISPLAY_IN_SESSION = "displayimage";
 	public static final String SURVEY_PARTICIPATION_MAIL_BODY_IN_SESSION = "surveymailbody";
+	public static final String SURVEY_PARTICIPATION_MAIL_SUBJECT_IN_SESSION = "surveymailsubject";
 	public static final String SURVEY_PARTICIPATION_REMINDER_MAIL_BODY_IN_SESSION = "surveyremindermailbody";
+	public static final String SURVEY_PARTICIPATION_REMINDER_MAIL_SUBJECT_IN_SESSION = "surveyremindermailsubject";
 	public static final String LOGIN_NAME = "loginName";
 	public static final String HIGHEST_ROLE_ID_IN_SESSION = "highestrole";
 	public static final String PAYMENT_NONCE = "payment_method_nonce";
