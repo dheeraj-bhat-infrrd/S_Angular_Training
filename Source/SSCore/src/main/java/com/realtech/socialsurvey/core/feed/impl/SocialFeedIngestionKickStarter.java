@@ -51,7 +51,7 @@ public class SocialFeedIngestionKickStarter {
 		startFeedIngestion(MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION);
 		startFeedIngestion(MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION);
 
-		executors.shutDownExecutors();
+		/*executors.shutDownExecutors();*/
 
 		// Deleting older posts
 		startOlderFeedPurging();

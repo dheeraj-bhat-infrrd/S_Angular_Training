@@ -644,7 +644,7 @@ input#find-pro-submit{
     background: url('../images/temp_ad.png') no-repeat center;
     height: 1000px;
     background-size: 100% auto;
-    background-position: center 70px;
+    background-position: center 53px;
 }
 
 .fp-txt-1 {
@@ -1316,10 +1316,12 @@ table.payment-pricing td:nth-child(2n+2) {
 	text-transform: none !important;
 	line-height: 34px;
 	box-shadow: none;
+	cursor: pointer;
 }
 
 .payment-button-disabled {
 	background-color: rgb(144, 130, 130);
+	cursor: auto;
 }
 
 .payment-container {

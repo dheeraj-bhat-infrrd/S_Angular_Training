@@ -123,8 +123,12 @@
 					$('#overlay-toast').html("We just sent you a link to access the requested survey.");
 					showToast();
 				},
-				error : function(e){
-					console.log(e);
+				error : function(e) {
+					if(e.status == 504) {
+						redirectToLoginPageOnSessionTimeOut(e.status);
+						return;
+					}
+					redirectErrorpage();
 				}
 			});
 		}
@@ -140,8 +144,12 @@
 					$('#overlay-toast').html('Mail sent to your registered email id for retaking the survey for ' + "${agentName}");
 					showToast();
 				},
-				error : function(e){
-					console.log(e);
+				error : function(e) {
+					if(e.status == 504) {
+						redirectToLoginPageOnSessionTimeOut(e.status);
+						return;
+					}
+					redirectErrorpage();
 				}
 			});
 		}

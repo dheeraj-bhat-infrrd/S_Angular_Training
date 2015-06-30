@@ -140,6 +140,8 @@ public interface SolrSearchService {
 	public SolrDocument getUserByUniqueId(long userId) throws InvalidInputException, SolrException;
 
 	public void editUserInSolr(long userId, String key, String value) throws SolrException;
+	
+	public void editUserInSolrWithMultipleValues(long userId, Map<String, Object> map) throws SolrException;
 
 	/**
 	 * Method to search for the users based on the iden specified, iden could be branchId/regionId

@@ -48,7 +48,7 @@ function initiateJcrop(input) {
 
 			$('#target').Jcrop({
 				aspectRatio : 1,
-				setSelect : [ 50, 50, 200, 200 ],
+				setSelect : [ 50, 50, 300, 300 ],
 				onSelect : updatePreview,
 				onChange : updatePreview,
 				trackDocument : true
@@ -96,6 +96,13 @@ function initiateJcrop(input) {
 				complete : function() {
 					hideOverlay();
 					$('#prof-image').val('');
+				},
+				error : function(e) {
+					if(e.status == 504) {
+						redirectToLoginPageOnSessionTimeOut(e.status);
+						return;
+					}
+					redirectErrorpage();
 				}
 			});
 		});

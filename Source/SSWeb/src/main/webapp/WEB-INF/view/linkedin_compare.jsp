@@ -416,7 +416,7 @@ function showStateCityRow() {
 
 function hideStateCityRow() {
 	$('#state-city-row').hide();
-	$('#com-city').val('');
+	$('#com-city').val('').hide();
 	$('#com-state').val(function() {
 		return $(this).find('option[selected]').text();
     });
