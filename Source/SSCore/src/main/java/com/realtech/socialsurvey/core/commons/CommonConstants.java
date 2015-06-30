@@ -290,6 +290,8 @@ public interface CommonConstants {
 	public static final String REVIEWS_SORT_CRITERIA_DATE = "date";
 	public static final String REVIEWS_SORT_CRITERIA_FEATURE = "feature";
 	public static final String REVIEWS_SORT_CRITERIA_DEFAULT = "default";
+	public static final String TEMP_FOLDER = "Temp";
+	public static final String LINKEDIN_URL_PART = "licdn";
 	
 	/**
 	 * Email templates config

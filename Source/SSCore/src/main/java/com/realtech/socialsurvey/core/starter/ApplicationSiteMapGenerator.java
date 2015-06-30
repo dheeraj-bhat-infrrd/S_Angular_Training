@@ -105,7 +105,7 @@ public class ApplicationSiteMapGenerator extends QuartzJobBean{
 	
 	public void uploadFile(String filePath, FileUploadService uploadService, String envPrefix) throws NonFatalException{
 		LOG.info("Uploading "+filePath+" to Amazon");
-		uploadService.uploadFile(new File(filePath), envPrefix+File.separator+filePath.substring(filePath.lastIndexOf(File.separator)+1));
+		uploadService.uploadFileAtDefautBucket(new File(filePath), envPrefix+File.separator+filePath.substring(filePath.lastIndexOf(File.separator)+1));
 		
 	}
 

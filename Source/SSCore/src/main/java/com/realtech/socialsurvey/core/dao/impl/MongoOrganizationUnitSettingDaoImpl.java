@@ -1,8 +1,11 @@
 package com.realtech.socialsurvey.core.dao.impl;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
@@ -16,6 +19,7 @@ import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Repository;
+
 import com.mongodb.BasicDBObject;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.dao.OrganizationUnitSettingsDao;
@@ -318,6 +322,19 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
 		query.addCriteria(Criteria.where("iden").in(agentIds));
 		mongoTemplate.remove(query, collectionName);
 		LOG.info("Method removeOganizationUnitSettings() finished.");
+	}
+	
+	@Override
+	public Map<Long, OrganizationUnitSettings> getSettingsMapWithLinkedinImageUrl(
+			String collectionName, String matchUrl) {
+		Query query = new Query();
+		query.addCriteria(Criteria.where(CommonConstants.PROFILE_IMAGE_URL_SOLR).regex( matchUrl ));
+		List<OrganizationUnitSettings> settings = mongoTemplate.find(query, OrganizationUnitSettings.class, collectionName);
+		Map<Long, OrganizationUnitSettings> settingsMap = new HashMap<>();
+		for(OrganizationUnitSettings setting : settings){
+			settingsMap.put(setting.getIden(), setting);
+		}
+		return settingsMap;
 	}
 
 	/*
