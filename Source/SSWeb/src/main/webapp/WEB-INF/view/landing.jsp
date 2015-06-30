@@ -9,8 +9,6 @@
 		loadDisplayPicture();
 	});
 </script>
-<script src="${initParam.resourcesPath}/resources/js/landing.js"></script>
-<script src="${initParam.resourcesPath}/resources/js/historySupport.js"></script>
 <script src="${initParam.resourcesPath}/resources/js/activesession.js"></script>
 <script type="text/javascript">
 $(document).ready(function() {

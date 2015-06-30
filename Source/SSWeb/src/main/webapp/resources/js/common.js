@@ -4,6 +4,13 @@
  * application
  */
 
+
+//Function to redirect to login page if session time out
+function redirectToLoginPageOnSessionTimeOut(status) {
+	window.location = window.location.origin + '/login.do?s=sessionerror';
+}
+
+
 /**
  * Generic function to be used for making ajax get calls
  * 
@@ -23,6 +30,10 @@ function callAjaxGET(url, callBackFunction, isAsync) {
 		async : isAsync,
 		success : callBackFunction,
 		error : function(e) {
+			if(e.status == 504) {
+				redirectToLoginPageOnSessionTimeOut(e.status);
+				return;
+			}
 			redirectErrorpage();
 		}
 	});
@@ -47,6 +58,10 @@ function callAjaxPOST(url, callBackFunction, isAsync) {
 		async : isAsync,
 		success : callBackFunction,
 		error : function(e) {
+			if(e.status == 504) {
+				redirectToLoginPageOnSessionTimeOut(e.status);
+				return;
+			}
 			redirectErrorpage();
 		}
 	});
@@ -78,10 +93,47 @@ function callAjaxPOSTWithTextData(url, callBackFunction, isAsync, formData) {
 			hideOverlay();
 			},
 		error : function(e) {
+			if(e.status == 504) {
+				redirectToLoginPageOnSessionTimeOut(e.status);
+				return;
+			}
 			redirectErrorpage();
 		}
 	});
 }
+
+/**
+ * Generic function to be used for making ajax get calls with datatype text and formdata
+ * 
+ * @param url
+ * @param callBackFunction
+ * @param isAsync
+ */
+function callAjaxGETWithTextData(url, callBackFunction, isAsync, formData) {
+	console.log("ajax post called for url :" + url);
+	if (typeof isAsync === "undefined") {
+		isAsync = true;
+	}
+	$.ajax({
+		url : url,
+		type : "GET",
+		dataType : "text",
+		data : formData,
+		async : isAsync,
+		success : callBackFunction,
+		complete: function(){
+			hideOverlay();
+		},
+		error : function(e) {
+			if(e.status == 504) {
+				redirectToLoginPageOnSessionTimeOut(e.status);
+				return;
+			}
+			redirectErrorpage();
+		}
+	});
+}
+
 
 /**
  * Generic function to be used for making form submission with ajax post
@@ -101,6 +153,10 @@ function callAjaxFormSubmit(url, callBackFunction, formId) {
 		data : payLoad,
 		success : callBackFunction,
 		error : function(e) {
+			if(e.status == 504) {
+				redirectToLoginPageOnSessionTimeOut(e.status);
+				return;
+			}
 			redirectErrorpage();
 		}
 	});
@@ -135,6 +191,10 @@ function callAjaxPostWithPayloadData(url, callBackFunction, payload, isAsync){
 			hideOverlay();
 		},
 		error : function(e) {
+			if(e.status == 504) {
+				redirectToLoginPageOnSessionTimeOut(e.status);
+				return;
+			}
 			redirectErrorpage();
 		}
 	});
@@ -155,6 +215,10 @@ function callAjaxGetWithPayloadData(url, callBackFunction, payload,isAsync){
 			hideOverlay();
 		},
 		error : function(e) {
+			if(e.status == 504) {
+				redirectToLoginPageOnSessionTimeOut(e.status);
+				return;
+			}
 			redirectErrorpage();
 		}
 	});
@@ -229,32 +293,37 @@ function shareOnFacebook(firstName, lastName, agentName, review, score, agentId)
 			"review" : review,
 			"score" : score,
 			"agentId" : agentId
-		};
-		$.ajax({
-			url : "./postonfacebook.do",
-			type : "GET",
-			dataType : "html",
-			data : payload,
-			success : function(data) {
-				if (data.errCode == undefined)
-					success = true;
-			},
-			complete : function(data) {
-				if (success) {
-					data = data.responseText;
-					if(data=='true')
-						$('#overlay-toast').html('No facebook account setup in hierarchy to share.');
-					else
-						$('#overlay-toast').html('Successfully shared on facebook.');
-					showToast();
-				}
-			},
-			error : function(e) {
-				console.error("error : " + e.responseText);
-				$('#overlay-toast').html(e.responseText);
-				showToast(e.responseText);
+	};
+	
+	$.ajax({
+		url : "./postonfacebook.do",
+		type : "GET",
+		dataType : "html",
+		data : payload,
+		success : function(data) {
+			if (data.errCode == undefined)
+				success = true;
+		},
+		complete : function(data) {
+			if (success) {
+				data = data.responseText;
+				if(data=='true')
+					$('#overlay-toast').html('No facebook account setup in hierarchy to share.');
+				else
+					$('#overlay-toast').html('Successfully shared on facebook.');
+				showToast();
 			}
-		});
+		},
+		error : function(e) {
+			if(e.status == 504) {
+				redirectToLoginPageOnSessionTimeOut(e.status);
+				return;
+			}
+			console.error("error : " + e.responseText);
+			$('#overlay-toast').html(e.responseText);
+			showToast(e.responseText);
+		}
+	});
 }
 
 function shareOnTwitter(firstName, lastName, agentName, review, score, agentId){
@@ -287,6 +356,10 @@ function shareOnTwitter(firstName, lastName, agentName, review, score, agentId){
 				}
 			},
 			error : function(e) {
+				if(e.status == 504) {
+					redirectToLoginPageOnSessionTimeOut(e.status);
+					return;
+				}
 				console.error("error : " + e.responseText);
 				$('#overlay-toast').html(e.responseText);
 				showToast(e.responseText);
@@ -324,6 +397,10 @@ function shareOnLinkedin(firstName, lastName, agentName, review, score, agentId)
 				}
 			},
 			error : function(e) {
+				if(e.status == 504) {
+					redirectToLoginPageOnSessionTimeOut(e.status);
+					return;
+				}
 				console.error("error : " + e.responseText);
 				$('#overlay-toast').html(e.responseText);
 				showToast(e.responseText);
@@ -361,6 +438,10 @@ function shareOnYelp(agentId, location, yelpElement){
 			}
 		},
 		error : function(e) {
+			if(e.status == 504) {
+				redirectToLoginPageOnSessionTimeOut(e.status);
+				return;
+			}
 			console.error("error : " + e.responseText);
 			$('#overlay-toast').html(e.responseText);
 			showToast(e.responseText);
@@ -401,6 +482,10 @@ function shareOnGooglePlus(agentId, location, googleElement){
 			}
 		},
 		error : function(e) {
+			if(e.status == 504) {
+				redirectToLoginPageOnSessionTimeOut(e.status);
+				return;
+			}
 			console.error("error : " + e.responseText);
 			$('#overlay-toast').html(e.responseText);
 			showToast(e.responseText);

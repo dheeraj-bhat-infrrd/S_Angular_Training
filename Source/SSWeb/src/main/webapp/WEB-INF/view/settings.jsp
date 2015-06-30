@@ -509,7 +509,7 @@ $(document).ready(function() {
 		} catch(e) {
 			console.log("ckeditor not supported for the environment");
 		}
-		$('#survey-mailcontent-subject').attr("readonly", false);
+		$('#survey-mailreminder-subject').attr("readonly", false);
 		
 		$('#save-participation-reminder-mail-content').show();
 		$('#save-participation-reminder-mail-content-disabled').hide();
@@ -526,7 +526,7 @@ $(document).ready(function() {
 		} catch(e) {
 			console.log("ckeditor not supported for the environment");
 		}
-		$('#survey-mailcontent-subject').attr("readonly", true);
+		$('#survey-mailreminder-subject').attr("readonly", true);
 		
 		$(this).hide();
 		$('#save-participation-reminder-mail-content-disabled').show();

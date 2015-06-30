@@ -7,6 +7,11 @@
 	<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<title><spring:message code="label.prolist.title.key" /></title>
+	<meta name="keywords"
+		content="[SearchQuery], professional, online, reputation, social, survey, reviews, rating">
+	<meta name="description"
+		content="[countResults] Professionals reviewed. Find [SearchQuery] professional reviews, ratings, reputation, and contact information on SocialSurvey.me">
+	<link rel="canonical" href="https://socialsurvey.me/findapro.do?find-pro-first-name=[firstName]&find-pro-last-name=[lastName]">
 	<link rel="shortcut icon" href="/favicon.ico" sizes="16x16">
 	<link rel="stylesheet" href="${initParam.resourcesPath}/resources/css/bootstrap.min.css">
 	<link rel="stylesheet" href="${initParam.resourcesPath}/resources/css/style-common-1.1.css">
