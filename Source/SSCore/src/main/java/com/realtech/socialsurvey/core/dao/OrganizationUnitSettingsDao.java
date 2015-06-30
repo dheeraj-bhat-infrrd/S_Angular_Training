@@ -1,7 +1,9 @@
 package com.realtech.socialsurvey.core.dao;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
+
 import com.realtech.socialsurvey.core.entities.AgentSettings;
 import com.realtech.socialsurvey.core.entities.FeedIngestionEntity;
 import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
@@ -138,5 +140,8 @@ public interface OrganizationUnitSettingsDao {
 	public void removeOganizationUnitSettings(List<Long> agentIds, String agentSettingsCollection);
 
 	public List<OrganizationUnitSettings> fetchOrganizationUnitSettingsForMultipleIds(Set<Long> identifiers, String collectionName);
+
+	public Map<Long, OrganizationUnitSettings> getSettingsMapWithLinkedinImageUrl(
+			String collectionName, String matchUrl);
 	
 }

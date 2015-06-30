@@ -130,6 +130,50 @@ public class SolrSearchServiceImpl implements SolrSearchService {
 		LOG.info("Method searchRegions finished for regionPattern :" + regionPattern + " returning : " + regionResult);
 		return regionResult;
 	}
+	
+	/**
+	 * Method to perform search of regions from solr based on input pattern , company and regionIds
+	 * if provided
+	 */
+	@Override
+	public long getRegionsCount(String regionPattern, Company company, Set<Long> regionIds) throws InvalidInputException,
+			SolrException {
+		LOG.info("Method searchRegions called for regionPattern :" + regionPattern);
+		if (regionPattern == null) {
+			throw new InvalidInputException("Region pattern is null while searching for region");
+		}
+		if (company == null) {
+			throw new InvalidInputException("company is null or empty while searching for region");
+		}
+		LOG.info("Method searchRegions called for regionPattern : " + regionPattern + " and company : " + company);
+		String regionResult = null;
+		QueryResponse response = null;
+		try {
+			regionPattern = regionPattern + "*";
+
+			SolrServer solrServer = new HttpSolrServer(solrRegionUrl);
+			SolrQuery solrQuery = new SolrQuery();
+			solrQuery.setQuery(CommonConstants.REGION_NAME_SOLR + ":" + regionPattern);
+			solrQuery.addFilterQuery(CommonConstants.COMPANY_ID_SOLR + ":" + company.getCompanyId(), CommonConstants.STATUS_COLUMN + ":"
+					+ CommonConstants.STATUS_ACTIVE, CommonConstants.IS_DEFAULT_BY_SYSTEM_SOLR + ":" + CommonConstants.NO);
+
+			if (regionIds != null && !regionIds.isEmpty()) {
+				String regionIdsStr = getSpaceSeparatedStringFromIds(regionIds);
+				solrQuery.addFilterQuery(CommonConstants.REGION_ID_SOLR + ":(" + regionIdsStr + ")");
+			}
+			LOG.debug("Querying solr for searching regions");
+			response = solrServer.query(solrQuery);
+			LOG.debug("Region search result is : " + regionResult);
+
+		}
+		catch (SolrServerException e) {
+			LOG.error("UnsupportedEncodingException while performing region search");
+			throw new SolrException("Exception while performing search. Reason : " + e.getMessage(), e);
+		}
+
+		LOG.info("Method searchRegions finished for regionPattern :" + regionPattern + " returning : " + regionResult);
+		return response.getResults().getNumFound();
+	}
 
 	/**
 	 * Method to perform search of branches from solr based on the input pattern, company and
@@ -232,6 +276,43 @@ public class SolrSearchServiceImpl implements SolrSearchService {
 		return branchResult;
 	}
 
+	/**
+	 * Method to perform count of branches from solr based on the region id.
+	 * 
+	 * @param regionId
+	 * @param start
+	 * @param rows
+	 * @return list of branches
+	 * @throws InvalidInputException
+	 * @throws SolrException
+	 */
+	@Override
+	public long getBranchCountByRegion(long regionId) throws InvalidInputException, SolrException {
+		LOG.info("Method searchBranchesByRegion() to search branches in a region started");
+		String branchResult = null;
+		QueryResponse response = null;
+		try {
+
+			SolrServer solrServer = new HttpSolrServer(solrBranchUrl);
+			SolrQuery query = new SolrQuery();
+			query.setQuery(CommonConstants.REGION_ID_SOLR + ":" + regionId);
+			query.addFilterQuery(CommonConstants.STATUS_SOLR + ":" + CommonConstants.STATUS_ACTIVE, CommonConstants.IS_DEFAULT_BY_SYSTEM_SOLR + ":"
+					+ CommonConstants.NO);
+
+			LOG.debug("Querying solr for counting branches");
+			response = solrServer.query(query);
+			LOG.debug("Results obtained from solr :" + branchResult);
+		}
+		catch (SolrServerException e) {
+			LOG.error("SolrServerException while performing branch search");
+			throw new SolrException("Exception while performing search. Reason : " + e.getMessage(), e);
+		}
+		LOG.info("Method searchBranchesByRegion() to search branches in a region finished");
+		return response.getResults().getNumFound();
+	}
+
+	
+	
 	/**
 	 * Method to add region into solr
 	 */
@@ -779,6 +860,43 @@ public class SolrSearchServiceImpl implements SolrSearchService {
 		return getUsersFromSolrDocuments(results);
 	}
 
+	@Override
+	public long getUsersCountByIden(long iden, String idenFieldName, boolean isAgent)
+			throws InvalidInputException, SolrException {
+		LOG.info("Method getUsersCountByIden called for iden :" + iden + "idenFieldName:" + idenFieldName);
+		if (iden <= 0l) {
+			throw new InvalidInputException("iden is not set in searchUsersByIden");
+		}
+		if (idenFieldName == null || idenFieldName.isEmpty()) {
+			throw new InvalidInputException("idenFieldName is null or empty in searchUsersByIden");
+		}
+
+		QueryResponse response = null;
+		SolrDocumentList results = null;
+		try {
+			SolrServer solrServer = new HttpSolrServer(solrUserUrl);
+			SolrQuery solrQuery = new SolrQuery();
+			solrQuery.setQuery(CommonConstants.STATUS_SOLR + ":" + CommonConstants.STATUS_ACTIVE + " OR " + CommonConstants.STATUS_SOLR + ":"
+					+ CommonConstants.STATUS_NOT_VERIFIED + " OR " + CommonConstants.STATUS_SOLR + ":" + CommonConstants.STATUS_TEMPORARILY_INACTIVE);
+			solrQuery.addFilterQuery(idenFieldName + ":" + iden);
+			if (isAgent) {
+				solrQuery.addFilterQuery(CommonConstants.IS_AGENT_SOLR + ":" + isAgent);
+			}
+
+			LOG.debug("Querying solr for searching users");
+			response = solrServer.query(solrQuery);
+			results = response.getResults();
+			LOG.debug("User search result is : " + results);
+		}
+		catch (SolrServerException e) {
+			LOG.error("SolrServerException in getUsersCountByIden().Reason:" + e.getMessage(), e);
+			throw new SolrException("Exception while performing search count for user. Reason : " + e.getMessage(), e);
+		}
+		LOG.info("Method getUsersCountByIden finished for iden : " + iden);
+		return results.getNumFound();
+	}
+
+	
 	/**
 	 * Method to perform search of region from solr based on the input Region id
 	 * 
@@ -1025,6 +1143,36 @@ public class SolrSearchServiceImpl implements SolrSearchService {
 		}
 		LOG.info("Method searchUsersByBranches executed successfully");
 		return usersResult;
+	}
+	
+	/**
+	 * Method to search for the users based on branches specified
+	 */
+	@Override
+	public long getUsersCountByBranches(Set<Long> branchIds) throws InvalidInputException, SolrException {
+		if (branchIds == null || branchIds.isEmpty()) {
+			throw new InvalidInputException("branchIds are null in getUsersCountByBranches");
+		}
+		LOG.info("Method getUsersCountByBranches called for branchIds:" + branchIds);
+		String usersResult = null;
+		QueryResponse response = null;
+		try {
+			SolrServer solrServer = new HttpSolrServer(solrUserUrl);
+			SolrQuery solrQuery = new SolrQuery();
+			solrQuery.setQuery(CommonConstants.STATUS_SOLR + ":" + CommonConstants.STATUS_ACTIVE + " OR " + CommonConstants.STATUS_SOLR + ":"
+					+ CommonConstants.STATUS_NOT_VERIFIED + " OR " + CommonConstants.STATUS_SOLR + ":" + CommonConstants.STATUS_TEMPORARILY_INACTIVE);
+			String branchIdsStr = getSpaceSeparatedStringFromIds(branchIds);
+			solrQuery.addFilterQuery(CommonConstants.BRANCHES_SOLR + ":(" + branchIdsStr + ")");
+
+			LOG.debug("Querying solr for counting users under the branches");
+			response = solrServer.query(solrQuery);
+			LOG.debug("Users search result is : " + usersResult);
+		}
+		catch (SolrServerException e) {
+			throw new SolrException("Exception while performing search for users by branches. Reason : " + e.getMessage(), e);
+		}
+		LOG.info("Method getUsersCountByBranches executed successfully");
+		return response.getResults().getNumFound();
 	}
 
 	@Override
