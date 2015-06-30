@@ -99,6 +99,10 @@ a,a:hover,a:visited {
 	font-family: 'opensanssemibold';
 }
 
+.capitalize {
+	text-transform: capitalize;
+}
+
 .margin-0-auto {
 	margin: 0 auto;
 }
@@ -5160,13 +5164,23 @@ td.v-tbl-spacer {
 }
 
 .v-um-inp {
-	width: 125px;
+	width: 100px;
 	border: 0;
 	box-shadow: none;
 	height: 32px;
-	padding: 0 25px 0 0;
+	/* padding: 0 25px 0 0;
+	background: url(../images/search.png) no-repeat;
+	background-position: right center; */
+}
+
+.um-search-icn {
+	display: block;
+	float: right;
+	width : 25px;
+	height : 32px;
 	background: url(../images/search.png) no-repeat;
 	background-position: right center;
+	cursor: pointer;
 }
 
 .v-tbl-uname {
