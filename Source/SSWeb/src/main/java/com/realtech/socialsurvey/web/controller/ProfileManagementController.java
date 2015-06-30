@@ -129,8 +129,14 @@ public class ProfileManagementController
     @Value ( "${APPLICATION_BASE_URL}")
     private String applicationBaseUrl;
 
-    @Value ( "${CDN_PATH}")
-    private String endpoint;
+    @Value ( "${AMAZON_ENDPOINT}")
+    private String amazonEndpoint;
+
+    @Value ( "${AMAZON_IMAGE_BUCKET}")
+    private String amazonImageBucket;
+
+    @Value ( "${AMAZON_LOGO_BUCKET}")
+    private String amazonLogoBucket;
 
 
     @SuppressWarnings ( "unchecked")
@@ -573,6 +579,7 @@ public class ProfileManagementController
                 profileManagementService.updateVertical( MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION,
                     companySettings, vertical );
 
+
                 userSettings.setCompanySettings( companySettings );
             } else if ( profilesMaster == CommonConstants.PROFILES_MASTER_REGION_ADMIN_PROFILE_ID ) {
                 long regionId = selectedProfile.getRegionId();
@@ -628,26 +635,19 @@ public class ProfileManagementController
                 Map<String, Object> userMap = new HashMap<>();
 
                 // Modify Agent details in Solr
-                // solrSearchService.editUserInSolr(agentSettings.getIden(),
-                // CommonConstants.USER_DISPLAY_NAME_SOLR, name);
-                // solrSearchService.editUserInSolr(agentSettings.getIden(),
-                // CommonConstants.TITLE_SOLR, title);
+                //  solrSearchService.editUserInSolr(agentSettings.getIden(), CommonConstants.USER_DISPLAY_NAME_SOLR, name);
+                //  solrSearchService.editUserInSolr(agentSettings.getIden(), CommonConstants.TITLE_SOLR, title);
                 userMap.put( CommonConstants.USER_DISPLAY_NAME_SOLR, name );
                 userMap.put( CommonConstants.TITLE_SOLR, title );
                 if ( name.indexOf( " " ) != -1 ) {
-                    // solrSearchService.editUserInSolr(agentSettings.getIden(),
-                    // CommonConstants.USER_FIRST_NAME_SOLR, name.substring(0,
-                    // name.indexOf(' ')));
-                    // solrSearchService.editUserInSolr(agentSettings.getIden(),
-                    // CommonConstants.USER_LAST_NAME_SOLR,
-                    // name.substring(name.indexOf(' ') + 1));
+                    //solrSearchService.editUserInSolr(agentSettings.getIden(), CommonConstants.USER_FIRST_NAME_SOLR, name.substring(0, name.indexOf(' ')));
+                    //solrSearchService.editUserInSolr(agentSettings.getIden(), CommonConstants.USER_LAST_NAME_SOLR, name.substring(name.indexOf(' ') + 1));
                     userMap.put( CommonConstants.USER_FIRST_NAME_SOLR, name.substring( 0, name.indexOf( ' ' ) ) );
                     userMap.put( CommonConstants.USER_LAST_NAME_SOLR, name.substring( name.indexOf( ' ' ) + 1 ) );
                     user.setFirstName( name.substring( 0, name.indexOf( ' ' ) ) );
                     user.setLastName( name.substring( 0, name.indexOf( ' ' ) ) );
                 } else {
-                    // solrSearchService.editUserInSolr(agentSettings.getIden(),
-                    // CommonConstants.USER_FIRST_NAME_SOLR, name);
+                    //solrSearchService.editUserInSolr(agentSettings.getIden(), CommonConstants.USER_FIRST_NAME_SOLR, name);
                     userMap.put( CommonConstants.USER_FIRST_NAME_SOLR, name );
                 }
                 userManagementService.updateUser( user, userMap );
@@ -1105,7 +1105,7 @@ public class ProfileManagementController
                     throw new InvalidInputException( "Logo passed is null or empty" );
                 }
                 logoUrl = fileUploadService.fileUploadHandler( fileLocal, logoFileName );
-                logoUrl = endpoint + "/" + logoUrl;
+                logoUrl = amazonEndpoint + File.separator + amazonLogoBucket + File.separator + logoUrl;
             } catch ( NonFatalException e ) {
                 LOG.error( "NonFatalException while uploading Logo. Reason :" + e.getMessage(), e );
                 model.addAttribute( "message",
@@ -1238,7 +1238,7 @@ public class ProfileManagementController
                 // uploading image
                 File fileLocal = new File( filePath );
                 profileImageUrl = fileUploadService.fileUploadHandler( fileLocal, imageFileName );
-                profileImageUrl = endpoint + "/" + profileImageUrl;
+                profileImageUrl = amazonEndpoint + File.separator + amazonImageBucket + File.separator + profileImageUrl;
             } catch ( NonFatalException e ) {
                 LOG.error( "NonFatalException while uploading Profile Image. Reason :" + e.getMessage(), e );
                 model.addAttribute( "message",
@@ -2982,6 +2982,7 @@ public class ProfileManagementController
                     DisplayMessageConstants.GENERAL_ERROR );
             }
 
+
             LOG.info( "Expertise list updated successfully" );
             model.addAttribute( "message", messageUtils.getDisplayMessage( DisplayMessageConstants.EXPERTISE_UPDATE_SUCCESSFUL,
                 DisplayMessageType.SUCCESS_MESSAGE ) );
@@ -3045,6 +3046,7 @@ public class ProfileManagementController
                 throw new InvalidInputException( "Invalid input exception occurred in adding hobbies.",
                     DisplayMessageConstants.GENERAL_ERROR );
             }
+
 
             LOG.info( "Hobbies list updated successfully" );
             model.addAttribute( "message", messageUtils.getDisplayMessage( DisplayMessageConstants.HOBBIES_UPDATE_SUCCESSFUL,
@@ -3201,21 +3203,21 @@ public class ProfileManagementController
      * @param model
      * @return
      */
-    /*
-     * @RequestMapping(value = "/companyprofile/{profileName}", method =
-     * RequestMethod.GET) public String initCompanyProfilePage(@PathVariable
-     * String profileName, Model model) {
-     * LOG.info("Service to initiate company profile page called"); String
-     * message = null; if (profileName == null || profileName.isEmpty()) {
-     * message = messageUtils.getDisplayMessage(DisplayMessageConstants.
-     * INVALID_COMPANY_PROFILENAME, DisplayMessageType.ERROR_MESSAGE)
-     * .getMessage(); model.addAttribute("message", message); return
-     * JspResolver.MESSAGE_HEADER; } model.addAttribute("companyProfileName",
-     * profileName); model.addAttribute("profileLevel",
-     * CommonConstants.PROFILE_LEVEL_COMPANY);
-     * LOG.info("Service to initiate company profile page executed successfully"
-     * ); return JspResolver.PROFILE_PAGE; }
-     */
+    /*@RequestMapping(value = "/companyprofile/{profileName}", method = RequestMethod.GET)
+    public String initCompanyProfilePage(@PathVariable String profileName, Model model) {
+        LOG.info("Service to initiate company profile page called");
+        String message = null;
+        if (profileName == null || profileName.isEmpty()) {
+            message = messageUtils.getDisplayMessage(DisplayMessageConstants.INVALID_COMPANY_PROFILENAME, DisplayMessageType.ERROR_MESSAGE)
+                    .getMessage();
+            model.addAttribute("message", message);
+            return JspResolver.MESSAGE_HEADER;
+        }
+        model.addAttribute("companyProfileName", profileName);
+        model.addAttribute("profileLevel", CommonConstants.PROFILE_LEVEL_COMPANY);
+        LOG.info("Service to initiate company profile page executed successfully");
+        return JspResolver.PROFILE_PAGE;
+    }*/
 
     /**
      * Method to return region profile page
@@ -3225,30 +3227,28 @@ public class ProfileManagementController
      * @param model
      * @return
      */
-    /*
-     * @RequestMapping(value =
-     * "/regionprofile/{companyProfileName}/region/{regionProfileName}") public
-     * String initRegionProfilePage(@PathVariable String companyProfileName,
-     * 
-     * @PathVariable String regionProfileName, Model model) {
-     * LOG.info("Service to initiate region profile page called"); String
-     * message = null; if (companyProfileName == null ||
-     * companyProfileName.isEmpty()) { message =
-     * messageUtils.getDisplayMessage(DisplayMessageConstants
-     * .INVALID_COMPANY_PROFILENAME, DisplayMessageType.ERROR_MESSAGE)
-     * .getMessage(); model.addAttribute("message", message); return
-     * JspResolver.MESSAGE_HEADER; } if (regionProfileName == null ||
-     * regionProfileName.isEmpty()) { message =
-     * messageUtils.getDisplayMessage(DisplayMessageConstants
-     * .INVALID_REGION_PROFILENAME, DisplayMessageType.ERROR_MESSAGE)
-     * .getMessage(); model.addAttribute("message", message); return
-     * JspResolver.MESSAGE_HEADER; } model.addAttribute("companyProfileName",
-     * companyProfileName); model.addAttribute("regionProfileName",
-     * regionProfileName); model.addAttribute("profileLevel",
-     * CommonConstants.PROFILE_LEVEL_REGION);
-     * LOG.info("Service to initiate region profile page executed successfully"
-     * ); return JspResolver.PROFILE_PAGE; }
-     */
+    /*@RequestMapping(value = "/regionprofile/{companyProfileName}/region/{regionProfileName}")
+    public String initRegionProfilePage(@PathVariable String companyProfileName, @PathVariable String regionProfileName, Model model) {
+        LOG.info("Service to initiate region profile page called");
+        String message = null;
+        if (companyProfileName == null || companyProfileName.isEmpty()) {
+            message = messageUtils.getDisplayMessage(DisplayMessageConstants.INVALID_COMPANY_PROFILENAME, DisplayMessageType.ERROR_MESSAGE)
+                    .getMessage();
+            model.addAttribute("message", message);
+            return JspResolver.MESSAGE_HEADER;
+        }
+        if (regionProfileName == null || regionProfileName.isEmpty()) {
+            message = messageUtils.getDisplayMessage(DisplayMessageConstants.INVALID_REGION_PROFILENAME, DisplayMessageType.ERROR_MESSAGE)
+                    .getMessage();
+            model.addAttribute("message", message);
+            return JspResolver.MESSAGE_HEADER;
+        }
+        model.addAttribute("companyProfileName", companyProfileName);
+        model.addAttribute("regionProfileName", regionProfileName);
+        model.addAttribute("profileLevel", CommonConstants.PROFILE_LEVEL_REGION);
+        LOG.info("Service to initiate region profile page executed successfully");
+        return JspResolver.PROFILE_PAGE;
+    }*/
 
     /**
      * Method to return branch profile page
@@ -3258,30 +3258,28 @@ public class ProfileManagementController
      * @param model
      * @return
      */
-    /*
-     * @RequestMapping(value =
-     * "/branchprofile/{companyProfileName}/branch/{branchProfileName}") public
-     * String initBranchProfilePage(@PathVariable String companyProfileName,
-     * 
-     * @PathVariable String branchProfileName, Model model) {
-     * LOG.info("Service to initiate branch profile page called"); String
-     * message = null; if (companyProfileName == null ||
-     * companyProfileName.isEmpty()) { message =
-     * messageUtils.getDisplayMessage(DisplayMessageConstants
-     * .INVALID_COMPANY_PROFILENAME, DisplayMessageType.ERROR_MESSAGE)
-     * .getMessage(); model.addAttribute("message", message); return
-     * JspResolver.MESSAGE_HEADER; } if (branchProfileName == null ||
-     * branchProfileName.isEmpty()) { message =
-     * messageUtils.getDisplayMessage(DisplayMessageConstants
-     * .INVALID_BRANCH_PROFILENAME, DisplayMessageType.ERROR_MESSAGE)
-     * .getMessage(); model.addAttribute("message", message); return
-     * JspResolver.MESSAGE_HEADER; } model.addAttribute("companyProfileName",
-     * companyProfileName); model.addAttribute("branchProfileName",
-     * branchProfileName); model.addAttribute("profileLevel",
-     * CommonConstants.PROFILE_LEVEL_BRANCH);
-     * LOG.info("Service to initiate branch profile page executed successfully"
-     * ); return JspResolver.PROFILE_PAGE; }
-     */
+    /*@RequestMapping(value = "/branchprofile/{companyProfileName}/branch/{branchProfileName}")
+    public String initBranchProfilePage(@PathVariable String companyProfileName, @PathVariable String branchProfileName, Model model) {
+        LOG.info("Service to initiate branch profile page called");
+        String message = null;
+        if (companyProfileName == null || companyProfileName.isEmpty()) {
+            message = messageUtils.getDisplayMessage(DisplayMessageConstants.INVALID_COMPANY_PROFILENAME, DisplayMessageType.ERROR_MESSAGE)
+                    .getMessage();
+            model.addAttribute("message", message);
+            return JspResolver.MESSAGE_HEADER;
+        }
+        if (branchProfileName == null || branchProfileName.isEmpty()) {
+            message = messageUtils.getDisplayMessage(DisplayMessageConstants.INVALID_BRANCH_PROFILENAME, DisplayMessageType.ERROR_MESSAGE)
+                    .getMessage();
+            model.addAttribute("message", message);
+            return JspResolver.MESSAGE_HEADER;
+        }
+        model.addAttribute("companyProfileName", companyProfileName);
+        model.addAttribute("branchProfileName", branchProfileName);
+        model.addAttribute("profileLevel", CommonConstants.PROFILE_LEVEL_BRANCH);
+        LOG.info("Service to initiate branch profile page executed successfully");
+        return JspResolver.PROFILE_PAGE;
+    }*/
 
     /**
      * Method to return agent profile page
@@ -3290,21 +3288,21 @@ public class ProfileManagementController
      * @param model
      * @return
      */
-    /*
-     * @RequestMapping(value = "/individualprofile/{agentProfileName}") public
-     * String initBranchProfilePage(@PathVariable String agentProfileName, Model
-     * model) { LOG.info("Service to initiate agent profile page called");
-     * String message = null; if (agentProfileName == null ||
-     * agentProfileName.isEmpty()) { message =
-     * messageUtils.getDisplayMessage(DisplayMessageConstants
-     * .INVALID_INDIVIDUAL_PROFILENAME, DisplayMessageType.ERROR_MESSAGE)
-     * .getMessage(); model.addAttribute("message", message); return
-     * JspResolver.MESSAGE_HEADER; } model.addAttribute("agentProfileName",
-     * agentProfileName); model.addAttribute("profileLevel",
-     * CommonConstants.PROFILE_LEVEL_INDIVIDUAL);
-     * LOG.info("Service to initiate agent profile page executed successfully");
-     * return JspResolver.PROFILE_PAGE; }
-     */
+    /*@RequestMapping(value = "/individualprofile/{agentProfileName}")
+    public String initBranchProfilePage(@PathVariable String agentProfileName, Model model) {
+        LOG.info("Service to initiate agent profile page called");
+        String message = null;
+        if (agentProfileName == null || agentProfileName.isEmpty()) {
+            message = messageUtils.getDisplayMessage(DisplayMessageConstants.INVALID_INDIVIDUAL_PROFILENAME, DisplayMessageType.ERROR_MESSAGE)
+                    .getMessage();
+            model.addAttribute("message", message);
+            return JspResolver.MESSAGE_HEADER;
+        }
+        model.addAttribute("agentProfileName", agentProfileName);
+        model.addAttribute("profileLevel", CommonConstants.PROFILE_LEVEL_INDIVIDUAL);
+        LOG.info("Service to initiate agent profile page executed successfully");
+        return JspResolver.PROFILE_PAGE;
+    }*/
 
     // Fetch Admin hierarchy
     @RequestMapping ( value = "/getadminhierarchy", method = RequestMethod.GET)

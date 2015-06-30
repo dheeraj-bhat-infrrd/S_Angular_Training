@@ -3059,17 +3059,17 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
      */
     @Override
     @Transactional
-    public List<BranchFromSearch> getBranchesUnderCompanyFromSolr( Company company, int start, int rows )
-        throws InvalidInputException, NoRecordsFetchedException, SolrException
+    public List<BranchFromSearch> getBranchesUnderCompanyFromSolr( Company company, int start ) throws InvalidInputException,
+        NoRecordsFetchedException, SolrException
     {
         if ( company == null ) {
             throw new InvalidInputException( "company is null in getBranchesUnderCompanyFromSolr" );
         }
-        LOG.info( "Method getBranchesUnderCompanyFromSolr called for company:" + company + " and start:" + start + " rows:"
-            + rows );
+        LOG.info( "Method getBranchesUnderCompanyFromSolr called for company:" + company + " and start:" + start );
         List<BranchFromSearch> branches = null;
         Region defaultRegion = getDefaultRegionForCompany( company );
-        String branchesJson = solrSearchService.searchBranchesByRegion( defaultRegion.getRegionId(), start, rows );
+        int branchCount = (int) solrSearchService.getBranchCountByRegion( defaultRegion.getRegionId() );
+        String branchesJson = solrSearchService.searchBranchesByRegion( defaultRegion.getRegionId(), start, branchCount );
         LOG.debug( "branchesJson obtained from solr is:" + branchesJson );
 
         Type searchedBranchesList = new TypeToken<List<BranchFromSearch>>() {}.getType();
@@ -3085,18 +3085,20 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
      */
     @Override
     @Transactional
-    public List<UserFromSearch> getUsersUnderCompanyFromSolr( Company company, int start, int rows )
-        throws InvalidInputException, NoRecordsFetchedException, SolrException
+    public List<UserFromSearch> getUsersUnderCompanyFromSolr( Company company, int start ) throws InvalidInputException,
+        NoRecordsFetchedException, SolrException
     {
         if ( company == null ) {
             throw new InvalidInputException( "company is null in getUsersUnderCompanyFromSolr" );
         }
-        LOG.info( "Method getUsersUnderCompanyFromSolr called for company:" + company + " and start:" + start + " rows:" + rows );
+        LOG.info( "Method getUsersUnderCompanyFromSolr called for company:" + company + " and start:" + start );
         List<UserFromSearch> users = null;
         Region defaultRegion = getDefaultRegionForCompany( company );
         Branch defaultBranch = getDefaultBranchForRegion( defaultRegion.getRegionId() );
+        int usersCount = (int) solrSearchService.getUsersCountByIden( defaultBranch.getBranchId(),
+            CommonConstants.BRANCHES_SOLR, false );
         Collection<UserFromSearch> usersResult = solrSearchService.searchUsersByIden( defaultBranch.getBranchId(),
-            CommonConstants.BRANCHES_SOLR, false, start, rows );
+            CommonConstants.BRANCHES_SOLR, false, start, usersCount );
         String usersJson = new Gson().toJson( usersResult );
         LOG.debug( "Solr result returned for users of company is:" + usersJson );
         /**
@@ -3124,7 +3126,11 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
             Branch branch = getDefaultBranchForRegion( regionId );
             branchIds.add( branch.getBranchId() );
         }
-        String usersJson = solrSearchService.searchUsersByBranches( branchIds, start, rows );
+        int userCount = rows;
+        if ( rows == -1 ) {
+            userCount = (int) solrSearchService.getUsersCountByBranches( branchIds );
+        }
+        String usersJson = solrSearchService.searchUsersByBranches( branchIds, start, userCount );
         LOG.debug( "Solr result returned for users of regions is:" + usersJson );
         /**
          * convert users to Object
@@ -3606,6 +3612,30 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
             mapping.getCrmMaster().getCrmName();
         }
         return mappings;
+    }
+
+
+    @Override
+    public Map<Long, OrganizationUnitSettings> getSettingsMapWithLinkedinImage( String profileLevel )
+    {
+
+        String collectionName = "";
+        switch ( profileLevel ) {
+            case CommonConstants.COMPANY:
+                collectionName = MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION;
+                break;
+            case CommonConstants.REGION_COLUMN:
+                collectionName = MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION;
+                break;
+            case CommonConstants.BRANCH_NAME_COLUMN:
+                collectionName = MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION;
+                break;
+            case "agent":
+                collectionName = MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION;
+                break;
+        }
+        return organizationUnitSettingsDao.getSettingsMapWithLinkedinImageUrl( collectionName,
+            CommonConstants.LINKEDIN_URL_PART );
     }
 
 }

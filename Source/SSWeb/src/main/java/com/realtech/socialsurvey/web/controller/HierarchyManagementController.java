@@ -1479,15 +1479,16 @@ public class HierarchyManagementController {
 
 			if (highestRole == CommonConstants.PROFILES_MASTER_COMPANY_ADMIN_PROFILE_ID) {
 				LOG.debug("fetching regions under company from solr");
-				String regionsJson = solrSearchService.searchRegions("*", user.getCompany(), null, start, rows);
+				int regionCount = (int)solrSearchService.getRegionsCount("*", user.getCompany(), null);
+				String regionsJson = solrSearchService.searchRegions("*", user.getCompany(), null, start, regionCount);
 				Type searchedRegionsList = new TypeToken<List<RegionFromSearch>>() {}.getType();
 				regions = new Gson().fromJson(regionsJson, searchedRegionsList);
 
 				LOG.debug("fetching branches under company from solr");
-				branches = organizationManagementService.getBranchesUnderCompanyFromSolr(user.getCompany(), start, rows);
+				branches = organizationManagementService.getBranchesUnderCompanyFromSolr(user.getCompany(), start);
 
 				LOG.debug("fetching users under company from solr");
-				users = organizationManagementService.getUsersUnderCompanyFromSolr(user.getCompany(), start, rows);
+				users = organizationManagementService.getUsersUnderCompanyFromSolr(user.getCompany(), start);
 
 				users = userManagementService.checkUserCanEdit(admin, adminUser, users);
 				jspToReturn = JspResolver.VIEW_HIERARCHY_REGION_LIST;
@@ -1495,8 +1496,7 @@ public class HierarchyManagementController {
 			else if (highestRole == CommonConstants.PROFILES_MASTER_REGION_ADMIN_PROFILE_ID) {
 				LOG.debug("Getting list of regions for the region admin");
 				regionIds = organizationManagementService.getRegionIdsForUser(user, highestRole);
-
-				String regionsJson = solrSearchService.searchRegions("*", user.getCompany(), regionIds, start, rows);
+				String regionsJson = solrSearchService.searchRegions("*", user.getCompany(), regionIds, start, regionIds.size());
 				Type searchedRegionsList = new TypeToken<List<RegionFromSearch>>() {}.getType();
 				regions = new Gson().fromJson(regionsJson, searchedRegionsList);
 
@@ -1511,7 +1511,7 @@ public class HierarchyManagementController {
 				branchIds = organizationManagementService.getBranchIdsForUser(user, highestRole);
 
 				String branchesJson = solrSearchService
-						.searchBranches("*", user.getCompany(), CommonConstants.BRANCH_ID_SOLR, branchIds, start, rows);
+						.searchBranches("*", user.getCompany(), CommonConstants.BRANCH_ID_SOLR, branchIds, start, branchIds.size());
 				Type searchedBranchesList = new TypeToken<List<BranchFromSearch>>() {}.getType();
 				branches = new Gson().fromJson(branchesJson, searchedBranchesList);
 
