@@ -660,7 +660,7 @@ public interface OrganizationManagementService {
 	 * @throws NoRecordsFetchedException
 	 * @throws SolrException
 	 */
-	public List<BranchFromSearch> getBranchesUnderCompanyFromSolr(Company company, int start, int rows) throws InvalidInputException,
+	public List<BranchFromSearch> getBranchesUnderCompanyFromSolr(Company company, int start) throws InvalidInputException,
 			NoRecordsFetchedException, SolrException;
 
 	/**
@@ -674,7 +674,7 @@ public interface OrganizationManagementService {
 	 * @throws NoRecordsFetchedException
 	 * @throws SolrException
 	 */
-	public List<UserFromSearch> getUsersUnderCompanyFromSolr(Company company, int start, int rows) throws InvalidInputException,
+	public List<UserFromSearch> getUsersUnderCompanyFromSolr(Company company, int start) throws InvalidInputException,
 			NoRecordsFetchedException, SolrException;
 
 	/**
@@ -705,4 +705,7 @@ public interface OrganizationManagementService {
 	public void updateCompany(Company company) throws DatabaseException;
 
 	public List<VerticalCrmMapping> getCrmMapping(User user);
+
+	public Map<Long, OrganizationUnitSettings> getSettingsMapWithLinkedinImage(
+			String string);
 }
