@@ -3,7 +3,54 @@
 <%@taglib uri="http://www.springframework.org/tags" prefix="spring"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
-<!DOCTYPE">
+<c:if test="${not empty profile}">
+	<c:if
+		test="${not empty profile.contact_details && not empty profile.contact_details.name }">
+		<c:set var="profName" value="${profile.contact_details.name }"></c:set>
+	</c:if>
+	<c:if test="${not empty profile.contact_details}">
+		<c:set var="contact_details" value="${profile.contact_details }"></c:set>
+		<c:if
+			test="${ not empty  contact_details && not empty contact_details.location}">
+			<c:set var="location" value="${contact_details.location}"></c:set>
+		</c:if>
+		<c:if test="${not empty contact_details.title}">
+			<c:set var="title" value="${contact_details.title}"></c:set>
+		</c:if>
+		<c:if test="${not empty contact_details.industry}">
+			<c:set var="vertical" value="${contact_details.industry}"></c:set>
+		</c:if>
+		<c:if test="${not empty contact_details.firstName }">
+			<c:set var="firstName" value="${contact_details.firstName}"></c:set>
+		</c:if>
+		<c:if test="${not empty contact_details.lastName }">
+			<c:set var="lastName" value="${contact_details.lastName}"></c:set>
+		</c:if>
+		<c:if test="${not empty contact_details.country }">
+			<c:set var="country" value="${contact_details.country}"></c:set>
+		</c:if>
+		<c:if test="${not empty contact_details.state }">
+			<c:set var="state" value="${contact_details.state}"></c:set>
+		</c:if>
+		<c:if test="${not empty contact_details.city }">
+			<c:set var="city" value="${contact_details.city}"></c:set>
+		</c:if>
+	</c:if>
+	<c:if test="${empty vertical && not empty profile.vertical}">
+		<c:set var="vertical" value="${profile.vertical}"></c:set>
+	</c:if>
+	<c:choose>
+		<c:when test="${profileLevel == 'INDIVIDUAL' }">
+			<c:if test="${not empty profile.companyProfileData}">
+				<c:set var="companyProfileData" value="${profile.companyProfileData }"></c:set>
+				<c:if test="${not empty companyProfileData.name}">
+					<c:set var="companyName" value="${companyProfileData.name}"></c:set>
+				</c:if>
+			</c:if>
+		</c:when>
+	</c:choose>
+</c:if>
+<!DOCTYPE>
 <html>
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
@@ -19,36 +66,40 @@
     <link rel="stylesheet" href="${initParam.resourcesPath}/resources/css/style-common-1.1.css">
     <link rel="stylesheet" href="${initParam.resourcesPath}/resources/css/style-resp-1.1.css">
     <c:if test="${not empty profile}">
-    	<c:if test="${not empty profile.contact_details && not empty profile.contact_details.name }">
-    		<c:set var="profName" value="${profile.contact_details.name }"></c:set>
-    	</c:if>
-	    <c:choose>
-	    	<c:when test="${not empty profile.contact_details && not empty profile.contact_details.name}">
-	    		<title>${profName} Ratings & Reviews
-	    			<c:if test="${not empty profile.vertical }">
-	    				 - [${profile.vertical }] Reviews
-	    			</c:if>
-	    		</title>	
-	    	</c:when>
-			<c:otherwise>
-				<title><spring:message code="label.profile.title.key" /></title>
-			</c:otherwise>
-		</c:choose>
-    	<c:if test="${not empty profile.completeProfileUrl }">
-    		<link rel="canonical" href="${profile.completeProfileUrl}">
-    	</c:if>
-    	<c:if test="${not empty profile.contact_details && not empty profile.contact_details.name }">
-    		<meta name="description" content="Use SocialSurvey Ratings & Reviews to find out how customers have rated ${profName }.">
-    		<meta name="keywords" content="${profName }, ${profName } ratings, ${profName } reviews, ${profName } scorecard, ${profName } ratings and reviews">
-    	</c:if>
-    	<c:if test="${not empty averageRating}">
-    		<fmt:formatNumber var="floatingAverageRating" type="number" value="${averageRating}" maxFractionDigits="2" minFractionDigits="2"/>
-    		<fmt:formatNumber var="integerAverageRating" type="number" value="${averageRating}" maxFractionDigits="0"/>
-    		<c:set var="integerAverageRating" value="${integerAverageRating}"></c:set>
-    		<c:if test="${integerAverageRating == 0}">
-    			<c:set var="integerAverageRating" value="1"></c:set>
-    		</c:if>
-    	</c:if>
+    <c:if test="${not empty profile.completeProfileUrl }">
+		<link rel="canonical" href="${profile.completeProfileUrl}">
+	</c:if>
+    <c:choose>
+    	<c:when test="${not empty profName}">
+    		<c:choose>
+    			<c:when test="${profileLevel == 'INDIVIDUAL' }">
+    				<title>${profName} ${title} ${companyName} ${location} ${vertical} Professional Reviews | SocialSurvey.me</title>
+		    		<meta name="keywords"
+						content="${profName}, ${title }, ${companyName }, ${location }, ${vertical }, professional, online, reputation, social, survey, reviews, rating">
+					<meta name="description"
+						content="Reviews for ${profName}. ${firstName} has ${reviewsCount} reviews. ${firstName} is a ${vertical} professional in ${location}. ${firstName} is the ${title} of ${companyName}.">
+    			</c:when>
+    			<c:otherwise>
+    				<title>${profName} ${vertical} Reviews | SocialSurvey.me</title>
+    				<meta name="keywords"
+						content="${profName}, ${vertical}, professional, online, reputation, social, survey, reviews, rating">
+					<meta name="description"
+						content="Reviews for ${profName}. ${profName} has ${reviewsCount} reviews. ${profName} is a ${vertical} company in ${city} ${state} ${country}.">
+    			</c:otherwise>
+    		</c:choose>
+    	</c:when>
+		<c:otherwise>
+			<title><spring:message code="label.profile.title.key" /></title>
+		</c:otherwise>
+	</c:choose>
+   	<c:if test="${not empty averageRating}">
+   		<fmt:formatNumber var="floatingAverageRating" type="number" value="${averageRating}" maxFractionDigits="2" minFractionDigits="2"/>
+   		<fmt:formatNumber var="integerAverageRating" type="number" value="${averageRating}" maxFractionDigits="0"/>
+   		<c:set var="integerAverageRating" value="${integerAverageRating}"></c:set>
+   		<c:if test="${integerAverageRating == 0}">
+   			<c:set var="integerAverageRating" value="1"></c:set>
+   		</c:if>
+   	</c:if>
     </c:if>
 </head>
 <body>
@@ -446,12 +497,39 @@
             </div>
             
             <div class="row prof-right-panel-wrapper col-lg-8 col-md-8 col-sm-8 col-xs-12">
-            	<c:if test="${not empty profile.contact_details && not empty profile.contact_details.about_me }">
-	                <div class="intro-wrapper rt-content-main bord-bot-dc hide" id="prof-company-intro">
-	                    <div class="main-con-header">About ${profName}</div>
-	                    <div class="pe-whitespace intro-body">${profile.contact_details.about_me}</div>
-	                </div>
-                </c:if>
+                <div class="intro-wrapper rt-content-main bord-bot-dc hide" id="prof-company-intro">
+                    <div class="main-con-header">About ${profName}</div>
+                    <c:choose>
+                    	<c:when test="${not empty profile.contact_details && not empty profile.contact_details.about_me }">
+                    		<div class="pe-whitespace intro-body">${profile.contact_details.about_me}</div>
+                    	</c:when>
+                    	<c:otherwise>
+                    		<c:choose>
+                    			<c:when test="${profileLevel == 'INDIVIDUAL'}">
+									<div class="intro-body">
+										Reviews for <span class="capitalize">${profName}</span>. 
+										<span class="capitalize">${firstName}</span> has ${reviewsCount} reviews. 
+										<c:if test="${not empty  vertical && not empty location}">
+											<span class="capitalize">${firstName}</span> is a ${vertical} professnal in ${location}.
+										</c:if>
+										<c:if test="${not empty title}">
+											<span class="capitalize">${firstName}</span> is the ${title} of ${companyName}.
+										</c:if>
+									</div>
+								</c:when>
+                    			<c:otherwise>
+                    				<div class="intro-body">
+                    					Reviews for <span class="capitalize">${profName}</span>. 
+                    					<span class="capitalize">${profName}</span> has ${reviewsCount} reviews. 
+                    					<c:if test="${not empty country && not empty vertical}">
+                    						<span class="capitalize">${profName}</span> is a ${vertical} company in ${city} ${state} ${country}.
+                    					</c:if>
+                    				</div>
+                    			</c:otherwise>
+                    		</c:choose>
+                    	</c:otherwise>
+                    </c:choose>
+                </div>
                 <c:if test="${not empty posts}">
                 <div class="rt-content-main bord-bot-dc clearfix" id="recent-post-container">
                     <div class="float-left panel-tweet-wrapper">

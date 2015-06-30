@@ -4,7 +4,11 @@
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
-	<title>Home Page</title>
+	<title>Professional Reputation Management | SocialSurvey.me</title>
+	<meta name="keywords"
+		content="socialsurvey.me, socialsurvey, professional, online, reputation management, social, survey, reviews, rating">
+	<meta name="description"
+		content="Rate and review professionals online. Engaging customers and enhance your online reputation. Create a winning social strategy and boost customer satisfaction.">
 	<link rel="canonical" href="https://socialsurvey.me">
 	<link rel="shortcut icon" href="/favicon.ico" sizes="16x16">
 	<link rel="stylesheet" href="${initParam.resourcesPath}/resources/css/bootstrap.min.css">
@@ -208,7 +212,7 @@ $(document).ready(function(){
 		async : false,
 		success : function(activeSessionFound){
 			if (activeSessionFound == "true") {
-				window.location.href = "./landing.do";
+				window.location.href = "./userlogin.do";
 			}
 		},
 		error : function(e) {
