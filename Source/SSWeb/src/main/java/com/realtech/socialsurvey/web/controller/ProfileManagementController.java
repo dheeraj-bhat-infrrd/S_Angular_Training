@@ -645,7 +645,7 @@ public class ProfileManagementController
                     userMap.put( CommonConstants.USER_FIRST_NAME_SOLR, name.substring( 0, name.indexOf( ' ' ) ) );
                     userMap.put( CommonConstants.USER_LAST_NAME_SOLR, name.substring( name.indexOf( ' ' ) + 1 ) );
                     user.setFirstName( name.substring( 0, name.indexOf( ' ' ) ) );
-                    user.setLastName( name.substring( 0, name.indexOf( ' ' ) ) );
+                    user.setLastName( name.substring( name.indexOf( ' ' ) + 1 ) );
                 } else {
                     //solrSearchService.editUserInSolr(agentSettings.getIden(), CommonConstants.USER_FIRST_NAME_SOLR, name);
                     userMap.put( CommonConstants.USER_FIRST_NAME_SOLR, name );
