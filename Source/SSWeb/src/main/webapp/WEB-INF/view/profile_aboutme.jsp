@@ -42,6 +42,6 @@
 			<spring:message code="label.aboutcompany.empty.key" />
 		</div>
 		<input type="hidden" id="aboutme-status" value="new"/>
-		<textarea class="pe-whitespace sb-txtarea hide" id="status-body-text-edit"></textarea>
+		<textarea class="pe-whitespace sb-txtarea hide" id="intro-body-text-edit"></textarea>
 	</c:otherwise>
 </c:choose>
