@@ -235,5 +235,17 @@ public interface SolrSearchService {
 	public List<Long> searchRegionIdsByCompany(long companyId) throws InvalidInputException, SolrException;
 
 	public void removeRegionsFromSolr(List<Long> regionIds) throws SolrException;
+
+	public long getRegionsCount(String regionPattern, Company company,
+			Set<Long> regionIds) throws InvalidInputException, SolrException;
+
+	public long getBranchCountByRegion(long regionId) throws InvalidInputException,
+			SolrException;
+
+	public long getUsersCountByIden(long iden, String idenFieldName, boolean isAgent)
+			throws InvalidInputException, SolrException;
+
+	public long getUsersCountByBranches(Set<Long> branchIds)
+			throws InvalidInputException, SolrException;
 }
 // JIRA:SS-62 BY RM 02 EOC

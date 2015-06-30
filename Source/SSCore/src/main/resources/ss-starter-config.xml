@@ -151,6 +151,23 @@
 		</property>
 		<property name="durability" value="true" />
 	</bean>
+	
+	<!-- Image loader job detail -->
+	<bean id="imageloaderjobdetail"
+		class="org.springframework.scheduling.quartz.JobDetailFactoryBean">
+		<property name="jobClass"
+			value="com.realtech.socialsurvey.core.starter.ImageLoader" />
+		<property name="jobDataAsMap">
+			<map>
+				<entry key="fileUploadService" value-ref="fileUploadService" />
+				<entry key="profileManagementService" value-ref="profileManagementService" />
+				<entry key="organizationManagementService" value-ref="organizationManagementService" />
+				<entry key="amazonEndPoint" value="${AMAZON_ENDPOINT}" />
+				<entry key="amazonImageBucket" value="${AMAZON_IMAGE_BUCKET}" />
+			</map>
+		</property>
+		<property name="durability" value="true" />
+	</bean>
 
 	<!-- setting cron for Account deactivator -->
 	<bean id="sitemapgeneratorcron"
@@ -207,6 +224,13 @@
 		<property name="jobDetail" ref="crmdataagentidmapperjobdetail" />
 		<property name="cronExpression" value="* 30 7 * * ?" />
 	</bean>
+	
+	<!-- setting cron for loading image from linkedin to amazon server -->
+	<bean id="imageloadercron"
+		class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
+		<property name="jobDetail" ref="imageloaderjobdetail" />
+		<property name="cronExpression" value="* 0/1 * * * ?" />
+	</bean>
 
 	<!-- Scheduler factory -->
 	<bean class="org.springframework.scheduling.quartz.SchedulerFactoryBean">
@@ -220,6 +244,7 @@
 				<ref bean="accountdeactivatorjobdetail" />
 				<ref bean="deactivatedaccountpurgerjobdetail" />
 				<ref bean="crmdataagentidmapperjobdetail" />
+				<ref bean="imageloaderjobdetail" />
 			</list>
 		</property>
 
@@ -233,6 +258,7 @@
 				<ref bean="accountdeactivatorcron" />
 				<ref bean="deactivatedaccountpurgercron" />
 				<ref bean="crmdataagentidmappercron" />
+				<ref bean="imageloadercron" />
 			</list>
 		</property>
 		<property name="quartzProperties">
@@ -280,6 +306,10 @@
 		class="com.realtech.socialsurvey.core.services.surveybuilder.impl.SurveyBuilderImpl" />
 	<bean id="socialManagementService"
 		class="com.realtech.socialsurvey.core.services.social.impl.SocialManagementServiceImpl" />
+	<bean id="fileUploadService"
+		class="com.realtech.socialsurvey.core.services.upload.impl.CloudUploadServiceImpl" />
+	<bean id="profileManagementService"
+		class="com.realtech.socialsurvey.core.services.organizationmanagement.impl.ProfileManagementServiceImpl" />
 
 	<bean id="regionsFullImport"
 		class="com.realtech.socialsurvey.core.utils.solr.RegionsFullImport" />

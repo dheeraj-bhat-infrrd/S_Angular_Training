@@ -5,12 +5,14 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
+
 import com.amazonaws.AmazonClientException;
 import com.amazonaws.auth.AWSCredentials;
 import com.amazonaws.auth.BasicAWSCredentials;
@@ -48,6 +50,12 @@ public class CloudUploadServiceImpl implements FileUploadService {
 	@Value("${AMAZON_ENDPOINT}")
 	private String endpoint;
 
+	@Value("${AMAZON_LOGO_BUCKET}")
+	private String logoBucket;
+	
+	@Value("${AMAZON_IMAGE_BUCKET}")
+	private String imageBucket;
+	
 	@Value("${AMAZON_BUCKET}")
 	private String bucket;
 
@@ -64,7 +72,7 @@ public class CloudUploadServiceImpl implements FileUploadService {
 	public String fileUploadHandler(File file, String imageName) throws InvalidInputException {
 		LOG.info("Method fileUploadHandler inside AmazonUploadServiceImpl called");
 		try {
-			return uploadImage(file, imageName);
+			return uploadImage(file, imageName, imageBucket);
 		}
 		catch (InvalidInputException e) {
 			LOG.error("IOException occured while reading file. Reason : " + e.getMessage(), e);
@@ -81,7 +89,7 @@ public class CloudUploadServiceImpl implements FileUploadService {
 				File convFile = new File(CommonConstants.IMAGE_NAME);
 				fileLocal.transferTo(convFile);
 
-				return uploadImage(convFile, logoName);
+				return uploadImage(convFile, logoName, logoBucket);
 			}
 			catch (IOException e) {
 				LOG.error("IOException occured while reading file. Reason : " + e.getMessage(), e);
@@ -93,8 +101,13 @@ public class CloudUploadServiceImpl implements FileUploadService {
 			throw new InvalidInputException("Upload failed: " + logoName + " because the file was empty", DisplayMessageConstants.INVALID_LOGO_FILE);
 		}
 	}
+	
+	@Override
+	public void uploadFileAtDefautBucket(File file, String fileName) throws NonFatalException{
+		uploadFile(file, fileName, bucket);
+	}
 
-	private String uploadImage(File convFile, String logoName) throws InvalidInputException {
+	private String uploadImage(File convFile, String logoName, String bucket) throws InvalidInputException {
 		uploadUtils.validateFile(convFile);
 
 		StringBuilder amazonFileName = new StringBuilder(envPrefix).append(CommonConstants.SYMBOL_HYPHEN);
@@ -102,7 +115,7 @@ public class CloudUploadServiceImpl implements FileUploadService {
 		amazonFileName.append(CommonConstants.SYMBOL_FULLSTOP + CommonConstants.IMAGE_FORMAT_PNG);
 
 		try {
-			uploadFile(convFile, amazonFileName.toString());
+			uploadFile(convFile, amazonFileName.toString(), bucket);
 		}
 		catch (NonFatalException e) {
 			throw new InvalidInputException("Could not upload file: " + e.getMessage(), e);
@@ -111,9 +124,8 @@ public class CloudUploadServiceImpl implements FileUploadService {
 		LOG.info("Amazon file Name: " + amazonFileName.toString());
 		return amazonFileName.toString();
 	}
-
-	@Override
-	public void uploadFile(File file, String fileName) throws NonFatalException {
+	
+	private void uploadFile(File file, String fileName, String bucket) throws NonFatalException {
 		LOG.info("Uploading file: " + fileName + " to Amazon S3");
 		if (file == null || !file.exists() || fileName == null || fileName.isEmpty()) {
 			throw new InvalidInputException("Either file or file name is not present");
