@@ -163,6 +163,7 @@
 				<entry key="profileManagementService" value-ref="profileManagementService" />
 				<entry key="organizationManagementService" value-ref="organizationManagementService" />
 				<entry key="amazonEndPoint" value="${AMAZON_ENDPOINT}" />
+				<entry key="amazonBucket" value="${AMAZON_BUCKET}" />
 				<entry key="amazonImageBucket" value="${AMAZON_IMAGE_BUCKET}" />
 			</map>
 		</property>

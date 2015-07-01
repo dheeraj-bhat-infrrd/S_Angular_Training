@@ -39,6 +39,7 @@ public class ImageLoader extends QuartzJobBean {
 	private FileUploadService fileUploadService;
 	
 	private String amazonEndPoint;
+    private String amazonBucket;
 	private String amazonImageBucket;
 	
 	@Override
@@ -134,7 +135,7 @@ public class ImageLoader extends QuartzJobBean {
 
 			ByteArrayOutputStream out = new ByteArrayOutputStream();
 
-			RandomAccessFile file = new RandomAccessFile(CommonConstants.TEMP_FOLDER + File.separator + imageName, "rw");
+			RandomAccessFile file = new RandomAccessFile(CommonConstants.TEMP_FOLDER + "/" + imageName, "rw");
 
 			byte[] buffer = new byte[4096];
 			for (int read = 0; (read = photoStream.read(buffer)) != -1; out.write(buffer, 0, read)) {}
@@ -144,7 +145,7 @@ public class ImageLoader extends QuartzJobBean {
 			photoStream.close();
 			method.releaseConnection();
 			fileName = fileUploadService.fileUploadHandler(new File(CommonConstants.TEMP_FOLDER, imageName), imageName);
-			FileUtils.deleteQuietly(new File(CommonConstants.TEMP_FOLDER + File.separator + imageName));
+			FileUtils.deleteQuietly(new File(CommonConstants.TEMP_FOLDER + "/" + imageName));
 			LOG.info("Successfully retrieved photo of contact");
 		}
 		catch (Exception e) {
@@ -152,7 +153,7 @@ public class ImageLoader extends QuartzJobBean {
 			throw e;
 		}
 
-		return amazonEndPoint + File.separator + amazonImageBucket + File.separator + fileName;
+		return amazonEndPoint + "/" + amazonBucket + "/" + amazonImageBucket + "/" + fileName;
 	}
 
 	private void initializeDependencies(JobDataMap jobMap) {
@@ -161,6 +162,7 @@ public class ImageLoader extends QuartzJobBean {
 		profileManagementService = (ProfileManagementService) jobMap.get("profileManagementService");
 		
 		amazonEndPoint = (String) jobMap.get("amazonEndPoint");
+		amazonBucket = (String) jobMap.get("amazonBucket");
 		amazonImageBucket = (String) jobMap.get("amazonImageBucket");
 	}
 }
