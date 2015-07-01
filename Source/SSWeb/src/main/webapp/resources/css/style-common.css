@@ -3401,11 +3401,29 @@ button.paypal.is-active {
 
 .prog-img-container {
 	position: relative;
-	width: 200px;
+	width: 190px;
+	height: 190px;
 	max-width: 100%;
+	background-color: rgb(244, 244, 244);
 }
+
+img.prof-image {
+	width: auto;
+	height: auto !important;
+	max-width: 100%;
+	max-height: 100%;
+	display: block;
+	position: absolute;
+	margin: auto;
+	top: 0;
+	bottom: 0;
+	left: 0;
+	right: 0;
+}
+
 .prof-img-wrapper {
 	width: 200px;
+	height: 200px;
 }
 
 .prof-name-container {
@@ -4568,26 +4586,26 @@ select.rfr_txt_fld,select.rfr_input_fld{
 }
 
 .pers-default-big {
-	background: url(../images/place-holder-individual.png) no-repeat center;
+	background: url(../images/place-holder-individual.png) no-repeat center #fff;
 	background-size: auto !important;
 	border: 1px dashed #ccc;
 	border-radius: 3px;
 }
 
 .region-default-img {
-	background: url(../images/place-holder-Region.png) no-repeat center;
+	background: url(../images/place-holder-Region.png) no-repeat center #fff;
 	background-size: auto !important;
 	border: 1px dashed #ccc;
 }
 
 .office-default-img {
-	background: url(../images/place-holder-Office.png) no-repeat center;
+	background: url(../images/place-holder-Office.png) no-repeat center #fff;
 	background-size: auto !important;
 	border: 1px dashed #ccc;
 }
 
 .comp-default-img {
-	background: url(../images/place-holder-Company.png) no-repeat center;
+	background: url(../images/place-holder-Company.png) no-repeat center #fff;
 	background-size: auto !important;
 	border: 1px dashed #ccc;
 }

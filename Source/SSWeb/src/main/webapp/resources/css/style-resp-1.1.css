@@ -517,4 +517,7 @@
     .user-info-logo, .hdr-logo {
 		width: 100px;
 	}
+	.left-panel-content {
+		padding-left: 5px;
+	}
 }
