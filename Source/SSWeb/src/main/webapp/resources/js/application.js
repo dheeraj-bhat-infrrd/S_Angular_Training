@@ -279,7 +279,8 @@ function paintDashboard(profileMasterId, newProfileName, newProfileValue, typeoO
 			oldConW = $('.container').width();
 		}
 	});
-	
+	lastColNameForCount = newProfileName;
+	lastColValueForCount = newProfileValue;
 	if (profileMasterId == 1) {
 		showCompanyAdminFlow(newProfileName, newProfileValue);
 	} else if (profileMasterId == 2) {
@@ -426,6 +427,7 @@ function bindSelectButtons() {
 		if($('#dsh-srch-survey-div').is(':visible')){
 			columnName = lastColNameForCount;
 			columnValue = lastColValueForCount;
+			console.info("lastColNameForCount:"+lastColNameForCount+" lastColValueForCount:"+lastColValueForCount);
 		}
 		showSurveyStatistics(columnName, columnValue);
 	});
