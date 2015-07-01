@@ -708,4 +708,6 @@ public interface OrganizationManagementService {
 
 	public Map<Long, OrganizationUnitSettings> getSettingsMapWithLinkedinImage(
 			String string);
+	
+	public SurveySettings retrieveDefaultSurveyProperties();
 }
