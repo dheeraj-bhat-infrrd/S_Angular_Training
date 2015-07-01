@@ -493,6 +493,8 @@ public class OrganizationManagementController
         if ( unitSettings != null && unitSettings.getSurvey_settings() != null ) {
             model.addAttribute( "autoPostEnabled", unitSettings.getSurvey_settings().isAutoPostEnabled() );
         }
+		SurveySettings surveySettings=organizationManagementService.retrieveDefaultSurveyProperties();
+		model.addAttribute("defaultSurveyProperties",surveySettings);
         session.setAttribute( CommonConstants.USER_ACCOUNT_SETTINGS, unitSettings );
         return JspResolver.EDIT_SETTINGS;
     }
