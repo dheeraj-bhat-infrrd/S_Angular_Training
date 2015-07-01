@@ -188,7 +188,9 @@
         <div class="row prof-pic-name-wrapper">
 			<c:if test="${not empty profile.profileImageUrl}">
 				<div id="prog-img-container" class="col-lg-4 col-md-4 col-sm-4 col-xs-6 prof-wrapper prof-img-wrapper">
-		            <div id="prof-image" class="prof-image pos-relative" style="background: url(${profile.profileImageUrl}) no-repeat center;"></div>
+					<div class="prog-img-container">
+		            	<img id="prof-image" class="prof-image pos-relative" src="${profile.profileImageUrl}"></img>
+		            </div>
 	            </div>
 			</c:if>
 			<c:if test="${not empty profile.profileImageUrl}">

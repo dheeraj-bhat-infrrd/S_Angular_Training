@@ -103,34 +103,7 @@
 		<div class="row prof-pic-name-wrapper edit-prof-pic-name-wrapper">
 			<div class="col-lg-4 col-md-4 col-sm-4 col-xs-6 prof-wrapper prof-img-wrapper">
 				<div id="prof-img-container" class="prog-img-container prof-img-lock-wrapper">
-					<c:choose>
-						<c:when test="${not empty profileimage}">
-							<div id="prof-image-edit" class="prof-image prof-image-edit pos-relative cursor-pointer" style="background: url(${profileimage}) no-repeat center; background-size: contain"></div>
-						</c:when>
-						<c:otherwise>
-							<c:choose>
-								<c:when test="${profilemasterid == 1}">
-									<c:set value="comp-default-img" var="defaultprofimageclass"></c:set>
-								</c:when>
-								<c:when test="${profilemasterid == 2}">
-									<c:set value="region-default-img" var="defaultprofimageclass"></c:set>
-								</c:when>
-								<c:when test="${profilemasterid == 3}">
-									<c:set value="office-default-img" var="defaultprofimageclass"></c:set>
-								</c:when>
-								<c:when test="${profilemasterid == 4}">
-									<c:set value="pers-default-big" var="defaultprofimageclass"></c:set>
-								</c:when>
-							</c:choose>	
-							<div id="prof-image-edit" class="prof-image prof-image-edit ${defaultprofimageclass} pos-relative cursor-pointer"></div>						
-						</c:otherwise>
-					</c:choose>
-					<form class="form_contact_image" enctype="multipart/form-data">
-						<input type='file' id="prof-image" class="con_img_inp_file" />
-					</form>
-					<div class="prof-rating-mobile-wrapper hide">
-						<div class="st-rating-wrapper maring-0 clearfix"></div>
-					</div>
+					<jsp:include page="profile_profileimage.jsp"></jsp:include>
 				</div>
 			</div>
 			<div class="col-lg-4 col-md-4 col-sm-4 col-xs-6 prof-wrapper pos-relative prof-name-wrapper edit-prof-name-wrapper">

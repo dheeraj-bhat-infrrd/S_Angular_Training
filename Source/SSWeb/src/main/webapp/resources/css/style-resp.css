@@ -381,7 +381,6 @@
         right: 0;
         bottom: 0;
         margin: auto;
-        margin-top: 5px;
     }
     .prof-rating-mobile-wrapper{
         display: block;
@@ -1343,7 +1342,8 @@
     .prog-img-container {
 		height: 200px;
 		max-height: 100%;
-		width: auto;
+		width: 200px;
+		margin : 0 auto;
 		position: static;
 	}
 	.edit-prof-name-wrapper{

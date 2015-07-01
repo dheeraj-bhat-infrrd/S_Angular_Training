@@ -249,5 +249,7 @@ public interface SolrSearchService {
 
 	public long getUsersCountByBranches(Set<Long> branchIds)
 			throws InvalidInputException, SolrException;
+
+	public SolrDocumentList getUserIdsByIden(long iden, String idenFieldName, boolean isAgent, int startIndex, int noOfRows)throws InvalidInputException, SolrException ;
 }
 // JIRA:SS-62 BY RM 02 EOC
