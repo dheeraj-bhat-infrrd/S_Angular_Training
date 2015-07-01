@@ -82,6 +82,7 @@ import com.realtech.socialsurvey.core.services.organizationmanagement.Organizati
 import com.realtech.socialsurvey.core.services.organizationmanagement.ProfileManagementService;
 import com.realtech.socialsurvey.core.services.organizationmanagement.UserManagementService;
 import com.realtech.socialsurvey.core.services.search.SolrSearchService;
+import com.realtech.socialsurvey.core.services.search.exception.SolrException;
 import com.realtech.socialsurvey.core.services.upload.FileUploadService;
 import com.realtech.socialsurvey.core.services.upload.impl.UploadUtils;
 import com.realtech.socialsurvey.core.utils.DisplayMessageConstants;
@@ -90,6 +91,7 @@ import com.realtech.socialsurvey.core.utils.UrlValidationHelper;
 import com.realtech.socialsurvey.web.common.ErrorCodes;
 import com.realtech.socialsurvey.web.common.ErrorResponse;
 import com.realtech.socialsurvey.web.common.JspResolver;
+import com.realtech.socialsurvey.web.util.BotRequestUtils;
 
 
 @Controller
@@ -137,6 +139,9 @@ public class ProfileManagementController
 
     @Value ( "${AMAZON_LOGO_BUCKET}")
     private String amazonLogoBucket;
+    
+    @Autowired
+    private BotRequestUtils botRequestUtils;
 
 
     @SuppressWarnings ( "unchecked")
@@ -3072,6 +3077,8 @@ public class ProfileManagementController
     {
         LOG.info( "Method findAProfile called." );
 
+        boolean isBotRequest = botRequestUtils.checkBotRequest(request);
+        
         String patternFirst = request.getParameter( "find-pro-first-name" );
         String patternLast = request.getParameter( "find-pro-last-name" );
 
@@ -3083,7 +3090,52 @@ public class ProfileManagementController
         }
 
         LOG.info( "Method findAProfile finished." );
-        return JspResolver.PROFILE_LIST;
+        
+        if(isBotRequest){
+        	UserListFromSearch userList = new UserListFromSearch();
+            List<Long> userIds = new ArrayList<Long>();
+            List<ProListUser> users = new ArrayList<ProListUser>();
+            try {
+                if ( patternFirst == null && patternLast == null ) {
+                    LOG.error( "Invalid search key passed in method findAProfileScroll()." );
+                    throw new InvalidInputException( messageUtils.getDisplayMessage(
+                        DisplayMessageConstants.INVALID_FIRSTORLAST_NAME_PATTERN, DisplayMessageType.ERROR_MESSAGE ).getMessage() );
+                }
+                if ( !patternFirst.trim().matches( CommonConstants.FINDAPRO_FIRST_NAME_REGEX )
+                    && !patternLast.trim().matches( CommonConstants.FINDAPRO_LAST_NAME_REGEX ) ) {
+                    LOG.error( "Invalid search key passed in method findAProfileScroll()." );
+                    throw new InvalidInputException( messageUtils.getDisplayMessage(
+                        DisplayMessageConstants.INVALID_FIRSTORLAST_NAME_PATTERN, DisplayMessageType.ERROR_MESSAGE ).getMessage() );
+                }
+
+                int startIndex = 0;
+                int batchSize = 100;
+                
+
+                try {
+                    SolrDocumentList results = solrSearchService.searchUsersByFirstOrLastName( patternFirst.trim(),
+                        patternLast.trim(), startIndex, batchSize );
+                    for ( SolrDocument solrDocument : results ) {
+                        userIds.add( (Long) solrDocument.getFieldValue( "userId" ) );
+                    }
+                    users = userManagementService.getMultipleUsersByUserId( userIds );
+
+                    userList.setUsers( users );
+                    userList.setUserFound( results.getNumFound() );
+                    model.addAttribute("usersList", userList);
+                } catch ( MalformedURLException e ) {
+                    LOG.error( "Error occured while searching in findAProfileScroll(). Reason is ", e );
+                    throw new NonFatalException( "Error occured while searching in findAProfileScroll()", e );
+                }
+            } catch ( NonFatalException nonFatalException ) {
+                LOG.error( "NonFatalException while searching in findAProfileScroll(). Reason : " + nonFatalException.getMessage(),
+                    nonFatalException );
+                return JspResolver.ERROR_PAGE;
+            }
+        	return JspResolver.PROFILE_LIST_NOSCRIPT;
+        } else{
+        	return JspResolver.PROFILE_LIST;        	
+        }
     }
 
 
@@ -3162,12 +3214,15 @@ public class ProfileManagementController
      * @return
      */
     @RequestMapping ( "/initfindapro")
-    public String initProListByProfileLevelPage( Model model, @QueryParam ( value = "profileLevel") String profileLevel,
+    public String initProListByProfileLevelPage( Model model, HttpServletRequest request, @QueryParam ( value = "profileLevel") String profileLevel,
         @QueryParam ( value = "iden") Long iden, @QueryParam ( value = "searchCriteria") String searchCriteria )
     {
         LOG.info( "Method initProListByProfileLevelPage called for profileLevel:" + profileLevel + " and iden:" + iden
             + " and searchCriteria:" + searchCriteria );
         DisplayMessage message = null;
+        
+        boolean isBotRequest = botRequestUtils.checkBotRequest(request);
+        
         try {
             if ( profileLevel == null || profileLevel.isEmpty() ) {
                 throw new InvalidInputException( "profile level is invalid in initProListByProfileLevelPage",
@@ -3192,7 +3247,53 @@ public class ProfileManagementController
             return JspResolver.MESSAGE_HEADER;
         }
         LOG.info( "Method initProListByProfileLevelPage executed successfully" );
-        return JspResolver.PROFILE_LIST;
+        if(isBotRequest){
+			int	start = -1;
+			int	numRows = -1;
+        	
+			try{
+	        	try {
+	        		UserListFromSearch userList = new UserListFromSearch();
+	                List<Long> userIds = new ArrayList<Long>();
+	                List<ProListUser> users = new ArrayList<ProListUser>();
+		            String idenFieldName = null;
+		    		switch (profileLevel) {
+		    			case CommonConstants.PROFILE_LEVEL_COMPANY:
+		    				idenFieldName = CommonConstants.COMPANY_ID_SOLR;
+		    				break;
+		    			case CommonConstants.PROFILE_LEVEL_REGION:
+		    				idenFieldName = CommonConstants.REGIONS_SOLR;
+		    				break;
+		    			case CommonConstants.PROFILE_LEVEL_BRANCH:
+		    				idenFieldName = CommonConstants.BRANCHES_SOLR;
+		    				break;
+		    			default:
+		    				throw new InvalidInputException("profile level is invalid in getProListByProfileLevel");
+		    		}
+
+		    		SolrDocumentList results = solrSearchService.getUserIdsByIden(iden, idenFieldName, true, start, numRows);
+		            for ( SolrDocument solrDocument : results ) {
+                        userIds.add( (Long) solrDocument.getFieldValue( "userId" ) );
+                    }
+                    users = userManagementService.getMultipleUsersByUserId( userIds );
+
+                    userList.setUsers( users );
+                    userList.setUserFound( results.getNumFound() );
+                    model.addAttribute("usersList", userList);
+	            } catch (InvalidInputException e) {
+	            	throw new InternalServerException(new ProfileServiceErrorCode(CommonConstants.ERROR_CODE_PRO_LIST_FETCH_FAILURE,
+							CommonConstants.SERVICE_CODE_PRO_LIST_FETCH, "Could not fetch users list."), e.getMessage());
+	            } catch (SolrException e) {
+	            	throw new InternalServerException(new ProfileServiceErrorCode(CommonConstants.ERROR_CODE_PRO_LIST_FETCH_FAILURE,
+							CommonConstants.SERVICE_CODE_PRO_LIST_FETCH, "Could not fetch users list."), e.getMessage());
+	            }
+			} catch (InternalServerException e) {
+				return JspResolver.ERROR_PAGE;
+			}
+        	return JspResolver.PROFILE_LIST_NOSCRIPT;
+        } else{
+        	return JspResolver.PROFILE_LIST;        	
+        }
     }
 
 
