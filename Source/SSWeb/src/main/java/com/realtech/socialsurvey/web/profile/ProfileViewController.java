@@ -5,13 +5,14 @@ package com.realtech.socialsurvey.web.profile;
 
 import java.io.IOException;
 import java.util.List;
+
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
 import org.apache.solr.common.SolrDocument;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
@@ -21,6 +22,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
+
 import com.amazonaws.util.json.JSONException;
 import com.amazonaws.util.json.JSONObject;
 import com.google.gson.Gson;
@@ -48,9 +50,10 @@ import com.realtech.socialsurvey.core.services.search.exception.SolrException;
 import com.realtech.socialsurvey.core.utils.DisplayMessageConstants;
 import com.realtech.socialsurvey.core.utils.MessageUtils;
 import com.realtech.socialsurvey.web.common.JspResolver;
+import com.realtech.socialsurvey.web.util.BotRequestUtils;
 
 @Controller
-public class ProfileViewController implements InitializingBean{
+public class ProfileViewController {
 	
 	private static final Logger LOG = LoggerFactory.getLogger(ProfileViewController.class);
 	
@@ -70,16 +73,14 @@ public class ProfileViewController implements InitializingBean{
 	@Autowired
 	private SolrSearchService solrSearchService;
 	
+	@Autowired
+	private BotRequestUtils botRequestUtils;
+	
 	@Value("${VALIDATE_CAPTCHA}")
 	private String validateCaptcha;
 	
 	@Value("${CAPTCHA_SECRET}")
 	private String captchaSecretKey;
-	
-	@Value("${BOTS_USER_AGENT_LIST}")
-	private String botUserAgentList;
-	
-	private String[] listBots;
 	
 	/**
 	 * Method to return company profile page
@@ -94,7 +95,7 @@ public class ProfileViewController implements InitializingBean{
 		LOG.info("Service to initiate company profile page called");
 		String message = null;
 		// check if the request is from bot
-		boolean isBotRequest = checkBotRequest(request);
+		boolean isBotRequest = botRequestUtils.checkBotRequest(request);
 
 		if (profileName == null || profileName.isEmpty()) {
 			message = messageUtils.getDisplayMessage(DisplayMessageConstants.INVALID_COMPANY_PROFILENAME, DisplayMessageType.ERROR_MESSAGE)
@@ -176,7 +177,7 @@ public class ProfileViewController implements InitializingBean{
 			HttpServletRequest request) throws NoRecordsFetchedException {
 		LOG.info("Service to initiate region profile page called");
 		String message = null;
-		boolean isBotRequest = checkBotRequest(request);
+		boolean isBotRequest = botRequestUtils.checkBotRequest(request);
 		if (companyProfileName == null || companyProfileName.isEmpty()) {
 			message = messageUtils.getDisplayMessage(DisplayMessageConstants.INVALID_COMPANY_PROFILENAME, DisplayMessageType.ERROR_MESSAGE)
 					.getMessage();
@@ -271,7 +272,7 @@ public class ProfileViewController implements InitializingBean{
 			HttpServletRequest request) throws NoRecordsFetchedException {
 		LOG.info("Service to initiate branch profile page called");
 		String message = null;
-		boolean isBotRequest = checkBotRequest(request);
+		boolean isBotRequest = botRequestUtils.checkBotRequest(request);
 		if (companyProfileName == null || companyProfileName.isEmpty()) {
 			message = messageUtils.getDisplayMessage(DisplayMessageConstants.INVALID_COMPANY_PROFILENAME, DisplayMessageType.ERROR_MESSAGE)
 					.getMessage();
@@ -364,7 +365,7 @@ public class ProfileViewController implements InitializingBean{
 	public String initAgentProfilePage(@PathVariable String agentProfileName, Model model, HttpServletResponse response, HttpServletRequest request)
 			throws NoRecordsFetchedException {
 		LOG.info("Service to initiate agent profile page called");
-		boolean isBotRequest = checkBotRequest(request);
+		boolean isBotRequest = botRequestUtils.checkBotRequest(request);
 		if (agentProfileName == null || agentProfileName.isEmpty()) {
 			model.addAttribute("message",
 					messageUtils.getDisplayMessage(DisplayMessageConstants.INVALID_INDIVIDUAL_PROFILENAME, DisplayMessageType.ERROR_MESSAGE)
@@ -575,29 +576,6 @@ public class ProfileViewController implements InitializingBean{
 		}
 		
 		return makeJsonMessage(CommonConstants.STATUS_ACTIVE, returnMessage);
-	}
-
-	private boolean checkBotRequest(HttpServletRequest request){
-		// Get the user agent. If its a bot, then return the no javascript page
-		boolean isBotRequest = false;
-		String userAgent = request.getHeader("User-Agent");
-		LOG.debug("User header found : "+userAgent);
-		if(userAgent != null){
-			for(String bot : listBots){
-				if(userAgent.indexOf(bot) != -1){
-					LOG.debug("Found a crawler: "+bot);
-					isBotRequest = true;
-					break;
-				}
-			}
-		}
-		return isBotRequest;
-	}
-
-	@Override
-	public void afterPropertiesSet() throws Exception {
-		LOG.info("Get the list of bots");
-		listBots = botUserAgentList.split(",");
 	}
 
 }

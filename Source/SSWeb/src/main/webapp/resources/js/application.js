@@ -88,6 +88,9 @@ var autoPostScore;
 var happyText;
 var neutralText;
 var sadText;
+var happyTextComplete;
+var neutralTexCompletet;
+var sadTextComplete;
 var rating;
 var firstName;
 var lastName;
@@ -276,7 +279,8 @@ function paintDashboard(profileMasterId, newProfileName, newProfileValue, typeoO
 			oldConW = $('.container').width();
 		}
 	});
-	
+	lastColNameForCount = newProfileName;
+	lastColValueForCount = newProfileValue;
 	if (profileMasterId == 1) {
 		showCompanyAdminFlow(newProfileName, newProfileValue);
 	} else if (profileMasterId == 2) {
@@ -423,6 +427,7 @@ function bindSelectButtons() {
 		if($('#dsh-srch-survey-div').is(':visible')){
 			columnName = lastColNameForCount;
 			columnValue = lastColValueForCount;
+			console.info("lastColNameForCount:"+lastColNameForCount+" lastColValueForCount:"+lastColValueForCount);
 		}
 		showSurveyStatistics(columnName, columnValue);
 	});
@@ -4658,6 +4663,9 @@ function paintSurveyPage(jsonData) {
 	happyText = jsonData.responseJSON.happyText;
 	neutralText = jsonData.responseJSON.neutralText;
 	sadText = jsonData.responseJSON.sadText;
+	happyTextComplete = jsonData.responseJSON.happyTextComplete;
+	neutralTextComplete = jsonData.responseJSON.neutralTextComplete;
+	sadTextComplete = jsonData.responseJSON.sadTextComplete;
 	autoPost = jsonData.responseJSON.autopostEnabled;
 	autoPostScore = jsonData.responseJSON.autopostScore;
 	yelpEnabled = Boolean(jsonData.responseJSON.yelpEnabled);
@@ -5050,7 +5058,13 @@ function showMasterQuestionPage(){
 		$("div[data-ques-type='error']").show();
 		$('#profile-link').html('View ' + agentName + '\'s profile at <a href="' + agentFullProfileLink + '" target="_blank">' + agentFullProfileLink + '</a>');
 		$('#content-head').html('Survey Completed');
-		$('#content').html("Congratulations! You have completed survey for " + agentName+ ".\nThanks for your participation.");
+			if (mood == 'Great')
+				$('#content').html("Congratulations! You have completed survey for " + agentName+ ".\n"+happyTextComplete);
+			else if(mood == 'OK')
+				$('#content').html("Congratulations! You have completed survey for " + agentName+ ".\n"+neutralTextComplete);
+			else
+				$('#content').html("Congratulations! You have completed survey for " + agentName+ ".\n"+sadTextComplete);
+	//	$('#content').html("Congratulations! You have completed survey for " + agentName+ ".\nThanks for your participation.");
 	}
 	return;
 }

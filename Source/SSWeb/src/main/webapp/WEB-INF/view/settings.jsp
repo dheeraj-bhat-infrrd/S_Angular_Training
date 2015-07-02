@@ -416,13 +416,33 @@ $(document).ready(function() {
 		autoSetCheckboxStatus('#st-settings-account-on', '#st-settings-account-off', '#other-account');
 		autoSetCheckboxStatus('#st-reminder-on', '#st-reminder-off', '#reminder-needed-hidden');
 		autoSetReminderIntervalStatus();
+		var happyTxt=$('#hm-main-content-wrapper').attr("data-hpy");
+		if(happyTxt == ""){
+			happyTxt = "${defaultSurveyProperties.happyText}";
+		}
+		var nuTxt=$('#hm-main-content-wrapper').attr("data-nutl");
+		if(nuTxt == ""){
+			nuTxt = "${defaultSurveyProperties.neutralText}";
+		}
 		
-		paintTextForMood($('#hm-main-content-wrapper').attr("data-hpy"), 
-			$('#hm-main-content-wrapper').attr("data-nutl"),
-			$('#hm-main-content-wrapper').attr("data-sad"),
-			$('#hm-main-content-wrapper').attr("data-hpy-compl"), 
-			$('#hm-main-content-wrapper').attr("data-nutl-compl"),
-			$('#hm-main-content-wrapper').attr("data-sad-compl"));
+		var sadTxt=$('#hm-main-content-wrapper').attr("data-sad");
+		if(sadTxt == ""){
+			sadTxt = "${defaultSurveyProperties.sadText}";
+		}
+		var happyTxtComplete=$('#hm-main-content-wrapper').attr("data-hpy-compl");
+		if(happyTxtComplete == ""){
+			happyTxtComplete = "${defaultSurveyProperties.happyTextComplete}";
+		}
+		var nuTxtComplete=$('#hm-main-content-wrapper').attr("data-nutl-compl");
+		if(nuTxtComplete == ""){
+			nuTxtComplete = "${defaultSurveyProperties.neutralTextComplete}";
+		}
+		var sadTxtComplete=$('#hm-main-content-wrapper').attr("data-sad-compl");
+		if(sadTxtComplete == ""){
+			sadTxtComplete = "${defaultSurveyProperties.sadTextComplete}";
+		}
+		
+		paintTextForMood(happyTxt, nuTxt,sadTxt,happyTxtComplete, nuTxtComplete,sadTxtComplete);		
 	}
 	
 	$('#encompass-username').blur(function() {
