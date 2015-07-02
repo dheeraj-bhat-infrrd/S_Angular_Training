@@ -58,7 +58,19 @@
 	           </td>
 	           <td class="v-tbl-name">${compUser.displayName}</td>
 	           <td class="v-tbl-add"><c:if test="${not empty compUser.emailId}">${compUser.emailId}</c:if></td>
-	           <td class="v-tbl-role"><c:if test="${compUser.isRegionAdmin || compUser.isBranchAdmin}"><spring:message code="label.admin.key"/></c:if>&nbsp;<c:if test="${compUser.isAgent}"><spring:message code="label.user.key"/></c:if></td>
+	           <td class="v-tbl-role">
+					<c:choose>
+						<c:when test="${(compUser.isRegionAdmin || compUser.isBranchAdmin) && compUser.isAgent}">
+							<spring:message code="label.admin.key" />&#44;&nbsp;<spring:message code="label.user.key" />
+						</c:when>
+						<c:when test="${compUser.isRegionAdmin || compUser.isBranchAdmin}">
+							<spring:message code="label.admin.key" />
+						</c:when>
+						<c:when test="${compUser.isAgent}">
+							<spring:message code="label.user.key" />
+						</c:when>
+					</c:choose>
+				</td>
 	           <td class="v-tbl-btns">
 	               <div class="clearfix v-tbl-icn-wraper">
 	                   <c:choose>
