@@ -237,7 +237,7 @@ $(document).on('click', '.report-abuse-txt', function(e) {
 	$('.rpa-report-btn').on('click',function(){
 		var reportText = $("#report-abuse-txtbox").val();
 		payload.reportText = reportText;
-		confirmReportAbuse(payload);
+		confirmUserReportAbuse(payload);
 	});
 });
 
