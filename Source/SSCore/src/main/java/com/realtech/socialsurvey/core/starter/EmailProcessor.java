@@ -56,13 +56,16 @@ public class EmailProcessor implements Runnable, InitializingBean
     {
         while ( true ) {
             List<EmailObject> emailObjectList = emailDao.findAllEmails();
-            for ( EmailObject emailObject : emailObjectList ) {
-                EmailEntity emailEntity = null;
+            if(emailObjectList.isEmpty()){
                 try {
-                    Thread.sleep( 1000 );
+                    Thread.sleep( 60000 );
                 } catch ( InterruptedException ie ) {
                     LOG.error( "Exception Caught " + ie.getMessage() );
                 }
+                
+            }
+            for ( EmailObject emailObject : emailObjectList ) {
+                EmailEntity emailEntity = null;
                 try {
                     emailEntity = (EmailEntity) utils.deserializeObject( emailObject.getEmailBinaryObject() );
                     if ( !sendEmail( emailEntity ) ) {
