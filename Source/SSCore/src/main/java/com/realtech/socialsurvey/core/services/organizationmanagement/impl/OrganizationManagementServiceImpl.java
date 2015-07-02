@@ -1731,26 +1731,93 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
         LOG.info( "Method getUsersFromEmailIds called for emailIdsArray:" + emailIdsArray );
         List<User> users = new ArrayList<User>();
         for ( String emailId : emailIdsArray ) {
+            String firstName = "";
+            String lastName = "";
             User user = null;
-            try {
-                user = userManagementService.getUserByLoginName( adminUser, emailId );
-            } catch ( NoRecordsFetchedException e ) {
-                /**
-                 * if no user is present with the specified emailId, send an invite to register
-                 */
-                String firstName = emailId.substring( 0, emailId.indexOf( "@" ) );
-                try {
-                    user = userManagementService.inviteUserToRegister( adminUser, firstName, null, emailId );
-                } catch ( UserAlreadyExistsException | UndeliveredEmailException e1 ) {
-                    LOG.debug( "Exception in getUsersFromEmailIds while inviting a new user. Reason:" + e1.getMessage(), e1 );
+            if ( emailId.contains( " " ) ) {
+                String[] userInformation = emailId.split( " " );
+                if ( userInformation.length >= 3 ) {
+                    LOG.debug( "This contains middle name as well" );
+                    for ( int i = 0; i < userInformation.length - 1; i++ ) {
+                        firstName = firstName + userInformation[i] + " ";
+                    }
+                    firstName = firstName.trim();
+                    lastName = userInformation[userInformation.length - 1];
+                    if ( lastName.contains( "<" ) ) {
+                        emailId = lastName.substring( lastName.indexOf( "<" ) + 1, lastName.length() - 1 );
+                        lastName = lastName.substring( 0, lastName.indexOf( "<" ) );
+                    }
+
+                } else if ( userInformation.length == 2 ) {
+                    firstName = userInformation[0];
+                    lastName = userInformation[1];
+                    if ( lastName.contains( "<" ) ) {
+                        emailId = lastName.substring( lastName.indexOf( "<" ) + 1, lastName.length() - 1 );
+                        lastName = lastName.substring( 0, lastName.indexOf( "<" ) );
+                    }
                 }
+            } else {
+                LOG.debug( "Contains no space hence wont have a last name" );
+                lastName = null;
+                if ( emailId.contains( "<" ) ) {
+                    firstName = emailId.substring( 0, emailId.indexOf( "<" ) );
+                    if ( firstName.equalsIgnoreCase( "" ) ) {
+                        firstName = emailId.substring( emailId.indexOf( "<" ) + 1, emailId.indexOf( "@" ) );
+                    }
+                    emailId = emailId.substring( emailId.indexOf( "<" ) + 1, emailId.indexOf( ">" ) );
+
+                } else {
+                    LOG.debug( "This doesnt contain a first name and last name" );
+                    firstName = emailId.substring( 0, emailId.indexOf( "@" ) );
+                }
+
+            }
+            if ( validateEmail( emailId ) ) {
+
+                try {
+                    user = userManagementService.getUserByLoginName( adminUser, emailId );
+                } catch ( NoRecordsFetchedException e ) {
+                    /**
+                     * if no user is present with the specified emailId, send an invite to register
+                     */
+                    try {
+                        user = userManagementService.inviteUserToRegister( adminUser, firstName, lastName, emailId );
+                    } catch ( UserAlreadyExistsException | UndeliveredEmailException e1 ) {
+                        LOG.debug( "Exception in getUsersFromEmailIds while inviting a new user. Reason:" + e1.getMessage(), e1 );
+                    }
+                }
+            } else {
+                LOG.error( "This email address " + emailId + " is not a valid email" );
             }
             if ( user != null ) {
                 users.add( user );
             }
+
+
         }
         LOG.info( "Method getUsersFromEmailIds executed successfully. Returning users size :" + users.size() );
         return users;
+    }
+
+
+    /**
+     * Method to validate single/multiple emailIds provided for assigning a user to a hierarchy
+     * level
+     * 
+     * @param selectedUserId
+     * @param selectedUserEmail
+     * @return
+     * @throws InvalidInputException
+     */
+    private Boolean validateEmail( String emailId ) throws InvalidInputException
+    {
+        boolean validEmail = true;
+        LOG.info( "Method validateAndParseEmailIds called" );
+        if ( !emailId.trim().matches( CommonConstants.EMAIL_REGEX ) ) {
+            validEmail = false;
+        }
+
+        return validEmail;
     }
 
 

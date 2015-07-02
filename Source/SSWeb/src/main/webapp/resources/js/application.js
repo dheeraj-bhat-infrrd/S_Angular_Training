@@ -1918,17 +1918,22 @@ function validateRegionName(elementId){
 function validateUserEmailTextArea(elementId) {
 	var emailIds = $('#'+elementId).val();
 	if (emailIds != "") {
-		var emailIdsArray = emailIds.split(/[\;,\s\n]/);
+		var emailIdsArray = emailIds.split(/[,;\n]/);
 		for(var i = 0; i < emailIdsArray.length; i++) {
 			var emailId = emailIdsArray[i].trim();
-			if(emailRegex.test(emailId) == true){
-				return true;
+			if(emailId == ""){
+				continue;
 			}
-			else {
+			if(emailId.indexOf(">") > -1){
+				emailId = emailId.substring(emailId.indexOf("<")+1,emailId.length-1);
+			}
+
+			if(emailRegex.test(emailId) == false){
 				showErrorMobileAndWeb('Please enter valid email addresses');
 				return false;
 			}
 		}
+		return true;
 	}
 }
 
