@@ -236,10 +236,25 @@ $(document).on('click', '.report-abuse-txt', function(e) {
 	});
 	$('.rpa-report-btn').on('click',function(){
 		var reportText = $("#report-abuse-txtbox").val();
-		payload.reportText = reportText;
-		confirmUserReportAbuse(payload);
+		if(validateReportAbuseUserForm(reportText)){
+			payload.reportText = reportText;
+			confirmUserReportAbuse(payload);
+		}
 	});
 });
+
+function validateReportAbuseUserForm(reportText) {
+	
+	//check if report text is empty
+	if(reportText == undefined || reportText == ""){
+		$('#overlay-toast').html('Please enter why you want to report the review!');
+		showToast();
+		return false;
+	}
+	
+	return true;
+}
+
 
 function confirmUserReportAbuse(payload) {
 	callAjaxGetWithPayloadData('./reportabuse.do', function() {
