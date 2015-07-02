@@ -644,6 +644,11 @@ $(document).on('click', '#wc-send-survey', function() {
 				showToast();
 				exit = true;
 				return false;
+			} else if (agentId != undefined && firstname == ""){
+				$('#overlay-toast').html('Please enter Firstname for all the customer');
+				showToast();
+				exit = true;
+				return false;
 			}
 			if (emailRegex.test(emailId)) {
 				var receiver = new Object();
@@ -652,10 +657,15 @@ $(document).on('click', '#wc-send-survey', function() {
 				receiver.emailId = emailId;
 				if (dataName == 'agent-name') {
 					receiver.agentId = agentId;
+					if(agentId == undefined){
+						$('#overlay-toast').html('Please enter Agent name for all survey requests');
+						showToast();
+						exit = true;
+						return false;					
+					}
 				}
 				receiversList.push(receiver);
-			}
-			else if(firstname != ""){
+			} else if(firstname != ""){
 				$('#overlay-toast').html('Please enter valid email for ' + firstname);
 				showToast();
 				exit = true;
@@ -665,6 +675,14 @@ $(document).on('click', '#wc-send-survey', function() {
 	});
 
 	if(exit){
+		exit = false;
+		return false;
+	}
+	
+	//Check if recievers list empty
+	if(receiversList.length == 0){
+		$('#overlay-toast').html('Add customers to send survey request!');
+		showToast();
 		exit = false;
 		return false;
 	}
