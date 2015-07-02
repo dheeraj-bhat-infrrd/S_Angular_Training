@@ -3704,6 +3704,17 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
         return organizationUnitSettingsDao.getSettingsMapWithLinkedinImageUrl( collectionName,
             CommonConstants.LINKEDIN_URL_PART );
     }
+	@Override
+	public SurveySettings retrieveDefaultSurveyProperties() {
+		SurveySettings surveySettings = new SurveySettings();
+		surveySettings.setHappyText(happyText);
+		surveySettings.setNeutralText(neutralText);
+		surveySettings.setSadText(sadText);
+		surveySettings.setHappyTextComplete(happyTextComplete);
+		surveySettings.setNeutralTextComplete(neutralTextComplete);
+		surveySettings.setSadTextComplete(sadTextComplete);
+		return surveySettings;
+	}
 
 }
 // JIRA: SS-27: By RM05: EOC

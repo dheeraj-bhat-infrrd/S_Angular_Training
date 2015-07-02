@@ -573,7 +573,8 @@ input#find-pro-submit{
 	width : 70px;
 	height : 70px;
 	margin: auto 15px;
-	background: url(../images/Person1.png) no-repeat center;
+	background: url(../images/place-holder-individual.png) no-repeat center;
+	background-size: contain;
 	border-radius: 3px;
     margin-left: 0;
 }

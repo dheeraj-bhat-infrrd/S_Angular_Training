@@ -961,14 +961,32 @@ public class SurveyManagementController {
 		}
 
 		OrganizationUnitSettings companySettings = organizationManagementService.getCompanySettings(userManagementService.getUserByUserId(agentId));
+		SurveySettings defaultSurveySettings=organizationManagementService.retrieveDefaultSurveyProperties();
+		surveyAndStage.put("happyText",defaultSurveySettings.getHappyText() );
+		surveyAndStage.put("neutralText", defaultSurveySettings.getNeutralText());
+		surveyAndStage.put("sadText", defaultSurveySettings.getSadText());
+		surveyAndStage.put("happyTextComplete", defaultSurveySettings.getHappyTextComplete());
+		surveyAndStage.put("neutralTextComplete", defaultSurveySettings.getNeutralTextComplete());
+		surveyAndStage.put("sadTextComplete", defaultSurveySettings.getSadTextComplete());
+		
 		if (companySettings != null) {
 			SurveySettings surveySettings = companySettings.getSurvey_settings();
 			if (surveySettings != null) {
-				surveyAndStage.put("happyText", surveySettings.getHappyText());
-				surveyAndStage.put("neutralText", surveySettings.getNeutralText());
-				surveyAndStage.put("sadText", surveySettings.getSadText());
+				if(surveySettings.getHappyText() != null && !(surveySettings.getHappyText().isEmpty()))
+					surveyAndStage.put("happyText", surveySettings.getHappyText());
+				if(surveySettings.getNeutralText()!= null && !(surveySettings.getNeutralText().isEmpty()))
+					surveyAndStage.put("neutralText", surveySettings.getNeutralText());
+				if(surveySettings.getSadText() != null && !surveySettings.getSadText().isEmpty())
+					surveyAndStage.put("sadText", surveySettings.getSadText());
 				surveyAndStage.put("autopostScore", surveySettings.getShow_survey_above_score());
 				surveyAndStage.put("autopostEnabled", surveySettings.isAutoPostEnabled());
+				if(surveySettings.getHappyTextComplete() != null && !surveySettings.getHappyTextComplete().isEmpty())
+					surveyAndStage.put("happyTextComplete", surveySettings.getHappyTextComplete());
+				if(surveySettings.getNeutralTextComplete() != null && !surveySettings.getNeutralTextComplete().isEmpty())
+					surveyAndStage.put("neutralTextComplete", surveySettings.getNeutralTextComplete());
+				if(surveySettings.getSadTextComplete() != null && !surveySettings.getSadTextComplete().isEmpty())
+					surveyAndStage.put("sadTextComplete", surveySettings.getSadTextComplete());
+				
 			}
 		}
 
