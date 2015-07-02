@@ -9,9 +9,21 @@
 	               <div class="v-line-ind"></div>
 	           </td>
 	           <td class="v-tbl-name">${branchUser.displayName}</td>
-	           <td class="v-tbl-add"><c:if test="${not empty branchUser.emailId}">${branchUser.emailId}</c:if></td>
-	           <td class="v-tbl-role"><c:if test="${branchUser.isRegionAdmin || branchUser.isBranchAdmin}"><spring:message code="label.admin.key"/></c:if>&nbsp;<c:if test="${branchUser.isAgent}"><spring:message code="label.user.key"/></c:if></td>
-	           <td class="v-tbl-btns">
+		           <td class="v-tbl-add"><c:if test="${not empty branchUser.emailId}">${branchUser.emailId}</c:if></td>
+				<td class="v-tbl-role">
+					<c:choose>
+						<c:when test="${(branchUser.isRegionAdmin || branchUser.isBranchAdmin) && branchUser.isAgent}">
+							<spring:message code="label.admin.key" />&#44;&nbsp;<spring:message code="label.user.key" />
+						</c:when>
+						<c:when test="${branchUser.isRegionAdmin || branchUser.isBranchAdmin}">
+							<spring:message code="label.admin.key" />
+						</c:when>
+						<c:when test="${branchUser.isAgent}">
+							<spring:message code="label.user.key" />
+						</c:when>
+					</c:choose>
+				</td>
+				<td class="v-tbl-btns">
 	               <div class="clearfix v-tbl-icn-wraper">
 		               <c:choose>
 							<c:when test="${branchUser.canEdit}">
