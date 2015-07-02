@@ -85,6 +85,7 @@ import com.realtech.socialsurvey.core.exception.UserAlreadyExistsException;
 import com.realtech.socialsurvey.core.services.mail.UndeliveredEmailException;
 import com.realtech.socialsurvey.core.services.organizationmanagement.OrganizationManagementService;
 import com.realtech.socialsurvey.core.services.organizationmanagement.ProfileManagementService;
+import com.realtech.socialsurvey.core.services.organizationmanagement.ProfileNotFoundException;
 import com.realtech.socialsurvey.core.services.organizationmanagement.UserAssignmentException;
 import com.realtech.socialsurvey.core.services.organizationmanagement.UserManagementService;
 import com.realtech.socialsurvey.core.services.organizationmanagement.UtilityService;
@@ -1442,7 +1443,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
      */
     @Override
     @Transactional
-    public List<Region> getRegionsForCompany( String companyProfileName ) throws InvalidInputException
+    public List<Region> getRegionsForCompany( String companyProfileName ) throws InvalidInputException, ProfileNotFoundException
     {
         LOG.info( "Method getRegionsForCompany called for companyProfileName:" + companyProfileName );
         OrganizationUnitSettings companySettings = profileManagementService.getCompanyProfileByProfileName( companyProfileName );
@@ -1512,7 +1513,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
     @Override
     @Transactional
     public List<Branch> getBranchesUnderCompany( String companyProfileName ) throws InvalidInputException,
-        NoRecordsFetchedException
+        NoRecordsFetchedException, ProfileNotFoundException
     {
         LOG.info( "Method getBranchesUnderCompany called for companyProfileName : " + companyProfileName );
         if ( companyProfileName == null || companyProfileName.isEmpty() ) {
@@ -1608,7 +1609,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
     @Override
     @Transactional
     public List<Branch> getBranchesForRegion( String companyProfileName, String regionProfileName )
-        throws InvalidInputException, NoRecordsFetchedException
+        throws InvalidInputException, NoRecordsFetchedException, ProfileNotFoundException
     {
         if ( companyProfileName == null || companyProfileName.isEmpty() ) {
             throw new InvalidInputException( "companyProfileName is null or empty in getBranchesForRegion" );

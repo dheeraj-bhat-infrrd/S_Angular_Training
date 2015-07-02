@@ -47,6 +47,7 @@ import com.realtech.socialsurvey.core.exception.RestErrorResponse;
 import com.realtech.socialsurvey.core.services.mail.EmailServices;
 import com.realtech.socialsurvey.core.services.organizationmanagement.OrganizationManagementService;
 import com.realtech.socialsurvey.core.services.organizationmanagement.ProfileManagementService;
+import com.realtech.socialsurvey.core.services.organizationmanagement.ProfileNotFoundException;
 import com.realtech.socialsurvey.core.services.search.SolrSearchService;
 import com.realtech.socialsurvey.core.services.search.exception.SolrException;
 
@@ -92,7 +93,7 @@ public class ProfileController {
 	 */
 	@ResponseBody
 	@RequestMapping(value = "/{profileName}")
-	public Response getCompanyProfile(@PathVariable String profileName) {
+	public Response getCompanyProfile(@PathVariable String profileName) throws ProfileNotFoundException {
 		LOG.info("Service to get company profile called for profileName :" + profileName);
 		Response response = null;
 		try {
@@ -102,16 +103,14 @@ public class ProfileController {
 						"Company profile name is not specified for getting company profile");
 			}
 			OrganizationUnitSettings companyProfile = null;
-			try {
+			
 				companyProfile = profileManagementService.getCompanyProfileByProfileName(profileName);
 				String json = new Gson().toJson(companyProfile);
 				LOG.debug("companyProfile json : " + json);
 				response = Response.ok(json).build();
-			}
-			catch (InvalidInputException e) {
-				throw new InternalServerException(new ProfileServiceErrorCode(CommonConstants.ERROR_CODE_COMPANY_PROFILE_SERVICE_FAILURE,
-						CommonConstants.SERVICE_CODE_COMPANY_PROFILE, "Error occured while fetching company profile"), e.getMessage());
-			}
+		
+			
+		
 		}
 		catch (BaseRestException e) {
 			response = getErrorResponse(e);
@@ -129,7 +128,7 @@ public class ProfileController {
 	 */
 	@ResponseBody
 	@RequestMapping(value = "/{companyProfileName}/region/{regionProfileName}")
-	public Response getRegionProfile(@PathVariable String companyProfileName, @PathVariable String regionProfileName) {
+	public Response getRegionProfile(@PathVariable String companyProfileName, @PathVariable String regionProfileName) throws ProfileNotFoundException {
 		LOG.info("Service to get region profile called for regionProfileName:" + regionProfileName);
 		Response response = null;
 		try {
@@ -174,7 +173,7 @@ public class ProfileController {
 	 */
 	@ResponseBody
 	@RequestMapping(value = "/{companyProfileName}/branch/{branchProfileName}")
-	public Response getBranchProfile(@PathVariable String companyProfileName, @PathVariable String branchProfileName) {
+	public Response getBranchProfile(@PathVariable String companyProfileName, @PathVariable String branchProfileName) throws ProfileNotFoundException {
 		LOG.info("Service to get branch profile called for regionProfileName:" + branchProfileName);
 		Response response = null;
 		try {
@@ -219,7 +218,7 @@ public class ProfileController {
 	 */
 	@ResponseBody
 	@RequestMapping(value = "/individual/{individualProfileName}")
-	public Response getIndividualProfile(@PathVariable String individualProfileName) {
+	public Response getIndividualProfile(@PathVariable String individualProfileName) throws ProfileNotFoundException {
 		LOG.info("Service to get profile of individual called for individualProfileName : " + individualProfileName);
 		Response response = null;
 		try {
@@ -262,7 +261,7 @@ public class ProfileController {
 	 */
 	@ResponseBody
 	@RequestMapping(value = "/{companyProfileName}/regions")
-	public Response getRegionsForCompany(@PathVariable String companyProfileName) throws InvalidInputException {
+	public Response getRegionsForCompany(@PathVariable String companyProfileName) throws InvalidInputException,ProfileNotFoundException {
 		LOG.info("Service to get regions for company called for companyProfileName:" + companyProfileName);
 		Response response = null;
 		try {
@@ -298,7 +297,7 @@ public class ProfileController {
 	 */
 	@ResponseBody
 	@RequestMapping(value = "/{companyProfileName}/branches")
-	public Response getBranchesForCompany(@PathVariable String companyProfileName) {
+	public Response getBranchesForCompany(@PathVariable String companyProfileName) throws ProfileNotFoundException {
 		LOG.info("Service to get all branches of company called");
 		Response response = null;
 		try {
@@ -339,7 +338,7 @@ public class ProfileController {
 	 */
 	@ResponseBody
 	@RequestMapping(value = "/{companyProfileName}/individuals")
-	public Response getIndividualsForCompany(@PathVariable String companyProfileName) {
+	public Response getIndividualsForCompany(@PathVariable String companyProfileName) throws ProfileNotFoundException {
 		LOG.info("Service to get all individuals of company called");
 		Response response = null;
 		try {
@@ -379,7 +378,7 @@ public class ProfileController {
 	 */
 	@ResponseBody
 	@RequestMapping(value = "/{companyProfileName}/region/{regionProfileName}/branches")
-	public Response getBranchesForRegion(@PathVariable String companyProfileName, @PathVariable String regionProfileName) {
+	public Response getBranchesForRegion(@PathVariable String companyProfileName, @PathVariable String regionProfileName) throws ProfileNotFoundException {
 		LOG.info("Service to fetch all the branches inside a region of company called");
 		Response response = null;
 		try {
@@ -422,7 +421,7 @@ public class ProfileController {
 	 */
 	@ResponseBody
 	@RequestMapping(value = "/region/{regionId}/branches")
-	public Response getBranchesByRegionId(@PathVariable long regionId) {
+	public Response getBranchesByRegionId(@PathVariable long regionId) throws ProfileNotFoundException{
 		LOG.info("Service to fetch branches for a region called for regionId :" + regionId);
 		Response response = null;
 		try {
@@ -526,7 +525,7 @@ public class ProfileController {
 	 */
 	@ResponseBody
 	@RequestMapping(value = "/{companyProfileName}/region/{regionProfileName}/individuals")
-	public Response getIndividualsForRegion(@PathVariable String companyProfileName, @PathVariable String regionProfileName) {
+	public Response getIndividualsForRegion(@PathVariable String companyProfileName, @PathVariable String regionProfileName) throws ProfileNotFoundException {
 		LOG.info("Service to get all individuals directly linked to the specified region called");
 		Response response = null;
 		try {
@@ -571,7 +570,7 @@ public class ProfileController {
 	 */
 	@ResponseBody
 	@RequestMapping(value = "/{companyProfileName}/branch/{branchProfileName}/individuals")
-	public Response getIndividualsForBranch(@PathVariable String companyProfileName, @PathVariable String branchProfileName) {
+	public Response getIndividualsForBranch(@PathVariable String companyProfileName, @PathVariable String branchProfileName) throws ProfileNotFoundException {
 		LOG.info("Servie to get all individuals in a branch called");
 		Response response = null;
 		try {
@@ -1220,7 +1219,7 @@ public class ProfileController {
 	 */
 	@RequestMapping(value = "/downloadvcard/{id}", method = RequestMethod.GET)
 	@ResponseBody
-	public Response downloadVCard(@PathVariable String id, HttpServletResponse response){
+	public Response downloadVCard(@PathVariable String id, HttpServletResponse response) throws ProfileNotFoundException{
 		LOG.info("Downloading vcard for profile id: "+id);
 		try{
 			if(id == null || id.isEmpty()){
@@ -1300,7 +1299,7 @@ public class ProfileController {
 					}
 					
 				}
-			}catch (InvalidInputException | NoRecordsFetchedException e) {
+			}catch (InvalidInputException  e) {
 				throw new InternalServerException(new ProfileServiceErrorCode(CommonConstants.ERROR_CODE_GENERAL,
 						CommonConstants.SERVICE_CODE_GENERAL, "Profile name for individual is invalid"), e.getMessage());
 			}
@@ -1321,7 +1320,7 @@ public class ProfileController {
 	@ResponseBody
 	@RequestMapping(value = "/{individualProfileName}/posts")
 	public Response getPostsForIndividual(@PathVariable String individualProfileName, @QueryParam(value = "start") Integer start,
-			@QueryParam(value = "numRows") Integer numRows) {
+			@QueryParam(value = "numRows") Integer numRows) throws ProfileNotFoundException{
 		//TODO
 		LOG.info("Service to get posts of an individual called for individualProfileName : " + individualProfileName);
 		Response response = null;
@@ -1354,7 +1353,7 @@ public class ProfileController {
 				LOG.debug("individual posts json : " + json);
 				response = Response.ok(json).build();
 			}
-			catch (InvalidInputException | NoRecordsFetchedException e) {
+			catch (InvalidInputException e) {
 				throw new InternalServerException(new ProfileServiceErrorCode(CommonConstants.ERROR_CODE_INDIVIDUAL_POSTS_FETCH_FAILURE,
 						CommonConstants.SERVICE_CODE_INDIVIDUAL_POSTS, "Profile name for individual is invalid"), e.getMessage());
 			}
@@ -1377,7 +1376,7 @@ public class ProfileController {
 	@ResponseBody
 	@RequestMapping(value = "/company/{companyProfileName}/posts")
 	public Response getPostsForCompany(@PathVariable String companyProfileName, @QueryParam(value = "start") Integer start,
-			@QueryParam(value = "numRows") Integer numRows) {
+			@QueryParam(value = "numRows") Integer numRows)throws ProfileNotFoundException {
 		//TODO
 		LOG.info("Service to get posts of a company called for companyProfileName : " + companyProfileName);
 		Response response = null;
@@ -1436,7 +1435,7 @@ public class ProfileController {
 	@ResponseBody
 	@RequestMapping(value = "/region/{companyProfileName}/{regionProfileName}/posts")
 	public Response getPostsForRegion(@PathVariable String regionProfileName,@PathVariable String companyProfileName, @QueryParam(value = "start") Integer start,
-			@QueryParam(value = "numRows") Integer numRows) {
+			@QueryParam(value = "numRows") Integer numRows)throws ProfileNotFoundException{
 		//TODO
 		LOG.info("Service to get posts of a region called for regionProfileName : " + regionProfileName);
 		Response response = null;
@@ -1492,7 +1491,7 @@ public class ProfileController {
 	@ResponseBody
 	@RequestMapping(value = "/branch/{companyProfileName}/{branchProfileName}/posts")
 	public Response getPostsForBranch(@PathVariable String branchProfileName, @PathVariable String companyProfileName, @QueryParam(value = "start") Integer start,
-			@QueryParam(value = "numRows") Integer numRows) {
+			@QueryParam(value = "numRows") Integer numRows)throws ProfileNotFoundException {
 		//TODO
 		LOG.info("Service to get posts of a branch called for branchProfileName : " + branchProfileName);
 		Response response = null;

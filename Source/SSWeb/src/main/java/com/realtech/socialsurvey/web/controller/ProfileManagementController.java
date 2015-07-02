@@ -80,6 +80,7 @@ import com.realtech.socialsurvey.core.exception.ProfileServiceErrorCode;
 import com.realtech.socialsurvey.core.services.mail.UndeliveredEmailException;
 import com.realtech.socialsurvey.core.services.organizationmanagement.OrganizationManagementService;
 import com.realtech.socialsurvey.core.services.organizationmanagement.ProfileManagementService;
+import com.realtech.socialsurvey.core.services.organizationmanagement.ProfileNotFoundException;
 import com.realtech.socialsurvey.core.services.organizationmanagement.UserManagementService;
 import com.realtech.socialsurvey.core.services.search.SolrSearchService;
 import com.realtech.socialsurvey.core.services.search.exception.SolrException;
@@ -3407,7 +3408,7 @@ public class ProfileManagementController
 
     // Fetch Admin hierarchy
     @RequestMapping ( value = "/getadminhierarchy", method = RequestMethod.GET)
-    public String getAdminHierarchy( Model model, HttpServletRequest request )
+    public String getAdminHierarchy( Model model, HttpServletRequest request ) throws ProfileNotFoundException
     {
         LOG.info( "Method getAdminHierarchy() called from ProfileManagementController" );
 
@@ -3433,7 +3434,7 @@ public class ProfileManagementController
     }
 
 
-    private Model getCompanyHierarchy( Model model, HttpServletRequest request ) throws InvalidInputException
+    private Model getCompanyHierarchy( Model model, HttpServletRequest request ) throws InvalidInputException, ProfileNotFoundException
     {
         LOG.debug( "Method getCompanyHierarchy() called from ProfileManagementController" );
         List<Region> regions;
@@ -3475,7 +3476,7 @@ public class ProfileManagementController
 
 
     @RequestMapping ( value = "/getcompanyhierarchy", method = RequestMethod.GET)
-    public String getCompanyHierarchyDirect( Model model, HttpServletRequest request )
+    public String getCompanyHierarchyDirect( Model model, HttpServletRequest request ) throws ProfileNotFoundException
     {
         LOG.info( "Method getCompanyHierarchyDirect() called from ProfileManagementController" );
         try {
