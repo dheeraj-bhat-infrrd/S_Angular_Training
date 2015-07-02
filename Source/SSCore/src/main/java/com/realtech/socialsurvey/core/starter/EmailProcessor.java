@@ -1,7 +1,6 @@
 package com.realtech.socialsurvey.core.starter;
 
 import java.util.List;
-import java.util.concurrent.Executors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -18,9 +17,9 @@ import com.realtech.socialsurvey.core.entities.EmailEntity;
 import com.realtech.socialsurvey.core.entities.EmailObject;
 import com.realtech.socialsurvey.core.utils.EmailFormatHelper;
 import com.sendgrid.SendGrid;
-import com.sendgrid.SendGridException;
 import com.sendgrid.SendGrid.Email;
 import com.sendgrid.SendGrid.Response;
+import com.sendgrid.SendGridException;
 
 
 @Component
