@@ -103,8 +103,18 @@
     </c:if>
 </head>
 <body>
-    
-    <div id="contact-us-pu-wrapper" class="bd-srv-pu hide">
+	<div class="hide" itemscope itemtype="http://schema.org/Review">
+		<h2 itemprop="name"> ${profName} </h2>
+		<span itemprop="title">Reviews</span>
+		<span itemprop="description"></span>
+		<div itemprop="aggregateRating" itemscope itemtype="http://schema.org/AggregateRating">
+			Rated <span itemprop="ratingValue">${floatingAverageRating }</span> out of
+			<span itemprop="bestRating">5</span> 
+			based on <span itemprop="ratingCount">${reviewsCount}</span>
+			reviews
+		</div>
+	</div>
+	<div id="contact-us-pu-wrapper" class="bd-srv-pu hide">
         <div class="container cntct-us-container">
             <div class="contact-us-pu">
                 <div class="bd-quest-item">
@@ -635,14 +645,6 @@
     <div class="float-left mob-icn icn-ppl"></div>
     <div class="float-left mob-icn icn-star-smile"></div>
     <div class="float-left mob-icn inc-more"></div>
-</div>
-<div class="hide" itemscope itemtype="http://schema.org/Product">
-	<span itemprop="name">${profName}</span>
-	<span id="agent-desc" itemprop="title"></span>
-	<div itemprop="aggregateRating" itemscope itemtype="http://schema.org/AggregateRating">Rated 
-		<span id="prof-schema-agent-rating" itemprop="ratingValue">${floatingAverageRating }</span>/5 based on 
-		<span id="prof-schema-reviews" itemprop="reviewCount">${reviewsCount}</span> reviews
-	</div>
 </div>
 <!-- EOC -->
 </body>
