@@ -560,4 +560,8 @@ public interface CommonConstants
     public static final long DEFAULT_VERTICAL_CRM_ID = -1;
 
     public static final int EXPIRE_AFTER_DAYS = 3;
+    
+    //Constants for survey request send type
+    public static final String SURVEY_REQUEST_AGENT = "agent";
+    public static final String SURVEY_REQUEST_ADMIN = "admin";
 }

@@ -6768,6 +6768,7 @@ a.sq-btn-post-social:hover, a.sq-btn-post-social:visited {
 	position: absolute;
   	background-color: white;
   	top: 36px;
+  	left:20px;
   	width: 215px;
   	right: 35px;
   	display: block;
