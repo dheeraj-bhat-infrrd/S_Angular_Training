@@ -199,7 +199,7 @@ public interface OrganizationManagementService {
 	 * @return
 	 * @throws InvalidInputException
 	 */
-	public List<Region> getRegionsForCompany(String companyProfileName) throws InvalidInputException;
+	public List<Region> getRegionsForCompany(String companyProfileName) throws InvalidInputException, ProfileNotFoundException;
 
 	/**
 	 * Method to get list of branches directly linked to a company
@@ -209,7 +209,7 @@ public interface OrganizationManagementService {
 	 * @throws InvalidInputException
 	 * @throws NoRecordsFetchedException
 	 */
-	public List<Branch> getBranchesUnderCompany(String companyProfileName) throws InvalidInputException, NoRecordsFetchedException;
+	public List<Branch> getBranchesUnderCompany(String companyProfileName) throws InvalidInputException, NoRecordsFetchedException, ProfileNotFoundException;
 
 	/**
 	 * Method to get list of branches linked to a region
@@ -221,7 +221,7 @@ public interface OrganizationManagementService {
 	 * @throws NoRecordsFetchedException
 	 */
 	public List<Branch> getBranchesForRegion(String companyProfileName, String regionProfileName) throws InvalidInputException,
-			NoRecordsFetchedException;
+			NoRecordsFetchedException, ProfileNotFoundException;
 
 	/**
 	 * Method to fetch the default branch associated with a region
@@ -712,4 +712,6 @@ public interface OrganizationManagementService {
 	public void removeOrganizationUnitSettings( Long idToRemove, String collectionName );
 	
     public void removeOrganizationUnitSettings( List<Long> idsToRemove, String collectionName );
+	
+	public SurveySettings retrieveDefaultSurveyProperties();
 }

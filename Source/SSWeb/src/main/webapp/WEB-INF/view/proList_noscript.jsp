@@ -1,6 +1,7 @@
 <%@ page language="java" contentType="text/html; charset=ISO-8859-1" pageEncoding="UTF-8"%>
 <%@ taglib uri="http://www.springframework.org/tags" prefix="spring"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <!DOCTYPE">
 <html>
 <head>
@@ -87,12 +88,64 @@
 									data-profile-level="${profileLevel}" data-iden="${iden}" type="hidden"/>
 							</div>
 							<div class="ctnt-list-header-right float-right">
-								<span id="srch-num" class="srch-num"><spring:message code="label.no.key" /></span>
-								<spring:message code="label.profilelistfound.key" />
+								<c:choose>
+									<c:when test="${not empty usersList && usersList.userFound  != 0 }">
+										<span id="srch-num" class="srch-num">${usersList.userFound } <spring:message code="label.profilelistfound.key" /></span>
+									</c:when>
+									<c:otherwise>
+										<spring:message code="label.noprofilesfound.key" />
+									</c:otherwise>
+								</c:choose>
 							</div>
 						</div>
 						
-						<div id="ctnt-list-wrapper" class="ctnt-list-wrapper"></div>
+						<div id="ctnt-list-wrapper" class="ctnt-list-wrapper">
+							<c:if test="${not empty usersList && not empty usersList.users}"></c:if>
+							<c:forEach var="userItem" items="${usersList.users}">
+								<div class="ctnt-list-item clearfix " data-profilename="${userItem.displayName}">
+									<c:choose>
+										<c:when test="${not empty  userItem.profileImageUrl}">
+											<div class="float-left ctnt-list-item-img" style="background-image: url(${userItem.profileImageUrl});"></div>
+										</c:when>
+										<c:otherwise>
+											<div class="float-left ctnt-list-item-img"></div>
+										</c:otherwise>
+									</c:choose>
+									<div class="float-left ctnt-list-item-txt-wrap">
+										<div class="ctnt-item-name user-display-name">${userItem.displayName}</div>
+										<c:if test="${not empty userItem.title }"><div class="ctnt-item-desig">${userItem.title}</div></c:if>
+										<c:choose>
+											<c:when test="${not empty  userItem.location && not empty  userItem.industry}">
+												<div class="pro-addr-cont">${userItem.location} | ${userItem.industry}</div>
+											</c:when>
+											<c:when test="${not empty  userItem.location}">
+												<div class="pro-addr-cont">${userItem.location}</div>
+											</c:when>
+											<c:when test="${not empty  userItem.industry}">
+												<div class="pro-addr-cont">${userItem.industry}</div>
+											</c:when>									
+										</c:choose>
+										<c:if test="${not empty userItem.aboutMe }">
+											<div class="ctnt-item-comment">${userItem.aboutMe }</div>
+										</c:if>
+									</div>
+									<div class="float-left ctnt-list-item-btn-wrap clearfix">
+										<fmt:formatNumber var="fractionReviewScore" type="number" value="${userItem.reviewScore}" maxFractionDigits="2" minFractionDigits="2"/>
+										<fmt:formatNumber var="integerAverageRating" type="number" value="${userItem.reviewScore}" maxFractionDigits="0"/>
+								   		<c:set var="integerAverageRating" value="${integerAverageRating}"></c:set>
+								   		<c:if test="${integerAverageRating == 0}">
+								   			<c:set var="integerAverageRating" value="1"></c:set>
+								   		</c:if>
+										<div class="float-left" data-score="${fractionReviewScore}">
+											<div class="rating-image float-left smiley-rat-${integerAverageRating}"></div>
+											<div class="rating-rounded float-left">${fractionReviewScore}</div>
+											<div style="white-space: pre; line-height: 30px;" class="float-left"> - </div>
+										</div>
+										<div class="float-left ctnt-review-count" user="${userItem.userId }">${userItem.reviewCount} Review(s)</div>
+									</div>
+								</div>
+							</c:forEach>
+						</div>
 					</div>
 					<div class="ctnt-right-item col-lg-3 col-md-3 col-sm-3 col-xs-12 ads-container"></div>
 				</div>
@@ -100,20 +153,5 @@
 		</div>
 	</div>
 	<jsp:include page="footer_new.jsp"></jsp:include>
-	<jsp:include page="scripts.jsp"></jsp:include>
-	<script>
-	$(document).ready(function() {
-		$('#fp-users-size').val(0);
-		
-		fetchUsers(startIndex);
-		adjustTextContainerWidthOnResize();
-		
-		$(window).resize(function() {
-			if ($(window).width() < 768) {
-				adjustTextContainerWidthOnResize();
-			}
-		});
-	});
-	</script>
 </body>
 </html>

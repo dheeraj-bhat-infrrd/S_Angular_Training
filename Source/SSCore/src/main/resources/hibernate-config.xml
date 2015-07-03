@@ -42,6 +42,7 @@
 		<property name="annotatedClasses">
 			<list>
 				<value>com.realtech.socialsurvey.core.entities.AccountsMaster</value>
+				<value>com.realtech.socialsurvey.core.entities.EmailObject</value>
 				<value>com.realtech.socialsurvey.core.entities.Branch</value>
 				<value>com.realtech.socialsurvey.core.entities.Company</value>
 				<value>com.realtech.socialsurvey.core.entities.CompanyInvitationLicenseKey</value>

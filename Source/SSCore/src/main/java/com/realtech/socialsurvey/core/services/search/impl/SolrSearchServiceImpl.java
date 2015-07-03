@@ -818,6 +818,49 @@ public class SolrSearchServiceImpl implements SolrSearchService {
 	}
 	
 	@Override
+	public SolrDocumentList getUserIdsByIden(long iden, String idenFieldName, boolean isAgent, int startIndex, int noOfRows) throws InvalidInputException, SolrException {
+		LOG.info("Method getUserIdsByIden called for iden :" + iden + "idenFieldName:" + idenFieldName + " startIndex:" + startIndex + " noOfrows:"
+				+ noOfRows);
+		if (iden <= 0l) {
+			throw new InvalidInputException("iden is not set in getUserIdsByIden");
+		}
+		if (idenFieldName == null || idenFieldName.isEmpty()) {
+			throw new InvalidInputException("idenFieldName is null or empty in getUserIdsByIden");
+		}
+
+		QueryResponse response = null;
+		SolrDocumentList results = null;
+		try {
+			SolrServer solrServer = new HttpSolrServer(solrUserUrl);
+			SolrQuery solrQuery = new SolrQuery();
+			solrQuery.setQuery(CommonConstants.STATUS_SOLR + ":" + CommonConstants.STATUS_ACTIVE + " OR " + CommonConstants.STATUS_SOLR + ":"
+					+ CommonConstants.STATUS_NOT_VERIFIED + " OR " + CommonConstants.STATUS_SOLR + ":" + CommonConstants.STATUS_TEMPORARILY_INACTIVE);
+			solrQuery.addFilterQuery(idenFieldName + ":" + iden);
+			if (isAgent) {
+				solrQuery.addFilterQuery(CommonConstants.IS_AGENT_SOLR + ":" + isAgent);
+			}
+			if (startIndex > -1) {
+				solrQuery.setStart(startIndex);
+			}
+			if (noOfRows > -1) {
+				solrQuery.setRows(noOfRows);
+			}
+
+			LOG.debug("Querying solr for searching users");
+			response = solrServer.query(solrQuery);
+			results = response.getResults();
+			LOG.debug("User search result is : " + results);
+		}
+		catch (SolrServerException e) {
+			LOG.error("SolrServerException in getUserIdsByIden.Reason:" + e.getMessage(), e);
+			throw new SolrException("Exception while performing search for user. Reason : " + e.getMessage(), e);
+		}
+		LOG.info("Method getUserIdsByIden finished for iden : " + iden);
+		return results;
+	}
+	
+	
+	@Override
 	public Collection<UserFromSearch> searchUsersByIden(long iden, String idenFieldName, boolean isAgent, int startIndex, int noOfRows)
 			throws InvalidInputException, SolrException {
 		LOG.info("Method searchUsersByIden called for iden :" + iden + "idenFieldName:" + idenFieldName + " startIndex:" + startIndex + " noOfrows:"
