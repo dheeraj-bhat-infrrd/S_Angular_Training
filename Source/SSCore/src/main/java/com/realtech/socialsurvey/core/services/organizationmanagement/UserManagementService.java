@@ -198,6 +198,9 @@ public interface UserManagementService
     public Map<String, String> validateRegistrationUrl( String encryptedUrlParameter ) throws InvalidInputException;
 
 
+    public Boolean checkIfTheLinkHasExpired( String encryptedUrlParameter ) throws InvalidInputException;
+
+
     public User addCorporateAdminAndUpdateStage( String firstName, String lastName, String emailId, String password,
         boolean isDirectRegistration ) throws InvalidInputException, UserAlreadyExistsException, UndeliveredEmailException;
 

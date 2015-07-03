@@ -181,17 +181,7 @@ public class UserManagementController {
 					}
 					catch (NoRecordsFetchedException noRecordsFetchedException) {
 						LOG.debug("No records exist with the email id passed, inviting the new user");
-						user = userManagementService.inviteNewUser(admin, firstName, lastName, emailId);
-						LOG.debug("Adding user {} to solr server.", user.getFirstName());
-
-						LOG.debug("Adding newly added user {} to mongo", user.getFirstName());
-						userManagementService.insertAgentSettings(user);
-						LOG.debug("Added newly added user {} to mongo", user.getFirstName());
-
-						LOG.debug("Adding newly added user {} to solr", user.getFirstName());
-						solrSearchService.addUserToSolr(user);
-						LOG.debug("Added newly added user {} to solr", user.getFirstName());
-
+						user = userManagementService.inviteUser(admin, firstName, lastName, emailId);
 						String profileName = userManagementService.getUserSettings(user.getUserId()).getProfileName();
 						userManagementService.sendRegistrationCompletionLink(emailId, firstName, lastName, admin.getCompany().getCompanyId(),
 								profileName, user.getLoginName());

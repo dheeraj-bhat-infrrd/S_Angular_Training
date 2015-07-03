@@ -172,6 +172,19 @@ public class RegistrationController
             Map<String, String> urlParams = null;
             try {
                 urlParams = userManagementService.validateRegistrationUrl( encryptedUrlParams );
+                if ( userManagementService.checkIfTheLinkHasExpired( encryptedUrlParams ) ) {
+                    Map<String, String> urlParameters = urlGenerator.decryptParameters( encryptedUrlParams );
+                    LOG.info( "The link has expired need to redirect the user to resend link page" );
+                    model.addAttribute( "firstname", urlParameters.get( CommonConstants.FIRST_NAME ) );
+                    model.addAttribute( "lastname", urlParameters.get( CommonConstants.LAST_NAME ) );
+                    model.addAttribute( "emailid", urlParameters.get( CommonConstants.EMAIL_ID ) );
+                    model.addAttribute( "status", DisplayMessageType.ERROR_MESSAGE );
+                    model.addAttribute( "message", messageUtils.getDisplayMessage( DisplayMessageConstants.USER_LINK_EXPIRED,
+                        DisplayMessageType.ERROR_MESSAGE ) );
+                    //TODO page for redirecting to be set here
+                    return JspResolver.REGISTRATION_LINK_EXPIRED;
+
+                }
             } catch ( InvalidInputException e ) {
                 throw new InvalidInputException( e.getMessage(), DisplayMessageConstants.INVALID_REGISTRATION_INVITE, e );
             }
