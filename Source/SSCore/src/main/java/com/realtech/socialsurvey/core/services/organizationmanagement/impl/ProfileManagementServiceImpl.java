@@ -1414,7 +1414,6 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 				isCompanyAdmin, iden);
 		return surveys;
 	}
-
 	/**
 	 * Method to fetch all users for the list of branches specified
 	 */

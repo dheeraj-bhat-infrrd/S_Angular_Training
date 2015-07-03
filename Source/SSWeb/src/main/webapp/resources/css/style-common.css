@@ -4063,13 +4063,25 @@ img.prof-image {
 	font-size: 13px;
 	text-transform: initial;
 }
+.dash-btn-dl-sd-admin {
+	color: #009FE0;
+	border-radius: 3px;
+	line-height: 32px;
+	margin-top: 6px;
+	border: 1px solid #009FE0;
+	height: 32px;
+	width: 410px;
+	text-align: center;
+	font-size: 13px;
+	text-transform: initial;
+}
 
 .dsh-dwnld-btn {
 	width: 45%;
 	padding-left: 5px;
 }
 .dsh-date-picker {
-	width: 25%;
+	width: 20%;
 	padding: 0 0 0 5px;
 	height: 28px;
 	border: none;
@@ -6807,4 +6819,22 @@ a.sq-btn-post-social:hover, a.sq-btn-post-social:visited {
 }
 .user-edit-btn:hover, .v-edt-btn-sav:hover {
 	background-color :#7AB400 !important;
+}
+.dash-download-sel-item {
+	background-color: #fff;
+	height: 25px;
+	width: 180px;
+	margin-left: 2px;
+	margin-top: 2px;
+	border: 1px solid #dcdcdc;
+	border-radius: 3px;
+	padding-left: 5px;
+	outline: none;
+}
+.dash-down-go-button{
+  width: 11%;
+  float: right;
+  background-color: #009FE0;
+  color: white;
+  height: 30px;
 }

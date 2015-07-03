@@ -127,6 +127,22 @@
 							<div id="review-desc" class="float-left dash-ppl-say-lbl">
 								<spring:message code="label.peoplesayabout.key" />${profileName}
 							</div>
+							
+							<div id="dsh-admin-cmp-dwnld" class="float-right dash-btn-dl-sd-admin hide">
+							<select id="download-survey-reports" class="float-left dash-download-sel-item">
+								<option value="1"><spring:message code="label.downloadsurveydata.one.key" /></option>
+								<option value="2"><spring:message code="label.downloadsurveydata.two.key" /></option>
+								<option value="3"><spring:message code="label.downloadsurveydata.three.key" /></option>
+								<option value="4"><spring:message code="label.downloadsurveydata.four.key" /></option>
+							</select>
+								<input id="dsh-start-date" class="dsh-date-picker" placeholder="<spring:message code="label.startdate.key" />">
+								<span>-</span>
+								<input id="dsh-end-date" class="dsh-date-picker" placeholder="<spring:message code="label.enddate.key" />">
+								<div id="dsh-dwnld-report-btn" class="dash-down-go-button float-right cursor-pointer">
+									<spring:message code="label.downloadsurveydata.key.click" />
+								</div>
+							</div>
+							
 							<div id="dsh-cmp-dwnld" class="float-right dash-btn-dl-sd hide">
 								<div id="dsh-dwnld-btn" class="dsh-dwnld-btn float-left cursor-pointer">
 									<spring:message code="label.downloadsurveydata.key" />
