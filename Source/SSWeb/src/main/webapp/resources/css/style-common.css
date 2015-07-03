@@ -6809,3 +6809,12 @@ a.sq-btn-post-social:hover, a.sq-btn-post-social:visited {
 .user-edit-btn:hover, .v-edt-btn-sav:hover {
 	background-color :#7AB400 !important;
 }
+
+.jcrop-img-upload {
+	max-width: 470px;
+	max-height: 470px;
+}
+
+.jcrop-holder {
+	margin: 0 auto;
+}
