@@ -294,6 +294,7 @@ public interface CommonConstants
     public static final String REVIEWS_SORT_CRITERIA_DEFAULT = "default";
     public static final String TEMP_FOLDER = "Temp";
     public static final String LINKEDIN_URL_PART = "licdn";
+    public static final String FILE_SEPARATOR = "/";
 
     /**
      * Email templates config

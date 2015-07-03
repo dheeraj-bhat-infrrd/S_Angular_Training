@@ -106,7 +106,7 @@ public class ImageLoader extends QuartzJobBean {
 	
 	private String loadImages(OrganizationUnitSettings setting) throws Exception{
 		String linkedinImageUrl = setting.getProfileImageUrl();
-		String[] imageUrl = linkedinImageUrl.split("/");
+		String[] imageUrl = linkedinImageUrl.split(CommonConstants.FILE_SEPARATOR);
 		String imageName = imageUrl[imageUrl.length-1]+".png";
 		String destination = copyImage(linkedinImageUrl, imageName);
 		return destination;
@@ -135,7 +135,7 @@ public class ImageLoader extends QuartzJobBean {
 
 			ByteArrayOutputStream out = new ByteArrayOutputStream();
 
-			RandomAccessFile file = new RandomAccessFile(CommonConstants.TEMP_FOLDER + "/" + imageName, "rw");
+			RandomAccessFile file = new RandomAccessFile(CommonConstants.TEMP_FOLDER + CommonConstants.FILE_SEPARATOR + imageName, "rw");
 
 			byte[] buffer = new byte[4096];
 			for (int read = 0; (read = photoStream.read(buffer)) != -1; out.write(buffer, 0, read)) {}
@@ -145,7 +145,7 @@ public class ImageLoader extends QuartzJobBean {
 			photoStream.close();
 			method.releaseConnection();
 			fileName = fileUploadService.fileUploadHandler(new File(CommonConstants.TEMP_FOLDER, imageName), imageName);
-			FileUtils.deleteQuietly(new File(CommonConstants.TEMP_FOLDER + "/" + imageName));
+			FileUtils.deleteQuietly(new File(CommonConstants.TEMP_FOLDER + CommonConstants.FILE_SEPARATOR + imageName));
 			LOG.info("Successfully retrieved photo of contact");
 		}
 		catch (Exception e) {
@@ -153,7 +153,7 @@ public class ImageLoader extends QuartzJobBean {
 			throw e;
 		}
 
-		return amazonEndPoint + "/" + amazonBucket + "/" + amazonImageBucket + "/" + fileName;
+		return amazonEndPoint + CommonConstants.FILE_SEPARATOR + amazonBucket + CommonConstants.FILE_SEPARATOR + amazonImageBucket + CommonConstants.FILE_SEPARATOR + fileName;
 	}
 
 	private void initializeDependencies(JobDataMap jobMap) {
