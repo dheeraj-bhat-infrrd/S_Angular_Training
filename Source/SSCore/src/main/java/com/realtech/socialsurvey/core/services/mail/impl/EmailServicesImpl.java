@@ -1,7 +1,11 @@
 package com.realtech.socialsurvey.core.services.mail.impl;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 
 import org.slf4j.Logger;
@@ -990,8 +994,11 @@ public class EmailServicesImpl implements EmailServices
         FileContentReplacements messageBodyReplacements = new FileContentReplacements();
         messageBodyReplacements.setFileName( EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER
             + EmailTemplateConstants.SURVEY_REMINDER_MAIL_BODY );
+        String currentYear = String.valueOf(Calendar.getInstance().get(Calendar.YEAR));
+		DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd");
+		String fullAddress = "";
         messageBodyReplacements.setReplacementArgs( Arrays.asList( appLogoUrl, displayName, link, link, agentName,
-            agentSignature, appBaseUrl ) );
+            agentSignature, appBaseUrl ,appBaseUrl , recipientMailId , companyName ,  dateFormat.format(new Date()),"" ,companyName , currentYear , fullAddress) );
 
         LOG.debug( "Calling email sender to send mail" );
         emailSender.sendEmailWithSubjectAndBodyReplacements( emailEntity, subjectReplacements, messageBodyReplacements );

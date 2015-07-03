@@ -517,6 +517,7 @@ function showIncompleteSurvey(columnName, columnValue) {
 			scrollContainer.onscroll = function() {
 				if (scrollContainer.scrollTop === scrollContainer.scrollHeight - scrollContainer.clientHeight) {
 					showIncompleteSurvey(colName, colValue);
+					$('#dsh-inc-srvey').perfectScrollbar('update');
 				}
 			};
 	
@@ -1869,15 +1870,18 @@ function showSelectorsByAssignToOption(assignToOption) {
 	case 'company':
 		disableRegionSelector();
 		disableOfficeSelector();
+		hideAdminPrivilegesChk();
 		break;
 	case 'region':
 		$("#selected-region-txt").prop("disabled",false);
 		disableOfficeSelector();
 		$("#bd-region-selector").show();
+		showAdminPrivilegesChk();
 		break;
 	case 'office':
 		$("#selected-office-txt").prop("disabled",false);
 		$("#bd-office-selector").show();
+		showAdminPrivilegesChk();
 		disableRegionSelector();
 		break;
 	default:
@@ -1961,10 +1965,18 @@ function validateUserEmailTextArea(elementId) {
 
 function validateUserSelection(elementId,hiddenElementId) {
 	if ($('#'+elementId).val() != "") {
+		var emailId = $('#'+elementId).val();
+		if(emailId.indexOf('"') > -1){
+			emailId = emailId.split('"').join("");
+		}
+		if(emailId.indexOf("<") > -1){
+			emailId = emailId.substring(emailId.indexOf("<")+1,emailId.indexOf(">"))
+		}
 		if($("#"+hiddenElementId).val() != ""){
 			return true;
 		}
-		else if (emailRegex.test($('#'+elementId).val()) == true) {
+		
+		else if (emailRegex.test(emailId) == true) {
 			return true;
 		}
 		else {
@@ -3177,7 +3189,7 @@ function saveTextForMoodFlow(content, mood){
 	};
 	callAjaxGetWithPayloadData("./storetextforflow.do", function(data) {
 		if (data == "success") {
-			$('#overlay-toast').html("Content added successfully!");
+			$('#overlay-toast').html("Content updated successfully!");
 		} else {
 			$('#overlay-toast').html("Oops! Something went wrong. Please try again later.");
 		}

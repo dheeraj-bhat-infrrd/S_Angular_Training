@@ -493,8 +493,8 @@ public class OrganizationManagementController
         if ( unitSettings != null && unitSettings.getSurvey_settings() != null ) {
             model.addAttribute( "autoPostEnabled", unitSettings.getSurvey_settings().isAutoPostEnabled() );
         }
-		SurveySettings surveySettings=organizationManagementService.retrieveDefaultSurveyProperties();
-		model.addAttribute("defaultSurveyProperties",surveySettings);
+        SurveySettings surveySettings = organizationManagementService.retrieveDefaultSurveyProperties();
+        model.addAttribute( "defaultSurveyProperties", surveySettings );
         session.setAttribute( CommonConstants.USER_ACCOUNT_SETTINGS, unitSettings );
         return JspResolver.EDIT_SETTINGS;
     }
@@ -1233,10 +1233,11 @@ public class OrganizationManagementController
         try {
             String text = request.getParameter( "text" );
             String mood = request.getParameter( "mood" );
-            if ( text == null || text.isEmpty() ) {
+            if ( text == null ) {
                 LOG.error( "Null or empty value found in storeTextForFlow() for text." );
-                throw new InvalidInputException( "Null or empty value found in storeTextForFlow() for text." );
+                text = "";
             }
+            text = text.trim();
             if ( mood == null || mood.isEmpty() ) {
                 LOG.error( "Null or empty value found in storeTextForFlow() for mood." );
                 throw new InvalidInputException( "Null or empty value found in storeTextForFlow() for mood." );

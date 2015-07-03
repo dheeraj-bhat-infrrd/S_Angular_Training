@@ -4018,7 +4018,8 @@ img.prof-image {
 .dash-lp-item-grp {
 	max-height: 200px;
 	position: relative;
-	padding-right: 0px;
+	margin-right: -12px;
+	padding-right: 12px;
 }
 
 .dash-lp-txt span {
@@ -6837,4 +6838,12 @@ a.sq-btn-post-social:hover, a.sq-btn-post-social:visited {
   background-color: #009FE0;
   color: white;
   height: 30px;
+
+.jcrop-img-upload {
+	max-width: 470px;
+	max-height: 470px;
+}
+
+.jcrop-holder {
+	margin: 0 auto;
 }

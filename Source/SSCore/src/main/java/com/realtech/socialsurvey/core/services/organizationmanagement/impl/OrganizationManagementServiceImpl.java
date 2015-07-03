@@ -516,10 +516,18 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
         String takeSurveyMail = "";
         String takeSurveyReminderMail = "";
         String takeSurveyByCustomerMail = "";
+        
+
+        String takeSurveyMailSubj = "";
+        String takeSurveyReminderMailSubj = "";
+        String takeSurveyByCustomerMailSubj = "";
         try {
             takeSurveyMail = readMailContentFromFile( CommonConstants.SURVEY_REQUEST_MAIL_FILENAME );
             takeSurveyByCustomerMail = readMailContentFromFile( CommonConstants.SURVEY_CUSTOMER_REQUEST_MAIL_FILENAME );
             takeSurveyReminderMail = readMailContentFromFile( CommonConstants.SURVEY_REMINDER_MAIL_FILENAME );
+            takeSurveyMailSubj = CommonConstants.SURVEY_MAIL_SUBJECT + "[AgentName]";
+            takeSurveyByCustomerMailSubj = CommonConstants.SURVEY_MAIL_SUBJECT_CUSTOMER;
+            takeSurveyReminderMailSubj =  CommonConstants.REMINDER_MAIL_SUBJECT + "[AgentName]";
         } catch ( IOException e ) {
             LOG.error(
                 "IOException occured in addOrganizationalDetails while copying default Email content. Nested exception is ", e );
@@ -527,16 +535,19 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 
         MailContentSettings mailContentSettings = new MailContentSettings();
         MailContent mailContent = new MailContent();
+        mailContent.setMail_subject(takeSurveyMailSubj);
         mailContent.setMail_body( takeSurveyMail );
         mailContent.setParam_order( new ArrayList<String>( Arrays.asList( paramOrderTakeSurvey.split( "," ) ) ) );
         mailContentSettings.setTake_survey_mail( mailContent );
 
         mailContent = new MailContent();
+        mailContent.setMail_subject(takeSurveyByCustomerMailSubj);
         mailContent.setMail_body( takeSurveyByCustomerMail );
         mailContent.setParam_order( new ArrayList<String>( Arrays.asList( paramOrderTakeSurveyCustomer.split( "," ) ) ) );
         mailContentSettings.setTake_survey_mail_customer( mailContent );
 
         mailContent = new MailContent();
+        mailContent.setMail_subject(takeSurveyReminderMailSubj);
         mailContent.setMail_body( takeSurveyReminderMail );
         mailContent.setParam_order( new ArrayList<String>( Arrays.asList( paramOrderTakeSurveyReminder.split( "," ) ) ) );
         mailContentSettings.setTake_survey_reminder_mail( mailContent );
@@ -1732,6 +1743,9 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
         LOG.info( "Method getUsersFromEmailIds called for emailIdsArray:" + emailIdsArray );
         List<User> users = new ArrayList<User>();
         for ( String emailId : emailIdsArray ) {
+            if(emailId.contains( "\"" )){
+                emailId = emailId.replace( "\"", "" );
+            }
             String firstName = "";
             String lastName = "";
             User user = null;
