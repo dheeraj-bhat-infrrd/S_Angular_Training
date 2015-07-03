@@ -486,7 +486,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
         companySettings.setVertical( organizationalDetails.get( CommonConstants.VERTICAL ) );
         companySettings.setContact_details( contactDetailSettings );
         companySettings.setProfileName( generateProfileNameForCompany( company.getCompany(), company.getCompanyId() ) );
-        companySettings.setProfileUrl( "/" + companySettings.getProfileName() );
+        companySettings.setProfileUrl(CommonConstants.FILE_SEPARATOR + companySettings.getProfileName() );
         companySettings.setCreatedOn( System.currentTimeMillis() );
         companySettings.setCreatedBy( String.valueOf( user.getUserId() ) );
         companySettings.setModifiedOn( System.currentTimeMillis() );
@@ -2507,7 +2507,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
      * @throws SolrException
      */
     @Override
-    @Transactional
+    @Transactional ( rollbackFor = { NonFatalException.class, FatalException.class })
     public Branch addNewBranch( User user, long regionId, int isDefaultBySystem, String branchName, String branchAddress1,
         String branchAddress2, String branchCountry, String branchCountryCode, String branchState, String branchCity,
         String branchZipcode ) throws InvalidInputException, SolrException
@@ -2557,19 +2557,53 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
         branch.setCountryCode( branchCountryCode );
         branch.setBranchName( branchName );
 
-        LOG.debug( "Adding new branch into mongo" );
-        insertBranchSettings( branch );
-
         LOG.debug( "Updating branch table with profile name" );
         branchDao.update( branch );
+        
+        LOG.debug( "Adding new branch into mongo" );
+        try{
+            insertBranchSettings( branch );
+        }
+        catch(NonFatalException|FatalException e){
+            LOG.error( "NonfatalException caught in addNewBranch(). Nested exception is ", e );
+            List<Long> branchIds = new ArrayList<>();
+            branchIds.add( branch.getBranchId() );
+            organizationUnitSettingsDao.removeOganizationUnitSettings( branchIds, MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION );
+            throw e;
+        }
 
         LOG.debug( "Adding newly added branch to solr" );
-        solrSearchService.addOrUpdateBranchToSolr( branch );
-
+        try{
+            solrSearchService.addOrUpdateBranchToSolr( branch );
+        }catch(SolrException|FatalException e){
+            LOG.error( "NonfatalEXception caught in addNewBranch(). Nested exception is ", e );
+            List<Long> branchIds = new ArrayList<>();
+            branchIds.add( branch.getBranchId() );
+            organizationUnitSettingsDao.removeOganizationUnitSettings( branchIds, MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION );
+            solrSearchService.removeBranchesFromSolr( branchIds );
+            throw e;
+        }
+            
         LOG.info( "Successfully completed method add new branch for regionId : " + region.getRegionId() + " and branchName : "
             + branchName );
         return branch;
 
+    }
+    
+    @Override
+    public void removeOrganizationUnitSettings(List<Long> idsToRemove, String collectionName){
+        LOG.info( "Method to remove OrganizationUnitSettings removeOrganizationUnitSettings() started." );
+        organizationUnitSettingsDao.removeOganizationUnitSettings( idsToRemove, MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION );
+        LOG.info( "Method to remove OrganizationUnitSettings removeOrganizationUnitSettings() finished." );
+    }
+    
+    @Override
+    public void removeOrganizationUnitSettings(Long idToRemove, String collectionName){
+        LOG.info( "Method to remove OrganizationUnitSettings removeOrganizationUnitSettings() started." );
+        List<Long> ids = new ArrayList<>();
+        ids.add( idToRemove );
+        organizationUnitSettingsDao.removeOganizationUnitSettings( ids, MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION );
+        LOG.info( "Method to remove OrganizationUnitSettings removeOrganizationUnitSettings() finished." );
     }
 
 
@@ -2737,7 +2771,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
      * @throws SolrException
      */
     @Override
-    @Transactional
+    @Transactional ( rollbackFor = { NonFatalException.class, FatalException.class })
     public Region addNewRegion( User user, String regionName, int isDefaultBySystem, String address1, String address2,
         String country, String countryCode, String state, String city, String zipcode ) throws InvalidInputException,
         SolrException
@@ -2760,13 +2794,28 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
         region.setZipcode( zipcode );
 
         LOG.debug( "Calling method to insert region settings" );
-        insertRegionSettings( region );
-
+        try {
+            insertRegionSettings( region );
+        } catch ( NonFatalException|FatalException e ) {
+            List<Long> regionIds = new ArrayList<>();
+            regionIds.add( region.getRegionId() );
+            organizationUnitSettingsDao.removeOganizationUnitSettings( regionIds, MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION );
+            throw e;
+        }
         regionDao.update( region );
 
         LOG.debug( "Updating solr with newly inserted region" );
-        solrSearchService.addOrUpdateRegionToSolr( region );
-
+        try{
+            solrSearchService.addOrUpdateRegionToSolr( region );
+        } catch(SolrException|FatalException e){
+            LOG.error( "SolrException caught in addNewRegion(). Nested exception is ", e );
+            List<Long> regionIds = new ArrayList<>();
+            regionIds.add( region.getRegionId() );
+            organizationUnitSettingsDao.removeOganizationUnitSettings( regionIds, MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION );
+            solrSearchService.removeRegionsFromSolr( regionIds );
+            throw e;
+        }
+        
         LOG.info( "Successfully completed method add new region for regionName : " + regionName );
         return region;
     }

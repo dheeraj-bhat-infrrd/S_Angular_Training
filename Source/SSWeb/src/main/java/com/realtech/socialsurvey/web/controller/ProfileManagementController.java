@@ -1111,7 +1111,7 @@ public class ProfileManagementController
                     throw new InvalidInputException( "Logo passed is null or empty" );
                 }
                 logoUrl = fileUploadService.fileUploadHandler( fileLocal, logoFileName );
-                logoUrl = amazonEndpoint + File.separator + amazonLogoBucket + File.separator + logoUrl;
+                logoUrl = amazonEndpoint + CommonConstants.FILE_SEPARATOR + amazonLogoBucket + CommonConstants.FILE_SEPARATOR + logoUrl;
             } catch ( NonFatalException e ) {
                 LOG.error( "NonFatalException while uploading Logo. Reason :" + e.getMessage(), e );
                 model.addAttribute( "message",
@@ -1218,7 +1218,7 @@ public class ProfileManagementController
                 if ( !dir.exists() ) {
                     dir.mkdirs();
                 }
-                String filePath = dir.getAbsolutePath() + File.separator + CommonConstants.IMAGE_NAME;
+                String filePath = dir.getAbsolutePath() + CommonConstants.FILE_SEPARATOR + CommonConstants.IMAGE_NAME;
 
                 BASE64Decoder decoder = new BASE64Decoder();
                 byte[] decodedBytes = decoder.decodeBuffer( imageBase64.split( "," )[1] );
@@ -1244,7 +1244,7 @@ public class ProfileManagementController
                 // uploading image
                 File fileLocal = new File( filePath );
                 profileImageUrl = fileUploadService.fileUploadHandler( fileLocal, imageFileName );
-                profileImageUrl = amazonEndpoint + File.separator + amazonImageBucket + File.separator + profileImageUrl;
+                profileImageUrl = amazonEndpoint + CommonConstants.FILE_SEPARATOR + amazonImageBucket + CommonConstants.FILE_SEPARATOR + profileImageUrl;
             } catch ( NonFatalException e ) {
                 LOG.error( "NonFatalException while uploading Profile Image. Reason :" + e.getMessage(), e );
                 model.addAttribute( "message",

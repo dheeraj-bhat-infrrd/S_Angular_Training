@@ -3,8 +3,6 @@ package com.realtech.socialsurvey.core.services.organizationmanagement;
 import java.util.List;
 import java.util.Map;
 
-import org.springframework.ui.Model;
-
 import com.realtech.socialsurvey.core.entities.AgentSettings;
 import com.realtech.socialsurvey.core.entities.Branch;
 import com.realtech.socialsurvey.core.entities.Company;
@@ -359,5 +357,14 @@ public interface UserManagementService
 
 
     public void updateUser( User user, Map<String, Object> map ) throws SolrException;
+
+
+    public User inviteUser( User admin, String firstName, String lastName, String emailId ) throws InvalidInputException,
+        UserAlreadyExistsException, UndeliveredEmailException, SolrException;
+
+
+    public User addCorporateAdmin( String firstName, String lastName, String emailId, String confirmPassword,
+        boolean isDirectRegistration ) throws InvalidInputException, UserAlreadyExistsException, UndeliveredEmailException,
+        SolrException;
 }
 // JIRA SS-34 BY RM02 BOC

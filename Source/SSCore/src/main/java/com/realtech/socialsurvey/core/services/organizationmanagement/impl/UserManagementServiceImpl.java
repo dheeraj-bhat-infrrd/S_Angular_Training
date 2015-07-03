@@ -2259,4 +2259,55 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
         solrSearchService.editUserInSolrWithMultipleValues( user.getUserId(), map );
         LOG.info( "Method updateUser() finished to update user." );
     }
+	
+    // Moved user addition from Controller.
+    @Override
+    @Transactional ( rollbackFor = { NonFatalException.class, FatalException.class })
+    public User inviteUser(User admin, String firstName, String lastName, String emailId) throws InvalidInputException, UserAlreadyExistsException, UndeliveredEmailException, SolrException
+    {
+        User user = inviteNewUser( admin, firstName, lastName, emailId );
+        LOG.debug( "Adding user {} to solr server.", user.getFirstName() );
+
+        LOG.debug( "Adding newly added user {} to mongo", user.getFirstName() );
+        insertAgentSettings( user );
+        LOG.debug( "Added newly added user {} to mongo", user.getFirstName() );
+
+        LOG.debug( "Adding newly added user {} to solr", user.getFirstName() );
+        try{
+            solrSearchService.addUserToSolr( user );
+        }catch(SolrException e){
+            LOG.error( "SolrException caught in inviteUser(). Nested exception is ", e );
+            organizationManagementService.removeOrganizationUnitSettings( user.getUserId(), MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION );
+            throw e;
+        }
+        LOG.debug( "Added newly added user {} to solr", user.getFirstName() );
+        
+        return user;
+    }
+    
+    @Override
+    @Transactional ( rollbackFor = { NonFatalException.class, FatalException.class })
+    public User addCorporateAdmin( String firstName, String lastName, String emailId, String confirmPassword,
+        boolean isDirectRegistration ) throws InvalidInputException, UserAlreadyExistsException, UndeliveredEmailException,
+        SolrException{
+    
+        User user = addCorporateAdminAndUpdateStage( firstName, lastName, emailId, confirmPassword, isDirectRegistration );
+        LOG.debug( "Succesfully completed registration of user with emailId : " + emailId );
+
+        LOG.debug( "Adding newly added user {} to mongo", user.getFirstName() );
+        insertAgentSettings( user );
+        LOG.debug( "Added newly added user {} to mongo", user.getFirstName() );
+
+        LOG.debug( "Adding newly added user {} to solr", user.getFirstName() );
+        try{
+            solrSearchService.addUserToSolr( user );
+        }catch(SolrException e){
+            LOG.error( "SolrException caught in addCorporateAdmin(). Nested exception is ", e );
+            organizationManagementService.removeOrganizationUnitSettings( user.getUserId(), MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION );
+            throw e;
+        }
+        LOG.debug( "Added newly added user {} to solr", user.getFirstName() );
+        
+        return user;
+    }
 }

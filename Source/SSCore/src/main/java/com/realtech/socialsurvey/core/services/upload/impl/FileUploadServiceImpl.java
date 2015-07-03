@@ -59,7 +59,7 @@ public class FileUploadServiceImpl implements FileUploadService {
 				LOG.debug("Creating the file on server");
 				String logoFormat = logoName.substring(logoName.lastIndexOf("."));
 				String logoNameHash = encryptionHelper.encryptSHA512(logoName+(System.currentTimeMillis()));
-				File serverFile = new File(dir.getAbsolutePath() + File.separator + logoNameHash + logoFormat);
+				File serverFile = new File(dir.getAbsolutePath() + CommonConstants.FILE_SEPARATOR + logoNameHash + logoFormat);
 				stream = new BufferedOutputStream(new FileOutputStream(serverFile));
 				stream.write(bytes);
 
