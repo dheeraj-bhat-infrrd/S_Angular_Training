@@ -11,7 +11,9 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
 import javax.annotation.Resource;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
@@ -21,6 +23,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.DependsOn;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
+
 import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.commons.Utils;
 import com.realtech.socialsurvey.core.dao.BranchDao;
@@ -69,6 +72,7 @@ import com.realtech.socialsurvey.core.services.mail.EmailServices;
 import com.realtech.socialsurvey.core.services.mail.UndeliveredEmailException;
 import com.realtech.socialsurvey.core.services.organizationmanagement.OrganizationManagementService;
 import com.realtech.socialsurvey.core.services.organizationmanagement.ProfileManagementService;
+import com.realtech.socialsurvey.core.services.organizationmanagement.ProfileNotFoundException;
 import com.realtech.socialsurvey.core.services.organizationmanagement.UserManagementService;
 import com.realtech.socialsurvey.core.services.search.SolrSearchService;
 import com.realtech.socialsurvey.core.services.search.exception.SolrException;
@@ -751,12 +755,12 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 	 */
 	@Override
 	@Transactional
-	public List<AgentSettings> getIndividualsForBranch(String companyProfileName, String branchProfileName) throws InvalidInputException {
+	public List<AgentSettings> getIndividualsForBranch(String companyProfileName, String branchProfileName) throws InvalidInputException, ProfileNotFoundException {
 		if (companyProfileName == null || companyProfileName.isEmpty()) {
-			throw new InvalidInputException("companyProfileName is null or empty in getIndividualsForBranch");
+			throw new ProfileNotFoundException("companyProfileName is null or empty in getIndividualsForBranch");
 		}
 		if (branchProfileName == null || branchProfileName.isEmpty()) {
-			throw new InvalidInputException("branchProfileName is null or empty in getIndividualsForBranch");
+			throw new ProfileNotFoundException("branchProfileName is null or empty in getIndividualsForBranch");
 		}
 		LOG.info("Method getIndividualsForBranch called for companyProfileName: " + companyProfileName + " branchProfileName:" + branchProfileName);
 		List<AgentSettings> users = null;
@@ -777,7 +781,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 	@Override
 	@Transactional
 	public List<AgentSettings> getIndividualsForRegion(String companyProfileName, String regionProfileName) throws InvalidInputException,
-			NoRecordsFetchedException {
+			NoRecordsFetchedException, ProfileNotFoundException {
 		if (companyProfileName == null || companyProfileName.isEmpty()) {
 			throw new InvalidInputException("companyProfileName is null or empty in getIndividualsForRegion");
 		}
@@ -800,7 +804,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 	 */
 	@Override
 	@Transactional
-	public List<AgentSettings> getIndividualsForCompany(String companyProfileName) throws InvalidInputException, NoRecordsFetchedException {
+	public List<AgentSettings> getIndividualsForCompany(String companyProfileName) throws InvalidInputException, NoRecordsFetchedException, ProfileNotFoundException {
 		if (companyProfileName == null || companyProfileName.isEmpty()) {
 			throw new InvalidInputException("companyProfileName is null or empty in getIndividualsForCompany");
 		}
@@ -824,13 +828,13 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 	 */
 	@Override
 	@Transactional
-	public OrganizationUnitSettings getRegionByProfileName(String companyProfileName, String regionProfileName) throws InvalidInputException {
+	public OrganizationUnitSettings getRegionByProfileName(String companyProfileName, String regionProfileName) throws ProfileNotFoundException, InvalidInputException {
 		LOG.info("Method getRegionByProfileName called for companyProfileName:" + companyProfileName + " and regionProfileName:" + regionProfileName);
 		if (companyProfileName == null || companyProfileName.isEmpty()) {
-			throw new InvalidInputException("companyProfileName is null or empty in getRegionByProfileName");
+			throw new ProfileNotFoundException("companyProfileName is null or empty in getRegionByProfileName");
 		}
 		if (regionProfileName == null || regionProfileName.isEmpty()) {
-			throw new InvalidInputException("regionProfileName is null or empty in getRegionByProfileName");
+			throw new ProfileNotFoundException("regionProfileName is null or empty in getRegionByProfileName");
 		}
 		/**
 		 * generate profileUrl and fetch the region by profileUrl since profileUrl for any region is
@@ -838,8 +842,15 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 		 */
 		String profileUrl = utils.generateRegionProfileUrl(companyProfileName, regionProfileName);
 		OrganizationUnitSettings companySettings = getCompanyProfileByProfileName(companyProfileName);
+		if(companySettings == null){
+		    LOG.error( "Unable to get company settings " );
+		    throw new ProfileNotFoundException("Unable to get company settings ");
+		}
 		OrganizationUnitSettings regionSettings = organizationUnitSettingsDao.fetchOrganizationUnitSettingsByProfileUrl(profileUrl,
 				MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION);
+		if(regionSettings == null){
+		    throw new ProfileNotFoundException("Unable to get region settings ");
+		}
 
 		LOG.debug("Generating final region settings based on lock settings");
 		regionSettings = aggregateRegionProfile(companySettings, regionSettings);
@@ -852,10 +863,14 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 	 */
 	@Override
 	@Transactional
-	public OrganizationUnitSettings getBranchByProfileName(String companyProfileName, String branchProfileName) throws InvalidInputException {
+	public OrganizationUnitSettings getBranchByProfileName(String companyProfileName, String branchProfileName) throws ProfileNotFoundException, InvalidInputException {
 		LOG.info("Method getBranchByProfileName called for companyProfileName:" + companyProfileName + " and branchProfileName:" + branchProfileName);
 
 		OrganizationUnitSettings companySettings = getCompanyProfileByProfileName(companyProfileName);
+		if(companySettings == null){
+		    LOG.error( "Unable to fetch company settings, invalid input provided by the user" );
+		    throw new ProfileNotFoundException( "Unable to get company settings " );
+		}
 		/**
 		 * generate profileUrl and fetch the branch by profileUrl since profileUrl for any branch is
 		 * unique, whereas profileName is unique only within a company
@@ -863,9 +878,19 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 		String profileUrl = utils.generateBranchProfileUrl(companyProfileName, branchProfileName);
 		OrganizationUnitSettings branchSettings = organizationUnitSettingsDao.fetchOrganizationUnitSettingsByProfileUrl(profileUrl,
 				MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION);
+		
+		if(branchSettings == null){
+            LOG.error( "Unable to fetch branch settings, invalid input provided by the user" );
+            throw new ProfileNotFoundException( "Unable to get branch settings " );
+        }
 
 		LOG.debug("Fetching branch from db to identify the region");
 		Branch branch = branchDao.findById(Branch.class, branchSettings.getIden());
+		if(branch == null){
+		    LOG.error( "Unable to get branch with this iden " +branchSettings.getIden() );
+		    throw new ProfileNotFoundException( "Unable to get branch with this iden " +branchSettings.getIden() );
+		    
+		}
 		OrganizationUnitSettings regionSettings = organizationUnitSettingsDao.fetchOrganizationUnitSettingsById(branch.getRegion().getRegionId(),
 				MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION);
 
@@ -880,10 +905,10 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 	 */
 	@Override
 	@Transactional
-	public OrganizationUnitSettings getCompanyProfileByProfileName(String profileName) throws InvalidInputException {
+	public OrganizationUnitSettings getCompanyProfileByProfileName(String profileName) throws ProfileNotFoundException {
 		LOG.info("Method getCompanyDetailsByProfileName called for profileName : " + profileName);
 		if (profileName == null || profileName.isEmpty()) {
-			throw new InvalidInputException("profile name is null or empty while getting company details");
+			throw new ProfileNotFoundException("profile name is null or empty while getting company details");
 		}
 		OrganizationUnitSettings companySettings = organizationUnitSettingsDao.fetchOrganizationUnitSettingsByProfileName(profileName,
 				MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION);
@@ -899,18 +924,18 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 	 */
 	@Override
 	@Transactional
-	public OrganizationUnitSettings getIndividualByProfileName(String agentProfileName) throws InvalidInputException, NoRecordsFetchedException {
+	public OrganizationUnitSettings getIndividualByProfileName(String agentProfileName) throws ProfileNotFoundException, InvalidInputException{
 		LOG.info("Method getIndividualByProfileName called for agentProfileName:" + agentProfileName);
 
 		OrganizationUnitSettings agentSettings = null;
 		if (agentProfileName == null || agentProfileName.isEmpty()) {
-			throw new InvalidInputException("agentProfileName is null or empty while getting agent settings");
+			throw new ProfileNotFoundException("agentProfileName is null or empty while getting agent settings");
 		}
 
 		agentSettings = organizationUnitSettingsDao.fetchOrganizationUnitSettingsByProfileName(agentProfileName,
 				MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION);
 		if (agentSettings == null) {
-			throw new NoRecordsFetchedException("No settings found for agent while fetching agent profile");
+			throw new ProfileNotFoundException("No settings found for agent while fetching agent profile");
 		}
 
 		User user = userDao.findById(User.class, agentSettings.getIden());
@@ -922,7 +947,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 			userProfile = userProfiles.get(0);
 		}
 		else {
-			throw new NoRecordsFetchedException("User profiles not found while fetching agent profile");
+			throw new ProfileNotFoundException("User profiles not found while fetching agent profile");
 		}
 
 		long companyId = userProfile.getCompany().getCompanyId();
@@ -1051,23 +1076,23 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 	 */
 	@Override
 	@Transactional
-	public User getUserByProfileName(String agentProfileName) throws InvalidInputException, NoRecordsFetchedException {
+	public User getUserByProfileName(String agentProfileName) throws InvalidInputException, NoRecordsFetchedException, ProfileNotFoundException {
 		LOG.info("Method getUserProfilesByProfileName called for agentProfileName:" + agentProfileName);
 
 		OrganizationUnitSettings agentSettings = null;
 		if (agentProfileName == null || agentProfileName.isEmpty()) {
-			throw new InvalidInputException("agentProfileName is null or empty while getting agent settings");
+			throw new ProfileNotFoundException("agentProfileName is null or empty while getting agent settings");
 		}
 
 		agentSettings = organizationUnitSettingsDao.fetchOrganizationUnitSettingsByProfileName(agentProfileName,
 				MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION);
 		if (agentSettings == null) {
-			throw new NoRecordsFetchedException("No settings found for agent while fetching agent profile");
+			throw new ProfileNotFoundException("No settings found for agent while fetching agent profile");
 		}
 
 		User user = userDao.findById(User.class, agentSettings.getIden());
 		if (user.getStatus() != CommonConstants.STATUS_ACTIVE) {
-			throw new NoRecordsFetchedException("No active agent found.");
+			throw new ProfileNotFoundException("No active agent found.");
 		}
 
 		LOG.info("Method getUserProfilesByProfileName executed successfully");

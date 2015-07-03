@@ -13,9 +13,11 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
+
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.apache.solr.common.SolrDocument;
 import org.slf4j.Logger;
@@ -27,6 +29,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.type.TypeFactory;
 import com.google.gson.Gson;
@@ -1202,7 +1205,7 @@ public class DashboardController {
 		try {
 			String source = request.getParameter("source");
 			String payload = request.getParameter("receiversList");
-			String columnName = request.getParameter("columnName");
+			//String columnName = request.getParameter("columnName");
 			try {
 				if (payload == null) {
 					throw new InvalidInputException("SurveyRecipients passed was null or empty");
@@ -1213,28 +1216,40 @@ public class DashboardController {
 			catch (IOException ioException) {
 				throw new NonFatalException("Error occurred while parsing the Json.", DisplayMessageConstants.GENERAL_ERROR, ioException);
 			}
-
-			if (columnName != null) {
+			/*if (columnName != null) {
 				String profileLevel = getProfileLevel(columnName);
-				if (profileLevel.equalsIgnoreCase(CommonConstants.PROFILE_LEVEL_INDIVIDUAL) || user.isAgent()) {
+				if (profileLevel.equalsIgnoreCase(CommonConstants.PROFILE_LEVEL_INDIVIDUAL)) {
 					agentId = user.getUserId();
 				}
+			} else {
+				agentId = user.getUserId();
+			}*/
+			if(source.equalsIgnoreCase(CommonConstants.SURVEY_REQUEST_AGENT)){
+				agentId = user.getUserId();
 			}
 
 			// sending mails on traversing the list
 			if (!surveyRecipients.isEmpty()) {
 				for (SurveyRecipient recipient : surveyRecipients) {
-					if (agentId == 0) {
-						agentId = recipient.getAgentId();
+					long currentAgentId = 0;
+					if (agentId != 0) {
+						currentAgentId = agentId;
 					}
+					else if (recipient.getAgentId() != 0) {
+						currentAgentId = recipient.getAgentId();
+					} else{
+						throw new InvalidInputException("Agent id can not be null");
+					}
+					User currentUser = userManagementService.getUserByUserId(currentAgentId); 
 					if (surveyHandler.getPreInitiatedSurvey(agentId, recipient.getEmailId()) == null)
-						surveyHandler.sendSurveyInvitationMail(recipient.getFirstname(), recipient.getLastname(), recipient.getEmailId(), null, user,
+						surveyHandler.sendSurveyInvitationMail(recipient.getFirstname(), recipient.getLastname(), recipient.getEmailId(), null, currentUser,
 								true, source);
 				}
 			}
 		}
 		catch (NonFatalException e) {
 			LOG.error("NonFatalException caught in sendMultipleSurveyInvitations(). Nested exception is ", e);
+			return "error";
 		}
 
 		LOG.info("Method sendMultipleSurveyInvitations() finished from DashboardController.");

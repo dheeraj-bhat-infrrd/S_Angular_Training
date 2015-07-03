@@ -1,13 +1,18 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <%@ taglib uri="http://www.springframework.org/tags" prefix="spring"%>
 
+<c:if test="${not empty profile}">
+	<c:set value="${profile.profilesMaster.profileId}" var="profilemasterid"></c:set>
+</c:if>
+
 <c:if test="${not empty profileSettings && not empty profileSettings.contact_details}">
 	<c:set value="${profileSettings.contact_details}" var="contactdetail"></c:set>
 </c:if>
-<c:if test="${empty contactdetail.address1 && not empty profileSettings.companyProfileData}">
-	<c:set value="${profileSettings.companyProfileData}" var="contactdetail"></c:set>
+<c:if test="${profilemasterid == 4 }">
+	<c:if test="${empty contactdetail.address1 && not empty profileSettings.companyProfileData}">
+		<c:set value="${profileSettings.companyProfileData}" var="contactdetail"></c:set>
+	</c:if>
 </c:if>
-
 <div id="prof-address-edit-container" class="prof-user-address prof-edit-icn">
 	<form id="prof-edit-address-form">
 		<input id="prof-address1" name="address1" class="pu-edit-fields" value="${contactdetail.address1}" placeholder='<spring:message code="label.address.address1.key"/>'>

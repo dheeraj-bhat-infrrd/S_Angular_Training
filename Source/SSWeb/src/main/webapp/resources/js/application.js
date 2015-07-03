@@ -88,6 +88,9 @@ var autoPostScore;
 var happyText;
 var neutralText;
 var sadText;
+var happyTextComplete;
+var neutralTexCompletet;
+var sadTextComplete;
 var rating;
 var firstName;
 var lastName;
@@ -233,10 +236,25 @@ $(document).on('click', '.report-abuse-txt', function(e) {
 	});
 	$('.rpa-report-btn').on('click',function(){
 		var reportText = $("#report-abuse-txtbox").val();
-		payload.reportText = reportText;
-		confirmReportAbuse(payload);
+		if(validateReportAbuseUserForm(reportText)){
+			payload.reportText = reportText;
+			confirmUserReportAbuse(payload);
+		}
 	});
 });
+
+function validateReportAbuseUserForm(reportText) {
+	
+	//check if report text is empty
+	if(reportText == undefined || reportText == ""){
+		$('#overlay-toast').html('Please enter why you want to report the review!');
+		showToast();
+		return false;
+	}
+	
+	return true;
+}
+
 
 function confirmUserReportAbuse(payload) {
 	callAjaxGetWithPayloadData('./reportabuse.do', function() {
@@ -276,7 +294,8 @@ function paintDashboard(profileMasterId, newProfileName, newProfileValue, typeoO
 			oldConW = $('.container').width();
 		}
 	});
-	
+	lastColNameForCount = newProfileName;
+	lastColValueForCount = newProfileValue;
 	if (profileMasterId == 1) {
 		showCompanyAdminFlow(newProfileName, newProfileValue);
 	} else if (profileMasterId == 2) {
@@ -423,6 +442,7 @@ function bindSelectButtons() {
 		if($('#dsh-srch-survey-div').is(':visible')){
 			columnName = lastColNameForCount;
 			columnValue = lastColValueForCount;
+			console.info("lastColNameForCount:"+lastColNameForCount+" lastColValueForCount:"+lastColValueForCount);
 		}
 		showSurveyStatistics(columnName, columnValue);
 	});
@@ -1913,17 +1933,22 @@ function validateRegionName(elementId){
 function validateUserEmailTextArea(elementId) {
 	var emailIds = $('#'+elementId).val();
 	if (emailIds != "") {
-		var emailIdsArray = emailIds.split(/[\;,\s\n]/);
+		var emailIdsArray = emailIds.split(/[,;\n]/);
 		for(var i = 0; i < emailIdsArray.length; i++) {
 			var emailId = emailIdsArray[i].trim();
-			if(emailRegex.test(emailId) == true){
-				return true;
+			if(emailId == ""){
+				continue;
 			}
-			else {
+			if(emailId.indexOf(">") > -1){
+				emailId = emailId.substring(emailId.indexOf("<")+1,emailId.length-1);
+			}
+
+			if(emailRegex.test(emailId) == false){
 				showErrorMobileAndWeb('Please enter valid email addresses');
 				return false;
 			}
 		}
+		return true;
 	}
 }
 
@@ -4653,6 +4678,9 @@ function paintSurveyPage(jsonData) {
 	happyText = jsonData.responseJSON.happyText;
 	neutralText = jsonData.responseJSON.neutralText;
 	sadText = jsonData.responseJSON.sadText;
+	happyTextComplete = jsonData.responseJSON.happyTextComplete;
+	neutralTextComplete = jsonData.responseJSON.neutralTextComplete;
+	sadTextComplete = jsonData.responseJSON.sadTextComplete;
 	autoPost = jsonData.responseJSON.autopostEnabled;
 	autoPostScore = jsonData.responseJSON.autopostScore;
 	yelpEnabled = Boolean(jsonData.responseJSON.yelpEnabled);
@@ -5045,7 +5073,13 @@ function showMasterQuestionPage(){
 		$("div[data-ques-type='error']").show();
 		$('#profile-link').html('View ' + agentName + '\'s profile at <a href="' + agentFullProfileLink + '" target="_blank">' + agentFullProfileLink + '</a>');
 		$('#content-head').html('Survey Completed');
-		$('#content').html("Congratulations! You have completed survey for " + agentName+ ".\nThanks for your participation.");
+			if (mood == 'Great')
+				$('#content').html("Congratulations! You have completed survey for " + agentName+ ".\n"+happyTextComplete);
+			else if(mood == 'OK')
+				$('#content').html("Congratulations! You have completed survey for " + agentName+ ".\n"+neutralTextComplete);
+			else
+				$('#content').html("Congratulations! You have completed survey for " + agentName+ ".\n"+sadTextComplete);
+	//	$('#content').html("Congratulations! You have completed survey for " + agentName+ ".\nThanks for your participation.");
 	}
 	return;
 }
