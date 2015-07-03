@@ -545,7 +545,14 @@ function getReviewsCountAndShowReviews(columnName, columnValue) {
 				return;
 			} else {
 				$("#review-desc").html("What people say about " + name.substring(1, name.length - 1));
-				$("#dsh-cmp-dwnld").show();
+				if(colName == "companyId"){
+					$("#dsh-cmp-dwnld").hide();
+					$("#dsh-admin-cmp-dwnld").show();
+				}
+				else{ 
+					$("#dsh-admin-cmp-dwnld").hide();
+					$("#dsh-cmp-dwnld").show();
+				}
 				
 				// initializing datepickers
 				var startDate;
