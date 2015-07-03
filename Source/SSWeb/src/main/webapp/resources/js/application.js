@@ -3170,7 +3170,7 @@ function saveTextForMoodFlow(content, mood){
 	};
 	callAjaxGetWithPayloadData("./storetextforflow.do", function(data) {
 		if (data == "success") {
-			$('#overlay-toast').html("Content added successfully!");
+			$('#overlay-toast').html("Content updated successfully!");
 		} else {
 			$('#overlay-toast').html("Oops! Something went wrong. Please try again later.");
 		}
