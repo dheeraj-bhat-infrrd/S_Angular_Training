@@ -1,0 +1,1 @@
+UPDATE ss_user.survey_questions SET SURVEY_QUESTIONS_CODE = "sb-range-smiles" WHERE SURVEY_QUESTIONS_ID IN ("1","2","3");

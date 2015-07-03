@@ -1,5 +1,9 @@
 package com.realtech.socialsurvey.core.starter;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 import org.quartz.JobDataMap;
 import org.quartz.JobExecutionContext;
@@ -110,7 +114,9 @@ public class IncompleteSurveyReminderSender extends QuartzJobBean {
 
 		User user = userManagementService.getUserByUserId(survey.getAgentId());
 		String companyName = user.getCompany().getCompany();
-
+		String currentYear = String.valueOf(Calendar.getInstance().get(Calendar.YEAR));
+		DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd");
+		String fullAddress = "";
 		// Null check
 		if (companySettings != null && companySettings.getMail_content() != null
 				&& companySettings.getMail_content().getTake_survey_reminder_mail() != null) {
@@ -124,7 +130,13 @@ public class IncompleteSurveyReminderSender extends QuartzJobBean {
 			mailBody = mailBody.replaceAll("\\[Name\\]", survey.getCustomerFirstName() + " " + survey.getCustomerLastName());
 			mailBody = mailBody.replaceAll("\\[Link\\]", surveyLink);
 			mailBody = mailBody.replaceAll("\\[AgentSignature\\]", agentSignature);
-
+			mailBody = mailBody.replaceAll("\\[RecipientEmail\\]", survey.getCustomerEmailId());
+			mailBody = mailBody.replaceAll("\\[SenderEmail\\]", user.getEmailId());
+			mailBody = mailBody.replaceAll("\\[CompanyName\\]", companyName);
+			mailBody = mailBody.replaceAll("\\[InitiatedDate\\]", dateFormat.format(new Date()));
+			mailBody = mailBody.replaceAll("\\[CurrentYear\\]", currentYear);
+			mailBody = mailBody.replaceAll("\\[FullAddress\\]", fullAddress);
+			mailBody = mailBody.replaceAll("null", "");
 			String mailSubject = CommonConstants.REMINDER_MAIL_SUBJECT + agentName;
 			if (mailContent.getMail_subject() != null && !mailContent.getMail_subject().isEmpty()) {
 				mailSubject = mailContent.getMail_subject();
@@ -132,7 +144,7 @@ public class IncompleteSurveyReminderSender extends QuartzJobBean {
 			}
 
 			try {
-				emailServices.sendSurveyReminderMail(survey.getCustomerEmailId(), mailSubject, mailBody);
+				emailServices.sendSurveyReminderMail(survey.getCustomerEmailId(), mailSubject, mailBody); 
 			}
 			catch (InvalidInputException | UndeliveredEmailException e) {
 				LOG.error("Exception caught while sending mail to " + survey.getCustomerEmailId() + " .Nested exception is ", e);

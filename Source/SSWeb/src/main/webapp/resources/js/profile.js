@@ -133,8 +133,8 @@ function paintProfilePage(result) {
 					}
 					
 					address = '';
-					if (addressData.name && addressData.name != "") {
-						address += addressData.name;
+					if (result.companyProfileData && result.companyProfileData.name && result.companyProfileData.name != "") {
+						address += result.companyProfileData.name;
 					}
 					if (addressData.address1 && addressData.address1 != "") {
 						address += ' ' + addressData.address1;
