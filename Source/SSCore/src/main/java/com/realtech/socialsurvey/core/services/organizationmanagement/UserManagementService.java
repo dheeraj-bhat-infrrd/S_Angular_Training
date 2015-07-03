@@ -298,5 +298,11 @@ public interface UserManagementService {
 	public User getCompanyAdmin(long companyId) throws InvalidInputException;
 
 	public void updateUser(User user, Map<String, Object> map) throws SolrException;
+
+    public User inviteUser(User admin, String firstName, String lastName, String emailId) throws InvalidInputException, UserAlreadyExistsException, UndeliveredEmailException, SolrException;
+
+    public User addCorporateAdmin( String firstName, String lastName, String emailId, String confirmPassword,
+        boolean isDirectRegistration ) throws InvalidInputException, UserAlreadyExistsException, UndeliveredEmailException,
+        SolrException;
 }
 // JIRA SS-34 BY RM02 BOC
