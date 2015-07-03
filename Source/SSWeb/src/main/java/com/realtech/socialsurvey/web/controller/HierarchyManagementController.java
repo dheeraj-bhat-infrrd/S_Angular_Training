@@ -1372,7 +1372,8 @@ public class HierarchyManagementController
                 throw new InvalidInputException( "Error while parsing regionId in fetchHierarchyViewBranches.Reason : "
                     + e.getMessage(), DisplayMessageConstants.GENERAL_ERROR, e );
             }
-            String branchesJson = solrSearchService.searchBranchesByRegion( regionId, start, rows );
+            int branchCount = (int) solrSearchService.getBranchCountByRegion( regionId );
+            String branchesJson = solrSearchService.searchBranchesByRegion( regionId, start, branchCount );
             LOG.debug( "Fetched branch .branches json is :" + branchesJson );
             Type searchedBranchesList = new TypeToken<List<BranchFromSearch>>() {}.getType();
             branches = new Gson().fromJson( branchesJson, searchedBranchesList );
@@ -1428,7 +1429,6 @@ public class HierarchyManagementController
         String strRegionId = request.getParameter( "regionId" );
         long branchId = 0l;
         int start = 0;
-        int rows = -1;
         try {
             try {
                 branchId = Long.parseLong( strBranchId );
@@ -1436,9 +1436,9 @@ public class HierarchyManagementController
                 throw new InvalidInputException( "Error while parsing branchId in fetchHierarchyViewBranches.Reason : "
                     + e.getMessage(), DisplayMessageConstants.GENERAL_ERROR, e );
             }
-
+            int userCount = (int) solrSearchService.getUsersCountByIden( branchId, CommonConstants.BRANCHES_SOLR, false );
             Collection<UserFromSearch> usersResult = solrSearchService.searchUsersByIden( branchId,
-                CommonConstants.BRANCHES_SOLR, false, start, rows );
+                CommonConstants.BRANCHES_SOLR, false, start, userCount );
             String usersJson = new Gson().toJson( usersResult );
             LOG.debug( "Solr result returned for users of branch is:" + usersJson );
             /**
