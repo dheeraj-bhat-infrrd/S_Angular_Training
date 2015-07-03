@@ -2260,7 +2260,7 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
         LOG.info( "Method updateUser() finished to update user." );
     }
 	
-
+    // Moved user addition from Controller.
     @Override
     @Transactional ( rollbackFor = { NonFatalException.class, FatalException.class })
     public User inviteUser(User admin, String firstName, String lastName, String emailId) throws InvalidInputException, UserAlreadyExistsException, UndeliveredEmailException, SolrException

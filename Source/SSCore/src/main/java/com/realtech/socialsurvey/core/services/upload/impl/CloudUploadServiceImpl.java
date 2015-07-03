@@ -72,7 +72,7 @@ public class CloudUploadServiceImpl implements FileUploadService {
 	public String fileUploadHandler(File file, String imageName) throws InvalidInputException {
 		LOG.info("Method fileUploadHandler inside AmazonUploadServiceImpl called");
 		try {
-			return uploadImage(file, imageName, bucket + File.separator + imageBucket);
+			return uploadImage(file, imageName, bucket + "/" + imageBucket);
 		}
 		catch (InvalidInputException e) {
 			LOG.error("IOException occured while reading file. Reason : " + e.getMessage(), e);
@@ -89,7 +89,7 @@ public class CloudUploadServiceImpl implements FileUploadService {
 				File convFile = new File(CommonConstants.IMAGE_NAME);
 				fileLocal.transferTo(convFile);
 
-				return uploadImage(convFile, logoName, bucket + File.separator + logoBucket);
+				return uploadImage(convFile, logoName, bucket + "/" + logoBucket);
 			}
 			catch (IOException e) {
 				LOG.error("IOException occured while reading file. Reason : " + e.getMessage(), e);
