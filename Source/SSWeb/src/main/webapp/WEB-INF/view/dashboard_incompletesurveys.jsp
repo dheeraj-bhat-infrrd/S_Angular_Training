@@ -7,9 +7,12 @@
 				${survey.customerFirstName} ${survey.customerLastName}
 				<div class="font-11 opensanslight">${survey.modifiedOn}</div>
 			</div>
-			<div data-custname="${survey.customerFirstName} ${survey.customerLastName}"
+			<div
+				data-custname="${survey.customerFirstName} ${survey.customerLastName}"
 				data-agentid="${survey.agentId}" data-agentname="${agentName}"
-				data-custemail="${survey.customerEmailId}" class="float-right dash-lp-rt-img cursor-pointer"></div>
+				data-custemail="${survey.customerEmailId}"
+				class="float-right dash-lp-rt-img cursor-pointer"
+				title="Resend Survey"></div>
 		</div>
 	</c:forEach>
 </c:if>

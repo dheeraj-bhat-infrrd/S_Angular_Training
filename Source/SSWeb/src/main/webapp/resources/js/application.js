@@ -517,6 +517,7 @@ function showIncompleteSurvey(columnName, columnValue) {
 			scrollContainer.onscroll = function() {
 				if (scrollContainer.scrollTop === scrollContainer.scrollHeight - scrollContainer.clientHeight) {
 					showIncompleteSurvey(colName, colValue);
+					$('#dsh-inc-srvey').perfectScrollbar('update');
 				}
 			};
 	
@@ -1862,15 +1863,18 @@ function showSelectorsByAssignToOption(assignToOption) {
 	case 'company':
 		disableRegionSelector();
 		disableOfficeSelector();
+		hideAdminPrivilegesChk();
 		break;
 	case 'region':
 		$("#selected-region-txt").prop("disabled",false);
 		disableOfficeSelector();
 		$("#bd-region-selector").show();
+		showAdminPrivilegesChk();
 		break;
 	case 'office':
 		$("#selected-office-txt").prop("disabled",false);
 		$("#bd-office-selector").show();
+		showAdminPrivilegesChk();
 		disableRegionSelector();
 		break;
 	default:

@@ -4018,7 +4018,8 @@ img.prof-image {
 .dash-lp-item-grp {
 	max-height: 200px;
 	position: relative;
-	padding-right: 0px;
+	margin-right: -12px;
+	padding-right: 12px;
 }
 
 .dash-lp-txt span {

@@ -107,12 +107,24 @@
 	 </div>
  </form>
  <script>
+ var selectedCountryRegEx = "";
  $(document).ready(function(){
 	 var stateList;
 	 var cityLookupList;
-	 var countryCode = $('#region-country-code').val();
+	 var countryCode = "US";
+	 
+	 if($('#region-country-code').val() != undefined && $('#region-country-code').val() != ""){
+		 countryCode = $('#region-country-code').val();	 
+	 }
+	 
 	 if(countryCode == "US"){
 	 	showStateCityRow();
+	 	if( $('#region-country').val() == null || $('#region-country').val() == "" ){
+			$('#region-country').val("United States");
+			$('#region-country-code').val(countryCode);
+		}
+		selectedCountryRegEx = "^" + "\\b\\d{5}\\b(?:[- ]{1}\\d{4})?" + "$";
+		selectedCountryRegEx = new RegExp(selectedCountryRegEx);
 	 }else{
 		 hideStateCityRow();
 	 }
