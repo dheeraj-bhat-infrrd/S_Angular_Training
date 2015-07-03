@@ -10,8 +10,8 @@ $(document).on('change', '#prof-image', function() {
 });
 
 function createPopupCanvas() {
-	var canvas = '<img src="" id="target" class="hide" style="position:absoulte;"/>'
-			+ '<canvas id="canvas" width="200" height="200" style="overflow:hidden; position:absoulte; display:none;"></canvas>';
+	var canvas = '<img src="" id="target" class="hide jcrop-img-upload" style="position:absoulte;"/>'
+			+ '<canvas id="canvas" style="overflow:hidden; position:absoulte; display:none;"></canvas>';
 	$('#overlay-header').html("Edit image");
 	$('#overlay-text').html(canvas).css('position', 'relative');
 	$('#overlay-continue').html("Upload");
@@ -28,6 +28,9 @@ function initiateJcrop(input) {
 			var myImage = new Image();
 			myImage.src = e.target.result;
 			
+			$('#target').attr('data-original-width',myImage.width);
+			$('#target').attr('data-original-height',myImage.height);
+			
 			if (myImage.width > myImage.height && myImage.width > imageMaxWidth) {
 				// landscape image
 				$('#target').width(imageMaxWidth);
@@ -36,10 +39,10 @@ function initiateJcrop(input) {
 				// portrait image
 				$('#target').height(imageMaxHeight);
 			}
-			else {
+			/*else {
 				$('#target').width(imageMaxWidth);
 				$('#target').height(imageMaxHeight);
-			}
+			}*/
 			
 			$('#target').attr('src', e.target.result);
 			$('#target').removeClass('hide');
@@ -74,13 +77,19 @@ function initiateJcrop(input) {
 				selected_h = 100;
 			}
 			
+			
+			var originalWidth = $('#target').attr('data-original-width');
+			var boxWidth = $('#target').width();
+			
+			var boxToOriginalRatio = originalWidth / boxWidth;
+			
 			var formData = new FormData();
-			formData.append("selected_x", Math.round(selected_x));
-			formData.append("selected_y", Math.round(selected_y));
-			formData.append("selected_w", Math.round(selected_w));
-			formData.append("selected_h", Math.round(selected_h));
-			formData.append("width", Math.round($('#target').width()));
-			formData.append("height", Math.round($('#target').height()));
+			formData.append("selected_x", Math.round(selected_x * boxToOriginalRatio));
+			formData.append("selected_y", Math.round(selected_y * boxToOriginalRatio));
+			formData.append("selected_w", Math.round(selected_w * boxToOriginalRatio));
+			formData.append("selected_h", Math.round(selected_h * boxToOriginalRatio));
+			formData.append("width", Math.round($('#target').width() * boxToOriginalRatio));
+			formData.append("height", Math.round($('#target').height() * boxToOriginalRatio));
 			formData.append("imageFileName", $('#prof-image').prop("files")[0].name);
 			formData.append("imageBase64", dataurl);
 			
