@@ -708,4 +708,8 @@ public interface OrganizationManagementService {
 
 	public Map<Long, OrganizationUnitSettings> getSettingsMapWithLinkedinImage(
 			String string);
+
+	public void removeOrganizationUnitSettings( Long idToRemove, String collectionName );
+	
+    public void removeOrganizationUnitSettings( List<Long> idsToRemove, String collectionName );
 }
