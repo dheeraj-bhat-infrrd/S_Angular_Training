@@ -152,18 +152,28 @@
 </div>
 </form>
 <script>
+var selectedCountryRegEx = "";
 $(document).ready(function(){
 	var stateList;
 	var cityLookupList;
+	var countryCode = "US";
 	
-	var countryCode = $('#office-country-code').val();
-	 if(countryCode == "US"){
-	 	showStateCityRow();
-	 }else{
+	if($('#office-country-code').val() != undefined && $('#office-country-code').val() != ""){
+		countryCode = $('#office-country-code').val();	 
+	}
+	if(countryCode == "US"){
+		showStateCityRow();
+		if( $('#office-country').val() == null || $('#office-country').val() == "" ){
+			$('#office-country').val("United States");
+			$('#office-country-code').val(countryCode);
+		}
+		selectedCountryRegEx = "^" + "\\b\\d{5}\\b(?:[- ]{1}\\d{4})?" + "$";
+		selectedCountryRegEx = new RegExp(selectedCountryRegEx);
+	}else{
 		hideStateCityRow();
-	 }
+	}
 	 
-	 $('.bd-check-img').click(function(e) {
+	$('.bd-check-img').click(function(e) {
 		 $(this).toggleClass('bd-check-img-checked');
 		/**
 		 * If class is "bd-check-img-checked", check box is unchecked ,
@@ -175,7 +185,7 @@ $(document).ready(function(){
 		 else {
 			$(this).next("#is-admin-chk").val("true");
 		 }
-   });
+	 });
 	$("#office-country").autocomplete({
 		minLength: 1,
 		source: countryData,
