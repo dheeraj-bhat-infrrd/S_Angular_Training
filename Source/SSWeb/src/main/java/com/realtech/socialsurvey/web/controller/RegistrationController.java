@@ -7,10 +7,8 @@ import java.net.URLEncoder;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,7 +20,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
-
 import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.entities.User;
 import com.realtech.socialsurvey.core.entities.VerticalsMaster;
@@ -365,17 +362,7 @@ public class RegistrationController
              */
             try {
                 LOG.debug( "Registering user with emailId : " + emailId );
-                User user = userManagementService.addCorporateAdminAndUpdateStage( firstName, lastName, emailId,
-                    confirmPassword, isDirectRegistration );
-                LOG.debug( "Succesfully completed registration of user with emailId : " + emailId );
-
-                LOG.debug( "Adding newly added user {} to mongo", user.getFirstName() );
-                userManagementService.insertAgentSettings( user );
-                LOG.debug( "Added newly added user {} to mongo", user.getFirstName() );
-
-                LOG.debug( "Adding newly added user {} to solr", user.getFirstName() );
-                solrSearchService.addUserToSolr( user );
-                LOG.debug( "Added newly added user {} to solr", user.getFirstName() );
+                userManagementService.addCorporateAdmin( firstName, lastName, emailId, confirmPassword, isDirectRegistration );
 
                 LOG.debug( "Adding newly registered user to principal session" );
                 sessionHelper.loginOnRegistration( emailId, password );

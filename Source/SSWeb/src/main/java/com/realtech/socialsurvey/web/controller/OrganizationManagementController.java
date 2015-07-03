@@ -134,7 +134,7 @@ public class OrganizationManagementController
         try {
             logoName = fileUploadService.fileUploadHandler( fileLocal, request.getParameter( "logo_name" ) );
             // Setting the complete logo url in session
-            logoName = endpoint + "/" + logoName;
+            logoName = endpoint + CommonConstants.FILE_SEPARATOR + logoName;
 
             LOG.debug( "Setting Logo image name to Session" );
             request.getSession( false ).setAttribute( CommonConstants.LOGO_NAME, logoName );
