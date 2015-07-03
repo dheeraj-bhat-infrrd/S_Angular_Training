@@ -1343,9 +1343,9 @@ public class DashboardController {
 			default:
 				LOG.error("Invalid value " + field
 						+ " passed for field. It should be either of "
-						+ CommonConstants.COMPANY_ID_COLUMN + "/"
-						+ CommonConstants.REGION_ID_COLUMN + "/"
-						+ CommonConstants.BRANCH_ID_COLUMN + "/"
+						+ CommonConstants.COMPANY_ID_COLUMN + CommonConstants.FILE_SEPARATOR
+						+ CommonConstants.REGION_ID_COLUMN + CommonConstants.FILE_SEPARATOR
+						+ CommonConstants.BRANCH_ID_COLUMN + CommonConstants.FILE_SEPARATOR
 						+ CommonConstants.AGENT_ID_COLUMN);
 			}
 		} catch (NullPointerException e) {

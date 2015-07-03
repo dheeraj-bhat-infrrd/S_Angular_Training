@@ -486,7 +486,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
         companySettings.setVertical( organizationalDetails.get( CommonConstants.VERTICAL ) );
         companySettings.setContact_details( contactDetailSettings );
         companySettings.setProfileName( generateProfileNameForCompany( company.getCompany(), company.getCompanyId() ) );
-        companySettings.setProfileUrl( "/" + companySettings.getProfileName() );
+        companySettings.setProfileUrl(CommonConstants.FILE_SEPARATOR + companySettings.getProfileName() );
         companySettings.setCreatedOn( System.currentTimeMillis() );
         companySettings.setCreatedBy( String.valueOf( user.getUserId() ) );
         companySettings.setModifiedOn( System.currentTimeMillis() );
