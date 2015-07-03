@@ -747,3 +747,10 @@ function linkedInDataImport() {
 		}
 	}, true);
 }
+function  convertTimeStampToLocalTimeStamp(generalTimestamp){
+	var convertedTimestamp= generalTimestamp.getTime() + (new Date().getTimezoneOffset())*60*1000 ;
+	var date3=new Date(convertedTimestamp);
+	console.info((date3.getMonth() + 1) + '/' + date3.getDate() + '/' +  date3.getFullYear());
+	var date4= date3.getFullYear() +'-'+(date3.getMonth() + 1)+'-'+ date3.getDate()+" "+date3.getHours()+":"+date3.getMinutes()+":"+ date3.getSeconds()+"."+date3.getMilliseconds() ;
+	return date4;
+}
