@@ -1954,10 +1954,18 @@ function validateUserEmailTextArea(elementId) {
 
 function validateUserSelection(elementId,hiddenElementId) {
 	if ($('#'+elementId).val() != "") {
+		var emailId = $('#'+elementId).val();
+		if(emailId.indexOf('"') > -1){
+			emailId = emailId.split('"').join("");
+		}
+		if(emailId.indexOf("<") > -1){
+			emailId = emailId.substring(emailId.indexOf("<")+1,emailId.indexOf(">"))
+		}
 		if($("#"+hiddenElementId).val() != ""){
 			return true;
 		}
-		else if (emailRegex.test($('#'+elementId).val()) == true) {
+		
+		else if (emailRegex.test(emailId) == true) {
 			return true;
 		}
 		else {
@@ -3170,7 +3178,7 @@ function saveTextForMoodFlow(content, mood){
 	};
 	callAjaxGetWithPayloadData("./storetextforflow.do", function(data) {
 		if (data == "success") {
-			$('#overlay-toast').html("Content added successfully!");
+			$('#overlay-toast').html("Content updated successfully!");
 		} else {
 			$('#overlay-toast').html("Oops! Something went wrong. Please try again later.");
 		}
