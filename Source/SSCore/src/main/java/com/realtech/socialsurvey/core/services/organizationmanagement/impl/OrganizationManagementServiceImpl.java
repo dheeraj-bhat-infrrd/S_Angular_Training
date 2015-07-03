@@ -1732,6 +1732,9 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
         LOG.info( "Method getUsersFromEmailIds called for emailIdsArray:" + emailIdsArray );
         List<User> users = new ArrayList<User>();
         for ( String emailId : emailIdsArray ) {
+            if(emailId.contains( "\"" )){
+                emailId = emailId.replace( "\"", "" );
+            }
             String firstName = "";
             String lastName = "";
             User user = null;
