@@ -6,7 +6,9 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
 import com.realtech.socialsurvey.core.entities.Achievement;
+import com.realtech.socialsurvey.core.entities.AgentRankingReport;
 import com.realtech.socialsurvey.core.entities.AgentSettings;
 import com.realtech.socialsurvey.core.entities.Association;
 import com.realtech.socialsurvey.core.entities.CompanyPositions;
@@ -404,4 +406,6 @@ public interface ProfileManagementService {
 	public void updateVertical(String collection, OrganizationUnitSettings companySettings, String vertical) throws InvalidInputException;
 	
 	public void updateCompanyName(long userId, long companyId, String companyName) throws InvalidInputException;
+
+    public List<AgentRankingReport> getAgentReport( long iden, String profileLevel, Date startDate, Date endDate, Object object ) throws InvalidInputException;
 }

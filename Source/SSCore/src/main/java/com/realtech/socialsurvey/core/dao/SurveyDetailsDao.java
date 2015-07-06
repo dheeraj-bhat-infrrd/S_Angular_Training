@@ -4,6 +4,8 @@ import java.text.ParseException;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+
+import com.realtech.socialsurvey.core.entities.AgentRankingReport;
 import com.realtech.socialsurvey.core.entities.SurveyDetails;
 import com.realtech.socialsurvey.core.entities.SurveyResponse;
 
@@ -73,5 +75,9 @@ public interface SurveyDetailsDao {
 	public void changeStatusOfSurvey(long agentId, String customerEmail, boolean editable);
 
 	public void updateReminderCountForSocialPost(Long agentId, String customerEmail);
+
+    public void getAverageScore( Date startDate, Date endDate, Map<Long, AgentRankingReport> agentReportData, String columnName, long columnValue );
+
+    public void getCompletedSurveysCount( Date startDate, Date endDate, Map<Long, AgentRankingReport> agentReportData, String colunmName, long columnValue );
 
 }
