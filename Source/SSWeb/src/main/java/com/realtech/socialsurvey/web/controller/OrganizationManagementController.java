@@ -493,9 +493,6 @@ public class OrganizationManagementController
         if ( unitSettings != null && unitSettings.getSurvey_settings() != null ) {
             model.addAttribute( "autoPostEnabled", unitSettings.getSurvey_settings().isAutoPostEnabled() );
         }
-        if(unitSettings.getSurvey_settings().getSurvey_reminder_interval_in_days() == 0 ){
-        	unitSettings.getSurvey_settings().setSurvey_reminder_interval_in_days(CommonConstants.DEFAULT_REMINDERMAIL_INTERVAL);
-        }
         SurveySettings surveySettings = organizationManagementService.retrieveDefaultSurveyProperties();
         model.addAttribute( "defaultSurveyProperties", surveySettings );
         session.setAttribute( CommonConstants.USER_ACCOUNT_SETTINGS, unitSettings );
