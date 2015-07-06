@@ -23,6 +23,7 @@ import org.springframework.stereotype.Repository;
 import com.mongodb.BasicDBObject;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.dao.OrganizationUnitSettingsDao;
+import com.realtech.socialsurvey.core.entities.AgentRankingReport;
 import com.realtech.socialsurvey.core.entities.AgentSettings;
 import com.realtech.socialsurvey.core.entities.FeedIngestionEntity;
 import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
@@ -336,6 +337,29 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
 		}
 		return settingsMap;
 	}
+	
+
+    @Override
+    public void setAgentNames( Map<Long, AgentRankingReport> agentsReport )
+    {
+        LOG.info( "Method setAgentNames() started." );
+        Set<Long> agentIds = agentsReport.keySet();
+        List<AgentSettings> agentSEttings = fetchMultipleAgentSettingsById(new ArrayList<Long>(agentIds));
+        for ( AgentSettings setting : agentSEttings ) {
+            if(agentsReport.get(setting.getIden()) != null){
+                try{
+                agentsReport.get(setting.getIden()).setAgentFirstName( setting.getContact_details().getFirstName() );
+                agentsReport.get(setting.getIden()).setAgentLastName( setting.getContact_details().getLastName() );
+                }catch(NullPointerException e){
+                    LOG.error( "Null Pointer exception caught in setAgentNames(). NEsted exception is ", e );
+                    LOG.debug( "Continuing..." );
+                    continue;
+                }
+            }
+        }
+        LOG.info( "Method setAgentNames() finished." );
+    }
+
 
 	/*
 	 * Method to set complete profile URL for each of the setting being fetched.

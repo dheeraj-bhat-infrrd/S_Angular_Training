@@ -1,8 +1,12 @@
 package com.realtech.socialsurvey.core.dao;
 
 import java.sql.Timestamp;
+import java.util.Date;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
+
+import com.realtech.socialsurvey.core.entities.AgentRankingReport;
 import com.realtech.socialsurvey.core.entities.SurveyPreInitiation;
 import com.realtech.socialsurvey.core.entities.integration.EngagementProcessingStatus;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
@@ -30,5 +34,7 @@ public interface SurveyPreInitiationDao extends GenericDao<SurveyPreInitiation, 
 			boolean isCompanyAdmin, long companyId) throws InvalidInputException;
 
 	public List<SurveyPreInitiation> getIncompleteSurveyForReminder(long companyId, int surveyReminderInterval, int maxReminders);
+
+    public void getIncompleteSurveysCount( Date startDate, Date endDate, Map<Long, AgentRankingReport> agentReportData );
 
 }
