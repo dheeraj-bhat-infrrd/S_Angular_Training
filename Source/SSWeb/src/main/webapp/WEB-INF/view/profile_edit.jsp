@@ -142,10 +142,14 @@
 
 					<c:if test="${accountMasterId != 5}">
 						<div id="prof-edit-social-link" class="prof-edit-social-link float-right hm-hr-row-right clearfix">
-							<div id="icn-fb" class="float-left social-item-icon icn-fb" data-link="${facebookToken.facebookPageLink}" title="Facebook"></div>
+							<%-- <div id="icn-fb" class="float-left social-item-icon icn-fb" data-link="${facebookToken.facebookPageLink}" title="Facebook"></div>
 							<div id="icn-twit" class="float-left social-item-icon icn-twit" data-link="${twitterToken.twitterPageLink}" title="Twitter"></div>
 							<div id="icn-lin" class="float-left social-item-icon icn-lin" data-link="${linkedInToken.linkedInPageLink}" title="LinkedIn"></div>
-                            <div id="icn-gplus" class="float-left social-item-icon icn-gplus" data-link="${googleToken.profileLink}" title="Google+"></div>
+                            <div id="icn-gplus" class="float-left social-item-icon icn-gplus" data-link="${googleToken.profileLink}" title="Google+"></div> --%>
+							<div id="icn-fb" class="float-left social-item-icon icn-fb" onclick="openAuthPage('facebook');" title="Facebook"></div>
+							<div id="icn-twit" class="float-left social-item-icon icn-twit" onclick="openAuthPage('twitter');" title="Twitter"></div>
+							<div id="icn-lin" class="float-left social-item-icon icn-lin" onclick="openAuthPage('linkedin');" title="LinkedIn"></div>
+                            <div id="icn-gplus" class="float-left social-item-icon icn-gplus" onclick="openAuthPage('google');" title="Google+"></div>
 							<div id="icn-yelp" class="float-left social-item-icon icn-yelp" data-link="${yelpToken.yelpPageLink}" title="Yelp"></div>
 							<div id="icn-zillow" class="float-left social-item-icon icn-zillow" data-link="${zillowToken.zillowProfileLink}" title="Zillow"></div>
 							<div id="icn-lendingtree" class="float-left social-item-icon icn-lendingtree" data-link="${lendingTreeToken.lendingTreeProfileLink}" title="LendingTree"></div>

@@ -83,7 +83,7 @@
 							<c:otherwise>
 							<div class="rfr_txt_fld">
 								<input class="rfr_input_fld" id="reg-email" data-non-empty="true" data-email="true" name="emailid"
-									value="${emailid}" placeholder='<spring:message code="label.emailid.key" />'>
+									value="${emailid}" placeholder='<spring:message code="label.emailid.key" />' readonly="readonly">
 							</div>
 							</c:otherwise>
 						</c:choose>

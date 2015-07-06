@@ -6528,7 +6528,7 @@ function callBackUpdateHobbies(data) {
 
 
 // Update Social links - facebook
-$('body').on('click', '#prof-edit-social-link .icn-fb', function() {
+/*$('body').on('click', '#prof-edit-social-link .icn-fb', function() {
 	$('#social-token-text').show();
 	var link = $(this).attr('data-link');
 	$('#social-token-text').attr({
@@ -6549,10 +6549,10 @@ function updateFacebookLink(link) {
 		$('#overlay-toast').html("Enter a valid url");
 		showToast();
 	}
-}
+}*/
 
 // Update Social links - twitter
-$('body').on('click', '#prof-edit-social-link .icn-twit', function() {
+/*$('body').on('click', '#prof-edit-social-link .icn-twit', function() {
 	$('#social-token-text').show();
 	var link = $(this).attr("data-link");
 	$('#social-token-text').attr({
@@ -6573,10 +6573,10 @@ function updateTwitterLink(link) {
 		$('#overlay-toast').html("Enter a valid url");
 		showToast();
 	}
-}
+}*/
 
 // Update Social links - linkedin
-$('body').on('click', '#prof-edit-social-link .icn-lin', function() {
+/*$('body').on('click', '#prof-edit-social-link .icn-lin', function() {
 	$('#social-token-text').show();
 	var link = $(this).attr("data-link");
 	$('#social-token-text').attr({
@@ -6597,10 +6597,10 @@ function updateLinkedInLink(link) {
 		$('#overlay-toast').html("Enter a valid url");
 		showToast();
 	}
-}
+}*/
 
 // Update Social links - google plus
-$('body').on('click', '#prof-edit-social-link .icn-gplus', function() {
+/*$('body').on('click', '#prof-edit-social-link .icn-gplus', function() {
 	$('#social-token-text').show();
 	var link = $(this).attr("data-link");
 	$('#social-token-text').attr({
@@ -6621,7 +6621,7 @@ function updateGoogleLink(link) {
 		$('#overlay-toast').html("Enter a valid url");
 		showToast();
 	}
-}
+}*/
 
 // Update Social links - yelp
 $('body').on('click', '#prof-edit-social-link .icn-yelp', function() {
@@ -6636,7 +6636,7 @@ $('body').on('click', '#prof-edit-social-link .icn-yelp', function() {
 
 function updateYelpLink(link) {
 	var payload = {
-		"yelplink" : link	
+		"yelplink" : link
 	};
 	if (isValidUrl(link)) {
 		callAjaxPostWithPayloadData("./updateyelplink.do", callBackUpdateSocialLink, payload);
@@ -6660,7 +6660,7 @@ $('body').on('click', '#prof-edit-social-link .icn-zillow', function() {
 
 function updateZillowLink(link) {
 	var payload = {
-		"zillowlink" : link	
+		"zillowlink" : link
 	};
 	if (isValidUrl(link)) {
 		callAjaxPostWithPayloadData("./updatezillowlink.do", callBackUpdateSocialLink, payload);
@@ -6684,7 +6684,7 @@ $('body').on('click', '#prof-edit-social-link .icn-lendingtree', function() {
 
 function updateLendingTreeLink(link) {
 	var payload = {
-		"lendingTreeLink" : link	
+		"lendingTreeLink" : link
 	};
 	if (isValidUrl(link)) {
 		callAjaxPostWithPayloadData("./updatelendingtreelink.do", callBackUpdateSocialLink, payload);
@@ -7105,7 +7105,7 @@ function paintPosts(posts) {
 				+ '<div class="tweet-text-main">' + post.postText + '</div>'
 				+ '<div class="tweet-text-link"><em>' + post.postedBy
 				+ '</em></div>' + '<div class="tweet-text-time"><em>'
-				+ new Date(post.timeInMillis).toUTCString() + '</em></div>'
+				+ convertUserDateToLocale(new Date(post.timeInMillis)) + '</em></div>'
 				+ '	</div>' + '</div>';
 	});
 
