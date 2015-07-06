@@ -8,10 +8,8 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
-
 import com.realtech.socialsurvey.core.enums.DisplayMessageType;
 import com.realtech.socialsurvey.core.exception.FatalException;
-import com.realtech.socialsurvey.core.exception.NoRecordsFetchedException;
 import com.realtech.socialsurvey.core.exception.UserSessionInvalidateException;
 import com.realtech.socialsurvey.core.services.organizationmanagement.ProfileNotFoundException;
 import com.realtech.socialsurvey.core.utils.DisplayMessageConstants;
@@ -50,8 +48,6 @@ public class GlobalErrorController {
 	public void handleNotFound(ProfileNotFoundException e) {
 		LOG.error("=====> RESOURCE NOT FOUND: " + e.getMessage(), e);
 	}
-	
-	
 
 	/**
 	 * Returns 401 UnAuthorised in case of UserSessionInvalidateException
