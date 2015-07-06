@@ -1,9 +1,12 @@
 package com.realtech.socialsurvey.core.dao.impl;
 
 import java.sql.Timestamp;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
+
 import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
 import org.hibernate.criterion.Order;
@@ -12,8 +15,10 @@ import org.hibernate.criterion.Restrictions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
+
 import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.dao.SurveyPreInitiationDao;
+import com.realtech.socialsurvey.core.entities.AgentRankingReport;
 import com.realtech.socialsurvey.core.entities.SurveyPreInitiation;
 import com.realtech.socialsurvey.core.entities.integration.EngagementProcessingStatus;
 import com.realtech.socialsurvey.core.exception.DatabaseException;
@@ -124,4 +129,41 @@ public class SurveyPreInitiationDaoImpl extends GenericDaoImpl<SurveyPreInitiati
 			throw new DatabaseException("Exception caught in getIncompleteSurveyForReminder() ", e);
 		}
 	}
+
+
+    @SuppressWarnings ( "unchecked")
+    @Override
+    public void getIncompleteSurveysCount( Date startDate, Date endDate, Map<Long, AgentRankingReport> agentReportData )
+    {
+        LOG.info( "Method getIncompleteSurveysCount() started" );
+        List<SurveyPreInitiation> surveys = new ArrayList<>();
+        Criteria criteria = getSession().createCriteria( SurveyPreInitiation.class );
+        try {
+            if ( startDate != null )
+                criteria.add( Restrictions.ge( CommonConstants.CREATED_ON, new Timestamp( startDate.getTime() ) ) );
+            if ( endDate != null )
+                criteria.add( Restrictions.le( CommonConstants.CREATED_ON, new Timestamp( endDate.getTime() ) ) );
+            surveys = criteria.list();
+        } catch ( HibernateException e ) {
+            LOG.error( "Exception caught in getIncomplgetIncompleteSurveysCounteteSurveyForReminder() ", e );
+            throw new DatabaseException( "Exception caught in getIncompleteSurveysCount() ", e );
+        }
+        for ( SurveyPreInitiation survey : surveys ) {
+            AgentRankingReport agentRankingReport = null;
+            if ( agentReportData.containsKey( survey.getAgentId() ) ) {
+                agentRankingReport = agentReportData.get( survey.getAgentId() );
+            } else {
+                agentRankingReport = new AgentRankingReport();
+                agentRankingReport.setAgentId( survey.getAgentId() );
+                agentRankingReport.setAgentName( survey.getAgentName() );
+            }
+            if ( startDate == null && endDate == null ) {
+                agentRankingReport.setAllTimeIncompleteSurveys( agentRankingReport.getAllTimeIncompleteSurveys() + 1 );
+            } else {
+                agentRankingReport.setIncompleteSurveys( agentRankingReport.getIncompleteSurveys() + 1 );
+            }
+            agentReportData.put( survey.getAgentId(), agentRankingReport );
+        }
+        LOG.info( "Method getIncompleteSurveysCount() finished" );
+    }
 }
