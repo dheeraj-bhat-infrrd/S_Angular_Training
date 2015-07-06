@@ -7105,7 +7105,7 @@ function paintPosts(posts) {
 				+ '<div class="tweet-text-main">' + post.postText + '</div>'
 				+ '<div class="tweet-text-link"><em>' + post.postedBy
 				+ '</em></div>' + '<div class="tweet-text-time"><em>'
-				+ new Date(post.timeInMillis).toUTCString() + '</em></div>'
+				+ convertUserDateToLocale(new Date(post.timeInMillis)) + '</em></div>'
 				+ '	</div>' + '</div>';
 	});
 
