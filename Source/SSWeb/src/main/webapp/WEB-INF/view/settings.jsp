@@ -130,16 +130,19 @@
 					<div class="bd-mcq-row clearfix txtareaRow">
 						<div class="float-left cs-gq-lbl"><spring:message code="label.flow.happy.label.text" /></div>
 						<textarea id="happy-text" class="float-left textarea-bd-mcq-txt" style=""></textarea>
+						<div class="float-left reset-icon cursor-pointer"><spring:message code="label.reset.key" /></div>
 					</div>
 					
 					<div class="bd-mcq-row clearfix txtareaRow">
 						<div class="float-left cs-gq-lbl"><spring:message code="label.flow.ok.label.text" /></div>
 						<textarea id="neutral-text" class="float-left textarea-bd-mcq-txt" style=""></textarea>
+						<div class="float-left reset-icon cursor-pointer"><spring:message code="label.reset.key" /></div>
 					</div>
 					
 					<div class="bd-mcq-row clearfix txtareaRow">
 						<div class="float-left cs-gq-lbl"><spring:message code="label.flow.sad.label.text" /></div>
 						<textarea id="sad-text" class="float-left textarea-bd-mcq-txt" style=""></textarea>
+						<div class="float-left reset-icon cursor-pointer"><spring:message code="label.reset.key" /></div>
 					</div>
 				</div>
 				<div class="um-gateway-cont">
@@ -148,16 +151,19 @@
 						<div class="bd-mcq-row clearfix txtareaRow">
 							<div class="float-left cs-gq-lbl"><spring:message code="label.complete.happy.label.text" /></div>
 							<textarea id="happy-text-complete" class="float-left textarea-bd-mcq-txt" style=""></textarea>
+							<div class="float-left reset-icon cursor-pointer"><spring:message code="label.reset.key" /></div>
 						</div>
 						
 						<div class="bd-mcq-row clearfix txtareaRow">
 							<div class="float-left cs-gq-lbl"><spring:message code="label.complete.ok.label.text" /></div>
 							<textarea id="neutral-text-complete" class="float-left textarea-bd-mcq-txt" style=""></textarea>
+							<div class="float-left reset-icon cursor-pointer"><spring:message code="label.reset.key" /></div>
 						</div>
 						
 						<div class="bd-mcq-row clearfix txtareaRow">
 							<div class="float-left cs-gq-lbl"><spring:message code="label.complete.sad.label.text" /></div>
 							<textarea id="sad-text-complete" class="float-left textarea-bd-mcq-txt" style=""></textarea>
+							<div class="float-left reset-icon cursor-pointer"><spring:message code="label.reset.key" /></div>
 						</div>
 					</div>
 				</div>
@@ -653,6 +659,32 @@ $(document).ready(function() {
 		saveTextForMoodFlow($("#sad-text-complete").val(), "sadComplete");
 	});
 
+	$('.reset-icon').click(function() {
+		var resetId = $(this).prev().attr('id');
+		var resetTag = "";
+		
+		if (resetId == 'happy-text') {
+			resetTag = 'happy';
+		}
+		else if (resetId == 'neutral-text') {
+			resetTag = 'neutral';
+		}
+		else if (resetId == 'sad-text') {
+			resetTag = 'sad';
+		}
+		else if (resetId == 'happy-text-complete') {
+			resetTag = 'happyComplete';
+		}
+		else if (resetId == 'neutral-text-complete') {
+			resetTag = 'neutralComplete';
+		}
+		else if (resetId == 'sad-text-complete') {
+			resetTag = 'sadComplete';
+		}
+		
+		resetTextForMoodFlow(resetTag, resetId);
+	});
+	
 	$('#atpst-chk-box').click(function() {
 		if ($('#atpst-chk-box').hasClass('bd-check-img-checked')) {
 			$('#atpst-chk-box').removeClass('bd-check-img-checked');
