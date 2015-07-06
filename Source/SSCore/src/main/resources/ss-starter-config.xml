@@ -176,9 +176,8 @@
 				<entry key="fileUploadService" value-ref="fileUploadService" />
 				<entry key="profileManagementService" value-ref="profileManagementService" />
 				<entry key="organizationManagementService" value-ref="organizationManagementService" />
-				<entry key="amazonEndPoint" value="${AMAZON_ENDPOINT}" />
-				<entry key="amazonBucket" value="${AMAZON_BUCKET}" />
 				<entry key="amazonImageBucket" value="${AMAZON_IMAGE_BUCKET}" />
+				<entry key="cdnUrl" value="${CDN_PATH}" />
 			</map>
 		</property>
 		<property name="durability" value="true" />

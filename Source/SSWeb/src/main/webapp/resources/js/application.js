@@ -7266,3 +7266,35 @@ $(document).on('blur', '#disclaimer-text', function() {
 		}, payload);
 	}
 });
+
+//Dashboard admin reports
+$(document).on('change','#download-survey-reports',function(){
+//	var selectedValue =
+});
+
+$(document).on('click','#dsh-dwnld-report-btn',function(){
+	var selectedValue = $('#download-survey-reports').val();
+	var startDate = $('#dsh-start-date').val();
+	var endDate = $("#dsh-end-date").val();
+	var key = parseInt(selectedValue);
+	switch (key) {
+	case 0:
+		console.log("complete-survey");
+		window.location.href = "/downloaddashboardcompletesurvey.do?columnName="+colName+"&startDate="+startDate+"&endDate="+endDate;
+		break;
+	case 1:
+		console.log("loan-officer-ranking");
+		window.location.href = "/downloadagentrankingreport.do?columnName="+colName+"&startDate="+startDate+"&endDate="+endDate;
+		break;
+	case 2:
+		console.log("customer-survey");
+		window.location.href = "/downloadcustomersurveyresults.do?columnName="+colName+"&startDate="+startDate+"&endDate="+endDate;
+		break;
+	case 3:
+		console.log("social-monitor");
+		window.location.href = "/downloaddashboardsocialmonitor.do?columnName="+colName+"&startDate="+startDate+"&endDate="+endDate;
+		break;
+	default:
+		break;
+	}
+});
