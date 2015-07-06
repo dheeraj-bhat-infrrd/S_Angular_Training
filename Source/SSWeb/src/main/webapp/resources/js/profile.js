@@ -1209,7 +1209,7 @@ function callBackPaintPublicPosts(data) {
 			+ '<div class="tweet-txt float-left">'
 				+ '<div class="tweet-text-main">' + post.postText + '</div>'
 				+ '<div class="tweet-text-link"><em>' + post.postedBy + '</em></div>'
-				+ '<div class="tweet-text-time"><em>' + new Date(post.timeInMillis).toUTCString() + '</em></div>'
+				+ '<div class="tweet-text-time"><em>' + convertUserDateToLocalWeekFormt( new Date(post.timeInMillis) )+ '</em></div>'
 			+ '	</div>'
 		+ '</div>';
 	});
