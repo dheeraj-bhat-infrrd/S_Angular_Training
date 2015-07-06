@@ -8,3 +8,10 @@ function convertUserDateToUTC(date) {
 			.getUTCDate(), date.getUTCHours(), date.getUTCMinutes(), date
 			.getUTCSeconds());
 }
+
+function convertUserDateToLocale(date){
+	console.info("date:"+date);
+	var convertedTimestamp= date.getTime() + (date.getTimezoneOffset())*60*1000 ;
+	console.info("Converted time zone:"+new Date(convertedTimestamp));
+	return new Date(convertedTimestamp);
+}
