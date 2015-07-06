@@ -38,9 +38,8 @@ public class ImageLoader extends QuartzJobBean {
 	private ProfileManagementService profileManagementService;
 	private FileUploadService fileUploadService;
 	
-	private String amazonEndPoint;
-    private String amazonBucket;
 	private String amazonImageBucket;
+	private String cdnUrl;
 	
 	@Override
 	protected void executeInternal(JobExecutionContext jobExecutionContext) {
@@ -153,7 +152,7 @@ public class ImageLoader extends QuartzJobBean {
 			throw e;
 		}
 
-		return amazonEndPoint + CommonConstants.FILE_SEPARATOR + amazonBucket + CommonConstants.FILE_SEPARATOR + amazonImageBucket + CommonConstants.FILE_SEPARATOR + fileName;
+		return cdnUrl + CommonConstants.FILE_SEPARATOR + amazonImageBucket + CommonConstants.FILE_SEPARATOR + fileName;
 	}
 
 	private void initializeDependencies(JobDataMap jobMap) {
@@ -161,8 +160,7 @@ public class ImageLoader extends QuartzJobBean {
 		fileUploadService = (FileUploadService) jobMap.get("fileUploadService");
 		profileManagementService = (ProfileManagementService) jobMap.get("profileManagementService");
 		
-		amazonEndPoint = (String) jobMap.get("amazonEndPoint");
-		amazonBucket = (String) jobMap.get("amazonBucket");
 		amazonImageBucket = (String) jobMap.get("amazonImageBucket");
+        cdnUrl = (String) jobMap.get("cdnUrl");
 	}
 }
