@@ -26,6 +26,7 @@ import org.springframework.stereotype.Component;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.dao.OrganizationUnitSettingsDao;
 import com.realtech.socialsurvey.core.dao.SurveyDetailsDao;
+import com.realtech.socialsurvey.core.entities.AgentRankingReport;
 import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
 import com.realtech.socialsurvey.core.entities.SurveyDetails;
 import com.realtech.socialsurvey.core.entities.SurveyPreInitiation;
@@ -486,6 +487,70 @@ public class DashboardServiceImpl implements DashboardService, InitializingBean 
                 else if (obj instanceof Date){
                     cell.setCellStyle(style);
                     cell.setCellValue((Date) obj);
+                }
+            }
+        }
+        return workbook;
+    }
+    
+
+    /*
+     * Method to create excel file from all the agents' detailed data.
+     */
+    @Override
+    public XSSFWorkbook downloadAgentRankingData( List<AgentRankingReport> agentDetails, String fileLocation )
+        throws IOException
+    {
+        // Blank workbook
+        XSSFWorkbook workbook = new XSSFWorkbook();
+
+        // Create a blank sheet
+        XSSFSheet sheet = workbook.createSheet();
+        XSSFDataFormat df = workbook.createDataFormat();
+        CellStyle style = workbook.createCellStyle();
+        style.setDataFormat( df.getFormat( "d-mm-yyyy" ) );
+        Integer counter = 1;
+        // This data needs to be written (List<Object>)
+        Map<String, List<Object>> data = new TreeMap<>();
+        List<Object> surveyDetailsToPopulate = new ArrayList<>();
+        for ( AgentRankingReport agentDetail : agentDetails ) {
+            surveyDetailsToPopulate.add( agentDetail.getAgentFirstName() );
+            surveyDetailsToPopulate.add( agentDetail.getAgentLastName() );
+            surveyDetailsToPopulate.add( agentDetail.getAllTimeAverageScore() );
+            surveyDetailsToPopulate.add( agentDetail.getAllTimeIncompleteSurveys() + agentDetail.getAllTimeCompletedSurveys() );
+            surveyDetailsToPopulate.add( agentDetail.getAverageScore() );
+            surveyDetailsToPopulate.add( agentDetail.getIncompleteSurveys() + agentDetail.getCompletedSurveys() );
+            data.put( ( ++counter ).toString(), surveyDetailsToPopulate );
+            surveyDetailsToPopulate = new ArrayList<>();
+        }
+        surveyDetailsToPopulate.add( "Loan Officer First" );
+        surveyDetailsToPopulate.add( "Loan Officer Last" );
+        surveyDetailsToPopulate.add( "Total Average Score" );
+        surveyDetailsToPopulate.add( "Total Surveys" );
+        surveyDetailsToPopulate.add( "Average Score for given period" );
+        surveyDetailsToPopulate.add( "Surveys over given period" );
+        data.put( "1", surveyDetailsToPopulate );
+
+        // Iterate over data and write to sheet
+        Set<String> keyset = data.keySet();
+        int rownum = 0;
+        for ( String key : keyset ) {
+            Row row = sheet.createRow( rownum++ );
+            List<Object> objArr = data.get( key );
+            int cellnum = 0;
+            for ( Object obj : objArr ) {
+                Cell cell = row.createCell( cellnum++ );
+                if ( obj instanceof String )
+                    cell.setCellValue( (String) obj );
+                else if ( obj instanceof Integer )
+                    cell.setCellValue( (Integer) obj );
+                else if ( obj instanceof Double )
+                    cell.setCellValue( (Double) obj );
+                else if ( obj instanceof Long )
+                    cell.setCellValue( (Long) obj );
+                else if ( obj instanceof Date ) {
+                    cell.setCellStyle( style );
+                    cell.setCellValue( (Date) obj );
                 }
             }
         }
