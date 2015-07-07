@@ -3182,6 +3182,23 @@ function updateAutoPostSetting(isautopostenabled){
 	});
 }
 
+function resetTextForMoodFlow(mood, resetId){
+	var payload = {
+		"mood" : mood
+	};
+	callAjaxGetWithPayloadData("./resettextforflow.do", function(data) {
+		var map =  $.parseJSON(data);
+
+		if (map.success == 1 && map.message) {
+			$('#' + resetId).val(map.message);
+			$('#overlay-toast').html("Content reverted successfully!");
+		} else {
+			$('#overlay-toast').html("Oops! Something went wrong. Please try again later.");
+		}
+		showToast();
+	}, payload, true);
+}
+
 function saveTextForMoodFlow(content, mood){
 	var payload = {
 		"text" : content,
@@ -7107,7 +7124,7 @@ function paintPosts(posts) {
 				+ '<div class="tweet-text-main">' + post.postText + '</div>'
 				+ '<div class="tweet-text-link"><em>' + post.postedBy
 				+ '</em></div>' + '<div class="tweet-text-time"><em>'
-				+ convertUserDateToLocale(new Date(post.timeInMillis)) + '</em></div>'
+				+ convertUserDateToLocalWeekFormt(new Date(post.timeInMillis)) + '</em></div>'
 				+ '	</div>' + '</div>';
 	});
 

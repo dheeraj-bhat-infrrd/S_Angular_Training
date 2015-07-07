@@ -131,10 +131,6 @@ public class SocialManagementController {
 	@Value("${GOOGLE_PROFILE_URI}")
 	private String googleProfileUri;
 
-	// Yelp
-	@Value("${YELP_REDIRECT_URI}")
-	private String yelpRedirectUri;
-
 	/**
 	 * Returns the social authorization page
 	 * 
@@ -1189,7 +1185,6 @@ public class SocialManagementController {
 					CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION);
 
 			if (settings.getSocialMediaTokens() != null && settings.getSocialMediaTokens().getYelpToken() != null) {
-				yelpUrl.put("host", yelpRedirectUri);
 				yelpUrl.put("relativePath", settings.getSocialMediaTokens().getYelpToken().getYelpPageLink());
 			}
 		}

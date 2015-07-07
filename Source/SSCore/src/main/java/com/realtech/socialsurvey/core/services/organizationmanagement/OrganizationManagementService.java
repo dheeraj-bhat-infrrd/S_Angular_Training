@@ -714,4 +714,6 @@ public interface OrganizationManagementService {
     public void removeOrganizationUnitSettings( List<Long> idsToRemove, String collectionName );
 	
 	public SurveySettings retrieveDefaultSurveyProperties();
+
+	public String resetDefaultSurveyText(SurveySettings surveySettings, String mood);
 }

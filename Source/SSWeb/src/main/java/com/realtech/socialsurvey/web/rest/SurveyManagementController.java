@@ -774,7 +774,6 @@ public class SurveyManagementController {
 
 			}
 			else {
-				yelpUrl.put("host", surveyHandler.getYelpShareUri());
 				yelpUrl.put("relativePath", settings.getSocialMediaTokens().getYelpToken().getYelpPageLink());
 			}
 		}

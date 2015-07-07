@@ -16,9 +16,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
 import javax.annotation.Resource;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
@@ -28,7 +26,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.DependsOn;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
-
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
@@ -3780,5 +3777,35 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 		return surveySettings;
 	}
 
+	@Override
+	public String resetDefaultSurveyText(SurveySettings surveySettings, String mood) {
+		if (mood.equalsIgnoreCase("happy")) {
+			surveySettings.setHappyText(happyText);
+			return happyText;
+		}
+		else if (mood.equalsIgnoreCase("neutral")) {
+			surveySettings.setNeutralText(neutralText);
+			return neutralText;
+		}
+		else if (mood.equalsIgnoreCase("sad")) {
+			surveySettings.setSadText(sadText);
+			return sadText;
+		}
+		else if (mood.equalsIgnoreCase("happyComplete")) {
+			surveySettings.setHappyTextComplete(happyTextComplete);
+			return happyTextComplete;
+		}
+		else if (mood.equalsIgnoreCase("neutralComplete")) {
+			surveySettings.setNeutralTextComplete(neutralTextComplete);
+			return neutralTextComplete;
+		}
+		else if (mood.equalsIgnoreCase("sadComplete")) {
+			surveySettings.setSadTextComplete(sadTextComplete);
+			return sadTextComplete;
+		}
+		else {
+			return "";
+		}
+	}
 }
 // JIRA: SS-27: By RM05: EOC
