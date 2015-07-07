@@ -7,6 +7,7 @@ public abstract class CRMInfo {
 
 	private String crm_source;
 	private boolean connection_successful;
+    private long companyId;
 
 	public String getCrm_source() {
 		return crm_source;
@@ -24,7 +25,17 @@ public abstract class CRMInfo {
 		this.connection_successful = connection_successful;
 	}
 
-	@Override
+	public long getCompanyId()
+    {
+        return companyId;
+    }
+
+    public void setCompanyId( long companyId )
+    {
+        this.companyId = companyId;
+    }
+
+    @Override
 	public String toString() {
 		return "crm_source: " + crm_source + "\t connection_successful: " + connection_successful;
 	}
