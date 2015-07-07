@@ -17,74 +17,96 @@ import com.realtech.socialsurvey.core.services.mail.UndeliveredEmailException;
 import com.realtech.socialsurvey.core.services.organizationmanagement.UserManagementService;
 import com.realtech.socialsurvey.core.services.surveybuilder.SurveyHandler;
 
-public class CrmDataAgentIdMapper extends QuartzJobBean {
 
-	public static final Logger LOG = LoggerFactory.getLogger(AccountDeactivator.class);
+public class CrmDataAgentIdMapper extends QuartzJobBean
+{
 
-	private SurveyHandler surveyHandler;
-	private EmailServices emailServices;
-	private UserManagementService userManagementService;
+    public static final Logger LOG = LoggerFactory.getLogger( AccountDeactivator.class );
 
-	@Override
-	protected void executeInternal(JobExecutionContext jobExecutionContext) throws JobExecutionException {
+    private SurveyHandler surveyHandler;
+    private EmailServices emailServices;
+    private UserManagementService userManagementService;
+    private String companyAdminEnabled;
+    private String adminEmailId;
+    private String adminName;
 
-		LOG.info("Executing CrmDataAgentIdMapper");
-		// initialize the dependencies
-		initializeDependencies(jobExecutionContext.getMergedJobDataMap());
-		Map<String, Object> corruptRecords = surveyHandler.mapAgentsInSurveyPreInitiation();
 
-		sendCorruptDataFromCrmNotificationMail(corruptRecords);
+    @Override
+    protected void executeInternal( JobExecutionContext jobExecutionContext ) throws JobExecutionException
+    {
 
-		LOG.info("Completed CrmDataAgentIdMapper");
+        LOG.info( "Executing CrmDataAgentIdMapper" );
+        // initialize the dependencies
+        initializeDependencies( jobExecutionContext.getMergedJobDataMap() );
+        Map<String, Object> corruptRecords = surveyHandler.mapAgentsInSurveyPreInitiation();
 
-	}
+        sendCorruptDataFromCrmNotificationMail( corruptRecords );
 
-	private void sendCorruptDataFromCrmNotificationMail(Map<String, Object> corruptRecords) {
-		@SuppressWarnings("unchecked") List<SurveyPreInitiation> unavailableAgents = (List<SurveyPreInitiation>) corruptRecords
-				.get("unavailableAgents");
-		@SuppressWarnings("unchecked") List<SurveyPreInitiation> customersWithoutFirstName = (List<SurveyPreInitiation>) corruptRecords
-				.get("customersWithoutFirstName");
-		@SuppressWarnings("unchecked") List<SurveyPreInitiation> customersWithoutEmailId = (List<SurveyPreInitiation>) corruptRecords
-				.get("customersWithoutEmailId");
-		@SuppressWarnings("unchecked") Set<Long> companies = (Set<Long>) corruptRecords.get("companies");
+        LOG.info( "Completed CrmDataAgentIdMapper" );
 
-		for (Long companyId : companies) {
+    }
 
-			String unavailableAgentsDetails = "";
-			String customersWithoutFirstNameDetails = "";
-			String customersWithoutEmailIdDetails = "";
 
-			for (SurveyPreInitiation survey : unavailableAgents) {
-				if (survey.getCompanyId() == companyId)
-					unavailableAgentsDetails += "Source Id " + survey.getSurveySourceId() + ", Source : " + survey.getSurveySource() + ";";
-			}
-			for (SurveyPreInitiation survey : customersWithoutFirstName) {
-				if (survey.getCompanyId() == companyId)
-					customersWithoutFirstNameDetails += "Source Id " + survey.getSurveySourceId() + ", Source : " + survey.getSurveySource() + ";";
-			}
-			for (SurveyPreInitiation survey : customersWithoutEmailId) {
-				if (survey.getCompanyId() == companyId)
-					customersWithoutEmailIdDetails += "Source Id " + survey.getSurveySourceId() + ", Source : " + survey.getSurveySource() + ";";
-			}
-			try {
-				if (!unavailableAgentsDetails.isEmpty() || !customersWithoutFirstNameDetails.isEmpty() || !customersWithoutEmailIdDetails.isEmpty()) {
-					User companyAdmin = userManagementService.getCompanyAdmin(companyId);
-					if (companyAdmin != null) {
-						emailServices.sendCorruptDataFromCrmNotificationMail(companyAdmin.getFirstName(), companyAdmin.getLastName(),
-										companyAdmin.getEmailId(), unavailableAgentsDetails, customersWithoutFirstNameDetails,
-										customersWithoutEmailIdDetails);
-					}
-				}
-			}
-			catch (InvalidInputException | UndeliveredEmailException e) {
-				LOG.error("Exception caught in sendCorruptDataFromCrmNotificationMail() while sending mail to company admin");
-			}
-		}
-	}
+    private void sendCorruptDataFromCrmNotificationMail( Map<String, Object> corruptRecords )
+    {
+        @SuppressWarnings ( "unchecked") List<SurveyPreInitiation> unavailableAgents = (List<SurveyPreInitiation>) corruptRecords
+            .get( "unavailableAgents" );
+        @SuppressWarnings ( "unchecked") List<SurveyPreInitiation> customersWithoutFirstName = (List<SurveyPreInitiation>) corruptRecords
+            .get( "customersWithoutFirstName" );
+        @SuppressWarnings ( "unchecked") List<SurveyPreInitiation> customersWithoutEmailId = (List<SurveyPreInitiation>) corruptRecords
+            .get( "customersWithoutEmailId" );
+        @SuppressWarnings ( "unchecked") Set<Long> companies = (Set<Long>) corruptRecords.get( "companies" );
 
-	private void initializeDependencies(JobDataMap jobMap) {
-		surveyHandler = (SurveyHandler) jobMap.get("surveyHandler");
-		emailServices = (EmailServices) jobMap.get("emailServices");
-		userManagementService = (UserManagementService) jobMap.get("userManagementService");
-	}
+        for ( Long companyId : companies ) {
+
+            String unavailableAgentsDetails = "";
+            String customersWithoutFirstNameDetails = "";
+            String customersWithoutEmailIdDetails = "";
+
+            for ( SurveyPreInitiation survey : unavailableAgents ) {
+                if ( survey.getCompanyId() == companyId )
+                    unavailableAgentsDetails += "Source Id " + survey.getSurveySourceId() + ", Source : "
+                        + survey.getSurveySource() + ";";
+            }
+            for ( SurveyPreInitiation survey : customersWithoutFirstName ) {
+                if ( survey.getCompanyId() == companyId )
+                    customersWithoutFirstNameDetails += "Source Id " + survey.getSurveySourceId() + ", Source : "
+                        + survey.getSurveySource() + ";";
+            }
+            for ( SurveyPreInitiation survey : customersWithoutEmailId ) {
+                if ( survey.getCompanyId() == companyId )
+                    customersWithoutEmailIdDetails += "Source Id " + survey.getSurveySourceId() + ", Source : "
+                        + survey.getSurveySource() + ";";
+            }
+            try {
+                if ( !unavailableAgentsDetails.isEmpty() || !customersWithoutFirstNameDetails.isEmpty()
+                    || !customersWithoutEmailIdDetails.isEmpty() ) {
+                    if ( companyAdminEnabled == "1" ) {
+                        User companyAdmin = userManagementService.getCompanyAdmin( companyId );
+                        if ( companyAdmin != null ) {
+                            emailServices.sendCorruptDataFromCrmNotificationMail( companyAdmin.getFirstName(),
+                                companyAdmin.getLastName(), companyAdmin.getEmailId(), unavailableAgentsDetails,
+                                customersWithoutFirstNameDetails, customersWithoutEmailIdDetails );
+                        }
+                    } else {
+                        emailServices.sendCorruptDataFromCrmNotificationMail( adminName, "", adminEmailId,
+                            unavailableAgentsDetails, customersWithoutFirstNameDetails, customersWithoutEmailIdDetails );
+                    }
+                }
+            } catch ( InvalidInputException | UndeliveredEmailException e ) {
+                LOG.error( "Exception caught in sendCorruptDataFromCrmNotificationMail() while sending mail to company admin" );
+            }
+        }
+    }
+
+
+    private void initializeDependencies( JobDataMap jobMap )
+    {
+        surveyHandler = (SurveyHandler) jobMap.get( "surveyHandler" );
+        emailServices = (EmailServices) jobMap.get( "emailServices" );
+        userManagementService = (UserManagementService) jobMap.get( "userManagementService" );
+        companyAdminEnabled = (String) jobMap.get( "companyAdminEnabled" );
+        adminEmailId = (String) jobMap.get( "adminEmailId" );
+        adminName = (String) jobMap.get( "adminName" );
+    }
 }

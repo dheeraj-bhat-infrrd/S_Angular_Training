@@ -531,6 +531,7 @@ public class OrganizationManagementController
             encompassCrmInfo.setConnection_successful( true );
             OrganizationUnitSettings companySettings = ( (UserSettings) session
                 .getAttribute( CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION ) ).getCompanySettings();
+            encompassCrmInfo.setCompanyId( companySettings.getIden() );
             organizationManagementService.updateCRMDetails( companySettings, encompassCrmInfo,
                 "com.realtech.socialsurvey.core.entities.EncompassCrmInfo" );
 
