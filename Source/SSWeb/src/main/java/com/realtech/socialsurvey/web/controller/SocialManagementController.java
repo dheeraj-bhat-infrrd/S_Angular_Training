@@ -1185,7 +1185,6 @@ public class SocialManagementController {
 					CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION);
 
 			if (settings.getSocialMediaTokens() != null && settings.getSocialMediaTokens().getYelpToken() != null) {
-				// yelpUrl.put("host", yelpRedirectUri);
 				yelpUrl.put("relativePath", settings.getSocialMediaTokens().getYelpToken().getYelpPageLink());
 			}
 		}
