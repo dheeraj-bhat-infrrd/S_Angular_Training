@@ -1004,8 +1004,10 @@ public class SurveyManagementController {
 
 		AgentSettings agentSettings = userManagementService.getUserSettings(agentId);
 		try {
-			if (agentSettings.getSocialMediaTokens().getYelpToken().getYelpPageLink() != null)
+			if (agentSettings.getSocialMediaTokens().getYelpToken().getYelpPageLink() != null){
 				surveyAndStage.put("yelpEnabled", true);
+				surveyAndStage.put("yelpLink", agentSettings.getSocialMediaTokens().getYelpToken().getYelpPageLink());
+			}
 			else
 				surveyAndStage.put("yelpEnabled", false);
 		}
@@ -1014,13 +1016,39 @@ public class SurveyManagementController {
 		}
 		
 		try {
-			if (agentSettings.getSocialMediaTokens().getGoogleToken().getProfileLink() != null)
+			if (agentSettings.getSocialMediaTokens().getGoogleToken().getProfileLink() != null){
 				surveyAndStage.put("googleEnabled", true);
+				surveyAndStage.put("googleLink", agentSettings.getSocialMediaTokens().getGoogleToken().getProfileLink());
+			}
 			else
 				surveyAndStage.put("googleEnabled", false);
 		}
 		catch (NullPointerException e) {
 			surveyAndStage.put("googleEnabled", false);
+		}
+		
+		try {
+			if (agentSettings.getSocialMediaTokens().getZillowToken().getZillowProfileLink() != null) {
+				surveyAndStage.put("zillowEnabled", true);
+				surveyAndStage.put("zillowLink", agentSettings.getSocialMediaTokens().getZillowToken().getZillowProfileLink());
+			}
+			else
+				surveyAndStage.put("zillowEnabled", false);
+		}
+		catch (NullPointerException e) {
+			surveyAndStage.put("zillowEnabled", false);
+		}
+		
+		try {
+			if (agentSettings.getSocialMediaTokens().getLendingTreeToken().getLendingTreeProfileLink() != null) {
+				surveyAndStage.put("lendingtreeEnabled", true);
+				surveyAndStage.put("lendingtreeLink", agentSettings.getSocialMediaTokens().getLendingTreeToken().getLendingTreeProfileLink());
+			}
+			else
+				surveyAndStage.put("lendingtreeEnabled", false);
+		}
+		catch (NullPointerException e) {
+			surveyAndStage.put("lendingtreeEnabled", false);
 		}
 		
 		surveyAndStage.put("agentFullProfileLink", getApplicationBaseUrl() + CommonConstants.AGENT_PROFILE_FIXED_URL + agentSettings.getProfileUrl());
