@@ -88,10 +88,6 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
 	@Value("${LINKED_IN_REST_API_URI}")
 	private String linkedInRestApiUri;
 	
-	// Yelp
-	@Value("${YELP_REDIRECT_URI}")
-	private String yelpRedirectUri;
-	
 	@Value("${APPLICATION_BASE_URL}")
 	private String applicationBaseUrl;
 	
