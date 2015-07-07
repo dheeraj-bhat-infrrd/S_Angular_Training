@@ -11,9 +11,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
 import javax.annotation.Resource;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
@@ -23,7 +21,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.DependsOn;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
-
 import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.commons.Utils;
 import com.realtech.socialsurvey.core.dao.BranchDao;
@@ -77,6 +74,7 @@ import com.realtech.socialsurvey.core.services.organizationmanagement.ProfileNot
 import com.realtech.socialsurvey.core.services.organizationmanagement.UserManagementService;
 import com.realtech.socialsurvey.core.services.search.SolrSearchService;
 import com.realtech.socialsurvey.core.services.search.exception.SolrException;
+import com.realtech.socialsurvey.core.utils.UrlValidationHelper;
 
 @DependsOn("generic")
 @Component
@@ -129,6 +127,9 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 
 	@Autowired
 	private URLGenerator urlGenerator;
+	
+	@Autowired
+	private UrlValidationHelper urlValidationHelper;
 
 	@Value("${APPLICATION_BASE_URL}")
 	private String applicationBaseUrl;
