@@ -7122,7 +7122,7 @@ function paintPosts(posts) {
 				+ '<div class="tweet-text-main">' + post.postText + '</div>'
 				+ '<div class="tweet-text-link"><em>' + post.postedBy
 				+ '</em></div>' + '<div class="tweet-text-time"><em>'
-				+ convertUserDateToLocale(new Date(post.timeInMillis)) + '</em></div>'
+				+ convertUserDateToLocalWeekFormt(new Date(post.timeInMillis)) + '</em></div>'
 				+ '	</div>' + '</div>';
 	});
 
