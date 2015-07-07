@@ -399,6 +399,12 @@
 		$('#prof-post-btn').unbind('click');
 		$('#prof-post-btn').click(function() {
 			var textContent = $('#status-body-text-edit').val().trim();
+			if (textContent == undefined || textContent == "") {
+				$('#overlay-toast').html("Please enter valid data to post");
+				showToast();
+				return;
+			}
+			
 			$('#status-body-text-edit').val('');
 			var payload = {
 				"text" : textContent
