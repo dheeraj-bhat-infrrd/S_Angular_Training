@@ -759,3 +759,10 @@ function  convertTimeStampToLocalTimeStamp(generalTimestamp){
 	var date4= date3.getFullYear() +'-'+month+'-'+ day +" "+hours+":"+ minutes +":"+ sec+"."+date3.getMilliseconds() ;
 	return date4;
 }
+
+function returnValidWebAddress(url) {
+	if (url && !url.match(/^http([s]?):\/\/.*/)) {
+		url = 'http://' + url;
+	}
+	return url;
+}

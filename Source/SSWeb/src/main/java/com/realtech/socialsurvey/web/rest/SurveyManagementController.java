@@ -1,5 +1,6 @@
 package com.realtech.socialsurvey.web.rest;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -48,6 +49,7 @@ import com.realtech.socialsurvey.core.services.surveybuilder.SurveyBuilder;
 import com.realtech.socialsurvey.core.services.surveybuilder.SurveyHandler;
 import com.realtech.socialsurvey.core.utils.DisplayMessageConstants;
 import com.realtech.socialsurvey.core.utils.MessageUtils;
+import com.realtech.socialsurvey.core.utils.UrlValidationHelper;
 import com.realtech.socialsurvey.web.common.ErrorCodes;
 import com.realtech.socialsurvey.web.common.ErrorResponse;
 import com.realtech.socialsurvey.web.common.JspResolver;
@@ -73,6 +75,9 @@ public class SurveyManagementController {
 	@Autowired
 	private URLGenerator urlGenerator;
 
+	@Autowired
+    private UrlValidationHelper urlValidationHelper;
+	
 	@Autowired
 	private SolrSearchService solrSearchService;
 
@@ -774,7 +779,15 @@ public class SurveyManagementController {
 
 			}
 			else {
-				yelpUrl.put("relativePath", settings.getSocialMediaTokens().getYelpToken().getYelpPageLink());
+				String validUrl = settings.getSocialMediaTokens().getYelpToken().getYelpPageLink();
+				try {
+					validUrl = urlValidationHelper.buildValidUrl(validUrl);
+				}
+				catch (IOException ioException) {
+					throw new InvalidInputException("Yelp link passed was invalid", DisplayMessageConstants.GENERAL_ERROR, ioException);
+				}
+
+				yelpUrl.put("relativePath", validUrl);
 			}
 		}
 		catch (NonFatalException e) {
