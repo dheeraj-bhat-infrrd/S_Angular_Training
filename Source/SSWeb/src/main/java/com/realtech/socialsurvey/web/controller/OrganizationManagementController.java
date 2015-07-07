@@ -1274,8 +1274,52 @@ public class OrganizationManagementController
         LOG.info( "Method to store text to be displayed to a customer after choosing the flow, storeTextForFlow() finished." );
         return status;
     }
+    
+    
+	/**
+	 * This controller is called to revert text to be displayed to a customer after choosing the
+	 * flow(happy/neutral/sad).
+	 * 
+	 * @param request
+	 * @param model
+	 * @return
+	 */
+	@ResponseBody
+	@RequestMapping(value = "/resettextforflow", method = RequestMethod.GET)
+	public String resetTextForFlow(HttpServletRequest request, Model model) {
+		LOG.info("Method to reset text to be displayed to a customer after choosing the flow, resetTextForFlow() started.");
+		User user = sessionHelper.getCurrentUser();
+		String message = "";
 
+		try {
+			String mood = request.getParameter("mood");
+			if (mood == null || mood.isEmpty()) {
+				LOG.error("Null or empty value found in resetTextForFlow() for mood.");
+				throw new InvalidInputException("Null or empty value found in resetTextForFlow() for mood.");
+			}
 
+			OrganizationUnitSettings companySettings = organizationManagementService.getCompanySettings(user);
+
+			SurveySettings surveySettings = companySettings.getSurvey_settings();
+			message = organizationManagementService.resetDefaultSurveyText(companySettings.getSurvey_settings(), mood);
+			organizationManagementService.updateSurveySettings(companySettings, surveySettings);
+			
+			message = makeJsonMessage(CommonConstants.STATUS_ACTIVE, message);
+
+			// Updating settings in session
+			HttpSession session = request.getSession();
+			UserSettings userSettings = (UserSettings) session.getAttribute(CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION);
+			if (userSettings != null)
+				userSettings.setCompanySettings(companySettings);
+		}
+		catch (NonFatalException e) {
+			LOG.error("Non fatal exception caught in resetTextForFlow(). Nested exception is ", e);
+		}
+
+		LOG.info("Method to reset text to be displayed to a customer after choosing the flow, resetTextForFlow() finished.");
+		return message;
+	}
+	
     @ResponseBody
     @RequestMapping ( value = "/getusstatelist", method = RequestMethod.GET)
     public String getUsStateList( HttpServletRequest request )
