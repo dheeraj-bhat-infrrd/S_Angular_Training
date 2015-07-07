@@ -569,6 +569,7 @@ html.is-modern.card-root.js.no-touch.csstransitions.svg.inlinesvg.placeholder
 	width: 145px;
 	/*  background: url(../images/userInfoLogo.png) no-repeat center;
     background-size: 100% auto; */
+    background-size: contain !important;
 }
 
 .user-info-seperator {
@@ -6861,4 +6862,12 @@ a.sq-btn-post-social:hover, a.sq-btn-post-social:visited {
     margin: 75px 0 0 10px;
     border-radius: 3px;
     cursor: pointer;
+}
+
+.sq-btn-post-social-btn {
+	margin: 10px auto;
+	display: block;
+}
+.sq-btn-post-social-btn:hover, .sq-btn-post-social-btn:visited {
+	color: #fff !important;
 }
