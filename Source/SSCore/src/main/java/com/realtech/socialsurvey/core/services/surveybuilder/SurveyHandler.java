@@ -75,8 +75,6 @@ public interface SurveyHandler {
 
 	public String getGoogleShareUri();
 	
-	public String getYelpShareUri();
-
 	public String getSurveyUrl(long agentId, String customerEmail, String baseUrl) throws InvalidInputException;
 
 	public void changeStatusOfSurvey(long agentId, String customerEmail, boolean editable);

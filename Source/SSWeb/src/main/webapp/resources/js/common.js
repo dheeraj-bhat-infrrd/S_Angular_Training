@@ -425,20 +425,20 @@ function shareOnYelp(agentId, location, yelpElement){
 		complete : function(data) {
 			data = data.responseJSON;
 			if (success) {
-				if(data.host!=undefined && data.relativePath!=undefined)
-					if(yelpElement==undefined){
-						window.open(data.host+data.relativePath);
-					}else{
-						yelpElement.href = data.host+data.relativePath;
+				if(data.relativePath != undefined)
+					if (yelpElement == undefined) {
+						window.open(data.relativePath);
+					} else {
+						yelpElement.href = data.relativePath;
 					}
-				else{
+				else {
 					$('#overlay-toast').html('Please setup your Yelp account to share.');
 					showToast();
 				}
 			}
 		},
 		error : function(e) {
-			if(e.status == 504) {
+			if (e.status == 504) {
 				redirectToLoginPageOnSessionTimeOut(e.status);
 				return;
 			}
