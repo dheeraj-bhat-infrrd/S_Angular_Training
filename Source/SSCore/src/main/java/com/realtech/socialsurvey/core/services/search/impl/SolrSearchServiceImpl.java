@@ -518,7 +518,7 @@ public class SolrSearchServiceImpl implements SolrSearchService {
 
 			String query = "";
 			if (!patternFirst.equals("") && !patternLast.equals("")) {
-				query = CommonConstants.USER_FIRST_NAME_SOLR + ":" + patternFirst + "*" + " OR " + CommonConstants.USER_LAST_NAME_SOLR + ":"
+				query = CommonConstants.USER_FIRST_NAME_SOLR + ":" + patternFirst + "*" + " AND " + CommonConstants.USER_LAST_NAME_SOLR + ":"
 						+ patternLast + "*";
 			}
 			else if (!patternFirst.equals("") && patternLast.equals("")) {
