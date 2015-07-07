@@ -98,6 +98,8 @@ var surveyUrl = "/rest/survey/";
 var editable;
 var yelpEnabled;
 var googleEnabled;
+var zillowEnabled;
+var lendingtreeEnabled;
 var agentProfileLink;
 var agentFullProfileLink;
 var companyLogo;
@@ -4723,8 +4725,37 @@ function paintSurveyPage(jsonData) {
 	autoPostScore = jsonData.responseJSON.autopostScore;
 	yelpEnabled = Boolean(jsonData.responseJSON.yelpEnabled);
 	googleEnabled = Boolean(jsonData.responseJSON.googleEnabled);
+	zillowEnabled = Boolean(jsonData.responseJSON.zillowEnabled);
+	lendingtreeEnabled = Boolean(jsonData.responseJSON.lendingtreeEnabled);
 	agentProfileLink = jsonData.responseJSON.agentProfileLink;
 	agentFullProfileLink = jsonData.responseJSON.agentFullProfileLink;
+	
+	
+	//If social token availiable populate the links
+	if(yelpEnabled) {
+		$('#ylp-btn').attr("href",jsonData.responseJSON.yelpLink);
+	} else {
+		$('#ylp-btn').remove();
+	}
+	
+	if(googleEnabled) {
+		$('#ggl-btn').attr("href",jsonData.responseJSON.googleLink);
+	} else {
+		$('#ggl-btn').remove();
+	}
+	
+	if(zillowEnabled) {
+		$('#zillow-btn').attr("href",jsonData.responseJSON.zillowLink);
+	} else {
+		$('#zillow-btn').remove();
+	}
+	
+	if(lendingtreeEnabled) {
+		$('#lt-btn').attr("href",jsonData.responseJSON.lendingtreeLink);
+	} else {
+		$('#lt-btn').remove();
+	}
+	
 	companyLogo = jsonData.responseJSON.companyLogo;
 	
 	if (stage != undefined)
@@ -5078,7 +5109,7 @@ function showMasterQuestionPage(){
 		}
 		if ($('#shr-post-chk-box').hasClass('bd-check-img') && (rating >= autoPostScore) && (Boolean(autoPost) == true)) {
 			postToSocialMedia(feedback);
-			$('#social-post-lnk').show();
+			/*$('#social-post-lnk').show();
 			if((mood == 'Great') && (yelpEnabled || googleEnabled) && !(yelpEnabled && googleEnabled)){
 				$('.sq-btn-social-wrapper').css({
 					"float" : "none",
@@ -5090,19 +5121,23 @@ function showMasterQuestionPage(){
 			}
 			if (yelpEnabled && (mood == 'Great')){
 				$('#ylp-btn').show();
-				var yelpElement = document.getElementById('ylp-btn');
-				shareOnYelp(agentId, window.location.origin+"/rest/survey/", yelpElement);
+				//var yelpElement = document.getElementById('ylp-btn');
+				//shareOnYelp(agentId, window.location.origin+"/rest/survey/", yelpElement);
 			}
 			else {
 				$('#ylp-btn').parent().remove();
 			}
 			if (googleEnabled && (mood == 'Great')){
 				$('#ggl-btn').show();
-				var googleElement = document.getElementById('ggl-btn');
-				shareOnGooglePlus(agentId, window.location.origin+"/rest/survey/", googleElement);
+				//var googleElement = document.getElementById('ggl-btn');
+				//shareOnGooglePlus(agentId, window.location.origin+"/rest/survey/", googleElement);
 			}
 			else {
 				$('#ggl-btn').parent().remove();
+			}*/
+			
+			if(mood == 'Great') {
+				$('#social-post-links').show();
 			}
 		}
 		
@@ -5606,6 +5641,16 @@ $('#ylp-btn').click(function(e) {
 $('#ggl-btn').click(function(e) {
 	//e.stopImmediatePropagation();
 	updateSharedOn("google", agentId, customerEmail);
+});
+
+$('#zillow-btn').click(function(e) {
+	//e.stopImmediatePropagation();
+	updateSharedOn("zillow", agentId, customerEmail);
+});
+
+$('#lt-btn').click(function(e) {
+	//e.stopImmediatePropagation();
+	updateSharedOn("lendingtree", agentId, customerEmail);
 });
 
 $('#shr-post-chk-box').click(function(){
