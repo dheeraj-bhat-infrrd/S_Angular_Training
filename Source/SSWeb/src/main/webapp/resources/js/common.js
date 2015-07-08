@@ -450,9 +450,9 @@ function shareOnYelp(agentId, location, yelpElement){
 }
 
 function shareOnGooglePlus(agentId, location, googleElement){
-	var success= false;
+	var success = false;
 	var payload = {
-			"agentId" : agentId
+		"agentId" : agentId
 	};
 	$.ajax({
 		url : location + "getgooglepluslinkrest",
@@ -466,23 +466,22 @@ function shareOnGooglePlus(agentId, location, googleElement){
 		complete : function(data) {
 			if (success) {
 				data = data.responseJSON;
-				if(data.host!=undefined && data.profileServer!=undefined && data.relativePath!=undefined){
-					if(googleElement==undefined){
-						window.open(data.host + data.profileServer
-								+ data.relativePath);
+				if (data.host != undefined && data.profileServer != undefined && data.relativePath != undefined) {
+					if (googleElement == undefined) {
+						window.open(data.host + data.profileServer + data.relativePath);
 					}
-					else{
+					else {
 						googleElement.href = data.host + data.profileServer + data.relativePath;
 					}
 				}
-				else{
+				else {
 					$('#overlay-toast').html('Please setup your Google+ account to share.');
 					showToast();
 				}
 			}
 		},
 		error : function(e) {
-			if(e.status == 504) {
+			if (e.status == 504) {
 				redirectToLoginPageOnSessionTimeOut(e.status);
 				return;
 			}
