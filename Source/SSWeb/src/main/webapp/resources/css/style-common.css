@@ -1976,6 +1976,10 @@ button.paypal.is-active {
 	background: url(../images/icnSave-Grey.png) no-repeat center;
 }
 
+.icn-blue-ellipse {
+	background: url(../images/ellipse.png) no-repeat center;
+}
+
 .btn-disabled {
 	background-color: #999 !important;
 	color: #fff !important;
