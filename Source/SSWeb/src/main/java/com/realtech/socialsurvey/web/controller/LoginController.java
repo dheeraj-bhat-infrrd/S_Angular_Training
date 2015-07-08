@@ -171,6 +171,14 @@ public class LoginController {
 			user = sessionHelper.getCurrentUser();
 			HttpSession session = request.getSession(true);
 
+			
+			//Check if super admin is logged in
+			
+			if(user.getSuperAdmin() == CommonConstants.STATUS_ACTIVE) {
+				return JspResolver.ADMIN_LANDING;
+			}
+			
+			
 			List<LicenseDetail> licenseDetails = user.getCompany().getLicenseDetails();
 			if (licenseDetails != null && !licenseDetails.isEmpty()) {
 
