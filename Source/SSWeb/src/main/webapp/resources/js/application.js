@@ -3816,6 +3816,7 @@ function searchUsersByNameEmailLoginId(searchKey) {
 
 function searchUsersByNameEmailLoginIdCallBack(data) {
 	$('#user-list').html(data);
+	bindEditUserClick();
 }
 
 /*function paintUsersList(data) {
