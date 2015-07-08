@@ -966,8 +966,83 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 
         return originalContentSettings;
     }
+    
+	@Override
+	public MailContentSettings revertSurveyParticipationMailBody(OrganizationUnitSettings companySettings, String mailCategory)
+			throws NonFatalException {
+		if (companySettings == null) {
+			throw new InvalidInputException("Company settings cannot be null.");
+		}
+		if (mailCategory == null) {
+			throw new InvalidInputException("Invalid mail category.");
+		}
+		LOG.debug("Reverting " + mailCategory + " for settings: " + companySettings.toString());
 
+		String mailBody = null;
+		String mailSubject = null;
+		List<String> paramOrder = null;
 
+		// TODO updating mail details
+		MailContentSettings originalContentSettings = companySettings.getMail_content();
+		if (mailCategory.equals(CommonConstants.SURVEY_MAIL_BODY_CATEGORY)) {
+			mailSubject = CommonConstants.SURVEY_MAIL_SUBJECT + "[AgentName]";
+			try {
+				mailBody = readMailContentFromFile(CommonConstants.SURVEY_REQUEST_MAIL_FILENAME);
+			}
+			catch (IOException e) {
+				throw new NonFatalException("Error occurred while parsing mail content.", DisplayMessageConstants.GENERAL_ERROR, e);
+			}
+			paramOrder = new ArrayList<String>(Arrays.asList(paramOrderTakeSurvey.split(",")));
+
+			MailContent mailContent = new MailContent();
+			mailContent.setMail_subject(mailSubject);
+			mailContent.setMail_body(mailBody);
+			mailContent.setParam_order(paramOrder);
+
+			originalContentSettings.setTake_survey_mail(mailContent);
+		}
+		else if (mailCategory.equals(CommonConstants.SURVEY_REMINDER_MAIL_BODY_CATEGORY)) {
+			mailSubject = CommonConstants.REMINDER_MAIL_SUBJECT + "[AgentName]";
+			try {
+				mailBody = readMailContentFromFile(CommonConstants.SURVEY_REMINDER_MAIL_FILENAME);
+			}
+			catch (IOException e) {
+				throw new NonFatalException("Error occurred while parsing mail content.", DisplayMessageConstants.GENERAL_ERROR, e);
+			}
+			paramOrder = new ArrayList<String>(Arrays.asList(paramOrderTakeSurveyReminder.split(",")));
+
+			MailContent mailContent = new MailContent();
+			mailContent.setMail_subject(mailSubject);
+			mailContent.setMail_body(mailBody);
+			mailContent.setParam_order(paramOrder);
+
+			originalContentSettings.setTake_survey_reminder_mail(mailContent);
+		}
+		else {
+			throw new InvalidInputException("Invalid mail category");
+		}
+
+		LOG.info("Reverting company settings mail content");
+		organizationUnitSettingsDao.updateParticularKeyOrganizationUnitSettings(MongoOrganizationUnitSettingDaoImpl.KEY_MAIL_CONTENT,
+				originalContentSettings, companySettings, MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION);
+		LOG.info("Reverting company settings mail content");
+
+		return originalContentSettings;
+	}
+
+	@Override
+	public ArrayList<String> getSurveyParamOrder(String mailCategory) throws InvalidInputException {
+		if (mailCategory.equals(CommonConstants.SURVEY_MAIL_BODY_CATEGORY)) {
+			return new ArrayList<String>(Arrays.asList(paramOrderTakeSurvey.split(",")));
+		}
+		else if (mailCategory.equals(CommonConstants.SURVEY_REMINDER_MAIL_BODY_CATEGORY)) {
+			return new ArrayList<String>(Arrays.asList(paramOrderTakeSurveyReminder.split(",")));
+		}
+		else {
+			throw new InvalidInputException("Invalid mail category");
+		}
+	}
+	
     @Override
     @Transactional
     public void addDisabledAccount( long companyId, boolean forceDisable ) throws InvalidInputException,
