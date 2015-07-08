@@ -60,7 +60,7 @@ namespace EncompassSocialSurvey.DAL
 
             string insertQuery = INSERT_QUERY;
             MySqlCommand commandToInsert = null;
-            
+
             try
             {
                 // if loand not present then and only then insert
@@ -76,7 +76,7 @@ namespace EncompassSocialSurvey.DAL
                     commandToInsert.Parameters.Add("?AGENT_ID", MySqlDbType.VarChar, 36).Value = loan.AgentId;
                     commandToInsert.Parameters.Add("?AGENT_NAME", MySqlDbType.VarChar, 100).Value = loan.AgentName;
                     commandToInsert.Parameters.Add("?AGENT_EMAILID", MySqlDbType.VarChar, 250).Value = loan.AgentEmailId;
-                    
+
                     commandToInsert.Parameters.Add("?CUSTOMER_FIRST_NAME", MySqlDbType.VarChar, 100).Value = loan.CustomerFirstName;
                     commandToInsert.Parameters.Add("?CUSTOMER_LAST_NAME", MySqlDbType.VarChar, 100).Value = loan.CustomerLastName;
                     commandToInsert.Parameters.Add("?CUSTOMER_EMAIL_ID", MySqlDbType.VarChar, 250).Value = loan.CustomerEmailId;
@@ -141,7 +141,8 @@ namespace EncompassSocialSurvey.DAL
 
         public bool IsSurveySourceIdExists(LoanEntity loan, MySqlConnection mySqlDbConnection)
         {
-            Logger.Info("Entering the method LoanRepository.IsSurveySourceIdExists()");
+            Logger.Info("Entering the method LoanRepository.IsSurveySourceIdExists(): SURVEY_SOURCE_ID: " + loan.SurveySourceId
+                 + " : CUSTOMER_EMAIL_ID :  " + loan.CustomerEmailId + " : CUSTOMER_FIRST_NAME : " + loan.CustomerFirstName);
             bool returnValue = false;
 
             string sqlQuery = SELECT_QUERY;
@@ -176,7 +177,16 @@ namespace EncompassSocialSurvey.DAL
                 if (null != commandToSelect) { commandToSelect.Dispose(); }
             }
 
-            Logger.Info("Exiting the method LoanRepository.IsSurveySourceIdExists()");
+            if (returnValue)
+            {
+                Logger.Info("Exiting the method LoanRepository.IsSurveySourceIdExists(): Records already present in database: don't insert: SURVEY_SOURCE_ID: " + loan.SurveySourceId
+                     + " : CUSTOMER_EMAIL_ID :  " + loan.CustomerEmailId + " : CUSTOMER_FIRST_NAME : " + loan.CustomerFirstName);
+            }
+            else
+            {
+                Logger.Info("Exiting the method LoanRepository.IsSurveySourceIdExists(): SURVEY_SOURCE_ID: " + loan.SurveySourceId
+                    + " : CUSTOMER_EMAIL_ID :  " + loan.CustomerEmailId + " : CUSTOMER_FIRST_NAME : " + loan.CustomerFirstName);
+            }
             return returnValue;
         }
     }

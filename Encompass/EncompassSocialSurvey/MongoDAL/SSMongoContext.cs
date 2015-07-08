@@ -1,4 +1,5 @@
-﻿using MongoDB.Driver;
+﻿using MongoDB.Bson.Serialization;
+using MongoDB.Driver;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -40,6 +41,21 @@ namespace EncompassSocialSurvey.MongoDAL
             }
         }
 
+        private static string MongoCompanyInfoCollection
+        {
+            get
+            {
+                string dbName = "";
+                if (false == string.IsNullOrWhiteSpace(System.Configuration.ConfigurationManager.AppSettings["MongoCompanyInfoCollection"]))
+                {
+                    dbName = System.Configuration.ConfigurationManager.AppSettings["MongoCompanyInfoCollection"];
+                }
+
+                return dbName;
+            }
+        }
+
+
         public SSMongoContext()
         {
             //var client = new MongoClient(SSMongoContext.MongoConnectionString);
@@ -55,8 +71,31 @@ namespace EncompassSocialSurvey.MongoDAL
         {
             get
             {
-                return this.Database.GetCollection<SoicalSurveryCompanyInfo>("company_settings");
+                // Ignore the extra element
+                //
+                BsonClassMappToIgnoreExtraElement();
+                //
+                return this.Database.GetCollection<SoicalSurveryCompanyInfo>(SSMongoContext.MongoCompanyInfoCollection);
             }
+        }
+
+        /// <summary>
+        /// Mongo is schema less, and it works based on parent collection, but in this case we're interested in child object company_info
+        /// So it's better the ignore the rest of the fields from based (parent) collection
+        /// </summary>
+        public static void BsonClassMappToIgnoreExtraElement()
+        {
+            BsonClassMap.RegisterClassMap<SoicalSurveryCompanyInfo>(map =>
+            {
+                map.AutoMap();
+                map.SetIgnoreExtraElements(true);
+
+                BsonClassMap.RegisterClassMap<CrmInfo>(childMap =>
+                {
+                    childMap.AutoMap();
+                    childMap.SetIgnoreExtraElements(true);
+                });
+            });
         }
     }
 

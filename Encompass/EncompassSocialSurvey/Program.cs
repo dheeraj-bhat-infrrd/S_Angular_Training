@@ -17,6 +17,10 @@ namespace EncompassSocialSurvey
 
             try
             {
+                //var stringDecrypted = CommonUtility.Decrypt("", "86e25dfad40cfe35ad938bf82929f88c");
+
+                // var stringDecrypted = CommonUtility.Decrypt("86e25dfad40cfe35ad938bf82929f88c");
+
                 // get company details
                 CompanyCredentialService _ccService = new CompanyCredentialService();
                 var companyCredentials = _ccService.GetCompanyCredentials();
@@ -31,6 +35,11 @@ namespace EncompassSocialSurvey
             {
                 Logger.Error("Caught an exception: Program.Main()", ex);
             }
+            finally
+            {
+                if (null != EncompassGlobal.EncompassLoginSession && EncompassGlobal.EncompassLoginSession.IsConnected)
+                    EncompassGlobal.EncompassLoginSession.End();
+            }
             Logger.Info("Exiting the method Program.Main()");
         }
 
@@ -43,7 +52,9 @@ namespace EncompassSocialSurvey
                 Logger.Info("Strating loan processing for company: "
                     + " companyId: " + forCompCredential.CompanyId
                     + " : companyUserName : " + forCompCredential.UserName
+                    + " : password : " + forCompCredential.Password
                     + " : companyURL : " + forCompCredential.EncompassUrl);
+                  
                 try
                 {
                     // do the login & create the login session 
