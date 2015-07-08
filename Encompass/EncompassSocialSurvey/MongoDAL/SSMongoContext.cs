@@ -71,11 +71,13 @@ namespace EncompassSocialSurvey.MongoDAL
         {
             get
             {
+
                 // Ignore the extra element
                 //
                 BsonClassMappToIgnoreExtraElement();
                 //
                 return this.Database.GetCollection<SoicalSurveryCompanyInfo>(SSMongoContext.MongoCompanyInfoCollection);
+
             }
         }
 
