@@ -440,123 +440,123 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 
 
     /**
-     * This method adds all the key and value pairs into mongo collection COMPANY_SETTINGS
-     * 
-     * @param user
-     * @param company
-     * @param organizationalDetails
-     * @throws InvalidInputException
-     */
-    private void addOrganizationalDetails( User user, Company company, Map<String, String> organizationalDetails )
-        throws InvalidInputException
-    {
-        LOG.debug( "Method addOrganizationalDetails called." );
+	 * This method adds all the key and value pairs into mongo collection COMPANY_SETTINGS
+	 * 
+	 * @param user
+	 * @param company
+	 * @param organizationalDetails
+	 * @throws InvalidInputException
+	 */
+	private void addOrganizationalDetails(User user, Company company, Map<String, String> organizationalDetails) throws InvalidInputException {
+		LOG.debug("Method addOrganizationalDetails called.");
 
-        // create a organization settings object
-        OrganizationUnitSettings companySettings = new OrganizationUnitSettings();
-        companySettings.setIden( company.getCompanyId() );
-        if ( organizationalDetails.get( CommonConstants.LOGO_NAME ) != null ) {
-            companySettings.setLogo( organizationalDetails.get( CommonConstants.LOGO_NAME ) );
-        }
+		// create a organization settings object
+		OrganizationUnitSettings companySettings = new OrganizationUnitSettings();
+		companySettings.setIden(company.getCompanyId());
+		if (organizationalDetails.get(CommonConstants.LOGO_NAME) != null) {
+			companySettings.setLogo(organizationalDetails.get(CommonConstants.LOGO_NAME));
+		}
 
-        ContactDetailsSettings contactDetailSettings = new ContactDetailsSettings();
-        contactDetailSettings.setName( company.getCompany() );
-        contactDetailSettings.setAddress( organizationalDetails.get( CommonConstants.ADDRESS ) );
-        contactDetailSettings.setAddress1( organizationalDetails.get( CommonConstants.ADDRESS1 ) );
-        contactDetailSettings.setAddress2( organizationalDetails.get( CommonConstants.ADDRESS2 ) );
-        contactDetailSettings.setZipcode( organizationalDetails.get( CommonConstants.ZIPCODE ) );
-        contactDetailSettings.setCountry( organizationalDetails.get( CommonConstants.COUNTRY ) );
-        contactDetailSettings.setCountryCode( organizationalDetails.get( CommonConstants.COUNTRY_CODE ) );
-        contactDetailSettings.setState( organizationalDetails.get( CommonConstants.STATE ) );
-        contactDetailSettings.setCity( organizationalDetails.get( CommonConstants.CITY ) );
+		ContactDetailsSettings contactDetailSettings = new ContactDetailsSettings();
+		contactDetailSettings.setName(company.getCompany());
+		contactDetailSettings.setAddress(organizationalDetails.get(CommonConstants.ADDRESS));
+		contactDetailSettings.setAddress1(organizationalDetails.get(CommonConstants.ADDRESS1));
+		contactDetailSettings.setAddress2(organizationalDetails.get(CommonConstants.ADDRESS2));
+		contactDetailSettings.setZipcode(organizationalDetails.get(CommonConstants.ZIPCODE));
+		contactDetailSettings.setCountry(organizationalDetails.get(CommonConstants.COUNTRY));
+		contactDetailSettings.setCountryCode(organizationalDetails.get(CommonConstants.COUNTRY_CODE));
+		contactDetailSettings.setState(organizationalDetails.get(CommonConstants.STATE));
+		contactDetailSettings.setCity(organizationalDetails.get(CommonConstants.CITY));
 
-        // Add work phone number in contact details
-        ContactNumberSettings contactNumberSettings = new ContactNumberSettings();
-        contactNumberSettings.setWork( organizationalDetails.get( CommonConstants.COMPANY_CONTACT_NUMBER ) );
-        contactDetailSettings.setContact_numbers( contactNumberSettings );
+		// Add work phone number in contact details
+		ContactNumberSettings contactNumberSettings = new ContactNumberSettings();
+		contactNumberSettings.setWork(organizationalDetails.get(CommonConstants.COMPANY_CONTACT_NUMBER));
+		contactDetailSettings.setContact_numbers(contactNumberSettings);
 
-        // Add work Mail id in contact details
-        MailIdSettings mailIdSettings = new MailIdSettings();
-        mailIdSettings.setWork( user.getEmailId() );
-        contactDetailSettings.setMail_ids( mailIdSettings );
+		// Add work Mail id in contact details
+		MailIdSettings mailIdSettings = new MailIdSettings();
+		mailIdSettings.setWork(user.getEmailId());
+		contactDetailSettings.setMail_ids(mailIdSettings);
 
-        companySettings.setVertical( organizationalDetails.get( CommonConstants.VERTICAL ) );
-        companySettings.setContact_details( contactDetailSettings );
-        companySettings.setProfileName( generateProfileNameForCompany( company.getCompany(), company.getCompanyId() ) );
-        companySettings.setProfileUrl(CommonConstants.FILE_SEPARATOR + companySettings.getProfileName() );
-        companySettings.setCreatedOn( System.currentTimeMillis() );
-        companySettings.setCreatedBy( String.valueOf( user.getUserId() ) );
-        companySettings.setModifiedOn( System.currentTimeMillis() );
-        companySettings.setModifiedBy( String.valueOf( user.getUserId() ) );
-        companySettings.setLockSettings( new LockSettings() );
+		companySettings.setVertical(organizationalDetails.get(CommonConstants.VERTICAL));
+		companySettings.setContact_details(contactDetailSettings);
+		companySettings.setProfileName(generateProfileNameForCompany(company.getCompany(), company.getCompanyId()));
+		companySettings.setProfileUrl(CommonConstants.FILE_SEPARATOR + companySettings.getProfileName());
+		companySettings.setCreatedOn(System.currentTimeMillis());
+		companySettings.setCreatedBy(String.valueOf(user.getUserId()));
+		companySettings.setModifiedOn(System.currentTimeMillis());
+		companySettings.setModifiedBy(String.valueOf(user.getUserId()));
 
-        // Adding default text for various flows of survey.
-        SurveySettings surveySettings = new SurveySettings();
-        surveySettings.setHappyText( happyText );
-        surveySettings.setNeutralText( neutralText );
-        surveySettings.setSadText( sadText );
-        surveySettings.setHappyTextComplete( happyTextComplete );
-        surveySettings.setNeutralTextComplete( neutralTextComplete );
-        surveySettings.setSadTextComplete( sadTextComplete );
-        surveySettings.setAutoPostEnabled( true );
-        surveySettings.setShow_survey_above_score( CommonConstants.DEFAULT_AUTOPOST_SCORE );
-        surveySettings.setSurvey_reminder_interval_in_days( CommonConstants.DEFAULT_REMINDERMAIL_INTERVAL );
-        companySettings.setSurvey_settings( surveySettings );
+		LockSettings lockSettings = new LockSettings();
+		lockSettings.setLogoLocked(true);
+		companySettings.setLockSettings(lockSettings);
 
-        // set seo content flag
-        companySettings.setSeoContentModified( true );
+		// Adding default text for various flows of survey.
+		SurveySettings surveySettings = new SurveySettings();
+		surveySettings.setHappyText(happyText);
+		surveySettings.setNeutralText(neutralText);
+		surveySettings.setSadText(sadText);
+		surveySettings.setHappyTextComplete(happyTextComplete);
+		surveySettings.setNeutralTextComplete(neutralTextComplete);
+		surveySettings.setSadTextComplete(sadTextComplete);
+		surveySettings.setAutoPostEnabled(true);
+		surveySettings.setShow_survey_above_score(CommonConstants.DEFAULT_AUTOPOST_SCORE);
+		surveySettings.setSurvey_reminder_interval_in_days(CommonConstants.DEFAULT_REMINDERMAIL_INTERVAL);
+		companySettings.setSurvey_settings(surveySettings);
 
-        // set default profile stages.
-        companySettings.setProfileStages( profileCompletionList.getDefaultProfileCompletionList( false ) );
+		// set seo content flag
+		companySettings.setSeoContentModified(true);
 
-        // Setting default values for mail content in Mail content settings of company settings.
-        String takeSurveyMail = "";
-        String takeSurveyReminderMail = "";
-        String takeSurveyByCustomerMail = "";
-        
+		// set default profile stages.
+		companySettings.setProfileStages(profileCompletionList.getDefaultProfileCompletionList(false));
 
-        String takeSurveyMailSubj = "";
-        String takeSurveyReminderMailSubj = "";
-        String takeSurveyByCustomerMailSubj = "";
-        try {
-            takeSurveyMail = readMailContentFromFile( CommonConstants.SURVEY_REQUEST_MAIL_FILENAME );
-            takeSurveyByCustomerMail = readMailContentFromFile( CommonConstants.SURVEY_CUSTOMER_REQUEST_MAIL_FILENAME );
-            takeSurveyReminderMail = readMailContentFromFile( CommonConstants.SURVEY_REMINDER_MAIL_FILENAME );
-            takeSurveyMailSubj = CommonConstants.SURVEY_MAIL_SUBJECT + "[AgentName]";
-            takeSurveyByCustomerMailSubj = CommonConstants.SURVEY_MAIL_SUBJECT_CUSTOMER;
-            takeSurveyReminderMailSubj =  CommonConstants.REMINDER_MAIL_SUBJECT + "[AgentName]";
-        } catch ( IOException e ) {
-            LOG.error(
-                "IOException occured in addOrganizationalDetails while copying default Email content. Nested exception is ", e );
-        }
+		// Setting default values for mail content in Mail content settings of company settings.
+		String takeSurveyMail = "";
+		String takeSurveyReminderMail = "";
+		String takeSurveyByCustomerMail = "";
 
-        MailContentSettings mailContentSettings = new MailContentSettings();
-        MailContent mailContent = new MailContent();
-        mailContent.setMail_subject(takeSurveyMailSubj);
-        mailContent.setMail_body( takeSurveyMail );
-        mailContent.setParam_order( new ArrayList<String>( Arrays.asList( paramOrderTakeSurvey.split( "," ) ) ) );
-        mailContentSettings.setTake_survey_mail( mailContent );
+		String takeSurveyMailSubj = "";
+		String takeSurveyReminderMailSubj = "";
+		String takeSurveyByCustomerMailSubj = "";
+		try {
+			takeSurveyMail = readMailContentFromFile(CommonConstants.SURVEY_REQUEST_MAIL_FILENAME);
+			takeSurveyByCustomerMail = readMailContentFromFile(CommonConstants.SURVEY_CUSTOMER_REQUEST_MAIL_FILENAME);
+			takeSurveyReminderMail = readMailContentFromFile(CommonConstants.SURVEY_REMINDER_MAIL_FILENAME);
+			
+			takeSurveyMailSubj = CommonConstants.SURVEY_MAIL_SUBJECT + "[AgentName]";
+			takeSurveyByCustomerMailSubj = CommonConstants.SURVEY_MAIL_SUBJECT_CUSTOMER;
+			takeSurveyReminderMailSubj = CommonConstants.REMINDER_MAIL_SUBJECT + "[AgentName]";
+		}
+		catch (IOException e) {
+			LOG.error("IOException occured in addOrganizationalDetails while copying default Email content. Nested exception is ", e);
+		}
 
-        mailContent = new MailContent();
-        mailContent.setMail_subject(takeSurveyByCustomerMailSubj);
-        mailContent.setMail_body( takeSurveyByCustomerMail );
-        mailContent.setParam_order( new ArrayList<String>( Arrays.asList( paramOrderTakeSurveyCustomer.split( "," ) ) ) );
-        mailContentSettings.setTake_survey_mail_customer( mailContent );
+		MailContentSettings mailContentSettings = new MailContentSettings();
+		MailContent mailContent = new MailContent();
+		mailContent.setMail_subject(takeSurveyMailSubj);
+		mailContent.setMail_body(takeSurveyMail);
+		mailContent.setParam_order(new ArrayList<String>(Arrays.asList(paramOrderTakeSurvey.split(","))));
+		mailContentSettings.setTake_survey_mail(mailContent);
 
-        mailContent = new MailContent();
-        mailContent.setMail_subject(takeSurveyReminderMailSubj);
-        mailContent.setMail_body( takeSurveyReminderMail );
-        mailContent.setParam_order( new ArrayList<String>( Arrays.asList( paramOrderTakeSurveyReminder.split( "," ) ) ) );
-        mailContentSettings.setTake_survey_reminder_mail( mailContent );
+		mailContent = new MailContent();
+		mailContent.setMail_subject(takeSurveyByCustomerMailSubj);
+		mailContent.setMail_body(takeSurveyByCustomerMail);
+		mailContent.setParam_order(new ArrayList<String>(Arrays.asList(paramOrderTakeSurveyCustomer.split(","))));
+		mailContentSettings.setTake_survey_mail_customer(mailContent);
 
-        companySettings.setMail_content( mailContentSettings );
+		mailContent = new MailContent();
+		mailContent.setMail_subject(takeSurveyReminderMailSubj);
+		mailContent.setMail_body(takeSurveyReminderMail);
+		mailContent.setParam_order(new ArrayList<String>(Arrays.asList(paramOrderTakeSurveyReminder.split(","))));
+		mailContentSettings.setTake_survey_reminder_mail(mailContent);
 
-        LOG.debug( "Inserting company settings." );
-        organizationUnitSettingsDao.insertOrganizationUnitSettings( companySettings,
-            MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION );
+		companySettings.setMail_content(mailContentSettings);
 
-        LOG.debug( "Method addOrganizationalDetails finished" );
-    }
+		LOG.debug("Inserting company settings.");
+		organizationUnitSettingsDao.insertOrganizationUnitSettings(companySettings, MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION);
+
+		LOG.debug("Method addOrganizationalDetails finished");
+	}
 
 
     /**
@@ -966,8 +966,83 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 
         return originalContentSettings;
     }
+    
+	@Override
+	public MailContentSettings revertSurveyParticipationMailBody(OrganizationUnitSettings companySettings, String mailCategory)
+			throws NonFatalException {
+		if (companySettings == null) {
+			throw new InvalidInputException("Company settings cannot be null.");
+		}
+		if (mailCategory == null) {
+			throw new InvalidInputException("Invalid mail category.");
+		}
+		LOG.debug("Reverting " + mailCategory + " for settings: " + companySettings.toString());
 
+		String mailBody = null;
+		String mailSubject = null;
+		List<String> paramOrder = null;
 
+		// TODO updating mail details
+		MailContentSettings originalContentSettings = companySettings.getMail_content();
+		if (mailCategory.equals(CommonConstants.SURVEY_MAIL_BODY_CATEGORY)) {
+			mailSubject = CommonConstants.SURVEY_MAIL_SUBJECT + "[AgentName]";
+			try {
+				mailBody = readMailContentFromFile(CommonConstants.SURVEY_REQUEST_MAIL_FILENAME);
+			}
+			catch (IOException e) {
+				throw new NonFatalException("Error occurred while parsing mail content.", DisplayMessageConstants.GENERAL_ERROR, e);
+			}
+			paramOrder = new ArrayList<String>(Arrays.asList(paramOrderTakeSurvey.split(",")));
+
+			MailContent mailContent = new MailContent();
+			mailContent.setMail_subject(mailSubject);
+			mailContent.setMail_body(mailBody);
+			mailContent.setParam_order(paramOrder);
+
+			originalContentSettings.setTake_survey_mail(mailContent);
+		}
+		else if (mailCategory.equals(CommonConstants.SURVEY_REMINDER_MAIL_BODY_CATEGORY)) {
+			mailSubject = CommonConstants.REMINDER_MAIL_SUBJECT + "[AgentName]";
+			try {
+				mailBody = readMailContentFromFile(CommonConstants.SURVEY_REMINDER_MAIL_FILENAME);
+			}
+			catch (IOException e) {
+				throw new NonFatalException("Error occurred while parsing mail content.", DisplayMessageConstants.GENERAL_ERROR, e);
+			}
+			paramOrder = new ArrayList<String>(Arrays.asList(paramOrderTakeSurveyReminder.split(",")));
+
+			MailContent mailContent = new MailContent();
+			mailContent.setMail_subject(mailSubject);
+			mailContent.setMail_body(mailBody);
+			mailContent.setParam_order(paramOrder);
+
+			originalContentSettings.setTake_survey_reminder_mail(mailContent);
+		}
+		else {
+			throw new InvalidInputException("Invalid mail category");
+		}
+
+		LOG.info("Reverting company settings mail content");
+		organizationUnitSettingsDao.updateParticularKeyOrganizationUnitSettings(MongoOrganizationUnitSettingDaoImpl.KEY_MAIL_CONTENT,
+				originalContentSettings, companySettings, MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION);
+		LOG.info("Reverting company settings mail content");
+
+		return originalContentSettings;
+	}
+
+	@Override
+	public ArrayList<String> getSurveyParamOrder(String mailCategory) throws InvalidInputException {
+		if (mailCategory.equals(CommonConstants.SURVEY_MAIL_BODY_CATEGORY)) {
+			return new ArrayList<String>(Arrays.asList(paramOrderTakeSurvey.split(",")));
+		}
+		else if (mailCategory.equals(CommonConstants.SURVEY_REMINDER_MAIL_BODY_CATEGORY)) {
+			return new ArrayList<String>(Arrays.asList(paramOrderTakeSurveyReminder.split(",")));
+		}
+		else {
+			throw new InvalidInputException("Invalid mail category");
+		}
+	}
+	
     @Override
     @Transactional
     public void addDisabledAccount( long companyId, boolean forceDisable ) throws InvalidInputException,
