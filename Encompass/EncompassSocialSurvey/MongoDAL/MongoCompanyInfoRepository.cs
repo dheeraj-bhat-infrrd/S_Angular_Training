@@ -1,4 +1,5 @@
 ﻿using EncompassSocialSurvey.Entity;
+using MongoDB.Bson.Serialization;
 using MongoDB.Driver;
 using System;
 using System.Collections.Generic;
@@ -18,8 +19,7 @@ namespace EncompassSocialSurvey.MongoDAL
                 SSMongoContext ssContext = new SSMongoContext();
                 var socialSurveyCollection = ssContext.SoicalSurveryCompanyInfos;
 
-                //
-                var deleteIt  = ssContext.Database.ListCollectionsAsync().Result;
+               
 
                 var resultSet = socialSurveyCollection.Find<SoicalSurveryCompanyInfo>(_ => true).ToListAsync<SoicalSurveryCompanyInfo>();
 
@@ -44,14 +44,21 @@ namespace EncompassSocialSurvey.MongoDAL
             {
                 var listCompanyInfo = GetCompnayCollectionEntity();
 
+                if (null != listCompanyInfo && listCompanyInfo.Count > 0)
+                    Logger.Info("Total company info result found : Count : " + listCompanyInfo.Count);
+
                 foreach (var ssCompInfo in listCompanyInfo)
                 {
+                    //
+                    if (null != ssCompInfo.crm_info)
+                        Logger.Info("Not to include: crm_info.crm_source : " + ssCompInfo.crm_info.crm_source);
+
                     if (ssCompInfo.crm_info != null && ssCompInfo.crm_info.crm_source == EncompassSocialSurverConstant.COMPANY_CREDENTIALS_CRM_SOURCE)
                     {
                         CompanyCredential forCompCredential = new CompanyCredential();
 
                         // TODO: Raushan check with Nishit
-                        forCompCredential.CompanyId =  0; // ssCompInfo.crm_info.Com
+                        forCompCredential.CompanyId = 0; // ssCompInfo.crm_info.Com
 
                         //
                         forCompCredential.EncompassUrl = ssCompInfo.crm_info.url;
