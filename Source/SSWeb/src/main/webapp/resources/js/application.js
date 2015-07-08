@@ -4633,7 +4633,6 @@ function initSurvey(firstName, lastName, email, agentId, agentName, grecaptchare
 }
 
 function initSurveyWithUrl(q) {
-	console.log(window.location.origin);
 	var success = false;
 	var payload = {
 		"q" : q
@@ -4732,26 +4731,27 @@ function paintSurveyPage(jsonData) {
 	
 	
 	//If social token availiable populate the links
-	if(yelpEnabled) {
-		$('#ylp-btn').attr("href",jsonData.responseJSON.yelpLink);
-	} else {
-		$('#ylp-btn').remove();
-	}
-	
-	if(googleEnabled) {
-		$('#ggl-btn').attr("href",jsonData.responseJSON.googleLink);
+	if (googleEnabled) {
+		var googleElement = document.getElementById('ggl-btn');
+		shareOnGooglePlus(agentId, window.location.origin + "/rest/survey/", googleElement);
 	} else {
 		$('#ggl-btn').remove();
 	}
 	
-	if(zillowEnabled) {
-		$('#zillow-btn').attr("href",jsonData.responseJSON.zillowLink);
+	if (yelpEnabled) {
+		$('#ylp-btn').attr("href", returnValidWebAddress(jsonData.responseJSON.yelpLink));
+	} else {
+		$('#ylp-btn').remove();
+	}
+	
+	if (zillowEnabled) {
+		$('#zillow-btn').attr("href", returnValidWebAddress(jsonData.responseJSON.zillowLink));
 	} else {
 		$('#zillow-btn').remove();
 	}
 	
-	if(lendingtreeEnabled) {
-		$('#lt-btn').attr("href",jsonData.responseJSON.lendingtreeLink);
+	if (lendingtreeEnabled) {
+		$('#lt-btn').attr("href", returnValidWebAddress(jsonData.responseJSON.lendingtreeLink));
 	} else {
 		$('#lt-btn').remove();
 	}
@@ -5128,9 +5128,8 @@ function showMasterQuestionPage(){
 				$('#ylp-btn').parent().remove();
 			}
 			if (googleEnabled && (mood == 'Great')){
-				$('#ggl-btn').show();
-				//var googleElement = document.getElementById('ggl-btn');
-				//shareOnGooglePlus(agentId, window.location.origin+"/rest/survey/", googleElement);
+				var googleElement = document.getElementById('ggl-btn');
+				shareOnGooglePlus(agentId, window.location.origin+"/rest/survey/", googleElement);
 			}
 			else {
 				$('#ggl-btn').parent().remove();
