@@ -4,11 +4,9 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,7 +18,6 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
-
 import com.amazonaws.util.json.JSONException;
 import com.amazonaws.util.json.JSONObject;
 import com.google.gson.Gson;
@@ -110,6 +107,8 @@ public class OrganizationManagementController
     @Value ( "${CDN_PATH}")
     private String endpoint;
 
+	@Value("${APPLICATION_LOGO_URL}")
+	private String applicationLogoUrl;
 
     /**
      * Method to upload logo image for a company
@@ -608,71 +607,147 @@ public class OrganizationManagementController
      * @param request
      * @return
      */
-    @RequestMapping ( value = "/savesurveyparticipationmail", method = RequestMethod.POST)
     @ResponseBody
-    public String setSurveyParticipationMailBody( Model model, HttpServletRequest request )
-    {
-        LOG.info( "Saving survey participation mail body" );
-        HttpSession session = request.getSession( false );
-        String mailCategory = request.getParameter( "mailcategory" );
-        String mailSubject = null;
-        String mailBody = null;
-        String message = "";
+    @RequestMapping ( value = "/savesurveyparticipationmail", method = RequestMethod.POST)
+	public String updateSurveyParticipationMailBody(Model model, HttpServletRequest request) {
+		LOG.info("Saving survey participation mail body");
+		HttpSession session = request.getSession(false);
+		String mailCategory = request.getParameter("mailcategory");
+		String mailSubject = null;
+		String mailBody = null;
+		String message = "";
 
-        try {
-            OrganizationUnitSettings companySettings = ( (UserSettings) session
-                .getAttribute( CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION ) ).getCompanySettings();
-            MailContentSettings updatedMailContentSettings = null;
-            if ( mailCategory != null && mailCategory.equals( "participationmail" ) ) {
-                mailSubject = request.getParameter( "survey-mailcontent-subject" );
+		try {
+			OrganizationUnitSettings companySettings = ((UserSettings) session.getAttribute(CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION))
+					.getCompanySettings();
+			MailContentSettings updatedMailContentSettings = null;
+			if (mailCategory != null && mailCategory.equals("participationmail")) {
 
+				mailSubject = request.getParameter("survey-mailcontent-subject");
+				if (mailSubject == null || mailSubject.isEmpty()) {
+					LOG.warn("Survey participation mail subject is blank.");
+					throw new InvalidInputException("Survey participation mail subject is blank.", DisplayMessageConstants.GENERAL_ERROR);
+				}
 
-                mailBody = request.getParameter( "survey-participation-mailcontent" );
-                if ( ( mailBody == null || mailBody.isEmpty() ) && ( mailSubject == null || mailSubject.isEmpty() ) ) {
-                    LOG.warn( "Survey participation mail body and subject is blank." );
-                    throw new InvalidInputException( "Survey participation mail body and subject is blank.",
-                        DisplayMessageConstants.GENERAL_ERROR );
-                }
+				mailBody = request.getParameter("survey-participation-mailcontent");
+				if (mailBody == null || mailBody.isEmpty()) {
+					LOG.warn("Survey participation mail body is blank.");
+					throw new InvalidInputException("Survey participation mail body is blank.", DisplayMessageConstants.GENERAL_ERROR);
+				}
 
-                updatedMailContentSettings = organizationManagementService.updateSurveyParticipationMailBody( companySettings,
-                    mailSubject, mailBody, CommonConstants.SURVEY_MAIL_BODY_CATEGORY );
+				updatedMailContentSettings = organizationManagementService.updateSurveyParticipationMailBody(companySettings, mailSubject, mailBody,
+						CommonConstants.SURVEY_MAIL_BODY_CATEGORY);
 
-                // set the value back in session
-                session.setAttribute( CommonConstants.SURVEY_PARTICIPATION_MAIL_BODY_IN_SESSION, mailBody );
-                message = messageUtils
-                    .getDisplayMessage( DisplayMessageConstants.SURVEY_PARTICIPATION_MAILBODY_UPDATE_SUCCESSFUL,
-                        DisplayMessageType.SUCCESS_MESSAGE ).getMessage();
-            }
+				// set the value back in session
+				session.setAttribute(CommonConstants.SURVEY_PARTICIPATION_MAIL_SUBJECT_IN_SESSION, mailSubject);
+				session.setAttribute(CommonConstants.SURVEY_PARTICIPATION_MAIL_BODY_IN_SESSION, mailBody);
+				
+				message = messageUtils.getDisplayMessage(DisplayMessageConstants.SURVEY_PARTICIPATION_MAILBODY_UPDATE_SUCCESSFUL,
+						DisplayMessageType.SUCCESS_MESSAGE).getMessage();
+			}
 
-            else if ( mailCategory != null && mailCategory.equals( "participationremindermail" ) ) {
-                mailSubject = request.getParameter( "survey-mailreminder-subject" );
-                mailBody = request.getParameter( "survey-participation-reminder-mailcontent" );
-                if ( ( mailBody == null || mailBody.isEmpty() ) && ( mailSubject == null || mailSubject.isEmpty() ) ) {
-                    LOG.warn( "Survey participation reminder mail body and subject is blank." );
-                    throw new InvalidInputException( "Survey participation reminder mail body and subject is blank.",
-                        DisplayMessageConstants.GENERAL_ERROR );
-                }
+			else if (mailCategory != null && mailCategory.equals("participationremindermail")) {
 
-                updatedMailContentSettings = organizationManagementService.updateSurveyParticipationMailBody( companySettings,
-                    mailSubject, mailBody, CommonConstants.SURVEY_REMINDER_MAIL_BODY_CATEGORY );
+				mailSubject = request.getParameter("survey-mailreminder-subject");
+				if (mailSubject == null || mailSubject.isEmpty()) {
+					LOG.warn("Survey participation reminder mail subject is blank.");
+					throw new InvalidInputException("Survey participation reminder mail subject is blank.", DisplayMessageConstants.GENERAL_ERROR);
+				}
 
-                // set the value back in session
-                session.setAttribute( CommonConstants.SURVEY_PARTICIPATION_REMINDER_MAIL_BODY_IN_SESSION, mailBody );
-                message = messageUtils.getDisplayMessage(
-                    DisplayMessageConstants.SURVEY_PARTICIPATION_REMINDERMAILBODY_UPDATE_SUCCESSFUL,
-                    DisplayMessageType.SUCCESS_MESSAGE ).getMessage();
-            }
+				mailBody = request.getParameter("survey-participation-reminder-mailcontent");
+				if (mailBody == null || mailBody.isEmpty()) {
+					LOG.warn("Survey participation reminder mail body is blank.");
+					throw new InvalidInputException("Survey participation reminder mail body is blank.", DisplayMessageConstants.GENERAL_ERROR);
+				}
 
-            // update the mail content settings in session
-            companySettings.setMail_content( updatedMailContentSettings );
-        } catch ( NonFatalException e ) {
-            LOG.error( "NonFatalException while saving survey participation mail body. Reason : " + e.getMessage(), e );
-            message = messageUtils.getDisplayMessage( e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE ).getMessage();
-        }
+				updatedMailContentSettings = organizationManagementService.updateSurveyParticipationMailBody(companySettings, mailSubject, mailBody,
+						CommonConstants.SURVEY_REMINDER_MAIL_BODY_CATEGORY);
 
-        return message;
-    }
+				// set the value back in session
+				session.setAttribute(CommonConstants.SURVEY_PARTICIPATION_REMINDER_MAIL_SUBJECT_IN_SESSION, mailSubject);
+				session.setAttribute(CommonConstants.SURVEY_PARTICIPATION_REMINDER_MAIL_BODY_IN_SESSION, mailBody);
+				
+				message = messageUtils.getDisplayMessage(DisplayMessageConstants.SURVEY_PARTICIPATION_REMINDERMAILBODY_UPDATE_SUCCESSFUL,
+						DisplayMessageType.SUCCESS_MESSAGE).getMessage();
+			}
 
+			// update the mail content settings in session
+			companySettings.setMail_content(updatedMailContentSettings);
+		}
+		catch (NonFatalException e) {
+			LOG.error("NonFatalException while saving survey participation mail body. Reason : " + e.getMessage(), e);
+			message = messageUtils.getDisplayMessage(e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE).getMessage();
+		}
+
+		return message;
+	}
+    
+    /**
+     * Method to save survey Mailbody content
+     * 
+     * @param model
+     * @param request
+     * @return
+     */
+    @ResponseBody
+	@RequestMapping(value = "/revertsurveyparticipationmail", method = RequestMethod.POST)
+	public String revertSurveyParticipationMailBody(Model model, HttpServletRequest request) {
+		LOG.info("Reverting survey participation mail body");
+		HttpSession session = request.getSession(false);
+		String mailCategory = request.getParameter("mailcategory");
+		String mailSubject = null;
+		String mailBody = null;
+		String message = "";
+
+		try {
+			UserSettings userSettings = (UserSettings) session.getAttribute(CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION);
+
+			OrganizationUnitSettings companySettings = userSettings.getCompanySettings();
+			MailContentSettings updatedMailContentSettings = null;
+			if (mailCategory != null && mailCategory.equals("participationmail")) {
+				updatedMailContentSettings = organizationManagementService.revertSurveyParticipationMailBody(companySettings,
+						CommonConstants.SURVEY_MAIL_BODY_CATEGORY);
+
+				mailBody = updatedMailContentSettings.getTake_survey_mail().getMail_body();
+				mailBody = emailFormatHelper.replaceEmailBodyWithParams(mailBody,
+						organizationManagementService.getSurveyParamOrder(CommonConstants.SURVEY_MAIL_BODY_CATEGORY));
+				mailBody = mailBody.replaceAll("\\[LogoUrl\\]", applicationLogoUrl);
+
+				mailSubject = updatedMailContentSettings.getTake_survey_mail().getMail_subject();
+				message = messageUtils.getDisplayMessage(DisplayMessageConstants.SURVEY_PARTICIPATION_MAILBODY_UPDATE_SUCCESSFUL,
+						DisplayMessageType.SUCCESS_MESSAGE).getMessage();
+
+				session.setAttribute(CommonConstants.SURVEY_PARTICIPATION_MAIL_BODY_IN_SESSION, mailBody);
+				session.setAttribute(CommonConstants.SURVEY_PARTICIPATION_MAIL_SUBJECT_IN_SESSION, mailSubject);
+			}
+
+			else if (mailCategory != null && mailCategory.equals("participationremindermail")) {
+				updatedMailContentSettings = organizationManagementService.revertSurveyParticipationMailBody(companySettings,
+						CommonConstants.SURVEY_REMINDER_MAIL_BODY_CATEGORY);
+
+				mailBody = updatedMailContentSettings.getTake_survey_reminder_mail().getMail_body();
+				mailBody = emailFormatHelper.replaceEmailBodyWithParams(mailBody,
+						organizationManagementService.getSurveyParamOrder(CommonConstants.SURVEY_REMINDER_MAIL_BODY_CATEGORY));
+				mailBody = mailBody.replaceAll("\\[LogoUrl\\]", applicationLogoUrl);
+
+				mailSubject = updatedMailContentSettings.getTake_survey_reminder_mail().getMail_subject();
+				message = messageUtils.getDisplayMessage(DisplayMessageConstants.SURVEY_PARTICIPATION_REMINDERMAILBODY_UPDATE_SUCCESSFUL,
+						DisplayMessageType.SUCCESS_MESSAGE).getMessage();
+
+				session.setAttribute(CommonConstants.SURVEY_PARTICIPATION_REMINDER_MAIL_BODY_IN_SESSION, mailBody);
+				session.setAttribute(CommonConstants.SURVEY_PARTICIPATION_REMINDER_MAIL_SUBJECT_IN_SESSION, mailSubject);
+			}
+
+			// update the mail content settings in session
+			companySettings.setMail_content(updatedMailContentSettings);
+		}
+		catch (NonFatalException e) {
+			LOG.error("NonFatalException while reverting survey participation mail body. Reason : " + e.getMessage(), e);
+			message = messageUtils.getDisplayMessage(e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE).getMessage();
+		}
+
+		return message;
+	}
 
     /**
      * Method to update Survey Settings
