@@ -153,6 +153,7 @@ public class SessionHelper {
 		}
 	}
 
+	
 	private void setMailContent(HttpSession session, UserSettings userSettings) {
 		LOG.debug("Setting mail content in the session");
 		String body = null;
