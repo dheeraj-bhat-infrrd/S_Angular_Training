@@ -84,6 +84,7 @@
     <Compile Include="DAL\TestDBConnection.cs" />
     <Compile Include="EncompassGlobal.cs" />
     <Compile Include="EncompassSocialSurverConstant.cs" />
+    <Compile Include="EncryptionHelper.cs" />
     <Compile Include="Entity\CompanyCredentials.cs" />
     <Compile Include="Entity\LoanEntity.cs" />
     <Compile Include="LoanUtility.cs" />

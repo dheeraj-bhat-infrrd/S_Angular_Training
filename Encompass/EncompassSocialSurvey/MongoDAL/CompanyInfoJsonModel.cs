@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using MongoDB.Bson;
+using System.Collections.Generic;
 
 namespace EncompassSocialSurvey.MongoDAL
 {
@@ -91,25 +92,25 @@ namespace EncompassSocialSurvey.MongoDAL
     public class SoicalSurveryCompanyInfo
     {
         public string _class { get; set; }
-        public string _id { get; set; }
-        public ContactDetails contact_details { get; set; }
-        public string createdBy { get; set; }
-        public string createdOn { get; set; }
+        public ObjectId _id { get; set; }
+        //public ContactDetails contact_details { get; set; }
+        //public string createdBy { get; set; }
+        //public string createdOn { get; set; }
         public CrmInfo crm_info { get; set; }
-        public int iden { get; set; }
-        public bool isAccountDisabled { get; set; }
-        public bool isDefaultBySystem { get; set; }
-        public bool isLocationEnabled { get; set; }
-        public bool isSeoContentModified { get; set; }
-        public LockSettings lockSettings { get; set; }
-        public MailContent mail_content { get; set; }
-        public string modifiedBy { get; set; }
-        public string modifiedOn { get; set; }
-        public string profileName { get; set; }
-        public List<ProfileStage> profileStages { get; set; }
-        public string profileUrl { get; set; }
-        public int profile_completion { get; set; }
-        public SurveySettings survey_settings { get; set; }
-        public string vertical { get; set; }
+        //public int iden { get; set; }
+        //public bool isAccountDisabled { get; set; }
+        //public bool isDefaultBySystem { get; set; }
+        //public bool isLocationEnabled { get; set; }
+        //public bool isSeoContentModified { get; set; }
+        //public LockSettings lockSettings { get; set; }
+        //public MailContent mail_content { get; set; }
+        //public string modifiedBy { get; set; }
+        //public string modifiedOn { get; set; }
+        //public string profileName { get; set; }
+        //public List<ProfileStage> profileStages { get; set; }
+        //public string profileUrl { get; set; }
+        //public int profile_completion { get; set; }
+        //public SurveySettings survey_settings { get; set; }
+        //public string vertical { get; set; }
     }
 }

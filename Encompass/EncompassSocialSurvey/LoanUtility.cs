@@ -229,7 +229,7 @@ namespace EncompassSocialSurvey
                     // if loan is not closed " closed field value will be null/empty/[//]
                     if (string.IsNullOrWhiteSpace(fieldValues[8]) || fieldValues[8].Equals("//") || fieldValues[8].Equals(@"\\"))
                     {
-                        Logger.Info("Exiting the method LoanUtility.LopopulateLoanList(): It's not a closed loan.");
+                        Logger.Info("Exiting the method LoanUtility.LopopulateLoanList(): It's not a closed loan. : LoanGUID : " + id.Guid);
                         continue;
                     }
 
