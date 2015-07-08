@@ -37,7 +37,7 @@ namespace EncompassSocialSurvey
             return folders;
         }
 
-        public List<LoanViewModel> LopulateLoanListWithKey(LoanFolder parentFolder, int runningCompanyId)
+        public List<LoanViewModel> LopulateLoanListWithKey(LoanFolder parentFolder, long runningCompanyId)
         {
             Logger.Info("Entering the method LoanUtility.LopopulateLoanList()");
 
@@ -75,7 +75,7 @@ namespace EncompassSocialSurvey
                 string surveySource = EncompassSocialSurverConstant.SURVEY_SOURCE;
 
                 // company id coming 
-                int companyId = runningCompanyId;
+                long companyId = runningCompanyId;
                 string lastReminderTime = EncompassSocialSurverConstant.LAST_REMINDER_TIME;
                 int reminderCount = EncompassSocialSurverConstant.REMINDER_COUNT;
                 int status = EncompassSocialSurverConstant.STATUS;
@@ -174,7 +174,7 @@ namespace EncompassSocialSurvey
             return returnLoansViewModel;
         }
 
-        public List<LoanViewModel> LopulateLoanList(LoanFolder parentFolder, int runningCompanyId)
+        public List<LoanViewModel> LopulateLoanList(LoanFolder parentFolder, long runningCompanyId)
         {
             Logger.Info("Entering the method LoanUtility.LopopulateLoanList(): FolderName: " + parentFolder.DisplayName);
 
@@ -212,7 +212,7 @@ namespace EncompassSocialSurvey
                 string surveySource = EncompassSocialSurverConstant.SURVEY_SOURCE;
 
                 // company id coming 
-                int companyId = runningCompanyId;
+                long companyId = runningCompanyId;
                 string lastReminderTime = EncompassSocialSurverConstant.LAST_REMINDER_TIME;
                 int reminderCount = EncompassSocialSurverConstant.REMINDER_COUNT;
                 int status = EncompassSocialSurverConstant.STATUS;
