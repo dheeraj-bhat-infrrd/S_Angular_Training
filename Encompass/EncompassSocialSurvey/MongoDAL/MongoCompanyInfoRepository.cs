@@ -58,7 +58,7 @@ namespace EncompassSocialSurvey.MongoDAL
                         CompanyCredential forCompCredential = new CompanyCredential();
 
                         // TODO: Raushan check with Nishit
-                        forCompCredential.CompanyId = 0; // ssCompInfo.crm_info.Com
+                        forCompCredential.CompanyId = ssCompInfo.crm_info.companyId;
 
                         //
                         forCompCredential.EncompassUrl = ssCompInfo.crm_info.url;
