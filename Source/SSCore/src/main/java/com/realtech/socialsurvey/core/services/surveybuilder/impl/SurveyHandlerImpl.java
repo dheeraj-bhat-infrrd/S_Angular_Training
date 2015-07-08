@@ -102,9 +102,6 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean {
 	@Value("${GOOGLE_SHARE_URI}")
 	private String googleShareUri;
 	
-	@Value("${YELP_REDIRECT_URI}")
-	private String yelpRedirectUri;
-
 	@Value("${APPLICATION_LOGO_URL}")
 	private String appLogoUrl;
 	
@@ -428,11 +425,6 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean {
 		return googleShareUri;
 	}
 	
-	@Override
-	public String getYelpShareUri() {
-		return yelpRedirectUri;
-	}
-
 	@Override
 	public void increaseSurveyCountForAgent(long agentId) throws SolrException {
 		LOG.info("Method to increase survey count for agent started.");

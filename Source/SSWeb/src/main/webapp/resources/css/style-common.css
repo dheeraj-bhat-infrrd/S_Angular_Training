@@ -569,6 +569,7 @@ html.is-modern.card-root.js.no-touch.csstransitions.svg.inlinesvg.placeholder
 	width: 145px;
 	/*  background: url(../images/userInfoLogo.png) no-repeat center;
     background-size: 100% auto; */
+    background-size: contain !important;
 }
 
 .user-info-seperator {
@@ -1973,6 +1974,10 @@ button.paypal.is-active {
 
 .icn-grey-tick {
 	background: url(../images/icnSave-Grey.png) no-repeat center;
+}
+
+.icn-blue-ellipse {
+	background: url(../images/ellipse.png) no-repeat center;
 }
 
 .btn-disabled {
@@ -4264,9 +4269,9 @@ img.prof-image {
 	position: absolute;
 	top: 200px;
 	line-height: 25px;
-	left: -215px;
+	left: -220px;
 	font-size: 13px;
-	width: 200px;
+	width: 205px;
 	text-align: right;
 }
 
@@ -6861,4 +6866,12 @@ a.sq-btn-post-social:hover, a.sq-btn-post-social:visited {
     margin: 75px 0 0 10px;
     border-radius: 3px;
     cursor: pointer;
+}
+
+.sq-btn-post-social-btn {
+	margin: 10px auto;
+	display: block;
+}
+.sq-btn-post-social-btn:hover, .sq-btn-post-social-btn:visited {
+	color: #fff !important;
 }

@@ -549,13 +549,13 @@ function paintReviews(result){
 		reviewsHtml += '			<a href="https://plus.google.com/share?url=' + reviewItem.completeProfileUrl + '" target="_blank"<span class="float-left ppl-share-icns icn-gplus" title="Google+"></span></a>';
 		
 		if (reviewItem.yelpProfileUrl != null && reviewItem.yelpProfileUrl != "") {
-			reviewsHtml += '		<a href="' + reviewItem.yelpProfileUrl + '" target="_blank"><span class="float-left ppl-share-icns icn-yelp" title="Yelp"></span></a>';
+			reviewsHtml += '		<a href="' + returnValidWebAddress(reviewItem.yelpProfileUrl) + '" target="_blank"><span class="float-left ppl-share-icns icn-yelp" title="Yelp"></span></a>';
 		}
 		if (reviewItem.zillowProfileUrl != null && reviewItem.zillowProfileUrl != "") {
-			reviewsHtml += '		<a href="' + reviewItem.zillowProfileUrl + '" target="_blank"><span class="float-left ppl-share-icns icn-zillow" title="Zillow"></span></a>';
+			reviewsHtml += '		<a href="' + returnValidWebAddress(reviewItem.zillowProfileUrl) + '" target="_blank"><span class="float-left ppl-share-icns icn-zillow" title="Zillow"></span></a>';
 		}
 		if (reviewItem.lendingTreeProfileUrl != null && reviewItem.lendingTreeProfileUrl != "") {
-			reviewsHtml += '		<a href="' + reviewItem.lendingTreeProfileUrl + '" target="_blank"><span class="float-left ppl-share-icns icn-lendingtree" title="LendingTree"></span></a>';
+			reviewsHtml += '		<a href="' + returnValidWebAddress(reviewItem.lendingTreeProfileUrl) + '" target="_blank"><span class="float-left ppl-share-icns icn-lendingtree" title="LendingTree"></span></a>';
 		}
 		reviewsHtml += '		</div>';
 		reviewsHtml += '		<div class="float-right" style="margin: 0 -5px;">';

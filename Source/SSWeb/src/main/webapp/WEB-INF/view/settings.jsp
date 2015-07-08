@@ -247,10 +247,14 @@
 										class="float-left st-header-txt-rt-icn icn-blue-tick margin-left-20 cursor-pointer hide"></div>
 									<div id="save-participation-mail-content-disabled"
 										class="float-left st-header-txt-rt-icn margin-left-20 icn-grey-tick"></div>
+										
+									<div id="revert-participation-mail"
+										class="float-left st-header-txt-rt-icn margin-left-20 cursor-pointer icn-blue-ellipse"></div>
 								</div>
 								<div class="clearfix">
 									<div class="float-left settings-btn-text">Edit</div>
-									<div class="float-right settings-btn-text">Save</div>
+									<div class="float-left settings-btn-text margin-left-20">Save</div>
+									<div class="float-left settings-btn-text margin-left-20">Reset</div>
 								</div>
 							</div>
 						</div>
@@ -280,10 +284,14 @@
 										class="float-left st-header-txt-rt-icn icn-blue-tick margin-left-20 cursor-pointer hide"></div>
 									<div id="save-participation-reminder-mail-content-disabled"
 										class="float-left st-header-txt-rt-icn margin-left-20 icn-grey-tick"></div>
+										
+									<div id="revert-participation-reminder-mail"
+										class="float-left st-header-txt-rt-icn margin-left-20 cursor-pointer icn-blue-ellipse"></div>
 								</div>
 								<div class="clearfix">
 									<div class="float-left settings-btn-text">Edit</div>
-									<div class="float-right settings-btn-text">Save</div>
+									<div class="float-left settings-btn-text margin-left-20">Save</div>
+									<div class="float-left settings-btn-text margin-left-20">Reset</div>
 								</div>
 							</div>
 						</div>
@@ -528,6 +536,14 @@ $(document).ready(function() {
 		$('#edit-participation-mail-content').show();
 		$('#edit-participation-mail-content-disabled').hide();
 	});
+	$('#revert-participation-mail').click(function() {
+		var payload = {
+			"mailcategory" : 'participationmail'
+		};
+		callAjaxPostWithPayloadData('./revertsurveyparticipationmail.do', function () {
+			showMainContent('./showcompanysettings.do');
+		}, payload, true);
+	});
 
 	$('#edit-participation-reminder-mail-content').click(function() {
 		try {
@@ -559,6 +575,14 @@ $(document).ready(function() {
 
 		$('#edit-participation-reminder-mail-content').show();
 		$('#edit-participation-reminder-mail-content-disabled').hide();
+	});
+	$('#revert-participation-reminder-mail').click(function() {
+		var payload = {
+			"mailcategory" : 'participationremindermail'
+		};
+		callAjaxPostWithPayloadData('./revertsurveyparticipationmail.do', function () {
+			showMainContent('./showcompanysettings.do');
+		}, payload, true);
 	});
 
 

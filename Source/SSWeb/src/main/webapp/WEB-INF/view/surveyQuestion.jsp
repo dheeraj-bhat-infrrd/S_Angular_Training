@@ -311,15 +311,21 @@
 					<div class="sq-ques">
 						<i><span id="content" class="sq-ques-txt"></span></i>
 					</div>
-					<div id="social-post-lnk" class="clearfix hide">
+					<!-- <div id="social-post-lnk" class="clearfix hide">
 						<div class="sq-bord-bot-sm"></div>
 						<div class="sq-btn-social-wrapper float-left">
 							<a id="ylp-btn" target="_blank" class="sq-btn-continue sq-btn-post-social float-right">Yelp</a>
 						</div>
 						<div class="sq-btn-social-wrapper float-left">
 							<a id="ggl-btn" target="_blank" class="sq-btn-continue sq-btn-post-social float-left">Google+</a>
-						</div>
+					</div> -->
+					<div id="social-post-links" class="share-social-link-cont hide">
+						<a id="ylp-btn" target="_blank" class="sq-btn-continue sq-btn-post-social-btn">Yelp</a>
+						<a id="ggl-btn" target="_blank" class="sq-btn-continue sq-btn-post-social-btn">Google+</a>
+						<a id="zillow-btn" target="_blank" class="sq-btn-continue sq-btn-post-social-btn">Zillow</a>
+						<a id="lt-btn" target="_blank" class="sq-btn-continue sq-btn-post-social-btn">Lending Tree</a>
 					</div>
+					<div></div>
 				</div>
 			</div>
 		</div>
