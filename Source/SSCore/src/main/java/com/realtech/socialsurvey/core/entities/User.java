@@ -61,6 +61,9 @@ public class User implements UserDetails, Serializable {
 	@Column(name = "NUM_OF_LOGINS")
 	private long numOfLogins;
 
+	@Column(name = "SUPER_ADMIN")
+	private long superAdmin;
+	
 	@Column(name = "LOGIN_NAME")
 	private String loginName;
 
@@ -183,6 +186,14 @@ public class User implements UserDetails, Serializable {
 
 	public void setNumOfLogins(long numOfLogins) {
 		this.numOfLogins = numOfLogins;
+	}
+	
+	public long getSuperAdmin() {
+		return superAdmin;
+	}
+
+	public void setSuperAdmin(long superAdmin) {
+		this.superAdmin = superAdmin;
 	}
 
 	public String getLoginName() {
