@@ -4,6 +4,7 @@ import java.io.Serializable;
 import java.sql.Timestamp;
 import java.util.Collection;
 import java.util.List;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -16,9 +17,12 @@ import javax.persistence.NamedQuery;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.persistence.Transient;
+
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
+
+import com.realtech.socialsurvey.core.commons.CommonConstants;
 
 /**
  * The persistent class for the users database table.
@@ -194,6 +198,13 @@ public class User implements UserDetails, Serializable {
 
 	public void setSuperAdmin(long superAdmin) {
 		this.superAdmin = superAdmin;
+	}
+	
+	public boolean isSuperAdmin() {
+		if(this.superAdmin == CommonConstants.STATUS_ACTIVE) {
+			return true;
+		}
+		return false;
 	}
 
 	public String getLoginName() {

@@ -3998,6 +3998,10 @@ img.prof-image {
 	margin-bottom: 18px;
 }
 
+.stats-right-survey {
+	margin-top: 40px;
+}
+
 .dash-panel-left {
 	padding-top: 30px;
 }
@@ -6797,6 +6801,7 @@ a.sq-btn-post-social:hover, a.sq-btn-post-social:visited {
   	display: block;
   	border: 1px solid #dcdcdc;
   	line-height: 32px;
+  	z-index: 2;
 }
 
 .dsh-inp-wrapper {
