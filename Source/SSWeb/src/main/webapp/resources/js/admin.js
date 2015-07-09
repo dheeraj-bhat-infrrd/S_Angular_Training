@@ -1,0 +1,1 @@
+//Contains js functions for realtech admin
