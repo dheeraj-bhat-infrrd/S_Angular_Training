@@ -384,11 +384,14 @@ public class DashboardController {
 			HttpServletRequest request) {
 		LOG.info("Method to get survey details for generating graph, getGraphDetailsForWeek() started.");
 
-		String realtechAdminStr = request.getParameter("realtechAdmin");
-		boolean realtechAdmin = false;
-		if (realtechAdminStr != null && !realtechAdminStr.isEmpty())
-			realtechAdmin = Boolean.parseBoolean(realtechAdminStr);
-
+		User user = sessionHelper.getCurrentUser();
+		
+		long superAdmin = user.getSuperAdmin();
+		boolean realtechAdmin = false;		
+		if(superAdmin == CommonConstants.STATUS_ACTIVE){
+			realtechAdmin = true;
+		}
+		
 		try {
 			String columnName = request.getParameter("columnName");
 			String reportType = request.getParameter("reportType");
@@ -409,7 +412,6 @@ public class DashboardController {
 			if (!realtechAdmin
 					&& columnName
 							.equalsIgnoreCase(CommonConstants.COMPANY_ID_COLUMN)) {
-				User user = sessionHelper.getCurrentUser();
 				columnValue = user.getCompany().getCompanyId();
 			}
 			LOG.info("Method to get details for generating graph, getGraphDetailsForWeek() finished.");
@@ -814,7 +816,8 @@ public class DashboardController {
 		User user = sessionHelper.getCurrentUser();
 		long regionOrBranchId = 0;
 		List<SolrDocument> result = null;
-
+		boolean isRealTechAdmin = user.isSuperAdmin();
+		
 		try {
 			String searchColumn = request.getParameter("searchColumn");
 			if (searchColumn == null || searchColumn.isEmpty()) {
@@ -825,17 +828,20 @@ public class DashboardController {
 			model.addAttribute("searchColumn", searchColumn);
 
 			String columnName = request.getParameter("columnName");
-			if (columnName == null || columnName.isEmpty()) {
-				LOG.error("Invalid value (null/empty) passed for profile level.");
-				throw new InvalidInputException(
-						"Invalid value (null/empty) passed for profile level.");
-			}
-
 			String columnValueStr = request.getParameter("columnValue");
-			if (columnValueStr == null || columnValueStr.isEmpty()) {
-				LOG.error("Invalid value (null/empty) passed for Region/branch Id.");
-				throw new InvalidInputException(
-						"Invalid value (null/empty) passed for Region/branch Id.");
+			
+			if(!isRealTechAdmin){
+				if (columnName == null || columnName.isEmpty()) {
+					LOG.error("Invalid value (null/empty) passed for profile level.");
+					throw new InvalidInputException(
+							"Invalid value (null/empty) passed for profile level.");
+				}
+
+				if (columnValueStr == null || columnValueStr.isEmpty()) {
+					LOG.error("Invalid value (null/empty) passed for Region/branch Id.");
+					throw new InvalidInputException(
+							"Invalid value (null/empty) passed for Region/branch Id.");
+				}				
 			}
 
 			String searchKey = request.getParameter("searchKey");
@@ -843,7 +849,18 @@ public class DashboardController {
 				searchKey = "";
 			}
 
-			if (columnName.equalsIgnoreCase(CommonConstants.COMPANY_ID_COLUMN)) {
+			if(isRealTechAdmin) {
+				try {
+					result = solrSearchService.searchBranchRegionOrAgentByName(
+							searchColumn, searchKey, columnName,-1);
+				} catch (InvalidInputException e) {
+					LOG.error(
+							"InvalidInputException caught in getRegionBranchOrAgent() while fetching details. Nested exception is ",
+							e);
+					throw e;
+				}
+			}
+			else if (columnName.equalsIgnoreCase(CommonConstants.COMPANY_ID_COLUMN)) {
 				try {
 					result = solrSearchService.searchBranchRegionOrAgentByName(
 							searchColumn, searchKey, columnName, user
