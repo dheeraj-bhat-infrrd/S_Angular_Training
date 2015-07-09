@@ -275,6 +275,7 @@ public interface CommonConstants
     public static final String PROFILE_LEVEL_REGION = "REGION";
     public static final String PROFILE_LEVEL_BRANCH = "BRANCH";
     public static final String PROFILE_LEVEL_INDIVIDUAL = "INDIVIDUAL";
+    public static final String PROFILE_LEVEL_REALTECH_ADMIN = "REALTECHADMIN";
     public static final String USERS_MAP_KEY = "users";
     public static final String BRANCHES_MAP_KEY = "branches";
     public static final String REGIONS_MAP_KEY = "regions";
