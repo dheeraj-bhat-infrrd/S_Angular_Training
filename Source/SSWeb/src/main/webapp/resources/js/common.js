@@ -517,6 +517,29 @@ function postOnSocialNetworkOnce(socialNetwork, firstName, lastName, agentName, 
 			"width=800,height=600,scrollbars=yes");
 }
 
+//Disconnect social media
+function disconnectSocialMedia(socialMedia) {
+	if($('div[data-social="'+socialMedia+'"]').text() == undefined || $('div[data-social="'+socialMedia+'"]').text() == ''){
+		return;
+	}
+	
+	var payload = {
+		"socialMedia" : socialMedia	
+	};
+	
+	callAjaxPostWithPayloadData("/disconnectsocialmedia.do", function(data) {
+		if(data == "success"){
+			$('div[data-social="'+socialMedia+'"]').html('');
+			$('#overlay-toast').html('Successfully disconnected ' + socialMedia);
+			showToast();
+		} else {
+			$('#overlay-toast').html('Some error occurred while disconnecting ' + socialMedia);
+			showToast();
+		}
+	}, payload, true);	
+}
+
+
 function showProfileLinkInEditProfilePage(source, profileUrl){
 	if(source=='facebook'){
 		$('#edt-prof-fb-lnk').html(profileUrl);

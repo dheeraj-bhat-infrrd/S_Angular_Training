@@ -6875,3 +6875,12 @@ a.sq-btn-post-social:hover, a.sq-btn-post-social:visited {
 .sq-btn-post-social-btn:hover, .sq-btn-post-social-btn:visited {
 	color: #fff !important;
 }
+
+.social-media-disconnect {
+	height: 30px;
+	width: 30px;
+	margin: 0 10px;
+	background: url(../images/disconnect.png) no-repeat center;
+	cursor: pointer;
+	background-size: contain;
+}
