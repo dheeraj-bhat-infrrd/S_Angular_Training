@@ -7,6 +7,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpPost;
@@ -20,12 +21,14 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.DependsOn;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
+
 import twitter4j.Twitter;
 import twitter4j.TwitterException;
 import twitter4j.TwitterFactory;
 import twitter4j.auth.RequestToken;
 import twitter4j.conf.Configuration;
 import twitter4j.conf.ConfigurationBuilder;
+
 import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.dao.OrganizationUnitSettingsDao;
 import com.realtech.socialsurvey.core.dao.UserDao;
@@ -40,6 +43,7 @@ import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.exception.NonFatalException;
 import com.realtech.socialsurvey.core.services.organizationmanagement.UserManagementService;
 import com.realtech.socialsurvey.core.services.social.SocialManagementService;
+
 import facebook4j.Facebook;
 import facebook4j.FacebookException;
 import facebook4j.FacebookFactory;
@@ -341,5 +345,39 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
 		}
 		return settings;
 
+	}
+	
+	@Override
+	public OrganizationUnitSettings disconnectSocialNetwork(String socialMedia, OrganizationUnitSettings unitSettings, String collectionName) throws InvalidInputException {
+	    LOG.debug("Method disconnectSocialNetwork() called");
+	    
+	    String keyToUpdate = null;
+	    
+	    switch (socialMedia) {
+		case CommonConstants.FACEBOOK_SOCIAL_SITE:
+			keyToUpdate = MongoOrganizationUnitSettingDaoImpl.KEY_FACEBOOK_SOCIAL_MEDIA_TOKEN;
+			break;
+			
+		case CommonConstants.TWITTER_SOCIAL_SITE:
+			keyToUpdate = MongoOrganizationUnitSettingDaoImpl.KEY_TWITTER_SOCIAL_MEDIA_TOKEN;
+			break;
+			
+		case CommonConstants.GOOGLE_SOCIAL_SITE:
+			keyToUpdate = MongoOrganizationUnitSettingDaoImpl.KEY_GOOGLE_SOCIAL_MEDIA_TOKEN;
+			break;
+			
+		case CommonConstants.LINKEDIN_SOCIAL_SITE:
+			keyToUpdate = MongoOrganizationUnitSettingDaoImpl.KEY_LINKEDIN_SOCIAL_MEDIA_TOKEN;
+			break;
+
+		default:
+			throw new InvalidInputException("Invalid social media token entered");
+		}
+	    
+	    OrganizationUnitSettings organizationUnitSettings = organizationUnitSettingsDao.removeKeyInOrganizationSettings(unitSettings, keyToUpdate, collectionName);
+	    
+	    LOG.debug("Method disconnectSocialNetwork() finished");
+	    
+	    return organizationUnitSettings;
 	}
 }
