@@ -19,13 +19,13 @@ import com.realtech.socialsurvey.core.entities.UserSettings;
  */
 public interface DashboardService {
 
-	public long getAllSurveyCountForPastNdays(String columnName, long columnValue, int numberOfDays, boolean realtechAdmin);
+	public long getAllSurveyCountForPastNdays(String columnName, long columnValue, int numberOfDays);
 
-	public long getCompletedSurveyCountForPastNdays(String columnName, long columnValue, int numberOfDays, boolean realtechAdmin);
+	public long getCompletedSurveyCountForPastNdays(String columnName, long columnValue, int numberOfDays);
 
-	public long getClickedSurveyCountForPastNdays(String columnName, long columnValue, int numberOfDays, boolean realtechAdmin);
+	public long getClickedSurveyCountForPastNdays(String columnName, long columnValue, int numberOfDays);
 
-	public long getSocialPostsForPastNdays(String columnName, long columnValue, int numberOfDays, boolean realtechAdmin);
+	public long getSocialPostsForPastNdays(String columnName, long columnValue, int numberOfDays);
 
 	public double getSurveyScore(String columnName, long columnValue, int numberOfDays, boolean realtechAdmin);
 

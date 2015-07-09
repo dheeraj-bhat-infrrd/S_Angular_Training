@@ -280,15 +280,17 @@ public class DashboardController {
 			throw e;
 		}
 
+		if(realtechAdmin)
+			columnName = null;
 		double surveyScore = (double) Math.round(dashboardService
 				.getSurveyScore(columnName, columnValue, numberOfDays,
 						realtechAdmin) * 1000.0) / 1000.0;
 		int sentSurveyCount = (int) dashboardService
 				.getAllSurveyCountForPastNdays(columnName, columnValue,
-						numberOfDays, realtechAdmin);
+						numberOfDays);
 		int socialPostsCount = (int) dashboardService
 				.getSocialPostsForPastNdays(columnName, columnValue,
-						numberOfDays, realtechAdmin);
+						numberOfDays);
 		int profileCompleteness = 0;
 		if (!realtechAdmin)
 			profileCompleteness = dashboardService
@@ -342,6 +344,8 @@ public class DashboardController {
 			User user = sessionHelper.getCurrentUser();
 			columnValue = user.getCompany().getCompanyId();
 		}
+		if(realtechAdmin)
+			columnName = null;
 
 		int numberOfDays = -1;
 		try {
@@ -356,16 +360,16 @@ public class DashboardController {
 
 		model.addAttribute("allSurveySent", dashboardService
 				.getAllSurveyCountForPastNdays(columnName, columnValue,
-						numberOfDays, realtechAdmin));
+						numberOfDays));
 		model.addAttribute("completedSurvey", dashboardService
 				.getCompletedSurveyCountForPastNdays(columnName, columnValue,
-						numberOfDays, realtechAdmin));
+						numberOfDays));
 		model.addAttribute("clickedSurvey", dashboardService
 				.getClickedSurveyCountForPastNdays(columnName, columnValue,
-						numberOfDays, realtechAdmin));
+						numberOfDays));
 		model.addAttribute("socialPosts", dashboardService
 				.getSocialPostsForPastNdays(columnName, columnValue,
-						numberOfDays, realtechAdmin));
+						numberOfDays));
 
 		LOG.info("Method to get count of all, completed and clicked surveys, getSurveyCount() finished");
 		return JspResolver.DASHBOARD_SURVEYSTATUS;

@@ -33,7 +33,7 @@ public interface SurveyDetailsDao {
 
 	public long getTotalSurveyCountByMonth(int year, int month);
 
-	public long getSocialPostsCount(String columnName, long columnValue, int numberOfDays, boolean realtechAdmin);
+	public long getSocialPostsCount(String columnName, long columnValue, int numberOfDays);
 
 	public Map<String, Long> getCountOfSurveyInitiators(String columnName, long columnValue);
 
@@ -41,11 +41,11 @@ public interface SurveyDetailsDao {
 
 	public long getIncompleteSurveyCount(String columnName, long columnValue, int noOfDays);
 
-	public long getCompletedSurveyCount(String columnName, long columnValue, int noOfDays, boolean realtechAdmin);
+	public long getCompletedSurveyCount(String columnName, long columnValue, int noOfDays);
 
-	public long getSentSurveyCount(String columnName, long columnValue, int noOfDays, boolean realtechAdmin);
+	public long getSentSurveyCount(String columnName, long columnValue, int noOfDays);
 
-	public long getClickedSurveyCount(String columnName, long columnValue, int noOfDays, boolean realtechAdmin);
+	public long getClickedSurveyCount(String columnName, long columnValue, int noOfDays);
 
 	public List<SurveyDetails> getFeedbacks(String columnName, long columNValue, int start, int rows, double startScore, double limitScore,
 			boolean fetchAbusive, Date startDate, Date endDate, String sortCriteria);
