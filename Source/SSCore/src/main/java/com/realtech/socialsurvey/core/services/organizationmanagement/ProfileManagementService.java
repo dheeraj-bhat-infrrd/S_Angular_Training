@@ -346,7 +346,7 @@ public interface ProfileManagementService {
 	 * @throws InvalidInputException
 	 */
 	public List<SurveyPreInitiation> getIncompleteSurvey(long iden, double startScore, double limitScore, int startIndex, int numOfRows, String profileLevel,
-			Date startDate, Date endDate) throws InvalidInputException;
+			Date startDate, Date endDate, boolean realtechAdmin) throws InvalidInputException;
 	
 	/**
 	 * Method that mails the contact us message to the respective individual,branch,region,company
