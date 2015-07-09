@@ -157,7 +157,7 @@ public class OrganizationManagementController
 	 * @return
 	 */
 	@RequestMapping(value = "/addcompanyinformation", method = RequestMethod.POST)
-	public String addCompanyInformation(Model model, HttpServletRequest request, RedirectAttributes redirectAttributes) {
+	public String addCompanyInformation(HttpServletRequest request, RedirectAttributes redirectAttributes) {
 		LOG.info("Method addCompanyInformation of UserManagementController called");
 		String companyName = request.getParameter("company");
 		String address1 = request.getParameter("address1");

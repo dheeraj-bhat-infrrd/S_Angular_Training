@@ -100,7 +100,7 @@ public class PaymentController {
 	 * @return
 	 */
 	@RequestMapping(value = "/subscribe", method = RequestMethod.POST)
-	public String subscribeForPlan(Model model, HttpServletRequest request, HttpServletResponse response, RedirectAttributes redirectAttributes) {
+	public String subscribeForPlan(HttpServletRequest request, HttpServletResponse response, RedirectAttributes redirectAttributes) {
 
 		LOG.info("Payment controller called for plan subscribal");
 		String skipPayment = request.getParameter("skipPayment");

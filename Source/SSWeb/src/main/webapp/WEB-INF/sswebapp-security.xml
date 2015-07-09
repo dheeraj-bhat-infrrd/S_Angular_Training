@@ -26,6 +26,8 @@
 		
 		<!-- Registration Services -->
 		<intercept-url pattern="/resendRegistrationMail.do" access="permitAll" />
+		<intercept-url pattern="/generateregistrationurl.do" access="permitAll" />
+		<intercept-url pattern="/invitetoregister.do" access="permitAll" />
 		
 		<intercept-url pattern="/showcompleteregistrationpage.do" access="permitAll" />
 		<intercept-url pattern="/completeregistrationpage.do" access="permitAll" />
