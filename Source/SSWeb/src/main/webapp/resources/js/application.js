@@ -4353,6 +4353,12 @@ function showLinkedInProfileUrl(data) {
 	$('#wc-connect-link').html('LinkedIn Profile <u><a href=' + data + ' target="_blank">' + data + '</a></u>');
 }
 
+function loadSocialMediaUrlInSettingsPage() {
+	callAjaxGET('/getsocialmediatokenonsettingspage.do', function(data){
+		$('#social-media-token-cont').html(data);
+	}, false);
+}
+
 function showProfileLink(source, profileUrl){
 	if(source=='facebook'){
 		$('#fb-profile-url').html(profileUrl);
