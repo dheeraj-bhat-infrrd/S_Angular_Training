@@ -58,23 +58,23 @@ public class DashboardServiceImpl implements DashboardService, InitializingBean 
 	private SurveyHandler surveyHandler;
 
 	@Override
-	public long getAllSurveyCountForPastNdays(String columnName, long columnValue, int numberOfDays, boolean realtechAdmin) {
-		return surveyDetailsDao.getSentSurveyCount(columnName, columnValue, numberOfDays, realtechAdmin);
+	public long getAllSurveyCountForPastNdays(String columnName, long columnValue, int numberOfDays) {
+		return surveyDetailsDao.getSentSurveyCount(columnName, columnValue, numberOfDays);
 	}
 
 	@Override
-	public long getCompletedSurveyCountForPastNdays(String columnName, long columnValue, int numberOfDays, boolean realtechAdmin) {
-		return surveyDetailsDao.getCompletedSurveyCount(columnName, columnValue, numberOfDays, realtechAdmin);
+	public long getCompletedSurveyCountForPastNdays(String columnName, long columnValue, int numberOfDays) {
+		return surveyDetailsDao.getCompletedSurveyCount(columnName, columnValue, numberOfDays);
 	}
 
 	@Override
-	public long getClickedSurveyCountForPastNdays(String columnName, long columnValue, int numberOfDays, boolean realtechAdmin) {
-		return surveyDetailsDao.getClickedSurveyCount(columnName, columnValue, numberOfDays, realtechAdmin);
+	public long getClickedSurveyCountForPastNdays(String columnName, long columnValue, int numberOfDays) {
+		return surveyDetailsDao.getClickedSurveyCount(columnName, columnValue, numberOfDays);
 	}
 
 	@Override
-	public long getSocialPostsForPastNdays(String columnName, long columnValue, int numberOfDays, boolean realtechAdmin) {
-		return surveyDetailsDao.getSocialPostsCount(columnName, columnValue, numberOfDays, realtechAdmin);
+	public long getSocialPostsForPastNdays(String columnName, long columnValue, int numberOfDays) {
+		return surveyDetailsDao.getSocialPostsCount(columnName, columnValue, numberOfDays);
 	}
 
 	@Override

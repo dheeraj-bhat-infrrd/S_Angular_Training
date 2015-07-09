@@ -187,7 +187,7 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao {
 	// columnValue field can contain respective values for the columnName.
 
 	@Override
-	public long getSentSurveyCount(String columnName, long columnValue, int noOfDays, boolean realtechAdmin) {
+	public long getSentSurveyCount(String columnName, long columnValue, int noOfDays) {
 		LOG.info("Method to get count of total number of surveys sent so far, getSentSurveyCount() started.");
 		Date startDate = getNdaysBackDate(noOfDays);
 
@@ -206,7 +206,7 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao {
 	// "columnValue" field can contain respective values for the columnName.
 
 	@Override
-	public long getClickedSurveyCount(String columnName, long columnValue, int noOfDays, boolean realtechAdmin) {
+	public long getClickedSurveyCount(String columnName, long columnValue, int noOfDays) {
 		LOG.info("Method to get count of total number of surveys clicked so far, getClickedSurveyCount() started.");
 		Date endDate = Calendar.getInstance().getTime();
 		Date startDate = getNdaysBackDate(noOfDays);
@@ -226,7 +226,7 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao {
 	// "columnValue" field can contain respective values for the columnName.
 
 	@Override
-	public long getCompletedSurveyCount(String columnName, long columnValue, int noOfDays, boolean realtechAdmin) {
+	public long getCompletedSurveyCount(String columnName, long columnValue, int noOfDays) {
 		LOG.info("Method to get count of total number of surveys completed so far, getCompletedSurveyCount() started.");
 		Date endDate = Calendar.getInstance().getTime();
 		Date startDate = getNdaysBackDate(noOfDays);
@@ -469,7 +469,7 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao {
 	// Returns posts count on that site.
 
 	@Override
-	public long getSocialPostsCount(String columnName, long columnValue, int numberOfDays, boolean realtechAdmin) {
+	public long getSocialPostsCount(String columnName, long columnValue, int numberOfDays) {
 		LOG.info("Method to count number of social posts by customers, getSocialPostsCount() started.");
 		Date endDate = Calendar.getInstance().getTime();
 		Date startDate = getNdaysBackDate(numberOfDays);
