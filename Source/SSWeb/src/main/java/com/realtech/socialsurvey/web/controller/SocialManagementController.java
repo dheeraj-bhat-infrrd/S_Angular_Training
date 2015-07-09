@@ -1341,4 +1341,49 @@ public class SocialManagementController {
 		return profileUrl;
 	}
 	
+	@ResponseBody
+	@RequestMapping(value = "/disconnectsocialmedia", method = RequestMethod.POST)
+	public String disconnectSocialMedia(HttpServletRequest request) {
+		
+		String socialMedia = request.getParameter("socialMedia");
+		
+		try {
+			
+			if(socialMedia == null || socialMedia.isEmpty()) {
+				throw new InvalidInputException("Social media can not be null or empty");
+			}
+			
+			HttpSession session = request.getSession();
+			
+	        UserSettings userSettings = (UserSettings) session.getAttribute( CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION );
+	        UserProfile selectedProfile = (UserProfile) session.getAttribute( CommonConstants.USER_PROFILE );
+	        
+	        OrganizationUnitSettings unitSettings = null;
+	        int profileMasterId = selectedProfile.getProfilesMaster().getProfileId();
+	        String collectionName = null;
+	        
+	        //Check for the collection to update
+	        if ( profileMasterId == CommonConstants.PROFILES_MASTER_COMPANY_ADMIN_PROFILE_ID) {
+	                unitSettings = userSettings.getCompanySettings();
+	                collectionName = MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION;
+            } else if ( profileMasterId == CommonConstants.PROFILES_MASTER_REGION_ADMIN_PROFILE_ID ) {
+                unitSettings = userSettings.getRegionSettings().get( selectedProfile.getRegionId() );
+                collectionName = MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION;
+            } else if ( profileMasterId == CommonConstants.PROFILES_MASTER_BRANCH_ADMIN_PROFILE_ID ) {
+                unitSettings = userSettings.getBranchSettings().get( selectedProfile.getBranchId() );
+                collectionName = MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION;
+            } else if ( profileMasterId == CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID ) {
+                unitSettings = userSettings.getAgentSettings();
+                collectionName = MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION;
+            }
+			unitSettings = socialManagementService.disconnectSocialNetwork(socialMedia, unitSettings, collectionName);
+			session.setAttribute(CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION, userSettings);
+		} catch (NonFatalException e) {
+			LOG.error("Exception occured in disconnectSocialNetwork() while disconnecting with the social Media.");
+			return "failue";
+		}
+		
+		return "success";
+	}
+	
 }

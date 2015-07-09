@@ -67,6 +67,10 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
 	public static final String KEY_PROFILE_STAGES = "profileStages";
 	public static final String KEY_MODIFIED_ON = "modifiedOn";
 	public static final String KEY_DISCLAIMER = "disclaimer";
+	public static final String KEY_FACEBOOK_SOCIAL_MEDIA_TOKEN = "socialMediaTokens.facebookToken";
+	public static final String KEY_TWITTER_SOCIAL_MEDIA_TOKEN = "socialMediaTokens.twitterToken";
+	public static final String KEY_GOOGLE_SOCIAL_MEDIA_TOKEN = "socialMediaTokens.googleToken";
+	public static final String KEY_LINKEDIN_SOCIAL_MEDIA_TOKEN = "socialMediaTokens.linkedInToken";
 
 	private static final Logger LOG = LoggerFactory.getLogger(MongoOrganizationUnitSettingDaoImpl.class);
 
@@ -359,6 +363,19 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
         }
         LOG.info( "Method setAgentNames() finished." );
     }
+    
+    @Override
+    public OrganizationUnitSettings removeKeyInOrganizationSettings(OrganizationUnitSettings unitSettings, String keyToUpdate, String collectionName){
+		LOG.info("Method removeKeyInOrganizationSettings() started.");
+		Query query = new Query();
+		query.addCriteria(Criteria.where("_id").is(unitSettings.getId()));
+		Update update = new Update().unset(keyToUpdate);
+		LOG.debug("Updating the unit settings");
+		mongoTemplate.updateFirst(query, update, OrganizationUnitSettings.class, collectionName);
+		OrganizationUnitSettings organizationUnitSettings = mongoTemplate.findOne(query, OrganizationUnitSettings.class, collectionName);
+		LOG.info("Method removeKeyInOrganizationSettings() finished.");
+		return organizationUnitSettings;
+	}
 
 
 	/*
