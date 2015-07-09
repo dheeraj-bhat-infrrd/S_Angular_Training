@@ -36,7 +36,6 @@ import com.realtech.socialsurvey.core.entities.User;
 import com.realtech.socialsurvey.core.entities.UserProfile;
 import com.realtech.socialsurvey.core.entities.UserSettings;
 import com.realtech.socialsurvey.core.entities.VerticalCrmMapping;
-import com.realtech.socialsurvey.core.entities.VerticalsMaster;
 import com.realtech.socialsurvey.core.enums.AccountType;
 import com.realtech.socialsurvey.core.enums.DisplayMessageType;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
@@ -150,115 +149,119 @@ public class OrganizationManagementController
     }
 
 
-    /**
-     * Method to call service for adding company information for a user
-     * 
-     * @param model
-     * @param request
-     * @return
-     */
-    @RequestMapping ( value = "/addcompanyinformation", method = RequestMethod.POST)
-    public String addCompanyInformation( Model model, HttpServletRequest request )
-    {
-        LOG.info( "Method addCompanyInformation of UserManagementController called" );
-        String companyName = request.getParameter( "company" );
-        String address1 = request.getParameter( "address1" );
-        String address2 = request.getParameter( "address2" );
-        String country = request.getParameter( "country" );
-        String countryCode = request.getParameter( "countrycode" );
-        String zipCode = request.getParameter( "zipcode" );
-        String state = request.getParameter( "state" );
-        String city = request.getParameter( "city" );
-        String companyContactNo = request.getParameter( "contactno" );
-        String vertical = request.getParameter( "vertical" );
-        String phoneFormat = request.getParameter( "phoneFormat" );
-        String logoDecoyName = request.getParameter( "logoDecoyName" );
-        // JIRA SS-536: Added for manual registration via invitation
-        String strIsDirectRegistration = request.getParameter( "isDirectRegistration" );
+	/**
+	 * Method to call service for adding company information for a user
+	 * 
+	 * @param model
+	 * @param request
+	 * @return
+	 */
+	@RequestMapping(value = "/addcompanyinformation", method = RequestMethod.POST)
+	public String addCompanyInformation(HttpServletRequest request, RedirectAttributes redirectAttributes) {
+		LOG.info("Method addCompanyInformation of UserManagementController called");
+		String companyName = request.getParameter("company");
+		String address1 = request.getParameter("address1");
+		String address2 = request.getParameter("address2");
+		String country = request.getParameter("country");
+		String countryCode = request.getParameter("countrycode");
+		String zipCode = request.getParameter("zipcode");
+		String state = request.getParameter("state");
+		String city = request.getParameter("city");
+		String companyContactNo = request.getParameter("contactno");
+		String vertical = request.getParameter("vertical");
+		String phoneFormat = request.getParameter("phoneFormat");
+		String logoDecoyName = request.getParameter("logoDecoyName");
+		// JIRA SS-536: Added for manual registration via invitation
+		String strIsDirectRegistration = request.getParameter("isDirectRegistration");
 
-        try {
-            try {
-                validateCompanyInfoParams( companyName, address1, country, countryCode, zipCode, companyContactNo, vertical );
-            } catch ( InvalidInputException e ) {
-                List<VerticalsMaster> verticalsMasters = null;
-                try {
-                    verticalsMasters = organizationManagementService.getAllVerticalsMaster();
-                    model.addAttribute( "verticals", verticalsMasters );
+		try {
+			try {
+				validateCompanyInfoParams(companyName, address1, country, countryCode, zipCode, companyContactNo, vertical);
+			}
+			catch (InvalidInputException e) {
+				try {
+					redirectAttributes.addFlashAttribute("verticals", organizationManagementService.getAllVerticalsMaster());
+					redirectAttributes.addFlashAttribute("companyName", companyName);
+					redirectAttributes.addFlashAttribute("address1", address1);
+					redirectAttributes.addFlashAttribute("address2", address2);
+					redirectAttributes.addFlashAttribute("country", country);
+					redirectAttributes.addFlashAttribute("countryCode", countryCode);
+					redirectAttributes.addFlashAttribute("zipCode", zipCode);
+					redirectAttributes.addFlashAttribute("state", state);
+					redirectAttributes.addFlashAttribute("city", city);
+					redirectAttributes.addFlashAttribute("vertical", vertical);
+					redirectAttributes.addFlashAttribute("companyContactNo", companyContactNo);
+					redirectAttributes.addFlashAttribute("phoneFormat", phoneFormat);
+					redirectAttributes.addFlashAttribute("isDirectRegistration", strIsDirectRegistration);
+					redirectAttributes.addFlashAttribute("logoDecoyName", logoDecoyName);
+				}
+				catch (InvalidInputException e1) {
+					throw new InvalidInputException("Invalid Input exception occured in method getAllVerticalsMaster()",
+							DisplayMessageConstants.GENERAL_ERROR, e1);
+				}
 
-                    model.addAttribute( "companyName", companyName );
-                    model.addAttribute( "address1", address1 );
-                    model.addAttribute( "address2", address2 );
-                    model.addAttribute( "country", country );
-                    model.addAttribute( "countryCode", countryCode );
-                    model.addAttribute( "zipCode", zipCode );
-                    model.addAttribute( "state", state );
-                    model.addAttribute( "city", city );
-                    model.addAttribute( "vertical", vertical );
-                    model.addAttribute( "companyContactNo", companyContactNo );
-                    model.addAttribute( "phoneFormat", phoneFormat );
-                    model.addAttribute( "isDirectRegistration", strIsDirectRegistration );
-                    model.addAttribute( "logoDecoyName", logoDecoyName );
-                } catch ( InvalidInputException e1 ) {
-                    throw new InvalidInputException( "Invalid Input exception occured in method getAllVerticalsMaster()",
-                        DisplayMessageConstants.GENERAL_ERROR, e1 );
-                }
+				throw new InvalidInputException("Invalid input exception occured while validating form parameters", e.getErrorCode(), e);
+			}
 
-                throw new InvalidInputException( "Invalid input exception occured while validating form parameters",
-                    e.getErrorCode(), e );
-            }
+			User user = sessionHelper.getCurrentUser();
+			HttpSession session = request.getSession(true);
+			String logoName = null;
+			if (session.getAttribute(CommonConstants.LOGO_NAME) != null) {
+				logoName = session.getAttribute(CommonConstants.LOGO_NAME).toString();
+			}
+			session.removeAttribute(CommonConstants.LOGO_NAME);
 
-            HttpSession session = request.getSession( true );
-            User user = sessionHelper.getCurrentUser();
-            String logoName = null;
-            if ( session.getAttribute( CommonConstants.LOGO_NAME ) != null ) {
-                logoName = session.getAttribute( CommonConstants.LOGO_NAME ).toString();
-            }
-            session.removeAttribute( CommonConstants.LOGO_NAME );
+			Map<String, String> companyDetails = new HashMap<String, String>();
+			companyDetails.put(CommonConstants.COMPANY_NAME, companyName);
+			companyDetails.put(CommonConstants.ADDRESS, getCompleteAddress(address1, address2));
+			companyDetails.put(CommonConstants.ADDRESS1, address1);
+			if (address2 != null) {
+				companyDetails.put(CommonConstants.ADDRESS2, address2);
+			}
+			companyDetails.put(CommonConstants.COUNTRY, country);
+			companyDetails.put(CommonConstants.STATE, state);
+			companyDetails.put(CommonConstants.CITY, city);
+			companyDetails.put(CommonConstants.COUNTRY_CODE, countryCode);
+			companyDetails.put(CommonConstants.ZIPCODE, zipCode);
+			companyDetails.put(CommonConstants.COMPANY_CONTACT_NUMBER, companyContactNo);
+			if (logoName != null) {
+				companyDetails.put(CommonConstants.LOGO_NAME, logoName);
+			}
+			companyDetails.put(CommonConstants.VERTICAL, vertical);
 
-            Map<String, String> companyDetails = new HashMap<String, String>();
-            companyDetails.put( CommonConstants.COMPANY_NAME, companyName );
-            companyDetails.put( CommonConstants.ADDRESS, getCompleteAddress( address1, address2 ) );
-            companyDetails.put( CommonConstants.ADDRESS1, address1 );
-            if ( address2 != null ) {
-                companyDetails.put( CommonConstants.ADDRESS2, address2 );
-            }
-            companyDetails.put( CommonConstants.COUNTRY, country );
-            companyDetails.put( CommonConstants.STATE, state );
-            companyDetails.put( CommonConstants.CITY, city );
-            companyDetails.put( CommonConstants.COUNTRY_CODE, countryCode );
-            companyDetails.put( CommonConstants.ZIPCODE, zipCode );
-            companyDetails.put( CommonConstants.COMPANY_CONTACT_NUMBER, companyContactNo );
-            if ( logoName != null ) {
-                companyDetails.put( CommonConstants.LOGO_NAME, logoName );
-            }
-            companyDetails.put( CommonConstants.VERTICAL, vertical );
-            // JIRA SS-536: Added for manual registration via invitation
-            if ( strIsDirectRegistration.equalsIgnoreCase( "false" ) ) {
-                companyDetails.put( CommonConstants.BILLING_MODE_COLUMN, CommonConstants.BILLING_MODE_INVOICE );
-                model.addAttribute( "skippayment", "true" );
-            } else {
-                companyDetails.put( CommonConstants.BILLING_MODE_COLUMN, CommonConstants.BILLING_MODE_AUTO );
-                model.addAttribute( "skippayment", "false" );
-            }
+			// JIRA SS-536: Added for manual registration via invitation
+			if (strIsDirectRegistration.equalsIgnoreCase("false")) {
+				companyDetails.put(CommonConstants.BILLING_MODE_COLUMN, CommonConstants.BILLING_MODE_INVOICE);
+				redirectAttributes.addFlashAttribute("skippayment", "true");
+			}
+			else {
+				companyDetails.put(CommonConstants.BILLING_MODE_COLUMN, CommonConstants.BILLING_MODE_AUTO);
+				redirectAttributes.addFlashAttribute("skippayment", "false");
+			}
 
-            LOG.debug( "Calling services to add company details" );
-            user = organizationManagementService.addCompanyInformation( user, companyDetails );
+			LOG.debug("Calling services to add company details");
+			user = organizationManagementService.addCompanyInformation(user, companyDetails);
 
-            LOG.debug( "Updating profile completion stage" );
-            userManagementService.updateProfileCompletionStage( user, CommonConstants.PROFILES_MASTER_COMPANY_ADMIN_PROFILE_ID,
-                CommonConstants.ADD_ACCOUNT_TYPE_STAGE );
-        } catch ( NonFatalException e ) {
-            LOG.error( "NonFatalException while adding company information. Reason :" + e.getMessage(), e );
-            model.addAttribute( "status", DisplayMessageType.ERROR_MESSAGE );
-            model
-                .addAttribute( "message", messageUtils.getDisplayMessage( e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE ) );
-            return JspResolver.COMPANY_INFORMATION;
-        }
+			LOG.debug("Updating profile completion stage");
+			userManagementService.updateProfileCompletionStage(user, CommonConstants.PROFILES_MASTER_COMPANY_ADMIN_PROFILE_ID,
+					CommonConstants.ADD_ACCOUNT_TYPE_STAGE);
+		}
+		catch (NonFatalException e) {
+			LOG.error("NonFatalException while adding company information. Reason :" + e.getMessage(), e);
+			redirectAttributes.addFlashAttribute("status", DisplayMessageType.ERROR_MESSAGE);
+			redirectAttributes.addFlashAttribute("message", messageUtils.getDisplayMessage(e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE));
+			return "redirect:/" + JspResolver.COMPANY_INFORMATION_PAGE + ".do";
+		}
 
-        LOG.info( "Method addCompanyInformation of UserManagementController completed successfully" );
-        return JspResolver.ACCOUNT_TYPE_SELECTION;
-    }
-
+		LOG.info("Method addCompanyInformation of UserManagementController completed successfully");
+		return "redirect:/" + JspResolver.ACCOUNT_TYPE_SELECTION_PAGE + ".do";
+	}
+	
+	@RequestMapping(value = "/selectaccounttype")
+	public String initSelectAccountTypePage() {
+		LOG.info("SelectAccountType Page started");
+		return JspResolver.ACCOUNT_TYPE_SELECTION;
+	}
 
     /**
      * Method to validate form parameters of company information provided by the user
@@ -333,82 +336,77 @@ public class OrganizationManagementController
     }
 
 
-    /**
-     * Method to call services for saving the selected account type(plan)
-     * 
-     * @param model
-     * @param request
-     * @return
-     */
-    @RequestMapping ( value = "/addaccounttype", method = RequestMethod.POST)
-    public String addAccountType( Model model, HttpServletRequest request, HttpServletResponse response )
-    {
-        LOG.info( "Method addAccountType of UserManagementController called" );
-        String strAccountType = request.getParameter( "accounttype" );
-        String returnPage = null;
-        try {
-            if ( strAccountType == null || strAccountType.isEmpty() ) {
-                throw new InvalidInputException( "Accounttype is null for adding account type",
-                    DisplayMessageConstants.INVALID_ADDRESS );
-            }
-            LOG.debug( "AccountType obtained : " + strAccountType );
+	/**
+	 * Method to call services for saving the selected account type(plan)
+	 * 
+	 * @param model
+	 * @param request
+	 * @return
+	 */
+	@RequestMapping(value = "/addaccounttype", method = RequestMethod.POST)
+	public String addAccountType(Model model, HttpServletRequest request, HttpServletResponse response) {
+		LOG.info("Method addAccountType of UserManagementController called");
+		String strAccountType = request.getParameter("accounttype");
+		String returnPage = null;
+		try {
+			if (strAccountType == null || strAccountType.isEmpty()) {
+				throw new InvalidInputException("Accounttype is null for adding account type", DisplayMessageConstants.INVALID_ADDRESS);
+			}
+			LOG.debug("AccountType obtained : " + strAccountType);
 
-            User user = sessionHelper.getCurrentUser();
+			User user = sessionHelper.getCurrentUser();
 
-            // JIRA - SS-536
+			// JIRA - SS-536
 
-            // We check if there is mapped survey for the company and add a default survey if
-            // not.
-            if ( surveyBuilder.checkForExistingSurvey( user ) == null ) {
-                surveyBuilder.addDefaultSurveyToCompany( user );
-            }
+			// We check if there is mapped survey for the company and add a default survey if
+			// not.
+			if (surveyBuilder.checkForExistingSurvey(user) == null) {
+				surveyBuilder.addDefaultSurveyToCompany(user);
+			}
 
-            // check the company and see if manual registaration. Skip payment in that case
-            if ( user.getCompany().getBillingMode().equals( CommonConstants.BILLING_MODE_INVOICE ) ) {
-                // do what is done after payment
-                // insert into license table
-                // the account type is the accounts master id
-                payment.insertIntoLicenseTable( Integer.parseInt( strAccountType ), user,
-                    CommonConstants.INVOICE_BILLED_DEFULAT_SUBSCRIPTION_ID );
-                // set profile completion flag for the company admin
-                LOG.debug( "Calling sevices for updating profile completion stage" );
-                userManagementService
-                    .updateProfileCompletionStage( user, CommonConstants.PROFILES_MASTER_COMPANY_ADMIN_PROFILE_ID,
-                        CommonConstants.PRE_PROCESSING_BEFORE_LOGIN_STAGE );
-                LOG.debug( "Successfully executed sevices for updating profile completion stage" );
-                returnPage = "redirect:./" + CommonConstants.PRE_PROCESSING_BEFORE_LOGIN_STAGE;
-            } else {
+			// check the company and see if manual registaration. Skip payment in that case
+			if (user.getCompany().getBillingMode().equals(CommonConstants.BILLING_MODE_INVOICE)) {
+				// do what is done after payment
+				// insert into license table
+				// the account type is the accounts master id
+				payment.insertIntoLicenseTable(Integer.parseInt(strAccountType), user, CommonConstants.INVOICE_BILLED_DEFULAT_SUBSCRIPTION_ID);
+				// set profile completion flag for the company admin
+				LOG.debug("Calling sevices for updating profile completion stage");
+				userManagementService.updateProfileCompletionStage(user, CommonConstants.PROFILES_MASTER_COMPANY_ADMIN_PROFILE_ID,
+						CommonConstants.PRE_PROCESSING_BEFORE_LOGIN_STAGE);
+				LOG.debug("Successfully executed sevices for updating profile completion stage");
+				returnPage = "redirect:./" + CommonConstants.PRE_PROCESSING_BEFORE_LOGIN_STAGE;
+			}
+			else {
+				LOG.debug("Checking if payment has already been made.");
+				if (gateway.checkIfPaymentMade(user.getCompany())
+						&& user.getCompany().getLicenseDetails().get(CommonConstants.INITIAL_INDEX).getAccountsMaster().getAccountsMasterId() != CommonConstants.ACCOUNTS_MASTER_FREE) {
+					LOG.debug("Payment for this company has already been made. Redirecting to dashboard.");
+					return JspResolver.PAYMENT_ALREADY_MADE;
+				}
 
-                LOG.debug( "Checking if payment has already been made." );
-                if ( gateway.checkIfPaymentMade( user.getCompany() )
-                    && user.getCompany().getLicenseDetails().get( CommonConstants.INITIAL_INDEX ).getAccountsMaster()
-                        .getAccountsMasterId() != CommonConstants.ACCOUNTS_MASTER_FREE ) {
-                    LOG.debug( "Payment for this company has already been made. Redirecting to dashboard." );
-                    return JspResolver.PAYMENT_ALREADY_MADE;
-                }
+				if (Integer.parseInt(strAccountType) == CommonConstants.ACCOUNTS_MASTER_FREE) {
+					LOG.debug("Since its a free account type returning no popup jsp");
+					return null;
+				}
 
-                if ( Integer.parseInt( strAccountType ) == CommonConstants.ACCOUNTS_MASTER_FREE ) {
-                    LOG.debug( "Since its a free account type returning no popup jsp" );
-                    return null;
-                }
+				model.addAttribute("accounttype", strAccountType);
+				model.addAttribute("clienttoken", gateway.getClientToken());
+				model.addAttribute("message",
+						messageUtils.getDisplayMessage(DisplayMessageConstants.ACCOUNT_TYPE_SELECTION_SUCCESSFUL, DisplayMessageType.SUCCESS_MESSAGE));
 
-                model.addAttribute( "accounttype", strAccountType );
-                model.addAttribute( "clienttoken", gateway.getClientToken() );
-                model.addAttribute( "message", messageUtils.getDisplayMessage(
-                    DisplayMessageConstants.ACCOUNT_TYPE_SELECTION_SUCCESSFUL, DisplayMessageType.SUCCESS_MESSAGE ) );
-
-                LOG.info( "Method addAccountType of UserManagementController completed successfully" );
-                returnPage = JspResolver.PAYMENT;
-            }
-        } catch ( NonFatalException e ) {
-            LOG.error( "NonfatalException while adding account type. Reason: " + e.getMessage(), e );
-            model
-                .addAttribute( "message", messageUtils.getDisplayMessage( e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE ) );
-            return JspResolver.MESSAGE_HEADER;
-        }
-        return returnPage;
-
-    }
+				LOG.info("Method addAccountType of UserManagementController completed successfully");
+				returnPage = JspResolver.PAYMENT;
+			}
+		}
+		catch (NonFatalException e) {
+			LOG.error("NonfatalException while adding account type. Reason: " + e.getMessage(), e);
+			model.addAttribute("message", messageUtils.getDisplayMessage(e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE));
+			return JspResolver.MESSAGE_HEADER;
+		}
+		
+		return returnPage;
+	}
 
 
     /**
