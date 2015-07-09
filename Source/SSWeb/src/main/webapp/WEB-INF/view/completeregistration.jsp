@@ -107,7 +107,7 @@
 				</div>
 			</div>
 			<input type="hidden" value="${message}" name="message" id="message"/>
-			<input type="hidden" value="${param.q}" name="q">
+			<input type="hidden" value="${q}" name="q">
 			<input type="hidden" value="${company}" name="companyId">
 		</form>
 		
