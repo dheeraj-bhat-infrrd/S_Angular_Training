@@ -1603,6 +1603,9 @@
         margin: 0 auto;
         float: none !important;
     }
+    .stats-right-survey {
+    	width: 600px
+    }
     .stats-right-adj{
         clear: both;
         width: 100%;
@@ -1610,10 +1613,10 @@
         float: none !important;
     }
     .stat-icn-lbl {
-        width: 180px;
-        font-size: 14px;
-    }
-    .stat-icn-img{
+		width: 190px;
+		font-size: 13px;
+	}
+	.stat-icn-img{
         width: 14px;
     }
     .stat-icn-txt-rt {

@@ -838,9 +838,17 @@ function paintSurveyGraph() {
 
 //Being called from dashboard.jsp on key up event.
 function searchBranchRegionOrAgent(searchKeyword, flow) {
-	var e = document.getElementById("selection-list");
-	if (flow == 'graph')
-		e = document.getElementById("graph-sel-list");
+	var e;
+	
+	if(flow == 'icons') {
+		e = document.getElementById("selection-list");
+	} else if (flow == 'graph'){
+		e = document.getElementById("graph-sel-list");		
+	} else if (flow == 'reports') {
+		e = document.getElementById("admin-report-dwn");	
+	} else {
+		return false;
+	}
 	searchColumn = e.options[e.selectedIndex].value;
 	var payload = {
 		"columnName" : colName,
