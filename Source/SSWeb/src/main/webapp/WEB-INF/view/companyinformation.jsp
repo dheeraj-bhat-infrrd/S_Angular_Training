@@ -58,7 +58,7 @@
 						<div class="float-left rfr_txt">
 							<div class="rfr_icn icn-logo"></div>
 							<div class="icn-lname input-file-icn-left" id="input-file-icn-left"></div>
-							<div class="rfr_txt_fld"><input type="text" class="rfr_input_fld" id="com-logo-decoy" placeholder='<spring:message code="label.logo.placeholder.key"/>'></div>
+							<div class="rfr_txt_fld"><input type="text" class="rfr_input_fld" id="com-logo-decoy" name="logoDecoyName" placeholder='<spring:message code="label.logo.placeholder.key"/>' value="${logoDecoyName}"></div>
 							<div><input type="file" class="rfr_input_fld com-logo-comp-info" id="com-logo" name="logo"></div>
 							<div class="float-right input-icon-internal icn-file file-pick-logo file-pick-logo-adj" id="icn-file"></div>
 						</div>
@@ -207,6 +207,8 @@ $(document).ready(function() {
 		phoneFormat = $('#com-phone-format').val();
 	}
 	
+	currentPhoneRegEx = phoneFormat; 
+	
 	$('#com-contactno').mask(phoneFormat, {'translation': {d: {pattern: /[0-9*]/}}});
 	
 	if ($('#com-country').val() != "" && $('#country-code').val() != "") {
@@ -214,7 +216,7 @@ $(document).ready(function() {
 		for (var i = 0; i < postCodeRegex.length; i++) {
 			if (postCodeRegex[i].code == countryCode) {
 				selectedCountryRegEx = "^" + postCodeRegex[i].regex + "$";
-				selectedCountryRegEx = new RegExp(selectedCountryRegEx);
+				selectedCountryRegEx = new RegExp(selectedCountryRegEx);					
 				break;
 			}
 		}
@@ -238,12 +240,9 @@ $(document).ready(function() {
 		minLength: 1,
 		source: countryData,
 		delay : 0,
+		autoFocus : true,
 		open : function(event, ui) {
 			$( "#country-code" ).val("");
-		},
-		focus: function(event, ui) {
-			$( "#com-country" ).val(ui.item.label);
-			return false;
 		},
 		select: function(event, ui) {
 			$("#com-country").val(ui.item.label);
@@ -263,6 +262,7 @@ $(document).ready(function() {
 			
 			$('#com-contactno').unmask();
 			phoneFormat = phoneFormatList[ui.item.code];
+			currentPhoneRegEx = phoneFormat;
 			$('#com-contactno').mask(phoneFormat, {'translation': {d: {pattern: /[0-9*]/}}});
 			
 			return false;
@@ -274,6 +274,15 @@ $(document).ready(function() {
 	}).autocomplete("instance")._renderItem = function(ul, item) {
 		return $("<li>").append(item.label).appendTo(ul);
   	};
+  	$("#com-country").keydown(function(e){
+  	    if( e.keyCode != $.ui.keyCode.TAB) return; 
+  	    
+   	   e.keyCode = $.ui.keyCode.DOWN;
+   	   $(this).trigger(e);
+
+   	   e.keyCode = $.ui.keyCode.ENTER;
+   	   $(this).trigger(e);
+   	});
 });
 
 $('#com-state').on('change',function(e){
@@ -316,7 +325,15 @@ function initializeCityLookup(searchData){
 			});
 			$('.ui-autocomplete').perfectScrollbar('update');
 		}
-	});
+	}).keydown(function(e){
+  	    if( e.keyCode != $.ui.keyCode.TAB) return; 
+  	    
+   	   e.keyCode = $.ui.keyCode.DOWN;
+   	   $(this).trigger(e);
+
+   	   e.keyCode = $.ui.keyCode.ENTER;
+   	   $(this).trigger(e);
+   	});
 	
 }
 

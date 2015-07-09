@@ -7,6 +7,11 @@
 	<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<title><spring:message code="label.prolist.title.key" /></title>
+	<meta name="keywords"
+		content="find-pro-first-name=${patternFirst}&find-pro-last-name=${patternLast}, professional, online, reputation, social, survey, reviews, rating">
+	<meta name="description"
+		content="${usersList.userFound } Professionals reviewed. Find find-pro-first-name=${patternFirst}&find-pro-last-name=${patternLast} professional reviews, ratings, reputation, and contact information on SocialSurvey.me">
+	<link rel="canonical" href="https://socialsurvey.me/findapro.do?find-pro-first-name=${patternFirst}&find-pro-last-name=${patternLast}">
 	<link rel="shortcut icon" href="/favicon.ico" sizes="16x16">
 	<link rel="stylesheet" href="${initParam.resourcesPath}/resources/css/bootstrap.min.css">
 	<link rel="stylesheet" href="${initParam.resourcesPath}/resources/css/style-common-1.1.css">
@@ -95,13 +100,7 @@
 		</div>
 	</div>
 	<jsp:include page="footer_new.jsp"></jsp:include>
-	<script src="${initParam.resourcesPath}/resources/js/jquery-2.1.1.min.js"></script>
-	<script src="${initParam.resourcesPath}/resources/js/bootstrap.min.js"></script>
-	<script src="${initParam.resourcesPath}/resources/js/script-1.1.js"></script>
-    <script src="${initParam.resourcesPath}/resources/js/script.js"></script>
-	<script src="${initParam.resourcesPath}/resources/js/common.js"></script>
-	<script src="${initParam.resourcesPath}/resources/js/profile_common.js"></script>
-	<script src="${initParam.resourcesPath}/resources/js/application.js"></script>
+	<jsp:include page="scripts.jsp"></jsp:include>
 	<script>
 	$(document).ready(function() {
 		$('#fp-users-size').val(0);

@@ -28,8 +28,10 @@
 	<c:set value="${socialMediaTokens.facebookToken}" var="facebookToken"></c:set>
 	<c:set value="${socialMediaTokens.twitterToken}" var="twitterToken"></c:set>
 	<c:set value="${socialMediaTokens.linkedInToken}" var="linkedInToken"></c:set>
-	<c:set value="${socialMediaTokens.yelpToken}" var="yelpToken"></c:set>
 	<c:set value="${socialMediaTokens.googleToken}" var="googleToken"></c:set>
+	<c:set value="${socialMediaTokens.yelpToken}" var="yelpToken"></c:set>
+	<c:set value="${socialMediaTokens.zillowToken}" var="zillowToken"></c:set>
+	<c:set value="${socialMediaTokens.lendingTreeToken}" var="lendingTreeToken"></c:set>
 </c:if>
 
 <!-- Setting agent page variables -->
@@ -101,34 +103,7 @@
 		<div class="row prof-pic-name-wrapper edit-prof-pic-name-wrapper">
 			<div class="col-lg-4 col-md-4 col-sm-4 col-xs-6 prof-wrapper prof-img-wrapper">
 				<div id="prof-img-container" class="prog-img-container prof-img-lock-wrapper">
-					<c:choose>
-						<c:when test="${not empty profileimage}">
-							<div id="prof-image-edit" class="prof-image prof-image-edit pos-relative cursor-pointer" style="background: url(${profileimage}) no-repeat center; background-size: contain"></div>
-						</c:when>
-						<c:otherwise>
-							<c:choose>
-								<c:when test="${profilemasterid == 1}">
-									<c:set value="comp-default-img" var="defaultprofimageclass"></c:set>
-								</c:when>
-								<c:when test="${profilemasterid == 2}">
-									<c:set value="region-default-img" var="defaultprofimageclass"></c:set>
-								</c:when>
-								<c:when test="${profilemasterid == 3}">
-									<c:set value="office-default-img" var="defaultprofimageclass"></c:set>
-								</c:when>
-								<c:when test="${profilemasterid == 4}">
-									<c:set value="pers-default-big" var="defaultprofimageclass"></c:set>
-								</c:when>
-							</c:choose>	
-							<div id="prof-image-edit" class="prof-image prof-image-edit ${defaultprofimageclass} pos-relative cursor-pointer"></div>						
-						</c:otherwise>
-					</c:choose>
-					<form class="form_contact_image" enctype="multipart/form-data">
-						<input type='file' id="prof-image" class="con_img_inp_file" />
-					</form>
-					<div class="prof-rating-mobile-wrapper hide">
-						<div class="st-rating-wrapper maring-0 clearfix"></div>
-					</div>
+					<jsp:include page="profile_profileimage.jsp"></jsp:include>
 				</div>
 			</div>
 			<div class="col-lg-4 col-md-4 col-sm-4 col-xs-6 prof-wrapper pos-relative prof-name-wrapper edit-prof-name-wrapper">
@@ -138,56 +113,8 @@
 			</div>
 			<div class="col-lg-4 col-md-4 col-sm-4 prof-wrapper prof-map-wrapper float-right">
 				<div id="prof-logo-container" class="lp-prog-img-container" style="position: relative;">
-					<c:choose>
-						<c:when test="${not empty profilelogo}">
-							<div id="prof-logo-edit" class="prof-image-rp prof-image-edit pos-relative cursor-pointer" style="background: url(${profilelogo}) no-repeat center; 50% 50% no-repeat; background-size: contain;"></div>
-							<c:choose>
-								<c:when test="${accountMasterId == 1 || accountMasterId == 5}">
-									<form class="form_contact_image" enctype="multipart/form-data">
-										<input type="file" id="prof-logo" class="con_img_inp_file">
-									</form>
-								</c:when>
-								<c:when	test="${parentLock.isLogoLocked && profilemasterid != 4}">
-									<div id="prof-logo-lock" data-state="locked" data-control="parent" class="prof-img-lock-item prof-img-lock prof-img-lock-locked"></div>
-									<form class="form_contact_image" enctype="multipart/form-data">
-										<input type="file" id="prof-logo" class="con_img_inp_file" disabled>
-									</form>
-								</c:when>
-								<c:when	test="${parentLock.isLogoLocked && profilemasterid == 4}">
-									<div id="prof-logo-lock" data-state="locked" data-control="parent" class="prof-img-lock-locked"></div>
-									<form class="form_contact_image" enctype="multipart/form-data">
-										<input type="file" id="prof-logo" class="con_img_inp_file" disabled>
-									</form>
-								</c:when>
-								<c:when	test="${not parentLock.isLogoLocked && profilemasterid == 4}">
-									<div id="prof-logo-lock" data-state="unlocked" data-control="user" class=""></div>
-									<form class="form_contact_image" enctype="multipart/form-data">
-										<input type="file" id="prof-logo" class="con_img_inp_file">
-									</form>
-								</c:when>
-								<c:when	test="${not parentLock.isLogoLocked && lock.isLogoLocked && profilemasterid != 4}">
-									<div id="prof-logo-lock" data-state="unlocked" data-control="user" class="prof-img-lock-item prof-img-lock prof-img-lock-locked"></div>
-									<form class="form_contact_image" enctype="multipart/form-data">
-										<input type="file" id="prof-logo" class="con_img_inp_file">
-									</form>
-								</c:when>
-								<c:when	test="${not parentLock.isLogoLocked && not lock.isLogoLocked && profilemasterid != 4}">
-									<div id="prof-logo-lock" data-state="unlocked" data-control="user" class="prof-img-lock-item prof-img-lock"></div>
-									<form class="form_contact_image" enctype="multipart/form-data">
-										<input type="file" id="prof-logo" class="con_img_inp_file">
-									</form>
-								</c:when>
-							</c:choose>
-						</c:when>
-						<c:otherwise>
-							<div id="prof-logo-edit" class="prof-image-rp prof-image-edit pos-relative cursor-pointer prof-logo-edit"></div>
-							<form class="form_contact_image" enctype="multipart/form-data">
-								<input type="file" id="prof-logo" class="con_img_inp_file">
-							</form>
-						</c:otherwise>
-					</c:choose>
+					<jsp:include page="profile_profilelogo.jsp"></jsp:include>
 				</div>
-				
 				<div id="prof-address-container" class="prof-user-address prof-edit-icn cursor-pointer" onclick="showEditAddressPopup();">
 					<jsp:include page="profile_addressdetails.jsp"></jsp:include>
 				</div>
@@ -214,13 +141,18 @@
 					</c:if>
 
 					<c:if test="${accountMasterId != 5}">
-						<div id="prof-edit-social-link"
-							class="prof-edit-social-link float-right hm-hr-row-right clearfix">
-							<div id="icn-fb" class="float-left social-item-icon icn-fb" data-link="${facebookToken.facebookPageLink}"></div>
-							<div id="icn-twit" class="float-left social-item-icon icn-twit" data-link="${twitterToken.twitterPageLink}"></div>
-							<div id="icn-lin" class="float-left social-item-icon icn-lin" data-link="${linkedInToken.linkedInPageLink}"></div>
-							<div id="icn-yelp" class="float-left social-item-icon icn-yelp" data-link="${yelpToken.yelpPageLink}"></div>
-                            <div id="icn-gplus" class="float-left social-item-icon icn-gplus" data-link="${googleToken.profileLink}"></div>
+						<div id="prof-edit-social-link" class="prof-edit-social-link float-right hm-hr-row-right clearfix">
+							<%-- <div id="icn-fb" class="float-left social-item-icon icn-fb" data-link="${facebookToken.facebookPageLink}" title="Facebook"></div>
+							<div id="icn-twit" class="float-left social-item-icon icn-twit" data-link="${twitterToken.twitterPageLink}" title="Twitter"></div>
+							<div id="icn-lin" class="float-left social-item-icon icn-lin" data-link="${linkedInToken.linkedInPageLink}" title="LinkedIn"></div>
+                            <div id="icn-gplus" class="float-left social-item-icon icn-gplus" data-link="${googleToken.profileLink}" title="Google+"></div> --%>
+							<div id="icn-fb" class="float-left social-item-icon icn-fb" onclick="openAuthPage('facebook');" title="Facebook"></div>
+							<div id="icn-twit" class="float-left social-item-icon icn-twit" onclick="openAuthPage('twitter');" title="Twitter"></div>
+							<div id="icn-lin" class="float-left social-item-icon icn-lin" onclick="openAuthPage('linkedin');" title="LinkedIn"></div>
+                            <div id="icn-gplus" class="float-left social-item-icon icn-gplus" onclick="openAuthPage('google');" title="Google+"></div>
+							<div id="icn-yelp" class="float-left social-item-icon icn-yelp" data-link="${yelpToken.yelpPageLink}" title="Yelp"></div>
+							<div id="icn-zillow" class="float-left social-item-icon icn-zillow" data-link="${zillowToken.zillowProfileLink}" title="Zillow"></div>
+							<div id="icn-lendingtree" class="float-left social-item-icon icn-lendingtree" data-link="${lendingTreeToken.lendingTreeProfileLink}" title="LendingTree"></div>
 							<input id="social-token-text" type="text" class="social-token-text hide"
 								placeholder='<spring:message code="label.socialpage.placeholder.key"/>'>
 						</div>
@@ -410,43 +342,7 @@
 			
 			<div class="row prof-right-panel-wrapper margin-top-25 col-lg-8 col-md-8 col-sm-8 col-xs-12">
 				<div id="intro-about-me" class="intro-wrapper rt-content-main bord-bot-dc main-rt-adj">
-					<div class="main-con-header main-con-header-adj clearfix">
-						<div class="float-left">
-							<spring:message code="label.about.key" /> ${contactdetail.name}
-						</div>
-						<div class="float-left">
-							<c:choose>
-								<c:when	test="${parentLock.isAboutMeLocked && profilemasterid != 4}">
-									<div id="aboutme-lock" data-state="locked" data-control="parent" class="lp-edit-locks float-left lp-edit-locks-locked"></div>
-								</c:when>
-								<c:when	test="${parentLock.isAboutMeLocked && profilemasterid == 4}">
-									<div id="aboutme-lock" data-state="locked" data-control="parent" class="hide lp-edit-locks float-left lp-edit-locks-locked"></div>
-								</c:when>
-								<c:when	test="${not parentLock.isAboutMeLocked && profilemasterid == 4}">
-									<div id="aboutme-lock" data-state="unlocked" data-control="user" class="hide lp-edit-locks float-left lp-edit-locks-locked"></div>
-								</c:when>
-								<c:when	test="${not parentLock.isAboutMeLocked && lock.isAboutMeLocked && profilemasterid != 4}">
-									<div id="aboutme-lock" data-state="unlocked" data-control="user" class="lp-edit-locks float-left lp-edit-locks-locked"></div>
-								</c:when>
-								<c:when	test="${not parentLock.isAboutMeLocked && not lock.isAboutMeLocked && profilemasterid != 4}">
-									<div id="aboutme-lock" data-state="unlocked" data-control="user" class="lp-edit-locks float-left"></div>
-								</c:when>
-							</c:choose>
-						</div>
-					</div>
-					<c:choose>
-						<c:when	test="${not empty contactdetail.about_me && not empty fn:trim(contactdetail.about_me)}">
-							<div class="pe-whitespace intro-body" id="intro-body-text">${fn:trim(contactdetail.about_me)}</div>
-							<textarea class="pe-whitespace sb-txtarea hide" id="intro-body-text-edit">${fn:trim(contactdetail.about_me)}</textarea>
-						</c:when>
-						<c:otherwise>
-							<div class="intro-body" id="intro-body-text">
-								<spring:message code="label.aboutcompany.empty.key" />
-							</div>
-							<input type="hidden" id="aboutme-status" value="new"/>
-							<textarea class="pe-whitespace sb-txtarea hide" id="intro-body-text-edit"></textarea>
-						</c:otherwise>
-					</c:choose>
+					<jsp:include page="profile_aboutme.jsp"></jsp:include>
 				</div>
 				
 				<div id="ppl-post-cont" class="rt-content-main bord-bot-dc clearfix">
@@ -457,22 +353,7 @@
 					<div class="float-left panel-tweet-wrapper">
 						<div class="main-con-header"><spring:message code="label.latestposts.key"/></div>
 						<div id="prof-posts" class="tweet-panel tweet-panel-left">
-							<div class="tweet-panel-item bord-bot-dc clearfix">
-								<div class="tweet-icn icn-tweet float-left"></div>
-								<div class="tweet-txt float-left">
-									<div class="tweet-text-main">Lorem ipsunmm dore tit sre leru Lorem ipsunmm dore tit sre leru Lorem ipsunmm dore tit sre leru Lorem ipsunmm dore tit </div>
-									<div class="tweet-text-link"><em>http://abblk.com</em></div>
-									<div class="tweet-text-time"><em>24 minutes ago</em></div>
-								</div>
-							</div>
-							<div class="tweet-panel-item bord-bot-dc clearfix">
-								<div class="tweet-icn icn-tweet float-left"></div>
-								<div class="tweet-txt float-left">
-									<div class="tweet-text-main">Lorem ipsunmm dore tit sre leru Lorem ipsunmm dore tit sre leru Lorem ipsunmm dore tit sre leru Lorem ipsunmm dore tit </div>
-									<div class="tweet-text-link"><em>http://abblk.com</em></div>
-									<div class="tweet-text-time"><em>24 minutes ago</em></div>
-								</div>
-							</div>
+							<!--  latest posts get populated here --> 
 						</div>
 					</div>
 				</div>
@@ -482,7 +363,7 @@
 						<span class="ppl-say-txt-st"><spring:message code="label.peoplesayabout.key"/></span>${contactdetail.name}
 					</div>
 					<div id="prof-review-item" class="prof-reviews">
-						<!--  reviews get populated here --> 
+						<!--  reviews get populated here -->
 					</div>
 			   	</div>
 			</div>
@@ -518,6 +399,12 @@
 		$('#prof-post-btn').unbind('click');
 		$('#prof-post-btn').click(function() {
 			var textContent = $('#status-body-text-edit').val().trim();
+			if (textContent == undefined || textContent == "") {
+				$('#overlay-toast').html("Please enter valid data to post");
+				showToast();
+				return;
+			}
+			
 			$('#status-body-text-edit').val('');
 			var payload = {
 				"text" : textContent
@@ -536,6 +423,13 @@
 					if (success) {
 						showPosts(true);
 					}
+				},
+				error : function(e) {
+					if(e.status == 504) {
+						redirectToLoginPageOnSessionTimeOut(e.status);
+						return;
+					}
+					redirectErrorpage();
 				}
 			});
 		});
@@ -585,6 +479,14 @@
 		$('#contact-wrapper').hide();
 		$('#reviews-container').hide();
 		$('#ppl-post-cont').hide();
+	});
+	$('#prof-basic-container').on('mouseover',function(e){
+		$('#prof-basic-container .prof-edit-field-icn').show();
+		$('#prof-basic-container .prof-edditable').addClass('prof-name-edit');
+	});
+	$('#prof-basic-container').on('mouseleave',function(e){
+		$('#prof-basic-container .prof-edit-field-icn').hide();
+		$('#prof-basic-container .prof-edditable').removeClass('prof-name-edit');
 	});
 });
 </script>

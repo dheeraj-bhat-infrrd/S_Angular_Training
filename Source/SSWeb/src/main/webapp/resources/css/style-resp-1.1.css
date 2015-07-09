@@ -372,12 +372,12 @@
     .fp-inp{
     	width:150px;
     }
-    .hdr-logo{
-        width: 110px;
-        background: url(../images/ss-logo.png) no-repeat left center;
-        background-size: 90%;
-    }
-    .hdr-link-item{
+    .hdr-logo {
+		width: 100px;
+		background: url(../images/ss-logo.png) no-repeat left 28px;
+		background-size: 90%;
+	}
+	.hdr-link-item{
         padding: 0 6px;
         font-size: 13px;
     }
@@ -399,6 +399,12 @@
         font-size: 11px;
         margin-left: 5px;
         padding-left: 5px;
+    }
+    .wc-form-txt {
+    	width: 80px;
+    }
+    .wc-form-input {
+    	width:  210px;
     }
 }
 
@@ -508,4 +514,13 @@
     .dash-btn-dl-sd *{
     	font-size: 11px;
     }
+    .user-info-logo, .hdr-logo {
+		width: 100px;
+	}
+	.left-panel-content {
+		padding-left: 5px;
+	}
+	.main-con-header {
+		padding-left: 5px;
+	}
 }

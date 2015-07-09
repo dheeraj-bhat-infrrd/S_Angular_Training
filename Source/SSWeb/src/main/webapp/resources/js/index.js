@@ -83,7 +83,6 @@ function validatePreRegistrationForm(id) {
 	if (!validateRegLastName('reg-lname')) {
 		$('#reg-lname').focus();
 		return false;
-
 	}
 	if (!validateRegEmailId('reg-email')) {
 		$('#reg-email').focus();
@@ -142,7 +141,8 @@ function validateRegLastName(elementId) {
 			return false;
 		}
 	} else {
-		return true;
+		showRegErr('Please enter a valid last name.');
+		return false;
 	}
 }
 

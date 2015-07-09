@@ -88,6 +88,9 @@ var autoPostScore;
 var happyText;
 var neutralText;
 var sadText;
+var happyTextComplete;
+var neutralTexCompletet;
+var sadTextComplete;
 var rating;
 var firstName;
 var lastName;
@@ -95,8 +98,76 @@ var surveyUrl = "/rest/survey/";
 var editable;
 var yelpEnabled;
 var googleEnabled;
+var zillowEnabled;
+var lendingtreeEnabled;
 var agentProfileLink;
 var agentFullProfileLink;
+var companyLogo;
+
+
+/**
+ * js functions for landing page
+ */
+/**
+ * function to change the content of page through ajax
+ * 
+ * @param url
+ */
+function showMainContent(url) {
+	closeMoblieScreenMenu();
+	saveState(url);
+	callAjaxGET(url, showMainContentCallBack, true);
+}
+
+/**
+ * Callback for showMainContent, displays data in the main content section
+ * 
+ * @param data
+ */
+function showMainContentCallBack(data) {
+	$("#main-content").html(data);
+}
+
+
+/*
+ * This module helps in browser navigation support to give a single page app
+ * 
+ * Functions for history support
+ */
+
+var historyCallback = false;
+var refreshSupport = true;
+
+function getRandomID() {
+	return (Math.floor(Math.random() * 10000) + Math
+			.floor(Math.random() * 10000));
+}
+
+function saveState(url) {
+
+	var hashUrl = "";
+	hashUrl = url.substring(2, url.length - 3);
+	if (!historyCallback) {
+		history.pushState(getRandomID(), null, "#" + hashUrl);
+
+	}
+	historyCallback = false;
+}
+
+function retrieveState() {
+	if (!refreshSupport) {
+		console.log('refresh not supported');
+		return;
+	}
+	var newLocation = window.location.hash.substring(1);
+	if (newLocation) {
+		showMainContent("/"+newLocation+".do");
+	}
+}
+/*End of functions for history support*/
+
+
+
 $(document).on('click', '.icn-plus-open', function() {
 	$(this).hide();
 	$(this).parent().find('.ppl-share-social,.icn-remove').show();
@@ -167,10 +238,25 @@ $(document).on('click', '.report-abuse-txt', function(e) {
 	});
 	$('.rpa-report-btn').on('click',function(){
 		var reportText = $("#report-abuse-txtbox").val();
-		payload.reportText = reportText;
-		confirmReportAbuse(payload);
+		if(validateReportAbuseUserForm(reportText)){
+			payload.reportText = reportText;
+			confirmUserReportAbuse(payload);
+		}
 	});
 });
+
+function validateReportAbuseUserForm(reportText) {
+	
+	//check if report text is empty
+	if(reportText == undefined || reportText == ""){
+		$('#overlay-toast').html('Please enter why you want to report the review!');
+		showToast();
+		return false;
+	}
+	
+	return true;
+}
+
 
 function confirmUserReportAbuse(payload) {
 	callAjaxGetWithPayloadData('./reportabuse.do', function() {
@@ -210,7 +296,8 @@ function paintDashboard(profileMasterId, newProfileName, newProfileValue, typeoO
 			oldConW = $('.container').width();
 		}
 	});
-	
+	lastColNameForCount = newProfileName;
+	lastColValueForCount = newProfileValue;
 	if (profileMasterId == 1) {
 		showCompanyAdminFlow(newProfileName, newProfileValue);
 	} else if (profileMasterId == 2) {
@@ -357,6 +444,7 @@ function bindSelectButtons() {
 		if($('#dsh-srch-survey-div').is(':visible')){
 			columnName = lastColNameForCount;
 			columnValue = lastColValueForCount;
+			console.info("lastColNameForCount:"+lastColNameForCount+" lastColValueForCount:"+lastColValueForCount);
 		}
 		showSurveyStatistics(columnName, columnValue);
 	});
@@ -431,6 +519,7 @@ function showIncompleteSurvey(columnName, columnValue) {
 			scrollContainer.onscroll = function() {
 				if (scrollContainer.scrollTop === scrollContainer.scrollHeight - scrollContainer.clientHeight) {
 					showIncompleteSurvey(colName, colValue);
+					$('#dsh-inc-srvey').perfectScrollbar('update');
 				}
 			};
 	
@@ -459,7 +548,14 @@ function getReviewsCountAndShowReviews(columnName, columnValue) {
 				return;
 			} else {
 				$("#review-desc").html("What people say about " + name.substring(1, name.length - 1));
-				$("#dsh-cmp-dwnld").show();
+				if(colName == "companyId"){
+					$("#dsh-cmp-dwnld").hide();
+					$("#dsh-admin-cmp-dwnld").show();
+				}
+				else{ 
+					$("#dsh-admin-cmp-dwnld").hide();
+					$("#dsh-cmp-dwnld").show();
+				}
 				
 				// initializing datepickers
 				var startDate;
@@ -595,6 +691,10 @@ function showSurveyGraph(columnName, columnValue, format) {
 			}
 		},
 		error : function(e) {
+			if(e.status == 504) {
+				redirectToLoginPageOnSessionTimeOut(e.status);
+				return;
+			}
 			console.error("error : " + e.responseText);
 			$('#overlay-toast').html(e.responseText);
 			showToast();
@@ -816,6 +916,10 @@ function sendSurveyReminderMail(agentId, agentName, customerEmail, customerName)
 			}
 		},
 		error : function(e) {
+			if(e.status == 504) {
+				redirectToLoginPageOnSessionTimeOut(e.status);
+				return;
+			}
 			console.error("error : " + e.responseText);
 			$('#overlay-toast').html('Something went wrong while sending mail. Please try again after sometime.');
 			showToast();
@@ -867,7 +971,11 @@ function showDisplayPic() {
 				return data.responseJSON;
 			}
 		},
-		error : function() {
+		error : function(e) {
+			if(e.status == 504) {
+				redirectToLoginPageOnSessionTimeOut(e.status);
+				return;
+			}
 			console.log("Logged in id as : "+colName);
 			$("#dsh-prsn-img").removeClass('person-img');
 			if (colName == 'agentId') {
@@ -949,7 +1057,7 @@ function loadActiveSurveyQuestions() {
 }
 
 function resizeAdjBuildSurvey(){
-	var winW = $(window).width();
+	var winW = window.innerWidth;
 	if (winW < 768) {
 		var txtW = winW - 118;
 		$('.srv-tbl-txt').width(txtW);
@@ -1764,15 +1872,18 @@ function showSelectorsByAssignToOption(assignToOption) {
 	case 'company':
 		disableRegionSelector();
 		disableOfficeSelector();
+		hideAdminPrivilegesChk();
 		break;
 	case 'region':
 		$("#selected-region-txt").prop("disabled",false);
 		disableOfficeSelector();
 		$("#bd-region-selector").show();
+		showAdminPrivilegesChk();
 		break;
 	case 'office':
 		$("#selected-office-txt").prop("disabled",false);
 		$("#bd-office-selector").show();
+		showAdminPrivilegesChk();
 		disableRegionSelector();
 		break;
 	default:
@@ -1835,26 +1946,39 @@ function validateRegionName(elementId){
 function validateUserEmailTextArea(elementId) {
 	var emailIds = $('#'+elementId).val();
 	if (emailIds != "") {
-		var emailIdsArray = emailIds.split(/[\;,\s\n]/);
+		var emailIdsArray = emailIds.split(/[,;\n]/);
 		for(var i = 0; i < emailIdsArray.length; i++) {
 			var emailId = emailIdsArray[i].trim();
-			if(emailRegex.test(emailId) == true){
-				return true;
+			if(emailId == ""){
+				continue;
 			}
-			else {
+			if(emailId.indexOf(">") > -1){
+				emailId = emailId.substring(emailId.indexOf("<")+1,emailId.length-1);
+			}
+
+			if(emailRegex.test(emailId) == false){
 				showErrorMobileAndWeb('Please enter valid email addresses');
 				return false;
 			}
 		}
+		return true;
 	}
 }
 
 function validateUserSelection(elementId,hiddenElementId) {
 	if ($('#'+elementId).val() != "") {
+		var emailId = $('#'+elementId).val();
+		if(emailId.indexOf('"') > -1){
+			emailId = emailId.split('"').join("");
+		}
+		if(emailId.indexOf("<") > -1){
+			emailId = emailId.substring(emailId.indexOf("<")+1,emailId.indexOf(">"))
+		}
 		if($("#"+hiddenElementId).val() != ""){
 			return true;
 		}
-		else if (emailRegex.test($('#'+elementId).val()) == true) {
+		
+		else if (emailRegex.test(emailId) == true) {
 			return true;
 		}
 		else {
@@ -2772,6 +2896,10 @@ function resendVerificationMail(){
 			}
 		},
 		error : function(e) {
+			if(e.status == 504) {
+				redirectToLoginPageOnSessionTimeOut(e.status);
+				return;
+			}
 			console.error("error : " + e.responseText);
 			$('#overlay-toast').html(e.responseText);
 			showToast();
@@ -3034,7 +3162,7 @@ function updateAutoPostSetting(isautopostenabled){
 	var success = false;
 	$.ajax({
 		url : "./updateautopostforsurvey.do",
-		type : "GET",
+		type : "POST",
 		data : payload,
 		success : function(data) {
 			if (data.errCode == undefined)
@@ -3045,11 +3173,32 @@ function updateAutoPostSetting(isautopostenabled){
 				$('#overlay-toast').html("Content added successfully!");
 			}
 		},
-		error : function() {
+		error : function(e) {
+			if(e.status == 504) {
+				redirectToLoginPageOnSessionTimeOut(e.status);
+				return;
+			}
 			$('#overlay-toast').html(
 					"Oops! Something went wrong. Please try again later.");
 		}
 	});
+}
+
+function resetTextForMoodFlow(mood, resetId){
+	var payload = {
+		"mood" : mood
+	};
+	callAjaxGetWithPayloadData("./resettextforflow.do", function(data) {
+		var map =  $.parseJSON(data);
+
+		if (map.success == 1 && map.message) {
+			$('#' + resetId).val(map.message);
+			$('#overlay-toast').html("Content reverted successfully!");
+		} else {
+			$('#overlay-toast').html("Oops! Something went wrong. Please try again later.");
+		}
+		showToast();
+	}, payload, true);
 }
 
 function saveTextForMoodFlow(content, mood){
@@ -3059,7 +3208,7 @@ function saveTextForMoodFlow(content, mood){
 	};
 	callAjaxGetWithPayloadData("./storetextforflow.do", function(data) {
 		if (data == "success") {
-			$('#overlay-toast').html("Content added successfully!");
+			$('#overlay-toast').html("Content updated successfully!");
 		} else {
 			$('#overlay-toast').html("Oops! Something went wrong. Please try again later.");
 		}
@@ -3196,6 +3345,10 @@ function assignUserToBranch(userId, branchId) {
 			hideOverlay();
 		},
 		error : function(e) {
+			if(e.status == 504) {
+				redirectToLoginPageOnSessionTimeOut(e.status);
+				return;
+			}
 			console.error("error : " + e);
 		}
 	});
@@ -3242,6 +3395,10 @@ function unassignUserFromBranch(userId, branchId) {
 			}
 		},
 		error : function(e) {
+			if(e.status == 504) {
+				redirectToLoginPageOnSessionTimeOut(e.status);
+				return;
+			}
 			console.error("error : " + e);
 		}
 	});
@@ -3289,6 +3446,10 @@ function inviteUser() {
 			hideOverlay();
 		},
 		error : function(e) {
+			if(e.status == 504) {
+				redirectToLoginPageOnSessionTimeOut(e.status);
+				return;
+			}
 			console.error("error : " + e);
 		}
 	});
@@ -3359,6 +3520,10 @@ function deleteUser(userId) {
 			hideOverlay();
 		},
 		error : function(e) {
+			if(e.status == 504) {
+				redirectToLoginPageOnSessionTimeOut(e.status);
+				return;
+			}
 			console.error("error : " + e);
 		}
 	});
@@ -3385,6 +3550,10 @@ function paintUserDetailsForm(userId) {
 			}
 		},
 		error : function(e) {
+			if(e.status == 504) {
+				redirectToLoginPageOnSessionTimeOut(e.status);
+				return;
+			}
 			console.error("error : " + e);
 		}
 	});
@@ -3411,6 +3580,10 @@ function paintUserListInUserManagement(startIndex) {
 			bindEditUserClick();
 		},
 		error : function(e) {
+			if(e.status == 504) {
+				redirectToLoginPageOnSessionTimeOut(e.status);
+				return;
+			}
 			console.error("error : " + e);
 		}
 	});
@@ -3459,6 +3632,10 @@ function activateOrDeactivateUser(isActive, userId) {
 			}
 		},
 		error : function(e) {
+			if(e.status == 504) {
+				redirectToLoginPageOnSessionTimeOut(e.status);
+				return;
+			}
 			console.error("error : " + e);
 		}
 	});
@@ -3616,6 +3793,18 @@ function validateAssignToBranchName() {
 	}
 }
 
+$(document).on('keyup', '#search-users-key', function(e) {
+	// detect enter
+	if (e.keyCode == 13) {
+		console.log("Enter");
+		searchUsersByNameEmailLoginId($(this).val());
+	}
+});
+
+$(document).on('click', '#um-search-icn', function(e) {
+	searchUsersByNameEmailLoginId($('#search-users-key').val());
+});
+
 function searchUsersByNameEmailLoginId(searchKey) {
 	userStartIndex = 0;
 	var url = "./findusers.do";
@@ -3627,6 +3816,7 @@ function searchUsersByNameEmailLoginId(searchKey) {
 
 function searchUsersByNameEmailLoginIdCallBack(data) {
 	$('#user-list').html(data);
+	bindEditUserClick();
 }
 
 /*function paintUsersList(data) {
@@ -3727,8 +3917,11 @@ function searchBranchesForUser(branchPattern) {
 				searchBranchesForUserCallBack(data.responseJSON);
 			}
 		},
-		error : function() {
-
+		error : function(e) {
+			if(e.status == 504) {
+				redirectToLoginPageOnSessionTimeOut(e.status);
+				return;
+			}
 		}
 	});
 }
@@ -3787,17 +3980,6 @@ function getUserAssignments(userId) {
             updateUserProfile(profileId, 1);
         });
 		
-		$("#btn-save-user-assignment").click(function(e){
-			if(validateIndividualForm()){
-				saveUserAssignment("user-assignment-form");
-				
-				// refreshing right section after assignment
-				setTimeout(function() {
-					getUserAssignments(userId);
-				}, 2000);
-			}
-		});
-		
 		setTimeout(function() {
 			$('#profile-tbl-wrapper-' + userId).perfectScrollbar();
 		}, 1000);
@@ -3806,6 +3988,91 @@ function getUserAssignments(userId) {
             $('.dd-droplist').slideUp(200);
         });
 	} , true);
+}
+
+$(document).on('click','#user-edit-btn',function(e){
+	
+	$('#user-edit-btn-row').hide();
+	$('form input[data-editable="true"]').removeAttr("readonly");
+	$('#btn-save-user-assignment').show();
+	
+	$("#btn-save-user-assignment").off('click');
+	$("#btn-save-user-assignment").on('click',function(e){
+		if(validateUserDetailsUserManagement()){
+			saveUserDetailsByAdmin();
+			
+			// refreshing right section after assignment
+			setTimeout(function() {
+				getUserAssignments($('#selected-userid-hidden').val());
+			}, 2000);
+		}
+	});
+});
+
+$(document).on('click','#user-assign-btn',function(e){
+	
+	$('#user-edit-btn-row').hide();
+	$('#user-assignment-cont').show();
+	$('#btn-save-user-assignment').show();
+	
+	$("#btn-save-user-assignment").off('click');
+	$("#btn-save-user-assignment").on('click',function(e){
+		if(validateIndividualForm()){
+			saveUserAssignment("user-assignment-form");
+			
+			// refreshing right section after assignment
+			setTimeout(function() {
+				getUserAssignments($('#selected-userid-hidden').val());
+			}, 2000);
+		}
+	});
+});
+
+function validateUserDetailsUserManagement() {
+	
+	var isUserDetailsFormValid = true;
+	
+	
+	return isUserDetailsFormValid;
+}
+
+/**
+ * Method to update user details edited by admin
+ * @param formId
+ */
+function saveUserDetailsByAdmin() {
+	var url = "./updateuserbyadmin.do";
+	var userId = $('#selected-userid-hidden').val();
+	var firstName = $('#um-user-first-name').val();
+	var lastName = $('#um-user-last-name').val();
+	var emailID = $('#selected-user-txt').val();
+	var name = firstName;
+	if(lastName && lastName != ""){
+		name += " " + lastName;
+	}
+	var payload = {
+			"userId" : userId,
+			"name" : name,
+			"firstName" : firstName,
+			"lastName" : lastName,
+			"emailId" : emailID
+	};
+	
+	showOverlay();
+	callAjaxPostWithPayloadData(url, function(data) {
+		hideOverlay();
+
+		//view hierarchy page
+		$('.v-tbl-row[data-userid="'+userId+'"]').find('.v-tbl-name').text(name);
+		$('.v-tbl-row[data-userid="'+userId+'"]').find('.v-tbl-add').text(emailID);
+		
+		//user management page
+		$('td[data-user-id="'+userId+'"]').text(name).attr("data-first-name",firstName).attr("data-last-name",lastName);
+		$('td[data-user-id="'+userId+'"]').parent().find('.v-tbl-email').text(emailID);
+		
+		$('#overlay-toast').html(data);
+		showToast();
+	}, payload, true);
 }
 
 /**
@@ -3826,6 +4093,29 @@ function saveUserAssignmentCallBack(data) {
 	hideOverlay();
 	displayMessage(data);
 }
+
+// remove user
+$(document).on('click', '.v-icn-rem-user', function() {
+	if ($(this).hasClass('v-tbl-icn-disabled')) {
+		return;
+	}
+
+	var userId = $(this).parent().find('.fetch-name').attr('data-user-id');
+    var adminId = '${user.userId}';
+    confirmDeleteUser(userId, adminId);
+});
+
+// resend verification mail
+$(document).on('click', '.v-icn-fmail', function() {
+	if ($(this).hasClass('v-tbl-icn-disabled')) {
+		return;
+	}
+
+	var firstName = $(this).parent().find('.fetch-name').attr('data-first-name');
+    var lastName = $(this).parent().find('.fetch-name').attr('data-last-name');
+    var emailId = $(this).parent().find('.fetch-email').html();
+    reinviteUser(firstName, lastName, emailId);
+});
 
 /**
  * Method to send invite link
@@ -3933,14 +4223,14 @@ function bindEditUserClick(){
 	});
 }
 
-$(document).on('click', '#page-previous', function(){
+$(document).on('click', '#page-previous.paginate-button', function(){
 	var newIndex = userStartIndex - userBatchSize;
 	if (newIndex < $('#users-count').val()) {
 		paintUserListInUserManagement(newIndex);
 	}
 });
 
-$(document).on('click', '#page-next', function(){
+$(document).on('click', '#page-next.paginate-button', function(){
 	var newIndex = userStartIndex + userBatchSize;
 	if (newIndex < $('#users-count').val()) {
 		paintUserListInUserManagement(newIndex);
@@ -4281,6 +4571,8 @@ function fetchUsersByProfileLevelCallback(data) {
 	var response = $.parseJSON(data);
 	if (response != undefined) {
 		var usersList = $.parseJSON(response.entity);
+		if(usersList.length > 0)
+			$('#srch-num').html(usersList.length);
 		paintProList(usersList);
 	}
 }
@@ -4342,7 +4634,6 @@ function initSurvey(firstName, lastName, email, agentId, agentName, grecaptchare
 }
 
 function initSurveyWithUrl(q) {
-	console.log(window.location.origin);
 	var success = false;
 	var payload = {
 		"q" : q
@@ -4373,6 +4664,10 @@ function initSurveyWithUrl(q) {
 			}
 		},
 		error : function(e) {
+			if(e.status == 504) {
+				redirectToLoginPageOnSessionTimeOut(e.status);
+				return;
+			}
 			showPageNotFoundError();
 		}
 	});
@@ -4406,6 +4701,10 @@ function loadAgentPic(agentId){
 			}
 		},
 		error : function(e) {
+			if(e.status == 504) {
+				redirectToLoginPageOnSessionTimeOut(e.status);
+				return;
+			}
 			console.error("error : " + e.responseText);
 		}
 	});
@@ -4419,12 +4718,46 @@ function paintSurveyPage(jsonData) {
 	happyText = jsonData.responseJSON.happyText;
 	neutralText = jsonData.responseJSON.neutralText;
 	sadText = jsonData.responseJSON.sadText;
+	happyTextComplete = jsonData.responseJSON.happyTextComplete;
+	neutralTextComplete = jsonData.responseJSON.neutralTextComplete;
+	sadTextComplete = jsonData.responseJSON.sadTextComplete;
 	autoPost = jsonData.responseJSON.autopostEnabled;
 	autoPostScore = jsonData.responseJSON.autopostScore;
 	yelpEnabled = Boolean(jsonData.responseJSON.yelpEnabled);
 	googleEnabled = Boolean(jsonData.responseJSON.googleEnabled);
+	zillowEnabled = Boolean(jsonData.responseJSON.zillowEnabled);
+	lendingtreeEnabled = Boolean(jsonData.responseJSON.lendingtreeEnabled);
 	agentProfileLink = jsonData.responseJSON.agentProfileLink;
 	agentFullProfileLink = jsonData.responseJSON.agentFullProfileLink;
+	
+	
+	//If social token availiable populate the links
+	if (googleEnabled) {
+		var googleElement = document.getElementById('ggl-btn');
+		shareOnGooglePlus(agentId, window.location.origin + "/rest/survey/", googleElement);
+	} else {
+		$('#ggl-btn').remove();
+	}
+	
+	if (yelpEnabled) {
+		$('#ylp-btn').attr("href", returnValidWebAddress(jsonData.responseJSON.yelpLink));
+	} else {
+		$('#ylp-btn').remove();
+	}
+	
+	if (zillowEnabled) {
+		$('#zillow-btn').attr("href", returnValidWebAddress(jsonData.responseJSON.zillowLink));
+	} else {
+		$('#zillow-btn').remove();
+	}
+	
+	if (lendingtreeEnabled) {
+		$('#lt-btn').attr("href", returnValidWebAddress(jsonData.responseJSON.lendingtreeLink));
+	} else {
+		$('#lt-btn').remove();
+	}
+	
+	companyLogo = jsonData.responseJSON.companyLogo;
 	
 	if (stage != undefined)
 		qno = stage;
@@ -4528,6 +4861,13 @@ function paintSurveyPageFromJson() {
 		$("#skip-ques-mcq").hide();
 	}
 	$(".sq-main-txt").html("Survey for " + agentName);
+	
+	if (companyLogo != undefined && companyLogo != "") {
+		var companylogoHtml = '<div class="float-left user-info-seperator"></div>';
+		companylogoHtml += '<div class="float-left user-info-logo" style="background: url('
+			+ companyLogo + ') no-repeat center; background-size: 100% auto;"></div>';
+		$('#header-user-info').html(companylogoHtml);
+	}
 }
 
 function togglePrevAndNext(){
@@ -4594,6 +4934,10 @@ function storeCustomerAnswer(customerResponse) {
 			}
 		},
 		error : function(e) {
+			if(e.status == 504) {
+				redirectToLoginPageOnSessionTimeOut(e.status);
+				return;
+			}
 			console.error("error : ");
 		}
 	});
@@ -4631,6 +4975,10 @@ function updateCustomerResponse(feedback) {
 			}
 		},
 		error : function(e) {
+			if(e.status == 504) {
+				redirectToLoginPageOnSessionTimeOut(e.status);
+				return;
+			}
 			console.error("error : "+e);
 		}
 	});
@@ -4762,16 +5110,35 @@ function showMasterQuestionPage(){
 		}
 		if ($('#shr-post-chk-box').hasClass('bd-check-img') && (rating >= autoPostScore) && (Boolean(autoPost) == true)) {
 			postToSocialMedia(feedback);
-			$('#social-post-lnk').show();
-			if (yelpEnabled && (mood=='Great'))
+			/*$('#social-post-lnk').show();
+			if((mood == 'Great') && (yelpEnabled || googleEnabled) && !(yelpEnabled && googleEnabled)){
+				$('.sq-btn-social-wrapper').css({
+					"float" : "none",
+					"width" : "100%"
+				});
+				$('.sq-btn-post-social').css({
+					"float" : "none"
+				});
+			}
+			if (yelpEnabled && (mood == 'Great')){
 				$('#ylp-btn').show();
-			else
-				$('#ylp-btn').hide();
+				//var yelpElement = document.getElementById('ylp-btn');
+				//shareOnYelp(agentId, window.location.origin+"/rest/survey/", yelpElement);
+			}
+			else {
+				$('#ylp-btn').parent().remove();
+			}
+			if (googleEnabled && (mood == 'Great')){
+				var googleElement = document.getElementById('ggl-btn');
+				shareOnGooglePlus(agentId, window.location.origin+"/rest/survey/", googleElement);
+			}
+			else {
+				$('#ggl-btn').parent().remove();
+			}*/
 			
-			if (googleEnabled && (mood=='Great'))
-				$('#ggl-btn').show();
-			else
-				$('#ggl-btn').hide();
+			if(mood == 'Great') {
+				$('#social-post-links').show();
+			}
 		}
 		
 		updateCustomerResponse(feedback);
@@ -4779,7 +5146,13 @@ function showMasterQuestionPage(){
 		$("div[data-ques-type='error']").show();
 		$('#profile-link').html('View ' + agentName + '\'s profile at <a href="' + agentFullProfileLink + '" target="_blank">' + agentFullProfileLink + '</a>');
 		$('#content-head').html('Survey Completed');
-		$('#content').html("Congratulations! You have completed survey for " + agentName+ ".\nThanks for your participation.");
+			if (mood == 'Great')
+				$('#content').html("Congratulations! You have completed survey for " + agentName+ ".\n"+happyTextComplete);
+			else if(mood == 'OK')
+				$('#content').html("Congratulations! You have completed survey for " + agentName+ ".\n"+neutralTextComplete);
+			else
+				$('#content').html("Congratulations! You have completed survey for " + agentName+ ".\n"+sadTextComplete);
+	//	$('#content').html("Congratulations! You have completed survey for " + agentName+ ".\nThanks for your participation.");
 	}
 	return;
 }
@@ -4810,6 +5183,10 @@ function postToSocialMedia(feedback){
 			}
 		},
 		error : function(e) {
+			if(e.status == 504) {
+				redirectToLoginPageOnSessionTimeOut(e.status);
+				return;
+			}
 			console.error("error : " + e.responseText);
 			$('#overlay-toast').html(e.responseText);
 			showToast();
@@ -4838,6 +5215,10 @@ function updateSharedOn(socialSite, agentId, customerEmail){
 			}
 		},
 		error : function(e) {
+			if(e.status == 504) {
+				redirectToLoginPageOnSessionTimeOut(e.status);
+				return;
+			}
 			console.error("error : " + e.responseText);
 			$('#overlay-toast').html(e.responseText);
 			showToast();
@@ -5254,16 +5635,22 @@ $('.sq-pts-dgreen').click(function() {
 
 $('#ylp-btn').click(function(e) {
 	//e.stopImmediatePropagation();
-	var yelpElement = document.getElementById('ylp-btn');
-	shareOnYelp(agentId, window.location.origin+"/rest/survey/", yelpElement);
 	updateSharedOn("yelp", agentId, customerEmail);
 });
 
 $('#ggl-btn').click(function(e) {
 	//e.stopImmediatePropagation();
-	var googleElement = document.getElementById('ggl-btn');
-	shareOnGooglePlus(agentId, window.location.origin+"/rest/survey/", googleElement);
 	updateSharedOn("google", agentId, customerEmail);
+});
+
+$('#zillow-btn').click(function(e) {
+	//e.stopImmediatePropagation();
+	updateSharedOn("zillow", agentId, customerEmail);
+});
+
+$('#lt-btn').click(function(e) {
+	//e.stopImmediatePropagation();
+	updateSharedOn("lendingtree", agentId, customerEmail);
 });
 
 $('#shr-post-chk-box').click(function(){
@@ -6205,7 +6592,7 @@ function callBackUpdateHobbies(data) {
 
 
 // Update Social links - facebook
-$('body').on('click', '#prof-edit-social-link .icn-fb', function() {
+/*$('body').on('click', '#prof-edit-social-link .icn-fb', function() {
 	$('#social-token-text').show();
 	var link = $(this).attr('data-link');
 	$('#social-token-text').attr({
@@ -6226,10 +6613,10 @@ function updateFacebookLink(link) {
 		$('#overlay-toast').html("Enter a valid url");
 		showToast();
 	}
-}
+}*/
 
 // Update Social links - twitter
-$('body').on('click', '#prof-edit-social-link .icn-twit', function() {
+/*$('body').on('click', '#prof-edit-social-link .icn-twit', function() {
 	$('#social-token-text').show();
 	var link = $(this).attr("data-link");
 	$('#social-token-text').attr({
@@ -6250,10 +6637,10 @@ function updateTwitterLink(link) {
 		$('#overlay-toast').html("Enter a valid url");
 		showToast();
 	}
-}
+}*/
 
 // Update Social links - linkedin
-$('body').on('click', '#prof-edit-social-link .icn-lin', function() {
+/*$('body').on('click', '#prof-edit-social-link .icn-lin', function() {
 	$('#social-token-text').show();
 	var link = $(this).attr("data-link");
 	$('#social-token-text').attr({
@@ -6274,34 +6661,10 @@ function updateLinkedInLink(link) {
 		$('#overlay-toast').html("Enter a valid url");
 		showToast();
 	}
-}
-
-// Update Social links - yelp
-$('body').on('click', '#prof-edit-social-link .icn-yelp', function() {
-	$('#social-token-text').show();
-	var link = $(this).attr("data-link");
-	$('#social-token-text').attr({
-		"placeholder" : "Add Yelp link",
-		"onblur" : "updateYelpLink(this.value);$('#social-token-text').hide();"
-	});
-	$('#social-token-text').val(link);
-});
-
-function updateYelpLink(link) {
-	var payload = {
-		"yelplink" : link	
-	};
-	if (isValidUrl(link)) {
-		callAjaxPostWithPayloadData("./updateyelplink.do", callBackUpdateSocialLink, payload);
-        $('#icn-yelp').attr("data-link", link);
-	} else {
-		$('#overlay-toast').html("Enter a valid url");
-		showToast();
-	}
-}
+}*/
 
 // Update Social links - google plus
-$('body').on('click', '#prof-edit-social-link .icn-gplus', function() {
+/*$('body').on('click', '#prof-edit-social-link .icn-gplus', function() {
 	$('#social-token-text').show();
 	var link = $(this).attr("data-link");
 	$('#social-token-text').attr({
@@ -6318,6 +6681,78 @@ function updateGoogleLink(link) {
 	if (isValidUrl(link)) {
         callAjaxPostWithPayloadData("./updategooglelink.do", callBackUpdateSocialLink, payload);
         $('#icn-gplus').attr("data-link", link);
+	} else {
+		$('#overlay-toast').html("Enter a valid url");
+		showToast();
+	}
+}*/
+
+// Update Social links - yelp
+$('body').on('click', '#prof-edit-social-link .icn-yelp', function() {
+	$('#social-token-text').show();
+	var link = $(this).attr("data-link");
+	$('#social-token-text').attr({
+		"placeholder" : "Add Yelp link",
+		"onblur" : "updateYelpLink(this.value);$('#social-token-text').hide();"
+	});
+	$('#social-token-text').val(link);
+});
+
+function updateYelpLink(link) {
+	var payload = {
+		"yelplink" : link
+	};
+	if (isValidUrl(link)) {
+		callAjaxPostWithPayloadData("./updateyelplink.do", callBackUpdateSocialLink, payload);
+        $('#icn-yelp').attr("data-link", link);
+	} else {
+		$('#overlay-toast').html("Enter a valid url");
+		showToast();
+	}
+}
+
+// Update Social links - zillow
+$('body').on('click', '#prof-edit-social-link .icn-zillow', function() {
+	$('#social-token-text').show();
+	var link = $(this).attr("data-link");
+	$('#social-token-text').attr({
+		"placeholder" : "Add Zillow link",
+		"onblur" : "updateZillowLink(this.value);$('#social-token-text').hide();"
+	});
+	$('#social-token-text').val(link);
+});
+
+function updateZillowLink(link) {
+	var payload = {
+		"zillowlink" : link
+	};
+	if (isValidUrl(link)) {
+		callAjaxPostWithPayloadData("./updatezillowlink.do", callBackUpdateSocialLink, payload);
+        $('#icn-zillow').attr("data-link", link);
+	} else {
+		$('#overlay-toast').html("Enter a valid url");
+		showToast();
+	}
+}
+
+// Update Social links - lendingTree
+$('body').on('click', '#prof-edit-social-link .icn-lendingtree', function() {
+	$('#social-token-text').show();
+	var link = $(this).attr("data-link");
+	$('#social-token-text').attr({
+		"placeholder" : "Add LendingTree link",
+		"onblur" : "updateLendingTreeLink(this.value);$('#social-token-text').hide();"
+	});
+	$('#social-token-text').val(link);
+});
+
+function updateLendingTreeLink(link) {
+	var payload = {
+		"lendingTreeLink" : link
+	};
+	if (isValidUrl(link)) {
+		callAjaxPostWithPayloadData("./updatelendingtreelink.do", callBackUpdateSocialLink, payload);
+        $('#icn-lendingtree').attr("data-link", link);
 	} else {
 		$('#overlay-toast').html("Enter a valid url");
 		showToast();
@@ -6343,7 +6778,7 @@ function isValidUrl(url){
 
 // Adjust image
 function adjustImage() {
-	var windW = $(window).width();
+	var windW = window.innerWidth;
 	if (windW < 768) {
 		$('.mobile-tabs').children('.mob-icn-active').click();
 		var imgW = $('#prof-image').width();
@@ -6669,6 +7104,10 @@ function countPosts() {
 			}
 		},
 		error : function(e) {
+			if(e.status == 504) {
+				redirectToLoginPageOnSessionTimeOut(e.status);
+				return;
+			}
 			console.error(e.responseText);
 		}
 	});
@@ -6701,7 +7140,10 @@ function showPosts(fromStart) {
 			}
 		},
 		error : function(e) {
-
+			if(e.status == 504) {
+				redirectToLoginPageOnSessionTimeOut(e.status);
+				return;
+			}
 		}
 	});
 }
@@ -6727,7 +7169,7 @@ function paintPosts(posts) {
 				+ '<div class="tweet-text-main">' + post.postText + '</div>'
 				+ '<div class="tweet-text-link"><em>' + post.postedBy
 				+ '</em></div>' + '<div class="tweet-text-time"><em>'
-				+ new Date(post.timeInMillis).toUTCString() + '</em></div>'
+				+ convertUserDateToLocalWeekFormt(new Date(post.timeInMillis)) + '</em></div>'
 				+ '	</div>' + '</div>';
 	});
 
@@ -6767,10 +7209,6 @@ function paintDashboardButtons(data){
 	var columnValue = data.columnValue;
 	var stages = data.stages;
 	var max = 2;
-	if(columnName != 'agentId'){
-		$('#dsh-btn1').addClass('hide');
-		max = 3;
-	}
 	if (stages != undefined && stages.length != 0) {
 		if (stages.length < max) {
 			$('#dsh-btn2').addClass('hide');
@@ -6797,30 +7235,11 @@ function paintDashboardButtons(data){
 				contentToDisplay = 'Enter achievements';
 			}
 			if (i == 0) {
-				if(columnName != 'agentId'){
-					$('#dsh-btn1').data('social', stages[i].profileStageKey);
-					$('#dsh-btn1').html(contentToDisplay);
-					$('#dsh-btn1').removeClass('hide');
-				}
-				else{
-					$('#dsh-btn2').data('social', stages[i].profileStageKey);
-					$('#dsh-btn2').html(contentToDisplay);
-					$('#dsh-btn2').removeClass('hide');
-				}
+				$('#dsh-btn2').data('social', stages[i].profileStageKey);
+				$('#dsh-btn2').html(contentToDisplay);
+				$('#dsh-btn2').removeClass('hide');
 			}
 			if (i == 1) {
-				if(columnName != 'agentId'){
-					$('#dsh-btn2').data('social', stages[i].profileStageKey);
-					$('#dsh-btn2').html(contentToDisplay);
-					$('#dsh-btn2').removeClass('hide');
-				}
-				else{
-					$('#dsh-btn3').data('social', stages[i].profileStageKey);
-					$('#dsh-btn3').html(contentToDisplay);
-					$('#dsh-btn3').removeClass('hide');
-				}
-			}
-			if(i == 2) {
 				$('#dsh-btn3').data('social', stages[i].profileStageKey);
 				$('#dsh-btn3').html(contentToDisplay);
 				$('#dsh-btn3').removeClass('hide');
@@ -6830,11 +7249,11 @@ function paintDashboardButtons(data){
 	$('#dsh-btn1').click(function(){
 		var buttonId = 'dsh-btn1';
 		var task = $('#dsh-btn1').data('social');
-		if(task == undefined){
+		if(columnName == 'agentId'){
 			sendSurveyInvitation();
 		}
 		else{
-			dashboardButtonAction(buttonId, task, columnName, columnValue);
+			sendSurveyInvitationAdmin(columnName, columnValue);
 		}
 	});
 	$('#dsh-btn2').click(function(){
@@ -6909,5 +7328,37 @@ $(document).on('blur', '#disclaimer-text', function() {
 			$('#overlay-toast').html($('#display-msg-div').text().trim());
 			showToast();
 		}, payload);
+	}
+});
+
+//Dashboard admin reports
+$(document).on('change','#download-survey-reports',function(){
+//	var selectedValue =
+});
+
+$(document).on('click','#dsh-dwnld-report-btn',function(){
+	var selectedValue = $('#download-survey-reports').val();
+	var startDate = $('#dsh-start-date').val();
+	var endDate = $("#dsh-end-date").val();
+	var key = parseInt(selectedValue);
+	switch (key) {
+	case 0:
+		console.log("complete-survey");
+		window.location.href = "/downloaddashboardcompletesurvey.do?columnName="+colName+"&startDate="+startDate+"&endDate="+endDate;
+		break;
+	case 1:
+		console.log("loan-officer-ranking");
+		window.location.href = "/downloadagentrankingreport.do?columnName="+colName+"&startDate="+startDate+"&endDate="+endDate;
+		break;
+	case 2:
+		console.log("customer-survey");
+		window.location.href = "/downloadcustomersurveyresults.do?columnName="+colName+"&startDate="+startDate+"&endDate="+endDate;
+		break;
+	case 3:
+		console.log("social-monitor");
+		window.location.href = "/downloaddashboardsocialmonitor.do?columnName="+colName+"&startDate="+startDate+"&endDate="+endDate;
+		break;
+	default:
+		break;
 	}
 });

@@ -12,6 +12,7 @@ public class CompanyProfileData {
 	private String city;
 	private String state;
 	private String country;
+	private String countryCode;
 	private String zipcode;
 
 	public String getName() {
@@ -78,4 +79,11 @@ public class CompanyProfileData {
 		this.zipcode = zipcode;
 	}
 
+	public String getCountryCode() {
+		return countryCode;
+	}
+
+	public void setCountryCode(String countryCode) {
+		this.countryCode = countryCode;
+	}
 }

@@ -9,37 +9,37 @@
 
 	<http use-expressions="true" auto-config="true" entry-point-ref="customEntryPoint"
 		authentication-manager-ref="authenticationManager">
+		<!-- Generic Services -->
 		<intercept-url pattern="/" access="permitAll" />
-		<intercept-url pattern="/login.do" access="permitAll" />
 		<intercept-url pattern="/home.do" access="permitAll" />
+		<intercept-url pattern="/login.do" access="permitAll" />
+		<intercept-url pattern="/errorpage.do" access="permitAll" />	
 		<intercept-url pattern="/fetchgatrackingid.do" access="permitAll" />
 		<intercept-url pattern="/fetchgooglemapapikey.do" access="permitAll" />
+		<intercept-url pattern="/redirectifexistsactivesession.do" access="permitAll" />
 
+		<!-- FindAPro Services -->
 		<intercept-url pattern="/initfindapro.do" access="permitAll" />
 		<intercept-url pattern="/findapro.do" access="permitAll" />
 		<intercept-url pattern="/findaproscroll.do" access="permitAll" />
-
-		<intercept-url pattern="/fetchprofile.do" access="permitAll" />
-		<intercept-url pattern="/companyprofile.do" access="permitAll" />
 		
-		<intercept-url pattern="/verification.do" access="permitAll" />
-		<intercept-url pattern="/emailverification.do" access="permitAll" />
-		<intercept-url pattern="/registration.do" access="permitAll" />
+		<!-- Registration Services -->
 		<intercept-url pattern="/register.do" access="permitAll" />
-		<intercept-url pattern="/showcompleteregistrationpage.do" access="permitAll" />
+		<intercept-url pattern="/registration.do" access="permitAll" />
 		<intercept-url pattern="/completeregistration.do" access="permitAll" />
-		<intercept-url pattern="/generateregistrationurl.do" access="permitAll" />
-		<intercept-url pattern="/invitetoregister.do" access="permitAll" />
+		<intercept-url pattern="/resendRegistrationMail.do" access="permitAll" />
+		<intercept-url pattern="/showregistrationpage.do" access="permitAll" />
+		<intercept-url pattern="/showcompleteregistrationpage.do" access="permitAll" />
 		
+		<!-- ForgotPassword Services -->
 		<intercept-url pattern="/forgotPassword.do" access="permitAll" />
 		<intercept-url pattern="/sendresetpasswordlink.do" access="permitAll" />
 		<intercept-url pattern="/setnewpassword.do" access="permitAll" />
-		<intercept-url pattern="/resetPassword.do" access="permitAll" />
-		<intercept-url pattern="/showregistrationpage.do" access="permitAll" />
-		<intercept-url pattern="/resendRegistrationMail.do" access="permitAll" />
 
-		<intercept-url pattern="/testpage.do" access="permitAll" />	
-		<intercept-url pattern="/errorpage.do" access="permitAll" />	
+		<!-- Amdin pages -->
+		<intercept-url pattern="/adminlogin.do" access="permitAll" />
+
+		<!-- Restricted Services -->
 		<intercept-url pattern="/*.do" access="isAuthenticated()" />
 
 		<form-login login-page="/"
@@ -50,6 +50,7 @@
 			<concurrency-control max-sessions="1" error-if-maximum-exceeded="true" />
 		</session-management>
 
+		<!-- Logout Services -->
 		<logout invalidate-session="true" logout-success-url="/?s=logout" />
 		<custom-filter ref="logoutFilter" before="LOGOUT_FILTER" />
 	</http>
@@ -87,5 +88,4 @@
 		class="com.realtech.socialsurvey.web.handler.UserLoginHandler" />
 	<beans:bean id="userLogoutHandler"
 		class="com.realtech.socialsurvey.web.handler.UserLogoutHandler" />
-
 </beans:beans>

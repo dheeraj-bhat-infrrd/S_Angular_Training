@@ -65,17 +65,16 @@
 				</div>
 			</div>
 			<div id="header-user-info" class="header-user-info float-right clearfix">
-				<c:if test="${displaylogo != null}">
+				<c:if test="${companyLogo != null}">
 					<div class="float-left user-info-seperator"></div>
-					<div class="float-left user-info-logo" style="background: url(${displaylogo}) no-repeat center; background-size: 100% auto;"></div>
+					<div class="float-left user-info-logo" style="background: url(${companyLogo}) no-repeat center; background-size: 100% auto;"></div>
 				</c:if>
 			</div>
-			<!-- <div id="header-menu-icn" class="header-menu-icn icn-menu hide float-right"></div> -->
 		</div>
 	</div>
-	<div id="err-nw-wrapper" class="err-nw-wrapper"
-		style="margin-bottom: 10px;">
-		<span class="err-new-close"></span><span id="err-nw-txt"></span>
+	<div id="err-nw-wrapper" class="err-nw-wrapper" style="margin-bottom: 10px;">
+		<span class="err-new-close"></span>
+		<span id="err-nw-txt"></span>
 	</div>
 	<div id="prof-container" data-q="${q}" data-agentid="${agentId}" data-agentName="${agentName}" data-agent-email="${agentEmail}"
 		 class="prof-main-content-wrapper margin-top-25 margin-bottom-25 min-height-container">
@@ -312,15 +311,21 @@
 					<div class="sq-ques">
 						<i><span id="content" class="sq-ques-txt"></span></i>
 					</div>
-					<div id="social-post-lnk" class="clearfix hide">
+					<!-- <div id="social-post-lnk" class="clearfix hide">
 						<div class="sq-bord-bot-sm"></div>
 						<div class="sq-btn-social-wrapper float-left">
 							<a id="ylp-btn" target="_blank" class="sq-btn-continue sq-btn-post-social float-right">Yelp</a>
 						</div>
 						<div class="sq-btn-social-wrapper float-left">
 							<a id="ggl-btn" target="_blank" class="sq-btn-continue sq-btn-post-social float-left">Google+</a>
-						</div>
+					</div> -->
+					<div id="social-post-links" class="share-social-link-cont hide">
+						<a id="ylp-btn" target="_blank" class="sq-btn-continue sq-btn-post-social-btn">Yelp</a>
+						<a id="ggl-btn" target="_blank" class="sq-btn-continue sq-btn-post-social-btn">Google+</a>
+						<a id="zillow-btn" target="_blank" class="sq-btn-continue sq-btn-post-social-btn">Zillow</a>
+						<a id="lt-btn" target="_blank" class="sq-btn-continue sq-btn-post-social-btn">Lending Tree</a>
 					</div>
+					<div></div>
 				</div>
 			</div>
 		</div>
@@ -344,7 +349,6 @@
 <script src="https://www.google.com/jsapi?autoload={'modules':[{'name':'visualization','version':'1','packages':['corechart']}]}"></script>
 <script src="${initParam.resourcesPath}/resources/js/common.js"></script>
 <script src="${initParam.resourcesPath}/resources/js/script.js"></script>
-<script src="${initParam.resourcesPath}/resources/js/usermanagement.js"></script>
 <script src="https://js.braintreegateway.com/v2/braintree.js"></script>
 <script src="${initParam.resourcesPath}/resources/js/progressbar.min.js"></script>
 <script src="${initParam.resourcesPath}/resources/js/rangeslider.min.js"></script>
@@ -361,7 +365,6 @@ $(document).ready(function() {
 		}
 	}
 	var q = $('#prof-container').attr("data-q");
-	console.log(q);
 	/**console.log("Loading captcha");
 	try {
 		Recaptcha.create('6LdlHOsSAAAAAM8ypy8W2KXvgMtY2dFsiQT3HVq-',

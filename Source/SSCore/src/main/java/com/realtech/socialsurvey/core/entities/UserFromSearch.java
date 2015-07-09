@@ -19,23 +19,30 @@ public class UserFromSearch {
 	private boolean isRegionAdmin;
 	private boolean isBranchAdmin;
 	private boolean isAgent;
-	private List<String> regions;
-	private List<String> branches;
+	private List<Long> regions;
+	private List<Long> branches;
 	private boolean canEdit;
+	private String title;
+	private String aboutMe;
+	private String profileUrl;
+	private String profileName;
+	private String profileImageUrl;
+	private List<Long> agentIds;
+	private long reviewCount;
 
-	public List<String> getRegions() {
+	public List<Long> getRegions() {
 		return regions;
 	}
 
-	public void setRegions(List<String> regions) {
+	public void setRegions(List<Long> regions) {
 		this.regions = regions;
 	}
 
-	public List<String> getBranches() {
+	public List<Long> getBranches() {
 		return branches;
 	}
 
-	public void setBranches(List<String> branches) {
+	public void setBranches(List<Long> branches) {
 		this.branches = branches;
 	}
 
@@ -141,6 +148,62 @@ public class UserFromSearch {
 
 	public void setCanEdit(boolean canEdit) {
 		this.canEdit = canEdit;
+	}
+	
+	public String getTitle() {
+		return title;
+	}
+
+	public void setTitle(String title) {
+		this.title = title;
+	}
+
+	public String getAboutMe() {
+		return aboutMe;
+	}
+
+	public void setAboutMe(String aboutMe) {
+		this.aboutMe = aboutMe;
+	}
+
+	public String getProfileUrl() {
+		return profileUrl;
+	}
+
+	public void setProfileUrl(String profileUrl) {
+		this.profileUrl = profileUrl;
+	}
+
+	public String getProfileName() {
+		return profileName;
+	}
+
+	public void setProfileName(String profileName) {
+		this.profileName = profileName;
+	}
+
+	public String getProfileImageUrl() {
+		return profileImageUrl;
+	}
+
+	public void setProfileImageUrl(String profileImageUrl) {
+		this.profileImageUrl = profileImageUrl;
+	}
+
+	public List<Long> getAgentIds() {
+		return agentIds;
+	}
+
+	public void setAgentIds(List<Long> agentIds) {
+		this.agentIds = agentIds;
+	}
+
+	public long getReviewCount() {
+		return reviewCount;
+	}
+
+	public void setReviewCount(long reviewCount) {
+		this.reviewCount = reviewCount;
 	}
 
 	@Override

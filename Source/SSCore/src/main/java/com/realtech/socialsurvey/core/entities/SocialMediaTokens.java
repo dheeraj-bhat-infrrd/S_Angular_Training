@@ -8,6 +8,8 @@ public class SocialMediaTokens {
 	private SocialProfileToken rssToken;
 	private TwitterToken twitterToken;
 	private YelpToken yelpToken;
+	private ZillowToken zillowToken;
+	private LendingTreeToken lendingTreeToken;
 
 	public FacebookToken getFacebookToken() {
 		return facebookToken;
@@ -57,9 +59,26 @@ public class SocialMediaTokens {
 		this.rssToken = rssToken;
 	}
 
+	public ZillowToken getZillowToken() {
+		return zillowToken;
+	}
+
+	public void setZillowToken(ZillowToken zillowToken) {
+		this.zillowToken = zillowToken;
+	}
+
+	public LendingTreeToken getLendingTreeToken() {
+		return lendingTreeToken;
+	}
+
+	public void setLendingTreeToken(LendingTreeToken lendingTreeToken) {
+		this.lendingTreeToken = lendingTreeToken;
+	}
+
 	@Override
 	public String toString() {
 		return "SocialMediaTokens [facebookToken=" + facebookToken + ", twitterToken=" + twitterToken + ", linkdenInToken=" + linkedInToken
-				+ ", yelpToken=" + yelpToken + ", googleToken=" + googleToken + ", rssToken=" + rssToken + "]";
+				+ ", yelpToken=" + yelpToken + ", googleToken=" + googleToken + ", rssToken=" + rssToken + ", zillowToken=" + zillowToken
+				+ ", lendingTreeToken=" + lendingTreeToken + "]";
 	}
 }

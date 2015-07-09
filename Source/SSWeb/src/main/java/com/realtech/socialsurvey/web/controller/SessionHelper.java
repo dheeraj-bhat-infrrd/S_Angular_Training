@@ -1,5 +1,6 @@
 package com.realtech.socialsurvey.web.controller;
 
+import java.io.IOException;
 import java.net.MalformedURLException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -7,12 +8,15 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -34,12 +38,14 @@ import com.realtech.socialsurvey.core.enums.AccountType;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.exception.NoRecordsFetchedException;
 import com.realtech.socialsurvey.core.exception.NonFatalException;
+import com.realtech.socialsurvey.core.exception.UserSessionInvalidateException;
 import com.realtech.socialsurvey.core.services.organizationmanagement.OrganizationManagementService;
 import com.realtech.socialsurvey.core.services.organizationmanagement.UserManagementService;
 import com.realtech.socialsurvey.core.utils.EmailFormatHelper;
 import com.realtech.socialsurvey.core.utils.EncryptionHelper;
 import com.realtech.socialsurvey.core.utils.FileOperations;
 import com.realtech.socialsurvey.core.utils.PropertyFileReader;
+import com.realtech.socialsurvey.web.common.JspResolver;
 import com.realtech.socialsurvey.web.security.UserAuthProvider;
 
 /**
@@ -73,6 +79,9 @@ public class SessionHelper {
 
 	@Autowired
 	private EmailFormatHelper emailFormatHelper;
+	
+	@Value("${APPLICATION_LOGO_URL}")
+	private String applicationLogoUrl;
 
 	@Value("${PARAM_ORDER_TAKE_SURVEY_REMINDER}")
 	String paramOrderTakeSurveyReminder;
@@ -144,6 +153,7 @@ public class SessionHelper {
 		}
 	}
 
+	
 	private void setMailContent(HttpSession session, UserSettings userSettings) {
 		LOG.debug("Setting mail content in the session");
 		String body = null;
@@ -157,9 +167,14 @@ public class SessionHelper {
 				List<String> paramOrder = new ArrayList<String>(Arrays.asList(paramOrderTakeSurveyReminder.split(",")));
 				body = fileOperations.replaceFileContents(replacements);
 				body = emailFormatHelper.replaceEmailBodyWithParams(body, paramOrder);
-				
+				body = body.replaceAll("\\[LogoUrl\\]", applicationLogoUrl);
 				session.setAttribute(CommonConstants.SURVEY_PARTICIPATION_MAIL_BODY_IN_SESSION, body);
+				session.setAttribute(CommonConstants.SURVEY_PARTICIPATION_MAIL_SUBJECT_IN_SESSION, CommonConstants.SURVEY_MAIL_SUBJECT
+						+ "[AgentName]");
+				
 				session.setAttribute(CommonConstants.SURVEY_PARTICIPATION_REMINDER_MAIL_BODY_IN_SESSION, body);
+				session.setAttribute(CommonConstants.SURVEY_PARTICIPATION_REMINDER_MAIL_SUBJECT_IN_SESSION, CommonConstants.SURVEY_MAIL_SUBJECT
+						+ "[AgentName]");
 			}
 			catch (InvalidInputException e) {
 				LOG.warn("Could not set mail content for survey participation");
@@ -172,17 +187,24 @@ public class SessionHelper {
 			if (userSettings.getCompanySettings().getMail_content().getTake_survey_mail() != null) {
 				MailContent mailContent = mailSettings.getTake_survey_mail();
 				String mailBody = emailFormatHelper.replaceEmailBodyWithParams(mailContent.getMail_body(), mailContent.getParam_order());
-				
+				mailBody = mailBody.replaceAll("\\[LogoUrl\\]", applicationLogoUrl);
 				mailSettings.getTake_survey_mail().setMail_body(mailBody);
 				session.setAttribute(CommonConstants.SURVEY_PARTICIPATION_MAIL_BODY_IN_SESSION, mailBody);
+			    String remainderSubject=CommonConstants.SURVEY_MAIL_SUBJECT + "[AgentName]";
+				if(mailContent.getMail_subject()!=null){
+					remainderSubject=mailContent.getMail_subject();
+				}
+				session.setAttribute(CommonConstants.SURVEY_PARTICIPATION_MAIL_SUBJECT_IN_SESSION, remainderSubject);
 			}
 			else {
 				try {
 					List<String> paramOrder = new ArrayList<String>(Arrays.asList(paramOrderTakeSurveyReminder.split(",")));
 					body = fileOperations.replaceFileContents(replacements);
 					body = emailFormatHelper.replaceEmailBodyWithParams(body, paramOrder);
-					
+					body = body.replaceAll("\\[LogoUrl\\]", applicationLogoUrl);
 					session.setAttribute(CommonConstants.SURVEY_PARTICIPATION_MAIL_BODY_IN_SESSION, body);
+					session.setAttribute(CommonConstants.SURVEY_PARTICIPATION_MAIL_SUBJECT_IN_SESSION, CommonConstants.SURVEY_MAIL_SUBJECT
+							+ "[AgentName]");
 				}
 				catch (InvalidInputException e) {
 					LOG.warn("Could not set mail content for survey participation");
@@ -192,17 +214,24 @@ public class SessionHelper {
 			if (userSettings.getCompanySettings().getMail_content().getTake_survey_reminder_mail() != null) {
 				MailContent mailContent = mailSettings.getTake_survey_reminder_mail();
 				String mailBody = emailFormatHelper.replaceEmailBodyWithParams(mailContent.getMail_body(), mailContent.getParam_order());
-				
+				mailBody = mailBody.replaceAll("\\[LogoUrl\\]", applicationLogoUrl);
 				mailSettings.getTake_survey_reminder_mail().setMail_body(mailBody);
 				session.setAttribute(CommonConstants.SURVEY_PARTICIPATION_REMINDER_MAIL_BODY_IN_SESSION, mailBody);
+				String remainderSubject=CommonConstants.REMINDER_MAIL_SUBJECT + "[AgentName]";
+					if(mailContent.getMail_subject()!=null){
+						remainderSubject=mailContent.getMail_subject();
+				}
+				session.setAttribute(CommonConstants.SURVEY_PARTICIPATION_REMINDER_MAIL_SUBJECT_IN_SESSION, remainderSubject);
 			}
 			else {
 				try {
 					List<String> paramOrder = new ArrayList<String>(Arrays.asList(paramOrderTakeSurveyReminder.split(",")));
 					body = fileOperations.replaceFileContents(replacements);
 					body = emailFormatHelper.replaceEmailBodyWithParams(body, paramOrder);
-					
+					body = body.replaceAll("\\[LogoUrl\\]", applicationLogoUrl);
 					session.setAttribute(CommonConstants.SURVEY_PARTICIPATION_REMINDER_MAIL_BODY_IN_SESSION, body);
+					session.setAttribute(CommonConstants.SURVEY_PARTICIPATION_REMINDER_MAIL_SUBJECT_IN_SESSION, CommonConstants.SURVEY_MAIL_SUBJECT
+							+ "[AgentName]");
 				}
 				catch (InvalidInputException e) {
 					LOG.warn("Could not set mail content for survey participation reminder");
@@ -260,6 +289,10 @@ public class SessionHelper {
 		User user = null;
 		if (sessionUser instanceof User) {
 			user = (User) sessionUser;
+		}
+		
+		if (user == null) {
+			throw new UserSessionInvalidateException("User session is no longer available.");
 		}
 		return user;
 	}
@@ -400,5 +433,29 @@ public class SessionHelper {
 		profileAbridged.setProfilesMasterId(profileMasterId);
 
 		return profileAbridged;
+	}
+	
+	// Redirects user to Landing Page if session is active
+	public void redirectToUserSessionIfExists(HttpServletResponse response) {
+		LOG.debug("Checking for state of principal session");
+		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+		if (!(auth instanceof AnonymousAuthenticationToken)) {
+			try {
+				response.sendRedirect("./" + JspResolver.LANDING + ".do");
+			}
+			catch (IOException e) {
+				LOG.error("IOException while redirecting logged in user. Reason : " + e.getMessage(), e);
+			}
+		}
+	}
+	
+	// Redirects user to Landing Page and requests user to logout from previous session if active
+	public boolean isUserActiveSessionExists() {
+		LOG.debug("Checking for state of principal session");
+		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+		if (!(auth instanceof AnonymousAuthenticationToken)) {
+			return true;
+		}
+		return false;
 	}
 }

@@ -109,17 +109,17 @@
 								<span class="payment-button payment-button-disabled">Start 30-Day Trial</span>
 							</c:when>
 							<c:otherwise>
-								<a class="payment-button" href="javascript:selectAccountType(1, '$9.95', ${skippayment})">Start 30-Day Trial</a>
+								<span class="payment-button" onclick="selectAccountType(1, '$9.95', ${skippayment});">Start 30-Day Trial</span>
 							</c:otherwise>
 							</c:choose>
 						</td>
 						<td>
 							<c:choose>
 							<c:when test="${ upgrade == 1 }">
-								<a class="payment-button" href="javascript:makePaidUpgrade(4, '$12.95')">Upgrade</a>
+								<span class="payment-button" onclick="makePaidUpgrade(4, '$12.95')">Upgrade</span>
 							</c:when>
 							<c:otherwise>
-								<a class="payment-button" href="javascript:selectAccountType(4, '$12.95', ${skippayment})">Start 30-Day Trial</a>
+								<span class="payment-button" onclick="selectAccountType(4, '$12.95', ${skippayment});">Start 30-Day Trial</span>
 							</c:otherwise>
 							</c:choose>
 						</td>
@@ -344,17 +344,17 @@
 								<span class="payment-button payment-button-disabled">Start 30-Day Trial</span>
 							</c:when>
 							<c:otherwise>
-								<a class="payment-button" href="javascript:selectAccountType(1, '$9.95', ${skippayment})">Start 30-Day Trial</a>
+								<span class="payment-button" onclick="selectAccountType(1, '$9.95', ${skippayment})">Start 30-Day Trial</span>
 							</c:otherwise>
 							</c:choose>
 						</td>
 						<td>
 							<c:choose>
 							<c:when test="${ upgrade == 1 }">
-								<a class="payment-button" href="javascript:makePaidUpgrade(4, '$12.95')">Upgrade</a>
+								<span class="payment-button" onclick="makePaidUpgrade(4, '$12.95')">Upgrade</span>
 							</c:when>
 							<c:otherwise>
-								<a class="payment-button" href="javascript:selectAccountType(4, '$12.95', ${skippayment})">Start 30-Day Trial</a>
+								<span class="payment-button" onclick="selectAccountType(4, '$12.95', ${skippayment})">Start 30-Day Trial</span>
 							</c:otherwise>
 							</c:choose>
 						</td>
@@ -363,6 +363,7 @@
 			</table>
 		</div>
 		<input type="hidden" name="accounttype" id="account-type" />
+		<input type="hidden" name="skipPayment" value="${skippayment}" />
 	</form>
 	</div>
 </div>
@@ -395,14 +396,14 @@
 
 <script>
 function selectAccountType(accountType, paymentAmount, skippayment) {
+	// show the progress icon
+	showOverlay();
 	if ($(this).attr('data-status') == 'disabled') {
 		return;
 	}
 	console.log("selecting and saving account type");
 	$('#account-type').val(accountType);
 
-	// show the progress icon
-	showOverlay();
 	console.log("skip payment "+skippayment);
 	var url = "./addaccounttype.do";
 	var $form = $("#account-type-selection-form");
@@ -422,19 +423,22 @@ function selectAccountType(accountType, paymentAmount, skippayment) {
 			}
 		},
 		error : function(e) {
-			console.error("error : " + e);
+			if(e.status == 504) {
+				redirectToLoginPageOnSessionTimeOut(e.status);
+				return;
+			}
+			redirectErrorpage();
 		}
 	});
 }
 
 function makePaidUpgrade(accountType,paymentAmount){
+	/* show the progress icon */
+    showOverlay();
 	console.log("upgrading to paid account");
     $('#account-type').val(accountType);
     
     var url = "./paymentpage.do";
-
-    /* show the progress icon */
-    showOverlay();
 
     var $form = $("#account-type-selection-form");
     var payLoad = $form.serialize();
@@ -446,12 +450,17 @@ function makePaidUpgrade(accountType,paymentAmount){
             selectAccountTypeCallBack(data,accountType,paymentAmount);
         },
         error : function(e) {
+        	if(e.status == 504) {
+				redirectToLoginPageOnSessionTimeOut(e.status);
+				return;
+			}
             console.error("error : " + e);
         }
     });
 }
 
 function selectAccountTypeCallBack(data,accountType,paymentAmount) {
+	showOverlay();
 	console.log("callback for selectAccountType called");
 	var paidUpgrade = '<c:out value="${upgrade}"/>';
     if(accountType == 5 && data == ""){
@@ -467,14 +476,15 @@ function selectAccountTypeCallBack(data,accountType,paymentAmount) {
             	location.href="./landing.do";
             },
             error : function(e) {
+            	if(e.status == 504) {
+    				redirectToLoginPageOnSessionTimeOut(e.status);
+    				return;
+    			}
     			redirectErrorpage();
     		}
         });
     }
     else{
-    	 /* hide the progress icon */
-        hideOverlay();
-    	 
     	if(paidUpgrade == 1){
     		$("#payment-form").css("display","none");
     	}
@@ -482,6 +492,7 @@ function selectAccountTypeCallBack(data,accountType,paymentAmount) {
         /* Replace the contents of account selection with payment page with selected account type contents*/
         $(".overlay-payment").html('<div class="payment-section">'+data+'</div>');		
         showPayment();
+        hideOverlay();
         var selectedAccountType = $("#account-type-"+accountType).html();
         $("#pu-acc-type-val").html(selectedAccountType);
         $("#pu-acc-amount-val").html(paymentAmount);
@@ -509,11 +520,19 @@ function confirmUpgradation(accountType){
 		data : data,
 		success : function(data){
 			$('.overlay-payment').html(data);		
-			hideOverlay();
 			$('.overlay-payment').show();
 			$('body').css('overflow', 'hidden');
 		},
-		error : redirectErrorpage
+		complete: function(){
+			hideOverlay();
+		},
+		error : function(e) {
+			if(e.status == 504) {
+				redirectToLoginPageOnSessionTimeOut(e.status);
+				return;
+			}
+			redirectErrorpage();
+		}
 	});
 }
 
@@ -532,7 +551,13 @@ function upgradeAccountType(accountType) {
 		type : "POST",
 		data : data,
 		success : showMessage,
-		error : redirectErrorpage
+		error : function(e) {
+			if(e.status == 504) {
+				redirectToLoginPageOnSessionTimeOut(e.status);
+				return;
+			}
+			redirectErrorpage();
+		}
 	});
 }
 

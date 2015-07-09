@@ -1,12 +1,15 @@
 package com.realtech.socialsurvey.core.starter;
 
 import java.io.File;
+
 import org.quartz.JobDataMap;
 import org.quartz.JobExecutionContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.quartz.QuartzJobBean;
 import org.springframework.stereotype.Component;
+
+import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.exception.NonFatalException;
 import com.realtech.socialsurvey.core.services.upload.FileUploadService;
 import com.realtech.socialsurvey.core.utils.sitemap.SiteMapGenerator;
@@ -105,7 +108,7 @@ public class ApplicationSiteMapGenerator extends QuartzJobBean{
 	
 	public void uploadFile(String filePath, FileUploadService uploadService, String envPrefix) throws NonFatalException{
 		LOG.info("Uploading "+filePath+" to Amazon");
-		uploadService.uploadFile(new File(filePath), envPrefix+File.separator+filePath.substring(filePath.lastIndexOf(File.separator)+1));
+		uploadService.uploadFileAtDefautBucket(new File(filePath), envPrefix+ CommonConstants.FILE_SEPARATOR +filePath.substring(filePath.lastIndexOf(CommonConstants.FILE_SEPARATOR)+1));
 		
 	}
 

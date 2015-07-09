@@ -3,7 +3,6 @@ package com.realtech.socialsurvey.core.entities;
 public class LockSettings {
 
 	private boolean isLogoLocked;
-	private boolean isDisplayNameLocked;
 	private boolean isWebAddressLocked;
 	private boolean isBlogAddressLocked;
 	private boolean isWorkPhoneLocked;
@@ -18,14 +17,6 @@ public class LockSettings {
 
 	public void setLogoLocked(boolean isLogoLocked) {
 		this.isLogoLocked = isLogoLocked;
-	}
-
-	public boolean getIsDisplayNameLocked() {
-		return isDisplayNameLocked;
-	}
-
-	public void setDisplayNameLocked(boolean isDisplayNameLocked) {
-		this.isDisplayNameLocked = isDisplayNameLocked;
 	}
 
 	public boolean getIsWebAddressLocked() {
@@ -86,8 +77,8 @@ public class LockSettings {
 
 	@Override
 	public String toString() {
-		return "LockSettings [isLogoLocked=" + isLogoLocked + ", isDisplayNameLocked=" + isDisplayNameLocked + ", isWebAddressLocked="
-				+ isWebAddressLocked + ", isBlogAddressLocked=" + isBlogAddressLocked + ", isWorkPhoneLocked=" + isWorkPhoneLocked + ", isPersonalPhoneLocked=" + isPersonalPhoneLocked
+		return "LockSettings [isLogoLocked=" + isLogoLocked + ", isWebAddressLocked=" + isWebAddressLocked + ", isBlogAddressLocked="
+				+ isBlogAddressLocked + ", isWorkPhoneLocked=" + isWorkPhoneLocked + ", isPersonalPhoneLocked=" + isPersonalPhoneLocked
 				+ ", isFaxPhoneLocked=" + isFaxPhoneLocked + ", isAboutMeLocked=" + isAboutMeLocked + ", isAddressLocked=" + isAddressLocked + "]";
 	}
 }

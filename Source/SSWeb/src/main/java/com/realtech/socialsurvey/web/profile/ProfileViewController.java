@@ -5,13 +5,14 @@ package com.realtech.socialsurvey.web.profile;
 
 import java.io.IOException;
 import java.util.List;
+
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
 import org.apache.solr.common.SolrDocument;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
@@ -21,6 +22,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
+
 import com.amazonaws.util.json.JSONException;
 import com.amazonaws.util.json.JSONObject;
 import com.google.gson.Gson;
@@ -43,535 +45,581 @@ import com.realtech.socialsurvey.core.services.authentication.CaptchaValidation;
 import com.realtech.socialsurvey.core.services.mail.UndeliveredEmailException;
 import com.realtech.socialsurvey.core.services.organizationmanagement.OrganizationManagementService;
 import com.realtech.socialsurvey.core.services.organizationmanagement.ProfileManagementService;
+import com.realtech.socialsurvey.core.services.organizationmanagement.ProfileNotFoundException;
 import com.realtech.socialsurvey.core.services.search.SolrSearchService;
 import com.realtech.socialsurvey.core.services.search.exception.SolrException;
 import com.realtech.socialsurvey.core.utils.DisplayMessageConstants;
 import com.realtech.socialsurvey.core.utils.MessageUtils;
 import com.realtech.socialsurvey.web.common.JspResolver;
+import com.realtech.socialsurvey.web.util.BotRequestUtils;
+
 
 @Controller
-public class ProfileViewController implements InitializingBean{
-	
-	private static final Logger LOG = LoggerFactory.getLogger(ProfileViewController.class);
-	
-	@Resource
-	@Qualifier("nocaptcha")
-	private CaptchaValidation captchaValidation;
-	
-	@Autowired
-	private MessageUtils messageUtils;
-	
-	@Autowired
-	private ProfileManagementService profileManagementService;
-	
-	@Autowired
-	private OrganizationManagementService organizationManagementService;
-	
-	@Autowired
-	private SolrSearchService solrSearchService;
-	
-	@Value("${VALIDATE_CAPTCHA}")
-	private String validateCaptcha;
-	
-	@Value("${CAPTCHA_SECRET}")
-	private String captchaSecretKey;
-	
-	@Value("${BOTS_USER_AGENT_LIST}")
-	private String botUserAgentList;
-	
-	private String[] listBots;
-	
-	/**
-	 * Method to return company profile page
-	 * 
-	 * @param profileName
-	 * @param model
-	 * @return
-	 */
-	@RequestMapping(value = "/company/{profileName}", method = RequestMethod.GET)
-	public String initCompanyProfilePage(@PathVariable String profileName, Model model, HttpServletRequest request) {
-		LOG.info("Service to initiate company profile page called");
-		String message = null;
-		// check if the request is from bot
-		boolean isBotRequest = checkBotRequest(request);
+public class ProfileViewController
+{
 
-		if (profileName == null || profileName.isEmpty()) {
-			message = messageUtils.getDisplayMessage(DisplayMessageConstants.INVALID_COMPANY_PROFILENAME, DisplayMessageType.ERROR_MESSAGE)
-					.getMessage();
-			model.addAttribute("message", message);
-			return JspResolver.MESSAGE_HEADER;
-		}
+    private static final Logger LOG = LoggerFactory.getLogger( ProfileViewController.class );
 
-		// making case insensitive
-		profileName = profileName.toLowerCase();
+    @Resource
+    @Qualifier ( "nocaptcha")
+    private CaptchaValidation captchaValidation;
 
-		OrganizationUnitSettings companyProfile = null;
-		try {
-			companyProfile = profileManagementService.getCompanyProfileByProfileName(profileName);
-			String json = new Gson().toJson(companyProfile);
-			model.addAttribute("profileJson", json);
-			
-			Long companyId = companyProfile.getIden();
-			double averageRating = profileManagementService.getAverageRatings(companyId, CommonConstants.PROFILE_LEVEL_COMPANY, false);
-			model.addAttribute("averageRating", averageRating);
-			
-			long reviewsCount = profileManagementService.getReviewsCount(companyId, CommonConstants.MIN_RATING_SCORE,
-					CommonConstants.MAX_RATING_SCORE, CommonConstants.PROFILE_LEVEL_COMPANY, false);
-			model.addAttribute("reviewsCount", reviewsCount);
-			
-			if (isBotRequest) {
-				// TODO:remove hardcoding of start,end,minScore etc
-				List<SurveyDetails> reviews = profileManagementService.getReviews(companyId, -1, -1, -1, CommonConstants.USER_AGENT_NUMBER_REVIEWS,
-						CommonConstants.PROFILE_LEVEL_COMPANY, false, null, null, CommonConstants.REVIEWS_SORT_CRITERIA_FEATURE);
-				model.addAttribute("reviews", reviews);
+    @Autowired
+    private MessageUtils messageUtils;
 
-				UserProfile selectedProfile = new UserProfile();
-				ProfilesMaster profilesMaster = new ProfilesMaster();
-				profilesMaster.setProfileId(CommonConstants.PROFILES_MASTER_COMPANY_ADMIN_PROFILE_ID);
+    @Autowired
+    private ProfileManagementService profileManagementService;
 
-				Company company = new Company();
-				company.setCompanyId(companyProfile.getIden());
+    @Autowired
+    private OrganizationManagementService organizationManagementService;
 
-				selectedProfile.setProfilesMaster(profilesMaster);
-				selectedProfile.setCompany(company);
+    @Autowired
+    private SolrSearchService solrSearchService;
 
-				List<SocialPost> posts = profileManagementService.getSocialPosts(selectedProfile, -1, CommonConstants.USER_AGENT_NUMBER_POST);
-				model.addAttribute("posts", posts);
-			}
-		}
-		catch (InvalidInputException e) {
-			throw new InternalServerException(new ProfileServiceErrorCode(CommonConstants.ERROR_CODE_COMPANY_PROFILE_SERVICE_FAILURE,
-					CommonConstants.SERVICE_CODE_COMPANY_PROFILE, "Error occured while fetching company profile"), e.getMessage());
-		}
-		
-		model.addAttribute("profile", companyProfile);
-		model.addAttribute("companyProfileName", profileName);
-		model.addAttribute("profileLevel", CommonConstants.PROFILE_LEVEL_COMPANY);
-		
-		LOG.info("Service to initiate company profile page executed successfully");
-		if (isBotRequest) {
-			return JspResolver.PROFILE_PAGE_NOSCRIPT;
-		}
-		else {
-			return JspResolver.PROFILE_PAGE;
-		}
-	}
-	
-	/**
-	 * Method to return region profile page
-	 * 
-	 * @param companyProfileName
-	 * @param regionProfileName
-	 * @param model
-	 * @return
-	 */
-	@RequestMapping(value = "/region/{companyProfileName}/{regionProfileName}")
-	public String initRegionProfilePage(@PathVariable String companyProfileName, @PathVariable String regionProfileName, Model model,
-			HttpServletRequest request) {
-		LOG.info("Service to initiate region profile page called");
-		String message = null;
-		boolean isBotRequest = checkBotRequest(request);
-		if (companyProfileName == null || companyProfileName.isEmpty()) {
-			message = messageUtils.getDisplayMessage(DisplayMessageConstants.INVALID_COMPANY_PROFILENAME, DisplayMessageType.ERROR_MESSAGE)
-					.getMessage();
-			model.addAttribute("message", message);
-			return JspResolver.MESSAGE_HEADER;
-		}
-		if (regionProfileName == null || regionProfileName.isEmpty()) {
-			message = messageUtils.getDisplayMessage(DisplayMessageConstants.INVALID_REGION_PROFILENAME, DisplayMessageType.ERROR_MESSAGE)
-					.getMessage();
-			model.addAttribute("message", message);
-			return JspResolver.MESSAGE_HEADER;
-		}
+    @Autowired
+    private BotRequestUtils botRequestUtils;
 
-		// making case insensitive
-		companyProfileName = companyProfileName.toLowerCase();
-		regionProfileName = regionProfileName.toLowerCase();
+    @Value ( "${VALIDATE_CAPTCHA}")
+    private String validateCaptcha;
 
-		OrganizationUnitSettings regionProfile = null;
-		try {
-			regionProfile = profileManagementService.getRegionByProfileName(companyProfileName, regionProfileName);
-			
-			// aggregated social profile urls
-			SocialMediaTokens regionTokens = profileManagementService.aggregateSocialProfiles(regionProfile, CommonConstants.REGION_ID);
-			regionProfile.setSocialMediaTokens(regionTokens);
+    @Value ( "${CAPTCHA_SECRET}")
+    private String captchaSecretKey;
 
-			// aggregated disclaimer
-			String disclaimer = profileManagementService.aggregateDisclaimer(regionProfile, CommonConstants.REGION_ID);
-			regionProfile.setDisclaimer(disclaimer);
-			
-			String json = new Gson().toJson(regionProfile);
-			model.addAttribute("profileJson", json);
-			
-			Long regionId = regionProfile.getIden();
-			double averageRating = profileManagementService.getAverageRatings(regionId, CommonConstants.PROFILE_LEVEL_REGION, false);
-			model.addAttribute("averageRating", averageRating);
-			
-			long reviewsCount = profileManagementService.getReviewsCount(regionId, CommonConstants.MIN_RATING_SCORE,
-					CommonConstants.MAX_RATING_SCORE, CommonConstants.PROFILE_LEVEL_REGION, false);
-			model.addAttribute("reviewsCount", reviewsCount);
-			
-			if (isBotRequest) {
-				// TODO:remove hardcoding of start,end,minScore etc
-				List<SurveyDetails> reviews = profileManagementService.getReviews(regionId, -1, -1, -1, CommonConstants.USER_AGENT_NUMBER_REVIEWS,
-						CommonConstants.PROFILE_LEVEL_REGION, false, null, null, CommonConstants.REVIEWS_SORT_CRITERIA_FEATURE);
-				model.addAttribute("reviews", reviews);
 
-				UserProfile selectedProfile = new UserProfile();
-				ProfilesMaster profilesMaster = new ProfilesMaster();
-				profilesMaster.setProfileId(CommonConstants.PROFILES_MASTER_REGION_ADMIN_PROFILE_ID);
+    /**
+     * Method to return company profile page
+     * 
+     * @param profileName
+     * @param model
+     * @return
+     * @throws NoRecordsFetchedException 
+     */
+    @RequestMapping ( value = "/company/{profileName}", method = RequestMethod.GET)
+    public String initCompanyProfilePage( @PathVariable String profileName, Model model, HttpServletRequest request )
+        throws NoRecordsFetchedException, ProfileNotFoundException
+    {
+        LOG.info( "Service to initiate company profile page called" );
+        String message = null;
+        // check if the request is from bot
+        boolean isBotRequest = botRequestUtils.checkBotRequest( request );
 
-				selectedProfile.setProfilesMaster(profilesMaster);
-				selectedProfile.setRegionId(regionProfile.getIden());
-				List<SocialPost> posts = profileManagementService.getSocialPosts(selectedProfile, -1, CommonConstants.USER_AGENT_NUMBER_POST);
-				model.addAttribute("posts", posts);
-			}
-		}
-		catch (InvalidInputException | NoRecordsFetchedException e) {
-			throw new InternalServerException(new ProfileServiceErrorCode(CommonConstants.ERROR_CODE_REGION_PROFILE_SERVICE_FAILURE,
-					CommonConstants.SERVICE_CODE_REGION_PROFILE, "Error occured while fetching region profile"), e.getMessage());
-		}
-		
-		model.addAttribute("profile", regionProfile);
-		model.addAttribute("companyProfileName", companyProfileName);
-		model.addAttribute("regionProfileName", regionProfileName);
-		model.addAttribute("profileLevel", CommonConstants.PROFILE_LEVEL_REGION);
-		
-		LOG.info("Service to initiate region profile page executed successfully");
-		if (isBotRequest) {
-			return JspResolver.PROFILE_PAGE_NOSCRIPT;
-		}
-		else {
-			return JspResolver.PROFILE_PAGE;
-		}
-	}
+        if ( profileName == null || profileName.isEmpty() ) {
+            message = messageUtils.getDisplayMessage( DisplayMessageConstants.INVALID_COMPANY_PROFILENAME,
+                DisplayMessageType.ERROR_MESSAGE ).getMessage();
+            model.addAttribute( "message", message );
+            return JspResolver.MESSAGE_HEADER;
+        }
 
-	/**
-	 * Method to return branch profile page
-	 * 
-	 * @param companyProfileName
-	 * @param branchProfileName
-	 * @param model
-	 * @return
-	 */
-	@RequestMapping(value = "/office/{companyProfileName}/{branchProfileName}")
-	public String initBranchProfilePage(@PathVariable String companyProfileName, @PathVariable String branchProfileName, Model model,
-			HttpServletRequest request) {
-		LOG.info("Service to initiate branch profile page called");
-		String message = null;
-		boolean isBotRequest = checkBotRequest(request);
-		if (companyProfileName == null || companyProfileName.isEmpty()) {
-			message = messageUtils.getDisplayMessage(DisplayMessageConstants.INVALID_COMPANY_PROFILENAME, DisplayMessageType.ERROR_MESSAGE)
-					.getMessage();
-			model.addAttribute("message", message);
-			return JspResolver.MESSAGE_HEADER;
-		}
-		if (branchProfileName == null || branchProfileName.isEmpty()) {
-			message = messageUtils.getDisplayMessage(DisplayMessageConstants.INVALID_BRANCH_PROFILENAME, DisplayMessageType.ERROR_MESSAGE)
-					.getMessage();
-			model.addAttribute("message", message);
-			return JspResolver.MESSAGE_HEADER;
-		}
+        // making case insensitive
+        profileName = profileName.toLowerCase();
 
-		// making case insensitive
-		companyProfileName = companyProfileName.toLowerCase();
-		branchProfileName = branchProfileName.toLowerCase();
+        OrganizationUnitSettings companyProfile = null;
+        try {
+            companyProfile = profileManagementService.getCompanyProfileByProfileName( profileName );
+            if ( companyProfile == null ) {
+                throw new ProfileNotFoundException( "No settings found for company while fetching company profile" );
+            }
 
-		OrganizationUnitSettings branchProfile = null;
-		try {
-			branchProfile = profileManagementService.getBranchByProfileName(companyProfileName, branchProfileName);
-			
-			// aggregated social profile urls
-			SocialMediaTokens branchTokens = profileManagementService.aggregateSocialProfiles(branchProfile, CommonConstants.BRANCH_ID);
-			branchProfile.setSocialMediaTokens(branchTokens);
-			
-			// aggregated disclaimer
-			String disclaimer = profileManagementService.aggregateDisclaimer(branchProfile, CommonConstants.BRANCH_ID);
-			branchProfile.setDisclaimer(disclaimer);
-			
-			String json = new Gson().toJson(branchProfile);
-			model.addAttribute("profileJson", json);
+            String json = new Gson().toJson( companyProfile );
+            model.addAttribute( "profileJson", json );
 
-			Long branchId = branchProfile.getIden();
-			double averageRating = profileManagementService.getAverageRatings(branchId, CommonConstants.PROFILE_LEVEL_BRANCH, false);
-			model.addAttribute("averageRating", averageRating);
+            Long companyId = companyProfile.getIden();
+            double averageRating = profileManagementService.getAverageRatings( companyId,
+                CommonConstants.PROFILE_LEVEL_COMPANY, false );
+            model.addAttribute( "averageRating", averageRating );
 
-			long reviewsCount = profileManagementService.getReviewsCount(branchId, CommonConstants.MIN_RATING_SCORE,
-					CommonConstants.MAX_RATING_SCORE, CommonConstants.PROFILE_LEVEL_BRANCH, false);
-			model.addAttribute("reviewsCount", reviewsCount);
+            long reviewsCount = profileManagementService.getReviewsCount( companyId, CommonConstants.MIN_RATING_SCORE,
+                CommonConstants.MAX_RATING_SCORE, CommonConstants.PROFILE_LEVEL_COMPANY, false );
+            model.addAttribute( "reviewsCount", reviewsCount );
 
-			if (isBotRequest) {
-				// TODO:remove hardcoding of start,end,minScore etc
-				List<SurveyDetails> reviews = profileManagementService.getReviews(branchId, -1, -1, -1, CommonConstants.USER_AGENT_NUMBER_REVIEWS,
-						CommonConstants.PROFILE_LEVEL_BRANCH, false, null, null, CommonConstants.REVIEWS_SORT_CRITERIA_FEATURE);
-				model.addAttribute("reviews", reviews);
+            if ( isBotRequest ) {
+                // TODO:remove hardcoding of start,end,minScore etc
+                List<SurveyDetails> reviews = profileManagementService.getReviews( companyId, -1, -1, -1,
+                    CommonConstants.USER_AGENT_NUMBER_REVIEWS, CommonConstants.PROFILE_LEVEL_COMPANY, false, null, null,
+                    CommonConstants.REVIEWS_SORT_CRITERIA_FEATURE );
+                model.addAttribute( "reviews", reviews );
 
-				UserProfile selectedProfile = new UserProfile();
-				ProfilesMaster profilesMaster = new ProfilesMaster();
-				profilesMaster.setProfileId(CommonConstants.PROFILES_MASTER_BRANCH_ADMIN_PROFILE_ID);
+                UserProfile selectedProfile = new UserProfile();
+                ProfilesMaster profilesMaster = new ProfilesMaster();
+                profilesMaster.setProfileId( CommonConstants.PROFILES_MASTER_COMPANY_ADMIN_PROFILE_ID );
 
-				selectedProfile.setProfilesMaster(profilesMaster);
-				selectedProfile.setBranchId(branchProfile.getIden());
-				List<SocialPost> posts = profileManagementService.getSocialPosts(selectedProfile, -1, CommonConstants.USER_AGENT_NUMBER_POST);
-				model.addAttribute("posts", posts);
-			}
-		}
-		catch (InvalidInputException | NoRecordsFetchedException e) {
-			throw new InternalServerException(new ProfileServiceErrorCode(CommonConstants.ERROR_CODE_BRANCH_PROFILE_SERVICE_FAILURE,
-					CommonConstants.SERVICE_CODE_BRANCH_PROFILE, "Error occured while fetching branch profile"), e.getMessage());
-		}
+                Company company = new Company();
+                company.setCompanyId( companyProfile.getIden() );
 
-		model.addAttribute("profile", branchProfile);
-		model.addAttribute("companyProfileName", companyProfileName);
-		model.addAttribute("branchProfileName", branchProfileName);
-		model.addAttribute("profileLevel", CommonConstants.PROFILE_LEVEL_BRANCH);
+                selectedProfile.setProfilesMaster( profilesMaster );
+                selectedProfile.setCompany( company );
 
-		LOG.info("Service to initiate branch profile page executed successfully");
-		if (isBotRequest) {
-			return JspResolver.PROFILE_PAGE_NOSCRIPT;
-		}
-		else {
-			return JspResolver.PROFILE_PAGE;
-		}
-	}
+                List<SocialPost> posts = profileManagementService.getSocialPosts( selectedProfile, -1,
+                    CommonConstants.USER_AGENT_NUMBER_POST );
+                model.addAttribute( "posts", posts );
+            }
+        } catch ( InvalidInputException e ) {
+            throw new InternalServerException( new ProfileServiceErrorCode(
+                CommonConstants.ERROR_CODE_COMPANY_PROFILE_SERVICE_FAILURE, CommonConstants.SERVICE_CODE_COMPANY_PROFILE,
+                "Error occured while fetching company profile" ), e.getMessage() );
+        } catch ( ProfileNotFoundException e ) {
+            throw e;
+        }
 
-	/**
-	 * Method to return agent profile page
-	 * 
-	 * @param agentProfileName
-	 * @param model
-	 * @return
-	 */
-	@RequestMapping(value = "/{agentProfileName}")
-	public String initAgentProfilePage(@PathVariable String agentProfileName, Model model, HttpServletResponse response, HttpServletRequest request) {
-		LOG.info("Service to initiate agent profile page called");
-		String message = null;
-		boolean isBotRequest = checkBotRequest(request);
-		if (agentProfileName == null || agentProfileName.isEmpty()) {
-			message = messageUtils.getDisplayMessage(DisplayMessageConstants.INVALID_INDIVIDUAL_PROFILENAME, DisplayMessageType.ERROR_MESSAGE)
-					.getMessage();
-			model.addAttribute("message", message);
-			return JspResolver.MESSAGE_HEADER;
-		}
-		
-		// making case insensitive
-		agentProfileName = agentProfileName.toLowerCase();
-		
-		// check for profiles and redirect to company if admin only
-		try {
-			User user = profileManagementService.getUserByProfileName(agentProfileName);
-			List<UserProfile> userProfiles = user.getUserProfiles();
-			if (userProfiles == null || userProfiles.size() < 1) {
-				throw new NoRecordsFetchedException(DisplayMessageConstants.INVALID_INDIVIDUAL_PROFILENAME);
-			}
-			
-			boolean hasAgentProfile = false;
-			for (UserProfile profile : userProfiles) {
-				if (profile.getProfilesMaster().getProfileId() == CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID) {
-					hasAgentProfile = true;
-				}
-			}
-			
-			// redirect to company profile page
-			if (!hasAgentProfile) {
-				OrganizationUnitSettings companySettings = organizationManagementService.getCompanySettings(user.getCompany().getCompanyId());
-				String companyProfileUrl = companySettings.getCompleteProfileUrl();
+        model.addAttribute( "profile", companyProfile );
+        model.addAttribute( "companyProfileName", profileName );
+        model.addAttribute( "profileLevel", CommonConstants.PROFILE_LEVEL_COMPANY );
 
-				try {
-					LOG.info("Service to redirect to company profile page executed successfully");
-					response.sendRedirect(companyProfileUrl);
-				}
-				catch (IOException e) {
-					LOG.error("IOException : message : " + e.getMessage(),e);
-					message = messageUtils.getDisplayMessage(DisplayMessageConstants.INVALID_COMPANY_PROFILENAME, DisplayMessageType.ERROR_MESSAGE).getMessage();
-					model.addAttribute("message", message);
-					return JspResolver.MESSAGE_HEADER;
-				}
-			}
-			
-			OrganizationUnitSettings individualProfile = null;
-			try {
-				individualProfile = profileManagementService.getIndividualByProfileName(agentProfileName);
-				
-				// aggregated social profile urls
-				SocialMediaTokens agentTokens = profileManagementService.aggregateSocialProfiles(individualProfile, CommonConstants.AGENT_ID);
-				individualProfile.setSocialMediaTokens(agentTokens);
-				
-				// aggregated disclaimer
-				String disclaimer = profileManagementService.aggregateDisclaimer(individualProfile, CommonConstants.AGENT_ID);
-				individualProfile.setDisclaimer(disclaimer);
-				
-				String json = new Gson().toJson(individualProfile);
-				model.addAttribute("profileJson",json);
-				
-				Long agentId = user.getUserId();
-				double averageRating = profileManagementService.getAverageRatings(agentId, CommonConstants.PROFILE_LEVEL_INDIVIDUAL, false);
-				model.addAttribute("averageRating",averageRating);
-				long reviewsCount = profileManagementService.getReviewsCount(agentId, CommonConstants.MIN_RATING_SCORE, CommonConstants.MAX_RATING_SCORE, CommonConstants.PROFILE_LEVEL_INDIVIDUAL, false);
-				model.addAttribute("reviewsCount",reviewsCount);
-				
-				if(isBotRequest){
-					//TODO:remove hardcoding of start,end,minScore etc
-					List<SurveyDetails> reviews = profileManagementService.getReviews(agentId, -1, -1, -1, CommonConstants.USER_AGENT_NUMBER_REVIEWS,
-						CommonConstants.PROFILE_LEVEL_INDIVIDUAL, false, null, null, CommonConstants.REVIEWS_SORT_CRITERIA_FEATURE);
-					model.addAttribute("reviews", reviews);
-					
-					UserProfile selectedProfile = new UserProfile();
-					ProfilesMaster profilesMaster = new ProfilesMaster();
-					profilesMaster.setProfileId(CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID);
-					
-					selectedProfile.setProfilesMaster(profilesMaster);
-					selectedProfile.setAgentId(individualProfile.getIden());
-					List<SocialPost> posts = profileManagementService.getSocialPosts(selectedProfile, -1, CommonConstants.USER_AGENT_NUMBER_POST);
-					model.addAttribute("posts", posts);
-				}
-				SolrDocument solrDocument;
-	            try {
-		            solrDocument = solrSearchService.getUserByUniqueId(individualProfile.getIden());
-		            if (solrDocument == null || solrDocument.isEmpty()) {
-						throw new NoRecordsFetchedException("No document found in solr for userId:" + individualProfile.getIden());
-					}
-					String firstName = solrDocument.get(CommonConstants.USER_FIRST_NAME_SOLR).toString();
-					model.addAttribute("agentFirstName",firstName);
-	            } catch (SolrException e) {
-	            	LOG.error("SolrException while searching for user id. Reason : " + e.getMessage(), e);
-					throw new NonFatalException("SolrException while searching for user id.", DisplayMessageConstants.GENERAL_ERROR, e);
-	            }
-				model.addAttribute("profile",individualProfile);
-			}
-			catch (InvalidInputException | NoRecordsFetchedException e) {
-				throw new InternalServerException(new ProfileServiceErrorCode(CommonConstants.ERROR_CODE_INDIVIDUAL_PROFILE_SERVICE_FAILURE,
-						CommonConstants.SERVICE_CODE_INDIVIDUAL_PROFILE, "Profile name for individual is invalid"), e.getMessage());
-			}
-		}
-		catch (InvalidInputException e) {
-			LOG.error("InvalidInputException : message : " + e.getMessage(),e);
-			message = messageUtils.getDisplayMessage(DisplayMessageConstants.INVALID_INDIVIDUAL_PROFILENAME, DisplayMessageType.ERROR_MESSAGE).getMessage();
-			model.addAttribute("message", message);
-			return JspResolver.MESSAGE_HEADER;
-		}
-		catch (NoRecordsFetchedException e) {
-			LOG.error("NoRecordsFetchedException : message : " + e.getMessage(),e);
-			message = messageUtils.getDisplayMessage(DisplayMessageConstants.INVALID_INDIVIDUAL_PROFILENAME, DisplayMessageType.ERROR_MESSAGE).getMessage();
-			model.addAttribute("message", message);
-			return JspResolver.MESSAGE_HEADER;
-		}
-		catch (NonFatalException e){
-			LOG.error("NonFatalException : message : " + e.getMessage(),e);
-			message = messageUtils.getDisplayMessage(DisplayMessageConstants.GENERAL_ERROR, DisplayMessageType.ERROR_MESSAGE).getMessage();
-			model.addAttribute("message", message);
-			return JspResolver.MESSAGE_HEADER;
-		}
-		
-		model.addAttribute("agentProfileName", agentProfileName);
-		model.addAttribute("profileLevel", CommonConstants.PROFILE_LEVEL_INDIVIDUAL);
-		
-		LOG.info("Service to initiate agent profile page executed successfully");
-		if(isBotRequest){
-			return JspResolver.PROFILE_PAGE_NOSCRIPT;			
-		}else{
-			return JspResolver.PROFILE_PAGE;
-		}
-	}
-	
-	private String makeJsonMessage(int status, String message) {
+        LOG.info( "Service to initiate company profile page executed successfully" );
+        if ( isBotRequest ) {
+            return JspResolver.PROFILE_PAGE_NOSCRIPT;
+        } else {
+            return JspResolver.PROFILE_PAGE;
+        }
+    }
 
-		JSONObject jsonMessage = new JSONObject();
-		LOG.debug("Building json response");
-		try {
-			jsonMessage.put("success", status);
-			jsonMessage.put("message", message);
-		}
-		catch (JSONException e) {
-			LOG.error("Exception occured while building json response : " + e.getMessage(), e);
-		}
 
-		LOG.info("Returning json response : " + jsonMessage.toString());
-		return jsonMessage.toString();
-	}
-	
-	/**
-	 * Method called on click of the contact us link on all profile pages
-	 * @param request
-	 * @return
-	 */
-	@RequestMapping(value="/profile/sendmail",method=RequestMethod.POST)
-	public @ResponseBody String sendEmail(HttpServletRequest request){
-		
-		LOG.info("Contact us mail controller called!");
-		
-		String profileType = request.getParameter("profiletype");
-		String returnMessage = null;
+    /**
+     * Method to return region profile page
+     * 
+     * @param companyProfileName
+     * @param regionProfileName
+     * @param model
+     * @return
+     * @throws NoRecordsFetchedException 
+     */
+    @RequestMapping ( value = "/region/{companyProfileName}/{regionProfileName}")
+    public String initRegionProfilePage( @PathVariable String companyProfileName, @PathVariable String regionProfileName,
+        Model model, HttpServletRequest request ) throws NoRecordsFetchedException, ProfileNotFoundException
+    {
+        LOG.info( "Service to initiate region profile page called" );
+        String message = null;
+        boolean isBotRequest = botRequestUtils.checkBotRequest( request );
+        if ( companyProfileName == null || companyProfileName.isEmpty() ) {
+            message = messageUtils.getDisplayMessage( DisplayMessageConstants.INVALID_COMPANY_PROFILENAME,
+                DisplayMessageType.ERROR_MESSAGE ).getMessage();
+            model.addAttribute( "message", message );
+            return JspResolver.MESSAGE_HEADER;
+        }
+        if ( regionProfileName == null || regionProfileName.isEmpty() ) {
+            message = messageUtils.getDisplayMessage( DisplayMessageConstants.INVALID_REGION_PROFILENAME,
+                DisplayMessageType.ERROR_MESSAGE ).getMessage();
+            model.addAttribute( "message", message );
+            return JspResolver.MESSAGE_HEADER;
+        }
 
-		try {
-			
-			if( profileType == null || profileType.isEmpty()){
-				LOG.error("Profile type not mentioned!");
-				throw new InvalidInputException("Profile type not mentioned!");
-			}
-			
-			String profileName = request.getParameter("profilename"); 
-			String senderName = request.getParameter("name");
-			String senderMailId = request.getParameter("email");
-			String message = request.getParameter("message");
-			
-			if (validateCaptcha.equals(CommonConstants.YES_STRING)) {
-				
-				if (!captchaValidation.isCaptchaValid(request.getRemoteAddr(), captchaSecretKey, request.getParameter("g-recaptcha-response"))) {
-					LOG.error("Captcha Validation failed!");
-					returnMessage = messageUtils.getDisplayMessage(DisplayMessageConstants.INVALID_CAPTCHA, DisplayMessageType.SUCCESS_MESSAGE).toString();
-					return makeJsonMessage(CommonConstants.STATUS_INACTIVE, returnMessage);
-				}
-			}
-			
-			LOG.debug("Sending mail to :  "  + profileName + " from : " + senderMailId);
-				
-			profileManagementService.findProfileMailIdAndSendMail(profileName, message, senderName,
-					senderMailId,profileType);
-			LOG.debug("Mail sent!");
-			returnMessage = messageUtils.getDisplayMessage(DisplayMessageConstants.CONTACT_US_MESSAGE_SENT, DisplayMessageType.SUCCESS_MESSAGE).toString();
-		} catch (InvalidInputException e) {
-			LOG.error("InvalidInputException : message : " + e.getMessage(),e);
-			returnMessage = messageUtils.getDisplayMessage(DisplayMessageConstants.CONTACT_US_MESSAGE_UNSUCCESSFUL, DisplayMessageType.ERROR_MESSAGE).toString();
-			return makeJsonMessage(CommonConstants.STATUS_INACTIVE, returnMessage);
-		} catch (NoRecordsFetchedException e) {
-			LOG.error("NoRecordsFetchedException : message : " + e.getMessage(),e);
-			returnMessage = messageUtils.getDisplayMessage(DisplayMessageConstants.CONTACT_US_MESSAGE_UNSUCCESSFUL, DisplayMessageType.ERROR_MESSAGE).toString();
-			return makeJsonMessage(CommonConstants.STATUS_INACTIVE, returnMessage);
-		} catch (UndeliveredEmailException e) {
-			LOG.error("UndeliveredEmailException : message : " + e.getMessage(),e);
-			returnMessage = messageUtils.getDisplayMessage(DisplayMessageConstants.CONTACT_US_MESSAGE_UNSUCCESSFUL, DisplayMessageType.ERROR_MESSAGE).toString();
-			return makeJsonMessage(CommonConstants.STATUS_INACTIVE, returnMessage);
-		} catch (Exception e) {
-			LOG.error("Exception : message : " + e.getMessage(),e);			
-			returnMessage = messageUtils.getDisplayMessage(DisplayMessageConstants.CONTACT_US_MESSAGE_UNSUCCESSFUL, DisplayMessageType.ERROR_MESSAGE).toString();
-			return makeJsonMessage(CommonConstants.STATUS_INACTIVE, returnMessage);
-		}
-		
-		return makeJsonMessage(CommonConstants.STATUS_ACTIVE, returnMessage);
-	}
+        // making case insensitive
+        companyProfileName = companyProfileName.toLowerCase();
+        regionProfileName = regionProfileName.toLowerCase();
 
-	private boolean checkBotRequest(HttpServletRequest request){
-		// Get the user agent. If its a bot, then return the no javascript page
-		boolean isBotRequest = false;
-		String userAgent = request.getHeader("User-Agent");
-		LOG.debug("User header found : "+userAgent);
-		if(userAgent != null){
-			for(String bot : listBots){
-				if(userAgent.indexOf(bot) != -1){
-					LOG.debug("Found a crawler: "+bot);
-					isBotRequest = true;
-					break;
-				}
-			}
-		}
-		return isBotRequest;
-	}
+        OrganizationUnitSettings regionProfile = null;
+        try {
+            regionProfile = profileManagementService.getRegionByProfileName( companyProfileName, regionProfileName );
+            if ( regionProfile == null ) {
+                throw new NoRecordsFetchedException( "No settings found for region while fetching region profile" );
+            }
 
-	@Override
-	public void afterPropertiesSet() throws Exception {
-		LOG.info("Get the list of bots");
-		listBots = botUserAgentList.split(",");
-	}
+            // aggregated social profile urls
+            if ( regionProfile.getSocialMediaTokens() != null ) {
+                SocialMediaTokens regionTokens = profileManagementService.aggregateSocialProfiles( regionProfile,
+                    CommonConstants.REGION_ID );
+                regionProfile.setSocialMediaTokens( regionTokens );
+            }
+
+            // aggregated disclaimer
+            String disclaimer = profileManagementService.aggregateDisclaimer( regionProfile, CommonConstants.REGION_ID );
+            regionProfile.setDisclaimer( disclaimer );
+
+            String json = new Gson().toJson( regionProfile );
+            model.addAttribute( "profileJson", json );
+
+            Long regionId = regionProfile.getIden();
+            double averageRating = profileManagementService.getAverageRatings( regionId, CommonConstants.PROFILE_LEVEL_REGION,
+                false );
+            model.addAttribute( "averageRating", averageRating );
+
+            long reviewsCount = profileManagementService.getReviewsCount( regionId, CommonConstants.MIN_RATING_SCORE,
+                CommonConstants.MAX_RATING_SCORE, CommonConstants.PROFILE_LEVEL_REGION, false );
+            model.addAttribute( "reviewsCount", reviewsCount );
+
+            if ( isBotRequest ) {
+                // TODO:remove hardcoding of start,end,minScore etc
+                List<SurveyDetails> reviews = profileManagementService.getReviews( regionId, -1, -1, -1,
+                    CommonConstants.USER_AGENT_NUMBER_REVIEWS, CommonConstants.PROFILE_LEVEL_REGION, false, null, null,
+                    CommonConstants.REVIEWS_SORT_CRITERIA_FEATURE );
+                model.addAttribute( "reviews", reviews );
+
+                UserProfile selectedProfile = new UserProfile();
+                ProfilesMaster profilesMaster = new ProfilesMaster();
+                profilesMaster.setProfileId( CommonConstants.PROFILES_MASTER_REGION_ADMIN_PROFILE_ID );
+
+                selectedProfile.setProfilesMaster( profilesMaster );
+                selectedProfile.setRegionId( regionProfile.getIden() );
+                List<SocialPost> posts = profileManagementService.getSocialPosts( selectedProfile, -1,
+                    CommonConstants.USER_AGENT_NUMBER_POST );
+                model.addAttribute( "posts", posts );
+            }
+        } catch ( ProfileNotFoundException e ) {
+            throw e;
+        } catch ( InvalidInputException e ) {
+            throw new InternalServerException( new ProfileServiceErrorCode(
+                CommonConstants.ERROR_CODE_REGION_PROFILE_SERVICE_FAILURE, CommonConstants.SERVICE_CODE_REGION_PROFILE,
+                "Error occured while fetching region profile" ), e.getMessage() );
+        }
+
+        model.addAttribute( "profile", regionProfile );
+        model.addAttribute( "companyProfileName", companyProfileName );
+        model.addAttribute( "regionProfileName", regionProfileName );
+        model.addAttribute( "profileLevel", CommonConstants.PROFILE_LEVEL_REGION );
+
+        LOG.info( "Service to initiate region profile page executed successfully" );
+        if ( isBotRequest ) {
+            return JspResolver.PROFILE_PAGE_NOSCRIPT;
+        } else {
+            return JspResolver.PROFILE_PAGE;
+        }
+    }
+
+
+    /**
+     * Method to return branch profile page
+     * 
+     * @param companyProfileName
+     * @param branchProfileName
+     * @param model
+     * @return
+     * @throws NoRecordsFetchedException 
+     */
+    @RequestMapping ( value = "/office/{companyProfileName}/{branchProfileName}")
+    public String initBranchProfilePage( @PathVariable String companyProfileName, @PathVariable String branchProfileName,
+        Model model, HttpServletRequest request ) throws NoRecordsFetchedException, ProfileNotFoundException
+    {
+        LOG.info( "Service to initiate branch profile page called" );
+        String message = null;
+        boolean isBotRequest = botRequestUtils.checkBotRequest( request );
+        if ( companyProfileName == null || companyProfileName.isEmpty() ) {
+            message = messageUtils.getDisplayMessage( DisplayMessageConstants.INVALID_COMPANY_PROFILENAME,
+                DisplayMessageType.ERROR_MESSAGE ).getMessage();
+            model.addAttribute( "message", message );
+            return JspResolver.MESSAGE_HEADER;
+        }
+        if ( branchProfileName == null || branchProfileName.isEmpty() ) {
+            message = messageUtils.getDisplayMessage( DisplayMessageConstants.INVALID_BRANCH_PROFILENAME,
+                DisplayMessageType.ERROR_MESSAGE ).getMessage();
+            model.addAttribute( "message", message );
+            return JspResolver.MESSAGE_HEADER;
+        }
+
+        // making case insensitive
+        companyProfileName = companyProfileName.toLowerCase();
+        branchProfileName = branchProfileName.toLowerCase();
+
+        OrganizationUnitSettings branchProfile = null;
+        try {
+            branchProfile = profileManagementService.getBranchByProfileName( companyProfileName, branchProfileName );
+            if ( branchProfile == null ) {
+                throw new NoRecordsFetchedException( "No settings found for branch while fetching branch profile" );
+            }
+
+            // aggregated social profile urls
+            if ( branchProfile.getSocialMediaTokens() != null ) {
+                SocialMediaTokens branchTokens = profileManagementService.aggregateSocialProfiles( branchProfile,
+                    CommonConstants.BRANCH_ID );
+                branchProfile.setSocialMediaTokens( branchTokens );
+            }
+
+            // aggregated disclaimer
+            String disclaimer = profileManagementService.aggregateDisclaimer( branchProfile, CommonConstants.BRANCH_ID );
+            branchProfile.setDisclaimer( disclaimer );
+
+            String json = new Gson().toJson( branchProfile );
+            model.addAttribute( "profileJson", json );
+
+            Long branchId = branchProfile.getIden();
+            double averageRating = profileManagementService.getAverageRatings( branchId, CommonConstants.PROFILE_LEVEL_BRANCH,
+                false );
+            model.addAttribute( "averageRating", averageRating );
+
+            long reviewsCount = profileManagementService.getReviewsCount( branchId, CommonConstants.MIN_RATING_SCORE,
+                CommonConstants.MAX_RATING_SCORE, CommonConstants.PROFILE_LEVEL_BRANCH, false );
+            model.addAttribute( "reviewsCount", reviewsCount );
+
+            if ( isBotRequest ) {
+                // TODO:remove hardcoding of start,end,minScore etc
+                List<SurveyDetails> reviews = profileManagementService.getReviews( branchId, -1, -1, -1,
+                    CommonConstants.USER_AGENT_NUMBER_REVIEWS, CommonConstants.PROFILE_LEVEL_BRANCH, false, null, null,
+                    CommonConstants.REVIEWS_SORT_CRITERIA_FEATURE );
+                model.addAttribute( "reviews", reviews );
+
+                UserProfile selectedProfile = new UserProfile();
+                ProfilesMaster profilesMaster = new ProfilesMaster();
+                profilesMaster.setProfileId( CommonConstants.PROFILES_MASTER_BRANCH_ADMIN_PROFILE_ID );
+
+                selectedProfile.setProfilesMaster( profilesMaster );
+                selectedProfile.setBranchId( branchProfile.getIden() );
+                List<SocialPost> posts = profileManagementService.getSocialPosts( selectedProfile, -1,
+                    CommonConstants.USER_AGENT_NUMBER_POST );
+                model.addAttribute( "posts", posts );
+            }
+        } catch ( ProfileNotFoundException e ) {
+            throw e;
+        } catch ( InvalidInputException e ) {
+            throw new InternalServerException( new ProfileServiceErrorCode(
+                CommonConstants.ERROR_CODE_BRANCH_PROFILE_SERVICE_FAILURE, CommonConstants.SERVICE_CODE_BRANCH_PROFILE,
+                "Error occured while fetching branch profile" ), e.getMessage() );
+        }
+
+        model.addAttribute( "profile", branchProfile );
+        model.addAttribute( "companyProfileName", companyProfileName );
+        model.addAttribute( "branchProfileName", branchProfileName );
+        model.addAttribute( "profileLevel", CommonConstants.PROFILE_LEVEL_BRANCH );
+
+        LOG.info( "Service to initiate branch profile page executed successfully" );
+        if ( isBotRequest ) {
+            return JspResolver.PROFILE_PAGE_NOSCRIPT;
+        } else {
+            return JspResolver.PROFILE_PAGE;
+        }
+    }
+
+
+    /**
+     * Method to return agent profile page
+     * 
+     * @param agentProfileName
+     * @param model
+     * @return
+     * @throws NoRecordsFetchedException 
+     */
+    @RequestMapping ( value = "/{agentProfileName}")
+    public String initAgentProfilePage( @PathVariable String agentProfileName, Model model, HttpServletResponse response,
+        HttpServletRequest request ) throws NoRecordsFetchedException, ProfileNotFoundException
+    {
+        LOG.info( "Service to initiate agent profile page called" );
+        boolean isBotRequest = botRequestUtils.checkBotRequest( request );
+        if ( agentProfileName == null || agentProfileName.isEmpty() ) {
+            model.addAttribute(
+                "message",
+                messageUtils.getDisplayMessage( DisplayMessageConstants.INVALID_INDIVIDUAL_PROFILENAME,
+                    DisplayMessageType.ERROR_MESSAGE ).getMessage() );
+            return JspResolver.MESSAGE_HEADER;
+        }
+
+        // making case insensitive
+        agentProfileName = agentProfileName.toLowerCase();
+
+        // check for profiles and redirect to company if admin only
+        try {
+            User user = profileManagementService.getUserByProfileName( agentProfileName );
+            List<UserProfile> userProfiles = user.getUserProfiles();
+            if ( userProfiles == null || userProfiles.size() < 1 ) {
+                throw new NoRecordsFetchedException( DisplayMessageConstants.INVALID_INDIVIDUAL_PROFILENAME );
+            }
+
+            boolean hasAgentProfile = false;
+            for ( UserProfile profile : userProfiles ) {
+                if ( profile.getProfilesMaster().getProfileId() == CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID ) {
+                    hasAgentProfile = true;
+                }
+            }
+
+            // redirect to company profile page
+            if ( !hasAgentProfile ) {
+                OrganizationUnitSettings companySettings = organizationManagementService.getCompanySettings( user.getCompany()
+                    .getCompanyId() );
+                String companyProfileUrl = companySettings.getCompleteProfileUrl();
+
+                try {
+                    LOG.info( "Service to redirect to company profile page executed successfully" );
+                    response.sendRedirect( companyProfileUrl );
+                } catch ( IOException e ) {
+                    LOG.error( "IOException : message : " + e.getMessage(), e );
+                    model.addAttribute(
+                        "message",
+                        messageUtils.getDisplayMessage( DisplayMessageConstants.INVALID_COMPANY_PROFILENAME,
+                            DisplayMessageType.ERROR_MESSAGE ).getMessage() );
+                    return JspResolver.MESSAGE_HEADER;
+                }
+            }
+
+            OrganizationUnitSettings individualProfile = null;
+            try {
+                individualProfile = profileManagementService.getIndividualByProfileName( agentProfileName );
+
+                // aggregated social profile urls
+                if ( individualProfile.getSocialMediaTokens() != null ) {
+                    SocialMediaTokens agentTokens = profileManagementService.aggregateSocialProfiles( individualProfile,
+                        CommonConstants.AGENT_ID );
+                    individualProfile.setSocialMediaTokens( agentTokens );
+                }
+
+                // aggregated disclaimer
+                String disclaimer = profileManagementService.aggregateDisclaimer( individualProfile, CommonConstants.AGENT_ID );
+                individualProfile.setDisclaimer( disclaimer );
+
+                String json = new Gson().toJson( individualProfile );
+                model.addAttribute( "profileJson", json );
+
+                Long agentId = user.getUserId();
+                double averageRating = profileManagementService.getAverageRatings( agentId,
+                    CommonConstants.PROFILE_LEVEL_INDIVIDUAL, false );
+                model.addAttribute( "averageRating", averageRating );
+
+                long reviewsCount = profileManagementService.getReviewsCount( agentId, CommonConstants.MIN_RATING_SCORE,
+                    CommonConstants.MAX_RATING_SCORE, CommonConstants.PROFILE_LEVEL_INDIVIDUAL, false );
+                model.addAttribute( "reviewsCount", reviewsCount );
+
+                if ( isBotRequest ) {
+                    // TODO:remove hardcoding of start, end, minScore etc
+                    List<SurveyDetails> reviews = profileManagementService.getReviews( agentId, -1, -1, -1,
+                        CommonConstants.USER_AGENT_NUMBER_REVIEWS, CommonConstants.PROFILE_LEVEL_INDIVIDUAL, false, null, null,
+                        CommonConstants.REVIEWS_SORT_CRITERIA_FEATURE );
+                    model.addAttribute( "reviews", reviews );
+
+                    ProfilesMaster profilesMaster = new ProfilesMaster();
+                    profilesMaster.setProfileId( CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID );
+
+                    UserProfile selectedProfile = new UserProfile();
+                    selectedProfile.setProfilesMaster( profilesMaster );
+                    selectedProfile.setAgentId( individualProfile.getIden() );
+
+                    List<SocialPost> posts = profileManagementService.getSocialPosts( selectedProfile, -1,
+                        CommonConstants.USER_AGENT_NUMBER_POST );
+                    model.addAttribute( "posts", posts );
+                }
+
+                SolrDocument solrDocument;
+                try {
+                    solrDocument = solrSearchService.getUserByUniqueId( individualProfile.getIden() );
+                    if ( solrDocument == null || solrDocument.isEmpty() ) {
+                        throw new NoRecordsFetchedException( "No document found in solr for userId:"
+                            + individualProfile.getIden() );
+                    }
+                    String firstName = solrDocument.get( CommonConstants.USER_FIRST_NAME_SOLR ).toString();
+                    model.addAttribute( "agentFirstName", firstName );
+                } catch ( SolrException e ) {
+                    LOG.error( "SolrException while searching for user id. Reason : " + e.getMessage(), e );
+                    throw new NonFatalException( "SolrException while searching for user id.",
+                        DisplayMessageConstants.GENERAL_ERROR, e );
+                }
+                model.addAttribute( "profile", individualProfile );
+            } catch ( ProfileNotFoundException e ) {
+                throw e;
+            } catch ( InvalidInputException e ) {
+                throw new InternalServerException( new ProfileServiceErrorCode(
+                    CommonConstants.ERROR_CODE_INDIVIDUAL_PROFILE_SERVICE_FAILURE,
+                    CommonConstants.SERVICE_CODE_INDIVIDUAL_PROFILE, "Profile name for individual is invalid" ), e.getMessage() );
+            }
+        } catch ( ProfileNotFoundException e ) {
+            throw e;
+        } catch ( InvalidInputException e ) {
+            LOG.error( "InvalidInputException: message : " + e.getMessage(), e );
+            model.addAttribute(
+                "message",
+                messageUtils.getDisplayMessage( DisplayMessageConstants.INVALID_INDIVIDUAL_PROFILENAME,
+                    DisplayMessageType.ERROR_MESSAGE ).getMessage() );
+            return JspResolver.NOT_FOUND_PAGE;
+        } catch ( NoRecordsFetchedException e ) {
+            LOG.error( "NoRecordsFetchedException: message : " + e.getMessage(), e );
+            throw e;
+        } catch ( NonFatalException e ) {
+            LOG.error( "NonFatalException: message : " + e.getMessage(), e );
+            model.addAttribute( "message",
+                messageUtils.getDisplayMessage( DisplayMessageConstants.GENERAL_ERROR, DisplayMessageType.ERROR_MESSAGE )
+                    .getMessage() );
+            return JspResolver.MESSAGE_HEADER;
+        }
+
+        model.addAttribute( "agentProfileName", agentProfileName );
+        model.addAttribute( "profileLevel", CommonConstants.PROFILE_LEVEL_INDIVIDUAL );
+
+        LOG.info( "Service to initiate agent profile page executed successfully" );
+        if ( isBotRequest ) {
+            return JspResolver.PROFILE_PAGE_NOSCRIPT;
+        } else {
+            return JspResolver.PROFILE_PAGE;
+        }
+    }
+
+
+    private String makeJsonMessage( int status, String message )
+    {
+
+        JSONObject jsonMessage = new JSONObject();
+        LOG.debug( "Building json response" );
+        try {
+            jsonMessage.put( "success", status );
+            jsonMessage.put( "message", message );
+        } catch ( JSONException e ) {
+            LOG.error( "Exception occured while building json response : " + e.getMessage(), e );
+        }
+
+        LOG.info( "Returning json response : " + jsonMessage.toString() );
+        return jsonMessage.toString();
+    }
+
+
+    /**
+     * Method called on click of the contact us link on all profile pages
+     * @param request
+     * @return
+     */
+    @RequestMapping ( value = "/profile/sendmail", method = RequestMethod.POST)
+    public @ResponseBody String sendEmail( HttpServletRequest request )
+    {
+
+        LOG.info( "Contact us mail controller called!" );
+
+        String profileType = request.getParameter( "profiletype" );
+        String returnMessage = null;
+
+        try {
+
+            if ( profileType == null || profileType.isEmpty() ) {
+                LOG.error( "Profile type not mentioned!" );
+                throw new InvalidInputException( "Profile type not mentioned!" );
+            }
+
+            String profileName = request.getParameter( "profilename" );
+            String senderName = request.getParameter( "name" );
+            String senderMailId = request.getParameter( "email" );
+            String message = request.getParameter( "message" );
+
+            if ( validateCaptcha.equals( CommonConstants.YES_STRING ) ) {
+
+                if ( !captchaValidation.isCaptchaValid( request.getRemoteAddr(), captchaSecretKey,
+                    request.getParameter( "g-recaptcha-response" ) ) ) {
+                    LOG.error( "Captcha Validation failed!" );
+                    returnMessage = messageUtils.getDisplayMessage( DisplayMessageConstants.INVALID_CAPTCHA,
+                        DisplayMessageType.SUCCESS_MESSAGE ).toString();
+                    return makeJsonMessage( CommonConstants.STATUS_INACTIVE, returnMessage );
+                }
+            }
+
+            LOG.debug( "Sending mail to :  " + profileName + " from : " + senderMailId );
+
+            profileManagementService.findProfileMailIdAndSendMail( profileName, message, senderName, senderMailId, profileType );
+            LOG.debug( "Mail sent!" );
+            returnMessage = messageUtils.getDisplayMessage( DisplayMessageConstants.CONTACT_US_MESSAGE_SENT,
+                DisplayMessageType.SUCCESS_MESSAGE ).toString();
+        } catch ( InvalidInputException e ) {
+            LOG.error( "InvalidInputException : message : " + e.getMessage(), e );
+            returnMessage = messageUtils.getDisplayMessage( DisplayMessageConstants.CONTACT_US_MESSAGE_UNSUCCESSFUL,
+                DisplayMessageType.ERROR_MESSAGE ).toString();
+            return makeJsonMessage( CommonConstants.STATUS_INACTIVE, returnMessage );
+        } catch ( NoRecordsFetchedException e ) {
+            LOG.error( "NoRecordsFetchedException : message : " + e.getMessage(), e );
+            returnMessage = messageUtils.getDisplayMessage( DisplayMessageConstants.CONTACT_US_MESSAGE_UNSUCCESSFUL,
+                DisplayMessageType.ERROR_MESSAGE ).toString();
+            return makeJsonMessage( CommonConstants.STATUS_INACTIVE, returnMessage );
+        } catch ( UndeliveredEmailException e ) {
+            LOG.error( "UndeliveredEmailException : message : " + e.getMessage(), e );
+            returnMessage = messageUtils.getDisplayMessage( DisplayMessageConstants.CONTACT_US_MESSAGE_UNSUCCESSFUL,
+                DisplayMessageType.ERROR_MESSAGE ).toString();
+            return makeJsonMessage( CommonConstants.STATUS_INACTIVE, returnMessage );
+        } catch ( Exception e ) {
+            LOG.error( "Exception : message : " + e.getMessage(), e );
+            returnMessage = messageUtils.getDisplayMessage( DisplayMessageConstants.CONTACT_US_MESSAGE_UNSUCCESSFUL,
+                DisplayMessageType.ERROR_MESSAGE ).toString();
+            return makeJsonMessage( CommonConstants.STATUS_INACTIVE, returnMessage );
+        }
+
+        return makeJsonMessage( CommonConstants.STATUS_ACTIVE, returnMessage );
+    }
 
 }

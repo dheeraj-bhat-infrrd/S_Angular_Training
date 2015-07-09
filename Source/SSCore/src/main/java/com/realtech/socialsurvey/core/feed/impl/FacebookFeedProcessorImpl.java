@@ -2,6 +2,7 @@ package com.realtech.socialsurvey.core.feed.impl;
 
 import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -170,7 +171,11 @@ public class FacebookFeedProcessorImpl implements SocialNetworkDataProcessor<Pos
 		try {
 			ResponseList<Post> resultList;
 			if (lastFetchedTill != null) {
-				resultList = facebook.getStatuses(new Reading().limit(PAGE_SIZE).since(lastFetchedTill));
+				Calendar calender = Calendar.getInstance();
+			    calender.setTimeInMillis(lastFetchedTill.getTime());
+			    calender.add(Calendar.SECOND, 1);
+			    Date lastFetchedTillWithoneSecChange=calender.getTime();
+				resultList = facebook.getStatuses(new Reading().limit(PAGE_SIZE).since(lastFetchedTillWithoneSecChange));
 			}
 			else {
 				resultList = facebook.getStatuses(new Reading().limit(PAGE_SIZE));

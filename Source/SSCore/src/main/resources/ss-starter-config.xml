@@ -106,6 +106,20 @@
 		<property name="durability" value="true" />
 	</bean>
 	
+	<!-- Setting email reader job detail -->
+	<bean id="emailreaderjobdetail"
+		class="org.springframework.scheduling.quartz.JobDetailFactoryBean">
+		<property name="jobClass"
+			value="com.realtech.socialsurvey.core.starter.EmailReader" />
+		<property name="jobDataAsMap">
+			<map>
+				<entry key="emailHandler" value-ref="emailHandler" />
+			</map>
+		</property>
+		<property name="durability" value="true" />
+	</bean>
+	
+
 	<!-- Account Deactivator job detail -->
 	<bean id="accountdeactivatorjobdetail"
 		class="org.springframework.scheduling.quartz.JobDetailFactoryBean">
@@ -120,7 +134,7 @@
 		</property>
 		<property name="durability" value="true" />
 	</bean>
-	
+
 	<!-- Deactivated Account Purger job detail -->
 	<bean id="deactivatedaccountpurgerjobdetail"
 		class="org.springframework.scheduling.quartz.JobDetailFactoryBean">
@@ -136,7 +150,7 @@
 		</property>
 		<property name="durability" value="true" />
 	</bean>
-	
+
 	<!-- Deactivated Account Purger job detail -->
 	<bean id="crmdataagentidmapperjobdetail"
 		class="org.springframework.scheduling.quartz.JobDetailFactoryBean">
@@ -147,6 +161,26 @@
 				<entry key="emailServices" value-ref="emailServices" />
 				<entry key="surveyHandler" value-ref="surveyHandler" />
 				<entry key="userManagementService" value-ref="userManagementService" />
+				<entry key="companyAdminEnabled" value="${BATCH_COMPANY_ADMIN_ENABLED}" />
+				<entry key="adminEmailId" value="${APPLICATION_ADMIN_EMAIL}" />
+				<entry key="adminName" value="${APPLICATION_ADMIN_NAME}" />
+			</map>
+		</property>
+		<property name="durability" value="true" />
+	</bean>
+
+	<!-- Image loader job detail -->
+	<bean id="imageloaderjobdetail"
+		class="org.springframework.scheduling.quartz.JobDetailFactoryBean">
+		<property name="jobClass"
+			value="com.realtech.socialsurvey.core.starter.ImageLoader" />
+		<property name="jobDataAsMap">
+			<map>
+				<entry key="fileUploadService" value-ref="fileUploadService" />
+				<entry key="profileManagementService" value-ref="profileManagementService" />
+				<entry key="organizationManagementService" value-ref="organizationManagementService" />
+				<entry key="amazonImageBucket" value="${AMAZON_IMAGE_BUCKET}" />
+				<entry key="cdnUrl" value="${CDN_PATH}" />
 			</map>
 		</property>
 		<property name="durability" value="true" />
@@ -156,7 +190,7 @@
 	<bean id="sitemapgeneratorcron"
 		class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
 		<property name="jobDetail" ref="sitemapjobdetail" />
-		<property name="cronExpression" value="0 15 7 * * ?" />
+		<property name="cronExpression" value="0 0 * * * ?" />
 	</bean>
 
 	<!-- setting cron for incomplete social post reminder -->
@@ -184,23 +218,33 @@
 	<bean id="socialfeedingestercron"
 		class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
 		<property name="jobDetail" ref="socialfeedingesterjobdetail" />
-		<property name="cronExpression" value="0 45 6 * * ?" />
+		<property name="cronExpression" value="0 0 19,20,21,22,23,0,1,2,3,4,5,6,7 * * ?" />
 	</bean>
 	
+	<!-- setting cron for email reader -->
+	<bean id="emailreadercron"
+		class="org.springframework.scheduling.quartz.SimpleTriggerFactoryBean">
+		<property name="jobDetail" ref="emailreaderjobdetail" />
+		<property name="repeatCount" value="0" />
+		<property name="startDelay" value="1000" />
+		<!-- <property name="cronExpression" value="0 0/1 * * * ?" /> -->
+	</bean>
+	
+
 	<!-- setting cron for account deactivator -->
 	<bean id="accountdeactivatorcron"
 		class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
 		<property name="jobDetail" ref="accountdeactivatorjobdetail" />
 		<property name="cronExpression" value="0 0 7 * * ?" />
 	</bean>
-	
+
 	<!-- setting cron for deactivated account purger -->
 	<bean id="deactivatedaccountpurgercron"
 		class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
 		<property name="jobDetail" ref="deactivatedaccountpurgerjobdetail" />
 		<property name="cronExpression" value="* 15 7 * * ?" />
 	</bean>
-	
+
 	<!-- setting cron for mapping crm data agent id -->
 	<bean id="crmdataagentidmappercron"
 		class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
@@ -208,11 +252,19 @@
 		<property name="cronExpression" value="* 30 7 * * ?" />
 	</bean>
 
+	<!-- setting cron for loading image from linkedin to amazon server -->
+	<bean id="imageloadercron"
+		class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
+		<property name="jobDetail" ref="imageloaderjobdetail" />
+		<property name="cronExpression" value="* 45 7 * * ?" />
+	</bean>
+
 	<!-- Scheduler factory -->
 	<bean class="org.springframework.scheduling.quartz.SchedulerFactoryBean">
 		<property name="jobDetails">
 			<list>
 				<ref bean="sitemapjobdetail" />
+				<ref bean="emailreaderjobdetail" />
 				<ref bean="incompletesocialpostjobdetail" />
 				<ref bean="incompletesurveyjobdetail" />
 				<ref bean="updatesubscriptionpricejobdetail" />
@@ -220,12 +272,14 @@
 				<ref bean="accountdeactivatorjobdetail" />
 				<ref bean="deactivatedaccountpurgerjobdetail" />
 				<ref bean="crmdataagentidmapperjobdetail" />
+				<ref bean="imageloaderjobdetail" />
 			</list>
 		</property>
 
 		<property name="triggers">
 			<list>
 				<ref bean="sitemapgeneratorcron" />
+				<ref bean="emailreadercron" />
 				<ref bean="incompletesocialpostcron" />
 				<ref bean="incompletesurveycron" />
 				<ref bean="updatesubscriptionpricecron" />
@@ -233,6 +287,7 @@
 				<ref bean="accountdeactivatorcron" />
 				<ref bean="deactivatedaccountpurgercron" />
 				<ref bean="crmdataagentidmappercron" />
+				<ref bean="imageloadercron" />
 			</list>
 		</property>
 		<property name="quartzProperties">
@@ -272,6 +327,7 @@
 	<!-- Social feed ingestor dependencies -->
 	<bean id="ingestor"
 		class="com.realtech.socialsurvey.core.feed.impl.SocialFeedIngestionKickStarter" />
+	<bean id="emailHandler" class="com.realtech.socialsurvey.core.handler.EmailHandler" />
 
 
 	<bean id="surveyGenerationService"
@@ -280,6 +336,10 @@
 		class="com.realtech.socialsurvey.core.services.surveybuilder.impl.SurveyBuilderImpl" />
 	<bean id="socialManagementService"
 		class="com.realtech.socialsurvey.core.services.social.impl.SocialManagementServiceImpl" />
+	<bean id="fileUploadService"
+		class="com.realtech.socialsurvey.core.services.upload.impl.CloudUploadServiceImpl" />
+	<bean id="profileManagementService"
+		class="com.realtech.socialsurvey.core.services.organizationmanagement.impl.ProfileManagementServiceImpl" />
 
 	<bean id="regionsFullImport"
 		class="com.realtech.socialsurvey.core.utils.solr.RegionsFullImport" />

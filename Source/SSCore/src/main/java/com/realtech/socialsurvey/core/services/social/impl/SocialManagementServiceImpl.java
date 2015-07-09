@@ -88,16 +88,15 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
 	@Value("${LINKED_IN_REST_API_URI}")
 	private String linkedInRestApiUri;
 	
-	// Yelp
-	@Value("${YELP_REDIRECT_URI}")
-	private String yelpRedirectUri;
-	
 	@Value("${APPLICATION_BASE_URL}")
 	private String applicationBaseUrl;
 	
 	@Value("${APPLICATION_LOGO_URL}")
 	private String applicationLogoUrl;
-
+	
+	@Value("${APPLICATION_LOGO_LINKEDIN_URL}")
+	private String applicationLogoUrlForLinkedin;
+	
 	/**
 	 * Returns the Twitter request token for a particular URL
 	 * 
@@ -252,7 +251,7 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
 								  +  "\"title\": \"\","
 								  +  "\"description\": \"" + message + "-" + linkedinMessageFeedback + "\","
 								  +  "\"submitted-url\": \"" + linkedinProfileUrl + "\",  "
-								  +  "\"submitted-image-url\": \"" + applicationLogoUrl + "\"},"
+								  +  "\"submitted-image-url\": \"" + applicationLogoUrlForLinkedin + "\"},"
 								  +  "\"visibility\": {\"code\": \"anyone\" }}";
 						StringEntity entity = new StringEntity(a);
 						post.setEntity(entity);

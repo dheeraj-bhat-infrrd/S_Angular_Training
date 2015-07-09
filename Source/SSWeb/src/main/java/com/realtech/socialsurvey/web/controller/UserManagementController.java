@@ -7,26 +7,32 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
+
 import org.noggit.JSONUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
+
 import com.amazonaws.util.json.JSONException;
 import com.amazonaws.util.json.JSONObject;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
+import com.realtech.socialsurvey.core.dao.impl.MongoOrganizationUnitSettingDaoImpl;
 import com.realtech.socialsurvey.core.entities.AgentSettings;
 import com.realtech.socialsurvey.core.entities.Branch;
 import com.realtech.socialsurvey.core.entities.BranchFromSearch;
+import com.realtech.socialsurvey.core.entities.ContactDetailsSettings;
 import com.realtech.socialsurvey.core.entities.LicenseDetail;
 import com.realtech.socialsurvey.core.entities.LockSettings;
 import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
@@ -175,17 +181,7 @@ public class UserManagementController {
 					}
 					catch (NoRecordsFetchedException noRecordsFetchedException) {
 						LOG.debug("No records exist with the email id passed, inviting the new user");
-						user = userManagementService.inviteNewUser(admin, firstName, lastName, emailId);
-						LOG.debug("Adding user {} to solr server.", user.getFirstName());
-
-						LOG.debug("Adding newly added user {} to mongo", user.getFirstName());
-						userManagementService.insertAgentSettings(user);
-						LOG.debug("Added newly added user {} to mongo", user.getFirstName());
-
-						LOG.debug("Adding newly added user {} to solr", user.getFirstName());
-						solrSearchService.addUserToSolr(user);
-						LOG.debug("Added newly added user {} to solr", user.getFirstName());
-
+						user = userManagementService.inviteUser(admin, firstName, lastName, emailId);
 						String profileName = userManagementService.getUserSettings(user.getUserId()).getProfileName();
 						userManagementService.sendRegistrationCompletionLink(emailId, firstName, lastName, admin.getCompany().getCompanyId(),
 								profileName, user.getLoginName());
@@ -840,9 +836,18 @@ public class UserManagementController {
 	 * @throws InvalidInputException
 	 */
 	@RequestMapping(value = "/showcompleteregistrationpage", method = RequestMethod.GET)
-	public String showCompleteRegistrationPage(@RequestParam("q") String encryptedUrlParams, Model model) {
+	public String showCompleteRegistrationPage(HttpServletRequest request, @RequestParam("q") String encryptedUrlParams, Model model) {
 		LOG.info("Method showCompleteRegistrationPage() to complete registration of user started.");
 
+		// Check for existing session
+		if (sessionHelper.isUserActiveSessionExists()) {
+			LOG.info("Existing Active Session detected");
+			
+			// Invalidate session in browser
+			request.getSession(false).invalidate();
+			SecurityContextHolder.clearContext();
+		}
+		
 		try {
 			Map<String, String> urlParams = null;
 			try {
@@ -870,15 +875,17 @@ public class UserManagementController {
 				model.addAttribute(CommonConstants.COMPANY, urlParams.get(CommonConstants.COMPANY));
 				model.addAttribute(CommonConstants.FIRST_NAME, urlParams.get(CommonConstants.FIRST_NAME));
 				model.addAttribute(CommonConstants.EMAIL_ID, emailId);
+				
 				User user = userManagementService.getUserByEmail(emailId);
 				AgentSettings agentSettings = userManagementService.getAgentSettingsForUserProfiles(user.getUserId());
 				if (agentSettings == null) {
 					throw new InvalidInputException("Settings not found for the given user.");
 				}
 				model.addAttribute("profileUrl", agentSettings.getCompleteProfileUrl());
+				
 				String lastName = urlParams.get(CommonConstants.LAST_NAME);
 				if (lastName != null && !lastName.isEmpty()) {
-					model.addAttribute(CommonConstants.LAST_NAME, urlParams.get(CommonConstants.LAST_NAME));
+					model.addAttribute(CommonConstants.LAST_NAME, lastName);
 				}
 				LOG.debug("Validation of url completed. Service returning params to be prepopulated in registration page");
 			}
@@ -947,10 +954,6 @@ public class UserManagementController {
 						DisplayMessageConstants.GENERAL_ERROR, e);
 			}
 
-			AccountType accountType = null;
-			request.getSession().invalidate();
-			HttpSession session = request.getSession(true);
-			
 			try {
 				// fetch user object with email Id
 				user = authenticationService.getUserWithLoginNameAndCompanyId(emailId, companyId);
@@ -966,6 +969,8 @@ public class UserManagementController {
 			sessionHelper.loginOnRegistration(emailId, password);
 			LOG.debug("Successfully added registered user to principal session");
 
+			AccountType accountType = null;
+			HttpSession session = request.getSession(true);
 			List<LicenseDetail> licenseDetails = user.getCompany().getLicenseDetails();
 			if (licenseDetails != null && !licenseDetails.isEmpty()) {
 				LicenseDetail licenseDetail = licenseDetails.get(0);
@@ -1301,6 +1306,7 @@ public class UserManagementController {
 			model.addAttribute("lastName", user.getLastName());
 			model.addAttribute("emailId", user.getEmailId());
 			model.addAttribute("userId", user.getUserId());
+			model.addAttribute("status", user.getStatus());
 
 			// returning in descending order
 			Collections.reverse(userAssignments);
@@ -1316,6 +1322,68 @@ public class UserManagementController {
 		return JspResolver.USER_MANAGEMENT_EDIT_USER_DETAILS;
 	}
 
+	@ResponseBody
+	@RequestMapping(value = "/updateuserbyadmin", method = RequestMethod.POST)
+	public String updateUserByAdmin(Model model, HttpServletRequest request) {
+		LOG.info("Method updateUserByAdmin() called from UserManagementController");
+		String userIdStr = request.getParameter("userId");
+		String firstName = request.getParameter("firstName");
+		String lastName = request.getParameter("lastName");
+		String emailId = request.getParameter("emailId");
+		
+		String fullName = "";
+		
+		fullName = firstName;
+		
+		if(lastName != null && lastName != ""){
+			fullName += " " + lastName;
+		}
+		
+		long userId = 0;
+		try {
+			try {
+				userId = Long.parseLong(userIdStr);
+			} catch (NumberFormatException e) {
+				LOG.error(
+				        "NumberFormatException while parsing user id. Reason : "
+				                + e.getMessage(), e);
+				throw e;
+			}
+			// Update AgentSetting in MySQL
+			User user = userManagementService.getUserByUserId(userId);
+			user.setFirstName(firstName);
+			user.setLastName(lastName);
+			user.setEmailId(emailId);
+			user.setLoginName(emailId);
+			
+			//update in solr
+			Map<String, Object> userMap = new HashMap<>();
+			userMap.put(CommonConstants.USER_DISPLAY_NAME_SOLR, fullName);
+		    userMap.put(CommonConstants.USER_FIRST_NAME_SOLR, firstName);
+		    userMap.put(CommonConstants.USER_LAST_NAME_SOLR, lastName);
+		    userMap.put(CommonConstants.USER_EMAIL_ID_SOLR, emailId);
+		    userMap.put(CommonConstants.USER_LOGIN_NAME_SOLR, emailId);
+			userManagementService.updateUser(user, userMap);
+
+			// Update AgentSetting in MongoDB
+			AgentSettings agentSettings = userManagementService
+			        .getAgentSettingsForUserProfiles(user.getUserId());
+			ContactDetailsSettings contactDetails = agentSettings
+			        .getContact_details();
+			contactDetails.setFirstName(firstName);
+			contactDetails.setLastName(lastName);
+			contactDetails.setName(fullName);
+			contactDetails.getMail_ids().setWork(emailId);
+			profileManagementService.updateContactDetails(MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION,
+			                agentSettings, contactDetails);
+		} catch (NonFatalException e) {
+			LOG.error("NonFatalException caught in updateUserByAdmin(). Nested exception is ", e);
+			return e.getMessage();
+		}
+		LOG.info("Method updateUserByAdmin() finished from UserManagementController");
+		return "User details updated successfully";
+	}
+	
 	@ResponseBody
 	@RequestMapping(value = "/updateuserprofile", method = RequestMethod.POST)
 	public String updateUserProfile(Model model, HttpServletRequest request) {
@@ -1390,7 +1458,7 @@ public class UserManagementController {
 			User invitedUser = userManagementService.getUserByEmail(emailId);
 			String profileName = userManagementService.getUserSettings(invitedUser.getUserId()).getProfileName();
 			userManagementService.sendRegistrationCompletionLink(emailId, firstName, lastName, user.getCompany().getCompanyId(), profileName,
-					user.getLoginName());
+					invitedUser.getLoginName());
 
 			message = messageUtils.getDisplayMessage(DisplayMessageConstants.INVITATION_RESEND_SUCCESSFUL, DisplayMessageType.SUCCESS_MESSAGE)
 					.getMessage();

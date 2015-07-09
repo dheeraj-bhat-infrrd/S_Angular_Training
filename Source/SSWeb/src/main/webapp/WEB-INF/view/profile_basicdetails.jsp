@@ -8,39 +8,24 @@
 	<c:set value="${profileSettings.lockSettings}" var="lock"></c:set>
 </c:if>
 
-<div id="prof-name-container" class="float-left lp-edit-wrapper clearfix">
-	<c:choose>
-		<c:when	test="${parentLock.isDisplayNameLocked && profilemasterid != 4}">
-			<input id="prof-name" class="prof-name prof-name-txt prof-edditable" value="${contactdetail.name}" readonly>
-			<!-- <div id="prof-name-lock" data-state="locked" data-control="parent" class="lp-edit-locks float-left lp-edit-locks-locked"></div> -->
-		</c:when>
-		<c:when	test="${parentLock.isDisplayNameLocked && profilemasterid == 4}">
-			<input id="prof-name" class="prof-name prof-name-txt prof-edditable" value="${contactdetail.name}" readonly>
-			<!-- <div id="prof-name-lock" data-state="locked" data-control="parent" class="float-left lp-edit-locks-locked"></div> -->
-		</c:when>
-		<c:when	test="${not parentLock.isDisplayNameLocked && profilemasterid == 4}">
-			<input id="prof-name" class="prof-name prof-name-txt prof-edditable" value="${contactdetail.name}">
-			<!-- <div id="prof-name-lock" data-state="unlocked" data-control="user" class="float-left"></div> -->
-		</c:when>
-		<c:when	test="${not parentLock.isDisplayNameLocked && lock.isDisplayNameLocked && profilemasterid != 4}">
-			<input id="prof-name" class="prof-name prof-name-txt prof-edditable" value="${contactdetail.name}">
-			<!-- <div id="prof-name-lock" data-state="unlocked" data-control="user" class="lp-edit-locks float-left lp-edit-locks-locked"></div> -->
-		</c:when>
-		<c:when	test="${not parentLock.isDisplayNameLocked && not lock.isDisplayNameLocked && profilemasterid != 4}">
-			<input id="prof-name" class="prof-name prof-name-txt prof-edditable" value="${contactdetail.name}">
-			<!-- <div id="prof-name-lock" data-state="unlocked" data-control="user" class="lp-edit-locks float-left"></div> -->
-		</c:when>
-	</c:choose>
+<div id="prof-name-container" class="lp-edit-wrapper clearfix prof-edditable-cont">
+	<input id="prof-name" class="prof-name prof-name-txt prof-edditable" value="${contactdetail.name}">
+	<div class="prof-edit-field-icn hide"></div>
 </div>
 <div class="prof-address">
 	<c:if test="${profilemasterid != 1}">
-		<input id="prof-title" class="prof-addline2 prof-edditable" value="${contactdetail.title}"
-			placeholder='<spring:message code="label.profiletitle.placeholder.key"/>'>
-		<div id="prof-title-lock" data-state="unlocked" data-control="user" class="hide float-left"></div>
+		<div class="prof-edditable-cont">
+			<input id="prof-title" class="prof-addline2 prof-edditable" value="${contactdetail.title}" placeholder='<spring:message code="label.profiletitle.placeholder.key"/>'>
+			<div id="prof-title-lock" data-state="unlocked" data-control="user" class="hide float-left"></div>
+			<div class="prof-edit-field-icn hide"></div>
+		</div>
 	</c:if>
-	<input id="prof-vertical" class="prof-addline2 prof-edditable" value="${profileSettings.vertical}"
-		placeholder='<spring:message code="label.profilevertical.placeholder.key"/>'>
-	<div id="prof-vertical-lock" data-state="unlocked" data-control="user" class="hide float-left"></div>
+	<div class="prof-edditable-cont">
+		<input id="prof-vertical" class="prof-addline2 prof-edditable" value="${profileSettings.vertical}"
+			placeholder='<spring:message code="label.profilevertical.placeholder.key"/>'>
+		<div id="prof-vertical-lock" data-state="unlocked" data-control="user" class="hide float-left"></div>
+		<div class="prof-edit-field-icn hide"></div>
+	</div>
 </div>
 <div id="prof-rating-review-count" class="prof-rating clearfix">
 	<div class="st-rating-wrapper maring-0 clearfix float-left"

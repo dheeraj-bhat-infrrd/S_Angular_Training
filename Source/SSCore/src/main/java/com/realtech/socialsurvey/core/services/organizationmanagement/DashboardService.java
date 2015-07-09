@@ -4,7 +4,10 @@ import java.io.IOException;
 import java.text.ParseException;
 import java.util.List;
 import java.util.Map;
+
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+
+import com.realtech.socialsurvey.core.entities.AgentRankingReport;
 import com.realtech.socialsurvey.core.entities.SurveyDetails;
 import com.realtech.socialsurvey.core.entities.SurveyPreInitiation;
 import com.realtech.socialsurvey.core.entities.User;
@@ -35,6 +38,14 @@ public interface DashboardService {
 	public XSSFWorkbook downloadIncompleteSurveyData(List<SurveyPreInitiation> surveyDetails, String fileLocation) throws IOException;
 
 	public Map<String, Map<String, Long>> getSurveyDetailsForGraph(String columnName, long columnValue, String reportType) throws ParseException;
+
+    public XSSFWorkbook downloadSocialMonitorData( List<SurveyDetails> surveyDetails, String fileName );
+
+    public XSSFWorkbook downloadCustomerSurveyResultsData( List<SurveyDetails> surveyDetails, String fileName ) throws IOException;
+
+    public XSSFWorkbook downloadAgentRankingData(
+        List<AgentRankingReport> agentDetails,
+        String fileLocation ) throws IOException;
 
 }
 // JIRA SS-137 BY RM05:EOC
