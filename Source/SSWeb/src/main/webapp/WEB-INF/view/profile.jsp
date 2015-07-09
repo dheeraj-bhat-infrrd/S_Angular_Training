@@ -459,12 +459,12 @@
                     			<c:when test="${profileLevel == 'INDIVIDUAL'}">
 									<div class="intro-body">
 										Reviews for <span class="capitalize">${profName}</span>. 
-										<span class="capitalize">${firstName}</span> has ${reviewsCount} reviews. 
+										<span class="capitalize">${profName}</span> has ${reviewsCount} reviews. 
 										<c:if test="${not empty  vertical && not empty location}">
-											<span class="capitalize">${firstName}</span> is a ${vertical} professnal in ${location}.
+											<span class="capitalize">${profName}</span> is a ${vertical} professnal in ${location}.
 										</c:if>
 										<c:if test="${not empty title}">
-											<span class="capitalize">${firstName}</span> is the ${title} of ${companyName}.
+											<span class="capitalize">${profName}</span> is the ${title} of ${companyName}.
 										</c:if>
 									</div>
 								</c:when>
