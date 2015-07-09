@@ -5763,13 +5763,8 @@ $(document).on('click', '.lp-edit-locks', function(e) {
 
 	if ($(this).attr('data-control') == 'user') {
 		if ($(this).hasClass('lp-edit-locks-locked')) {
-			$(this).removeClass('lp-edit-locks-locked');
-			$(this).attr('data-state', 'unlocked');
 			updateLockSettings(lockId, false);
-
 		} else {
-			$(this).addClass('lp-edit-locks-locked');
-			$(this).attr('data-state', 'locked');
 			updateLockSettings(lockId, true);
 		}
 	} else {
@@ -5784,13 +5779,8 @@ $(document).on('click', '.prof-img-lock-item', function(e) {
 
 	if ($(this).attr('data-control') == 'user') {
 		if ($(this).hasClass('prof-img-lock-locked')) {
-			$(this).removeClass('prof-img-lock-locked');
-			$(this).attr('data-state', 'unlocked');
 			updateLockSettings(lockId, false);
-
 		} else {
-			$(this).addClass('prof-img-lock-locked');
-			$(this).attr('data-state', 'locked');
 			updateLockSettings(lockId, true);
 		}
 	} else {
@@ -5809,12 +5799,25 @@ function updateLockSettings(id, state) {
 			"id" : id,
 			"state" : state
 		};
-		callAjaxPostWithPayloadData("./updatelocksettings.do",
-				callBackUpdateLock, payload);
+		callAjaxPostWithPayloadData("./updatelocksettings.do", function(data) {
+			$('#prof-message-header').html(data);
+			if ($('#prof-message-header #display-msg-div').hasClass('success-message')) {
+				if (state == false) {
+					$('#' + id).removeClass('lp-edit-locks-locked');
+					$('#' + id).removeClass('prof-img-lock-locked');
+					$('#' + id).attr('data-state', 'unlocked');
+				}
+				else if (state == true) {
+					$('#' + id).addClass('lp-edit-locks-locked');
+					$('#' + id).addClass('prof-img-lock-locked');
+					$('#' + id).attr('data-state', 'locked');
+				}
+			}
+			
+			$('#overlay-toast').html($('#display-msg-div').text().trim());
+			showToast();
+		}, payload);
 	}, 0);
-}
-function callBackUpdateLock () {
-	showMainContent('./showprofilepage.do');
 }
 
 // Update AboutMe details
