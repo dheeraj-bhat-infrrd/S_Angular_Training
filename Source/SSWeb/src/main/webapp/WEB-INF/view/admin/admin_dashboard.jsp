@@ -121,7 +121,7 @@
 								<input id="admin-report-dwn" class="dash-sel-item" type="text"
 									placeholder="Start typing..."
 									onkeyup="searchBranchRegionOrAgent(this.value, 'reports')">
-								<div id="dsh-srch-res"></div>
+								<div id="dsh-srch-report"></div>
 							</div>
 						</div>
 					</div>

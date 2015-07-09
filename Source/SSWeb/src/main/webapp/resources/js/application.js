@@ -845,7 +845,7 @@ function searchBranchRegionOrAgent(searchKeyword, flow) {
 	} else if (flow == 'graph'){
 		e = document.getElementById("graph-sel-list");		
 	} else if (flow == 'reports') {
-		e = document.getElementById("admin-report-dwn");	
+		e = document.getElementById("report-sel");	
 	} else {
 		return false;
 	}
@@ -861,10 +861,12 @@ function searchBranchRegionOrAgent(searchKeyword, flow) {
 		if (flow == 'icons'){
 			$('#dsh-srch-res').addClass('dsh-sb-dd');
 			$('#dsh-srch-res').html(data);
-		}
-		else if (flow == 'graph'){
+		} else if (flow == 'graph'){
 			$('#dsh-grph-srch-res').addClass('dsh-sb-dd');
 			$('#dsh-grph-srch-res').html(data);
+		} else if (flow == 'reports'){
+			$('#dsh-srch-report').addClass('dsh-sb-dd');
+			$('#dsh-srch-report').html(data);
 		}
 		$('.dsh-res-display').click(function() {
 			if (flow == 'icons'){
