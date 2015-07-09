@@ -120,7 +120,8 @@ $(window).on('unload', function(){
 			};
 			fetchSocialProfileUrl(payload, function(data) {
 				if(data.statusText == 'OK'){
-					parentWindow.showProfileLink("${socialNetwork}", data.responseText);
+					parentWindow.loadSocialMediaUrlInSettingsPage();
+					//parentWindow.showProfileLink("${socialNetwork}", data.responseText);
 					parentWindow.showProfileLinkInEditProfilePage("${socialNetwork}", data.responseText);					
 				}
 			});
