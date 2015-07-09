@@ -967,7 +967,7 @@ public class UserManagementController
 	}
 	
 	@RequestMapping(value = "/completeregistrationpage")
-	public String initLandingPage() {
+	public String initCompleteRegistrationPage() {
 		LOG.info("CompleteRegistration Page started");
 		return JspResolver.COMPLETE_REGISTRATION;
 	}

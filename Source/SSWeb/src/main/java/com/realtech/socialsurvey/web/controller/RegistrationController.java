@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.entities.User;
 import com.realtech.socialsurvey.core.entities.VerticalsMaster;
@@ -145,271 +146,284 @@ public class RegistrationController
     }
 
 
-    /**
-     * JIRA:SS-26 BY RM02 Method to validate the url and present registration jsp with pre-populated
-     * user details when registration is done from invitation url
-     * 
-     * @param encryptedUrlParams
-     * @param request
-     * @param model
-     * @return
-     */
-    @RequestMapping ( value = "/showregistrationpage")
-    public String showRegistrationPage( @RequestParam ( "q") String encryptedUrlParams, HttpServletRequest request, Model model )
-    {
-        LOG.info( "Method showRegistrationPage of Registration Controller called with encryptedUrl : " + encryptedUrlParams );
+	/**
+	 * JIRA:SS-26 BY RM02 Method to validate the url and present registration jsp with pre-populated
+	 * user details when registration is done from invitation url
+	 * 
+	 * @param encryptedUrlParams
+	 * @param request
+	 * @param model
+	 * @return
+	 */
+	@RequestMapping(value = "/showregistrationpage")
+	public String showRegistrationPage(@RequestParam("q") String encryptedUrlParams, HttpServletRequest request, Model model,
+			RedirectAttributes redirectAttributes) {
+		LOG.info("Method showRegistrationPage of Registration Controller called with encryptedUrl : " + encryptedUrlParams);
 
-        // Check for existing session
-        if ( sessionHelper.isUserActiveSessionExists() ) {
-            LOG.info( "Existing Active Session detected" );
+		// Check for existing session
+		if (sessionHelper.isUserActiveSessionExists()) {
+			LOG.info("Existing Active Session detected");
+			redirectAttributes.addFlashAttribute(CommonConstants.ACTIVE_SESSIONS_FOUND, "true");
+			return "redirect:/" + JspResolver.LANDING + ".do";
+		}
 
-            model.addAttribute( CommonConstants.ACTIVE_SESSIONS_FOUND, "true" );
-            return JspResolver.LANDING;
-        }
+		try {
+			LOG.debug("Calling registration service for validating registration url and extracting parameters from it");
+			Map<String, String> urlParams = null;
+			try {
+				urlParams = userManagementService.validateRegistrationUrl(encryptedUrlParams);
+				if (userManagementService.checkIfTheLinkHasExpired(encryptedUrlParams)) {
+					Map<String, String> urlParameters = urlGenerator.decryptParameters(encryptedUrlParams);
+					LOG.info("The link has expired need to redirect the user to resend link page");
+					model.addAttribute("firstname", urlParameters.get(CommonConstants.FIRST_NAME));
+					model.addAttribute("lastname", urlParameters.get(CommonConstants.LAST_NAME));
+					model.addAttribute("emailid", urlParameters.get(CommonConstants.EMAIL_ID));
+					model.addAttribute("status", DisplayMessageType.ERROR_MESSAGE);
+					model.addAttribute("message",
+							messageUtils.getDisplayMessage(DisplayMessageConstants.USER_LINK_EXPIRED, DisplayMessageType.ERROR_MESSAGE));
+					
+					return JspResolver.REGISTRATION_LINK_EXPIRED;
+				}
+			}
+			catch (InvalidInputException e) {
+				throw new InvalidInputException(e.getMessage(), DisplayMessageConstants.INVALID_REGISTRATION_INVITE, e);
+			}
 
-        try {
-            LOG.debug( "Calling registration service for validating registration url and extracting parameters from it" );
-            Map<String, String> urlParams = null;
-            try {
-                urlParams = userManagementService.validateRegistrationUrl( encryptedUrlParams );
-                if ( userManagementService.checkIfTheLinkHasExpired( encryptedUrlParams ) ) {
-                    Map<String, String> urlParameters = urlGenerator.decryptParameters( encryptedUrlParams );
-                    LOG.info( "The link has expired need to redirect the user to resend link page" );
-                    model.addAttribute( "firstname", urlParameters.get( CommonConstants.FIRST_NAME ) );
-                    model.addAttribute( "lastname", urlParameters.get( CommonConstants.LAST_NAME ) );
-                    model.addAttribute( "emailid", urlParameters.get( CommonConstants.EMAIL_ID ) );
-                    model.addAttribute( "status", DisplayMessageType.ERROR_MESSAGE );
-                    model.addAttribute( "message", messageUtils.getDisplayMessage( DisplayMessageConstants.USER_LINK_EXPIRED,
-                        DisplayMessageType.ERROR_MESSAGE ) );
-                    //TODO page for redirecting to be set here
-                    return JspResolver.REGISTRATION_LINK_EXPIRED;
+			if (urlParams == null || urlParams.isEmpty()) {
+				throw new InvalidInputException("Url params are null or empty in showRegistrationPage");
+			}
 
-                }
-            } catch ( InvalidInputException e ) {
-                throw new InvalidInputException( e.getMessage(), DisplayMessageConstants.INVALID_REGISTRATION_INVITE, e );
-            }
+			String emailAddress = urlParams.get(CommonConstants.EMAIL_ID);
+			User invitedUser = null;
+			try {
+				invitedUser = userManagementService.getUserByEmail(emailAddress);
+			}
+			catch (NoRecordsFetchedException e) {
+				LOG.warn("NonFatalException while showing registration page. Reason : " + e.getMessage(), e);
+			}
 
-            if ( urlParams == null || urlParams.isEmpty() ) {
-                throw new InvalidInputException( "Url params are null or empty in showRegistrationPage" );
-            }
+			if (invitedUser != null) {
+				redirectAttributes.addFlashAttribute("status", DisplayMessageType.ERROR_MESSAGE);
+				redirectAttributes.addFlashAttribute("message",
+						messageUtils.getDisplayMessage(DisplayMessageConstants.INVALID_REGISTRATION_INVITE, DisplayMessageType.ERROR_MESSAGE));
+				return "redirect:/" + JspResolver.LOGIN + ".do";
+			}
 
-            String emailAddress = urlParams.get( CommonConstants.EMAIL_ID );
-            User invitedUser = null;
-            try {
-                invitedUser = userManagementService.getUserByEmail( emailAddress );
-            } catch ( NoRecordsFetchedException e ) {
-                LOG.warn( "NonFatalException while showing registration page. Reason : " + e.getMessage(), e );
-            }
+			redirectAttributes.addFlashAttribute("firstname", urlParams.get(CommonConstants.FIRST_NAME));
+			redirectAttributes.addFlashAttribute("lastname", urlParams.get(CommonConstants.LAST_NAME));
+			redirectAttributes.addFlashAttribute("emailid", emailAddress);
+			redirectAttributes.addFlashAttribute("isDirectRegistration", true);
 
-            if ( invitedUser != null ) {
-                model.addAttribute( "status", DisplayMessageType.ERROR_MESSAGE );
-                model.addAttribute( "message", messageUtils.getDisplayMessage(
-                    DisplayMessageConstants.INVALID_REGISTRATION_INVITE, DisplayMessageType.ERROR_MESSAGE ) );
-                return JspResolver.LOGIN;
-            }
+			LOG.debug("Validation of url completed. Service returning params to be prepopulated in registration page");
+		}
+		catch (NonFatalException e) {
+			LOG.error("NonFatalException while showing registration page. Reason : " + e.getMessage(), e);
+			redirectAttributes.addFlashAttribute("message", messageUtils.getDisplayMessage(e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE));
+			return "redirect:/" + JspResolver.LOGIN + ".do";
+		}
+		
+		return "redirect:/" + JspResolver.REGISTRATION_PAGE + ".do";
+	}
 
-            model.addAttribute( "firstname", urlParams.get( CommonConstants.FIRST_NAME ) );
-            model.addAttribute( "lastname", urlParams.get( CommonConstants.LAST_NAME ) );
-            model.addAttribute( "emailid", emailAddress );
-            model.addAttribute( "isDirectRegistration", true );
+	@RequestMapping(value = "/registrationpage")
+	public String initRegistrationPage() {
+		LOG.info("Registration Page started");
+		return JspResolver.REGISTRATION;
+	}
+	
+	/**
+	 * Method to show the registration page directly
+	 * 
+	 * @param model
+	 * @param request
+	 * @return
+	 * @throws IOException
+	 */
+	@RequestMapping(value = "/registration")
+	public String initDirectRegistration(Model model, HttpServletRequest request, RedirectAttributes redirectAttributes) {
+		LOG.info("Method called for showing up the direct registration page");
+		String firstName = request.getParameter("firstName");
+		String lastName = request.getParameter("lastName");
+		String emailId = request.getParameter("emailId");
 
-            LOG.debug( "Validation of url completed. Service returning params to be prepopulated in registration page" );
-        } catch ( NonFatalException e ) {
-            LOG.error( "NonFatalException while showing registration page. Reason : " + e.getMessage(), e );
-            model
-                .addAttribute( "message", messageUtils.getDisplayMessage( e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE ) );
-            return JspResolver.LOGIN;
-        }
-        return JspResolver.REGISTRATION;
-    }
+		try {
+			LOG.debug("Validating form elements");
+			validateFormParameters(firstName, lastName, emailId);
+			LOG.debug("Form parameters validation passed for firstName: " + firstName + " lastName: " + lastName + " and emailID: " + emailId);
+			// check if email id already exists
+			if (userManagementService.userExists(emailId.trim())) {
+				LOG.warn(emailId + " is already present");
+				throw new UserAlreadyExistsException("Email address " + emailId + " already exists.");
+			}
+			if (validateCaptcha.equals(CommonConstants.YES_STRING)) {
+				if (!captchaValidation.isCaptchaValid(request.getRemoteAddr(), captchaSecretKey, request.getParameter("g-recaptcha-response"))) {
+					LOG.error("Captcha Validation failed!");
+					throw new InvalidInputException("Captcha Validation failed!", DisplayMessageConstants.INVALID_CAPTCHA);
+				}
+				LOG.debug("Captcha validation complete!");
+			}
 
+			model.addAttribute("firstname", firstName);
+			model.addAttribute("lastname", lastName);
+			model.addAttribute("emailid", emailId);
+			model.addAttribute("isDirectRegistration", true);
 
-    /**
-     * Method to show the registration page directly
-     * 
-     * @param model
-     * @param request
-     * @return
-     * @throws IOException
-     */
-    @RequestMapping ( value = "/registration")
-    public String initDirectRegistration( Model model, HttpServletRequest request )
-    {
-        LOG.info( "Method called for showing up the direct registration page" );
-        String firstName = request.getParameter( "firstName" );
-        String lastName = request.getParameter( "lastName" );
-        String emailId = request.getParameter( "emailId" );
+			// send verification mail and then redirect to index page
+			LOG.debug("Calling service for sending the registration invitation");
+			userManagementService.inviteCorporateToRegister(firstName, lastName, emailId, false);
+			LOG.debug("Service for sending the registration invitation excecuted successfully");
 
-        try {
-            LOG.debug( "Validating form elements" );
-            validateFormParameters( firstName, lastName, emailId );
-            LOG.debug( "Form parameters validation passed for firstName: " + firstName + " lastName: " + lastName
-                + " and emailID: " + emailId );
-            // check if email id already exists
-            if ( userManagementService.userExists( emailId.trim() ) ) {
-                LOG.warn( emailId + " is already present" );
-                throw new UserAlreadyExistsException( "Email address " + emailId + " already exists." );
-            }
-            if ( validateCaptcha.equals( CommonConstants.YES_STRING ) ) {
-                if ( !captchaValidation.isCaptchaValid( request.getRemoteAddr(), captchaSecretKey,
-                    request.getParameter( "g-recaptcha-response" ) ) ) {
-                    LOG.error( "Captcha Validation failed!" );
-                    throw new InvalidInputException( "Captcha Validation failed!", DisplayMessageConstants.INVALID_CAPTCHA );
-                }
-                LOG.debug( "Captcha validation complete!" );
-            }
+			model.addAttribute("message",
+					messageUtils.getDisplayMessage(DisplayMessageConstants.REGISTRATION_INVITE_SUCCESSFUL, DisplayMessageType.SUCCESS_MESSAGE));
+			return JspResolver.REGISTRATION_INVITE_SUCCESSFUL;
+		}
+		catch (UserAlreadyExistsException e) {
+			redirectAttributes.addFlashAttribute("message",
+					messageUtils.getDisplayMessage(DisplayMessageConstants.USERNAME_ALREADY_TAKEN, DisplayMessageType.ERROR_MESSAGE));
+			redirectAttributes.addFlashAttribute("firstname", firstName);
+			redirectAttributes.addFlashAttribute("lastname", lastName);
+			redirectAttributes.addFlashAttribute("emailid", emailId);
+		}
+		catch (NonFatalException e) {
+			LOG.error("NonFatalException while showing registration page. Reason : " + e.getMessage(), e);
+			redirectAttributes.addFlashAttribute("message",
+					messageUtils.getDisplayMessage(DisplayMessageConstants.INVALID_CAPTCHA, DisplayMessageType.ERROR_MESSAGE));
+			redirectAttributes.addFlashAttribute("firstname", firstName);
+			redirectAttributes.addFlashAttribute("lastname", lastName);
+			redirectAttributes.addFlashAttribute("emailid", emailId);
+		}
 
-            model.addAttribute( "firstname", firstName );
-            model.addAttribute( "lastname", lastName );
-            model.addAttribute( "emailid", emailId );
-            model.addAttribute( "isDirectRegistration", true );
-            // send verification mail and then redirect to index page
-            LOG.debug( "Calling service for sending the registration invitation" );
-            userManagementService.inviteCorporateToRegister( firstName, lastName, emailId, false );
-            LOG.debug( "Service for sending the registration invitation excecuted successfully" );
-            model.addAttribute( "message", messageUtils.getDisplayMessage(
-                DisplayMessageConstants.REGISTRATION_INVITE_SUCCESSFUL, DisplayMessageType.SUCCESS_MESSAGE ) );
-            return JspResolver.REGISTRATION_INVITE_SUCCESSFUL;
-        } catch ( UserAlreadyExistsException e ) {
-            model.addAttribute( "message", messageUtils.getDisplayMessage( DisplayMessageConstants.USERNAME_ALREADY_TAKEN,
-                DisplayMessageType.ERROR_MESSAGE ) );
-            model.addAttribute( "firstname", firstName );
-            model.addAttribute( "lastname", lastName );
-            model.addAttribute( "emailid", emailId );
-        } catch ( NonFatalException e ) {
-            LOG.error( "NonFatalException while showing registration page. Reason : " + e.getMessage(), e );
-            model.addAttribute( "message",
-                messageUtils.getDisplayMessage( DisplayMessageConstants.INVALID_CAPTCHA, DisplayMessageType.ERROR_MESSAGE ) );
-            model.addAttribute( "firstname", firstName );
-            model.addAttribute( "lastname", lastName );
-            model.addAttribute( "emailid", emailId );
-        }
-        return JspResolver.INDEX;
-    }
+		return "redirect:/" + JspResolver.INDEX + ".do";
+	}
 
+	/*
+	 * Resend co-operate invite
+	 */
+	@ResponseBody
+	@RequestMapping(value = "/resendRegistrationMail", method = RequestMethod.GET)
+	public String initResendDirectRegistration(Model model, HttpServletRequest request) {
+		LOG.info("Method called for showing up the direct registration page");
+		String firstName = request.getParameter("firstName");
+		String lastName = request.getParameter("lastName");
+		String emailId = request.getParameter("emailId");
 
-    /*
-     * Resend co-operate invite
-     */
-    @ResponseBody
-    @RequestMapping ( value = "/resendRegistrationMail", method = RequestMethod.GET)
-    public String initResendDirectRegistration( Model model, HttpServletRequest request )
-    {
-        LOG.info( "Method called for showing up the direct registration page" );
-        String firstName = request.getParameter( "firstName" );
-        String lastName = request.getParameter( "lastName" );
-        String emailId = request.getParameter( "emailId" );
+		try {
+			LOG.debug("Validating form elements");
+			validateFormParameters(firstName, lastName, emailId);
+			LOG.debug("Form parameters validation passed for firstName: " + firstName + " lastName: " + lastName + " and emailID: " + emailId);
+			// check if email id already exists
+			if (userManagementService.userExists(emailId.trim())) {
+				LOG.warn(emailId + " is already present");
+				throw new UserAlreadyExistsException("Email address " + emailId + " already exists.");
+			}
 
-        try {
-            LOG.debug( "Validating form elements" );
-            validateFormParameters( firstName, lastName, emailId );
-            LOG.debug( "Form parameters validation passed for firstName: " + firstName + " lastName: " + lastName
-                + " and emailID: " + emailId );
-            // check if email id already exists
-            if ( userManagementService.userExists( emailId.trim() ) ) {
-                LOG.warn( emailId + " is already present" );
-                throw new UserAlreadyExistsException( "Email address " + emailId + " already exists." );
-            }
+			LOG.debug("Calling service for sending the registration invitation");
+			userManagementService.inviteCorporateToRegister(firstName, lastName, emailId, false);
+			LOG.debug("Service for sending the registration invitation excecuted successfully");
+			model.addAttribute("message",
+					messageUtils.getDisplayMessage(DisplayMessageConstants.REGISTRATION_INVITE_SUCCESSFUL, DisplayMessageType.SUCCESS_MESSAGE));
+		}
+		catch (UserAlreadyExistsException e) {
+			return "User already registered";
+		}
+		catch (NonFatalException e) {
+			return "Some error occurred while sending registration mail";
+		}
+		return "Registration invite resend successfully";
+	}
 
-            LOG.debug( "Calling service for sending the registration invitation" );
-            userManagementService.inviteCorporateToRegister( firstName, lastName, emailId, false );
-            LOG.debug( "Service for sending the registration invitation excecuted successfully" );
-            model.addAttribute( "message", messageUtils.getDisplayMessage(
-                DisplayMessageConstants.REGISTRATION_INVITE_SUCCESSFUL, DisplayMessageType.SUCCESS_MESSAGE ) );
-        } catch ( UserAlreadyExistsException e ) {
-            return "User already registered";
-        } catch ( NonFatalException e ) {
-            return "Some error occurred while sending registration mail";
-        }
-        return "Registration invite resend successfully";
-    }
+	/**
+	 * JIRA:SS-26 BY RM02 Method to validate registration form parameters and call service to add a
+	 * new user in application
+	 * 
+	 * @param model
+	 * @param request
+	 * @return
+	 */
+	@RequestMapping(value = "/register", method = RequestMethod.POST)
+	public String registerUser(Model model, HttpServletRequest request, RedirectAttributes redirectAttributes) {
+		LOG.info("Method registerUser of Registration Controller called");
 
+		String firstName = request.getParameter("firstname");
+		String lastName = request.getParameter("lastname");
+		String emailId = request.getParameter("emailid");
+		String originalEmailId = request.getParameter("originalemailid");
+		String password = request.getParameter("password");
+		String confirmPassword = request.getParameter("confirmpassword");
+		String strIsDirectRegistration = request.getParameter("isDirectRegistration");
 
-    /**
-     * JIRA:SS-26 BY RM02 Method to validate registration form parameters and call service to add a
-     * new user in application
-     * 
-     * @param model
-     * @param request
-     * @return
-     */
-    @RequestMapping ( value = "/register", method = RequestMethod.POST)
-    public String registerUser( Model model, HttpServletRequest request )
-    {
-        LOG.info( "Method registerUser of Registration Controller called" );
+		try {
+			boolean isDirectRegistration = false;
+			if (strIsDirectRegistration != null && !strIsDirectRegistration.isEmpty()) {
+				isDirectRegistration = Boolean.parseBoolean(strIsDirectRegistration);
+			}
+			/**
+			 * Validate the parameters obtained from registration form
+			 */
+			validateRegistrationForm(firstName, lastName, emailId, password, confirmPassword);
 
-        String firstName = request.getParameter( "firstname" );
-        String lastName = request.getParameter( "lastname" );
-        String emailId = request.getParameter( "emailid" );
-        String originalEmailId = request.getParameter( "originalemailid" );
-        String password = request.getParameter( "password" );
-        String confirmPassword = request.getParameter( "confirmpassword" );
-        String strIsDirectRegistration = request.getParameter( "isDirectRegistration" );
+			/**
+			 * If emailId sent in the link and emailId entered by the user are same, register the
+			 * user else send a registration invite on the changed emailId
+			 */
+			try {
+				LOG.debug("Registering user with emailId : " + emailId);
+				userManagementService.addCorporateAdmin(firstName, lastName, emailId, confirmPassword, isDirectRegistration);
 
-        try {
-            boolean isDirectRegistration = false;
-            if ( strIsDirectRegistration != null && !strIsDirectRegistration.isEmpty() ) {
-                isDirectRegistration = Boolean.parseBoolean( strIsDirectRegistration );
-            }
-            /**
-             * Validate the parameters obtained from registration form
-             */
-            validateRegistrationForm( firstName, lastName, emailId, password, confirmPassword );
+				LOG.debug("Adding newly registered user to principal session");
+				sessionHelper.loginOnRegistration(emailId, password);
+				LOG.debug("Successfully added registered user to principal session");
 
-            /**
-             * If emailId sent in the link and emailId entered by the user are same, register the
-             * user else send a registration invite on the changed emailId
-             */
-            try {
-                LOG.debug( "Registering user with emailId : " + emailId );
-                userManagementService.addCorporateAdmin( firstName, lastName, emailId, confirmPassword, isDirectRegistration );
+				// send verification mail
+				// no need to send verification mail as the new sign up path doesn't need it
+				/**
+				 * if (isDirectRegistration) {
+				 * LOG.debug("Calling method for sending verification link for user : " +
+				 * user.getUserId()); userManagementService.sendVerificationLink(user); }
+				 */
+			}
+			catch (InvalidInputException e) {
+				throw new InvalidInputException(e.getMessage(), DisplayMessageConstants.REGISTRATION_GENERAL_ERROR, e);
+			}
+			catch (UserAlreadyExistsException e) {
+				throw new UserAlreadyExistsException(e.getMessage(), DisplayMessageConstants.USERNAME_ALREADY_TAKEN, e);
+			}
+			catch (UndeliveredEmailException e) {
+				throw new UndeliveredEmailException(e.getMessage(), DisplayMessageConstants.GENERAL_ERROR, e);
+			}
 
-                LOG.debug( "Adding newly registered user to principal session" );
-                sessionHelper.loginOnRegistration( emailId, password );
-                LOG.debug( "Successfully added registered user to principal session" );
+			List<VerticalsMaster> verticalsMasters = null;
+			try {
+				verticalsMasters = organizationManagementService.getAllVerticalsMaster();
+			}
+			catch (InvalidInputException e) {
+				throw new InvalidInputException("Invalid Input exception occured in method getAllVerticalsMaster()",
+						DisplayMessageConstants.GENERAL_ERROR, e);
+			}
+			
+			redirectAttributes.addFlashAttribute("verticals", verticalsMasters);
+			redirectAttributes.addFlashAttribute("isDirectRegistration", strIsDirectRegistration);
+		}
+		catch (NonFatalException e) {
+			LOG.error("NonFatalException while registering user. Reason : " + e.getMessage(), e);
+			redirectAttributes.addFlashAttribute("message", messageUtils.getDisplayMessage(e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE));
+			redirectAttributes.addFlashAttribute("firstname", firstName);
+			redirectAttributes.addFlashAttribute("lastname", lastName);
+			redirectAttributes.addFlashAttribute("emailid", originalEmailId);
+			redirectAttributes.addFlashAttribute("isDirectRegistration", strIsDirectRegistration);
+			
+			return "redirect:/" + JspResolver.REGISTRATION_PAGE + ".do";
+		}
+		
+		LOG.info("Method registerUser of Registration Controller finished");
+		return "redirect:/" + JspResolver.COMPANY_INFORMATION_PAGE + ".do";
+	}
 
-                // send verification mail
-                // no need to send verification mail as the new sign up path doesn't need it
-                /**
-                 * if (isDirectRegistration) {
-                 * LOG.debug("Calling method for sending verification link for user : " +
-                 * user.getUserId()); userManagementService.sendVerificationLink(user); }
-                 */
-            } catch ( InvalidInputException e ) {
-                throw new InvalidInputException( e.getMessage(), DisplayMessageConstants.REGISTRATION_GENERAL_ERROR, e );
-            } catch ( UserAlreadyExistsException e ) {
-                throw new UserAlreadyExistsException( e.getMessage(), DisplayMessageConstants.USERNAME_ALREADY_TAKEN, e );
-            } catch ( UndeliveredEmailException e ) {
-                throw new UndeliveredEmailException( e.getMessage(), DisplayMessageConstants.GENERAL_ERROR, e );
-            }
-
-            List<VerticalsMaster> verticalsMasters = null;
-            try {
-                verticalsMasters = organizationManagementService.getAllVerticalsMaster();
-            } catch ( InvalidInputException e ) {
-                throw new InvalidInputException( "Invalid Input exception occured in method getAllVerticalsMaster()",
-                    DisplayMessageConstants.GENERAL_ERROR, e );
-            }
-            model.addAttribute( "verticals", verticalsMasters );
-            // JIRA - SS-536
-            model.addAttribute( "isDirectRegistration", strIsDirectRegistration );
-        } catch ( NonFatalException e ) {
-            LOG.error( "NonFatalException while registering user. Reason : " + e.getMessage(), e );
-            model
-                .addAttribute( "message", messageUtils.getDisplayMessage( e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE ) );
-            /**
-             * Adding the attributes required in page after reloading
-             */
-            model.addAttribute( "firstname", firstName );
-            model.addAttribute( "lastname", lastName );
-            model.addAttribute( "emailid", originalEmailId );
-            model.addAttribute( "isDirectRegistration", strIsDirectRegistration );
-            return JspResolver.REGISTRATION;
-        }
-        LOG.info( "Method registerUser of Registration Controller finished" );
-        return JspResolver.COMPANY_INFORMATION;
-    }
-
+	@RequestMapping(value = "/companyinformationpage")
+	public String initCompanyInfoPage() {
+		LOG.info("CompanyInformation Page started");
+		return JspResolver.COMPANY_INFORMATION;
+	}
 
     /**
      * Method to verify an account
