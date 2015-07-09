@@ -1364,8 +1364,8 @@ public class SocialManagementController {
 	        
 	        //Check for the collection to update
 	        if ( profileMasterId == CommonConstants.PROFILES_MASTER_COMPANY_ADMIN_PROFILE_ID) {
-	                unitSettings = userSettings.getCompanySettings();
-	                collectionName = MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION;
+                unitSettings = userSettings.getCompanySettings();
+                collectionName = MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION;
             } else if ( profileMasterId == CommonConstants.PROFILES_MASTER_REGION_ADMIN_PROFILE_ID ) {
                 unitSettings = userSettings.getRegionSettings().get( selectedProfile.getRegionId() );
                 collectionName = MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION;
@@ -1377,6 +1377,16 @@ public class SocialManagementController {
                 collectionName = MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION;
             }
 			unitSettings = socialManagementService.disconnectSocialNetwork(socialMedia, unitSettings, collectionName);
+			//Check for the collection to update
+	        if ( profileMasterId == CommonConstants.PROFILES_MASTER_COMPANY_ADMIN_PROFILE_ID) {
+                userSettings.setCompanySettings(unitSettings);
+            } else if ( profileMasterId == CommonConstants.PROFILES_MASTER_REGION_ADMIN_PROFILE_ID ) {
+                userSettings.getRegionSettings().put(selectedProfile.getRegionId(), unitSettings);
+            } else if ( profileMasterId == CommonConstants.PROFILES_MASTER_BRANCH_ADMIN_PROFILE_ID ) {
+                userSettings.getBranchSettings().put(selectedProfile.getBranchId(), unitSettings);
+            } else if ( profileMasterId == CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID ) {
+                userSettings.setAgentSettings((AgentSettings) unitSettings);
+            }
 			session.setAttribute(CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION, userSettings);
 		} catch (NonFatalException e) {
 			LOG.error("Exception occured in disconnectSocialNetwork() while disconnecting with the social Media.");
