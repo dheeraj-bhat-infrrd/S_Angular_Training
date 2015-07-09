@@ -8,8 +8,11 @@ public interface JspResolver
     // Registration
     public static final String INVITATION = "invitation";
     public static final String REGISTRATION = "registration";
+    public static final String REGISTRATION_PAGE = "registrationpage";
     public static final String COMPANY_INFORMATION = "companyinformation";
+    public static final String COMPANY_INFORMATION_PAGE = "companyinformationpage";
     public static final String ACCOUNT_TYPE_SELECTION = "accounttypeselection";
+    public static final String ACCOUNT_TYPE_SELECTION_PAGE = "selectaccounttype";
     public static final String COMPLETE_REGISTRATION = "completeregistration";
     public static final String COMPLETE_REGISTRATION_PAGE = "completeregistrationpage";
     public static final String USER_ID_ON_INVITE = "useridoninvite";
