@@ -146,4 +146,6 @@ public interface OrganizationUnitSettingsDao {
 			String collectionName, String matchUrl);
 	
     public void setAgentNames( Map<Long, AgentRankingReport> agentsReport );
+
+	public OrganizationUnitSettings removeKeyInOrganizationSettings(OrganizationUnitSettings unitSettings, String keyToUpdate, String collectionName);
 }
