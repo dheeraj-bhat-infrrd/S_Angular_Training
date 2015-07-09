@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
+
 import org.apache.commons.lang.StringUtils;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellStyle;
@@ -21,9 +22,11 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+
 import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.dao.OrganizationUnitSettingsDao;
 import com.realtech.socialsurvey.core.dao.SurveyDetailsDao;
+import com.realtech.socialsurvey.core.entities.AgentRankingReport;
 import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
 import com.realtech.socialsurvey.core.entities.SurveyDetails;
 import com.realtech.socialsurvey.core.entities.SurveyPreInitiation;
@@ -354,5 +357,204 @@ public class DashboardServiceImpl implements DashboardService, InitializingBean 
 		map.put("socialposts", surveyDetailsDao.getSocialPostsCountByCriteria(columnName, columnValue, reportType));
 		return map;
 	}
+
+	/*
+	 * Method to create excel file for Social posts.
+	 */
+    @Override
+    public XSSFWorkbook downloadSocialMonitorData( List<SurveyDetails> surveyDetails, String fileName )
+    {
+     // Blank workbook
+        XSSFWorkbook workbook = new XSSFWorkbook();
+
+        // Create a blank sheet
+        XSSFSheet sheet = workbook.createSheet();
+        XSSFDataFormat df = workbook.createDataFormat();
+        CellStyle style = workbook.createCellStyle();
+        style.setDataFormat(df.getFormat("d-mm-yyyy"));
+        Integer counter = 1;
+        // This data needs to be written (List<Object>)
+        Map<String, List<Object>> data = new TreeMap<>();
+        List<Object> surveyDetailsToPopulate = new ArrayList<>();
+        for (SurveyDetails survey : surveyDetails) {
+            if (survey.getSharedOn() != null && !survey.getSharedOn().isEmpty()){
+                surveyDetailsToPopulate.add(survey.getReview());
+                surveyDetailsToPopulate.add(survey.getModifiedOn());
+                surveyDetailsToPopulate.add(StringUtils.join(survey.getSharedOn(), ","));
+                surveyDetailsToPopulate.add(survey.getCustomerFirstName());
+                surveyDetailsToPopulate.add(survey.getCustomerLastName());
+                data.put((++counter).toString(), surveyDetailsToPopulate);
+                surveyDetailsToPopulate = new ArrayList<>();
+        }
+        }
+        surveyDetailsToPopulate.add("Post");
+        surveyDetailsToPopulate.add("Post Date");
+        surveyDetailsToPopulate.add("Media");
+        surveyDetailsToPopulate.add("User First");
+        surveyDetailsToPopulate.add("User Last");
+        data.put("1", surveyDetailsToPopulate);
+
+        // Iterate over data and write to sheet
+        Set<String> keyset = data.keySet();
+        int rownum = 0;
+        for (String key : keyset) {
+            Row row = sheet.createRow(rownum++);
+            List<Object> objArr = data.get(key);
+            int cellnum = 0;
+            for (Object obj : objArr) {
+                Cell cell = row.createCell(cellnum++);
+                if (obj instanceof String)
+                    cell.setCellValue((String) obj);
+                else if (obj instanceof Integer)
+                    cell.setCellValue((Integer) obj);
+                else if (obj instanceof Double)
+                    cell.setCellValue((Double) obj);
+                else if (obj instanceof Date){
+                    cell.setCellStyle(style);
+                    cell.setCellValue((Date) obj);
+                }
+            }
+        }
+        return workbook;
+    }
+    
+    /*
+     * Method to create excel file from all the completed survey data.
+     */
+    @Override
+    public XSSFWorkbook downloadCustomerSurveyResultsData(List<SurveyDetails> surveyDetails, String fileLocation) throws IOException {
+        // Blank workbook
+        XSSFWorkbook workbook = new XSSFWorkbook();
+
+        // Create a blank sheet
+        XSSFSheet sheet = workbook.createSheet();
+        XSSFDataFormat df = workbook.createDataFormat();
+        CellStyle style = workbook.createCellStyle();
+        style.setDataFormat(df.getFormat("d-mm-yyyy"));
+        Integer counter = 1;
+        int max = 0;
+        int internalMax = 0;
+        // This data needs to be written (List<Object>)
+        Map<String, List<Object>> data = new TreeMap<>();
+        List<Object> surveyDetailsToPopulate = new ArrayList<>();
+        for (SurveyDetails survey : surveyDetails) {
+            internalMax = 0;
+            surveyDetailsToPopulate.add(survey.getAgentName());
+            surveyDetailsToPopulate.add(survey.getCustomerFirstName());
+            surveyDetailsToPopulate.add(survey.getCustomerLastName());
+            surveyDetailsToPopulate.add(survey.getCreatedOn());
+            surveyDetailsToPopulate.add(survey.getModifiedOn());
+            surveyDetailsToPopulate.add(survey.getScore());
+            for (SurveyResponse response : survey.getSurveyResponse()) {
+                internalMax++;
+                surveyDetailsToPopulate.add(response.getAnswer());
+            }
+            surveyDetailsToPopulate.add(survey.getMood());
+            surveyDetailsToPopulate.add(survey.getReview());
+            data.put((++counter).toString(), surveyDetailsToPopulate);
+            surveyDetailsToPopulate = new ArrayList<>();
+            if (internalMax > max)
+                max = internalMax;
+        }
+        surveyDetailsToPopulate.add("Loan Officer Name");
+        surveyDetailsToPopulate.add("Custmer First");
+        surveyDetailsToPopulate.add("Customer Last");
+        surveyDetailsToPopulate.add("Survey Requested");
+        surveyDetailsToPopulate.add("Survey Completed");
+        surveyDetailsToPopulate.add("Score");
+        for (counter = 1; counter <= max; counter++) {
+            surveyDetailsToPopulate.add("Question " + counter);
+        }
+        surveyDetailsToPopulate.add("Gateway");
+        surveyDetailsToPopulate.add("Customer Comments");
+        data.put("1", surveyDetailsToPopulate);
+
+        // Iterate over data and write to sheet
+        Set<String> keyset = data.keySet();
+        int rownum = 0;
+        for (String key : keyset) {
+            Row row = sheet.createRow(rownum++);
+            List<Object> objArr = data.get(key);
+            int cellnum = 0;
+            for (Object obj : objArr) {
+                Cell cell = row.createCell(cellnum++);
+                if (obj instanceof String)
+                    cell.setCellValue((String) obj);
+                else if (obj instanceof Integer)
+                    cell.setCellValue((Integer) obj);
+                else if (obj instanceof Double)
+                    cell.setCellValue((Double) obj);
+                else if (obj instanceof Date){
+                    cell.setCellStyle(style);
+                    cell.setCellValue((Date) obj);
+                }
+            }
+        }
+        return workbook;
+    }
+    
+
+    /*
+     * Method to create excel file from all the agents' detailed data.
+     */
+    @Override
+    public XSSFWorkbook downloadAgentRankingData( List<AgentRankingReport> agentDetails, String fileLocation )
+        throws IOException
+    {
+        // Blank workbook
+        XSSFWorkbook workbook = new XSSFWorkbook();
+
+        // Create a blank sheet
+        XSSFSheet sheet = workbook.createSheet();
+        XSSFDataFormat df = workbook.createDataFormat();
+        CellStyle style = workbook.createCellStyle();
+        style.setDataFormat( df.getFormat( "d-mm-yyyy" ) );
+        Integer counter = 1;
+        // This data needs to be written (List<Object>)
+        Map<String, List<Object>> data = new TreeMap<>();
+        List<Object> surveyDetailsToPopulate = new ArrayList<>();
+        for ( AgentRankingReport agentDetail : agentDetails ) {
+            surveyDetailsToPopulate.add( agentDetail.getAgentFirstName() );
+            surveyDetailsToPopulate.add( agentDetail.getAgentLastName() );
+            surveyDetailsToPopulate.add( agentDetail.getAllTimeAverageScore() );
+            surveyDetailsToPopulate.add( agentDetail.getAllTimeIncompleteSurveys() + agentDetail.getAllTimeCompletedSurveys() );
+            surveyDetailsToPopulate.add( agentDetail.getAverageScore() );
+            surveyDetailsToPopulate.add( agentDetail.getIncompleteSurveys() + agentDetail.getCompletedSurveys() );
+            data.put( ( ++counter ).toString(), surveyDetailsToPopulate );
+            surveyDetailsToPopulate = new ArrayList<>();
+        }
+        surveyDetailsToPopulate.add( "Loan Officer First" );
+        surveyDetailsToPopulate.add( "Loan Officer Last" );
+        surveyDetailsToPopulate.add( "Total Average Score" );
+        surveyDetailsToPopulate.add( "Total Surveys" );
+        surveyDetailsToPopulate.add( "Average Score for given period" );
+        surveyDetailsToPopulate.add( "Surveys over given period" );
+        data.put( "1", surveyDetailsToPopulate );
+
+        // Iterate over data and write to sheet
+        Set<String> keyset = data.keySet();
+        int rownum = 0;
+        for ( String key : keyset ) {
+            Row row = sheet.createRow( rownum++ );
+            List<Object> objArr = data.get( key );
+            int cellnum = 0;
+            for ( Object obj : objArr ) {
+                Cell cell = row.createCell( cellnum++ );
+                if ( obj instanceof String )
+                    cell.setCellValue( (String) obj );
+                else if ( obj instanceof Integer )
+                    cell.setCellValue( (Integer) obj );
+                else if ( obj instanceof Double )
+                    cell.setCellValue( (Double) obj );
+                else if ( obj instanceof Long )
+                    cell.setCellValue( (Long) obj );
+                else if ( obj instanceof Date ) {
+                    cell.setCellStyle( style );
+                    cell.setCellValue( (Date) obj );
+                }
+            }
+        }
+        return workbook;
+    }
 }
 // JIRA SS-137 BY RM05:EOC

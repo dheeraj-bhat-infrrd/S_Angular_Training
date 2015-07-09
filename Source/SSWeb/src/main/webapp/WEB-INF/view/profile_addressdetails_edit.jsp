@@ -1,10 +1,18 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <%@ taglib uri="http://www.springframework.org/tags" prefix="spring"%>
 
+<c:if test="${not empty profile}">
+	<c:set value="${profile.profilesMaster.profileId}" var="profilemasterid"></c:set>
+</c:if>
+
 <c:if test="${not empty profileSettings && not empty profileSettings.contact_details}">
 	<c:set value="${profileSettings.contact_details}" var="contactdetail"></c:set>
 </c:if>
-
+<c:if test="${profilemasterid == 4 }">
+	<c:if test="${empty contactdetail.address1 && not empty profileSettings.companyProfileData}">
+		<c:set value="${profileSettings.companyProfileData}" var="contactdetail"></c:set>
+	</c:if>
+</c:if>
 <div id="prof-address-edit-container" class="prof-user-address prof-edit-icn">
 	<form id="prof-edit-address-form">
 		<input id="prof-address1" name="address1" class="pu-edit-fields" value="${contactdetail.address1}" placeholder='<spring:message code="label.address.address1.key"/>'>
@@ -34,12 +42,9 @@ $(document).ready(function(){
 		minLength: 1,
 		source: countryData,
 		delay : 0,
+		autoFocus : true,
 		open : function(event, ui) {
 			$( "#prof-country-code" ).val("");
-		},
-		focus: function(event, ui) {
-			$( "#prof-country" ).val(ui.item.label);
-			return false;
 		},
 		select: function(event, ui) {
 			$("#prof-country").val(ui.item.label);
@@ -65,6 +70,15 @@ $(document).ready(function(){
 	}).autocomplete("instance")._renderItem = function(ul, item) {
 		return $("<li>").append(item.label).appendTo(ul);
 	};
+	$("#prof-country").keydown(function(e){
+	   if( e.keyCode != $.ui.keyCode.TAB) return; 
+
+	   e.keyCode = $.ui.keyCode.DOWN;
+   	   $(this).trigger(e);
+
+   	   e.keyCode = $.ui.keyCode.ENTER;
+   	   $(this).trigger(e);
+   	});
 	$('#prof-state').on('change',function(e){
   		$('#prof-city').val('');
   		var stateId = $(this).find(":selected").attr('data-stateid');
@@ -105,7 +119,15 @@ $(document).ready(function(){
   				});
   				$('.ui-autocomplete').perfectScrollbar('update');
   			}
-  		});
+  		}).keydown(function(e){
+  	  	    if( e.keyCode != $.ui.keyCode.TAB) return; 
+  	  	    
+  	   	   e.keyCode = $.ui.keyCode.DOWN;
+  	   	   $(this).trigger(e);
+
+  	   	   e.keyCode = $.ui.keyCode.ENTER;
+  	   	   $(this).trigger(e);
+  	   	});
   		
   	}
   	function showStateCityRow() {
@@ -125,8 +147,8 @@ $(document).ready(function(){
   		}
   	}
   	function hideStateCityRow() {
-  		$('#prof-state').hide().val('');
-		$('#prof-city').hide();
+  		$('#prof-state').hide();
+		$('#prof-city').hide().val('');
   		$('#prof-state').val(function() {
   			return $(this).find('option[selected]').text();
   	    });

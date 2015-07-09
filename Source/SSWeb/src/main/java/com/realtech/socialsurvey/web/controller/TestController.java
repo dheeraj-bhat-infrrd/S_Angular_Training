@@ -39,12 +39,6 @@ public class TestController {
 
 	private static final Logger LOG = LoggerFactory.getLogger(TestController.class);
 
-	@RequestMapping(value = "/testpage")
-	public String testpage(HttpServletRequest request) {
-		LOG.info("Method testpage called");
-		return "hierarchy-view-old";
-	}
-
 	@RequestMapping(value = "/jumptodashboard")
 	public String jumpToDashboard(Model model, HttpServletRequest req, HttpServletResponse response) {
 		LOG.info("Jumping to Dashboard with ");
@@ -94,7 +88,6 @@ public class TestController {
 		return "test";
 	}
 
-	
 	public static void main(String[] args) throws IOException {
 		URL u = new URL("https://www.dotloop.com/my/api/v1_0/profile");
 		HttpURLConnection huc = (HttpURLConnection) u.openConnection();
@@ -104,7 +97,4 @@ public class TestController {
 		int status = huc.getResponseCode();
 		System.out.println(status);
 	}
-	
-	
-	
 }

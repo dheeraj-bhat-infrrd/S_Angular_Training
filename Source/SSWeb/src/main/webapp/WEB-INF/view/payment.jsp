@@ -12,7 +12,7 @@
 <c:when test="${ paymentChange == 1 }">
 	<div class="overlay-loader hide"></div>
 	<div class="ov-payment-container">
-		<div class="clearfix container ov-payment-shadow margin-top-25 margin-bottom-25 padding-001 margin-top-25 margin-bottom-25 login-wrapper bg-fff margin-0-auto col-md-6 col-xs-9">
+		<div class="clearfix ov-payment-shadow margin-top-25 margin-bottom-25 padding-001 margin-top-25 margin-bottom-25 login-wrapper bg-fff margin-0-auto">
     		<div>
     			
     		<style>
@@ -38,21 +38,19 @@
 </c:when>
 <c:when test="${ paidUpgrade == 1 }"></c:when>
 <c:otherwise>
-	<!DOCTYPE">
+	<%-- <!DOCTYPE">
 	<html>
 	<head>
 	    <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
 	    <meta name="viewport" content="width=device-width, initial-scale=1">
 	    <title><spring:message code="label.makepayment.title.key" /></title>
 	    <link rel="shortcut icon" href="/favicon.ico" sizes="16x16">
+	    <script src="${initParam.resourcesPath}/resources/js/jquery-2.1.1.min.js"></script>
+	    <script src="${initParam.resourcesPath}/resources/js/jquery.mask.js"></script>
 	    <script type="text/javascript" src="${initParam.resourcesPath}/resources/js/common.js"></script>
-	    <link rel="stylesheet" href="${initParam.resourcesPath}/resources/css/bootstrap.min.css">
-	    <link rel="stylesheet" href="${initParam.resourcesPath}/resources/css/style.css">
-	    <link rel="stylesheet" href="${initParam.resourcesPath}/resources/css/style-common.css">
-	    <link rel="stylesheet" href="${initParam.resourcesPath}/resources/css/style-resp.css">
 	</head>
 	    
-	<body>
+	<body> --%>
 </c:otherwise>
 </c:choose>
     <div class="payment-details-wrapper">
@@ -65,18 +63,18 @@
 	          	  <div class="pu-acc-type-txt float-left"><spring:message code="label.cardnumber.key"/></div>
 	              <div class="pu-acc-type-val float-right">'${cardNumber}'</div>
 	          </div>
-	          <div class="clearfix pu-acc-type-sel">
+	         <%--  <div class="clearfix pu-acc-type-sel">
 	          	  <div class="pu-acc-type-txt float-left"><spring:message code="label.cardholder.key"/></div>
 	              <div class="pu-acc-type-val float-right">'${cardHolderName}'</div>
-	          </div>
+	          </div> --%>
 	          <div class="clearfix pu-acc-type-sel">
 	          	  <div class="pu-acc-type-txt float-left"><spring:message code="label.cardtype.key"/></div>
 	              <div class="pu-acc-type-val float-right">'${cardType}'</div>
 	          </div>
-	          <div class="clearfix pu-acc-type-sel">
+	         <%--  <div class="clearfix pu-acc-type-sel">
 	          	  <div class="pu-acc-type-txt float-left"><spring:message code="label.issuingbank.key"/></div>
 	              <div class="pu-acc-type-val float-right">'${issuingBank}'</div>
-	          </div>
+	          </div> --%>
 	          <br>
 	          <div class="login-txt text-center font-24 margin-bot-20"><spring:message code="label.newpaymentdetails.key"/></div>
     	</c:when>
@@ -97,44 +95,38 @@
 	    </c:otherwise>
 	    </c:choose>
 	          <div id="payment-details-form" class="payment-details-form">
-	          		<c:choose>
-	          		<c:when test="${ paymentChange == 1 }">
-	          			<form id="checkout" method="POST">
-	          			<div id="dropin" class="payment-dropin"></div>	          			
-	          		</c:when>
-	          		<c:when test="${ paidUpgrade == 1 }">
-	          			<form id="checkout" method="POST">
-	          			<div id="dropin" class="payment-dropin"></div>	          			
-	          		</c:when>
-	          		<c:otherwise>
-	          			<form id="checkout" method="POST" action="./subscribe.do">
-	          			<div id="dropin" class="payment-dropin"></div>	          			
-	          		</c:otherwise>
-	          		</c:choose>
-				            <div class="clearfix">
-				            	<c:choose>
-						        <c:when test="${ paymentChange == 1 }">
-						        	<input type="submit" class="btn-payment float-left" value='<spring:message code="label.update.key"/>' />
-						        </c:when>
-						        <c:when test="${ paidUpgrade == 1 }">
-						        	<input type="submit" class="btn-payment float-left" value='<spring:message code="label.makepayment.key"/>' />
-						        </c:when>
-						        <c:otherwise>
-					            	<input type="submit" class="btn-payment float-left" value='<spring:message code="label.makepayment.key"/>' />
-					            </c:otherwise>
-					            </c:choose>
-					            <input type="button" id="cancel-payment" class="btn-payment float-right" value='<spring:message code="label.cancel.key"/>'/>
-				            </div>
-				        <c:choose>
-				        <c:when test="${ paidUpgrade == 1 }">
-				        	<input type="hidden" value="${accounttype}" name="accounttype">
-				        </c:when>
-				        <c:when test="${ paymentChange == 1 }"></c:when>
-				        <c:otherwise>
-			            <input type="hidden" value="${accounttype}" name="accounttype"></c:otherwise>
-			            </c:choose>
-			        </form>
-	      	</div>
+	          		<c:if test="${paymentChange != 1 && paidUpgrade != 1}">
+	          			<c:set var="actionVal" value="/subscribe.do"></c:set>
+	          		</c:if>
+					<form id="checkout" method="POST" action="${actionVal}">
+						<div id="dropin" class="payment-dropin"></div>
+						<div class="clearfix">
+							<c:choose>
+								<c:when test="${ paymentChange == 1 }">
+									<input type="submit" class="btn-payment"
+										value='<spring:message code="label.update.key"/>' />
+								</c:when>
+								<c:when test="${ paidUpgrade == 1 }">
+									<input type="submit" class="btn-payment"
+										value='<spring:message code="label.makepayment.key"/>' />
+								</c:when>
+								<c:otherwise>
+									<input type="submit" class="btn-payment"
+										value='<spring:message code="label.makepayment.key"/>' />
+								</c:otherwise>
+							</c:choose>
+						</div>
+						<c:choose>
+							<c:when test="${ paidUpgrade == 1 }">
+								<input type="hidden" value="${accounttype}" name="accounttype">
+							</c:when>
+							<c:when test="${ paymentChange == 1 }"></c:when>
+							<c:otherwise>
+								<input type="hidden" value="${accounttype}" name="accounttype">
+							</c:otherwise>
+						</c:choose>
+					</form>
+				</div>
         </div>
     </div>  
     <c:if test="${ paymentChange == 1 || paidUpgrade == 1 }">
@@ -148,7 +140,11 @@
 		   
 		   //attach click event to close btn
 		   $('.payment-close').click(function(){
-			   $("#cancel-payment").click();
+			   $('body').removeClass('body-no-scroll');
+		   		$('#st-settings-payment-off').show();
+		   		$('#st-settings-payment-on').hide();
+			   	hidePayment();
+			   	pageInitialized=false;
 		   });
 		   
 		   console.log("pageInitialized : " + pageInitialized);
@@ -219,15 +215,8 @@
 		   console.log(data);
 
 		   var url = "./upgradeplan.do";
-		   $.ajax({
-			  url : url,
-			  type : "POST",
-			  data : data,
-			  success : showMessage,
-			  error : function(e) {
-					redirectErrorpage();
-				}
-		   });
+		   
+		   callAjaxPostWithPayloadData(url, showMessage, data, false);
 	   }
 	   
 	   function showMessage(data){
@@ -258,15 +247,8 @@
 		   showOverlay();
 		   var data = "payment_method_nonce=" + nonce;
 		   var url = "./paymentupgrade.do";
-		   $.ajax({
-			  url : url,
-			  type : "POST",
-			  data : data,
-			  success : displayToast,
-			  error : function(e) {
-					redirectErrorpage();
-				}
-		   });
+		   
+		   callAjaxGetWithPayloadData(url, displayToast, data, false);
 	   }
 	   
 	   function displayToast(data){
@@ -289,9 +271,8 @@
    <c:when test="${ paymentChange == 1 }"></c:when>
    <c:when test="${ paidUpgrade == 1 }"></c:when>
    <c:otherwise>
-	    <script src="${initParam.resourcesPath}/resources/js/jquery-2.1.1.min.js"></script>
-	    <script src="${initParam.resourcesPath}/resources/js/bootstrap.min.js"></script>
-	    <script src="${initParam.resourcesPath}/resources/js/script.js"></script>
+	    <%-- <script src="${initParam.resourcesPath}/resources/js/bootstrap.min.js"></script>
+	    <script src="${initParam.resourcesPath}/resources/js/script.js"></script> --%>
    </c:otherwise>
    </c:choose>
 

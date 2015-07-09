@@ -573,7 +573,8 @@ input#find-pro-submit{
 	width : 70px;
 	height : 70px;
 	margin: auto 15px;
-	background: url(../images/Person1.png) no-repeat center;
+	background: url(../images/place-holder-individual.png) no-repeat center;
+	background-size: contain;
 	border-radius: 3px;
     margin-left: 0;
 }
@@ -644,7 +645,7 @@ input#find-pro-submit{
     background: url('../images/temp_ad.png') no-repeat center;
     height: 1000px;
     background-size: 100% auto;
-    background-position: center 70px;
+    background-position: center 53px;
 }
 
 .fp-txt-1 {
@@ -761,7 +762,7 @@ input#find-pro-submit{
     position: relative;
     top: 75px;
     width: 900px;
-    margin: 0 auto;
+    margin: 0 auto 20px;
     background: #fff;
     border: 1px solid #dcdcdc;
     border-radius: 3px;
@@ -838,6 +839,7 @@ input#find-pro-submit{
 .wc-review-table-cont{
 	max-height: 300px;
 	position: relative;
+	padding: 20px 0px;
 }
 
 span.txt-highlight {
@@ -962,6 +964,26 @@ span.txt-highlight {
     width: 10%;
 }
 
+.wc-admin-table .wc-review-th1,.wc-admin-table  .wc-review-tc1{
+	width: 22.5%;
+}
+
+.wc-admin-table .wc-review-th2,.wc-admin-table  .wc-review-tc2{
+	width: 22.5%;
+}
+
+.wc-admin-table .wc-review-th3,.wc-admin-table  .wc-review-tc3{
+	width: 22.5%;
+}
+
+.wc-admin-table .wc-review-th4,.wc-admin-table  .wc-review-tc4{
+	width: 22.5%;
+}
+
+.wc-admin-table .wc-review-th5,.wc-admin-table  .wc-review-tc5{
+	width: 10%;
+}
+
 .wc-review-input{
 	width: 100%;
 	height: 40px;
@@ -996,7 +1018,7 @@ span.txt-highlight {
 	position: relative;
 }
 
-input.wc-form-input {
+.wc-form-input {
 	width: 275px;
 	height: 40px;
 	padding: 0 10px;
@@ -1295,10 +1317,12 @@ table.payment-pricing td:nth-child(2n+2) {
 	text-transform: none !important;
 	line-height: 34px;
 	box-shadow: none;
+	cursor: pointer;
 }
 
 .payment-button-disabled {
 	background-color: rgb(144, 130, 130);
+	cursor: auto;
 }
 
 .payment-container {

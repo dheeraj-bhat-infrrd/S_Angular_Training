@@ -44,7 +44,7 @@
 				</div>
 				<div id="dsh-srch-survey-div" class="clearfix dash-sel-wrapper">
 					<div class="float-left dash-sel-lbl"><spring:message code="label.choose.key" /></div>
-					<div class="dsh-inp-wrapper">
+					<div class="dsh-inp-wrapper float-left">
 						<input id="dsh-sel-item" class="dash-sel-item" type="text" placeholder="<spring:message code="label.starttyping.key" />"
 							onkeyup="searchBranchRegionOrAgent(this.value, 'icons')">
 						<div id="dsh-srch-res"></div>
@@ -74,7 +74,7 @@
 				</div>
 				<div id="dsh-grph-srch-survey-div" class="clearfix dash-sel-wrapper">
 					<div class="float-left dash-sel-lbl"><spring:message code="label.choose.key" /></div>
-					<div class="dsh-inp-wrapper">
+					<div class="dsh-inp-wrapper float-left">
 						<input id="dsh-grph-sel-item" class="dash-sel-item" type="text" placeholder="<spring:message code="label.starttyping.key" />"
 							onkeyup="searchBranchRegionOrAgent(this.value, 'graph')">
 						<div id="dsh-grph-srch-res"></div>
@@ -127,6 +127,22 @@
 							<div id="review-desc" class="float-left dash-ppl-say-lbl">
 								<spring:message code="label.peoplesayabout.key" />${profileName}
 							</div>
+							
+							<div id="dsh-admin-cmp-dwnld" class="float-right dash-btn-dl-sd-admin hide">
+							<select id="download-survey-reports" class="float-left dash-download-sel-item">
+								<option value=0 data-report="complete-survey"><spring:message code="label.downloadsurveydata.one.key" /></option>
+								<option value=1 data-report="loan-officer-ranking"><spring:message code="label.downloadsurveydata.two.key" /></option>
+								<option value=2 data-report="customer-survey"><spring:message code="label.downloadsurveydata.three.key" /></option>
+								<option value=3 data-report="social-monitor"><spring:message code="label.downloadsurveydata.four.key" /></option>
+							</select>
+								<input id="dsh-start-date" class="dsh-date-picker" placeholder="<spring:message code="label.startdate.key" />">
+								<span>-</span>
+								<input id="dsh-end-date" class="dsh-date-picker" placeholder="<spring:message code="label.enddate.key" />">
+								<div id="dsh-dwnld-report-btn" class="dash-down-go-button float-right cursor-pointer">
+									<spring:message code="label.downloadsurveydata.key.click" />
+								</div>
+							</div>
+							
 							<div id="dsh-cmp-dwnld" class="float-right dash-btn-dl-sd hide">
 								<div id="dsh-dwnld-btn" class="dsh-dwnld-btn float-left cursor-pointer">
 									<spring:message code="label.downloadsurveydata.key" />
@@ -145,39 +161,6 @@
 		</div>
 	</div>
 </div>
-
-<style>
-.dsh-dd-wrapper {
-	width: 300px;
-	background-color: #fff;
-	padding: 8px;
-	border: 1px solid #dcdcdc;
-}
-
-.dsh-rgn-brnch-agnt-list {
-	position: absolute;
-}
-
-.dsh-sb-dd {
-	position: absolute;
-  	background-color: white;
-  	top: 36px;
-  	width: 215px;
-  	right: 35px;
-  	display: block;
-  	border: 1px solid #dcdcdc;
-  	line-height: 32px;
-}
-
-.dsh-inp-wrapper {
-	position: relative;
-}
-
-.dsh-res-display {
-	padding: 0 10px;
-	cursor: pointer;
-}
-</style>
 <link rel="stylesheet" href="${initParam.resourcesPath}/resources/css/datepicker3.css">
 
 <script>
@@ -189,6 +172,14 @@ $(document).ready(function() {
 	var currentProfileName = $('#prof-container').attr('data-column-name');
 	var currentProfileValue = $('#prof-container').attr('data-column-value');
 	var accountType = $('#prof-container').attr('data-account-type');
+	
+	var popupStatus = "${popupStatus}";
+	var showSendSurveyPopupAdmin = "${showSendSurveyPopupAdmin}";
+
+	if (showSendSurveyPopupAdmin == "true" && popupStatus == "Y") {
+		sendSurveyInvitationAdmin(currentProfileName, currentProfileValue);
+	}
+	
 
 	paintDashboard(profileMasterId, currentProfileName, currentProfileValue, accountType);
 });

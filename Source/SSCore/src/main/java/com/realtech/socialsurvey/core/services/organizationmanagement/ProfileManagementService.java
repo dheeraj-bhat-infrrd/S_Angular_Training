@@ -1,12 +1,14 @@
 package com.realtech.socialsurvey.core.services.organizationmanagement;
 
 import java.net.MalformedURLException;
+import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import org.apache.solr.common.SolrDocumentList;
+
 import com.realtech.socialsurvey.core.entities.Achievement;
+import com.realtech.socialsurvey.core.entities.AgentRankingReport;
 import com.realtech.socialsurvey.core.entities.AgentSettings;
 import com.realtech.socialsurvey.core.entities.Association;
 import com.realtech.socialsurvey.core.entities.CompanyPositions;
@@ -21,6 +23,7 @@ import com.realtech.socialsurvey.core.entities.SocialPost;
 import com.realtech.socialsurvey.core.entities.SurveyDetails;
 import com.realtech.socialsurvey.core.entities.SurveyPreInitiation;
 import com.realtech.socialsurvey.core.entities.User;
+import com.realtech.socialsurvey.core.entities.UserFromSearch;
 import com.realtech.socialsurvey.core.entities.UserProfile;
 import com.realtech.socialsurvey.core.entities.UserSettings;
 import com.realtech.socialsurvey.core.enums.AccountType;
@@ -151,7 +154,7 @@ public interface ProfileManagementService {
 	 * @return
 	 * @throws InvalidInputException
 	 */
-	public List<AgentSettings> getIndividualsForBranch(String companyProfileName, String branchProfileName) throws InvalidInputException;
+	public List<AgentSettings> getIndividualsForBranch(String companyProfileName, String branchProfileName) throws InvalidInputException, ProfileNotFoundException;
 
 	/**
 	 * Method to fetch all users under the specified branch of specified company
@@ -181,7 +184,7 @@ public interface ProfileManagementService {
 	 * @throws NoRecordsFetchedException
 	 */
 	public List<AgentSettings> getIndividualsForRegion(String companyProfileName, String regionProfileName) throws InvalidInputException,
-			NoRecordsFetchedException;
+			NoRecordsFetchedException, ProfileNotFoundException;
 
 	/**
 	 * Method to fetch all users under the specified region
@@ -211,7 +214,7 @@ public interface ProfileManagementService {
 	 * @throws InvalidInputException
 	 * @throws NoRecordsFetchedException
 	 */
-	public List<AgentSettings> getIndividualsForCompany(String companyProfileName) throws InvalidInputException, NoRecordsFetchedException;
+	public List<AgentSettings> getIndividualsForCompany(String companyProfileName) throws InvalidInputException, NoRecordsFetchedException, ProfileNotFoundException;
 
 	/**
 	 * Method to get the region profile based on region and company profile name
@@ -221,7 +224,7 @@ public interface ProfileManagementService {
 	 * @return
 	 * @throws InvalidInputException
 	 */
-	public OrganizationUnitSettings getRegionByProfileName(String companyProfileName, String regionProfileName) throws InvalidInputException;
+	public OrganizationUnitSettings getRegionByProfileName(String companyProfileName, String regionProfileName) throws ProfileNotFoundException, InvalidInputException;
 
 	/**
 	 * Method to get the branch profile based on branch and company profile name
@@ -231,7 +234,7 @@ public interface ProfileManagementService {
 	 * @return
 	 * @throws InvalidInputException
 	 */
-	public OrganizationUnitSettings getBranchByProfileName(String companyProfileName, String branchProfileName) throws InvalidInputException;
+	public OrganizationUnitSettings getBranchByProfileName(String companyProfileName, String branchProfileName) throws ProfileNotFoundException, InvalidInputException;
 
 	/**
 	 * JIRA SS-117 by RM-02 Method to fetch company profile when profile name is provided
@@ -241,7 +244,7 @@ public interface ProfileManagementService {
 	 * @param logo
 	 * @throws InvalidInputException
 	 */
-	public OrganizationUnitSettings getCompanyProfileByProfileName(String profileName) throws InvalidInputException;
+	public OrganizationUnitSettings getCompanyProfileByProfileName(String profileName) throws ProfileNotFoundException;
 
 	/**
 	 * Method to get profile of an individual
@@ -251,12 +254,12 @@ public interface ProfileManagementService {
 	 * @throws InvalidInputException
 	 * @throws NoRecordsFetchedException
 	 */
-	public OrganizationUnitSettings getIndividualByProfileName(String profileName) throws InvalidInputException, NoRecordsFetchedException;
+	public OrganizationUnitSettings getIndividualByProfileName(String profileName) throws ProfileNotFoundException, InvalidInputException;
 
 	public SocialMediaTokens aggregateSocialProfiles(OrganizationUnitSettings unitSettings, String entity) throws InvalidInputException,
 		NoRecordsFetchedException;
 	
-	public User getUserByProfileName(String profileName) throws InvalidInputException, NoRecordsFetchedException;
+	public User getUserByProfileName(String profileName) throws InvalidInputException, NoRecordsFetchedException, ProfileNotFoundException;
 
 	/**
 	 * Method to fetch reviews based on the profile level specified, iden is one of
@@ -321,7 +324,7 @@ public interface ProfileManagementService {
 	 * @throws MalformedURLException
 	 * @throws SolrException
 	 */
-	public SolrDocumentList getProListByProfileLevel(long iden, String profileLevel, int start, int numOfRows) throws InvalidInputException,
+	public Collection<UserFromSearch> getProListByProfileLevel(long iden, String profileLevel, int start, int numOfRows) throws InvalidInputException,
 			SolrException;
 
 	public void generateVerificationUrl(Map<String, String> urlParams, String applicationUrl, String recipientMailId, String recipientName)
@@ -401,4 +404,8 @@ public interface ProfileManagementService {
 	public void setAgentProfileUrlForReview(List<SurveyDetails> reviews);
 	
 	public void updateVertical(String collection, OrganizationUnitSettings companySettings, String vertical) throws InvalidInputException;
+	
+	public void updateCompanyName(long userId, long companyId, String companyName) throws InvalidInputException;
+
+    public List<AgentRankingReport> getAgentReport( long iden, String profileLevel, Date startDate, Date endDate, Object object ) throws InvalidInputException;
 }

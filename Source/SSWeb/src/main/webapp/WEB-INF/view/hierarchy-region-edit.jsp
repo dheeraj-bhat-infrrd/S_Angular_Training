@@ -107,12 +107,24 @@
 	 </div>
  </form>
  <script>
+ var selectedCountryRegEx = "";
  $(document).ready(function(){
 	 var stateList;
 	 var cityLookupList;
-	 var countryCode = $('#region-country-code').val();
+	 var countryCode = "US";
+	 
+	 if($('#region-country-code').val() != undefined && $('#region-country-code').val() != ""){
+		 countryCode = $('#region-country-code').val();	 
+	 }
+	 
 	 if(countryCode == "US"){
 	 	showStateCityRow();
+	 	if( $('#region-country').val() == null || $('#region-country').val() == "" ){
+			$('#region-country').val("United States");
+			$('#region-country-code').val(countryCode);
+		}
+		selectedCountryRegEx = "^" + "\\b\\d{5}\\b(?:[- ]{1}\\d{4})?" + "$";
+		selectedCountryRegEx = new RegExp(selectedCountryRegEx);
 	 }else{
 		 hideStateCityRow();
 	 }
@@ -136,12 +148,9 @@
 		minLength: 1,
 		source: countryData,
 		delay : 0,
+		autoFocus : true,
 		open : function(event, ui) {
 			$( "#region-country-code" ).val("");
-		},
-		focus: function(event, ui) {
-			$( "#region-country" ).val(ui.item.label);
-			return false;
 		},
 		select: function(event, ui) {
 			$("#region-country").val(ui.item.label);
@@ -167,6 +176,15 @@
 	}).autocomplete("instance")._renderItem = function(ul, item) {
 		return $("<li>").append(item.label).appendTo(ul);
   	};
+  	$("#region-country").keydown(function(e){
+  	    if( e.keyCode != $.ui.keyCode.TAB) return; 
+  	    
+   	   e.keyCode = $.ui.keyCode.DOWN;
+   	   $(this).trigger(e);
+
+   	   e.keyCode = $.ui.keyCode.ENTER;
+   	   $(this).trigger(e);
+   	});
   	$('#region-state-txt').on('change',function(e){
   		$('#region-city-txt').val('');
   		var stateId = $(this).find(":selected").attr('data-stateid');
@@ -206,7 +224,15 @@
   				});
   				$('.ui-autocomplete').perfectScrollbar('update');
   			}
-  		});
+  		}).keydown(function(e){
+  	  	    if( e.keyCode != $.ui.keyCode.TAB) return; 
+  	  	    
+  	  	   e.keyCode = $.ui.keyCode.DOWN;
+  	  	   $(this).trigger(e);
+
+  	  	   e.keyCode = $.ui.keyCode.ENTER;
+  	  	   $(this).trigger(e);
+  	  	});
   		
   	}
   	function showStateCityRow() {

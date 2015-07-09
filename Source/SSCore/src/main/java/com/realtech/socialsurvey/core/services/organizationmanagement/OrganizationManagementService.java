@@ -1,11 +1,11 @@
 package com.realtech.socialsurvey.core.services.organizationmanagement;
 
 import java.net.MalformedURLException;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
 import com.realtech.socialsurvey.core.entities.Branch;
 import com.realtech.socialsurvey.core.entities.BranchFromSearch;
 import com.realtech.socialsurvey.core.entities.BranchSettings;
@@ -27,6 +27,7 @@ import com.realtech.socialsurvey.core.enums.AccountType;
 import com.realtech.socialsurvey.core.exception.DatabaseException;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.exception.NoRecordsFetchedException;
+import com.realtech.socialsurvey.core.exception.NonFatalException;
 import com.realtech.socialsurvey.core.services.payment.exception.PaymentException;
 import com.realtech.socialsurvey.core.services.search.exception.SolrException;
 
@@ -144,14 +145,20 @@ public interface OrganizationManagementService {
 	 * Updates the mail body content for company settings
 	 * 
 	 * @param companySettings
+	 * @param mailSubject
 	 * @param mailBody
 	 * @param mailCategory
 	 * @return
 	 * @throws InvalidInputException
 	 */
-	public MailContentSettings updateSurveyParticipationMailBody(OrganizationUnitSettings companySettings, String mailBody, String mailCategory)
-			throws InvalidInputException;
+	public MailContentSettings updateSurveyParticipationMailBody(OrganizationUnitSettings companySettings, String mailSubject, String mailBody,
+			String mailCategory) throws InvalidInputException;
 
+	public MailContentSettings revertSurveyParticipationMailBody(OrganizationUnitSettings companySettings, String mailCategory)
+			throws NonFatalException;
+	
+	public ArrayList<String> getSurveyParamOrder(String category) throws InvalidInputException;
+	
 	/**
 	 * Adds a Disabled Account record in the database
 	 * 
@@ -199,7 +206,7 @@ public interface OrganizationManagementService {
 	 * @return
 	 * @throws InvalidInputException
 	 */
-	public List<Region> getRegionsForCompany(String companyProfileName) throws InvalidInputException;
+	public List<Region> getRegionsForCompany(String companyProfileName) throws InvalidInputException, ProfileNotFoundException;
 
 	/**
 	 * Method to get list of branches directly linked to a company
@@ -209,7 +216,7 @@ public interface OrganizationManagementService {
 	 * @throws InvalidInputException
 	 * @throws NoRecordsFetchedException
 	 */
-	public List<Branch> getBranchesUnderCompany(String companyProfileName) throws InvalidInputException, NoRecordsFetchedException;
+	public List<Branch> getBranchesUnderCompany(String companyProfileName) throws InvalidInputException, NoRecordsFetchedException, ProfileNotFoundException;
 
 	/**
 	 * Method to get list of branches linked to a region
@@ -221,7 +228,7 @@ public interface OrganizationManagementService {
 	 * @throws NoRecordsFetchedException
 	 */
 	public List<Branch> getBranchesForRegion(String companyProfileName, String regionProfileName) throws InvalidInputException,
-			NoRecordsFetchedException;
+			NoRecordsFetchedException, ProfileNotFoundException;
 
 	/**
 	 * Method to fetch the default branch associated with a region
@@ -660,7 +667,7 @@ public interface OrganizationManagementService {
 	 * @throws NoRecordsFetchedException
 	 * @throws SolrException
 	 */
-	public List<BranchFromSearch> getBranchesUnderCompanyFromSolr(Company company, int start, int rows) throws InvalidInputException,
+	public List<BranchFromSearch> getBranchesUnderCompanyFromSolr(Company company, int start) throws InvalidInputException,
 			NoRecordsFetchedException, SolrException;
 
 	/**
@@ -674,7 +681,7 @@ public interface OrganizationManagementService {
 	 * @throws NoRecordsFetchedException
 	 * @throws SolrException
 	 */
-	public List<UserFromSearch> getUsersUnderCompanyFromSolr(Company company, int start, int rows) throws InvalidInputException,
+	public List<UserFromSearch> getUsersUnderCompanyFromSolr(Company company, int start) throws InvalidInputException,
 			NoRecordsFetchedException, SolrException;
 
 	/**
@@ -705,4 +712,15 @@ public interface OrganizationManagementService {
 	public void updateCompany(Company company) throws DatabaseException;
 
 	public List<VerticalCrmMapping> getCrmMapping(User user);
+
+	public Map<Long, OrganizationUnitSettings> getSettingsMapWithLinkedinImage(
+			String string);
+
+	public void removeOrganizationUnitSettings( Long idToRemove, String collectionName );
+	
+    public void removeOrganizationUnitSettings( List<Long> idsToRemove, String collectionName );
+	
+	public SurveySettings retrieveDefaultSurveyProperties();
+
+	public String resetDefaultSurveyText(SurveySettings surveySettings, String mood);
 }

@@ -4,6 +4,13 @@
  * application
  */
 
+
+//Function to redirect to login page if session time out
+function redirectToLoginPageOnSessionTimeOut(status) {
+	window.location = window.location.origin + '/login.do?s=sessionerror';
+}
+
+
 /**
  * Generic function to be used for making ajax get calls
  * 
@@ -23,6 +30,10 @@ function callAjaxGET(url, callBackFunction, isAsync) {
 		async : isAsync,
 		success : callBackFunction,
 		error : function(e) {
+			if(e.status == 504) {
+				redirectToLoginPageOnSessionTimeOut(e.status);
+				return;
+			}
 			redirectErrorpage();
 		}
 	});
@@ -47,6 +58,10 @@ function callAjaxPOST(url, callBackFunction, isAsync) {
 		async : isAsync,
 		success : callBackFunction,
 		error : function(e) {
+			if(e.status == 504) {
+				redirectToLoginPageOnSessionTimeOut(e.status);
+				return;
+			}
 			redirectErrorpage();
 		}
 	});
@@ -78,10 +93,47 @@ function callAjaxPOSTWithTextData(url, callBackFunction, isAsync, formData) {
 			hideOverlay();
 			},
 		error : function(e) {
+			if(e.status == 504) {
+				redirectToLoginPageOnSessionTimeOut(e.status);
+				return;
+			}
 			redirectErrorpage();
 		}
 	});
 }
+
+/**
+ * Generic function to be used for making ajax get calls with datatype text and formdata
+ * 
+ * @param url
+ * @param callBackFunction
+ * @param isAsync
+ */
+function callAjaxGETWithTextData(url, callBackFunction, isAsync, formData) {
+	console.log("ajax post called for url :" + url);
+	if (typeof isAsync === "undefined") {
+		isAsync = true;
+	}
+	$.ajax({
+		url : url,
+		type : "GET",
+		dataType : "text",
+		data : formData,
+		async : isAsync,
+		success : callBackFunction,
+		complete: function(){
+			hideOverlay();
+		},
+		error : function(e) {
+			if(e.status == 504) {
+				redirectToLoginPageOnSessionTimeOut(e.status);
+				return;
+			}
+			redirectErrorpage();
+		}
+	});
+}
+
 
 /**
  * Generic function to be used for making form submission with ajax post
@@ -101,6 +153,10 @@ function callAjaxFormSubmit(url, callBackFunction, formId) {
 		data : payLoad,
 		success : callBackFunction,
 		error : function(e) {
+			if(e.status == 504) {
+				redirectToLoginPageOnSessionTimeOut(e.status);
+				return;
+			}
 			redirectErrorpage();
 		}
 	});
@@ -135,6 +191,10 @@ function callAjaxPostWithPayloadData(url, callBackFunction, payload, isAsync){
 			hideOverlay();
 		},
 		error : function(e) {
+			if(e.status == 504) {
+				redirectToLoginPageOnSessionTimeOut(e.status);
+				return;
+			}
 			redirectErrorpage();
 		}
 	});
@@ -155,6 +215,10 @@ function callAjaxGetWithPayloadData(url, callBackFunction, payload,isAsync){
 			hideOverlay();
 		},
 		error : function(e) {
+			if(e.status == 504) {
+				redirectToLoginPageOnSessionTimeOut(e.status);
+				return;
+			}
 			redirectErrorpage();
 		}
 	});
@@ -229,32 +293,37 @@ function shareOnFacebook(firstName, lastName, agentName, review, score, agentId)
 			"review" : review,
 			"score" : score,
 			"agentId" : agentId
-		};
-		$.ajax({
-			url : "./postonfacebook.do",
-			type : "GET",
-			dataType : "html",
-			data : payload,
-			success : function(data) {
-				if (data.errCode == undefined)
-					success = true;
-			},
-			complete : function(data) {
-				if (success) {
-					data = data.responseText;
-					if(data=='true')
-						$('#overlay-toast').html('No facebook account setup in hierarchy to share.');
-					else
-						$('#overlay-toast').html('Successfully shared on facebook.');
-					showToast();
-				}
-			},
-			error : function(e) {
-				console.error("error : " + e.responseText);
-				$('#overlay-toast').html(e.responseText);
-				showToast(e.responseText);
+	};
+	
+	$.ajax({
+		url : "./postonfacebook.do",
+		type : "GET",
+		dataType : "html",
+		data : payload,
+		success : function(data) {
+			if (data.errCode == undefined)
+				success = true;
+		},
+		complete : function(data) {
+			if (success) {
+				data = data.responseText;
+				if(data=='true')
+					$('#overlay-toast').html('No facebook account setup in hierarchy to share.');
+				else
+					$('#overlay-toast').html('Successfully shared on facebook.');
+				showToast();
 			}
-		});
+		},
+		error : function(e) {
+			if(e.status == 504) {
+				redirectToLoginPageOnSessionTimeOut(e.status);
+				return;
+			}
+			console.error("error : " + e.responseText);
+			$('#overlay-toast').html(e.responseText);
+			showToast(e.responseText);
+		}
+	});
 }
 
 function shareOnTwitter(firstName, lastName, agentName, review, score, agentId){
@@ -287,6 +356,10 @@ function shareOnTwitter(firstName, lastName, agentName, review, score, agentId){
 				}
 			},
 			error : function(e) {
+				if(e.status == 504) {
+					redirectToLoginPageOnSessionTimeOut(e.status);
+					return;
+				}
 				console.error("error : " + e.responseText);
 				$('#overlay-toast').html(e.responseText);
 				showToast(e.responseText);
@@ -324,6 +397,10 @@ function shareOnLinkedin(firstName, lastName, agentName, review, score, agentId)
 				}
 			},
 			error : function(e) {
+				if(e.status == 504) {
+					redirectToLoginPageOnSessionTimeOut(e.status);
+					return;
+				}
 				console.error("error : " + e.responseText);
 				$('#overlay-toast').html(e.responseText);
 				showToast(e.responseText);
@@ -348,19 +425,23 @@ function shareOnYelp(agentId, location, yelpElement){
 		complete : function(data) {
 			data = data.responseJSON;
 			if (success) {
-				if(data.host!=undefined && data.relativePath!=undefined)
-					if(yelpElement==undefined){
-						window.open(data.host+data.relativePath);
-					}else{
-						yelpElement.href = data.host+data.relativePath;
+				if(data.relativePath != undefined)
+					if (yelpElement == undefined) {
+						window.open(data.relativePath);
+					} else {
+						yelpElement.href = data.relativePath;
 					}
-				else{
+				else {
 					$('#overlay-toast').html('Please setup your Yelp account to share.');
 					showToast();
 				}
 			}
 		},
 		error : function(e) {
+			if (e.status == 504) {
+				redirectToLoginPageOnSessionTimeOut(e.status);
+				return;
+			}
 			console.error("error : " + e.responseText);
 			$('#overlay-toast').html(e.responseText);
 			showToast(e.responseText);
@@ -369,9 +450,9 @@ function shareOnYelp(agentId, location, yelpElement){
 }
 
 function shareOnGooglePlus(agentId, location, googleElement){
-	var success= false;
+	var success = false;
 	var payload = {
-			"agentId" : agentId
+		"agentId" : agentId
 	};
 	$.ajax({
 		url : location + "getgooglepluslinkrest",
@@ -385,22 +466,25 @@ function shareOnGooglePlus(agentId, location, googleElement){
 		complete : function(data) {
 			if (success) {
 				data = data.responseJSON;
-				if(data.host!=undefined && data.profileServer!=undefined && data.relativePath!=undefined){
-					if(googleElement==undefined){
-						window.open(data.host + data.profileServer
-								+ data.relativePath);
+				if (data.host != undefined && data.profileServer != undefined && data.relativePath != undefined) {
+					if (googleElement == undefined) {
+						window.open(data.host + data.profileServer + data.relativePath);
 					}
-					else{
+					else {
 						googleElement.href = data.host + data.profileServer + data.relativePath;
 					}
 				}
-				else{
+				else {
 					$('#overlay-toast').html('Please setup your Google+ account to share.');
 					showToast();
 				}
 			}
 		},
 		error : function(e) {
+			if (e.status == 504) {
+				redirectToLoginPageOnSessionTimeOut(e.status);
+				return;
+			}
 			console.error("error : " + e.responseText);
 			$('#overlay-toast').html(e.responseText);
 			showToast(e.responseText);
@@ -448,8 +532,8 @@ function showProfileLinkInEditProfilePage(source, profileUrl){
 	}
 }
 
-// Send Survey
-$(document).on('input', '.wc-review-fname, .wc-review-lname, .wc-review-email', function() {
+// Send Survey Agent
+$(document).on('input', '#wc-review-table-inner[data-role="agent"] input', function() {
 	var parentDiv = $(this).parent().parent();
 	if (parentDiv.is(':last-child')) {
 		var htmlData = '<div class="wc-review-tr clearfix">'
@@ -457,6 +541,32 @@ $(document).on('input', '.wc-review-fname, .wc-review-lname, .wc-review-email', 
 			+ '<div class="wc-review-tc2 float-left"><input class="wc-review-input wc-review-lname"></div>'
 			+ '<div class="wc-review-tc3 float-left"><input class="wc-review-input wc-review-email"></div>'
 			+ '<div class="wc-review-tc4 float-left"><div class="wc-review-rmv-icn hide"></div></div>'
+		+ '</div>';
+		parentDiv.after(htmlData);
+		
+		// enable remove button
+		if ($('#wc-review-table-inner').children().length > 2) {
+			$('.wc-review-rmv-icn').show();
+		}
+		
+		// setting up perfect scrollbar
+		setTimeout(function() {
+			$('#wc-review-table').perfectScrollbar();
+			$('#wc-review-table').perfectScrollbar('update');
+		}, 1000);
+	}
+});
+
+//Send Survey Admin
+$(document).on('input', '#wc-review-table-inner[data-role="admin"] input', function() {
+	var parentDiv = $(this).parent().parent();
+	if (parentDiv.is(':last-child')) {
+		var htmlData = '<div class="wc-review-tr clearfix">'
+			+ '<div class="wc-review-tc1 float-left pos-relative"><input data-name="agent-name" class="wc-review-input wc-review-agentname"></div>'
+			+ '<div class="wc-review-tc2 float-left"><input class="wc-review-input wc-review-fname"></div>'
+			+ '<div class="wc-review-tc3 float-left"><input class="wc-review-input wc-review-lname"></div>'
+			+ '<div class="wc-review-tc4 float-left"><input class="wc-review-input wc-review-email"></div>'
+			+ '<div class="wc-review-tc5 float-left"><div class="wc-review-rmv-icn hide"></div></div>'
 		+ '</div>';
 		parentDiv.after(htmlData);
 		
@@ -491,29 +601,108 @@ $(document).on('click', '.wc-review-rmv-icn', function() {
 
 $(document).on('click', '#wc-send-survey', function() {
 	var receiversList = [];
+	var agentId = undefined;
+	var columnName = undefined;
+	var firstname = "";
+	var lastname = "";
+	var idx=0;
+	var exit = false;
 	$('#wc-review-table-inner').children().each(function() {
 		if (!$(this).hasClass('wc-review-hdr')) {
+			var dataName = $(this).find('input.wc-review-agentname').first().attr('data-name');
+			if (dataName == 'agent-name') {
+				agentId = $(this).find('input.wc-review-agentname').first().attr('agent-id');
+
+				/*var name = $(this).find('input.wc-review-custname').first().val();
+				if(name!=undefined){
+				var name = $(this).find('input.wc-review-custname').first().val();
+				if (name != undefined) {
+					var nameParts = name.split(" ");
+					if (nameParts.length == 1) {
+						firstname = name;
+					} else {
+						for (var i = 0; i < nameParts.length-1; i++) {
+							firstname = firstname + nameParts[i];
+						}
+						lastname = nameParts[nameParts.length - 1];
+					}
+				}*/
+				if (idx == 0) {
+					columnName = $(this).find('input.wc-review-agentname').first().attr('column-name');
+					idx ++;
+				}
+			}
 			
-			var firstname = $(this).find('input.wc-review-fname').first().val();
-			var lastname = $(this).find('input.wc-review-lname').first().val();
+			firstname = $(this).find('input.wc-review-fname').first().val();
+			lastname = $(this).find('input.wc-review-lname').first().val();
+			
 			var emailId = $(this).find('input.wc-review-email').first().val();
 			
-			if (nameRegex.test(firstname) && emailRegex.test(emailId)) {
+			if(firstname == "" && emailId != ""){
+				$('#overlay-toast').html('Please enter Firstname for all the customer');
+				showToast();
+				exit = true;
+				return false;
+			} else if (agentId != undefined && firstname == ""){
+				$('#overlay-toast').html('Please enter Firstname for all the customer');
+				showToast();
+				exit = true;
+				return false;
+			}
+			if (emailRegex.test(emailId)) {
 				var receiver = new Object();
 				receiver.firstname = firstname;
 				receiver.lastname = lastname;
 				receiver.emailId = emailId;
-
+				if (dataName == 'agent-name') {
+					receiver.agentId = agentId;
+					if(agentId == undefined){
+						$('#overlay-toast').html('Please enter Agent name for all survey requests');
+						showToast();
+						exit = true;
+						return false;					
+					}
+				}
 				receiversList.push(receiver);
+			} else if(firstname != ""){
+				$('#overlay-toast').html('Please enter valid email for ' + firstname);
+				showToast();
+				exit = true;
+				return false;
 			}
 		}
 	});
 
+	if(exit){
+		exit = false;
+		return false;
+	}
+	
+	//Check if recievers list empty
+	if(receiversList.length == 0){
+		$('#overlay-toast').html('Add customers to send survey request!');
+		showToast();
+		exit = false;
+		return false;
+	}
+	
 	receiversList = JSON.stringify(receiversList);
 	var payload = {
 		"receiversList" : receiversList,
 		"source" : 'agent'
 	};
+	if (columnName != undefined) {
+		payload = {
+			"receiversList" : receiversList,
+			"source" : 'admin',
+			"columnName" : columnName,
+		};
+	}
+
+	loadDisplayPicture();
+	$(this).closest('.overlay-login').hide();
+	showDisplayPic();
+	
 	callAjaxPostWithPayloadData("./sendmultiplesurveyinvites.do", function(data) {
 		$('#overlay-toast').html('Survey request sent successfully!');
 		showToast();
@@ -534,6 +723,20 @@ function sendSurveyInvitation() {
 	}, true);
 }
 
+function sendSurveyInvitationAdmin(columnName, columnValue) {
+	var payload = {
+			"columnName" : columnName,
+			"columnValue" : columnValue
+	};
+	callAjaxGetWithPayloadData("./sendsurveyinvitationadmin.do", function(data) {
+		$('#overlay-send-survey').html(data);
+		if ($("#welcome-popup-invite").length) {
+			$('#overlay-send-survey').removeClass("hide");
+			$('#overlay-send-survey').show();
+		}
+	}, payload, true);
+}
+
 function linkedInDataImport() {
 	callAjaxGET("./linkedindataimport.do", function(data) {
 		$('#overlay-linkedin-import').html(data);
@@ -542,4 +745,23 @@ function linkedInDataImport() {
 			$('#overlay-linkedin-import').show();
 		}
 	}, true);
+}
+function  convertTimeStampToLocalTimeStamp(generalTimestamp){
+	var convertedTimestamp= generalTimestamp.getTime() + (generalTimestamp.getTimezoneOffset())*60*1000 ;
+	var date3=new Date(convertedTimestamp);
+	console.info((date3.getMonth() + 1) + '/' + date3.getDate() + '/' +  date3.getFullYear());
+	var month=((date3.getMonth() + 1)<10)? "0"+(date3.getMonth() + 1) : (date3.getMonth() + 1);
+	var day=(date3.getDate()<10) ? "0"+(date3.getDate()) : (date3.getDate());
+	var minutes= (date3.getMinutes()<10) ? "0"+(date3.getMinutes()) : (date3.getMinutes());
+	var hours= (date3.getHours()<10) ? "0"+(date3.getHours()) : (date3.getHours());
+	var sec=  (date3.getSeconds()<10) ? "0"+(date3.getSeconds()) : (date3.getSeconds());
+	var date4= date3.getFullYear() +'-'+month+'-'+ day +" "+hours+":"+ minutes +":"+ sec+"."+date3.getMilliseconds() ;
+	return date4;
+}
+
+function returnValidWebAddress(url) {
+	if (url && !url.match(/^http([s]?):\/\/.*/)) {
+		url = 'http://' + url;
+	}
+	return url;
 }
