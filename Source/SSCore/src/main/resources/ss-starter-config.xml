@@ -105,7 +105,7 @@
 		</property>
 		<property name="durability" value="true" />
 	</bean>
-	
+
 	<!-- Setting email reader job detail -->
 	<bean id="emailreaderjobdetail"
 		class="org.springframework.scheduling.quartz.JobDetailFactoryBean">
@@ -118,7 +118,7 @@
 		</property>
 		<property name="durability" value="true" />
 	</bean>
-	
+
 
 	<!-- Account Deactivator job detail -->
 	<bean id="accountdeactivatorjobdetail"
@@ -164,6 +164,7 @@
 				<entry key="companyAdminEnabled" value="${BATCH_COMPANY_ADMIN_ENABLED}" />
 				<entry key="adminEmailId" value="${APPLICATION_ADMIN_EMAIL}" />
 				<entry key="adminName" value="${APPLICATION_ADMIN_NAME}" />
+				<entry key="fileDirectoryLocation" value="${FILE_DIRECTORY_LOCATION}" />
 			</map>
 		</property>
 		<property name="durability" value="true" />
@@ -220,7 +221,7 @@
 		<property name="jobDetail" ref="socialfeedingesterjobdetail" />
 		<property name="cronExpression" value="0 0 19,20,21,22,23,0,1,2,3,4,5,6,7 * * ?" />
 	</bean>
-	
+
 	<!-- setting cron for email reader -->
 	<bean id="emailreadercron"
 		class="org.springframework.scheduling.quartz.SimpleTriggerFactoryBean">
@@ -229,7 +230,7 @@
 		<property name="startDelay" value="1000" />
 		<!-- <property name="cronExpression" value="0 0/1 * * * ?" /> -->
 	</bean>
-	
+
 
 	<!-- setting cron for account deactivator -->
 	<bean id="accountdeactivatorcron"

@@ -1,7 +1,14 @@
 package com.realtech.socialsurvey.core.starter;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.List;
 
+import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
@@ -55,13 +62,13 @@ public class EmailProcessor implements Runnable, InitializingBean
     {
         while ( true ) {
             List<EmailObject> emailObjectList = emailDao.findAllEmails();
-            if(emailObjectList.isEmpty()){
+            if ( emailObjectList.isEmpty() ) {
                 try {
                     Thread.sleep( 60000 );
                 } catch ( InterruptedException ie ) {
                     LOG.error( "Exception Caught " + ie.getMessage() );
                 }
-                
+
             }
             for ( EmailObject emailObject : emailObjectList ) {
                 EmailEntity emailEntity = null;
@@ -95,6 +102,33 @@ public class EmailProcessor implements Runnable, InitializingBean
         email.setSubject( emailEntity.getSubject() );
         email.setHtml( emailEntity.getBody() );
         email.setText( emailFormatHelper.getEmailTextFormat( emailEntity.getBody() ) );
+        if ( emailEntity.getAttachmentLocation() != null && !emailEntity.getAttachmentLocation().isEmpty() ) {
+            File file = null;
+            FileInputStream fileInputStream = null;
+            try {
+                file = new File( emailEntity.getAttachmentLocation() );
+                fileInputStream = new FileInputStream( file );
+                HSSFWorkbook workbook = new HSSFWorkbook( fileInputStream );
+                ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                workbook.write( baos );
+                InputStream inputStream = new ByteArrayInputStream( baos.toByteArray() );
+                email.addAttachment( "CorruptRecords.xls", inputStream );
+
+            } catch ( IOException e ) {
+                // TODO Auto-generated catch block
+                LOG.error( "Exception caught " + e.getMessage() );
+            } finally {
+                if ( file != null ) {
+                    if ( file.exists() ) {
+                        file.delete();
+                    }
+                }
+                if ( fileInputStream != null ) {
+                    fileInputStream.close();
+                }
+            }
+
+        }
 
         Response response = null;
         try {
