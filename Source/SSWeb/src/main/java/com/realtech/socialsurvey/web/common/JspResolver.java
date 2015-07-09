@@ -11,6 +11,7 @@ public interface JspResolver
     public static final String COMPANY_INFORMATION = "companyinformation";
     public static final String ACCOUNT_TYPE_SELECTION = "accounttypeselection";
     public static final String COMPLETE_REGISTRATION = "completeregistration";
+    public static final String COMPLETE_REGISTRATION_PAGE = "completeregistrationpage";
     public static final String USER_ID_ON_INVITE = "useridoninvite";
     public static final String REGISTRATION_INVITE_SUCCESSFUL = "registration-invite-successful";
     public static final String REGISTRATION_LINK_EXPIRED = "registration-link-expired";
@@ -81,6 +82,7 @@ public interface JspResolver
     // Edit Settings
     public static final String EDIT_SETTINGS = "settings";
     public static final String SOCIAL_AUTH_MESSAGE = "socialauthmessage";
+    public static final String LINKEDIN_ACCESS = "linkedinaccess";
 
     // Profile Settings
     public static final String PROFILE_EDIT = "profile_edit";
@@ -95,7 +97,4 @@ public interface JspResolver
     public static final String PROFILE_HIERARCHY = "profile_hierarchy";
     public static final String PROFILE_HIERARCHY_CLICK_REGION = "profile_hierarchy_region";
     public static final String PROFILE_HIERARCHY_CLICK_BRANCH = "profile_hierarchy_branch";
-
-    // Old pages
-    public static final String LINKEDIN_ACCESS = "linkedinaccess";
 }
