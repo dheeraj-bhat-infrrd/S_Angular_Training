@@ -27,7 +27,7 @@ public interface DashboardService {
 
 	public long getSocialPostsForPastNdays(String columnName, long columnValue, int numberOfDays);
 
-	public double getSurveyScore(String columnName, long columnValue, int numberOfDays);
+	public double getSurveyScore(String columnName, long columnValue, int numberOfDays, boolean realtechAdmin);
 
 	public int getProfileCompletionPercentage(User user, String columnName, long columnValue, UserSettings userSettings);
 
@@ -37,7 +37,7 @@ public interface DashboardService {
 
 	public XSSFWorkbook downloadIncompleteSurveyData(List<SurveyPreInitiation> surveyDetails, String fileLocation) throws IOException;
 
-	public Map<String, Map<String, Long>> getSurveyDetailsForGraph(String columnName, long columnValue, String reportType) throws ParseException;
+	public Map<String, Map<String, Long>> getSurveyDetailsForGraph(String columnName, long columnValue, String reportType, boolean realtechAdmin) throws ParseException;
 
     public XSSFWorkbook downloadSocialMonitorData( List<SurveyDetails> surveyDetails, String fileName );
 
