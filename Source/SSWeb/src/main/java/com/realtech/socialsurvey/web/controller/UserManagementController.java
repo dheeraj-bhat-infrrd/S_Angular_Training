@@ -981,7 +981,7 @@ public class UserManagementController
 	 * @throws InvalidInputException
 	 */
 	@RequestMapping(value = "/completeregistration", method = RequestMethod.POST)
-	public String completeRegistration(Model model, HttpServletRequest request, RedirectAttributes redirectAttributes) {
+	public String completeRegistration(HttpServletRequest request, RedirectAttributes redirectAttributes) {
 		LOG.info("Method completeRegistration() to complete registration of user started.");
 		User user = null;
 
