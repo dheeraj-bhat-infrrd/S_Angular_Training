@@ -20,7 +20,7 @@
 						<option value="displayName">Individual</option>
 						<option value="branchName">Branch</option>
 						<option value="regionName">Region</option>
-						<!-- <option value="company">Company</option> -->
+						<option value="company">Company</option>
 					</select>
 				</div>
 				<div id="dsh-srch-survey-div" class="clearfix dash-sel-wrapper">
@@ -55,7 +55,7 @@
 						<option value="displayName">Individual</option>
 						<option value="branchName">Branch</option>
 						<option value="regionName">Region</option>
-						<!-- <option value="company">Company</option> -->
+						<option value="company">Company</option>
 					</select>
 				</div>
 				<div id="dsh-grph-srch-survey-div" class="clearfix dash-sel-wrapper">
@@ -95,72 +95,39 @@
 					</div>
 				</div>
 			</div>
-		</div>
-		
-		<div class="dash-panels-wrapper">
-			<div class="row">
-				<div class="clearfix admin-report-dwn-row">
-					<div class="admin-report-sel-col float-left">
-						<div class="clearfix dash-sel-wrapper">
-							<div class="float-left dash-sel-lbl">
-								<spring:message code="label.choose.key" />
+			
+			<div class="dash-panel-right col-lg-8 col-md-8 col-sm-8 col-xs-12 resp-adj">
+					<div class="people-say-wrapper rt-content-main rt-content-main-adj">
+						<div class="main-con-header clearfix pad-bot-10-resp">
+							<div id="review-desc" class="float-left dash-ppl-say-lbl">
+								<spring:message code="label.peoplesayabout.key" />${profileName}
 							</div>
-							<select id="report-sel" class="float-left dash-sel-item">
-								<option value="displayName">Individual</option>
-								<option value="branchName">Branch</option>
-								<option value="regionName">Region</option>
-								<!-- <option value="company">Company</option> -->
+							
+							<div id="dsh-admin-cmp-dwnld" class="float-right dash-btn-dl-sd-admin hide">
+							<select id="download-survey-reports" class="float-left dash-download-sel-item">
+								<option value=0 data-report="complete-survey"><spring:message code="label.downloadsurveydata.one.key" /></option>
+								<option value=1 data-report="loan-officer-ranking"><spring:message code="label.downloadsurveydata.two.key" /></option>
+								<option value=2 data-report="customer-survey"><spring:message code="label.downloadsurveydata.three.key" /></option>
+								<option value=3 data-report="social-monitor"><spring:message code="label.downloadsurveydata.four.key" /></option>
 							</select>
-						</div>
-					</div>
-					<div class="admin-report-val-col float-left">
-						<div id="dsh-srch-survey-div" class="clearfix dash-sel-wrapper"
-							style="display: block;">
-							<div class="float-left dash-sel-lbl">Choose</div>
-							<div class="dsh-inp-wrapper float-left">
-								<input id="admin-report-dwn" class="dash-sel-item" type="text"
-									placeholder="Start typing..."
-									onkeyup="searchBranchRegionOrAgent(this.value, 'reports')">
-								<div id="dsh-srch-report"></div>
+								<input id="dsh-start-date" class="dsh-date-picker" placeholder="<spring:message code="label.startdate.key" />">
+								<span>-</span>
+								<input id="dsh-end-date" class="dsh-date-picker" placeholder="<spring:message code="label.enddate.key" />">
+								<div id="dsh-dwnld-report-btn" class="dash-down-go-button float-right cursor-pointer">
+									<spring:message code="label.downloadsurveydata.key.click" />
+								</div>
+							</div>
+							
+							<div id="dsh-cmp-dwnld" class="float-right dash-btn-dl-sd hide">
+								<div id="dsh-dwnld-btn" class="dsh-dwnld-btn float-left cursor-pointer">
+									<spring:message code="label.downloadsurveydata.key" />
+								</div>
+								<input id="dsh-start-date" class="dsh-date-picker" placeholder="<spring:message code="label.startdate.key" />">
+								<span>-</span>
+								<input id="dsh-end-date" class="dsh-date-picker" placeholder="<spring:message code="label.enddate.key" />">
 							</div>
 						</div>
-					</div>
-					<div class="dwnl-bnt-col float-right">
-						<div id="dsh-admin-cmp-dwnld"
-							class="float-right dash-btn-dl-sd-admin hide">
-							<select id="download-survey-reports"
-								class="float-left dash-download-sel-item">
-								<option value=0 data-report="complete-survey"><spring:message
-										code="label.downloadsurveydata.one.key" /></option>
-								<option value=1 data-report="loan-officer-ranking"><spring:message
-										code="label.downloadsurveydata.two.key" /></option>
-								<option value=2 data-report="customer-survey"><spring:message
-										code="label.downloadsurveydata.three.key" /></option>
-								<option value=3 data-report="social-monitor"><spring:message
-										code="label.downloadsurveydata.four.key" /></option>
-							</select> <input id="dsh-start-date" class="dsh-date-picker"
-								placeholder="<spring:message code="label.startdate.key" />">
-							<span>-</span> <input id="dsh-end-date" class="dsh-date-picker"
-								placeholder="<spring:message code="label.enddate.key" />">
-							<div id="dsh-dwnld-report-btn"
-								class="dash-down-go-button float-right cursor-pointer">
-								<spring:message code="label.downloadsurveydata.key.click" />
-							</div>
-						</div>
-
-						<div id="dsh-cmp-dwnld" class="float-right dash-btn-dl-sd hide">
-							<div id="dsh-dwnld-btn"
-								class="dsh-dwnld-btn float-left cursor-pointer">
-								<spring:message code="label.downloadsurveydata.key" />
-							</div>
-							<input id="dsh-start-date" class="dsh-date-picker"
-								placeholder="<spring:message code="label.startdate.key" />">
-							<span>-</span> <input id="dsh-end-date" class="dsh-date-picker"
-								placeholder="<spring:message code="label.enddate.key" />">
-						</div>
-					</div>
-				</div>
-			</div>
+			
 		</div>
 	</div>
 </div>
@@ -170,5 +137,6 @@ $(document).ready(function() {
 	colName = "superAdmin";
 	hideOverlay();
 	$(document).attr("title", "Dashboard");
+	bindSelectButtons();
 });
 </script>
