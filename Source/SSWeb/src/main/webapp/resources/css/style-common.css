@@ -4656,7 +4656,7 @@ select.rfr_txt_fld,select.rfr_input_fld{
 
 .bd-hr-item {
 	padding-left: 15px;
-	cursor: pointer;
+	/* cursor: pointer; */
 }
 
 .bd-hr-txt {
@@ -4998,12 +4998,23 @@ tr.v-tbl-header {
 	background-image: url(../images/hm-arrow-open.png);
 }
 
+.prf-public-txt:hover {
+	 color: rgb(62, 157, 203);
+}
+
 .bd-hr-item-l1>.bd-lt-l1, 
 .bd-hr-item-l2>.bd-lt-l2, 
 .bd-hr-item-l1>.bd-lt-l2 {
 	background-image: url(../images/hm-arrow-closed.png);
 	background-position: 5px center;
 	background-repeat: no-repeat;
+	padding-left: 20px;
+}
+
+.bd-hr-item-l1>.bd-lt-l1:hover, 
+.bd-hr-item-l2>.bd-lt-l2:hover, 
+.bd-hr-item-l1>.bd-lt-l2:hover {
+	background-image: url(../images/hm-arrow-closed-blue.png);
 }
 
 .bd-hr-item-l1[data-openstatus="open"]>.bd-lt-l1,
@@ -5011,6 +5022,12 @@ tr.v-tbl-header {
 .bd-hr-item-l1[data-openstatus="open"]>.bd-lt-l2 {
 	background-image: url(../images/hm-arrow-open.png);
 	background-position: 3px center;
+}
+
+.bd-hr-item-l1[data-openstatus="open"]>.bd-lt-l1:hover,
+.bd-hr-item-l2[data-openstatus="open"]>.bd-lt-l2:hover, 
+.bd-hr-item-l1[data-openstatus="open"]>.bd-lt-l2:hover {
+	background-image: url(../images/hm-arrow-open-blue.png);
 }
 
 .v-hr-tbl tr.v-tbl-row td {

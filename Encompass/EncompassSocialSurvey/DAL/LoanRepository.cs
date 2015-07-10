@@ -34,6 +34,7 @@ namespace EncompassSocialSurvey.DAL
                                         , LAST_REMINDER_TIME
                                         , STATUS
                                         , CREATED_ON
+                                        , MODIFIED_ON
                                           )
                                         VALUES(
                                           ?SURVEY_SOURCE
@@ -51,6 +52,7 @@ namespace EncompassSocialSurvey.DAL
                                         , ?LAST_REMINDER_TIME
                                         , ?STATUS
                                         , ?CREATED_ON
+                                        , ?MODIFIED_ON
                                         ) ;";
 
         public bool InsertLoan(LoanEntity loan, MySqlConnection mySqlDbConnection)
@@ -86,6 +88,7 @@ namespace EncompassSocialSurvey.DAL
                     commandToInsert.Parameters.Add("?LAST_REMINDER_TIME", MySqlDbType.DateTime).Value = DateTime.Now;
                     commandToInsert.Parameters.Add("?STATUS", MySqlDbType.Int32).Value = loan.Status;
                     commandToInsert.Parameters.Add("?CREATED_ON", MySqlDbType.DateTime).Value = loan.CreatedOn;
+                    commandToInsert.Parameters.Add("?MODIFIED_ON", MySqlDbType.DateTime).Value = DateTime.Now;
 
                     //
                     commandToInsert.ExecuteNonQuery();
