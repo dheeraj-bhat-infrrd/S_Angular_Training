@@ -28,6 +28,8 @@ import com.amazonaws.util.json.JSONObject;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
+import com.realtech.socialsurvey.core.commons.Utils;
+import com.realtech.socialsurvey.core.dao.OrganizationUnitSettingsDao;
 import com.realtech.socialsurvey.core.dao.impl.MongoOrganizationUnitSettingDaoImpl;
 import com.realtech.socialsurvey.core.entities.AgentSettings;
 import com.realtech.socialsurvey.core.entities.Branch;
@@ -85,6 +87,9 @@ public class UserManagementController
 
     @Autowired
     private OrganizationManagementService organizationManagementService;
+    
+    @Autowired
+	private OrganizationUnitSettingsDao organizationUnitSettingsDao;
 
     @Autowired
     private ProfileManagementService profileManagementService;
@@ -101,6 +106,9 @@ public class UserManagementController
     @Autowired
     private SolrSearchService solrSearchService;
 
+
+    @Autowired
+    private Utils utils;
     
     private final static int SOLR_BATCH_SIZE = 20;
 
@@ -1424,6 +1432,7 @@ public class UserManagementController
             }
             // Update AgentSetting in MySQL
             User user = userManagementService.getUserByUserId( userId );
+            
             user.setFirstName( firstName );
             user.setLastName( lastName );
             user.setEmailId( emailId );
@@ -1445,8 +1454,25 @@ public class UserManagementController
             contactDetails.setLastName( lastName );
             contactDetails.setName( fullName );
             contactDetails.getMail_ids().setWork( emailId );
+            if(user.getStatus() == CommonConstants.STATUS_ACCOUNT_DISABLED){
+	            String profileName = userManagementService.generateIndividualProfileName( user.getUserId(), contactDetails.getName(), user.getEmailId() );
+	            agentSettings.setProfileName( profileName );
+	
+	            String profileUrl = utils.generateAgentProfileUrl( profileName );
+	            agentSettings.setProfileUrl( profileUrl );
+	            userManagementService.sendRegistrationCompletionLink( emailId, firstName, lastName, user.getCompany()
+	                    .getCompanyId(), profileName, user.getLoginName() );
+	         // Update the profile pic URL 
+	            organizationUnitSettingsDao.updateParticularKeyOrganizationUnitSettings(MongoOrganizationUnitSettingDaoImpl.KEY_PROFILE_URL, agentSettings.getProfileUrl(),
+	    				agentSettings, MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION);
+	    		
+	            organizationUnitSettingsDao.updateParticularKeyOrganizationUnitSettings(MongoOrganizationUnitSettingDaoImpl.KEY_PROFILE_NAME, agentSettings.getProfileName(),
+	    				agentSettings, MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION);
+            }
             profileManagementService.updateContactDetails( MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION,
                 agentSettings, contactDetails );
+            
+         
         } catch ( NonFatalException e ) {
             LOG.error( "NonFatalException caught in updateUserByAdmin(). Nested exception is ", e );
             return e.getMessage();

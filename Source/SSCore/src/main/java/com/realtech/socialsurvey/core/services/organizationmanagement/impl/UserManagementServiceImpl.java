@@ -1961,7 +1961,7 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
      * @return
      * @throws InvalidInputException
      */
-    private String generateIndividualProfileName( long userId, String name, String emailId ) throws InvalidInputException
+    public String generateIndividualProfileName( long userId, String name, String emailId ) throws InvalidInputException
     {
         LOG.info( "Method generateIndividualProfileName called for userId:" + userId + " and emailId:" + emailId );
         if ( emailId == null || emailId.isEmpty() ) {
