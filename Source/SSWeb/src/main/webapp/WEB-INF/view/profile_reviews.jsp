@@ -60,7 +60,7 @@
 $(document).ready(function(){
 	$('.ppl-head-2').each(function(index, currentElement) {
 		var dateSplit = $(this).attr('data-modifiedon').split('-');
-		var date = convertUserDateToLocale(new Date(dateSplit[0], dateSplit[1], dateSplit[2], dateSplit[3], dateSplit[4], dateSplit[5]));
+		var date = convertUserDateToLocale(new Date(dateSplit[0], dateSplit[1]-1, dateSplit[2], dateSplit[3], dateSplit[4], dateSplit[5]));
 		$(this).html(date.toDateString());
 	});
 	
