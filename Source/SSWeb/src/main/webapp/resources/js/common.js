@@ -244,10 +244,8 @@ function callAjaxGetWithPayloadData(url, callBackFunction, payload,isAsync){
 	});
 }*/
 
-function changeRatingPattern(rating, ratingParent,isOverallRating) {
-	
+function changeRatingPattern(rating, ratingParent, isOverallRating) {
 	var ratingIntVal = 0;
-	
 
 	if (ratingIntVal % 1 == 0) {
 		ratingIntVal = parseInt(rating);
@@ -258,18 +256,16 @@ function changeRatingPattern(rating, ratingParent,isOverallRating) {
 	if (ratingIntVal == 0) {
 		ratingIntVal = 1;
 	}
+
+	var roundedFloatingVal = parseFloat(rating).toFixed(3);
 	
-	var roundedFloatingVal = parseFloat(rating).toFixed(2);
-	
-	var ratingImgHtml = "<div class='rating-image float-left smiley-rat-"+ratingIntVal+"'></div>";
-	var ratingValHtml = "<div class='rating-rounded float-left'>"+roundedFloatingVal+"</div>";
-	
-	if(isOverallRating){
-		ratingValHtml = "<div class='rating-rounded float-left'>"+roundedFloatingVal+" - </div>";
+	var ratingImgHtml = "<div class='rating-image float-left smiley-rat-" + ratingIntVal + "'></div>";
+	var ratingValHtml = "<div class='rating-rounded float-left'>" + roundedFloatingVal + "</div>";
+	if (isOverallRating) {
+		ratingValHtml = "<div class='rating-rounded float-left'>" + roundedFloatingVal + " - </div>";
 	}
-	
+
 	ratingParent.html('');
-	
 	ratingParent.append(ratingImgHtml).append(ratingValHtml);
 }
 
