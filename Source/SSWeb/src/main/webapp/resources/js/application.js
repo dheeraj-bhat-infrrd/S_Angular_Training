@@ -4949,7 +4949,7 @@ function storeCustomerAnswer(customerResponse) {
 	});
 }
 
-function updateCustomerResponse(feedback) {
+function updateCustomerResponse(feedback, agreedToShare) {
 	var success = false;
 	isAbusive = false;
 	var feedbackArr = feedback.split(" ");
@@ -4963,7 +4963,8 @@ function updateCustomerResponse(feedback) {
 		"feedback" : feedback,
 		"agentId" : agentId,
 		"customerEmail" : customerEmail,
-		"isAbusive" : isAbusive
+		"isAbusive" : isAbusive,
+		"agreedToShare" : agreedToShare
 	};
 	questionDetails.customerResponse = customerResponse;
 	$.ajax({
@@ -5147,7 +5148,7 @@ function showMasterQuestionPage(){
 			}
 		}
 		
-		updateCustomerResponse(feedback);
+		updateCustomerResponse(feedback, $('#shr-pst-cb').val());
 		$("div[data-ques-type]").hide();
 		$("div[data-ques-type='error']").show();
 		$('#profile-link').html('View ' + agentName + '\'s profile at <a href="' + agentFullProfileLink + '" target="_blank">' + agentFullProfileLink + '</a>');

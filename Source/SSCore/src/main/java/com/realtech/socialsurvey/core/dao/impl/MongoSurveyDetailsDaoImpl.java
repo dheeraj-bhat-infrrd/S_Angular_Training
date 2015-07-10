@@ -114,7 +114,7 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao {
 	 * collection.
 	 */
 	@Override
-	public void updateGatewayAnswer(long agentId, String customerEmail, String mood, String review, boolean isAbusive) {
+	public void updateGatewayAnswer(long agentId, String customerEmail, String mood, String review, boolean isAbusive, String agreedToShare) {
 		LOG.info("Method updateGatewayAnswer() to update review provided by customer started.");
 		Query query = new Query();
 		query.addCriteria(Criteria.where(CommonConstants.AGENT_ID_COLUMN).is(agentId));
@@ -126,6 +126,7 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao {
 		update.set(CommonConstants.IS_ABUSIVE_COLUMN, isAbusive);
 		update.set(CommonConstants.MODIFIED_ON_COLUMN, new Date());
 		update.set(CommonConstants.EDITABLE_SURVEY_COLUMN, false);
+		update.set(CommonConstants.AGREE_SHARE_COLUMN, agreedToShare);
 		mongoTemplate.updateMulti(query, update, SURVEY_DETAILS_COLLECTION);
 		LOG.info("Method updateGatewayAnswer() to update review provided by customer finished.");
 	}
