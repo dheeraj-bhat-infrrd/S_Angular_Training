@@ -425,82 +425,97 @@ public class DashboardServiceImpl implements DashboardService, InitializingBean 
 		}
 		return workbook;
 	}
-    
-    /*
-     * Method to create excel file from all the completed survey data.
-     */
-    @Override
-    public XSSFWorkbook downloadCustomerSurveyResultsData(List<SurveyDetails> surveyDetails, String fileLocation) throws IOException {
-        // Blank workbook
-        XSSFWorkbook workbook = new XSSFWorkbook();
 
-        // Create a blank sheet
-        XSSFSheet sheet = workbook.createSheet();
-        XSSFDataFormat df = workbook.createDataFormat();
-        CellStyle style = workbook.createCellStyle();
-        style.setDataFormat(df.getFormat("d-mm-yyyy"));
-        Integer counter = 1;
-        int max = 0;
-        int internalMax = 0;
-        // This data needs to be written (List<Object>)
-        Map<String, List<Object>> data = new TreeMap<>();
-        List<Object> surveyDetailsToPopulate = new ArrayList<>();
-        for (SurveyDetails survey : surveyDetails) {
-            internalMax = 0;
-            surveyDetailsToPopulate.add(survey.getAgentName());
-            surveyDetailsToPopulate.add(survey.getCustomerFirstName());
-            surveyDetailsToPopulate.add(survey.getCustomerLastName());
-            surveyDetailsToPopulate.add(survey.getCreatedOn());
-            surveyDetailsToPopulate.add(survey.getModifiedOn());
-            surveyDetailsToPopulate.add(survey.getScore());
-            for (SurveyResponse response : survey.getSurveyResponse()) {
-                internalMax++;
-                surveyDetailsToPopulate.add(response.getAnswer());
-            }
-            surveyDetailsToPopulate.add(survey.getMood());
-            surveyDetailsToPopulate.add(survey.getReview());
-            data.put((++counter).toString(), surveyDetailsToPopulate);
-            surveyDetailsToPopulate = new ArrayList<>();
-            if (internalMax > max)
-                max = internalMax;
-        }
-        surveyDetailsToPopulate.add("Loan Officer Name");
-        surveyDetailsToPopulate.add("Custmer First");
-        surveyDetailsToPopulate.add("Customer Last");
-        surveyDetailsToPopulate.add("Survey Requested");
-        surveyDetailsToPopulate.add("Survey Completed");
-        surveyDetailsToPopulate.add("Score");
-        for (counter = 1; counter <= max; counter++) {
-            surveyDetailsToPopulate.add("Question " + counter);
-        }
-        surveyDetailsToPopulate.add("Gateway");
-        surveyDetailsToPopulate.add("Customer Comments");
-        data.put("1", surveyDetailsToPopulate);
+	/*
+	 * Method to create excel file from all the completed survey data.
+	 */
+	@Override
+	public XSSFWorkbook downloadCustomerSurveyResultsData(List<SurveyDetails> surveyDetails, String fileLocation) throws IOException {
+		// Blank workbook
+		XSSFWorkbook workbook = new XSSFWorkbook();
 
-        // Iterate over data and write to sheet
-        Set<String> keyset = data.keySet();
-        int rownum = 0;
-        for (String key : keyset) {
-            Row row = sheet.createRow(rownum++);
-            List<Object> objArr = data.get(key);
-            int cellnum = 0;
-            for (Object obj : objArr) {
-                Cell cell = row.createCell(cellnum++);
-                if (obj instanceof String)
-                    cell.setCellValue((String) obj);
-                else if (obj instanceof Integer)
-                    cell.setCellValue((Integer) obj);
-                else if (obj instanceof Double)
-                    cell.setCellValue((Double) obj);
-                else if (obj instanceof Date){
-                    cell.setCellStyle(style);
-                    cell.setCellValue((Date) obj);
-                }
-            }
-        }
-        return workbook;
-    }
-    
+		// Create a blank sheet
+		XSSFSheet sheet = workbook.createSheet();
+		XSSFDataFormat df = workbook.createDataFormat();
+		CellStyle style = workbook.createCellStyle();
+		style.setDataFormat(df.getFormat("d-mm-yyyy"));
+		Integer counter = 1;
+		int max = 0;
+		int internalMax = 0;
+		
+		// This data needs to be written (List<Object>)
+		Map<String, List<Object>> data = new TreeMap<>();
+		List<Object> surveyDetailsToPopulate = new ArrayList<>();
+		for (SurveyDetails survey : surveyDetails) {
+			internalMax = 0;
+			
+			String agentName = survey.getAgentName();
+			surveyDetailsToPopulate.add(agentName.substring(0, agentName.lastIndexOf(' ')));
+			surveyDetailsToPopulate.add(agentName.substring(agentName.lastIndexOf(' ') + 1));
+			
+			surveyDetailsToPopulate.add(survey.getCustomerFirstName());
+			surveyDetailsToPopulate.add(survey.getCustomerLastName());
+			surveyDetailsToPopulate.add(DATE_FORMATTER.format(survey.getCreatedOn()));
+			surveyDetailsToPopulate.add(DATE_FORMATTER.format(survey.getModifiedOn()));
+			surveyDetailsToPopulate.add("");
+			surveyDetailsToPopulate.add(survey.getScore());
+			for (SurveyResponse response : survey.getSurveyResponse()) {
+				internalMax++;
+				surveyDetailsToPopulate.add(response.getAnswer());
+			}
+			surveyDetailsToPopulate.add(survey.getMood());
+			surveyDetailsToPopulate.add(survey.getReview());
+			surveyDetailsToPopulate.add("");
+			surveyDetailsToPopulate.add(StringUtils.join(survey.getSharedOn(), ","));
+			
+			data.put((++counter).toString(), surveyDetailsToPopulate);
+			surveyDetailsToPopulate = new ArrayList<>();
+			if (internalMax > max)
+				max = internalMax;
+		}
+		
+		surveyDetailsToPopulate.add(CommonConstants.HEADER_AGENT_FIRST_NAME);
+		surveyDetailsToPopulate.add(CommonConstants.HEADER_AGENT_LAST_NAME);
+		surveyDetailsToPopulate.add(CommonConstants.HEADER_CUSTOMER_FIRST_NAME);
+		surveyDetailsToPopulate.add(CommonConstants.HEADER_CUSTOMER_LAST_NAME);
+		surveyDetailsToPopulate.add(CommonConstants.HEADER_SURVEY_SENT_DATE);
+		surveyDetailsToPopulate.add(CommonConstants.HEADER_SURVEY_COMPLETED_DATE);
+		surveyDetailsToPopulate.add(CommonConstants.HEADER_SURVEY_SOURCE);
+		surveyDetailsToPopulate.add(CommonConstants.HEADER_SURVEY_SCORE);
+		for (counter = 1; counter <= max; counter++) {
+			surveyDetailsToPopulate.add(CommonConstants.HEADER_SURVEY_QUESTION + counter);
+		}
+		surveyDetailsToPopulate.add(CommonConstants.HEADER_SURVEY_GATEWAY);
+		surveyDetailsToPopulate.add(CommonConstants.HEADER_CUSTOMER_COMMENTS);
+		surveyDetailsToPopulate.add(CommonConstants.HEADER_AGREED_SHARE);
+		surveyDetailsToPopulate.add(CommonConstants.HEADER_CLICK_THROUGH);
+		
+		data.put("1", surveyDetailsToPopulate);
+
+		// Iterate over data and write to sheet
+		Set<String> keyset = data.keySet();
+		int rownum = 0;
+		for (String key : keyset) {
+			Row row = sheet.createRow(rownum++);
+			List<Object> objArr = data.get(key);
+			int cellnum = 0;
+			for (Object obj : objArr) {
+				Cell cell = row.createCell(cellnum++);
+				if (obj instanceof String)
+					cell.setCellValue((String) obj);
+				else if (obj instanceof Integer)
+					cell.setCellValue((Integer) obj);
+				else if (obj instanceof Double)
+					cell.setCellValue((Double) obj);
+				else if (obj instanceof Date) {
+					cell.setCellStyle(style);
+					cell.setCellValue((Date) obj);
+				}
+			}
+		}
+		return workbook;
+	}
+
 	/*
 	 * Method to create excel file from all the agents' detailed data.
 	 */

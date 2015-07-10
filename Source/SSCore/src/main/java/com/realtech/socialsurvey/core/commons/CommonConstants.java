@@ -576,11 +576,21 @@ public interface CommonConstants
 	public static final String HEADER_REGISTRATION_DATE = "Registation Date";
 	
 	// Constants for Survey Results Report
-	
-	
-	// Constants for Social Monitor Report
 	public static final String HEADER_AGENT_FIRST_NAME = "Agent First Name";
 	public static final String HEADER_AGENT_LAST_NAME = "Agent Last Name";
+	public static final String HEADER_CUSTOMER_FIRST_NAME = "Customer First Name";
+	public static final String HEADER_CUSTOMER_LAST_NAME = "Customer Last Name";
+	public static final String HEADER_SURVEY_SENT_DATE = "Survey Sent";
+	public static final String HEADER_SURVEY_COMPLETED_DATE = "Survey Completed";
+	public static final String HEADER_SURVEY_SOURCE = "Survey Source";
+	public static final String HEADER_SURVEY_SCORE = "Score";
+	public static final String HEADER_SURVEY_QUESTION = "Q";
+	public static final String HEADER_SURVEY_GATEWAY = "Gateway";
+	public static final String HEADER_CUSTOMER_COMMENTS = "Customer Comments";
+	public static final String HEADER_AGREED_SHARE = "Agreed to Share";
+	public static final String HEADER_CLICK_THROUGH = "Click through";
+	
+	// Constants for Social Monitor Report
 	public static final String HEADER_POST_COMMENT = "Post Comment";
 	public static final String HEADER_POST_DATE = "Post Date";
 	public static final String HEADER_POST_SOURCE = "Source";
