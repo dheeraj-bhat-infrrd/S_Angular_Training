@@ -463,19 +463,31 @@ public class DashboardServiceImpl implements DashboardService, InitializingBean 
 			else {
 				surveyDetailsToPopulate.add(MongoSocialPostDaoImpl.KEY_SOURCE_SS);
 			}
+			
 			surveyDetailsToPopulate.add(survey.getScore());
 			for (SurveyResponse response : survey.getSurveyResponse()) {
 				internalMax++;
 				surveyDetailsToPopulate.add(response.getAnswer());
 			}
+			
 			surveyDetailsToPopulate.add(survey.getMood());
 			surveyDetailsToPopulate.add(survey.getReview());
-			if (survey.getSharedOn() != null && !survey.getSharedOn().isEmpty()) {
+			if (survey.getAgreedToShare() != null && !survey.getAgreedToShare().isEmpty()) {
+				String status = survey.getAgreedToShare();
+				if (status.equals("true")) {
+					surveyDetailsToPopulate.add(CommonConstants.STATUS_YES);
+				}
+				else {
+					surveyDetailsToPopulate.add(CommonConstants.STATUS_NO);
+				}
+			}
+			else if (survey.getSharedOn() != null && !survey.getSharedOn().isEmpty()) {
 				surveyDetailsToPopulate.add(CommonConstants.STATUS_YES);
 			}
 			else {
 				surveyDetailsToPopulate.add(CommonConstants.STATUS_NO);
 			}
+			
 			surveyDetailsToPopulate.add(StringUtils.join(survey.getSharedOn(), ","));
 			
 			data.put((++counter).toString(), surveyDetailsToPopulate);

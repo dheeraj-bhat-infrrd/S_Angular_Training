@@ -14,7 +14,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
@@ -24,7 +23,6 @@ import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
-
 import com.google.gson.Gson;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.dao.OrganizationUnitSettingsDao;
@@ -222,14 +220,13 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
      * SURVEY_DETAILS.
      */
     @Override
-    public void updateGatewayQuestionResponseAndScore( long agentId, String customerEmail, String mood, String review,
-        boolean isAbusive )
-    {
-        LOG.info( "Method to update customer review and final score on the basis of rating questions in SURVEY_DETAILS, updateCustomerAnswersInSurvey() started." );
-        surveyDetailsDao.updateGatewayAnswer( agentId, customerEmail, mood, review, isAbusive );
-        surveyDetailsDao.updateFinalScore( agentId, customerEmail );
-        LOG.info( "Method to update customer review and final score on the basis of rating questions in SURVEY_DETAILS, updateCustomerAnswersInSurvey() finished." );
-    }
+	public void updateGatewayQuestionResponseAndScore(long agentId, String customerEmail, String mood, String review, boolean isAbusive,
+			String agreedToShare) {
+		LOG.info("Method to update customer review and final score on the basis of rating questions in SURVEY_DETAILS, updateCustomerAnswersInSurvey() started.");
+		surveyDetailsDao.updateGatewayAnswer(agentId, customerEmail, mood, review, isAbusive, agreedToShare);
+		surveyDetailsDao.updateFinalScore(agentId, customerEmail);
+		LOG.info("Method to update customer review and final score on the basis of rating questions in SURVEY_DETAILS, updateCustomerAnswersInSurvey() finished.");
+	}
 
 
     @Override

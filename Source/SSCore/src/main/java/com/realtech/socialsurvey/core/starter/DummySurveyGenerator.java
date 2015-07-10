@@ -87,7 +87,7 @@ public class DummySurveyGenerator {
 					}
 					// Store final answer and gateway answer.
 					surveyHandler.updateGatewayQuestionResponseAndScore(user.getUserId(), custEmail + count + custEmailDomain, mood,
-							"I am kind of happy but dont go by the rating. It may say anything. ", false);
+							"I am kind of happy but dont go by the rating. It may say anything. ", false, "false");
 				}
 				catch (SolrException | NoRecordsFetchedException | InvalidInputException e) {
 					e.printStackTrace();

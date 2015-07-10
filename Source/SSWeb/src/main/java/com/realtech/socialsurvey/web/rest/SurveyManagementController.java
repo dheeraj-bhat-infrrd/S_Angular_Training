@@ -144,6 +144,7 @@ public class SurveyManagementController {
 			String feedback = request.getParameter("feedback");
 			String mood = request.getParameter("mood");
 			String customerEmail = request.getParameter("customerEmail");
+			String agreedToShare = request.getParameter("agreedToShare");
 
 			long agentId = 0;
 			try {
@@ -159,7 +160,7 @@ public class SurveyManagementController {
 			}
 
 			boolean isAbusive = Boolean.parseBoolean(request.getParameter("isAbusive"));
-			surveyHandler.updateGatewayQuestionResponseAndScore(agentId, customerEmail, mood, feedback, isAbusive);
+			surveyHandler.updateGatewayQuestionResponseAndScore(agentId, customerEmail, mood, feedback, isAbusive, agreedToShare);
 			surveyHandler.increaseSurveyCountForAgent(agentId);
 			SurveyPreInitiation surveyPreInitiation = surveyHandler.getPreInitiatedSurvey(agentId, customerEmail);
 			surveyHandler.deleteSurveyPreInitiationDetailsPermanently(surveyPreInitiation);
