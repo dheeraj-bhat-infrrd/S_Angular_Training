@@ -48,6 +48,7 @@ import com.realtech.socialsurvey.core.services.surveybuilder.SurveyHandler;
 public class DashboardServiceImpl implements DashboardService, InitializingBean {
 
 	private static final Logger LOG = LoggerFactory.getLogger(DashboardServiceImpl.class);
+	private static final SimpleDateFormat DATE_FORMATTER = new SimpleDateFormat("MM/dd/yyyy");
 	private static Map<String, Integer> weightageColumns;
 
 	@Autowired
@@ -363,62 +364,67 @@ public class DashboardServiceImpl implements DashboardService, InitializingBean 
 	/*
 	 * Method to create excel file for Social posts.
 	 */
-    @Override
-    public XSSFWorkbook downloadSocialMonitorData( List<SurveyDetails> surveyDetails, String fileName )
-    {
-     // Blank workbook
-        XSSFWorkbook workbook = new XSSFWorkbook();
+	@Override
+	public XSSFWorkbook downloadSocialMonitorData(List<SurveyDetails> surveyDetails, String fileName) {
+		// Blank workbook
+		XSSFWorkbook workbook = new XSSFWorkbook();
 
-        // Create a blank sheet
-        XSSFSheet sheet = workbook.createSheet();
-        XSSFDataFormat df = workbook.createDataFormat();
-        CellStyle style = workbook.createCellStyle();
-        style.setDataFormat(df.getFormat("d-mm-yyyy"));
-        Integer counter = 1;
-        // This data needs to be written (List<Object>)
-        Map<String, List<Object>> data = new TreeMap<>();
-        List<Object> surveyDetailsToPopulate = new ArrayList<>();
-        for (SurveyDetails survey : surveyDetails) {
-            if (survey.getSharedOn() != null && !survey.getSharedOn().isEmpty()){
-                surveyDetailsToPopulate.add(survey.getReview());
-                surveyDetailsToPopulate.add(survey.getModifiedOn());
-                surveyDetailsToPopulate.add(StringUtils.join(survey.getSharedOn(), ","));
-                surveyDetailsToPopulate.add(survey.getCustomerFirstName());
-                surveyDetailsToPopulate.add(survey.getCustomerLastName());
-                data.put((++counter).toString(), surveyDetailsToPopulate);
-                surveyDetailsToPopulate = new ArrayList<>();
-        }
-        }
-        surveyDetailsToPopulate.add("Post");
-        surveyDetailsToPopulate.add("Post Date");
-        surveyDetailsToPopulate.add("Media");
-        surveyDetailsToPopulate.add("User First");
-        surveyDetailsToPopulate.add("User Last");
-        data.put("1", surveyDetailsToPopulate);
+		// Create a blank sheet
+		XSSFSheet sheet = workbook.createSheet();
+		XSSFDataFormat df = workbook.createDataFormat();
+		CellStyle style = workbook.createCellStyle();
+		style.setDataFormat(df.getFormat("d-mm-yyyy"));
+		Integer counter = 1;
+		
+		// This data needs to be written (List<Object>)
+		Map<String, List<Object>> data = new TreeMap<>();
+		List<Object> surveyDetailsToPopulate = new ArrayList<>();
+		for (SurveyDetails survey : surveyDetails) {
+			if (survey.getSharedOn() != null && !survey.getSharedOn().isEmpty()) {
+				surveyDetailsToPopulate.add(survey.getReview());
+				surveyDetailsToPopulate.add(DATE_FORMATTER.format(survey.getModifiedOn()));
+				surveyDetailsToPopulate.add(StringUtils.join(survey.getSharedOn(), ","));
+				
+				String agentName = survey.getAgentName();
+				surveyDetailsToPopulate.add(agentName.substring(0, agentName.lastIndexOf(' ')));
+				surveyDetailsToPopulate.add(agentName.substring(agentName.lastIndexOf(' ') + 1));
+				
+				data.put((++counter).toString(), surveyDetailsToPopulate);
+				surveyDetailsToPopulate = new ArrayList<>();
+			}
+		}
+		
+		surveyDetailsToPopulate.add(CommonConstants.HEADER_POST_COMMENT);
+		surveyDetailsToPopulate.add(CommonConstants.HEADER_POST_DATE);
+		surveyDetailsToPopulate.add(CommonConstants.HEADER_POST_SOURCE);
+		surveyDetailsToPopulate.add(CommonConstants.HEADER_AGENT_FIRST_NAME);
+		surveyDetailsToPopulate.add(CommonConstants.HEADER_AGENT_LAST_NAME);
+		
+		data.put("1", surveyDetailsToPopulate);
 
-        // Iterate over data and write to sheet
-        Set<String> keyset = data.keySet();
-        int rownum = 0;
-        for (String key : keyset) {
-            Row row = sheet.createRow(rownum++);
-            List<Object> objArr = data.get(key);
-            int cellnum = 0;
-            for (Object obj : objArr) {
-                Cell cell = row.createCell(cellnum++);
-                if (obj instanceof String)
-                    cell.setCellValue((String) obj);
-                else if (obj instanceof Integer)
-                    cell.setCellValue((Integer) obj);
-                else if (obj instanceof Double)
-                    cell.setCellValue((Double) obj);
-                else if (obj instanceof Date){
-                    cell.setCellStyle(style);
-                    cell.setCellValue((Date) obj);
-                }
-            }
-        }
-        return workbook;
-    }
+		// Iterate over data and write to sheet
+		Set<String> keyset = data.keySet();
+		int rownum = 0;
+		for (String key : keyset) {
+			Row row = sheet.createRow(rownum++);
+			List<Object> objArr = data.get(key);
+			int cellnum = 0;
+			for (Object obj : objArr) {
+				Cell cell = row.createCell(cellnum++);
+				if (obj instanceof String)
+					cell.setCellValue((String) obj);
+				else if (obj instanceof Integer)
+					cell.setCellValue((Integer) obj);
+				else if (obj instanceof Double)
+					cell.setCellValue((Double) obj);
+				else if (obj instanceof Date) {
+					cell.setCellStyle(style);
+					cell.setCellValue((Date) obj);
+				}
+			}
+		}
+		return workbook;
+	}
     
     /*
      * Method to create excel file from all the completed survey data.
@@ -524,7 +530,7 @@ public class DashboardServiceImpl implements DashboardService, InitializingBean 
 			
 			Calendar calendar = Calendar.getInstance();
 			calendar.setTimeInMillis(agentDetail.getRegistrationDate());
-			surveyDetailsToPopulate.add(new SimpleDateFormat("MM/dd/yyyy").format(calendar.getTime()));
+			surveyDetailsToPopulate.add(DATE_FORMATTER.format(calendar.getTime()));
 			
 			data.put((++counter).toString(), surveyDetailsToPopulate);
 			surveyDetailsToPopulate = new ArrayList<>();

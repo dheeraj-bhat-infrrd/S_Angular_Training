@@ -1284,118 +1284,106 @@ public class DashboardController {
         LOG.info("Method getCustomerSurveyResultsFile() finished.");
     }
 	
-	 /*
-     * Method to download file containing incomplete surveys
-     */
-    @RequestMapping(value = "/downloaddashboardsocialmonitor")
-    public void getSocialMonitorFile(Model model,
-            HttpServletRequest request, HttpServletResponse response) {
-        LOG.info("Method to get file containg Social Monitors list getSocialMonitorFile() started.");
-        List<SurveyDetails> surveyDetails = new ArrayList<>();
-        try {
-            String columnName = request.getParameter("columnName");
-            if (columnName == null || columnName.isEmpty()) {
-                LOG.error("Invalid value (null/empty) passed for profile level.");
-                throw new InvalidInputException(
-                        "Invalid value (null/empty) passed for profile level.");
-            }
+	/*
+	 * Method to download file containing incomplete surveys
+	 */
+	@RequestMapping(value = "/downloaddashboardsocialmonitor")
+	public void getSocialMonitorFile(Model model, HttpServletRequest request, HttpServletResponse response) {
+		LOG.info("Method to get file containg Social Monitors list getSocialMonitorFile() started.");
+		List<SurveyDetails> surveyDetails = new ArrayList<>();
+		try {
+			String columnName = request.getParameter("columnName");
+			if (columnName == null || columnName.isEmpty()) {
+				LOG.error("Invalid value (null/empty) passed for profile level.");
+				throw new InvalidInputException("Invalid value (null/empty) passed for profile level.");
+			}
 
-            String startDateStr = request.getParameter("startDate");
-            String endDateStr = request.getParameter("endDate");
+			Date startDate = null;
+			String startDateStr = request.getParameter("startDate");
+			if (startDateStr != null) {
+				try {
+					startDate = new SimpleDateFormat(CommonConstants.DATE_FORMAT).parse(startDateStr);
+				}
+				catch (ParseException e) {
+					LOG.error("ParseException caught in getSocialMonitorFile() while parsing startDate. Nested exception is ", e);
+				}
+			}
+			
+			String endDateStr = request.getParameter("endDate");
+			Date endDate = Calendar.getInstance().getTime();
+			if (endDateStr != null) {
+				try {
+					endDate = new SimpleDateFormat(CommonConstants.DATE_FORMAT).parse(endDateStr);
+				}
+				catch (ParseException e) {
+					LOG.error("ParseException caught in getSocialMonitorFile() while parsing startDate. Nested exception is ", e);
+				}
+			}
 
-            Date startDate = null;
-            Date endDate = Calendar.getInstance().getTime();
-            if (startDateStr != null) {
-                try {
-                    startDate = new SimpleDateFormat(
-                            CommonConstants.DATE_FORMAT).parse(startDateStr);
-                } catch (ParseException e) {
-                    LOG.error(
-                            "ParseException caught in getSocialMonitorFile() while parsing startDate. Nested exception is ",
-                            e);
-                }
-            }
-            if (endDateStr != null) {
-                try {
-                    endDate = new SimpleDateFormat(CommonConstants.DATE_FORMAT)
-                            .parse(endDateStr);
-                } catch (ParseException e) {
-                    LOG.error(
-                            "ParseException caught in getSocialMonitorFile() while parsing startDate. Nested exception is ",
-                            e);
-                }
-            }
+			String profileLevel = getProfileLevel(columnName);
+			long iden = 0;
 
-            String profileLevel = getProfileLevel(columnName);
-            long iden = 0;
-
-            User user = sessionHelper.getCurrentUser();
-            if (profileLevel.equals(CommonConstants.PROFILE_LEVEL_COMPANY)) {
-                iden = user.getCompany().getCompanyId();
-            } else if (profileLevel
-                    .equals(CommonConstants.PROFILE_LEVEL_INDIVIDUAL)) {
-                iden = user.getUserId();
-            } else {
-                String columnValue = request.getParameter("columnValue");
-                if (columnValue != null && !columnValue.isEmpty()) {
-                    try {
-                        iden = Long.parseLong(columnValue);
-                    } catch (NumberFormatException e) {
-                        LOG.error(
-                                "NumberFormatExcept;ion caught while parsing columnValue in getSocialMonitorFile(). Nested exception is ",
-                                e);
-                        throw e;
-                    }
-                }
-            }
-            try {
-                surveyDetails = profileManagementService.getReviews( iden, -1, -1, -1, -1, profileLevel, true, startDate, endDate, null );
-                String fileName = "Social_Monitor_" + profileLevel + "_"
-                        + iden + ".xlsx";
-                XSSFWorkbook workbook = dashboardService
-                        .downloadSocialMonitorData(surveyDetails, fileName);
-                response.setContentType(EXCEL_FORMAT);
-                String headerKey = CONTENT_DISPOSITION_HEADER;
-                String headerValue = String.format(
-                        "attachment; filename=\"%s\"",
-                        new File(fileName).getName());
-                response.setHeader(headerKey, headerValue);
-                // write into file
-                OutputStream responseStream = null;
-                try {
-                    responseStream = response.getOutputStream();
-                    workbook.write(responseStream);
-                } catch (IOException e) {
-                    LOG.error(
-                            "IOException caught in getSocialMonitorFile(). Nested exception is ",
-                            e);
-                } finally {
-                    try {
-                        responseStream.close();
-                    } catch (IOException e) {
-                        LOG.error(
-                                "IOException caught in getSocialMonitorFile(). Nested exception is ",
-                                e);
-                    }
-                }
-                response.flushBuffer();
-            } catch (InvalidInputException e) {
-                LOG.error(
-                        "InvalidInputException caught in getSocialMonitorFile(). Nested exception is ",
-                        e);
-                throw e;
-            } catch (IOException e) {
-                LOG.error(
-                        "IOException caught in getSocialMonitorFile(). Nested exception is ",
-                        e);
-            }
-        } catch (NonFatalException e) {
-            LOG.error(
-                    "Non fatal exception caught in getSocialMonitorFile(). Nested exception is ",
-                    e);
-        }
-        LOG.info("Method getSocialMonitorFile() finished.");
-    }
+			User user = sessionHelper.getCurrentUser();
+			if (profileLevel.equals(CommonConstants.PROFILE_LEVEL_COMPANY)) {
+				iden = user.getCompany().getCompanyId();
+			}
+			else if (profileLevel.equals(CommonConstants.PROFILE_LEVEL_INDIVIDUAL)) {
+				iden = user.getUserId();
+			}
+			else {
+				String columnValue = request.getParameter("columnValue");
+				if (columnValue != null && !columnValue.isEmpty()) {
+					try {
+						iden = Long.parseLong(columnValue);
+					}
+					catch (NumberFormatException e) {
+						LOG.error("NumberFormatExcept;ion caught while parsing columnValue in getSocialMonitorFile(). Nested exception is ", e);
+						throw e;
+					}
+				}
+			}
+			
+			try {
+				surveyDetails = profileManagementService.getReviews(iden, -1, -1, -1, -1, profileLevel, true, startDate, endDate, null);
+				String fileName = "Social_Monitor_" + profileLevel + "_" + iden + ".xlsx";
+				XSSFWorkbook workbook = dashboardService.downloadSocialMonitorData(surveyDetails, fileName);
+				response.setContentType(EXCEL_FORMAT);
+				String headerKey = CONTENT_DISPOSITION_HEADER;
+				String headerValue = String.format("attachment; filename=\"%s\"", new File(fileName).getName());
+				response.setHeader(headerKey, headerValue);
+				
+				// write into file
+				OutputStream responseStream = null;
+				try {
+					responseStream = response.getOutputStream();
+					workbook.write(responseStream);
+				}
+				catch (IOException e) {
+					LOG.error("IOException caught in getSocialMonitorFile(). Nested exception is ", e);
+				}
+				finally {
+					try {
+						responseStream.close();
+					}
+					catch (IOException e) {
+						LOG.error("IOException caught in getSocialMonitorFile(). Nested exception is ", e);
+					}
+				}
+				response.flushBuffer();
+			}
+			catch (InvalidInputException e) {
+				LOG.error("InvalidInputException caught in getSocialMonitorFile(). Nested exception is ", e);
+				throw e;
+			}
+			catch (IOException e) {
+				LOG.error("IOException caught in getSocialMonitorFile(). Nested exception is ", e);
+			}
+		}
+		catch (NonFatalException e) {
+			LOG.error("Non fatal exception caught in getSocialMonitorFile(). Nested exception is ", e);
+		}
+		LOG.info("Method getSocialMonitorFile() finished.");
+	}
 
 	/*
 	 * Method to download file containing incomplete surveys
