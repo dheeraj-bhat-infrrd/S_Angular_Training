@@ -994,11 +994,12 @@ public class EmailServicesImpl implements EmailServices
         FileContentReplacements messageBodyReplacements = new FileContentReplacements();
         messageBodyReplacements.setFileName( EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER
             + EmailTemplateConstants.SURVEY_REMINDER_MAIL_BODY );
-        String currentYear = String.valueOf(Calendar.getInstance().get(Calendar.YEAR));
-		DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd");
-		String fullAddress = "";
+        String currentYear = String.valueOf( Calendar.getInstance().get( Calendar.YEAR ) );
+        DateFormat dateFormat = new SimpleDateFormat( "yyyy/MM/dd" );
+        String fullAddress = "";
         messageBodyReplacements.setReplacementArgs( Arrays.asList( appLogoUrl, displayName, link, link, agentName,
-            agentSignature, appBaseUrl ,appBaseUrl , recipientMailId , companyName ,  dateFormat.format(new Date()),"" ,companyName , currentYear , fullAddress) );
+            agentSignature, appBaseUrl, appBaseUrl, recipientMailId, companyName, dateFormat.format( new Date() ), "",
+            companyName, currentYear, fullAddress ) );
 
         LOG.debug( "Calling email sender to send mail" );
         emailSender.sendEmailWithSubjectAndBodyReplacements( emailEntity, subjectReplacements, messageBodyReplacements );
@@ -1583,8 +1584,7 @@ public class EmailServicesImpl implements EmailServices
 
     @Override
     public void sendCorruptDataFromCrmNotificationMail( String firstName, String lastName, String recipientMailId,
-        String unavailableAgentsDetails, String customersWithoutFirstNameDetails, String customersWithoutEmailIdDetails )
-        throws InvalidInputException, UndeliveredEmailException
+        String attachmentLocation ) throws InvalidInputException, UndeliveredEmailException
     {
         LOG.info( "Method sendCorruptDataFromCrmNotificationMail() started." );
         if ( recipientMailId == null || recipientMailId.isEmpty() ) {
@@ -1594,6 +1594,7 @@ public class EmailServicesImpl implements EmailServices
         }
 
         EmailEntity emailEntity = prepareEmailEntityForSendingEmail( recipientMailId );
+        emailEntity.setAttachmentLocation( attachmentLocation );
         String subjectFileName = EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER
             + EmailTemplateConstants.CORRUPT_PREINITIATION_RECORD_MAIL_SUBJECT;
         String displayName = firstName + " " + lastName;
@@ -1601,8 +1602,7 @@ public class EmailServicesImpl implements EmailServices
         FileContentReplacements messageBodyReplacements = new FileContentReplacements();
         messageBodyReplacements.setFileName( EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER
             + EmailTemplateConstants.CORRUPT_PREINITIATION_RECORD_MAIL_BODY );
-        messageBodyReplacements.setReplacementArgs( Arrays.asList( appLogoUrl, displayName, unavailableAgentsDetails,
-            customersWithoutFirstNameDetails, customersWithoutEmailIdDetails, appBaseUrl ) );
+        messageBodyReplacements.setReplacementArgs( Arrays.asList( appLogoUrl, displayName, appBaseUrl ) );
 
         LOG.debug( "Calling email sender to send mail" );
         emailSender.sendEmailWithBodyReplacements( emailEntity, subjectFileName, messageBodyReplacements );
