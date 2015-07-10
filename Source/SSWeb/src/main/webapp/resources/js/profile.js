@@ -72,6 +72,20 @@ function paintProfilePage(result) {
 		// paint public  posts
 		paintPublicPosts();
 		
+		var breadCrumUrl = '/rest/breadcrumb/';
+		
+		if (profileLevel == 'INDIVIDUAL') {
+			breadCrumUrl += 'individual/' + profileJson.profileName;
+		} else if (profileLevel == 'BRANCH') {
+			breadCrumUrl += companyProfileName + '/branch/' + profileJson.profileName;
+		} else if (profileLevel == 'REGION') {
+			breadCrumUrl += companyProfileName+'/region/' + profileJson.profileName;
+		}
+		
+		if(profileLevel != 'COMPANY'){
+			paintBreadCrums(breadCrumUrl);			
+		}
+		
 		if (contactDetails != undefined) {
             var addressHtml = "";
             
@@ -197,6 +211,29 @@ function paintProfilePage(result) {
         });
 	}
 }
+
+
+
+function paintBreadCrums(url) {
+	
+	callAjaxGETWithTextData(url, function(data) {
+		var jsonData = $.parseJSON(data);
+		if(jsonData.entity) {
+			var entityJson = $.parseJSON(jsonData.entity);
+			console.log(JSON.stringify(entityJson));
+			
+			var htmlContent = '<span class="brd-crm">'+ entityJson[0].breadCrumbProfile +'</span>';
+			
+			for(var i=1; i<entityJson.length; i++) {
+				htmlContent += '<span class="brd-crm-divider">&gt;&gt;</span>';
+				htmlContent += '<a target="_blank" class="brd-crm brd-crm-link" href="'+entityJson[i].breadCrumbUrl + '">'+entityJson[i].breadCrumbProfile+'</a>';
+			}
+			
+			$('#bread-crum-cont').html(htmlContent);
+		}
+	}, true, {});
+}
+
 
 function returnValidWebAddress(url) {
 	if (url && !url.match(/^http([s]?):\/\/.*/)) {
