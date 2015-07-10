@@ -7175,7 +7175,7 @@ function paintPosts(posts) {
 		divToPopulate += '<div class="tweet-panel-item bord-bot-dc clearfix">'
 				+ '<div class="tweet-icn ' + iconClass + ' float-left"></div>'
 				+ '<div class="tweet-txt float-left">'
-				+ '<div class="tweet-text-main">' + post.postText + '</div>'
+				+ '<div class="tweet-text-main">' + linkify(post.postText) + '</div>'
 				+ '<div class="tweet-text-link"><em>' + post.postedBy
 				+ '</em></div>' + '<div class="tweet-text-time"><em>'
 				+ convertUserDateToLocalWeekFormt(new Date(post.timeInMillis)) + '</em></div>'
