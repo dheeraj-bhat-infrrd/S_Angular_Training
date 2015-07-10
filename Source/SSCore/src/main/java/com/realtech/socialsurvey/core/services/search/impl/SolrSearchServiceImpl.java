@@ -1055,6 +1055,9 @@ public class SolrSearchServiceImpl implements SolrSearchService {
 			} else {
 				query.setQuery("*:*");
 			}
+			
+            if ( !searchColumn.equalsIgnoreCase( CommonConstants.USER_DISPLAY_NAME_SOLR ) )
+                query.addFilterQuery( CommonConstants.IS_DEFAULT_BY_SYSTEM_SOLR + ":" + CommonConstants.IS_DEFAULT_BY_SYSTEM_NO );
 
 			query.addFilterQuery(searchColumn + ":" + searchKey);
 			query.addFilterQuery(CommonConstants.STATUS_SOLR + ":" + CommonConstants.STATUS_ACTIVE);
