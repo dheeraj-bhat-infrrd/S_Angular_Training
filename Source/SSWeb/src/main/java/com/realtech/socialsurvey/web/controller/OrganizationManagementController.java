@@ -4,11 +4,9 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,7 +18,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
-
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import com.amazonaws.util.json.JSONException;
 import com.amazonaws.util.json.JSONObject;
 import com.google.gson.Gson;
@@ -110,6 +108,8 @@ public class OrganizationManagementController
     @Value ( "${CDN_PATH}")
     private String endpoint;
 
+	@Value("${APPLICATION_LOGO_URL}")
+	private String applicationLogoUrl;
 
     /**
      * Method to upload logo image for a company
@@ -521,7 +521,8 @@ public class OrganizationManagementController
 
             // Encrypting the password
             String plainPassword = request.getParameter( "encompass-password" );
-            String cipherPassword = encryptionHelper.encryptAES( plainPassword, "" );
+            String cipherPassword = plainPassword;
+            /*String cipherPassword = encryptionHelper.encryptAES( plainPassword, "" );*/
 
             EncompassCrmInfo encompassCrmInfo = new EncompassCrmInfo();
             encompassCrmInfo.setCrm_source( CommonConstants.CRM_INFO_SOURCE_ENCOMPASS );
@@ -531,6 +532,7 @@ public class OrganizationManagementController
             encompassCrmInfo.setConnection_successful( true );
             OrganizationUnitSettings companySettings = ( (UserSettings) session
                 .getAttribute( CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION ) ).getCompanySettings();
+            encompassCrmInfo.setCompanyId( companySettings.getIden() );
             organizationManagementService.updateCRMDetails( companySettings, encompassCrmInfo,
                 "com.realtech.socialsurvey.core.entities.EncompassCrmInfo" );
 
@@ -607,71 +609,147 @@ public class OrganizationManagementController
      * @param request
      * @return
      */
-    @RequestMapping ( value = "/savesurveyparticipationmail", method = RequestMethod.POST)
     @ResponseBody
-    public String setSurveyParticipationMailBody( Model model, HttpServletRequest request )
-    {
-        LOG.info( "Saving survey participation mail body" );
-        HttpSession session = request.getSession( false );
-        String mailCategory = request.getParameter( "mailcategory" );
-        String mailSubject = null;
-        String mailBody = null;
-        String message = "";
+    @RequestMapping ( value = "/savesurveyparticipationmail", method = RequestMethod.POST)
+	public String updateSurveyParticipationMailBody(Model model, HttpServletRequest request) {
+		LOG.info("Saving survey participation mail body");
+		HttpSession session = request.getSession(false);
+		String mailCategory = request.getParameter("mailcategory");
+		String mailSubject = null;
+		String mailBody = null;
+		String message = "";
 
-        try {
-            OrganizationUnitSettings companySettings = ( (UserSettings) session
-                .getAttribute( CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION ) ).getCompanySettings();
-            MailContentSettings updatedMailContentSettings = null;
-            if ( mailCategory != null && mailCategory.equals( "participationmail" ) ) {
-                mailSubject = request.getParameter( "survey-mailcontent-subject" );
+		try {
+			OrganizationUnitSettings companySettings = ((UserSettings) session.getAttribute(CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION))
+					.getCompanySettings();
+			MailContentSettings updatedMailContentSettings = null;
+			if (mailCategory != null && mailCategory.equals("participationmail")) {
 
+				mailSubject = request.getParameter("survey-mailcontent-subject");
+				if (mailSubject == null || mailSubject.isEmpty()) {
+					LOG.warn("Survey participation mail subject is blank.");
+					throw new InvalidInputException("Survey participation mail subject is blank.", DisplayMessageConstants.GENERAL_ERROR);
+				}
 
-                mailBody = request.getParameter( "survey-participation-mailcontent" );
-                if ( ( mailBody == null || mailBody.isEmpty() ) && ( mailSubject == null || mailSubject.isEmpty() ) ) {
-                    LOG.warn( "Survey participation mail body and subject is blank." );
-                    throw new InvalidInputException( "Survey participation mail body and subject is blank.",
-                        DisplayMessageConstants.GENERAL_ERROR );
-                }
+				mailBody = request.getParameter("survey-participation-mailcontent");
+				if (mailBody == null || mailBody.isEmpty()) {
+					LOG.warn("Survey participation mail body is blank.");
+					throw new InvalidInputException("Survey participation mail body is blank.", DisplayMessageConstants.GENERAL_ERROR);
+				}
 
-                updatedMailContentSettings = organizationManagementService.updateSurveyParticipationMailBody( companySettings,
-                    mailSubject, mailBody, CommonConstants.SURVEY_MAIL_BODY_CATEGORY );
+				updatedMailContentSettings = organizationManagementService.updateSurveyParticipationMailBody(companySettings, mailSubject, mailBody,
+						CommonConstants.SURVEY_MAIL_BODY_CATEGORY);
 
-                // set the value back in session
-                session.setAttribute( CommonConstants.SURVEY_PARTICIPATION_MAIL_BODY_IN_SESSION, mailBody );
-                message = messageUtils
-                    .getDisplayMessage( DisplayMessageConstants.SURVEY_PARTICIPATION_MAILBODY_UPDATE_SUCCESSFUL,
-                        DisplayMessageType.SUCCESS_MESSAGE ).getMessage();
-            }
+				// set the value back in session
+				session.setAttribute(CommonConstants.SURVEY_PARTICIPATION_MAIL_SUBJECT_IN_SESSION, mailSubject);
+				session.setAttribute(CommonConstants.SURVEY_PARTICIPATION_MAIL_BODY_IN_SESSION, mailBody);
+				
+				message = messageUtils.getDisplayMessage(DisplayMessageConstants.SURVEY_PARTICIPATION_MAILBODY_UPDATE_SUCCESSFUL,
+						DisplayMessageType.SUCCESS_MESSAGE).getMessage();
+			}
 
-            else if ( mailCategory != null && mailCategory.equals( "participationremindermail" ) ) {
-                mailSubject = request.getParameter( "survey-mailreminder-subject" );
-                mailBody = request.getParameter( "survey-participation-reminder-mailcontent" );
-                if ( ( mailBody == null || mailBody.isEmpty() ) && ( mailSubject == null || mailSubject.isEmpty() ) ) {
-                    LOG.warn( "Survey participation reminder mail body and subject is blank." );
-                    throw new InvalidInputException( "Survey participation reminder mail body and subject is blank.",
-                        DisplayMessageConstants.GENERAL_ERROR );
-                }
+			else if (mailCategory != null && mailCategory.equals("participationremindermail")) {
 
-                updatedMailContentSettings = organizationManagementService.updateSurveyParticipationMailBody( companySettings,
-                    mailSubject, mailBody, CommonConstants.SURVEY_REMINDER_MAIL_BODY_CATEGORY );
+				mailSubject = request.getParameter("survey-mailreminder-subject");
+				if (mailSubject == null || mailSubject.isEmpty()) {
+					LOG.warn("Survey participation reminder mail subject is blank.");
+					throw new InvalidInputException("Survey participation reminder mail subject is blank.", DisplayMessageConstants.GENERAL_ERROR);
+				}
 
-                // set the value back in session
-                session.setAttribute( CommonConstants.SURVEY_PARTICIPATION_REMINDER_MAIL_BODY_IN_SESSION, mailBody );
-                message = messageUtils.getDisplayMessage(
-                    DisplayMessageConstants.SURVEY_PARTICIPATION_REMINDERMAILBODY_UPDATE_SUCCESSFUL,
-                    DisplayMessageType.SUCCESS_MESSAGE ).getMessage();
-            }
+				mailBody = request.getParameter("survey-participation-reminder-mailcontent");
+				if (mailBody == null || mailBody.isEmpty()) {
+					LOG.warn("Survey participation reminder mail body is blank.");
+					throw new InvalidInputException("Survey participation reminder mail body is blank.", DisplayMessageConstants.GENERAL_ERROR);
+				}
 
-            // update the mail content settings in session
-            companySettings.setMail_content( updatedMailContentSettings );
-        } catch ( NonFatalException e ) {
-            LOG.error( "NonFatalException while saving survey participation mail body. Reason : " + e.getMessage(), e );
-            message = messageUtils.getDisplayMessage( e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE ).getMessage();
-        }
+				updatedMailContentSettings = organizationManagementService.updateSurveyParticipationMailBody(companySettings, mailSubject, mailBody,
+						CommonConstants.SURVEY_REMINDER_MAIL_BODY_CATEGORY);
 
-        return message;
-    }
+				// set the value back in session
+				session.setAttribute(CommonConstants.SURVEY_PARTICIPATION_REMINDER_MAIL_SUBJECT_IN_SESSION, mailSubject);
+				session.setAttribute(CommonConstants.SURVEY_PARTICIPATION_REMINDER_MAIL_BODY_IN_SESSION, mailBody);
+				
+				message = messageUtils.getDisplayMessage(DisplayMessageConstants.SURVEY_PARTICIPATION_REMINDERMAILBODY_UPDATE_SUCCESSFUL,
+						DisplayMessageType.SUCCESS_MESSAGE).getMessage();
+			}
 
+			// update the mail content settings in session
+			companySettings.setMail_content(updatedMailContentSettings);
+		}
+		catch (NonFatalException e) {
+			LOG.error("NonFatalException while saving survey participation mail body. Reason : " + e.getMessage(), e);
+			message = messageUtils.getDisplayMessage(e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE).getMessage();
+		}
+
+		return message;
+	}
+    
+    /**
+     * Method to save survey Mailbody content
+     * 
+     * @param model
+     * @param request
+     * @return
+     */
+    @ResponseBody
+	@RequestMapping(value = "/revertsurveyparticipationmail", method = RequestMethod.POST)
+	public String revertSurveyParticipationMailBody(Model model, HttpServletRequest request) {
+		LOG.info("Reverting survey participation mail body");
+		HttpSession session = request.getSession(false);
+		String mailCategory = request.getParameter("mailcategory");
+		String mailSubject = null;
+		String mailBody = null;
+		String message = "";
+
+		try {
+			UserSettings userSettings = (UserSettings) session.getAttribute(CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION);
+
+			OrganizationUnitSettings companySettings = userSettings.getCompanySettings();
+			MailContentSettings updatedMailContentSettings = null;
+			if (mailCategory != null && mailCategory.equals("participationmail")) {
+				updatedMailContentSettings = organizationManagementService.revertSurveyParticipationMailBody(companySettings,
+						CommonConstants.SURVEY_MAIL_BODY_CATEGORY);
+
+				mailBody = updatedMailContentSettings.getTake_survey_mail().getMail_body();
+				mailBody = emailFormatHelper.replaceEmailBodyWithParams(mailBody,
+						organizationManagementService.getSurveyParamOrder(CommonConstants.SURVEY_MAIL_BODY_CATEGORY));
+				mailBody = mailBody.replaceAll("\\[LogoUrl\\]", applicationLogoUrl);
+
+				mailSubject = updatedMailContentSettings.getTake_survey_mail().getMail_subject();
+				message = messageUtils.getDisplayMessage(DisplayMessageConstants.SURVEY_PARTICIPATION_MAILBODY_UPDATE_SUCCESSFUL,
+						DisplayMessageType.SUCCESS_MESSAGE).getMessage();
+
+				session.setAttribute(CommonConstants.SURVEY_PARTICIPATION_MAIL_BODY_IN_SESSION, mailBody);
+				session.setAttribute(CommonConstants.SURVEY_PARTICIPATION_MAIL_SUBJECT_IN_SESSION, mailSubject);
+			}
+
+			else if (mailCategory != null && mailCategory.equals("participationremindermail")) {
+				updatedMailContentSettings = organizationManagementService.revertSurveyParticipationMailBody(companySettings,
+						CommonConstants.SURVEY_REMINDER_MAIL_BODY_CATEGORY);
+
+				mailBody = updatedMailContentSettings.getTake_survey_reminder_mail().getMail_body();
+				mailBody = emailFormatHelper.replaceEmailBodyWithParams(mailBody,
+						organizationManagementService.getSurveyParamOrder(CommonConstants.SURVEY_REMINDER_MAIL_BODY_CATEGORY));
+				mailBody = mailBody.replaceAll("\\[LogoUrl\\]", applicationLogoUrl);
+
+				mailSubject = updatedMailContentSettings.getTake_survey_reminder_mail().getMail_subject();
+				message = messageUtils.getDisplayMessage(DisplayMessageConstants.SURVEY_PARTICIPATION_REMINDERMAILBODY_UPDATE_SUCCESSFUL,
+						DisplayMessageType.SUCCESS_MESSAGE).getMessage();
+
+				session.setAttribute(CommonConstants.SURVEY_PARTICIPATION_REMINDER_MAIL_BODY_IN_SESSION, mailBody);
+				session.setAttribute(CommonConstants.SURVEY_PARTICIPATION_REMINDER_MAIL_SUBJECT_IN_SESSION, mailSubject);
+			}
+
+			// update the mail content settings in session
+			companySettings.setMail_content(updatedMailContentSettings);
+		}
+		catch (NonFatalException e) {
+			LOG.error("NonFatalException while reverting survey participation mail body. Reason : " + e.getMessage(), e);
+			message = messageUtils.getDisplayMessage(e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE).getMessage();
+		}
+
+		return message;
+	}
 
     /**
      * Method to update Survey Settings
@@ -1112,106 +1190,103 @@ public class OrganizationManagementController
     }
 
 
-    /**
-     * This controller is called to initialize the default branches and regions in case they arent
-     * done after payment.
-     * 
-     * @param request
-     * @param model
-     * @return
-     */
-    @RequestMapping ( value = "/defaultbrandandregioncreation", method = RequestMethod.GET)
-    public String createDefaultBranchesAndRegions( HttpServletRequest request, Model model )
-    {
-        LOG.info( "createDefaultBranchesAndRegions called to do pre processing before log in" );
-        User user = sessionHelper.getCurrentUser();
+	/**
+	 * This controller is called to initialize the default branches and regions in case they arent
+	 * done after payment.
+	 * 
+	 * @param request
+	 * @param model
+	 * @return
+	 */
+	@RequestMapping(value = "/defaultbrandandregioncreation", method = RequestMethod.GET)
+	public String createDefaultBranchesAndRegions(HttpServletRequest request, RedirectAttributes redirectAttributes, Model model) {
+		LOG.info("createDefaultBranchesAndRegions called to do pre processing before log in");
+		User user = sessionHelper.getCurrentUser();
 
-        try {
-            LicenseDetail currentLicenseDetail = user.getCompany().getLicenseDetails().get( CommonConstants.INITIAL_INDEX );
-            HttpSession session = request.getSession( false );
-            AccountType accountType = null;
+		try {
+			LicenseDetail currentLicenseDetail = user.getCompany().getLicenseDetails().get(CommonConstants.INITIAL_INDEX);
+			HttpSession session = request.getSession(false);
+			AccountType accountType = null;
 
-            if ( currentLicenseDetail == null ) {
-                LOG.error( "createDefaultBranchesAndRegions : License details not found for user with id : " + user.getUserId() );
-                throw new InvalidInputException(
-                    "createDefaultBranchesAndRegions : License details not found for user with id : " + user.getUserId() );
-            }
+			if (currentLicenseDetail == null) {
+				LOG.error("createDefaultBranchesAndRegions : License details not found for user with id : " + user.getUserId());
+				throw new InvalidInputException("createDefaultBranchesAndRegions : License details not found for user with id : " + user.getUserId());
+			}
 
-            AccountsMaster currentAccountsMaster = currentLicenseDetail.getAccountsMaster();
-            if ( currentAccountsMaster == null ) {
-                LOG.error( "createDefaultBranchesAndRegions : Accounts Master not found for license details with id : "
-                    + currentLicenseDetail.getLicenseId() );
-                throw new InvalidInputException(
-                    "createDefaultBranchesAndRegions : Accounts Master not found for license details with id : "
-                        + currentLicenseDetail.getLicenseId() );
-            }
+			AccountsMaster currentAccountsMaster = currentLicenseDetail.getAccountsMaster();
+			if (currentAccountsMaster == null) {
+				LOG.error("createDefaultBranchesAndRegions : Accounts Master not found for license details with id: "
+						+ currentLicenseDetail.getLicenseId());
+				throw new InvalidInputException("createDefaultBranchesAndRegions : Accounts Master not found for license details with id: "
+						+ currentLicenseDetail.getLicenseId());
+			}
 
-            try {
-                LOG.debug( "Calling sevices for adding account type of company" );
-                accountType = organizationManagementService.addAccountTypeForCompany( user,
-                    String.valueOf( currentAccountsMaster.getAccountsMasterId() ) );
-                LOG.debug( "Successfully executed sevices for adding account type of company.Returning account type : "
-                    + accountType );
+			try {
+				LOG.debug("Calling sevices for adding account type of company");
+				accountType = organizationManagementService.addAccountTypeForCompany(user,
+						String.valueOf(currentAccountsMaster.getAccountsMasterId()));
+				LOG.debug("Successfully executed sevices for adding account type of company.Returning account type : " + accountType);
 
-                LOG.debug( "Adding account type in session" );
-                session.setAttribute( CommonConstants.ACCOUNT_TYPE_IN_SESSION, accountType );
-                // get the settings
-                sessionHelper.getCanonicalSettings( session );
-                // set the session variable
-                sessionHelper.setSettingVariablesInSession( session );
-            } catch ( InvalidInputException e ) {
-                throw new InvalidInputException( "InvalidInputException in addAccountType. Reason :" + e.getMessage(),
-                    DisplayMessageConstants.GENERAL_ERROR, e );
-            }
-            try {
-                /**
-                 * For each account type, only the company admin's profile completion stage is
-                 * updated, all the other profiles created by default need no action so their
-                 * profile completion stage is marked completed at the time of insert
-                 */
-                LOG.debug( "Calling sevices for updating profile completion stage" );
-                userManagementService.updateProfileCompletionStage( user,
-                    CommonConstants.PROFILES_MASTER_COMPANY_ADMIN_PROFILE_ID, CommonConstants.DASHBOARD_STAGE );
-                LOG.debug( "Successfully executed sevices for updating profile completion stage" );
-            } catch ( InvalidInputException e ) {
-                LOG.error( "InvalidInputException while updating profile completion stage. Reason : " + e.getMessage(), e );
-                throw new InvalidInputException( e.getMessage(), DisplayMessageConstants.GENERAL_ERROR, e );
-            }
+				LOG.debug("Adding account type in session");
+				session.setAttribute(CommonConstants.ACCOUNT_TYPE_IN_SESSION, accountType);
+				sessionHelper.getCanonicalSettings(session);
+				sessionHelper.setSettingVariablesInSession(session);
+			}
+			catch (InvalidInputException e) {
+				throw new InvalidInputException("InvalidInputException in addAccountType. Reason :" + e.getMessage(),
+						DisplayMessageConstants.GENERAL_ERROR, e);
+			}
+			try {
+				/**
+				 * For each account type, only the company admin's profile completion stage is
+				 * updated, all the other profiles created by default need no action so their
+				 * profile completion stage is marked completed at the time of insert
+				 */
+				LOG.debug("Calling sevices for updating profile completion stage");
+				userManagementService.updateProfileCompletionStage(user, CommonConstants.PROFILES_MASTER_COMPANY_ADMIN_PROFILE_ID,
+						CommonConstants.DASHBOARD_STAGE);
+				LOG.debug("Successfully executed sevices for updating profile completion stage");
+			}
+			catch (InvalidInputException e) {
+				LOG.error("InvalidInputException while updating profile completion stage. Reason : " + e.getMessage(), e);
+				throw new InvalidInputException(e.getMessage(), DisplayMessageConstants.GENERAL_ERROR, e);
+			}
 
-            // Setting session variable to show linkedin signup and sendsurvey popups only once
-            String popupStatus = (String) session.getAttribute( CommonConstants.POPUP_FLAG_IN_SESSION );
-            if ( popupStatus == null ) {
-                session.setAttribute( CommonConstants.POPUP_FLAG_IN_SESSION, CommonConstants.YES_STRING );
-            } else if ( popupStatus.equals( CommonConstants.YES_STRING ) ) {
-                session.setAttribute( CommonConstants.POPUP_FLAG_IN_SESSION, CommonConstants.NO_STRING );
-            }
+			// Setting session variable to show linkedin signup and sendsurvey popups only once
+			String popupStatus = (String) session.getAttribute(CommonConstants.POPUP_FLAG_IN_SESSION);
+			if (popupStatus == null) {
+				session.setAttribute(CommonConstants.POPUP_FLAG_IN_SESSION, CommonConstants.YES_STRING);
+			}
+			else if (popupStatus.equals(CommonConstants.YES_STRING)) {
+				session.setAttribute(CommonConstants.POPUP_FLAG_IN_SESSION, CommonConstants.NO_STRING);
+			}
 
-            // setting popup attributes
-            boolean showLinkedInPopup = false;
-            boolean showSendSurveyPopup = false;
-            user = userManagementService.getUserByUserId( user.getUserId() );
-            for ( UserProfile profile : user.getUserProfiles() ) {
-                if ( profile.getProfilesMaster().getProfileId() == CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID ) {
-                    showLinkedInPopup = true;
-                    showSendSurveyPopup = true;
-                    break;
-                }
-            }
-            model.addAttribute( "showLinkedInPopup", String.valueOf( showLinkedInPopup ) );
-            model.addAttribute( "showSendSurveyPopup", String.valueOf( showSendSurveyPopup ) );
+			// setting popup attributes
+			boolean showLinkedInPopup = false;
+			boolean showSendSurveyPopup = false;
+			user = userManagementService.getUserByUserId(user.getUserId());
+			for (UserProfile profile : user.getUserProfiles()) {
+				if (profile.getProfilesMaster().getProfileId() == CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID) {
+					showLinkedInPopup = true;
+					showSendSurveyPopup = true;
+					break;
+				}
+			}
+			redirectAttributes.addFlashAttribute("showLinkedInPopup", String.valueOf(showLinkedInPopup));
+			redirectAttributes.addFlashAttribute("showSendSurveyPopup", String.valueOf(showSendSurveyPopup));
 
-            // update the last login time and number of logins
-            //			userManagementService.updateUserLoginTimeAndNum(user);
-        } catch ( NonFatalException e ) {
-            LOG.error( "NonfatalException while adding account type. Reason: " + e.getMessage(), e );
-            model
-                .addAttribute( "message", messageUtils.getDisplayMessage( e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE ) );
-            return JspResolver.ERROR_PAGE;
-        }
+			// update the last login time and number of logins
+			// userManagementService.updateUserLoginTimeAndNum(user);
+		}
+		catch (NonFatalException e) {
+			LOG.error("NonfatalException while adding account type. Reason: " + e.getMessage(), e);
+			model.addAttribute("message", messageUtils.getDisplayMessage(e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE));
+			return JspResolver.ERROR_PAGE;
+		}
 
-        LOG.info( "createDefaultBranchesAndRegions : Default branches and regions created. Returing the landing page!" );
-        return JspResolver.LANDING;
-    }
+		LOG.info("createDefaultBranchesAndRegions : Default branches and regions created. Returing the landing page!");
+		return "redirect:/" + JspResolver.LANDING + ".do";
+	}
 
 
     /**
@@ -1274,8 +1349,52 @@ public class OrganizationManagementController
         LOG.info( "Method to store text to be displayed to a customer after choosing the flow, storeTextForFlow() finished." );
         return status;
     }
+    
+    
+	/**
+	 * This controller is called to revert text to be displayed to a customer after choosing the
+	 * flow(happy/neutral/sad).
+	 * 
+	 * @param request
+	 * @param model
+	 * @return
+	 */
+	@ResponseBody
+	@RequestMapping(value = "/resettextforflow", method = RequestMethod.GET)
+	public String resetTextForFlow(HttpServletRequest request, Model model) {
+		LOG.info("Method to reset text to be displayed to a customer after choosing the flow, resetTextForFlow() started.");
+		User user = sessionHelper.getCurrentUser();
+		String message = "";
 
+		try {
+			String mood = request.getParameter("mood");
+			if (mood == null || mood.isEmpty()) {
+				LOG.error("Null or empty value found in resetTextForFlow() for mood.");
+				throw new InvalidInputException("Null or empty value found in resetTextForFlow() for mood.");
+			}
 
+			OrganizationUnitSettings companySettings = organizationManagementService.getCompanySettings(user);
+
+			SurveySettings surveySettings = companySettings.getSurvey_settings();
+			message = organizationManagementService.resetDefaultSurveyText(companySettings.getSurvey_settings(), mood);
+			organizationManagementService.updateSurveySettings(companySettings, surveySettings);
+			
+			message = makeJsonMessage(CommonConstants.STATUS_ACTIVE, message);
+
+			// Updating settings in session
+			HttpSession session = request.getSession();
+			UserSettings userSettings = (UserSettings) session.getAttribute(CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION);
+			if (userSettings != null)
+				userSettings.setCompanySettings(companySettings);
+		}
+		catch (NonFatalException e) {
+			LOG.error("Non fatal exception caught in resetTextForFlow(). Nested exception is ", e);
+		}
+
+		LOG.info("Method to reset text to be displayed to a customer after choosing the flow, resetTextForFlow() finished.");
+		return message;
+	}
+	
     @ResponseBody
     @RequestMapping ( value = "/getusstatelist", method = RequestMethod.GET)
     public String getUsStateList( HttpServletRequest request )

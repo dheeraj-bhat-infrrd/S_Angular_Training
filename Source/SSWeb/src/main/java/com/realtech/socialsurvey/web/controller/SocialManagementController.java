@@ -131,10 +131,6 @@ public class SocialManagementController {
 	@Value("${GOOGLE_PROFILE_URI}")
 	private String googleProfileUri;
 
-	// Yelp
-	@Value("${YELP_REDIRECT_URI}")
-	private String yelpRedirectUri;
-
 	/**
 	 * Returns the social authorization page
 	 * 
@@ -1189,7 +1185,6 @@ public class SocialManagementController {
 					CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION);
 
 			if (settings.getSocialMediaTokens() != null && settings.getSocialMediaTokens().getYelpToken() != null) {
-				yelpUrl.put("host", yelpRedirectUri);
 				yelpUrl.put("relativePath", settings.getSocialMediaTokens().getYelpToken().getYelpPageLink());
 			}
 		}
@@ -1344,6 +1339,104 @@ public class SocialManagementController {
 
 		LOG.info("Method getProfileUrl() finished from SocialManagementController");
 		return profileUrl;
+	}
+	
+	@ResponseBody
+	@RequestMapping(value = "/disconnectsocialmedia", method = RequestMethod.POST)
+	public String disconnectSocialMedia(HttpServletRequest request) {
+		
+		String socialMedia = request.getParameter("socialMedia");
+		
+		try {
+			
+			if(socialMedia == null || socialMedia.isEmpty()) {
+				throw new InvalidInputException("Social media can not be null or empty");
+			}
+			
+			HttpSession session = request.getSession();
+			
+	        UserSettings userSettings = (UserSettings) session.getAttribute( CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION );
+	        UserProfile selectedProfile = (UserProfile) session.getAttribute( CommonConstants.USER_PROFILE );
+	        
+	        OrganizationUnitSettings unitSettings = null;
+	        int profileMasterId = selectedProfile.getProfilesMaster().getProfileId();
+	        String collectionName = null;
+	        
+	        //Check for the collection to update
+	        if ( profileMasterId == CommonConstants.PROFILES_MASTER_COMPANY_ADMIN_PROFILE_ID) {
+                unitSettings = userSettings.getCompanySettings();
+                collectionName = MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION;
+            } else if ( profileMasterId == CommonConstants.PROFILES_MASTER_REGION_ADMIN_PROFILE_ID ) {
+                unitSettings = userSettings.getRegionSettings().get( selectedProfile.getRegionId() );
+                collectionName = MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION;
+            } else if ( profileMasterId == CommonConstants.PROFILES_MASTER_BRANCH_ADMIN_PROFILE_ID ) {
+                unitSettings = userSettings.getBranchSettings().get( selectedProfile.getBranchId() );
+                collectionName = MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION;
+            } else if ( profileMasterId == CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID ) {
+                unitSettings = userSettings.getAgentSettings();
+                collectionName = MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION;
+            }
+			unitSettings = socialManagementService.disconnectSocialNetwork(socialMedia, unitSettings, collectionName);
+			//Check for the collection to update
+	        if ( profileMasterId == CommonConstants.PROFILES_MASTER_COMPANY_ADMIN_PROFILE_ID) {
+                userSettings.setCompanySettings(unitSettings);
+            } else if ( profileMasterId == CommonConstants.PROFILES_MASTER_REGION_ADMIN_PROFILE_ID ) {
+                userSettings.getRegionSettings().put(selectedProfile.getRegionId(), unitSettings);
+            } else if ( profileMasterId == CommonConstants.PROFILES_MASTER_BRANCH_ADMIN_PROFILE_ID ) {
+                userSettings.getBranchSettings().put(selectedProfile.getBranchId(), unitSettings);
+            } else if ( profileMasterId == CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID ) {
+                userSettings.setAgentSettings((AgentSettings) unitSettings);
+            }
+			session.setAttribute(CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION, userSettings);
+		} catch (NonFatalException e) {
+			LOG.error("Exception occured in disconnectSocialNetwork() while disconnecting with the social Media.");
+			return "failue";
+		}
+		
+		return "success";
+	}
+	@RequestMapping(value = "/getsocialmediatokenonsettingspage", method = RequestMethod.GET)
+	public String getSocialMediaTokenonSettingsPage(HttpServletRequest request, Model model) {
+		
+		LOG.info("Inside getSocialMediaTokenonSettingsPage() method");
+		
+		HttpSession session = request.getSession();
+		
+        UserSettings userSettings = (UserSettings) session.getAttribute( CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION );
+        UserProfile selectedProfile = (UserProfile) session.getAttribute( CommonConstants.USER_PROFILE );
+        
+        OrganizationUnitSettings unitSettings = null;
+        int profileMasterId = selectedProfile.getProfilesMaster().getProfileId();
+        
+        //Check for the collection to update
+        if ( profileMasterId == CommonConstants.PROFILES_MASTER_COMPANY_ADMIN_PROFILE_ID) {
+            unitSettings = userSettings.getCompanySettings();
+        } else if ( profileMasterId == CommonConstants.PROFILES_MASTER_REGION_ADMIN_PROFILE_ID ) {
+            unitSettings = userSettings.getRegionSettings().get( selectedProfile.getRegionId() );
+        } else if ( profileMasterId == CommonConstants.PROFILES_MASTER_BRANCH_ADMIN_PROFILE_ID ) {
+            unitSettings = userSettings.getBranchSettings().get( selectedProfile.getBranchId() );
+        } else if ( profileMasterId == CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID ) {
+            unitSettings = userSettings.getAgentSettings();
+        }
+		
+        SocialMediaTokens tokens = unitSettings.getSocialMediaTokens(); 
+        
+        if (tokens != null) {
+        	if (tokens.getFacebookToken() != null && tokens.getFacebookToken().getFacebookPageLink() != null ){
+        		model.addAttribute("facebookLink", tokens.getFacebookToken().getFacebookPageLink());
+        	}
+        	if (tokens.getGoogleToken() != null && tokens.getGoogleToken().getProfileLink() != null ) {
+        		model.addAttribute("googleLink", tokens.getGoogleToken().getProfileLink());
+        	}
+        	if (tokens.getTwitterToken() != null && tokens.getTwitterToken().getTwitterPageLink() != null) {
+        		model.addAttribute("twitterLink", tokens.getTwitterToken().getTwitterPageLink());
+        	}
+        	if (tokens.getLinkedInToken() != null && tokens.getLinkedInToken().getLinkedInPageLink() != null) {
+        		model.addAttribute("linkedinLink", tokens.getLinkedInToken().getLinkedInPageLink() );
+        	}
+        }
+        
+		return JspResolver.SOCIAL_MEDIA_TOKENS;
 	}
 	
 }

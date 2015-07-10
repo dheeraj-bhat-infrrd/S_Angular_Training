@@ -153,6 +153,7 @@ public class SessionHelper {
 		}
 	}
 
+	
 	private void setMailContent(HttpSession session, UserSettings userSettings) {
 		LOG.debug("Setting mail content in the session");
 		String body = null;
@@ -189,7 +190,11 @@ public class SessionHelper {
 				mailBody = mailBody.replaceAll("\\[LogoUrl\\]", applicationLogoUrl);
 				mailSettings.getTake_survey_mail().setMail_body(mailBody);
 				session.setAttribute(CommonConstants.SURVEY_PARTICIPATION_MAIL_BODY_IN_SESSION, mailBody);
-				session.setAttribute(CommonConstants.SURVEY_PARTICIPATION_MAIL_SUBJECT_IN_SESSION, mailContent.getMail_subject());
+			    String remainderSubject=CommonConstants.SURVEY_MAIL_SUBJECT + "[AgentName]";
+				if(mailContent.getMail_subject()!=null){
+					remainderSubject=mailContent.getMail_subject();
+				}
+				session.setAttribute(CommonConstants.SURVEY_PARTICIPATION_MAIL_SUBJECT_IN_SESSION, remainderSubject);
 			}
 			else {
 				try {
@@ -212,7 +217,11 @@ public class SessionHelper {
 				mailBody = mailBody.replaceAll("\\[LogoUrl\\]", applicationLogoUrl);
 				mailSettings.getTake_survey_reminder_mail().setMail_body(mailBody);
 				session.setAttribute(CommonConstants.SURVEY_PARTICIPATION_REMINDER_MAIL_BODY_IN_SESSION, mailBody);
-				session.setAttribute(CommonConstants.SURVEY_PARTICIPATION_REMINDER_MAIL_SUBJECT_IN_SESSION, mailContent.getMail_subject());
+				String remainderSubject=CommonConstants.REMINDER_MAIL_SUBJECT + "[AgentName]";
+					if(mailContent.getMail_subject()!=null){
+						remainderSubject=mailContent.getMail_subject();
+				}
+				session.setAttribute(CommonConstants.SURVEY_PARTICIPATION_REMINDER_MAIL_SUBJECT_IN_SESSION, remainderSubject);
 			}
 			else {
 				try {

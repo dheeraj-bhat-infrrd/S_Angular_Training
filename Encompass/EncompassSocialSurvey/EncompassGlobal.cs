@@ -36,6 +36,8 @@ namespace EncompassSocialSurvey
                 // Start the session
                 EllieMae.Encompass.Client.Session s = new EllieMae.Encompass.Client.Session();
 
+                
+
                 // 
                 if (companyCredential.EncompassUrl == "")
                     s.StartOffline(companyCredential.UserName, companyCredential.Password);

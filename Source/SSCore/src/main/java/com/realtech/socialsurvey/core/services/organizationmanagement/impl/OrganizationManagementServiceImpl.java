@@ -13,6 +13,7 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -486,12 +487,15 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
         companySettings.setVertical( organizationalDetails.get( CommonConstants.VERTICAL ) );
         companySettings.setContact_details( contactDetailSettings );
         companySettings.setProfileName( generateProfileNameForCompany( company.getCompany(), company.getCompanyId() ) );
-        companySettings.setProfileUrl(CommonConstants.FILE_SEPARATOR + companySettings.getProfileName() );
+        companySettings.setProfileUrl( CommonConstants.FILE_SEPARATOR + companySettings.getProfileName() );
         companySettings.setCreatedOn( System.currentTimeMillis() );
         companySettings.setCreatedBy( String.valueOf( user.getUserId() ) );
         companySettings.setModifiedOn( System.currentTimeMillis() );
         companySettings.setModifiedBy( String.valueOf( user.getUserId() ) );
-        companySettings.setLockSettings( new LockSettings() );
+
+        LockSettings lockSettings = new LockSettings();
+        lockSettings.setLogoLocked( true );
+        companySettings.setLockSettings( lockSettings );
 
         // Adding default text for various flows of survey.
         SurveySettings surveySettings = new SurveySettings();
@@ -516,7 +520,6 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
         String takeSurveyMail = "";
         String takeSurveyReminderMail = "";
         String takeSurveyByCustomerMail = "";
-        
 
         String takeSurveyMailSubj = "";
         String takeSurveyReminderMailSubj = "";
@@ -525,9 +528,10 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
             takeSurveyMail = readMailContentFromFile( CommonConstants.SURVEY_REQUEST_MAIL_FILENAME );
             takeSurveyByCustomerMail = readMailContentFromFile( CommonConstants.SURVEY_CUSTOMER_REQUEST_MAIL_FILENAME );
             takeSurveyReminderMail = readMailContentFromFile( CommonConstants.SURVEY_REMINDER_MAIL_FILENAME );
+
             takeSurveyMailSubj = CommonConstants.SURVEY_MAIL_SUBJECT + "[AgentName]";
             takeSurveyByCustomerMailSubj = CommonConstants.SURVEY_MAIL_SUBJECT_CUSTOMER;
-            takeSurveyReminderMailSubj =  CommonConstants.REMINDER_MAIL_SUBJECT + "[AgentName]";
+            takeSurveyReminderMailSubj = CommonConstants.REMINDER_MAIL_SUBJECT + "[AgentName]";
         } catch ( IOException e ) {
             LOG.error(
                 "IOException occured in addOrganizationalDetails while copying default Email content. Nested exception is ", e );
@@ -535,19 +539,19 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 
         MailContentSettings mailContentSettings = new MailContentSettings();
         MailContent mailContent = new MailContent();
-        mailContent.setMail_subject(takeSurveyMailSubj);
+        mailContent.setMail_subject( takeSurveyMailSubj );
         mailContent.setMail_body( takeSurveyMail );
         mailContent.setParam_order( new ArrayList<String>( Arrays.asList( paramOrderTakeSurvey.split( "," ) ) ) );
         mailContentSettings.setTake_survey_mail( mailContent );
 
         mailContent = new MailContent();
-        mailContent.setMail_subject(takeSurveyByCustomerMailSubj);
+        mailContent.setMail_subject( takeSurveyByCustomerMailSubj );
         mailContent.setMail_body( takeSurveyByCustomerMail );
         mailContent.setParam_order( new ArrayList<String>( Arrays.asList( paramOrderTakeSurveyCustomer.split( "," ) ) ) );
         mailContentSettings.setTake_survey_mail_customer( mailContent );
 
         mailContent = new MailContent();
-        mailContent.setMail_subject(takeSurveyReminderMailSubj);
+        mailContent.setMail_subject( takeSurveyReminderMailSubj );
         mailContent.setMail_body( takeSurveyReminderMail );
         mailContent.setParam_order( new ArrayList<String>( Arrays.asList( paramOrderTakeSurveyReminder.split( "," ) ) ) );
         mailContentSettings.setTake_survey_reminder_mail( mailContent );
@@ -690,9 +694,10 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
             EncompassCrmInfo crmInfo = (EncompassCrmInfo) companySettings.getCrm_info();
 
             String encryptedPassword = crmInfo.getCrm_password();
-            String decryptedPassword = encryptionHelper.decryptAES( encryptedPassword, "" );
+            /*String decryptedPassword = encryptionHelper.decryptAES( encryptedPassword, "" );*/
 
-            crmInfo.setCrm_password( decryptedPassword );
+            // TODO Temp Fix
+            crmInfo.setCrm_password( encryptedPassword );
         }
         return companySettings;
     }
@@ -968,6 +973,83 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
         LOG.info( "Updated company settings mail content" );
 
         return originalContentSettings;
+    }
+
+
+    @Override
+    public MailContentSettings revertSurveyParticipationMailBody( OrganizationUnitSettings companySettings, String mailCategory )
+        throws NonFatalException
+    {
+        if ( companySettings == null ) {
+            throw new InvalidInputException( "Company settings cannot be null." );
+        }
+        if ( mailCategory == null ) {
+            throw new InvalidInputException( "Invalid mail category." );
+        }
+        LOG.debug( "Reverting " + mailCategory + " for settings: " + companySettings.toString() );
+
+        String mailBody = null;
+        String mailSubject = null;
+        List<String> paramOrder = null;
+
+        // TODO updating mail details
+        MailContentSettings originalContentSettings = companySettings.getMail_content();
+        if ( mailCategory.equals( CommonConstants.SURVEY_MAIL_BODY_CATEGORY ) ) {
+            mailSubject = CommonConstants.SURVEY_MAIL_SUBJECT + "[AgentName]";
+            try {
+                mailBody = readMailContentFromFile( CommonConstants.SURVEY_REQUEST_MAIL_FILENAME );
+            } catch ( IOException e ) {
+                throw new NonFatalException( "Error occurred while parsing mail content.",
+                    DisplayMessageConstants.GENERAL_ERROR, e );
+            }
+            paramOrder = new ArrayList<String>( Arrays.asList( paramOrderTakeSurvey.split( "," ) ) );
+
+            MailContent mailContent = new MailContent();
+            mailContent.setMail_subject( mailSubject );
+            mailContent.setMail_body( mailBody );
+            mailContent.setParam_order( paramOrder );
+
+            originalContentSettings.setTake_survey_mail( mailContent );
+        } else if ( mailCategory.equals( CommonConstants.SURVEY_REMINDER_MAIL_BODY_CATEGORY ) ) {
+            mailSubject = CommonConstants.REMINDER_MAIL_SUBJECT + "[AgentName]";
+            try {
+                mailBody = readMailContentFromFile( CommonConstants.SURVEY_REMINDER_MAIL_FILENAME );
+            } catch ( IOException e ) {
+                throw new NonFatalException( "Error occurred while parsing mail content.",
+                    DisplayMessageConstants.GENERAL_ERROR, e );
+            }
+            paramOrder = new ArrayList<String>( Arrays.asList( paramOrderTakeSurveyReminder.split( "," ) ) );
+
+            MailContent mailContent = new MailContent();
+            mailContent.setMail_subject( mailSubject );
+            mailContent.setMail_body( mailBody );
+            mailContent.setParam_order( paramOrder );
+
+            originalContentSettings.setTake_survey_reminder_mail( mailContent );
+        } else {
+            throw new InvalidInputException( "Invalid mail category" );
+        }
+
+        LOG.info( "Reverting company settings mail content" );
+        organizationUnitSettingsDao.updateParticularKeyOrganizationUnitSettings(
+            MongoOrganizationUnitSettingDaoImpl.KEY_MAIL_CONTENT, originalContentSettings, companySettings,
+            MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION );
+        LOG.info( "Reverting company settings mail content" );
+
+        return originalContentSettings;
+    }
+
+
+    @Override
+    public ArrayList<String> getSurveyParamOrder( String mailCategory ) throws InvalidInputException
+    {
+        if ( mailCategory.equals( CommonConstants.SURVEY_MAIL_BODY_CATEGORY ) ) {
+            return new ArrayList<String>( Arrays.asList( paramOrderTakeSurvey.split( "," ) ) );
+        } else if ( mailCategory.equals( CommonConstants.SURVEY_REMINDER_MAIL_BODY_CATEGORY ) ) {
+            return new ArrayList<String>( Arrays.asList( paramOrderTakeSurveyReminder.split( "," ) ) );
+        } else {
+            throw new InvalidInputException( "Invalid mail category" );
+        }
     }
 
 
@@ -1454,7 +1536,8 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
      */
     @Override
     @Transactional
-    public List<Region> getRegionsForCompany( String companyProfileName ) throws InvalidInputException, ProfileNotFoundException
+    public List<Region> getRegionsForCompany( String companyProfileName ) throws InvalidInputException,
+        ProfileNotFoundException
     {
         LOG.info( "Method getRegionsForCompany called for companyProfileName:" + companyProfileName );
         OrganizationUnitSettings companySettings = profileManagementService.getCompanyProfileByProfileName( companyProfileName );
@@ -1743,14 +1826,15 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
         LOG.info( "Method getUsersFromEmailIds called for emailIdsArray:" + emailIdsArray );
         List<User> users = new ArrayList<User>();
         for ( String emailId : emailIdsArray ) {
-            if(emailId.contains( "\"" )){
+            if ( emailId.contains( "\"" ) ) {
                 emailId = emailId.replace( "\"", "" );
             }
             String firstName = "";
             String lastName = "";
             User user = null;
             if ( emailId.contains( " " ) ) {
-                String[] userInformation = emailId.split( " " );
+                String[] userArray = emailId.split( " " );
+                String[] userInformation = removeElements( userArray, "" );
                 if ( userInformation.length >= 3 ) {
                     LOG.debug( "This contains middle name as well" );
                     for ( int i = 0; i < userInformation.length - 1; i++ ) {
@@ -1761,6 +1845,12 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
                     if ( lastName.contains( "<" ) ) {
                         emailId = lastName.substring( lastName.indexOf( "<" ) + 1, lastName.length() - 1 );
                         lastName = lastName.substring( 0, lastName.indexOf( "<" ) );
+                        if ( lastName.equalsIgnoreCase( "" ) ) {
+                            lastName = userInformation[userInformation.length - 2];
+                            if ( firstName.contains( lastName ) ) {
+                                firstName = firstName.substring( 0, firstName.indexOf( lastName ) );
+                            }
+                        }
                     }
 
                 } else if ( userInformation.length == 2 ) {
@@ -1812,6 +1902,19 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
         }
         LOG.info( "Method getUsersFromEmailIds executed successfully. Returning users size :" + users.size() );
         return users;
+    }
+
+
+    public static String[] removeElements( String[] input, String deleteMe )
+    {
+        List<String> result = new LinkedList<String>();
+
+        for ( String item : input )
+            if ( !deleteMe.equals( item ) )
+                result.add( item );
+
+        String[] modifiedArray = result.toArray( new String[result.size()] );
+        return modifiedArray;
     }
 
 
@@ -2570,50 +2673,57 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 
         LOG.debug( "Updating branch table with profile name" );
         branchDao.update( branch );
-        
+
         LOG.debug( "Adding new branch into mongo" );
-        try{
+        try {
             insertBranchSettings( branch );
-        }
-        catch(NonFatalException|FatalException e){
+        } catch ( NonFatalException | FatalException e ) {
             LOG.error( "NonfatalException caught in addNewBranch(). Nested exception is ", e );
             List<Long> branchIds = new ArrayList<>();
             branchIds.add( branch.getBranchId() );
-            organizationUnitSettingsDao.removeOganizationUnitSettings( branchIds, MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION );
+            organizationUnitSettingsDao.removeOganizationUnitSettings( branchIds,
+                MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION );
             throw e;
         }
 
         LOG.debug( "Adding newly added branch to solr" );
-        try{
+        try {
             solrSearchService.addOrUpdateBranchToSolr( branch );
-        }catch(SolrException|FatalException e){
+        } catch ( SolrException | FatalException e ) {
             LOG.error( "NonfatalEXception caught in addNewBranch(). Nested exception is ", e );
             List<Long> branchIds = new ArrayList<>();
             branchIds.add( branch.getBranchId() );
-            organizationUnitSettingsDao.removeOganizationUnitSettings( branchIds, MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION );
+            organizationUnitSettingsDao.removeOganizationUnitSettings( branchIds,
+                MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION );
             solrSearchService.removeBranchesFromSolr( branchIds );
             throw e;
         }
-            
+
         LOG.info( "Successfully completed method add new branch for regionId : " + region.getRegionId() + " and branchName : "
             + branchName );
         return branch;
 
     }
-    
+
+
     @Override
-    public void removeOrganizationUnitSettings(List<Long> idsToRemove, String collectionName){
+    public void removeOrganizationUnitSettings( List<Long> idsToRemove, String collectionName )
+    {
         LOG.info( "Method to remove OrganizationUnitSettings removeOrganizationUnitSettings() started." );
-        organizationUnitSettingsDao.removeOganizationUnitSettings( idsToRemove, MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION );
+        organizationUnitSettingsDao.removeOganizationUnitSettings( idsToRemove,
+            MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION );
         LOG.info( "Method to remove OrganizationUnitSettings removeOrganizationUnitSettings() finished." );
     }
-    
+
+
     @Override
-    public void removeOrganizationUnitSettings(Long idToRemove, String collectionName){
+    public void removeOrganizationUnitSettings( Long idToRemove, String collectionName )
+    {
         LOG.info( "Method to remove OrganizationUnitSettings removeOrganizationUnitSettings() started." );
         List<Long> ids = new ArrayList<>();
         ids.add( idToRemove );
-        organizationUnitSettingsDao.removeOganizationUnitSettings( ids, MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION );
+        organizationUnitSettingsDao.removeOganizationUnitSettings( ids,
+            MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION );
         LOG.info( "Method to remove OrganizationUnitSettings removeOrganizationUnitSettings() finished." );
     }
 
@@ -2807,26 +2917,28 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
         LOG.debug( "Calling method to insert region settings" );
         try {
             insertRegionSettings( region );
-        } catch ( NonFatalException|FatalException e ) {
+        } catch ( NonFatalException | FatalException e ) {
             List<Long> regionIds = new ArrayList<>();
             regionIds.add( region.getRegionId() );
-            organizationUnitSettingsDao.removeOganizationUnitSettings( regionIds, MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION );
+            organizationUnitSettingsDao.removeOganizationUnitSettings( regionIds,
+                MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION );
             throw e;
         }
         regionDao.update( region );
 
         LOG.debug( "Updating solr with newly inserted region" );
-        try{
+        try {
             solrSearchService.addOrUpdateRegionToSolr( region );
-        } catch(SolrException|FatalException e){
+        } catch ( SolrException | FatalException e ) {
             LOG.error( "SolrException caught in addNewRegion(). Nested exception is ", e );
             List<Long> regionIds = new ArrayList<>();
             regionIds.add( region.getRegionId() );
-            organizationUnitSettingsDao.removeOganizationUnitSettings( regionIds, MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION );
+            organizationUnitSettingsDao.removeOganizationUnitSettings( regionIds,
+                MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION );
             solrSearchService.removeRegionsFromSolr( regionIds );
             throw e;
         }
-        
+
         LOG.info( "Successfully completed method add new region for regionName : " + regionName );
         return region;
     }
@@ -3768,17 +3880,46 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
         return organizationUnitSettingsDao.getSettingsMapWithLinkedinImageUrl( collectionName,
             CommonConstants.LINKEDIN_URL_PART );
     }
-	@Override
-	public SurveySettings retrieveDefaultSurveyProperties() {
-		SurveySettings surveySettings = new SurveySettings();
-		surveySettings.setHappyText(happyText);
-		surveySettings.setNeutralText(neutralText);
-		surveySettings.setSadText(sadText);
-		surveySettings.setHappyTextComplete(happyTextComplete);
-		surveySettings.setNeutralTextComplete(neutralTextComplete);
-		surveySettings.setSadTextComplete(sadTextComplete);
-		return surveySettings;
-	}
 
+
+    @Override
+    public SurveySettings retrieveDefaultSurveyProperties()
+    {
+        SurveySettings surveySettings = new SurveySettings();
+        surveySettings.setHappyText( happyText );
+        surveySettings.setNeutralText( neutralText );
+        surveySettings.setSadText( sadText );
+        surveySettings.setHappyTextComplete( happyTextComplete );
+        surveySettings.setNeutralTextComplete( neutralTextComplete );
+        surveySettings.setSadTextComplete( sadTextComplete );
+        return surveySettings;
+    }
+
+
+    @Override
+    public String resetDefaultSurveyText( SurveySettings surveySettings, String mood )
+    {
+        if ( mood.equalsIgnoreCase( "happy" ) ) {
+            surveySettings.setHappyText( happyText );
+            return happyText;
+        } else if ( mood.equalsIgnoreCase( "neutral" ) ) {
+            surveySettings.setNeutralText( neutralText );
+            return neutralText;
+        } else if ( mood.equalsIgnoreCase( "sad" ) ) {
+            surveySettings.setSadText( sadText );
+            return sadText;
+        } else if ( mood.equalsIgnoreCase( "happyComplete" ) ) {
+            surveySettings.setHappyTextComplete( happyTextComplete );
+            return happyTextComplete;
+        } else if ( mood.equalsIgnoreCase( "neutralComplete" ) ) {
+            surveySettings.setNeutralTextComplete( neutralTextComplete );
+            return neutralTextComplete;
+        } else if ( mood.equalsIgnoreCase( "sadComplete" ) ) {
+            surveySettings.setSadTextComplete( sadTextComplete );
+            return sadTextComplete;
+        } else {
+            return "";
+        }
+    }
 }
 // JIRA: SS-27: By RM05: EOC

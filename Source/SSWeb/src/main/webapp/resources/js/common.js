@@ -244,10 +244,8 @@ function callAjaxGetWithPayloadData(url, callBackFunction, payload,isAsync){
 	});
 }*/
 
-function changeRatingPattern(rating, ratingParent,isOverallRating) {
-	
+function changeRatingPattern(rating, ratingParent, isOverallRating) {
 	var ratingIntVal = 0;
-	
 
 	if (ratingIntVal % 1 == 0) {
 		ratingIntVal = parseInt(rating);
@@ -258,18 +256,16 @@ function changeRatingPattern(rating, ratingParent,isOverallRating) {
 	if (ratingIntVal == 0) {
 		ratingIntVal = 1;
 	}
+
+	var roundedFloatingVal = parseFloat(rating).toFixed(3);
 	
-	var roundedFloatingVal = parseFloat(rating).toFixed(2);
-	
-	var ratingImgHtml = "<div class='rating-image float-left smiley-rat-"+ratingIntVal+"'></div>";
-	var ratingValHtml = "<div class='rating-rounded float-left'>"+roundedFloatingVal+"</div>";
-	
-	if(isOverallRating){
-		ratingValHtml = "<div class='rating-rounded float-left'>"+roundedFloatingVal+" - </div>";
+	var ratingImgHtml = "<div class='rating-image float-left smiley-rat-" + ratingIntVal + "'></div>";
+	var ratingValHtml = "<div class='rating-rounded float-left'>" + roundedFloatingVal + "</div>";
+	if (isOverallRating) {
+		ratingValHtml = "<div class='rating-rounded float-left'>" + roundedFloatingVal + " - </div>";
 	}
-	
+
 	ratingParent.html('');
-	
 	ratingParent.append(ratingImgHtml).append(ratingValHtml);
 }
 
@@ -425,20 +421,20 @@ function shareOnYelp(agentId, location, yelpElement){
 		complete : function(data) {
 			data = data.responseJSON;
 			if (success) {
-				if(data.host!=undefined && data.relativePath!=undefined)
-					if(yelpElement==undefined){
-						window.open(data.host+data.relativePath);
-					}else{
-						yelpElement.href = data.host+data.relativePath;
+				if(data.relativePath != undefined)
+					if (yelpElement == undefined) {
+						window.open(data.relativePath);
+					} else {
+						yelpElement.href = data.relativePath;
 					}
-				else{
+				else {
 					$('#overlay-toast').html('Please setup your Yelp account to share.');
 					showToast();
 				}
 			}
 		},
 		error : function(e) {
-			if(e.status == 504) {
+			if (e.status == 504) {
 				redirectToLoginPageOnSessionTimeOut(e.status);
 				return;
 			}
@@ -450,9 +446,9 @@ function shareOnYelp(agentId, location, yelpElement){
 }
 
 function shareOnGooglePlus(agentId, location, googleElement){
-	var success= false;
+	var success = false;
 	var payload = {
-			"agentId" : agentId
+		"agentId" : agentId
 	};
 	$.ajax({
 		url : location + "getgooglepluslinkrest",
@@ -466,23 +462,22 @@ function shareOnGooglePlus(agentId, location, googleElement){
 		complete : function(data) {
 			if (success) {
 				data = data.responseJSON;
-				if(data.host!=undefined && data.profileServer!=undefined && data.relativePath!=undefined){
-					if(googleElement==undefined){
-						window.open(data.host + data.profileServer
-								+ data.relativePath);
+				if (data.host != undefined && data.profileServer != undefined && data.relativePath != undefined) {
+					if (googleElement == undefined) {
+						window.open(data.host + data.profileServer + data.relativePath);
 					}
-					else{
+					else {
 						googleElement.href = data.host + data.profileServer + data.relativePath;
 					}
 				}
-				else{
+				else {
 					$('#overlay-toast').html('Please setup your Google+ account to share.');
 					showToast();
 				}
 			}
 		},
 		error : function(e) {
-			if(e.status == 504) {
+			if (e.status == 504) {
 				redirectToLoginPageOnSessionTimeOut(e.status);
 				return;
 			}
@@ -517,6 +512,29 @@ function postOnSocialNetworkOnce(socialNetwork, firstName, lastName, agentName, 
 			+ review, "Authorization Page",
 			"width=800,height=600,scrollbars=yes");
 }
+
+//Disconnect social media
+function disconnectSocialMedia(socialMedia) {
+	if($('div[data-social="'+socialMedia+'"]').text() == undefined || $('div[data-social="'+socialMedia+'"]').text() == ''){
+		return;
+	}
+	
+	var payload = {
+		"socialMedia" : socialMedia	
+	};
+	
+	callAjaxPostWithPayloadData("/disconnectsocialmedia.do", function(data) {
+		if(data == "success"){
+			$('div[data-social="'+socialMedia+'"]').html('');
+			$('#overlay-toast').html('Successfully disconnected ' + socialMedia);
+			showToast();
+		} else {
+			$('#overlay-toast').html('Some error occurred while disconnecting ' + socialMedia);
+			showToast();
+		}
+	}, payload, true);	
+}
+
 
 function showProfileLinkInEditProfilePage(source, profileUrl){
 	if(source=='facebook'){
@@ -746,4 +764,41 @@ function linkedInDataImport() {
 			$('#overlay-linkedin-import').show();
 		}
 	}, true);
+}
+function  convertTimeStampToLocalTimeStamp(generalTimestamp){
+	var convertedTimestamp= generalTimestamp.getTime() + (generalTimestamp.getTimezoneOffset())*60*1000 ;
+	var date3=new Date(convertedTimestamp);
+	console.info((date3.getMonth() + 1) + '/' + date3.getDate() + '/' +  date3.getFullYear());
+	var month=((date3.getMonth() + 1)<10)? "0"+(date3.getMonth() + 1) : (date3.getMonth() + 1);
+	var day=(date3.getDate()<10) ? "0"+(date3.getDate()) : (date3.getDate());
+	var minutes= (date3.getMinutes()<10) ? "0"+(date3.getMinutes()) : (date3.getMinutes());
+	var hours= (date3.getHours()<10) ? "0"+(date3.getHours()) : (date3.getHours());
+	var sec=  (date3.getSeconds()<10) ? "0"+(date3.getSeconds()) : (date3.getSeconds());
+	var date4= date3.getFullYear() +'-'+month+'-'+ day +" "+hours+":"+ minutes +":"+ sec+"."+date3.getMilliseconds() ;
+	return date4;
+}
+
+function returnValidWebAddress(url) {
+	if (url && !url.match(/^http([s]?):\/\/.*/)) {
+		url = 'http://' + url;
+	}
+	return url;
+}
+
+function linkify(inputText) {
+    var replacedText, replacePattern1, replacePattern2, replacePattern3;
+
+    //URLs starting with http://, https://, or ftp://
+    replacePattern1 = /(\b(https?|ftp):\/\/[-A-Z0-9+&@#\/%?=~_|!:,.;]*[-A-Z0-9+&@#\/%=~_|])/gim;
+    replacedText = inputText.replace(replacePattern1, '<a href="$1" target="_blank">$1</a>');
+
+    //URLs starting with "www." (without // before it, or it'd re-link the ones done above).
+    replacePattern2 = /(^|[^\/])(www\.[\S]+(\b|$))/gim;
+    replacedText = replacedText.replace(replacePattern2, '$1<a href="http://$2" target="_blank">$2</a>');
+
+    //Change email addresses to mailto:: links.
+    replacePattern3 = /(([a-zA-Z0-9\-\_\.])+@[a-zA-Z\_]+?(\.[a-zA-Z]{2,6})+)/gim;
+    replacedText = replacedText.replace(replacePattern3, '<a href="mailto:$1">$1</a>');
+
+    return replacedText;
 }

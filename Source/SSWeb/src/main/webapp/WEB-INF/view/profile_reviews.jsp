@@ -60,8 +60,21 @@
 $(document).ready(function(){
 	$('.ppl-head-2').each(function(index, currentElement) {
 		var dateSplit = $(this).attr('data-modifiedon').split('-');
-		var date = convertUTCToUserDate(new Date(dateSplit[0], dateSplit[1], dateSplit[2], dateSplit[3], dateSplit[4], dateSplit[5]));
+		var date = convertUserDateToLocale(new Date(dateSplit[0], dateSplit[1]-1, dateSplit[2], dateSplit[3], dateSplit[4], dateSplit[5]));
 		$(this).html(date.toDateString());
+	});
+	
+	$('.icn-yelp').each(function(index, currentElement) {
+		var url = $(this).parent().attr('href');
+		$(this).parent().attr('href', returnValidWebAddress(url));
+	});
+	$('.icn-zillow').each(function(index, currentElement) {
+		var url = $(this).parent().attr('href');
+		$(this).parent().attr('href', returnValidWebAddress(url));
+	});
+	$('.icn-lendingtree').each(function(index, currentElement) {
+		var url = $(this).parent().attr('href');
+		$(this).parent().attr('href', returnValidWebAddress(url));
 	});
 });
 </script>
