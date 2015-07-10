@@ -1836,28 +1836,25 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 		LOG.info("Successfully completed method to update company status");
 	}
 	
-
-    @Override
-    @Transactional
-    public List<AgentRankingReport> getAgentReport( long iden, String columnName, Date startDate, Date endDate, Object object )
-        throws InvalidInputException
-    {
-        LOG.info( "Method to get Agent's Report for a specific time and all time started." );
-        if ( columnName == null || columnName.isEmpty() ) {
-            throw new InvalidInputException( "Null/Empty value passed for profile level." );
-        }
-        if ( iden < 0 ) {
-            throw new InvalidInputException( "Invalid value passed for iden of profile level." );
-        }
-        Map<Long, AgentRankingReport> agentReportData = new HashMap<>();
-        surveyDetailsDao.getAverageScore( null, null, agentReportData, columnName, iden );
-        surveyDetailsDao.getAverageScore( startDate, endDate, agentReportData, columnName, iden );
-        surveyDetailsDao.getCompletedSurveysCount( null, null, agentReportData, columnName, iden );
-        surveyDetailsDao.getCompletedSurveysCount( startDate, endDate, agentReportData, columnName, iden );
-        surveyPreInitiationDao.getIncompleteSurveysCount( null, null, agentReportData );
-        surveyPreInitiationDao.getIncompleteSurveysCount( startDate, endDate, agentReportData );
-        organizationUnitSettingsDao.setAgentNames( agentReportData );
-        LOG.info( "Method to get Agent's Report for a specific time and all time finished." );
-        return new ArrayList<>( agentReportData.values() );
-    }
+	@Override
+	@Transactional
+	public List<AgentRankingReport> getAgentReport(long iden, String columnName, Date startDate, Date endDate, Object object)
+			throws InvalidInputException {
+		LOG.info("Method to get Agent's Report for a specific time and all time started.");
+		if (columnName == null || columnName.isEmpty()) {
+			throw new InvalidInputException("Null/Empty value passed for profile level.");
+		}
+		if (iden < 0) {
+			throw new InvalidInputException("Invalid value passed for iden of profile level.");
+		}
+		
+		Map<Long, AgentRankingReport> agentReportData = new HashMap<>();
+		surveyDetailsDao.getAverageScore(startDate, endDate, agentReportData, columnName, iden);
+		surveyDetailsDao.getCompletedSurveysCount(startDate, endDate, agentReportData, columnName, iden);
+		surveyPreInitiationDao.getIncompleteSurveysCount(startDate, endDate, agentReportData);
+		organizationUnitSettingsDao.setAgentDetails(agentReportData);
+		
+		LOG.info("Method to get Agent's Report for a specific time and all time finished.");
+		return new ArrayList<>(agentReportData.values());
+	}
 }

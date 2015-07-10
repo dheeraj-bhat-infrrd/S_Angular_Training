@@ -130,40 +130,45 @@ public class SurveyPreInitiationDaoImpl extends GenericDaoImpl<SurveyPreInitiati
 		}
 	}
 
-
-    @SuppressWarnings ( "unchecked")
-    @Override
-    public void getIncompleteSurveysCount( Date startDate, Date endDate, Map<Long, AgentRankingReport> agentReportData )
-    {
-        LOG.info( "Method getIncompleteSurveysCount() started" );
-        List<SurveyPreInitiation> surveys = new ArrayList<>();
-        Criteria criteria = getSession().createCriteria( SurveyPreInitiation.class );
-        try {
-            if ( startDate != null )
-                criteria.add( Restrictions.ge( CommonConstants.CREATED_ON, new Timestamp( startDate.getTime() ) ) );
-            if ( endDate != null )
-                criteria.add( Restrictions.le( CommonConstants.CREATED_ON, new Timestamp( endDate.getTime() ) ) );
-            surveys = criteria.list();
-        } catch ( HibernateException e ) {
-            LOG.error( "Exception caught in getIncomplgetIncompleteSurveysCounteteSurveyForReminder() ", e );
-            throw new DatabaseException( "Exception caught in getIncompleteSurveysCount() ", e );
-        }
-        for ( SurveyPreInitiation survey : surveys ) {
-            AgentRankingReport agentRankingReport = null;
-            if ( agentReportData.containsKey( survey.getAgentId() ) ) {
-                agentRankingReport = agentReportData.get( survey.getAgentId() );
-            } else {
-                agentRankingReport = new AgentRankingReport();
-                agentRankingReport.setAgentId( survey.getAgentId() );
-                agentRankingReport.setAgentName( survey.getAgentName() );
-            }
-            if ( startDate == null && endDate == null ) {
-                agentRankingReport.setAllTimeIncompleteSurveys( agentRankingReport.getAllTimeIncompleteSurveys() + 1 );
-            } else {
-                agentRankingReport.setIncompleteSurveys( agentRankingReport.getIncompleteSurveys() + 1 );
-            }
-            agentReportData.put( survey.getAgentId(), agentRankingReport );
-        }
-        LOG.info( "Method getIncompleteSurveysCount() finished" );
-    }
+	@SuppressWarnings("unchecked")
+	@Override
+	public void getIncompleteSurveysCount(Date startDate, Date endDate, Map<Long, AgentRankingReport> agentReportData) {
+		LOG.info("Method getIncompleteSurveysCount() started");
+		List<SurveyPreInitiation> surveys = new ArrayList<>();
+		
+		Criteria criteria = getSession().createCriteria(SurveyPreInitiation.class);
+		try {
+			if (startDate != null && endDate != null) {
+				criteria.add(Restrictions.ge(CommonConstants.CREATED_ON, new Timestamp(startDate.getTime())));
+				criteria.add(Restrictions.le(CommonConstants.CREATED_ON, new Timestamp(endDate.getTime())));
+			}
+			else if (startDate != null && endDate == null)
+				criteria.add(Restrictions.ge(CommonConstants.CREATED_ON, new Timestamp(startDate.getTime())));
+			else if (startDate == null && endDate != null)
+				criteria.add(Restrictions.le(CommonConstants.CREATED_ON, new Timestamp(endDate.getTime())));
+			
+			surveys = criteria.list();
+		}
+		catch (HibernateException e) {
+			LOG.error("Exception caught in getIncomplgetIncompleteSurveysCounteteSurveyForReminder() ", e);
+			throw new DatabaseException("Exception caught in getIncompleteSurveysCount() ", e);
+		}
+		
+		for (SurveyPreInitiation survey : surveys) {
+			AgentRankingReport agentRankingReport = null;
+			if (agentReportData.containsKey(survey.getAgentId())) {
+				agentRankingReport = agentReportData.get(survey.getAgentId());
+			}
+			else {
+				agentRankingReport = new AgentRankingReport();
+				agentRankingReport.setAgentId(survey.getAgentId());
+				agentRankingReport.setAgentName(survey.getAgentName());
+			}
+			
+			// agentRankingReport.setAllTimeIncompleteSurveys(agentRankingReport.getAllTimeIncompleteSurveys() + 1);
+			agentRankingReport.setIncompleteSurveys(agentRankingReport.getIncompleteSurveys() + 1);
+			agentReportData.put(survey.getAgentId(), agentRankingReport);
+		}
+		LOG.info("Method getIncompleteSurveysCount() finished");
+	}
 }
