@@ -145,7 +145,7 @@ public interface OrganizationUnitSettingsDao {
 	public Map<Long, OrganizationUnitSettings> getSettingsMapWithLinkedinImageUrl(
 			String collectionName, String matchUrl);
 	
-    public void setAgentNames( Map<Long, AgentRankingReport> agentsReport );
+    public void setAgentDetails( Map<Long, AgentRankingReport> agentsReport );
 
 	public OrganizationUnitSettings removeKeyInOrganizationSettings(OrganizationUnitSettings unitSettings, String keyToUpdate, String collectionName);
 }

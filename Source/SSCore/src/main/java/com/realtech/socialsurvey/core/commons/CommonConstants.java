@@ -562,8 +562,16 @@ public interface CommonConstants
     public static final long DEFAULT_VERTICAL_CRM_ID = -1;
 
     public static final int EXPIRE_AFTER_DAYS = 3;
+    public static final int DECIMALS_TO_ROUND_OFF = 3;
 
     //Constants for survey request send type
     public static final String SURVEY_REQUEST_AGENT = "agent";
     public static final String SURVEY_REQUEST_ADMIN = "admin";
+    
+    // Constants Excel Report Heading
+    public static final String HEADER_FIRST_NAME = "First Name";
+    public static final String HEADER_LAST_NAME = "Last Name";
+    public static final String HEADER_AVG_SCORE = "Avg Score";
+    public static final String HEADER_SUM_SURVEYS = "Sum Surveys";
+    public static final String HEADER_REGISTRATION_DATE = "Registation Date";
 }

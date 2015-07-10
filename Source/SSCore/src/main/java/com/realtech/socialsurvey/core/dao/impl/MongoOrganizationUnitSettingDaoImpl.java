@@ -343,26 +343,27 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
 	}
 	
 
-    @Override
-    public void setAgentNames( Map<Long, AgentRankingReport> agentsReport )
-    {
-        LOG.info( "Method setAgentNames() started." );
-        Set<Long> agentIds = agentsReport.keySet();
-        List<AgentSettings> agentSEttings = fetchMultipleAgentSettingsById(new ArrayList<Long>(agentIds));
-        for ( AgentSettings setting : agentSEttings ) {
-            if(agentsReport.get(setting.getIden()) != null){
-                try{
-                agentsReport.get(setting.getIden()).setAgentFirstName( setting.getContact_details().getFirstName() );
-                agentsReport.get(setting.getIden()).setAgentLastName( setting.getContact_details().getLastName() );
-                }catch(NullPointerException e){
-                    LOG.error( "Null Pointer exception caught in setAgentNames(). NEsted exception is ", e );
-                    LOG.debug( "Continuing..." );
-                    continue;
-                }
-            }
-        }
-        LOG.info( "Method setAgentNames() finished." );
-    }
+	@Override
+	public void setAgentDetails(Map<Long, AgentRankingReport> agentsReport) {
+		LOG.info("Method setAgentNames() started.");
+		Set<Long> agentIds = agentsReport.keySet();
+		List<AgentSettings> agentSettings = fetchMultipleAgentSettingsById(new ArrayList<Long>(agentIds));
+		for (AgentSettings setting : agentSettings) {
+			if (agentsReport.get(setting.getIden()) != null) {
+				try {
+					agentsReport.get(setting.getIden()).setAgentFirstName(setting.getContact_details().getFirstName());
+					agentsReport.get(setting.getIden()).setAgentLastName(setting.getContact_details().getLastName());
+					agentsReport.get(setting.getIden()).setRegistrationDate(setting.getCreatedOn());
+				}
+				catch (NullPointerException e) {
+					LOG.error("Null Pointer exception caught in setAgentNames(). Nested exception is ", e);
+					LOG.debug("Continuing...");
+					continue;
+				}
+			}
+		}
+		LOG.info("Method setAgentNames() finished.");
+	}
     
     @Override
     public OrganizationUnitSettings removeKeyInOrganizationSettings(OrganizationUnitSettings unitSettings, String keyToUpdate, String collectionName){

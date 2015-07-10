@@ -1397,119 +1397,108 @@ public class DashboardController {
         LOG.info("Method getSocialMonitorFile() finished.");
     }
 
-    /*
-    * Method to download file containing incomplete surveys
-    */
-   @RequestMapping(value = "/downloadagentrankingreport")
-   public void getAgentRankingFile(Model model,
-           HttpServletRequest request, HttpServletResponse response) {
-       LOG.info("Method to get file containg Agent's data getAgentSurveyFile() started.");
-       List<AgentRankingReport> agentRanking= new ArrayList<>();
-       try {
-           String columnName = request.getParameter("columnName");
-           if (columnName == null || columnName.isEmpty()) {
-               LOG.error("Invalid value (null/empty) passed for profile level.");
-               throw new InvalidInputException(
-                       "Invalid value (null/empty) passed for profile level.");
-           }
+	/*
+	 * Method to download file containing incomplete surveys
+	 */
+	@RequestMapping(value = "/downloadagentrankingreport")
+	public void getAgentRankingFile(Model model, HttpServletRequest request, HttpServletResponse response) {
+		LOG.info("Method to get file containg Agent's data getAgentSurveyFile() started.");
+		List<AgentRankingReport> agentRankingList = new ArrayList<AgentRankingReport>();
+		
+		try {
+			String columnName = request.getParameter("columnName");
+			if (columnName == null || columnName.isEmpty()) {
+				LOG.error("Invalid value (null/empty) passed for profile level.");
+				throw new InvalidInputException("Invalid value (null/empty) passed for profile level.");
+			}
 
-           String startDateStr = request.getParameter("startDate");
-           String endDateStr = request.getParameter("endDate");
+			String startDateStr = request.getParameter("startDate");
+			Date startDate = null;
+			if (startDateStr != null) {
+				try {
+					startDate = new SimpleDateFormat(CommonConstants.DATE_FORMAT).parse(startDateStr);
+				}
+				catch (ParseException e) {
+					LOG.error("ParseException caught in getAgentSurveyFile() while parsing startDate. Nested exception is ", e);
+				}
+			}
+			
+			String endDateStr = request.getParameter("endDate");
+			Date endDate = Calendar.getInstance().getTime();
+			if (endDateStr != null) {
+				try {
+					endDate = new SimpleDateFormat(CommonConstants.DATE_FORMAT).parse(endDateStr);
+				}
+				catch (ParseException e) {
+					LOG.error("ParseException caught in getAgentSurveyFile() while parsing startDate. Nested exception is ", e);
+				}
+			}
 
-           Date startDate = null;
-           Date endDate = Calendar.getInstance().getTime();
-           if (startDateStr != null) {
-               try {
-                   startDate = new SimpleDateFormat(
-                           CommonConstants.DATE_FORMAT).parse(startDateStr);
-               } catch (ParseException e) {
-                   LOG.error(
-                           "ParseException caught in getAgentSurveyFile() while parsing startDate. Nested exception is ",
-                           e);
-               }
-           }
-           if (endDateStr != null) {
-               try {
-                   endDate = new SimpleDateFormat(CommonConstants.DATE_FORMAT)
-                           .parse(endDateStr);
-               } catch (ParseException e) {
-                   LOG.error(
-                           "ParseException caught in getAgentSurveyFile() while parsing startDate. Nested exception is ",
-                           e);
-               }
-           }
+			String profileLevel = getProfileLevel(columnName);
+			long iden = 0;
 
-           String profileLevel = getProfileLevel(columnName);
-           long iden = 0;
-
-           User user = sessionHelper.getCurrentUser();
-           if (profileLevel.equals(CommonConstants.PROFILE_LEVEL_COMPANY)) {
-               iden = user.getCompany().getCompanyId();
-           } else if (profileLevel
-                   .equals(CommonConstants.PROFILE_LEVEL_INDIVIDUAL)) {
-               iden = user.getUserId();
-           } else {
-               String columnValue = request.getParameter("columnValue");
-               if (columnValue != null && !columnValue.isEmpty()) {
-                   try {
-                       iden = Long.parseLong(columnValue);
-                   } catch (NumberFormatException e) {
-                       LOG.error(
-                               "NumberFormatExcept;ion caught while parsing columnValue in getAgentSurveyFile(). Nested exception is ",
-                               e);
-                       throw e;
-                   }
-               }
-           }
-           try {
-               agentRanking = profileManagementService.getAgentReport( iden, columnName, startDate, endDate, null );
-               String fileName = "Agent_Ranking_Report_" + profileLevel + "_"
-                       + iden + ".xlsx";
-               XSSFWorkbook workbook = dashboardService
-                       .downloadAgentRankingData(agentRanking, fileName);
-               response.setContentType(EXCEL_FORMAT);
-               String headerKey = CONTENT_DISPOSITION_HEADER;
-               String headerValue = String.format(
-                       "attachment; filename=\"%s\"",
-                       new File(fileName).getName());
-               response.setHeader(headerKey, headerValue);
-               // write into file
-               OutputStream responseStream = null;
-               try {
-                   responseStream = response.getOutputStream();
-                   workbook.write(responseStream);
-               } catch (IOException e) {
-                   LOG.error(
-                           "IOException caught in getAgentSurveyFile(). Nested exception is ",
-                           e);
-               } finally {
-                   try {
-                       responseStream.close();
-                   } catch (IOException e) {
-                       LOG.error(
-                               "IOException caught in getAgentSurveyFile(). Nested exception is ",
-                               e);
-                   }
-               }
-               response.flushBuffer();
-           } catch (InvalidInputException e) {
-               LOG.error(
-                       "InvalidInputException caught in getAgentSurveyFile(). Nested exception is ",
-                       e);
-               throw e;
-           } catch (IOException e) {
-               LOG.error(
-                       "IOException caught in getAgentSurveyFile(). Nested exception is ",
-                       e);
-           }
-       } catch (NonFatalException e) {
-           LOG.error(
-                   "Non fatal exception caught in getAgentSurveyFile(). Nested exception is ",
-                   e);
-       }
-       LOG.info("Method to get file containg Agent's data getAgentSurveyFile() finished.");
-   }
-
+			User user = sessionHelper.getCurrentUser();
+			if (profileLevel.equals(CommonConstants.PROFILE_LEVEL_COMPANY)) {
+				iden = user.getCompany().getCompanyId();
+			}
+			else if (profileLevel.equals(CommonConstants.PROFILE_LEVEL_INDIVIDUAL)) {
+				iden = user.getUserId();
+			}
+			else {
+				String columnValue = request.getParameter("columnValue");
+				if (columnValue != null && !columnValue.isEmpty()) {
+					try {
+						iden = Long.parseLong(columnValue);
+					}
+					catch (NumberFormatException e) {
+						LOG.error("NumberFormatExcept;ion caught while parsing columnValue in getAgentSurveyFile(). Nested exception is ", e);
+						throw e;
+					}
+				}
+			}
+			
+			try {
+				agentRankingList = profileManagementService.getAgentReport(iden, columnName, startDate, endDate, null);
+				String fileName = "Agent_Ranking_Report_" + profileLevel + "_" + iden + ".xlsx";
+				XSSFWorkbook workbook = dashboardService.downloadAgentRankingData(agentRankingList, fileName);
+				response.setContentType(EXCEL_FORMAT);
+				String headerKey = CONTENT_DISPOSITION_HEADER;
+				String headerValue = String.format("attachment; filename=\"%s\"", new File(fileName).getName());
+				response.setHeader(headerKey, headerValue);
+				
+				// write into file
+				OutputStream responseStream = null;
+				try {
+					responseStream = response.getOutputStream();
+					workbook.write(responseStream);
+				}
+				catch (IOException e) {
+					LOG.error("IOException caught in getAgentSurveyFile(). Nested exception is ", e);
+				}
+				finally {
+					try {
+						responseStream.close();
+					}
+					catch (IOException e) {
+						LOG.error("IOException caught in getAgentSurveyFile(). Nested exception is ", e);
+					}
+				}
+				response.flushBuffer();
+			}
+			catch (InvalidInputException e) {
+				LOG.error("InvalidInputException caught in getAgentSurveyFile(). Nested exception is ", e);
+				throw e;
+			}
+			catch (IOException e) {
+				LOG.error("IOException caught in getAgentSurveyFile(). Nested exception is ", e);
+			}
+		}
+		catch (NonFatalException e) {
+			LOG.error("Non fatal exception caught in getAgentSurveyFile(). Nested exception is ", e);
+		}
+		
+		LOG.info("Method to get file containg Agent's data getAgentSurveyFile() finished.");
+	}
     
 	/*
 	 * Method to 1. Store initial details of customer. 2. Send Invitation mail

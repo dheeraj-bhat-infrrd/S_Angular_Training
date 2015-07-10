@@ -7356,11 +7356,11 @@ $(document).on('click','#dsh-dwnld-report-btn',function(){
 		window.location.href = "/downloaddashboardcompletesurvey.do?columnName="+colName+"&startDate="+startDate+"&endDate="+endDate;
 		break;
 	case 1:
-		console.log("loan-officer-ranking");
+		console.log("agent-ranking");
 		window.location.href = "/downloadagentrankingreport.do?columnName="+colName+"&startDate="+startDate+"&endDate="+endDate;
 		break;
 	case 2:
-		console.log("customer-survey");
+		console.log("survey-results");
 		window.location.href = "/downloadcustomersurveyresults.do?columnName="+colName+"&startDate="+startDate+"&endDate="+endDate;
 		break;
 	case 3:
