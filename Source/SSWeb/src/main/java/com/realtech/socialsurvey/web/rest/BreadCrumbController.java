@@ -12,8 +12,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import com.google.gson.Gson;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
+import com.realtech.socialsurvey.core.entities.BreadCrumb;
+
 import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
 import com.realtech.socialsurvey.core.entities.UserProfile;
+
 import com.realtech.socialsurvey.core.exception.BaseRestException;
 import com.realtech.socialsurvey.core.exception.InputValidationException;
 import com.realtech.socialsurvey.core.exception.InternalServerException;
@@ -36,6 +39,7 @@ public class BreadCrumbController {
 	private UserManagementService userManagementService;
 
 	
+
 	/**
 	 * Service to get the breadcrumb of an individual
 	 * 
@@ -61,7 +65,7 @@ public class BreadCrumbController {
 				List<UserProfile> userProfiles = userManagementService.getUserByUserId(individualProfile.getIden()).getUserProfiles();
 				UserProfile userProfile = null;
 				for (UserProfile element : userProfiles) {
-					if (element.getProfilesMaster().getProfileId() == 4) {
+					if (element.getProfilesMaster().getProfileId() == CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID) {
 						userProfile = element;
 						break;
 					}
@@ -71,7 +75,7 @@ public class BreadCrumbController {
 					throw new ProfileNotFoundException("No records found  ");
 				}
 
-				List<Object> userBreadCrumb = profileManagementService.getIndividualsBreadCrumb(userProfile);
+				List<BreadCrumb> userBreadCrumb = profileManagementService.getIndividualsBreadCrumb(userProfile);
 				String json = new Gson().toJson(userBreadCrumb);
 				LOG.debug("individualProfile breadCrumb json : " + json);
 				response = Response.ok(json).build();
@@ -121,7 +125,7 @@ public class BreadCrumbController {
 				if (regionProfile == null) {
 					throw new ProfileNotFoundException("No records found ");
 				}
-				List<Object> regionBreadCrumb = profileManagementService.getRegionsBreadCrumb(regionProfile);
+				List<BreadCrumb> regionBreadCrumb = profileManagementService.getRegionsBreadCrumb(regionProfile);
 				String json = new Gson().toJson(regionBreadCrumb);
 				LOG.debug("regionProfile json : " + json);
 				response = Response.ok(json).build();
@@ -169,7 +173,7 @@ public class BreadCrumbController {
 					throw new ProfileNotFoundException("No records found ");
 				}
 
-				List<Object> branchBreadCrumb = profileManagementService.getBranchsBreadCrumb(branchProfile);
+				List<BreadCrumb> branchBreadCrumb = profileManagementService.getBranchsBreadCrumb(branchProfile);
 				String json = new Gson().toJson(branchBreadCrumb);
 				LOG.debug("branchProfile json : " + json);
 				response = Response.ok(json).build();
