@@ -119,8 +119,11 @@ $(window).on('unload', function(){
 				'socialNetwork' : "${socialNetwork}"
 			};
 			fetchSocialProfileUrl(payload, function(data) {
-				parentWindow.showProfileLink("${socialNetwork}", data);
-				parentWindow.showProfileLinkInEditProfilePage("${socialNetwork}", data);
+				if(data.statusText == 'OK'){
+					parentWindow.loadSocialMediaUrlInSettingsPage();
+					//parentWindow.showProfileLink("${socialNetwork}", data.responseText);
+					parentWindow.showProfileLinkInEditProfilePage("${socialNetwork}", data.responseText);					
+				}
 			});
 		}
 	}
@@ -132,7 +135,7 @@ function fetchSocialProfileUrl(payload, callBackFunction){
 		type : "GET",
 		data : payload,
 		async : false,
-		success : callBackFunction,
+		complete : callBackFunction,
 		error : function(e) {
 			if(e.status == 504) {
 				redirectToLoginPageOnSessionTimeOut(e.status);

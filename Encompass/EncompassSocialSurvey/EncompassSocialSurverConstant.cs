@@ -13,6 +13,8 @@ namespace EncompassSocialSurvey
         public const int STATUS = 2;
 
         public const string COMPANY_CREDENTIALS_CRM_SOURCE = "encompass";
+
+        //
         public const string MongoCompanyInfoCollection = "MongoCompanyInfoCollection";
 
         public static string GetAppSettingsValue(string key)

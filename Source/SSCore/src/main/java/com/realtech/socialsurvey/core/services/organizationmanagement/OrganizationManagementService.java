@@ -1,6 +1,7 @@
 package com.realtech.socialsurvey.core.services.organizationmanagement;
 
 import java.net.MalformedURLException;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -26,6 +27,7 @@ import com.realtech.socialsurvey.core.enums.AccountType;
 import com.realtech.socialsurvey.core.exception.DatabaseException;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.exception.NoRecordsFetchedException;
+import com.realtech.socialsurvey.core.exception.NonFatalException;
 import com.realtech.socialsurvey.core.services.payment.exception.PaymentException;
 import com.realtech.socialsurvey.core.services.search.exception.SolrException;
 
@@ -152,6 +154,11 @@ public interface OrganizationManagementService {
 	public MailContentSettings updateSurveyParticipationMailBody(OrganizationUnitSettings companySettings, String mailSubject, String mailBody,
 			String mailCategory) throws InvalidInputException;
 
+	public MailContentSettings revertSurveyParticipationMailBody(OrganizationUnitSettings companySettings, String mailCategory)
+			throws NonFatalException;
+	
+	public ArrayList<String> getSurveyParamOrder(String category) throws InvalidInputException;
+	
 	/**
 	 * Adds a Disabled Account record in the database
 	 * 
@@ -714,4 +721,6 @@ public interface OrganizationManagementService {
     public void removeOrganizationUnitSettings( List<Long> idsToRemove, String collectionName );
 	
 	public SurveySettings retrieveDefaultSurveyProperties();
+
+	public String resetDefaultSurveyText(SurveySettings surveySettings, String mood);
 }

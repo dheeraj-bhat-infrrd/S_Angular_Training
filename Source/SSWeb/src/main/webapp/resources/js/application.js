@@ -98,6 +98,8 @@ var surveyUrl = "/rest/survey/";
 var editable;
 var yelpEnabled;
 var googleEnabled;
+var zillowEnabled;
+var lendingtreeEnabled;
 var agentProfileLink;
 var agentFullProfileLink;
 var companyLogo;
@@ -3182,6 +3184,23 @@ function updateAutoPostSetting(isautopostenabled){
 	});
 }
 
+function resetTextForMoodFlow(mood, resetId){
+	var payload = {
+		"mood" : mood
+	};
+	callAjaxGetWithPayloadData("./resettextforflow.do", function(data) {
+		var map =  $.parseJSON(data);
+
+		if (map.success == 1 && map.message) {
+			$('#' + resetId).val(map.message);
+			$('#overlay-toast').html("Content reverted successfully!");
+		} else {
+			$('#overlay-toast').html("Oops! Something went wrong. Please try again later.");
+		}
+		showToast();
+	}, payload, true);
+}
+
 function saveTextForMoodFlow(content, mood){
 	var payload = {
 		"text" : content,
@@ -3797,6 +3816,7 @@ function searchUsersByNameEmailLoginId(searchKey) {
 
 function searchUsersByNameEmailLoginIdCallBack(data) {
 	$('#user-list').html(data);
+	bindEditUserClick();
 }
 
 /*function paintUsersList(data) {
@@ -4333,6 +4353,12 @@ function showLinkedInProfileUrl(data) {
 	$('#wc-connect-link').html('LinkedIn Profile <u><a href=' + data + ' target="_blank">' + data + '</a></u>');
 }
 
+function loadSocialMediaUrlInSettingsPage() {
+	callAjaxGET('/getsocialmediatokenonsettingspage.do', function(data){
+		$('#social-media-token-cont').html(data);
+	}, false);
+}
+
 function showProfileLink(source, profileUrl){
 	if(source=='facebook'){
 		$('#fb-profile-url').html(profileUrl);
@@ -4551,6 +4577,8 @@ function fetchUsersByProfileLevelCallback(data) {
 	var response = $.parseJSON(data);
 	if (response != undefined) {
 		var usersList = $.parseJSON(response.entity);
+		if(usersList.length > 0)
+			$('#srch-num').html(usersList.length);
 		paintProList(usersList);
 	}
 }
@@ -4612,7 +4640,6 @@ function initSurvey(firstName, lastName, email, agentId, agentName, grecaptchare
 }
 
 function initSurveyWithUrl(q) {
-	console.log(window.location.origin);
 	var success = false;
 	var payload = {
 		"q" : q
@@ -4704,8 +4731,38 @@ function paintSurveyPage(jsonData) {
 	autoPostScore = jsonData.responseJSON.autopostScore;
 	yelpEnabled = Boolean(jsonData.responseJSON.yelpEnabled);
 	googleEnabled = Boolean(jsonData.responseJSON.googleEnabled);
+	zillowEnabled = Boolean(jsonData.responseJSON.zillowEnabled);
+	lendingtreeEnabled = Boolean(jsonData.responseJSON.lendingtreeEnabled);
 	agentProfileLink = jsonData.responseJSON.agentProfileLink;
 	agentFullProfileLink = jsonData.responseJSON.agentFullProfileLink;
+	
+	
+	//If social token availiable populate the links
+	if (googleEnabled) {
+		var googleElement = document.getElementById('ggl-btn');
+		shareOnGooglePlus(agentId, window.location.origin + "/rest/survey/", googleElement);
+	} else {
+		$('#ggl-btn').remove();
+	}
+	
+	if (yelpEnabled) {
+		$('#ylp-btn').attr("href", returnValidWebAddress(jsonData.responseJSON.yelpLink));
+	} else {
+		$('#ylp-btn').remove();
+	}
+	
+	if (zillowEnabled) {
+		$('#zillow-btn').attr("href", returnValidWebAddress(jsonData.responseJSON.zillowLink));
+	} else {
+		$('#zillow-btn').remove();
+	}
+	
+	if (lendingtreeEnabled) {
+		$('#lt-btn').attr("href", returnValidWebAddress(jsonData.responseJSON.lendingtreeLink));
+	} else {
+		$('#lt-btn').remove();
+	}
+	
 	companyLogo = jsonData.responseJSON.companyLogo;
 	
 	if (stage != undefined)
@@ -5059,7 +5116,7 @@ function showMasterQuestionPage(){
 		}
 		if ($('#shr-post-chk-box').hasClass('bd-check-img') && (rating >= autoPostScore) && (Boolean(autoPost) == true)) {
 			postToSocialMedia(feedback);
-			$('#social-post-lnk').show();
+			/*$('#social-post-lnk').show();
 			if((mood == 'Great') && (yelpEnabled || googleEnabled) && !(yelpEnabled && googleEnabled)){
 				$('.sq-btn-social-wrapper').css({
 					"float" : "none",
@@ -5071,19 +5128,22 @@ function showMasterQuestionPage(){
 			}
 			if (yelpEnabled && (mood == 'Great')){
 				$('#ylp-btn').show();
-				var yelpElement = document.getElementById('ylp-btn');
-				shareOnYelp(agentId, window.location.origin+"/rest/survey/", yelpElement);
+				//var yelpElement = document.getElementById('ylp-btn');
+				//shareOnYelp(agentId, window.location.origin+"/rest/survey/", yelpElement);
 			}
 			else {
 				$('#ylp-btn').parent().remove();
 			}
 			if (googleEnabled && (mood == 'Great')){
-				$('#ggl-btn').show();
 				var googleElement = document.getElementById('ggl-btn');
 				shareOnGooglePlus(agentId, window.location.origin+"/rest/survey/", googleElement);
 			}
 			else {
 				$('#ggl-btn').parent().remove();
+			}*/
+			
+			if(mood == 'Great') {
+				$('#social-post-links').show();
 			}
 		}
 		
@@ -5589,6 +5649,16 @@ $('#ggl-btn').click(function(e) {
 	updateSharedOn("google", agentId, customerEmail);
 });
 
+$('#zillow-btn').click(function(e) {
+	//e.stopImmediatePropagation();
+	updateSharedOn("zillow", agentId, customerEmail);
+});
+
+$('#lt-btn').click(function(e) {
+	//e.stopImmediatePropagation();
+	updateSharedOn("lendingtree", agentId, customerEmail);
+});
+
 $('#shr-post-chk-box').click(function(){
 	if($('#shr-post-chk-box').hasClass('bd-check-img-checked')){
 		$('#shr-post-chk-box').removeClass('bd-check-img-checked');
@@ -5699,13 +5769,8 @@ $(document).on('click', '.lp-edit-locks', function(e) {
 
 	if ($(this).attr('data-control') == 'user') {
 		if ($(this).hasClass('lp-edit-locks-locked')) {
-			$(this).removeClass('lp-edit-locks-locked');
-			$(this).attr('data-state', 'unlocked');
 			updateLockSettings(lockId, false);
-
 		} else {
-			$(this).addClass('lp-edit-locks-locked');
-			$(this).attr('data-state', 'locked');
 			updateLockSettings(lockId, true);
 		}
 	} else {
@@ -5720,13 +5785,8 @@ $(document).on('click', '.prof-img-lock-item', function(e) {
 
 	if ($(this).attr('data-control') == 'user') {
 		if ($(this).hasClass('prof-img-lock-locked')) {
-			$(this).removeClass('prof-img-lock-locked');
-			$(this).attr('data-state', 'unlocked');
 			updateLockSettings(lockId, false);
-
 		} else {
-			$(this).addClass('prof-img-lock-locked');
-			$(this).attr('data-state', 'locked');
 			updateLockSettings(lockId, true);
 		}
 	} else {
@@ -5745,12 +5805,25 @@ function updateLockSettings(id, state) {
 			"id" : id,
 			"state" : state
 		};
-		callAjaxPostWithPayloadData("./updatelocksettings.do",
-				callBackUpdateLock, payload);
+		callAjaxPostWithPayloadData("./updatelocksettings.do", function(data) {
+			$('#prof-message-header').html(data);
+			if ($('#prof-message-header #display-msg-div').hasClass('success-message')) {
+				if (state == false) {
+					$('#' + id).removeClass('lp-edit-locks-locked');
+					$('#' + id).removeClass('prof-img-lock-locked');
+					$('#' + id).attr('data-state', 'unlocked');
+				}
+				else if (state == true) {
+					$('#' + id).addClass('lp-edit-locks-locked');
+					$('#' + id).addClass('prof-img-lock-locked');
+					$('#' + id).attr('data-state', 'locked');
+				}
+			}
+			
+			$('#overlay-toast').html($('#display-msg-div').text().trim());
+			showToast();
+		}, payload);
 	}, 0);
-}
-function callBackUpdateLock () {
-	showMainContent('./showprofilepage.do');
 }
 
 // Update AboutMe details
@@ -6528,7 +6601,7 @@ function callBackUpdateHobbies(data) {
 
 
 // Update Social links - facebook
-$('body').on('click', '#prof-edit-social-link .icn-fb', function() {
+/*$('body').on('click', '#prof-edit-social-link .icn-fb', function() {
 	$('#social-token-text').show();
 	var link = $(this).attr('data-link');
 	$('#social-token-text').attr({
@@ -6549,10 +6622,10 @@ function updateFacebookLink(link) {
 		$('#overlay-toast').html("Enter a valid url");
 		showToast();
 	}
-}
+}*/
 
 // Update Social links - twitter
-$('body').on('click', '#prof-edit-social-link .icn-twit', function() {
+/*$('body').on('click', '#prof-edit-social-link .icn-twit', function() {
 	$('#social-token-text').show();
 	var link = $(this).attr("data-link");
 	$('#social-token-text').attr({
@@ -6573,10 +6646,10 @@ function updateTwitterLink(link) {
 		$('#overlay-toast').html("Enter a valid url");
 		showToast();
 	}
-}
+}*/
 
 // Update Social links - linkedin
-$('body').on('click', '#prof-edit-social-link .icn-lin', function() {
+/*$('body').on('click', '#prof-edit-social-link .icn-lin', function() {
 	$('#social-token-text').show();
 	var link = $(this).attr("data-link");
 	$('#social-token-text').attr({
@@ -6597,10 +6670,10 @@ function updateLinkedInLink(link) {
 		$('#overlay-toast').html("Enter a valid url");
 		showToast();
 	}
-}
+}*/
 
 // Update Social links - google plus
-$('body').on('click', '#prof-edit-social-link .icn-gplus', function() {
+/*$('body').on('click', '#prof-edit-social-link .icn-gplus', function() {
 	$('#social-token-text').show();
 	var link = $(this).attr("data-link");
 	$('#social-token-text').attr({
@@ -6621,7 +6694,7 @@ function updateGoogleLink(link) {
 		$('#overlay-toast').html("Enter a valid url");
 		showToast();
 	}
-}
+}*/
 
 // Update Social links - yelp
 $('body').on('click', '#prof-edit-social-link .icn-yelp', function() {
@@ -6636,7 +6709,7 @@ $('body').on('click', '#prof-edit-social-link .icn-yelp', function() {
 
 function updateYelpLink(link) {
 	var payload = {
-		"yelplink" : link	
+		"yelplink" : link
 	};
 	if (isValidUrl(link)) {
 		callAjaxPostWithPayloadData("./updateyelplink.do", callBackUpdateSocialLink, payload);
@@ -6660,7 +6733,7 @@ $('body').on('click', '#prof-edit-social-link .icn-zillow', function() {
 
 function updateZillowLink(link) {
 	var payload = {
-		"zillowlink" : link	
+		"zillowlink" : link
 	};
 	if (isValidUrl(link)) {
 		callAjaxPostWithPayloadData("./updatezillowlink.do", callBackUpdateSocialLink, payload);
@@ -6684,7 +6757,7 @@ $('body').on('click', '#prof-edit-social-link .icn-lendingtree', function() {
 
 function updateLendingTreeLink(link) {
 	var payload = {
-		"lendingTreeLink" : link	
+		"lendingTreeLink" : link
 	};
 	if (isValidUrl(link)) {
 		callAjaxPostWithPayloadData("./updatelendingtreelink.do", callBackUpdateSocialLink, payload);
@@ -7102,10 +7175,10 @@ function paintPosts(posts) {
 		divToPopulate += '<div class="tweet-panel-item bord-bot-dc clearfix">'
 				+ '<div class="tweet-icn ' + iconClass + ' float-left"></div>'
 				+ '<div class="tweet-txt float-left">'
-				+ '<div class="tweet-text-main">' + post.postText + '</div>'
+				+ '<div class="tweet-text-main">' + linkify(post.postText) + '</div>'
 				+ '<div class="tweet-text-link"><em>' + post.postedBy
 				+ '</em></div>' + '<div class="tweet-text-time"><em>'
-				+ new Date(post.timeInMillis).toUTCString() + '</em></div>'
+				+ convertUserDateToLocalWeekFormt(new Date(post.timeInMillis)) + '</em></div>'
 				+ '	</div>' + '</div>';
 	});
 
@@ -7264,5 +7337,37 @@ $(document).on('blur', '#disclaimer-text', function() {
 			$('#overlay-toast').html($('#display-msg-div').text().trim());
 			showToast();
 		}, payload);
+	}
+});
+
+//Dashboard admin reports
+$(document).on('change','#download-survey-reports',function(){
+//	var selectedValue =
+});
+
+$(document).on('click','#dsh-dwnld-report-btn',function(){
+	var selectedValue = $('#download-survey-reports').val();
+	var startDate = $('#dsh-start-date').val();
+	var endDate = $("#dsh-end-date").val();
+	var key = parseInt(selectedValue);
+	switch (key) {
+	case 0:
+		console.log("complete-survey");
+		window.location.href = "/downloaddashboardcompletesurvey.do?columnName="+colName+"&startDate="+startDate+"&endDate="+endDate;
+		break;
+	case 1:
+		console.log("loan-officer-ranking");
+		window.location.href = "/downloadagentrankingreport.do?columnName="+colName+"&startDate="+startDate+"&endDate="+endDate;
+		break;
+	case 2:
+		console.log("customer-survey");
+		window.location.href = "/downloadcustomersurveyresults.do?columnName="+colName+"&startDate="+startDate+"&endDate="+endDate;
+		break;
+	case 3:
+		console.log("social-monitor");
+		window.location.href = "/downloaddashboardsocialmonitor.do?columnName="+colName+"&startDate="+startDate+"&endDate="+endDate;
+		break;
+	default:
+		break;
 	}
 });

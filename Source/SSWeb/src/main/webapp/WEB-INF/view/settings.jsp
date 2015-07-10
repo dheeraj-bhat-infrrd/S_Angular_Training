@@ -130,16 +130,19 @@
 					<div class="bd-mcq-row clearfix txtareaRow">
 						<div class="float-left cs-gq-lbl"><spring:message code="label.flow.happy.label.text" /></div>
 						<textarea id="happy-text" class="float-left textarea-bd-mcq-txt" style=""></textarea>
+						<div class="float-left reset-icon cursor-pointer"><spring:message code="label.reset.key" /></div>
 					</div>
 					
 					<div class="bd-mcq-row clearfix txtareaRow">
 						<div class="float-left cs-gq-lbl"><spring:message code="label.flow.ok.label.text" /></div>
 						<textarea id="neutral-text" class="float-left textarea-bd-mcq-txt" style=""></textarea>
+						<div class="float-left reset-icon cursor-pointer"><spring:message code="label.reset.key" /></div>
 					</div>
 					
 					<div class="bd-mcq-row clearfix txtareaRow">
 						<div class="float-left cs-gq-lbl"><spring:message code="label.flow.sad.label.text" /></div>
 						<textarea id="sad-text" class="float-left textarea-bd-mcq-txt" style=""></textarea>
+						<div class="float-left reset-icon cursor-pointer"><spring:message code="label.reset.key" /></div>
 					</div>
 				</div>
 				<div class="um-gateway-cont">
@@ -148,16 +151,19 @@
 						<div class="bd-mcq-row clearfix txtareaRow">
 							<div class="float-left cs-gq-lbl"><spring:message code="label.complete.happy.label.text" /></div>
 							<textarea id="happy-text-complete" class="float-left textarea-bd-mcq-txt" style=""></textarea>
+							<div class="float-left reset-icon cursor-pointer"><spring:message code="label.reset.key" /></div>
 						</div>
 						
 						<div class="bd-mcq-row clearfix txtareaRow">
 							<div class="float-left cs-gq-lbl"><spring:message code="label.complete.ok.label.text" /></div>
 							<textarea id="neutral-text-complete" class="float-left textarea-bd-mcq-txt" style=""></textarea>
+							<div class="float-left reset-icon cursor-pointer"><spring:message code="label.reset.key" /></div>
 						</div>
 						
 						<div class="bd-mcq-row clearfix txtareaRow">
 							<div class="float-left cs-gq-lbl"><spring:message code="label.complete.sad.label.text" /></div>
 							<textarea id="sad-text-complete" class="float-left textarea-bd-mcq-txt" style=""></textarea>
+							<div class="float-left reset-icon cursor-pointer"><spring:message code="label.reset.key" /></div>
 						</div>
 					</div>
 				</div>
@@ -176,26 +182,8 @@
 				</div>
 				<input type="hidden" name="ratingcategory" id="ratingcategory">
 				<div class="clearfix float-right col-lg-8 col-md-8 col-sm-8 col-xs-12">
-					<div class="soc-nw-wrapper clearfix">
-						<div class="soc-nw-icns-cont clearfix">
-							<div class="float-left soc-nw-icns cursor-pointer icn-wide-fb soc-nw-adj" onclick="openAuthPage('facebook');"></div>
-							<div id="edt-prof-fb-lnk" class="float-left soc-nw-icn-link">${facebookLink}</div>
-						</div>
-						<!-- <div class="float-left soc-nw-icns cursor-pointer icn-wide-gplus" onclick="openAuthPage('google');"></div> -->
-						<div class="soc-nw-icns-cont clearfix">
-							<div class="float-left soc-nw-icns cursor-pointer icn-wide-twitter soc-nw-adj" onclick="openAuthPage('twitter');"></div>
-							<div id="edt-prof-twt-lnk" class="float-left soc-nw-icn-link">${twitterLink}</div>
-						</div>
-						<!-- <div class="float-left soc-nw-icns cursor-pointer icn-wide-rss" onclick="openAuthPage('rss');"></div> -->
-						<div class="soc-nw-icns-cont clearfix">
-							<div class="float-left soc-nw-icns cursor-pointer icn-wide-linkedin soc-nw-adj" onclick="openAuthPage('linkedin');"></div>
-							<div id="edt-prof-linkedin-lnk" class="float-left soc-nw-icn-link">${linkedinLink}</div>
-						</div>
-						<!-- <div class="float-left soc-nw-icns cursor-pointer icn-wide-yelp" onclick="openAuthPage('yelp');"></div> -->
-						<div class="soc-nw-icns-cont clearfix">
-							<div class="float-left soc-nw-icns cursor-pointer icn-wide-gplus soc-nw-adj" onclick="openAuthPage('google');"></div>
-							<div id="edt-prof-ggl-lnk" class="float-left soc-nw-icn-link">${googleLink}</div>
-						</div>
+					<div id="social-media-token-cont" class="soc-nw-wrapper clearfix">
+						<jsp:include page="settings_socialauth.jsp"></jsp:include>
 					</div>
 				</div>
 			</div>
@@ -241,10 +229,14 @@
 										class="float-left st-header-txt-rt-icn icn-blue-tick margin-left-20 cursor-pointer hide"></div>
 									<div id="save-participation-mail-content-disabled"
 										class="float-left st-header-txt-rt-icn margin-left-20 icn-grey-tick"></div>
+										
+									<div id="revert-participation-mail"
+										class="float-left st-header-txt-rt-icn margin-left-20 cursor-pointer icn-blue-ellipse"></div>
 								</div>
 								<div class="clearfix">
 									<div class="float-left settings-btn-text">Edit</div>
-									<div class="float-right settings-btn-text">Save</div>
+									<div class="float-left settings-btn-text margin-left-20">Save</div>
+									<div class="float-left settings-btn-text margin-left-20">Reset</div>
 								</div>
 							</div>
 						</div>
@@ -274,10 +266,14 @@
 										class="float-left st-header-txt-rt-icn icn-blue-tick margin-left-20 cursor-pointer hide"></div>
 									<div id="save-participation-reminder-mail-content-disabled"
 										class="float-left st-header-txt-rt-icn margin-left-20 icn-grey-tick"></div>
+										
+									<div id="revert-participation-reminder-mail"
+										class="float-left st-header-txt-rt-icn margin-left-20 cursor-pointer icn-blue-ellipse"></div>
 								</div>
 								<div class="clearfix">
 									<div class="float-left settings-btn-text">Edit</div>
-									<div class="float-right settings-btn-text">Save</div>
+									<div class="float-left settings-btn-text margin-left-20">Save</div>
+									<div class="float-left settings-btn-text margin-left-20">Reset</div>
 								</div>
 							</div>
 						</div>
@@ -522,6 +518,14 @@ $(document).ready(function() {
 		$('#edit-participation-mail-content').show();
 		$('#edit-participation-mail-content-disabled').hide();
 	});
+	$('#revert-participation-mail').click(function() {
+		var payload = {
+			"mailcategory" : 'participationmail'
+		};
+		callAjaxPostWithPayloadData('./revertsurveyparticipationmail.do', function () {
+			showMainContent('./showcompanysettings.do');
+		}, payload, true);
+	});
 
 	$('#edit-participation-reminder-mail-content').click(function() {
 		try {
@@ -553,6 +557,14 @@ $(document).ready(function() {
 
 		$('#edit-participation-reminder-mail-content').show();
 		$('#edit-participation-reminder-mail-content-disabled').hide();
+	});
+	$('#revert-participation-reminder-mail').click(function() {
+		var payload = {
+			"mailcategory" : 'participationremindermail'
+		};
+		callAjaxPostWithPayloadData('./revertsurveyparticipationmail.do', function () {
+			showMainContent('./showcompanysettings.do');
+		}, payload, true);
 	});
 
 
@@ -653,6 +665,32 @@ $(document).ready(function() {
 		saveTextForMoodFlow($("#sad-text-complete").val(), "sadComplete");
 	});
 
+	$('.reset-icon').click(function() {
+		var resetId = $(this).prev().attr('id');
+		var resetTag = "";
+		
+		if (resetId == 'happy-text') {
+			resetTag = 'happy';
+		}
+		else if (resetId == 'neutral-text') {
+			resetTag = 'neutral';
+		}
+		else if (resetId == 'sad-text') {
+			resetTag = 'sad';
+		}
+		else if (resetId == 'happy-text-complete') {
+			resetTag = 'happyComplete';
+		}
+		else if (resetId == 'neutral-text-complete') {
+			resetTag = 'neutralComplete';
+		}
+		else if (resetId == 'sad-text-complete') {
+			resetTag = 'sadComplete';
+		}
+		
+		resetTextForMoodFlow(resetTag, resetId);
+	});
+	
 	$('#atpst-chk-box').click(function() {
 		if ($('#atpst-chk-box').hasClass('bd-check-img-checked')) {
 			$('#atpst-chk-box').removeClass('bd-check-img-checked');

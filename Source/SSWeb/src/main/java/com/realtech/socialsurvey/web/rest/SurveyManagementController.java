@@ -1,5 +1,6 @@
 package com.realtech.socialsurvey.web.rest;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -48,6 +49,7 @@ import com.realtech.socialsurvey.core.services.surveybuilder.SurveyBuilder;
 import com.realtech.socialsurvey.core.services.surveybuilder.SurveyHandler;
 import com.realtech.socialsurvey.core.utils.DisplayMessageConstants;
 import com.realtech.socialsurvey.core.utils.MessageUtils;
+import com.realtech.socialsurvey.core.utils.UrlValidationHelper;
 import com.realtech.socialsurvey.web.common.ErrorCodes;
 import com.realtech.socialsurvey.web.common.ErrorResponse;
 import com.realtech.socialsurvey.web.common.JspResolver;
@@ -73,6 +75,9 @@ public class SurveyManagementController {
 	@Autowired
 	private URLGenerator urlGenerator;
 
+	@Autowired
+    private UrlValidationHelper urlValidationHelper;
+	
 	@Autowired
 	private SolrSearchService solrSearchService;
 
@@ -774,8 +779,15 @@ public class SurveyManagementController {
 
 			}
 			else {
-				yelpUrl.put("host", surveyHandler.getYelpShareUri());
-				yelpUrl.put("relativePath", settings.getSocialMediaTokens().getYelpToken().getYelpPageLink());
+				String validUrl = settings.getSocialMediaTokens().getYelpToken().getYelpPageLink();
+				try {
+					validUrl = urlValidationHelper.buildValidUrl(validUrl);
+				}
+				catch (IOException ioException) {
+					throw new InvalidInputException("Yelp link passed was invalid", DisplayMessageConstants.GENERAL_ERROR, ioException);
+				}
+
+				yelpUrl.put("relativePath", validUrl);
 			}
 		}
 		catch (NonFatalException e) {
@@ -961,56 +973,89 @@ public class SurveyManagementController {
 		}
 
 		OrganizationUnitSettings companySettings = organizationManagementService.getCompanySettings(userManagementService.getUserByUserId(agentId));
-		SurveySettings defaultSurveySettings=organizationManagementService.retrieveDefaultSurveyProperties();
-		surveyAndStage.put("happyText",defaultSurveySettings.getHappyText() );
+		SurveySettings defaultSurveySettings = organizationManagementService.retrieveDefaultSurveyProperties();
+		surveyAndStage.put("happyText", defaultSurveySettings.getHappyText());
 		surveyAndStage.put("neutralText", defaultSurveySettings.getNeutralText());
 		surveyAndStage.put("sadText", defaultSurveySettings.getSadText());
 		surveyAndStage.put("happyTextComplete", defaultSurveySettings.getHappyTextComplete());
 		surveyAndStage.put("neutralTextComplete", defaultSurveySettings.getNeutralTextComplete());
 		surveyAndStage.put("sadTextComplete", defaultSurveySettings.getSadTextComplete());
-		
+
 		if (companySettings != null) {
 			SurveySettings surveySettings = companySettings.getSurvey_settings();
 			if (surveySettings != null) {
-				if(surveySettings.getHappyText() != null && !(surveySettings.getHappyText().isEmpty()))
+				if (surveySettings.getHappyText() != null && !(surveySettings.getHappyText().isEmpty()))
 					surveyAndStage.put("happyText", surveySettings.getHappyText());
-				if(surveySettings.getNeutralText()!= null && !(surveySettings.getNeutralText().isEmpty()))
+				if (surveySettings.getNeutralText() != null && !(surveySettings.getNeutralText().isEmpty()))
 					surveyAndStage.put("neutralText", surveySettings.getNeutralText());
-				if(surveySettings.getSadText() != null && !surveySettings.getSadText().isEmpty())
+				if (surveySettings.getSadText() != null && !surveySettings.getSadText().isEmpty())
 					surveyAndStage.put("sadText", surveySettings.getSadText());
+				if (surveySettings.getHappyTextComplete() != null && !surveySettings.getHappyTextComplete().isEmpty())
+					surveyAndStage.put("happyTextComplete", surveySettings.getHappyTextComplete());
+				if (surveySettings.getNeutralTextComplete() != null && !surveySettings.getNeutralTextComplete().isEmpty())
+					surveyAndStage.put("neutralTextComplete", surveySettings.getNeutralTextComplete());
+				if (surveySettings.getSadTextComplete() != null && !surveySettings.getSadTextComplete().isEmpty())
+					surveyAndStage.put("sadTextComplete", surveySettings.getSadTextComplete());
+
 				surveyAndStage.put("autopostScore", surveySettings.getShow_survey_above_score());
 				surveyAndStage.put("autopostEnabled", surveySettings.isAutoPostEnabled());
-				if(surveySettings.getHappyTextComplete() != null && !surveySettings.getHappyTextComplete().isEmpty())
-					surveyAndStage.put("happyTextComplete", surveySettings.getHappyTextComplete());
-				if(surveySettings.getNeutralTextComplete() != null && !surveySettings.getNeutralTextComplete().isEmpty())
-					surveyAndStage.put("neutralTextComplete", surveySettings.getNeutralTextComplete());
-				if(surveySettings.getSadTextComplete() != null && !surveySettings.getSadTextComplete().isEmpty())
-					surveyAndStage.put("sadTextComplete", surveySettings.getSadTextComplete());
-				
 			}
 		}
 
 		AgentSettings agentSettings = userManagementService.getUserSettings(agentId);
+		
+		// Fetching Yelp Url
 		try {
-			if (agentSettings.getSocialMediaTokens().getYelpToken().getYelpPageLink() != null)
+			if (agentSettings.getSocialMediaTokens().getYelpToken().getYelpPageLink() != null) {
 				surveyAndStage.put("yelpEnabled", true);
+				surveyAndStage.put("yelpLink", agentSettings.getSocialMediaTokens().getYelpToken().getYelpPageLink());
+			}
 			else
 				surveyAndStage.put("yelpEnabled", false);
 		}
 		catch (NullPointerException e) {
 			surveyAndStage.put("yelpEnabled", false);
 		}
-		
+
+		// Fetching Google Plus Url
 		try {
-			if (agentSettings.getSocialMediaTokens().getGoogleToken().getProfileLink() != null)
+			if (agentSettings.getSocialMediaTokens().getGoogleToken().getProfileLink() != null) {
 				surveyAndStage.put("googleEnabled", true);
+				surveyAndStage.put("googleLink", agentSettings.getSocialMediaTokens().getGoogleToken().getProfileLink());
+			}
 			else
 				surveyAndStage.put("googleEnabled", false);
 		}
 		catch (NullPointerException e) {
 			surveyAndStage.put("googleEnabled", false);
 		}
-		
+
+		// Fetching Zillow Url
+		try {
+			if (agentSettings.getSocialMediaTokens().getZillowToken().getZillowProfileLink() != null) {
+				surveyAndStage.put("zillowEnabled", true);
+				surveyAndStage.put("zillowLink", agentSettings.getSocialMediaTokens().getZillowToken().getZillowProfileLink());
+			}
+			else
+				surveyAndStage.put("zillowEnabled", false);
+		}
+		catch (NullPointerException e) {
+			surveyAndStage.put("zillowEnabled", false);
+		}
+
+		// Fetching LendingTree Url
+		try {
+			if (agentSettings.getSocialMediaTokens().getLendingTreeToken().getLendingTreeProfileLink() != null) {
+				surveyAndStage.put("lendingtreeEnabled", true);
+				surveyAndStage.put("lendingtreeLink", agentSettings.getSocialMediaTokens().getLendingTreeToken().getLendingTreeProfileLink());
+			}
+			else
+				surveyAndStage.put("lendingtreeEnabled", false);
+		}
+		catch (NullPointerException e) {
+			surveyAndStage.put("lendingtreeEnabled", false);
+		}
+
 		surveyAndStage.put("agentFullProfileLink", getApplicationBaseUrl() + CommonConstants.AGENT_PROFILE_FIXED_URL + agentSettings.getProfileUrl());
 		surveyAndStage.put("agentProfileLink", agentSettings.getProfileUrl());
 		surveyAndStage.put("stage", stage);
