@@ -1877,14 +1877,14 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 		List<BreadCrumb> breadCrumbList = new ArrayList<>();
 
 		Branch branch = branchDao.findById(Branch.class, userProfile.getBranchId());
-		getBranchBreadCrumb(breadCrumbList, branch);
+		updateCrumbListWithBranchName(breadCrumbList, branch);
 
 		Region region = regionDao.findById(Region.class, userProfile.getRegionId());
-		getRegionBreadCrumb(breadCrumbList, region);
+		updateCrumbListWithRegionName(breadCrumbList, region);
 
 		Company company = companyDao.findById(Company.class, userProfile.getCompany().getCompanyId());
-		getCompanyBreadCrumb(breadCrumbList, company);
-		getVerticalBreadCrumb(breadCrumbList, company);
+		updateCrumbListWithCompanyName(breadCrumbList, company);
+		updateCrumbListWithVerticalName(breadCrumbList, company);
 
 		Collections.reverse(breadCrumbList);
 		LOG.info("Method getIndividualsBreadCrumb finished :");
@@ -1898,11 +1898,11 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 		List<BreadCrumb> breadCrumbList = new ArrayList<>();
 
 		Region region = regionDao.findById(Region.class, regionProfile.getIden());
-		getRegionBreadCrumb(breadCrumbList, region);
+		updateCrumbListWithRegionName(breadCrumbList, region);
 
 		Company company = region.getCompany();
-		getCompanyBreadCrumb(breadCrumbList, company);
-		getVerticalBreadCrumb(breadCrumbList, company);
+		updateCrumbListWithCompanyName(breadCrumbList, company);
+		updateCrumbListWithVerticalName(breadCrumbList, company);
 
 		Collections.reverse(breadCrumbList);
 		LOG.info("Method getRegionsBreadCrumb finished :");
@@ -1916,29 +1916,29 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 		List<BreadCrumb> breadCrumbList = new ArrayList<>();
 
 		Branch branch = branchDao.findById(Branch.class, branchProfile.getIden());
-		getBranchBreadCrumb(breadCrumbList, branch);
+		updateCrumbListWithBranchName(breadCrumbList, branch);
 
 		Region region = branch.getRegion();
-		getRegionBreadCrumb(breadCrumbList, region);
+		updateCrumbListWithRegionName(breadCrumbList, region);
 
 		Company company = branch.getCompany();
-		getCompanyBreadCrumb(breadCrumbList, company);
-		getVerticalBreadCrumb(breadCrumbList, company);
+		updateCrumbListWithCompanyName(breadCrumbList, company);
+		updateCrumbListWithVerticalName(breadCrumbList, company);
 
 		Collections.reverse(breadCrumbList);
 		LOG.info("Method getBranchsBreadCrumb finished :");
 		return breadCrumbList;
 	}
 
-	private void getCompanyBreadCrumb(List<BreadCrumb> breadCrumbList, Company company) throws InvalidInputException {
-		BreadCrumb breadCrumb;
-		breadCrumb = new BreadCrumb();
+	private void updateCrumbListWithCompanyName(List<BreadCrumb> breadCrumbList, Company company) throws InvalidInputException {
+		BreadCrumb breadCrumb = new BreadCrumb();
 		breadCrumb.setBreadCrumbProfile(company.getCompany());
 		breadCrumb.setBreadCrumbUrl(organizationManagementService.getCompanySettings(company.getCompanyId()).getCompleteProfileUrl());
 		breadCrumbList.add(breadCrumb);
 	}
 
-	private void getBranchBreadCrumb(List<BreadCrumb> breadCrumbList, Branch branch) throws InvalidInputException, NoRecordsFetchedException {
+	private void updateCrumbListWithBranchName(List<BreadCrumb> breadCrumbList, Branch branch) throws InvalidInputException,
+			NoRecordsFetchedException {
 		if (branch.getIsDefaultBySystem() != CommonConstants.IS_DEFAULT_BY_SYSTEM_YES) {
 			BreadCrumb breadCrumb = new BreadCrumb();
 			breadCrumb.setBreadCrumbProfile(branch.getBranch());
@@ -1948,7 +1948,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 		}
 	}
 
-	private void getRegionBreadCrumb(List<BreadCrumb> breadCrumbList, Region region) throws InvalidInputException {
+	private void updateCrumbListWithRegionName(List<BreadCrumb> breadCrumbList, Region region) throws InvalidInputException {
 		if (region.getIsDefaultBySystem() != CommonConstants.IS_DEFAULT_BY_SYSTEM_YES) {
 			BreadCrumb breadCrumb = new BreadCrumb();
 			breadCrumb.setBreadCrumbProfile(region.getRegion());
@@ -1957,11 +1957,27 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 		}
 	}
 
-	private void getVerticalBreadCrumb(List<BreadCrumb> breadCrumbList, Company company) {
+	private void updateCrumbListWithVerticalName(List<BreadCrumb> breadCrumbList, Company company) {
 		BreadCrumb breadCrumb = new BreadCrumb();
 		breadCrumb.setBreadCrumbProfile(company.getVerticalsMaster().getVerticalName());
 		breadCrumbList.add(breadCrumb);
 	}
 
-	
+	@Override
+	@Transactional
+	public List<String> getCompanyList(String verticalName) throws InvalidInputException, ProfileNotFoundException {
+		LOG.info("Method getCompanyList called :");
+		List<String> companyNameList = new ArrayList<>();
+		List<VerticalsMaster> verticalsMaster = verticalsMasterDao.findByColumn(VerticalsMaster.class, CommonConstants.VERTICAL_NAME, verticalName);
+		if (verticalsMaster == null) {
+			throw new ProfileNotFoundException("No records found  ");
+		}
+		List<Company> companyList = verticalsMaster.get(0).getCompanies();
+		for (Company company : companyList) {
+			companyNameList.add(company.getCompany());
+		}
+		LOG.info("Method getCompanyList finished :");
+		return companyNameList;
+	}
+
 }
