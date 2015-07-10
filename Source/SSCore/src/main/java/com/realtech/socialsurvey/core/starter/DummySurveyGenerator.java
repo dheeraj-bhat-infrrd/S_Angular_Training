@@ -11,6 +11,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
+import com.realtech.socialsurvey.core.dao.impl.MongoSocialPostDaoImpl;
 import com.realtech.socialsurvey.core.dummy.generator.SurveyGenerationService;
 import com.realtech.socialsurvey.core.entities.SurveyQuestionDetails;
 import com.realtech.socialsurvey.core.entities.User;
@@ -69,7 +70,7 @@ public class DummySurveyGenerator {
 					}
 					// Trigger survey (Store initial details)
 					surveyHandler.storeInitialSurveyDetails(user.getUserId(), custEmail + count + custEmailDomain, custEmail + count, custEmail
-							+ "last", 0, "transacted", "http://localhost:8080/rest/survey/showsurveypage");
+							+ "last", 0, "transacted", "http://localhost:8080/rest/survey/showsurveypage", MongoSocialPostDaoImpl.KEY_SOURCE_SS);
 					// Fetch survey for each agent
 					List<SurveyQuestionDetails> surveyQuestionDetails = surveyBuilder.getSurveyByAgenId(user.getUserId());
 					// Store answer to each question

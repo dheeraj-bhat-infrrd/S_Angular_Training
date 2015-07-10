@@ -28,6 +28,7 @@ import com.realtech.socialsurvey.core.commons.AgentRankingReportComparator;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.dao.OrganizationUnitSettingsDao;
 import com.realtech.socialsurvey.core.dao.SurveyDetailsDao;
+import com.realtech.socialsurvey.core.dao.impl.MongoSocialPostDaoImpl;
 import com.realtech.socialsurvey.core.entities.AgentRankingReport;
 import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
 import com.realtech.socialsurvey.core.entities.SurveyDetails;
@@ -452,12 +453,16 @@ public class DashboardServiceImpl implements DashboardService, InitializingBean 
 			String agentName = survey.getAgentName();
 			surveyDetailsToPopulate.add(agentName.substring(0, agentName.lastIndexOf(' ')));
 			surveyDetailsToPopulate.add(agentName.substring(agentName.lastIndexOf(' ') + 1));
-			
 			surveyDetailsToPopulate.add(survey.getCustomerFirstName());
 			surveyDetailsToPopulate.add(survey.getCustomerLastName());
 			surveyDetailsToPopulate.add(DATE_FORMATTER.format(survey.getCreatedOn()));
 			surveyDetailsToPopulate.add(DATE_FORMATTER.format(survey.getModifiedOn()));
-			surveyDetailsToPopulate.add("");
+			if (survey.getSource() != null && !survey.getSource().isEmpty()) {
+				surveyDetailsToPopulate.add(survey.getSource());
+			}
+			else {
+				surveyDetailsToPopulate.add(MongoSocialPostDaoImpl.KEY_SOURCE_SS);
+			}
 			surveyDetailsToPopulate.add(survey.getScore());
 			for (SurveyResponse response : survey.getSurveyResponse()) {
 				internalMax++;
@@ -465,7 +470,12 @@ public class DashboardServiceImpl implements DashboardService, InitializingBean 
 			}
 			surveyDetailsToPopulate.add(survey.getMood());
 			surveyDetailsToPopulate.add(survey.getReview());
-			surveyDetailsToPopulate.add("");
+			if (survey.getSharedOn() != null && !survey.getSharedOn().isEmpty()) {
+				surveyDetailsToPopulate.add(CommonConstants.STATUS_YES);
+			}
+			else {
+				surveyDetailsToPopulate.add(CommonConstants.STATUS_NO);
+			}
 			surveyDetailsToPopulate.add(StringUtils.join(survey.getSharedOn(), ","));
 			
 			data.put((++counter).toString(), surveyDetailsToPopulate);
