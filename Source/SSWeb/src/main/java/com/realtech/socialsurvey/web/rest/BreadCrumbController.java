@@ -13,10 +13,8 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import com.google.gson.Gson;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.entities.BreadCrumb;
-
 import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
 import com.realtech.socialsurvey.core.entities.UserProfile;
-
 import com.realtech.socialsurvey.core.exception.BaseRestException;
 import com.realtech.socialsurvey.core.exception.InputValidationException;
 import com.realtech.socialsurvey.core.exception.InternalServerException;
@@ -24,8 +22,8 @@ import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.exception.NoRecordsFetchedException;
 import com.realtech.socialsurvey.core.exception.ProfileServiceErrorCode;
 import com.realtech.socialsurvey.core.exception.RestErrorResponse;
-import com.realtech.socialsurvey.core.services.organizationmanagement.ProfileNotFoundException;
 import com.realtech.socialsurvey.core.services.organizationmanagement.ProfileManagementService;
+import com.realtech.socialsurvey.core.services.organizationmanagement.ProfileNotFoundException;
 import com.realtech.socialsurvey.core.services.organizationmanagement.UserManagementService;
 
 @Controller
@@ -38,7 +36,44 @@ public class BreadCrumbController {
 	@Autowired
 	private UserManagementService userManagementService;
 
-	
+	/**
+	 * Service to get breadcrumb of  verticalName
+	 * 
+	 * @param individualProfileName
+	 * @return
+	 * @throws ProfileNotFoundException
+	 * @throws NoRecordsFetchedException
+	 */
+	@ResponseBody
+	@RequestMapping(value = "/{verticalName}")
+	public Response getCompanyList(@PathVariable String verticalName) throws ProfileNotFoundException, NoRecordsFetchedException {
+		LOG.info("Service to get breadcrumb of  verticalName : " + verticalName);
+		Response response = null;
+		try {
+			if (verticalName == null || verticalName.isEmpty()) {
+				throw new InputValidationException(new ProfileServiceErrorCode(
+						CommonConstants.ERROR_CODE_INDIVIDUAL_PROFILE_SERVICE_PRECONDITION_FAILURE, CommonConstants.SERVICE_CODE_INDIVIDUAL_PROFILE,
+						"verticalName is invalid"), "verticalName  is null or empty");
+			}
+			List<String> companyNameList = null;
+			try {
+				companyNameList = profileManagementService.getCompanyList(verticalName);
+				String json = new Gson().toJson(companyNameList);
+				LOG.debug("individualProfile breadCrumb json : " + json);
+				response = Response.ok(json).build();
+			}
+			catch (InvalidInputException e) {
+				throw new InternalServerException(new ProfileServiceErrorCode(CommonConstants.ERROR_CODE_INDIVIDUAL_PROFILE_SERVICE_FAILURE,
+						CommonConstants.SERVICE_CODE_INDIVIDUAL_PROFILE, "verticalName  is invalid"), e.getMessage());
+			}
+		}
+		catch (BaseRestException e) {
+			response = getErrorResponse(e);
+		}
+		LOG.info("Service to get breadcrumb of verticalName finished");
+		return response;
+
+	}
 
 	/**
 	 * Service to get the breadcrumb of an individual
