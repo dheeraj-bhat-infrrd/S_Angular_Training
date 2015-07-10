@@ -151,6 +151,7 @@ public interface CommonConstants
      * Mongo entities and column name constants
      */
     public static final String AGENT_ID_COLUMN = "agentId";
+    public static final String AGENT_EMAIL_ID_COLUMN = "emailId";
     public static final String CUSTOMER_EMAIL_COLUMN = "customerEmail";
     public static final String CREATED_ON = "createdOn";
     public static final String UPDATED_ON = "updatedOn";
@@ -561,7 +562,7 @@ public interface CommonConstants
     public static final long DEFAULT_VERTICAL_CRM_ID = -1;
 
     public static final int EXPIRE_AFTER_DAYS = 3;
-    
+
     //Constants for survey request send type
     public static final String SURVEY_REQUEST_AGENT = "agent";
     public static final String SURVEY_REQUEST_ADMIN = "admin";
