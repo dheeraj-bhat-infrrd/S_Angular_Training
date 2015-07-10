@@ -372,9 +372,9 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
 		Update update = new Update().unset(keyToUpdate);
 		LOG.debug("Updating the unit settings");
 		mongoTemplate.updateFirst(query, update, OrganizationUnitSettings.class, collectionName);
-		OrganizationUnitSettings organizationUnitSettings = mongoTemplate.findOne(query, OrganizationUnitSettings.class, collectionName);
+		unitSettings = mongoTemplate.findOne(query, OrganizationUnitSettings.class, collectionName);
 		LOG.info("Method removeKeyInOrganizationSettings() finished.");
-		return organizationUnitSettings;
+		return unitSettings;
 	}
 
 
