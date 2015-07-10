@@ -568,10 +568,20 @@ public interface CommonConstants
     public static final String SURVEY_REQUEST_AGENT = "agent";
     public static final String SURVEY_REQUEST_ADMIN = "admin";
     
-    // Constants Excel Report Heading
-    public static final String HEADER_FIRST_NAME = "First Name";
-    public static final String HEADER_LAST_NAME = "Last Name";
-    public static final String HEADER_AVG_SCORE = "Avg Score";
-    public static final String HEADER_SUM_SURVEYS = "Sum Surveys";
-    public static final String HEADER_REGISTRATION_DATE = "Registation Date";
+	// Constants for Agent Ranking Report
+	public static final String HEADER_FIRST_NAME = "First Name";
+	public static final String HEADER_LAST_NAME = "Last Name";
+	public static final String HEADER_AVG_SCORE = "Avg Score";
+	public static final String HEADER_SUM_SURVEYS = "Sum Surveys";
+	public static final String HEADER_REGISTRATION_DATE = "Registation Date";
+	
+	// Constants for Survey Results Report
+	
+	
+	// Constants for Social Monitor Report
+	public static final String HEADER_AGENT_FIRST_NAME = "Agent First Name";
+	public static final String HEADER_AGENT_LAST_NAME = "Agent Last Name";
+	public static final String HEADER_POST_COMMENT = "Post Comment";
+	public static final String HEADER_POST_DATE = "Post Date";
+	public static final String HEADER_POST_SOURCE = "Source";
 }
