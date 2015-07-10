@@ -328,10 +328,9 @@ public class DashboardController {
 
 		String columnName = request.getParameter("columnName");
 		long columnValue = 0;
-		String realtechAdminStr = request.getParameter("realtechAdmin");
-		boolean realtechAdmin = false;
-		if (realtechAdminStr != null && !realtechAdminStr.isEmpty())
-			realtechAdmin = Boolean.parseBoolean(realtechAdminStr);
+		User user = sessionHelper.getCurrentUser();
+		boolean realtechAdmin = user.isSuperAdmin();
+		
 		try {
 			String columnValueStr = request.getParameter("columnValue");
 			columnValue = Long.parseLong(columnValueStr);
@@ -341,12 +340,8 @@ public class DashboardController {
 		}
 		if (columnName.equalsIgnoreCase(CommonConstants.COMPANY_ID_COLUMN)
 				&& !realtechAdmin) {
-			User user = sessionHelper.getCurrentUser();
 			columnValue = user.getCompany().getCompanyId();
 		}
-		if(realtechAdmin)
-			columnName = null;
-
 		int numberOfDays = -1;
 		try {
 			if (request.getParameter("numberOfDays") != null) {
@@ -851,8 +846,14 @@ public class DashboardController {
 
 			if(isRealTechAdmin) {
 				try {
-					result = solrSearchService.searchBranchRegionOrAgentByName(
+					if(searchColumn.equalsIgnoreCase("company")){
+						model.addAttribute("results", organizationManagementService.getCompaniesByName(searchKey));
+						return JspResolver.DASHBOARD_SEARCHRESULTS;
+					}
+					else{
+						result = solrSearchService.searchBranchRegionOrAgentByName(
 							searchColumn, searchKey, columnName,-1);
+					}
 				} catch (InvalidInputException e) {
 					LOG.error(
 							"InvalidInputException caught in getRegionBranchOrAgent() while fetching details. Nested exception is ",

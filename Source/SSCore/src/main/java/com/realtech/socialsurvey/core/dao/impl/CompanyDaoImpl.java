@@ -6,6 +6,7 @@ import java.util.List;
 import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
+import org.hibernate.criterion.MatchMode;
 import org.hibernate.criterion.Restrictions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -41,9 +42,14 @@ public class CompanyDaoImpl extends GenericDaoImpl<Company, Long> implements Com
         return criteria.list();
     }
 
-    /*
-     * Method to delete all the users of a company.
-     */
+    @SuppressWarnings("unchecked")
+	@Override
+    public List<Company> searchCompaniesByName(String namePattern){
+    	Session session = sessionFactory.getCurrentSession();
+        Criteria criteria = session.createCriteria( Company.class );
+        criteria.add( Restrictions.like("company", namePattern, MatchMode.START) );
+        return criteria.list();
+    }
 
 }
 // JIRA SS-42 By RM-05 EOC
