@@ -10,6 +10,7 @@ import com.realtech.socialsurvey.core.entities.Achievement;
 import com.realtech.socialsurvey.core.entities.AgentRankingReport;
 import com.realtech.socialsurvey.core.entities.AgentSettings;
 import com.realtech.socialsurvey.core.entities.Association;
+import com.realtech.socialsurvey.core.entities.BreadCrumb;
 import com.realtech.socialsurvey.core.entities.CompanyPositions;
 import com.realtech.socialsurvey.core.entities.ContactDetailsSettings;
 import com.realtech.socialsurvey.core.entities.Licenses;
@@ -420,9 +421,10 @@ public interface ProfileManagementService {
 	public List<AgentRankingReport> getAgentReport(long iden, String profileLevel, Date startDate, Date endDate, Object object)
 			throws InvalidInputException;
 
-	public List<Object> getIndividualsBreadCrumb(UserProfile userProfile) throws InvalidInputException, NoRecordsFetchedException;
+	public List<BreadCrumb> getIndividualsBreadCrumb(UserProfile userProfile) throws InvalidInputException, NoRecordsFetchedException;
 
-	public List<Object> getRegionsBreadCrumb(OrganizationUnitSettings regionProfile) throws InvalidInputException, NoRecordsFetchedException;
+	public List<BreadCrumb> getRegionsBreadCrumb(OrganizationUnitSettings regionProfile) throws InvalidInputException, NoRecordsFetchedException;
 
-	public List<Object> getBranchsBreadCrumb(OrganizationUnitSettings branchProfile) throws InvalidInputException, NoRecordsFetchedException;
+	public List<BreadCrumb> getBranchsBreadCrumb(OrganizationUnitSettings branchProfile) throws InvalidInputException, NoRecordsFetchedException;
+
 }

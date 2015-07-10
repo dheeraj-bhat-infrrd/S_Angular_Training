@@ -35,6 +35,7 @@ import com.realtech.socialsurvey.core.entities.AgentRankingReport;
 import com.realtech.socialsurvey.core.entities.AgentSettings;
 import com.realtech.socialsurvey.core.entities.Association;
 import com.realtech.socialsurvey.core.entities.Branch;
+import com.realtech.socialsurvey.core.entities.BreadCrumb;
 import com.realtech.socialsurvey.core.entities.Company;
 import com.realtech.socialsurvey.core.entities.CompanyPositions;
 import com.realtech.socialsurvey.core.entities.CompanyProfileData;
@@ -60,6 +61,7 @@ import com.realtech.socialsurvey.core.entities.User;
 import com.realtech.socialsurvey.core.entities.UserFromSearch;
 import com.realtech.socialsurvey.core.entities.UserProfile;
 import com.realtech.socialsurvey.core.entities.UserSettings;
+import com.realtech.socialsurvey.core.entities.VerticalsMaster;
 import com.realtech.socialsurvey.core.entities.WebAddressSettings;
 import com.realtech.socialsurvey.core.entities.YelpToken;
 import com.realtech.socialsurvey.core.enums.AccountType;
@@ -75,7 +77,6 @@ import com.realtech.socialsurvey.core.services.organizationmanagement.UserManage
 import com.realtech.socialsurvey.core.services.search.SolrSearchService;
 import com.realtech.socialsurvey.core.services.search.exception.SolrException;
 import com.realtech.socialsurvey.core.utils.UrlValidationHelper;
-import com.realtech.socialsurvey.core.entities.BreadCrumb;
 
 @DependsOn("generic")
 @Component
@@ -104,6 +105,9 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 
 	@Autowired
 	private GenericDao<User, Long> userDao;
+
+	@Autowired
+	private GenericDao<VerticalsMaster, Long> verticalsMasterDao;
 
 	@Autowired
 	private SurveyDetailsDao surveyDetailsDao;
@@ -1868,37 +1872,20 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 
 	@Override
 	@Transactional
-	public List<Object> getIndividualsBreadCrumb(UserProfile userProfile) throws InvalidInputException, NoRecordsFetchedException {
+	public List<BreadCrumb> getIndividualsBreadCrumb(UserProfile userProfile) throws InvalidInputException, NoRecordsFetchedException {
 		LOG.info("Method getIndividualsBreadCrumb called :");
-		List<Object> breadCrumbList = new ArrayList<>();
-		BreadCrumb breadCrumb = null;
+		List<BreadCrumb> breadCrumbList = new ArrayList<>();
 
 		Branch branch = branchDao.findById(Branch.class, userProfile.getBranchId());
-		if (branch.getIsDefaultBySystem() != 1) {
-			breadCrumb = new BreadCrumb();
-			breadCrumb.setBreadCrumbProfile(branch.getBranch());
-			breadCrumb.setBreadCrumbUrl(organizationManagementService.getBranchSettings(branch.getBranchId()).getOrganizationUnitSettings()
-					.getCompleteProfileUrl());
-			breadCrumbList.add(breadCrumb);
-		}
+		getBranchBreadCrumb(breadCrumbList, branch);
 
 		Region region = regionDao.findById(Region.class, userProfile.getRegionId());
-		if (region.getIsDefaultBySystem() != 1) {
-			breadCrumb = new BreadCrumb();
-			breadCrumb.setBreadCrumbProfile(region.getRegion());
-			breadCrumb.setBreadCrumbUrl(organizationManagementService.getRegionSettings(region.getRegionId()).getCompleteProfileUrl());
-			breadCrumbList.add(breadCrumb);
-		}
+		getRegionBreadCrumb(breadCrumbList, region);
 
 		Company company = companyDao.findById(Company.class, userProfile.getCompany().getCompanyId());
-		breadCrumb = new BreadCrumb();
-		breadCrumb.setBreadCrumbProfile(company.getCompany());
-		breadCrumb.setBreadCrumbUrl(organizationManagementService.getCompanySettings(company.getCompanyId()).getCompleteProfileUrl());
-		breadCrumbList.add(breadCrumb);
-		// add vertical
-		breadCrumb = new BreadCrumb();
-		breadCrumb.setBreadCrumbProfile(company.getVerticalsMaster().getVerticalName());
-		breadCrumbList.add(breadCrumb);
+		getCompanyBreadCrumb(breadCrumbList, company);
+		getVerticalBreadCrumb(breadCrumbList, company);
+
 		Collections.reverse(breadCrumbList);
 		LOG.info("Method getIndividualsBreadCrumb finished :");
 		return breadCrumbList;
@@ -1906,27 +1893,17 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 
 	@Override
 	@Transactional
-	public List<Object> getRegionsBreadCrumb(OrganizationUnitSettings regionProfile) throws InvalidInputException, NoRecordsFetchedException {
+	public List<BreadCrumb> getRegionsBreadCrumb(OrganizationUnitSettings regionProfile) throws InvalidInputException, NoRecordsFetchedException {
 		LOG.info("Method getRegionsBreadCrumb called :");
-		List<Object> breadCrumbList = new ArrayList<>();
-		BreadCrumb breadCrumb = null;
+		List<BreadCrumb> breadCrumbList = new ArrayList<>();
+
 		Region region = regionDao.findById(Region.class, regionProfile.getIden());
-		if (region.getIsDefaultBySystem() != 1) {
-			breadCrumb = new BreadCrumb();
-			breadCrumb.setBreadCrumbProfile(region.getRegion());
-			breadCrumb.setBreadCrumbUrl(organizationManagementService.getRegionSettings(region.getRegionId()).getCompleteProfileUrl());
-			breadCrumbList.add(breadCrumb);
+		getRegionBreadCrumb(breadCrumbList, region);
 
-		}
+		Company company = region.getCompany();
+		getCompanyBreadCrumb(breadCrumbList, company);
+		getVerticalBreadCrumb(breadCrumbList, company);
 
-		breadCrumb = new BreadCrumb();
-		breadCrumb.setBreadCrumbProfile(region.getCompany().getCompany());
-		breadCrumb.setBreadCrumbUrl(organizationManagementService.getCompanySettings(region.getCompany().getCompanyId()).getCompleteProfileUrl());
-		breadCrumbList.add(breadCrumb);
-		// add vertical
-		breadCrumb = new BreadCrumb();
-		breadCrumb.setBreadCrumbProfile(region.getCompany().getVerticalsMaster().getVerticalName());
-		breadCrumbList.add(breadCrumb);
 		Collections.reverse(breadCrumbList);
 		LOG.info("Method getRegionsBreadCrumb finished :");
 		return breadCrumbList;
@@ -1934,39 +1911,57 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 
 	@Override
 	@Transactional
-	public List<Object> getBranchsBreadCrumb(OrganizationUnitSettings branchProfile) throws InvalidInputException, NoRecordsFetchedException {
+	public List<BreadCrumb> getBranchsBreadCrumb(OrganizationUnitSettings branchProfile) throws InvalidInputException, NoRecordsFetchedException {
 		LOG.info("Method getBranchsBreadCrumb called :");
-		List<Object> breadCrumbList = new ArrayList<>();
-		BreadCrumb breadCrumb = null;
+		List<BreadCrumb> breadCrumbList = new ArrayList<>();
 
 		Branch branch = branchDao.findById(Branch.class, branchProfile.getIden());
-		if (branch.getIsDefaultBySystem() != 1) {
-			breadCrumb = new BreadCrumb();
+		getBranchBreadCrumb(breadCrumbList, branch);
+
+		Region region = branch.getRegion();
+		getRegionBreadCrumb(breadCrumbList, region);
+
+		Company company = branch.getCompany();
+		getCompanyBreadCrumb(breadCrumbList, company);
+		getVerticalBreadCrumb(breadCrumbList, company);
+
+		Collections.reverse(breadCrumbList);
+		LOG.info("Method getBranchsBreadCrumb finished :");
+		return breadCrumbList;
+	}
+
+	private void getCompanyBreadCrumb(List<BreadCrumb> breadCrumbList, Company company) throws InvalidInputException {
+		BreadCrumb breadCrumb;
+		breadCrumb = new BreadCrumb();
+		breadCrumb.setBreadCrumbProfile(company.getCompany());
+		breadCrumb.setBreadCrumbUrl(organizationManagementService.getCompanySettings(company.getCompanyId()).getCompleteProfileUrl());
+		breadCrumbList.add(breadCrumb);
+	}
+
+	private void getBranchBreadCrumb(List<BreadCrumb> breadCrumbList, Branch branch) throws InvalidInputException, NoRecordsFetchedException {
+		if (branch.getIsDefaultBySystem() != CommonConstants.IS_DEFAULT_BY_SYSTEM_YES) {
+			BreadCrumb breadCrumb = new BreadCrumb();
 			breadCrumb.setBreadCrumbProfile(branch.getBranch());
 			breadCrumb.setBreadCrumbUrl(organizationManagementService.getBranchSettings(branch.getBranchId()).getOrganizationUnitSettings()
 					.getCompleteProfileUrl());
 			breadCrumbList.add(breadCrumb);
 		}
+	}
 
-		Region region = branch.getRegion();
-		if (region.getIsDefaultBySystem() != 1) {
-			breadCrumb = new BreadCrumb();
+	private void getRegionBreadCrumb(List<BreadCrumb> breadCrumbList, Region region) throws InvalidInputException {
+		if (region.getIsDefaultBySystem() != CommonConstants.IS_DEFAULT_BY_SYSTEM_YES) {
+			BreadCrumb breadCrumb = new BreadCrumb();
 			breadCrumb.setBreadCrumbProfile(region.getRegion());
 			breadCrumb.setBreadCrumbUrl(organizationManagementService.getRegionSettings(region.getRegionId()).getCompleteProfileUrl());
 			breadCrumbList.add(breadCrumb);
-
 		}
-
-		breadCrumb = new BreadCrumb();
-		breadCrumb.setBreadCrumbProfile(branch.getCompany().getCompany());
-		breadCrumb.setBreadCrumbUrl(organizationManagementService.getCompanySettings(branch.getCompany().getCompanyId()).getCompleteProfileUrl());
-		breadCrumbList.add(breadCrumb);
-		// add vertical
-		breadCrumb = new BreadCrumb();
-		breadCrumb.setBreadCrumbProfile(branch.getCompany().getVerticalsMaster().getVerticalName());
-		breadCrumbList.add(breadCrumb);
-		Collections.reverse(breadCrumbList);
-		LOG.info("Method getBranchsBreadCrumb finished :");
-		return breadCrumbList;
 	}
+
+	private void getVerticalBreadCrumb(List<BreadCrumb> breadCrumbList, Company company) {
+		BreadCrumb breadCrumb = new BreadCrumb();
+		breadCrumb.setBreadCrumbProfile(company.getVerticalsMaster().getVerticalName());
+		breadCrumbList.add(breadCrumb);
+	}
+
+	
 }
