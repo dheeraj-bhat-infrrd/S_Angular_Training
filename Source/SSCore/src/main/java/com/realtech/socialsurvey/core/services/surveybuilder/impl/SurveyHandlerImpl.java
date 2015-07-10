@@ -121,64 +121,63 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
     @Value ( "${SOCIAL_POST_REMINDER_INTERVAL}")
     private int socialPostReminderInterval;
 
+	/**
+	 * Method to store question and answer format into mongo.
+	 * 
+	 * @param agentId
+	 * @throws InvalidInputException
+	 * @throws Exception
+	 */
+	@Override
+	@Transactional
+	public SurveyDetails storeInitialSurveyDetails(long agentId, String customerEmail, String firstName, String lastName, int reminderCount,
+			String custRelationWithAgent, String baseUrl, String source) throws SolrException, NoRecordsFetchedException, InvalidInputException {
+		LOG.info("Method to store initial details of survey, storeInitialSurveyAnswers() started.");
+		String agentName;
+		long branchId = 0;
+		long companyId = 0;
+		long regionId = 0;
 
-    /**
-     * Method to store question and answer format into mongo.
-     * 
-     * @param agentId
-     * @throws InvalidInputException
-     * @throws Exception
-     */
-    @Override
-    @Transactional
-    public SurveyDetails storeInitialSurveyDetails( long agentId, String customerEmail, String firstName, String lastName,
-        int reminderCount, String custRelationWithAgent, String baseUrl ) throws SolrException, NoRecordsFetchedException,
-        InvalidInputException
-    {
+		User user = userDao.findById(User.class, agentId);
+		companyId = user.getCompany().getCompanyId();
+		agentName = user.getFirstName() + " " + user.getLastName();
+		for (UserProfile userProfile : user.getUserProfiles()) {
+			if (userProfile.getAgentId() == agentId) {
+				branchId = userProfile.getBranchId();
+				regionId = userProfile.getRegionId();
+			}
+		}
 
-        LOG.info( "Method to store initial details of survey, storeInitialSurveyAnswers() started." );
-
-        String agentName;
-        long branchId = 0;
-        long companyId = 0;
-        long regionId = 0;
-
-        User user = userDao.findById( User.class, agentId );
-        companyId = user.getCompany().getCompanyId();
-        agentName = user.getFirstName() + " " + user.getLastName();
-        for ( UserProfile userProfile : user.getUserProfiles() ) {
-            if ( userProfile.getAgentId() == agentId ) {
-                branchId = userProfile.getBranchId();
-                regionId = userProfile.getRegionId();
-            }
-        }
-
-        SurveyDetails surveyDetails = new SurveyDetails();
-        surveyDetails.setAgentId( agentId );
-        surveyDetails.setAgentName( agentName );
-        surveyDetails.setBranchId( branchId );
-        surveyDetails.setCustomerFirstName( firstName );
-        surveyDetails.setCustomerLastName( lastName );
-        surveyDetails.setCompanyId( companyId );
-        surveyDetails.setCustomerEmail( customerEmail );
-        surveyDetails.setRegionId( regionId );
-        surveyDetails.setStage( CommonConstants.INITIAL_INDEX );
-        surveyDetails.setReminderCount( reminderCount );
-        surveyDetails.setModifiedOn( new Date( System.currentTimeMillis() ) );
-        surveyDetails.setCreatedOn( new Date( System.currentTimeMillis() ) );
-        surveyDetails.setSurveyResponse( new ArrayList<SurveyResponse>() );
-        surveyDetails.setCustRelationWithAgent( custRelationWithAgent );
-        surveyDetails.setUrl( getSurveyUrl( agentId, customerEmail, baseUrl ) );
-        surveyDetails.setEditable( true );
-        SurveyDetails survey = surveyDetailsDao.getSurveyByAgentIdAndCustomerEmail( agentId, customerEmail );
-        LOG.info( "Method to store initial details of survey, storeInitialSurveyAnswers() finished." );
-        if ( survey == null ) {
-            surveyDetailsDao.insertSurveyDetails( surveyDetails );
-            return null;
-        } else {
-            return survey;
-        }
-    }
+		SurveyDetails surveyDetails = new SurveyDetails();
+		surveyDetails.setAgentId(agentId);
+		surveyDetails.setAgentName(agentName);
+		surveyDetails.setBranchId(branchId);
+		surveyDetails.setCustomerFirstName(firstName);
+		surveyDetails.setCustomerLastName(lastName);
+		surveyDetails.setCompanyId(companyId);
+		surveyDetails.setCustomerEmail(customerEmail);
+		surveyDetails.setRegionId(regionId);
+		surveyDetails.setStage(CommonConstants.INITIAL_INDEX);
+		surveyDetails.setReminderCount(reminderCount);
+		surveyDetails.setModifiedOn(new Date(System.currentTimeMillis()));
+		surveyDetails.setCreatedOn(new Date(System.currentTimeMillis()));
+		surveyDetails.setSurveyResponse(new ArrayList<SurveyResponse>());
+		surveyDetails.setCustRelationWithAgent(custRelationWithAgent);
+		surveyDetails.setUrl(getSurveyUrl(agentId, customerEmail, baseUrl));
+		surveyDetails.setEditable(true);
+		surveyDetails.setSource(source);
+		
+		SurveyDetails survey = surveyDetailsDao.getSurveyByAgentIdAndCustomerEmail(agentId, customerEmail);
+		LOG.info("Method to store initial details of survey, storeInitialSurveyAnswers() finished.");
+		
+		if (survey == null) {
+			surveyDetailsDao.insertSurveyDetails(surveyDetails);
+			return null;
+		}
+		else {
+			return survey;
+		}
+	}
 
 
     /*

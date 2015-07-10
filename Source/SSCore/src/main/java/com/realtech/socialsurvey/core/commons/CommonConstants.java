@@ -589,6 +589,8 @@ public interface CommonConstants
 	public static final String HEADER_CUSTOMER_COMMENTS = "Customer Comments";
 	public static final String HEADER_AGREED_SHARE = "Agreed to Share";
 	public static final String HEADER_CLICK_THROUGH = "Click through";
+    public static final String STATUS_YES = "Yes";
+    public static final String STATUS_NO = "No";
 	
 	// Constants for Social Monitor Report
 	public static final String HEADER_POST_COMMENT = "Post Comment";
