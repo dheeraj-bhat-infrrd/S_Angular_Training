@@ -75,6 +75,7 @@ import com.realtech.socialsurvey.core.services.organizationmanagement.UserManage
 import com.realtech.socialsurvey.core.services.search.SolrSearchService;
 import com.realtech.socialsurvey.core.services.search.exception.SolrException;
 import com.realtech.socialsurvey.core.utils.UrlValidationHelper;
+import com.realtech.socialsurvey.core.entities.BreadCrumb;
 
 @DependsOn("generic")
 @Component
@@ -96,7 +97,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 
 	@Autowired
 	private GenericDao<Region, Long> regionDao;
-	
+
 	@Resource
 	@Qualifier("branch")
 	private BranchDao branchDao;
@@ -127,7 +128,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 
 	@Autowired
 	private URLGenerator urlGenerator;
-	
+
 	@Autowired
 	private UrlValidationHelper urlValidationHelper;
 
@@ -429,7 +430,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 		// Aggregate Company Profile settings
 		LockSettings userLock = new LockSettings();
 		agentSettings = (AgentSettings) aggregateProfileData(companySettings, agentSettings, userLock);
-		
+
 		AgentSettings agentSettingsType = null;
 		if (agentSettings instanceof AgentSettings) {
 			agentSettingsType = (AgentSettings) agentSettings;
@@ -585,7 +586,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 				companySettings, collection);
 		LOG.info("vertical updated successfully");
 	}
-	
+
 	// Associations
 	@Override
 	public List<Association> addAssociations(String collection, OrganizationUnitSettings unitSettings, List<Association> associations)
@@ -739,7 +740,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 				mediaTokens, unitSettings, collection);
 		LOG.info("Successfully updated the social media tokens.");
 	}
-	
+
 	// Disclaimer
 	@Override
 	public void updateDisclaimer(String collection, OrganizationUnitSettings unitSettings, String disclaimer) throws InvalidInputException {
@@ -757,7 +758,8 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 	 */
 	@Override
 	@Transactional
-	public List<AgentSettings> getIndividualsForBranch(String companyProfileName, String branchProfileName) throws InvalidInputException, ProfileNotFoundException {
+	public List<AgentSettings> getIndividualsForBranch(String companyProfileName, String branchProfileName) throws InvalidInputException,
+			ProfileNotFoundException {
 		if (companyProfileName == null || companyProfileName.isEmpty()) {
 			throw new ProfileNotFoundException("companyProfileName is null or empty in getIndividualsForBranch");
 		}
@@ -806,7 +808,8 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 	 */
 	@Override
 	@Transactional
-	public List<AgentSettings> getIndividualsForCompany(String companyProfileName) throws InvalidInputException, NoRecordsFetchedException, ProfileNotFoundException {
+	public List<AgentSettings> getIndividualsForCompany(String companyProfileName) throws InvalidInputException, NoRecordsFetchedException,
+			ProfileNotFoundException {
 		if (companyProfileName == null || companyProfileName.isEmpty()) {
 			throw new InvalidInputException("companyProfileName is null or empty in getIndividualsForCompany");
 		}
@@ -830,7 +833,8 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 	 */
 	@Override
 	@Transactional
-	public OrganizationUnitSettings getRegionByProfileName(String companyProfileName, String regionProfileName) throws ProfileNotFoundException, InvalidInputException {
+	public OrganizationUnitSettings getRegionByProfileName(String companyProfileName, String regionProfileName) throws ProfileNotFoundException,
+			InvalidInputException {
 		LOG.info("Method getRegionByProfileName called for companyProfileName:" + companyProfileName + " and regionProfileName:" + regionProfileName);
 		if (companyProfileName == null || companyProfileName.isEmpty()) {
 			throw new ProfileNotFoundException("companyProfileName is null or empty in getRegionByProfileName");
@@ -844,14 +848,14 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 		 */
 		String profileUrl = utils.generateRegionProfileUrl(companyProfileName, regionProfileName);
 		OrganizationUnitSettings companySettings = getCompanyProfileByProfileName(companyProfileName);
-		if(companySettings == null){
-		    LOG.error( "Unable to get company settings " );
-		    throw new ProfileNotFoundException("Unable to get company settings ");
+		if (companySettings == null) {
+			LOG.error("Unable to get company settings ");
+			throw new ProfileNotFoundException("Unable to get company settings ");
 		}
 		OrganizationUnitSettings regionSettings = organizationUnitSettingsDao.fetchOrganizationUnitSettingsByProfileUrl(profileUrl,
 				MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION);
-		if(regionSettings == null){
-		    throw new ProfileNotFoundException("Unable to get region settings ");
+		if (regionSettings == null) {
+			throw new ProfileNotFoundException("Unable to get region settings ");
 		}
 
 		LOG.debug("Generating final region settings based on lock settings");
@@ -865,13 +869,14 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 	 */
 	@Override
 	@Transactional
-	public OrganizationUnitSettings getBranchByProfileName(String companyProfileName, String branchProfileName) throws ProfileNotFoundException, InvalidInputException {
+	public OrganizationUnitSettings getBranchByProfileName(String companyProfileName, String branchProfileName) throws ProfileNotFoundException,
+			InvalidInputException {
 		LOG.info("Method getBranchByProfileName called for companyProfileName:" + companyProfileName + " and branchProfileName:" + branchProfileName);
 
 		OrganizationUnitSettings companySettings = getCompanyProfileByProfileName(companyProfileName);
-		if(companySettings == null){
-		    LOG.error( "Unable to fetch company settings, invalid input provided by the user" );
-		    throw new ProfileNotFoundException( "Unable to get company settings " );
+		if (companySettings == null) {
+			LOG.error("Unable to fetch company settings, invalid input provided by the user");
+			throw new ProfileNotFoundException("Unable to get company settings ");
 		}
 		/**
 		 * generate profileUrl and fetch the branch by profileUrl since profileUrl for any branch is
@@ -880,18 +885,18 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 		String profileUrl = utils.generateBranchProfileUrl(companyProfileName, branchProfileName);
 		OrganizationUnitSettings branchSettings = organizationUnitSettingsDao.fetchOrganizationUnitSettingsByProfileUrl(profileUrl,
 				MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION);
-		
-		if(branchSettings == null){
-            LOG.error( "Unable to fetch branch settings, invalid input provided by the user" );
-            throw new ProfileNotFoundException( "Unable to get branch settings " );
-        }
+
+		if (branchSettings == null) {
+			LOG.error("Unable to fetch branch settings, invalid input provided by the user");
+			throw new ProfileNotFoundException("Unable to get branch settings ");
+		}
 
 		LOG.debug("Fetching branch from db to identify the region");
 		Branch branch = branchDao.findById(Branch.class, branchSettings.getIden());
-		if(branch == null){
-		    LOG.error( "Unable to get branch with this iden " +branchSettings.getIden() );
-		    throw new ProfileNotFoundException( "Unable to get branch with this iden " +branchSettings.getIden() );
-		    
+		if (branch == null) {
+			LOG.error("Unable to get branch with this iden " + branchSettings.getIden());
+			throw new ProfileNotFoundException("Unable to get branch with this iden " + branchSettings.getIden());
+
 		}
 		OrganizationUnitSettings regionSettings = organizationUnitSettingsDao.fetchOrganizationUnitSettingsById(branch.getRegion().getRegionId(),
 				MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION);
@@ -926,7 +931,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 	 */
 	@Override
 	@Transactional
-	public OrganizationUnitSettings getIndividualByProfileName(String agentProfileName) throws ProfileNotFoundException, InvalidInputException{
+	public OrganizationUnitSettings getIndividualByProfileName(String agentProfileName) throws ProfileNotFoundException, InvalidInputException {
 		LOG.info("Method getIndividualByProfileName called for agentProfileName:" + agentProfileName);
 
 		OrganizationUnitSettings agentSettings = null;
@@ -977,7 +982,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 		LOG.info("Method getIndividualByProfileName executed successfully");
 		return agentSettings;
 	}
-	
+
 	@Override
 	@Transactional
 	public SocialMediaTokens aggregateSocialProfiles(OrganizationUnitSettings unitSettings, String entity) throws InvalidInputException,
@@ -1004,7 +1009,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 
 		// Aggregate urls
 		SocialMediaTokens entityTokens = validateSocialMediaTokens(unitSettings);
-		
+
 		if (companySettings.getSocialMediaTokens() != null) {
 			SocialMediaTokens companyTokens = validateSocialMediaTokens(companySettings);
 
@@ -1179,7 +1184,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 		if (iden <= 0l) {
 			throw new InvalidInputException("iden is invalid while fetching reviews");
 		}
-		
+
 		Calendar calendar = Calendar.getInstance();
 		if (startDate != null) {
 			calendar.setTime(startDate);
@@ -1191,11 +1196,11 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 			calendar.add(Calendar.DATE, 1);
 			endDate = calendar.getTime();
 		}
-		
+
 		String idenColumnName = getIdenColumnNameFromProfileLevel(profileLevel);
 		surveyDetails = surveyDetailsDao.getFeedbacks(idenColumnName, iden, startIndex, numOfRows, startScore, limitScore, fetchAbusive, startDate,
 				endDate, sortCriteria);
-		
+
 		for (SurveyDetails review : surveyDetails) {
 			OrganizationUnitSettings agentSettings = organizationUnitSettingsDao.fetchAgentSettingsById(review.getAgentId());
 			if (agentSettings != null && agentSettings.getSocialMediaTokens() != null) {
@@ -1217,7 +1222,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 				}
 			}
 		}
-		
+
 		return surveyDetails;
 	}
 
@@ -1298,8 +1303,8 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 	 * @throws SolrException
 	 */
 	@Override
-	public Collection<UserFromSearch> getProListByProfileLevel(long iden, String profileLevel, int start, int numOfRows) throws InvalidInputException,
-			SolrException {
+	public Collection<UserFromSearch> getProListByProfileLevel(long iden, String profileLevel, int start, int numOfRows)
+			throws InvalidInputException, SolrException {
 		LOG.info("Method getProListByProfileLevel called for iden: " + iden + " profileLevel:" + profileLevel + " start:" + start + " numOfRows:"
 				+ numOfRows);
 		if (iden <= 0l) {
@@ -1416,6 +1421,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 				isCompanyAdmin, iden);
 		return surveys;
 	}
+
 	/**
 	 * Method to fetch all users for the list of branches specified
 	 */
@@ -1649,24 +1655,25 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 				agentSettings);
 		LOG.info("Updated company positions.");
 	}
-	
+
 	@Override
-	public void updateProfileStages(List<ProfileStage> profileStages, OrganizationUnitSettings settings, String collectionName){
+	public void updateProfileStages(List<ProfileStage> profileStages, OrganizationUnitSettings settings, String collectionName) {
 		LOG.info("Method to update profile stages started.");
 		organizationUnitSettingsDao.updateParticularKeyOrganizationUnitSettings(MongoOrganizationUnitSettingDaoImpl.KEY_PROFILE_STAGES,
 				profileStages, settings, collectionName);
 		LOG.info("Method to update profile stages finished.");
 	}
-	
+
 	@Override
 	public void setAgentProfileUrlForReview(List<SurveyDetails> reviews) {
 		String profileUrl;
 		String baseProfileUrl = applicationBaseUrl + CommonConstants.AGENT_PROFILE_FIXED_URL;
 		for (SurveyDetails review : reviews) {
-			
+
 			// adding completeProfileUrl
 			try {
-				Collection<UserFromSearch> documents = solrSearchService.searchUsersByIden(review.getAgentId(), CommonConstants.USER_ID_SOLR, true, 0, 1);
+				Collection<UserFromSearch> documents = solrSearchService.searchUsersByIden(review.getAgentId(), CommonConstants.USER_ID_SOLR, true,
+						0, 1);
 				if (documents != null && !documents.isEmpty()) {
 					profileUrl = (String) documents.iterator().next().getProfileUrl();
 					review.setCompleteProfileUrl(baseProfileUrl + profileUrl);
@@ -1675,7 +1682,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 			catch (InvalidInputException | SolrException e) {
 				LOG.error("Exception caught in setAgentProfileUrlForReview() for agent : " + review.getAgentName() + " Nested exception is ", e);
 			}
-			
+
 			OrganizationUnitSettings agentSettings = organizationUnitSettingsDao.fetchAgentSettingsById(review.getAgentId());
 			if (agentSettings != null && agentSettings.getSocialMediaTokens() != null) {
 				SocialMediaTokens mediaTokens = agentSettings.getSocialMediaTokens();
@@ -1736,7 +1743,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 		}
 		return userIds;
 	}
-	
+
 	@Override
 	@Transactional
 	public String aggregateDisclaimer(OrganizationUnitSettings unitSettings, String entity) throws InvalidInputException {
@@ -1792,13 +1799,13 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 		}
 		else if (entity.equals(CommonConstants.BRANCH_ID)) {
 			Branch branch = branchDao.findById(Branch.class, unitSettings.getIden());
-			
+
 			// check for region
 			entitySetting = organizationManagementService.getRegionSettings(branch.getRegion().getRegionId());
 			if (entitySetting != null && entitySetting.getDisclaimer() != null && !entitySetting.getDisclaimer().isEmpty()) {
 				return entitySetting.getDisclaimer();
 			}
-			
+
 			// check for company
 			entitySetting = organizationManagementService.getCompanySettings(branch.getCompany().getCompanyId());
 			if (entitySetting != null && entitySetting.getDisclaimer() != null && !entitySetting.getDisclaimer().isEmpty()) {
@@ -1807,7 +1814,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 		}
 		else if (entity.equals(CommonConstants.REGION_ID)) {
 			Region region = regionDao.findById(Region.class, unitSettings.getIden());
-			
+
 			// check for company
 			entitySetting = organizationManagementService.getCompanySettings(region.getCompany().getCompanyId());
 			if (entitySetting != null && entitySetting.getDisclaimer() != null && !entitySetting.getDisclaimer().isEmpty()) {
@@ -1818,12 +1825,12 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 		LOG.info("Method aggregateDisclaimer() called from ProfileManagementService");
 		return disclaimer;
 	}
-	
+
 	@Override
 	@Transactional
 	public void updateCompanyName(long userId, long companyId, String companyName) throws InvalidInputException {
 		LOG.info("Method updateCompanyName of profileManagementService called for companyId : " + companyId);
-		
+
 		Company company = companyDao.findById(Company.class, companyId);
 		if (company == null) {
 			throw new InvalidInputException("No company present for the specified companyId");
@@ -1835,29 +1842,131 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 
 		LOG.info("Successfully completed method to update company status");
 	}
-	
 
-    @Override
-    @Transactional
-    public List<AgentRankingReport> getAgentReport( long iden, String columnName, Date startDate, Date endDate, Object object )
-        throws InvalidInputException
-    {
-        LOG.info( "Method to get Agent's Report for a specific time and all time started." );
-        if ( columnName == null || columnName.isEmpty() ) {
-            throw new InvalidInputException( "Null/Empty value passed for profile level." );
-        }
-        if ( iden < 0 ) {
-            throw new InvalidInputException( "Invalid value passed for iden of profile level." );
-        }
-        Map<Long, AgentRankingReport> agentReportData = new HashMap<>();
-        surveyDetailsDao.getAverageScore( null, null, agentReportData, columnName, iden );
-        surveyDetailsDao.getAverageScore( startDate, endDate, agentReportData, columnName, iden );
-        surveyDetailsDao.getCompletedSurveysCount( null, null, agentReportData, columnName, iden );
-        surveyDetailsDao.getCompletedSurveysCount( startDate, endDate, agentReportData, columnName, iden );
-        surveyPreInitiationDao.getIncompleteSurveysCount( null, null, agentReportData );
-        surveyPreInitiationDao.getIncompleteSurveysCount( startDate, endDate, agentReportData );
-        organizationUnitSettingsDao.setAgentNames( agentReportData );
-        LOG.info( "Method to get Agent's Report for a specific time and all time finished." );
-        return new ArrayList<>( agentReportData.values() );
-    }
+	@Override
+	@Transactional
+	public List<AgentRankingReport> getAgentReport(long iden, String columnName, Date startDate, Date endDate, Object object)
+			throws InvalidInputException {
+		LOG.info("Method to get Agent's Report for a specific time and all time started.");
+		if (columnName == null || columnName.isEmpty()) {
+			throw new InvalidInputException("Null/Empty value passed for profile level.");
+		}
+		if (iden < 0) {
+			throw new InvalidInputException("Invalid value passed for iden of profile level.");
+		}
+		Map<Long, AgentRankingReport> agentReportData = new HashMap<>();
+		surveyDetailsDao.getAverageScore(null, null, agentReportData, columnName, iden);
+		surveyDetailsDao.getAverageScore(startDate, endDate, agentReportData, columnName, iden);
+		surveyDetailsDao.getCompletedSurveysCount(null, null, agentReportData, columnName, iden);
+		surveyDetailsDao.getCompletedSurveysCount(startDate, endDate, agentReportData, columnName, iden);
+		surveyPreInitiationDao.getIncompleteSurveysCount(null, null, agentReportData);
+		surveyPreInitiationDao.getIncompleteSurveysCount(startDate, endDate, agentReportData);
+		organizationUnitSettingsDao.setAgentNames(agentReportData);
+		LOG.info("Method to get Agent's Report for a specific time and all time finished.");
+		return new ArrayList<>(agentReportData.values());
+	}
+
+	@Override
+	@Transactional
+	public List<Object> getIndividualsBreadCrumb(UserProfile userProfile) throws InvalidInputException, NoRecordsFetchedException {
+		LOG.info("Method getIndividualsBreadCrumb called :");
+		List<Object> breadCrumbList = new ArrayList<>();
+		BreadCrumb breadCrumb = null;
+
+		Branch branch = branchDao.findById(Branch.class, userProfile.getBranchId());
+		if (branch.getIsDefaultBySystem() != 1) {
+			breadCrumb = new BreadCrumb();
+			breadCrumb.setBreadCrumbProfile(branch.getBranch());
+			breadCrumb.setBreadCrumbUrl(organizationManagementService.getBranchSettings(branch.getBranchId()).getOrganizationUnitSettings()
+					.getCompleteProfileUrl());
+			breadCrumbList.add(breadCrumb);
+		}
+
+		Region region = regionDao.findById(Region.class, userProfile.getRegionId());
+		if (region.getIsDefaultBySystem() != 1) {
+			breadCrumb = new BreadCrumb();
+			breadCrumb.setBreadCrumbProfile(region.getRegion());
+			breadCrumb.setBreadCrumbUrl(organizationManagementService.getRegionSettings(region.getRegionId()).getCompleteProfileUrl());
+			breadCrumbList.add(breadCrumb);
+		}
+
+		Company company = companyDao.findById(Company.class, userProfile.getCompany().getCompanyId());
+		breadCrumb = new BreadCrumb();
+		breadCrumb.setBreadCrumbProfile(company.getCompany());
+		breadCrumb.setBreadCrumbUrl(organizationManagementService.getCompanySettings(company.getCompanyId()).getCompleteProfileUrl());
+		breadCrumbList.add(breadCrumb);
+		// add vertical
+		breadCrumb = new BreadCrumb();
+		breadCrumb.setBreadCrumbProfile(company.getVerticalsMaster().getVerticalName());
+		breadCrumbList.add(breadCrumb);
+		Collections.reverse(breadCrumbList);
+		LOG.info("Method getIndividualsBreadCrumb finished :");
+		return breadCrumbList;
+	}
+
+	@Override
+	@Transactional
+	public List<Object> getRegionsBreadCrumb(OrganizationUnitSettings regionProfile) throws InvalidInputException, NoRecordsFetchedException {
+		LOG.info("Method getRegionsBreadCrumb called :");
+		List<Object> breadCrumbList = new ArrayList<>();
+		BreadCrumb breadCrumb = null;
+		Region region = regionDao.findById(Region.class, regionProfile.getIden());
+		if (region.getIsDefaultBySystem() != 1) {
+			breadCrumb = new BreadCrumb();
+			breadCrumb.setBreadCrumbProfile(region.getRegion());
+			breadCrumb.setBreadCrumbUrl(organizationManagementService.getRegionSettings(region.getRegionId()).getCompleteProfileUrl());
+			breadCrumbList.add(breadCrumb);
+
+		}
+
+		breadCrumb = new BreadCrumb();
+		breadCrumb.setBreadCrumbProfile(region.getCompany().getCompany());
+		breadCrumb.setBreadCrumbUrl(organizationManagementService.getCompanySettings(region.getCompany().getCompanyId()).getCompleteProfileUrl());
+		breadCrumbList.add(breadCrumb);
+		// add vertical
+		breadCrumb = new BreadCrumb();
+		breadCrumb.setBreadCrumbProfile(region.getCompany().getVerticalsMaster().getVerticalName());
+		breadCrumbList.add(breadCrumb);
+		Collections.reverse(breadCrumbList);
+		LOG.info("Method getRegionsBreadCrumb finished :");
+		return breadCrumbList;
+	}
+
+	@Override
+	@Transactional
+	public List<Object> getBranchsBreadCrumb(OrganizationUnitSettings branchProfile) throws InvalidInputException, NoRecordsFetchedException {
+		LOG.info("Method getBranchsBreadCrumb called :");
+		List<Object> breadCrumbList = new ArrayList<>();
+		BreadCrumb breadCrumb = null;
+
+		Branch branch = branchDao.findById(Branch.class, branchProfile.getIden());
+		if (branch.getIsDefaultBySystem() != 1) {
+			breadCrumb = new BreadCrumb();
+			breadCrumb.setBreadCrumbProfile(branch.getBranch());
+			breadCrumb.setBreadCrumbUrl(organizationManagementService.getBranchSettings(branch.getBranchId()).getOrganizationUnitSettings()
+					.getCompleteProfileUrl());
+			breadCrumbList.add(breadCrumb);
+		}
+
+		Region region = branch.getRegion();
+		if (region.getIsDefaultBySystem() != 1) {
+			breadCrumb = new BreadCrumb();
+			breadCrumb.setBreadCrumbProfile(region.getRegion());
+			breadCrumb.setBreadCrumbUrl(organizationManagementService.getRegionSettings(region.getRegionId()).getCompleteProfileUrl());
+			breadCrumbList.add(breadCrumb);
+
+		}
+
+		breadCrumb = new BreadCrumb();
+		breadCrumb.setBreadCrumbProfile(branch.getCompany().getCompany());
+		breadCrumb.setBreadCrumbUrl(organizationManagementService.getCompanySettings(branch.getCompany().getCompanyId()).getCompleteProfileUrl());
+		breadCrumbList.add(breadCrumb);
+		// add vertical
+		breadCrumb = new BreadCrumb();
+		breadCrumb.setBreadCrumbProfile(branch.getCompany().getVerticalsMaster().getVerticalName());
+		breadCrumbList.add(breadCrumb);
+		Collections.reverse(breadCrumbList);
+		LOG.info("Method getBranchsBreadCrumb finished :");
+		return breadCrumbList;
+	}
 }
