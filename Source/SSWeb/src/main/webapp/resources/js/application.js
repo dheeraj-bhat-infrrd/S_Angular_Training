@@ -869,14 +869,6 @@ function searchBranchRegionOrAgent(searchKeyword, flow) {
 			$('#dsh-srch-report').html(data);
 		}
 		$('.dsh-res-display').click(function() {
-			if (flow == 'icons'){
-				$('#dsh-srch-res').removeClass('dsh-sb-dd');
-				$('#dsh-sel-item').val($(this).html());
-			}
-			else if (flow == 'graph') {
-				$('#dsh-grph-srch-res').removeClass('dsh-sb-dd');
-				$('#dsh-grph-sel-item').val($(this).html());
-			}
 			
 			var value = $(this).data('attr');
 			if (searchColumn == "regionName") {
@@ -887,7 +879,30 @@ function searchBranchRegionOrAgent(searchKeyword, flow) {
 				columnName = "agentId";
 			} else if (searchColumn == "company") {
 				columnName = "companyId";
-			} 
+			}
+			
+			if (flow == 'icons'){
+			    $('#dsh-srch-res').removeClass('dsh-sb-dd');
+				$('#dsh-sel-item').val($(this).html());
+			}
+			else if (flow == 'graph') {
+				$('#dsh-grph-srch-res').removeClass('dsh-sb-dd');
+				$('#dsh-grph-sel-item').val($(this).html());
+			}
+			else if (flow == 'reports'){
+				$('#dsh-srch-report').removeClass('dsh-sb-dd');
+				$('#admin-report-dwn').val($(this).html());
+				$('#report-sel').attr('data-iden',columnName);
+				$('#report-sel').attr('data-idenVal',value);
+				if (searchColumn == "displayName") {
+					$('#dsh-ind-rep-bnt').show();
+					$('#dsh-admin-rep-bnt').hide();
+				} else {
+					$('#dsh-admin-rep-bnt').show();
+					$('#dsh-ind-rep-bnt').hide();
+				}
+				
+			}
 			
 			if (flow == 'icons'){
 				lastColNameForCount = columnName;

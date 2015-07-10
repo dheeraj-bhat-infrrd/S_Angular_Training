@@ -1022,9 +1022,7 @@ public class DashboardController {
 		LOG.info("Method to get file containg completed surveys list getCompleteSurveyFile() started.");
 		User user = sessionHelper.getCurrentUser();
 		List<SurveyDetails> surveyDetails = new ArrayList<>();
-		String realtechAdminStr = request.getParameter("realtechAdmin");
-		boolean realtechAdmin = false;
-		realtechAdmin = Boolean.parseBoolean(realtechAdminStr);
+		boolean realtechAdmin = user.isSuperAdmin();
 		try {
 			String columnName = request.getParameter("columnName");
 			String startDateStr = request.getParameter("startDate");
@@ -1260,10 +1258,13 @@ public class DashboardController {
 	public void getCustomerSurveyResultsFile(Model model,
 			HttpServletRequest request, HttpServletResponse response) {
 		LOG.info("Method to get file containg customer survey results getCustomerSurveyResultsFile() started.");
+		
+		User user = sessionHelper.getCurrentUser();
+		boolean realTechAdmin = user.isSuperAdmin();
 		List<SurveyDetails> surveyDetails = new ArrayList<>();
 		try {
 			String columnName = request.getParameter("columnName");
-			if (columnName == null || columnName.isEmpty()) {
+			if (!realTechAdmin && (columnName == null || columnName.isEmpty())) {
 				LOG.error("Invalid value (null/empty) passed for profile level.");
 				throw new InvalidInputException(
 						"Invalid value (null/empty) passed for profile level.");
@@ -1298,7 +1299,10 @@ public class DashboardController {
 			String profileLevel = getProfileLevel(columnName);
 			long iden = 0;
 
-			User user = sessionHelper.getCurrentUser();
+			if(realTechAdmin) {
+				profileLevel = CommonConstants.PROFILE_LEVEL_REALTECH_ADMIN;
+			}
+			
 			if (profileLevel.equals(CommonConstants.PROFILE_LEVEL_COMPANY)) {
 				iden = user.getCompany().getCompanyId();
 			} else if (profileLevel
@@ -1376,10 +1380,12 @@ public class DashboardController {
 	public void getSocialMonitorFile(Model model, HttpServletRequest request,
 			HttpServletResponse response) {
 		LOG.info("Method to get file containg Social Monitors list getSocialMonitorFile() started.");
+		User user = sessionHelper.getCurrentUser();
+		boolean realTechAdmin = user.isSuperAdmin();
 		List<SurveyDetails> surveyDetails = new ArrayList<>();
 		try {
 			String columnName = request.getParameter("columnName");
-			if (columnName == null || columnName.isEmpty()) {
+			if (!realTechAdmin && (columnName == null || columnName.isEmpty())) {
 				LOG.error("Invalid value (null/empty) passed for profile level.");
 				throw new InvalidInputException(
 						"Invalid value (null/empty) passed for profile level.");
@@ -1413,8 +1419,11 @@ public class DashboardController {
 
 			String profileLevel = getProfileLevel(columnName);
 			long iden = 0;
+			
+			if(realTechAdmin) {
+				profileLevel = CommonConstants.PROFILE_LEVEL_REALTECH_ADMIN;
+			}
 
-			User user = sessionHelper.getCurrentUser();
 			if (profileLevel.equals(CommonConstants.PROFILE_LEVEL_COMPANY)) {
 				iden = user.getCompany().getCompanyId();
 			} else if (profileLevel
@@ -1491,10 +1500,12 @@ public class DashboardController {
 	public void getAgentRankingFile(Model model, HttpServletRequest request,
 			HttpServletResponse response) {
 		LOG.info("Method to get file containg Agent's data getAgentSurveyFile() started.");
+		User user = sessionHelper.getCurrentUser();
 		List<AgentRankingReport> agentRanking = new ArrayList<>();
+		boolean realtechAdmin = user.isSuperAdmin();
 		try {
 			String columnName = request.getParameter("columnName");
-			if (columnName == null || columnName.isEmpty()) {
+			if (!realtechAdmin && (columnName == null || columnName.isEmpty())) {
 				LOG.error("Invalid value (null/empty) passed for profile level.");
 				throw new InvalidInputException(
 						"Invalid value (null/empty) passed for profile level.");
@@ -1528,8 +1539,9 @@ public class DashboardController {
 
 			String profileLevel = getProfileLevel(columnName);
 			long iden = 0;
-
-			User user = sessionHelper.getCurrentUser();
+			if(realtechAdmin){
+				profileLevel = CommonConstants.PROFILE_LEVEL_REALTECH_ADMIN;
+			}
 			if (profileLevel.equals(CommonConstants.PROFILE_LEVEL_COMPANY)) {
 				iden = user.getCompany().getCompanyId();
 			} else if (profileLevel
