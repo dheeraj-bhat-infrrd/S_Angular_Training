@@ -1061,6 +1061,10 @@ public class SolrSearchServiceImpl implements SolrSearchService {
 
 			LOG.debug("Querying solr for searching " + searchColumn);
 			response = solrServer.query(query);
+			// Change to get all matching records.
+			int rows = (int) response.getResults().getNumFound();
+			query.setRows(rows);
+			response = solrServer.query(query);
 			SolrDocumentList documentList = response.getResults();
 			for (SolrDocument doc : documentList) {
 				results.add(doc);

@@ -885,7 +885,9 @@ function searchBranchRegionOrAgent(searchKeyword, flow) {
 				columnName = "branchId";
 			} else if (searchColumn == "displayName") {
 				columnName = "agentId";
-			}
+			} else if (searchColumn == "company") {
+				columnName = "companyId";
+			} 
 			
 			if (flow == 'icons'){
 				lastColNameForCount = columnName;
