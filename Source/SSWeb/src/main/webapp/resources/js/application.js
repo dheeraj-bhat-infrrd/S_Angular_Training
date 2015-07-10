@@ -4949,7 +4949,7 @@ function storeCustomerAnswer(customerResponse) {
 	});
 }
 
-function updateCustomerResponse(feedback) {
+function updateCustomerResponse(feedback, agreedToShare) {
 	var success = false;
 	isAbusive = false;
 	var feedbackArr = feedback.split(" ");
@@ -4963,7 +4963,8 @@ function updateCustomerResponse(feedback) {
 		"feedback" : feedback,
 		"agentId" : agentId,
 		"customerEmail" : customerEmail,
-		"isAbusive" : isAbusive
+		"isAbusive" : isAbusive,
+		"agreedToShare" : agreedToShare
 	};
 	questionDetails.customerResponse = customerResponse;
 	$.ajax({
@@ -5147,7 +5148,7 @@ function showMasterQuestionPage(){
 			}
 		}
 		
-		updateCustomerResponse(feedback);
+		updateCustomerResponse(feedback, $('#shr-pst-cb').val());
 		$("div[data-ques-type]").hide();
 		$("div[data-ques-type='error']").show();
 		$('#profile-link').html('View ' + agentName + '\'s profile at <a href="' + agentFullProfileLink + '" target="_blank">' + agentFullProfileLink + '</a>');
@@ -7356,11 +7357,11 @@ $(document).on('click','#dsh-dwnld-report-btn',function(){
 		window.location.href = "/downloaddashboardcompletesurvey.do?columnName="+colName+"&startDate="+startDate+"&endDate="+endDate;
 		break;
 	case 1:
-		console.log("loan-officer-ranking");
+		console.log("agent-ranking");
 		window.location.href = "/downloadagentrankingreport.do?columnName="+colName+"&startDate="+startDate+"&endDate="+endDate;
 		break;
 	case 2:
-		console.log("customer-survey");
+		console.log("survey-results");
 		window.location.href = "/downloadcustomersurveyresults.do?columnName="+colName+"&startDate="+startDate+"&endDate="+endDate;
 		break;
 	case 3:

@@ -171,6 +171,7 @@ public interface CommonConstants
     public static final String REMINDERS_FOR_SOCIAL_POSTS = "remindersForSocialPosts";
     public static final String REVIEW_COUNT_MONGO = "reviewCount";
     public static final String EDITABLE_SURVEY_COLUMN = "editable";
+    public static final String AGREE_SHARE_COLUMN = "agreedToShare";
 
     /**
      * Constants to be used in code for referencing variables(i.e in maps or session attributes)
@@ -562,8 +563,38 @@ public interface CommonConstants
     public static final long DEFAULT_VERTICAL_CRM_ID = -1;
 
     public static final int EXPIRE_AFTER_DAYS = 3;
+    public static final int DECIMALS_TO_ROUND_OFF = 3;
 
     //Constants for survey request send type
     public static final String SURVEY_REQUEST_AGENT = "agent";
     public static final String SURVEY_REQUEST_ADMIN = "admin";
+    
+	// Constants for Agent Ranking Report
+	public static final String HEADER_FIRST_NAME = "First Name";
+	public static final String HEADER_LAST_NAME = "Last Name";
+	public static final String HEADER_AVG_SCORE = "Avg Score";
+	public static final String HEADER_SUM_SURVEYS = "Sum Surveys";
+	public static final String HEADER_REGISTRATION_DATE = "Registation Date";
+	
+	// Constants for Survey Results Report
+	public static final String HEADER_AGENT_FIRST_NAME = "Agent First Name";
+	public static final String HEADER_AGENT_LAST_NAME = "Agent Last Name";
+	public static final String HEADER_CUSTOMER_FIRST_NAME = "Customer First Name";
+	public static final String HEADER_CUSTOMER_LAST_NAME = "Customer Last Name";
+	public static final String HEADER_SURVEY_SENT_DATE = "Survey Sent";
+	public static final String HEADER_SURVEY_COMPLETED_DATE = "Survey Completed";
+	public static final String HEADER_SURVEY_SOURCE = "Survey Source";
+	public static final String HEADER_SURVEY_SCORE = "Score";
+	public static final String HEADER_SURVEY_QUESTION = "Q";
+	public static final String HEADER_SURVEY_GATEWAY = "Gateway";
+	public static final String HEADER_CUSTOMER_COMMENTS = "Customer Comments";
+	public static final String HEADER_AGREED_SHARE = "Agreed to Share";
+	public static final String HEADER_CLICK_THROUGH = "Click through";
+    public static final String STATUS_YES = "Yes";
+    public static final String STATUS_NO = "No";
+	
+	// Constants for Social Monitor Report
+	public static final String HEADER_POST_COMMENT = "Post Comment";
+	public static final String HEADER_POST_DATE = "Post Date";
+	public static final String HEADER_POST_SOURCE = "Source";
 }
