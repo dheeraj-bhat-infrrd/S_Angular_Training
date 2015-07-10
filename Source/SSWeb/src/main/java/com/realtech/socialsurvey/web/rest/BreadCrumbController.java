@@ -35,59 +35,7 @@ public class BreadCrumbController {
 	@Autowired
 	private UserManagementService userManagementService;
 
-	/**
-	 * Service to get the List of Company
-	 * 
-	 * @param individualProfileName
-	 * @return
-	 * @throws ProfileNotFoundException
-	 * @throws NoRecordsFetchedException
-	 */
-	@ResponseBody
-	@RequestMapping(value = "{/verticalProfileName}")
-	public Response getCompanyList(@PathVariable String individualProfileName) throws ProfileNotFoundException, NoRecordsFetchedException {
-		LOG.info("Service to get breadcrumb of  individualProfileName : " + individualProfileName);
-		Response response = null;
-		try {
-			if (individualProfileName == null || individualProfileName.isEmpty()) {
-				throw new InputValidationException(new ProfileServiceErrorCode(
-						CommonConstants.ERROR_CODE_INDIVIDUAL_PROFILE_SERVICE_PRECONDITION_FAILURE, CommonConstants.SERVICE_CODE_INDIVIDUAL_PROFILE,
-						"Profile name for individual is invalid"), "individual profile name is null or empty");
-			}
-			OrganizationUnitSettings individualProfile = null;
-			try {
-				individualProfile = profileManagementService.getIndividualByProfileName(individualProfileName);
-				List<UserProfile> userProfiles = userManagementService.getUserByUserId(individualProfile.getIden()).getUserProfiles();
-				UserProfile userProfile = null;
-				for (UserProfile element : userProfiles) {
-					if (element.getProfilesMaster().getProfileId() == 4) {
-						userProfile = element;
-						break;
-					}
-				}
-
-				if (userProfile == null) {
-					throw new ProfileNotFoundException("No records found  ");
-				}
-
-				List<Object> userBreadCrumb = profileManagementService.getIndividualsBreadCrumb(userProfile);
-				String json = new Gson().toJson(userBreadCrumb);
-				LOG.debug("individualProfile breadCrumb json : " + json);
-				response = Response.ok(json).build();
-			}
-			catch (InvalidInputException e) {
-				throw new InternalServerException(new ProfileServiceErrorCode(CommonConstants.ERROR_CODE_INDIVIDUAL_PROFILE_SERVICE_FAILURE,
-						CommonConstants.SERVICE_CODE_INDIVIDUAL_PROFILE, "Profile name for individual is invalid"), e.getMessage());
-			}
-		}
-		catch (BaseRestException e) {
-			response = getErrorResponse(e);
-		}
-		LOG.info("Service to get breadcrumb of individual finished");
-		return response;
-
-	}
-
+	
 	/**
 	 * Service to get the breadcrumb of an individual
 	 * 
