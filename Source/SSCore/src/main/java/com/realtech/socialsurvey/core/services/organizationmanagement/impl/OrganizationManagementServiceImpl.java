@@ -694,9 +694,10 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
             EncompassCrmInfo crmInfo = (EncompassCrmInfo) companySettings.getCrm_info();
 
             String encryptedPassword = crmInfo.getCrm_password();
-            String decryptedPassword = encryptionHelper.decryptAES( encryptedPassword, "" );
+            /*String decryptedPassword = encryptionHelper.decryptAES( encryptedPassword, "" );*/
 
-            crmInfo.setCrm_password( decryptedPassword );
+            // TODO Temp Fix
+            crmInfo.setCrm_password( encryptedPassword );
         }
         return companySettings;
     }

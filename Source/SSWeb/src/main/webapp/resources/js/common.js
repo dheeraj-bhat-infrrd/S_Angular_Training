@@ -244,10 +244,8 @@ function callAjaxGetWithPayloadData(url, callBackFunction, payload,isAsync){
 	});
 }*/
 
-function changeRatingPattern(rating, ratingParent,isOverallRating) {
-	
+function changeRatingPattern(rating, ratingParent, isOverallRating) {
 	var ratingIntVal = 0;
-	
 
 	if (ratingIntVal % 1 == 0) {
 		ratingIntVal = parseInt(rating);
@@ -258,18 +256,16 @@ function changeRatingPattern(rating, ratingParent,isOverallRating) {
 	if (ratingIntVal == 0) {
 		ratingIntVal = 1;
 	}
+
+	var roundedFloatingVal = parseFloat(rating).toFixed(3);
 	
-	var roundedFloatingVal = parseFloat(rating).toFixed(2);
-	
-	var ratingImgHtml = "<div class='rating-image float-left smiley-rat-"+ratingIntVal+"'></div>";
-	var ratingValHtml = "<div class='rating-rounded float-left'>"+roundedFloatingVal+"</div>";
-	
-	if(isOverallRating){
-		ratingValHtml = "<div class='rating-rounded float-left'>"+roundedFloatingVal+" - </div>";
+	var ratingImgHtml = "<div class='rating-image float-left smiley-rat-" + ratingIntVal + "'></div>";
+	var ratingValHtml = "<div class='rating-rounded float-left'>" + roundedFloatingVal + "</div>";
+	if (isOverallRating) {
+		ratingValHtml = "<div class='rating-rounded float-left'>" + roundedFloatingVal + " - </div>";
 	}
-	
+
 	ratingParent.html('');
-	
 	ratingParent.append(ratingImgHtml).append(ratingValHtml);
 }
 
@@ -787,4 +783,22 @@ function returnValidWebAddress(url) {
 		url = 'http://' + url;
 	}
 	return url;
+}
+
+function linkify(inputText) {
+    var replacedText, replacePattern1, replacePattern2, replacePattern3;
+
+    //URLs starting with http://, https://, or ftp://
+    replacePattern1 = /(\b(https?|ftp):\/\/[-A-Z0-9+&@#\/%?=~_|!:,.;]*[-A-Z0-9+&@#\/%=~_|])/gim;
+    replacedText = inputText.replace(replacePattern1, '<a href="$1" target="_blank">$1</a>');
+
+    //URLs starting with "www." (without // before it, or it'd re-link the ones done above).
+    replacePattern2 = /(^|[^\/])(www\.[\S]+(\b|$))/gim;
+    replacedText = replacedText.replace(replacePattern2, '$1<a href="http://$2" target="_blank">$2</a>');
+
+    //Change email addresses to mailto:: links.
+    replacePattern3 = /(([a-zA-Z0-9\-\_\.])+@[a-zA-Z\_]+?(\.[a-zA-Z]{2,6})+)/gim;
+    replacedText = replacedText.replace(replacePattern3, '<a href="mailto:$1">$1</a>');
+
+    return replacedText;
 }

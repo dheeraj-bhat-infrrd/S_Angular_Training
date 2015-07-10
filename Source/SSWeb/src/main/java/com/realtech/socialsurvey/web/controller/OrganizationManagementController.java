@@ -519,7 +519,8 @@ public class OrganizationManagementController
 
             // Encrypting the password
             String plainPassword = request.getParameter( "encompass-password" );
-            String cipherPassword = encryptionHelper.encryptAES( plainPassword, "" );
+            String cipherPassword = plainPassword;
+            /*String cipherPassword = encryptionHelper.encryptAES( plainPassword, "" );*/
 
             EncompassCrmInfo encompassCrmInfo = new EncompassCrmInfo();
             encompassCrmInfo.setCrm_source( CommonConstants.CRM_INFO_SOURCE_ENCOMPASS );
