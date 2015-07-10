@@ -16,7 +16,9 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
 import javax.annotation.Resource;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
@@ -26,6 +28,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.DependsOn;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
+
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
@@ -33,6 +36,7 @@ import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.commons.ProfileCompletionList;
 import com.realtech.socialsurvey.core.commons.Utils;
 import com.realtech.socialsurvey.core.dao.BranchDao;
+import com.realtech.socialsurvey.core.dao.CompanyDao;
 import com.realtech.socialsurvey.core.dao.DisabledAccountDao;
 import com.realtech.socialsurvey.core.dao.GenericDao;
 import com.realtech.socialsurvey.core.dao.OrganizationUnitSettingsDao;
@@ -105,7 +109,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
     private static Map<Integer, VerticalsMaster> verticalsMastersMap = new HashMap<Integer, VerticalsMaster>();
 
     @Autowired
-    private GenericDao<Company, Long> companyDao;
+    private CompanyDao companyDao;
 
     @Autowired
     private UserDao userDao;
@@ -3881,6 +3885,12 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 		else {
 			return "";
 		}
+	}
+	
+	@Override
+	@Transactional
+	public List<Company> getCompaniesByName(String namePattern){
+		return companyDao.searchCompaniesByName(namePattern);
 	}
 }
 // JIRA: SS-27: By RM05: EOC
