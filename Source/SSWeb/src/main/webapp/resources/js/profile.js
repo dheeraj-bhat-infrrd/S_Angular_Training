@@ -72,6 +72,20 @@ function paintProfilePage(result) {
 		// paint public  posts
 		paintPublicPosts();
 		
+		var breadCrumUrl = '/rest/breadcrumb/';
+		
+		if (profileLevel == 'INDIVIDUAL') {
+			breadCrumUrl += 'individual/' + profileJson.profileName;
+		} else if (profileLevel == 'BRANCH') {
+			breadCrumUrl += companyProfileName + '/branch/' + profileJson.profileName;
+		} else if (profileLevel == 'REGION') {
+			breadCrumUrl += companyProfileName+'/region/' + profileJson.profileName;
+		}
+		
+		if(profileLevel != 'COMPANY'){
+			paintBreadCrums(breadCrumUrl);			
+		}
+		
 		if (contactDetails != undefined) {
             var addressHtml = "";
             
@@ -198,6 +212,29 @@ function paintProfilePage(result) {
 	}
 }
 
+
+
+function paintBreadCrums(url) {
+	
+	callAjaxGETWithTextData(url, function(data) {
+		var jsonData = $.parseJSON(data);
+		if(jsonData.entity) {
+			var entityJson = $.parseJSON(jsonData.entity);
+			console.log(JSON.stringify(entityJson));
+			
+			var htmlContent = '<span class="brd-crm">'+ entityJson[0].breadCrumbProfile +'</span>';
+			
+			for(var i=1; i<entityJson.length; i++) {
+				htmlContent += '<span class="brd-crm-divider">&gt;&gt;</span>';
+				htmlContent += '<a target="_blank" class="brd-crm brd-crm-link" href="'+entityJson[i].breadCrumbUrl + '">'+entityJson[i].breadCrumbProfile+'</a>';
+			}
+			
+			$('#bread-crum-cont').html(htmlContent);
+		}
+	}, true, {});
+}
+
+
 function returnValidWebAddress(url) {
 	if (url && !url.match(/^http([s]?):\/\/.*/)) {
 		url = 'http://' + url;
@@ -240,7 +277,7 @@ function paintCompanyRegions(data) {
 			$.each(result,function(i, region) {
 				regionsHtml = regionsHtml+'<div class="bd-hr-item-l1 comp-region" data-openstatus="closed" data-regionid = '+region.regionId+'>';
 				regionsHtml = regionsHtml+'	<div class="bd-hr-item bd-lt-l1 clearfix">';
-				regionsHtml = regionsHtml+'    <div class="bd-hr-txt cursor-pointer region-link" data-profilename="'+region.profileName+'">'+region.region+'</div>';
+				regionsHtml = regionsHtml+'    <div class="prf-public-txt bd-hr-txt cursor-pointer region-link" data-profilename="'+region.profileName+'">'+region.region+'</div>';
 				regionsHtml = regionsHtml+'	</div>';
 				regionsHtml = regionsHtml+'</div>';
 				regionsHtml = regionsHtml+'	   <div class="bd-hr-item-l2 hide" id="comp-region-branches-'+region.regionId+'"></div>';
@@ -267,7 +304,7 @@ function paintBranchesForRegion(data) {
 			$.each(result,function(i,branch) {
 				branchesHtml = branchesHtml +'<div class="bd-hr-item-l2 comp-region-branch" data-openstatus="closed" data-branchid="'+branch.branchId+'">';
 				branchesHtml = branchesHtml +'	<div class="bd-hr-item bd-lt-l2 clearfix">';
-				branchesHtml = branchesHtml +'		<div class="bd-hr-txt cursor-pointer branch-link" data-profilename="'+branch.profileName+'">'+branch.branch+'</div>';
+				branchesHtml = branchesHtml +'		<div class="prf-public-txt bd-hr-txt cursor-pointer branch-link" data-profilename="'+branch.profileName+'">'+branch.branch+'</div>';
 				branchesHtml = branchesHtml +'	</div>';
 				branchesHtml = branchesHtml +'</div>' ;
 				branchesHtml = branchesHtml +'		<div class="bd-hr-item-l3 hide" id="comp-branch-individuals-'+branch.branchId+'"></div>';
@@ -327,7 +364,7 @@ function paintIndividualForBranch(data) {
 					} else {
 						individualsHtml += '	<div class="float-left bd-hr-img pers-default-img comp-individual-prof-image"></div>';
 					}
-					individualsHtml += '		<div class="bd-hr-txt cursor-pointer individual-link" data-profilename="'
+					individualsHtml += '		<div class="prf-public-txt bd-hr-txt cursor-pointer individual-link" data-profilename="'
 						+ individual.profileName + '">' + individual.contact_details.name + '</div>';
 					individualsHtml += '	</div>';
 					individualsHtml += '</div>';
@@ -379,7 +416,7 @@ function paintIndividualsForRegion(data) {
 						} else {
 							individualsHtml += '	<div class="float-left bd-hr-img pers-default-img comp-individual-prof-image"></div>';
 						}
-						individualsHtml += '	<div class="bd-hr-txt cursor-pointer individual-link" data-profilename="'
+						individualsHtml += '	<div class="prf-public-txt bd-hr-txt cursor-pointer individual-link" data-profilename="'
 							+ individual.profileName + '">' + individual.contact_details.name + '</div>';
 						individualsHtml += '	</div>';
 						individualsHtml += '</div>';
@@ -432,7 +469,7 @@ function paintCompanyIndividuals(data) {
 					} else {
 						compIndividualsHtml += '	<div class="float-left bd-hr-img pers-default-img comp-individual-prof-image"></div>';
 					}
-					compIndividualsHtml += '		<div class="bd-hr-txt cursor-pointer individual-link" data-profilename="'
+					compIndividualsHtml += '		<div class="prf-public-txt bd-hr-txt cursor-pointer individual-link" data-profilename="'
 						+ compIndividual.profileName + '">' + compIndividual.contact_details.name + '</div>';
 					compIndividualsHtml += '	</div>';
 					compIndividualsHtml += '</div>';
@@ -461,7 +498,7 @@ function paintCompanyBranches(data) {
 			$.each(result,function(i,branch) {
 				compBranchesHtml = compBranchesHtml +'<div class="bd-hr-item-l1 comp-branch" data-openstatus="closed" data-branchid="'+branch.branchId+'">';
 				compBranchesHtml = compBranchesHtml +'	<div class="bd-hr-item bd-lt-l2 clearfix">';
-				compBranchesHtml = compBranchesHtml +'		<div class="bd-hr-txt cursor-pointer branch-link" data-profilename="'+branch.profileName+'">'+branch.branch+'</div>';
+				compBranchesHtml = compBranchesHtml +'		<div class="prf-public-txt bd-hr-txt cursor-pointer branch-link" data-profilename="'+branch.profileName+'">'+branch.branch+'</div>';
 				compBranchesHtml = compBranchesHtml +'	</div>';
 				compBranchesHtml = compBranchesHtml +'</div>' ;
 				compBranchesHtml = compBranchesHtml +'		<div class="lpsub-2 hide" id="comp-branch-individuals-'+branch.branchId+'"></div>';
@@ -1207,7 +1244,7 @@ function callBackPaintPublicPosts(data) {
 		divToPopulate += '<div class="tweet-panel-item bord-bot-dc clearfix">'
 			+ '<div class="tweet-icn '+ iconClass +' float-left"></div>'
 			+ '<div class="tweet-txt float-left">'
-				+ '<div class="tweet-text-main">' + post.postText + '</div>'
+				+ '<div class="tweet-text-main">' + linkify(post.postText) + '</div>'
 				+ '<div class="tweet-text-link"><em>' + post.postedBy + '</em></div>'
 				+ '<div class="tweet-text-time"><em>' + convertUserDateToLocalWeekFormt( new Date(post.timeInMillis) )+ '</em></div>'
 			+ '	</div>'
@@ -1272,9 +1309,11 @@ $('body').on("click",".comp-branch,.comp-region-branch",function(e){
 	if($(this).data("openstatus") == "closed") {
 		fetchIndividualsForBranch($(this).data('branchid'));
 		$(this).data("openstatus","open");
+		$(this).attr("data-openstatus","open");
 	}else {
 		$('#comp-branch-individuals-'+$(this).data('branchid')).slideUp(200);
 		$(this).data("openstatus","closed");
+		$(this).attr("data-openstatus","closed");
 	}
 });
 
@@ -1284,9 +1323,11 @@ $('body').on("click",".comp-region",function(){
 		fetchBranchesForRegion($(this).data('regionid'));
 		fetchIndividualsForRegion($(this).data('regionid'));
 		$(this).data("openstatus","open");
+		$(this).attr("data-openstatus","open");
 	}else {
 		$('#comp-region-branches-'+$(this).data('regionid')).slideUp(200);
 		$(this).data("openstatus","closed");
+		$(this).attr("data-openstatus","closed");
 	}
 	
 });

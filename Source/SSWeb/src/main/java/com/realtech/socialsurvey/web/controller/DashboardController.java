@@ -1250,7 +1250,6 @@ public class DashboardController {
 		}
 		LOG.info("Method to get file containg incomplete surveys list getIncompleteSurveyFile() finished.");
 	}
-
 	/*
 	 * Method to download file containing incomplete surveys
 	 */
@@ -1539,6 +1538,7 @@ public class DashboardController {
 
 			String profileLevel = getProfileLevel(columnName);
 			long iden = 0;
+
 			if(realtechAdmin){
 				profileLevel = CommonConstants.PROFILE_LEVEL_REALTECH_ADMIN;
 			}
