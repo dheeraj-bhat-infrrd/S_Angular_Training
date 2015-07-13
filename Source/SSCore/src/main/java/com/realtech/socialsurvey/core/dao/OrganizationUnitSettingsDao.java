@@ -148,4 +148,6 @@ public interface OrganizationUnitSettingsDao {
     public void setAgentDetails( Map<Long, AgentRankingReport> agentsReport );
 
 	public OrganizationUnitSettings removeKeyInOrganizationSettings(OrganizationUnitSettings unitSettings, String keyToUpdate, String collectionName);
+
+	List<OrganizationUnitSettings> getCompanyListByVerticalName(String verticalName);
 }

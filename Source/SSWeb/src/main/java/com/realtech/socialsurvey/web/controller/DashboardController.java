@@ -381,11 +381,7 @@ public class DashboardController {
 
 		User user = sessionHelper.getCurrentUser();
 		
-		long superAdmin = user.getSuperAdmin();
-		boolean realtechAdmin = false;		
-		if(superAdmin == CommonConstants.STATUS_ACTIVE){
-			realtechAdmin = true;
-		}
+		boolean realtechAdmin = user.isSuperAdmin();	
 		
 		try {
 			String columnName = request.getParameter("columnName");
