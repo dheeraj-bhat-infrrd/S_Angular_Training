@@ -753,7 +753,7 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
             user.setAboutMe( agentSettings.getContact_details().getAbout_me() );
             user.setReviewCount( agentSettings.getReviewCount() );
             user.setReviewScore( surveyDetailsDao.getRatingForPastNdays( CommonConstants.AGENT_ID, agentSettings.getIden(),
-                CommonConstants.NO_LIMIT, true ) );
+                CommonConstants.NO_LIMIT, true, false ) );
             users.add( user );
         }
         LOG.info( "Method to find multiple users on the basis of list of user id finished for user ids " + userIds );

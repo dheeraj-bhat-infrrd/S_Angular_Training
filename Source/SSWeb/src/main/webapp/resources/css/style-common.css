@@ -3998,6 +3998,10 @@ img.prof-image {
 	margin-bottom: 18px;
 }
 
+.stats-right-survey {
+	margin-top: 40px;
+}
+
 .dash-panel-left {
 	padding-top: 30px;
 }
@@ -4269,9 +4273,9 @@ img.prof-image {
 	position: absolute;
 	top: 200px;
 	line-height: 25px;
-	left: -215px;
+	left: -220px;
 	font-size: 13px;
-	width: 200px;
+	width: 205px;
 	text-align: right;
 }
 
@@ -6814,6 +6818,7 @@ a.sq-btn-post-social:hover, a.sq-btn-post-social:visited {
   	display: block;
   	border: 1px solid #dcdcdc;
   	line-height: 32px;
+  	z-index: 2;
 }
 
 .dsh-inp-wrapper {
@@ -6900,4 +6905,16 @@ a.sq-btn-post-social:hover, a.sq-btn-post-social:visited {
 	background: url(../images/disconnect.png) no-repeat center;
 	cursor: pointer;
 	background-size: contain;
+}
+
+.bread-crum-row {
+    margin: 10px 0;
+}
+
+.brd-crm-divider {
+    padding: 0 5px;
+}
+
+.brd-crm {
+    font-size: 14px;
 }
