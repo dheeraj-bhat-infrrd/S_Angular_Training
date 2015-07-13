@@ -838,9 +838,17 @@ function paintSurveyGraph() {
 
 //Being called from dashboard.jsp on key up event.
 function searchBranchRegionOrAgent(searchKeyword, flow) {
-	var e = document.getElementById("selection-list");
-	if (flow == 'graph')
-		e = document.getElementById("graph-sel-list");
+	var e;
+	
+	if(flow == 'icons') {
+		e = document.getElementById("selection-list");
+	} else if (flow == 'graph'){
+		e = document.getElementById("graph-sel-list");		
+	} else if (flow == 'reports') {
+		e = document.getElementById("report-sel");	
+	} else {
+		return false;
+	}
 	searchColumn = e.options[e.selectedIndex].value;
 	var payload = {
 		"columnName" : colName,
@@ -853,20 +861,14 @@ function searchBranchRegionOrAgent(searchKeyword, flow) {
 		if (flow == 'icons'){
 			$('#dsh-srch-res').addClass('dsh-sb-dd');
 			$('#dsh-srch-res').html(data);
-		}
-		else if (flow == 'graph'){
+		} else if (flow == 'graph'){
 			$('#dsh-grph-srch-res').addClass('dsh-sb-dd');
 			$('#dsh-grph-srch-res').html(data);
+		} else if (flow == 'reports'){
+			$('#dsh-srch-report').addClass('dsh-sb-dd');
+			$('#dsh-srch-report').html(data);
 		}
 		$('.dsh-res-display').click(function() {
-			if (flow == 'icons'){
-				$('#dsh-srch-res').removeClass('dsh-sb-dd');
-				$('#dsh-sel-item').val($(this).html());
-			}
-			else if (flow == 'graph') {
-				$('#dsh-grph-srch-res').removeClass('dsh-sb-dd');
-				$('#dsh-grph-sel-item').val($(this).html());
-			}
 			
 			var value = $(this).data('attr');
 			if (searchColumn == "regionName") {
@@ -875,6 +877,31 @@ function searchBranchRegionOrAgent(searchKeyword, flow) {
 				columnName = "branchId";
 			} else if (searchColumn == "displayName") {
 				columnName = "agentId";
+			} else if (searchColumn == "company") {
+				columnName = "companyId";
+			}
+			
+			if (flow == 'icons'){
+			    $('#dsh-srch-res').removeClass('dsh-sb-dd');
+				$('#dsh-sel-item').val($(this).html());
+			}
+			else if (flow == 'graph') {
+				$('#dsh-grph-srch-res').removeClass('dsh-sb-dd');
+				$('#dsh-grph-sel-item').val($(this).html());
+			}
+			else if (flow == 'reports'){
+				$('#dsh-srch-report').removeClass('dsh-sb-dd');
+				$('#admin-report-dwn').val($(this).html());
+				$('#report-sel').attr('data-iden',columnName);
+				$('#report-sel').attr('data-idenVal',value);
+				if (searchColumn == "displayName") {
+					$('#dsh-ind-rep-bnt').show();
+					$('#dsh-admin-rep-bnt').hide();
+				} else {
+					$('#dsh-admin-rep-bnt').show();
+					$('#dsh-ind-rep-bnt').hide();
+				}
+				
 			}
 			
 			if (flow == 'icons'){
