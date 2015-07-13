@@ -51,6 +51,7 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
 	public static final String KEY_LOCK_SETTINGS = "lockSettings";
 	public static final String KEY_LINKEDIN_PROFILEDATA = "linkedInProfileData";
 	public static final String KEY_PROFILE_NAME = "profileName";
+	public static final String KEY_UNIQUE_IDENTIFIER = "uniqueIdentifier";
 	public static final String KEY_PROFILE_URL = "profileUrl";
 	public static final String KEY_LOGO = "logo";
 	public static final String KEY_PROFILE_IMAGE = "profileImageUrl";
@@ -413,4 +414,17 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
 			}
 		}
 	}
+
+    @Override
+    public OrganizationUnitSettings fetchOrganizationUnitSettingsByUniqueIdentifier( String uniqueIdentifier,
+        String collectionName )
+    {
+        Query query = new Query();
+        query.addCriteria(Criteria.where(KEY_UNIQUE_IDENTIFIER).is(uniqueIdentifier));
+        query.fields().exclude(KEY_LINKEDIN_PROFILEDATA);
+        OrganizationUnitSettings organizationUnitSettings = mongoTemplate.findOne(query, OrganizationUnitSettings.class, collectionName);
+        setCompleteUrlForSettings(organizationUnitSettings, collectionName);
+        LOG.info("Successfully executed method fetchOrganizationUnitSettingsByProfileName");
+        return organizationUnitSettings;
+    }
 }
