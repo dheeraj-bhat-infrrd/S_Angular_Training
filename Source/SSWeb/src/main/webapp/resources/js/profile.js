@@ -221,12 +221,19 @@ function paintBreadCrums(url) {
 		if(jsonData.entity) {
 			var entityJson = $.parseJSON(jsonData.entity);
 			console.log(JSON.stringify(entityJson));
-			
-			var htmlContent = '<span class="brd-crm">'+ entityJson[0].breadCrumbProfile +'</span>';
+			var htmlContent = '<a target="_blank" class="brd-crm brd-crm-link" href="'
+					+ window.location.origin
+					+ '/findcompany.do?verticalName='
+					+ entityJson[0].breadCrumbProfile
+					+ '">'
+					+ entityJson[0].breadCrumbProfile + '</a>';
 			
 			for(var i=1; i<entityJson.length; i++) {
 				htmlContent += '<span class="brd-crm-divider">&gt;&gt;</span>';
-				htmlContent += '<a target="_blank" class="brd-crm brd-crm-link" href="'+entityJson[i].breadCrumbUrl + '">'+entityJson[i].breadCrumbProfile+'</a>';
+				htmlContent += '<a target="_blank" class="brd-crm brd-crm-link" href="'
+						+ entityJson[i].breadCrumbUrl
+						+ '">'
+						+ entityJson[i].breadCrumbProfile + '</a>';
 			}
 			
 			$('#bread-crum-cont').html(htmlContent);

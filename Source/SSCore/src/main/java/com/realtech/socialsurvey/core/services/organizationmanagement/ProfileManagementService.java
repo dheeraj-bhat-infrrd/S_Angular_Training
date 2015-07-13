@@ -427,5 +427,5 @@ public interface ProfileManagementService {
 
 	public List<BreadCrumb> getBranchsBreadCrumb(OrganizationUnitSettings branchProfile) throws InvalidInputException, NoRecordsFetchedException;
 
-	public List<String> getCompanyList(String verticalName) throws InvalidInputException, ProfileNotFoundException;
+	public List<OrganizationUnitSettings> getCompanyList(String verticalName) throws InvalidInputException, ProfileNotFoundException;
 }
