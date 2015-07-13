@@ -37,7 +37,7 @@ namespace EncompassSocialSurvey
             return folders;
         }
 
-        public List<LoanViewModel> LopulateLoanListWithKey(LoanFolder parentFolder, int runningCompanyId)
+        public List<LoanViewModel> LopulateLoanListWithKey(LoanFolder parentFolder, long runningCompanyId)
         {
             Logger.Info("Entering the method LoanUtility.LopopulateLoanList()");
 
@@ -75,7 +75,7 @@ namespace EncompassSocialSurvey
                 string surveySource = EncompassSocialSurverConstant.SURVEY_SOURCE;
 
                 // company id coming 
-                int companyId = runningCompanyId;
+                long companyId = runningCompanyId;
                 string lastReminderTime = EncompassSocialSurverConstant.LAST_REMINDER_TIME;
                 int reminderCount = EncompassSocialSurverConstant.REMINDER_COUNT;
                 int status = EncompassSocialSurverConstant.STATUS;
@@ -174,7 +174,7 @@ namespace EncompassSocialSurvey
             return returnLoansViewModel;
         }
 
-        public List<LoanViewModel> LopulateLoanList(LoanFolder parentFolder, int runningCompanyId)
+        public List<LoanViewModel> LopulateLoanList(LoanFolder parentFolder, long runningCompanyId)
         {
             Logger.Info("Entering the method LoanUtility.LopopulateLoanList(): FolderName: " + parentFolder.DisplayName);
 
@@ -212,7 +212,7 @@ namespace EncompassSocialSurvey
                 string surveySource = EncompassSocialSurverConstant.SURVEY_SOURCE;
 
                 // company id coming 
-                int companyId = runningCompanyId;
+                long companyId = runningCompanyId;
                 string lastReminderTime = EncompassSocialSurverConstant.LAST_REMINDER_TIME;
                 int reminderCount = EncompassSocialSurverConstant.REMINDER_COUNT;
                 int status = EncompassSocialSurverConstant.STATUS;
@@ -229,7 +229,7 @@ namespace EncompassSocialSurvey
                     // if loan is not closed " closed field value will be null/empty/[//]
                     if (string.IsNullOrWhiteSpace(fieldValues[8]) || fieldValues[8].Equals("//") || fieldValues[8].Equals(@"\\"))
                     {
-                        Logger.Info("Exiting the method LoanUtility.LopopulateLoanList(): It's not a closed loan.");
+                        Logger.Info("Exiting the method LoanUtility.LopopulateLoanList(): It's not a closed loan. : LoanGUID : " + id.Guid);
                         continue;
                     }
 
