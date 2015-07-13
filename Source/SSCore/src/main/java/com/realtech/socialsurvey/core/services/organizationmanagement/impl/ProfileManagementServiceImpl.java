@@ -1859,13 +1859,11 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 			throw new InvalidInputException("Invalid value passed for iden of profile level.");
 		}
 		Map<Long, AgentRankingReport> agentReportData = new HashMap<>();
-		surveyDetailsDao.getAverageScore(null, null, agentReportData, columnName, iden);
 		surveyDetailsDao.getAverageScore(startDate, endDate, agentReportData, columnName, iden);
-		surveyDetailsDao.getCompletedSurveysCount(null, null, agentReportData, columnName, iden);
 		surveyDetailsDao.getCompletedSurveysCount(startDate, endDate, agentReportData, columnName, iden);
-		surveyPreInitiationDao.getIncompleteSurveysCount(null, null, agentReportData);
 		surveyPreInitiationDao.getIncompleteSurveysCount(startDate, endDate, agentReportData);
-		organizationUnitSettingsDao.setAgentNames(agentReportData);
+		organizationUnitSettingsDao.setAgentDetails(agentReportData);
+		
 		LOG.info("Method to get Agent's Report for a specific time and all time finished.");
 		return new ArrayList<>(agentReportData.values());
 	}
