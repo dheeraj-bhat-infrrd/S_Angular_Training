@@ -7,10 +7,8 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
-
 import org.noggit.JSONUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -22,7 +20,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
-
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import com.amazonaws.util.json.JSONException;
 import com.amazonaws.util.json.JSONObject;
 import com.google.gson.Gson;
@@ -894,211 +892,223 @@ public class UserManagementController
     }
 
 
-    /**
-     * Method to show registration completion page to the user. User can update first name, last
-     * name here. User must update the password for completion of registration.
-     * 
-     * @param model
-     * @param request
-     * @return
-     * @throws InvalidInputException
-     */
-    @RequestMapping ( value = "/showcompleteregistrationpage", method = RequestMethod.GET)
-    public String showCompleteRegistrationPage( HttpServletRequest request, @RequestParam ( "q") String encryptedUrlParams,
-        Model model )
-    {
-        LOG.info( "Method showCompleteRegistrationPage() to complete registration of user started." );
+	/**
+	 * Method to show registration completion page to the user. User can update first name, last
+	 * name here. User must update the password for completion of registration.
+	 * 
+	 * @param model
+	 * @param request
+	 * @return
+	 * @throws InvalidInputException
+	 */
+	@RequestMapping(value = "/showcompleteregistrationpage", method = RequestMethod.GET)
+	public String showCompleteRegistrationPage(HttpServletRequest request, @RequestParam("q") String encryptedUrlParams, Model model,
+			RedirectAttributes redirectAttributes) {
+		LOG.info("Method showCompleteRegistrationPage() to complete registration of user started.");
 
-        // Check for existing session
-        if ( sessionHelper.isUserActiveSessionExists() ) {
-            LOG.info( "Existing Active Session detected" );
+		// Check for existing session
+		if (sessionHelper.isUserActiveSessionExists()) {
+			LOG.info("Existing Active Session detected");
 
-            // Invalidate session in browser
-            request.getSession( false ).invalidate();
-            SecurityContextHolder.clearContext();
-        }
+			// Invalidate session in browser
+			request.getSession(false).invalidate();
+			SecurityContextHolder.clearContext();
+		}
 
-        try {
-            Map<String, String> urlParams = null;
-            try {
-                urlParams = urlGenerator.decryptParameters( encryptedUrlParams );
-            } catch ( InvalidInputException e ) {
-                LOG.error( "Invalid Input exception in decrypting url parameters in showCompleteRegistrationPage(). Reason "
-                    + e.getMessage(), e );
-                throw new InvalidInputException( e.getMessage(), DisplayMessageConstants.GENERAL_ERROR, e );
-            }
+		try {
+			Map<String, String> urlParams = null;
+			try {
+				urlParams = urlGenerator.decryptParameters(encryptedUrlParams);
+			}
+			catch (InvalidInputException e) {
+				LOG.error("Invalid Input exception in decrypting url parameters in showCompleteRegistrationPage(). Reason " + e.getMessage(), e);
+				throw new InvalidInputException(e.getMessage(), DisplayMessageConstants.GENERAL_ERROR, e);
+			}
 
-            // fetching details from urlparams
-            long companyId;
-            try {
-                companyId = Long.parseLong( urlParams.get( CommonConstants.COMPANY ) );
-            } catch ( NumberFormatException e ) {
-                throw new NonFatalException( e.getMessage(), DisplayMessageConstants.INVALID_REGISTRATION_INVITE, e );
-            }
+			// fetching details from urlparams
+			long companyId;
+			try {
+				companyId = Long.parseLong(urlParams.get(CommonConstants.COMPANY));
+			}
+			catch (NumberFormatException e) {
+				throw new NonFatalException(e.getMessage(), DisplayMessageConstants.INVALID_REGISTRATION_INVITE, e);
+			}
 
-            // checking status of user
-            String emailId = urlParams.get( CommonConstants.EMAIL_ID );
-            User newUser = userManagementService.getUserByEmailAndCompany( companyId, emailId );
+			// checking status of user
+			String emailId = urlParams.get(CommonConstants.EMAIL_ID);
+			User newUser = userManagementService.getUserByEmailAndCompany(companyId, emailId);
 
-            if ( newUser.getStatus() == CommonConstants.STATUS_NOT_VERIFIED ) {
-                model.addAttribute( CommonConstants.COMPANY, urlParams.get( CommonConstants.COMPANY ) );
-                model.addAttribute( CommonConstants.FIRST_NAME, urlParams.get( CommonConstants.FIRST_NAME ) );
-                model.addAttribute( CommonConstants.EMAIL_ID, emailId );
+			if (newUser.getStatus() == CommonConstants.STATUS_NOT_VERIFIED) {
+				redirectAttributes.addFlashAttribute(CommonConstants.COMPANY, urlParams.get(CommonConstants.COMPANY));
+				redirectAttributes.addFlashAttribute(CommonConstants.FIRST_NAME, urlParams.get(CommonConstants.FIRST_NAME));
+				redirectAttributes.addFlashAttribute(CommonConstants.EMAIL_ID, emailId);
+				redirectAttributes.addFlashAttribute("q", encryptedUrlParams);
 
-                User user = userManagementService.getUserByEmail( emailId );
-                AgentSettings agentSettings = userManagementService.getAgentSettingsForUserProfiles( user.getUserId() );
-                if ( agentSettings == null ) {
-                    throw new InvalidInputException( "Settings not found for the given user." );
-                }
-                model.addAttribute( "profileUrl", agentSettings.getCompleteProfileUrl() );
+				User user = userManagementService.getUserByEmail(emailId);
+				AgentSettings agentSettings = userManagementService.getAgentSettingsForUserProfiles(user.getUserId());
+				if (agentSettings == null) {
+					throw new InvalidInputException("Settings not found for the given user.");
+				}
+				redirectAttributes.addFlashAttribute("profileUrl", agentSettings.getCompleteProfileUrl());
 
-                String lastName = urlParams.get( CommonConstants.LAST_NAME );
-                if ( lastName != null && !lastName.isEmpty() ) {
-                    model.addAttribute( CommonConstants.LAST_NAME, lastName );
-                }
-                LOG.debug( "Validation of url completed. Service returning params to be prepopulated in registration page" );
-            } else {
-                model.addAttribute( "message", "The registration url is no longer valid" );
-                model.addAttribute( "status", DisplayMessageType.ERROR_MESSAGE );
-                LOG.debug( "The registration url had been used earlier" );
-                return JspResolver.LOGIN;
-            }
-            LOG.info( "Method showCompleteRegistrationPage() to complete registration of user finished." );
-        } catch ( NonFatalException e ) {
-            LOG.error( "NonFatalException in showCompleteRegistrationPage(). Reason : " + e.getMessage(), e );
-            model
-                .addAttribute( "message", messageUtils.getDisplayMessage( e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE ) );
-            return JspResolver.MESSAGE_HEADER;
-        }
-        return JspResolver.COMPLETE_REGISTRATION;
-    }
+				String lastName = urlParams.get(CommonConstants.LAST_NAME);
+				if (lastName != null && !lastName.isEmpty()) {
+					redirectAttributes.addFlashAttribute(CommonConstants.LAST_NAME, lastName);
+				}
+				LOG.debug("Validation of url completed. Service returning params to be prepopulated in registration page");
+			}
+			else {
+				LOG.debug("The registration url had been used earlier");
+				redirectAttributes.addFlashAttribute("message", "The registration url is no longer valid");
+				redirectAttributes.addFlashAttribute("status", DisplayMessageType.ERROR_MESSAGE);
+				return "redirect:/" + JspResolver.LOGIN + ".do";
+			}
+			LOG.info("Method showCompleteRegistrationPage() to complete registration of user finished.");
+		}
+		catch (NonFatalException e) {
+			LOG.error("NonFatalException in showCompleteRegistrationPage(). Reason : " + e.getMessage(), e);
+			model.addAttribute("message", messageUtils.getDisplayMessage(e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE));
+			return JspResolver.MESSAGE_HEADER;
+		}
 
+		return "redirect:/" + JspResolver.COMPLETE_REGISTRATION_PAGE + ".do";
+	}
+	
+	@RequestMapping(value = "/completeregistrationpage")
+	public String initCompleteRegistrationPage() {
+		LOG.info("CompleteRegistration Page started");
+		return JspResolver.COMPLETE_REGISTRATION;
+	}
+	
+	/**
+	 * Method to complete registration of the user.
+	 * 
+	 * @param model
+	 * @param request
+	 * @return
+	 * @throws InvalidInputException
+	 */
+	@RequestMapping(value = "/completeregistration", method = RequestMethod.POST)
+	public String completeRegistration(HttpServletRequest request, RedirectAttributes redirectAttributes) {
+		LOG.info("Method completeRegistration() to complete registration of user started.");
+		User user = null;
 
-    /**
-     * Method to complete registration of the user.
-     * 
-     * @param model
-     * @param request
-     * @return
-     * @throws InvalidInputException
-     */
-    @RequestMapping ( value = "/completeregistration", method = RequestMethod.POST)
-    public String completeRegistration( Model model, HttpServletRequest request )
-    {
-        LOG.info( "Method completeRegistration() to complete registration of user started." );
-        User user = null;
+		try {
+			String firstName = request.getParameter(CommonConstants.FIRST_NAME);
+			String lastName = request.getParameter(CommonConstants.LAST_NAME);
+			String emailId = request.getParameter(CommonConstants.EMAIL_ID);
+			String password = request.getParameter("password");
+			String confirmPassword = request.getParameter("confirmPassword");
+			String companyIdStr = request.getParameter("companyId");
 
-        try {
-            String firstName = request.getParameter( CommonConstants.FIRST_NAME );
-            String lastName = request.getParameter( CommonConstants.LAST_NAME );
-            String emailId = request.getParameter( CommonConstants.EMAIL_ID );
-            String password = request.getParameter( "password" );
-            String confirmPassword = request.getParameter( "confirmPassword" );
-            String companyIdStr = request.getParameter( "companyId" );
+			// form parameters validation
+			validateCompleteRegistrationForm(firstName, lastName, emailId, password, companyIdStr, confirmPassword);
 
-            // form parameters validation
-            validateCompleteRegistrationForm( firstName, lastName, emailId, password, companyIdStr, confirmPassword );
+			// Decrypting URL parameters
+			Map<String, String> urlParams = new HashMap<>();
+			try {
+				String encryptedUrlParameters = request.getParameter("q");
+				urlParams = urlGenerator.decryptParameters(encryptedUrlParameters);
+			}
+			catch (InvalidInputException e) {
+				throw new InvalidInputException(e.getMessage(), DisplayMessageConstants.GENERAL_ERROR, e);
+			}
 
-            // Decrypting URL parameters
-            Map<String, String> urlParams = new HashMap<>();
-            try {
-                String encryptedUrlParameters = request.getParameter( "q" );
-                urlParams = urlGenerator.decryptParameters( encryptedUrlParameters );
-            } catch ( InvalidInputException e ) {
-                throw new InvalidInputException( e.getMessage(), DisplayMessageConstants.GENERAL_ERROR, e );
-            }
+			// check if email address entered matches with the one in the encrypted url
+			if (!urlParams.get("emailId").equalsIgnoreCase(emailId)) {
+				LOG.error("Invalid Input exception. Reason emailId entered does not match with the one to which the mail was sent");
+				throw new InvalidInputException("Invalid Input exception", DisplayMessageConstants.INVALID_EMAILID);
+			}
 
-            // check if email address entered matches with the one in the encrypted url
-            if ( !urlParams.get( "emailId" ).equalsIgnoreCase( emailId ) ) {
-                LOG.error( "Invalid Input exception. Reason emailId entered does not match with the one to which the mail was sent" );
-                throw new InvalidInputException( "Invalid Input exception", DisplayMessageConstants.INVALID_EMAILID );
-            }
+			long companyId = 0;
+			try {
+				companyId = Long.parseLong(companyIdStr);
+			}
+			catch (NumberFormatException e) {
+				throw new InvalidInputException("NumberFormat exception parsing companyId. Reason : " + e.getMessage(),
+						DisplayMessageConstants.GENERAL_ERROR, e);
+			}
 
-            long companyId = 0;
-            try {
-                companyId = Long.parseLong( companyIdStr );
-            } catch ( NumberFormatException e ) {
-                throw new InvalidInputException( "NumberFormat exception parsing companyId. Reason : " + e.getMessage(),
-                    DisplayMessageConstants.GENERAL_ERROR, e );
-            }
+			try {
+				// fetch user object with email Id
+				user = authenticationService.getUserWithLoginNameAndCompanyId(emailId, companyId);
 
-            try {
-                // fetch user object with email Id
-                user = authenticationService.getUserWithLoginNameAndCompanyId( emailId, companyId );
+				// calling service to update user details on registration
+				user = userManagementService.updateUserOnCompleteRegistration(user, emailId, companyId, firstName, lastName, password);
+			}
+			catch (InvalidInputException e) {
+				throw new InvalidInputException(e.getMessage(), DisplayMessageConstants.USER_NOT_PRESENT, e);
+			}
 
-                // calling service to update user details on registration
-                user = userManagementService.updateUserOnCompleteRegistration( user, emailId, companyId, firstName, lastName,
-                    password );
-            } catch ( InvalidInputException e ) {
-                throw new InvalidInputException( e.getMessage(), DisplayMessageConstants.USER_NOT_PRESENT, e );
-            }
+			LOG.debug("Adding newly registered user to principal session");
+			sessionHelper.loginOnRegistration(emailId, password);
+			LOG.debug("Successfully added registered user to principal session");
 
-            LOG.debug( "Adding newly registered user to principal session" );
-            sessionHelper.loginOnRegistration( emailId, password );
-            LOG.debug( "Successfully added registered user to principal session" );
+			AccountType accountType = null;
+			HttpSession session = request.getSession(true);
+			List<LicenseDetail> licenseDetails = user.getCompany().getLicenseDetails();
+			if (licenseDetails != null && !licenseDetails.isEmpty()) {
+				LicenseDetail licenseDetail = licenseDetails.get(0);
+				accountType = AccountType.getAccountType(licenseDetail.getAccountsMaster().getAccountsMasterId());
+				LOG.debug("Adding account type in session");
+				session.setAttribute(CommonConstants.ACCOUNT_TYPE_IN_SESSION, accountType);
+			}
+			else {
+				LOG.debug("License details not found for the user's company");
+			}
 
-            AccountType accountType = null;
-            HttpSession session = request.getSession( true );
-            List<LicenseDetail> licenseDetails = user.getCompany().getLicenseDetails();
-            if ( licenseDetails != null && !licenseDetails.isEmpty() ) {
-                LicenseDetail licenseDetail = licenseDetails.get( 0 );
-                accountType = AccountType.getAccountType( licenseDetail.getAccountsMaster().getAccountsMasterId() );
-                LOG.debug( "Adding account type in session" );
-                session.setAttribute( CommonConstants.ACCOUNT_TYPE_IN_SESSION, accountType );
-            } else {
-                LOG.debug( "License details not found for the user's company" );
-            }
+			// updating the flags for user profiles
+			if (user.getIsAtleastOneUserprofileComplete() == CommonConstants.PROCESS_COMPLETE) {
+				// get the user's canonical settings
+				LOG.info("Fetching the user's canonical settings and setting it in session");
+				sessionHelper.getCanonicalSettings(session);
+				sessionHelper.setSettingVariablesInSession(session);
+				LOG.debug("Updating user count modification notification");
+				userManagementService.updateUserCountModificationNotification(user.getCompany());
+			}
+			else {
+				// TODO: add logic for what happens when no user profile present
+			}
 
-            // updating the flags for user profiles
-            if ( user.getIsAtleastOneUserprofileComplete() == CommonConstants.PROCESS_COMPLETE ) {
-                // get the user's canonical settings
-                LOG.info( "Fetching the user's canonical settings and setting it in session" );
-                sessionHelper.getCanonicalSettings( session );
-                sessionHelper.setSettingVariablesInSession( session );
-                LOG.debug( "Updating user count modification notification" );
-                userManagementService.updateUserCountModificationNotification( user.getCompany() );
-            } else {
-                // TODO: add logic for what happens when no user profile present
-            }
+			// Setting session variable to show linkedin signup and sendsurvey popups only once
+			String popupStatus = (String) session.getAttribute(CommonConstants.POPUP_FLAG_IN_SESSION);
+			if (popupStatus == null) {
+				session.setAttribute(CommonConstants.POPUP_FLAG_IN_SESSION, CommonConstants.YES_STRING);
+			}
+			else if (popupStatus.equals(CommonConstants.YES_STRING)) {
+				session.setAttribute(CommonConstants.POPUP_FLAG_IN_SESSION, CommonConstants.NO_STRING);
+			}
 
-            // Setting session variable to show linkedin signup and sendsurvey popups only once
-            String popupStatus = (String) session.getAttribute( CommonConstants.POPUP_FLAG_IN_SESSION );
-            if ( popupStatus == null ) {
-                session.setAttribute( CommonConstants.POPUP_FLAG_IN_SESSION, CommonConstants.YES_STRING );
-            } else if ( popupStatus.equals( CommonConstants.YES_STRING ) ) {
-                session.setAttribute( CommonConstants.POPUP_FLAG_IN_SESSION, CommonConstants.NO_STRING );
-            }
+			// updating session with signup path params
+			LOG.debug("Updating session with selected user profile if not set");
+			boolean showLinkedInPopup = false;
+			boolean showSendSurveyPopup = false;
+			List<UserProfile> profiles = userManagementService.getAllUserProfilesForUser(user);
+			for (UserProfile profile : profiles) {
+				if (profile.getProfilesMaster().getProfileId() == CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID) {
+					showLinkedInPopup = true;
+					showSendSurveyPopup = true;
+					break;
+				}
+			}
+			redirectAttributes.addFlashAttribute("showLinkedInPopup", String.valueOf(showLinkedInPopup));
+			redirectAttributes.addFlashAttribute("showSendSurveyPopup", String.valueOf(showSendSurveyPopup));
 
-            // updating session with signup path params
-            LOG.debug( "Updating session with selected user profile if not set" );
-            boolean showLinkedInPopup = false;
-            boolean showSendSurveyPopup = false;
-            List<UserProfile> profiles = userManagementService.getAllUserProfilesForUser( user );
-            for ( UserProfile profile : profiles ) {
-                if ( profile.getProfilesMaster().getProfileId() == CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID ) {
-                    showLinkedInPopup = true;
-                    showSendSurveyPopup = true;
-                    break;
-                }
-            }
-            model.addAttribute( "showLinkedInPopup", String.valueOf( showLinkedInPopup ) );
-            model.addAttribute( "showSendSurveyPopup", String.valueOf( showSendSurveyPopup ) );
+			// updating session with aggregated user profiles, if not set
+			sessionHelper.updateProcessedUserProfiles(session, user);
 
-            // updating session with aggregated user profiles, if not set
-            sessionHelper.updateProcessedUserProfiles( session, user );
+			// update the last login time and number of logins
+			userManagementService.updateUserLoginTimeAndNum(user);
+		}
+		catch (NonFatalException e) {
+			LOG.error("NonFatalException while setting new Password. Reason : " + e.getMessage(), e);
+			redirectAttributes.addFlashAttribute("message", messageUtils.getDisplayMessage(e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE));
+			return "redirect:/" + JspResolver.COMPLETE_REGISTRATION_PAGE + ".do";
+		}
 
-            // update the last login time and number of logins
-            userManagementService.updateUserLoginTimeAndNum( user );
-        } catch ( NonFatalException e ) {
-            LOG.error( "NonFatalException while setting new Password. Reason : " + e.getMessage(), e );
-            model
-                .addAttribute( "message", messageUtils.getDisplayMessage( e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE ) );
-            return JspResolver.COMPLETE_REGISTRATION;
-        }
-
-        LOG.info( "Method completeRegistration() to complete registration of user finished." );
-        return JspResolver.LANDING;
-    }
+		LOG.info("Method completeRegistration() to complete registration of user finished.");
+		return "redirect:/" + JspResolver.LANDING + ".do";
+	}
 
 
     @RequestMapping ( value = "/showlinkedindatacompare")
