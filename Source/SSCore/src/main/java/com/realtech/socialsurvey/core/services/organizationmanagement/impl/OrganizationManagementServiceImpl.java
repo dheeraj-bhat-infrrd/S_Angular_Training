@@ -37,6 +37,7 @@ import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.commons.ProfileCompletionList;
 import com.realtech.socialsurvey.core.commons.Utils;
 import com.realtech.socialsurvey.core.dao.BranchDao;
+import com.realtech.socialsurvey.core.dao.CompanyDao;
 import com.realtech.socialsurvey.core.dao.DisabledAccountDao;
 import com.realtech.socialsurvey.core.dao.GenericDao;
 import com.realtech.socialsurvey.core.dao.OrganizationUnitSettingsDao;
@@ -109,7 +110,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
     private static Map<Integer, VerticalsMaster> verticalsMastersMap = new HashMap<Integer, VerticalsMaster>();
 
     @Autowired
-    private GenericDao<Company, Long> companyDao;
+    private CompanyDao companyDao;
 
     @Autowired
     private UserDao userDao;
@@ -3881,45 +3882,53 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
             CommonConstants.LINKEDIN_URL_PART );
     }
 
-
     @Override
-    public SurveySettings retrieveDefaultSurveyProperties()
-    {
-        SurveySettings surveySettings = new SurveySettings();
-        surveySettings.setHappyText( happyText );
-        surveySettings.setNeutralText( neutralText );
-        surveySettings.setSadText( sadText );
-        surveySettings.setHappyTextComplete( happyTextComplete );
-        surveySettings.setNeutralTextComplete( neutralTextComplete );
-        surveySettings.setSadTextComplete( sadTextComplete );
-        return surveySettings;
-    }
+	public SurveySettings retrieveDefaultSurveyProperties() {
+		SurveySettings surveySettings = new SurveySettings();
+		surveySettings.setHappyText(happyText);
+		surveySettings.setNeutralText(neutralText);
+		surveySettings.setSadText(sadText);
+		surveySettings.setHappyTextComplete(happyTextComplete);
+		surveySettings.setNeutralTextComplete(neutralTextComplete);
+		surveySettings.setSadTextComplete(sadTextComplete);
+		return surveySettings;
+	}
 
-
-    @Override
-    public String resetDefaultSurveyText( SurveySettings surveySettings, String mood )
-    {
-        if ( mood.equalsIgnoreCase( "happy" ) ) {
-            surveySettings.setHappyText( happyText );
-            return happyText;
-        } else if ( mood.equalsIgnoreCase( "neutral" ) ) {
-            surveySettings.setNeutralText( neutralText );
-            return neutralText;
-        } else if ( mood.equalsIgnoreCase( "sad" ) ) {
-            surveySettings.setSadText( sadText );
-            return sadText;
-        } else if ( mood.equalsIgnoreCase( "happyComplete" ) ) {
-            surveySettings.setHappyTextComplete( happyTextComplete );
-            return happyTextComplete;
-        } else if ( mood.equalsIgnoreCase( "neutralComplete" ) ) {
-            surveySettings.setNeutralTextComplete( neutralTextComplete );
-            return neutralTextComplete;
-        } else if ( mood.equalsIgnoreCase( "sadComplete" ) ) {
-            surveySettings.setSadTextComplete( sadTextComplete );
-            return sadTextComplete;
-        } else {
-            return "";
-        }
-    }
+	@Override
+	public String resetDefaultSurveyText(SurveySettings surveySettings, String mood) {
+		if (mood.equalsIgnoreCase("happy")) {
+			surveySettings.setHappyText(happyText);
+			return happyText;
+		}
+		else if (mood.equalsIgnoreCase("neutral")) {
+			surveySettings.setNeutralText(neutralText);
+			return neutralText;
+		}
+		else if (mood.equalsIgnoreCase("sad")) {
+			surveySettings.setSadText(sadText);
+			return sadText;
+		}
+		else if (mood.equalsIgnoreCase("happyComplete")) {
+			surveySettings.setHappyTextComplete(happyTextComplete);
+			return happyTextComplete;
+		}
+		else if (mood.equalsIgnoreCase("neutralComplete")) {
+			surveySettings.setNeutralTextComplete(neutralTextComplete);
+			return neutralTextComplete;
+		}
+		else if (mood.equalsIgnoreCase("sadComplete")) {
+			surveySettings.setSadTextComplete(sadTextComplete);
+			return sadTextComplete;
+		}
+		else {
+			return "";
+		}
+	}
+	
+	@Override
+	@Transactional
+	public List<Company> getCompaniesByName(String namePattern){
+		return companyDao.searchCompaniesByName(namePattern);
+	}
 }
 // JIRA: SS-27: By RM05: EOC

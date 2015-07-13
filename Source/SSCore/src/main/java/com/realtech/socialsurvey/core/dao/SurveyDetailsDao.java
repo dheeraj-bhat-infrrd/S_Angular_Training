@@ -4,7 +4,6 @@ import java.text.ParseException;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
-
 import com.realtech.socialsurvey.core.entities.AgentRankingReport;
 import com.realtech.socialsurvey.core.entities.SurveyDetails;
 import com.realtech.socialsurvey.core.entities.SurveyResponse;
@@ -19,7 +18,7 @@ public interface SurveyDetailsDao {
 
 	public void updateCustomerResponse(long agentId, String customerEmail, SurveyResponse surveyResponse, int stage);
 
-	public void updateGatewayAnswer(long agentId, String customerEmail, String mood, String review, boolean isAbusive);
+	public void updateGatewayAnswer(long agentId, String customerEmail, String mood, String review, boolean isAbusive, String agreedToShare);
 
 	public void updateFinalScore(long agentId, String customerEmail);
 
@@ -37,7 +36,7 @@ public interface SurveyDetailsDao {
 
 	public Map<String, Long> getCountOfSurveyInitiators(String columnName, long columnValue);
 
-	public double getRatingForPastNdays(String columnName, long columnValue, int noOfDays, boolean aggregateAbusive);
+	public double getRatingForPastNdays(String columnName, long columnValue, int noOfDays, boolean aggregateAbusive, boolean realtechAdmin);
 
 	public long getIncompleteSurveyCount(String columnName, long columnValue, int noOfDays);
 
@@ -56,13 +55,13 @@ public interface SurveyDetailsDao {
 
 	public void updateReminderCount(long agentId, String customerEmail);
 
-	public Map<String, Long> getClickedSurveyByCriteria(String columnName, long columnValue, String groupByCriteria) throws ParseException;
+	public Map<String, Long> getClickedSurveyByCriteria(String columnName, long columnValue, String groupByCriteria, boolean realtechAdmin) throws ParseException;
 
-	public Map<String, Long> getSentSurveyByCriteria(String columnName, long columnValue, String groupByCriteria) throws ParseException;
+	public Map<String, Long> getSentSurveyByCriteria(String columnName, long columnValue, String groupByCriteria, boolean realtechAdmin) throws ParseException;
 
-	public Map<String, Long> getSocialPostsCountByCriteria(String columnName, long columnValue, String groupByCriteria) throws ParseException;
+	public Map<String, Long> getSocialPostsCountByCriteria(String columnName, long columnValue, String groupByCriteria, boolean realtechAdmin) throws ParseException;
 
-	public Map<String, Long> getCompletedSurveyByCriteria(String columnName, long columnValue, String groupByCriteria) throws ParseException;
+	public Map<String, Long> getCompletedSurveyByCriteria(String columnName, long columnValue, String groupByCriteria, boolean realtechAdmin) throws ParseException;
 
 	public List<SurveyDetails> getIncompleteSurveyCustomers(long companyId, int surveyReminderInterval, int maxReminders);
 

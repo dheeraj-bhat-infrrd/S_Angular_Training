@@ -43,6 +43,9 @@
 		<intercept-url pattern="/sendresetpasswordlink.do" access="permitAll" />
 		<intercept-url pattern="/setnewpassword.do" access="permitAll" />
 
+		<!-- Amdin pages -->
+		<intercept-url pattern="/adminlogin.do" access="permitAll" />
+
 		<!-- Restricted Services -->
 		<intercept-url pattern="/*.do" access="isAuthenticated()" />
 
