@@ -6901,3 +6901,15 @@ a.sq-btn-post-social:hover, a.sq-btn-post-social:visited {
 	cursor: pointer;
 	background-size: contain;
 }
+
+.bread-crum-row {
+    margin: 10px 0;
+}
+
+.brd-crm-divider {
+    padding: 0 5px;
+}
+
+.brd-crm {
+    font-size: 14px;
+}
