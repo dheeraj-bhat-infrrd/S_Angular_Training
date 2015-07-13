@@ -13,6 +13,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.entities.Company;
 import com.realtech.socialsurvey.core.entities.LicenseDetail;
@@ -99,12 +100,11 @@ public class PaymentController {
 	 * @return
 	 */
 	@RequestMapping(value = "/subscribe", method = RequestMethod.POST)
-	public String subscribeForPlan(Model model, HttpServletRequest request, HttpServletResponse response) {
+	public String subscribeForPlan(HttpServletRequest request, HttpServletResponse response, RedirectAttributes redirectAttributes) {
 
 		LOG.info("Payment controller called for plan subscribal");
 		String skipPayment = request.getParameter("skipPayment");
 		try {
-			
 			String strAccountType = request.getParameter(CommonConstants.ACCOUNT_TYPE_IN_SESSION);
 			// Get the nonce from the request
 			String nonce = request.getParameter(CommonConstants.PAYMENT_NONCE);
@@ -123,7 +123,7 @@ public class PaymentController {
 			catch (NumberFormatException e) {
 				throw new InvalidInputException("Error while parsing account type ", DisplayMessageConstants.GENERAL_ERROR, e);
 			}
-			
+
 			try {
 				gateway.subscribe(user, accountTypeValue, nonce);
 			}
@@ -136,19 +136,22 @@ public class PaymentController {
 				throw new PaymentException(e.getMessage(), DisplayMessageConstants.GENERAL_ERROR, e);
 			}
 			catch (CreditCardException e) {
-				LOG.error("PaymentController subscribeForPlan() : CreditCardException thrown : " + e.getMessage(),e);
-				throw new CreditCardException("PaymentController subscribeForPlan() : CreditCardException thrown : " + e.getMessage(),DisplayMessageConstants.CREDIT_CARD_INVALID,e);
+				LOG.error("PaymentController subscribeForPlan() : CreditCardException thrown : " + e.getMessage(), e);
+				throw new CreditCardException("PaymentController subscribeForPlan() : CreditCardException thrown : " + e.getMessage(),
+						DisplayMessageConstants.CREDIT_CARD_INVALID, e);
 			}
 			catch (SubscriptionUnsuccessfulException e) {
-				LOG.error("PaymentController subscribeForPlan() : SubscriptionUnsuccessfulException thrown : " + e.getMessage(),e);
+				LOG.error("PaymentController subscribeForPlan() : SubscriptionUnsuccessfulException thrown : " + e.getMessage(), e);
 				if (e.getErrorCode().equals(DisplayMessageConstants.BANK_REJECTED)) {
-					throw new SubscriptionUnsuccessfulException("PaymentController subscribeForPlan() : SubscriptionUnsuccessfulException thrown : " + e.getMessage(),DisplayMessageConstants.BANK_REJECTED,e);
+					throw new SubscriptionUnsuccessfulException("PaymentController subscribeForPlan() : SubscriptionUnsuccessfulException thrown : "
+							+ e.getMessage(), DisplayMessageConstants.BANK_REJECTED, e);
 				}
-				throw new SubscriptionUnsuccessfulException("PaymentController subscribeForPlan() : SubscriptionUnsuccessfulException thrown : " + e.getMessage(),DisplayMessageConstants.SUBSCRIPTION_UNSUCCESSFUL,e);
+				throw new SubscriptionUnsuccessfulException("PaymentController subscribeForPlan() : SubscriptionUnsuccessfulException thrown : "
+						+ e.getMessage(), DisplayMessageConstants.SUBSCRIPTION_UNSUCCESSFUL, e);
 			}
-			
 			LOG.info("Subscription Successful!");
-			//Now we update the stage after payment is done and before the setting up the account.
+			
+			// Now we update the stage after payment is done and before the setting up the account.
 			try {
 				/**
 				 * For each account type, only the company admin's profile completion stage is
@@ -164,14 +167,14 @@ public class PaymentController {
 				LOG.error("InvalidInputException while updating profile completion stage. Reason : " + e.getMessage(), e);
 				throw new InvalidInputException(e.getMessage(), DisplayMessageConstants.GENERAL_ERROR, e);
 			}
-			
 		}
 		catch (NonFatalException e) {
 			LOG.error("NonfatalException while adding account type. Reason: " + e.getMessage(), e);
-			model.addAttribute("skipPayment", skipPayment);
-			model.addAttribute("message", messageUtils.getDisplayMessage(e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE));
-			return JspResolver.ACCOUNT_TYPE_SELECTION;
+			redirectAttributes.addFlashAttribute("skipPayment", skipPayment);
+			redirectAttributes.addFlashAttribute("message", messageUtils.getDisplayMessage(e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE));
+			return "redirect:/" + JspResolver.ACCOUNT_TYPE_SELECTION_PAGE + ".do";
 		}
+		
 		return "redirect:./" + CommonConstants.PRE_PROCESSING_BEFORE_LOGIN_STAGE;
 	}
 
