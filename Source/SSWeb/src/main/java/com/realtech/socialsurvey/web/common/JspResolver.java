@@ -99,4 +99,10 @@ public interface JspResolver
 
     // Old pages
     public static final String LINKEDIN_ACCESS = "linkedinaccess";
+    
+    
+    //Admin pages
+    public static final String ADMIN_LOGIN = "admin/admin_login";
+    public static final String ADMIN_LANDING = "admin/admin_landing";
+    public static final String ADMIN_DASHBOARD = "admin/admin_dashboard";
 }

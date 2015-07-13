@@ -6,6 +6,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
 import com.realtech.socialsurvey.core.entities.Branch;
 import com.realtech.socialsurvey.core.entities.BranchFromSearch;
 import com.realtech.socialsurvey.core.entities.BranchSettings;
@@ -723,4 +724,6 @@ public interface OrganizationManagementService {
 	public SurveySettings retrieveDefaultSurveyProperties();
 
 	public String resetDefaultSurveyText(SurveySettings surveySettings, String mood);
+
+	public List<Company> getCompaniesByName(String searchKey);
 }

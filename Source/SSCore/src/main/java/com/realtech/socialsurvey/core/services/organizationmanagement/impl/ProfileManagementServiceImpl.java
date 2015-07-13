@@ -1241,7 +1241,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 			throw new InvalidInputException("iden is invalid for getting average rating os a company");
 		}
 		String idenColumnName = getIdenColumnNameFromProfileLevel(profileLevel);
-		double averageRating = surveyDetailsDao.getRatingForPastNdays(idenColumnName, iden, -1, aggregateAbusive);
+		double averageRating = surveyDetailsDao.getRatingForPastNdays(idenColumnName, iden, -1, aggregateAbusive, false);
 
 		LOG.info("Method getAverageRatings executed successfully.Returning: " + averageRating);
 		return averageRating;
@@ -1272,6 +1272,8 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 				break;
 			case CommonConstants.PROFILE_LEVEL_INDIVIDUAL:
 				idenColumnName = CommonConstants.AGENT_ID_COLUMN;
+				break;
+			case CommonConstants.PROFILE_LEVEL_REALTECH_ADMIN:
 				break;
 			default:
 				throw new InvalidInputException("Invalid profile level while getting iden column name");
@@ -1401,7 +1403,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 	@Override
 	@Transactional
 	public List<SurveyPreInitiation> getIncompleteSurvey(long iden, double startScore, double limitScore, int startIndex, int numOfRows,
-			String profileLevel, Date startDate, Date endDate) throws InvalidInputException {
+			String profileLevel, Date startDate, Date endDate, boolean realtechAdmin) throws InvalidInputException {
 		LOG.info("Method getIncompleteSurvey() called for iden:" + iden + " startScore:" + startScore + " limitScore:" + limitScore + " startIndex:"
 				+ startIndex + " numOfRows:" + numOfRows + " profileLevel:" + profileLevel);
 		if (iden <= 0l) {
@@ -1422,7 +1424,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 		if (endDate != null)
 			endTime = new Timestamp(endDate.getTime());
 		List<SurveyPreInitiation> surveys = surveyPreInitiationDao.getIncompleteSurvey(startTime, endTime, startIndex, numOfRows, agentIds,
-				isCompanyAdmin, iden);
+				isCompanyAdmin, iden, realtechAdmin);
 		return surveys;
 	}
 

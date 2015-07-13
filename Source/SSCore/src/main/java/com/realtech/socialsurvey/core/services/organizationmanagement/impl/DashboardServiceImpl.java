@@ -82,8 +82,8 @@ public class DashboardServiceImpl implements DashboardService, InitializingBean 
 	}
 
 	@Override
-	public double getSurveyScore(String columnName, long columnValue, int numberOfDays) {
-		return surveyDetailsDao.getRatingForPastNdays(columnName, columnValue, numberOfDays, true);
+	public double getSurveyScore(String columnName, long columnValue, int numberOfDays, boolean realtechAdmin) {
+		return surveyDetailsDao.getRatingForPastNdays(columnName, columnValue, numberOfDays, true, realtechAdmin);
 	}
 
 	@Override
@@ -353,12 +353,12 @@ public class DashboardServiceImpl implements DashboardService, InitializingBean 
 	}
 	
 	@Override
-	public Map<String, Map<String, Long>> getSurveyDetailsForGraph(String columnName, long columnValue, String reportType) throws ParseException{
+	public Map<String, Map<String, Long>> getSurveyDetailsForGraph(String columnName, long columnValue, String reportType, boolean realtechAdmin) throws ParseException{
 		Map<String, Map<String, Long>> map = new HashMap<String, Map<String, Long>>();
-		map.put("clicked", surveyDetailsDao.getClickedSurveyByCriteria(columnName, columnValue, reportType));
-		map.put("sent", surveyDetailsDao.getSentSurveyByCriteria(columnName, columnValue, reportType));
-		map.put("complete", surveyDetailsDao.getCompletedSurveyByCriteria(columnName, columnValue, reportType));
-		map.put("socialposts", surveyDetailsDao.getSocialPostsCountByCriteria(columnName, columnValue, reportType));
+		map.put("clicked", surveyDetailsDao.getClickedSurveyByCriteria(columnName, columnValue, reportType, realtechAdmin));
+		map.put("sent", surveyDetailsDao.getSentSurveyByCriteria(columnName, columnValue, reportType, realtechAdmin));
+		map.put("complete", surveyDetailsDao.getCompletedSurveyByCriteria(columnName, columnValue, reportType, realtechAdmin));
+		map.put("socialposts", surveyDetailsDao.getSocialPostsCountByCriteria(columnName, columnValue, reportType, realtechAdmin));
 		return map;
 	}
 
