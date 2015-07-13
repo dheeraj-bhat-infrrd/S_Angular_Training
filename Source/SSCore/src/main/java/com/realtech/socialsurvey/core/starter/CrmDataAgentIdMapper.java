@@ -1,18 +1,13 @@
 package com.realtech.socialsurvey.core.starter;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.StringWriter;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
-import org.apache.commons.io.IOUtils;
 import org.apache.poi.hssf.usermodel.HSSFSheet;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.Cell;
@@ -23,7 +18,6 @@ import org.quartz.JobExecutionException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.quartz.QuartzJobBean;
-
 import com.realtech.socialsurvey.core.entities.SurveyPreInitiation;
 import com.realtech.socialsurvey.core.entities.User;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
@@ -150,22 +144,6 @@ public class CrmDataAgentIdMapper extends QuartzJobBean
                 }
             } catch ( InvalidInputException | UndeliveredEmailException e ) {
                 LOG.error( "Exception caught in sendCorruptDataFromCrmNotificationMail() while sending mail to company admin" );
-            }
-        }
-    }
-
-
-    private void clearOldRecords()
-    {
-        LOG.debug( "Clearing old files " );
-        if ( fileDirectoryLocation != null ) {
-            File files = new File( fileDirectoryLocation );
-            if ( files.isDirectory() ) {
-                for ( File file : files.listFiles() ) {
-                    if ( file.exists() ) {
-                        file.delete();
-                    }
-                }
             }
         }
     }
