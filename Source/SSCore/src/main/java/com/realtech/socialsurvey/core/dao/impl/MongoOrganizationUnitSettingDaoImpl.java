@@ -378,6 +378,19 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
 		return unitSettings;
 	}
 
+    @Override
+    public List<OrganizationUnitSettings> getCompanyListByVerticalName (String verticalName) {
+    	LOG.debug( "Method getCompanyListByVerticalName() called for vertical name : " + verticalName);
+    	
+    	List<OrganizationUnitSettings> unitSettings = null;
+    	Query query = new Query();
+    	query.addCriteria(Criteria.where(KEY_VERTICAL).is(verticalName));
+    	query.fields().include(KEY_LOGO).include(KEY_CONTACT_DETAILS).include(KEY_PROFILE_NAME).include(KEY_VERTICAL).exclude("_id");
+    	
+    	unitSettings = mongoTemplate.find(query, OrganizationUnitSettings.class, COMPANY_SETTINGS_COLLECTION);
+    	
+    	return unitSettings;
+    }
 
 	/*
 	 * Method to set complete profile URL for each of the setting being fetched.

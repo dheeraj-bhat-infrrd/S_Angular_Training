@@ -174,7 +174,7 @@ public class LoginController {
 			
 			//Check if super admin is logged in
 			
-			if(user.getSuperAdmin() == CommonConstants.STATUS_ACTIVE) {
+			if(user.isSuperAdmin()) {
 				return JspResolver.ADMIN_LANDING;
 			}
 			

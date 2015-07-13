@@ -23,6 +23,9 @@
 		<intercept-url pattern="/findapro.do" access="permitAll" />
 		<intercept-url pattern="/findaproscroll.do" access="permitAll" />
 		
+		<!-- Company list page -->
+		<intercept-url pattern="/findcompany.do" access="permitAll" />
+		
 		<!-- Registration Services -->
 		<intercept-url pattern="/register.do" access="permitAll" />
 		<intercept-url pattern="/registration.do" access="permitAll" />

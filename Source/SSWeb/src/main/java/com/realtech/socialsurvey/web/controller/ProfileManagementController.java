@@ -3297,6 +3297,30 @@ public class ProfileManagementController
         }
     }
 
+    
+    @RequestMapping(value = "/findcompany")
+    public String findCompanies( Model model, HttpServletRequest request ) {
+    	
+    	LOG.info("Method findCompanies() called");
+    	
+    	String verticalName = request.getParameter("verticalName");
+    	try {
+    		if(verticalName == null || verticalName.isEmpty()) {
+    			throw new InvalidInputException("Null/Empty vertical name");
+    		}
+    		
+    		List<OrganizationUnitSettings> companyList = profileManagementService.getCompanyList(verticalName);
+    		if(companyList != null && companyList.size() > 0) {
+    			model.addAttribute("companyList", companyList);
+        		model.addAttribute("numFound", companyList.size());    			
+    		}
+    		model.addAttribute("verticalName", verticalName);
+    		
+    	} catch (NonFatalException e) {
+    		LOG.error("NonFatalException caught in findCompanies() method, reason : " + e.getMessage());
+    	}
+    	return JspResolver.COMPANY_LIST;
+    }
 
     /**
      * Method to return company profile page
