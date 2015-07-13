@@ -25,6 +25,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import twitter4j.TwitterException;
 import com.google.gson.Gson;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
+import com.realtech.socialsurvey.core.dao.impl.MongoSocialPostDaoImpl;
 import com.realtech.socialsurvey.core.entities.AgentSettings;
 import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
 import com.realtech.socialsurvey.core.entities.SurveyDetails;
@@ -143,6 +144,7 @@ public class SurveyManagementController {
 			String feedback = request.getParameter("feedback");
 			String mood = request.getParameter("mood");
 			String customerEmail = request.getParameter("customerEmail");
+			String agreedToShare = request.getParameter("agreedToShare");
 
 			long agentId = 0;
 			try {
@@ -158,7 +160,7 @@ public class SurveyManagementController {
 			}
 
 			boolean isAbusive = Boolean.parseBoolean(request.getParameter("isAbusive"));
-			surveyHandler.updateGatewayQuestionResponseAndScore(agentId, customerEmail, mood, feedback, isAbusive);
+			surveyHandler.updateGatewayQuestionResponseAndScore(agentId, customerEmail, mood, feedback, isAbusive, agreedToShare);
 			surveyHandler.increaseSurveyCountForAgent(agentId);
 			SurveyPreInitiation surveyPreInitiation = surveyHandler.getPreInitiatedSurvey(agentId, customerEmail);
 			surveyHandler.deleteSurveyPreInitiationDetailsPermanently(surveyPreInitiation);
@@ -434,13 +436,14 @@ public class SurveyManagementController {
 				SurveyPreInitiation surveyPreInitiation = surveyHandler.getPreInitiatedSurvey(agentId, customerEmail);
 				if (surveyPreInitiation == null) {
 					surveyAndStage = getSurvey(agentId, urlParams.get(CommonConstants.CUSTOMER_EMAIL_COLUMN), null, null, 0, null,
-							surveyHandler.composeLink(agentId, customerEmail));
+							surveyHandler.composeLink(agentId, customerEmail), MongoSocialPostDaoImpl.KEY_SOURCE_SS);
 				}
 				else {
 					surveyAndStage = getSurvey(agentId, urlParams.get(CommonConstants.CUSTOMER_EMAIL_COLUMN),
 							surveyPreInitiation.getCustomerFirstName(), surveyPreInitiation.getCustomerLastName(),
 							surveyPreInitiation.getReminderCounts(), surveyPreInitiation.getCustomerInteractionDetails(),
-							surveyHandler.composeLink(agentId, customerEmail));
+							surveyHandler.composeLink(agentId, customerEmail), surveyPreInitiation.getSurveySource());
+					
 					surveyHandler.markSurveyAsStarted(surveyPreInitiation);
 				}
 				
@@ -927,8 +930,9 @@ public class SurveyManagementController {
 	}
 
 	private SurveyDetails storeInitialSurveyDetails(long agentId, String customerEmail, String firstName, String lastName, int reminderCount,
-			String custRelationWithAgent, String url) throws SolrException, NoRecordsFetchedException, InvalidInputException {
-		return surveyHandler.storeInitialSurveyDetails(agentId, customerEmail, firstName, lastName, reminderCount, custRelationWithAgent, url);
+			String custRelationWithAgent, String url, String source) throws SolrException, NoRecordsFetchedException, InvalidInputException {
+		return surveyHandler
+				.storeInitialSurveyDetails(agentId, customerEmail, firstName, lastName, reminderCount, custRelationWithAgent, url, source);
 	}
 
 	private String getApplicationBaseUrl() {
@@ -936,13 +940,14 @@ public class SurveyManagementController {
 	}
 
 	private Map<String, Object> getSurvey(long agentId, String customerEmail, String firstName, String lastName, int reminderCount,
-			String custRelationWithAgent, String url) throws InvalidInputException, SolrException, NoRecordsFetchedException {
+			String custRelationWithAgent, String url, String source) throws InvalidInputException, SolrException, NoRecordsFetchedException {
 		Integer stage = null;
 		Map<String, Object> surveyAndStage = new HashMap<>();
 		List<SurveyQuestionDetails> surveyQuestionDetails = surveyBuilder.getSurveyByAgenId(agentId);
 		boolean editable = false;
 		try {
-			SurveyDetails survey = storeInitialSurveyDetails(agentId, customerEmail, firstName, lastName, reminderCount, custRelationWithAgent, url);
+			SurveyDetails survey = storeInitialSurveyDetails(agentId, customerEmail, firstName, lastName, reminderCount, custRelationWithAgent, url,
+					source);
 			surveyHandler.updateSurveyAsClicked(agentId, customerEmail);
 
 			if (survey != null) {
@@ -1062,6 +1067,7 @@ public class SurveyManagementController {
 		surveyAndStage.put("survey", surveyQuestionDetails);
 		surveyAndStage.put("agentId", agentId);
 		surveyAndStage.put("editable", editable);
+		surveyAndStage.put("source", source);
 		return surveyAndStage;
 	}
 
