@@ -6571,6 +6571,11 @@ tr.u-tbl-header td {
     color: #3E9DCB;
 }
 
+.ctnt-com-default-img {
+	background: url(../images/place-holder-Company.png) no-repeat center;
+	background-size : contain; 
+}
+
 .pro-addr-cont {
     font-family: 'opensanslight';
     font-size: 12px;

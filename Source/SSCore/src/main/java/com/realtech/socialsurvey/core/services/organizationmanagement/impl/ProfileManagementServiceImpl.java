@@ -1965,19 +1965,11 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 
 	@Override
 	@Transactional
-	public List<String> getCompanyList(String verticalName) throws InvalidInputException, ProfileNotFoundException {
+	public List<OrganizationUnitSettings> getCompanyList(String verticalName) throws InvalidInputException, ProfileNotFoundException {
 		LOG.info("Method getCompanyList called :");
-		List<String> companyNameList = new ArrayList<>();
-		List<VerticalsMaster> verticalsMaster = verticalsMasterDao.findByColumn(VerticalsMaster.class, CommonConstants.VERTICAL_NAME, verticalName);
-		if (verticalsMaster == null) {
-			throw new ProfileNotFoundException("No records found  ");
-		}
-		List<Company> companyList = verticalsMaster.get(0).getCompanies();
-		for (Company company : companyList) {
-			companyNameList.add(company.getCompany());
-		}
+		List<OrganizationUnitSettings> companyList = organizationUnitSettingsDao.getCompanyListByVerticalName(verticalName);
 		LOG.info("Method getCompanyList finished :");
-		return companyNameList;
+		return companyList;
 	}
 
 }

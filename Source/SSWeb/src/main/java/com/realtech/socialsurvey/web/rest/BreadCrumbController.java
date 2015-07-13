@@ -55,7 +55,7 @@ public class BreadCrumbController {
 						CommonConstants.ERROR_CODE_INDIVIDUAL_PROFILE_SERVICE_PRECONDITION_FAILURE, CommonConstants.SERVICE_CODE_INDIVIDUAL_PROFILE,
 						"verticalName is invalid"), "verticalName  is null or empty");
 			}
-			List<String> companyNameList = null;
+			List<OrganizationUnitSettings> companyNameList = null;
 			try {
 				companyNameList = profileManagementService.getCompanyList(verticalName);
 				String json = new Gson().toJson(companyNameList);
