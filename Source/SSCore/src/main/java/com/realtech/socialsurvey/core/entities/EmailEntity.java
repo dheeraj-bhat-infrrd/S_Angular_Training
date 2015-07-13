@@ -30,6 +30,7 @@ public class EmailEntity implements Serializable
     private String senderEmailId;
     private String senderName;
     private String senderPassword;
+    private String attachmentLocation;
 
 
     public List<String> getRecipients()
@@ -116,12 +117,25 @@ public class EmailEntity implements Serializable
     }
 
 
+    public String getAttachmentLocation()
+    {
+        return attachmentLocation;
+    }
+
+
+    public void setAttachmentLocation( String attachmentLocation )
+    {
+        this.attachmentLocation = attachmentLocation;
+    }
+
+
     @Override
     public String toString()
     {
         return "EmailEntity [recipients=" + recipients + ", subject=" + subject + ", body=" + body + ", recipientType="
             + recipientType + ", senderEmailId=" + senderEmailId + ", senderName=" + senderName;
     }
+
 
 }
 

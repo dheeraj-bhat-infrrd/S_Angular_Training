@@ -34,6 +34,7 @@ namespace EncompassSocialSurvey.DAL
                                         , LAST_REMINDER_TIME
                                         , STATUS
                                         , CREATED_ON
+                                        , MODIFIED_ON
                                           )
                                         VALUES(
                                           ?SURVEY_SOURCE
@@ -51,6 +52,7 @@ namespace EncompassSocialSurvey.DAL
                                         , ?LAST_REMINDER_TIME
                                         , ?STATUS
                                         , ?CREATED_ON
+                                        , ?MODIFIED_ON
                                         ) ;";
 
         public bool InsertLoan(LoanEntity loan, MySqlConnection mySqlDbConnection)
@@ -60,7 +62,7 @@ namespace EncompassSocialSurvey.DAL
 
             string insertQuery = INSERT_QUERY;
             MySqlCommand commandToInsert = null;
-            
+
             try
             {
                 // if loand not present then and only then insert
@@ -73,19 +75,20 @@ namespace EncompassSocialSurvey.DAL
                     commandToInsert.Parameters.Add("?SURVEY_SOURCE", MySqlDbType.VarChar, 100).Value = loan.SurveySource;
                     commandToInsert.Parameters.Add("?SURVEY_SOURCE_ID", MySqlDbType.VarChar, 250).Value = loan.SurveySourceId;
                     commandToInsert.Parameters.Add("?COMPANY_ID", MySqlDbType.Int32).Value = loan.CompanyId;
-                    commandToInsert.Parameters.Add("?AGENT_ID", MySqlDbType.VarChar, 36).Value = loan.AgentId;
+                    commandToInsert.Parameters.Add("?AGENT_ID", MySqlDbType.VarChar, 36).Value = "0";
                     commandToInsert.Parameters.Add("?AGENT_NAME", MySqlDbType.VarChar, 100).Value = loan.AgentName;
                     commandToInsert.Parameters.Add("?AGENT_EMAILID", MySqlDbType.VarChar, 250).Value = loan.AgentEmailId;
-                    
+
                     commandToInsert.Parameters.Add("?CUSTOMER_FIRST_NAME", MySqlDbType.VarChar, 100).Value = loan.CustomerFirstName;
                     commandToInsert.Parameters.Add("?CUSTOMER_LAST_NAME", MySqlDbType.VarChar, 100).Value = loan.CustomerLastName;
                     commandToInsert.Parameters.Add("?CUSTOMER_EMAIL_ID", MySqlDbType.VarChar, 250).Value = loan.CustomerEmailId;
                     commandToInsert.Parameters.Add("?CUSTOMER_INTERACTION_DETAILS", MySqlDbType.VarChar, 500).Value = loan.CustomerInteractionDetails;
                     commandToInsert.Parameters.Add("?ENGAGEMENT_CLOSED_TIME", MySqlDbType.DateTime).Value = loan.EngagementClosedTime;
                     commandToInsert.Parameters.Add("?REMINDER_COUNTS", MySqlDbType.Int32).Value = loan.ReminderCounts;
-                    commandToInsert.Parameters.Add("?LAST_REMINDER_TIME", MySqlDbType.DateTime).Value = loan.LastReminderTime;
+                    commandToInsert.Parameters.Add("?LAST_REMINDER_TIME", MySqlDbType.DateTime).Value = DateTime.Now;
                     commandToInsert.Parameters.Add("?STATUS", MySqlDbType.Int32).Value = loan.Status;
                     commandToInsert.Parameters.Add("?CREATED_ON", MySqlDbType.DateTime).Value = loan.CreatedOn;
+                    commandToInsert.Parameters.Add("?MODIFIED_ON", MySqlDbType.DateTime).Value = DateTime.Now;
 
                     //
                     commandToInsert.ExecuteNonQuery();
@@ -141,7 +144,8 @@ namespace EncompassSocialSurvey.DAL
 
         public bool IsSurveySourceIdExists(LoanEntity loan, MySqlConnection mySqlDbConnection)
         {
-            Logger.Info("Entering the method LoanRepository.IsSurveySourceIdExists()");
+            Logger.Info("Entering the method LoanRepository.IsSurveySourceIdExists(): SURVEY_SOURCE_ID: " + loan.SurveySourceId
+                 + " : CUSTOMER_EMAIL_ID :  " + loan.CustomerEmailId + " : CUSTOMER_FIRST_NAME : " + loan.CustomerFirstName);
             bool returnValue = false;
 
             string sqlQuery = SELECT_QUERY;
@@ -176,7 +180,16 @@ namespace EncompassSocialSurvey.DAL
                 if (null != commandToSelect) { commandToSelect.Dispose(); }
             }
 
-            Logger.Info("Exiting the method LoanRepository.IsSurveySourceIdExists()");
+            if (returnValue)
+            {
+                Logger.Info("Exiting the method LoanRepository.IsSurveySourceIdExists(): Records already present in database: don't insert: SURVEY_SOURCE_ID: " + loan.SurveySourceId
+                     + " : CUSTOMER_EMAIL_ID :  " + loan.CustomerEmailId + " : CUSTOMER_FIRST_NAME : " + loan.CustomerFirstName);
+            }
+            else
+            {
+                Logger.Info("Exiting the method LoanRepository.IsSurveySourceIdExists(): SURVEY_SOURCE_ID: " + loan.SurveySourceId
+                    + " : CUSTOMER_EMAIL_ID :  " + loan.CustomerEmailId + " : CUSTOMER_FIRST_NAME : " + loan.CustomerFirstName);
+            }
             return returnValue;
         }
     }

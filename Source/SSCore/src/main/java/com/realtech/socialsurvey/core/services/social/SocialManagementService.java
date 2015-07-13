@@ -1,15 +1,18 @@
 package com.realtech.socialsurvey.core.services.social;
 
 import java.util.List;
+
 import twitter4j.Twitter;
 import twitter4j.TwitterException;
 import twitter4j.auth.RequestToken;
+
 import com.realtech.socialsurvey.core.entities.AgentSettings;
 import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
 import com.realtech.socialsurvey.core.entities.SocialMediaTokens;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.exception.NoRecordsFetchedException;
 import com.realtech.socialsurvey.core.exception.NonFatalException;
+
 import facebook4j.Facebook;
 import facebook4j.FacebookException;
 
@@ -55,6 +58,8 @@ public interface SocialManagementService {
 	public List<OrganizationUnitSettings> getBranchAndRegionSettingsForUser(long userId);
 	
 	public boolean updateLinkedin(OrganizationUnitSettings agentSettings, String message, String linkedinProfileUrl, String linkedinMessageFeedback) throws NonFatalException;
+	
+	public OrganizationUnitSettings disconnectSocialNetwork(String socialMedia, OrganizationUnitSettings unitSettings, String collectionName) throws InvalidInputException;
 
 }
 // JIRA SS-34 BY RM02 BOC

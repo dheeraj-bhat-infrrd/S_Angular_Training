@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import com.amazonaws.util.json.JSONException;
 import com.amazonaws.util.json.JSONObject;
 import com.google.gson.Gson;
@@ -520,7 +521,8 @@ public class OrganizationManagementController
 
             // Encrypting the password
             String plainPassword = request.getParameter( "encompass-password" );
-            String cipherPassword = encryptionHelper.encryptAES( plainPassword, "" );
+            String cipherPassword = plainPassword;
+            /*String cipherPassword = encryptionHelper.encryptAES( plainPassword, "" );*/
 
             EncompassCrmInfo encompassCrmInfo = new EncompassCrmInfo();
             encompassCrmInfo.setCrm_source( CommonConstants.CRM_INFO_SOURCE_ENCOMPASS );
@@ -1188,106 +1190,103 @@ public class OrganizationManagementController
     }
 
 
-    /**
-     * This controller is called to initialize the default branches and regions in case they arent
-     * done after payment.
-     * 
-     * @param request
-     * @param model
-     * @return
-     */
-    @RequestMapping ( value = "/defaultbrandandregioncreation", method = RequestMethod.GET)
-    public String createDefaultBranchesAndRegions( HttpServletRequest request, Model model )
-    {
-        LOG.info( "createDefaultBranchesAndRegions called to do pre processing before log in" );
-        User user = sessionHelper.getCurrentUser();
+	/**
+	 * This controller is called to initialize the default branches and regions in case they arent
+	 * done after payment.
+	 * 
+	 * @param request
+	 * @param model
+	 * @return
+	 */
+	@RequestMapping(value = "/defaultbrandandregioncreation", method = RequestMethod.GET)
+	public String createDefaultBranchesAndRegions(HttpServletRequest request, RedirectAttributes redirectAttributes, Model model) {
+		LOG.info("createDefaultBranchesAndRegions called to do pre processing before log in");
+		User user = sessionHelper.getCurrentUser();
 
-        try {
-            LicenseDetail currentLicenseDetail = user.getCompany().getLicenseDetails().get( CommonConstants.INITIAL_INDEX );
-            HttpSession session = request.getSession( false );
-            AccountType accountType = null;
+		try {
+			LicenseDetail currentLicenseDetail = user.getCompany().getLicenseDetails().get(CommonConstants.INITIAL_INDEX);
+			HttpSession session = request.getSession(false);
+			AccountType accountType = null;
 
-            if ( currentLicenseDetail == null ) {
-                LOG.error( "createDefaultBranchesAndRegions : License details not found for user with id : " + user.getUserId() );
-                throw new InvalidInputException(
-                    "createDefaultBranchesAndRegions : License details not found for user with id : " + user.getUserId() );
-            }
+			if (currentLicenseDetail == null) {
+				LOG.error("createDefaultBranchesAndRegions : License details not found for user with id : " + user.getUserId());
+				throw new InvalidInputException("createDefaultBranchesAndRegions : License details not found for user with id : " + user.getUserId());
+			}
 
-            AccountsMaster currentAccountsMaster = currentLicenseDetail.getAccountsMaster();
-            if ( currentAccountsMaster == null ) {
-                LOG.error( "createDefaultBranchesAndRegions : Accounts Master not found for license details with id : "
-                    + currentLicenseDetail.getLicenseId() );
-                throw new InvalidInputException(
-                    "createDefaultBranchesAndRegions : Accounts Master not found for license details with id : "
-                        + currentLicenseDetail.getLicenseId() );
-            }
+			AccountsMaster currentAccountsMaster = currentLicenseDetail.getAccountsMaster();
+			if (currentAccountsMaster == null) {
+				LOG.error("createDefaultBranchesAndRegions : Accounts Master not found for license details with id: "
+						+ currentLicenseDetail.getLicenseId());
+				throw new InvalidInputException("createDefaultBranchesAndRegions : Accounts Master not found for license details with id: "
+						+ currentLicenseDetail.getLicenseId());
+			}
 
-            try {
-                LOG.debug( "Calling sevices for adding account type of company" );
-                accountType = organizationManagementService.addAccountTypeForCompany( user,
-                    String.valueOf( currentAccountsMaster.getAccountsMasterId() ) );
-                LOG.debug( "Successfully executed sevices for adding account type of company.Returning account type : "
-                    + accountType );
+			try {
+				LOG.debug("Calling sevices for adding account type of company");
+				accountType = organizationManagementService.addAccountTypeForCompany(user,
+						String.valueOf(currentAccountsMaster.getAccountsMasterId()));
+				LOG.debug("Successfully executed sevices for adding account type of company.Returning account type : " + accountType);
 
-                LOG.debug( "Adding account type in session" );
-                session.setAttribute( CommonConstants.ACCOUNT_TYPE_IN_SESSION, accountType );
-                // get the settings
-                sessionHelper.getCanonicalSettings( session );
-                // set the session variable
-                sessionHelper.setSettingVariablesInSession( session );
-            } catch ( InvalidInputException e ) {
-                throw new InvalidInputException( "InvalidInputException in addAccountType. Reason :" + e.getMessage(),
-                    DisplayMessageConstants.GENERAL_ERROR, e );
-            }
-            try {
-                /**
-                 * For each account type, only the company admin's profile completion stage is
-                 * updated, all the other profiles created by default need no action so their
-                 * profile completion stage is marked completed at the time of insert
-                 */
-                LOG.debug( "Calling sevices for updating profile completion stage" );
-                userManagementService.updateProfileCompletionStage( user,
-                    CommonConstants.PROFILES_MASTER_COMPANY_ADMIN_PROFILE_ID, CommonConstants.DASHBOARD_STAGE );
-                LOG.debug( "Successfully executed sevices for updating profile completion stage" );
-            } catch ( InvalidInputException e ) {
-                LOG.error( "InvalidInputException while updating profile completion stage. Reason : " + e.getMessage(), e );
-                throw new InvalidInputException( e.getMessage(), DisplayMessageConstants.GENERAL_ERROR, e );
-            }
+				LOG.debug("Adding account type in session");
+				session.setAttribute(CommonConstants.ACCOUNT_TYPE_IN_SESSION, accountType);
+				sessionHelper.getCanonicalSettings(session);
+				sessionHelper.setSettingVariablesInSession(session);
+			}
+			catch (InvalidInputException e) {
+				throw new InvalidInputException("InvalidInputException in addAccountType. Reason :" + e.getMessage(),
+						DisplayMessageConstants.GENERAL_ERROR, e);
+			}
+			try {
+				/**
+				 * For each account type, only the company admin's profile completion stage is
+				 * updated, all the other profiles created by default need no action so their
+				 * profile completion stage is marked completed at the time of insert
+				 */
+				LOG.debug("Calling sevices for updating profile completion stage");
+				userManagementService.updateProfileCompletionStage(user, CommonConstants.PROFILES_MASTER_COMPANY_ADMIN_PROFILE_ID,
+						CommonConstants.DASHBOARD_STAGE);
+				LOG.debug("Successfully executed sevices for updating profile completion stage");
+			}
+			catch (InvalidInputException e) {
+				LOG.error("InvalidInputException while updating profile completion stage. Reason : " + e.getMessage(), e);
+				throw new InvalidInputException(e.getMessage(), DisplayMessageConstants.GENERAL_ERROR, e);
+			}
 
-            // Setting session variable to show linkedin signup and sendsurvey popups only once
-            String popupStatus = (String) session.getAttribute( CommonConstants.POPUP_FLAG_IN_SESSION );
-            if ( popupStatus == null ) {
-                session.setAttribute( CommonConstants.POPUP_FLAG_IN_SESSION, CommonConstants.YES_STRING );
-            } else if ( popupStatus.equals( CommonConstants.YES_STRING ) ) {
-                session.setAttribute( CommonConstants.POPUP_FLAG_IN_SESSION, CommonConstants.NO_STRING );
-            }
+			// Setting session variable to show linkedin signup and sendsurvey popups only once
+			String popupStatus = (String) session.getAttribute(CommonConstants.POPUP_FLAG_IN_SESSION);
+			if (popupStatus == null) {
+				session.setAttribute(CommonConstants.POPUP_FLAG_IN_SESSION, CommonConstants.YES_STRING);
+			}
+			else if (popupStatus.equals(CommonConstants.YES_STRING)) {
+				session.setAttribute(CommonConstants.POPUP_FLAG_IN_SESSION, CommonConstants.NO_STRING);
+			}
 
-            // setting popup attributes
-            boolean showLinkedInPopup = false;
-            boolean showSendSurveyPopup = false;
-            user = userManagementService.getUserByUserId( user.getUserId() );
-            for ( UserProfile profile : user.getUserProfiles() ) {
-                if ( profile.getProfilesMaster().getProfileId() == CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID ) {
-                    showLinkedInPopup = true;
-                    showSendSurveyPopup = true;
-                    break;
-                }
-            }
-            model.addAttribute( "showLinkedInPopup", String.valueOf( showLinkedInPopup ) );
-            model.addAttribute( "showSendSurveyPopup", String.valueOf( showSendSurveyPopup ) );
+			// setting popup attributes
+			boolean showLinkedInPopup = false;
+			boolean showSendSurveyPopup = false;
+			user = userManagementService.getUserByUserId(user.getUserId());
+			for (UserProfile profile : user.getUserProfiles()) {
+				if (profile.getProfilesMaster().getProfileId() == CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID) {
+					showLinkedInPopup = true;
+					showSendSurveyPopup = true;
+					break;
+				}
+			}
+			redirectAttributes.addFlashAttribute("showLinkedInPopup", String.valueOf(showLinkedInPopup));
+			redirectAttributes.addFlashAttribute("showSendSurveyPopup", String.valueOf(showSendSurveyPopup));
 
-            // update the last login time and number of logins
-            //			userManagementService.updateUserLoginTimeAndNum(user);
-        } catch ( NonFatalException e ) {
-            LOG.error( "NonfatalException while adding account type. Reason: " + e.getMessage(), e );
-            model
-                .addAttribute( "message", messageUtils.getDisplayMessage( e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE ) );
-            return JspResolver.ERROR_PAGE;
-        }
+			// update the last login time and number of logins
+			// userManagementService.updateUserLoginTimeAndNum(user);
+		}
+		catch (NonFatalException e) {
+			LOG.error("NonfatalException while adding account type. Reason: " + e.getMessage(), e);
+			model.addAttribute("message", messageUtils.getDisplayMessage(e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE));
+			return JspResolver.ERROR_PAGE;
+		}
 
-        LOG.info( "createDefaultBranchesAndRegions : Default branches and regions created. Returing the landing page!" );
-        return JspResolver.LANDING;
-    }
+		LOG.info("createDefaultBranchesAndRegions : Default branches and regions created. Returing the landing page!");
+		return "redirect:/" + JspResolver.LANDING + ".do";
+	}
 
 
     /**
