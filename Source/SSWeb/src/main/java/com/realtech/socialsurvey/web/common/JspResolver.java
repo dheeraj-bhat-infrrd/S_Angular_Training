@@ -23,6 +23,7 @@ public interface JspResolver {
 	public static final String LOGIN = "login";
 	public static final String PROFILE_LIST = "proList";
 	public static final String PROFILE_LIST_NOSCRIPT = "proList_noscript";
+	public static final String COMPANY_LIST = "company_list";
 	public static final String PROFILE_PAGE = "profile";
 	public static final String PROFILE_PAGE_NOSCRIPT = "profile_noscript";
 	public static final String MESSAGE_HEADER = "messageheader";
