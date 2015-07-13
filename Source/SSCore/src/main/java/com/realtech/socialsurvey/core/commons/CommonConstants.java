@@ -600,4 +600,13 @@ public interface CommonConstants
     public static final String HEADER_POST_COMMENT = "Post Comment";
     public static final String HEADER_POST_DATE = "Post Date";
     public static final String HEADER_POST_SOURCE = "Source";
+
+
+    public static final String VALID_USERS_LIST = "validUsersList";
+
+    public static final String INVALID_USERS_LIST = "invalidUsersList";
+
+    public static final String BRANCH_OBJECT = "branch";
+
+    public static final String REGION_OBJECT = "region";
 }
