@@ -4,7 +4,6 @@ import java.text.ParseException;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
-
 import com.realtech.socialsurvey.core.entities.AgentRankingReport;
 import com.realtech.socialsurvey.core.entities.SurveyDetails;
 import com.realtech.socialsurvey.core.entities.SurveyResponse;
@@ -19,7 +18,7 @@ public interface SurveyDetailsDao {
 
 	public void updateCustomerResponse(long agentId, String customerEmail, SurveyResponse surveyResponse, int stage);
 
-	public void updateGatewayAnswer(long agentId, String customerEmail, String mood, String review, boolean isAbusive);
+	public void updateGatewayAnswer(long agentId, String customerEmail, String mood, String review, boolean isAbusive, String agreedToShare);
 
 	public void updateFinalScore(long agentId, String customerEmail);
 

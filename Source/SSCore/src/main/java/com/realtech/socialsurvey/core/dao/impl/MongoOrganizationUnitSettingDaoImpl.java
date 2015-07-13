@@ -67,6 +67,10 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
 	public static final String KEY_PROFILE_STAGES = "profileStages";
 	public static final String KEY_MODIFIED_ON = "modifiedOn";
 	public static final String KEY_DISCLAIMER = "disclaimer";
+	public static final String KEY_FACEBOOK_SOCIAL_MEDIA_TOKEN = "socialMediaTokens.facebookToken";
+	public static final String KEY_TWITTER_SOCIAL_MEDIA_TOKEN = "socialMediaTokens.twitterToken";
+	public static final String KEY_GOOGLE_SOCIAL_MEDIA_TOKEN = "socialMediaTokens.googleToken";
+	public static final String KEY_LINKEDIN_SOCIAL_MEDIA_TOKEN = "socialMediaTokens.linkedInToken";
 
 	private static final Logger LOG = LoggerFactory.getLogger(MongoOrganizationUnitSettingDaoImpl.class);
 
@@ -339,26 +343,40 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
 	}
 	
 
+	@Override
+	public void setAgentDetails(Map<Long, AgentRankingReport> agentsReport) {
+		LOG.info("Method setAgentNames() started.");
+		Set<Long> agentIds = agentsReport.keySet();
+		List<AgentSettings> agentSettings = fetchMultipleAgentSettingsById(new ArrayList<Long>(agentIds));
+		for (AgentSettings setting : agentSettings) {
+			if (agentsReport.get(setting.getIden()) != null) {
+				try {
+					agentsReport.get(setting.getIden()).setAgentFirstName(setting.getContact_details().getFirstName());
+					agentsReport.get(setting.getIden()).setAgentLastName(setting.getContact_details().getLastName());
+					agentsReport.get(setting.getIden()).setRegistrationDate(setting.getCreatedOn());
+				}
+				catch (NullPointerException e) {
+					LOG.error("Null Pointer exception caught in setAgentNames(). Nested exception is ", e);
+					LOG.debug("Continuing...");
+					continue;
+				}
+			}
+		}
+		LOG.info("Method setAgentNames() finished.");
+	}
+    
     @Override
-    public void setAgentNames( Map<Long, AgentRankingReport> agentsReport )
-    {
-        LOG.info( "Method setAgentNames() started." );
-        Set<Long> agentIds = agentsReport.keySet();
-        List<AgentSettings> agentSEttings = fetchMultipleAgentSettingsById(new ArrayList<Long>(agentIds));
-        for ( AgentSettings setting : agentSEttings ) {
-            if(agentsReport.get(setting.getIden()) != null){
-                try{
-                agentsReport.get(setting.getIden()).setAgentFirstName( setting.getContact_details().getFirstName() );
-                agentsReport.get(setting.getIden()).setAgentLastName( setting.getContact_details().getLastName() );
-                }catch(NullPointerException e){
-                    LOG.error( "Null Pointer exception caught in setAgentNames(). NEsted exception is ", e );
-                    LOG.debug( "Continuing..." );
-                    continue;
-                }
-            }
-        }
-        LOG.info( "Method setAgentNames() finished." );
-    }
+    public OrganizationUnitSettings removeKeyInOrganizationSettings(OrganizationUnitSettings unitSettings, String keyToUpdate, String collectionName){
+		LOG.info("Method removeKeyInOrganizationSettings() started.");
+		Query query = new Query();
+		query.addCriteria(Criteria.where("_id").is(unitSettings.getId()));
+		Update update = new Update().unset(keyToUpdate);
+		LOG.debug("Updating the unit settings");
+		mongoTemplate.updateFirst(query, update, OrganizationUnitSettings.class, collectionName);
+		unitSettings = mongoTemplate.findOne(query, OrganizationUnitSettings.class, collectionName);
+		LOG.info("Method removeKeyInOrganizationSettings() finished.");
+		return unitSettings;
+	}
 
 
 	/*

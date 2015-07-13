@@ -9,7 +9,7 @@ namespace EncompassSocialSurvey.Entity
         public string SurveySourceId { get; set; }
         
         //
-        public int CompanyId { get; set; }
+        public long CompanyId { get; set; }
         public string AgentId { get; set; }
         public string AgentName { get; set; }
         public string AgentEmailId { get; set; }
