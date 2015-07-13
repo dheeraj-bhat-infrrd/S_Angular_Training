@@ -13,6 +13,7 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -485,6 +486,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
         mailIdSettings.setWork( user.getEmailId() );
         contactDetailSettings.setMail_ids( mailIdSettings );
 
+        companySettings.setUniqueIdentifier( organizationalDetails.get( CommonConstants.UNIQUE_IDENTIFIER ) );
         companySettings.setVertical( organizationalDetails.get( CommonConstants.VERTICAL ) );
         companySettings.setContact_details( contactDetailSettings );
         companySettings.setProfileName( generateProfileNameForCompany( company.getCompany(), company.getCompanyId() ) );
@@ -560,8 +562,18 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
         companySettings.setMail_content( mailContentSettings );
 
         LOG.debug( "Inserting company settings." );
-        organizationUnitSettingsDao.insertOrganizationUnitSettings( companySettings,
-            MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION );
+        OrganizationUnitSettings oldCompanySettings = organizationUnitSettingsDao
+            .fetchOrganizationUnitSettingsByUniqueIdentifier( companySettings.getUniqueIdentifier(),
+                MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION );
+        if ( oldCompanySettings == null ) {
+            organizationUnitSettingsDao.insertOrganizationUnitSettings( companySettings,
+                MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION );
+        } else {
+            organizationUnitSettingsDao.updateKeyOrganizationUnitSettingsByCriteria(
+                MongoOrganizationUnitSettingDaoImpl.KEY_CONTACT_DETAIL_SETTINGS, contactDetailSettings,
+                MongoOrganizationUnitSettingDaoImpl.KEY_IDENTIFIER, oldCompanySettings.getId(),
+                MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION );
+        }
 
         LOG.debug( "Method addOrganizationalDetails finished" );
     }
@@ -1833,9 +1845,61 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
             String firstName = "";
             String lastName = "";
             User user = null;
+            String toRemove = null;
             if ( emailId.contains( " " ) ) {
                 String[] userArray = emailId.split( " " );
                 String[] userInformation = removeElements( userArray, "" );
+                List<String> tempList = new LinkedList<String>();
+                for ( String str : userInformation ) {
+                    tempList.add( str );
+                }
+                String tempString = "";
+                for ( int i = 0; i < tempList.size(); i++ ) {
+
+                    LOG.debug( "removing extra spaces " );
+                    if ( tempList.get( i ).equalsIgnoreCase( "<" ) ) {
+                        if ( i + 1 < tempList.size() ) {
+                            if ( !tempList.get( i + 1 ).contains( "<" ) ) {
+                                tempString = tempList.get( i ).concat( tempList.get( i + 1 ) );
+
+                                toRemove = tempList.get( i + 1 );
+                                if ( i + 2 < tempList.size() ) {
+
+                                    if ( tempList.get( i + 2 ).equalsIgnoreCase( ">" ) ) {
+                                        tempString = tempString.concat( tempList.get( i + 2 ) );
+
+
+                                    }
+                                }
+                            }
+                        }
+                    } else if ( tempList.get( i ).equalsIgnoreCase( ">" ) ) {
+                        if ( !tempList.get( i - 1 ).contains( ">" ) ) {
+                            if ( tempString.isEmpty() ) {
+                                tempString = tempList.get( i - 1 ).concat( tempList.get( i ) );
+                                toRemove = tempList.get( i - 1 );
+                            }
+
+                        }
+                    }
+
+                }
+                if ( !tempString.isEmpty() ) {
+                    tempList.add( tempString );
+                }
+                Iterator<String> it = tempList.iterator();
+                while ( it.hasNext() ) {
+                    String iteratedValue = it.next();
+                    if ( iteratedValue.equalsIgnoreCase( "<" ) || iteratedValue.equalsIgnoreCase( ">" ) ) {
+                        it.remove();
+                    }
+                    if ( toRemove != null ) {
+                        if ( iteratedValue.equalsIgnoreCase( toRemove ) ) {
+                            it.remove();
+                        }
+                    }
+                }
+                userInformation = tempList.toArray( new String[tempList.size()] );
                 if ( userInformation.length >= 3 ) {
                     LOG.debug( "This contains middle name as well" );
                     for ( int i = 0; i < userInformation.length - 1; i++ ) {
