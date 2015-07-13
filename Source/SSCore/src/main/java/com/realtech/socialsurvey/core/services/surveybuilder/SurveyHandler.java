@@ -42,10 +42,11 @@ public interface SurveyHandler {
 	 * Method to update customer review and final score on the basis of rating questions in
 	 * SURVEY_DETAILS.
 	 */
-	public void updateGatewayQuestionResponseAndScore(long agentId, String customerEmail, String mood, String review, boolean isAbusive);
+	public void updateGatewayQuestionResponseAndScore(long agentId, String customerEmail, String mood, String review, boolean isAbusive,
+			String agreedToShare);
 
 	public SurveyDetails storeInitialSurveyDetails(long agentId, String customerEmail, String firstName, String lastName, int reminderCount,
-			String custRelationWithAgent, String url) throws SolrException, NoRecordsFetchedException, InvalidInputException;
+			String custRelationWithAgent, String url, String source) throws SolrException, NoRecordsFetchedException, InvalidInputException;
 
 	public SurveyDetails getSurveyDetails(long agentId, String customerEmail);
 
