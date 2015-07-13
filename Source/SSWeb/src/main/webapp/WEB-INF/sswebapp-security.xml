@@ -12,6 +12,7 @@
 		<!-- Generic Services -->
 		<intercept-url pattern="/" access="permitAll" />
 		<intercept-url pattern="/home.do" access="permitAll" />
+		<intercept-url pattern="/index.do" access="permitAll" />
 		<intercept-url pattern="/login.do" access="permitAll" />
 		<intercept-url pattern="/errorpage.do" access="permitAll" />	
 		<intercept-url pattern="/fetchgatrackingid.do" access="permitAll" />
@@ -27,12 +28,18 @@
 		<intercept-url pattern="/findcompany.do" access="permitAll" />
 		
 		<!-- Registration Services -->
-		<intercept-url pattern="/register.do" access="permitAll" />
-		<intercept-url pattern="/registration.do" access="permitAll" />
-		<intercept-url pattern="/completeregistration.do" access="permitAll" />
 		<intercept-url pattern="/resendRegistrationMail.do" access="permitAll" />
-		<intercept-url pattern="/showregistrationpage.do" access="permitAll" />
+		<intercept-url pattern="/generateregistrationurl.do" access="permitAll" />
+		<intercept-url pattern="/invitetoregister.do" access="permitAll" />
+		
 		<intercept-url pattern="/showcompleteregistrationpage.do" access="permitAll" />
+		<intercept-url pattern="/completeregistrationpage.do" access="permitAll" />
+		<intercept-url pattern="/completeregistration.do" access="permitAll" />
+		
+		<intercept-url pattern="/registration.do" access="permitAll" />
+		<intercept-url pattern="/showregistrationpage.do" access="permitAll" />
+		<intercept-url pattern="/registrationpage.do" access="permitAll" />
+		<intercept-url pattern="/register.do" access="permitAll" />
 		
 		<!-- ForgotPassword Services -->
 		<intercept-url pattern="/forgotPassword.do" access="permitAll" />
