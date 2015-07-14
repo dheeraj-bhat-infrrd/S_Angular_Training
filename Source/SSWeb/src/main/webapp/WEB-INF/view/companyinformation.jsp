@@ -152,6 +152,7 @@
 				<input type="hidden" value="${countryCode}" name="countrycode" id="country-code">
 				<input type="hidden" value="${message}" data-status="${status}" name="message" id="message"/>
 				<input type="hidden" value="${isDirectRegistration}" name="isDirectRegistration" id="isDirectRegistration"/>
+				<input type="hidden" value="${uniqueIdentifier}" name="uniqueIdentifier" id="uniqueIdentifier"/>
 			</form>
 			
 		</div>

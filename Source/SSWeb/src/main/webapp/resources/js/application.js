@@ -29,6 +29,7 @@ var lastColValueForCount;
 var lastColNameForGraph;
 var lastColValueForGraph;
 
+
 //Variables for processing Edit profile
 var startIndex = 0;
 var numOfRows = 3;
@@ -4589,6 +4590,7 @@ function paintProList(usersList) {
 		}
 	}
 }
+
 
 function fetchUsersByProfileLevel(iden, profileLevel, startIndex) {
 	if (iden == undefined) {
