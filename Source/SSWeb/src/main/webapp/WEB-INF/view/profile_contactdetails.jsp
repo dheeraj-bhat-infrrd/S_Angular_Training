@@ -11,7 +11,7 @@
 	<c:set value="${contactdetail.contact_numbers}" var="contactNumbers"></c:set>
 	<c:set value="${contactdetail.web_addresses}" var="webAddresses"></c:set>
 </c:if>
-
+<input type="hidden" id="sel-prof-country-code" value="${contactdetail.countryCode}">
 <div class="lp-con-row lp-row clearfix">
 	<div class="float-left lp-con-icn icn-mail"></div>
 	<%-- <div class="float-left lp-con-row-item" data-email="work">${mailIds.work}</div> --%>
@@ -99,7 +99,8 @@
 			</c:when>
 		</c:choose>
 	</div>
-</div>
+</div>--%>
+
 <div class="lp-con-row lp-row clearfix">
 	<div class="float-left lp-con-icn icn-phone"></div>
 	<div class="float-left lp-edit-wrapper clearfix float-left">
@@ -127,6 +128,7 @@
 		</c:choose>
 	</div>
 </div>
+<%--
 <div class="lp-con-row lp-row clearfix">
 	<div class="float-left lp-con-icn icn-fax"></div>
 	<div>
@@ -154,3 +156,16 @@
 		</c:choose>
 	</div>
 </div> --%>
+<script>
+var phoneFormat = '(ddd) ddd-dddd';
+$(document).ready(function() {
+	var countryCode = $('#sel-prof-country-code').val();
+	if(countryCode == undefined || countryCode == "") {
+		countryCode = "US";
+	}
+	if(phoneFormatList[countryCode] && phoneFormatList[countryCode] != "") {
+		phoneFormat = phoneFormatList[countryCode];		
+	}
+	$('#phone-number-work').mask(phoneFormat, {'translation': {d: {pattern: /[0-9*]/}}});
+});
+</script>
