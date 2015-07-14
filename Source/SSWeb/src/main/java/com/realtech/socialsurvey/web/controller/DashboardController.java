@@ -1013,84 +1013,73 @@ public class DashboardController {
 	 * Method to download file containing completed surveys
 	 */
 	@RequestMapping(value = "/downloaddashboardcompletesurvey")
-	public void getCompleteSurveyFile(Model model, HttpServletRequest request,
-			HttpServletResponse response) {
+	public void getCompleteSurveyFile(Model model, HttpServletRequest request, HttpServletResponse response) {
 		LOG.info("Method to get file containg completed surveys list getCompleteSurveyFile() started.");
 		User user = sessionHelper.getCurrentUser();
 		List<SurveyDetails> surveyDetails = new ArrayList<>();
 		boolean realtechAdmin = user.isSuperAdmin();
+		
 		try {
 			String columnName = request.getParameter("columnName");
-			String startDateStr = request.getParameter("startDate");
-			String endDateStr = request.getParameter("endDate");
 
 			if (!realtechAdmin && (columnName == null || columnName.isEmpty())) {
 				LOG.error("Invalid value (null/empty) passed for profile level.");
-				throw new InvalidInputException(
-						"Invalid value (null/empty) passed for profile level.");
+				throw new InvalidInputException("Invalid value (null/empty) passed for profile level.");
 			}
 
 			Date startDate = null;
+			String startDateStr = request.getParameter("startDate");
 			if (startDateStr != null && !startDateStr.isEmpty()) {
 				try {
-					startDate = new SimpleDateFormat(
-							CommonConstants.DATE_FORMAT).parse(startDateStr);
-				} catch (ParseException e) {
-					LOG.error(
-							"ParseException caught in getCompleteSurveyFile() while parsing startDate. Nested exception is ",
-							e);
+					startDate = new SimpleDateFormat(CommonConstants.DATE_FORMAT).parse(startDateStr);
+				}
+				catch (ParseException e) {
+					LOG.error("ParseException caught in getCompleteSurveyFile() while parsing startDate. Nested exception is ", e);
 				}
 			}
 
 			Date endDate = Calendar.getInstance().getTime();
+			String endDateStr = request.getParameter("endDate");
 			if (endDateStr != null && !endDateStr.isEmpty()) {
 				try {
-					endDate = new SimpleDateFormat(CommonConstants.DATE_FORMAT)
-							.parse(endDateStr);
-				} catch (ParseException e) {
-					LOG.error(
-							"ParseException caught in getCompleteSurveyFile() while parsing startDate. Nested exception is ",
-							e);
+					endDate = new SimpleDateFormat(CommonConstants.DATE_FORMAT).parse(endDateStr);
+				}
+				catch (ParseException e) {
+					LOG.error("ParseException caught in getCompleteSurveyFile() while parsing startDate. Nested exception is ", e);
 				}
 			}
 
 			long iden = 0;
 			String profileLevel = getProfileLevel(columnName);
-			if(realtechAdmin){
+			if (realtechAdmin) {
 				profileLevel = CommonConstants.PROFILE_LEVEL_REALTECH_ADMIN;
 			}
 			if (profileLevel.equals(CommonConstants.PROFILE_LEVEL_COMPANY)) {
 				iden = user.getCompany().getCompanyId();
-			} else if (profileLevel
-					.equals(CommonConstants.PROFILE_LEVEL_INDIVIDUAL)) {
+			}
+			else if (profileLevel.equals(CommonConstants.PROFILE_LEVEL_INDIVIDUAL)) {
 				iden = user.getUserId();
-			} else {
+			}
+			else {
 				String columnValue = request.getParameter("columnValue");
 				if (columnValue != null && !columnValue.isEmpty()) {
 					try {
 						iden = Long.parseLong(columnValue);
-					} catch (NumberFormatException e) {
-						LOG.error(
-								"NumberFormatException caught while parsing columnValue in getCompleteSurveyFile(). Nested exception is ",
-								e);
+					}
+					catch (NumberFormatException e) {
+						LOG.error("NumberFormatException caught while parsing columnValue in getCompleteSurveyFile(). Nested exception is ", e);
 						throw e;
 					}
 				}
 			}
 
 			try {
-				surveyDetails = profileManagementService.getReviews(iden, -1,
-						-1, -1, -1, profileLevel, true, startDate, endDate,
-						"date");
-				String fileLocation = "Completed_Survey_" + profileLevel + "_"
-						+ iden + EXCEL_FILE_EXTENSION;
-				XSSFWorkbook workbook = dashboardService
-						.downloadCompleteSurveyData(surveyDetails, fileLocation);
+				surveyDetails = profileManagementService.getReviews(iden, -1, -1, -1, -1, profileLevel, true, startDate, endDate, "date");
+				String fileLocation = "Completed_Survey_" + profileLevel + "_" + iden + EXCEL_FILE_EXTENSION;
+				XSSFWorkbook workbook = dashboardService.downloadCompleteSurveyData(surveyDetails, fileLocation);
 				response.setContentType(EXCEL_FORMAT);
 				String headerKey = CONTENT_DISPOSITION_HEADER;
-				String headerValue = String.format(
-						"attachment; filename=\"%s\"",
-						new File(fileLocation).getName());
+				String headerValue = String.format("attachment; filename=\"%s\"", new File(fileLocation).getName());
 				response.setHeader(headerKey, headerValue);
 
 				// write into file
@@ -1098,30 +1087,30 @@ public class DashboardController {
 				try {
 					responseStream = response.getOutputStream();
 					workbook.write(responseStream);
-				} catch (IOException e) {
+				}
+				catch (IOException e) {
 					e.printStackTrace();
-				} finally {
+				}
+				finally {
 					try {
 						responseStream.close();
-					} catch (IOException e) {
+					}
+					catch (IOException e) {
 						e.printStackTrace();
 					}
 				}
 				response.flushBuffer();
-			} catch (InvalidInputException e) {
-				LOG.error(
-						"InvalidInputException caught in getCompleteSurveyFile() while fetching completed surveys file. Nested exception is ",
-						e);
-				throw e;
-			} catch (IOException e) {
-				LOG.error(
-						"IOException caught in getCompleteSurveyFile() while fetching completed surveys file. Nested exception is ",
-						e);
 			}
-		} catch (NonFatalException e) {
-			LOG.error(
-					"Non fatal exception caught in getCompleteSurveyFile() while fetching completed surveys file. Nested exception is ",
-					e);
+			catch (InvalidInputException e) {
+				LOG.error("InvalidInputException caught in getCompleteSurveyFile() while fetching completed surveys file. Nested exception is ", e);
+				throw e;
+			}
+			catch (IOException e) {
+				LOG.error("IOException caught in getCompleteSurveyFile() while fetching completed surveys file. Nested exception is ", e);
+			}
+		}
+		catch (NonFatalException e) {
+			LOG.error("Non fatal exception caught in getCompleteSurveyFile() while fetching completed surveys file. Nested exception is ", e);
 		}
 		LOG.info("Method to get file containg completed surveys list getCompleteSurveyFile() finished.");
 	}
@@ -1130,50 +1119,44 @@ public class DashboardController {
 	 * Method to download file containing incomplete surveys
 	 */
 	@RequestMapping(value = "/downloaddashboardincompletesurvey")
-	public void getIncompleteSurveyFile(Model model,
-			HttpServletRequest request, HttpServletResponse response) {
+	public void getIncompleteSurveyFile(Model model, HttpServletRequest request, HttpServletResponse response) {
 		LOG.info("Method to get file containg incomplete surveys list getIncompleteSurveyFile() started.");
 		List<SurveyPreInitiation> surveyDetails = new ArrayList<>();
+		
 		try {
 			String realtechAdminStr = request.getParameter("realtechAdmin");
-			boolean realtechAdmin = false;
-			realtechAdmin = Boolean.parseBoolean(realtechAdminStr);
+			boolean realtechAdmin = Boolean.parseBoolean(realtechAdminStr);
 
 			String columnName = request.getParameter("columnName");
 			if (columnName == null || columnName.isEmpty()) {
 				LOG.error("Invalid value (null/empty) passed for profile level.");
-				throw new InvalidInputException(
-						"Invalid value (null/empty) passed for profile level.");
+				throw new InvalidInputException("Invalid value (null/empty) passed for profile level.");
 			}
-
-			String startDateStr = request.getParameter("startDate");
-			String endDateStr = request.getParameter("endDate");
 
 			Date startDate = null;
-			Date endDate = Calendar.getInstance().getTime();
+			String startDateStr = request.getParameter("startDate");
 			if (startDateStr != null) {
 				try {
-					startDate = new SimpleDateFormat(
-							CommonConstants.DATE_FORMAT).parse(startDateStr);
-				} catch (ParseException e) {
-					LOG.error(
-							"ParseException caught in getCompleteSurveyFile() while parsing startDate. Nested exception is ",
-							e);
+					startDate = new SimpleDateFormat(CommonConstants.DATE_FORMAT).parse(startDateStr);
+				}
+				catch (ParseException e) {
+					LOG.error("ParseException caught in getCompleteSurveyFile() while parsing startDate. Nested exception is ", e);
 				}
 			}
+			
+			Date endDate = Calendar.getInstance().getTime();
+			String endDateStr = request.getParameter("endDate");
 			if (endDateStr != null) {
 				try {
-					endDate = new SimpleDateFormat(CommonConstants.DATE_FORMAT)
-							.parse(endDateStr);
-				} catch (ParseException e) {
-					LOG.error(
-							"ParseException caught in getCompleteSurveyFile() while parsing startDate. Nested exception is ",
-							e);
+					endDate = new SimpleDateFormat(CommonConstants.DATE_FORMAT).parse(endDateStr);
+				}
+				catch (ParseException e) {
+					LOG.error("ParseException caught in getCompleteSurveyFile() while parsing startDate. Nested exception is ", e);
 				}
 			}
 
 			String profileLevel = getProfileLevel(columnName);
-			if(realtechAdmin){
+			if (realtechAdmin) {
 				profileLevel = CommonConstants.PROFILE_LEVEL_REALTECH_ADMIN;
 			}
 			long iden = 0;
@@ -1181,189 +1164,168 @@ public class DashboardController {
 			User user = sessionHelper.getCurrentUser();
 			if (profileLevel.equals(CommonConstants.PROFILE_LEVEL_COMPANY)) {
 				iden = user.getCompany().getCompanyId();
-			} else if (profileLevel
-					.equals(CommonConstants.PROFILE_LEVEL_INDIVIDUAL)) {
+			}
+			else if (profileLevel.equals(CommonConstants.PROFILE_LEVEL_INDIVIDUAL)) {
 				iden = user.getUserId();
-			} else {
+			}
+			else {
 				String columnValue = request.getParameter("columnValue");
 				if (columnValue != null && !columnValue.isEmpty()) {
 					try {
 						iden = Long.parseLong(columnValue);
-					} catch (NumberFormatException e) {
-						LOG.error(
-								"NumberFormatExcept;ion caught while parsing columnValue in getIncompleteSurveyFile(). Nested exception is ",
-								e);
+					}
+					catch (NumberFormatException e) {
+						LOG.error("NumberFormatExcept;ion caught while parsing columnValue in getIncompleteSurveyFile(). Nested exception is ", e);
 						throw e;
 					}
 				}
 			}
+			
 			try {
-				surveyDetails = profileManagementService.getIncompleteSurvey(
-						iden, 0, 0, -1, -1, profileLevel, startDate, endDate, realtechAdmin);
-				String fileName = "Incomplete_Survey_" + profileLevel + "_"
-						+ iden + ".xlsx";
-				XSSFWorkbook workbook = dashboardService
-						.downloadIncompleteSurveyData(surveyDetails, fileName);
+				surveyDetails = profileManagementService.getIncompleteSurvey(iden, 0, 0, -1, -1, profileLevel, startDate, endDate, realtechAdmin);
+				String fileName = "Incomplete_Survey_" + profileLevel + "_" + iden + ".xlsx";
+				XSSFWorkbook workbook = dashboardService.downloadIncompleteSurveyData(surveyDetails, fileName);
 				response.setContentType(EXCEL_FORMAT);
 				String headerKey = CONTENT_DISPOSITION_HEADER;
-				String headerValue = String.format(
-						"attachment; filename=\"%s\"",
-						new File(fileName).getName());
+				String headerValue = String.format("attachment; filename=\"%s\"", new File(fileName).getName());
 				response.setHeader(headerKey, headerValue);
+				
 				// write into file
 				OutputStream responseStream = null;
 				try {
 					responseStream = response.getOutputStream();
 					workbook.write(responseStream);
-				} catch (IOException e) {
-					LOG.error(
-							"IOException caught in getIncompleteSurveyFile(). Nested exception is ",
-							e);
-				} finally {
+				}
+				catch (IOException e) {
+					LOG.error("IOException caught in getIncompleteSurveyFile(). Nested exception is ", e);
+				}
+				finally {
 					try {
 						responseStream.close();
-					} catch (IOException e) {
-						LOG.error(
-								"IOException caught in getIncompleteSurveyFile(). Nested exception is ",
-								e);
+					}
+					catch (IOException e) {
+						LOG.error("IOException caught in getIncompleteSurveyFile(). Nested exception is ", e);
 					}
 				}
 				response.flushBuffer();
-			} catch (InvalidInputException e) {
-				LOG.error(
-						"InvalidInputException caught in getIncompleteSurveyFile() while fetching incomplete reviews file. Nested exception is ",
-						e);
-				throw e;
-			} catch (IOException e) {
-				LOG.error(
-						"IOException caught in getIncompleteSurveyFile() while fetching incomplete reviews file. Nested exception is ",
-						e);
 			}
-		} catch (NonFatalException e) {
-			LOG.error(
-					"Non fatal exception caught in getReviews() while fetching incomplete reviews file. Nested exception is ",
-					e);
+			catch (InvalidInputException e) {
+				LOG.error("InvalidInputException caught in getIncompleteSurveyFile() while fetching incomplete reviews file. Nested exception is ", e);
+				throw e;
+			}
+			catch (IOException e) {
+				LOG.error("IOException caught in getIncompleteSurveyFile() while fetching incomplete reviews file. Nested exception is ", e);
+			}
+		}
+		catch (NonFatalException e) {
+			LOG.error("Non fatal exception caught in getReviews() while fetching incomplete reviews file. Nested exception is ", e);
 		}
 		LOG.info("Method to get file containg incomplete surveys list getIncompleteSurveyFile() finished.");
 	}
+	
 	/*
 	 * Method to download file containing incomplete surveys
 	 */
 	@RequestMapping(value = "/downloadcustomersurveyresults")
-	public void getCustomerSurveyResultsFile(Model model,
-			HttpServletRequest request, HttpServletResponse response) {
+	public void getCustomerSurveyResultsFile(Model model, HttpServletRequest request, HttpServletResponse response) {
 		LOG.info("Method to get file containg customer survey results getCustomerSurveyResultsFile() started.");
-		
 		User user = sessionHelper.getCurrentUser();
 		boolean realTechAdmin = user.isSuperAdmin();
 		List<SurveyDetails> surveyDetails = new ArrayList<>();
+		
 		try {
 			String columnName = request.getParameter("columnName");
 			if (!realTechAdmin && (columnName == null || columnName.isEmpty())) {
 				LOG.error("Invalid value (null/empty) passed for profile level.");
-				throw new InvalidInputException(
-						"Invalid value (null/empty) passed for profile level.");
+				throw new InvalidInputException("Invalid value (null/empty) passed for profile level.");
 			}
-
-			String startDateStr = request.getParameter("startDate");
-			String endDateStr = request.getParameter("endDate");
 
 			Date startDate = null;
-			Date endDate = Calendar.getInstance().getTime();
-			if (startDateStr != null) {
+			String startDateStr = request.getParameter("startDate");
+			if (startDateStr != null && !startDateStr.isEmpty()) {
 				try {
-					startDate = new SimpleDateFormat(
-							CommonConstants.DATE_FORMAT).parse(startDateStr);
-				} catch (ParseException e) {
-					LOG.error(
-							"ParseException caught in getCustomerSurveyResultsFile() while parsing startDate. Nested exception is ",
-							e);
+					startDate = new SimpleDateFormat(CommonConstants.DATE_FORMAT).parse(startDateStr);
+				}
+				catch (ParseException e) {
+					LOG.error("ParseException caught in getCustomerSurveyResultsFile() while parsing startDate. Nested exception is ", e);
 				}
 			}
-			if (endDateStr != null) {
+
+			Date endDate = Calendar.getInstance().getTime();
+			String endDateStr = request.getParameter("endDate");
+			if (endDateStr != null && !endDateStr.isEmpty()) {
 				try {
-					endDate = new SimpleDateFormat(CommonConstants.DATE_FORMAT)
-							.parse(endDateStr);
-				} catch (ParseException e) {
-					LOG.error(
-							"ParseException caught in getCustomerSurveyResultsFile() while parsing startDate. Nested exception is ",
-							e);
+					endDate = new SimpleDateFormat(CommonConstants.DATE_FORMAT).parse(endDateStr);
+				}
+				catch (ParseException e) {
+					LOG.error("ParseException caught in getCustomerSurveyResultsFile() while parsing startDate. Nested exception is ", e);
 				}
 			}
 
 			String profileLevel = getProfileLevel(columnName);
 			long iden = 0;
 
-			if(realTechAdmin) {
+			if (realTechAdmin) {
 				profileLevel = CommonConstants.PROFILE_LEVEL_REALTECH_ADMIN;
 			}
-			
+
 			if (profileLevel.equals(CommonConstants.PROFILE_LEVEL_COMPANY)) {
 				iden = user.getCompany().getCompanyId();
-			} else if (profileLevel
-					.equals(CommonConstants.PROFILE_LEVEL_INDIVIDUAL)) {
+			}
+			else if (profileLevel.equals(CommonConstants.PROFILE_LEVEL_INDIVIDUAL)) {
 				iden = user.getUserId();
-			} else {
+			}
+			else {
 				String columnValue = request.getParameter("columnValue");
 				if (columnValue != null && !columnValue.isEmpty()) {
 					try {
 						iden = Long.parseLong(columnValue);
-					} catch (NumberFormatException e) {
-						LOG.error(
-								"NumberFormatException caught while parsing columnValue in getCustomerSurveyResultsFile(). Nested exception is ",
-								e);
+					}
+					catch (NumberFormatException e) {
+						LOG.error("NumberFormatException caught while parsing columnValue in getCustomerSurveyResultsFile(). Nested exception is ", e);
 						throw e;
 					}
 				}
 			}
+			
 			try {
-				surveyDetails = profileManagementService.getReviews(iden, -1,
-						-1, -1, -1, profileLevel, true, startDate, endDate,
-						null);
-				String fileName = "Customer_Survey_Results_" + profileLevel
-						+ "_" + iden + ".xlsx";
-				XSSFWorkbook workbook = dashboardService
-						.downloadCustomerSurveyResultsData(surveyDetails,
-								fileName);
+				surveyDetails = profileManagementService.getReviews(iden, -1, -1, -1, -1, profileLevel, true, startDate, endDate, null);
+				String fileName = "Survey_Results_" + profileLevel + "_" + iden + ".xlsx";
+				XSSFWorkbook workbook = dashboardService.downloadCustomerSurveyResultsData(surveyDetails, fileName);
 				response.setContentType(EXCEL_FORMAT);
 				String headerKey = CONTENT_DISPOSITION_HEADER;
-				String headerValue = String.format(
-						"attachment; filename=\"%s\"",
-						new File(fileName).getName());
+				String headerValue = String.format("attachment; filename=\"%s\"", new File(fileName).getName());
 				response.setHeader(headerKey, headerValue);
+				
 				// write into file
 				OutputStream responseStream = null;
 				try {
 					responseStream = response.getOutputStream();
 					workbook.write(responseStream);
-				} catch (IOException e) {
-					LOG.error(
-							"IOException caught in getCustomerSurveyResultsFile(). Nested exception is ",
-							e);
-				} finally {
+				}
+				catch (IOException e) {
+					LOG.error("IOException caught in getCustomerSurveyResultsFile(). Nested exception is ", e);
+				}
+				finally {
 					try {
 						responseStream.close();
-					} catch (IOException e) {
-						LOG.error(
-								"IOException caught in getCustomerSurveyResultsFile(). Nested exception is ",
-								e);
+					}
+					catch (IOException e) {
+						LOG.error("IOException caught in getCustomerSurveyResultsFile(). Nested exception is ", e);
 					}
 				}
 				response.flushBuffer();
-			} catch (InvalidInputException e) {
-				LOG.error(
-						"InvalidInputException caught in getCustomerSurveyResultsFile(). Nested exception is ",
-						e);
-				throw e;
-			} catch (IOException e) {
-				LOG.error(
-						"IOException caught in getCustomerSurveyResultsFile(). Nested exception is ",
-						e);
 			}
-		} catch (NonFatalException e) {
-			LOG.error(
-					"Non fatal exception caught in getCustomerSurveyResultsFile(). Nested exception is ",
-					e);
+			catch (InvalidInputException e) {
+				LOG.error("InvalidInputException caught in getCustomerSurveyResultsFile(). Nested exception is ", e);
+				throw e;
+			}
+			catch (IOException e) {
+				LOG.error("IOException caught in getCustomerSurveyResultsFile(). Nested exception is ", e);
+			}
+		}
+		catch (NonFatalException e) {
+			LOG.error("Non fatal exception caught in getCustomerSurveyResultsFile(). Nested exception is ", e);
 		}
 		LOG.info("Method getCustomerSurveyResultsFile() finished.");
 	}
@@ -1372,18 +1334,17 @@ public class DashboardController {
 	 * Method to download file containing incomplete surveys
 	 */
 	@RequestMapping(value = "/downloaddashboardsocialmonitor")
-	public void getSocialMonitorFile(Model model, HttpServletRequest request,
-			HttpServletResponse response) {
+	public void getSocialMonitorFile(Model model, HttpServletRequest request, HttpServletResponse response) {
 		LOG.info("Method to get file containg Social Monitors list getSocialMonitorFile() started.");
 		User user = sessionHelper.getCurrentUser();
 		boolean realTechAdmin = user.isSuperAdmin();
 		List<SurveyDetails> surveyDetails = new ArrayList<>();
+		
 		try {
 			String columnName = request.getParameter("columnName");
 			if (!realTechAdmin && (columnName == null || columnName.isEmpty())) {
 				LOG.error("Invalid value (null/empty) passed for profile level.");
-				throw new InvalidInputException(
-						"Invalid value (null/empty) passed for profile level.");
+				throw new InvalidInputException("Invalid value (null/empty) passed for profile level.");
 			}
 
 			String startDateStr = request.getParameter("startDate");
@@ -1391,99 +1352,87 @@ public class DashboardController {
 
 			Date startDate = null;
 			Date endDate = Calendar.getInstance().getTime();
-			if (startDateStr != null) {
+			if (startDateStr != null && !startDateStr.isEmpty()) {
 				try {
-					startDate = new SimpleDateFormat(
-							CommonConstants.DATE_FORMAT).parse(startDateStr);
-				} catch (ParseException e) {
-					LOG.error(
-							"ParseException caught in getSocialMonitorFile() while parsing startDate. Nested exception is ",
-							e);
+					startDate = new SimpleDateFormat(CommonConstants.DATE_FORMAT).parse(startDateStr);
+				}
+				catch (ParseException e) {
+					LOG.error("ParseException caught in getSocialMonitorFile() while parsing startDate. Nested exception is ", e);
 				}
 			}
-			if (endDateStr != null) {
+			if (endDateStr != null && !endDateStr.isEmpty()) {
 				try {
-					endDate = new SimpleDateFormat(CommonConstants.DATE_FORMAT)
-							.parse(endDateStr);
-				} catch (ParseException e) {
-					LOG.error(
-							"ParseException caught in getSocialMonitorFile() while parsing startDate. Nested exception is ",
-							e);
+					endDate = new SimpleDateFormat(CommonConstants.DATE_FORMAT).parse(endDateStr);
+				}
+				catch (ParseException e) {
+					LOG.error("ParseException caught in getSocialMonitorFile() while parsing startDate. Nested exception is ", e);
 				}
 			}
 
 			String profileLevel = getProfileLevel(columnName);
 			long iden = 0;
-			
-			if(realTechAdmin) {
+
+			if (realTechAdmin) {
 				profileLevel = CommonConstants.PROFILE_LEVEL_REALTECH_ADMIN;
 			}
 
 			if (profileLevel.equals(CommonConstants.PROFILE_LEVEL_COMPANY)) {
 				iden = user.getCompany().getCompanyId();
-			} else if (profileLevel
-					.equals(CommonConstants.PROFILE_LEVEL_INDIVIDUAL)) {
+			}
+			else if (profileLevel.equals(CommonConstants.PROFILE_LEVEL_INDIVIDUAL)) {
 				iden = user.getUserId();
-			} else {
+			}
+			else {
 				String columnValue = request.getParameter("columnValue");
 				if (columnValue != null && !columnValue.isEmpty()) {
 					try {
 						iden = Long.parseLong(columnValue);
-					} catch (NumberFormatException e) {
-						LOG.error(
-								"NumberFormatExcept;ion caught while parsing columnValue in getSocialMonitorFile(). Nested exception is ",
-								e);
+					}
+					catch (NumberFormatException e) {
+						LOG.error("NumberFormatExcept;ion caught while parsing columnValue in getSocialMonitorFile(). Nested exception is ", e);
 						throw e;
 					}
 				}
 			}
+			
 			try {
-				surveyDetails = profileManagementService.getReviews(iden, -1,
-						-1, -1, -1, profileLevel, true, startDate, endDate,
-						null);
-				String fileName = "Social_Monitor_" + profileLevel + "_" + iden
-						+ ".xlsx";
-				XSSFWorkbook workbook = dashboardService
-						.downloadSocialMonitorData(surveyDetails, fileName);
+				surveyDetails = profileManagementService.getReviews(iden, -1, -1, -1, -1, profileLevel, true, startDate, endDate, null);
+				String fileName = "Social_Monitor_" + profileLevel + "_" + iden + ".xlsx";
+				XSSFWorkbook workbook = dashboardService.downloadSocialMonitorData(surveyDetails, fileName);
 				response.setContentType(EXCEL_FORMAT);
 				String headerKey = CONTENT_DISPOSITION_HEADER;
-				String headerValue = String.format(
-						"attachment; filename=\"%s\"",
-						new File(fileName).getName());
+				String headerValue = String.format("attachment; filename=\"%s\"", new File(fileName).getName());
 				response.setHeader(headerKey, headerValue);
+				
 				// write into file
 				OutputStream responseStream = null;
 				try {
 					responseStream = response.getOutputStream();
 					workbook.write(responseStream);
-				} catch (IOException e) {
-					LOG.error(
-							"IOException caught in getSocialMonitorFile(). Nested exception is ",
-							e);
-				} finally {
+				}
+				catch (IOException e) {
+					LOG.error("IOException caught in getSocialMonitorFile(). Nested exception is ", e);
+				}
+				finally {
 					try {
 						responseStream.close();
-					} catch (IOException e) {
-						LOG.error(
-								"IOException caught in getSocialMonitorFile(). Nested exception is ",
-								e);
+					}
+					catch (IOException e) {
+						LOG.error("IOException caught in getSocialMonitorFile(). Nested exception is ", e);
 					}
 				}
 				response.flushBuffer();
-			} catch (InvalidInputException e) {
-				LOG.error(
-						"InvalidInputException caught in getSocialMonitorFile(). Nested exception is ",
-						e);
-				throw e;
-			} catch (IOException e) {
-				LOG.error(
-						"IOException caught in getSocialMonitorFile(). Nested exception is ",
-						e);
 			}
-		} catch (NonFatalException e) {
-			LOG.error(
-					"Non fatal exception caught in getSocialMonitorFile(). Nested exception is ",
-					e);
+			catch (InvalidInputException e) {
+				LOG.error("InvalidInputException caught in getSocialMonitorFile(). Nested exception is ", e);
+				throw e;
+			}
+			catch (IOException e) {
+				LOG.error("IOException caught in getSocialMonitorFile(). Nested exception is ", e);
+			}
+		}
+		catch (NonFatalException e) {
+			LOG.error("Non fatal exception caught in getSocialMonitorFile(). Nested exception is ", e);
 		}
 		LOG.info("Method getSocialMonitorFile() finished.");
 	}
@@ -1492,18 +1441,17 @@ public class DashboardController {
 	 * Method to download file containing incomplete surveys
 	 */
 	@RequestMapping(value = "/downloadagentrankingreport")
-	public void getAgentRankingFile(Model model, HttpServletRequest request,
-			HttpServletResponse response) {
+	public void getAgentRankingFile(Model model, HttpServletRequest request, HttpServletResponse response) {
 		LOG.info("Method to get file containg Agent's data getAgentSurveyFile() started.");
 		User user = sessionHelper.getCurrentUser();
 		List<AgentRankingReport> agentRanking = new ArrayList<>();
 		boolean realtechAdmin = user.isSuperAdmin();
+		
 		try {
 			String columnName = request.getParameter("columnName");
 			if (!realtechAdmin && (columnName == null || columnName.isEmpty())) {
 				LOG.error("Invalid value (null/empty) passed for profile level.");
-				throw new InvalidInputException(
-						"Invalid value (null/empty) passed for profile level.");
+				throw new InvalidInputException("Invalid value (null/empty) passed for profile level.");
 			}
 
 			String startDateStr = request.getParameter("startDate");
@@ -1511,97 +1459,86 @@ public class DashboardController {
 
 			Date startDate = null;
 			Date endDate = Calendar.getInstance().getTime();
-			if (startDateStr != null) {
+			if (startDateStr != null && !startDateStr.isEmpty()) {
 				try {
-					startDate = new SimpleDateFormat(
-							CommonConstants.DATE_FORMAT).parse(startDateStr);
-				} catch (ParseException e) {
-					LOG.error(
-							"ParseException caught in getAgentSurveyFile() while parsing startDate. Nested exception is ",
-							e);
+					startDate = new SimpleDateFormat(CommonConstants.DATE_FORMAT).parse(startDateStr);
+				}
+				catch (ParseException e) {
+					LOG.error("ParseException caught in getAgentSurveyFile() while parsing startDate. Nested exception is ", e);
 				}
 			}
-			if (endDateStr != null) {
+			if (endDateStr != null && !endDateStr.isEmpty()) {
 				try {
-					endDate = new SimpleDateFormat(CommonConstants.DATE_FORMAT)
-							.parse(endDateStr);
-				} catch (ParseException e) {
-					LOG.error(
-							"ParseException caught in getAgentSurveyFile() while parsing startDate. Nested exception is ",
-							e);
+					endDate = new SimpleDateFormat(CommonConstants.DATE_FORMAT).parse(endDateStr);
+				}
+				catch (ParseException e) {
+					LOG.error("ParseException caught in getAgentSurveyFile() while parsing startDate. Nested exception is ", e);
 				}
 			}
 
 			String profileLevel = getProfileLevel(columnName);
 			long iden = 0;
 
-			if(realtechAdmin){
+			if (realtechAdmin) {
 				profileLevel = CommonConstants.PROFILE_LEVEL_REALTECH_ADMIN;
 			}
 			if (profileLevel.equals(CommonConstants.PROFILE_LEVEL_COMPANY)) {
 				iden = user.getCompany().getCompanyId();
-			} else if (profileLevel
-					.equals(CommonConstants.PROFILE_LEVEL_INDIVIDUAL)) {
+			}
+			else if (profileLevel.equals(CommonConstants.PROFILE_LEVEL_INDIVIDUAL)) {
 				iden = user.getUserId();
-			} else {
+			}
+			else {
 				String columnValue = request.getParameter("columnValue");
 				if (columnValue != null && !columnValue.isEmpty()) {
 					try {
 						iden = Long.parseLong(columnValue);
-					} catch (NumberFormatException e) {
-						LOG.error(
-								"NumberFormatExcept;ion caught while parsing columnValue in getAgentSurveyFile(). Nested exception is ",
-								e);
+					}
+					catch (NumberFormatException e) {
+						LOG.error("NumberFormatExcept;ion caught while parsing columnValue in getAgentSurveyFile(). Nested exception is ", e);
 						throw e;
 					}
 				}
 			}
+			
 			try {
-				agentRanking = profileManagementService.getAgentReport(iden,
-						columnName, startDate, endDate, null);
-				String fileName = "Agent_Ranking_Report_" + profileLevel + "_"
-						+ iden + ".xlsx";
-				XSSFWorkbook workbook = dashboardService
-						.downloadAgentRankingData(agentRanking, fileName);
+				agentRanking = profileManagementService.getAgentReport(iden, columnName, startDate, endDate, null);
+				String fileName = "Agent_Ranking_Report_" + profileLevel + "_" + iden + ".xlsx";
+				XSSFWorkbook workbook = dashboardService.downloadAgentRankingData(agentRanking, fileName);
 				response.setContentType(EXCEL_FORMAT);
 				String headerKey = CONTENT_DISPOSITION_HEADER;
-				String headerValue = String.format(
-						"attachment; filename=\"%s\"",
-						new File(fileName).getName());
+				String headerValue = String.format("attachment; filename=\"%s\"", new File(fileName).getName());
 				response.setHeader(headerKey, headerValue);
+				
 				// write into file
 				OutputStream responseStream = null;
 				try {
 					responseStream = response.getOutputStream();
 					workbook.write(responseStream);
-				} catch (IOException e) {
-					LOG.error(
-							"IOException caught in getAgentSurveyFile(). Nested exception is ",
-							e);
-				} finally {
+				}
+				catch (IOException e) {
+					LOG.error("IOException caught in getAgentSurveyFile(). Nested exception is ", e);
+				}
+				finally {
 					try {
 						responseStream.close();
-					} catch (IOException e) {
-						LOG.error(
-								"IOException caught in getAgentSurveyFile(). Nested exception is ",
-								e);
+					}
+					catch (IOException e) {
+						LOG.error("IOException caught in getAgentSurveyFile(). Nested exception is ", e);
 					}
 				}
 				response.flushBuffer();
-			} catch (InvalidInputException e) {
-				LOG.error(
-						"InvalidInputException caught in getAgentSurveyFile(). Nested exception is ",
-						e);
-				throw e;
-			} catch (IOException e) {
-				LOG.error(
-						"IOException caught in getAgentSurveyFile(). Nested exception is ",
-						e);
 			}
-		} catch (NonFatalException e) {
-			LOG.error(
-					"Non fatal exception caught in getAgentSurveyFile(). Nested exception is ",
-					e);
+			catch (InvalidInputException e) {
+				LOG.error("InvalidInputException caught in getAgentSurveyFile(). Nested exception is ", e);
+				throw e;
+			}
+			catch (IOException e) {
+				LOG.error("IOException caught in getAgentSurveyFile(). Nested exception is ", e);
+			}
+		}
+		catch (NonFatalException e) {
+			LOG.error("Non fatal exception caught in getAgentSurveyFile(). Nested exception is ", e);
 		}
 		LOG.info("Method to get file containg Agent's data getAgentSurveyFile() finished.");
 	}
