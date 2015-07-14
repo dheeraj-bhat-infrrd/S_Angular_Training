@@ -4605,8 +4605,8 @@ function fetchUsersByProfileLevelCallback(data) {
 	if (response != undefined) {
 		var usersList = $.parseJSON(response.entity);
 		if(usersList.length > 0)
-			$('#srch-num').html(usersList.length);
-		paintProList(usersList);
+			$('#srch-num').html(usersList.userFound);
+		paintProList(usersList.users);
 	}
 }
 
