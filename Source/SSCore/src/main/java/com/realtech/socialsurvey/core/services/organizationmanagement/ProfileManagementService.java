@@ -418,6 +418,16 @@ public interface ProfileManagementService {
 
 	public void updateCompanyName(long userId, long companyId, String companyName) throws InvalidInputException;
 
+	public void updateRegionName(long userId, long regionId, String regionName) throws InvalidInputException;
+
+	public void updateBranchName(long userId, long branchId, String branchName) throws InvalidInputException;
+
+	public void updateIndividualName(long userId, long individualId, String individualName) throws InvalidInputException;
+
+	public void updateCompanyEmail(long companyId, String emailId) throws InvalidInputException;
+
+	public void updateIndividualEmail(long userId, long individualId, String emailId) throws InvalidInputException;
+
 	public List<AgentRankingReport> getAgentReport(long iden, String profileLevel, Date startDate, Date endDate, Object object)
 			throws InvalidInputException;
 
