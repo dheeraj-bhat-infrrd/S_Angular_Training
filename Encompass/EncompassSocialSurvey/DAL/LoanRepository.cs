@@ -12,7 +12,7 @@ namespace EncompassSocialSurvey.DAL
     {
         EncompassSocialSurveryContext _socialSurveryContext = new EncompassSocialSurveryContext();
 
-
+        static readonly DateTime EPOCH_TIME = new DateTime(1970, 1, 2, 0, 0, 0);
         // select spi.SURVEY_SOURCE_ID, spi.CUSTOMER_EMAIL_ID, spi.CUSTOMER_FIRST_NAME from survey_pre_initiation as spi
         private const string SELECT_QUERY = @"SELECT spi.SURVEY_PRE_INITIATION_ID, spi.SURVEY_SOURCE_ID FROM SURVEY_PRE_INITIATION as  spi
                                         WHERE spi.SURVEY_SOURCE_ID = ?SURVEY_SOURCE_ID AND spi.CUSTOMER_EMAIL_ID = ?CUSTOMER_EMAIL_ID AND spi.CUSTOMER_FIRST_NAME = ?CUSTOMER_FIRST_NAME ;";
@@ -92,7 +92,7 @@ namespace EncompassSocialSurvey.DAL
                     commandToInsert.Parameters.Add("?CUSTOMER_INTERACTION_DETAILS", MySqlDbType.VarChar, 500).Value = loan.CustomerInteractionDetails;
                     commandToInsert.Parameters.Add("?ENGAGEMENT_CLOSED_TIME", MySqlDbType.DateTime).Value = loan.EngagementClosedTime;
                     commandToInsert.Parameters.Add("?REMINDER_COUNTS", MySqlDbType.Int32).Value = loan.ReminderCounts;
-                    commandToInsert.Parameters.Add("?LAST_REMINDER_TIME", MySqlDbType.DateTime).Value = DateTime.Now;
+                    commandToInsert.Parameters.Add("?LAST_REMINDER_TIME", MySqlDbType.DateTime).Value = EPOCH_TIME;
                     commandToInsert.Parameters.Add("?STATUS", MySqlDbType.Int32).Value = loan.Status;
                     commandToInsert.Parameters.Add("?CREATED_ON", MySqlDbType.DateTime).Value = loan.CreatedOn;
                     commandToInsert.Parameters.Add("?MODIFIED_ON", MySqlDbType.DateTime).Value = DateTime.Now;
@@ -210,7 +210,15 @@ namespace EncompassSocialSurvey.DAL
             {
                 email = email.Replace("@", "+");
                 Logger.Debug("Transitional email address: " + email);
-                email = emailPrefix + "+" + email + "@" + emailDomain;
+                if (string.IsNullOrWhiteSpace(emailPrefix))
+                {
+                    email = email + "@" + emailDomain;
+                }
+                else
+                {
+                    email = emailPrefix + "+" + email + "@" + emailDomain;
+                }
+               
                 Logger.Debug("Final replaced email address: " + email);
                 return email;
             }
