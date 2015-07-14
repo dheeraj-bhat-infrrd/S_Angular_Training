@@ -6087,7 +6087,8 @@ function callBackUpdateAddressDetails(data) {
 	$('#prof-message-header').html(data);
 	callAjaxGET("./fetchbasicdetails.do", callBackShowBasicDetails);
 	callAjaxGET("./fetchaddressdetails.do", callBackShowAddressDetails);
-
+	callAjaxGET("./fetchcontactdetails.do", callBackShowContactDetails);
+	
 	$('#overlay-toast').html($('#display-msg-div').text().trim());
 	showToast();
 
