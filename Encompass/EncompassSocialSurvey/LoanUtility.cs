@@ -195,7 +195,6 @@ namespace EncompassSocialSurvey
 
                 fieldIds.Add("364");         // Loan Number
                 fieldIds.Add("LoanTeamMember.Name.Loan Officer"); // Loan Processor Name
-
                 fieldIds.Add("36");          // Customer First Name
                 fieldIds.Add("37");          // Customer Last Name
                 fieldIds.Add("1240");        // CustomerEmailId
@@ -205,7 +204,7 @@ namespace EncompassSocialSurvey
                 fieldIds.Add("1268");  // Co-BorrowerEmailId
 
                 fieldIds.Add("748");      // closed date
-
+                fieldIds.Add("Log.MS.Date.Funding");    //Funded Milestone Due Date
                 #endregion  // Popualted FieldIds // list of ids to get the details from loan
 
 
@@ -226,7 +225,7 @@ namespace EncompassSocialSurvey
 
 
                     // TODO: Raushan: uncommend this line of code: Consider only the closed loans
-                    // if loan is not closed " closed field value will be null/empty/[//]
+                    // if loan is not closed " funded field value will be null/empty/[//]
                     if (string.IsNullOrWhiteSpace(fieldValues[8]) || fieldValues[8].Equals("//") || fieldValues[8].Equals(@"\\"))
                     {
                         Logger.Info("Exiting the method LoanUtility.LopopulateLoanList(): It's not a closed loan. : LoanGUID : " + id.Guid);
@@ -269,6 +268,7 @@ namespace EncompassSocialSurvey
                     forLoanVM_Borrower.LastReminderTime = lastReminderTime;
 
                     forLoanVM_Borrower.EngagementClosedTime = fieldValues[8];
+                    forLoanVM_Borrower.fundedTime = fieldValues[9];
                     forLoanVM_Borrower.Status = status;
 
                     returnLoansViewModel.Add(forLoanVM_Borrower);
@@ -299,6 +299,7 @@ namespace EncompassSocialSurvey
                         forLoanVM_Co_Borrower.LastReminderTime = lastReminderTime;
 
                         forLoanVM_Co_Borrower.EngagementClosedTime = fieldValues[8];
+                        forLoanVM_Co_Borrower.fundedTime = fieldValues[9];
                         forLoanVM_Co_Borrower.Status = status;
 
                         //
