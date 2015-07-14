@@ -204,7 +204,7 @@ namespace EncompassSocialSurvey
                 fieldIds.Add("1268");  // Co-BorrowerEmailId
 
                 fieldIds.Add("748");      // closed date
-                fieldIds.Add("MS.FUN.DUE");    //Funded Milestone Due Date
+                fieldIds.Add("Log.MS.Date.Funding");    //Funded Milestone Due Date
                 #endregion  // Popualted FieldIds // list of ids to get the details from loan
 
 
@@ -226,7 +226,7 @@ namespace EncompassSocialSurvey
 
                     // TODO: Raushan: uncommend this line of code: Consider only the closed loans
                     // if loan is not closed " funded field value will be null/empty/[//]
-                    if (string.IsNullOrWhiteSpace(fieldValues[9]) || fieldValues[9].Equals("//") || fieldValues[9].Equals(@"\\"))
+                    if (string.IsNullOrWhiteSpace(fieldValues[8]) || fieldValues[8].Equals("//") || fieldValues[8].Equals(@"\\"))
                     {
                         Logger.Info("Exiting the method LoanUtility.LopopulateLoanList(): It's not a closed loan. : LoanGUID : " + id.Guid);
                         continue;
