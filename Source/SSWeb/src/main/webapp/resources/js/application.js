@@ -546,14 +546,21 @@ function getReviewsCountAndShowReviews(columnName, columnValue) {
 		callAjaxGetWithPayloadData("./fetchName.do", function(name) {
 			if (totalReview == 0) {
 				$("#review-desc").html("No reviews found for " + name);
+				$("#dsh-admin-cmp-dwnld").hide();
+				$("#dsh-cmp-dwnld").hide();
+				$("#review-details").html('');
 				return;
 			} else {
 				$("#review-desc").html("What people say about " + name.substring(1, name.length - 1));
-				if(colName == "companyId"){
+				if (colName != "agentId"){
 					$("#dsh-cmp-dwnld").hide();
 					$("#dsh-admin-cmp-dwnld").show();
 				}
-				else{ 
+				else if (accountType == "INDIVIDUAL") {
+					$("#dsh-cmp-dwnld").hide();
+					$("#dsh-admin-cmp-dwnld").show();
+				}
+				else { 
 					$("#dsh-admin-cmp-dwnld").hide();
 					$("#dsh-cmp-dwnld").show();
 				}
@@ -7383,19 +7390,23 @@ $(document).on('click','#dsh-dwnld-report-btn',function(){
 	switch (key) {
 	case 0:
 		console.log("complete-survey");
-		window.location.href = "/downloaddashboardcompletesurvey.do?columnName="+colName+"&startDate="+startDate+"&endDate="+endDate;
+		window.location.href = "/downloaddashboardcompletesurvey.do?columnName=" + colName+ "&columnValue=" + colValue
+			+ "&startDate=" + startDate + "&endDate=" + endDate;
 		break;
 	case 1:
 		console.log("agent-ranking");
-		window.location.href = "/downloadagentrankingreport.do?columnName="+colName+"&startDate="+startDate+"&endDate="+endDate;
+		window.location.href = "/downloadagentrankingreport.do?columnName=" + colName + "&columnValue=" + colValue
+			+ "&startDate=" + startDate + "&endDate=" + endDate;
 		break;
 	case 2:
 		console.log("survey-results");
-		window.location.href = "/downloadcustomersurveyresults.do?columnName="+colName+"&startDate="+startDate+"&endDate="+endDate;
+		window.location.href = "/downloadcustomersurveyresults.do?columnName=" + colName + "&columnValue=" + colValue
+			+ "&startDate=" + startDate + "&endDate=" + endDate;
 		break;
 	case 3:
 		console.log("social-monitor");
-		window.location.href = "/downloaddashboardsocialmonitor.do?columnName="+colName+"&startDate="+startDate+"&endDate="+endDate;
+		window.location.href = "/downloaddashboardsocialmonitor.do?columnName=" + colName + "&columnValue=" + colValue
+			+ "&startDate=" + startDate + "&endDate=" + endDate;
 		break;
 	default:
 		break;
