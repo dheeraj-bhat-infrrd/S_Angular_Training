@@ -29,7 +29,7 @@
 					<td class="v-tbl-role"></td>
 					<td class="v-tbl-btns">
 						<div class="clearfix v-tbl-icn-wraper">
-							<div class="float-left v-tbl-icn v-icn-close region-del-icn vis-hidden"
+							<div class="float-left v-tbl-icn v-icn-close region-del-icn hidden"
 								data-regionid="${region.regionId}"></div>
 							<div class="float-left v-tbl-icn v-icn-edit region-edit-icn"
 								clicked="false" data-regionid="${region.regionId}"></div>
@@ -60,7 +60,7 @@
 					<td class="v-tbl-role"></td>
 					<td class="v-tbl-btns">
 						<div class="clearfix v-tbl-icn-wraper">
-							<div class="float-left v-tbl-icn v-icn-close branch-del-icn vis-hidden"
+							<div class="float-left v-tbl-icn v-icn-close branch-del-icn hidden"
 								data-branchid="${branch.branchId}"></div>
 							<div class="float-left v-tbl-icn v-icn-edit branch-edit-icn"
 								clicked="false" data-branchid="${branch.branchId}"></div>
@@ -103,7 +103,7 @@
 						</c:choose></td>
 					<td class="v-tbl-btns">
 						<div class="clearfix v-tbl-icn-wraper">
-							<div class="float-left v-tbl-icn v-icn-close user-del-icn vis-hidden"
+							<div class="float-left v-tbl-icn v-icn-close user-del-icn hidden"
 								data-userid="${compUser.userId}"></div>
 							<div class="float-left v-tbl-icn v-icn-edit user-edit-icn"
 								clicked="false" data-userid="${compUser.userId}" data-iscom-admin="${compUser.isOwner}"></div>

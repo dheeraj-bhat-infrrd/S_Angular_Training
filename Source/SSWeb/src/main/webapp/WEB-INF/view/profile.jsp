@@ -296,7 +296,7 @@
 						</div>
 					</c:if>
 					<div class="float-right hm-hr-row-right clearfix">
-						<c:if test="${not empty profile.socialMediaTokens}">
+						<c:if test="${not empty profile.socialMediaTokens || (not empty profile.contact_details && not empty profile.contact_details.contact_numbers && not empty profile.contact_details.contact_numbers.work)}">
 							<div id="social-connect-txt" class="float-left social-connect-txt">Connect with ${profName }:</div>
 							<c:if test="${not empty profile.socialMediaTokens.facebookToken && not empty profile.socialMediaTokens.facebookToken.facebookPageLink}">
 								<div id="icn-fb" class="float-left social-item-icon icn-fb" data-link="${profile.socialMediaTokens.facebookToken.facebookPageLink}" title="Facebook"></div>
@@ -318,6 +318,9 @@
 							</c:if>
 							<c:if test="${not empty profile.socialMediaTokens.lendingTreeToken && not empty profile.socialMediaTokens.lendingTreeToken.lendingTreeProfileLink}">
 								<div id="icn-lendingtree" class="float-left social-item-icon icn-lendingtree" data-link="${profile.socialMediaTokens.lendingTreeToken.lendingTreeProfileLink}" title="LendingTree"></div>
+							</c:if>
+							<c:if test="${not empty profile.contact_details && not empty profile.contact_details.contact_numbers && not empty profile.contact_details.contact_numbers.work}">
+								<div id="icn-lendingtree" class="float-left social-item-icon icn-tele-blue" title="${profile.contact_details.contact_numbers.work}"></div>
 							</c:if>
 						</c:if>
 					</div>
