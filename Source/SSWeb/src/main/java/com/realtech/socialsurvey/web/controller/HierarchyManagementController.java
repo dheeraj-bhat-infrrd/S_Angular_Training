@@ -639,7 +639,7 @@ public class HierarchyManagementController
                 Map<String, Object> map = organizationManagementService.addNewBranchWithUser( user, branchName.trim(),
                     regionId, CommonConstants.NO, branchAddress1, branchAddress2, branchCountry, branchCountryCode,
                     branchState, branchCity, branchZipcode, selectedUserId, assigneeEmailIds, isAdmin );
-                Branch branch = (Branch) map.get( CommonConstants.REGION_OBJECT );
+                Branch branch = (Branch) map.get( CommonConstants.BRANCH_OBJECT );
                 List<User> invalidUserList = (List<User>) map.get( CommonConstants.INVALID_USERS_LIST );
                 LOG.debug( "Successfully executed service to add a new branch" );
                 String invalidMessage = "These email address are ";
@@ -763,8 +763,27 @@ public class HierarchyManagementController
 
             try {
                 LOG.debug( "Calling service to add/assign invidual(s)" );
-                organizationManagementService.addIndividual( user, selectedUserId, branchId, regionId, assigneeEmailIds,
-                    isAdmin );
+                Map<String, Object> map = organizationManagementService.addIndividual( user, selectedUserId, branchId,
+                    regionId, assigneeEmailIds, isAdmin );
+                List<User> invalidUserList = (List<User>) map.get( CommonConstants.INVALID_USERS_LIST );
+                LOG.debug( "Successfully executed service to add a new branch" );
+                String invalidMessage = "These email address are ";
+                if ( invalidUserList != null ) {
+                    String emailaddressses = "";
+                    for ( User invalidUser : invalidUserList ) {
+                        emailaddressses = emailaddressses.concat( invalidUser.getEmailId() ).concat( "," );
+                    }
+                    if ( emailaddressses.endsWith( "," ) ) {
+                        emailaddressses = emailaddressses.substring( 0, emailaddressses.length() - 1 );
+                    }
+
+                    if ( invalidUserList.size() < 2 ) {
+
+                        invalidMessage = "This email address is " + emailaddressses + " is invalid";
+                    } else {
+                        invalidMessage = invalidMessage + emailaddressses + " are invalid";
+                    }
+                }
                 LOG.debug( "Successfully executed service to add/assign an invidual(s)" );
 
                 DisplayMessage message = null;
@@ -885,7 +904,7 @@ public class HierarchyManagementController
                 Map<String, Object> map = organizationManagementService.updateBranch( user, branchId, regionId, branchName,
                     branchAddress1, branchAddress2, branchCountry, branchCountryCode, branchState, branchCity, branchZipcode,
                     selectedUserId, assigneeEmailIds, isAdmin );
-                Branch branch = (Branch) map.get( CommonConstants.REGION_OBJECT );
+                Branch branch = (Branch) map.get( CommonConstants.BRANCH_OBJECT );
                 List<User> invalidUserList = (List<User>) map.get( CommonConstants.INVALID_USERS_LIST );
                 addOrUpdateBranchInSession( branch, session );
                 String invalidMessage = "These email address are ";
