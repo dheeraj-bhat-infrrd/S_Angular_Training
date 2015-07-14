@@ -29,6 +29,7 @@ var lastColValueForCount;
 var lastColNameForGraph;
 var lastColValueForGraph;
 
+
 //Variables for processing Edit profile
 var startIndex = 0;
 var numOfRows = 3;
@@ -2025,20 +2026,22 @@ function validateRegionForm() {
 	
 	var userSelectionType = $('#user-selection-info').data('user-selection-type');
 	if(userSelectionType =="single"){
-		
+		if(!validateUserSelection('selected-user-txt','selected-userid-hidden')){
+			isRegionValid = false;
 			if(!isFocussed){
 				$('#selected-user-txt').focus();
 				isFocussed=true;
 			}
-		
+		}
 	}
 	else {
-		
+		if(!validateUserEmailTextArea('selected-user-txt-area')){
+			isRegionValid = false;
 			if(!isFocussed){
 				$('#selected-user-txt-area').focus();
 				isFocussed=true;
 			}
-		
+		}
 		
 	}
 	if(!validateRegionName('region-name-txt')){
@@ -2196,20 +2199,22 @@ function validateOfficeForm() {
 	
 	var userSelectionType = $('#user-selection-info').data('user-selection-type');
 	if(userSelectionType =="single"){
-		
+		if(!validateUserSelection('selected-user-txt','selected-userid-hidden')){
+			isOfficeValid = false;
 			if(!isFocussed){
 				$('#selected-user-txt').focus();
 				isFocussed=true;
 			}
-		
+		}
 	}
 	else {
-		
+		if(!validateUserEmailTextArea('selected-user-txt-area')){
+			isOfficeValid = false;
 			if(!isFocussed){
 				$('#selected-user-txt-area').focus();
 				isFocussed=true;
 			}
-			
+		}		
 	}
 	if(!validateOfficeName('office-name-txt')){
 		isOfficeValid = false;
@@ -2366,12 +2371,13 @@ function validateIndividualForm() {
 				isFocussed=true;
 			}
 		}
-	
+		if(!validateUserSelection('selected-user-txt','selected-userid-hidden')){
+			isOfficeValid = false;
 			if(!isFocussed){
 				$('#selected-user-txt').focus();
 				isFocussed=true;
 			}
-		
+		}
 	}
 	else {
 		if(!validateIndividualSelection('selected-user-txt-area')) {
@@ -2381,12 +2387,13 @@ function validateIndividualForm() {
 				isFocussed=true;
 			}
 		}
-		
+		if(!validateUserEmailTextArea('selected-user-txt-area')){
+			isOfficeValid = false;
 			if(!isFocussed){
 				$('#selected-user-txt-area').focus();
 				isFocussed=true;
 			}
-				
+		}		
 	}
 	
 	if(isIndividualValid){
@@ -4584,6 +4591,7 @@ function paintProList(usersList) {
 	}
 }
 
+
 function fetchUsersByProfileLevel(iden, profileLevel, startIndex) {
 	if (iden == undefined) {
 		console.log("iden is undefined for fetchUsersByProfileLevel");
@@ -4599,8 +4607,8 @@ function fetchUsersByProfileLevelCallback(data) {
 	if (response != undefined) {
 		var usersList = $.parseJSON(response.entity);
 		if(usersList.length > 0)
-			$('#srch-num').html(usersList.length);
-		paintProList(usersList);
+			$('#srch-num').html(usersList.userFound);
+		paintProList(usersList.users);
 	}
 }
 
