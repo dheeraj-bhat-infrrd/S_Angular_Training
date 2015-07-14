@@ -2,15 +2,15 @@ package com.realtech.socialsurvey.web.rest;
 
 import java.io.IOException;
 import java.io.OutputStream;
-import java.util.Collection;
+import java.util.ArrayList;
 import java.util.List;
-
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
-
+import org.apache.solr.common.SolrDocument;
+import org.apache.solr.common.SolrDocumentList;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,7 +20,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
-
 import com.google.gson.Gson;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.entities.AgentSettings;
@@ -28,12 +27,13 @@ import com.realtech.socialsurvey.core.entities.Branch;
 import com.realtech.socialsurvey.core.entities.Company;
 import com.realtech.socialsurvey.core.entities.ContactDetailsSettings;
 import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
+import com.realtech.socialsurvey.core.entities.ProListUser;
 import com.realtech.socialsurvey.core.entities.ProfilesMaster;
 import com.realtech.socialsurvey.core.entities.Region;
 import com.realtech.socialsurvey.core.entities.SocialMediaTokens;
 import com.realtech.socialsurvey.core.entities.SocialPost;
 import com.realtech.socialsurvey.core.entities.SurveyDetails;
-import com.realtech.socialsurvey.core.entities.UserFromSearch;
+import com.realtech.socialsurvey.core.entities.UserListFromSearch;
 import com.realtech.socialsurvey.core.entities.UserProfile;
 import com.realtech.socialsurvey.core.exception.BaseRestException;
 import com.realtech.socialsurvey.core.exception.CompanyProfilePreconditionFailureErrorCode;
@@ -48,9 +48,9 @@ import com.realtech.socialsurvey.core.services.mail.EmailServices;
 import com.realtech.socialsurvey.core.services.organizationmanagement.OrganizationManagementService;
 import com.realtech.socialsurvey.core.services.organizationmanagement.ProfileManagementService;
 import com.realtech.socialsurvey.core.services.organizationmanagement.ProfileNotFoundException;
+import com.realtech.socialsurvey.core.services.organizationmanagement.UserManagementService;
 import com.realtech.socialsurvey.core.services.search.SolrSearchService;
 import com.realtech.socialsurvey.core.services.search.exception.SolrException;
-
 import ezvcard.Ezvcard;
 import ezvcard.VCard;
 import ezvcard.VCardVersion;
@@ -72,6 +72,9 @@ public class ProfileController {
 
 	@Autowired
 	private ProfileManagementService profileManagementService;
+	
+	@Autowired
+	private UserManagementService userManagementService;
 	
 	@Autowired
 	private SolrSearchService solrSearchService;
@@ -1188,11 +1191,36 @@ public class ProfileController {
 				numRows = -1;
 			}
 			try {
-				Collection<UserFromSearch> solrSearchResult = profileManagementService.getProListByProfileLevel(iden, profileLevel, start, numRows);
-				String json = new Gson().toJson(solrSearchResult);
-				LOG.debug("Pro list json : " + json);
-				response = Response.ok(json).build();
+				List<Long> userIds = new ArrayList<Long>();
+				String idenFieldName = "";
+				List<ProListUser> users = new ArrayList<ProListUser>();
+				UserListFromSearch userList = new UserListFromSearch();
 
+				switch (profileLevel) {
+					case CommonConstants.PROFILE_LEVEL_COMPANY:
+						idenFieldName = CommonConstants.COMPANY_ID_SOLR;
+						break;
+					case CommonConstants.PROFILE_LEVEL_REGION:
+						idenFieldName = CommonConstants.REGIONS_SOLR;
+						break;
+					case CommonConstants.PROFILE_LEVEL_BRANCH:
+						idenFieldName = CommonConstants.BRANCHES_SOLR;
+						break;
+					default:
+						throw new InvalidInputException("profile level is invalid in getProListByProfileLevel");
+				}
+
+				SolrDocumentList results = solrSearchService.getUserIdsByIden(iden, idenFieldName, true, start, numRows);
+
+				for (SolrDocument solrDocument : results) {
+					userIds.add((Long) solrDocument.getFieldValue("userId"));
+				}
+				users = userManagementService.getMultipleUsersByUserId(userIds);
+				userList.setUsers(users);
+				userList.setUserFound(results.getNumFound());
+				String json = new Gson().toJson(userList);
+				LOG.debug("userList json : " + json);
+				response = Response.ok(json).build();
 			}
 			catch (SolrException e) {
 				throw new InternalServerException(new ProfileServiceErrorCode(CommonConstants.ERROR_CODE_PRO_LIST_FETCH_FAILURE,
