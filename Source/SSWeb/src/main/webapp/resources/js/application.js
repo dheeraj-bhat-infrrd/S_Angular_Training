@@ -29,6 +29,7 @@ var lastColValueForCount;
 var lastColNameForGraph;
 var lastColValueForGraph;
 
+
 //Variables for processing Edit profile
 var startIndex = 0;
 var numOfRows = 3;
@@ -4591,6 +4592,7 @@ function paintProList(usersList) {
 	}
 }
 
+
 function fetchUsersByProfileLevel(iden, profileLevel, startIndex) {
 	if (iden == undefined) {
 		console.log("iden is undefined for fetchUsersByProfileLevel");
@@ -4606,8 +4608,8 @@ function fetchUsersByProfileLevelCallback(data) {
 	if (response != undefined) {
 		var usersList = $.parseJSON(response.entity);
 		if(usersList.length > 0)
-			$('#srch-num').html(usersList.length);
-		paintProList(usersList);
+			$('#srch-num').html(usersList.userFound);
+		paintProList(usersList.users);
 	}
 }
 

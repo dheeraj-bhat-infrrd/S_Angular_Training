@@ -113,6 +113,7 @@
 			<input type="hidden" value="${message}" name="message" id="message"/>
 			<input type="hidden" value="${emailid}" name="originalemailid" id="originalemailid"/>
 			<input type="hidden" value="${isDirectRegistration}" name="isDirectRegistration" id="isDirectRegistration"/>
+			<input type="hidden" value="${uniqueIdentifier}" name="uniqueIdentifier" id="uniqueIdentifier"/>
 		</form>
 		
 	</div>
