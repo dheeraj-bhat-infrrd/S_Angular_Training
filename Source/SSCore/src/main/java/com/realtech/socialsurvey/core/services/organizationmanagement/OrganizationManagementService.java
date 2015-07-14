@@ -313,7 +313,7 @@ public interface OrganizationManagementService {
 	 * @throws NoRecordsFetchedException
 	 * @throws UserAssignmentException
 	 */
-	public Region addNewRegionWithUser(User user, String regionName, int isDefaultBySystem, String address1, String address2, String country, String countryCode, String state, String city, String zipcode, long selectedUserId,
+	public Map<String, Object> addNewRegionWithUser(User user, String regionName, int isDefaultBySystem, String address1, String address2, String country, String countryCode, String state, String city, String zipcode, long selectedUserId,
 			String[] emailIdsArray, boolean isAdmin) throws InvalidInputException, SolrException, NoRecordsFetchedException, UserAssignmentException;
 
 	/**
@@ -338,7 +338,7 @@ public interface OrganizationManagementService {
 	 * @throws NoRecordsFetchedException
 	 * @throws UserAssignmentException
 	 */
-	public Region updateRegion(User user, long regionId, String regionName, String address1, String address2, String country, String countryCode, String state, String city, String zipcode, long selectedUserId,
+	public Map<String, Object> updateRegion(User user, long regionId, String regionName, String address1, String address2, String country, String countryCode, String state, String city, String zipcode, long selectedUserId,
 			String[] emailIdsArray, boolean isAdmin) throws InvalidInputException, SolrException, NoRecordsFetchedException, UserAssignmentException;
 
 	/**
@@ -364,7 +364,7 @@ public interface OrganizationManagementService {
 	 * @throws NoRecordsFetchedException
 	 * @throws UserAssignmentException
 	 */
-	public Branch updateBranch(User user, long branchId, long regionId, String branchName, String address1, String address2, String country, String countryCode, String state, String city, String zipcode, long selectedUserId,
+	public Map<String, Object> updateBranch(User user, long branchId, long regionId, String branchName, String address1, String address2, String country, String countryCode, String state, String city, String zipcode, long selectedUserId,
 			String[] emailIdsArray, boolean isAdmin) throws InvalidInputException, SolrException, NoRecordsFetchedException, UserAssignmentException;
 
 	/**
@@ -405,7 +405,7 @@ public interface OrganizationManagementService {
 	 * @throws NoRecordsFetchedException
 	 * @throws UserAssignmentException
 	 */
-	public Branch addNewBranchWithUser(User user, String branchName, long regionId, int isDefaultBySystem, String address1, String address2, String country, String countryCode, String state, String city, String zipcode,
+	public Map<String, Object> addNewBranchWithUser(User user, String branchName, long regionId, int isDefaultBySystem, String address1, String address2, String country, String countryCode, String state, String city, String zipcode,
 			long selectedUserId, String[] emailIdsArray, boolean isAdmin) throws InvalidInputException, SolrException, NoRecordsFetchedException,
 			UserAssignmentException;
 
@@ -433,12 +433,13 @@ public interface OrganizationManagementService {
 	 * @param regionId
 	 * @param emailIdsArray
 	 * @param isAdmin
+	 * @return 
 	 * @throws InvalidInputException
 	 * @throws NoRecordsFetchedException
 	 * @throws SolrException
 	 * @throws UserAssignmentException
 	 */
-	public void addIndividual(User adminUser, long selectedUserId, long branchId, long regionId, String[] emailIdsArray, boolean isAdmin)
+	public Map<String, Object> addIndividual(User adminUser, long selectedUserId, long branchId, long regionId, String[] emailIdsArray, boolean isAdmin)
 			throws InvalidInputException, NoRecordsFetchedException, SolrException, UserAssignmentException;
 
 	/**
