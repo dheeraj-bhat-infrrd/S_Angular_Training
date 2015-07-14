@@ -64,6 +64,18 @@ namespace EncompassSocialSurvey
                     LoanUtility _loanUtility = new LoanUtility();
                     ArrayList loanFolder = _loanUtility.PopulateLoanFolderList();
 
+                    // get the ss_environment value
+                    var ssEnv = System.Configuration.ConfigurationManager.AppSettings["ss_environment"];
+                    string emailDomain = null;
+                    string emailPrefix = null;
+                    if (ssEnv.Equals("test"))
+                    {
+                        emailDomain = System.Configuration.ConfigurationManager.AppSettings["email_domain_to_replace"];
+                        emailPrefix = System.Configuration.ConfigurationManager.AppSettings["email_address_prefix"];
+                        Logger.Debug("Email Domain: " + emailDomain);
+                        Logger.Debug("Email Prefix: " + emailPrefix);
+                    }
+
                     // process loan for each loan folder
                     foreach (string folderName in loanFolder)
                     {
@@ -83,7 +95,7 @@ namespace EncompassSocialSurvey
                             // process for insert
 
                             LoanService loanSerivce = new LoanService();
-                            loanSerivce.InsertLoans(loansVM);
+                            loanSerivce.InsertLoans(loansVM, emailDomain, emailPrefix);
                         }
                         catch (System.Exception ex)
                         {
