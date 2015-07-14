@@ -918,7 +918,7 @@
         padding-left: 10px;
         line-height: 16px;
         padding-top: 4px;
-        width: 100px;
+        width: 180px;
     }
     .stat-icn-img{
         width: 12px;
@@ -951,7 +951,7 @@
         line-height: 30px;
         left: -210px;
         font-size: 13px;
-        width: 192px;
+        width: 210px;
         text-align: right;
         margin: 15px auto 0;;
     }
@@ -1603,6 +1603,9 @@
         margin: 0 auto;
         float: none !important;
     }
+    .stats-right-survey {
+    	width: 600px
+    }
     .stats-right-adj{
         clear: both;
         width: 100%;
@@ -1610,10 +1613,10 @@
         float: none !important;
     }
     .stat-icn-lbl {
-        width: 180px;
-        font-size: 14px;
-    }
-    .stat-icn-img{
+		width: 190px;
+		font-size: 13px;
+	}
+	.stat-icn-img{
         width: 14px;
     }
     .stat-icn-txt-rt {
@@ -1634,7 +1637,7 @@
     }
     .util-gph-legend{
         position: static;
-        width: 54%;
+        width: 420px;
         margin: 25px auto 0;
     }
     .dash-left-txt-wrapper{

@@ -14,7 +14,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
@@ -24,7 +23,6 @@ import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
-
 import com.google.gson.Gson;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.dao.OrganizationUnitSettingsDao;
@@ -132,12 +130,10 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
     @Override
     @Transactional
     public SurveyDetails storeInitialSurveyDetails( long agentId, String customerEmail, String firstName, String lastName,
-        int reminderCount, String custRelationWithAgent, String baseUrl ) throws SolrException, NoRecordsFetchedException,
-        InvalidInputException
+        int reminderCount, String custRelationWithAgent, String baseUrl, String source ) throws SolrException,
+        NoRecordsFetchedException, InvalidInputException
     {
-
         LOG.info( "Method to store initial details of survey, storeInitialSurveyAnswers() started." );
-
         String agentName;
         long branchId = 0;
         long companyId = 0;
@@ -170,8 +166,11 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
         surveyDetails.setCustRelationWithAgent( custRelationWithAgent );
         surveyDetails.setUrl( getSurveyUrl( agentId, customerEmail, baseUrl ) );
         surveyDetails.setEditable( true );
+        surveyDetails.setSource( source );
+
         SurveyDetails survey = surveyDetailsDao.getSurveyByAgentIdAndCustomerEmail( agentId, customerEmail );
         LOG.info( "Method to store initial details of survey, storeInitialSurveyAnswers() finished." );
+
         if ( survey == null ) {
             surveyDetailsDao.insertSurveyDetails( surveyDetails );
             return null;
@@ -224,10 +223,10 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
      */
     @Override
     public void updateGatewayQuestionResponseAndScore( long agentId, String customerEmail, String mood, String review,
-        boolean isAbusive )
+        boolean isAbusive, String agreedToShare )
     {
         LOG.info( "Method to update customer review and final score on the basis of rating questions in SURVEY_DETAILS, updateCustomerAnswersInSurvey() started." );
-        surveyDetailsDao.updateGatewayAnswer( agentId, customerEmail, mood, review, isAbusive );
+        surveyDetailsDao.updateGatewayAnswer( agentId, customerEmail, mood, review, isAbusive, agreedToShare );
         surveyDetailsDao.updateFinalScore( agentId, customerEmail );
         LOG.info( "Method to update customer review and final score on the basis of rating questions in SURVEY_DETAILS, updateCustomerAnswersInSurvey() finished." );
     }
@@ -688,6 +687,11 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
                     survey.getAgentEmailId() );
                 if ( userList != null && !userList.isEmpty() ) {
                     user = userList.get( 0 );
+                    if ( user != null ) {
+                        LOG.debug( "Mapping the agent to this survey " );
+                        survey.setAgentId( user.getUserId() );
+                        surveyPreInitiationDao.update( survey );
+                    }
                 }
             }
             if ( survey.getAgentEmailId() == null || survey.getAgentEmailId().isEmpty() ) {

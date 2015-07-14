@@ -51,6 +51,7 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
 	public static final String KEY_LOCK_SETTINGS = "lockSettings";
 	public static final String KEY_LINKEDIN_PROFILEDATA = "linkedInProfileData";
 	public static final String KEY_PROFILE_NAME = "profileName";
+	public static final String KEY_UNIQUE_IDENTIFIER = "uniqueIdentifier";
 	public static final String KEY_PROFILE_URL = "profileUrl";
 	public static final String KEY_LOGO = "logo";
 	public static final String KEY_PROFILE_IMAGE = "profileImageUrl";
@@ -343,26 +344,27 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
 	}
 	
 
-    @Override
-    public void setAgentNames( Map<Long, AgentRankingReport> agentsReport )
-    {
-        LOG.info( "Method setAgentNames() started." );
-        Set<Long> agentIds = agentsReport.keySet();
-        List<AgentSettings> agentSEttings = fetchMultipleAgentSettingsById(new ArrayList<Long>(agentIds));
-        for ( AgentSettings setting : agentSEttings ) {
-            if(agentsReport.get(setting.getIden()) != null){
-                try{
-                agentsReport.get(setting.getIden()).setAgentFirstName( setting.getContact_details().getFirstName() );
-                agentsReport.get(setting.getIden()).setAgentLastName( setting.getContact_details().getLastName() );
-                }catch(NullPointerException e){
-                    LOG.error( "Null Pointer exception caught in setAgentNames(). NEsted exception is ", e );
-                    LOG.debug( "Continuing..." );
-                    continue;
-                }
-            }
-        }
-        LOG.info( "Method setAgentNames() finished." );
-    }
+	@Override
+	public void setAgentDetails(Map<Long, AgentRankingReport> agentsReport) {
+		LOG.info("Method setAgentNames() started.");
+		Set<Long> agentIds = agentsReport.keySet();
+		List<AgentSettings> agentSettings = fetchMultipleAgentSettingsById(new ArrayList<Long>(agentIds));
+		for (AgentSettings setting : agentSettings) {
+			if (agentsReport.get(setting.getIden()) != null) {
+				try {
+					agentsReport.get(setting.getIden()).setAgentFirstName(setting.getContact_details().getFirstName());
+					agentsReport.get(setting.getIden()).setAgentLastName(setting.getContact_details().getLastName());
+					agentsReport.get(setting.getIden()).setRegistrationDate(setting.getCreatedOn());
+				}
+				catch (NullPointerException e) {
+					LOG.error("Null Pointer exception caught in setAgentNames(). Nested exception is ", e);
+					LOG.debug("Continuing...");
+					continue;
+				}
+			}
+		}
+		LOG.info("Method setAgentNames() finished.");
+	}
     
     @Override
     public OrganizationUnitSettings removeKeyInOrganizationSettings(OrganizationUnitSettings unitSettings, String keyToUpdate, String collectionName){
@@ -377,6 +379,19 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
 		return unitSettings;
 	}
 
+    @Override
+    public List<OrganizationUnitSettings> getCompanyListByVerticalName (String verticalName) {
+    	LOG.debug( "Method getCompanyListByVerticalName() called for vertical name : " + verticalName);
+    	
+    	List<OrganizationUnitSettings> unitSettings = null;
+    	Query query = new Query();
+    	query.addCriteria(Criteria.where(KEY_VERTICAL).is(verticalName));
+    	query.fields().include(KEY_LOGO).include(KEY_CONTACT_DETAILS).include(KEY_PROFILE_NAME).include(KEY_VERTICAL).exclude("_id");
+    	
+    	unitSettings = mongoTemplate.find(query, OrganizationUnitSettings.class, COMPANY_SETTINGS_COLLECTION);
+    	
+    	return unitSettings;
+    }
 
 	/*
 	 * Method to set complete profile URL for each of the setting being fetched.
@@ -399,4 +414,17 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
 			}
 		}
 	}
+
+    @Override
+    public OrganizationUnitSettings fetchOrganizationUnitSettingsByUniqueIdentifier( String uniqueIdentifier,
+        String collectionName )
+    {
+        Query query = new Query();
+        query.addCriteria(Criteria.where(KEY_UNIQUE_IDENTIFIER).is(uniqueIdentifier));
+        query.fields().exclude(KEY_LINKEDIN_PROFILEDATA);
+        OrganizationUnitSettings organizationUnitSettings = mongoTemplate.findOne(query, OrganizationUnitSettings.class, collectionName);
+        setCompleteUrlForSettings(organizationUnitSettings, collectionName);
+        LOG.info("Successfully executed method fetchOrganizationUnitSettingsByProfileName");
+        return organizationUnitSettings;
+    }
 }

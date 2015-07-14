@@ -328,15 +328,19 @@ public class SessionHelper {
 		}
 		
 		AccountType accountType = (AccountType) session.getAttribute(CommonConstants.ACCOUNT_TYPE_IN_SESSION);
+		UserProfile selectedProfile = (UserProfile) session.getAttribute( CommonConstants.USER_PROFILE );
+		
 		List<UserProfile> profiles = userManagementService.getAllUserProfilesForUser(user);
-		UserProfile selectedProfile = profiles.get(CommonConstants.INITIAL_INDEX);
-		for (UserProfile profile : profiles) {
-			if (profile.getProfilesMaster().getProfileId() == CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID) {
-				selectedProfile = profile;
-				break;
+		if (selectedProfile == null) {
+			selectedProfile = profiles.get(CommonConstants.INITIAL_INDEX);
+			for (UserProfile profile : profiles) {
+				if (profile.getProfilesMaster().getProfileId() == CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID) {
+					selectedProfile = profile;
+					break;
+				}
 			}
 		}
-		
+			
 		long branchId = 0;
 		long regionId = 0;
 		boolean agentAdded = false;
@@ -457,5 +461,33 @@ public class SessionHelper {
 			return true;
 		}
 		return false;
+	}
+	
+    // update user profiles in session if current user is updated
+	@Transactional
+	public void updateProcessedProfilesInSession(HttpSession session, User user, String[] assigneeEmailIds) throws InvalidInputException,
+			NoRecordsFetchedException {
+		AccountType accountType = (AccountType) session.getAttribute(CommonConstants.ACCOUNT_TYPE_IN_SESSION);
+		userManagementService.getCanonicalUserSettings(user, accountType);
+
+		List<String> usersEmailIds;
+		if (assigneeEmailIds != null && assigneeEmailIds.length > 0) {
+			usersEmailIds = Arrays.asList(assigneeEmailIds);
+		}
+		else {
+			return;
+		}
+
+		for (String userEmail : usersEmailIds) {
+			if (user.getEmailId().equalsIgnoreCase(userEmail)) {
+				try {
+					updateProcessedUserProfiles(session, user);
+					break;
+				}
+				catch (NonFatalException e) {
+					LOG.error("NonFatalException while logging in. Reason : " + e.getMessage(), e);
+				}
+			}
+		}
 	}
 }
