@@ -1834,23 +1834,6 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 
 	@Override
 	@Transactional
-	public void updateCompanyName(long userId, long companyId, String companyName) throws InvalidInputException {
-		LOG.info("Method updateCompanyName of profileManagementService called for companyId : " + companyId);
-
-		Company company = companyDao.findById(Company.class, companyId);
-		if (company == null) {
-			throw new InvalidInputException("No company present for the specified companyId");
-		}
-		company.setCompany(companyName);
-		company.setModifiedBy(String.valueOf(userId));
-		company.setModifiedOn(new Timestamp(System.currentTimeMillis()));
-		companyDao.update(company);
-
-		LOG.info("Successfully completed method to update company status");
-	}
-
-	@Override
-	@Transactional
 	public List<AgentRankingReport> getAgentReport(long iden, String columnName, Date startDate, Date endDate, Object object)
 			throws InvalidInputException {
 		LOG.info("Method to get Agent's Report for a specific time and all time started.");
@@ -1972,4 +1955,134 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 		return companyList;
 	}
 
+	@Override
+	@Transactional
+	public void updateCompanyName(long userId, long companyId, String companyName) throws InvalidInputException {
+		LOG.info("Method updateCompanyName of profileManagementService called for companyId : " + companyId);
+
+		Company company = companyDao.findById(Company.class, companyId);
+		if (company == null) {
+			throw new InvalidInputException("No company present for the specified companyId");
+		}
+		company.setCompany(companyName);
+		company.setModifiedBy(String.valueOf(userId));
+		company.setModifiedOn(new Timestamp(System.currentTimeMillis()));
+		companyDao.update(company);
+
+		LOG.info("Successfully completed method to update company name");
+	}
+
+	@Override
+	@Transactional
+	public void updateRegionName(long userId, long regionId, String regionName) throws InvalidInputException {
+		LOG.info("Method updateRegionName of profileManagementService called for regionId : " + regionId);
+
+		Region region = regionDao.findById(Region.class, regionId);
+		if (region == null) {
+			throw new InvalidInputException("No region present for the specified companyId");
+		}
+		region.setRegion(regionName);
+		region.setModifiedBy(String.valueOf(userId));
+		region.setModifiedOn(new Timestamp(System.currentTimeMillis()));
+		regionDao.update(region);
+
+		LOG.info("Successfully completed method to update region name");
+	}
+
+	@Override
+	@Transactional
+	public void updateBranchName(long userId, long branchId, String branchName) throws InvalidInputException {
+		LOG.info("Method updateBranchName of profileManagementService called for branchId : " + branchId);
+
+		Branch branch = branchDao.findById(Branch.class, branchId);
+		if (branch == null) {
+			throw new InvalidInputException("No branch present for the specified companyId");
+		}
+		branch.setBranch(branchName);
+		branch.setModifiedBy(String.valueOf(userId));
+		branch.setModifiedOn(new Timestamp(System.currentTimeMillis()));
+		branchDao.update(branch);
+
+		LOG.info("Successfully completed method to update branch name");
+	}
+
+	@Override
+	@Transactional
+	public void updateIndividualName(long userId, long individualId, String individualName) throws InvalidInputException {
+		LOG.info("Method updateIndividualName of profileManagementService called for individualId : " + individualId);
+
+		User user = userDao.findById(User.class, individualId);
+		if (user == null) {
+			throw new InvalidInputException("No user present for the specified companyId");
+		}
+		user.setFirstName(individualName.substring(0, individualName.indexOf(' ')));
+		user.setLastName(individualName.substring(individualName.indexOf(' ') + 1));
+		user.setModifiedBy(String.valueOf(userId));
+		user.setModifiedOn(new Timestamp(System.currentTimeMillis()));
+		userDao.update(user);
+
+		LOG.info("Successfully completed method to update individual name");
+	}
+
+	@Override
+	@Transactional
+	public void updateCompanyEmail(long companyId, String emailId) throws InvalidInputException {
+		LOG.info("Method updateCompanyEmail of profileManagementService called for companyId : " + companyId);
+
+		Company company = companyDao.findById(Company.class, companyId);
+		if (company == null) {
+			throw new InvalidInputException("No user present for the specified companyId");
+		}
+		
+		User companyAdmin = null;
+		List<User> users = company.getUsers();
+		for (User user : users) {
+			if (user.getIsOwner() == CommonConstants.IS_OWNER) {
+				companyAdmin = user;
+				break;
+			}
+		}
+		
+		companyAdmin.setEmailId(emailId);
+		companyAdmin.setModifiedBy(String.valueOf(companyAdmin.getUserId()));
+		companyAdmin.setModifiedOn(new Timestamp(System.currentTimeMillis()));
+		userDao.update(companyAdmin);
+		
+		for (UserProfile userProfile : companyAdmin.getUserProfiles()) {
+			userProfile.setEmailId(emailId);
+			userProfile.setModifiedBy(String.valueOf(companyAdmin.getUserId()));
+			userProfile.setModifiedOn(new Timestamp(System.currentTimeMillis()));
+			userProfileDao.update(userProfile);
+		}
+		
+		company.setModifiedBy(String.valueOf(companyAdmin.getUserId()));
+		company.setModifiedOn(new Timestamp(System.currentTimeMillis()));
+		companyDao.update(company);
+
+		LOG.info("Successfully completed method to update company email");
+	}
+
+	@Override
+	@Transactional
+	public void updateIndividualEmail(long userId, long individualId, String emailId) throws InvalidInputException {
+		LOG.info("Method updateIndividualEmail of profileManagementService called for individualId : " + individualId);
+
+		User user = userDao.findById(User.class, individualId);
+		if (user == null) {
+			throw new InvalidInputException("No user present for the specified companyId");
+		}
+		user.setEmailId(emailId);
+		user.setModifiedBy(String.valueOf(userId));
+		user.setModifiedOn(new Timestamp(System.currentTimeMillis()));
+		userDao.update(user);
+		
+		for (UserProfile userProfile : user.getUserProfiles()) {
+			userProfile.setEmailId(emailId);
+			userProfile.setModifiedBy(String.valueOf(userId));
+			userProfile.setModifiedOn(new Timestamp(System.currentTimeMillis()));
+			userProfileDao.update(userProfile);
+		}
+
+		LOG.info("Successfully completed method to update individual email");
+	}
 }
