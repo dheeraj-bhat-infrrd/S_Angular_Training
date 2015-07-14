@@ -94,6 +94,7 @@
 	</c:choose>
    	<c:if test="${not empty averageRating}">
    		<fmt:formatNumber var="floatingAverageRating" type="number" value="${averageRating}" maxFractionDigits="2" minFractionDigits="2"/>
+   		<fmt:formatNumber var="floatingAverageGoogleRating" type="number" value="${averageRating}" maxFractionDigits="1" minFractionDigits="1"/>
    		<fmt:formatNumber var="integerAverageRating" type="number" value="${averageRating}" maxFractionDigits="0"/>
    		<c:set var="integerAverageRating" value="${integerAverageRating}"></c:set>
    		<c:if test="${integerAverageRating == 0}">
@@ -108,7 +109,7 @@
 		<span itemprop="title">Reviews</span>
 		<span itemprop="description"></span>
 		<div itemprop="aggregateRating" itemscope itemtype="http://schema.org/AggregateRating">
-			Rated <span itemprop="ratingValue">${floatingAverageRating }</span> out of
+			Rated <span itemprop="ratingValue">${floatingAverageGoogleRating }</span> out of
 			<span itemprop="bestRating">5</span> 
 			based on <span itemprop="ratingCount">${reviewsCount}</span>
 			reviews
