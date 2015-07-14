@@ -95,6 +95,10 @@ a,a:hover,a:visited {
 	display: block;
 }
 
+.vis-hidden {
+	visibility: hidden;
+}
+
 .semibold {
 	font-family: 'opensanssemibold';
 }
