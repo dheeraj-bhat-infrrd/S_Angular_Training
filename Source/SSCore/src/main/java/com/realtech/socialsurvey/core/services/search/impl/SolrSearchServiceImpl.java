@@ -1049,12 +1049,24 @@ public class SolrSearchServiceImpl implements SolrSearchService {
 					solrServer = new HttpSolrServer(solrRegionUrl);
 			}
 
-			query.setQuery(columnName + ":" + id);
+			//Check if proper id is passed
+			if(id>-1){
+				query.setQuery(columnName + ":" + id);				
+			} else {
+				query.setQuery("*:*");
+			}
+			
+            if ( !searchColumn.equalsIgnoreCase( CommonConstants.USER_DISPLAY_NAME_SOLR ) )
+                query.addFilterQuery( CommonConstants.IS_DEFAULT_BY_SYSTEM_SOLR + ":" + CommonConstants.IS_DEFAULT_BY_SYSTEM_NO );
 
 			query.addFilterQuery(searchColumn + ":" + searchKey);
 			query.addFilterQuery(CommonConstants.STATUS_SOLR + ":" + CommonConstants.STATUS_ACTIVE);
 
 			LOG.debug("Querying solr for searching " + searchColumn);
+			response = solrServer.query(query);
+			// Change to get all matching records.
+			int rows = (int) response.getResults().getNumFound();
+			query.setRows(rows);
 			response = solrServer.query(query);
 			SolrDocumentList documentList = response.getResults();
 			for (SolrDocument doc : documentList) {

@@ -182,6 +182,14 @@
     </div>
 </div>
 
+<div class="bread-crum-hdr">
+	<div class="container">
+		<div id="bread-crum-cont" class="row bread-crum-row">
+			
+		</div>
+	</div>
+</div>
+
 <div id="profile-main-content" class="prof-main-content-wrapper margin-top-25 margin-bottom-25">
     <div class="">
     	<div class="container">

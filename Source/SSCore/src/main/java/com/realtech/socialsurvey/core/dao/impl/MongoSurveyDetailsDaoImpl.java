@@ -1,5 +1,7 @@
 package com.realtech.socialsurvey.core.dao.impl;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.sql.Timestamp;
 import java.text.DateFormatSymbols;
 import java.text.ParseException;
@@ -12,7 +14,6 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -113,7 +114,7 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao {
 	 * collection.
 	 */
 	@Override
-	public void updateGatewayAnswer(long agentId, String customerEmail, String mood, String review, boolean isAbusive) {
+	public void updateGatewayAnswer(long agentId, String customerEmail, String mood, String review, boolean isAbusive, String agreedToShare) {
 		LOG.info("Method updateGatewayAnswer() to update review provided by customer started.");
 		Query query = new Query();
 		query.addCriteria(Criteria.where(CommonConstants.AGENT_ID_COLUMN).is(agentId));
@@ -125,6 +126,7 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao {
 		update.set(CommonConstants.IS_ABUSIVE_COLUMN, isAbusive);
 		update.set(CommonConstants.MODIFIED_ON_COLUMN, new Date());
 		update.set(CommonConstants.EDITABLE_SURVEY_COLUMN, false);
+		update.set(CommonConstants.AGREE_SHARE_COLUMN, agreedToShare);
 		mongoTemplate.updateMulti(query, update, SURVEY_DETAILS_COLLECTION);
 		LOG.info("Method updateGatewayAnswer() to update review provided by customer finished.");
 	}
@@ -361,7 +363,7 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao {
 
 	@Override
 	@SuppressWarnings("unchecked")
-	public double getRatingForPastNdays(String columnName, long columnValue, int noOfDays, boolean aggregateAbusive) {
+	public double getRatingForPastNdays(String columnName, long columnValue, int noOfDays, boolean aggregateAbusive, boolean realtechAdmin) {
 		LOG.info("Method getRatingOfAgentForPastNdays(), to calculate rating of agent started for columnName: " + columnName + " columnValue:"
 				+ columnValue + " noOfDays:" + noOfDays + " aggregateAbusive:" + aggregateAbusive);
 		Date startDate = null;
@@ -387,15 +389,16 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao {
 			query.addCriteria(Criteria.where(CommonConstants.IS_ABUSIVE_COLUMN).is(aggregateAbusive));
 		}
 
-		query.addCriteria(Criteria
-				.where(columnName)
-				.is(columnValue)
-				.andOperator(Criteria.where(CommonConstants.MODIFIED_ON_COLUMN).lte(endDate),
+		if(!realtechAdmin){
+			query.addCriteria(Criteria.where(columnName).is(columnValue));
+		}
+		
+		query.addCriteria(Criteria.where(CommonConstants.MODIFIED_ON_COLUMN).lte(endDate).andOperator(
 						Criteria.where(CommonConstants.MODIFIED_ON_COLUMN).gte(startDate),
 						Criteria.where(CommonConstants.STAGE_COLUMN).is(CommonConstants.SURVEY_STAGE_COMPLETE)));
 
 		TypedAggregation<SurveyDetails> aggregation = null;
-		if (!aggregateAbusive) {
+		if (!aggregateAbusive && !realtechAdmin) {
 			aggregation = new TypedAggregation<SurveyDetails>(SurveyDetails.class, Aggregation.match(Criteria.where(
 					CommonConstants.MODIFIED_ON_COLUMN).lte(endDate)), Aggregation.match(Criteria.where(CommonConstants.MODIFIED_ON_COLUMN).gte(
 					startDate)), Aggregation.match(Criteria.where(columnName).is(columnValue)), Aggregation.match(Criteria.where(
@@ -403,10 +406,17 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao {
 					CommonConstants.IS_ABUSIVE_COLUMN).is(aggregateAbusive)), Aggregation.group(columnName).sum(CommonConstants.SCORE_COLUMN)
 					.as("total_score"));
 		}
-		else {
+		else if(aggregateAbusive && !realtechAdmin){
 			aggregation = new TypedAggregation<SurveyDetails>(SurveyDetails.class, Aggregation.match(Criteria.where(
 					CommonConstants.MODIFIED_ON_COLUMN).lte(endDate)), Aggregation.match(Criteria.where(CommonConstants.MODIFIED_ON_COLUMN).gte(
 					startDate)), Aggregation.match(Criteria.where(columnName).is(columnValue)), Aggregation.match(Criteria.where(
+					CommonConstants.STAGE_COLUMN).is(CommonConstants.SURVEY_STAGE_COMPLETE)), Aggregation.group(columnName)
+					.sum(CommonConstants.SCORE_COLUMN).as("total_score"));
+		}
+		else{
+			aggregation = new TypedAggregation<SurveyDetails>(SurveyDetails.class, Aggregation.match(Criteria.where(
+					CommonConstants.MODIFIED_ON_COLUMN).lte(endDate)), Aggregation.match(Criteria.where(CommonConstants.MODIFIED_ON_COLUMN).gte(
+					startDate)), Aggregation.match(Criteria.where(
 					CommonConstants.STAGE_COLUMN).is(CommonConstants.SURVEY_STAGE_COMPLETE)), Aggregation.group(columnName)
 					.sum(CommonConstants.SCORE_COLUMN).as("total_score"));
 		}
@@ -673,7 +683,7 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao {
 	 * Method to get count of clicked surveys based upon criteria(Weekly/Monthly/Yearly)
 	 */
 	@Override
-	public Map<String, Long> getClickedSurveyByCriteria(String columnName, long columnValue, String groupByCriteria) throws ParseException {
+	public Map<String, Long> getClickedSurveyByCriteria(String columnName, long columnValue, String groupByCriteria, boolean realtechAdmin) throws ParseException {
 		LOG.info("Method to get");
 		TypedAggregation<SurveyDetails> aggregation;
 //		Date endDate = new Date();
@@ -696,11 +706,30 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao {
 				break;
 		}
 		Date startDate = getNdaysBackDate(numberOfPastDaysToConsider);
-		aggregation = new TypedAggregation<SurveyDetails>(SurveyDetails.class, Aggregation.match(Criteria.where(CommonConstants.SURVEY_CLICKED_COLUMN).is(true)), Aggregation.match(Criteria.where(
-				columnName).is(columnValue)), Aggregation.match(Criteria.where(
-				CommonConstants.MODIFIED_ON_COLUMN).gte(startDate)), Aggregation.project(CommonConstants.MODIFIED_ON_COLUMN)
-				.andExpression(criteriaColumn + "(modifiedOn)").as("groupCol"), Aggregation.group("groupCol").count().as("count"));
-
+		if (realtechAdmin && columnName == null) {
+			aggregation = new TypedAggregation<SurveyDetails>(
+					SurveyDetails.class,
+					Aggregation.match(Criteria.where(
+							CommonConstants.SURVEY_CLICKED_COLUMN).is(true)),
+					Aggregation.match(Criteria.where(
+							CommonConstants.MODIFIED_ON_COLUMN).gte(startDate)),
+					Aggregation.project(CommonConstants.MODIFIED_ON_COLUMN)
+							.andExpression(criteriaColumn + "(modifiedOn)")
+							.as("groupCol"), Aggregation.group("groupCol")
+							.count().as("count"));
+		} else {
+			aggregation = new TypedAggregation<SurveyDetails>(
+					SurveyDetails.class, Aggregation.match(Criteria.where(
+							CommonConstants.SURVEY_CLICKED_COLUMN).is(true)),
+					Aggregation.match(Criteria.where(columnName)
+							.is(columnValue)), Aggregation.match(Criteria
+							.where(CommonConstants.MODIFIED_ON_COLUMN).gte(
+									startDate)), Aggregation
+							.project(CommonConstants.MODIFIED_ON_COLUMN)
+							.andExpression(criteriaColumn + "(modifiedOn)")
+							.as("groupCol"), Aggregation.group("groupCol")
+							.count().as("count"));
+		}
 		AggregationResults<SurveyDetails> result = mongoTemplate.aggregate(aggregation, SURVEY_DETAILS_COLLECTION, SurveyDetails.class);
 		Map<String, Long> clickedSurveys = new LinkedHashMap<>();
 		if (result != null) {
@@ -764,7 +793,7 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao {
 	 * Method to get count of sent surveys based upon criteria(Weekly/Monthly/Yearly).
 	 */
 	@Override
-	public Map<String, Long> getSentSurveyByCriteria(String columnName, long columnValue, String groupByCriteria) throws ParseException {
+	public Map<String, Long> getSentSurveyByCriteria(String columnName, long columnValue, String groupByCriteria, boolean realtechAdmin) throws ParseException {
 		LOG.info("Method to get count of sent surveys based upon criteria(Weekly/Monthly/Yearly) getSentSurveyByCriteria() started.");
 		TypedAggregation<SurveyDetails> aggregation;
 //		Date endDate = new Date();
@@ -787,11 +816,17 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao {
 				break;
 		}
 		Date startDate = getNdaysBackDate(numberOfPastDaysToConsider);
+		if(realtechAdmin && columnName == null){
+			aggregation = new TypedAggregation<SurveyDetails>(SurveyDetails.class, Aggregation.match(Criteria.where(CommonConstants.CREATED_ON).gte(startDate)), Aggregation.project(CommonConstants.CREATED_ON)
+					.andExpression(criteriaColumn + "(" + CommonConstants.CREATED_ON + ")").as("groupCol"), Aggregation.group("groupCol").count()
+					.as("count"));
+		}
+		else{
 		aggregation = new TypedAggregation<SurveyDetails>(SurveyDetails.class, Aggregation.match(Criteria.where(CommonConstants.CREATED_ON).gte(startDate)), Aggregation.match(Criteria.where(columnName)
 				.is(columnValue)), Aggregation.project(CommonConstants.CREATED_ON)
 				.andExpression(criteriaColumn + "(" + CommonConstants.CREATED_ON + ")").as("groupCol"), Aggregation.group("groupCol").count()
 				.as("count"));
-
+		}
 		AggregationResults<SurveyDetails> result = mongoTemplate.aggregate(aggregation, SURVEY_DETAILS_COLLECTION, SurveyDetails.class);
 		Map<String, Long> sentSurveys = new LinkedHashMap<>();
 		if (result != null) {
@@ -855,7 +890,7 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao {
 	 * Method to get count of completed surveys based upon criteria(Weekly/Monthly/Yearly).
 	 */
 	@Override
-	public Map<String, Long> getCompletedSurveyByCriteria(String columnName, long columnValue, String groupByCriteria) throws ParseException {
+	public Map<String, Long> getCompletedSurveyByCriteria(String columnName, long columnValue, String groupByCriteria, boolean realtechAdmin) throws ParseException {
 		LOG.info("Method to get count of completed surveys based upon criteria(Weekly/Monthly/Yearly) getCompletedSurveyByCriteria() started.");
 		TypedAggregation<SurveyDetails> aggregation;
 //		Date endDate = new Date();
@@ -878,12 +913,20 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao {
 				break;
 		}
 		Date startDate = getNdaysBackDate(numberOfPastDaysToConsider);
+		if(realtechAdmin && columnName == null){
 		aggregation = new TypedAggregation<SurveyDetails>(SurveyDetails.class, Aggregation.match(Criteria.where(CommonConstants.STAGE_COLUMN).is(
-				CommonConstants.SURVEY_STAGE_COMPLETE)), Aggregation.match(Criteria.where(columnName).is(columnValue)), Aggregation.match(Criteria.where(CommonConstants.MODIFIED_ON_COLUMN).gte(
+				CommonConstants.SURVEY_STAGE_COMPLETE)), Aggregation.match(Criteria.where(CommonConstants.MODIFIED_ON_COLUMN).gte(
 				startDate)), Aggregation.project(CommonConstants.MODIFIED_ON_COLUMN)
 				.andExpression(criteriaColumn + "(" + CommonConstants.MODIFIED_ON_COLUMN + ")").as("groupCol"), Aggregation.group("groupCol").count()
 				.as("count"));
-
+		}
+		else{
+			aggregation = new TypedAggregation<SurveyDetails>(SurveyDetails.class, Aggregation.match(Criteria.where(CommonConstants.STAGE_COLUMN).is(
+					CommonConstants.SURVEY_STAGE_COMPLETE)), Aggregation.match(Criteria.where(columnName).is(columnValue)), Aggregation.match(Criteria.where(CommonConstants.MODIFIED_ON_COLUMN).gte(
+					startDate)), Aggregation.project(CommonConstants.MODIFIED_ON_COLUMN)
+					.andExpression(criteriaColumn + "(" + CommonConstants.MODIFIED_ON_COLUMN + ")").as("groupCol"), Aggregation.group("groupCol").count()
+					.as("count"));
+		}
 		AggregationResults<SurveyDetails> result = mongoTemplate.aggregate(aggregation, SURVEY_DETAILS_COLLECTION, SurveyDetails.class);
 		Map<String, Long> completedSurveys = new LinkedHashMap<>();
 		if (result != null) {
@@ -946,7 +989,7 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao {
 	 * Method to get count of social posts based upon criteria(Weekly/Monthly/Yearly).
 	 */
 	@Override
-	public Map<String, Long> getSocialPostsCountByCriteria(String columnName, long columnValue, String groupByCriteria) throws ParseException {
+	public Map<String, Long> getSocialPostsCountByCriteria(String columnName, long columnValue, String groupByCriteria, boolean realtechAdmin) throws ParseException {
 		LOG.info("Method to get count of social posts based upon criteria(Weekly/Monthly/Yearly), getSocialPostsCountByCriteria() started.");
 		TypedAggregation<SurveyDetails> aggregation;
 //		Date endDate = new Date();
@@ -970,12 +1013,20 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao {
 				break;
 		}
 		Date startDate = getNdaysBackDate(numberOfPastDaysToConsider);
+		if(realtechAdmin && columnName == null ){
+			aggregation = new TypedAggregation<SurveyDetails>(SurveyDetails.class, Aggregation.match(Criteria.where(CommonConstants.SHARED_ON_COLUMN)
+					.exists(true)),
+					Aggregation.match(Criteria.where(CommonConstants.MODIFIED_ON_COLUMN).gte(startDate)), Aggregation
+							.project(CommonConstants.MODIFIED_ON_COLUMN).andExpression(criteriaColumn + "(" + CommonConstants.MODIFIED_ON_COLUMN + ")")
+							.as("groupCol"), Aggregation.group("groupCol").count().as("count"));
+		}
+		else{
 		aggregation = new TypedAggregation<SurveyDetails>(SurveyDetails.class, Aggregation.match(Criteria.where(CommonConstants.SHARED_ON_COLUMN)
 				.exists(true)), Aggregation.match(Criteria.where(columnName).is(columnValue)),
 				Aggregation.match(Criteria.where(CommonConstants.MODIFIED_ON_COLUMN).gte(startDate)), Aggregation
 						.project(CommonConstants.MODIFIED_ON_COLUMN).andExpression(criteriaColumn + "(" + CommonConstants.MODIFIED_ON_COLUMN + ")")
 						.as("groupCol"), Aggregation.group("groupCol").count().as("count"));
-
+		}
 		AggregationResults<SurveyDetails> result = mongoTemplate.aggregate(aggregation, SURVEY_DETAILS_COLLECTION, SurveyDetails.class);
 		Map<String, Long> socialPosts = new LinkedHashMap<>();
 		if (result != null) {
@@ -1145,81 +1196,92 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao {
 		LOG.info("Method to update status of survey in SurveyDetails collection, changeStatusOfSurvey() finished.");
 	}
 
-	
-    @Override
-    public void getAverageScore( Date startDate, Date endDate, Map<Long, AgentRankingReport> agentReportData, String columnName, long columnValue )
-    {
-        TypedAggregation<SurveyDetails> aggregation;
-        if ( startDate == null && endDate == null ) {
-            aggregation = new TypedAggregation<SurveyDetails>( SurveyDetails.class, 
-                Aggregation.match(Criteria.where(columnName).is(columnValue)), Aggregation.group( CommonConstants.AGENT_ID_COLUMN ).avg(CommonConstants.SCORE_COLUMN).as( "score" ) );
-        } else {
-            aggregation = new TypedAggregation<SurveyDetails>( SurveyDetails.class, Aggregation.match(Criteria.where(columnName).is(columnValue)),
-                Aggregation.group( CommonConstants.AGENT_ID_COLUMN ).avg(CommonConstants.SCORE_COLUMN).as( "score" ) );
-        }
-        
-        AggregationResults<SurveyDetails> result = mongoTemplate.aggregate(aggregation, SURVEY_DETAILS_COLLECTION, SurveyDetails.class);
-        
-        if (result != null) {
-            @SuppressWarnings("unchecked") List<BasicDBObject> averageSCore = (List<BasicDBObject>) result.getRawResults().get("result");
-            for (BasicDBObject o : averageSCore) {
-                long agentId = Long.parseLong(o.get(CommonConstants.DEFAULT_MONGO_ID_COLUMN).toString());
-                AgentRankingReport agentRankingReport;
-                if(agentReportData.containsKey( agentId )){
-                    agentRankingReport = agentReportData.get( agentId );
-                }
-                else{
-                    agentRankingReport = new AgentRankingReport();
-                }
-                if(startDate == null && endDate == null){
-                    agentRankingReport.setAllTimeAverageScore( Double.parseDouble(o.get("score").toString()) );
-                }
-                else{
-                    agentRankingReport.setAverageScore( Double.parseDouble(o.get("score").toString()) );
-                }
-                agentReportData.put(agentId, agentRankingReport);
-            }
-        }
-    }
+	@Override
+	public void getAverageScore(Date startDate, Date endDate, Map<Long, AgentRankingReport> agentReportData, String columnName, long columnValue) {
 
+		TypedAggregation<SurveyDetails> aggregation;
+		if (startDate != null && endDate != null) {
+			aggregation = new TypedAggregation<SurveyDetails>(SurveyDetails.class, Aggregation.match(Criteria.where(columnName).is(columnValue)),
+					Aggregation.match(Criteria.where(CommonConstants.CREATED_ON).gte(startDate)), Aggregation.match(Criteria.where(
+							CommonConstants.CREATED_ON).lte(endDate)), Aggregation.group(CommonConstants.AGENT_ID_COLUMN)
+							.avg(CommonConstants.SCORE_COLUMN).as("score"));
+		}
+		else if (startDate != null && endDate == null)
+			aggregation = new TypedAggregation<SurveyDetails>(SurveyDetails.class, Aggregation.match(Criteria.where(columnName).is(columnValue)),
+					Aggregation.match(Criteria.where(CommonConstants.CREATED_ON).gte(startDate)), Aggregation.group(CommonConstants.AGENT_ID_COLUMN)
+							.avg(CommonConstants.SCORE_COLUMN).as("score"));
+		else if (startDate == null && endDate != null)
+			aggregation = new TypedAggregation<SurveyDetails>(SurveyDetails.class, Aggregation.match(Criteria.where(columnName).is(columnValue)),
+					Aggregation.match(Criteria.where(CommonConstants.CREATED_ON).lte(endDate)), Aggregation.group(CommonConstants.AGENT_ID_COLUMN)
+							.avg(CommonConstants.SCORE_COLUMN).as("score"));
+		else {
+			aggregation = new TypedAggregation<SurveyDetails>(SurveyDetails.class, Aggregation.match(Criteria.where(columnName).is(columnValue)),
+					Aggregation.group(CommonConstants.AGENT_ID_COLUMN).avg(CommonConstants.SCORE_COLUMN).as("score"));
+		}
 
-    @Override
-    public void getCompletedSurveysCount( Date startDate, Date endDate, Map<Long, AgentRankingReport> agentReportData, String columnName, long columnValue )
-    {
-        TypedAggregation<SurveyDetails> aggregation;
-        if ( startDate == null && endDate == null ) {
-            aggregation = new TypedAggregation<SurveyDetails>( SurveyDetails.class,
-                Aggregation.match(Criteria.where(columnName).is(columnValue)),
-                Aggregation.group( CommonConstants.AGENT_ID_COLUMN ).count().as( "count" ) );
-        } else {
-            aggregation = new TypedAggregation<SurveyDetails>( SurveyDetails.class, 
-                Aggregation.match(Criteria.where(columnName).is(columnValue)),
-                Aggregation.group( CommonConstants.AGENT_ID_COLUMN ).count().as( "count" ) );
-        }
-        
-        AggregationResults<SurveyDetails> result = mongoTemplate.aggregate(aggregation, SURVEY_DETAILS_COLLECTION, SurveyDetails.class);
-        
-        if (result != null) {
-            @SuppressWarnings("unchecked") List<BasicDBObject> sentSurveys = (List<BasicDBObject>) result.getRawResults().get("result");
-            for (BasicDBObject o : sentSurveys) {
-                long agentId = Long.parseLong(o.get(CommonConstants.DEFAULT_MONGO_ID_COLUMN).toString());
-                AgentRankingReport agentRankingReport;
-                if(agentReportData.containsKey( agentId )){
-                    agentRankingReport = agentReportData.get( agentId );
-                }
-                else{
-                    agentRankingReport = new AgentRankingReport();
-                }
-                if(startDate == null && endDate == null){
-                    agentRankingReport.setAllTimeCompletedSurveys( ( Long.parseLong(o.get("count").toString()) ));
-                }
-                else{
-                    agentRankingReport.setCompletedSurveys( ( Long.parseLong(o.get("count").toString()) ));
-                }
-                agentReportData.put(agentId, agentRankingReport);
-            }
-        }
-    }
-    
+		AggregationResults<SurveyDetails> result = mongoTemplate.aggregate(aggregation, SURVEY_DETAILS_COLLECTION, SurveyDetails.class);
+
+		if (result != null) {
+			@SuppressWarnings("unchecked") List<BasicDBObject> averageSCore = (List<BasicDBObject>) result.getRawResults().get("result");
+			for (BasicDBObject o : averageSCore) {
+				AgentRankingReport agentRankingReport;
+				long agentId = Long.parseLong(o.get(CommonConstants.DEFAULT_MONGO_ID_COLUMN).toString());
+				if (agentReportData.containsKey(agentId)) {
+					agentRankingReport = agentReportData.get(agentId);
+				}
+				else {
+					agentRankingReport = new AgentRankingReport();
+				}
+
+				double score = Double.parseDouble(o.get("score").toString());
+				score = new BigDecimal(score).setScale(CommonConstants.DECIMALS_TO_ROUND_OFF, RoundingMode.HALF_UP).doubleValue();
+				agentRankingReport.setAverageScore(score);
+				
+				agentReportData.put(agentId, agentRankingReport);
+			}
+		}
+	}
+
+	@Override
+	public void getCompletedSurveysCount(Date startDate, Date endDate, Map<Long, AgentRankingReport> agentReportData, String columnName,
+			long columnValue) {
+		TypedAggregation<SurveyDetails> aggregation;
+		if (startDate != null && endDate != null) {
+			aggregation = new TypedAggregation<SurveyDetails>(SurveyDetails.class, Aggregation.match(Criteria.where(columnName).is(columnValue)),
+					Aggregation.match(Criteria.where(CommonConstants.CREATED_ON).gte(startDate)), Aggregation.match(Criteria.where(
+							CommonConstants.CREATED_ON).lte(endDate)), Aggregation.group(CommonConstants.AGENT_ID_COLUMN).count().as("count"));
+		}
+		else if (startDate != null && endDate == null)
+			aggregation = new TypedAggregation<SurveyDetails>(SurveyDetails.class, Aggregation.match(Criteria.where(columnName).is(columnValue)),
+					Aggregation.match(Criteria.where(CommonConstants.CREATED_ON).gte(startDate)), Aggregation.group(CommonConstants.AGENT_ID_COLUMN)
+							.count().as("count"));
+		else if (startDate == null && endDate != null)
+			aggregation = new TypedAggregation<SurveyDetails>(SurveyDetails.class, Aggregation.match(Criteria.where(columnName).is(columnValue)),
+					Aggregation.match(Criteria.where(CommonConstants.CREATED_ON).lte(endDate)), Aggregation.group(CommonConstants.AGENT_ID_COLUMN)
+							.count().as("count"));
+		else {
+			aggregation = new TypedAggregation<SurveyDetails>(SurveyDetails.class, Aggregation.match(Criteria.where(columnName).is(columnValue)),
+					Aggregation.group(CommonConstants.AGENT_ID_COLUMN).count().as("count"));
+		}
+
+		AggregationResults<SurveyDetails> result = mongoTemplate.aggregate(aggregation, SURVEY_DETAILS_COLLECTION, SurveyDetails.class);
+
+		if (result != null) {
+			@SuppressWarnings("unchecked") List<BasicDBObject> sentSurveys = (List<BasicDBObject>) result.getRawResults().get("result");
+			for (BasicDBObject o : sentSurveys) {
+				long agentId = Long.parseLong(o.get(CommonConstants.DEFAULT_MONGO_ID_COLUMN).toString());
+				AgentRankingReport agentRankingReport;
+				if (agentReportData.containsKey(agentId)) {
+					agentRankingReport = agentReportData.get(agentId);
+				}
+				else {
+					agentRankingReport = new AgentRankingReport();
+				}
+
+				agentRankingReport.setCompletedSurveys((Long.parseLong(o.get("count").toString())));
+				agentReportData.put(agentId, agentRankingReport);
+			}
+		}
+	}
 	// JIRA SS-137 and 158 : EOC
 }

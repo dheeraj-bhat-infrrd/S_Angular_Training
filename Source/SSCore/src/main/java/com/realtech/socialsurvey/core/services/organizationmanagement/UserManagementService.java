@@ -366,5 +366,7 @@ public interface UserManagementService
     public User addCorporateAdmin( String firstName, String lastName, String emailId, String confirmPassword,
         boolean isDirectRegistration ) throws InvalidInputException, UserAlreadyExistsException, UndeliveredEmailException,
         SolrException;
+    
+    public String generateIndividualProfileName( long userId, String name, String emailId ) throws InvalidInputException;
 }
 // JIRA SS-34 BY RM02 BOC

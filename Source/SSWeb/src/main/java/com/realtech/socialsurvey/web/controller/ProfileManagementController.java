@@ -11,12 +11,10 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
 import javax.imageio.ImageIO;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import javax.ws.rs.QueryParam;
-
 import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrDocumentList;
 import org.slf4j.Logger;
@@ -24,15 +22,14 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
-
 import sun.misc.BASE64Decoder;
-
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.type.TypeFactory;
 import com.google.gson.Gson;
@@ -144,7 +141,7 @@ public class ProfileManagementController
     @Autowired
     private BotRequestUtils botRequestUtils;
 
-
+	@Transactional
     @SuppressWarnings ( "unchecked")
     @RequestMapping ( value = "/showprofilepage", method = RequestMethod.GET)
     public String showProfileEditPage( Model model, HttpServletRequest request )
@@ -157,7 +154,16 @@ public class ProfileManagementController
         AccountType accountType = (AccountType) session.getAttribute( CommonConstants.ACCOUNT_TYPE_IN_SESSION );
         UserSettings userSettings = (UserSettings) session.getAttribute( CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION );
 
-        // fetching selected profile if not in session
+		try {
+			sessionHelper.updateProcessedUserProfiles(session, user);
+			userManagementService.getCanonicalUserSettings(user, accountType);
+		}
+		catch (NonFatalException e) {
+			LOG.error("Exception while updating profiles. Reason :" + e.getMessage(), e);
+			model.addAttribute("message", messageUtils.getDisplayMessage(e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE));
+		}
+        
+		// fetching selected profile if not in session
         UserProfile selectedProfile = null;
         String profileIdStr = request.getParameter( "profileId" );
         if ( profileIdStr == null ) {
@@ -3297,6 +3303,30 @@ public class ProfileManagementController
         }
     }
 
+    
+    @RequestMapping(value = "/findcompany")
+    public String findCompanies( Model model, HttpServletRequest request ) {
+    	
+    	LOG.info("Method findCompanies() called");
+    	
+    	String verticalName = request.getParameter("verticalName");
+    	try {
+    		if(verticalName == null || verticalName.isEmpty()) {
+    			throw new InvalidInputException("Null/Empty vertical name");
+    		}
+    		
+    		List<OrganizationUnitSettings> companyList = profileManagementService.getCompanyList(verticalName);
+    		if(companyList != null && companyList.size() > 0) {
+    			model.addAttribute("companyList", companyList);
+        		model.addAttribute("numFound", companyList.size());    			
+    		}
+    		model.addAttribute("verticalName", verticalName);
+    		
+    	} catch (NonFatalException e) {
+    		LOG.error("NonFatalException caught in findCompanies() method, reason : " + e.getMessage());
+    	}
+    	return JspResolver.COMPANY_LIST;
+    }
 
     /**
      * Method to return company profile page

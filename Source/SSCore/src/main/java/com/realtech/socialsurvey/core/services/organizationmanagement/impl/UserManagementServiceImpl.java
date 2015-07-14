@@ -194,6 +194,7 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
         urlParams.put( CommonConstants.LAST_NAME, lastName );
         urlParams.put( CommonConstants.EMAIL_ID, emailId );
         urlParams.put( CommonConstants.CURRENT_TIMESTAMP, String.valueOf( System.currentTimeMillis() ) );
+        urlParams.put( CommonConstants.UNIQUE_IDENTIFIER, generateUniqueIdentifier() );
         LOG.debug( "Generating URL" );
         String url = urlGenerator.generateUrl( urlParams, applicationBaseUrl
             + CommonConstants.REQUEST_MAPPING_SHOW_REGISTRATION );
@@ -201,6 +202,19 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
         inviteUser( url, emailId, firstName, lastName, isReinvitation );
 
         LOG.info( "Successfully sent invitation to :" + emailId + " for registration" );
+    }
+
+
+    private synchronized String generateUniqueIdentifier()
+    {
+        String systemTimeStamp = String.valueOf( System.currentTimeMillis() );
+        try {
+            systemTimeStamp = encryptionHelper.encryptAES( systemTimeStamp, "" );
+        } catch ( InvalidInputException e ) {
+            LOG.error( "Exception Caught " + e.getMessage() );
+        }
+        return systemTimeStamp;
+
     }
 
 
@@ -753,7 +767,7 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
             user.setAboutMe( agentSettings.getContact_details().getAbout_me() );
             user.setReviewCount( agentSettings.getReviewCount() );
             user.setReviewScore( surveyDetailsDao.getRatingForPastNdays( CommonConstants.AGENT_ID, agentSettings.getIden(),
-                CommonConstants.NO_LIMIT, true ) );
+                CommonConstants.NO_LIMIT, true, false ) );
             users.add( user );
         }
         LOG.info( "Method to find multiple users on the basis of list of user id finished for user ids " + userIds );
@@ -1961,7 +1975,7 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
      * @return
      * @throws InvalidInputException
      */
-    private String generateIndividualProfileName( long userId, String name, String emailId ) throws InvalidInputException
+    public String generateIndividualProfileName( long userId, String name, String emailId ) throws InvalidInputException
     {
         LOG.info( "Method generateIndividualProfileName called for userId:" + userId + " and emailId:" + emailId );
         if ( emailId == null || emailId.isEmpty() ) {
@@ -2259,11 +2273,13 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
         solrSearchService.editUserInSolrWithMultipleValues( user.getUserId(), map );
         LOG.info( "Method updateUser() finished to update user." );
     }
-	
+
+
     // Moved user addition from Controller.
     @Override
     @Transactional ( rollbackFor = { NonFatalException.class, FatalException.class })
-    public User inviteUser(User admin, String firstName, String lastName, String emailId) throws InvalidInputException, UserAlreadyExistsException, UndeliveredEmailException, SolrException
+    public User inviteUser( User admin, String firstName, String lastName, String emailId ) throws InvalidInputException,
+        UserAlreadyExistsException, UndeliveredEmailException, SolrException
     {
         User user = inviteNewUser( admin, firstName, lastName, emailId );
         LOG.debug( "Adding user {} to solr server.", user.getFirstName() );
@@ -2273,24 +2289,27 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
         LOG.debug( "Added newly added user {} to mongo", user.getFirstName() );
 
         LOG.debug( "Adding newly added user {} to solr", user.getFirstName() );
-        try{
+        try {
             solrSearchService.addUserToSolr( user );
-        }catch(SolrException e){
+        } catch ( SolrException e ) {
             LOG.error( "SolrException caught in inviteUser(). Nested exception is ", e );
-            organizationManagementService.removeOrganizationUnitSettings( user.getUserId(), MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION );
+            organizationManagementService.removeOrganizationUnitSettings( user.getUserId(),
+                MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION );
             throw e;
         }
         LOG.debug( "Added newly added user {} to solr", user.getFirstName() );
-        
+
         return user;
     }
-    
+
+
     @Override
     @Transactional ( rollbackFor = { NonFatalException.class, FatalException.class })
     public User addCorporateAdmin( String firstName, String lastName, String emailId, String confirmPassword,
         boolean isDirectRegistration ) throws InvalidInputException, UserAlreadyExistsException, UndeliveredEmailException,
-        SolrException{
-    
+        SolrException
+    {
+
         User user = addCorporateAdminAndUpdateStage( firstName, lastName, emailId, confirmPassword, isDirectRegistration );
         LOG.debug( "Succesfully completed registration of user with emailId : " + emailId );
 
@@ -2299,15 +2318,16 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
         LOG.debug( "Added newly added user {} to mongo", user.getFirstName() );
 
         LOG.debug( "Adding newly added user {} to solr", user.getFirstName() );
-        try{
+        try {
             solrSearchService.addUserToSolr( user );
-        }catch(SolrException e){
+        } catch ( SolrException e ) {
             LOG.error( "SolrException caught in addCorporateAdmin(). Nested exception is ", e );
-            organizationManagementService.removeOrganizationUnitSettings( user.getUserId(), MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION );
+            organizationManagementService.removeOrganizationUnitSettings( user.getUserId(),
+                MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION );
             throw e;
         }
         LOG.debug( "Added newly added user {} to solr", user.getFirstName() );
-        
+
         return user;
     }
 }
