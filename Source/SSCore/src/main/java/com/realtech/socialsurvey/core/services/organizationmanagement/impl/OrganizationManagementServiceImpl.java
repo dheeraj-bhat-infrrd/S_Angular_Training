@@ -3930,5 +3930,11 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 	public List<Company> getCompaniesByName(String namePattern){
 		return companyDao.searchCompaniesByName(namePattern);
 	}
+	
+	@Override
+	@Transactional
+	public Company getCompanyById(long companyId) {
+		return companyDao.findById(Company.class, companyId);
+	}
 }
 // JIRA: SS-27: By RM05: EOC

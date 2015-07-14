@@ -726,4 +726,6 @@ public interface OrganizationManagementService {
 	public String resetDefaultSurveyText(SurveySettings surveySettings, String mood);
 
 	public List<Company> getCompaniesByName(String searchKey);
+
+	public Company getCompanyById(long companyId);
 }
