@@ -2,15 +2,15 @@ package com.realtech.socialsurvey.web.rest;
 
 import java.io.IOException;
 import java.io.OutputStream;
-import java.util.Collection;
+import java.util.ArrayList;
 import java.util.List;
-
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
-
+import org.apache.solr.common.SolrDocument;
+import org.apache.solr.common.SolrDocumentList;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,7 +20,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
-
 import com.google.gson.Gson;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.entities.AgentSettings;
@@ -28,12 +27,13 @@ import com.realtech.socialsurvey.core.entities.Branch;
 import com.realtech.socialsurvey.core.entities.Company;
 import com.realtech.socialsurvey.core.entities.ContactDetailsSettings;
 import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
+import com.realtech.socialsurvey.core.entities.ProListUser;
 import com.realtech.socialsurvey.core.entities.ProfilesMaster;
 import com.realtech.socialsurvey.core.entities.Region;
 import com.realtech.socialsurvey.core.entities.SocialMediaTokens;
 import com.realtech.socialsurvey.core.entities.SocialPost;
 import com.realtech.socialsurvey.core.entities.SurveyDetails;
-import com.realtech.socialsurvey.core.entities.UserFromSearch;
+import com.realtech.socialsurvey.core.entities.UserListFromSearch;
 import com.realtech.socialsurvey.core.entities.UserProfile;
 import com.realtech.socialsurvey.core.exception.BaseRestException;
 import com.realtech.socialsurvey.core.exception.CompanyProfilePreconditionFailureErrorCode;
@@ -48,9 +48,11 @@ import com.realtech.socialsurvey.core.services.mail.EmailServices;
 import com.realtech.socialsurvey.core.services.organizationmanagement.OrganizationManagementService;
 import com.realtech.socialsurvey.core.services.organizationmanagement.ProfileManagementService;
 import com.realtech.socialsurvey.core.services.organizationmanagement.ProfileNotFoundException;
+import com.realtech.socialsurvey.core.services.organizationmanagement.UserManagementService;
 import com.realtech.socialsurvey.core.services.search.SolrSearchService;
 import com.realtech.socialsurvey.core.services.search.exception.SolrException;
-
+import com.realtech.socialsurvey.web.common.ErrorCodes;
+import com.realtech.socialsurvey.web.common.ErrorResponse;
 import ezvcard.Ezvcard;
 import ezvcard.VCard;
 import ezvcard.VCardVersion;
@@ -61,6 +63,7 @@ import ezvcard.property.Kind;
 /**
  * JIRA:SS-117 by RM02 Class with rest services for fetching various profiles
  */
+
 @Controller
 @RequestMapping(value = "/profile")
 public class ProfileController {
@@ -72,16 +75,17 @@ public class ProfileController {
 
 	@Autowired
 	private ProfileManagementService profileManagementService;
-	
+	@Autowired
+	private UserManagementService userManagementService;
 	@Autowired
 	private SolrSearchService solrSearchService;
 
 	@Autowired
 	private EmailServices emailServices;
-	
+
 	@Value("${APPLICATION_ADMIN_EMAIL}")
 	private String applicationAdminEmail;
-	
+
 	@Value("${APPLICATION_ADMIN_NAME}")
 	private String applicationAdminName;
 
@@ -103,14 +107,12 @@ public class ProfileController {
 						"Company profile name is not specified for getting company profile");
 			}
 			OrganizationUnitSettings companyProfile = null;
-			
-				companyProfile = profileManagementService.getCompanyProfileByProfileName(profileName);
-				String json = new Gson().toJson(companyProfile);
-				LOG.debug("companyProfile json : " + json);
-				response = Response.ok(json).build();
-		
-			
-		
+
+			companyProfile = profileManagementService.getCompanyProfileByProfileName(profileName);
+			String json = new Gson().toJson(companyProfile);
+			LOG.debug("companyProfile json : " + json);
+			response = Response.ok(json).build();
+
 		}
 		catch (BaseRestException e) {
 			response = getErrorResponse(e);
@@ -143,11 +145,11 @@ public class ProfileController {
 			OrganizationUnitSettings regionProfile = null;
 			try {
 				regionProfile = profileManagementService.getRegionByProfileName(companyProfileName, regionProfileName);
-				
+
 				// aggregated social profile urls
 				SocialMediaTokens agentTokens = profileManagementService.aggregateSocialProfiles(regionProfile, CommonConstants.REGION_ID);
 				regionProfile.setSocialMediaTokens(agentTokens);
-				
+
 				String json = new Gson().toJson(regionProfile);
 				LOG.debug("regionProfile json : " + json);
 				response = Response.ok(json).build();
@@ -188,11 +190,11 @@ public class ProfileController {
 			OrganizationUnitSettings branchProfile = null;
 			try {
 				branchProfile = profileManagementService.getBranchByProfileName(companyProfileName, branchProfileName);
-				
+
 				// aggregated social profile urls
 				SocialMediaTokens agentTokens = profileManagementService.aggregateSocialProfiles(branchProfile, CommonConstants.BRANCH_ID);
 				branchProfile.setSocialMediaTokens(agentTokens);
-				
+
 				String json = new Gson().toJson(branchProfile);
 				LOG.debug("branchProfile json : " + json);
 				response = Response.ok(json).build();
@@ -230,11 +232,11 @@ public class ProfileController {
 			OrganizationUnitSettings individualProfile = null;
 			try {
 				individualProfile = profileManagementService.getIndividualByProfileName(individualProfileName);
-				
+
 				// aggregated social profile urls
 				SocialMediaTokens agentTokens = profileManagementService.aggregateSocialProfiles(individualProfile, CommonConstants.AGENT_ID);
 				individualProfile.setSocialMediaTokens(agentTokens);
-				
+
 				String json = new Gson().toJson(individualProfile);
 				LOG.debug("individualProfile json : " + json);
 				response = Response.ok(json).build();
@@ -261,7 +263,7 @@ public class ProfileController {
 	 */
 	@ResponseBody
 	@RequestMapping(value = "/{companyProfileName}/regions")
-	public Response getRegionsForCompany(@PathVariable String companyProfileName) throws InvalidInputException,ProfileNotFoundException {
+	public Response getRegionsForCompany(@PathVariable String companyProfileName) throws InvalidInputException, ProfileNotFoundException {
 		LOG.info("Service to get regions for company called for companyProfileName:" + companyProfileName);
 		Response response = null;
 		try {
@@ -378,7 +380,8 @@ public class ProfileController {
 	 */
 	@ResponseBody
 	@RequestMapping(value = "/{companyProfileName}/region/{regionProfileName}/branches")
-	public Response getBranchesForRegion(@PathVariable String companyProfileName, @PathVariable String regionProfileName) throws ProfileNotFoundException {
+	public Response getBranchesForRegion(@PathVariable String companyProfileName, @PathVariable String regionProfileName)
+			throws ProfileNotFoundException {
 		LOG.info("Service to fetch all the branches inside a region of company called");
 		Response response = null;
 		try {
@@ -421,7 +424,7 @@ public class ProfileController {
 	 */
 	@ResponseBody
 	@RequestMapping(value = "/region/{regionId}/branches")
-	public Response getBranchesByRegionId(@PathVariable long regionId) throws ProfileNotFoundException{
+	public Response getBranchesByRegionId(@PathVariable long regionId) throws ProfileNotFoundException {
 		LOG.info("Service to fetch branches for a region called for regionId :" + regionId);
 		Response response = null;
 		try {
@@ -525,7 +528,8 @@ public class ProfileController {
 	 */
 	@ResponseBody
 	@RequestMapping(value = "/{companyProfileName}/region/{regionProfileName}/individuals")
-	public Response getIndividualsForRegion(@PathVariable String companyProfileName, @PathVariable String regionProfileName) throws ProfileNotFoundException {
+	public Response getIndividualsForRegion(@PathVariable String companyProfileName, @PathVariable String regionProfileName)
+			throws ProfileNotFoundException {
 		LOG.info("Service to get all individuals directly linked to the specified region called");
 		Response response = null;
 		try {
@@ -570,7 +574,8 @@ public class ProfileController {
 	 */
 	@ResponseBody
 	@RequestMapping(value = "/{companyProfileName}/branch/{branchProfileName}/individuals")
-	public Response getIndividualsForBranch(@PathVariable String companyProfileName, @PathVariable String branchProfileName) throws ProfileNotFoundException {
+	public Response getIndividualsForBranch(@PathVariable String companyProfileName, @PathVariable String branchProfileName)
+			throws ProfileNotFoundException {
 		LOG.info("Servie to get all individuals in a branch called");
 		Response response = null;
 		try {
@@ -638,7 +643,7 @@ public class ProfileController {
 			if (numRows == null) {
 				numRows = -1;
 			}
-			if(sortCriteria == null){
+			if (sortCriteria == null) {
 				sortCriteria = "date";
 			}
 			try {
@@ -697,7 +702,7 @@ public class ProfileController {
 			if (numRows == null) {
 				numRows = -1;
 			}
-			if(sortCriteria == null){
+			if (sortCriteria == null) {
 				sortCriteria = "date";
 			}
 			try {
@@ -999,7 +1004,7 @@ public class ProfileController {
 			if (numRows == null) {
 				numRows = -1;
 			}
-			if(sortCriteria == null){
+			if (sortCriteria == null) {
 				sortCriteria = "date";
 			}
 			try {
@@ -1138,7 +1143,7 @@ public class ProfileController {
 			if (numRows == null) {
 				numRows = -1;
 			}
-			if(sortCriteria == null || sortCriteria.equalsIgnoreCase(CommonConstants.REVIEWS_SORT_CRITERIA_DEFAULT)){
+			if (sortCriteria == null || sortCriteria.equalsIgnoreCase(CommonConstants.REVIEWS_SORT_CRITERIA_DEFAULT)) {
 				sortCriteria = CommonConstants.REVIEWS_SORT_CRITERIA_DATE;
 			}
 			try {
@@ -1169,6 +1174,7 @@ public class ProfileController {
 	@RequestMapping(value = "/individuals/{iden}")
 	public Response getProListByProfile(@PathVariable long iden, @QueryParam(value = "profileLevel") String profileLevel,
 			@QueryParam(value = "start") Integer start, @QueryParam(value = "numOfRows") Integer numRows) {
+		LOG.info("Method getProListByProfile called for iden:" + iden + " and profileLevel:" + profileLevel);
 		Response response = null;
 		try {
 			if (iden <= 0l) {
@@ -1188,11 +1194,36 @@ public class ProfileController {
 				numRows = -1;
 			}
 			try {
-				Collection<UserFromSearch> solrSearchResult = profileManagementService.getProListByProfileLevel(iden, profileLevel, start, numRows);
-				String json = new Gson().toJson(solrSearchResult);
-				LOG.debug("Pro list json : " + json);
-				response = Response.ok(json).build();
+				List<Long> userIds = new ArrayList<Long>();
+				String idenFieldName = "";
+				List<ProListUser> users = new ArrayList<ProListUser>();
+				UserListFromSearch userList = new UserListFromSearch();
 
+				switch (profileLevel) {
+					case CommonConstants.PROFILE_LEVEL_COMPANY:
+						idenFieldName = CommonConstants.COMPANY_ID_SOLR;
+						break;
+					case CommonConstants.PROFILE_LEVEL_REGION:
+						idenFieldName = CommonConstants.REGIONS_SOLR;
+						break;
+					case CommonConstants.PROFILE_LEVEL_BRANCH:
+						idenFieldName = CommonConstants.BRANCHES_SOLR;
+						break;
+					default:
+						throw new InvalidInputException("profile level is invalid in getProListByProfileLevel");
+				}
+
+				SolrDocumentList results = solrSearchService.getUserIdsByIden(iden, idenFieldName, true, start, numRows);
+
+				for (SolrDocument solrDocument : results) {
+					userIds.add((Long) solrDocument.getFieldValue("userId"));
+				}
+				users = userManagementService.getMultipleUsersByUserId(userIds);
+				userList.setUsers(users);
+				userList.setUserFound(results.getNumFound());
+				String json = new Gson().toJson(userList);
+				LOG.debug("userList json : " + json);
+				response = Response.ok(json).build();
 			}
 			catch (SolrException e) {
 				throw new InternalServerException(new ProfileServiceErrorCode(CommonConstants.ERROR_CODE_PRO_LIST_FETCH_FAILURE,
@@ -1204,83 +1235,88 @@ public class ProfileController {
 			}
 		}
 		catch (BaseRestException e) {
-			response = getErrorResponse(e);
+			LOG.error("BaseRestException while searching in getProListByProfile(). Reason : " + e.getMessage(), e);
+			ErrorResponse errorResponse = new ErrorResponse();
+			errorResponse.setErrCode(ErrorCodes.REQUEST_FAILED);
+			errorResponse.setErrMessage(e.getMessage());
+			String json = new Gson().toJson(errorResponse);
+			response = Response.ok(json).build();
 		}
 
-		LOG.info("Method getProListByProfile called for iden:" + iden + " and profileLevel:" + profileLevel);
 		return response;
 
 	}
-	
+
 	/**
 	 * Downloads the vcard
+	 * 
 	 * @param id
 	 * @return
 	 */
 	@RequestMapping(value = "/downloadvcard/{id}", method = RequestMethod.GET)
 	@ResponseBody
-	public Response downloadVCard(@PathVariable String id, HttpServletResponse response) throws ProfileNotFoundException{
-		LOG.info("Downloading vcard for profile id: "+id);
-		try{
-			if(id == null || id.isEmpty()){
+	public Response downloadVCard(@PathVariable String id, HttpServletResponse response) throws ProfileNotFoundException {
+		LOG.info("Downloading vcard for profile id: " + id);
+		try {
+			if (id == null || id.isEmpty()) {
 				LOG.error("Profile id missing to download vcard");
 				throw new InputValidationException(new ProfileServiceErrorCode(CommonConstants.ERROR_CODE_GENERAL,
-						CommonConstants.SERVICE_CODE_GENERAL, "Profile id missing to download vcard"),
-						"Expected profile id, but is null or empty");
+						CommonConstants.SERVICE_CODE_GENERAL, "Profile id missing to download vcard"), "Expected profile id, but is null or empty");
 			}
 			OrganizationUnitSettings individualProfile = null;
-			try{
+			try {
 				individualProfile = profileManagementService.getIndividualByProfileName(id);
-				if(individualProfile != null){
+				if (individualProfile != null) {
 					LOG.debug("Creating Vcard for the profile");
 					VCard vCard = new VCard();
 					vCard.setKind(Kind.individual());
 					// Set the name
-					if(individualProfile.getProfileName() != null){
+					if (individualProfile.getProfileName() != null) {
 						LOG.debug("Setting profile name as formatted name in the vcard");
 						vCard.setFormattedName(individualProfile.getProfileName());
 					}
 					// set the contact number
-					if(individualProfile.getContact_details() != null){
+					if (individualProfile.getContact_details() != null) {
 						ContactDetailsSettings contactDetails = individualProfile.getContact_details();
 						// set the contact number
-						if(contactDetails.getContact_numbers() != null){
-							if(contactDetails.getContact_numbers().getWork() != null){
+						if (contactDetails.getContact_numbers() != null) {
+							if (contactDetails.getContact_numbers().getWork() != null) {
 								LOG.debug("Setting work contact number");
 								vCard.addTelephoneNumber(contactDetails.getContact_numbers().getWork(), TelephoneType.WORK);
 							}
-							if(contactDetails.getContact_numbers().getPersonal() != null){
+							if (contactDetails.getContact_numbers().getPersonal() != null) {
 								LOG.debug("Setting cell contact number");
 								vCard.addTelephoneNumber(contactDetails.getContact_numbers().getPersonal(), TelephoneType.CELL);
 							}
-							if(contactDetails.getContact_numbers().getFax() != null){
+							if (contactDetails.getContact_numbers().getFax() != null) {
 								LOG.debug("Setting fax number");
 								vCard.addTelephoneNumber(contactDetails.getContact_numbers().getFax(), TelephoneType.FAX);
 							}
 						}
 						// setting email addresses
-						if(contactDetails.getMail_ids() != null){
-							if(contactDetails.getMail_ids().getWork() != null && contactDetails.getMail_ids().getIsWorkEmailVerified()){
+						if (contactDetails.getMail_ids() != null) {
+							if (contactDetails.getMail_ids().getWork() != null && contactDetails.getMail_ids().getIsWorkEmailVerified()) {
 								LOG.debug("Adding work email address");
 								vCard.addEmail(contactDetails.getMail_ids().getWork(), EmailType.WORK);
 							}
-							if(contactDetails.getMail_ids().getPersonal() != null && contactDetails.getMail_ids().getIsPersonalEmailVerified()){
+							if (contactDetails.getMail_ids().getPersonal() != null && contactDetails.getMail_ids().getIsPersonalEmailVerified()) {
 								LOG.debug("Adding personla email address");
 								vCard.addEmail(contactDetails.getMail_ids().getPersonal(), EmailType.HOME);
 							}
 						}
 						// setting the title
-						if(contactDetails.getTitle() != null){
-							LOG.debug("Setting title: "+contactDetails.getTitle());
+						if (contactDetails.getTitle() != null) {
+							LOG.debug("Setting title: " + contactDetails.getTitle());
 							vCard.addTitle(contactDetails.getTitle());
 						}
-						
+
 						// validate to version 4
 						LOG.warn(vCard.validate(VCardVersion.V4_0).toString());
-						
+
 						// send it to the response
 						response.setContentType("text/vcf");
-						response.setHeader("Content-Disposition", String.format("attachment; filename=\"%s\"", individualProfile.getProfileName()+".vcf"));
+						response.setHeader("Content-Disposition",
+								String.format("attachment; filename=\"%s\"", individualProfile.getProfileName() + ".vcf"));
 						OutputStream responseStream = null;
 						try {
 							responseStream = response.getOutputStream();
@@ -1288,7 +1324,8 @@ public class ProfileController {
 						}
 						catch (IOException e) {
 							e.printStackTrace();
-						}finally{
+						}
+						finally {
 							try {
 								responseStream.close();
 							}
@@ -1297,18 +1334,20 @@ public class ProfileController {
 							}
 						}
 					}
-					
+
 				}
-			}catch (InvalidInputException  e) {
+			}
+			catch (InvalidInputException e) {
 				throw new InternalServerException(new ProfileServiceErrorCode(CommonConstants.ERROR_CODE_GENERAL,
 						CommonConstants.SERVICE_CODE_GENERAL, "Profile name for individual is invalid"), e.getMessage());
 			}
-		}catch(BaseRestException e){
+		}
+		catch (BaseRestException e) {
 			return getErrorResponse(e);
 		}
 		return null;
 	}
-	
+
 	/**
 	 * Service to get the posts of an individual
 	 * 
@@ -1320,8 +1359,8 @@ public class ProfileController {
 	@ResponseBody
 	@RequestMapping(value = "/{individualProfileName}/posts")
 	public Response getPostsForIndividual(@PathVariable String individualProfileName, @QueryParam(value = "start") Integer start,
-			@QueryParam(value = "numRows") Integer numRows) throws ProfileNotFoundException{
-		//TODO
+			@QueryParam(value = "numRows") Integer numRows) throws ProfileNotFoundException {
+		// TODO
 		LOG.info("Service to get posts of an individual called for individualProfileName : " + individualProfileName);
 		Response response = null;
 		try {
@@ -1339,15 +1378,15 @@ public class ProfileController {
 			OrganizationUnitSettings individualProfile = null;
 			try {
 				individualProfile = profileManagementService.getIndividualByProfileName(individualProfileName);
-				
+
 				UserProfile selectedProfile = new UserProfile();
-				
+
 				ProfilesMaster profilesMaster = new ProfilesMaster();
 				profilesMaster.setProfileId(CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID);
-				
+
 				selectedProfile.setProfilesMaster(profilesMaster);
 				selectedProfile.setAgentId(individualProfile.getIden());
-				
+
 				List<SocialPost> posts = profileManagementService.getSocialPosts(selectedProfile, start, numRows);
 				String json = new Gson().toJson(posts);
 				LOG.debug("individual posts json : " + json);
@@ -1364,7 +1403,7 @@ public class ProfileController {
 		LOG.info("Service to get posts of individual finished");
 		return response;
 	}
-	
+
 	/**
 	 * Service to get the posts of company
 	 * 
@@ -1376,15 +1415,14 @@ public class ProfileController {
 	@ResponseBody
 	@RequestMapping(value = "/company/{companyProfileName}/posts")
 	public Response getPostsForCompany(@PathVariable String companyProfileName, @QueryParam(value = "start") Integer start,
-			@QueryParam(value = "numRows") Integer numRows)throws ProfileNotFoundException {
-		//TODO
+			@QueryParam(value = "numRows") Integer numRows) throws ProfileNotFoundException {
+		// TODO
 		LOG.info("Service to get posts of a company called for companyProfileName : " + companyProfileName);
 		Response response = null;
 		try {
 			if (companyProfileName == null || companyProfileName.isEmpty()) {
-				throw new InputValidationException(new ProfileServiceErrorCode(
-						CommonConstants.ERROR_CODE_COMPANY_POSTS_FETCH_PRECONDITION_FAILURE, CommonConstants.SERVICE_CODE_COMPANY_POSTS,
-						"Profile name for company is invalid"), "company profile name is null or empty");
+				throw new InputValidationException(new ProfileServiceErrorCode(CommonConstants.ERROR_CODE_COMPANY_POSTS_FETCH_PRECONDITION_FAILURE,
+						CommonConstants.SERVICE_CODE_COMPANY_POSTS, "Profile name for company is invalid"), "company profile name is null or empty");
 			}
 			if (start == null) {
 				start = -1;
@@ -1397,16 +1435,16 @@ public class ProfileController {
 			try {
 				companyProfile = profileManagementService.getCompanyProfileByProfileName(companyProfileName);
 				UserProfile selectedProfile = new UserProfile();
-				
+
 				ProfilesMaster profilesMaster = new ProfilesMaster();
 				profilesMaster.setProfileId(CommonConstants.PROFILES_MASTER_COMPANY_ADMIN_PROFILE_ID);
-				
+
 				Company company = new Company();
 				company.setCompanyId(companyProfile.getIden());
-				
+
 				selectedProfile.setProfilesMaster(profilesMaster);
 				selectedProfile.setCompany(company);
-				
+
 				List<SocialPost> posts = profileManagementService.getSocialPosts(selectedProfile, start, numRows);
 				String json = new Gson().toJson(posts);
 				LOG.debug("individual posts json : " + json);
@@ -1423,7 +1461,7 @@ public class ProfileController {
 		LOG.info("Service to get posts of company finished");
 		return response;
 	}
-	
+
 	/**
 	 * Service to get the posts of region
 	 * 
@@ -1434,16 +1472,15 @@ public class ProfileController {
 	 */
 	@ResponseBody
 	@RequestMapping(value = "/region/{companyProfileName}/{regionProfileName}/posts")
-	public Response getPostsForRegion(@PathVariable String regionProfileName,@PathVariable String companyProfileName, @QueryParam(value = "start") Integer start,
-			@QueryParam(value = "numRows") Integer numRows)throws ProfileNotFoundException{
-		//TODO
+	public Response getPostsForRegion(@PathVariable String regionProfileName, @PathVariable String companyProfileName,
+			@QueryParam(value = "start") Integer start, @QueryParam(value = "numRows") Integer numRows) throws ProfileNotFoundException {
+		// TODO
 		LOG.info("Service to get posts of a region called for regionProfileName : " + regionProfileName);
 		Response response = null;
 		try {
 			if (regionProfileName == null || regionProfileName.isEmpty()) {
-				throw new InputValidationException(new ProfileServiceErrorCode(
-						CommonConstants.ERROR_CODE_REGION_POSTS_FETCH_PRECONDITION_FAILURE, CommonConstants.SERVICE_CODE_REGION_POSTS,
-						"Profile name for region is invalid"), "region profile name is null or empty");
+				throw new InputValidationException(new ProfileServiceErrorCode(CommonConstants.ERROR_CODE_REGION_POSTS_FETCH_PRECONDITION_FAILURE,
+						CommonConstants.SERVICE_CODE_REGION_POSTS, "Profile name for region is invalid"), "region profile name is null or empty");
 			}
 			if (start == null) {
 				start = -1;
@@ -1456,13 +1493,13 @@ public class ProfileController {
 			try {
 				regionProfile = profileManagementService.getRegionByProfileName(companyProfileName, regionProfileName);
 				UserProfile selectedProfile = new UserProfile();
-				
+
 				ProfilesMaster profilesMaster = new ProfilesMaster();
 				profilesMaster.setProfileId(CommonConstants.PROFILES_MASTER_REGION_ADMIN_PROFILE_ID);
-				
+
 				selectedProfile.setProfilesMaster(profilesMaster);
 				selectedProfile.setRegionId(regionProfile.getIden());
-				
+
 				List<SocialPost> posts = profileManagementService.getSocialPosts(selectedProfile, start, numRows);
 				String json = new Gson().toJson(posts);
 				LOG.debug("individual posts json : " + json);
@@ -1479,7 +1516,7 @@ public class ProfileController {
 		LOG.info("Service to get posts of region finished");
 		return response;
 	}
-	
+
 	/**
 	 * Service to get the posts of branch
 	 * 
@@ -1490,16 +1527,15 @@ public class ProfileController {
 	 */
 	@ResponseBody
 	@RequestMapping(value = "/branch/{companyProfileName}/{branchProfileName}/posts")
-	public Response getPostsForBranch(@PathVariable String branchProfileName, @PathVariable String companyProfileName, @QueryParam(value = "start") Integer start,
-			@QueryParam(value = "numRows") Integer numRows)throws ProfileNotFoundException {
-		//TODO
+	public Response getPostsForBranch(@PathVariable String branchProfileName, @PathVariable String companyProfileName,
+			@QueryParam(value = "start") Integer start, @QueryParam(value = "numRows") Integer numRows) throws ProfileNotFoundException {
+		// TODO
 		LOG.info("Service to get posts of a branch called for branchProfileName : " + branchProfileName);
 		Response response = null;
 		try {
 			if (branchProfileName == null || branchProfileName.isEmpty()) {
-				throw new InputValidationException(new ProfileServiceErrorCode(
-						CommonConstants.ERROR_CODE_BRANCH_POSTS_FETCH_PRECONDITION_FAILURE, CommonConstants.SERVICE_CODE_BRANCH_POSTS,
-						"Profile name for branch is invalid"), "branch profile name is null or empty");
+				throw new InputValidationException(new ProfileServiceErrorCode(CommonConstants.ERROR_CODE_BRANCH_POSTS_FETCH_PRECONDITION_FAILURE,
+						CommonConstants.SERVICE_CODE_BRANCH_POSTS, "Profile name for branch is invalid"), "branch profile name is null or empty");
 			}
 			if (start == null) {
 				start = -1;
@@ -1512,13 +1548,13 @@ public class ProfileController {
 			try {
 				branchProfile = profileManagementService.getBranchByProfileName(companyProfileName, branchProfileName);
 				UserProfile selectedProfile = new UserProfile();
-				
+
 				ProfilesMaster profilesMaster = new ProfilesMaster();
 				profilesMaster.setProfileId(CommonConstants.PROFILES_MASTER_BRANCH_ADMIN_PROFILE_ID);
-				
+
 				selectedProfile.setProfilesMaster(profilesMaster);
 				selectedProfile.setBranchId(branchProfile.getIden());
-				
+
 				List<SocialPost> posts = profileManagementService.getSocialPosts(selectedProfile, start, numRows);
 				String json = new Gson().toJson(posts);
 				LOG.debug("individual posts json : " + json);
@@ -1535,7 +1571,7 @@ public class ProfileController {
 		LOG.info("Service to get posts of branch finished");
 		return response;
 	}
-	
+
 	@ResponseBody
 	@RequestMapping(value = "/surveyreportabuse")
 	public void reportAbuse(HttpServletRequest request) {
@@ -1550,8 +1586,8 @@ public class ProfileController {
 				throw new InvalidInputException("Invalid value (Null/Empty) found for agentId.");
 			}
 			long agentId = 0;
-			try{
-				 agentId = Long.parseLong(agentIdStr);
+			try {
+				agentId = Long.parseLong(agentIdStr);
 			}
 			catch (NumberFormatException e) {
 				LOG.error("NumberFormatException caught in reportAbuse() while converting agentId.");
@@ -1559,16 +1595,17 @@ public class ProfileController {
 			}
 			String customerName = firstName + lastName;
 			String agentName = "";
-			try{
+			try {
 				agentName = solrSearchService.getUserDisplayNameById(agentId);
 			}
-			catch(SolrException e){
+			catch (SolrException e) {
 				LOG.info("Solr Exception occured while fetching agent name. Nested exception is ", e);
 				throw e;
 			}
-			
+
 			// Calling email services method to send mail to the Application level admin.
-			emailServices.sendReportAbuseMail(applicationAdminEmail, applicationAdminName, agentName, customerName.replaceAll("null", ""), customerEmail, review, reason);
+			emailServices.sendReportAbuseMail(applicationAdminEmail, applicationAdminName, agentName, customerName.replaceAll("null", ""),
+					customerEmail, review, reason);
 		}
 		catch (NonFatalException e) {
 			LOG.error("NonfatalException caught in makeSurveyEditable(). Nested exception is ", e);
