@@ -8,7 +8,7 @@ namespace EncompassSocialSurvey.Service
 {
     public class LoanService
     {
-        public bool InsertLoans(List<LoanViewModel> loansVM)
+        public bool InsertLoans(List<LoanViewModel> loansVM, string emailDomain, string emailPrefix)
         {
             Logger.Info("Entering the method LoanService.InsertLoans(List<>):");
             bool returnValue = false;
@@ -24,7 +24,7 @@ namespace EncompassSocialSurvey.Service
 
                 // 3rd now insert the records into db
                 LoanRepository loanRepo = new LoanRepository();
-                returnValue = loanRepo.InserLoan(loansEntity);
+                returnValue = loanRepo.InserLoan(loansEntity, emailDomain, emailPrefix);
             }
             catch (Exception ex)
             {

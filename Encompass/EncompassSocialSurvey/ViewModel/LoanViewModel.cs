@@ -15,6 +15,7 @@ namespace EncompassSocialSurvey.ViewModel
         public string CustomerEmailId { get; set; }
         public string CustomerInteractionDetails { get; set; }
         public string EngagementClosedTime { get; set; }
+        public string fundedTime { get; set; }
         public int ReminderCounts { get; set; }
         public string LastReminderTime { get; set; }
         public int Status { get; set; }
