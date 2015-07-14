@@ -2,7 +2,6 @@ package com.realtech.socialsurvey.web.controller;
 
 import java.lang.reflect.Type;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
@@ -526,7 +525,7 @@ public class HierarchyManagementController
                     DisplayMessageConstants.GENERAL_ERROR, e );
             }
 
-            updateProcessedProfilesInSession( session, loggedInUser, assigneeEmailIds );
+            sessionHelper.updateProcessedProfilesInSession( session, loggedInUser, assigneeEmailIds );
         } catch ( NonFatalException e ) {
             LOG.error( "NonFatalException while adding a region. Reason : " + e.getMessage(), e );
             model
@@ -670,7 +669,7 @@ public class HierarchyManagementController
                     DisplayMessageConstants.GENERAL_ERROR, e );
             }
 
-            updateProcessedProfilesInSession( session, user, assigneeEmailIds );
+            sessionHelper.updateProcessedProfilesInSession( session, user, assigneeEmailIds );
         } catch ( NonFatalException e ) {
             LOG.error( "NonFatalException while adding a branch. Reason : " + e.getMessage(), e );
             model
@@ -808,7 +807,7 @@ public class HierarchyManagementController
                 sessionHelper.updateProcessedUserProfiles( session, user );
             }
 
-            updateProcessedProfilesInSession( session, user, assigneeEmailIds );
+            sessionHelper.updateProcessedProfilesInSession( session, user, assigneeEmailIds );
         } catch ( NonFatalException e ) {
             LOG.error( "NonFatalException while adding an individual. Reason : " + e.getMessage(), e );
             model.addAttribute( "message", messageUtils.getDisplayMessage( e.getMessage(), DisplayMessageType.ERROR_MESSAGE ) );
@@ -932,7 +931,7 @@ public class HierarchyManagementController
                     + e.getMessage(), DisplayMessageConstants.GENERAL_ERROR, e );
             }
 
-            updateProcessedProfilesInSession( session, user, assigneeEmailIds );
+            sessionHelper.updateProcessedProfilesInSession( session, user, assigneeEmailIds );
         } catch ( NonFatalException e ) {
             LOG.error( "NonFatalException while updating branch. Reason : " + e.getMessage(), e );
             model
@@ -1119,7 +1118,7 @@ public class HierarchyManagementController
                     + e.getMessage(), DisplayMessageConstants.GENERAL_ERROR, e );
             }
 
-            updateProcessedProfilesInSession( session, user, assigneeEmailIds );
+            sessionHelper.updateProcessedProfilesInSession( session, user, assigneeEmailIds );
         } catch ( NonFatalException e ) {
             LOG.error( "NonFatalException while updating region. Reason : " + e.getMessage(), e );
             model
@@ -1931,26 +1930,5 @@ public class HierarchyManagementController
     }
 
 
-    // update user profiles in session if current user is updated
-    private void updateProcessedProfilesInSession( HttpSession session, User user, String[] assigneeEmailIds )
-    {
-        List<String> usersEmailIds;
-        if ( assigneeEmailIds != null && assigneeEmailIds.length > 0 ) {
-            usersEmailIds = Arrays.asList( assigneeEmailIds );
-        } else {
-            return;
-        }
-
-        for ( String userEmail : usersEmailIds ) {
-            if ( user.getEmailId().equalsIgnoreCase( userEmail ) ) {
-                try {
-                    sessionHelper.updateProcessedUserProfiles( session, user );
-                    break;
-                } catch ( NonFatalException e ) {
-                    LOG.error( "NonFatalException while logging in. Reason : " + e.getMessage(), e );
-                }
-            }
-        }
-    }
 }
 // JIRA SS-37 BY RM02 EOC
