@@ -141,8 +141,8 @@
         </div>
     </div>
 
-<input type="hidden" name="reviewsCount" value="${reviewsCount }">    
-<input type="hidden" name="averageRatings" value="${averageRating }">
+<input type="hidden" name="reviewsCount" value="${reviewsCount}">    
+<input type="hidden" name="averageRatings" value="${averageRating}">
 <input type="hidden" value="${companyProfileName}" id="company-profile-name">
 <input type="hidden" value="${regionProfileName}" id="region-profile-name">
 <input type="hidden" value="${branchProfileName}" id="branch-profile-name">
@@ -232,10 +232,10 @@
                 	</div>
 					<div class="prof-rating clearfix">
 						<div class="prof-rating-wrapper maring-0 clearfix float-left" id="rating-avg-comp">
-							<div class='rating-image float-left smiley-rat-${integerAverageRating }'></div>
-							<div class='rating-rounded float-left'>${floatingAverageRating}</div>
+							<div class='rating-image float-left smiley-rat-${integerAverageRating}'></div>
+							<div class='rating-rounded float-left' data-score="${floatingAverageRating}"></div>
 						</div>
-						<div class="float-left review-count-left cursor-pointer" id="prof-company-review-count">${reviewsCount } Review(s)</div>
+						<div class="float-left review-count-left cursor-pointer" id="prof-company-review-count">${reviewsCount} Review(s)</div>
 					</div>
 					<div class="prof-btn-wrapper clearfix">
 						<div class="prof-btn-contact float-left" onclick="focusOnContact()" >Contact

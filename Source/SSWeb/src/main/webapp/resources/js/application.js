@@ -5699,10 +5699,12 @@ $('#lt-btn').click(function(e) {
 $('#shr-post-chk-box').click(function(){
 	if($('#shr-post-chk-box').hasClass('bd-check-img-checked')){
 		$('#shr-post-chk-box').removeClass('bd-check-img-checked');
+		$('#shr-pst-cb').val('true');
 		autoPost = true;
 	}
 	else{
 		$('#shr-post-chk-box').addClass('bd-check-img-checked');
+		$('#shr-pst-cb').val('false');
 		autoPost = false;
 	}
 });
