@@ -127,6 +127,7 @@ function showMainContent(url) {
  */
 function showMainContentCallBack(data) {
 	$("#main-content").html(data);
+	hideOverlay();
 }
 
 

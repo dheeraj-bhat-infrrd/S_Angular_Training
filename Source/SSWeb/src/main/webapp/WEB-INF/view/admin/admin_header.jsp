@@ -26,11 +26,6 @@
 	<link rel="stylesheet" href="${initParam.resourcesPath}/resources/css/style-resp-1.1.css">
 </head>
 <body>
-	<div id="overlay-linkedin-import" class="overlay-login overlay-main hide"></div>
-	<div id="overlay-send-survey" class="overlay-login overlay-main hide"></div>
-	<div id="srv-req-pop" class="survey-request-popup-container hide">
-		<div class="survey-request-popup"></div>
-	</div>
 	<div id="toast-container" class="toast-container">
 	   <span id="overlay-toast" class="overlay-toast"></span>
     </div>
@@ -67,7 +62,10 @@
 		<div class="header-slider">
 			<div id="header-links-slider" class="header-links header-links-slider float-left clearfix">
 				<div class="header-links-item">
-					<a id="dashboard-link" href="javascript:showMainContent('./admindashboard.do')"><spring:message code="label.header.dashboard.key" /></a>
+					<a href="javascript:showMainContent('./admindashboard.do')"><spring:message code="label.header.dashboard.key" /></a>
+				</div>
+				<div class="header-links-item">
+					<a href="javascript:showMainContent('./adminhierarchy.do')"><spring:message code="label.header.hierachy.key" /></a>
 				</div>
 				<div class="header-links-item" >
 					<a href="javascript:showMainContent('./showchangepasswordpage.do')"><spring:message code="label.changepassword.key"/></a>
@@ -86,11 +84,14 @@
 				<div class="hdr-link-item hdr-link-active">
 					<a id="dashboard-link" href="javascript:showMainContent('./admindashboard.do')" onclick="showOverlay();"><spring:message code="label.header.dashboard.key" /></a>
 				</div>
+				<div class="hdr-link-item hdr-link-active">
+					<a id="heirarchy-link" href="javascript:showMainContent('./adminhierarchy.do')" onclick="showOverlay();"><spring:message code="label.header.hierachy.key" /></a>
+				</div>
 			</div>
 			<div id="header-menu-icn" class="header-menu-icn icn-menu hide float-right"></div>
 			<div id="header-user-info" class="header-user-info float-right clearfix">
 				<div id="hdr-usr-img" class="float-right user-info-initial">
-					<span id="usr-initl">${fn:substring(user.firstName, 0, 1)}</span>
+					<span>${fn:substring(user.firstName, 0, 1)}</span>
 					<div class="initial-dd-wrapper hide blue-arrow-bot text-normal">
 						<div class="initial-dd-item" id="change-password" onclick="showMainContent('./showchangepasswordpage.do'); showOverlay();">
 							<spring:message code="label.changepassword.key"/>
