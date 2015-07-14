@@ -179,7 +179,6 @@ $(document).ready(function() {
 	if (showSendSurveyPopupAdmin == "true" && popupStatus == "Y") {
 		sendSurveyInvitationAdmin(currentProfileName, currentProfileValue);
 	}
-	
 
 	paintDashboard(profileMasterId, currentProfileName, currentProfileValue, accountType);
 });
