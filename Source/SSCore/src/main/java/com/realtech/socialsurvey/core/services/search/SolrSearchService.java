@@ -9,10 +9,8 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
 import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrDocumentList;
-
 import com.realtech.socialsurvey.core.entities.Branch;
 import com.realtech.socialsurvey.core.entities.Company;
 import com.realtech.socialsurvey.core.entities.Region;
@@ -107,7 +105,7 @@ public interface SolrSearchService {
 	public SolrDocumentList searchUsersByFirstOrLastName(String patternFirst, String patternLast, int startIndex, int noOfRows)
 			throws InvalidInputException, SolrException, MalformedURLException;
 
-	public String searchUsersByCompany(long companyId, int startIndex, int noOfRows) throws InvalidInputException, SolrException,
+	public SolrDocumentList searchUsersByCompany(long companyId, int startIndex, int noOfRows) throws InvalidInputException, SolrException,
 			MalformedURLException;
 
 	public long countUsersByCompany(long companyId, int startIndex, int noOfRows) throws InvalidInputException, SolrException, MalformedURLException;
@@ -125,7 +123,7 @@ public interface SolrSearchService {
 	 * @return
 	 * @throws NoRecordsFetchedException
 	 * @throws InvalidInputException
-	 * @throws SolrException 
+	 * @throws SolrException
 	 */
 	public String getUserDisplayNameById(long userId) throws NoRecordsFetchedException, InvalidInputException, SolrException;
 
@@ -135,12 +133,12 @@ public interface SolrSearchService {
 	 * @param userId
 	 * @return
 	 * @throws InvalidInputException
-	 * @throws SolrException 
+	 * @throws SolrException
 	 */
 	public SolrDocument getUserByUniqueId(long userId) throws InvalidInputException, SolrException;
 
 	public void editUserInSolr(long userId, String key, String value) throws SolrException;
-	
+
 	public void editUserInSolrWithMultipleValues(long userId, Map<String, Object> map) throws SolrException;
 
 	/**
@@ -189,6 +187,7 @@ public interface SolrSearchService {
 
 	/**
 	 * Method to search for the users based on branches specified
+	 * 
 	 * @param branchIds
 	 * @param start
 	 * @param rows
@@ -238,18 +237,17 @@ public interface SolrSearchService {
 
 	public void removeRegionsFromSolr(List<Long> regionIds) throws SolrException;
 
-	public long getRegionsCount(String regionPattern, Company company,
-			Set<Long> regionIds) throws InvalidInputException, SolrException;
+	public long getRegionsCount(String regionPattern, Company company, Set<Long> regionIds) throws InvalidInputException, SolrException;
 
-	public long getBranchCountByRegion(long regionId) throws InvalidInputException,
-			SolrException;
+	public long getBranchCountByRegion(long regionId) throws InvalidInputException, SolrException;
 
-	public long getUsersCountByIden(long iden, String idenFieldName, boolean isAgent)
+	public long getUsersCountByIden(long iden, String idenFieldName, boolean isAgent) throws InvalidInputException, SolrException;
+
+	public long getUsersCountByBranches(Set<Long> branchIds) throws InvalidInputException, SolrException;
+
+	public SolrDocumentList getUserIdsByIden(long iden, String idenFieldName, boolean isAgent, int startIndex, int noOfRows)
 			throws InvalidInputException, SolrException;
 
-	public long getUsersCountByBranches(Set<Long> branchIds)
-			throws InvalidInputException, SolrException;
-
-	public SolrDocumentList getUserIdsByIden(long iden, String idenFieldName, boolean isAgent, int startIndex, int noOfRows)throws InvalidInputException, SolrException ;
+	public Collection<UserFromSearch> getUsersFromSolrDocuments(SolrDocumentList documentList) throws InvalidInputException;
 }
 // JIRA:SS-62 BY RM 02 EOC

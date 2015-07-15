@@ -5,7 +5,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
+import java.util.regex.Pattern;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
@@ -19,7 +19,6 @@ import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Repository;
-
 import com.mongodb.BasicDBObject;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.dao.OrganizationUnitSettingsDao;
@@ -40,6 +39,7 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
 	public static final String BRANCH_SETTINGS_COLLECTION = "BRANCH_SETTINGS";
 	public static final String AGENT_SETTINGS_COLLECTION = "AGENT_SETTINGS";
 	public static final String KEY_CRM_INFO = "crm_info";
+	public static final String KEY_IDEN = "iden";
 	public static final String KEY_CRM_INFO_CLASS = "crm_info._class";
 	public static final String KEY_MAIL_CONTENT = "mail_content";
 	public static final String KEY_SURVEY_SETTINGS = "survey_settings";
@@ -51,6 +51,7 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
 	public static final String KEY_LOCK_SETTINGS = "lockSettings";
 	public static final String KEY_LINKEDIN_PROFILEDATA = "linkedInProfileData";
 	public static final String KEY_PROFILE_NAME = "profileName";
+	public static final String KEY_UNIQUE_IDENTIFIER = "uniqueIdentifier";
 	public static final String KEY_PROFILE_URL = "profileUrl";
 	public static final String KEY_LOGO = "logo";
 	public static final String KEY_PROFILE_IMAGE = "profileImageUrl";
@@ -71,7 +72,8 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
 	public static final String KEY_TWITTER_SOCIAL_MEDIA_TOKEN = "socialMediaTokens.twitterToken";
 	public static final String KEY_GOOGLE_SOCIAL_MEDIA_TOKEN = "socialMediaTokens.googleToken";
 	public static final String KEY_LINKEDIN_SOCIAL_MEDIA_TOKEN = "socialMediaTokens.linkedInToken";
-
+	public static final String KEY_CONTACT_NAME = "contact_details.name";
+	
 	private static final Logger LOG = LoggerFactory.getLogger(MongoOrganizationUnitSettingDaoImpl.class);
 
 	@Autowired
@@ -343,26 +345,27 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
 	}
 	
 
-    @Override
-    public void setAgentNames( Map<Long, AgentRankingReport> agentsReport )
-    {
-        LOG.info( "Method setAgentNames() started." );
-        Set<Long> agentIds = agentsReport.keySet();
-        List<AgentSettings> agentSEttings = fetchMultipleAgentSettingsById(new ArrayList<Long>(agentIds));
-        for ( AgentSettings setting : agentSEttings ) {
-            if(agentsReport.get(setting.getIden()) != null){
-                try{
-                agentsReport.get(setting.getIden()).setAgentFirstName( setting.getContact_details().getFirstName() );
-                agentsReport.get(setting.getIden()).setAgentLastName( setting.getContact_details().getLastName() );
-                }catch(NullPointerException e){
-                    LOG.error( "Null Pointer exception caught in setAgentNames(). NEsted exception is ", e );
-                    LOG.debug( "Continuing..." );
-                    continue;
-                }
-            }
-        }
-        LOG.info( "Method setAgentNames() finished." );
-    }
+	@Override
+	public void setAgentDetails(Map<Long, AgentRankingReport> agentsReport) {
+		LOG.info("Method setAgentNames() started.");
+		Set<Long> agentIds = agentsReport.keySet();
+		List<AgentSettings> agentSettings = fetchMultipleAgentSettingsById(new ArrayList<Long>(agentIds));
+		for (AgentSettings setting : agentSettings) {
+			if (agentsReport.get(setting.getIden()) != null) {
+				try {
+					agentsReport.get(setting.getIden()).setAgentFirstName(setting.getContact_details().getFirstName());
+					agentsReport.get(setting.getIden()).setAgentLastName(setting.getContact_details().getLastName());
+					agentsReport.get(setting.getIden()).setRegistrationDate(setting.getCreatedOn());
+				}
+				catch (NullPointerException e) {
+					LOG.error("Null Pointer exception caught in setAgentNames(). Nested exception is ", e);
+					LOG.debug("Continuing...");
+					continue;
+				}
+			}
+		}
+		LOG.info("Method setAgentNames() finished.");
+	}
     
     @Override
     public OrganizationUnitSettings removeKeyInOrganizationSettings(OrganizationUnitSettings unitSettings, String keyToUpdate, String collectionName){
@@ -377,7 +380,51 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
 		return unitSettings;
 	}
 
+    @Override
+    public List<OrganizationUnitSettings> getCompanyListByVerticalName (String verticalName) {
+    	LOG.debug( "Method getCompanyListByVerticalName() called for vertical name : " + verticalName);
+    	
+    	List<OrganizationUnitSettings> unitSettings = null;
+    	Query query = new Query();
+    	query.addCriteria(Criteria.where(KEY_VERTICAL).is(verticalName));
+    	query.fields().include(KEY_LOGO).include(KEY_CONTACT_DETAILS).include(KEY_PROFILE_NAME).include(KEY_VERTICAL).exclude("_id");
+    	
+    	unitSettings = mongoTemplate.find(query, OrganizationUnitSettings.class, COMPANY_SETTINGS_COLLECTION);
+    	
+    	return unitSettings;
+    }
 
+    @Override
+    public List<OrganizationUnitSettings> getCompanyList() {
+    	LOG.debug( "Method getCompanyList() called");
+    	
+    	List<OrganizationUnitSettings> unitSettings = null;
+    	Query query = new Query();
+    	query.fields().include(KEY_CONTACT_DETAILS).include(KEY_PROFILE_NAME).include(KEY_VERTICAL).include(KEY_IDEN).exclude("_id");
+    	query.with(new Sort(Sort.Direction.DESC, KEY_MODIFIED_ON));
+    	
+    	unitSettings = mongoTemplate.find(query, OrganizationUnitSettings.class, COMPANY_SETTINGS_COLLECTION);
+    	
+    	return unitSettings;
+    }
+    
+    
+    @Override
+    public List<OrganizationUnitSettings> getCompanyListByKey(String searchKey) {
+		LOG.debug("Method getCompanyListByKey() called for key : " + searchKey);
+    	
+    	List<OrganizationUnitSettings> unitSettings = null;
+    	Query query = new Query();
+    	Pattern pattern = Pattern.compile(searchKey+".*");
+    	query.addCriteria(Criteria.where(KEY_CONTACT_NAME).regex(pattern));
+    	query.fields().include(KEY_CONTACT_DETAILS).include(KEY_VERTICAL).include(KEY_IDEN).exclude("_id");
+    	query.with(new Sort(Sort.Direction.DESC, KEY_MODIFIED_ON));
+    	
+    	unitSettings = mongoTemplate.find(query, OrganizationUnitSettings.class, COMPANY_SETTINGS_COLLECTION);
+    	
+    	return unitSettings;
+    }
+    
 	/*
 	 * Method to set complete profile URL for each of the setting being fetched.
 	 */
@@ -399,4 +446,17 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
 			}
 		}
 	}
+
+    @Override
+    public OrganizationUnitSettings fetchOrganizationUnitSettingsByUniqueIdentifier( String uniqueIdentifier,
+        String collectionName )
+    {
+        Query query = new Query();
+        query.addCriteria(Criteria.where(KEY_UNIQUE_IDENTIFIER).is(uniqueIdentifier));
+        query.fields().exclude(KEY_LINKEDIN_PROFILEDATA);
+        OrganizationUnitSettings organizationUnitSettings = mongoTemplate.findOne(query, OrganizationUnitSettings.class, collectionName);
+        setCompleteUrlForSettings(organizationUnitSettings, collectionName);
+        LOG.info("Successfully executed method fetchOrganizationUnitSettingsByProfileName");
+        return organizationUnitSettings;
+    }
 }

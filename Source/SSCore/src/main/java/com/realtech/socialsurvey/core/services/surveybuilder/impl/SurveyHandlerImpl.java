@@ -34,6 +34,7 @@ import com.realtech.socialsurvey.core.dao.UserDao;
 import com.realtech.socialsurvey.core.dao.UserProfileDao;
 import com.realtech.socialsurvey.core.dao.impl.MongoOrganizationUnitSettingDaoImpl;
 import com.realtech.socialsurvey.core.entities.AgentSettings;
+import com.realtech.socialsurvey.core.entities.Company;
 import com.realtech.socialsurvey.core.entities.MailContent;
 import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
 import com.realtech.socialsurvey.core.entities.SurveyDetails;
@@ -112,6 +113,9 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
     @Value ( "${MAX_SURVEY_REMINDERS}")
     private int maxSurveyReminders;
 
+    @Value ( "${VALID_SURVEY_INTERVAL}")
+    private int validSurveyInterval;
+
     @Value ( "${MAX_SOCIAL_POST_REMINDERS}")
     private int maxSocialpostReminders;
 
@@ -132,12 +136,10 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
     @Override
     @Transactional
     public SurveyDetails storeInitialSurveyDetails( long agentId, String customerEmail, String firstName, String lastName,
-        int reminderCount, String custRelationWithAgent, String baseUrl ) throws SolrException, NoRecordsFetchedException,
-        InvalidInputException
+        int reminderCount, String custRelationWithAgent, String baseUrl, String source ) throws SolrException,
+        NoRecordsFetchedException, InvalidInputException
     {
-
         LOG.info( "Method to store initial details of survey, storeInitialSurveyAnswers() started." );
-
         String agentName;
         long branchId = 0;
         long companyId = 0;
@@ -170,8 +172,11 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
         surveyDetails.setCustRelationWithAgent( custRelationWithAgent );
         surveyDetails.setUrl( getSurveyUrl( agentId, customerEmail, baseUrl ) );
         surveyDetails.setEditable( true );
+        surveyDetails.setSource( source );
+
         SurveyDetails survey = surveyDetailsDao.getSurveyByAgentIdAndCustomerEmail( agentId, customerEmail );
         LOG.info( "Method to store initial details of survey, storeInitialSurveyAnswers() finished." );
+
         if ( survey == null ) {
             surveyDetailsDao.insertSurveyDetails( surveyDetails );
             return null;
@@ -224,10 +229,10 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
      */
     @Override
     public void updateGatewayQuestionResponseAndScore( long agentId, String customerEmail, String mood, String review,
-        boolean isAbusive )
+        boolean isAbusive, String agreedToShare )
     {
         LOG.info( "Method to update customer review and final score on the basis of rating questions in SURVEY_DETAILS, updateCustomerAnswersInSurvey() started." );
-        surveyDetailsDao.updateGatewayAnswer( agentId, customerEmail, mood, review, isAbusive );
+        surveyDetailsDao.updateGatewayAnswer( agentId, customerEmail, mood, review, isAbusive, agreedToShare );
         surveyDetailsDao.updateFinalScore( agentId, customerEmail );
         LOG.info( "Method to update customer review and final score on the basis of rating questions in SURVEY_DETAILS, updateCustomerAnswersInSurvey() finished." );
     }
@@ -262,16 +267,14 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
      */
     @Override
     @Transactional
-    public void updateReminderCount( long agentId, String customerEmail )
+    public void updateReminderCount( long surveyPreInitiationId )
     {
         LOG.info( "Method to increase reminder count by 1, updateReminderCount() started." );
-        Map<String, Object> queries = new HashMap<>();
-        queries.put( "agentId", agentId );
-        queries.put( "customerEmailId", customerEmail );
-        List<SurveyPreInitiation> surveys = surveyPreInitiationDao.findByKeyValue( SurveyPreInitiation.class, queries );
-        if ( surveys != null && !surveys.isEmpty() ) {
-            SurveyPreInitiation survey = surveys.get( CommonConstants.INITIAL_INDEX );
+
+        SurveyPreInitiation survey = surveyPreInitiationDao.findById( SurveyPreInitiation.class, surveyPreInitiationId );
+        if ( survey != null ) {
             survey.setModifiedOn( new Timestamp( System.currentTimeMillis() ) );
+            survey.setLastReminderTime( new Timestamp( System.currentTimeMillis() ) );
             survey.setReminderCounts( survey.getReminderCounts() + 1 );
             surveyPreInitiationDao.merge( survey );
         }
@@ -355,22 +358,17 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
     }
 
 
-    /*
-     * Method to get list of customers' email ids who have not completed survey yet. It checks if
-     * max number of reminder mails have been sent. It also checks if required number of days have
-     * been passed since the last mail was sent.
-     */
     @Override
     @Transactional
-    public List<SurveyPreInitiation> getIncompleteSurveyCustomersEmail( long companyId )
+    public Map<String, Integer> getReminderInformationForCompany( long companyId )
     {
-        LOG.info( "started." );
+        LOG.debug( "Inside method getReminderInformationForCompany" );
+        Map<String, Integer> map = new HashMap<String, Integer>();
         int reminderInterval = 0;
         int maxReminders = 0;
-        List<SurveyPreInitiation> incompleteSurveyCustomers = new ArrayList<>();
         OrganizationUnitSettings organizationUnitSettings = organizationUnitSettingsDao.fetchOrganizationUnitSettingsById(
             companyId, MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION );
-        // Fetching surveyReminderInterval and max number of reminders for a company.
+
         if ( organizationUnitSettings != null ) {
             SurveySettings surveySettings = organizationUnitSettings.getSurvey_settings();
             if ( surveySettings != null ) {
@@ -380,17 +378,40 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
                 }
             }
         }
-        // Setting default values for Max number of survey reminders and survey reminder interval. 
+
         if ( maxReminders == 0 ) {
+            LOG.debug( "No Reminder count found for company " + companyId + " hence setting default value" );
             maxReminders = maxSurveyReminders;
         }
         if ( reminderInterval == 0 ) {
+            LOG.debug( "No Reminder interval found for company " + companyId + " hence setting default value " );
             reminderInterval = surveyReminderInterval;
         }
-        //		incompleteSurveyCustomers = surveyDetailsDao.getIncompleteSurveyCustomers(companyId, surveyReminderInterval, maxReminders);
-        incompleteSurveyCustomers = surveyPreInitiationDao.getIncompleteSurveyForReminder( companyId, reminderInterval,
-            maxReminders );
-        // TODO do above code using mysql...should be simple
+
+        map.put( CommonConstants.SURVEY_REMINDER_COUNT, maxReminders );
+        map.put( CommonConstants.SURVEY_REMINDER_INTERVAL, reminderInterval );
+        return map;
+    }
+
+
+    /*
+     * Method to get list of customers' email ids who have not completed survey yet. It checks if
+     * max number of reminder mails have been sent. It also checks if required number of days have
+     * been passed since the last mail was sent.
+     */
+    @Override
+    @Transactional
+    public List<SurveyPreInitiation> getIncompleteSurveyCustomersEmail( Company company )
+    {
+        LOG.info( "started." );
+
+        List<SurveyPreInitiation> incompleteSurveyCustomers = new ArrayList<>();
+
+        LOG.debug( "Now fetching survey which are already processed " );
+        HashMap<String, Object> queries = new HashMap<>();
+        queries.put( CommonConstants.COMPANY_ID_COLUMN, company.getCompanyId() );
+        queries.put( CommonConstants.STATUS_COLUMN, CommonConstants.SURVEY_STATUS_PRE_INITIATED );
+        incompleteSurveyCustomers = surveyPreInitiationDao.findByKeyValue( SurveyPreInitiation.class, queries );
         LOG.info( "finished." );
         return incompleteSurveyCustomers;
     }
@@ -671,23 +692,44 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
     @Transactional
     public Map<String, Object> mapAgentsInSurveyPreInitiation()
     {
+
+        LOG.debug( "Inside method mapAgentsInSurveyPreInitiation " );
         List<SurveyPreInitiation> surveys = surveyPreInitiationDao.findByColumn( SurveyPreInitiation.class,
             CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_SURVEYPREINITIATION_NOT_PROCESSED );
-
         List<SurveyPreInitiation> unavailableAgents = new ArrayList<>();
         List<SurveyPreInitiation> invalidAgents = new ArrayList<>();
         List<SurveyPreInitiation> customersWithoutName = new ArrayList<>();
         List<SurveyPreInitiation> customersWithoutEmailId = new ArrayList<>();
         Set<Long> companies = new HashSet<>();
         for ( SurveyPreInitiation survey : surveys ) {
-            survey.setStatus( CommonConstants.STATUS_SURVEYPREINITIATION_PROCESSED );
-            survey.setModifiedOn( new Timestamp( System.currentTimeMillis() ) );
+            int status = CommonConstants.SURVEY_STATUS_PRE_INITIATED;
             User user = null;
             if ( survey.getAgentEmailId() != null ) {
                 List<User> userList = userDao.findByColumn( User.class, CommonConstants.AGENT_EMAIL_ID_COLUMN,
                     survey.getAgentEmailId() );
                 if ( userList != null && !userList.isEmpty() ) {
                     user = userList.get( 0 );
+                    if ( user != null ) {
+                        LOG.debug( "Mapping the agent to this survey " );
+                        survey.setAgentId( user.getUserId() );
+                        surveyPreInitiationDao.update( survey );
+                        if ( survey.getSurveySource().equalsIgnoreCase( CommonConstants.CRM_INFO_SOURCE_ENCOMPASS ) ) {
+                            if ( user.getLoginPassword() != null ) {
+                                if ( user.getCreatedOn().after( survey.getEngagementClosedTime() ) ) {
+                                    status = CommonConstants.STATUS_SURVEYPREINITIATION_OLD_RECORD;
+                                }
+                            } else {
+                                LOG.debug( "Only a user invite has been sent so far, hence can't mark it as an old record for user "
+                                    + user.getUserId() );
+                            }
+
+                            long surveyClosedTime = survey.getEngagementClosedTime().getTime();
+                            long currentTime = System.currentTimeMillis();
+                            if ( checkIfRecordHasExpired( surveyClosedTime, currentTime, validSurveyInterval ) ) {
+                                status = CommonConstants.STATUS_SURVEYPREINITIATION_OLD_RECORD;
+                            }
+                        }
+                    }
                 }
             }
             if ( survey.getAgentEmailId() == null || survey.getAgentEmailId().isEmpty() ) {
@@ -724,6 +766,8 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
                 unavailableAgents.add( survey );
                 companies.add( survey.getCompanyId() );
             }
+            survey.setStatus( status );
+            survey.setModifiedOn( new Timestamp( System.currentTimeMillis() ) );
             surveyPreInitiationDao.merge( survey );
         }
 
@@ -876,6 +920,31 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
         surveyPreInitiationDao.save( surveyPreInitiation );
 
         LOG.debug( "Method preInitiateSurvey() finished." );
+    }
+
+
+    private Boolean checkIfRecordHasExpired( long surveyClosedDate, long systemTime, int expirationDays )
+    {
+        long totalDaysInMillseconds = systemTime - surveyClosedDate;
+        int totalDays = (int) ( totalDaysInMillseconds / ( 1000 * 60 * 60 * 24 ) );
+        if ( totalDays >= expirationDays ) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+
+    @Override
+    public Boolean checkIfTimeIntervalHasExpired( long lastRemindedTime, long systemTime, int reminderInterval )
+    {
+        long remainingTime = systemTime - lastRemindedTime;
+        int remainingDays = (int) ( remainingTime / ( 1000 * 60 * 60 * 24 ) );
+        if ( remainingDays >= reminderInterval ) {
+            return true;
+        } else {
+            return false;
+        }
     }
 }
 // JIRA SS-119 by RM-05:EOC

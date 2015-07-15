@@ -25,6 +25,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import twitter4j.TwitterException;
 import com.google.gson.Gson;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
+import com.realtech.socialsurvey.core.dao.impl.MongoSocialPostDaoImpl;
 import com.realtech.socialsurvey.core.entities.AgentSettings;
 import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
 import com.realtech.socialsurvey.core.entities.SurveyDetails;
@@ -143,6 +144,7 @@ public class SurveyManagementController {
 			String feedback = request.getParameter("feedback");
 			String mood = request.getParameter("mood");
 			String customerEmail = request.getParameter("customerEmail");
+			String agreedToShare = request.getParameter("agreedToShare");
 
 			long agentId = 0;
 			try {
@@ -158,7 +160,7 @@ public class SurveyManagementController {
 			}
 
 			boolean isAbusive = Boolean.parseBoolean(request.getParameter("isAbusive"));
-			surveyHandler.updateGatewayQuestionResponseAndScore(agentId, customerEmail, mood, feedback, isAbusive);
+			surveyHandler.updateGatewayQuestionResponseAndScore(agentId, customerEmail, mood, feedback, isAbusive, agreedToShare);
 			surveyHandler.increaseSurveyCountForAgent(agentId);
 			SurveyPreInitiation surveyPreInitiation = surveyHandler.getPreInitiatedSurvey(agentId, customerEmail);
 			surveyHandler.deleteSurveyPreInitiationDetailsPermanently(surveyPreInitiation);
@@ -434,13 +436,14 @@ public class SurveyManagementController {
 				SurveyPreInitiation surveyPreInitiation = surveyHandler.getPreInitiatedSurvey(agentId, customerEmail);
 				if (surveyPreInitiation == null) {
 					surveyAndStage = getSurvey(agentId, urlParams.get(CommonConstants.CUSTOMER_EMAIL_COLUMN), null, null, 0, null,
-							surveyHandler.composeLink(agentId, customerEmail));
+							surveyHandler.composeLink(agentId, customerEmail), MongoSocialPostDaoImpl.KEY_SOURCE_SS);
 				}
 				else {
 					surveyAndStage = getSurvey(agentId, urlParams.get(CommonConstants.CUSTOMER_EMAIL_COLUMN),
 							surveyPreInitiation.getCustomerFirstName(), surveyPreInitiation.getCustomerLastName(),
 							surveyPreInitiation.getReminderCounts(), surveyPreInitiation.getCustomerInteractionDetails(),
-							surveyHandler.composeLink(agentId, customerEmail));
+							surveyHandler.composeLink(agentId, customerEmail), surveyPreInitiation.getSurveySource());
+					
 					surveyHandler.markSurveyAsStarted(surveyPreInitiation);
 				}
 				
@@ -468,6 +471,7 @@ public class SurveyManagementController {
 	@RequestMapping(value = "/posttosocialnetwork", method = RequestMethod.GET)
 	public String postToSocialMedia(HttpServletRequest request) {
 		LOG.info("Method to post feedback of customer to various pages of social networking sites started.");
+
 		try {
 			String agentName = request.getParameter("agentName");
 			String agentProfileLink = request.getParameter("agentProfileLink");
@@ -478,6 +482,7 @@ public class SurveyManagementController {
 			String customerEmail = request.getParameter("customerEmail");
 			String feedback = request.getParameter("feedback");
 			String serverBaseUrl = requestUtils.getRequestServerName(request);
+
 			long agentId = 0;
 			double rating = 0;
 			try {
@@ -490,38 +495,35 @@ public class SurveyManagementController {
 						e);
 				return e.getMessage();
 			}
-			
+
 			User agent = userManagementService.getUserByUserId(agentId);
 			int accountMasterId = 0;
-			try{
+			try {
 				accountMasterId = agent.getCompany().getLicenseDetails().get(CommonConstants.INITIAL_INDEX).getAccountsMaster().getAccountsMasterId();
-			}catch(NullPointerException e){
+			}
+			catch (NullPointerException e) {
 				LOG.error("NullPointerException caught in postToSocialMedia() while fetching account master id for agent " + agent.getFirstName());
 			}
+
 			List<OrganizationUnitSettings> settings = socialManagementService.getSettingsForBranchesAndRegionsInHierarchy(agentId);
 			AgentSettings agentSettings = userManagementService.getUserSettings(agentId);
+
+			// Facebook
 			String facebookMessage = rating + "-Star Survey Response from " + custFirstName + " " + custLastName + " for " + agentName
 					+ " on Social Survey - view at " + getApplicationBaseUrl() + CommonConstants.AGENT_PROFILE_FIXED_URL + agentProfileLink;
-
-			String twitterMessage = rating + "-Star Survey Response from " + custFirstName + " " + custLastName + " for " + agentName
-					+ " on @SocialSurveyMe - view at " + getApplicationBaseUrl() + CommonConstants.AGENT_PROFILE_FIXED_URL + agentProfileLink;
-
-			String linkedinMessage = rating + "-Star Survey Response from " + custFirstName + " " + custLastName + " for " + agentName
-					+ " on SocialSurvey ";
-			String linkedinProfileUrl = getApplicationBaseUrl() + CommonConstants.AGENT_PROFILE_FIXED_URL + agentProfileLink;
-			String linkedinMessageFeedback = "From : " + custFirstName + " " + custLastName + " - "+ feedback;
+			facebookMessage += "\n Feedback : " + feedback;
 			try {
-				if(!socialManagementService.updateStatusIntoFacebookPage(agentSettings, facebookMessage, serverBaseUrl)){
+				if (!socialManagementService.updateStatusIntoFacebookPage(agentSettings, facebookMessage, serverBaseUrl)) {
 					surveyHandler.updateSharedOn(CommonConstants.FACEBOOK_SOCIAL_SITE, agentId, customerEmail);
 				}
 			}
 			catch (FacebookException e) {
 				LOG.error("FacebookException caught in postToSocialMedia() while trying to post to facebook. Nested excption is ", e);
 			}
-			if(accountMasterId != CommonConstants.ACCOUNTS_MASTER_INDIVIDUAL){
+			if (accountMasterId != CommonConstants.ACCOUNTS_MASTER_INDIVIDUAL) {
 				for (OrganizationUnitSettings setting : settings) {
 					try {
-						if(!socialManagementService.updateStatusIntoFacebookPage(setting, facebookMessage, serverBaseUrl)){
+						if (!socialManagementService.updateStatusIntoFacebookPage(setting, facebookMessage, serverBaseUrl)) {
 							surveyHandler.updateSharedOn(CommonConstants.FACEBOOK_SOCIAL_SITE, agentId, customerEmail);
 						}
 					}
@@ -530,34 +532,43 @@ public class SurveyManagementController {
 					}
 				}
 			}
+
+			// LinkedIn
+			String linkedinMessage = rating + "-Star Survey Response from " + custFirstName + " " + custLastName + " for " + agentName
+					+ " on SocialSurvey ";
+			String linkedinProfileUrl = getApplicationBaseUrl() + CommonConstants.AGENT_PROFILE_FIXED_URL + agentProfileLink;
+			String linkedinMessageFeedback = "From : " + custFirstName + " " + custLastName + " - " + feedback;
+			socialManagementService.updateLinkedin(agentSettings, linkedinMessage, linkedinProfileUrl, linkedinMessageFeedback);
+			if (accountMasterId != CommonConstants.ACCOUNTS_MASTER_INDIVIDUAL) {
+				for (OrganizationUnitSettings setting : settings) {
+					if (!socialManagementService.updateLinkedin(setting, linkedinMessage, linkedinProfileUrl, linkedinMessageFeedback)) {
+						surveyHandler.updateSharedOn(CommonConstants.LINKEDIN_SOCIAL_SITE, agentId, customerEmail);
+					}
+				}
+			}
+			
+			// Twitter
+			String twitterMessage = rating + "-Star Survey Response from " + custFirstName + " " + custLastName + " for " + agentName
+					+ " on @SocialSurveyMe - view at " + getApplicationBaseUrl() + CommonConstants.AGENT_PROFILE_FIXED_URL + agentProfileLink;
 			try {
-				if(!socialManagementService.tweet(agentSettings, twitterMessage)){
+				if (!socialManagementService.tweet(agentSettings, twitterMessage)) {
 					surveyHandler.updateSharedOn(CommonConstants.TWITTER_SOCIAL_SITE, agentId, customerEmail);
 				}
 			}
 			catch (TwitterException e) {
 				LOG.error("TwitterException caught in postToSocialMedia() while trying to post to twitter. Nested excption is ", e);
 			}
-			if(accountMasterId != CommonConstants.ACCOUNTS_MASTER_INDIVIDUAL){
-			for (OrganizationUnitSettings setting : settings) {
-				try {
-					if(!socialManagementService.tweet(setting, twitterMessage)){
-						surveyHandler.updateSharedOn(CommonConstants.LINKEDIN_SOCIAL_SITE, agentId, customerEmail);
+			if (accountMasterId != CommonConstants.ACCOUNTS_MASTER_INDIVIDUAL) {
+				for (OrganizationUnitSettings setting : settings) {
+					try {
+						if (!socialManagementService.tweet(setting, twitterMessage)) {
+							surveyHandler.updateSharedOn(CommonConstants.TWITTER_SOCIAL_SITE, agentId, customerEmail);
+						}
+					}
+					catch (TwitterException e) {
+						LOG.error("TwitterException caught in postToSocialMedia() while trying to post to twitter. Nested excption is ", e);
 					}
 				}
-				catch (TwitterException e) {
-					LOG.error("TwitterException caught in postToSocialMedia() while trying to post to twitter. Nested excption is ", e);
-				}
-			}
-			}
-
-			socialManagementService.updateLinkedin(agentSettings, linkedinMessage, linkedinProfileUrl, linkedinMessageFeedback);
-			if(accountMasterId != CommonConstants.ACCOUNTS_MASTER_INDIVIDUAL){
-			for (OrganizationUnitSettings setting : settings) {
-				if(!socialManagementService.updateLinkedin(setting, linkedinMessage, linkedinProfileUrl, linkedinMessageFeedback)){
-					surveyHandler.updateSharedOn(CommonConstants.LINKEDIN_SOCIAL_SITE, agentId, customerEmail);
-				}
-			}
 			}
 		}
 		catch (NonFatalException e) {
@@ -927,8 +938,9 @@ public class SurveyManagementController {
 	}
 
 	private SurveyDetails storeInitialSurveyDetails(long agentId, String customerEmail, String firstName, String lastName, int reminderCount,
-			String custRelationWithAgent, String url) throws SolrException, NoRecordsFetchedException, InvalidInputException {
-		return surveyHandler.storeInitialSurveyDetails(agentId, customerEmail, firstName, lastName, reminderCount, custRelationWithAgent, url);
+			String custRelationWithAgent, String url, String source) throws SolrException, NoRecordsFetchedException, InvalidInputException {
+		return surveyHandler
+				.storeInitialSurveyDetails(agentId, customerEmail, firstName, lastName, reminderCount, custRelationWithAgent, url, source);
 	}
 
 	private String getApplicationBaseUrl() {
@@ -936,13 +948,14 @@ public class SurveyManagementController {
 	}
 
 	private Map<String, Object> getSurvey(long agentId, String customerEmail, String firstName, String lastName, int reminderCount,
-			String custRelationWithAgent, String url) throws InvalidInputException, SolrException, NoRecordsFetchedException {
+			String custRelationWithAgent, String url, String source) throws InvalidInputException, SolrException, NoRecordsFetchedException {
 		Integer stage = null;
 		Map<String, Object> surveyAndStage = new HashMap<>();
 		List<SurveyQuestionDetails> surveyQuestionDetails = surveyBuilder.getSurveyByAgenId(agentId);
 		boolean editable = false;
 		try {
-			SurveyDetails survey = storeInitialSurveyDetails(agentId, customerEmail, firstName, lastName, reminderCount, custRelationWithAgent, url);
+			SurveyDetails survey = storeInitialSurveyDetails(agentId, customerEmail, firstName, lastName, reminderCount, custRelationWithAgent, url,
+					source);
 			surveyHandler.updateSurveyAsClicked(agentId, customerEmail);
 
 			if (survey != null) {
@@ -1062,6 +1075,7 @@ public class SurveyManagementController {
 		surveyAndStage.put("survey", surveyQuestionDetails);
 		surveyAndStage.put("agentId", agentId);
 		surveyAndStage.put("editable", editable);
+		surveyAndStage.put("source", source);
 		return surveyAndStage;
 	}
 

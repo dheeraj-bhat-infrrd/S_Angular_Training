@@ -13,13 +13,12 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
 import javax.annotation.Resource;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
@@ -29,7 +28,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.DependsOn;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
-
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
@@ -37,6 +35,7 @@ import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.commons.ProfileCompletionList;
 import com.realtech.socialsurvey.core.commons.Utils;
 import com.realtech.socialsurvey.core.dao.BranchDao;
+import com.realtech.socialsurvey.core.dao.CompanyDao;
 import com.realtech.socialsurvey.core.dao.DisabledAccountDao;
 import com.realtech.socialsurvey.core.dao.GenericDao;
 import com.realtech.socialsurvey.core.dao.OrganizationUnitSettingsDao;
@@ -109,7 +108,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
     private static Map<Integer, VerticalsMaster> verticalsMastersMap = new HashMap<Integer, VerticalsMaster>();
 
     @Autowired
-    private GenericDao<Company, Long> companyDao;
+    private CompanyDao companyDao;
 
     @Autowired
     private UserDao userDao;
@@ -484,6 +483,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
         mailIdSettings.setWork( user.getEmailId() );
         contactDetailSettings.setMail_ids( mailIdSettings );
 
+        companySettings.setUniqueIdentifier( organizationalDetails.get( CommonConstants.UNIQUE_IDENTIFIER ) );
         companySettings.setVertical( organizationalDetails.get( CommonConstants.VERTICAL ) );
         companySettings.setContact_details( contactDetailSettings );
         companySettings.setProfileName( generateProfileNameForCompany( company.getCompany(), company.getCompanyId() ) );
@@ -559,8 +559,18 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
         companySettings.setMail_content( mailContentSettings );
 
         LOG.debug( "Inserting company settings." );
-        organizationUnitSettingsDao.insertOrganizationUnitSettings( companySettings,
-            MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION );
+        OrganizationUnitSettings oldCompanySettings = organizationUnitSettingsDao
+            .fetchOrganizationUnitSettingsByUniqueIdentifier( companySettings.getUniqueIdentifier(),
+                MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION );
+        if ( oldCompanySettings == null ) {
+            organizationUnitSettingsDao.insertOrganizationUnitSettings( companySettings,
+                MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION );
+        } else {
+            organizationUnitSettingsDao.updateKeyOrganizationUnitSettingsByCriteria(
+                MongoOrganizationUnitSettingDaoImpl.KEY_CONTACT_DETAIL_SETTINGS, contactDetailSettings,
+                MongoOrganizationUnitSettingDaoImpl.KEY_IDENTIFIER, oldCompanySettings.getId(),
+                MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION );
+        }
 
         LOG.debug( "Method addOrganizationalDetails finished" );
     }
@@ -1760,15 +1770,16 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
      */
     @Override
     @Transactional
-    public Region addNewRegionWithUser( User user, String regionName, int isDefaultBySystem, String address1, String address2,
-        String country, String countryCode, String state, String city, String zipcode, long selectedUserId,
+    public Map<String, Object> addNewRegionWithUser( User user, String regionName, int isDefaultBySystem, String address1,
+        String address2, String country, String countryCode, String state, String city, String zipcode, long selectedUserId,
         String[] emailIdsArray, boolean isAdmin ) throws InvalidInputException, SolrException, NoRecordsFetchedException,
         UserAssignmentException
     {
         LOG.info( "Method addNewRegionWithUser called for user:" + user + " regionName:" + regionName + " isDefaultBySystem:"
             + isDefaultBySystem + " selectedUserId:" + selectedUserId + " emailIdsArray:" + emailIdsArray + " isAdmin:"
             + isAdmin );
-
+        Map<String, Object> map = new HashMap<String, Object>();
+        Map<String, List<User>> userMap = new HashMap<String, List<User>>();
         Region region = addNewRegion( user, regionName, isDefaultBySystem, address1, address2, country, countryCode, state,
             city, zipcode );
 
@@ -1794,7 +1805,8 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
             }
         } else if ( emailIdsArray != null && emailIdsArray.length > 0 ) {
             LOG.debug( "Fetching users list to assign to the region" );
-            List<User> assigneeUsers = getUsersFromEmailIds( emailIdsArray, user );
+            userMap = getUsersFromEmailIds( emailIdsArray, user );
+            List<User> assigneeUsers = userMap.get( CommonConstants.VALID_USERS_LIST );
 
             if ( assigneeUsers != null && !assigneeUsers.isEmpty() ) {
                 for ( User assigneeUser : assigneeUsers ) {
@@ -1807,8 +1819,12 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
                 }
             }
         }
+        map.put( CommonConstants.REGION_OBJECT, region );
+        if ( userMap != null ) {
+            map.put( CommonConstants.INVALID_USERS_LIST, userMap.get( CommonConstants.INVALID_USERS_LIST ) );
+        }
         LOG.info( "Method addNewRegionWithUser completed successfully" );
-        return region;
+        return map;
     }
 
 
@@ -1821,10 +1837,12 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
      * @return
      * @throws InvalidInputException
      */
-    private List<User> getUsersFromEmailIds( String[] emailIdsArray, User adminUser ) throws InvalidInputException
+    private Map<String, List<User>> getUsersFromEmailIds( String[] emailIdsArray, User adminUser ) throws InvalidInputException
     {
         LOG.info( "Method getUsersFromEmailIds called for emailIdsArray:" + emailIdsArray );
         List<User> users = new ArrayList<User>();
+        List<User> invalidUsers = new ArrayList<User>();
+        Map<String, List<User>> usersMap = new HashMap<String, List<User>>();
         for ( String emailId : emailIdsArray ) {
             if ( emailId.contains( "\"" ) ) {
                 emailId = emailId.replace( "\"", "" );
@@ -1832,50 +1850,104 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
             String firstName = "";
             String lastName = "";
             User user = null;
-            if ( emailId.contains( " " ) ) {
-                String[] userArray = emailId.split( " " );
-                String[] userInformation = removeElements( userArray, "" );
-                if ( userInformation.length >= 3 ) {
-                    LOG.debug( "This contains middle name as well" );
-                    for ( int i = 0; i < userInformation.length - 1; i++ ) {
-                        firstName = firstName + userInformation[i] + " ";
+            String toRemove = null;
+            if ( emailId.indexOf( "@" ) != -1 && emailId.indexOf( "." ) != -1 ) {
+                if ( emailId.contains( " " ) ) {
+                    String[] userArray = emailId.split( " " );
+                    String[] userInformation = removeElements( userArray, "" );
+                    List<String> tempList = new LinkedList<String>();
+                    for ( String str : userInformation ) {
+                        tempList.add( str );
                     }
-                    firstName = firstName.trim();
-                    lastName = userInformation[userInformation.length - 1];
-                    if ( lastName.contains( "<" ) ) {
-                        emailId = lastName.substring( lastName.indexOf( "<" ) + 1, lastName.length() - 1 );
-                        lastName = lastName.substring( 0, lastName.indexOf( "<" ) );
-                        if ( lastName.equalsIgnoreCase( "" ) ) {
-                            lastName = userInformation[userInformation.length - 2];
-                            if ( firstName.contains( lastName ) ) {
-                                firstName = firstName.substring( 0, firstName.indexOf( lastName ) );
+                    String tempString = "";
+                    for ( int i = 0; i < tempList.size(); i++ ) {
+
+                        LOG.debug( "removing extra spaces " );
+                        if ( tempList.get( i ).equalsIgnoreCase( "<" ) ) {
+                            if ( i + 1 < tempList.size() ) {
+                                if ( !tempList.get( i + 1 ).contains( "<" ) ) {
+                                    tempString = tempList.get( i ).concat( tempList.get( i + 1 ) );
+
+                                    toRemove = tempList.get( i + 1 );
+                                    if ( i + 2 < tempList.size() ) {
+
+                                        if ( tempList.get( i + 2 ).equalsIgnoreCase( ">" ) ) {
+                                            tempString = tempString.concat( tempList.get( i + 2 ) );
+
+
+                                        }
+                                    }
+                                }
+                            }
+                        } else if ( tempList.get( i ).equalsIgnoreCase( ">" ) ) {
+                            if ( !tempList.get( i - 1 ).contains( ">" ) ) {
+                                if ( tempString.isEmpty() ) {
+                                    tempString = tempList.get( i - 1 ).concat( tempList.get( i ) );
+                                    toRemove = tempList.get( i - 1 );
+                                }
+
+                            }
+                        }
+
+                    }
+                    if ( !tempString.isEmpty() ) {
+                        tempList.add( tempString );
+                    }
+                    Iterator<String> it = tempList.iterator();
+                    while ( it.hasNext() ) {
+                        String iteratedValue = it.next();
+                        if ( iteratedValue.equalsIgnoreCase( "<" ) || iteratedValue.equalsIgnoreCase( ">" ) ) {
+                            it.remove();
+                        }
+                        if ( toRemove != null ) {
+                            if ( iteratedValue.equalsIgnoreCase( toRemove ) ) {
+                                it.remove();
                             }
                         }
                     }
+                    userInformation = tempList.toArray( new String[tempList.size()] );
+                    if ( userInformation.length >= 3 ) {
+                        LOG.debug( "This contains middle name as well" );
+                        for ( int i = 0; i < userInformation.length - 1; i++ ) {
+                            firstName = firstName + userInformation[i] + " ";
+                        }
+                        firstName = firstName.trim();
+                        lastName = userInformation[userInformation.length - 1];
+                        if ( lastName.contains( "<" ) ) {
+                            emailId = lastName.substring( lastName.indexOf( "<" ) + 1, lastName.length() - 1 );
+                            lastName = lastName.substring( 0, lastName.indexOf( "<" ) );
+                            if ( lastName.equalsIgnoreCase( "" ) ) {
+                                lastName = userInformation[userInformation.length - 2];
+                                if ( firstName.contains( lastName ) ) {
+                                    firstName = firstName.substring( 0, firstName.indexOf( lastName ) );
+                                }
+                            }
+                        }
 
-                } else if ( userInformation.length == 2 ) {
-                    firstName = userInformation[0];
-                    lastName = userInformation[1];
-                    if ( lastName.contains( "<" ) ) {
-                        emailId = lastName.substring( lastName.indexOf( "<" ) + 1, lastName.length() - 1 );
-                        lastName = lastName.substring( 0, lastName.indexOf( "<" ) );
+                    } else if ( userInformation.length == 2 ) {
+                        firstName = userInformation[0];
+                        lastName = userInformation[1];
+                        if ( lastName.contains( "<" ) ) {
+                            emailId = lastName.substring( lastName.indexOf( "<" ) + 1, lastName.length() - 1 );
+                            lastName = lastName.substring( 0, lastName.indexOf( "<" ) );
+                        }
                     }
-                }
-            } else {
-                LOG.debug( "Contains no space hence wont have a last name" );
-                lastName = null;
-                if ( emailId.contains( "<" ) ) {
-                    firstName = emailId.substring( 0, emailId.indexOf( "<" ) );
-                    if ( firstName.equalsIgnoreCase( "" ) ) {
-                        firstName = emailId.substring( emailId.indexOf( "<" ) + 1, emailId.indexOf( "@" ) );
-                    }
-                    emailId = emailId.substring( emailId.indexOf( "<" ) + 1, emailId.indexOf( ">" ) );
-
                 } else {
-                    LOG.debug( "This doesnt contain a first name and last name" );
-                    firstName = emailId.substring( 0, emailId.indexOf( "@" ) );
-                }
+                    LOG.debug( "Contains no space hence wont have a last name" );
+                    lastName = null;
+                    if ( emailId.contains( "<" ) ) {
+                        firstName = emailId.substring( 0, emailId.indexOf( "<" ) );
+                        if ( firstName.equalsIgnoreCase( "" ) ) {
+                            firstName = emailId.substring( emailId.indexOf( "<" ) + 1, emailId.indexOf( "@" ) );
+                        }
+                        emailId = emailId.substring( emailId.indexOf( "<" ) + 1, emailId.indexOf( ">" ) );
 
+                    } else {
+                        LOG.debug( "This doesnt contain a first name and last name" );
+                        firstName = emailId.substring( 0, emailId.indexOf( "@" ) );
+                    }
+
+                }
             }
             if ( validateEmail( emailId ) ) {
 
@@ -1893,15 +1965,21 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
                 }
             } else {
                 LOG.error( "This email address " + emailId + " is not a valid email" );
+                User invalidUser = new User();
+                invalidUser.setEmailId( emailId );
+                invalidUsers.add( invalidUser );
             }
             if ( user != null ) {
                 users.add( user );
+
             }
 
 
         }
+        usersMap.put( CommonConstants.VALID_USERS_LIST, users );
+        usersMap.put( CommonConstants.INVALID_USERS_LIST, invalidUsers );
         LOG.info( "Method getUsersFromEmailIds executed successfully. Returning users size :" + users.size() );
-        return users;
+        return usersMap;
     }
 
 
@@ -2040,11 +2118,14 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
      */
     @Override
     @Transactional
-    public Branch addNewBranchWithUser( User user, String branchName, long regionId, int isDefaultBySystem, String address1,
-        String address2, String country, String countryCode, String state, String city, String zipcode, long selectedUserId,
-        String[] emailIdsArray, boolean isAdmin ) throws InvalidInputException, SolrException, NoRecordsFetchedException,
-        UserAssignmentException
+    public Map<String, Object> addNewBranchWithUser( User user, String branchName, long regionId, int isDefaultBySystem,
+        String address1, String address2, String country, String countryCode, String state, String city, String zipcode,
+        long selectedUserId, String[] emailIdsArray, boolean isAdmin ) throws InvalidInputException, SolrException,
+        NoRecordsFetchedException, UserAssignmentException
     {
+        Map<String, Object> map = new HashMap<String, Object>();
+        Map<String, List<User>> userMap = new HashMap<String, List<User>>();
+
         LOG.info( "Method addNewBranchWithUser called for user:" + user + " branchName:" + branchName + "regionId: " + regionId
             + " isDefaultBySystem:" + isDefaultBySystem + " selectedUserId:" + selectedUserId + " emailIdsArray:"
             + emailIdsArray + " isAdmin:" + isAdmin );
@@ -2070,7 +2151,8 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
             }
         } else if ( emailIdsArray != null && emailIdsArray.length > 0 ) {
             LOG.debug( "Fetching users list to assign to the branch" );
-            List<User> assigneeUsers = getUsersFromEmailIds( emailIdsArray, user );
+            userMap = getUsersFromEmailIds( emailIdsArray, user );
+            List<User> assigneeUsers = userMap.get( CommonConstants.VALID_USERS_LIST );
 
             if ( assigneeUsers != null && !assigneeUsers.isEmpty() ) {
                 for ( User assigneeUser : assigneeUsers ) {
@@ -2083,8 +2165,12 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
                 }
             }
         }
+        map.put( CommonConstants.BRANCH_OBJECT, branch );
+        if ( userMap != null ) {
+            map.put( CommonConstants.INVALID_USERS_LIST, userMap.get( CommonConstants.INVALID_USERS_LIST ) );
+        }
         LOG.info( "Method addNewBranchWithUser completed successfully" );
-        return branch;
+        return map;
     }
 
 
@@ -2183,13 +2269,15 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
      */
     @Override
     @Transactional
-    public void addIndividual( User adminUser, long selectedUserId, long branchId, long regionId, String[] emailIdsArray,
-        boolean isAdmin ) throws InvalidInputException, NoRecordsFetchedException, SolrException, UserAssignmentException
+    public Map<String, Object> addIndividual( User adminUser, long selectedUserId, long branchId, long regionId,
+        String[] emailIdsArray, boolean isAdmin ) throws InvalidInputException, NoRecordsFetchedException, SolrException,
+        UserAssignmentException
     {
         LOG.info( "Method addIndividual called for adminUser:" + adminUser + " branchId:" + branchId + " regionId:" + regionId
             + " isAdmin:" + isAdmin );
         List<User> assigneeUsers = null;
-
+        Map<String, List<User>> userMap = new HashMap<String, List<User>>();
+        Map<String, Object> map = new HashMap<String, Object>();
         if ( selectedUserId > 0l ) {
             LOG.debug( "Fetching user for selectedUserId " + selectedUserId );
             User assigneeUser = userDao.findById( User.class, selectedUserId );
@@ -2200,7 +2288,8 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
             assigneeUsers.add( assigneeUser );
         } else if ( emailIdsArray != null && emailIdsArray.length > 0 ) {
             LOG.debug( "Fetching users list for the email addresses provided" );
-            assigneeUsers = getUsersFromEmailIds( emailIdsArray, adminUser );
+            userMap = getUsersFromEmailIds( emailIdsArray, adminUser );
+            assigneeUsers = userMap.get( CommonConstants.VALID_USERS_LIST );
         }
 
         if ( assigneeUsers != null && !assigneeUsers.isEmpty() ) {
@@ -2238,6 +2327,10 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 
         }
         LOG.info( "Method addNewIndividual executed successfully" );
+        if ( userMap != null ) {
+            map.put( CommonConstants.INVALID_USERS_LIST, userMap.get( CommonConstants.INVALID_USERS_LIST ) );
+        }
+        return map;
     }
 
 
@@ -3391,10 +3484,13 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
      */
     @Override
     @Transactional
-    public Region updateRegion( User user, long regionId, String regionName, String address1, String address2, String country,
-        String countryCode, String state, String city, String zipcode, long selectedUserId, String[] emailIdsArray,
-        boolean isAdmin ) throws InvalidInputException, SolrException, NoRecordsFetchedException, UserAssignmentException
+    public Map<String, Object> updateRegion( User user, long regionId, String regionName, String address1, String address2,
+        String country, String countryCode, String state, String city, String zipcode, long selectedUserId,
+        String[] emailIdsArray, boolean isAdmin ) throws InvalidInputException, SolrException, NoRecordsFetchedException,
+        UserAssignmentException
     {
+        Map<String, Object> map = new HashMap<String, Object>();
+        Map<String, List<User>> userMap = new HashMap<String, List<User>>();
         if ( user == null ) {
             throw new InvalidInputException( "User is null in update region" );
         }
@@ -3450,7 +3546,8 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
             }
         } else if ( emailIdsArray != null && emailIdsArray.length > 0 ) {
             LOG.debug( "Fetching users list to assign to the region" );
-            List<User> assigneeUsers = getUsersFromEmailIds( emailIdsArray, user );
+            userMap = getUsersFromEmailIds( emailIdsArray, user );
+            List<User> assigneeUsers = userMap.get( CommonConstants.VALID_USERS_LIST );
 
             if ( assigneeUsers != null && !assigneeUsers.isEmpty() ) {
                 for ( User assigneeUser : assigneeUsers ) {
@@ -3464,7 +3561,11 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
             }
         }
         LOG.info( "Method to update region completed successfully" );
-        return region;
+        map.put( CommonConstants.REGION_OBJECT, region );
+        if ( userMap != null ) {
+            map.put( CommonConstants.INVALID_USERS_LIST, userMap.get( CommonConstants.INVALID_USERS_LIST ) );
+        }
+        return map;
     }
 
 
@@ -3535,11 +3636,13 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
      */
     @Override
     @Transactional
-    public Branch updateBranch( User user, long branchId, long regionId, String branchName, String address1, String address2,
-        String country, String countryCode, String state, String city, String zipcode, long selectedUserId,
+    public Map<String, Object> updateBranch( User user, long branchId, long regionId, String branchName, String address1,
+        String address2, String country, String countryCode, String state, String city, String zipcode, long selectedUserId,
         String[] emailIdsArray, boolean isAdmin ) throws InvalidInputException, SolrException, NoRecordsFetchedException,
         UserAssignmentException
     {
+        Map<String, Object> map = new HashMap<String, Object>();
+        Map<String, List<User>> userMap = new HashMap<String, List<User>>();
         LOG.info( "Method updateBranch called for branchId:" + branchId + " regionId:" + regionId + " branchName:" + branchName );
         if ( user == null ) {
             throw new InvalidInputException( "User is null in update branch" );
@@ -3620,7 +3723,8 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
             }
         } else if ( emailIdsArray != null && emailIdsArray.length > 0 ) {
             LOG.debug( "Fetching users list to assign to the branch" );
-            List<User> assigneeUsers = getUsersFromEmailIds( emailIdsArray, user );
+            userMap = getUsersFromEmailIds( emailIdsArray, user );
+            List<User> assigneeUsers = userMap.get( CommonConstants.VALID_USERS_LIST );
 
             if ( assigneeUsers != null && !assigneeUsers.isEmpty() ) {
                 for ( User assigneeUser : assigneeUsers ) {
@@ -3633,8 +3737,10 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
                 }
             }
         }
+        map.put( CommonConstants.BRANCH_OBJECT, branch );
+        map.put( CommonConstants.INVALID_USERS_LIST, userMap.get( CommonConstants.INVALID_USERS_LIST ) );
         LOG.info( "Method to update branch completed successfully" );
-        return branch;
+        return map;
     }
 
 
@@ -3920,6 +4026,36 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
         } else {
             return "";
         }
+    }
+
+
+    @Override
+    @Transactional
+    public List<Company> getCompaniesByName( String namePattern )
+    {
+        return companyDao.searchCompaniesByName( namePattern );
+    }
+    
+    @Override
+	@Transactional
+	public Company getCompanyById(long companyId) {
+		return companyDao.findById(Company.class, companyId);
+	}
+    
+    @Override
+    public List<OrganizationUnitSettings> getAllCompaniesFromMongo() {
+    	LOG.debug("Method getAllCompaniesFromMongo() called");
+    	
+    	List<OrganizationUnitSettings> unitSettings = organizationUnitSettingsDao.getCompanyList();
+    	
+    	return unitSettings;
+    }
+    
+    @Override
+    public List<OrganizationUnitSettings> getCompaniesByNameFromMongo(String searchKey) {
+    	LOG.debug("Method getCompaniesByNameFromMongo() called");
+    	List<OrganizationUnitSettings> unitSettings = organizationUnitSettingsDao.getCompanyListByKey(searchKey);
+    	return unitSettings;
     }
 }
 // JIRA: SS-27: By RM05: EOC
