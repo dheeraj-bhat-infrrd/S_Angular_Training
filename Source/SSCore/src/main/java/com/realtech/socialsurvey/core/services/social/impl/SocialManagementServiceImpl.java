@@ -182,15 +182,20 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
 			if (agentSettings.getSocialMediaTokens() != null) {
 				if (agentSettings.getSocialMediaTokens().getFacebookToken() != null
 						&& agentSettings.getSocialMediaTokens().getFacebookToken().getFacebookAccessToken() != null) {
-					facebook.setOAuthAccessToken(new AccessToken(agentSettings.getSocialMediaTokens().getFacebookToken().getFacebookAccessToken(),
-							null));
-					try {
-						facebookNotSetup = false;
-						facebook.postStatusMessage(message);
-					}
-					catch (RuntimeException e) {
-						LOG.error("Runtime exception caught while trying to post on facebook. Nested exception is ", e);
-					}
+					if(agentSettings.getSocialMediaTokens().getFacebookToken().getFacebookAccessTokenToPost()!=null)
+						facebook.setOAuthAccessToken(new AccessToken(agentSettings.getSocialMediaTokens().getFacebookToken().getFacebookAccessTokenToPost(),
+								null));
+					else
+						facebook.setOAuthAccessToken(new AccessToken(agentSettings.getSocialMediaTokens().getFacebookToken().getFacebookAccessToken(),
+								null));
+						try {
+							facebookNotSetup = false;
+							facebook.postStatusMessage(message);
+						}
+						catch (RuntimeException e) {
+							LOG.error("Runtime exception caught while trying to post on facebook. Nested exception is ", e);
+						}
+					
 				}
 			}
 		}
