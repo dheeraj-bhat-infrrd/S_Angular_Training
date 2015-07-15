@@ -8,13 +8,9 @@
 			<div class="float-left hm-header-row-left text-center">
 				<spring:message code="label.viewcompanyhierachy.key" />
 			</div>
-			<div class="clearfix float-right">
-				<div class="float-left dash-sel-lbl">Company</div>
-				<div class="dsh-inp-wrapper float-left">
-					<input id="hr-comp-sel" class="dash-sel-item" type="text"
-						placeholder="Start typing..." onkeyup="searchAdminCompanies(this)">
-					<div id="hr-comp-res" class="dsh-sb-dd hide"></div>
-				</div>
+			<div class="v-um-hdr-right float-right">
+				<input id="hr-comp-sel" class="v-comp-inp" placeholder="Search Company">
+				<span id="hr-comp-icn" class="um-search-icn"></span>
 			</div>
 		</div>
 	</div>
@@ -23,5 +19,18 @@
 	<jsp:include page="../messageheader.jsp"></jsp:include>
 </div>
 <div id="comp-hierarchy-cont" class="container v-hr-container">
+	<div class="v-hr-tbl">
+		<div class="v-tbl-header comp-row" id="hierarchy-list-header">
+			<div class="v-tbl-line"></div>
+			<div class="v-tbl-name">Name</div>
+			<div class="v-tbl-add">Email Address</div>
+			<div class="v-tbl-role">Role</div>
+			<div class="v-tbl-btns"></div>
+			<div class="v-tbl-spacer"></div>
+		</div>
+		<div id="admin-com-list">
+			<jsp:include page="admin_company_list.jsp"></jsp:include>
+		</div>
+	</div>
 </div>
  <div id="temp-message" class="hide"></div>

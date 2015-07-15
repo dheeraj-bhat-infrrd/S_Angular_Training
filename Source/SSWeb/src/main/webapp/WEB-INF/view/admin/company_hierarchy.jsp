@@ -1,19 +1,8 @@
 <%@ taglib prefix="spring" uri="http://www.springframework.org/tags"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 
-<c:if test="${not empty companyObj && not empty companyObj.company}">
-	<div class="v-hr-header">${companyObj.company}</div>
-</c:if>
 <div class="v-hr-tbl-wrapper">
 	<table class="v-hr-tbl">
-		<tr class="v-tbl-header" id="hierarchy-list-header">
-			<td class="v-tbl-line"></td>
-			<td class="v-tbl-name"><spring:message code="label.name.key" /></td>
-			<td class="v-tbl-add"><spring:message code="label.emailid.key" /></td>
-			<td class="v-tbl-role"><spring:message code="label.role.key" /></td>
-			<td class="v-tbl-btns"></td>
-			<td class="v-tbl-spacer"></td>
-		</tr>
 		<c:if test="${not empty regions}">
 			<c:forEach var="region" items="${regions}">
 				<tr id="tr-region-${region.regionId}" clicked="false"
@@ -31,7 +20,7 @@
 						<div class="clearfix v-tbl-icn-wraper">
 							<div class="float-left v-tbl-icn v-icn-close region-del-icn hidden"
 								data-regionid="${region.regionId}"></div>
-							<div class="float-left v-tbl-icn v-icn-edit region-edit-icn"
+							<div class="float-right v-tbl-icn v-icn-edit region-edit-icn"
 								clicked="false" data-regionid="${region.regionId}"></div>
 						</div>
 					</td>
@@ -48,7 +37,7 @@
 		<c:if test="${not empty branches}">
 			<c:forEach var="branch" items="${branches}">
 				<tr id="tr-branch-row-${branch.branchId}" clicked="false"
-					class="v-tbl-row v-tbl-row-sel v-tbl-row-brnch branch-row sel-b${branch.branchId}"
+					class="v-tbl-row v-tbl-row-sel v-tbl-row-brnch branch-row comp-branch-row sel-b${branch.branchId}"
 					data-branchid="${branch.branchId}">
 					<td class="v-tbl-line">
 						<div class="v-line-brnch v-line-comp-brnch"></div>
@@ -62,7 +51,7 @@
 						<div class="clearfix v-tbl-icn-wraper">
 							<div class="float-left v-tbl-icn v-icn-close branch-del-icn hidden"
 								data-branchid="${branch.branchId}"></div>
-							<div class="float-left v-tbl-icn v-icn-edit branch-edit-icn"
+							<div class="float-right v-tbl-icn v-icn-edit branch-edit-icn"
 								clicked="false" data-branchid="${branch.branchId}"></div>
 						</div>
 					</td>
@@ -105,7 +94,7 @@
 						<div class="clearfix v-tbl-icn-wraper">
 							<div class="float-left v-tbl-icn v-icn-close user-del-icn hidden"
 								data-userid="${compUser.userId}"></div>
-							<div class="float-left v-tbl-icn v-icn-edit user-edit-icn"
+							<div class="float-right v-tbl-icn v-icn-edit user-edit-icn"
 								clicked="false" data-userid="${compUser.userId}" data-iscom-admin="${compUser.isOwner}"></div>
 						</div>
 					</td>

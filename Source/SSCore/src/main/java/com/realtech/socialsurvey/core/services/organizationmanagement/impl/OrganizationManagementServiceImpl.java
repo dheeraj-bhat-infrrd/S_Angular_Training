@@ -18,9 +18,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
 import javax.annotation.Resource;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
@@ -30,7 +28,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.DependsOn;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
-
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
@@ -4044,5 +4041,21 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 	public Company getCompanyById(long companyId) {
 		return companyDao.findById(Company.class, companyId);
 	}
+    
+    @Override
+    public List<OrganizationUnitSettings> getAllCompaniesFromMongo() {
+    	LOG.debug("Method getAllCompaniesFromMongo() called");
+    	
+    	List<OrganizationUnitSettings> unitSettings = organizationUnitSettingsDao.getCompanyList();
+    	
+    	return unitSettings;
+    }
+    
+    @Override
+    public List<OrganizationUnitSettings> getCompaniesByNameFromMongo(String searchKey) {
+    	LOG.debug("Method getCompaniesByNameFromMongo() called");
+    	List<OrganizationUnitSettings> unitSettings = organizationUnitSettingsDao.getCompanyListByKey(searchKey);
+    	return unitSettings;
+    }
 }
 // JIRA: SS-27: By RM05: EOC
