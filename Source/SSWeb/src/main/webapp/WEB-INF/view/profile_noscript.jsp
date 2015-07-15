@@ -523,7 +523,7 @@
 										Reviews for <span class="capitalize">${profName}</span>. 
 										<span class="capitalize">${firstName}</span> has ${reviewsCount} reviews. 
 										<c:if test="${not empty  vertical && not empty location}">
-											<span class="capitalize">${firstName}</span> is a ${vertical} professnal in ${location}.
+											<span class="capitalize">${firstName}</span> is a ${vertical} professional in ${location}.
 										</c:if>
 										<c:if test="${not empty title}">
 											<span class="capitalize">${firstName}</span> is the ${title} of ${companyName}.
