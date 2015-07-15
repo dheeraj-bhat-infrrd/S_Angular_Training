@@ -3291,7 +3291,6 @@ $(document).on('blur', '#um-emailid', function() {
 function initUserManagementPage() {
 	userStartIndex = 0;
 	paintUserListInUserManagement(userStartIndex);
-	updatePaginateButtons();
 }
 
 function selectBranch(element) {
@@ -3612,7 +3611,7 @@ function paintUserListInUserManagement(startIndex) {
 			bindEditUserClick();
 		},
 		error : function(e) {
-			if(e.status == 504) {
+			if (e.status == 504) {
 				redirectToLoginPageOnSessionTimeOut(e.status);
 				return;
 			}
@@ -4270,18 +4269,26 @@ $(document).on('click', '#page-next.paginate-button', function(){
 });
 
 function updatePaginateButtons() {
-	// next button
-	if (userStartIndex <= 0) {
-		$('#page-previous').removeClass('paginate-button');
-	} else {
-		$('#page-previous').addClass('paginate-button');
+	var numFound = $('#u-tbl-header').attr('data-num-found');
+	if (numFound > userBatchSize) {
+		$('#paginate-buttons').show();
+		
+		// next button
+		if (userStartIndex <= 0) {
+			$('#page-previous').removeClass('paginate-button');
+		} else {
+			$('#page-previous').addClass('paginate-button');
+		}
+		
+		// previous button
+		if (userStartIndex + userBatchSize >= $('#users-count').val()) {
+			$('#page-next').removeClass('paginate-button');
+		} else {
+			$('#page-next').addClass('paginate-button');
+		}
 	}
-	
-	// previous button
-	if (userStartIndex + userBatchSize >= $('#users-count').val()) {
-		$('#page-next').removeClass('paginate-button');
-	} else {
-		$('#page-next').addClass('paginate-button');
+	else {
+		$('#paginate-buttons').hide();
 	}
 }
 
