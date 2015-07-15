@@ -30,11 +30,10 @@ public interface DashboardService {
 
 	public int getBadges(double surveyScore, int surveyCount, int socialPosts, int profileCompleteness);
 
-	public XSSFWorkbook downloadCompleteSurveyData(List<SurveyDetails> surveyDetails, String fileLocation) throws IOException;
+	public Map<String, Map<String, Long>> getSurveyDetailsForGraph(String columnName, long columnValue, String reportType, boolean realtechAdmin)
+			throws ParseException;
 
 	public XSSFWorkbook downloadIncompleteSurveyData(List<SurveyPreInitiation> surveyDetails, String fileLocation) throws IOException;
-
-	public Map<String, Map<String, Long>> getSurveyDetailsForGraph(String columnName, long columnValue, String reportType, boolean realtechAdmin) throws ParseException;
 
 	public XSSFWorkbook downloadSocialMonitorData(List<SurveyDetails> surveyDetails, String fileName);
 

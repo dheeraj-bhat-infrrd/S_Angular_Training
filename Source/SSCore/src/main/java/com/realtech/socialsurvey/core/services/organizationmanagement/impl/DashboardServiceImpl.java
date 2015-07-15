@@ -26,6 +26,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import com.realtech.socialsurvey.core.commons.AgentRankingReportComparator;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
+import com.realtech.socialsurvey.core.commons.SurveyResultsComparator;
 import com.realtech.socialsurvey.core.dao.OrganizationUnitSettingsDao;
 import com.realtech.socialsurvey.core.dao.SurveyDetailsDao;
 import com.realtech.socialsurvey.core.dao.impl.MongoSocialPostDaoImpl;
@@ -181,92 +182,14 @@ public class DashboardServiceImpl implements DashboardService, InitializingBean 
 		return badges;
 	}
 
-	/*
-	 * Method to create excel file from all the completed survey data.
-	 */
 	@Override
-	public XSSFWorkbook downloadCompleteSurveyData(List<SurveyDetails> surveyDetails, String fileLocation) throws IOException {
-		// Blank workbook
-		XSSFWorkbook workbook = new XSSFWorkbook();
-
-		// Create a blank sheet
-		XSSFSheet sheet = workbook.createSheet();
-		XSSFDataFormat df = workbook.createDataFormat();
-		CellStyle style = workbook.createCellStyle();
-		style.setDataFormat(df.getFormat("d-mm-yyyy"));
-		Integer counter = 1;
-		int max = 0;
-		int internalMax = 0;
-		// This data needs to be written (List<Object>)
-		Map<String, List<Object>> data = new TreeMap<>();
-		List<Object> surveyDetailsToPopulate = new ArrayList<>();
-		for (SurveyDetails survey : surveyDetails) {
-			internalMax = 0;
-			surveyDetailsToPopulate.add(survey.getCustomerFirstName());
-			surveyDetailsToPopulate.add(survey.getCustomerLastName());
-			surveyDetailsToPopulate.add(survey.getCreatedOn());
-			surveyDetailsToPopulate.add(survey.getModifiedOn());
-			surveyDetailsToPopulate.add(survey.getScore());
-			surveyDetailsToPopulate.add(survey.getMood());
-			surveyDetailsToPopulate.add(survey.getReview());
-			if (survey.getSharedOn() == null)
-				surveyDetailsToPopulate.add(null);
-			else
-				surveyDetailsToPopulate.add(StringUtils.join(survey.getSharedOn(), ","));
-			for (SurveyResponse response : survey.getSurveyResponse()) {
-				internalMax++;
-				surveyDetailsToPopulate.add(response.getAnswer());
-			}
-			data.put((++counter).toString(), surveyDetailsToPopulate);
-			surveyDetailsToPopulate = new ArrayList<>();
-			if (internalMax > max)
-				max = internalMax;
-		}
-		surveyDetailsToPopulate.add("First Name");
-		surveyDetailsToPopulate.add("Last Name");
-		surveyDetailsToPopulate.add("Started On");
-		surveyDetailsToPopulate.add("Completed On");
-		surveyDetailsToPopulate.add("Score");
-		surveyDetailsToPopulate.add("Experience");
-		surveyDetailsToPopulate.add("Comments");
-		surveyDetailsToPopulate.add("Social");
-		for (counter = 1; counter <= max; counter++) {
-			surveyDetailsToPopulate.add("Question " + counter);
-		}
-		data.put("1", surveyDetailsToPopulate);
-
-		// Iterate over data and write to sheet
-		Set<String> keyset = data.keySet();
-		int rownum = 0;
-		for (String key : keyset) {
-			Row row = sheet.createRow(rownum++);
-			List<Object> objArr = data.get(key);
-			int cellnum = 0;
-			for (Object obj : objArr) {
-				Cell cell = row.createCell(cellnum++);
-				if (obj instanceof String)
-					cell.setCellValue((String) obj);
-				else if (obj instanceof Integer)
-					cell.setCellValue((Integer) obj);
-				else if (obj instanceof Double)
-					cell.setCellValue((Double) obj);
-				else if (obj instanceof Date){
-					cell.setCellStyle(style);
-					cell.setCellValue((Date) obj);
-				}
-			}
-		}
-		/** try {
-			// Write the workbook in file system
-			FileOutputStream out = new FileOutputStream(new File(fileLocation));
-			workbook.write(out);
-			out.close();
-		}
-		catch (IOException e) {
-			LOG.error("IOException caught in downloadCompleteSurveyData() while trying to create excel file at " + fileLocation);
-			throw e;
-		}*/
-		return workbook;
+	public Map<String, Map<String, Long>> getSurveyDetailsForGraph(String columnName, long columnValue, String reportType, boolean realtechAdmin) throws ParseException{
+		Map<String, Map<String, Long>> map = new HashMap<String, Map<String, Long>>();
+		map.put("clicked", surveyDetailsDao.getClickedSurveyByCriteria(columnName, columnValue, reportType, realtechAdmin));
+		map.put("sent", surveyDetailsDao.getSentSurveyByCriteria(columnName, columnValue, reportType, realtechAdmin));
+		map.put("complete", surveyDetailsDao.getCompletedSurveyByCriteria(columnName, columnValue, reportType, realtechAdmin));
+		map.put("socialposts", surveyDetailsDao.getSocialPostsCountByCriteria(columnName, columnValue, reportType, realtechAdmin));
+		return map;
 	}
 
 	/*
@@ -285,6 +208,7 @@ public class DashboardServiceImpl implements DashboardService, InitializingBean 
 		Integer counter = 1;
 		int max = 0;
 		int internalMax = 0;
+		
 		// This data needs to be written (List<Object>)
 		Map<String, List<Object>> data = new TreeMap<>();
 		List<Object> surveyDetailsToPopulate = new ArrayList<>();
@@ -295,6 +219,7 @@ public class DashboardServiceImpl implements DashboardService, InitializingBean 
 			surveyDetailsToPopulate.add(survey.getCustomerEmailId());
 			surveyDetailsToPopulate.add(survey.getCreatedOn());
 			surveyDetailsToPopulate.add(survey.getModifiedOn());
+			
 			try {
 				surveyDetailsToPopulate.add(surveyHandler.composeLink(survey.getAgentId(), survey.getCustomerEmailId()));
 			}
@@ -316,6 +241,7 @@ public class DashboardServiceImpl implements DashboardService, InitializingBean 
 			internalMax++;
 			surveyDetailsToPopulate.add("Question " + counter);
 		}
+		
 		data.put("1", surveyDetailsToPopulate);
 
 		// Iterate over data and write to sheet
@@ -324,6 +250,7 @@ public class DashboardServiceImpl implements DashboardService, InitializingBean 
 		for (String key : keyset) {
 			Row row = sheet.createRow(rownum++);
 			List<Object> objArr = data.get(key);
+			
 			int cellnum = 0;
 			for (Object obj : objArr) {
 				Cell cell = row.createCell(cellnum++);
@@ -331,37 +258,16 @@ public class DashboardServiceImpl implements DashboardService, InitializingBean 
 					cell.setCellValue((String) obj);
 				else if (obj instanceof Integer)
 					cell.setCellValue((Integer) obj);
-				else if (obj instanceof Date){
+				else if (obj instanceof Date) {
 					cell.setCellStyle(style);
 					cell.setCellValue((Date) obj);
 				}
 			}
 		}
-		/**try {
-			// Write the workbook in file system
-			File file = new File(fileLocation);
-			file.createNewFile();
-			FileOutputStream out = new FileOutputStream(file);
-			workbook.write(out);
-			out.close();
-		}
-		catch (IOException e) {
-			LOG.error("IOException caught in downloadCompleteSurveyData() while trying to create excel file at " + fileLocation);
-			throw e;
-		}*/
+		
 		return workbook;
 	}
 	
-	@Override
-	public Map<String, Map<String, Long>> getSurveyDetailsForGraph(String columnName, long columnValue, String reportType, boolean realtechAdmin) throws ParseException{
-		Map<String, Map<String, Long>> map = new HashMap<String, Map<String, Long>>();
-		map.put("clicked", surveyDetailsDao.getClickedSurveyByCriteria(columnName, columnValue, reportType, realtechAdmin));
-		map.put("sent", surveyDetailsDao.getSentSurveyByCriteria(columnName, columnValue, reportType, realtechAdmin));
-		map.put("complete", surveyDetailsDao.getCompletedSurveyByCriteria(columnName, columnValue, reportType, realtechAdmin));
-		map.put("socialposts", surveyDetailsDao.getSocialPostsCountByCriteria(columnName, columnValue, reportType, realtechAdmin));
-		return map;
-	}
-
 	/*
 	 * Method to create excel file for Social posts.
 	 */
@@ -376,6 +282,9 @@ public class DashboardServiceImpl implements DashboardService, InitializingBean 
 		CellStyle style = workbook.createCellStyle();
 		style.setDataFormat(df.getFormat("d-mm-yyyy"));
 		Integer counter = 1;
+		
+		// Sorting SurveyResults
+		Collections.sort(surveyDetails, new SurveyResultsComparator());
 		
 		// This data needs to be written (List<Object>)
 		Map<String, List<Object>> data = new TreeMap<>();
@@ -395,6 +304,7 @@ public class DashboardServiceImpl implements DashboardService, InitializingBean 
 			}
 		}
 		
+		// Setting up headers
 		surveyDetailsToPopulate.add(CommonConstants.HEADER_POST_COMMENT);
 		surveyDetailsToPopulate.add(CommonConstants.HEADER_POST_DATE);
 		surveyDetailsToPopulate.add(CommonConstants.HEADER_POST_SOURCE);
@@ -443,6 +353,9 @@ public class DashboardServiceImpl implements DashboardService, InitializingBean 
 		Integer counter = 1;
 		int max = 0;
 		int internalMax = 0;
+		
+		// Sorting SurveyResults
+		Collections.sort(surveyDetails, new SurveyResultsComparator());
 		
 		// This data needs to be written (List<Object>)
 		Map<String, List<Object>> data = new TreeMap<>();
@@ -496,6 +409,7 @@ public class DashboardServiceImpl implements DashboardService, InitializingBean 
 				max = internalMax;
 		}
 		
+		// Setting up headers
 		surveyDetailsToPopulate.add(CommonConstants.HEADER_AGENT_FIRST_NAME);
 		surveyDetailsToPopulate.add(CommonConstants.HEADER_AGENT_LAST_NAME);
 		surveyDetailsToPopulate.add(CommonConstants.HEADER_CUSTOMER_FIRST_NAME);
