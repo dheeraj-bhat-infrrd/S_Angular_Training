@@ -267,15 +267,12 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
      */
     @Override
     @Transactional
-    public void updateReminderCount( long agentId, String customerEmail )
+    public void updateReminderCount( long surveyPreInitiationId )
     {
         LOG.info( "Method to increase reminder count by 1, updateReminderCount() started." );
-        Map<String, Object> queries = new HashMap<>();
-        queries.put( "agentId", agentId );
-        queries.put( "customerEmailId", customerEmail );
-        List<SurveyPreInitiation> surveys = surveyPreInitiationDao.findByKeyValue( SurveyPreInitiation.class, queries );
-        if ( surveys != null && !surveys.isEmpty() ) {
-            SurveyPreInitiation survey = surveys.get( CommonConstants.INITIAL_INDEX );
+
+        SurveyPreInitiation survey = surveyPreInitiationDao.findById( SurveyPreInitiation.class, surveyPreInitiationId );
+        if ( survey != null ) {
             survey.setModifiedOn( new Timestamp( System.currentTimeMillis() ) );
             survey.setLastReminderTime( new Timestamp( System.currentTimeMillis() ) );
             survey.setReminderCounts( survey.getReminderCounts() + 1 );

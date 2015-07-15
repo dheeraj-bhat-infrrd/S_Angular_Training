@@ -70,7 +70,7 @@ public interface SurveyHandler
     public String getSwearWords();
 
 
-    public void updateReminderCount( long agentId, String customerEmail );
+    public void updateReminderCount( long surveyPreInitiationId );
 
 
     public Map<String, String> getEmailIdsOfAdminsInHierarchy( long agentId ) throws InvalidInputException;
