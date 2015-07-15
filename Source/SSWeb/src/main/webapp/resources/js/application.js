@@ -318,8 +318,8 @@ function paintDashboard(profileMasterId, newProfileName, newProfileValue, typeoO
 	$('#dsh-dwnld-btn').click(function() {
 		var startDate = $('#dsh-start-date').val();
 		var endDate = $("#dsh-end-date").val();
-		window.location.href = "./downloaddashboardcompletesurvey.do?columnName="
-				+ colName + "&columnValue=" + colValue + "&startDate=" + startDate + "&endDate=" + endDate;
+		window.location.href = "/downloadcustomersurveyresults.do?columnName=" + colName + "&columnValue=" + colValue
+			+ "&startDate=" + startDate + "&endDate=" + endDate;
 	});
 	
 	// Loads the image in circle of header.
@@ -7393,13 +7393,9 @@ $(document).on('click','#dsh-dwnld-report-btn',function(){
 	var selectedValue = $('#download-survey-reports').val();
 	var startDate = $('#dsh-start-date').val();
 	var endDate = $("#dsh-end-date").val();
+	
 	var key = parseInt(selectedValue);
 	switch (key) {
-	case 0:
-		console.log("complete-survey");
-		window.location.href = "/downloaddashboardcompletesurvey.do?columnName=" + colName+ "&columnValue=" + colValue
-			+ "&startDate=" + startDate + "&endDate=" + endDate;
-		break;
 	case 1:
 		console.log("agent-ranking");
 		window.location.href = "/downloadagentrankingreport.do?columnName=" + colName + "&columnValue=" + colValue
