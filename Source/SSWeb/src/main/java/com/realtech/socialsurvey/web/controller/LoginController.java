@@ -301,6 +301,9 @@ public class LoginController {
 						model.addAttribute("showLinkedInPopup", String.valueOf(showLinkedInPopup));
 						model.addAttribute("showSendSurveyPopup", String.valueOf(showSendSurveyPopup));
 
+						// updating session with selected user profile if not set
+						sessionHelper.updateProcessedUserProfiles(session, user);
+
 						// update the last login time and number of logins
 						userManagementService.updateUserLoginTimeAndNum(user);
 					}

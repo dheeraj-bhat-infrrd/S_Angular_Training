@@ -399,8 +399,8 @@ function showAgentFlow(newProfileName, newProfileValue) {
 
 	showProfileDetails(newProfileName, 0, 90);
 	bindSelectButtons();
-	showSurveyCount(newProfileName, 0, 30);
-	showSurveyStatisticsGraphically(newProfileName, 0);
+	showSurveyStatistics(newProfileName, newProfileValue);
+	showSurveyStatisticsGraphically(newProfileName, newProfileValue);
 
 	getReviewsCountAndShowReviews(newProfileName, 0);
 	showIncompleteSurvey(colName, colValue);
@@ -426,11 +426,26 @@ function bindSelectButtons() {
 	$("#selection-list").change(function() {
 		$('#dsh-sel-item').val('');
 		$('.dsh-res-display').hide();
+		
+		if ($("#selection-list").val() == 'companyId') {
+			$('#dsh-srch-survey-div').hide();
+			showSurveyStatistics('companyId', 0);
+		} else {
+			$('#dsh-srch-survey-div').show();
+		}
 	});
 	$("#graph-sel-list").change(function() {
 		$('#dsh-grph-sel-item').val('');
 		$('.dsh-res-display').hide();
+		
+		if ($("#graph-sel-list").val() == 'companyId') {
+			$('#dsh-grph-srch-survey-div').hide();
+			showSurveyStatisticsGraphically('companyId', 0);
+		} else {
+			$('#dsh-grph-srch-survey-div').show();
+		}
 	});
+	
 	$("#dsh-grph-format").change(function() {
 		var columnName = colName;
 		var columnValue = colValue;
@@ -458,6 +473,10 @@ function populateSurveyStatisticsList(columnName) {
 	
 	var options = "";
 	var optionsForGraph = "";
+	if ((columnName == "companyId") && (accountType == "ENTERPRISE" || accountType == "COMPANY")) {
+		options += "<option value=companyId>Company</option>";
+		optionsForGraph += "<option value=companyId>Company</option>";
+	}
 	if ((columnName == "companyId") && (accountType == "ENTERPRISE")) {
 		options += "<option value=regionName>Region</option>";
 		optionsForGraph += "<option value=regionName>Region</option>";
@@ -474,7 +493,10 @@ function populateSurveyStatisticsList(columnName) {
 	}
 	
 	$("#selection-list").html(options);
+	$('#dsh-srch-survey-div').hide();
+
 	$("#graph-sel-list").html(options);
+	$('#dsh-grph-srch-survey-div').hide();
 }
 
 function showSurveyStatistics(columnName, columnValue) {
@@ -1056,7 +1078,8 @@ $(document).on('click','.da-dd-item',function(e){
 	var newProfileId = $(this).attr('data-profile-id');
 	updateCurrentProfile(newProfileId);
 
-	var newProfileMasterId = $(this).attr('data-profile-master-id');
+	showMainContent('./dashboard.do');
+	/*var newProfileMasterId = $(this).attr('data-profile-master-id');
 	var newProfileName = $(this).attr('data-column-name');
 	var newProfileValue = $(this).attr('data-column-value');
 	paintDashboard(newProfileMasterId, newProfileName, newProfileValue);
@@ -1068,7 +1091,7 @@ $(document).on('click','.da-dd-item',function(e){
 	$('#prof-container').attr('data-column-value', newProfileValue);
 	
 	colName = newProfileName;
-	colValue = newProfileValue;
+	colValue = newProfileValue;*/
 });
 
 $(document).click(function(){
@@ -4292,7 +4315,7 @@ function updatePaginateButtons() {
 	}
 }
 
-//Edit profile drodown
+//Edit profile dropdown
 //Profile View as
 $('body').on('click','#profile-sel',function(e) {
 	e.stopPropagation();

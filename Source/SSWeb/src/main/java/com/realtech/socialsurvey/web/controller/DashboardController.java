@@ -13,11 +13,9 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
-
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.apache.solr.common.SolrDocument;
 import org.slf4j.Logger;
@@ -29,7 +27,6 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
-
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.type.TypeFactory;
 import com.google.gson.Gson;
@@ -46,7 +43,6 @@ import com.realtech.socialsurvey.core.entities.User;
 import com.realtech.socialsurvey.core.entities.UserProfile;
 import com.realtech.socialsurvey.core.entities.UserSettings;
 import com.realtech.socialsurvey.core.enums.AccountType;
-import com.realtech.socialsurvey.core.enums.DisplayMessageType;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.exception.NonFatalException;
 import com.realtech.socialsurvey.core.services.generator.URLGenerator;
@@ -119,70 +115,34 @@ public class DashboardController {
 		HttpSession session = request.getSession(false);
 		User user = sessionHelper.getCurrentUser();
 
-		try {
-			// updating session with selected user profile if not set
-			sessionHelper.updateProcessedUserProfiles(session, user);
+		UserProfile selectedProfile = (UserProfile) session.getAttribute(CommonConstants.USER_PROFILE);
+		int profileMasterId = selectedProfile.getProfilesMaster().getProfileId();
 
-			UserProfile selectedProfile = (UserProfile) session
-					.getAttribute(CommonConstants.USER_PROFILE);
-			int profileMasterId = selectedProfile.getProfilesMaster()
-					.getProfileId();
+		model.addAttribute("userId", user.getUserId());
+		model.addAttribute("emailId", user.getEmailId());
+		model.addAttribute("profileId", selectedProfile.getUserProfileId());
+		model.addAttribute("profileMasterId", profileMasterId);
 
-			model.addAttribute("userId", user.getUserId());
-			model.addAttribute("emailId", user.getEmailId());
-			model.addAttribute("profileId", selectedProfile.getUserProfileId());
-			model.addAttribute("profileMasterId", profileMasterId);
-
-			if (profileMasterId == CommonConstants.PROFILES_MASTER_COMPANY_ADMIN_PROFILE_ID) {
-				model.addAttribute("columnName",
-						CommonConstants.COMPANY_ID_COLUMN);
-				model.addAttribute("columnValue", user.getCompany()
-						.getCompanyId());
-				model.addAttribute("showSendSurveyPopupAdmin",
-						String.valueOf(true));
-			} else if (profileMasterId == CommonConstants.PROFILES_MASTER_REGION_ADMIN_PROFILE_ID) {
-				model.addAttribute("columnName",
-						CommonConstants.REGION_ID_COLUMN);
-				model.addAttribute("columnValue", selectedProfile.getRegionId());
-				model.addAttribute("showSendSurveyPopupAdmin",
-						String.valueOf(true));
-			} else if (profileMasterId == CommonConstants.PROFILES_MASTER_BRANCH_ADMIN_PROFILE_ID) {
-				model.addAttribute("columnName",
-						CommonConstants.BRANCH_ID_COLUMN);
-				model.addAttribute("columnValue", selectedProfile.getBranchId());
-				model.addAttribute("showSendSurveyPopupAdmin",
-						String.valueOf(true));
-			} else if (profileMasterId == CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID) {
-				model.addAttribute("columnName",
-						CommonConstants.AGENT_ID_COLUMN);
-				model.addAttribute("columnValue", selectedProfile.getAgentId());
-			}
-		} catch (InvalidInputException e) {
-			LOG.error(
-					"InvalidInputException caught in initDashboardPage while setting details about user. Nested exception is ",
-					e);
-			model.addAttribute(
-					"message",
-					"InvalidInputException caught in initDashboardPage while setting details about user. Nested exception is "
-							+ e.getMessage());
-			return JspResolver.ERROR_PAGE;
-		} catch (SolrException e) {
-			LOG.error(
-					"SolrException caught in initDashboardPage while setting details about user. Nested exception is ",
-					e);
-			model.addAttribute(
-					"message",
-					"SolrException caught in initDashboardPage while setting details about user. Nested exception is "
-							+ e.getMessage());
-			return JspResolver.ERROR_PAGE;
-		} catch (NonFatalException e) {
-			LOG.error(
-					"NonFatalException while logging in. Reason : "
-							+ e.getMessage(), e);
-			model.addAttribute("message", messageUtils.getDisplayMessage(
-					e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE));
-			return JspResolver.LOGIN;
+		if (profileMasterId == CommonConstants.PROFILES_MASTER_COMPANY_ADMIN_PROFILE_ID) {
+			model.addAttribute("columnName", CommonConstants.COMPANY_ID_COLUMN);
+			model.addAttribute("columnValue", user.getCompany().getCompanyId());
+			model.addAttribute("showSendSurveyPopupAdmin", String.valueOf(true));
 		}
+		else if (profileMasterId == CommonConstants.PROFILES_MASTER_REGION_ADMIN_PROFILE_ID) {
+			model.addAttribute("columnName", CommonConstants.REGION_ID_COLUMN);
+			model.addAttribute("columnValue", selectedProfile.getRegionId());
+			model.addAttribute("showSendSurveyPopupAdmin", String.valueOf(true));
+		}
+		else if (profileMasterId == CommonConstants.PROFILES_MASTER_BRANCH_ADMIN_PROFILE_ID) {
+			model.addAttribute("columnName", CommonConstants.BRANCH_ID_COLUMN);
+			model.addAttribute("columnValue", selectedProfile.getBranchId());
+			model.addAttribute("showSendSurveyPopupAdmin", String.valueOf(true));
+		}
+		else if (profileMasterId == CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID) {
+			model.addAttribute("columnName", CommonConstants.AGENT_ID_COLUMN);
+			model.addAttribute("columnValue", selectedProfile.getAgentId());
+		}
+
 		return JspResolver.DASHBOARD;
 	}
 
@@ -329,41 +289,34 @@ public class DashboardController {
 		long columnValue = 0;
 		User user = sessionHelper.getCurrentUser();
 		boolean realtechAdmin = user.isSuperAdmin();
-		
 		try {
 			String columnValueStr = request.getParameter("columnValue");
 			columnValue = Long.parseLong(columnValueStr);
-		} catch (NumberFormatException e) {
+		}
+		catch (NumberFormatException e) {
 			LOG.error("NumberFormatException caught in getSurveyCount() while converting columnValue for regionId/branchId/agentId.");
 			throw e;
 		}
-		if (columnName.equalsIgnoreCase(CommonConstants.COMPANY_ID_COLUMN)
-				&& !realtechAdmin) {
+		
+		if (columnName.equalsIgnoreCase(CommonConstants.COMPANY_ID_COLUMN) && !realtechAdmin) {
 			columnValue = user.getCompany().getCompanyId();
 		}
+		
 		int numberOfDays = -1;
 		try {
 			if (request.getParameter("numberOfDays") != null) {
-				numberOfDays = Integer.parseInt(request
-						.getParameter("numberOfDays"));
+				numberOfDays = Integer.parseInt(request.getParameter("numberOfDays"));
 			}
-		} catch (NumberFormatException e) {
+		}
+		catch (NumberFormatException e) {
 			LOG.error("NumberFormatException caught in getSurveyCount() while converting numberOfDays.");
 			throw e;
 		}
 
-		model.addAttribute("allSurveySent", dashboardService
-				.getAllSurveyCountForPastNdays(columnName, columnValue,
-						numberOfDays));
-		model.addAttribute("completedSurvey", dashboardService
-				.getCompletedSurveyCountForPastNdays(columnName, columnValue,
-						numberOfDays));
-		model.addAttribute("clickedSurvey", dashboardService
-				.getClickedSurveyCountForPastNdays(columnName, columnValue,
-						numberOfDays));
-		model.addAttribute("socialPosts", dashboardService
-				.getSocialPostsForPastNdays(columnName, columnValue,
-						numberOfDays));
+		model.addAttribute("allSurveySent", dashboardService.getAllSurveyCountForPastNdays(columnName, columnValue, numberOfDays));
+		model.addAttribute("completedSurvey", dashboardService.getCompletedSurveyCountForPastNdays(columnName, columnValue, numberOfDays));
+		model.addAttribute("clickedSurvey", dashboardService.getClickedSurveyCountForPastNdays(columnName, columnValue, numberOfDays));
+		model.addAttribute("socialPosts", dashboardService.getSocialPostsForPastNdays(columnName, columnValue, numberOfDays));
 
 		LOG.info("Method to get count of all, completed and clicked surveys, getSurveyCount() finished");
 		return JspResolver.DASHBOARD_SURVEYSTATUS;
