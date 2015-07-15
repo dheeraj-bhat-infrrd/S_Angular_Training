@@ -519,11 +519,15 @@ $(document).ready(function() {
 		$('#edit-participation-mail-content-disabled').hide();
 	});
 	$('#revert-participation-mail').click(function() {
+	    showOverlay();
 		var payload = {
 			"mailcategory" : 'participationmail'
 		};
-		callAjaxPostWithPayloadData('./revertsurveyparticipationmail.do', function () {
+		callAjaxPostWithPayloadData('./revertsurveyparticipationmail.do', function (data) {
 			showMainContent('./showcompanysettings.do');
+			hideOverlay();
+			$("#overlay-toast").html(data);
+			showToast();
 		}, payload, true);
 	});
 
@@ -559,11 +563,15 @@ $(document).ready(function() {
 		$('#edit-participation-reminder-mail-content-disabled').hide();
 	});
 	$('#revert-participation-reminder-mail').click(function() {
+	    showOverlay();
 		var payload = {
 			"mailcategory" : 'participationremindermail'
 		};
-		callAjaxPostWithPayloadData('./revertsurveyparticipationmail.do', function () {
+		callAjaxPostWithPayloadData('./revertsurveyparticipationmail.do', function (data) {
 			showMainContent('./showcompanysettings.do');
+			hideOverlay();
+			$("#overlay-toast").html(data);
+			showToast();
 		}, payload, true);
 	});
 
@@ -688,6 +696,7 @@ $(document).ready(function() {
 			resetTag = 'sadComplete';
 		}
 		
+	    showOverlay();
 		resetTextForMoodFlow(resetTag, resetId);
 	});
 	
