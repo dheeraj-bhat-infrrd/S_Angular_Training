@@ -2,7 +2,7 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"%>
 
-<div class="float-left stats-right">
+<div class="float-left stats-right stats-right-survey">
 	<div class="clearfix stat-icns-wrapper">
 		<div class="float-left stat-icn-lbl"><spring:message code="label.surveyssent.key" /></div>
 		<div id="all-surv-icn" class="float-left stat-icns-item clearfix">

@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.entities.User;
 import com.realtech.socialsurvey.core.entities.VerticalsMaster;
@@ -48,7 +49,6 @@ import com.realtech.socialsurvey.web.common.JspResolver;
 @Controller
 public class RegistrationController
 {
-
     private static final Logger LOG = LoggerFactory.getLogger( RegistrationController.class );
 
     @Resource
@@ -155,16 +155,16 @@ public class RegistrationController
      * @return
      */
     @RequestMapping ( value = "/showregistrationpage")
-    public String showRegistrationPage( @RequestParam ( "q") String encryptedUrlParams, HttpServletRequest request, Model model )
+    public String showRegistrationPage( @RequestParam ( "q") String encryptedUrlParams, HttpServletRequest request,
+        Model model, RedirectAttributes redirectAttributes )
     {
         LOG.info( "Method showRegistrationPage of Registration Controller called with encryptedUrl : " + encryptedUrlParams );
 
         // Check for existing session
         if ( sessionHelper.isUserActiveSessionExists() ) {
             LOG.info( "Existing Active Session detected" );
-
-            model.addAttribute( CommonConstants.ACTIVE_SESSIONS_FOUND, "true" );
-            return JspResolver.LANDING;
+            redirectAttributes.addFlashAttribute( CommonConstants.ACTIVE_SESSIONS_FOUND, "true" );
+            return "redirect:/" + JspResolver.LANDING + ".do";
         }
 
         try {
@@ -178,12 +178,12 @@ public class RegistrationController
                     model.addAttribute( "firstname", urlParameters.get( CommonConstants.FIRST_NAME ) );
                     model.addAttribute( "lastname", urlParameters.get( CommonConstants.LAST_NAME ) );
                     model.addAttribute( "emailid", urlParameters.get( CommonConstants.EMAIL_ID ) );
+
                     model.addAttribute( "status", DisplayMessageType.ERROR_MESSAGE );
                     model.addAttribute( "message", messageUtils.getDisplayMessage( DisplayMessageConstants.USER_LINK_EXPIRED,
                         DisplayMessageType.ERROR_MESSAGE ) );
-                    //TODO page for redirecting to be set here
-                    return JspResolver.REGISTRATION_LINK_EXPIRED;
 
+                    return JspResolver.REGISTRATION_LINK_EXPIRED;
                 }
             } catch ( InvalidInputException e ) {
                 throw new InvalidInputException( e.getMessage(), DisplayMessageConstants.INVALID_REGISTRATION_INVITE, e );
@@ -202,24 +202,34 @@ public class RegistrationController
             }
 
             if ( invitedUser != null ) {
-                model.addAttribute( "status", DisplayMessageType.ERROR_MESSAGE );
-                model.addAttribute( "message", messageUtils.getDisplayMessage(
+                redirectAttributes.addFlashAttribute( "status", DisplayMessageType.ERROR_MESSAGE );
+                redirectAttributes.addFlashAttribute( "message", messageUtils.getDisplayMessage(
                     DisplayMessageConstants.INVALID_REGISTRATION_INVITE, DisplayMessageType.ERROR_MESSAGE ) );
-                return JspResolver.LOGIN;
+                return "redirect:/" + JspResolver.LOGIN + ".do";
             }
 
-            model.addAttribute( "firstname", urlParams.get( CommonConstants.FIRST_NAME ) );
-            model.addAttribute( "lastname", urlParams.get( CommonConstants.LAST_NAME ) );
-            model.addAttribute( "emailid", emailAddress );
-            model.addAttribute( "isDirectRegistration", true );
+            redirectAttributes.addFlashAttribute( "firstname", urlParams.get( CommonConstants.FIRST_NAME ) );
+            redirectAttributes.addFlashAttribute( "lastname", urlParams.get( CommonConstants.LAST_NAME ) );
+            redirectAttributes.addFlashAttribute( "emailid", emailAddress );
+            redirectAttributes.addFlashAttribute( "uniqueIdentifier", urlParams.get( CommonConstants.UNIQUE_IDENTIFIER ) );
+            redirectAttributes.addFlashAttribute( "isDirectRegistration", true );
 
             LOG.debug( "Validation of url completed. Service returning params to be prepopulated in registration page" );
         } catch ( NonFatalException e ) {
             LOG.error( "NonFatalException while showing registration page. Reason : " + e.getMessage(), e );
-            model
-                .addAttribute( "message", messageUtils.getDisplayMessage( e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE ) );
-            return JspResolver.LOGIN;
+            redirectAttributes.addFlashAttribute( "message",
+                messageUtils.getDisplayMessage( e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE ) );
+            return "redirect:/" + JspResolver.LOGIN + ".do";
         }
+
+        return "redirect:/" + JspResolver.REGISTRATION_PAGE + ".do";
+    }
+
+
+    @RequestMapping ( value = "/registrationpage")
+    public String initRegistrationPage()
+    {
+        LOG.info( "Registration Page started" );
         return JspResolver.REGISTRATION;
     }
 
@@ -233,7 +243,7 @@ public class RegistrationController
      * @throws IOException
      */
     @RequestMapping ( value = "/registration")
-    public String initDirectRegistration( Model model, HttpServletRequest request )
+    public String initDirectRegistration( Model model, HttpServletRequest request, RedirectAttributes redirectAttributes )
     {
         LOG.info( "Method called for showing up the direct registration page" );
         String firstName = request.getParameter( "firstName" );
@@ -263,28 +273,31 @@ public class RegistrationController
             model.addAttribute( "lastname", lastName );
             model.addAttribute( "emailid", emailId );
             model.addAttribute( "isDirectRegistration", true );
+
             // send verification mail and then redirect to index page
             LOG.debug( "Calling service for sending the registration invitation" );
             userManagementService.inviteCorporateToRegister( firstName, lastName, emailId, false );
             LOG.debug( "Service for sending the registration invitation excecuted successfully" );
+
             model.addAttribute( "message", messageUtils.getDisplayMessage(
                 DisplayMessageConstants.REGISTRATION_INVITE_SUCCESSFUL, DisplayMessageType.SUCCESS_MESSAGE ) );
             return JspResolver.REGISTRATION_INVITE_SUCCESSFUL;
         } catch ( UserAlreadyExistsException e ) {
-            model.addAttribute( "message", messageUtils.getDisplayMessage( DisplayMessageConstants.USERNAME_ALREADY_TAKEN,
-                DisplayMessageType.ERROR_MESSAGE ) );
-            model.addAttribute( "firstname", firstName );
-            model.addAttribute( "lastname", lastName );
-            model.addAttribute( "emailid", emailId );
+            redirectAttributes.addFlashAttribute( "message", messageUtils.getDisplayMessage(
+                DisplayMessageConstants.USERNAME_ALREADY_TAKEN, DisplayMessageType.ERROR_MESSAGE ) );
+            redirectAttributes.addFlashAttribute( "firstname", firstName );
+            redirectAttributes.addFlashAttribute( "lastname", lastName );
+            redirectAttributes.addFlashAttribute( "emailid", emailId );
         } catch ( NonFatalException e ) {
             LOG.error( "NonFatalException while showing registration page. Reason : " + e.getMessage(), e );
-            model.addAttribute( "message",
+            redirectAttributes.addFlashAttribute( "message",
                 messageUtils.getDisplayMessage( DisplayMessageConstants.INVALID_CAPTCHA, DisplayMessageType.ERROR_MESSAGE ) );
-            model.addAttribute( "firstname", firstName );
-            model.addAttribute( "lastname", lastName );
-            model.addAttribute( "emailid", emailId );
+            redirectAttributes.addFlashAttribute( "firstname", firstName );
+            redirectAttributes.addFlashAttribute( "lastname", lastName );
+            redirectAttributes.addFlashAttribute( "emailid", emailId );
         }
-        return JspResolver.INDEX;
+
+        return "redirect:/" + JspResolver.INDEX + ".do";
     }
 
 
@@ -334,7 +347,7 @@ public class RegistrationController
      * @return
      */
     @RequestMapping ( value = "/register", method = RequestMethod.POST)
-    public String registerUser( Model model, HttpServletRequest request )
+    public String registerUser( HttpServletRequest request, RedirectAttributes redirectAttributes )
     {
         LOG.info( "Method registerUser of Registration Controller called" );
 
@@ -344,6 +357,7 @@ public class RegistrationController
         String originalEmailId = request.getParameter( "originalemailid" );
         String password = request.getParameter( "password" );
         String confirmPassword = request.getParameter( "confirmpassword" );
+        String uniqueIdentifier = request.getParameter( "uniqueIdentifier" );
         String strIsDirectRegistration = request.getParameter( "isDirectRegistration" );
 
         try {
@@ -390,23 +404,32 @@ public class RegistrationController
                 throw new InvalidInputException( "Invalid Input exception occured in method getAllVerticalsMaster()",
                     DisplayMessageConstants.GENERAL_ERROR, e );
             }
-            model.addAttribute( "verticals", verticalsMasters );
-            // JIRA - SS-536
-            model.addAttribute( "isDirectRegistration", strIsDirectRegistration );
+
+            redirectAttributes.addFlashAttribute( "verticals", verticalsMasters );
+            redirectAttributes.addFlashAttribute( "isDirectRegistration", strIsDirectRegistration );
+            redirectAttributes.addFlashAttribute( "uniqueIdentifier", uniqueIdentifier );
         } catch ( NonFatalException e ) {
             LOG.error( "NonFatalException while registering user. Reason : " + e.getMessage(), e );
-            model
-                .addAttribute( "message", messageUtils.getDisplayMessage( e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE ) );
-            /**
-             * Adding the attributes required in page after reloading
-             */
-            model.addAttribute( "firstname", firstName );
-            model.addAttribute( "lastname", lastName );
-            model.addAttribute( "emailid", originalEmailId );
-            model.addAttribute( "isDirectRegistration", strIsDirectRegistration );
-            return JspResolver.REGISTRATION;
+            redirectAttributes.addFlashAttribute( "message",
+                messageUtils.getDisplayMessage( e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE ) );
+            redirectAttributes.addFlashAttribute( "firstname", firstName );
+            redirectAttributes.addFlashAttribute( "lastname", lastName );
+            redirectAttributes.addFlashAttribute( "emailid", originalEmailId );
+            redirectAttributes.addFlashAttribute( "isDirectRegistration", strIsDirectRegistration );
+            redirectAttributes.addFlashAttribute( "uniqueIdentifier", uniqueIdentifier );
+
+            return "redirect:/" + JspResolver.REGISTRATION_PAGE + ".do";
         }
+
         LOG.info( "Method registerUser of Registration Controller finished" );
+        return "redirect:/" + JspResolver.COMPANY_INFORMATION_PAGE + ".do";
+    }
+
+
+    @RequestMapping ( value = "/companyinformationpage")
+    public String initCompanyInfoPage()
+    {
+        LOG.info( "CompanyInformation Page started" );
         return JspResolver.COMPANY_INFORMATION;
     }
 
@@ -444,36 +467,43 @@ public class RegistrationController
     // JIRA - SS-536: Added for manual registration via invite
     @RequestMapping ( value = "/invitetoregister")
     public String initManualRegistration( @RequestParam ( "q") String encryptedUrlParams, HttpServletRequest request,
-        Model model )
+        Model model, RedirectAttributes redirectAttributes )
     {
         LOG.info( "Manual invitation for registration" );
         // decrypt the url
         String creatorEmailId = null;
         String emailId = null;
+
         try {
             Map<String, String> urlParams = urlGenerator.decryptParameters( encryptedUrlParams );
             if ( urlParams.get( CommonConstants.FIRST_NAME ) != null ) {
-                model.addAttribute( "firstname", URLDecoder.decode( urlParams.get( CommonConstants.FIRST_NAME ), "UTF-8" ) );
+                redirectAttributes.addFlashAttribute( "firstname",
+                    URLDecoder.decode( urlParams.get( CommonConstants.FIRST_NAME ), "UTF-8" ) );
             } else {
                 throw new InvalidInputException( "First name is not present" );
             }
+
             if ( urlParams.get( CommonConstants.LAST_NAME ) != null ) {
-                model.addAttribute( "lastname", URLDecoder.decode( urlParams.get( CommonConstants.LAST_NAME ), "UTF-8" ) );
+                redirectAttributes.addFlashAttribute( "lastname",
+                    URLDecoder.decode( urlParams.get( CommonConstants.LAST_NAME ), "UTF-8" ) );
             } else {
-                model.addAttribute( "lastname", "" );
+                redirectAttributes.addFlashAttribute( "lastname", "" );
             }
+
             if ( urlParams.get( CommonConstants.EMAIL_ID ) != null ) {
                 emailId = URLDecoder.decode( urlParams.get( CommonConstants.EMAIL_ID ), "UTF-8" );
-                model.addAttribute( "emailid", emailId );
+                redirectAttributes.addFlashAttribute( "emailid", emailId );
             } else {
                 throw new InvalidInputException( "Email id is not present" );
             }
+
             if ( urlParams.get( CommonConstants.ACCOUNT_CRETOR_EMAIL_ID ) != null ) {
                 creatorEmailId = URLDecoder.decode( urlParams.get( CommonConstants.ACCOUNT_CRETOR_EMAIL_ID ), "UTF-8" );
-                model.addAttribute( "creatorEmailId", creatorEmailId );
+                redirectAttributes.addFlashAttribute( "creatorEmailId", creatorEmailId );
             } else {
                 throw new InvalidInputException( "Creator email id is not present" );
             }
+
             if ( urlParams.get( CommonConstants.API_KEY_FROM_URL ) != null ) {
                 if ( !userManagementService.isValidApiKey( creatorEmailId, urlParams.get( CommonConstants.API_KEY_FROM_URL ) ) ) {
                     throw new InvalidInputException( "Could not authenticate the API key" );
@@ -481,19 +511,22 @@ public class RegistrationController
             } else {
                 throw new InvalidInputException( "No API Key present" );
             }
-            model.addAttribute( "isDirectRegistration", false );
+            redirectAttributes.addFlashAttribute( "isDirectRegistration", false );
+
             // check if the email id exists.
             if ( userManagementService.userExists( emailId ) ) {
-                return JspResolver.LOGIN;
+                redirectAttributes.addFlashAttribute( "message", "The Email address is already taken" );
+                redirectAttributes.addFlashAttribute( "status", DisplayMessageType.ERROR_MESSAGE );
+                return "redirect:/" + JspResolver.LOGIN + ".do";
             }
-
         } catch ( InvalidInputException | UnsupportedEncodingException | NoRecordsFetchedException e ) {
             LOG.error( "Exception while inviting user for manual registration", e );
             model.addAttribute( "message", messageUtils.getDisplayMessage( DisplayMessageConstants.INVALID_VERIFICATION_URL,
                 DisplayMessageType.ERROR_MESSAGE ) );
             return JspResolver.NOT_FOUND_PAGE;
         }
-        return JspResolver.REGISTRATION;
+
+        return "redirect:/" + JspResolver.REGISTRATION_PAGE + ".do";
     }
 
 
@@ -506,6 +539,7 @@ public class RegistrationController
     {
         LOG.info( "Creating invitation url for " + firstName + " " + lastName + " and email " + emailId );
         String result = null;
+
         try {
             // generate the url
             Map<String, String> params = new HashMap<String, String>();
@@ -516,6 +550,7 @@ public class RegistrationController
             params.put( CommonConstants.EMAIL_ID, URLEncoder.encode( emailId, "UTF-8" ) );
             params.put( CommonConstants.ACCOUNT_CRETOR_EMAIL_ID, URLEncoder.encode( creatorEmailId, "UTF-8" ) );
             params.put( CommonConstants.API_KEY_FROM_URL, apiKey );
+
             LOG.debug( "Validating api key" );
             if ( !userManagementService.isValidApiKey( creatorEmailId, apiKey ) ) {
                 LOG.warn( "Invalid api key" );

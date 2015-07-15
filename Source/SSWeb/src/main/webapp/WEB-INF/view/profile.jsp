@@ -141,8 +141,8 @@
         </div>
     </div>
 
-<input type="hidden" name="reviewsCount" value="${reviewsCount }">    
-<input type="hidden" name="averageRatings" value="${averageRating }">
+<input type="hidden" name="reviewsCount" value="${reviewsCount}">    
+<input type="hidden" name="averageRatings" value="${averageRating}">
 <input type="hidden" value="${companyProfileName}" id="company-profile-name">
 <input type="hidden" value="${regionProfileName}" id="region-profile-name">
 <input type="hidden" value="${branchProfileName}" id="branch-profile-name">
@@ -180,6 +180,14 @@
             </div>
         </div>
     </div>
+</div>
+
+<div class="bread-crum-hdr">
+	<div class="container">
+		<div id="bread-crum-cont" class="row bread-crum-row">
+			
+		</div>
+	</div>
 </div>
 
 <div id="profile-main-content" class="prof-main-content-wrapper margin-top-25 margin-bottom-25">
@@ -224,10 +232,10 @@
                 	</div>
 					<div class="prof-rating clearfix">
 						<div class="prof-rating-wrapper maring-0 clearfix float-left" id="rating-avg-comp">
-							<div class='rating-image float-left smiley-rat-${integerAverageRating }'></div>
-							<div class='rating-rounded float-left'>${floatingAverageRating}</div>
+							<div class='rating-image float-left smiley-rat-${integerAverageRating}'></div>
+							<div class='rating-rounded float-left' data-score="${floatingAverageRating}"></div>
 						</div>
-						<div class="float-left review-count-left cursor-pointer" id="prof-company-review-count">${reviewsCount } Review(s)</div>
+						<div class="float-left review-count-left cursor-pointer" id="prof-company-review-count">${reviewsCount} Review(s)</div>
 					</div>
 					<div class="prof-btn-wrapper clearfix">
 						<div class="prof-btn-contact float-left" onclick="focusOnContact()" >Contact
@@ -288,7 +296,7 @@
 						</div>
 					</c:if>
 					<div class="float-right hm-hr-row-right clearfix">
-						<c:if test="${not empty profile.socialMediaTokens}">
+						<c:if test="${not empty profile.socialMediaTokens || (not empty profile.contact_details && not empty profile.contact_details.contact_numbers && not empty profile.contact_details.contact_numbers.work)}">
 							<div id="social-connect-txt" class="float-left social-connect-txt">Connect with ${profName }:</div>
 							<c:if test="${not empty profile.socialMediaTokens.facebookToken && not empty profile.socialMediaTokens.facebookToken.facebookPageLink}">
 								<div id="icn-fb" class="float-left social-item-icon icn-fb" data-link="${profile.socialMediaTokens.facebookToken.facebookPageLink}" title="Facebook"></div>
@@ -310,6 +318,9 @@
 							</c:if>
 							<c:if test="${not empty profile.socialMediaTokens.lendingTreeToken && not empty profile.socialMediaTokens.lendingTreeToken.lendingTreeProfileLink}">
 								<div id="icn-lendingtree" class="float-left social-item-icon icn-lendingtree" data-link="${profile.socialMediaTokens.lendingTreeToken.lendingTreeProfileLink}" title="LendingTree"></div>
+							</c:if>
+							<c:if test="${not empty profile.contact_details && not empty profile.contact_details.contact_numbers && not empty profile.contact_details.contact_numbers.work}">
+								<div id="icn-lendingtree" class="float-left social-item-icon icn-tele-blue" title="${profile.contact_details.contact_numbers.work}"></div>
 							</c:if>
 						</c:if>
 					</div>

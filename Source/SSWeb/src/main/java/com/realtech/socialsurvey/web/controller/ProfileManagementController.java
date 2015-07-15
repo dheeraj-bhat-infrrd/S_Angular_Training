@@ -11,12 +11,10 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
 import javax.imageio.ImageIO;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import javax.ws.rs.QueryParam;
-
 import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrDocumentList;
 import org.slf4j.Logger;
@@ -24,15 +22,14 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
-
 import sun.misc.BASE64Decoder;
-
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.type.TypeFactory;
 import com.google.gson.Gson;
@@ -144,7 +141,7 @@ public class ProfileManagementController
     @Autowired
     private BotRequestUtils botRequestUtils;
 
-
+	@Transactional
     @SuppressWarnings ( "unchecked")
     @RequestMapping ( value = "/showprofilepage", method = RequestMethod.GET)
     public String showProfileEditPage( Model model, HttpServletRequest request )
@@ -157,7 +154,16 @@ public class ProfileManagementController
         AccountType accountType = (AccountType) session.getAttribute( CommonConstants.ACCOUNT_TYPE_IN_SESSION );
         UserSettings userSettings = (UserSettings) session.getAttribute( CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION );
 
-        // fetching selected profile if not in session
+		try {
+			sessionHelper.updateProcessedUserProfiles(session, user);
+			userManagementService.getCanonicalUserSettings(user, accountType);
+		}
+		catch (NonFatalException e) {
+			LOG.error("Exception while updating profiles. Reason :" + e.getMessage(), e);
+			model.addAttribute("message", messageUtils.getDisplayMessage(e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE));
+		}
+        
+		// fetching selected profile if not in session
         UserProfile selectedProfile = null;
         String profileIdStr = request.getParameter( "profileId" );
         if ( profileIdStr == null ) {
@@ -579,12 +585,11 @@ public class ProfileManagementController
                 companySettings.setContact_details( contactDetailsSettings );
 
                 // update company name
-                profileManagementService.updateCompanyName( user.getUserId(), companySettings.getIden(), name );
+				profileManagementService.updateCompanyName(user.getUserId(), companySettings.getIden(), name);
 
                 companySettings.setVertical( vertical );
                 profileManagementService.updateVertical( MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION,
                     companySettings, vertical );
-
 
                 userSettings.setCompanySettings( companySettings );
             } else if ( profilesMaster == CommonConstants.PROFILES_MASTER_REGION_ADMIN_PROFILE_ID ) {
@@ -599,6 +604,9 @@ public class ProfileManagementController
                     MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION, regionSettings, contactDetailsSettings );
                 regionSettings.setContact_details( contactDetailsSettings );
 
+                // update region name
+				profileManagementService.updateRegionName(user.getUserId(), regionSettings.getIden(), name);
+                
                 regionSettings.setVertical( vertical );
                 profileManagementService.updateVertical( MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION,
                     regionSettings, vertical );
@@ -616,6 +624,9 @@ public class ProfileManagementController
                     MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION, branchSettings, contactDetailsSettings );
                 branchSettings.setContact_details( contactDetailsSettings );
 
+                // update branch name
+				profileManagementService.updateBranchName(user.getUserId(), branchSettings.getIden(), name);
+				
                 branchSettings.setVertical( vertical );
                 profileManagementService.updateVertical( MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION,
                     branchSettings, vertical );
@@ -632,30 +643,28 @@ public class ProfileManagementController
                     MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION, agentSettings, contactDetailsSettings );
                 agentSettings.setContact_details( contactDetailsSettings );
 
+                // update user name
+				profileManagementService.updateIndividualName(user.getUserId(), agentSettings.getIden(), name);
+				
                 agentSettings.setVertical( vertical );
                 profileManagementService.updateVertical( MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION,
                     agentSettings, vertical );
 
                 userSettings.setAgentSettings( agentSettings );
 
-                Map<String, Object> userMap = new HashMap<>();
-
                 // Modify Agent details in Solr
-                //  solrSearchService.editUserInSolr(agentSettings.getIden(), CommonConstants.USER_DISPLAY_NAME_SOLR, name);
-                //  solrSearchService.editUserInSolr(agentSettings.getIden(), CommonConstants.TITLE_SOLR, title);
-                userMap.put( CommonConstants.USER_DISPLAY_NAME_SOLR, name );
-                userMap.put( CommonConstants.TITLE_SOLR, title );
-                if ( name.indexOf( " " ) != -1 ) {
-                    //solrSearchService.editUserInSolr(agentSettings.getIden(), CommonConstants.USER_FIRST_NAME_SOLR, name.substring(0, name.indexOf(' ')));
-                    //solrSearchService.editUserInSolr(agentSettings.getIden(), CommonConstants.USER_LAST_NAME_SOLR, name.substring(name.indexOf(' ') + 1));
-                    userMap.put( CommonConstants.USER_FIRST_NAME_SOLR, name.substring( 0, name.indexOf( ' ' ) ) );
-                    userMap.put( CommonConstants.USER_LAST_NAME_SOLR, name.substring( name.indexOf( ' ' ) + 1 ) );
-                    user.setFirstName( name.substring( 0, name.indexOf( ' ' ) ) );
-                    user.setLastName( name.substring( name.indexOf( ' ' ) + 1 ) );
-                } else {
-                    //solrSearchService.editUserInSolr(agentSettings.getIden(), CommonConstants.USER_FIRST_NAME_SOLR, name);
-                    userMap.put( CommonConstants.USER_FIRST_NAME_SOLR, name );
-                }
+                Map<String, Object> userMap = new HashMap<>();
+				userMap.put(CommonConstants.USER_DISPLAY_NAME_SOLR, name);
+				userMap.put(CommonConstants.TITLE_SOLR, title);
+				if (name.indexOf(" ") != -1) {
+					userMap.put(CommonConstants.USER_FIRST_NAME_SOLR, name.substring(0, name.indexOf(' ')));
+					userMap.put(CommonConstants.USER_LAST_NAME_SOLR, name.substring(name.indexOf(' ') + 1));
+					user.setFirstName(name.substring(0, name.indexOf(' ')));
+					user.setLastName(name.substring(name.indexOf(' ') + 1));
+				}
+				else {
+					userMap.put(CommonConstants.USER_FIRST_NAME_SOLR, name);
+				}
                 userManagementService.updateUser( user, userMap );
             } else {
                 throw new InvalidInputException( "Invalid input exception occurred in upadting Basic details.",
@@ -1327,188 +1336,204 @@ public class ProfileManagementController
      * @param model
      * @param request
      */
-    @RequestMapping ( value = "/updateemailids", method = RequestMethod.POST)
-    public String updateEmailds( Model model, HttpServletRequest request )
-    {
-        LOG.info( "Method updateEmailds() called from ProfileManagementController" );
-        HttpSession session = request.getSession( false );
-        ContactDetailsSettings contactDetailsSettings = null;
+	@RequestMapping(value = "/updateemailids", method = RequestMethod.POST)
+	public String updateEmailds(Model model, HttpServletRequest request) {
+		LOG.info("Method updateEmailds() called from ProfileManagementController");
+		HttpSession session = request.getSession(false);
+		ContactDetailsSettings contactDetailsSettings = null;
 
-        try {
-            UserSettings userSettings = (UserSettings) session.getAttribute( CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION );
-            OrganizationUnitSettings profileSettings = (OrganizationUnitSettings) session
-                .getAttribute( CommonConstants.USER_PROFILE_SETTINGS );
-            UserProfile selectedProfile = (UserProfile) request.getSession( false ).getAttribute( CommonConstants.USER_PROFILE );
-            if ( userSettings == null || profileSettings == null || selectedProfile == null ) {
-                throw new InvalidInputException( "No user settings found in session" );
-            }
+		try {
+			UserSettings userSettings = (UserSettings) session.getAttribute(CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION);
+			OrganizationUnitSettings profileSettings = (OrganizationUnitSettings) session.getAttribute(CommonConstants.USER_PROFILE_SETTINGS);
+			UserProfile selectedProfile = (UserProfile) request.getSession(false).getAttribute(CommonConstants.USER_PROFILE);
+			if (userSettings == null || profileSettings == null || selectedProfile == null) {
+				throw new InvalidInputException("No user settings found in session");
+			}
 
-            List<MiscValues> mailIds = null;
-            try {
-                String payload = request.getParameter( "mailIds" );
-                if ( payload == null || payload.isEmpty() ) {
-                    throw new InvalidInputException( "Maild ids passed was null or empty" );
-                }
-                ObjectMapper mapper = new ObjectMapper();
-                mailIds = mapper.readValue( payload,
-                    TypeFactory.defaultInstance().constructCollectionType( List.class, MiscValues.class ) );
-            } catch ( IOException ioException ) {
-                throw new NonFatalException( "Error occurred while parsing json.", DisplayMessageConstants.GENERAL_ERROR,
-                    ioException );
-            }
+			List<MiscValues> mailIds = null;
+			try {
+				String payload = request.getParameter("mailIds");
+				if (payload == null || payload.isEmpty()) {
+					throw new InvalidInputException("Maild ids passed was null or empty");
+				}
+				ObjectMapper mapper = new ObjectMapper();
+				mailIds = mapper.readValue(payload, TypeFactory.defaultInstance().constructCollectionType(List.class, MiscValues.class));
+			}
+			catch (IOException ioException) {
+				throw new NonFatalException("Error occurred while parsing json.", DisplayMessageConstants.GENERAL_ERROR, ioException);
+			}
 
-            int profilesMaster = selectedProfile.getProfilesMaster().getProfileId();
-            if ( profilesMaster == CommonConstants.PROFILES_MASTER_COMPANY_ADMIN_PROFILE_ID ) {
-                OrganizationUnitSettings companySettings = userSettings.getCompanySettings();
-                if ( companySettings == null ) {
-                    throw new InvalidInputException( "No company settings found in current session" );
-                }
-                contactDetailsSettings = companySettings.getContact_details();
-                // Send verification Links
-                sendVerificationLinks( contactDetailsSettings, mailIds,
-                    MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION, companySettings );
-                contactDetailsSettings = updateMailSettings( contactDetailsSettings, mailIds );
-                contactDetailsSettings = profileManagementService.updateContactDetails(
-                    MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION, companySettings, contactDetailsSettings );
-                companySettings.setContact_details( contactDetailsSettings );
-                userSettings.setCompanySettings( companySettings );
-            } else if ( profilesMaster == CommonConstants.PROFILES_MASTER_REGION_ADMIN_PROFILE_ID ) {
-                long regionId = selectedProfile.getRegionId();
-                OrganizationUnitSettings regionSettings = userSettings.getRegionSettings().get( regionId );
-                if ( regionSettings == null ) {
-                    throw new InvalidInputException( "No Region settings found in current session" );
-                }
-                contactDetailsSettings = regionSettings.getContact_details();
-                // Send verification Links
-                sendVerificationLinks( contactDetailsSettings, mailIds,
-                    MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION, regionSettings );
-                contactDetailsSettings = updateMailSettings( contactDetailsSettings, mailIds );
-                contactDetailsSettings = profileManagementService.updateContactDetails(
-                    MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION, regionSettings, contactDetailsSettings );
-                regionSettings.setContact_details( contactDetailsSettings );
-                userSettings.getRegionSettings().put( regionId, regionSettings );
-            } else if ( profilesMaster == CommonConstants.PROFILES_MASTER_BRANCH_ADMIN_PROFILE_ID ) {
-                long branchId = selectedProfile.getBranchId();
-                OrganizationUnitSettings branchSettings = userSettings.getBranchSettings().get( branchId );
-                if ( branchSettings == null ) {
-                    throw new InvalidInputException( "No Branch settings found in current session" );
-                }
-                contactDetailsSettings = branchSettings.getContact_details();
-                // Send verification Links
-                sendVerificationLinks( contactDetailsSettings, mailIds,
-                    MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION, branchSettings );
-                contactDetailsSettings = updateMailSettings( contactDetailsSettings, mailIds );
-                contactDetailsSettings = profileManagementService.updateContactDetails(
-                    MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION, branchSettings, contactDetailsSettings );
-                branchSettings.setContact_details( contactDetailsSettings );
-                userSettings.getBranchSettings().put( branchId, branchSettings );
-            } else if ( profilesMaster == CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID ) {
-                AgentSettings agentSettings = userSettings.getAgentSettings();
-                if ( agentSettings == null ) {
-                    throw new InvalidInputException( "No Agent settings found in current session" );
-                }
-                contactDetailsSettings = agentSettings.getContact_details();
-                // Send verification Links
-                sendVerificationLinks( contactDetailsSettings, mailIds,
-                    MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION, agentSettings );
-                contactDetailsSettings = updateMailSettings( contactDetailsSettings, mailIds );
-                contactDetailsSettings = profileManagementService.updateAgentContactDetails(
-                    MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION, agentSettings, contactDetailsSettings );
-                agentSettings.setContact_details( contactDetailsSettings );
-                userSettings.setAgentSettings( agentSettings );
-            } else {
-                throw new InvalidInputException( "Invalid input exception occurred while updating emailids.",
-                    DisplayMessageConstants.GENERAL_ERROR );
-            }
+			int profilesMaster = selectedProfile.getProfilesMaster().getProfileId();
+			if (profilesMaster == CommonConstants.PROFILES_MASTER_COMPANY_ADMIN_PROFILE_ID) {
+				OrganizationUnitSettings companySettings = userSettings.getCompanySettings();
+				if (companySettings == null) {
+					throw new InvalidInputException("No company settings found in current session");
+				}
+				contactDetailsSettings = companySettings.getContact_details();
+				
+				// Send verification Links
+				sendVerificationLinks(contactDetailsSettings, mailIds, MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION,
+						companySettings);
+				
+				contactDetailsSettings = updateMailSettings(companySettings.getIden(), contactDetailsSettings, mailIds,
+						MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION);
+				contactDetailsSettings = profileManagementService.updateContactDetails(
+						MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION, companySettings, contactDetailsSettings);
+				companySettings.setContact_details(contactDetailsSettings);
+				userSettings.setCompanySettings(companySettings);
+			}
+			else if (profilesMaster == CommonConstants.PROFILES_MASTER_REGION_ADMIN_PROFILE_ID) {
+				long regionId = selectedProfile.getRegionId();
+				OrganizationUnitSettings regionSettings = userSettings.getRegionSettings().get(regionId);
+				if (regionSettings == null) {
+					throw new InvalidInputException("No Region settings found in current session");
+				}
+				contactDetailsSettings = regionSettings.getContact_details();
+				
+				// Send verification Links
+				sendVerificationLinks(contactDetailsSettings, mailIds, MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION, regionSettings);
+				
+				contactDetailsSettings = updateMailSettings(regionSettings.getIden(), contactDetailsSettings, mailIds,
+						MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION);
+				contactDetailsSettings = profileManagementService.updateContactDetails(
+						MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION, regionSettings, contactDetailsSettings);
+				regionSettings.setContact_details(contactDetailsSettings);
+				userSettings.getRegionSettings().put(regionId, regionSettings);
+			}
+			else if (profilesMaster == CommonConstants.PROFILES_MASTER_BRANCH_ADMIN_PROFILE_ID) {
+				long branchId = selectedProfile.getBranchId();
+				OrganizationUnitSettings branchSettings = userSettings.getBranchSettings().get(branchId);
+				if (branchSettings == null) {
+					throw new InvalidInputException("No Branch settings found in current session");
+				}
+				contactDetailsSettings = branchSettings.getContact_details();
+				
+				// Send verification Links
+				sendVerificationLinks(contactDetailsSettings, mailIds, MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION, branchSettings);
+				
+				contactDetailsSettings = updateMailSettings(branchSettings.getIden(), contactDetailsSettings, mailIds,
+						MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION);
+				contactDetailsSettings = profileManagementService.updateContactDetails(
+						MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION, branchSettings, contactDetailsSettings);
+				branchSettings.setContact_details(contactDetailsSettings);
+				userSettings.getBranchSettings().put(branchId, branchSettings);
+			}
+			else if (profilesMaster == CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID) {
+				AgentSettings agentSettings = userSettings.getAgentSettings();
+				if (agentSettings == null) {
+					throw new InvalidInputException("No Agent settings found in current session");
+				}
+				contactDetailsSettings = agentSettings.getContact_details();
+				
+				// Send verification Links
+				sendVerificationLinks(contactDetailsSettings, mailIds, MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION, agentSettings);
+				
+				contactDetailsSettings = updateMailSettings(agentSettings.getIden(), contactDetailsSettings, mailIds,
+						MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION);
+				contactDetailsSettings = profileManagementService.updateAgentContactDetails(
+						MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION, agentSettings, contactDetailsSettings);
+				agentSettings.setContact_details(contactDetailsSettings);
+				userSettings.setAgentSettings(agentSettings);
+			}
+			else {
+				throw new InvalidInputException("Invalid input exception occurred while updating emailids.", DisplayMessageConstants.GENERAL_ERROR);
+			}
 
-            profileSettings.setContact_details( contactDetailsSettings );
+			profileSettings.setContact_details(contactDetailsSettings);
 
-            LOG.info( "Maild ids updated successfully" );
-            model.addAttribute( "message", messageUtils.getDisplayMessage( DisplayMessageConstants.MAIL_IDS_UPDATE_SUCCESSFUL,
-                DisplayMessageType.SUCCESS_MESSAGE ) );
-        } catch ( NonFatalException nonFatalException ) {
-            LOG.error( "NonFatalException while updating Mail ids. Reason :" + nonFatalException.getMessage(),
-                nonFatalException );
-            model.addAttribute( "message", messageUtils.getDisplayMessage(
-                DisplayMessageConstants.MAIL_IDS_UPDATE_UNSUCCESSFUL, DisplayMessageType.ERROR_MESSAGE ) );
-        }
+			LOG.info("Maild ids updated successfully");
+			model.addAttribute("message",
+					messageUtils.getDisplayMessage(DisplayMessageConstants.MAIL_IDS_UPDATE_SUCCESSFUL, DisplayMessageType.SUCCESS_MESSAGE));
+		}
+		catch (NonFatalException nonFatalException) {
+			LOG.error("NonFatalException while updating Mail ids. Reason :" + nonFatalException.getMessage(), nonFatalException);
+			model.addAttribute("message",
+					messageUtils.getDisplayMessage(DisplayMessageConstants.MAIL_IDS_UPDATE_UNSUCCESSFUL, DisplayMessageType.ERROR_MESSAGE));
+		}
 
-        LOG.info( "Method updateEmailds() finished from ProfileManagementController" );
-        return JspResolver.MESSAGE_HEADER;
-    }
+		LOG.info("Method updateEmailds() finished from ProfileManagementController");
+		return JspResolver.MESSAGE_HEADER;
+	}
 
+	// send verification links
+	private void sendVerificationLinks(ContactDetailsSettings oldSettings, List<MiscValues> mailIds, String profile,
+			OrganizationUnitSettings userSettings) throws InvalidInputException, UndeliveredEmailException {
+		LOG.debug("Method sendVerificationLinks() called from ProfileManagementController");
+		Map<String, String> urlParams = null;
 
-    // send verification links
-    private void sendVerificationLinks( ContactDetailsSettings oldSettings, List<MiscValues> mailIds, String profile,
-        OrganizationUnitSettings userSettings ) throws InvalidInputException, UndeliveredEmailException
-    {
-        LOG.debug( "Method sendVerificationLinks() called from ProfileManagementController" );
-        Map<String, String> urlParams = null;
+		if (oldSettings == null) {
+			throw new InvalidInputException("No contact details object found for user");
+		}
+		MailIdSettings mailIdSettings = oldSettings.getMail_ids();
+		if (mailIdSettings == null) {
+			LOG.debug("No maild ids added, create new mail id object in contact details");
+			mailIdSettings = new MailIdSettings();
+		}
 
-        if ( oldSettings == null ) {
-            throw new InvalidInputException( "No contact details object found for user" );
-        }
-        MailIdSettings mailIdSettings = oldSettings.getMail_ids();
-        if ( mailIdSettings == null ) {
-            LOG.debug( "No maild ids added, create new mail id object in contact details" );
-            mailIdSettings = new MailIdSettings();
-        }
+		for (MiscValues mailId : mailIds) {
+			String key = mailId.getKey();
+			String emailId = mailId.getValue();
+			if (key.equalsIgnoreCase(CommonConstants.EMAIL_TYPE_WORK)) {
+				urlParams = new HashMap<String, String>();
+				urlParams.put(CommonConstants.EMAIL_ID, emailId);
+				urlParams.put(CommonConstants.USER_PROFILE, profile);
+				urlParams.put(CommonConstants.EMAIL_TYPE, CommonConstants.EMAIL_TYPE_WORK);
+				urlParams.put(CommonConstants.USER_ID, userSettings.getIden() + "");
 
-        for ( MiscValues mailId : mailIds ) {
-            String key = mailId.getKey();
-            String emailId = mailId.getValue();
-            if ( key.equalsIgnoreCase( CommonConstants.EMAIL_TYPE_WORK ) ) {
-                urlParams = new HashMap<String, String>();
-                urlParams.put( CommonConstants.EMAIL_ID, emailId );
-                urlParams.put( CommonConstants.USER_PROFILE, profile );
-                urlParams.put( CommonConstants.EMAIL_TYPE, CommonConstants.EMAIL_TYPE_WORK );
-                urlParams.put( CommonConstants.USER_ID, userSettings.getIden() + "" );
-
-                profileManagementService.generateVerificationUrl( urlParams, applicationBaseUrl
-                    + CommonConstants.REQUEST_MAPPING_EMAIL_EDIT_VERIFICATION, emailId, userSettings.getContact_details()
-                    .getName() );
-            }
-        }
-        LOG.debug( "Method sendVerificationLinks() finished from ProfileManagementController" );
-    }
-
+				profileManagementService.generateVerificationUrl(urlParams, applicationBaseUrl
+						+ CommonConstants.REQUEST_MAPPING_EMAIL_EDIT_VERIFICATION, emailId, userSettings.getContact_details().getName());
+			}
+		}
+		LOG.debug("Method sendVerificationLinks() finished from ProfileManagementController");
+	}
 
     // Update mail ids
-    private ContactDetailsSettings updateMailSettings( ContactDetailsSettings contactDetailsSettings, List<MiscValues> mailIds )
-        throws InvalidInputException
-    {
-        LOG.debug( "Method updateMailSettings() called from ProfileManagementController" );
-        if ( contactDetailsSettings == null ) {
-            throw new InvalidInputException( "No contact details object found for user" );
-        }
-        MailIdSettings mailIdSettings = contactDetailsSettings.getMail_ids();
-        if ( mailIdSettings == null ) {
-            LOG.debug( "No maild ids added, create new mail id object in contact details" );
-            mailIdSettings = new MailIdSettings();
-        }
-        List<MiscValues> others = null;
-        for ( MiscValues mailId : mailIds ) {
-            String key = mailId.getKey();
-            String value = mailId.getValue();
-            if ( key.equalsIgnoreCase( CommonConstants.EMAIL_TYPE_WORK ) ) {
-                mailIdSettings.setWork( value );
-                mailIdSettings.setWorkEmailVerified( false );
-            } else if ( key.equalsIgnoreCase( CommonConstants.EMAIL_TYPE_PERSONAL ) ) {
-                mailIdSettings.setPersonal( value );
-                mailIdSettings.setPersonalEmailVerified( false );
-            } else {
-                if ( others == null ) {
-                    others = new ArrayList<>();
-                }
-                others.add( mailId );
-            }
-        }
-        mailIdSettings.setOthers( others );
-        contactDetailsSettings.setMail_ids( mailIdSettings );
-        LOG.debug( "Method updateMailSettings() finished from ProfileManagementController" );
-        return contactDetailsSettings;
-    }
+	private ContactDetailsSettings updateMailSettings(long entityId, ContactDetailsSettings contactDetailsSettings, List<MiscValues> mailIds,
+			String entityType) throws InvalidInputException {
+		LOG.debug("Method updateMailSettings() called from ProfileManagementController");
+		if (contactDetailsSettings == null) {
+			throw new InvalidInputException("No contact details object found for user");
+		}
+		
+		MailIdSettings mailIdSettings = contactDetailsSettings.getMail_ids();
+		if (mailIdSettings == null) {
+			LOG.debug("No maild ids added, create new mail id object in contact details");
+			mailIdSettings = new MailIdSettings();
+		}
+		
+		List<MiscValues> others = null;
+		for (MiscValues mailId : mailIds) {
+			String key = mailId.getKey();
+			String value = mailId.getValue();
+			if (key.equalsIgnoreCase(CommonConstants.EMAIL_TYPE_WORK)) {
+				mailIdSettings.setWork(value);
+				mailIdSettings.setWorkEmailVerified(false);
 
+				// add email id to sql
+				if (entityType.equals(MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION)) {
+					profileManagementService.updateIndividualEmail(entityId, entityId, value);
+				}
+				else if (entityType.equals(MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION)) {
+					profileManagementService.updateCompanyEmail(entityId, value);
+				}
+			}
+			else if (key.equalsIgnoreCase(CommonConstants.EMAIL_TYPE_PERSONAL)) {
+				mailIdSettings.setPersonal(value);
+				mailIdSettings.setPersonalEmailVerified(false);
+			}
+			else {
+				if (others == null) {
+					others = new ArrayList<>();
+				}
+				others.add(mailId);
+			}
+		}
+		
+		mailIdSettings.setOthers(others);
+		contactDetailsSettings.setMail_ids(mailIdSettings);
+		LOG.debug("Method updateMailSettings() finished from ProfileManagementController");
+		return contactDetailsSettings;
+	}
 
     /**
      * Method to update phone numbers of a profile
@@ -3297,6 +3322,30 @@ public class ProfileManagementController
         }
     }
 
+    
+    @RequestMapping(value = "/findcompany")
+    public String findCompanies( Model model, HttpServletRequest request ) {
+    	
+    	LOG.info("Method findCompanies() called");
+    	
+    	String verticalName = request.getParameter("verticalName");
+    	try {
+    		if(verticalName == null || verticalName.isEmpty()) {
+    			throw new InvalidInputException("Null/Empty vertical name");
+    		}
+    		
+    		List<OrganizationUnitSettings> companyList = profileManagementService.getCompanyList(verticalName);
+    		if(companyList != null && companyList.size() > 0) {
+    			model.addAttribute("companyList", companyList);
+        		model.addAttribute("numFound", companyList.size());    			
+    		}
+    		model.addAttribute("verticalName", verticalName);
+    		
+    	} catch (NonFatalException e) {
+    		LOG.error("NonFatalException caught in findCompanies() method, reason : " + e.getMessage());
+    	}
+    	return JspResolver.COMPANY_LIST;
+    }
 
     /**
      * Method to return company profile page

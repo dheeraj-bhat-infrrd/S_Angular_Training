@@ -1,13 +1,11 @@
 package com.realtech.socialsurvey.core.services.mail.impl;
 
 import java.io.IOException;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
-
 import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.commons.Utils;
 import com.realtech.socialsurvey.core.dao.EmailDao;
@@ -19,7 +17,6 @@ import com.realtech.socialsurvey.core.services.mail.EmailSender;
 import com.realtech.socialsurvey.core.services.mail.UndeliveredEmailException;
 import com.realtech.socialsurvey.core.utils.EmailFormatHelper;
 import com.realtech.socialsurvey.core.utils.FileOperations;
-import com.sendgrid.SendGrid;
 
 
 /**
@@ -52,7 +49,6 @@ public class SendGridEmailSenderImpl implements EmailSender
     @Autowired
     private EmailFormatHelper emailFormatHelper;
 
-    private SendGrid sendGrid;
 
     @Autowired
     private EmailDao emailDao;

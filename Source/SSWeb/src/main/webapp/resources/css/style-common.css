@@ -95,6 +95,10 @@ a,a:hover,a:visited {
 	display: block;
 }
 
+.vis-hidden {
+	visibility: hidden;
+}
+
 .semibold {
 	font-family: 'opensanssemibold';
 }
@@ -1723,6 +1727,10 @@ button.paypal.is-active {
 
 .icn-lendingtree {
 	background: url(../images/lendingtree.png) no-repeat center;
+}
+
+.icn-tele-blue {
+	background: url(../images/tele_blue.png) no-repeat center;
 }
 
 .icn-gplus {
@@ -3998,6 +4006,10 @@ img.prof-image {
 	margin-bottom: 18px;
 }
 
+.stats-right-survey {
+	margin-top: 40px;
+}
+
 .dash-panel-left {
 	padding-top: 30px;
 }
@@ -4269,9 +4281,9 @@ img.prof-image {
 	position: absolute;
 	top: 200px;
 	line-height: 25px;
-	left: -215px;
+	left: -220px;
 	font-size: 13px;
-	width: 200px;
+	width: 205px;
 	text-align: right;
 }
 
@@ -6567,6 +6579,11 @@ tr.u-tbl-header td {
     color: #3E9DCB;
 }
 
+.ctnt-com-default-img {
+	background: url(../images/place-holder-Company.png) no-repeat center;
+	background-size : contain; 
+}
+
 .pro-addr-cont {
     font-family: 'opensanslight';
     font-size: 12px;
@@ -6814,6 +6831,7 @@ a.sq-btn-post-social:hover, a.sq-btn-post-social:visited {
   	display: block;
   	border: 1px solid #dcdcdc;
   	line-height: 32px;
+  	z-index: 2;
 }
 
 .dsh-inp-wrapper {
@@ -6900,4 +6918,89 @@ a.sq-btn-post-social:hover, a.sq-btn-post-social:visited {
 	background: url(../images/disconnect.png) no-repeat center;
 	cursor: pointer;
 	background-size: contain;
+}
+
+.bread-crum-row {
+    margin: 10px 0;
+}
+
+.brd-crm-divider {
+    padding: 0 5px;
+}
+
+.brd-crm {
+    font-size: 14px;
+}
+
+.comp-list-table {
+	width: 100%;
+}
+
+.comp-row {
+	border-bottom: 1px solid #dcdcdc;
+	height: 41px;
+	line-height: 41px;
+}
+
+.v-line-comp {
+	border-left: 3px solid #CF8661;
+	height: 41px;
+	position: absolute;
+	top: 0;
+	width: 100%;
+	background-image: url(../images/hm-arrow-closed.png);
+	background-position: 10px center;
+	background-repeat: no-repeat;
+}
+
+.v-line-comp[clicked="true"] {
+	background-image: url(../images/hm-arrow-open.png);
+}
+
+.comp-row>div{
+	display: inline-block;
+	float: left;
+	height: 100%;
+}
+
+div.v-tbl-line {
+	width: 9%;
+}
+
+div.v-tbl-name {
+	width: 26%;
+}
+
+div.v-tbl-add {
+	width: 35%;
+}
+
+div.v-tbl-role {
+	width: 20%;
+}
+
+div.v-tbl-btns {
+	width: 7.5%;
+}
+
+div.v-tbl-spacer {
+	width: 2.5%;
+}
+
+.comp-hr-cont {
+	position: relative;
+	top: -11px;
+	padding-left: 10px;
+}
+
+.comp-row .region-row>.v-tbl-line ,.comp-row .comp-branch-row>.v-tbl-line{
+	padding-left: 10px;
+}
+
+.v-comp-inp {
+	width: 150px;
+	border: 0;
+	box-shadow: none;
+	height: 32px;
+	background-color: transparent;
 }

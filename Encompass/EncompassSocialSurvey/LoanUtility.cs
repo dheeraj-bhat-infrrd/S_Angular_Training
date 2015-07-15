@@ -174,7 +174,7 @@ namespace EncompassSocialSurvey
             return returnLoansViewModel;
         }
 
-        public List<LoanViewModel> LopulateLoanList(LoanFolder parentFolder, long runningCompanyId)
+        public List<LoanViewModel> LopulateLoanList(LoanFolder parentFolder, long runningCompanyId, string fieldid)
         {
             Logger.Info("Entering the method LoanUtility.LopopulateLoanList(): FolderName: " + parentFolder.DisplayName);
 
@@ -195,7 +195,6 @@ namespace EncompassSocialSurvey
 
                 fieldIds.Add("364");         // Loan Number
                 fieldIds.Add("LoanTeamMember.Name.Loan Officer"); // Loan Processor Name
-
                 fieldIds.Add("36");          // Customer First Name
                 fieldIds.Add("37");          // Customer Last Name
                 fieldIds.Add("1240");        // CustomerEmailId
@@ -204,8 +203,16 @@ namespace EncompassSocialSurvey
                 fieldIds.Add("69");    // Co-BorrowerLastName
                 fieldIds.Add("1268");  // Co-BorrowerEmailId
 
-                fieldIds.Add("748");      // closed date
-
+                if(string.IsNullOrWhiteSpace(fieldid))
+                {
+                    fieldIds.Add("748");   // closed date
+                }
+                else
+                {
+                    fieldIds.Add(fieldid); //User provided field
+                }
+                    
+              
                 #endregion  // Popualted FieldIds // list of ids to get the details from loan
 
 
@@ -226,7 +233,7 @@ namespace EncompassSocialSurvey
 
 
                     // TODO: Raushan: uncommend this line of code: Consider only the closed loans
-                    // if loan is not closed " closed field value will be null/empty/[//]
+                    // if loan is not closed " funded field value will be null/empty/[//]
                     if (string.IsNullOrWhiteSpace(fieldValues[8]) || fieldValues[8].Equals("//") || fieldValues[8].Equals(@"\\"))
                     {
                         Logger.Info("Exiting the method LoanUtility.LopopulateLoanList(): It's not a closed loan. : LoanGUID : " + id.Guid);

@@ -34,6 +34,8 @@ public class SurveyDetails {
 	private String yelpProfileUrl;
 	private String zillowProfileUrl;
 	private String lendingTreeProfileUrl;
+	private String source;
+	private String agreedToShare;
 
 	public long getAgentId() {
 		return agentId;
@@ -273,5 +275,21 @@ public class SurveyDetails {
 
 	public void setLendingTreeProfileUrl(String lendingTreeProfileUrl) {
 		this.lendingTreeProfileUrl = lendingTreeProfileUrl;
+	}
+
+	public String getSource() {
+		return source;
+	}
+
+	public void setSource(String source) {
+		this.source = source;
+	}
+
+	public String getAgreedToShare() {
+		return agreedToShare;
+	}
+
+	public void setAgreedToShare(String agreedToShare) {
+		this.agreedToShare = agreedToShare;
 	}
 }

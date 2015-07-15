@@ -83,7 +83,7 @@ public class SurveyPreInitiationDaoImpl extends GenericDaoImpl<SurveyPreInitiati
 	@SuppressWarnings("unchecked")
 	@Override
 	public List<SurveyPreInitiation> getIncompleteSurvey(Timestamp startDate, Timestamp endDate, int start, int row, Set<Long> agentIds,
-			boolean isCompanyAdmin, long companyId) throws DatabaseException {
+			boolean isCompanyAdmin, long companyId, boolean realtechAdmin) throws DatabaseException {
 		Criteria criteria = getSession().createCriteria(SurveyPreInitiation.class);
 		try {
 			if (startDate != null)
@@ -94,13 +94,16 @@ public class SurveyPreInitiationDaoImpl extends GenericDaoImpl<SurveyPreInitiati
 				criteria.setMaxResults(row);
 			if (start > 0)
 				criteria.setFirstResult(start);
-
-			if (!isCompanyAdmin && agentIds.size() > 0)
-				criteria.add(Restrictions.in(CommonConstants.AGENT_ID_COLUMN, agentIds));
-			else {
-				criteria.add(Restrictions.eq(CommonConstants.COMPANY_ID_COLUMN, companyId));
+			
+			if (!realtechAdmin) {
+				if (!isCompanyAdmin && agentIds.size() > 0)
+					criteria.add(Restrictions.in(
+							CommonConstants.AGENT_ID_COLUMN, agentIds));
+				else {
+					criteria.add(Restrictions.eq(
+							CommonConstants.COMPANY_ID_COLUMN, companyId));
+				}
 			}
-
 			criteria.addOrder(Order.desc(CommonConstants.MODIFIED_ON_COLUMN));
 			return criteria.list();
 		}
@@ -130,40 +133,45 @@ public class SurveyPreInitiationDaoImpl extends GenericDaoImpl<SurveyPreInitiati
 		}
 	}
 
-
-    @SuppressWarnings ( "unchecked")
-    @Override
-    public void getIncompleteSurveysCount( Date startDate, Date endDate, Map<Long, AgentRankingReport> agentReportData )
-    {
-        LOG.info( "Method getIncompleteSurveysCount() started" );
-        List<SurveyPreInitiation> surveys = new ArrayList<>();
-        Criteria criteria = getSession().createCriteria( SurveyPreInitiation.class );
-        try {
-            if ( startDate != null )
-                criteria.add( Restrictions.ge( CommonConstants.CREATED_ON, new Timestamp( startDate.getTime() ) ) );
-            if ( endDate != null )
-                criteria.add( Restrictions.le( CommonConstants.CREATED_ON, new Timestamp( endDate.getTime() ) ) );
-            surveys = criteria.list();
-        } catch ( HibernateException e ) {
-            LOG.error( "Exception caught in getIncomplgetIncompleteSurveysCounteteSurveyForReminder() ", e );
-            throw new DatabaseException( "Exception caught in getIncompleteSurveysCount() ", e );
-        }
-        for ( SurveyPreInitiation survey : surveys ) {
-            AgentRankingReport agentRankingReport = null;
-            if ( agentReportData.containsKey( survey.getAgentId() ) ) {
-                agentRankingReport = agentReportData.get( survey.getAgentId() );
-            } else {
-                agentRankingReport = new AgentRankingReport();
-                agentRankingReport.setAgentId( survey.getAgentId() );
-                agentRankingReport.setAgentName( survey.getAgentName() );
-            }
-            if ( startDate == null && endDate == null ) {
-                agentRankingReport.setAllTimeIncompleteSurveys( agentRankingReport.getAllTimeIncompleteSurveys() + 1 );
-            } else {
-                agentRankingReport.setIncompleteSurveys( agentRankingReport.getIncompleteSurveys() + 1 );
-            }
-            agentReportData.put( survey.getAgentId(), agentRankingReport );
-        }
-        LOG.info( "Method getIncompleteSurveysCount() finished" );
-    }
+	@SuppressWarnings("unchecked")
+	@Override
+	public void getIncompleteSurveysCount(Date startDate, Date endDate, Map<Long, AgentRankingReport> agentReportData) {
+		LOG.info("Method getIncompleteSurveysCount() started");
+		List<SurveyPreInitiation> surveys = new ArrayList<>();
+		
+		Criteria criteria = getSession().createCriteria(SurveyPreInitiation.class);
+		try {
+			if (startDate != null && endDate != null) {
+				criteria.add(Restrictions.ge(CommonConstants.CREATED_ON, new Timestamp(startDate.getTime())));
+				criteria.add(Restrictions.le(CommonConstants.CREATED_ON, new Timestamp(endDate.getTime())));
+			}
+			else if (startDate != null && endDate == null)
+				criteria.add(Restrictions.ge(CommonConstants.CREATED_ON, new Timestamp(startDate.getTime())));
+			else if (startDate == null && endDate != null)
+				criteria.add(Restrictions.le(CommonConstants.CREATED_ON, new Timestamp(endDate.getTime())));
+			
+			surveys = criteria.list();
+		}
+		catch (HibernateException e) {
+			LOG.error("Exception caught in getIncomplgetIncompleteSurveysCounteteSurveyForReminder() ", e);
+			throw new DatabaseException("Exception caught in getIncompleteSurveysCount() ", e);
+		}
+		
+		for (SurveyPreInitiation survey : surveys) {
+			AgentRankingReport agentRankingReport = null;
+			if (agentReportData.containsKey(survey.getAgentId())) {
+				agentRankingReport = agentReportData.get(survey.getAgentId());
+			}
+			else {
+				agentRankingReport = new AgentRankingReport();
+				agentRankingReport.setAgentId(survey.getAgentId());
+				agentRankingReport.setAgentName(survey.getAgentName());
+			}
+			
+			// agentRankingReport.setAllTimeIncompleteSurveys(agentRankingReport.getAllTimeIncompleteSurveys() + 1);
+			agentRankingReport.setIncompleteSurveys(agentRankingReport.getIncompleteSurveys() + 1);
+			agentReportData.put(survey.getAgentId(), agentRankingReport);
+		}
+		LOG.info("Method getIncompleteSurveysCount() finished");
+	}
 }

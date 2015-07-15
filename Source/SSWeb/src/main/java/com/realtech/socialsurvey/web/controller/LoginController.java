@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import com.google.gson.Gson;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.entities.BranchFromSearch;
@@ -79,16 +80,23 @@ public class LoginController {
 		return JspResolver.INDEX;
 	}
 
+	@RequestMapping(value = "/index")
+	public String initIndexPage(HttpServletResponse response) {
+		LOG.info("Method initIndexPage() called from LoginController");
+		return JspResolver.INDEX;
+	}
+	
 	@RequestMapping(value = "/login")
-	public String initLoginPage(Model model, @RequestParam(value = STATUS_PARAM, required = false) String status) {
+	public String initLoginPage(Model model, @RequestParam(value = STATUS_PARAM, required = false) String status,
+			RedirectAttributes redirectAttributes) {
 		LOG.info("Inside initLoginPage() of LoginController");
 		
 		// Check for existing session
 		if (sessionHelper.isUserActiveSessionExists()) {
 			LOG.info("Existing Active Session detected");
 			
-			model.addAttribute(CommonConstants.ACTIVE_SESSIONS_FOUND, "true");
-			return JspResolver.LANDING;
+			redirectAttributes.addFlashAttribute(CommonConstants.ACTIVE_SESSIONS_FOUND, "true");
+			return "redirect:/" + JspResolver.LANDING + ".do";
 		}
 
 		if (status != null) {
@@ -171,6 +179,14 @@ public class LoginController {
 			user = sessionHelper.getCurrentUser();
 			HttpSession session = request.getSession(true);
 
+			
+			//Check if super admin is logged in
+			
+			if(user.isSuperAdmin()) {
+				return JspResolver.ADMIN_LANDING;
+			}
+			
+			
 			List<LicenseDetail> licenseDetails = user.getCompany().getLicenseDetails();
 			if (licenseDetails != null && !licenseDetails.isEmpty()) {
 
@@ -284,6 +300,9 @@ public class LoginController {
 						}
 						model.addAttribute("showLinkedInPopup", String.valueOf(showLinkedInPopup));
 						model.addAttribute("showSendSurveyPopup", String.valueOf(showSendSurveyPopup));
+
+						// updating session with selected user profile if not set
+						sessionHelper.updateProcessedUserProfiles(session, user);
 
 						// update the last login time and number of logins
 						userManagementService.updateUserLoginTimeAndNum(user);
