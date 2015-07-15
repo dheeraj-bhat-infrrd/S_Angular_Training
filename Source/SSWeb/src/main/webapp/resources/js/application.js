@@ -3225,6 +3225,7 @@ function resetTextForMoodFlow(mood, resetId){
 		"mood" : mood
 	};
 	callAjaxGetWithPayloadData("./resettextforflow.do", function(data) {
+		hideOverlay();
 		var map =  $.parseJSON(data);
 
 		if (map.success == 1 && map.message) {
