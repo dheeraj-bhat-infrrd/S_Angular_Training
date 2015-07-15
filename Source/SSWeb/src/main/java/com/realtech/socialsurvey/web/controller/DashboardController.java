@@ -65,8 +65,7 @@ import com.realtech.socialsurvey.web.common.JspResolver;
 @Controller
 public class DashboardController {
 
-	private static final Logger LOG = LoggerFactory
-			.getLogger(DashboardController.class);
+	private static final Logger LOG = LoggerFactory.getLogger(DashboardController.class);
 
 	@Autowired
 	private SessionHelper sessionHelper;
@@ -1010,112 +1009,6 @@ public class DashboardController {
 	}
 
 	/*
-	 * Method to download file containing completed surveys
-	 */
-	@RequestMapping(value = "/downloaddashboardcompletesurvey")
-	public void getCompleteSurveyFile(Model model, HttpServletRequest request, HttpServletResponse response) {
-		LOG.info("Method to get file containg completed surveys list getCompleteSurveyFile() started.");
-		User user = sessionHelper.getCurrentUser();
-		List<SurveyDetails> surveyDetails = new ArrayList<>();
-		boolean realtechAdmin = user.isSuperAdmin();
-		
-		try {
-			String columnName = request.getParameter("columnName");
-
-			if (!realtechAdmin && (columnName == null || columnName.isEmpty())) {
-				LOG.error("Invalid value (null/empty) passed for profile level.");
-				throw new InvalidInputException("Invalid value (null/empty) passed for profile level.");
-			}
-
-			Date startDate = null;
-			String startDateStr = request.getParameter("startDate");
-			if (startDateStr != null && !startDateStr.isEmpty()) {
-				try {
-					startDate = new SimpleDateFormat(CommonConstants.DATE_FORMAT).parse(startDateStr);
-				}
-				catch (ParseException e) {
-					LOG.error("ParseException caught in getCompleteSurveyFile() while parsing startDate. Nested exception is ", e);
-				}
-			}
-
-			Date endDate = Calendar.getInstance().getTime();
-			String endDateStr = request.getParameter("endDate");
-			if (endDateStr != null && !endDateStr.isEmpty()) {
-				try {
-					endDate = new SimpleDateFormat(CommonConstants.DATE_FORMAT).parse(endDateStr);
-				}
-				catch (ParseException e) {
-					LOG.error("ParseException caught in getCompleteSurveyFile() while parsing startDate. Nested exception is ", e);
-				}
-			}
-
-			long iden = 0;
-			String profileLevel = getProfileLevel(columnName);
-			if (realtechAdmin) {
-				profileLevel = CommonConstants.PROFILE_LEVEL_REALTECH_ADMIN;
-			}
-			if (profileLevel.equals(CommonConstants.PROFILE_LEVEL_COMPANY)) {
-				iden = user.getCompany().getCompanyId();
-			}
-			else if (profileLevel.equals(CommonConstants.PROFILE_LEVEL_INDIVIDUAL)) {
-				iden = user.getUserId();
-			}
-			else {
-				String columnValue = request.getParameter("columnValue");
-				if (columnValue != null && !columnValue.isEmpty()) {
-					try {
-						iden = Long.parseLong(columnValue);
-					}
-					catch (NumberFormatException e) {
-						LOG.error("NumberFormatException caught while parsing columnValue in getCompleteSurveyFile(). Nested exception is ", e);
-						throw e;
-					}
-				}
-			}
-
-			try {
-				surveyDetails = profileManagementService.getReviews(iden, -1, -1, -1, -1, profileLevel, true, startDate, endDate, "date");
-				String fileLocation = "Completed_Survey_" + profileLevel + "_" + iden + EXCEL_FILE_EXTENSION;
-				XSSFWorkbook workbook = dashboardService.downloadCompleteSurveyData(surveyDetails, fileLocation);
-				response.setContentType(EXCEL_FORMAT);
-				String headerKey = CONTENT_DISPOSITION_HEADER;
-				String headerValue = String.format("attachment; filename=\"%s\"", new File(fileLocation).getName());
-				response.setHeader(headerKey, headerValue);
-
-				// write into file
-				OutputStream responseStream = null;
-				try {
-					responseStream = response.getOutputStream();
-					workbook.write(responseStream);
-				}
-				catch (IOException e) {
-					e.printStackTrace();
-				}
-				finally {
-					try {
-						responseStream.close();
-					}
-					catch (IOException e) {
-						e.printStackTrace();
-					}
-				}
-				response.flushBuffer();
-			}
-			catch (InvalidInputException e) {
-				LOG.error("InvalidInputException caught in getCompleteSurveyFile() while fetching completed surveys file. Nested exception is ", e);
-				throw e;
-			}
-			catch (IOException e) {
-				LOG.error("IOException caught in getCompleteSurveyFile() while fetching completed surveys file. Nested exception is ", e);
-			}
-		}
-		catch (NonFatalException e) {
-			LOG.error("Non fatal exception caught in getCompleteSurveyFile() while fetching completed surveys file. Nested exception is ", e);
-		}
-		LOG.info("Method to get file containg completed surveys list getCompleteSurveyFile() finished.");
-	}
-
-	/*
 	 * Method to download file containing incomplete surveys
 	 */
 	@RequestMapping(value = "/downloaddashboardincompletesurvey")
@@ -1183,7 +1076,7 @@ public class DashboardController {
 			
 			try {
 				surveyDetails = profileManagementService.getIncompleteSurvey(iden, 0, 0, -1, -1, profileLevel, startDate, endDate, realtechAdmin);
-				String fileName = "Incomplete_Survey_" + profileLevel + "_" + iden + ".xlsx";
+				String fileName = "Incomplete_Survey_" + profileLevel + "_" + iden + EXCEL_FILE_EXTENSION;
 				XSSFWorkbook workbook = dashboardService.downloadIncompleteSurveyData(surveyDetails, fileName);
 				response.setContentType(EXCEL_FORMAT);
 				String headerKey = CONTENT_DISPOSITION_HEADER;
@@ -1290,7 +1183,7 @@ public class DashboardController {
 			
 			try {
 				surveyDetails = profileManagementService.getReviews(iden, -1, -1, -1, -1, profileLevel, true, startDate, endDate, null);
-				String fileName = "Survey_Results_" + profileLevel + "_" + iden + ".xlsx";
+				String fileName = "Survey_Results_" + profileLevel + "_" + iden + EXCEL_FILE_EXTENSION;
 				XSSFWorkbook workbook = dashboardService.downloadCustomerSurveyResultsData(surveyDetails, fileName);
 				response.setContentType(EXCEL_FORMAT);
 				String headerKey = CONTENT_DISPOSITION_HEADER;
@@ -1397,7 +1290,7 @@ public class DashboardController {
 			
 			try {
 				surveyDetails = profileManagementService.getReviews(iden, -1, -1, -1, -1, profileLevel, true, startDate, endDate, null);
-				String fileName = "Social_Monitor_" + profileLevel + "_" + iden + ".xlsx";
+				String fileName = "Social_Monitor_" + profileLevel + "_" + iden + EXCEL_FILE_EXTENSION;
 				XSSFWorkbook workbook = dashboardService.downloadSocialMonitorData(surveyDetails, fileName);
 				response.setContentType(EXCEL_FORMAT);
 				String headerKey = CONTENT_DISPOSITION_HEADER;
