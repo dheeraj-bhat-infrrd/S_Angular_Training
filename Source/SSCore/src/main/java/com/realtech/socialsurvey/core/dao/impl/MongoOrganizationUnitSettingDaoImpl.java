@@ -5,7 +5,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
+import java.util.regex.Pattern;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
@@ -19,7 +19,6 @@ import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Repository;
-
 import com.mongodb.BasicDBObject;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.dao.OrganizationUnitSettingsDao;
@@ -40,6 +39,7 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
 	public static final String BRANCH_SETTINGS_COLLECTION = "BRANCH_SETTINGS";
 	public static final String AGENT_SETTINGS_COLLECTION = "AGENT_SETTINGS";
 	public static final String KEY_CRM_INFO = "crm_info";
+	public static final String KEY_IDEN = "iden";
 	public static final String KEY_CRM_INFO_CLASS = "crm_info._class";
 	public static final String KEY_MAIL_CONTENT = "mail_content";
 	public static final String KEY_SURVEY_SETTINGS = "survey_settings";
@@ -72,7 +72,8 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
 	public static final String KEY_TWITTER_SOCIAL_MEDIA_TOKEN = "socialMediaTokens.twitterToken";
 	public static final String KEY_GOOGLE_SOCIAL_MEDIA_TOKEN = "socialMediaTokens.googleToken";
 	public static final String KEY_LINKEDIN_SOCIAL_MEDIA_TOKEN = "socialMediaTokens.linkedInToken";
-
+	public static final String KEY_CONTACT_NAME = "contact_details.name";
+	
 	private static final Logger LOG = LoggerFactory.getLogger(MongoOrganizationUnitSettingDaoImpl.class);
 
 	@Autowired
@@ -393,6 +394,37 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
     	return unitSettings;
     }
 
+    @Override
+    public List<OrganizationUnitSettings> getCompanyList() {
+    	LOG.debug( "Method getCompanyList() called");
+    	
+    	List<OrganizationUnitSettings> unitSettings = null;
+    	Query query = new Query();
+    	query.fields().include(KEY_CONTACT_DETAILS).include(KEY_PROFILE_NAME).include(KEY_VERTICAL).include(KEY_IDEN).exclude("_id");
+    	query.with(new Sort(Sort.Direction.DESC, KEY_MODIFIED_ON));
+    	
+    	unitSettings = mongoTemplate.find(query, OrganizationUnitSettings.class, COMPANY_SETTINGS_COLLECTION);
+    	
+    	return unitSettings;
+    }
+    
+    
+    @Override
+    public List<OrganizationUnitSettings> getCompanyListByKey(String searchKey) {
+		LOG.debug("Method getCompanyListByKey() called for key : " + searchKey);
+    	
+    	List<OrganizationUnitSettings> unitSettings = null;
+    	Query query = new Query();
+    	Pattern pattern = Pattern.compile(searchKey+".*");
+    	query.addCriteria(Criteria.where(KEY_CONTACT_NAME).regex(pattern));
+    	query.fields().include(KEY_CONTACT_DETAILS).include(KEY_VERTICAL).include(KEY_IDEN).exclude("_id");
+    	query.with(new Sort(Sort.Direction.DESC, KEY_MODIFIED_ON));
+    	
+    	unitSettings = mongoTemplate.find(query, OrganizationUnitSettings.class, COMPANY_SETTINGS_COLLECTION);
+    	
+    	return unitSettings;
+    }
+    
 	/*
 	 * Method to set complete profile URL for each of the setting being fetched.
 	 */

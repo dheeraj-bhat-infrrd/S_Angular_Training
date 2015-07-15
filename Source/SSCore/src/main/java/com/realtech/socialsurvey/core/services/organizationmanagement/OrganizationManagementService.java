@@ -729,4 +729,8 @@ public interface OrganizationManagementService {
 	public List<Company> getCompaniesByName(String searchKey);
 
 	public Company getCompanyById(long companyId);
+	
+	public List<OrganizationUnitSettings> getAllCompaniesFromMongo();
+	
+	public List<OrganizationUnitSettings> getCompaniesByNameFromMongo(String searchKey);
 }
