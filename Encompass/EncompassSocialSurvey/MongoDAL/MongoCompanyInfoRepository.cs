@@ -64,7 +64,7 @@ namespace EncompassSocialSurvey.MongoDAL
                         forCompCredential.EncompassUrl = ssCompInfo.crm_info.url;
                         forCompCredential.UserName = ssCompInfo.crm_info.crm_username;
                         forCompCredential.Password = ssCompInfo.crm_info.crm_password;
-
+                        forCompCredential.fieldId = ssCompInfo.crm_info.crm_fieldId;
                         //
                         returnValue.Add(forCompCredential);
                     }
