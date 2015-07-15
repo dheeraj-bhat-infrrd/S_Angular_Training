@@ -63,8 +63,11 @@ import com.realtech.socialsurvey.web.common.ErrorResponse;
 import com.realtech.socialsurvey.web.common.JspResolver;
 import com.realtech.socialsurvey.web.util.RequestUtils;
 
+import facebook4j.Account;
 import facebook4j.Facebook;
 import facebook4j.FacebookException;
+import facebook4j.FacebookFactory;
+import facebook4j.ResponseList;
 
 /**
  * Controller to manage social media oauth and pull/push posts
@@ -98,6 +101,12 @@ public class SocialManagementController {
 	// Facebook
 	@Value("${FB_REDIRECT_URI}")
 	private String facebookRedirectUri;
+	
+	@Value("${FB_CLIENT_ID}")
+	private String facebookClientId;
+
+	@Value("${FB_CLIENT_SECRET}")
+	private String facebookClientSecret;
 	
 	// LinkedIn
 	@Value("${LINKED_IN_REST_API_URI}")
@@ -237,7 +246,10 @@ public class SocialManagementController {
 		}
 
 		model.addAttribute(CommonConstants.MESSAGE, CommonConstants.YES);
-		return JspResolver.SOCIAL_AUTH_MESSAGE;
+		if(socialNetwork.equalsIgnoreCase("facebook"))
+			return JspResolver.SOCIAL_FACEBOOK_INTERMEDIATE;
+		else 
+			return JspResolver.SOCIAL_AUTH_MESSAGE;
 	}
 
 	/**
@@ -283,16 +295,20 @@ public class SocialManagementController {
 			Facebook facebook = (Facebook) session.getAttribute(CommonConstants.SOCIAL_REQUEST_TOKEN);
 			String profileLink = null;
 			facebook4j.auth.AccessToken accessToken = null;
+			Map<String, String> facebookPages=new HashMap<>();
 			try {
 				accessToken = facebook.getOAuthAccessToken(oauthCode, requestUtils.getRequestServerName(request)+facebookRedirectUri);
 				facebook4j.User user = facebook.getUser(facebook.getId());
-				if (user != null)
+				if (user != null){
 					profileLink = user.getLink().toString();
+					facebookPages.put(user.getName(), accessToken.getToken());
+				}
 			}
 			catch (FacebookException e) {
 				LOG.error("Error while creating access token for facebook: " + e.getLocalizedMessage(), e);
 			}
 			boolean updated = false;
+			
 			// Storing token
 			SocialMediaTokens mediaTokens;
 			int accountMasterId = accountType.getValue();
@@ -380,6 +396,20 @@ public class SocialManagementController {
 				throw new InvalidInputException("Invalid input exception occurred while creating access token for facebook",
 						DisplayMessageConstants.GENERAL_ERROR);
 			}
+			Facebook facebook1 = new FacebookFactory().getInstance();
+			facebook1.setOAuthAppId(facebookClientId, facebookClientSecret);
+			facebook1.setOAuthAccessToken(new facebook4j.auth.AccessToken(accessToken.getToken()));
+			
+			ResponseList<Account> accounts;
+			try {
+				accounts = facebook1.getAccounts();
+				for (Account account : accounts) {
+					facebookPages.put(account.getName(), account.getAccessToken());
+				}
+				model.addAttribute("pageNames", facebookPages);
+			} catch (FacebookException e) {
+				LOG.error("Error while creating access token for facebook: " + e.getLocalizedMessage(), e);
+			}
 		}
 		catch (Exception e) {
 			session.removeAttribute(CommonConstants.SOCIAL_REQUEST_TOKEN);
@@ -392,9 +422,91 @@ public class SocialManagementController {
 		model.addAttribute(CommonConstants.SUCCESS_ATTRIBUTE, CommonConstants.YES);
 		model.addAttribute("socialNetwork", "facebook");
 		LOG.info("Facebook Access tokens obtained and added to mongo successfully!");
-		return JspResolver.SOCIAL_AUTH_MESSAGE;
+		return JspResolver.SOCIAL_FACEBOOK_INTERMEDIATE;
 	}
 
+	
+	@ResponseBody
+	@RequestMapping(value = "/saveSelectedAccessFacebookToken")
+	public String saveSelectedAccessFacebookToken(Model model, HttpServletRequest request) {
+		LOG.info("Method saveSelectedAccessFacebookToken() called from SocialManagementController");
+		
+	
+		String selectedAccessFacebookToken = request.getParameter("selectedAccessFacebookToken");
+		HttpSession session = request.getSession(false);
+		UserSettings userSettings = (UserSettings) session.getAttribute(CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION);
+		UserProfile selectedProfile = (UserProfile) session.getAttribute(CommonConstants.USER_PROFILE);
+		AccountType accountType = (AccountType) session.getAttribute(CommonConstants.ACCOUNT_TYPE_IN_SESSION);
+		int accountMasterId = accountType.getValue();
+		int profilesMaster = selectedProfile.getProfilesMaster().getProfileId();
+		if(session.getAttribute("columnName")!=null){
+			String columnName = (String) session.getAttribute("columnName");
+			String columnValue = (String) session.getAttribute("columnValue");
+			session.removeAttribute("columnName");
+			session.removeAttribute("columnValue");
+			model.addAttribute("columnName", columnName);
+			model.addAttribute("columnValue", columnValue);
+			model.addAttribute("fromDashboard", 1);
+		}
+		boolean updated = false;
+		SocialMediaTokens mediaTokens =null;
+		try {
+			if (profilesMaster == CommonConstants.PROFILES_MASTER_COMPANY_ADMIN_PROFILE_ID
+					|| accountMasterId == CommonConstants.ACCOUNTS_MASTER_INDIVIDUAL) {
+				OrganizationUnitSettings companySettings = userSettings.getCompanySettings();
+				if (companySettings == null) {
+					throw new InvalidInputException("No company settings found in current session");
+				}
+				mediaTokens = companySettings.getSocialMediaTokens();
+				mediaTokens.getFacebookToken().setFacebookAccessTokenToPost(selectedAccessFacebookToken);
+					socialManagementService.updateSocialMediaTokens(MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION,
+							companySettings, mediaTokens);
+					updated = true;
+			}
+			else if (profilesMaster == CommonConstants.PROFILES_MASTER_REGION_ADMIN_PROFILE_ID) {
+				long regionId = selectedProfile.getRegionId();
+				OrganizationUnitSettings regionSettings = userSettings.getRegionSettings().get(regionId);
+				if (regionSettings == null) {
+					throw new InvalidInputException("No Region settings found in current session");
+				}
+				mediaTokens = regionSettings.getSocialMediaTokens();
+				mediaTokens.getFacebookToken().setFacebookAccessTokenToPost(selectedAccessFacebookToken);
+				socialManagementService.updateSocialMediaTokens(MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION,
+						regionSettings, mediaTokens);
+				updated = true;
+			}
+			else if (profilesMaster == CommonConstants.PROFILES_MASTER_BRANCH_ADMIN_PROFILE_ID) {
+				long branchId = selectedProfile.getBranchId();
+				OrganizationUnitSettings branchSettings = userSettings.getBranchSettings().get(branchId);
+				if (branchSettings == null) {
+					throw new InvalidInputException("No Branch settings found in current session");
+				}
+				mediaTokens = branchSettings.getSocialMediaTokens();
+				mediaTokens.getFacebookToken().setFacebookAccessTokenToPost(selectedAccessFacebookToken);
+				socialManagementService.updateSocialMediaTokens(MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION,
+						branchSettings, mediaTokens);
+				updated = true;
+			}
+			if (profilesMaster == CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID) {
+				AgentSettings agentSettings = userSettings.getAgentSettings();
+				if (agentSettings == null) {
+					throw new InvalidInputException("No Agent settings found in current session");
+				}
+				mediaTokens = agentSettings.getSocialMediaTokens();
+				mediaTokens.getFacebookToken().setFacebookAccessTokenToPost(selectedAccessFacebookToken);
+				socialManagementService.updateAgentSocialMediaTokens(agentSettings, mediaTokens);
+				updated = true;
+			}
+			if (!updated) {
+				throw new InvalidInputException("Invalid input exception occurred while saving access token for facebook",
+						DisplayMessageConstants.GENERAL_ERROR);
+			}
+		} catch (InvalidInputException e) {
+			LOG.error("Error while saving access token for facebook to post: " + e.getLocalizedMessage(), e);		
+		}
+		model.addAttribute("socialNetwork", "facebook");
+		return JspResolver.SOCIAL_FACEBOOK_INTERMEDIATE;
+	}
 	private SocialMediaTokens updateFacebookToken(facebook4j.auth.AccessToken accessToken, SocialMediaTokens mediaTokens, String profileLink) {
 		LOG.debug("Method updateFacebookToken() called from SocialManagementController");
 		if (mediaTokens == null) {
@@ -414,11 +526,31 @@ public class SocialManagementController {
 
 		mediaTokens.getFacebookToken().setFacebookAccessToken(accessToken.getToken());
 		mediaTokens.getFacebookToken().setFacebookAccessTokenCreatedOn(System.currentTimeMillis());
-		mediaTokens.getFacebookToken().setFacebookAccessTokenExpiresOn(accessToken.getExpires());
+		if(accessToken.getExpires()!=null)
+			mediaTokens.getFacebookToken().setFacebookAccessTokenExpiresOn(accessToken.getExpires());
+		
+		mediaTokens.getFacebookToken().setFacebookAccessTokenToPost(accessToken.getToken());
 
+		Facebook facebook = new FacebookFactory().getInstance();
+		facebook.setOAuthAppId(facebookClientId, facebookClientSecret);
+		facebook.setOAuthAccessToken(new facebook4j.auth.AccessToken(accessToken.getToken()));
+		
+		ResponseList<Account> accounts;
+		List<String> pageAccessToken=new ArrayList<String>();
+		try {
+			accounts = facebook.getAccounts();
+			for (Account account : accounts) {
+				pageAccessToken.add(account.getAccessToken());
+			}
+		} catch (FacebookException e) {
+			LOG.error("Error while creating access token for facebook: " + e.getLocalizedMessage(), e);
+		}
+		mediaTokens.getFacebookToken().setFacebookPublicPageAccessToken(pageAccessToken);
+		
 		LOG.debug("Method updateFacebookToken() finished from SocialManagementController");
 		return mediaTokens;
 	}
+	
 
 	/**
 	 * The url that twitter send request to with the oauth verification code
@@ -666,6 +798,8 @@ public class SocialManagementController {
 			String basicProfileStr = httpclient.execute(httpGet, new BasicResponseHandler());
 			LinkedinUserProfileResponse profileData = new Gson().fromJson(basicProfileStr, LinkedinUserProfileResponse.class);
 			String profileLink = (String) profileData.getSiteStandardProfileRequest().getUrl();
+			
+			
 
 			SocialMediaTokens mediaTokens;
 			int accountMasterId = accountType.getValue();
@@ -1339,104 +1473,6 @@ public class SocialManagementController {
 
 		LOG.info("Method getProfileUrl() finished from SocialManagementController");
 		return profileUrl;
-	}
-	
-	@ResponseBody
-	@RequestMapping(value = "/disconnectsocialmedia", method = RequestMethod.POST)
-	public String disconnectSocialMedia(HttpServletRequest request) {
-		
-		String socialMedia = request.getParameter("socialMedia");
-		
-		try {
-			
-			if(socialMedia == null || socialMedia.isEmpty()) {
-				throw new InvalidInputException("Social media can not be null or empty");
-			}
-			
-			HttpSession session = request.getSession();
-			
-	        UserSettings userSettings = (UserSettings) session.getAttribute( CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION );
-	        UserProfile selectedProfile = (UserProfile) session.getAttribute( CommonConstants.USER_PROFILE );
-	        
-	        OrganizationUnitSettings unitSettings = null;
-	        int profileMasterId = selectedProfile.getProfilesMaster().getProfileId();
-	        String collectionName = null;
-	        
-	        //Check for the collection to update
-	        if ( profileMasterId == CommonConstants.PROFILES_MASTER_COMPANY_ADMIN_PROFILE_ID) {
-                unitSettings = userSettings.getCompanySettings();
-                collectionName = MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION;
-            } else if ( profileMasterId == CommonConstants.PROFILES_MASTER_REGION_ADMIN_PROFILE_ID ) {
-                unitSettings = userSettings.getRegionSettings().get( selectedProfile.getRegionId() );
-                collectionName = MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION;
-            } else if ( profileMasterId == CommonConstants.PROFILES_MASTER_BRANCH_ADMIN_PROFILE_ID ) {
-                unitSettings = userSettings.getBranchSettings().get( selectedProfile.getBranchId() );
-                collectionName = MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION;
-            } else if ( profileMasterId == CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID ) {
-                unitSettings = userSettings.getAgentSettings();
-                collectionName = MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION;
-            }
-			unitSettings = socialManagementService.disconnectSocialNetwork(socialMedia, unitSettings, collectionName);
-			//Check for the collection to update
-	        if ( profileMasterId == CommonConstants.PROFILES_MASTER_COMPANY_ADMIN_PROFILE_ID) {
-                userSettings.setCompanySettings(unitSettings);
-            } else if ( profileMasterId == CommonConstants.PROFILES_MASTER_REGION_ADMIN_PROFILE_ID ) {
-                userSettings.getRegionSettings().put(selectedProfile.getRegionId(), unitSettings);
-            } else if ( profileMasterId == CommonConstants.PROFILES_MASTER_BRANCH_ADMIN_PROFILE_ID ) {
-                userSettings.getBranchSettings().put(selectedProfile.getBranchId(), unitSettings);
-            } else if ( profileMasterId == CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID ) {
-                userSettings.setAgentSettings((AgentSettings) unitSettings);
-            }
-			session.setAttribute(CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION, userSettings);
-		} catch (NonFatalException e) {
-			LOG.error("Exception occured in disconnectSocialNetwork() while disconnecting with the social Media.");
-			return "failue";
-		}
-		
-		return "success";
-	}
-	@RequestMapping(value = "/getsocialmediatokenonsettingspage", method = RequestMethod.GET)
-	public String getSocialMediaTokenonSettingsPage(HttpServletRequest request, Model model) {
-		
-		LOG.info("Inside getSocialMediaTokenonSettingsPage() method");
-		
-		HttpSession session = request.getSession();
-		
-        UserSettings userSettings = (UserSettings) session.getAttribute( CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION );
-        UserProfile selectedProfile = (UserProfile) session.getAttribute( CommonConstants.USER_PROFILE );
-        
-        OrganizationUnitSettings unitSettings = null;
-        int profileMasterId = selectedProfile.getProfilesMaster().getProfileId();
-        
-        //Check for the collection to update
-        if ( profileMasterId == CommonConstants.PROFILES_MASTER_COMPANY_ADMIN_PROFILE_ID) {
-            unitSettings = userSettings.getCompanySettings();
-        } else if ( profileMasterId == CommonConstants.PROFILES_MASTER_REGION_ADMIN_PROFILE_ID ) {
-            unitSettings = userSettings.getRegionSettings().get( selectedProfile.getRegionId() );
-        } else if ( profileMasterId == CommonConstants.PROFILES_MASTER_BRANCH_ADMIN_PROFILE_ID ) {
-            unitSettings = userSettings.getBranchSettings().get( selectedProfile.getBranchId() );
-        } else if ( profileMasterId == CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID ) {
-            unitSettings = userSettings.getAgentSettings();
-        }
-		
-        SocialMediaTokens tokens = unitSettings.getSocialMediaTokens(); 
-        
-        if (tokens != null) {
-        	if (tokens.getFacebookToken() != null && tokens.getFacebookToken().getFacebookPageLink() != null ){
-        		model.addAttribute("facebookLink", tokens.getFacebookToken().getFacebookPageLink());
-        	}
-        	if (tokens.getGoogleToken() != null && tokens.getGoogleToken().getProfileLink() != null ) {
-        		model.addAttribute("googleLink", tokens.getGoogleToken().getProfileLink());
-        	}
-        	if (tokens.getTwitterToken() != null && tokens.getTwitterToken().getTwitterPageLink() != null) {
-        		model.addAttribute("twitterLink", tokens.getTwitterToken().getTwitterPageLink());
-        	}
-        	if (tokens.getLinkedInToken() != null && tokens.getLinkedInToken().getLinkedInPageLink() != null) {
-        		model.addAttribute("linkedinLink", tokens.getLinkedInToken().getLinkedInPageLink() );
-        	}
-        }
-        
-		return JspResolver.SOCIAL_MEDIA_TOKENS;
 	}
 	
 }
