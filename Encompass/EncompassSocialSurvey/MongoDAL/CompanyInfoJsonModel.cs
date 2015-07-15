@@ -32,6 +32,7 @@ namespace EncompassSocialSurvey.MongoDAL
         public long companyId { get; set; }
         public string crm_username { get; set; }
         public string crm_password { get; set; }
+        public string crm_fieldId { get; set; }
         public string url { get; set; }
         public string crm_source { get; set; }
         public bool connection_successful { get; set; }

@@ -174,7 +174,7 @@ namespace EncompassSocialSurvey
             return returnLoansViewModel;
         }
 
-        public List<LoanViewModel> LopulateLoanList(LoanFolder parentFolder, long runningCompanyId)
+        public List<LoanViewModel> LopulateLoanList(LoanFolder parentFolder, long runningCompanyId, string fieldid)
         {
             Logger.Info("Entering the method LoanUtility.LopopulateLoanList(): FolderName: " + parentFolder.DisplayName);
 
@@ -203,8 +203,16 @@ namespace EncompassSocialSurvey
                 fieldIds.Add("69");    // Co-BorrowerLastName
                 fieldIds.Add("1268");  // Co-BorrowerEmailId
 
-                fieldIds.Add("748");      // closed date
-                fieldIds.Add("Log.MS.Date.Funding");    //Funded Milestone Due Date
+                if(string.IsNullOrWhiteSpace(fieldid))
+                {
+                    fieldIds.Add("748");   // closed date
+                }
+                else
+                {
+                    fieldIds.Add(fieldid); //User provided field
+                }
+                    
+              
                 #endregion  // Popualted FieldIds // list of ids to get the details from loan
 
 
@@ -268,7 +276,6 @@ namespace EncompassSocialSurvey
                     forLoanVM_Borrower.LastReminderTime = lastReminderTime;
 
                     forLoanVM_Borrower.EngagementClosedTime = fieldValues[8];
-                    forLoanVM_Borrower.fundedTime = fieldValues[9];
                     forLoanVM_Borrower.Status = status;
 
                     returnLoansViewModel.Add(forLoanVM_Borrower);
@@ -299,7 +306,6 @@ namespace EncompassSocialSurvey
                         forLoanVM_Co_Borrower.LastReminderTime = lastReminderTime;
 
                         forLoanVM_Co_Borrower.EngagementClosedTime = fieldValues[8];
-                        forLoanVM_Co_Borrower.fundedTime = fieldValues[9];
                         forLoanVM_Co_Borrower.Status = status;
 
                         //
