@@ -66,6 +66,7 @@ namespace EncompassSocialSurvey
 
                     // get the ss_environment value
                     var ssEnv = System.Configuration.ConfigurationManager.AppSettings["ss_environment"];
+                    string fieldId = forCompCredential.fieldId;
                     string emailDomain = null;
                     string emailPrefix = null;
                     if (ssEnv.Equals("test"))
@@ -86,7 +87,7 @@ namespace EncompassSocialSurvey
                         try
                         {
                             // 1st Get loan VM
-                            var loansVM = _loanUtility.LopulateLoanList(EncompassGlobal.EncompassLoginSession.Loans.Folders[folderName], forCompCredential.CompanyId);
+                            var loansVM = _loanUtility.LopulateLoanList(EncompassGlobal.EncompassLoginSession.Loans.Folders[folderName], forCompCredential.CompanyId, fieldId);
 
                             // 2nd if no loansVM continue
                             if (null == loansVM) continue;
