@@ -13,3 +13,6 @@
     </div>
 </div>
 </c:if>
+<c:if test="${not empty invalidEmailAddress}">
+	<div id="invalid-display-msg-div" class="hide">${invalidEmailAddress}</div>
+</c:if>
