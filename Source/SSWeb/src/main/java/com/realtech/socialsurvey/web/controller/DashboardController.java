@@ -62,12 +62,10 @@ import com.realtech.socialsurvey.core.utils.DisplayMessageConstants;
 import com.realtech.socialsurvey.core.utils.MessageUtils;
 import com.realtech.socialsurvey.web.common.JspResolver;
 
-
 @Controller
-public class DashboardController
-{
+public class DashboardController {
 
-    private static final Logger LOG = LoggerFactory.getLogger( DashboardController.class );
+    private static final Logger LOG = LoggerFactory.getLogger(DashboardController.class);
 
     @Autowired
     private SessionHelper sessionHelper;
@@ -99,347 +97,400 @@ public class DashboardController
     @Autowired
     private URLGenerator urlGenerator;
 
-    @Value ( "${ENABLE_KAFKA}")
+    @Value("${ENABLE_KAFKA}")
     private String enableKafka;
 
-    @Value ( "${APPLICATION_ADMIN_EMAIL}")
+    @Value("${APPLICATION_ADMIN_EMAIL}")
     private String applicationAdminEmail;
 
-    @Value ( "${APPLICATION_ADMIN_NAME}")
+    @Value("${APPLICATION_ADMIN_NAME}")
     private String applicationAdminName;
 
     private final String EXCEL_FORMAT = "application/vnd.ms-excel";
     private final String CONTENT_DISPOSITION_HEADER = "Content-Disposition";
     private final String EXCEL_FILE_EXTENSION = ".xlsx";
 
-
     /*
      * Method to initiate dashboard
      */
-    @RequestMapping ( value = "/dashboard")
-    public String initDashboardPage( Model model, HttpServletRequest request )
-    {
-        LOG.info( "Dashboard Page started" );
-        HttpSession session = request.getSession( false );
+    @RequestMapping(value = "/dashboard")
+    public String initDashboardPage(Model model, HttpServletRequest request) {
+        LOG.info("Dashboard Page started");
+        HttpSession session = request.getSession(false);
         User user = sessionHelper.getCurrentUser();
 
         try {
             // updating session with selected user profile if not set
-            sessionHelper.updateProcessedUserProfiles( session, user );
+            sessionHelper.updateProcessedUserProfiles(session, user);
 
-            UserProfile selectedProfile = (UserProfile) session.getAttribute( CommonConstants.USER_PROFILE );
-            int profileMasterId = selectedProfile.getProfilesMaster().getProfileId();
+            UserProfile selectedProfile = (UserProfile) session
+                    .getAttribute(CommonConstants.USER_PROFILE);
+            int profileMasterId = selectedProfile.getProfilesMaster()
+                    .getProfileId();
 
-            model.addAttribute( "userId", user.getUserId() );
-            model.addAttribute( "emailId", user.getEmailId() );
-            model.addAttribute( "profileId", selectedProfile.getUserProfileId() );
-            model.addAttribute( "profileMasterId", profileMasterId );
+            model.addAttribute("userId", user.getUserId());
+            model.addAttribute("emailId", user.getEmailId());
+            model.addAttribute("profileId", selectedProfile.getUserProfileId());
+            model.addAttribute("profileMasterId", profileMasterId);
 
-            if ( profileMasterId == CommonConstants.PROFILES_MASTER_COMPANY_ADMIN_PROFILE_ID ) {
-                model.addAttribute( "columnName", CommonConstants.COMPANY_ID_COLUMN );
-                model.addAttribute( "columnValue", user.getCompany().getCompanyId() );
-                model.addAttribute( "showSendSurveyPopupAdmin", String.valueOf( true ) );
-            } else if ( profileMasterId == CommonConstants.PROFILES_MASTER_REGION_ADMIN_PROFILE_ID ) {
-                model.addAttribute( "columnName", CommonConstants.REGION_ID_COLUMN );
-                model.addAttribute( "columnValue", selectedProfile.getRegionId() );
-                model.addAttribute( "showSendSurveyPopupAdmin", String.valueOf( true ) );
-            } else if ( profileMasterId == CommonConstants.PROFILES_MASTER_BRANCH_ADMIN_PROFILE_ID ) {
-                model.addAttribute( "columnName", CommonConstants.BRANCH_ID_COLUMN );
-                model.addAttribute( "columnValue", selectedProfile.getBranchId() );
-                model.addAttribute( "showSendSurveyPopupAdmin", String.valueOf( true ) );
-            } else if ( profileMasterId == CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID ) {
-                model.addAttribute( "columnName", CommonConstants.AGENT_ID_COLUMN );
-                model.addAttribute( "columnValue", selectedProfile.getAgentId() );
+            if (profileMasterId == CommonConstants.PROFILES_MASTER_COMPANY_ADMIN_PROFILE_ID) {
+                model.addAttribute("columnName",
+                        CommonConstants.COMPANY_ID_COLUMN);
+                model.addAttribute("columnValue", user.getCompany()
+                        .getCompanyId());
+                model.addAttribute("showSendSurveyPopupAdmin",
+                        String.valueOf(true));
+            } else if (profileMasterId == CommonConstants.PROFILES_MASTER_REGION_ADMIN_PROFILE_ID) {
+                model.addAttribute("columnName",
+                        CommonConstants.REGION_ID_COLUMN);
+                model.addAttribute("columnValue", selectedProfile.getRegionId());
+                model.addAttribute("showSendSurveyPopupAdmin",
+                        String.valueOf(true));
+            } else if (profileMasterId == CommonConstants.PROFILES_MASTER_BRANCH_ADMIN_PROFILE_ID) {
+                model.addAttribute("columnName",
+                        CommonConstants.BRANCH_ID_COLUMN);
+                model.addAttribute("columnValue", selectedProfile.getBranchId());
+                model.addAttribute("showSendSurveyPopupAdmin",
+                        String.valueOf(true));
+            } else if (profileMasterId == CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID) {
+                model.addAttribute("columnName",
+                        CommonConstants.AGENT_ID_COLUMN);
+                model.addAttribute("columnValue", selectedProfile.getAgentId());
             }
-        } catch ( InvalidInputException e ) {
+        } catch (InvalidInputException e) {
             LOG.error(
-                "InvalidInputException caught in initDashboardPage while setting details about user. Nested exception is ", e );
+                    "InvalidInputException caught in initDashboardPage while setting details about user. Nested exception is ",
+                    e);
             model.addAttribute(
-                "message",
-                "InvalidInputException caught in initDashboardPage while setting details about user. Nested exception is "
-                    + e.getMessage() );
+                    "message",
+                    "InvalidInputException caught in initDashboardPage while setting details about user. Nested exception is "
+                            + e.getMessage());
             return JspResolver.ERROR_PAGE;
-        } catch ( SolrException e ) {
-            LOG.error( "SolrException caught in initDashboardPage while setting details about user. Nested exception is ", e );
+        } catch (SolrException e) {
+            LOG.error(
+                    "SolrException caught in initDashboardPage while setting details about user. Nested exception is ",
+                    e);
             model.addAttribute(
-                "message",
-                "SolrException caught in initDashboardPage while setting details about user. Nested exception is "
-                    + e.getMessage() );
+                    "message",
+                    "SolrException caught in initDashboardPage while setting details about user. Nested exception is "
+                            + e.getMessage());
             return JspResolver.ERROR_PAGE;
-        } catch ( NonFatalException e ) {
-            LOG.error( "NonFatalException while logging in. Reason : " + e.getMessage(), e );
-            model
-                .addAttribute( "message", messageUtils.getDisplayMessage( e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE ) );
+        } catch (NonFatalException e) {
+            LOG.error(
+                    "NonFatalException while logging in. Reason : "
+                            + e.getMessage(), e);
+            model.addAttribute("message", messageUtils.getDisplayMessage(
+                    e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE));
             return JspResolver.LOGIN;
         }
         return JspResolver.DASHBOARD;
     }
 
-
     /*
      * Method to get profile details for displaying
      */
-    @RequestMapping ( value = "/profiledetails")
-    public String getProfileDetails( Model model, HttpServletRequest request )
-    {
-        LOG.info( "Method to get profile of company/region/branch/agent getProfileDetails() started" );
+    @RequestMapping(value = "/profiledetails")
+    public String getProfileDetails(Model model, HttpServletRequest request) {
+        LOG.info("Method to get profile of company/region/branch/agent getProfileDetails() started");
         User user = sessionHelper.getCurrentUser();
-        UserSettings userSettings = (UserSettings) request.getSession( false ).getAttribute(
-            CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION );
+        UserSettings userSettings = (UserSettings) request
+                .getSession(false)
+                .getAttribute(CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION);
 
         // settings profile details
-        String columnName = request.getParameter( "columnName" );
-        String realtechAdminStr = request.getParameter( "realtechAdmin" );
+        String columnName = request.getParameter("columnName");
+        String realtechAdminStr = request.getParameter("realtechAdmin");
         boolean realtechAdmin = false;
 
         OrganizationUnitSettings unitSettings;
         long columnValue = 0;
-        if ( columnName.equalsIgnoreCase( CommonConstants.COMPANY_ID_COLUMN ) ) {
+        if (columnName.equalsIgnoreCase(CommonConstants.COMPANY_ID_COLUMN)) {
             columnValue = user.getCompany().getCompanyId();
 
             unitSettings = userSettings.getCompanySettings();
-            if ( unitSettings.getContact_details() != null && unitSettings.getContact_details().getName() != null ) {
-                model.addAttribute( "name", unitSettings.getContact_details().getName() );
+            if (unitSettings.getContact_details() != null
+                    && unitSettings.getContact_details().getName() != null) {
+                model.addAttribute("name", unitSettings.getContact_details()
+                        .getName());
             }
-            model.addAttribute( "title", getTitle( request, columnName, columnValue, user ) );
-        } else if ( columnName.equalsIgnoreCase( CommonConstants.REGION_ID_COLUMN ) ) {
+            model.addAttribute("title",
+                    getTitle(request, columnName, columnValue, user));
+        } else if (columnName
+                .equalsIgnoreCase(CommonConstants.REGION_ID_COLUMN)) {
             try {
-                columnValue = Long.parseLong( request.getParameter( "columnValue" ) );
-            } catch ( NumberFormatException e ) {
-                LOG.error( "NumberFormatException caught in getProfileDetails() while converting columnValue for regionId/branchId/agentId." );
+                columnValue = Long.parseLong(request
+                        .getParameter("columnValue"));
+            } catch (NumberFormatException e) {
+                LOG.error("NumberFormatException caught in getProfileDetails() while converting columnValue for regionId/branchId/agentId.");
                 throw e;
             }
 
-            unitSettings = userSettings.getRegionSettings().get( columnValue );
-            if ( unitSettings.getContact_details() != null && unitSettings.getContact_details().getName() != null ) {
-                model.addAttribute( "name", unitSettings.getContact_details().getName() );
+            unitSettings = userSettings.getRegionSettings().get(columnValue);
+            if (unitSettings.getContact_details() != null
+                    && unitSettings.getContact_details().getName() != null) {
+                model.addAttribute("name", unitSettings.getContact_details()
+                        .getName());
             }
-            model.addAttribute( "title", getTitle( request, columnName, columnValue, user ) );
-            model.addAttribute( "company", user.getCompany().getCompany() );
-        } else if ( columnName.equalsIgnoreCase( CommonConstants.BRANCH_ID_COLUMN ) ) {
+            model.addAttribute("title",
+                    getTitle(request, columnName, columnValue, user));
+            model.addAttribute("company", user.getCompany().getCompany());
+        } else if (columnName
+                .equalsIgnoreCase(CommonConstants.BRANCH_ID_COLUMN)) {
             try {
-                columnValue = Long.parseLong( request.getParameter( "columnValue" ) );
-            } catch ( NumberFormatException e ) {
-                LOG.error( "NumberFormatException caught in getProfileDetails() while converting columnValue for regionId/branchId/agentId." );
+                columnValue = Long.parseLong(request
+                        .getParameter("columnValue"));
+            } catch (NumberFormatException e) {
+                LOG.error("NumberFormatException caught in getProfileDetails() while converting columnValue for regionId/branchId/agentId.");
                 throw e;
             }
 
-            unitSettings = userSettings.getBranchSettings().get( columnValue );
-            if ( unitSettings.getContact_details() != null && unitSettings.getContact_details().getName() != null ) {
-                model.addAttribute( "name", unitSettings.getContact_details().getName() );
+            unitSettings = userSettings.getBranchSettings().get(columnValue);
+            if (unitSettings.getContact_details() != null
+                    && unitSettings.getContact_details().getName() != null) {
+                model.addAttribute("name", unitSettings.getContact_details()
+                        .getName());
             }
-            model.addAttribute( "title", getTitle( request, columnName, columnValue, user ) );
-            model.addAttribute( "company", user.getCompany().getCompany() );
-        } else if ( columnName.equalsIgnoreCase( CommonConstants.AGENT_ID_COLUMN ) ) {
+            model.addAttribute("title",
+                    getTitle(request, columnName, columnValue, user));
+            model.addAttribute("company", user.getCompany().getCompany());
+        } else if (columnName.equalsIgnoreCase(CommonConstants.AGENT_ID_COLUMN)) {
             columnValue = user.getUserId();
-            model.addAttribute( "name", user.getFirstName() + " " + ( user.getLastName() != null ? user.getLastName() : "" ) );
-            model.addAttribute( "title", getTitle( request, columnName, columnValue, user ) );
-            model.addAttribute( "company", user.getCompany().getCompany() );
-        } else if ( realtechAdminStr != null && !realtechAdminStr.isEmpty() ) {
-            realtechAdmin = Boolean.parseBoolean( realtechAdminStr );
+            model.addAttribute("name",
+                    user.getFirstName()
+                            + " "
+                            + (user.getLastName() != null ? user.getLastName()
+                                    : ""));
+            model.addAttribute("title",
+                    getTitle(request, columnName, columnValue, user));
+            model.addAttribute("company", user.getCompany().getCompany());
+        } else if (realtechAdminStr != null && !realtechAdminStr.isEmpty()) {
+            realtechAdmin = Boolean.parseBoolean(realtechAdminStr);
         }
 
         // calculating details for circles
         int numberOfDays = 30;
         try {
-            if ( request.getParameter( "numberOfDays" ) != null ) {
-                numberOfDays = Integer.parseInt( request.getParameter( "numberOfDays" ) );
+            if (request.getParameter("numberOfDays") != null) {
+                numberOfDays = Integer.parseInt(request
+                        .getParameter("numberOfDays"));
             }
-        } catch ( NumberFormatException e ) {
-            LOG.error( "NumberFormatException caught in getProfileDetails() while converting numberOfDays." );
+        } catch (NumberFormatException e) {
+            LOG.error("NumberFormatException caught in getProfileDetails() while converting numberOfDays.");
             throw e;
         }
 
-        if ( realtechAdmin )
+        if(realtechAdmin)
             columnName = null;
-        double surveyScore = (double) Math.round( dashboardService.getSurveyScore( columnName, columnValue, numberOfDays,
-            realtechAdmin ) * 1000.0 ) / 1000.0;
-        int sentSurveyCount = (int) dashboardService.getAllSurveyCountForPastNdays( columnName, columnValue, numberOfDays );
-        int socialPostsCount = (int) dashboardService.getSocialPostsForPastNdays( columnName, columnValue, numberOfDays );
+        double surveyScore = (double) Math.round(dashboardService
+                .getSurveyScore(columnName, columnValue, numberOfDays,
+                        realtechAdmin) * 1000.0) / 1000.0;
+        int sentSurveyCount = (int) dashboardService
+                .getAllSurveyCountForPastNdays(columnName, columnValue,
+                        numberOfDays);
+        int socialPostsCount = (int) dashboardService
+                .getSocialPostsForPastNdays(columnName, columnValue,
+                        numberOfDays);
         int profileCompleteness = 0;
-        if ( !realtechAdmin )
-            profileCompleteness = dashboardService.getProfileCompletionPercentage( user, columnName, columnValue, userSettings );
+        if (!realtechAdmin)
+            profileCompleteness = dashboardService
+                    .getProfileCompletionPercentage(user, columnName,
+                            columnValue, userSettings);
 
-        model.addAttribute( "socialScore", surveyScore );
-        if ( sentSurveyCount > 999 )
-            model.addAttribute( "surveyCount", "1K+" );
+        model.addAttribute("socialScore", surveyScore);
+        if (sentSurveyCount > 999)
+            model.addAttribute("surveyCount", "1K+");
         else
-            model.addAttribute( "surveyCount", sentSurveyCount );
+            model.addAttribute("surveyCount", sentSurveyCount);
 
-        if ( socialPostsCount > 999 )
-            model.addAttribute( "socialPosts", "1K+" );
+        if (socialPostsCount > 999)
+            model.addAttribute("socialPosts", "1K+");
         else
-            model.addAttribute( "socialPosts", socialPostsCount );
+            model.addAttribute("socialPosts", socialPostsCount);
 
-        model.addAttribute( "profileCompleteness", profileCompleteness );
-        model.addAttribute( "badges",
-            dashboardService.getBadges( surveyScore, sentSurveyCount, socialPostsCount, profileCompleteness ) );
+        model.addAttribute("profileCompleteness", profileCompleteness);
+        model.addAttribute("badges", dashboardService.getBadges(surveyScore,
+                sentSurveyCount, socialPostsCount, profileCompleteness));
 
-        model.addAttribute( "columnName", columnName );
-        model.addAttribute( "columnValue", columnValue );
+        model.addAttribute("columnName", columnName);
+        model.addAttribute("columnValue", columnValue);
 
-        LOG.info( "Method to get profile of company/region/branch/agent getProfileDetails() finished" );
+        LOG.info("Method to get profile of company/region/branch/agent getProfileDetails() finished");
         return JspResolver.DASHBOARD_PROFILEDETAIL;
     }
-
 
     /*
      * Method to get survey details for showing details
      */
-    @RequestMapping ( value = "/surveycount")
-    public String getSurveyCount( Model model, HttpServletRequest request )
-    {
-        LOG.info( "Method to get count of all, completed and clicked surveys, getSurveyCount() started" );
+    @RequestMapping(value = "/surveycount")
+    public String getSurveyCount(Model model, HttpServletRequest request) {
+        LOG.info("Method to get count of all, completed and clicked surveys, getSurveyCount() started");
 
-        String columnName = request.getParameter( "columnName" );
+        String columnName = request.getParameter("columnName");
         long columnValue = 0;
         User user = sessionHelper.getCurrentUser();
         boolean realtechAdmin = user.isSuperAdmin();
-
+        
         try {
-            String columnValueStr = request.getParameter( "columnValue" );
-            columnValue = Long.parseLong( columnValueStr );
-        } catch ( NumberFormatException e ) {
-            LOG.error( "NumberFormatException caught in getSurveyCount() while converting columnValue for regionId/branchId/agentId." );
+            String columnValueStr = request.getParameter("columnValue");
+            columnValue = Long.parseLong(columnValueStr);
+        } catch (NumberFormatException e) {
+            LOG.error("NumberFormatException caught in getSurveyCount() while converting columnValue for regionId/branchId/agentId.");
             throw e;
         }
-        if ( columnName.equalsIgnoreCase( CommonConstants.COMPANY_ID_COLUMN ) && !realtechAdmin ) {
+        if (columnName.equalsIgnoreCase(CommonConstants.COMPANY_ID_COLUMN)
+                && !realtechAdmin) {
             columnValue = user.getCompany().getCompanyId();
         }
         int numberOfDays = -1;
         try {
-            if ( request.getParameter( "numberOfDays" ) != null ) {
-                numberOfDays = Integer.parseInt( request.getParameter( "numberOfDays" ) );
+            if (request.getParameter("numberOfDays") != null) {
+                numberOfDays = Integer.parseInt(request
+                        .getParameter("numberOfDays"));
             }
-        } catch ( NumberFormatException e ) {
-            LOG.error( "NumberFormatException caught in getSurveyCount() while converting numberOfDays." );
+        } catch (NumberFormatException e) {
+            LOG.error("NumberFormatException caught in getSurveyCount() while converting numberOfDays.");
             throw e;
         }
 
-        model.addAttribute( "allSurveySent",
-            dashboardService.getAllSurveyCountForPastNdays( columnName, columnValue, numberOfDays ) );
-        model.addAttribute( "completedSurvey",
-            dashboardService.getCompletedSurveyCountForPastNdays( columnName, columnValue, numberOfDays ) );
-        model.addAttribute( "clickedSurvey",
-            dashboardService.getClickedSurveyCountForPastNdays( columnName, columnValue, numberOfDays ) );
-        model
-            .addAttribute( "socialPosts", dashboardService.getSocialPostsForPastNdays( columnName, columnValue, numberOfDays ) );
+        model.addAttribute("allSurveySent", dashboardService
+                .getAllSurveyCountForPastNdays(columnName, columnValue,
+                        numberOfDays));
+        model.addAttribute("completedSurvey", dashboardService
+                .getCompletedSurveyCountForPastNdays(columnName, columnValue,
+                        numberOfDays));
+        model.addAttribute("clickedSurvey", dashboardService
+                .getClickedSurveyCountForPastNdays(columnName, columnValue,
+                        numberOfDays));
+        model.addAttribute("socialPosts", dashboardService
+                .getSocialPostsForPastNdays(columnName, columnValue,
+                        numberOfDays));
 
-        LOG.info( "Method to get count of all, completed and clicked surveys, getSurveyCount() finished" );
+        LOG.info("Method to get count of all, completed and clicked surveys, getSurveyCount() finished");
         return JspResolver.DASHBOARD_SURVEYSTATUS;
     }
-
 
     /*
      * Method to get survey details for generating graph.
      */
     @ResponseBody
-    @RequestMapping ( value = "/surveydetailsforgraph")
-    public String getSurveyDetailsForGraph( Model model, HttpServletRequest request )
-    {
-        LOG.info( "Method to get survey details for generating graph, getGraphDetailsForWeek() started." );
+    @RequestMapping(value = "/surveydetailsforgraph")
+    public String getSurveyDetailsForGraph(Model model,
+            HttpServletRequest request) {
+        LOG.info("Method to get survey details for generating graph, getGraphDetailsForWeek() started.");
 
         User user = sessionHelper.getCurrentUser();
-
-        boolean realtechAdmin = user.isSuperAdmin();
-
+        
+        boolean realtechAdmin = user.isSuperAdmin();    
+        
         try {
-            String columnName = request.getParameter( "columnName" );
-            String reportType = request.getParameter( "reportType" );
-            if ( !realtechAdmin && ( columnName == null || columnName.isEmpty() ) ) {
-                LOG.error( "Null/Empty value found for field columnName." );
-                throw new NonFatalException( "Null/Empty value found for field columnName." );
+            String columnName = request.getParameter("columnName");
+            String reportType = request.getParameter("reportType");
+            if (!realtechAdmin && (columnName == null || columnName.isEmpty())) {
+                LOG.error("Null/Empty value found for field columnName.");
+                throw new NonFatalException(
+                        "Null/Empty value found for field columnName.");
             }
 
             long columnValue = 0;
             try {
-                String columnValueStr = request.getParameter( "columnValue" );
-                columnValue = Long.parseLong( columnValueStr );
-            } catch ( NumberFormatException e ) {
-                LOG.error( "NumberFormatException caught in getSurveyCountForCompany() while converting columnValue for regionId/branchId/agentId." );
+                String columnValueStr = request.getParameter("columnValue");
+                columnValue = Long.parseLong(columnValueStr);
+            } catch (NumberFormatException e) {
+                LOG.error("NumberFormatException caught in getSurveyCountForCompany() while converting columnValue for regionId/branchId/agentId.");
                 throw e;
             }
-            if ( !realtechAdmin && columnName.equalsIgnoreCase( CommonConstants.COMPANY_ID_COLUMN ) ) {
+            if (!realtechAdmin
+                    && columnName
+                            .equalsIgnoreCase(CommonConstants.COMPANY_ID_COLUMN)) {
                 columnValue = user.getCompany().getCompanyId();
             }
-            LOG.info( "Method to get details for generating graph, getGraphDetailsForWeek() finished." );
+            LOG.info("Method to get details for generating graph, getGraphDetailsForWeek() finished.");
 
             try {
-                return new Gson().toJson( dashboardService.getSurveyDetailsForGraph( columnName, columnValue, reportType,
-                    realtechAdmin ) );
-            } catch ( ParseException e ) {
-                LOG.error( "Parse Exception occurred in getSurveyDetailsForGraph(). Nested exception is ", e );
+                return new Gson().toJson(dashboardService
+                        .getSurveyDetailsForGraph(columnName, columnValue,
+                                reportType, realtechAdmin));
+            } catch (ParseException e) {
+                LOG.error(
+                        "Parse Exception occurred in getSurveyDetailsForGraph(). Nested exception is ",
+                        e);
                 return e.getMessage();
             }
-        } catch ( NonFatalException e ) {
+        } catch (NonFatalException e) {
             LOG.error(
-                "Non fatal EXception caught in getSurveyDetailsForGraph() while getting details of surveys for graph. Nested exception is ",
-                e );
+                    "Non fatal EXception caught in getSurveyDetailsForGraph() while getting details of surveys for graph. Nested exception is ",
+                    e);
             return e.getMessage();
         }
     }
-
 
     /*
      * Method to fetch reviews for showing on dash board based upon start index
      * and batch size.
      */
-    @RequestMapping ( value = "/fetchdashboardreviews")
-    public String getReviews( Model model, HttpServletRequest request )
-    {
-        LOG.info( "Method to get reviews of company, region, branch, agent getReviews() started." );
+    @RequestMapping(value = "/fetchdashboardreviews")
+    public String getReviews(Model model, HttpServletRequest request) {
+        LOG.info("Method to get reviews of company, region, branch, agent getReviews() started.");
         User user = sessionHelper.getCurrentUser();
         List<SurveyDetails> surveyDetails = new ArrayList<>();
 
         try {
-            String startIndexStr = request.getParameter( "startIndex" );
-            String batchSizeStr = request.getParameter( "batchSize" );
-            int startIndex = Integer.parseInt( startIndexStr );
-            int batchSize = Integer.parseInt( batchSizeStr );
+            String startIndexStr = request.getParameter("startIndex");
+            String batchSizeStr = request.getParameter("batchSize");
+            int startIndex = Integer.parseInt(startIndexStr);
+            int batchSize = Integer.parseInt(batchSizeStr);
 
-            String columnName = request.getParameter( "columnName" );
-            if ( columnName == null || columnName.isEmpty() ) {
-                LOG.error( "Invalid value (null/empty) passed for profile level." );
-                throw new InvalidInputException( "Invalid value (null/empty) passed for profile level." );
+            String columnName = request.getParameter("columnName");
+            if (columnName == null || columnName.isEmpty()) {
+                LOG.error("Invalid value (null/empty) passed for profile level.");
+                throw new InvalidInputException(
+                        "Invalid value (null/empty) passed for profile level.");
             }
-            String profileLevel = getProfileLevel( columnName );
+            String profileLevel = getProfileLevel(columnName);
 
             long iden = 0;
-            if ( profileLevel.equals( CommonConstants.PROFILE_LEVEL_COMPANY ) ) {
+            if (profileLevel.equals(CommonConstants.PROFILE_LEVEL_COMPANY)) {
                 iden = user.getCompany().getCompanyId();
-            } else if ( profileLevel.equals( CommonConstants.PROFILE_LEVEL_INDIVIDUAL ) ) {
+            } else if (profileLevel
+                    .equals(CommonConstants.PROFILE_LEVEL_INDIVIDUAL)) {
                 iden = user.getUserId();
             } else {
-                String columnValue = request.getParameter( "columnValue" );
-                if ( columnValue != null && !columnValue.isEmpty() ) {
+                String columnValue = request.getParameter("columnValue");
+                if (columnValue != null && !columnValue.isEmpty()) {
                     try {
-                        iden = Long.parseLong( columnValue );
-                    } catch ( NumberFormatException e ) {
+                        iden = Long.parseLong(columnValue);
+                    } catch (NumberFormatException e) {
                         LOG.error(
-                            "NumberFormatException caught while parsing columnValue in getReviews(). Nested exception is ", e );
+                                "NumberFormatException caught while parsing columnValue in getReviews(). Nested exception is ",
+                                e);
                         throw e;
                     }
                 }
             }
 
             try {
-                surveyDetails = profileManagementService.getReviews( iden, -1, -1, startIndex, batchSize, profileLevel, true,
-                    null, null, "date" );
-                profileManagementService.setAgentProfileUrlForReview( surveyDetails );
-            } catch ( InvalidInputException e ) {
-                LOG.error( "InvalidInputException caught in getReviews() while fetching reviews. Nested exception is ", e );
+                surveyDetails = profileManagementService.getReviews(iden, -1,
+                        -1, startIndex, batchSize, profileLevel, true, null,
+                        null, "date");
+                profileManagementService
+                        .setAgentProfileUrlForReview(surveyDetails);
+            } catch (InvalidInputException e) {
+                LOG.error(
+                        "InvalidInputException caught in getReviews() while fetching reviews. Nested exception is ",
+                        e);
                 throw e;
             }
-            model.addAttribute( "reviews", surveyDetails );
-        } catch ( NonFatalException e ) {
-            LOG.error( "Non fatal exception caught in getReviews() while fetching reviews. Nested exception is ", e );
-            model.addAttribute( "message", e.getMessage() );
+            model.addAttribute("reviews", surveyDetails);
+        } catch (NonFatalException e) {
+            LOG.error(
+                    "Non fatal exception caught in getReviews() while fetching reviews. Nested exception is ",
+                    e);
+            model.addAttribute("message", e.getMessage());
         }
 
-        LOG.info( "Method to get reviews of company, region, branch, agent getReviews() finished." );
+        LOG.info("Method to get reviews of company, region, branch, agent getReviews() finished.");
         return JspResolver.DASHBOARD_REVIEWS;
     }
-
 
     /*
      * Method to fetch count of all the reviews in SURVEY_DETAILS collection. It
@@ -447,1047 +498,997 @@ public class DashboardController
      * either of companyId/RegionId/BranchId/AgentId.
      */
     @ResponseBody
-    @RequestMapping ( value = "/fetchdashboardreviewCount")
-    public String getReviewCount( Model model, HttpServletRequest request )
-    {
-        LOG.info( "Method to get reviews count getReviewCount() started." );
+    @RequestMapping(value = "/fetchdashboardreviewCount")
+    public String getReviewCount(Model model, HttpServletRequest request) {
+        LOG.info("Method to get reviews count getReviewCount() started.");
         User user = sessionHelper.getCurrentUser();
         long reviewCount = 0;
 
         try {
-            String columnName = request.getParameter( "columnName" );
-            if ( columnName == null || columnName.isEmpty() ) {
-                LOG.error( "Invalid value (null/empty) passed for profile level." );
-                throw new InvalidInputException( "Invalid value (null/empty) passed for profile level." );
+            String columnName = request.getParameter("columnName");
+            if (columnName == null || columnName.isEmpty()) {
+                LOG.error("Invalid value (null/empty) passed for profile level.");
+                throw new InvalidInputException(
+                        "Invalid value (null/empty) passed for profile level.");
             }
-            String profileLevel = getProfileLevel( columnName );
+            String profileLevel = getProfileLevel(columnName);
 
             long iden = 0;
-            if ( profileLevel.equals( CommonConstants.PROFILE_LEVEL_COMPANY ) ) {
+            if (profileLevel.equals(CommonConstants.PROFILE_LEVEL_COMPANY)) {
                 iden = user.getCompany().getCompanyId();
-            } else if ( profileLevel.equals( CommonConstants.PROFILE_LEVEL_INDIVIDUAL ) ) {
+            } else if (profileLevel
+                    .equals(CommonConstants.PROFILE_LEVEL_INDIVIDUAL)) {
                 iden = user.getUserId();
             } else {
-                String columnValue = request.getParameter( "columnValue" );
-                if ( columnValue == null || columnValue.isEmpty() ) {
-                    LOG.error( "Null or empty value passed for Region/BranchId. Please pass valid value." );
-                    throw new InvalidInputException( "Null or empty value passed for Region/BranchId. Please pass valid value." );
+                String columnValue = request.getParameter("columnValue");
+                if (columnValue == null || columnValue.isEmpty()) {
+                    LOG.error("Null or empty value passed for Region/BranchId. Please pass valid value.");
+                    throw new InvalidInputException(
+                            "Null or empty value passed for Region/BranchId. Please pass valid value.");
                 }
 
                 try {
-                    iden = Long.parseLong( columnValue );
-                } catch ( NumberFormatException e ) {
-                    LOG.error( "NumberFormatException caught while parsing columnValue in getReviews(). Nested exception is ",
-                        e );
+                    iden = Long.parseLong(columnValue);
+                } catch (NumberFormatException e) {
+                    LOG.error(
+                            "NumberFormatException caught while parsing columnValue in getReviews(). Nested exception is ",
+                            e);
                     throw e;
                 }
             }
 
             // Calling service method to count number of reviews stored in
             // database.
-            reviewCount = profileManagementService.getReviewsCount( iden, -1, -1, profileLevel, true );
-        } catch ( NonFatalException e ) {
-            LOG.error( "Non fatal exception caught in getReviewCount() while fetching reviews count. Nested exception is ", e );
-            return new Gson().toJson( e.getMessage() );
+            reviewCount = profileManagementService.getReviewsCount(iden, -1,
+                    -1, profileLevel, true);
+        } catch (NonFatalException e) {
+            LOG.error(
+                    "Non fatal exception caught in getReviewCount() while fetching reviews count. Nested exception is ",
+                    e);
+            return new Gson().toJson(e.getMessage());
         }
-        LOG.info( "Method to get reviews count getReviewCount() finished." );
-        return String.valueOf( reviewCount );
+        LOG.info("Method to get reviews count getReviewCount() finished.");
+        return String.valueOf(reviewCount);
     }
-
 
     /*
      * Method to fetch name which has to be displayed in Review section of dash
      * board.
      */
     @ResponseBody
-    @RequestMapping ( value = "/fetchName")
-    public String getName( Model model, HttpServletRequest request )
-    {
-        LOG.info( "Method to get name to display in review section getName() started." );
+    @RequestMapping(value = "/fetchName")
+    public String getName(Model model, HttpServletRequest request) {
+        LOG.info("Method to get name to display in review section getName() started.");
         User user = sessionHelper.getCurrentUser();
         String name = "";
 
         try {
-            String columnName = request.getParameter( "columnName" );
-            if ( columnName == null || columnName.isEmpty() ) {
-                LOG.error( "Invalid value (null/empty) passed for profile level." );
-                throw new InvalidInputException( "Invalid value (null/empty) passed for profile level." );
+            String columnName = request.getParameter("columnName");
+            if (columnName == null || columnName.isEmpty()) {
+                LOG.error("Invalid value (null/empty) passed for profile level.");
+                throw new InvalidInputException(
+                        "Invalid value (null/empty) passed for profile level.");
             }
 
             long id = 0;
-            if ( columnName.equals( CommonConstants.COMPANY_ID_COLUMN ) ) {
-                return new Gson().toJson( user.getCompany().getCompany() );
-            } else if ( columnName.equals( CommonConstants.AGENT_ID_COLUMN ) ) {
-                return new Gson().toJson( user.getFirstName() + " " + user.getLastName() );
+            if (columnName.equals(CommonConstants.COMPANY_ID_COLUMN)) {
+                return new Gson().toJson(user.getCompany().getCompany());
+            } else if (columnName.equals(CommonConstants.AGENT_ID_COLUMN)) {
+                return new Gson().toJson(user.getFirstName() + " "
+                        + user.getLastName());
             } else {
-                String columnValue = request.getParameter( "columnValue" );
-                if ( columnValue != null && !columnValue.isEmpty() ) {
+                String columnValue = request.getParameter("columnValue");
+                if (columnValue != null && !columnValue.isEmpty()) {
                     try {
-                        id = Long.parseLong( columnValue );
-                    } catch ( NumberFormatException e ) {
+                        id = Long.parseLong(columnValue);
+                    } catch (NumberFormatException e) {
                         LOG.error(
-                            "NumberFormatException caught while parsing columnValue in getReviews(). Nested exception is ", e );
+                                "NumberFormatException caught while parsing columnValue in getReviews(). Nested exception is ",
+                                e);
                         throw e;
                     }
                 }
 
-                if ( columnName.equalsIgnoreCase( CommonConstants.BRANCH_ID_COLUMN ) )
-                    name = solrSearchService.searchBranchNameById( id );
-                else if ( columnName.equalsIgnoreCase( CommonConstants.REGION_ID_COLUMN ) )
-                    name = solrSearchService.searchRegionById( id );
+                if (columnName
+                        .equalsIgnoreCase(CommonConstants.BRANCH_ID_COLUMN))
+                    name = solrSearchService.searchBranchNameById(id);
+                else if (columnName
+                        .equalsIgnoreCase(CommonConstants.REGION_ID_COLUMN))
+                    name = solrSearchService.searchRegionById(id);
             }
-        } catch ( NonFatalException e ) {
-            LOG.error( "Non fatal exception caught in getReviewCount() while fetching reviews count. Nested exception is ", e );
-            return new Gson().toJson( e.getMessage() );
+        } catch (NonFatalException e) {
+            LOG.error(
+                    "Non fatal exception caught in getReviewCount() while fetching reviews count. Nested exception is ",
+                    e);
+            return new Gson().toJson(e.getMessage());
         }
 
-        LOG.info( "Method to get name to display in review section getName() finished." );
+        LOG.info("Method to get name to display in review section getName() finished.");
         return name;
     }
-
 
     /*
      * Method to fetch incomplete survey data.
      */
-    @RequestMapping ( value = "/fetchdashboardincompletesurvey")
-    public String getIncompleteSurvey( Model model, HttpServletRequest request )
-    {
-        LOG.info( "Method to get reviews of company, region, branch, agent getReviews() started." );
+    @RequestMapping(value = "/fetchdashboardincompletesurvey")
+    public String getIncompleteSurvey(Model model, HttpServletRequest request) {
+        LOG.info("Method to get reviews of company, region, branch, agent getReviews() started.");
         List<SurveyPreInitiation> surveyDetails;
         User user = sessionHelper.getCurrentUser();
-        String realtechAdminStr = request.getParameter( "realtechAdmin" );
+        String realtechAdminStr = request.getParameter("realtechAdmin");
         boolean realtechAdmin = false;
-        realtechAdmin = Boolean.parseBoolean( realtechAdminStr );
+        realtechAdmin = Boolean.parseBoolean(realtechAdminStr);
 
         try {
-            surveyDetails = fetchIncompleteSurveys( request, user, realtechAdmin );
-            model.addAttribute( "incompleteSurveys", surveyDetails );
+            surveyDetails = fetchIncompleteSurveys(request, user, realtechAdmin);
+            model.addAttribute("incompleteSurveys", surveyDetails);
             String agentName = user.getFirstName() + " " + user.getLastName();
-            agentName = agentName.replaceAll( "null", "" );
-            model.addAttribute( "agentName", agentName );
-        } catch ( NonFatalException e ) {
-            LOG.error( "Non fatal exception caught in getReviews() while fetching reviews. Nested exception is ", e );
-            model.addAttribute( "message", e.getMessage() );
+            agentName = agentName.replaceAll("null", "");
+            model.addAttribute("agentName", agentName);
+        } catch (NonFatalException e) {
+            LOG.error(
+                    "Non fatal exception caught in getReviews() while fetching reviews. Nested exception is ",
+                    e);
+            model.addAttribute("message", e.getMessage());
         }
 
-        LOG.info( "Method to get reviews of company, region, branch, agent getReviews() finished." );
+        LOG.info("Method to get reviews of company, region, branch, agent getReviews() finished.");
         return JspResolver.DASHBOARD_INCOMPLETESURVEYS;
     }
-
 
     /*
      * Method to get count of all the incomplete surveys.
      */
     @ResponseBody
-    @RequestMapping ( value = "/fetchdashboardincompletesurveycount")
-    public String getIncompleteSurveyCount( Model model, HttpServletRequest request )
-    {
-        LOG.info( "Method to get reviews of company, region, branch, agent getReviews() started." );
+    @RequestMapping(value = "/fetchdashboardincompletesurveycount")
+    public String getIncompleteSurveyCount(Model model,
+            HttpServletRequest request) {
+        LOG.info("Method to get reviews of company, region, branch, agent getReviews() started.");
         List<SurveyPreInitiation> surveyDetails;
         User user = sessionHelper.getCurrentUser();
-        String realtechAdminStr = request.getParameter( "realtechAdmin" );
+        String realtechAdminStr = request.getParameter("realtechAdmin");
         boolean realtechAdmin = false;
-        realtechAdmin = Boolean.parseBoolean( realtechAdminStr );
+        realtechAdmin = Boolean.parseBoolean(realtechAdminStr);
 
         try {
-            surveyDetails = fetchIncompleteSurveys( request, user, realtechAdmin );
-        } catch ( NonFatalException e ) {
-            LOG.error( "Non fatal exception caught in getReviews() while fetching reviews. Nested exception is ", e );
+            surveyDetails = fetchIncompleteSurveys(request, user, realtechAdmin);
+        } catch (NonFatalException e) {
+            LOG.error(
+                    "Non fatal exception caught in getReviews() while fetching reviews. Nested exception is ",
+                    e);
             return e.getMessage();
         }
 
-        LOG.info( "Method to get reviews of company, region, branch, agent getReviews() finished." );
-        return String.valueOf( surveyDetails.size() );
+        LOG.info("Method to get reviews of company, region, branch, agent getReviews() finished.");
+        return String.valueOf(surveyDetails.size());
     }
 
-
-    @RequestMapping ( value = "/redirecttosurveyrequestpage")
-    public String redirectToSurveyRequestPage( Model model, HttpServletRequest request )
-    {
+    @RequestMapping(value = "/redirecttosurveyrequestpage")
+    public String redirectToSurveyRequestPage(Model model,
+            HttpServletRequest request) {
         User agent = sessionHelper.getCurrentUser();
-        model.addAttribute( "agentId", agent.getUserId() );
-        model.addAttribute( "agentName", agent.getFirstName() + agent.getLastName() );
-        model.addAttribute( "agentEmail", agent.getEmailId() );
+        model.addAttribute("agentId", agent.getUserId());
+        model.addAttribute("agentName",
+                agent.getFirstName() + agent.getLastName());
+        model.addAttribute("agentEmail", agent.getEmailId());
         return JspResolver.SURVEY_REQUEST;
     }
 
-
     @ResponseBody
-    @RequestMapping ( value = "/fetchagentsforadmin")
-    public String fetchAgentsForAdmin( Model model, HttpServletRequest request )
-    {
-        LOG.info( "Method fetchAgentsForAdmin() started." );
+    @RequestMapping(value = "/fetchagentsforadmin")
+    public String fetchAgentsForAdmin(Model model, HttpServletRequest request) {
+        LOG.info("Method fetchAgentsForAdmin() started.");
         User user = sessionHelper.getCurrentUser();
 
         List<SolrDocument> solrDocuments = null;
         try {
-            String columnName = request.getParameter( "columnName" );
-            if ( columnName == null || columnName.isEmpty() ) {
-                LOG.error( "Invalid value (null/empty) passed for profile level." );
-                throw new InvalidInputException( "Invalid value (null/empty) passed for profile level." );
+            String columnName = request.getParameter("columnName");
+            if (columnName == null || columnName.isEmpty()) {
+                LOG.error("Invalid value (null/empty) passed for profile level.");
+                throw new InvalidInputException(
+                        "Invalid value (null/empty) passed for profile level.");
             }
 
             String idenFieldName = "";
-            String profileLevel = getProfileLevel( columnName );
-            switch ( profileLevel ) {
-                case CommonConstants.PROFILE_LEVEL_COMPANY:
-                    idenFieldName = CommonConstants.COMPANY_ID_SOLR;
-                    break;
-                case CommonConstants.PROFILE_LEVEL_REGION:
-                    idenFieldName = CommonConstants.REGION_ID_COLUMN;
-                    break;
-                case CommonConstants.PROFILE_LEVEL_BRANCH:
-                    idenFieldName = CommonConstants.BRANCH_ID_COLUMN;
-                    break;
-                default:
-                    throw new InvalidInputException( "profile level is invalid in getProListByProfileLevel" );
+            String profileLevel = getProfileLevel(columnName);
+            switch (profileLevel) {
+            case CommonConstants.PROFILE_LEVEL_COMPANY:
+                idenFieldName = CommonConstants.COMPANY_ID_SOLR;
+                break;
+            case CommonConstants.PROFILE_LEVEL_REGION:
+                idenFieldName = CommonConstants.REGION_ID_COLUMN;
+                break;
+            case CommonConstants.PROFILE_LEVEL_BRANCH:
+                idenFieldName = CommonConstants.BRANCH_ID_COLUMN;
+                break;
+            default:
+                throw new InvalidInputException(
+                        "profile level is invalid in getProListByProfileLevel");
             }
 
             long iden = 0;
-            if ( profileLevel.equals( CommonConstants.PROFILE_LEVEL_COMPANY ) ) {
+            if (profileLevel.equals(CommonConstants.PROFILE_LEVEL_COMPANY)) {
                 iden = user.getCompany().getCompanyId();
-            } else if ( profileLevel.equals( CommonConstants.PROFILE_LEVEL_INDIVIDUAL ) ) {
+            } else if (profileLevel
+                    .equals(CommonConstants.PROFILE_LEVEL_INDIVIDUAL)) {
                 iden = user.getUserId();
             } else {
-                String columnValue = request.getParameter( "columnValue" );
-                if ( columnValue == null || columnValue.isEmpty() ) {
-                    LOG.error( "Null or empty value passed for Region/BranchId. Please pass valid value." );
-                    throw new InvalidInputException( "Null or empty value passed for Region/BranchId. Please pass valid value." );
+                String columnValue = request.getParameter("columnValue");
+                if (columnValue == null || columnValue.isEmpty()) {
+                    LOG.error("Null or empty value passed for Region/BranchId. Please pass valid value.");
+                    throw new InvalidInputException(
+                            "Null or empty value passed for Region/BranchId. Please pass valid value.");
                 }
 
                 try {
-                    iden = Long.parseLong( columnValue );
-                } catch ( NumberFormatException e ) {
-                    LOG.error( "NumberFormatException caught while parsing columnValue in getReviews(). Nested exception is ",
-                        e );
+                    iden = Long.parseLong(columnValue);
+                } catch (NumberFormatException e) {
+                    LOG.error(
+                            "NumberFormatException caught while parsing columnValue in getReviews(). Nested exception is ",
+                            e);
                     throw e;
                 }
             }
 
             // Searching based on searchKey
-            String searchKey = request.getParameter( "searchKey" );
-            solrDocuments = solrSearchService.searchBranchRegionOrAgentByName( CommonConstants.USER_DISPLAY_NAME_SOLR,
-                searchKey, idenFieldName, iden );
-        } catch ( NonFatalException e ) {
-            LOG.error( "NonFatal exception caught in fetchAgentsForAdmin(). Nested exception is ", e );
+            String searchKey = request.getParameter("searchKey");
+            solrDocuments = solrSearchService.searchBranchRegionOrAgentByName(
+                    CommonConstants.USER_DISPLAY_NAME_SOLR, searchKey,
+                    idenFieldName, iden);
+        } catch (NonFatalException e) {
+            LOG.error(
+                    "NonFatal exception caught in fetchAgentsForAdmin(). Nested exception is ",
+                    e);
             return "";
         }
 
-        LOG.info( "Method fetchAgentsForAdmin() finished." );
-        return new Gson().toJson( solrDocuments );
+        LOG.info("Method fetchAgentsForAdmin() finished.");
+        return new Gson().toJson(solrDocuments);
     }
-
 
     /*
      * Fetches incomplete surveys based upon the criteria. Criteria can be
      * startIndex and/or batchSize.
      */
-    private List<SurveyPreInitiation> fetchIncompleteSurveys( HttpServletRequest request, User user, boolean realtechAdmin )
-        throws InvalidInputException
-    {
-        LOG.debug( "Method fetchIncompleteSurveys() started" );
+    private List<SurveyPreInitiation> fetchIncompleteSurveys(
+            HttpServletRequest request, User user, boolean realtechAdmin) throws InvalidInputException {
+        LOG.debug("Method fetchIncompleteSurveys() started");
         List<SurveyPreInitiation> surveyDetails;
-        String startIndexStr = request.getParameter( "startIndex" );
-        String batchSizeStr = request.getParameter( "batchSize" );
-        int startIndex = Integer.parseInt( startIndexStr );
-        int batchSize = Integer.parseInt( batchSizeStr );
+        String startIndexStr = request.getParameter("startIndex");
+        String batchSizeStr = request.getParameter("batchSize");
+        int startIndex = Integer.parseInt(startIndexStr);
+        int batchSize = Integer.parseInt(batchSizeStr);
 
-        String columnName = request.getParameter( "columnName" );
-        if ( !realtechAdmin && ( columnName == null || columnName.isEmpty() ) ) {
-            LOG.error( "Invalid value (null/empty) passed for profile level." );
-            throw new InvalidInputException( "Invalid value (null/empty) passed for profile level." );
+        String columnName = request.getParameter("columnName");
+        if (!realtechAdmin && (columnName == null || columnName.isEmpty())) {
+            LOG.error("Invalid value (null/empty) passed for profile level.");
+            throw new InvalidInputException(
+                    "Invalid value (null/empty) passed for profile level.");
         }
-        String profileLevel = getProfileLevel( columnName );
+        String profileLevel = getProfileLevel(columnName);
 
         long iden = 0;
-        if ( profileLevel.equals( CommonConstants.PROFILE_LEVEL_COMPANY ) ) {
+        if (profileLevel.equals(CommonConstants.PROFILE_LEVEL_COMPANY)) {
             iden = user.getCompany().getCompanyId();
-        } else if ( profileLevel.equals( CommonConstants.PROFILE_LEVEL_INDIVIDUAL ) ) {
+        } else if (profileLevel
+                .equals(CommonConstants.PROFILE_LEVEL_INDIVIDUAL)) {
             iden = user.getUserId();
         } else {
-            String columnValue = request.getParameter( "columnValue" );
-            if ( columnValue != null && !columnValue.isEmpty() ) {
+            String columnValue = request.getParameter("columnValue");
+            if (columnValue != null && !columnValue.isEmpty()) {
                 try {
-                    iden = Long.parseLong( columnValue );
-                } catch ( NumberFormatException e ) {
-                    LOG.error( "NumberFormatException caught while parsing columnValue in getReviews(). Nested exception is ",
-                        e );
+                    iden = Long.parseLong(columnValue);
+                } catch (NumberFormatException e) {
+                    LOG.error(
+                            "NumberFormatException caught while parsing columnValue in getReviews(). Nested exception is ",
+                            e);
                     throw e;
                 }
             }
         }
 
         try {
-            surveyDetails = profileManagementService.getIncompleteSurvey( iden, 0, 0, startIndex, batchSize, profileLevel,
-                null, null, realtechAdmin );
-        } catch ( InvalidInputException e ) {
-            LOG.error( "InvalidInputException caught in getReviews() while fetching reviews. Nested exception is ", e );
+            surveyDetails = profileManagementService.getIncompleteSurvey(iden,
+                    0, 0, startIndex, batchSize, profileLevel, null, null, realtechAdmin);
+        } catch (InvalidInputException e) {
+            LOG.error(
+                    "InvalidInputException caught in getReviews() while fetching reviews. Nested exception is ",
+                    e);
             throw e;
         }
-        LOG.debug( "Method fetchIncompleteSurveys() finished" );
+        LOG.debug("Method fetchIncompleteSurveys() finished");
         return surveyDetails;
     }
 
-
-    @RequestMapping ( value = "/findregionbranchorindividual")
-    public String getRegionBranchOrAgent( Model model, HttpServletRequest request )
-    {
-        LOG.info( "Method to get list of regions, branches, agents getRegionBranchOrAgent() started." );
+    @RequestMapping(value = "/findregionbranchorindividual")
+    public String getRegionBranchOrAgent(Model model, HttpServletRequest request) {
+        LOG.info("Method to get list of regions, branches, agents getRegionBranchOrAgent() started.");
         User user = sessionHelper.getCurrentUser();
         long regionOrBranchId = 0;
         List<SolrDocument> result = null;
         boolean isRealTechAdmin = user.isSuperAdmin();
-
+        
         try {
-            String searchColumn = request.getParameter( "searchColumn" );
-            if ( searchColumn == null || searchColumn.isEmpty() ) {
-                LOG.error( "Invalid value (null/empty) passed for search criteria." );
-                throw new InvalidInputException( "Invalid value (null/empty) passed for search criteria." );
+            String searchColumn = request.getParameter("searchColumn");
+            if (searchColumn == null || searchColumn.isEmpty()) {
+                LOG.error("Invalid value (null/empty) passed for search criteria.");
+                throw new InvalidInputException(
+                        "Invalid value (null/empty) passed for search criteria.");
             }
-            model.addAttribute( "searchColumn", searchColumn );
+            model.addAttribute("searchColumn", searchColumn);
 
-            String columnName = request.getParameter( "columnName" );
-            String columnValueStr = request.getParameter( "columnValue" );
-
-            if ( !isRealTechAdmin ) {
-                if ( columnName == null || columnName.isEmpty() ) {
-                    LOG.error( "Invalid value (null/empty) passed for profile level." );
-                    throw new InvalidInputException( "Invalid value (null/empty) passed for profile level." );
+            String columnName = request.getParameter("columnName");
+            String columnValueStr = request.getParameter("columnValue");
+            
+            if(!isRealTechAdmin){
+                if (columnName == null || columnName.isEmpty()) {
+                    LOG.error("Invalid value (null/empty) passed for profile level.");
+                    throw new InvalidInputException(
+                            "Invalid value (null/empty) passed for profile level.");
                 }
 
-                if ( columnValueStr == null || columnValueStr.isEmpty() ) {
-                    LOG.error( "Invalid value (null/empty) passed for Region/branch Id." );
-                    throw new InvalidInputException( "Invalid value (null/empty) passed for Region/branch Id." );
-                }
+                if (columnValueStr == null || columnValueStr.isEmpty()) {
+                    LOG.error("Invalid value (null/empty) passed for Region/branch Id.");
+                    throw new InvalidInputException(
+                            "Invalid value (null/empty) passed for Region/branch Id.");
+                }               
             }
 
-            String searchKey = request.getParameter( "searchKey" );
-            if ( searchKey == null ) {
+            String searchKey = request.getParameter("searchKey");
+            if (searchKey == null) {
                 searchKey = "";
             }
 
-            if ( isRealTechAdmin ) {
+            if(isRealTechAdmin) {
                 try {
-                    if ( searchColumn.equalsIgnoreCase( "company" ) ) {
-                        model.addAttribute( "results", organizationManagementService.getCompaniesByName( searchKey ) );
+                    if(searchColumn.equalsIgnoreCase("company")){
+                        model.addAttribute("results", organizationManagementService.getCompaniesByName(searchKey));
                         return JspResolver.DASHBOARD_SEARCHRESULTS;
-                    } else {
-                        result = solrSearchService.searchBranchRegionOrAgentByName( searchColumn, searchKey, columnName, -1 );
                     }
-                } catch ( InvalidInputException e ) {
+                    else{
+                        result = solrSearchService.searchBranchRegionOrAgentByName(
+                            searchColumn, searchKey, columnName,-1);
+                    }
+                } catch (InvalidInputException e) {
                     LOG.error(
-                        "InvalidInputException caught in getRegionBranchOrAgent() while fetching details. Nested exception is ",
-                        e );
-                    throw e;
-                }
-            } else if ( columnName.equalsIgnoreCase( CommonConstants.COMPANY_ID_COLUMN ) ) {
-                try {
-                    result = solrSearchService.searchBranchRegionOrAgentByName( searchColumn, searchKey, columnName, user
-                        .getCompany().getCompanyId() );
-                } catch ( InvalidInputException e ) {
-                    LOG.error(
-                        "InvalidInputException caught in getRegionBranchOrAgent() while fetching details. Nested exception is ",
-                        e );
-                    throw e;
-                }
-            } else if ( columnName.equalsIgnoreCase( CommonConstants.REGION_ID_COLUMN ) ) {
-                try {
-                    regionOrBranchId = Long.parseLong( columnValueStr );
-                    result = solrSearchService.searchBranchRegionOrAgentByName( searchColumn, searchKey, columnName,
-                        regionOrBranchId );
-                } catch ( NumberFormatException e ) {
-                    LOG.error(
-                        "NumberFormatException caught in getRegionBranchOrAgent() while fetching details. Nested exception is ",
-                        e );
-                    throw e;
-                } catch ( InvalidInputException e ) {
-                    LOG.error(
-                        "InvalidInputException caught in getRegionBranchOrAgent() while fetching details. Nested exception is ",
-                        e );
-                    throw e;
-                }
-            } else if ( columnName.equalsIgnoreCase( CommonConstants.BRANCH_ID_COLUMN ) ) {
-                try {
-                    result = solrSearchService.searchBranchRegionOrAgentByName( searchColumn, searchKey, columnName,
-                        regionOrBranchId );
-                } catch ( InvalidInputException e ) {
-                    LOG.error(
-                        "InvalidInputException caught in getRegionBranchOrAgent() while fetching details. Nested exception is ",
-                        e );
+                            "InvalidInputException caught in getRegionBranchOrAgent() while fetching details. Nested exception is ",
+                            e);
                     throw e;
                 }
             }
-            model.addAttribute( "results", result );
-        } catch ( NonFatalException e ) {
-            LOG.error( "Non fatal exception caught in getReviews() while fetching reviews. Nested exception is ", e );
-            model.addAttribute( "message", e.getMessage() );
+            else if (columnName.equalsIgnoreCase(CommonConstants.COMPANY_ID_COLUMN)) {
+                try {
+                    result = solrSearchService.searchBranchRegionOrAgentByName(
+                            searchColumn, searchKey, columnName, user
+                                    .getCompany().getCompanyId());
+                } catch (InvalidInputException e) {
+                    LOG.error(
+                            "InvalidInputException caught in getRegionBranchOrAgent() while fetching details. Nested exception is ",
+                            e);
+                    throw e;
+                }
+            } else if (columnName
+                    .equalsIgnoreCase(CommonConstants.REGION_ID_COLUMN)) {
+                try {
+                    regionOrBranchId = Long.parseLong(columnValueStr);
+                    result = solrSearchService.searchBranchRegionOrAgentByName(
+                            searchColumn, searchKey, columnName,
+                            regionOrBranchId);
+                } catch (NumberFormatException e) {
+                    LOG.error(
+                            "NumberFormatException caught in getRegionBranchOrAgent() while fetching details. Nested exception is ",
+                            e);
+                    throw e;
+                } catch (InvalidInputException e) {
+                    LOG.error(
+                            "InvalidInputException caught in getRegionBranchOrAgent() while fetching details. Nested exception is ",
+                            e);
+                    throw e;
+                }
+            } else if (columnName
+                    .equalsIgnoreCase(CommonConstants.BRANCH_ID_COLUMN)) {
+                try {
+                    result = solrSearchService.searchBranchRegionOrAgentByName(
+                            searchColumn, searchKey, columnName,
+                            regionOrBranchId);
+                } catch (InvalidInputException e) {
+                    LOG.error(
+                            "InvalidInputException caught in getRegionBranchOrAgent() while fetching details. Nested exception is ",
+                            e);
+                    throw e;
+                }
+            }
+            model.addAttribute("results", result);
+        } catch (NonFatalException e) {
+            LOG.error(
+                    "Non fatal exception caught in getReviews() while fetching reviews. Nested exception is ",
+                    e);
+            model.addAttribute("message", e.getMessage());
         }
-        LOG.info( "Method to get list of regions, branches, agents getRegionBranchOrAgent() finished." );
+        LOG.info("Method to get list of regions, branches, agents getRegionBranchOrAgent() finished.");
         return JspResolver.DASHBOARD_SEARCHRESULTS;
     }
-
 
     /*
      * Method to send a reminder email to the customer if not completed survey
      * already.
      */
     @ResponseBody
-    @RequestMapping ( value = "/sendsurveyremindermail")
-    public String sendReminderMailForSurvey( Model model, HttpServletRequest request )
-    {
-        LOG.info( "Method to send email to remind customer for survey sendReminderMailForSurvey() started." );
+    @RequestMapping(value = "/sendsurveyremindermail")
+    public String sendReminderMailForSurvey(Model model,
+            HttpServletRequest request) {
+        LOG.info("Method to send email to remind customer for survey sendReminderMailForSurvey() started.");
 
         try {
-            String customerName = request.getParameter( "customerName" );
-            String customerEmail = request.getParameter( "customerEmail" );
-            String agentName = request.getParameter( "agentName" );
+            String customerName = request.getParameter("customerName");
+            String customerEmail = request.getParameter("customerEmail");
+            String agentName = request.getParameter("agentName");
 
-            if ( customerName == null || customerName.isEmpty() ) {
-                LOG.error( "Invalid value (null/empty) passed for customerName." );
-                throw new InvalidInputException( "Invalid value (null/empty) passed for customerName." );
+            if (customerName == null || customerName.isEmpty()) {
+                LOG.error("Invalid value (null/empty) passed for customerName.");
+                throw new InvalidInputException(
+                        "Invalid value (null/empty) passed for customerName.");
             }
-            if ( customerEmail == null || customerEmail.isEmpty() ) {
-                LOG.error( "Invalid value (null/empty) passed for customerEmail." );
-                throw new InvalidInputException( "Invalid value (null/empty) passed for customerEmail." );
+            if (customerEmail == null || customerEmail.isEmpty()) {
+                LOG.error("Invalid value (null/empty) passed for customerEmail.");
+                throw new InvalidInputException(
+                        "Invalid value (null/empty) passed for customerEmail.");
             }
 
             long agentId = 0;
             try {
-                String agentIdStr = request.getParameter( "agentId" );
-                if ( agentIdStr == null || agentIdStr.isEmpty() ) {
-                    LOG.error( "Invalid value (null/empty) passed for agentIdStr." );
-                    throw new InvalidInputException( "Invalid value (null/empty) passed for agentIdStr." );
+                String agentIdStr = request.getParameter("agentId");
+                if (agentIdStr == null || agentIdStr.isEmpty()) {
+                    LOG.error("Invalid value (null/empty) passed for agentIdStr.");
+                    throw new InvalidInputException(
+                            "Invalid value (null/empty) passed for agentIdStr.");
                 }
-                agentId = Long.parseLong( agentIdStr );
-            } catch ( NumberFormatException e ) {
+                agentId = Long.parseLong(agentIdStr);
+            } catch (NumberFormatException e) {
                 LOG.error(
-                    "NumberFormatException caught while parsing agentId in sendReminderMailForSurvey(). Nested exception is ",
-                    e );
+                        "NumberFormatException caught while parsing agentId in sendReminderMailForSurvey(). Nested exception is ",
+                        e);
                 throw e;
             }
 
             String surveyLink = "";
-            SurveyPreInitiation survey = surveyHandler.getPreInitiatedSurvey( agentId, customerEmail );
-            if ( survey != null ) {
-                surveyLink = surveyHandler.getSurveyUrl( agentId, customerEmail,
-                    surveyHandler.composeLink( agentId, customerEmail ) );
+            SurveyPreInitiation survey = surveyHandler.getPreInitiatedSurvey(
+                    agentId, customerEmail);
+            if (survey != null) {
+                surveyLink = surveyHandler.getSurveyUrl(agentId, customerEmail,
+                        surveyHandler.composeLink(agentId, customerEmail));
             }
 
             try {
-                AgentSettings agentSettings = userManagementService.getUserSettings( agentId );
+                AgentSettings agentSettings = userManagementService
+                        .getUserSettings(agentId);
                 String agentTitle = "";
-                if ( agentSettings.getContact_details() != null && agentSettings.getContact_details().getTitle() != null ) {
+                if (agentSettings.getContact_details() != null
+                        && agentSettings.getContact_details().getTitle() != null) {
                     agentTitle = agentSettings.getContact_details().getTitle();
                 }
 
                 String agentPhone = "";
-                if ( agentSettings.getContact_details() != null
-                    && agentSettings.getContact_details().getContact_numbers() != null
-                    && agentSettings.getContact_details().getContact_numbers().getWork() != null ) {
-                    agentPhone = agentSettings.getContact_details().getContact_numbers().getWork();
+                if (agentSettings.getContact_details() != null
+                        && agentSettings.getContact_details()
+                                .getContact_numbers() != null
+                        && agentSettings.getContact_details()
+                                .getContact_numbers().getWork() != null) {
+                    agentPhone = agentSettings.getContact_details()
+                            .getContact_numbers().getWork();
                 }
 
-                User user = userManagementService.getUserByUserId( agentId );
+                User user = userManagementService.getUserByUserId(agentId);
                 String companyName = user.getCompany().getCompany();
 
-                if ( enableKafka.equals( CommonConstants.YES ) ) {
-                    emailServices.queueSurveyReminderMail( customerEmail, customerName, agentName, surveyLink, agentPhone,
-                        agentTitle, companyName );
+                if (enableKafka.equals(CommonConstants.YES)) {
+                    emailServices.queueSurveyReminderMail(customerEmail,
+                            customerName, agentName, surveyLink, agentPhone,
+                            agentTitle, companyName);
                 } else {
-                    emailServices.sendDefaultSurveyReminderMail( customerEmail, customerName, agentName, surveyLink,
-                        agentPhone, agentTitle, companyName );
+                    emailServices.sendDefaultSurveyReminderMail(customerEmail,
+                            customerName, agentName, surveyLink, agentPhone,
+                            agentTitle, companyName);
                 }
-            } catch ( InvalidInputException e ) {
-                LOG.error( "Exception occurred while trying to send survey reminder mail to : " + customerEmail );
+            } catch (InvalidInputException e) {
+                LOG.error("Exception occurred while trying to send survey reminder mail to : "
+                        + customerEmail);
                 throw e;
             }
 
             // Increasing value of reminder count by 1.
-            if ( survey != null ) {
-                surveyHandler.updateReminderCount( survey.getSurveyPreIntitiationId() );
-            }
-        } catch ( NonFatalException e ) {
-            LOG.error( "NonFatalException caught in sendReminderMailForSurvey() while sending mail. Nested exception is ", e );
-        }
-
-        LOG.info( "Method to send email to remind customer for survey sendReminderMailForSurvey() finished." );
-        return new Gson().toJson( "success" );
-    }
-
-
-    /*
-     * Method to download file containing completed surveys
-     */
-    @RequestMapping ( value = "/downloaddashboardcompletesurvey")
-    public void getCompleteSurveyFile( Model model, HttpServletRequest request, HttpServletResponse response )
-    {
-        LOG.info( "Method to get file containg completed surveys list getCompleteSurveyFile() started." );
-        User user = sessionHelper.getCurrentUser();
-        List<SurveyDetails> surveyDetails = new ArrayList<>();
-        boolean realtechAdmin = user.isSuperAdmin();
-
-        try {
-            String columnName = request.getParameter( "columnName" );
-
-            if ( !realtechAdmin && ( columnName == null || columnName.isEmpty() ) ) {
-                LOG.error( "Invalid value (null/empty) passed for profile level." );
-                throw new InvalidInputException( "Invalid value (null/empty) passed for profile level." );
-            }
-
-            Date startDate = null;
-            String startDateStr = request.getParameter( "startDate" );
-            if ( startDateStr != null && !startDateStr.isEmpty() ) {
-                try {
-                    startDate = new SimpleDateFormat( CommonConstants.DATE_FORMAT ).parse( startDateStr );
-                } catch ( ParseException e ) {
-                    LOG.error(
-                        "ParseException caught in getCompleteSurveyFile() while parsing startDate. Nested exception is ", e );
-                }
-            }
-
-            Date endDate = Calendar.getInstance().getTime();
-            String endDateStr = request.getParameter( "endDate" );
-            if ( endDateStr != null && !endDateStr.isEmpty() ) {
-                try {
-                    endDate = new SimpleDateFormat( CommonConstants.DATE_FORMAT ).parse( endDateStr );
-                } catch ( ParseException e ) {
-                    LOG.error(
-                        "ParseException caught in getCompleteSurveyFile() while parsing startDate. Nested exception is ", e );
-                }
-            }
-
-            long iden = 0;
-            String profileLevel = getProfileLevel( columnName );
-            if ( realtechAdmin ) {
-                profileLevel = CommonConstants.PROFILE_LEVEL_REALTECH_ADMIN;
-            }
-            if ( profileLevel.equals( CommonConstants.PROFILE_LEVEL_COMPANY ) ) {
-                iden = user.getCompany().getCompanyId();
-            } else if ( profileLevel.equals( CommonConstants.PROFILE_LEVEL_INDIVIDUAL ) ) {
-                iden = user.getUserId();
-            } else {
-                String columnValue = request.getParameter( "columnValue" );
-                if ( columnValue != null && !columnValue.isEmpty() ) {
-                    try {
-                        iden = Long.parseLong( columnValue );
-                    } catch ( NumberFormatException e ) {
-                        LOG.error(
-                            "NumberFormatException caught while parsing columnValue in getCompleteSurveyFile(). Nested exception is ",
-                            e );
-                        throw e;
-                    }
-                }
-            }
-
-            try {
-                surveyDetails = profileManagementService.getReviews( iden, -1, -1, -1, -1, profileLevel, true, startDate,
-                    endDate, "date" );
-                String fileLocation = "Completed_Survey_" + profileLevel + "_" + iden + EXCEL_FILE_EXTENSION;
-                XSSFWorkbook workbook = dashboardService.downloadCompleteSurveyData( surveyDetails, fileLocation );
-                response.setContentType( EXCEL_FORMAT );
-                String headerKey = CONTENT_DISPOSITION_HEADER;
-                String headerValue = String.format( "attachment; filename=\"%s\"", new File( fileLocation ).getName() );
-                response.setHeader( headerKey, headerValue );
-
-                // write into file
-                OutputStream responseStream = null;
-                try {
-                    responseStream = response.getOutputStream();
-                    workbook.write( responseStream );
-                } catch ( IOException e ) {
-                    e.printStackTrace();
-                } finally {
-                    try {
-                        responseStream.close();
-                    } catch ( IOException e ) {
-                        e.printStackTrace();
-                    }
-                }
-                response.flushBuffer();
-            } catch ( InvalidInputException e ) {
-                LOG.error(
-                    "InvalidInputException caught in getCompleteSurveyFile() while fetching completed surveys file. Nested exception is ",
-                    e );
-                throw e;
-            } catch ( IOException e ) {
-                LOG.error(
-                    "IOException caught in getCompleteSurveyFile() while fetching completed surveys file. Nested exception is ",
-                    e );
-            }
-        } catch ( NonFatalException e ) {
+            if(survey != null)
+            {surveyHandler.updateReminderCount(survey.getSurveyPreIntitiationId());}
+        } catch (NonFatalException e) {
             LOG.error(
-                "Non fatal exception caught in getCompleteSurveyFile() while fetching completed surveys file. Nested exception is ",
-                e );
+                    "NonFatalException caught in sendReminderMailForSurvey() while sending mail. Nested exception is ",
+                    e);
         }
-        LOG.info( "Method to get file containg completed surveys list getCompleteSurveyFile() finished." );
-    }
 
+        LOG.info("Method to send email to remind customer for survey sendReminderMailForSurvey() finished.");
+        return new Gson().toJson("success");
+    }
 
     /*
      * Method to download file containing incomplete surveys
      */
-    @RequestMapping ( value = "/downloaddashboardincompletesurvey")
-    public void getIncompleteSurveyFile( Model model, HttpServletRequest request, HttpServletResponse response )
-    {
-        LOG.info( "Method to get file containg incomplete surveys list getIncompleteSurveyFile() started." );
+    @RequestMapping(value = "/downloaddashboardincompletesurvey")
+    public void getIncompleteSurveyFile(Model model, HttpServletRequest request, HttpServletResponse response) {
+        LOG.info("Method to get file containg incomplete surveys list getIncompleteSurveyFile() started.");
         List<SurveyPreInitiation> surveyDetails = new ArrayList<>();
-
+        
         try {
-            String realtechAdminStr = request.getParameter( "realtechAdmin" );
-            boolean realtechAdmin = Boolean.parseBoolean( realtechAdminStr );
+            String realtechAdminStr = request.getParameter("realtechAdmin");
+            boolean realtechAdmin = Boolean.parseBoolean(realtechAdminStr);
 
-            String columnName = request.getParameter( "columnName" );
-            if ( columnName == null || columnName.isEmpty() ) {
-                LOG.error( "Invalid value (null/empty) passed for profile level." );
-                throw new InvalidInputException( "Invalid value (null/empty) passed for profile level." );
+            String columnName = request.getParameter("columnName");
+            if (columnName == null || columnName.isEmpty()) {
+                LOG.error("Invalid value (null/empty) passed for profile level.");
+                throw new InvalidInputException("Invalid value (null/empty) passed for profile level.");
             }
 
             Date startDate = null;
-            String startDateStr = request.getParameter( "startDate" );
-            if ( startDateStr != null ) {
+            String startDateStr = request.getParameter("startDate");
+            if (startDateStr != null) {
                 try {
-                    startDate = new SimpleDateFormat( CommonConstants.DATE_FORMAT ).parse( startDateStr );
-                } catch ( ParseException e ) {
-                    LOG.error(
-                        "ParseException caught in getCompleteSurveyFile() while parsing startDate. Nested exception is ", e );
+                    startDate = new SimpleDateFormat(CommonConstants.DATE_FORMAT).parse(startDateStr);
+                }
+                catch (ParseException e) {
+                    LOG.error("ParseException caught in getCompleteSurveyFile() while parsing startDate. Nested exception is ", e);
                 }
             }
-
+            
             Date endDate = Calendar.getInstance().getTime();
-            String endDateStr = request.getParameter( "endDate" );
-            if ( endDateStr != null ) {
+            String endDateStr = request.getParameter("endDate");
+            if (endDateStr != null) {
                 try {
-                    endDate = new SimpleDateFormat( CommonConstants.DATE_FORMAT ).parse( endDateStr );
-                } catch ( ParseException e ) {
-                    LOG.error(
-                        "ParseException caught in getCompleteSurveyFile() while parsing startDate. Nested exception is ", e );
+                    endDate = new SimpleDateFormat(CommonConstants.DATE_FORMAT).parse(endDateStr);
+                }
+                catch (ParseException e) {
+                    LOG.error("ParseException caught in getCompleteSurveyFile() while parsing startDate. Nested exception is ", e);
                 }
             }
 
-            String profileLevel = getProfileLevel( columnName );
-            if ( realtechAdmin ) {
+            String profileLevel = getProfileLevel(columnName);
+            if (realtechAdmin) {
                 profileLevel = CommonConstants.PROFILE_LEVEL_REALTECH_ADMIN;
             }
             long iden = 0;
 
             User user = sessionHelper.getCurrentUser();
-            if ( profileLevel.equals( CommonConstants.PROFILE_LEVEL_COMPANY ) ) {
+            if (profileLevel.equals(CommonConstants.PROFILE_LEVEL_COMPANY)) {
                 iden = user.getCompany().getCompanyId();
-            } else if ( profileLevel.equals( CommonConstants.PROFILE_LEVEL_INDIVIDUAL ) ) {
+            }
+            else if (profileLevel.equals(CommonConstants.PROFILE_LEVEL_INDIVIDUAL)) {
                 iden = user.getUserId();
-            } else {
-                String columnValue = request.getParameter( "columnValue" );
-                if ( columnValue != null && !columnValue.isEmpty() ) {
+            }
+            else {
+                String columnValue = request.getParameter("columnValue");
+                if (columnValue != null && !columnValue.isEmpty()) {
                     try {
-                        iden = Long.parseLong( columnValue );
-                    } catch ( NumberFormatException e ) {
-                        LOG.error(
-                            "NumberFormatExcept;ion caught while parsing columnValue in getIncompleteSurveyFile(). Nested exception is ",
-                            e );
+                        iden = Long.parseLong(columnValue);
+                    }
+                    catch (NumberFormatException e) {
+                        LOG.error("NumberFormatExcept;ion caught while parsing columnValue in getIncompleteSurveyFile(). Nested exception is ", e);
                         throw e;
                     }
                 }
             }
-
+            
             try {
-                surveyDetails = profileManagementService.getIncompleteSurvey( iden, 0, 0, -1, -1, profileLevel, startDate,
-                    endDate, realtechAdmin );
-                String fileName = "Incomplete_Survey_" + profileLevel + "_" + iden + ".xlsx";
-                XSSFWorkbook workbook = dashboardService.downloadIncompleteSurveyData( surveyDetails, fileName );
-                response.setContentType( EXCEL_FORMAT );
+                surveyDetails = profileManagementService.getIncompleteSurvey(iden, 0, 0, -1, -1, profileLevel, startDate, endDate, realtechAdmin);
+                String fileName = "Incomplete_Survey_" + profileLevel + "_" + iden + EXCEL_FILE_EXTENSION;
+                XSSFWorkbook workbook = dashboardService.downloadIncompleteSurveyData(surveyDetails, fileName);
+                response.setContentType(EXCEL_FORMAT);
                 String headerKey = CONTENT_DISPOSITION_HEADER;
-                String headerValue = String.format( "attachment; filename=\"%s\"", new File( fileName ).getName() );
-                response.setHeader( headerKey, headerValue );
-
+                String headerValue = String.format("attachment; filename=\"%s\"", new File(fileName).getName());
+                response.setHeader(headerKey, headerValue);
+                
                 // write into file
                 OutputStream responseStream = null;
                 try {
                     responseStream = response.getOutputStream();
-                    workbook.write( responseStream );
-                } catch ( IOException e ) {
-                    LOG.error( "IOException caught in getIncompleteSurveyFile(). Nested exception is ", e );
-                } finally {
+                    workbook.write(responseStream);
+                }
+                catch (IOException e) {
+                    LOG.error("IOException caught in getIncompleteSurveyFile(). Nested exception is ", e);
+                }
+                finally {
                     try {
                         responseStream.close();
-                    } catch ( IOException e ) {
-                        LOG.error( "IOException caught in getIncompleteSurveyFile(). Nested exception is ", e );
+                    }
+                    catch (IOException e) {
+                        LOG.error("IOException caught in getIncompleteSurveyFile(). Nested exception is ", e);
                     }
                 }
                 response.flushBuffer();
-            } catch ( InvalidInputException e ) {
-                LOG.error(
-                    "InvalidInputException caught in getIncompleteSurveyFile() while fetching incomplete reviews file. Nested exception is ",
-                    e );
-                throw e;
-            } catch ( IOException e ) {
-                LOG.error(
-                    "IOException caught in getIncompleteSurveyFile() while fetching incomplete reviews file. Nested exception is ",
-                    e );
             }
-        } catch ( NonFatalException e ) {
-            LOG.error(
-                "Non fatal exception caught in getReviews() while fetching incomplete reviews file. Nested exception is ", e );
+            catch (InvalidInputException e) {
+                LOG.error("InvalidInputException caught in getIncompleteSurveyFile() while fetching incomplete reviews file. Nested exception is ", e);
+                throw e;
+            }
+            catch (IOException e) {
+                LOG.error("IOException caught in getIncompleteSurveyFile() while fetching incomplete reviews file. Nested exception is ", e);
+            }
         }
-        LOG.info( "Method to get file containg incomplete surveys list getIncompleteSurveyFile() finished." );
+        catch (NonFatalException e) {
+            LOG.error("Non fatal exception caught in getReviews() while fetching incomplete reviews file. Nested exception is ", e);
+        }
+        LOG.info("Method to get file containg incomplete surveys list getIncompleteSurveyFile() finished.");
     }
-
-
+    
     /*
      * Method to download file containing incomplete surveys
      */
-    @RequestMapping ( value = "/downloadcustomersurveyresults")
-    public void getCustomerSurveyResultsFile( Model model, HttpServletRequest request, HttpServletResponse response )
-    {
-        LOG.info( "Method to get file containg customer survey results getCustomerSurveyResultsFile() started." );
+    @RequestMapping(value = "/downloadcustomersurveyresults")
+    public void getCustomerSurveyResultsFile(Model model, HttpServletRequest request, HttpServletResponse response) {
+        LOG.info("Method to get file containg customer survey results getCustomerSurveyResultsFile() started.");
         User user = sessionHelper.getCurrentUser();
         boolean realTechAdmin = user.isSuperAdmin();
         List<SurveyDetails> surveyDetails = new ArrayList<>();
-
+        
         try {
-            String columnName = request.getParameter( "columnName" );
-            if ( !realTechAdmin && ( columnName == null || columnName.isEmpty() ) ) {
-                LOG.error( "Invalid value (null/empty) passed for profile level." );
-                throw new InvalidInputException( "Invalid value (null/empty) passed for profile level." );
+            String columnName = request.getParameter("columnName");
+            if (!realTechAdmin && (columnName == null || columnName.isEmpty())) {
+                LOG.error("Invalid value (null/empty) passed for profile level.");
+                throw new InvalidInputException("Invalid value (null/empty) passed for profile level.");
             }
 
             Date startDate = null;
-            String startDateStr = request.getParameter( "startDate" );
-            if ( startDateStr != null && !startDateStr.isEmpty() ) {
+            String startDateStr = request.getParameter("startDate");
+            if (startDateStr != null && !startDateStr.isEmpty()) {
                 try {
-                    startDate = new SimpleDateFormat( CommonConstants.DATE_FORMAT ).parse( startDateStr );
-                } catch ( ParseException e ) {
-                    LOG.error(
-                        "ParseException caught in getCustomerSurveyResultsFile() while parsing startDate. Nested exception is ",
-                        e );
+                    startDate = new SimpleDateFormat(CommonConstants.DATE_FORMAT).parse(startDateStr);
+                }
+                catch (ParseException e) {
+                    LOG.error("ParseException caught in getCustomerSurveyResultsFile() while parsing startDate. Nested exception is ", e);
                 }
             }
 
             Date endDate = Calendar.getInstance().getTime();
-            String endDateStr = request.getParameter( "endDate" );
-            if ( endDateStr != null && !endDateStr.isEmpty() ) {
+            String endDateStr = request.getParameter("endDate");
+            if (endDateStr != null && !endDateStr.isEmpty()) {
                 try {
-                    endDate = new SimpleDateFormat( CommonConstants.DATE_FORMAT ).parse( endDateStr );
-                } catch ( ParseException e ) {
-                    LOG.error(
-                        "ParseException caught in getCustomerSurveyResultsFile() while parsing startDate. Nested exception is ",
-                        e );
+                    endDate = new SimpleDateFormat(CommonConstants.DATE_FORMAT).parse(endDateStr);
+                }
+                catch (ParseException e) {
+                    LOG.error("ParseException caught in getCustomerSurveyResultsFile() while parsing startDate. Nested exception is ", e);
                 }
             }
 
-            String profileLevel = getProfileLevel( columnName );
+            String profileLevel = getProfileLevel(columnName);
             long iden = 0;
 
-            if ( realTechAdmin ) {
+            if (realTechAdmin) {
                 profileLevel = CommonConstants.PROFILE_LEVEL_REALTECH_ADMIN;
             }
 
-            if ( profileLevel.equals( CommonConstants.PROFILE_LEVEL_COMPANY ) ) {
+            if (profileLevel.equals(CommonConstants.PROFILE_LEVEL_COMPANY)) {
                 iden = user.getCompany().getCompanyId();
-            } else if ( profileLevel.equals( CommonConstants.PROFILE_LEVEL_INDIVIDUAL ) ) {
+            }
+            else if (profileLevel.equals(CommonConstants.PROFILE_LEVEL_INDIVIDUAL)) {
                 iden = user.getUserId();
-            } else {
-                String columnValue = request.getParameter( "columnValue" );
-                if ( columnValue != null && !columnValue.isEmpty() ) {
+            }
+            else {
+                String columnValue = request.getParameter("columnValue");
+                if (columnValue != null && !columnValue.isEmpty()) {
                     try {
-                        iden = Long.parseLong( columnValue );
-                    } catch ( NumberFormatException e ) {
-                        LOG.error(
-                            "NumberFormatException caught while parsing columnValue in getCustomerSurveyResultsFile(). Nested exception is ",
-                            e );
+                        iden = Long.parseLong(columnValue);
+                    }
+                    catch (NumberFormatException e) {
+                        LOG.error("NumberFormatException caught while parsing columnValue in getCustomerSurveyResultsFile(). Nested exception is ", e);
                         throw e;
                     }
                 }
             }
-
+            
             try {
-                surveyDetails = profileManagementService.getReviews( iden, -1, -1, -1, -1, profileLevel, true, startDate,
-                    endDate, null );
-                String fileName = "Survey_Results_" + profileLevel + "_" + iden + ".xlsx";
-                XSSFWorkbook workbook = dashboardService.downloadCustomerSurveyResultsData( surveyDetails, fileName );
-                response.setContentType( EXCEL_FORMAT );
+                surveyDetails = profileManagementService.getReviews(iden, -1, -1, -1, -1, profileLevel, true, startDate, endDate, null);
+                String fileName = "Survey_Results_" + profileLevel + "_" + iden + EXCEL_FILE_EXTENSION;
+                XSSFWorkbook workbook = dashboardService.downloadCustomerSurveyResultsData(surveyDetails, fileName);
+                response.setContentType(EXCEL_FORMAT);
                 String headerKey = CONTENT_DISPOSITION_HEADER;
-                String headerValue = String.format( "attachment; filename=\"%s\"", new File( fileName ).getName() );
-                response.setHeader( headerKey, headerValue );
-
+                String headerValue = String.format("attachment; filename=\"%s\"", new File(fileName).getName());
+                response.setHeader(headerKey, headerValue);
+                
                 // write into file
                 OutputStream responseStream = null;
                 try {
                     responseStream = response.getOutputStream();
-                    workbook.write( responseStream );
-                } catch ( IOException e ) {
-                    LOG.error( "IOException caught in getCustomerSurveyResultsFile(). Nested exception is ", e );
-                } finally {
+                    workbook.write(responseStream);
+                }
+                catch (IOException e) {
+                    LOG.error("IOException caught in getCustomerSurveyResultsFile(). Nested exception is ", e);
+                }
+                finally {
                     try {
                         responseStream.close();
-                    } catch ( IOException e ) {
-                        LOG.error( "IOException caught in getCustomerSurveyResultsFile(). Nested exception is ", e );
+                    }
+                    catch (IOException e) {
+                        LOG.error("IOException caught in getCustomerSurveyResultsFile(). Nested exception is ", e);
                     }
                 }
                 response.flushBuffer();
-            } catch ( InvalidInputException e ) {
-                LOG.error( "InvalidInputException caught in getCustomerSurveyResultsFile(). Nested exception is ", e );
-                throw e;
-            } catch ( IOException e ) {
-                LOG.error( "IOException caught in getCustomerSurveyResultsFile(). Nested exception is ", e );
             }
-        } catch ( NonFatalException e ) {
-            LOG.error( "Non fatal exception caught in getCustomerSurveyResultsFile(). Nested exception is ", e );
+            catch (InvalidInputException e) {
+                LOG.error("InvalidInputException caught in getCustomerSurveyResultsFile(). Nested exception is ", e);
+                throw e;
+            }
+            catch (IOException e) {
+                LOG.error("IOException caught in getCustomerSurveyResultsFile(). Nested exception is ", e);
+            }
         }
-        LOG.info( "Method getCustomerSurveyResultsFile() finished." );
+        catch (NonFatalException e) {
+            LOG.error("Non fatal exception caught in getCustomerSurveyResultsFile(). Nested exception is ", e);
+        }
+        LOG.info("Method getCustomerSurveyResultsFile() finished.");
     }
-
 
     /*
      * Method to download file containing incomplete surveys
      */
-    @RequestMapping ( value = "/downloaddashboardsocialmonitor")
-    public void getSocialMonitorFile( Model model, HttpServletRequest request, HttpServletResponse response )
-    {
-        LOG.info( "Method to get file containg Social Monitors list getSocialMonitorFile() started." );
+    @RequestMapping(value = "/downloaddashboardsocialmonitor")
+    public void getSocialMonitorFile(Model model, HttpServletRequest request, HttpServletResponse response) {
+        LOG.info("Method to get file containg Social Monitors list getSocialMonitorFile() started.");
         User user = sessionHelper.getCurrentUser();
         boolean realTechAdmin = user.isSuperAdmin();
         List<SurveyDetails> surveyDetails = new ArrayList<>();
-
+        
         try {
-            String columnName = request.getParameter( "columnName" );
-            if ( !realTechAdmin && ( columnName == null || columnName.isEmpty() ) ) {
-                LOG.error( "Invalid value (null/empty) passed for profile level." );
-                throw new InvalidInputException( "Invalid value (null/empty) passed for profile level." );
+            String columnName = request.getParameter("columnName");
+            if (!realTechAdmin && (columnName == null || columnName.isEmpty())) {
+                LOG.error("Invalid value (null/empty) passed for profile level.");
+                throw new InvalidInputException("Invalid value (null/empty) passed for profile level.");
             }
 
-            String startDateStr = request.getParameter( "startDate" );
-            String endDateStr = request.getParameter( "endDate" );
+            String startDateStr = request.getParameter("startDate");
+            String endDateStr = request.getParameter("endDate");
 
             Date startDate = null;
             Date endDate = Calendar.getInstance().getTime();
-            if ( startDateStr != null && !startDateStr.isEmpty() ) {
+            if (startDateStr != null && !startDateStr.isEmpty()) {
                 try {
-                    startDate = new SimpleDateFormat( CommonConstants.DATE_FORMAT ).parse( startDateStr );
-                } catch ( ParseException e ) {
-                    LOG.error( "ParseException caught in getSocialMonitorFile() while parsing startDate. Nested exception is ",
-                        e );
+                    startDate = new SimpleDateFormat(CommonConstants.DATE_FORMAT).parse(startDateStr);
+                }
+                catch (ParseException e) {
+                    LOG.error("ParseException caught in getSocialMonitorFile() while parsing startDate. Nested exception is ", e);
                 }
             }
-            if ( endDateStr != null && !endDateStr.isEmpty() ) {
+            if (endDateStr != null && !endDateStr.isEmpty()) {
                 try {
-                    endDate = new SimpleDateFormat( CommonConstants.DATE_FORMAT ).parse( endDateStr );
-                } catch ( ParseException e ) {
-                    LOG.error( "ParseException caught in getSocialMonitorFile() while parsing startDate. Nested exception is ",
-                        e );
+                    endDate = new SimpleDateFormat(CommonConstants.DATE_FORMAT).parse(endDateStr);
+                }
+                catch (ParseException e) {
+                    LOG.error("ParseException caught in getSocialMonitorFile() while parsing startDate. Nested exception is ", e);
                 }
             }
 
-            String profileLevel = getProfileLevel( columnName );
+            String profileLevel = getProfileLevel(columnName);
             long iden = 0;
 
-            if ( realTechAdmin ) {
+            if (realTechAdmin) {
                 profileLevel = CommonConstants.PROFILE_LEVEL_REALTECH_ADMIN;
             }
 
-            if ( profileLevel.equals( CommonConstants.PROFILE_LEVEL_COMPANY ) ) {
+            if (profileLevel.equals(CommonConstants.PROFILE_LEVEL_COMPANY)) {
                 iden = user.getCompany().getCompanyId();
-            } else if ( profileLevel.equals( CommonConstants.PROFILE_LEVEL_INDIVIDUAL ) ) {
+            }
+            else if (profileLevel.equals(CommonConstants.PROFILE_LEVEL_INDIVIDUAL)) {
                 iden = user.getUserId();
-            } else {
-                String columnValue = request.getParameter( "columnValue" );
-                if ( columnValue != null && !columnValue.isEmpty() ) {
+            }
+            else {
+                String columnValue = request.getParameter("columnValue");
+                if (columnValue != null && !columnValue.isEmpty()) {
                     try {
-                        iden = Long.parseLong( columnValue );
-                    } catch ( NumberFormatException e ) {
-                        LOG.error(
-                            "NumberFormatExcept;ion caught while parsing columnValue in getSocialMonitorFile(). Nested exception is ",
-                            e );
+                        iden = Long.parseLong(columnValue);
+                    }
+                    catch (NumberFormatException e) {
+                        LOG.error("NumberFormatExcept;ion caught while parsing columnValue in getSocialMonitorFile(). Nested exception is ", e);
                         throw e;
                     }
                 }
             }
-
+            
             try {
-                surveyDetails = profileManagementService.getReviews( iden, -1, -1, -1, -1, profileLevel, true, startDate,
-                    endDate, null );
-                String fileName = "Social_Monitor_" + profileLevel + "_" + iden + ".xlsx";
-                XSSFWorkbook workbook = dashboardService.downloadSocialMonitorData( surveyDetails, fileName );
-                response.setContentType( EXCEL_FORMAT );
+                surveyDetails = profileManagementService.getReviews(iden, -1, -1, -1, -1, profileLevel, true, startDate, endDate, null);
+                String fileName = "Social_Monitor_" + profileLevel + "_" + iden + EXCEL_FILE_EXTENSION;
+                XSSFWorkbook workbook = dashboardService.downloadSocialMonitorData(surveyDetails, fileName);
+                response.setContentType(EXCEL_FORMAT);
                 String headerKey = CONTENT_DISPOSITION_HEADER;
-                String headerValue = String.format( "attachment; filename=\"%s\"", new File( fileName ).getName() );
-                response.setHeader( headerKey, headerValue );
-
+                String headerValue = String.format("attachment; filename=\"%s\"", new File(fileName).getName());
+                response.setHeader(headerKey, headerValue);
+                
                 // write into file
                 OutputStream responseStream = null;
                 try {
                     responseStream = response.getOutputStream();
-                    workbook.write( responseStream );
-                } catch ( IOException e ) {
-                    LOG.error( "IOException caught in getSocialMonitorFile(). Nested exception is ", e );
-                } finally {
+                    workbook.write(responseStream);
+                }
+                catch (IOException e) {
+                    LOG.error("IOException caught in getSocialMonitorFile(). Nested exception is ", e);
+                }
+                finally {
                     try {
                         responseStream.close();
-                    } catch ( IOException e ) {
-                        LOG.error( "IOException caught in getSocialMonitorFile(). Nested exception is ", e );
+                    }
+                    catch (IOException e) {
+                        LOG.error("IOException caught in getSocialMonitorFile(). Nested exception is ", e);
                     }
                 }
                 response.flushBuffer();
-            } catch ( InvalidInputException e ) {
-                LOG.error( "InvalidInputException caught in getSocialMonitorFile(). Nested exception is ", e );
-                throw e;
-            } catch ( IOException e ) {
-                LOG.error( "IOException caught in getSocialMonitorFile(). Nested exception is ", e );
             }
-        } catch ( NonFatalException e ) {
-            LOG.error( "Non fatal exception caught in getSocialMonitorFile(). Nested exception is ", e );
+            catch (InvalidInputException e) {
+                LOG.error("InvalidInputException caught in getSocialMonitorFile(). Nested exception is ", e);
+                throw e;
+            }
+            catch (IOException e) {
+                LOG.error("IOException caught in getSocialMonitorFile(). Nested exception is ", e);
+            }
         }
-        LOG.info( "Method getSocialMonitorFile() finished." );
+        catch (NonFatalException e) {
+            LOG.error("Non fatal exception caught in getSocialMonitorFile(). Nested exception is ", e);
+        }
+        LOG.info("Method getSocialMonitorFile() finished.");
     }
-
 
     /*
      * Method to download file containing incomplete surveys
      */
-    @RequestMapping ( value = "/downloadagentrankingreport")
-    public void getAgentRankingFile( Model model, HttpServletRequest request, HttpServletResponse response )
-    {
-        LOG.info( "Method to get file containg Agent's data getAgentSurveyFile() started." );
+    @RequestMapping(value = "/downloadagentrankingreport")
+    public void getAgentRankingFile(Model model, HttpServletRequest request, HttpServletResponse response) {
+        LOG.info("Method to get file containg Agent's data getAgentSurveyFile() started.");
         User user = sessionHelper.getCurrentUser();
         List<AgentRankingReport> agentRanking = new ArrayList<>();
         boolean realtechAdmin = user.isSuperAdmin();
-
+        
         try {
-            String columnName = request.getParameter( "columnName" );
-            if ( !realtechAdmin && ( columnName == null || columnName.isEmpty() ) ) {
-                LOG.error( "Invalid value (null/empty) passed for profile level." );
-                throw new InvalidInputException( "Invalid value (null/empty) passed for profile level." );
+            String columnName = request.getParameter("columnName");
+            if (!realtechAdmin && (columnName == null || columnName.isEmpty())) {
+                LOG.error("Invalid value (null/empty) passed for profile level.");
+                throw new InvalidInputException("Invalid value (null/empty) passed for profile level.");
             }
 
-            String startDateStr = request.getParameter( "startDate" );
-            String endDateStr = request.getParameter( "endDate" );
+            String startDateStr = request.getParameter("startDate");
+            String endDateStr = request.getParameter("endDate");
 
             Date startDate = null;
             Date endDate = Calendar.getInstance().getTime();
-            if ( startDateStr != null && !startDateStr.isEmpty() ) {
+            if (startDateStr != null && !startDateStr.isEmpty()) {
                 try {
-                    startDate = new SimpleDateFormat( CommonConstants.DATE_FORMAT ).parse( startDateStr );
-                } catch ( ParseException e ) {
-                    LOG.error( "ParseException caught in getAgentSurveyFile() while parsing startDate. Nested exception is ", e );
+                    startDate = new SimpleDateFormat(CommonConstants.DATE_FORMAT).parse(startDateStr);
+                }
+                catch (ParseException e) {
+                    LOG.error("ParseException caught in getAgentSurveyFile() while parsing startDate. Nested exception is ", e);
                 }
             }
-            if ( endDateStr != null && !endDateStr.isEmpty() ) {
+            if (endDateStr != null && !endDateStr.isEmpty()) {
                 try {
-                    endDate = new SimpleDateFormat( CommonConstants.DATE_FORMAT ).parse( endDateStr );
-                } catch ( ParseException e ) {
-                    LOG.error( "ParseException caught in getAgentSurveyFile() while parsing startDate. Nested exception is ", e );
+                    endDate = new SimpleDateFormat(CommonConstants.DATE_FORMAT).parse(endDateStr);
+                }
+                catch (ParseException e) {
+                    LOG.error("ParseException caught in getAgentSurveyFile() while parsing startDate. Nested exception is ", e);
                 }
             }
 
-            String profileLevel = getProfileLevel( columnName );
+            String profileLevel = getProfileLevel(columnName);
             long iden = 0;
 
-            if ( realtechAdmin ) {
+            if (realtechAdmin) {
                 profileLevel = CommonConstants.PROFILE_LEVEL_REALTECH_ADMIN;
             }
-            if ( profileLevel.equals( CommonConstants.PROFILE_LEVEL_COMPANY ) ) {
+            if (profileLevel.equals(CommonConstants.PROFILE_LEVEL_COMPANY)) {
                 iden = user.getCompany().getCompanyId();
-            } else if ( profileLevel.equals( CommonConstants.PROFILE_LEVEL_INDIVIDUAL ) ) {
+            }
+            else if (profileLevel.equals(CommonConstants.PROFILE_LEVEL_INDIVIDUAL)) {
                 iden = user.getUserId();
-            } else {
-                String columnValue = request.getParameter( "columnValue" );
-                if ( columnValue != null && !columnValue.isEmpty() ) {
+            }
+            else {
+                String columnValue = request.getParameter("columnValue");
+                if (columnValue != null && !columnValue.isEmpty()) {
                     try {
-                        iden = Long.parseLong( columnValue );
-                    } catch ( NumberFormatException e ) {
-                        LOG.error(
-                            "NumberFormatExcept;ion caught while parsing columnValue in getAgentSurveyFile(). Nested exception is ",
-                            e );
+                        iden = Long.parseLong(columnValue);
+                    }
+                    catch (NumberFormatException e) {
+                        LOG.error("NumberFormatExcept;ion caught while parsing columnValue in getAgentSurveyFile(). Nested exception is ", e);
                         throw e;
                     }
                 }
             }
-
+            
             try {
-                agentRanking = profileManagementService.getAgentReport( iden, columnName, startDate, endDate, null );
+                agentRanking = profileManagementService.getAgentReport(iden, columnName, startDate, endDate, null);
                 String fileName = "Agent_Ranking_Report_" + profileLevel + "_" + iden + ".xlsx";
-                XSSFWorkbook workbook = dashboardService.downloadAgentRankingData( agentRanking, fileName );
-                response.setContentType( EXCEL_FORMAT );
+                XSSFWorkbook workbook = dashboardService.downloadAgentRankingData(agentRanking, fileName);
+                response.setContentType(EXCEL_FORMAT);
                 String headerKey = CONTENT_DISPOSITION_HEADER;
-                String headerValue = String.format( "attachment; filename=\"%s\"", new File( fileName ).getName() );
-                response.setHeader( headerKey, headerValue );
-
+                String headerValue = String.format("attachment; filename=\"%s\"", new File(fileName).getName());
+                response.setHeader(headerKey, headerValue);
+                
                 // write into file
                 OutputStream responseStream = null;
                 try {
                     responseStream = response.getOutputStream();
-                    workbook.write( responseStream );
-                } catch ( IOException e ) {
-                    LOG.error( "IOException caught in getAgentSurveyFile(). Nested exception is ", e );
-                } finally {
+                    workbook.write(responseStream);
+                }
+                catch (IOException e) {
+                    LOG.error("IOException caught in getAgentSurveyFile(). Nested exception is ", e);
+                }
+                finally {
                     try {
                         responseStream.close();
-                    } catch ( IOException e ) {
-                        LOG.error( "IOException caught in getAgentSurveyFile(). Nested exception is ", e );
+                    }
+                    catch (IOException e) {
+                        LOG.error("IOException caught in getAgentSurveyFile(). Nested exception is ", e);
                     }
                 }
                 response.flushBuffer();
-            } catch ( InvalidInputException e ) {
-                LOG.error( "InvalidInputException caught in getAgentSurveyFile(). Nested exception is ", e );
-                throw e;
-            } catch ( IOException e ) {
-                LOG.error( "IOException caught in getAgentSurveyFile(). Nested exception is ", e );
             }
-        } catch ( NonFatalException e ) {
-            LOG.error( "Non fatal exception caught in getAgentSurveyFile(). Nested exception is ", e );
+            catch (InvalidInputException e) {
+                LOG.error("InvalidInputException caught in getAgentSurveyFile(). Nested exception is ", e);
+                throw e;
+            }
+            catch (IOException e) {
+                LOG.error("IOException caught in getAgentSurveyFile(). Nested exception is ", e);
+            }
         }
-        LOG.info( "Method to get file containg Agent's data getAgentSurveyFile() finished." );
+        catch (NonFatalException e) {
+            LOG.error("Non fatal exception caught in getAgentSurveyFile(). Nested exception is ", e);
+        }
+        LOG.info("Method to get file containg Agent's data getAgentSurveyFile() finished.");
     }
-
 
     /*
      * Method to 1. Store initial details of customer. 2. Send Invitation mail
      * to the customer to take survey.
      */
     @ResponseBody
-    @RequestMapping ( value = "/sendsurveyinvite")
-    public String sendSurveyInvitation( HttpServletRequest request )
-    {
-        LOG.info( "Method sendSurveyInvitation() called from DashboardController." );
-        String custFirstName = request.getParameter( "firstName" );
-        String custLastName = request.getParameter( "lastName" );
-        String custEmail = request.getParameter( "email" );
-        String custRelationWithAgent = request.getParameter( "relation" );
+    @RequestMapping(value = "/sendsurveyinvite")
+    public String sendSurveyInvitation(HttpServletRequest request) {
+        LOG.info("Method sendSurveyInvitation() called from DashboardController.");
+        String custFirstName = request.getParameter("firstName");
+        String custLastName = request.getParameter("lastName");
+        String custEmail = request.getParameter("email");
+        String custRelationWithAgent = request.getParameter("relation");
         User user = sessionHelper.getCurrentUser();
 
         try {
-            surveyHandler.sendSurveyInvitationMail( custFirstName, custLastName, custEmail, custRelationWithAgent, user, true,
-                "customer" );
-        } catch ( NonFatalException e ) {
-            LOG.error( "NonFatalException caught in sendSurveyInvitation(). Nested exception is ", e );
+            surveyHandler.sendSurveyInvitationMail(custFirstName, custLastName,
+                    custEmail, custRelationWithAgent, user, true, "customer");
+        } catch (NonFatalException e) {
+            LOG.error(
+                    "NonFatalException caught in sendSurveyInvitation(). Nested exception is ",
+                    e);
         }
 
-        LOG.info( "Method sendSurveyInvitation() finished from DashboardController." );
+        LOG.info("Method sendSurveyInvitation() finished from DashboardController.");
         return "Success";
     }
 
-
     @ResponseBody
-    @RequestMapping ( value = "/sendmultiplesurveyinvites", method = RequestMethod.POST)
-    public String sendMultipleSurveyInvitations( HttpServletRequest request )
-    {
-        LOG.info( "Method sendMultipleSurveyInvitations() called from DashboardController." );
+    @RequestMapping(value = "/sendmultiplesurveyinvites", method = RequestMethod.POST)
+    public String sendMultipleSurveyInvitations(HttpServletRequest request) {
+        LOG.info("Method sendMultipleSurveyInvitations() called from DashboardController.");
         User user = sessionHelper.getCurrentUser();
         List<SurveyRecipient> surveyRecipients = null;
         long agentId = 0;
 
         try {
-            String source = request.getParameter( "source" );
-            String payload = request.getParameter( "receiversList" );
+            String source = request.getParameter("source");
+            String payload = request.getParameter("receiversList");
             // String columnName = request.getParameter("columnName");
             try {
-                if ( payload == null ) {
-                    throw new InvalidInputException( "SurveyRecipients passed was null or empty" );
+                if (payload == null) {
+                    throw new InvalidInputException(
+                            "SurveyRecipients passed was null or empty");
                 }
-                surveyRecipients = new ObjectMapper().readValue( payload, TypeFactory.defaultInstance()
-                    .constructCollectionType( List.class, SurveyRecipient.class ) );
-            } catch ( IOException ioException ) {
-                throw new NonFatalException( "Error occurred while parsing the Json.", DisplayMessageConstants.GENERAL_ERROR,
-                    ioException );
+                surveyRecipients = new ObjectMapper().readValue(
+                        payload,
+                        TypeFactory.defaultInstance().constructCollectionType(
+                                List.class, SurveyRecipient.class));
+            } catch (IOException ioException) {
+                throw new NonFatalException(
+                        "Error occurred while parsing the Json.",
+                        DisplayMessageConstants.GENERAL_ERROR, ioException);
             }
             /*
              * if (columnName != null) { String profileLevel =
@@ -1496,242 +1497,275 @@ public class DashboardController
              * .PROFILE_LEVEL_INDIVIDUAL)) { agentId = user.getUserId(); } }
              * else { agentId = user.getUserId(); }
              */
-            if ( source.equalsIgnoreCase( CommonConstants.SURVEY_REQUEST_AGENT ) ) {
+            if (source.equalsIgnoreCase(CommonConstants.SURVEY_REQUEST_AGENT)) {
                 agentId = user.getUserId();
             }
 
             // sending mails on traversing the list
-            if ( !surveyRecipients.isEmpty() ) {
-                for ( SurveyRecipient recipient : surveyRecipients ) {
+            if (!surveyRecipients.isEmpty()) {
+                for (SurveyRecipient recipient : surveyRecipients) {
                     long currentAgentId = 0;
-                    if ( agentId != 0 ) {
+                    if (agentId != 0) {
                         currentAgentId = agentId;
-                    } else if ( recipient.getAgentId() != 0 ) {
+                    } else if (recipient.getAgentId() != 0) {
                         currentAgentId = recipient.getAgentId();
                     } else {
-                        throw new InvalidInputException( "Agent id can not be null" );
+                        throw new InvalidInputException(
+                                "Agent id can not be null");
                     }
-                    User currentUser = userManagementService.getUserByUserId( currentAgentId );
-                    if ( surveyHandler.getPreInitiatedSurvey( agentId, recipient.getEmailId() ) == null )
-                        surveyHandler.sendSurveyInvitationMail( recipient.getFirstname(), recipient.getLastname(),
-                            recipient.getEmailId(), null, currentUser, true, source );
+                    User currentUser = userManagementService
+                            .getUserByUserId(currentAgentId);
+                    if (surveyHandler.getPreInitiatedSurvey(agentId,
+                            recipient.getEmailId()) == null)
+                        surveyHandler.sendSurveyInvitationMail(
+                                recipient.getFirstname(),
+                                recipient.getLastname(),
+                                recipient.getEmailId(), null, currentUser,
+                                true, source);
                 }
             }
-        } catch ( NonFatalException e ) {
-            LOG.error( "NonFatalException caught in sendMultipleSurveyInvitations(). Nested exception is ", e );
+        } catch (NonFatalException e) {
+            LOG.error(
+                    "NonFatalException caught in sendMultipleSurveyInvitations(). Nested exception is ",
+                    e);
             return "error";
         }
 
-        LOG.info( "Method sendMultipleSurveyInvitations() finished from DashboardController." );
+        LOG.info("Method sendMultipleSurveyInvitations() finished from DashboardController.");
         return "Success";
     }
 
-
     @ResponseBody
-    @RequestMapping ( value = "/dashboardbuttonsorder", method = RequestMethod.GET)
-    public String getDashboardButtonsOrder( HttpServletRequest request )
-    {
-        LOG.info( "Method sendMultipleSurveyInvitations() called from DashboardController." );
-        String columnName = request.getParameter( "columnName" );
-        String columnValueStr = request.getParameter( "columnValue" );
-        long columnValue = Long.parseLong( columnValueStr );
-        UserSettings userSettings = (UserSettings) request.getSession( false ).getAttribute(
-            CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION );
+    @RequestMapping(value = "/dashboardbuttonsorder", method = RequestMethod.GET)
+    public String getDashboardButtonsOrder(HttpServletRequest request) {
+        LOG.info("Method sendMultipleSurveyInvitations() called from DashboardController.");
+        String columnName = request.getParameter("columnName");
+        String columnValueStr = request.getParameter("columnValue");
+        long columnValue = Long.parseLong(columnValueStr);
+        UserSettings userSettings = (UserSettings) request
+                .getSession(false)
+                .getAttribute(CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION);
         List<ProfileStage> stages = new ArrayList<>();
-        if ( userSettings != null ) {
-            if ( columnName.equalsIgnoreCase( CommonConstants.COMPANY_ID_COLUMN ) ) {
-                if ( userSettings.getCompanySettings() != null )
-                    stages = new ArrayList<>( userSettings.getCompanySettings().getProfileStages() );
-            } else if ( columnName.equalsIgnoreCase( CommonConstants.REGION_ID_COLUMN ) ) {
-                if ( userSettings.getRegionSettings() != null )
-                    stages = new ArrayList<>( userSettings.getRegionSettings().get( columnValue ).getProfileStages() );
-            } else if ( columnName.equalsIgnoreCase( CommonConstants.BRANCH_ID_COLUMN ) ) {
-                if ( userSettings.getBranchSettings() != null )
-                    stages = new ArrayList<>( userSettings.getBranchSettings().get( columnValue ).getProfileStages() );
-            } else if ( columnName.equalsIgnoreCase( CommonConstants.AGENT_ID_COLUMN ) ) {
-                if ( userSettings.getAgentSettings() != null )
-                    stages = new ArrayList<>( userSettings.getAgentSettings().getProfileStages() );
+        if (userSettings != null) {
+            if (columnName.equalsIgnoreCase(CommonConstants.COMPANY_ID_COLUMN)) {
+                if (userSettings.getCompanySettings() != null)
+                    stages = new ArrayList<>(userSettings.getCompanySettings()
+                            .getProfileStages());
+            } else if (columnName
+                    .equalsIgnoreCase(CommonConstants.REGION_ID_COLUMN)) {
+                if (userSettings.getRegionSettings() != null)
+                    stages = new ArrayList<>(userSettings.getRegionSettings()
+                            .get(columnValue).getProfileStages());
+            } else if (columnName
+                    .equalsIgnoreCase(CommonConstants.BRANCH_ID_COLUMN)) {
+                if (userSettings.getBranchSettings() != null)
+                    stages = new ArrayList<>(userSettings.getBranchSettings()
+                            .get(columnValue).getProfileStages());
+            } else if (columnName
+                    .equalsIgnoreCase(CommonConstants.AGENT_ID_COLUMN)) {
+                if (userSettings.getAgentSettings() != null)
+                    stages = new ArrayList<>(userSettings.getAgentSettings()
+                            .getProfileStages());
             }
         }
-        Collections.sort( stages );
-        for ( int index = stages.size() - 1; index >= 0; index-- ) {
-            if ( stages.get( index ).getStatus() == CommonConstants.STATUS_INACTIVE )
-                stages.remove( index );
+        Collections.sort(stages);
+        for (int index = stages.size() - 1; index >= 0; index--) {
+            if (stages.get(index).getStatus() == CommonConstants.STATUS_INACTIVE)
+                stages.remove(index);
         }
         Map<String, Object> stagesAndColumn = new HashMap<>();
-        stagesAndColumn.put( "columnName", columnName );
-        stagesAndColumn.put( "columnValue", columnValue );
-        stagesAndColumn.put( "stages", stages );
-        String stagesJson = new Gson().toJson( stagesAndColumn );
-        LOG.info( "Method sendMultipleSurveyInvitations() finished from DashboardController." );
+        stagesAndColumn.put("columnName", columnName);
+        stagesAndColumn.put("columnValue", columnValue);
+        stagesAndColumn.put("stages", stages);
+        String stagesJson = new Gson().toJson(stagesAndColumn);
+        LOG.info("Method sendMultipleSurveyInvitations() finished from DashboardController.");
         return stagesJson;
     }
-
 
     // Method to return title for logged in user.
     // It returns title for various fields e.g. company, region, branch and
     // agent.
-    private String getTitle( HttpServletRequest request, String field, long value, User user )
-    {
-        LOG.debug( "Method to find title for " + field + " started." );
+    private String getTitle(HttpServletRequest request, String field,
+            long value, User user) {
+        LOG.debug("Method to find title for " + field + " started.");
         String title = "";
         try {
-            UserSettings userSettings = (UserSettings) request.getSession( false ).getAttribute(
-                CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION );
-            switch ( field ) {
-                case CommonConstants.COMPANY_ID_COLUMN:
-                    title = userSettings.getCompanySettings().getContact_details().getTitle();
-                    break;
-                case CommonConstants.REGION_ID_COLUMN:
-                    OrganizationUnitSettings regionSettings = userSettings.getRegionSettings().get( value );
-                    title = regionSettings.getContact_details().getTitle();
-                    break;
-                case CommonConstants.BRANCH_ID_COLUMN:
-                    OrganizationUnitSettings branchSettings = userSettings.getBranchSettings().get( value );
-                    title = branchSettings.getContact_details().getTitle();
-                    break;
-                case CommonConstants.AGENT_ID_COLUMN:
-                    for ( UserProfile userProfile : user.getUserProfiles() ) {
-                        if ( userProfile.getBranchId() == value ) {
-                            AgentSettings agentSettings = userSettings.getAgentSettings();
-                            if ( agentSettings != null )
-                                title = agentSettings.getContact_details().getTitle();
-                        }
+            UserSettings userSettings = (UserSettings) request
+                    .getSession(false).getAttribute(
+                            CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION);
+            switch (field) {
+            case CommonConstants.COMPANY_ID_COLUMN:
+                title = userSettings.getCompanySettings().getContact_details()
+                        .getTitle();
+                break;
+            case CommonConstants.REGION_ID_COLUMN:
+                OrganizationUnitSettings regionSettings = userSettings
+                        .getRegionSettings().get(value);
+                title = regionSettings.getContact_details().getTitle();
+                break;
+            case CommonConstants.BRANCH_ID_COLUMN:
+                OrganizationUnitSettings branchSettings = userSettings
+                        .getBranchSettings().get(value);
+                title = branchSettings.getContact_details().getTitle();
+                break;
+            case CommonConstants.AGENT_ID_COLUMN:
+                for (UserProfile userProfile : user.getUserProfiles()) {
+                    if (userProfile.getBranchId() == value) {
+                        AgentSettings agentSettings = userSettings
+                                .getAgentSettings();
+                        if (agentSettings != null)
+                            title = agentSettings.getContact_details()
+                                    .getTitle();
                     }
-                    break;
-                default:
-                    LOG.error( "Invalid value " + field + " passed for field. It should be either of "
-                        + CommonConstants.COMPANY_ID_COLUMN + CommonConstants.FILE_SEPARATOR + CommonConstants.REGION_ID_COLUMN
-                        + CommonConstants.FILE_SEPARATOR + CommonConstants.BRANCH_ID_COLUMN + CommonConstants.FILE_SEPARATOR
-                        + CommonConstants.AGENT_ID_COLUMN );
+                }
+                break;
+            default:
+                LOG.error("Invalid value " + field
+                        + " passed for field. It should be either of "
+                        + CommonConstants.COMPANY_ID_COLUMN
+                        + CommonConstants.FILE_SEPARATOR
+                        + CommonConstants.REGION_ID_COLUMN
+                        + CommonConstants.FILE_SEPARATOR
+                        + CommonConstants.BRANCH_ID_COLUMN
+                        + CommonConstants.FILE_SEPARATOR
+                        + CommonConstants.AGENT_ID_COLUMN);
             }
-        } catch ( NullPointerException e ) {
+        } catch (NullPointerException e) {
             LOG.error(
-                "Null Pointer exception caught in getProfileDetails() while fetching designation of agent. Nested exception is ",
-                e );
+                    "Null Pointer exception caught in getProfileDetails() while fetching designation of agent. Nested exception is ",
+                    e);
         }
-        LOG.debug( "Method to find title for " + field + " finished." );
+        LOG.debug("Method to find title for " + field + " finished.");
         return title;
     }
 
-
-    private String getProfileLevel( String columnName )
-    {
-        LOG.debug( "Method to return profile level based upon column to be queried started." );
+    private String getProfileLevel(String columnName) {
+        LOG.debug("Method to return profile level based upon column to be queried started.");
         String profileLevel = "";
-        switch ( columnName ) {
-            case CommonConstants.COMPANY_ID_COLUMN:
-                profileLevel = CommonConstants.PROFILE_LEVEL_COMPANY;
-                break;
-            case CommonConstants.REGION_ID_COLUMN:
-                profileLevel = CommonConstants.PROFILE_LEVEL_REGION;
-                break;
-            case CommonConstants.BRANCH_ID_COLUMN:
-                profileLevel = CommonConstants.PROFILE_LEVEL_BRANCH;
-                break;
-            case CommonConstants.AGENT_ID_COLUMN:
-                profileLevel = CommonConstants.PROFILE_LEVEL_INDIVIDUAL;
-                break;
+        switch (columnName) {
+        case CommonConstants.COMPANY_ID_COLUMN:
+            profileLevel = CommonConstants.PROFILE_LEVEL_COMPANY;
+            break;
+        case CommonConstants.REGION_ID_COLUMN:
+            profileLevel = CommonConstants.PROFILE_LEVEL_REGION;
+            break;
+        case CommonConstants.BRANCH_ID_COLUMN:
+            profileLevel = CommonConstants.PROFILE_LEVEL_BRANCH;
+            break;
+        case CommonConstants.AGENT_ID_COLUMN:
+            profileLevel = CommonConstants.PROFILE_LEVEL_INDIVIDUAL;
+            break;
         }
-        LOG.debug( "Method to return profile level based upon column to be quried finished." );
+        LOG.debug("Method to return profile level based upon column to be quried finished.");
         return profileLevel;
     }
 
-
     @ResponseBody
-    @SuppressWarnings ( "unchecked")
-    @RequestMapping ( value = "/updatecurrentprofile")
-    public String updateSelectedProfile( Model model, HttpServletRequest request )
-    {
-        LOG.info( "Method updateSelectedProfile() started." );
+    @SuppressWarnings("unchecked")
+    @RequestMapping(value = "/updatecurrentprofile")
+    public String updateSelectedProfile(Model model, HttpServletRequest request) {
+        LOG.info("Method updateSelectedProfile() started.");
 
-        HttpSession session = request.getSession( false );
+        HttpSession session = request.getSession(false);
         User user = sessionHelper.getCurrentUser();
 
-        AccountType accountType = (AccountType) session.getAttribute( CommonConstants.ACCOUNT_TYPE_IN_SESSION );
-        Map<Long, UserProfile> profileMap = (Map<Long, UserProfile>) session.getAttribute( CommonConstants.USER_PROFILE_MAP );
+        AccountType accountType = (AccountType) session
+                .getAttribute(CommonConstants.ACCOUNT_TYPE_IN_SESSION);
+        Map<Long, UserProfile> profileMap = (Map<Long, UserProfile>) session
+                .getAttribute(CommonConstants.USER_PROFILE_MAP);
         Map<Long, AbridgedUserProfile> profileAbridgedMap = (Map<Long, AbridgedUserProfile>) session
-            .getAttribute( CommonConstants.USER_PROFILE_LIST );
-        String profileIdStr = request.getParameter( "profileId" );
+                .getAttribute(CommonConstants.USER_PROFILE_LIST);
+        String profileIdStr = request.getParameter("profileId");
 
-        UserProfile selectedProfile = userManagementService.updateSelectedProfile( user, accountType, profileMap, profileIdStr );
+        UserProfile selectedProfile = userManagementService
+                .updateSelectedProfile(user, accountType, profileMap,
+                        profileIdStr);
 
-        session.setAttribute( CommonConstants.USER_PROFILE, selectedProfile );
-        session.setAttribute( CommonConstants.PROFILE_NAME_COLUMN, profileAbridgedMap.get( selectedProfile.getUserProfileId() )
-            .getUserProfileName() );
+        session.setAttribute(CommonConstants.USER_PROFILE, selectedProfile);
+        session.setAttribute(CommonConstants.PROFILE_NAME_COLUMN,
+                profileAbridgedMap.get(selectedProfile.getUserProfileId())
+                        .getUserProfileName());
 
-        LOG.info( "Method updateSelectedProfile() finished." );
+        LOG.info("Method updateSelectedProfile() finished.");
         return CommonConstants.SUCCESS_ATTRIBUTE;
     }
-
 
     /*
      * Method to mark a particular survey as editable and re-send the link to a
      * customer.
      */
     @ResponseBody
-    @RequestMapping ( value = "/restartsurvey")
-    public void restartSurvey( HttpServletRequest request )
-    {
-        String agentIdStr = request.getParameter( "agentId" );
-        String customerEmail = request.getParameter( "customerEmail" );
-        String firstName = request.getParameter( "firstName" );
-        String lastName = request.getParameter( "lastName" );
+    @RequestMapping(value = "/restartsurvey")
+    public void restartSurvey(HttpServletRequest request) {
+        String agentIdStr = request.getParameter("agentId");
+        String customerEmail = request.getParameter("customerEmail");
+        String firstName = request.getParameter("firstName");
+        String lastName = request.getParameter("lastName");
         try {
-            if ( agentIdStr == null || agentIdStr.isEmpty() ) {
-                throw new InvalidInputException( "Invalid value (Null/Empty) found for agentId." );
+            if (agentIdStr == null || agentIdStr.isEmpty()) {
+                throw new InvalidInputException(
+                        "Invalid value (Null/Empty) found for agentId.");
             }
-            long agentId = Long.parseLong( agentIdStr );
-            surveyHandler.changeStatusOfSurvey( agentId, customerEmail, true );
-            SurveyDetails survey = surveyHandler.getSurveyDetails( agentId, customerEmail );
-            User user = userManagementService.getUserByUserId( agentId );
-            surveyHandler.decreaseSurveyCountForAgent( agentId );
-            surveyHandler.sendSurveyRestartMail( firstName, lastName, customerEmail, survey.getCustRelationWithAgent(), user,
-                survey.getUrl() );
-        } catch ( NonFatalException e ) {
-            LOG.error( "NonfatalException caught in makeSurveyEditable(). Nested exception is ", e );
+            long agentId = Long.parseLong(agentIdStr);
+            surveyHandler.changeStatusOfSurvey(agentId, customerEmail, true);
+            SurveyDetails survey = surveyHandler.getSurveyDetails(agentId,
+                    customerEmail);
+            User user = userManagementService.getUserByUserId(agentId);
+            surveyHandler.decreaseSurveyCountForAgent(agentId);
+            surveyHandler.sendSurveyRestartMail(firstName, lastName,
+                    customerEmail, survey.getCustRelationWithAgent(), user,
+                    survey.getUrl());
+        } catch (NonFatalException e) {
+            LOG.error(
+                    "NonfatalException caught in makeSurveyEditable(). Nested exception is ",
+                    e);
         }
     }
-
 
     // Method to report a feedback of customer as abusive.
     // Anybody in the hierarchy can report a feedback from dash board.
 
     @ResponseBody
-    @RequestMapping ( value = "/reportabuse")
-    public void reportAbuse( HttpServletRequest request )
-    {
-        String agentIdStr = request.getParameter( "agentId" );
-        String customerEmail = request.getParameter( "customerEmail" );
-        String firstName = request.getParameter( "firstName" );
-        String lastName = request.getParameter( "lastName" );
-        String review = request.getParameter( "review" );
+    @RequestMapping(value = "/reportabuse")
+    public void reportAbuse(HttpServletRequest request) {
+        String agentIdStr = request.getParameter("agentId");
+        String customerEmail = request.getParameter("customerEmail");
+        String firstName = request.getParameter("firstName");
+        String lastName = request.getParameter("lastName");
+        String review = request.getParameter("review");
         try {
-            if ( agentIdStr == null || agentIdStr.isEmpty() ) {
-                throw new InvalidInputException( "Invalid value (Null/Empty) found for agentId." );
+            if (agentIdStr == null || agentIdStr.isEmpty()) {
+                throw new InvalidInputException(
+                        "Invalid value (Null/Empty) found for agentId.");
             }
             long agentId = 0;
             try {
-                agentId = Long.parseLong( agentIdStr );
-            } catch ( NumberFormatException e ) {
-                LOG.error( "NumberFormatException caught in reportAbuse() while converting agentId." );
+                agentId = Long.parseLong(agentIdStr);
+            } catch (NumberFormatException e) {
+                LOG.error("NumberFormatException caught in reportAbuse() while converting agentId.");
                 throw e;
             }
             String customerName = firstName + lastName;
             String agentName = "";
             try {
-                agentName = solrSearchService.getUserDisplayNameById( agentId );
-            } catch ( SolrException e ) {
-                LOG.info( "Solr Exception occured while fetching agent name. Nested exception is ", e );
+                agentName = solrSearchService.getUserDisplayNameById(agentId);
+            } catch (SolrException e) {
+                LOG.info(
+                        "Solr Exception occured while fetching agent name. Nested exception is ",
+                        e);
                 throw e;
             }
 
             // Calling email services method to send mail to the Application
             // level admin.
-            emailServices.sendReportAbuseMail( applicationAdminEmail, applicationAdminName, agentName,
-                customerName.replaceAll( "null", "" ), customerEmail, review, "" );
-        } catch ( NonFatalException e ) {
-            LOG.error( "NonfatalException caught in makeSurveyEditable(). Nested exception is ", e );
+            emailServices.sendReportAbuseMail(applicationAdminEmail,
+                    applicationAdminName, agentName,
+                    customerName.replaceAll("null", ""), customerEmail, review,
+                    "");
+        } catch (NonFatalException e) {
+            LOG.error(
+                    "NonfatalException caught in makeSurveyEditable(). Nested exception is ",
+                    e);
         }
     }
 }

@@ -173,9 +173,12 @@ public interface OrganizationUnitSettingsDao
         String collectionName );
 
 
-    List<OrganizationUnitSettings> getCompanyListByVerticalName( String verticalName );
+    public List<OrganizationUnitSettings> getCompanyListByVerticalName( String verticalName );
+    
+    public List<OrganizationUnitSettings> getCompanyList();
 
-
+    public List<OrganizationUnitSettings> getCompanyListByKey(String searchKey);
+    
     public OrganizationUnitSettings fetchOrganizationUnitSettingsByUniqueIdentifier( String uniqueIdentifier,
         String collectionName );
 }

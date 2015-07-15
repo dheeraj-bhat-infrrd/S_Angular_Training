@@ -22,6 +22,7 @@ import com.google.gson.reflect.TypeToken;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.entities.BranchFromSearch;
 import com.realtech.socialsurvey.core.entities.Company;
+import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
 import com.realtech.socialsurvey.core.entities.RegionFromSearch;
 import com.realtech.socialsurvey.core.entities.User;
 import com.realtech.socialsurvey.core.entities.UserFromSearch;
@@ -73,6 +74,9 @@ public class AdminController {
 
 		LOG.info("Inside adminHierarchyPage() method in admin controller");
 
+		List<OrganizationUnitSettings> companies = organizationManagementService.getAllCompaniesFromMongo();
+		model.addAttribute("companyList", companies);
+
 		return JspResolver.ADMIN_HIERARCHY_VIEW;
 	}
 
@@ -123,7 +127,7 @@ public class AdminController {
 				LOG.error("MalformedURLException while fetching branches. Reason : " + e.getMessage(), e);
 				throw new NonFatalException("MalformedURLException while fetching branches", e);
 			}
-			
+
 			LOG.debug("fetching branches under company from solr");
 			branches = organizationManagementService.getBranchesUnderCompanyFromSolr(company, start);
 
@@ -143,6 +147,24 @@ public class AdminController {
 			return JspResolver.MESSAGE_HEADER;
 		}
 		return JspResolver.ADMIN_COMPANY_HIERARCHY;
+	}
+
+	@RequestMapping(value = "/fetchcompaniesbykey", method = RequestMethod.GET)
+	public String fetchCompaniesByKey(Model model, HttpServletRequest request) {
+
+		LOG.info("Inside fetchCompaniesByKey() method");
+
+		String searchKey = request.getParameter("searchKey");
+
+		if (searchKey == null) {
+			searchKey = "";
+		}
+
+		List<OrganizationUnitSettings> unitSettings = organizationManagementService.getCompaniesByNameFromMongo(searchKey);
+
+		model.addAttribute("companyList", unitSettings);
+
+		return JspResolver.ADMIN_COMPANY_LIST;
 	}
 
 	@RequestMapping(value = "/fetchhierarchyviewbranchesforadmin", method = RequestMethod.GET)
