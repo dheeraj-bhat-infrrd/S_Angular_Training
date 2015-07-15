@@ -387,8 +387,11 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
             reminderInterval = surveyReminderInterval;
         }
         //		incompleteSurveyCustomers = surveyDetailsDao.getIncompleteSurveyCustomers(companyId, surveyReminderInterval, maxReminders);
-        incompleteSurveyCustomers = surveyPreInitiationDao.getIncompleteSurveyForReminder( companyId, reminderInterval,
-            maxReminders );
+        /*  incompleteSurveyCustomers = surveyPreInitiationDao.getIncompleteSurveyForReminder( companyId, reminderInterval,
+              maxReminders );*/
+        LOG.debug( "Now fetching survey which are already processed " );
+        incompleteSurveyCustomers = surveyPreInitiationDao.findByColumn( SurveyPreInitiation.class,
+            CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_SURVEYPREINITIATION_PROCESSED );
         // TODO do above code using mysql...should be simple
         LOG.info( "finished." );
         return incompleteSurveyCustomers;
@@ -670,6 +673,7 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
     @Transactional
     public Map<String, Object> mapAgentsInSurveyPreInitiation()
     {
+
         List<SurveyPreInitiation> surveys = surveyPreInitiationDao.findByColumn( SurveyPreInitiation.class,
             CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_SURVEYPREINITIATION_NOT_PROCESSED );
 
@@ -679,8 +683,7 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
         List<SurveyPreInitiation> customersWithoutEmailId = new ArrayList<>();
         Set<Long> companies = new HashSet<>();
         for ( SurveyPreInitiation survey : surveys ) {
-            survey.setStatus( CommonConstants.STATUS_SURVEYPREINITIATION_PROCESSED );
-            survey.setModifiedOn( new Timestamp( System.currentTimeMillis() ) );
+            int status = CommonConstants.STATUS_SURVEYPREINITIATION_PROCESSED;
             User user = null;
             if ( survey.getAgentEmailId() != null ) {
                 List<User> userList = userDao.findByColumn( User.class, CommonConstants.AGENT_EMAIL_ID_COLUMN,
@@ -691,6 +694,9 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
                         LOG.debug( "Mapping the agent to this survey " );
                         survey.setAgentId( user.getUserId() );
                         surveyPreInitiationDao.update( survey );
+                        if ( user.getCreatedOn().after( survey.getEngagementClosedTime() ) ) {
+                            status = CommonConstants.STATUS_SURVEYPREINITIATION_OLD_RECORD;
+                        }
                     }
                 }
             }
@@ -728,6 +734,8 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
                 unavailableAgents.add( survey );
                 companies.add( survey.getCompanyId() );
             }
+            survey.setStatus( status );
+            survey.setModifiedOn( new Timestamp( System.currentTimeMillis() ) );
             surveyPreInitiationDao.merge( survey );
         }
 
