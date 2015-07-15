@@ -519,16 +519,7 @@ $(document).ready(function() {
 		$('#edit-participation-mail-content-disabled').hide();
 	});
 	$('#revert-participation-mail').click(function() {
-	    showOverlay();
-		var payload = {
-			"mailcategory" : 'participationmail'
-		};
-		callAjaxPostWithPayloadData('./revertsurveyparticipationmail.do', function (data) {
-			showMainContent('./showcompanysettings.do');
-			hideOverlay();
-			$("#overlay-toast").html(data);
-			showToast();
-		}, payload, true);
+		revertMailContent('participationmail');
 	});
 
 	$('#edit-participation-reminder-mail-content').click(function() {
@@ -563,9 +554,13 @@ $(document).ready(function() {
 		$('#edit-participation-reminder-mail-content-disabled').hide();
 	});
 	$('#revert-participation-reminder-mail').click(function() {
+		revertMailContent('participationremindermail');
+	});
+	
+	function revertMailContent(mailcategory) {
 	    showOverlay();
 		var payload = {
-			"mailcategory" : 'participationremindermail'
+			"mailcategory" : mailcategory
 		};
 		callAjaxPostWithPayloadData('./revertsurveyparticipationmail.do', function (data) {
 			showMainContent('./showcompanysettings.do');
@@ -573,8 +568,7 @@ $(document).ready(function() {
 			$("#overlay-toast").html(data);
 			showToast();
 		}, payload, true);
-	});
-
+	}
 
 	$('#reminder-interval').change(function() {
 		$('#mailcategory').val('reminder-interval');
