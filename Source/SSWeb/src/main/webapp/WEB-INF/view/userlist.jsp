@@ -5,7 +5,7 @@
 <c:set var="user" value="${sessionScope.SPRING_SECURITY_CONTEXT.authentication.principal}" />
 <c:set var="accountTypeId" value="${user.company.licenseDetails[0].accountsMaster.accountsMasterId}"/>
 <table class="v-um-tbl">
-	<tr class="u-tbl-header">
+	<tr id="u-tbl-header" class="u-tbl-header" data-num-found="${numFound}">
 		<td class="v-tbl-uname"><spring:message code="label.usermanagement.username.key" /></td>
 		<td class="v-tbl-email"><spring:message code="label.emailid.key" /></td>
 		<td class="v-tbl-rgn-adm text-center">

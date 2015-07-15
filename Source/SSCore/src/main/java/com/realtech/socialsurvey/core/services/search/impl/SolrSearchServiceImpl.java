@@ -554,14 +554,14 @@ public class SolrSearchServiceImpl implements SolrSearchService {
 	 * @throws MalformedURLException
 	 */
 	@Override
-	public String searchUsersByCompany(long companyId, int startIndex, int noOfRows) throws InvalidInputException, SolrException,
+	public SolrDocumentList searchUsersByCompany(long companyId, int startIndex, int noOfRows) throws InvalidInputException, SolrException,
 			MalformedURLException {
 		if (companyId < 0) {
 			throw new InvalidInputException("Pattern is null or empty while searching for Users");
 		}
 		LOG.info("Method searchUsersByCompanyId() called for company id : " + companyId);
-		String usersResult = null;
-		QueryResponse response = null;
+
+		SolrDocumentList results = null;
 		try {
 			SolrServer solrServer = new HttpSolrServer(solrUserUrl);
 			SolrQuery solrQuery = new SolrQuery();
@@ -572,10 +572,8 @@ public class SolrSearchServiceImpl implements SolrSearchService {
 			solrQuery.setRows(noOfRows);
 			solrQuery.addSort(CommonConstants.USER_DISPLAY_NAME_SOLR, ORDER.asc);
 			LOG.debug("Querying solr for searching users");
-			response = solrServer.query(solrQuery);
-			SolrDocumentList results = response.getResults();
-			usersResult = new Gson().toJson(getUsersFromSolrDocuments(results));
-			LOG.debug("User search result is : " + usersResult);
+
+			results = solrServer.query(solrQuery).getResults();
 		}
 		catch (SolrServerException e) {
 			LOG.error("SolrServerException while performing User search");
@@ -583,7 +581,7 @@ public class SolrSearchServiceImpl implements SolrSearchService {
 		}
 
 		LOG.info("Method searchUsersByCompanyId() finished for company id : " + companyId);
-		return usersResult;
+		return results;
 	}
 
 	@Override
@@ -1665,7 +1663,7 @@ public class SolrSearchServiceImpl implements SolrSearchService {
 	}
 	
 	@SuppressWarnings("unchecked")
-	private Collection<UserFromSearch> getUsersFromSolrDocuments(SolrDocumentList documentList) throws InvalidInputException {
+	public Collection<UserFromSearch> getUsersFromSolrDocuments(SolrDocumentList documentList) throws InvalidInputException {
 		Map<Long, UserFromSearch> matchedUsers = new LinkedHashMap<>();
 		for (SolrDocument document : documentList) {
 			UserFromSearch user = new UserFromSearch();

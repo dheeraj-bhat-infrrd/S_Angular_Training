@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
+import org.apache.solr.common.SolrDocumentList;
 import org.noggit.JSONUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -292,81 +293,83 @@ public class UserManagementController
     }
 
 
-    /*
-     * Method to fetch list of all the users who belong to the same as that of current user. Current
-     * user is company admin who can assign different roles to other users.
-     */
-    @RequestMapping ( value = "/findusersforcompany", method = RequestMethod.GET)
-    public String findUsersForCompany( Model model, HttpServletRequest request )
-    {
-        LOG.info( "Method to fetch user by user, findUserByUserId() started." );
-        int startIndex = 0;
-        int batchSize = 0;
+	/*
+	 * Method to fetch list of all the users who belong to the same as that of current user. Current
+	 * user is company admin who can assign different roles to other users.
+	 */
+	@RequestMapping(value = "/findusersforcompany", method = RequestMethod.GET)
+	public String findUsersForCompany(Model model, HttpServletRequest request) {
+		LOG.info("Method to fetch user by user, findUserByUserId() started.");
+		int startIndex = 0;
+		int batchSize = 0;
 
-        try {
-            String startIndexStr = request.getParameter( "startIndex" );
-            String batchSizeStr = request.getParameter( "batchSize" );
-            try {
-                if ( startIndexStr == null || startIndexStr.isEmpty() ) {
-                    LOG.error( "Invalid value found in startIndex. It cannot be null or empty." );
-                    throw new InvalidInputException( "Invalid value found in startIndex. It cannot be null or empty." );
-                }
-                if ( batchSizeStr == null || batchSizeStr.isEmpty() ) {
-                    LOG.error( "Invalid value found in batchSizeStr. It cannot be null or empty." );
-                    batchSize = SOLR_BATCH_SIZE;
-                }
+		try {
+			String startIndexStr = request.getParameter("startIndex");
+			String batchSizeStr = request.getParameter("batchSize");
+			try {
+				if (startIndexStr == null || startIndexStr.isEmpty()) {
+					LOG.error("Invalid value found in startIndex. It cannot be null or empty.");
+					throw new InvalidInputException("Invalid value found in startIndex. It cannot be null or empty.");
+				}
+				if (batchSizeStr == null || batchSizeStr.isEmpty()) {
+					LOG.error("Invalid value found in batchSizeStr. It cannot be null or empty.");
+					batchSize = SOLR_BATCH_SIZE;
+				}
 
-                startIndex = Integer.parseInt( startIndexStr );
-                batchSize = Integer.parseInt( batchSizeStr );
-            } catch ( NumberFormatException e ) {
-                LOG.error( "NumberFormatException while searching for user id. Reason : " + e.getMessage(), e );
-                throw new NonFatalException( "NumberFormatException while searching for user id", e );
-            }
+				startIndex = Integer.parseInt(startIndexStr);
+				batchSize = Integer.parseInt(batchSizeStr);
+			}
+			catch (NumberFormatException e) {
+				LOG.error("NumberFormatException while searching for user id. Reason : " + e.getMessage(), e);
+				throw new NonFatalException("NumberFormatException while searching for user id", e);
+			}
 
-            User admin = sessionHelper.getCurrentUser();
-            if ( admin == null ) {
-                LOG.error( "No user found in session" );
-                throw new InvalidInputException( "No user found in session", DisplayMessageConstants.NO_USER_IN_SESSION );
-            }
+			User admin = sessionHelper.getCurrentUser();
+			if (admin == null) {
+				LOG.error("No user found in session");
+				throw new InvalidInputException("No user found in session", DisplayMessageConstants.NO_USER_IN_SESSION);
+			}
 
-            // fetching admin details
-            UserFromSearch adminUser;
-            try {
-                String adminUserDoc = JSONUtil.toJSON( solrSearchService.getUserByUniqueId( admin.getUserId() ) );
-                Type searchedUser = new TypeToken<UserFromSearch>() {}.getType();
-                adminUser = new Gson().fromJson( adminUserDoc.toString(), searchedUser );
-            } catch ( SolrException e ) {
-                LOG.error( "SolrException while searching for user id. Reason : " + e.getMessage(), e );
-                throw new NonFatalException( "SolrException while searching for user id.", e );
-            }
+			// fetching admin details
+			UserFromSearch adminUser;
+			try {
+				String adminUserDoc = JSONUtil.toJSON(solrSearchService.getUserByUniqueId(admin.getUserId()));
+				Type searchedUser = new TypeToken<UserFromSearch>() {}.getType();
+				adminUser = new Gson().fromJson(adminUserDoc.toString(), searchedUser);
+			}
+			catch (SolrException e) {
+				LOG.error("SolrException while searching for user id. Reason : " + e.getMessage(), e);
+				throw new NonFatalException("SolrException while searching for user id.", e);
+			}
 
-            // fetching users from solr
-            try {
-                String users = solrSearchService
-                    .searchUsersByCompany( admin.getCompany().getCompanyId(), startIndex, batchSize );
-                Type searchedUsersList = new TypeToken<List<UserFromSearch>>() {}.getType();
-                List<UserFromSearch> usersList = new Gson().fromJson( users, searchedUsersList );
+			// fetching users from solr
+			try {
+				SolrDocumentList results = solrSearchService.searchUsersByCompany(admin.getCompany().getCompanyId(), startIndex, batchSize);
+				
+				String users = new Gson().toJson(solrSearchService.getUsersFromSolrDocuments(results));
+				Type searchedUsersList = new TypeToken<List<UserFromSearch>>() {}.getType();
+				List<UserFromSearch> usersList = new Gson().fromJson(users, searchedUsersList);
 
-                usersList = userManagementService.checkUserCanEdit( admin, adminUser, usersList );
+				usersList = userManagementService.checkUserCanEdit(admin, adminUser, usersList);
+				model.addAttribute("userslist", usersList);
+				
+				model.addAttribute("numFound", results.getNumFound());
+				LOG.debug("Users List: " + usersList.toString());
+			}
+			catch (MalformedURLException e) {
+				LOG.error("MalformedURLException while searching for user id. Reason : " + e.getMessage(), e);
+				throw new NonFatalException("MalformedURLException while searching for user id.", DisplayMessageConstants.GENERAL_ERROR, e);
+			}
+		}
+		catch (NonFatalException nonFatalException) {
+			LOG.error("NonFatalException while searching for user id. Reason : " + nonFatalException.getStackTrace(), nonFatalException);
+			model.addAttribute("message", messageUtils.getDisplayMessage(nonFatalException.getErrorCode(), DisplayMessageType.ERROR_MESSAGE));
+			return JspResolver.MESSAGE_HEADER;
+		}
 
-                model.addAttribute( "userslist", usersList );
-                LOG.debug( "Users List: " + usersList.toString() );
-            } catch ( MalformedURLException e ) {
-                LOG.error( "MalformedURLException while searching for user id. Reason : " + e.getMessage(), e );
-                throw new NonFatalException( "MalformedURLException while searching for user id.",
-                    DisplayMessageConstants.GENERAL_ERROR, e );
-            }
-        } catch ( NonFatalException nonFatalException ) {
-            LOG.error( "NonFatalException while searching for user id. Reason : " + nonFatalException.getStackTrace(),
-                nonFatalException );
-            model.addAttribute( "message",
-                messageUtils.getDisplayMessage( nonFatalException.getErrorCode(), DisplayMessageType.ERROR_MESSAGE ) );
-            return JspResolver.MESSAGE_HEADER;
-        }
-
-        LOG.info( "Method to fetch users by company , findUsersForCompany() finished." );
-        return JspResolver.USER_LIST_FOR_MANAGEMENT;
-    }
+		LOG.info("Method to fetch users by company , findUsersForCompany() finished.");
+		return JspResolver.USER_LIST_FOR_MANAGEMENT;
+	}
 
 
     /*
