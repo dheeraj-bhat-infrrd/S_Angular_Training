@@ -1885,6 +1885,7 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 
 			}
 		}
+		
 		/**
 		 * Region admin : able to edit users only in his region
 		 */
@@ -1897,6 +1898,7 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 				}
 			}
 		}
+		
 		/**
 		 * Branch admin : able to edit users only in his office
 		 */
