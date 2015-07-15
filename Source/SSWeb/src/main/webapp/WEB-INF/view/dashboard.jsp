@@ -130,10 +130,9 @@
 							
 							<div id="dsh-admin-cmp-dwnld" class="float-right dash-btn-dl-sd-admin hide">
 							<select id="download-survey-reports" class="float-left dash-download-sel-item">
-								<option value=0 data-report="complete-survey"><spring:message code="label.downloadsurveydata.one.key" /></option>
-								<option value=1 data-report="agent-ranking"><spring:message code="label.downloadsurveydata.two.key" /></option>
-								<option value=2 data-report="survey-results"><spring:message code="label.downloadsurveydata.three.key" /></option>
-								<option value=3 data-report="social-monitor"><spring:message code="label.downloadsurveydata.four.key" /></option>
+								<option value=1 data-report="agent-ranking"><spring:message code="label.downloadsurveydata.one.key" /></option>
+								<option value=2 data-report="survey-results"><spring:message code="label.downloadsurveydata.two.key" /></option>
+								<option value=3 data-report="social-monitor"><spring:message code="label.downloadsurveydata.three.key" /></option>
 							</select>
 								<input id="dsh-start-date" class="dsh-date-picker" placeholder="<spring:message code="label.startdate.key" />">
 								<span>-</span>

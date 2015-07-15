@@ -96,8 +96,6 @@
 				</div>
 			</div>
 
-
-
 			<div class="dash-panels-wrapper">
 				<div class="row">
 					<div class="clearfix admin-report-dwn-row">
@@ -129,14 +127,12 @@
 						<div class="dwnl-bnt-col float-right">
 							<div id="dsh-admin-rep-bnt" class="float-right dash-btn-dl-sd-admin hide">
 								<select id="download-survey-reports" class="float-left dash-download-sel-item">
-									<option value=0 data-report="complete-survey"><spring:message
-											code="label.downloadsurveydata.one.key" /></option>
 									<option value=1 data-report="loan-officer-ranking"><spring:message
-											code="label.downloadsurveydata.two.key" /></option>
+											code="label.downloadsurveydata.one.key" /></option>
 									<option value=2 data-report="customer-survey"><spring:message
-											code="label.downloadsurveydata.three.key" /></option>
+											code="label.downloadsurveydata.two.key" /></option>
 									<option value=3 data-report="social-monitor"><spring:message
-											code="label.downloadsurveydata.four.key" /></option>
+											code="label.downloadsurveydata.three.key" /></option>
 								</select> 
 								<input id="dsh-start-date" class="dsh-date-picker"
 									placeholder="<spring:message code="label.startdate.key" />">
@@ -175,14 +171,12 @@
 							class="float-right dash-btn-dl-sd-admin hide">
 							<select id="download-survey-reports"
 								class="float-left dash-download-sel-item">
-								<option value=0 data-report="complete-survey"><spring:message
-										code="label.downloadsurveydata.one.key" /></option>
 								<option value=1 data-report="loan-officer-ranking"><spring:message
-										code="label.downloadsurveydata.two.key" /></option>
+										code="label.downloadsurveydata.one.key" /></option>
 								<option value=2 data-report="customer-survey"><spring:message
-										code="label.downloadsurveydata.three.key" /></option>
+										code="label.downloadsurveydata.two.key" /></option>
 								<option value=3 data-report="social-monitor"><spring:message
-										code="label.downloadsurveydata.four.key" /></option>
+										code="label.downloadsurveydata.three.key" /></option>
 							</select> <input id="dsh-start-date" class="dsh-date-picker"
 								placeholder="<spring:message code="label.startdate.key" />">
 							<span>-</span> <input id="dsh-end-date" class="dsh-date-picker"
