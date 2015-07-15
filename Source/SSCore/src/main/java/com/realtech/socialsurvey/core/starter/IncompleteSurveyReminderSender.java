@@ -68,7 +68,7 @@ public class IncompleteSurveyReminderSender extends QuartzJobBean
                         try {
                             sendEmail( emailServices, organizationManagementService, userManagementService, survey,
                                 company.getCompanyId() );
-                            surveyHandler.updateReminderCount( survey.getAgentId(), survey.getCustomerEmailId() );
+                            surveyHandler.updateReminderCount( survey.getSurveyPreIntitiationId() );
                         } catch ( InvalidInputException e ) {
                             LOG.error(
                                 "InvalidInputException caught in executeInternal() method of IncompleteSurveyReminderSender class. Nested exception is ",
