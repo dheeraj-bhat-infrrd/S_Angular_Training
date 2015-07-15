@@ -30,7 +30,7 @@ import com.realtech.socialsurvey.core.services.surveybuilder.SurveyHandler;
 public class CrmDataAgentIdMapper extends QuartzJobBean
 {
 
-    public static final Logger LOG = LoggerFactory.getLogger( AccountDeactivator.class );
+    public static final Logger LOG = LoggerFactory.getLogger( CrmDataAgentIdMapper.class );
 
     private SurveyHandler surveyHandler;
     private EmailServices emailServices;
