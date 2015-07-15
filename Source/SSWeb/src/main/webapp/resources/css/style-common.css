@@ -1729,6 +1729,10 @@ button.paypal.is-active {
 	background: url(../images/lendingtree.png) no-repeat center;
 }
 
+.icn-tele-blue {
+	background: url(../images/tele_blue.png) no-repeat center;
+}
+
 .icn-gplus {
 	background: url(../images/gplus.png) no-repeat center;
 }
