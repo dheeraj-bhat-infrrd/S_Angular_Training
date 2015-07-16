@@ -493,10 +493,12 @@ function populateSurveyStatisticsList(columnName) {
 	}
 	
 	$("#selection-list").html(options);
-	$('#dsh-srch-survey-div').hide();
-
 	$("#graph-sel-list").html(options);
-	$('#dsh-grph-srch-survey-div').hide();
+	
+	if (columnName == "companyId") {
+		$('#dsh-srch-survey-div').hide();
+		$('#dsh-grph-srch-survey-div').hide();
+	}
 }
 
 function showSurveyStatistics(columnName, columnValue) {
