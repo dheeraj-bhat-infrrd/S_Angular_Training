@@ -730,9 +730,11 @@ $(document).on('click', '#wc-send-survey', function() {
 
 $(document).on('click', '#wc-skip-send-survey', function() {
 	$('#overlay-send-survey').html('');
+	$('body').removeClass('body-no-scroll');
 });
 
 function sendSurveyInvitation() {
+	$('body').addClass('body-no-scroll');
 	callAjaxGET("./sendsurveyinvitation.do", function(data) {
 		$('#overlay-send-survey').html(data);
 		if ($("#welcome-popup-invite").length) {
@@ -743,6 +745,7 @@ function sendSurveyInvitation() {
 }
 
 function sendSurveyInvitationAdmin(columnName, columnValue) {
+	$('body').addClass('body-no-scroll');
 	var payload = {
 			"columnName" : columnName,
 			"columnValue" : columnValue
@@ -757,6 +760,7 @@ function sendSurveyInvitationAdmin(columnName, columnValue) {
 }
 
 function linkedInDataImport() {
+	$('body').addClass('body-no-scroll');
 	callAjaxGET("./linkedindataimport.do", function(data) {
 		$('#overlay-linkedin-import').html(data);
 		if ($("#welocome-step1").length) {
