@@ -695,16 +695,16 @@ $(document).on('scroll', '#dsh-inc-srvey', function() {
 
 function showSurveyStatisticsGraphically(columnName, columnValue) {
 	var element = document.getElementById("dsh-grph-format");
-	var format = element.options[element.selectedIndex].value;
-	showSurveyGraph(columnName, columnValue, format);
+	var numberOfDays = element.options[element.selectedIndex].value;
+	showSurveyGraph(columnName, columnValue, numberOfDays);
 }
 
-function showSurveyGraph(columnName, columnValue, format) {
+function showSurveyGraph(columnName, columnValue, numberOfDays) {
 	var success = false;
 	var payload = {
 		"columnName" : columnName,
 		"columnValue" : columnValue,
-		"reportType" : format
+		"numberOfDays" : numberOfDays
 	};
 	$.ajax({
 		url : "./surveydetailsforgraph.do",
@@ -734,8 +734,7 @@ function showSurveyGraph(columnName, columnValue, format) {
 }
 
 function paintSurveyGraph() {
-	
-	if(graphData == undefined)
+	if (graphData == undefined)
 		return;
 	var allTimeslots = [];
 	var timeslots = [];
@@ -788,27 +787,32 @@ function paintSurveyGraph() {
 		allTimeslots = timeslots;
 		timeslots = [];
 	}
+	
 	var element = document.getElementById("dsh-grph-format");
 	if(element == null){
 		return;
 	}
+	
 	var format = element.options[element.selectedIndex].value;
 	var type = '';
-	if (format == 'weekly') {
-		type = 'Date';
-	} else if (format == 'monthly') {
+	if (format == '30') {
 		type = 'Week Starting';
-	} else if (format == 'yearly') {
+	} else if (format == '60') {
+		type = 'Week Starting';
+	} else if (format == '90') {
+		type = 'Week Starting';
+	} else if (format == '365') {
 		type = 'Month';
 	}
 
-	if (format != 'yearly') {
+	if (format != '365') {
 		allTimeslots.reverse();
 		clickedSurveys.reverse();
 		sentSurveys.reverse();
 		completedSurveys.reverse();
 		socialPosts.reverse();
 	}
+	
 	var internalData = [];
 	var nestedInternalData = [];
 	nestedInternalData.push(type, 'No. of surveys sent',
@@ -845,6 +849,7 @@ function paintSurveyGraph() {
 		} else {
 			socialPost = parseInt(socialPosts[itr]);
 		}
+		
 		nestedInternalData.push(allTimeslots[itr], sentSurvey, clickedSurvey, completedSurvey, socialPost);
 		internalData.push(nestedInternalData);
 	}
@@ -2036,7 +2041,7 @@ function validateUserSelection(elementId,hiddenElementId) {
 			emailId = emailId.split('"').join("");
 		}
 		if(emailId.indexOf("<") > -1){
-			emailId = emailId.substring(emailId.indexOf("<")+1,emailId.indexOf(">"))
+			emailId = emailId.substring(emailId.indexOf("<")+1,emailId.indexOf(">"));
 		}
 		if($("#"+hiddenElementId).val() != ""){
 			return true;
