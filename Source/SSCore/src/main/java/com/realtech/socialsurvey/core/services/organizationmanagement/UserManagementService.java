@@ -368,5 +368,8 @@ public interface UserManagementService
         SolrException;
     
     public String generateIndividualProfileName( long userId, String name, String emailId ) throws InvalidInputException;
+
+
+    public User getUserObjByUserId(long userId) throws InvalidInputException;
 }
 // JIRA SS-34 BY RM02 BOC

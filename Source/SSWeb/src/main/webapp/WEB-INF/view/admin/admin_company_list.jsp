@@ -18,7 +18,7 @@
 			<div class="v-tbl-role"></div>
 			<div class="v-tbl-btns">
 				<div class="clearfix v-tbl-icn-wraper">
-					<div class="float-left v-tbl-icn v-icn-close region-del-icn hidden"
+					<div class="float-left v-tbl-icn v-icn-close comp-del-icn vis-hidden"
 						data-iden="${companyItem.iden}"></div>
 					<div class="float-right v-tbl-icn v-icn-edit comp-edit-icn"
 						clicked="false" data-iden="${companyItem.iden}"></div>
@@ -29,3 +29,15 @@
 		<div data-iden="${companyItem.iden}" class="hide comp-hr-cont"></div>
 	</c:forEach>
 </c:if>
+<script>
+$('.comp-login-icn').on('click',function(e){
+	e.stopImmediatePropagation();
+	var payload = {
+		"colName" : "companyId",
+		"colValue" : $(this).attr('data-iden')	
+	};
+	callAjaxGETWithTextData("/loginadminas.do", function(data) {
+		window.location = window.location.origin + '/userlogin.do';
+	}, true, payload);
+});
+</script>
