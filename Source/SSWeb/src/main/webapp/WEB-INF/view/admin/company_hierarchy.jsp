@@ -18,9 +18,11 @@
 					<td class="v-tbl-role"></td>
 					<td class="v-tbl-btns">
 						<div class="clearfix v-tbl-icn-wraper">
-							<div class="float-left v-tbl-icn v-icn-close region-del-icn vis-hidden"
+							<div
+								class="float-left v-tbl-icn v-icn-close region-del-icn vis-hidden"
 								data-regionid="${region.regionId}"></div>
-							<div class="float-right v-tbl-icn v-icn-edit region-edit-icn"
+							<div
+								class="float-right v-tbl-icn v-icn-edit region-edit-icn vis-hidden"
 								clicked="false" data-regionid="${region.regionId}"></div>
 						</div>
 					</td>
@@ -49,9 +51,11 @@
 					<td class="v-tbl-role"></td>
 					<td class="v-tbl-btns">
 						<div class="clearfix v-tbl-icn-wraper">
-							<div class="float-left v-tbl-icn v-icn-close branch-del-icn vis-hidden"
+							<div
+								class="float-left v-tbl-icn v-icn-close branch-del-icn vis-hidden"
 								data-branchid="${branch.branchId}"></div>
-							<div class="float-right v-tbl-icn v-icn-edit branch-edit-icn"
+							<div
+								class="float-right v-tbl-icn v-icn-edit branch-edit-icn vis-hidden"
 								clicked="false" data-branchid="${branch.branchId}"></div>
 						</div>
 					</td>
@@ -94,10 +98,12 @@
 						<div class="clearfix v-tbl-icn-wraper">
 							<div class="float-left v-tbl-icn v-icn-close user-del-icn hidden"
 								data-userid="${compUser.userId}"></div>
-							<div class="float-left v-tbl-icn v-icn-login user-login-icn"
+							<div class="float-right v-tbl-icn v-icn-login user-login-icn"
 								data-iden="${compUser.userId}" title="login as"></div>
-							<div class="float-right v-tbl-icn v-icn-edit user-edit-icn"
-								clicked="false" data-userid="${compUser.userId}" data-iscom-admin="${compUser.isOwner}"></div>
+							<div
+								class="float-right v-tbl-icn v-icn-edit user-edit-icn vis-hidden"
+								clicked="false" data-userid="${compUser.userId}"
+								data-iscom-admin="${compUser.isOwner}"></div>
 						</div>
 					</td>
 					<td class="v-tbl-spacer"></td>
@@ -114,5 +120,5 @@
 	</table>
 </div>
 <script>
-bindUserLoginEvent();
+	bindUserLoginEvent();
 </script>
