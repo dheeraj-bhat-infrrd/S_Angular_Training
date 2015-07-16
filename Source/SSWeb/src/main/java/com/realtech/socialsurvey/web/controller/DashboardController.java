@@ -1124,10 +1124,18 @@ public class DashboardController {
             long iden = 0;
 
             if (realTechAdmin) {
-                profileLevel = CommonConstants.PROFILE_LEVEL_REALTECH_ADMIN;
+            	String columnValue = request.getParameter("columnValue");
+                if (columnValue != null && !columnValue.isEmpty()) {
+                    try {
+                        iden = Long.parseLong(columnValue);
+                    }
+                    catch (NumberFormatException e) {
+                        LOG.error("NumberFormatException caught while parsing columnValue in getCustomerSurveyResultsFile(). Nested exception is ", e);
+                        throw e;
+                    }
+                }
             }
-
-            if (profileLevel.equals(CommonConstants.PROFILE_LEVEL_COMPANY)) {
+            else if (profileLevel.equals(CommonConstants.PROFILE_LEVEL_COMPANY)) {
                 iden = user.getCompany().getCompanyId();
             }
             else if (profileLevel.equals(CommonConstants.PROFILE_LEVEL_INDIVIDUAL)) {

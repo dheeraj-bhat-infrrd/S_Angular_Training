@@ -6285,7 +6285,7 @@ tr.u-tbl-header td {
 }
 
 .rating-image-txt {
-    padding-left: 15px;
+    padding-left: 5px;
     line-height: 30px;
     font-size:12px;
     font-family:'opensanssemibold';
@@ -6293,9 +6293,16 @@ tr.u-tbl-header td {
 
 .web-address-txt {
     line-height: 30px;
-    padding-left: 10px;
+    padding-left: 5px;
     font-size:12px;
     font-family:'opensanssemibold';
+}
+
+.phone-number-txt {
+	line-height: 30px;
+	padding-left: 5px;
+	font-size: 12px;
+	font-family: 'opensanssemibold';
 }
 
 .social-connect-txt {
@@ -6311,7 +6318,7 @@ tr.u-tbl-header td {
 
 .web-addr-header{
 	padding-top: 5px;
-	padding-left: 40px;
+	padding-left: 30px;
 }
 
 .prof-details-header .social-item-icon{
@@ -6382,6 +6389,13 @@ tr.u-tbl-header td {
 	width: 19px;
 	height: 25px;
 	background: url(../images/web_blue.png) no-repeat center;
+}
+
+.phn-num-img {
+	width: 25px;
+	height: 25px;
+	background: url(../images/tele_blue.png) no-repeat center;
+	background-size : contain;
 }
 
 .prof-input-cont {

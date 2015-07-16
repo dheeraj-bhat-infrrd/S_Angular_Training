@@ -32,9 +32,9 @@
 				<div class="clearfix v-tbl-icn-wraper">
 					<div class="float-left v-tbl-icn v-icn-close user-del-icn hidden"
 						data-userid="${branchUser.userId}"></div>
-					<div class="float-left v-tbl-icn v-icn-login user-login-icn"
+					<div class="float-right v-tbl-icn v-icn-login user-login-icn"
 						data-iden="${branchUser.userId}" title="login as"></div>
-					<div class="float-right v-tbl-icn v-icn-edit user-edit-icn"
+					<div class="float-right v-tbl-icn v-icn-edit user-edit-icn vis-hidden"
 						clicked="false" data-userid="${branchUser.userId}"
 						data-iscom-admin="${branchUser.isOwner}"></div>
 				</div>
