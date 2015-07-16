@@ -12,6 +12,8 @@
 					<c:set var="encompasspassword"
 						value="${accountSettings.crm_info.crm_password}" />
 					<c:set var="encompassurl" value="${accountSettings.crm_info.url}" />
+					<c:set var="encompassfieldid"
+						value="${accountSettings.crm_info.crm_fieldId}" />
 				</c:if>
 				<div class="col-lg-6 col-md-6 col-sm-12 col-xs-12 um-panel-item">
 					<div class="hm-item-row item-row-OR clearfix float-left">
@@ -69,6 +71,25 @@
 								class="encompass-testconnection-adj um-item-row-icon icn-spanner margin-left-0 cursor-pointer"></div>
 							<div id="encompass-save"
 								class="um-item-row-icon icn-blue-tick margin-left-0 cursor-pointer"></div>
+						</div>
+					</div>
+				</div>
+				<div
+					class="col-lg-6 col-md-6 col-sm-12 col-xs-12 um-panel-item overflow-hidden">
+					<div class="hm-item-row item-row-OR clearfix float-left">
+						<div class="um-item-row-left text-right">
+							<spring:message code="label.crm.fieldId.key" />
+						</div>
+						<div class="clearfix float-right ">
+							<div class="um-item-row-icon margin-left-0"></div>
+							<div class="um-item-row-icon margin-left-0"></div>
+						</div>
+						<div
+							class="hm-item-row-right um-item-row-right margin-right-10 hm-item-height-adj float-left">
+							<input id="encompass-fieldId" type="text"
+								class="um-item-row-txt um-item-row-txt-OR"
+								placeholder="fieldId" name="encompass-fieldId"
+								value="${encompassfieldid}">
 						</div>
 					</div>
 				</div>
