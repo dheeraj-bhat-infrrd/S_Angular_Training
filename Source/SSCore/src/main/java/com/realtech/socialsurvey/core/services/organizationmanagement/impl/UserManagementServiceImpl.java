@@ -670,6 +670,22 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 		return user;
 	}
 
+	/**
+	 * Method to get user object for the given user id
+	 */
+	@Transactional
+	@Override
+	public User getUserObjByUserId(long userId) throws InvalidInputException {
+		LOG.info("Method to find user on the basis of user id started for user id " + userId);
+		User user = null;
+		user = userDao.findById(User.class, userId);
+		if (user == null) {
+			throw new InvalidInputException("User not found for userId:" + userId);
+		}
+		LOG.info("Method to find user on the basis of user id finished for user id " + userId);
+		return user;
+	}
+	
 	@Override
 	@Transactional
 	public User getUserByProfileId(long profileId) throws InvalidInputException {
