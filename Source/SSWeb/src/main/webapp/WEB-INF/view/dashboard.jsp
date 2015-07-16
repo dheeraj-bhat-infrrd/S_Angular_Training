@@ -1,11 +1,11 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <%@ taglib prefix="spring" uri="http://www.springframework.org/tags"%>
 <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions"%>
+
 <div class="hm-header-main-wrapper hm-hdr-bord-bot">
 	<div class="container">
 		<div class="hm-header-row clearfix">
 			<div class="float-left hm-header-row-left hr-dsh-adj-lft"><spring:message code="label.header.dashboard.key" /></div>
-			
 			<c:if test="${not empty profileList && fn:length(profileList) > 1}">
 				<div class="float-right header-right clearfix hr-dsh-adj-rt" style="z-index: 99; margin-left: 50px;">
 					<div class="float-left hr-txt1"><spring:message code="label.viewas.key" /></div>
@@ -31,7 +31,7 @@
 			data-account-type="${accounttype}"
 			data-column-value="${columnValue}" class="dash-top-info">
 			<div id="dash-profile-detail-circles" class="row row-dash-top-adj">
-				<!-- Populated by profile detail -->
+				<!-- Populated by dashboard_profiledetail.jsp -->
 			</div>
 		</div>
 
@@ -61,7 +61,7 @@
 				</div>
 			</div>
 			<div id="dash-survey-status" >
-				<!-- Populated by survey status -->
+				<!-- Populated by dashboard_surveystatus.jsp -->
 			</div>
 		</div>
 
@@ -80,16 +80,20 @@
 						<div id="dsh-grph-srch-res"></div>
 					</div>
 				</div>
-				
 				<div class="clearfix dash-sel-wrapper">
-					<div class="float-left dash-sel-lbl"><spring:message code="label.format.key" /></div>
+					<div class="float-left dash-sel-lbl"><spring:message code="label.duration.key" /></div>
 					<select id="dsh-grph-format" class="float-left dash-sel-item">
-						<option value="weekly"><spring:message code="label.format.one.key" /></option>
+						<option value="30"><spring:message code="label.duration.one.key" /></option>
+						<option value="60"><spring:message code="label.duration.two.key" /></option>
+						<option value="90"><spring:message code="label.duration.three.key" /></option>
+						<option value="365"><spring:message code="label.duration.four.key" /></option>
+						<%-- <option value="weekly"><spring:message code="label.format.one.key" /></option>
 						<option value="monthly"><spring:message code="label.format.two.key" /></option>
-						<option value="yearly"><spring:message code="label.format.three.key" /></option>
+						<option value="yearly"><spring:message code="label.format.three.key" /></option> --%>
 					</select>
 				</div>
 			</div>
+			
 			<div class="float-left stats-right stats-right-adj">
 				<div class="util-graph-wrapper">
 					<div id="util-gph-item" class="util-gph-item"></div>
@@ -116,7 +120,7 @@
 				<div id="dash-survey-incomplete" class="dash-panel-left col-lg-4 col-md-4 col-sm-4 col-xs-12">
 					<div class="dash-lp-header" id="incomplete-survey-header"><spring:message code="label.incompletesurveys.key" /></div>
 					<div id="dsh-inc-srvey" class="dash-lp-item-grp">
-						<!-- Populated with incomplete surveys -->
+						<!-- Populated with dashboard_incompletesurveys.jsp -->
 					</div>
 					<div id="dsh-inc-dwnld" class="dash-btn-sur-data hide"><spring:message code="label.incompletesurveydata.key" /></div>
 				</div>
@@ -129,11 +133,11 @@
 							</div>
 							
 							<div id="dsh-admin-cmp-dwnld" class="float-right dash-btn-dl-sd-admin hide">
-							<select id="download-survey-reports" class="float-left dash-download-sel-item">
-								<option value=1 data-report="agent-ranking"><spring:message code="label.downloadsurveydata.one.key" /></option>
-								<option value=2 data-report="survey-results"><spring:message code="label.downloadsurveydata.two.key" /></option>
-								<option value=3 data-report="social-monitor"><spring:message code="label.downloadsurveydata.three.key" /></option>
-							</select>
+								<select id="download-survey-reports" class="float-left dash-download-sel-item">
+									<option value=1 data-report="agent-ranking"><spring:message code="label.downloadsurveydata.one.key" /></option>
+									<option value=2 data-report="survey-results"><spring:message code="label.downloadsurveydata.two.key" /></option>
+									<option value=3 data-report="social-monitor"><spring:message code="label.downloadsurveydata.three.key" /></option>
+								</select>
 								<input id="dsh-start-date" class="dsh-date-picker" placeholder="<spring:message code="label.startdate.key" />">
 								<span>-</span>
 								<input id="dsh-end-date" class="dsh-date-picker" placeholder="<spring:message code="label.enddate.key" />">
@@ -152,7 +156,7 @@
 							</div>
 						</div>
 						<div id="review-details" class="ppl-review-item-wrapper">
-							<!-- Populated with reviews -->
+							<!-- Populated with dashboard_reviews.jsp -->
 						</div>
 					</div>
 				</div>
