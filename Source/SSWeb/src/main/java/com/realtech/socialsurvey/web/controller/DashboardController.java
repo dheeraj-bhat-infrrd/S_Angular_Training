@@ -116,6 +116,14 @@ public class DashboardController {
         User user = sessionHelper.getCurrentUser();
 
         UserProfile selectedProfile = (UserProfile) session.getAttribute(CommonConstants.USER_PROFILE);
+        if (selectedProfile == null) {
+			try {
+				sessionHelper.updateProcessedUserProfiles(session, user);
+			}
+			catch (NonFatalException e) {
+				LOG.error("NonFatalException while logging in. Reason : " + e.getMessage(), e);
+			}
+        }
         int profileMasterId = selectedProfile.getProfilesMaster().getProfileId();
 
         model.addAttribute("userId", user.getUserId());
@@ -322,60 +330,62 @@ public class DashboardController {
         return JspResolver.DASHBOARD_SURVEYSTATUS;
     }
 
-    /*
-     * Method to get survey details for generating graph.
-     */
-    @ResponseBody
-    @RequestMapping(value = "/surveydetailsforgraph")
-    public String getSurveyDetailsForGraph(Model model,
-            HttpServletRequest request) {
-        LOG.info("Method to get survey details for generating graph, getGraphDetailsForWeek() started.");
+	/*
+	 * Method to get survey details for generating graph.
+	 */
+	@ResponseBody
+	@RequestMapping(value = "/surveydetailsforgraph")
+	public String getSurveyDetailsForGraph(Model model, HttpServletRequest request) {
+		LOG.info("Method to get survey details for generating graph, getGraphDetailsForWeek() started.");
+		User user = sessionHelper.getCurrentUser();
+		boolean realtechAdmin = user.isSuperAdmin();
 
-        User user = sessionHelper.getCurrentUser();
-        
-        boolean realtechAdmin = user.isSuperAdmin();    
-        
-        try {
-            String columnName = request.getParameter("columnName");
-            String reportType = request.getParameter("reportType");
-            if (!realtechAdmin && (columnName == null || columnName.isEmpty())) {
-                LOG.error("Null/Empty value found for field columnName.");
-                throw new NonFatalException(
-                        "Null/Empty value found for field columnName.");
-            }
+		try {
+			String columnName = request.getParameter("columnName");
+			if (!realtechAdmin && (columnName == null || columnName.isEmpty())) {
+				LOG.error("Null/Empty value found for field columnName.");
+				throw new NonFatalException("Null/Empty value found for field columnName.");
+			}
 
-            long columnValue = 0;
-            try {
-                String columnValueStr = request.getParameter("columnValue");
-                columnValue = Long.parseLong(columnValueStr);
-            } catch (NumberFormatException e) {
-                LOG.error("NumberFormatException caught in getSurveyCountForCompany() while converting columnValue for regionId/branchId/agentId.");
-                throw e;
-            }
-            if (!realtechAdmin
-                    && columnName
-                            .equalsIgnoreCase(CommonConstants.COMPANY_ID_COLUMN)) {
-                columnValue = user.getCompany().getCompanyId();
-            }
-            LOG.info("Method to get details for generating graph, getGraphDetailsForWeek() finished.");
+			long columnValue = 0;
+			try {
+				String columnValueStr = request.getParameter("columnValue");
+				columnValue = Long.parseLong(columnValueStr);
+			}
+			catch (NumberFormatException e) {
+				LOG.error("NumberFormatException in getSurveyCountForCompany() while converting columnValue for regionId/branchId/agentId.");
+				throw e;
+			}
+			
+	        int numberOfDays = -1;
+	        try {
+	            if (request.getParameter("numberOfDays") != null) {
+	                numberOfDays = Integer.parseInt(request.getParameter("numberOfDays"));
+	            }
+	        }
+	        catch (NumberFormatException e) {
+	            LOG.error("NumberFormatException caught in getSurveyCount() while converting numberOfDays.");
+	            throw e;
+	        }
+	        
+			if (!realtechAdmin && columnName.equalsIgnoreCase(CommonConstants.COMPANY_ID_COLUMN)) {
+				columnValue = user.getCompany().getCompanyId();
+			}
+			LOG.info("Method to get details for generating graph, getGraphDetailsForWeek() finished.");
 
-            try {
-                return new Gson().toJson(dashboardService
-                        .getSurveyDetailsForGraph(columnName, columnValue,
-                                reportType, realtechAdmin));
-            } catch (ParseException e) {
-                LOG.error(
-                        "Parse Exception occurred in getSurveyDetailsForGraph(). Nested exception is ",
-                        e);
-                return e.getMessage();
-            }
-        } catch (NonFatalException e) {
-            LOG.error(
-                    "Non fatal EXception caught in getSurveyDetailsForGraph() while getting details of surveys for graph. Nested exception is ",
-                    e);
-            return e.getMessage();
-        }
-    }
+			try {
+				return new Gson().toJson(dashboardService.getSurveyDetailsForGraph(columnName, columnValue, numberOfDays, realtechAdmin));
+			}
+			catch (ParseException e) {
+				LOG.error("Parse Exception occurred in getSurveyDetailsForGraph(). Nested exception is ", e);
+				return e.getMessage();
+			}
+		}
+		catch (NonFatalException e) {
+			LOG.error("NonFatalException caught in getSurveyDetailsForGraph() while getting details of surveys for graph. Nested exception is ", e);
+			return e.getMessage();
+		}
+	}
 
     /*
      * Method to fetch reviews for showing on dash board based upon start index
