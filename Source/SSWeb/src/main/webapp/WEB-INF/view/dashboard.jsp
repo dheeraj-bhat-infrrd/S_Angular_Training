@@ -81,7 +81,7 @@
 					</div>
 				</div>
 				<div class="clearfix dash-sel-wrapper">
-					<div class="float-left dash-sel-lbl"><spring:message code="label.format.key" /></div>
+					<div class="float-left dash-sel-lbl"><spring:message code="label.duration.key" /></div>
 					<select id="dsh-grph-format" class="float-left dash-sel-item">
 						<option value="30"><spring:message code="label.duration.one.key" /></option>
 						<option value="60"><spring:message code="label.duration.two.key" /></option>
