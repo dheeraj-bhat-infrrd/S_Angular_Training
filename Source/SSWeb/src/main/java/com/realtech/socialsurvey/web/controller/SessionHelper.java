@@ -278,6 +278,34 @@ public class SessionHelper {
 			LOG.error("Problem authenticating user" + username, e);
 		}
 	}
+	
+	
+	/**
+	 * Method loginAdminAs to login admin as user
+	 * 
+	 * @param username
+	 * @param password
+	 */
+	public void loginAdminAs(String username, String password) {
+		LOG.debug("Adding newly registered user to session");
+		try {
+			UserDetails userDetails = userDetailsService.loadUserByUsername(username);
+			UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(userDetails, password, userDetails.getAuthorities());
+			userAuthProvider.authenticate(auth);
+
+			if (auth.isAuthenticated()) {
+				SecurityContextHolder.getContext().setAuthentication(auth);
+			}
+
+			if (getCurrentUser() == null) {
+				throw new NullPointerException();
+			}
+		}
+		catch (Exception e) {
+			SecurityContextHolder.getContext().setAuthentication(null);
+			LOG.error("Problem authenticating user" + username, e);
+		}
+	}
 
 	/**
 	 * Method to get active user from Principal

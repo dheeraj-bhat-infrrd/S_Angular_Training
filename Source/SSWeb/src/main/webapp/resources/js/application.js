@@ -7438,3 +7438,12 @@ $(document).on('click','#dsh-dwnld-report-btn',function(){
 		break;
 	}
 });
+
+//function to switch to admin 
+function userSwitchToAdmin() {
+	callAjaxGET("/switchtoadmin.do", function(data){
+		if(data == "success") {
+			window.location = window.location.origin + '/userlogin.do';
+		}
+	}, true);
+}
