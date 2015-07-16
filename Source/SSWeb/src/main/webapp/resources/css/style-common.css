@@ -6953,7 +6953,7 @@ a.sq-btn-post-social:hover, a.sq-btn-post-social:visited {
 	background-repeat: no-repeat;
 }
 
-.v-line-comp[clicked="true"] {
+.comp-row[clicked="true"] .v-line-comp{
 	background-image: url(../images/hm-arrow-open.png);
 }
 
@@ -6989,7 +6989,7 @@ div.v-tbl-spacer {
 
 .comp-hr-cont {
 	position: relative;
-	top: -11px;
+	top: -10px;
 	padding-left: 10px;
 }
 
@@ -7003,4 +7003,9 @@ div.v-tbl-spacer {
 	box-shadow: none;
 	height: 32px;
 	background-color: transparent;
+}
+
+.v-icn-login {
+	background: url(../images/login.png) no-repeat center;
+	background-size : auto 18px;
 }

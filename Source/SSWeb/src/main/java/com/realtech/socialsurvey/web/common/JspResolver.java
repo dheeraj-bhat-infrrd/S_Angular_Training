@@ -109,4 +109,6 @@ public interface JspResolver {
 	public static final String ADMIN_HIERARCHY_VIEW = "admin/admin_hierarchy_view";
 	public static final String ADMIN_COMPANY_HIERARCHY = "admin/company_hierarchy";
 	public static final String ADMIN_COMPANY_LIST = "admin/admin_company_list";
+	public static final String ADMIN_REGION_HIERARCHY = "admin/admin_region_hierarchy";
+	public static final String ADMIN_BRANCH_HIERARCHY = "admin/admin_branch_hierarchy";
 }

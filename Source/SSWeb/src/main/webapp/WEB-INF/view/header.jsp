@@ -184,9 +184,18 @@
 								<spring:message	code="label.header.upgrade.key" />
 							</div>
 						</c:if>
-						<div class="initial-dd-item" onclick="userLogout();">
-							<spring:message code="label.logout.key" />
-						</div>
+						<c:choose>
+							<c:when test="${not empty realTechAdminId }">
+								<div class="initial-dd-item" onclick="userSwitchToAdmin();">
+									<spring:message code="label.switch.key" />
+								</div>
+							</c:when>
+							<c:otherwise>
+								<div class="initial-dd-item" onclick="userLogout();">
+									<spring:message code="label.logout.key" />
+								</div>
+							</c:otherwise>
+						</c:choose>
 					</div>
 				</div>
                 <c:if test="${displaylogo != null}">
