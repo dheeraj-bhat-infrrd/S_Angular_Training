@@ -6168,7 +6168,8 @@ function callBackShowBasicDetails(response) {
 $(document).on('blur', '#prof-basic-container input', function() {
 	var lockId = $(this).attr("id") + "-lock";
 	if ($('#'+lockId).length > 0) {
-		if ($('#prof-all-lock').val() != 'modified' || !$(this).val()) {
+		//if ($('#prof-all-lock').val() != 'modified' || !$(this).val()) {
+		if ($('#prof-all-lock').val() != 'modified') {
 			return;
 		}
 	} else {
