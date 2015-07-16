@@ -756,6 +756,7 @@ input#find-pro-submit{
 
 /*Styles for first time login popup*/
 .overlay-login {
+	padding-bottom: 225px;
 }
 
 .welcome-popup-wrapper {

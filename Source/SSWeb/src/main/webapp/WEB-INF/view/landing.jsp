@@ -58,6 +58,7 @@ function landingFlow() {
 		loadDisplayPicture();
 		$(this).closest('.overlay-login').hide();
 		showDisplayPic();
+		$('body').removeClass('body-no-scroll');
 	});
 	
 	onpopstate = function(event) {

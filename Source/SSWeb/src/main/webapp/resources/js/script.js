@@ -584,7 +584,7 @@ $(window).resize(function(){
 
 function closeMoblieScreenMenu() {
 	$('#header-slider-wrapper').removeClass('rt-panel-slide');
-	$('body').removeClass('body-no-scroll');
+	//$('body').removeClass('body-no-scroll');
 }
 
 function upgradeToPaidPlan(){
