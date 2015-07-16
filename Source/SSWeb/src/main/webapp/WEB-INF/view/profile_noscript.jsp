@@ -104,14 +104,14 @@
     </c:if>
 </head>
 <body>
-	<div class="hide" itemscope itemtype="http://schema.org/Review">
+	<div class="hide" itemscope itemtype="http://schema.org/Product">
 		<h2 itemprop="name"> ${profName} </h2>
 		<span itemprop="title">Reviews</span>
 		<span itemprop="description"></span>
 		<div itemprop="aggregateRating" itemscope itemtype="http://schema.org/AggregateRating">
 			Rated <span itemprop="ratingValue">${floatingAverageGoogleRating }</span> out of
 			<span itemprop="bestRating">5</span> 
-			based on <span itemprop="ratingCount">${reviewsCount}</span>
+			based on <span itemprop="reviewCount">${reviewsCount}</span>
 			reviews
 		</div>
 	</div>
