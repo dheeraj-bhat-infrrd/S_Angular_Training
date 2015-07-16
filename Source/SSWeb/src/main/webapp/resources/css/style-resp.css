@@ -1467,6 +1467,9 @@
 	.dsh-sb-dd {
 		right: 0;
 	}
+	.bread-crum-hdr {
+		border-bottom: 1px solid #dcdcdc;
+	}
 }
 
 
@@ -1775,6 +1778,18 @@
 		width: 250px;
 		left: 10px;
 	}
+	.rating-image-txt {
+		width: 200px;
+		overflow: hidden;
+		text-overflow: ellipsis;
+		white-space: nowrap;
+	}
+	.web-addr-header {
+		padding-left: 10px;
+	}
+	.social-item-icon {
+		width: 32px;
+	}
 }
 
 /* ============== MEDIUM SIZED SCREENS ==============*/
@@ -1924,6 +1939,12 @@
     }
     .welcome-popup-wrapper{
 		width: 95%;
+	}
+	.rating-image-txt {
+		width: 200px;
+		overflow: hidden;
+		text-overflow: ellipsis;
+		white-space: nowrap;
 	}
 }
 

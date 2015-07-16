@@ -1965,7 +1965,7 @@ function showSelectorsByAssignToOption(assignToOption) {
 
 function showAdminPrivilegesChk(){
 	$("#admin-privilege-div").show();
-	if($('.bd-check-img').hasClass('bd-check-img-checked') ){
+	if(!$('.bd-check-img').hasClass('bd-check-img-checked') ){
 		$('.bd-check-img').next("#is-admin-chk").val("true");
 		$('.bd-check-img').removeClass('bd-check-img-checked');
 	}
