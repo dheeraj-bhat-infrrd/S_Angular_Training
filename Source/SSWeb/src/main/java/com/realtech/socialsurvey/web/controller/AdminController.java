@@ -30,6 +30,7 @@ import com.realtech.socialsurvey.core.entities.User;
 import com.realtech.socialsurvey.core.entities.UserFromSearch;
 import com.realtech.socialsurvey.core.enums.DisplayMessageType;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
+import com.realtech.socialsurvey.core.exception.NoRecordsFetchedException;
 import com.realtech.socialsurvey.core.exception.NonFatalException;
 import com.realtech.socialsurvey.core.services.admin.AdminAuthenticationService;
 import com.realtech.socialsurvey.core.services.organizationmanagement.OrganizationManagementService;
@@ -130,12 +131,18 @@ public class AdminController {
 				throw new NonFatalException("MalformedURLException while fetching branches", e);
 			}
 
-			LOG.debug("fetching branches under company from solr");
-			branches = organizationManagementService.getBranchesUnderCompanyFromSolr(company, start);
+			try {
+				LOG.debug("fetching branches under company from solr");
+				branches = organizationManagementService.getBranchesUnderCompanyFromSolr(company, start);
 
-			LOG.debug("fetching users under company from solr");
-			users = organizationManagementService.getUsersUnderCompanyFromSolr(company, start);
-
+				LOG.debug("fetching users under company from solr");
+				users = organizationManagementService.getUsersUnderCompanyFromSolr(company, start);
+			}
+			catch (NoRecordsFetchedException e) {
+				LOG.error("No records found for company branch or region, reason : " + e.getMessage());
+				throw new NonFatalException("No defaul branch or region found for company " + company.getCompany(),
+						DisplayMessageConstants.COMPANY_NOT_REGISTERD, e);
+			}
 			model.addAttribute("companyObj", company);
 
 			model.addAttribute("regions", regions);
