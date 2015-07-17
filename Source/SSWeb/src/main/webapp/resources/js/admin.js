@@ -214,3 +214,17 @@ function bindUserLoginEvent() {
 		}, true, payload);
 	});
 }
+
+$(document).on('click','#send-invite-form-submit',function(){
+	var formData = $('#send-invite-form').serialize();
+	callAjaxGetWithPayloadData("/generateregistrationurl.do", function(data){
+		$('#overlay-toast').html(data);
+		showToast();
+	}, formData, true);
+});
+
+$(document).on('keyup','#send-invite-form',function(e){
+	if(e.which==13){
+		$('#send-invite-form-submit').trigger('click');
+	}
+});
