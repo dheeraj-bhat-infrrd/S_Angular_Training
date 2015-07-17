@@ -24,9 +24,11 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 import com.realtech.socialsurvey.core.commons.AgentRankingReportComparator;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.commons.SurveyResultsComparator;
+import com.realtech.socialsurvey.core.dao.GenericDao;
 import com.realtech.socialsurvey.core.dao.OrganizationUnitSettingsDao;
 import com.realtech.socialsurvey.core.dao.SurveyDetailsDao;
 import com.realtech.socialsurvey.core.dao.impl.MongoSocialPostDaoImpl;
@@ -39,6 +41,7 @@ import com.realtech.socialsurvey.core.entities.User;
 import com.realtech.socialsurvey.core.entities.UserSettings;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.services.organizationmanagement.DashboardService;
+import com.realtech.socialsurvey.core.services.organizationmanagement.ProfileManagementService;
 import com.realtech.socialsurvey.core.services.surveybuilder.SurveyHandler;
 
 // JIRA SS-137 BY RM05:BOC
@@ -54,17 +57,54 @@ public class DashboardServiceImpl implements DashboardService, InitializingBean 
 	private static Map<String, Integer> weightageColumns;
 
 	@Autowired
+	private SurveyHandler surveyHandler;
+
+	@Autowired
 	private SurveyDetailsDao surveyDetailsDao;
 
 	@Autowired
 	private OrganizationUnitSettingsDao organizationUnitSettingsDao;
 	
 	@Autowired
-	private SurveyHandler surveyHandler;
-
+	private GenericDao<SurveyPreInitiation, Long> surveyPreInitiationDao;
+	
+	@Autowired
+	private ProfileManagementService profileManagementService;
+	
 	@Override
+	@Transactional
 	public long getAllSurveyCountForPastNdays(String columnName, long columnValue, int numberOfDays) {
-		return surveyDetailsDao.getSentSurveyCount(columnName, columnValue, numberOfDays);
+		LOG.info("Sent Survey Count for columnName: " + columnName + ", columnValue: " + columnValue);
+		long noOfPreInitiatedSurveys = noOfPreInitiatedSurveys(columnName, columnValue);
+		return noOfPreInitiatedSurveys + surveyDetailsDao.getSentSurveyCount(columnName, columnValue, numberOfDays);
+	}
+
+	private long noOfPreInitiatedSurveys(String columnName, long columnValue) {
+		long noOfPreInitiatedSurveys = 0;
+		// adding pre initiated surveys count
+		if (columnName.equals(CommonConstants.AGENT_ID) || columnName.equals(CommonConstants.COMPANY_ID)) {
+			Map<String, Object> queries = new HashMap<String, Object>();
+			queries.put(CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_ACTIVE);
+			queries.put(columnName, columnValue);
+			noOfPreInitiatedSurveys = surveyPreInitiationDao.findNumberOfRowsByKeyValue(SurveyPreInitiation.class, queries);
+		}
+		else {
+			try {
+				String profileLevel = "";
+				if (columnName.equals(CommonConstants.REGION_ID)) {
+					profileLevel = CommonConstants.PROFILE_LEVEL_REGION;
+				}
+				if (columnName.equals(CommonConstants.BRANCH_ID)) {
+					profileLevel = CommonConstants.PROFILE_LEVEL_BRANCH;
+				}
+				noOfPreInitiatedSurveys = profileManagementService.getIncompleteSurvey(columnValue, 0, 0, 0, -1, profileLevel, null, null, false)
+						.size();
+			}
+			catch (InvalidInputException e) {
+				LOG.error("InvalidInputException caught in getReviews() while fetching reviews. Nested exception is ", e);
+			}
+		}
+		return noOfPreInitiatedSurveys;
 	}
 
 	@Override
