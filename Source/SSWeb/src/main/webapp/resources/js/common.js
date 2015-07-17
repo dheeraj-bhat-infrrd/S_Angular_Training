@@ -769,18 +769,6 @@ function linkedInDataImport() {
 		}
 	}, true);
 }
-function  convertTimeStampToLocalTimeStamp(generalTimestamp){
-	var convertedTimestamp= generalTimestamp.getTime() + (generalTimestamp.getTimezoneOffset())*60*1000 ;
-	var date3=new Date(convertedTimestamp);
-	console.info((date3.getMonth() + 1) + '/' + date3.getDate() + '/' +  date3.getFullYear());
-	var month=((date3.getMonth() + 1)<10)? "0"+(date3.getMonth() + 1) : (date3.getMonth() + 1);
-	var day=(date3.getDate()<10) ? "0"+(date3.getDate()) : (date3.getDate());
-	var minutes= (date3.getMinutes()<10) ? "0"+(date3.getMinutes()) : (date3.getMinutes());
-	var hours= (date3.getHours()<10) ? "0"+(date3.getHours()) : (date3.getHours());
-	var sec=  (date3.getSeconds()<10) ? "0"+(date3.getSeconds()) : (date3.getSeconds());
-	var date4= date3.getFullYear() +'-'+month+'-'+ day +" "+hours+":"+ minutes +":"+ sec+"."+date3.getMilliseconds() ;
-	return date4;
-}
 
 function returnValidWebAddress(url) {
 	if (url && !url.match(/^http([s]?):\/\/.*/)) {
