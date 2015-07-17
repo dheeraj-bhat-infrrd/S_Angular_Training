@@ -146,9 +146,6 @@
 	</div>
 </div>
 
-<link rel="stylesheet" href="${initParam.resourcesPath}/resources/jcrop/jquery.Jcrop.min.css">
-<script src="${initParam.resourcesPath}/resources/jcrop/jquery.Jcrop.min.js"></script>
-<script src="${initParam.resourcesPath}/resources/js/jcrop.js"></script>
 <script>
 var selectedCountryRegEx = "";
 var phoneFormat = '(ddd) ddd-dddd';
@@ -253,7 +250,7 @@ $(document).on('click', '#prof-image-upload-btn', function() {
 	$('#prof-image').trigger('click');
 });
 
-function callBackOnProfileImageUpload(data) {
+/* function callBackOnProfileImageUpload(data) {
 	$('#message-header').html(data);
 	callAjaxGET("./fetchuploadedprofileimage.do", function(profileImageUrl) {
 		if (profilemasterid == 4) {
@@ -273,7 +270,7 @@ function callBackOnProfileImageUpload(data) {
 
 	$('#overlay-toast').html($('#display-msg-div').text().trim());
 	showToast();
-}
+} */
 
 // Company information
 function validateCompanyInformationForm(elementId) {
