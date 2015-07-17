@@ -838,6 +838,7 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao {
 			Calendar calendar = Calendar.getInstance();
 			@SuppressWarnings("unchecked") List<BasicDBObject> sent = (List<BasicDBObject>) result.getRawResults().get("result");
 			Date currDate = Calendar.getInstance().getTime();
+			currDate = getNdaysBackDate(currDate, Calendar.YEAR, 1);
 			for (BasicDBObject sentSurvey : sent) {
 				if (criteriaColumn == "dayOfMonth") {
 					for (String date : sentSurveys.keySet()) {
@@ -864,12 +865,12 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao {
 					}
 				}
 				if (criteriaColumn == "month") {
-					int reductionInMonth = 1;
+					int reductionInMonth = -1;
 					for (String date : sentSurveys.keySet()) {
 						calendar.setTime(new SimpleDateFormat("MMM").parse(date));
 
 						Date startMonth = getNdaysBackDate(currDate, Calendar.MONTH, reductionInMonth);
-						long noOfSurveys = noOfPreInitiatedSurveys(columnName, columnValue, startMonth, currDate);
+						long noOfSurveys = noOfPreInitiatedSurveys(columnName, columnValue, currDate, startMonth);
 						sentSurveys.put(date, noOfSurveys);
 						currDate = startMonth;
 						
