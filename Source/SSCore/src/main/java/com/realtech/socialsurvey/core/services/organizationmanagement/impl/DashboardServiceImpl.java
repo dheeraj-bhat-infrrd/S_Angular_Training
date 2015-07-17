@@ -24,7 +24,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Transactional;
 import com.realtech.socialsurvey.core.commons.AgentRankingReportComparator;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.commons.SurveyResultsComparator;
@@ -41,14 +40,12 @@ import com.realtech.socialsurvey.core.entities.User;
 import com.realtech.socialsurvey.core.entities.UserSettings;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.services.organizationmanagement.DashboardService;
-import com.realtech.socialsurvey.core.services.organizationmanagement.ProfileManagementService;
 import com.realtech.socialsurvey.core.services.surveybuilder.SurveyHandler;
 
 // JIRA SS-137 BY RM05:BOC
 /**
  * Class with methods defined to show dash board of user.
  */
-
 @Component
 public class DashboardServiceImpl implements DashboardService, InitializingBean {
 
@@ -64,47 +61,15 @@ public class DashboardServiceImpl implements DashboardService, InitializingBean 
 
 	@Autowired
 	private OrganizationUnitSettingsDao organizationUnitSettingsDao;
-	
+
 	@Autowired
 	private GenericDao<SurveyPreInitiation, Long> surveyPreInitiationDao;
-	
-	@Autowired
-	private ProfileManagementService profileManagementService;
-	
+
 	@Override
-	@Transactional
 	public long getAllSurveyCountForPastNdays(String columnName, long columnValue, int numberOfDays) {
 		LOG.info("Sent Survey Count for columnName: " + columnName + ", columnValue: " + columnValue);
-		long noOfPreInitiatedSurveys = noOfPreInitiatedSurveys(columnName, columnValue);
+		long noOfPreInitiatedSurveys = surveyDetailsDao.noOfPreInitiatedSurveys(columnName, columnValue, null, null);
 		return noOfPreInitiatedSurveys + surveyDetailsDao.getSentSurveyCount(columnName, columnValue, numberOfDays);
-	}
-
-	private long noOfPreInitiatedSurveys(String columnName, long columnValue) {
-		long noOfPreInitiatedSurveys = 0;
-		// adding pre initiated surveys count
-		if (columnName.equals(CommonConstants.AGENT_ID) || columnName.equals(CommonConstants.COMPANY_ID)) {
-			Map<String, Object> queries = new HashMap<String, Object>();
-			queries.put(CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_ACTIVE);
-			queries.put(columnName, columnValue);
-			noOfPreInitiatedSurveys = surveyPreInitiationDao.findNumberOfRowsByKeyValue(SurveyPreInitiation.class, queries);
-		}
-		else {
-			try {
-				String profileLevel = "";
-				if (columnName.equals(CommonConstants.REGION_ID)) {
-					profileLevel = CommonConstants.PROFILE_LEVEL_REGION;
-				}
-				if (columnName.equals(CommonConstants.BRANCH_ID)) {
-					profileLevel = CommonConstants.PROFILE_LEVEL_BRANCH;
-				}
-				noOfPreInitiatedSurveys = profileManagementService.getIncompleteSurvey(columnValue, 0, 0, 0, -1, profileLevel, null, null, false)
-						.size();
-			}
-			catch (InvalidInputException e) {
-				LOG.error("InvalidInputException caught in getReviews() while fetching reviews. Nested exception is ", e);
-			}
-		}
-		return noOfPreInitiatedSurveys;
 	}
 
 	@Override
@@ -273,7 +238,7 @@ public class DashboardServiceImpl implements DashboardService, InitializingBean 
 		Integer counter = 1;
 		int max = 0;
 		int internalMax = 0;
-		
+
 		// This data needs to be written (List<Object>)
 		Map<String, List<Object>> data = new TreeMap<>();
 		List<Object> surveyDetailsToPopulate = new ArrayList<>();
@@ -284,7 +249,7 @@ public class DashboardServiceImpl implements DashboardService, InitializingBean 
 			surveyDetailsToPopulate.add(survey.getCustomerEmailId());
 			surveyDetailsToPopulate.add(survey.getCreatedOn());
 			surveyDetailsToPopulate.add(survey.getModifiedOn());
-			
+
 			try {
 				surveyDetailsToPopulate.add(surveyHandler.composeLink(survey.getAgentId(), survey.getCustomerEmailId()));
 			}
@@ -306,7 +271,7 @@ public class DashboardServiceImpl implements DashboardService, InitializingBean 
 			internalMax++;
 			surveyDetailsToPopulate.add("Question " + counter);
 		}
-		
+
 		data.put("1", surveyDetailsToPopulate);
 
 		// Iterate over data and write to sheet
@@ -315,7 +280,7 @@ public class DashboardServiceImpl implements DashboardService, InitializingBean 
 		for (String key : keyset) {
 			Row row = sheet.createRow(rownum++);
 			List<Object> objArr = data.get(key);
-			
+
 			int cellnum = 0;
 			for (Object obj : objArr) {
 				Cell cell = row.createCell(cellnum++);
@@ -329,10 +294,10 @@ public class DashboardServiceImpl implements DashboardService, InitializingBean 
 				}
 			}
 		}
-		
+
 		return workbook;
 	}
-	
+
 	/*
 	 * Method to create excel file for Social posts.
 	 */
@@ -347,10 +312,10 @@ public class DashboardServiceImpl implements DashboardService, InitializingBean 
 		CellStyle style = workbook.createCellStyle();
 		style.setDataFormat(df.getFormat("d-mm-yyyy"));
 		Integer counter = 1;
-		
+
 		// Sorting SurveyResults
 		Collections.sort(surveyDetails, new SurveyResultsComparator());
-		
+
 		// This data needs to be written (List<Object>)
 		Map<String, List<Object>> data = new TreeMap<>();
 		List<Object> surveyDetailsToPopulate = new ArrayList<>();
@@ -359,23 +324,23 @@ public class DashboardServiceImpl implements DashboardService, InitializingBean 
 				surveyDetailsToPopulate.add(survey.getReview());
 				surveyDetailsToPopulate.add(DATE_FORMATTER.format(survey.getModifiedOn()));
 				surveyDetailsToPopulate.add(StringUtils.join(survey.getSharedOn(), ","));
-				
+
 				String agentName = survey.getAgentName();
 				surveyDetailsToPopulate.add(agentName.substring(0, agentName.lastIndexOf(' ')));
 				surveyDetailsToPopulate.add(agentName.substring(agentName.lastIndexOf(' ') + 1));
-				
+
 				data.put((++counter).toString(), surveyDetailsToPopulate);
 				surveyDetailsToPopulate = new ArrayList<>();
 			}
 		}
-		
+
 		// Setting up headers
 		surveyDetailsToPopulate.add(CommonConstants.HEADER_POST_COMMENT);
 		surveyDetailsToPopulate.add(CommonConstants.HEADER_POST_DATE);
 		surveyDetailsToPopulate.add(CommonConstants.HEADER_POST_SOURCE);
 		surveyDetailsToPopulate.add(CommonConstants.HEADER_AGENT_FIRST_NAME);
 		surveyDetailsToPopulate.add(CommonConstants.HEADER_AGENT_LAST_NAME);
-		
+
 		data.put("1", surveyDetailsToPopulate);
 
 		// Iterate over data and write to sheet
@@ -418,16 +383,16 @@ public class DashboardServiceImpl implements DashboardService, InitializingBean 
 		Integer counter = 1;
 		int max = 0;
 		int internalMax = 0;
-		
+
 		// Sorting SurveyResults
 		Collections.sort(surveyDetails, new SurveyResultsComparator());
-		
+
 		// This data needs to be written (List<Object>)
 		Map<String, List<Object>> data = new TreeMap<>();
 		List<Object> surveyDetailsToPopulate = new ArrayList<>();
 		for (SurveyDetails survey : surveyDetails) {
 			internalMax = 0;
-			
+
 			String agentName = survey.getAgentName();
 			surveyDetailsToPopulate.add(agentName.substring(0, agentName.lastIndexOf(' ')));
 			surveyDetailsToPopulate.add(agentName.substring(agentName.lastIndexOf(' ') + 1));
@@ -441,13 +406,13 @@ public class DashboardServiceImpl implements DashboardService, InitializingBean 
 			else {
 				surveyDetailsToPopulate.add(MongoSocialPostDaoImpl.KEY_SOURCE_SS);
 			}
-			
+
 			surveyDetailsToPopulate.add(survey.getScore());
 			for (SurveyResponse response : survey.getSurveyResponse()) {
 				internalMax++;
 				surveyDetailsToPopulate.add(response.getAnswer());
 			}
-			
+
 			surveyDetailsToPopulate.add(survey.getMood());
 			surveyDetailsToPopulate.add(survey.getReview());
 			if (survey.getAgreedToShare() != null && !survey.getAgreedToShare().isEmpty()) {
@@ -465,15 +430,15 @@ public class DashboardServiceImpl implements DashboardService, InitializingBean 
 			else {
 				surveyDetailsToPopulate.add(CommonConstants.STATUS_NO);
 			}
-			
+
 			surveyDetailsToPopulate.add(StringUtils.join(survey.getSharedOn(), ","));
-			
+
 			data.put((++counter).toString(), surveyDetailsToPopulate);
 			surveyDetailsToPopulate = new ArrayList<>();
 			if (internalMax > max)
 				max = internalMax;
 		}
-		
+
 		// Setting up headers
 		surveyDetailsToPopulate.add(CommonConstants.HEADER_AGENT_FIRST_NAME);
 		surveyDetailsToPopulate.add(CommonConstants.HEADER_AGENT_LAST_NAME);
@@ -490,7 +455,7 @@ public class DashboardServiceImpl implements DashboardService, InitializingBean 
 		surveyDetailsToPopulate.add(CommonConstants.HEADER_CUSTOMER_COMMENTS);
 		surveyDetailsToPopulate.add(CommonConstants.HEADER_AGREED_SHARE);
 		surveyDetailsToPopulate.add(CommonConstants.HEADER_CLICK_THROUGH);
-		
+
 		data.put("1", surveyDetailsToPopulate);
 
 		// Iterate over data and write to sheet
@@ -531,10 +496,10 @@ public class DashboardServiceImpl implements DashboardService, InitializingBean 
 		CellStyle style = workbook.createCellStyle();
 		style.setDataFormat(df.getFormat("d-mm-yyyy"));
 		Integer counter = 1;
-		
+
 		// Sorting AgentRankingReports
 		Collections.sort(agentDetails, new AgentRankingReportComparator());
-		
+
 		// This data needs to be written (List<Object>)
 		Map<String, List<Object>> data = new TreeMap<>();
 		List<Object> surveyDetailsToPopulate = new ArrayList<>();
@@ -543,11 +508,11 @@ public class DashboardServiceImpl implements DashboardService, InitializingBean 
 			surveyDetailsToPopulate.add(agentDetail.getAgentLastName());
 			surveyDetailsToPopulate.add(agentDetail.getAverageScore());
 			surveyDetailsToPopulate.add(agentDetail.getIncompleteSurveys() + agentDetail.getCompletedSurveys());
-			
+
 			Calendar calendar = Calendar.getInstance();
 			calendar.setTimeInMillis(agentDetail.getRegistrationDate());
 			surveyDetailsToPopulate.add(DATE_FORMATTER.format(calendar.getTime()));
-			
+
 			data.put((++counter).toString(), surveyDetailsToPopulate);
 			surveyDetailsToPopulate = new ArrayList<>();
 		}
