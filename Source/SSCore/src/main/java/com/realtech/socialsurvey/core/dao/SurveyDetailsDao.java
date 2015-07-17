@@ -84,4 +84,6 @@ public interface SurveyDetailsDao {
 
 	public void getCompletedSurveysCount(Date startDate, Date endDate, Map<Long, AgentRankingReport> agentReportData, String colunmName,
 			long columnValue);
+	
+	public long noOfPreInitiatedSurveys(String columnName, long columnValue, Date startDate, Date endDate);
 }

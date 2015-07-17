@@ -158,6 +158,10 @@ public class SurveyPreInitiationDaoImpl extends GenericDaoImpl<SurveyPreInitiati
 		}
 		
 		for (SurveyPreInitiation survey : surveys) {
+			if (survey.getStatus() != CommonConstants.SURVEY_STATUS_PRE_INITIATED) {
+				continue;
+			}
+			
 			AgentRankingReport agentRankingReport = null;
 			if (agentReportData.containsKey(survey.getAgentId())) {
 				agentRankingReport = agentReportData.get(survey.getAgentId());
@@ -168,7 +172,6 @@ public class SurveyPreInitiationDaoImpl extends GenericDaoImpl<SurveyPreInitiati
 				agentRankingReport.setAgentName(survey.getAgentName());
 			}
 			
-			// agentRankingReport.setAllTimeIncompleteSurveys(agentRankingReport.getAllTimeIncompleteSurveys() + 1);
 			agentRankingReport.setIncompleteSurveys(agentRankingReport.getIncompleteSurveys() + 1);
 			agentReportData.put(survey.getAgentId(), agentRankingReport);
 		}
