@@ -1231,10 +1231,10 @@ public class SocialManagementController {
 	@RequestMapping(value = "/linkedindataimport")
 	public String linkedInDataImport(HttpServletRequest request, Model model) {
 		LOG.info("Method linkedInDataImport() called from SocialManagementController");
-		String facebookProfileUrl = "";
+		/*String facebookProfileUrl = "";
 		String twitterProfileUrl = "";
+		String googleProfileUrl = "";*/
 		String linkedinProfileUrl = "";
-		String googleProfileUrl = "";
 		try {
 			sessionHelper.getCanonicalSettings(request.getSession(false));
 		}
@@ -1242,10 +1242,10 @@ public class SocialManagementController {
 			LOG.error("Exception caught while importing links for various pages of the Agent. Nested exception is ", e.getMessage());
 			return JspResolver.ERROR_PAGE;
 		}
-		/*	HttpSession session = request.getSession(false);
+		HttpSession session = request.getSession(false);
 		UserSettings usersettings = (UserSettings) session.getAttribute(CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION);
 		if(usersettings!=null && usersettings.getAgentSettings()!=null && usersettings.getAgentSettings().getSocialMediaTokens()!=null){
-			if(usersettings.getAgentSettings().getSocialMediaTokens().getFacebookToken()!=null
+			/*if(usersettings.getAgentSettings().getSocialMediaTokens().getFacebookToken()!=null
 				&& usersettings.getAgentSettings().getSocialMediaTokens().getFacebookToken().getFacebookPageLink()!=null){
 				facebookProfileUrl = usersettings.getAgentSettings().getSocialMediaTokens().getFacebookToken().getFacebookPageLink();
 			}
@@ -1256,16 +1256,16 @@ public class SocialManagementController {
 			if(usersettings.getAgentSettings().getSocialMediaTokens().getGoogleToken()!=null
 					&& usersettings.getAgentSettings().getSocialMediaTokens().getGoogleToken().getProfileLink()!=null){
 					googleProfileUrl = usersettings.getAgentSettings().getSocialMediaTokens().getGoogleToken().getProfileLink();
-			}
+			}*/
 			if(usersettings.getAgentSettings().getSocialMediaTokens().getLinkedInToken()!=null
 					&& usersettings.getAgentSettings().getSocialMediaTokens().getLinkedInToken().getLinkedInPageLink()!=null){
 					linkedinProfileUrl = usersettings.getAgentSettings().getSocialMediaTokens().getLinkedInToken().getLinkedInPageLink();
 			}
-		}*/
-		model.addAttribute("facebookProfileUrl", facebookProfileUrl);
-		model.addAttribute("twitterProfileUrl", twitterProfileUrl);
+		}
 		model.addAttribute("linkedinProfileUrl", linkedinProfileUrl);
-		model.addAttribute("googleProfileUrl", googleProfileUrl);
+		/*model.addAttribute("facebookProfileUrl", facebookProfileUrl);
+		model.addAttribute("twitterProfileUrl", twitterProfileUrl);
+		model.addAttribute("googleProfileUrl", googleProfileUrl);*/
 		return JspResolver.LINKEDIN_IMPORT;
 	}
 

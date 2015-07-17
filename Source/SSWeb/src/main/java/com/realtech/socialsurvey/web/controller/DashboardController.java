@@ -36,6 +36,7 @@ import com.realtech.socialsurvey.core.entities.AgentRankingReport;
 import com.realtech.socialsurvey.core.entities.AgentSettings;
 import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
 import com.realtech.socialsurvey.core.entities.ProfileStage;
+import com.realtech.socialsurvey.core.entities.SocialMediaTokens;
 import com.realtech.socialsurvey.core.entities.SurveyDetails;
 import com.realtech.socialsurvey.core.entities.SurveyPreInitiation;
 import com.realtech.socialsurvey.core.entities.SurveyRecipient;
@@ -1740,5 +1741,37 @@ public class DashboardController {
                     e);
         }
     }
+    
+    
+    @RequestMapping(value = "/fetchsociallinksinpopup")
+    public String fetchSocialLinksInPopup(HttpServletRequest request, Model model) {
+    	LOG.info("Method fetchSocialLinksInPopup() called");
+    	
+    	HttpSession session = request.getSession();
+		
+        UserSettings userSettings = (UserSettings) session.getAttribute( CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION );
+        OrganizationUnitSettings unitSettings = null;
+        unitSettings = userSettings.getAgentSettings();
+        
+        SocialMediaTokens tokens = unitSettings.getSocialMediaTokens(); 
+        
+        if (tokens != null) {
+        	if (tokens.getFacebookToken() != null && tokens.getFacebookToken().getFacebookPageLink() != null ){
+        		model.addAttribute("facebookProfileUrl", tokens.getFacebookToken().getFacebookPageLink());
+        	}
+        	if (tokens.getGoogleToken() != null && tokens.getGoogleToken().getProfileLink() != null ) {
+        		model.addAttribute("googleProfileUrl", tokens.getGoogleToken().getProfileLink());
+        	}
+        	if (tokens.getTwitterToken() != null && tokens.getTwitterToken().getTwitterPageLink() != null) {
+        		model.addAttribute("twitterProfileUrl", tokens.getTwitterToken().getTwitterPageLink());
+        	}
+        	if (tokens.getLinkedInToken() != null && tokens.getLinkedInToken().getLinkedInPageLink() != null) {
+        		model.addAttribute("linkedinProfileUrl", tokens.getLinkedInToken().getLinkedInPageLink() );
+        	}
+        }
+        
+		return JspResolver.LINKEDIN_IMPORT_SOCIAL_LINKS;
+    }
+    
 }
 // JIRA SS-137 : by RM-05 : EOC

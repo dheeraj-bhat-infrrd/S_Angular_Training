@@ -110,8 +110,8 @@ $(window).on('unload', function(){
 				'socialNetwork' : "linkedin"
 			};
 			fetchSocialProfileUrl(payload, function(data) {
-				parentWindow.showLinkedInProfileUrl(data);
-				parentWindow.showProfileLink("linkedin", data);
+				parentWindow.showLinkedInProfileUrl(data.responseText);
+				parentWindow.showProfileLink("linkedin", data.responseText);
 			});
 		}
 		else {
@@ -120,8 +120,9 @@ $(window).on('unload', function(){
 			};
 			fetchSocialProfileUrl(payload, function(data) {
 				if(data.statusText == 'OK'){
+					parentWindow.loadSocialMediaUrlInPopup();
 					parentWindow.loadSocialMediaUrlInSettingsPage();
-					//parentWindow.showProfileLink("${socialNetwork}", data.responseText);
+					parentWindow.showProfileLink("${socialNetwork}", data.responseText);
 					parentWindow.showProfileLinkInEditProfilePage("${socialNetwork}", data.responseText);					
 				}
 			});
