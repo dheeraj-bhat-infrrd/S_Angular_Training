@@ -44,6 +44,7 @@
 		<!-- ForgotPassword Services -->
 		<intercept-url pattern="/forgotPassword.do" access="permitAll" />
 		<intercept-url pattern="/sendresetpasswordlink.do" access="permitAll" />
+		<intercept-url pattern="/resetpassword.do" access="permitAll" />
 		<intercept-url pattern="/setnewpassword.do" access="permitAll" />
 
 		<!-- Amdin pages -->

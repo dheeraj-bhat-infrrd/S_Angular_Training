@@ -1730,12 +1730,12 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 		switch (profileLevel) {
 			case CommonConstants.PROFILE_LEVEL_REGION:
 				queries.put("regionId", iden);
-				queries.put("profilesMaster", userManagementService.getProfilesMasterById(CommonConstants.PROFILES_MASTER_REGION_ADMIN_PROFILE_ID));
+				// queries.put("profilesMaster", userManagementService.getProfilesMasterById(CommonConstants.PROFILES_MASTER_REGION_ADMIN_PROFILE_ID));
 				users = userProfileDao.findByKeyValue(UserProfile.class, queries);
 				break;
 			case CommonConstants.PROFILE_LEVEL_BRANCH:
 				queries.put("branchId", iden);
-				queries.put("profilesMaster", userManagementService.getProfilesMasterById(CommonConstants.PROFILES_MASTER_BRANCH_ADMIN_PROFILE_ID));
+				// queries.put("profilesMaster", userManagementService.getProfilesMasterById(CommonConstants.PROFILES_MASTER_BRANCH_ADMIN_PROFILE_ID));
 				users = userProfileDao.findByKeyValue(UserProfile.class, queries);
 				break;
 			case CommonConstants.PROFILE_LEVEL_INDIVIDUAL:
@@ -1747,6 +1747,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 		for (UserProfile user : users) {
 			userIds.add(user.getUser().getUserId());
 		}
+		
 		return userIds;
 	}
 
