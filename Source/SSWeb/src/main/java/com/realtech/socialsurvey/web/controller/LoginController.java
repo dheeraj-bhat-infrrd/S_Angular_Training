@@ -150,12 +150,13 @@ public class LoginController {
 	 * @return
 	 */
 	@RequestMapping(value = "/userlogin", method = RequestMethod.GET)
-	public String login(Model model, HttpServletRequest request, HttpServletResponse response) {
+	public String login(Model model, HttpServletRequest request, HttpServletResponse response, RedirectAttributes redirectAttributes) {
 		LOG.info("Login controller called for user login");
 		User user = null;
 		AccountType accountType = null;
 		String redirectTo = null;
 		String isDirectRegistration = null;
+		
 		try {
 			// Setting the direct registration flag
 			isDirectRegistration = request.getParameter("isDirectRegistration");
@@ -176,20 +177,19 @@ public class LoginController {
 			else {
 				model.addAttribute("skippayment", "false");
 			}
-			user = sessionHelper.getCurrentUser();
+			
 			HttpSession session = request.getSession(true);
+			user = sessionHelper.getCurrentUser();
+			user = userManagementService.getUserByUserId(user.getUserId());
+			userManagementService.setProfilesOfUser(user);
 
-			
-			//Check if super admin is logged in
-			
+			// Check if super admin is logged in
 			if(user.isSuperAdmin()) {
 				return JspResolver.ADMIN_LANDING;
 			}
 			
-			
 			List<LicenseDetail> licenseDetails = user.getCompany().getLicenseDetails();
 			if (licenseDetails != null && !licenseDetails.isEmpty()) {
-
 				LicenseDetail licenseDetail = licenseDetails.get(0);
 				accountType = AccountType.getAccountType(licenseDetail.getAccountsMaster().getAccountsMasterId());
 				session.setAttribute(CommonConstants.ACCOUNT_TYPE_IN_SESSION, accountType);
@@ -216,17 +216,18 @@ public class LoginController {
 
 				LOG.debug("Company profile not complete, redirecting to company information page");
 				redirectTo = JspResolver.COMPANY_INFORMATION;
-				if (redirectTo.equals(JspResolver.COMPANY_INFORMATION)) {
-					List<VerticalsMaster> verticalsMasters = null;
-					try {
-						verticalsMasters = organizationManagementService.getAllVerticalsMaster();
-					}
-					catch (InvalidInputException e) {
-						throw new InvalidInputException("Invalid Input exception occured in method getAllVerticalsMaster()",
-								DisplayMessageConstants.GENERAL_ERROR, e);
-					}
-					model.addAttribute("verticals", verticalsMasters);
+				
+				List<VerticalsMaster> verticalsMasters = null;
+				try {
+					verticalsMasters = organizationManagementService.getAllVerticalsMaster();
 				}
+				catch (InvalidInputException e) {
+					throw new InvalidInputException("Invalid Input exception occured in method getAllVerticalsMaster()",
+							DisplayMessageConstants.GENERAL_ERROR, e);
+				}
+				
+				redirectAttributes.addFlashAttribute("verticals", verticalsMasters);
+				return "redirect:/" + JspResolver.COMPANY_INFORMATION_PAGE + ".do";
 			}
 			else {
 				LOG.debug("Company profile complete, check any of the user profiles is entered");
@@ -266,7 +267,7 @@ public class LoginController {
 									&& (userProfile.getProfilesMaster().getProfileId() == CommonConstants.PROFILES_MASTER_COMPANY_ADMIN_PROFILE_ID))
 								adminProfile = userProfile;
 						}
-						redirectTo = getRedirectionFromProfileCompletionStage(adminProfile.getProfileCompletionStage());
+						redirectTo = getRedirectionFromProfileCompletionStage(adminProfile, redirectAttributes);
 					}
 					else {
 						redirectTo = JspResolver.LANDING;
@@ -319,15 +320,16 @@ public class LoginController {
 		}
 		catch (NonFatalException e) {
 			LOG.error("NonFatalException while logging in. Reason : " + e.getMessage(), e);
-			model.addAttribute("message", messageUtils.getDisplayMessage(e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE));
-			model.addAttribute("isDirectRegistration", isDirectRegistration);
-			return JspResolver.LOGIN;
+			redirectAttributes.addFlashAttribute("message", messageUtils.getDisplayMessage(e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE));
+			redirectAttributes.addFlashAttribute("isDirectRegistration", isDirectRegistration);
+			return "redirect:/" + JspResolver.LOGIN + ".do";
 		}
+		
 		// set the direct registration value, in case if its a manual
 		// registration
 		LOG.debug("Settings isDirectRegistration to " + request.getParameter("isDirectRegistration"));
-		model.addAttribute("isDirectRegistration", isDirectRegistration);
-		return redirectTo;
+		redirectAttributes.addFlashAttribute("isDirectRegistration", isDirectRegistration);
+		return "redirect:/" + redirectTo + ".do";
 	}
 
 	/**
@@ -634,18 +636,39 @@ public class LoginController {
 	 * @return
 	 * @throws InvalidInputException
 	 */
-	private String getRedirectionFromProfileCompletionStage(String profileCompletionStage) throws InvalidInputException {
+	private String getRedirectionFromProfileCompletionStage(UserProfile adminProfile, RedirectAttributes redirectAttributes)
+			throws InvalidInputException {
+		String profileCompletionStage = adminProfile.getProfileCompletionStage();
 		LOG.debug("Method getRedirectionFromProfileCompletionStage called for profileCompletionStage: " + profileCompletionStage);
+		
 		String redirectTo = null;
 		switch (profileCompletionStage) {
 			case CommonConstants.ADD_COMPANY_STAGE:
-				redirectTo = JspResolver.COMPANY_INFORMATION;
+				List<VerticalsMaster> verticalsMasters = null;
+				try {
+					verticalsMasters = organizationManagementService.getAllVerticalsMaster();
+				}
+				catch (InvalidInputException e) {
+					throw new InvalidInputException("Invalid Input exception occured in method getAllVerticalsMaster()",
+							DisplayMessageConstants.GENERAL_ERROR, e);
+				}
+				redirectAttributes.addFlashAttribute("verticals", verticalsMasters);
+				redirectTo = JspResolver.COMPANY_INFORMATION_PAGE;
+
 				break;
 			case CommonConstants.ADD_ACCOUNT_TYPE_STAGE:
-				redirectTo = JspResolver.ACCOUNT_TYPE_SELECTION;
+				String invoiceType = adminProfile.getCompany().getBillingMode();
+				if (invoiceType.equalsIgnoreCase(CommonConstants.BILLING_MODE_INVOICE)) {
+					redirectAttributes.addFlashAttribute("skippayment", "true");
+				}
+				else if (invoiceType.equalsIgnoreCase(CommonConstants.BILLING_MODE_AUTO)) {
+					redirectAttributes.addFlashAttribute("skippayment", "false");
+				}
+				redirectTo = JspResolver.ACCOUNT_TYPE_SELECTION_PAGE;
+
 				break;
 			case CommonConstants.PRE_PROCESSING_BEFORE_LOGIN_STAGE:
-				redirectTo = "redirect:./" + CommonConstants.PRE_PROCESSING_BEFORE_LOGIN_STAGE;
+				redirectTo = CommonConstants.PRE_PROCESSING_BEFORE_LOGIN_STAGE;
 				break;
 			case CommonConstants.DASHBOARD_STAGE:
 				redirectTo = JspResolver.LANDING;

@@ -183,12 +183,37 @@ public class DashboardServiceImpl implements DashboardService, InitializingBean 
 	}
 
 	@Override
-	public Map<String, Map<String, Long>> getSurveyDetailsForGraph(String columnName, long columnValue, String reportType, boolean realtechAdmin) throws ParseException{
+	public Map<String, Map<String, Long>> getSurveyDetailsForGraph(String columnName, long columnValue, int numberOfDays, boolean realtechAdmin)
+			throws ParseException {
+		String criteria = "";
+		int noOfDaysToConsider = -1;
+		switch (numberOfDays) {
+			case 30:
+				noOfDaysToConsider = numberOfDays + Calendar.getInstance().get(Calendar.DAY_OF_WEEK);
+				criteria = "week";
+				break;
+			case 60:
+				noOfDaysToConsider = numberOfDays + Calendar.getInstance().get(Calendar.DAY_OF_WEEK);
+				criteria = "week";
+				break;
+			case 90:
+				noOfDaysToConsider = numberOfDays + Calendar.getInstance().get(Calendar.DAY_OF_WEEK);
+				criteria = "week";
+				break;
+			case 365:
+				noOfDaysToConsider = numberOfDays + Calendar.getInstance().get(Calendar.DAY_OF_MONTH);
+				criteria = "month";
+				break;
+		}
+
 		Map<String, Map<String, Long>> map = new HashMap<String, Map<String, Long>>();
-		map.put("clicked", surveyDetailsDao.getClickedSurveyByCriteria(columnName, columnValue, reportType, realtechAdmin));
-		map.put("sent", surveyDetailsDao.getSentSurveyByCriteria(columnName, columnValue, reportType, realtechAdmin));
-		map.put("complete", surveyDetailsDao.getCompletedSurveyByCriteria(columnName, columnValue, reportType, realtechAdmin));
-		map.put("socialposts", surveyDetailsDao.getSocialPostsCountByCriteria(columnName, columnValue, reportType, realtechAdmin));
+		map.put("clicked",
+				surveyDetailsDao.getClickedSurveyByCriteria(columnName, columnValue, numberOfDays, noOfDaysToConsider, criteria, realtechAdmin));
+		map.put("sent", surveyDetailsDao.getSentSurveyByCriteria(columnName, columnValue, numberOfDays, noOfDaysToConsider, criteria, realtechAdmin));
+		map.put("complete",
+				surveyDetailsDao.getCompletedSurveyByCriteria(columnName, columnValue, numberOfDays, noOfDaysToConsider, criteria, realtechAdmin));
+		map.put("socialposts",
+				surveyDetailsDao.getSocialPostsCountByCriteria(columnName, columnValue, numberOfDays, noOfDaysToConsider, criteria, realtechAdmin));
 		return map;
 	}
 
