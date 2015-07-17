@@ -32,6 +32,7 @@ import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.dao.SurveyDetailsDao;
 import com.realtech.socialsurvey.core.entities.AgentRankingReport;
 import com.realtech.socialsurvey.core.entities.SurveyDetails;
+import com.realtech.socialsurvey.core.entities.SurveyPreInitiation;
 import com.realtech.socialsurvey.core.entities.SurveyResponse;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.services.organizationmanagement.SurveyPreInitiationService;
@@ -1276,7 +1277,6 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao {
 	
 	@Override
 	public long noOfPreInitiatedSurveys(String columnName, long columnValue, Date startDate, Date endDate) {
-		long noOfPreInitiatedSurveys = 0l;
 		String profileLevel = "";
 		if (columnName.equals(CommonConstants.COMPANY_ID)) {
 			profileLevel = CommonConstants.PROFILE_LEVEL_COMPANY;
@@ -1291,9 +1291,15 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao {
 			profileLevel = CommonConstants.PROFILE_LEVEL_INDIVIDUAL;
 		}
 
+		long noOfPreInitiatedSurveys = 0l;
 		try {
-			noOfPreInitiatedSurveys = surveyPreInitiationService.getIncompleteSurvey(columnValue, 0, 0, 0, -1, profileLevel, startDate, endDate,
-					false).size();
+			List<SurveyPreInitiation> preInitiations = surveyPreInitiationService.getIncompleteSurvey(columnValue, 0, 0, 0, -1, profileLevel, startDate, endDate,
+					false);
+			for (SurveyPreInitiation initiation : preInitiations) {
+				if (initiation.getStatus() == CommonConstants.SURVEY_STATUS_PRE_INITIATED) {
+					noOfPreInitiatedSurveys++;
+				}
+			}
 		}
 		catch (InvalidInputException e) {
 			LOG.error("InvalidInputException caught in noOfPreInitiatedSurveys() while fetching reviews. Nested exception is ", e);
