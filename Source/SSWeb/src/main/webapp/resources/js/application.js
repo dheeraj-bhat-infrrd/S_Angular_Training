@@ -4428,6 +4428,12 @@ function loadSocialMediaUrlInSettingsPage() {
 	}, false);
 }
 
+function loadSocialMediaUrlInPopup() {
+	callAjaxGET('/fetchsociallinksinpopup.do', function(data){
+		$('#wc-step3-body-cont').html(data);
+	}, false);
+}
+
 function showProfileLink(source, profileUrl){
 	if(source=='facebook'){
 		$('#fb-profile-url').html(profileUrl);
@@ -6248,21 +6254,49 @@ $(document).on('change', '#prof-logo', function() {
 
 // Function to crop and upload profile image
 function callBackOnProfileImageUpload(data) {
-	$('#prof-message-header').html(data);
 
-	callAjaxGET("./fetchprofileimage.do", function(data) {
-		$('#prof-img-container').html(data);
-		var profileImageUrl = $('#prof-image-edit').css("background-image");
-		if (profileImageUrl == undefined || profileImageUrl == "none") {
-			return;
-		}
-		adjustImage();
-		hideOverlay();
-	});
+	if ($('#overlay-linkedin-import').is(":visible")) {
+		$('#message-header').html(data);
+		callAjaxGET("./fetchuploadedprofileimage.do",
+				function(profileImageUrl) {
+					if (profilemasterid == 4) {
+						$("#wc-photo-upload").removeClass('dsh-pers-default-img');
+					} else if (profilemasterid == 3) {
+						$("#wc-photo-upload").removeClass('dsh-office-default-img');
+					} else if (profilemasterid == 2) {
+						$("#wc-photo-upload").removeClass('dsh-region-default-img');
+					} else if (profilemasterid == 1) {
+						$("#wc-photo-upload").removeClass('dsh-comp-default-img');
+					}
 
-	$('#overlay-toast').html($('#display-msg-div').text().trim());
-	showToast();
-	loadDisplayPicture();
+					$('#wc-photo-upload').css("background",
+							"url(" + profileImageUrl + ") no-repeat center");
+					$('#wc-photo-upload').css("background-size", "contain");
+					hideOverlay();
+				});
+
+		$('#overlay-toast').html($('#display-msg-div').text().trim());
+		showToast();
+	} else {
+		$('#prof-message-header').html(data);
+
+		callAjaxGET("./fetchprofileimage.do",
+				function(data) {
+					$('#prof-img-container').html(data);
+					var profileImageUrl = $('#prof-image-edit').css(
+							"background-image");
+					if (profileImageUrl == undefined
+							|| profileImageUrl == "none") {
+						return;
+					}
+					adjustImage();
+					hideOverlay();
+				});
+
+		$('#overlay-toast').html($('#display-msg-div').text().trim());
+		showToast();
+		loadDisplayPicture();
+	}
 }
 
 // Agent details

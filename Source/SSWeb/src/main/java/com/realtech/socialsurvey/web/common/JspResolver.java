@@ -42,6 +42,7 @@ public interface JspResolver {
 
 	// Dashboard
 	public static final String LINKEDIN_IMPORT = "linkedin_import";
+	public static final String LINKEDIN_IMPORT_SOCIAL_LINKS = "linkedin_import_social_links";
 	public static final String LINKEDIN_COMPARE = "linkedin_compare";
 	public static final String HEADER_SURVEY_INVITE = "header_sendsurveyinvite";
 	public static final String HEADER_SURVEY_INVITE_ADMIN = "header_sendsurveyinvite_admin";
