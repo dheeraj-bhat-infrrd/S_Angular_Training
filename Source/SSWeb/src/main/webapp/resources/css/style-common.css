@@ -7023,3 +7023,8 @@ div.v-tbl-spacer {
 	background: url(../images/login.png) no-repeat center;
 	background-size : auto 18px;
 }
+
+.hdr-prof-sel {
+	z-index: 99;
+	margin-left: 50px;
+}
