@@ -559,7 +559,7 @@ public class RegistrationController
 
             String url = urlGenerator.generateUrl( params, applicationBaseUrl + CommonConstants.MANUAL_REGISTRATION );
             emailServices.sendManualRegistrationLink( creatorEmailId, firstName, lastName, url );
-            result = "Done";
+            result = "Invitation sent successfully";
         } catch ( InvalidInputException | UndeliveredEmailException | UnsupportedEncodingException | NoRecordsFetchedException e ) {
             LOG.error( "Exception caught while sending mail to generating registration url", e );
             result = "Something went wrong. " + e.getMessage();
