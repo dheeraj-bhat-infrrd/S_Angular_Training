@@ -104,14 +104,14 @@
     </c:if>
 </head>
 <body>
-	<div class="hide" itemscope itemtype="http://schema.org/Review">
+	<div class="hide" itemscope itemtype="http://schema.org/Product">
 		<h2 itemprop="name"> ${profName} </h2>
 		<span itemprop="title">Reviews</span>
 		<span itemprop="description"></span>
 		<div itemprop="aggregateRating" itemscope itemtype="http://schema.org/AggregateRating">
 			Rated <span itemprop="ratingValue">${floatingAverageGoogleRating }</span> out of
 			<span itemprop="bestRating">5</span> 
-			based on <span itemprop="ratingCount">${reviewsCount}</span>
+			based on <span itemprop="reviewCount">${reviewsCount}</span>
 			reviews
 		</div>
 	</div>
@@ -531,7 +531,7 @@
 										Reviews for <span class="capitalize">${profName}</span>. 
 										<span class="capitalize">${firstName}</span> has ${reviewsCount} reviews. 
 										<c:if test="${not empty  vertical && not empty location}">
-											<span class="capitalize">${firstName}</span> is a ${vertical} professnal in ${location}.
+											<span class="capitalize">${firstName}</span> is a ${vertical} professional in ${location}.
 										</c:if>
 										<c:if test="${not empty title}">
 											<span class="capitalize">${firstName}</span> is the ${title} of ${companyName}.
