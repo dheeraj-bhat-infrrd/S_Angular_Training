@@ -124,6 +124,13 @@ public class LoginController {
 	@RequestMapping(value = "/landing")
 	public String initLandingPage() {
 		LOG.info("Login Page started");
+		
+		User user = sessionHelper.getCurrentUser();
+		
+		if(user.isSuperAdmin()) {
+			return JspResolver.ADMIN_LANDING;
+		}
+		
 		return JspResolver.LANDING;
 	}
 

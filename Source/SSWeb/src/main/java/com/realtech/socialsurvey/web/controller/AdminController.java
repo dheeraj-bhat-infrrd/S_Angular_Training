@@ -382,5 +382,11 @@ public class AdminController {
 		}
 		return "success";
 	}
-
+	
+	@RequestMapping(value = "/showsendinvition", method = RequestMethod.GET)
+	public String showSendInvition() {
+		LOG.info("Inside showSendInvition() method");
+		
+		return JspResolver.ADMIN_INVITE_VIEW;
+	}
 }
