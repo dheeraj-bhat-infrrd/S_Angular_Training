@@ -32,7 +32,10 @@ import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.dao.SurveyDetailsDao;
 import com.realtech.socialsurvey.core.entities.AgentRankingReport;
 import com.realtech.socialsurvey.core.entities.SurveyDetails;
+import com.realtech.socialsurvey.core.entities.SurveyPreInitiation;
 import com.realtech.socialsurvey.core.entities.SurveyResponse;
+import com.realtech.socialsurvey.core.exception.InvalidInputException;
+import com.realtech.socialsurvey.core.services.organizationmanagement.SurveyPreInitiationService;
 
 /*
  * Provides list of operations to be performed on SurveyDetails collection of mongo. SurveyDetails
@@ -48,6 +51,9 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao {
 
 	@Autowired
 	private MongoTemplate mongoTemplate;
+
+	@Autowired
+	private SurveyPreInitiationService surveyPreInitiationService;
 
 	/*
 	 * Method to fetch survey details on the basis of agentId and customer email.
@@ -829,8 +835,11 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao {
 					sentSurveys.put(getMonthAsString((++currMonth) % 12).toString(), 0l);
 				}
 			}
+			
 			Calendar calendar = Calendar.getInstance();
 			@SuppressWarnings("unchecked") List<BasicDBObject> sent = (List<BasicDBObject>) result.getRawResults().get("result");
+			Date currDate = Calendar.getInstance().getTime();
+			currDate = getNdaysBackDate(currDate, Calendar.YEAR, 1);
 			for (BasicDBObject sentSurvey : sent) {
 				if (criteriaColumn == "dayOfMonth") {
 					for (String date : sentSurveys.keySet()) {
@@ -841,20 +850,35 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao {
 					}
 				}
 				if (criteriaColumn == "week") {
+					int reductionInDate = 7;
 					for (String date : sentSurveys.keySet()) {
-						calendar.setTime(new SimpleDateFormat(CommonConstants.DATE_FORMAT).parse(date));
+						currDate = new SimpleDateFormat(CommonConstants.DATE_FORMAT).parse(date);
+						calendar.setTime(currDate);
+
+						long noOfSurveys = noOfPreInitiatedSurveys(columnName, columnValue,
+								getNdaysBackDate(currDate, Calendar.DATE, reductionInDate), currDate);
+						sentSurveys.put(date, noOfSurveys);
+						
 						if (calendar.get(Calendar.WEEK_OF_YEAR) == Integer.parseInt(sentSurvey.get(CommonConstants.DEFAULT_MONGO_ID_COLUMN)
-								.toString()) + 1)
-							sentSurveys.put(date, Long.parseLong(sentSurvey.get("count").toString()));
+								.toString()) + 1) {
+							sentSurveys.put(date, noOfSurveys + Long.parseLong(sentSurvey.get("count").toString()));
+						}
 					}
 				}
-				if (criteriaColumn == "month")
+				if (criteriaColumn == "month") {
+					int reductionInMonth = -1;
 					for (String date : sentSurveys.keySet()) {
-						String dateFormat = "MMM";
-						calendar.setTime(new SimpleDateFormat(dateFormat).parse(date));
+						calendar.setTime(new SimpleDateFormat("MMM").parse(date));
+
+						Date startMonth = getNdaysBackDate(currDate, Calendar.MONTH, reductionInMonth);
+						long noOfSurveys = noOfPreInitiatedSurveys(columnName, columnValue, currDate, startMonth);
+						sentSurveys.put(date, noOfSurveys);
+						currDate = startMonth;
+						
 						if (calendar.get(Calendar.MONTH) + 1 == Integer.parseInt(sentSurvey.get(CommonConstants.DEFAULT_MONGO_ID_COLUMN).toString()))
-							sentSurveys.put(date, Long.parseLong(sentSurvey.get("count").toString()));
+							sentSurveys.put(date, noOfSurveys + Long.parseLong(sentSurvey.get("count").toString()));
 					}
+				}
 			}
 		}
 		LOG.info("Method to get count of sent surveys based upon criteria(Weekly/Monthly/Yearly) getSentSurveyByCriteria() finished.");
@@ -1062,6 +1086,14 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao {
 		return startDate;
 	}
 
+	private Date getNdaysBackDate(Date date, int type, int duration) {
+		Calendar calendar = Calendar.getInstance();
+		calendar.setTime(date);
+		calendar.add(type, duration * (-1));
+		Date startDate = calendar.getTime();
+		return startDate;
+	}
+	
 	private String getMonthAsString(int monthInt) {
 		String month = "Invalid Month";
 		DateFormatSymbols dateFormatSymbols = new DateFormatSymbols();
@@ -1242,4 +1274,36 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao {
 		}
 	}
 	// JIRA SS-137 and 158 : EOC
+	
+	@Override
+	public long noOfPreInitiatedSurveys(String columnName, long columnValue, Date startDate, Date endDate) {
+		String profileLevel = "";
+		if (columnName.equals(CommonConstants.COMPANY_ID)) {
+			profileLevel = CommonConstants.PROFILE_LEVEL_COMPANY;
+		}
+		else if (columnName.equals(CommonConstants.REGION_ID)) {
+			profileLevel = CommonConstants.PROFILE_LEVEL_REGION;
+		}
+		else if (columnName.equals(CommonConstants.BRANCH_ID)) {
+			profileLevel = CommonConstants.PROFILE_LEVEL_BRANCH;
+		}
+		else if (columnName.equals(CommonConstants.AGENT_ID)) {
+			profileLevel = CommonConstants.PROFILE_LEVEL_INDIVIDUAL;
+		}
+
+		long noOfPreInitiatedSurveys = 0l;
+		try {
+			List<SurveyPreInitiation> preInitiations = surveyPreInitiationService.getIncompleteSurvey(columnValue, 0, 0, 0, -1, profileLevel, startDate, endDate,
+					false);
+			for (SurveyPreInitiation initiation : preInitiations) {
+				if (initiation.getStatus() == CommonConstants.SURVEY_STATUS_PRE_INITIATED) {
+					noOfPreInitiatedSurveys++;
+				}
+			}
+		}
+		catch (InvalidInputException e) {
+			LOG.error("InvalidInputException caught in noOfPreInitiatedSurveys() while fetching reviews. Nested exception is ", e);
+		}
+		return noOfPreInitiatedSurveys;
+	}
 }

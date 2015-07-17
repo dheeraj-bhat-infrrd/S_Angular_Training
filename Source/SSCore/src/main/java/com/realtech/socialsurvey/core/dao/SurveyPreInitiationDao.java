@@ -5,24 +5,24 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
 import com.realtech.socialsurvey.core.entities.AgentRankingReport;
 import com.realtech.socialsurvey.core.entities.SurveyPreInitiation;
 import com.realtech.socialsurvey.core.entities.integration.EngagementProcessingStatus;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 
 public interface SurveyPreInitiationDao extends GenericDao<SurveyPreInitiation, Long> {
-
 	/**
 	 * Gets the last run time for the source
+	 * 
 	 * @param source
 	 * @return
 	 * @throws InvalidInputException
 	 */
 	public Timestamp getLastRunTime(String source) throws InvalidInputException;
-	
+
 	/**
 	 * Gets a list of processed ids
+	 * 
 	 * @param source
 	 * @param timestamp
 	 * @return
@@ -35,6 +35,5 @@ public interface SurveyPreInitiationDao extends GenericDao<SurveyPreInitiation, 
 
 	public List<SurveyPreInitiation> getIncompleteSurveyForReminder(long companyId, int surveyReminderInterval, int maxReminders);
 
-    public void getIncompleteSurveysCount( Date startDate, Date endDate, Map<Long, AgentRankingReport> agentReportData );
-
+	public void getIncompleteSurveysCount(Date startDate, Date endDate, Map<Long, AgentRankingReport> agentReportData);
 }
