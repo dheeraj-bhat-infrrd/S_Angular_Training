@@ -868,9 +868,10 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao {
 					for (String date : sentSurveys.keySet()) {
 						calendar.setTime(new SimpleDateFormat("MMM").parse(date));
 
-						long noOfSurveys = noOfPreInitiatedSurveys(columnName, columnValue,
-								getNdaysBackDate(currDate, Calendar.MONTH, reductionInMonth), currDate);
+						Date startMonth = getNdaysBackDate(currDate, Calendar.MONTH, reductionInMonth);
+						long noOfSurveys = noOfPreInitiatedSurveys(columnName, columnValue, startMonth, currDate);
 						sentSurveys.put(date, noOfSurveys);
+						currDate = startMonth;
 						
 						if (calendar.get(Calendar.MONTH) + 1 == Integer.parseInt(sentSurvey.get(CommonConstants.DEFAULT_MONGO_ID_COLUMN).toString()))
 							sentSurveys.put(date, noOfSurveys + Long.parseLong(sentSurvey.get("count").toString()));
