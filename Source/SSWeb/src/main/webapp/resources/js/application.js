@@ -19,6 +19,9 @@ var surveyFetchedSoFarInc;
 var accountType;
 var graphData;
 
+// Variable for dashboard review no survey found
+var isFromPagination=false;
+
 //colName and colValue contains profile level of logged in user and value for
 //colName is present in colValue.
 var colName;
@@ -525,14 +528,17 @@ function showIncompleteSurvey(columnName, columnValue) {
 		"startIndex" : startIndexInc,
 		"batchSize" : batchSizeInc
 	};
+	console.info("startIndex:"+startIndexInc+" -- batchSizeInc:"+batchSizeInc);
 	callAjaxGetWithPayloadData("./fetchdashboardincompletesurveycount.do", function(totalIncompleteReviews) {
 		if (totalIncompleteReviews == 0) {
-			$("#incomplete-survey-header").html("No incomplete surveys found");
+			if(!isFromPagination)
+				$("#incomplete-survey-header").html("No incomplete surveys found");
 			return;
 		}
 
 		callAjaxGetWithPayloadData("./fetchdashboardincompletesurvey.do", function(data) {
 			if (startIndexInc == 0) {
+				console.info("startIndex ==0:"+startIndexInc);
 				$('#dsh-inc-srvey').html(data);
 				$("#dsh-inc-dwnld").show();
 			}
@@ -544,6 +550,7 @@ function showIncompleteSurvey(columnName, columnValue) {
 			var scrollContainer = document.getElementById('dsh-inc-srvey');
 			scrollContainer.onscroll = function() {
 				if (scrollContainer.scrollTop === scrollContainer.scrollHeight - scrollContainer.clientHeight) {
+					isFromPagination=true;
 					showIncompleteSurvey(colName, colValue);
 					$('#dsh-inc-srvey').perfectScrollbar('update');
 				}
