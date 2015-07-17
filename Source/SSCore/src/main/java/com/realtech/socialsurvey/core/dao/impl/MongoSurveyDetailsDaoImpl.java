@@ -34,7 +34,7 @@ import com.realtech.socialsurvey.core.entities.AgentRankingReport;
 import com.realtech.socialsurvey.core.entities.SurveyDetails;
 import com.realtech.socialsurvey.core.entities.SurveyResponse;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
-import com.realtech.socialsurvey.core.services.organizationmanagement.ProfileManagementService;
+import com.realtech.socialsurvey.core.services.organizationmanagement.SurveyPreInitiationService;
 
 /*
  * Provides list of operations to be performed on SurveyDetails collection of mongo. SurveyDetails
@@ -52,7 +52,7 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao {
 	private MongoTemplate mongoTemplate;
 
 	@Autowired
-	private ProfileManagementService profileManagementService;
+	private SurveyPreInitiationService surveyPreInitiationService;
 
 	/*
 	 * Method to fetch survey details on the basis of agentId and customer email.
@@ -1292,8 +1292,8 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao {
 		}
 
 		try {
-			noOfPreInitiatedSurveys = profileManagementService.getIncompleteSurvey(columnValue, 0, 0, 0, -1, profileLevel, startDate, endDate, false)
-					.size();
+			noOfPreInitiatedSurveys = surveyPreInitiationService.getIncompleteSurvey(columnValue, 0, 0, 0, -1, profileLevel, startDate, endDate,
+					false).size();
 		}
 		catch (InvalidInputException e) {
 			LOG.error("InvalidInputException caught in noOfPreInitiatedSurveys() while fetching reviews. Nested exception is ", e);
