@@ -653,4 +653,25 @@ public class SessionHelper {
 		LOG.info("Method processAssignments() finished from SessionHelper");
 		return assignments;
 	}
+	
+	public void updateSelectedProfile(HttpSession session, long entityId, String entityType) {
+		String entityName = "";
+		UserHierarchyAssignments assignments = (UserHierarchyAssignments) session.getAttribute(CommonConstants.USER_ASSIGNMENTS);
+		if (entityType.equals(CommonConstants.COMPANY_ID_COLUMN)) {
+			entityName = assignments.getCompanies().get(entityId);
+		}
+		else if (entityType.equals(CommonConstants.REGION_ID_COLUMN)) {
+			entityName = assignments.getRegions().get(entityId);
+		}
+		else if (entityType.equals(CommonConstants.BRANCH_ID_COLUMN)) {
+			entityName = assignments.getBranches().get(entityId);
+		}
+		else if (entityType.equals(CommonConstants.PROFILE_AGENT_VIEW)) {
+			entityName = assignments.getAgents().get(entityId);
+		}
+
+		session.setAttribute(CommonConstants.ENTITY_TYPE_COLUMN, entityType);
+		session.setAttribute(CommonConstants.ENTITY_ID_COLUMN, entityId);
+		session.setAttribute(CommonConstants.ENTITY_NAME_COLUMN, entityName);
+	}
 }

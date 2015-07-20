@@ -40,7 +40,6 @@ import com.realtech.socialsurvey.core.entities.SurveyDetails;
 import com.realtech.socialsurvey.core.entities.SurveyPreInitiation;
 import com.realtech.socialsurvey.core.entities.SurveyRecipient;
 import com.realtech.socialsurvey.core.entities.User;
-import com.realtech.socialsurvey.core.entities.UserHierarchyAssignments;
 import com.realtech.socialsurvey.core.entities.UserProfile;
 import com.realtech.socialsurvey.core.entities.UserSettings;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
@@ -1627,9 +1626,8 @@ public class DashboardController {
 	public String updateSelectedProfile(Model model, HttpServletRequest request) {
 		LOG.info("Method updateSelectedProfile() started.");
 		HttpSession session = request.getSession(false);
+		
 		String entityIdStr = request.getParameter("entityId");
-		String entityType = request.getParameter("entityType");
-
 		long entityId = 0;
 		try {
 			if (entityIdStr != null && !entityIdStr.equals("")) {
@@ -1642,33 +1640,18 @@ public class DashboardController {
 		catch (NumberFormatException e) {
 			LOG.error("Number format exception occurred while parsing the entity id. Reason :" + e.getMessage(), e);
 		}
-
+		
+		String entityType = request.getParameter("entityType");
 		if (entityType.equals(CommonConstants.AGENT_ID_COLUMN)) {
 			entityType = CommonConstants.PROFILE_AGENT_VIEW;
 		}
-
-		String entityName = "";
-		UserHierarchyAssignments assignments = (UserHierarchyAssignments) session.getAttribute(CommonConstants.USER_ASSIGNMENTS);
-		if (entityType.equals(CommonConstants.COMPANY_ID_COLUMN)) {
-			entityName = assignments.getCompanies().get(entityId);
-		}
-		else if (entityType.equals(CommonConstants.REGION_ID_COLUMN)) {
-			entityName = assignments.getRegions().get(entityId);
-		}
-		else if (entityType.equals(CommonConstants.BRANCH_ID_COLUMN)) {
-			entityName = assignments.getBranches().get(entityId);
-		}
-		else if (entityType.equals(CommonConstants.PROFILE_AGENT_VIEW)) {
-			entityName = assignments.getAgents().get(entityId);
-		}
-
-		session.setAttribute(CommonConstants.ENTITY_TYPE_COLUMN, entityType);
-		session.setAttribute(CommonConstants.ENTITY_ID_COLUMN, entityId);
-		session.setAttribute(CommonConstants.ENTITY_NAME_COLUMN, entityName);
+		
+		sessionHelper.updateSelectedProfile(session, entityId, entityType);
 
 		LOG.info("Method updateSelectedProfile() finished.");
 		return CommonConstants.SUCCESS_ATTRIBUTE;
 	}
+	
 
     /*
      * Method to mark a particular survey as editable and re-send the link to a

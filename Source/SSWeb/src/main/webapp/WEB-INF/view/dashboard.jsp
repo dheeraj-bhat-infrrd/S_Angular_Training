@@ -184,6 +184,10 @@ $(document).ready(function() {
 	hideOverlay();
 	$(document).attr("title", "Dashboard");
 	
+	if ($("#da-dd-wrapper-profiles > div").length <= 1) {
+		$('#da-dd-wrapper-profiles').remove();
+	}
+	
 	var profileMasterId = $('#prof-container').attr('data-profile-master-id');
 	var currentProfileName = $('#prof-container').attr('data-column-name');
 	var currentProfileValue = $('#prof-container').attr('data-column-value');

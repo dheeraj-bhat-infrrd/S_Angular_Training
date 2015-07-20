@@ -5,9 +5,6 @@
 <!-- Setting common page variables -->
 <c:set value="${sessionScope.SPRING_SECURITY_CONTEXT.authentication.principal}" var="user" />
 <c:set value="${user.company.licenseDetails[0].accountsMaster.accountsMasterId}" var="accountMasterId"/>
-<c:if test="${not empty profile}">
-	<c:set value="${profile.profilesMaster.profileId}" var="profilemasterid"></c:set>
-</c:if>
 <c:if test="${not empty profile && not empty profileSettings.completeProfileUrl}">
 	<c:set value="${profileSettings.completeProfileUrl}" var="completeProfileUrl"></c:set>
 </c:if>
@@ -33,6 +30,20 @@
 	<c:set value="${socialMediaTokens.zillowToken}" var="zillowToken"></c:set>
 	<c:set value="${socialMediaTokens.lendingTreeToken}" var="lendingTreeToken"></c:set>
 </c:if>
+<c:choose>
+	<c:when test="${columnName == 'companyId'}">
+		<c:set value="1" var="profilemasterid"></c:set>
+	</c:when>
+	<c:when test="${columnName == 'regionId'}">
+		<c:set value="2" var="profilemasterid"></c:set>
+	</c:when>
+	<c:when test="${columnName == 'branchId'}">
+		<c:set value="3" var="profilemasterid"></c:set>
+	</c:when>
+	<c:when test="${columnName == 'agentId'}">
+		<c:set value="4" var="profilemasterid"></c:set>
+	</c:when>
+</c:choose>
 
 <!-- Setting agent page variables -->
 <c:if test="${profilemasterid == 4}">
@@ -81,13 +92,30 @@
 	<div class="container">
 		<div class="hm-header-row hm-header-row-main clearfix">
 			<div class="float-left hm-header-row-left hm-header-row-left-edit-pr"><spring:message code="label.profileheader.key" /></div>
-			<c:if test="${not empty profileList && fn:length(profileList) > 1}">
+			<c:if test="${not empty assignments}">
 				<div class="float-right header-right clearfix hr-dsh-adj-rt hdr-prof-sel">
 					<div class="float-left hr-txt1"><spring:message code="label.viewas.key" /></div>
-					<div id="profile-sel" class="float-left hr-txt2 cursor-pointer">${profileName}</div>
+					<div id="profile-sel" class="float-left hr-txt2 cursor-pointer">${entityName}</div>
 					<div id="pe-dd-wrapper-profiles" class="va-dd-wrapper hide">
-						<c:forEach var="userprofile" items="${profileList}">
-							<div class="pe-dd-item" data-profile-id="${userprofile.key}">${userprofile.value.userProfileName}</div>
+						<c:forEach var="company" items="${assignments.companies}">
+							<div class="pe-dd-item" data-column-type="companyId"
+								data-column-name="${company.value}"
+								data-column-value="${company.key}">${company.value}</div>
+						</c:forEach>
+						<c:forEach var="region" items="${assignments.regions}">
+							<div class="pe-dd-item" data-column-type="regionId" 
+								data-column-name="${region.value}"
+								data-column-value="${region.key}">${region.value}</div>
+						</c:forEach>
+						<c:forEach var="branch" items="${assignments.branches}">
+							<div class="pe-dd-item" data-column-type="branchId"
+								data-column-name="${branch.value}"
+								data-column-value="${branch.key}">${branch.value}</div>
+						</c:forEach>
+						<c:forEach var="agent" items="${assignments.agents}">
+							<div class="pe-dd-item" data-column-type="agentId"
+								data-column-name="${agent.value}"
+								data-column-value="${agent.key}">${agent.value}</div>
 						</c:forEach>
 					</div>
 				</div>
@@ -383,6 +411,11 @@
 		hideOverlay();
 		countPosts();
 		$(document).attr("title", "Profile Settings");
+		
+		if ($("#pe-dd-wrapper-profiles > div").length <= 1) {
+			$('#pe-dd-wrapper-profiles').remove();
+		}
+		
 		adjustImage();
 		$(window).resize(adjustImage);
 		

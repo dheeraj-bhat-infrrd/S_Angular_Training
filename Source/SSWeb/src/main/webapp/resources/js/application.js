@@ -1063,8 +1063,8 @@ function showDisplayPic() {
 	});
 }
 
-function updateCurrentProfile(entityType, columnValue) {
-	var url = "./updatecurrentprofile.do?entityId=" + columnValue + "&entityType=" + entityType;
+function updateCurrentProfile(entityType, entityValue) {
+	var url = "./updatecurrentprofile.do?entityId=" + entityValue + "&entityType=" + entityType;
 	callAjaxGET(url, function(data) {}, true);
 }
 
@@ -4344,12 +4344,13 @@ $('body').on('click','#setting-sel',function(e){
 });
 
 $('body').on('click','.se-dd-item',function(e) {
-	var newProfileId = $(this).data('profile-id');
-	
 	$('#setting-sel').html($(this).html());
 	$('#se-dd-wrapper-profiles').slideToggle(200);
 	
-	showMainContent('./showcompanysettings.do?profileId=' + newProfileId);
+	var entityId = $(this).attr('data-column-value');
+	var entityType = $(this).attr('data-column-type');
+	
+	showMainContent("./showcompanysettings.do?entityId=" + entityId + "&entityType=" + entityType);
 });
 
 $('body').click(function() {

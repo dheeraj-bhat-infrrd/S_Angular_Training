@@ -24,7 +24,6 @@ import com.amazonaws.util.json.JSONObject;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
-import com.realtech.socialsurvey.core.entities.AbridgedUserProfile;
 import com.realtech.socialsurvey.core.entities.AccountsMaster;
 import com.realtech.socialsurvey.core.entities.EncompassCrmInfo;
 import com.realtech.socialsurvey.core.entities.LicenseDetail;
@@ -419,93 +418,109 @@ public class OrganizationManagementController
     }
 
 
-    /**
-     * Method to show Company settings on edit company
-     * 
-     * @param model
-     * @param request
-     * @return
-     */
-    @SuppressWarnings ( "unchecked")
-    @RequestMapping ( value = "/showcompanysettings", method = RequestMethod.GET)
-    public String showCompanySettings( Model model, HttpServletRequest request )
-    {
-        LOG.info( "Method showCompanySettings of UserManagementController called" );
-        HttpSession session = request.getSession( false );
-        User user = sessionHelper.getCurrentUser();
+	/**
+	 * Method to show Company settings on edit company
+	 * 
+	 * @param model
+	 * @param request
+	 * @return
+	 */
+	@RequestMapping(value = "/showcompanysettings", method = RequestMethod.GET)
+	public String showCompanySettings(Model model, HttpServletRequest request) {
+		LOG.info("Method showCompanySettings of UserManagementController called");
+		HttpSession session = request.getSession(false);
+		User user = sessionHelper.getCurrentUser();
 
-        AccountType accountType = (AccountType) session.getAttribute( CommonConstants.ACCOUNT_TYPE_IN_SESSION );
-        UserSettings userSettings = (UserSettings) session.getAttribute( CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION );
+		AccountType accountType = (AccountType) session.getAttribute(CommonConstants.ACCOUNT_TYPE_IN_SESSION);
+		UserSettings userSettings = (UserSettings) session.getAttribute(CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION);
 
-        UserProfile selectedProfile = null;
-        String profileIdStr = request.getParameter( "profileId" );
-        if ( profileIdStr == null ) {
-            selectedProfile = (UserProfile) session.getAttribute( CommonConstants.USER_PROFILE );
-        }
-        if ( selectedProfile == null ) {
-            Map<Long, UserProfile> profileMap = (Map<Long, UserProfile>) session
-                .getAttribute( CommonConstants.USER_PROFILE_MAP );
-            Map<Long, AbridgedUserProfile> profileAbridgedMap = (Map<Long, AbridgedUserProfile>) session
-                .getAttribute( CommonConstants.USER_PROFILE_LIST );
+		long entityId = 0;
+		String entityIdStr = request.getParameter("entityId");
+		if (entityIdStr == null || entityIdStr.isEmpty()) {
+			entityId = (long) session.getAttribute(CommonConstants.ENTITY_ID_COLUMN);
+		}
+		else {
+			try {
+				if (entityIdStr != null && !entityIdStr.equals("")) {
+					entityId = Long.parseLong(entityIdStr);
+				}
+				else {
+					throw new NumberFormatException();
+				}
+			}
+			catch (NumberFormatException e) {
+				LOG.error("Number format exception occurred while parsing the entity id. Reason :" + e.getMessage(), e);
+			}
+		}
+		
+		String entityType = request.getParameter("entityType");
+		if (entityType == null || entityType.isEmpty()) {
+			entityType = (String) session.getAttribute(CommonConstants.ENTITY_TYPE_COLUMN);
+		}
+		if (entityType.equals(CommonConstants.AGENT_ID_COLUMN)) {
+			entityType = CommonConstants.PROFILE_AGENT_VIEW;
+		}
+		
+		sessionHelper.updateSelectedProfile(session, entityId, entityType);
+		
+		OrganizationUnitSettings unitSettings = null;
+		int accountMasterId = accountType.getValue();
+		if (entityType.equals(CommonConstants.COMPANY_ID_COLUMN) || accountMasterId == CommonConstants.ACCOUNTS_MASTER_INDIVIDUAL) {
+			unitSettings = userSettings.getCompanySettings();
+			List<VerticalCrmMapping> mappings = organizationManagementService.getCrmMapping(user);
+			model.addAttribute("crmMappings", mappings);
+            model.addAttribute("columnName", entityType);
+            model.addAttribute("columnValue", entityId);
+		}
+		else if (entityType.equals(CommonConstants.REGION_ID_COLUMN)) {
+			unitSettings = userSettings.getRegionSettings().get(entityId);
+            model.addAttribute("columnName", entityType);
+            model.addAttribute("columnValue", entityId);
+		}
+		else if (entityType.equals(CommonConstants.BRANCH_ID_COLUMN)) {
+			unitSettings = userSettings.getBranchSettings().get(entityId);
+            model.addAttribute("columnName", entityType);
+            model.addAttribute("columnValue", entityId);
+		}
+		else if (entityType.equals(CommonConstants.PROFILE_AGENT_VIEW)) {
+			unitSettings = userSettings.getAgentSettings();
+            model.addAttribute("columnName", CommonConstants.AGENT_ID_COLUMN);
+            model.addAttribute("columnValue", entityId);
+		}
 
-            selectedProfile = userManagementService.updateSelectedProfile( user, accountType, profileMap, profileIdStr );
+		model.addAttribute("facebookLink", "");
+		model.addAttribute("twitterLink", "");
+		model.addAttribute("linkedinLink", "");
+		model.addAttribute("googleLink", "");
 
-            session.setAttribute( CommonConstants.USER_PROFILE, selectedProfile );
-            session.setAttribute( CommonConstants.PROFILE_NAME_COLUMN,
-                profileAbridgedMap.get( selectedProfile.getUserProfileId() ).getUserProfileName() );
-        }
+		if (unitSettings != null && unitSettings.getSocialMediaTokens() != null) {
 
-        OrganizationUnitSettings unitSettings = null;
-        int profileMasterId = selectedProfile.getProfilesMaster().getProfileId();
-        int accountMasterId = accountType.getValue();
-        if ( profileMasterId == CommonConstants.PROFILES_MASTER_COMPANY_ADMIN_PROFILE_ID
-            || accountMasterId == CommonConstants.ACCOUNTS_MASTER_INDIVIDUAL ) {
-            unitSettings = userSettings.getCompanySettings();
-            List<VerticalCrmMapping> mappings = organizationManagementService.getCrmMapping( user );
-            model.addAttribute( "crmMappings", mappings );
-        } else if ( profileMasterId == CommonConstants.PROFILES_MASTER_REGION_ADMIN_PROFILE_ID ) {
-            unitSettings = userSettings.getRegionSettings().get( selectedProfile.getRegionId() );
-        } else if ( profileMasterId == CommonConstants.PROFILES_MASTER_BRANCH_ADMIN_PROFILE_ID ) {
-            unitSettings = userSettings.getBranchSettings().get( selectedProfile.getBranchId() );
-        } else if ( profileMasterId == CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID ) {
-            unitSettings = userSettings.getAgentSettings();
-        }
-
-        model.addAttribute( "facebookLink", "" );
-        model.addAttribute( "twitterLink", "" );
-        model.addAttribute( "linkedinLink", "" );
-        model.addAttribute( "googleLink", "" );
-
-        if ( unitSettings != null && unitSettings.getSocialMediaTokens() != null ) {
-
-            if ( unitSettings.getSocialMediaTokens().getFacebookToken() != null
-                && unitSettings.getSocialMediaTokens().getFacebookToken().getFacebookPageLink() != null ) {
-                model.addAttribute( "facebookLink", unitSettings.getSocialMediaTokens().getFacebookToken()
-                    .getFacebookPageLink() );
-            }
-            if ( unitSettings.getSocialMediaTokens().getTwitterToken() != null
-                && unitSettings.getSocialMediaTokens().getTwitterToken().getTwitterPageLink() != null ) {
-                model.addAttribute( "twitterLink", unitSettings.getSocialMediaTokens().getTwitterToken().getTwitterPageLink() );
-            }
-            if ( unitSettings.getSocialMediaTokens().getLinkedInToken() != null
-                && unitSettings.getSocialMediaTokens().getLinkedInToken().getLinkedInPageLink() != null ) {
-                model.addAttribute( "linkedinLink", unitSettings.getSocialMediaTokens().getLinkedInToken()
-                    .getLinkedInPageLink() );
-            }
-            if ( unitSettings.getSocialMediaTokens().getGoogleToken() != null
-                && unitSettings.getSocialMediaTokens().getGoogleToken().getProfileLink() != null ) {
-                model.addAttribute( "googleLink", unitSettings.getSocialMediaTokens().getGoogleToken().getProfileLink() );
-            }
-        }
-        model.addAttribute( "autoPostEnabled", false );
-        if ( unitSettings != null && unitSettings.getSurvey_settings() != null ) {
-            model.addAttribute( "autoPostEnabled", unitSettings.getSurvey_settings().isAutoPostEnabled() );
-        }
-        SurveySettings surveySettings = organizationManagementService.retrieveDefaultSurveyProperties();
-        model.addAttribute( "defaultSurveyProperties", surveySettings );
-        session.setAttribute( CommonConstants.USER_ACCOUNT_SETTINGS, unitSettings );
-        return JspResolver.EDIT_SETTINGS;
-    }
+			if (unitSettings.getSocialMediaTokens().getFacebookToken() != null
+					&& unitSettings.getSocialMediaTokens().getFacebookToken().getFacebookPageLink() != null) {
+				model.addAttribute("facebookLink", unitSettings.getSocialMediaTokens().getFacebookToken().getFacebookPageLink());
+			}
+			if (unitSettings.getSocialMediaTokens().getTwitterToken() != null
+					&& unitSettings.getSocialMediaTokens().getTwitterToken().getTwitterPageLink() != null) {
+				model.addAttribute("twitterLink", unitSettings.getSocialMediaTokens().getTwitterToken().getTwitterPageLink());
+			}
+			if (unitSettings.getSocialMediaTokens().getLinkedInToken() != null
+					&& unitSettings.getSocialMediaTokens().getLinkedInToken().getLinkedInPageLink() != null) {
+				model.addAttribute("linkedinLink", unitSettings.getSocialMediaTokens().getLinkedInToken().getLinkedInPageLink());
+			}
+			if (unitSettings.getSocialMediaTokens().getGoogleToken() != null
+					&& unitSettings.getSocialMediaTokens().getGoogleToken().getProfileLink() != null) {
+				model.addAttribute("googleLink", unitSettings.getSocialMediaTokens().getGoogleToken().getProfileLink());
+			}
+		}
+		model.addAttribute("autoPostEnabled", false);
+		if (unitSettings != null && unitSettings.getSurvey_settings() != null) {
+			model.addAttribute("autoPostEnabled", unitSettings.getSurvey_settings().isAutoPostEnabled());
+		}
+		SurveySettings surveySettings = organizationManagementService.retrieveDefaultSurveyProperties();
+		model.addAttribute("defaultSurveyProperties", surveySettings);
+		session.setAttribute(CommonConstants.USER_ACCOUNT_SETTINGS, unitSettings);
+		return JspResolver.EDIT_SETTINGS;
+	}
 
 
     /**
