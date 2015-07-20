@@ -303,13 +303,13 @@ function paintDashboard(profileMasterId, newProfileName, newProfileValue, typeoO
 	});
 	lastColNameForCount = newProfileName;
 	lastColValueForCount = newProfileValue;
-	if (profileMasterId == 1) {
+	if (newProfileName == "companyId") {
 		showCompanyAdminFlow(newProfileName, newProfileValue);
-	} else if (profileMasterId == 2) {
+	} else if (newProfileName == "regionId") {
 		showRegionAdminFlow(newProfileName, newProfileValue);
-	} else if (profileMasterId == 3) {
+	} else if (newProfileName == "branchId") {
 		showBranchAdminFlow(newProfileName, newProfileValue);
-	} else if (profileMasterId == 4) {
+	} else if (newProfileName == "agentId") {
 		showAgentFlow(newProfileName, newProfileValue);
 	}
 
@@ -1063,8 +1063,8 @@ function showDisplayPic() {
 	});
 }
 
-function updateCurrentProfile(profileId) {
-	var url = "./updatecurrentprofile.do?profileId=" + profileId;
+function updateCurrentProfile(entityType, columnValue) {
+	var url = "./updatecurrentprofile.do?entityId=" + columnValue + "&entityType=" + entityType;
 	callAjaxGET(url, function(data) {}, true);
 }
 
@@ -1089,23 +1089,9 @@ $(document).on('click','.da-dd-item',function(e){
 	$('#da-dd-wrapper-profiles').slideToggle(200);
 	
 	// update selected profile in session
-	var newProfileId = $(this).attr('data-profile-id');
-	updateCurrentProfile(newProfileId);
+	updateCurrentProfile($(this).attr('data-column-type'), $(this).attr('data-column-value'));
 
 	showMainContent('./dashboard.do');
-	/*var newProfileMasterId = $(this).attr('data-profile-master-id');
-	var newProfileName = $(this).attr('data-column-name');
-	var newProfileValue = $(this).attr('data-column-value');
-	paintDashboard(newProfileMasterId, newProfileName, newProfileValue);
-	
-	// updating data
-	$('#prof-container').attr('data-profile-id', newProfileId);
-	$('#prof-container').attr('data-profile-master-id', newProfileMasterId);
-	$('#prof-container').attr('data-column-name', newProfileName);
-	$('#prof-container').attr('data-column-value', newProfileValue);
-	
-	colName = newProfileName;
-	colValue = newProfileValue;*/
 });
 
 $(document).click(function(){

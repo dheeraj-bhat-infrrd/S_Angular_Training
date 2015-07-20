@@ -451,6 +451,8 @@ public interface OrganizationManagementService {
 	 */
 	public List<Branch> getAllBranchesForCompany(Company company) throws InvalidInputException;
 
+	public List<Branch> getAllBranchesForCompanyWithProjections(Company company) throws InvalidInputException;
+	
 	/**
 	 * Method to fetch branches mapped to a region
 	 * 
@@ -460,6 +462,8 @@ public interface OrganizationManagementService {
 	 */
 	public List<Branch> getAllBranchesInRegion(long regionId) throws InvalidInputException;
 
+	public List<Branch> getAllBranchesInRegionWithProjections(long regionId) throws InvalidInputException;
+	
 	/**
 	 * Method to fetch UserProfiles mapped to a branch
 	 * 
@@ -495,6 +499,8 @@ public interface OrganizationManagementService {
 	 * @throws InvalidInputException
 	 */
 	public List<Region> getAllRegionsForCompany(Company company) throws InvalidInputException;
+	
+	public List<Region> getAllRegionsForCompanyWithProjections(Company company) throws InvalidInputException;
 
 	/**
 	 * Method to update status of a branch

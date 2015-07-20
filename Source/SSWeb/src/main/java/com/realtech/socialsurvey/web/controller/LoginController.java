@@ -311,7 +311,8 @@ public class LoginController {
 						redirectAttributes.addFlashAttribute("showSendSurveyPopup", String.valueOf(showSendSurveyPopup));
 
 						// updating session with selected user profile if not set
-						sessionHelper.updateProcessedUserProfiles(session, user);
+						// sessionHelper.updateProcessedUserProfiles(session, user);
+						sessionHelper.processAssignments(session, user);
 
 						// update the last login time and number of logins
 						userManagementService.updateUserLoginTimeAndNum(user);

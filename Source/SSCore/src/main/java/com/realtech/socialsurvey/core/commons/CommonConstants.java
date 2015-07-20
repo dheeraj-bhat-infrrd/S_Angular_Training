@@ -250,6 +250,11 @@ public interface CommonConstants
     public static final String FLOW_REGISTRATION = "registration";
     public static final String POPUP_FLAG_IN_SESSION = "popupStatus";
     public static final String ACTIVE_SESSIONS_FOUND = "activeSessionFound";
+    
+    public static final String USER_ASSIGNMENTS = "assignments";
+    public static final String ENTITY_ID_COLUMN = "entityId";
+    public static final String ENTITY_NAME_COLUMN = "entityName";
+    public static final String ENTITY_TYPE_COLUMN = "entityType";
 
     /**
      * Batch Constants
