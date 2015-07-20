@@ -832,12 +832,20 @@ public class DashboardController
 
         try {
             String customerName = request.getParameter( "customerName" );
+            String custFirstName = "";
             String customerEmail = request.getParameter( "customerEmail" );
             String agentName = request.getParameter( "agentName" );
 
             if ( customerName == null || customerName.isEmpty() ) {
                 LOG.error( "Invalid value (null/empty) passed for customerName." );
                 throw new InvalidInputException( "Invalid value (null/empty) passed for customerName." );
+            }
+            if ( customerName.contains( " " ) ) {
+                String[] nameArray = customerName.split( " " );
+                for ( int nameIdx = 0; nameIdx < nameArray.length - 1; nameIdx++ ) {
+                    custFirstName = custFirstName + nameArray[nameIdx] + " ";
+                }
+                custFirstName = custFirstName.trim();
             }
             if ( customerEmail == null || customerEmail.isEmpty() ) {
                 LOG.error( "Invalid value (null/empty) passed for customerEmail." );
@@ -884,11 +892,12 @@ public class DashboardController
                 String companyName = user.getCompany().getCompany();
 
                 if ( enableKafka.equals( CommonConstants.YES ) ) {
-                    emailServices.queueSurveyReminderMail( customerEmail, customerName, agentName, surveyLink, agentPhone,
+                    emailServices.queueSurveyReminderMail( customerEmail, custFirstName, agentName, surveyLink, agentPhone,
                         agentTitle, companyName );
                 } else {
-                    emailServices.sendDefaultSurveyReminderMail( customerEmail, customerName, agentName, surveyLink,
+                    emailServices.sendDefaultSurveyReminderMail( customerEmail, custFirstName, agentName, surveyLink,
                         agentPhone, agentTitle, companyName );
+
                 }
             } catch ( InvalidInputException e ) {
                 LOG.error( "Exception occurred while trying to send survey reminder mail to : " + customerEmail );
