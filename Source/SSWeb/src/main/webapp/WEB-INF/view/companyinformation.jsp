@@ -171,7 +171,6 @@
 <script>
 var isCompanyInfoPageValid;
 var selectedCountryRegEx = "";
-var stateList;
 var cityLookupList;
 var phoneFormat = '(ddd) ddd-dddd';
 $(document).ready(function() {
@@ -185,7 +184,7 @@ $(document).ready(function() {
 		countryCode = $('#country-code').val();
 	}
 	if(countryCode == "US"){
-		showStateCityRow();
+		showStateCityRow("state-city-row", "com-state");
 		if( $('input[name="country"]').val() == null || $('input[name="country"]').val() == "" ){
 			$('input[name="country"]').val("United States");
 			$('#country-code').val(countryCode);
@@ -256,9 +255,9 @@ $(document).ready(function() {
 				}
 			}
 			if(ui.item.code=="US"){
-				showStateCityRow();
+				showStateCityRow("state-city-row", "com-state");
 			}else{
-				hideStateCityRow();
+				hideStateCityRow("state-city-row", "com-state");
 			}
 			
 			$('#com-contactno').unmask();
@@ -287,19 +286,10 @@ $(document).ready(function() {
 });
 
 $('#com-state').on('change',function(e){
-	$('#com-city').val('');
 	var stateId = $(this).find(":selected").attr('data-stateid');
 	callAjaxGET("./getzipcodesbystateid.do?stateId="+stateId, function(data){
-		cityLookupList = JSON.parse(data);
-		var searchData = [];
-		for(var i=0; i<cityLookupList.length; i++){
-			searchData[i] = cityLookupList[i].cityname;
-		}
-		
-		var uniqueSearchData = searchData.filter(function(itm,i,a){
-		    return i==a.indexOf(itm);
-		});
-		initializeCityLookup(uniqueSearchData);
+		var uniqueSearchData = getUniqueCitySearchData(data);
+		initializeCityLookup(uniqueSearchData, "com-city");
 	}, true);
 });
 
@@ -309,58 +299,6 @@ $('#com-city').bind('focus', function(){
 		$(this).autocomplete("search");		
 	}
 });
-
-function initializeCityLookup(searchData){
-	$('#com-city').autocomplete({
-		minLength : 0,
-		source : searchData,
-		focus : function(event, ui) {
-			event.stopPropagation();
-		},
-		select : function(event, ui) {
-			event.stopPropagation();
-		},
-		open : function() {
-			$('.ui-autocomplete').perfectScrollbar({
-				suppressScrollX : true
-			});
-			$('.ui-autocomplete').perfectScrollbar('update');
-		}
-	}).keydown(function(e){
-  	    if( e.keyCode != $.ui.keyCode.TAB) return; 
-  	    
-   	   e.keyCode = $.ui.keyCode.DOWN;
-   	   $(this).trigger(e);
-
-   	   e.keyCode = $.ui.keyCode.ENTER;
-   	   $(this).trigger(e);
-   	});
-	
-}
-
-function showStateCityRow() {
-	$('#state-city-row').show();
-	if(!stateList){
-		callAjaxGET("./getusstatelist.do", function(data){
-			stateList = JSON.parse(data);
-			for(var i=0; i<stateList.length; i++){
-				$('#com-state').append('<option data-stateid='+stateList[i].id+'>'+stateList[i].statecode+'</option>');
-			}
-			var stateVal = $('#com-state').attr('data-value');
-			if(stateVal && stateVal != ""){
-				$('#com-state').val(stateVal);
-			}
-		}, true);
-	}
-}
-
-function hideStateCityRow() {
-	$('#state-city-row').hide();
-	$('#com-city').val('');
-	$('#com-state').val(function() {
-		return $(this).find('option[selected]').text();
-    });
-}
 
 function submitCompanyInfoForm() {
 	console.log("submitting company information form");
@@ -437,7 +375,7 @@ function validateCountry() {
 function validateCompanyInformationForm(elementId) {
 	isCompanyInfoPageValid = true;
 	var isFocussed = false;
-	var isSmallScreen = false;
+	//var isSmallScreen = false;
 	if($(window).width()<768){
 		isSmallScreen = true;
 	}

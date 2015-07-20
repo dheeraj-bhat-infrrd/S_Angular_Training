@@ -28,14 +28,11 @@
 </div>
 <script>
 $(document).ready(function(){
-	var stateList;
-	var cityLookupList;
-	
-	var countryCode = $('#prof-country-code').val();
+	 var countryCode = $('#prof-country-code').val();
 	 if(countryCode == "US"){
-	 	showStateCityRow();
+	 	showProfStateCityRow();
 	 }else{
-		hideStateCityRow();
+		hideProfStateCityRow();
 	 }
 	 
 	$("#prof-country").autocomplete({
@@ -57,9 +54,9 @@ $(document).ready(function(){
 				}
 			}
 			if(ui.item.code=="US"){
-				showStateCityRow();
+				showProfStateCityRow();
 			}else{
-				hideStateCityRow();
+				hideProfStateCityRow();
 			}
 			return false;
 		},
@@ -80,19 +77,10 @@ $(document).ready(function(){
    	   $(this).trigger(e);
    	});
 	$('#prof-state').on('change',function(e){
-  		$('#prof-city').val('');
   		var stateId = $(this).find(":selected").attr('data-stateid');
   		callAjaxGET("./getzipcodesbystateid.do?stateId="+stateId, function(data){
-  			cityLookupList = JSON.parse(data);
-  			var searchData = [];
-  			for(var i=0; i<cityLookupList.length; i++){
-  				searchData[i] = cityLookupList[i].cityname;
-  			}
-  			
-  			var uniqueSearchData = searchData.filter(function(itm,i,a){
-  			    return i==a.indexOf(itm);
-  			});
-  			initializeCityLookup(uniqueSearchData);
+  			var uniqueSearchData = getUniqueCitySearchData(data);
+  			initializeCityLookup(uniqueSearchData, "prof-city");
   		}, true);
   	});
 
@@ -103,7 +91,7 @@ $(document).ready(function(){
   		}
   	});
 	  	
-  	function initializeCityLookup(searchData){
+  	/* function initializeCityLookup(searchData){
   		$('#prof-city').autocomplete({
   			minLength : 0,
   			source : searchData,
@@ -129,28 +117,53 @@ $(document).ready(function(){
   	   	   $(this).trigger(e);
   	   	});
   		
-  	}
-  	function showStateCityRow() {
+  	} */
+  	function showProfStateCityRow() {
   		$('#prof-state').show();
 		$('#prof-city').show();
+		var stateVal = $('#prof-state').attr('data-value');
   		if(!stateList){
   			callAjaxGET("./getusstatelist.do", function(data){
   				stateList = JSON.parse(data);
-  				for(var i=0; i<stateList.length; i++){
-  					$('#prof-state').append('<option data-stateid='+stateList[i].id+'>'+stateList[i].statecode+'</option>');
+  				for (var i = 0; i < stateList.length; i++) {
+  					if (stateVal == stateList[i].statecode) {
+  						$('#'+elementId).append(
+  								'<option data-stateid=' + stateList[i].id
+  										+ ' selected >' + stateList[i].statecode
+  										+ '</option>');
+  					} else {
+  						$('#'+elementId).append(
+  								'<option data-stateid=' + stateList[i].id + '>'
+  										+ stateList[i].statecode + '</option>');
+  					}
   				}
-  				var stateVal = $('#prof-state').attr('data-value');
-  				 if(stateVal && stateVal != ""){
-  				 	$('#prof-state').val(stateVal);
-  				 }
   			}, true);
+  		}else {
+  			if ($('#prof-state').children('option').size() == 1) {
+  				for (var i = 0; i < stateList.length; i++) {
+  					if (stateVal == stateList[i].statecode) {
+  						$('#prof-state').append(
+  								'<option data-stateid=' + stateList[i].id
+  										+ ' selected >' + stateList[i].statecode
+  										+ '</option>');
+  					} else {
+  						$('#prof-state').append(
+  								'<option data-stateid=' + stateList[i].id + '>'
+  										+ stateList[i].statecode + '</option>');
+  					}
+  				}
+  			} else {
+  				if (stateVal != undefined && stateVal != "") {
+  					$('#prof-state').val(stateVal);
+  				}
+  			}
   		}
   	}
-  	function hideStateCityRow() {
+  	function hideProfStateCityRow() {
   		$('#prof-state').hide();
 		$('#prof-city').hide().val('');
   		$('#prof-state').val(function() {
-  			return $(this).find('option[selected]').text();
+  			return $(this).find('option[disabled]').text();
   	    });
   	}
 });
