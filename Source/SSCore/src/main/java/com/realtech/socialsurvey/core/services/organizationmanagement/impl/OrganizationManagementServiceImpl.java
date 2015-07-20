@@ -855,16 +855,11 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 
         if ( branch.getRegion().getIsDefaultBySystem() != CommonConstants.YES ) {
             LOG.debug( "fetching region settings for regionId : " + regionId );
-            OrganizationUnitSettings regionSettings = organizationUnitSettingsDao.fetchOrganizationUnitSettingsById( regionId,
-                MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION );
-            if ( regionSettings == null ) {
-                throw new NoRecordsFetchedException( "No region settings present in mongo for regionId : " + regionId );
-            }
-            LOG.debug( "Successfully fetched region settings for regionId : " + regionId
-                + " adding the info to branch settings" );
-            branchSettings.setRegionId( regionSettings.getIden() );
-            branchSettings.setRegionName( regionSettings.getContact_details().getName() );
+            branchSettings.setRegionId( regionId );
+            branchSettings.setRegionName( branch.getRegion().getRegionName() );
         } else {
+        	branchSettings.setRegionId( regionId );
+            branchSettings.setRegionName( branch.getRegion().getRegion() );
             LOG.debug( "Branch belongs to default region" );
         }
 
@@ -3340,7 +3335,9 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
     public Map<Long, BranchFromSearch> fetchBranchesMapByCompany( long companyId ) throws InvalidInputException, SolrException,
         MalformedURLException
     {
-        String branchesResult = solrSearchService.fetchBranchesByCompany( companyId );
+    	
+		long branchCount = solrSearchService.fetchBranchCountByCompany(companyId);
+		String branchesResult = solrSearchService.fetchBranchesByCompany(companyId, (int) branchCount);
 
         // convert branches to map
         Type searchedBranchesList = new TypeToken<List<BranchFromSearch>>() {}.getType();
@@ -3375,7 +3372,8 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
     public Map<Long, RegionFromSearch> fetchRegionsMapByCompany( long companyId ) throws InvalidInputException, SolrException,
         MalformedURLException
     {
-        String regionsResult = solrSearchService.fetchRegionsByCompany( companyId );
+    	long regionsCount = solrSearchService.fetchRegionCountByCompany(companyId);
+        String regionsResult = solrSearchService.fetchRegionsByCompany( companyId , (int) regionsCount);
 
         // convert regions to map
         Type searchedRegionsList = new TypeToken<List<RegionFromSearch>>() {}.getType();
