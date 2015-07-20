@@ -78,6 +78,9 @@ public final class EmailTemplateConstants {
 
 	public static final String SURVEY_INVITATION_MAIL_CUSTOMER_BODY = "SurveyCustomerInvitationMailBody.html";
 	public static final String SURVEY_INVITATION_MAIL_CUSTOMER_SUBJECT = "SurveyCustomerInvitationMailSubject.txt";
+	
+	public static final String AGENT_SURVEY_REMINDER_EMAIL_BODY = "AgentSurveyReminderMailBody.html";
+	public static final String AGENT_SURVEY_REMINDER_EMAIL_SUBJECT = "AgentSurveyReminderMailSubject.txt";
 
 	// Mail template for mail settings
 	public static final String SURVEY_PARTICIPATION_MAIL_BODY = "SurveyParticipationMailBody.html";
