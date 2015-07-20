@@ -109,7 +109,7 @@ public class IncompleteSurveyReminderSender extends QuartzJobBean
             LOG.error( "EXception caught in sendEmail(). Nested exception is ", e1 );
         }
 
-        String surveyLink = surveyHandler.composeLink( survey.getAgentId(), survey.getCustomerEmailId() );
+        String surveyLink = surveyHandler.composeLink( survey.getAgentId(), survey.getCustomerEmailId(), survey.getCustomerFirstName(), survey.getCustomerLastName() );
         try {
             companySettings = organizationManagementService.getCompanySettings( companyId );
         } catch ( InvalidInputException e ) {

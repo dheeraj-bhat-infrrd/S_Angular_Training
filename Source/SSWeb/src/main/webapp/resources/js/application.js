@@ -5046,6 +5046,8 @@ function updateCustomerResponse(feedback, agreedToShare) {
 		"feedback" : feedback,
 		"agentId" : agentId,
 		"customerEmail" : customerEmail,
+		"firstName" : firstName,
+		"lastName" : lastName,
 		"isAbusive" : isAbusive,
 		"agreedToShare" : agreedToShare
 	};

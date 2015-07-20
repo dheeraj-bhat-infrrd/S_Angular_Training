@@ -58,7 +58,7 @@ public interface SurveyHandler
         NoRecordsFetchedException, InvalidInputException;
 
 
-    public SurveyDetails getSurveyDetails( long agentId, String customerEmail );
+    public SurveyDetails getSurveyDetails( long agentId, String customerEmail, String firstName, String lastName );
 
 
     public String getApplicationBaseUrl();
@@ -103,7 +103,7 @@ public interface SurveyHandler
     public String getSurveyUrl( long agentId, String customerEmail, String baseUrl ) throws InvalidInputException;
 
 
-    public void changeStatusOfSurvey( long agentId, String customerEmail, boolean editable );
+    public void changeStatusOfSurvey( long agentId, String customerEmail, String firstName, String lastName, boolean editable );
 
 
     public void sendSurveyInvitationMail( String custFirstName, String custLastName, String custEmail,
@@ -115,13 +115,13 @@ public interface SurveyHandler
         String custRelationWithAgent, User user, String link ) throws InvalidInputException, UndeliveredEmailException;
 
 
-    public SurveyPreInitiation getPreInitiatedSurvey( long agentId, String customerEmail ) throws NoRecordsFetchedException;
+    public SurveyPreInitiation getPreInitiatedSurvey( long agentId, String customerEmail, String custFirstName, String custLastName ) throws NoRecordsFetchedException;
 
 
     public void deleteSurveyPreInitiationDetailsPermanently( SurveyPreInitiation surveyPreInitiation );
 
 
-    public String composeLink( long userId, String custEmail ) throws InvalidInputException;
+    public String composeLink( long userId, String custEmail, String custFirstName, String custaLastName ) throws InvalidInputException;
 
 
     public void markSurveyAsStarted( SurveyPreInitiation surveyPreInitiation );
