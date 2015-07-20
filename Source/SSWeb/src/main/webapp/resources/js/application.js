@@ -5235,6 +5235,10 @@ function showMasterQuestionPage(){
 		$("div[data-ques-type]").hide();
 		$("div[data-ques-type='error']").show();
 		$('#profile-link').html('View ' + agentName + '\'s profile at <a href="' + agentFullProfileLink + '" target="_blank">' + agentFullProfileLink + '</a>');
+		$('#icn-fb-shr').attr("href","https://www.facebook.com/sharer/sharer.php?u="+agentFullProfileLink);
+		$('#icn-google-shr').attr("href","https://plus.google.com/share?url="+agentFullProfileLink);
+		$('#icn-linkedin-shr').attr("href","https://www.linkedin.com/shareArticle?mini=true&url="+agentFullProfileLink+"&title=&summary="+rating+"-star response from " +firstName+ " " +lastName+ " for "+agentName+ " at SocialSurvey - "+ feedback + "&source=");
+		$('#icn-twitter-shr').attr("href","https://twitter.com/home?status="+agentFullProfileLink);
 		$('#content-head').html('Survey Completed');
 			if (mood == 'Great')
 				$('#content').html("Congratulations! You have completed survey for " + agentName+ ".\n"+happyTextComplete);
