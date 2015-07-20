@@ -559,9 +559,11 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
         companySettings.setMail_content( mailContentSettings );
 
         LOG.debug( "Inserting company settings." );
-        OrganizationUnitSettings oldCompanySettings = organizationUnitSettingsDao
-            .fetchOrganizationUnitSettingsByUniqueIdentifier( companySettings.getUniqueIdentifier(),
-                MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION );
+        OrganizationUnitSettings oldCompanySettings = null;
+        if ( companySettings.getUniqueIdentifier() != null && !companySettings.getUniqueIdentifier().isEmpty() ) {
+            oldCompanySettings = organizationUnitSettingsDao.fetchOrganizationUnitSettingsByUniqueIdentifier(
+                companySettings.getUniqueIdentifier(), MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION );
+        }
         if ( oldCompanySettings == null ) {
             organizationUnitSettingsDao.insertOrganizationUnitSettings( companySettings,
                 MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION );
@@ -4035,27 +4037,33 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
     {
         return companyDao.searchCompaniesByName( namePattern );
     }
-    
+
+
     @Override
-	@Transactional
-	public Company getCompanyById(long companyId) {
-		return companyDao.findById(Company.class, companyId);
-	}
-    
-    @Override
-    public List<OrganizationUnitSettings> getAllCompaniesFromMongo() {
-    	LOG.debug("Method getAllCompaniesFromMongo() called");
-    	
-    	List<OrganizationUnitSettings> unitSettings = organizationUnitSettingsDao.getCompanyList();
-    	
-    	return unitSettings;
+    @Transactional
+    public Company getCompanyById( long companyId )
+    {
+        return companyDao.findById( Company.class, companyId );
     }
-    
+
+
     @Override
-    public List<OrganizationUnitSettings> getCompaniesByNameFromMongo(String searchKey) {
-    	LOG.debug("Method getCompaniesByNameFromMongo() called");
-    	List<OrganizationUnitSettings> unitSettings = organizationUnitSettingsDao.getCompanyListByKey(searchKey);
-    	return unitSettings;
+    public List<OrganizationUnitSettings> getAllCompaniesFromMongo()
+    {
+        LOG.debug( "Method getAllCompaniesFromMongo() called" );
+
+        List<OrganizationUnitSettings> unitSettings = organizationUnitSettingsDao.getCompanyList();
+
+        return unitSettings;
+    }
+
+
+    @Override
+    public List<OrganizationUnitSettings> getCompaniesByNameFromMongo( String searchKey )
+    {
+        LOG.debug( "Method getCompaniesByNameFromMongo() called" );
+        List<OrganizationUnitSettings> unitSettings = organizationUnitSettingsDao.getCompanyListByKey( searchKey );
+        return unitSettings;
     }
 }
 // JIRA: SS-27: By RM05: EOC
