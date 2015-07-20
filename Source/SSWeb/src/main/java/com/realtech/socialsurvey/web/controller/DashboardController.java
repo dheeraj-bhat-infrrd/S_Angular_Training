@@ -31,7 +31,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.type.TypeFactory;
 import com.google.gson.Gson;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
-import com.realtech.socialsurvey.core.entities.AbridgedUserProfile;
 import com.realtech.socialsurvey.core.entities.AgentRankingReport;
 import com.realtech.socialsurvey.core.entities.AgentSettings;
 import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
@@ -41,9 +40,9 @@ import com.realtech.socialsurvey.core.entities.SurveyDetails;
 import com.realtech.socialsurvey.core.entities.SurveyPreInitiation;
 import com.realtech.socialsurvey.core.entities.SurveyRecipient;
 import com.realtech.socialsurvey.core.entities.User;
+import com.realtech.socialsurvey.core.entities.UserHierarchyAssignments;
 import com.realtech.socialsurvey.core.entities.UserProfile;
 import com.realtech.socialsurvey.core.entities.UserSettings;
-import com.realtech.socialsurvey.core.enums.AccountType;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.exception.NonFatalException;
 import com.realtech.socialsurvey.core.services.generator.URLGenerator;
@@ -116,41 +115,31 @@ public class DashboardController {
         HttpSession session = request.getSession(false);
         User user = sessionHelper.getCurrentUser();
 
-        UserProfile selectedProfile = (UserProfile) session.getAttribute(CommonConstants.USER_PROFILE);
-        if (selectedProfile == null) {
-			try {
-				sessionHelper.updateProcessedUserProfiles(session, user);
-			}
-			catch (NonFatalException e) {
-				LOG.error("NonFatalException while logging in. Reason : " + e.getMessage(), e);
-			}
+		long entityId = (long) session.getAttribute(CommonConstants.ENTITY_ID_COLUMN);
+		String entityType = (String) session.getAttribute(CommonConstants.ENTITY_TYPE_COLUMN);
+		
+        if (entityType.equals(CommonConstants.COMPANY_ID_COLUMN)) {
+            model.addAttribute("columnName", entityType);
+            model.addAttribute("columnValue", entityId);
+            model.addAttribute("showSendSurveyPopupAdmin", String.valueOf(true));
         }
-        int profileMasterId = selectedProfile.getProfilesMaster().getProfileId();
+        else if (entityType.equals(CommonConstants.REGION_ID_COLUMN)) {
+            model.addAttribute("columnName", entityType);
+            model.addAttribute("columnValue", entityId);
+            model.addAttribute("showSendSurveyPopupAdmin", String.valueOf(true));
+        }
+        else if (entityType.equals(CommonConstants.BRANCH_ID_COLUMN)) {
+            model.addAttribute("columnName", entityType);
+            model.addAttribute("columnValue", entityId);
+            model.addAttribute("showSendSurveyPopupAdmin", String.valueOf(true));
+        }
+        else if (entityType.equals(CommonConstants.PROFILE_AGENT_VIEW)) {
+            model.addAttribute("columnName", CommonConstants.AGENT_ID_COLUMN);
+            model.addAttribute("columnValue", entityId);
+        }
 
         model.addAttribute("userId", user.getUserId());
         model.addAttribute("emailId", user.getEmailId());
-        model.addAttribute("profileId", selectedProfile.getUserProfileId());
-        model.addAttribute("profileMasterId", profileMasterId);
-
-        if (profileMasterId == CommonConstants.PROFILES_MASTER_COMPANY_ADMIN_PROFILE_ID) {
-            model.addAttribute("columnName", CommonConstants.COMPANY_ID_COLUMN);
-            model.addAttribute("columnValue", user.getCompany().getCompanyId());
-            model.addAttribute("showSendSurveyPopupAdmin", String.valueOf(true));
-        }
-        else if (profileMasterId == CommonConstants.PROFILES_MASTER_REGION_ADMIN_PROFILE_ID) {
-            model.addAttribute("columnName", CommonConstants.REGION_ID_COLUMN);
-            model.addAttribute("columnValue", selectedProfile.getRegionId());
-            model.addAttribute("showSendSurveyPopupAdmin", String.valueOf(true));
-        }
-        else if (profileMasterId == CommonConstants.PROFILES_MASTER_BRANCH_ADMIN_PROFILE_ID) {
-            model.addAttribute("columnName", CommonConstants.BRANCH_ID_COLUMN);
-            model.addAttribute("columnValue", selectedProfile.getBranchId());
-            model.addAttribute("showSendSurveyPopupAdmin", String.valueOf(true));
-        }
-        else if (profileMasterId == CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID) {
-            model.addAttribute("columnName", CommonConstants.AGENT_ID_COLUMN);
-            model.addAttribute("columnValue", selectedProfile.getAgentId());
-        }
 
         return JspResolver.DASHBOARD;
     }
@@ -1634,34 +1623,52 @@ public class DashboardController {
     }
 
     @ResponseBody
-    @SuppressWarnings("unchecked")
     @RequestMapping(value = "/updatecurrentprofile")
-    public String updateSelectedProfile(Model model, HttpServletRequest request) {
-        LOG.info("Method updateSelectedProfile() started.");
+	public String updateSelectedProfile(Model model, HttpServletRequest request) {
+		LOG.info("Method updateSelectedProfile() started.");
+		HttpSession session = request.getSession(false);
+		String entityIdStr = request.getParameter("entityId");
+		String entityType = request.getParameter("entityType");
 
-        HttpSession session = request.getSession(false);
-        User user = sessionHelper.getCurrentUser();
+		long entityId = 0;
+		try {
+			if (entityIdStr != null && !entityIdStr.equals("")) {
+				entityId = Long.parseLong(entityIdStr);
+			}
+			else {
+				throw new NumberFormatException();
+			}
+		}
+		catch (NumberFormatException e) {
+			LOG.error("Number format exception occurred while parsing the entity id. Reason :" + e.getMessage(), e);
+		}
 
-        AccountType accountType = (AccountType) session
-                .getAttribute(CommonConstants.ACCOUNT_TYPE_IN_SESSION);
-        Map<Long, UserProfile> profileMap = (Map<Long, UserProfile>) session
-                .getAttribute(CommonConstants.USER_PROFILE_MAP);
-        Map<Long, AbridgedUserProfile> profileAbridgedMap = (Map<Long, AbridgedUserProfile>) session
-                .getAttribute(CommonConstants.USER_PROFILE_LIST);
-        String profileIdStr = request.getParameter("profileId");
+		if (entityType.equals(CommonConstants.AGENT_ID_COLUMN)) {
+			entityType = CommonConstants.PROFILE_AGENT_VIEW;
+		}
 
-        UserProfile selectedProfile = userManagementService
-                .updateSelectedProfile(user, accountType, profileMap,
-                        profileIdStr);
+		String entityName = "";
+		UserHierarchyAssignments assignments = (UserHierarchyAssignments) session.getAttribute(CommonConstants.USER_ASSIGNMENTS);
+		if (entityType.equals(CommonConstants.COMPANY_ID_COLUMN)) {
+			entityName = assignments.getCompanies().get(entityId);
+		}
+		else if (entityType.equals(CommonConstants.REGION_ID_COLUMN)) {
+			entityName = assignments.getRegions().get(entityId);
+		}
+		else if (entityType.equals(CommonConstants.BRANCH_ID_COLUMN)) {
+			entityName = assignments.getBranches().get(entityId);
+		}
+		else if (entityType.equals(CommonConstants.PROFILE_AGENT_VIEW)) {
+			entityName = assignments.getAgents().get(entityId);
+		}
 
-        session.setAttribute(CommonConstants.USER_PROFILE, selectedProfile);
-        session.setAttribute(CommonConstants.PROFILE_NAME_COLUMN,
-                profileAbridgedMap.get(selectedProfile.getUserProfileId())
-                        .getUserProfileName());
+		session.setAttribute(CommonConstants.ENTITY_TYPE_COLUMN, entityType);
+		session.setAttribute(CommonConstants.ENTITY_ID_COLUMN, entityId);
+		session.setAttribute(CommonConstants.ENTITY_NAME_COLUMN, entityName);
 
-        LOG.info("Method updateSelectedProfile() finished.");
-        return CommonConstants.SUCCESS_ATTRIBUTE;
-    }
+		LOG.info("Method updateSelectedProfile() finished.");
+		return CommonConstants.SUCCESS_ATTRIBUTE;
+	}
 
     /*
      * Method to mark a particular survey as editable and re-send the link to a
@@ -1772,6 +1779,5 @@ public class DashboardController {
         
 		return JspResolver.LINKEDIN_IMPORT_SOCIAL_LINKS;
     }
-    
 }
 // JIRA SS-137 : by RM-05 : EOC

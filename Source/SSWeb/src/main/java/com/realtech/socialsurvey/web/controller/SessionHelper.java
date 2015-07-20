@@ -26,12 +26,16 @@ import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.commons.EmailTemplateConstants;
 import com.realtech.socialsurvey.core.commons.UserProfileComparator;
 import com.realtech.socialsurvey.core.entities.AbridgedUserProfile;
+import com.realtech.socialsurvey.core.entities.Branch;
 import com.realtech.socialsurvey.core.entities.BranchFromSearch;
+import com.realtech.socialsurvey.core.entities.Company;
 import com.realtech.socialsurvey.core.entities.FileContentReplacements;
 import com.realtech.socialsurvey.core.entities.MailContent;
 import com.realtech.socialsurvey.core.entities.MailContentSettings;
+import com.realtech.socialsurvey.core.entities.Region;
 import com.realtech.socialsurvey.core.entities.RegionFromSearch;
 import com.realtech.socialsurvey.core.entities.User;
+import com.realtech.socialsurvey.core.entities.UserHierarchyAssignments;
 import com.realtech.socialsurvey.core.entities.UserProfile;
 import com.realtech.socialsurvey.core.entities.UserSettings;
 import com.realtech.socialsurvey.core.enums.AccountType;
@@ -368,7 +372,7 @@ public class SessionHelper {
 				}
 			}
 		}
-			
+		
 		long branchId = 0;
 		long regionId = 0;
 		boolean agentAdded = false;
@@ -517,5 +521,136 @@ public class SessionHelper {
 				}
 			}
 		}
+	}
+	
+	// TODO
+	@SuppressWarnings("unchecked")
+	public UserHierarchyAssignments processAssignments(HttpSession session, User user) throws NonFatalException {
+		LOG.info("Method processAssignments() called from SessionHelper");
+		UserHierarchyAssignments assignments = new UserHierarchyAssignments();
+		Map<Long, String> regionsMap = new HashMap<Long, String>();
+		Map<Long, String> branchesMap = new HashMap<Long, String>();
+		
+		List<UserProfile> profiles = userManagementService.getAllUserProfilesForUser(user);
+		Company company = user.getCompany();
+		
+		// Fetch regions data for company
+		List<Region> regions = organizationManagementService.getAllRegionsForCompanyWithProjections(company);
+		if (regions != null && !regions.isEmpty()) {
+			for (Region region : regions) {
+				regionsMap.put(region.getRegionId(), region.getRegion());
+			}
+		}
+		
+		// Fetch branches data for company
+		List<Branch> branches = organizationManagementService.getAllBranchesForCompanyWithProjections(company);
+		if (branches != null && !branches.isEmpty()) {
+			for (Branch branch : branches) {
+				branchesMap.put(branch.getBranchId(), branch.getBranch());
+			}
+		}
+		
+		if (user.isCompanyAdmin()) {
+			Map<Long, String> companies = new HashMap<Long, String>();
+			companies.put(company.getCompanyId(), company.getCompany());
+			assignments.setCompanies(companies);
+			
+			assignments.setRegions(regionsMap);
+			assignments.setBranches(branchesMap);
+		}
+		
+		if (user.isRegionAdmin()) {
+			Map<Long, String> regionsMapUser = assignments.getRegions();
+			if (regionsMapUser == null) {
+				regionsMapUser = new HashMap<Long, String>();
+			}
+			
+			Map<Long, String> branchesMapUser = assignments.getBranches();
+			if (branchesMapUser == null) {
+				branchesMapUser = new HashMap<Long, String>();
+			}
+			
+			for (UserProfile userProfile : profiles) {
+				
+				// fetching for all regions
+				if (userProfile.getProfilesMaster().getProfileId() == CommonConstants.PROFILES_MASTER_REGION_ADMIN_PROFILE_ID) {
+					if (userProfile.getRegionId() > 0l) {
+						long regionId = userProfile.getRegionId();
+						String regionName = regionsMap.get(regionId);
+						if (regionName != null) {
+							regionsMapUser.put(regionId, regionName);
+						}
+						
+						// Fetching branches inside the region
+						List<Branch> branchesInRegion = organizationManagementService.getAllBranchesInRegionWithProjections(regionId);
+						if (branchesInRegion != null && !branchesInRegion.isEmpty()) {
+							for (Branch branch : branchesInRegion) {
+								branchesMapUser.put(branch.getBranchId(), branch.getBranch());
+							}
+						}
+					}
+				}
+			}
+			
+			assignments.setRegions(regionsMapUser);
+			assignments.setBranches(branchesMapUser);
+		}
+		if (user.isBranchAdmin()) {
+			Map<Long, String> regionsMapUser = assignments.getRegions();
+			if (regionsMapUser == null) {
+				regionsMapUser = new HashMap<Long, String>();
+			}
+			
+			Map<Long, String> branchesMapUser = assignments.getBranches();
+			if (branchesMapUser == null) {
+				branchesMapUser = new HashMap<Long, String>();
+			}
+			
+			for (UserProfile userProfile : profiles) {
+				if (userProfile.getProfilesMaster().getProfileId() == CommonConstants.PROFILES_MASTER_BRANCH_ADMIN_PROFILE_ID) {
+					if (userProfile.getBranchId() > 0l) {
+						long branchId = userProfile.getBranchId();
+						String branchName = branchesMap.get(branchId);
+						if (branchName != null) {
+							branchesMapUser.put(branchId, branchName);
+						}
+					}
+				}
+			}
+			
+			assignments.setRegions(regionsMapUser);
+			assignments.setBranches(branchesMapUser);
+		}
+		
+		if (user.isAgent()) {
+			Map<Long, String> agents = new HashMap<Long, String>();
+			agents.put(user.getUserId(), CommonConstants.PROFILE_AGENT_VIEW);
+			assignments.setAgents(agents);
+			
+			session.setAttribute(CommonConstants.ENTITY_ID_COLUMN, user.getUserId());
+			session.setAttribute(CommonConstants.ENTITY_NAME_COLUMN, CommonConstants.PROFILE_AGENT_VIEW);
+			session.setAttribute(CommonConstants.ENTITY_TYPE_COLUMN, CommonConstants.AGENT_ID_COLUMN);
+		}
+		else if (user.isCompanyAdmin()) {
+			session.setAttribute(CommonConstants.ENTITY_ID_COLUMN, company.getCompanyId());
+			session.setAttribute(CommonConstants.ENTITY_NAME_COLUMN, company.getCompany());
+			session.setAttribute(CommonConstants.ENTITY_TYPE_COLUMN, CommonConstants.COMPANY_ID_COLUMN);
+		}
+		else if (assignments.getRegions() != null && !assignments.getRegions().isEmpty()) {
+			Map.Entry<String, String> entry = (Map.Entry<String, String>) assignments.getRegions().entrySet().toArray()[0];
+			session.setAttribute(CommonConstants.ENTITY_ID_COLUMN, entry.getKey());
+			session.setAttribute(CommonConstants.ENTITY_NAME_COLUMN, entry.getValue());
+			session.setAttribute(CommonConstants.ENTITY_TYPE_COLUMN, CommonConstants.REGION_ID_COLUMN);
+		}
+		else if (assignments.getBranches() != null && !assignments.getBranches().isEmpty()) {
+			Map.Entry<String, String> entry = (Map.Entry<String, String>) assignments.getBranches().entrySet().toArray()[0];
+			session.setAttribute(CommonConstants.ENTITY_ID_COLUMN, entry.getKey());
+			session.setAttribute(CommonConstants.ENTITY_NAME_COLUMN, entry.getValue());
+			session.setAttribute(CommonConstants.ENTITY_TYPE_COLUMN, CommonConstants.BRANCH_ID_COLUMN);
+		}
+		session.setAttribute(CommonConstants.USER_ASSIGNMENTS, assignments);
+		
+		LOG.info("Method processAssignments() finished from SessionHelper");
+		return assignments;
 	}
 }
