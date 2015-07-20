@@ -885,6 +885,7 @@ public class DashboardController {
 
         try {
             String customerName = request.getParameter("customerName");
+            String custFirstName = "";
             String customerEmail = request.getParameter("customerEmail");
             String agentName = request.getParameter("agentName");
 
@@ -892,6 +893,13 @@ public class DashboardController {
                 LOG.error("Invalid value (null/empty) passed for customerName.");
                 throw new InvalidInputException(
                         "Invalid value (null/empty) passed for customerName.");
+            }
+            if ( customerName.contains( " " ) ) {
+                String[] nameArray = customerName.split( " " );
+                for ( int nameIdx = 0; nameIdx < nameArray.length - 1; nameIdx++ ) {
+                    custFirstName = custFirstName + nameArray[nameIdx] + " ";
+                }
+                custFirstName = custFirstName.trim();
             }
             if (customerEmail == null || customerEmail.isEmpty()) {
                 LOG.error("Invalid value (null/empty) passed for customerEmail.");
@@ -947,11 +955,11 @@ public class DashboardController {
 
                 if (enableKafka.equals(CommonConstants.YES)) {
                     emailServices.queueSurveyReminderMail(customerEmail,
-                            customerName, agentName, surveyLink, agentPhone,
+                    		custFirstName, agentName, surveyLink, agentPhone,
                             agentTitle, companyName);
                 } else {
                     emailServices.sendDefaultSurveyReminderMail(customerEmail,
-                            customerName, agentName, surveyLink, agentPhone,
+                    		custFirstName, agentName, surveyLink, agentPhone,
                             agentTitle, companyName);
                 }
             } catch (InvalidInputException e) {

@@ -145,6 +145,7 @@ public class IncompleteSurveyReminderSender extends QuartzJobBean
             mailBody = mailBody.replaceAll( "\\[LogoUrl\\]", applicationLogoUrl );
             mailBody = mailBody.replaceAll( "\\[BaseUrl\\]", applicationBaseUrl );
             mailBody = mailBody.replaceAll( "\\[AgentName\\]", agentName );
+            mailBody = mailBody.replaceAll( "\\[FirstName\\]", survey.getCustomerFirstName() );
             mailBody = mailBody.replaceAll( "\\[Name\\]", survey.getCustomerFirstName() + " " + survey.getCustomerLastName() );
             mailBody = mailBody.replaceAll( "\\[Link\\]", surveyLink );
             mailBody = mailBody.replaceAll( "\\[AgentSignature\\]", agentSignature );
@@ -169,8 +170,7 @@ public class IncompleteSurveyReminderSender extends QuartzJobBean
             }
         } else {
             try {
-                emailServices.sendDefaultSurveyReminderMail( survey.getCustomerEmailId(), survey.getCustomerFirstName() + " "
-                    + survey.getCustomerLastName(), agentName, surveyLink, agentPhone, agentTitle, companyName );
+                emailServices.sendDefaultSurveyReminderMail( survey.getCustomerEmailId(), survey.getCustomerFirstName(), agentName, surveyLink, agentPhone, agentTitle, companyName );
             } catch ( InvalidInputException | UndeliveredEmailException e ) {
                 LOG.error( "Exception caught in IncompleteSurveyReminderSender.main while trying to send reminder mail to "
                     + survey.getCustomerFirstName() + " for completion of survey. Nested exception is ", e );
