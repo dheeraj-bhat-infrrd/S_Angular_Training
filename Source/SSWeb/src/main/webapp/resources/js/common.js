@@ -794,3 +794,95 @@ function linkify(inputText) {
 
     return replacedText;
 }
+
+function initializeCityLookup(searchData, elementId) {
+	$('#' + elementId).autocomplete({
+		minLength : 0,
+		source : searchData,
+		focus : function(event, ui) {
+			event.stopPropagation();
+		},
+		select : function(event, ui) {
+			event.stopPropagation();
+		},
+		open : function() {
+			$('.ui-autocomplete').perfectScrollbar({
+				suppressScrollX : true
+			});
+			$('.ui-autocomplete').perfectScrollbar('update');
+		}
+	}).keydown(function(e) {
+		if (e.keyCode != $.ui.keyCode.TAB)
+			return;
+
+		e.keyCode = $.ui.keyCode.DOWN;
+		$(this).trigger(e);
+
+		e.keyCode = $.ui.keyCode.ENTER;
+		$(this).trigger(e);
+	});
+}
+
+function getUniqueCitySearchData(data) {
+	cityLookupList = JSON.parse(data);
+	var searchData = [];
+	for (var i = 0; i < cityLookupList.length; i++) {
+		searchData[i] = toTitleCase(cityLookupList[i].cityname);
+	}
+
+	var uniqueSearchData = searchData.filter(function(itm, i, a) {
+		return i == a.indexOf(itm);
+	});
+	return uniqueSearchData;
+}
+
+function showStateCityRow(parentId, elementId) {
+	$('#'+parentId).show();
+	var stateVal = $('#'+elementId).attr('data-value');
+	if (!stateList) {
+		callAjaxGET("./getusstatelist.do", function(data) {
+			stateList = JSON.parse(data);
+			for (var i = 0; i < stateList.length; i++) {
+				if (stateVal == stateList[i].statecode) {
+					$('#'+elementId).append(
+							'<option data-stateid=' + stateList[i].id
+									+ ' selected >' + stateList[i].statecode
+									+ '</option>');
+				} else {
+					$('#'+elementId).append(
+							'<option data-stateid=' + stateList[i].id + '>'
+									+ stateList[i].statecode + '</option>');
+				}
+			}
+		}, true);
+	} else {
+
+		if ($('#'+elementId).children('option').size() == 1) {
+			for (var i = 0; i < stateList.length; i++) {
+				if (stateVal == stateList[i].statecode) {
+					$('#'+elementId).append(
+							'<option data-stateid=' + stateList[i].id
+									+ ' selected >' + stateList[i].statecode
+									+ '</option>');
+				} else {
+					$('#'+elementId).append(
+							'<option data-stateid=' + stateList[i].id + '>'
+									+ stateList[i].statecode + '</option>');
+				}
+			}
+		} else {
+			if (stateVal != undefined && stateVal != "") {
+				$('#'+elementId).val(stateVal);
+			}
+		}
+	}
+}
+
+function hideStateCityRow(parentId, elementId) {
+	$('#' + parentId).hide();
+	$('#' + parentId + ' input').val('');
+	$('#' + elementId).attr('data-value','');
+	$('#' + elementId).val(function() {
+		return $(this).find('option[disabled]').text();
+	});
+}
