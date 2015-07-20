@@ -17,6 +17,8 @@ var firstNamePatternRegex = /^[a-zA-Z]{2,}$/;
 var lastNamePatternRegEx = /^[a-zA-Z]{2,}$/;
 var pageInitialized = false;
 var currentPhoneRegEx; //Vary the phone regex according to masking
+var stateList; //usStateList
+var cityLookupList; //cityLookupList
 
 function buildMessageDiv(){
 	if($('.err-nw-wrapper').length == 0){
@@ -752,4 +754,10 @@ function validateCountryZipcode(elementId, isOnlyShowToast) {
 		}
 		return false;
 	}
+}
+
+function toTitleCase(str) {
+	return str.replace(/\w\S*/g, function(txt) {
+		return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();
+	});
 }
