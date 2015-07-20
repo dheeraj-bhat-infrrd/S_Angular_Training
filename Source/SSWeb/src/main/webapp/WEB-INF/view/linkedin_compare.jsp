@@ -149,8 +149,6 @@
 <script>
 var selectedCountryRegEx = "";
 var phoneFormat = '(ddd) ddd-dddd';
-var stateList;
-var cityLookupList;
 var profilemasterid = "${profilemasterid}";
 $(document).ready(function() {
 	var countryCode = $('#country-code').val();
@@ -165,7 +163,7 @@ $(document).ready(function() {
 	}
 	
 	if(countryCode == "US"){
-		showStateCityRow();
+		showStateCityRow("state-city-row", "com-state");
 		if( $('input[name="country"]').val() == null || $('input[name="country"]').val() == "" ){
 			$('input[name="country"]').val("United States");
 			$('#country-code').val(countryCode);
@@ -219,9 +217,9 @@ $(document).ready(function() {
 				}
 			}
 			if(ui.item.code=="US"){
-				showStateCityRow();
+				showStateCityRow("state-city-row", "com-state");
 			}else{
-				hideStateCityRow();
+				hideStateCityRow("state-city-row", "com-state");
 			}
 			$('#com-contactno').unmask();
 			phoneFormat = phoneFormatList[ui.item.code];
@@ -250,27 +248,6 @@ $(document).on('click', '#prof-image-upload-btn', function() {
 	$('#prof-image').trigger('click');
 });
 
-/* function callBackOnProfileImageUpload(data) {
-	$('#message-header').html(data);
-	callAjaxGET("./fetchuploadedprofileimage.do", function(profileImageUrl) {
-		if (profilemasterid == 4) {
-			$("#wc-photo-upload").removeClass('dsh-pers-default-img');
-		} else if (profilemasterid == 3) {
-			$("#wc-photo-upload").removeClass('dsh-office-default-img');
-		} else if (profilemasterid == 2) {
-			$("#wc-photo-upload").removeClass('dsh-region-default-img');
-		} else if (profilemasterid == 1) {
-			$("#wc-photo-upload").removeClass('dsh-comp-default-img');
-		}
-		
-		$('#wc-photo-upload').css("background", "url(" + profileImageUrl + ") no-repeat center");
-		$('#wc-photo-upload').css("background-size","contain");
-		hideOverlay();
-	});
-
-	$('#overlay-toast').html($('#display-msg-div').text().trim());
-	showToast();
-} */
 
 // Company information
 function validateCompanyInformationForm(elementId) {
@@ -395,30 +372,6 @@ function validateSummaryForm() {
 	return isFormValid;
 }
 
-function showStateCityRow() {
-	$('#state-city-row').show();
-	if(!stateList){
-		callAjaxGET("./getusstatelist.do", function(data){
-			stateList = JSON.parse(data);
-			for(var i=0; i<stateList.length; i++){
-				$('#com-state').append('<option data-stateid='+stateList[i].id+'>'+stateList[i].statecode+'</option>');
-			}
-			var stateVal = $('#com-state').attr('data-value');
-			if(stateVal && stateVal != ""){
-				$('#com-state').val(stateVal);
-			}
-		}, true);
-	}
-}
-
-function hideStateCityRow() {
-	$('#state-city-row').hide();
-	$('#com-city').val('').hide();
-	$('#com-state').val(function() {
-		return $(this).find('option[selected]').text();
-    });
-}
-
 $(document).on('click', '#wc-summary-submit', function() {
 	if (validateSummaryForm()) {
 		var payload = {
@@ -434,19 +387,10 @@ $(document).on('click', '#wc-summary-submit', function() {
 	}
 });
 $('#com-state').on('change',function(e){
-	$('#com-city').val('');
 	var stateId = $(this).find(":selected").attr('data-stateid');
 	callAjaxGET("./getzipcodesbystateid.do?stateId="+stateId, function(data){
-		cityLookupList = JSON.parse(data);
-		var searchData = [];
-		for(var i=0; i<cityLookupList.length; i++){
-			searchData[i] = cityLookupList[i].cityname;
-		}
-		
-		var uniqueSearchData = searchData.filter(function(itm,i,a){
-		    return i==a.indexOf(itm);
-		});
-		initializeCityLookup(uniqueSearchData);
+		var uniqueSearchData = getUniqueCitySearchData(data);
+		initializeCityLookup(uniqueSearchData, "com-city");
 	}, true);
 });
 
@@ -456,31 +400,4 @@ $('#com-city').bind('focus', function(){
 		$(this).autocomplete("search");		
 	}
 });
-function initializeCityLookup(searchData){
-	$('#com-city').autocomplete({
-		minLength : 0,
-		source : searchData,
-		focus : function(event, ui) {
-			event.stopPropagation();
-		},
-		select : function(event, ui) {
-			event.stopPropagation();
-		},
-		open : function() {
-			$('.ui-autocomplete').perfectScrollbar({
-				suppressScrollX : true
-			});
-			$('.ui-autocomplete').perfectScrollbar('update');
-		}
-	}).keydown(function(e){
-  	    if( e.keyCode != $.ui.keyCode.TAB) return; 
-  	    
-   	   e.keyCode = $.ui.keyCode.DOWN;
-   	   $(this).trigger(e);
-
-   	   e.keyCode = $.ui.keyCode.ENTER;
-   	   $(this).trigger(e);
-   	});
-	
-}
 </script>
