@@ -881,6 +881,7 @@ function showStateCityRow(parentId, elementId) {
 function hideStateCityRow(parentId, elementId) {
 	$('#' + parentId).hide();
 	$('#' + parentId + ' input').val('');
+	$('#' + elementId).attr('data-value','');
 	$('#' + elementId).val(function() {
 		return $(this).find('option[disabled]').text();
 	});
