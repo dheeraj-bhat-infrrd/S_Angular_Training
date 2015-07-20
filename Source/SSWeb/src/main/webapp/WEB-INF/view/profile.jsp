@@ -299,8 +299,10 @@
 					</c:if>
 					<c:if test="${not empty profile.contact_details && not empty profile.contact_details.contact_numbers && not empty profile.contact_details.contact_numbers.work}">
 						<div class="web-addr-header float-left clearfix">
+						<a href="tel:${profile.contact_details.contact_numbers.work}">
 							<div class="phn-num-img float-left"></div>
 							<div class="phone-number-txt float-left">${profile.contact_details.contact_numbers.work}</div>
+						</a>
 						</div>
 					</c:if>
 					<div class="float-right hm-hr-row-right clearfix">
