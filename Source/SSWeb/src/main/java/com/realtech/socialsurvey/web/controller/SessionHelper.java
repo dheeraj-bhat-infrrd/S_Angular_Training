@@ -27,6 +27,7 @@ import com.realtech.socialsurvey.core.commons.UserProfileComparator;
 import com.realtech.socialsurvey.core.entities.Branch;
 import com.realtech.socialsurvey.core.entities.Company;
 import com.realtech.socialsurvey.core.entities.FileContentReplacements;
+import com.realtech.socialsurvey.core.entities.LicenseDetail;
 import com.realtech.socialsurvey.core.entities.MailContent;
 import com.realtech.socialsurvey.core.entities.MailContentSettings;
 import com.realtech.socialsurvey.core.entities.Region;
@@ -357,6 +358,25 @@ public class SessionHelper {
 
 		List<UserProfile> profiles = userManagementService.getAllUserProfilesForUser(user);
 		Company company = user.getCompany();
+		
+		// For individual account type
+		AccountType accountType = null;
+		List<LicenseDetail> licenseDetails = user.getCompany().getLicenseDetails();
+		if (licenseDetails != null && !licenseDetails.isEmpty()) {
+			LicenseDetail licenseDetail = licenseDetails.get(0);
+			accountType = AccountType.getAccountType(licenseDetail.getAccountsMaster().getAccountsMasterId());
+		}
+		if (accountType.getValue() == CommonConstants.ACCOUNTS_MASTER_INDIVIDUAL) {
+			Map<Long, String> agents = new HashMap<Long, String>();
+			agents.put(user.getUserId(), CommonConstants.PROFILE_AGENT_VIEW);
+			assignments.setAgents(agents);
+			
+			session.setAttribute(CommonConstants.ENTITY_ID_COLUMN, user.getUserId());
+			session.setAttribute(CommonConstants.ENTITY_NAME_COLUMN, CommonConstants.PROFILE_AGENT_VIEW);
+			session.setAttribute(CommonConstants.ENTITY_TYPE_COLUMN, CommonConstants.AGENT_ID_COLUMN);
+			session.setAttribute(CommonConstants.USER_ASSIGNMENTS, assignments);
+			return assignments;
+		}
 
 		// Fetch regions data for company
 		List<Region> regions = organizationManagementService.getAllRegionsForCompanyWithProjections(company);
