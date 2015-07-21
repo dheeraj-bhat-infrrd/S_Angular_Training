@@ -326,7 +326,7 @@ function paintDashboard(profileMasterId, newProfileName, newProfileValue, typeoO
 	});
 	
 	// Loads the image in circle of header.
-	loadDisplayPicture(profileMasterId);
+	loadDisplayPicture();
 	// Loads the master image in dashboard.
 	showDisplayPic();
 }
