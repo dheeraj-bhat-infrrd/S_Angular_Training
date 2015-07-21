@@ -107,48 +107,60 @@ public class DashboardController
     private final String CONTENT_DISPOSITION_HEADER = "Content-Disposition";
     private final String EXCEL_FILE_EXTENSION = ".xlsx";
 
-
-    /*
-     * Method to initiate dashboard
-     */
-    @RequestMapping ( value = "/dashboard")
-    public String initDashboardPage( Model model, HttpServletRequest request ) throws NonFatalException
-    {
-        LOG.info( "Dashboard Page started" );
-        HttpSession session = request.getSession( false );
-        User user = sessionHelper.getCurrentUser();
-        if ( user == null ) {
-            throw new NonFatalException( "NonFatalException while logging in. " );
-        }
+	/*
+	 * Method to initiate dashboard
+	 */
+	@RequestMapping(value = "/dashboard")
+	public String initDashboardPage(Model model, HttpServletRequest request) throws NonFatalException {
+		LOG.info("Dashboard Page started");
+		HttpSession session = request.getSession(false);
+		User user = sessionHelper.getCurrentUser();
+		if (user == null) {
+			throw new NonFatalException("NonFatalException while logging in. ");
+		}
 
 		long entityId = (long) session.getAttribute(CommonConstants.ENTITY_ID_COLUMN);
 		String entityType = (String) session.getAttribute(CommonConstants.ENTITY_TYPE_COLUMN);
-		
-        if (entityType.equals(CommonConstants.COMPANY_ID_COLUMN)) {
-            model.addAttribute("columnName", entityType);
-            model.addAttribute("columnValue", entityId);
-            model.addAttribute("showSendSurveyPopupAdmin", String.valueOf(true));
-        }
-        else if (entityType.equals(CommonConstants.REGION_ID_COLUMN)) {
-            model.addAttribute("columnName", entityType);
-            model.addAttribute("columnValue", entityId);
-            model.addAttribute("showSendSurveyPopupAdmin", String.valueOf(true));
-        }
-        else if (entityType.equals(CommonConstants.BRANCH_ID_COLUMN)) {
-            model.addAttribute("columnName", entityType);
-            model.addAttribute("columnValue", entityId);
-            model.addAttribute("showSendSurveyPopupAdmin", String.valueOf(true));
-        }
-        else if (entityType.equals(CommonConstants.AGENT_ID_COLUMN)) {
-            model.addAttribute("columnName", CommonConstants.AGENT_ID_COLUMN);
-            model.addAttribute("columnValue", entityId);
-        }
 
-        model.addAttribute("userId", user.getUserId());
-        model.addAttribute("emailId", user.getEmailId());
+		boolean modelSet = false;
+		if (user.getCompany() != null && user.getCompany().getLicenseDetails() != null && !user.getCompany().getLicenseDetails().isEmpty()
+				&& user.getCompany().getLicenseDetails().get(0).getAccountsMaster() != null) {
+			if (user.getCompany().getLicenseDetails().get(0).getAccountsMaster().getAccountsMasterId() == CommonConstants.ACCOUNTS_MASTER_INDIVIDUAL) {
+				model.addAttribute("columnName", CommonConstants.COMPANY_ID_COLUMN);
+				model.addAttribute("columnValue", user.getCompany().getCompanyId());
+				model.addAttribute("showSendSurveyPopupAdmin", String.valueOf(false));
+				model.addAttribute("showSendSurveyPopup", String.valueOf(true));
+				modelSet = true;
+			}
+		}
 
-        return JspResolver.DASHBOARD;
-    }
+		if (!modelSet) {
+			if (entityType.equals(CommonConstants.COMPANY_ID_COLUMN)) {
+				model.addAttribute("columnName", entityType);
+				model.addAttribute("columnValue", entityId);
+				model.addAttribute("showSendSurveyPopupAdmin", String.valueOf(true));
+			}
+			else if (entityType.equals(CommonConstants.REGION_ID_COLUMN)) {
+				model.addAttribute("columnName", entityType);
+				model.addAttribute("columnValue", entityId);
+				model.addAttribute("showSendSurveyPopupAdmin", String.valueOf(true));
+			}
+			else if (entityType.equals(CommonConstants.BRANCH_ID_COLUMN)) {
+				model.addAttribute("columnName", entityType);
+				model.addAttribute("columnValue", entityId);
+				model.addAttribute("showSendSurveyPopupAdmin", String.valueOf(true));
+			}
+			else if (entityType.equals(CommonConstants.AGENT_ID_COLUMN)) {
+				model.addAttribute("columnName", CommonConstants.AGENT_ID_COLUMN);
+				model.addAttribute("columnValue", entityId);
+			}
+		}
+
+		model.addAttribute("userId", user.getUserId());
+		model.addAttribute("emailId", user.getEmailId());
+
+		return JspResolver.DASHBOARD;
+	}
 
 
     /*
@@ -835,6 +847,7 @@ public class DashboardController
         try {
             String customerName = request.getParameter( "customerName" );
             String custFirstName = "";
+            String custLastName = "";
             String customerEmail = request.getParameter( "customerEmail" );
             String agentName = request.getParameter( "agentName" );
 
@@ -844,6 +857,7 @@ public class DashboardController
             }
             if ( customerName.contains( " " ) ) {
                 String[] nameArray = customerName.split( " " );
+                custLastName = nameArray[nameArray.length - 1];
                 for ( int nameIdx = 0; nameIdx < nameArray.length - 1; nameIdx++ ) {
                     custFirstName = custFirstName + nameArray[nameIdx] + " ";
                 }
@@ -870,10 +884,10 @@ public class DashboardController
             }
 
             String surveyLink = "";
-            SurveyPreInitiation survey = surveyHandler.getPreInitiatedSurvey( agentId, customerEmail );
+            SurveyPreInitiation survey = surveyHandler.getPreInitiatedSurvey( agentId, customerEmail, custFirstName, custLastName );
             if ( survey != null ) {
                 surveyLink = surveyHandler.getSurveyUrl( agentId, customerEmail,
-                    surveyHandler.composeLink( agentId, customerEmail ) );
+                    surveyHandler.composeLink( agentId, customerEmail, custFirstName, custLastName ) );
             }
 
             try {
@@ -1416,7 +1430,7 @@ public class DashboardController
                         throw new InvalidInputException( "Agent id can not be null" );
                     }
                     User currentUser = userManagementService.getUserByUserId( currentAgentId );
-                    if ( surveyHandler.getPreInitiatedSurvey( agentId, recipient.getEmailId() ) == null )
+                    if ( surveyHandler.getPreInitiatedSurvey( agentId, recipient.getEmailId(), recipient.getFirstname(), recipient.getLastname() ) == null )
                         surveyHandler.sendSurveyInvitationMail( recipient.getFirstname(), recipient.getLastname(),
                             recipient.getEmailId(), null, currentUser, true, source );
                 }
@@ -1538,8 +1552,8 @@ public class DashboardController
                 throw new InvalidInputException( "Invalid value (Null/Empty) found for agentId." );
             }
             long agentId = Long.parseLong( agentIdStr );
-            surveyHandler.changeStatusOfSurvey( agentId, customerEmail, true );
-            SurveyDetails survey = surveyHandler.getSurveyDetails( agentId, customerEmail );
+            surveyHandler.changeStatusOfSurvey( agentId, customerEmail, firstName, lastName, true );
+            SurveyDetails survey = surveyHandler.getSurveyDetails( agentId, customerEmail, firstName, lastName );
             User user = userManagementService.getUserByUserId( agentId );
             surveyHandler.decreaseSurveyCountForAgent( agentId );
             surveyHandler.sendSurveyRestartMail( firstName, lastName, customerEmail, survey.getCustRelationWithAgent(), user,
