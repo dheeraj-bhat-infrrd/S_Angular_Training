@@ -119,7 +119,7 @@ public class DashboardController
         LOG.info( "Dashboard Page started" );
         HttpSession session = request.getSession( false );
         User user = sessionHelper.getCurrentUser();
-
+        boolean modelSet = false;
         if ( user == null ) {
             throw new NonFatalException( "NonFatalException while logging in. " );
         } else {
@@ -138,23 +138,37 @@ public class DashboardController
             model.addAttribute( "profileId", selectedProfile.getUserProfileId() );
             model.addAttribute( "profileMasterId", profileMasterId );
 
-            if ( profileMasterId == CommonConstants.PROFILES_MASTER_COMPANY_ADMIN_PROFILE_ID ) {
-                model.addAttribute( "columnName", CommonConstants.COMPANY_ID_COLUMN );
-                model.addAttribute( "columnValue", user.getCompany().getCompanyId() );
-                model.addAttribute( "showSendSurveyPopupAdmin", String.valueOf( true ) );
-            } else if ( profileMasterId == CommonConstants.PROFILES_MASTER_REGION_ADMIN_PROFILE_ID ) {
-                model.addAttribute( "columnName", CommonConstants.REGION_ID_COLUMN );
-                model.addAttribute( "columnValue", selectedProfile.getRegionId() );
-                model.addAttribute( "showSendSurveyPopupAdmin", String.valueOf( true ) );
-            } else if ( profileMasterId == CommonConstants.PROFILES_MASTER_BRANCH_ADMIN_PROFILE_ID ) {
-                model.addAttribute( "columnName", CommonConstants.BRANCH_ID_COLUMN );
-                model.addAttribute( "columnValue", selectedProfile.getBranchId() );
-                model.addAttribute( "showSendSurveyPopupAdmin", String.valueOf( true ) );
-            } else if ( profileMasterId == CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID ) {
-                model.addAttribute( "columnName", CommonConstants.AGENT_ID_COLUMN );
-                model.addAttribute( "columnValue", selectedProfile.getAgentId() );
+            if ( user.getCompany() != null ) {
+                if ( user.getCompany().getLicenseDetails() != null && !user.getCompany().getLicenseDetails().isEmpty() ) {
+                    if ( user.getCompany().getLicenseDetails().get( 0 ).getAccountsMaster() != null ) {
+                        if ( user.getCompany().getLicenseDetails().get( 0 ).getAccountsMaster().getAccountsMasterId() == CommonConstants.ACCOUNTS_MASTER_INDIVIDUAL ) {
+                            model.addAttribute( "columnName", CommonConstants.COMPANY_ID_COLUMN );
+                            model.addAttribute( "columnValue", user.getCompany().getCompanyId() );
+                            model.addAttribute( "showSendSurveyPopupAdmin", String.valueOf( false ) );
+                            model.addAttribute( "showSendSurveyPopup", String.valueOf( true ) );
+                            modelSet = true;
+                        }
+                    }
+                }
             }
-
+            if ( !modelSet ) {
+                if ( profileMasterId == CommonConstants.PROFILES_MASTER_COMPANY_ADMIN_PROFILE_ID ) {
+                    model.addAttribute( "columnName", CommonConstants.COMPANY_ID_COLUMN );
+                    model.addAttribute( "columnValue", user.getCompany().getCompanyId() );
+                    model.addAttribute( "showSendSurveyPopupAdmin", String.valueOf( true ) );
+                } else if ( profileMasterId == CommonConstants.PROFILES_MASTER_REGION_ADMIN_PROFILE_ID ) {
+                    model.addAttribute( "columnName", CommonConstants.REGION_ID_COLUMN );
+                    model.addAttribute( "columnValue", selectedProfile.getRegionId() );
+                    model.addAttribute( "showSendSurveyPopupAdmin", String.valueOf( true ) );
+                } else if ( profileMasterId == CommonConstants.PROFILES_MASTER_BRANCH_ADMIN_PROFILE_ID ) {
+                    model.addAttribute( "columnName", CommonConstants.BRANCH_ID_COLUMN );
+                    model.addAttribute( "columnValue", selectedProfile.getBranchId() );
+                    model.addAttribute( "showSendSurveyPopupAdmin", String.valueOf( true ) );
+                } else if ( profileMasterId == CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID ) {
+                    model.addAttribute( "columnName", CommonConstants.AGENT_ID_COLUMN );
+                    model.addAttribute( "columnValue", selectedProfile.getAgentId() );
+                }
+            }
             return JspResolver.DASHBOARD;
         }
     }
