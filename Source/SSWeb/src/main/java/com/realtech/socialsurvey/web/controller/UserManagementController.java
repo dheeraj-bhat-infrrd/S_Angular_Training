@@ -1150,7 +1150,7 @@ public class UserManagementController
 		try {
 			profileSettings = profileManagementService.aggregateUserProfile(user, accountType, userSettings, branchId, regionId, profilesMaster);
 		}
-		catch (InvalidInputException e) {
+		catch (InvalidInputException | NoRecordsFetchedException e) {
 			LOG.error("InvalidInputException while fetching profile. Reason :" + e.getMessage(), e);
 			model.addAttribute("message", messageUtils.getDisplayMessage(e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE));
 		}
@@ -1161,7 +1161,7 @@ public class UserManagementController
 		try {
 			parentLock = profileManagementService.aggregateParentLockSettings(user, accountType, userSettings, branchId, regionId, profilesMaster);
 		}
-		catch (InvalidInputException e) {
+		catch (InvalidInputException | NoRecordsFetchedException e) {
 			LOG.error("InvalidInputException while fetching profile. Reason :" + e.getMessage(), e);
 			model.addAttribute("message", messageUtils.getDisplayMessage(e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE));
 		}

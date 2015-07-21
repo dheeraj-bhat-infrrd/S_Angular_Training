@@ -150,7 +150,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 
 	@Override
 	public LockSettings aggregateParentLockSettings(User user, AccountType accountType, UserSettings settings, long branchId, long regionId,
-			int profilesMaster) throws InvalidInputException {
+			int profilesMaster) throws InvalidInputException, NoRecordsFetchedException {
 		LOG.info("Method aggregateParentLockSettings() called from ProfileManagementService");
 		if (user == null) {
 			throw new InvalidInputException("User is not set.");
@@ -171,6 +171,8 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 
 		// If user is not Company Admin, Lock settings need to be aggregated
 		else {
+			OrganizationUnitSettings branchSettings = null;
+			OrganizationUnitSettings regionSettings = null;
 			switch (accountType) {
 				case FREE:
 				case INDIVIDUAL:
@@ -192,7 +194,8 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 					// Individual
 					else if (profilesMaster == CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID) {
 						LOG.debug("Aggregating LockSettings till Branch for Agent of Company account type");
-						parentLockSettings = lockSettingsTillBranch(settings.getCompanySettings(), null, settings.getBranchSettings().get(branchId));
+						branchSettings = organizationManagementService.getBranchSettingsDefault(branchId);
+						parentLockSettings = lockSettingsTillBranch(settings.getCompanySettings(), null, branchSettings);
 					}
 					break;
 
@@ -207,17 +210,30 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 					else if (profilesMaster == CommonConstants.PROFILES_MASTER_BRANCH_ADMIN_PROFILE_ID) {
 						LOG.debug("Aggregating LockSettings till Region for Branch Admin of Enterprise account type");
 						if (branchId > 0l) {
+							branchSettings = organizationManagementService.getBranchSettingsDefault(branchId);
+
 							Branch branch = branchDao.findById(Branch.class, branchId);
 							regionId = branch.getRegion().getRegionId();
 						}
-						parentLockSettings = lockSettingsTillRegion(settings.getCompanySettings(), settings.getRegionSettings().get(regionId));
+						if (regionId > 0l) {
+							regionSettings = organizationManagementService.getRegionSettings(regionId);
+						}
+						parentLockSettings = lockSettingsTillRegion(settings.getCompanySettings(), regionSettings);
 					}
 
 					// Individual
 					else if (profilesMaster == CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID) {
 						LOG.debug("Aggregating LockSettings till Branch for Agent of Enterprise account type");
-						parentLockSettings = lockSettingsTillBranch(settings.getCompanySettings(), settings.getRegionSettings().get(regionId),
-								settings.getBranchSettings().get(branchId));
+						if (branchId > 0l) {
+							branchSettings = organizationManagementService.getBranchSettingsDefault(branchId);
+
+							Branch branch = branchDao.findById(Branch.class, branchId);
+							regionId = branch.getRegion().getRegionId();
+						}
+						if (regionId > 0l) {
+							regionSettings = organizationManagementService.getRegionSettings(regionId);
+						}
+						parentLockSettings = lockSettingsTillBranch(settings.getCompanySettings(), regionSettings, branchSettings);
 					}
 					break;
 
@@ -305,7 +321,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 
 	@Override
 	public OrganizationUnitSettings aggregateUserProfile(User user, AccountType accountType, UserSettings settings, long branchId, long regionId,
-			int profilesMaster) throws InvalidInputException {
+			int profilesMaster) throws InvalidInputException, NoRecordsFetchedException {
 		LOG.info("Method aggregateUserProfile() called from ProfileManagementService");
 		if (user == null) {
 			throw new InvalidInputException("User is not set.");
@@ -326,6 +342,8 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 
 		// If user is not Company Admin, Profile need to be aggregated
 		else {
+			OrganizationUnitSettings branchSettings = null;
+			OrganizationUnitSettings regionSettings = null;
 			switch (accountType) {
 				case FREE:
 				case INDIVIDUAL:
@@ -339,45 +357,50 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 
 				case COMPANY:
 					LOG.info("Company account type");
+					branchSettings = organizationManagementService.getBranchSettingsDefault(branchId);
+
 					// Branch Admin
 					if (profilesMaster == CommonConstants.PROFILES_MASTER_BRANCH_ADMIN_PROFILE_ID) {
 						LOG.debug("Aggregate Profile for BranchAdmin of Company account type");
-						userProfile = aggregateBranchProfile(settings.getCompanySettings(), null, settings.getBranchSettings().get(branchId));
+						userProfile = aggregateBranchProfile(settings.getCompanySettings(), null, branchSettings);
 					}
 
 					// Individual
 					else if (profilesMaster == CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID) {
 						LOG.debug("Aggregate Profile for Agent of Company account type");
-						userProfile = aggregateAgentProfile(settings.getCompanySettings(), null, settings.getBranchSettings().get(branchId),
-								settings.getAgentSettings());
+						userProfile = aggregateAgentProfile(settings.getCompanySettings(), null, branchSettings, settings.getAgentSettings());
 					}
 					break;
 
 				case ENTERPRISE:
 					LOG.info("Enterprise account type");
 					if (branchId > 0l) {
+						branchSettings = organizationManagementService.getBranchSettingsDefault(branchId);
+						
 						Branch branch = branchDao.findById(Branch.class, branchId);
 						regionId = branch.getRegion().getRegionId();
 					}
-					
+					if (regionId > 0l) {
+						regionSettings = organizationManagementService.getRegionSettings(regionId);
+					}
+
 					// Region Admin
 					if (profilesMaster == CommonConstants.PROFILES_MASTER_REGION_ADMIN_PROFILE_ID) {
 						LOG.debug("Aggregate Profile for RegionAdmin of Enterprise account type");
-						userProfile = aggregateRegionProfile(settings.getCompanySettings(), settings.getRegionSettings().get(regionId));
+						userProfile = aggregateRegionProfile(settings.getCompanySettings(), regionSettings);
 					}
 
 					// Branch Admin
 					else if (profilesMaster == CommonConstants.PROFILES_MASTER_BRANCH_ADMIN_PROFILE_ID) {
 						LOG.debug("Aggregate Profile for BranchAdmin of Enterprise account type");
-						userProfile = aggregateBranchProfile(settings.getCompanySettings(), settings.getRegionSettings().get(regionId), settings
-								.getBranchSettings().get(branchId));
+						userProfile = aggregateBranchProfile(settings.getCompanySettings(), regionSettings, branchSettings);
 					}
 
 					// Individual
 					else if (profilesMaster == CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID) {
 						LOG.debug("Aggregate Profile for Agent of Enterprise account type");
-						userProfile = aggregateAgentProfile(settings.getCompanySettings(), settings.getRegionSettings().get(regionId), settings
-								.getBranchSettings().get(branchId), settings.getAgentSettings());
+						userProfile = aggregateAgentProfile(settings.getCompanySettings(), regionSettings, branchSettings,
+								settings.getAgentSettings());
 					}
 					break;
 
