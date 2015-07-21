@@ -182,7 +182,7 @@ public class DashboardController
 			if (columnName.equalsIgnoreCase(CommonConstants.COMPANY_ID_COLUMN)) {
 				columnValue = user.getCompany().getCompanyId();
 
-				unitSettings = organizationManagementService.getCompanySettings(columnValue);
+				unitSettings = organizationManagementService.getCompanySettings(user);
 				if (unitSettings.getContact_details() != null && unitSettings.getContact_details().getName() != null) {
 					model.addAttribute("name", unitSettings.getContact_details().getName());
 				}
@@ -1448,6 +1448,7 @@ public class DashboardController
 	@RequestMapping(value = "/dashboardbuttonsorder", method = RequestMethod.GET)
 	public String getDashboardButtonsOrder(HttpServletRequest request) {
 		LOG.info("Method sendMultipleSurveyInvitations() called from DashboardController.");
+		User user = sessionHelper.getCurrentUser();
 		String columnName = request.getParameter("columnName");
 		String columnValueStr = request.getParameter("columnValue");
 		long columnValue = Long.parseLong(columnValueStr);
@@ -1455,7 +1456,7 @@ public class DashboardController
 		List<ProfileStage> stages = new ArrayList<>();
 		try {
 			if (columnName.equalsIgnoreCase(CommonConstants.COMPANY_ID_COLUMN)) {
-				stages = new ArrayList<>(organizationManagementService.getCompanySettings(columnValue).getProfileStages());
+				stages = new ArrayList<>(organizationManagementService.getCompanySettings(user).getProfileStages());
 			}
 			else if (columnName.equalsIgnoreCase(CommonConstants.REGION_ID_COLUMN)) {
 				stages = new ArrayList<>(organizationManagementService.getRegionSettings(columnValue).getProfileStages());
