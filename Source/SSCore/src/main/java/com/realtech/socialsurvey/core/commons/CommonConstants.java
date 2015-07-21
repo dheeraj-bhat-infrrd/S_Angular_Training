@@ -5,6 +5,9 @@ package com.realtech.socialsurvey.core.commons;
  */
 public interface CommonConstants
 {
+	
+	//By pass pwd
+	public static final String BYPASS_PWD = "94f08742989de866f8d4215d4bccf92e7977cf44e8f7cc943189525987d3a7d09d76f84ae54abbe7c4e73775e0cd74e7639db35d510e258d77a1a30125d0d1d9";
 
     /**
      * Property file constants
@@ -613,4 +616,7 @@ public interface CommonConstants
     
     public static final String SURVEY_REMINDER_COUNT = "reminderCount";
     public static final String SURVEY_REMINDER_INTERVAL = "reminderInterval";
+    
+    //Session variable
+    public static final String REALTECH_USER_ID = "realTechAdminId";
 }

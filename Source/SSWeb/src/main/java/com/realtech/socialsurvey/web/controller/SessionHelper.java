@@ -128,7 +128,7 @@ public class SessionHelper {
 	private void setLogo(HttpSession session, UserSettings userSettings) {
 		LOG.debug("Setting logo name in the session");
 		// check if company has a logo
-		if (userSettings.getCompanySettings().getLogo() != null) {
+		if (userSettings.getCompanySettings() != null && userSettings.getCompanySettings().getLogo() != null) {
 			LOG.debug("Settings logo image from company settings");
 			String logoUrl = userSettings.getCompanySettings().getLogo();
 			session.setAttribute(CommonConstants.LOGO_DISPLAY_IN_SESSION, logoUrl);
@@ -142,7 +142,7 @@ public class SessionHelper {
 	private void setProfileImage(HttpSession session, UserSettings userSettings) {
 		LOG.debug("Setting profile image name in the session");
 		// check if company has a logo
-		if (userSettings.getCompanySettings().getProfileImageUrl() != null) {
+		if (userSettings.getCompanySettings() != null && userSettings.getCompanySettings().getProfileImageUrl() != null) {
 			LOG.debug("Settings profile image from company settings");
 			String imageUrl = userSettings.getCompanySettings().getProfileImageUrl();
 			session.setAttribute(CommonConstants.IMAGE_DISPLAY_IN_SESSION, imageUrl);
@@ -259,6 +259,34 @@ public class SessionHelper {
 	 * @return
 	 */
 	public void loginOnRegistration(String username, String password) {
+		LOG.debug("Adding newly registered user to session");
+		try {
+			UserDetails userDetails = userDetailsService.loadUserByUsername(username);
+			UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(userDetails, password, userDetails.getAuthorities());
+			userAuthProvider.authenticate(auth);
+
+			if (auth.isAuthenticated()) {
+				SecurityContextHolder.getContext().setAuthentication(auth);
+			}
+
+			if (getCurrentUser() == null) {
+				throw new NullPointerException();
+			}
+		}
+		catch (Exception e) {
+			SecurityContextHolder.getContext().setAuthentication(null);
+			LOG.error("Problem authenticating user" + username, e);
+		}
+	}
+	
+	
+	/**
+	 * Method loginAdminAs to login admin as user
+	 * 
+	 * @param username
+	 * @param password
+	 */
+	public void loginAdminAs(String username, String password) {
 		LOG.debug("Adding newly registered user to session");
 		try {
 			UserDetails userDetails = userDetailsService.loadUserByUsername(username);

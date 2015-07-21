@@ -71,7 +71,7 @@ public class LoginController {
 		LOG.info("Method redirectToUserHomeIfSessionExists() called from LoginController");
 		return String.valueOf(sessionHelper.isUserActiveSessionExists());
 	}
-	
+
 	// Redirects user to Landing Page if session is active, else to index page
 	@RequestMapping(value = "/home")
 	public String initHomePage(HttpServletResponse response) {
@@ -85,16 +85,16 @@ public class LoginController {
 		LOG.info("Method initIndexPage() called from LoginController");
 		return JspResolver.INDEX;
 	}
-	
+
 	@RequestMapping(value = "/login")
 	public String initLoginPage(Model model, @RequestParam(value = STATUS_PARAM, required = false) String status,
 			RedirectAttributes redirectAttributes) {
 		LOG.info("Inside initLoginPage() of LoginController");
-		
+
 		// Check for existing session
 		if (sessionHelper.isUserActiveSessionExists()) {
 			LOG.info("Existing Active Session detected");
-			
+
 			redirectAttributes.addFlashAttribute(CommonConstants.ACTIVE_SESSIONS_FOUND, "true");
 			return "redirect:/" + JspResolver.LANDING + ".do";
 		}
@@ -122,8 +122,15 @@ public class LoginController {
 	}
 
 	@RequestMapping(value = "/landing")
-	public String initLandingPage() {
+	public String initLandingPage(Model model, HttpServletRequest request) {
 		LOG.info("Login Page started");
+
+		User user = sessionHelper.getCurrentUser();
+
+		if (user.isSuperAdmin()) {
+			return JspResolver.ADMIN_LANDING;
+		}
+
 		return JspResolver.LANDING;
 	}
 
@@ -150,12 +157,13 @@ public class LoginController {
 	 * @return
 	 */
 	@RequestMapping(value = "/userlogin", method = RequestMethod.GET)
-	public String login(Model model, HttpServletRequest request, HttpServletResponse response) {
+	public String login(Model model, HttpServletRequest request, HttpServletResponse response, RedirectAttributes redirectAttributes) {
 		LOG.info("Login controller called for user login");
 		User user = null;
 		AccountType accountType = null;
 		String redirectTo = null;
 		String isDirectRegistration = null;
+
 		try {
 			// Setting the direct registration flag
 			isDirectRegistration = request.getParameter("isDirectRegistration");
@@ -176,20 +184,19 @@ public class LoginController {
 			else {
 				model.addAttribute("skippayment", "false");
 			}
-			user = sessionHelper.getCurrentUser();
-			HttpSession session = request.getSession(true);
 
-			
-			//Check if super admin is logged in
-			
-			if(user.isSuperAdmin()) {
+			HttpSession session = request.getSession(true);
+			user = sessionHelper.getCurrentUser();
+			user = userManagementService.getUserByUserId(user.getUserId());
+			userManagementService.setProfilesOfUser(user);
+
+			// Check if super admin is logged in
+			if (user.isSuperAdmin()) {
 				return JspResolver.ADMIN_LANDING;
 			}
-			
-			
+
 			List<LicenseDetail> licenseDetails = user.getCompany().getLicenseDetails();
 			if (licenseDetails != null && !licenseDetails.isEmpty()) {
-
 				LicenseDetail licenseDetail = licenseDetails.get(0);
 				accountType = AccountType.getAccountType(licenseDetail.getAccountsMaster().getAccountsMasterId());
 				session.setAttribute(CommonConstants.ACCOUNT_TYPE_IN_SESSION, accountType);
@@ -216,17 +223,18 @@ public class LoginController {
 
 				LOG.debug("Company profile not complete, redirecting to company information page");
 				redirectTo = JspResolver.COMPANY_INFORMATION;
-				if (redirectTo.equals(JspResolver.COMPANY_INFORMATION)) {
-					List<VerticalsMaster> verticalsMasters = null;
-					try {
-						verticalsMasters = organizationManagementService.getAllVerticalsMaster();
-					}
-					catch (InvalidInputException e) {
-						throw new InvalidInputException("Invalid Input exception occured in method getAllVerticalsMaster()",
-								DisplayMessageConstants.GENERAL_ERROR, e);
-					}
-					model.addAttribute("verticals", verticalsMasters);
+
+				List<VerticalsMaster> verticalsMasters = null;
+				try {
+					verticalsMasters = organizationManagementService.getAllVerticalsMaster();
 				}
+				catch (InvalidInputException e) {
+					throw new InvalidInputException("Invalid Input exception occured in method getAllVerticalsMaster()",
+							DisplayMessageConstants.GENERAL_ERROR, e);
+				}
+
+				redirectAttributes.addFlashAttribute("verticals", verticalsMasters);
+				return "redirect:/" + JspResolver.COMPANY_INFORMATION_PAGE + ".do";
 			}
 			else {
 				LOG.debug("Company profile complete, check any of the user profiles is entered");
@@ -266,7 +274,7 @@ public class LoginController {
 									&& (userProfile.getProfilesMaster().getProfileId() == CommonConstants.PROFILES_MASTER_COMPANY_ADMIN_PROFILE_ID))
 								adminProfile = userProfile;
 						}
-						redirectTo = getRedirectionFromProfileCompletionStage(adminProfile.getProfileCompletionStage());
+						redirectTo = getRedirectionFromProfileCompletionStage(adminProfile, redirectAttributes);
 					}
 					else {
 						redirectTo = JspResolver.LANDING;
@@ -277,6 +285,7 @@ public class LoginController {
 
 						// Setting session variable to show linkedin signup and sendsurvey popups
 						// only once
+
 						String popupStatus = (String) session.getAttribute(CommonConstants.POPUP_FLAG_IN_SESSION);
 						if (popupStatus == null) {
 							session.setAttribute(CommonConstants.POPUP_FLAG_IN_SESSION, CommonConstants.YES_STRING);
@@ -298,8 +307,8 @@ public class LoginController {
 						if (user.getNumOfLogins() != 0) {
 							showLinkedInPopup = false;
 						}
-						model.addAttribute("showLinkedInPopup", String.valueOf(showLinkedInPopup));
-						model.addAttribute("showSendSurveyPopup", String.valueOf(showSendSurveyPopup));
+						redirectAttributes.addFlashAttribute("showLinkedInPopup", String.valueOf(showLinkedInPopup));
+						redirectAttributes.addFlashAttribute("showSendSurveyPopup", String.valueOf(showSendSurveyPopup));
 
 						// updating session with selected user profile if not set
 						sessionHelper.updateProcessedUserProfiles(session, user);
@@ -319,15 +328,16 @@ public class LoginController {
 		}
 		catch (NonFatalException e) {
 			LOG.error("NonFatalException while logging in. Reason : " + e.getMessage(), e);
-			model.addAttribute("message", messageUtils.getDisplayMessage(e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE));
-			model.addAttribute("isDirectRegistration", isDirectRegistration);
-			return JspResolver.LOGIN;
+			redirectAttributes.addFlashAttribute("message", messageUtils.getDisplayMessage(e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE));
+			redirectAttributes.addFlashAttribute("isDirectRegistration", isDirectRegistration);
+			return "redirect:/" + JspResolver.LOGIN + ".do";
 		}
+
 		// set the direct registration value, in case if its a manual
 		// registration
 		LOG.debug("Settings isDirectRegistration to " + request.getParameter("isDirectRegistration"));
-		model.addAttribute("isDirectRegistration", isDirectRegistration);
-		return redirectTo;
+		redirectAttributes.addFlashAttribute("isDirectRegistration", isDirectRegistration);
+		return "redirect:/" + redirectTo + ".do";
 	}
 
 	/**
@@ -634,18 +644,39 @@ public class LoginController {
 	 * @return
 	 * @throws InvalidInputException
 	 */
-	private String getRedirectionFromProfileCompletionStage(String profileCompletionStage) throws InvalidInputException {
+	private String getRedirectionFromProfileCompletionStage(UserProfile adminProfile, RedirectAttributes redirectAttributes)
+			throws InvalidInputException {
+		String profileCompletionStage = adminProfile.getProfileCompletionStage();
 		LOG.debug("Method getRedirectionFromProfileCompletionStage called for profileCompletionStage: " + profileCompletionStage);
+
 		String redirectTo = null;
 		switch (profileCompletionStage) {
 			case CommonConstants.ADD_COMPANY_STAGE:
-				redirectTo = JspResolver.COMPANY_INFORMATION;
+				List<VerticalsMaster> verticalsMasters = null;
+				try {
+					verticalsMasters = organizationManagementService.getAllVerticalsMaster();
+				}
+				catch (InvalidInputException e) {
+					throw new InvalidInputException("Invalid Input exception occured in method getAllVerticalsMaster()",
+							DisplayMessageConstants.GENERAL_ERROR, e);
+				}
+				redirectAttributes.addFlashAttribute("verticals", verticalsMasters);
+				redirectTo = JspResolver.COMPANY_INFORMATION_PAGE;
+
 				break;
 			case CommonConstants.ADD_ACCOUNT_TYPE_STAGE:
-				redirectTo = JspResolver.ACCOUNT_TYPE_SELECTION;
+				String invoiceType = adminProfile.getCompany().getBillingMode();
+				if (invoiceType.equalsIgnoreCase(CommonConstants.BILLING_MODE_INVOICE)) {
+					redirectAttributes.addFlashAttribute("skippayment", "true");
+				}
+				else if (invoiceType.equalsIgnoreCase(CommonConstants.BILLING_MODE_AUTO)) {
+					redirectAttributes.addFlashAttribute("skippayment", "false");
+				}
+				redirectTo = JspResolver.ACCOUNT_TYPE_SELECTION_PAGE;
+
 				break;
 			case CommonConstants.PRE_PROCESSING_BEFORE_LOGIN_STAGE:
-				redirectTo = "redirect:./" + CommonConstants.PRE_PROCESSING_BEFORE_LOGIN_STAGE;
+				redirectTo = CommonConstants.PRE_PROCESSING_BEFORE_LOGIN_STAGE;
 				break;
 			case CommonConstants.DASHBOARD_STAGE:
 				redirectTo = JspResolver.LANDING;

@@ -164,7 +164,7 @@ public class FacebookFeedProcessorImpl implements SocialNetworkDataProcessor<Pos
 		// Settings Consumer and Access Tokens
 		Facebook facebook = new FacebookFactory().getInstance();
 		facebook.setOAuthAppId(facebookClientId, facebookClientSecret);
-		facebook.setOAuthAccessToken(new AccessToken(token.getFacebookAccessToken()));
+		facebook.setOAuthAccessToken(new AccessToken(token.getFacebookAccessTokenToPost()));
 
 		// building query to fetch
 		List<Post> posts = new ArrayList<Post>();

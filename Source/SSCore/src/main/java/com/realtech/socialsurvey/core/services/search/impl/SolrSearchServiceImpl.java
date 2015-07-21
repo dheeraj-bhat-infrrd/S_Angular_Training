@@ -12,7 +12,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
-
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrQuery.ORDER;
 import org.apache.solr.client.solrj.SolrServer;
@@ -28,7 +27,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
-
 import com.google.gson.Gson;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.dao.OrganizationUnitSettingsDao;
@@ -130,14 +128,13 @@ public class SolrSearchServiceImpl implements SolrSearchService {
 		LOG.info("Method searchRegions finished for regionPattern :" + regionPattern + " returning : " + regionResult);
 		return regionResult;
 	}
-	
+
 	/**
 	 * Method to perform search of regions from solr based on input pattern , company and regionIds
 	 * if provided
 	 */
 	@Override
-	public long getRegionsCount(String regionPattern, Company company, Set<Long> regionIds) throws InvalidInputException,
-			SolrException {
+	public long getRegionsCount(String regionPattern, Company company, Set<Long> regionIds) throws InvalidInputException, SolrException {
 		LOG.info("Method searchRegions called for regionPattern :" + regionPattern);
 		if (regionPattern == null) {
 			throw new InvalidInputException("Region pattern is null while searching for region");
@@ -216,9 +213,9 @@ public class SolrSearchServiceImpl implements SolrSearchService {
 			LOG.debug("Querying solr for searching branches");
 			response = solrServer.query(query);
 			SolrDocumentList documentList = response.getResults();
-			
+
 			Collection<BranchFromSearch> branches = getBranchesFromSolrDocuments(documentList);
-			
+
 			branchResult = new Gson().toJson(branches);
 
 			LOG.debug("Results obtained from solr :" + branchResult);
@@ -261,9 +258,9 @@ public class SolrSearchServiceImpl implements SolrSearchService {
 			LOG.debug("Querying solr for searching branches");
 			response = solrServer.query(query);
 			SolrDocumentList documentList = response.getResults();
-			
+
 			Collection<BranchFromSearch> branches = getBranchesFromSolrDocuments(documentList);
-			
+
 			branchResult = new Gson().toJson(branches);
 
 			LOG.debug("Results obtained from solr :" + branchResult);
@@ -311,8 +308,6 @@ public class SolrSearchServiceImpl implements SolrSearchService {
 		return response.getResults().getNumFound();
 	}
 
-	
-	
 	/**
 	 * Method to add region into solr
 	 */
@@ -444,7 +439,7 @@ public class SolrSearchServiceImpl implements SolrSearchService {
 			LOG.debug("Querying solr for searching users");
 			response = solrServer.query(solrQuery);
 			SolrDocumentList results = response.getResults();
-			
+
 			usersResult = new Gson().toJson(getUsersFromSolrDocuments(results));
 			LOG.debug("User search result is : " + usersResult);
 
@@ -788,8 +783,7 @@ public class SolrSearchServiceImpl implements SolrSearchService {
 	}
 
 	@Override
-	public void editUserInSolrWithMultipleValues(long userId,
-	        Map<String, Object> map) throws SolrException {
+	public void editUserInSolrWithMultipleValues(long userId, Map<String, Object> map) throws SolrException {
 		LOG.info("Method to edit user in solr called for user : " + userId);
 
 		try {
@@ -799,7 +793,7 @@ public class SolrSearchServiceImpl implements SolrSearchService {
 			// Adding fields to be updated
 			SolrInputDocument document = new SolrInputDocument();
 			document.setField(CommonConstants.USER_ID_SOLR, userId);
-			for(Entry<String, Object> e:map.entrySet()){
+			for (Entry<String, Object> e : map.entrySet()) {
 				editKeyValues = new HashMap<String, Object>();
 				editKeyValues.put(SOLR_EDIT_REPLACE, e.getValue());
 				document.setField(e.getKey(), editKeyValues);
@@ -814,9 +808,10 @@ public class SolrSearchServiceImpl implements SolrSearchService {
 		}
 		LOG.info("Method to edit user in solr finished for user : " + userId);
 	}
-	
+
 	@Override
-	public SolrDocumentList getUserIdsByIden(long iden, String idenFieldName, boolean isAgent, int startIndex, int noOfRows) throws InvalidInputException, SolrException {
+	public SolrDocumentList getUserIdsByIden(long iden, String idenFieldName, boolean isAgent, int startIndex, int noOfRows)
+			throws InvalidInputException, SolrException {
 		LOG.info("Method getUserIdsByIden called for iden :" + iden + "idenFieldName:" + idenFieldName + " startIndex:" + startIndex + " noOfrows:"
 				+ noOfRows);
 		if (iden <= 0l) {
@@ -856,8 +851,7 @@ public class SolrSearchServiceImpl implements SolrSearchService {
 		LOG.info("Method getUserIdsByIden finished for iden : " + iden);
 		return results;
 	}
-	
-	
+
 	@Override
 	public Collection<UserFromSearch> searchUsersByIden(long iden, String idenFieldName, boolean isAgent, int startIndex, int noOfRows)
 			throws InvalidInputException, SolrException {
@@ -902,8 +896,7 @@ public class SolrSearchServiceImpl implements SolrSearchService {
 	}
 
 	@Override
-	public long getUsersCountByIden(long iden, String idenFieldName, boolean isAgent)
-			throws InvalidInputException, SolrException {
+	public long getUsersCountByIden(long iden, String idenFieldName, boolean isAgent) throws InvalidInputException, SolrException {
 		LOG.info("Method getUsersCountByIden called for iden :" + iden + "idenFieldName:" + idenFieldName);
 		if (iden <= 0l) {
 			throw new InvalidInputException("iden is not set in searchUsersByIden");
@@ -937,7 +930,6 @@ public class SolrSearchServiceImpl implements SolrSearchService {
 		return results.getNumFound();
 	}
 
-	
 	/**
 	 * Method to perform search of region from solr based on the input Region id
 	 * 
@@ -1022,7 +1014,7 @@ public class SolrSearchServiceImpl implements SolrSearchService {
 		List<SolrDocument> results = new ArrayList<SolrDocument>();
 		QueryResponse response = null;
 		searchKey = searchKey + "*";
-		
+
 		SolrQuery query = new SolrQuery();
 		try {
 			SolrServer solrServer;
@@ -1047,15 +1039,16 @@ public class SolrSearchServiceImpl implements SolrSearchService {
 					solrServer = new HttpSolrServer(solrRegionUrl);
 			}
 
-			//Check if proper id is passed
-			if(id>-1){
-				query.setQuery(columnName + ":" + id);				
-			} else {
+			// Check if proper id is passed
+			if (id > -1) {
+				query.setQuery(columnName + ":" + id);
+			}
+			else {
 				query.setQuery("*:*");
 			}
-			
-            if ( !searchColumn.equalsIgnoreCase( CommonConstants.USER_DISPLAY_NAME_SOLR ) )
-                query.addFilterQuery( CommonConstants.IS_DEFAULT_BY_SYSTEM_SOLR + ":" + CommonConstants.IS_DEFAULT_BY_SYSTEM_NO );
+
+			if (!searchColumn.equalsIgnoreCase(CommonConstants.USER_DISPLAY_NAME_SOLR))
+				query.addFilterQuery(CommonConstants.IS_DEFAULT_BY_SYSTEM_SOLR + ":" + CommonConstants.IS_DEFAULT_BY_SYSTEM_NO);
 
 			query.addFilterQuery(searchColumn + ":" + searchKey);
 			query.addFilterQuery(CommonConstants.STATUS_SOLR + ":" + CommonConstants.STATUS_ACTIVE);
@@ -1077,13 +1070,13 @@ public class SolrSearchServiceImpl implements SolrSearchService {
 			LOG.error("SolrServerException while performing region, branch or agent search");
 			throw new SolrException("Exception while performing search. Reason : " + e.getMessage(), e);
 		}
-		
+
 		LOG.info("Method searchBranchRegionOrAgentByNameAndCompany() to search regions, branches, agent in a company finished");
 		return results;
 	}
 
 	@Override
-	public String fetchRegionsByCompany(long companyId) throws InvalidInputException, SolrException, MalformedURLException {
+	public String fetchRegionsByCompany(long companyId, int size) throws InvalidInputException, SolrException, MalformedURLException {
 		if (companyId < 0) {
 			throw new InvalidInputException("Pattern is null or empty while searching for Regions");
 		}
@@ -1096,6 +1089,10 @@ public class SolrSearchServiceImpl implements SolrSearchService {
 			solrQuery.setQuery(CommonConstants.STATUS_SOLR + ":" + CommonConstants.STATUS_ACTIVE);
 			solrQuery.addFilterQuery(CommonConstants.COMPANY_ID_SOLR + ":" + companyId);
 
+			if(size > -1) {
+				solrQuery.setRows(size);
+			}
+			
 			LOG.debug("Querying solr for searching regions");
 			response = solrServer.query(solrQuery);
 			SolrDocumentList results = response.getResults();
@@ -1112,7 +1109,7 @@ public class SolrSearchServiceImpl implements SolrSearchService {
 	}
 
 	@Override
-	public String fetchBranchesByCompany(long companyId) throws InvalidInputException, SolrException, MalformedURLException {
+	public String fetchBranchesByCompany(long companyId, int size) throws InvalidInputException, SolrException, MalformedURLException {
 		if (companyId < 0) {
 			throw new InvalidInputException("Pattern is null or empty while searching for Branches");
 		}
@@ -1124,6 +1121,8 @@ public class SolrSearchServiceImpl implements SolrSearchService {
 			SolrQuery solrQuery = new SolrQuery();
 			solrQuery.setQuery(CommonConstants.STATUS_SOLR + ":" + CommonConstants.STATUS_ACTIVE);
 			solrQuery.addFilterQuery(CommonConstants.COMPANY_ID_SOLR + ":" + companyId);
+			if (size > 0)
+				solrQuery.setRows(size);
 
 			LOG.debug("Querying solr for searching branches");
 			response = solrServer.query(solrQuery);
@@ -1136,6 +1135,58 @@ public class SolrSearchServiceImpl implements SolrSearchService {
 		}
 		LOG.info("Method fetchBranchesByCompany() finished for company id : " + companyId);
 		return branchesResult;
+	}
+
+	@Override
+	public Long fetchBranchCountByCompany(long companyId) throws InvalidInputException, SolrException, MalformedURLException {
+		if (companyId < 0) {
+			throw new InvalidInputException("Pattern is null or empty while searching for Branches");
+		}
+		LOG.info("Method fetchBranchCountByCompany() called for company id : " + companyId);
+		QueryResponse response = null;
+		long resultsCount = 0;
+		try {
+			SolrServer solrServer = new HttpSolrServer(solrBranchUrl);
+			SolrQuery solrQuery = new SolrQuery();
+			solrQuery.setQuery(CommonConstants.STATUS_SOLR + ":" + CommonConstants.STATUS_ACTIVE);
+			solrQuery.addFilterQuery(CommonConstants.COMPANY_ID_SOLR + ":" + companyId);
+
+			LOG.debug("Querying solr for searching branches");
+			response = solrServer.query(solrQuery);
+			resultsCount = response.getResults().getNumFound();
+		}
+		catch (SolrServerException e) {
+			LOG.error("SolrServerException while performing Branches search");
+			throw new SolrException("Exception while performing search for Branches count. Reason : " + e.getMessage(), e);
+		}
+		LOG.info("Method fetchBranchCountByCompany() finished for company id : " + companyId);
+		return resultsCount;
+	}
+
+	@Override
+	public Long fetchRegionCountByCompany(long companyId) throws InvalidInputException, SolrException, MalformedURLException {
+		if (companyId < 0) {
+			throw new InvalidInputException("companyId is null or empty while searching for Regions");
+		}
+		LOG.info("Method fetchRegionCountByCompany() called for company id : " + companyId);
+		QueryResponse response = null;
+		long resultsCount = 0;
+		try {
+			SolrServer solrServer = new HttpSolrServer(solrRegionUrl);
+			SolrQuery solrQuery = new SolrQuery();
+			solrQuery.setQuery(CommonConstants.STATUS_SOLR + ":" + CommonConstants.STATUS_ACTIVE);
+			solrQuery.addFilterQuery(CommonConstants.COMPANY_ID_SOLR + ":" + companyId);
+
+			LOG.debug("Querying solr for searching Regions");
+			response = solrServer.query(solrQuery);
+			resultsCount = response.getResults().getNumFound();
+		}
+		catch (SolrServerException e) {
+			LOG.error("SolrServerException while performing Regions search");
+			throw new SolrException("Exception while performing search for Regions count. Reason : " + e.getMessage(), e);
+		}
+		LOG.info("Method fetchRegionCountByCompany() finished for company id : " + companyId);
+		return resultsCount;
 	}
 
 	/**
@@ -1197,7 +1248,7 @@ public class SolrSearchServiceImpl implements SolrSearchService {
 		LOG.info("Method searchUsersByBranches executed successfully");
 		return usersResult;
 	}
-	
+
 	/**
 	 * Method to search for the users based on branches specified
 	 */
@@ -1375,7 +1426,7 @@ public class SolrSearchServiceImpl implements SolrSearchService {
 		SolrServer solrServer;
 		solrServer = new HttpSolrServer(solrUserUrl);
 		SolrQuery solrQuery = new SolrQuery();
-		solrQuery.setQuery(CommonConstants.USER_ID_SOLR + ":" + agentId); 
+		solrQuery.setQuery(CommonConstants.USER_ID_SOLR + ":" + agentId);
 		LOG.debug("Querying solr for searching user");
 		QueryResponse response;
 		try {
@@ -1548,7 +1599,7 @@ public class SolrSearchServiceImpl implements SolrSearchService {
 			}
 		}
 	}
-	
+
 	/**
 	 * Method to perform search of Region Ids from solr based on the company.
 	 * 
@@ -1603,10 +1654,10 @@ public class SolrSearchServiceImpl implements SolrSearchService {
 			}
 		}
 	}
-	
-	private Collection<BranchFromSearch> getBranchesFromSolrDocuments(SolrDocumentList documentList){
+
+	private Collection<BranchFromSearch> getBranchesFromSolrDocuments(SolrDocumentList documentList) {
 		Map<Long, BranchFromSearch> matchedBranches = new HashMap<>();
-		for(SolrDocument document : documentList){
+		for (SolrDocument document : documentList) {
 			BranchFromSearch branch = new BranchFromSearch();
 
 			branch.setCompanyId(Long.parseLong(document.get(CommonConstants.COMPANY_ID_SOLR).toString()));
@@ -1615,11 +1666,12 @@ public class SolrSearchServiceImpl implements SolrSearchService {
 			branch.setRegionName(document.get(CommonConstants.REGION_NAME_SOLR).toString());
 			branch.setStatus(Integer.parseInt(document.get(CommonConstants.STATUS_SOLR).toString()));
 			branch.setIsDefaultBySystem(Long.parseLong(document.get(CommonConstants.IS_DEFAULT_BY_SYSTEM_SOLR).toString()));
-			
+
 			matchedBranches.put(Long.parseLong(document.get(CommonConstants.BRANCH_ID_SOLR).toString()), branch);
 		}
-		List<OrganizationUnitSettings> branchSettings = organizationUnitSettingsDao.fetchOrganizationUnitSettingsForMultipleIds(matchedBranches.keySet(), MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION);
-		for(OrganizationUnitSettings setting : branchSettings){
+		List<OrganizationUnitSettings> branchSettings = organizationUnitSettingsDao.fetchOrganizationUnitSettingsForMultipleIds(
+				matchedBranches.keySet(), MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION);
+		for (OrganizationUnitSettings setting : branchSettings) {
 			BranchFromSearch branch = matchedBranches.get(setting.getIden());
 			branch.setAddress1(setting.getContact_details().getAddress1());
 			branch.setAddress2(setting.getContact_details().getAddress2());
@@ -1630,13 +1682,13 @@ public class SolrSearchServiceImpl implements SolrSearchService {
 			branch.setState(setting.getContact_details().getState());
 			branch.setZipcode(setting.getContact_details().getZipcode());
 		}
-		
+
 		return matchedBranches.values();
 	}
-	
-	private Collection<RegionFromSearch> getRegionsFromSolrDocuments(SolrDocumentList documentList){
+
+	private Collection<RegionFromSearch> getRegionsFromSolrDocuments(SolrDocumentList documentList) {
 		Map<Long, RegionFromSearch> matchedRegions = new HashMap<>();
-		for(SolrDocument document : documentList){
+		for (SolrDocument document : documentList) {
 			RegionFromSearch region = new RegionFromSearch();
 
 			region.setCompanyId(Long.parseLong(document.get(CommonConstants.COMPANY_ID_SOLR).toString()));
@@ -1644,11 +1696,12 @@ public class SolrSearchServiceImpl implements SolrSearchService {
 			region.setRegionName(document.get(CommonConstants.REGION_NAME_SOLR).toString());
 			region.setStatus(Integer.parseInt(document.get(CommonConstants.STATUS_SOLR).toString()));
 			region.setIsDefaultBySystem(Long.parseLong(document.get(CommonConstants.IS_DEFAULT_BY_SYSTEM_SOLR).toString()));
-			
+
 			matchedRegions.put(Long.parseLong(document.get(CommonConstants.REGION_ID_SOLR).toString()), region);
 		}
-		List<OrganizationUnitSettings> branchSettings = organizationUnitSettingsDao.fetchOrganizationUnitSettingsForMultipleIds(matchedRegions.keySet(), MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION);
-		for(OrganizationUnitSettings setting : branchSettings){
+		List<OrganizationUnitSettings> branchSettings = organizationUnitSettingsDao.fetchOrganizationUnitSettingsForMultipleIds(
+				matchedRegions.keySet(), MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION);
+		for (OrganizationUnitSettings setting : branchSettings) {
 			RegionFromSearch region = matchedRegions.get(setting.getIden());
 			region.setAddress1(setting.getContact_details().getAddress1());
 			region.setAddress2(setting.getContact_details().getAddress2());
@@ -1658,10 +1711,10 @@ public class SolrSearchServiceImpl implements SolrSearchService {
 			region.setState(setting.getContact_details().getState());
 			region.setZipcode(setting.getContact_details().getZipcode());
 		}
-		
+
 		return matchedRegions.values();
 	}
-	
+
 	@SuppressWarnings("unchecked")
 	public Collection<UserFromSearch> getUsersFromSolrDocuments(SolrDocumentList documentList) throws InvalidInputException {
 		Map<Long, UserFromSearch> matchedUsers = new LinkedHashMap<>();

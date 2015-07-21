@@ -67,6 +67,9 @@
 				<div class="header-links-item">
 					<a href="javascript:showMainContent('./adminhierarchy.do')"><spring:message code="label.header.hierachy.key" /></a>
 				</div>
+				<div class="header-links-item">
+					<a href="javascript:showMainContent('./showsendinvition.do')"><spring:message code="label.sendinvite.header.key" /></a>
+				</div>
 				<div class="header-links-item" >
 					<a href="javascript:showMainContent('./showchangepasswordpage.do')"><spring:message code="label.changepassword.key"/></a>
 				</div>
@@ -86,6 +89,9 @@
 				</div>
 				<div class="hdr-link-item hdr-link-active">
 					<a id="heirarchy-link" href="javascript:showMainContent('./adminhierarchy.do')" onclick="showOverlay();"><spring:message code="label.header.hierachy.key" /></a>
+				</div>
+				<div class="hdr-link-item hdr-link-active">
+					<a id="invite-link" href="javascript:showMainContent('./showsendinvition.do')" onclick="showOverlay();"><spring:message code="label.sendinvite.header.key" /></a>
 				</div>
 			</div>
 			<div id="header-menu-icn" class="header-menu-icn icn-menu hide float-right"></div>

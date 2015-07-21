@@ -51,17 +51,22 @@ public interface SurveyDetailsDao {
 
 	public long getFeedBacksCount(String columnName, long columnValue, double startScore, double limitScore, boolean fetchAbusive);
 
-	public List<SurveyDetails> getIncompleteSurvey(String columnName, long columNValue, int start, int rows, double startScore, double limitScore, Date startDate, Date endDate);
+	public List<SurveyDetails> getIncompleteSurvey(String columnName, long columNValue, int start, int rows, double startScore, double limitScore,
+			Date startDate, Date endDate);
 
 	public void updateReminderCount(long agentId, String customerEmail);
 
-	public Map<String, Long> getClickedSurveyByCriteria(String columnName, long columnValue, String groupByCriteria, boolean realtechAdmin) throws ParseException;
+	public Map<String, Long> getClickedSurveyByCriteria(String columnName, long columnValue, int noOfDays, int noOfPastDaysToConsider,
+			String criteriaColumn, boolean realtechAdmin) throws ParseException;
 
-	public Map<String, Long> getSentSurveyByCriteria(String columnName, long columnValue, String groupByCriteria, boolean realtechAdmin) throws ParseException;
+	public Map<String, Long> getSentSurveyByCriteria(String columnName, long columnValue, int noOfDays, int noOfPastDaysToConsider,
+			String criteriaColumn, boolean realtechAdmin) throws ParseException;
 
-	public Map<String, Long> getSocialPostsCountByCriteria(String columnName, long columnValue, String groupByCriteria, boolean realtechAdmin) throws ParseException;
+	public Map<String, Long> getSocialPostsCountByCriteria(String columnName, long columnValue, int noOfDays, int noOfPastDaysToConsider,
+			String criteriaColumn, boolean realtechAdmin) throws ParseException;
 
-	public Map<String, Long> getCompletedSurveyByCriteria(String columnName, long columnValue, String groupByCriteria, boolean realtechAdmin) throws ParseException;
+	public Map<String, Long> getCompletedSurveyByCriteria(String columnName, long columnValue, int noOfDays, int noOfPastDaysToConsider,
+			String criteriaColumn, boolean realtechAdmin) throws ParseException;
 
 	public List<SurveyDetails> getIncompleteSurveyCustomers(long companyId, int surveyReminderInterval, int maxReminders);
 
@@ -75,8 +80,10 @@ public interface SurveyDetailsDao {
 
 	public void updateReminderCountForSocialPost(Long agentId, String customerEmail);
 
-    public void getAverageScore( Date startDate, Date endDate, Map<Long, AgentRankingReport> agentReportData, String columnName, long columnValue );
+	public void getAverageScore(Date startDate, Date endDate, Map<Long, AgentRankingReport> agentReportData, String columnName, long columnValue);
 
-    public void getCompletedSurveysCount( Date startDate, Date endDate, Map<Long, AgentRankingReport> agentReportData, String colunmName, long columnValue );
-
+	public void getCompletedSurveysCount(Date startDate, Date endDate, Map<Long, AgentRankingReport> agentReportData, String colunmName,
+			long columnValue);
+	
+	public long noOfPreInitiatedSurveys(String columnName, long columnValue, Date startDate, Date endDate);
 }
