@@ -24,8 +24,8 @@ function adjustImage(){
         var imgW = $('#prof-image').width();
         $('#prof-image').height(imgW * 0.7);
         // var h2 = $('.prog-img-container').height() - 11;
-        var rowW = $('.lp-con-row').width() - 55 - 10;
-        $('.lp-con-row-item').width(rowW+'px');
+        /*var rowW = $('.lp-con-row').width() - 55 - 10;
+        $('.lp-con-row-item').width(rowW+'px');*/
         $('.footer-main-wrapper').hide();
     }else{
         //$('.prof-name-container,#prof-image').height(200);

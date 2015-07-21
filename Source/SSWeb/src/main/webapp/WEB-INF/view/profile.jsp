@@ -370,14 +370,16 @@
 									<c:if test="${not empty profile.contact_details.web_addresses && not empty profile.contact_details.web_addresses.work}">
 										<div class="lp-con-row lp-row clearfix">
 											<div class="float-left lp-con-icn icn-web"></div>
-											<div id="web-addr-link-lp" class="float-left lp-con-row-item blue-text web-address-link" data-link="${profile.contact_details.web_addresses.work}">
+											<div id="web-addr-link-lp" class="float-left lp-con-row-item pp-lp-con-row-item blue-text web-address-link" data-link="${profile.contact_details.web_addresses.work}">
 											</div>
 										</div>
 									</c:if>
 									<c:if test="${not empty profile.contact_details.contact_numbers && not empty profile.contact_details.contact_numbers.work}">
 										<div class="lp-con-row lp-row clearfix">
-											<div class="float-left lp-con-icn icn-phone"></div>
-											<div class="float-left lp-con-row-item">${profile.contact_details.contact_numbers.work}</div>
+											<a href="tel:${profile.contact_details.contact_numbers.work}">
+												<div class="float-left lp-con-icn icn-phone"></div>
+												<div class="float-left lp-con-row-item pp-lp-con-row-item">${profile.contact_details.contact_numbers.work}</div>
+											</a>
 										</div>
 									</c:if>
 								</div>
@@ -626,7 +628,7 @@
             $('.mob-icn').removeClass('mob-icn-active');
             $(this).addClass('mob-icn-active');
             $('#prof-company-intro').show();
-            $('#contact-info').hide();
+            $('#contact-info').show();
             $('#prof-agent-container').hide();
             $('#reviews-container').hide();
             $('#recent-post-container').hide();
