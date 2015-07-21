@@ -196,15 +196,10 @@ $(document).ready(function() {
 	var popupStatus = "${popupStatus}";
 	var showSendSurveyPopupAdmin = "${showSendSurveyPopupAdmin}";
 	
-	var accountType = "${accounttype}";
-
 	if (showSendSurveyPopupAdmin == "true" && popupStatus == "Y") {
 		sendSurveyInvitationAdmin(currentProfileName, currentProfileValue);
 	}
-	if (accountType == "INDIVIDUAL"){
-			sendSurveyInvitation();
-	}
-
+	
 	paintDashboard(profileMasterId, currentProfileName, currentProfileValue, accountType);
 });
 </script>
