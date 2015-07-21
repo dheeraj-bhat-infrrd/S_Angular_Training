@@ -551,52 +551,30 @@ public class LoginController {
 	public String getDisplayPictureLocation(Model model, HttpServletRequest request, HttpServletResponse response) {
 		LOG.info("fetching display picture");
 		HttpSession session = request.getSession(false);
-		User user = sessionHelper.getCurrentUser();
 		String imageUrl = "";
-		String profileMasterIdStr = request.getParameter("profileMasterId");
 		try {
-			user = userManagementService.getUserByUserId(user.getUserId());
-			UserProfile currentProfile = (UserProfile) session.getAttribute(CommonConstants.USER_PROFILE);
-			if (currentProfile == null) {
-				currentProfile = user.getUserProfiles().get(CommonConstants.INITIAL_INDEX);
-				for (UserProfile profile : user.getUserProfiles()) {
-					if (profile.getProfilesMaster().getProfileId() == CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID) {
-						currentProfile = profile;
-						break;
-					}
-				}
-			}
 			UserSettings userSettings = (UserSettings) session.getAttribute(CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION);
-			if (userSettings == null || currentProfile == null) {
+			if (userSettings == null) {
 				throw new InvalidInputException("No user settings found in session");
 			}
 
-			int profileMasterId = currentProfile.getProfilesMaster().getProfileId();
-
-			if (profileMasterIdStr != null && !profileMasterIdStr.isEmpty()) {
-				try {
-					profileMasterId = Integer.parseInt(profileMasterIdStr);
-				}
-				catch (NumberFormatException e) {
-					LOG.error("Error occured while parsing provided profileMasterId as parameter. Proceeding with default id.");
-				}
+			long entityId = (long) session.getAttribute(CommonConstants.ENTITY_ID_COLUMN);
+			String entityType = (String) session.getAttribute(CommonConstants.ENTITY_TYPE_COLUMN);
+			if (entityId == 0 || entityType == null) {
+				throw new InvalidInputException("No user settings found in session");
 			}
-
-			if (profileMasterId == CommonConstants.PROFILES_MASTER_COMPANY_ADMIN_PROFILE_ID) {
-				imageUrl = userSettings.getCompanySettings().getProfileImageUrl();
+			
+			if (entityType.equals(CommonConstants.COMPANY_ID_COLUMN)) {
+				imageUrl = organizationManagementService.getCompanySettings(entityId).getProfileImageUrl();
 			}
-			else if (profileMasterId == CommonConstants.PROFILES_MASTER_REGION_ADMIN_PROFILE_ID) {
-				long regionId = currentProfile.getRegionId();
-				if (regionId != 0)
-					imageUrl = userSettings.getRegionSettings().get(regionId).getProfileImageUrl();
+			else if (entityType.equals(CommonConstants.REGION_ID_COLUMN)) {
+				imageUrl = organizationManagementService.getRegionSettings(entityId).getProfileImageUrl();
 			}
-			else if (profileMasterId == CommonConstants.PROFILES_MASTER_BRANCH_ADMIN_PROFILE_ID) {
-				long branchId = currentProfile.getBranchId();
-				if (branchId != 0)
-					imageUrl = userSettings.getBranchSettings().get(branchId).getProfileImageUrl();
+			else if (entityType.equals(CommonConstants.BRANCH_ID_COLUMN)) {
+				imageUrl = organizationManagementService.getBranchSettingsDefault(entityId).getProfileImageUrl();
 			}
-			else if (profileMasterId == CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID) {
-				imageUrl = userSettings.getAgentSettings().getProfileImageUrl();
+			else if (entityType.equals(CommonConstants.PROFILE_AGENT_VIEW)) {
+				imageUrl = userManagementService.getUserSettings(entityId).getProfileImageUrl();
 			}
 		}
 		catch (NonFatalException e) {
