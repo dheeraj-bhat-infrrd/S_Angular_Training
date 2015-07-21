@@ -1,5 +1,6 @@
 package com.realtech.socialsurvey.core.services.mail;
 
+import com.realtech.socialsurvey.core.entities.SurveyPreInitiation;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 
 
@@ -358,4 +359,8 @@ public interface EmailServices
 
     public void sendCorruptDataFromCrmNotificationMail( String firstName, String lastName, String recipientEmail,
         String attachmentPath ) throws InvalidInputException, UndeliveredEmailException;
+
+
+    public void sendAgentSurveyReminderMail( String recipientMailId, SurveyPreInitiation survey ) throws InvalidInputException,
+        UndeliveredEmailException;
 }
