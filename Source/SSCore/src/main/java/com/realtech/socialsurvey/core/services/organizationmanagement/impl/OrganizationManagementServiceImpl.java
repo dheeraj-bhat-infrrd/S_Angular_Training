@@ -869,6 +869,27 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
         LOG.info( "Successfully fetched the branch settings for branch id: " + branchId + " returning : " + branchSettings );
         return branchSettings;
     }
+    
+	@Transactional
+	@Override
+	public OrganizationUnitSettings getBranchSettingsDefault(long branchId) throws InvalidInputException, NoRecordsFetchedException {
+		OrganizationUnitSettings organizationUnitSettings = null;
+		BranchSettings branchSettings = null;
+		if (branchId <= 0l) {
+			throw new InvalidInputException("Invalid branch id. :" + branchId);
+		}
+		LOG.info("Get the branch settings for branch id: " + branchId);
+		organizationUnitSettings = organizationUnitSettingsDao.fetchOrganizationUnitSettingsById(branchId,
+				MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION);
+
+		// Filter profile stages.
+		if (organizationUnitSettings != null && organizationUnitSettings.getProfileStages() != null) {
+			organizationUnitSettings.setProfileStages(profileCompletionList.getProfileCompletionList(organizationUnitSettings.getProfileStages()));
+		}
+
+		LOG.info("Successfully fetched the branch settings for branch id: " + branchId + " returning : " + branchSettings);
+		return organizationUnitSettings;
+	}
 
 
     @Override

@@ -432,7 +432,6 @@ public class OrganizationManagementController
 		User user = sessionHelper.getCurrentUser();
 
 		AccountType accountType = (AccountType) session.getAttribute(CommonConstants.ACCOUNT_TYPE_IN_SESSION);
-		UserSettings userSettings = (UserSettings) session.getAttribute(CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION);
 
 		long entityId = 0;
 		String entityIdStr = request.getParameter("entityId");
@@ -465,29 +464,36 @@ public class OrganizationManagementController
 		
 		OrganizationUnitSettings unitSettings = null;
 		int accountMasterId = accountType.getValue();
-		if (entityType.equals(CommonConstants.COMPANY_ID_COLUMN) || accountMasterId == CommonConstants.ACCOUNTS_MASTER_INDIVIDUAL) {
-			unitSettings = userSettings.getCompanySettings();
-			List<VerticalCrmMapping> mappings = organizationManagementService.getCrmMapping(user);
-			model.addAttribute("crmMappings", mappings);
-            model.addAttribute("columnName", entityType);
-            model.addAttribute("columnValue", entityId);
+		try {
+			if (entityType.equals(CommonConstants.COMPANY_ID_COLUMN) || accountMasterId == CommonConstants.ACCOUNTS_MASTER_INDIVIDUAL) {
+				unitSettings = organizationManagementService.getCompanySettings(user.getCompany().getCompanyId());
+				List<VerticalCrmMapping> mappings = organizationManagementService.getCrmMapping(user);
+				model.addAttribute("crmMappings", mappings);
+				model.addAttribute("columnName", entityType);
+				model.addAttribute("columnValue", entityId);
+			}
+			else if (entityType.equals(CommonConstants.REGION_ID_COLUMN)) {
+				unitSettings = organizationManagementService.getRegionSettings(entityId);
+				model.addAttribute("columnName", entityType);
+				model.addAttribute("columnValue", entityId);
+			}
+			else if (entityType.equals(CommonConstants.BRANCH_ID_COLUMN)) {
+				unitSettings = organizationManagementService.getBranchSettingsDefault(entityId);
+				model.addAttribute("columnName", entityType);
+				model.addAttribute("columnValue", entityId);
+			}
+			else if (entityType.equals(CommonConstants.PROFILE_AGENT_VIEW)) {
+				unitSettings = userManagementService.getUserSettings(user.getUserId());
+				model.addAttribute("columnName", CommonConstants.AGENT_ID_COLUMN);
+				model.addAttribute("columnValue", entityId);
+			}
 		}
-		else if (entityType.equals(CommonConstants.REGION_ID_COLUMN)) {
-			unitSettings = userSettings.getRegionSettings().get(entityId);
-            model.addAttribute("columnName", entityType);
-            model.addAttribute("columnValue", entityId);
+		catch (InvalidInputException | NoRecordsFetchedException e) {
+			LOG.error("NonFatalException while fetching profile details. Reason :" + e.getMessage(), e);
+			model.addAttribute("message", messageUtils.getDisplayMessage(DisplayMessageConstants.GENERAL_ERROR, DisplayMessageType.ERROR_MESSAGE));
+			return JspResolver.MESSAGE_HEADER;
 		}
-		else if (entityType.equals(CommonConstants.BRANCH_ID_COLUMN)) {
-			unitSettings = userSettings.getBranchSettings().get(entityId);
-            model.addAttribute("columnName", entityType);
-            model.addAttribute("columnValue", entityId);
-		}
-		else if (entityType.equals(CommonConstants.PROFILE_AGENT_VIEW)) {
-			unitSettings = userSettings.getAgentSettings();
-            model.addAttribute("columnName", CommonConstants.AGENT_ID_COLUMN);
-            model.addAttribute("columnValue", entityId);
-		}
-
+		
 		model.addAttribute("facebookLink", "");
 		model.addAttribute("twitterLink", "");
 		model.addAttribute("linkedinLink", "");
@@ -523,54 +529,53 @@ public class OrganizationManagementController
 	}
 
 
-    /**
-     * Method to save encompass details / CRM info
-     * 
-     * @param model
-     * @param request
-     * @return
-     */
-    @RequestMapping ( value = "/saveencompassdetails", method = RequestMethod.POST)
-    @ResponseBody
-    public String saveEncompassDetails( Model model, HttpServletRequest request )
-    {
-        LOG.info( "Saving encompass details" );
-        HttpSession session = request.getSession( false );
-        request.setAttribute( "saveencompassdetails", "true" );
-        String message;
+	/**
+	 * Method to save encompass details / CRM info
+	 * 
+	 * @param model
+	 * @param request
+	 * @return
+	 */
+	@RequestMapping(value = "/saveencompassdetails", method = RequestMethod.POST)
+	@ResponseBody
+	public String saveEncompassDetails(Model model, HttpServletRequest request) {
+		LOG.info("Saving encompass details");
+		User user = sessionHelper.getCurrentUser();
+		request.setAttribute("saveencompassdetails", "true");
+		String message;
 
-        try {
-            testEncompassConnection( model, request );
+		try {
+			testEncompassConnection(model, request);
 
-            // Encrypting the password
-            String plainPassword = request.getParameter( "encompass-password" );
-            String cipherPassword = plainPassword;
-            /*String cipherPassword = encryptionHelper.encryptAES( plainPassword, "" );*/
+			// Encrypting the password
+			String plainPassword = request.getParameter("encompass-password");
+			String cipherPassword = plainPassword;
 
-            EncompassCrmInfo encompassCrmInfo = new EncompassCrmInfo();
-            encompassCrmInfo.setCrm_source( CommonConstants.CRM_INFO_SOURCE_ENCOMPASS );
-            encompassCrmInfo.setCrm_username( request.getParameter( "encompass-username" ) );
-            encompassCrmInfo.setCrm_fieldId( request.getParameter( "encompass-fieldId" ) );
-            encompassCrmInfo.setCrm_password( cipherPassword );
-            encompassCrmInfo.setUrl( request.getParameter( "encompass-url" ) );
-            encompassCrmInfo.setConnection_successful( true );
-            OrganizationUnitSettings companySettings = ( (UserSettings) session
-                .getAttribute( CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION ) ).getCompanySettings();
-            encompassCrmInfo.setCompanyId( companySettings.getIden() );
-            organizationManagementService.updateCRMDetails( companySettings, encompassCrmInfo,
-                "com.realtech.socialsurvey.core.entities.EncompassCrmInfo" );
+			EncompassCrmInfo encompassCrmInfo = new EncompassCrmInfo();
+			encompassCrmInfo.setCrm_source(CommonConstants.CRM_INFO_SOURCE_ENCOMPASS);
+			encompassCrmInfo.setCrm_username(request.getParameter("encompass-username"));
+			encompassCrmInfo.setCrm_fieldId(request.getParameter("encompass-fieldId"));
+			encompassCrmInfo.setCrm_password(cipherPassword);
+			encompassCrmInfo.setUrl(request.getParameter("encompass-url"));
+			encompassCrmInfo.setConnection_successful(true);
 
-            // set the updated settings value in session with plain password
-            encompassCrmInfo.setCrm_password( plainPassword );
-            companySettings.setCrm_info( encompassCrmInfo );
-            message = messageUtils.getDisplayMessage( DisplayMessageConstants.ENCOMPASS_DATA_UPDATE_SUCCESSFUL,
-                DisplayMessageType.SUCCESS_MESSAGE ).getMessage();
-        } catch ( NonFatalException e ) {
-            LOG.error( "NonFatalException while testing encompass detials. Reason : " + e.getMessage(), e );
-            message = messageUtils.getDisplayMessage( e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE ).getMessage();
-        }
-        return message;
-    }
+			OrganizationUnitSettings companySettings = organizationManagementService.getCompanySettings(user.getCompany().getCompanyId());
+			encompassCrmInfo.setCompanyId(companySettings.getIden());
+			organizationManagementService.updateCRMDetails(companySettings, encompassCrmInfo,
+					"com.realtech.socialsurvey.core.entities.EncompassCrmInfo");
+
+			// set the updated settings value in session with plain password
+			encompassCrmInfo.setCrm_password(plainPassword);
+			companySettings.setCrm_info(encompassCrmInfo);
+			message = messageUtils.getDisplayMessage(DisplayMessageConstants.ENCOMPASS_DATA_UPDATE_SUCCESSFUL, DisplayMessageType.SUCCESS_MESSAGE)
+					.getMessage();
+		}
+		catch (NonFatalException e) {
+			LOG.error("NonFatalException while testing encompass detials. Reason : " + e.getMessage(), e);
+			message = messageUtils.getDisplayMessage(e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE).getMessage();
+		}
+		return message;
+	}
 
 
     /**
@@ -626,93 +631,87 @@ public class OrganizationManagementController
     }
 
 
-    /**
-     * Method to save survey Mailbody content
-     * 
-     * @param model
-     * @param request
-     * @return
-     */
-    @ResponseBody
-    @RequestMapping ( value = "/savesurveyparticipationmail", method = RequestMethod.POST)
-    public String updateSurveyParticipationMailBody( Model model, HttpServletRequest request )
-    {
-        LOG.info( "Saving survey participation mail body" );
-        HttpSession session = request.getSession( false );
-        String mailCategory = request.getParameter( "mailcategory" );
-        String mailSubject = null;
-        String mailBody = null;
-        String message = "";
+	/**
+	 * Method to save survey Mailbody content
+	 * 
+	 * @param model
+	 * @param request
+	 * @return
+	 */
+	@ResponseBody
+	@RequestMapping(value = "/savesurveyparticipationmail", method = RequestMethod.POST)
+	public String updateSurveyParticipationMailBody(Model model, HttpServletRequest request) {
+		LOG.info("Saving survey participation mail body");
+		User user = sessionHelper.getCurrentUser();
+		HttpSession session = request.getSession(false);
+		String mailCategory = request.getParameter("mailcategory");
+		String mailSubject = null;
+		String mailBody = null;
+		String message = "";
 
-        try {
-            OrganizationUnitSettings companySettings = ( (UserSettings) session
-                .getAttribute( CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION ) ).getCompanySettings();
-            MailContentSettings updatedMailContentSettings = null;
-            if ( mailCategory != null && mailCategory.equals( "participationmail" ) ) {
+		try {
+			OrganizationUnitSettings companySettings = organizationManagementService.getCompanySettings(user.getCompany().getCompanyId());
+			MailContentSettings updatedMailContentSettings = null;
+			if (mailCategory != null && mailCategory.equals("participationmail")) {
 
-                mailSubject = request.getParameter( "survey-mailcontent-subject" );
-                if ( mailSubject == null || mailSubject.isEmpty() ) {
-                    LOG.warn( "Survey participation mail subject is blank." );
-                    throw new InvalidInputException( "Survey participation mail subject is blank.",
-                        DisplayMessageConstants.GENERAL_ERROR );
-                }
+				mailSubject = request.getParameter("survey-mailcontent-subject");
+				if (mailSubject == null || mailSubject.isEmpty()) {
+					LOG.warn("Survey participation mail subject is blank.");
+					throw new InvalidInputException("Survey participation mail subject is blank.", DisplayMessageConstants.GENERAL_ERROR);
+				}
 
-                mailBody = request.getParameter( "survey-participation-mailcontent" );
-                if ( mailBody == null || mailBody.isEmpty() ) {
-                    LOG.warn( "Survey participation mail body is blank." );
-                    throw new InvalidInputException( "Survey participation mail body is blank.",
-                        DisplayMessageConstants.GENERAL_ERROR );
-                }
+				mailBody = request.getParameter("survey-participation-mailcontent");
+				if (mailBody == null || mailBody.isEmpty()) {
+					LOG.warn("Survey participation mail body is blank.");
+					throw new InvalidInputException("Survey participation mail body is blank.", DisplayMessageConstants.GENERAL_ERROR);
+				}
 
-                updatedMailContentSettings = organizationManagementService.updateSurveyParticipationMailBody( companySettings,
-                    mailSubject, mailBody, CommonConstants.SURVEY_MAIL_BODY_CATEGORY );
+				updatedMailContentSettings = organizationManagementService.updateSurveyParticipationMailBody(companySettings, mailSubject, mailBody,
+						CommonConstants.SURVEY_MAIL_BODY_CATEGORY);
 
-                // set the value back in session
-                session.setAttribute( CommonConstants.SURVEY_PARTICIPATION_MAIL_SUBJECT_IN_SESSION, mailSubject );
-                session.setAttribute( CommonConstants.SURVEY_PARTICIPATION_MAIL_BODY_IN_SESSION, mailBody );
+				// set the value back in session
+				session.setAttribute(CommonConstants.SURVEY_PARTICIPATION_MAIL_SUBJECT_IN_SESSION, mailSubject);
+				session.setAttribute(CommonConstants.SURVEY_PARTICIPATION_MAIL_BODY_IN_SESSION, mailBody);
 
-                message = messageUtils
-                    .getDisplayMessage( DisplayMessageConstants.SURVEY_PARTICIPATION_MAILBODY_UPDATE_SUCCESSFUL,
-                        DisplayMessageType.SUCCESS_MESSAGE ).getMessage();
-            }
+				message = messageUtils.getDisplayMessage(DisplayMessageConstants.SURVEY_PARTICIPATION_MAILBODY_UPDATE_SUCCESSFUL,
+						DisplayMessageType.SUCCESS_MESSAGE).getMessage();
+			}
 
-            else if ( mailCategory != null && mailCategory.equals( "participationremindermail" ) ) {
+			else if (mailCategory != null && mailCategory.equals("participationremindermail")) {
 
-                mailSubject = request.getParameter( "survey-mailreminder-subject" );
-                if ( mailSubject == null || mailSubject.isEmpty() ) {
-                    LOG.warn( "Survey participation reminder mail subject is blank." );
-                    throw new InvalidInputException( "Survey participation reminder mail subject is blank.",
-                        DisplayMessageConstants.GENERAL_ERROR );
-                }
+				mailSubject = request.getParameter("survey-mailreminder-subject");
+				if (mailSubject == null || mailSubject.isEmpty()) {
+					LOG.warn("Survey participation reminder mail subject is blank.");
+					throw new InvalidInputException("Survey participation reminder mail subject is blank.", DisplayMessageConstants.GENERAL_ERROR);
+				}
 
-                mailBody = request.getParameter( "survey-participation-reminder-mailcontent" );
-                if ( mailBody == null || mailBody.isEmpty() ) {
-                    LOG.warn( "Survey participation reminder mail body is blank." );
-                    throw new InvalidInputException( "Survey participation reminder mail body is blank.",
-                        DisplayMessageConstants.GENERAL_ERROR );
-                }
+				mailBody = request.getParameter("survey-participation-reminder-mailcontent");
+				if (mailBody == null || mailBody.isEmpty()) {
+					LOG.warn("Survey participation reminder mail body is blank.");
+					throw new InvalidInputException("Survey participation reminder mail body is blank.", DisplayMessageConstants.GENERAL_ERROR);
+				}
 
-                updatedMailContentSettings = organizationManagementService.updateSurveyParticipationMailBody( companySettings,
-                    mailSubject, mailBody, CommonConstants.SURVEY_REMINDER_MAIL_BODY_CATEGORY );
+				updatedMailContentSettings = organizationManagementService.updateSurveyParticipationMailBody(companySettings, mailSubject, mailBody,
+						CommonConstants.SURVEY_REMINDER_MAIL_BODY_CATEGORY);
 
-                // set the value back in session
-                session.setAttribute( CommonConstants.SURVEY_PARTICIPATION_REMINDER_MAIL_SUBJECT_IN_SESSION, mailSubject );
-                session.setAttribute( CommonConstants.SURVEY_PARTICIPATION_REMINDER_MAIL_BODY_IN_SESSION, mailBody );
+				// set the value back in session
+				session.setAttribute(CommonConstants.SURVEY_PARTICIPATION_REMINDER_MAIL_SUBJECT_IN_SESSION, mailSubject);
+				session.setAttribute(CommonConstants.SURVEY_PARTICIPATION_REMINDER_MAIL_BODY_IN_SESSION, mailBody);
 
-                message = messageUtils.getDisplayMessage(
-                    DisplayMessageConstants.SURVEY_PARTICIPATION_REMINDERMAILBODY_UPDATE_SUCCESSFUL,
-                    DisplayMessageType.SUCCESS_MESSAGE ).getMessage();
-            }
+				message = messageUtils.getDisplayMessage(DisplayMessageConstants.SURVEY_PARTICIPATION_REMINDERMAILBODY_UPDATE_SUCCESSFUL,
+						DisplayMessageType.SUCCESS_MESSAGE).getMessage();
+			}
 
-            // update the mail content settings in session
-            companySettings.setMail_content( updatedMailContentSettings );
-        } catch ( NonFatalException e ) {
-            LOG.error( "NonFatalException while saving survey participation mail body. Reason : " + e.getMessage(), e );
-            message = messageUtils.getDisplayMessage( e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE ).getMessage();
-        }
+			// update the mail content settings in session
+			companySettings.setMail_content(updatedMailContentSettings);
+		}
+		catch (NonFatalException e) {
+			LOG.error("NonFatalException while saving survey participation mail body. Reason : " + e.getMessage(), e);
+			message = messageUtils.getDisplayMessage(e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE).getMessage();
+		}
 
-        return message;
-    }
+		return message;
+	}
 
 
     /**
@@ -727,16 +726,15 @@ public class OrganizationManagementController
     public String revertSurveyParticipationMailBody( Model model, HttpServletRequest request )
     {
         LOG.info( "Reverting survey participation mail body" );
-        HttpSession session = request.getSession( false );
+		User user = sessionHelper.getCurrentUser();
+		HttpSession session = request.getSession( false );
         String mailCategory = request.getParameter( "mailcategory" );
         String mailSubject = null;
         String mailBody = null;
         String message = "";
 
         try {
-            UserSettings userSettings = (UserSettings) session.getAttribute( CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION );
-
-            OrganizationUnitSettings companySettings = userSettings.getCompanySettings();
+			OrganizationUnitSettings companySettings = organizationManagementService.getCompanySettings(user.getCompany().getCompanyId());
             MailContentSettings updatedMailContentSettings = null;
             if ( mailCategory != null && mailCategory.equals( "participationmail" ) ) {
                 updatedMailContentSettings = organizationManagementService.revertSurveyParticipationMailBody( companySettings,
@@ -797,7 +795,6 @@ public class OrganizationManagementController
     public String updateSurveySettings( Model model, HttpServletRequest request )
     {
         LOG.info( "Updating Survey Settings" );
-        HttpSession session = request.getSession( false );
         String ratingCategory = request.getParameter( "ratingcategory" );
         String autopost = request.getParameter( "autopost" );
         SurveySettings originalSurveySettings = null;
@@ -805,8 +802,8 @@ public class OrganizationManagementController
 
         try {
             boolean isAutopostEnabled = Boolean.parseBoolean( autopost );
-            OrganizationUnitSettings companySettings = ( (UserSettings) session
-                .getAttribute( CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION ) ).getCompanySettings();
+    		User user = sessionHelper.getCurrentUser();
+			OrganizationUnitSettings companySettings = organizationManagementService.getCompanySettings(user.getCompany().getCompanyId());
 
             if ( ratingCategory != null && ratingCategory.equals( "rating-auto-post" ) ) {
                 double autopostRating = Double.parseDouble( request.getParameter( "rating-auto-post" ) );
@@ -860,13 +857,12 @@ public class OrganizationManagementController
     {
         LOG.info( "Method to update autopost for a survey started" );
         try {
-            HttpSession session = request.getSession( false );
             String autopost = request.getParameter( "autopost" );
             boolean isAutoPostEnabled = false;
             if ( autopost != null && !autopost.isEmpty() ) {
                 isAutoPostEnabled = Boolean.parseBoolean( autopost );
-                OrganizationUnitSettings companySettings = ( (UserSettings) session
-                    .getAttribute( CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION ) ).getCompanySettings();
+        		User user = sessionHelper.getCurrentUser();
+    			OrganizationUnitSettings companySettings = organizationManagementService.getCompanySettings(user.getCompany().getCompanyId());
                 SurveySettings surveySettings = companySettings.getSurvey_settings();
                 surveySettings.setAutoPostEnabled( isAutoPostEnabled );
                 if ( organizationManagementService.updateSurveySettings( companySettings, surveySettings ) ) {
@@ -898,14 +894,13 @@ public class OrganizationManagementController
     public String updateSurveyReminderSettings( Model model, HttpServletRequest request )
     {
         LOG.info( "Updating Survey Reminder Settings" );
-        HttpSession session = request.getSession( false );
         String mailCategory = request.getParameter( "mailcategory" );
         SurveySettings originalSurveySettings = null;
         String message = "";
 
         try {
-            OrganizationUnitSettings companySettings = ( (UserSettings) session
-                .getAttribute( CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION ) ).getCompanySettings();
+    		User user = sessionHelper.getCurrentUser();
+			OrganizationUnitSettings companySettings = organizationManagementService.getCompanySettings(user.getCompany().getCompanyId());
 
             if ( mailCategory != null && mailCategory.equals( "reminder-interval" ) ) {
                 int reminderInterval = Integer.parseInt( request.getParameter( "reminder-interval" ) );
@@ -963,13 +958,12 @@ public class OrganizationManagementController
     public String updateOtherSettings( Model model, HttpServletRequest request )
     {
         LOG.info( "Updating Location Settings" );
-        HttpSession session = request.getSession( false );
         String otherCategory = request.getParameter( "othercategory" );
         String message = "";
 
         try {
-            OrganizationUnitSettings companySettings = ( (UserSettings) session
-                .getAttribute( CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION ) ).getCompanySettings();
+    		User user = sessionHelper.getCurrentUser();
+			OrganizationUnitSettings companySettings = organizationManagementService.getCompanySettings(user.getCompany().getCompanyId());
 
             if ( otherCategory != null && otherCategory.equals( "other-location" ) ) {
                 boolean isLocationEnabled = Boolean.parseBoolean( request.getParameter( "other-location" ) );

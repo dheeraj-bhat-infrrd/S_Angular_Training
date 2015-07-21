@@ -488,7 +488,6 @@ public class HierarchyManagementController
             }
             validateRegionForm( regionName );
 
-
             String[] assigneeEmailIds = parseEmailIdsIntoArray( selectedUserEmail );
 
             User loggedInUser = sessionHelper.getCurrentUser();
@@ -528,7 +527,7 @@ public class HierarchyManagementController
                     DisplayMessageConstants.GENERAL_ERROR, e );
             }
 
-            sessionHelper.updateProcessedProfilesInSession( session, loggedInUser, assigneeEmailIds );
+			sessionHelper.processAssignments(session, loggedInUser);
         } catch ( NonFatalException e ) {
             LOG.error( "NonFatalException while adding a region. Reason : " + e.getMessage(), e );
             model
@@ -674,7 +673,7 @@ public class HierarchyManagementController
                     DisplayMessageConstants.GENERAL_ERROR, e );
             }
 
-            sessionHelper.updateProcessedProfilesInSession( session, user, assigneeEmailIds );
+			sessionHelper.processAssignments(session, user);
         } catch ( NonFatalException e ) {
             LOG.error( "NonFatalException while adding a branch. Reason : " + e.getMessage(), e );
             model
@@ -811,10 +810,9 @@ public class HierarchyManagementController
             // updating session with new assignment
             if ( user.getUserId() == selectedUserId ) {
                 sessionHelper.getCanonicalSettings( session );
-                sessionHelper.updateProcessedUserProfiles( session, user );
             }
 
-            sessionHelper.updateProcessedProfilesInSession( session, user, assigneeEmailIds );
+			sessionHelper.processAssignments(session, user);
         } catch ( NonFatalException e ) {
             LOG.error( "NonFatalException while adding an individual. Reason : " + e.getMessage(), e );
             model.addAttribute( "message", messageUtils.getDisplayMessage( e.getMessage(), DisplayMessageType.ERROR_MESSAGE ) );
@@ -941,7 +939,7 @@ public class HierarchyManagementController
                     + e.getMessage(), DisplayMessageConstants.GENERAL_ERROR, e );
             }
 
-            sessionHelper.updateProcessedProfilesInSession( session, user, assigneeEmailIds );
+			sessionHelper.processAssignments(session, user);
         } catch ( NonFatalException e ) {
             LOG.error( "NonFatalException while updating branch. Reason : " + e.getMessage(), e );
             model
@@ -1131,7 +1129,7 @@ public class HierarchyManagementController
                     + e.getMessage(), DisplayMessageConstants.GENERAL_ERROR, e );
             }
 
-            sessionHelper.updateProcessedProfilesInSession( session, user, assigneeEmailIds );
+			sessionHelper.processAssignments(session, user);
         } catch ( NonFatalException e ) {
             LOG.error( "NonFatalException while updating region. Reason : " + e.getMessage(), e );
             model

@@ -1518,7 +1518,7 @@ public class UserManagementController
             User updatedUser = userManagementService.getUserByProfileId( profileId );
             if ( user.getUserId() == updatedUser.getUserId() ) {
                 try {
-                    sessionHelper.updateProcessedUserProfiles( request.getSession( false ), user );
+                    sessionHelper.processAssignments( request.getSession( false ), user );
                 } catch ( NonFatalException e ) {
                     LOG.error( "NonFatalException while logging in. Reason : " + e.getMessage(), e );
                 }

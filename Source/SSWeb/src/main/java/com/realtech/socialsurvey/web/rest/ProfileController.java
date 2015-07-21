@@ -24,17 +24,14 @@ import com.google.gson.Gson;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.entities.AgentSettings;
 import com.realtech.socialsurvey.core.entities.Branch;
-import com.realtech.socialsurvey.core.entities.Company;
 import com.realtech.socialsurvey.core.entities.ContactDetailsSettings;
 import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
 import com.realtech.socialsurvey.core.entities.ProListUser;
-import com.realtech.socialsurvey.core.entities.ProfilesMaster;
 import com.realtech.socialsurvey.core.entities.Region;
 import com.realtech.socialsurvey.core.entities.SocialMediaTokens;
 import com.realtech.socialsurvey.core.entities.SocialPost;
 import com.realtech.socialsurvey.core.entities.SurveyDetails;
 import com.realtech.socialsurvey.core.entities.UserListFromSearch;
-import com.realtech.socialsurvey.core.entities.UserProfile;
 import com.realtech.socialsurvey.core.exception.BaseRestException;
 import com.realtech.socialsurvey.core.exception.CompanyProfilePreconditionFailureErrorCode;
 import com.realtech.socialsurvey.core.exception.InputValidationException;
@@ -1360,7 +1357,6 @@ public class ProfileController {
 	@RequestMapping(value = "/{individualProfileName}/posts")
 	public Response getPostsForIndividual(@PathVariable String individualProfileName, @QueryParam(value = "start") Integer start,
 			@QueryParam(value = "numRows") Integer numRows) throws ProfileNotFoundException {
-		// TODO
 		LOG.info("Service to get posts of an individual called for individualProfileName : " + individualProfileName);
 		Response response = null;
 		try {
@@ -1378,16 +1374,8 @@ public class ProfileController {
 			OrganizationUnitSettings individualProfile = null;
 			try {
 				individualProfile = profileManagementService.getIndividualByProfileName(individualProfileName);
-
-				UserProfile selectedProfile = new UserProfile();
-
-				ProfilesMaster profilesMaster = new ProfilesMaster();
-				profilesMaster.setProfileId(CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID);
-
-				selectedProfile.setProfilesMaster(profilesMaster);
-				selectedProfile.setAgentId(individualProfile.getIden());
-
-				List<SocialPost> posts = profileManagementService.getSocialPosts(selectedProfile, start, numRows);
+				List<SocialPost> posts = profileManagementService.getSocialPosts(individualProfile.getIden(), CommonConstants.PROFILE_AGENT_VIEW,
+						start, numRows);
 				String json = new Gson().toJson(posts);
 				LOG.debug("individual posts json : " + json);
 				response = Response.ok(json).build();
@@ -1416,7 +1404,6 @@ public class ProfileController {
 	@RequestMapping(value = "/company/{companyProfileName}/posts")
 	public Response getPostsForCompany(@PathVariable String companyProfileName, @QueryParam(value = "start") Integer start,
 			@QueryParam(value = "numRows") Integer numRows) throws ProfileNotFoundException {
-		// TODO
 		LOG.info("Service to get posts of a company called for companyProfileName : " + companyProfileName);
 		Response response = null;
 		try {
@@ -1434,18 +1421,8 @@ public class ProfileController {
 			OrganizationUnitSettings companyProfile = null;
 			try {
 				companyProfile = profileManagementService.getCompanyProfileByProfileName(companyProfileName);
-				UserProfile selectedProfile = new UserProfile();
-
-				ProfilesMaster profilesMaster = new ProfilesMaster();
-				profilesMaster.setProfileId(CommonConstants.PROFILES_MASTER_COMPANY_ADMIN_PROFILE_ID);
-
-				Company company = new Company();
-				company.setCompanyId(companyProfile.getIden());
-
-				selectedProfile.setProfilesMaster(profilesMaster);
-				selectedProfile.setCompany(company);
-
-				List<SocialPost> posts = profileManagementService.getSocialPosts(selectedProfile, start, numRows);
+				List<SocialPost> posts = profileManagementService.getSocialPosts(companyProfile.getIden(), CommonConstants.COMPANY_ID_COLUMN, start,
+						numRows);
 				String json = new Gson().toJson(posts);
 				LOG.debug("individual posts json : " + json);
 				response = Response.ok(json).build();
@@ -1474,7 +1451,6 @@ public class ProfileController {
 	@RequestMapping(value = "/region/{companyProfileName}/{regionProfileName}/posts")
 	public Response getPostsForRegion(@PathVariable String regionProfileName, @PathVariable String companyProfileName,
 			@QueryParam(value = "start") Integer start, @QueryParam(value = "numRows") Integer numRows) throws ProfileNotFoundException {
-		// TODO
 		LOG.info("Service to get posts of a region called for regionProfileName : " + regionProfileName);
 		Response response = null;
 		try {
@@ -1492,15 +1468,8 @@ public class ProfileController {
 			OrganizationUnitSettings regionProfile = null;
 			try {
 				regionProfile = profileManagementService.getRegionByProfileName(companyProfileName, regionProfileName);
-				UserProfile selectedProfile = new UserProfile();
-
-				ProfilesMaster profilesMaster = new ProfilesMaster();
-				profilesMaster.setProfileId(CommonConstants.PROFILES_MASTER_REGION_ADMIN_PROFILE_ID);
-
-				selectedProfile.setProfilesMaster(profilesMaster);
-				selectedProfile.setRegionId(regionProfile.getIden());
-
-				List<SocialPost> posts = profileManagementService.getSocialPosts(selectedProfile, start, numRows);
+				List<SocialPost> posts = profileManagementService.getSocialPosts(regionProfile.getIden(), CommonConstants.REGION_ID_COLUMN, start,
+						numRows);
 				String json = new Gson().toJson(posts);
 				LOG.debug("individual posts json : " + json);
 				response = Response.ok(json).build();
@@ -1529,7 +1498,6 @@ public class ProfileController {
 	@RequestMapping(value = "/branch/{companyProfileName}/{branchProfileName}/posts")
 	public Response getPostsForBranch(@PathVariable String branchProfileName, @PathVariable String companyProfileName,
 			@QueryParam(value = "start") Integer start, @QueryParam(value = "numRows") Integer numRows) throws ProfileNotFoundException {
-		// TODO
 		LOG.info("Service to get posts of a branch called for branchProfileName : " + branchProfileName);
 		Response response = null;
 		try {
@@ -1547,15 +1515,8 @@ public class ProfileController {
 			OrganizationUnitSettings branchProfile = null;
 			try {
 				branchProfile = profileManagementService.getBranchByProfileName(companyProfileName, branchProfileName);
-				UserProfile selectedProfile = new UserProfile();
-
-				ProfilesMaster profilesMaster = new ProfilesMaster();
-				profilesMaster.setProfileId(CommonConstants.PROFILES_MASTER_BRANCH_ADMIN_PROFILE_ID);
-
-				selectedProfile.setProfilesMaster(profilesMaster);
-				selectedProfile.setBranchId(branchProfile.getIden());
-
-				List<SocialPost> posts = profileManagementService.getSocialPosts(selectedProfile, start, numRows);
+				List<SocialPost> posts = profileManagementService.getSocialPosts(branchProfile.getIden(), CommonConstants.BRANCH_ID_COLUMN, start,
+						numRows);
 				String json = new Gson().toJson(posts);
 				LOG.debug("individual posts json : " + json);
 				response = Response.ok(json).build();

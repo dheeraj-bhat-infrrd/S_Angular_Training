@@ -4322,12 +4322,13 @@ $('body').on('click','#profile-sel',function(e) {
 	$('#pe-dd-wrapper-profiles').slideToggle(200);
 });
 $('body').on('click','.pe-dd-item',function(e) {
-	var newProfileId = $(this).data('profile-id');
-
 	$('#profile-sel').html($(this).html());
 	$('#pe-dd-wrapper-profiles').slideToggle(200);
 
-	showMainContent('./showprofilepage.do?profileId=' + newProfileId);
+	var entityId = $(this).attr('data-column-value');
+	var entityType = $(this).attr('data-column-type');
+	
+	showMainContent("./showprofilepage.do?entityId=" + entityId + "&entityType=" + entityType);
 });
 
 $('body').click(function() {

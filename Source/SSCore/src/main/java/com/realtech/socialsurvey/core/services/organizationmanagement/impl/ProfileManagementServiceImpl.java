@@ -76,6 +76,7 @@ import com.realtech.socialsurvey.core.services.organizationmanagement.ProfileNot
 import com.realtech.socialsurvey.core.services.organizationmanagement.UserManagementService;
 import com.realtech.socialsurvey.core.services.search.SolrSearchService;
 import com.realtech.socialsurvey.core.services.search.exception.SolrException;
+import com.realtech.socialsurvey.core.utils.DisplayMessageConstants;
 import com.realtech.socialsurvey.core.utils.UrlValidationHelper;
 
 @DependsOn("generic")
@@ -205,6 +206,10 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 					// Branch Admin
 					else if (profilesMaster == CommonConstants.PROFILES_MASTER_BRANCH_ADMIN_PROFILE_ID) {
 						LOG.debug("Aggregating LockSettings till Region for Branch Admin of Enterprise account type");
+						if (branchId > 0l) {
+							Branch branch = branchDao.findById(Branch.class, branchId);
+							regionId = branch.getRegion().getRegionId();
+						}
 						parentLockSettings = lockSettingsTillRegion(settings.getCompanySettings(), settings.getRegionSettings().get(regionId));
 					}
 
@@ -350,6 +355,11 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 
 				case ENTERPRISE:
 					LOG.info("Enterprise account type");
+					if (branchId > 0l) {
+						Branch branch = branchDao.findById(Branch.class, branchId);
+						regionId = branch.getRegion().getRegionId();
+					}
+					
 					// Region Admin
 					if (profilesMaster == CommonConstants.PROFILES_MASTER_REGION_ADMIN_PROFILE_ID) {
 						LOG.debug("Aggregate Profile for RegionAdmin of Enterprise account type");
@@ -1548,28 +1558,26 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 	 * Method to store status of a user into the mongo.
 	 */
 	@Override
-	public void addSocialPosts(UserProfile selectedProfile, String postText) throws InvalidInputException {
+	public void addSocialPosts(User user, long entityId, String entityType, String postText) throws InvalidInputException {
 		LOG.info("Method to add post to a user's profile started.");
-		if (selectedProfile == null) {
-			throw new InvalidInputException("No user settings found in session");
-		}
 		SocialPost socialPost = new SocialPost();
-		socialPost.setPostedBy(selectedProfile.getUser().getFirstName() + " " + selectedProfile.getUser().getLastName());
+		socialPost.setPostedBy(user.getFirstName() + " " + user.getLastName());
 		socialPost.setPostText(postText);
 		socialPost.setSource("SocialSurvey");
-		int profilesMaster = selectedProfile.getProfilesMaster().getProfileId();
-		if (profilesMaster == CommonConstants.PROFILES_MASTER_COMPANY_ADMIN_PROFILE_ID) {
-			socialPost.setCompanyId(selectedProfile.getCompany().getCompanyId());
+		
+		if (entityType.equals(CommonConstants.COMPANY_ID_COLUMN)) {
+			socialPost.setCompanyId(user.getCompany().getCompanyId());
 		}
-		else if (profilesMaster == CommonConstants.PROFILES_MASTER_REGION_ADMIN_PROFILE_ID) {
-			socialPost.setRegionId(selectedProfile.getRegionId());
+		else if (entityType.equals(CommonConstants.REGION_ID_COLUMN)) {
+			socialPost.setRegionId(entityId);
 		}
-		else if (profilesMaster == CommonConstants.PROFILES_MASTER_BRANCH_ADMIN_PROFILE_ID) {
-			socialPost.setBranchId(selectedProfile.getBranchId());
+		else if (entityType.equals(CommonConstants.BRANCH_ID_COLUMN)) {
+			socialPost.setBranchId(entityId);
 		}
-		else {
-			socialPost.setAgentId(selectedProfile.getAgentId());
+		else if (entityType.equals(CommonConstants.PROFILE_AGENT_VIEW)) {
+			socialPost.setAgentId(user.getUserId());
 		}
+		
 		socialPost.setTimeInMillis(System.currentTimeMillis());
 		socialPostDao.addPostToUserProfile(socialPost);
 		LOG.info("Method to add post to a user's profile finished.");
@@ -1579,26 +1587,23 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 	 * Method to fetch social posts for a particular user.
 	 */
 	@Override
-	public List<SocialPost> getSocialPosts(UserProfile selectedProfile, int startIndex, int batchSize) throws InvalidInputException {
+	public List<SocialPost> getSocialPosts(long entityId, String entityType, int startIndex, int batchSize) throws InvalidInputException {
 		LOG.info("Method to fetch social posts , getSocialPosts() started.");
-		if (selectedProfile == null) {
-			throw new InvalidInputException("No user settings found in session");
+		if (entityType == null) {
+			throw new InvalidInputException("No entity type found in session", DisplayMessageConstants.GENERAL_ERROR);
 		}
+		
 		String key = CommonConstants.AGENT_ID;
-		long iden = selectedProfile.getAgentId();
+		long iden = entityId;
 
-		int profilesMaster = selectedProfile.getProfilesMaster().getProfileId();
-		if (profilesMaster == CommonConstants.PROFILES_MASTER_COMPANY_ADMIN_PROFILE_ID) {
+		if (entityType.equals(CommonConstants.COMPANY_ID_COLUMN)) {
 			key = CommonConstants.COMPANY_ID;
-			iden = selectedProfile.getCompany().getCompanyId();
 		}
-		else if (profilesMaster == CommonConstants.PROFILES_MASTER_REGION_ADMIN_PROFILE_ID) {
+		else if (entityType.equals(CommonConstants.REGION_ID_COLUMN)) {
 			key = CommonConstants.REGION_ID;
-			iden = selectedProfile.getRegionId();
 		}
-		else if (profilesMaster == CommonConstants.PROFILES_MASTER_BRANCH_ADMIN_PROFILE_ID) {
+		else if (entityType.equals(CommonConstants.BRANCH_ID_COLUMN)) {
 			key = CommonConstants.BRANCH_ID;
-			iden = selectedProfile.getBranchId();
 		}
 
 		List<SocialPost> posts = socialPostDao.getSocialPosts(iden, key, startIndex, batchSize);
