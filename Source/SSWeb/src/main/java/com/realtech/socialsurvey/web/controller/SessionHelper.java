@@ -490,7 +490,7 @@ public class SessionHelper {
 		else if (entityType.equals(CommonConstants.BRANCH_ID_COLUMN)) {
 			entityName = assignments.getBranches().get(entityId);
 		}
-		else if (entityType.equals(CommonConstants.PROFILE_AGENT_VIEW)) {
+		else if (entityType.equals(CommonConstants.AGENT_ID_COLUMN)) {
 			entityName = assignments.getAgents().get(entityId);
 		}
 

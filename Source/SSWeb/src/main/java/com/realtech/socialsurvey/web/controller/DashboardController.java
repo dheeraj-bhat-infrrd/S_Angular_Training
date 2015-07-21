@@ -139,7 +139,7 @@ public class DashboardController
             model.addAttribute("columnValue", entityId);
             model.addAttribute("showSendSurveyPopupAdmin", String.valueOf(true));
         }
-        else if (entityType.equals(CommonConstants.PROFILE_AGENT_VIEW)) {
+        else if (entityType.equals(CommonConstants.AGENT_ID_COLUMN)) {
             model.addAttribute("columnName", CommonConstants.AGENT_ID_COLUMN);
             model.addAttribute("columnValue", entityId);
         }
@@ -1514,10 +1514,6 @@ public class DashboardController
 		}
 		
 		String entityType = request.getParameter("entityType");
-		if (entityType.equals(CommonConstants.AGENT_ID_COLUMN)) {
-			entityType = CommonConstants.PROFILE_AGENT_VIEW;
-		}
-		
 		sessionHelper.updateSelectedProfile(session, entityId, entityType);
 
 		LOG.info("Method updateSelectedProfile() finished.");

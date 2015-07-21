@@ -1374,7 +1374,7 @@ public class ProfileController {
 			OrganizationUnitSettings individualProfile = null;
 			try {
 				individualProfile = profileManagementService.getIndividualByProfileName(individualProfileName);
-				List<SocialPost> posts = profileManagementService.getSocialPosts(individualProfile.getIden(), CommonConstants.PROFILE_AGENT_VIEW,
+				List<SocialPost> posts = profileManagementService.getSocialPosts(individualProfile.getIden(), CommonConstants.AGENT_ID_COLUMN,
 						start, numRows);
 				String json = new Gson().toJson(posts);
 				LOG.debug("individual posts json : " + json);

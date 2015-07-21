@@ -1140,7 +1140,7 @@ public class UserManagementController
 			profilesMaster = CommonConstants.PROFILES_MASTER_BRANCH_ADMIN_PROFILE_ID;
 			branchId = entityId;
 		}
-		else if (entityType.equals(CommonConstants.PROFILE_AGENT_VIEW)) {
+		else if (entityType.equals(CommonConstants.AGENT_ID_COLUMN)) {
 			model.addAttribute("columnName", CommonConstants.AGENT_ID_COLUMN);
 			profilesMaster = CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID;
 		}
