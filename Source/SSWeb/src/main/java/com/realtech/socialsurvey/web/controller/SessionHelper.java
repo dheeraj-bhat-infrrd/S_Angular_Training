@@ -1,7 +1,6 @@
 package com.realtech.socialsurvey.web.controller;
 
 import java.io.IOException;
-import java.net.MalformedURLException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -25,13 +24,15 @@ import org.springframework.transaction.annotation.Transactional;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.commons.EmailTemplateConstants;
 import com.realtech.socialsurvey.core.commons.UserProfileComparator;
-import com.realtech.socialsurvey.core.entities.AbridgedUserProfile;
-import com.realtech.socialsurvey.core.entities.BranchFromSearch;
+import com.realtech.socialsurvey.core.entities.Branch;
+import com.realtech.socialsurvey.core.entities.Company;
 import com.realtech.socialsurvey.core.entities.FileContentReplacements;
+import com.realtech.socialsurvey.core.entities.LicenseDetail;
 import com.realtech.socialsurvey.core.entities.MailContent;
 import com.realtech.socialsurvey.core.entities.MailContentSettings;
-import com.realtech.socialsurvey.core.entities.RegionFromSearch;
+import com.realtech.socialsurvey.core.entities.Region;
 import com.realtech.socialsurvey.core.entities.User;
+import com.realtech.socialsurvey.core.entities.UserHierarchyAssignments;
 import com.realtech.socialsurvey.core.entities.UserProfile;
 import com.realtech.socialsurvey.core.entities.UserSettings;
 import com.realtech.socialsurvey.core.enums.AccountType;
@@ -79,7 +80,7 @@ public class SessionHelper {
 
 	@Autowired
 	private EmailFormatHelper emailFormatHelper;
-	
+
 	@Value("${APPLICATION_LOGO_URL}")
 	private String applicationLogoUrl;
 
@@ -123,6 +124,7 @@ public class SessionHelper {
 		setProfileImage(session, userSettings);
 		LOG.info("Logo successfully updated in session");
 	}
+
 	// JIRA SS-97 by RM-06 : EOC
 
 	private void setLogo(HttpSession session, UserSettings userSettings) {
@@ -153,7 +155,6 @@ public class SessionHelper {
 		}
 	}
 
-	
 	private void setMailContent(HttpSession session, UserSettings userSettings) {
 		LOG.debug("Setting mail content in the session");
 		String body = null;
@@ -171,7 +172,7 @@ public class SessionHelper {
 				session.setAttribute(CommonConstants.SURVEY_PARTICIPATION_MAIL_BODY_IN_SESSION, body);
 				session.setAttribute(CommonConstants.SURVEY_PARTICIPATION_MAIL_SUBJECT_IN_SESSION, CommonConstants.SURVEY_MAIL_SUBJECT
 						+ "[AgentName]");
-				
+
 				session.setAttribute(CommonConstants.SURVEY_PARTICIPATION_REMINDER_MAIL_BODY_IN_SESSION, body);
 				session.setAttribute(CommonConstants.SURVEY_PARTICIPATION_REMINDER_MAIL_SUBJECT_IN_SESSION, CommonConstants.SURVEY_MAIL_SUBJECT
 						+ "[AgentName]");
@@ -190,9 +191,9 @@ public class SessionHelper {
 				mailBody = mailBody.replaceAll("\\[LogoUrl\\]", applicationLogoUrl);
 				mailSettings.getTake_survey_mail().setMail_body(mailBody);
 				session.setAttribute(CommonConstants.SURVEY_PARTICIPATION_MAIL_BODY_IN_SESSION, mailBody);
-			    String remainderSubject=CommonConstants.SURVEY_MAIL_SUBJECT + "[AgentName]";
-				if(mailContent.getMail_subject()!=null){
-					remainderSubject=mailContent.getMail_subject();
+				String remainderSubject = CommonConstants.SURVEY_MAIL_SUBJECT + "[AgentName]";
+				if (mailContent.getMail_subject() != null) {
+					remainderSubject = mailContent.getMail_subject();
 				}
 				session.setAttribute(CommonConstants.SURVEY_PARTICIPATION_MAIL_SUBJECT_IN_SESSION, remainderSubject);
 			}
@@ -217,9 +218,9 @@ public class SessionHelper {
 				mailBody = mailBody.replaceAll("\\[LogoUrl\\]", applicationLogoUrl);
 				mailSettings.getTake_survey_reminder_mail().setMail_body(mailBody);
 				session.setAttribute(CommonConstants.SURVEY_PARTICIPATION_REMINDER_MAIL_BODY_IN_SESSION, mailBody);
-				String remainderSubject=CommonConstants.REMINDER_MAIL_SUBJECT + "[AgentName]";
-					if(mailContent.getMail_subject()!=null){
-						remainderSubject=mailContent.getMail_subject();
+				String remainderSubject = CommonConstants.REMINDER_MAIL_SUBJECT + "[AgentName]";
+				if (mailContent.getMail_subject() != null) {
+					remainderSubject = mailContent.getMail_subject();
 				}
 				session.setAttribute(CommonConstants.SURVEY_PARTICIPATION_REMINDER_MAIL_SUBJECT_IN_SESSION, remainderSubject);
 			}
@@ -278,8 +279,7 @@ public class SessionHelper {
 			LOG.error("Problem authenticating user" + username, e);
 		}
 	}
-	
-	
+
 	/**
 	 * Method loginAdminAs to login admin as user
 	 * 
@@ -318,155 +318,13 @@ public class SessionHelper {
 		if (sessionUser instanceof User) {
 			user = (User) sessionUser;
 		}
-		
+
 		if (user == null) {
 			throw new UserSessionInvalidateException("User session is no longer available.");
 		}
 		return user;
 	}
-	
-	/**
-	 * Method to update user profiles in session
-	 * @throws NonFatalException 
-	 */
-	public void updateProcessedUserProfiles(HttpSession session, User user) throws NonFatalException {
-		LOG.info("Method updateProcessedUserProfiles() called from SessionHelper");
-		
-		Map<Long, RegionFromSearch> regions;
-		Map<Long, BranchFromSearch> branches;
-		long companyId = user.getCompany().getCompanyId();
-		LOG.debug("Fetching regions from solr to set in session for company:" + companyId);
-		try {
-			regions = organizationManagementService.fetchRegionsMapByCompany(companyId);
-			session.setAttribute(CommonConstants.REGIONS_IN_SESSION, regions);
-		}
-		catch (MalformedURLException e) {
-			LOG.error("MalformedURLException while fetching regions. Reason : " + e.getMessage(), e);
-			throw new NonFatalException("MalformedURLException while fetching regions", e);
-		}
 
-		LOG.debug("Fetching branches from solr to set in session for company:" + companyId);
-		try {
-			branches = organizationManagementService.fetchBranchesMapByCompany(companyId);
-			session.setAttribute(CommonConstants.BRANCHES_IN_SESSION, branches);
-		}
-		catch (MalformedURLException e) {
-			LOG.error("MalformedURLException while fetching branches. Reason : " + e.getMessage(), e);
-			throw new NonFatalException("MalformedURLException while fetching branches", e);
-		}
-		
-		AccountType accountType = (AccountType) session.getAttribute(CommonConstants.ACCOUNT_TYPE_IN_SESSION);
-		UserProfile selectedProfile = (UserProfile) session.getAttribute( CommonConstants.USER_PROFILE );
-		
-		List<UserProfile> profiles = userManagementService.getAllUserProfilesForUser(user);
-		if (selectedProfile == null) {
-			selectedProfile = profiles.get(CommonConstants.INITIAL_INDEX);
-			for (UserProfile profile : profiles) {
-				if (profile.getProfilesMaster().getProfileId() == CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID) {
-					selectedProfile = profile;
-					break;
-				}
-			}
-		}
-			
-		long branchId = 0;
-		long regionId = 0;
-		boolean agentAdded = false;
-		RegionFromSearch region = null;
-		BranchFromSearch branch = null;
-		Map<Long, UserProfile> profileMap = new HashMap<Long, UserProfile>();
-		Map<Long, AbridgedUserProfile> abridgedUserProfileMap = new HashMap<Long, AbridgedUserProfile>();
-		
-		AbridgedUserProfile profileAbridged = null;
-		for (UserProfile profile : profiles) {
-			profileAbridged = new AbridgedUserProfile();
-
-			profileMap.put(profile.getUserProfileId(), profile);
-
-			// updating display name for drop down
-			int profileMasterId = profile.getProfilesMaster().getProfileId();
-			switch (profileMasterId) {
-				case CommonConstants.PROFILES_MASTER_COMPANY_ADMIN_PROFILE_ID:
-					profileAbridged = getAbridgedUserProfile(profileAbridged, profile.getUserProfileId(), user.getCompany().getCompany(), user
-							.getCompany().getCompanyId(), CommonConstants.COMPANY_ID_COLUMN,
-							CommonConstants.PROFILES_MASTER_COMPANY_ADMIN_PROFILE_ID);
-					abridgedUserProfileMap.put(profile.getUserProfileId(), profileAbridged);
-					break;
-
-				case CommonConstants.PROFILES_MASTER_REGION_ADMIN_PROFILE_ID:
-					regionId = profile.getRegionId();
-					if (regionId != 0l) {
-						region = regions.get(regionId);
-					}
-					if (region.getIsDefaultBySystem() != 1) {
-						profileAbridged = getAbridgedUserProfile(profileAbridged, profile.getUserProfileId(), region.getRegionName(), regionId,
-								CommonConstants.REGION_ID_COLUMN, CommonConstants.PROFILES_MASTER_REGION_ADMIN_PROFILE_ID);
-						abridgedUserProfileMap.put(profile.getUserProfileId(), profileAbridged);
-					}
-					regionId = 0;
-					break;
-
-				case CommonConstants.PROFILES_MASTER_BRANCH_ADMIN_PROFILE_ID:
-					branchId = profile.getBranchId();
-					if (branchId != 0l) {
-						branch = branches.get(branchId);
-					}
-					if (branch.getIsDefaultBySystem() != 1) {
-						profileAbridged = getAbridgedUserProfile(profileAbridged, profile.getUserProfileId(), branch.getBranchName(), branchId,
-								CommonConstants.BRANCH_ID_COLUMN, CommonConstants.PROFILES_MASTER_BRANCH_ADMIN_PROFILE_ID);
-						abridgedUserProfileMap.put(profile.getUserProfileId(), profileAbridged);
-					}
-					branchId = 0;
-					break;
-
-				case CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID:
-					if (!agentAdded) {
-						profileAbridged = getAbridgedUserProfile(profileAbridged, profile.getUserProfileId(), CommonConstants.PROFILE_AGENT_VIEW,
-								user.getUserId(), CommonConstants.AGENT_ID_COLUMN, CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID);
-						abridgedUserProfileMap.put(profile.getUserProfileId(), profileAbridged);
-						agentAdded = true;
-					}
-					break;
-
-				default:
-					continue;
-			}
-		}
-		
-		Map<Long, AbridgedUserProfile> profileAbridgedMap;
-		switch (accountType) {
-			case COMPANY:
-			case ENTERPRISE:
-				profileAbridgedMap = abridgedUserProfileMap;
-				break;
-
-			default:
-				profileAbridgedMap = new HashMap<Long, AbridgedUserProfile>();
-				break;
-		}
-
-		// updating session with aggregated user profiles, if not set
-		if (profileAbridgedMap.size() > 0) {
-			session.setAttribute(CommonConstants.USER_PROFILE_LIST, profileAbridgedMap);
-			session.setAttribute(CommonConstants.PROFILE_NAME_COLUMN, profileAbridgedMap.get(selectedProfile.getUserProfileId()).getUserProfileName());
-		}
-		session.setAttribute(CommonConstants.USER_PROFILE, selectedProfile);
-		session.setAttribute(CommonConstants.USER_PROFILE_MAP, profileMap);
-
-		LOG.info("Method updateProcessedUserProfiles() finished from SessionHelper");
-	}
-	
-	private AbridgedUserProfile getAbridgedUserProfile(AbridgedUserProfile profileAbridged, long userProfileId, String userProfileName,
-			long profileId, String profileType, int profileMasterId) {
-		profileAbridged.setUserProfileId(userProfileId);
-		profileAbridged.setUserProfileName(userProfileName);
-		profileAbridged.setProfileName(profileType);
-		profileAbridged.setProfileValue(profileId);
-		profileAbridged.setProfilesMasterId(profileMasterId);
-
-		return profileAbridged;
-	}
-	
 	// Redirects user to Landing Page if session is active
 	public void redirectToUserSessionIfExists(HttpServletResponse response) {
 		LOG.debug("Checking for state of principal session");
@@ -480,7 +338,7 @@ public class SessionHelper {
 			}
 		}
 	}
-	
+
 	// Redirects user to Landing Page and requests user to logout from previous session if active
 	public boolean isUserActiveSessionExists() {
 		LOG.debug("Checking for state of principal session");
@@ -490,32 +348,175 @@ public class SessionHelper {
 		}
 		return false;
 	}
-	
-    // update user profiles in session if current user is updated
-	@Transactional
-	public void updateProcessedProfilesInSession(HttpSession session, User user, String[] assigneeEmailIds) throws InvalidInputException,
-			NoRecordsFetchedException {
-		AccountType accountType = (AccountType) session.getAttribute(CommonConstants.ACCOUNT_TYPE_IN_SESSION);
-		userManagementService.getCanonicalUserSettings(user, accountType);
 
-		List<String> usersEmailIds;
-		if (assigneeEmailIds != null && assigneeEmailIds.length > 0) {
-			usersEmailIds = Arrays.asList(assigneeEmailIds);
+	@SuppressWarnings("unchecked")
+	public UserHierarchyAssignments processAssignments(HttpSession session, User user) throws NonFatalException {
+		LOG.info("Method processAssignments() called from SessionHelper");
+		UserHierarchyAssignments assignments = new UserHierarchyAssignments();
+		Map<Long, String> regionsMap = new HashMap<Long, String>();
+		Map<Long, String> branchesMap = new HashMap<Long, String>();
+
+		user = userManagementService.getUserByUserId(user.getUserId());
+		userManagementService.setProfilesOfUser(user);
+		Company company = user.getCompany();
+		
+		// For individual account type
+		AccountType accountType = null;
+		List<LicenseDetail> licenseDetails = user.getCompany().getLicenseDetails();
+		if (licenseDetails != null && !licenseDetails.isEmpty()) {
+			LicenseDetail licenseDetail = licenseDetails.get(0);
+			accountType = AccountType.getAccountType(licenseDetail.getAccountsMaster().getAccountsMasterId());
 		}
-		else {
-			return;
+		if (accountType.getValue() == CommonConstants.ACCOUNTS_MASTER_INDIVIDUAL) {
+			Map<Long, String> agents = new HashMap<Long, String>();
+			agents.put(user.getUserId(), CommonConstants.PROFILE_AGENT_VIEW);
+			assignments.setAgents(agents);
+			
+			session.setAttribute(CommonConstants.ENTITY_ID_COLUMN, user.getUserId());
+			session.setAttribute(CommonConstants.ENTITY_NAME_COLUMN, CommonConstants.PROFILE_AGENT_VIEW);
+			session.setAttribute(CommonConstants.ENTITY_TYPE_COLUMN, CommonConstants.AGENT_ID_COLUMN);
+			session.setAttribute(CommonConstants.USER_ASSIGNMENTS, assignments);
+			return assignments;
 		}
 
-		for (String userEmail : usersEmailIds) {
-			if (user.getEmailId().equalsIgnoreCase(userEmail)) {
-				try {
-					updateProcessedUserProfiles(session, user);
-					break;
-				}
-				catch (NonFatalException e) {
-					LOG.error("NonFatalException while logging in. Reason : " + e.getMessage(), e);
-				}
+		// Fetch regions data for company
+		List<Region> regions = organizationManagementService.getAllRegionsForCompanyWithProjections(company);
+		if (regions != null && !regions.isEmpty()) {
+			for (Region region : regions) {
+				regionsMap.put(region.getRegionId(), region.getRegion());
 			}
 		}
+
+		// Fetch branches data for company
+		List<Branch> branches = organizationManagementService.getAllBranchesForCompanyWithProjections(company);
+		if (branches != null && !branches.isEmpty()) {
+			for (Branch branch : branches) {
+				branchesMap.put(branch.getBranchId(), branch.getBranch());
+			}
+		}
+
+		if (user.isCompanyAdmin()) {
+			Map<Long, String> companies = new HashMap<Long, String>();
+			companies.put(company.getCompanyId(), company.getCompany());
+			assignments.setCompanies(companies);
+
+			assignments.setRegions(regionsMap);
+			assignments.setBranches(branchesMap);
+		}
+
+		if (user.isRegionAdmin()) {
+			Map<Long, String> regionsMapUser = assignments.getRegions();
+			if (regionsMapUser == null) {
+				regionsMapUser = new HashMap<Long, String>();
+			}
+
+			Map<Long, String> branchesMapUser = assignments.getBranches();
+			if (branchesMapUser == null) {
+				branchesMapUser = new HashMap<Long, String>();
+			}
+
+			for (UserProfile userProfile : user.getUserProfiles()) {
+
+				// fetching for all regions
+				if (userProfile.getProfilesMaster().getProfileId() == CommonConstants.PROFILES_MASTER_REGION_ADMIN_PROFILE_ID) {
+					if (userProfile.getRegionId() > 0l) {
+						long regionId = userProfile.getRegionId();
+						String regionName = regionsMap.get(regionId);
+						if (regionName != null) {
+							regionsMapUser.put(regionId, regionName);
+						}
+
+						// Fetching branches inside the region
+						List<Branch> branchesInRegion = organizationManagementService.getAllBranchesInRegionWithProjections(regionId);
+						if (branchesInRegion != null && !branchesInRegion.isEmpty()) {
+							for (Branch branch : branchesInRegion) {
+								branchesMapUser.put(branch.getBranchId(), branch.getBranch());
+							}
+						}
+					}
+				}
+			}
+
+			assignments.setRegions(regionsMapUser);
+			assignments.setBranches(branchesMapUser);
+		}
+		if (user.isBranchAdmin()) {
+			Map<Long, String> regionsMapUser = assignments.getRegions();
+			if (regionsMapUser == null) {
+				regionsMapUser = new HashMap<Long, String>();
+			}
+
+			Map<Long, String> branchesMapUser = assignments.getBranches();
+			if (branchesMapUser == null) {
+				branchesMapUser = new HashMap<Long, String>();
+			}
+
+			for (UserProfile userProfile : user.getUserProfiles()) {
+				if (userProfile.getProfilesMaster().getProfileId() == CommonConstants.PROFILES_MASTER_BRANCH_ADMIN_PROFILE_ID) {
+					if (userProfile.getBranchId() > 0l) {
+						long branchId = userProfile.getBranchId();
+						String branchName = branchesMap.get(branchId);
+						if (branchName != null) {
+							branchesMapUser.put(branchId, branchName);
+						}
+					}
+				}
+			}
+
+			assignments.setRegions(regionsMapUser);
+			assignments.setBranches(branchesMapUser);
+		}
+
+		if (user.isAgent()) {
+			Map<Long, String> agents = new HashMap<Long, String>();
+			agents.put(user.getUserId(), CommonConstants.PROFILE_AGENT_VIEW);
+			assignments.setAgents(agents);
+
+			session.setAttribute(CommonConstants.ENTITY_ID_COLUMN, user.getUserId());
+			session.setAttribute(CommonConstants.ENTITY_NAME_COLUMN, CommonConstants.PROFILE_AGENT_VIEW);
+			session.setAttribute(CommonConstants.ENTITY_TYPE_COLUMN, CommonConstants.AGENT_ID_COLUMN);
+		}
+		else if (user.isCompanyAdmin()) {
+			session.setAttribute(CommonConstants.ENTITY_ID_COLUMN, company.getCompanyId());
+			session.setAttribute(CommonConstants.ENTITY_NAME_COLUMN, company.getCompany());
+			session.setAttribute(CommonConstants.ENTITY_TYPE_COLUMN, CommonConstants.COMPANY_ID_COLUMN);
+		}
+		else if (assignments.getRegions() != null && !assignments.getRegions().isEmpty()) {
+			Map.Entry<String, String> entry = (Map.Entry<String, String>) assignments.getRegions().entrySet().toArray()[0];
+			session.setAttribute(CommonConstants.ENTITY_ID_COLUMN, entry.getKey());
+			session.setAttribute(CommonConstants.ENTITY_NAME_COLUMN, entry.getValue());
+			session.setAttribute(CommonConstants.ENTITY_TYPE_COLUMN, CommonConstants.REGION_ID_COLUMN);
+		}
+		else if (assignments.getBranches() != null && !assignments.getBranches().isEmpty()) {
+			Map.Entry<String, String> entry = (Map.Entry<String, String>) assignments.getBranches().entrySet().toArray()[0];
+			session.setAttribute(CommonConstants.ENTITY_ID_COLUMN, entry.getKey());
+			session.setAttribute(CommonConstants.ENTITY_NAME_COLUMN, entry.getValue());
+			session.setAttribute(CommonConstants.ENTITY_TYPE_COLUMN, CommonConstants.BRANCH_ID_COLUMN);
+		}
+		session.setAttribute(CommonConstants.USER_ASSIGNMENTS, assignments);
+
+		LOG.info("Method processAssignments() finished from SessionHelper");
+		return assignments;
+	}
+
+	public void updateSelectedProfile(HttpSession session, long entityId, String entityType) {
+		String entityName = "";
+		UserHierarchyAssignments assignments = (UserHierarchyAssignments) session.getAttribute(CommonConstants.USER_ASSIGNMENTS);
+		if (entityType.equals(CommonConstants.COMPANY_ID_COLUMN)) {
+			entityName = assignments.getCompanies().get(entityId);
+		}
+		else if (entityType.equals(CommonConstants.REGION_ID_COLUMN)) {
+			entityName = assignments.getRegions().get(entityId);
+		}
+		else if (entityType.equals(CommonConstants.BRANCH_ID_COLUMN)) {
+			entityName = assignments.getBranches().get(entityId);
+		}
+		else if (entityType.equals(CommonConstants.AGENT_ID_COLUMN)) {
+			entityName = assignments.getAgents().get(entityId);
+		}
+
+		session.setAttribute(CommonConstants.ENTITY_TYPE_COLUMN, entityType);
+		session.setAttribute(CommonConstants.ENTITY_ID_COLUMN, entityId);
+		session.setAttribute(CommonConstants.ENTITY_NAME_COLUMN, entityName);
 	}
 }

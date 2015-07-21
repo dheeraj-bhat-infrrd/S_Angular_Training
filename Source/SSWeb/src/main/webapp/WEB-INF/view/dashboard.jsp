@@ -6,16 +6,30 @@
 	<div class="container">
 		<div class="hm-header-row clearfix">
 			<div class="float-left hm-header-row-left hr-dsh-adj-lft"><spring:message code="label.header.dashboard.key" /></div>
-			<c:if test="${not empty profileList && fn:length(profileList) > 1}">
-				<div class="float-right header-right clearfix hr-dsh-adj-rt hdr-prof-sel">
+			<c:if test="${not empty assignments}">
+				<div id="da-dd-wrapper" class="float-right header-right clearfix hr-dsh-adj-rt hdr-prof-sel">
 					<div class="float-left hr-txt1"><spring:message code="label.viewas.key" /></div>
-					<div id="dashboard-sel" class="float-left hr-txt2 cursor-pointer">${profileName}</div>
+					<div id="dashboard-sel" class="float-left hr-txt2 cursor-pointer">${entityName}</div>
 					<div id="da-dd-wrapper-profiles" class="va-dd-wrapper hide">
-						<c:forEach var="userprofile" items="${profileList}">
-							<div class="da-dd-item" data-profile-id="${userprofile.key}"
-								data-column-name="${userprofile.value.profileName}"
-								data-column-value="${userprofile.value.profileValue}"
-								data-profile-master-id="${userprofile.value.profilesMasterId}">${userprofile.value.userProfileName}</div>
+						<c:forEach var="company" items="${assignments.companies}">
+							<div class="da-dd-item" data-column-type="companyId"
+								data-column-name="${company.value}"
+								data-column-value="${company.key}">${company.value}</div>
+						</c:forEach>
+						<c:forEach var="region" items="${assignments.regions}">
+							<div class="da-dd-item" data-column-type="regionId" 
+								data-column-name="${region.value}"
+								data-column-value="${region.key}">${region.value}</div>
+						</c:forEach>
+						<c:forEach var="branch" items="${assignments.branches}">
+							<div class="da-dd-item" data-column-type="branchId"
+								data-column-name="${branch.value}"
+								data-column-value="${branch.key}">${branch.value}</div>
+						</c:forEach>
+						<c:forEach var="agent" items="${assignments.agents}">
+							<div class="da-dd-item" data-column-type="agentId"
+								data-column-name="${agent.value}"
+								data-column-value="${agent.key}">${agent.value}</div>
 						</c:forEach>
 					</div>
 				</div>
@@ -27,8 +41,7 @@
 <div class="dash-wrapper-main">
 	<div class="dash-container container">
 		<div id="prof-container" data-profile-master-id="${profileMasterId}"
-			data-profile-id="${profileId}" data-column-name="${columnName}"
-			data-account-type="${accounttype}"
+			data-column-name="${columnName}" data-account-type="${accounttype}"
 			data-column-value="${columnValue}" class="dash-top-info">
 			<div id="dash-profile-detail-circles" class="row row-dash-top-adj">
 				<!-- Populated by dashboard_profiledetail.jsp -->
@@ -170,6 +183,10 @@
 $(document).ready(function() {
 	hideOverlay();
 	$(document).attr("title", "Dashboard");
+	
+	if ($("#da-dd-wrapper-profiles > div").length <= 1) {
+		$('#da-dd-wrapper').remove();
+	}
 	
 	var profileMasterId = $('#prof-container').attr('data-profile-master-id');
 	var currentProfileName = $('#prof-container').attr('data-column-name');

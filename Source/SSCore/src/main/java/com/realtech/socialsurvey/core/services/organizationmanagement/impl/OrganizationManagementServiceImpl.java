@@ -866,6 +866,27 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
         LOG.info( "Successfully fetched the branch settings for branch id: " + branchId + " returning : " + branchSettings );
         return branchSettings;
     }
+    
+	@Transactional
+	@Override
+	public OrganizationUnitSettings getBranchSettingsDefault(long branchId) throws InvalidInputException, NoRecordsFetchedException {
+		OrganizationUnitSettings organizationUnitSettings = null;
+		BranchSettings branchSettings = null;
+		if (branchId <= 0l) {
+			throw new InvalidInputException("Invalid branch id. :" + branchId);
+		}
+		LOG.info("Get the branch settings for branch id: " + branchId);
+		organizationUnitSettings = organizationUnitSettingsDao.fetchOrganizationUnitSettingsById(branchId,
+				MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION);
+
+		// Filter profile stages.
+		if (organizationUnitSettings != null && organizationUnitSettings.getProfileStages() != null) {
+			organizationUnitSettings.setProfileStages(profileCompletionList.getProfileCompletionList(organizationUnitSettings.getProfileStages()));
+		}
+
+		LOG.info("Successfully fetched the branch settings for branch id: " + branchId + " returning : " + branchSettings);
+		return organizationUnitSettings;
+	}
 
 
     @Override
@@ -2355,6 +2376,29 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
         return branchList;
     }
 
+	@Override
+	@Transactional
+	public List<Branch> getAllBranchesForCompanyWithProjections(Company company) throws InvalidInputException {
+		if (company == null) {
+			LOG.error("Company object passed can not be null");
+			throw new InvalidInputException("Invalid Company passed");
+		}
+		LOG.info("Fetching the list of branches for company :" + company.getCompany());
+		
+		List<String> projections = new ArrayList<>();
+		projections.add(CommonConstants.BRANCH_ID_COLUMN);
+		projections.add(CommonConstants.BRANCH_NAME_COLUMN);
+		projections.add(CommonConstants.IS_DEFAULT_BY_SYSTEM);
+
+		Map<String, Object> queries = new HashMap<String, Object>();
+		queries.put(CommonConstants.COMPANY_COLUMN, company);
+		queries.put(CommonConstants.IS_DEFAULT_BY_SYSTEM, CommonConstants.STATUS_INACTIVE);
+		queries.put(CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_ACTIVE);
+		
+		List<Branch> branchList = branchDao.findProjectionsByKeyValue(Branch.class, projections, queries);
+		LOG.info("Branch list fetched for the company " + company);
+		return branchList;
+	}
 
     /**
      * Fetch list of regions in a company
@@ -2382,6 +2426,30 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
         LOG.info( "Region list fetched for the company " + company );
         return regionList;
     }
+    
+	@Override
+	@Transactional
+	public List<Region> getAllRegionsForCompanyWithProjections(Company company) throws InvalidInputException {
+		if (company == null) {
+			LOG.error("Company object passed can not be null");
+			throw new InvalidInputException("Invalid Company passed");
+		}
+		LOG.info("Fetching the list of regions for company :" + company.getCompany());
+
+		List<String> projections = new ArrayList<>();
+		projections.add(CommonConstants.REGION_ID_COLUMN);
+		projections.add(CommonConstants.REGION_COLUMN);
+		projections.add(CommonConstants.IS_DEFAULT_BY_SYSTEM);
+
+		Map<String, Object> queries = new HashMap<String, Object>();
+		queries.put(CommonConstants.COMPANY_COLUMN, company);
+		queries.put(CommonConstants.IS_DEFAULT_BY_SYSTEM, CommonConstants.STATUS_INACTIVE);
+		queries.put(CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_ACTIVE);
+
+		List<Region> regionList = regionDao.findProjectionsByKeyValue(Region.class, projections, queries);
+		LOG.info("Region list fetched for the company " + company);
+		return regionList;
+	}
 
 
     /**
@@ -2488,7 +2556,36 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
         return branchList;
     }
 
+	@Override
+	@Transactional
+	public List<Branch> getAllBranchesInRegionWithProjections(long regionId) throws InvalidInputException {
+		if (regionId <= 0l) {
+			throw new InvalidInputException("RegionId is not set in getAllBranchesForRegion");
+		}
+		
+		Region region = regionDao.findById(Region.class, regionId);
+		if (region == null) {
+			LOG.error("No region present with the region Id :" + regionId);
+			throw new InvalidInputException("No region present with the region Id :" + regionId);
+		}
+		LOG.info("Fetching the list of branches for region :" + region);
 
+		List<String> projections = new ArrayList<>();
+		projections.add(CommonConstants.BRANCH_ID_COLUMN);
+		projections.add(CommonConstants.BRANCH_NAME_COLUMN);
+		projections.add(CommonConstants.IS_DEFAULT_BY_SYSTEM);
+
+		Map<String, Object> queries = new HashMap<String, Object>();
+		queries.put(CommonConstants.REGION_COLUMN, region);
+		queries.put(CommonConstants.IS_DEFAULT_BY_SYSTEM, CommonConstants.STATUS_INACTIVE);
+		queries.put(CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_ACTIVE);
+		
+		List<Branch> branchList = branchDao.findProjectionsByKeyValue(Branch.class, projections, queries);
+
+		LOG.info("Branch list fetched for the region " + region);
+		return branchList;
+	}
+    
     /**
      * Method to fetch count of branches in a company for a Region
      * 

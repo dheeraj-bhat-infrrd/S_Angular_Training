@@ -76,6 +76,7 @@ import com.realtech.socialsurvey.core.services.organizationmanagement.ProfileNot
 import com.realtech.socialsurvey.core.services.organizationmanagement.UserManagementService;
 import com.realtech.socialsurvey.core.services.search.SolrSearchService;
 import com.realtech.socialsurvey.core.services.search.exception.SolrException;
+import com.realtech.socialsurvey.core.utils.DisplayMessageConstants;
 import com.realtech.socialsurvey.core.utils.UrlValidationHelper;
 
 @DependsOn("generic")
@@ -149,7 +150,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 
 	@Override
 	public LockSettings aggregateParentLockSettings(User user, AccountType accountType, UserSettings settings, long branchId, long regionId,
-			int profilesMaster) throws InvalidInputException {
+			int profilesMaster) throws InvalidInputException, NoRecordsFetchedException {
 		LOG.info("Method aggregateParentLockSettings() called from ProfileManagementService");
 		if (user == null) {
 			throw new InvalidInputException("User is not set.");
@@ -170,6 +171,8 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 
 		// If user is not Company Admin, Lock settings need to be aggregated
 		else {
+			OrganizationUnitSettings branchSettings = null;
+			OrganizationUnitSettings regionSettings = null;
 			switch (accountType) {
 				case FREE:
 				case INDIVIDUAL:
@@ -191,7 +194,8 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 					// Individual
 					else if (profilesMaster == CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID) {
 						LOG.debug("Aggregating LockSettings till Branch for Agent of Company account type");
-						parentLockSettings = lockSettingsTillBranch(settings.getCompanySettings(), null, settings.getBranchSettings().get(branchId));
+						branchSettings = organizationManagementService.getBranchSettingsDefault(branchId);
+						parentLockSettings = lockSettingsTillBranch(settings.getCompanySettings(), null, branchSettings);
 					}
 					break;
 
@@ -205,14 +209,31 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 					// Branch Admin
 					else if (profilesMaster == CommonConstants.PROFILES_MASTER_BRANCH_ADMIN_PROFILE_ID) {
 						LOG.debug("Aggregating LockSettings till Region for Branch Admin of Enterprise account type");
-						parentLockSettings = lockSettingsTillRegion(settings.getCompanySettings(), settings.getRegionSettings().get(regionId));
+						if (branchId > 0l) {
+							branchSettings = organizationManagementService.getBranchSettingsDefault(branchId);
+
+							Branch branch = branchDao.findById(Branch.class, branchId);
+							regionId = branch.getRegion().getRegionId();
+						}
+						if (regionId > 0l) {
+							regionSettings = organizationManagementService.getRegionSettings(regionId);
+						}
+						parentLockSettings = lockSettingsTillRegion(settings.getCompanySettings(), regionSettings);
 					}
 
 					// Individual
 					else if (profilesMaster == CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID) {
 						LOG.debug("Aggregating LockSettings till Branch for Agent of Enterprise account type");
-						parentLockSettings = lockSettingsTillBranch(settings.getCompanySettings(), settings.getRegionSettings().get(regionId),
-								settings.getBranchSettings().get(branchId));
+						if (branchId > 0l) {
+							branchSettings = organizationManagementService.getBranchSettingsDefault(branchId);
+
+							Branch branch = branchDao.findById(Branch.class, branchId);
+							regionId = branch.getRegion().getRegionId();
+						}
+						if (regionId > 0l) {
+							regionSettings = organizationManagementService.getRegionSettings(regionId);
+						}
+						parentLockSettings = lockSettingsTillBranch(settings.getCompanySettings(), regionSettings, branchSettings);
 					}
 					break;
 
@@ -300,7 +321,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 
 	@Override
 	public OrganizationUnitSettings aggregateUserProfile(User user, AccountType accountType, UserSettings settings, long branchId, long regionId,
-			int profilesMaster) throws InvalidInputException {
+			int profilesMaster) throws InvalidInputException, NoRecordsFetchedException {
 		LOG.info("Method aggregateUserProfile() called from ProfileManagementService");
 		if (user == null) {
 			throw new InvalidInputException("User is not set.");
@@ -321,6 +342,8 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 
 		// If user is not Company Admin, Profile need to be aggregated
 		else {
+			OrganizationUnitSettings branchSettings = null;
+			OrganizationUnitSettings regionSettings = null;
 			switch (accountType) {
 				case FREE:
 				case INDIVIDUAL:
@@ -334,40 +357,50 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 
 				case COMPANY:
 					LOG.info("Company account type");
+					branchSettings = organizationManagementService.getBranchSettingsDefault(branchId);
+
 					// Branch Admin
 					if (profilesMaster == CommonConstants.PROFILES_MASTER_BRANCH_ADMIN_PROFILE_ID) {
 						LOG.debug("Aggregate Profile for BranchAdmin of Company account type");
-						userProfile = aggregateBranchProfile(settings.getCompanySettings(), null, settings.getBranchSettings().get(branchId));
+						userProfile = aggregateBranchProfile(settings.getCompanySettings(), null, branchSettings);
 					}
 
 					// Individual
 					else if (profilesMaster == CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID) {
 						LOG.debug("Aggregate Profile for Agent of Company account type");
-						userProfile = aggregateAgentProfile(settings.getCompanySettings(), null, settings.getBranchSettings().get(branchId),
-								settings.getAgentSettings());
+						userProfile = aggregateAgentProfile(settings.getCompanySettings(), null, branchSettings, settings.getAgentSettings());
 					}
 					break;
 
 				case ENTERPRISE:
 					LOG.info("Enterprise account type");
+					if (branchId > 0l) {
+						branchSettings = organizationManagementService.getBranchSettingsDefault(branchId);
+						
+						Branch branch = branchDao.findById(Branch.class, branchId);
+						regionId = branch.getRegion().getRegionId();
+					}
+					if (regionId > 0l) {
+						regionSettings = organizationManagementService.getRegionSettings(regionId);
+					}
+
 					// Region Admin
 					if (profilesMaster == CommonConstants.PROFILES_MASTER_REGION_ADMIN_PROFILE_ID) {
 						LOG.debug("Aggregate Profile for RegionAdmin of Enterprise account type");
-						userProfile = aggregateRegionProfile(settings.getCompanySettings(), settings.getRegionSettings().get(regionId));
+						userProfile = aggregateRegionProfile(settings.getCompanySettings(), regionSettings);
 					}
 
 					// Branch Admin
 					else if (profilesMaster == CommonConstants.PROFILES_MASTER_BRANCH_ADMIN_PROFILE_ID) {
 						LOG.debug("Aggregate Profile for BranchAdmin of Enterprise account type");
-						userProfile = aggregateBranchProfile(settings.getCompanySettings(), settings.getRegionSettings().get(regionId), settings
-								.getBranchSettings().get(branchId));
+						userProfile = aggregateBranchProfile(settings.getCompanySettings(), regionSettings, branchSettings);
 					}
 
 					// Individual
 					else if (profilesMaster == CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID) {
 						LOG.debug("Aggregate Profile for Agent of Enterprise account type");
-						userProfile = aggregateAgentProfile(settings.getCompanySettings(), settings.getRegionSettings().get(regionId), settings
-								.getBranchSettings().get(branchId), settings.getAgentSettings());
+						userProfile = aggregateAgentProfile(settings.getCompanySettings(), regionSettings, branchSettings,
+								settings.getAgentSettings());
 					}
 					break;
 
@@ -1548,28 +1581,26 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 	 * Method to store status of a user into the mongo.
 	 */
 	@Override
-	public void addSocialPosts(UserProfile selectedProfile, String postText) throws InvalidInputException {
+	public void addSocialPosts(User user, long entityId, String entityType, String postText) throws InvalidInputException {
 		LOG.info("Method to add post to a user's profile started.");
-		if (selectedProfile == null) {
-			throw new InvalidInputException("No user settings found in session");
-		}
 		SocialPost socialPost = new SocialPost();
-		socialPost.setPostedBy(selectedProfile.getUser().getFirstName() + " " + selectedProfile.getUser().getLastName());
+		socialPost.setPostedBy(user.getFirstName() + " " + user.getLastName());
 		socialPost.setPostText(postText);
 		socialPost.setSource("SocialSurvey");
-		int profilesMaster = selectedProfile.getProfilesMaster().getProfileId();
-		if (profilesMaster == CommonConstants.PROFILES_MASTER_COMPANY_ADMIN_PROFILE_ID) {
-			socialPost.setCompanyId(selectedProfile.getCompany().getCompanyId());
+		
+		if (entityType.equals(CommonConstants.COMPANY_ID_COLUMN)) {
+			socialPost.setCompanyId(user.getCompany().getCompanyId());
 		}
-		else if (profilesMaster == CommonConstants.PROFILES_MASTER_REGION_ADMIN_PROFILE_ID) {
-			socialPost.setRegionId(selectedProfile.getRegionId());
+		else if (entityType.equals(CommonConstants.REGION_ID_COLUMN)) {
+			socialPost.setRegionId(entityId);
 		}
-		else if (profilesMaster == CommonConstants.PROFILES_MASTER_BRANCH_ADMIN_PROFILE_ID) {
-			socialPost.setBranchId(selectedProfile.getBranchId());
+		else if (entityType.equals(CommonConstants.BRANCH_ID_COLUMN)) {
+			socialPost.setBranchId(entityId);
 		}
-		else {
-			socialPost.setAgentId(selectedProfile.getAgentId());
+		else if (entityType.equals(CommonConstants.AGENT_ID_COLUMN)) {
+			socialPost.setAgentId(user.getUserId());
 		}
+		
 		socialPost.setTimeInMillis(System.currentTimeMillis());
 		socialPostDao.addPostToUserProfile(socialPost);
 		LOG.info("Method to add post to a user's profile finished.");
@@ -1579,26 +1610,23 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 	 * Method to fetch social posts for a particular user.
 	 */
 	@Override
-	public List<SocialPost> getSocialPosts(UserProfile selectedProfile, int startIndex, int batchSize) throws InvalidInputException {
+	public List<SocialPost> getSocialPosts(long entityId, String entityType, int startIndex, int batchSize) throws InvalidInputException {
 		LOG.info("Method to fetch social posts , getSocialPosts() started.");
-		if (selectedProfile == null) {
-			throw new InvalidInputException("No user settings found in session");
+		if (entityType == null) {
+			throw new InvalidInputException("No entity type found in session", DisplayMessageConstants.GENERAL_ERROR);
 		}
+		
 		String key = CommonConstants.AGENT_ID;
-		long iden = selectedProfile.getAgentId();
+		long iden = entityId;
 
-		int profilesMaster = selectedProfile.getProfilesMaster().getProfileId();
-		if (profilesMaster == CommonConstants.PROFILES_MASTER_COMPANY_ADMIN_PROFILE_ID) {
+		if (entityType.equals(CommonConstants.COMPANY_ID_COLUMN)) {
 			key = CommonConstants.COMPANY_ID;
-			iden = selectedProfile.getCompany().getCompanyId();
 		}
-		else if (profilesMaster == CommonConstants.PROFILES_MASTER_REGION_ADMIN_PROFILE_ID) {
+		else if (entityType.equals(CommonConstants.REGION_ID_COLUMN)) {
 			key = CommonConstants.REGION_ID;
-			iden = selectedProfile.getRegionId();
 		}
-		else if (profilesMaster == CommonConstants.PROFILES_MASTER_BRANCH_ADMIN_PROFILE_ID) {
+		else if (entityType.equals(CommonConstants.BRANCH_ID_COLUMN)) {
 			key = CommonConstants.BRANCH_ID;
-			iden = selectedProfile.getBranchId();
 		}
 
 		List<SocialPost> posts = socialPostDao.getSocialPosts(iden, key, startIndex, batchSize);

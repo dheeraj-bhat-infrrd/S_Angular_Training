@@ -48,9 +48,25 @@ public class PostToWall {
 
 			// Posting to wall of user
 			UserProfile selectedProfile = user.getUserProfiles().get(CommonConstants.INITIAL_INDEX);
+			int profilesMaster = selectedProfile.getProfilesMaster().getProfileId();
 			for (int i = 0; i < POST_SIZE; i++) {
 				try {
-					profileManagementService.addSocialPosts(selectedProfile, POST_DATA);
+					String key = CommonConstants.AGENT_ID;
+					long iden = selectedProfile.getAgentId();
+
+					if (profilesMaster == CommonConstants.PROFILES_MASTER_COMPANY_ADMIN_PROFILE_ID) {
+						key = CommonConstants.COMPANY_ID;
+						iden = selectedProfile.getCompany().getCompanyId();
+					}
+					else if (profilesMaster == CommonConstants.PROFILES_MASTER_REGION_ADMIN_PROFILE_ID) {
+						key = CommonConstants.REGION_ID;
+						iden = selectedProfile.getRegionId();
+					}
+					else if (profilesMaster == CommonConstants.PROFILES_MASTER_BRANCH_ADMIN_PROFILE_ID) {
+						key = CommonConstants.BRANCH_ID;
+						iden = selectedProfile.getBranchId();
+					}
+					profileManagementService.addSocialPosts(user, iden, key, POST_DATA);
 				}
 				catch (InvalidInputException e) {
 					LOG.info("InvalidInputException occurred while fetching regions");

@@ -234,8 +234,6 @@ public interface CommonConstants
     public static final String SOCIAL_AUTH_URL = "authUrl";
     public static final String SOCIAL_REQUEST_TOKEN = "requestToken";
     public static final String SOCIAL_FLOW = "socialFlow";
-    public static final String BRANCHES_IN_SESSION = "branchesInSession";
-    public static final String REGIONS_IN_SESSION = "regionsInSession";
     public static final String PROFILE_AGENT_VIEW = "Myself";
     public static final String FACEBOOK_SOCIAL_SITE = "facebook";
     public static final String TWITTER_SOCIAL_SITE = "twitter";
@@ -250,6 +248,11 @@ public interface CommonConstants
     public static final String FLOW_REGISTRATION = "registration";
     public static final String POPUP_FLAG_IN_SESSION = "popupStatus";
     public static final String ACTIVE_SESSIONS_FOUND = "activeSessionFound";
+    
+    public static final String USER_ASSIGNMENTS = "assignments";
+    public static final String ENTITY_ID_COLUMN = "entityId";
+    public static final String ENTITY_NAME_COLUMN = "entityName";
+    public static final String ENTITY_TYPE_COLUMN = "entityType";
 
     /**
      * Batch Constants
