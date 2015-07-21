@@ -102,18 +102,22 @@
    		</c:if>
    	</c:if>
     </c:if>
+<script type="application/ld+json">
+{
+  "@context" : "http://schema.org",
+  "@type" : "Product",
+  "name" : ${profName},
+  "aggregateRating" : {
+    "@type" : "AggregateRating",
+    "ratingValue" : ${floatingAverageGoogleRating },
+    "ratingCount" : ${reviewsCount},
+	"bestRating" : "5",
+	"worstRating" : "0"
+  }
+}
+</script>
 </head>
 <body>
-	<div class="hide" itemscope itemtype="http://schema.org/Product">
-		<span itemprop="name">${profName}</span> 
-		<span id="agent-desc" itemprop="title"></span>
-		<div itemprop="aggregateRating" itemscope
-			itemtype="http://schema.org/AggregateRating">
-			Rated <span id="prof-schema-agent-rating" itemprop="ratingValue">${floatingAverageGoogleRating }</span>/5
-			based on <span id="prof-schema-reviews" itemprop="reviewCount">${reviewsCount}</span>
-			reviews
-		</div>
-	</div>
 	<%-- <div class="hide" itemscope itemtype="http://schema.org/Product">
 		<h2 itemprop="name"> ${profName} </h2>
 		<span itemprop="title">Reviews</span>
@@ -185,7 +189,7 @@
     </div>
 </div>
 
-<div id="profile-main-content" class="prof-main-content-wrapper margin-top-25 margin-bottom-25">
+<div id="profile-main-content" class="prof-main-content-wrapper margin-top-10 margin-bottom-25">
     <div class="">
     	<div class="container">
         <div class="row prof-pic-name-wrapper">
@@ -263,16 +267,24 @@
 		<div class="prof-details-header">
 			<div class="container">
 				<div class="prof-details-header-row clearfix">
-					<div class="prof-link-header float-left clearfix">
-						<div id="prof-header-rating" class="rating-image float-left smiley-rat-5"></div>
-						<div id="prof-header-url" class="rating-image-txt float-left">
-							<c:if test="${not empty profile.completeProfileUrl}">${profile.completeProfileUrl}</c:if>
+					<c:if test="${not empty profile.completeProfileUrl}">
+						<div class="prof-link-header float-left clearfix">
+							<div id="prof-header-rating" class="rating-image float-left smiley-rat-5"></div>
+							<div id="prof-header-url" class="rating-image-txt float-left" title="${profile.completeProfileUrl}">
+								${profile.completeProfileUrl}
+							</div>
 						</div>
-					</div>
+					</c:if>
 					<c:if test="${not empty profile.contact_details && not empty profile.contact_details.web_addresses && not empty profile.contact_details.web_addresses.work}">
 						<div id="web-addr-header" class="web-addr-header float-left clearfix">
 							<div class="web-address-img float-left"></div>
 							<div id="web-address-txt" class="web-address-txt float-left web-address-link" data-link="${profile.contact_details.web_addresses.work}">${profile.contact_details.web_addresses.work}</div>
+						</div>
+					</c:if>
+					<c:if test="${not empty profile.contact_details && not empty profile.contact_details.contact_numbers && not empty profile.contact_details.contact_numbers.work}">
+						<div class="web-addr-header float-left clearfix">
+							<div class="phn-num-img float-left"></div>
+							<div class="phone-number-txt float-left">${profile.contact_details.contact_numbers.work}</div>
 						</div>
 					</c:if>
 					<div class="float-right hm-hr-row-right clearfix">
