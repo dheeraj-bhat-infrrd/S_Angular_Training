@@ -7,7 +7,7 @@
 		<div class="hm-header-row clearfix">
 			<div class="float-left hm-header-row-left hr-dsh-adj-lft"><spring:message code="label.header.dashboard.key" /></div>
 			<c:if test="${not empty assignments}">
-				<div class="float-right header-right clearfix hr-dsh-adj-rt hdr-prof-sel">
+				<div id="da-dd-wrapper" class="float-right header-right clearfix hr-dsh-adj-rt hdr-prof-sel">
 					<div class="float-left hr-txt1"><spring:message code="label.viewas.key" /></div>
 					<div id="dashboard-sel" class="float-left hr-txt2 cursor-pointer">${entityName}</div>
 					<div id="da-dd-wrapper-profiles" class="va-dd-wrapper hide">
@@ -185,7 +185,7 @@ $(document).ready(function() {
 	$(document).attr("title", "Dashboard");
 	
 	if ($("#da-dd-wrapper-profiles > div").length <= 1) {
-		$('#da-dd-wrapper-profiles').remove();
+		$('#da-dd-wrapper').remove();
 	}
 	
 	var profileMasterId = $('#prof-container').attr('data-profile-master-id');
