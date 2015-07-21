@@ -233,7 +233,7 @@ public class DashboardServiceImpl implements DashboardService, InitializingBean 
 			surveyDetailsToPopulate.add(survey.getModifiedOn());
 
 			try {
-				surveyDetailsToPopulate.add(surveyHandler.composeLink(survey.getAgentId(), survey.getCustomerEmailId()));
+				surveyDetailsToPopulate.add(surveyHandler.composeLink(survey.getAgentId(), survey.getCustomerEmailId(), survey.getCustomerFirstName(), survey.getCustomerLastName()));
 			}
 			catch (InvalidInputException e) {
 				LOG.error("Invalid input exception caught in downloadIncompleteSurveyData(). Nested exception is ", e);

@@ -5034,6 +5034,8 @@ function updateCustomerResponse(feedback, agreedToShare) {
 		"feedback" : feedback,
 		"agentId" : agentId,
 		"customerEmail" : customerEmail,
+		"firstName" : firstName,
+		"lastName" : lastName,
 		"isAbusive" : isAbusive,
 		"agreedToShare" : agreedToShare
 	};
@@ -7367,6 +7369,8 @@ function paintDashboardButtons(data){
 		var buttonId = 'dsh-btn1';
 		var task = $('#dsh-btn1').data('social');
 		if(columnName == 'agentId'){
+			sendSurveyInvitation();
+		}else if(accountType="INDIVIDUAL"){
 			sendSurveyInvitation();
 		}
 		else{

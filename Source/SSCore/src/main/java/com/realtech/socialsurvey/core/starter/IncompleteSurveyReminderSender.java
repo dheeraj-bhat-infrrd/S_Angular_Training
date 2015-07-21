@@ -66,6 +66,9 @@ public class IncompleteSurveyReminderSender extends QuartzJobBean
                     long currentTime = System.currentTimeMillis();
                     if ( surveyHandler.checkIfTimeIntervalHasExpired( surveyLastRemindedTime, currentTime, reminderInterval ) ) {
                         try {
+                            if ( survey.getSurveySource().equalsIgnoreCase( CommonConstants.CRM_SOURCE_ENCOMPASS ) ) {
+                                sendMailToAgent( survey );
+                            }
                             sendEmail( emailServices, organizationManagementService, userManagementService, survey,
                                 company.getCompanyId() );
                             surveyHandler.updateReminderCount( survey.getSurveyPreIntitiationId() );
@@ -81,6 +84,18 @@ public class IncompleteSurveyReminderSender extends QuartzJobBean
             }
         }
         LOG.info( "Completed IncompleteSurveyReminderSender" );
+    }
+
+
+    private void sendMailToAgent( SurveyPreInitiation survey )
+    {
+        try {
+            emailServices.sendAgentSurveyReminderMail( survey.getCustomerEmailId(), survey );
+        } catch ( InvalidInputException | UndeliveredEmailException e ) {
+            LOG.error( "Exception caught " + e.getMessage() );
+        }
+
+
     }
 
 
@@ -109,7 +124,7 @@ public class IncompleteSurveyReminderSender extends QuartzJobBean
             LOG.error( "EXception caught in sendEmail(). Nested exception is ", e1 );
         }
 
-        String surveyLink = surveyHandler.composeLink( survey.getAgentId(), survey.getCustomerEmailId() );
+        String surveyLink = surveyHandler.composeLink( survey.getAgentId(), survey.getCustomerEmailId(), survey.getCustomerFirstName(), survey.getCustomerLastName() );
         try {
             companySettings = organizationManagementService.getCompanySettings( companyId );
         } catch ( InvalidInputException e ) {
