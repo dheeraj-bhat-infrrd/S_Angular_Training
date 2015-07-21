@@ -4,10 +4,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
-
 import org.apache.http.NameValuePair;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
@@ -28,12 +26,10 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
-
 import twitter4j.Twitter;
 import twitter4j.TwitterException;
 import twitter4j.auth.AccessToken;
 import twitter4j.auth.RequestToken;
-
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
@@ -48,12 +44,12 @@ import com.realtech.socialsurvey.core.entities.ProfileStage;
 import com.realtech.socialsurvey.core.entities.SocialMediaTokens;
 import com.realtech.socialsurvey.core.entities.TwitterToken;
 import com.realtech.socialsurvey.core.entities.User;
-import com.realtech.socialsurvey.core.entities.UserProfile;
 import com.realtech.socialsurvey.core.entities.UserSettings;
 import com.realtech.socialsurvey.core.enums.AccountType;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.exception.NoRecordsFetchedException;
 import com.realtech.socialsurvey.core.exception.NonFatalException;
+import com.realtech.socialsurvey.core.services.organizationmanagement.OrganizationManagementService;
 import com.realtech.socialsurvey.core.services.organizationmanagement.ProfileManagementService;
 import com.realtech.socialsurvey.core.services.organizationmanagement.UserManagementService;
 import com.realtech.socialsurvey.core.services.social.SocialAsyncService;
@@ -62,7 +58,6 @@ import com.realtech.socialsurvey.core.utils.DisplayMessageConstants;
 import com.realtech.socialsurvey.web.common.ErrorResponse;
 import com.realtech.socialsurvey.web.common.JspResolver;
 import com.realtech.socialsurvey.web.util.RequestUtils;
-
 import facebook4j.Account;
 import facebook4j.Facebook;
 import facebook4j.FacebookException;
@@ -88,6 +83,9 @@ public class SocialManagementController {
 
 	@Autowired
 	private UserManagementService userManagementService;
+	
+	@Autowired
+	private OrganizationManagementService organizationManagementService;
 	
 	@Autowired
 	private ProfileManagementService profileManagementService;
@@ -276,10 +274,10 @@ public class SocialManagementController {
 
 		try {
 			UserSettings userSettings = (UserSettings) session.getAttribute(CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION);
-			UserProfile selectedProfile = (UserProfile) session.getAttribute(CommonConstants.USER_PROFILE);
-			if (userSettings == null || selectedProfile == null) {
-				LOG.error("authenticateFacebookAccess : userSettings not found in session!");
-				throw new NonFatalException("authenticateFacebookAccess : userSettings not found in session!");
+			long entityId = (long) session.getAttribute(CommonConstants.ENTITY_ID_COLUMN);
+			String entityType = (String) session.getAttribute(CommonConstants.ENTITY_TYPE_COLUMN);
+			if (userSettings == null || entityType == null) {
+				throw new InvalidInputException("No user settings found in session");
 			}
 
 			// On auth error
@@ -312,10 +310,8 @@ public class SocialManagementController {
 			// Storing token
 			SocialMediaTokens mediaTokens;
 			int accountMasterId = accountType.getValue();
-			int profilesMaster = selectedProfile.getProfilesMaster().getProfileId();
-			if (profilesMaster == CommonConstants.PROFILES_MASTER_COMPANY_ADMIN_PROFILE_ID
-					|| accountMasterId == CommonConstants.ACCOUNTS_MASTER_INDIVIDUAL) {
-				OrganizationUnitSettings companySettings = userSettings.getCompanySettings();
+			if (entityType.equals(CommonConstants.COMPANY_ID_COLUMN) || accountMasterId == CommonConstants.ACCOUNTS_MASTER_INDIVIDUAL) {
+				OrganizationUnitSettings companySettings = organizationManagementService.getCompanySettings(entityId);
 				if (companySettings == null) {
 					throw new InvalidInputException("No company settings found in current session");
 				}
@@ -333,9 +329,8 @@ public class SocialManagementController {
 				userSettings.setCompanySettings(companySettings);
 				updated = true;
 			}
-			else if (profilesMaster == CommonConstants.PROFILES_MASTER_REGION_ADMIN_PROFILE_ID) {
-				long regionId = selectedProfile.getRegionId();
-				OrganizationUnitSettings regionSettings = userSettings.getRegionSettings().get(regionId);
+			else if (entityType.equals(CommonConstants.REGION_ID_COLUMN)) {
+				OrganizationUnitSettings regionSettings = organizationManagementService.getRegionSettings(entityId);
 				if (regionSettings == null) {
 					throw new InvalidInputException("No Region settings found in current session");
 				}
@@ -350,12 +345,11 @@ public class SocialManagementController {
 					}
 				}
 				profileManagementService.updateProfileStages(regionSettings.getProfileStages(), regionSettings, MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION);
-				userSettings.getRegionSettings().put(regionId, regionSettings);
+				userSettings.getRegionSettings().put(entityId, regionSettings);
 				updated = true;
 			}
-			else if (profilesMaster == CommonConstants.PROFILES_MASTER_BRANCH_ADMIN_PROFILE_ID) {
-				long branchId = selectedProfile.getBranchId();
-				OrganizationUnitSettings branchSettings = userSettings.getBranchSettings().get(branchId);
+			else if (entityType.equals(CommonConstants.BRANCH_ID_COLUMN)) {
+				OrganizationUnitSettings branchSettings = organizationManagementService.getBranchSettingsDefault(entityId);
 				if (branchSettings == null) {
 					throw new InvalidInputException("No Branch settings found in current session");
 				}
@@ -370,11 +364,11 @@ public class SocialManagementController {
 					}
 				}
 				profileManagementService.updateProfileStages(branchSettings.getProfileStages(), branchSettings, MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION);
-				userSettings.getBranchSettings().put(branchId, branchSettings);
+				userSettings.getBranchSettings().put(entityId, branchSettings);
 				updated = true;
 			}
-			if (profilesMaster == CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID) {
-				AgentSettings agentSettings = userSettings.getAgentSettings();
+			if (entityType.equals(CommonConstants.AGENT_ID_COLUMN)) {
+				AgentSettings agentSettings = userManagementService.getUserSettings(entityId);
 				if (agentSettings == null) {
 					throw new InvalidInputException("No Agent settings found in current session");
 				}
@@ -430,15 +424,14 @@ public class SocialManagementController {
 	@RequestMapping(value = "/saveSelectedAccessFacebookToken")
 	public String saveSelectedAccessFacebookToken(Model model, HttpServletRequest request) {
 		LOG.info("Method saveSelectedAccessFacebookToken() called from SocialManagementController");
-		
-	
 		String selectedAccessFacebookToken = request.getParameter("selectedAccessFacebookToken");
+		
 		HttpSession session = request.getSession(false);
-		UserSettings userSettings = (UserSettings) session.getAttribute(CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION);
-		UserProfile selectedProfile = (UserProfile) session.getAttribute(CommonConstants.USER_PROFILE);
 		AccountType accountType = (AccountType) session.getAttribute(CommonConstants.ACCOUNT_TYPE_IN_SESSION);
+		long entityId = (long) session.getAttribute(CommonConstants.ENTITY_ID_COLUMN);
+		String entityType = (String) session.getAttribute(CommonConstants.ENTITY_TYPE_COLUMN);
+		
 		int accountMasterId = accountType.getValue();
-		int profilesMaster = selectedProfile.getProfilesMaster().getProfileId();
 		if(session.getAttribute("columnName")!=null){
 			String columnName = (String) session.getAttribute("columnName");
 			String columnValue = (String) session.getAttribute("columnValue");
@@ -448,12 +441,12 @@ public class SocialManagementController {
 			model.addAttribute("columnValue", columnValue);
 			model.addAttribute("fromDashboard", 1);
 		}
+		
 		boolean updated = false;
 		SocialMediaTokens mediaTokens =null;
 		try {
-			if (profilesMaster == CommonConstants.PROFILES_MASTER_COMPANY_ADMIN_PROFILE_ID
-					|| accountMasterId == CommonConstants.ACCOUNTS_MASTER_INDIVIDUAL) {
-				OrganizationUnitSettings companySettings = userSettings.getCompanySettings();
+			if (entityType.equals(CommonConstants.COMPANY_ID_COLUMN) || accountMasterId == CommonConstants.ACCOUNTS_MASTER_INDIVIDUAL) {
+				OrganizationUnitSettings companySettings = organizationManagementService.getCompanySettings(entityId);
 				if (companySettings == null) {
 					throw new InvalidInputException("No company settings found in current session");
 				}
@@ -463,9 +456,8 @@ public class SocialManagementController {
 							companySettings, mediaTokens);
 					updated = true;
 			}
-			else if (profilesMaster == CommonConstants.PROFILES_MASTER_REGION_ADMIN_PROFILE_ID) {
-				long regionId = selectedProfile.getRegionId();
-				OrganizationUnitSettings regionSettings = userSettings.getRegionSettings().get(regionId);
+			else if (entityType.equals(CommonConstants.REGION_ID_COLUMN)) {
+				OrganizationUnitSettings regionSettings = organizationManagementService.getRegionSettings(entityId);
 				if (regionSettings == null) {
 					throw new InvalidInputException("No Region settings found in current session");
 				}
@@ -475,9 +467,8 @@ public class SocialManagementController {
 						regionSettings, mediaTokens);
 				updated = true;
 			}
-			else if (profilesMaster == CommonConstants.PROFILES_MASTER_BRANCH_ADMIN_PROFILE_ID) {
-				long branchId = selectedProfile.getBranchId();
-				OrganizationUnitSettings branchSettings = userSettings.getBranchSettings().get(branchId);
+			else if (entityType.equals(CommonConstants.BRANCH_ID_COLUMN)) {
+				OrganizationUnitSettings branchSettings = organizationManagementService.getBranchSettingsDefault(entityId);
 				if (branchSettings == null) {
 					throw new InvalidInputException("No Branch settings found in current session");
 				}
@@ -487,8 +478,8 @@ public class SocialManagementController {
 						branchSettings, mediaTokens);
 				updated = true;
 			}
-			if (profilesMaster == CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID) {
-				AgentSettings agentSettings = userSettings.getAgentSettings();
+			if (entityType.equals(CommonConstants.AGENT_ID_COLUMN)) {
+				AgentSettings agentSettings = userManagementService.getUserSettings(entityId);
 				if (agentSettings == null) {
 					throw new InvalidInputException("No Agent settings found in current session");
 				}
@@ -501,7 +492,7 @@ public class SocialManagementController {
 				throw new InvalidInputException("Invalid input exception occurred while saving access token for facebook",
 						DisplayMessageConstants.GENERAL_ERROR);
 			}
-		} catch (InvalidInputException e) {
+		} catch (InvalidInputException | NoRecordsFetchedException e) {
 			LOG.error("Error while saving access token for facebook to post: " + e.getLocalizedMessage(), e);		
 		}
 		model.addAttribute("socialNetwork", "facebook");
@@ -575,10 +566,10 @@ public class SocialManagementController {
 		}
 		try {
 			UserSettings userSettings = (UserSettings) session.getAttribute(CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION);
-			UserProfile selectedProfile = (UserProfile) session.getAttribute(CommonConstants.USER_PROFILE);
-			if (userSettings == null || selectedProfile == null) {
-				LOG.error("authenticateTwitterAccess : userSettings not found in session!");
-				throw new NonFatalException("authenticateTwitterAccess : userSettings not found in session!");
+			long entityId = (long) session.getAttribute(CommonConstants.ENTITY_ID_COLUMN);
+			String entityType = (String) session.getAttribute(CommonConstants.ENTITY_TYPE_COLUMN);
+			if (userSettings == null || entityType == null) {
+				throw new InvalidInputException("No user settings found in session");
 			}
 
 			// On auth error
@@ -612,13 +603,12 @@ public class SocialManagementController {
 				throw new NonFatalException("Unable to procure twitter access token");
 			}
 			boolean updated = false;
+			
 			// Storing token
 			SocialMediaTokens mediaTokens;
 			int accountMasterId = accountType.getValue();
-			int profilesMaster = selectedProfile.getProfilesMaster().getProfileId();
-			if (profilesMaster == CommonConstants.PROFILES_MASTER_COMPANY_ADMIN_PROFILE_ID
-					|| accountMasterId == CommonConstants.ACCOUNTS_MASTER_INDIVIDUAL) {
-				OrganizationUnitSettings companySettings = userSettings.getCompanySettings();
+			if (entityType.equals(CommonConstants.COMPANY_ID_COLUMN) || accountMasterId == CommonConstants.ACCOUNTS_MASTER_INDIVIDUAL) {
+				OrganizationUnitSettings companySettings = organizationManagementService.getCompanySettings(entityId);
 				if (companySettings == null) {
 					throw new InvalidInputException("No company settings found in current session");
 				}
@@ -636,9 +626,8 @@ public class SocialManagementController {
 				userSettings.setCompanySettings(companySettings);
 				updated = true;
 			}
-			else if (profilesMaster == CommonConstants.PROFILES_MASTER_REGION_ADMIN_PROFILE_ID) {
-				long regionId = selectedProfile.getRegionId();
-				OrganizationUnitSettings regionSettings = userSettings.getRegionSettings().get(regionId);
+			else if (entityType.equals(CommonConstants.REGION_ID_COLUMN)) {
+				OrganizationUnitSettings regionSettings = organizationManagementService.getRegionSettings(entityId);
 				if (regionSettings == null) {
 					throw new InvalidInputException("No Region settings found in current session");
 				}
@@ -653,12 +642,11 @@ public class SocialManagementController {
 					}
 				}
 				profileManagementService.updateProfileStages(regionSettings.getProfileStages(), regionSettings, MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION);
-				userSettings.getRegionSettings().put(regionId, regionSettings);
+				userSettings.getRegionSettings().put(entityId, regionSettings);
 				updated = true;
 			}
-			else if (profilesMaster == CommonConstants.PROFILES_MASTER_BRANCH_ADMIN_PROFILE_ID) {
-				long branchId = selectedProfile.getBranchId();
-				OrganizationUnitSettings branchSettings = userSettings.getBranchSettings().get(branchId);
+			else if (entityType.equals(CommonConstants.BRANCH_ID_COLUMN)) {
+				OrganizationUnitSettings branchSettings = organizationManagementService.getBranchSettingsDefault(entityId);
 				if (branchSettings == null) {
 					throw new InvalidInputException("No Branch settings found in current session");
 				}
@@ -673,11 +661,11 @@ public class SocialManagementController {
 					}
 				}
 				profileManagementService.updateProfileStages(branchSettings.getProfileStages(), branchSettings, MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION);
-				userSettings.getBranchSettings().put(branchId, branchSettings);
+				userSettings.getBranchSettings().put(entityId, branchSettings);
 				updated = true;
 			}
-			if (profilesMaster == CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID) {
-				AgentSettings agentSettings = userSettings.getAgentSettings();
+			if (entityType.equals(CommonConstants.AGENT_ID_COLUMN)) {
+				AgentSettings agentSettings = userManagementService.getUserSettings(entityId);
 				if (agentSettings == null) {
 					throw new InvalidInputException("No Agent settings found in current session");
 				}
@@ -762,10 +750,10 @@ public class SocialManagementController {
 		}
 		try {
 			UserSettings userSettings = (UserSettings) session.getAttribute(CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION);
-			UserProfile selectedProfile = (UserProfile) session.getAttribute(CommonConstants.USER_PROFILE);
-			if (userSettings == null || selectedProfile == null) {
-				LOG.error("authenticateLinkedInAccess : userSettings not found in session!");
-				throw new NonFatalException("authenticateLinkedInAccess : userSettings not found in session!");
+			long entityId = (long) session.getAttribute(CommonConstants.ENTITY_ID_COLUMN);
+			String entityType = (String) session.getAttribute(CommonConstants.ENTITY_TYPE_COLUMN);
+			if (userSettings == null || entityType == null) {
+				throw new InvalidInputException("No user settings found in session");
 			}
 
 			// On auth error
@@ -802,12 +790,10 @@ public class SocialManagementController {
 			
 
 			SocialMediaTokens mediaTokens;
-			int accountMasterId = accountType.getValue();
-			int profilesMaster = selectedProfile.getProfilesMaster().getProfileId();
 			boolean updated = false;
-			if (profilesMaster == CommonConstants.PROFILES_MASTER_COMPANY_ADMIN_PROFILE_ID
-					|| accountMasterId == CommonConstants.ACCOUNTS_MASTER_INDIVIDUAL) {
-				OrganizationUnitSettings companySettings = userSettings.getCompanySettings();
+			int accountMasterId = accountType.getValue();
+			if (entityType.equals(CommonConstants.COMPANY_ID_COLUMN) || accountMasterId == CommonConstants.ACCOUNTS_MASTER_INDIVIDUAL) {
+				OrganizationUnitSettings companySettings = organizationManagementService.getCompanySettings(entityId);
 				if (companySettings == null) {
 					throw new InvalidInputException("No company settings found in current session");
 				}
@@ -825,9 +811,8 @@ public class SocialManagementController {
 				userSettings.setCompanySettings(companySettings);
 				updated = true;
 			}
-			else if (profilesMaster == CommonConstants.PROFILES_MASTER_REGION_ADMIN_PROFILE_ID) {
-				long regionId = selectedProfile.getRegionId();
-				OrganizationUnitSettings regionSettings = userSettings.getRegionSettings().get(regionId);
+			else if (entityType.equals(CommonConstants.REGION_ID_COLUMN)) {
+				OrganizationUnitSettings regionSettings = organizationManagementService.getRegionSettings(entityId);
 				if (regionSettings == null) {
 					throw new InvalidInputException("No Region settings found in current session");
 				}
@@ -842,12 +827,11 @@ public class SocialManagementController {
 					}
 				}
 				profileManagementService.updateProfileStages(regionSettings.getProfileStages(), regionSettings, MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION);
-				userSettings.getRegionSettings().put(regionId, regionSettings);
+				userSettings.getRegionSettings().put(entityId, regionSettings);
 				updated = true;
 			}
-			else if (profilesMaster == CommonConstants.PROFILES_MASTER_BRANCH_ADMIN_PROFILE_ID) {
-				long branchId = selectedProfile.getBranchId();
-				OrganizationUnitSettings branchSettings = userSettings.getBranchSettings().get(branchId);
+			else if (entityType.equals(CommonConstants.BRANCH_ID_COLUMN)) {
+				OrganizationUnitSettings branchSettings = organizationManagementService.getBranchSettingsDefault(entityId);
 				if (branchSettings == null) {
 					throw new InvalidInputException("No Branch settings found in current session");
 				}
@@ -862,11 +846,11 @@ public class SocialManagementController {
 					}
 				}
 				profileManagementService.updateProfileStages(branchSettings.getProfileStages(), branchSettings, MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION);
-				userSettings.getBranchSettings().put(branchId, branchSettings);
+				userSettings.getBranchSettings().put(entityId, branchSettings);
 				updated = true;
 			}
-			if (profilesMaster == CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID) {
-				AgentSettings agentSettings = userSettings.getAgentSettings();
+			if (entityType.equals(CommonConstants.AGENT_ID_COLUMN)) {
+				AgentSettings agentSettings = userManagementService.getUserSettings(entityId);
 				if (agentSettings == null) {
 					throw new InvalidInputException("No Agent settings found in current session");
 				}
@@ -961,10 +945,10 @@ public class SocialManagementController {
 		}
 		try {
 			UserSettings userSettings = (UserSettings) session.getAttribute(CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION);
-			UserProfile selectedProfile = (UserProfile) session.getAttribute(CommonConstants.USER_PROFILE);
-			if (userSettings == null || selectedProfile == null) {
-				LOG.error("authenticateGoogleAccess : userSettings not found in session!");
-				throw new NonFatalException("authenticateGoogleAccess : userSettings not found in session!");
+			long entityId = (long) session.getAttribute(CommonConstants.ENTITY_ID_COLUMN);
+			String entityType = (String) session.getAttribute(CommonConstants.ENTITY_TYPE_COLUMN);
+			if (userSettings == null || entityType == null) {
+				throw new InvalidInputException("No user settings found in session");
 			}
 
 			// On auth error
@@ -1005,13 +989,12 @@ public class SocialManagementController {
 				profileLink = profileData.get("link").toString();
 			}
 			boolean updated = false;
+			
 			// Storing access token
 			SocialMediaTokens mediaTokens;
 			int accountMasterId = accountType.getValue();
-			int profilesMaster = selectedProfile.getProfilesMaster().getProfileId();
-			if (profilesMaster == CommonConstants.PROFILES_MASTER_COMPANY_ADMIN_PROFILE_ID
-					|| accountMasterId == CommonConstants.ACCOUNTS_MASTER_INDIVIDUAL) {
-				OrganizationUnitSettings companySettings = userSettings.getCompanySettings();
+			if (entityType.equals(CommonConstants.COMPANY_ID_COLUMN) || accountMasterId == CommonConstants.ACCOUNTS_MASTER_INDIVIDUAL) {
+				OrganizationUnitSettings companySettings = organizationManagementService.getCompanySettings(entityId);
 				if (companySettings == null) {
 					throw new InvalidInputException("No company settings found in current session");
 				}
@@ -1029,9 +1012,8 @@ public class SocialManagementController {
 				userSettings.setCompanySettings(companySettings);
 				updated = true;
 			}
-			else if (profilesMaster == CommonConstants.PROFILES_MASTER_REGION_ADMIN_PROFILE_ID) {
-				long regionId = selectedProfile.getRegionId();
-				OrganizationUnitSettings regionSettings = userSettings.getRegionSettings().get(regionId);
+			else if (entityType.equals(CommonConstants.REGION_ID_COLUMN)) {
+				OrganizationUnitSettings regionSettings = organizationManagementService.getRegionSettings(entityId);
 				if (regionSettings == null) {
 					throw new InvalidInputException("No Region settings found in current session");
 				}
@@ -1046,12 +1028,11 @@ public class SocialManagementController {
 					}
 				}
 				profileManagementService.updateProfileStages(regionSettings.getProfileStages(), regionSettings, MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION);
-				userSettings.getRegionSettings().put(regionId, regionSettings);
+				userSettings.getRegionSettings().put(entityId, regionSettings);
 				updated = true;
 			}
-			else if (profilesMaster == CommonConstants.PROFILES_MASTER_BRANCH_ADMIN_PROFILE_ID) {
-				long branchId = selectedProfile.getBranchId();
-				OrganizationUnitSettings branchSettings = userSettings.getBranchSettings().get(branchId);
+			else if (entityType.equals(CommonConstants.BRANCH_ID_COLUMN)) {
+				OrganizationUnitSettings branchSettings = organizationManagementService.getBranchSettingsDefault(entityId);
 				if (branchSettings == null) {
 					throw new InvalidInputException("No Branch settings found in current session");
 				}
@@ -1066,11 +1047,11 @@ public class SocialManagementController {
 					}
 				}
 				profileManagementService.updateProfileStages(branchSettings.getProfileStages(), branchSettings, MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION);
-				userSettings.getBranchSettings().put(branchId, branchSettings);
+				userSettings.getBranchSettings().put(entityId, branchSettings);
 				updated = true;
 			}
-			if (profilesMaster == CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID) {
-				AgentSettings agentSettings = userSettings.getAgentSettings();
+			if (entityType.equals(CommonConstants.AGENT_ID_COLUMN)) {
+				AgentSettings agentSettings = userManagementService.getUserSettings(entityId);
 				if (agentSettings == null) {
 					throw new InvalidInputException("No Agent settings found in current session");
 				}
@@ -1408,13 +1389,20 @@ public class SocialManagementController {
 	public String finalizeProfileImage(Model model, HttpServletRequest request) {
 		LOG.info("Method finalizeProfileImage() called from SocialManagementController");
 		HttpSession session = request.getSession(false);
-		UserSettings userSettings = (UserSettings) session.getAttribute(CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION);
-		UserProfile selectedProfile = (UserProfile) session.getAttribute(CommonConstants.USER_PROFILE);
 
-		if (selectedProfile != null) {
-			AgentSettings agentSettings = userSettings.getAgentSettings();
-			socialAsyncService.updateLinkedInProfileImage(MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION, agentSettings);
+		AgentSettings agentSettings = null;
+		try {
+			long entityId = (long) session.getAttribute(CommonConstants.ENTITY_ID_COLUMN);
+			String entityType = (String) session.getAttribute(CommonConstants.ENTITY_TYPE_COLUMN);
+			if (entityType == null) {
+				throw new InvalidInputException("No user settings found in session");
+			}
+			agentSettings = userManagementService.getUserSettings(entityId);
 		}
+		catch (InvalidInputException e) {
+			LOG.error("Exception caught while importing links for various pages of the Agent. Nested exception is ", e.getMessage());
+		}
+		socialAsyncService.updateLinkedInProfileImage(MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION, agentSettings);
 
 		LOG.info("Method finalizeProfileImage() finished from SocialManagementController");
 		return CommonConstants.SUCCESS_ATTRIBUTE;
@@ -1475,4 +1463,108 @@ public class SocialManagementController {
 		return profileUrl;
 	}
 	
+	@ResponseBody
+	@RequestMapping(value = "/disconnectsocialmedia", method = RequestMethod.POST)
+	public String disconnectSocialMedia(HttpServletRequest request) {
+		String socialMedia = request.getParameter("socialMedia");
+
+		try {
+			if (socialMedia == null || socialMedia.isEmpty()) {
+				throw new InvalidInputException("Social media can not be null or empty");
+			}
+
+			HttpSession session = request.getSession();
+			UserSettings userSettings = (UserSettings) session.getAttribute(CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION);
+			long entityId = (long) session.getAttribute(CommonConstants.ENTITY_ID_COLUMN);
+			String entityType = (String) session.getAttribute(CommonConstants.ENTITY_TYPE_COLUMN);
+			if (userSettings == null || entityType == null) {
+				throw new InvalidInputException("No user settings found in session");
+			}
+
+			// Check for the collection to update
+			OrganizationUnitSettings unitSettings = null;
+			if (entityType.equals(CommonConstants.COMPANY_ID_COLUMN)) {
+				unitSettings = organizationManagementService.getCompanySettings(entityId);
+				unitSettings = socialManagementService.disconnectSocialNetwork(socialMedia, unitSettings,
+						MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION);
+				userSettings.setCompanySettings(unitSettings);
+			}
+			else if (entityType.equals(CommonConstants.REGION_ID_COLUMN)) {
+				unitSettings = organizationManagementService.getRegionSettings(entityId);
+				unitSettings = socialManagementService.disconnectSocialNetwork(socialMedia, unitSettings,
+						MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION);
+				userSettings.getRegionSettings().put(entityId, unitSettings);
+			}
+			else if (entityType.equals(CommonConstants.BRANCH_ID_COLUMN)) {
+				unitSettings = organizationManagementService.getBranchSettingsDefault(entityId);
+				unitSettings = socialManagementService.disconnectSocialNetwork(socialMedia, unitSettings,
+						MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION);
+				userSettings.getBranchSettings().put(entityId, unitSettings);
+			}
+			if (entityType.equals(CommonConstants.AGENT_ID_COLUMN)) {
+				unitSettings = userManagementService.getUserSettings(entityId);
+				unitSettings = socialManagementService.disconnectSocialNetwork(socialMedia, unitSettings,
+						MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION);
+				userSettings.setAgentSettings((AgentSettings) unitSettings);
+			}
+		}
+		catch (NonFatalException e) {
+			LOG.error("Exception occured in disconnectSocialNetwork() while disconnecting with the social Media.");
+			return "failue";
+		}
+
+		return "success";
+	}
+	
+	@RequestMapping(value = "/getsocialmediatokenonsettingspage", method = RequestMethod.GET)
+	public String getSocialMediaTokenonSettingsPage(HttpServletRequest request, Model model) {
+		LOG.info("Inside getSocialMediaTokenonSettingsPage() method");
+		HttpSession session = request.getSession();
+
+		try {
+			UserSettings userSettings = (UserSettings) session.getAttribute(CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION);
+			long entityId = (long) session.getAttribute(CommonConstants.ENTITY_ID_COLUMN);
+			String entityType = (String) session.getAttribute(CommonConstants.ENTITY_TYPE_COLUMN);
+			if (userSettings == null || entityType == null) {
+				throw new InvalidInputException("No user settings found in session");
+			}
+
+			// Check for the collection to update
+			OrganizationUnitSettings unitSettings = null;
+			if (entityType.equals(CommonConstants.COMPANY_ID_COLUMN)) {
+				unitSettings = organizationManagementService.getCompanySettings(entityId);
+			}
+			else if (entityType.equals(CommonConstants.REGION_ID_COLUMN)) {
+				unitSettings = organizationManagementService.getRegionSettings(entityId);
+			}
+			else if (entityType.equals(CommonConstants.BRANCH_ID_COLUMN)) {
+				unitSettings = organizationManagementService.getBranchSettingsDefault(entityId);
+			}
+			if (entityType.equals(CommonConstants.AGENT_ID_COLUMN)) {
+				unitSettings = userManagementService.getUserSettings(entityId);
+			}
+
+			SocialMediaTokens tokens = unitSettings.getSocialMediaTokens();
+
+			if (tokens != null) {
+				if (tokens.getFacebookToken() != null && tokens.getFacebookToken().getFacebookPageLink() != null) {
+					model.addAttribute("facebookLink", tokens.getFacebookToken().getFacebookPageLink());
+				}
+				if (tokens.getGoogleToken() != null && tokens.getGoogleToken().getProfileLink() != null) {
+					model.addAttribute("googleLink", tokens.getGoogleToken().getProfileLink());
+				}
+				if (tokens.getTwitterToken() != null && tokens.getTwitterToken().getTwitterPageLink() != null) {
+					model.addAttribute("twitterLink", tokens.getTwitterToken().getTwitterPageLink());
+				}
+				if (tokens.getLinkedInToken() != null && tokens.getLinkedInToken().getLinkedInPageLink() != null) {
+					model.addAttribute("linkedinLink", tokens.getLinkedInToken().getLinkedInPageLink());
+				}
+			}
+		}
+		catch (NonFatalException e) {
+			LOG.error("Exception occured in getSocialMediaTokenonSettingsPage()");
+			return "failue";
+		}
+		return JspResolver.SOCIAL_MEDIA_TOKENS;
+	}
 }

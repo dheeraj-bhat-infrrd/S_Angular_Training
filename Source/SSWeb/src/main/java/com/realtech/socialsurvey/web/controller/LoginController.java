@@ -1,7 +1,6 @@
 package com.realtech.socialsurvey.web.controller;
 
 // JIRA SS-21 : by RM-06 : BOC
-import java.net.MalformedURLException;
 import java.util.List;
 import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
@@ -19,9 +18,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import com.google.gson.Gson;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
-import com.realtech.socialsurvey.core.entities.BranchFromSearch;
 import com.realtech.socialsurvey.core.entities.LicenseDetail;
-import com.realtech.socialsurvey.core.entities.RegionFromSearch;
 import com.realtech.socialsurvey.core.entities.User;
 import com.realtech.socialsurvey.core.entities.UserProfile;
 import com.realtech.socialsurvey.core.entities.UserSettings;
@@ -240,30 +237,6 @@ public class LoginController {
 				LOG.debug("Company profile complete, check any of the user profiles is entered");
 				if (user.getIsAtleastOneUserprofileComplete() == CommonConstants.PROCESS_COMPLETE) {
 					/**
-					 * Set the regions and branches in session from solr
-					 */
-					long companyId = user.getCompany().getCompanyId();
-					LOG.debug("Fetching regions from solr to set in session for company:" + companyId);
-					try {
-						Map<Long, RegionFromSearch> regions = organizationManagementService.fetchRegionsMapByCompany(companyId);
-						session.setAttribute(CommonConstants.REGIONS_IN_SESSION, regions);
-					}
-					catch (MalformedURLException e) {
-						LOG.error("MalformedURLException while fetching regions. Reason : " + e.getMessage(), e);
-						throw new NonFatalException("MalformedURLException while fetching regions", e);
-					}
-
-					LOG.debug("Fetching branches from solr to set in session for company:" + companyId);
-					try {
-						Map<Long, BranchFromSearch> branches = organizationManagementService.fetchBranchesMapByCompany(companyId);
-						session.setAttribute(CommonConstants.BRANCHES_IN_SESSION, branches);
-					}
-					catch (MalformedURLException e) {
-						LOG.error("MalformedURLException while fetching branches. Reason : " + e.getMessage(), e);
-						throw new NonFatalException("MalformedURLException while fetching branches", e);
-					}
-
-					/**
 					 * Compute all conditions for user and if user is CA then check for profile
 					 * completion stage.
 					 */
@@ -311,7 +284,7 @@ public class LoginController {
 						redirectAttributes.addFlashAttribute("showSendSurveyPopup", String.valueOf(showSendSurveyPopup));
 
 						// updating session with selected user profile if not set
-						sessionHelper.updateProcessedUserProfiles(session, user);
+						sessionHelper.processAssignments(session, user);
 
 						// update the last login time and number of logins
 						userManagementService.updateUserLoginTimeAndNum(user);
@@ -551,52 +524,30 @@ public class LoginController {
 	public String getDisplayPictureLocation(Model model, HttpServletRequest request, HttpServletResponse response) {
 		LOG.info("fetching display picture");
 		HttpSession session = request.getSession(false);
-		User user = sessionHelper.getCurrentUser();
 		String imageUrl = "";
-		String profileMasterIdStr = request.getParameter("profileMasterId");
 		try {
-			user = userManagementService.getUserByUserId(user.getUserId());
-			UserProfile currentProfile = (UserProfile) session.getAttribute(CommonConstants.USER_PROFILE);
-			if (currentProfile == null) {
-				currentProfile = user.getUserProfiles().get(CommonConstants.INITIAL_INDEX);
-				for (UserProfile profile : user.getUserProfiles()) {
-					if (profile.getProfilesMaster().getProfileId() == CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID) {
-						currentProfile = profile;
-						break;
-					}
-				}
-			}
 			UserSettings userSettings = (UserSettings) session.getAttribute(CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION);
-			if (userSettings == null || currentProfile == null) {
+			if (userSettings == null) {
 				throw new InvalidInputException("No user settings found in session");
 			}
 
-			int profileMasterId = currentProfile.getProfilesMaster().getProfileId();
-
-			if (profileMasterIdStr != null && !profileMasterIdStr.isEmpty()) {
-				try {
-					profileMasterId = Integer.parseInt(profileMasterIdStr);
-				}
-				catch (NumberFormatException e) {
-					LOG.error("Error occured while parsing provided profileMasterId as parameter. Proceeding with default id.");
-				}
+			long entityId = (long) session.getAttribute(CommonConstants.ENTITY_ID_COLUMN);
+			String entityType = (String) session.getAttribute(CommonConstants.ENTITY_TYPE_COLUMN);
+			if (entityId == 0 || entityType == null) {
+				throw new InvalidInputException("No user settings found in session");
 			}
-
-			if (profileMasterId == CommonConstants.PROFILES_MASTER_COMPANY_ADMIN_PROFILE_ID) {
-				imageUrl = userSettings.getCompanySettings().getProfileImageUrl();
+			
+			if (entityType.equals(CommonConstants.COMPANY_ID_COLUMN)) {
+				imageUrl = organizationManagementService.getCompanySettings(entityId).getProfileImageUrl();
 			}
-			else if (profileMasterId == CommonConstants.PROFILES_MASTER_REGION_ADMIN_PROFILE_ID) {
-				long regionId = currentProfile.getRegionId();
-				if (regionId != 0)
-					imageUrl = userSettings.getRegionSettings().get(regionId).getProfileImageUrl();
+			else if (entityType.equals(CommonConstants.REGION_ID_COLUMN)) {
+				imageUrl = organizationManagementService.getRegionSettings(entityId).getProfileImageUrl();
 			}
-			else if (profileMasterId == CommonConstants.PROFILES_MASTER_BRANCH_ADMIN_PROFILE_ID) {
-				long branchId = currentProfile.getBranchId();
-				if (branchId != 0)
-					imageUrl = userSettings.getBranchSettings().get(branchId).getProfileImageUrl();
+			else if (entityType.equals(CommonConstants.BRANCH_ID_COLUMN)) {
+				imageUrl = organizationManagementService.getBranchSettingsDefault(entityId).getProfileImageUrl();
 			}
-			else if (profileMasterId == CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID) {
-				imageUrl = userSettings.getAgentSettings().getProfileImageUrl();
+			else if (entityType.equals(CommonConstants.AGENT_ID_COLUMN)) {
+				imageUrl = userManagementService.getUserSettings(entityId).getProfileImageUrl();
 			}
 		}
 		catch (NonFatalException e) {

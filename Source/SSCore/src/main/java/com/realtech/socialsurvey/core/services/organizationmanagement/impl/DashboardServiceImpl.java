@@ -37,7 +37,6 @@ import com.realtech.socialsurvey.core.entities.SurveyDetails;
 import com.realtech.socialsurvey.core.entities.SurveyPreInitiation;
 import com.realtech.socialsurvey.core.entities.SurveyResponse;
 import com.realtech.socialsurvey.core.entities.User;
-import com.realtech.socialsurvey.core.entities.UserSettings;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.services.organizationmanagement.DashboardService;
 import com.realtech.socialsurvey.core.services.surveybuilder.SurveyHandler;
@@ -93,27 +92,10 @@ public class DashboardServiceImpl implements DashboardService, InitializingBean 
 	}
 
 	@Override
-	public int getProfileCompletionPercentage(User user, String columnName, long columnValue, UserSettings userSettings) {
+	public int getProfileCompletionPercentage(User user, String columnName, long columnValue, OrganizationUnitSettings organizationUnitSettings) {
 		LOG.info("Method to calculate profile completion percentage started.");
 		int totalWeight = 0;
 		double currentWeight = 0;
-		OrganizationUnitSettings organizationUnitSettings = new OrganizationUnitSettings();
-		switch (columnName) {
-			case CommonConstants.COMPANY_ID_COLUMN:
-				organizationUnitSettings = userSettings.getCompanySettings();
-				break;
-			case CommonConstants.REGION_ID_COLUMN:
-				organizationUnitSettings = userSettings.getRegionSettings().get(columnValue);
-				break;
-			case CommonConstants.BRANCH_ID_COLUMN:
-				organizationUnitSettings = userSettings.getBranchSettings().get(columnValue);
-				break;
-			case CommonConstants.AGENT_ID_COLUMN:
-				organizationUnitSettings = userSettings.getAgentSettings();
-				break;
-			default:
-				LOG.error("Invalid value passed for columnName. It should be either of companyId/regionId/branchId/agentId.");
-		}
 		if (weightageColumns.containsKey("email")) {
 			totalWeight += weightageColumns.get("email");
 			if (organizationUnitSettings.getContact_details() != null && organizationUnitSettings.getContact_details().getMail_ids() != null)

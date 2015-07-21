@@ -1,11 +1,9 @@
 package com.realtech.socialsurvey.web.controller;
 
 import java.lang.reflect.Type;
-import java.net.MalformedURLException;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
@@ -94,8 +92,6 @@ public class AdminController {
 		List<UserFromSearch> users = null;
 		int start = 0;
 
-		HttpSession session = request.getSession();
-
 		try {
 			long companyId = 0;
 			try {
@@ -111,25 +107,6 @@ public class AdminController {
 			String regionsJson = solrSearchService.searchRegions("*", company, null, start, regionCount);
 			Type searchedRegionsList = new TypeToken<List<RegionFromSearch>>() {}.getType();
 			regions = new Gson().fromJson(regionsJson, searchedRegionsList);
-
-			Map<Long, RegionFromSearch> regionsInSession = null;
-			try {
-				regionsInSession = organizationManagementService.fetchRegionsMapByCompany(companyId);
-			}
-			catch (MalformedURLException e) {
-				LOG.error("MalformedURLException while fetching regions. Reason : " + e.getMessage(), e);
-				throw new NonFatalException("MalformedURLException while fetching regions", e);
-			}
-			session.setAttribute(CommonConstants.REGIONS_IN_SESSION, regionsInSession);
-
-			try {
-				Map<Long, BranchFromSearch> branchesInSession = organizationManagementService.fetchBranchesMapByCompany(companyId);
-				session.setAttribute(CommonConstants.BRANCHES_IN_SESSION, branchesInSession);
-			}
-			catch (MalformedURLException e) {
-				LOG.error("MalformedURLException while fetching branches. Reason : " + e.getMessage(), e);
-				throw new NonFatalException("MalformedURLException while fetching branches", e);
-			}
 
 			try {
 				LOG.debug("fetching branches under company from solr");
