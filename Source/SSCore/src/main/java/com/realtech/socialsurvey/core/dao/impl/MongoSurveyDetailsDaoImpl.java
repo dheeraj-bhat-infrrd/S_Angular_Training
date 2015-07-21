@@ -59,10 +59,12 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao {
 	 * Method to fetch survey details on the basis of agentId and customer email.
 	 */
 	@Override
-	public SurveyDetails getSurveyByAgentIdAndCustomerEmail(long agentId, String customerEmail) {
+	public SurveyDetails getSurveyByAgentIdAndCustomerEmail(long agentId, String customerEmail, String firstName, String lastName) {
 		LOG.info("Method getSurveyByAgentIdAndCustomerEmail() to insert details of survey started.");
 		Query query = new Query(Criteria.where(CommonConstants.AGENT_ID_COLUMN).is(agentId));
 		query.addCriteria(Criteria.where(CommonConstants.CUSTOMER_EMAIL_COLUMN).is(customerEmail));
+        query.addCriteria(Criteria.where("customerFirstName").is(firstName));
+        query.addCriteria(Criteria.where("customerLastName").is(lastName));
 		List<SurveyDetails> surveys = mongoTemplate.find(query, SurveyDetails.class, SURVEY_DETAILS_COLLECTION);
 		if (surveys == null || surveys.size() == 0)
 			return null;
@@ -1173,11 +1175,13 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao {
 	}
 
 	@Override
-	public void changeStatusOfSurvey(long agentId, String customerEmail, boolean editable) {
+	public void changeStatusOfSurvey(long agentId, String customerEmail, String firstName, String lastName, boolean editable) {
 		LOG.info("Method to update status of survey in SurveyDetails collection, changeStatusOfSurvey() started.");
 		Query query = new Query();
 		query.addCriteria(Criteria.where(CommonConstants.AGENT_ID_COLUMN).is(agentId));
 		query.addCriteria(Criteria.where(CommonConstants.CUSTOMER_EMAIL_COLUMN).is(customerEmail));
+        query.addCriteria(Criteria.where("customerFirstName").is(firstName));
+        query.addCriteria(Criteria.where("customerLastName").is(lastName));
 		Update update = new Update();
 		update.set(CommonConstants.EDITABLE_SURVEY_COLUMN, editable);
 		update.set(CommonConstants.STAGE_COLUMN, 0);
