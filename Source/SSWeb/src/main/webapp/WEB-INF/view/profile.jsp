@@ -97,12 +97,27 @@
     	</c:if>
     	<c:if test="${not empty averageRating}">
     		<fmt:formatNumber var="floatingAverageRating" type="number" value="${averageRating}" maxFractionDigits="2" minFractionDigits="2"/>
+    		<fmt:formatNumber var="floatingAverageGoogleRating" type="number" value="${averageRating}" maxFractionDigits="1" minFractionDigits="1"/>
     		<fmt:formatNumber var="integerAverageRating" type="number" value="${averageRating}" maxFractionDigits="0"/>
     		<c:if test="${integerAverageRating == 6}">
     			<c:set var="integerAverageRating" value="5"></c:set>
     		</c:if>
     	</c:if>
     </c:if>
+<script type="application/ld+json">
+{
+  "@context" : "http://schema.org",
+  "@type" : "Product",
+  "name" : ${profName},
+  "aggregateRating" : {
+    "@type" : "AggregateRating",
+    "ratingValue" : ${floatingAverageGoogleRating },
+    "ratingCount" : ${reviewsCount},
+	"bestRating" : "5",
+	"worstRating" : "0"
+  }
+}
+</script>
 </head>
 <body>
     <div id="toast-container" class="toast-container">
@@ -355,14 +370,16 @@
 									<c:if test="${not empty profile.contact_details.web_addresses && not empty profile.contact_details.web_addresses.work}">
 										<div class="lp-con-row lp-row clearfix">
 											<div class="float-left lp-con-icn icn-web"></div>
-											<div id="web-addr-link-lp" class="float-left lp-con-row-item blue-text web-address-link" data-link="${profile.contact_details.web_addresses.work}">
+											<div id="web-addr-link-lp" class="float-left lp-con-row-item pp-lp-con-row-item blue-text web-address-link" data-link="${profile.contact_details.web_addresses.work}">
 											</div>
 										</div>
 									</c:if>
 									<c:if test="${not empty profile.contact_details.contact_numbers && not empty profile.contact_details.contact_numbers.work}">
 										<div class="lp-con-row lp-row clearfix">
-											<div class="float-left lp-con-icn icn-phone"></div>
-											<div class="float-left lp-con-row-item">${profile.contact_details.contact_numbers.work}</div>
+											<a href="tel:${profile.contact_details.contact_numbers.work}">
+												<div class="float-left lp-con-icn icn-phone"></div>
+												<div class="float-left lp-con-row-item pp-lp-con-row-item">${profile.contact_details.contact_numbers.work}</div>
+											</a>
 										</div>
 									</c:if>
 								</div>
@@ -548,14 +565,14 @@
 </div> -->
 
 <!-- Code snippet to show aggregated ratings for agent in Google results : BOC-->
-<div class="hide" itemscope itemtype="http://schema.org/Product">
+<%-- <div class="hide" itemscope itemtype="http://schema.org/Product">
 	<span itemprop="name">Social Survey</span>
 	<span id="agent-desc" itemprop="title"></span>
 	<div itemprop="aggregateRating" itemscope itemtype="http://schema.org/AggregateRating">Rated 
 		<span id="prof-schema-agent-rating" itemprop="ratingValue">${floatingAverageRating }</span>/5 based on 
 		<span id="prof-schema-reviews" itemprop="reviewCount">${reviewsCount}</span> reviews
 	</div>
-</div>
+</div> --%>
 <!-- EOC -->
 
 <script src="${initParam.resourcesPath}/resources/js/jquery-2.1.1.min.js"></script>
@@ -611,7 +628,7 @@
             $('.mob-icn').removeClass('mob-icn-active');
             $(this).addClass('mob-icn-active');
             $('#prof-company-intro').show();
-            $('#contact-info').hide();
+            $('#contact-info').show();
             $('#prof-agent-container').hide();
             $('#reviews-container').hide();
             $('#recent-post-container').hide();
