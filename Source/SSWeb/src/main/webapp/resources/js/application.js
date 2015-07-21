@@ -303,13 +303,13 @@ function paintDashboard(profileMasterId, newProfileName, newProfileValue, typeoO
 	});
 	lastColNameForCount = newProfileName;
 	lastColValueForCount = newProfileValue;
-	if (profileMasterId == 1) {
+	if (newProfileName == "companyId") {
 		showCompanyAdminFlow(newProfileName, newProfileValue);
-	} else if (profileMasterId == 2) {
+	} else if (newProfileName == "regionId") {
 		showRegionAdminFlow(newProfileName, newProfileValue);
-	} else if (profileMasterId == 3) {
+	} else if (newProfileName == "branchId") {
 		showBranchAdminFlow(newProfileName, newProfileValue);
-	} else if (profileMasterId == 4) {
+	} else if (newProfileName == "agentId") {
 		showAgentFlow(newProfileName, newProfileValue);
 	}
 
@@ -326,7 +326,7 @@ function paintDashboard(profileMasterId, newProfileName, newProfileValue, typeoO
 	});
 	
 	// Loads the image in circle of header.
-	loadDisplayPicture(profileMasterId);
+	loadDisplayPicture();
 	// Loads the master image in dashboard.
 	showDisplayPic();
 }
@@ -1063,8 +1063,8 @@ function showDisplayPic() {
 	});
 }
 
-function updateCurrentProfile(profileId) {
-	var url = "./updatecurrentprofile.do?profileId=" + profileId;
+function updateCurrentProfile(entityType, entityValue) {
+	var url = "./updatecurrentprofile.do?entityId=" + entityValue + "&entityType=" + entityType;
 	callAjaxGET(url, function(data) {}, true);
 }
 
@@ -1089,23 +1089,9 @@ $(document).on('click','.da-dd-item',function(e){
 	$('#da-dd-wrapper-profiles').slideToggle(200);
 	
 	// update selected profile in session
-	var newProfileId = $(this).attr('data-profile-id');
-	updateCurrentProfile(newProfileId);
+	updateCurrentProfile($(this).attr('data-column-type'), $(this).attr('data-column-value'));
 
 	showMainContent('./dashboard.do');
-	/*var newProfileMasterId = $(this).attr('data-profile-master-id');
-	var newProfileName = $(this).attr('data-column-name');
-	var newProfileValue = $(this).attr('data-column-value');
-	paintDashboard(newProfileMasterId, newProfileName, newProfileValue);
-	
-	// updating data
-	$('#prof-container').attr('data-profile-id', newProfileId);
-	$('#prof-container').attr('data-profile-master-id', newProfileMasterId);
-	$('#prof-container').attr('data-column-name', newProfileName);
-	$('#prof-container').attr('data-column-value', newProfileValue);
-	
-	colName = newProfileName;
-	colValue = newProfileValue;*/
 });
 
 $(document).click(function(){
@@ -4342,12 +4328,13 @@ $('body').on('click','#profile-sel',function(e) {
 	$('#pe-dd-wrapper-profiles').slideToggle(200);
 });
 $('body').on('click','.pe-dd-item',function(e) {
-	var newProfileId = $(this).data('profile-id');
-
 	$('#profile-sel').html($(this).html());
 	$('#pe-dd-wrapper-profiles').slideToggle(200);
 
-	showMainContent('./showprofilepage.do?profileId=' + newProfileId);
+	var entityId = $(this).attr('data-column-value');
+	var entityType = $(this).attr('data-column-type');
+	
+	showMainContent("./showprofilepage.do?entityId=" + entityId + "&entityType=" + entityType);
 });
 
 $('body').click(function() {
@@ -4364,12 +4351,13 @@ $('body').on('click','#setting-sel',function(e){
 });
 
 $('body').on('click','.se-dd-item',function(e) {
-	var newProfileId = $(this).data('profile-id');
-	
 	$('#setting-sel').html($(this).html());
 	$('#se-dd-wrapper-profiles').slideToggle(200);
 	
-	showMainContent('./showcompanysettings.do?profileId=' + newProfileId);
+	var entityId = $(this).attr('data-column-value');
+	var entityType = $(this).attr('data-column-type');
+	
+	showMainContent("./showcompanysettings.do?entityId=" + entityId + "&entityType=" + entityType);
 });
 
 $('body').click(function() {
@@ -5052,6 +5040,8 @@ function updateCustomerResponse(feedback, agreedToShare) {
 		"feedback" : feedback,
 		"agentId" : agentId,
 		"customerEmail" : customerEmail,
+		"firstName" : firstName,
+		"lastName" : lastName,
 		"isAbusive" : isAbusive,
 		"agreedToShare" : agreedToShare
 	};
@@ -7385,6 +7375,8 @@ function paintDashboardButtons(data){
 		var buttonId = 'dsh-btn1';
 		var task = $('#dsh-btn1').data('social');
 		if(columnName == 'agentId'){
+			sendSurveyInvitation();
+		}else if(accountType="INDIVIDUAL"){
 			sendSurveyInvitation();
 		}
 		else{

@@ -77,6 +77,7 @@
 		<span id="err-nw-txt"></span>
 	</div>
 	<div id="prof-container" data-q="${q}" data-agentid="${agentId}" data-agentName="${agentName}" data-agent-email="${agentEmail}"
+	data-last-name="${lastName}" data-first-name="${firstName}"
 		 class="prof-main-content-wrapper margin-top-25 margin-bottom-25 min-height-container">
 		<div class="container">
 			<div class="sq-ques-wrapper">

@@ -174,7 +174,7 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
         surveyDetails.setEditable( true );
         surveyDetails.setSource( source );
 
-        SurveyDetails survey = surveyDetailsDao.getSurveyByAgentIdAndCustomerEmail( agentId, customerEmail );
+        SurveyDetails survey = surveyDetailsDao.getSurveyByAgentIdAndCustomerEmail( agentId, customerEmail, firstName, lastName );
         LOG.info( "Method to store initial details of survey, storeInitialSurveyAnswers() finished." );
 
         if ( survey == null ) {
@@ -239,11 +239,11 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
 
 
     @Override
-    public SurveyDetails getSurveyDetails( long agentId, String customerEmail )
+    public SurveyDetails getSurveyDetails( long agentId, String customerEmail, String firstName, String lastName )
     {
         LOG.info( "Method getSurveyDetails() to return survey details by agent id and customer email started." );
         SurveyDetails surveyDetails;
-        surveyDetails = surveyDetailsDao.getSurveyByAgentIdAndCustomerEmail( agentId, customerEmail );
+        surveyDetails = surveyDetailsDao.getSurveyByAgentIdAndCustomerEmail( agentId, customerEmail, firstName, lastName );
         LOG.info( "Method getSurveyDetails() to return survey details by agent id and customer email finished." );
         return surveyDetails;
     }
@@ -516,10 +516,10 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
 
 
     @Override
-    public void changeStatusOfSurvey( long agentId, String customerEmail, boolean editable )
+    public void changeStatusOfSurvey( long agentId, String customerEmail, String firstName, String lastName, boolean editable )
     {
         LOG.info( "Method to update status of survey in SurveyDetails collection, changeStatusOfSurvey() started." );
-        surveyDetailsDao.changeStatusOfSurvey( agentId, customerEmail, editable );
+        surveyDetailsDao.changeStatusOfSurvey( agentId, customerEmail, firstName, lastName, editable );
         LOG.info( "Method to update status of survey in SurveyDetails collection, changeStatusOfSurvey() finished." );
     }
 
@@ -547,7 +547,7 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
             throw new InvalidInputException( "Null/Empty value found for customer's email id." );
         }
 
-        String link = composeLink( user.getUserId(), custEmail );
+        String link = composeLink( user.getUserId(), custEmail, custFirstName, custLastName );
         preInitiateSurvey( user, custEmail, custFirstName, custLastName, 0, custRelationWithAgent, source );
         //		storeInitialSurveyDetails(user.getUserId(), custEmail, custFirstName, custLastName, 0, custRelationWithAgent, link);
 
@@ -632,12 +632,14 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
     // Method to fetch initial survey details from MySQL based upn agent id and customer email.
     @Override
     @Transactional
-    public SurveyPreInitiation getPreInitiatedSurvey( long agentId, String customerEmail ) throws NoRecordsFetchedException
+    public SurveyPreInitiation getPreInitiatedSurvey( long agentId, String customerEmail, String custFirstName, String custLastName ) throws NoRecordsFetchedException
     {
         LOG.info( "Method getSurveyByAgentIdAndCutomerEmail() started. " );
         Map<String, Object> queries = new HashMap<>();
         queries.put( CommonConstants.AGENT_ID_COLUMN, agentId );
         queries.put( "customerEmailId", customerEmail );
+        queries.put( "customerFirstName", custFirstName );
+        queries.put( "customerLastName", custLastName );
         List<SurveyPreInitiation> surveyPreInitiations = surveyPreInitiationDao.findByKeyValue( SurveyPreInitiation.class,
             queries );
         LOG.info( "Method getSurveyByAgentIdAndCutomerEmail() finished. " );
@@ -664,12 +666,14 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
      * Method to compose link for sending to a user to start survey started.
      */
     @Override
-    public String composeLink( long userId, String custEmail ) throws InvalidInputException
+    public String composeLink( long userId, String custEmail, String custFirstName, String custLastName ) throws InvalidInputException
     {
         LOG.debug( "Method composeLink() started" );
         Map<String, String> urlParams = new HashMap<>();
         urlParams.put( CommonConstants.AGENT_ID_COLUMN, userId + "" );
         urlParams.put( CommonConstants.CUSTOMER_EMAIL_COLUMN, custEmail );
+        urlParams.put( CommonConstants.FIRST_NAME, custFirstName );
+        urlParams.put( CommonConstants.LAST_NAME, custLastName );
         LOG.debug( "Method composeLink() finished" );
         return urlGenerator.generateUrl( urlParams, getApplicationBaseUrl() + "rest/survey/showsurveypageforurl" );
     }
