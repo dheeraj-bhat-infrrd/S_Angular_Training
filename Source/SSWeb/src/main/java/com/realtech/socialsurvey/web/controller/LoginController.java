@@ -523,6 +523,7 @@ public class LoginController {
 	@RequestMapping(value = "/getdisplaypiclocation")
 	public String getDisplayPictureLocation(Model model, HttpServletRequest request, HttpServletResponse response) {
 		LOG.info("fetching display picture");
+		User user = sessionHelper.getCurrentUser();
 		HttpSession session = request.getSession(false);
 		String imageUrl = "";
 		try {
@@ -538,7 +539,7 @@ public class LoginController {
 			}
 			
 			if (entityType.equals(CommonConstants.COMPANY_ID_COLUMN)) {
-				imageUrl = organizationManagementService.getCompanySettings(entityId).getProfileImageUrl();
+				imageUrl = organizationManagementService.getCompanySettings(user).getProfileImageUrl();
 			}
 			else if (entityType.equals(CommonConstants.REGION_ID_COLUMN)) {
 				imageUrl = organizationManagementService.getRegionSettings(entityId).getProfileImageUrl();

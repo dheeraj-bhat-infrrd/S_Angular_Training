@@ -260,6 +260,7 @@ public class SocialManagementController {
 	@RequestMapping(value = "/facebookauth", method = RequestMethod.GET)
 	public String authenticateFacebookAccess(Model model, HttpServletRequest request) {
 		LOG.info("Facebook authentication url requested");
+		User user = sessionHelper.getCurrentUser();
 		HttpSession session = request.getSession(false);
 		AccountType accountType = (AccountType) session.getAttribute(CommonConstants.ACCOUNT_TYPE_IN_SESSION);
 		if(session.getAttribute("columnName")!=null){
@@ -296,10 +297,10 @@ public class SocialManagementController {
 			Map<String, String> facebookPages=new HashMap<>();
 			try {
 				accessToken = facebook.getOAuthAccessToken(oauthCode, requestUtils.getRequestServerName(request)+facebookRedirectUri);
-				facebook4j.User user = facebook.getUser(facebook.getId());
+				facebook4j.User fbUser = facebook.getUser(facebook.getId());
 				if (user != null){
-					profileLink = user.getLink().toString();
-					facebookPages.put(user.getName(), accessToken.getToken());
+					profileLink = fbUser.getLink().toString();
+					facebookPages.put(fbUser.getName(), accessToken.getToken());
 				}
 			}
 			catch (FacebookException e) {
@@ -311,7 +312,7 @@ public class SocialManagementController {
 			SocialMediaTokens mediaTokens;
 			int accountMasterId = accountType.getValue();
 			if (entityType.equals(CommonConstants.COMPANY_ID_COLUMN) || accountMasterId == CommonConstants.ACCOUNTS_MASTER_INDIVIDUAL) {
-				OrganizationUnitSettings companySettings = organizationManagementService.getCompanySettings(entityId);
+				OrganizationUnitSettings companySettings = organizationManagementService.getCompanySettings(user.getCompany().getCompanyId());
 				if (companySettings == null) {
 					throw new InvalidInputException("No company settings found in current session");
 				}
@@ -425,7 +426,7 @@ public class SocialManagementController {
 	public String saveSelectedAccessFacebookToken(Model model, HttpServletRequest request) {
 		LOG.info("Method saveSelectedAccessFacebookToken() called from SocialManagementController");
 		String selectedAccessFacebookToken = request.getParameter("selectedAccessFacebookToken");
-		
+		User user = sessionHelper.getCurrentUser();
 		HttpSession session = request.getSession(false);
 		AccountType accountType = (AccountType) session.getAttribute(CommonConstants.ACCOUNT_TYPE_IN_SESSION);
 		long entityId = (long) session.getAttribute(CommonConstants.ENTITY_ID_COLUMN);
@@ -446,7 +447,7 @@ public class SocialManagementController {
 		SocialMediaTokens mediaTokens =null;
 		try {
 			if (entityType.equals(CommonConstants.COMPANY_ID_COLUMN) || accountMasterId == CommonConstants.ACCOUNTS_MASTER_INDIVIDUAL) {
-				OrganizationUnitSettings companySettings = organizationManagementService.getCompanySettings(entityId);
+				OrganizationUnitSettings companySettings = organizationManagementService.getCompanySettings(user.getCompany().getCompanyId());
 				if (companySettings == null) {
 					throw new InvalidInputException("No company settings found in current session");
 				}
@@ -553,6 +554,7 @@ public class SocialManagementController {
 	@RequestMapping(value = "/twitterauth", method = RequestMethod.GET)
 	public String authenticateTwitterAccess(Model model, HttpServletRequest request) {
 		LOG.info("Twitter authentication url requested");
+		User user = sessionHelper.getCurrentUser();
 		HttpSession session = request.getSession(false);
 		AccountType accountType = (AccountType) session.getAttribute(CommonConstants.ACCOUNT_TYPE_IN_SESSION);
 		if(session.getAttribute("columnName")!=null){
@@ -588,9 +590,9 @@ public class SocialManagementController {
 			RequestToken requestToken = (RequestToken) session.getAttribute(CommonConstants.SOCIAL_REQUEST_TOKEN);
 			try {
 				accessToken = twitter.getOAuthAccessToken(requestToken, oauthVerifier);
-				twitter4j.User user = twitter.showUser(twitter.getId());
-				if (user != null && user.getScreenName() != null)
-					profileLink = CommonConstants.TWITTER_BASE_URL + user.getScreenName();
+				twitter4j.User twitterUser = twitter.showUser(twitter.getId());
+				if (twitterUser != null && twitterUser.getScreenName() != null)
+					profileLink = CommonConstants.TWITTER_BASE_URL + twitterUser.getScreenName();
 			}
 			catch (TwitterException te) {
 				if (TwitterException.UNAUTHORIZED == te.getStatusCode()) {
@@ -608,7 +610,7 @@ public class SocialManagementController {
 			SocialMediaTokens mediaTokens;
 			int accountMasterId = accountType.getValue();
 			if (entityType.equals(CommonConstants.COMPANY_ID_COLUMN) || accountMasterId == CommonConstants.ACCOUNTS_MASTER_INDIVIDUAL) {
-				OrganizationUnitSettings companySettings = organizationManagementService.getCompanySettings(entityId);
+				OrganizationUnitSettings companySettings = organizationManagementService.getCompanySettings(user.getCompany().getCompanyId());
 				if (companySettings == null) {
 					throw new InvalidInputException("No company settings found in current session");
 				}
@@ -737,9 +739,10 @@ public class SocialManagementController {
 	@RequestMapping(value = "/linkedinauth", method = RequestMethod.GET)
 	public String authenticateLinkedInAccess(Model model, HttpServletRequest request) {
 		LOG.info("Method authenticateLinkedInAccess() called from SocialManagementController");
+		User user = sessionHelper.getCurrentUser();
 		HttpSession session = request.getSession(false);
 		AccountType accountType = (AccountType) session.getAttribute(CommonConstants.ACCOUNT_TYPE_IN_SESSION);
-		if(session.getAttribute("columnName")!=null){
+		if (session.getAttribute("columnName") != null) {
 			String columnName = (String) session.getAttribute("columnName");
 			String columnValue = (String) session.getAttribute("columnValue");
 			session.removeAttribute("columnName");
@@ -787,13 +790,11 @@ public class SocialManagementController {
 			LinkedinUserProfileResponse profileData = new Gson().fromJson(basicProfileStr, LinkedinUserProfileResponse.class);
 			String profileLink = (String) profileData.getSiteStandardProfileRequest().getUrl();
 			
-			
-
 			SocialMediaTokens mediaTokens;
 			boolean updated = false;
 			int accountMasterId = accountType.getValue();
 			if (entityType.equals(CommonConstants.COMPANY_ID_COLUMN) || accountMasterId == CommonConstants.ACCOUNTS_MASTER_INDIVIDUAL) {
-				OrganizationUnitSettings companySettings = organizationManagementService.getCompanySettings(entityId);
+				OrganizationUnitSettings companySettings = organizationManagementService.getCompanySettings(user.getCompany().getCompanyId());
 				if (companySettings == null) {
 					throw new InvalidInputException("No company settings found in current session");
 				}
@@ -932,6 +933,7 @@ public class SocialManagementController {
 	@RequestMapping(value = "/googleauth", method = RequestMethod.GET)
 	public String authenticateGoogleAccess(Model model, HttpServletRequest request) {
 		LOG.info("Method authenticateGoogleAccess() called from SocialManagementController");
+		User user = sessionHelper.getCurrentUser();
 		HttpSession session = request.getSession(false);
 		AccountType accountType = (AccountType) session.getAttribute(CommonConstants.ACCOUNT_TYPE_IN_SESSION);
 		if(session.getAttribute("columnName")!=null){
@@ -994,7 +996,7 @@ public class SocialManagementController {
 			SocialMediaTokens mediaTokens;
 			int accountMasterId = accountType.getValue();
 			if (entityType.equals(CommonConstants.COMPANY_ID_COLUMN) || accountMasterId == CommonConstants.ACCOUNTS_MASTER_INDIVIDUAL) {
-				OrganizationUnitSettings companySettings = organizationManagementService.getCompanySettings(entityId);
+				OrganizationUnitSettings companySettings = organizationManagementService.getCompanySettings(user.getCompany().getCompanyId());
 				if (companySettings == null) {
 					throw new InvalidInputException("No company settings found in current session");
 				}
@@ -1473,6 +1475,7 @@ public class SocialManagementController {
 				throw new InvalidInputException("Social media can not be null or empty");
 			}
 
+			User user = sessionHelper.getCurrentUser();
 			HttpSession session = request.getSession();
 			UserSettings userSettings = (UserSettings) session.getAttribute(CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION);
 			long entityId = (long) session.getAttribute(CommonConstants.ENTITY_ID_COLUMN);
@@ -1484,7 +1487,7 @@ public class SocialManagementController {
 			// Check for the collection to update
 			OrganizationUnitSettings unitSettings = null;
 			if (entityType.equals(CommonConstants.COMPANY_ID_COLUMN)) {
-				unitSettings = organizationManagementService.getCompanySettings(entityId);
+				unitSettings = organizationManagementService.getCompanySettings(user.getCompany().getCompanyId());
 				unitSettings = socialManagementService.disconnectSocialNetwork(socialMedia, unitSettings,
 						MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION);
 				userSettings.setCompanySettings(unitSettings);
@@ -1519,6 +1522,7 @@ public class SocialManagementController {
 	@RequestMapping(value = "/getsocialmediatokenonsettingspage", method = RequestMethod.GET)
 	public String getSocialMediaTokenonSettingsPage(HttpServletRequest request, Model model) {
 		LOG.info("Inside getSocialMediaTokenonSettingsPage() method");
+		User user = sessionHelper.getCurrentUser();
 		HttpSession session = request.getSession();
 
 		try {
@@ -1532,7 +1536,7 @@ public class SocialManagementController {
 			// Check for the collection to update
 			OrganizationUnitSettings unitSettings = null;
 			if (entityType.equals(CommonConstants.COMPANY_ID_COLUMN)) {
-				unitSettings = organizationManagementService.getCompanySettings(entityId);
+				unitSettings = organizationManagementService.getCompanySettings(user);
 			}
 			else if (entityType.equals(CommonConstants.REGION_ID_COLUMN)) {
 				unitSettings = organizationManagementService.getRegionSettings(entityId);
