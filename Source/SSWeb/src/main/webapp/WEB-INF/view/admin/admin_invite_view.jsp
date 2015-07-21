@@ -19,7 +19,7 @@
 		<div class="reg_form_wrapper_2">
 			<div class="reg_form_row clearfix">
 				<div class="float-left rfr_lbl">
-					<spring:message code="label.customeremail.key" />
+					<spring:message code="label.customername.key" />
 				</div>
 				<div class="float-left rfr_txt">
 					<div class="rfr_icn icn-name"></div>

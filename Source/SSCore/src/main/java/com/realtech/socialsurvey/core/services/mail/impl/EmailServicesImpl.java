@@ -969,16 +969,16 @@ public class EmailServicesImpl implements EmailServices
 
     @Async
     @Override
-    public void sendDefaultSurveyReminderMail( String recipientMailId, String displayName, String agentName, String link,
+    public void sendDefaultSurveyReminderMail( String recipientMailId, String firstName, String agentName, String link,
         String agentPhone, String agentTitle, String companyName ) throws InvalidInputException, UndeliveredEmailException
     {
         if ( recipientMailId == null || recipientMailId.isEmpty() ) {
             LOG.error( "Recipient email Id is empty or null for sending survey completion mail " );
             throw new InvalidInputException( "Recipient email Id is empty or null for sending survey completion mail " );
         }
-        if ( displayName == null || displayName.isEmpty() ) {
-            LOG.error( "displayName parameter is empty or null for sending account upgrade mail " );
-            throw new InvalidInputException( "displayName parameter is empty or null for sending survey completion mail " );
+        if ( firstName == null || firstName.isEmpty() ) {
+            LOG.error( "firstName parameter is empty or null for sending account upgrade mail " );
+            throw new InvalidInputException( "firstName parameter is empty or null for sending survey completion mail " );
         }
 
         LOG.info( "Sending survey reminder email to : " + recipientMailId );
@@ -997,7 +997,7 @@ public class EmailServicesImpl implements EmailServices
         String currentYear = String.valueOf( Calendar.getInstance().get( Calendar.YEAR ) );
         DateFormat dateFormat = new SimpleDateFormat( "yyyy/MM/dd" );
         String fullAddress = "";
-        messageBodyReplacements.setReplacementArgs( Arrays.asList( appLogoUrl, displayName, link, link, agentName,
+        messageBodyReplacements.setReplacementArgs( Arrays.asList( appLogoUrl, firstName, link, link, agentName,
             agentSignature, appBaseUrl, appBaseUrl, recipientMailId, companyName, dateFormat.format( new Date() ), "",
             companyName, currentYear, fullAddress ) );
 
@@ -1219,7 +1219,7 @@ public class EmailServicesImpl implements EmailServices
 
     @Async
     @Override
-    public void sendDefaultSurveyInvitationMail( String recipientMailId, String displayName, String agentName, String link,
+    public void sendDefaultSurveyInvitationMail( String recipientMailId, String firstName, String agentName, String link,
         String agentEmailId, String agentSignature, String companyName, String surveyInitiatedOn, String currentYear,
         String fullAddress ) throws InvalidInputException, UndeliveredEmailException
     {
@@ -1227,9 +1227,9 @@ public class EmailServicesImpl implements EmailServices
             LOG.error( "Recipient email Id is empty or null for sending survey completion mail " );
             throw new InvalidInputException( "Recipient email Id is empty or null for sending survey completion mail " );
         }
-        if ( displayName == null || displayName.isEmpty() ) {
-            LOG.error( "displayName parameter is empty or null for sending account upgrade mail " );
-            throw new InvalidInputException( "displayName parameter is empty or null for sending survey completion mail " );
+        if ( firstName == null || firstName.isEmpty() ) {
+            LOG.error( "firstName parameter is empty or null for sending account upgrade mail " );
+            throw new InvalidInputException( "firstName parameter is empty or null for sending survey completion mail " );
         }
 
         LOG.info( "Sending survey reminder email to : " + recipientMailId );
@@ -1240,7 +1240,7 @@ public class EmailServicesImpl implements EmailServices
         FileContentReplacements messageBodyReplacements = new FileContentReplacements();
         messageBodyReplacements.setFileName( EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER
             + EmailTemplateConstants.SURVEY_INVITATION_MAIL_BODY );
-        messageBodyReplacements.setReplacementArgs( Arrays.asList( appLogoUrl, displayName, link, link, link, agentName,
+        messageBodyReplacements.setReplacementArgs( Arrays.asList( appLogoUrl, firstName, link, link, link, agentName,
             agentSignature, appBaseUrl, recipientMailId, companyName, surveyInitiatedOn, agentEmailId, companyName,
             currentYear, fullAddress ) );
 
@@ -1437,14 +1437,14 @@ public class EmailServicesImpl implements EmailServices
 
     @Async
     @Override
-    public void sendDefaultSurveyInvitationMailByCustomer( String recipientMailId, String displayName, String agentName,
+    public void sendDefaultSurveyInvitationMailByCustomer( String recipientMailId, String firstName, String agentName,
         String link, String agentEmailId ) throws InvalidInputException, UndeliveredEmailException
     {
         if ( recipientMailId == null || recipientMailId.isEmpty() ) {
             LOG.error( "Recipient email Id is empty or null for sending survey completion mail " );
             throw new InvalidInputException( "Recipient email Id is empty or null for sending survey completion mail " );
         }
-        if ( displayName == null || displayName.isEmpty() ) {
+        if ( firstName == null || firstName.isEmpty() ) {
             LOG.error( "displayName parameter is empty or null for sending account upgrade mail " );
             throw new InvalidInputException( "displayName parameter is empty or null for sending survey completion mail " );
         }
@@ -1457,7 +1457,7 @@ public class EmailServicesImpl implements EmailServices
         FileContentReplacements messageBodyReplacements = new FileContentReplacements();
         messageBodyReplacements.setFileName( EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER
             + EmailTemplateConstants.SURVEY_INVITATION_MAIL_CUSTOMER_BODY );
-        messageBodyReplacements.setReplacementArgs( Arrays.asList( appLogoUrl, displayName, agentName, link, link, link,
+        messageBodyReplacements.setReplacementArgs( Arrays.asList( appLogoUrl, firstName, agentName, link, link, link,
             appBaseUrl, appBaseUrl, appBaseUrl ) );
 
         LOG.debug( "Calling email sender to send mail" );

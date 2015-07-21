@@ -110,9 +110,9 @@ public interface SolrSearchService {
 
 	public long countUsersByCompany(long companyId, int startIndex, int noOfRows) throws InvalidInputException, SolrException, MalformedURLException;
 
-	public String fetchRegionsByCompany(long companyId) throws InvalidInputException, SolrException, MalformedURLException;
+	public String fetchRegionsByCompany(long companyId, int size) throws InvalidInputException, SolrException, MalformedURLException;
 
-	public String fetchBranchesByCompany(long companyId) throws InvalidInputException, SolrException, MalformedURLException;
+	public String fetchBranchesByCompany(long companyId, int size) throws InvalidInputException, SolrException, MalformedURLException;
 
 	public void removeUserFromSolr(long userIdToRemove) throws SolrException;
 
@@ -249,5 +249,9 @@ public interface SolrSearchService {
 			throws InvalidInputException, SolrException;
 
 	public Collection<UserFromSearch> getUsersFromSolrDocuments(SolrDocumentList documentList) throws InvalidInputException;
+
+	public Long fetchBranchCountByCompany(long companyId) throws InvalidInputException, SolrException, MalformedURLException;
+	
+	public Long fetchRegionCountByCompany(long companyId) throws InvalidInputException, SolrException, MalformedURLException;
 }
 // JIRA:SS-62 BY RM 02 EOC
