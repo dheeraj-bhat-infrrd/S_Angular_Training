@@ -58,8 +58,11 @@ import com.realtech.socialsurvey.core.utils.DisplayMessageConstants;
 import com.realtech.socialsurvey.web.common.ErrorResponse;
 import com.realtech.socialsurvey.web.common.JspResolver;
 import com.realtech.socialsurvey.web.util.RequestUtils;
+import facebook4j.Account;
 import facebook4j.Facebook;
 import facebook4j.FacebookException;
+import facebook4j.FacebookFactory;
+import facebook4j.ResponseList;
 
 /**
  * Controller to manage social media oauth and pull/push posts
@@ -96,6 +99,12 @@ public class SocialManagementController {
 	// Facebook
 	@Value("${FB_REDIRECT_URI}")
 	private String facebookRedirectUri;
+	
+	@Value("${FB_CLIENT_ID}")
+	private String facebookClientId;
+
+	@Value("${FB_CLIENT_SECRET}")
+	private String facebookClientSecret;
 	
 	// LinkedIn
 	@Value("${LINKED_IN_REST_API_URI}")
@@ -235,7 +244,10 @@ public class SocialManagementController {
 		}
 
 		model.addAttribute(CommonConstants.MESSAGE, CommonConstants.YES);
-		return JspResolver.SOCIAL_AUTH_MESSAGE;
+		if(socialNetwork.equalsIgnoreCase("facebook"))
+			return JspResolver.SOCIAL_FACEBOOK_INTERMEDIATE;
+		else 
+			return JspResolver.SOCIAL_AUTH_MESSAGE;
 	}
 
 	/**
@@ -281,11 +293,14 @@ public class SocialManagementController {
 			Facebook facebook = (Facebook) session.getAttribute(CommonConstants.SOCIAL_REQUEST_TOKEN);
 			String profileLink = null;
 			facebook4j.auth.AccessToken accessToken = null;
+			Map<String, String> facebookPages=new HashMap<>();
 			try {
 				accessToken = facebook.getOAuthAccessToken(oauthCode, requestUtils.getRequestServerName(request)+facebookRedirectUri);
 				facebook4j.User user = facebook.getUser(facebook.getId());
-				if (user != null)
+				if (user != null){
 					profileLink = user.getLink().toString();
+					facebookPages.put(user.getName(), accessToken.getToken());
+				}
 			}
 			catch (FacebookException e) {
 				LOG.error("Error while creating access token for facebook: " + e.getLocalizedMessage(), e);
@@ -375,6 +390,20 @@ public class SocialManagementController {
 				throw new InvalidInputException("Invalid input exception occurred while creating access token for facebook",
 						DisplayMessageConstants.GENERAL_ERROR);
 			}
+			Facebook facebook1 = new FacebookFactory().getInstance();
+			facebook1.setOAuthAppId(facebookClientId, facebookClientSecret);
+			facebook1.setOAuthAccessToken(new facebook4j.auth.AccessToken(accessToken.getToken()));
+			
+			ResponseList<Account> accounts;
+			try {
+				accounts = facebook1.getAccounts();
+				for (Account account : accounts) {
+					facebookPages.put(account.getName(), account.getAccessToken());
+				}
+				model.addAttribute("pageNames", facebookPages);
+			} catch (FacebookException e) {
+				LOG.error("Error while creating access token for facebook: " + e.getLocalizedMessage(), e);
+			}
 		}
 		catch (Exception e) {
 			session.removeAttribute(CommonConstants.SOCIAL_REQUEST_TOKEN);
@@ -387,9 +416,88 @@ public class SocialManagementController {
 		model.addAttribute(CommonConstants.SUCCESS_ATTRIBUTE, CommonConstants.YES);
 		model.addAttribute("socialNetwork", "facebook");
 		LOG.info("Facebook Access tokens obtained and added to mongo successfully!");
-		return JspResolver.SOCIAL_AUTH_MESSAGE;
+		return JspResolver.SOCIAL_FACEBOOK_INTERMEDIATE;
 	}
 
+	
+	@ResponseBody
+	@RequestMapping(value = "/saveSelectedAccessFacebookToken")
+	public String saveSelectedAccessFacebookToken(Model model, HttpServletRequest request) {
+		LOG.info("Method saveSelectedAccessFacebookToken() called from SocialManagementController");
+		String selectedAccessFacebookToken = request.getParameter("selectedAccessFacebookToken");
+		
+		HttpSession session = request.getSession(false);
+		AccountType accountType = (AccountType) session.getAttribute(CommonConstants.ACCOUNT_TYPE_IN_SESSION);
+		long entityId = (long) session.getAttribute(CommonConstants.ENTITY_ID_COLUMN);
+		String entityType = (String) session.getAttribute(CommonConstants.ENTITY_TYPE_COLUMN);
+		
+		int accountMasterId = accountType.getValue();
+		if(session.getAttribute("columnName")!=null){
+			String columnName = (String) session.getAttribute("columnName");
+			String columnValue = (String) session.getAttribute("columnValue");
+			session.removeAttribute("columnName");
+			session.removeAttribute("columnValue");
+			model.addAttribute("columnName", columnName);
+			model.addAttribute("columnValue", columnValue);
+			model.addAttribute("fromDashboard", 1);
+		}
+		
+		boolean updated = false;
+		SocialMediaTokens mediaTokens =null;
+		try {
+			if (entityType.equals(CommonConstants.COMPANY_ID_COLUMN) || accountMasterId == CommonConstants.ACCOUNTS_MASTER_INDIVIDUAL) {
+				OrganizationUnitSettings companySettings = organizationManagementService.getCompanySettings(entityId);
+				if (companySettings == null) {
+					throw new InvalidInputException("No company settings found in current session");
+				}
+				mediaTokens = companySettings.getSocialMediaTokens();
+				mediaTokens.getFacebookToken().setFacebookAccessTokenToPost(selectedAccessFacebookToken);
+					socialManagementService.updateSocialMediaTokens(MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION,
+							companySettings, mediaTokens);
+					updated = true;
+			}
+			else if (entityType.equals(CommonConstants.REGION_ID_COLUMN)) {
+				OrganizationUnitSettings regionSettings = organizationManagementService.getRegionSettings(entityId);
+				if (regionSettings == null) {
+					throw new InvalidInputException("No Region settings found in current session");
+				}
+				mediaTokens = regionSettings.getSocialMediaTokens();
+				mediaTokens.getFacebookToken().setFacebookAccessTokenToPost(selectedAccessFacebookToken);
+				socialManagementService.updateSocialMediaTokens(MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION,
+						regionSettings, mediaTokens);
+				updated = true;
+			}
+			else if (entityType.equals(CommonConstants.BRANCH_ID_COLUMN)) {
+				OrganizationUnitSettings branchSettings = organizationManagementService.getBranchSettingsDefault(entityId);
+				if (branchSettings == null) {
+					throw new InvalidInputException("No Branch settings found in current session");
+				}
+				mediaTokens = branchSettings.getSocialMediaTokens();
+				mediaTokens.getFacebookToken().setFacebookAccessTokenToPost(selectedAccessFacebookToken);
+				socialManagementService.updateSocialMediaTokens(MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION,
+						branchSettings, mediaTokens);
+				updated = true;
+			}
+			if (entityType.equals(CommonConstants.PROFILE_AGENT_VIEW)) {
+				AgentSettings agentSettings = userManagementService.getUserSettings(entityId);
+				if (agentSettings == null) {
+					throw new InvalidInputException("No Agent settings found in current session");
+				}
+				mediaTokens = agentSettings.getSocialMediaTokens();
+				mediaTokens.getFacebookToken().setFacebookAccessTokenToPost(selectedAccessFacebookToken);
+				socialManagementService.updateAgentSocialMediaTokens(agentSettings, mediaTokens);
+				updated = true;
+			}
+			if (!updated) {
+				throw new InvalidInputException("Invalid input exception occurred while saving access token for facebook",
+						DisplayMessageConstants.GENERAL_ERROR);
+			}
+		} catch (InvalidInputException | NoRecordsFetchedException e) {
+			LOG.error("Error while saving access token for facebook to post: " + e.getLocalizedMessage(), e);		
+		}
+		model.addAttribute("socialNetwork", "facebook");
+		return JspResolver.SOCIAL_FACEBOOK_INTERMEDIATE;
+	}
 	private SocialMediaTokens updateFacebookToken(facebook4j.auth.AccessToken accessToken, SocialMediaTokens mediaTokens, String profileLink) {
 		LOG.debug("Method updateFacebookToken() called from SocialManagementController");
 		if (mediaTokens == null) {
@@ -409,11 +517,31 @@ public class SocialManagementController {
 
 		mediaTokens.getFacebookToken().setFacebookAccessToken(accessToken.getToken());
 		mediaTokens.getFacebookToken().setFacebookAccessTokenCreatedOn(System.currentTimeMillis());
-		mediaTokens.getFacebookToken().setFacebookAccessTokenExpiresOn(accessToken.getExpires());
+		if(accessToken.getExpires()!=null)
+			mediaTokens.getFacebookToken().setFacebookAccessTokenExpiresOn(accessToken.getExpires());
+		
+		mediaTokens.getFacebookToken().setFacebookAccessTokenToPost(accessToken.getToken());
 
+		Facebook facebook = new FacebookFactory().getInstance();
+		facebook.setOAuthAppId(facebookClientId, facebookClientSecret);
+		facebook.setOAuthAccessToken(new facebook4j.auth.AccessToken(accessToken.getToken()));
+		
+		ResponseList<Account> accounts;
+		List<String> pageAccessToken=new ArrayList<String>();
+		try {
+			accounts = facebook.getAccounts();
+			for (Account account : accounts) {
+				pageAccessToken.add(account.getAccessToken());
+			}
+		} catch (FacebookException e) {
+			LOG.error("Error while creating access token for facebook: " + e.getLocalizedMessage(), e);
+		}
+		mediaTokens.getFacebookToken().setFacebookPublicPageAccessToken(pageAccessToken);
+		
 		LOG.debug("Method updateFacebookToken() finished from SocialManagementController");
 		return mediaTokens;
 	}
+	
 
 	/**
 	 * The url that twitter send request to with the oauth verification code
@@ -658,6 +786,8 @@ public class SocialManagementController {
 			String basicProfileStr = httpclient.execute(httpGet, new BasicResponseHandler());
 			LinkedinUserProfileResponse profileData = new Gson().fromJson(basicProfileStr, LinkedinUserProfileResponse.class);
 			String profileLink = (String) profileData.getSiteStandardProfileRequest().getUrl();
+			
+			
 
 			SocialMediaTokens mediaTokens;
 			boolean updated = false;
@@ -1437,5 +1567,4 @@ public class SocialManagementController {
 		}
 		return JspResolver.SOCIAL_MEDIA_TOKENS;
 	}
-	
 }

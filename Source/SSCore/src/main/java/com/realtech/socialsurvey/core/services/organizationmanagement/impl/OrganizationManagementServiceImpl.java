@@ -559,9 +559,11 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
         companySettings.setMail_content( mailContentSettings );
 
         LOG.debug( "Inserting company settings." );
-        OrganizationUnitSettings oldCompanySettings = organizationUnitSettingsDao
-            .fetchOrganizationUnitSettingsByUniqueIdentifier( companySettings.getUniqueIdentifier(),
-                MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION );
+        OrganizationUnitSettings oldCompanySettings = null;
+        if ( companySettings.getUniqueIdentifier() != null && !companySettings.getUniqueIdentifier().isEmpty() ) {
+            oldCompanySettings = organizationUnitSettingsDao.fetchOrganizationUnitSettingsByUniqueIdentifier(
+                companySettings.getUniqueIdentifier(), MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION );
+        }
         if ( oldCompanySettings == null ) {
             organizationUnitSettingsDao.insertOrganizationUnitSettings( companySettings,
                 MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION );
@@ -853,16 +855,11 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 
         if ( branch.getRegion().getIsDefaultBySystem() != CommonConstants.YES ) {
             LOG.debug( "fetching region settings for regionId : " + regionId );
-            OrganizationUnitSettings regionSettings = organizationUnitSettingsDao.fetchOrganizationUnitSettingsById( regionId,
-                MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION );
-            if ( regionSettings == null ) {
-                throw new NoRecordsFetchedException( "No region settings present in mongo for regionId : " + regionId );
-            }
-            LOG.debug( "Successfully fetched region settings for regionId : " + regionId
-                + " adding the info to branch settings" );
-            branchSettings.setRegionId( regionSettings.getIden() );
-            branchSettings.setRegionName( regionSettings.getContact_details().getName() );
+            branchSettings.setRegionId( regionId );
+            branchSettings.setRegionName( branch.getRegion().getRegionName() );
         } else {
+        	branchSettings.setRegionId( regionId );
+            branchSettings.setRegionName( branch.getRegion().getRegion() );
             LOG.debug( "Branch belongs to default region" );
         }
 
@@ -3435,7 +3432,9 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
     public Map<Long, BranchFromSearch> fetchBranchesMapByCompany( long companyId ) throws InvalidInputException, SolrException,
         MalformedURLException
     {
-        String branchesResult = solrSearchService.fetchBranchesByCompany( companyId );
+    	
+		long branchCount = solrSearchService.fetchBranchCountByCompany(companyId);
+		String branchesResult = solrSearchService.fetchBranchesByCompany(companyId, (int) branchCount);
 
         // convert branches to map
         Type searchedBranchesList = new TypeToken<List<BranchFromSearch>>() {}.getType();
@@ -3470,7 +3469,8 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
     public Map<Long, RegionFromSearch> fetchRegionsMapByCompany( long companyId ) throws InvalidInputException, SolrException,
         MalformedURLException
     {
-        String regionsResult = solrSearchService.fetchRegionsByCompany( companyId );
+    	long regionsCount = solrSearchService.fetchRegionCountByCompany(companyId);
+        String regionsResult = solrSearchService.fetchRegionsByCompany( companyId , (int) regionsCount);
 
         // convert regions to map
         Type searchedRegionsList = new TypeToken<List<RegionFromSearch>>() {}.getType();
@@ -4132,27 +4132,33 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
     {
         return companyDao.searchCompaniesByName( namePattern );
     }
-    
+
+
     @Override
-	@Transactional
-	public Company getCompanyById(long companyId) {
-		return companyDao.findById(Company.class, companyId);
-	}
-    
-    @Override
-    public List<OrganizationUnitSettings> getAllCompaniesFromMongo() {
-    	LOG.debug("Method getAllCompaniesFromMongo() called");
-    	
-    	List<OrganizationUnitSettings> unitSettings = organizationUnitSettingsDao.getCompanyList();
-    	
-    	return unitSettings;
+    @Transactional
+    public Company getCompanyById( long companyId )
+    {
+        return companyDao.findById( Company.class, companyId );
     }
-    
+
+
     @Override
-    public List<OrganizationUnitSettings> getCompaniesByNameFromMongo(String searchKey) {
-    	LOG.debug("Method getCompaniesByNameFromMongo() called");
-    	List<OrganizationUnitSettings> unitSettings = organizationUnitSettingsDao.getCompanyListByKey(searchKey);
-    	return unitSettings;
+    public List<OrganizationUnitSettings> getAllCompaniesFromMongo()
+    {
+        LOG.debug( "Method getAllCompaniesFromMongo() called" );
+
+        List<OrganizationUnitSettings> unitSettings = organizationUnitSettingsDao.getCompanyList();
+
+        return unitSettings;
+    }
+
+
+    @Override
+    public List<OrganizationUnitSettings> getCompaniesByNameFromMongo( String searchKey )
+    {
+        LOG.debug( "Method getCompaniesByNameFromMongo() called" );
+        List<OrganizationUnitSettings> unitSettings = organizationUnitSettingsDao.getCompanyListByKey( searchKey );
+        return unitSettings;
     }
 }
 // JIRA: SS-27: By RM05: EOC
