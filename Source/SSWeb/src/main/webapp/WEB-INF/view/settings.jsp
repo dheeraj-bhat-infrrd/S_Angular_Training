@@ -27,7 +27,7 @@
 		<div class="hm-header-row clearfix">
 			<div class="float-left hm-header-row-left"><spring:message code="label.title.settings.key" /></div>
 			<c:if test="${not empty assignments}">
-				<div class="float-right header-right clearfix hr-dsh-adj-rt hdr-prof-sel">
+				<div id="se-dd-wrapper" class="float-right header-right clearfix hr-dsh-adj-rt hdr-prof-sel">
 					<div class="float-left hr-txt1"><spring:message code="label.viewas.key" /></div>
 					<div id="setting-sel" class="float-left hr-txt2 cursor-pointer">${entityName}</div>
 					<div id="se-dd-wrapper-profiles" class="va-dd-wrapper hide">
@@ -414,7 +414,7 @@ $(document).ready(function() {
 	$(document).attr("title", "Edit Settings");
 	
 	if ($("#se-dd-wrapper-profiles > div").length <= 1) {
-		$('#se-dd-wrapper-profiles').remove();
+		$('#se-dd-wrapper').remove();
 	}
 	
 	if("${autoPostEnabled}" == "false"){
