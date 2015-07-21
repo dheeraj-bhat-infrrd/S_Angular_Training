@@ -730,9 +730,11 @@ $(document).on('click', '#wc-send-survey', function() {
 
 $(document).on('click', '#wc-skip-send-survey', function() {
 	$('#overlay-send-survey').html('');
+	$('body').removeClass('body-no-scroll');
 });
 
 function sendSurveyInvitation() {
+	$('body').addClass('body-no-scroll');
 	callAjaxGET("./sendsurveyinvitation.do", function(data) {
 		$('#overlay-send-survey').html(data);
 		if ($("#welcome-popup-invite").length) {
@@ -743,6 +745,7 @@ function sendSurveyInvitation() {
 }
 
 function sendSurveyInvitationAdmin(columnName, columnValue) {
+	$('body').addClass('body-no-scroll');
 	var payload = {
 			"columnName" : columnName,
 			"columnValue" : columnValue
@@ -757,6 +760,7 @@ function sendSurveyInvitationAdmin(columnName, columnValue) {
 }
 
 function linkedInDataImport() {
+	$('body').addClass('body-no-scroll');
 	callAjaxGET("./linkedindataimport.do", function(data) {
 		$('#overlay-linkedin-import').html(data);
 		if ($("#welocome-step1").length) {
@@ -764,18 +768,6 @@ function linkedInDataImport() {
 			$('#overlay-linkedin-import').show();
 		}
 	}, true);
-}
-function  convertTimeStampToLocalTimeStamp(generalTimestamp){
-	var convertedTimestamp= generalTimestamp.getTime() + (generalTimestamp.getTimezoneOffset())*60*1000 ;
-	var date3=new Date(convertedTimestamp);
-	console.info((date3.getMonth() + 1) + '/' + date3.getDate() + '/' +  date3.getFullYear());
-	var month=((date3.getMonth() + 1)<10)? "0"+(date3.getMonth() + 1) : (date3.getMonth() + 1);
-	var day=(date3.getDate()<10) ? "0"+(date3.getDate()) : (date3.getDate());
-	var minutes= (date3.getMinutes()<10) ? "0"+(date3.getMinutes()) : (date3.getMinutes());
-	var hours= (date3.getHours()<10) ? "0"+(date3.getHours()) : (date3.getHours());
-	var sec=  (date3.getSeconds()<10) ? "0"+(date3.getSeconds()) : (date3.getSeconds());
-	var date4= date3.getFullYear() +'-'+month+'-'+ day +" "+hours+":"+ minutes +":"+ sec+"."+date3.getMilliseconds() ;
-	return date4;
 }
 
 function returnValidWebAddress(url) {
@@ -801,4 +793,96 @@ function linkify(inputText) {
     replacedText = replacedText.replace(replacePattern3, '<a href="mailto:$1">$1</a>');
 
     return replacedText;
+}
+
+function initializeCityLookup(searchData, elementId) {
+	$('#' + elementId).autocomplete({
+		minLength : 0,
+		source : searchData,
+		focus : function(event, ui) {
+			event.stopPropagation();
+		},
+		select : function(event, ui) {
+			event.stopPropagation();
+		},
+		open : function() {
+			$('.ui-autocomplete').perfectScrollbar({
+				suppressScrollX : true
+			});
+			$('.ui-autocomplete').perfectScrollbar('update');
+		}
+	}).keydown(function(e) {
+		if (e.keyCode != $.ui.keyCode.TAB)
+			return;
+
+		e.keyCode = $.ui.keyCode.DOWN;
+		$(this).trigger(e);
+
+		e.keyCode = $.ui.keyCode.ENTER;
+		$(this).trigger(e);
+	});
+}
+
+function getUniqueCitySearchData(data) {
+	cityLookupList = JSON.parse(data);
+	var searchData = [];
+	for (var i = 0; i < cityLookupList.length; i++) {
+		searchData[i] = toTitleCase(cityLookupList[i].cityname);
+	}
+
+	var uniqueSearchData = searchData.filter(function(itm, i, a) {
+		return i == a.indexOf(itm);
+	});
+	return uniqueSearchData;
+}
+
+function showStateCityRow(parentId, elementId) {
+	$('#'+parentId).show();
+	var stateVal = $('#'+elementId).attr('data-value');
+	if (!stateList) {
+		callAjaxGET("./getusstatelist.do", function(data) {
+			stateList = JSON.parse(data);
+			for (var i = 0; i < stateList.length; i++) {
+				if (stateVal == stateList[i].statecode) {
+					$('#'+elementId).append(
+							'<option data-stateid=' + stateList[i].id
+									+ ' selected >' + stateList[i].statecode
+									+ '</option>');
+				} else {
+					$('#'+elementId).append(
+							'<option data-stateid=' + stateList[i].id + '>'
+									+ stateList[i].statecode + '</option>');
+				}
+			}
+		}, true);
+	} else {
+
+		if ($('#'+elementId).children('option').size() == 1) {
+			for (var i = 0; i < stateList.length; i++) {
+				if (stateVal == stateList[i].statecode) {
+					$('#'+elementId).append(
+							'<option data-stateid=' + stateList[i].id
+									+ ' selected >' + stateList[i].statecode
+									+ '</option>');
+				} else {
+					$('#'+elementId).append(
+							'<option data-stateid=' + stateList[i].id + '>'
+									+ stateList[i].statecode + '</option>');
+				}
+			}
+		} else {
+			if (stateVal != undefined && stateVal != "") {
+				$('#'+elementId).val(stateVal);
+			}
+		}
+	}
+}
+
+function hideStateCityRow(parentId, elementId) {
+	$('#' + parentId).hide();
+	$('#' + parentId + ' input').val('');
+	$('#' + elementId).attr('data-value','');
+	$('#' + elementId).val(function() {
+		return $(this).find('option[disabled]').text();
+	});
 }

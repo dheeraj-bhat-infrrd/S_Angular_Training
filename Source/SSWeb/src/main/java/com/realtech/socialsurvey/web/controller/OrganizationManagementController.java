@@ -535,6 +535,7 @@ public class OrganizationManagementController
             EncompassCrmInfo encompassCrmInfo = new EncompassCrmInfo();
             encompassCrmInfo.setCrm_source( CommonConstants.CRM_INFO_SOURCE_ENCOMPASS );
             encompassCrmInfo.setCrm_username( request.getParameter( "encompass-username" ) );
+            encompassCrmInfo.setCrm_fieldId( request.getParameter( "encompass-fieldId" ) );
             encompassCrmInfo.setCrm_password( cipherPassword );
             encompassCrmInfo.setUrl( request.getParameter( "encompass-url" ) );
             encompassCrmInfo.setConnection_successful( true );

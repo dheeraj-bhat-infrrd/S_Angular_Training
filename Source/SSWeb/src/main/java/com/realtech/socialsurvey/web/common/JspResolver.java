@@ -42,6 +42,7 @@ public interface JspResolver {
 
 	// Dashboard
 	public static final String LINKEDIN_IMPORT = "linkedin_import";
+	public static final String LINKEDIN_IMPORT_SOCIAL_LINKS = "linkedin_import_social_links";
 	public static final String LINKEDIN_COMPARE = "linkedin_compare";
 	public static final String HEADER_SURVEY_INVITE = "header_sendsurveyinvite";
 	public static final String HEADER_SURVEY_INVITE_ADMIN = "header_sendsurveyinvite_admin";
@@ -85,6 +86,7 @@ public interface JspResolver {
 	// Edit Settings
 	public static final String EDIT_SETTINGS = "settings";
 	public static final String SOCIAL_AUTH_MESSAGE = "socialauthmessage";
+        public static final String SOCIAL_FACEBOOK_INTERMEDIATE = "facebookintermediate";
 	public static final String LINKEDIN_ACCESS = "linkedinaccess";
 	public static final String SOCIAL_MEDIA_TOKENS = "settings_socialauth";
 
@@ -107,6 +109,9 @@ public interface JspResolver {
 	public static final String ADMIN_LANDING = "admin/admin_landing";
 	public static final String ADMIN_DASHBOARD = "admin/admin_dashboard";
 	public static final String ADMIN_HIERARCHY_VIEW = "admin/admin_hierarchy_view";
+	public static final String ADMIN_INVITE_VIEW = "admin/admin_invite_view";
 	public static final String ADMIN_COMPANY_HIERARCHY = "admin/company_hierarchy";
 	public static final String ADMIN_COMPANY_LIST = "admin/admin_company_list";
+	public static final String ADMIN_REGION_HIERARCHY = "admin/admin_region_hierarchy";
+	public static final String ADMIN_BRANCH_HIERARCHY = "admin/admin_branch_hierarchy";
 }

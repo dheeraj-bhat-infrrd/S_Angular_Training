@@ -10,17 +10,30 @@
 				<div class="v-line-comp"></div>
 			</div>
 			<div class="v-tbl-name">
-				<c:if test="${not empty companyItem.contact_details && not empty companyItem.contact_details.name }">
+				<c:if
+					test="${not empty companyItem.contact_details && not empty companyItem.contact_details.name }">
 					${companyItem.contact_details.name}
 				</c:if>
 			</div>
-			<div class="v-tbl-add"></div>
+			<div class="v-tbl-add">
+				<c:if
+					test="${not empty companyItem.contact_details && not empty companyItem.contact_details.address1 }">
+					${companyItem.contact_details.address1}
+				</c:if>
+				&nbsp;
+				<c:if
+					test="${not empty companyItem.contact_details && not empty companyItem.contact_details.address2 }">
+					${companyItem.contact_details.address2}
+				</c:if>
+			</div>
 			<div class="v-tbl-role"></div>
 			<div class="v-tbl-btns">
 				<div class="clearfix v-tbl-icn-wraper">
-					<div class="float-left v-tbl-icn v-icn-close region-del-icn hidden"
+					<div
+						class="float-left v-tbl-icn v-icn-close comp-del-icn vis-hidden"
 						data-iden="${companyItem.iden}"></div>
-					<div class="float-right v-tbl-icn v-icn-edit comp-edit-icn"
+					<div
+						class="float-right v-tbl-icn v-icn-edit comp-edit-icn vis-hidden"
 						clicked="false" data-iden="${companyItem.iden}"></div>
 				</div>
 			</div>

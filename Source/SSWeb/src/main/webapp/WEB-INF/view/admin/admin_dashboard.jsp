@@ -68,11 +68,15 @@
 				</div>
 				
 				<div class="clearfix dash-sel-wrapper">
-					<div class="float-left dash-sel-lbl"><spring:message code="label.format.key" /></div>
+					<div class="float-left dash-sel-lbl"><spring:message code="label.duration.key" /></div>
 					<select id="dsh-grph-format" class="float-left dash-sel-item">
-						<option value="weekly"><spring:message code="label.format.one.key" /></option>
+						<option value="30"><spring:message code="label.duration.one.key" /></option>
+						<option value="60"><spring:message code="label.duration.two.key" /></option>
+						<option value="90"><spring:message code="label.duration.three.key" /></option>
+						<option value="365"><spring:message code="label.duration.four.key" /></option>
+						<%-- <option value="weekly"><spring:message code="label.format.one.key" /></option>
 						<option value="monthly"><spring:message code="label.format.two.key" /></option>
-						<option value="yearly"><spring:message code="label.format.three.key" /></option>
+						<option value="yearly"><spring:message code="label.format.three.key" /></option> --%>
 					</select>
 				</div>
 			</div>

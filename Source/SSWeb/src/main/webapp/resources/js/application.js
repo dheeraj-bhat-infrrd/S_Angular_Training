@@ -19,6 +19,9 @@ var surveyFetchedSoFarInc;
 var accountType;
 var graphData;
 
+// Variable for dashboard review no survey found
+var isFromPagination=false;
+
 //colName and colValue contains profile level of logged in user and value for
 //colName is present in colValue.
 var colName;
@@ -493,10 +496,12 @@ function populateSurveyStatisticsList(columnName) {
 	}
 	
 	$("#selection-list").html(options);
-	$('#dsh-srch-survey-div').hide();
-
 	$("#graph-sel-list").html(options);
-	$('#dsh-grph-srch-survey-div').hide();
+	
+	if (columnName == "companyId") {
+		$('#dsh-srch-survey-div').hide();
+		$('#dsh-grph-srch-survey-div').hide();
+	}
 }
 
 function showSurveyStatistics(columnName, columnValue) {
@@ -523,14 +528,17 @@ function showIncompleteSurvey(columnName, columnValue) {
 		"startIndex" : startIndexInc,
 		"batchSize" : batchSizeInc
 	};
+	console.info("startIndex:"+startIndexInc+" -- batchSizeInc:"+batchSizeInc);
 	callAjaxGetWithPayloadData("./fetchdashboardincompletesurveycount.do", function(totalIncompleteReviews) {
 		if (totalIncompleteReviews == 0) {
-			$("#incomplete-survey-header").html("No incomplete surveys found");
+			if(!isFromPagination)
+				$("#incomplete-survey-header").html("No incomplete surveys found");
 			return;
 		}
 
 		callAjaxGetWithPayloadData("./fetchdashboardincompletesurvey.do", function(data) {
 			if (startIndexInc == 0) {
+				console.info("startIndex ==0:"+startIndexInc);
 				$('#dsh-inc-srvey').html(data);
 				$("#dsh-inc-dwnld").show();
 			}
@@ -542,6 +550,7 @@ function showIncompleteSurvey(columnName, columnValue) {
 			var scrollContainer = document.getElementById('dsh-inc-srvey');
 			scrollContainer.onscroll = function() {
 				if (scrollContainer.scrollTop === scrollContainer.scrollHeight - scrollContainer.clientHeight) {
+					isFromPagination=true;
 					showIncompleteSurvey(colName, colValue);
 					$('#dsh-inc-srvey').perfectScrollbar('update');
 				}
@@ -695,16 +704,16 @@ $(document).on('scroll', '#dsh-inc-srvey', function() {
 
 function showSurveyStatisticsGraphically(columnName, columnValue) {
 	var element = document.getElementById("dsh-grph-format");
-	var format = element.options[element.selectedIndex].value;
-	showSurveyGraph(columnName, columnValue, format);
+	var numberOfDays = element.options[element.selectedIndex].value;
+	showSurveyGraph(columnName, columnValue, numberOfDays);
 }
 
-function showSurveyGraph(columnName, columnValue, format) {
+function showSurveyGraph(columnName, columnValue, numberOfDays) {
 	var success = false;
 	var payload = {
 		"columnName" : columnName,
 		"columnValue" : columnValue,
-		"reportType" : format
+		"numberOfDays" : numberOfDays
 	};
 	$.ajax({
 		url : "./surveydetailsforgraph.do",
@@ -734,8 +743,7 @@ function showSurveyGraph(columnName, columnValue, format) {
 }
 
 function paintSurveyGraph() {
-	
-	if(graphData == undefined)
+	if (graphData == undefined)
 		return;
 	var allTimeslots = [];
 	var timeslots = [];
@@ -788,27 +796,32 @@ function paintSurveyGraph() {
 		allTimeslots = timeslots;
 		timeslots = [];
 	}
+	
 	var element = document.getElementById("dsh-grph-format");
 	if(element == null){
 		return;
 	}
+	
 	var format = element.options[element.selectedIndex].value;
 	var type = '';
-	if (format == 'weekly') {
-		type = 'Date';
-	} else if (format == 'monthly') {
+	if (format == '30') {
 		type = 'Week Starting';
-	} else if (format == 'yearly') {
+	} else if (format == '60') {
+		type = 'Week Starting';
+	} else if (format == '90') {
+		type = 'Week Starting';
+	} else if (format == '365') {
 		type = 'Month';
 	}
 
-	if (format != 'yearly') {
+	if (format != '365') {
 		allTimeslots.reverse();
 		clickedSurveys.reverse();
 		sentSurveys.reverse();
 		completedSurveys.reverse();
 		socialPosts.reverse();
 	}
+	
 	var internalData = [];
 	var nestedInternalData = [];
 	nestedInternalData.push(type, 'No. of surveys sent',
@@ -845,6 +858,7 @@ function paintSurveyGraph() {
 		} else {
 			socialPost = parseInt(socialPosts[itr]);
 		}
+		
 		nestedInternalData.push(allTimeslots[itr], sentSurvey, clickedSurvey, completedSurvey, socialPost);
 		internalData.push(nestedInternalData);
 	}
@@ -1958,7 +1972,7 @@ function showSelectorsByAssignToOption(assignToOption) {
 
 function showAdminPrivilegesChk(){
 	$("#admin-privilege-div").show();
-	if($('.bd-check-img').hasClass('bd-check-img-checked') ){
+	if(!$('.bd-check-img').hasClass('bd-check-img-checked') ){
 		$('.bd-check-img').next("#is-admin-chk").val("true");
 		$('.bd-check-img').removeClass('bd-check-img-checked');
 	}
@@ -2036,7 +2050,7 @@ function validateUserSelection(elementId,hiddenElementId) {
 			emailId = emailId.split('"').join("");
 		}
 		if(emailId.indexOf("<") > -1){
-			emailId = emailId.substring(emailId.indexOf("<")+1,emailId.indexOf(">"))
+			emailId = emailId.substring(emailId.indexOf("<")+1,emailId.indexOf(">"));
 		}
 		if($("#"+hiddenElementId).val() != ""){
 			return true;
@@ -4421,6 +4435,12 @@ function loadSocialMediaUrlInSettingsPage() {
 	}, false);
 }
 
+function loadSocialMediaUrlInPopup() {
+	callAjaxGET('/fetchsociallinksinpopup.do', function(data){
+		$('#wc-step3-body-cont').html(data);
+	}, false);
+}
+
 function showProfileLink(source, profileUrl){
 	if(source=='facebook'){
 		$('#fb-profile-url').html(profileUrl);
@@ -5215,6 +5235,10 @@ function showMasterQuestionPage(){
 		$("div[data-ques-type]").hide();
 		$("div[data-ques-type='error']").show();
 		$('#profile-link').html('View ' + agentName + '\'s profile at <a href="' + agentFullProfileLink + '" target="_blank">' + agentFullProfileLink + '</a>');
+		$('#icn-fb-shr').attr("href","https://www.facebook.com/sharer/sharer.php?u="+agentFullProfileLink);
+		$('#icn-google-shr').attr("href","https://plus.google.com/share?url="+agentFullProfileLink);
+		$('#icn-linkedin-shr').attr("href","https://www.linkedin.com/shareArticle?mini=true&url="+agentFullProfileLink+"&title=&summary="+rating+"-star response from " +firstName+ " " +lastName+ " for "+agentName+ " at SocialSurvey - "+ feedback + "&source=");
+		$('#icn-twitter-shr').attr("href","https://twitter.com/home?status="+agentFullProfileLink);
 		$('#content-head').html('Survey Completed');
 			if (mood == 'Great')
 				$('#content').html("Congratulations! You have completed survey for " + agentName+ ".\n"+happyTextComplete);
@@ -6163,7 +6187,8 @@ function callBackShowBasicDetails(response) {
 $(document).on('blur', '#prof-basic-container input', function() {
 	var lockId = $(this).attr("id") + "-lock";
 	if ($('#'+lockId).length > 0) {
-		if ($('#prof-all-lock').val() != 'modified' || !$(this).val()) {
+		//if ($('#prof-all-lock').val() != 'modified' || !$(this).val()) {
+		if ($('#prof-all-lock').val() != 'modified') {
 			return;
 		}
 	} else {
@@ -6240,21 +6265,49 @@ $(document).on('change', '#prof-logo', function() {
 
 // Function to crop and upload profile image
 function callBackOnProfileImageUpload(data) {
-	$('#prof-message-header').html(data);
 
-	callAjaxGET("./fetchprofileimage.do", function(data) {
-		$('#prof-img-container').html(data);
-		var profileImageUrl = $('#prof-image-edit').css("background-image");
-		if (profileImageUrl == undefined || profileImageUrl == "none") {
-			return;
-		}
-		adjustImage();
-		hideOverlay();
-	});
+	if ($('#overlay-linkedin-import').is(":visible")) {
+		$('#message-header').html(data);
+		callAjaxGET("./fetchuploadedprofileimage.do",
+				function(profileImageUrl) {
+					if (profilemasterid == 4) {
+						$("#wc-photo-upload").removeClass('dsh-pers-default-img');
+					} else if (profilemasterid == 3) {
+						$("#wc-photo-upload").removeClass('dsh-office-default-img');
+					} else if (profilemasterid == 2) {
+						$("#wc-photo-upload").removeClass('dsh-region-default-img');
+					} else if (profilemasterid == 1) {
+						$("#wc-photo-upload").removeClass('dsh-comp-default-img');
+					}
 
-	$('#overlay-toast').html($('#display-msg-div').text().trim());
-	showToast();
-	loadDisplayPicture();
+					$('#wc-photo-upload').css("background",
+							"url(" + profileImageUrl + ") no-repeat center");
+					$('#wc-photo-upload').css("background-size", "contain");
+					hideOverlay();
+				});
+
+		$('#overlay-toast').html($('#display-msg-div').text().trim());
+		showToast();
+	} else {
+		$('#prof-message-header').html(data);
+
+		callAjaxGET("./fetchprofileimage.do",
+				function(data) {
+					$('#prof-img-container').html(data);
+					var profileImageUrl = $('#prof-image-edit').css(
+							"background-image");
+					if (profileImageUrl == undefined
+							|| profileImageUrl == "none") {
+						return;
+					}
+					adjustImage();
+					hideOverlay();
+				});
+
+		$('#overlay-toast').html($('#display-msg-div').text().trim());
+		showToast();
+		loadDisplayPicture();
+	}
 }
 
 // Agent details
@@ -6856,12 +6909,12 @@ function isValidUrl(url){
 function adjustImage() {
 	var windW = window.innerWidth;
 	if (windW < 768) {
-		$('.mobile-tabs').children('.mob-icn-active').click();
+		//$('.mobile-tabs').children('.mob-icn-active').click();
 		var imgW = $('#prof-image').width();
 		$('#prof-image').height(imgW * 0.7);
 		var h2 = $('.prog-img-container').height() - 11;
 		$('.prof-name-container').height(h2);
-		var rowW = $('.lp-con-row').width() - 55 - 10 - 5;
+		var rowW = $('.lp-con-row').width() - 55 - 45;
 		$('.lp-con-row-item').width(rowW + 'px');
 		$('.footer-main-wrapper').hide();
 	} else {
@@ -7438,3 +7491,12 @@ $(document).on('click','#dsh-dwnld-report-btn',function(){
 		break;
 	}
 });
+
+//function to switch to admin 
+function userSwitchToAdmin() {
+	callAjaxGET("/switchtoadmin.do", function(data){
+		if(data == "success") {
+			window.location = window.location.origin + '/userlogin.do';
+		}
+	}, true);
+}

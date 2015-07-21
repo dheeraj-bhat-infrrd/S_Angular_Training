@@ -56,8 +56,9 @@ function landingFlow() {
 
 	$('body').on('click', '.wc-final-skip', function(){
 		loadDisplayPicture();
-		$(this).closest('.overlay-login').hide();
+		$(this).closest('.overlay-login').hide().html('');
 		showDisplayPic();
+		$('body').removeClass('body-no-scroll');
 	});
 	
 	onpopstate = function(event) {

@@ -54,32 +54,8 @@
 	</div>
 	<div class="welcome-popup-body-wrapper clearfix">
 		<div class="wc-popup-body-hdr"><spring:message code="label.sharehappyreviews.key" /></div>
-		<div class="wc-popup-body-cont wc-step3-body-cont">
-			<div class="wc-social-icn-row clearfix">
-				<div class="wc-social-icn float-left i-fb" onclick="authenticate('facebook');"></div>
-				<div id="fb-profile-url" class="wc-icn-txt float-left">${facebookProfileUrl}</div>
-			</div>
-			<div class="wc-social-icn-row clearfix">
-				<div class="wc-social-icn float-left i-twt" onclick="authenticate('twitter');"></div>
-				<div id="twitter-profile-url" class="wc-icn-txt float-left">${twitterProfileUrl}</div>
-			</div>
-			<div class="wc-social-icn-row clearfix">
-				<div class="wc-social-icn float-left i-ln" onclick="authenticate('linkedin');"></div>
-				<div id="linkedin-profile-url" class="wc-icn-txt float-left">${linkedinProfileUrl}</div>
-			</div>
-			<div class="wc-social-icn-row clearfix">
-				<div class="wc-social-icn float-left i-gplus" onclick="authenticate('google');"></div>
-				<div id="ggl-profile-url" class="wc-icn-txt float-left">${googleProfileUrl}</div>
-			</div>
-			<div class="wc-social-icn-row clearfix">
-				<div class="wc-social-icn i-yelp float-left" onclick="showYelpInput();"></div>
-				<input id="yelp-profile-url" class="wc-icn-txt float-left wc-form-input hide">
-				<div id="yelp-profile-url-display" class="wc-icn-txt float-left"></div>
-			</div>
-			<!-- <div class="wc-social-icn-row clearfix">
-				<div class="wc-social-icn i-rss float-left"></div>
-				<div class="wc-icn-txt float-left"></div>
-			</div> -->
+		<div id="wc-step3-body-cont" class="wc-popup-body-cont wc-step3-body-cont">
+			<jsp:include page="linkedin_import_social_links.jsp"></jsp:include>
 		</div>
 	</div>
 	<div class="wc-btn-row clearfix">

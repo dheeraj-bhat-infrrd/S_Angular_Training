@@ -188,15 +188,43 @@ function paintAdminUsersFromBranch(data,branchId,regionId) {
 	bindUserEditClicks();
 }
 
-$(document).on('click','.comp-row',function(e){
+$(document).on('click', '.comp-row', function(e) {
 	var element = this;
 	var companyId = $(element).attr('data-iden');
-	if($(element).attr('clicked') == "false"){
+	$('.comp-hr-cont').html('').hide();
+	if ($(element).attr('clicked') == "false") {
 		showSelectedCompanyHierarchy(companyId);
-		 $(element).attr('clicked','true');
+		$('.comp-row').attr('clicked', 'false');
+		$(element).attr('clicked', 'true');
+	} else {
+		$('.comp-hr-cont[data-iden="' + companyId + '"]').html('').hide();
+		$('.comp-row').attr('clicked', 'false');
 	}
-	else {
-		$('.comp-hr-cont[data-iden="'+companyId+'"]').html('').hide();
-        $(element).attr('clicked','false');
+});
+
+function bindUserLoginEvent() {
+	$('.user-login-icn').on('click', function(e) {
+		e.stopImmediatePropagation();
+		var payload = {
+			"colName" : "userId",
+			"colValue" : $(this).attr('data-iden')
+		};
+		callAjaxGETWithTextData("/loginadminas.do", function(data) {
+			window.location = window.location.origin + '/userlogin.do';
+		}, true, payload);
+	});
+}
+
+$(document).on('click','#send-invite-form-submit',function(){
+	var formData = $('#send-invite-form').serialize();
+	callAjaxGetWithPayloadData("/generateregistrationurl.do", function(data){
+		$('#overlay-toast').html(data);
+		showToast();
+	}, formData, true);
+});
+
+$(document).on('keyup','#send-invite-form',function(e){
+	if(e.which==13){
+		$('#send-invite-form-submit').trigger('click');
 	}
 });

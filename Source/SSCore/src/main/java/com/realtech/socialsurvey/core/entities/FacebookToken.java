@@ -1,5 +1,7 @@
 package com.realtech.socialsurvey.core.entities;
 
+import java.util.List;
+
 public class FacebookToken {
 
 	private String facebookId;
@@ -7,7 +9,9 @@ public class FacebookToken {
 	private String facebookAccessToken;
 	private long facebookAccessTokenCreatedOn;
 	private long facebookAccessTokenExpiresOn;
-
+	private List<String> facebookPublicPageAccessToken;
+	private String facebookAccessTokenToPost;
+	
 	public String getFacebookId() {
 		return facebookId;
 	}
@@ -46,6 +50,23 @@ public class FacebookToken {
 
 	public void setFacebookAccessTokenExpiresOn(long facebookAccessTokenExpiresOn) {
 		this.facebookAccessTokenExpiresOn = facebookAccessTokenExpiresOn;
+	}
+
+	
+	public List<String> getFacebookPublicPageAccessToken() {
+		return facebookPublicPageAccessToken;
+	}
+
+	public void setFacebookPublicPageAccessToken(List<String> facebookPublicPageAccessToken) {
+		this.facebookPublicPageAccessToken = facebookPublicPageAccessToken;
+	}
+
+	public String getFacebookAccessTokenToPost() {
+		return facebookAccessTokenToPost;
+	}
+
+	public void setFacebookAccessTokenToPost(String facebookAccessTokenToPost) {
+		this.facebookAccessTokenToPost = facebookAccessTokenToPost;
 	}
 
 	@Override

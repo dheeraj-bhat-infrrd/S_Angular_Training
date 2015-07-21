@@ -13,10 +13,12 @@ import org.noggit.JSONUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.ResponseBody;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
@@ -28,6 +30,7 @@ import com.realtech.socialsurvey.core.entities.User;
 import com.realtech.socialsurvey.core.entities.UserFromSearch;
 import com.realtech.socialsurvey.core.enums.DisplayMessageType;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
+import com.realtech.socialsurvey.core.exception.NoRecordsFetchedException;
 import com.realtech.socialsurvey.core.exception.NonFatalException;
 import com.realtech.socialsurvey.core.services.admin.AdminAuthenticationService;
 import com.realtech.socialsurvey.core.services.organizationmanagement.OrganizationManagementService;
@@ -128,12 +131,18 @@ public class AdminController {
 				throw new NonFatalException("MalformedURLException while fetching branches", e);
 			}
 
-			LOG.debug("fetching branches under company from solr");
-			branches = organizationManagementService.getBranchesUnderCompanyFromSolr(company, start);
+			try {
+				LOG.debug("fetching branches under company from solr");
+				branches = organizationManagementService.getBranchesUnderCompanyFromSolr(company, start);
 
-			LOG.debug("fetching users under company from solr");
-			users = organizationManagementService.getUsersUnderCompanyFromSolr(company, start);
-
+				LOG.debug("fetching users under company from solr");
+				users = organizationManagementService.getUsersUnderCompanyFromSolr(company, start);
+			}
+			catch (NoRecordsFetchedException e) {
+				LOG.error("No records found for company branch or region, reason : " + e.getMessage());
+				throw new NonFatalException("No defaul branch or region found for company " + company.getCompany(),
+						DisplayMessageConstants.COMPANY_NOT_REGISTERD, e);
+			}
 			model.addAttribute("companyObj", company);
 
 			model.addAttribute("regions", regions);
@@ -230,7 +239,7 @@ public class AdminController {
 			return JspResolver.MESSAGE_HEADER;
 		}
 		LOG.info("Method fetchHierarchyViewBranches finished in controller. Returning : " + branches);
-		return JspResolver.VIEW_HIERARCHY_BRANCH_LIST;
+		return JspResolver.ADMIN_REGION_HIERARCHY;
 	}
 
 	@RequestMapping(value = "/fetchbranchusersforadmin", method = RequestMethod.GET)
@@ -296,8 +305,88 @@ public class AdminController {
 		}
 
 		LOG.info("Method fetchHierarchyViewUsersForBranch executed successfully");
-		return JspResolver.VIEW_HIERARCHY_USERS_LIST;
+		return JspResolver.ADMIN_BRANCH_HIERARCHY;
 
 	}
 
+	@ResponseBody
+	@RequestMapping(value = "/loginadminas", method = RequestMethod.GET)
+	public String loginAdminAsUser(Model model, HttpServletRequest request) {
+
+		LOG.info("Inside loginAdminAsUser() method in admin controller");
+
+		String columnName = request.getParameter("colName");
+		String columnValue = request.getParameter("colValue");
+
+		try {
+
+			if (columnName == null || columnName.isEmpty()) {
+				throw new InvalidInputException("Column name passed null/empty");
+			}
+
+			if (columnValue == null || columnValue.isEmpty()) {
+				throw new InvalidInputException("Column value passed null/empty");
+			}
+
+			long id = 01;
+
+			try {
+				id = Long.parseLong(columnValue);
+			}
+			catch (NumberFormatException e) {
+				throw new InvalidInputException("Invalid id was passed", e);
+			}
+
+			HttpSession session = request.getSession();
+			User adminUser = sessionHelper.getCurrentUser();
+			session.invalidate();
+
+			User newUser = userManagementService.getUserByUserId(id);
+
+			HttpSession newSession = request.getSession(true);
+			newSession.setAttribute(CommonConstants.REALTECH_USER_ID, adminUser.getUserId());
+
+			sessionHelper.loginAdminAs(newUser.getLoginName(), CommonConstants.BYPASS_PWD);
+
+		}
+		catch (NonFatalException e) {
+			LOG.error("NonFatalException occurred in loginAdminAsUser(), reason : " + e.getMessage());
+		}
+		return "success";
+	}
+
+	@ResponseBody
+	@RequestMapping(value = "/switchtoadmin", method = RequestMethod.GET)
+	public String switchToAdminUser(Model model, HttpServletRequest request) {
+
+		HttpSession session = request.getSession();
+		Long adminUserid = (Long) session.getAttribute(CommonConstants.REALTECH_USER_ID);
+
+		// Logout current user
+		session.invalidate();
+		SecurityContextHolder.clearContext();
+
+		session = request.getSession(true);
+
+		try {
+			User adminUser = userManagementService.getUserObjByUserId(adminUserid);
+
+			if (!adminUser.isSuperAdmin()) {
+				throw new InvalidInputException("Admin user in session is not realtech admin");
+			}
+			sessionHelper.loginAdminAs(adminUser.getLoginName(), CommonConstants.BYPASS_PWD);
+		}
+		catch (NonFatalException e) {
+			LOG.error("Exception occurred in switchToAdminUser() method , reason : " + e.getMessage());
+			return "failure";
+		}
+		return "success";
+	}
+	
+	@RequestMapping(value = "/showsendinvition", method = RequestMethod.GET)
+	public String showSendInvition() {
+		LOG.info("Inside showSendInvition() method");
+		
+		return JspResolver.ADMIN_INVITE_VIEW;
+	}
 }

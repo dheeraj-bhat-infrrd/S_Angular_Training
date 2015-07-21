@@ -16,7 +16,7 @@
 		<div class="hm-header-row clearfix">
 			<div class="float-left hm-header-row-left"><spring:message code="label.title.settings.key" /></div>
 			<c:if test="${not empty profileList && fn:length(profileList) > 1}">
-				<div class="float-right header-right clearfix hr-dsh-adj-rt" style="z-index: 99; margin-left: 50px;">
+				<div class="float-right header-right clearfix hr-dsh-adj-rt hdr-prof-sel">
 					<div class="float-left hr-txt1"><spring:message code="label.viewas.key" /></div>
 					<div id="setting-sel" class="float-left hr-txt2 cursor-pointer">${profileName}</div>
 					<div id="se-dd-wrapper-profiles" class="va-dd-wrapper hide">
@@ -202,6 +202,7 @@
 							&nbsp&nbsp&nbsp&nbsp[Link] : Url of the survey,
 							<br />
 							&nbsp&nbsp&nbsp&nbsp[Name] : Customer Name,
+							&nbsp&nbsp&nbsp&nbsp[FirstName] : Customer First Name,
 							&nbsp&nbsp&nbsp&nbsp[AgentName] : Agent Name,
 							&nbsp&nbsp&nbsp&nbsp[AgentSignature] : Agent's Signature,
 							<br />
