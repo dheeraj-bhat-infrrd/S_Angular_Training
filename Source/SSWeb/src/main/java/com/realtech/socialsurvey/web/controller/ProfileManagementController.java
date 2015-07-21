@@ -60,6 +60,7 @@ import com.realtech.socialsurvey.core.entities.SurveyDetails;
 import com.realtech.socialsurvey.core.entities.TwitterToken;
 import com.realtech.socialsurvey.core.entities.User;
 import com.realtech.socialsurvey.core.entities.UserFromSearch;
+import com.realtech.socialsurvey.core.entities.UserHierarchyAssignments;
 import com.realtech.socialsurvey.core.entities.UserListFromSearch;
 import com.realtech.socialsurvey.core.entities.UserSettings;
 import com.realtech.socialsurvey.core.entities.WebAddressSettings;
@@ -188,13 +189,11 @@ public class ProfileManagementController {
 		else if (entityType.equals(CommonConstants.REGION_ID_COLUMN)) {
 			model.addAttribute("columnName", entityType);
 			profilesMaster = CommonConstants.PROFILES_MASTER_REGION_ADMIN_PROFILE_ID;
-
 			regionId = entityId;
 		}
 		else if (entityType.equals(CommonConstants.BRANCH_ID_COLUMN)) {
 			model.addAttribute("columnName", entityType);
 			profilesMaster = CommonConstants.PROFILES_MASTER_BRANCH_ADMIN_PROFILE_ID;
-
 			branchId = entityId;
 		}
 		else if (entityType.equals(CommonConstants.PROFILE_AGENT_VIEW)) {
@@ -221,7 +220,7 @@ public class ProfileManagementController {
 		try {
 			profile = profileManagementService.aggregateUserProfile(user, accountType, settings, branchId, regionId, profilesMaster);
 		}
-		catch (InvalidInputException e) {
+		catch (InvalidInputException | NoRecordsFetchedException e) {
 			LOG.error("InvalidInputException while fetching profile. Reason :" + e.getMessage(), e);
 			model.addAttribute("message", messageUtils.getDisplayMessage(e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE));
 		}
@@ -236,7 +235,7 @@ public class ProfileManagementController {
 		try {
 			parentLock = profileManagementService.aggregateParentLockSettings(user, accountType, settings, branchId, regionId, profilesMaster);
 		}
-		catch (InvalidInputException e) {
+		catch (InvalidInputException | NoRecordsFetchedException e) {
 			LOG.error("InvalidInputException while fetching profile. Reason :" + e.getMessage(), e);
 			model.addAttribute("message", messageUtils.getDisplayMessage(e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE));
 		}
@@ -532,6 +531,7 @@ public class ProfileManagementController {
 			User user = sessionHelper.getCurrentUser();
 			UserSettings userSettings = (UserSettings) session.getAttribute(CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION);
 			OrganizationUnitSettings profileSettings = (OrganizationUnitSettings) session.getAttribute(CommonConstants.USER_PROFILE_SETTINGS);
+			UserHierarchyAssignments assignments = (UserHierarchyAssignments) session.getAttribute(CommonConstants.USER_ASSIGNMENTS);
 			long entityId = (long) session.getAttribute(CommonConstants.ENTITY_ID_COLUMN);
 			String entityType = (String) session.getAttribute(CommonConstants.ENTITY_TYPE_COLUMN);
 			if (userSettings == null || profileSettings == null || entityType == null) {
@@ -550,7 +550,7 @@ public class ProfileManagementController {
 			}
 
 			if (entityType.equals(CommonConstants.COMPANY_ID_COLUMN)) {
-				OrganizationUnitSettings companySettings = userSettings.getCompanySettings();
+				OrganizationUnitSettings companySettings = organizationManagementService.getCompanySettings(entityId);
 				if (companySettings == null) {
 					throw new InvalidInputException("No company settings found in current session");
 				}
@@ -562,6 +562,7 @@ public class ProfileManagementController {
 
 				// update company name
 				profileManagementService.updateCompanyName(user.getUserId(), companySettings.getIden(), name);
+				assignments.getCompanies().put(entityId, name);
 
 				companySettings.setVertical(vertical);
 				profileManagementService.updateVertical(MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION, companySettings, vertical);
@@ -569,7 +570,7 @@ public class ProfileManagementController {
 				userSettings.setCompanySettings(companySettings);
 			}
 			else if (entityType.equals(CommonConstants.REGION_ID_COLUMN)) {
-				OrganizationUnitSettings regionSettings = userSettings.getRegionSettings().get(entityId);
+				OrganizationUnitSettings regionSettings = organizationManagementService.getRegionSettings(entityId);
 				if (regionSettings == null) {
 					throw new InvalidInputException("No Region settings found in current session");
 				}
@@ -581,6 +582,7 @@ public class ProfileManagementController {
 
 				// update region name
 				profileManagementService.updateRegionName(user.getUserId(), regionSettings.getIden(), name);
+				assignments.getRegions().put(entityId, name);
 
 				regionSettings.setVertical(vertical);
 				profileManagementService.updateVertical(MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION, regionSettings, vertical);
@@ -600,6 +602,7 @@ public class ProfileManagementController {
 
 				// update branch name
 				profileManagementService.updateBranchName(user.getUserId(), branchSettings.getIden(), name);
+				assignments.getBranches().put(entityId, name);
 
 				branchSettings.setVertical(vertical);
 				profileManagementService.updateVertical(MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION, branchSettings, vertical);
@@ -710,7 +713,7 @@ public class ProfileManagementController {
 			}
 
 			if (entityType.equals(CommonConstants.COMPANY_ID_COLUMN)) {
-				OrganizationUnitSettings companySettings = userSettings.getCompanySettings();
+				OrganizationUnitSettings companySettings = organizationManagementService.getCompanySettings(entityId);
 				if (companySettings == null) {
 					throw new InvalidInputException("No company settings found in current session");
 				}
@@ -722,7 +725,7 @@ public class ProfileManagementController {
 				userSettings.setCompanySettings(companySettings);
 			}
 			else if (entityType.equals(CommonConstants.REGION_ID_COLUMN)) {
-				OrganizationUnitSettings regionSettings = userSettings.getRegionSettings().get(entityId);
+				OrganizationUnitSettings regionSettings = organizationManagementService.getRegionSettings(entityId);
 				if (regionSettings == null) {
 					throw new InvalidInputException("No Region settings found in current session");
 				}
@@ -839,7 +842,7 @@ public class ProfileManagementController {
 			}
 
 			if (entityType.equals(CommonConstants.COMPANY_ID_COLUMN)) {
-				OrganizationUnitSettings companySettings = userSettings.getCompanySettings();
+				OrganizationUnitSettings companySettings = organizationManagementService.getCompanySettings(entityId);
 				if (companySettings == null) {
 					throw new InvalidInputException("No company settings found in current session");
 				}
@@ -852,7 +855,7 @@ public class ProfileManagementController {
 				userSettings.setCompanySettings(companySettings);
 			}
 			else if (entityType.equals(CommonConstants.REGION_ID_COLUMN)) {
-				OrganizationUnitSettings regionSettings = userSettings.getRegionSettings().get(entityId);
+				OrganizationUnitSettings regionSettings = organizationManagementService.getRegionSettings(entityId);
 				if (regionSettings == null) {
 					throw new InvalidInputException("No Region settings found in current session");
 				}
@@ -952,7 +955,7 @@ public class ProfileManagementController {
 			String aboutme = request.getParameter("aboutme");
 
 			if (entityType.equals(CommonConstants.COMPANY_ID_COLUMN)) {
-				OrganizationUnitSettings companySettings = userSettings.getCompanySettings();
+				OrganizationUnitSettings companySettings = organizationManagementService.getCompanySettings(entityId);
 				if (companySettings == null) {
 					throw new InvalidInputException("No company settings found in current session");
 				}
@@ -964,7 +967,7 @@ public class ProfileManagementController {
 				userSettings.setCompanySettings(companySettings);
 			}
 			else if (entityType.equals(CommonConstants.REGION_ID_COLUMN)) {
-				OrganizationUnitSettings regionSettings = userSettings.getRegionSettings().get(entityId);
+				OrganizationUnitSettings regionSettings = organizationManagementService.getRegionSettings(entityId);
 				if (regionSettings == null) {
 					throw new InvalidInputException("No Region settings found in current session");
 				}
@@ -1075,7 +1078,7 @@ public class ProfileManagementController {
 			}
 
 			if (entityType.equals(CommonConstants.COMPANY_ID_COLUMN)) {
-				OrganizationUnitSettings companySettings = userSettings.getCompanySettings();
+				OrganizationUnitSettings companySettings = organizationManagementService.getCompanySettings(entityId);
 				if (companySettings == null) {
 					throw new InvalidInputException("No company settings found in current session");
 				}
@@ -1084,7 +1087,7 @@ public class ProfileManagementController {
 				userSettings.setCompanySettings(companySettings);
 			}
 			else if (entityType.equals(CommonConstants.REGION_ID_COLUMN)) {
-				OrganizationUnitSettings regionSettings = userSettings.getRegionSettings().get(entityId);
+				OrganizationUnitSettings regionSettings = organizationManagementService.getRegionSettings(entityId);
 				if (regionSettings == null) {
 					throw new InvalidInputException("No Region settings found in current session");
 				}
@@ -1208,7 +1211,7 @@ public class ProfileManagementController {
 			}
 
 			if (entityType.equals(CommonConstants.COMPANY_ID_COLUMN)) {
-				OrganizationUnitSettings companySettings = userSettings.getCompanySettings();
+				OrganizationUnitSettings companySettings = organizationManagementService.getCompanySettings(entityId);
 				if (companySettings == null) {
 					throw new InvalidInputException("No company settings found in current session");
 				}
@@ -1218,7 +1221,7 @@ public class ProfileManagementController {
 				userSettings.setCompanySettings(companySettings);
 			}
 			else if (entityType.equals(CommonConstants.REGION_ID_COLUMN)) {
-				OrganizationUnitSettings regionSettings = userSettings.getRegionSettings().get(entityId);
+				OrganizationUnitSettings regionSettings = organizationManagementService.getRegionSettings(entityId);
 				if (regionSettings == null) {
 					throw new InvalidInputException("No Region settings found in current session");
 				}
@@ -1307,7 +1310,7 @@ public class ProfileManagementController {
 			}
 
 			if (entityType.equals(CommonConstants.COMPANY_ID_COLUMN)) {
-				OrganizationUnitSettings companySettings = userSettings.getCompanySettings();
+				OrganizationUnitSettings companySettings = organizationManagementService.getCompanySettings(entityId);
 				if (companySettings == null) {
 					throw new InvalidInputException("No company settings found in current session");
 				}
@@ -1325,7 +1328,7 @@ public class ProfileManagementController {
 				userSettings.setCompanySettings(companySettings);
 			}
 			else if (entityType.equals(CommonConstants.REGION_ID_COLUMN)) {
-				OrganizationUnitSettings regionSettings = userSettings.getRegionSettings().get(entityId);
+				OrganizationUnitSettings regionSettings = organizationManagementService.getRegionSettings(entityId);
 				if (regionSettings == null) {
 					throw new InvalidInputException("No Region settings found in current session");
 				}
@@ -1511,7 +1514,7 @@ public class ProfileManagementController {
 			}
 
 			if (entityType.equals(CommonConstants.COMPANY_ID_COLUMN)) {
-				OrganizationUnitSettings companySettings = userSettings.getCompanySettings();
+				OrganizationUnitSettings companySettings = organizationManagementService.getCompanySettings(entityId);
 				if (companySettings == null) {
 					throw new InvalidInputException("No company settings found in current session");
 				}
@@ -1523,7 +1526,7 @@ public class ProfileManagementController {
 				userSettings.setCompanySettings(companySettings);
 			}
 			else if (entityType.equals(CommonConstants.REGION_ID_COLUMN)) {
-				OrganizationUnitSettings regionSettings = userSettings.getRegionSettings().get(entityId);
+				OrganizationUnitSettings regionSettings = organizationManagementService.getRegionSettings(entityId);
 				if (regionSettings == null) {
 					throw new InvalidInputException("No Region settings found in current session");
 				}
@@ -1653,7 +1656,7 @@ public class ProfileManagementController {
 			}
 
 			if (entityType.equals(CommonConstants.COMPANY_ID_COLUMN)) {
-				OrganizationUnitSettings companySettings = userSettings.getCompanySettings();
+				OrganizationUnitSettings companySettings = organizationManagementService.getCompanySettings(entityId);
 				if (companySettings == null) {
 					throw new InvalidInputException("No company settings found in current session");
 				}
@@ -1665,7 +1668,7 @@ public class ProfileManagementController {
 				userSettings.setCompanySettings(companySettings);
 			}
 			else if (entityType.equals(CommonConstants.REGION_ID_COLUMN)) {
-				OrganizationUnitSettings regionSettings = userSettings.getRegionSettings().get(entityId);
+				OrganizationUnitSettings regionSettings = organizationManagementService.getRegionSettings(entityId);
 				if (regionSettings == null) {
 					throw new InvalidInputException("No Region settings found in current session");
 				}
@@ -1793,7 +1796,7 @@ public class ProfileManagementController {
 			}
 
 			if (entityType.equals(CommonConstants.COMPANY_ID_COLUMN)) {
-				OrganizationUnitSettings companySettings = userSettings.getCompanySettings();
+				OrganizationUnitSettings companySettings = organizationManagementService.getCompanySettings(entityId);
 				if (companySettings == null) {
 					throw new InvalidInputException("No company settings found in current session");
 				}
@@ -1805,7 +1808,7 @@ public class ProfileManagementController {
 				userSettings.setCompanySettings(companySettings);
 			}
 			else if (entityType.equals(CommonConstants.REGION_ID_COLUMN)) {
-				OrganizationUnitSettings regionSettings = userSettings.getRegionSettings().get(entityId);
+				OrganizationUnitSettings regionSettings = organizationManagementService.getRegionSettings(entityId);
 				if (regionSettings == null) {
 					throw new InvalidInputException("No Region settings found in current session");
 				}
@@ -1903,7 +1906,7 @@ public class ProfileManagementController {
 			}
 
 			if (entityType.equals(CommonConstants.COMPANY_ID_COLUMN)) {
-				OrganizationUnitSettings companySettings = userSettings.getCompanySettings();
+				OrganizationUnitSettings companySettings = organizationManagementService.getCompanySettings(entityId);
 				if (companySettings == null) {
 					throw new InvalidInputException("No company settings found in current session");
 				}
@@ -1915,7 +1918,7 @@ public class ProfileManagementController {
 				userSettings.setCompanySettings(companySettings);
 			}
 			else if (entityType.equals(CommonConstants.REGION_ID_COLUMN)) {
-				OrganizationUnitSettings regionSettings = userSettings.getRegionSettings().get(entityId);
+				OrganizationUnitSettings regionSettings = organizationManagementService.getRegionSettings(entityId);
 				if (regionSettings == null) {
 					throw new InvalidInputException("No Region settings found in current session");
 				}
@@ -2013,7 +2016,7 @@ public class ProfileManagementController {
 			}
 
 			if (entityType.equals(CommonConstants.COMPANY_ID_COLUMN)) {
-				OrganizationUnitSettings companySettings = userSettings.getCompanySettings();
+				OrganizationUnitSettings companySettings = organizationManagementService.getCompanySettings(entityId);
 				if (companySettings == null) {
 					throw new InvalidInputException("No company settings found in current session");
 				}
@@ -2025,7 +2028,7 @@ public class ProfileManagementController {
 				userSettings.setCompanySettings(companySettings);
 			}
 			else if (entityType.equals(CommonConstants.REGION_ID_COLUMN)) {
-				OrganizationUnitSettings regionSettings = userSettings.getRegionSettings().get(entityId);
+				OrganizationUnitSettings regionSettings = organizationManagementService.getRegionSettings(entityId);
 				if (regionSettings == null) {
 					throw new InvalidInputException("No Region settings found in current session");
 				}
@@ -2123,7 +2126,7 @@ public class ProfileManagementController {
 			}
 
 			if (entityType.equals(CommonConstants.COMPANY_ID_COLUMN)) {
-				OrganizationUnitSettings companySettings = userSettings.getCompanySettings();
+				OrganizationUnitSettings companySettings = organizationManagementService.getCompanySettings(entityId);
 				if (companySettings == null) {
 					throw new InvalidInputException("No company settings found in current session");
 				}
@@ -2142,7 +2145,7 @@ public class ProfileManagementController {
 				userSettings.setCompanySettings(companySettings);
 			}
 			else if (entityType.equals(CommonConstants.REGION_ID_COLUMN)) {
-				OrganizationUnitSettings regionSettings = userSettings.getRegionSettings().get(entityId);
+				OrganizationUnitSettings regionSettings = organizationManagementService.getRegionSettings(entityId);
 				if (regionSettings == null) {
 					throw new InvalidInputException("No Region settings found in current session");
 				}
@@ -2261,7 +2264,7 @@ public class ProfileManagementController {
 			}
 
 			if (entityType.equals(CommonConstants.COMPANY_ID_COLUMN)) {
-				OrganizationUnitSettings companySettings = userSettings.getCompanySettings();
+				OrganizationUnitSettings companySettings = organizationManagementService.getCompanySettings(entityId);
 				if (companySettings == null) {
 					throw new InvalidInputException("No company settings found in current session");
 				}
@@ -2273,7 +2276,7 @@ public class ProfileManagementController {
 				userSettings.setCompanySettings(companySettings);
 			}
 			else if (entityType.equals(CommonConstants.REGION_ID_COLUMN)) {
-				OrganizationUnitSettings regionSettings = userSettings.getRegionSettings().get(entityId);
+				OrganizationUnitSettings regionSettings = organizationManagementService.getRegionSettings(entityId);
 				if (regionSettings == null) {
 					throw new InvalidInputException("No Region settings found in current session");
 				}
@@ -2371,7 +2374,7 @@ public class ProfileManagementController {
 			}
 
 			if (entityType.equals(CommonConstants.COMPANY_ID_COLUMN)) {
-				OrganizationUnitSettings companySettings = userSettings.getCompanySettings();
+				OrganizationUnitSettings companySettings = organizationManagementService.getCompanySettings(entityId);
 				if (companySettings == null) {
 					throw new InvalidInputException("No company settings found in current session");
 				}
@@ -2383,7 +2386,7 @@ public class ProfileManagementController {
 				userSettings.setCompanySettings(companySettings);
 			}
 			else if (entityType.equals(CommonConstants.REGION_ID_COLUMN)) {
-				OrganizationUnitSettings regionSettings = userSettings.getRegionSettings().get(entityId);
+				OrganizationUnitSettings regionSettings = organizationManagementService.getRegionSettings(entityId);
 				if (regionSettings == null) {
 					throw new InvalidInputException("No Region settings found in current session");
 				}
@@ -2482,7 +2485,7 @@ public class ProfileManagementController {
 			}
 
 			if (entityType.equals(CommonConstants.COMPANY_ID_COLUMN)) {
-				OrganizationUnitSettings companySettings = userSettings.getCompanySettings();
+				OrganizationUnitSettings companySettings = organizationManagementService.getCompanySettings(entityId);
 				if (companySettings == null) {
 					throw new InvalidInputException("No company settings found in current session");
 				}
@@ -2494,7 +2497,7 @@ public class ProfileManagementController {
 				userSettings.setCompanySettings(companySettings);
 			}
 			else if (entityType.equals(CommonConstants.REGION_ID_COLUMN)) {
-				OrganizationUnitSettings regionSettings = userSettings.getRegionSettings().get(entityId);
+				OrganizationUnitSettings regionSettings = organizationManagementService.getRegionSettings(entityId);
 				if (regionSettings == null) {
 					throw new InvalidInputException("No Region settings found in current session");
 				}
@@ -2602,7 +2605,7 @@ public class ProfileManagementController {
 			}
 
 			if (entityType.equals(CommonConstants.COMPANY_ID_COLUMN)) {
-				OrganizationUnitSettings companySettings = userSettings.getCompanySettings();
+				OrganizationUnitSettings companySettings = organizationManagementService.getCompanySettings(entityId);
 				if (companySettings == null) {
 					throw new InvalidInputException("No company settings found in current session");
 				}
@@ -2612,7 +2615,7 @@ public class ProfileManagementController {
 				userSettings.setCompanySettings(companySettings);
 			}
 			else if (entityType.equals(CommonConstants.REGION_ID_COLUMN)) {
-				OrganizationUnitSettings regionSettings = userSettings.getRegionSettings().get(entityId);
+				OrganizationUnitSettings regionSettings = organizationManagementService.getRegionSettings(entityId);
 				if (regionSettings == null) {
 					throw new InvalidInputException("No Region settings found in current session");
 				}
@@ -2704,7 +2707,7 @@ public class ProfileManagementController {
 			}
 
 			if (entityType.equals(CommonConstants.COMPANY_ID_COLUMN)) {
-				OrganizationUnitSettings companySettings = userSettings.getCompanySettings();
+				OrganizationUnitSettings companySettings = organizationManagementService.getCompanySettings(entityId);
 				if (companySettings == null) {
 					throw new InvalidInputException("No company settings found in current session");
 				}
@@ -2714,7 +2717,7 @@ public class ProfileManagementController {
 				userSettings.setCompanySettings(companySettings);
 			}
 			else if (entityType.equals(CommonConstants.REGION_ID_COLUMN)) {
-				OrganizationUnitSettings regionSettings = userSettings.getRegionSettings().get(entityId);
+				OrganizationUnitSettings regionSettings = organizationManagementService.getRegionSettings(entityId);
 				if (regionSettings == null) {
 					throw new InvalidInputException("No Region settings found in current session");
 				}
@@ -2798,7 +2801,7 @@ public class ProfileManagementController {
 			}
 
 			if (entityType.equals(CommonConstants.COMPANY_ID_COLUMN)) {
-				OrganizationUnitSettings companySettings = userSettings.getCompanySettings();
+				OrganizationUnitSettings companySettings = organizationManagementService.getCompanySettings(entityId);
 				if (companySettings == null) {
 					throw new InvalidInputException("No company settings found in current session");
 				}
@@ -2808,7 +2811,7 @@ public class ProfileManagementController {
 				userSettings.setCompanySettings(companySettings);
 			}
 			else if (entityType.equals(CommonConstants.REGION_ID_COLUMN)) {
-				OrganizationUnitSettings regionSettings = userSettings.getRegionSettings().get(entityId);
+				OrganizationUnitSettings regionSettings = organizationManagementService.getRegionSettings(entityId);
 				if (regionSettings == null) {
 					throw new InvalidInputException("No Region settings found in current session");
 				}
@@ -3832,7 +3835,7 @@ public class ProfileManagementController {
 				userSettings.setCompanySettings(companySettings);
 			}
 			else if (entityType.equals(CommonConstants.REGION_ID_COLUMN)) {
-				OrganizationUnitSettings regionSettings = userSettings.getRegionSettings().get(entityId);
+				OrganizationUnitSettings regionSettings = organizationManagementService.getRegionSettings(entityId);
 				if (regionSettings == null) {
 					throw new InvalidInputException("No Region settings found in current session");
 				}

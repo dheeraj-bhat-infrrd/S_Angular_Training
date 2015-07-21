@@ -33,6 +33,7 @@ import com.realtech.socialsurvey.core.entities.Region;
 import com.realtech.socialsurvey.core.entities.RegionFromSearch;
 import com.realtech.socialsurvey.core.entities.User;
 import com.realtech.socialsurvey.core.entities.UserFromSearch;
+import com.realtech.socialsurvey.core.entities.UserHierarchyAssignments;
 import com.realtech.socialsurvey.core.entities.UserSettings;
 import com.realtech.socialsurvey.core.enums.AccountType;
 import com.realtech.socialsurvey.core.enums.DisplayMessageType;
@@ -511,8 +512,6 @@ public class HierarchyManagementController {
 				throw new InvalidInputException("Exception occured while adding new region.Reason : " + e.getMessage(),
 						DisplayMessageConstants.GENERAL_ERROR, e);
 			}
-
-			sessionHelper.processAssignments(session, loggedInUser);
 		}
 		catch (NonFatalException e) {
 			LOG.error("NonFatalException while adding a region. Reason : " + e.getMessage(), e);
@@ -656,8 +655,6 @@ public class HierarchyManagementController {
 				throw new InvalidInputException("Exception occured while adding new branch.REason : " + e.getMessage(),
 						DisplayMessageConstants.GENERAL_ERROR, e);
 			}
-
-			sessionHelper.processAssignments(session, user);
 		}
 		catch (NonFatalException e) {
 			LOG.error("NonFatalException while adding a branch. Reason : " + e.getMessage(), e);
@@ -930,8 +927,6 @@ public class HierarchyManagementController {
 				throw new InvalidInputException("InvalidInputException occured while updating branch.Reason : " + e.getMessage(),
 						DisplayMessageConstants.GENERAL_ERROR, e);
 			}
-
-			sessionHelper.processAssignments(session, user);
 		}
 		catch (NonFatalException e) {
 			LOG.error("NonFatalException while updating branch. Reason : " + e.getMessage(), e);
@@ -950,40 +945,9 @@ public class HierarchyManagementController {
 	 */
 	private void addOrUpdateBranchInSession(Branch branch, HttpSession session) throws NoRecordsFetchedException {
 		LOG.info("Method addOrUpdateBranchInSession called for branch:" + branch);
-		@SuppressWarnings("unchecked") Map<Long, BranchFromSearch> branches = (Map<Long, BranchFromSearch>) session
-				.getAttribute(CommonConstants.BRANCHES_IN_SESSION);
-		if (branches != null && branches.containsKey(branch.getBranchId())) {
-			LOG.debug("Updating branch in session");
-			BranchFromSearch branchInSession = branches.get(branch.getBranchId());
-			branchInSession.setBranchName(branch.getBranchName());
-			branchInSession.setAddress1(branch.getAddress1());
-			branchInSession.setAddress2(branch.getAddress2());
-			branchInSession.setRegionId(branch.getRegion().getRegionId());
-			branchInSession.setRegionName(branch.getRegion().getRegion());
-			branchInSession.setStatus(branch.getStatus());
-			branchInSession.setCountry(branch.getCountry());
-			branchInSession.setCountryCode(branch.getCountryCode());
-			branchInSession.setState(branch.getState());
-			branchInSession.setCity(branch.getCity());
-			branchInSession.setZipcode(branch.getZipcode());
-		}
-		else {
-			LOG.debug("Adding newly created branch to session");
-			BranchFromSearch branchInSession = new BranchFromSearch();
-			branchInSession.setBranchId(branch.getBranchId());
-			branchInSession.setCompanyId(branch.getCompany().getCompanyId());
-			branchInSession.setIsDefaultBySystem(branch.getIsDefaultBySystem());
-			branchInSession.setBranchName(branch.getBranchName());
-			branchInSession.setAddress1(branch.getAddress1());
-			branchInSession.setAddress2(branch.getAddress2());
-			branchInSession.setRegionId(branch.getRegion().getRegionId());
-			branchInSession.setRegionName(branch.getRegion().getRegion());
-			branchInSession.setStatus(branch.getStatus());
-			branchInSession.setCountry(branch.getCountry());
-			branchInSession.setCountryCode(branch.getCountryCode());
-			branchInSession.setZipcode(branch.getZipcode());
-			branches.put(branch.getBranchId(), branchInSession);
-		}
+		UserHierarchyAssignments assignments = (UserHierarchyAssignments) session.getAttribute(CommonConstants.USER_ASSIGNMENTS);
+		Map<Long, String> branches = assignments.getBranches();
+		branches.put(branch.getBranchId(), branch.getBranch());
 		LOG.info("Method addOrUpdateBranchInSession completed successfully");
 	}
 
@@ -995,8 +959,8 @@ public class HierarchyManagementController {
 	 */
 	private void removeBranchFromSession(long branchId, HttpSession session) {
 		LOG.info("Method removeBranchFromSession called for branchId:" + branchId);
-		@SuppressWarnings("unchecked") Map<Long, BranchFromSearch> branches = (Map<Long, BranchFromSearch>) session
-				.getAttribute(CommonConstants.BRANCHES_IN_SESSION);
+		UserHierarchyAssignments assignments = (UserHierarchyAssignments) session.getAttribute(CommonConstants.USER_ASSIGNMENTS);
+		Map<Long, String> branches = assignments.getBranches();
 		if (branches != null && branches.containsKey(branchId)) {
 			branches.remove(branchId);
 		}
@@ -1011,8 +975,8 @@ public class HierarchyManagementController {
 	 */
 	private void removeRegionFromSession(long regionId, HttpSession session) {
 		LOG.info("Method removeRegionFromSession called for regionId:" + regionId);
-		@SuppressWarnings("unchecked") Map<Long, RegionFromSearch> regions = (Map<Long, RegionFromSearch>) session
-				.getAttribute(CommonConstants.REGIONS_IN_SESSION);
+		UserHierarchyAssignments assignments = (UserHierarchyAssignments) session.getAttribute(CommonConstants.USER_ASSIGNMENTS);
+		Map<Long, String> regions = assignments.getRegions();
 		if (regions != null && regions.containsKey(regionId)) {
 			regions.remove(regionId);
 		}
@@ -1119,8 +1083,6 @@ public class HierarchyManagementController {
 				throw new InvalidInputException("InvalidInputException occured while updating region.Reason : " + e.getMessage(),
 						DisplayMessageConstants.GENERAL_ERROR, e);
 			}
-
-			sessionHelper.processAssignments(session, user);
 		}
 		catch (NonFatalException e) {
 			LOG.error("NonFatalException while updating region. Reason : " + e.getMessage(), e);
@@ -1139,38 +1101,9 @@ public class HierarchyManagementController {
 	 */
 	private void addOrUpdateRegionInSession(Region region, HttpSession session) throws NoRecordsFetchedException {
 		LOG.info("Method addOrUpdateRegionInSession called for region:" + region);
-		@SuppressWarnings("unchecked") Map<Long, RegionFromSearch> regions = (Map<Long, RegionFromSearch>) session
-				.getAttribute(CommonConstants.REGIONS_IN_SESSION);
-		if (regions != null && regions.containsKey(region.getRegionId())) {
-			LOG.debug("Updating region in session");
-			RegionFromSearch regionInSession = regions.get(region.getRegionId());
-			regionInSession.setRegionName(region.getRegion());
-			regionInSession.setAddress1(region.getAddress1());
-			regionInSession.setAddress2(region.getAddress2());
-			regionInSession.setStatus(region.getStatus());
-			regionInSession.setCountry(region.getCountry());
-			regionInSession.setCountryCode(region.getCountryCode());
-			regionInSession.setState(region.getState());
-			regionInSession.setCity(region.getCity());
-			regionInSession.setZipcode(region.getZipcode());
-		}
-		else {
-			LOG.debug("Adding region in session");
-			RegionFromSearch regionInSession = new RegionFromSearch();
-			regionInSession.setIsDefaultBySystem(region.getIsDefaultBySystem());
-			regionInSession.setRegionId(region.getRegionId());
-			regionInSession.setCompanyId(region.getCompany().getCompanyId());
-			regionInSession.setRegionName(region.getRegion());
-			regionInSession.setAddress1(region.getAddress1());
-			regionInSession.setAddress2(region.getAddress2());
-			regionInSession.setStatus(region.getStatus());
-			regionInSession.setCountry(region.getCountry());
-			regionInSession.setCountryCode(region.getCountryCode());
-			regionInSession.setState(region.getState());
-			regionInSession.setCity(region.getCity());
-			regionInSession.setZipcode(region.getZipcode());
-			regions.put(region.getRegionId(), regionInSession);
-		}
+		UserHierarchyAssignments assignments = (UserHierarchyAssignments) session.getAttribute(CommonConstants.USER_ASSIGNMENTS);
+		Map<Long, String> regions = assignments.getRegions();
+		regions.put(region.getRegionId(), region.getRegion());
 		LOG.info("Method addOrUpdateRegionInSession executed successfully");
 	}
 

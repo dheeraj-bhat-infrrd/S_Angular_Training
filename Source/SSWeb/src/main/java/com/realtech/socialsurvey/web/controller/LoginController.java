@@ -1,7 +1,6 @@
 package com.realtech.socialsurvey.web.controller;
 
 // JIRA SS-21 : by RM-06 : BOC
-import java.net.MalformedURLException;
 import java.util.List;
 import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
@@ -19,9 +18,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import com.google.gson.Gson;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
-import com.realtech.socialsurvey.core.entities.BranchFromSearch;
 import com.realtech.socialsurvey.core.entities.LicenseDetail;
-import com.realtech.socialsurvey.core.entities.RegionFromSearch;
 import com.realtech.socialsurvey.core.entities.User;
 import com.realtech.socialsurvey.core.entities.UserProfile;
 import com.realtech.socialsurvey.core.entities.UserSettings;
@@ -239,30 +236,6 @@ public class LoginController {
 			else {
 				LOG.debug("Company profile complete, check any of the user profiles is entered");
 				if (user.getIsAtleastOneUserprofileComplete() == CommonConstants.PROCESS_COMPLETE) {
-					/**
-					 * Set the regions and branches in session from solr
-					 */
-					long companyId = user.getCompany().getCompanyId();
-					LOG.debug("Fetching regions from solr to set in session for company:" + companyId);
-					try {
-						Map<Long, RegionFromSearch> regions = organizationManagementService.fetchRegionsMapByCompany(companyId);
-						session.setAttribute(CommonConstants.REGIONS_IN_SESSION, regions);
-					}
-					catch (MalformedURLException e) {
-						LOG.error("MalformedURLException while fetching regions. Reason : " + e.getMessage(), e);
-						throw new NonFatalException("MalformedURLException while fetching regions", e);
-					}
-
-					LOG.debug("Fetching branches from solr to set in session for company:" + companyId);
-					try {
-						Map<Long, BranchFromSearch> branches = organizationManagementService.fetchBranchesMapByCompany(companyId);
-						session.setAttribute(CommonConstants.BRANCHES_IN_SESSION, branches);
-					}
-					catch (MalformedURLException e) {
-						LOG.error("MalformedURLException while fetching branches. Reason : " + e.getMessage(), e);
-						throw new NonFatalException("MalformedURLException while fetching branches", e);
-					}
-
 					/**
 					 * Compute all conditions for user and if user is CA then check for profile
 					 * completion stage.
