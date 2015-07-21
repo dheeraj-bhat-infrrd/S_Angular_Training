@@ -97,12 +97,27 @@
     	</c:if>
     	<c:if test="${not empty averageRating}">
     		<fmt:formatNumber var="floatingAverageRating" type="number" value="${averageRating}" maxFractionDigits="2" minFractionDigits="2"/>
+    		<fmt:formatNumber var="floatingAverageGoogleRating" type="number" value="${averageRating}" maxFractionDigits="1" minFractionDigits="1"/>
     		<fmt:formatNumber var="integerAverageRating" type="number" value="${averageRating}" maxFractionDigits="0"/>
     		<c:if test="${integerAverageRating == 6}">
     			<c:set var="integerAverageRating" value="5"></c:set>
     		</c:if>
     	</c:if>
     </c:if>
+<script type="application/ld+json">
+{
+  "@context" : "http://schema.org",
+  "@type" : "Product",
+  "name" : ${profName},
+  "aggregateRating" : {
+    "@type" : "AggregateRating",
+    "ratingValue" : ${floatingAverageGoogleRating },
+    "ratingCount" : ${reviewsCount},
+	"bestRating" : "5",
+	"worstRating" : "0"
+  }
+}
+</script>
 </head>
 <body>
     <div id="toast-container" class="toast-container">
@@ -548,14 +563,14 @@
 </div> -->
 
 <!-- Code snippet to show aggregated ratings for agent in Google results : BOC-->
-<div class="hide" itemscope itemtype="http://schema.org/Product">
+<%-- <div class="hide" itemscope itemtype="http://schema.org/Product">
 	<span itemprop="name">Social Survey</span>
 	<span id="agent-desc" itemprop="title"></span>
 	<div itemprop="aggregateRating" itemscope itemtype="http://schema.org/AggregateRating">Rated 
 		<span id="prof-schema-agent-rating" itemprop="ratingValue">${floatingAverageRating }</span>/5 based on 
 		<span id="prof-schema-reviews" itemprop="reviewCount">${reviewsCount}</span> reviews
 	</div>
-</div>
+</div> --%>
 <!-- EOC -->
 
 <script src="${initParam.resourcesPath}/resources/js/jquery-2.1.1.min.js"></script>
