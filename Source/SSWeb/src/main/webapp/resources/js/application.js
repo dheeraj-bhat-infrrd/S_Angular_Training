@@ -2736,7 +2736,8 @@ function bindUserEditClicks() {
 			var userId = $(this).attr('data-userid');
 			$(".user-assignment-edit-div").html("");
 			$(".user-edit-row").slideUp();
-			getUserAssignments(userId);
+			var elementToAppendTo = $(this).closest('tr').next('tr.user-edit-row').find('td.td-user-edit');
+			getUserAssignments(userId,elementToAppendTo);
 			$(this).parent().parent().parent().next('.user-edit-row').slideDown(200);
 			$(this).attr('clicked','true');
 	    }else {
@@ -4020,10 +4021,15 @@ function searchBranchesForUserCallBack(jsonData) {
 /*
  * Function fetch assignments for user
  */
-function getUserAssignments(userId) {
+function getUserAssignments(userId, element) {
 	var url = "./finduserassignments.do?userId=" + userId; 
 	callAjaxGET(url, function(data){
-		$('#user-details-and-assignments-' + userId).html(data);
+		
+		if(element == undefined){
+			$('#user-details-and-assignments-' + userId).html(data);			
+		} else {
+			element.html(data);
+		}
 		
 		var assignToOption = $("#assign-to-txt").attr('data-assignto');
 		showSelectorsByAssignToOption(assignToOption);
