@@ -320,11 +320,13 @@
 						<div class="sq-btn-social-wrapper float-left">
 							<a id="ggl-btn" target="_blank" class="sq-btn-continue sq-btn-post-social float-left">Google+</a>
 					</div> -->
-					<div id="social-post-links" class="share-social-link-cont">
-						<!-- <a id="ylp-btn" target="_blank" class="sq-btn-continue sq-btn-post-social-btn">Yelp</a>
+					<div id="social-post-links" class="share-social-link-cont hide">
+						 <a id="ylp-btn" target="_blank" class="sq-btn-continue sq-btn-post-social-btn">Yelp</a>
 						<a id="ggl-btn" target="_blank" class="sq-btn-continue sq-btn-post-social-btn">Google+</a>
 						<a id="zillow-btn" target="_blank" class="sq-btn-continue sq-btn-post-social-btn">Zillow</a>
-						<a id="lt-btn" target="_blank" class="sq-btn-continue sq-btn-post-social-btn">Lending Tree</a> -->
+						<a id="lt-btn" target="_blank" class="sq-btn-continue sq-btn-post-social-btn">Lending Tree</a> 
+					
+					</div>
 							<div class="ppl-share-wrapper clearfix">
 					<div class="float-left blue-text ppl-share-shr-txt"><spring:message code="label.share.key"/></div>
 					<div class="float-left clearfix ppl-share-social ">
@@ -335,7 +337,6 @@
 					
 					</div>
 				</div>
-					</div>
 				
 				</div>
 			</div>
