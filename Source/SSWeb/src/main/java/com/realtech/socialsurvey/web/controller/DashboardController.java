@@ -126,8 +126,8 @@ public class DashboardController
 		if (user.getCompany() != null && user.getCompany().getLicenseDetails() != null && !user.getCompany().getLicenseDetails().isEmpty()
 				&& user.getCompany().getLicenseDetails().get(0).getAccountsMaster() != null) {
 			if (user.getCompany().getLicenseDetails().get(0).getAccountsMaster().getAccountsMasterId() == CommonConstants.ACCOUNTS_MASTER_INDIVIDUAL) {
-				model.addAttribute("columnName", CommonConstants.COMPANY_ID_COLUMN);
-				model.addAttribute("columnValue", user.getCompany().getCompanyId());
+				model.addAttribute("columnName", CommonConstants.AGENT_ID_COLUMN);
+				model.addAttribute("columnValue", entityId);
 				modelSet = true;
 			}
 		}
