@@ -856,7 +856,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
         if ( branch.getRegion().getIsDefaultBySystem() != CommonConstants.YES ) {
             LOG.debug( "fetching region settings for regionId : " + regionId );
             branchSettings.setRegionId( regionId );
-            branchSettings.setRegionName( branch.getRegion().getRegionName() );
+            branchSettings.setRegionName( branch.getRegion().getRegion() );
         } else {
         	branchSettings.setRegionId( regionId );
             branchSettings.setRegionName( branch.getRegion().getRegion() );

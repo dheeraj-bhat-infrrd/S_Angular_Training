@@ -6988,6 +6988,9 @@ div.v-tbl-name {
 
 div.v-tbl-add {
 	width: 35%;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
 }
 
 div.v-tbl-role {
@@ -7028,4 +7031,9 @@ div.v-tbl-spacer {
 .hdr-prof-sel {
 	z-index: 99;
 	margin-left: 50px;
+}
+
+.pp-lp-con-row-item {
+	width: 70%;
+	width: calc(100% - 50px);
 }
