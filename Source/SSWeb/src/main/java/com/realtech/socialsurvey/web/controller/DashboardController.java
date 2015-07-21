@@ -847,6 +847,7 @@ public class DashboardController
         try {
             String customerName = request.getParameter( "customerName" );
             String custFirstName = "";
+            String custLastName = "";
             String customerEmail = request.getParameter( "customerEmail" );
             String agentName = request.getParameter( "agentName" );
 
@@ -856,6 +857,7 @@ public class DashboardController
             }
             if ( customerName.contains( " " ) ) {
                 String[] nameArray = customerName.split( " " );
+                custLastName = nameArray[nameArray.length - 1];
                 for ( int nameIdx = 0; nameIdx < nameArray.length - 1; nameIdx++ ) {
                     custFirstName = custFirstName + nameArray[nameIdx] + " ";
                 }
@@ -882,10 +884,10 @@ public class DashboardController
             }
 
             String surveyLink = "";
-            SurveyPreInitiation survey = surveyHandler.getPreInitiatedSurvey( agentId, customerEmail );
+            SurveyPreInitiation survey = surveyHandler.getPreInitiatedSurvey( agentId, customerEmail, custFirstName, custLastName );
             if ( survey != null ) {
                 surveyLink = surveyHandler.getSurveyUrl( agentId, customerEmail,
-                    surveyHandler.composeLink( agentId, customerEmail ) );
+                    surveyHandler.composeLink( agentId, customerEmail, custFirstName, custLastName ) );
             }
 
             try {
@@ -1428,7 +1430,7 @@ public class DashboardController
                         throw new InvalidInputException( "Agent id can not be null" );
                     }
                     User currentUser = userManagementService.getUserByUserId( currentAgentId );
-                    if ( surveyHandler.getPreInitiatedSurvey( agentId, recipient.getEmailId() ) == null )
+                    if ( surveyHandler.getPreInitiatedSurvey( agentId, recipient.getEmailId(), recipient.getFirstname(), recipient.getLastname() ) == null )
                         surveyHandler.sendSurveyInvitationMail( recipient.getFirstname(), recipient.getLastname(),
                             recipient.getEmailId(), null, currentUser, true, source );
                 }
@@ -1598,8 +1600,8 @@ public class DashboardController
                 throw new InvalidInputException( "Invalid value (Null/Empty) found for agentId." );
             }
             long agentId = Long.parseLong( agentIdStr );
-            surveyHandler.changeStatusOfSurvey( agentId, customerEmail, true );
-            SurveyDetails survey = surveyHandler.getSurveyDetails( agentId, customerEmail );
+            surveyHandler.changeStatusOfSurvey( agentId, customerEmail, firstName, lastName, true );
+            SurveyDetails survey = surveyHandler.getSurveyDetails( agentId, customerEmail, firstName, lastName );
             User user = userManagementService.getUserByUserId( agentId );
             surveyHandler.decreaseSurveyCountForAgent( agentId );
             surveyHandler.sendSurveyRestartMail( firstName, lastName, customerEmail, survey.getCustRelationWithAgent(), user,

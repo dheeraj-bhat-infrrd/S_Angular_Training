@@ -10,7 +10,7 @@ import com.realtech.socialsurvey.core.entities.SurveyResponse;
 
 public interface SurveyDetailsDao {
 
-	public SurveyDetails getSurveyByAgentIdAndCustomerEmail(long agentId, String customerEmail);
+	public SurveyDetails getSurveyByAgentIdAndCustomerEmail(long agentId, String customerEmail, String firstName, String lastName);
 
 	public void insertSurveyDetails(SurveyDetails surveyDetails);
 
@@ -76,7 +76,7 @@ public interface SurveyDetailsDao {
 
 	public void updateSharedOn(String socialSite, long agentId, String customerEmail);
 
-	public void changeStatusOfSurvey(long agentId, String customerEmail, boolean editable);
+	public void changeStatusOfSurvey(long agentId, String customerEmail, String firstName, String lastName, boolean editable);
 
 	public void updateReminderCountForSocialPost(Long agentId, String customerEmail);
 
