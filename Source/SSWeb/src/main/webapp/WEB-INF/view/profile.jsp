@@ -103,6 +103,20 @@
     		</c:if>
     	</c:if>
     </c:if>
+<script type="application/ld+json">
+{
+  "@context" : "http://schema.org",
+  "@type" : "Product",
+  "name" : ${profName},
+  "aggregateRating" : {
+    "@type" : "AggregateRating",
+    "ratingValue" : ${floatingAverageGoogleRating },
+    "ratingCount" : ${reviewsCount},
+	"bestRating" : "5",
+	"worstRating" : "0"
+  }
+}
+</script>
 </head>
 <body>
     <div id="toast-container" class="toast-container">
@@ -548,14 +562,14 @@
 </div> -->
 
 <!-- Code snippet to show aggregated ratings for agent in Google results : BOC-->
-<div class="hide" itemscope itemtype="http://schema.org/Product">
+<%-- <div class="hide" itemscope itemtype="http://schema.org/Product">
 	<span itemprop="name">Social Survey</span>
 	<span id="agent-desc" itemprop="title"></span>
 	<div itemprop="aggregateRating" itemscope itemtype="http://schema.org/AggregateRating">Rated 
 		<span id="prof-schema-agent-rating" itemprop="ratingValue">${floatingAverageRating }</span>/5 based on 
 		<span id="prof-schema-reviews" itemprop="reviewCount">${reviewsCount}</span> reviews
 	</div>
-</div>
+</div> --%>
 <!-- EOC -->
 
 <script src="${initParam.resourcesPath}/resources/js/jquery-2.1.1.min.js"></script>
