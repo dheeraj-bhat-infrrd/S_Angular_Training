@@ -43,7 +43,7 @@ public interface ProfileManagementService {
 	 * @throws InvalidInputException
 	 */
 	public LockSettings aggregateParentLockSettings(User user, AccountType accountType, UserSettings settings, long branchId, long regionId,
-			int profilesMaster) throws InvalidInputException;
+			int profilesMaster) throws InvalidInputException, NoRecordsFetchedException;
 
 	/**
 	 * Finalize profile settings in the hierarchy
@@ -54,7 +54,7 @@ public interface ProfileManagementService {
 	 * @throws InvalidInputException
 	 */
 	public OrganizationUnitSettings aggregateUserProfile(User user, AccountType accountType, UserSettings settings, long branchId, long regionId,
-			int profilesMaster) throws InvalidInputException;
+			int profilesMaster) throws InvalidInputException, NoRecordsFetchedException;
 
 	public String aggregateDisclaimer(OrganizationUnitSettings unitSettings, String entity) throws InvalidInputException;
 
@@ -366,9 +366,9 @@ public interface ProfileManagementService {
 	public void findProfileMailIdAndSendMail(String agentProfileName, String message, String senderName, String senderMailId, String profileType)
 			throws InvalidInputException, NoRecordsFetchedException, UndeliveredEmailException;
 
-	public void addSocialPosts(UserProfile selectedProfile, String postText) throws InvalidInputException;
+	public void addSocialPosts(User user, long entityId, String entityType, String postText) throws InvalidInputException;
 
-	public List<SocialPost> getSocialPosts(UserProfile selectedProfile, int startIndex, int batchSize) throws InvalidInputException;
+	public List<SocialPost> getSocialPosts(long entityId, String entityType, int startIndex, int batchSize) throws InvalidInputException;
 
 	public long getPostsCountForUser(long userId);
 

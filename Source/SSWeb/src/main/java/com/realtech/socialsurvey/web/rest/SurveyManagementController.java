@@ -144,6 +144,8 @@ public class SurveyManagementController {
 			String feedback = request.getParameter("feedback");
 			String mood = request.getParameter("mood");
 			String customerEmail = request.getParameter("customerEmail");
+            String firstName = request.getParameter("firstName");
+            String lastName = request.getParameter("lastName");
 			String agreedToShare = request.getParameter("agreedToShare");
 
 			long agentId = 0;
@@ -162,7 +164,7 @@ public class SurveyManagementController {
 			boolean isAbusive = Boolean.parseBoolean(request.getParameter("isAbusive"));
 			surveyHandler.updateGatewayQuestionResponseAndScore(agentId, customerEmail, mood, feedback, isAbusive, agreedToShare);
 			surveyHandler.increaseSurveyCountForAgent(agentId);
-			SurveyPreInitiation surveyPreInitiation = surveyHandler.getPreInitiatedSurvey(agentId, customerEmail);
+			SurveyPreInitiation surveyPreInitiation = surveyHandler.getPreInitiatedSurvey(agentId, customerEmail, firstName, lastName );
 			surveyHandler.deleteSurveyPreInitiationDetailsPermanently(surveyPreInitiation);
 
 			// TODO Search Engine Optimization
@@ -194,7 +196,7 @@ public class SurveyManagementController {
 			}
 
 			// Sending email to the customer telling about successful completion of survey.
-			SurveyDetails survey = surveyHandler.getSurveyDetails(agentId, customerEmail);
+			SurveyDetails survey = surveyHandler.getSurveyDetails(agentId, customerEmail, firstName, lastName);
 			try {
 				String customerName = survey.getCustomerFirstName();
 				if (survey.getCustomerLastName() != null && !survey.getCustomerLastName().isEmpty()) {
@@ -386,8 +388,8 @@ public class SurveyManagementController {
 			model.addAttribute("source", source);
 
 			User user = userManagementService.getUserByUserId(agentId);
-			SurveyPreInitiation preInitiatedSurvey = surveyHandler.getPreInitiatedSurvey(agentId, customerEmail);
-			SurveyDetails survey = surveyHandler.getSurveyDetails(agentId, customerEmail);
+			SurveyPreInitiation preInitiatedSurvey = surveyHandler.getPreInitiatedSurvey(agentId, customerEmail, firstName, lastName );
+			SurveyDetails survey = surveyHandler.getSurveyDetails(agentId, customerEmail, firstName, lastName);
 
 			// Code to be executed when survey has already been taken.
 			if (preInitiatedSurvey == null && survey!=null && survey.getStage() == -1) {
@@ -432,17 +434,19 @@ public class SurveyManagementController {
 			if (urlParams != null) {
 				long agentId = Long.parseLong(urlParams.get(CommonConstants.AGENT_ID_COLUMN));
 				String customerEmail = urlParams.get(CommonConstants.CUSTOMER_EMAIL_COLUMN);
+                String custFirstName = urlParams.get(CommonConstants.FIRST_NAME);
+                String custLastName = urlParams.get(CommonConstants.LAST_NAME);
 				
-				SurveyPreInitiation surveyPreInitiation = surveyHandler.getPreInitiatedSurvey(agentId, customerEmail);
+				SurveyPreInitiation surveyPreInitiation = surveyHandler.getPreInitiatedSurvey(agentId, customerEmail, custFirstName, custLastName);
 				if (surveyPreInitiation == null) {
-					surveyAndStage = getSurvey(agentId, urlParams.get(CommonConstants.CUSTOMER_EMAIL_COLUMN), null, null, 0, null,
-							surveyHandler.composeLink(agentId, customerEmail), MongoSocialPostDaoImpl.KEY_SOURCE_SS);
+					surveyAndStage = getSurvey(agentId, customerEmail, custFirstName, custLastName, 0, null,
+							surveyHandler.composeLink(agentId, customerEmail, custFirstName, custLastName), MongoSocialPostDaoImpl.KEY_SOURCE_SS);
 				}
 				else {
 					surveyAndStage = getSurvey(agentId, urlParams.get(CommonConstants.CUSTOMER_EMAIL_COLUMN),
 							surveyPreInitiation.getCustomerFirstName(), surveyPreInitiation.getCustomerLastName(),
 							surveyPreInitiation.getReminderCounts(), surveyPreInitiation.getCustomerInteractionDetails(),
-							surveyHandler.composeLink(agentId, customerEmail), surveyPreInitiation.getSurveySource());
+							surveyHandler.composeLink(agentId, customerEmail, custFirstName, custLastName), surveyPreInitiation.getSurveySource());
 					
 					surveyHandler.markSurveyAsStarted(surveyPreInitiation);
 				}
@@ -898,8 +902,8 @@ public class SurveyManagementController {
 				throw new InvalidInputException("Invalid value (Null/Empty) found for agentId.");
 			}
 			long agentId = Long.parseLong(agentIdStr);
-			surveyHandler.changeStatusOfSurvey(agentId, customerEmail, true);
-			SurveyDetails survey = surveyHandler.getSurveyDetails(agentId, customerEmail);
+			surveyHandler.changeStatusOfSurvey(agentId, customerEmail, firstName, lastName, true);
+			SurveyDetails survey = surveyHandler.getSurveyDetails(agentId, customerEmail, firstName, lastName);
 			User user = userManagementService.getUserByUserId(agentId);
 			surveyHandler.sendSurveyRestartMail(firstName, lastName, customerEmail, survey.getCustRelationWithAgent(), user, survey.getUrl());
 		}
@@ -922,10 +926,10 @@ public class SurveyManagementController {
 				throw new InvalidInputException("Invalid value (Null/Empty) found for agentId.");
 			}
 			long agentId = Long.parseLong(agentIdStr);
-			SurveyPreInitiation survey = surveyHandler.getPreInitiatedSurvey(agentId, customerEmail);
+			SurveyPreInitiation survey = surveyHandler.getPreInitiatedSurvey(agentId, customerEmail, firstName, lastName );
 			User user = userManagementService.getUserByUserId(agentId);
 			surveyHandler.sendSurveyRestartMail(firstName, lastName, customerEmail, survey.getCustomerInteractionDetails(), user,
-					surveyHandler.composeLink(agentId, customerEmail));
+					surveyHandler.composeLink(agentId, customerEmail, firstName, lastName));
 		}
 		catch (NonFatalException e) {
 			LOG.error("NonfatalException caught in makeSurveyEditable(). Nested exception is ", e);

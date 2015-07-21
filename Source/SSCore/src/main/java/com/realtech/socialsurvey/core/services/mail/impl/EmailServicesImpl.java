@@ -19,6 +19,7 @@ import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.commons.EmailTemplateConstants;
 import com.realtech.socialsurvey.core.entities.EmailEntity;
 import com.realtech.socialsurvey.core.entities.FileContentReplacements;
+import com.realtech.socialsurvey.core.entities.SurveyPreInitiation;
 import com.realtech.socialsurvey.core.enums.EmailHeader;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.services.mail.EmailSender;
@@ -141,6 +142,34 @@ public class EmailServicesImpl implements EmailServices
             + EmailTemplateConstants.REGISTRATION_INVITATION_MAIL_BODY );
         messageBodyReplacements.setReplacementArgs( Arrays.asList( appLogoUrl, fullName, url, url, url, recipientMailId,
             appBaseUrl, appBaseUrl ) );
+
+        LOG.debug( "Calling email sender to send mail" );
+        emailSender.sendEmailWithBodyReplacements( emailEntity, subjectFileName, messageBodyReplacements );
+        LOG.info( "Successfully sent registration invite mail" );
+    }
+
+
+    @Async
+    @Override
+    public void sendAgentSurveyReminderMail( String recipientMailId, SurveyPreInitiation survey ) throws InvalidInputException,
+        UndeliveredEmailException
+    {
+
+        if ( recipientMailId == null || recipientMailId.isEmpty() ) {
+            LOG.error( "Recipient email Id is empty or null for sending registration invite mail " );
+            throw new InvalidInputException( "Recipient email Id is empty or null for sending registration invite mail " );
+        }
+
+        EmailEntity emailEntity = prepareEmailEntityForSendingEmail( recipientMailId );
+        String subjectFileName = EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER
+            + EmailTemplateConstants.AGENT_SURVEY_REMINDER_EMAIL_SUBJECT;
+
+        FileContentReplacements messageBodyReplacements = new FileContentReplacements();
+        messageBodyReplacements.setFileName( EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER
+            + EmailTemplateConstants.AGENT_SURVEY_REMINDER_EMAIL_BODY );
+        String customerName = survey.getCustomerFirstName() + " " + survey.getCustomerLastName();
+        messageBodyReplacements.setReplacementArgs( Arrays.asList( appLogoUrl, survey.getAgentName(), customerName,
+            survey.getCustomerEmailId(), appBaseUrl, appBaseUrl, appBaseUrl ) );
 
         LOG.debug( "Calling email sender to send mail" );
         emailSender.sendEmailWithBodyReplacements( emailEntity, subjectFileName, messageBodyReplacements );
@@ -519,12 +548,12 @@ public class EmailServicesImpl implements EmailServices
         String subjectFileName = EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER
             + EmailTemplateConstants.COMPLETE_REGISTRATION_MAIL_SUBJECT;
 
+
         FileContentReplacements messageBodyReplacements = new FileContentReplacements();
         messageBodyReplacements.setFileName( EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER
             + EmailTemplateConstants.COMPLETE_REGISTRATION_MAIL_BODY );
         messageBodyReplacements.setReplacementArgs( Arrays.asList( appLogoUrl, name, url, url, url, appBaseUrl, profileName,
             appBaseUrl, profileName, loginName, appBaseUrl, appBaseUrl ) );
-
         LOG.debug( "Calling email sender to send mail" );
         emailSender.sendEmailWithBodyReplacements( emailEntity, subjectFileName, messageBodyReplacements );
         LOG.info( "Successfully sent mail for registraion completion." );

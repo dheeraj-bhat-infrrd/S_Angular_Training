@@ -5,11 +5,9 @@ package com.realtech.socialsurvey.web.profile;
 
 import java.io.IOException;
 import java.util.List;
-
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-
 import org.apache.solr.common.SolrDocument;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -22,14 +20,11 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
-
 import com.amazonaws.util.json.JSONException;
 import com.amazonaws.util.json.JSONObject;
 import com.google.gson.Gson;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
-import com.realtech.socialsurvey.core.entities.Company;
 import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
-import com.realtech.socialsurvey.core.entities.ProfilesMaster;
 import com.realtech.socialsurvey.core.entities.SocialMediaTokens;
 import com.realtech.socialsurvey.core.entities.SocialPost;
 import com.realtech.socialsurvey.core.entities.SurveyDetails;
@@ -139,18 +134,8 @@ public class ProfileViewController
                     CommonConstants.REVIEWS_SORT_CRITERIA_FEATURE );
                 model.addAttribute( "reviews", reviews );
 
-                UserProfile selectedProfile = new UserProfile();
-                ProfilesMaster profilesMaster = new ProfilesMaster();
-                profilesMaster.setProfileId( CommonConstants.PROFILES_MASTER_COMPANY_ADMIN_PROFILE_ID );
-
-                Company company = new Company();
-                company.setCompanyId( companyProfile.getIden() );
-
-                selectedProfile.setProfilesMaster( profilesMaster );
-                selectedProfile.setCompany( company );
-
-                List<SocialPost> posts = profileManagementService.getSocialPosts( selectedProfile, -1,
-                    CommonConstants.USER_AGENT_NUMBER_POST );
+				List<SocialPost> posts = profileManagementService.getSocialPosts(companyProfile.getIden(), CommonConstants.COMPANY_ID_COLUMN, -1,
+						CommonConstants.USER_AGENT_NUMBER_POST);
                 model.addAttribute( "posts", posts );
             }
         } catch ( InvalidInputException e ) {
@@ -244,14 +229,8 @@ public class ProfileViewController
                     CommonConstants.REVIEWS_SORT_CRITERIA_FEATURE );
                 model.addAttribute( "reviews", reviews );
 
-                UserProfile selectedProfile = new UserProfile();
-                ProfilesMaster profilesMaster = new ProfilesMaster();
-                profilesMaster.setProfileId( CommonConstants.PROFILES_MASTER_REGION_ADMIN_PROFILE_ID );
-
-                selectedProfile.setProfilesMaster( profilesMaster );
-                selectedProfile.setRegionId( regionProfile.getIden() );
-                List<SocialPost> posts = profileManagementService.getSocialPosts( selectedProfile, -1,
-                    CommonConstants.USER_AGENT_NUMBER_POST );
+				List<SocialPost> posts = profileManagementService.getSocialPosts(regionProfile.getIden(), CommonConstants.REGION_ID_COLUMN, -1,
+						CommonConstants.USER_AGENT_NUMBER_POST);
                 model.addAttribute( "posts", posts );
             }
         } catch ( ProfileNotFoundException e ) {
@@ -346,14 +325,8 @@ public class ProfileViewController
                     CommonConstants.REVIEWS_SORT_CRITERIA_FEATURE );
                 model.addAttribute( "reviews", reviews );
 
-                UserProfile selectedProfile = new UserProfile();
-                ProfilesMaster profilesMaster = new ProfilesMaster();
-                profilesMaster.setProfileId( CommonConstants.PROFILES_MASTER_BRANCH_ADMIN_PROFILE_ID );
-
-                selectedProfile.setProfilesMaster( profilesMaster );
-                selectedProfile.setBranchId( branchProfile.getIden() );
-                List<SocialPost> posts = profileManagementService.getSocialPosts( selectedProfile, -1,
-                    CommonConstants.USER_AGENT_NUMBER_POST );
+				List<SocialPost> posts = profileManagementService.getSocialPosts(branchProfile.getIden(), CommonConstants.BRANCH_ID_COLUMN, -1,
+						CommonConstants.USER_AGENT_NUMBER_POST);
                 model.addAttribute( "posts", posts );
             }
         } catch ( ProfileNotFoundException e ) {
@@ -471,15 +444,8 @@ public class ProfileViewController
                         CommonConstants.REVIEWS_SORT_CRITERIA_FEATURE );
                     model.addAttribute( "reviews", reviews );
 
-                    ProfilesMaster profilesMaster = new ProfilesMaster();
-                    profilesMaster.setProfileId( CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID );
-
-                    UserProfile selectedProfile = new UserProfile();
-                    selectedProfile.setProfilesMaster( profilesMaster );
-                    selectedProfile.setAgentId( individualProfile.getIden() );
-
-                    List<SocialPost> posts = profileManagementService.getSocialPosts( selectedProfile, -1,
-                        CommonConstants.USER_AGENT_NUMBER_POST );
+					List<SocialPost> posts = profileManagementService.getSocialPosts(individualProfile.getIden(), CommonConstants.AGENT_ID_COLUMN,
+							-1, CommonConstants.USER_AGENT_NUMBER_POST);
                     model.addAttribute( "posts", posts );
                 }
 

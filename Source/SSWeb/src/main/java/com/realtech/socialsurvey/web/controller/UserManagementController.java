@@ -32,15 +32,14 @@ import com.realtech.socialsurvey.core.dao.OrganizationUnitSettingsDao;
 import com.realtech.socialsurvey.core.dao.impl.MongoOrganizationUnitSettingDaoImpl;
 import com.realtech.socialsurvey.core.entities.AgentSettings;
 import com.realtech.socialsurvey.core.entities.Branch;
-import com.realtech.socialsurvey.core.entities.BranchFromSearch;
 import com.realtech.socialsurvey.core.entities.ContactDetailsSettings;
 import com.realtech.socialsurvey.core.entities.LicenseDetail;
 import com.realtech.socialsurvey.core.entities.LockSettings;
 import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
-import com.realtech.socialsurvey.core.entities.RegionFromSearch;
 import com.realtech.socialsurvey.core.entities.User;
 import com.realtech.socialsurvey.core.entities.UserAssignment;
 import com.realtech.socialsurvey.core.entities.UserFromSearch;
+import com.realtech.socialsurvey.core.entities.UserHierarchyAssignments;
 import com.realtech.socialsurvey.core.entities.UserProfile;
 import com.realtech.socialsurvey.core.entities.UserSettings;
 import com.realtech.socialsurvey.core.enums.AccountType;
@@ -1098,7 +1097,7 @@ public class UserManagementController
 			redirectAttributes.addFlashAttribute("showSendSurveyPopup", String.valueOf(showSendSurveyPopup));
 
 			// updating session with aggregated user profiles, if not set
-			sessionHelper.updateProcessedUserProfiles(session, user);
+			sessionHelper.processAssignments(session, user);
 
 			// update the last login time and number of logins
 			userManagementService.updateUserLoginTimeAndNum(user);
@@ -1113,54 +1112,64 @@ public class UserManagementController
 		return "redirect:/" + JspResolver.LANDING + ".do";
 	}
 
+	@RequestMapping(value = "/showlinkedindatacompare")
+	public String showLinkedInDataCompare(Model model, HttpServletRequest request) {
+		LOG.info("Method showLinkedInDataCompare() called");
+		HttpSession session = request.getSession(false);
 
-    @RequestMapping ( value = "/showlinkedindatacompare")
-    public String showLinkedInDataCompare( Model model, HttpServletRequest request )
-    {
-        LOG.info( "Method showLinkedInDataCompare() called" );
-        HttpSession session = request.getSession( false );
+		User user = sessionHelper.getCurrentUser();
+		AccountType accountType = (AccountType) session.getAttribute(CommonConstants.ACCOUNT_TYPE_IN_SESSION);
+		UserSettings userSettings = (UserSettings) session.getAttribute(CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION);
+		long entityId = (long) session.getAttribute(CommonConstants.ENTITY_ID_COLUMN);
+		String entityType = (String) session.getAttribute(CommonConstants.ENTITY_TYPE_COLUMN);
 
-        User user = sessionHelper.getCurrentUser();
-        AccountType accountType = (AccountType) session.getAttribute( CommonConstants.ACCOUNT_TYPE_IN_SESSION );
-        UserSettings userSettings = (UserSettings) session.getAttribute( CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION );
-        UserProfile selectedProfile = (UserProfile) session.getAttribute( CommonConstants.USER_PROFILE );
+		long branchId = 0;
+		long regionId = 0;
+		int profilesMaster = 0;
+		if (entityType.equals(CommonConstants.COMPANY_ID_COLUMN)) {
+			model.addAttribute("columnName", entityType);
+			profilesMaster = CommonConstants.PROFILES_MASTER_COMPANY_ADMIN_PROFILE_ID;
+		}
+		else if (entityType.equals(CommonConstants.REGION_ID_COLUMN)) {
+			model.addAttribute("columnName", entityType);
+			profilesMaster = CommonConstants.PROFILES_MASTER_REGION_ADMIN_PROFILE_ID;
+			regionId = entityId;
+		}
+		else if (entityType.equals(CommonConstants.BRANCH_ID_COLUMN)) {
+			model.addAttribute("columnName", entityType);
+			profilesMaster = CommonConstants.PROFILES_MASTER_BRANCH_ADMIN_PROFILE_ID;
+			branchId = entityId;
+		}
+		else if (entityType.equals(CommonConstants.AGENT_ID_COLUMN)) {
+			model.addAttribute("columnName", CommonConstants.AGENT_ID_COLUMN);
+			profilesMaster = CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID;
+		}
 
-        long branchId = 0;
-        long regionId = 0;
-        int profilesMaster = 0;
-        if ( selectedProfile != null ) {
-            branchId = selectedProfile.getBranchId();
-            regionId = selectedProfile.getRegionId();
-            profilesMaster = selectedProfile.getProfilesMaster().getProfileId();
-        }
+		// Setting userSettings in session
+		OrganizationUnitSettings profileSettings = null;
+		try {
+			profileSettings = profileManagementService.aggregateUserProfile(user, accountType, userSettings, branchId, regionId, profilesMaster);
+		}
+		catch (InvalidInputException | NoRecordsFetchedException e) {
+			LOG.error("InvalidInputException while fetching profile. Reason :" + e.getMessage(), e);
+			model.addAttribute("message", messageUtils.getDisplayMessage(e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE));
+		}
+		session.setAttribute(CommonConstants.USER_PROFILE_SETTINGS, profileSettings);
 
-        // Setting userSettings in session
-        OrganizationUnitSettings profileSettings = null;
-        try {
-            profileSettings = profileManagementService.aggregateUserProfile( user, accountType, userSettings, branchId,
-                regionId, profilesMaster );
-        } catch ( InvalidInputException e ) {
-            LOG.error( "InvalidInputException while fetching profile. Reason :" + e.getMessage(), e );
-            model
-                .addAttribute( "message", messageUtils.getDisplayMessage( e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE ) );
-        }
-        session.setAttribute( CommonConstants.USER_PROFILE_SETTINGS, profileSettings );
+		// Setting parentLock in session
+		LockSettings parentLock = null;
+		try {
+			parentLock = profileManagementService.aggregateParentLockSettings(user, accountType, userSettings, branchId, regionId, profilesMaster);
+		}
+		catch (InvalidInputException | NoRecordsFetchedException e) {
+			LOG.error("InvalidInputException while fetching profile. Reason :" + e.getMessage(), e);
+			model.addAttribute("message", messageUtils.getDisplayMessage(e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE));
+		}
+		session.setAttribute(CommonConstants.PARENT_LOCK, parentLock);
 
-        // Setting parentLock in session
-        LockSettings parentLock = null;
-        try {
-            parentLock = profileManagementService.aggregateParentLockSettings( user, accountType, userSettings, branchId,
-                regionId, profilesMaster );
-        } catch ( InvalidInputException e ) {
-            LOG.error( "InvalidInputException while fetching profile. Reason :" + e.getMessage(), e );
-            model
-                .addAttribute( "message", messageUtils.getDisplayMessage( e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE ) );
-        }
-        session.setAttribute( CommonConstants.PARENT_LOCK, parentLock );
-
-        LOG.info( "Method showLinkedInDataCompare() finished" );
-        return JspResolver.LINKEDIN_COMPARE;
-    }
+		LOG.info("Method showLinkedInDataCompare() finished");
+		return JspResolver.LINKEDIN_COMPARE;
+	}
 
 
     @ResponseBody
@@ -1275,146 +1284,149 @@ public class UserManagementController
     }
 
 
-    @SuppressWarnings ( "unchecked")
-    @RequestMapping ( value = "/finduserassignments", method = RequestMethod.GET)
-    public String getUserAssignments( Model model, HttpServletRequest request )
-    {
-        LOG.info( "Method getUserAssignments() called from UserManagementController" );
-        HttpSession session = request.getSession();
+	@RequestMapping(value = "/finduserassignments", method = RequestMethod.GET)
+	public String getUserAssignments(Model model, HttpServletRequest request) {
+		LOG.info("Method getUserAssignments() called from UserManagementController");
+		HttpSession session = request.getSession();
 
-        try {
-            long userId = 0l;
-            try {
-                userId = Long.parseLong( request.getParameter( "userId" ) );
-            } catch ( NumberFormatException e ) {
-                throw new InvalidInputException( "NumberFormatException while parsing userId.Reason: " + e.getMessage(),
-                    DisplayMessageConstants.GENERAL_ERROR, e );
-            }
-            User user = null;
-            try {
-                user = userManagementService.getUserByUserId( userId );
-            } catch ( InvalidInputException e ) {
-                throw new InvalidInputException( "InvalidInputException while getting user.Reason: " + e.getMessage(),
-                    DisplayMessageConstants.GENERAL_ERROR, e );
-            }
+		try {
+			long userId = 0l;
+			try {
+				userId = Long.parseLong(request.getParameter("userId"));
+			}
+			catch (NumberFormatException e) {
+				throw new InvalidInputException("NumberFormatException while parsing userId.Reason: " + e.getMessage(),
+						DisplayMessageConstants.GENERAL_ERROR, e);
+			}
+			User user = null;
+			try {
+				user = userManagementService.getUserByUserId(userId);
+			}
+			catch (InvalidInputException e) {
+				throw new InvalidInputException("InvalidInputException while getting user.Reason: " + e.getMessage(),
+						DisplayMessageConstants.GENERAL_ERROR, e);
+			}
 
-            Map<Long, RegionFromSearch> regions = (Map<Long, RegionFromSearch>) session
-                .getAttribute( CommonConstants.REGIONS_IN_SESSION );
-            Map<Long, BranchFromSearch> branches = (Map<Long, BranchFromSearch>) session
-                .getAttribute( CommonConstants.BRANCHES_IN_SESSION );
+			UserHierarchyAssignments assignments = (UserHierarchyAssignments) session.getAttribute(CommonConstants.USER_ASSIGNMENTS);
+			Map<Long, String> regions = assignments.getRegions();
+			Map<Long, String> branches = assignments.getBranches();
 
-            List<UserAssignment> userAssignments = new ArrayList<UserAssignment>();
-            for ( UserProfile userProfile : user.getUserProfiles() ) {
-                // Check if profile is complete
-                if ( userProfile.getIsProfileComplete() != CommonConstants.PROCESS_COMPLETE ) {
-                    continue;
-                }
-                UserAssignment assignment = new UserAssignment();
-                assignment.setUserId( user.getUserId() );
-                assignment.setProfileId( userProfile.getUserProfileId() );
-                assignment.setStatus( userProfile.getStatus() );
+			String branchName = "";
+			String regionName = "";
+			List<UserAssignment> userAssignments = new ArrayList<UserAssignment>();
+			for (UserProfile userProfile : user.getUserProfiles()) {
+				// Check if profile is complete
+				if (userProfile.getIsProfileComplete() != CommonConstants.PROCESS_COMPLETE) {
+					continue;
+				}
+				UserAssignment assignment = new UserAssignment();
+				assignment.setUserId(user.getUserId());
+				assignment.setProfileId(userProfile.getUserProfileId());
+				assignment.setStatus(userProfile.getStatus());
 
-                long regionId;
-                long branchId;
-                RegionFromSearch region = null;
-                BranchFromSearch branch = null;
-                int profileMaster = userProfile.getProfilesMaster().getProfileId();
-                switch ( profileMaster ) {
-                    case CommonConstants.PROFILES_MASTER_REGION_ADMIN_PROFILE_ID:
-                        regionId = userProfile.getRegionId();
-                        if ( regionId != 0l ) {
-                            region = regions.get( regionId );
-                        }
+				long regionId;
+				long branchId;
+				int profileMaster = userProfile.getProfilesMaster().getProfileId();
+				switch (profileMaster) {
+					case CommonConstants.PROFILES_MASTER_REGION_ADMIN_PROFILE_ID:
+						regionId = userProfile.getRegionId();
+						if (regionId == 0l) {
+							continue;
+						}
 
-                        // if region is not default
-                        if ( region.getIsDefaultBySystem() != CommonConstants.YES ) {
-                            assignment.setEntityId( regionId );
-                            assignment.setEntityName( region.getRegionName() );
-                        }
-                        // if region is default
-                        else {
-                            continue;
-                        }
-                        assignment.setRole( ROLE_ADMIN );
+						// if region is not default
+						regionName = regions.get(regionId);
+						if (regionName != null) {
+							assignment.setEntityId(regionId);
+							assignment.setEntityName(regionName);
+						}
+						// if region is default
+						else {
+							continue;
+						}
+						assignment.setRole(ROLE_ADMIN);
 
-                        break;
+						break;
 
-                    case CommonConstants.PROFILES_MASTER_BRANCH_ADMIN_PROFILE_ID:
-                        branchId = userProfile.getBranchId();
-                        if ( branchId != 0l ) {
-                            branch = branches.get( branchId );
-                        }
+					case CommonConstants.PROFILES_MASTER_BRANCH_ADMIN_PROFILE_ID:
+						branchId = userProfile.getBranchId();
+						if (branchId == 0l) {
+							continue;
+						}
 
-                        // if branch is not default
-                        if ( branch.getIsDefaultBySystem() != CommonConstants.YES ) {
-                            assignment.setEntityId( branchId );
-                            assignment.setEntityName( branch.getBranchName() );
-                        }
-                        // if branch is default
-                        else {
-                            continue;
-                        }
-                        assignment.setRole( ROLE_ADMIN );
+						// if branch is not default
+						branchName = branches.get(branchId);
+						if (branchName != null) {
+							assignment.setEntityId(branchId);
+							assignment.setEntityName(branchName);
+						}
+						// if branch is default
+						else {
+							continue;
+						}
+						assignment.setRole(ROLE_ADMIN);
 
-                        break;
+						break;
 
-                    case CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID:
-                        branchId = userProfile.getBranchId();
-                        if ( branchId != 0l ) {
-                            branch = branches.get( branchId );
-                        }
+					case CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID:
+						branchId = userProfile.getBranchId();
+						if (branchId == 0l) {
+							continue;
+						}
 
-                        // if branch is not default
-                        if ( branch.getIsDefaultBySystem() != CommonConstants.YES ) {
-                            assignment.setEntityId( branchId );
-                            assignment.setEntityName( branch.getBranchName() );
-                        }
-                        // if branch is default
-                        else {
-                            regionId = userProfile.getRegionId();
-                            if ( regionId != 0l ) {
-                                region = regions.get( regionId );
-                            }
+						// if branch is not default
+						branchName = branches.get(branchId);
+						if (branchName != null) {
+							assignment.setEntityId(branchId);
+							assignment.setEntityName(branchName);
+						}
+						// if branch is default
+						else {
+							regionId = userProfile.getRegionId();
+							if (regionId == 0l) {
+								continue;
+							}
 
-                            // if region is not default
-                            if ( region.getIsDefaultBySystem() != 1 ) {
-                                assignment.setEntityId( regionId );
-                                assignment.setEntityName( region.getRegionName() );
-                            }
-                            // if region is default
-                            else {
-                                assignment.setEntityId( user.getCompany().getCompanyId() );
-                                assignment.setEntityName( user.getCompany().getCompany() );
-                            }
-                        }
-                        assignment.setRole( ROLE_USER );
-                        break;
+							// if region is not default
+							regionName = regions.get(regionId);
+							if (regionName != null) {
+								assignment.setEntityId(regionId);
+								assignment.setEntityName(regionName);
+							}
+							// if region is default
+							else {
+								assignment.setEntityId(user.getCompany().getCompanyId());
+								assignment.setEntityName(user.getCompany().getCompany());
+							}
+						}
+						assignment.setRole(ROLE_USER);
+						break;
 
-                    default:
-                }
-                userAssignments.add( assignment );
-            }
+					default:
+				}
+				userAssignments.add(assignment);
+			}
 
-            // set the request parameters in model
-            model.addAttribute( "firstName", user.getFirstName() );
-            model.addAttribute( "lastName", user.getLastName() );
-            model.addAttribute( "emailId", user.getEmailId() );
-            model.addAttribute( "userId", user.getUserId() );
-            model.addAttribute( "status", user.getStatus() );
+			// set the request parameters in model
+			model.addAttribute("firstName", user.getFirstName());
+			model.addAttribute("lastName", user.getLastName());
+			model.addAttribute("emailId", user.getEmailId());
+			model.addAttribute("userId", user.getUserId());
+			model.addAttribute("status", user.getStatus());
 
-            // returning in descending order
-            Collections.reverse( userAssignments );
-            model.addAttribute( "profiles", userAssignments );
-        } catch ( NonFatalException e ) {
-            LOG.error( "NonFatalException while finding user assignments Reason : " + e.getMessage(), e );
-            model
-                .addAttribute( "message", messageUtils.getDisplayMessage( e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE ) );
-            return JspResolver.MESSAGE_HEADER;
-        }
+			// returning in descending order
+			Collections.reverse(userAssignments);
+			model.addAttribute("profiles", userAssignments);
+		}
+		catch (NonFatalException e) {
+			LOG.error("NonFatalException while finding user assignments Reason : " + e.getMessage(), e);
+			model.addAttribute("message", messageUtils.getDisplayMessage(e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE));
+			return JspResolver.MESSAGE_HEADER;
+		}
 
-        LOG.info( "Method getUserAssignments() finished from UserManagementController" );
-        return JspResolver.USER_MANAGEMENT_EDIT_USER_DETAILS;
-    }
+		LOG.info("Method getUserAssignments() finished from UserManagementController");
+		return JspResolver.USER_MANAGEMENT_EDIT_USER_DETAILS;
+	}
 
 
     @ResponseBody
@@ -1518,7 +1530,7 @@ public class UserManagementController
             User updatedUser = userManagementService.getUserByProfileId( profileId );
             if ( user.getUserId() == updatedUser.getUserId() ) {
                 try {
-                    sessionHelper.updateProcessedUserProfiles( request.getSession( false ), user );
+                    sessionHelper.processAssignments( request.getSession( false ), user );
                 } catch ( NonFatalException e ) {
                     LOG.error( "NonFatalException while logging in. Reason : " + e.getMessage(), e );
                 }
