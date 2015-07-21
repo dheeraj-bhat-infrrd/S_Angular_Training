@@ -5,7 +5,7 @@
 <!-- Setting common page variables -->
 <c:set value="${sessionScope.SPRING_SECURITY_CONTEXT.authentication.principal}" var="user" />
 <c:set value="${user.company.licenseDetails[0].accountsMaster.accountsMasterId}" var="accountMasterId"/>
-<c:if test="${not empty profile && not empty profileSettings.completeProfileUrl}">
+<c:if test="${not empty profileSettings.completeProfileUrl}">
 	<c:set value="${profileSettings.completeProfileUrl}" var="completeProfileUrl"></c:set>
 </c:if>
 <c:if test="${not empty profileSettings && not empty profileSettings.contact_details}">
@@ -76,13 +76,13 @@
 				<input type="hidden" id="company-profile-name" value="${profileSettings.profileName}">
 			</c:when>
 			<c:when test="${profilemasterid == 2}">
-				<input type="hidden" id="prof-region-id" value="${profile.regionId}">
+				<input type="hidden" id="prof-region-id" value="${entityId}">
 			</c:when>
 			<c:when test="${profilemasterid == 3}">
-				<input type="hidden" id="prof-branch-id" value="${profile.branchId}">
+				<input type="hidden" id="prof-branch-id" value="${entityId}">
 			</c:when>
 			<c:when test="${profilemasterid == 4}">
-				<input type="hidden" id="prof-agent-id" value="${profile.agentId}">
+				<input type="hidden" id="prof-agent-id" value="${entityId}">
 			</c:when>
 		</c:choose>
 		<input type="hidden" id="profile-id" value="${profile.userProfileId}"/>

@@ -40,9 +40,9 @@ import com.realtech.socialsurvey.core.entities.SurveyDetails;
 import com.realtech.socialsurvey.core.entities.SurveyPreInitiation;
 import com.realtech.socialsurvey.core.entities.SurveyRecipient;
 import com.realtech.socialsurvey.core.entities.User;
-import com.realtech.socialsurvey.core.entities.UserProfile;
-import com.realtech.socialsurvey.core.entities.UserSettings;
+import com.realtech.socialsurvey.core.enums.DisplayMessageType;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
+import com.realtech.socialsurvey.core.exception.NoRecordsFetchedException;
 import com.realtech.socialsurvey.core.exception.NonFatalException;
 import com.realtech.socialsurvey.core.services.generator.URLGenerator;
 import com.realtech.socialsurvey.core.services.mail.EmailServices;
@@ -147,133 +147,119 @@ public class DashboardController {
      * Method to get profile details for displaying
      */
     @RequestMapping(value = "/profiledetails")
-    public String getProfileDetails(Model model, HttpServletRequest request) {
-        LOG.info("Method to get profile of company/region/branch/agent getProfileDetails() started");
-        User user = sessionHelper.getCurrentUser();
-        UserSettings userSettings = (UserSettings) request
-                .getSession(false)
-                .getAttribute(CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION);
+	public String getProfileDetails(Model model, HttpServletRequest request) {
+		LOG.info("Method to get profile of company/region/branch/agent getProfileDetails() started");
+		User user = sessionHelper.getCurrentUser();
 
-        // settings profile details
-        String columnName = request.getParameter("columnName");
-        String realtechAdminStr = request.getParameter("realtechAdmin");
-        boolean realtechAdmin = false;
+		// settings profile details
+		String columnName = request.getParameter("columnName");
+		String realtechAdminStr = request.getParameter("realtechAdmin");
+		boolean realtechAdmin = false;
 
-        OrganizationUnitSettings unitSettings;
-        long columnValue = 0;
-        if (columnName.equalsIgnoreCase(CommonConstants.COMPANY_ID_COLUMN)) {
-            columnValue = user.getCompany().getCompanyId();
+		OrganizationUnitSettings unitSettings = null;
+		long columnValue = 0;
+		try {
+			if (columnName.equalsIgnoreCase(CommonConstants.COMPANY_ID_COLUMN)) {
+				columnValue = user.getCompany().getCompanyId();
 
-            unitSettings = userSettings.getCompanySettings();
-            if (unitSettings.getContact_details() != null
-                    && unitSettings.getContact_details().getName() != null) {
-                model.addAttribute("name", unitSettings.getContact_details()
-                        .getName());
-            }
-            model.addAttribute("title",
-                    getTitle(request, columnName, columnValue, user));
-        } else if (columnName
-                .equalsIgnoreCase(CommonConstants.REGION_ID_COLUMN)) {
-            try {
-                columnValue = Long.parseLong(request
-                        .getParameter("columnValue"));
-            } catch (NumberFormatException e) {
-                LOG.error("NumberFormatException caught in getProfileDetails() while converting columnValue for regionId/branchId/agentId.");
-                throw e;
-            }
+				unitSettings = organizationManagementService.getCompanySettings(columnValue);
+				if (unitSettings.getContact_details() != null && unitSettings.getContact_details().getName() != null) {
+					model.addAttribute("name", unitSettings.getContact_details().getName());
+				}
+				model.addAttribute("title", unitSettings.getContact_details().getTitle());
+			}
+			else if (columnName.equalsIgnoreCase(CommonConstants.REGION_ID_COLUMN)) {
+				try {
+					columnValue = Long.parseLong(request.getParameter("columnValue"));
+				}
+				catch (NumberFormatException e) {
+					LOG.error("NumberFormatException caught in getProfileDetails() while converting columnValue for regionId/branchId/agentId.");
+					throw e;
+				}
 
-            unitSettings = userSettings.getRegionSettings().get(columnValue);
-            if (unitSettings.getContact_details() != null
-                    && unitSettings.getContact_details().getName() != null) {
-                model.addAttribute("name", unitSettings.getContact_details()
-                        .getName());
-            }
-            model.addAttribute("title",
-                    getTitle(request, columnName, columnValue, user));
-            model.addAttribute("company", user.getCompany().getCompany());
-        } else if (columnName
-                .equalsIgnoreCase(CommonConstants.BRANCH_ID_COLUMN)) {
-            try {
-                columnValue = Long.parseLong(request
-                        .getParameter("columnValue"));
-            } catch (NumberFormatException e) {
-                LOG.error("NumberFormatException caught in getProfileDetails() while converting columnValue for regionId/branchId/agentId.");
-                throw e;
-            }
+				unitSettings = organizationManagementService.getRegionSettings(columnValue);
+				if (unitSettings.getContact_details() != null && unitSettings.getContact_details().getName() != null) {
+					model.addAttribute("name", unitSettings.getContact_details().getName());
+				}
+				model.addAttribute("title", unitSettings.getContact_details().getTitle());
+				model.addAttribute("company", user.getCompany().getCompany());
+			}
+			else if (columnName.equalsIgnoreCase(CommonConstants.BRANCH_ID_COLUMN)) {
+				try {
+					columnValue = Long.parseLong(request.getParameter("columnValue"));
+				}
+				catch (NumberFormatException e) {
+					LOG.error("NumberFormatException caught in getProfileDetails() while converting columnValue for regionId/branchId/agentId.");
+					throw e;
+				}
 
-            unitSettings = userSettings.getBranchSettings().get(columnValue);
-            if (unitSettings.getContact_details() != null
-                    && unitSettings.getContact_details().getName() != null) {
-                model.addAttribute("name", unitSettings.getContact_details()
-                        .getName());
-            }
-            model.addAttribute("title",
-                    getTitle(request, columnName, columnValue, user));
-            model.addAttribute("company", user.getCompany().getCompany());
-        } else if (columnName.equalsIgnoreCase(CommonConstants.AGENT_ID_COLUMN)) {
-            columnValue = user.getUserId();
-            model.addAttribute("name",
-                    user.getFirstName()
-                            + " "
-                            + (user.getLastName() != null ? user.getLastName()
-                                    : ""));
-            model.addAttribute("title",
-                    getTitle(request, columnName, columnValue, user));
-            model.addAttribute("company", user.getCompany().getCompany());
-        } else if (realtechAdminStr != null && !realtechAdminStr.isEmpty()) {
-            realtechAdmin = Boolean.parseBoolean(realtechAdminStr);
-        }
+				unitSettings = organizationManagementService.getBranchSettingsDefault(columnValue);
+				if (unitSettings.getContact_details() != null && unitSettings.getContact_details().getName() != null) {
+					model.addAttribute("name", unitSettings.getContact_details().getName());
+				}
+				model.addAttribute("title", unitSettings.getContact_details().getTitle());
+				model.addAttribute("company", user.getCompany().getCompany());
+			}
+			else if (columnName.equalsIgnoreCase(CommonConstants.AGENT_ID_COLUMN)) {
+				columnValue = user.getUserId();
+				
+				unitSettings = userManagementService.getUserSettings(columnValue);
+				model.addAttribute("name", user.getFirstName() + " " + (user.getLastName() != null ? user.getLastName() : ""));
+				model.addAttribute("title", unitSettings.getContact_details().getTitle());
+				model.addAttribute("company", user.getCompany().getCompany());
+			}
+			else if (realtechAdminStr != null && !realtechAdminStr.isEmpty()) {
+				realtechAdmin = Boolean.parseBoolean(realtechAdminStr);
+			}
+		}
+		catch (InvalidInputException | NoRecordsFetchedException e) {
+			LOG.error("NonFatalException while fetching profile details. Reason :" + e.getMessage(), e);
+			model.addAttribute("message",
+					messageUtils.getDisplayMessage(DisplayMessageConstants.GENERAL_ERROR, DisplayMessageType.ERROR_MESSAGE));
+			return JspResolver.MESSAGE_HEADER;
+		}
 
-        // calculating details for circles
-        int numberOfDays = 30;
-        try {
-            if (request.getParameter("numberOfDays") != null) {
-                numberOfDays = Integer.parseInt(request
-                        .getParameter("numberOfDays"));
-            }
-        } catch (NumberFormatException e) {
-            LOG.error("NumberFormatException caught in getProfileDetails() while converting numberOfDays.");
-            throw e;
-        }
+		// calculating details for circles
+		int numberOfDays = 30;
+		try {
+			if (request.getParameter("numberOfDays") != null) {
+				numberOfDays = Integer.parseInt(request.getParameter("numberOfDays"));
+			}
+		}
+		catch (NumberFormatException e) {
+			LOG.error("NumberFormatException caught in getProfileDetails() while converting numberOfDays.");
+			throw e;
+		}
 
-        if(realtechAdmin)
-            columnName = null;
-        double surveyScore = (double) Math.round(dashboardService
-                .getSurveyScore(columnName, columnValue, numberOfDays,
-                        realtechAdmin) * 1000.0) / 1000.0;
-        int sentSurveyCount = (int) dashboardService
-                .getAllSurveyCountForPastNdays(columnName, columnValue,
-                        numberOfDays);
-        int socialPostsCount = (int) dashboardService
-                .getSocialPostsForPastNdays(columnName, columnValue,
-                        numberOfDays);
-        int profileCompleteness = 0;
-        if (!realtechAdmin)
-            profileCompleteness = dashboardService
-                    .getProfileCompletionPercentage(user, columnName,
-                            columnValue, userSettings);
+		if (realtechAdmin)
+			columnName = null;
+		double surveyScore = (double) Math.round(dashboardService.getSurveyScore(columnName, columnValue, numberOfDays, realtechAdmin) * 1000.0) / 1000.0;
+		int sentSurveyCount = (int) dashboardService.getAllSurveyCountForPastNdays(columnName, columnValue, numberOfDays);
+		int socialPostsCount = (int) dashboardService.getSocialPostsForPastNdays(columnName, columnValue, numberOfDays);
+		int profileCompleteness = 0;
+		if (!realtechAdmin)
+			profileCompleteness = dashboardService.getProfileCompletionPercentage(user, columnName, columnValue, unitSettings);
 
-        model.addAttribute("socialScore", surveyScore);
-        if (sentSurveyCount > 999)
-            model.addAttribute("surveyCount", "1K+");
-        else
-            model.addAttribute("surveyCount", sentSurveyCount);
+		model.addAttribute("socialScore", surveyScore);
+		if (sentSurveyCount > 999)
+			model.addAttribute("surveyCount", "1K+");
+		else
+			model.addAttribute("surveyCount", sentSurveyCount);
 
-        if (socialPostsCount > 999)
-            model.addAttribute("socialPosts", "1K+");
-        else
-            model.addAttribute("socialPosts", socialPostsCount);
+		if (socialPostsCount > 999)
+			model.addAttribute("socialPosts", "1K+");
+		else
+			model.addAttribute("socialPosts", socialPostsCount);
 
-        model.addAttribute("profileCompleteness", profileCompleteness);
-        model.addAttribute("badges", dashboardService.getBadges(surveyScore,
-                sentSurveyCount, socialPostsCount, profileCompleteness));
+		model.addAttribute("profileCompleteness", profileCompleteness);
+		model.addAttribute("badges", dashboardService.getBadges(surveyScore, sentSurveyCount, socialPostsCount, profileCompleteness));
 
-        model.addAttribute("columnName", columnName);
-        model.addAttribute("columnValue", columnValue);
+		model.addAttribute("columnName", columnName);
+		model.addAttribute("columnValue", columnValue);
 
-        LOG.info("Method to get profile of company/region/branch/agent getProfileDetails() finished");
-        return JspResolver.DASHBOARD_PROFILEDETAIL;
-    }
+		LOG.info("Method to get profile of company/region/branch/agent getProfileDetails() finished");
+		return JspResolver.DASHBOARD_PROFILEDETAIL;
+	}
 
     /*
      * Method to get survey details for showing details
@@ -1496,109 +1482,46 @@ public class DashboardController {
         return "Success";
     }
 
-    @ResponseBody
-    @RequestMapping(value = "/dashboardbuttonsorder", method = RequestMethod.GET)
-    public String getDashboardButtonsOrder(HttpServletRequest request) {
-        LOG.info("Method sendMultipleSurveyInvitations() called from DashboardController.");
-        String columnName = request.getParameter("columnName");
-        String columnValueStr = request.getParameter("columnValue");
-        long columnValue = Long.parseLong(columnValueStr);
-        UserSettings userSettings = (UserSettings) request
-                .getSession(false)
-                .getAttribute(CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION);
-        List<ProfileStage> stages = new ArrayList<>();
-        if (userSettings != null) {
-            if (columnName.equalsIgnoreCase(CommonConstants.COMPANY_ID_COLUMN)) {
-                if (userSettings.getCompanySettings() != null)
-                    stages = new ArrayList<>(userSettings.getCompanySettings()
-                            .getProfileStages());
-            } else if (columnName
-                    .equalsIgnoreCase(CommonConstants.REGION_ID_COLUMN)) {
-                if (userSettings.getRegionSettings() != null)
-                    stages = new ArrayList<>(userSettings.getRegionSettings()
-                            .get(columnValue).getProfileStages());
-            } else if (columnName
-                    .equalsIgnoreCase(CommonConstants.BRANCH_ID_COLUMN)) {
-                if (userSettings.getBranchSettings() != null)
-                    stages = new ArrayList<>(userSettings.getBranchSettings()
-                            .get(columnValue).getProfileStages());
-            } else if (columnName
-                    .equalsIgnoreCase(CommonConstants.AGENT_ID_COLUMN)) {
-                if (userSettings.getAgentSettings() != null)
-                    stages = new ArrayList<>(userSettings.getAgentSettings()
-                            .getProfileStages());
-            }
-        }
-        Collections.sort(stages);
-        for (int index = stages.size() - 1; index >= 0; index--) {
-            if (stages.get(index).getStatus() == CommonConstants.STATUS_INACTIVE)
-                stages.remove(index);
-        }
-        Map<String, Object> stagesAndColumn = new HashMap<>();
-        stagesAndColumn.put("columnName", columnName);
-        stagesAndColumn.put("columnValue", columnValue);
-        stagesAndColumn.put("stages", stages);
-        String stagesJson = new Gson().toJson(stagesAndColumn);
-        LOG.info("Method sendMultipleSurveyInvitations() finished from DashboardController.");
-        return stagesJson;
-    }
+	@ResponseBody
+	@RequestMapping(value = "/dashboardbuttonsorder", method = RequestMethod.GET)
+	public String getDashboardButtonsOrder(HttpServletRequest request) {
+		LOG.info("Method sendMultipleSurveyInvitations() called from DashboardController.");
+		String columnName = request.getParameter("columnName");
+		String columnValueStr = request.getParameter("columnValue");
+		long columnValue = Long.parseLong(columnValueStr);
 
-    // Method to return title for logged in user.
-    // It returns title for various fields e.g. company, region, branch and
-    // agent.
-    private String getTitle(HttpServletRequest request, String field,
-            long value, User user) {
-        LOG.debug("Method to find title for " + field + " started.");
-        String title = "";
-        try {
-            UserSettings userSettings = (UserSettings) request
-                    .getSession(false).getAttribute(
-                            CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION);
-            switch (field) {
-            case CommonConstants.COMPANY_ID_COLUMN:
-                title = userSettings.getCompanySettings().getContact_details()
-                        .getTitle();
-                break;
-            case CommonConstants.REGION_ID_COLUMN:
-                OrganizationUnitSettings regionSettings = userSettings
-                        .getRegionSettings().get(value);
-                title = regionSettings.getContact_details().getTitle();
-                break;
-            case CommonConstants.BRANCH_ID_COLUMN:
-                OrganizationUnitSettings branchSettings = userSettings
-                        .getBranchSettings().get(value);
-                title = branchSettings.getContact_details().getTitle();
-                break;
-            case CommonConstants.AGENT_ID_COLUMN:
-                for (UserProfile userProfile : user.getUserProfiles()) {
-                    if (userProfile.getBranchId() == value) {
-                        AgentSettings agentSettings = userSettings
-                                .getAgentSettings();
-                        if (agentSettings != null)
-                            title = agentSettings.getContact_details()
-                                    .getTitle();
-                    }
-                }
-                break;
-            default:
-                LOG.error("Invalid value " + field
-                        + " passed for field. It should be either of "
-                        + CommonConstants.COMPANY_ID_COLUMN
-                        + CommonConstants.FILE_SEPARATOR
-                        + CommonConstants.REGION_ID_COLUMN
-                        + CommonConstants.FILE_SEPARATOR
-                        + CommonConstants.BRANCH_ID_COLUMN
-                        + CommonConstants.FILE_SEPARATOR
-                        + CommonConstants.AGENT_ID_COLUMN);
-            }
-        } catch (NullPointerException e) {
-            LOG.error(
-                    "Null Pointer exception caught in getProfileDetails() while fetching designation of agent. Nested exception is ",
-                    e);
-        }
-        LOG.debug("Method to find title for " + field + " finished.");
-        return title;
-    }
+		List<ProfileStage> stages = new ArrayList<>();
+		try {
+			if (columnName.equalsIgnoreCase(CommonConstants.COMPANY_ID_COLUMN)) {
+				stages = new ArrayList<>(organizationManagementService.getCompanySettings(columnValue).getProfileStages());
+			}
+			else if (columnName.equalsIgnoreCase(CommonConstants.REGION_ID_COLUMN)) {
+				stages = new ArrayList<>(organizationManagementService.getRegionSettings(columnValue).getProfileStages());
+			}
+			else if (columnName.equalsIgnoreCase(CommonConstants.BRANCH_ID_COLUMN)) {
+				stages = new ArrayList<>(organizationManagementService.getBranchSettingsDefault(columnValue).getProfileStages());
+			}
+			else if (columnName.equalsIgnoreCase(CommonConstants.AGENT_ID_COLUMN)) {
+				stages = new ArrayList<>(userManagementService.getUserSettings(columnValue).getProfileStages());
+			}
+		}
+		catch (InvalidInputException | NoRecordsFetchedException e) {
+			LOG.error("NonFatalException while fetching badge details. Reason :" + e.getMessage(), e);
+		}
+		Collections.sort(stages);
+		for (int index = stages.size() - 1; index >= 0; index--) {
+			if (stages.get(index).getStatus() == CommonConstants.STATUS_INACTIVE)
+				stages.remove(index);
+		}
+
+		Map<String, Object> stagesAndColumn = new HashMap<>();
+		stagesAndColumn.put("columnName", columnName);
+		stagesAndColumn.put("columnValue", columnValue);
+		stagesAndColumn.put("stages", stages);
+
+		LOG.info("Method sendMultipleSurveyInvitations() finished from DashboardController.");
+		return new Gson().toJson(stagesAndColumn);
+	}
 
     private String getProfileLevel(String columnName) {
         LOG.debug("Method to return profile level based upon column to be queried started.");
@@ -1732,35 +1655,37 @@ public class DashboardController {
         }
     }
     
-    
-    @RequestMapping(value = "/fetchsociallinksinpopup")
-    public String fetchSocialLinksInPopup(HttpServletRequest request, Model model) {
-    	LOG.info("Method fetchSocialLinksInPopup() called");
-    	
-    	HttpSession session = request.getSession();
-		
-        UserSettings userSettings = (UserSettings) session.getAttribute( CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION );
-        OrganizationUnitSettings unitSettings = null;
-        unitSettings = userSettings.getAgentSettings();
-        
-        SocialMediaTokens tokens = unitSettings.getSocialMediaTokens(); 
-        
-        if (tokens != null) {
-        	if (tokens.getFacebookToken() != null && tokens.getFacebookToken().getFacebookPageLink() != null ){
-        		model.addAttribute("facebookProfileUrl", tokens.getFacebookToken().getFacebookPageLink());
-        	}
-        	if (tokens.getGoogleToken() != null && tokens.getGoogleToken().getProfileLink() != null ) {
-        		model.addAttribute("googleProfileUrl", tokens.getGoogleToken().getProfileLink());
-        	}
-        	if (tokens.getTwitterToken() != null && tokens.getTwitterToken().getTwitterPageLink() != null) {
-        		model.addAttribute("twitterProfileUrl", tokens.getTwitterToken().getTwitterPageLink());
-        	}
-        	if (tokens.getLinkedInToken() != null && tokens.getLinkedInToken().getLinkedInPageLink() != null) {
-        		model.addAttribute("linkedinProfileUrl", tokens.getLinkedInToken().getLinkedInPageLink() );
-        	}
-        }
-        
+	@RequestMapping(value = "/fetchsociallinksinpopup")
+	public String fetchSocialLinksInPopup(HttpServletRequest request, Model model) {
+		LOG.info("Method fetchSocialLinksInPopup() called");
+		User user = sessionHelper.getCurrentUser();
+		OrganizationUnitSettings unitSettings;
+		try {
+			unitSettings = userManagementService.getUserSettings(user.getUserId());
+		}
+		catch (InvalidInputException e) {
+			LOG.error("NonFatalException while fetching profile details. Reason :" + e.getMessage(), e);
+			model.addAttribute("message", messageUtils.getDisplayMessage(DisplayMessageConstants.GENERAL_ERROR, DisplayMessageType.ERROR_MESSAGE));
+			return JspResolver.MESSAGE_HEADER;
+		}
+
+		SocialMediaTokens tokens = unitSettings.getSocialMediaTokens();
+		if (tokens != null) {
+			if (tokens.getFacebookToken() != null && tokens.getFacebookToken().getFacebookPageLink() != null) {
+				model.addAttribute("facebookProfileUrl", tokens.getFacebookToken().getFacebookPageLink());
+			}
+			if (tokens.getGoogleToken() != null && tokens.getGoogleToken().getProfileLink() != null) {
+				model.addAttribute("googleProfileUrl", tokens.getGoogleToken().getProfileLink());
+			}
+			if (tokens.getTwitterToken() != null && tokens.getTwitterToken().getTwitterPageLink() != null) {
+				model.addAttribute("twitterProfileUrl", tokens.getTwitterToken().getTwitterPageLink());
+			}
+			if (tokens.getLinkedInToken() != null && tokens.getLinkedInToken().getLinkedInPageLink() != null) {
+				model.addAttribute("linkedinProfileUrl", tokens.getLinkedInToken().getLinkedInPageLink());
+			}
+		}
+
 		return JspResolver.LINKEDIN_IMPORT_SOCIAL_LINKS;
-    }
+	}
 }
 // JIRA SS-137 : by RM-05 : EOC

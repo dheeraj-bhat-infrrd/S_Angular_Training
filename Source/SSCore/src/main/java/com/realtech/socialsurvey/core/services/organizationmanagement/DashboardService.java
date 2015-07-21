@@ -6,10 +6,10 @@ import java.util.List;
 import java.util.Map;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import com.realtech.socialsurvey.core.entities.AgentRankingReport;
+import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
 import com.realtech.socialsurvey.core.entities.SurveyDetails;
 import com.realtech.socialsurvey.core.entities.SurveyPreInitiation;
 import com.realtech.socialsurvey.core.entities.User;
-import com.realtech.socialsurvey.core.entities.UserSettings;
 
 // JIRA SS-137 BY RM05:BOC
 /**
@@ -26,7 +26,7 @@ public interface DashboardService {
 
 	public double getSurveyScore(String columnName, long columnValue, int numberOfDays, boolean realtechAdmin);
 
-	public int getProfileCompletionPercentage(User user, String columnName, long columnValue, UserSettings userSettings);
+	public int getProfileCompletionPercentage(User user, String columnName, long columnValue, OrganizationUnitSettings unitSettings);
 
 	public int getBadges(double surveyScore, int surveyCount, int socialPosts, int profileCompleteness);
 

@@ -106,6 +106,8 @@ public interface OrganizationManagementService {
 	 */
 	public BranchSettings getBranchSettings(long branchId) throws InvalidInputException, NoRecordsFetchedException;
 
+	public OrganizationUnitSettings getBranchSettingsDefault(long branchId) throws InvalidInputException, NoRecordsFetchedException;
+	
 	/**
 	 * Updates the crm info in the settings
 	 * 
