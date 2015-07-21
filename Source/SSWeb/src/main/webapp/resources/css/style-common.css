@@ -7032,3 +7032,8 @@ div.v-tbl-spacer {
 	z-index: 99;
 	margin-left: 50px;
 }
+
+.pp-lp-con-row-item {
+	width: 70%;
+	width: calc(100% - 50px);
+}
