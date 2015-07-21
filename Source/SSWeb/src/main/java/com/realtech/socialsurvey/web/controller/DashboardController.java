@@ -128,8 +128,6 @@ public class DashboardController
 			if (user.getCompany().getLicenseDetails().get(0).getAccountsMaster().getAccountsMasterId() == CommonConstants.ACCOUNTS_MASTER_INDIVIDUAL) {
 				model.addAttribute("columnName", CommonConstants.COMPANY_ID_COLUMN);
 				model.addAttribute("columnValue", user.getCompany().getCompanyId());
-				model.addAttribute("showSendSurveyPopupAdmin", String.valueOf(false));
-				model.addAttribute("showSendSurveyPopup", String.valueOf(true));
 				modelSet = true;
 			}
 		}
