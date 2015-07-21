@@ -356,7 +356,8 @@ public class SessionHelper {
 		Map<Long, String> regionsMap = new HashMap<Long, String>();
 		Map<Long, String> branchesMap = new HashMap<Long, String>();
 
-		List<UserProfile> profiles = userManagementService.getAllUserProfilesForUser(user);
+		user = userManagementService.getUserByUserId(user.getUserId());
+		userManagementService.setProfilesOfUser(user);
 		Company company = user.getCompany();
 		
 		// For individual account type
@@ -414,7 +415,7 @@ public class SessionHelper {
 				branchesMapUser = new HashMap<Long, String>();
 			}
 
-			for (UserProfile userProfile : profiles) {
+			for (UserProfile userProfile : user.getUserProfiles()) {
 
 				// fetching for all regions
 				if (userProfile.getProfilesMaster().getProfileId() == CommonConstants.PROFILES_MASTER_REGION_ADMIN_PROFILE_ID) {
@@ -450,7 +451,7 @@ public class SessionHelper {
 				branchesMapUser = new HashMap<Long, String>();
 			}
 
-			for (UserProfile userProfile : profiles) {
+			for (UserProfile userProfile : user.getUserProfiles()) {
 				if (userProfile.getProfilesMaster().getProfileId() == CommonConstants.PROFILES_MASTER_BRANCH_ADMIN_PROFILE_ID) {
 					if (userProfile.getBranchId() > 0l) {
 						long branchId = userProfile.getBranchId();

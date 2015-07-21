@@ -1261,6 +1261,7 @@ public class OrganizationManagementController
                 session.setAttribute( CommonConstants.ACCOUNT_TYPE_IN_SESSION, accountType );
                 sessionHelper.getCanonicalSettings( session );
                 sessionHelper.setSettingVariablesInSession( session );
+                sessionHelper.processAssignments(session, user);
             } catch ( InvalidInputException e ) {
                 throw new InvalidInputException( "InvalidInputException in addAccountType. Reason :" + e.getMessage(),
                     DisplayMessageConstants.GENERAL_ERROR, e );
