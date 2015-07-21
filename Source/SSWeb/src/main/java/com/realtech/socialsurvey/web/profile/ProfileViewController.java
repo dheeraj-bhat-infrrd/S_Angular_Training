@@ -444,7 +444,7 @@ public class ProfileViewController
                         CommonConstants.REVIEWS_SORT_CRITERIA_FEATURE );
                     model.addAttribute( "reviews", reviews );
 
-					List<SocialPost> posts = profileManagementService.getSocialPosts(individualProfile.getIden(), CommonConstants.PROFILE_AGENT_VIEW,
+					List<SocialPost> posts = profileManagementService.getSocialPosts(individualProfile.getIden(), CommonConstants.AGENT_ID_COLUMN,
 							-1, CommonConstants.USER_AGENT_NUMBER_POST);
                     model.addAttribute( "posts", posts );
                 }

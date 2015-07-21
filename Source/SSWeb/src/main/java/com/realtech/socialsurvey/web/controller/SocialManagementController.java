@@ -367,7 +367,7 @@ public class SocialManagementController {
 				userSettings.getBranchSettings().put(entityId, branchSettings);
 				updated = true;
 			}
-			if (entityType.equals(CommonConstants.PROFILE_AGENT_VIEW)) {
+			if (entityType.equals(CommonConstants.AGENT_ID_COLUMN)) {
 				AgentSettings agentSettings = userManagementService.getUserSettings(entityId);
 				if (agentSettings == null) {
 					throw new InvalidInputException("No Agent settings found in current session");
@@ -478,7 +478,7 @@ public class SocialManagementController {
 						branchSettings, mediaTokens);
 				updated = true;
 			}
-			if (entityType.equals(CommonConstants.PROFILE_AGENT_VIEW)) {
+			if (entityType.equals(CommonConstants.AGENT_ID_COLUMN)) {
 				AgentSettings agentSettings = userManagementService.getUserSettings(entityId);
 				if (agentSettings == null) {
 					throw new InvalidInputException("No Agent settings found in current session");
@@ -664,7 +664,7 @@ public class SocialManagementController {
 				userSettings.getBranchSettings().put(entityId, branchSettings);
 				updated = true;
 			}
-			if (entityType.equals(CommonConstants.PROFILE_AGENT_VIEW)) {
+			if (entityType.equals(CommonConstants.AGENT_ID_COLUMN)) {
 				AgentSettings agentSettings = userManagementService.getUserSettings(entityId);
 				if (agentSettings == null) {
 					throw new InvalidInputException("No Agent settings found in current session");
@@ -849,7 +849,7 @@ public class SocialManagementController {
 				userSettings.getBranchSettings().put(entityId, branchSettings);
 				updated = true;
 			}
-			if (entityType.equals(CommonConstants.PROFILE_AGENT_VIEW)) {
+			if (entityType.equals(CommonConstants.AGENT_ID_COLUMN)) {
 				AgentSettings agentSettings = userManagementService.getUserSettings(entityId);
 				if (agentSettings == null) {
 					throw new InvalidInputException("No Agent settings found in current session");
@@ -1050,7 +1050,7 @@ public class SocialManagementController {
 				userSettings.getBranchSettings().put(entityId, branchSettings);
 				updated = true;
 			}
-			if (entityType.equals(CommonConstants.PROFILE_AGENT_VIEW)) {
+			if (entityType.equals(CommonConstants.AGENT_ID_COLUMN)) {
 				AgentSettings agentSettings = userManagementService.getUserSettings(entityId);
 				if (agentSettings == null) {
 					throw new InvalidInputException("No Agent settings found in current session");
@@ -1501,7 +1501,7 @@ public class SocialManagementController {
 						MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION);
 				userSettings.getBranchSettings().put(entityId, unitSettings);
 			}
-			if (entityType.equals(CommonConstants.PROFILE_AGENT_VIEW)) {
+			if (entityType.equals(CommonConstants.AGENT_ID_COLUMN)) {
 				unitSettings = userManagementService.getUserSettings(entityId);
 				unitSettings = socialManagementService.disconnectSocialNetwork(socialMedia, unitSettings,
 						MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION);
@@ -1540,7 +1540,7 @@ public class SocialManagementController {
 			else if (entityType.equals(CommonConstants.BRANCH_ID_COLUMN)) {
 				unitSettings = organizationManagementService.getBranchSettingsDefault(entityId);
 			}
-			if (entityType.equals(CommonConstants.PROFILE_AGENT_VIEW)) {
+			if (entityType.equals(CommonConstants.AGENT_ID_COLUMN)) {
 				unitSettings = userManagementService.getUserSettings(entityId);
 			}
 

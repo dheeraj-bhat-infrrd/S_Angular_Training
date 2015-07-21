@@ -1597,7 +1597,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 		else if (entityType.equals(CommonConstants.BRANCH_ID_COLUMN)) {
 			socialPost.setBranchId(entityId);
 		}
-		else if (entityType.equals(CommonConstants.PROFILE_AGENT_VIEW)) {
+		else if (entityType.equals(CommonConstants.AGENT_ID_COLUMN)) {
 			socialPost.setAgentId(user.getUserId());
 		}
 		

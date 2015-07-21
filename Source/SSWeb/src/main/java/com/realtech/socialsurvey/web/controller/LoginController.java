@@ -546,7 +546,7 @@ public class LoginController {
 			else if (entityType.equals(CommonConstants.BRANCH_ID_COLUMN)) {
 				imageUrl = organizationManagementService.getBranchSettingsDefault(entityId).getProfileImageUrl();
 			}
-			else if (entityType.equals(CommonConstants.PROFILE_AGENT_VIEW)) {
+			else if (entityType.equals(CommonConstants.AGENT_ID_COLUMN)) {
 				imageUrl = userManagementService.getUserSettings(entityId).getProfileImageUrl();
 			}
 		}

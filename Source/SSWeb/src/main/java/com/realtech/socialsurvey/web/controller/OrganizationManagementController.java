@@ -456,9 +456,6 @@ public class OrganizationManagementController
 		if (entityType == null || entityType.isEmpty()) {
 			entityType = (String) session.getAttribute(CommonConstants.ENTITY_TYPE_COLUMN);
 		}
-		if (entityType.equals(CommonConstants.AGENT_ID_COLUMN)) {
-			entityType = CommonConstants.PROFILE_AGENT_VIEW;
-		}
 		
 		sessionHelper.updateSelectedProfile(session, entityId, entityType);
 		
@@ -482,7 +479,7 @@ public class OrganizationManagementController
 				model.addAttribute("columnName", entityType);
 				model.addAttribute("columnValue", entityId);
 			}
-			else if (entityType.equals(CommonConstants.PROFILE_AGENT_VIEW)) {
+			else if (entityType.equals(CommonConstants.AGENT_ID_COLUMN)) {
 				unitSettings = userManagementService.getUserSettings(user.getUserId());
 				model.addAttribute("columnName", CommonConstants.AGENT_ID_COLUMN);
 				model.addAttribute("columnValue", entityId);

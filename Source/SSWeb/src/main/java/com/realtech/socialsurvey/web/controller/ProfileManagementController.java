@@ -172,9 +172,6 @@ public class ProfileManagementController {
 		if (entityType == null || entityType.isEmpty()) {
 			entityType = (String) session.getAttribute(CommonConstants.ENTITY_TYPE_COLUMN);
 		}
-		if (entityType.equals(CommonConstants.AGENT_ID_COLUMN)) {
-			entityType = CommonConstants.PROFILE_AGENT_VIEW;
-		}
 
 		sessionHelper.updateSelectedProfile(session, entityId, entityType);
 
@@ -196,8 +193,8 @@ public class ProfileManagementController {
 			profilesMaster = CommonConstants.PROFILES_MASTER_BRANCH_ADMIN_PROFILE_ID;
 			branchId = entityId;
 		}
-		else if (entityType.equals(CommonConstants.PROFILE_AGENT_VIEW)) {
-			model.addAttribute("columnName", CommonConstants.AGENT_ID_COLUMN);
+		else if (entityType.equals(CommonConstants.AGENT_ID_COLUMN)) {
+			model.addAttribute("columnName", entityType);
 			profilesMaster = CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID;
 		}
 
@@ -479,7 +476,7 @@ public class ProfileManagementController {
 				branchSettings.setContact_details(contactDetailsSettings);
 				userSettings.getRegionSettings().put(entityId, branchSettings);
 			}
-			else if (entityType.equals(CommonConstants.PROFILE_AGENT_VIEW)) {
+			else if (entityType.equals(CommonConstants.AGENT_ID_COLUMN)) {
 				AgentSettings agentSettings = userManagementService.getUserSettings(entityId);
 				if (agentSettings == null) {
 					throw new InvalidInputException("No Agent settings found in current session");
@@ -609,7 +606,7 @@ public class ProfileManagementController {
 
 				userSettings.getRegionSettings().put(entityId, branchSettings);
 			}
-			else if (entityType.equals(CommonConstants.PROFILE_AGENT_VIEW)) {
+			else if (entityType.equals(CommonConstants.AGENT_ID_COLUMN)) {
 				AgentSettings agentSettings = userManagementService.getUserSettings(entityId);
 				if (agentSettings == null) {
 					throw new InvalidInputException("No Agent settings found in current session");
@@ -748,7 +745,7 @@ public class ProfileManagementController {
 				branchSettings.setContact_details(contactDetailsSettings);
 				userSettings.getRegionSettings().put(entityId, branchSettings);
 			}
-			else if (entityType.equals(CommonConstants.PROFILE_AGENT_VIEW)) {
+			else if (entityType.equals(CommonConstants.AGENT_ID_COLUMN)) {
 				AgentSettings agentSettings = userManagementService.getUserSettings(entityId);
 				if (agentSettings == null) {
 					throw new InvalidInputException("No Agent settings found in current session");
@@ -880,7 +877,7 @@ public class ProfileManagementController {
 				branchSettings.setContact_details(contactDetailsSettings);
 				userSettings.getRegionSettings().put(entityId, branchSettings);
 			}
-			else if (entityType.equals(CommonConstants.PROFILE_AGENT_VIEW)) {
+			else if (entityType.equals(CommonConstants.AGENT_ID_COLUMN)) {
 				AgentSettings agentSettings = userManagementService.getUserSettings(entityId);
 				if (agentSettings == null) {
 					throw new InvalidInputException("No Agent settings found in current session");
@@ -990,7 +987,7 @@ public class ProfileManagementController {
 				branchSettings.setContact_details(contactDetailsSettings);
 				userSettings.getRegionSettings().put(entityId, branchSettings);
 			}
-			else if (entityType.equals(CommonConstants.PROFILE_AGENT_VIEW)) {
+			else if (entityType.equals(CommonConstants.AGENT_ID_COLUMN)) {
 				AgentSettings agentSettings = userManagementService.getUserSettings(entityId);
 				if (agentSettings == null) {
 					throw new InvalidInputException("No Agent settings found in current session");
@@ -1104,7 +1101,7 @@ public class ProfileManagementController {
 				branchSettings.setLogo(logoUrl);
 				userSettings.getRegionSettings().put(entityId, branchSettings);
 			}
-			else if (entityType.equals(CommonConstants.PROFILE_AGENT_VIEW)) {
+			else if (entityType.equals(CommonConstants.AGENT_ID_COLUMN)) {
 				AgentSettings agentSettings = userManagementService.getUserSettings(entityId);
 				if (agentSettings == null) {
 					throw new InvalidInputException("No Agent settings found in current session");
@@ -1240,7 +1237,7 @@ public class ProfileManagementController {
 				branchSettings.setProfileImageUrl(profileImageUrl);
 				userSettings.getRegionSettings().put(entityId, branchSettings);
 			}
-			else if (entityType.equals(CommonConstants.PROFILE_AGENT_VIEW)) {
+			else if (entityType.equals(CommonConstants.AGENT_ID_COLUMN)) {
 				AgentSettings agentSettings = userManagementService.getUserSettings(entityId);
 				if (agentSettings == null) {
 					throw new InvalidInputException("No Agent settings found in current session");
@@ -1361,7 +1358,7 @@ public class ProfileManagementController {
 				branchSettings.setContact_details(contactDetailsSettings);
 				userSettings.getRegionSettings().put(entityId, branchSettings);
 			}
-			else if (entityType.equals(CommonConstants.PROFILE_AGENT_VIEW)) {
+			else if (entityType.equals(CommonConstants.AGENT_ID_COLUMN)) {
 				AgentSettings agentSettings = userManagementService.getUserSettings(entityId);
 				if (agentSettings == null) {
 					throw new InvalidInputException("No Agent settings found in current session");
@@ -1549,7 +1546,7 @@ public class ProfileManagementController {
 				branchSettings.setContact_details(contactDetailsSettings);
 				userSettings.getRegionSettings().put(entityId, branchSettings);
 			}
-			else if (entityType.equals(CommonConstants.PROFILE_AGENT_VIEW)) {
+			else if (entityType.equals(CommonConstants.AGENT_ID_COLUMN)) {
 				AgentSettings agentSettings = userManagementService.getUserSettings(entityId);
 				if (agentSettings == null) {
 					throw new InvalidInputException("No Agent settings found in current session");
@@ -1691,7 +1688,7 @@ public class ProfileManagementController {
 				branchSettings.setContact_details(contactDetailsSettings);
 				userSettings.getRegionSettings().put(entityId, branchSettings);
 			}
-			else if (entityType.equals(CommonConstants.PROFILE_AGENT_VIEW)) {
+			else if (entityType.equals(CommonConstants.AGENT_ID_COLUMN)) {
 				AgentSettings agentSettings = userManagementService.getUserSettings(entityId);
 				if (agentSettings == null) {
 					throw new InvalidInputException("No Agent settings found in current session");
@@ -1831,7 +1828,7 @@ public class ProfileManagementController {
 				branchSettings.setSocialMediaTokens(socialMediaTokens);
 				userSettings.getRegionSettings().put(entityId, branchSettings);
 			}
-			else if (entityType.equals(CommonConstants.PROFILE_AGENT_VIEW)) {
+			else if (entityType.equals(CommonConstants.AGENT_ID_COLUMN)) {
 				AgentSettings agentSettings = userManagementService.getUserSettings(entityId);
 				if (agentSettings == null) {
 					throw new InvalidInputException("No Agent settings found in current session");
@@ -1941,7 +1938,7 @@ public class ProfileManagementController {
 				branchSettings.setSocialMediaTokens(socialMediaTokens);
 				userSettings.getRegionSettings().put(entityId, branchSettings);
 			}
-			else if (entityType.equals(CommonConstants.PROFILE_AGENT_VIEW)) {
+			else if (entityType.equals(CommonConstants.AGENT_ID_COLUMN)) {
 				AgentSettings agentSettings = userManagementService.getUserSettings(entityId);
 				if (agentSettings == null) {
 					throw new InvalidInputException("No Agent settings found in current session");
@@ -2051,7 +2048,7 @@ public class ProfileManagementController {
 				branchSettings.setSocialMediaTokens(socialMediaTokens);
 				userSettings.getRegionSettings().put(entityId, branchSettings);
 			}
-			else if (entityType.equals(CommonConstants.PROFILE_AGENT_VIEW)) {
+			else if (entityType.equals(CommonConstants.AGENT_ID_COLUMN)) {
 				AgentSettings agentSettings = userManagementService.getUserSettings(entityId);
 				if (agentSettings == null) {
 					throw new InvalidInputException("No Agent settings found in current session");
@@ -2182,7 +2179,7 @@ public class ProfileManagementController {
 				branchSettings.setSocialMediaTokens(socialMediaTokens);
 				userSettings.getRegionSettings().put(entityId, branchSettings);
 			}
-			else if (entityType.equals(CommonConstants.PROFILE_AGENT_VIEW)) {
+			else if (entityType.equals(CommonConstants.AGENT_ID_COLUMN)) {
 				AgentSettings agentSettings = userManagementService.getUserSettings(entityId);
 				if (agentSettings == null) {
 					throw new InvalidInputException("No Agent settings found in current session");
@@ -2299,7 +2296,7 @@ public class ProfileManagementController {
 				branchSettings.setSocialMediaTokens(socialMediaTokens);
 				userSettings.getRegionSettings().put(entityId, branchSettings);
 			}
-			else if (entityType.equals(CommonConstants.PROFILE_AGENT_VIEW)) {
+			else if (entityType.equals(CommonConstants.AGENT_ID_COLUMN)) {
 				AgentSettings agentSettings = userManagementService.getUserSettings(entityId);
 				if (agentSettings == null) {
 					throw new InvalidInputException("No Agent settings found in current session");
@@ -2409,7 +2406,7 @@ public class ProfileManagementController {
 				branchSettings.setSocialMediaTokens(socialMediaTokens);
 				userSettings.getRegionSettings().put(entityId, branchSettings);
 			}
-			else if (entityType.equals(CommonConstants.PROFILE_AGENT_VIEW)) {
+			else if (entityType.equals(CommonConstants.AGENT_ID_COLUMN)) {
 				AgentSettings agentSettings = userManagementService.getUserSettings(entityId);
 				if (agentSettings == null) {
 					throw new InvalidInputException("No Agent settings found in current session");
@@ -2520,7 +2517,7 @@ public class ProfileManagementController {
 				branchSettings.setSocialMediaTokens(socialMediaTokens);
 				userSettings.getRegionSettings().put(entityId, branchSettings);
 			}
-			else if (entityType.equals(CommonConstants.PROFILE_AGENT_VIEW)) {
+			else if (entityType.equals(CommonConstants.AGENT_ID_COLUMN)) {
 				AgentSettings agentSettings = userManagementService.getUserSettings(entityId);
 				if (agentSettings == null) {
 					throw new InvalidInputException("No Agent settings found in current session");
@@ -2634,7 +2631,7 @@ public class ProfileManagementController {
 				branchSettings.setAchievements(achievements);
 				userSettings.getRegionSettings().put(entityId, branchSettings);
 			}
-			else if (entityType.equals(CommonConstants.PROFILE_AGENT_VIEW)) {
+			else if (entityType.equals(CommonConstants.AGENT_ID_COLUMN)) {
 				AgentSettings agentSettings = userManagementService.getUserSettings(entityId);
 				if (agentSettings == null) {
 					throw new InvalidInputException("No Agent settings found in current session");
@@ -2736,7 +2733,7 @@ public class ProfileManagementController {
 				branchSettings.setAssociations(associations);
 				userSettings.getRegionSettings().put(entityId, branchSettings);
 			}
-			else if (entityType.equals(CommonConstants.PROFILE_AGENT_VIEW)) {
+			else if (entityType.equals(CommonConstants.AGENT_ID_COLUMN)) {
 				AgentSettings agentSettings = userManagementService.getUserSettings(entityId);
 				if (agentSettings == null) {
 					throw new InvalidInputException("No Agent settings found in current session");
@@ -2830,7 +2827,7 @@ public class ProfileManagementController {
 				branchSettings.setLicenses(licenses);
 				userSettings.getRegionSettings().put(entityId, branchSettings);
 			}
-			else if (entityType.equals(CommonConstants.PROFILE_AGENT_VIEW)) {
+			else if (entityType.equals(CommonConstants.AGENT_ID_COLUMN)) {
 				AgentSettings agentSettings = userManagementService.getUserSettings(entityId);
 				if (agentSettings == null) {
 					throw new InvalidInputException("No Agent settings found in current session");
@@ -2893,7 +2890,7 @@ public class ProfileManagementController {
 				throw new NonFatalException("Error occurred while parsing json.", DisplayMessageConstants.GENERAL_ERROR, ioException);
 			}
 
-			if (entityType.equals(CommonConstants.PROFILE_AGENT_VIEW)) {
+			if (entityType.equals(CommonConstants.AGENT_ID_COLUMN)) {
 				AgentSettings agentSettings = userManagementService.getUserSettings(entityId);
 				if (agentSettings == null) {
 					throw new InvalidInputException("No Agent settings found in current session");
@@ -2946,7 +2943,7 @@ public class ProfileManagementController {
 				throw new NonFatalException("Error occurred while parsing json.", DisplayMessageConstants.GENERAL_ERROR, ioException);
 			}
 
-			if (entityType.equals(CommonConstants.PROFILE_AGENT_VIEW)) {
+			if (entityType.equals(CommonConstants.AGENT_ID_COLUMN)) {
 				AgentSettings agentSettings = userManagementService.getUserSettings(entityId);
 				if (agentSettings == null) {
 					throw new InvalidInputException("No Agent settings found in current session");
@@ -3545,7 +3542,7 @@ public class ProfileManagementController {
 				reviewItems = profileManagementService.getReviews(branchId, minScore, maxScore, startIndex, numRows,
 						CommonConstants.PROFILE_LEVEL_BRANCH, fetchAbusive, null, null, null);
 			}
-			else if (entityType.equals(CommonConstants.PROFILE_AGENT_VIEW)) {
+			else if (entityType.equals(CommonConstants.AGENT_ID_COLUMN)) {
 				long agentId = Long.parseLong(request.getParameter("agentId"));
 				if (agentId == 0l) {
 					LOG.error("Invalid agentId passed in method fetchReviews().");
@@ -3617,7 +3614,7 @@ public class ProfileManagementController {
 				reviewCount = profileManagementService.getReviewsCount(branchId, minScore, maxScore, CommonConstants.PROFILE_LEVEL_BRANCH,
 						fetchAbusive);
 			}
-			else if (entityType.equals(CommonConstants.PROFILE_AGENT_VIEW)) {
+			else if (entityType.equals(CommonConstants.AGENT_ID_COLUMN)) {
 				long agentId = Long.parseLong(request.getParameter("agentId"));
 				if (agentId == 0l) {
 					LOG.error("Invalid agentId passed in method fetchReviews().");
@@ -3677,7 +3674,7 @@ public class ProfileManagementController {
 
 				averageRating = profileManagementService.getAverageRatings(branchId, CommonConstants.PROFILE_LEVEL_BRANCH, aggregateAbusive);
 			}
-			else if (entityType.equals(CommonConstants.PROFILE_AGENT_VIEW)) {
+			else if (entityType.equals(CommonConstants.AGENT_ID_COLUMN)) {
 				long agentId = Long.parseLong(request.getParameter("agentId"));
 				if (agentId == 0l) {
 					LOG.error("Invalid agentId passed in method fetchReviews().");
@@ -3854,7 +3851,7 @@ public class ProfileManagementController {
 
 				userSettings.getRegionSettings().put(entityId, branchSettings);
 			}
-			else if (entityType.equals(CommonConstants.PROFILE_AGENT_VIEW)) {
+			else if (entityType.equals(CommonConstants.AGENT_ID_COLUMN)) {
 				AgentSettings agentSettings = userManagementService.getUserSettings(entityId);
 				if (agentSettings == null) {
 					throw new InvalidInputException("No Agent settings found in current session");
