@@ -7380,6 +7380,8 @@ function paintDashboardButtons(data){
 		var task = $('#dsh-btn1').data('social');
 		if(columnName == 'agentId'){
 			sendSurveyInvitation();
+		}else if(accountType="INDIVIDUAL"){
+			sendSurveyInvitation();
 		}
 		else{
 			sendSurveyInvitationAdmin(columnName, columnValue);
