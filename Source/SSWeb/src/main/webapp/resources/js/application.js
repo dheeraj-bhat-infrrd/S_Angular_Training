@@ -108,6 +108,9 @@ var agentProfileLink;
 var agentFullProfileLink;
 var companyLogo;
 
+//Verticals master
+var verticalsMasterList;
+
 
 /**
  * js functions for landing page
@@ -5237,11 +5240,11 @@ function showMasterQuestionPage(){
 		$('#icn-twitter-shr').attr("href","https://twitter.com/home?status="+agentFullProfileLink);
 		$('#content-head').html('Survey Completed');
 			if (mood == 'Great')
-				$('#content').html("Congratulations! You have completed survey for " + agentName+ ".\n"+happyTextComplete);
+				$('#content').html(happyTextComplete);
 			else if(mood == 'OK')
-				$('#content').html("Congratulations! You have completed survey for " + agentName+ ".\n"+neutralTextComplete);
+				$('#content').html(neutralTextComplete);
 			else
-				$('#content').html("Congratulations! You have completed survey for " + agentName+ ".\n"+sadTextComplete);
+				$('#content').html(sadTextComplete);
 	//	$('#content').html("Congratulations! You have completed survey for " + agentName+ ".\nThanks for your participation.");
 	}
 	return;
@@ -7508,4 +7511,31 @@ function userSwitchToAdmin() {
 			window.location = window.location.origin + '/userlogin.do';
 		}
 	}, true);
+}
+
+function initializeVerticalAutcomplete() {
+	$('#prof-vertical').autocomplete({
+		minLength: 1,
+		source: verticalsMasterList,
+		delay : 0,
+		autoFocus : true,
+		close: function(event, ui) {},
+		select: function(event, ui) {},
+		create: function(event, ui) {
+	        $('.ui-helper-hidden-accessible').remove();
+		}
+	});
+	$("#prof-vertical").keydown(function(e){
+  	    if( e.keyCode != $.ui.keyCode.TAB) return; 
+  	    
+   	   e.keyCode = $.ui.keyCode.DOWN;
+   	   $(this).trigger(e);
+
+   	   e.keyCode = $.ui.keyCode.ENTER;
+   	   $(this).trigger(e);
+   	});
+	$("#prof-vertical").focus(function() {
+		$(this).trigger('keydown');
+		$(this).autocomplete("search");	
+	});
 }
