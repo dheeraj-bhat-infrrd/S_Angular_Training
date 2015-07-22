@@ -4,6 +4,8 @@ import java.util.List;
 import java.util.Map;
 import org.springframework.stereotype.Component;
 import com.realtech.socialsurvey.core.entities.BranchUploadVO;
+import com.realtech.socialsurvey.core.entities.FileUpload;
+import com.realtech.socialsurvey.core.entities.Region;
 import com.realtech.socialsurvey.core.entities.RegionUploadVO;
 import com.realtech.socialsurvey.core.entities.User;
 import com.realtech.socialsurvey.core.entities.UserUploadVO;
@@ -24,6 +26,14 @@ public interface CsvUploadService {
 	 * @return
 	 */
 	public Map<String, List<Object>> parseCsv(String fileName);
+	
+	/**
+	 * Parses the temp csv and upload
+	 * @param fileUpload
+	 * @return
+	 * @throws InvalidInputException
+	 */
+	public List<String> parseAndUploadTempCsv(FileUpload fileUpload) throws InvalidInputException;
 
 	/**
 	 * Used to get the admin user while testing
@@ -59,11 +69,12 @@ public interface CsvUploadService {
 	 * Creates a region
 	 * @param adminUser
 	 * @param region
+	 * @return region
 	 * @throws InvalidInputException
 	 * @throws RegionAdditionException
 	 * @throws SolrException
 	 */
-	public void createRegion(User adminUser, RegionUploadVO region) throws InvalidInputException, RegionAdditionException, SolrException;
+	public Region createRegion(User adminUser, RegionUploadVO region) throws InvalidInputException, RegionAdditionException, SolrException;
 
 	/**
 	 * Takes a map of objects and creates them and returns list of errors if any
