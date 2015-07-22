@@ -3518,11 +3518,14 @@ public class ProfileManagementController {
 	@RequestMapping(value = "/fetchreviews", method = RequestMethod.GET)
 	public String fetchReviews(Model model, HttpServletRequest request) {
 		LOG.info("Method fetchReviews() called from ProfileManagementController");
+		HttpSession session = request.getSession(false);
+		User user = sessionHelper.getCurrentUser();
 
 		boolean fetchAbusive = true;
 		List<SurveyDetails> reviewItems = null;
 		try {
-			String entityType = (String) request.getSession(false).getAttribute(CommonConstants.ENTITY_TYPE_COLUMN);
+			long entityId = (long) session.getAttribute(CommonConstants.ENTITY_ID_COLUMN);
+			String entityType = (String) session.getAttribute(CommonConstants.ENTITY_TYPE_COLUMN);
 			if (entityType == null) {
 				throw new InvalidInputException("No user settings found in session", DisplayMessageConstants.GENERAL_ERROR);
 			}
@@ -3533,43 +3536,19 @@ public class ProfileManagementController {
 			int numRows = Integer.parseInt(request.getParameter("numOfRows"));
 
 			if (entityType.equals(CommonConstants.COMPANY_ID_COLUMN)) {
-				long companyId = Long.parseLong(request.getParameter("companyId"));
-				if (companyId == 0l) {
-					LOG.error("Invalid companyId passed in method fetchReviews().");
-					throw new InvalidInputException("Invalid companyId passed in method fetchReviews().");
-				}
-
-				reviewItems = profileManagementService.getReviews(companyId, minScore, maxScore, startIndex, numRows,
+				reviewItems = profileManagementService.getReviews(user.getCompany().getCompanyId(), minScore, maxScore, startIndex, numRows,
 						CommonConstants.PROFILE_LEVEL_COMPANY, fetchAbusive, null, null, null);
 			}
 			else if (entityType.equals(CommonConstants.REGION_ID_COLUMN)) {
-				long regionId = Long.parseLong(request.getParameter("regionId"));
-				if (regionId == 0l) {
-					LOG.error("Invalid regionId passed in method fetchReviews().");
-					throw new InvalidInputException("Invalid regionId passed in method fetchReviews().");
-				}
-
-				reviewItems = profileManagementService.getReviews(regionId, minScore, maxScore, startIndex, numRows,
+				reviewItems = profileManagementService.getReviews(entityId, minScore, maxScore, startIndex, numRows,
 						CommonConstants.PROFILE_LEVEL_REGION, fetchAbusive, null, null, null);
 			}
 			else if (entityType.equals(CommonConstants.BRANCH_ID_COLUMN)) {
-				long branchId = Long.parseLong(request.getParameter("branchId"));
-				if (branchId == 0l) {
-					LOG.error("Invalid branchId passed in method fetchReviews().");
-					throw new InvalidInputException("Invalid branchId passed in method fetchReviews().");
-				}
-
-				reviewItems = profileManagementService.getReviews(branchId, minScore, maxScore, startIndex, numRows,
+				reviewItems = profileManagementService.getReviews(entityId, minScore, maxScore, startIndex, numRows,
 						CommonConstants.PROFILE_LEVEL_BRANCH, fetchAbusive, null, null, null);
 			}
 			else if (entityType.equals(CommonConstants.AGENT_ID_COLUMN)) {
-				long agentId = Long.parseLong(request.getParameter("agentId"));
-				if (agentId == 0l) {
-					LOG.error("Invalid agentId passed in method fetchReviews().");
-					throw new InvalidInputException("Invalid agentId passed in method fetchReviews().");
-				}
-
-				reviewItems = profileManagementService.getReviews(agentId, minScore, maxScore, startIndex, numRows,
+				reviewItems = profileManagementService.getReviews(user.getUserId(), minScore, maxScore, startIndex, numRows,
 						CommonConstants.PROFILE_LEVEL_INDIVIDUAL, fetchAbusive, null, null, null);
 			}
 
@@ -3577,7 +3556,6 @@ public class ProfileManagementController {
 			profileManagementService.setAgentProfileUrlForReview(reviewItems);
 
 			model.addAttribute("reviewItems", reviewItems);
-
 		}
 		catch (InvalidInputException e) {
 			throw new InternalServerException(new ProfileServiceErrorCode(CommonConstants.ERROR_CODE_COMPANY_REVIEWS_FETCH_FAILURE,
