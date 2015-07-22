@@ -9,7 +9,7 @@ public class FacebookToken {
 	private String facebookAccessToken;
 	private long facebookAccessTokenCreatedOn;
 	private long facebookAccessTokenExpiresOn;
-	private List<String> facebookPublicPageAccessToken;
+	private List<FacebookPage> facebookPages;
 	private String facebookAccessTokenToPost;
 	
 	public String getFacebookId() {
@@ -52,13 +52,12 @@ public class FacebookToken {
 		this.facebookAccessTokenExpiresOn = facebookAccessTokenExpiresOn;
 	}
 
-	
-	public List<String> getFacebookPublicPageAccessToken() {
-		return facebookPublicPageAccessToken;
+	public List<FacebookPage> getFacebookPages() {
+		return facebookPages;
 	}
 
-	public void setFacebookPublicPageAccessToken(List<String> facebookPublicPageAccessToken) {
-		this.facebookPublicPageAccessToken = facebookPublicPageAccessToken;
+	public void setFacebookPages(List<FacebookPage> facebookPages) {
+		this.facebookPages = facebookPages;
 	}
 
 	public String getFacebookAccessTokenToPost() {
