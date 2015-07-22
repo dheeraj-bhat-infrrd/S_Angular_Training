@@ -63,7 +63,10 @@ public class FacebookFeedProcessorImpl implements SocialNetworkDataProcessor<Pos
 
 	@Value("${FB_CLIENT_SECRET}")
 	private String facebookClientSecret;
-
+	
+	@Value("${FB_URI}")
+	private String facebookUri;
+	
 	private FeedStatus status;
 	private long profileId;
 	private Date lastFetchedTill;
@@ -239,12 +242,13 @@ public class FacebookFeedProcessorImpl implements SocialNetworkDataProcessor<Pos
 			else {
 				feed.setPostText(post.getStory());
 			}
-
+			
 			feed.setSource(FEED_SOURCE);
 			feed.setPostId(post.getId());
 			feed.setPostedBy(post.getFrom().getName());
 			feed.setTimeInMillis(post.getUpdatedTime().getTime());
-
+			feed.setPostUrl(facebookUri.concat(post.getId()));
+			
 			switch (collection) {
 				case MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION:
 					feed.setCompanyId(profileId);

@@ -42,7 +42,7 @@ public class TwitterFeedProcessorImpl implements SocialNetworkDataProcessor<Stat
 	private static final Logger LOG = LoggerFactory.getLogger(TwitterFeedProcessorImpl.class);
 	private static final String FEED_SOURCE = "twitter";
 	private static final int PAGE_SIZE = 200;
-
+	private static final String twitterUriSplitStr="http";
 	@Autowired
 	private GenericDao<FeedStatus, Long> feedStatusDao;
 
@@ -64,6 +64,7 @@ public class TwitterFeedProcessorImpl implements SocialNetworkDataProcessor<Stat
 	@Value("${TWITTER_CONSUMER_SECRET}")
 	private String twitterConsumerSecret;
 
+	
 	private FeedStatus status;
 	private long profileId;
 	private Timestamp lastFetchedTill;
@@ -215,7 +216,11 @@ public class TwitterFeedProcessorImpl implements SocialNetworkDataProcessor<Stat
 			post.setPostId(String.valueOf(tweet.getId()));
 			post.setPostedBy(tweet.getUser().getName());
 			post.setTimeInMillis(tweet.getCreatedAt().getTime());
-
+			String[] twitterHref=tweet.getText().split(twitterUriSplitStr);
+			if(twitterHref.length > 1){
+				String postUrl=twitterHref[1];
+				post.setPostUrl(twitterUriSplitStr.concat(postUrl));
+			}
 			switch (collection) {
 				case MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION:
 					post.setCompanyId(profileId);
