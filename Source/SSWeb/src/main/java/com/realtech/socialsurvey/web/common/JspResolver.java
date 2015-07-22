@@ -114,4 +114,6 @@ public interface JspResolver {
 	public static final String ADMIN_COMPANY_LIST = "admin/admin_company_list";
 	public static final String ADMIN_REGION_HIERARCHY = "admin/admin_region_hierarchy";
 	public static final String ADMIN_BRANCH_HIERARCHY = "admin/admin_branch_hierarchy";
+	
+	public static final String FINDAPRO = "findapro";
 }
