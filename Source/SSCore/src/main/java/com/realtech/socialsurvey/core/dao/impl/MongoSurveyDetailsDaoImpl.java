@@ -860,7 +860,7 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao {
 						long noOfSurveys = noOfPreInitiatedSurveys(columnName, columnValue,
 								getNdaysBackDate(currDate, Calendar.DATE, reductionInDate), currDate);
 						sentSurveys.put(date, noOfSurveys);
-						
+
 						if (calendar.get(Calendar.WEEK_OF_YEAR) == Integer.parseInt(sentSurvey.get(CommonConstants.DEFAULT_MONGO_ID_COLUMN)
 								.toString()) + 1) {
 							sentSurveys.put(date, noOfSurveys + Long.parseLong(sentSurvey.get("count").toString()));
@@ -990,16 +990,18 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao {
 		Date startDate = getNdaysBackDate(noOfPastDaysToConsider);
 		if (realtechAdmin && columnName == null) {
 			aggregation = new TypedAggregation<SurveyDetails>(SurveyDetails.class, Aggregation.match(Criteria.where(CommonConstants.SHARED_ON_COLUMN)
-					.exists(true)), Aggregation.match(Criteria.where(CommonConstants.MODIFIED_ON_COLUMN).gte(startDate)), Aggregation
-					.project(CommonConstants.MODIFIED_ON_COLUMN).andExpression(criteriaColumn + "(" + CommonConstants.MODIFIED_ON_COLUMN + ")")
-					.as("groupCol"), Aggregation.group("groupCol").count().as("count"));
+					.exists(true)), Aggregation.unwind("sharedOn"), Aggregation.match(Criteria.where(CommonConstants.MODIFIED_ON_COLUMN).gte(
+					startDate)), Aggregation.project(CommonConstants.MODIFIED_ON_COLUMN)
+					.andExpression(criteriaColumn + "(" + CommonConstants.MODIFIED_ON_COLUMN + ")").as("groupCol"), Aggregation.group("groupCol")
+					.count().as("count"));
 		}
 		else {
 			aggregation = new TypedAggregation<SurveyDetails>(SurveyDetails.class, Aggregation.match(Criteria.where(CommonConstants.SHARED_ON_COLUMN)
-					.exists(true)), Aggregation.match(Criteria.where(columnName).is(columnValue)), Aggregation.match(Criteria.where(
-					CommonConstants.MODIFIED_ON_COLUMN).gte(startDate)), Aggregation.project(CommonConstants.MODIFIED_ON_COLUMN)
-					.andExpression(criteriaColumn + "(" + CommonConstants.MODIFIED_ON_COLUMN + ")").as("groupCol"), Aggregation.group("groupCol")
-					.count().as("count"));
+					.exists(true)), Aggregation.unwind("sharedOn"), Aggregation.match(Criteria.where(columnName).is(columnValue)),
+					Aggregation.match(Criteria.where(CommonConstants.MODIFIED_ON_COLUMN).gte(startDate)), Aggregation
+							.project(CommonConstants.MODIFIED_ON_COLUMN)
+							.andExpression(criteriaColumn + "(" + CommonConstants.MODIFIED_ON_COLUMN + ")").as("groupCol"), Aggregation
+							.group("groupCol").count().as("count"));
 		}
 		AggregationResults<SurveyDetails> result = mongoTemplate.aggregate(aggregation, SURVEY_DETAILS_COLLECTION, SurveyDetails.class);
 		Map<String, Long> socialPosts = new LinkedHashMap<>();
