@@ -5,9 +5,9 @@ package com.realtech.socialsurvey.core.commons;
  */
 public interface CommonConstants
 {
-	
-	//By pass pwd
-	public static final String BYPASS_PWD = "94f08742989de866f8d4215d4bccf92e7977cf44e8f7cc943189525987d3a7d09d76f84ae54abbe7c4e73775e0cd74e7639db35d510e258d77a1a30125d0d1d9";
+
+    //By pass pwd
+    public static final String BYPASS_PWD = "94f08742989de866f8d4215d4bccf92e7977cf44e8f7cc943189525987d3a7d09d76f84ae54abbe7c4e73775e0cd74e7639db35d510e258d77a1a30125d0d1d9";
 
     /**
      * Property file constants
@@ -249,7 +249,7 @@ public interface CommonConstants
     public static final String FLOW_REGISTRATION = "registration";
     public static final String POPUP_FLAG_IN_SESSION = "popupStatus";
     public static final String ACTIVE_SESSIONS_FOUND = "activeSessionFound";
-    
+
     public static final String USER_ASSIGNMENTS = "assignments";
     public static final String ENTITY_ID_COLUMN = "entityId";
     public static final String ENTITY_NAME_COLUMN = "entityName";
@@ -617,10 +617,14 @@ public interface CommonConstants
     public static final String BRANCH_OBJECT = "branch";
 
     public static final String REGION_OBJECT = "region";
-    
+
     public static final String SURVEY_REMINDER_COUNT = "reminderCount";
     public static final String SURVEY_REMINDER_INTERVAL = "reminderInterval";
-    
+
     //Session variable
     public static final String REALTECH_USER_ID = "realTechAdminId";
+
+    public static final String PATTERN_FIRST = "patternFirst";
+
+    public static final String PATTERN_LAST = "patternLast";
 }
