@@ -63,6 +63,7 @@ import com.realtech.socialsurvey.core.entities.UserFromSearch;
 import com.realtech.socialsurvey.core.entities.UserHierarchyAssignments;
 import com.realtech.socialsurvey.core.entities.UserListFromSearch;
 import com.realtech.socialsurvey.core.entities.UserSettings;
+import com.realtech.socialsurvey.core.entities.VerticalsMaster;
 import com.realtech.socialsurvey.core.entities.WebAddressSettings;
 import com.realtech.socialsurvey.core.entities.YelpToken;
 import com.realtech.socialsurvey.core.entities.ZillowToken;
@@ -210,6 +211,34 @@ public class ProfileManagementController {
 		return JspResolver.PROFILE_EDIT;
 	}
 
+	@ResponseBody
+	@RequestMapping(value = "/fetchverticalsmaster", method = RequestMethod.GET)
+	public String fetchVerticalsMaster(Model model, HttpServletRequest request) {
+		LOG.info("Fetching profile aboutme");
+		String response = null;
+		try {
+			try {
+				List<VerticalsMaster> verticalsMasterList = organizationManagementService.getAllVerticalsMaster();
+
+				List<String> verticalsMap = new ArrayList<>();
+				for (VerticalsMaster verticalsMaster : verticalsMasterList) {
+					verticalsMap.add(verticalsMaster.getVerticalName());
+				}
+				response = new Gson().toJson(verticalsMap);
+			}
+			catch (InvalidInputException e) {
+				throw new NonFatalException("Some error occurred while fetching verticals master", e);
+			}
+		}
+		catch (NonFatalException e) {
+			ErrorResponse errorResponse = new ErrorResponse();
+			errorResponse.setErrCode(ErrorCodes.REQUEST_FAILED);
+			errorResponse.setErrMessage(e.getMessage());
+			response = new Gson().toJson(errorResponse);
+		}
+		return response;
+	}
+	
 	private OrganizationUnitSettings fetchUserProfile(Model model, User user, AccountType accountType, UserSettings settings, long branchId,
 			long regionId, int profilesMaster) {
 		LOG.debug("Method fetchUserProfile() called from ProfileManagementService");
@@ -554,6 +583,7 @@ public class ProfileManagementController {
 					throw new InvalidInputException("No company settings found in current session");
 				}
 				contactDetailsSettings = companySettings.getContact_details();
+				
 				contactDetailsSettings = updateBasicDetail(contactDetailsSettings, name, title);
 				contactDetailsSettings = profileManagementService.updateContactDetails(
 						MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION, companySettings, contactDetailsSettings);
@@ -614,6 +644,8 @@ public class ProfileManagementController {
 					throw new InvalidInputException("No Agent settings found in current session");
 				}
 				contactDetailsSettings = agentSettings.getContact_details();
+				//for individual set vertical/industry
+				contactDetailsSettings.setIndustry(vertical);
 				contactDetailsSettings = updateBasicDetail(contactDetailsSettings, name, title);
 				contactDetailsSettings = profileManagementService.updateAgentContactDetails(
 						MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION, agentSettings, contactDetailsSettings);
@@ -646,6 +678,7 @@ public class ProfileManagementController {
 				throw new InvalidInputException("Invalid input exception occurred in upadting Basic details.", DisplayMessageConstants.GENERAL_ERROR);
 			}
 
+			profileSettings.setVertical(vertical);
 			profileSettings.setContact_details(contactDetailsSettings);
 
 			LOG.info("Basic Detail updated successfully");
