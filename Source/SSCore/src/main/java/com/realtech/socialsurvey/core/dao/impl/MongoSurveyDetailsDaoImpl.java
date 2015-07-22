@@ -839,9 +839,8 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao {
 			}
 			
 			Calendar calendar = Calendar.getInstance();
+			Date currDate = calendar.getTime();
 			@SuppressWarnings("unchecked") List<BasicDBObject> sent = (List<BasicDBObject>) result.getRawResults().get("result");
-			Date currDate = Calendar.getInstance().getTime();
-			currDate = getNdaysBackDate(currDate, Calendar.YEAR, 1);
 			for (BasicDBObject sentSurvey : sent) {
 				if (criteriaColumn == "dayOfMonth") {
 					for (String date : sentSurveys.keySet()) {
@@ -853,32 +852,37 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao {
 				}
 				if (criteriaColumn == "week") {
 					int reductionInDate = 7;
+					LOG.info("Size: " + sentSurveys.keySet().size());
 					for (String date : sentSurveys.keySet()) {
-						currDate = new SimpleDateFormat(CommonConstants.DATE_FORMAT).parse(date);
-						calendar.setTime(currDate);
+						calendar.setTime(new SimpleDateFormat(CommonConstants.DATE_FORMAT).parse(date));
 
-						long noOfSurveys = noOfPreInitiatedSurveys(columnName, columnValue,
-								getNdaysBackDate(currDate, Calendar.DATE, reductionInDate), currDate);
-						sentSurveys.put(date, noOfSurveys);
+						Date startDay = getNdaysBackDate(currDate, Calendar.DATE, reductionInDate);
+						long noOfSurveys = noOfPreInitiatedSurveys(columnName, columnValue, startDay, currDate);
+						currDate = startDay;
 
 						if (calendar.get(Calendar.WEEK_OF_YEAR) == Integer.parseInt(sentSurvey.get(CommonConstants.DEFAULT_MONGO_ID_COLUMN)
 								.toString()) + 1) {
-							sentSurveys.put(date, noOfSurveys + Long.parseLong(sentSurvey.get("count").toString()));
+							noOfSurveys += Long.parseLong(sentSurvey.get("count").toString());
+						}
+						if (sentSurveys.get(date) == 0l) {
+							sentSurveys.put(date, noOfSurveys);
 						}
 					}
 				}
 				if (criteriaColumn == "month") {
 					int reductionInMonth = -1;
+					currDate = getNdaysBackDate(currDate, Calendar.YEAR, 1);
 					for (String date : sentSurveys.keySet()) {
 						calendar.setTime(new SimpleDateFormat("MMM").parse(date));
 
-						Date startMonth = getNdaysBackDate(currDate, Calendar.MONTH, reductionInMonth);
-						long noOfSurveys = noOfPreInitiatedSurveys(columnName, columnValue, currDate, startMonth);
-						sentSurveys.put(date, noOfSurveys);
-						currDate = startMonth;
+						Date endMonth = getNdaysBackDate(currDate, Calendar.MONTH, reductionInMonth);
+						long noOfSurveys = noOfPreInitiatedSurveys(columnName, columnValue, currDate, endMonth);
+						currDate = endMonth;
 						
-						if (calendar.get(Calendar.MONTH) + 1 == Integer.parseInt(sentSurvey.get(CommonConstants.DEFAULT_MONGO_ID_COLUMN).toString()))
-							sentSurveys.put(date, noOfSurveys + Long.parseLong(sentSurvey.get("count").toString()));
+						if (calendar.get(Calendar.MONTH) + 1 == Integer.parseInt(sentSurvey.get(CommonConstants.DEFAULT_MONGO_ID_COLUMN).toString())) {
+							noOfSurveys += Long.parseLong(sentSurvey.get("count").toString());
+						}
+						sentSurveys.put(date, noOfSurveys);
 					}
 				}
 			}
