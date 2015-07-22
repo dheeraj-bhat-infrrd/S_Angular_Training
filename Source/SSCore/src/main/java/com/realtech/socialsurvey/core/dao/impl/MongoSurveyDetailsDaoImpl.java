@@ -880,7 +880,7 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao {
 						if (calendar.get(Calendar.MONTH) + 1 == Integer.parseInt(sentSurvey.get(CommonConstants.DEFAULT_MONGO_ID_COLUMN).toString())) {
 							noOfSurveys += Long.parseLong(sentSurvey.get("count").toString());
 						}
-						sentSurveys.put(date, noOfSurveys);
+						sentSurveys.put(date, noOfSurveys + sentSurveys.get(date));
 					}
 				}
 			}
