@@ -292,6 +292,7 @@ public class ProfileManagementController {
 	@RequestMapping(value = "/updatelocksettings", method = RequestMethod.POST)
 	public String updateLockSettings(Model model, HttpServletRequest request) {
 		LOG.info("Method updateLockSettings() called from ProfileManagementController");
+		User user = sessionHelper.getCurrentUser();
 		HttpSession session = request.getSession(false);
 		LockSettings lockSettings = null;
 
@@ -313,7 +314,7 @@ public class ProfileManagementController {
 			}
 
 			if (entityType.equals(CommonConstants.COMPANY_ID_COLUMN)) {
-				OrganizationUnitSettings companySettings = organizationManagementService.getCompanySettings(entityId);
+				OrganizationUnitSettings companySettings = organizationManagementService.getCompanySettings(user);
 				if (companySettings == null) {
 					throw new InvalidInputException("No company settings found in current session");
 				}
@@ -423,6 +424,7 @@ public class ProfileManagementController {
 	@RequestMapping(value = "/addorupdateaboutme", method = RequestMethod.POST)
 	public String updateAboutMe(Model model, HttpServletRequest request) {
 		LOG.info("Method updateAboutMe() called from ProfileManagementController");
+		User user = sessionHelper.getCurrentUser();
 		HttpSession session = request.getSession(false);
 		ContactDetailsSettings contactDetailsSettings = null;
 
@@ -441,7 +443,7 @@ public class ProfileManagementController {
 			}
 
 			if (entityType.equals(CommonConstants.COMPANY_ID_COLUMN)) {
-				OrganizationUnitSettings companySettings = organizationManagementService.getCompanySettings(entityId);
+				OrganizationUnitSettings companySettings = organizationManagementService.getCompanySettings(user);
 				if (companySettings == null) {
 					throw new InvalidInputException("No company settings found in current session");
 				}
@@ -547,7 +549,7 @@ public class ProfileManagementController {
 			}
 
 			if (entityType.equals(CommonConstants.COMPANY_ID_COLUMN)) {
-				OrganizationUnitSettings companySettings = organizationManagementService.getCompanySettings(entityId);
+				OrganizationUnitSettings companySettings = organizationManagementService.getCompanySettings(user);
 				if (companySettings == null) {
 					throw new InvalidInputException("No company settings found in current session");
 				}
@@ -679,6 +681,7 @@ public class ProfileManagementController {
 	@RequestMapping(value = "/updateprofileaddress", method = RequestMethod.POST)
 	public String updateProfileAddress(Model model, HttpServletRequest request) {
 		LOG.info("Method updateProfileAddress() called from ProfileManagementController");
+		User user = sessionHelper.getCurrentUser();
 		HttpSession session = request.getSession(false);
 		ContactDetailsSettings contactDetailsSettings = null;
 
@@ -710,7 +713,7 @@ public class ProfileManagementController {
 			}
 
 			if (entityType.equals(CommonConstants.COMPANY_ID_COLUMN)) {
-				OrganizationUnitSettings companySettings = organizationManagementService.getCompanySettings(entityId);
+				OrganizationUnitSettings companySettings = organizationManagementService.getCompanySettings(user);
 				if (companySettings == null) {
 					throw new InvalidInputException("No company settings found in current session");
 				}
@@ -796,6 +799,7 @@ public class ProfileManagementController {
 	@RequestMapping(value = "/editcompanyinformation", method = RequestMethod.POST)
 	public String editCompanyInformation(Model model, HttpServletRequest request) {
 		LOG.info("Method editCompanyInformation of ProfileManagementController called");
+		User user = sessionHelper.getCurrentUser();
 		HttpSession session = request.getSession(false);
 		ContactDetailsSettings contactDetailsSettings = null;
 
@@ -839,7 +843,7 @@ public class ProfileManagementController {
 			}
 
 			if (entityType.equals(CommonConstants.COMPANY_ID_COLUMN)) {
-				OrganizationUnitSettings companySettings = organizationManagementService.getCompanySettings(entityId);
+				OrganizationUnitSettings companySettings = organizationManagementService.getCompanySettings(user);
 				if (companySettings == null) {
 					throw new InvalidInputException("No company settings found in current session");
 				}
@@ -934,6 +938,7 @@ public class ProfileManagementController {
 	@RequestMapping(value = "/updatesummarydata", method = RequestMethod.POST)
 	public String updateSummaryDetail(Model model, HttpServletRequest request) {
 		LOG.info("Method updateSummaryDetail() called from ProfileManagementController");
+		User user = sessionHelper.getCurrentUser();
 		HttpSession session = request.getSession(false);
 		ContactDetailsSettings contactDetailsSettings = null;
 
@@ -952,7 +957,7 @@ public class ProfileManagementController {
 			String aboutme = request.getParameter("aboutme");
 
 			if (entityType.equals(CommonConstants.COMPANY_ID_COLUMN)) {
-				OrganizationUnitSettings companySettings = organizationManagementService.getCompanySettings(entityId);
+				OrganizationUnitSettings companySettings = organizationManagementService.getCompanySettings(user);
 				if (companySettings == null) {
 					throw new InvalidInputException("No company settings found in current session");
 				}
@@ -1048,6 +1053,7 @@ public class ProfileManagementController {
 	@RequestMapping(value = "/updatelogo", method = RequestMethod.POST)
 	public String updateLogo(Model model, HttpServletRequest request, @RequestParam("logo") MultipartFile fileLocal) {
 		LOG.info("Method updateLogo() called from ProfileManagementController");
+		User user = sessionHelper.getCurrentUser();
 		HttpSession session = request.getSession(false);
 		String logoUrl = "";
 
@@ -1075,7 +1081,7 @@ public class ProfileManagementController {
 			}
 
 			if (entityType.equals(CommonConstants.COMPANY_ID_COLUMN)) {
-				OrganizationUnitSettings companySettings = organizationManagementService.getCompanySettings(entityId);
+				OrganizationUnitSettings companySettings = organizationManagementService.getCompanySettings(user);
 				if (companySettings == null) {
 					throw new InvalidInputException("No company settings found in current session");
 				}
@@ -1134,6 +1140,7 @@ public class ProfileManagementController {
 	@RequestMapping(value = "/updateprofileimage", method = RequestMethod.POST)
 	public String updateProfileImage(Model model, HttpServletRequest request) {
 		LOG.info("Method updateProfileImage() called from ProfileManagementController");
+		User user = sessionHelper.getCurrentUser();
 		HttpSession session = request.getSession(false);
 		String profileImageUrl = "";
 
@@ -1208,7 +1215,7 @@ public class ProfileManagementController {
 			}
 
 			if (entityType.equals(CommonConstants.COMPANY_ID_COLUMN)) {
-				OrganizationUnitSettings companySettings = organizationManagementService.getCompanySettings(entityId);
+				OrganizationUnitSettings companySettings = organizationManagementService.getCompanySettings(user);
 				if (companySettings == null) {
 					throw new InvalidInputException("No company settings found in current session");
 				}
@@ -1281,6 +1288,7 @@ public class ProfileManagementController {
 	@RequestMapping(value = "/updateemailids", method = RequestMethod.POST)
 	public String updateEmailds(Model model, HttpServletRequest request) {
 		LOG.info("Method updateEmailds() called from ProfileManagementController");
+		User user = sessionHelper.getCurrentUser();
 		HttpSession session = request.getSession(false);
 		ContactDetailsSettings contactDetailsSettings = null;
 
@@ -1307,7 +1315,7 @@ public class ProfileManagementController {
 			}
 
 			if (entityType.equals(CommonConstants.COMPANY_ID_COLUMN)) {
-				OrganizationUnitSettings companySettings = organizationManagementService.getCompanySettings(entityId);
+				OrganizationUnitSettings companySettings = organizationManagementService.getCompanySettings(user);
 				if (companySettings == null) {
 					throw new InvalidInputException("No company settings found in current session");
 				}
@@ -1485,6 +1493,7 @@ public class ProfileManagementController {
 	@RequestMapping(value = "/updatephonenumbers", method = RequestMethod.POST)
 	public String updatePhoneNumbers(Model model, HttpServletRequest request) {
 		LOG.info("Method updatePhoneNumbers() called from ProfileManagementController");
+		User user = sessionHelper.getCurrentUser();
 		HttpSession session = request.getSession(false);
 		ContactDetailsSettings contactDetailsSettings = null;
 
@@ -1511,7 +1520,7 @@ public class ProfileManagementController {
 			}
 
 			if (entityType.equals(CommonConstants.COMPANY_ID_COLUMN)) {
-				OrganizationUnitSettings companySettings = organizationManagementService.getCompanySettings(entityId);
+				OrganizationUnitSettings companySettings = organizationManagementService.getCompanySettings(user);
 				if (companySettings == null) {
 					throw new InvalidInputException("No company settings found in current session");
 				}
@@ -1626,6 +1635,7 @@ public class ProfileManagementController {
 	@RequestMapping(value = "/updatewebaddresses", method = RequestMethod.POST)
 	public String updateWebAddresses(Model model, HttpServletRequest request) {
 		LOG.info("Method updateWebAddresses() called from ProfileManagementController");
+		User user = sessionHelper.getCurrentUser();
 		HttpSession session = request.getSession(false);
 		ContactDetailsSettings contactDetailsSettings = null;
 
@@ -1653,7 +1663,7 @@ public class ProfileManagementController {
 			}
 
 			if (entityType.equals(CommonConstants.COMPANY_ID_COLUMN)) {
-				OrganizationUnitSettings companySettings = organizationManagementService.getCompanySettings(entityId);
+				OrganizationUnitSettings companySettings = organizationManagementService.getCompanySettings(user);
 				if (companySettings == null) {
 					throw new InvalidInputException("No company settings found in current session");
 				}
@@ -1769,6 +1779,7 @@ public class ProfileManagementController {
 	@RequestMapping(value = "/updatefacebooklink", method = RequestMethod.POST)
 	public String updateFacebookLink(Model model, HttpServletRequest request) {
 		LOG.info("Method updateFacebookLink() called from ProfileManagementController");
+		User user = sessionHelper.getCurrentUser();
 		HttpSession session = request.getSession(false);
 		SocialMediaTokens socialMediaTokens = null;
 
@@ -1793,7 +1804,7 @@ public class ProfileManagementController {
 			}
 
 			if (entityType.equals(CommonConstants.COMPANY_ID_COLUMN)) {
-				OrganizationUnitSettings companySettings = organizationManagementService.getCompanySettings(entityId);
+				OrganizationUnitSettings companySettings = organizationManagementService.getCompanySettings(user);
 				if (companySettings == null) {
 					throw new InvalidInputException("No company settings found in current session");
 				}
@@ -1879,6 +1890,7 @@ public class ProfileManagementController {
 	@RequestMapping(value = "/updatetwitterlink", method = RequestMethod.POST)
 	public String updateTwitterLink(Model model, HttpServletRequest request) {
 		LOG.info("Method updateTwitterLink() called from ProfileManagementController");
+		User user = sessionHelper.getCurrentUser();
 		HttpSession session = request.getSession(false);
 		SocialMediaTokens socialMediaTokens = null;
 
@@ -1903,7 +1915,7 @@ public class ProfileManagementController {
 			}
 
 			if (entityType.equals(CommonConstants.COMPANY_ID_COLUMN)) {
-				OrganizationUnitSettings companySettings = organizationManagementService.getCompanySettings(entityId);
+				OrganizationUnitSettings companySettings = organizationManagementService.getCompanySettings(user);
 				if (companySettings == null) {
 					throw new InvalidInputException("No company settings found in current session");
 				}
@@ -1989,6 +2001,7 @@ public class ProfileManagementController {
 	@RequestMapping(value = "/updatelinkedinlink", method = RequestMethod.POST)
 	public String updateLinkedInLink(Model model, HttpServletRequest request) {
 		LOG.info("Method updateLinkedInLink() called from ProfileManagementController");
+		User user = sessionHelper.getCurrentUser();
 		HttpSession session = request.getSession(false);
 		SocialMediaTokens socialMediaTokens = null;
 
@@ -2013,7 +2026,7 @@ public class ProfileManagementController {
 			}
 
 			if (entityType.equals(CommonConstants.COMPANY_ID_COLUMN)) {
-				OrganizationUnitSettings companySettings = organizationManagementService.getCompanySettings(entityId);
+				OrganizationUnitSettings companySettings = organizationManagementService.getCompanySettings(user);
 				if (companySettings == null) {
 					throw new InvalidInputException("No company settings found in current session");
 				}
@@ -2099,6 +2112,7 @@ public class ProfileManagementController {
 	@RequestMapping(value = "/updateyelplink", method = RequestMethod.POST)
 	public String updateYelpLink(Model model, HttpServletRequest request) {
 		LOG.info("Method updateYelpLink() called from ProfileManagementController");
+		User user = sessionHelper.getCurrentUser();
 		HttpSession session = request.getSession(false);
 		SocialMediaTokens socialMediaTokens = null;
 
@@ -2123,7 +2137,7 @@ public class ProfileManagementController {
 			}
 
 			if (entityType.equals(CommonConstants.COMPANY_ID_COLUMN)) {
-				OrganizationUnitSettings companySettings = organizationManagementService.getCompanySettings(entityId);
+				OrganizationUnitSettings companySettings = organizationManagementService.getCompanySettings(user);
 				if (companySettings == null) {
 					throw new InvalidInputException("No company settings found in current session");
 				}
@@ -2237,6 +2251,7 @@ public class ProfileManagementController {
 	@RequestMapping(value = "/updategooglelink", method = RequestMethod.POST)
 	public String updateGoogleLink(Model model, HttpServletRequest request) {
 		LOG.info("Method updateGoogleLink() called from ProfileManagementController");
+		User user = sessionHelper.getCurrentUser();
 		HttpSession session = request.getSession(false);
 		SocialMediaTokens socialMediaTokens = null;
 
@@ -2261,7 +2276,7 @@ public class ProfileManagementController {
 			}
 
 			if (entityType.equals(CommonConstants.COMPANY_ID_COLUMN)) {
-				OrganizationUnitSettings companySettings = organizationManagementService.getCompanySettings(entityId);
+				OrganizationUnitSettings companySettings = organizationManagementService.getCompanySettings(user);
 				if (companySettings == null) {
 					throw new InvalidInputException("No company settings found in current session");
 				}
@@ -2347,6 +2362,7 @@ public class ProfileManagementController {
 	@RequestMapping(value = "/updatezillowlink", method = RequestMethod.POST)
 	public String updateZillowLink(Model model, HttpServletRequest request) {
 		LOG.info("Method updateZillowLink() called from ProfileManagementController");
+		User user = sessionHelper.getCurrentUser();
 		HttpSession session = request.getSession(false);
 		SocialMediaTokens socialMediaTokens = null;
 
@@ -2371,7 +2387,7 @@ public class ProfileManagementController {
 			}
 
 			if (entityType.equals(CommonConstants.COMPANY_ID_COLUMN)) {
-				OrganizationUnitSettings companySettings = organizationManagementService.getCompanySettings(entityId);
+				OrganizationUnitSettings companySettings = organizationManagementService.getCompanySettings(user);
 				if (companySettings == null) {
 					throw new InvalidInputException("No company settings found in current session");
 				}
@@ -2458,6 +2474,7 @@ public class ProfileManagementController {
 	@RequestMapping(value = "/updatelendingtreelink", method = RequestMethod.POST)
 	public String updateLendingTreeLink(Model model, HttpServletRequest request) {
 		LOG.info("Method updateLendingTreeLink() called from ProfileManagementController");
+		User user = sessionHelper.getCurrentUser();
 		HttpSession session = request.getSession(false);
 		SocialMediaTokens socialMediaTokens = null;
 
@@ -2482,7 +2499,7 @@ public class ProfileManagementController {
 			}
 
 			if (entityType.equals(CommonConstants.COMPANY_ID_COLUMN)) {
-				OrganizationUnitSettings companySettings = organizationManagementService.getCompanySettings(entityId);
+				OrganizationUnitSettings companySettings = organizationManagementService.getCompanySettings(user);
 				if (companySettings == null) {
 					throw new InvalidInputException("No company settings found in current session");
 				}
@@ -2577,6 +2594,7 @@ public class ProfileManagementController {
 	@RequestMapping(value = "/updateachievements", method = RequestMethod.POST)
 	public String updateAchievements(Model model, HttpServletRequest request) {
 		LOG.info("Method updateAchievements() called from ProfileManagementController");
+		User user = sessionHelper.getCurrentUser();
 		HttpSession session = request.getSession(false);
 		List<Achievement> achievements = null;
 
@@ -2602,7 +2620,7 @@ public class ProfileManagementController {
 			}
 
 			if (entityType.equals(CommonConstants.COMPANY_ID_COLUMN)) {
-				OrganizationUnitSettings companySettings = organizationManagementService.getCompanySettings(entityId);
+				OrganizationUnitSettings companySettings = organizationManagementService.getCompanySettings(user);
 				if (companySettings == null) {
 					throw new InvalidInputException("No company settings found in current session");
 				}
@@ -2679,6 +2697,7 @@ public class ProfileManagementController {
 	@RequestMapping(value = "/updateassociations", method = RequestMethod.POST)
 	public String updateAssociations(Model model, HttpServletRequest request) {
 		LOG.info("Method updateAssociations() called from ProfileManagementController");
+		User user = sessionHelper.getCurrentUser();
 		HttpSession session = request.getSession(false);
 		List<Association> associations = null;
 
@@ -2704,7 +2723,7 @@ public class ProfileManagementController {
 			}
 
 			if (entityType.equals(CommonConstants.COMPANY_ID_COLUMN)) {
-				OrganizationUnitSettings companySettings = organizationManagementService.getCompanySettings(entityId);
+				OrganizationUnitSettings companySettings = organizationManagementService.getCompanySettings(user);
 				if (companySettings == null) {
 					throw new InvalidInputException("No company settings found in current session");
 				}
@@ -2772,6 +2791,7 @@ public class ProfileManagementController {
 	@RequestMapping(value = "/updatelicenses", method = RequestMethod.POST)
 	public String updateProfileLicenses(Model model, HttpServletRequest request) {
 		LOG.info("Method updateProfileLicenses() called from ProfileManagementController");
+		User user = sessionHelper.getCurrentUser();
 		HttpSession session = request.getSession(false);
 		Licenses licenses = null;
 
@@ -2798,7 +2818,7 @@ public class ProfileManagementController {
 			}
 
 			if (entityType.equals(CommonConstants.COMPANY_ID_COLUMN)) {
-				OrganizationUnitSettings companySettings = organizationManagementService.getCompanySettings(entityId);
+				OrganizationUnitSettings companySettings = organizationManagementService.getCompanySettings(user);
 				if (companySettings == null) {
 					throw new InvalidInputException("No company settings found in current session");
 				}
@@ -3804,6 +3824,7 @@ public class ProfileManagementController {
 	@RequestMapping(value = "/updatedisclaimer", method = RequestMethod.POST)
 	public String updateDisclaimer(Model model, HttpServletRequest request) {
 		LOG.info("Method updateDisclaimer() called from ProfileManagementController");
+		User user = sessionHelper.getCurrentUser();
 		HttpSession session = request.getSession(false);
 
 		try {
@@ -3821,7 +3842,7 @@ public class ProfileManagementController {
 			}
 
 			if (entityType.equals(CommonConstants.COMPANY_ID_COLUMN)) {
-				OrganizationUnitSettings companySettings = organizationManagementService.getCompanySettings(entityId);
+				OrganizationUnitSettings companySettings = organizationManagementService.getCompanySettings(user);
 				if (companySettings == null) {
 					throw new InvalidInputException("No company settings found in current session");
 				}
