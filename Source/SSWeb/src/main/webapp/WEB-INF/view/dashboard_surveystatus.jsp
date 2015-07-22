@@ -59,7 +59,7 @@
 	</div>
 	
 	<div class="clearfix stat-icns-wrapper">
-		<div class="float-left stat-icn-lbl"><spring:message code="label.socialposts.key" /></div>
+		<div class="float-left stat-icn-lbl"><spring:message code="label.surveyssocialposts.key" /></div>
 		<div id="social-post-icn" class="float-left stat-icns-item clearfix">
 			<c:choose>
 				<c:when test="${not empty socialPosts && socialPosts != 0}">

@@ -1702,38 +1702,41 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 	public void setAgentProfileUrlForReview(List<SurveyDetails> reviews) {
 		String profileUrl;
 		String baseProfileUrl = applicationBaseUrl + CommonConstants.AGENT_PROFILE_FIXED_URL;
-		for (SurveyDetails review : reviews) {
 
-			// adding completeProfileUrl
-			try {
-				Collection<UserFromSearch> documents = solrSearchService.searchUsersByIden(review.getAgentId(), CommonConstants.USER_ID_SOLR, true,
-						0, 1);
-				if (documents != null && !documents.isEmpty()) {
-					profileUrl = (String) documents.iterator().next().getProfileUrl();
-					review.setCompleteProfileUrl(baseProfileUrl + profileUrl);
+		if (reviews != null && !reviews.isEmpty()) {
+			for (SurveyDetails review : reviews) {
+
+				// adding completeProfileUrl
+				try {
+					Collection<UserFromSearch> documents = solrSearchService.searchUsersByIden(review.getAgentId(), CommonConstants.USER_ID_SOLR,
+							true, 0, 1);
+					if (documents != null && !documents.isEmpty()) {
+						profileUrl = (String) documents.iterator().next().getProfileUrl();
+						review.setCompleteProfileUrl(baseProfileUrl + profileUrl);
+					}
 				}
-			}
-			catch (InvalidInputException | SolrException e) {
-				LOG.error("Exception caught in setAgentProfileUrlForReview() for agent : " + review.getAgentName() + " Nested exception is ", e);
-			}
-
-			OrganizationUnitSettings agentSettings = organizationUnitSettingsDao.fetchAgentSettingsById(review.getAgentId());
-			if (agentSettings != null && agentSettings.getSocialMediaTokens() != null) {
-				SocialMediaTokens mediaTokens = agentSettings.getSocialMediaTokens();
-
-				// adding yelpUrl
-				if (mediaTokens.getYelpToken() != null && mediaTokens.getYelpToken().getYelpPageLink() != null) {
-					review.setYelpProfileUrl(mediaTokens.getYelpToken().getYelpPageLink());
+				catch (InvalidInputException | SolrException e) {
+					LOG.error("Exception caught in setAgentProfileUrlForReview() for agent : " + review.getAgentName() + " Nested exception is ", e);
 				}
 
-				// adding zillowUrl
-				if (mediaTokens.getZillowToken() != null && mediaTokens.getZillowToken().getZillowProfileLink() != null) {
-					review.setZillowProfileUrl(mediaTokens.getZillowToken().getZillowProfileLink());
-				}
+				OrganizationUnitSettings agentSettings = organizationUnitSettingsDao.fetchAgentSettingsById(review.getAgentId());
+				if (agentSettings != null && agentSettings.getSocialMediaTokens() != null) {
+					SocialMediaTokens mediaTokens = agentSettings.getSocialMediaTokens();
 
-				// adding lendingTreeUrl
-				if (mediaTokens.getLendingTreeToken() != null && mediaTokens.getLendingTreeToken().getLendingTreeProfileLink() != null) {
-					review.setLendingTreeProfileUrl(mediaTokens.getLendingTreeToken().getLendingTreeProfileLink());
+					// adding yelpUrl
+					if (mediaTokens.getYelpToken() != null && mediaTokens.getYelpToken().getYelpPageLink() != null) {
+						review.setYelpProfileUrl(mediaTokens.getYelpToken().getYelpPageLink());
+					}
+
+					// adding zillowUrl
+					if (mediaTokens.getZillowToken() != null && mediaTokens.getZillowToken().getZillowProfileLink() != null) {
+						review.setZillowProfileUrl(mediaTokens.getZillowToken().getZillowProfileLink());
+					}
+
+					// adding lendingTreeUrl
+					if (mediaTokens.getLendingTreeToken() != null && mediaTokens.getLendingTreeToken().getLendingTreeProfileLink() != null) {
+						review.setLendingTreeProfileUrl(mediaTokens.getLendingTreeToken().getLendingTreeProfileLink());
+					}
 				}
 			}
 		}

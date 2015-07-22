@@ -121,7 +121,7 @@
 							<spring:message code="label.surveyscompleted.key" /><span class="lgn-col-item lgn-col-yel"></span>
 						</div>
 						<div class="util-gph-legend-item">
-							<spring:message code="label.socialposts.key" /><span class="lgn-col-item lgn-col-red"></span>
+							<spring:message code="label.surveyssocialposts.key" /><span class="lgn-col-item lgn-col-red"></span>
 						</div>
 					</div>
 				</div>
