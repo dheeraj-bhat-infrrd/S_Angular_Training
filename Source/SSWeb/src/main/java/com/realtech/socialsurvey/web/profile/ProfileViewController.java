@@ -5,9 +5,12 @@ package com.realtech.socialsurvey.web.profile;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Map;
+
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
 import org.apache.solr.common.SolrDocument;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -20,6 +23,8 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+
 import com.amazonaws.util.json.JSONException;
 import com.amazonaws.util.json.JSONObject;
 import com.google.gson.Gson;
@@ -90,8 +95,8 @@ public class ProfileViewController
      * @throws NoRecordsFetchedException 
      */
     @RequestMapping ( value = "/company/{profileName}", method = RequestMethod.GET)
-    public String initCompanyProfilePage( @PathVariable String profileName, Model model, HttpServletRequest request )
-        throws NoRecordsFetchedException, ProfileNotFoundException
+    public String initCompanyProfilePage( @PathVariable String profileName, Model model, HttpServletRequest request,
+        RedirectAttributes redirectAttributes ) throws NoRecordsFetchedException
     {
         LOG.info( "Service to initiate company profile page called" );
         String message = null;
@@ -134,8 +139,8 @@ public class ProfileViewController
                     CommonConstants.REVIEWS_SORT_CRITERIA_FEATURE );
                 model.addAttribute( "reviews", reviews );
 
-				List<SocialPost> posts = profileManagementService.getSocialPosts(companyProfile.getIden(), CommonConstants.COMPANY_ID_COLUMN, -1,
-						CommonConstants.USER_AGENT_NUMBER_POST);
+                List<SocialPost> posts = profileManagementService.getSocialPosts( companyProfile.getIden(),
+                    CommonConstants.COMPANY_ID_COLUMN, -1, CommonConstants.USER_AGENT_NUMBER_POST );
                 model.addAttribute( "posts", posts );
             }
         } catch ( InvalidInputException e ) {
@@ -143,7 +148,11 @@ public class ProfileViewController
                 CommonConstants.ERROR_CODE_COMPANY_PROFILE_SERVICE_FAILURE, CommonConstants.SERVICE_CODE_COMPANY_PROFILE,
                 "Error occured while fetching company profile" ), e.getMessage() );
         } catch ( ProfileNotFoundException e ) {
-            throw e;
+            LOG.error( "Excpetion caught " + e.getMessage() );
+            Map<String, String> nameMap = profileManagementService.findNamesfromProfileName( profileName );
+            redirectAttributes.addFlashAttribute( "patternFirst", nameMap.get( CommonConstants.PATTERN_FIRST ) );
+            redirectAttributes.addFlashAttribute( "patternLast", nameMap.get( CommonConstants.PATTERN_LAST ) );
+            return "redirect:/" + JspResolver.FINDAPRO + ".do";
         }
 
         model.addAttribute( "profile", companyProfile );
@@ -170,7 +179,7 @@ public class ProfileViewController
      */
     @RequestMapping ( value = "/region/{companyProfileName}/{regionProfileName}")
     public String initRegionProfilePage( @PathVariable String companyProfileName, @PathVariable String regionProfileName,
-        Model model, HttpServletRequest request ) throws NoRecordsFetchedException, ProfileNotFoundException
+        Model model, HttpServletRequest request, RedirectAttributes redirectAttributes ) throws NoRecordsFetchedException
     {
         LOG.info( "Service to initiate region profile page called" );
         String message = null;
@@ -229,12 +238,16 @@ public class ProfileViewController
                     CommonConstants.REVIEWS_SORT_CRITERIA_FEATURE );
                 model.addAttribute( "reviews", reviews );
 
-				List<SocialPost> posts = profileManagementService.getSocialPosts(regionProfile.getIden(), CommonConstants.REGION_ID_COLUMN, -1,
-						CommonConstants.USER_AGENT_NUMBER_POST);
+                List<SocialPost> posts = profileManagementService.getSocialPosts( regionProfile.getIden(),
+                    CommonConstants.REGION_ID_COLUMN, -1, CommonConstants.USER_AGENT_NUMBER_POST );
                 model.addAttribute( "posts", posts );
             }
         } catch ( ProfileNotFoundException e ) {
-            throw e;
+            LOG.error( "Excpetion caught " + e.getMessage() );
+            Map<String, String> nameMap = profileManagementService.findNamesfromProfileName( regionProfileName );
+            redirectAttributes.addFlashAttribute( "patternFirst", nameMap.get( CommonConstants.PATTERN_FIRST ) );
+            redirectAttributes.addFlashAttribute( "patternLast", nameMap.get( CommonConstants.PATTERN_LAST ) );
+            return "redirect:/" + JspResolver.FINDAPRO + ".do";
         } catch ( InvalidInputException e ) {
             throw new InternalServerException( new ProfileServiceErrorCode(
                 CommonConstants.ERROR_CODE_REGION_PROFILE_SERVICE_FAILURE, CommonConstants.SERVICE_CODE_REGION_PROFILE,
@@ -266,7 +279,7 @@ public class ProfileViewController
      */
     @RequestMapping ( value = "/office/{companyProfileName}/{branchProfileName}")
     public String initBranchProfilePage( @PathVariable String companyProfileName, @PathVariable String branchProfileName,
-        Model model, HttpServletRequest request ) throws NoRecordsFetchedException, ProfileNotFoundException
+        Model model, HttpServletRequest request, RedirectAttributes redirectAttributes ) throws NoRecordsFetchedException
     {
         LOG.info( "Service to initiate branch profile page called" );
         String message = null;
@@ -325,12 +338,16 @@ public class ProfileViewController
                     CommonConstants.REVIEWS_SORT_CRITERIA_FEATURE );
                 model.addAttribute( "reviews", reviews );
 
-				List<SocialPost> posts = profileManagementService.getSocialPosts(branchProfile.getIden(), CommonConstants.BRANCH_ID_COLUMN, -1,
-						CommonConstants.USER_AGENT_NUMBER_POST);
+                List<SocialPost> posts = profileManagementService.getSocialPosts( branchProfile.getIden(),
+                    CommonConstants.BRANCH_ID_COLUMN, -1, CommonConstants.USER_AGENT_NUMBER_POST );
                 model.addAttribute( "posts", posts );
             }
         } catch ( ProfileNotFoundException e ) {
-            throw e;
+            LOG.error( "Excpetion caught " + e.getMessage() );
+            Map<String, String> nameMap = profileManagementService.findNamesfromProfileName( branchProfileName );
+            redirectAttributes.addFlashAttribute( "patternFirst", nameMap.get( CommonConstants.PATTERN_FIRST ) );
+            redirectAttributes.addFlashAttribute( "patternLast", nameMap.get( CommonConstants.PATTERN_LAST ) );
+            return "redirect:/" + JspResolver.FINDAPRO + ".do";
         } catch ( InvalidInputException e ) {
             throw new InternalServerException( new ProfileServiceErrorCode(
                 CommonConstants.ERROR_CODE_BRANCH_PROFILE_SERVICE_FAILURE, CommonConstants.SERVICE_CODE_BRANCH_PROFILE,
@@ -361,7 +378,7 @@ public class ProfileViewController
      */
     @RequestMapping ( value = "/{agentProfileName}")
     public String initAgentProfilePage( @PathVariable String agentProfileName, Model model, HttpServletResponse response,
-        HttpServletRequest request ) throws NoRecordsFetchedException, ProfileNotFoundException
+        HttpServletRequest request, RedirectAttributes redirectAttributes ) throws NoRecordsFetchedException
     {
         LOG.info( "Service to initiate agent profile page called" );
         boolean isBotRequest = botRequestUtils.checkBotRequest( request );
@@ -444,8 +461,8 @@ public class ProfileViewController
                         CommonConstants.REVIEWS_SORT_CRITERIA_FEATURE );
                     model.addAttribute( "reviews", reviews );
 
-					List<SocialPost> posts = profileManagementService.getSocialPosts(individualProfile.getIden(), CommonConstants.AGENT_ID_COLUMN,
-							-1, CommonConstants.USER_AGENT_NUMBER_POST);
+                    List<SocialPost> posts = profileManagementService.getSocialPosts( individualProfile.getIden(),
+                        CommonConstants.AGENT_ID_COLUMN, -1, CommonConstants.USER_AGENT_NUMBER_POST );
                     model.addAttribute( "posts", posts );
                 }
 
@@ -465,14 +482,22 @@ public class ProfileViewController
                 }
                 model.addAttribute( "profile", individualProfile );
             } catch ( ProfileNotFoundException e ) {
-                throw e;
+                LOG.error( "Excpetion caught " + e.getMessage() );
+                Map<String, String> nameMap = profileManagementService.findNamesfromProfileName( agentProfileName );
+                redirectAttributes.addFlashAttribute( "patternFirst", nameMap.get( CommonConstants.PATTERN_FIRST ) );
+                redirectAttributes.addFlashAttribute( "patternLast", nameMap.get( CommonConstants.PATTERN_LAST ) );
+                return "redirect:/" + JspResolver.FINDAPRO + ".do";
             } catch ( InvalidInputException e ) {
                 throw new InternalServerException( new ProfileServiceErrorCode(
                     CommonConstants.ERROR_CODE_INDIVIDUAL_PROFILE_SERVICE_FAILURE,
                     CommonConstants.SERVICE_CODE_INDIVIDUAL_PROFILE, "Profile name for individual is invalid" ), e.getMessage() );
             }
         } catch ( ProfileNotFoundException e ) {
-            throw e;
+            LOG.error( "Excpetion caught " + e.getMessage() );
+            Map<String, String> nameMap = profileManagementService.findNamesfromProfileName( agentProfileName );
+            redirectAttributes.addFlashAttribute( "patternFirst", nameMap.get( CommonConstants.PATTERN_FIRST ) );
+            redirectAttributes.addFlashAttribute( "patternLast", nameMap.get( CommonConstants.PATTERN_LAST ) );
+            return "redirect:/" + JspResolver.FINDAPRO + ".do";
         } catch ( InvalidInputException e ) {
             LOG.error( "InvalidInputException: message : " + e.getMessage(), e );
             model.addAttribute(
