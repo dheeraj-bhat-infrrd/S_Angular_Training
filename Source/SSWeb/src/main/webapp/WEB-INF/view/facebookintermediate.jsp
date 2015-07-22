@@ -71,11 +71,10 @@ $(document).ready(function() {
 	else {
 		console.log("Unable to access parent window!");
 	}
-	
-	
+	 var pages= "${pageNames}";
 	var radioButtonDiv= $("<div style='text-align:left;margin-left:130px;'>")
-	<c:forEach var="page" items="${pageNames}">
-	   radioButtonDiv.append('<input type="radio" name="pageselection" value="${page.value}"/>'+"${page.key}"+" <br/>");
+	<c:forEach var="page" items="${pageNames}"  varStatus="loop">
+	   radioButtonDiv.append('<input type="radio" name="pageselection" value="${loop.index}"/>'+"${page.name}"+" <br/>");
 	</c:forEach>
 	$("#page").append(radioButtonDiv);
 	var saveButton= $("<div class='reg_btn'>save</div>");
@@ -86,9 +85,18 @@ $(document).ready(function() {
 	
 	
 	saveButton.click(function() {
-		var selectedPageToken=$('input:radio[name=pageselection]:checked').val();
+		var selectedPage=$('input:radio[name=pageselection]:checked').val();
+		var selectedAccessFacebookToken;
+		var selectedProfileUrl;
+		<c:forEach var="page" items="${pageNames}"  varStatus="loop">
+		  if("${loop.index}" == selectedPage){
+			  selectedProfileUrl= "${page.profileUrl}";
+			  selectedAccessFacebookToken= "${page.accessToken}";
+		  }
+		</c:forEach>
 		var facebookToken = {
-				'selectedAccessFacebookToken' : selectedPageToken
+				'selectedAccessFacebookToken' : selectedAccessFacebookToken,
+				'selectedProfileUrl' :  selectedProfileUrl
 			};
 		$.ajax({
 			url : './saveSelectedAccessFacebookToken.do',

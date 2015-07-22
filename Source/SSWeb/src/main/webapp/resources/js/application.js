@@ -7298,6 +7298,9 @@ function paintPosts(posts) {
 		else if(post.source == "linkedin"){
 			iconClass = "icn-lin";
 		}
+		if(typeof post.postUrl!=  "undefined" ){
+			 href= post.postUrl;
+		}
 		var hrefComplet='<a href='+href+' target="_blank">';
 		
 		divToPopulate += '<div class="tweet-panel-item bord-bot-dc clearfix">'		

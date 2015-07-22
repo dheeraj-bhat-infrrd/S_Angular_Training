@@ -10,7 +10,7 @@ public class SocialPost {
 	private String postId;
 	private String postText;
 	private String postedBy;
-
+	private String postUrl;
 	public String getSource() {
 		return source;
 	}
@@ -82,4 +82,13 @@ public class SocialPost {
 	public void setPostId(String postId) {
 		this.postId = postId;
 	}
+
+	public String getPostUrl() {
+		return postUrl;
+	}
+
+	public void setPostUrl(String postUrl) {
+		this.postUrl = postUrl;
+	}
+
 }

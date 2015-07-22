@@ -35,6 +35,7 @@ import com.google.gson.reflect.TypeToken;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.dao.impl.MongoOrganizationUnitSettingDaoImpl;
 import com.realtech.socialsurvey.core.entities.AgentSettings;
+import com.realtech.socialsurvey.core.entities.FacebookPage;
 import com.realtech.socialsurvey.core.entities.FacebookToken;
 import com.realtech.socialsurvey.core.entities.GoogleToken;
 import com.realtech.socialsurvey.core.entities.LinkedInToken;
@@ -105,7 +106,10 @@ public class SocialManagementController {
 
 	@Value("${FB_CLIENT_SECRET}")
 	private String facebookClientSecret;
-	
+
+	@Value("${FB_URI}")
+	private String facebookUri;
+
 	// LinkedIn
 	@Value("${LINKED_IN_REST_API_URI}")
 	private String linkedInRestApiUri;
@@ -294,13 +298,17 @@ public class SocialManagementController {
 			Facebook facebook = (Facebook) session.getAttribute(CommonConstants.SOCIAL_REQUEST_TOKEN);
 			String profileLink = null;
 			facebook4j.auth.AccessToken accessToken = null;
-			Map<String, String> facebookPages=new HashMap<>();
+			List<FacebookPage> facebookPages=new ArrayList<>();
 			try {
 				accessToken = facebook.getOAuthAccessToken(oauthCode, requestUtils.getRequestServerName(request)+facebookRedirectUri);
 				facebook4j.User fbUser = facebook.getUser(facebook.getId());
 				if (user != null){
 					profileLink = fbUser.getLink().toString();
-					facebookPages.put(fbUser.getName(), accessToken.getToken());
+					FacebookPage personalUserAccount=new FacebookPage();
+					personalUserAccount.setAccessToken(accessToken.getToken());
+					personalUserAccount.setName(fbUser.getName());
+					personalUserAccount.setProfileUrl(profileLink);
+					facebookPages.add(personalUserAccount);
 				}
 			}
 			catch (FacebookException e) {
@@ -376,6 +384,7 @@ public class SocialManagementController {
 
 				mediaTokens = agentSettings.getSocialMediaTokens();
 				mediaTokens = updateFacebookToken(accessToken, mediaTokens, profileLink);
+				facebookPages.addAll(mediaTokens.getFacebookToken().getFacebookPages());
 				mediaTokens = socialManagementService.updateAgentSocialMediaTokens(agentSettings, mediaTokens);
 				agentSettings.setSocialMediaTokens(mediaTokens);
 				for(ProfileStage stage : agentSettings.getProfileStages()){
@@ -391,20 +400,7 @@ public class SocialManagementController {
 				throw new InvalidInputException("Invalid input exception occurred while creating access token for facebook",
 						DisplayMessageConstants.GENERAL_ERROR);
 			}
-			Facebook facebook1 = new FacebookFactory().getInstance();
-			facebook1.setOAuthAppId(facebookClientId, facebookClientSecret);
-			facebook1.setOAuthAccessToken(new facebook4j.auth.AccessToken(accessToken.getToken()));
-			
-			ResponseList<Account> accounts;
-			try {
-				accounts = facebook1.getAccounts();
-				for (Account account : accounts) {
-					facebookPages.put(account.getName(), account.getAccessToken());
-				}
-				model.addAttribute("pageNames", facebookPages);
-			} catch (FacebookException e) {
-				LOG.error("Error while creating access token for facebook: " + e.getLocalizedMessage(), e);
-			}
+			model.addAttribute("pageNames", facebookPages);
 		}
 		catch (Exception e) {
 			session.removeAttribute(CommonConstants.SOCIAL_REQUEST_TOKEN);
@@ -426,6 +422,8 @@ public class SocialManagementController {
 	public String saveSelectedAccessFacebookToken(Model model, HttpServletRequest request) {
 		LOG.info("Method saveSelectedAccessFacebookToken() called from SocialManagementController");
 		String selectedAccessFacebookToken = request.getParameter("selectedAccessFacebookToken");
+		String selectedProfileUrl = request.getParameter("selectedProfileUrl");
+		
 		User user = sessionHelper.getCurrentUser();
 		HttpSession session = request.getSession(false);
 		AccountType accountType = (AccountType) session.getAttribute(CommonConstants.ACCOUNT_TYPE_IN_SESSION);
@@ -453,6 +451,7 @@ public class SocialManagementController {
 				}
 				mediaTokens = companySettings.getSocialMediaTokens();
 				mediaTokens.getFacebookToken().setFacebookAccessTokenToPost(selectedAccessFacebookToken);
+				mediaTokens.getFacebookToken().setFacebookPageLink(selectedProfileUrl);
 					socialManagementService.updateSocialMediaTokens(MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION,
 							companySettings, mediaTokens);
 					updated = true;
@@ -464,6 +463,7 @@ public class SocialManagementController {
 				}
 				mediaTokens = regionSettings.getSocialMediaTokens();
 				mediaTokens.getFacebookToken().setFacebookAccessTokenToPost(selectedAccessFacebookToken);
+				mediaTokens.getFacebookToken().setFacebookPageLink(selectedProfileUrl);
 				socialManagementService.updateSocialMediaTokens(MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION,
 						regionSettings, mediaTokens);
 				updated = true;
@@ -475,6 +475,7 @@ public class SocialManagementController {
 				}
 				mediaTokens = branchSettings.getSocialMediaTokens();
 				mediaTokens.getFacebookToken().setFacebookAccessTokenToPost(selectedAccessFacebookToken);
+				mediaTokens.getFacebookToken().setFacebookPageLink(selectedProfileUrl);
 				socialManagementService.updateSocialMediaTokens(MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION,
 						branchSettings, mediaTokens);
 				updated = true;
@@ -486,6 +487,7 @@ public class SocialManagementController {
 				}
 				mediaTokens = agentSettings.getSocialMediaTokens();
 				mediaTokens.getFacebookToken().setFacebookAccessTokenToPost(selectedAccessFacebookToken);
+				mediaTokens.getFacebookToken().setFacebookPageLink(selectedProfileUrl);
 				socialManagementService.updateAgentSocialMediaTokens(agentSettings, mediaTokens);
 				updated = true;
 			}
@@ -528,16 +530,23 @@ public class SocialManagementController {
 		facebook.setOAuthAccessToken(new facebook4j.auth.AccessToken(accessToken.getToken()));
 		
 		ResponseList<Account> accounts;
-		List<String> pageAccessToken=new ArrayList<String>();
+		List<FacebookPage> facebookPages=new ArrayList<FacebookPage>();
 		try {
 			accounts = facebook.getAccounts();
+			FacebookPage facebookPage=null;
 			for (Account account : accounts) {
-				pageAccessToken.add(account.getAccessToken());
+				facebookPage=new FacebookPage();
+				facebookPage.setId(account.getId());
+				facebookPage.setName(account.getName());
+				facebookPage.setAccessToken(account.getAccessToken());
+				facebookPage.setCategory(account.getCategory());
+				facebookPage.setProfileUrl(facebookUri.concat(account.getId()));
+				facebookPages.add(facebookPage);
 			}
 		} catch (FacebookException e) {
 			LOG.error("Error while creating access token for facebook: " + e.getLocalizedMessage(), e);
 		}
-		mediaTokens.getFacebookToken().setFacebookPublicPageAccessToken(pageAccessToken);
+		mediaTokens.getFacebookToken().setFacebookPages(facebookPages);
 		
 		LOG.debug("Method updateFacebookToken() finished from SocialManagementController");
 		return mediaTokens;
