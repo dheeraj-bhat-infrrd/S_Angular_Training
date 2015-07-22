@@ -108,6 +108,7 @@ public interface CommonConstants
     public static final String NO_STRING = "N";
     public static final int SURVEY_STATUS_PRE_INITIATED = 1;
     public static final int SURVEY_STATUS_INITIATED = 2;
+    public static final int SURVEY_STATUS_EMAIL_SENT = 5;
     public static final int STATUS_SURVEYPREINITIATION_NOT_PROCESSED = 2;
     public static final int STATUS_SURVEYPREINITIATION_PROCESSED = 3;
     public static final int STATUS_SURVEYPREINITIATION_OLD_RECORD = 4;
