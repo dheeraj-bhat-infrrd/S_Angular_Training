@@ -864,9 +864,7 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao {
 								.toString()) + 1) {
 							noOfSurveys += Long.parseLong(sentSurvey.get("count").toString());
 						}
-						if (sentSurveys.get(date) == 0l) {
-							sentSurveys.put(date, noOfSurveys);
-						}
+						sentSurveys.put(date, noOfSurveys + sentSurveys.get(date));
 					}
 				}
 				if (criteriaColumn == "month") {
