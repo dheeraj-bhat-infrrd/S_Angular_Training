@@ -1,19 +1,29 @@
 package com.realtech.socialsurvey.core.services.upload.impl;
 
 import java.io.BufferedReader;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.InputStream;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import javax.annotation.Resource;
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.xssf.usermodel.XSSFCell;
+import org.apache.poi.xssf.usermodel.XSSFRow;
+import org.apache.poi.xssf.usermodel.XSSFSheet;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
@@ -23,6 +33,7 @@ import com.realtech.socialsurvey.core.dao.UserDao;
 import com.realtech.socialsurvey.core.entities.Branch;
 import com.realtech.socialsurvey.core.entities.BranchUploadVO;
 import com.realtech.socialsurvey.core.entities.Company;
+import com.realtech.socialsurvey.core.entities.FileUpload;
 import com.realtech.socialsurvey.core.entities.LicenseDetail;
 import com.realtech.socialsurvey.core.entities.Region;
 import com.realtech.socialsurvey.core.entities.RegionUploadVO;
@@ -46,6 +57,15 @@ import com.realtech.socialsurvey.core.utils.EncryptionHelper;
 @Component
 public class CsvUploadServiceImpl implements CsvUploadService {
 
+	private static final String REGION_SHEET = "Regions";
+	
+	private static final int REGION_ID_INDEX = 0;
+	private static final int REGION_NAME_INDEX = 1;
+	private static final int REGION_ADDRESS1_INDEX = 2;
+	private static final int REGION_ADDRESS2_INDEX = 3;
+	private static final int REGION_CITY_INDEX = 4;
+	private static final int REGION_ZIP_INDEX = 5;
+	
 	@Autowired
 	private OrganizationManagementService organizationManagementService;
 
@@ -67,6 +87,9 @@ public class CsvUploadServiceImpl implements CsvUploadService {
 
 	@Autowired
 	private UserManagementService userManagementService;
+	
+	@Value("${FILE_DIRECTORY_LOCATION}")
+	private String fileDirectory;
 
 	private static Logger LOG = LoggerFactory.getLogger(CsvUploadServiceImpl.class);
 
@@ -83,6 +106,142 @@ public class CsvUploadServiceImpl implements CsvUploadService {
 		Map<String, List<Object>> uploadObjects = parseTestFile(fileName);
 
 		return uploadObjects;
+	}
+	
+	@Transactional
+	@Override
+	public List<String> parseAndUploadTempCsv(FileUpload fileUpload) throws InvalidInputException{
+		if(fileUpload == null || fileUpload.getFileName() == null || fileUpload.getFileName().isEmpty() || fileUpload.getCompany() == null || fileUpload.getAdminUserId() <= 0l){
+			LOG.info("Invalid upload details");
+			throw new InvalidInputException("File name is not provided");
+		}
+		InputStream fileStream = null;
+		List<String> regionErrors = null;
+		User adminUser = getUser(fileUpload.getAdminUserId());
+		adminUser.setCompanyAdmin(true);
+		try{
+			fileStream = new FileInputStream(fileDirectory+fileUpload.getFileName());
+			XSSFWorkbook workBook = new XSSFWorkbook(fileStream);
+			parseAndUploadRegions(fileUpload, workBook, regionErrors, adminUser);
+		}
+		catch (IOException e) {
+			e.printStackTrace();
+		}finally{
+			if(fileStream != null){
+				try {
+					fileStream.close();
+				}
+				catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}
+		}
+		LOG.info("Parsing and uploading hierarchy "+fileUpload.getFileName()+" for company "+fileUpload.getCompany().getCompany());
+		
+		return null;
+	}
+	
+	private List<RegionUploadVO> parseAndUploadRegions(FileUpload fileUpload, XSSFWorkbook workBook, List<String> regionErrors, User adminUser){
+		LOG.debug("Parsing and uploading csv: BEGIN");
+		List<RegionUploadVO> regionUploads =  parseRegions(fileUpload, workBook, regionErrors, adminUser);
+		// uploading regions
+		if(regionUploads != null && !regionUploads.isEmpty()){
+			LOG.info("No regions found to upload");
+			uploadRegions(regionUploads, adminUser);
+		}
+		return regionUploads;
+	}
+	
+	private List<RegionUploadVO> parseRegions(FileUpload fileUpload, XSSFWorkbook workBook, List<String> regionErrors, User adminUser){
+		LOG.debug("Parsing regions from CSV");
+		List<RegionUploadVO> uploadedRegions = new ArrayList<RegionUploadVO>();
+		XSSFSheet regionSheet = workBook.getSheet(REGION_SHEET);
+		Iterator<Row> rows = regionSheet.rowIterator();
+		Iterator<Cell> cells = null;
+		XSSFRow row = null;
+		XSSFCell cell = null;
+		RegionUploadVO uploadedRegion = null;
+		boolean rowContainsError = false;
+		int rowCounter = 1;
+		while(rows.hasNext()){
+			row = (XSSFRow)rows.next();
+			cells = row.cellIterator();
+			uploadedRegion = new RegionUploadVO();
+			int cellIndex = REGION_ID_INDEX;
+			while(cells.hasNext()){
+				cell = (XSSFCell)cells.next();
+				if(cellIndex == REGION_ID_INDEX){
+					try{
+						uploadedRegion.setSourceRegionId(Long.parseLong(cell.getStringCellValue()));
+					}catch(NumberFormatException nfe){
+						// TODO: mark this record as error
+						LOG.error("Source region id is not present");
+						rowContainsError = true;
+						break;
+					}
+				}
+				if(cellIndex == REGION_NAME_INDEX){
+					String regionName = cell.getStringCellValue();
+					if(regionName != null && !regionName.isEmpty()){
+						uploadedRegion.setRegionName(regionName);
+					}else{
+						LOG.error("Region name is not present");
+						rowContainsError = true;
+						break;
+					}
+				}
+				if(cellIndex == REGION_ADDRESS1_INDEX){
+					uploadedRegion.setRegionAddress1(cell.getStringCellValue());
+				}
+				if(cellIndex == REGION_ADDRESS2_INDEX){
+					uploadedRegion.setRegionAddress2(cell.getStringCellValue());
+				}
+				if(cellIndex == REGION_CITY_INDEX){
+					uploadedRegion.setRegionCity(cell.getStringCellValue());
+				}
+				if(cellIndex == REGION_ZIP_INDEX){
+					uploadedRegion.setRegionZipcode(cell.getStringCellValue());
+				}
+				cellIndex++;
+			}
+			if(rowContainsError){
+				LOG.error("Could not process row");
+				if(regionErrors == null){
+					regionErrors = new ArrayList<>();
+				}
+				regionErrors.add("Error in Region row "+rowCounter);
+				rowContainsError = false;
+				continue;
+			}
+			rowCounter++;
+			uploadedRegions.add(uploadedRegion);
+		}
+		return uploadedRegions;
+	}
+	
+	// modifies the list of regionsToUpload with the actual region id
+	private void uploadRegions(List<RegionUploadVO> regionsToUpload, User adminUser){
+		LOG.debug("Uploading regions");
+		Region region = null;
+		for(RegionUploadVO regionToUpload : regionsToUpload){
+			try {
+				region = createRegion(adminUser, regionToUpload);
+				regionToUpload.setRegionId(region.getRegionId());
+			}
+			catch (InvalidInputException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			catch (RegionAdditionException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			catch (SolrException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
 	}
 
 	private boolean validateUser(String emailId, Company company) {
@@ -462,7 +621,8 @@ public class CsvUploadServiceImpl implements CsvUploadService {
 	 */
 	@Transactional
 	@Override
-	public void createRegion(User adminUser, RegionUploadVO region) throws InvalidInputException, RegionAdditionException, SolrException {
+	public Region createRegion(User adminUser, RegionUploadVO region) throws InvalidInputException, RegionAdditionException, SolrException {
+		Region newRegion = null;
 		if (adminUser == null) {
 			LOG.error("admin user parameter is null!");
 			throw new InvalidInputException("admin user parameter is null!");
@@ -482,7 +642,7 @@ public class CsvUploadServiceImpl implements CsvUploadService {
 				throw new RegionAdditionException("Region with that name already exists!");
 			}
 			LOG.debug("Adding region : " + region.getRegionName());
-			Region newRegion = organizationManagementService.addNewRegion(adminUser, region.getRegionName(), CommonConstants.NO,
+			newRegion = organizationManagementService.addNewRegion(adminUser, region.getRegionName(), CommonConstants.NO,
 					region.getRegionAddress1(), region.getRegionAddress2(), region.getRegionCountry(), region.getRegionCountryCode(), region.getRegionState(), region.getRegionCity(), region.getRegionZipcode());
 			organizationManagementService.addNewBranch(adminUser, newRegion.getRegionId(), CommonConstants.YES, CommonConstants.DEFAULT_BRANCH_NAME,
 					CommonConstants.DEFAULT_ADDRESS, null,null,null,null,null,null);
@@ -491,7 +651,7 @@ public class CsvUploadServiceImpl implements CsvUploadService {
 			LOG.error("admin user : " + adminUser.getEmailId() + " is not authorized to add regions");
 			throw new RegionAdditionException("admin user : " + adminUser.getEmailId() + " is not authorized to add regions");
 		}
-
+		return newRegion;
 	}
 
 	/**

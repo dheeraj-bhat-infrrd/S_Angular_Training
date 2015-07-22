@@ -71,6 +71,7 @@
 				<value>com.realtech.socialsurvey.core.entities.SurveyPreInitiation</value>
 				<value>com.realtech.socialsurvey.core.entities.ZipCodeLookup</value>
 				<value>com.realtech.socialsurvey.core.entities.StateLookup</value>
+				<value>com.realtech.socialsurvey.core.entities.FileUpload</value>
 			</list>
 		</property>
 	</bean>
