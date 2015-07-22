@@ -10,6 +10,7 @@ public class GooglePlusPost {
 	private String postedBy;
 	private Date createdOn;
 	private Timestamp lastUpdatedOn;
+	private String url;
 	
 	public String getId() {
 		return id;
@@ -41,4 +42,11 @@ public class GooglePlusPost {
 	public void setPostedBy(String postedBy) {
 		this.postedBy = postedBy;
 	}
+	public String getUrl() {
+		return url;
+	}
+	public void setUrl(String url) {
+		this.url = url;
+	}
+	
 }
