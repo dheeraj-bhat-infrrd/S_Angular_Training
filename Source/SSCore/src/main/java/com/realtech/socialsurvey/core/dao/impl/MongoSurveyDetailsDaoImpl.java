@@ -1300,7 +1300,7 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao {
 			List<SurveyPreInitiation> preInitiations = surveyPreInitiationService.getIncompleteSurvey(columnValue, 0, 0, 0, -1, profileLevel, startDate, endDate,
 					false);
 			for (SurveyPreInitiation initiation : preInitiations) {
-				if (initiation.getStatus() == CommonConstants.SURVEY_STATUS_PRE_INITIATED) {
+				if (initiation.getStatus() == CommonConstants.SURVEY_STATUS_EMAIL_SENT) {
 					noOfPreInitiatedSurveys++;
 				}
 			}
