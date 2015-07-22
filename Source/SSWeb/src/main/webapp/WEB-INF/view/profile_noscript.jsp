@@ -106,7 +106,7 @@
 {
   "@context" : "http://schema.org",
   "@type" : "Product",
-  "name" : ${profName},
+  "name" : "${profName}",
   "aggregateRating" : {
     "@type" : "AggregateRating",
     "ratingValue" : ${floatingAverageGoogleRating },
