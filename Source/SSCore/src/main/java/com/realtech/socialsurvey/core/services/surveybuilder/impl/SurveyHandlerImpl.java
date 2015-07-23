@@ -261,25 +261,37 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
     }
 
 
-    /*
-     * Method to increase reminder count by 1. This method is called every time a reminder mail is
-     * sent to the customer.
-     */
-    @Override
-    @Transactional
-    public void updateReminderCount( long surveyPreInitiationId )
-    {
-        LOG.info( "Method to increase reminder count by 1, updateReminderCount() started." );
+	/*
+	 * Method to increase reminder count by 1. This method is called every time a reminder mail is
+	 * sent to the customer.
+	 */
+	@Override
+	@Transactional
+	public void updateReminderCount(long surveyPreInitiationId) {
+		LOG.info("Method to increase reminder count by 1, updateReminderCount() started.");
 
-        SurveyPreInitiation survey = surveyPreInitiationDao.findById( SurveyPreInitiation.class, surveyPreInitiationId );
-        if ( survey != null ) {
-            survey.setModifiedOn( new Timestamp( System.currentTimeMillis() ) );
-            survey.setLastReminderTime( new Timestamp( System.currentTimeMillis() ) );
-            survey.setReminderCounts( survey.getReminderCounts() + 1 );
-            surveyPreInitiationDao.merge( survey );
-        }
-        LOG.info( "Method to increase reminder count by 1, updateReminderCount() finished." );
-    }
+		SurveyPreInitiation survey = surveyPreInitiationDao.findById(SurveyPreInitiation.class, surveyPreInitiationId);
+		if (survey != null) {
+			survey.setModifiedOn(new Timestamp(System.currentTimeMillis()));
+			survey.setLastReminderTime(new Timestamp(System.currentTimeMillis()));
+			survey.setReminderCounts(survey.getReminderCounts() + 1);
+			surveyPreInitiationDao.merge(survey);
+		}
+		LOG.info("Method to increase reminder count by 1, updateReminderCount() finished.");
+	}
+
+	@Override
+	@Transactional
+	public void markSurveyAsSent(SurveyPreInitiation surveyPreInitiation) {
+		LOG.info("Method to increase reminder count by 1, updateReminderCount() started.");
+		if (surveyPreInitiation != null) {
+			surveyPreInitiation.setModifiedOn(new Timestamp(System.currentTimeMillis()));
+			surveyPreInitiation.setLastReminderTime(new Timestamp(System.currentTimeMillis()));
+			surveyPreInitiation.setStatus(CommonConstants.SURVEY_STATUS_EMAIL_SENT);
+			surveyPreInitiationDao.merge(surveyPreInitiation);
+		}
+		LOG.info("Method to increase reminder count by 1, updateReminderCount() finished.");
+	}
 
 
     @Override
@@ -410,7 +422,7 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
         LOG.debug( "Now fetching survey which are already processed " );
         HashMap<String, Object> queries = new HashMap<>();
         queries.put( CommonConstants.COMPANY_ID_COLUMN, company.getCompanyId() );
-        queries.put( CommonConstants.STATUS_COLUMN, CommonConstants.SURVEY_STATUS_PRE_INITIATED );
+        queries.put( CommonConstants.STATUS_COLUMN, CommonConstants.SURVEY_STATUS_EMAIL_SENT );
         incompleteSurveyCustomers = surveyPreInitiationDao.findByKeyValue( SurveyPreInitiation.class, queries );
         LOG.info( "finished." );
         return incompleteSurveyCustomers;
@@ -921,7 +933,7 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
         surveyPreInitiation.setLastReminderTime( new Timestamp( System.currentTimeMillis() ) );
         surveyPreInitiation.setModifiedOn( new Timestamp( System.currentTimeMillis() ) );
         surveyPreInitiation.setReminderCounts( 0 );
-        surveyPreInitiation.setStatus( CommonConstants.SURVEY_STATUS_PRE_INITIATED );
+        surveyPreInitiation.setStatus( CommonConstants.SURVEY_STATUS_EMAIL_SENT );
         surveyPreInitiation.setSurveySource( source );
         surveyPreInitiationDao.save( surveyPreInitiation );
 

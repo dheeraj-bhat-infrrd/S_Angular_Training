@@ -542,7 +542,9 @@ public class SurveyManagementController {
 					+ " on SocialSurvey ";
 			String linkedinProfileUrl = getApplicationBaseUrl() + CommonConstants.AGENT_PROFILE_FIXED_URL + agentProfileLink;
 			String linkedinMessageFeedback = "From : " + custFirstName + " " + custLastName + " - " + feedback;
-			socialManagementService.updateLinkedin(agentSettings, linkedinMessage, linkedinProfileUrl, linkedinMessageFeedback);
+			if (!socialManagementService.updateLinkedin(agentSettings, linkedinMessage, linkedinProfileUrl, linkedinMessageFeedback)) {
+				surveyHandler.updateSharedOn(CommonConstants.LINKEDIN_SOCIAL_SITE, agentId, customerEmail);
+			}
 			if (accountMasterId != CommonConstants.ACCOUNTS_MASTER_INDIVIDUAL) {
 				for (OrganizationUnitSettings setting : settings) {
 					if (!socialManagementService.updateLinkedin(setting, linkedinMessage, linkedinProfileUrl, linkedinMessageFeedback)) {

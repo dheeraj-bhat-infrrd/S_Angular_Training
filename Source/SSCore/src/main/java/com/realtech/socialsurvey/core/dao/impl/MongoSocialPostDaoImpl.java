@@ -28,6 +28,7 @@ public class MongoSocialPostDaoImpl implements SocialPostDao {
 	public static final String KEY_BRANCH_ID = "branchId";
 	public static final String KEY_AGENT_ID = "agentId";
 	public static final String KEY_TIME_IN_MILLIS = "timeInMillis";
+	public static final String KEY_POST_URL = "postUrl";
 	public static final String KEY_SOURCE_SS = "SocialSurvey";
 
 	@Autowired
@@ -51,6 +52,7 @@ public class MongoSocialPostDaoImpl implements SocialPostDao {
 		query.fields().include(KEY_POSTED_BY);
 		query.fields().include(KEY_SOURCE);
 		query.fields().include(KEY_TIME_IN_MILLIS);
+		query.fields().include(KEY_POST_URL);
 
 		if (skip != -1)
 			query.skip(skip);

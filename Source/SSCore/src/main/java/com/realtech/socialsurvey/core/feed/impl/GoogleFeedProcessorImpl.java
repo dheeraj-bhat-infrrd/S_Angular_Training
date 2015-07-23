@@ -243,10 +243,12 @@ public class GoogleFeedProcessorImpl implements SocialNetworkDataProcessor<Googl
                             allPostUpdated = true;
                             break;
                         }
+                        System.out.println("items:"+items.toString());
                         GooglePlusPost post = new GooglePlusPost();
                         post.setId( items.get( "id" ).getAsString() );
                         post.setCreatedOn( postCreatedOn );
                         post.setPost( items.get( "title" ).getAsString() );
+                        post.setUrl( items.get( "url" ).getAsString() );
                         post.setPostedBy( actor.get( "displayName" ).getAsString() );
                         post.setLastUpdatedOn( profileUpdatedOn );
                         posts.add( post );
@@ -299,7 +301,7 @@ public class GoogleFeedProcessorImpl implements SocialNetworkDataProcessor<Googl
         // Add parameters which are required in response fetch results.
         StringBuffer url = new StringBuffer( "https://www.googleapis.com/plus/v1/people/me/activities/public?access_token="
             + accessToken );
-        url.append( "&fields=nextPageToken,updated,items(id,title,published,actor)" );
+        url.append( "&fields=nextPageToken,updated,items(id,title,published,url,actor)" );
         url.append( "&maxResults=" ).append( PAGE_SIZE );
 
         if ( nextPageToken != null && !nextPageToken.isEmpty() ) {
@@ -348,6 +350,7 @@ public class GoogleFeedProcessorImpl implements SocialNetworkDataProcessor<Googl
                 socialPost.setSource( FEED_SOURCE );
                 socialPost.setPostId( post.getId() );
                 socialPost.setTimeInMillis( post.getCreatedOn().getTime() );
+                socialPost.setPostUrl(post.getUrl());
             }
 
             if ( lastFetchedTill != null && lastFetchedTill.before( post.getCreatedOn() ) ) {
@@ -359,6 +362,7 @@ public class GoogleFeedProcessorImpl implements SocialNetworkDataProcessor<Googl
                 socialPost.setSource( FEED_SOURCE );
                 socialPost.setPostId( post.getId() );
                 socialPost.setTimeInMillis( post.getCreatedOn().getTime() );
+                socialPost.setPostUrl(post.getUrl());
             }
 
             if ( socialPost == null )
