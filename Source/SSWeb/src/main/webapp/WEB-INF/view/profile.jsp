@@ -3,14 +3,12 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <c:if test="${not empty profile}">
-	<c:if
-		test="${not empty profile.contact_details && not empty profile.contact_details.name }">
-		<c:set var="profName" value="${profile.contact_details.name }"></c:set>
+	<c:if test="${not empty profile.contact_details && not empty profile.contact_details.name}">
+		<c:set var="profName" value="${profile.contact_details.name}"></c:set>
 	</c:if>
 	<c:if test="${not empty profile.contact_details}">
-		<c:set var="contact_details" value="${profile.contact_details }"></c:set>
-		<c:if
-			test="${ not empty  contact_details && not empty contact_details.location}">
+		<c:set var="contact_details" value="${profile.contact_details}"></c:set>
+		<c:if test="${ not empty  contact_details && not empty contact_details.location}">
 			<c:set var="location" value="${contact_details.location}"></c:set>
 		</c:if>
 		<c:if test="${not empty contact_details.title}">
@@ -39,9 +37,9 @@
 		<c:set var="vertical" value="${profile.vertical}"></c:set>
 	</c:if>
 	<c:choose>
-		<c:when test="${profileLevel == 'INDIVIDUAL' }">
+		<c:when test="${profileLevel == 'INDIVIDUAL'}">
 			<c:if test="${not empty profile.companyProfileData}">
-				<c:set var="companyProfileData" value="${profile.companyProfileData }"></c:set>
+				<c:set var="companyProfileData" value="${profile.companyProfileData}"></c:set>
 				<c:if test="${not empty companyProfileData.name}">
 					<c:set var="companyName" value="${companyProfileData.name}"></c:set>
 				</c:if>
