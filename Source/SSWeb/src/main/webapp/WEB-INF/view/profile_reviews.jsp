@@ -33,18 +33,18 @@
 					<div class="float-left blue-text ppl-share-shr-txt"><spring:message code="label.share.key"/></div>
 					<div class="float-left icn-share icn-plus-open"></div>
 					<div class="float-left clearfix ppl-share-social hide">
-						<a href="https://www.facebook.com/sharer/sharer.php?u=${reviewItem.completeProfileUrl}" target="_blank"><span class="float-left ppl-share-icns icn-fb fb-shr" title="Facebook"></span></a>
-						<a href="https://twitter.com/home?status=${reviewItem.completeProfileUrl}" target="_blank"><span class="float-left ppl-share-icns icn-twit twt-shr" title="Twitter"></span></a>
-						<a href="https://www.linkedin.com/shareArticle?mini=true&url=${reviewItem.completeProfileUrl} &title=&summary=${reviewItem.score}-star response from ${reviewItem.customerFirstName} ${reviewItem.customerLastName} for ${reviewItem.agentName} at SocialSurvey - ${reviewItem.review} + &source=" target="_blank"><span class="float-left ppl-share-icns icn-lin lnkdn-shr" title="LinkedIn"></span></a>
-                        <a href="https://plus.google.com/share?url=${reviewItem.completeProfileUrl}" target="_blank"><span class="float-left ppl-share-icns icn-gplus yelp-shr" title="Google+"></span></a>
+						<span class="float-left ppl-share-icns icn-fb" title="Facebook" data-link="https://www.facebook.com/sharer/sharer.php?u=${reviewItem.completeProfileUrl}"></span>
+						<span class="float-left ppl-share-icns icn-twit" title="Twitter" data-link="https://twitter.com/home?status=${reviewItem.completeProfileUrl}"></span>
+						<span class="float-left ppl-share-icns icn-lin" title="LinkedIn" data-link="https://www.linkedin.com/shareArticle?mini=true&url=${reviewItem.completeProfileUrl} &title=&summary=${reviewItem.score}-star response from ${reviewItem.customerFirstName} ${reviewItem.customerLastName} for ${reviewItem.agentName} at SocialSurvey - ${reviewItem.review} + &source="></span>
+                        <span class="float-left ppl-share-icns icn-gplus" title="Google+" data-link="https://plus.google.com/share?url=${reviewItem.completeProfileUrl}"></span>
 						<c:if test="${not empty reviewItem.yelpProfileUrl}">
-							<a href="${reviewItem.yelpProfileUrl}" target="_blank"><span class="float-left ppl-share-icns icn-yelp yelp-shr" title="Yelp"></span></a>
+							<span class="float-left ppl-share-icns icn-yelp" title="Yelp" data-link="${reviewItem.yelpProfileUrl}"></span>
 						</c:if>
 						<c:if test="${not empty reviewItem.zillowProfileUrl}">
-							<a href="${reviewItem.zillowProfileUrl}" target="_blank"><span class="float-left ppl-share-icns icn-zillow yelp-shr" title="Zillow"></span></a>
+							<span class="float-left ppl-share-icns icn-zillow" title="Zillow" data-link="${reviewItem.zillowProfileUrl}"></span>
 						</c:if>
 						<c:if test="${not empty reviewItem.lendingTreeProfileUrl}">
-							<a href="${reviewItem.lendingTreeProfileUrl}" target="_blank"><span class="float-left ppl-share-icns icn-lendingtree yelp-shr" title="LendingTree"></span></a>
+							<span class="float-left ppl-share-icns icn-lendingtree" title="LendingTree" data-link="${reviewItem.lendingTreeProfileUrl}"></span>
 						</c:if>
 					</div>
 					<div class="float-left icn-share icn-remove icn-rem-size hide"></div>
@@ -75,6 +75,15 @@ $(document).ready(function(){
 	$('.icn-lendingtree').each(function(index, currentElement) {
 		var url = $(this).parent().attr('href');
 		$(this).parent().attr('href', returnValidWebAddress(url));
+	});
+	
+	$('.ppl-share-icns').bind('click', function() {
+		var link = $(this).attr('data-link');
+		var title = $(this).attr('title');
+		if (link == undefined || link == "") {
+			return false;
+		}
+		window.open(link, 'Post to ' + title, 'width=800,height=600,scrollbars=yes');
 	});
 });
 </script>

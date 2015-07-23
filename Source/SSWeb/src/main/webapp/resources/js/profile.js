@@ -587,19 +587,18 @@ function paintReviews(result){
 		reviewsHtml += '		<div class="float-left blue-text ppl-share-shr-txt">Share</div>';
 		reviewsHtml += '		<div class="float-left icn-share icn-plus-open"></div>';
 		reviewsHtml += '		<div class="float-left clearfix ppl-share-social hide">';
-		reviewsHtml += '			<a href="https://www.facebook.com/sharer/sharer.php?u=' + reviewItem.completeProfileUrl + '" target="_blank"><span class="float-left ppl-share-icns icn-fb icn-fb-pp" title="Facebook"></span></a>';
-		reviewsHtml += '			<a href="https://twitter.com/home?status=' + reviewItem.completeProfileUrl + '" target="_blank"><span class="float-left ppl-share-icns icn-twit icn-twit-pp" title="Twitter"></span></a>';
-		reviewsHtml += '			<a href="https://www.linkedin.com/shareArticle?mini=true&url=' + reviewItem.completeProfileUrl + '&title=&summary=' + reviewItem.score + '-star response from ' + reviewItem.customerFirstName+' '+reviewItem.customerLastName + ' for ' + reviewItem.agentName +' at SocialSurvey - ' + reviewItem.review + '&source=" target="_blank"><span class="float-left ppl-share-icns icn-lin icn-lin-pp" title="LinkedIn"></span></a>';
-		reviewsHtml += '			<a href="https://plus.google.com/share?url=' + reviewItem.completeProfileUrl + '" target="_blank"<span class="float-left ppl-share-icns icn-gplus" title="Google+"></span></a>';
-		
+		reviewsHtml += '			<span class="float-left ppl-share-icns icn-fb icn-fb-pp" title="Facebook" data-link="https://www.facebook.com/sharer/sharer.php?u=' + reviewItem.completeProfileUrl + '"></span>';
+		reviewsHtml += '			<span class="float-left ppl-share-icns icn-twit icn-twit-pp" title="Twitter" data-link="https://twitter.com/home?status=' + reviewItem.completeProfileUrl + '"></span>';
+		reviewsHtml += '			<span class="float-left ppl-share-icns icn-lin icn-lin-pp" title="LinkedIn" data-link="https://www.linkedin.com/shareArticle?mini=true&url=' + reviewItem.completeProfileUrl + '&title=&summary=' + reviewItem.score + '-star response from ' + reviewItem.customerFirstName+' '+reviewItem.customerLastName + ' for ' + reviewItem.agentName +' at SocialSurvey - ' + reviewItem.review + '&source="></span>';
+		reviewsHtml += '			<span class="float-left ppl-share-icns icn-gplus" title="Google+" data-link="https://plus.google.com/share?url=' + reviewItem.completeProfileUrl + '"></span>';
 		if (reviewItem.yelpProfileUrl != null && reviewItem.yelpProfileUrl != "") {
-			reviewsHtml += '		<a href="' + returnValidWebAddress(reviewItem.yelpProfileUrl) + '" target="_blank"><span class="float-left ppl-share-icns icn-yelp" title="Yelp"></span></a>';
+			reviewsHtml += '		<span class="float-left ppl-share-icns icn-yelp" title="Yelp" data-link="' + returnValidWebAddress(reviewItem.yelpProfileUrl) + '"></span>';
 		}
 		if (reviewItem.zillowProfileUrl != null && reviewItem.zillowProfileUrl != "") {
-			reviewsHtml += '		<a href="' + returnValidWebAddress(reviewItem.zillowProfileUrl) + '" target="_blank"><span class="float-left ppl-share-icns icn-zillow" title="Zillow"></span></a>';
+			reviewsHtml += '		<span class="float-left ppl-share-icns icn-zillow" title="Zillow" data-link="' + returnValidWebAddress(reviewItem.zillowProfileUrl) + '"></span>';
 		}
 		if (reviewItem.lendingTreeProfileUrl != null && reviewItem.lendingTreeProfileUrl != "") {
-			reviewsHtml += '		<a href="' + returnValidWebAddress(reviewItem.lendingTreeProfileUrl) + '" target="_blank"><span class="float-left ppl-share-icns icn-lendingtree" title="LendingTree"></span></a>';
+			reviewsHtml += '		<span class="float-left ppl-share-icns icn-lendingtree" title="LendingTree" data-link="' + returnValidWebAddress(reviewItem.lendingTreeProfileUrl) + '"></span>';
 		}
 		reviewsHtml += '		</div>';
 		reviewsHtml += '		<div class="float-right" style="margin: 0 -5px;">';
@@ -610,7 +609,6 @@ function paintReviews(result){
 		reviewsHtml += '</div>';
 	});
 	
-	
 	if(result.length > 0){
 		$('#reviews-container').show();
 	}
@@ -620,7 +618,8 @@ function paintReviews(result){
 	}else {
 		$("#prof-review-item").append(reviewsHtml);
 	}
-	 $("#prof-reviews-header").parent().show();
+	
+	$("#prof-reviews-header").parent().show();
 	$(".review-ratings").each(function() {
 		changeRatingPattern($(this).data("rating"), $(this));
 	});
@@ -634,6 +633,15 @@ function paintReviews(result){
         $(this).parent().find('.ppl-share-social').hide();
         $(this).parent().find('.icn-plus-open').show();
     });
+    
+	$('.ppl-share-icns').bind('click', function() {
+		var link = $(this).attr('data-link');
+		var title = $(this).attr('title');
+		if (link == undefined || link == "") {
+			return false;
+		}
+		window.open(link, 'Post to ' + title, 'width=800,height=600,scrollbars=yes');
+	});
 }
 
 $(document).on('click','.review-more-button',function(){
