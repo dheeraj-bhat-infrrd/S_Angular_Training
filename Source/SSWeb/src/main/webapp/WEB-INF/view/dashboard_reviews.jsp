@@ -32,18 +32,18 @@
 					<div class="float-left blue-text ppl-share-shr-txt"><spring:message code="label.share.key" /></div>
 					<div class="float-left icn-share icn-plus-open" style="display: block;"></div>
 					<div class="float-left clearfix ppl-share-social hide" style="display: none;">
-						<a href="https://www.facebook.com/sharer/sharer.php?u=${feedback.completeProfileUrl}" target="_blank"><span class="float-left ppl-share-icns icn-fb" title="Facebook"></span></a>
-						<a href="https://twitter.com/home?status=${feedback.completeProfileUrl}" target="_blank"><span class="float-left ppl-share-icns icn-twit" title="Twitter"></span></a>
-						<a href="https://www.linkedin.com/shareArticle?mini=true&url=${feedback.completeProfileUrl} &title=&summary=${feedback.score}-star response from ${feedback.customerFirstName} ${feedback.customerLastName} for ${feedback.agentName} at SocialSurvey - ${feedback.review} + &source=" target="_blank"><span class="float-left ppl-share-icns icn-lin" title="LinkedIn"></span></a>
-                        <a href="https://plus.google.com/share?url=${feedback.completeProfileUrl}" target="_blank"><span class="float-left ppl-share-icns icn-gplus" title="Google+"></span></a>
+						<span class="float-left ppl-share-icns icn-fb" title="Facebook" data-link="https://www.facebook.com/sharer/sharer.php?u=${feedback.completeProfileUrl}"></span>
+						<span class="float-left ppl-share-icns icn-twit" title="Twitter" data-link="https://twitter.com/home?status=${feedback.completeProfileUrl}"></span>
+						<span class="float-left ppl-share-icns icn-lin" title="LinkedIn" data-link="https://www.linkedin.com/shareArticle?mini=true&url=${feedback.completeProfileUrl} &title=&summary=${feedback.score}-star response from ${feedback.customerFirstName} ${feedback.customerLastName} for ${feedback.agentName} at SocialSurvey - ${feedback.review} + &source="></span>
+                        <span class="float-left ppl-share-icns icn-gplus" title="Google+" data-link="https://plus.google.com/share?url=${feedback.completeProfileUrl}"></span>
 						<c:if test="${not empty feedback.yelpProfileUrl}">
-							<a href="${feedback.yelpProfileUrl}" target="_blank"><span class="float-left ppl-share-icns icn-yelp" title="Yelp"></span></a>
+							<span class="float-left ppl-share-icns icn-yelp" title="Yelp" data-link="${feedback.yelpProfileUrl}"></span>
 						</c:if>
 						<c:if test="${not empty feedback.zillowProfileUrl}">
-							<a href="${feedback.zillowProfileUrl}" target="_blank"><span class="float-left ppl-share-icns icn-zillow" title="Zillow"></span></a>
+							<span class="float-left ppl-share-icns icn-zillow" title="Zillow" data-link="${feedback.zillowProfileUrl}"></span>
 						</c:if>
 						<c:if test="${not empty feedback.lendingTreeProfileUrl}">
-							<a href="${feedback.lendingTreeProfileUrl}" target="_blank"><span class="float-left ppl-share-icns icn-lendingtree" title="LendingTree"></span></a>
+							<span class="float-left ppl-share-icns icn-lendingtree" title="LendingTree" data-link="${feedback.lendingTreeProfileUrl}"></span>
 						</c:if>
 					</div>
 					<div class="float-left icn-share icn-remove icn-rem-size hide" style="display: none;"></div>
@@ -74,6 +74,15 @@ $(document).ready(function(){
 	$('.icn-lendingtree').each(function(index, currentElement) {
 		var url = $(this).parent().attr('href');
 		$(this).parent().attr('href', returnValidWebAddress(url));
+	});
+	
+	$('.ppl-share-icns').bind('click', function() {
+		var link = $(this).attr('data-link');
+		var title = $(this).attr('title');
+		if (link == undefined || link == "") {
+			return false;
+		}
+		window.open(link, 'Post to ' + title, 'width=800,height=600,scrollbars=yes');
 	});
 });
 </script>
