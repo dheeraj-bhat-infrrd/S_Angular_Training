@@ -43,6 +43,7 @@ import com.realtech.socialsurvey.core.entities.ContactDetailsSettings;
 import com.realtech.socialsurvey.core.entities.ContactNumberSettings;
 import com.realtech.socialsurvey.core.entities.FacebookToken;
 import com.realtech.socialsurvey.core.entities.GoogleToken;
+import com.realtech.socialsurvey.core.entities.LendingTreeToken;
 import com.realtech.socialsurvey.core.entities.Licenses;
 import com.realtech.socialsurvey.core.entities.LinkedInProfileData;
 import com.realtech.socialsurvey.core.entities.LinkedInToken;
@@ -64,6 +65,7 @@ import com.realtech.socialsurvey.core.entities.UserSettings;
 import com.realtech.socialsurvey.core.entities.VerticalsMaster;
 import com.realtech.socialsurvey.core.entities.WebAddressSettings;
 import com.realtech.socialsurvey.core.entities.YelpToken;
+import com.realtech.socialsurvey.core.entities.ZillowToken;
 import com.realtech.socialsurvey.core.enums.AccountType;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.exception.NoRecordsFetchedException;
@@ -1105,108 +1107,115 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
         return agentSettings;
     }
 
+	@Override
+	@Transactional
+	public SocialMediaTokens aggregateSocialProfiles(OrganizationUnitSettings unitSettings, String entity) throws InvalidInputException,
+			NoRecordsFetchedException {
+		LOG.info("Method aggregateSocialProfiles called for agentProfileName:" + unitSettings.getProfileName());
 
-    @Override
-    @Transactional
-    public SocialMediaTokens aggregateSocialProfiles( OrganizationUnitSettings unitSettings, String entity )
-        throws InvalidInputException, NoRecordsFetchedException
-    {
-        LOG.info( "Method aggregateSocialProfiles called for agentProfileName:" + unitSettings.getProfileName() );
+		long companyId = 0l;
+		if (entity.equals(CommonConstants.AGENT_ID)) {
+			User user = userDao.findById(User.class, unitSettings.getIden());
+			companyId = user.getCompany().getCompanyId();
+		}
+		else if (entity.equals(CommonConstants.BRANCH_ID)) {
+			Branch branch = branchDao.findById(Branch.class, unitSettings.getIden());
+			companyId = branch.getCompany().getCompanyId();
+		}
+		else if (entity.equals(CommonConstants.REGION_ID)) {
+			Region region = regionDao.findById(Region.class, unitSettings.getIden());
+			companyId = region.getCompany().getCompanyId();
+		}
 
-        long companyId = 0l;
-        if ( entity.equals( CommonConstants.AGENT_ID ) ) {
-            User user = userDao.findById( User.class, unitSettings.getIden() );
-            companyId = user.getCompany().getCompanyId();
-        } else if ( entity.equals( CommonConstants.BRANCH_ID ) ) {
-            Branch branch = branchDao.findById( Branch.class, unitSettings.getIden() );
-            companyId = branch.getCompany().getCompanyId();
-        } else if ( entity.equals( CommonConstants.REGION_ID ) ) {
-            Region region = regionDao.findById( Region.class, unitSettings.getIden() );
-            companyId = region.getCompany().getCompanyId();
-        }
+		LOG.debug("Fetching company settings for companyId: " + companyId);
+		OrganizationUnitSettings companySettings = organizationUnitSettingsDao.fetchOrganizationUnitSettingsById(companyId,
+				MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION);
 
-        LOG.debug( "Fetching company settings for companyId: " + companyId );
-        OrganizationUnitSettings companySettings = organizationUnitSettingsDao.fetchOrganizationUnitSettingsById( companyId,
-            MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION );
+		// Aggregate urls
+		SocialMediaTokens entityTokens = validateSocialMediaTokens(unitSettings);
 
-        // Aggregate urls
-        SocialMediaTokens entityTokens = validateSocialMediaTokens( unitSettings );
+		if (companySettings.getSocialMediaTokens() != null) {
+			SocialMediaTokens companyTokens = validateSocialMediaTokens(companySettings);
 
-        if ( companySettings.getSocialMediaTokens() != null ) {
-            SocialMediaTokens companyTokens = validateSocialMediaTokens( companySettings );
+			if ((entityTokens.getFacebookToken().getFacebookPageLink() == null || entityTokens.getFacebookToken().getFacebookPageLink().equals(""))
+					&& companyTokens.getFacebookToken().getFacebookPageLink() != null
+					&& !companyTokens.getFacebookToken().getFacebookPageLink().equals("")) {
+				entityTokens.getFacebookToken().setFacebookPageLink(companyTokens.getFacebookToken().getFacebookPageLink());
+			}
+			if ((entityTokens.getGoogleToken().getProfileLink() == null || entityTokens.getGoogleToken().getProfileLink().equals(""))
+					&& companyTokens.getGoogleToken().getProfileLink() != null && !companyTokens.getGoogleToken().getProfileLink().equals("")) {
+				entityTokens.getGoogleToken().setProfileLink(companyTokens.getGoogleToken().getProfileLink());
+			}
+			if ((entityTokens.getLinkedInToken().getLinkedInPageLink() == null || entityTokens.getLinkedInToken().getLinkedInPageLink().equals(""))
+					&& companyTokens.getLinkedInToken().getLinkedInPageLink() != null
+					&& !companyTokens.getLinkedInToken().getLinkedInPageLink().equals("")) {
+				entityTokens.getLinkedInToken().setLinkedInPageLink(companyTokens.getLinkedInToken().getLinkedInPageLink());
+			}
+			if ((entityTokens.getRssToken().getProfileLink() == null || entityTokens.getRssToken().getProfileLink().equals(""))
+					&& companyTokens.getRssToken().getProfileLink() != null && !companyTokens.getRssToken().getProfileLink().equals("")) {
+				entityTokens.getRssToken().setProfileLink(companyTokens.getRssToken().getProfileLink());
+			}
+			if ((entityTokens.getTwitterToken().getTwitterPageLink() == null || entityTokens.getTwitterToken().getTwitterPageLink().equals(""))
+					&& companyTokens.getTwitterToken().getTwitterPageLink() != null
+					&& !companyTokens.getTwitterToken().getTwitterPageLink().equals("")) {
+				entityTokens.getTwitterToken().setTwitterPageLink(companyTokens.getTwitterToken().getTwitterPageLink());
+			}
+			if ((entityTokens.getYelpToken().getYelpPageLink() == null || entityTokens.getYelpToken().getYelpPageLink().equals(""))
+					&& companyTokens.getYelpToken().getYelpPageLink() != null && !companyTokens.getYelpToken().getYelpPageLink().equals("")) {
+				entityTokens.getYelpToken().setYelpPageLink(companyTokens.getYelpToken().getYelpPageLink());
+			}
+			if ((entityTokens.getZillowToken().getZillowProfileLink() == null || entityTokens.getZillowToken().getZillowProfileLink().equals(""))
+					&& companyTokens.getZillowToken().getZillowProfileLink() != null
+					&& !companyTokens.getZillowToken().getZillowProfileLink().equals("")) {
+				entityTokens.getZillowToken().setZillowProfileLink(companyTokens.getZillowToken().getZillowProfileLink());
+			}
+			if ((entityTokens.getLendingTreeToken().getLendingTreeProfileLink() == null || entityTokens.getLendingTreeToken()
+					.getLendingTreeProfileLink().equals(""))
+					&& companyTokens.getLendingTreeToken().getLendingTreeProfileLink() != null
+					&& !companyTokens.getLendingTreeToken().getLendingTreeProfileLink().equals("")) {
+				entityTokens.getLendingTreeToken().setLendingTreeProfileLink(companyTokens.getLendingTreeToken().getLendingTreeProfileLink());
+			}
+		}
 
-            if ( ( entityTokens.getFacebookToken().getFacebookPageLink() == null || entityTokens.getFacebookToken()
-                .getFacebookPageLink().equals( "" ) )
-                && companyTokens.getFacebookToken().getFacebookPageLink() != null
-                && !companyTokens.getFacebookToken().getFacebookPageLink().equals( "" ) ) {
-                entityTokens.getFacebookToken().setFacebookPageLink( companyTokens.getFacebookToken().getFacebookPageLink() );
-            }
-            if ( ( entityTokens.getGoogleToken().getProfileLink() == null || entityTokens.getGoogleToken().getProfileLink()
-                .equals( "" ) )
-                && companyTokens.getGoogleToken().getProfileLink() != null
-                && !companyTokens.getGoogleToken().getProfileLink().equals( "" ) ) {
-                entityTokens.getGoogleToken().setProfileLink( companyTokens.getGoogleToken().getProfileLink() );
-            }
-            if ( ( entityTokens.getLinkedInToken().getLinkedInPageLink() == null || entityTokens.getLinkedInToken()
-                .getLinkedInPageLink().equals( "" ) )
-                && companyTokens.getLinkedInToken().getLinkedInPageLink() != null
-                && !companyTokens.getLinkedInToken().getLinkedInPageLink().equals( "" ) ) {
-                entityTokens.getLinkedInToken().setLinkedInPageLink( companyTokens.getLinkedInToken().getLinkedInPageLink() );
-            }
-            if ( ( entityTokens.getRssToken().getProfileLink() == null || entityTokens.getRssToken().getProfileLink()
-                .equals( "" ) )
-                && companyTokens.getRssToken().getProfileLink() != null
-                && !companyTokens.getRssToken().getProfileLink().equals( "" ) ) {
-                entityTokens.getRssToken().setProfileLink( companyTokens.getRssToken().getProfileLink() );
-            }
-            if ( ( entityTokens.getTwitterToken().getTwitterPageLink() == null || entityTokens.getTwitterToken()
-                .getTwitterPageLink().equals( "" ) )
-                && companyTokens.getTwitterToken().getTwitterPageLink() != null
-                && !companyTokens.getTwitterToken().getTwitterPageLink().equals( "" ) ) {
-                entityTokens.getTwitterToken().setTwitterPageLink( companyTokens.getTwitterToken().getTwitterPageLink() );
-            }
-            if ( ( entityTokens.getYelpToken().getYelpPageLink() == null || entityTokens.getYelpToken().getYelpPageLink()
-                .equals( "" ) )
-                && companyTokens.getYelpToken().getYelpPageLink() != null
-                && !companyTokens.getYelpToken().getYelpPageLink().equals( "" ) ) {
-                entityTokens.getYelpToken().setYelpPageLink( companyTokens.getYelpToken().getYelpPageLink() );
-            }
-        }
+		LOG.info("Method aggregateSocialProfiles executed successfully: " + entityTokens.toString());
+		return entityTokens;
+	}
 
-        LOG.info( "Method aggregateSocialProfiles executed successfully: " + entityTokens.toString() );
-        return entityTokens;
-    }
+	private SocialMediaTokens validateSocialMediaTokens(OrganizationUnitSettings unitSettings) {
+		SocialMediaTokens mediaTokens;
+		if (unitSettings.getSocialMediaTokens() == null) {
+			mediaTokens = new SocialMediaTokens();
+		}
+		else {
+			mediaTokens = unitSettings.getSocialMediaTokens();
+		}
 
-
-    private SocialMediaTokens validateSocialMediaTokens( OrganizationUnitSettings unitSettings )
-    {
-        SocialMediaTokens mediaTokens;
-        if ( unitSettings.getSocialMediaTokens() == null ) {
-            mediaTokens = new SocialMediaTokens();
-        } else {
-            mediaTokens = unitSettings.getSocialMediaTokens();
-        }
-
-        if ( mediaTokens.getFacebookToken() == null ) {
-            mediaTokens.setFacebookToken( new FacebookToken() );
-        }
-        if ( mediaTokens.getGoogleToken() == null ) {
-            mediaTokens.setGoogleToken( new GoogleToken() );
-        }
-        if ( mediaTokens.getLinkedInToken() == null ) {
-            mediaTokens.setLinkedInToken( new LinkedInToken() );
-        }
-        if ( mediaTokens.getRssToken() == null ) {
-            mediaTokens.setRssToken( new SocialProfileToken() );
-        }
-        if ( mediaTokens.getTwitterToken() == null ) {
-            mediaTokens.setTwitterToken( new TwitterToken() );
-        }
-        if ( mediaTokens.getYelpToken() == null ) {
-            mediaTokens.setYelpToken( new YelpToken() );
-        }
-        return mediaTokens;
-    }
+		if (mediaTokens.getFacebookToken() == null) {
+			mediaTokens.setFacebookToken(new FacebookToken());
+		}
+		if (mediaTokens.getGoogleToken() == null) {
+			mediaTokens.setGoogleToken(new GoogleToken());
+		}
+		if (mediaTokens.getLinkedInToken() == null) {
+			mediaTokens.setLinkedInToken(new LinkedInToken());
+		}
+		if (mediaTokens.getRssToken() == null) {
+			mediaTokens.setRssToken(new SocialProfileToken());
+		}
+		if (mediaTokens.getTwitterToken() == null) {
+			mediaTokens.setTwitterToken(new TwitterToken());
+		}
+		if (mediaTokens.getYelpToken() == null) {
+			mediaTokens.setYelpToken(new YelpToken());
+		}
+		if (mediaTokens.getZillowToken() == null) {
+			mediaTokens.setZillowToken(new ZillowToken());
+		}
+		if (mediaTokens.getLendingTreeToken() == null) {
+			mediaTokens.setLendingTreeToken(new LendingTreeToken());
+		}
+		return mediaTokens;
+	}
 
 
     /**
@@ -2344,7 +2353,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
     private static boolean isNumeric( String str )
     {
         try {
-            double d = Double.parseDouble( str );
+            Double.parseDouble( str );
         } catch ( NumberFormatException nfe ) {
             return false;
         }
