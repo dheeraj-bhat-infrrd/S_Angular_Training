@@ -75,6 +75,9 @@ public class CsvUploadServiceImpl implements CsvUploadService {
 	@Resource
 	@Qualifier("branch")
 	private BranchDao branchDao;
+	
+	@Autowired
+	private GenericDao<FileUpload, Long> fileUploadDao;
 
 	@Autowired
 	private GenericDao<Region, Long> regionDao;
@@ -147,8 +150,10 @@ public class CsvUploadServiceImpl implements CsvUploadService {
 		List<RegionUploadVO> regionUploads =  parseRegions(fileUpload, workBook, regionErrors, adminUser);
 		// uploading regions
 		if(regionUploads != null && !regionUploads.isEmpty()){
-			LOG.info("No regions found to upload");
-			uploadRegions(regionUploads, adminUser);
+			LOG.info("Uploading regions to database.");
+			uploadRegions(regionUploads, adminUser, regionErrors);
+		}else{
+			LOG.info("No regions to database.");
 		}
 		return regionUploads;
 	}
@@ -221,7 +226,7 @@ public class CsvUploadServiceImpl implements CsvUploadService {
 	}
 	
 	// modifies the list of regionsToUpload with the actual region id
-	private void uploadRegions(List<RegionUploadVO> regionsToUpload, User adminUser){
+	private void uploadRegions(List<RegionUploadVO> regionsToUpload, User adminUser, List<String> regionErrors){
 		LOG.debug("Uploading regions");
 		Region region = null;
 		for(RegionUploadVO regionToUpload : regionsToUpload){
@@ -230,16 +235,16 @@ public class CsvUploadServiceImpl implements CsvUploadService {
 				regionToUpload.setRegionId(region.getRegionId());
 			}
 			catch (InvalidInputException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+				LOG.error("InvalidInputException while uploading region to database. "+regionToUpload.getSourceRegionId(), e);
+				regionErrors.add("Error while uploading region to database. "+regionToUpload.getSourceRegionId());
 			}
 			catch (RegionAdditionException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+				LOG.error("RegionAdditionException while uploading region to database. "+regionToUpload.getSourceRegionId(), e);
+				regionErrors.add("Error while uploading region to database. "+regionToUpload.getSourceRegionId());
 			}
 			catch (SolrException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+				LOG.error("SolrException while uploading region to database. "+regionToUpload.getSourceRegionId(), e);
+				regionErrors.add("Error while uploading region to database. "+regionToUpload.getSourceRegionId());
 			}
 		}
 	}
@@ -966,6 +971,26 @@ public class CsvUploadServiceImpl implements CsvUploadService {
 			}
 		}
 
+	}
+
+	@Transactional
+	@Override
+	public List<FileUpload> getFilesToBeUploaded() throws NoRecordsFetchedException {
+		LOG.info("Check if files need to be uploaded");
+		List<FileUpload> filesToBeUploaded = fileUploadDao.findByColumn(FileUpload.class, CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_ACTIVE);
+		if(filesToBeUploaded == null || filesToBeUploaded.isEmpty()){
+			throw new NoRecordsFetchedException("No files to be uploaded");
+		}
+		return filesToBeUploaded;
+	}
+
+	@Override
+	public void updateFileUploadRecord(FileUpload fileUpload) throws InvalidInputException {
+		LOG.info("Check if files need to be uploaded");
+		if(fileUpload == null){
+			throw new InvalidInputException("File upload is null");
+		}
+		fileUploadDao.update(fileUpload);
 	}
 
 }

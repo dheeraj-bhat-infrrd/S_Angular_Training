@@ -94,5 +94,19 @@ public interface CsvUploadService {
 	 * @param adminUser
 	 */
 	public void postProcess(User adminUser);
+	
+	/**
+	 * Returns a list of files that need to be uploaded
+	 * @return
+	 * @throws NoRecordsFetchedException
+	 */
+	public List<FileUpload> getFilesToBeUploaded() throws NoRecordsFetchedException;
+	
+	/**
+	 * Updates the status of file upload
+	 * @param fileUpload
+	 * @throws InvalidInputException
+	 */
+	public void updateFileUploadRecord(FileUpload fileUpload) throws InvalidInputException;
 
 }
