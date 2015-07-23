@@ -458,8 +458,7 @@ public class SocialManagementController
         boolean updated = false;
         SocialMediaTokens mediaTokens = null;
         try {
-            if ( entityType.equals( CommonConstants.COMPANY_ID_COLUMN )
-                || accountMasterId == CommonConstants.ACCOUNTS_MASTER_INDIVIDUAL ) {
+            if ( entityType.equals( CommonConstants.COMPANY_ID_COLUMN ) ) {
                 OrganizationUnitSettings companySettings = organizationManagementService.getCompanySettings( user.getCompany()
                     .getCompanyId() );
                 if ( companySettings == null ) {
@@ -493,8 +492,8 @@ public class SocialManagementController
                 socialManagementService.updateSocialMediaTokens(
                     MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION, branchSettings, mediaTokens );
                 updated = true;
-            }
-            if ( entityType.equals( CommonConstants.AGENT_ID_COLUMN ) ) {
+            } else if ( entityType.equals( CommonConstants.AGENT_ID_COLUMN )
+                || accountMasterId == CommonConstants.ACCOUNTS_MASTER_INDIVIDUAL ) {
                 AgentSettings agentSettings = userManagementService.getUserSettings( entityId );
                 if ( agentSettings == null ) {
                     throw new InvalidInputException( "No Agent settings found in current session" );
