@@ -5025,7 +5025,7 @@ tr.v-tbl-header {
 .bd-hr-item-l2>.bd-lt-l2, 
 .bd-hr-item-l1>.bd-lt-l2 {
 	background-image: url(../images/hm-arrow-closed.png);
-	background-position: 5px center;
+	background-position: 8px center;
 	background-repeat: no-repeat;
 	padding-left: 20px;
 }
