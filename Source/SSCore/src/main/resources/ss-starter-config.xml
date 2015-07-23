@@ -187,6 +187,19 @@
 		<property name="durability" value="true" />
 	</bean>
 
+	<!-- Setting file upload job detail -->
+	<bean id="fileuploadjobdetail"
+		class="org.springframework.scheduling.quartz.JobDetailFactoryBean">
+		<property name="jobClass"
+			value="com.realtech.socialsurvey.core.starter.CSVHierarchyUploader" />
+		<property name="jobDataAsMap">
+			<map>
+				<entry key="uploadHandler" value-ref="uploadHandler" />
+			</map>
+		</property>
+		<property name="durability" value="true" />
+	</bean>
+	
 	<!-- setting cron for Account deactivator -->
 	<bean id="sitemapgeneratorcron"
 		class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
@@ -260,11 +273,19 @@
 		<property name="cronExpression" value="0 45 7 * * ?" />
 	</bean>
 
+	<!-- setting cron for email reader -->
+	<bean id="fileuploadcron"
+		class="org.springframework.scheduling.quartz.SimpleTriggerFactoryBean">
+		<property name="jobDetail" ref="fileuploadjobdetail" />
+		<property name="repeatCount" value="0" />
+		<property name="startDelay" value="2000" />
+	</bean>
+	
 	<!-- Scheduler factory -->
 	<bean class="org.springframework.scheduling.quartz.SchedulerFactoryBean">
 		<property name="jobDetails">
 			<list>
-				<ref bean="sitemapjobdetail" />
+				<!-- <ref bean="sitemapjobdetail" />
 				<ref bean="emailreaderjobdetail" />
 				<ref bean="incompletesocialpostjobdetail" />
 				<ref bean="incompletesurveyjobdetail" />
@@ -273,13 +294,14 @@
 				<ref bean="accountdeactivatorjobdetail" />
 				<ref bean="deactivatedaccountpurgerjobdetail" />
 				<ref bean="crmdataagentidmapperjobdetail" />
-				<ref bean="imageloaderjobdetail" />
+				<ref bean="imageloaderjobdetail" /> -->
+				<ref bean="fileuploadjobdetail" />
 			</list>
 		</property>
 
 		<property name="triggers">
 			<list>
-				<ref bean="sitemapgeneratorcron" />
+				<!-- <ref bean="sitemapgeneratorcron" />
 				<ref bean="emailreadercron" />
 				<ref bean="incompletesocialpostcron" />
 				<ref bean="incompletesurveycron" />
@@ -288,7 +310,8 @@
 				<ref bean="accountdeactivatorcron" />
 				<ref bean="deactivatedaccountpurgercron" />
 				<ref bean="crmdataagentidmappercron" />
-				<ref bean="imageloadercron" />
+				<ref bean="imageloadercron" /> -->
+				<ref bean="fileuploadcron" />
 			</list>
 		</property>
 		<property name="quartzProperties">
@@ -328,6 +351,7 @@
 	<!-- Social feed ingestor dependencies -->
 	<bean id="ingestor"
 		class="com.realtech.socialsurvey.core.feed.impl.SocialFeedIngestionKickStarter" />
+	<!-- Email reader -->
 	<bean id="emailHandler" class="com.realtech.socialsurvey.core.handler.EmailHandler" />
 
 
@@ -352,4 +376,7 @@
 
 	<!-- Posts to wall -->
 	<bean id="postToWall" class="com.realtech.socialsurvey.core.utils.mongo.PostToWall" />
+	
+	<!-- Email reader -->
+	<bean id="uploadHandler" class="com.realtech.socialsurvey.core.handler.CSVUploadHandler" />
 </beans>
