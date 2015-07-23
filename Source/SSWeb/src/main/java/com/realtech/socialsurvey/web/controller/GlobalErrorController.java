@@ -43,7 +43,7 @@ public class GlobalErrorController {
 	 * 
 	 * @param e
 	 */
-	@ExceptionHandler(ProfileNotFoundException.class)
+	/*@ExceptionHandler(ProfileNotFoundException.class)*/
 	@ResponseStatus(value = HttpStatus.NOT_FOUND, reason = "Resource Not Found")
 	public void handleNotFound(ProfileNotFoundException e) {
 		LOG.error("=====> RESOURCE NOT FOUND: " + e.getMessage(), e);

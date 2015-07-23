@@ -1795,6 +1795,11 @@ button.paypal.is-active {
 	line-height: 24px;
 }
 
+.rev-ppl-share-wrapper {
+	margin: 0 auto;
+	width: 250px;
+}
+
 .ppl-share-wrapper {
 	margin-top: 10px;
 	line-height: 36px;
@@ -3470,6 +3475,8 @@ img.prof-image {
 }
 
 .lp-edit-locks {
+	position: absolute;
+	right: 20px;
 	cursor: pointer;
 	width: 46px;
 	height: 34px;
@@ -6296,6 +6303,14 @@ tr.u-tbl-header td {
     padding-left: 5px;
     font-size:12px;
     font-family:'opensanssemibold';
+    max-width: 200px;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    white-space: nowrap;
+}
+
+.web-address-link {
+	color: #428bca;
 }
 
 .phone-number-txt {

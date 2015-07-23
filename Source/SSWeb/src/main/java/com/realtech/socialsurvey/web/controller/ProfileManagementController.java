@@ -63,6 +63,7 @@ import com.realtech.socialsurvey.core.entities.UserFromSearch;
 import com.realtech.socialsurvey.core.entities.UserHierarchyAssignments;
 import com.realtech.socialsurvey.core.entities.UserListFromSearch;
 import com.realtech.socialsurvey.core.entities.UserSettings;
+import com.realtech.socialsurvey.core.entities.VerticalsMaster;
 import com.realtech.socialsurvey.core.entities.WebAddressSettings;
 import com.realtech.socialsurvey.core.entities.YelpToken;
 import com.realtech.socialsurvey.core.entities.ZillowToken;
@@ -210,6 +211,34 @@ public class ProfileManagementController {
 		return JspResolver.PROFILE_EDIT;
 	}
 
+	@ResponseBody
+	@RequestMapping(value = "/fetchverticalsmaster", method = RequestMethod.GET)
+	public String fetchVerticalsMaster(Model model, HttpServletRequest request) {
+		LOG.info("Fetching profile aboutme");
+		String response = null;
+		try {
+			try {
+				List<VerticalsMaster> verticalsMasterList = organizationManagementService.getAllVerticalsMaster();
+
+				List<String> verticalsMap = new ArrayList<>();
+				for (VerticalsMaster verticalsMaster : verticalsMasterList) {
+					verticalsMap.add(verticalsMaster.getVerticalName());
+				}
+				response = new Gson().toJson(verticalsMap);
+			}
+			catch (InvalidInputException e) {
+				throw new NonFatalException("Some error occurred while fetching verticals master", e);
+			}
+		}
+		catch (NonFatalException e) {
+			ErrorResponse errorResponse = new ErrorResponse();
+			errorResponse.setErrCode(ErrorCodes.REQUEST_FAILED);
+			errorResponse.setErrMessage(e.getMessage());
+			response = new Gson().toJson(errorResponse);
+		}
+		return response;
+	}
+	
 	private OrganizationUnitSettings fetchUserProfile(Model model, User user, AccountType accountType, UserSettings settings, long branchId,
 			long regionId, int profilesMaster) {
 		LOG.debug("Method fetchUserProfile() called from ProfileManagementService");
@@ -554,6 +583,7 @@ public class ProfileManagementController {
 					throw new InvalidInputException("No company settings found in current session");
 				}
 				contactDetailsSettings = companySettings.getContact_details();
+				
 				contactDetailsSettings = updateBasicDetail(contactDetailsSettings, name, title);
 				contactDetailsSettings = profileManagementService.updateContactDetails(
 						MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION, companySettings, contactDetailsSettings);
@@ -614,6 +644,8 @@ public class ProfileManagementController {
 					throw new InvalidInputException("No Agent settings found in current session");
 				}
 				contactDetailsSettings = agentSettings.getContact_details();
+				//for individual set vertical/industry
+				contactDetailsSettings.setIndustry(vertical);
 				contactDetailsSettings = updateBasicDetail(contactDetailsSettings, name, title);
 				contactDetailsSettings = profileManagementService.updateAgentContactDetails(
 						MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION, agentSettings, contactDetailsSettings);
@@ -646,6 +678,7 @@ public class ProfileManagementController {
 				throw new InvalidInputException("Invalid input exception occurred in upadting Basic details.", DisplayMessageConstants.GENERAL_ERROR);
 			}
 
+			profileSettings.setVertical(vertical);
 			profileSettings.setContact_details(contactDetailsSettings);
 
 			LOG.info("Basic Detail updated successfully");
@@ -3518,11 +3551,14 @@ public class ProfileManagementController {
 	@RequestMapping(value = "/fetchreviews", method = RequestMethod.GET)
 	public String fetchReviews(Model model, HttpServletRequest request) {
 		LOG.info("Method fetchReviews() called from ProfileManagementController");
+		HttpSession session = request.getSession(false);
+		User user = sessionHelper.getCurrentUser();
 
 		boolean fetchAbusive = true;
 		List<SurveyDetails> reviewItems = null;
 		try {
-			String entityType = (String) request.getSession(false).getAttribute(CommonConstants.ENTITY_TYPE_COLUMN);
+			long entityId = (long) session.getAttribute(CommonConstants.ENTITY_ID_COLUMN);
+			String entityType = (String) session.getAttribute(CommonConstants.ENTITY_TYPE_COLUMN);
 			if (entityType == null) {
 				throw new InvalidInputException("No user settings found in session", DisplayMessageConstants.GENERAL_ERROR);
 			}
@@ -3533,43 +3569,19 @@ public class ProfileManagementController {
 			int numRows = Integer.parseInt(request.getParameter("numOfRows"));
 
 			if (entityType.equals(CommonConstants.COMPANY_ID_COLUMN)) {
-				long companyId = Long.parseLong(request.getParameter("companyId"));
-				if (companyId == 0l) {
-					LOG.error("Invalid companyId passed in method fetchReviews().");
-					throw new InvalidInputException("Invalid companyId passed in method fetchReviews().");
-				}
-
-				reviewItems = profileManagementService.getReviews(companyId, minScore, maxScore, startIndex, numRows,
+				reviewItems = profileManagementService.getReviews(user.getCompany().getCompanyId(), minScore, maxScore, startIndex, numRows,
 						CommonConstants.PROFILE_LEVEL_COMPANY, fetchAbusive, null, null, null);
 			}
 			else if (entityType.equals(CommonConstants.REGION_ID_COLUMN)) {
-				long regionId = Long.parseLong(request.getParameter("regionId"));
-				if (regionId == 0l) {
-					LOG.error("Invalid regionId passed in method fetchReviews().");
-					throw new InvalidInputException("Invalid regionId passed in method fetchReviews().");
-				}
-
-				reviewItems = profileManagementService.getReviews(regionId, minScore, maxScore, startIndex, numRows,
+				reviewItems = profileManagementService.getReviews(entityId, minScore, maxScore, startIndex, numRows,
 						CommonConstants.PROFILE_LEVEL_REGION, fetchAbusive, null, null, null);
 			}
 			else if (entityType.equals(CommonConstants.BRANCH_ID_COLUMN)) {
-				long branchId = Long.parseLong(request.getParameter("branchId"));
-				if (branchId == 0l) {
-					LOG.error("Invalid branchId passed in method fetchReviews().");
-					throw new InvalidInputException("Invalid branchId passed in method fetchReviews().");
-				}
-
-				reviewItems = profileManagementService.getReviews(branchId, minScore, maxScore, startIndex, numRows,
+				reviewItems = profileManagementService.getReviews(entityId, minScore, maxScore, startIndex, numRows,
 						CommonConstants.PROFILE_LEVEL_BRANCH, fetchAbusive, null, null, null);
 			}
 			else if (entityType.equals(CommonConstants.AGENT_ID_COLUMN)) {
-				long agentId = Long.parseLong(request.getParameter("agentId"));
-				if (agentId == 0l) {
-					LOG.error("Invalid agentId passed in method fetchReviews().");
-					throw new InvalidInputException("Invalid agentId passed in method fetchReviews().");
-				}
-
-				reviewItems = profileManagementService.getReviews(agentId, minScore, maxScore, startIndex, numRows,
+				reviewItems = profileManagementService.getReviews(user.getUserId(), minScore, maxScore, startIndex, numRows,
 						CommonConstants.PROFILE_LEVEL_INDIVIDUAL, fetchAbusive, null, null, null);
 			}
 
@@ -3577,7 +3589,6 @@ public class ProfileManagementController {
 			profileManagementService.setAgentProfileUrlForReview(reviewItems);
 
 			model.addAttribute("reviewItems", reviewItems);
-
 		}
 		catch (InvalidInputException e) {
 			throw new InternalServerException(new ProfileServiceErrorCode(CommonConstants.ERROR_CODE_COMPANY_REVIEWS_FETCH_FAILURE,
