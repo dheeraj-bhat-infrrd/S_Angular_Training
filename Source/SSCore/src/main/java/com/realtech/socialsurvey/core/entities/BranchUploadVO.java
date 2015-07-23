@@ -1,10 +1,15 @@
 package com.realtech.socialsurvey.core.entities;
+
 /*
  * The view class for Branch
  */
 
 public class BranchUploadVO {
-	
+
+	private long branchId;
+	private long sourceBranchId;
+	private long regionId;
+	private long sourceRegionId;
 	private String branchName;
 	private String branchAddress1;
 	private String branchAddress2;
@@ -15,7 +20,39 @@ public class BranchUploadVO {
 	private String branchZipcode;
 	private boolean assignToCompany;
 	private String assignedRegionName;
-	
+
+	public long getBranchId() {
+		return branchId;
+	}
+
+	public void setBranchId(long branchId) {
+		this.branchId = branchId;
+	}
+
+	public long getSourceBranchId() {
+		return sourceBranchId;
+	}
+
+	public void setSourceBranchId(long sourceBranchId) {
+		this.sourceBranchId = sourceBranchId;
+	}
+
+	public long getRegionId() {
+		return regionId;
+	}
+
+	public void setRegionId(long regionId) {
+		this.regionId = regionId;
+	}
+
+	public long getSourceRegionId() {
+		return sourceRegionId;
+	}
+
+	public void setSourceRegionId(long sourceRegionId) {
+		this.sourceRegionId = sourceRegionId;
+	}
+
 	public String getBranchName() {
 		return branchName;
 	}
@@ -39,7 +76,7 @@ public class BranchUploadVO {
 	public void setBranchAddress2(String branchAddress2) {
 		this.branchAddress2 = branchAddress2;
 	}
-	
+
 	public String getBranchCountry() {
 		return branchCountry;
 	}

@@ -285,7 +285,7 @@
 	<bean class="org.springframework.scheduling.quartz.SchedulerFactoryBean">
 		<property name="jobDetails">
 			<list>
-				<!-- <ref bean="sitemapjobdetail" />
+				<ref bean="sitemapjobdetail" />
 				<ref bean="emailreaderjobdetail" />
 				<ref bean="incompletesocialpostjobdetail" />
 				<ref bean="incompletesurveyjobdetail" />
@@ -294,14 +294,14 @@
 				<ref bean="accountdeactivatorjobdetail" />
 				<ref bean="deactivatedaccountpurgerjobdetail" />
 				<ref bean="crmdataagentidmapperjobdetail" />
-				<ref bean="imageloaderjobdetail" /> -->
+				<ref bean="imageloaderjobdetail" />
 				<ref bean="fileuploadjobdetail" />
 			</list>
 		</property>
 
 		<property name="triggers">
 			<list>
-				<!-- <ref bean="sitemapgeneratorcron" />
+				<ref bean="sitemapgeneratorcron" />
 				<ref bean="emailreadercron" />
 				<ref bean="incompletesocialpostcron" />
 				<ref bean="incompletesurveycron" />
@@ -310,7 +310,7 @@
 				<ref bean="accountdeactivatorcron" />
 				<ref bean="deactivatedaccountpurgercron" />
 				<ref bean="crmdataagentidmappercron" />
-				<ref bean="imageloadercron" /> -->
+				<ref bean="imageloadercron" />
 				<ref bean="fileuploadcron" />
 			</list>
 		</property>
