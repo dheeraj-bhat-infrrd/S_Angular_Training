@@ -3,6 +3,7 @@ package com.realtech.socialsurvey.core.services.upload;
 import java.util.List;
 import java.util.Map;
 import org.springframework.stereotype.Component;
+import com.realtech.socialsurvey.core.entities.Branch;
 import com.realtech.socialsurvey.core.entities.BranchUploadVO;
 import com.realtech.socialsurvey.core.entities.FileUpload;
 import com.realtech.socialsurvey.core.entities.Region;
@@ -63,7 +64,7 @@ public interface CsvUploadService {
 	 * @throws SolrException
 	 * @throws NoRecordsFetchedException
 	 */
-	public void createBranch(User adminUser, BranchUploadVO branch) throws InvalidInputException, BranchAdditionException, SolrException, NoRecordsFetchedException;
+	public Branch createBranch(User adminUser, BranchUploadVO branch) throws InvalidInputException, BranchAdditionException, SolrException;
 
 	/**
 	 * Creates a region
