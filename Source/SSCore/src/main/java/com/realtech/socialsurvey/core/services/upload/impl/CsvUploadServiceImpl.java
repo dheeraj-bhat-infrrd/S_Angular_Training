@@ -129,21 +129,7 @@ public class CsvUploadServiceImpl implements CsvUploadService {
 
 	private static Logger LOG = LoggerFactory.getLogger(CsvUploadServiceImpl.class);
 
-	/**
-	 * Parses a csv and returns a map of lists of users,branches and regions
-	 * 
-	 * @param fileName
-	 * @return
-	 */
-	@Transactional
-	@Override
-	public Map<String, List<Object>> parseCsv(String fileName) {
-
-		Map<String, List<Object>> uploadObjects = parseTestFile(fileName);
-
-		return uploadObjects;
-	}
-
+	
 	@Transactional
 	@Override
 	public List<String> parseAndUploadTempCsv(FileUpload fileUpload) throws InvalidInputException {

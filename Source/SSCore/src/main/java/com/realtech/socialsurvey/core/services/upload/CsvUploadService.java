@@ -22,13 +22,6 @@ import com.realtech.socialsurvey.core.services.search.exception.SolrException;
 public interface CsvUploadService {
 
 	/**
-	 * Parses a csv and returns a map of lists of users,branches and regions
-	 * @param fileName
-	 * @return
-	 */
-	public Map<String, List<Object>> parseCsv(String fileName);
-	
-	/**
 	 * Parses the temp csv and upload
 	 * @param fileUpload
 	 * @return
