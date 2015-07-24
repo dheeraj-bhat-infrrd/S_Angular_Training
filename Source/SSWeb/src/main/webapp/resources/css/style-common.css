@@ -7061,3 +7061,7 @@ div.v-tbl-spacer {
   border: 1px solid #dcdcdc;
   border-radius: 3px;
 }
+
+.dash-prof-wrapper {
+	height: auto;
+}

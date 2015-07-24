@@ -6,7 +6,6 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
 import com.realtech.socialsurvey.core.entities.Achievement;
 import com.realtech.socialsurvey.core.entities.AgentRankingReport;
 import com.realtech.socialsurvey.core.entities.AgentSettings;
@@ -25,7 +24,6 @@ import com.realtech.socialsurvey.core.entities.SurveyDetails;
 import com.realtech.socialsurvey.core.entities.SurveyPreInitiation;
 import com.realtech.socialsurvey.core.entities.User;
 import com.realtech.socialsurvey.core.entities.UserFromSearch;
-import com.realtech.socialsurvey.core.entities.UserProfile;
 import com.realtech.socialsurvey.core.entities.UserSettings;
 import com.realtech.socialsurvey.core.enums.AccountType;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
@@ -504,8 +502,7 @@ public interface ProfileManagementService
         throws InvalidInputException;
 
 
-    public List<BreadCrumb> getIndividualsBreadCrumb( UserProfile userProfile ) throws InvalidInputException,
-        NoRecordsFetchedException;
+	public List<BreadCrumb> getIndividualsBreadCrumb(Long userId) throws InvalidInputException, NoRecordsFetchedException, ProfileNotFoundException;
 
 
     public List<BreadCrumb> getRegionsBreadCrumb( OrganizationUnitSettings regionProfile ) throws InvalidInputException,
@@ -521,4 +518,5 @@ public interface ProfileManagementService
 
 
     public Map<String, String> findNamesfromProfileName( String profileName );
+
 }

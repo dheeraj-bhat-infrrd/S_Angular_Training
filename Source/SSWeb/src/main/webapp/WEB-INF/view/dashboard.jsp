@@ -42,7 +42,7 @@
 	<div class="dash-container container">
 		<div id="prof-container" data-profile-master-id="${profileMasterId}"
 			data-column-name="${columnName}" data-account-type="${accounttype}"
-			data-column-value="${columnValue}" class="dash-top-info">
+			data-column-value="${columnValue}" class="dash-top-info dash-prof-wrapper">
 			<div id="dash-profile-detail-circles" class="row row-dash-top-adj">
 				<!-- Populated by dashboard_profiledetail.jsp -->
 			</div>
