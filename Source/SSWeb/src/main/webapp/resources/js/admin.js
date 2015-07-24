@@ -50,7 +50,8 @@ $(document).on('click','#hr-comp-icn',function(e){
 });
 
 function searchAndDisplayCompanies(key) {
-	callAjaxGET("/fetchcompaniesbykey.do?searchKey="+key, function(data) {
+	var filterValue = $('#com-filter').val();
+	callAjaxGET("/fetchcompaniesbykey.do?searchKey="+key+"&comSelFilter="+filterValue, function(data) {
 		$('#admin-com-list').html(data);
 	}, true);
 }
@@ -227,4 +228,11 @@ $(document).on('keyup','#send-invite-form',function(e){
 	if(e.which==13){
 		$('#send-invite-form-submit').trigger('click');
 	}
+});
+
+//Company select filter
+$(document).on('change', '#com-filter', function(e){
+	var key = "";
+	$('#hr-comp-sel').val(key);
+	searchAndDisplayCompanies(key);
 });
