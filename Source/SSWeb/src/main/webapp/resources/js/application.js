@@ -7388,15 +7388,12 @@ function paintDashboardButtons(data){
 			}
 		}
 	}
-	$('#dsh-btn1').click(function(){
-		var buttonId = 'dsh-btn1';
-		var task = $('#dsh-btn1').data('social');
-		if(columnName == 'agentId'){
+	$('#dsh-btn1').click(function() {
+		if (columnName == 'agentId') {
 			sendSurveyInvitation();
-		}else if(accountType="INDIVIDUAL"){
+		} else if (accountType == "INDIVIDUAL") {
 			sendSurveyInvitation();
-		}
-		else{
+		} else {
 			sendSurveyInvitationAdmin(columnName, columnValue);
 		}
 	});
