@@ -102,33 +102,18 @@
    		</c:if>
    	</c:if>
     </c:if>
-<script type="application/ld+json">
-{
-  "@context" : "http://schema.org",
-  "@type" : "Product",
-  "name" : "${profName}",
-  "aggregateRating" : {
-    "@type" : "AggregateRating",
-    "ratingValue" : ${floatingAverageGoogleRating },
-    "ratingCount" : ${reviewsCount},
-	"bestRating" : "5",
-	"worstRating" : "0"
-  }
-}
-</script>
 </head>
 <body>
-	<%-- <div class="hide" itemscope itemtype="http://schema.org/Product">
-		<h2 itemprop="name"> ${profName} </h2>
-		<span itemprop="title">Reviews</span>
-		<span itemprop="description"></span>
-		<div itemprop="aggregateRating" itemscope itemtype="http://schema.org/AggregateRating">
-			Rated <span itemprop="ratingValue">${floatingAverageGoogleRating }</span> out of
-			<span itemprop="bestRating">5</span> 
-			based on <span itemprop="reviewCount">${reviewsCount}</span>
+	<div class="hide" itemscope itemtype="http://schema.org/Product">
+		<span itemprop="name">${profName}</span> 
+		<span id="agent-desc" itemprop="title"></span>
+		<div itemprop="aggregateRating" itemscope
+			itemtype="http://schema.org/AggregateRating">
+			Rated <span id="prof-schema-agent-rating" itemprop="ratingValue">${floatingAverageGoogleRating }</span>/5
+			based on <span id="prof-schema-reviews" itemprop="reviewCount">${reviewsCount}</span>
 			reviews
 		</div>
-	</div> --%>
+	</div>
 	<div id="contact-us-pu-wrapper" class="bd-srv-pu hide">
         <div class="container cntct-us-container">
             <div class="contact-us-pu">
