@@ -74,10 +74,8 @@ public class AdminController {
 	public String adminHierarchyPage(Model model, HttpServletRequest request) {
 
 		LOG.info("Inside adminHierarchyPage() method in admin controller");
-
-		List<OrganizationUnitSettings> companies = organizationManagementService.getAllCompaniesFromMongo();
-		model.addAttribute("companyList", companies);
-
+		/*List<OrganizationUnitSettings> companies = organizationManagementService.getAllActiveCompaniesFromMongo();
+		model.addAttribute("companyList", companies);*/
 		return JspResolver.ADMIN_HIERARCHY_VIEW;
 	}
 
@@ -141,12 +139,29 @@ public class AdminController {
 		LOG.info("Inside fetchCompaniesByKey() method");
 
 		String searchKey = request.getParameter("searchKey");
-
+		String filerValue = request.getParameter("comSelFilter");
+		List<OrganizationUnitSettings> unitSettings = null;
 		if (searchKey == null) {
 			searchKey = "";
 		}
-
-		List<OrganizationUnitSettings> unitSettings = organizationManagementService.getCompaniesByNameFromMongo(searchKey);
+		if(filerValue == null) {
+			unitSettings = organizationManagementService.getCompaniesByNameFromMongo(searchKey);
+		} else {
+			switch (filerValue) {
+				case "all":
+					unitSettings = organizationManagementService.getCompaniesByNameFromMongo(searchKey);
+					break;
+				case "active":
+					unitSettings = organizationManagementService.getActiveCompaniesByNameFromMongo(searchKey);
+					break;
+				case "inactive":
+					unitSettings = organizationManagementService.getInactiveCompaniesByNameFromMongo(searchKey);
+					break;
+				default:
+					unitSettings = organizationManagementService.getCompaniesByNameFromMongo(searchKey);
+					break;
+			}
+		}
 
 		model.addAttribute("companyList", unitSettings);
 

@@ -11,6 +11,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.dao.CompanyDao;
 import com.realtech.socialsurvey.core.entities.Company;
 
@@ -39,6 +40,26 @@ public class CompanyDaoImpl extends GenericDaoImpl<Company, Long> implements Com
 	public List<Company> searchCompaniesByName(String namePattern) {
 		Session session = sessionFactory.getCurrentSession();
 		Criteria criteria = session.createCriteria(Company.class);
+		criteria.add(Restrictions.like("company", namePattern, MatchMode.START));
+		return criteria.list();
+	}
+	
+	@SuppressWarnings("unchecked")
+	@Override
+	public List<Company> searchActiveCompaniesByName(String namePattern) {
+		Session session = sessionFactory.getCurrentSession();
+		Criteria criteria = session.createCriteria(Company.class);
+		criteria.add(Restrictions.eq(CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_ACTIVE));
+		criteria.add(Restrictions.like("company", namePattern, MatchMode.START));
+		return criteria.list();
+	}
+	
+	@SuppressWarnings("unchecked")
+	@Override
+	public List<Company> searchInactiveCompaniesByName(String namePattern) {
+		Session session = sessionFactory.getCurrentSession();
+		Criteria criteria = session.createCriteria(Company.class);
+		criteria.add(Restrictions.eq(CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_INACTIVE));
 		criteria.add(Restrictions.like("company", namePattern, MatchMode.START));
 		return criteria.list();
 	}

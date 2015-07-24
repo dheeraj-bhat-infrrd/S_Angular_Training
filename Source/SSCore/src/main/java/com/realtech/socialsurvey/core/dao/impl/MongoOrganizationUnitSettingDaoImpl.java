@@ -409,6 +409,24 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
     	return unitSettings;
     }
     
+    /**
+     * Method to fetch the company setting list by set of company ids passed
+     */
+    @Override
+    public List<OrganizationUnitSettings> getCompanyListByIds(Set<Long> companyIds) {
+    	LOG.debug( "Method getCompanyList() called");
+    	
+    	List<OrganizationUnitSettings> unitSettings = null;
+    	Query query = new Query();
+    	query.addCriteria(Criteria.where(KEY_IDENTIFIER).in(companyIds));
+    	query.fields().include(KEY_CONTACT_DETAILS).include(KEY_PROFILE_NAME).include(KEY_VERTICAL).include(KEY_IDEN).exclude("_id");
+    	query.with(new Sort(Sort.Direction.DESC, KEY_MODIFIED_ON));
+    	
+    	unitSettings = mongoTemplate.find(query, OrganizationUnitSettings.class, COMPANY_SETTINGS_COLLECTION);
+    	
+    	return unitSettings;
+    }
+    
     
     @Override
     public List<OrganizationUnitSettings> getCompanyListByKey(String searchKey) {
