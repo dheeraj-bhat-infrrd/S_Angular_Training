@@ -4151,6 +4151,25 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 
         return unitSettings;
     }
+    
+    @Transactional
+    @Override
+    public List<OrganizationUnitSettings> getAllActiveCompaniesFromMongo()
+    {
+        LOG.debug( "Method getAllCompaniesFromMongo() called" );
+
+        List<Company> companyList = companyDao.findAllActive(Company.class);
+        
+        Set<Long> companyIds = new HashSet<>();
+        
+        for(Company company : companyList) {
+        	companyIds.add(company.getCompanyId());
+        }
+        
+        List<OrganizationUnitSettings> unitSettings = organizationUnitSettingsDao.getCompanyListByIds(companyIds);
+
+        return unitSettings;
+    }
 
 
     @Override
@@ -4160,5 +4179,33 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
         List<OrganizationUnitSettings> unitSettings = organizationUnitSettingsDao.getCompanyListByKey( searchKey );
         return unitSettings;
     }
+    
+    @Transactional
+	@Override
+	public List<OrganizationUnitSettings> getActiveCompaniesByNameFromMongo(String searchKey) {
+		
+		List<Company> companyList = companyDao.searchActiveCompaniesByName(searchKey);
+		Set<Long> companyIds = new HashSet<>();
+		for (Company company : companyList) {
+			companyIds.add(company.getCompanyId());
+		}
+		LOG.debug("Method getCompaniesByNameFromMongo() called");
+		List<OrganizationUnitSettings> unitSettings = organizationUnitSettingsDao.getCompanyListByIds(companyIds);
+		return unitSettings;
+	}
+
+    @Transactional
+	@Override
+	public List<OrganizationUnitSettings> getInactiveCompaniesByNameFromMongo(String searchKey) {
+
+		List<Company> companyList = companyDao.searchInactiveCompaniesByName(searchKey);
+		Set<Long> companyIds = new HashSet<>();
+		for (Company company : companyList) {
+			companyIds.add(company.getCompanyId());
+		}
+		LOG.debug("Method getCompaniesByNameFromMongo() called");
+		List<OrganizationUnitSettings> unitSettings = organizationUnitSettingsDao.getCompanyListByIds(companyIds);
+		return unitSettings;
+	}
 }
 // JIRA: SS-27: By RM05: EOC

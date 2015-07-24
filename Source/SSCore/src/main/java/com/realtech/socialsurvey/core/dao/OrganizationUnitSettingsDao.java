@@ -181,4 +181,7 @@ public interface OrganizationUnitSettingsDao
     
     public OrganizationUnitSettings fetchOrganizationUnitSettingsByUniqueIdentifier( String uniqueIdentifier,
         String collectionName );
+
+
+	public List<OrganizationUnitSettings> getCompanyListByIds(Set<Long> companyIds);
 }
