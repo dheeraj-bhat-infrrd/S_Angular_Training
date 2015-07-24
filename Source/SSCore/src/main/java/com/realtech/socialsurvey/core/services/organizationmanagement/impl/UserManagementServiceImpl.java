@@ -1069,6 +1069,40 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 		userProfileDao.update(userProfile);
 		LOG.info("Method to update a user finished for user : " + profileIdToUpdate);
 	}
+	
+	/*
+	 * Method to update the given user as active based on profiles completed
+	 */
+	// TODO
+	@Override
+	@Transactional
+	public void updateUserProfilesStatus(User admin, long profileIdToUpdate) throws InvalidInputException {
+		LOG.info("Method to update a user called for user: " + profileIdToUpdate);
+		if (admin == null) {
+			throw new InvalidInputException("No admin user present.");
+		}
+
+		LOG.info("Method to assign user to a branch called by user : " + admin.getUserId());
+		UserProfile userProfile = userProfileDao.findById(UserProfile.class, profileIdToUpdate);
+		if (userProfile == null) {
+			throw new InvalidInputException("No user profile present for the specified userId");
+		}
+		
+		User user = userProfile.getUser();
+		
+		int noOfActiveProfiles = getAllUserProfilesForUser(user).size();
+		if (noOfActiveProfiles > 0) {
+			user.setIsAtleastOneUserprofileComplete(CommonConstants.STATUS_ACTIVE);
+		}
+		else {
+			user.setIsAtleastOneUserprofileComplete(CommonConstants.STATUS_INACTIVE);
+		}
+		user.setModifiedBy(String.valueOf(admin.getUserId()));
+		user.setModifiedOn(new Timestamp(System.currentTimeMillis()));
+
+		userDao.update(user);
+		LOG.info("Method to update a user finished for user : " + profileIdToUpdate);
+	}
 
 	/**
 	 * Sends an email to user with the link to complete registration. User has to provide password
