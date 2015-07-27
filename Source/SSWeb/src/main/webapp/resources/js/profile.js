@@ -1136,7 +1136,7 @@ function paintIndividualDetails(result) {
 		individualDetailsHtml = individualDetailsHtml + '	</div>';
 		individualDetailsHtml = individualDetailsHtml + '</div>';
 	}
-	
+	/*
 	// paint disclaimer
 	if (result.disclaimer != undefined && result.disclaimer != "") {
 		individualDetailsHtml = individualDetailsHtml + '<div class="prof-left-row prof-left-ach bord-bot-dc">';
@@ -1147,7 +1147,7 @@ function paintIndividualDetails(result) {
 		individualDetailsHtml = individualDetailsHtml + '		</div>';
 		individualDetailsHtml = individualDetailsHtml + '	</div>';
 		individualDetailsHtml = individualDetailsHtml + '</div>';
-	}
+	}*/
 
 	$("#individual-details").html(individualDetailsHtml);
 	$('.lph-dd').click(function() {
