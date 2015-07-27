@@ -4031,6 +4031,12 @@ img.prof-image {
 	background: url(../images/fast_mail.png) no-repeat center;
 }
 
+.dash-icn-close {
+	width: 44px;
+	height: 36px;
+	background: url(../images/delete.png) no-repeat center;
+}
+
 .dash-lp-item {
 	margin-bottom:5px;
 	padding-left: 15px;

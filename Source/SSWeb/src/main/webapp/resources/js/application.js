@@ -7539,3 +7539,19 @@ function initializeVerticalAutcomplete() {
 		$(this).autocomplete("search");	
 	});
 }
+
+function showIncompleteSurveyListPopup() {
+	var payload = {
+			"columnName" : colName,
+			"columnValue" : colValue
+		};
+		callAjaxGetWithPayloadData("./fetchincompletesurveypopup.do", function(data) {
+			$('body').addClass('body-no-scroll');
+			$("#overlay-incomplete-survey").html(data).show();
+		}, payload, false);
+}
+
+function hideIncompleteSurveyListPopup() {
+	$('body').removeClass('body-no-scroll');
+	$("#overlay-incomplete-survey").html('').hide();
+}

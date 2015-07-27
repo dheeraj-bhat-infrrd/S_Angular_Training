@@ -33,6 +33,7 @@
 	<div id="srv-req-pop" class="survey-request-popup-container hide">
 		<div class="survey-request-popup"></div>
 	</div>
+	<div id="overlay-incomplete-survey" class="overlay-login overlay-main hide"></div>
 	<div id="toast-container" class="toast-container">
 	   <span id="overlay-toast" class="overlay-toast"></span>
     </div>
