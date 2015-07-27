@@ -2071,7 +2071,7 @@
         display: none;
     }
     .prof-contact-info,#contact-info{
-        display: none !important;
+        /* display: none !important; */
     }
     
     #recent-post-container,#reviews-container,
