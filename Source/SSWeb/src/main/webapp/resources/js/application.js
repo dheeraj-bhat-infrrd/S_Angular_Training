@@ -7555,3 +7555,14 @@ function hideIncompleteSurveyListPopup() {
 	$('body').removeClass('body-no-scroll');
 	$("#overlay-incomplete-survey").html('').hide();
 }
+
+
+function removeIncompleteSurveyRequest(incompleteSurveyId) {
+	callAjaxPOSTWithTextData("/delteincompletesurveyrequest.do?incompleteSurveyId="+incompleteSurveyId, function(data) {
+		if(data == "success") {
+			$('div[data-iden="sur-pre-'+incompleteSurveyId+'"]').remove();
+			$('#overlay-toast').html('Survey reminder request deleted successfully');
+			showToast();
+		}
+	}, true, {});
+}

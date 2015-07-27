@@ -7071,3 +7071,11 @@ div.v-tbl-spacer {
 .dash-prof-wrapper {
 	height: auto;
 }
+
+.dash-sur-link {
+    color: #009FE0;
+    font-size: 13px;
+    text-decoration: underline;
+    line-height: 20px;
+    cursor: pointer;
+}
