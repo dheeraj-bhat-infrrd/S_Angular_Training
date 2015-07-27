@@ -209,6 +209,10 @@ public class TwitterFeedProcessorImpl implements SocialNetworkDataProcessor<Stat
 		Collections.sort(tweets, new TwitterStatusTimeComparator());
 		TwitterSocialPost post;
 		for (Status tweet : tweets) {
+			if (tweet.getText() == null || tweet.getText().isEmpty()) {
+				continue;
+			}
+			
 			post = new TwitterSocialPost();
 			post.setTweet(tweet);
 			post.setPostText(tweet.getText());
