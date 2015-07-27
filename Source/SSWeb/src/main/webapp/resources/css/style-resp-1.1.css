@@ -523,4 +523,7 @@
 	.main-con-header {
 		padding-left: 5px;
 	}
+	.sur-com-logo {
+		display: none;
+	}
 }

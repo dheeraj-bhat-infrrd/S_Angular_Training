@@ -75,7 +75,7 @@ function paintProfilePage(result) {
 		var breadCrumUrl = '/rest/breadcrumb/';
 		
 		if (profileLevel == 'INDIVIDUAL') {
-			breadCrumUrl += 'individual/' + profileJson.profileName;
+			breadCrumUrl += 'individual/' + profileJson.iden;
 		} else if (profileLevel == 'BRANCH') {
 			breadCrumUrl += companyProfileName + '/branch/' + profileJson.profileName;
 		} else if (profileLevel == 'REGION') {

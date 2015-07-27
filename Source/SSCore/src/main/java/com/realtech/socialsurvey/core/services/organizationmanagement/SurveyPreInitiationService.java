@@ -21,4 +21,6 @@ public interface SurveyPreInitiationService {
 	 */
 	public List<SurveyPreInitiation> getIncompleteSurvey(long iden, double startScore, double limitScore, int startIndex, int numOfRows,
 			String profileLevel, Date startDate, Date endDate, boolean realtechAdmin) throws InvalidInputException;
+
+	public void deleteSurveyReminder(long incompleteSurveyId);
 }

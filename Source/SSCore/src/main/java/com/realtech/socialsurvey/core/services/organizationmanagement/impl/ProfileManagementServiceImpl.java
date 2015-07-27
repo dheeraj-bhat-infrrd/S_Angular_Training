@@ -2045,28 +2045,62 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
     }
 
 
-    @Override
-    @Transactional
-    public List<BreadCrumb> getIndividualsBreadCrumb( UserProfile userProfile ) throws InvalidInputException,
-        NoRecordsFetchedException
-    {
-        LOG.info( "Method getIndividualsBreadCrumb called :" );
-        List<BreadCrumb> breadCrumbList = new ArrayList<>();
+	@Override
+	@Transactional
+	public List<BreadCrumb> getIndividualsBreadCrumb(Long userId) throws InvalidInputException, NoRecordsFetchedException, ProfileNotFoundException {
+		User user = userDao.findById(User.class, userId);
 
-        Branch branch = branchDao.findById( Branch.class, userProfile.getBranchId() );
-        updateCrumbListWithBranchName( breadCrumbList, branch );
+		List<UserProfile> userProfiles = user.getUserProfiles();
+		UserProfile userProfile = null;
+		for (UserProfile element : userProfiles) {
+			if (element.getProfilesMaster().getProfileId() == CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID) {
+				userProfile = element;
+				break;
+			}
+		}
+		if (userProfile == null) {
+			throw new ProfileNotFoundException("No records found  ");
+		}
 
-        Region region = regionDao.findById( Region.class, userProfile.getRegionId() );
-        updateCrumbListWithRegionName( breadCrumbList, region );
+		Company company = userProfile.getCompany();
+		AccountType accountType = AccountType.getAccountType(company.getLicenseDetails().get(0).getAccountsMaster().getAccountsMasterId());
 
-        Company company = companyDao.findById( Company.class, userProfile.getCompany().getCompanyId() );
-        updateCrumbListWithCompanyName( breadCrumbList, company );
-        updateCrumbListWithVerticalName( breadCrumbList, company );
+		LOG.info("Method getIndividualsBreadCrumb called :");
+		List<BreadCrumb> breadCrumbList = new ArrayList<>();
 
-        Collections.reverse( breadCrumbList );
-        LOG.info( "Method getIndividualsBreadCrumb finished :" );
-        return breadCrumbList;
-    }
+		switch (accountType.getValue()) {
+			case CommonConstants.ACCOUNTS_MASTER_INDIVIDUAL:
+				updateCrumbListWithVerticalName(breadCrumbList, company);
+				break;
+			case CommonConstants.ACCOUNTS_MASTER_TEAM:
+				updateCrumbListWithCompanyName(breadCrumbList, company);
+				updateCrumbListWithVerticalName(breadCrumbList, company);
+				break;
+			case CommonConstants.ACCOUNTS_MASTER_COMPANY:
+				Branch compBranch = branchDao.findById(Branch.class, userProfile.getBranchId());
+				updateCrumbListWithBranchName(breadCrumbList, compBranch);
+
+				updateCrumbListWithCompanyName(breadCrumbList, company);
+				updateCrumbListWithVerticalName(breadCrumbList, company);
+				break;
+			case CommonConstants.ACCOUNTS_MASTER_ENTERPRISE:
+				Branch branch = branchDao.findById(Branch.class, userProfile.getBranchId());
+				updateCrumbListWithBranchName(breadCrumbList, branch);
+
+				Region region = regionDao.findById(Region.class, userProfile.getRegionId());
+				updateCrumbListWithRegionName(breadCrumbList, region);
+
+				updateCrumbListWithCompanyName(breadCrumbList, company);
+				updateCrumbListWithVerticalName(breadCrumbList, company);
+				break;
+			default:
+				throw new InvalidInputException("Invalid account type detected");
+		}
+
+		Collections.reverse(breadCrumbList);
+		LOG.info("Method getIndividualsBreadCrumb finished :");
+		return breadCrumbList;
+	}
 
 
     @Override
