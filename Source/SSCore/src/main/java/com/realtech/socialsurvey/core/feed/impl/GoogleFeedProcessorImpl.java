@@ -236,6 +236,9 @@ public class GoogleFeedProcessorImpl implements SocialNetworkDataProcessor<Googl
                             continue;
                         }
                         JsonObject items = (JsonObject) jsonElement;
+                        if (items.get("title") == null || items.get("title").getAsString().isEmpty()) {
+							continue;
+						}
 
                         Timestamp postCreatedOn = convertStringToDate( items.get( "published" ).getAsString() );
                         JsonObject actor = (JsonObject) items.get( "actor" );
