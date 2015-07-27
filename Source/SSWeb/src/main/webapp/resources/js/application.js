@@ -4529,8 +4529,8 @@ $('#find-pro-form input').keypress(function(e) {
 $(window).scroll(function() {
 	var newIndex = startIndex + rowSize;
 	if ((window.innerHeight + window.pageYOffset) >= (document.body.offsetHeight) && newIndex < $('#srch-num').html()) {
-		fetchUsers(newIndex);
 		startIndex = newIndex;
+		fetchUsers(newIndex);
 	}
 });
 
@@ -4649,7 +4649,7 @@ function fetchUsersByProfileLevel(iden, profileLevel, startIndex) {
 		return;
 	}
 	var url = window.location.origin + "/rest/profile/individuals/" + iden
-			+ "?profileLevel=" + profileLevel + "&startIndex=" + startIndex;
+			+ "?profileLevel=" + profileLevel + "&start=" + startIndex;
 	callAjaxGET(url, fetchUsersByProfileLevelCallback, false);
 }
 
@@ -4657,8 +4657,8 @@ function fetchUsersByProfileLevelCallback(data) {
 	var response = $.parseJSON(data);
 	if (response != undefined) {
 		var usersList = $.parseJSON(response.entity);
-		if(usersList.length > 0)
-			$('#srch-num').html(usersList.userFound);
+		if(usersList.userFound > 0)
+			$('#srch-num').text(usersList.userFound);
 		paintProList(usersList.users);
 	}
 }
@@ -7538,4 +7538,20 @@ function initializeVerticalAutcomplete() {
 		$(this).trigger('keydown');
 		$(this).autocomplete("search");	
 	});
+}
+
+function showIncompleteSurveyListPopup() {
+	var payload = {
+			"columnName" : colName,
+			"columnValue" : colValue
+		};
+		callAjaxGetWithPayloadData("./fetchincompletesurveypopup.do", function(data) {
+			$('body').addClass('body-no-scroll');
+			$("#overlay-incomplete-survey").html(data).show();
+		}, payload, false);
+}
+
+function hideIncompleteSurveyListPopup() {
+	$('body').removeClass('body-no-scroll');
+	$("#overlay-incomplete-survey").html('').hide();
 }
