@@ -1,7 +1,7 @@
 // Contains js functions for realtech admin
 $(document).on('click','#dsh-ind-report-dwn-btn',function(e){
-	var startDate = $('#dsh-start-date').val();
-	var endDate = $("#dsh-end-date").val();
+	var startDate = $('#indv-dsh-start-date').val();
+	var endDate = $("#indv-dsh-end-date").val();
 	var idenVal = $('#report-sel').attr('data-idenVal');
 	var selectedProf = $('#report-sel').attr('data-iden');
 	if(idenVal == undefined || idenVal == "") {
@@ -51,7 +51,8 @@ $(document).on('click','#hr-comp-icn',function(e){
 
 function searchAndDisplayCompanies(key) {
 	var filterValue = $('#com-filter').val();
-	callAjaxGET("/fetchcompaniesbykey.do?searchKey="+key+"&comSelFilter="+filterValue, function(data) {
+	var accountType = $('#com-type-filter').val();
+	callAjaxGET("/fetchcompaniesbykey.do?searchKey="+key+"&comSelFilter="+filterValue+"&accountType="+accountType, function(data) {
 		$('#admin-com-list').html(data);
 	}, true);
 }
@@ -236,3 +237,50 @@ $(document).on('change', '#com-filter', function(e){
 	$('#hr-comp-sel').val(key);
 	searchAndDisplayCompanies(key);
 });
+
+//Company select filter
+$(document).on('change', '#com-type-filter', function(e){
+	var key = "";
+	$('#hr-comp-sel').val(key);
+	searchAndDisplayCompanies(key);
+});
+
+function bindDatePickerForCompanyReport() {
+	var startDate;
+	var fromEndDate = new Date();
+	var toEndDate = new Date();
+	$("input[data-date-type='startDate']").datepicker({
+		orientation: "auto",
+		format: 'mm/dd/yyyy',
+		endDate: fromEndDate,
+		todayHighlight: true,
+		clearBtn: true,
+		autoclose: true
+	})
+	.on('changeDate', function(selected){
+        startDate = new Date(selected.date.valueOf());
+        startDate.setDate(startDate.getDate(new Date(selected.date.valueOf())));
+        $("input[data-date-type='endDate']").datepicker('setStartDate', startDate);
+    });
+	
+	$("input[data-date-type='endDate']").datepicker({
+		orientation: "auto",
+		format: 'mm/dd/yyyy',
+		endDate: toEndDate,
+		todayHighlight: true,
+		clearBtn: true,
+		autoclose: true
+	})
+	.on('changeDate', function(selected){
+        fromEndDate = new Date(selected.date.valueOf());
+        fromEndDate.setDate(fromEndDate.getDate(new Date(selected.date.valueOf())));
+        $("input[data-date-type='startDate']").datepicker('setEndDate', fromEndDate);
+    });
+}
+
+function downloadCompanyReport() {
+	var startDate = $('#comp-start-date').val();
+	var endDate = $('#comp-end-date').val();
+	window.location.href = "/downloadcompanyregistrationreport.do?startDate="
+			+ startDate + "&endDate=" + endDate;
+}
