@@ -61,9 +61,9 @@ public class IncompleteSurveyReminderSender extends QuartzJobBean {
 					long currentTime = System.currentTimeMillis();
 					if (surveyHandler.checkIfTimeIntervalHasExpired(surveyLastRemindedTime, currentTime, reminderInterval)) {
 						try {
-							if (survey.getSurveySource().equalsIgnoreCase(CommonConstants.CRM_SOURCE_ENCOMPASS)) {
+							/*if (survey.getSurveySource().equalsIgnoreCase(CommonConstants.CRM_SOURCE_ENCOMPASS)) {
 								sendMailToAgent(survey);
-							}
+							}*/
 							sendEmail(emailServices, organizationManagementService, userManagementService, survey, company.getCompanyId());
 							// Change status to Sent Mail
 							surveyHandler.markSurveyAsSent(survey);
