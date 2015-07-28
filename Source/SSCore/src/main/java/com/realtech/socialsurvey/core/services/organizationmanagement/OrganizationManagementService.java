@@ -6,6 +6,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import com.realtech.socialsurvey.core.entities.Branch;
 import com.realtech.socialsurvey.core.entities.BranchFromSearch;
 import com.realtech.socialsurvey.core.entities.BranchSettings;
@@ -743,7 +744,9 @@ public interface OrganizationManagementService {
 	
 	public List<OrganizationUnitSettings> getCompaniesByNameFromMongo(String searchKey);
 
-	public List<OrganizationUnitSettings> getActiveCompaniesByNameFromMongo(String searchKey);
-
-	public List<OrganizationUnitSettings> getInactiveCompaniesByNameFromMongo(String searchKey);
+	public List<OrganizationUnitSettings> getCompaniesByKeyValueFromMongo(String searchKey, int accountType, int status);
+	
+	public List<Company> getCompaniesByDateRange(Date startDate, Date endDate);
+	
+	public XSSFWorkbook downloadCompanyReport(List<Company> companies, String fileName);
 }

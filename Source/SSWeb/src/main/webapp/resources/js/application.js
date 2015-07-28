@@ -322,8 +322,8 @@ function paintDashboard(profileMasterId, newProfileName, newProfileValue, typeoO
 	});
 
 	$('#dsh-dwnld-btn').click(function() {
-		var startDate = $('#dsh-start-date').val();
-		var endDate = $("#dsh-end-date").val();
+		var startDate = $('#indv-dsh-start-date').val();
+		var endDate = $("#indv-dsh-end-date").val();
 		window.location.href = "/downloadcustomersurveyresults.do?columnName=" + colName + "&columnValue=" + colValue
 			+ "&startDate=" + startDate + "&endDate=" + endDate;
 	});
@@ -601,36 +601,8 @@ function getReviewsCountAndShowReviews(columnName, columnValue) {
 				}
 				
 				// initializing datepickers
-				var startDate;
-				var fromEndDate = new Date();
-				var toEndDate = new Date();
-				$("#dsh-start-date").datepicker({
-					orientation: "bottom auto",
-					format: 'mm/dd/yyyy',
-					endDate: fromEndDate,
-					todayHighlight: true,
-					clearBtn: true,
-					autoclose: true
-				})
-				.on('changeDate', function(selected){
-			        startDate = new Date(selected.date.valueOf());
-			        startDate.setDate(startDate.getDate(new Date(selected.date.valueOf())));
-			        $('#dsh-end-date').datepicker('setStartDate', startDate);
-			    });
-				
-				$("#dsh-end-date").datepicker({
-					orientation: "bottom auto",
-					format: 'mm/dd/yyyy',
-					endDate: toEndDate,
-					todayHighlight: true,
-					clearBtn: true,
-					autoclose: true
-				})
-				.on('changeDate', function(selected){
-			        fromEndDate = new Date(selected.date.valueOf());
-			        fromEndDate.setDate(fromEndDate.getDate(new Date(selected.date.valueOf())));
-			        $('#dsh-start-date').datepicker('setEndDate', fromEndDate);
-			    });
+				bindDatePickerforSurveyDownload();
+				bindDatePickerforIndividualSurveyDownload();
 			}
 		}, payload, false);
 		
@@ -7565,4 +7537,72 @@ function removeIncompleteSurveyRequest(incompleteSurveyId) {
 			showToast();
 		}
 	}, true, {});
+}
+
+function bindDatePickerforSurveyDownload() {
+	// initializing datepickers
+	var startDate;
+	var fromEndDate = new Date();
+	var toEndDate = new Date();
+	$("#dsh-start-date").datepicker({
+		orientation: "auto",
+		format: 'mm/dd/yyyy',
+		endDate: fromEndDate,
+		todayHighlight: true,
+		clearBtn: true,
+		autoclose: true
+	})
+	.on('changeDate', function(selected){
+        startDate = new Date(selected.date.valueOf());
+        startDate.setDate(startDate.getDate(new Date(selected.date.valueOf())));
+        $('#dsh-end-date').datepicker('setStartDate', startDate);
+    });
+	
+	$("#dsh-end-date").datepicker({
+		orientation: "auto",
+		format: 'mm/dd/yyyy',
+		endDate: toEndDate,
+		todayHighlight: true,
+		clearBtn: true,
+		autoclose: true
+	})
+	.on('changeDate', function(selected){
+        fromEndDate = new Date(selected.date.valueOf());
+        fromEndDate.setDate(fromEndDate.getDate(new Date(selected.date.valueOf())));
+        $('#dsh-start-date').datepicker('setEndDate', fromEndDate);
+    });
+}
+
+function bindDatePickerforIndividualSurveyDownload() {
+	// initializing datepickers
+	var startDate;
+	var fromEndDate = new Date();
+	var toEndDate = new Date();
+	$("#indv-dsh-start-date").datepicker({
+		orientation: "auto",
+		format: 'mm/dd/yyyy',
+		endDate: fromEndDate,
+		todayHighlight: true,
+		clearBtn: true,
+		autoclose: true
+	})
+	.on('changeDate', function(selected){
+        startDate = new Date(selected.date.valueOf());
+        startDate.setDate(startDate.getDate(new Date(selected.date.valueOf())));
+        $('#indv-dsh-end-date').datepicker('setStartDate', startDate);
+    });
+	
+	$("#indv-dsh-end-date").datepicker({
+		orientation: "auto",
+		format: 'mm/dd/yyyy',
+		endDate: toEndDate,
+		todayHighlight: true,
+		clearBtn: true,
+		autoclose: true
+	})
+	.on('changeDate', function(selected){
+        fromEndDate = new Date(selected.date.valueOf());
+        fromEndDate.setDate(fromEndDate.getDate(new Date(selected.date.valueOf())));
+        $('#indv-dsh-start-date').datepicker('setEndDate', fromEndDate);
+    });
 }

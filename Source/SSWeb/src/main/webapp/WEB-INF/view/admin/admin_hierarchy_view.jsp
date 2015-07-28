@@ -10,6 +10,7 @@
 				<spring:message code="label.viewcompanyhierachy.key" />
 			</div>
 			<div class="v-um-hdr-right float-right">
+				<label class="fil-label">Company Status : </label>
 				<select class="com-sel-filter" id="com-filter">
 					<option value="all">All</option>
 					<option value="active">Active</option>
@@ -24,14 +25,21 @@
 </div>
 <div id="comp-hierarchy-cont" class="container v-hr-container">
 	<div class="v-um-header clearfix">
-		<div class="v-um-hdr-left float-left">Browse Company</div>
+		<div class="v-um-hdr-left float-left">
+			<label class="fil-label">Company Type : </label> 
+			<select class="com-sel-filter" id="com-type-filter">
+				<option value="all">All</option>
+				<option value="individual">Individual</option>
+				<option value="enterprise">Enterprise</option>
+			</select>
+		</div>
 		<div class="v-um-hdr-right float-right">
 			<input id="hr-comp-sel" class="v-comp-inp"
 				placeholder="Search Company"> <span id="hr-comp-icn"
 				class="um-search-icn"></span>
 		</div>
 	</div>
-	<div class="v-hr-tbl">
+	<div class="v-hr-tbl" style="margin-top: 0">
 		<div class="v-tbl-header comp-row" id="hierarchy-list-header">
 			<div class="v-tbl-line"></div>
 			<div class="v-tbl-name">Name</div>
@@ -41,13 +49,14 @@
 			<div class="v-tbl-spacer"></div>
 		</div>
 		<div id="admin-com-list">
-			<%-- <jsp:include page="admin_company_list.jsp"></jsp:include> --%>
+			<!-- Get the company list from the JavaScript -->
 		</div>
 	</div>
 </div>
 <div id="temp-message" class="hide"></div>
 <script>
-	$(document).ready(function(e){
+	$(document).ready(function(){
+		$(document).attr("title", "Hierarchy");
 		searchAndDisplayCompanies("");
 	});
 </script>
