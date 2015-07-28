@@ -110,7 +110,7 @@ public interface CommonConstants
     public static final int SURVEY_STATUS_PRE_INITIATED = 1;
     public static final int STATUS_SURVEYPREINITIATION_PROCESSED = 1;
     public static final int SURVEY_STATUS_INITIATED = 2;
-    public static final int STATUS_SURVEYPREINITIATION_OLD_RECORD = 3;
+    public static final int STATUS_SURVEYPREINITIATION_CORRUPT_RECORD = 3;
     public static final int STATUS_SURVEYPREINITIATION_NOT_PROCESSED = 4;
 
     /**
