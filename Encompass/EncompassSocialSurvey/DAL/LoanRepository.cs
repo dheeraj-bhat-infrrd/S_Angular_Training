@@ -55,7 +55,7 @@ namespace EncompassSocialSurvey.DAL
                                         , ?MODIFIED_ON
                                         ) ;";
 
-        public bool InsertLoan(LoanEntity loan, MySqlConnection mySqlDbConnection, string emailDomain, string emailPrefix)
+        public bool InsertLoan(LoanEntity loan, MySqlConnection mySqlDbConnection)
         {
             Logger.Info("Entering the method LoanRepository.InsertLoan(): LoanId:" + loan.SurveySourceId + " : CustomerEmailId : " + loan.CustomerEmailId);
             bool returnValue = false;
@@ -81,14 +81,7 @@ namespace EncompassSocialSurvey.DAL
 
                     commandToInsert.Parameters.Add("?CUSTOMER_FIRST_NAME", MySqlDbType.VarChar, 100).Value = loan.CustomerFirstName;
                     commandToInsert.Parameters.Add("?CUSTOMER_LAST_NAME", MySqlDbType.VarChar, 100).Value = loan.CustomerLastName;
-                    if (string.IsNullOrWhiteSpace(emailDomain))
-                    {
-                        commandToInsert.Parameters.Add("?CUSTOMER_EMAIL_ID", MySqlDbType.VarChar, 250).Value = loan.CustomerEmailId;
-                    }
-                    else
-                    {
-                        commandToInsert.Parameters.Add("?CUSTOMER_EMAIL_ID", MySqlDbType.VarChar, 250).Value = replaceEmailAddress(loan.CustomerEmailId, emailDomain, emailPrefix);
-                    }
+                    commandToInsert.Parameters.Add("?CUSTOMER_EMAIL_ID", MySqlDbType.VarChar, 250).Value = loan.CustomerEmailId;
                     commandToInsert.Parameters.Add("?CUSTOMER_INTERACTION_DETAILS", MySqlDbType.VarChar, 500).Value = loan.CustomerInteractionDetails;
                     commandToInsert.Parameters.Add("?ENGAGEMENT_CLOSED_TIME", MySqlDbType.DateTime).Value = loan.EngagementClosedTime;
                     commandToInsert.Parameters.Add("?REMINDER_COUNTS", MySqlDbType.Int32).Value = loan.ReminderCounts;
@@ -115,7 +108,7 @@ namespace EncompassSocialSurvey.DAL
             return returnValue;
         }
 
-        public bool InserLoan(List<LoanEntity> loans, string emailDomain, string emailPrefix)
+        public bool InserLoan(List<LoanEntity> loans)
         {
             Logger.Info("Entering the method LoanRepository.InsertLoan(List<>)");
             bool returnValue = false;
@@ -126,7 +119,7 @@ namespace EncompassSocialSurvey.DAL
                 mySqlDbConnnection = _socialSurveryContext.DBConnnection;
                 foreach (var loanEntity in loans)
                 {
-                    InsertLoan(loanEntity, mySqlDbConnnection, emailDomain, emailPrefix);
+                    InsertLoan(loanEntity, mySqlDbConnnection);
                 }
             }
             catch (Exception ex)
@@ -198,30 +191,6 @@ namespace EncompassSocialSurvey.DAL
                     + " : CUSTOMER_EMAIL_ID :  " + loan.CustomerEmailId + " : CUSTOMER_FIRST_NAME : " + loan.CustomerFirstName);
             }
             return returnValue;
-        }
-
-        private string replaceEmailAddress(string email, string emailDomain, string emailPrefix)
-        {
-            if (string.IsNullOrWhiteSpace(email))
-            {
-                return "";
-            }
-            else
-            {
-                email = email.Replace("@", "+");
-                Logger.Debug("Transitional email address: " + email);
-                if (string.IsNullOrWhiteSpace(emailPrefix))
-                {
-                    email = email + "@" + emailDomain;
-                }
-                else
-                {
-                    email = emailPrefix + "+" + email + "@" + emailDomain;
-                }
-               
-                Logger.Debug("Final replaced email address: " + email);
-                return email;
-            }
         }
     }
 }
