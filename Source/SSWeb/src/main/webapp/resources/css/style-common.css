@@ -4117,6 +4117,7 @@ img.prof-image {
 	height: 28px;
 	border: none;
 	color: #777;
+	font-size: 11px;
 }
 
 .dsh-date-picker:focus {
@@ -7027,8 +7028,6 @@ div.v-tbl-spacer {
 }
 
 .comp-hr-cont {
-	position: relative;
-	top: -10px;
 	padding-left: 10px;
 }
 
@@ -7061,11 +7060,12 @@ div.v-tbl-spacer {
 
 .com-sel-filter{
   width: 100px;
-  height: 35px;
-  line-height: 35px;
+  height: 30px;
+  line-height: 30px;
   padding-left: 5px;
   border: 1px solid #dcdcdc;
   border-radius: 3px;
+  font-size: 13px;
 }
 
 .dash-prof-wrapper {
@@ -7078,4 +7078,10 @@ div.v-tbl-spacer {
     text-decoration: underline;
     line-height: 20px;
     cursor: pointer;
+}
+
+label.fil-label {
+	font-size: 13px;
+	line-height: 30px;
+	margin-bottom: 0;
 }

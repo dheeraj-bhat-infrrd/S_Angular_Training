@@ -13,8 +13,8 @@ public interface CompanyDao extends GenericDao<Company, Long> {
 	
 	public List<Company> searchCompaniesByName(String namePattern);
 
-	public List<Company> searchActiveCompaniesByName(String namePattern);
+	public List<Company> searchCompaniesByNameAndKeyValue(String namePattern, int accountType, int status);
 
-	public List<Company> searchInactiveCompaniesByName(String namePattern);
+	public List<Company> getCompaniesByDateRange(Timestamp startTime, Timestamp endTime);
 
 }
