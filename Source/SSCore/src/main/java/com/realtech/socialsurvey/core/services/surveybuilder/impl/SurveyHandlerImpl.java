@@ -425,7 +425,7 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
         LOG.debug( "Now fetching survey which are already processed " );
         HashMap<String, Object> queries = new HashMap<>();
         queries.put( CommonConstants.COMPANY_ID_COLUMN, company.getCompanyId() );
-        queries.put( CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_SURVEYPREINITIATION_NOT_PROCESSED );
+        queries.put( CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_SURVEYPREINITIATION_PROCESSED );
         incompleteSurveyCustomers = surveyPreInitiationDao.findByKeyValue( SurveyPreInitiation.class, queries );
         LOG.info( "finished." );
         return incompleteSurveyCustomers;
@@ -945,7 +945,7 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
         surveyPreInitiation.setLastReminderTime( new Timestamp( System.currentTimeMillis() ) );
         surveyPreInitiation.setModifiedOn( new Timestamp( System.currentTimeMillis() ) );
         surveyPreInitiation.setReminderCounts( 0 );
-        surveyPreInitiation.setStatus( CommonConstants.STATUS_SURVEYPREINITIATION_NOT_PROCESSED );
+        surveyPreInitiation.setStatus( CommonConstants.SURVEY_STATUS_PRE_INITIATED );
         surveyPreInitiation.setSurveySource( source );
         surveyPreInitiationDao.save( surveyPreInitiation );
 
