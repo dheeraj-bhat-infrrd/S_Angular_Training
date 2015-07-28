@@ -2,7 +2,7 @@
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"%>
 <c:if test="${not empty incompleteSurveys}">
 	<c:forEach var="survey" items="${incompleteSurveys}"  varStatus="loop">
-		<div class="dash-lp-item clearfix">
+		<div class="dash-lp-item clearfix"  data-iden="sur-pre-${survey.surveyPreIntitiationId }">
 			<div class="float-left dash-lp-txt">
 				${survey.customerFirstName} ${survey.customerLastName}
 					<div class="font-11 opensanslight" data-modifiedon="<fmt:formatDate type="date" pattern="yyyy-MM-dd-hh-mm-ss"

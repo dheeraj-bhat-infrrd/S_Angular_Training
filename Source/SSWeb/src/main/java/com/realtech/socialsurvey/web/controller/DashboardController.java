@@ -594,10 +594,16 @@ public class DashboardController
 
         try {
             surveyDetails = fetchIncompleteSurveys( request, user, realtechAdmin );
+            for (SurveyPreInitiation surveyPreInitiation : surveyDetails) {
+				if (surveyPreInitiation.getAgentId() > 0) {
+					surveyPreInitiation.setAgentEmailId(surveyPreInitiation.getUser().getEmailId());
+					surveyPreInitiation
+							.setAgentName(surveyPreInitiation.getUser().getFirstName() + " " + surveyPreInitiation.getUser().getLastName());
+				}
+            }
+            
             model.addAttribute( "incompleteSurveys", surveyDetails );
-            String agentName = user.getFirstName() + " " + user.getLastName();
-            agentName = agentName.replaceAll( "null", "" );
-            model.addAttribute( "agentName", agentName );
+            
         } catch ( NonFatalException e ) {
             LOG.error( "Non fatal exception caught in getReviews() while fetching reviews. Nested exception is ", e );
             model.addAttribute( "message", e.getMessage() );

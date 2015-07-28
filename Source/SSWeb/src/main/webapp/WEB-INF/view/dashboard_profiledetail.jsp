@@ -156,9 +156,9 @@ $(document).ready(function() {
 		}
 	}); */
 	
-	$('#srv-scr').click(function(){
+	/* $('#srv-scr').click(function(){
 		showSurveyRequestPage();
-	});
+	}); */
 	
 	var columnName = "${columnName}";
 	var columnValue = "${columnValue}";

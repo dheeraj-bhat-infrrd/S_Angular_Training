@@ -131,8 +131,11 @@
 		<div class="dash-panels-wrapper">
 			<div class="row">
 				<div id="dash-survey-incomplete" class="dash-panel-left col-lg-4 col-md-4 col-sm-4 col-xs-12">
-					<div class="dash-lp-header" id="incomplete-survey-header"><spring:message code="label.incompletesurveys.key" /></div>
-					<div id="dsh-inc-srvey" class="dash-lp-item-grp">
+					<div class="dash-lp-header clearfix" id="incomplete-survey-header">
+						<div class="float-left"><spring:message code="label.incompletesurveys.key" /></div>
+						<div class="float-right dash-sur-link" onclick="showIncompleteSurveyListPopup()">View All</div>
+					</div>
+					<div id="dsh-inc-srvey" class="dash-lp-item-grp clearfix">
 						<!-- Populated with dashboard_incompletesurveys.jsp -->
 					</div>
 					<div id="dsh-inc-dwnld" class="dash-btn-sur-data hide"><spring:message code="label.incompletesurveydata.key" /></div>
