@@ -19,13 +19,11 @@ import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
 import com.realtech.socialsurvey.core.entities.SurveyPreInitiation;
 import com.realtech.socialsurvey.core.entities.User;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
-import com.realtech.socialsurvey.core.exception.NoRecordsFetchedException;
 import com.realtech.socialsurvey.core.services.mail.EmailServices;
 import com.realtech.socialsurvey.core.services.mail.UndeliveredEmailException;
 import com.realtech.socialsurvey.core.services.organizationmanagement.OrganizationManagementService;
 import com.realtech.socialsurvey.core.services.organizationmanagement.UserManagementService;
 import com.realtech.socialsurvey.core.services.search.SolrSearchService;
-import com.realtech.socialsurvey.core.services.search.exception.SolrException;
 import com.realtech.socialsurvey.core.services.surveybuilder.SurveyHandler;
 import com.realtech.socialsurvey.core.utils.EmailFormatHelper;
 
@@ -53,7 +51,7 @@ public class IncompleteSurveyReminderSender extends QuartzJobBean {
 			Map<String, Integer> reminderMap = surveyHandler.getReminderInformationForCompany(company.getCompanyId());
 			int reminderInterval = reminderMap.get(CommonConstants.SURVEY_REMINDER_INTERVAL);
 			int reminderCount = reminderMap.get(CommonConstants.SURVEY_REMINDER_COUNT);
-			
+
 			List<SurveyPreInitiation> incompleteSurveyCustomers = surveyHandler.getIncompleteSurveyCustomersEmail(company);
 			for (SurveyPreInitiation survey : incompleteSurveyCustomers) {
 				if (survey.getReminderCounts() < reminderCount) {
@@ -109,11 +107,12 @@ public class IncompleteSurveyReminderSender extends QuartzJobBean {
 		// Send email to complete survey to each customer.
 		OrganizationUnitSettings companySettings = null;
 		String agentName = "";
-		try {
-			agentName = solrSearchService.getUserDisplayNameById(survey.getAgentId());
-		}
-		catch (NoRecordsFetchedException | SolrException e1) {
-			LOG.error("EXception caught in sendEmail(). Nested exception is ", e1);
+		User user = null;
+
+		user = userManagementService.getUserByUserId(survey.getAgentId());
+
+		if (user != null) {
+			agentName = user.getFirstName();
 		}
 
 		String surveyLink = surveyHandler.composeLink(survey.getAgentId(), survey.getCustomerEmailId(), survey.getCustomerFirstName(),
@@ -137,8 +136,6 @@ public class IncompleteSurveyReminderSender extends QuartzJobBean {
 				&& agentSettings.getContact_details().getContact_numbers().getWork() != null) {
 			agentPhone = agentSettings.getContact_details().getContact_numbers().getWork();
 		}
-
-		User user = userManagementService.getUserByUserId(survey.getAgentId());
 		String companyName = user.getCompany().getCompany();
 		String currentYear = String.valueOf(Calendar.getInstance().get(Calendar.YEAR));
 		DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd");

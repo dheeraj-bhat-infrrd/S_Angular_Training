@@ -100,4 +100,13 @@ public class SurveyPreInitiationServiceImpl implements SurveyPreInitiationServic
 
 		return userIds;
 	}
+	
+	@Transactional
+	@Override
+	public void deleteSurveyReminder(long incompleteSurveyId) {
+		LOG.debug("Method deleteSurveyReminder() called");
+		SurveyPreInitiation surveyPreInitiation = surveyPreInitiationDao.findById(SurveyPreInitiation.class, incompleteSurveyId);
+		surveyPreInitiationDao.delete(surveyPreInitiation);
+		LOG.debug("Method deleteSurveyReminder() finished");
+	}
 }

@@ -18,7 +18,14 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.TreeMap;
 import javax.annotation.Resource;
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.CellStyle;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.xssf.usermodel.XSSFDataFormat;
+import org.apache.poi.xssf.usermodel.XSSFSheet;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
@@ -4182,9 +4189,9 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
     
     @Transactional
 	@Override
-	public List<OrganizationUnitSettings> getActiveCompaniesByNameFromMongo(String searchKey) {
-		
-		List<Company> companyList = companyDao.searchActiveCompaniesByName(searchKey);
+	public List<OrganizationUnitSettings> getCompaniesByKeyValueFromMongo(String searchKey, int accountType, int status) {
+
+		List<Company> companyList = companyDao.searchCompaniesByNameAndKeyValue(searchKey, accountType, status);
 		Set<Long> companyIds = new HashSet<>();
 		for (Company company : companyList) {
 			companyIds.add(company.getCompanyId());
@@ -4193,19 +4200,91 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 		List<OrganizationUnitSettings> unitSettings = organizationUnitSettingsDao.getCompanyListByIds(companyIds);
 		return unitSettings;
 	}
-
+    
+    /**
+     * Method to get the company list by date range
+     */
+    @Override
     @Transactional
+    public List<Company> getCompaniesByDateRange(Date startDate, Date endDate) {
+    	Timestamp startTime = null;
+        Timestamp endTime = null;
+        if ( startDate != null )
+            startTime = new Timestamp( startDate.getTime() );
+        if ( endDate != null )
+            endTime = new Timestamp( endDate.getTime() );
+        
+        List<Company> companies = companyDao.getCompaniesByDateRange(startTime, endTime);
+        
+    	return companies;
+    }
+    
 	@Override
-	public List<OrganizationUnitSettings> getInactiveCompaniesByNameFromMongo(String searchKey) {
+	public XSSFWorkbook downloadCompanyReport(List<Company> companies, String fileName) {
+		XSSFWorkbook workbook = new XSSFWorkbook();
 
-		List<Company> companyList = companyDao.searchInactiveCompaniesByName(searchKey);
-		Set<Long> companyIds = new HashSet<>();
-		for (Company company : companyList) {
-			companyIds.add(company.getCompanyId());
+		// Create a blank sheet
+		XSSFSheet sheet = workbook.createSheet();
+		XSSFDataFormat df = workbook.createDataFormat();
+		CellStyle style = workbook.createCellStyle();
+		style.setDataFormat(df.getFormat("d-mm-yyyy"));
+		Integer counter = 1;
+		int max = 0;
+		int internalMax = 0;
+
+		// This data needs to be written (List<Object>)
+		Map<String, List<Object>> data = new TreeMap<>();
+		List<Object> companyDetailsToPopulate = new ArrayList<>();
+		for (Company company : companies) {
+			internalMax = 0;
+			companyDetailsToPopulate.add(company.getCompany());
+			if(company.getLicenseDetails() != null && !company.getLicenseDetails().isEmpty())
+				companyDetailsToPopulate.add(company.getLicenseDetails().get(0).getAccountsMaster().getAccountName());
+			else
+				companyDetailsToPopulate.add("");
+			companyDetailsToPopulate.add(company.getCreatedOn());
+			companyDetailsToPopulate.add(company.getDisplayBillingMode());
+			if(company.getLicenseDetails() != null && !company.getLicenseDetails().isEmpty())
+				companyDetailsToPopulate.add("Registered");
+			else
+				companyDetailsToPopulate.add("Not registered");
+			data.put((++counter).toString(), companyDetailsToPopulate);
+			companyDetailsToPopulate = new ArrayList<>();
+			if (internalMax > max)
+				max = internalMax;
 		}
-		LOG.debug("Method getCompaniesByNameFromMongo() called");
-		List<OrganizationUnitSettings> unitSettings = organizationUnitSettingsDao.getCompanyListByIds(companyIds);
-		return unitSettings;
+		
+		companyDetailsToPopulate.add("Company Name");
+		companyDetailsToPopulate.add("Account Type");
+		companyDetailsToPopulate.add("Created on");
+		companyDetailsToPopulate.add("Billing mode");
+		companyDetailsToPopulate.add("Status");
+
+		data.put("1", companyDetailsToPopulate);
+		
+		// Iterate over data and write to sheet
+		Set<String> keyset = data.keySet();
+		int rownum = 0;
+		for (String key : keyset) {
+			Row row = sheet.createRow(rownum++);
+			List<Object> objArr = data.get(key);
+
+			int cellnum = 0;
+			for (Object obj : objArr) {
+				Cell cell = row.createCell(cellnum++);
+				if (obj instanceof String)
+					cell.setCellValue((String) obj);
+				else if (obj instanceof Integer)
+					cell.setCellValue((Integer) obj);
+				else if (obj instanceof Date) {
+					cell.setCellStyle(style);
+					cell.setCellValue((Date) obj);
+				}
+			}
+		}
+
+		return workbook;
 	}
+    
 }
 // JIRA: SS-27: By RM05: EOC

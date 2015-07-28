@@ -106,12 +106,12 @@ public interface CommonConstants
     public static final double MAX_RATING_SCORE = 5;
     public static final String YES_STRING = "Y";
     public static final String NO_STRING = "N";
+    
     public static final int SURVEY_STATUS_PRE_INITIATED = 1;
+    public static final int STATUS_SURVEYPREINITIATION_PROCESSED = 1;
     public static final int SURVEY_STATUS_INITIATED = 2;
-    public static final int SURVEY_STATUS_EMAIL_SENT = 5;
-    public static final int STATUS_SURVEYPREINITIATION_NOT_PROCESSED = 2;
-    public static final int STATUS_SURVEYPREINITIATION_PROCESSED = 3;
-    public static final int STATUS_SURVEYPREINITIATION_OLD_RECORD = 4;
+    public static final int STATUS_SURVEYPREINITIATION_CORRUPT_RECORD = 3;
+    public static final int STATUS_SURVEYPREINITIATION_NOT_PROCESSED = 4;
 
     /**
      * Hibernate entities and column name constants
@@ -160,6 +160,7 @@ public interface CommonConstants
     public static final String AGENT_EMAIL_ID_COLUMN = "emailId";
     public static final String CUSTOMER_EMAIL_COLUMN = "customerEmail";
     public static final String CREATED_ON = "createdOn";
+    public static final String CREATED_BY = "createdBy";
     public static final String UPDATED_ON = "updatedOn";
     public static final String MODIFIED_ON_COLUMN = "modifiedOn";
     public static final String SCORE_COLUMN = "score";
@@ -627,4 +628,9 @@ public interface CommonConstants
     public static final String PATTERN_FIRST = "patternFirst";
 
     public static final String PATTERN_LAST = "patternLast";
+    
+    //Excel constants
+    public final String EXCEL_FORMAT = "application/vnd.ms-excel";
+    public final String CONTENT_DISPOSITION_HEADER = "Content-Disposition";
+    public final String EXCEL_FILE_EXTENSION = ".xlsx";
 }

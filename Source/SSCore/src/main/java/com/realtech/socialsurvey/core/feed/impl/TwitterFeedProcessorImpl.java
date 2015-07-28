@@ -6,6 +6,8 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import org.joda.time.DateTime;
+import org.joda.time.Days;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,8 +29,8 @@ import com.realtech.socialsurvey.core.commons.TwitterStatusTimeComparator;
 import com.realtech.socialsurvey.core.dao.GenericDao;
 import com.realtech.socialsurvey.core.dao.OrganizationUnitSettingsDao;
 import com.realtech.socialsurvey.core.dao.impl.MongoOrganizationUnitSettingDaoImpl;
+import com.realtech.socialsurvey.core.entities.ContactDetailsSettings;
 import com.realtech.socialsurvey.core.entities.FeedStatus;
-import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
 import com.realtech.socialsurvey.core.entities.TwitterSocialPost;
 import com.realtech.socialsurvey.core.entities.TwitterToken;
 import com.realtech.socialsurvey.core.exception.NonFatalException;
@@ -42,7 +44,7 @@ public class TwitterFeedProcessorImpl implements SocialNetworkDataProcessor<Stat
 	private static final Logger LOG = LoggerFactory.getLogger(TwitterFeedProcessorImpl.class);
 	private static final String FEED_SOURCE = "twitter";
 	private static final int PAGE_SIZE = 200;
-	private static final String twitterUriSplitStr="http";
+	private static final String twitterUriSplitStr = "http";
 	@Autowired
 	private GenericDao<FeedStatus, Long> feedStatusDao;
 
@@ -54,17 +56,19 @@ public class TwitterFeedProcessorImpl implements SocialNetworkDataProcessor<Stat
 
 	@Autowired
 	private EmailServices emailServices;
-	
+
 	@Value("${SOCIAL_CONNECT_REMINDER_THRESHOLD}")
 	private long socialConnectThreshold;
-	
+
+	@Value("${SOCIAL_CONNECT_REMINDER_INTERVAL_DAYS}")
+	private long socialConnectInterval;
+
 	@Value("${TWITTER_CONSUMER_KEY}")
 	private String twitterConsumerKey;
 
 	@Value("${TWITTER_CONSUMER_SECRET}")
 	private String twitterConsumerSecret;
 
-	
 	private FeedStatus status;
 	private long profileId;
 	private Timestamp lastFetchedTill;
@@ -184,19 +188,30 @@ public class TwitterFeedProcessorImpl implements SocialNetworkDataProcessor<Stat
 		catch (TwitterException e) {
 			LOG.error("Exception in Twitter feed extration. Reason: " + e.getMessage());
 
-			// setting no.of retries
-			status.setRetries(status.getRetries() + 1);
-			
-			// sending reminder mail and increasing counter
-			if (status.getRemindersSent() < socialConnectThreshold) {
-				OrganizationUnitSettings unitSettings = settingsDao.fetchOrganizationUnitSettingsById(iden, collection);
-				
-				String userEmail = unitSettings.getContact_details().getMail_ids().getWork();
-				emailServices.sendSocialConnectMail(userEmail, unitSettings.getContact_details().getName(), userEmail, FEED_SOURCE);
-				
-				status.setRemindersSent(status.getRemindersSent() + 1);
+			if (lastFetchedPostId == null || lastFetchedPostId.isEmpty()) {
+				lastFetchedPostId = "0";
 			}
 			
+			// setting no.of retries
+			status.setRetries(status.getRetries() + 1);
+			status.setLastFetchedPostId(lastFetchedPostId);
+
+			Timestamp timestamp = new Timestamp(System.currentTimeMillis());
+			DateTime currentTime = new DateTime(timestamp.getTime());
+		    DateTime sentTime = new DateTime(status.getReminderSentOn().getTime());
+		    Days days = Days.daysBetween(sentTime, currentTime);
+			
+			// sending reminder mail and increasing counter
+			if (status.getRemindersSent() < socialConnectThreshold && days.getDays() >= socialConnectInterval) {
+				ContactDetailsSettings contactDetailsSettings = settingsDao.fetchOrganizationUnitSettingsById(iden, collection).getContact_details();
+				String userEmail = contactDetailsSettings.getMail_ids().getWork();
+				
+				emailServices.sendSocialConnectMail(userEmail, contactDetailsSettings.getName(), userEmail, FEED_SOURCE);
+
+				status.setReminderSentOn(timestamp);
+				status.setRemindersSent(status.getRemindersSent() + 1);
+			}
+
 			feedStatusDao.saveOrUpdate(status);
 		}
 		return tweets;
@@ -209,6 +224,10 @@ public class TwitterFeedProcessorImpl implements SocialNetworkDataProcessor<Stat
 		Collections.sort(tweets, new TwitterStatusTimeComparator());
 		TwitterSocialPost post;
 		for (Status tweet : tweets) {
+			if (tweet.getText() == null || tweet.getText().isEmpty()) {
+				continue;
+			}
+
 			post = new TwitterSocialPost();
 			post.setTweet(tweet);
 			post.setPostText(tweet.getText());
@@ -216,9 +235,10 @@ public class TwitterFeedProcessorImpl implements SocialNetworkDataProcessor<Stat
 			post.setPostId(String.valueOf(tweet.getId()));
 			post.setPostedBy(tweet.getUser().getName());
 			post.setTimeInMillis(tweet.getCreatedAt().getTime());
-			String[] twitterHref=tweet.getText().split(twitterUriSplitStr);
-			if(twitterHref.length > 1){
-				String postUrl=twitterHref[1];
+			
+			String[] twitterHref = tweet.getText().split(twitterUriSplitStr);
+			if (twitterHref.length > 1) {
+				String postUrl = twitterHref[1];
 				post.setPostUrl(twitterUriSplitStr.concat(postUrl));
 			}
 			switch (collection) {
@@ -242,7 +262,7 @@ public class TwitterFeedProcessorImpl implements SocialNetworkDataProcessor<Stat
 			// updating last fetched details
 			lastFetchedTill = new Timestamp(tweet.getCreatedAt().getTime());
 			lastFetchedPostId = String.valueOf(tweet.getId());
-
+			
 			// pushing to mongo
 			mongoTemplate.insert(post, CommonConstants.SOCIAL_POST_COLLECTION);
 		}
@@ -251,6 +271,10 @@ public class TwitterFeedProcessorImpl implements SocialNetworkDataProcessor<Stat
 	@Override
 	@Transactional
 	public void postProcess(long iden, String collection) throws NonFatalException {
+		if (lastFetchedPostId == null || lastFetchedPostId.isEmpty()) {
+			lastFetchedPostId = "0";
+		}
+		
 		status.setLastFetchedTill(lastFetchedTill);
 		status.setLastFetchedPostId(lastFetchedPostId);
 

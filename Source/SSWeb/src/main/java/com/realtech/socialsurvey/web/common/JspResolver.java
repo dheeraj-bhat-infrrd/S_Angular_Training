@@ -17,6 +17,8 @@ public interface JspResolver {
 	public static final String USER_ID_ON_INVITE = "useridoninvite";
 	public static final String REGISTRATION_INVITE_SUCCESSFUL = "registration-invite-successful";
 	public static final String REGISTRATION_LINK_EXPIRED = "registration-link-expired";
+	public static final String NO_PROFILES_FOUND = "noprofilesfound";
+	public static final String NO_ACTIVE_PROFILES = "noactiveprofiles";
 
 	// Generic pages
 	public static final String INDEX = "index";
@@ -55,6 +57,7 @@ public interface JspResolver {
 	public static final String DASHBOARD_SEARCHRESULTS = "dashboard_searchresults";
 	public static final String DASHBOARD_INCOMPLETESURVEYS = "dashboard_incompletesurveys";
 	public static final String DASHBOARD_REVIEWS = "dashboard_reviews";
+	public static final String HEADER_DASHBOARD_INCOMPLETESURVEYS = "header_incompletesurvey";
 
 	// Hierarchy Management
 	public static final String BUILD_HIERARCHY = "build-hierarchy";

@@ -64,7 +64,7 @@
 					<spring:message code="label.joinus.key" />
 				</div>
 			</div>
-			<div id="header-user-info" class="header-user-info float-right clearfix">
+			<div id="header-user-info" class="header-user-info float-right clearfix sur-com-logo">
 				<c:if test="${companyLogo != null}">
 					<div class="float-left user-info-seperator"></div>
 					<div class="float-left user-info-logo" style="background: url(${companyLogo}) no-repeat center; background-size: 100% auto;"></div>

@@ -42,7 +42,7 @@
 	<div class="dash-container container">
 		<div id="prof-container" data-profile-master-id="${profileMasterId}"
 			data-column-name="${columnName}" data-account-type="${accounttype}"
-			data-column-value="${columnValue}" class="dash-top-info">
+			data-column-value="${columnValue}" class="dash-top-info dash-prof-wrapper">
 			<div id="dash-profile-detail-circles" class="row row-dash-top-adj">
 				<!-- Populated by dashboard_profiledetail.jsp -->
 			</div>
@@ -131,8 +131,11 @@
 		<div class="dash-panels-wrapper">
 			<div class="row">
 				<div id="dash-survey-incomplete" class="dash-panel-left col-lg-4 col-md-4 col-sm-4 col-xs-12">
-					<div class="dash-lp-header" id="incomplete-survey-header"><spring:message code="label.incompletesurveys.key" /></div>
-					<div id="dsh-inc-srvey" class="dash-lp-item-grp">
+					<div class="dash-lp-header clearfix" id="incomplete-survey-header">
+						<div class="float-left"><spring:message code="label.incompletesurveys.key" /></div>
+						<div class="float-right dash-sur-link" onclick="showIncompleteSurveyListPopup()">View All</div>
+					</div>
+					<div id="dsh-inc-srvey" class="dash-lp-item-grp clearfix">
 						<!-- Populated with dashboard_incompletesurveys.jsp -->
 					</div>
 					<div id="dsh-inc-dwnld" class="dash-btn-sur-data hide"><spring:message code="label.incompletesurveydata.key" /></div>
@@ -151,9 +154,9 @@
 									<option value=2 data-report="survey-results"><spring:message code="label.downloadsurveydata.two.key" /></option>
 									<option value=3 data-report="social-monitor"><spring:message code="label.downloadsurveydata.three.key" /></option>
 								</select>
-								<input id="dsh-start-date" class="dsh-date-picker" placeholder="<spring:message code="label.startdate.key" />">
+								<input id="indv-dsh-start-date" class="dsh-date-picker" placeholder="<spring:message code="label.startdate.key" />">
 								<span>-</span>
-								<input id="dsh-end-date" class="dsh-date-picker" placeholder="<spring:message code="label.enddate.key" />">
+								<input id="indv-dsh-end-date" class="dsh-date-picker" placeholder="<spring:message code="label.enddate.key" />">
 								<div id="dsh-dwnld-report-btn" class="dash-down-go-button float-right cursor-pointer">
 									<spring:message code="label.downloadsurveydata.key.click" />
 								</div>

@@ -1563,7 +1563,7 @@ public class EmailServicesImpl implements EmailServices
             throw new InvalidInputException( "displayName parameter is empty or null for sending survey completion mail " );
         }
 
-        LOG.info( "Sending account blocking email to : " + recipientMailId );
+        LOG.info( "Sending Social Connect email to : " + recipientMailId );
         EmailEntity emailEntity = prepareEmailEntityForSendingEmail( recipientMailId );
         String subjectFileName = EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER
             + EmailTemplateConstants.SOCIAL_CONNECT_MAIL_SUBJECT;

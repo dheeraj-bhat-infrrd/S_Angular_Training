@@ -83,6 +83,12 @@ public class LoginController {
 		return JspResolver.INDEX;
 	}
 
+	@RequestMapping(value = "/noactiveprofiles")
+	public String initNoProfilesFoundPage(HttpServletResponse response) {
+		LOG.info("Method initIndexPage() called from LoginController");
+		return JspResolver.NO_PROFILES_FOUND;
+	}
+	
 	@RequestMapping(value = "/login")
 	public String initLoginPage(Model model, @RequestParam(value = STATUS_PARAM, required = false) String status,
 			RedirectAttributes redirectAttributes) {
@@ -292,8 +298,7 @@ public class LoginController {
 				}
 				else {
 					LOG.info("No User profile present");
-					// TODO: add logic for what happens when no user profile
-					// present
+					return "redirect:/" + JspResolver.NO_ACTIVE_PROFILES + ".do";
 				}
 			}
 
