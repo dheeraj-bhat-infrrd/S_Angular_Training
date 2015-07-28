@@ -12,6 +12,18 @@
 <div class="dash-wrapper-main">
 	<div class="dash-container container">
 		<div class="dash-stats-wrapper bord-bot-dc clearfix">
+			<div class="dash-sub-head float-left">Company Report</div>
+			<div class="dwnl-bnt-col float-right">
+				<div id="dsh-ind-rep-bnt" class="float-right dash-btn-dl-sd">
+					<div class="dsh-dwnld-btn float-left cursor-pointer" onclick="downloadCompanyReport()">Download Report</div>
+					<input id="comp-start-date" data-date-type="startDate"
+						class="dsh-date-picker" placeholder="Start Date"> <span>-</span>
+					<input id="comp-end-date" data-date-type="endDate"
+						class="dsh-date-picker" placeholder="End Date">
+				</div>
+			</div>
+		</div>
+		<div class="dash-stats-wrapper bord-bot-dc clearfix">
 			<div class="float-left stats-left clearfix">
 				<div class="dash-sub-head"><spring:message code="label.surveystatus.key" /></div>
 				<div id="region-div" class="clearfix dash-sel-wrapper">
@@ -138,9 +150,9 @@
 									<option value=3 data-report="social-monitor"><spring:message
 											code="label.downloadsurveydata.three.key" /></option>
 								</select> 
-								<input id="dsh-start-date" class="dsh-date-picker"
+								<input id="dsh-start-date" data-date-type="startDate" class="dsh-date-picker"
 									placeholder="<spring:message code="label.startdate.key" />">
-								<span>-</span> <input id="dsh-end-date" class="dsh-date-picker"
+								<span>-</span> <input id="dsh-end-date" data-date-type="startDate" class="dsh-date-picker"
 									placeholder="<spring:message code="label.enddate.key" />">
 								<div id="dsh-admin-report-dwn-btn"
 									class="dash-down-go-button float-right cursor-pointer">
@@ -153,65 +165,27 @@
 									class="dsh-dwnld-btn float-left cursor-pointer">
 									<spring:message code="label.downloadsurveydata.key" />
 								</div>
-								<input id="dsh-start-date" class="dsh-date-picker"
+								<input id="indv-dsh-start-date" data-date-type="startDate" class="dsh-date-picker"
 									placeholder="<spring:message code="label.startdate.key" />">
-								<span>-</span> <input id="dsh-end-date" class="dsh-date-picker"
+								<span>-</span> <input id="indv-dsh-end-date" data-date-type="endDate" class="dsh-date-picker"
 									placeholder="<spring:message code="label.enddate.key" />">
 							</div>
 						</div>
 					</div>
 				</div>
 			</div>
-
-
-			<%-- <div class="dash-panel-right col-lg-8 col-md-8 col-sm-8 col-xs-12 resp-adj">
-				<div class="people-say-wrapper rt-content-main rt-content-main-adj">
-					<div class="main-con-header clearfix pad-bot-10-resp">
-						<div id="review-desc" class="float-left dash-ppl-say-lbl">
-							<spring:message code="label.peoplesayabout.key" />${profileName}
-						</div>
-
-						<div id="dsh-admin-cmp-dwnld"
-							class="float-right dash-btn-dl-sd-admin hide">
-							<select id="download-survey-reports"
-								class="float-left dash-download-sel-item">
-								<option value=1 data-report="loan-officer-ranking"><spring:message
-										code="label.downloadsurveydata.one.key" /></option>
-								<option value=2 data-report="customer-survey"><spring:message
-										code="label.downloadsurveydata.two.key" /></option>
-								<option value=3 data-report="social-monitor"><spring:message
-										code="label.downloadsurveydata.three.key" /></option>
-							</select> <input id="dsh-start-date" class="dsh-date-picker"
-								placeholder="<spring:message code="label.startdate.key" />">
-							<span>-</span> <input id="dsh-end-date" class="dsh-date-picker"
-								placeholder="<spring:message code="label.enddate.key" />">
-							<div id="dsh-dwnld-report-btn"
-								class="dash-down-go-button float-right cursor-pointer">
-								<spring:message code="label.downloadsurveydata.key.click" />
-							</div>
-						</div>
-
-						<div id="dsh-cmp-dwnld" class="float-right dash-btn-dl-sd hide">
-							<div id="dsh-dwnld-btn"
-								class="dsh-dwnld-btn float-left cursor-pointer">
-								<spring:message code="label.downloadsurveydata.key" />
-							</div>
-							<input id="dsh-start-date" class="dsh-date-picker"
-								placeholder="<spring:message code="label.startdate.key" />">
-							<span>-</span> <input id="dsh-end-date" class="dsh-date-picker"
-								placeholder="<spring:message code="label.enddate.key" />">
-						</div>
-					</div>
-
-				</div>
-			</div> --%>
 		</div>
-
+	</div>
+</div>
 <script>
 $(document).ready(function() {
 	colName = "superAdmin";
 	hideOverlay();
-	$(document).attr("title", "Dashboard");
+	$(document).attr("title", "Admin Dashboard");
 	bindSelectButtons();
+	// initializing datepickers
+	bindDatePickerForCompanyReport();
+	bindDatePickerforSurveyDownload();
+	bindDatePickerforIndividualSurveyDownload();
 });
 </script>

@@ -1,12 +1,21 @@
 package com.realtech.socialsurvey.web.controller;
 
+import java.io.File;
+import java.io.IOException;
+import java.io.OutputStream;
 import java.lang.reflect.Type;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Collection;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.noggit.JSONUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -140,28 +149,31 @@ public class AdminController {
 
 		String searchKey = request.getParameter("searchKey");
 		String filerValue = request.getParameter("comSelFilter");
+		String accountTypeStr = request.getParameter("accountType");
 		List<OrganizationUnitSettings> unitSettings = null;
-		if (searchKey == null) {
-			searchKey = "";
-		}
-		if(filerValue == null) {
-			unitSettings = organizationManagementService.getCompaniesByNameFromMongo(searchKey);
-		} else {
-			switch (filerValue) {
-				case "all":
-					unitSettings = organizationManagementService.getCompaniesByNameFromMongo(searchKey);
-					break;
-				case "active":
-					unitSettings = organizationManagementService.getActiveCompaniesByNameFromMongo(searchKey);
-					break;
-				case "inactive":
-					unitSettings = organizationManagementService.getInactiveCompaniesByNameFromMongo(searchKey);
-					break;
-				default:
-					unitSettings = organizationManagementService.getCompaniesByNameFromMongo(searchKey);
-					break;
+		int accountType = -1;
+		int status = -1;
+		// Check for company status filer
+		if (filerValue != null && filerValue != "all") {
+			if (filerValue.equals("active")) {
+				status = CommonConstants.STATUS_ACTIVE;
+			}
+			else if (filerValue.equals("inactive")) {
+				status = CommonConstants.STATUS_INACTIVE;
 			}
 		}
+
+		// Check for account type filter
+		if (accountTypeStr != null && accountTypeStr != "all") {
+			if (accountTypeStr.equals("individual")) {
+				accountType = CommonConstants.ACCOUNTS_MASTER_INDIVIDUAL;
+			}
+			else if (accountTypeStr.equals("enterprise")) {
+				accountType = CommonConstants.ACCOUNTS_MASTER_ENTERPRISE;
+			}
+		}
+
+		unitSettings = organizationManagementService.getCompaniesByKeyValueFromMongo(searchKey, accountType, status);
 
 		model.addAttribute("companyList", unitSettings);
 
@@ -380,5 +392,67 @@ public class AdminController {
 		LOG.info("Inside showSendInvition() method");
 		
 		return JspResolver.ADMIN_INVITE_VIEW;
+	}
+	
+	@RequestMapping(value = "/downloadcompanyregistrationreport")
+	public void downloadCompanyRegistrationReport(HttpServletRequest request, HttpServletResponse response) {
+
+		LOG.info("Method called to download the company registration report");
+		
+		try {
+			Date startDate = null;
+			String startDateStr = request.getParameter("startDate");
+			if (startDateStr != null && !startDateStr.isEmpty()) {
+				try {
+					startDate = new SimpleDateFormat(CommonConstants.DATE_FORMAT).parse(startDateStr);
+				}
+				catch (ParseException e) {
+					throw new InvalidInputException("ParseException caught in getCompleteSurveyFile() while parsing startDate. Nested exception is ",
+							e);
+				}
+			}
+
+			Date endDate = Calendar.getInstance().getTime();
+			String endDateStr = request.getParameter("endDate");
+			if (endDateStr != null && !endDateStr.isEmpty()) {
+				try {
+					endDate = new SimpleDateFormat(CommonConstants.DATE_FORMAT).parse(endDateStr);
+				}
+				catch (ParseException e) {
+					throw new InvalidInputException("ParseException caught in getCompleteSurveyFile() while parsing startDate. Nested exception is ",
+							e);
+				}
+			}
+
+			List<Company> companyList = organizationManagementService.getCompaniesByDateRange(startDate, endDate);
+			String fileName = "Company_Registation_Report" + CommonConstants.EXCEL_FILE_EXTENSION;
+
+			XSSFWorkbook workbook = organizationManagementService.downloadCompanyReport(companyList, fileName);
+			response.setContentType(CommonConstants.EXCEL_FORMAT);
+			String headerKey = CommonConstants.CONTENT_DISPOSITION_HEADER;
+			String headerValue = String.format("attachment; filename=\"%s\"", new File(fileName).getName());
+			response.setHeader(headerKey, headerValue);
+
+			// write into file
+			OutputStream responseStream = null;
+			try {
+				responseStream = response.getOutputStream();
+				workbook.write(responseStream);
+			}
+			catch (IOException e) {
+				throw new NonFatalException("IOException caught in getIncompleteSurveyFile(). Nested exception is ", e);
+			}
+			finally {
+				try {
+					responseStream.close();
+				}
+				catch (IOException e) {
+					throw new NonFatalException("IOException caught in getIncompleteSurveyFile(). Nested exception is ", e);
+				}
+			}
+		}
+		catch (NonFatalException e) {
+			LOG.error("Non fatal exception occured while downloading the company report , reason " + e.getMessage());
+		}
 	}
 }
