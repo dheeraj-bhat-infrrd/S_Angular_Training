@@ -43,6 +43,7 @@ public class FacebookFeedProcessorImpl implements SocialNetworkDataProcessor<Pos
 
 	private static final Logger LOG = LoggerFactory.getLogger(FacebookFeedProcessorImpl.class);
 	private static final String FEED_SOURCE = "facebook";
+	private static final int RETRIES_INITIAL = 0;
 	private static final int PAGE_SIZE = 200;
 
 	@Autowired
@@ -56,6 +57,9 @@ public class FacebookFeedProcessorImpl implements SocialNetworkDataProcessor<Pos
 
 	@Autowired
 	private EmailServices emailServices;
+
+	@Value("${SOCIAL_CONNECT_RETRY_THRESHOLD}")
+	private long socialConnectRetryThreshold;
 
 	@Value("${SOCIAL_CONNECT_REMINDER_THRESHOLD}")
 	private long socialConnectThreshold;
@@ -194,6 +198,8 @@ public class FacebookFeedProcessorImpl implements SocialNetworkDataProcessor<Pos
 				resultList = facebook.fetchNext(resultList.getPaging());
 				posts.addAll(resultList);
 			}
+
+			status.setRetries(RETRIES_INITIAL);
 		}
 		catch (FacebookException e) {
 			LOG.error("Exception in Facebook feed extration. Reason: " + e.getMessage());
@@ -201,21 +207,22 @@ public class FacebookFeedProcessorImpl implements SocialNetworkDataProcessor<Pos
 			if (lastFetchedPostId == null || lastFetchedPostId.isEmpty()) {
 				lastFetchedPostId = "0";
 			}
-			
+
 			// increasing no.of retries
 			status.setRetries(status.getRetries() + 1);
 			status.setLastFetchedPostId(lastFetchedPostId);
 
 			Timestamp timestamp = new Timestamp(System.currentTimeMillis());
 			DateTime currentTime = new DateTime(timestamp.getTime());
-		    DateTime sentTime = new DateTime(status.getReminderSentOn().getTime());
-		    Days days = Days.daysBetween(sentTime, currentTime);
-			
+			DateTime sentTime = new DateTime(status.getReminderSentOn().getTime());
+			Days days = Days.daysBetween(sentTime, currentTime);
+
 			// sending reminder mail and increasing counter
-			if (status.getRemindersSent() < socialConnectThreshold && days.getDays() >= socialConnectInterval) {
+			if (status.getRemindersSent() < socialConnectThreshold && days.getDays() >= socialConnectInterval
+					&& status.getRetries() >= socialConnectRetryThreshold) {
 				ContactDetailsSettings contactDetailsSettings = settingsDao.fetchOrganizationUnitSettingsById(iden, collection).getContact_details();
 				String userEmail = contactDetailsSettings.getMail_ids().getWork();
-				
+
 				emailServices.sendSocialConnectMail(userEmail, contactDetailsSettings.getName(), userEmail, FEED_SOURCE);
 
 				status.setReminderSentOn(timestamp);
@@ -234,7 +241,7 @@ public class FacebookFeedProcessorImpl implements SocialNetworkDataProcessor<Pos
 		if (posts == null || posts.isEmpty()) {
 			return;
 		}
-		
+
 		if (lastFetchedTill == null) {
 			lastFetchedTill = posts.get(0).getUpdatedTime();
 		}
@@ -303,7 +310,7 @@ public class FacebookFeedProcessorImpl implements SocialNetworkDataProcessor<Pos
 		if (lastFetchedTill != null) {
 			status.setLastFetchedTill(new Timestamp(lastFetchedTill.getTime()));
 		}
-		
+
 		status.setLastFetchedPostId(lastFetchedPostId);
 
 		feedStatusDao.saveOrUpdate(status);

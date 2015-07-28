@@ -54,6 +54,7 @@ public class GoogleFeedProcessorImpl implements SocialNetworkDataProcessor<Googl
 
 	private static final Logger LOG = LoggerFactory.getLogger(GoogleFeedProcessorImpl.class);
 	private static final String FEED_SOURCE = "google";
+	private static final int RETRIES_INITIAL = 0;
 	private static final int PAGE_SIZE = 100;
 
 	@Autowired
@@ -67,6 +68,9 @@ public class GoogleFeedProcessorImpl implements SocialNetworkDataProcessor<Googl
 
 	@Autowired
 	private EmailServices emailServices;
+
+	@Value("${SOCIAL_CONNECT_RETRY_THRESHOLD}")
+	private long socialConnectRetryThreshold;
 
 	@Value("${SOCIAL_CONNECT_REMINDER_THRESHOLD}")
 	private long socialConnectThreshold;
@@ -216,6 +220,7 @@ public class GoogleFeedProcessorImpl implements SocialNetworkDataProcessor<Googl
 				getRequest = new HttpGet(createGooglePlusFeedURL(accessToken));
 				response = httpClient.execute(getRequest);
 			}
+			status.setRetries(RETRIES_INITIAL);
 
 			InputStreamReader jsonReader = new InputStreamReader(response.getEntity().getContent());
 
@@ -284,18 +289,19 @@ public class GoogleFeedProcessorImpl implements SocialNetworkDataProcessor<Googl
 			if (lastFetchedPostId == null || lastFetchedPostId.isEmpty()) {
 				lastFetchedPostId = "0";
 			}
-			
+
 			// setting no.of retries
 			status.setRetries(status.getRetries() + 1);
 			status.setLastFetchedPostId(lastFetchedPostId);
 
 			Timestamp timestamp = new Timestamp(System.currentTimeMillis());
 			DateTime currentTime = new DateTime(timestamp.getTime());
-		    DateTime sentTime = new DateTime(status.getReminderSentOn().getTime());
-		    Days days = Days.daysBetween(sentTime, currentTime);
-			
+			DateTime sentTime = new DateTime(status.getReminderSentOn().getTime());
+			Days days = Days.daysBetween(sentTime, currentTime);
+
 			// sending reminder mail and increasing counter
-			if (status.getRemindersSent() < socialConnectThreshold && days.getDays() >= socialConnectInterval) {
+			if (status.getRemindersSent() < socialConnectThreshold && days.getDays() >= socialConnectInterval
+					&& status.getRetries() >= socialConnectRetryThreshold) {
 				ContactDetailsSettings contactDetailsSettings = settingsDao.fetchOrganizationUnitSettingsById(iden, collection).getContact_details();
 				String userEmail = contactDetailsSettings.getMail_ids().getWork();
 
@@ -399,7 +405,7 @@ public class GoogleFeedProcessorImpl implements SocialNetworkDataProcessor<Googl
 			// pushing to mongo
 			mongoTemplate.insert(socialPost, CommonConstants.SOCIAL_POST_COLLECTION);
 		}
-		
+
 		// updating last fetched details
 		if (lastFetchedOn != null) {
 			lastFetchedTill = new Timestamp(lastFetchedOn.getTime());
@@ -412,7 +418,7 @@ public class GoogleFeedProcessorImpl implements SocialNetworkDataProcessor<Googl
 		if (lastFetchedPostId == null || lastFetchedPostId.isEmpty()) {
 			lastFetchedPostId = "0";
 		}
-		
+
 		status.setLastFetchedTill(lastFetchedTill);
 		status.setLastFetchedPostId(lastFetchedPostId);
 
