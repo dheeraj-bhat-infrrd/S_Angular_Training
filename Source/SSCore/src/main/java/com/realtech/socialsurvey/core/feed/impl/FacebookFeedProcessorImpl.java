@@ -7,6 +7,8 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import org.joda.time.DateTime;
+import org.joda.time.Days;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,10 +22,10 @@ import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.dao.GenericDao;
 import com.realtech.socialsurvey.core.dao.OrganizationUnitSettingsDao;
 import com.realtech.socialsurvey.core.dao.impl.MongoOrganizationUnitSettingDaoImpl;
+import com.realtech.socialsurvey.core.entities.ContactDetailsSettings;
 import com.realtech.socialsurvey.core.entities.FacebookSocialPost;
 import com.realtech.socialsurvey.core.entities.FacebookToken;
 import com.realtech.socialsurvey.core.entities.FeedStatus;
-import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
 import com.realtech.socialsurvey.core.exception.NonFatalException;
 import com.realtech.socialsurvey.core.feed.SocialNetworkDataProcessor;
 import com.realtech.socialsurvey.core.services.mail.EmailServices;
@@ -54,19 +56,22 @@ public class FacebookFeedProcessorImpl implements SocialNetworkDataProcessor<Pos
 
 	@Autowired
 	private EmailServices emailServices;
-	
+
 	@Value("${SOCIAL_CONNECT_REMINDER_THRESHOLD}")
 	private long socialConnectThreshold;
-	
+
+	@Value("${SOCIAL_CONNECT_REMINDER_INTERVAL_DAYS}")
+	private long socialConnectInterval;
+
 	@Value("${FB_CLIENT_ID}")
 	private String facebookClientId;
 
 	@Value("${FB_CLIENT_SECRET}")
 	private String facebookClientSecret;
-	
+
 	@Value("${FB_URI}")
 	private String facebookUri;
-	
+
 	private FeedStatus status;
 	private long profileId;
 	private Date lastFetchedTill;
@@ -175,9 +180,9 @@ public class FacebookFeedProcessorImpl implements SocialNetworkDataProcessor<Pos
 			ResponseList<Post> resultList;
 			if (lastFetchedTill != null) {
 				Calendar calender = Calendar.getInstance();
-			    calender.setTimeInMillis(lastFetchedTill.getTime());
-			    calender.add(Calendar.SECOND, 1);
-			    Date lastFetchedTillWithoneSecChange=calender.getTime();
+				calender.setTimeInMillis(lastFetchedTill.getTime());
+				calender.add(Calendar.SECOND, 1);
+				Date lastFetchedTillWithoneSecChange = calender.getTime();
 				resultList = facebook.getStatuses(new Reading().limit(PAGE_SIZE).since(lastFetchedTillWithoneSecChange));
 			}
 			else {
@@ -193,19 +198,30 @@ public class FacebookFeedProcessorImpl implements SocialNetworkDataProcessor<Pos
 		catch (FacebookException e) {
 			LOG.error("Exception in Facebook feed extration. Reason: " + e.getMessage());
 
-			// increasing no.of retries
-			status.setRetries(status.getRetries() + 1);
-			
-			// sending reminder mail and increasing counter
-			if (status.getRemindersSent() < socialConnectThreshold) {
-				OrganizationUnitSettings unitSettings = settingsDao.fetchOrganizationUnitSettingsById(iden, collection);
-				
-				String userEmail = unitSettings.getContact_details().getMail_ids().getWork();
-				emailServices.sendSocialConnectMail(userEmail, unitSettings.getContact_details().getName(), userEmail, FEED_SOURCE);
-				
-				status.setRemindersSent(status.getRemindersSent() + 1);
+			if (lastFetchedPostId == null || lastFetchedPostId.isEmpty()) {
+				lastFetchedPostId = "0";
 			}
 			
+			// increasing no.of retries
+			status.setRetries(status.getRetries() + 1);
+			status.setLastFetchedPostId(lastFetchedPostId);
+
+			Timestamp timestamp = new Timestamp(System.currentTimeMillis());
+			DateTime currentTime = new DateTime(timestamp.getTime());
+		    DateTime sentTime = new DateTime(status.getReminderSentOn().getTime());
+		    Days days = Days.daysBetween(sentTime, currentTime);
+			
+			// sending reminder mail and increasing counter
+			if (status.getRemindersSent() < socialConnectThreshold && days.getDays() >= socialConnectInterval) {
+				ContactDetailsSettings contactDetailsSettings = settingsDao.fetchOrganizationUnitSettingsById(iden, collection).getContact_details();
+				String userEmail = contactDetailsSettings.getMail_ids().getWork();
+				
+				emailServices.sendSocialConnectMail(userEmail, contactDetailsSettings.getName(), userEmail, FEED_SOURCE);
+
+				status.setReminderSentOn(timestamp);
+				status.setRemindersSent(status.getRemindersSent() + 1);
+			}
+
 			feedStatusDao.saveOrUpdate(status);
 		}
 
@@ -215,6 +231,10 @@ public class FacebookFeedProcessorImpl implements SocialNetworkDataProcessor<Pos
 	@Override
 	public void processFeed(List<Post> posts, String collection) throws NonFatalException {
 		LOG.info("Process posts for organizationUnit " + collection);
+		if (posts == null || posts.isEmpty()) {
+			return;
+		}
+		
 		if (lastFetchedTill == null) {
 			lastFetchedTill = posts.get(0).getUpdatedTime();
 		}
@@ -225,7 +245,7 @@ public class FacebookFeedProcessorImpl implements SocialNetworkDataProcessor<Pos
 			if (post.getMessage() == null && post.getName() == null && post.getStory() == null) {
 				continue;
 			}
-			
+
 			if (lastFetchedTill.before(post.getUpdatedTime())) {
 				lastFetchedTill = post.getUpdatedTime();
 			}
@@ -242,13 +262,13 @@ public class FacebookFeedProcessorImpl implements SocialNetworkDataProcessor<Pos
 			else {
 				feed.setPostText(post.getStory());
 			}
-			
+
 			feed.setSource(FEED_SOURCE);
 			feed.setPostId(post.getId());
 			feed.setPostedBy(post.getFrom().getName());
 			feed.setTimeInMillis(post.getUpdatedTime().getTime());
 			feed.setPostUrl(facebookUri.concat(post.getId()));
-			
+
 			switch (collection) {
 				case MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION:
 					feed.setCompanyId(profileId);
@@ -268,7 +288,7 @@ public class FacebookFeedProcessorImpl implements SocialNetworkDataProcessor<Pos
 			}
 
 			lastFetchedPostId = post.getId();
-			
+
 			// pushing to mongo
 			mongoTemplate.insert(feed, CommonConstants.SOCIAL_POST_COLLECTION);
 		}
@@ -277,7 +297,13 @@ public class FacebookFeedProcessorImpl implements SocialNetworkDataProcessor<Pos
 	@Override
 	@Transactional
 	public void postProcess(long iden, String collection) throws NonFatalException {
-		status.setLastFetchedTill(new Timestamp(lastFetchedTill.getTime()));
+		if (lastFetchedPostId == null || lastFetchedPostId.isEmpty()) {
+			lastFetchedPostId = "0";
+		}
+		if (lastFetchedTill != null) {
+			status.setLastFetchedTill(new Timestamp(lastFetchedTill.getTime()));
+		}
+		
 		status.setLastFetchedPostId(lastFetchedPostId);
 
 		feedStatusDao.saveOrUpdate(status);
