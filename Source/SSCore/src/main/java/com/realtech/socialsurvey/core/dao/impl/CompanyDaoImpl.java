@@ -6,6 +6,7 @@ import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.criterion.MatchMode;
+import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Restrictions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -46,22 +47,30 @@ public class CompanyDaoImpl extends GenericDaoImpl<Company, Long> implements Com
 	
 	@SuppressWarnings("unchecked")
 	@Override
-	public List<Company> searchActiveCompaniesByName(String namePattern) {
-		Session session = sessionFactory.getCurrentSession();
-		Criteria criteria = session.createCriteria(Company.class);
-		criteria.add(Restrictions.eq(CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_ACTIVE));
-		criteria.add(Restrictions.like("company", namePattern, MatchMode.START));
+	public List<Company> searchCompaniesByNameAndKeyValue(String namePattern, int accountType, int status) {
+		Criteria criteria = getSession().createCriteria(Company.class);
+		criteria.add(Restrictions.ilike("company", namePattern, MatchMode.START));
+		if (status > -1) {
+			criteria.add(Restrictions.eq(CommonConstants.STATUS_COLUMN, status));
+		}
+		if (accountType > -1) {
+			criteria.add(Restrictions.sqlRestriction("COMPANY_ID in (select ld.COMPANY_ID from LICENSE_DETAILS ld where ACCOUNTS_MASTER_ID=" + accountType + ")"));
+		}
 		return criteria.list();
 	}
 	
 	@SuppressWarnings("unchecked")
 	@Override
-	public List<Company> searchInactiveCompaniesByName(String namePattern) {
-		Session session = sessionFactory.getCurrentSession();
-		Criteria criteria = session.createCriteria(Company.class);
-		criteria.add(Restrictions.eq(CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_INACTIVE));
-		criteria.add(Restrictions.like("company", namePattern, MatchMode.START));
+	public List<Company> getCompaniesByDateRange(Timestamp startTime, Timestamp endTime) {
+		Criteria criteria = getSession().createCriteria(Company.class);
+		criteria.add(Restrictions.ne(CommonConstants.CREATED_BY, "ADMIN"));
+		criteria.addOrder(Order.desc(CommonConstants.CREATED_ON));
+		if (startTime != null)
+			criteria.add(Restrictions.ge(CommonConstants.CREATED_ON, startTime));
+		if (endTime != null)
+			criteria.add(Restrictions.le(CommonConstants.CREATED_ON, endTime));
 		return criteria.list();
 	}
+	
 }
 // JIRA SS-42 By RM-05 EOC
