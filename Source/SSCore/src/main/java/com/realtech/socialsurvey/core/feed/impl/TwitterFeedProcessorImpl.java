@@ -43,8 +43,10 @@ public class TwitterFeedProcessorImpl implements SocialNetworkDataProcessor<Stat
 
 	private static final Logger LOG = LoggerFactory.getLogger(TwitterFeedProcessorImpl.class);
 	private static final String FEED_SOURCE = "twitter";
+	private static final int RETRIES_INITIAL = 0;
 	private static final int PAGE_SIZE = 200;
 	private static final String twitterUriSplitStr = "http";
+
 	@Autowired
 	private GenericDao<FeedStatus, Long> feedStatusDao;
 
@@ -56,6 +58,9 @@ public class TwitterFeedProcessorImpl implements SocialNetworkDataProcessor<Stat
 
 	@Autowired
 	private EmailServices emailServices;
+
+	@Value("${SOCIAL_CONNECT_RETRY_THRESHOLD}")
+	private long socialConnectRetryThreshold;
 
 	@Value("${SOCIAL_CONNECT_REMINDER_THRESHOLD}")
 	private long socialConnectThreshold;
@@ -184,6 +189,8 @@ public class TwitterFeedProcessorImpl implements SocialNetworkDataProcessor<Stat
 				pageNo++;
 			}
 			while (resultList.size() == PAGE_SIZE);
+
+			status.setRetries(RETRIES_INITIAL);
 		}
 		catch (TwitterException e) {
 			LOG.error("Exception in Twitter feed extration. Reason: " + e.getMessage());
@@ -191,21 +198,22 @@ public class TwitterFeedProcessorImpl implements SocialNetworkDataProcessor<Stat
 			if (lastFetchedPostId == null || lastFetchedPostId.isEmpty()) {
 				lastFetchedPostId = "0";
 			}
-			
+
 			// setting no.of retries
 			status.setRetries(status.getRetries() + 1);
 			status.setLastFetchedPostId(lastFetchedPostId);
 
 			Timestamp timestamp = new Timestamp(System.currentTimeMillis());
 			DateTime currentTime = new DateTime(timestamp.getTime());
-		    DateTime sentTime = new DateTime(status.getReminderSentOn().getTime());
-		    Days days = Days.daysBetween(sentTime, currentTime);
-			
+			DateTime sentTime = new DateTime(status.getReminderSentOn().getTime());
+			Days days = Days.daysBetween(sentTime, currentTime);
+
 			// sending reminder mail and increasing counter
-			if (status.getRemindersSent() < socialConnectThreshold && days.getDays() >= socialConnectInterval) {
+			if (status.getRemindersSent() < socialConnectThreshold && days.getDays() >= socialConnectInterval
+					&& status.getRetries() >= socialConnectRetryThreshold) {
 				ContactDetailsSettings contactDetailsSettings = settingsDao.fetchOrganizationUnitSettingsById(iden, collection).getContact_details();
 				String userEmail = contactDetailsSettings.getMail_ids().getWork();
-				
+
 				emailServices.sendSocialConnectMail(userEmail, contactDetailsSettings.getName(), userEmail, FEED_SOURCE);
 
 				status.setReminderSentOn(timestamp);
@@ -235,7 +243,7 @@ public class TwitterFeedProcessorImpl implements SocialNetworkDataProcessor<Stat
 			post.setPostId(String.valueOf(tweet.getId()));
 			post.setPostedBy(tweet.getUser().getName());
 			post.setTimeInMillis(tweet.getCreatedAt().getTime());
-			
+
 			String[] twitterHref = tweet.getText().split(twitterUriSplitStr);
 			if (twitterHref.length > 1) {
 				String postUrl = twitterHref[1];
@@ -262,7 +270,7 @@ public class TwitterFeedProcessorImpl implements SocialNetworkDataProcessor<Stat
 			// updating last fetched details
 			lastFetchedTill = new Timestamp(tweet.getCreatedAt().getTime());
 			lastFetchedPostId = String.valueOf(tweet.getId());
-			
+
 			// pushing to mongo
 			mongoTemplate.insert(post, CommonConstants.SOCIAL_POST_COLLECTION);
 		}
@@ -274,7 +282,7 @@ public class TwitterFeedProcessorImpl implements SocialNetworkDataProcessor<Stat
 		if (lastFetchedPostId == null || lastFetchedPostId.isEmpty()) {
 			lastFetchedPostId = "0";
 		}
-		
+
 		status.setLastFetchedTill(lastFetchedTill);
 		status.setLastFetchedPostId(lastFetchedPostId);
 
