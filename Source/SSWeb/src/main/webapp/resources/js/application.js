@@ -322,8 +322,8 @@ function paintDashboard(profileMasterId, newProfileName, newProfileValue, typeoO
 	});
 
 	$('#dsh-dwnld-btn').click(function() {
-		var startDate = $('#dsh-start-date').val();
-		var endDate = $("#dsh-end-date").val();
+		var startDate = $('#indv-dsh-start-date').val();
+		var endDate = $("#indv-dsh-end-date").val();
 		window.location.href = "/downloadcustomersurveyresults.do?columnName=" + colName + "&columnValue=" + colValue
 			+ "&startDate=" + startDate + "&endDate=" + endDate;
 	});
@@ -601,36 +601,8 @@ function getReviewsCountAndShowReviews(columnName, columnValue) {
 				}
 				
 				// initializing datepickers
-				var startDate;
-				var fromEndDate = new Date();
-				var toEndDate = new Date();
-				$("#dsh-start-date").datepicker({
-					orientation: "bottom auto",
-					format: 'mm/dd/yyyy',
-					endDate: fromEndDate,
-					todayHighlight: true,
-					clearBtn: true,
-					autoclose: true
-				})
-				.on('changeDate', function(selected){
-			        startDate = new Date(selected.date.valueOf());
-			        startDate.setDate(startDate.getDate(new Date(selected.date.valueOf())));
-			        $('#dsh-end-date').datepicker('setStartDate', startDate);
-			    });
-				
-				$("#dsh-end-date").datepicker({
-					orientation: "bottom auto",
-					format: 'mm/dd/yyyy',
-					endDate: toEndDate,
-					todayHighlight: true,
-					clearBtn: true,
-					autoclose: true
-				})
-				.on('changeDate', function(selected){
-			        fromEndDate = new Date(selected.date.valueOf());
-			        fromEndDate.setDate(fromEndDate.getDate(new Date(selected.date.valueOf())));
-			        $('#dsh-start-date').datepicker('setEndDate', fromEndDate);
-			    });
+				bindDatePickerforSurveyDownload();
+				bindDatePickerforIndividualSurveyDownload();
 			}
 		}, payload, false);
 		
@@ -4529,8 +4501,8 @@ $('#find-pro-form input').keypress(function(e) {
 $(window).scroll(function() {
 	var newIndex = startIndex + rowSize;
 	if ((window.innerHeight + window.pageYOffset) >= (document.body.offsetHeight) && newIndex < $('#srch-num').html()) {
-		fetchUsers(newIndex);
 		startIndex = newIndex;
+		fetchUsers(newIndex);
 	}
 });
 
@@ -4649,7 +4621,7 @@ function fetchUsersByProfileLevel(iden, profileLevel, startIndex) {
 		return;
 	}
 	var url = window.location.origin + "/rest/profile/individuals/" + iden
-			+ "?profileLevel=" + profileLevel + "&startIndex=" + startIndex;
+			+ "?profileLevel=" + profileLevel + "&start=" + startIndex;
 	callAjaxGET(url, fetchUsersByProfileLevelCallback, false);
 }
 
@@ -4657,8 +4629,8 @@ function fetchUsersByProfileLevelCallback(data) {
 	var response = $.parseJSON(data);
 	if (response != undefined) {
 		var usersList = $.parseJSON(response.entity);
-		if(usersList.length > 0)
-			$('#srch-num').html(usersList.userFound);
+		if(usersList.userFound > 0)
+			$('#srch-num').text(usersList.userFound);
 		paintProList(usersList.users);
 	}
 }
@@ -7388,15 +7360,12 @@ function paintDashboardButtons(data){
 			}
 		}
 	}
-	$('#dsh-btn1').click(function(){
-		var buttonId = 'dsh-btn1';
-		var task = $('#dsh-btn1').data('social');
-		if(columnName == 'agentId'){
+	$('#dsh-btn1').click(function() {
+		if (columnName == 'agentId') {
 			sendSurveyInvitation();
-		}else if(accountType="INDIVIDUAL"){
+		} else if (accountType == "INDIVIDUAL") {
 			sendSurveyInvitation();
-		}
-		else{
+		} else {
 			sendSurveyInvitationAdmin(columnName, columnValue);
 		}
 	});
@@ -7541,4 +7510,99 @@ function initializeVerticalAutcomplete() {
 		$(this).trigger('keydown');
 		$(this).autocomplete("search");	
 	});
+}
+
+function showIncompleteSurveyListPopup() {
+	var payload = {
+			"columnName" : colName,
+			"columnValue" : colValue
+		};
+		callAjaxGetWithPayloadData("./fetchincompletesurveypopup.do", function(data) {
+			$('body').addClass('body-no-scroll');
+			$("#overlay-incomplete-survey").html(data).show();
+		}, payload, false);
+}
+
+function hideIncompleteSurveyListPopup() {
+	$('body').removeClass('body-no-scroll');
+	$("#overlay-incomplete-survey").html('').hide();
+}
+
+
+function removeIncompleteSurveyRequest(incompleteSurveyId) {
+	callAjaxPOSTWithTextData("/delteincompletesurveyrequest.do?incompleteSurveyId="+incompleteSurveyId, function(data) {
+		if(data == "success") {
+			$('div[data-iden="sur-pre-'+incompleteSurveyId+'"]').remove();
+			$('#overlay-toast').html('Survey reminder request deleted successfully');
+			showToast();
+		}
+	}, true, {});
+}
+
+function bindDatePickerforSurveyDownload() {
+	// initializing datepickers
+	var startDate;
+	var fromEndDate = new Date();
+	var toEndDate = new Date();
+	$("#dsh-start-date").datepicker({
+		orientation: "auto",
+		format: 'mm/dd/yyyy',
+		endDate: fromEndDate,
+		todayHighlight: true,
+		clearBtn: true,
+		autoclose: true
+	})
+	.on('changeDate', function(selected){
+        startDate = new Date(selected.date.valueOf());
+        startDate.setDate(startDate.getDate(new Date(selected.date.valueOf())));
+        $('#dsh-end-date').datepicker('setStartDate', startDate);
+    });
+	
+	$("#dsh-end-date").datepicker({
+		orientation: "auto",
+		format: 'mm/dd/yyyy',
+		endDate: toEndDate,
+		todayHighlight: true,
+		clearBtn: true,
+		autoclose: true
+	})
+	.on('changeDate', function(selected){
+        fromEndDate = new Date(selected.date.valueOf());
+        fromEndDate.setDate(fromEndDate.getDate(new Date(selected.date.valueOf())));
+        $('#dsh-start-date').datepicker('setEndDate', fromEndDate);
+    });
+}
+
+function bindDatePickerforIndividualSurveyDownload() {
+	// initializing datepickers
+	var startDate;
+	var fromEndDate = new Date();
+	var toEndDate = new Date();
+	$("#indv-dsh-start-date").datepicker({
+		orientation: "auto",
+		format: 'mm/dd/yyyy',
+		endDate: fromEndDate,
+		todayHighlight: true,
+		clearBtn: true,
+		autoclose: true
+	})
+	.on('changeDate', function(selected){
+        startDate = new Date(selected.date.valueOf());
+        startDate.setDate(startDate.getDate(new Date(selected.date.valueOf())));
+        $('#indv-dsh-end-date').datepicker('setStartDate', startDate);
+    });
+	
+	$("#indv-dsh-end-date").datepicker({
+		orientation: "auto",
+		format: 'mm/dd/yyyy',
+		endDate: toEndDate,
+		todayHighlight: true,
+		clearBtn: true,
+		autoclose: true
+	})
+	.on('changeDate', function(selected){
+        fromEndDate = new Date(selected.date.valueOf());
+        fromEndDate.setDate(fromEndDate.getDate(new Date(selected.date.valueOf())));
+        $('#indv-dsh-start-date').datepicker('setEndDate', fromEndDate);
+    });
 }

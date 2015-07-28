@@ -6,7 +6,6 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
 import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
 import org.hibernate.criterion.Order;
@@ -15,7 +14,6 @@ import org.hibernate.criterion.Restrictions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
-
 import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.dao.SurveyPreInitiationDao;
 import com.realtech.socialsurvey.core.entities.AgentRankingReport;
@@ -158,7 +156,7 @@ public class SurveyPreInitiationDaoImpl extends GenericDaoImpl<SurveyPreInitiati
 		}
 		
 		for (SurveyPreInitiation survey : surveys) {
-			if (survey.getStatus() != CommonConstants.SURVEY_STATUS_EMAIL_SENT) {
+			if (survey.getStatus() != CommonConstants.SURVEY_STATUS_PRE_INITIATED) {
 				continue;
 			}
 			

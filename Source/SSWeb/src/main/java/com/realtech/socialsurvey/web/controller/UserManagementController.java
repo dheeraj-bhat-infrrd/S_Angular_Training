@@ -1069,7 +1069,8 @@ public class UserManagementController
 				userManagementService.updateUserCountModificationNotification(user.getCompany());
 			}
 			else {
-				// TODO: add logic for what happens when no user profile present
+				LOG.info("No User profile present");
+				return "redirect:/" + JspResolver.NO_ACTIVE_PROFILES + ".do";
 			}
 
 			// Setting session variable to show linkedin signup and sendsurvey popups only once
@@ -1521,6 +1522,7 @@ public class UserManagementController
             int status = Integer.parseInt( request.getParameter( "status" ) );
 
             userManagementService.updateUserProfile( user, profileId, status );
+            userManagementService.updateUserProfilesStatus( user, profileId );
 
             message = messageUtils.getDisplayMessage( DisplayMessageConstants.PROFILE_UPDATE_SUCCESSFUL,
                 DisplayMessageType.SUCCESS_MESSAGE ).getMessage();

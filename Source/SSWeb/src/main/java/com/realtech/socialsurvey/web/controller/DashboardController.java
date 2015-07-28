@@ -49,6 +49,7 @@ import com.realtech.socialsurvey.core.services.mail.EmailServices;
 import com.realtech.socialsurvey.core.services.organizationmanagement.DashboardService;
 import com.realtech.socialsurvey.core.services.organizationmanagement.OrganizationManagementService;
 import com.realtech.socialsurvey.core.services.organizationmanagement.ProfileManagementService;
+import com.realtech.socialsurvey.core.services.organizationmanagement.SurveyPreInitiationService;
 import com.realtech.socialsurvey.core.services.organizationmanagement.UserManagementService;
 import com.realtech.socialsurvey.core.services.search.SolrSearchService;
 import com.realtech.socialsurvey.core.services.search.exception.SolrException;
@@ -93,6 +94,9 @@ public class DashboardController
 
     @Autowired
     private URLGenerator urlGenerator;
+    
+    @Autowired
+    private SurveyPreInitiationService surveyPreInitiationService;
 
     @Value ( "${ENABLE_KAFKA}")
     private String enableKafka;
@@ -560,9 +564,7 @@ public class DashboardController
         LOG.info( "Method to get reviews of company, region, branch, agent getReviews() started." );
         List<SurveyPreInitiation> surveyDetails;
         User user = sessionHelper.getCurrentUser();
-        String realtechAdminStr = request.getParameter( "realtechAdmin" );
-        boolean realtechAdmin = false;
-        realtechAdmin = Boolean.parseBoolean( realtechAdminStr );
+        boolean realtechAdmin = user.isSuperAdmin();
 
         try {
             surveyDetails = fetchIncompleteSurveys( request, user, realtechAdmin );
@@ -578,7 +580,70 @@ public class DashboardController
         LOG.info( "Method to get reviews of company, region, branch, agent getReviews() finished." );
         return JspResolver.DASHBOARD_INCOMPLETESURVEYS;
     }
+    
+    /*
+     * Method to get the incomplete survey popup
+     */
+    @RequestMapping ( value = "/fetchincompletesurveypopup")
+    public String getIncompleteSurveyPopup( Model model, HttpServletRequest request )
+    {
+        LOG.info( "Method to get reviews of company, region, branch, agent getReviews() started." );
+        List<SurveyPreInitiation> surveyDetails;
+        User user = sessionHelper.getCurrentUser();
+        boolean realtechAdmin = user.isSuperAdmin();
 
+        try {
+            surveyDetails = fetchIncompleteSurveys( request, user, realtechAdmin );
+            for (SurveyPreInitiation surveyPreInitiation : surveyDetails) {
+				if (surveyPreInitiation.getAgentId() > 0) {
+					surveyPreInitiation.setAgentEmailId(surveyPreInitiation.getUser().getEmailId());
+					surveyPreInitiation
+							.setAgentName(surveyPreInitiation.getUser().getFirstName() + " " + surveyPreInitiation.getUser().getLastName());
+				}
+            }
+            
+            model.addAttribute( "incompleteSurveys", surveyDetails );
+            
+        } catch ( NonFatalException e ) {
+            LOG.error( "Non fatal exception caught in getReviews() while fetching reviews. Nested exception is ", e );
+            model.addAttribute( "message", e.getMessage() );
+        }
+
+        LOG.info( "Method to get reviews of company, region, branch, agent getReviews() finished." );
+        return JspResolver.HEADER_DASHBOARD_INCOMPLETESURVEYS;
+    }
+
+    /**
+     * Method to delete the survey reminder request
+     * 
+     * @param model
+     * @param request
+     * @return
+     */
+	@ResponseBody
+	@RequestMapping(value = "/delteincompletesurveyrequest")
+	public String cancelSurveyReminder(Model model, HttpServletRequest request) {
+
+		LOG.info("Method cancelSurveyReminder() called");
+
+		String incompleteSurveyIdStr = request.getParameter("incompleteSurveyId");
+		long incompleteSurveyId = 0;
+		try {
+			try {
+				incompleteSurveyId = Long.parseLong(incompleteSurveyIdStr);
+				surveyPreInitiationService.deleteSurveyReminder(incompleteSurveyId);
+			}
+			catch (NumberFormatException e) {
+				throw new NonFatalException("Number format exception occured while parsing incomplet survey id : " + incompleteSurveyIdStr, e);
+			}
+		}
+		catch (NonFatalException nonFatalException) {
+			LOG.error("Nonfatal exception occured in method cancelSurveyReminder, reason : " + nonFatalException.getMessage());
+			return CommonConstants.ERROR;
+		}
+		return CommonConstants.SUCCESS_ATTRIBUTE;
+	}
+    
 
     /*
      * Method to get count of all the incomplete surveys.
@@ -694,9 +759,27 @@ public class DashboardController
         List<SurveyPreInitiation> surveyDetails;
         String startIndexStr = request.getParameter( "startIndex" );
         String batchSizeStr = request.getParameter( "batchSize" );
-        int startIndex = Integer.parseInt( startIndexStr );
-        int batchSize = Integer.parseInt( batchSizeStr );
+        int startIndex = -1;
+        int batchSize = -1;
 
+        if(startIndexStr != null && !startIndexStr.isEmpty()) {
+        	try {
+    			startIndex = Integer.parseInt(startIndexStr);
+    		}
+    		catch (NumberFormatException e) {
+    			throw new InvalidInputException("Invalid start index passed");
+    		}
+        }
+
+        if(batchSizeStr != null && !batchSizeStr.isEmpty()){
+        	try {
+    			batchSize = Integer.parseInt(batchSizeStr);
+    		}
+    		catch (NumberFormatException e) {
+    			throw new InvalidInputException("Invalid batch size passed");
+    		}        	
+        }
+        
         String columnName = request.getParameter( "columnName" );
         if ( !realtechAdmin && ( columnName == null || columnName.isEmpty() ) ) {
             LOG.error( "Invalid value (null/empty) passed for profile level." );

@@ -1407,3 +1407,7 @@ span.footer-ul a {
 span.footer-ul a:hover {
     text-decoration:underline !important;
 }
+
+.icn-sur-popup-cont{
+	padding: 20px;
+}

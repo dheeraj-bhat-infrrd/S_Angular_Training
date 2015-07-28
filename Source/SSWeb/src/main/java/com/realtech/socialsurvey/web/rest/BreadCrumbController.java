@@ -14,7 +14,6 @@ import com.google.gson.Gson;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.entities.BreadCrumb;
 import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
-import com.realtech.socialsurvey.core.entities.UserProfile;
 import com.realtech.socialsurvey.core.exception.BaseRestException;
 import com.realtech.socialsurvey.core.exception.InputValidationException;
 import com.realtech.socialsurvey.core.exception.InternalServerException;
@@ -84,33 +83,18 @@ public class BreadCrumbController {
 	 * @throws NoRecordsFetchedException
 	 */
 	@ResponseBody
-	@RequestMapping(value = "/individual/{individualProfileName}")
-	public Response getIndividualBreadCrumb(@PathVariable String individualProfileName) throws ProfileNotFoundException, NoRecordsFetchedException {
-		LOG.info("Service to get breadcrumb of  individualProfileName : " + individualProfileName);
+	@RequestMapping(value = "/individual/{iden}")
+	public Response getIndividualBreadCrumb(@PathVariable Long iden) throws ProfileNotFoundException, NoRecordsFetchedException {
+		LOG.info("Service to get breadcrumb of  individualProfileName with id : " + iden);
 		Response response = null;
 		try {
-			if (individualProfileName == null || individualProfileName.isEmpty()) {
+			if (iden < 0) {
 				throw new InputValidationException(new ProfileServiceErrorCode(
 						CommonConstants.ERROR_CODE_INDIVIDUAL_PROFILE_SERVICE_PRECONDITION_FAILURE, CommonConstants.SERVICE_CODE_INDIVIDUAL_PROFILE,
 						"Profile name for individual is invalid"), "individual profile name is null or empty");
 			}
-			OrganizationUnitSettings individualProfile = null;
 			try {
-				individualProfile = profileManagementService.getIndividualByProfileName(individualProfileName);
-				List<UserProfile> userProfiles = userManagementService.getUserByUserId(individualProfile.getIden()).getUserProfiles();
-				UserProfile userProfile = null;
-				for (UserProfile element : userProfiles) {
-					if (element.getProfilesMaster().getProfileId() == CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID) {
-						userProfile = element;
-						break;
-					}
-				}
-
-				if (userProfile == null) {
-					throw new ProfileNotFoundException("No records found  ");
-				}
-
-				List<BreadCrumb> userBreadCrumb = profileManagementService.getIndividualsBreadCrumb(userProfile);
+				List<BreadCrumb> userBreadCrumb = profileManagementService.getIndividualsBreadCrumb(iden);
 				String json = new Gson().toJson(userBreadCrumb);
 				LOG.debug("individualProfile breadCrumb json : " + json);
 				response = Response.ok(json).build();

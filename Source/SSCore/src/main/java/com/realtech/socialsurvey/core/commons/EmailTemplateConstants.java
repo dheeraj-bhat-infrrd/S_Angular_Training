@@ -54,7 +54,6 @@ public final class EmailTemplateConstants {
 	public static final String RETRY_CHARGE_MAIL_BODY = "RetryChargeMailBody.html";
 	public static final String RETRY_CHARGE_MAIL_SUBJECT = "RetryChargeMailSubject.txt";
 
-	// TODO
 	public static final String SOCIALPOST_REMINDER_MAIL_BODY = "SocialPostReminderMailBody.html";
 	public static final String SOCIALPOST_REMINDER_MAIL_SUBJECT = "SocialPostReminderMailSubject.txt";
 

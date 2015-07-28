@@ -87,7 +87,7 @@ namespace EncompassSocialSurvey
                         try
                         {
                             // 1st Get loan VM
-                            var loansVM = _loanUtility.LopulateLoanList(EncompassGlobal.EncompassLoginSession.Loans.Folders[folderName], forCompCredential.CompanyId, fieldId);
+                            var loansVM = _loanUtility.LopulateLoanList(EncompassGlobal.EncompassLoginSession.Loans.Folders[folderName], forCompCredential.CompanyId, fieldId, emailDomain, emailPrefix);
 
                             // 2nd if no loansVM continue
                             if (null == loansVM) continue;
@@ -96,7 +96,7 @@ namespace EncompassSocialSurvey
                             // process for insert
 
                             LoanService loanSerivce = new LoanService();
-                            loanSerivce.InsertLoans(loansVM, emailDomain, emailPrefix);
+                            loanSerivce.InsertLoans(loansVM);
                         }
                         catch (System.Exception ex)
                         {

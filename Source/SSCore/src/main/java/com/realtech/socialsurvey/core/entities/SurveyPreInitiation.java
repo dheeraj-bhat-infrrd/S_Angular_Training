@@ -4,9 +4,12 @@ import java.io.Serializable;
 import java.sql.Timestamp;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.NamedQuery;
 import javax.persistence.Table;
 
@@ -72,7 +75,15 @@ public class SurveyPreInitiation implements Serializable {
 
 	@Column(name = "MODIFIED_ON")
 	private Timestamp modifiedOn;
-
+	
+	@ManyToOne(fetch=FetchType.LAZY)
+	@JoinColumn(name="AGENT_ID", referencedColumnName = "USER_ID", insertable=false, updatable=false)
+	private User user;
+	
+	public User getUser(){
+		return this.user;
+	}
+	
 	public long getSurveyPreIntitiationId() {
 		return surveyPreIntitiationId;
 	}

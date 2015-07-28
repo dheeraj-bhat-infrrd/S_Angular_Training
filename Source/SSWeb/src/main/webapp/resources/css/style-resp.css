@@ -1884,6 +1884,7 @@
     }
     .dash-main-left {
         margin-left: -45px;
+        padding-left: 45px;
     }
     .dsh-g-wrap-1{
         left: 50px;
@@ -2070,7 +2071,7 @@
         display: none;
     }
     .prof-contact-info,#contact-info{
-        display: none !important;
+        /* display: none !important; */
     }
     
     #recent-post-container,#reviews-container,

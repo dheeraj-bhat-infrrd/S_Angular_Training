@@ -174,7 +174,7 @@ namespace EncompassSocialSurvey
             return returnLoansViewModel;
         }
 
-        public List<LoanViewModel> LopulateLoanList(LoanFolder parentFolder, long runningCompanyId, string fieldid)
+        public List<LoanViewModel> LopulateLoanList(LoanFolder parentFolder, long runningCompanyId, string fieldid, string emailDomain, string emailPrefix)
         {
             Logger.Info("Entering the method LoanUtility.LopopulateLoanList(): FolderName: " + parentFolder.DisplayName);
 
@@ -260,14 +260,30 @@ namespace EncompassSocialSurvey
                     // TODO: not getting any field for agent id: keeping loan number as agent id
                     //forLoanVM_Borrower.AgentId = fieldValues[0];
                     //forLoanVM_Borrower.AgentName = fieldValues[1];
-
+                   
+                   
                     forLoanVM_Borrower.AgentId = (loanOfficer != null) ? loanOfficer.ID : "";
                     forLoanVM_Borrower.AgentName = (loanOfficer != null) ? loanOfficer.FullName : "";
                     forLoanVM_Borrower.AgentEmailId = (loanOfficer != null) ? loanOfficer.Email : "";
 
                     forLoanVM_Borrower.CustomerFirstName = fieldValues[2];
                     forLoanVM_Borrower.CustomerLastName = fieldValues[3];
-                    forLoanVM_Borrower.CustomerEmailId = fieldValues[4];
+
+
+                    string emailId = fieldValues[4];
+
+                    if (string.IsNullOrWhiteSpace(emailDomain))
+                    {
+
+                        forLoanVM_Borrower.CustomerEmailId = emailId;
+                    }
+                    else
+                    {
+                        forLoanVM_Borrower.CustomerEmailId = replaceEmailAddress(emailId, emailDomain, emailPrefix);
+                    }
+
+
+
 
                     // TODO: not getting any field for reminder count: by default set it by 0
                     forLoanVM_Borrower.ReminderCounts = reminderCount;
@@ -298,7 +314,20 @@ namespace EncompassSocialSurvey
 
                         forLoanVM_Co_Borrower.CustomerFirstName = fieldValues[5];
                         forLoanVM_Co_Borrower.CustomerLastName = fieldValues[6];
-                        forLoanVM_Co_Borrower.CustomerEmailId = fieldValues[7];
+
+                        string coborrowerEmailId = fieldValues[7];
+
+                        if (string.IsNullOrWhiteSpace(emailDomain))
+                        {
+
+                            forLoanVM_Co_Borrower.CustomerEmailId = coborrowerEmailId;
+                        }
+                        else
+                        {
+                            forLoanVM_Co_Borrower.CustomerEmailId = replaceEmailAddress(coborrowerEmailId, emailDomain, emailPrefix);
+                        }
+
+                        
 
                         forLoanVM_Co_Borrower.ReminderCounts = reminderCount;
 
@@ -327,6 +356,31 @@ namespace EncompassSocialSurvey
 
             Logger.Info("Exiting the method LoanUtility.LopopulateLoanList()");
             return returnLoansViewModel;
+        }
+
+
+        private string replaceEmailAddress(string email, string emailDomain, string emailPrefix)
+        {
+            if (string.IsNullOrWhiteSpace(email))
+            {
+                return "";
+            }
+            else
+            {
+                email = email.Replace("@", "+");
+                Logger.Debug("Transitional email address: " + email);
+                if (string.IsNullOrWhiteSpace(emailPrefix))
+                {
+                    email = email + "@" + emailDomain;
+                }
+                else
+                {
+                    email = emailPrefix + "+" + email + "@" + emailDomain;
+                }
+
+                Logger.Debug("Final replaced email address: " + email);
+                return email;
+            }
         }
 
 
