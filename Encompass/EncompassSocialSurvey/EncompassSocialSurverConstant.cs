@@ -10,7 +10,7 @@ namespace EncompassSocialSurvey
         // MM/dd/yyyy
         public const string LAST_REMINDER_TIME = "01/01/1970";
         public const int REMINDER_COUNT = 0;
-        public const int STATUS = 2;
+        public const int STATUS = 4;
 
         public const string COMPANY_CREDENTIALS_CRM_SOURCE = "encompass";
 
