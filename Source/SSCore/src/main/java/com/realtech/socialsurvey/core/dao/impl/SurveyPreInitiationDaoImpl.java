@@ -156,7 +156,7 @@ public class SurveyPreInitiationDaoImpl extends GenericDaoImpl<SurveyPreInitiati
 		}
 		
 		for (SurveyPreInitiation survey : surveys) {
-			if (survey.getStatus() != CommonConstants.SURVEY_STATUS_EMAIL_SENT) {
+			if (survey.getStatus() != CommonConstants.STATUS_SURVEYPREINITIATION_NOT_PROCESSED) {
 				continue;
 			}
 			
