@@ -186,6 +186,20 @@ public class Company implements Serializable {
 		this.billingMode = billingMode;
 	}
 
+	public String getDisplayBillingMode() {
+
+		String billingModeStr = "";
+
+		if (this.billingMode.equals("A")) {
+			billingModeStr = "Auto Dedit";
+		}
+		else if (this.billingMode.equals("I")) {
+			billingModeStr = "Invoice";
+		}
+
+		return billingModeStr;
+	}
+	
 	public List<Branch> getBranches() {
 		return this.branches;
 	}
