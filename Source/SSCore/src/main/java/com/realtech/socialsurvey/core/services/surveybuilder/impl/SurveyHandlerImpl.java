@@ -174,7 +174,8 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
         surveyDetails.setEditable( true );
         surveyDetails.setSource( source );
 
-        SurveyDetails survey = surveyDetailsDao.getSurveyByAgentIdAndCustomerEmail( agentId, customerEmail, firstName, lastName );
+        SurveyDetails survey = surveyDetailsDao
+            .getSurveyByAgentIdAndCustomerEmail( agentId, customerEmail, firstName, lastName );
         LOG.info( "Method to store initial details of survey, storeInitialSurveyAnswers() finished." );
 
         if ( survey == null ) {
@@ -261,37 +262,39 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
     }
 
 
-	/*
-	 * Method to increase reminder count by 1. This method is called every time a reminder mail is
-	 * sent to the customer.
-	 */
-	@Override
-	@Transactional
-	public void updateReminderCount(long surveyPreInitiationId) {
-		LOG.info("Method to increase reminder count by 1, updateReminderCount() started.");
+    /*
+     * Method to increase reminder count by 1. This method is called every time a reminder mail is
+     * sent to the customer.
+     */
+    @Override
+    @Transactional
+    public void updateReminderCount( long surveyPreInitiationId )
+    {
+        LOG.info( "Method to increase reminder count by 1, updateReminderCount() started." );
 
-		SurveyPreInitiation survey = surveyPreInitiationDao.findById(SurveyPreInitiation.class, surveyPreInitiationId);
-		if (survey != null) {
-			survey.setModifiedOn(new Timestamp(System.currentTimeMillis()));
-			survey.setLastReminderTime(new Timestamp(System.currentTimeMillis()));
-			survey.setReminderCounts(survey.getReminderCounts() + 1);
-			surveyPreInitiationDao.merge(survey);
-		}
-		LOG.info("Method to increase reminder count by 1, updateReminderCount() finished.");
-	}
+        SurveyPreInitiation survey = surveyPreInitiationDao.findById( SurveyPreInitiation.class, surveyPreInitiationId );
+        if ( survey != null ) {
+            survey.setModifiedOn( new Timestamp( System.currentTimeMillis() ) );
+            survey.setLastReminderTime( new Timestamp( System.currentTimeMillis() ) );
+            survey.setReminderCounts( survey.getReminderCounts() + 1 );
+            surveyPreInitiationDao.merge( survey );
+        }
+        LOG.info( "Method to increase reminder count by 1, updateReminderCount() finished." );
+    }
 
-	@Override
-	@Transactional
-	public void markSurveyAsSent(SurveyPreInitiation surveyPreInitiation) {
-		LOG.info("Method to increase reminder count by 1, updateReminderCount() started.");
-		if (surveyPreInitiation != null) {
-			surveyPreInitiation.setModifiedOn(new Timestamp(System.currentTimeMillis()));
-			surveyPreInitiation.setLastReminderTime(new Timestamp(System.currentTimeMillis()));
-			surveyPreInitiation.setStatus(CommonConstants.STATUS_SURVEYPREINITIATION_NOT_PROCESSED);
-			surveyPreInitiationDao.merge(surveyPreInitiation);
-		}
-		LOG.info("Method to increase reminder count by 1, updateReminderCount() finished.");
-	}
+
+    @Override
+    @Transactional
+    public void markSurveyAsSent( SurveyPreInitiation surveyPreInitiation )
+    {
+        LOG.info( "Method to increase reminder count by 1, updateReminderCount() started." );
+        if ( surveyPreInitiation != null ) {
+            surveyPreInitiation.setModifiedOn( new Timestamp( System.currentTimeMillis() ) );
+            surveyPreInitiation.setLastReminderTime( new Timestamp( System.currentTimeMillis() ) );
+            surveyPreInitiationDao.merge( surveyPreInitiation );
+        }
+        LOG.info( "Method to increase reminder count by 1, updateReminderCount() finished." );
+    }
 
 
     @Override
@@ -644,7 +647,8 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
     // Method to fetch initial survey details from MySQL based upn agent id and customer email.
     @Override
     @Transactional
-    public SurveyPreInitiation getPreInitiatedSurvey( long agentId, String customerEmail, String custFirstName, String custLastName ) throws NoRecordsFetchedException
+    public SurveyPreInitiation getPreInitiatedSurvey( long agentId, String customerEmail, String custFirstName,
+        String custLastName ) throws NoRecordsFetchedException
     {
         LOG.info( "Method getSurveyByAgentIdAndCutomerEmail() started. " );
         Map<String, Object> queries = new HashMap<>();
@@ -678,7 +682,8 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
      * Method to compose link for sending to a user to start survey started.
      */
     @Override
-    public String composeLink( long userId, String custEmail, String custFirstName, String custLastName ) throws InvalidInputException
+    public String composeLink( long userId, String custEmail, String custFirstName, String custLastName )
+        throws InvalidInputException
     {
         LOG.debug( "Method composeLink() started" );
         Map<String, String> urlParams = new HashMap<>();
@@ -718,7 +723,7 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
         List<SurveyPreInitiation> customersWithoutEmailId = new ArrayList<>();
         Set<Long> companies = new HashSet<>();
         for ( SurveyPreInitiation survey : surveys ) {
-            int status = CommonConstants.SURVEY_STATUS_PRE_INITIATED;
+            int status = CommonConstants.STATUS_SURVEYPREINITIATION_PROCESSED;
             User user = null;
             if ( survey.getAgentEmailId() != null ) {
                 List<User> userList = userDao.findByColumn( User.class, CommonConstants.AGENT_EMAIL_ID_COLUMN,
@@ -732,7 +737,7 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
                         if ( survey.getSurveySource().equalsIgnoreCase( CommonConstants.CRM_INFO_SOURCE_ENCOMPASS ) ) {
                             if ( user.getLoginPassword() != null ) {
                                 if ( user.getCreatedOn().after( survey.getEngagementClosedTime() ) ) {
-                                    status = CommonConstants.STATUS_SURVEYPREINITIATION_OLD_RECORD;
+                                    status = CommonConstants.STATUS_SURVEYPREINITIATION_CORRUPT_RECORD;
                                 }
                             } else {
                                 LOG.debug( "Only a user invite has been sent so far, hence can't mark it as an old record for user "
@@ -742,7 +747,7 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
                             long surveyClosedTime = survey.getEngagementClosedTime().getTime();
                             long currentTime = System.currentTimeMillis();
                             if ( checkIfRecordHasExpired( surveyClosedTime, currentTime, validSurveyInterval ) ) {
-                                status = CommonConstants.STATUS_SURVEYPREINITIATION_OLD_RECORD;
+                                status = CommonConstants.STATUS_SURVEYPREINITIATION_CORRUPT_RECORD;
                             }
                         }
                     }
@@ -750,12 +755,14 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
             }
             if ( survey.getAgentEmailId() == null || survey.getAgentEmailId().isEmpty() ) {
                 LOG.error( "Agent email not found , invalid survey " + survey.getSurveyPreIntitiationId() );
+                status = CommonConstants.STATUS_SURVEYPREINITIATION_CORRUPT_RECORD;
                 unavailableAgents.add( survey );
                 companies.add( survey.getCompanyId() );
             } else if ( survey.getCustomerFirstName() == null || survey.getCustomerFirstName().isEmpty() ) {
                 if ( survey.getCustomerLastName() == null || survey.getCustomerLastName().isEmpty() ) {
                     LOG.error( "No Name found for customer, hence this is an invalid survey "
                         + survey.getSurveyPreIntitiationId() );
+                    status = CommonConstants.STATUS_SURVEYPREINITIATION_CORRUPT_RECORD;
                     customersWithoutName.add( survey );
                 }
 
@@ -763,22 +770,27 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
                 if ( survey.getCustomerFirstName() == null || survey.getCustomerFirstName().isEmpty() ) {
                     LOG.error( "No Name found for customer, hence this is an invalid survey "
                         + survey.getSurveyPreIntitiationId() );
+                    status = CommonConstants.STATUS_SURVEYPREINITIATION_CORRUPT_RECORD;
                     customersWithoutName.add( survey );
                     companies.add( survey.getCompanyId() );
                 }
             } else if ( survey.getCustomerEmailId() == null || survey.getCustomerEmailId().isEmpty() ) {
                 LOG.error( "No customer email id found, invalid survey " + survey.getSurveyPreIntitiationId() );
+                status = CommonConstants.STATUS_SURVEYPREINITIATION_CORRUPT_RECORD;
                 customersWithoutEmailId.add( survey );
                 companies.add( survey.getCompanyId() );
             } else if ( user == null ) {
                 LOG.error( "no agent found with this email id" );
+                status = CommonConstants.STATUS_SURVEYPREINITIATION_CORRUPT_RECORD;
                 invalidAgents.add( survey );
                 companies.add( survey.getCompanyId() );
             } else if ( user.getCompany() == null ) {
                 LOG.error( "Agent doesnt have an company associated with it " );
+                status = CommonConstants.STATUS_SURVEYPREINITIATION_CORRUPT_RECORD;
                 invalidAgents.add( survey );
                 companies.add( survey.getCompanyId() );
             } else if ( user.getCompany().getCompanyId() != survey.getCompanyId() ) {
+                status = CommonConstants.STATUS_SURVEYPREINITIATION_CORRUPT_RECORD;
                 unavailableAgents.add( survey );
                 companies.add( survey.getCompanyId() );
             }
