@@ -33,7 +33,23 @@
 	<div id="srv-req-pop" class="survey-request-popup-container hide">
 		<div class="survey-request-popup"></div>
 	</div>
-	<div id="overlay-incomplete-survey" class="overlay-login overlay-main hide"></div>
+	<div id="overlay-incomplete-survey"
+		class="overlay-login overlay-main hide">
+		<div class="welcome-popup-wrapper">
+			<div class="welcome-popup-hdr-wrapper clearfix">
+				<div class="float-left wc-hdr-txt">
+					<spring:message code="label.header.incompletesurvey.key" />
+				</div>
+				<div class="float-right popup-close-icn" onclick="hideIncompleteSurveyListPopup();"></div>
+			</div>
+			<div id="icn-sur-popup-cont" data-start="0" data-total="0" data-batch="5" class="welcome-popup-body-wrapper clearfix icn-sur-popup-cont">
+			</div>
+			<div class="paginate-buttons-survey">
+				<div id="sur-previous" class="float-left">&lt; Prev</div>
+				<div id="sur-next" class="float-right">Next &gt;</div>
+			</div>
+		</div>
+	</div>
 	<div id="toast-container" class="toast-container">
 	   <span id="overlay-toast" class="overlay-toast"></span>
     </div>
