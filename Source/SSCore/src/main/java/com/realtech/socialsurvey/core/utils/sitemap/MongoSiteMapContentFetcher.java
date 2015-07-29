@@ -127,7 +127,7 @@ public class MongoSiteMapContentFetcher implements SitemapContentFecher, Initial
 			Timestamp modifiedOnTimestamp =  new Timestamp(profileUrl.getModifiedOn());
 			// change the modified time if the modified on is older than the configured value
 			if(minLastModifiedTimeInterval.after(modifiedOnTimestamp)){
-				entry.setLastModifiedDate(DATE_FORMAT.format(minLastModifiedTimeInterval));
+				entry.setLastModifiedDate(DATE_FORMAT.format(new Timestamp(System.currentTimeMillis())));
 			}else{
 				entry.setLastModifiedDate(DATE_FORMAT.format(modifiedOnTimestamp));
 			}
