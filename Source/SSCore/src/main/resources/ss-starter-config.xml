@@ -71,7 +71,6 @@
 				<entry key="emailServices" value-ref="emailServices" />
 				<entry key="userManagementService" value-ref="userManagementService" />
 				<entry key="organizationManagementService" value-ref="organizationManagementService" />
-				<entry key="solrSearchService" value-ref="solrSearchService" />
 				<entry key="emailFormatHelper" value-ref="emailFormatHelper" />
 				<entry key="applicationBaseUrl" value="${APPLICATION_BASE_URL}" />
 				<entry key="applicationLogoUrl" value="${APPLICATION_LOGO_URL}" />
@@ -218,7 +217,7 @@
 	<bean id="incompletesurveycron"
 		class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
 		<property name="jobDetail" ref="incompletesurveyjobdetail" />
-		<property name="cronExpression" value="0 38 * * * ?" />
+		<property name="cronExpression" value="0 06 * * * ?" />
 	</bean>
 
 	<!-- setting cron for update subscription price -->
@@ -263,7 +262,7 @@
 	<bean id="crmdataagentidmappercron"
 		class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
 		<property name="jobDetail" ref="crmdataagentidmapperjobdetail" />
-		<property name="cronExpression" value="0 37 * * * ?" />
+		<property name="cronExpression" value="0 05 * * * ?" />
 	</bean>
 
 	<!-- setting cron for loading image from linkedin to amazon server -->
