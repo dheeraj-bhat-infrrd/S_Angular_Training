@@ -7085,3 +7085,15 @@ label.fil-label {
 	line-height: 30px;
 	margin-bottom: 0;
 }
+
+.paginate-buttons-survey {
+	width: 100px;
+	margin: 0 auto;
+	padding: 20px 0;
+}
+
+.sur-icn-checkbox {
+	width: 20px;
+	height: 20px;
+	margin: 0 10px 0 -10px;
+}
