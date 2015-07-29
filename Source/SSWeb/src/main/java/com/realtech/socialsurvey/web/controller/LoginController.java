@@ -99,7 +99,7 @@ public class LoginController {
 			LOG.info("Existing Active Session detected");
 
 			redirectAttributes.addFlashAttribute(CommonConstants.ACTIVE_SESSIONS_FOUND, "true");
-			return "redirect:/" + JspResolver.LANDING + ".do";
+			return "redirect:/" + JspResolver.USER_LOGIN + ".do";
 		}
 
 		if (status != null) {
@@ -609,15 +609,6 @@ public class LoginController {
 		String redirectTo = null;
 		switch (profileCompletionStage) {
 			case CommonConstants.ADD_COMPANY_STAGE:
-				List<VerticalsMaster> verticalsMasters = null;
-				try {
-					verticalsMasters = organizationManagementService.getAllVerticalsMaster();
-				}
-				catch (InvalidInputException e) {
-					throw new InvalidInputException("Invalid Input exception occured in method getAllVerticalsMaster()",
-							DisplayMessageConstants.GENERAL_ERROR, e);
-				}
-				redirectAttributes.addFlashAttribute("verticals", verticalsMasters);
 				redirectTo = JspResolver.COMPANY_INFORMATION_PAGE;
 
 				break;

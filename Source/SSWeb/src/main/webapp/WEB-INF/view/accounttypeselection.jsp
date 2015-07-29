@@ -5,7 +5,7 @@
 <c:set var="user" value="${sessionScope.SPRING_SECURITY_CONTEXT.authentication.principal}" />
 <c:choose>
 	<c:when test="${upgrade == 1}"></c:when>
-	<c:when test="${ paidUpgrade == 1 }">
+	<c:when test="${paidUpgrade == 1}">
 		<body>
 			<div class="overlay-payment overlay-main hide">
 				<div id="payment-section" class="payment-section">
