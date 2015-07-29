@@ -42,7 +42,9 @@
 				</div>
 				<div class="float-right popup-close-icn" onclick="hideIncompleteSurveyListPopup();"></div>
 			</div>
-			<div id="icn-sur-popup-cont" data-start="0" data-total="0" data-batch="5" class="welcome-popup-body-wrapper clearfix icn-sur-popup-cont">
+			<div class="welcome-popup-body-wrapper clearfix icn-sur-popup-wrapper">
+				<div id="icn-sur-popup-cont" data-start="0" data-total="0" data-batch="5" class="icn-sur-popup-cont"></div>
+				<div id="del-mult-sur-icn" class="del-mult-sur-icn"></div>
 			</div>
 			<div class="paginate-buttons-survey">
 				<div id="sur-previous" class="float-left">&lt; Prev</div>
