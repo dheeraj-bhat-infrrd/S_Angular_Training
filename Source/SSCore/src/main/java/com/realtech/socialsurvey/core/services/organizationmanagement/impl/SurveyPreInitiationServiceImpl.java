@@ -103,10 +103,9 @@ public class SurveyPreInitiationServiceImpl implements SurveyPreInitiationServic
 	
 	@Transactional
 	@Override
-	public void deleteSurveyReminder(long incompleteSurveyId) {
+	public void deleteSurveyReminder(Set<Long> incompleteSurveyIds) {
 		LOG.debug("Method deleteSurveyReminder() called");
-		SurveyPreInitiation surveyPreInitiation = surveyPreInitiationDao.findById(SurveyPreInitiation.class, incompleteSurveyId);
-		surveyPreInitiationDao.delete(surveyPreInitiation);
+		surveyPreInitiationDao.deleteSurveysWithIds(incompleteSurveyIds);
 		LOG.debug("Method deleteSurveyReminder() finished");
 	}
 }

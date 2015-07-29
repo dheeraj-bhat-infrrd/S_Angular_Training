@@ -36,4 +36,6 @@ public interface SurveyPreInitiationDao extends GenericDao<SurveyPreInitiation, 
 	public List<SurveyPreInitiation> getIncompleteSurveyForReminder(long companyId, int surveyReminderInterval, int maxReminders);
 
 	public void getIncompleteSurveysCount(Date startDate, Date endDate, Map<Long, AgentRankingReport> agentReportData);
+
+	public void deleteSurveysWithIds(Set<Long> incompleteSurveyIds);
 }

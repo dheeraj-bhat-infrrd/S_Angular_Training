@@ -12,7 +12,6 @@
 			<div class="v-um-hdr-right float-right">
 				<label class="fil-label">Company Status : </label>
 				<select class="com-sel-filter" id="com-filter">
-					<option value="all">All</option>
 					<option value="active">Active</option>
 					<option value="inactive">Inactive</option>
 				</select>
