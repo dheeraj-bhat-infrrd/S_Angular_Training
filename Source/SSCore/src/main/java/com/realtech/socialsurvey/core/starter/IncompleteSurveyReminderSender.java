@@ -6,11 +6,13 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+
 import org.quartz.JobDataMap;
 import org.quartz.JobExecutionContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.quartz.QuartzJobBean;
+
 import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.entities.AgentSettings;
 import com.realtech.socialsurvey.core.entities.Company;
@@ -19,13 +21,10 @@ import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
 import com.realtech.socialsurvey.core.entities.SurveyPreInitiation;
 import com.realtech.socialsurvey.core.entities.User;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
-import com.realtech.socialsurvey.core.exception.NoRecordsFetchedException;
 import com.realtech.socialsurvey.core.services.mail.EmailServices;
 import com.realtech.socialsurvey.core.services.mail.UndeliveredEmailException;
 import com.realtech.socialsurvey.core.services.organizationmanagement.OrganizationManagementService;
 import com.realtech.socialsurvey.core.services.organizationmanagement.UserManagementService;
-import com.realtech.socialsurvey.core.services.search.SolrSearchService;
-import com.realtech.socialsurvey.core.services.search.exception.SolrException;
 import com.realtech.socialsurvey.core.services.surveybuilder.SurveyHandler;
 import com.realtech.socialsurvey.core.utils.EmailFormatHelper;
 
@@ -39,7 +38,6 @@ public class IncompleteSurveyReminderSender extends QuartzJobBean
     private EmailServices emailServices;
     private UserManagementService userManagementService;
     private OrganizationManagementService organizationManagementService;
-    private SolrSearchService solrSearchService;
     private EmailFormatHelper emailFormatHelper;
     private String applicationBaseUrl;
     private String applicationLogoUrl;
@@ -60,17 +58,22 @@ public class IncompleteSurveyReminderSender extends QuartzJobBean
 
             List<SurveyPreInitiation> incompleteSurveyCustomers = surveyHandler.getIncompleteSurveyCustomersEmail( company );
             for ( SurveyPreInitiation survey : incompleteSurveyCustomers ) {
-                if ( survey.getReminderCounts() < reminderCount ) {
+                if ( survey.getReminderCounts() <= reminderCount ) {
+                    boolean reminder = false;
+                    if ( survey.getReminderCounts() == 0 ) {
+                        reminder = false;
+                    } else {
+                        reminder = true;
+                    }
                     long surveyLastRemindedTime = survey.getLastReminderTime().getTime();
                     long currentTime = System.currentTimeMillis();
                     if ( surveyHandler.checkIfTimeIntervalHasExpired( surveyLastRemindedTime, currentTime, reminderInterval ) ) {
                         try {
-                            if ( survey.getSurveySource().equalsIgnoreCase( CommonConstants.CRM_SOURCE_ENCOMPASS ) ) {
+                          /*  if ( survey.getSurveySource().equalsIgnoreCase( CommonConstants.CRM_SOURCE_ENCOMPASS ) ) {
                                 sendMailToAgent( survey );
-                            }
+                            }*/
                             sendEmail( emailServices, organizationManagementService, userManagementService, survey,
-                                company.getCompanyId() );
-                            // Change status to Sent Mail
+                                company.getCompanyId(), reminder );
                             surveyHandler.markSurveyAsSent( survey );
                             surveyHandler.updateReminderCount( survey.getSurveyPreIntitiationId() );
                         } catch ( InvalidInputException e ) {
@@ -104,7 +107,6 @@ public class IncompleteSurveyReminderSender extends QuartzJobBean
         emailServices = (EmailServices) jobMap.get( "emailServices" );
         userManagementService = (UserManagementService) jobMap.get( "userManagementService" );
         organizationManagementService = (OrganizationManagementService) jobMap.get( "organizationManagementService" );
-        solrSearchService = (SolrSearchService) jobMap.get( "solrSearchService" );
         emailFormatHelper = (EmailFormatHelper) jobMap.get( "emailFormatHelper" );
         applicationBaseUrl = (String) jobMap.get( "applicationBaseUrl" );
         applicationLogoUrl = (String) jobMap.get( "applicationLogoUrl" );
@@ -112,7 +114,8 @@ public class IncompleteSurveyReminderSender extends QuartzJobBean
 
 
     private void sendEmail( EmailServices emailServices, OrganizationManagementService organizationManagementService,
-        UserManagementService userManagementService, SurveyPreInitiation survey, long companyId ) throws InvalidInputException
+        UserManagementService userManagementService, SurveyPreInitiation survey, long companyId, boolean reminderMail )
+        throws InvalidInputException
     {
         // Send email to complete survey to each customer.
         OrganizationUnitSettings companySettings = null;
@@ -154,7 +157,12 @@ public class IncompleteSurveyReminderSender extends QuartzJobBean
         // Null check
         if ( companySettings != null && companySettings.getMail_content() != null
             && companySettings.getMail_content().getTake_survey_reminder_mail() != null ) {
-            MailContent mailContent = companySettings.getMail_content().getTake_survey_reminder_mail();
+            MailContent mailContent = null;
+            if ( reminderMail ) {
+                mailContent = companySettings.getMail_content().getTake_survey_reminder_mail();
+            } else {
+                mailContent = companySettings.getMail_content().getTake_survey_mail();
+            }
             String mailBody = emailFormatHelper.replaceEmailBodyWithParams( mailContent.getMail_body(),
                 mailContent.getParam_order() );
             String agentSignature = emailFormatHelper.buildAgentSignature( agentPhone, agentTitle, companyName );
