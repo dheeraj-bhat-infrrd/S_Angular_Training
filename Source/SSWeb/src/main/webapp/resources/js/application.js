@@ -7512,29 +7512,105 @@ function initializeVerticalAutcomplete() {
 	});
 }
 
-function showIncompleteSurveyListPopup() {
+function getIncompleteSurveyCount(){
 	var payload = {
-			"columnName" : colName,
-			"columnValue" : colValue
-		};
-		callAjaxGetWithPayloadData("./fetchincompletesurveypopup.do", function(data) {
-			$('body').addClass('body-no-scroll');
-			$("#overlay-incomplete-survey").html(data).show();
-		}, payload, false);
+		"columnName" : colName,
+		"columnValue" : colValue
+	};
+	callAjaxGetWithPayloadData("./fetchdashboardincompletesurveycount.do", function(data) {
+		$('#icn-sur-popup-cont').attr("data-total", data);
+		var incompleteSurveystartIndex = $('#icn-sur-popup-cont').attr("data-start");
+		paintIncompleteSurveyListPopupResults(incompleteSurveystartIndex);
+	}, payload, true);
+}
+
+$(document).on('click', '#sur-next.paginate-button',function(){
+	var incompleteSurveyStartIndex = parseInt($('#icn-sur-popup-cont').attr("data-start"));
+	var incompleteSurveyBatchSize = parseInt($('#icn-sur-popup-cont').attr("data-batch"));
+	incompleteSurveyStartIndex = incompleteSurveyStartIndex + incompleteSurveyBatchSize;
+	$('#icn-sur-popup-cont').attr("data-start", incompleteSurveyStartIndex);
+	paintIncompleteSurveyListPopupResults(incompleteSurveyStartIndex);	
+});
+
+$(document).on('click', '#sur-previous.paginate-button',function(){
+	var incompleteSurveyStartIndex = parseInt($('#icn-sur-popup-cont').attr("data-start"));
+	var incompleteSurveyBatchSize = parseInt($('#icn-sur-popup-cont').attr("data-batch"));
+	if(incompleteSurveyStartIndex % incompleteSurveyBatchSize == 0) {
+		incompleteSurveyStartIndex = parseInt(incompleteSurveyStartIndex / incompleteSurveyBatchSize)  - 1;
+	} else {
+		incompleteSurveyStartIndex = parseInt(incompleteSurveyStartIndex / incompleteSurveyBatchSize);	
+	}
+	incompleteSurveyStartIndex = incompleteSurveyStartIndex * incompleteSurveyBatchSize ;
+	$('#icn-sur-popup-cont').attr("data-start", incompleteSurveyStartIndex);
+	paintIncompleteSurveyListPopupResults(incompleteSurveyStartIndex);
+});
+
+function showIncompleteSurveyListPopup() {
+	var startIndex = $('#icn-sur-popup-cont').attr("data-start");
+	if(parseInt(startIndex) == 0){
+		$("#overlay-incomplete-survey").show();
+		getIncompleteSurveyCount();			
+	}else {
+		paintIncompleteSurveyListPopupResults(startIndex);		
+	}
+}
+
+function paintIncompleteSurveyListPopupResults(incompleteSurveystartIndex){
+	var payload = {
+		"columnName" : colName,
+		"columnValue" : colValue,
+		"startIndex" : incompleteSurveystartIndex,
+		"batchSize" : $('#icn-sur-popup-cont').attr("data-batch")
+	};
+	callAjaxGetWithPayloadData("./fetchincompletesurveypopup.do", function(data) {
+		$('body').addClass('body-no-scroll');
+		$('#icn-sur-popup-cont').html(data);
+		if(parseInt(incompleteSurveystartIndex) > 0 ) {
+			$('#sur-previous').addClass('paginate-button');
+		} else {
+			$('#sur-previous').removeClass('paginate-button');
+		}
+		incompleteSurveystartIndex = parseInt(incompleteSurveystartIndex) + parseInt($('#icn-sur-popup-cont').children('.dash-lp-item').size());
+		var totalSurveysCount = parseInt($('#icn-sur-popup-cont').attr("data-total"));
+		if(incompleteSurveystartIndex < totalSurveysCount ) {
+			$('#sur-next').addClass('paginate-button');
+		} else {
+			$('#sur-next').removeClass('paginate-button');
+		}
+	}, payload, false);
 }
 
 function hideIncompleteSurveyListPopup() {
 	$('body').removeClass('body-no-scroll');
-	$("#overlay-incomplete-survey").html('').hide();
+	$("#overlay-incomplete-survey").hide();
+	$('#icn-sur-popup-cont').html('');
+	$('#icn-sur-popup-cont').attr("data-start", 0);
+	$('#icn-sur-popup-cont').data('selected-survey-to-delete', new Array());
 }
 
+$(document).on('click','#del-mult-sur-icn.del-mult-sur-icn-active',function(){
+	var selectSurveyToDelete = $('#icn-sur-popup-cont').data('selected-survey-to-delete');
+	removeMultipleIncompleteSurveyRequest(selectSurveyToDelete);
+});
 
 function removeIncompleteSurveyRequest(incompleteSurveyId) {
-	callAjaxPOSTWithTextData("/delteincompletesurveyrequest.do?incompleteSurveyId="+incompleteSurveyId, function(data) {
+	var surveyToDelete = [];
+	surveyToDelete.push(incompleteSurveyId);
+	removeMultipleIncompleteSurveyRequest(surveyToDelete);
+}
+
+function removeMultipleIncompleteSurveyRequest(incompleteSurveyIds) {
+	callAjaxPOSTWithTextData("/deletemultipleincompletesurveyrequest.do?surveySetToDelete="+incompleteSurveyIds, function(data) {
 		if(data == "success") {
-			$('div[data-iden="sur-pre-'+incompleteSurveyId+'"]').remove();
+			var totalIncSurveys = $('#icn-sur-popup-cont').attr('data-total');
+			totalIncSurveys = totalIncSurveys - incompleteSurveyIds.length;
+			$('#icn-sur-popup-cont').attr('data-total', totalIncSurveys);
+			for(var i=0; i < incompleteSurveyIds.length; i++){
+				$('div[data-iden="sur-pre-'+incompleteSurveyIds[i]+'"]').remove();
+			}
 			$('#overlay-toast').html('Survey reminder request deleted successfully');
 			showToast();
+			$('#del-mult-sur-icn').removeClass('del-mult-sur-icn-active');
 		}
 	}, true, {});
 }

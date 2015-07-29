@@ -152,15 +152,10 @@ public class AdminController {
 		String accountTypeStr = request.getParameter("accountType");
 		List<OrganizationUnitSettings> unitSettings = null;
 		int accountType = -1;
-		int status = -1;
+		int status = CommonConstants.STATUS_ACTIVE;;
 		// Check for company status filer
-		if (filerValue != null && filerValue != "all") {
-			if (filerValue.equals("active")) {
-				status = CommonConstants.STATUS_ACTIVE;
-			}
-			else if (filerValue.equals("inactive")) {
-				status = CommonConstants.STATUS_INACTIVE;
-			}
+		if (filerValue != null && filerValue.equals("inactive")) {
+			status = CommonConstants.STATUS_INACTIVE;
 		}
 
 		// Check for account type filter
