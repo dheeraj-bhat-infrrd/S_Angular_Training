@@ -218,7 +218,7 @@
 	<bean id="incompletesurveycron"
 		class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
 		<property name="jobDetail" ref="incompletesurveyjobdetail" />
-		<property name="cronExpression" value="0 38 * * * ?" />
+		<property name="cronExpression" value="0 06 * * * ?" />
 	</bean>
 
 	<!-- setting cron for update subscription price -->
@@ -263,7 +263,7 @@
 	<bean id="crmdataagentidmappercron"
 		class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
 		<property name="jobDetail" ref="crmdataagentidmapperjobdetail" />
-		<property name="cronExpression" value="0 37 * * * ?" />
+		<property name="cronExpression" value="0 05 * * * ?" />
 	</bean>
 
 	<!-- setting cron for loading image from linkedin to amazon server -->
