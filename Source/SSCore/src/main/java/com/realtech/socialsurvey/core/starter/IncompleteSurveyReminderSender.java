@@ -25,7 +25,6 @@ import com.realtech.socialsurvey.core.services.mail.EmailServices;
 import com.realtech.socialsurvey.core.services.mail.UndeliveredEmailException;
 import com.realtech.socialsurvey.core.services.organizationmanagement.OrganizationManagementService;
 import com.realtech.socialsurvey.core.services.organizationmanagement.UserManagementService;
-import com.realtech.socialsurvey.core.services.search.SolrSearchService;
 import com.realtech.socialsurvey.core.services.surveybuilder.SurveyHandler;
 import com.realtech.socialsurvey.core.utils.EmailFormatHelper;
 
@@ -39,7 +38,6 @@ public class IncompleteSurveyReminderSender extends QuartzJobBean
     private EmailServices emailServices;
     private UserManagementService userManagementService;
     private OrganizationManagementService organizationManagementService;
-    private SolrSearchService solrSearchService;
     private EmailFormatHelper emailFormatHelper;
     private String applicationBaseUrl;
     private String applicationLogoUrl;
@@ -109,7 +107,6 @@ public class IncompleteSurveyReminderSender extends QuartzJobBean
         emailServices = (EmailServices) jobMap.get( "emailServices" );
         userManagementService = (UserManagementService) jobMap.get( "userManagementService" );
         organizationManagementService = (OrganizationManagementService) jobMap.get( "organizationManagementService" );
-        solrSearchService = (SolrSearchService) jobMap.get( "solrSearchService" );
         emailFormatHelper = (EmailFormatHelper) jobMap.get( "emailFormatHelper" );
         applicationBaseUrl = (String) jobMap.get( "applicationBaseUrl" );
         applicationLogoUrl = (String) jobMap.get( "applicationLogoUrl" );
