@@ -7525,16 +7525,24 @@ function getIncompleteSurveyCount(){
 }
 
 $(document).on('click', '#sur-next.paginate-button',function(){
-	var incompleteSurveyStartIndex = $('#icn-sur-popup-cont').attr("data-start");
+	var incompleteSurveyStartIndex = parseInt($('#icn-sur-popup-cont').attr("data-start"));
+	var incompleteSurveyBatchSize = parseInt($('#icn-sur-popup-cont').attr("data-batch"));
+	incompleteSurveyStartIndex = incompleteSurveyStartIndex + incompleteSurveyBatchSize;
+	$('#icn-sur-popup-cont').attr("data-start", incompleteSurveyStartIndex);
 	paintIncompleteSurveyListPopupResults(incompleteSurveyStartIndex);	
 });
 
 $(document).on('click', '#sur-previous.paginate-button',function(){
-	var incompleteSurveyStartIndex = $('#icn-sur-popup-cont').attr("data-start");
-	var incompleteSurveyBatchSize = $('#icn-sur-popup-cont').attr("data-batch");
-	incompleteSurveyStartIndex = (parseInt(incompleteSurveyStartIndex) - parseInt(incompleteSurveyBatchSize))
-			/ parseInt(incompleteSurveyBatchSize);
-	paintIncompleteSurveyListPopupResults(parseInt(incompleteSurveyStartIndex));	
+	var incompleteSurveyStartIndex = parseInt($('#icn-sur-popup-cont').attr("data-start"));
+	var incompleteSurveyBatchSize = parseInt($('#icn-sur-popup-cont').attr("data-batch"));
+	if(incompleteSurveyStartIndex % incompleteSurveyBatchSize == 0) {
+		incompleteSurveyStartIndex = parseInt(incompleteSurveyStartIndex / incompleteSurveyBatchSize)  - 1;
+	} else {
+		incompleteSurveyStartIndex = parseInt(incompleteSurveyStartIndex / incompleteSurveyBatchSize);	
+	}
+	incompleteSurveyStartIndex = incompleteSurveyStartIndex * incompleteSurveyBatchSize ;
+	$('#icn-sur-popup-cont').attr("data-start", incompleteSurveyStartIndex);
+	paintIncompleteSurveyListPopupResults(incompleteSurveyStartIndex);
 });
 
 function showIncompleteSurveyListPopup() {
@@ -7557,7 +7565,7 @@ function paintIncompleteSurveyListPopupResults(incompleteSurveystartIndex){
 	callAjaxGetWithPayloadData("./fetchincompletesurveypopup.do", function(data) {
 		$('body').addClass('body-no-scroll');
 		$('#icn-sur-popup-cont').html(data);
-		if(incompleteSurveystartIndex > 0 ) {
+		if(parseInt(incompleteSurveystartIndex) > 0 ) {
 			$('#sur-previous').addClass('paginate-button');
 		} else {
 			$('#sur-previous').removeClass('paginate-button');
@@ -7569,7 +7577,6 @@ function paintIncompleteSurveyListPopupResults(incompleteSurveystartIndex){
 		} else {
 			$('#sur-next').removeClass('paginate-button');
 		}
-		$('#icn-sur-popup-cont').attr("data-start", incompleteSurveystartIndex);
 	}, payload, false);
 }
 
@@ -7578,15 +7585,32 @@ function hideIncompleteSurveyListPopup() {
 	$("#overlay-incomplete-survey").hide();
 	$('#icn-sur-popup-cont').html('');
 	$('#icn-sur-popup-cont').attr("data-start", 0);
+	$('#icn-sur-popup-cont').data('selected-survey-to-delete', new Array());
 }
 
+$(document).on('click','#del-mult-sur-icn.del-mult-sur-icn-active',function(){
+	var selectSurveyToDelete = $('#icn-sur-popup-cont').data('selected-survey-to-delete');
+	removeMultipleIncompleteSurveyRequest(selectSurveyToDelete);
+});
 
 function removeIncompleteSurveyRequest(incompleteSurveyId) {
-	callAjaxPOSTWithTextData("/delteincompletesurveyrequest.do?incompleteSurveyId="+incompleteSurveyId, function(data) {
+	var surveyToDelete = [];
+	surveyToDelete.push(incompleteSurveyId);
+	removeMultipleIncompleteSurveyRequest(surveyToDelete);
+}
+
+function removeMultipleIncompleteSurveyRequest(incompleteSurveyIds) {
+	callAjaxPOSTWithTextData("/deletemultipleincompletesurveyrequest.do?surveySetToDelete="+incompleteSurveyIds, function(data) {
 		if(data == "success") {
-			$('div[data-iden="sur-pre-'+incompleteSurveyId+'"]').remove();
+			var totalIncSurveys = $('#icn-sur-popup-cont').attr('data-total');
+			totalIncSurveys = totalIncSurveys - incompleteSurveyIds.length;
+			$('#icn-sur-popup-cont').attr('data-total', totalIncSurveys);
+			for(var i=0; i < incompleteSurveyIds.length; i++){
+				$('div[data-iden="sur-pre-'+incompleteSurveyIds[i]+'"]').remove();
+			}
 			$('#overlay-toast').html('Survey reminder request deleted successfully');
 			showToast();
+			$('#del-mult-sur-icn').removeClass('del-mult-sur-icn-active');
 		}
 	}, true, {});
 }

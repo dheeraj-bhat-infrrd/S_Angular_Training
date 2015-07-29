@@ -17,9 +17,9 @@
 							value="${survey.modifiedOn}" />">
 				</div>
 			</div>
-			<div class="float-right dash-icn-close cursor-pointer"
+			<%-- <div class="float-right dash-icn-close cursor-pointer"
 				title="Cancel Survey Reminder"
-				onclick="removeIncompleteSurveyRequest(${survey.surveyPreIntitiationId })"></div>
+				onclick="removeIncompleteSurveyRequest(${survey.surveyPreIntitiationId })"></div> --%>
 			<div
 				data-custname="${survey.customerFirstName} ${survey.customerLastName}"
 				data-agentid="${survey.agentId}"
@@ -36,6 +36,43 @@
 			var dateSplit = $(this).attr('data-modifiedon').split('-');
 			var date = convertTimeStampToLocalTimeStamp(new Date(dateSplit[0],dateSplit[1] - 1, dateSplit[2], dateSplit[3], dateSplit[4], dateSplit[5]));
 			$(this).html(date);
+		});
+		$('.sur-icn-checkbox').each(function(index, currentElement) {
+			var selectSurveyToDelete = $('#icn-sur-popup-cont').data('selected-survey-to-delete');
+			if(selectSurveyToDelete == undefined) {
+				return;
+			} else {
+				var surveyId = $(this).closest('.dash-lp-item').attr('data-sur-iden');
+				var index = selectSurveyToDelete.indexOf(surveyId);
+				if(index > -1) {
+					$(this).addClass('sb-q-chk-yes').removeClass('sb-q-chk-no');
+				}
+			}
+		});
+		$('.sur-icn-checkbox').on('click',function(e){
+			var selectSurveyToDelete = $('#icn-sur-popup-cont').data('selected-survey-to-delete');
+			if(selectSurveyToDelete == undefined) {
+				selectSurveyToDelete = new Array();
+			}
+			var surveyId = $(this).closest('.dash-lp-item').attr('data-sur-iden');
+			var index = selectSurveyToDelete.indexOf(surveyId);
+			if($(this).hasClass('sb-q-chk-no')){
+				$(this).addClass('sb-q-chk-yes').removeClass('sb-q-chk-no');
+				if(index < 0){
+					selectSurveyToDelete.push(surveyId);
+				}
+			} else {
+				$(this).addClass('sb-q-chk-no').removeClass('sb-q-chk-yes');
+				if(index > -1) {
+					selectSurveyToDelete.splice(index, 1);
+				}
+			}
+			$('#icn-sur-popup-cont').data('selected-survey-to-delete',selectSurveyToDelete);
+			if(selectSurveyToDelete != undefined && selectSurveyToDelete.length > 0 ) {
+				$('#del-mult-sur-icn').addClass('del-mult-sur-icn-active');
+			} else {
+				$('#del-mult-sur-icn').removeClass('del-mult-sur-icn-active');
+			}
 		});
 	});
 </script>
