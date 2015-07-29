@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
@@ -18,7 +19,7 @@ import com.realtech.socialsurvey.core.entities.SiteMapEntry;
 
 @Component
 @Scope(value = ConfigurableBeanFactory.SCOPE_PROTOTYPE)
-public class MongoSiteMapContentFetcher implements SitemapContentFecher {
+public class MongoSiteMapContentFetcher implements SitemapContentFecher, InitializingBean {
 
 	private static final Logger LOG = LoggerFactory.getLogger(MongoSiteMapContentFetcher.class);
 	
@@ -31,13 +32,17 @@ public class MongoSiteMapContentFetcher implements SitemapContentFecher {
 	private long count;
 	private int recordsFetched;
 	private boolean areMoreRecordsPresent;
+	private Timestamp minLastModifiedTimeInterval;
 
 	@Autowired
 	private OrganizationUnitSettingsDao organizationUnitSettingsDao;
 
 	@Value("${APPLICATION_BASE_URL}")
 	private String applicationUrl;
-
+	
+	@Value("${SITEMAP_LAST_MODIFIED_TIME_INTERVAL}")
+	private String lastModifiedTimeInterval;
+	
 	public void setInterval(String interval) {
 		this.interval = interval;
 	}
@@ -119,10 +124,22 @@ public class MongoSiteMapContentFetcher implements SitemapContentFecher {
 			entry = new SiteMapEntry();
 			// generate location
 			entry.setLocation(generateLocation(profileUrl.getProfileUrl()));
-			entry.setLastModifiedDate(DATE_FORMAT.format(new Timestamp(profileUrl.getModifiedOn())));
+			Timestamp modifiedOnTimestamp =  new Timestamp(profileUrl.getModifiedOn());
+			// change the modified time if the modified on is older than the configured value
+			if(minLastModifiedTimeInterval.after(modifiedOnTimestamp)){
+				entry.setLastModifiedDate(DATE_FORMAT.format(minLastModifiedTimeInterval));
+			}else{
+				entry.setLastModifiedDate(DATE_FORMAT.format(modifiedOnTimestamp));
+			}
 			entries.add(entry);
 		}
 		return entries;
+	}
+
+	@Override
+	public void afterPropertiesSet() throws Exception {
+		LOG.debug("Setting the minimum last modified time allowes");
+		minLastModifiedTimeInterval = new Timestamp(System.currentTimeMillis() - (Integer.parseInt(lastModifiedTimeInterval) * 24 * 60 * 60 * 1000));
 	}
 
 }
