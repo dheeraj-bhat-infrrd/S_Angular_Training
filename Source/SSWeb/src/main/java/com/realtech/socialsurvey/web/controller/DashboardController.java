@@ -11,8 +11,10 @@ import java.util.Calendar;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
@@ -612,30 +614,36 @@ public class DashboardController
         LOG.info( "Method to get reviews of company, region, branch, agent getReviews() finished." );
         return JspResolver.HEADER_DASHBOARD_INCOMPLETESURVEYS;
     }
-
-    /**
-     * Method to delete the survey reminder request
-     * 
-     * @param model
-     * @param request
-     * @return
-     */
+    
+	/**
+	 * Method to delete multiple pre intiated survey to cancel sending reminders
+	 * @param model
+	 * @param request
+	 * @return
+	 */
 	@ResponseBody
-	@RequestMapping(value = "/delteincompletesurveyrequest")
-	public String cancelSurveyReminder(Model model, HttpServletRequest request) {
+	@RequestMapping(value = "/deletemultipleincompletesurveyrequest")
+	public String cancelMultipleSurveyReminder(Model model, HttpServletRequest request) {
 
 		LOG.info("Method cancelSurveyReminder() called");
 
-		String incompleteSurveyIdStr = request.getParameter("incompleteSurveyId");
-		long incompleteSurveyId = 0;
+		String surveySetToDeleteStr = request.getParameter("surveySetToDelete");
+		String[] surveySetToDeleteArray = surveySetToDeleteStr.split(",");
+		Set<Long> incompleteSurveyIds = new HashSet<>();
 		try {
-			try {
-				incompleteSurveyId = Long.parseLong(incompleteSurveyIdStr);
-				surveyPreInitiationService.deleteSurveyReminder(incompleteSurveyId);
+
+			for (String incompleteSurveyIdStr : surveySetToDeleteArray) {
+				try {
+					long incompleteSurveyId = 0;
+					incompleteSurveyId = Long.parseLong(incompleteSurveyIdStr);
+					incompleteSurveyIds.add(incompleteSurveyId);
+				}
+				catch (NumberFormatException e) {
+					throw new NonFatalException("Number format exception occured while parsing incomplet survey id : " + incompleteSurveyIdStr, e);
+				}
 			}
-			catch (NumberFormatException e) {
-				throw new NonFatalException("Number format exception occured while parsing incomplet survey id : " + incompleteSurveyIdStr, e);
-			}
+			surveyPreInitiationService.deleteSurveyReminder(incompleteSurveyIds);
+
 		}
 		catch (NonFatalException nonFatalException) {
 			LOG.error("Nonfatal exception occured in method cancelSurveyReminder, reason : " + nonFatalException.getMessage());
@@ -643,7 +651,6 @@ public class DashboardController
 		}
 		return CommonConstants.SUCCESS_ATTRIBUTE;
 	}
-    
 
     /*
      * Method to get count of all the incomplete surveys.
