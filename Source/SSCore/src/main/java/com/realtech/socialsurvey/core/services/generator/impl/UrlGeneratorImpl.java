@@ -23,6 +23,7 @@ import com.realtech.socialsurvey.core.utils.EncryptionHelper;
 public class UrlGeneratorImpl implements URLGenerator {
 	
 	private static final Logger LOG = LoggerFactory.getLogger(UrlGeneratorImpl.class);
+	
 	@Autowired
 	private EncryptionHelper encryptionHelper;
 			
@@ -150,25 +151,26 @@ public class UrlGeneratorImpl implements URLGenerator {
 	 * @throws InvalidInputException
 	 */
 	@Override
-	public Map<String,String> decryptParameters(String parameterCipherText) throws InvalidInputException {
-		
-		if( parameterCipherText == null || parameterCipherText.isEmpty() ){
+	public Map<String, String> decryptParameters(String parameterCipherText) throws InvalidInputException {
+		if (parameterCipherText == null || parameterCipherText.isEmpty()) {
 			LOG.error("Parameter to decryptParameters() in VerificationUrlGenerator is null or empty!");
 			throw new InvalidInputException("Parameter to decryptParameters() in VerificationUrlGenerator is null!");
 		}
-		
 		LOG.info("decryptParameters() : parameters: " + parameterCipherText);
-		
-		Map<String,String> params = new HashMap<String,String>();
-		
+
+		Map<String, String> params = new HashMap<String, String>();
 		String plainText = decryptCipher(parameterCipherText);
 		String keyValuePairs[] = plainText.split("&");
-		
-		for( int counter = 0;counter < keyValuePairs.length; counter += 1){
-			params.put(keyValuePairs[counter].split("=")[0], keyValuePairs[counter].split("=")[1]);
-		}		
+
+		for (int counter = 0; counter < keyValuePairs.length; counter += 1) {
+			try {
+				params.put(keyValuePairs[counter].split("=")[0], keyValuePairs[counter].split("=")[1]);
+			}
+			catch (ArrayIndexOutOfBoundsException e) {
+				continue;
+			}
+		}
 		return params;
-		
 	}
 	
 	
