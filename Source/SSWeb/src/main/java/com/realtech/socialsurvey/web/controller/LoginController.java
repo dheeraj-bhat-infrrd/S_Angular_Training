@@ -190,14 +190,14 @@ public class LoginController {
 
 			HttpSession session = request.getSession(true);
 			user = sessionHelper.getCurrentUser();
-			user = userManagementService.getUserByUserId(user.getUserId());
-			userManagementService.setProfilesOfUser(user);
 
 			// Check if super admin is logged in
 			if (user.isSuperAdmin()) {
 				return JspResolver.ADMIN_LANDING;
 			}
 
+			user = userManagementService.getUserByUserId(user.getUserId());
+			userManagementService.setProfilesOfUser(user);
 			List<LicenseDetail> licenseDetails = user.getCompany().getLicenseDetails();
 			if (licenseDetails != null && !licenseDetails.isEmpty()) {
 				LicenseDetail licenseDetail = licenseDetails.get(0);
