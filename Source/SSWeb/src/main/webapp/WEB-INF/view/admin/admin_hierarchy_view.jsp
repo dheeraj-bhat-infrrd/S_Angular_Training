@@ -38,7 +38,7 @@
 				class="um-search-icn"></span>
 		</div>
 	</div>
-	<div class="v-hr-tbl" style="margin-top: 0">
+	<div class="v-hr-tbl">
 		<div class="v-tbl-header comp-row" id="hierarchy-list-header">
 			<div class="v-tbl-line"></div>
 			<div class="v-tbl-name">Name</div>
