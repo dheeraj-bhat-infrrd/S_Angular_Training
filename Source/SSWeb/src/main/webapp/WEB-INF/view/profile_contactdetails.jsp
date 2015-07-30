@@ -11,6 +11,21 @@
 	<c:set value="${contactdetail.contact_numbers}" var="contactNumbers"></c:set>
 	<c:set value="${contactdetail.web_addresses}" var="webAddresses"></c:set>
 </c:if>
+<c:choose>
+	<c:when test="${entityType == 'companyId'}">
+		<c:set value="1" var="profilemasterid"></c:set>
+	</c:when>
+	<c:when test="${entityType == 'regionId'}">
+		<c:set value="2" var="profilemasterid"></c:set>
+	</c:when>
+	<c:when test="${entityType == 'branchId'}">
+		<c:set value="3" var="profilemasterid"></c:set>
+	</c:when>
+	<c:when test="${entityType == 'agentId'}">
+		<c:set value="4" var="profilemasterid"></c:set>
+	</c:when>
+</c:choose>
+
 <input type="hidden" id="sel-prof-country-code" value="${contactdetail.countryCode}">
 <div class="lp-con-row lp-row clearfix">
 	<div class="float-left lp-con-icn icn-mail"></div>
