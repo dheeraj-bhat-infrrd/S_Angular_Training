@@ -354,7 +354,7 @@
                     </div>
                 </div> -->
                 <c:if test="${not empty profile.contact_details }">
-                	<c:if test="${not empty profile.contact_details.web_addresses || not empty profile.contact_details.contact_numbers}">
+                	<c:if test="${(not empty profile.contact_details.web_addresses && not empty profile.contact_details.web_addresses.work) || (not empty profile.contact_details.contact_numbers && profile.contact_details.contact_numbers.work)}">
 						<div id="contact-info" class="prof-left-row prof-left-info bord-bot-dc prof-contact-info">
 							<div class="left-contact-wrapper">
 								<div class="left-panel-header">
