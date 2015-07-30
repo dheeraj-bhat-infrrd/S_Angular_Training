@@ -47,7 +47,10 @@
 		<intercept-url pattern="/resetpassword.do" access="permitAll" />
 		<intercept-url pattern="/setnewpassword.do" access="permitAll" />
 
-		<!-- Amdin pages -->
+		<!-- Email Verification -->
+		<intercept-url pattern="/emailverification.do" access="permitAll" />
+		
+		<!-- Admin pages -->
 		<intercept-url pattern="/adminlogin.do" access="permitAll" />
 
 		<!-- Restricted Services -->
