@@ -62,6 +62,7 @@ import com.realtech.socialsurvey.core.entities.User;
 import com.realtech.socialsurvey.core.entities.UserFromSearch;
 import com.realtech.socialsurvey.core.entities.UserHierarchyAssignments;
 import com.realtech.socialsurvey.core.entities.UserListFromSearch;
+import com.realtech.socialsurvey.core.entities.UserProfile;
 import com.realtech.socialsurvey.core.entities.UserSettings;
 import com.realtech.socialsurvey.core.entities.VerticalsMaster;
 import com.realtech.socialsurvey.core.entities.WebAddressSettings;
@@ -197,6 +198,13 @@ public class ProfileManagementController {
 		else if (entityType.equals(CommonConstants.AGENT_ID_COLUMN)) {
 			model.addAttribute("columnName", entityType);
 			profilesMaster = CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID;
+			
+			for (UserProfile userProfile : user.getUserProfiles()) {
+				if (userProfile.getProfilesMaster().getProfileId() == CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID) {
+					regionId = userProfile.getRegionId();
+					branchId = userProfile.getBranchId();
+				}
+			}
 		}
 
 		// Setting userSettings in session
