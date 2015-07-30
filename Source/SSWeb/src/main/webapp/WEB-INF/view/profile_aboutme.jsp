@@ -7,6 +7,20 @@
 	<c:set value="${profileSettings.contact_details}" var="contactdetail"></c:set>
 	<c:set value="${profileSettings.lockSettings}" var="lock"></c:set>
 </c:if>
+<c:choose>
+	<c:when test="${columnName == 'companyId'}">
+		<c:set value="1" var="profilemasterid"></c:set>
+	</c:when>
+	<c:when test="${columnName == 'regionId'}">
+		<c:set value="2" var="profilemasterid"></c:set>
+	</c:when>
+	<c:when test="${columnName == 'branchId'}">
+		<c:set value="3" var="profilemasterid"></c:set>
+	</c:when>
+	<c:when test="${columnName == 'agentId'}">
+		<c:set value="4" var="profilemasterid"></c:set>
+	</c:when>
+</c:choose>
 
 <div class="main-con-header main-con-header-adj clearfix">
 	<div class="float-left">
