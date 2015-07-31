@@ -1502,6 +1502,12 @@
 		margin-top: 0 !important;
 		margin-left: 2% !important;
 	}
+	.textarea-bd-mcq-txt {
+		width: 100%;
+	}
+	.reset-icon {
+	    margin: 15px 0 5px 0;
+	}
 }
 
 
