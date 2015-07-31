@@ -17,7 +17,7 @@
 	<c:when test="${columnName == 'branchId'}">
 		<c:set value="3" var="profilemasterid"></c:set>
 	</c:when>
-	<c:when test="${columnName == 'agentId'}">
+	<c:when test="${entityType == 'agentId'}">
 		<c:set value="4" var="profilemasterid"></c:set>
 	</c:when>
 </c:choose>
