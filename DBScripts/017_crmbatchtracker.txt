@@ -1,0 +1,11 @@
+CREATE TABLE IF NOT EXIST `ss_user`.`CRM_BATCH_TRACKER`( 
+   `ID` int(11) NOT NULL AUTO_INCREMENT , 
+   `COMPANY_ID` int(11) NOT NULL , 
+   `SOURCE` varchar(50) NOT NULL , 
+   `RECENT_RECORD_FETCHED_DATE` timestamp NOT NULL , 
+   `CREATED_ON` timestamp DEFAULT CURRENT_TIMESTAMP , 
+   `MODIFIED_ON` timestamp , 
+   PRIMARY KEY (`ID`)
+ )
+ 
+ 

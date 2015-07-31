@@ -461,73 +461,76 @@ public class RegistrationController
     }
 
 
-    // JIRA - SS-536: Added for manual registration via invite
-    @RequestMapping ( value = "/invitetoregister")
-    public String initManualRegistration( @RequestParam ( "q") String encryptedUrlParams, HttpServletRequest request,
-        Model model, RedirectAttributes redirectAttributes )
-    {
-        LOG.info( "Manual invitation for registration" );
-        // decrypt the url
-        String creatorEmailId = null;
-        String emailId = null;
+	// JIRA - SS-536: Added for manual registration via invite
+	@RequestMapping(value = "/invitetoregister")
+	public String initManualRegistration(@RequestParam("q") String encryptedUrlParams, HttpServletRequest request, Model model,
+			RedirectAttributes redirectAttributes) {
+		LOG.info("Manual invitation for registration");
+		// decrypt the url
+		String creatorEmailId = null;
+		String emailId = null;
 
-        try {
-            Map<String, String> urlParams = urlGenerator.decryptParameters( encryptedUrlParams );
-            if ( urlParams.get( CommonConstants.FIRST_NAME ) != null ) {
-                redirectAttributes.addFlashAttribute( "firstname",
-                    URLDecoder.decode( urlParams.get( CommonConstants.FIRST_NAME ), "UTF-8" ) );
-            } else {
-                throw new InvalidInputException( "First name is not present" );
-            }
+		try {
+			Map<String, String> urlParams = urlGenerator.decryptParameters(encryptedUrlParams);
+			if (urlParams.containsKey(CommonConstants.FIRST_NAME)) {
+				redirectAttributes.addFlashAttribute("firstname", URLDecoder.decode(urlParams.get(CommonConstants.FIRST_NAME), "UTF-8"));
+			}
+			else {
+				throw new InvalidInputException("First name is not present");
+			}
 
-            if ( urlParams.get( CommonConstants.LAST_NAME ) != null ) {
-                redirectAttributes.addFlashAttribute( "lastname",
-                    URLDecoder.decode( urlParams.get( CommonConstants.LAST_NAME ), "UTF-8" ) );
-            } else {
-                redirectAttributes.addFlashAttribute( "lastname", "" );
-            }
+			if (urlParams.containsKey(CommonConstants.LAST_NAME)) {
+				redirectAttributes.addFlashAttribute("lastname", URLDecoder.decode(urlParams.get(CommonConstants.LAST_NAME), "UTF-8"));
+			}
+			else {
+				redirectAttributes.addFlashAttribute("lastname", "");
+			}
 
-            if ( urlParams.get( CommonConstants.EMAIL_ID ) != null ) {
-                emailId = URLDecoder.decode( urlParams.get( CommonConstants.EMAIL_ID ), "UTF-8" );
-                redirectAttributes.addFlashAttribute( "emailid", emailId );
-            } else {
-                throw new InvalidInputException( "Email id is not present" );
-            }
+			if (urlParams.containsKey(CommonConstants.EMAIL_ID)) {
+				emailId = URLDecoder.decode(urlParams.get(CommonConstants.EMAIL_ID), "UTF-8");
+				redirectAttributes.addFlashAttribute("emailid", emailId);
+			}
+			else {
+				throw new InvalidInputException("Email id is not present");
+			}
 
-            if ( urlParams.get( CommonConstants.ACCOUNT_CRETOR_EMAIL_ID ) != null ) {
-                creatorEmailId = URLDecoder.decode( urlParams.get( CommonConstants.ACCOUNT_CRETOR_EMAIL_ID ), "UTF-8" );
-                redirectAttributes.addFlashAttribute( "creatorEmailId", creatorEmailId );
-            } else {
-                throw new InvalidInputException( "Creator email id is not present" );
-            }
+			if (urlParams.containsKey(CommonConstants.ACCOUNT_CRETOR_EMAIL_ID)) {
+				creatorEmailId = URLDecoder.decode(urlParams.get(CommonConstants.ACCOUNT_CRETOR_EMAIL_ID), "UTF-8");
+				redirectAttributes.addFlashAttribute("creatorEmailId", creatorEmailId);
+			}
+			else {
+				throw new InvalidInputException("Creator email id is not present");
+			}
 
-            if ( urlParams.get( CommonConstants.API_KEY_FROM_URL ) != null ) {
-                if ( !userManagementService.isValidApiKey( creatorEmailId, urlParams.get( CommonConstants.API_KEY_FROM_URL ) ) ) {
-                    throw new InvalidInputException( "Could not authenticate the API key" );
-                }
-            } else {
-                throw new InvalidInputException( "No API Key present" );
-            }
-            redirectAttributes.addFlashAttribute( "isDirectRegistration", false );
+			if (urlParams.containsKey(CommonConstants.API_KEY_FROM_URL)) {
+				if (!userManagementService.isValidApiKey(creatorEmailId, urlParams.get(CommonConstants.API_KEY_FROM_URL))) {
+					throw new InvalidInputException("Could not authenticate the API key");
+				}
+			}
+			else {
+				throw new InvalidInputException("No API Key present");
+			}
 
-            // check if the email id exists.
-            if ( userManagementService.userExists( emailId ) ) {
-                redirectAttributes.addFlashAttribute( "message", "The Email address is already taken" );
-                redirectAttributes.addFlashAttribute( "status", DisplayMessageType.ERROR_MESSAGE );
-                return "redirect:/" + JspResolver.LOGIN + ".do";
-            }
-        } catch ( InvalidInputException | UnsupportedEncodingException | NoRecordsFetchedException e ) {
-            LOG.error( "Exception while inviting user for manual registration", e );
-            model.addAttribute( "message", messageUtils.getDisplayMessage( DisplayMessageConstants.INVALID_VERIFICATION_URL,
-                DisplayMessageType.ERROR_MESSAGE ) );
-            return JspResolver.NOT_FOUND_PAGE;
-        }
+			redirectAttributes.addFlashAttribute("isDirectRegistration", false);
 
-        return "redirect:/" + JspResolver.REGISTRATION_PAGE + ".do";
-    }
+			// check if the email id exists.
+			if (userManagementService.userExists(emailId)) {
+				redirectAttributes.addFlashAttribute("message", "The Email address is already taken");
+				redirectAttributes.addFlashAttribute("status", DisplayMessageType.ERROR_MESSAGE);
+				return "redirect:/" + JspResolver.LOGIN + ".do";
+			}
+		}
+		catch (InvalidInputException | UnsupportedEncodingException | NoRecordsFetchedException e) {
+			LOG.error("Exception while inviting user for manual registration", e);
+			model.addAttribute("message",
+					messageUtils.getDisplayMessage(DisplayMessageConstants.INVALID_VERIFICATION_URL, DisplayMessageType.ERROR_MESSAGE));
+			return JspResolver.NOT_FOUND_PAGE;
+		}
 
+		return "redirect:/" + JspResolver.REGISTRATION_PAGE + ".do";
+	}
 
-    // JIRA - SS-536: Added for manual registration via invite
+	// JIRA - SS-536: Added for manual registration via invite
 	@ResponseBody
 	@RequestMapping(value = "/generateregistrationurl")
 	public String geerateRegistrationUrlForManualCompanyCreation(@RequestParam("firstName") String firstName,
@@ -542,6 +545,9 @@ public class RegistrationController
 			params.put(CommonConstants.FIRST_NAME, URLEncoder.encode(firstName, "UTF-8"));
 			if (lastName != null) {
 				params.put(CommonConstants.LAST_NAME, URLEncoder.encode(lastName, "UTF-8"));
+			}
+			else {
+				params.put(CommonConstants.LAST_NAME, URLEncoder.encode("", "UTF-8"));
 			}
 			params.put(CommonConstants.EMAIL_ID, URLEncoder.encode(emailId, "UTF-8"));
 			params.put(CommonConstants.ACCOUNT_CRETOR_EMAIL_ID, URLEncoder.encode(creatorEmailId, "UTF-8"));

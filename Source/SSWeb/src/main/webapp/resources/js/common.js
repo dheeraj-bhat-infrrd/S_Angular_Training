@@ -526,6 +526,7 @@ function disconnectSocialMedia(socialMedia) {
 	callAjaxPostWithPayloadData("/disconnectsocialmedia.do", function(data) {
 		if(data == "success"){
 			$('div[data-social="'+socialMedia+'"]').html('');
+			$('div[data-social="'+socialMedia+'"]').parent().find('.social-media-disconnect').addClass('social-media-disconnect-disabled').removeAttr("onclick").removeAttr("title");
 			$('#overlay-toast').html('Successfully disconnected ' + socialMedia);
 			showToast();
 		} else {
@@ -718,7 +719,7 @@ $(document).on('click', '#wc-send-survey', function() {
 		};
 	}
 
-	loadDisplayPicture();
+	//loadDisplayPicture();
 	$(this).closest('.overlay-login').hide();
 	showDisplayPic();
 	
