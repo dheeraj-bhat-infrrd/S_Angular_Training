@@ -55,9 +55,9 @@ function landingFlow() {
 	});
 
 	$('body').on('click', '.wc-final-skip', function(){
-		loadDisplayPicture();
+		//loadDisplayPicture();
+		//showDisplayPic();
 		$(this).closest('.overlay-login').hide().html('');
-		showDisplayPic();
 		$('body').removeClass('body-no-scroll');
 	});
 	
