@@ -618,31 +618,6 @@ function loadDisplayPicture(profileMasterId){
 		}
 		return data.responseJSON;
 	}, false, payload);
-	/*$.ajax({
-		url : "./getdisplaypiclocation.do",
-		type : "GET",
-		data : payload,
-		dataType : "text",
-		success : function(data) {
-			if (data != undefined){
-				console.log("Image location : " + data);
-				var imageUrl = data;
-				if (imageUrl != '' && imageUrl != undefined) {
-					$("#hdr-usr-img").css("background", "url(" + imageUrl + ") no-repeat center");
-					$("#hdr-usr-img").css("background-size", "cover");
-					$("#usr-initl").html("");
-				}
-				else{
-					callAjaxGET('./initialofusername.do', displayPicCallback, false);
-				}
-			}
-			return data.responseJSON;
-		},
-		error : function() {
-			console.log("error in displaypilocation script.js");
-			callAjaxGET('./initialofusername.do', displayPicCallback, false);
-		}
-	});*/
 }
 function displayPicCallback(data){
 	$("#hdr-usr-img").css("background", "");

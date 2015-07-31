@@ -4114,7 +4114,7 @@ img.prof-image {
 .dsh-date-picker {
 	width: 20%;
 	padding: 0 0 0 5px;
-	height: 28px;
+	height: 27px;
 	border: none;
 	color: #777;
 	font-size: 11px;
@@ -6955,6 +6955,11 @@ a.sq-btn-post-social:hover, a.sq-btn-post-social:visited {
 	background: url(../images/disconnect.png) no-repeat center;
 	cursor: pointer;
 	background-size: contain;
+}
+
+.social-media-disconnect-disabled {
+	cursor: auto;
+	opacity: 0.5;
 }
 
 .bread-crum-row {

@@ -6,7 +6,7 @@
 		$('.header-links-item').on('click',function(){
 			 window.location.href = $(this).find('a').attr('href');
 		});
-		loadDisplayPicture();
+		//loadDisplayPicture();
 	});
 </script>
 <script src="${initParam.resourcesPath}/resources/js/activesession.js"></script>
