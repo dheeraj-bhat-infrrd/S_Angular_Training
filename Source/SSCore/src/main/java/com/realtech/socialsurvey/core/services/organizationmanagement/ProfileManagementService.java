@@ -518,7 +518,7 @@ public interface ProfileManagementService
 
 
     public Map<String, String> findNamesfromProfileName( String profileName );
-
+    
 	public OrganizationUnitSettings aggregateAgentDetails(UserSettings userSettings, OrganizationUnitSettings profileSettings,
 			LockSettings parentLockSettings) throws InvalidInputException;
 }

@@ -2402,6 +2402,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 			throw new InvalidInputException("No aggregated Settings found");
 		}
 
+		String logoUrl = "";
 		OrganizationUnitSettings entitySettings = null;
 		ContactDetailsSettings contactDetails = null;
 		AgentSettings agentSettings = null;
@@ -2409,19 +2410,26 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
         	agentSettings = (AgentSettings) profileSettings;
         }
 		
-        if (agentSettings.getContact_details() != null && agentSettings.getContact_details().getAddress1() != null) {
-        	
-        }
-        else {
-        	
-        }
-        
 		// checking all assigned branches for address 
 		for (long branchId : userSettings.getBranchSettings().keySet()) {
 			entitySettings = userSettings.getBranchSettings().get(branchId);
 			contactDetails = entitySettings.getContact_details();
 			if (contactDetails != null && contactDetails.getAddress1() != null) {
+				if (!parentLockSettings.getIsLogoLocked() && entitySettings.getLogo() != null && !entitySettings.getLogo().isEmpty()) {
+					logoUrl = entitySettings.getLogo();
+				}
 				break;
+			}
+		}
+		
+		// check logo url in region of branch
+		if (!parentLockSettings.getIsLogoLocked() && entitySettings != null && contactDetails != null) {
+			if (logoUrl == null || logoUrl.isEmpty()) {
+				Branch branch = branchDao.findById(Branch.class, entitySettings.getIden());
+				OrganizationUnitSettings regionSettings = organizationManagementService.getRegionSettings(branch.getRegion().getRegionId());
+				if (regionSettings.getLogo() != null && !regionSettings.getLogo().isEmpty()) {
+					logoUrl = regionSettings.getLogo();
+				}
 			}
 		}
 		
@@ -2429,6 +2437,11 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 		if (contactDetails == null) {
 			entitySettings = userSettings.getCompanySettings();
 			contactDetails = entitySettings.getContact_details();
+		}
+		if (!parentLockSettings.getIsLogoLocked() && (logoUrl == null || logoUrl.isEmpty())) {
+			if (userSettings.getCompanySettings().getLogo() != null && !userSettings.getCompanySettings().getLogo().isEmpty()) {
+				logoUrl = userSettings.getCompanySettings().getLogo();
+			}
 		}
 		
 		// add the company profile data into agent settings
@@ -2441,7 +2454,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 		companyProfileData.setCountry(contactDetails.getCountry());
 		companyProfileData.setCountryCode(contactDetails.getCountryCode());
 		companyProfileData.setZipcode(contactDetails.getZipcode());
-		companyProfileData.setCompanyLogo(entitySettings.getLogo());
+		companyProfileData.setCompanyLogo(logoUrl);
 		
 		if (agentSettings != null) {
 			agentSettings.setCompanyProfileData(companyProfileData);
