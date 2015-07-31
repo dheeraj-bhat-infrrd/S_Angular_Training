@@ -503,7 +503,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
         }
 
         // add the company profile data into agent settings
-        CompanyProfileData companyProfileData = new CompanyProfileData();
+        /*CompanyProfileData companyProfileData = new CompanyProfileData();
         companyProfileData.setName( companySettings.getContact_details().getName() );
         companyProfileData.setCompanyLogo( companySettings.getLogo() );
         companyProfileData.setAddress1( companySettings.getContact_details().getAddress1() );
@@ -515,7 +515,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
         companyProfileData.setZipcode( companySettings.getContact_details().getZipcode() );
         if ( agentSettingsType != null ) {
             agentSettingsType.setCompanyProfileData( companyProfileData );
-        }
+        }*/
 
         // Aggregate Region Profile settings if exists
         if ( regionSettings != null ) {
@@ -2393,4 +2393,61 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
         }
         return true;
     }
+    
+    @Override
+	public OrganizationUnitSettings aggregateAgentDetails(UserSettings userSettings, OrganizationUnitSettings profileSettings,
+			LockSettings parentLockSettings) throws InvalidInputException {
+		LOG.debug("Method aggregateAgentDetails() called from ProfileManagementService");
+		if (userSettings == null || profileSettings == null) {
+			throw new InvalidInputException("No aggregated Settings found");
+		}
+
+		OrganizationUnitSettings entitySettings = null;
+		ContactDetailsSettings contactDetails = null;
+		AgentSettings agentSettings = null;
+        if ( profileSettings instanceof AgentSettings ) {
+        	agentSettings = (AgentSettings) profileSettings;
+        }
+		
+        if (agentSettings.getContact_details() != null && agentSettings.getContact_details().getAddress1() != null) {
+        	
+        }
+        else {
+        	
+        }
+        
+		// checking all assigned branches for address 
+		for (long branchId : userSettings.getBranchSettings().keySet()) {
+			entitySettings = userSettings.getBranchSettings().get(branchId);
+			contactDetails = entitySettings.getContact_details();
+			if (contactDetails != null && contactDetails.getAddress1() != null) {
+				break;
+			}
+		}
+		
+		// checking all company for address if null 
+		if (contactDetails == null) {
+			entitySettings = userSettings.getCompanySettings();
+			contactDetails = entitySettings.getContact_details();
+		}
+		
+		// add the company profile data into agent settings
+		CompanyProfileData companyProfileData = new CompanyProfileData();
+		companyProfileData.setName(contactDetails.getName());
+		companyProfileData.setAddress1(contactDetails.getAddress1());
+		companyProfileData.setAddress2(contactDetails.getAddress2());
+		companyProfileData.setCity(contactDetails.getCity());
+		companyProfileData.setState(contactDetails.getState());
+		companyProfileData.setCountry(contactDetails.getCountry());
+		companyProfileData.setCountryCode(contactDetails.getCountryCode());
+		companyProfileData.setZipcode(contactDetails.getZipcode());
+		companyProfileData.setCompanyLogo(entitySettings.getLogo());
+		
+		if (agentSettings != null) {
+			agentSettings.setCompanyProfileData(companyProfileData);
+		}
+
+		LOG.debug("Method aggregateAgentProfile() finished from ProfileManagementService");
+		return (agentSettings != null ? agentSettings : profileSettings);
+	}
 }
