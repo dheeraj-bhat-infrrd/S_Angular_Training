@@ -40,7 +40,6 @@ import com.realtech.socialsurvey.core.entities.BranchUploadVO;
 import com.realtech.socialsurvey.core.entities.Company;
 import com.realtech.socialsurvey.core.entities.FileUpload;
 import com.realtech.socialsurvey.core.entities.LicenseDetail;
-import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
 import com.realtech.socialsurvey.core.entities.Region;
 import com.realtech.socialsurvey.core.entities.RegionUploadVO;
 import com.realtech.socialsurvey.core.entities.User;
@@ -155,7 +154,7 @@ public class CsvUploadServiceImpl implements CsvUploadService
         InputStream fileStream = null;
         List<String> regionErrors = null;
         List<String> branchErrors = null;
-        List<String> userErrors = null;
+        List<String> userErrors = new ArrayList<String>();
         User adminUser = getUser( fileUpload.getAdminUserId() );
         adminUser.setCompanyAdmin( true );
         try {
@@ -200,7 +199,7 @@ public class CsvUploadServiceImpl implements CsvUploadService
                     UserUploadVO userUploadVO = entry.getKey();
                     User uploadedUser = entry.getValue();
                     try {
-                        updateUserSettingsInMongo( uploadedUser, userUploadVO.getUserPhotoUrl(), userErrors );
+                        updateUserSettingsInMongo( uploadedUser, userUploadVO, userErrors );
                     } catch ( Exception e ) {
                         userErrors.add( "Exception caught for user " + uploadedUser.getUsername() + " "
                             + uploadedUser.getUserId() );
@@ -214,16 +213,23 @@ public class CsvUploadServiceImpl implements CsvUploadService
     }
 
 
-    private void updateUserSettingsInMongo( User user, String photoImageUrl, List<String> userErrors )
+    private void updateUserSettingsInMongo( User user, UserUploadVO userUploadVO, List<String> userErrors )
         throws InvalidInputException
     {
         LOG.debug( "Inside method updateUserSettingsInMongo " );
         AgentSettings agentSettings = userManagementService.getAgentSettingsForUserProfiles( user.getUserId() );
         if ( agentSettings == null ) {
             userErrors.add( "No company settings found for user " + user.getUsername() + " " + user.getUserId() );
+
+        } else {
+            if ( agentSettings.getContact_details() != null ) {
+                agentSettings.getContact_details().setTitle( userUploadVO.getTitle() );
+                profileManagementService.updateContactDetails( MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION,
+                    agentSettings, agentSettings.getContact_details() );
+            }
+            profileManagementService.updateProfileImage( MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION,
+                agentSettings, userUploadVO.getUserPhotoUrl() );
         }
-        profileManagementService.updateProfileImage( MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION,
-            agentSettings, photoImageUrl );
     }
 
 

@@ -331,7 +331,7 @@ public class SessionHelper {
 		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 		if (!(auth instanceof AnonymousAuthenticationToken)) {
 			try {
-				response.sendRedirect("./" + JspResolver.LANDING + ".do");
+				response.sendRedirect("./" + JspResolver.USER_LOGIN + ".do");
 			}
 			catch (IOException e) {
 				LOG.error("IOException while redirecting logged in user. Reason : " + e.getMessage(), e);
