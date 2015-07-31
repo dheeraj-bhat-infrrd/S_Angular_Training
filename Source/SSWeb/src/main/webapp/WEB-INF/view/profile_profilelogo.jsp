@@ -21,7 +21,7 @@
 	<c:set value="${profileSettings.logo}" var="profilelogo"></c:set>
 	<c:set value="${profileSettings.lockSettings}" var="lock"></c:set>
 </c:if>
-<c:if test="${profilemasterid == 4 && not parentLock.isLogoLocked}">
+<c:if test="${profilemasterid == 4 && not lock.isLogoLocked}">
 	<c:set value="${profileSettings.companyProfileData.companyLogo}" var="profilelogo"></c:set>
 </c:if>
 
