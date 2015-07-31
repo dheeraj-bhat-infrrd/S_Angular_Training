@@ -211,7 +211,7 @@
 				<input type="hidden" name="ratingcategory" id="ratingcategory">
 				<div class="clearfix float-right col-lg-8 col-md-8 col-sm-8 col-xs-12">
 					<div id="social-media-token-cont" class="soc-nw-wrapper clearfix">
-						<jsp:include page="settings_socialauth.jsp"></jsp:include>
+						<%-- <jsp:include page="settings_socialauth.jsp"></jsp:include> --%>
 					</div>
 				</div>
 			</div>
@@ -413,6 +413,9 @@
 $(document).ready(function() {
 	hideOverlay();
 	$(document).attr("title", "Edit Settings");
+	
+	//social media urls
+	loadSocialMediaUrlInSettingsPage();
 	
 	if ($("#se-dd-wrapper-profiles > div").length <= 1) {
 		$('#se-dd-wrapper').remove();
