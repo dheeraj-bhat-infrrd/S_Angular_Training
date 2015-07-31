@@ -502,21 +502,6 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
             sortCompanyPositions( agentSettingsType.getPositions() );
         }
 
-        // add the company profile data into agent settings
-        /*CompanyProfileData companyProfileData = new CompanyProfileData();
-        companyProfileData.setName( companySettings.getContact_details().getName() );
-        companyProfileData.setCompanyLogo( companySettings.getLogo() );
-        companyProfileData.setAddress1( companySettings.getContact_details().getAddress1() );
-        companyProfileData.setAddress2( companySettings.getContact_details().getAddress2() );
-        companyProfileData.setCity( companySettings.getContact_details().getCity() );
-        companyProfileData.setState( companySettings.getContact_details().getState() );
-        companyProfileData.setCountry( companySettings.getContact_details().getCountry() );
-        companyProfileData.setCountryCode( companySettings.getContact_details().getCountryCode() );
-        companyProfileData.setZipcode( companySettings.getContact_details().getZipcode() );
-        if ( agentSettingsType != null ) {
-            agentSettingsType.setCompanyProfileData( companyProfileData );
-        }*/
-
         // Aggregate Region Profile settings if exists
         if ( regionSettings != null ) {
             agentSettings = aggregateProfileData( regionSettings, agentSettings, userLock );
