@@ -293,7 +293,7 @@ public interface ProfileManagementService
      * @throws NoRecordsFetchedException
      */
     public OrganizationUnitSettings getIndividualByProfileName( String profileName ) throws ProfileNotFoundException,
-        InvalidInputException;
+        InvalidInputException, NoRecordsFetchedException;
 
 
     public SocialMediaTokens aggregateSocialProfiles( OrganizationUnitSettings unitSettings, String entity )
@@ -519,6 +519,6 @@ public interface ProfileManagementService
 
     public Map<String, String> findNamesfromProfileName( String profileName );
     
-	public OrganizationUnitSettings aggregateAgentDetails(UserSettings userSettings, OrganizationUnitSettings profileSettings,
-			LockSettings parentLockSettings) throws InvalidInputException;
+	public OrganizationUnitSettings aggregateAgentDetails(User user, OrganizationUnitSettings profileSettings, LockSettings parentLockSettings)
+			throws InvalidInputException, NoRecordsFetchedException;
 }

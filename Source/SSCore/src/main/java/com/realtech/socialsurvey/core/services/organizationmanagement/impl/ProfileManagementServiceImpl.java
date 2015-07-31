@@ -1052,60 +1052,66 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
      * 
      * @throws NoRecordsFetchedException
      */
-    @Override
-    @Transactional
-    public OrganizationUnitSettings getIndividualByProfileName( String agentProfileName ) throws ProfileNotFoundException,
-        InvalidInputException
-    {
-        LOG.info( "Method getIndividualByProfileName called for agentProfileName:" + agentProfileName );
+	@Override
+	@Transactional
+	public OrganizationUnitSettings getIndividualByProfileName(String agentProfileName) throws ProfileNotFoundException, InvalidInputException,
+			NoRecordsFetchedException {
+		LOG.info("Method getIndividualByProfileName called for agentProfileName:" + agentProfileName);
 
-        OrganizationUnitSettings agentSettings = null;
-        if ( agentProfileName == null || agentProfileName.isEmpty() ) {
-            throw new ProfileNotFoundException( "agentProfileName is null or empty while getting agent settings" );
-        }
+		OrganizationUnitSettings agentSettings = null;
+		if (agentProfileName == null || agentProfileName.isEmpty()) {
+			throw new ProfileNotFoundException("agentProfileName is null or empty while getting agent settings");
+		}
 
-        agentSettings = organizationUnitSettingsDao.fetchOrganizationUnitSettingsByProfileName( agentProfileName,
-            MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION );
-        if ( agentSettings == null ) {
-            throw new ProfileNotFoundException( "No settings found for agent while fetching agent profile" );
-        }
+		agentSettings = organizationUnitSettingsDao.fetchOrganizationUnitSettingsByProfileName(agentProfileName,
+				MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION);
+		if (agentSettings == null) {
+			throw new ProfileNotFoundException("No settings found for agent while fetching agent profile");
+		}
 
-        User user = userDao.findById( User.class, agentSettings.getIden() );
+		User user = userDao.findById(User.class, agentSettings.getIden());
 
-        LOG.debug( "Fetching user profiles for agentId: " + agentSettings.getIden() );
-        List<UserProfile> userProfiles = user.getUserProfiles();
-        UserProfile userProfile = null;
-        if ( userProfiles != null && !userProfiles.isEmpty() ) {
-            userProfile = userProfiles.get( 0 );
-        } else {
-            throw new ProfileNotFoundException( "User profiles not found while fetching agent profile" );
-        }
+		LOG.debug("Fetching user profiles for agentId: " + agentSettings.getIden());
+		UserProfile userProfile = null;
+		for (UserProfile profile : user.getUserProfiles()) {
+			if (profile.getProfilesMaster().getProfileId() == CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID
+					&& profile.getStatus() == CommonConstants.STATUS_ACTIVE) {
+				userProfile = profile;
+				break;
+			}
+		}
+		if (userProfile == null) {
+			throw new ProfileNotFoundException("User profiles not found while fetching agent profile");
+		}
 
-        long companyId = userProfile.getCompany().getCompanyId();
-        LOG.debug( "Fetching company settings for companyId: " + companyId );
-        OrganizationUnitSettings companySettings = organizationUnitSettingsDao.fetchOrganizationUnitSettingsById( companyId,
-            MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION );
+		long companyId = userProfile.getCompany().getCompanyId();
+		LOG.debug("Fetching company settings for companyId: " + companyId);
+		OrganizationUnitSettings companySettings = organizationUnitSettingsDao.fetchOrganizationUnitSettingsById(companyId,
+				MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION);
 
-        long regionId = userProfile.getRegionId();
-        OrganizationUnitSettings regionSettings = null;
-        if ( regionId > 0l ) {
-            LOG.debug( "Fetching region settings for regionId: " + regionId );
-            regionSettings = organizationUnitSettingsDao.fetchOrganizationUnitSettingsById( regionId,
-                MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION );
-        }
+		long regionId = userProfile.getRegionId();
+		OrganizationUnitSettings regionSettings = null;
+		if (regionId > 0l) {
+			LOG.debug("Fetching region settings for regionId: " + regionId);
+			regionSettings = organizationUnitSettingsDao.fetchOrganizationUnitSettingsById(regionId,
+					MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION);
+		}
 
-        long branchId = userProfile.getBranchId();
-        OrganizationUnitSettings branchSettings = null;
-        if ( branchId > 0l ) {
-            LOG.debug( "Fetching branch settings for regionId: " + branchId );
-            branchSettings = organizationUnitSettingsDao.fetchOrganizationUnitSettingsById( branchId,
-                MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION );
-        }
+		long branchId = userProfile.getBranchId();
+		OrganizationUnitSettings branchSettings = null;
+		if (branchId > 0l) {
+			LOG.debug("Fetching branch settings for regionId: " + branchId);
+			branchSettings = organizationUnitSettingsDao.fetchOrganizationUnitSettingsById(branchId,
+					MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION);
+		}
 
-        agentSettings = aggregateAgentProfile( companySettings, regionSettings, branchSettings, agentSettings );
-        LOG.info( "Method getIndividualByProfileName executed successfully" );
-        return agentSettings;
-    }
+		// LockSettings parentLock = lockSettingsTillBranch(companySettings, regionSettings, branchSettings);
+		agentSettings = aggregateAgentProfile(companySettings, regionSettings, branchSettings, agentSettings);
+		agentSettings = aggregateAgentDetails(user, agentSettings, agentSettings.getLockSettings());
+		
+		LOG.info("Method getIndividualByProfileName executed successfully");
+		return agentSettings;
+	}
 
 	@Override
 	@Transactional
@@ -2395,10 +2401,10 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
     }
     
     @Override
-	public OrganizationUnitSettings aggregateAgentDetails(UserSettings userSettings, OrganizationUnitSettings profileSettings,
-			LockSettings parentLockSettings) throws InvalidInputException {
+	public OrganizationUnitSettings aggregateAgentDetails(User user, OrganizationUnitSettings profileSettings, LockSettings parentLockSettings)
+			throws InvalidInputException, NoRecordsFetchedException {
 		LOG.debug("Method aggregateAgentDetails() called from ProfileManagementService");
-		if (userSettings == null || profileSettings == null) {
+		if (profileSettings == null) {
 			throw new InvalidInputException("No aggregated Settings found");
 		}
 
@@ -2406,22 +2412,28 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 		OrganizationUnitSettings entitySettings = null;
 		ContactDetailsSettings contactDetails = null;
 		AgentSettings agentSettings = null;
-        if ( profileSettings instanceof AgentSettings ) {
-        	agentSettings = (AgentSettings) profileSettings;
-        }
-		
-		// checking all assigned branches for address 
-		for (long branchId : userSettings.getBranchSettings().keySet()) {
-			entitySettings = userSettings.getBranchSettings().get(branchId);
-			contactDetails = entitySettings.getContact_details();
-			if (contactDetails != null && contactDetails.getAddress1() != null) {
-				if (!parentLockSettings.getIsLogoLocked() && entitySettings.getLogo() != null && !entitySettings.getLogo().isEmpty()) {
-					logoUrl = entitySettings.getLogo();
+		if (profileSettings instanceof AgentSettings) {
+			agentSettings = (AgentSettings) profileSettings;
+		}
+
+		// checking all assigned branches for address
+		for (UserProfile userProfile : user.getUserProfiles()) {
+			if (userProfile.getProfilesMaster().getProfileId() == CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID
+					&& userProfile.getStatus() == CommonConstants.STATUS_ACTIVE) {
+				// get the branch profile if it is not present in the branch settings
+				if (userProfile.getBranchId() > 0l) {
+					entitySettings = organizationManagementService.getBranchSettingsDefault(userProfile.getBranchId());
+					contactDetails = entitySettings.getContact_details();
+					if (contactDetails != null && contactDetails.getAddress1() != null) {
+						if (!parentLockSettings.getIsLogoLocked() && entitySettings.getLogo() != null && !entitySettings.getLogo().isEmpty()) {
+							logoUrl = entitySettings.getLogo();
+						}
+						break;
+					}
 				}
-				break;
 			}
 		}
-		
+
 		// check logo url in region of branch
 		if (!parentLockSettings.getIsLogoLocked() && entitySettings != null && contactDetails != null) {
 			if (logoUrl == null || logoUrl.isEmpty()) {
@@ -2432,18 +2444,19 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 				}
 			}
 		}
-		
-		// checking all company for address if null 
+
+		// checking all company for address if null
 		if (contactDetails == null) {
-			entitySettings = userSettings.getCompanySettings();
+			entitySettings = organizationManagementService.getCompanySettings(user);
 			contactDetails = entitySettings.getContact_details();
 		}
 		if (!parentLockSettings.getIsLogoLocked() && (logoUrl == null || logoUrl.isEmpty())) {
-			if (userSettings.getCompanySettings().getLogo() != null && !userSettings.getCompanySettings().getLogo().isEmpty()) {
-				logoUrl = userSettings.getCompanySettings().getLogo();
+			OrganizationUnitSettings companySettings = organizationManagementService.getCompanySettings(user);
+			if (companySettings.getLogo() != null && !companySettings.getLogo().isEmpty()) {
+				logoUrl = companySettings.getLogo();
 			}
 		}
-		
+
 		// add the company profile data into agent settings
 		CompanyProfileData companyProfileData = new CompanyProfileData();
 		companyProfileData.setName(contactDetails.getName());
@@ -2455,12 +2468,15 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 		companyProfileData.setCountryCode(contactDetails.getCountryCode());
 		companyProfileData.setZipcode(contactDetails.getZipcode());
 		companyProfileData.setCompanyLogo(logoUrl);
-		
+
 		if (agentSettings != null) {
+			if (!parentLockSettings.getIsLogoLocked() && logoUrl != null && !logoUrl.isEmpty()) {
+				agentSettings.setLogo(logoUrl);
+			}
 			agentSettings.setCompanyProfileData(companyProfileData);
 		}
 
-		LOG.debug("Method aggregateAgentProfile() finished from ProfileManagementService");
+		LOG.debug("Method aggregateAgentDetails() finished from ProfileManagementService");
 		return (agentSettings != null ? agentSettings : profileSettings);
 	}
 }

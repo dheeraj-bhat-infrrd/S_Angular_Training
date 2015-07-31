@@ -215,9 +215,9 @@ public class ProfileManagementController {
 		OrganizationUnitSettings profileSettings = fetchUserProfile(model, user, accountType, userSettings, branchId, regionId, profilesMaster);
 		if (entityType.equals(CommonConstants.AGENT_ID_COLUMN)) {
 			try {
-				profileManagementService.aggregateAgentDetails(userSettings, profileSettings, parentLock);
+				profileManagementService.aggregateAgentDetails(user, profileSettings, parentLock);
 			}
-			catch (InvalidInputException e) {
+			catch (InvalidInputException | NoRecordsFetchedException e) {
 				LOG.error("InvalidInputException while updating profile. Reason :" + e.getMessage(), e);
 				model.addAttribute("message", messageUtils.getDisplayMessage(e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE));
 			}
