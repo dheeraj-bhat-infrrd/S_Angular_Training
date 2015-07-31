@@ -86,6 +86,7 @@
     <Compile Include="EncompassSocialSurverConstant.cs" />
     <Compile Include="EncryptionHelper.cs" />
     <Compile Include="Entity\CompanyCredentials.cs" />
+    <Compile Include="Entity\CRMBatchTrackerEntity.cs" />
     <Compile Include="Entity\LoanEntity.cs" />
     <Compile Include="LoanUtility.cs" />
     <Compile Include="Logger.cs" />
