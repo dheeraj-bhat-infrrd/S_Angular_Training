@@ -17,10 +17,8 @@
 <c:if test="${not empty profileSettings && not empty profileSettings.contact_details}">
 	<c:set value="${profileSettings.contact_details}" var="contactdetail"></c:set>
 </c:if>
-<c:if test="${profilemasterid == 4 }">
-	<c:if test="${empty contactdetail.address1 && not empty profileSettings.companyProfileData}">
-		<c:set value="${profileSettings.companyProfileData}" var="contactdetail"></c:set>
-	</c:if>
+<c:if test="${profilemasterid == 4 && empty contactdetail.address1 && not empty profileSettings.companyProfileData}">
+	<c:set value="${profileSettings.companyProfileData}" var="contactdetail"></c:set>
 </c:if>
 
 <c:if test="${not empty contactdetail.address1}">
