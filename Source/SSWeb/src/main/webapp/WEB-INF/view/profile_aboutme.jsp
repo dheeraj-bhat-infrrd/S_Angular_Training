@@ -8,13 +8,13 @@
 	<c:set value="${profileSettings.lockSettings}" var="lock"></c:set>
 </c:if>
 <c:choose>
-	<c:when test="${columnName == 'companyId'}">
+	<c:when test="${entityType == 'companyId'}">
 		<c:set value="1" var="profilemasterid"></c:set>
 	</c:when>
-	<c:when test="${columnName == 'regionId'}">
+	<c:when test="${entityType == 'regionId'}">
 		<c:set value="2" var="profilemasterid"></c:set>
 	</c:when>
-	<c:when test="${columnName == 'branchId'}">
+	<c:when test="${entityType == 'branchId'}">
 		<c:set value="3" var="profilemasterid"></c:set>
 	</c:when>
 	<c:when test="${entityType == 'agentId'}">
