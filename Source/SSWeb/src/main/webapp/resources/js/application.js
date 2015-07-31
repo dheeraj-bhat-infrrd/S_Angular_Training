@@ -329,7 +329,7 @@ function paintDashboard(profileMasterId, newProfileName, newProfileValue, typeoO
 	});
 	
 	// Loads the image in circle of header.
-	loadDisplayPicture();
+	//loadDisplayPicture();
 	// Loads the master image in dashboard.
 	showDisplayPic();
 }
@@ -559,17 +559,17 @@ function showIncompleteSurvey(columnName, columnValue) {
 				}
 			};
 	
-			$('.dash-lp-rt-img').click(function() {
-				var agentId = $(this).data("agentid");
-				var agentName = $(this).data("agentname");
-				var customerEmail = $(this).data("custemail");
-				var customerName = $(this).data("custname");
-				sendSurveyReminderMail(agentId, agentName, customerEmail, customerName);
-			});
-			
 			startIndexInc += batchSizeInc;
 	}, payload, false);}, payload, false);
 }
+
+$(document).on('click','.dash-lp-rt-img',function() {
+	var agentId = $(this).data("agentid");
+	var agentName = $(this).data("agentname");
+	var customerEmail = $(this).data("custemail");
+	var customerName = $(this).data("custname");
+	sendSurveyReminderMail(agentId, agentName, customerEmail, customerName);
+});
 
 function getReviewsCountAndShowReviews(columnName, columnValue) {
 	var payload = {

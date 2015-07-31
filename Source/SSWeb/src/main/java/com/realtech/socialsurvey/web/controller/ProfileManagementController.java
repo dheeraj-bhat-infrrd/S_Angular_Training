@@ -198,7 +198,7 @@ public class ProfileManagementController {
 		else if (entityType.equals(CommonConstants.AGENT_ID_COLUMN)) {
 			model.addAttribute("columnName", entityType);
 			profilesMaster = CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID;
-			
+
 			for (UserProfile userProfile : user.getUserProfiles()) {
 				if (userProfile.getProfilesMaster().getProfileId() == CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID) {
 					regionId = userProfile.getRegionId();
