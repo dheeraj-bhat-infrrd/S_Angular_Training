@@ -249,6 +249,7 @@ namespace EncompassSocialSurvey.DAL
                 while (dataReader.Read())
                 {
                     crmBatchTracker = new CRMBatchTrackerEntity();
+                    crmBatchTracker.Id = dataReader.GetInt32("ID");
                     crmBatchTracker.CompanyId = companyId;
                     crmBatchTracker.RecentRecordFetchedDate = dataReader.GetDateTime("RECENT_RECORD_FETCHED_DATE");
                     crmBatchTracker.Source = source;
