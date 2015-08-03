@@ -47,6 +47,7 @@
 		</c:when>
 	</c:choose>
 </c:if>
+
 <!DOCTYPE">
 <html>
 <head>
@@ -70,10 +71,10 @@
 	    <c:choose>
 	    	<c:when test="${not empty profName}">
 	    		<c:choose>
-	    			<c:when test="${profileLevel == 'INDIVIDUAL' }">
+	    			<c:when test="${profileLevel == 'INDIVIDUAL'}">
 	    				<title>${profName} ${title} ${companyName} ${location} ${vertical} Professional Reviews | SocialSurvey.me</title>
 			    		<meta name="keywords"
-							content="${profName}, ${title }, ${companyName }, ${location }, ${vertical }, professional, online, reputation, social, survey, reviews, rating">
+							content="${profName}, ${title}, ${companyName}, ${location}, ${vertical}, professional, online, reputation, social, survey, reviews, rating">
 						<meta name="description"
 							content="Reviews for ${profName}. ${firstName} has ${reviewsCount} reviews. ${firstName} is a ${vertical} professional in ${location}. ${firstName} is the ${title} of ${companyName}.">
 	    			</c:when>
@@ -109,7 +110,7 @@
 		<span id="agent-desc" itemprop="title"></span>
 		<div itemprop="aggregateRating" itemscope
 			itemtype="http://schema.org/AggregateRating">
-			Rated <span id="prof-schema-agent-rating" itemprop="ratingValue">${floatingAverageGoogleRating }</span>/5
+			Rated <span id="prof-schema-agent-rating" itemprop="ratingValue">${floatingAverageGoogleRating}</span>/5
 			based on <span id="prof-schema-reviews" itemprop="reviewCount">${reviewsCount}</span>
 			reviews
 		</div>
@@ -193,9 +194,7 @@
 
 <div class="bread-crum-hdr">
 	<div class="container">
-		<div id="bread-crum-cont" class="row bread-crum-row">
-			
-		</div>
+		<div id="bread-crum-cont" class="row bread-crum-row"></div>
 	</div>
 </div>
 
@@ -221,18 +220,18 @@
                 			<div class="prof-addline2">${profile.contact_details.title}</div>
                 		</c:if>
                 		<div class="prof-addline1">
-                			<c:if test="${ not empty profile.contact_details && not empty profile.contact_details.location }">
+                			<c:if test="${not empty profile.contact_details && not empty profile.contact_details.location}">
                 				${profile.contact_details.location}
                 				<c:set var="isLocationTrue" value="yes"></c:set>
                 			</c:if>
 	                		<c:choose>
-	                			<c:when test="${ not empty profile.contact_details && not empty profile.contact_details.industry }">
-	                				<c:if test="${isLocationTrue == 'yes' }"> | </c:if>
+	                			<c:when test="${not empty profile.contact_details && not empty profile.contact_details.industry}">
+	                				<c:if test="${isLocationTrue == 'yes'}"> | </c:if>
 	                				${profile.contact_details.industry}
 	                			</c:when>
 	                			<c:otherwise>
 		                			<c:if test="${not empty profile.vertical}">
-		                				<c:if test="${isLocationTrue == 'yes' }"> | </c:if>
+		                				<c:if test="${isLocationTrue == 'yes'}"> | </c:if>
 			                			${profile.vertical}
 			                		</c:if>
 	                			</c:otherwise>

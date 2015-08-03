@@ -6172,10 +6172,12 @@ $(document).on('blur', '#prof-basic-container input', function() {
 		var profName = $('#prof-name').val().trim();
 		var profTitle = $('#prof-title').val().trim();
 		var profVertical = $('#prof-vertical').val().trim();
+		var profLocation = $('#prof-location').val().trim();
 		var payload = {
 			"profName" : profName,
 			"profTitle" : profTitle,
-			"profVertical" : profVertical
+			"profVertical" : profVertical,
+			"profLocation" : profLocation
 		};
 		callAjaxPostWithPayloadData("./updatebasicprofile.do", callBackUpdateBasicDetails, payload);
 	}, 0);
