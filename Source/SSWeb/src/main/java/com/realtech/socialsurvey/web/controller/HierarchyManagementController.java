@@ -56,6 +56,7 @@ import com.realtech.socialsurvey.web.common.JspResolver;
  * Controller to manage hierarchy
  */
 @Controller
+@SuppressWarnings("unchecked")
 public class HierarchyManagementController {
 
 	private static final Logger LOG = LoggerFactory.getLogger(HierarchyManagementController.class);
@@ -1518,9 +1519,9 @@ public class HierarchyManagementController {
 	@RequestMapping(value = "/fetchhierarchyviewlist", method = RequestMethod.GET)
 	public String fetchHierarchyViewList(Model model, HttpServletRequest request) {
 		LOG.info("Method fetchHierarchyViewList called");
-		User user = sessionHelper.getCurrentUser();
 		HttpSession session = request.getSession(false);
-		int highestRole = (int) session.getAttribute(CommonConstants.HIGHEST_ROLE_ID_IN_SESSION);
+		User admin = sessionHelper.getCurrentUser();
+		
 		Set<Long> regionIds = null;
 		Set<Long> branchIds = null;
 		List<RegionFromSearch> regions = null;
@@ -1528,12 +1529,8 @@ public class HierarchyManagementController {
 		List<UserFromSearch> users = null;
 		String jspToReturn = null;
 		int start = 0;
-		int rows = -1;
 		try {
-			User admin = sessionHelper.getCurrentUser();
-			/**
-			 * fetching admin details
-			 */
+			// fetching admin details
 			UserFromSearch adminUser = null;
 			try {
 				String adminUserDoc = JSONUtil.toJSON(solrSearchService.getUserByUniqueId(admin.getUserId()));
@@ -1545,40 +1542,37 @@ public class HierarchyManagementController {
 				throw new NonFatalException("SolrException while searching for user id.", DisplayMessageConstants.GENERAL_ERROR, e);
 			}
 
+			int highestRole = (int) session.getAttribute(CommonConstants.HIGHEST_ROLE_ID_IN_SESSION);
 			if (highestRole == CommonConstants.PROFILES_MASTER_COMPANY_ADMIN_PROFILE_ID) {
 				LOG.debug("fetching regions under company from solr");
-				int regionCount = (int) solrSearchService.getRegionsCount("*", user.getCompany(), null);
-				String regionsJson = solrSearchService.searchRegions("*", user.getCompany(), null, start, regionCount);
+				int regionCount = (int) solrSearchService.getRegionsCount("*", admin.getCompany(), null);
+				String regionsJson = solrSearchService.searchRegions("*", admin.getCompany(), null, start, regionCount);
 				Type searchedRegionsList = new TypeToken<List<RegionFromSearch>>() {}.getType();
 				regions = new Gson().fromJson(regionsJson, searchedRegionsList);
 
 				LOG.debug("fetching branches under company from solr");
-				branches = organizationManagementService.getBranchesUnderCompanyFromSolr(user.getCompany(), start);
+				branches = organizationManagementService.getBranchesUnderCompanyFromSolr(admin.getCompany(), start);
 
 				LOG.debug("fetching users under company from solr");
-				users = organizationManagementService.getUsersUnderCompanyFromSolr(user.getCompany(), start);
+				users = organizationManagementService.getUsersUnderCompanyFromSolr(admin.getCompany(), start);
 
 				users = userManagementService.checkUserCanEdit(admin, adminUser, users);
 				jspToReturn = JspResolver.VIEW_HIERARCHY_REGION_LIST;
 			}
 			else if (highestRole == CommonConstants.PROFILES_MASTER_REGION_ADMIN_PROFILE_ID) {
 				LOG.debug("Getting list of regions for the region admin");
-				regionIds = organizationManagementService.getRegionIdsForUser(user, highestRole);
-				String regionsJson = solrSearchService.searchRegions("*", user.getCompany(), regionIds, start, regionIds.size());
+				regionIds = organizationManagementService.getRegionIdsForUser(admin, highestRole);
+				String regionsJson = solrSearchService.searchRegions("*", admin.getCompany(), regionIds, start, regionIds.size());
 				Type searchedRegionsList = new TypeToken<List<RegionFromSearch>>() {}.getType();
 				regions = new Gson().fromJson(regionsJson, searchedRegionsList);
 
-				LOG.debug("fetching users under region from solr");
-				users = organizationManagementService.getUsersUnderRegionFromSolr(regionIds, start, rows);
-
-				users = userManagementService.checkUserCanEdit(admin, adminUser, users);
 				jspToReturn = JspResolver.VIEW_HIERARCHY_REGION_LIST;
 			}
 			else if (highestRole == CommonConstants.PROFILES_MASTER_BRANCH_ADMIN_PROFILE_ID) {
 				LOG.debug("Getting list of branches for the branch admin");
-				branchIds = organizationManagementService.getBranchIdsForUser(user, highestRole);
+				branchIds = organizationManagementService.getBranchIdsForUser(admin, highestRole);
 
-				String branchesJson = solrSearchService.searchBranches("*", user.getCompany(), CommonConstants.BRANCH_ID_SOLR, branchIds, start,
+				String branchesJson = solrSearchService.searchBranches("*", admin.getCompany(), CommonConstants.BRANCH_ID_SOLR, branchIds, start,
 						branchIds.size());
 				Type searchedBranchesList = new TypeToken<List<BranchFromSearch>>() {}.getType();
 				branches = new Gson().fromJson(branchesJson, searchedBranchesList);
@@ -1588,6 +1582,7 @@ public class HierarchyManagementController {
 			else {
 				throw new InvalidInputException("not aurhorised to view hierarchy", DisplayMessageConstants.HIERARCHY_EDIT_NOT_AUTHORIZED);
 			}
+			
 			model.addAttribute("regions", regions);
 			model.addAttribute("branches", branches);
 			model.addAttribute("individuals", users);
@@ -1597,10 +1592,10 @@ public class HierarchyManagementController {
 			model.addAttribute("message", messageUtils.getDisplayMessage(e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE));
 			jspToReturn = JspResolver.MESSAGE_HEADER;
 		}
+		
 		LOG.info("Method fetchHierarchyViewList executed successfully. JspToReturn: " + jspToReturn);
 		return jspToReturn;
 	}
-
 	// JIRA SS-137 BY RM-05 : EOC
 
 	/**
