@@ -31,7 +31,7 @@ function convertUserDateToLocalWeekFormt(date){
 }
 
 function  convertTimeStampToLocalTimeStamp(generalTimestamp){
-	var convertedTimestamp= generalTimestamp.getTime() + offset;
+	var convertedTimestamp= generalTimestamp.getTime() - offset;
 	var date3=new Date(convertedTimestamp);	
 	var month=((date3.getMonth() + 1)<10)? "0"+(date3.getMonth() + 1) : (date3.getMonth() + 1);
 	var day=(date3.getDate()<10) ? "0"+(date3.getDate()) : (date3.getDate());
