@@ -207,13 +207,22 @@ public class ProfileManagementController {
 			}
 		}
 
-		// Setting userSettings in session
-		OrganizationUnitSettings profileSettings = fetchUserProfile(model, user, accountType, userSettings, branchId, regionId, profilesMaster);
-		session.setAttribute(CommonConstants.USER_PROFILE_SETTINGS, profileSettings);
-
 		// Setting parentLock in session
 		LockSettings parentLock = fetchParentLockSettings(model, user, accountType, userSettings, branchId, regionId, profilesMaster);
 		session.setAttribute(CommonConstants.PARENT_LOCK, parentLock);
+
+		// Setting userSettings in session
+		OrganizationUnitSettings profileSettings = fetchUserProfile(model, user, accountType, userSettings, branchId, regionId, profilesMaster);
+		if (entityType.equals(CommonConstants.AGENT_ID_COLUMN)) {
+			try {
+				profileManagementService.aggregateAgentDetails(user, profileSettings, parentLock);
+			}
+			catch (InvalidInputException | NoRecordsFetchedException e) {
+				LOG.error("InvalidInputException while updating profile. Reason :" + e.getMessage(), e);
+				model.addAttribute("message", messageUtils.getDisplayMessage(e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE));
+			}
+		}
+		session.setAttribute(CommonConstants.USER_PROFILE_SETTINGS, profileSettings);
 
 		LOG.info("Method showProfileEditPage() finished from ProfileManagementService");
 		return JspResolver.PROFILE_EDIT;
