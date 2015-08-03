@@ -2191,12 +2191,22 @@ function validateOfficeForm() {
 	isOfficeValid = true;
 	var isFocussed = false;
 	
+	if(!validateOfficeName('office-name-txt')){
+		isOfficeValid = false;
+		if(!isFocussed){
+			$('#office-name-txt').focus();
+			isFocussed=true;
+		}
+		return isOfficeValid;
+	}
+	
 	if(!validateRegionSelector('selected-region-txt', 'selected-region-id-hidden')) {
 		isOfficeValid = false;
 		if(!isFocussed){
 			$('#selected-region-txt').focus();
 			isFocussed=true;
 		}
+		return isOfficeValid;
 	}
 	if(!validateAddress1('office-address-txt')){
 		isOfficeValid = false;
@@ -2204,6 +2214,7 @@ function validateOfficeForm() {
 			$('#office-address-txt').focus();
 			isFocussed=true;
 		}
+		return isOfficeValid;
 	}
 	
 	var userSelectionType = $('#user-selection-info').data('user-selection-type');
@@ -2220,13 +2231,6 @@ function validateOfficeForm() {
 				isFocussed=true;
 			}
 				
-	}
-	if(!validateOfficeName('office-name-txt')){
-		isOfficeValid = false;
-		if(!isFocussed){
-			$('#office-name-txt').focus();
-			isFocussed=true;
-		}
 	}
 	
 	if(isOfficeValid){
