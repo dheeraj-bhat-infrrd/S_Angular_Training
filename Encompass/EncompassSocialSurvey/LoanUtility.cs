@@ -176,7 +176,7 @@ namespace EncompassSocialSurvey
             Logger.Debug("Updating crm batch tracker");
             if (returnLoansViewModel.Count > 0) {
                 insertOrUpdateCrmBatchTracker(crmBatchTracker, runningCompanyId, EncompassSocialSurverConstant.SURVEY_SOURCE);
-            }
+             }
             
             Logger.Info("Exiting the method LoanUtility.LopopulateLoanList()");
             return returnLoansViewModel;
