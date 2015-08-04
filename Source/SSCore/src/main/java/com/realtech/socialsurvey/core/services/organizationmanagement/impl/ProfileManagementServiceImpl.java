@@ -639,6 +639,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 
     // vertical
     @Override
+    @Transactional
     public void updateVertical( String collection, OrganizationUnitSettings companySettings, String vertical )
         throws InvalidInputException
     {
@@ -646,6 +647,26 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
             throw new InvalidInputException( "vertical passed can not be null or empty" );
         }
         LOG.info( "Updating vertical" );
+        if(collection.equals(MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION)) {
+        	
+        	List<VerticalsMaster> verticalsMasters = organizationManagementService.getAllVerticalsMaster();
+        	VerticalsMaster verticalsMaster = null;
+
+        	for(VerticalsMaster vm : verticalsMasters) {
+				if(vertical.equals(vm.getVerticalName())){
+					verticalsMaster= vm;
+					break;
+				}
+			}
+			
+			if(verticalsMaster == null) {
+				throw new InvalidInputException("Invalid vertial name passed");
+			}
+			
+        	Company company = companyDao.findById(Company.class, companySettings.getIden());
+        	company.setVerticalsMaster(verticalsMaster);
+        	companyDao.update(company);
+        }
         organizationUnitSettingsDao.updateParticularKeyOrganizationUnitSettings(
             MongoOrganizationUnitSettingDaoImpl.KEY_VERTICAL, vertical, companySettings, collection );
         LOG.info( "vertical updated successfully" );
@@ -1048,8 +1069,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 			throw new ProfileNotFoundException("agentProfileName is null or empty while getting agent settings");
 		}
 
-		agentSettings = organizationUnitSettingsDao.fetchOrganizationUnitSettingsByProfileName(agentProfileName,
-				MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION);
+		agentSettings = organizationUnitSettingsDao.fetchOrganizationUnitSettingsByProfileName(agentProfileName, MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION);
 		if (agentSettings == null) {
 			throw new ProfileNotFoundException("No settings found for agent while fetching agent profile");
 		}
