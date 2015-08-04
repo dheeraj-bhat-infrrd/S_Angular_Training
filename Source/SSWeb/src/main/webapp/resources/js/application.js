@@ -2035,6 +2035,25 @@ function validateRegionForm() {
 	isRegionValid = true;
 	var isFocussed = false;
 	
+	
+	if(!validateRegionName('region-name-txt')){
+		isRegionValid = false;
+		if(!isFocussed){
+			$('#region-name-txt').focus();
+			isFocussed=true;
+		}
+		return isRegionValid;
+	}
+	
+	if(!validateAddress1('region-address1-txt')){
+		isOfficeValid = false;
+		if(!isFocussed){
+			$('#office-address-txt').focus();
+			isFocussed=true;
+		}
+		return isRegionValid;
+	}
+	
 	var userSelectionType = $('#user-selection-info').data('user-selection-type');
 	if(userSelectionType =="single"){
 	
@@ -2053,13 +2072,7 @@ function validateRegionForm() {
 		
 		
 	}
-	if(!validateRegionName('region-name-txt')){
-		isRegionValid = false;
-		if(!isFocussed){
-			$('#region-name-txt').focus();
-			isFocussed=true;
-		}
-	}
+	
 	
 	if(isRegionValid){
 		hideError();
@@ -6175,14 +6188,17 @@ $(document).on('blur', '#prof-basic-container input', function() {
 	delay(function() {
 		var profName = $('#prof-name').val().trim();
 		var profTitle = $('#prof-title').val().trim();
-		var profVertical = $('#prof-vertical').val().trim();
-		var profLocation = $('#prof-location').val().trim();
 		var payload = {
 			"profName" : profName,
-			"profTitle" : profTitle,
-			"profVertical" : profVertical,
-			"profLocation" : profLocation
+			"profTitle" : profTitle
 		};
+		if($('#prof-vertical').val()){
+			payload["profVertical"] = $('#prof-vertical').val().trim();
+		}
+		if($('#prof-location').val()){
+			payload["profLocation"] = $('#prof-location').val().trim();
+		}
+		
 		callAjaxPostWithPayloadData("./updatebasicprofile.do", callBackUpdateBasicDetails, payload);
 	}, 0);
 });
