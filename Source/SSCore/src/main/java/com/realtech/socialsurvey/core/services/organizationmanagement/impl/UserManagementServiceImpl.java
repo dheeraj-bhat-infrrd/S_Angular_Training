@@ -1932,7 +1932,6 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 		if (admin.getIsOwner() == CommonConstants.IS_OWNER) {
 			for (UserFromSearch user : users) {
 				user.setCanEdit(true);
-
 			}
 		}
 		
@@ -1944,7 +1943,6 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 				boolean hasCommon = Collections.disjoint(adminFromSearch.getRegions(), user.getRegions());
 				if (user.getIsOwner() != 1) {
 					user.setCanEdit(!hasCommon);
-
 				}
 			}
 		}
@@ -1957,7 +1955,6 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 				boolean hasCommon = Collections.disjoint(adminFromSearch.getBranches(), user.getBranches());
 				if (user.getIsOwner() != 1) {
 					user.setCanEdit(!hasCommon);
-
 				}
 			}
 		}
