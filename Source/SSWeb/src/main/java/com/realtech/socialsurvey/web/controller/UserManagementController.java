@@ -1317,7 +1317,8 @@ public class UserManagementController
 			List<UserAssignment> userAssignments = new ArrayList<UserAssignment>();
 			for (UserProfile userProfile : user.getUserProfiles()) {
 				// Check if profile is complete
-				if (userProfile.getIsProfileComplete() != CommonConstants.PROCESS_COMPLETE) {
+				if (userProfile.getIsProfileComplete() != CommonConstants.PROCESS_COMPLETE
+						|| userProfile.getStatus() != CommonConstants.STATUS_ACTIVE) {
 					continue;
 				}
 				UserAssignment assignment = new UserAssignment();
