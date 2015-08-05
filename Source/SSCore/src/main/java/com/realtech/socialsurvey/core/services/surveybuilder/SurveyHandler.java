@@ -92,6 +92,8 @@ public interface SurveyHandler {
 	public SurveyPreInitiation getPreInitiatedSurvey(long agentId, String customerEmail, String custFirstName, String custLastName)
 			throws NoRecordsFetchedException;
 
+	public SurveyPreInitiation getPreInitiatedSurvey(long surveyPreInitiationId) throws NoRecordsFetchedException;
+	
 	public void deleteSurveyPreInitiationDetailsPermanently(SurveyPreInitiation surveyPreInitiation);
 
 	public String composeLink(long userId, String custEmail, String custFirstName, String custaLastName) throws InvalidInputException;
