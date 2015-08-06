@@ -104,7 +104,7 @@
     </c:if>
 </head>
 <body>
-	<div class="hide" itemscope itemtype="http://schema.org/Product">
+	<%-- <div class="hide" itemscope itemtype="http://schema.org/Product">
 		<span itemprop="name">${profName}</span> 
 		<span id="agent-desc" itemprop="title"></span>
 		<div itemprop="aggregateRating" itemscope
@@ -113,7 +113,7 @@
 			based on <span id="prof-schema-reviews" itemprop="reviewCount">${reviewsCount}</span>
 			reviews
 		</div>
-	</div>
+	</div> --%>
 	<div id="contact-us-pu-wrapper" class="bd-srv-pu hide">
         <div class="container cntct-us-container">
             <div class="contact-us-pu">
@@ -189,8 +189,8 @@
 				<c:set var="profileNameClass" value="profile-name-img-wrapper"></c:set>
 			</c:if>
             <div class="col-lg-4 col-md-4 col-sm-4 col-xs-6 prof-wrapper pos-relative prof-name-wrapper ${profileNameClass}">
-                <div class="prof-name-container" id="prof-company-head-content">
-                	<div class="prof-name">${profName}</div>
+                <div itemscope itemtype="http://schema.org/Product" class="prof-name-container">
+                	<div itemprop="name" class="prof-name">${profName}</div>
                 	<div class="prof-address">
                 		<c:if test="${not empty profile.vertical}">
                 			<div class="prof-addline1">${profile.vertical}</div>
@@ -199,12 +199,12 @@
                 			<div class="prof-addline2">${profile.contact_details.title}</div>
                 		</c:if>
                 	</div>
-					<div class="prof-rating clearfix">
+					<div itemprop="aggregateRating" itemscope itemtype="http://schema.org/AggregateRating" class="prof-rating clearfix">
 						<div class="prof-rating-wrapper maring-0 clearfix float-left" id="rating-avg-comp">
 							<div class='rating-image float-left smiley-rat-${integerAverageRating }'></div>
-							<div class='rating-rounded float-left'>${floatingAverageRating} - </div>
+							<div class='rating-rounded float-left'><span itemprop="ratingValue">${floatingAverageRating}</span>  - </div>
 						</div>
-						<div class="float-left review-count-left cursor-pointer" id="prof-company-review-count">${reviewsCount } Reviews(s)</div>
+						<div class="float-left review-count-left cursor-pointer" id="prof-company-review-count"><span itemprop="ratingCount">${reviewsCount }</span> Reviews(s)</div>
 					</div>
 					<div class="prof-btn-wrapper clearfix">
 						<div class="prof-btn-contact float-left" onclick="focusOnContact()" >Contact
