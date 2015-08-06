@@ -4916,6 +4916,7 @@ function paintSurveyPageFromJson() {
 		$("div[data-ques-type='smiley-text-final']").show();
 		$("#ques-text-textarea").html(question);
 		$("#text-area").show();
+		$("#text-area").val('');
 		$('#text-box-disclaimer').show();
 		$("#smiles-final").hide();
 		if(questionDetails.customerResponse!=undefined)
