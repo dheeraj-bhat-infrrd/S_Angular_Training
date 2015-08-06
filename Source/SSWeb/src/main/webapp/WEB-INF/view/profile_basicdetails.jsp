@@ -2,6 +2,7 @@
 <%@ taglib uri="http://www.springframework.org/tags" prefix="spring"%>
 
 <c:set value="${sessionScope.SPRING_SECURITY_CONTEXT.authentication.principal}" var="user" />
+<c:set value="${user.company.licenseDetails[0].accountsMaster.accountsMasterId}" var="accountMasterId"/>
 <c:if test="${not empty profileSettings && not empty profileSettings.contact_details}">
 	<c:set value="${profileSettings.contact_details}" var="contactdetail"></c:set>
 	<c:set value="${profileSettings.vertical}" var="companyvertical"></c:set>
@@ -48,7 +49,7 @@
 		<div id="prof-title-lock" data-state="unlocked" data-control="user" class="hide float-left"></div>
 		<div class="prof-edit-field-icn hide"></div>
 	</div>
-	<c:if test="${profilemasterid == 1}">
+	<c:if test="${profilemasterid == 1 || accountMasterId == 1}">
 		<div class="prof-edditable-cont">
 			<input id="prof-vertical" class="prof-addline2 prof-edditable" value="${verticalVal}"
 				placeholder='<spring:message code="label.profilevertical.placeholder.key"/>'>

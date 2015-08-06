@@ -597,7 +597,9 @@ public class ProfileManagementController {
 			String vertical = request.getParameter("profVertical");
 			String location = request.getParameter("profLocation");
 
-			if (entityType.equals(CommonConstants.COMPANY_ID_COLUMN)) {
+			AccountType accountType = (AccountType) session.getAttribute(CommonConstants.ACCOUNT_TYPE_IN_SESSION);
+	        
+			if (entityType.equals(CommonConstants.COMPANY_ID_COLUMN)|| accountType.getValue() == CommonConstants.ACCOUNTS_MASTER_INDIVIDUAL) {
 				OrganizationUnitSettings companySettings = organizationManagementService.getCompanySettings(user);
 				if (companySettings == null) {
 					throw new InvalidInputException("No company settings found in current session");
@@ -611,12 +613,13 @@ public class ProfileManagementController {
 
 				// update company name
 				profileManagementService.updateCompanyName(user.getUserId(), companySettings.getIden(), name);
-				assignments.getCompanies().put(entityId, name);
+				if (accountType.getValue() != CommonConstants.ACCOUNTS_MASTER_INDIVIDUAL) {
+					assignments.getCompanies().put(entityId, name);
+				}
 
+				companySettings.setVertical(vertical);
 				profileManagementService.updateVertical(MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION, companySettings, vertical);
 				
-				companySettings.setVertical(vertical);
-				profileSettings = companySettings;
 				userSettings.setCompanySettings(companySettings);
 			}
 			else if (entityType.equals(CommonConstants.REGION_ID_COLUMN)) {
@@ -637,7 +640,6 @@ public class ProfileManagementController {
 				regionSettings.setVertical(vertical);
 				profileManagementService.updateVertical(MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION, regionSettings, vertical);
 
-				profileSettings = regionSettings;
 				userSettings.getRegionSettings().put(entityId, regionSettings);
 			}
 			else if (entityType.equals(CommonConstants.BRANCH_ID_COLUMN)) {
@@ -657,7 +659,7 @@ public class ProfileManagementController {
 
 				branchSettings.setVertical(vertical);
 				profileManagementService.updateVertical(MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION, branchSettings, vertical);
-				profileSettings = branchSettings;
+
 				userSettings.getRegionSettings().put(entityId, branchSettings);
 			}
 			else if (entityType.equals(CommonConstants.AGENT_ID_COLUMN)) {
@@ -678,7 +680,7 @@ public class ProfileManagementController {
 
 				/*agentSettings.setVertical(vertical);
 				profileManagementService.updateVertical(MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION, agentSettings, vertical);*/
-				profileSettings = agentSettings;
+
 				userSettings.setAgentSettings(agentSettings);
 
 				// Modify Agent details in Solr
@@ -700,7 +702,9 @@ public class ProfileManagementController {
 				throw new InvalidInputException("Invalid input exception occurred in upadting Basic details.", DisplayMessageConstants.GENERAL_ERROR);
 			}
 
-			//profileSettings.setVertical(vertical);
+			if (vertical != null && !vertical.isEmpty()) {
+				profileSettings.setVertical(vertical);
+			}
 			profileSettings.setContact_details(contactDetailsSettings);
 
 			LOG.info("Basic Detail updated successfully");
