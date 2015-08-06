@@ -97,17 +97,17 @@ public class AdminController
     public @ResponseBody String purgeCompanyInformation( @RequestParam long companyId )
     {
         Company company = companyDao.findById( Company.class, companyId );
-        String message = "Company Removed Successfully";
+        String message = CommonConstants.SUCCESS_ATTRIBUTE;
         if ( company != null ) {
             if ( company.getStatus() == CommonConstants.STATUS_INACTIVE ) {
                 try {
                     organizationManagementService.purgeCompany( company );
                 } catch ( InvalidInputException e ) {
                     LOG.error( "Exception Caught " + e.getMessage() );
-                    message = "Unable to remove company";
+                    message = CommonConstants.ERROR;
                 } catch ( SolrException e ) {
                     LOG.error( "Exception Caught " + e.getMessage() );
-                    message = "Unable to remove company";
+                    message = CommonConstants.ERROR;
                 }
             }
         }
