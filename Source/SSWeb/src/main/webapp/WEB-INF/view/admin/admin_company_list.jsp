@@ -30,7 +30,7 @@
 			<div class="v-tbl-btns">
 				<div class="clearfix v-tbl-icn-wraper">
 					<div
-						class="float-right v-tbl-icn v-icn-close comp-del-icn"
+						class="float-left v-tbl-icn v-icn-close comp-del-icn vis-hidden"
 						data-iden="${companyItem.iden}"></div>
 					<div
 						class="float-right v-tbl-icn v-icn-edit comp-edit-icn vis-hidden"
@@ -42,12 +42,3 @@
 		<div data-iden="${companyItem.iden}" class="hide comp-hr-cont"></div>
 	</c:forEach>
 </c:if>
-<script>
-	$('.comp-del-icn').on('click',function(e) {
-		var id = $(this).attr('data-iden');
-		callAjaxGETWithTextData("/purgeCompany.do?companyId="+ id , function(data){
-			$('#overlay-toast').html(data);
-			showToast();
-		}, true, {});
-	});
-</script>
