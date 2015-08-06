@@ -597,7 +597,9 @@ public class ProfileManagementController {
 			String vertical = request.getParameter("profVertical");
 			String location = request.getParameter("profLocation");
 
-			if (entityType.equals(CommonConstants.COMPANY_ID_COLUMN)) {
+			AccountType accountType = (AccountType) session.getAttribute(CommonConstants.ACCOUNT_TYPE_IN_SESSION);
+	        
+			if (entityType.equals(CommonConstants.COMPANY_ID_COLUMN)|| accountType.getValue() == CommonConstants.ACCOUNTS_MASTER_INDIVIDUAL) {
 				OrganizationUnitSettings companySettings = organizationManagementService.getCompanySettings(user);
 				if (companySettings == null) {
 					throw new InvalidInputException("No company settings found in current session");
@@ -611,7 +613,9 @@ public class ProfileManagementController {
 
 				// update company name
 				profileManagementService.updateCompanyName(user.getUserId(), companySettings.getIden(), name);
-				assignments.getCompanies().put(entityId, name);
+				if (accountType.getValue() != CommonConstants.ACCOUNTS_MASTER_INDIVIDUAL) {
+					assignments.getCompanies().put(entityId, name);
+				}
 
 				companySettings.setVertical(vertical);
 				profileManagementService.updateVertical(MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION, companySettings, vertical);
