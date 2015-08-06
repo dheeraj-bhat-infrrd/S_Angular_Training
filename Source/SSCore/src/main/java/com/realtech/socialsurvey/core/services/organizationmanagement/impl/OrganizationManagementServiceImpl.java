@@ -19,7 +19,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
+
 import javax.annotation.Resource;
+
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellStyle;
 import org.apache.poi.ss.usermodel.Row;
@@ -35,6 +37,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.DependsOn;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
+
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
@@ -63,6 +66,7 @@ import com.realtech.socialsurvey.core.entities.ContactDetailsSettings;
 import com.realtech.socialsurvey.core.entities.ContactNumberSettings;
 import com.realtech.socialsurvey.core.entities.DisabledAccount;
 import com.realtech.socialsurvey.core.entities.EncompassCrmInfo;
+import com.realtech.socialsurvey.core.entities.FileUpload;
 import com.realtech.socialsurvey.core.entities.LicenseDetail;
 import com.realtech.socialsurvey.core.entities.LockSettings;
 import com.realtech.socialsurvey.core.entities.MailContent;
@@ -119,6 +123,9 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 
     @Autowired
     private UserDao userDao;
+
+    @Autowired
+    private GenericDao<FileUpload, Long> fileUploadDao;
 
     @Autowired
     private GenericDao<LicenseDetail, Long> licenceDetailDao;
@@ -3978,24 +3985,44 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
                 throw new InvalidInputException( "Null value passed for company in purgeCompany()." );
             }
 
-            List<Long> agentIds = solrSearchService.searchUserIdsByCompany( company.getCompanyId() );
-            organizationUnitSettingsDao.removeOganizationUnitSettings( agentIds, CommonConstants.AGENT_SETTINGS_COLLECTION );
-            solrSearchService.removeUsersFromSolr( agentIds );
+            List<Long> agentIds = null;
+            
+            do{
+                agentIds =  solrSearchService.searchUserIdsByCompany( company.getCompanyId() );
+                if(agentIds == null || agentIds.isEmpty()){
+                    break;
+                }
+                organizationUnitSettingsDao.removeOganizationUnitSettings( agentIds, CommonConstants.AGENT_SETTINGS_COLLECTION );
+                solrSearchService.removeUsersFromSolr( agentIds );
+            }while(true);
             // Deleting all the users of company from MySQL
             userProfileDao.deleteUserProfilesByCompany( company.getCompanyId() );
             // Delete foreign key references from Removed users.
             removedUserDao.deleteRemovedUsersByCompany( company.getCompanyId() );
             userDao.deleteUsersByCompanyId( company.getCompanyId() );
+            
 
-            List<Long> branchIds = solrSearchService.searchBranchIdsByCompany( company.getCompanyId() );
-            organizationUnitSettingsDao.removeOganizationUnitSettings( branchIds, CommonConstants.BRANCH_SETTINGS_COLLECTION );
-            solrSearchService.removeBranchesFromSolr( branchIds );
+            List<Long> branchIds = null;
+            do{
+                branchIds = solrSearchService.searchBranchIdsByCompany( company.getCompanyId() );
+                if(branchIds == null || branchIds.isEmpty()){
+                    break;
+                }
+                organizationUnitSettingsDao.removeOganizationUnitSettings( branchIds, CommonConstants.BRANCH_SETTINGS_COLLECTION );
+                solrSearchService.removeBranchesFromSolr( branchIds );
+            }while(true);
             // Deleting all the branches of company from MySQL
             branchDao.deleteBranchesByCompanyId( company.getCompanyId() );
-
-            List<Long> regionIds = solrSearchService.searchRegionIdsByCompany( company.getCompanyId() );
-            organizationUnitSettingsDao.removeOganizationUnitSettings( regionIds, CommonConstants.REGION_SETTINGS_COLLECTION );
-            solrSearchService.removeRegionsFromSolr( regionIds );
+            List<Long> regionIds = null;
+            do{
+                regionIds = solrSearchService.searchRegionIdsByCompany( company.getCompanyId() );
+                if(regionIds == null || regionIds.isEmpty()){
+                    break;
+                }
+                organizationUnitSettingsDao.removeOganizationUnitSettings( regionIds, CommonConstants.REGION_SETTINGS_COLLECTION );
+                solrSearchService.removeRegionsFromSolr( regionIds );
+            }while(true);
+           
             // Deleting all the regions of company from MySQL
             regionDao.deleteRegionsByCompanyId( company.getCompanyId() );
 
@@ -4033,17 +4060,20 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
             .findByColumn( LicenseDetail.class, "company.companyId", companyId );
         // Delete from PaymentRetry table
         List<String> conditions = new ArrayList<>();
-        StringBuilder licenseIds = new StringBuilder( "(" );
-        for ( LicenseDetail license : licenseDetails ) {
-            licenseIds.append( license.getLicenseId() ).append( "," );
+        if ( licenseDetails != null && !licenseDetails.isEmpty() ) {
+            StringBuilder licenseIds = new StringBuilder( "(" );
+            for ( LicenseDetail license : licenseDetails ) {
+                licenseIds.append( license.getLicenseId() ).append( "," );
+            }
+            int commaIndex = licenseIds.lastIndexOf( "," );
+            if ( commaIndex != -1 ) {
+                licenseIds = new StringBuilder( licenseIds.substring( 0, commaIndex ) );
+                licenseIds.append( ")" );
+            }
+
+            conditions.add( "licenseDetail.licenseId in " + licenseIds );
+            retriedTransactionDao.deleteByCondition( "RetriedTransaction", conditions );
         }
-        int commaIndex = licenseIds.lastIndexOf( "," );
-        if ( commaIndex != -1 ) {
-            licenseIds = new StringBuilder( licenseIds.substring( 0, commaIndex ) );
-            licenseIds.append( ")" );
-        }
-        conditions.add( "licenseDetail.licenseId in " + licenseIds );
-        retriedTransactionDao.deleteByCondition( "RetriedTransaction", conditions );
         conditions.clear();
 
         conditions.add( "company.companyId = " + companyId );
@@ -4057,6 +4087,9 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
         usercountModificationNotificationDao.deleteByCondition( "UsercountModificationNotification", conditions );
 
         surveyCompanyMappingDao.deleteByCondition( "SurveyCompanyMapping", conditions );
+
+        fileUploadDao.deleteByCondition( "FileUpload", conditions );
+
     }
 
 
