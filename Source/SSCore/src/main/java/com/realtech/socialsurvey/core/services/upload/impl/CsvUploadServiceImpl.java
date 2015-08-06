@@ -32,18 +32,23 @@ import org.springframework.transaction.annotation.Transactional;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.dao.BranchDao;
 import com.realtech.socialsurvey.core.dao.GenericDao;
+import com.realtech.socialsurvey.core.dao.OrganizationUnitSettingsDao;
 import com.realtech.socialsurvey.core.dao.UserDao;
 import com.realtech.socialsurvey.core.dao.impl.MongoOrganizationUnitSettingDaoImpl;
 import com.realtech.socialsurvey.core.entities.AgentSettings;
 import com.realtech.socialsurvey.core.entities.Branch;
 import com.realtech.socialsurvey.core.entities.BranchUploadVO;
 import com.realtech.socialsurvey.core.entities.Company;
+import com.realtech.socialsurvey.core.entities.ContactDetailsSettings;
+import com.realtech.socialsurvey.core.entities.ContactNumberSettings;
 import com.realtech.socialsurvey.core.entities.FileUpload;
 import com.realtech.socialsurvey.core.entities.LicenseDetail;
+import com.realtech.socialsurvey.core.entities.Licenses;
 import com.realtech.socialsurvey.core.entities.Region;
 import com.realtech.socialsurvey.core.entities.RegionUploadVO;
 import com.realtech.socialsurvey.core.entities.User;
 import com.realtech.socialsurvey.core.entities.UserUploadVO;
+import com.realtech.socialsurvey.core.entities.WebAddressSettings;
 import com.realtech.socialsurvey.core.enums.AccountType;
 import com.realtech.socialsurvey.core.exception.BranchAdditionException;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
@@ -94,7 +99,12 @@ public class CsvUploadServiceImpl implements CsvUploadService
     private static final int USER_BRANCH_ID_ADMIN_INDEX = 6;
     private static final int USER_REGION_ID_ADMIN_INDEX = 7;
     private static final int USER_EMAIL_INDEX = 8;
-    private static final int USER_PHOTO_PROFILE_URL = 9;
+    private static final int USER_PHONE_NUMBER = 9;
+    private static final int USER_WEBSITE = 10;
+    private static final int USER_LICENSES = 11;
+    private static final int USER_LEGAL_DISCLAIMER = 12;
+    private static final int USER_PHOTO_PROFILE_URL = 13;
+    private static final int USER_ABOUT_ME_DESCRIPTION = 14;
 
     private static final String COUNTRY = "United States";
     private static final String COUNTRY_CODE = "US";
@@ -123,6 +133,9 @@ public class CsvUploadServiceImpl implements CsvUploadService
 
     @Autowired
     private ProfileManagementService profileManagementService;
+
+    @Autowired
+    private OrganizationUnitSettingsDao organizationUnitSettingsDao;
 
     @Autowired
     private UserManagementService userManagementService;
@@ -222,14 +235,84 @@ public class CsvUploadServiceImpl implements CsvUploadService
             userErrors.add( "No company settings found for user " + user.getUsername() + " " + user.getUserId() );
 
         } else {
-            if ( agentSettings.getContact_details() != null ) {
-                agentSettings.getContact_details().setTitle( userUploadVO.getTitle() );
-                profileManagementService.updateContactDetails( MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION,
-                    agentSettings, agentSettings.getContact_details() );
+            ContactDetailsSettings contactDetailsSettings = agentSettings.getContact_details();
+            if ( contactDetailsSettings == null ) {
+                contactDetailsSettings = new ContactDetailsSettings();
             }
-            profileManagementService.updateProfileImage( MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION,
-                agentSettings, userUploadVO.getUserPhotoUrl() );
+            ContactNumberSettings contactNumberSettings = contactDetailsSettings.getContact_numbers();
+            if ( contactNumberSettings == null ) {
+                contactNumberSettings = new ContactNumberSettings();
+            }
+            contactNumberSettings.setWork( userUploadVO.getPhoneNumber() );
+            contactDetailsSettings.setContact_numbers( contactNumberSettings );
+            contactDetailsSettings.setAbout_me( userUploadVO.getAboutMeDescription() );
+            contactDetailsSettings.setTitle( userUploadVO.getTitle() );
+            WebAddressSettings webAddressSettings = contactDetailsSettings.getWeb_addresses();
+            if ( webAddressSettings == null ) {
+                webAddressSettings = new WebAddressSettings();
+            }
+            webAddressSettings.setWork( userUploadVO.getWebsiteUrl() );
+            contactDetailsSettings.setWeb_addresses( webAddressSettings );
+            agentSettings.setContact_details( contactDetailsSettings );
+
+            Licenses licenses = agentSettings.getLicenses();
+            if ( licenses == null ) {
+                licenses = new Licenses();
+            }
+            List<String> authorizedIn = licenses.getAuthorized_in();
+            if ( authorizedIn == null ) {
+                authorizedIn = new ArrayList<String>();
+            }
+            licenses.setAuthorized_in( getAllStateLicenses( userUploadVO.getLicense(), authorizedIn ) );
+            agentSettings.setLicenses( licenses );
+            agentSettings.setDisclaimer( userUploadVO.getLegalDisclaimer() );
+            if ( licenses != null && licenses.getAuthorized_in() != null && !licenses.getAuthorized_in().isEmpty() ) {
+                organizationUnitSettingsDao.updateParticularKeyAgentSettings( MongoOrganizationUnitSettingDaoImpl.KEY_LICENCES,
+                    licenses, agentSettings );
+            }
+            profileManagementService.updateAgentContactDetails( MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION,
+                agentSettings, contactDetailsSettings );
+
+            if ( userUploadVO.getLegalDisclaimer() != null ) {
+                organizationUnitSettingsDao.updateParticularKeyOrganizationUnitSettings(
+                    MongoOrganizationUnitSettingDaoImpl.KEY_DISCLAIMER, userUploadVO.getLegalDisclaimer(), agentSettings,
+                    MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION );
+            }
+
+            if ( userUploadVO.getUserPhotoUrl() != null ) {
+                profileManagementService.updateProfileImage( MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION,
+                    agentSettings, userUploadVO.getUserPhotoUrl() );
+            }
         }
+    }
+
+
+    private List<String> getAllStateLicenses( String licenses, List<String> authorizedIn )
+    {
+        String toRemove = "Licensed State(s):";
+        String nmlsStrng = "NMLS";
+        String nmlsDelimiter = "#:";
+        String nmlsID = "";
+        licenses = licenses.substring( licenses.indexOf( "Licensed State(s):" ) + toRemove.length(), licenses.length() );
+        licenses = licenses.trim();
+        if ( licenses.contains( "NMLS" ) ) {
+            nmlsID = licenses.substring( licenses.lastIndexOf( "#:" ) + nmlsDelimiter.length() );
+            nmlsID = nmlsID.trim();
+
+        }
+        String[] authorizedInArray = licenses.split( ",|;" );
+        for ( String authorizedStates : authorizedInArray ) {
+            authorizedStates = authorizedStates.trim();
+            if ( nmlsID != null && !nmlsID.equalsIgnoreCase( "" ) )
+                if ( !authorizedStates.contains( "NMLS" ) ) {
+                    authorizedStates = authorizedStates.concat( "#" ).concat( nmlsID ).concat( nmlsStrng );
+                    System.out.println( authorizedStates );
+
+                    authorizedIn.add( authorizedStates );
+                }
+
+        }
+        return authorizedIn;
     }
 
 
@@ -346,6 +429,31 @@ public class CsvUploadServiceImpl implements CsvUploadService
                     if ( cell.getCellType() != XSSFCell.CELL_TYPE_BLANK ) {
                         String userPhotoUrl = cell.getStringCellValue();
                         uploadedUser.setUserPhotoUrl( userPhotoUrl );
+                    }
+                } else if ( cellIndex == USER_PHONE_NUMBER ) {
+                    if ( cell.getCellType() != XSSFCell.CELL_TYPE_BLANK ) {
+                        String phoneNumber = cell.getStringCellValue();
+                        uploadedUser.setPhoneNumber( phoneNumber );
+                    }
+                } else if ( cellIndex == USER_WEBSITE ) {
+                    if ( cell.getCellType() != XSSFCell.CELL_TYPE_BLANK ) {
+                        String websiteUrl = cell.getStringCellValue();
+                        uploadedUser.setWebsiteUrl( websiteUrl );
+                    }
+                } else if ( cellIndex == USER_LICENSES ) {
+                    if ( cell.getCellType() != XSSFCell.CELL_TYPE_BLANK ) {
+                        String license = cell.getStringCellValue();
+                        uploadedUser.setLicense( license );
+                    }
+                } else if ( cellIndex == USER_LEGAL_DISCLAIMER ) {
+                    if ( cell.getCellType() != XSSFCell.CELL_TYPE_BLANK ) {
+                        String legalDisclaimer = cell.getStringCellValue();
+                        uploadedUser.setLegalDisclaimer( legalDisclaimer );
+                    }
+                } else if ( cellIndex == USER_ABOUT_ME_DESCRIPTION ) {
+                    if ( cell.getCellType() != XSSFCell.CELL_TYPE_BLANK ) {
+                        String aboutMeDescription = cell.getStringCellValue();
+                        uploadedUser.setAboutMeDescription( aboutMeDescription );
                     }
                 }
                 cellIndex++;

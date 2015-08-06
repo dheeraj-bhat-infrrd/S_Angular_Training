@@ -20,6 +20,12 @@ public class UserUploadVO
     private String assignedRegionName;
     private boolean isBranchAdmin;
     private boolean isRegionAdmin;
+    private String phoneNumber;
+    private String websiteUrl;
+    private String license;
+    private String legalDisclaimer;
+    private String aboutMeDescription;
+
     private String userPhotoUrl;
 
 
@@ -203,5 +209,76 @@ public class UserUploadVO
     }
 
 
-    
+    public boolean isAssignToCompany()
+    {
+        return assignToCompany;
+    }
+
+
+    public void setAssignToCompany( boolean assignToCompany )
+    {
+        this.assignToCompany = assignToCompany;
+    }
+
+
+    public String getPhoneNumber()
+    {
+        return phoneNumber;
+    }
+
+
+    public void setPhoneNumber( String phoneNumber )
+    {
+        this.phoneNumber = phoneNumber;
+    }
+
+
+    public String getWebsiteUrl()
+    {
+        return websiteUrl;
+    }
+
+
+    public void setWebsiteUrl( String websiteUrl )
+    {
+        this.websiteUrl = websiteUrl;
+    }
+
+
+    public String getLicense()
+    {
+        return license;
+    }
+
+
+    public void setLicense( String license )
+    {
+        this.license = license;
+    }
+
+
+    public String getLegalDisclaimer()
+    {
+        return legalDisclaimer;
+    }
+
+
+    public void setLegalDisclaimer( String legalDisclaimer )
+    {
+        this.legalDisclaimer = legalDisclaimer;
+    }
+
+
+    public String getAboutMeDescription()
+    {
+        return aboutMeDescription;
+    }
+
+
+    public void setAboutMeDescription( String aboutMeDescription )
+    {
+        this.aboutMeDescription = aboutMeDescription;
+    }
+
+
 }
