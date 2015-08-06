@@ -585,14 +585,17 @@ public class ProfileManagementController {
 
 			// Get the profile address parameters
 			String name = request.getParameter("profName");
+			if (name == null || name.isEmpty()) {
+				throw new InvalidInputException("Name passed can not be null or empty", DisplayMessageConstants.GENERAL_ERROR);
+			}
+			
 			String title = request.getParameter("profTitle");
 			if (title.contains("\"")) {
 				title = title.replace("\"", "&quot;");
 			}
+			
 			String vertical = request.getParameter("profVertical");
-			if (name == null || name.isEmpty()) {
-				throw new InvalidInputException("Name passed can not be null or empty", DisplayMessageConstants.GENERAL_ERROR);
-			}
+			String location = request.getParameter("profLocation");
 
 			if (entityType.equals(CommonConstants.COMPANY_ID_COLUMN)) {
 				OrganizationUnitSettings companySettings = organizationManagementService.getCompanySettings(user);
@@ -601,7 +604,7 @@ public class ProfileManagementController {
 				}
 				contactDetailsSettings = companySettings.getContact_details();
 				
-				contactDetailsSettings = updateBasicDetail(contactDetailsSettings, name, title);
+				contactDetailsSettings = updateBasicDetail(contactDetailsSettings, name, title, location);
 				contactDetailsSettings = profileManagementService.updateContactDetails(
 						MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION, companySettings, contactDetailsSettings);
 				companySettings.setContact_details(contactDetailsSettings);
@@ -610,9 +613,10 @@ public class ProfileManagementController {
 				profileManagementService.updateCompanyName(user.getUserId(), companySettings.getIden(), name);
 				assignments.getCompanies().put(entityId, name);
 
-				companySettings.setVertical(vertical);
 				profileManagementService.updateVertical(MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION, companySettings, vertical);
-
+				
+				companySettings.setVertical(vertical);
+				profileSettings = companySettings;
 				userSettings.setCompanySettings(companySettings);
 			}
 			else if (entityType.equals(CommonConstants.REGION_ID_COLUMN)) {
@@ -621,7 +625,7 @@ public class ProfileManagementController {
 					throw new InvalidInputException("No Region settings found in current session");
 				}
 				contactDetailsSettings = regionSettings.getContact_details();
-				contactDetailsSettings = updateBasicDetail(contactDetailsSettings, name, title);
+				contactDetailsSettings = updateBasicDetail(contactDetailsSettings, name, title, location);
 				contactDetailsSettings = profileManagementService.updateContactDetails(
 						MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION, regionSettings, contactDetailsSettings);
 				regionSettings.setContact_details(contactDetailsSettings);
@@ -633,6 +637,7 @@ public class ProfileManagementController {
 				regionSettings.setVertical(vertical);
 				profileManagementService.updateVertical(MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION, regionSettings, vertical);
 
+				profileSettings = regionSettings;
 				userSettings.getRegionSettings().put(entityId, regionSettings);
 			}
 			else if (entityType.equals(CommonConstants.BRANCH_ID_COLUMN)) {
@@ -641,7 +646,7 @@ public class ProfileManagementController {
 					throw new InvalidInputException("No Branch settings found in current session");
 				}
 				contactDetailsSettings = branchSettings.getContact_details();
-				contactDetailsSettings = updateBasicDetail(contactDetailsSettings, name, title);
+				contactDetailsSettings = updateBasicDetail(contactDetailsSettings, name, title, location);
 				contactDetailsSettings = profileManagementService.updateContactDetails(
 						MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION, branchSettings, contactDetailsSettings);
 				branchSettings.setContact_details(contactDetailsSettings);
@@ -652,7 +657,7 @@ public class ProfileManagementController {
 
 				branchSettings.setVertical(vertical);
 				profileManagementService.updateVertical(MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION, branchSettings, vertical);
-
+				profileSettings = branchSettings;
 				userSettings.getRegionSettings().put(entityId, branchSettings);
 			}
 			else if (entityType.equals(CommonConstants.AGENT_ID_COLUMN)) {
@@ -662,8 +667,8 @@ public class ProfileManagementController {
 				}
 				contactDetailsSettings = agentSettings.getContact_details();
 				//for individual set vertical/industry
-				contactDetailsSettings.setIndustry(vertical);
-				contactDetailsSettings = updateBasicDetail(contactDetailsSettings, name, title);
+				//contactDetailsSettings.setIndustry(vertical);
+				contactDetailsSettings = updateBasicDetail(contactDetailsSettings, name, title, location);
 				contactDetailsSettings = profileManagementService.updateAgentContactDetails(
 						MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION, agentSettings, contactDetailsSettings);
 				agentSettings.setContact_details(contactDetailsSettings);
@@ -671,9 +676,9 @@ public class ProfileManagementController {
 				// update user name
 				profileManagementService.updateIndividualName(user.getUserId(), agentSettings.getIden(), name);
 
-				agentSettings.setVertical(vertical);
-				profileManagementService.updateVertical(MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION, agentSettings, vertical);
-
+				/*agentSettings.setVertical(vertical);
+				profileManagementService.updateVertical(MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION, agentSettings, vertical);*/
+				profileSettings = agentSettings;
 				userSettings.setAgentSettings(agentSettings);
 
 				// Modify Agent details in Solr
@@ -695,7 +700,7 @@ public class ProfileManagementController {
 				throw new InvalidInputException("Invalid input exception occurred in upadting Basic details.", DisplayMessageConstants.GENERAL_ERROR);
 			}
 
-			profileSettings.setVertical(vertical);
+			//profileSettings.setVertical(vertical);
 			profileSettings.setContact_details(contactDetailsSettings);
 
 			LOG.info("Basic Detail updated successfully");
@@ -713,10 +718,11 @@ public class ProfileManagementController {
 	}
 
 	// Update address details
-	private ContactDetailsSettings updateBasicDetail(ContactDetailsSettings contactDetailsSettings, String name, String title) {
+	private ContactDetailsSettings updateBasicDetail(ContactDetailsSettings contactDetailsSettings, String name, String title, String location) {
 		LOG.debug("Method updateBasicDetial() called from ProfileManagementController");
 		contactDetailsSettings.setName(name);
 		contactDetailsSettings.setTitle(title);
+		contactDetailsSettings.setLocation(location);
 		LOG.debug("Method updateBasicDetial() finished from ProfileManagementController");
 		return contactDetailsSettings;
 	}
