@@ -44,7 +44,10 @@
 			</div>
 			<div class="welcome-popup-body-wrapper clearfix icn-sur-popup-wrapper">
 				<div id="icn-sur-popup-cont" data-start="0" data-total="0" data-batch="5" class="icn-sur-popup-cont"></div>
-				<div id="del-mult-sur-icn" class="del-mult-sur-icn"></div>
+				<div class="mult-sur-icn-wrapper">
+					<div id="resend-mult-sur-icn" class="mult-sur-icn resend-mult-sur-icn float-left"></div>
+					<div id="del-mult-sur-icn" class="mult-sur-icn del-mult-sur-icn float-right"></div>
+				</div>
 			</div>
 			<div class="paginate-buttons-survey">
 				<div id="sur-previous" class="float-left">&lt; Prev</div>

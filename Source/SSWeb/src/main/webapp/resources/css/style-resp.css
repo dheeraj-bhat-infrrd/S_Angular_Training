@@ -2089,6 +2089,7 @@
         display: none;
     }
     .prof-name-wrapper{
-        width: 33.33333333% !important;
+        width: 33.33333333%;
+        width: calc(66.666666% - 250px);
     }
 }

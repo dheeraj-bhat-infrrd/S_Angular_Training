@@ -518,8 +518,10 @@
 		$('#prof-basic-container .prof-edditable').addClass('prof-name-edit');
 	});
 	$('#prof-basic-container').on('mouseleave',function(e){
-		$('#prof-basic-container .prof-edit-field-icn').hide();
-		$('#prof-basic-container .prof-edditable').removeClass('prof-name-edit');
+		if(!$('#prof-basic-container input').is(':focus')){
+			$('#prof-basic-container .prof-edit-field-icn').hide();
+			$('#prof-basic-container .prof-edditable').removeClass('prof-name-edit');			
+		}
 	});
 });
 </script>

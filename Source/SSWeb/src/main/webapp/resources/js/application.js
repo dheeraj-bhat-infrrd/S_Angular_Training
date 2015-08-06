@@ -563,7 +563,7 @@ function showIncompleteSurvey(columnName, columnValue) {
 	}, payload, false);}, payload, false);
 }
 
-$(document).on('click','.dash-lp-rt-img',function() {
+$(document).on('click', '.dash-lp-rt-img', function() {
 	var agentId = $(this).data("agentid");
 	var agentName = $(this).data("agentname");
 	var customerEmail = $(this).data("custemail");
@@ -2035,6 +2035,25 @@ function validateRegionForm() {
 	isRegionValid = true;
 	var isFocussed = false;
 	
+	
+	if(!validateRegionName('region-name-txt')){
+		isRegionValid = false;
+		if(!isFocussed){
+			$('#region-name-txt').focus();
+			isFocussed=true;
+		}
+		return isRegionValid;
+	}
+	
+	if(!validateAddress1('region-address1-txt')){
+		isOfficeValid = false;
+		if(!isFocussed){
+			$('#office-address-txt').focus();
+			isFocussed=true;
+		}
+		return isRegionValid;
+	}
+	
 	var userSelectionType = $('#user-selection-info').data('user-selection-type');
 	if(userSelectionType =="single"){
 	
@@ -2053,13 +2072,7 @@ function validateRegionForm() {
 		
 		
 	}
-	if(!validateRegionName('region-name-txt')){
-		isRegionValid = false;
-		if(!isFocussed){
-			$('#region-name-txt').focus();
-			isFocussed=true;
-		}
-	}
+	
 	
 	if(isRegionValid){
 		hideError();
@@ -2191,12 +2204,22 @@ function validateOfficeForm() {
 	isOfficeValid = true;
 	var isFocussed = false;
 	
+	if(!validateOfficeName('office-name-txt')){
+		isOfficeValid = false;
+		if(!isFocussed){
+			$('#office-name-txt').focus();
+			isFocussed=true;
+		}
+		return isOfficeValid;
+	}
+	
 	if(!validateRegionSelector('selected-region-txt', 'selected-region-id-hidden')) {
 		isOfficeValid = false;
 		if(!isFocussed){
 			$('#selected-region-txt').focus();
 			isFocussed=true;
 		}
+		return isOfficeValid;
 	}
 	if(!validateAddress1('office-address-txt')){
 		isOfficeValid = false;
@@ -2204,6 +2227,7 @@ function validateOfficeForm() {
 			$('#office-address-txt').focus();
 			isFocussed=true;
 		}
+		return isOfficeValid;
 	}
 	
 	var userSelectionType = $('#user-selection-info').data('user-selection-type');
@@ -2220,13 +2244,6 @@ function validateOfficeForm() {
 				isFocussed=true;
 			}
 				
-	}
-	if(!validateOfficeName('office-name-txt')){
-		isOfficeValid = false;
-		if(!isFocussed){
-			$('#office-name-txt').focus();
-			isFocussed=true;
-		}
 	}
 	
 	if(isOfficeValid){
@@ -6171,12 +6188,17 @@ $(document).on('blur', '#prof-basic-container input', function() {
 	delay(function() {
 		var profName = $('#prof-name').val().trim();
 		var profTitle = $('#prof-title').val().trim();
-		var profVertical = $('#prof-vertical').val().trim();
 		var payload = {
 			"profName" : profName,
-			"profTitle" : profTitle,
-			"profVertical" : profVertical
+			"profTitle" : profTitle
 		};
+		if($('#prof-vertical').val()){
+			payload["profVertical"] = $('#prof-vertical').val().trim();
+		}
+		if($('#prof-location').val()){
+			payload["profLocation"] = $('#prof-location').val().trim();
+		}
+		
 		callAjaxPostWithPayloadData("./updatebasicprofile.do", callBackUpdateBasicDetails, payload);
 	}, 0);
 });
@@ -7585,32 +7607,50 @@ function hideIncompleteSurveyListPopup() {
 	$("#overlay-incomplete-survey").hide();
 	$('#icn-sur-popup-cont').html('');
 	$('#icn-sur-popup-cont').attr("data-start", 0);
-	$('#icn-sur-popup-cont').data('selected-survey-to-delete', new Array());
+	$('#icn-sur-popup-cont').data('selected-survey', new Array());
 }
 
-$(document).on('click','#del-mult-sur-icn.del-mult-sur-icn-active',function(){
-	var selectSurveyToDelete = $('#icn-sur-popup-cont').data('selected-survey-to-delete');
-	removeMultipleIncompleteSurveyRequest(selectSurveyToDelete);
+$(document).on('click','#del-mult-sur-icn.mult-sur-icn-active',function(){
+	var selectedSurveys = $('#icn-sur-popup-cont').data('selected-survey');
+	removeMultipleIncompleteSurveyRequest(selectedSurveys);
 });
 
 function removeIncompleteSurveyRequest(incompleteSurveyId) {
-	var surveyToDelete = [];
-	surveyToDelete.push(incompleteSurveyId);
-	removeMultipleIncompleteSurveyRequest(surveyToDelete);
+	var selectedSurveys = [];
+	selectedSurveys.push(incompleteSurveyId);
+	removeMultipleIncompleteSurveyRequest(selectedSurveys);
 }
 
 function removeMultipleIncompleteSurveyRequest(incompleteSurveyIds) {
-	callAjaxPOSTWithTextData("/deletemultipleincompletesurveyrequest.do?surveySetToDelete="+incompleteSurveyIds, function(data) {
-		if(data == "success") {
+	callAjaxPOSTWithTextData("/deletemultipleincompletesurveyrequest.do?surveySetToDelete=" + incompleteSurveyIds, function(data) {
+		if (data == "success") {
 			var totalIncSurveys = $('#icn-sur-popup-cont').attr('data-total');
 			totalIncSurveys = totalIncSurveys - incompleteSurveyIds.length;
 			$('#icn-sur-popup-cont').attr('data-total', totalIncSurveys);
-			for(var i=0; i < incompleteSurveyIds.length; i++){
+			for (var i=0; i < incompleteSurveyIds.length; i++) {
 				$('div[data-iden="sur-pre-'+incompleteSurveyIds[i]+'"]').remove();
 			}
+			
 			$('#overlay-toast').html('Survey reminder request deleted successfully');
 			showToast();
-			$('#del-mult-sur-icn').removeClass('del-mult-sur-icn-active');
+			$('#del-mult-sur-icn').removeClass('mult-sur-icn-active');
+			$('#resend-mult-sur-icn').removeClass('mult-sur-icn-active');
+		}
+	}, true, {});
+}
+
+$(document).on('click','#resend-mult-sur-icn.mult-sur-icn-active',function(){
+	var selectedSurveys = $('#icn-sur-popup-cont').data('selected-survey');
+	resendMultipleIncompleteSurveyRequests(selectedSurveys);
+});
+
+function resendMultipleIncompleteSurveyRequests(incompleteSurveyIds) {
+	callAjaxPOSTWithTextData("/resendmultipleincompletesurveyrequest.do?surveysSelected=" + incompleteSurveyIds, function(data) {
+		if (data == "success") {
+			$('#overlay-toast').html('Survey reminder request resent successfully');
+			showToast();
+			$('#del-mult-sur-icn').removeClass('mult-sur-icn-active');
+			$('#resend-mult-sur-icn').removeClass('mult-sur-icn-active');
 		}
 	}, true, {});
 }
