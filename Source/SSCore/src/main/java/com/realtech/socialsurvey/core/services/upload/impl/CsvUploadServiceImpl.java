@@ -248,8 +248,8 @@ public class CsvUploadServiceImpl implements CsvUploadService
         int rowCounter = 0;
         while ( rows.hasNext() ) {
             row = (XSSFRow) rows.next();
-            // skip the first 3 rows. first row is the schema and second is the header
-            if ( row.getRowNum() < 3 ) {
+            // skip the first 2 rows. first row is the schema and second is the header
+            if ( row.getRowNum() < 2 ) {
                 continue;
             }
             cells = row.cellIterator();
