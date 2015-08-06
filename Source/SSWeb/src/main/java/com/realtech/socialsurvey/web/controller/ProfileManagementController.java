@@ -599,7 +599,17 @@ public class ProfileManagementController {
 
 			AccountType accountType = (AccountType) session.getAttribute(CommonConstants.ACCOUNT_TYPE_IN_SESSION);
 	        
-			if (entityType.equals(CommonConstants.COMPANY_ID_COLUMN)|| accountType.getValue() == CommonConstants.ACCOUNTS_MASTER_INDIVIDUAL) {
+			if(accountType.getValue() == CommonConstants.ACCOUNTS_MASTER_INDIVIDUAL) {
+				OrganizationUnitSettings companySettings = organizationManagementService.getCompanySettings(user);
+				if (companySettings == null) {
+					throw new InvalidInputException("No company settings found in current session");
+				}
+				
+				companySettings.setVertical(vertical);
+				profileManagementService.updateVertical(MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION, companySettings, vertical);
+			}
+			
+			if (entityType.equals(CommonConstants.COMPANY_ID_COLUMN)) {
 				OrganizationUnitSettings companySettings = organizationManagementService.getCompanySettings(user);
 				if (companySettings == null) {
 					throw new InvalidInputException("No company settings found in current session");
