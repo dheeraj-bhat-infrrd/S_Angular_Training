@@ -52,6 +52,9 @@
 		
 		<!-- Admin pages -->
 		<intercept-url pattern="/adminlogin.do" access="permitAll" />
+		
+		<!--  purge company -->
+		<intercept-url pattern="/purgeCompany.do" access="permitAll" />
 
 		<!-- Restricted Services -->
 		<intercept-url pattern="/*.do" access="isAuthenticated()" />
