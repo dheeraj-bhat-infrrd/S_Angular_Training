@@ -4919,7 +4919,15 @@ function paintSurveyPageFromJson() {
 		$("div[data-ques-type='smiley-text-final']").show();
 		$("#ques-text-textarea").html(question);
 		$("#text-area").show();
-		$("#text-area").val('');
+		
+		var val = questionDetails.customerResponse;
+		if (val != undefined) {
+			$("#text-area").val(val);
+		}
+		else {
+			$("#text-area").val('');
+		}
+		
 		$('#text-box-disclaimer').show();
 		$("#smiles-final").hide();
 		if(questionDetails.customerResponse!=undefined)
