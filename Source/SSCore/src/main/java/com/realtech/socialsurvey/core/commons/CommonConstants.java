@@ -1,4 +1,6 @@
 package com.realtech.socialsurvey.core.commons;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 /**
  * Holds application level constants
@@ -633,4 +635,6 @@ public interface CommonConstants
     public final String EXCEL_FORMAT = "application/vnd.ms-excel";
     public final String CONTENT_DISPOSITION_HEADER = "Content-Disposition";
     public final String EXCEL_FILE_EXTENSION = ".xlsx";
+    
+    public final String EPOCH_REMINDER_TIME = "02/01/1970";
 }
