@@ -268,15 +268,18 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
      */
     @Override
     @Transactional
-    public void updateReminderCount( long surveyPreInitiationId )
+    public void updateReminderCount( long surveyPreInitiationId, boolean reminder )
     {
         LOG.info( "Method to increase reminder count by 1, updateReminderCount() started." );
 
         SurveyPreInitiation survey = surveyPreInitiationDao.findById( SurveyPreInitiation.class, surveyPreInitiationId );
         if ( survey != null ) {
             survey.setModifiedOn( new Timestamp( System.currentTimeMillis() ) );
+
             survey.setLastReminderTime( new Timestamp( System.currentTimeMillis() ) );
-            survey.setReminderCounts( survey.getReminderCounts() + 1 );
+            if ( reminder ) {
+                survey.setReminderCounts( survey.getReminderCounts() + 1 );
+            }
             surveyPreInitiationDao.merge( survey );
         }
         LOG.info( "Method to increase reminder count by 1, updateReminderCount() finished." );
@@ -665,14 +668,18 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
         return null;
     }
 
+
     @Override
     @Transactional
-	public SurveyPreInitiation getPreInitiatedSurvey(long surveyPreInitiationId) throws NoRecordsFetchedException {
-		LOG.info("Method getSurveyByAgentIdAndCutomerEmail() started. ");
-		SurveyPreInitiation surveyPreInitiation = surveyPreInitiationDao.findById(SurveyPreInitiation.class, surveyPreInitiationId);
-		LOG.info("Method getSurveyByAgentIdAndCutomerEmail() finished. ");
-		return surveyPreInitiation;
-	}
+    public SurveyPreInitiation getPreInitiatedSurvey( long surveyPreInitiationId ) throws NoRecordsFetchedException
+    {
+        LOG.info( "Method getSurveyByAgentIdAndCutomerEmail() started. " );
+        SurveyPreInitiation surveyPreInitiation = surveyPreInitiationDao.findById( SurveyPreInitiation.class,
+            surveyPreInitiationId );
+        LOG.info( "Method getSurveyByAgentIdAndCutomerEmail() finished. " );
+        return surveyPreInitiation;
+    }
+
 
     // MEthod to delete survey pre initiation record from MySQL after making an entry into Mongo.
     @Override
