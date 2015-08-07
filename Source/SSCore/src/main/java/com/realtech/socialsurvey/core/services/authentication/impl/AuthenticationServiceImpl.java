@@ -133,7 +133,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 	@Transactional
 	public User verifyRegisteredUser(String emailId) throws InvalidInputException {
 		LOG.info("Verify whether the User is registered with the emailId");
-		List<User> users = userDao.findByColumn(User.class, CommonConstants.EMAIL_ID, emailId);
+		List<User> users = userDao.findByColumn(User.class, CommonConstants.LOGIN_NAME, emailId);
 		if (users == null || users.isEmpty() || users.get(0).getStatus() != CommonConstants.STATUS_ACTIVE) {
 			LOG.error("No User object found with the passed emailId : " + emailId);
 			throw new InvalidInputException("Email ID not registered with us");
@@ -153,7 +153,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 			UndeliveredEmailException {
 		LOG.info("Send a reset password link to the user");
 		Map<String, String> urlParams = new HashMap<String, String>();
-		urlParams.put(CommonConstants.EMAIL_ID, emailId);
+		urlParams.put(CommonConstants.EMAIL_ID, loginName);
 		urlParams.put(CommonConstants.COMPANY, companyId + "");
 		urlParams.put(NAME, name);
 

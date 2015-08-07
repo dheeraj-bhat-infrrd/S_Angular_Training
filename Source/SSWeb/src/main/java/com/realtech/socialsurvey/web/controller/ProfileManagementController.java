@@ -1474,7 +1474,7 @@ public class ProfileManagementController {
 	}
 
 	// send verification links
-	private void sendVerificationLinks(ContactDetailsSettings oldSettings, List<MiscValues> mailIds, String profile,
+	private void sendVerificationLinks(ContactDetailsSettings oldSettings, List<MiscValues> mailIds, String entityType,
 			OrganizationUnitSettings userSettings) throws InvalidInputException, UndeliveredEmailException {
 		LOG.debug("Method sendVerificationLinks() called from ProfileManagementController");
 		Map<String, String> urlParams = null;
@@ -1494,9 +1494,9 @@ public class ProfileManagementController {
 			if (key.equalsIgnoreCase(CommonConstants.EMAIL_TYPE_WORK)) {
 				urlParams = new HashMap<String, String>();
 				urlParams.put(CommonConstants.EMAIL_ID, emailId);
-				urlParams.put(CommonConstants.USER_PROFILE, profile);
 				urlParams.put(CommonConstants.EMAIL_TYPE, CommonConstants.EMAIL_TYPE_WORK);
-				urlParams.put(CommonConstants.USER_ID, userSettings.getIden() + "");
+				urlParams.put(CommonConstants.ENTITY_ID_COLUMN, userSettings.getIden() + "");
+				urlParams.put(CommonConstants.ENTITY_TYPE_COLUMN, entityType);
 
 				profileManagementService.generateVerificationUrl(urlParams, applicationBaseUrl
 						+ CommonConstants.REQUEST_MAPPING_EMAIL_EDIT_VERIFICATION, emailId, userSettings.getContact_details().getName());
@@ -1524,19 +1524,12 @@ public class ProfileManagementController {
 			String key = mailId.getKey();
 			String value = mailId.getValue();
 			if (key.equalsIgnoreCase(CommonConstants.EMAIL_TYPE_WORK)) {
-				mailIdSettings.setWork(value);
+				mailIdSettings.setWorkEmailToVerify(value);
 				mailIdSettings.setWorkEmailVerified(false);
-
-				// add email id to sql
-				if (entityType.equals(MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION)) {
-					profileManagementService.updateIndividualEmail(entityId, entityId, value);
-				}
-				else if (entityType.equals(MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION)) {
-					profileManagementService.updateCompanyEmail(entityId, value);
-				}
 			}
 			else if (key.equalsIgnoreCase(CommonConstants.EMAIL_TYPE_PERSONAL)) {
 				mailIdSettings.setPersonal(value);
+				mailIdSettings.setPersonalEmailToVerify(value);
 				mailIdSettings.setPersonalEmailVerified(false);
 			}
 			else {
