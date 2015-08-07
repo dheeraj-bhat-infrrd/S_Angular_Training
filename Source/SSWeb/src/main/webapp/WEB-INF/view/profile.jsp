@@ -224,18 +224,10 @@
                 				${profile.contact_details.location}
                 				<c:set var="isLocationTrue" value="yes"></c:set>
                 			</c:if>
-	                		<c:choose>
-	                			<c:when test="${not empty profile.contact_details && not empty profile.contact_details.industry}">
-	                				<c:if test="${isLocationTrue == 'yes'}"> | </c:if>
-	                				${profile.contact_details.industry}
-	                			</c:when>
-	                			<c:otherwise>
-		                			<c:if test="${not empty profile.vertical}">
-		                				<c:if test="${isLocationTrue == 'yes'}"> | </c:if>
-			                			${profile.vertical}
-			                		</c:if>
-	                			</c:otherwise>
-	                		</c:choose>
+                			<c:if test="${not empty profile.vertical}">
+                				<c:if test="${isLocationTrue == 'yes'}"> | </c:if>
+	                			${profile.vertical}
+	                		</c:if>
                 		</div>
                 	</div>
 					<div itemprop="aggregateRating" itemscope itemtype="http://schema.org/AggregateRating" class="prof-rating clearfix">
