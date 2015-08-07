@@ -1006,7 +1006,7 @@ public class DashboardController
 
             // Increasing value of reminder count by 1.
             if ( survey != null ) {
-                surveyHandler.updateReminderCount( survey.getSurveyPreIntitiationId() );
+                surveyHandler.updateReminderCount( survey.getSurveyPreIntitiationId(), true );
             }
         } catch ( NonFatalException e ) {
             LOG.error( "NonFatalException caught in sendReminderMailForSurvey() while sending mail. Nested exception is ", e );
@@ -1075,7 +1075,7 @@ public class DashboardController
 								companyName);
 					}
 
-					surveyHandler.updateReminderCount(survey.getSurveyPreIntitiationId());
+					surveyHandler.updateReminderCount(survey.getSurveyPreIntitiationId(), true);
 				}
 				catch (NumberFormatException e) {
 					throw new NonFatalException("Number format exception occured while parsing incomplete survey id : " + incompleteSurveyIdStr, e);
