@@ -7174,35 +7174,29 @@ function paintAvgRating(avgRating) {
 }
 
 // Edit EmailIds
-$(document).on(
-		'blur',
-		'#contant-info-container input[data-email]',
-		function() {
-			if (!$(this).val()
-					|| !emailRegex.test(this.value)
-					|| ($(this).val() == $('#' + $(this).attr("id") + '-old')
-							.val())) {
-				return;
+$(document).on('blur', '#contant-info-container input[data-email]', function() {
+	if (!$(this).val() || !emailRegex.test(this.value)
+			|| ($(this).val() == $('#' + $(this).attr("id") + '-old').val())) {
+		return;
+	}
+	
+	delay(function() {
+		var mailIds = [];
+		$('#contant-info-container input[data-email]').each(function() {
+			if (this.value != "") {
+				var mailId = {};
+				mailId.key = $(this).attr("data-email");
+				mailId.value = this.value;
+				mailIds.push(mailId);
 			}
-
-			delay(function() {
-				var mailIds = [];
-				$('#contant-info-container input[data-email]').each(function() {
-					if (this.value != "") {
-						var mailId = {};
-						mailId.key = $(this).attr("data-email");
-						mailId.value = this.value;
-						mailIds.push(mailId);
-					}
-				});
-				mailIds = JSON.stringify(mailIds);
-				var payload = {
-					"mailIds" : mailIds
-				};
-				callAjaxPostWithPayloadData("./updateemailids.do",
-						callBackOnUpdateMailIds, payload);
-			}, 0);
 		});
+		mailIds = JSON.stringify(mailIds);
+		var payload = {
+			"mailIds" : mailIds
+		};
+		callAjaxPostWithPayloadData("./updateemailids.do", callBackOnUpdateMailIds, payload);
+	}, 0);
+});
 
 function callBackOnUpdateMailIds(data) {
 	$('#prof-message-header').html(data);
