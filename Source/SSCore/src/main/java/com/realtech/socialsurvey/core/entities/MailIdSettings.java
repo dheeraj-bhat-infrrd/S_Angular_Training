@@ -8,19 +8,28 @@ import java.util.List;
 public class MailIdSettings {
 
 	private String work;
+	private String workEmailToVerify;
 	private boolean isWorkEmailVerified = true;
 	private String personal;
+	private String personalEmailToVerify;
 	private boolean isPersonalEmailVerified = true;
 	private List<MiscValues> others;
 
 	// Need to implement verification for others
-
 	public String getWork() {
 		return work;
 	}
 
 	public void setWork(String work) {
 		this.work = work;
+	}
+
+	public String getWorkEmailToVerify() {
+		return workEmailToVerify;
+	}
+
+	public void setWorkEmailToVerify(String workEmailToVerify) {
+		this.workEmailToVerify = workEmailToVerify;
 	}
 
 	public boolean getIsWorkEmailVerified() {
@@ -37,6 +46,14 @@ public class MailIdSettings {
 
 	public void setPersonal(String personal) {
 		this.personal = personal;
+	}
+
+	public String getPersonalEmailToVerify() {
+		return personalEmailToVerify;
+	}
+
+	public void setPersonalEmailToVerify(String personalEmailToVerify) {
+		this.personalEmailToVerify = personalEmailToVerify;
 	}
 
 	public boolean getIsPersonalEmailVerified() {
