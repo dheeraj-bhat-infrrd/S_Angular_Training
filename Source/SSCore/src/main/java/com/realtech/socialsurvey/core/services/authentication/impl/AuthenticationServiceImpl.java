@@ -153,7 +153,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 			UndeliveredEmailException {
 		LOG.info("Send a reset password link to the user");
 		Map<String, String> urlParams = new HashMap<String, String>();
-		urlParams.put(CommonConstants.EMAIL_ID, emailId);
+		urlParams.put(CommonConstants.EMAIL_ID, loginName);
 		urlParams.put(CommonConstants.COMPANY, companyId + "");
 		urlParams.put(NAME, name);
 

@@ -422,7 +422,6 @@ public class LoginController {
 	public String resetPassword(Model model, HttpServletRequest request) {
 		LOG.info("Reset the user password");
 		Map<String, String> urlParams = null;
-		String encryptedUrlParameters = "";
 		String emailId = "";
 		User user = null;
 
@@ -435,7 +434,7 @@ public class LoginController {
 			validateResetPasswordFormParameters(emailId, password, confirmPassword);
 
 			// Decrypt Url parameters
-			encryptedUrlParameters = request.getParameter("q");
+			String encryptedUrlParameters = request.getParameter("q");
 			try {
 				urlParams = urlGenerator.decryptParameters(encryptedUrlParameters);
 			}

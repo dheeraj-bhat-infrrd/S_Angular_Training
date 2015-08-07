@@ -95,6 +95,9 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
     @Autowired
     private OrganizationManagementService organizationManagementService;
 
+	@Autowired
+	private ProfileManagementService profileManagementService;
+	
     @Autowired
     private GenericDao<UserProfile, Long> userProfileDao;
 
@@ -1528,48 +1531,45 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
     }
 
 
-    @Override
-    public void updateEmailVerificationStatus( String urlParamsStr ) throws InvalidInputException
-    {
-        Map<String, String> urlParams = urlGenerator.decryptParameters( urlParamsStr );
-        if ( urlParams == null || urlParams.isEmpty() ) {
-            throw new InvalidInputException( "Url params are invalid for email verification" );
-        }
+	@Override
+	public void updateEmailVerificationStatus(String urlParamsStr) throws InvalidInputException {
+		Map<String, String> urlParams = urlGenerator.decryptParameters(urlParamsStr);
+		if (urlParams == null || urlParams.isEmpty()) {
+			throw new InvalidInputException("Url params are invalid for email verification");
+		}
 
-        ContactDetailsSettings contact = null;
-        MailIdSettings mail = null;
-        String collection = urlParams.get( CommonConstants.USER_PROFILE );
-        String emailType = urlParams.get( CommonConstants.EMAIL_TYPE );
-        String emailAddress = urlParams.get( CommonConstants.EMAIL_ID );
-        long iden = Long.parseLong( urlParams.get( CommonConstants.USER_ID ) );
+		String emailAddress = urlParams.get(CommonConstants.EMAIL_ID);
+		String emailType = urlParams.get(CommonConstants.EMAIL_TYPE);
+		long iden = Long.parseLong(urlParams.get(CommonConstants.ENTITY_ID_COLUMN));
+		String collection = urlParams.get(CommonConstants.ENTITY_TYPE_COLUMN);
 
-        if ( !collection.equals( MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION ) ) {
-            OrganizationUnitSettings unitSettings = organizationUnitSettingsDao.fetchOrganizationUnitSettingsById( iden,
-                collection );
-            contact = unitSettings.getContact_details();
-            mail = contact.getMail_ids();
-            if ( emailType.equals( CommonConstants.EMAIL_TYPE_WORK ) && mail.getWork().equals( emailAddress ) ) {
-                mail.setWorkEmailVerified( true );
-            } else if ( emailType.equals( CommonConstants.EMAIL_TYPE_PERSONAL ) && mail.getPersonal().equals( emailAddress ) ) {
-                mail.setPersonalEmailVerified( true );
-            }
-            contact.setMail_ids( mail );
-            organizationUnitSettingsDao.updateParticularKeyOrganizationUnitSettings(
-                MongoOrganizationUnitSettingDaoImpl.KEY_CONTACT_DETAIL_SETTINGS, contact, unitSettings, collection );
-        } else {
-            AgentSettings agentSettings = organizationUnitSettingsDao.fetchAgentSettingsById( iden );
-            contact = agentSettings.getContact_details();
-            mail = contact.getMail_ids();
-            if ( emailType.equals( CommonConstants.EMAIL_TYPE_WORK ) && mail.getWork().equals( emailAddress ) ) {
-                mail.setWorkEmailVerified( true );
-            } else if ( emailType.equals( CommonConstants.EMAIL_TYPE_PERSONAL ) && mail.getPersonal().equals( emailAddress ) ) {
-                mail.setPersonalEmailVerified( true );
-            }
-            contact.setMail_ids( mail );
-            organizationUnitSettingsDao.updateParticularKeyAgentSettings(
-                MongoOrganizationUnitSettingDaoImpl.KEY_CONTACT_DETAIL_SETTINGS, contact, agentSettings );
-        }
-    }
+		OrganizationUnitSettings unitSettings = organizationUnitSettingsDao.fetchOrganizationUnitSettingsById(iden, collection);
+		ContactDetailsSettings contactDetails = unitSettings.getContact_details();
+		MailIdSettings mailIds = contactDetails.getMail_ids();
+		
+		if (emailType.equals(CommonConstants.EMAIL_TYPE_WORK) && mailIds.getWork().equals(emailAddress)) {
+			String emailVerified = mailIds.getWorkEmailToVerify();
+			mailIds.setWork(emailVerified);
+			mailIds.setWorkEmailToVerify(null);
+			mailIds.setWorkEmailVerified(true);
+
+			if (collection.equals(MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION)) {
+				profileManagementService.updateCompanyEmail(iden, emailVerified);
+			}
+			else if (collection.equals(MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION)) {
+				profileManagementService.updateIndividualEmail(iden, iden, emailVerified);
+			}
+		}
+		else if (emailType.equals(CommonConstants.EMAIL_TYPE_PERSONAL) && mailIds.getPersonal().equals(emailAddress)) {
+			mailIds.setPersonal(mailIds.getWorkEmailToVerify());
+			mailIds.setPersonalEmailToVerify(null);
+			mailIds.setPersonalEmailVerified(true);
+		}
+		contactDetails.setMail_ids(mailIds);
+		
+		organizationUnitSettingsDao.updateParticularKeyOrganizationUnitSettings(MongoOrganizationUnitSettingDaoImpl.KEY_CONTACT_DETAIL_SETTINGS,
+				contactDetails, unitSettings, collection);
+	}
 
 
     /**
