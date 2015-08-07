@@ -95,9 +95,6 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
     @Autowired
     private OrganizationManagementService organizationManagementService;
 
-	@Autowired
-	private ProfileManagementService profileManagementService;
-	
     @Autowired
     private GenericDao<UserProfile, Long> userProfileDao;
 
@@ -1532,6 +1529,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 
 
 	@Override
+	@Transactional
 	public void updateEmailVerificationStatus(String urlParamsStr) throws InvalidInputException {
 		Map<String, String> urlParams = urlGenerator.decryptParameters(urlParamsStr);
 		if (urlParams == null || urlParams.isEmpty()) {
@@ -1547,21 +1545,32 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 		ContactDetailsSettings contactDetails = unitSettings.getContact_details();
 		MailIdSettings mailIds = contactDetails.getMail_ids();
 		
-		if (emailType.equals(CommonConstants.EMAIL_TYPE_WORK) && mailIds.getWork().equals(emailAddress)) {
+		if (emailType.equals(CommonConstants.EMAIL_TYPE_WORK)) {
 			String emailVerified = mailIds.getWorkEmailToVerify();
+			
+			if (emailVerified == null || emailVerified.isEmpty() || !emailVerified.equals(emailAddress)) {
+				throw new InvalidInputException("Email Id to verify does not match with our records");
+			}
+			
 			mailIds.setWork(emailVerified);
 			mailIds.setWorkEmailToVerify(null);
 			mailIds.setWorkEmailVerified(true);
 
 			if (collection.equals(MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION)) {
-				profileManagementService.updateCompanyEmail(iden, emailVerified);
+				updateCompanyEmail(iden, emailVerified);
 			}
 			else if (collection.equals(MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION)) {
-				profileManagementService.updateIndividualEmail(iden, iden, emailVerified);
+				updateIndividualEmail(iden, emailVerified);
 			}
 		}
-		else if (emailType.equals(CommonConstants.EMAIL_TYPE_PERSONAL) && mailIds.getPersonal().equals(emailAddress)) {
-			mailIds.setPersonal(mailIds.getWorkEmailToVerify());
+		else if (emailType.equals(CommonConstants.EMAIL_TYPE_PERSONAL)) {
+			String emailVerified = mailIds.getPersonalEmailToVerify();
+			
+			if (emailVerified == null || emailVerified.isEmpty() || !emailVerified.equals(emailAddress)) {
+				throw new InvalidInputException("Email Id to verify does not match with our records");
+			}
+			
+			mailIds.setPersonal(mailIds.getPersonalEmailToVerify());
 			mailIds.setPersonalEmailToVerify(null);
 			mailIds.setPersonalEmailVerified(true);
 		}
@@ -2334,11 +2343,11 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 
     @Override
     @Transactional
-    public void updateIndividualEmail( long userId, long individualId, String emailId ) throws InvalidInputException
+    public void updateIndividualEmail( long userId, String emailId ) throws InvalidInputException
     {
-        LOG.info( "Method updateIndividualEmail of profileManagementService called for individualId : " + individualId );
+        LOG.info( "Method updateIndividualEmail of profileManagementService called for userId : " + userId );
 
-        User user = userDao.findById( User.class, individualId );
+        User user = userDao.findById( User.class, userId );
         if ( user == null ) {
             throw new InvalidInputException( "No user present for the specified companyId" );
         }
