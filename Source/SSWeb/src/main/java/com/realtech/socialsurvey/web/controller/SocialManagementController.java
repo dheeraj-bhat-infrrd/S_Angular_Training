@@ -338,6 +338,7 @@ public class SocialManagementController
                 }
                 mediaTokens = companySettings.getSocialMediaTokens();
                 mediaTokens = updateFacebookToken( accessToken, mediaTokens, profileLink );
+                facebookPages.addAll( mediaTokens.getFacebookToken().getFacebookPages() );
                 mediaTokens = socialManagementService.updateSocialMediaTokens(
                     MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION, companySettings, mediaTokens );
                 companySettings.setSocialMediaTokens( mediaTokens );
@@ -357,6 +358,7 @@ public class SocialManagementController
                 }
                 mediaTokens = regionSettings.getSocialMediaTokens();
                 mediaTokens = updateFacebookToken( accessToken, mediaTokens, profileLink );
+                facebookPages.addAll( mediaTokens.getFacebookToken().getFacebookPages() );
                 mediaTokens = socialManagementService.updateSocialMediaTokens(
                     MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION, regionSettings, mediaTokens );
                 regionSettings.setSocialMediaTokens( mediaTokens );
@@ -376,6 +378,7 @@ public class SocialManagementController
                 }
                 mediaTokens = branchSettings.getSocialMediaTokens();
                 mediaTokens = updateFacebookToken( accessToken, mediaTokens, profileLink );
+                facebookPages.addAll( mediaTokens.getFacebookToken().getFacebookPages() );
                 mediaTokens = socialManagementService.updateSocialMediaTokens(
                     MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION, branchSettings, mediaTokens );
                 branchSettings.setSocialMediaTokens( mediaTokens );
