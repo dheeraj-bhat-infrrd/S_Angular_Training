@@ -103,6 +103,8 @@ public class SurveyPreInitiationDaoImpl extends GenericDaoImpl<SurveyPreInitiati
 							CommonConstants.COMPANY_ID_COLUMN, companyId));
 				}
 			}
+			long initialIndex = 0;
+			criteria.add(Restrictions.gt(CommonConstants.AGENT_ID_COLUMN, initialIndex));
 			criteria.addOrder(Order.desc(CommonConstants.MODIFIED_ON_COLUMN));
 			return criteria.list();
 		}
