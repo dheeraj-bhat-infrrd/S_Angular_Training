@@ -295,23 +295,7 @@ public class CsvUploadServiceImpl implements CsvUploadService
         String nmlsID = "";
         licenses = licenses.substring( licenses.indexOf( "Licensed State(s):" ) + toRemove.length(), licenses.length() );
         licenses = licenses.trim();
-        if ( licenses.contains( "NMLS" ) ) {
-            nmlsID = licenses.substring( licenses.lastIndexOf( "#:" ) + nmlsDelimiter.length() );
-            nmlsID = nmlsID.trim();
-
-        }
-        String[] authorizedInArray = licenses.split( ",|;" );
-        for ( String authorizedStates : authorizedInArray ) {
-            authorizedStates = authorizedStates.trim();
-            if ( nmlsID != null && !nmlsID.equalsIgnoreCase( "" ) )
-                if ( !authorizedStates.contains( "NMLS" ) ) {
-                    authorizedStates = authorizedStates.concat( "#" ).concat( nmlsID ).concat( nmlsStrng );
-                    System.out.println( authorizedStates );
-
-                    authorizedIn.add( authorizedStates );
-                }
-
-        }
+        authorizedIn.add( licenses );
         return authorizedIn;
     }
 
