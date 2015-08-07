@@ -321,12 +321,12 @@ function paintDashboard(profileMasterId, newProfileName, newProfileValue, typeoO
 				+ colName + "&columnValue=" + colValue;
 	});
 
-	$('#dsh-dwnld-btn').click(function() {
+	/*$('#dsh-dwnld-btn').click(function() {
 		var startDate = $('#indv-dsh-start-date').val();
 		var endDate = $("#indv-dsh-end-date").val();
 		window.location.href = "/downloadcustomersurveyresults.do?columnName=" + colName + "&columnValue=" + colValue
 			+ "&startDate=" + startDate + "&endDate=" + endDate;
-	});
+	});*/
 	
 	// Loads the image in circle of header.
 	//loadDisplayPicture();
@@ -7497,6 +7497,11 @@ $(document).on('click','#dsh-dwnld-report-btn',function(){
 	case 3:
 		console.log("social-monitor");
 		window.location.href = "/downloaddashboardsocialmonitor.do?columnName=" + colName + "&columnValue=" + colValue
+			+ "&startDate=" + startDate + "&endDate=" + endDate;
+		break;
+	case 4:
+		console.log("incomplete-survey");
+		window.location.href = "/downloaddashboardincompletesurvey.do?columnName=" + colName + "&columnValue=" + colValue
 			+ "&startDate=" + startDate + "&endDate=" + endDate;
 		break;
 	default:

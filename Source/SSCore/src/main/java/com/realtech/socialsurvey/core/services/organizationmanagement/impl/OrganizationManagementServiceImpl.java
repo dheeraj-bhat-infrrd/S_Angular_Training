@@ -64,6 +64,7 @@ import com.realtech.socialsurvey.core.entities.CRMInfo;
 import com.realtech.socialsurvey.core.entities.Company;
 import com.realtech.socialsurvey.core.entities.ContactDetailsSettings;
 import com.realtech.socialsurvey.core.entities.ContactNumberSettings;
+import com.realtech.socialsurvey.core.entities.CrmBatchTracker;
 import com.realtech.socialsurvey.core.entities.DisabledAccount;
 import com.realtech.socialsurvey.core.entities.EncompassCrmInfo;
 import com.realtech.socialsurvey.core.entities.FileUpload;
@@ -79,6 +80,7 @@ import com.realtech.socialsurvey.core.entities.RegionFromSearch;
 import com.realtech.socialsurvey.core.entities.RetriedTransaction;
 import com.realtech.socialsurvey.core.entities.StateLookup;
 import com.realtech.socialsurvey.core.entities.SurveyCompanyMapping;
+import com.realtech.socialsurvey.core.entities.SurveyPreInitiation;
 import com.realtech.socialsurvey.core.entities.SurveySettings;
 import com.realtech.socialsurvey.core.entities.User;
 import com.realtech.socialsurvey.core.entities.UserFromSearch;
@@ -126,6 +128,12 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 
     @Autowired
     private GenericDao<FileUpload, Long> fileUploadDao;
+
+    @Autowired
+    private GenericDao<CrmBatchTracker, Long> crmBatchTrackerDao;
+
+    @Autowired
+    private GenericDao<SurveyPreInitiation, Long> surveyPreInitiationDao;
 
     @Autowired
     private GenericDao<LicenseDetail, Long> licenceDetailDao;
@@ -3986,43 +3994,45 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
             }
 
             List<Long> agentIds = null;
-            
-            do{
-                agentIds =  solrSearchService.searchUserIdsByCompany( company.getCompanyId() );
-                if(agentIds == null || agentIds.isEmpty()){
+
+            do {
+                agentIds = solrSearchService.searchUserIdsByCompany( company.getCompanyId() );
+                if ( agentIds == null || agentIds.isEmpty() ) {
                     break;
                 }
                 organizationUnitSettingsDao.removeOganizationUnitSettings( agentIds, CommonConstants.AGENT_SETTINGS_COLLECTION );
                 solrSearchService.removeUsersFromSolr( agentIds );
-            }while(true);
+            } while ( true );
             // Deleting all the users of company from MySQL
             userProfileDao.deleteUserProfilesByCompany( company.getCompanyId() );
             // Delete foreign key references from Removed users.
             removedUserDao.deleteRemovedUsersByCompany( company.getCompanyId() );
             userDao.deleteUsersByCompanyId( company.getCompanyId() );
-            
+
 
             List<Long> branchIds = null;
-            do{
+            do {
                 branchIds = solrSearchService.searchBranchIdsByCompany( company.getCompanyId() );
-                if(branchIds == null || branchIds.isEmpty()){
+                if ( branchIds == null || branchIds.isEmpty() ) {
                     break;
                 }
-                organizationUnitSettingsDao.removeOganizationUnitSettings( branchIds, CommonConstants.BRANCH_SETTINGS_COLLECTION );
+                organizationUnitSettingsDao.removeOganizationUnitSettings( branchIds,
+                    CommonConstants.BRANCH_SETTINGS_COLLECTION );
                 solrSearchService.removeBranchesFromSolr( branchIds );
-            }while(true);
+            } while ( true );
             // Deleting all the branches of company from MySQL
             branchDao.deleteBranchesByCompanyId( company.getCompanyId() );
             List<Long> regionIds = null;
-            do{
+            do {
                 regionIds = solrSearchService.searchRegionIdsByCompany( company.getCompanyId() );
-                if(regionIds == null || regionIds.isEmpty()){
+                if ( regionIds == null || regionIds.isEmpty() ) {
                     break;
                 }
-                organizationUnitSettingsDao.removeOganizationUnitSettings( regionIds, CommonConstants.REGION_SETTINGS_COLLECTION );
+                organizationUnitSettingsDao.removeOganizationUnitSettings( regionIds,
+                    CommonConstants.REGION_SETTINGS_COLLECTION );
                 solrSearchService.removeRegionsFromSolr( regionIds );
-            }while(true);
-           
+            } while ( true );
+
             // Deleting all the regions of company from MySQL
             regionDao.deleteRegionsByCompanyId( company.getCompanyId() );
 
@@ -4090,6 +4100,20 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 
         fileUploadDao.deleteByCondition( "FileUpload", conditions );
 
+        List<CrmBatchTracker> crmBatchTrackerList = crmBatchTrackerDao.findByColumn( CrmBatchTracker.class, "companyId",
+            companyId );
+        if ( crmBatchTrackerList != null ) {
+            for ( CrmBatchTracker crmBatchTracker : crmBatchTrackerList ) {
+                crmBatchTrackerDao.delete( crmBatchTracker );
+            }
+        }
+        List<SurveyPreInitiation> surveyPreInitiationList = surveyPreInitiationDao.findByColumn( SurveyPreInitiation.class,
+            "companyId", companyId );
+        if ( surveyPreInitiationList != null ) {
+            for ( SurveyPreInitiation surveyPreInitiation : surveyPreInitiationList ) {
+                surveyPreInitiationDao.delete( surveyPreInitiation );
+            }
+        }
     }
 
 
