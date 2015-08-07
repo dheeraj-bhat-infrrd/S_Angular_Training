@@ -2,6 +2,21 @@
 <%@ taglib prefix="spring" uri="http://www.springframework.org/tags"%>
 <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions"%>
 
+<c:choose>
+	<c:when test="${columnName == 'companyId'}">
+		<c:set value="1" var="profilemasterid"></c:set>
+	</c:when>
+	<c:when test="${columnName == 'regionId'}">
+		<c:set value="2" var="profilemasterid"></c:set>
+	</c:when>
+	<c:when test="${columnName == 'branchId'}">
+		<c:set value="3" var="profilemasterid"></c:set>
+	</c:when>
+	<c:when test="${columnName == 'agentId'}">
+		<c:set value="4" var="profilemasterid"></c:set>
+	</c:when>
+</c:choose>
+
 <div class="hm-header-main-wrapper hm-hdr-bord-bot">
 	<div class="container">
 		<div class="hm-header-row clearfix">
@@ -138,7 +153,7 @@
 					<div id="dsh-inc-srvey" class="dash-lp-item-grp clearfix">
 						<!-- Populated with dashboard_incompletesurveys.jsp -->
 					</div>
-					<div id="dsh-inc-dwnld" class="dash-btn-sur-data hide"><spring:message code="label.incompletesurveydata.key" /></div>
+					<%-- <div id="dsh-inc-dwnld" class="dash-btn-sur-data hide"><spring:message code="label.incompletesurveydata.key" /></div> --%>
 				</div>
 				
 				<div class="dash-panel-right col-lg-8 col-md-8 col-sm-8 col-xs-12 resp-adj">
@@ -147,29 +162,41 @@
 							<div id="review-desc" class="float-left dash-ppl-say-lbl">
 								<spring:message code="label.peoplesayabout.key" />${profileName}
 							</div>
-							
-							<div id="dsh-admin-cmp-dwnld" class="float-right dash-btn-dl-sd-admin hide">
-								<select id="download-survey-reports" class="float-left dash-download-sel-item">
-									<option value=1 data-report="agent-ranking"><spring:message code="label.downloadsurveydata.one.key" /></option>
-									<option value=2 data-report="survey-results"><spring:message code="label.downloadsurveydata.two.key" /></option>
-									<option value=3 data-report="social-monitor"><spring:message code="label.downloadsurveydata.three.key" /></option>
-								</select>
-								<input id="indv-dsh-start-date" class="dsh-date-picker" placeholder="<spring:message code="label.startdate.key" />">
-								<span>-</span>
-								<input id="indv-dsh-end-date" class="dsh-date-picker" placeholder="<spring:message code="label.enddate.key" />">
-								<div id="dsh-dwnld-report-btn" class="dash-down-go-button float-right cursor-pointer">
-									<spring:message code="label.downloadsurveydata.key.click" />
-								</div>
-							</div>
-							
-							<div id="dsh-cmp-dwnld" class="float-right dash-btn-dl-sd hide">
-								<div id="dsh-dwnld-btn" class="dsh-dwnld-btn float-left cursor-pointer">
-									<spring:message code="label.downloadsurveydata.key" />
-								</div>
-								<input id="dsh-start-date" class="dsh-date-picker" placeholder="<spring:message code="label.startdate.key" />">
-								<span>-</span>
-								<input id="dsh-end-date" class="dsh-date-picker" placeholder="<spring:message code="label.enddate.key" />">
-							</div>
+							<c:choose>
+								<c:when test="${profilemasterid != 4 }">
+									<div id="dsh-admin-cmp-dwnld" class="float-right dash-btn-dl-sd-admin hide">
+										<select id="download-survey-reports" class="float-left dash-download-sel-item">
+											<option value=1 data-report="agent-ranking"><spring:message code="label.downloadsurveydata.one.key" /></option>
+											<option value=2 data-report="survey-results"><spring:message code="label.downloadsurveydata.two.key" /></option>
+											<option value=3 data-report="social-monitor"><spring:message code="label.downloadsurveydata.three.key" /></option>
+											<option value=4 data-report="incomplete-survey"><spring:message code="label.incompletesurveydata.key" /></option>
+										</select>
+										<input id="indv-dsh-start-date" class="dsh-date-picker" placeholder="<spring:message code="label.startdate.key" />">
+										<span>-</span>
+										<input id="indv-dsh-end-date" class="dsh-date-picker" placeholder="<spring:message code="label.enddate.key" />">
+										<div id="dsh-dwnld-report-btn" class="dash-down-go-button float-right cursor-pointer">
+											<spring:message code="label.downloadsurveydata.key.click" />
+										</div>
+									</div>
+								</c:when>
+								<c:otherwise>
+									<div id="dsh-cmp-dwnld" class="float-right dash-btn-dl-sd dash-btn-dl-sd-admin hide">
+										<%-- <div id="dsh-dwnld-btn" class="dsh-dwnld-btn float-left cursor-pointer">
+											<spring:message code="label.downloadsurveydata.key" />
+										</div> --%>
+										<select id="download-survey-reports" class="float-left dash-download-sel-item">
+											<option value=2 data-report="survey-results"><spring:message code="label.downloadsurveydata.two.key" /></option>
+											<option value=4 data-report="incomplete-survey"><spring:message code="label.incompletesurveydata.key" /></option>
+										</select>
+										<input id="dsh-start-date" class="dsh-date-picker" placeholder="<spring:message code="label.startdate.key" />">
+										<span>-</span>
+										<input id="dsh-end-date" class="dsh-date-picker" placeholder="<spring:message code="label.enddate.key" />">
+										<div id="dsh-dwnld-report-btn" class="dash-down-go-button float-right cursor-pointer">
+											<spring:message code="label.downloadsurveydata.key.click" />
+										</div>
+									</div>
+								</c:otherwise>
+							</c:choose>
 						</div>
 						<div id="review-details" class="ppl-review-item-wrapper">
 							<!-- Populated with dashboard_reviews.jsp -->

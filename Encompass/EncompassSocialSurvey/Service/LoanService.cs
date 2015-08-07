@@ -25,6 +25,27 @@ namespace EncompassSocialSurvey.Service
             }
             return entity;
         }
+
+        public Boolean isCompanyActive(long companyId)
+        {
+            Logger.Debug("Inside method getCompany");
+            LoanRepository loanRepo = new LoanRepository();
+            Company company = null;
+            try
+            {
+                company = loanRepo.getCompanyById(companyId);
+                if(company.status.Equals(EncompassSocialSurverConstant.COMPANY_INACTIVE)){
+                    return false;
+                }else{
+                    return true;
+                }
+            }
+            catch (Exception ex)
+            {
+                Logger.Error("Caught an exception: LoanService.getCompany(): ", ex);
+                throw;
+            }
+        }
         public void UpdateCrmbatchTracker(CRMBatchTrackerEntity entity)
         {
             Logger.Debug("Inside method updateCrmBatchTracker");
