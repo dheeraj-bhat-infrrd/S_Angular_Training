@@ -35,8 +35,10 @@ namespace EncompassSocialSurvey.Translator
             Logger.Info("Entering the method LoanTranslator.GetLoanEntity()");
             if (loanVM == null) return null;
 
-            // TODO: Raushan Delete it: Only for testing purpose:
-            if (loanVM.EngagementClosedTime.Equals("//")) loanVM.EngagementClosedTime = "01/01/1970";
+            if (loanVM.EngagementClosedTime.Equals("//"))
+            {
+                loanVM.EngagementClosedTime = EncompassSocialSurverConstant.DEFAULT_ENGAGEMENT_CLOSE_TIME;
+            }
 
             LoanEntity returnLoanEntity = null;
             try

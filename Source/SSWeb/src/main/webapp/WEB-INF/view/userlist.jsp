@@ -72,11 +72,11 @@
 				</c:choose>
 
 				<c:choose>
-					<c:when test="${userfromsearch.canEdit && user.userId!=userfromsearch.userId }">
-						<c:set var="admintcanremoveclass" value="v-tbl-icn" />
+					<c:when test="${userfromsearch.canEdit && user.userId != userfromsearch.userId}">
+						<c:set var="admincanremoveclass" value="v-tbl-icn" />
 					</c:when>
 					<c:otherwise>
-						<c:set var="admintcanremoveclass" value="v-tbl-icn-disabled" />
+						<c:set var="admincanremoveclass" value="v-tbl-icn-disabled" />
 					</c:otherwise>
 				</c:choose>
 
@@ -104,7 +104,7 @@
 							<td class="v-tbl-online v-tbl-icn ${userstatustickclass}" title="<spring:message code="label.verified.key" />"></td>
 						</c:otherwise>
 					</c:choose>
-					<td class="v-tbl-rem ${admintcanremoveclass} v-icn-rem-user" title="<spring:message code="label.remove.key" />"></td>
+					<td class="v-tbl-rem ${admincanremoveclass} v-icn-rem-user" title="<spring:message code="label.remove.key" />"></td>
 					<td class="v-tbl-edit ${admincaneditclass} v-icn-edit-user edit-user" title="<spring:message code="label.edit.key" />"></td>
 				</tr>
 				<tr class="u-tbl-row u-tbl-row-sel hide user-assignment-edit-row">

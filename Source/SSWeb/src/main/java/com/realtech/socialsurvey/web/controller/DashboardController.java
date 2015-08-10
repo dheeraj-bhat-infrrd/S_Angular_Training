@@ -11,8 +11,10 @@ import java.util.Calendar;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
@@ -612,30 +614,33 @@ public class DashboardController
         LOG.info( "Method to get reviews of company, region, branch, agent getReviews() finished." );
         return JspResolver.HEADER_DASHBOARD_INCOMPLETESURVEYS;
     }
-
-    /**
-     * Method to delete the survey reminder request
-     * 
-     * @param model
-     * @param request
-     * @return
-     */
+    
+	/**
+	 * Method to delete multiple pre intiated survey to cancel sending reminders
+	 * @param model
+	 * @param request
+	 * @return
+	 */
 	@ResponseBody
-	@RequestMapping(value = "/delteincompletesurveyrequest")
-	public String cancelSurveyReminder(Model model, HttpServletRequest request) {
-
+	@RequestMapping(value = "/deletemultipleincompletesurveyrequest")
+	public String cancelMultipleSurveyReminder(Model model, HttpServletRequest request) {
 		LOG.info("Method cancelSurveyReminder() called");
 
-		String incompleteSurveyIdStr = request.getParameter("incompleteSurveyId");
-		long incompleteSurveyId = 0;
+		String surveySetToDeleteStr = request.getParameter("surveySetToDelete");
+		String[] surveySetToDeleteArray = surveySetToDeleteStr.split(",");
+		Set<Long> incompleteSurveyIds = new HashSet<>();
 		try {
-			try {
-				incompleteSurveyId = Long.parseLong(incompleteSurveyIdStr);
-				surveyPreInitiationService.deleteSurveyReminder(incompleteSurveyId);
+			for (String incompleteSurveyIdStr : surveySetToDeleteArray) {
+				try {
+					long incompleteSurveyId = 0;
+					incompleteSurveyId = Long.parseLong(incompleteSurveyIdStr);
+					incompleteSurveyIds.add(incompleteSurveyId);
+				}
+				catch (NumberFormatException e) {
+					throw new NonFatalException("Number format exception occured while parsing incomplet survey id : " + incompleteSurveyIdStr, e);
+				}
 			}
-			catch (NumberFormatException e) {
-				throw new NonFatalException("Number format exception occured while parsing incomplet survey id : " + incompleteSurveyIdStr, e);
-			}
+			surveyPreInitiationService.deleteSurveyReminder(incompleteSurveyIds);
 		}
 		catch (NonFatalException nonFatalException) {
 			LOG.error("Nonfatal exception occured in method cancelSurveyReminder, reason : " + nonFatalException.getMessage());
@@ -643,7 +648,6 @@ public class DashboardController
 		}
 		return CommonConstants.SUCCESS_ATTRIBUTE;
 	}
-    
 
     /*
      * Method to get count of all the incomplete surveys.
@@ -994,7 +998,6 @@ public class DashboardController
                 } else {
                     emailServices.sendDefaultSurveyReminderMail( customerEmail, custFirstName, agentName, surveyLink,
                         agentPhone, agentTitle, companyName );
-
                 }
             } catch ( InvalidInputException e ) {
                 LOG.error( "Exception occurred while trying to send survey reminder mail to : " + customerEmail );
@@ -1012,6 +1015,79 @@ public class DashboardController
         LOG.info( "Method to send email to remind customer for survey sendReminderMailForSurvey() finished." );
         return new Gson().toJson( "success" );
     }
+    
+    /**
+	 * Method to resend multiple pre intiated survey reminders
+	 * @param model
+	 * @param request
+	 * @return
+	 */
+	@ResponseBody
+	@RequestMapping(value = "/resendmultipleincompletesurveyrequest")
+	public String sendMultipleSurveyReminders(Model model, HttpServletRequest request) {
+		LOG.info("Method sendMultipleSurveyReminders() called");
+
+		String surveysSelectedStr = request.getParameter("surveysSelected");
+		String[] surveysSelectedArray = surveysSelectedStr.split(",");
+		try {
+			for (String incompleteSurveyIdStr : surveysSelectedArray) {
+				try {
+					long incompleteSurveyId = Long.parseLong(incompleteSurveyIdStr);
+					SurveyPreInitiation survey = surveyHandler.getPreInitiatedSurvey(incompleteSurveyId);
+
+					long agentId = survey.getAgentId();
+					String customerEmail = survey.getCustomerEmailId();
+					String custFirstName = survey.getCustomerFirstName();
+					String custLastName = "";
+					if (survey.getCustomerLastName() != null) {
+						custLastName = survey.getCustomerLastName();
+					}
+
+					String surveyLink = "";
+					if (survey != null) {
+						surveyLink = surveyHandler.getSurveyUrl(agentId, customerEmail,
+								surveyHandler.composeLink(agentId, customerEmail, custFirstName, custLastName));
+					}
+
+					AgentSettings agentSettings = userManagementService.getUserSettings(agentId);
+					String agentName = "";
+					String agentTitle = "";
+					if (agentSettings.getContact_details() != null && agentSettings.getContact_details().getTitle() != null) {
+						agentName = agentSettings.getContact_details().getName();
+						agentTitle = agentSettings.getContact_details().getTitle();
+					}
+
+					String agentPhone = "";
+					if (agentSettings.getContact_details() != null && agentSettings.getContact_details().getContact_numbers() != null
+							&& agentSettings.getContact_details().getContact_numbers().getWork() != null) {
+						agentPhone = agentSettings.getContact_details().getContact_numbers().getWork();
+					}
+
+					User user = userManagementService.getUserByUserId(agentId);
+					String companyName = user.getCompany().getCompany();
+
+					if (enableKafka.equals(CommonConstants.YES)) {
+						emailServices.queueSurveyReminderMail(customerEmail, custFirstName, agentName, surveyLink, agentPhone, agentTitle,
+								companyName);
+					}
+					else {
+						emailServices.sendDefaultSurveyReminderMail(customerEmail, custFirstName, agentName, surveyLink, agentPhone, agentTitle,
+								companyName);
+					}
+
+					surveyHandler.updateReminderCount(survey.getSurveyPreIntitiationId());
+				}
+				catch (NumberFormatException e) {
+					throw new NonFatalException("Number format exception occured while parsing incomplete survey id : " + incompleteSurveyIdStr, e);
+				}
+			}
+		}
+		catch (NonFatalException nonFatalException) {
+			LOG.error("Nonfatal exception occured in method sendMultipleSurveyReminders, reason : " + nonFatalException.getMessage());
+			return CommonConstants.ERROR;
+		}
+		return CommonConstants.SUCCESS_ATTRIBUTE;
+	}
 
 
     /*

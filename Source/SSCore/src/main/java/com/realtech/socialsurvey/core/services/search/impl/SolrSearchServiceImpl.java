@@ -1545,6 +1545,7 @@ public class SolrSearchServiceImpl implements SolrSearchService {
 		}
 	}
 
+	
 	/**
 	 * Method to perform search of Branch Ids from solr based on the company.
 	 * 

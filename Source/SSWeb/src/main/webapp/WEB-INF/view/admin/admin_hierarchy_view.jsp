@@ -12,7 +12,6 @@
 			<div class="v-um-hdr-right float-right">
 				<label class="fil-label">Company Status : </label>
 				<select class="com-sel-filter" id="com-filter">
-					<option value="all">All</option>
 					<option value="active">Active</option>
 					<option value="inactive">Inactive</option>
 				</select>
@@ -39,7 +38,7 @@
 				class="um-search-icn"></span>
 		</div>
 	</div>
-	<div class="v-hr-tbl" style="margin-top: 0">
+	<div class="v-hr-tbl">
 		<div class="v-tbl-header comp-row" id="hierarchy-list-header">
 			<div class="v-tbl-line"></div>
 			<div class="v-tbl-name">Name</div>

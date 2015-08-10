@@ -99,7 +99,7 @@ public class LoginController {
 			LOG.info("Existing Active Session detected");
 
 			redirectAttributes.addFlashAttribute(CommonConstants.ACTIVE_SESSIONS_FOUND, "true");
-			return "redirect:/" + JspResolver.LANDING + ".do";
+			return "redirect:/" + JspResolver.USER_LOGIN + ".do";
 		}
 
 		if (status != null) {
@@ -190,14 +190,14 @@ public class LoginController {
 
 			HttpSession session = request.getSession(true);
 			user = sessionHelper.getCurrentUser();
-			user = userManagementService.getUserByUserId(user.getUserId());
-			userManagementService.setProfilesOfUser(user);
 
 			// Check if super admin is logged in
 			if (user.isSuperAdmin()) {
 				return JspResolver.ADMIN_LANDING;
 			}
 
+			user = userManagementService.getUserByUserId(user.getUserId());
+			userManagementService.setProfilesOfUser(user);
 			List<LicenseDetail> licenseDetails = user.getCompany().getLicenseDetails();
 			if (licenseDetails != null && !licenseDetails.isEmpty()) {
 				LicenseDetail licenseDetail = licenseDetails.get(0);
@@ -609,15 +609,6 @@ public class LoginController {
 		String redirectTo = null;
 		switch (profileCompletionStage) {
 			case CommonConstants.ADD_COMPANY_STAGE:
-				List<VerticalsMaster> verticalsMasters = null;
-				try {
-					verticalsMasters = organizationManagementService.getAllVerticalsMaster();
-				}
-				catch (InvalidInputException e) {
-					throw new InvalidInputException("Invalid Input exception occured in method getAllVerticalsMaster()",
-							DisplayMessageConstants.GENERAL_ERROR, e);
-				}
-				redirectAttributes.addFlashAttribute("verticals", verticalsMasters);
 				redirectTo = JspResolver.COMPANY_INFORMATION_PAGE;
 
 				break;
