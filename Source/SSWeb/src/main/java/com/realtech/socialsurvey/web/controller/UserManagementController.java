@@ -1431,83 +1431,93 @@ public class UserManagementController
 	}
 
 
-    @ResponseBody
-    @RequestMapping ( value = "/updateuserbyadmin", method = RequestMethod.POST)
-    public String updateUserByAdmin( Model model, HttpServletRequest request )
-    {
-        LOG.info( "Method updateUserByAdmin() called from UserManagementController" );
-        String userIdStr = request.getParameter( "userId" );
-        String firstName = request.getParameter( "firstName" );
-        String lastName = request.getParameter( "lastName" );
-        String emailId = request.getParameter( "emailId" );
+	@ResponseBody
+	@RequestMapping(value = "/updateuserbyadmin", method = RequestMethod.POST)
+	public String updateUserByAdmin(Model model, HttpServletRequest request) {
+		LOG.info("Method updateUserByAdmin() called from UserManagementController");
+		String userIdStr = request.getParameter("userId");
+		String firstName = request.getParameter("firstName");
+		String lastName = request.getParameter("lastName");
+		String emailId = request.getParameter("emailId");
 
-        String fullName = "";
+		String fullName = firstName;
+		if (lastName != null && lastName != "") {
+			fullName += " " + lastName;
+		}
 
-        fullName = firstName;
+		try {
+			long userId = 0;
+			try {
+				userId = Long.parseLong(userIdStr);
+			}
+			catch (NumberFormatException e) {
+				LOG.error("NumberFormatException while parsing user id. Reason : " + e.getMessage(), e);
+				throw e;
+			}
+			
+			// Check for email in DB for other users
+			try {
+				User existingUser = userManagementService.getUserByEmail(emailId);
+				if (existingUser != null && existingUser.getUserId() != userId) {
+					return "Email address is already in use";
+				}
+			}
+			catch (InvalidInputException | NoRecordsFetchedException e) {
+				LOG.warn("No users found with given emailId");
+			}
+			
+			// Update AgentSetting in MySQL
+			User user = userManagementService.getUserByUserId(userId);
+			user.setFirstName(firstName);
+			user.setLastName(lastName);
+			user.setEmailId(emailId);
+			user.setLoginName(emailId);
 
-        if ( lastName != null && lastName != "" ) {
-            fullName += " " + lastName;
-        }
+			// update in solr
+			Map<String, Object> userMap = new HashMap<>();
+			userMap.put(CommonConstants.USER_DISPLAY_NAME_SOLR, fullName);
+			userMap.put(CommonConstants.USER_FIRST_NAME_SOLR, firstName);
+			userMap.put(CommonConstants.USER_LAST_NAME_SOLR, lastName);
+			userMap.put(CommonConstants.USER_EMAIL_ID_SOLR, emailId);
+			userMap.put(CommonConstants.USER_LOGIN_NAME_SOLR, emailId);
+			userManagementService.updateUser(user, userMap);
 
-        long userId = 0;
-        try {
-            try {
-                userId = Long.parseLong( userIdStr );
-            } catch ( NumberFormatException e ) {
-                LOG.error( "NumberFormatException while parsing user id. Reason : " + e.getMessage(), e );
-                throw e;
-            }
-            // Update AgentSetting in MySQL
-            User user = userManagementService.getUserByUserId( userId );
-            
-            user.setFirstName( firstName );
-            user.setLastName( lastName );
-            user.setEmailId( emailId );
-            user.setLoginName( emailId );
+			// Update AgentSetting in MongoDB
+			AgentSettings agentSettings = userManagementService.getAgentSettingsForUserProfiles(user.getUserId());
+			ContactDetailsSettings contactDetails = agentSettings.getContact_details();
+			contactDetails.setFirstName(firstName);
+			contactDetails.setLastName(lastName);
+			contactDetails.setName(fullName);
+			contactDetails.getMail_ids().setWork(emailId);
+			if (user.getStatus() == CommonConstants.STATUS_ACCOUNT_DISABLED) {
+				String profileName = userManagementService.generateIndividualProfileName(user.getUserId(), contactDetails.getName(),
+						user.getEmailId());
+				agentSettings.setProfileName(profileName);
 
-            //update in solr
-            Map<String, Object> userMap = new HashMap<>();
-            userMap.put( CommonConstants.USER_DISPLAY_NAME_SOLR, fullName );
-            userMap.put( CommonConstants.USER_FIRST_NAME_SOLR, firstName );
-            userMap.put( CommonConstants.USER_LAST_NAME_SOLR, lastName );
-            userMap.put( CommonConstants.USER_EMAIL_ID_SOLR, emailId );
-            userMap.put( CommonConstants.USER_LOGIN_NAME_SOLR, emailId );
-            userManagementService.updateUser( user, userMap );
+				String profileUrl = utils.generateAgentProfileUrl(profileName);
+				agentSettings.setProfileUrl(profileUrl);
+				userManagementService.sendRegistrationCompletionLink(emailId, firstName, lastName, user.getCompany().getCompanyId(), profileName,
+						user.getLoginName());
+				
+				// Update the profile pic URL
+				organizationUnitSettingsDao.updateParticularKeyOrganizationUnitSettings(MongoOrganizationUnitSettingDaoImpl.KEY_PROFILE_URL,
+						agentSettings.getProfileUrl(), agentSettings, MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION);
 
-            // Update AgentSetting in MongoDB
-            AgentSettings agentSettings = userManagementService.getAgentSettingsForUserProfiles( user.getUserId() );
-            ContactDetailsSettings contactDetails = agentSettings.getContact_details();
-            contactDetails.setFirstName( firstName );
-            contactDetails.setLastName( lastName );
-            contactDetails.setName( fullName );
-            contactDetails.getMail_ids().setWork( emailId );
-            if(user.getStatus() == CommonConstants.STATUS_ACCOUNT_DISABLED){
-	            String profileName = userManagementService.generateIndividualProfileName( user.getUserId(), contactDetails.getName(), user.getEmailId() );
-	            agentSettings.setProfileName( profileName );
-	
-	            String profileUrl = utils.generateAgentProfileUrl( profileName );
-	            agentSettings.setProfileUrl( profileUrl );
-	            userManagementService.sendRegistrationCompletionLink( emailId, firstName, lastName, user.getCompany()
-	                    .getCompanyId(), profileName, user.getLoginName() );
-	         // Update the profile pic URL 
-	            organizationUnitSettingsDao.updateParticularKeyOrganizationUnitSettings(MongoOrganizationUnitSettingDaoImpl.KEY_PROFILE_URL, agentSettings.getProfileUrl(),
-	    				agentSettings, MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION);
-	    		
-	            organizationUnitSettingsDao.updateParticularKeyOrganizationUnitSettings(MongoOrganizationUnitSettingDaoImpl.KEY_PROFILE_NAME, agentSettings.getProfileName(),
-	    				agentSettings, MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION);
-            }
-            profileManagementService.updateContactDetails( MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION,
-                agentSettings, contactDetails );
-            
-         
-        } catch ( NonFatalException e ) {
-            LOG.error( "NonFatalException caught in updateUserByAdmin(). Nested exception is ", e );
-            return e.getMessage();
-        }
-        LOG.info( "Method updateUserByAdmin() finished from UserManagementController" );
-        return "User details updated successfully";
-    }
-
+				organizationUnitSettingsDao.updateParticularKeyOrganizationUnitSettings(MongoOrganizationUnitSettingDaoImpl.KEY_PROFILE_NAME,
+						agentSettings.getProfileName(), agentSettings, MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION);
+			}
+			
+			profileManagementService.updateContactDetails(MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION, agentSettings,
+					contactDetails);
+		}
+		catch (NonFatalException e) {
+			LOG.error("NonFatalException caught in updateUserByAdmin(). Nested exception is ", e);
+			return e.getMessage();
+		}
+		
+		LOG.info("Method updateUserByAdmin() finished from UserManagementController");
+		return "User details updated successfully";
+	}
 
     @ResponseBody
     @RequestMapping ( value = "/updateuserprofile", method = RequestMethod.POST)
