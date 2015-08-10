@@ -2,6 +2,7 @@
 <%@ taglib prefix="spring" uri="http://www.springframework.org/tags"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
+
 <c:if test="${not empty profile}">
 	<c:if test="${not empty profile.contact_details && not empty profile.contact_details.name}">
 		<c:set var="profName" value="${profile.contact_details.name}"></c:set>
@@ -48,7 +49,7 @@
 	</c:choose>
 </c:if>
 
-<!DOCTYPE">
+<!DOCTYPE>
 <html>
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
