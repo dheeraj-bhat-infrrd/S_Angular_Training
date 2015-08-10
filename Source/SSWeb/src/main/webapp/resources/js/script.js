@@ -606,8 +606,8 @@ function loadDisplayPicture(profileMasterId){
 	callAjaxGETWithTextData("./getdisplaypiclocation.do", function(data) {
 		if (data != undefined){
 			console.log("Image location : " + data);
-			var imageUrl = data;
-			if (imageUrl != '' && imageUrl != undefined) {
+			var imageUrl = JSON.parse(data);
+			if (imageUrl != undefined && imageUrl != "undefined" && imageUrl.trim() != "") {
 				$("#hdr-usr-img").css("background", "url(" + imageUrl + ") no-repeat center");
 				$("#hdr-usr-img").css("background-size", "cover");
 				$("#usr-initl").html("");
