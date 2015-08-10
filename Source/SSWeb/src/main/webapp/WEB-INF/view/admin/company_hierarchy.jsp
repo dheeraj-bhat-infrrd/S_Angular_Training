@@ -2,7 +2,7 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 
 <div class="v-hr-tbl-wrapper">
-	<table class="v-hr-tbl">
+	<table class="v-hr-tbl" style="margin-top: 0">
 		<c:if test="${not empty regions}">
 			<c:forEach var="region" items="${regions}">
 				<tr id="tr-region-${region.regionId}" clicked="false"

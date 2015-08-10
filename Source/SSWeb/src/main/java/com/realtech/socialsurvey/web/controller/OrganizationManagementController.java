@@ -491,30 +491,6 @@ public class OrganizationManagementController
 			return JspResolver.MESSAGE_HEADER;
 		}
 		
-		model.addAttribute("facebookLink", "");
-		model.addAttribute("twitterLink", "");
-		model.addAttribute("linkedinLink", "");
-		model.addAttribute("googleLink", "");
-
-		if (unitSettings != null && unitSettings.getSocialMediaTokens() != null) {
-
-			if (unitSettings.getSocialMediaTokens().getFacebookToken() != null
-					&& unitSettings.getSocialMediaTokens().getFacebookToken().getFacebookPageLink() != null) {
-				model.addAttribute("facebookLink", unitSettings.getSocialMediaTokens().getFacebookToken().getFacebookPageLink());
-			}
-			if (unitSettings.getSocialMediaTokens().getTwitterToken() != null
-					&& unitSettings.getSocialMediaTokens().getTwitterToken().getTwitterPageLink() != null) {
-				model.addAttribute("twitterLink", unitSettings.getSocialMediaTokens().getTwitterToken().getTwitterPageLink());
-			}
-			if (unitSettings.getSocialMediaTokens().getLinkedInToken() != null
-					&& unitSettings.getSocialMediaTokens().getLinkedInToken().getLinkedInPageLink() != null) {
-				model.addAttribute("linkedinLink", unitSettings.getSocialMediaTokens().getLinkedInToken().getLinkedInPageLink());
-			}
-			if (unitSettings.getSocialMediaTokens().getGoogleToken() != null
-					&& unitSettings.getSocialMediaTokens().getGoogleToken().getProfileLink() != null) {
-				model.addAttribute("googleLink", unitSettings.getSocialMediaTokens().getGoogleToken().getProfileLink());
-			}
-		}
 		model.addAttribute("autoPostEnabled", false);
 		if (unitSettings != null && unitSettings.getSurvey_settings() != null) {
 			model.addAttribute("autoPostEnabled", unitSettings.getSurvey_settings().isAutoPostEnabled());

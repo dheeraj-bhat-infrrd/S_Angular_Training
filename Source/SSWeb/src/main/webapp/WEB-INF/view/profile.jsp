@@ -47,6 +47,7 @@
 		</c:when>
 	</c:choose>
 </c:if>
+
 <!DOCTYPE">
 <html>
 <head>
@@ -70,10 +71,10 @@
 	    <c:choose>
 	    	<c:when test="${not empty profName}">
 	    		<c:choose>
-	    			<c:when test="${profileLevel == 'INDIVIDUAL' }">
+	    			<c:when test="${profileLevel == 'INDIVIDUAL'}">
 	    				<title>${profName} ${title} ${companyName} ${location} ${vertical} Professional Reviews | SocialSurvey.me</title>
 			    		<meta name="keywords"
-							content="${profName}, ${title }, ${companyName }, ${location }, ${vertical }, professional, online, reputation, social, survey, reviews, rating">
+							content="${profName}, ${title}, ${companyName}, ${location}, ${vertical}, professional, online, reputation, social, survey, reviews, rating">
 						<meta name="description"
 							content="Reviews for ${profName}. ${firstName} has ${reviewsCount} reviews. ${firstName} is a ${vertical} professional in ${location}. ${firstName} is the ${title} of ${companyName}.">
 	    			</c:when>
@@ -104,16 +105,16 @@
     </c:if>
 </head>
 <body>
-	<div class="hide" itemscope itemtype="http://schema.org/Product">
+	<%-- <div class="hide" itemscope itemtype="http://schema.org/Product">
 		<span itemprop="name">${profName}</span> 
 		<span id="agent-desc" itemprop="title"></span>
 		<div itemprop="aggregateRating" itemscope
 			itemtype="http://schema.org/AggregateRating">
-			Rated <span id="prof-schema-agent-rating" itemprop="ratingValue">${floatingAverageGoogleRating }</span>/5
+			Rated <span id="prof-schema-agent-rating" itemprop="ratingValue">${floatingAverageGoogleRating}</span>/5
 			based on <span id="prof-schema-reviews" itemprop="reviewCount">${reviewsCount}</span>
 			reviews
 		</div>
-	</div>
+	</div> --%>
     <div id="toast-container" class="toast-container">
 	   <span id="overlay-toast" class="overlay-toast"></span>
     </div>
@@ -193,9 +194,7 @@
 
 <div class="bread-crum-hdr">
 	<div class="container">
-		<div id="bread-crum-cont" class="row bread-crum-row">
-			
-		</div>
+		<div id="bread-crum-cont" class="row bread-crum-row"></div>
 	</div>
 </div>
 
@@ -214,37 +213,29 @@
 				<c:set var="profileNameClass" value="profile-name-img-wrapper"></c:set>
 			</c:if>
             <div class="col-lg-4 col-md-4 col-sm-4 col-xs-6 prof-wrapper pos-relative prof-name-wrapper ${profileNameClass}">
-                <div class="prof-name-container" id="prof-company-head-content">
-                	<div class="prof-name">${profName}</div>
+                <div itemscope itemtype="http://schema.org/Product" class="prof-name-container" id="prof-company-head-content">
+                	<div itemprop="name" class="prof-name">${profName}</div>
                 	<div class="prof-address">
                 		<c:if test="${not empty profile.contact_details &&  not empty profile.contact_details.title}">
                 			<div class="prof-addline2">${profile.contact_details.title}</div>
                 		</c:if>
                 		<div class="prof-addline1">
-                			<c:if test="${ not empty profile.contact_details && not empty profile.contact_details.location }">
+                			<c:if test="${not empty profile.contact_details && not empty profile.contact_details.location}">
                 				${profile.contact_details.location}
                 				<c:set var="isLocationTrue" value="yes"></c:set>
                 			</c:if>
-	                		<c:choose>
-	                			<c:when test="${ not empty profile.contact_details && not empty profile.contact_details.industry }">
-	                				<c:if test="${isLocationTrue == 'yes' }"> | </c:if>
-	                				${profile.contact_details.industry}
-	                			</c:when>
-	                			<c:otherwise>
-		                			<c:if test="${not empty profile.vertical}">
-		                				<c:if test="${isLocationTrue == 'yes' }"> | </c:if>
-			                			${profile.vertical}
-			                		</c:if>
-	                			</c:otherwise>
-	                		</c:choose>
+                			<c:if test="${not empty profile.vertical}">
+                				<c:if test="${isLocationTrue == 'yes'}"> | </c:if>
+	                			${profile.vertical}
+	                		</c:if>
                 		</div>
                 	</div>
-					<div class="prof-rating clearfix">
+					<div itemprop="aggregateRating" itemscope itemtype="http://schema.org/AggregateRating" class="prof-rating clearfix">
 						<div class="prof-rating-wrapper maring-0 clearfix float-left" id="rating-avg-comp">
 							<div class='rating-image float-left smiley-rat-${integerAverageRating}'></div>
-							<div class='rating-rounded float-left' data-score="${floatingAverageRating}"></div>
+							<div class='rating-rounded float-left' data-score="${floatingAverageRating}"><span itemprop="ratingValue">${floatingAverageRating}</span> - </div>
 						</div>
-						<div class="float-left review-count-left cursor-pointer" id="prof-company-review-count">${reviewsCount} Review(s)</div>
+						<div class="float-left review-count-left cursor-pointer" id="prof-company-review-count"><span itemprop="ratingCount">${reviewsCount}</span> Review(s)</div>
 					</div>
 					<div class="prof-btn-wrapper clearfix">
 						<div class="prof-btn-contact float-left" onclick="focusOnContact()" >Contact
@@ -354,7 +345,7 @@
                     </div>
                 </div> -->
                 <c:if test="${not empty profile.contact_details }">
-                	<c:if test="${not empty profile.contact_details.web_addresses || not empty profile.contact_details.contact_numbers}">
+                	<c:if test="${(not empty profile.contact_details.web_addresses && not empty profile.contact_details.web_addresses.work) || (not empty profile.contact_details.contact_numbers && profile.contact_details.contact_numbers.work)}">
 						<div id="contact-info" class="prof-left-row prof-left-info bord-bot-dc prof-contact-info">
 							<div class="left-contact-wrapper">
 								<div class="left-panel-header">

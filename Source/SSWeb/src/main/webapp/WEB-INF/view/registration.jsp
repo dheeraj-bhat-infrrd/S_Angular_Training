@@ -200,6 +200,7 @@ $(document).ready(function() {
     		if (isSmallScreen) {
     			return isRegistrationFormValid;
     		}
+    		return isRegistrationFormValid;
 		}
 		if (!validateLastName('reg-lname')) {
 			isRegistrationFormValid = false;
@@ -210,6 +211,7 @@ $(document).ready(function() {
     		if (isSmallScreen) {
     			return isRegistrationFormValid;
     		}
+    		return isRegistrationFormValid;
 		}
 		if (!validateEmailId('reg-email')) {
 			isRegistrationFormValid = false;
@@ -220,6 +222,7 @@ $(document).ready(function() {
     		if (isSmallScreen) {
     			return isRegistrationFormValid;
     		}
+    		return isRegistrationFormValid;
 		}
 		if (!validatePassword('reg-pwd')) {
 			isRegistrationFormValid = false;
@@ -230,6 +233,7 @@ $(document).ready(function() {
     		if (isSmallScreen) {
     			return isRegistrationFormValid;
     		}
+    		return isRegistrationFormValid;
 		}
 		if (!validateConfirmPassword('reg-pwd', 'reg-conf-pwd')) {
 			isRegistrationFormValid = false;
@@ -240,6 +244,7 @@ $(document).ready(function() {
     		if (isSmallScreen) {
     			return isRegistrationFormValid;
     		}
+    		return isRegistrationFormValid;
 		}
     	return isRegistrationFormValid;
 	}

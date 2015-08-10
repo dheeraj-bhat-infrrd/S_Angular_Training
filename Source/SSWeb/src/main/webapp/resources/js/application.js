@@ -329,7 +329,7 @@ function paintDashboard(profileMasterId, newProfileName, newProfileValue, typeoO
 	});
 	
 	// Loads the image in circle of header.
-	loadDisplayPicture();
+	//loadDisplayPicture();
 	// Loads the master image in dashboard.
 	showDisplayPic();
 }
@@ -559,17 +559,17 @@ function showIncompleteSurvey(columnName, columnValue) {
 				}
 			};
 	
-			$('.dash-lp-rt-img').click(function() {
-				var agentId = $(this).data("agentid");
-				var agentName = $(this).data("agentname");
-				var customerEmail = $(this).data("custemail");
-				var customerName = $(this).data("custname");
-				sendSurveyReminderMail(agentId, agentName, customerEmail, customerName);
-			});
-			
 			startIndexInc += batchSizeInc;
 	}, payload, false);}, payload, false);
 }
+
+$(document).on('click', '.dash-lp-rt-img', function() {
+	var agentId = $(this).data("agentid");
+	var agentName = $(this).data("agentname");
+	var customerEmail = $(this).data("custemail");
+	var customerName = $(this).data("custname");
+	sendSurveyReminderMail(agentId, agentName, customerEmail, customerName);
+});
 
 function getReviewsCountAndShowReviews(columnName, columnValue) {
 	var payload = {
@@ -1272,30 +1272,33 @@ $(document).on('click', '.srv-tbl-edit', function() {
 
 $(document).on('input', '.bd-q-pu-txt-edit', function() {
 	var quesNum = $(this).closest('form').data('quesnum');
-	$('#bs-question-' + quesNum).attr('data-status', 'edited');
-	showStatus('#bs-question-' + quesNum, 'Edited');
+	$('#bs-question-edit-' + quesNum).attr('data-status', 'edited');
+	showStatus('#bs-question-edit-' + quesNum, 'Edited');
 });
 
 $(document).on('click', '.bd-q-btn-done-edit', function() {
 	var questionId = $(this).data('quesnum');
 
-	if ($('#sb-question-txt-' + questionId).val() == '' || $('#sb-question-type-' + questionId).val() == '') {
+	if ($('#sb-question-edit-txt-' + questionId).val() == '' || $('#sb-question-edit-type-' + questionId).val() == '') {
 		$("#overlay-toast").html('Please finish editing the Question');
 		showToast();
 	} else {
 		var url = "./updatequestionfromsurvey.do?order=" + questionId + "&questionId=" + questionId;
-		showProgress('#bs-question-' + questionId);
+		showProgress('#bs-question-edit-' + questionId);
 		callAjaxFormSubmit(url, function(data) {
 			var map =  $.parseJSON(data);
-			showInfo(map.message);
 			
 			if (map.status == "success") {
+				showInfo(map.message);
 				$('.bd-srv-tbl-row-' + questionId).next().remove();
-				loadActiveSurveyQuestions();
+				
+				delay(function() {
+					loadActiveSurveyQuestions();
+				}, 500);
 			} else {
-				showStatus('#bs-question-' + questionId, 'Retry Saving');
+				showStatus('#bs-question-edit-' + questionId, 'Retry Saving');
 			}
-		}, 'bs-question-' + questionId);
+		}, 'bs-question-edit-' + questionId);
 	}
 });
 
@@ -2035,6 +2038,25 @@ function validateRegionForm() {
 	isRegionValid = true;
 	var isFocussed = false;
 	
+	
+	if(!validateRegionName('region-name-txt')){
+		isRegionValid = false;
+		if(!isFocussed){
+			$('#region-name-txt').focus();
+			isFocussed=true;
+		}
+		return isRegionValid;
+	}
+	
+	if(!validateAddress1('region-address1-txt')){
+		isOfficeValid = false;
+		if(!isFocussed){
+			$('#office-address-txt').focus();
+			isFocussed=true;
+		}
+		return isRegionValid;
+	}
+	
 	var userSelectionType = $('#user-selection-info').data('user-selection-type');
 	if(userSelectionType =="single"){
 	
@@ -2053,13 +2075,7 @@ function validateRegionForm() {
 		
 		
 	}
-	if(!validateRegionName('region-name-txt')){
-		isRegionValid = false;
-		if(!isFocussed){
-			$('#region-name-txt').focus();
-			isFocussed=true;
-		}
-	}
+	
 	
 	if(isRegionValid){
 		hideError();
@@ -2191,12 +2207,22 @@ function validateOfficeForm() {
 	isOfficeValid = true;
 	var isFocussed = false;
 	
+	if(!validateOfficeName('office-name-txt')){
+		isOfficeValid = false;
+		if(!isFocussed){
+			$('#office-name-txt').focus();
+			isFocussed=true;
+		}
+		return isOfficeValid;
+	}
+	
 	if(!validateRegionSelector('selected-region-txt', 'selected-region-id-hidden')) {
 		isOfficeValid = false;
 		if(!isFocussed){
 			$('#selected-region-txt').focus();
 			isFocussed=true;
 		}
+		return isOfficeValid;
 	}
 	if(!validateAddress1('office-address-txt')){
 		isOfficeValid = false;
@@ -2204,6 +2230,7 @@ function validateOfficeForm() {
 			$('#office-address-txt').focus();
 			isFocussed=true;
 		}
+		return isOfficeValid;
 	}
 	
 	var userSelectionType = $('#user-selection-info').data('user-selection-type');
@@ -2220,13 +2247,6 @@ function validateOfficeForm() {
 				isFocussed=true;
 			}
 				
-	}
-	if(!validateOfficeName('office-name-txt')){
-		isOfficeValid = false;
-		if(!isFocussed){
-			$('#office-name-txt').focus();
-			isFocussed=true;
-		}
 	}
 	
 	if(isOfficeValid){
@@ -4899,6 +4919,15 @@ function paintSurveyPageFromJson() {
 		$("div[data-ques-type='smiley-text-final']").show();
 		$("#ques-text-textarea").html(question);
 		$("#text-area").show();
+		
+		var val = questionDetails.customerResponse;
+		if (val != undefined) {
+			$("#text-area").val(val);
+		}
+		else {
+			$("#text-area").val('');
+		}
+		
 		$('#text-box-disclaimer').show();
 		$("#smiles-final").hide();
 		if(questionDetails.customerResponse!=undefined)
@@ -6171,12 +6200,17 @@ $(document).on('blur', '#prof-basic-container input', function() {
 	delay(function() {
 		var profName = $('#prof-name').val().trim();
 		var profTitle = $('#prof-title').val().trim();
-		var profVertical = $('#prof-vertical').val().trim();
 		var payload = {
 			"profName" : profName,
-			"profTitle" : profTitle,
-			"profVertical" : profVertical
+			"profTitle" : profTitle
 		};
+		if($('#prof-vertical').val()){
+			payload["profVertical"] = $('#prof-vertical').val().trim();
+		}
+		if($('#prof-location').val()){
+			payload["profLocation"] = $('#prof-location').val().trim();
+		}
+		
 		callAjaxPostWithPayloadData("./updatebasicprofile.do", callBackUpdateBasicDetails, payload);
 	}, 0);
 });
@@ -7512,29 +7546,123 @@ function initializeVerticalAutcomplete() {
 	});
 }
 
-function showIncompleteSurveyListPopup() {
+function getIncompleteSurveyCount(){
 	var payload = {
-			"columnName" : colName,
-			"columnValue" : colValue
-		};
-		callAjaxGetWithPayloadData("./fetchincompletesurveypopup.do", function(data) {
-			$('body').addClass('body-no-scroll');
-			$("#overlay-incomplete-survey").html(data).show();
-		}, payload, false);
+		"columnName" : colName,
+		"columnValue" : colValue
+	};
+	callAjaxGetWithPayloadData("./fetchdashboardincompletesurveycount.do", function(data) {
+		$('#icn-sur-popup-cont').attr("data-total", data);
+		var incompleteSurveystartIndex = $('#icn-sur-popup-cont').attr("data-start");
+		paintIncompleteSurveyListPopupResults(incompleteSurveystartIndex);
+	}, payload, true);
+}
+
+$(document).on('click', '#sur-next.paginate-button',function(){
+	var incompleteSurveyStartIndex = parseInt($('#icn-sur-popup-cont').attr("data-start"));
+	var incompleteSurveyBatchSize = parseInt($('#icn-sur-popup-cont').attr("data-batch"));
+	incompleteSurveyStartIndex = incompleteSurveyStartIndex + incompleteSurveyBatchSize;
+	$('#icn-sur-popup-cont').attr("data-start", incompleteSurveyStartIndex);
+	paintIncompleteSurveyListPopupResults(incompleteSurveyStartIndex);	
+});
+
+$(document).on('click', '#sur-previous.paginate-button',function(){
+	var incompleteSurveyStartIndex = parseInt($('#icn-sur-popup-cont').attr("data-start"));
+	var incompleteSurveyBatchSize = parseInt($('#icn-sur-popup-cont').attr("data-batch"));
+	if(incompleteSurveyStartIndex % incompleteSurveyBatchSize == 0) {
+		incompleteSurveyStartIndex = parseInt(incompleteSurveyStartIndex / incompleteSurveyBatchSize)  - 1;
+	} else {
+		incompleteSurveyStartIndex = parseInt(incompleteSurveyStartIndex / incompleteSurveyBatchSize);	
+	}
+	incompleteSurveyStartIndex = incompleteSurveyStartIndex * incompleteSurveyBatchSize ;
+	$('#icn-sur-popup-cont').attr("data-start", incompleteSurveyStartIndex);
+	paintIncompleteSurveyListPopupResults(incompleteSurveyStartIndex);
+});
+
+function showIncompleteSurveyListPopup() {
+	var startIndex = $('#icn-sur-popup-cont').attr("data-start");
+	if(parseInt(startIndex) == 0){
+		$("#overlay-incomplete-survey").show();
+		getIncompleteSurveyCount();			
+	}else {
+		paintIncompleteSurveyListPopupResults(startIndex);		
+	}
+}
+
+function paintIncompleteSurveyListPopupResults(incompleteSurveystartIndex){
+	var payload = {
+		"columnName" : colName,
+		"columnValue" : colValue,
+		"startIndex" : incompleteSurveystartIndex,
+		"batchSize" : $('#icn-sur-popup-cont').attr("data-batch")
+	};
+	callAjaxGetWithPayloadData("./fetchincompletesurveypopup.do", function(data) {
+		$('body').addClass('body-no-scroll');
+		$('#icn-sur-popup-cont').html(data);
+		if(parseInt(incompleteSurveystartIndex) > 0 ) {
+			$('#sur-previous').addClass('paginate-button');
+		} else {
+			$('#sur-previous').removeClass('paginate-button');
+		}
+		incompleteSurveystartIndex = parseInt(incompleteSurveystartIndex) + parseInt($('#icn-sur-popup-cont').children('.dash-lp-item').size());
+		var totalSurveysCount = parseInt($('#icn-sur-popup-cont').attr("data-total"));
+		if(incompleteSurveystartIndex < totalSurveysCount ) {
+			$('#sur-next').addClass('paginate-button');
+		} else {
+			$('#sur-next').removeClass('paginate-button');
+		}
+	}, payload, false);
 }
 
 function hideIncompleteSurveyListPopup() {
 	$('body').removeClass('body-no-scroll');
-	$("#overlay-incomplete-survey").html('').hide();
+	$("#overlay-incomplete-survey").hide();
+	$('#icn-sur-popup-cont').html('');
+	$('#icn-sur-popup-cont').attr("data-start", 0);
+	$('#icn-sur-popup-cont').data('selected-survey', new Array());
 }
 
+$(document).on('click','#del-mult-sur-icn.mult-sur-icn-active',function(){
+	var selectedSurveys = $('#icn-sur-popup-cont').data('selected-survey');
+	removeMultipleIncompleteSurveyRequest(selectedSurveys);
+});
 
 function removeIncompleteSurveyRequest(incompleteSurveyId) {
-	callAjaxPOSTWithTextData("/delteincompletesurveyrequest.do?incompleteSurveyId="+incompleteSurveyId, function(data) {
-		if(data == "success") {
-			$('div[data-iden="sur-pre-'+incompleteSurveyId+'"]').remove();
+	var selectedSurveys = [];
+	selectedSurveys.push(incompleteSurveyId);
+	removeMultipleIncompleteSurveyRequest(selectedSurveys);
+}
+
+function removeMultipleIncompleteSurveyRequest(incompleteSurveyIds) {
+	callAjaxPOSTWithTextData("/deletemultipleincompletesurveyrequest.do?surveySetToDelete=" + incompleteSurveyIds, function(data) {
+		if (data == "success") {
+			var totalIncSurveys = $('#icn-sur-popup-cont').attr('data-total');
+			totalIncSurveys = totalIncSurveys - incompleteSurveyIds.length;
+			$('#icn-sur-popup-cont').attr('data-total', totalIncSurveys);
+			for (var i=0; i < incompleteSurveyIds.length; i++) {
+				$('div[data-iden="sur-pre-'+incompleteSurveyIds[i]+'"]').remove();
+			}
+			
 			$('#overlay-toast').html('Survey reminder request deleted successfully');
 			showToast();
+			$('#del-mult-sur-icn').removeClass('mult-sur-icn-active');
+			$('#resend-mult-sur-icn').removeClass('mult-sur-icn-active');
+		}
+	}, true, {});
+}
+
+$(document).on('click','#resend-mult-sur-icn.mult-sur-icn-active',function(){
+	var selectedSurveys = $('#icn-sur-popup-cont').data('selected-survey');
+	resendMultipleIncompleteSurveyRequests(selectedSurveys);
+});
+
+function resendMultipleIncompleteSurveyRequests(incompleteSurveyIds) {
+	callAjaxPOSTWithTextData("/resendmultipleincompletesurveyrequest.do?surveysSelected=" + incompleteSurveyIds, function(data) {
+		if (data == "success") {
+			$('#overlay-toast').html('Survey reminder request resent successfully');
+			showToast();
+			$('#del-mult-sur-icn').removeClass('mult-sur-icn-active');
+			$('#resend-mult-sur-icn').removeClass('mult-sur-icn-active');
 		}
 	}, true, {});
 }

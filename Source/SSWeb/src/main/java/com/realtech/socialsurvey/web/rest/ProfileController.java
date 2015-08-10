@@ -1334,7 +1334,7 @@ public class ProfileController {
 
 				}
 			}
-			catch (InvalidInputException e) {
+			catch (InvalidInputException | NoRecordsFetchedException e) {
 				throw new InternalServerException(new ProfileServiceErrorCode(CommonConstants.ERROR_CODE_GENERAL,
 						CommonConstants.SERVICE_CODE_GENERAL, "Profile name for individual is invalid"), e.getMessage());
 			}
@@ -1380,7 +1380,7 @@ public class ProfileController {
 				LOG.debug("individual posts json : " + json);
 				response = Response.ok(json).build();
 			}
-			catch (InvalidInputException e) {
+			catch (InvalidInputException | NoRecordsFetchedException e) {
 				throw new InternalServerException(new ProfileServiceErrorCode(CommonConstants.ERROR_CODE_INDIVIDUAL_POSTS_FETCH_FAILURE,
 						CommonConstants.SERVICE_CODE_INDIVIDUAL_POSTS, "Profile name for individual is invalid"), e.getMessage());
 			}

@@ -1,15 +1,27 @@
 <%@ taglib prefix="spring" uri="http://www.springframework.org/tags"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+
 <c:if test="${not empty profileSettings && not empty profileSettings.profileImageUrl}">
 	<c:set value="${profileSettings.profileImageUrl}" var="profileimage"></c:set>
 </c:if>
-<c:if test="${not empty profile}">
-	<c:set value="${profile.profilesMaster.profileId}" var="profilemasterid"></c:set>
-</c:if>
+<c:choose>
+	<c:when test="${entityType == 'companyId'}">
+		<c:set value="1" var="profilemasterid"></c:set>
+	</c:when>
+	<c:when test="${entityType == 'regionId'}">
+		<c:set value="2" var="profilemasterid"></c:set>
+	</c:when>
+	<c:when test="${entityType == 'branchId'}">
+		<c:set value="3" var="profilemasterid"></c:set>
+	</c:when>
+	<c:when test="${entityType == 'agentId'}">
+		<c:set value="4" var="profilemasterid"></c:set>
+	</c:when>
+</c:choose>
+
 <c:choose>
 	<c:when test="${not empty profileimage}">
-		<img id="prof-image-edit" class="prof-image prof-image-edit pos-relative cursor-pointer"
-			src="${profileimage}"></img>
+		<img id="prof-image-edit" class="prof-image prof-image-edit pos-relative cursor-pointer" src="${profileimage}"></img>
 	</c:when>
 	<c:otherwise>
 		<c:choose>
@@ -26,8 +38,7 @@
 				<c:set value="pers-default-big" var="defaultprofimageclass"></c:set>
 			</c:when>
 		</c:choose>
-		<div id="prof-image-edit"
-			class="prof-image prof-image-edit ${defaultprofimageclass} pos-relative cursor-pointer"></div>
+		<div id="prof-image-edit" class="prof-image prof-image-edit ${defaultprofimageclass} pos-relative cursor-pointer"></div>
 	</c:otherwise>
 </c:choose>
 <form class="form_contact_image" enctype="multipart/form-data">

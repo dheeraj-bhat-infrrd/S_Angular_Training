@@ -4113,12 +4113,16 @@ img.prof-image {
 	padding-left: 5px;
 }
 .dsh-date-picker {
+	position: relative;
+	top: -2px;
 	width: 20%;
 	padding: 0 0 0 5px;
 	height: 28px;
+	line-height: normal;
 	border: none;
 	color: #777;
 	font-size: 11px;
+	outline: none;
 }
 
 .dsh-date-picker:focus {
@@ -6958,6 +6962,11 @@ a.sq-btn-post-social:hover, a.sq-btn-post-social:visited {
 	background-size: contain;
 }
 
+.social-media-disconnect-disabled {
+	cursor: auto;
+	opacity: 0.5;
+}
+
 .bread-crum-row {
     margin: 10px 0;
 }
@@ -7085,4 +7094,45 @@ label.fil-label {
 	font-size: 13px;
 	line-height: 30px;
 	margin-bottom: 0;
+}
+
+.paginate-buttons-survey {
+	width: 100px;
+	margin: 0 auto;
+	padding: 20px 0;
+}
+
+.sur-icn-checkbox {
+	width: 20px;
+	height: 20px;
+	margin: 0 10px 0 -10px;
+	background-position: center;
+}
+
+.mult-sur-icn-wrapper {
+	width: 80px;
+	margin: 0 auto;
+}
+
+.mult-sur-icn {
+	width: 30px;
+	height: 30px;
+	margin: 0 auto 10px;
+	border: 1px solid #EFDDDD;
+	border-radius: 50%;
+	opacity: 0.5;
+}
+
+.mult-sur-icn-active {
+	cursor: pointer;
+	opacity: 1;
+}
+
+.del-mult-sur-icn {
+	background: url(../images/delete.png) no-repeat center;
+}
+
+.resend-mult-sur-icn {
+	background: url(../images/fast_mail.png) no-repeat center;
+	background-size: contain;
 }

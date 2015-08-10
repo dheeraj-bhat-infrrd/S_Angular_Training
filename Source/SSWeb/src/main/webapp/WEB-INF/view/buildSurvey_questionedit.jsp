@@ -7,13 +7,13 @@
 </c:if>
 
 <div class="sb-edit-q-wrapper">
-	<form id="bs-question-${surveyQuestion.questionId}" data-quesnum="${surveyQuestion.questionId}">
+	<form id="bs-question-edit-${surveyQuestion.questionId}" data-quesnum="${surveyQuestion.questionId}">
 		<div class="bd-q-pu-header bd-q-pu-header-margin-override clearfix">
 			<div class="float-left bd-q-pu-header-lft"><spring:message code="label.editquestion.key" /></div>
 		</div>
 		<div class="bd-q-pu-txt-wrapper pos-relative">
-			<input type="hidden" id="sb-question-type-${surveyQuestion.questionId}" name="sb-question-type-${surveyQuestion.questionId}" value="${surveyQuestion.questionType}"/>
-			<input id="sb-question-txt-${surveyQuestion.questionId}" name="sb-question-txt-${surveyQuestion.questionId}" class="bd-q-pu-txt-edit" data-nextquest="false" value="${surveyQuestion.question}">
+			<input type="hidden" id="sb-question-edit-type-${surveyQuestion.questionId}" name="sb-question-type-${surveyQuestion.questionId}" value="${surveyQuestion.questionType}"/>
+			<input id="sb-question-edit-txt-${surveyQuestion.questionId}" name="sb-question-txt-${surveyQuestion.questionId}" class="bd-q-pu-txt-edit" data-nextquest="false" value="${surveyQuestion.question}">
 			<div class="bd-q-pu-close hide"></div>
 		</div>
 		<div class="bs-ans-wrapper hide" style="display: block">
@@ -154,4 +154,3 @@
   		<div data-quesnum="${surveyQuestion.questionId}" class="bd-q-btn-done-edit float-left"><spring:message code="label.done.key" /></div>
   	</div>
 </div>
-  	
