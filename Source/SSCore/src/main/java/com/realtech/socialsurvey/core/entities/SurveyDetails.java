@@ -31,12 +31,28 @@ public class SurveyDetails {
 	private List<SurveyResponse> surveyResponse;
 	private boolean editable;
 	private String completeProfileUrl;
+	private String faceBookShareUrl;
+	private String googleApi;
 	private String yelpProfileUrl;
 	private String zillowProfileUrl;
 	private String lendingTreeProfileUrl;
 	private String source;
 	private String agreedToShare;
+	
+	public String getGoogleApi() {
+		return googleApi;
+	}
 
+	public void setGoogleApi(String googleApi) {
+		this.googleApi = googleApi;
+	}
+	public String getFaceBookShareUrl() {
+		return faceBookShareUrl;
+	}
+
+	public void setFaceBookShareUrl(String faceBookShareUrl) {
+		this.faceBookShareUrl = faceBookShareUrl;
+	}
 	public long getAgentId() {
 		return agentId;
 	}

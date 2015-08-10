@@ -587,10 +587,12 @@ function paintReviews(result){
 		reviewsHtml += '		<div class="float-left blue-text ppl-share-shr-txt">Share</div>';
 		reviewsHtml += '		<div class="float-left icn-share icn-plus-open"></div>';
 		reviewsHtml += '		<div class="float-left clearfix ppl-share-social hide">';
-		reviewsHtml += '			<span class="float-left ppl-share-icns icn-fb icn-fb-pp" title="Facebook" data-link="https://www.facebook.com/sharer/sharer.php?u=' + reviewItem.completeProfileUrl + '"></span>';
-		reviewsHtml += '			<span class="float-left ppl-share-icns icn-twit icn-twit-pp" title="Twitter" data-link="https://twitter.com/home?status=' + reviewItem.completeProfileUrl + '"></span>';
+		reviewsHtml += '			<span id ="fb_' + i + '"class="float-left ppl-share-icns icn-fb icn-fb-pp" onclick="getImageandCaption(' + i + ');" title="Facebook" data-link="https://www.facebook.com/dialog/feed?' + reviewItem.faceBookShareUrl + '&link=' + reviewItem.completeProfileUrl + '&description=' + reviewItem.score + '-star response from ' + reviewItem.customerFirstName + ' ' + reviewItem.customerLastName + ' for ' + reviewItem.agentName + ' at SocialSurvey - ' + reviewItem.review + ' .&redirect_uri=https://www.facebook.com"></span>';
+		reviewsHtml += '            <input type="hidden" id="twttxt_' + i + '" class ="twitterText_loop" value ="' + reviewItem.score + '-star response from ' + reviewItem.customerFirstName + ' ' + reviewItem.customerLastName + ' for ' + reviewItem.agentName + ' at SocialSurvey - ' + reviewItem.review + '"/></input>';
+		reviewsHtml += '			<span id ="twitt_' + i + '" class="float-left ppl-share-icns icn-twit icn-twit-pp" onclick="twitterFn(' + i + ');" title="Twitter" data-link="https://twitter.com/intent/tweet?text=' + reviewItem.score + '-star response from ' + reviewItem.customerFirstName + ' ' + reviewItem.customerLastName + ' for ' + reviewItem.agentName + ' at SocialSurvey - ' + reviewItem.review + ' &url='+ reviewItem.completeProfileUrl +'"></span>';	
 		reviewsHtml += '			<span class="float-left ppl-share-icns icn-lin icn-lin-pp" title="LinkedIn" data-link="https://www.linkedin.com/shareArticle?mini=true&url=' + reviewItem.completeProfileUrl + '&title=&summary=' + reviewItem.score + '-star response from ' + reviewItem.customerFirstName+' '+reviewItem.customerLastName + ' for ' + reviewItem.agentName +' at SocialSurvey - ' + reviewItem.review + '&source="></span>';
-		reviewsHtml += '			<span class="float-left ppl-share-icns icn-gplus" title="Google+" data-link="https://plus.google.com/share?url=' + reviewItem.completeProfileUrl + '"></span>';
+		reviewsHtml += '			<span class="float-left ppl-share-icns icn-gplus" title="Google+"> <button class="g-interactivepost float-left ppl-share-icns icn-gplus" data-contenturl="' + reviewItem.completeProfileUrl + '" data-clientid="' + reviewItem.googleApi + '"data-cookiepolicy="single_host_origin" data-prefilltext="' + reviewItem.score + '-star response from ' + reviewItem.customerFirstName + ' ' + reviewItem.customerLastName + ' for ' + reviewItem.agentName + 'at SocialSurvey - ' + reviewItem.review + '" data-calltoactionlabel="USE" data-calltoactionurl=" ' + reviewItem.completeProfileUrl + '"> <span class="icon">&nbsp;</span> <span class="label">share</span> </button> </span>';
+		
 		if (reviewItem.yelpProfileUrl != null && reviewItem.yelpProfileUrl != "") {
 			reviewsHtml += '		<span class="float-left ppl-share-icns icn-yelp" title="Yelp" data-link="' + returnValidWebAddress(reviewItem.yelpProfileUrl) + '"></span>';
 		}
@@ -1369,4 +1371,35 @@ function constructDate(dateStr) {
 	}
 	
 	return dateDisplay;
+}
+
+function getImageandCaption(index)
+{
+	var fblink = $("#fb_"+index).data('link');
+	var pictureandCaptionLink = "&picture="+document.getElementById("prof-image").getAttribute("src")+"&caption="+document.getElementsByClassName("prof-name")[0].innerHTML+","+document.getElementsByClassName("prof-addline2")[0].innerHTML+","+document.getElementsByClassName("prof-addline1")[0].innerHTML;
+	fblink = fblink.concat(pictureandCaptionLink);
+	document.getElementById('fb_'+index).setAttribute('data-link',fblink);
+
+}
+
+function twitterFn (loop) {
+	
+  	var twitLink = $("#twitt_"+loop).data('link');
+  	var String=twitLink.substring(twitLink.indexOf("=")+1,twitLink.lastIndexOf("&"));
+	var twitId = 'twttxt_'+loop;
+	var twitText = $("#"+twitId).val();
+	var length = twitText.length;
+	if(length > 40)
+		{
+		var arr = twitLink.split('');
+   		var twittStrnDot = "...";
+		var substringed = twitText.substring(0, 40);
+		var finalString = substringed.concat(twittStrnDot);
+		$("#"+twitId).val(finalString);
+		twitLink = twitLink.replace(String,finalString);
+		
+		document.getElementById('twitt_'+loop).setAttribute('data-link',twitLink);
+		}
+	 
+	
 }
