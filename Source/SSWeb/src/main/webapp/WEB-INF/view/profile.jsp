@@ -203,7 +203,7 @@
     <div class="">
     	<div class="container">
         <div class="row prof-pic-name-wrapper">
-			<c:if test="${not empty profile.profileImageUrl}">
+			<c:if test="${not empty profile.profileImageUrl && not empty fn:trim(profile.profileImageUrl)}}">
 				<div id="prog-img-container" class="col-lg-4 col-md-4 col-sm-4 col-xs-6 prof-wrapper prof-img-wrapper">
 					<div class="prog-img-container">
 		            	<img id="prof-image" class="prof-image pos-relative" src="${profile.profileImageUrl}"></img>
