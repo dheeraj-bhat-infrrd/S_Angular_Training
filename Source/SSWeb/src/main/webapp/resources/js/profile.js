@@ -365,9 +365,8 @@ function paintIndividualForBranch(data) {
 				if (individual.contact_details != undefined) {
 					individualsHtml += '<div class="bd-hr-item-l3 comp-individual" data-agentid=' + individual.iden + '>';
 					individualsHtml += '	<div class="bd-hr-item bd-lt-l3 clearfix">';
-					if (individual.profileImageUrl != undefined) {
-						individualsHtml += '	<div class="float-left bd-hr-img pers-default-img comp-individual-prof-image"'
-							+ 'style="background: url(' + individual.profileImageUrl + ') 50% 50% / 100% no-repeat;"></div>';
+					if (individual.profileImageUrl != undefined && individual.profileImageUrl.trim() != "") {
+						individualsHtml += '	<div class="float-left bd-hr-img pers-default-img comp-individual-prof-image"><img class="hr-ind-img" src="'+individual.profileImageUrl+'"/></div>';
 					} else {
 						individualsHtml += '	<div class="float-left bd-hr-img pers-default-img comp-individual-prof-image"></div>';
 					}
@@ -417,9 +416,8 @@ function paintIndividualsForRegion(data) {
 					if (individual.contact_details != undefined){
 						individualsHtml += '<div class="bd-hr-item-l2 comp-region-individual" data-agentid=' + individual.iden + '>';
 						individualsHtml += '	<div class="bd-hr-item bd-lt-l3 clearfix">';
-						if (individual.profileImageUrl != undefined) {
-							individualsHtml += '	<div class="float-left bd-hr-img pers-default-img comp-individual-prof-image"'
-								+ 'style="background: url(' + individual.profileImageUrl + ') 50% 50% / 100% no-repeat;"></div>';
+						if (individual.profileImageUrl != undefined && individual.profileImageUrl.trim() != "") {
+							individualsHtml += '	<div class="float-left bd-hr-img pers-default-img comp-individual-prof-image"><img class="hr-ind-img" src="'+individual.profileImageUrl+'"/></div>';
 						} else {
 							individualsHtml += '	<div class="float-left bd-hr-img pers-default-img comp-individual-prof-image"></div>';
 						}
@@ -461,7 +459,7 @@ function fetchCompanyIndividuals() {
 
 function paintCompanyIndividuals(data) {
 	var response= $.parseJSON(data);
-	if (response != undefined) {
+	if (response != undefined && response.entity != "") {
 		var result = $.parseJSON(response.entity);
 		if (result != undefined && result.length > 0) {
 			var compIndividualsHtml = "";
@@ -470,9 +468,8 @@ function paintCompanyIndividuals(data) {
 					compIndividualsHtml += '<div class="bd-hr-item-l1 comp-individual" data-agentid=' + compIndividual.iden + '>';
 					compIndividualsHtml += '	<div class="bd-hr-item bd-lt-l3 clearfix">';
 					
-					if (compIndividual.profileImageUrl != undefined) {
-						compIndividualsHtml += '	<div class="float-left bd-hr-img pers-default-img comp-individual-prof-image"'
-							+ 'style="background: url(' + compIndividual.profileImageUrl + ') 50% 50% / 100% no-repeat;"></div>';
+					if (compIndividual.profileImageUrl != undefined && compIndividual.profileImageUrl.trim() != "") {
+						compIndividualsHtml += '	<div class="float-left bd-hr-img pers-default-img comp-individual-prof-image"><img class="hr-ind-img" src="'+compIndividual.profileImageUrl+'"/></div>';
 					} else {
 						compIndividualsHtml += '	<div class="float-left bd-hr-img pers-default-img comp-individual-prof-image"></div>';
 					}
