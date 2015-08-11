@@ -238,6 +238,7 @@ $(document).on('click', '.report-abuse-txt', function(e) {
 	$('.rpa-report-btn').on('click', function() {
 		var reportText = $("#report-abuse-txtbox").val();
 		if (validateReportAbuseUserForm(reportText)) {
+			showOverlay();
 			payload.reportText = reportText;
 			confirmUserReportAbuse(payload);
 		}
@@ -251,7 +252,6 @@ function validateReportAbuseUserForm(reportText) {
 		showToast();
 		return false;
 	}
-	
 	return true;
 }
 
@@ -264,6 +264,7 @@ function confirmUserReportAbuse(payload) {
 		} else {
 			$('#overlay-toast').html('Failed to report abuse, Please try again later');
 		}
+		hideOverlay();
 		showToast();
 	}, payload, true);
 }
