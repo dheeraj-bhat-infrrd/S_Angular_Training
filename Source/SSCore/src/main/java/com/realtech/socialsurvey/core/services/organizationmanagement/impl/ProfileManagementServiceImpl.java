@@ -1816,6 +1816,15 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
         organizationUnitSettingsDao.updateParticularKeyOrganizationUnitSettings(
             MongoOrganizationUnitSettingDaoImpl.KEY_LINKEDIN_PROFILEDATA, linkedInProfileData, organizationUnitSettings,
             collectionName );
+        
+        String profileImageUrl = organizationUnitSettings.getProfileImageUrl();
+        
+		if ((profileImageUrl == null || profileImageUrl.trim().isEmpty()) && linkedInProfileData.getPictureUrl() != null) {
+			profileImageUrl = linkedInProfileData.getPictureUrl();
+			organizationUnitSettingsDao.updateParticularKeyOrganizationUnitSettings(MongoOrganizationUnitSettingDaoImpl.KEY_PROFILE_IMAGE,
+					profileImageUrl, organizationUnitSettings, collectionName);
+		}
+        
         LOG.info( "Updated the linkedin profile data." );
 
     }

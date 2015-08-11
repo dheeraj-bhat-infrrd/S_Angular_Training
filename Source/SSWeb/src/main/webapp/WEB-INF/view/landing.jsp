@@ -53,12 +53,15 @@ function landingFlow() {
 		parent.hide();
 		parent.next('.welcome-popup-wrapper').show();
 	});
-
+	
 	$('body').on('click', '.wc-final-skip', function(){
-		//loadDisplayPicture();
-		//showDisplayPic();
 		$(this).closest('.overlay-login').hide().html('');
 		$('body').removeClass('body-no-scroll');
+	});
+	
+	$('body').on('click', '.lnk-final-skip.wc-final-skip', function(){
+		loadDisplayPicture();
+		showDisplayPic();
 	});
 	
 	onpopstate = function(event) {
