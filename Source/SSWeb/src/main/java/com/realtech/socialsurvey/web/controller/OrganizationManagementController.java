@@ -11,6 +11,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -1430,41 +1431,44 @@ public class OrganizationManagementController
         return usStateZipcodeList;
     }
 
+	// Method to delete all the records of a company.
+	@RequestMapping(value = "/deletecompany", method = RequestMethod.GET)
+	public String deleteCompany(HttpServletRequest request, Model model, RedirectAttributes redirectAttributes) throws NonFatalException {
+		User user = sessionHelper.getCurrentUser();
+		String message = "";
 
-    // Method to delete all the records of a company.
-    @RequestMapping ( value = "/deletecompany", method = RequestMethod.GET)
-    public String deleteCompany( HttpServletRequest request, Model model ) throws NonFatalException
-    {
-        try {
-            User user = sessionHelper.getCurrentUser();
-            if ( user != null ) {
-                if ( user.isCompanyAdmin() ) {
-                    // Add an entry into Disabled_Accounts table with disable_date as current date and status as inactive.
-                    try {
-                        organizationManagementService.addDisabledAccount( user.getCompany().getCompanyId(), true );
-                    } catch ( NoRecordsFetchedException | PaymentException e ) {
-                        LOG.error(
-                            "Exception caught in deleteCompany() of OrganizationManagementController. Nested exception is ", e );
-                        throw e;
-                    }
+		try {
+			if (user != null && user.isCompanyAdmin()) {
+				// Add an entry into Disabled_Accounts table with disable_date as current date
+				// and status as inactive.
+				try {
+					organizationManagementService.addDisabledAccount(user.getCompany().getCompanyId(), true);
+				}
+				catch (NoRecordsFetchedException | PaymentException e) {
+					LOG.error("Exception caught in deleteCompany() of OrganizationManagementController. Nested exception is ", e);
+					throw e;
+				}
 
-                    // Modify the company status to inactive.
-                    user.getCompany().setStatus( CommonConstants.STATUS_INACTIVE );
-                    organizationManagementService.updateCompany( user.getCompany() );
+				// Modify the company status to inactive.
+				user.getCompany().setStatus(CommonConstants.STATUS_INACTIVE);
+				organizationManagementService.updateCompany(user.getCompany());
 
-                    LOG.info( "Company deactivated successfully, logging out now." );
-                    request.getSession( false ).invalidate();
-                    model.addAttribute( "message", messageUtils.getDisplayMessage(
-                        DisplayMessageConstants.ACCOUNT_DELETION_SUCCESSFUL, DisplayMessageType.SUCCESS_MESSAGE ) );
-                    return JspResolver.LOGIN;
-                }
-            }
-        } catch ( InvalidInputException e ) {
-            LOG.error( "InvalidInputException caught in purgeCompany(). Nested exception is ", e );
-        }
-        model.addAttribute( "message", messageUtils.getDisplayMessage( DisplayMessageConstants.ACCOUNT_DELETION_UNSUCCESSFUL,
-            DisplayMessageType.ERROR_MESSAGE ) );
-        return JspResolver.LOGIN;
-    }
+				LOG.info("Company deactivated successfully, logging out now.");
+				request.getSession(false).invalidate();
+				SecurityContextHolder.clearContext();
+				
+				message = messageUtils.getDisplayMessage(DisplayMessageConstants.ACCOUNT_DELETION_SUCCESSFUL, DisplayMessageType.SUCCESS_MESSAGE)
+						.toString();
+			}
+		}
+		catch (InvalidInputException e) {
+			LOG.error("InvalidInputException caught in purgeCompany(). Nested exception is ", e);
+			message = messageUtils.getDisplayMessage(DisplayMessageConstants.ACCOUNT_DELETION_UNSUCCESSFUL, DisplayMessageType.ERROR_MESSAGE)
+					.toString();
+		}
+
+		redirectAttributes.addFlashAttribute(CommonConstants.MESSAGE, message);
+		return "redirect:/" + JspResolver.LOGIN + ".do";
+	}
 }
 // JIRA: SS-24 BY RM02 EOC
