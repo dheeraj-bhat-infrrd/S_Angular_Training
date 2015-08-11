@@ -1535,25 +1535,27 @@ public class ProfileController {
 
 	@ResponseBody
 	@RequestMapping(value = "/surveyreportabuse")
-	public void reportAbuse(HttpServletRequest request) {
-		String agentIdStr = request.getParameter("agentId");
+	public String reportAbuse(HttpServletRequest request) {
 		String customerEmail = request.getParameter("customerEmail");
 		String firstName = request.getParameter("firstName");
 		String lastName = request.getParameter("lastName");
 		String review = request.getParameter("review");
 		String reason = request.getParameter("reportText");
+		
 		try {
-			if (agentIdStr == null || agentIdStr.isEmpty()) {
-				throw new InvalidInputException("Invalid value (Null/Empty) found for agentId.");
-			}
 			long agentId = 0;
 			try {
+				String agentIdStr = request.getParameter("agentId");
+				if (agentIdStr == null || agentIdStr.isEmpty()) {
+					throw new InvalidInputException("Invalid value (Null/Empty) found for agentId.");
+				}
 				agentId = Long.parseLong(agentIdStr);
 			}
 			catch (NumberFormatException e) {
 				LOG.error("NumberFormatException caught in reportAbuse() while converting agentId.");
 				throw e;
 			}
+
 			String customerName = firstName + lastName;
 			String agentName = "";
 			try {
@@ -1569,8 +1571,11 @@ public class ProfileController {
 					customerEmail, review, reason);
 		}
 		catch (NonFatalException e) {
-			LOG.error("NonfatalException caught in makeSurveyEditable(). Nested exception is ", e);
+			LOG.error("NonfatalException caught in reportAbuse(). Nested exception is ", e);
+			return CommonConstants.ERROR;
 		}
+		
+		return CommonConstants.SUCCESS_ATTRIBUTE;
 	}
 
 	/**
