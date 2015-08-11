@@ -349,9 +349,11 @@ public interface EmailServices
         throws InvalidInputException, UndeliveredEmailException;
 
 
-    public void sendReportAbuseMail( String recipientMailId, String displayName, String agentName, String customerName,
-        String customerEmail, String review, String reason ) throws InvalidInputException, UndeliveredEmailException;
+	public void sendReportAbuseMail(String recipientMailId, String displayName, String agentName, String customerName, String customerEmail,
+			String review, String reason) throws InvalidInputException, UndeliveredEmailException;
 
+	public void sendSurveyReportMail(String recipientMailId, String displayName, String reason) throws InvalidInputException,
+			UndeliveredEmailException;
 
     public void sendAccountDeletionMail( String recipientMailId, String displayName, String loginName )
         throws InvalidInputException, UndeliveredEmailException;
