@@ -6344,7 +6344,12 @@ $(document).on('click', '.lp-ach-item-img', function(e) {
 		updateAchievements();
 	} else if (type == 'license') {
 		updateLicenseAuthorizations();
-	}
+	} else if (type == 'expertise') {
+		updateExpertise();
+	} else if (type == 'hobby') {
+		updateHobbies();
+	}  
+			
 });
 
 // Function to update association/membership list
