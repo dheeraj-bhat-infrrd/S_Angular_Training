@@ -1,8 +1,10 @@
 package com.realtech.socialsurvey.core.services.upload.impl;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -15,6 +17,8 @@ import java.util.Map;
 
 import javax.annotation.Resource;
 
+import org.apache.poi.hssf.usermodel.HSSFSheet;
+import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.xssf.usermodel.XSSFCell;
@@ -55,6 +59,8 @@ import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.exception.NoRecordsFetchedException;
 import com.realtech.socialsurvey.core.exception.RegionAdditionException;
 import com.realtech.socialsurvey.core.exception.UserAdditionException;
+import com.realtech.socialsurvey.core.services.mail.EmailServices;
+import com.realtech.socialsurvey.core.services.mail.UndeliveredEmailException;
 import com.realtech.socialsurvey.core.services.organizationmanagement.OrganizationManagementService;
 import com.realtech.socialsurvey.core.services.organizationmanagement.ProfileManagementService;
 import com.realtech.socialsurvey.core.services.organizationmanagement.UserAssignmentException;
@@ -140,6 +146,9 @@ public class CsvUploadServiceImpl implements CsvUploadService
     @Autowired
     private UserManagementService userManagementService;
 
+    @Autowired
+    private EmailServices emailServices;
+
     @Value ( "${FILEUPLOAD_DIRECTORY_LOCATION}")
     private String fileDirectory;
 
@@ -151,6 +160,15 @@ public class CsvUploadServiceImpl implements CsvUploadService
 
     @Value ( "${EMAIL_MASKING_SUFFIX}")
     private String maskingSuffix;
+
+    @Value ( "${FILE_DIRECTORY_LOCATION}")
+    private String fileDirectoryLocation;
+
+    @Value ( "${APPLICATION_ADMIN_EMAIL}")
+    private String adminEmailId;
+
+    @Value ( "${APPLICATION_ADMIN_NAME}")
+    private String adminName;
 
     private static Logger LOG = LoggerFactory.getLogger( CsvUploadServiceImpl.class );
 
@@ -176,7 +194,13 @@ public class CsvUploadServiceImpl implements CsvUploadService
             List<RegionUploadVO> uploadedRegions = parseAndUploadRegions( fileUpload, workBook, regionErrors, adminUser );
             List<BranchUploadVO> uploadedBranches = parseAndUploadBranches( fileUpload, workBook, branchErrors,
                 uploadedRegions, adminUser );
-            parseAndUploadUsers( fileUpload, workBook, userErrors, uploadedRegions, uploadedBranches, adminUser );
+            userErrors = parseAndUploadUsers( fileUpload, workBook, userErrors, uploadedRegions, uploadedBranches, adminUser );
+
+            if ( userErrors != null && !userErrors.isEmpty() ) {
+                LOG.debug( "Sending mail to realtech admin for users who were not uploaded due to some exception " );
+                generateExcelForFailedRecordsAndSendMail( userErrors );
+
+            }
         } catch ( IOException e ) {
             e.printStackTrace();
         } finally {
@@ -196,16 +220,99 @@ public class CsvUploadServiceImpl implements CsvUploadService
     }
 
 
-    private List<UserUploadVO> parseAndUploadUsers( FileUpload fileUpload, XSSFWorkbook workBook, List<String> userErrors,
+    private void generateExcelForFailedRecordsAndSendMail( List<String> userErrors )
+    {
+        int rownum = 1;
+        int count = 1;
+        boolean excelCreated = false;
+        HSSFWorkbook workbook = new HSSFWorkbook();
+        HSSFSheet sheet = workbook.createSheet( "Records not uploaded" );
+        sheet = fillHeaders( sheet );
+        for ( String error : userErrors ) {
+            Row row = sheet.createRow( rownum++ );
+            row = fillCellsInRow( row, error, count++ );
+        }
+
+        String fileName = "Record_Upload_Failure" + "_" + System.currentTimeMillis();
+        FileOutputStream fileOutput = null;
+        InputStream inputStream = null;
+        File file = null;
+        String filePath = null;
+        try {
+            file = new File( fileDirectoryLocation + File.separator + fileName + ".xls" );
+            fileOutput = new FileOutputStream( file );
+            file.createNewFile();
+            workbook.write( fileOutput );
+            filePath = file.getPath();
+            excelCreated = true;
+        } catch ( FileNotFoundException fe ) {
+            LOG.error( "Exception caught " + fe.getMessage() );
+            excelCreated = false;
+        } catch ( IOException e ) {
+            LOG.error( "Exception caught " + e.getMessage() );
+            excelCreated = false;
+        } finally {
+            try {
+                fileOutput.close();
+                if ( inputStream != null ) {
+                    inputStream.close();
+                }
+            } catch ( IOException e ) {
+                LOG.error( "Exception caught " + e.getMessage() );
+                excelCreated = false;
+            }
+        }
+        if ( excelCreated ) {
+            try {
+                emailServices.sendRecordsNotUploadedCrmNotificationMail( adminName, "", adminEmailId, filePath );
+            } catch ( InvalidInputException e ) {
+                LOG.error( "Exception caught " + e.getMessage() );
+            } catch ( UndeliveredEmailException e ) {
+                LOG.error( "Exception caught " + e.getMessage() );
+            }
+        }
+    }
+
+
+    private Row fillCellsInRow( Row row, String userErrorString, int counter )
+    {
+        int cellnum = 0;
+        Cell cell1 = row.createCell( cellnum++ );
+        cell1.setCellValue( counter );
+        Cell cell2 = row.createCell( cellnum++ );
+        cell2.setCellValue( userErrorString );
+        return row;
+
+    }
+
+
+    public HSSFSheet fillHeaders( HSSFSheet sheet )
+    {
+        int cellnum = 0;
+        Row row = sheet.createRow( 0 );
+        Cell cell1 = row.createCell( cellnum++ );
+        cell1.setCellValue( "S.No" );
+        Cell cell2 = row.createCell( cellnum++ );
+        cell2.setCellValue( "Error" );
+
+        return sheet;
+    }
+
+
+    @SuppressWarnings ( { "rawtypes", "unchecked" })
+    private List<String> parseAndUploadUsers( FileUpload fileUpload, XSSFWorkbook workBook, List<String> userErrors,
         List<RegionUploadVO> uploadedRegions, List<BranchUploadVO> uploadedBranches, User adminUser )
     {
         LOG.debug( "Parsing and uploading users: BEGIN" );
+        Map<Object, Object> userMap = new HashMap<Object, Object>();
         Map<UserUploadVO, User> map = new HashMap<UserUploadVO, User>();
         List<UserUploadVO> userUploads = parseUsers( fileUpload, workBook, userErrors, uploadedRegions, uploadedBranches,
             adminUser );
         if ( userUploads != null && !userUploads.isEmpty() ) {
             LOG.info( "Uploading users to database." );
-            map = uploadUsers( userUploads, adminUser, userErrors );
+            userMap = uploadUsers( userUploads, adminUser, userErrors );
+            map = (HashMap) userMap.get( "ValidUser" );
+            userErrors = (List) userMap.get( "InvalidUser" );
             if ( map != null && !map.isEmpty() ) {
                 LOG.debug( "Adding extra user details " );
                 for ( Map.Entry<UserUploadVO, User> entry : map.entrySet() ) {
@@ -220,9 +327,9 @@ public class CsvUploadServiceImpl implements CsvUploadService
                 }
             }
         } else {
-            LOG.info( "No branches to upload into the database." );
+            LOG.info( "No users to upload into the database." );
         }
-        return userUploads;
+        return userErrors;
     }
 
 
@@ -371,7 +478,7 @@ public class CsvUploadServiceImpl implements CsvUploadService
                 } else if ( cellIndex == USER_HAS_PUBLIC_PAGE_INDEX ) {
                     if ( cell.getCellType() != XSSFCell.CELL_TYPE_BLANK ) {
                         String hasProfilePage = cell.getStringCellValue();
-                        if ( hasProfilePage.equals( "YES" ) ) {
+                        if ( hasProfilePage.equalsIgnoreCase( "YES" ) ) {
                             uploadedUser.setAgent( true );
                         }
                     }
@@ -462,9 +569,10 @@ public class CsvUploadServiceImpl implements CsvUploadService
 
 
     // modifies the list of branchesToUpload with the actual branch id
-    private Map<UserUploadVO, User> uploadUsers( List<UserUploadVO> usersToUpload, User adminUser, List<String> userErrors )
+    private Map<Object, Object> uploadUsers( List<UserUploadVO> usersToUpload, User adminUser, List<String> userErrors )
     {
         LOG.debug( "Uploading users to database" );
+        Map<Object, Object> userMap = new HashMap<Object, Object>();
         Map<UserUploadVO, User> map = new HashMap<UserUploadVO, User>();
         for ( UserUploadVO userToBeUploaded : usersToUpload ) {
             if ( checkIfEmailIdExists( userToBeUploaded.getEmailId(), adminUser.getCompany() ) ) {
@@ -475,19 +583,24 @@ public class CsvUploadServiceImpl implements CsvUploadService
                     }
                 } catch ( UserAdditionException e ) {
                     LOG.error( "UserAdditionException while adding user: " + userToBeUploaded.getEmailId() );
-                    userErrors.add( "Error while adding user: " + userToBeUploaded.getEmailId() );
+                    userErrors.add( "UserAdditionException while adding user: " + userToBeUploaded.getEmailId()
+                        + " Exception is : " + e.getMessage() );
                 } catch ( InvalidInputException e ) {
                     LOG.error( "InvalidInputException while adding user: " + userToBeUploaded.getEmailId() );
-                    userErrors.add( "Error while adding user: " + userToBeUploaded.getEmailId() );
+                    userErrors.add( "InvalidInputException while adding user: " + userToBeUploaded.getEmailId()
+                        + " Exception is : " + e.getMessage() );
                 } catch ( SolrException e ) {
                     LOG.error( "SolrException while adding user: " + userToBeUploaded.getEmailId() );
-                    userErrors.add( "Error while adding user: " + userToBeUploaded.getEmailId() );
+                    userErrors.add( "SolrException while adding user: " + userToBeUploaded.getEmailId() + " Exception is : "
+                        + e.getMessage() );
                 } catch ( NoRecordsFetchedException e ) {
                     LOG.error( "NoRecordsFetchedException while adding user: " + userToBeUploaded.getEmailId() );
-                    userErrors.add( "Error while adding user: " + userToBeUploaded.getEmailId() );
+                    userErrors.add( "NoRecordsFetchedException while adding user: " + userToBeUploaded.getEmailId()
+                        + " Exception is : " + e.getMessage() );
                 } catch ( UserAssignmentException e ) {
                     LOG.error( "UserAssignmentException while adding user: " + userToBeUploaded.getEmailId() );
-                    userErrors.add( "Error while adding user: " + userToBeUploaded.getEmailId() );
+                    userErrors.add( "UserAssignmentException while adding user: " + userToBeUploaded.getEmailId()
+                        + " Exception is : " + e.getMessage() );
                 }
             } else {
                 // add user
@@ -498,23 +611,30 @@ public class CsvUploadServiceImpl implements CsvUploadService
                     }
                 } catch ( InvalidInputException e ) {
                     LOG.error( "InvalidInputException while adding user: " + userToBeUploaded.getEmailId() );
-                    userErrors.add( "Error while adding user: " + userToBeUploaded.getEmailId() );
+                    userErrors.add( "InvalidInputException while adding user: " + userToBeUploaded.getEmailId()
+                        + " Exception is : " + e.getMessage() );
                 } catch ( NoRecordsFetchedException e ) {
                     LOG.error( "NoRecordsFetchedException while adding user: " + userToBeUploaded.getEmailId() );
-                    userErrors.add( "Error while adding user: " + userToBeUploaded.getEmailId() );
+                    userErrors.add( "NoRecordsFetchedException while adding user: " + userToBeUploaded.getEmailId()
+                        + " Exception is : " + e.getMessage() );
                 } catch ( SolrException e ) {
                     LOG.error( "SolrException while adding user: " + userToBeUploaded.getEmailId() );
-                    userErrors.add( "Error while adding user: " + userToBeUploaded.getEmailId() );
+                    userErrors.add( "SolrException while adding user: " + userToBeUploaded.getEmailId() + " Exception is : "
+                        + e.getMessage() );
                 } catch ( UserAssignmentException e ) {
                     LOG.error( "UserAssignmentException while adding user: " + userToBeUploaded.getEmailId() );
-                    userErrors.add( "Error while adding user: " + userToBeUploaded.getEmailId() );
+                    userErrors.add( "UserAssignmentException while adding user: " + userToBeUploaded.getEmailId()
+                        + " Exception is : " + e.getMessage() );
                 } catch ( UserAdditionException e ) {
                     LOG.error( "UserAdditionException while adding user: " + userToBeUploaded.getEmailId() );
-                    userErrors.add( "Error while adding user: " + userToBeUploaded.getEmailId() );
+                    userErrors.add( "UserAdditionException while adding user: " + userToBeUploaded.getEmailId()
+                        + " Exception is : " + e.getMessage() );
                 }
             }
         }
-        return map;
+        userMap.put( "ValidUser", map );
+        userMap.put( "InvalidUser", userErrors );
+        return userMap;
 
     }
 
@@ -951,6 +1071,10 @@ public class CsvUploadServiceImpl implements CsvUploadService
                 LOG.debug( "User is the branch admin" );
                 map = organizationManagementService.addIndividual( adminUser, 0, branch.getBranchId(), branch.getRegion()
                     .getRegionId(), new String[] { user.getEmailId() }, true );
+                if ( user.isAgent() ) {
+                    organizationManagementService.addIndividual( adminUser, 0, branch.getBranchId(), branch.getRegion()
+                        .getRegionId(), new String[] { user.getEmailId() }, false );
+                }
                 if ( map != null ) {
                     userList = (List<User>) map.get( CommonConstants.VALID_USERS_LIST );
                 }
@@ -972,6 +1096,10 @@ public class CsvUploadServiceImpl implements CsvUploadService
                 LOG.debug( "User is the region admin." );
                 map = organizationManagementService.addIndividual( adminUser, 0, 0, region.getRegionId(),
                     new String[] { user.getEmailId() }, true );
+                if ( user.isAgent() ) {
+                    organizationManagementService.addIndividual( adminUser, 0, 0, region.getRegionId(),
+                        new String[] { user.getEmailId() }, false );
+                }
                 if ( map != null ) {
                     userList = (List<User>) map.get( CommonConstants.VALID_USERS_LIST );
                 }
@@ -1021,6 +1149,10 @@ public class CsvUploadServiceImpl implements CsvUploadService
                 LOG.debug( "User is the branch admin" );
                 organizationManagementService.addIndividual( adminUser, assigneeUser.getUserId(), branch.getBranchId(), branch
                     .getRegion().getRegionId(), null, true );
+                if ( user.isAgent() ) {
+                    organizationManagementService.addIndividual( adminUser, assigneeUser.getUserId(), branch.getBranchId(),
+                        branch.getRegion().getRegionId(), null, false );
+                }
                 LOG.debug( "Added user : " + user.getEmailId() );
             } else {
                 LOG.debug( "User is not the branch admin" );
@@ -1037,6 +1169,11 @@ public class CsvUploadServiceImpl implements CsvUploadService
                 organizationManagementService.addIndividual( adminUser, assigneeUser.getUserId(), 0, region.getRegionId(),
                     null, true );
                 LOG.debug( "Added user : " + user.getEmailId() );
+                if ( user.isAgent() ) {
+                    organizationManagementService.addIndividual( adminUser, assigneeUser.getUserId(), 0, region.getRegionId(),
+                        null, false );
+                }
+
             } else {
                 LOG.debug( "User is not the admin of the region" );
                 organizationManagementService.addIndividual( adminUser, assigneeUser.getUserId(), 0, region.getRegionId(),
