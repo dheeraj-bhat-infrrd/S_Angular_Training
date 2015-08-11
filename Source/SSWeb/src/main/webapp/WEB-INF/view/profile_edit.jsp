@@ -268,7 +268,7 @@
 												<c:forEach items="${expertiseList}" var="expertise">
 													<div class="lp-dummy-row clearfix">
 														<input class="lp-expertise-row lp-row clearfix prof-edditable-sin-agent" value="${expertise}" data-status="saved">
-														<div class="float-right lp-ach-item-img hide" data-type="expertise"></div>
+														<div class="float-right lp-expertise-item-img hide" data-type="expertise"></div>
 													</div>
 												</c:forEach>
 											</c:when>
@@ -316,7 +316,7 @@
 												<c:forEach items="${hobbies}" var="hobby">
 													<div class="lp-dummy-row clearfix">
 														<input class="lp-hobby-row lp-row clearfix prof-edditable-sin-agent" value="${hobby}" data-status="saved">
-														<div class="float-right lp-ach-item-img hide" data-type="hobby"></div>
+														<div class="float-right lp-hobby-item-img hide" data-type="hobby"></div>
 													</div>
 												</c:forEach>
 											</c:when>
