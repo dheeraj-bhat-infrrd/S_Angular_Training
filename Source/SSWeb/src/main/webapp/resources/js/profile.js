@@ -679,6 +679,7 @@ $(document).on('click', '.prof-report-abuse-txt', function(e) {
 		var cusEmail = $('#report-abuse-cus-email').val();
 		
 		if (validateReportAbuseForm(reportText, cusName, cusEmail)) {
+			showOverlay();
 			payload.reportText = reportText;
 			payload.reporterName = cusName;
 			payload.reporterEmail = cusEmail;
@@ -688,21 +689,21 @@ $(document).on('click', '.prof-report-abuse-txt', function(e) {
 });
 
 function validateReportAbuseForm(reportText, cusName, cusEmail) {
-	//check if custname is empty
+	// check if custname is empty
 	if(cusName == undefined || cusName == ""){
 		$('#overlay-toast').html('Please enter valid name!');
 		showToast();
 		return false;
 	}
 	
-	//check if custemail is valid
+	// check if custemail is valid
 	if(cusEmail == undefined || cusEmail == "" || !emailRegex.test(cusEmail)){
 		$('#overlay-toast').html('Please enter a valid email address!');
 		showToast();
 		return false;
 	}
 	
-	//check if report text is empty
+	// check if report text is empty
 	if(reportText == undefined || reportText == ""){
 		$('#overlay-toast').html('Please enter why you want to report the review!');
 		showToast();
@@ -721,6 +722,7 @@ function confirmReportAbuse(payload) {
 		} else {
 			$('#overlay-toast').html('Failed to report abuse, Please try again later');
 		}
+		hideOverlay();
 		showToast();
 	}, payload, true);
 }
