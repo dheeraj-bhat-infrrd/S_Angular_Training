@@ -1001,7 +1001,7 @@ function showDisplayPic() {
 			if (data.errCode == undefined){
 				console.log("Image location : " + data.responseJSON);
 				var imageUrl = data.responseJSON;
-				if (imageUrl != '' && imageUrl != undefined && imageUrl != "undefined") {
+				if (imageUrl != undefined && imageUrl != "undefined" && imageUrl.trim() != "") {
 					$("#dsh-prsn-img").removeClass('dsh-pers-default-img');
 					$("#dsh-prsn-img").removeClass('dsh-office-default-img');
 					$("#dsh-prsn-img").removeClass('dsh-region-default-img');
@@ -4768,9 +4768,9 @@ function loadAgentPic(agentId){
 		complete : function(data) {
 			if (success) {
 				imageUrl = data.responseText;
-				if(imageUrl!='' && imageUrl!=null)
-					$("#agnt-img").css("background", "url("+imageUrl+") no-repeat center");
-					$("#agnt-img").css("background-size", "contain");
+				if(imageUrl!='' && imageUrl!=null) {
+					$("#agnt-img").html("<img class='hr-ind-img' src='"+imageUrl+"'/>");
+				}
 			}
 		},
 		error : function(e) {
