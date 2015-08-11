@@ -7,14 +7,12 @@ import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
-
 import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.commons.EmailTemplateConstants;
 import com.realtech.socialsurvey.core.entities.EmailEntity;
@@ -1604,6 +1602,32 @@ public class EmailServicesImpl implements EmailServices
 		LOG.debug("Calling email sender to send mail");
 		emailSender.sendEmailWithBodyReplacements(emailEntity, subjectFileName, messageBodyReplacements);
 		LOG.info("Successfully sent social connect mail");
+	}
+	
+	@Async
+	@Override
+	public void sendSurveyReportMail(String recipientMailId, String displayName, String reason) throws InvalidInputException,
+			UndeliveredEmailException {
+		if (recipientMailId == null || recipientMailId.isEmpty()) {
+			LOG.error("Recipient email Id is empty or null for sending survey completion mail ");
+			throw new InvalidInputException("Recipient email Id is empty or null for sending survey completion mail ");
+		}
+		if (displayName == null || displayName.isEmpty()) {
+			LOG.error("displayName parameter is empty or null for sending account upgrade mail ");
+			throw new InvalidInputException("displayName parameter is empty or null for sending survey completion mail ");
+		}
+
+		LOG.info("Sending survey completion email to : " + recipientMailId);
+		EmailEntity emailEntity = prepareEmailEntityForSendingEmail(recipientMailId);
+		String subjectFileName = EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER + EmailTemplateConstants.SURVEY_REPORT_MAIL_SUBJECT;
+
+		FileContentReplacements messageBodyReplacements = new FileContentReplacements();
+		messageBodyReplacements.setFileName(EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER + EmailTemplateConstants.SURVEY_REPORT_MAIL_BODY);
+		messageBodyReplacements.setReplacementArgs(Arrays.asList(appLogoUrl, displayName, reason));
+
+		LOG.debug("Calling email sender to send mail");
+		emailSender.sendEmailWithBodyReplacements(emailEntity, subjectFileName, messageBodyReplacements);
+		LOG.info("Successfully sent survey completion mail");
 	}
 
     @Override

@@ -1747,7 +1747,7 @@ public class DashboardController
 				throw e;
 			}
 			
-			String customerName = firstName + lastName;
+			String customerName = firstName  + " " + lastName;
 			String agentName = "";
 			try {
 				agentName = solrSearchService.getUserDisplayNameById(agentId);

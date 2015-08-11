@@ -1541,6 +1541,8 @@ public class ProfileController {
 		String lastName = request.getParameter("lastName");
 		String review = request.getParameter("review");
 		String reason = request.getParameter("reportText");
+		String reporterName = request.getParameter("reporterName");
+		String reporterEmail = request.getParameter("reporterEmail");
 		
 		try {
 			long agentId = 0;
@@ -1556,7 +1558,7 @@ public class ProfileController {
 				throw e;
 			}
 
-			String customerName = firstName + lastName;
+			String customerName = firstName  + " " + lastName;
 			String agentName = "";
 			try {
 				agentName = solrSearchService.getUserDisplayNameById(agentId);
@@ -1569,6 +1571,9 @@ public class ProfileController {
 			// Calling email services method to send mail to the Application level admin.
 			emailServices.sendReportAbuseMail(applicationAdminEmail, applicationAdminName, agentName, customerName.replaceAll("null", ""),
 					customerEmail, review, reason);
+			
+			// Calling email services method to send mail to the reporter
+			emailServices.sendSurveyReportMail(reporterEmail, reporterName, reason);
 		}
 		catch (NonFatalException e) {
 			LOG.error("NonfatalException caught in reportAbuse(). Nested exception is ", e);
