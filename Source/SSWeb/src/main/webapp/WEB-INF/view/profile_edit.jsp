@@ -47,22 +47,22 @@
 
 <!-- Setting agent page variables -->
 <c:if test="${profilemasterid == 4}">
-	<c:if test="${not empty profile && not empty profileSettings.licenses}">
+	<c:if test="${not empty profileSettings && not empty profileSettings.licenses}">
 		<c:set value="${profileSettings.licenses.authorized_in}" var="authorisedInList"></c:set>
 	</c:if>
-	<c:if test="${not empty profile && not empty profileSettings.positions}">
+	<c:if test="${not empty profileSettings && not empty profileSettings.positions}">
 		<c:set value="${profileSettings.positions}" var="positions"></c:set>
 	</c:if>
-	<c:if test="${not empty profile && not empty profileSettings.associations}">
+	<c:if test="${not empty profileSettings && not empty profileSettings.associations}">
 		<c:set value="${profileSettings.associations}" var="associations"></c:set>
 	</c:if>
-	<c:if test="${not empty profile && not empty profileSettings.expertise}">
+	<c:if test="${not empty profileSettings && not empty profileSettings.expertise}">
 		<c:set value="${profileSettings.expertise}" var="expertiseList"></c:set>
 	</c:if>
-	<c:if test="${not empty profile && not empty profileSettings.achievements}">
+	<c:if test="${not empty profileSettings && not empty profileSettings.achievements}">
 		<c:set value="${profileSettings.achievements}" var="achievements"></c:set>
 	</c:if>
-	<c:if test="${not empty profile && not empty profileSettings.hobbies}">
+	<c:if test="${not empty profileSettings && not empty profileSettings.hobbies}">
 		<c:set value="${profileSettings.hobbies}" var="hobbies"></c:set>
 	</c:if>
 </c:if>
