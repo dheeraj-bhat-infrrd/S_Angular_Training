@@ -154,7 +154,7 @@ function getRandomID() {
 function saveState(url) {
 
 	var hashUrl = "";
-	hashUrl = url.substring(2, url.length - 3);
+	hashUrl = url.substring(2).split('.')[0];
 	if (!historyCallback) {
 		history.pushState(getRandomID(), null, "#" + hashUrl);
 
