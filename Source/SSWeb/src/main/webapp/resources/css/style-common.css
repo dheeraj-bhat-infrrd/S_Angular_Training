@@ -2602,11 +2602,11 @@ button.paypal.is-active {
 
 .sq-top-img {
 	height: 70px;
-	margin-bottom: 20px;
-	background: url(../images/place-holder-individual.png) no-repeat center;
 	width: 70px;
+	background: url(../images/place-holder-individual.png) no-repeat center;
     margin: 0 auto;
-    border-radius: 50%;
+    margin-bottom: 20px;
+    background-size: 40px;
 }
 
 .sq-bord-bot-sm {
@@ -4635,7 +4635,7 @@ select.rfr_txt_fld,select.rfr_input_fld{
 
 .pers-default-big {
 	background: url(../images/place-holder-individual.png) no-repeat center #fff;
-	background-size: auto !important;
+	background-size: contain;
 	border: 1px dashed #ccc;
 	border-radius: 3px;
 }
