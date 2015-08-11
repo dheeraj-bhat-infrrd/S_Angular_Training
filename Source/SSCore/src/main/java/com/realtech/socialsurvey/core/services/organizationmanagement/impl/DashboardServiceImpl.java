@@ -19,6 +19,8 @@ import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.xssf.usermodel.XSSFDataFormat;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.joda.time.DateTime;
+import org.joda.time.Days;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
@@ -382,6 +384,8 @@ public class DashboardServiceImpl implements DashboardService, InitializingBean 
 			surveyDetailsToPopulate.add(survey.getCustomerLastName());
 			surveyDetailsToPopulate.add(DATE_FORMATTER.format(survey.getCreatedOn()));
 			surveyDetailsToPopulate.add(DATE_FORMATTER.format(survey.getModifiedOn()));
+			surveyDetailsToPopulate.add(Days.daysBetween(new DateTime(survey.getCreatedOn()), new DateTime(survey.getModifiedOn())).getDays());
+			
 			if (survey.getSource() != null && !survey.getSource().isEmpty()) {
 				surveyDetailsToPopulate.add(survey.getSource());
 			}
@@ -428,6 +432,7 @@ public class DashboardServiceImpl implements DashboardService, InitializingBean 
 		surveyDetailsToPopulate.add(CommonConstants.HEADER_CUSTOMER_LAST_NAME);
 		surveyDetailsToPopulate.add(CommonConstants.HEADER_SURVEY_SENT_DATE);
 		surveyDetailsToPopulate.add(CommonConstants.HEADER_SURVEY_COMPLETED_DATE);
+		surveyDetailsToPopulate.add(CommonConstants.HEADER_SURVEY_TIME_INTERVAL);
 		surveyDetailsToPopulate.add(CommonConstants.HEADER_SURVEY_SOURCE);
 		surveyDetailsToPopulate.add(CommonConstants.HEADER_SURVEY_SCORE);
 		for (counter = 1; counter <= max; counter++) {
