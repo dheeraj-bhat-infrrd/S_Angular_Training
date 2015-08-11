@@ -57,7 +57,7 @@ public interface SurveyHandler {
 
 	public String getSwearWords();
 
-	public void updateReminderCount(long surveyPreInitiationId);
+	public void updateReminderCount(long surveyPreInitiationId, boolean reminder);
 
 	public void markSurveyAsSent(SurveyPreInitiation surveyPreInitiation);
 

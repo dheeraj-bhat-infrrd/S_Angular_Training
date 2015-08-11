@@ -19,6 +19,8 @@ namespace EncompassSocialSurvey.DAL
 
         private const string CRM_BATCH_TRACKER_SELECT_QUERY = @"SELECT crmtrck.ID, crmtrck.SOURCE, crmtrck.COMPANY_ID, crmtrck.RECENT_RECORD_FETCHED_DATE, crmtrck.CREATED_ON, crmtrck.MODIFIED_ON FROM CRM_BATCH_TRACKER as  crmtrck WHERE crmtrck.COMPANY_ID = ?COMPANY_ID AND crmtrck.SOURCE = ?SOURCE ;";
 
+        private const string COMPANY_SELECT_QUERY = @"SELECT comp.COMPANY_ID, comp.COMPANY, comp.STATUS FROM COMPANY as  comp WHERE comp.COMPANY_ID = ?COMPANY_ID;";
+
         private const string CRM_BATCH_TRACKER_UPDATE_QUERY = @"UPDATE CRM_BATCH_TRACKER SET RECENT_RECORD_FETCHED_DATE = ?RECENT_RECORD_FETCHED_DATE, MODIFIED_ON = ?MODIFIED_ON WHERE ID = ?ID";
 
         private const string CRM_BATCH_TRACKER_INSERT_QUERY = @"INSERT INTO CRM_BATCH_TRACKER(  
@@ -272,6 +274,47 @@ namespace EncompassSocialSurvey.DAL
             }
             return crmBatchTracker;
         }
+
+        public Company getCompanyById(long companyId)
+        {
+            Logger.Debug("Inside method getCompanyById");
+            String sqlQuery = COMPANY_SELECT_QUERY;
+            MySqlCommand commandToSelect = null;
+            MySqlDataReader dataReader = null;
+            Company company = null;
+            MySqlConnection mySqlDbConnection = null;
+            try
+            {
+                mySqlDbConnection = _socialSurveryContext.DBConnnection;
+                commandToSelect = new MySqlCommand(sqlQuery, mySqlDbConnection);
+                commandToSelect.Parameters.Add("?COMPANY_ID", MySqlDbType.Int32).Value = companyId;
+                
+                dataReader = commandToSelect.ExecuteReader();
+                while (dataReader.Read())
+                {
+                    company = new Company();
+                    company.companyId = companyId;
+                    company.company = dataReader.GetString("COMPANY");
+                    company.status = dataReader.GetString("STATUS");
+                 
+
+                }
+            }
+            catch (Exception ex)
+            {
+                Logger.Error("Caught an exception: LoanRepository.getCrmBatchTrackerByCompanyAndSource(): ", ex);
+                throw ex;
+            }
+            finally
+            {
+                if (null != dataReader && dataReader.IsClosed == false) { dataReader.Close(); }
+                if (null != dataReader) { dataReader.Dispose(); }
+                if (null != commandToSelect) { commandToSelect.Dispose(); }
+                if (null != mySqlDbConnection) { mySqlDbConnection.Close(); }
+            }
+            return company;
+        }
+
         public bool IsSurveySourceIdExists(LoanEntity loan, MySqlConnection mySqlDbConnection)
         {
             Logger.Info("Entering the method LoanRepository.IsSurveySourceIdExists(): SURVEY_SOURCE_ID: " + loan.SurveySourceId

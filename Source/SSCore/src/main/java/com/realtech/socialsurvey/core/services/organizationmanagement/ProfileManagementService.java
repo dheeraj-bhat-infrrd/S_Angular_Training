@@ -495,7 +495,7 @@ public interface ProfileManagementService
     public void updateCompanyEmail( long companyId, String emailId ) throws InvalidInputException;
 
 
-    public void updateIndividualEmail( long userId, long individualId, String emailId ) throws InvalidInputException;
+    public void updateIndividualEmail( long userId, String emailId ) throws InvalidInputException;
 
 
     public List<AgentRankingReport> getAgentReport( long iden, String profileLevel, Date startDate, Date endDate, Object object )

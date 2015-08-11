@@ -154,7 +154,7 @@ function getRandomID() {
 function saveState(url) {
 
 	var hashUrl = "";
-	hashUrl = url.substring(2, url.length - 3);
+	hashUrl = url.substring(2).split('.')[0];
 	if (!historyCallback) {
 		history.pushState(getRandomID(), null, "#" + hashUrl);
 
@@ -321,12 +321,12 @@ function paintDashboard(profileMasterId, newProfileName, newProfileValue, typeoO
 				+ colName + "&columnValue=" + colValue;
 	});
 
-	$('#dsh-dwnld-btn').click(function() {
+	/*$('#dsh-dwnld-btn').click(function() {
 		var startDate = $('#indv-dsh-start-date').val();
 		var endDate = $("#indv-dsh-end-date").val();
 		window.location.href = "/downloadcustomersurveyresults.do?columnName=" + colName + "&columnValue=" + colValue
 			+ "&startDate=" + startDate + "&endDate=" + endDate;
-	});
+	});*/
 	
 	// Loads the image in circle of header.
 	//loadDisplayPicture();
@@ -7174,35 +7174,29 @@ function paintAvgRating(avgRating) {
 }
 
 // Edit EmailIds
-$(document).on(
-		'blur',
-		'#contant-info-container input[data-email]',
-		function() {
-			if (!$(this).val()
-					|| !emailRegex.test(this.value)
-					|| ($(this).val() == $('#' + $(this).attr("id") + '-old')
-							.val())) {
-				return;
+$(document).on('blur', '#contant-info-container input[data-email]', function() {
+	if (!$(this).val() || !emailRegex.test(this.value)
+			|| ($(this).val() == $('#' + $(this).attr("id") + '-old').val())) {
+		return;
+	}
+	
+	delay(function() {
+		var mailIds = [];
+		$('#contant-info-container input[data-email]').each(function() {
+			if (this.value != "") {
+				var mailId = {};
+				mailId.key = $(this).attr("data-email");
+				mailId.value = this.value;
+				mailIds.push(mailId);
 			}
-
-			delay(function() {
-				var mailIds = [];
-				$('#contant-info-container input[data-email]').each(function() {
-					if (this.value != "") {
-						var mailId = {};
-						mailId.key = $(this).attr("data-email");
-						mailId.value = this.value;
-						mailIds.push(mailId);
-					}
-				});
-				mailIds = JSON.stringify(mailIds);
-				var payload = {
-					"mailIds" : mailIds
-				};
-				callAjaxPostWithPayloadData("./updateemailids.do",
-						callBackOnUpdateMailIds, payload);
-			}, 0);
 		});
+		mailIds = JSON.stringify(mailIds);
+		var payload = {
+			"mailIds" : mailIds
+		};
+		callAjaxPostWithPayloadData("./updateemailids.do", callBackOnUpdateMailIds, payload);
+	}, 0);
+});
 
 function callBackOnUpdateMailIds(data) {
 	$('#prof-message-header').html(data);
@@ -7503,6 +7497,11 @@ $(document).on('click','#dsh-dwnld-report-btn',function(){
 	case 3:
 		console.log("social-monitor");
 		window.location.href = "/downloaddashboardsocialmonitor.do?columnName=" + colName + "&columnValue=" + colValue
+			+ "&startDate=" + startDate + "&endDate=" + endDate;
+		break;
+	case 4:
+		console.log("incomplete-survey");
+		window.location.href = "/downloaddashboardincompletesurvey.do?columnName=" + colName + "&columnValue=" + colValue
 			+ "&startDate=" + startDate + "&endDate=" + endDate;
 		break;
 	default:
