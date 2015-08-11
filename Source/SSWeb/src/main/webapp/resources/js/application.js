@@ -4773,9 +4773,9 @@ function loadAgentPic(agentId){
 		complete : function(data) {
 			if (success) {
 				imageUrl = data.responseText;
-				if(imageUrl!='' && imageUrl!=null)
-					$("#agnt-img").css("background", "url("+imageUrl+") no-repeat center");
-					$("#agnt-img").css("background-size", "contain");
+				if(imageUrl!='' && imageUrl!=null) {
+					$("#agnt-img").html("<img class='hr-ind-img' src='"+imageUrl+"'/>");
+				}
 			}
 		},
 		error : function(e) {
