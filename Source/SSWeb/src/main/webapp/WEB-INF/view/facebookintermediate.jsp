@@ -31,11 +31,8 @@
 							</c:choose>
 						</div>
 					</div>
-					<div style="font-size: 11px; text-align: center;">
-					
-					</div>
+					<div style="font-size: 11px; text-align: center;"></div>
 				</div>
-
 				<div class="footer-copyright text-center">
 					<spring:message code="label.copyright.key" />&copy;
 					<spring:message code="label.footer.socialsurvey.key" /><span class="center-dot">.</span>
@@ -71,18 +68,17 @@ $(document).ready(function() {
 	else {
 		console.log("Unable to access parent window!");
 	}
-	 var pages= "${pageNames}";
+	
 	var radioButtonDiv= $("<div style='text-align:left;margin-left:130px;'>")
-	<c:forEach var="page" items="${pageNames}"  varStatus="loop">
-	   radioButtonDiv.append('<input type="radio" name="pageselection" value="${loop.index}"/>'+"${page.name}"+" <br/>");
+	<c:forEach var="page" items="${pageNames}" varStatus="loop">
+		radioButtonDiv.append('<input type="radio" name="pageselection" value="${loop.index}"/>'+"${page.name}"+" <br/>");
 	</c:forEach>
 	$("#page").append(radioButtonDiv);
-	var saveButton= $("<div class='reg_btn'>save</div>");
 	
+	var saveButton= $("<div class='reg_btn'>save</div>");
 	<c:if test="${not empty pageNames}">
 		$("#page").append(saveButton);
 	</c:if>
-	
 	
 	saveButton.click(function() {
 		var selectedPage=$('input:radio[name=pageselection]:checked').val();
@@ -95,9 +91,9 @@ $(document).ready(function() {
 		  }
 		</c:forEach>
 		var facebookToken = {
-				'selectedAccessFacebookToken' : selectedAccessFacebookToken,
-				'selectedProfileUrl' :  selectedProfileUrl
-			};
+			'selectedAccessFacebookToken' : selectedAccessFacebookToken,
+			'selectedProfileUrl' :  selectedProfileUrl
+		};
 		$.ajax({
 			url : './saveSelectedAccessFacebookToken.do',
 			type : "GET",
@@ -117,12 +113,9 @@ $(document).ready(function() {
 			}
 		});
     });
-	
 });
 
-
 $(window).on('unload', function(){
-
 	var parentWindow = null;
 	if (window.opener != null && !window.opener.closed) {
 		parentWindow = window.opener;
@@ -176,7 +169,6 @@ function fetchSocialProfileUrl(payload, callBackFunction){
 		}
 	});
 }
-
 </script>
 
 </body>

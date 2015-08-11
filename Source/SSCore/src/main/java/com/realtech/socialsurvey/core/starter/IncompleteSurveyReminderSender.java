@@ -55,27 +55,34 @@ public class IncompleteSurveyReminderSender extends QuartzJobBean
             Map<String, Integer> reminderMap = surveyHandler.getReminderInformationForCompany( company.getCompanyId() );
             int reminderInterval = reminderMap.get( CommonConstants.SURVEY_REMINDER_INTERVAL );
             int reminderCount = reminderMap.get( CommonConstants.SURVEY_REMINDER_COUNT );
-
+            SimpleDateFormat sdf = new SimpleDateFormat( "dd/MM/yyyy" );
+            Date epochReminderDate = null;
             List<SurveyPreInitiation> incompleteSurveyCustomers = surveyHandler.getIncompleteSurveyCustomersEmail( company );
             for ( SurveyPreInitiation survey : incompleteSurveyCustomers ) {
                 if ( survey.getReminderCounts() <= reminderCount ) {
                     boolean reminder = false;
-                    if ( survey.getReminderCounts() == 0 ) {
-                        reminder = false;
-                    } else {
+                    try {
+                        epochReminderDate = sdf.parse( CommonConstants.EPOCH_REMINDER_TIME );
+                    } catch ( Exception e ) {
+                        LOG.error( "Exception caught " + e.getMessage() );
+                        continue;
+                    }
+                    if ( survey.getLastReminderTime().after( epochReminderDate ) ) {
                         reminder = true;
+                    } else {
+                        reminder = false;
                     }
                     long surveyLastRemindedTime = survey.getLastReminderTime().getTime();
                     long currentTime = System.currentTimeMillis();
                     if ( surveyHandler.checkIfTimeIntervalHasExpired( surveyLastRemindedTime, currentTime, reminderInterval ) ) {
                         try {
-                          /*  if ( survey.getSurveySource().equalsIgnoreCase( CommonConstants.CRM_SOURCE_ENCOMPASS ) ) {
-                                sendMailToAgent( survey );
-                            }*/
+                            /*  if ( survey.getSurveySource().equalsIgnoreCase( CommonConstants.CRM_SOURCE_ENCOMPASS ) ) {
+                                  sendMailToAgent( survey );
+                              }*/
                             sendEmail( emailServices, organizationManagementService, userManagementService, survey,
                                 company.getCompanyId(), reminder );
                             surveyHandler.markSurveyAsSent( survey );
-                            surveyHandler.updateReminderCount( survey.getSurveyPreIntitiationId() );
+                            surveyHandler.updateReminderCount( survey.getSurveyPreIntitiationId() , reminder);
                         } catch ( InvalidInputException e ) {
                             LOG.error(
                                 "InvalidInputException caught in executeInternal() method of IncompleteSurveyReminderSender. Nested exception is ",
