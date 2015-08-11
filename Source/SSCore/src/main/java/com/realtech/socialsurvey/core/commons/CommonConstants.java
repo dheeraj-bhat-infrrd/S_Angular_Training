@@ -1,6 +1,4 @@
 package com.realtech.socialsurvey.core.commons;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 
 /**
  * Holds application level constants
