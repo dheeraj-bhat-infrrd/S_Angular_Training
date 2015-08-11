@@ -49,7 +49,7 @@
 <div id="welocome-step3" class="welcome-popup-wrapper hide" data-page="three">
 	<div class="welcome-popup-hdr-wrapper clearfix">
 		<div class="float-left wc-hdr-txt"><spring:message code="label.socialaccounts.key" /></div>
-		<div class="float-right popup-close-icn wc-skip-btn wc-final-skip"></div>
+		<div class="float-right popup-close-icn wc-skip-btn wc-final-skip lnk-final-skip"></div>
 		<%-- <div class="float-right wc-hdr-step"><spring:message code="label.step.three.key" /></div> --%>
 	</div>
 	<div class="welcome-popup-body-wrapper clearfix">
@@ -60,10 +60,10 @@
 	</div>
 	<div class="wc-btn-row clearfix">
 		<div class="wc-btn-col float-left">
-			<div class="wc-skip-btn float-right wc-final-skip"><spring:message code="label.skip.key" /></div>
+			<div class="wc-skip-btn float-right wc-final-skip lnk-final-skip"><spring:message code="label.skip.key" /></div>
 		</div>
 		<div class="wc-btn-col float-left">
-			<div class="wc-sub-btn float-left wc-final-skip wc-final-submit"><spring:message code="label.done.key" /></div>
+			<div class="wc-sub-btn float-left wc-final-skip lnk-final-skip wc-final-submit"><spring:message code="label.done.key" /></div>
 		</div>
 	</div>
 </div>

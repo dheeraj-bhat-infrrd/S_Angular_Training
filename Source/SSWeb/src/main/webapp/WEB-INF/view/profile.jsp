@@ -1,6 +1,7 @@
 <%@ page language="java" contentType="text/html; charset=ISO-8859-1" pageEncoding="UTF-8"%>
 <%@ taglib prefix="spring" uri="http://www.springframework.org/tags"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions"%>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <c:if test="${not empty profile}">
 	<c:if test="${not empty profile.contact_details && not empty profile.contact_details.name}">
@@ -202,14 +203,14 @@
     <div class="">
     	<div class="container">
         <div class="row prof-pic-name-wrapper">
-			<c:if test="${not empty profile.profileImageUrl}">
+			<c:if test="${not empty profile.profileImageUrl && not empty fn:trim(profile.profileImageUrl)}}">
 				<div id="prog-img-container" class="col-lg-4 col-md-4 col-sm-4 col-xs-6 prof-wrapper prof-img-wrapper">
 					<div class="prog-img-container">
 		            	<img id="prof-image" class="prof-image pos-relative" src="${profile.profileImageUrl}"></img>
 		            </div>
 	            </div>
 			</c:if>
-			<c:if test="${not empty profile.profileImageUrl}">
+			<c:if test="${not empty profile.profileImageUrl && not empty fn:trim(profile.profileImageUrl)}">
 				<c:set var="profileNameClass" value="profile-name-img-wrapper"></c:set>
 			</c:if>
             <div class="col-lg-4 col-md-4 col-sm-4 col-xs-6 prof-wrapper pos-relative prof-name-wrapper ${profileNameClass}">
