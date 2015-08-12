@@ -524,7 +524,7 @@ public class SolrSearchServiceImpl implements SolrSearchService {
 			}
 			solrQuery.setQuery(query);
 			solrQuery.addFilterQuery(CommonConstants.IS_AGENT_SOLR + ":" + CommonConstants.IS_AGENT_TRUE_SOLR);
-			solrQuery.addFilterQuery("-" + CommonConstants.STATUS_SOLR + ":" + CommonConstants.STATUS_ACTIVE);
+			solrQuery.addFilterQuery("-" + CommonConstants.STATUS_SOLR + ":" + CommonConstants.STATUS_INACTIVE);
 			solrQuery.setStart(startIndex);
 			solrQuery.setRows(noOfRows);
 
