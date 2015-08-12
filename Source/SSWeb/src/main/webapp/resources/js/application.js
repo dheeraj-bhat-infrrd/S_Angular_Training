@@ -104,6 +104,7 @@ var yelpEnabled;
 var googleEnabled;
 var zillowEnabled;
 var lendingtreeEnabled;
+var realtorEnabled;
 var agentProfileLink;
 var agentFullProfileLink;
 var companyLogo;
@@ -4800,6 +4801,7 @@ function paintSurveyPage(jsonData) {
 	googleEnabled = Boolean(jsonData.responseJSON.googleEnabled);
 	zillowEnabled = Boolean(jsonData.responseJSON.zillowEnabled);
 	lendingtreeEnabled = Boolean(jsonData.responseJSON.lendingtreeEnabled);
+	realtorEnabled = Boolean(jsonData.responseJSON.realtorEnabled);
 	agentProfileLink = jsonData.responseJSON.agentProfileLink;
 	agentFullProfileLink = jsonData.responseJSON.agentFullProfileLink;
 	
@@ -4828,6 +4830,12 @@ function paintSurveyPage(jsonData) {
 		$('#lt-btn').attr("href", returnValidWebAddress(jsonData.responseJSON.lendingtreeLink));
 	} else {
 		$('#lt-btn').remove();
+	}
+	
+	if (realtorEnabled) {
+		$('#realtor-btn').attr("href", returnValidWebAddress(jsonData.responseJSON.realtorLink));
+	} else {
+		$('#realtor-btn').remove();
 	}
 	
 	companyLogo = jsonData.responseJSON.companyLogo;
@@ -5740,6 +5748,11 @@ $('#zillow-btn').click(function(e) {
 $('#lt-btn').click(function(e) {
 	//e.stopImmediatePropagation();
 	updateSharedOn("lendingtree", agentId, customerEmail);
+});
+
+$('#realtor-btn').click(function(e) {
+	//e.stopImmediatePropagation();
+	updateSharedOn("realtor", agentId, customerEmail);
 });
 
 $('#shr-post-chk-box').click(function(){
@@ -6887,6 +6900,29 @@ function updateLendingTreeLink(link) {
 	if (isValidUrl(link)) {
 		callAjaxPostWithPayloadData("./updatelendingtreelink.do", callBackUpdateSocialLink, payload);
         $('#icn-lendingtree').attr("data-link", link);
+	} else {
+		$('#overlay-toast').html("Enter a valid url");
+		showToast();
+	}
+}
+
+$('body').on('click', '#prof-edit-social-link .icn-realtor', function() {
+	$('#social-token-text').show();
+	var link = $(this).attr("data-link");
+	$('#social-token-text').attr({
+		"placeholder" : "Add Realtor link",
+		"onblur" : "updateRealtorLink(this.value);$('#social-token-text').hide();"
+	});
+	$('#social-token-text').val(link);
+});
+
+function updateRealtorLink(link) {
+	var payload = {
+		"realtorLink" : link
+	};
+	if (isValidUrl(link)) {
+		callAjaxPostWithPayloadData("./updateRealtorlink.do", callBackUpdateSocialLink, payload);
+        $('#icn-realtor').attr("data-link", link);
 	} else {
 		$('#overlay-toast').html("Enter a valid url");
 		showToast();

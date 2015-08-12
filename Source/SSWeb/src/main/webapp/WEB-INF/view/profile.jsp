@@ -331,6 +331,9 @@
 							<c:if test="${not empty profile.socialMediaTokens.lendingTreeToken && not empty profile.socialMediaTokens.lendingTreeToken.lendingTreeProfileLink}">
 								<div id="icn-lendingtree" class="float-left social-item-icon icn-lendingtree" data-link="${profile.socialMediaTokens.lendingTreeToken.lendingTreeProfileLink}" title="LendingTree"></div>
 							</c:if>
+							<c:if test="${not empty profile.socialMediaTokens.realtorToken && not empty profile.socialMediaTokens.realtorToken.realtorProfileLink}">
+								<div id="icn-realtor" class="float-left social-item-icon icn-realtor" data-link="${profile.socialMediaTokens.realtorToken.realtorProfileLink}" title="Realtor"></div>
+							</c:if>
 						</c:if>
 					</div>
 				</div>
