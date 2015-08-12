@@ -46,6 +46,9 @@
 						<c:if test="${not empty reviewItem.lendingTreeProfileUrl}">
 							<span class="float-left ppl-share-icns icn-lendingtree" title="LendingTree" data-link="${reviewItem.lendingTreeProfileUrl}"></span>
 						</c:if>
+						<c:if test="${not empty reviewItem.realtorProfileUrl}">
+							<span class="float-left ppl-share-icns icn-realtor" title="Realtor" data-link="${reviewItem.realtorProfileUrl}"></span>
+						</c:if>
 					</div>
 					<div class="float-left icn-share icn-remove icn-rem-size hide"></div>
 				</div>
@@ -73,6 +76,11 @@ $(document).ready(function(){
 		$(this).parent().attr('href', returnValidWebAddress(url));
 	});
 	$('.icn-lendingtree').each(function(index, currentElement) {
+		var url = $(this).parent().attr('href');
+		$(this).parent().attr('href', returnValidWebAddress(url));
+	});
+	
+	$('.icn-realtor').each(function(index, currentElement) {
 		var url = $(this).parent().attr('href');
 		$(this).parent().attr('href', returnValidWebAddress(url));
 	});
