@@ -597,6 +597,9 @@ function paintReviews(result){
 		if (reviewItem.lendingTreeProfileUrl != null && reviewItem.lendingTreeProfileUrl != "") {
 			reviewsHtml += '		<span class="float-left ppl-share-icns icn-lendingtree" title="LendingTree" data-link="' + returnValidWebAddress(reviewItem.lendingTreeProfileUrl) + '"></span>';
 		}
+		if (reviewItem.realtorProfileUrl != null && reviewItem.realtorProfileUrl != "") {
+			reviewsHtml += '		<span class="float-left ppl-share-icns icn-realtor" title="Realtor" data-link="' + returnValidWebAddress(reviewItem.realtorProfileUrl) + '"></span>';
+		}
 		reviewsHtml += '		</div>';
 		reviewsHtml += '		<div class="float-right" style="margin: 0 -5px;">';
 		reviewsHtml += '			<div class="report-abuse-txt report-txt prof-report-abuse-txt">Report Abuse</div>';
