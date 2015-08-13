@@ -45,6 +45,9 @@
 						<c:if test="${not empty feedback.lendingTreeProfileUrl}">
 							<span class="float-left ppl-share-icns icn-lendingtree" title="LendingTree" data-link="${feedback.lendingTreeProfileUrl}"></span>
 						</c:if>
+						<c:if test="${not empty feedback.realtorProfileUrl}">
+							<span class="float-left ppl-share-icns icn-realtor" title="Realtor" data-link="${feedback.realtorProfileUrl}"></span>
+						</c:if>
 					</div>
 					<div class="float-left icn-share icn-remove icn-rem-size hide" style="display: none;"></div>
 				</div>

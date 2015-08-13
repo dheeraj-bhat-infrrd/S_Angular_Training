@@ -29,6 +29,7 @@
 	<c:set value="${socialMediaTokens.yelpToken}" var="yelpToken"></c:set>
 	<c:set value="${socialMediaTokens.zillowToken}" var="zillowToken"></c:set>
 	<c:set value="${socialMediaTokens.lendingTreeToken}" var="lendingTreeToken"></c:set>
+	<c:set value="${socialMediaTokens.realtorToken}" var="realtorToken"></c:set>
 </c:if>
 <c:choose>
 	<c:when test="${columnName == 'companyId'}">
@@ -181,6 +182,7 @@
 							<div id="icn-yelp" class="float-left social-item-icon icn-yelp" data-link="${yelpToken.yelpPageLink}" title="Yelp"></div>
 							<div id="icn-zillow" class="float-left social-item-icon icn-zillow" data-link="${zillowToken.zillowProfileLink}" title="Zillow"></div>
 							<div id="icn-lendingtree" class="float-left social-item-icon icn-lendingtree" data-link="${lendingTreeToken.lendingTreeProfileLink}" title="LendingTree"></div>
+							<div id="icn-realtor" class="float-left social-item-icon icn-realtor" data-link="${realtorToken.realtorProfileLink}" title="Realtor"></div>
 							<input id="social-token-text" type="text" class="social-token-text hide"
 								placeholder='<spring:message code="label.socialpage.placeholder.key"/>'>
 						</div>

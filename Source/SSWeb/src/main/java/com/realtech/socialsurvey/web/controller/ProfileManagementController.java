@@ -3944,7 +3944,6 @@ public class ProfileManagementController {
 		LOG.info("Method updateDisclaimer() finished from ProfileManagementController");
 		return JspResolver.MESSAGE_HEADER;
 	}
-	
 	@RequestMapping(value = "/geteditpositions")
 	public String getEditPositions(HttpServletRequest request, Model model) {
 
