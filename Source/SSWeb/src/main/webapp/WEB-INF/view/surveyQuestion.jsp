@@ -327,8 +327,8 @@
 						<a id="zillow-btn" target="_blank" class="sq-btn-continue sq-btn-post-social-btn">Zillow</a>
 						<a id="lt-btn" target="_blank" class="sq-btn-continue sq-btn-post-social-btn">Lending Tree</a> 
 							<div class="ppl-share-wrapper clearfix rev-ppl-share-wrapper">
-						<a id="realtor-btn" target="_blank" class="sq-btn-continue sq-btn-post-social-btn">Realtor</a> 
-							<div class="ppl-share-wrapper clearfix rev-ppl-share-wrapper">
+						<!-- <a id="realtor-btn" target="_blank" class="sq-btn-continue sq-btn-post-social-btn">Realtor</a> 
+							<div class="ppl-share-wrapper clearfix rev-ppl-share-wrapper"> -->
 
 					<div class="float-left blue-text ppl-share-shr-txt"><spring:message code="label.share.key"/></div>
 					<div class="float-left clearfix ppl-share-social ">

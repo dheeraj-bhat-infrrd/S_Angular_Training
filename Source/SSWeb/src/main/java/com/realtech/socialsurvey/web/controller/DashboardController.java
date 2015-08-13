@@ -1759,7 +1759,7 @@ public class DashboardController
 
 			// Calling email services method to send mail to the Application level admin.
 			emailServices.sendReportAbuseMail(applicationAdminEmail, applicationAdminName, agentName, customerName.replaceAll("null", ""),
-					customerEmail, review, reason);
+					customerEmail, review, reason, null , null);
 		}
 		catch (NonFatalException e) {
 			LOG.error("NonfatalException caught in reportAbuse(). Nested exception is ", e);

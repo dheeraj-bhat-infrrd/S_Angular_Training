@@ -350,7 +350,7 @@ public interface EmailServices
 
 
     public void sendReportAbuseMail( String recipientMailId, String displayName, String agentName, String customerName,
-        String customerEmail, String review, String reason ) throws InvalidInputException, UndeliveredEmailException;
+        String customerEmail, String review, String reason, String reporterName, String reporterEmail ) throws InvalidInputException, UndeliveredEmailException;
 
 
     public void sendSurveyReportMail( String recipientMailId, String displayName, String reason ) throws InvalidInputException,
