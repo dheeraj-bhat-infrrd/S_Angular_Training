@@ -18,6 +18,7 @@
 
 	<link rel="shortcut icon" href="/favicon.ico" sizes="16x16">
 	<link rel="stylesheet" href="${initParam.resourcesPath}/resources/css/bootstrap.min.css">
+	<link rel="stylesheet" href="${initParam.resourcesPath}/resources/css/datepicker3.css">
 	<link rel="stylesheet" href="${initParam.resourcesPath}/resources/jcrop/jquery.Jcrop.min.css">
 	<link rel="stylesheet" href="${initParam.resourcesPath}/resources/css/style.css">
 	<link rel="stylesheet" href="${initParam.resourcesPath}/resources/css/style-common.css">
@@ -54,6 +55,8 @@
 				<div id="sur-next" class="float-right">Next &gt;</div>
 			</div>
 		</div>
+	</div>
+	<div id="overlay-edit-positions" class="overlay-login overlay-main hide">
 	</div>
 	<div id="toast-container" class="toast-container">
 	   <span id="overlay-toast" class="overlay-toast"></span>

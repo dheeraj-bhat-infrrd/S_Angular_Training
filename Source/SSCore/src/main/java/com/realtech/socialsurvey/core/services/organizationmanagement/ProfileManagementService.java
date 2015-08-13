@@ -521,4 +521,7 @@ public interface ProfileManagementService
     
 	public OrganizationUnitSettings aggregateAgentDetails(User user, OrganizationUnitSettings profileSettings, LockSettings parentLockSettings)
 			throws InvalidInputException, NoRecordsFetchedException;
+
+
+	public void addOrUpdateAgentPositions(List<CompanyPositions> companyPositions, AgentSettings agentSettings);
 }
