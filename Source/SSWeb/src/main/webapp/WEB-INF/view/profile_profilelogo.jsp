@@ -22,6 +22,9 @@
 	<c:set value="${profileSettings.lockSettings}" var="lock"></c:set>
 </c:if>
 
+<c:if test="${accountMasterId != 1 && profilemasterid == 4 && not lock.isLogoLocked}">
+	<c:set value="${profileSettings.companyProfileData.companyLogo}" var="profilelogo"></c:set>
+</c:if>
 
 <c:choose>
 	<c:when test="${not empty profilelogo}">
