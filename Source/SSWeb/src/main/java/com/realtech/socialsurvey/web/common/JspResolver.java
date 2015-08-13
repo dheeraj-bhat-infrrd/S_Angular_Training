@@ -100,6 +100,7 @@ public interface JspResolver {
 	public static final String PROFILE_ABOUT_ME = "profile_aboutme";
 	public static final String PROFILE_ADDRESS_DETAILS = "profile_addressdetails";
 	public static final String PROFILE_ADDRESS_DETAILS_EDIT = "profile_addressdetails_edit";
+	public static final String PROFILE_POSITIONS_EDIT = "profile_position_edit";
 	public static final String PROFILE_BASIC_DETAILS = "profile_basicdetails";
 	public static final String PROFILE_IMAGE = "profile_profileimage";
 	public static final String PROFILE_LOGO = "profile_profilelogo";
