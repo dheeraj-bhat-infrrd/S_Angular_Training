@@ -97,6 +97,7 @@ public final class EmailTemplateConstants {
 	public static final String VERIFICATION_MAIL_SUBJECT = "VerificationMailSubject.txt";
 	
 	public static final String REPORT_ABUSE_MAIL_BODY = "ReportAbuseMailBody.html";
+	public static final String REPORT_ABUSE_MAIL_WITH_REVIEWER_BODY = "ReportAbuseMailReviewerBody.html";
 	public static final String REPORT_ABUSE_MAIL_SUBJECT = "ReportAbuseMailSubject.txt";
 	
 	public static final String CORRUPT_PREINITIATION_RECORD_MAIL_SUBJECT = "CorruptRecordsFromCrmMailSubject.txt";
