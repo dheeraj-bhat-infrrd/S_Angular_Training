@@ -74,8 +74,10 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
 	public static final String KEY_GOOGLE_SOCIAL_MEDIA_TOKEN = "socialMediaTokens.googleToken";
 	public static final String KEY_LINKEDIN_SOCIAL_MEDIA_TOKEN = "socialMediaTokens.linkedInToken";
 	public static final String KEY_CONTACT_NAME = "contact_details.name";
+	public static final String KEY_POSTIONS = "positions";
 	
 	private static final Logger LOG = LoggerFactory.getLogger(MongoOrganizationUnitSettingDaoImpl.class);
+	
 
 	@Autowired
 	private MongoTemplate mongoTemplate;

@@ -207,6 +207,50 @@
 				<div id="prof-agent-container">
 					<c:choose>
 						<c:when	test="${profilemasterid == 4}">
+							<!-- Positions left panel -->
+							<div class="prof-left-row prof-left-auth bord-bot-dc">
+								<div class="left-auth-wrapper">
+									<div class="clearfix">
+										<div class="float-left left-panel-header"><spring:message code="label.positions.key" /></div>
+										<div class="float-right icn-share edit-pos-icn" onclick="editPositions();" title="Edit"></div>
+									</div>
+									<div id="positions-container" class="left-panel-content">
+										<c:choose>
+											<c:when test="${not empty positions}">
+												<c:forEach items="${positions}" var="positionItem">
+													<div class="postions-content">
+              		 									<c:if test="${not empty positionItem.name}">
+              		 										<div class="lp-pos-row-1 lp-row clearfix">${positionItem.name}</div>
+              		 									</c:if>
+              		 									<c:if test="${not empty positionItem.title}">
+              		 										<div class="lp-pos-row-2 lp-row clearfix">${positionItem.title}</div>
+              		 									</c:if>
+              		 									<c:choose>
+              		 										<c:when test="${not positionItem.isCurrent}">
+              		 											<c:if test="${not empty positionItem.startTime && not empty positionItem.endTime}">
+              		 												<div class="lp-pos-row-3 lp-row clearfix">
+              		 													${positionItem.startTime} - ${positionItem.endTime}
+              		 												</div>
+              		 											</c:if>
+              		 										</c:when>
+              		 										<c:otherwise>
+              		 											<c:if test="${not empty positionItem.startTime}">
+               		 											<div class="lp-pos-row-3 lp-row clearfix">
+               		 												${positionItem.startTime} - Current
+               		 											</div>
+              		 											</c:if>
+              		 										</c:otherwise>
+              		 									</c:choose>
+              		 								</div>
+												</c:forEach>
+											</c:when>
+											<c:otherwise>
+												<span><spring:message code="label.positions.empty.key"></spring:message></span>
+											</c:otherwise>
+										</c:choose>
+									</div>
+								</div>
+							</div>
 							<!-- Licences left panel -->
 							<div class="prof-left-row prof-left-auth bord-bot-dc">
 								<div class="left-auth-wrapper">

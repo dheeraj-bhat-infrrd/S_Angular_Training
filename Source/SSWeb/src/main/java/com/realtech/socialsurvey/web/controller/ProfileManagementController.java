@@ -33,12 +33,14 @@ import sun.misc.BASE64Decoder;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.type.TypeFactory;
 import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.dao.impl.MongoOrganizationUnitSettingDaoImpl;
 import com.realtech.socialsurvey.core.entities.Achievement;
 import com.realtech.socialsurvey.core.entities.AgentSettings;
 import com.realtech.socialsurvey.core.entities.Association;
 import com.realtech.socialsurvey.core.entities.Branch;
+import com.realtech.socialsurvey.core.entities.CompanyPositions;
 import com.realtech.socialsurvey.core.entities.ContactDetailsSettings;
 import com.realtech.socialsurvey.core.entities.ContactNumberSettings;
 import com.realtech.socialsurvey.core.entities.DisplayMessage;
@@ -3941,5 +3943,31 @@ public class ProfileManagementController {
 
 		LOG.info("Method updateDisclaimer() finished from ProfileManagementController");
 		return JspResolver.MESSAGE_HEADER;
+	}
+	
+	@RequestMapping(value = "/geteditpositions")
+	public String getEditPositions(HttpServletRequest request, Model model) {
+
+		LOG.info("Method called to get the edit positions container");
+
+		return JspResolver.PROFILE_POSITIONS_EDIT;
+	}
+
+	@ResponseBody
+	@RequestMapping(value = "/updatepositions")
+	public String updatePositions(HttpServletRequest request, Model model) {
+
+		LOG.info("Method called to get the update positions");
+
+		HttpSession session = request.getSession();
+
+		AgentSettings agentSettings = (AgentSettings) session.getAttribute(CommonConstants.USER_PROFILE_SETTINGS);
+
+		String postionsJson = request.getParameter("positions");
+		List<CompanyPositions> companyPositions = new Gson().fromJson(postionsJson, new TypeToken<List<CompanyPositions>>() {}.getType());
+
+		profileManagementService.addOrUpdateAgentPositions(companyPositions, agentSettings);
+		agentSettings.setPositions(companyPositions);
+		return CommonConstants.SUCCESS_ATTRIBUTE;
 	}
 }

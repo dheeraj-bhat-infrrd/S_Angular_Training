@@ -2502,4 +2502,11 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 		LOG.debug("Method aggregateAgentDetails() finished from ProfileManagementService");
 		return (agentSettings != null ? agentSettings : profileSettings);
 	}
+    
+    @Override
+    public void addOrUpdateAgentPositions(List<CompanyPositions> companyPositions, AgentSettings agentSettings) {
+    	LOG.debug("Method addOrUpdateAgentPositions() called to update agent positions");
+    	
+    	organizationUnitSettingsDao.updateParticularKeyAgentSettings(MongoOrganizationUnitSettingDaoImpl.KEY_POSTIONS, companyPositions, agentSettings);
+    }
 }

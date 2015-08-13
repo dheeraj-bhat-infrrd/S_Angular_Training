@@ -6123,7 +6123,8 @@ function callBackEditAddressDetails(data) {
 	});
 
 	$('.overlay-disable-wrapper').addClass('pu_arrow_rt');
-	$('body').css('overflow', 'hidden');
+	$('body').addClass('body-no-scroll');
+	//$('body').css('overflow', 'hidden');
 	$('body').scrollTop('0');
 }
 
@@ -6167,7 +6168,8 @@ function overlayRevert() {
 
 	$('#overlay-continue').unbind('click');
 
-	$('body').css('overflow', 'auto');
+	//$('body').css('overflow', 'auto');
+	$('body').removeClass('body-no-scroll');
 	$('.overlay-disable-wrapper').removeClass('pu_arrow_rt');
 }
 
@@ -7732,4 +7734,229 @@ function bindDatePickerforIndividualSurveyDownload() {
         fromEndDate.setDate(fromEndDate.getDate(new Date(selected.date.valueOf())));
         $('#indv-dsh-start-date').datepicker('setEndDate', fromEndDate);
     });
+}
+
+function editPositions() {
+	callAjaxGET("/geteditpositions.do", function(data) {
+		createEditPositionsPopup("Edit positions", data);
+		
+		addDatePcikerForPositions();
+		$('.pos-edit-icn').click(function() {
+			$(this).parent().find('input').prop('readonly',false);
+		});
+		$('.add-pos-link').click(function() {
+			var htmlToAppned = "<div class='pos-cont margin-top-10 text-left'>" + 
+					"<div class='checkbox-input-cont'>" +
+					"<div class='checkbox-input checkbox-iscurrent' data-checked='false'></div>" +
+					"Current Employer</div>" +
+					"<input name='companyName' class='pos-input' placeholder='Company Name'>" +
+					"<input name='title' class='pos-input' placeholder='Job Title'>" +
+					"<input name='startTime' class='pos-input'placeholder='Start Date'>" +
+					"<input name='endTime' class='pos-input' placeholder='End Date'>" +
+					"<div class='pos-remove-icn'></div>" +
+					"</div>";
+			$(this).before(htmlToAppned);
+			//$(this).remove();
+			addDatePcikerForPositions();
+		});
+	}, true);
+	
+}
+
+$(document).on('click', '.checkbox-iscurrent', function(e){
+	var isCurrent = $(this).attr('data-checked');
+	if(isCurrent == "true") {
+		$(this).attr('data-checked',"false");
+		$(this).parent().parent().find('input[name="endTime"]').show();
+	} else {
+		$(this).attr('data-checked',"true");
+		$(this).parent().parent().find('input[name="endTime"]').hide();
+	}
+});
+
+$(document).on('click', '.pos-remove-icn', function(e){
+	$(this).parent().remove();
+	updatePositions();
+});
+
+function addDatePcikerForPositions() {
+	
+	var startDate;
+	var fromEndDate = new Date();
+	var toEndDate = new Date();
+	
+	$('input[name="endTime"]').datepicker({
+		orientation: "auto",
+		format: "mm-yyyy",
+	    startView: "months", 
+	    minViewMode: "months",
+	    endDate : toEndDate,
+	    todayHighlight: true,
+		clearBtn: true,
+		autoclose: true
+	}).on('changeDate', function(selected){
+        fromEndDate = new Date(selected.date.valueOf());
+        fromEndDate.setDate(fromEndDate.getDate(new Date(selected.date.valueOf())));
+        $(this).parent().find('input[name="startTime"]').datepicker('setEndDate', fromEndDate);
+    });
+	$('input[name="startTime"]').datepicker({
+		orientation: "auto",
+		format: "mm-yyyy",
+	    startView: "months", 
+	    minViewMode: "months",
+	    endDate : toEndDate,
+	    todayHighlight: true,
+		clearBtn: true,
+		autoclose: true
+	}).on('changeDate', function(selected){
+        startDate = new Date(selected.date.valueOf());
+        startDate.setDate(startDate.getDate(new Date(selected.date.valueOf())));
+        $(this).parent().find('input[name="endTime"]').datepicker('setStartDate', startDate);
+    });
+}
+
+function createEditPositionsPopup(header, body) {
+	$('#overlay-header').html(header);
+	$('#overlay-text').html(body);
+	$('#overlay-continue').html("Save");
+	$('#overlay-cancel').html("Cancel");
+	$('#overlay-continue').off();
+	$('#overlay-continue').click(function(){
+		updatePositions();
+	});
+	
+	$('#overlay-main').show();
+	$('body').addClass('body-no-scroll');
+}
+
+function updatePositions() {
+	var positions = [];
+	var isFormValid = true;
+	$('#prof-position-edit-container').find('.pos-cont').each(function() {
+		var position = {};
+		var companyName = $(this).find('input[name="companyName"]').val();
+		var title = $(this).find('input[name="title"]').val();
+		var startTime = $(this).find('input[name="startTime"]').val();
+		var endTime = $(this).find('input[name="endTime"]').val();
+		var startMonth, startYear, endMonth, endYear;
+		var isCurrent = false;
+		
+		var isCurrentString = $(this).find('.checkbox-input-cont').find('.checkbox-iscurrent').attr("data-checked");
+		
+		if(isCurrentString == "true") {
+			isCurrent = true;
+		}
+		
+		if(companyName == undefined || companyName == '') {
+			$(this).find('input[name="companyName"]').focus();
+			$('#overlay-toast').html("Please enter company name");
+			showToast();
+			isFormValid = false;
+			return false;
+		}
+		
+		if(title == undefined || title == '') {
+			$(this).find('input[name="title"]').focus();
+			$('#overlay-toast').html("Please enter title");
+			showToast();
+			isFormValid = false;
+			return false;
+		}
+		
+		if(startTime == undefined || startTime == '') {
+			$(this).find('input[name="startTime"]').focus();
+			$('#overlay-toast').html("Please enter start time");
+			showToast();
+			isFormValid = false;
+			return false;
+		} else {
+			var startDateSplit = startTime.split("-");
+			if(startDateSplit.length < 2) {
+				$('#overlay-toast').html("Please enter valid start time");
+				showToast();
+			}
+			startMonth = parseInt(startDateSplit[0]);
+			startYear = parseInt(startDateSplit[1]);
+		}
+		
+		position["name"] = companyName;
+		position["title"] = title;
+		position["startTime"] = startTime;
+		position["startMonth"] = startMonth;
+		position["startYear"] = startYear;
+		
+		if(!isCurrent) {
+			if(endTime == undefined || endTime == ''){
+				$(this).find('input[name="endTime"]').focus();
+				$('#overlay-toast').html("Please enter end time");
+				showToast();
+				isFormValid = false;
+				return false;
+			} else {
+				var endDateSplit = endTime.split("-");
+				if(endDateSplit.length < 2) {
+					$('#overlay-toast').html("Please enter valid end time");
+					showToast();
+					isFormValid = false;
+					return false;
+				}
+				endMonth = parseInt(endDateSplit[0]);
+				endYear = parseInt(endDateSplit[1]);
+				position["endTime"] = endTime;
+				position["endMonth"] = endMonth;
+				position["endYear"] = endYear;
+			}
+		} 
+		
+		position["isCurrent"] = isCurrent;
+		
+		positions.push(position);
+	});
+	
+	if (!isFormValid) {
+		return;
+	}
+	
+	if(positions.length > 0) {
+		positions = JSON.stringify(positions);
+	} else {
+		return false;
+		$('#overlay-toast').html("Add positions");
+		showToast();
+	}
+	
+	callAjaxPOSTWithTextData("/updatepositions.do?positions="+positions, function(data) {
+		if(data == "success") {
+			$('#overlay-toast').html("Positions updated successfully");
+			showToast();			
+			updatePositionInLeftSection(positions);
+			$('#overlay-cancel').click();
+		}
+		$('body').removeClass('body-no-scroll');
+	}, true, {});
+}
+
+
+function updatePositionInLeftSection(positions) {
+	var contentToAppend = "";
+	var positionsArray = [];
+	if(positions != undefined && positions != "")
+		positionsArray = JSON.parse(positions);
+	if(positionsArray.length > 0) {
+		for(var index in positionsArray) {
+			var position = positionsArray[index];
+			contentToAppend += '<div class="postions-content">';
+			contentToAppend += '<div class="lp-pos-row-1 lp-row clearfix">'+position.name+'</div>';
+			contentToAppend += '<div class="lp-pos-row-2 lp-row clearfix">'+position.title+'</div>';
+			if(position.isCurrent) {
+				contentToAppend += '<div class="lp-pos-row-3 lp-row clearfix">'+position.startTime + ' - Current' +'</div>';
+			} else {
+				contentToAppend += '<div class="lp-pos-row-3 lp-row clearfix">'+position.startTime + ' - ' + position.endTime +'</div>';
+			}
+		}
+	} else {
+		contentToAppend = "No positions added yet";
+	}
+	
+	$('#positions-container').html(contentToAppend);
 }
