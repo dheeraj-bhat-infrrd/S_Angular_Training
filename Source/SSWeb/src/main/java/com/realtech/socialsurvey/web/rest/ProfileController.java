@@ -1570,7 +1570,7 @@ public class ProfileController {
 
 			// Calling email services method to send mail to the Application level admin.
 			emailServices.sendReportAbuseMail(applicationAdminEmail, applicationAdminName, agentName, customerName.replaceAll("null", ""),
-					customerEmail, review, reason);
+					customerEmail, review, reason, reporterName, reporterEmail);
 			
 			// Calling email services method to send mail to the reporter
 			emailServices.sendSurveyReportMail(reporterEmail, reporterName, reason);
