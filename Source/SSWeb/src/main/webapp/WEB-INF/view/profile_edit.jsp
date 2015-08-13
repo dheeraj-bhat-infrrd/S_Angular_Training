@@ -1,3 +1,4 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <%@ taglib prefix="spring" uri="http://www.springframework.org/tags"%>
 <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions"%>
@@ -162,12 +163,12 @@
 						</c:if>
 						
 					</div>
-					<c:if test="${not empty webAddresses.work}">
+					<%-- <c:if test="${not empty webAddresses.work}">
 						<div id="web-addr-header" class="web-addr-header float-left clearfix">
 							<div class="web-address-img float-left"></div>
 							<div id="web-address-txt" class="web-address-txt float-left">${webAddresses.work}</div>
 						</div>
-					</c:if>
+					</c:if> --%>
 
 					<c:if test="${accountMasterId != 5}">
 						<div id="prof-edit-social-link" class="prof-edit-social-link float-right hm-hr-row-right clearfix">
