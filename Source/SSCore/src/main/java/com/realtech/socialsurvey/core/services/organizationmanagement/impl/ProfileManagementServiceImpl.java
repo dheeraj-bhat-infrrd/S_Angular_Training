@@ -144,14 +144,10 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
     @Value ( "${APPLICATION_BASE_URL}")
     private String applicationBaseUrl;
 
-    @Value ( "${FB_CLIENT_ID}")
-    private String facebookAppId;
-    
     @Value ( "${ENABLE_KAFKA}")
     private String enableKafka;
 
-    @Value ( "${GOOGLE_API_KEY}")
-    private String googlePlusId;
+
     @Override
     public void afterPropertiesSet() throws Exception
     {
@@ -1871,8 +1867,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
     {
         String profileUrl;
         String baseProfileUrl = applicationBaseUrl + CommonConstants.AGENT_PROFILE_FIXED_URL;
-        String facebookShareUrl = "app_id="+facebookAppId;
-        String googleApiKey = googlePlusId;
+
         if ( reviews != null && !reviews.isEmpty() ) {
             for ( SurveyDetails review : reviews ) {
 
@@ -1883,8 +1878,6 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
                     if ( documents != null && !documents.isEmpty() ) {
                         profileUrl = (String) documents.iterator().next().getProfileUrl();
                         review.setCompleteProfileUrl( baseProfileUrl + profileUrl );
-                        review.setGoogleApi(googleApiKey);
-                        review.setFaceBookShareUrl(facebookShareUrl);
                     }
                 } catch ( InvalidInputException | SolrException e ) {
                     LOG.error( "Exception caught in setAgentProfileUrlForReview() for agent : " + review.getAgentName()
