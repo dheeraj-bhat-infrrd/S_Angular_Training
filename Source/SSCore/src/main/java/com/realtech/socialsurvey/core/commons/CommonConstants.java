@@ -595,6 +595,7 @@ public interface CommonConstants
     public static final String HEADER_CUSTOMER_LAST_NAME = "Customer Last Name";
     public static final String HEADER_SURVEY_SENT_DATE = "Survey Sent";
     public static final String HEADER_SURVEY_COMPLETED_DATE = "Survey Completed";
+    public static final String HEADER_SURVEY_TIME_INTERVAL = "Time Interval";
     public static final String HEADER_SURVEY_SOURCE = "Survey Source";
     public static final String HEADER_SURVEY_SCORE = "Score";
     public static final String HEADER_SURVEY_QUESTION = "Q";
@@ -633,4 +634,6 @@ public interface CommonConstants
     public final String EXCEL_FORMAT = "application/vnd.ms-excel";
     public final String CONTENT_DISPOSITION_HEADER = "Content-Disposition";
     public final String EXCEL_FILE_EXTENSION = ".xlsx";
+    
+    public final String EPOCH_REMINDER_TIME = "02/01/1970";
 }

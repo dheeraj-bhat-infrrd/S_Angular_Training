@@ -1,4 +1,4 @@
-<html prefix="og:http://og[.me/ns#">
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ taglib prefix="spring" uri="http://www.springframework.org/tags"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"%>
@@ -21,11 +21,11 @@
     	var twitId = 'twttxt_'+loop;
     	var twitText = $("#"+twitId).val();
     	var length = twitText.length;
-    	if(length > 40)
+    	if(length > 109)
     		{
     		var arr = twitLink.split('');
        		var twittStrnDot = "...";
-    		var substringed = twitText.substring(0, 40);
+    		var substringed = twitText.substring(0, 105);
     		var finalString = substringed.concat(twittStrnDot);
     		$("#"+twitId).val(finalString);
     		twitLink = twitLink.replace(String,finalString);
@@ -37,7 +37,6 @@
     }
     function getImageandCaption(loop)
     {
-    	debugger;
     var fblink = $("#fb_"+loop).data('link');
     var imgId = $("#dsh-prsn-img").css("background-image"); 
     
@@ -109,6 +108,9 @@
 						</c:if>
 						<c:if test="${not empty feedback.lendingTreeProfileUrl}">
 							<span class="float-left ppl-share-icns icn-lendingtree" title="LendingTree" data-link="${feedback.lendingTreeProfileUrl}"></span>
+						</c:if>
+						<c:if test="${not empty feedback.realtorProfileUrl}">
+							<span class="float-left ppl-share-icns icn-realtor" title="Realtor" data-link="${feedback.realtorProfileUrl}"></span>
 						</c:if>
 					</div>
 					<div class="float-left icn-share icn-remove icn-rem-size hide" style="display: none;"></div>

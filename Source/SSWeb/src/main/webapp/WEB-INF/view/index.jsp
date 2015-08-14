@@ -1,11 +1,12 @@
-<%@ page language="java" contentType="text/html; charset=ISO-8859-1" pageEncoding="UTF-8"%>
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <!DOCTYPE">
 <html>
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<title>Professional Reputation Management | SocialSurvey.me</title>
-	
+	<meta name="norton-safeweb-site-verification" 
+ 		 content="s97qgdn0xldafh23hpih0sd0qpc19jjqnb37xio342-fltqdwg1jjoe2o5mnkfonqua26k1hukucj52b7c6r8-2ts8zcwvh-zv42i5rcg06bimirv1mykg0ucoupvxr3" />
 	<meta name="keywords"
 		content="socialsurvey.me, socialsurvey, professional, online, reputation management, social, survey, reviews, rating">
 	<meta name="description"

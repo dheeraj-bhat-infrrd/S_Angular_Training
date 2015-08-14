@@ -1,3 +1,4 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <%@ taglib prefix="spring" uri="http://www.springframework.org/tags"%>
 <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions"%>
@@ -29,6 +30,7 @@
 	<c:set value="${socialMediaTokens.yelpToken}" var="yelpToken"></c:set>
 	<c:set value="${socialMediaTokens.zillowToken}" var="zillowToken"></c:set>
 	<c:set value="${socialMediaTokens.lendingTreeToken}" var="lendingTreeToken"></c:set>
+	<c:set value="${socialMediaTokens.realtorToken}" var="realtorToken"></c:set>
 </c:if>
 <c:choose>
 	<c:when test="${columnName == 'companyId'}">
@@ -47,22 +49,22 @@
 
 <!-- Setting agent page variables -->
 <c:if test="${profilemasterid == 4}">
-	<c:if test="${not empty profile && not empty profileSettings.licenses}">
+	<c:if test="${not empty profileSettings && not empty profileSettings.licenses}">
 		<c:set value="${profileSettings.licenses.authorized_in}" var="authorisedInList"></c:set>
 	</c:if>
-	<c:if test="${not empty profile && not empty profileSettings.positions}">
+	<c:if test="${not empty profileSettings && not empty profileSettings.positions}">
 		<c:set value="${profileSettings.positions}" var="positions"></c:set>
 	</c:if>
-	<c:if test="${not empty profile && not empty profileSettings.associations}">
+	<c:if test="${not empty profileSettings && not empty profileSettings.associations}">
 		<c:set value="${profileSettings.associations}" var="associations"></c:set>
 	</c:if>
-	<c:if test="${not empty profile && not empty profileSettings.expertise}">
+	<c:if test="${not empty profileSettings && not empty profileSettings.expertise}">
 		<c:set value="${profileSettings.expertise}" var="expertiseList"></c:set>
 	</c:if>
-	<c:if test="${not empty profile && not empty profileSettings.achievements}">
+	<c:if test="${not empty profileSettings && not empty profileSettings.achievements}">
 		<c:set value="${profileSettings.achievements}" var="achievements"></c:set>
 	</c:if>
-	<c:if test="${not empty profile && not empty profileSettings.hobbies}">
+	<c:if test="${not empty profileSettings && not empty profileSettings.hobbies}">
 		<c:set value="${profileSettings.hobbies}" var="hobbies"></c:set>
 	</c:if>
 </c:if>
@@ -161,12 +163,12 @@
 						</c:if>
 						
 					</div>
-					<c:if test="${not empty webAddresses.work}">
+					<%-- <c:if test="${not empty webAddresses.work}">
 						<div id="web-addr-header" class="web-addr-header float-left clearfix">
 							<div class="web-address-img float-left"></div>
 							<div id="web-address-txt" class="web-address-txt float-left">${webAddresses.work}</div>
 						</div>
-					</c:if>
+					</c:if> --%>
 
 					<c:if test="${accountMasterId != 5}">
 						<div id="prof-edit-social-link" class="prof-edit-social-link float-right hm-hr-row-right clearfix">
@@ -181,6 +183,7 @@
 							<div id="icn-yelp" class="float-left social-item-icon icn-yelp" data-link="${yelpToken.yelpPageLink}" title="Yelp"></div>
 							<div id="icn-zillow" class="float-left social-item-icon icn-zillow" data-link="${zillowToken.zillowProfileLink}" title="Zillow"></div>
 							<div id="icn-lendingtree" class="float-left social-item-icon icn-lendingtree" data-link="${lendingTreeToken.lendingTreeProfileLink}" title="LendingTree"></div>
+							<div id="icn-realtor" class="float-left social-item-icon icn-realtor" data-link="${realtorToken.realtorProfileLink}" title="Realtor"></div>
 							<input id="social-token-text" type="text" class="social-token-text hide"
 								placeholder='<spring:message code="label.socialpage.placeholder.key"/>'>
 						</div>
@@ -207,6 +210,50 @@
 				<div id="prof-agent-container">
 					<c:choose>
 						<c:when	test="${profilemasterid == 4}">
+							<!-- Positions left panel -->
+							<div class="prof-left-row prof-left-auth bord-bot-dc">
+								<div class="left-auth-wrapper">
+									<div class="clearfix">
+										<div class="float-left left-panel-header"><spring:message code="label.positions.key" /></div>
+										<div class="float-right icn-share edit-pos-icn" onclick="editPositions();" title="Edit"></div>
+									</div>
+									<div id="positions-container" class="left-panel-content">
+										<c:choose>
+											<c:when test="${not empty positions}">
+												<c:forEach items="${positions}" var="positionItem">
+													<div class="postions-content">
+              		 									<c:if test="${not empty positionItem.name}">
+              		 										<div class="lp-pos-row-1 lp-row clearfix">${positionItem.name}</div>
+              		 									</c:if>
+              		 									<c:if test="${not empty positionItem.title}">
+              		 										<div class="lp-pos-row-2 lp-row clearfix">${positionItem.title}</div>
+              		 									</c:if>
+              		 									<c:choose>
+              		 										<c:when test="${not positionItem.isCurrent}">
+              		 											<c:if test="${not empty positionItem.startTime && not empty positionItem.endTime}">
+              		 												<div class="lp-pos-row-3 lp-row clearfix">
+              		 													${positionItem.startTime} - ${positionItem.endTime}
+              		 												</div>
+              		 											</c:if>
+              		 										</c:when>
+              		 										<c:otherwise>
+              		 											<c:if test="${not empty positionItem.startTime}">
+               		 											<div class="lp-pos-row-3 lp-row clearfix">
+               		 												${positionItem.startTime} - Current
+               		 											</div>
+              		 											</c:if>
+              		 										</c:otherwise>
+              		 									</c:choose>
+              		 								</div>
+												</c:forEach>
+											</c:when>
+											<c:otherwise>
+												<span><spring:message code="label.positions.empty.key"></spring:message></span>
+											</c:otherwise>
+										</c:choose>
+									</div>
+								</div>
+							</div>
 							<!-- Licences left panel -->
 							<div class="prof-left-row prof-left-auth bord-bot-dc">
 								<div class="left-auth-wrapper">
@@ -268,7 +315,7 @@
 												<c:forEach items="${expertiseList}" var="expertise">
 													<div class="lp-dummy-row clearfix">
 														<input class="lp-expertise-row lp-row clearfix prof-edditable-sin-agent" value="${expertise}" data-status="saved">
-														<div class="float-right lp-expertise-item-img hide" data-type="expertise"></div>
+														<div class="float-right lp-ach-item-img hide" data-type="expertise"></div>
 													</div>
 												</c:forEach>
 											</c:when>
@@ -316,7 +363,7 @@
 												<c:forEach items="${hobbies}" var="hobby">
 													<div class="lp-dummy-row clearfix">
 														<input class="lp-hobby-row lp-row clearfix prof-edditable-sin-agent" value="${hobby}" data-status="saved">
-														<div class="float-right lp-hobby-item-img hide" data-type="hobby"></div>
+														<div class="float-right lp-ach-item-img hide" data-type="hobby"></div>
 													</div>
 												</c:forEach>
 											</c:when>
