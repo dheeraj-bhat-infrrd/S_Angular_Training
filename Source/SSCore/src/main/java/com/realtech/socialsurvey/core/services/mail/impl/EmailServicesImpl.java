@@ -1024,7 +1024,7 @@ public class EmailServicesImpl implements EmailServices
         String currentYear = String.valueOf( Calendar.getInstance().get( Calendar.YEAR ) );
         DateFormat dateFormat = new SimpleDateFormat( "yyyy/MM/dd" );
         String fullAddress = "";
-        messageBodyReplacements.setReplacementArgs( Arrays.asList( appLogoUrl, firstName, link, link, link, agentName,
+        messageBodyReplacements.setReplacementArgs( Arrays.asList( appLogoUrl, firstName, link, link, link, "",
             agentSignature, appBaseUrl, appBaseUrl, recipientMailId, companyName, dateFormat.format( new Date() ), "",
             companyName, currentYear, fullAddress ) );
 

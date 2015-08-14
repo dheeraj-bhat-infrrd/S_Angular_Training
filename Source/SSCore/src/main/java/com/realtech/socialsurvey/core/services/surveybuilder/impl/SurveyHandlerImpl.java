@@ -871,7 +871,7 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
             mailBody = mailBody.replaceAll( "\\[Link\\]", surveyUrl );
             mailBody = mailBody.replaceAll( "\\[FirstName\\]", custFirstName );
             mailBody = mailBody.replaceAll( "\\[Name\\]", custFirstName + " " + custLastName );
-            mailBody = mailBody.replaceAll( "\\[AgentName\\]", agentName );
+            mailBody = mailBody.replaceAll( "\\[AgentName\\]", "" );
             mailBody = mailBody.replaceAll( "\\[AgentSignature\\]", agentSignature );
             mailBody = mailBody.replaceAll( "\\[RecipientEmail\\]", custEmail );
             mailBody = mailBody.replaceAll( "\\[SenderEmail\\]", user.getEmailId() );
