@@ -172,11 +172,11 @@ public class IncompleteSurveyReminderSender extends QuartzJobBean
             }
             String mailBody = emailFormatHelper.replaceEmailBodyWithParams( mailContent.getMail_body(),
                 mailContent.getParam_order() );
-            String agentSignature = emailFormatHelper.buildAgentSignature( agentPhone, agentTitle, companyName );
+            String agentSignature = emailFormatHelper.buildAgentSignature( agentName, agentPhone, agentTitle, companyName );
 
             mailBody = mailBody.replaceAll( "\\[LogoUrl\\]", applicationLogoUrl );
             mailBody = mailBody.replaceAll( "\\[BaseUrl\\]", applicationBaseUrl );
-            mailBody = mailBody.replaceAll( "\\[AgentName\\]", agentName );
+            mailBody = mailBody.replaceAll( "\\[AgentName\\]", "" );
             mailBody = mailBody.replaceAll( "\\[FirstName\\]", survey.getCustomerFirstName() );
             mailBody = mailBody.replaceAll( "\\[Name\\]", survey.getCustomerFirstName() + " " + survey.getCustomerLastName() );
             mailBody = mailBody.replaceAll( "\\[Link\\]", surveyLink );
