@@ -365,9 +365,8 @@ function paintIndividualForBranch(data) {
 				if (individual.contact_details != undefined) {
 					individualsHtml += '<div class="bd-hr-item-l3 comp-individual" data-agentid=' + individual.iden + '>';
 					individualsHtml += '	<div class="bd-hr-item bd-lt-l3 clearfix">';
-					if (individual.profileImageUrl != undefined) {
-						individualsHtml += '	<div class="float-left bd-hr-img pers-default-img comp-individual-prof-image"'
-							+ 'style="background: url(' + individual.profileImageUrl + ') 50% 50% / 100% no-repeat;"></div>';
+					if (individual.profileImageUrl != undefined && individual.profileImageUrl.trim() != "") {
+						individualsHtml += '	<div class="float-left bd-hr-img pers-default-img comp-individual-prof-image"><img class="hr-ind-img" src="'+individual.profileImageUrl+'"/></div>';
 					} else {
 						individualsHtml += '	<div class="float-left bd-hr-img pers-default-img comp-individual-prof-image"></div>';
 					}
@@ -417,9 +416,8 @@ function paintIndividualsForRegion(data) {
 					if (individual.contact_details != undefined){
 						individualsHtml += '<div class="bd-hr-item-l2 comp-region-individual" data-agentid=' + individual.iden + '>';
 						individualsHtml += '	<div class="bd-hr-item bd-lt-l3 clearfix">';
-						if (individual.profileImageUrl != undefined) {
-							individualsHtml += '	<div class="float-left bd-hr-img pers-default-img comp-individual-prof-image"'
-								+ 'style="background: url(' + individual.profileImageUrl + ') 50% 50% / 100% no-repeat;"></div>';
+						if (individual.profileImageUrl != undefined && individual.profileImageUrl.trim() != "") {
+							individualsHtml += '	<div class="float-left bd-hr-img pers-default-img comp-individual-prof-image"><img class="hr-ind-img" src="'+individual.profileImageUrl+'"/></div>';
 						} else {
 							individualsHtml += '	<div class="float-left bd-hr-img pers-default-img comp-individual-prof-image"></div>';
 						}
@@ -461,7 +459,7 @@ function fetchCompanyIndividuals() {
 
 function paintCompanyIndividuals(data) {
 	var response= $.parseJSON(data);
-	if (response != undefined) {
+	if (response != undefined && response.entity != "") {
 		var result = $.parseJSON(response.entity);
 		if (result != undefined && result.length > 0) {
 			var compIndividualsHtml = "";
@@ -470,9 +468,8 @@ function paintCompanyIndividuals(data) {
 					compIndividualsHtml += '<div class="bd-hr-item-l1 comp-individual" data-agentid=' + compIndividual.iden + '>';
 					compIndividualsHtml += '	<div class="bd-hr-item bd-lt-l3 clearfix">';
 					
-					if (compIndividual.profileImageUrl != undefined) {
-						compIndividualsHtml += '	<div class="float-left bd-hr-img pers-default-img comp-individual-prof-image"'
-							+ 'style="background: url(' + compIndividual.profileImageUrl + ') 50% 50% / 100% no-repeat;"></div>';
+					if (compIndividual.profileImageUrl != undefined && compIndividual.profileImageUrl.trim() != "") {
+						compIndividualsHtml += '	<div class="float-left bd-hr-img pers-default-img comp-individual-prof-image"><img class="hr-ind-img" src="'+compIndividual.profileImageUrl+'"/></div>';
 					} else {
 						compIndividualsHtml += '	<div class="float-left bd-hr-img pers-default-img comp-individual-prof-image"></div>';
 					}
@@ -602,6 +599,9 @@ function paintReviews(result){
 		if (reviewItem.lendingTreeProfileUrl != null && reviewItem.lendingTreeProfileUrl != "") {
 			reviewsHtml += '		<span class="float-left ppl-share-icns icn-lendingtree" title="LendingTree" data-link="' + returnValidWebAddress(reviewItem.lendingTreeProfileUrl) + '"></span>';
 		}
+		if (reviewItem.realtorProfileUrl != null && reviewItem.realtorProfileUrl != "") {
+			reviewsHtml += '		<span class="float-left ppl-share-icns icn-realtor" title="Realtor" data-link="' + returnValidWebAddress(reviewItem.realtorProfileUrl) + '"></span>';
+		}
 		reviewsHtml += '		</div>';
 		reviewsHtml += '		<div class="float-right" style="margin: 0 -5px;">';
 		reviewsHtml += '			<div class="report-abuse-txt report-txt prof-report-abuse-txt">Report Abuse</div>';
@@ -652,43 +652,36 @@ $(document).on('click','.review-more-button',function(){
 	$(this).hide();
 });
 
-//Report abuse click event.
+// Report abuse click event.
 $(document).on('click', '.prof-report-abuse-txt', function(e) {
-	
-	var firstName = $(this).parent().parent().parent().parent().attr('data-cust-first-name');
-	var lastName = $(this).parent().parent().parent().parent().attr('data-cust-last-name');
-	var agentName = $(this).parent().parent().parent().parent().attr('data-agent-name');
-	var customerEmail = $(this).parent().parent().parent().parent().attr('data-customeremail');
-	var agentId = $(this).parent().parent().parent().parent().attr('data-agentid');
-	var review = $(this).parent().parent().parent().parent().attr('data-review');
+	var reviewElement = $(this).parent().parent().parent();
 	var payload = {
-			"customerEmail" : customerEmail,
-			"agentId" : agentId,
-			"firstName" : firstName,
-			"lastName" : lastName,
-			"agentName" : agentName,
-			"review" : review
+		"customerEmail" : reviewElement.attr('data-customeremail'),
+		"agentId" : reviewElement.attr('data-agentid'),
+		"firstName" : reviewElement.attr('data-cust-first-name'),
+		"lastName" : reviewElement.attr('data-cust-last-name'),
+		"agentName" : reviewElement.attr('data-agent-name'),
+		"review" : reviewElement.attr('data-review')
 	};
 	$("#report-abuse-txtbox").val('');
 	$('#report-abuse-cus-name').val('');
 	$('#report-abuse-cus-email').val('');
 	
-	//Unbind click events for button
+	// Unbind click events for button
 	$('.rpa-cancel-btn').off('click');
 	$('.rpa-report-btn').off('click');
 	
-	
 	$('#report-abuse-overlay').show();
-	
-	$('.rpa-cancel-btn').on('click',function(){
+	$('.rpa-cancel-btn').on('click', function() {
 		$('#report-abuse-overlay').hide();
 	});
-	$('.rpa-report-btn').on('click',function(){
+	$('.rpa-report-btn').on('click', function() {
 		var reportText = $("#report-abuse-txtbox").val();
 		var cusName = $('#report-abuse-cus-name').val();
 		var cusEmail = $('#report-abuse-cus-email').val();
 		
 		if (validateReportAbuseForm(reportText, cusName, cusEmail)) {
+			showOverlay();
 			payload.reportText = reportText;
 			payload.reporterName = cusName;
 			payload.reporterEmail = cusEmail;
@@ -698,21 +691,21 @@ $(document).on('click', '.prof-report-abuse-txt', function(e) {
 });
 
 function validateReportAbuseForm(reportText, cusName, cusEmail) {
-	//check if custname is empty
+	// check if custname is empty
 	if(cusName == undefined || cusName == ""){
 		$('#overlay-toast').html('Please enter valid name!');
 		showToast();
 		return false;
 	}
 	
-	//check if custemail is valid
+	// check if custemail is valid
 	if(cusEmail == undefined || cusEmail == "" || !emailRegex.test(cusEmail)){
 		$('#overlay-toast').html('Please enter a valid email address!');
 		showToast();
 		return false;
 	}
 	
-	//check if report text is empty
+	// check if report text is empty
 	if(reportText == undefined || reportText == ""){
 		$('#overlay-toast').html('Please enter why you want to report the review!');
 		showToast();
@@ -723,9 +716,15 @@ function validateReportAbuseForm(reportText, cusName, cusEmail) {
 }
 
 function confirmReportAbuse(payload) {
-	callAjaxGetWithPayloadData('/rest/profile/surveyreportabuse', function() {
+	callAjaxGetWithPayloadData('/rest/profile/surveyreportabuse', function(status) {
 		$('#report-abuse-overlay').hide();
-		$('#overlay-toast').html('Reported Successfully!');
+		
+		if (status == 'success') {
+			$('#overlay-toast').html('Reported Successfully!');
+		} else {
+			$('#overlay-toast').html('Failed to report abuse, Please try again later');
+		}
+		hideOverlay();
 		showToast();
 	}, payload, true);
 }
@@ -1389,11 +1388,11 @@ function twitterFn (loop) {
 	var twitId = 'twttxt_'+loop;
 	var twitText = $("#"+twitId).val();
 	var length = twitText.length;
-	if(length > 40)
+	if(length > 109)
 		{
 		var arr = twitLink.split('');
    		var twittStrnDot = "...";
-		var substringed = twitText.substring(0, 40);
+		var substringed = twitText.substring(0, 105);
 		var finalString = substringed.concat(twittStrnDot);
 		$("#"+twitId).val(finalString);
 		twitLink = twitLink.replace(String,finalString);

@@ -1006,7 +1006,7 @@ public class DashboardController
 
             // Increasing value of reminder count by 1.
             if ( survey != null ) {
-                surveyHandler.updateReminderCount( survey.getSurveyPreIntitiationId() );
+                surveyHandler.updateReminderCount( survey.getSurveyPreIntitiationId(), true );
             }
         } catch ( NonFatalException e ) {
             LOG.error( "NonFatalException caught in sendReminderMailForSurvey() while sending mail. Nested exception is ", e );
@@ -1075,7 +1075,7 @@ public class DashboardController
 								companyName);
 					}
 
-					surveyHandler.updateReminderCount(survey.getSurveyPreIntitiationId());
+					surveyHandler.updateReminderCount(survey.getSurveyPreIntitiationId(), true);
 				}
 				catch (NumberFormatException e) {
 					throw new NonFatalException("Number format exception occured while parsing incomplete survey id : " + incompleteSurveyIdStr, e);
@@ -1722,46 +1722,52 @@ public class DashboardController
     }
 
 
-    // Method to report a feedback of customer as abusive.
-    // Anybody in the hierarchy can report a feedback from dash board.
+	// Method to report a feedback of customer as abusive.
+	// Anybody in the hierarchy can report a feedback from dash board.
+	@ResponseBody
+	@RequestMapping(value = "/reportabuse")
+	public String reportAbuse(HttpServletRequest request) {
+		String customerEmail = request.getParameter("customerEmail");
+		String firstName = request.getParameter("firstName");
+		String lastName = request.getParameter("lastName");
+		String review = request.getParameter("review");
+		String reason = request.getParameter("reportText");
+		
+		try {
+			long agentId = 0;
+			try {
+				String agentIdStr = request.getParameter("agentId");
+				if (agentIdStr == null || agentIdStr.isEmpty()) {
+					throw new InvalidInputException("Invalid value (Null/Empty) found for agentId.");
+				}
+				agentId = Long.parseLong(agentIdStr);
+			}
+			catch (NumberFormatException e) {
+				LOG.error("NumberFormatException caught in reportAbuse() while converting agentId.");
+				throw e;
+			}
+			
+			String customerName = firstName  + " " + lastName;
+			String agentName = "";
+			try {
+				agentName = solrSearchService.getUserDisplayNameById(agentId);
+			}
+			catch (SolrException e) {
+				LOG.info("Solr Exception occured while fetching agent name. Nested exception is ", e);
+				throw e;
+			}
 
-    @ResponseBody
-    @RequestMapping ( value = "/reportabuse")
-    public void reportAbuse( HttpServletRequest request )
-    {
-        String agentIdStr = request.getParameter( "agentId" );
-        String customerEmail = request.getParameter( "customerEmail" );
-        String firstName = request.getParameter( "firstName" );
-        String lastName = request.getParameter( "lastName" );
-        String review = request.getParameter( "review" );
-        try {
-            if ( agentIdStr == null || agentIdStr.isEmpty() ) {
-                throw new InvalidInputException( "Invalid value (Null/Empty) found for agentId." );
-            }
-            long agentId = 0;
-            try {
-                agentId = Long.parseLong( agentIdStr );
-            } catch ( NumberFormatException e ) {
-                LOG.error( "NumberFormatException caught in reportAbuse() while converting agentId." );
-                throw e;
-            }
-            String customerName = firstName + lastName;
-            String agentName = "";
-            try {
-                agentName = solrSearchService.getUserDisplayNameById( agentId );
-            } catch ( SolrException e ) {
-                LOG.info( "Solr Exception occured while fetching agent name. Nested exception is ", e );
-                throw e;
-            }
-
-            // Calling email services method to send mail to the Application
-            // level admin.
-            emailServices.sendReportAbuseMail( applicationAdminEmail, applicationAdminName, agentName,
-                customerName.replaceAll( "null", "" ), customerEmail, review, "" );
-        } catch ( NonFatalException e ) {
-            LOG.error( "NonfatalException caught in makeSurveyEditable(). Nested exception is ", e );
-        }
-    }
+			// Calling email services method to send mail to the Application level admin.
+			emailServices.sendReportAbuseMail(applicationAdminEmail, applicationAdminName, agentName, customerName.replaceAll("null", ""),
+					customerEmail, review, reason, null , null);
+		}
+		catch (NonFatalException e) {
+			LOG.error("NonfatalException caught in reportAbuse(). Nested exception is ", e);
+			return CommonConstants.ERROR;
+		}
+		
+		return CommonConstants.SUCCESS_ATTRIBUTE;
+	}
     
 	@RequestMapping(value = "/fetchsociallinksinpopup")
 	public String fetchSocialLinksInPopup(HttpServletRequest request, Model model) {

@@ -1,6 +1,7 @@
-<%@ page language="java" contentType="text/html; charset=ISO-8859-1" pageEncoding="UTF-8"%>
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ taglib prefix="spring" uri="http://www.springframework.org/tags"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions"%>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <script>
 (function() {
@@ -55,7 +56,7 @@
 	</c:choose>
 </c:if>
 
-<!DOCTYPE">
+<!DOCTYPE>
 <html>
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
@@ -209,14 +210,14 @@
     <div class="">
     	<div class="container">
         <div class="row prof-pic-name-wrapper">
-			<c:if test="${not empty profile.profileImageUrl}">
+			<c:if test="${not empty profile.profileImageUrl && not empty fn:trim(profile.profileImageUrl)}">
 				<div id="prog-img-container" class="col-lg-4 col-md-4 col-sm-4 col-xs-6 prof-wrapper prof-img-wrapper">
 					<div class="prog-img-container">
 		            	<img id="prof-image" class="prof-image pos-relative" src="${profile.profileImageUrl}"></img>
 		            </div>
 	            </div>
 			</c:if>
-			<c:if test="${not empty profile.profileImageUrl}">
+			<c:if test="${not empty profile.profileImageUrl && not empty fn:trim(profile.profileImageUrl)}">
 				<c:set var="profileNameClass" value="profile-name-img-wrapper"></c:set>
 			</c:if>
             <div class="col-lg-4 col-md-4 col-sm-4 col-xs-6 prof-wrapper pos-relative prof-name-wrapper ${profileNameClass}">
@@ -335,6 +336,9 @@
 							</c:if>
 							<c:if test="${not empty profile.socialMediaTokens.lendingTreeToken && not empty profile.socialMediaTokens.lendingTreeToken.lendingTreeProfileLink}">
 								<div id="icn-lendingtree" class="float-left social-item-icon icn-lendingtree" data-link="${profile.socialMediaTokens.lendingTreeToken.lendingTreeProfileLink}" title="LendingTree"></div>
+							</c:if>
+							<c:if test="${not empty profile.socialMediaTokens.realtorToken && not empty profile.socialMediaTokens.realtorToken.realtorProfileLink}">
+								<div id="icn-realtor" class="float-left social-item-icon icn-realtor" data-link="${profile.socialMediaTokens.realtorToken.realtorProfileLink}" title="Realtor"></div>
 							</c:if>
 						</c:if>
 					</div>

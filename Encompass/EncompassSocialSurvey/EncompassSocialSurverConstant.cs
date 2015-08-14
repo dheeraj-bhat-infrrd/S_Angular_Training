@@ -9,6 +9,8 @@ namespace EncompassSocialSurvey
     {
         public const string SURVEY_SOURCE = "encompass";
 
+        public const string COMPANY_INACTIVE = "0";
+
         public const string SETUP_ENVIRONMENT = "ss_environment";
 
         public const string EMAIL_DOMAIN_REPLACEMENT = "email_domain_to_replace";

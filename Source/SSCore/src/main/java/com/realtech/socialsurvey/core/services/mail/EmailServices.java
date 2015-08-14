@@ -350,7 +350,11 @@ public interface EmailServices
 
 
     public void sendReportAbuseMail( String recipientMailId, String displayName, String agentName, String customerName,
-        String customerEmail, String review, String reason ) throws InvalidInputException, UndeliveredEmailException;
+        String customerEmail, String review, String reason, String reporterName, String reporterEmail ) throws InvalidInputException, UndeliveredEmailException;
+
+
+    public void sendSurveyReportMail( String recipientMailId, String displayName, String reason ) throws InvalidInputException,
+        UndeliveredEmailException;
 
 
     public void sendAccountDeletionMail( String recipientMailId, String displayName, String loginName )
@@ -358,6 +362,10 @@ public interface EmailServices
 
 
     public void sendCorruptDataFromCrmNotificationMail( String firstName, String lastName, String recipientEmail,
+        String attachmentPath ) throws InvalidInputException, UndeliveredEmailException;
+
+
+    public void sendRecordsNotUploadedCrmNotificationMail( String firstName, String lastName, String recipientEmail,
         String attachmentPath ) throws InvalidInputException, UndeliveredEmailException;
 
 

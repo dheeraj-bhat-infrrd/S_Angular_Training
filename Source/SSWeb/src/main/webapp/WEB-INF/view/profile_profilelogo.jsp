@@ -1,3 +1,4 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ taglib uri="http://www.springframework.org/tags" prefix="spring"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 
@@ -21,7 +22,8 @@
 	<c:set value="${profileSettings.logo}" var="profilelogo"></c:set>
 	<c:set value="${profileSettings.lockSettings}" var="lock"></c:set>
 </c:if>
-<c:if test="${profilemasterid == 4 && not lock.isLogoLocked}">
+
+<c:if test="${accountMasterId != 1 && profilemasterid == 4 && not lock.isLogoLocked}">
 	<c:set value="${profileSettings.companyProfileData.companyLogo}" var="profilelogo"></c:set>
 </c:if>
 

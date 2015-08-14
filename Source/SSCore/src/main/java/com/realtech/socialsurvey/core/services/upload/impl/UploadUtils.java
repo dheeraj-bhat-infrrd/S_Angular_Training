@@ -62,6 +62,9 @@ public final class UploadUtils {
 	 */
 	public boolean imageSize(File logo) {
 		LOG.debug("Validation imageSize method inside ImageUploadServiceImpl called");
+		if (maxBytes == -1 ) {
+            return true;
+        }
 		return (logo.length() < maxBytes) ? true : false;
 	}
 

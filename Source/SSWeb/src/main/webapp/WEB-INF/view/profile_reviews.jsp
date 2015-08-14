@@ -1,3 +1,4 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"%>
 <%@ taglib uri="http://www.springframework.org/tags" prefix="spring"%>
@@ -21,11 +22,11 @@ function twitterFn (loop,twitterElement) {
 	var twitId = 'twttxt_'+loop;
 	var twitText = $("#"+twitId).val();
 	var length = twitText.length;
-	if(length > 40)
+	if(length > 109)
 		{
 		var arr = twitLink.split('');
    		var twittStrnDot = "...";
-		var substringed = twitText.substring(0, 40);
+		var substringed = twitText.substring(0, 105);
 		var finalString = substringed.concat(twittStrnDot);
 		$("#"+twitId).val(finalString);
 		twitLink = twitLink.replace(String,finalString);
@@ -116,6 +117,9 @@ document.getElementById('fb_'+loop).setAttribute('data-link',fblink);
 								title="LendingTree"
 								data-link="${reviewItem.lendingTreeProfileUrl}"></span>
 						</c:if>
+						<c:if test="${not empty reviewItem.realtorProfileUrl}">
+							<span class="float-left ppl-share-icns icn-realtor" title="Realtor" data-link="${reviewItem.realtorProfileUrl}"></span>
+						</c:if>
 					</div>
 					<div class="float-left icn-share icn-remove icn-rem-size hide"></div>
 				</div>
@@ -143,6 +147,11 @@ $(document).ready(function(){
 		$(this).parent().attr('href', returnValidWebAddress(url));
 	});
 	$('.icn-lendingtree').each(function(index, currentElement) {
+		var url = $(this).parent().attr('href');
+		$(this).parent().attr('href', returnValidWebAddress(url));
+	});
+	
+	$('.icn-realtor').each(function(index, currentElement) {
 		var url = $(this).parent().attr('href');
 		$(this).parent().attr('href', returnValidWebAddress(url));
 	});
