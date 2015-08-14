@@ -28,33 +28,36 @@ function initiateJcrop(input) {
 			var myImage = new Image();
 			myImage.src = e.target.result;
 			
-			$('#target').attr('data-original-width',myImage.width);
-			$('#target').attr('data-original-height',myImage.height);
-			
-			if (myImage.width > myImage.height && myImage.width > imageMaxWidth) {
-				// landscape image
-				$('#target').width(imageMaxWidth);
-			}
-			else if (myImage.width <= myImage.height && myImage.height > imageMaxHeight) {
-				// portrait image
-				$('#target').height(imageMaxHeight);
-			}
-			/*else {
-				$('#target').width(imageMaxWidth);
-				$('#target').height(imageMaxHeight);
-			}*/
-			
 			$('#target').attr('src', e.target.result);
 			$('#target').removeClass('hide');
 			
-			ratio = $('#target').width() / myImage.width;
-
-			$('#target').Jcrop({
-				aspectRatio : 1,
-				setSelect : [ 50, 50, 300, 300 ],
-				onSelect : updatePreview,
-				onChange : updatePreview,
-				trackDocument : true
+			$('#target').load(function() {
+				$('#target').attr('data-original-width',myImage.width);
+				$('#target').attr('data-original-height',myImage.height);
+				
+				if (myImage.width > myImage.height && myImage.width > imageMaxWidth) {
+					// landscape image
+					$('#target').width(imageMaxWidth);
+				}
+				else if (myImage.width <= myImage.height && myImage.height > imageMaxHeight) {
+					// portrait image
+					$('#target').height(imageMaxHeight);
+				}
+				/*else {
+					$('#target').width(imageMaxWidth);
+					$('#target').height(imageMaxHeight);
+				}*/
+				
+				
+				ratio = $('#target').width() / myImage.width;
+	
+				$('#target').Jcrop({
+					aspectRatio : 1,
+					setSelect : [ 50, 50, 300, 300 ],
+					onSelect : updatePreview,
+					onChange : updatePreview,
+					trackDocument : true
+				});
 			});
 		};
 		reader.readAsDataURL(input.files[0]);
