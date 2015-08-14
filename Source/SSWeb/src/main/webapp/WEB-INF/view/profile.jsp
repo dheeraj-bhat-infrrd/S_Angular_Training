@@ -2,6 +2,13 @@
 <%@ taglib prefix="spring" uri="http://www.springframework.org/tags"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
+<script>
+(function() {
+	   var po = document.createElement('script'); po.type = 'text/javascript'; po.async = true;
+	   po.src = 'https://apis.google.com/js/client:plusone.js';
+	   var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(po, s);
+	 })();
+</script>
 <c:if test="${not empty profile}">
 	<c:if test="${not empty profile.contact_details && not empty profile.contact_details.name}">
 		<c:set var="profName" value="${profile.contact_details.name}"></c:set>
