@@ -1008,7 +1008,7 @@ public class EmailServicesImpl implements EmailServices
         LOG.info( "Sending survey reminder email to : " + recipientMailId );
         EmailEntity emailEntity = prepareEmailEntityForSendingEmail( recipientMailId );
 
-        String agentSignature = emailFormatHelper.buildAgentSignature( agentPhone, agentTitle, companyName );
+        String agentSignature = emailFormatHelper.buildAgentSignature( agentName, agentPhone, agentTitle, companyName );
 
         FileContentReplacements subjectReplacements = new FileContentReplacements();
         subjectReplacements.setFileName( EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER
@@ -1171,7 +1171,7 @@ public class EmailServicesImpl implements EmailServices
         String subjectFileName = EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER
             + EmailTemplateConstants.SOCIALPOST_REMINDER_MAIL_SUBJECT;
 
-        String agentSignature = emailFormatHelper.buildAgentSignature( agentPhone, agentTitle, companyName );
+        String agentSignature = emailFormatHelper.buildAgentSignature( agentName, agentPhone, agentTitle, companyName );
 
         FileContentReplacements messageBodyReplacements = new FileContentReplacements();
         messageBodyReplacements.setFileName( EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER

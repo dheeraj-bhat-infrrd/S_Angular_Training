@@ -18,9 +18,12 @@ public class EmailFormatHelper {
 	private static final String PARAM_OPEN = "[";
 	private static final String PARAM_CLOSE = "]";
 
-	public String buildAgentSignature(String agentPhone, String agentTitle, String companyName) {
+	public String buildAgentSignature(String agentName, String agentPhone, String agentTitle, String companyName) {
 		LOG.info("Formatting Individual Signature for email");
 		StringBuilder agentDetail = new StringBuilder();
+		if (agentName != null && !agentName.isEmpty()) {
+            agentDetail.append(agentName).append("<br />");
+        }
 		if (agentPhone != null && !agentPhone.isEmpty()) {
 			agentDetail.append(agentPhone).append("<br />");
 		}
