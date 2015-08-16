@@ -602,7 +602,7 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
         if ( user.getLastName() != null && !user.getLastName().isEmpty() ) {
             agentName = user.getFirstName() + " " + user.getLastName();
         }
-        String agentSignature = emailFormatHelper.buildAgentSignature( agentPhone, agentTitle, companyName );
+        String agentSignature = emailFormatHelper.buildAgentSignature( agentName, agentPhone, agentTitle, companyName );
         String currentYear = String.valueOf( Calendar.getInstance().get( Calendar.YEAR ) );
         DateFormat dateFormat = new SimpleDateFormat( "yyyy/MM/dd" );
         // TODO add address for mail footer
@@ -851,7 +851,7 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
             agentName = user.getFirstName() + " " + user.getLastName();
         }
 
-        String agentSignature = emailFormatHelper.buildAgentSignature( agentPhone, agentTitle, companyName );
+        String agentSignature = emailFormatHelper.buildAgentSignature( agentName, agentPhone, agentTitle, companyName );
         String currentYear = String.valueOf( Calendar.getInstance().get( Calendar.YEAR ) );
         DateFormat dateFormat = new SimpleDateFormat( "yyyy/MM/dd" );
         // TODO add address for mail footer

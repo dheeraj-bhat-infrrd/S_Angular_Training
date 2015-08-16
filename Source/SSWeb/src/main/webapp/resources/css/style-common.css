@@ -1739,6 +1739,7 @@ button.paypal.is-active {
 
 .icn-gplus {
 	background: url(../images/gplus.png) no-repeat center;
+	border:0px;
 }
 
 .icn-tweet {

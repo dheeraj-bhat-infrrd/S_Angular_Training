@@ -39,8 +39,24 @@ public class SurveyDetails
     private String realtorProfileUrl;
     private String source;
     private String agreedToShare;
+    private String googleApi;
+    private String faceBookShareUrl;
 
+    public String getGoogleApi() {
+		return googleApi;
+	}
 
+	public void setGoogleApi(String googleApi) {
+		this.googleApi = googleApi;
+	}
+	public String getFaceBookShareUrl() {
+		return faceBookShareUrl;
+	}
+
+	public void setFaceBookShareUrl(String faceBookShareUrl) {
+		this.faceBookShareUrl = faceBookShareUrl;
+	}
+    
     public long getAgentId()
     {
         return agentId;
