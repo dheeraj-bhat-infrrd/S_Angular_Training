@@ -14,12 +14,18 @@
 
 <script type="text/javascript">
 
-    function theFunction (loop,twitterElement) {
-    	
+    function twitterFn (loop,twitterElement) {
+    	console.log("in twitterFn");
+    	var twitText = "";
       	var twitLink = $("#twitt_"+loop).data('link');
       	var String=twitLink.substring(twitLink.indexOf("=")+1,twitLink.lastIndexOf("&"));
     	var twitId = 'twttxt_'+loop;
-    	var twitText = $("#"+twitId).val();
+    	if($("#"+twitId) != undefined)
+    		{
+    		console.log("twittId not null");
+    		 twitText = $("#"+twitId).val();
+    		}
+    	
     	var length = twitText.length;
     	if(length > 109)
     		{
@@ -27,7 +33,11 @@
        		var twittStrnDot = "...";
     		var substringed = twitText.substring(0, 105);
     		var finalString = substringed.concat(twittStrnDot);
-    		$("#"+twitId).val(finalString);
+    		if($("#"+twitId) != undefined)
+    			{
+    			$("#"+twitId).val(finalString);
+    			}
+    		
     		twitLink = twitLink.replace(String,finalString);
     		if(document.getElementById('twitt_'+loop) != undefined)
     		document.getElementById('twitt_'+loop).setAttribute('data-link',twitLink);
@@ -37,15 +47,53 @@
     }
     function getImageandCaption(loop)
     {
-    var fblink = $("#fb_"+loop).data('link');
-    var imgId = $("#dsh-prsn-img").css("background-image"); 
+    	console.log("inside imagCaption- dashboard");
+    	var name = "";
+    	var designation = "";
+    	var company = "";
+    	var pictureandCaptionLink = "";
+    	var fblink="";
+    	if($("#fb_"+loop) != undefined)
+    		{
+    		
+    		fblink = $("#fb_"+loop).data('link');	
+    		console.log("fb id is not undefined");
+    		}
+   
+    var imgId= "";
+    if($("#dsh-prsn-img").css("background-image") != undefined && $("#dsh-prsn-img") != undefined)
+    	{
+  	 imgId = $("#dsh-prsn-img").css("background-image");
+     var imgIdFirstIndex = imgId.indexOf("(");
+     var imgIdlastIndex = imgId.lastIndexOf(")");
+     imgId = imgId.substring(imgIdFirstIndex+1, imgIdlastIndex);
+     console.log("imgId id is not undefined");
+    	}
     
-    var imgIdFirstIndex = imgId.indexOf("(");
-    var imgIdlastIndex = imgId.lastIndexOf(")");
-    imgId = imgId.substring(imgIdFirstIndex+1, imgIdlastIndex);
-    var pictureandCaptionLink = "&picture="+imgId+"&caption="+document.getElementById("name").innerHTML+","+document.getElementById("designation").innerHTML+","+document.getElementById("company").innerHTML;
+	    if(document.getElementById("name") != null)
+		{
+		  name = document.getElementById("name").innerHTML;
+		  console.log("name id is not undefined");
+		}
+
+		if(document.getElementById("designation") != null)
+		{
+			 console.log("designation id is not undefined");
+		designation = document.getElementById("designation").innerHTML;
+		}
+		
+		if(document.getElementById("company") != null)
+		{
+			console.log("company id is not undefined");
+			company = document.getElementById("company").innerHTML;
+		
+		}
+ 
+    pictureandCaptionLink = "&picture="+imgId+"&caption="+name+","+designation+","+company;
     fblink = fblink.concat(pictureandCaptionLink);
+    if(document.getElementById('fb_'+loop) != null)
     document.getElementById('fb_'+loop).setAttribute('data-link',fblink);
+    console.log("exit dashboard get img");
     	}
 </script>
 <c:choose>
@@ -82,7 +130,7 @@
 						<span id ="fb_${loop.index}"class="float-left ppl-share-icns icn-fb" title="Facebook" onclick ="getImageandCaption(${loop.index})" data-link="https://www.facebook.com/dialog/feed?${feedback.faceBookShareUrl}&link=${feedback.completeProfileUrl}&description=${feedback.score}-star response from ${feedback.customerFirstName} ${feedback.customerLastName} for ${feedback.agentName} at SocialSurvey - ${feedback.review} .&redirect_uri=https://www.facebook.com"></span>
 						
 						<input type="hidden" id="twttxt_${loop.index}" class ="twitterText_loop" value ="${feedback.score}-star response from ${feedback.customerFirstName} ${reviewItem.customerLastName} for ${feedback.agentName} at SocialSurvey - ${feedback.review}"/>
-						<span class="float-left ppl-share-icns icn-twit" id ="twitt_${loop.index}" onclick="theFunction(${loop.index},this);" data-link="https://twitter.com/intent/tweet?text=${feedback.score}-star response from ${feedback.customerFirstName} ${feedback.customerLastName} for ${feedback.agentName} at SocialSurvey - ${feedback.review}&url=${feedback.completeProfileUrl}"></span>
+						<span class="float-left ppl-share-icns icn-twit" id ="twitt_${loop.index}" onclick="twitterFn(${loop.index},this);" data-link="https://twitter.com/intent/tweet?text=${feedback.score}-star response from ${feedback.customerFirstName} ${feedback.customerLastName} for ${feedback.agentName} at SocialSurvey - ${feedback.review}&url=${feedback.completeProfileUrl}"></span>
 						 <span
 							class="float-left ppl-share-icns icn-lin" title="LinkedIn"
 							data-link="https://www.linkedin.com/shareArticle?mini=true&url=${feedback.completeProfileUrl} &title=&summary=${feedback.score}-star response from ${feedback.customerFirstName} ${feedback.customerLastName} for ${feedback.agentName} at SocialSurvey - ${feedback.review} + &source="></span>
