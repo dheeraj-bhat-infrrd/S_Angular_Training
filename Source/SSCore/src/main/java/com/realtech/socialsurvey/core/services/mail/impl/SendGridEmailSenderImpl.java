@@ -129,7 +129,7 @@ public class SendGridEmailSenderImpl implements EmailSender
     public void sendEmailWithSubjectAndBodyReplacements( EmailEntity emailEntity, FileContentReplacements subjectReplacements,
         FileContentReplacements messageBodyReplacements ) throws InvalidInputException, UndeliveredEmailException
     {
-        LOG.info( "Method sendEmailWithBodyReplacements called for emailEntity : " + emailEntity + " subjectReplacements : "
+        LOG.info( "Method sendEmailWithSubjectAndBodyReplacements called for emailEntity : " + emailEntity + " subjectReplacements : "
             + subjectReplacements + " and messageBodyReplacements : " + messageBodyReplacements );
 
         if ( sendMail.equals( CommonConstants.YES_STRING ) ) {
@@ -155,7 +155,7 @@ public class SendGridEmailSenderImpl implements EmailSender
 
             // Send the mail
             saveEmail( emailEntity );
-            LOG.info( "Method sendEmailWithBodyReplacements completed successfully" );
+            LOG.info( "Method sendEmailWithSubjectAndBodyReplacements completed successfully" );
         }
     }
 
@@ -164,7 +164,7 @@ public class SendGridEmailSenderImpl implements EmailSender
     public void sendEmail( EmailEntity emailEntity, String subject, String mailBody ) throws InvalidInputException,
         UndeliveredEmailException
     {
-        LOG.info( "Method sendEmailWithBodyReplacements called for subject : " + subject );
+        LOG.info( "Method sendEmail called for subject : " + subject );
         if ( sendMail.equals( CommonConstants.YES_STRING ) ) {
             if ( subject == null || subject.isEmpty() ) {
                 throw new InvalidInputException( "Subject is null for sending mail" );
@@ -176,11 +176,11 @@ public class SendGridEmailSenderImpl implements EmailSender
             LOG.debug( "Setting the mail subject and body" );
             emailEntity.setSubject( subject );
             emailEntity.setBody( mailBody );
-
+            
             // Send the mail
             saveEmail( emailEntity );
         }
-        LOG.info( "Method sendEmailWithBodyReplacements completed successfully" );
+        LOG.info( "Method sendEmail completed successfully" );
     }
 
 
