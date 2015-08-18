@@ -5622,6 +5622,10 @@ tr.u-tbl-header td {
 	background: url(../images/rss_wide.png) no-repeat center;
 }
 
+.icn-wide-zillow {
+	background: url(../images/zillow_wide.png) no-repeat center;
+}
+
 .icn-wide-linkedin {
 	background: url(../images/linkedin_wide.png) no-repeat center;
 }
