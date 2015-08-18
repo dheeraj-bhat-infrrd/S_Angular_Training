@@ -23,7 +23,9 @@
 		<c:set value="4" var="profilemasterid"></c:set>
 	</c:when>
 </c:choose>
-<c:set value="${profileSettings.vertical}" var="verticalVal"></c:set>
+<c:if test="${not empty cannonicalusersettings && not empty cannonicalusersettings.companySettings && not empty cannonicalusersettings.companySettings.vertical}">
+	<c:set value="${cannonicalusersettings.companySettings.vertical}" var="verticalVal"></c:set>
+</c:if>
 <div id="prof-name-container" class="lp-edit-wrapper clearfix prof-edditable-cont">
 	<input id="prof-name" class="prof-name prof-name-txt prof-edditable" value="${contactdetail.name}">
 	<div class="prof-edit-field-icn hide"></div>
