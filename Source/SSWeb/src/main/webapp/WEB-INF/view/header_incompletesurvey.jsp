@@ -13,7 +13,7 @@
 					${survey.customerLastName}</div>
 				<div>Agent Name - ${survey.agentName}</div>
 				<div>Reminder count - ${survey.reminderCounts}</div>
-				<div class="font-11 opensanslight date-inc-sur" data-value="${survey.modifiedOn}">
+				<div class="font-11 opensanslight date-inc-sur" data-value='<fmt:formatDate value="${survey.modifiedOn}" pattern="yyyy-MM-dd-H-mm-s-S"/>'>
 				</div>
 			</div>
 			<%-- <div class="float-right dash-icn-close cursor-pointer"
@@ -32,7 +32,8 @@
 	$(document).ready(function() {
 		$('.opensanslight.date-inc-sur').each(function(index, currentElement) {
 			var dateStr = $(this).attr('data-value');
-			var date = convertTimeStampToLocalTimeStamp(new Date(dateStr));
+			var dateSplit = dateStr.split("-");
+			var date = convertTimeStampToLocalTimeStamp(new Date(dateSplit[0],dateSplit[1],dateSplit[2],dateSplit[3],dateSplit[4],dateSplit[5],dateSplit[6]));
 			$(this).html(date);
 		});
 		
