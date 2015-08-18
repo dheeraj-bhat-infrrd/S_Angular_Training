@@ -31,17 +31,52 @@ function twitterFn (loop,twitterElement) {
 		$("#"+twitId).val(finalString);
 		twitLink = twitLink.replace(String,finalString);
 		
-		document.getElementById('twitt_'+loop).setAttribute('data-link',twitLink);
+		if(document.getElementById('twitt_'+loop) != null)
+			{
+			
+			document.getElementById('twitt_'+loop).setAttribute('data-link',twitLink);	
+			}
+		
 		}
 	 
-	
+
 }
 function getImageandCaption(loop)
 {
+	
+var pictureandCaptionLink="";
 var fblink = $("#fb_"+loop).data('link');
-var pictureandCaptionLink = "&picture="+document.getElementById("prof-image-edit").getAttribute("src")+"&caption="+document.getElementById("prof-name").value+","+document.getElementById("prof-title").value+","+document.getElementById("prof-vertical").value;
+var name ="";
+var title ="";
+var vertical ="";
+var imgid="";
+if(document.getElementById("prof-image-edit") != null && document.getElementById("prof-image-edit").getAttribute("src") != null )
+	{
+	
+	imgid = document.getElementById("prof-image-edit").getAttribute("src");
+	}
+	if($("#prof-name") != undefined)
+		{
+      	name = $("#prof-name").val();
+		}
+	if($("#prof-title") != undefined)
+	{
+	
+		title = $("#prof-title").val();
+	}
+	if($("#prof-vertical") != undefined)
+	{
+	
+		vertical = $("#prof-vertical").val();
+	}
+	pictureandCaptionLink = "&picture="+imgid+"&caption="+name+","+title+","+vertical;
+
 fblink = fblink.concat(pictureandCaptionLink);
-document.getElementById('fb_'+loop).setAttribute('data-link',fblink);
+if(document.getElementById('fb_'+loop) != null)
+	{
+	document.getElementById('fb_'+loop).setAttribute('data-link',fblink);
+	}
+
 	}
 </script>
 <c:choose>
