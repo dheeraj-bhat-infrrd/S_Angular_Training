@@ -23,6 +23,11 @@
 	<div id="ggl-profile-url" class="wc-icn-txt float-left">${googleProfileUrl}</div>
 </div>
 <div class="wc-social-icn-row clearfix">
+	<div class="wc-social-icn float-left i-zillow"
+		onclick="authenticate('zillow');"></div>
+	<div id="zillow-profile-url" class="wc-icn-txt float-left">${zillowProfileUrl}</div>
+</div>
+<div class="wc-social-icn-row clearfix">
 	<div class="wc-social-icn i-yelp float-left" onclick="showYelpInput();"></div>
 	<input id="yelp-profile-url"
 		class="wc-icn-txt float-left wc-form-input hide">
