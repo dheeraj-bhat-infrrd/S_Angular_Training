@@ -9,10 +9,10 @@
 			data-iden="sur-pre-${survey.surveyPreIntitiationId}">
 			<div class="float-left sur-icn-checkbox sb-q-chk-no"></div>
 			<div class="float-left dash-lp-txt">
-				<div>Customer Name - ${survey.customerFirstName}
+				<div><spring:message code="label.customername.key"/> - ${survey.customerFirstName}
 					${survey.customerLastName}</div>
-				<div>Agent Name - ${survey.agentName}</div>
-				<div>Reminder count - ${survey.reminderCounts}</div>
+				<div><spring:message code="label.agentname.key"/> - ${survey.agentName}</div>
+				<div><spring:message code="label.remindercount.key"/> - ${survey.reminderCounts}</div>
 				<div class="font-11 opensanslight date-inc-sur" data-value='<fmt:formatDate value="${survey.modifiedOn}" pattern="yyyy-MM-dd-H-mm-s-S"/>'>
 				</div>
 			</div>
