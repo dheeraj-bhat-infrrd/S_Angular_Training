@@ -1152,6 +1152,13 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
         OrganizationUnitSettings companySettings = organizationUnitSettingsDao.fetchOrganizationUnitSettingsById( companyId,
             MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION );
 
+        //Check if unit settings or company settings have any tokens
+        //if company social token and entity tokens are null return null
+        if(unitSettings.getSocialMediaTokens() == null && companySettings.getSocialMediaTokens() == null) {
+        	return null;
+        }
+        
+        
         // Aggregate urls
         SocialMediaTokens entityTokens = validateSocialMediaTokens( unitSettings );
 
@@ -1853,8 +1860,8 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 
         String profileImageUrl = organizationUnitSettings.getProfileImageUrl();
 
-        if ( ( profileImageUrl == null || profileImageUrl.trim().isEmpty() ) && linkedInProfileData.getPictureUrl() != null ) {
-            profileImageUrl = linkedInProfileData.getPictureUrl();
+        if ( ( profileImageUrl == null || profileImageUrl.trim().isEmpty() ) && linkedInProfileData.getPictureUrls() != null && linkedInProfileData.getPictureUrls().get_total() > 0 ) {
+            profileImageUrl = linkedInProfileData.getPictureUrls().getValues().get(0);
             organizationUnitSettingsDao.updateParticularKeyOrganizationUnitSettings(
                 MongoOrganizationUnitSettingDaoImpl.KEY_PROFILE_IMAGE, profileImageUrl, organizationUnitSettings,
                 collectionName );
