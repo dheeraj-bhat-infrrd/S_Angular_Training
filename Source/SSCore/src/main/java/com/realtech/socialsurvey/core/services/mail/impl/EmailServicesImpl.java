@@ -51,7 +51,7 @@ public class EmailServicesImpl implements EmailServices
 	@Autowired
 	private EmailSender emailSender;
 
-/*	@Autowired
+	/*	@Autowired
 	private OrganizationManagementService organizationManagementService;*/
 
 	@Value ( "${MAX_PAYMENT_RETRIES}")
@@ -1738,7 +1738,7 @@ public class EmailServicesImpl implements EmailServices
 		LOG.debug( "Prepared email entity for sending mail" );
 		return emailEntity;
 	}
-	
+
 	/**
 	 * Method to send survey reminder when the resend button is manually clicked
 	 * @param user
@@ -1750,7 +1750,7 @@ public class EmailServicesImpl implements EmailServices
 	 * @param surveyLink
 	 */
 	public void sendManualSurveyReminderMail(OrganizationUnitSettings companySettings, User user, String agentName, String agentPhone, String agentTitle, String companyName, SurveyPreInitiation survey, String surveyLink){
-		
+
 		if ( companySettings != null && companySettings.getMail_content() != null
 				&& companySettings.getMail_content().getTake_survey_reminder_mail() != null ) {
 			MailContent mailContent = companySettings.getMail_content().getTake_survey_reminder_mail();
