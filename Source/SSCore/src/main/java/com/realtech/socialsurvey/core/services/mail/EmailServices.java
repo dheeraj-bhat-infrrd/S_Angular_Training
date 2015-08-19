@@ -1,6 +1,8 @@
 package com.realtech.socialsurvey.core.services.mail;
 
+import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
 import com.realtech.socialsurvey.core.entities.SurveyPreInitiation;
+import com.realtech.socialsurvey.core.entities.User;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 
 
@@ -371,4 +373,16 @@ public interface EmailServices
 
     public void sendAgentSurveyReminderMail( String recipientMailId, SurveyPreInitiation survey ) throws InvalidInputException,
         UndeliveredEmailException;
+    
+    /**
+	 * Method to send survey reminder when the resend button is manually clicked
+	 * @param user
+	 * @param agentName
+	 * @param agentPhone
+	 * @param agentTitle
+	 * @param companyName
+	 * @param survey
+	 * @param surveyLink
+	 */
+	public void sendManualSurveyReminderMail(OrganizationUnitSettings companySettings, User user, String agentName, String agentPhone, String agentTitle, String companyName, SurveyPreInitiation survey, String surveyLink);
 }
