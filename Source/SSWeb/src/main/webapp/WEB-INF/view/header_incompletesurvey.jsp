@@ -24,7 +24,7 @@
 				data-agentid="${survey.agentId}"
 				data-agentname="${survey.agentName}"
 				data-custemail="${survey.customerEmailId}"
-				class="float-right dash-lp-rt-img cursor-pointer"></div>
+				class="float-right dash-lp-rt-img cursor-pointer hide"></div>
 		</div>
 	</c:forEach>
 </c:if>
