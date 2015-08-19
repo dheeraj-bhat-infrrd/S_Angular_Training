@@ -28,6 +28,8 @@ import com.realtech.socialsurvey.core.services.search.exception.SolrException;
 public interface UserManagementService
 {
 
+    public List<User> getAllActiveUsers();
+
     public ProfilesMaster getProfilesMasterById( int profileId ) throws InvalidInputException;
 
 
