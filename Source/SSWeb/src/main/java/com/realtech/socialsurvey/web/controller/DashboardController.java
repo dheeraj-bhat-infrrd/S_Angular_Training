@@ -1012,10 +1012,6 @@ public class DashboardController
                     emailServices.queueSurveyReminderMail( customerEmail, custFirstName, agentName, surveyLink, agentPhone,
                         agentTitle, companyName );
                 } else {
-                	//TODO: SS-995 use modified survey reminder template
-                    /*emailServices.sendDefaultSurveyReminderMail( customerEmail, custFirstName, agentName, surveyLink,
-                        agentPhone, agentTitle, companyName );*/
-                	
                 	OrganizationUnitSettings companySettings = null;
                 	
                 	try {
