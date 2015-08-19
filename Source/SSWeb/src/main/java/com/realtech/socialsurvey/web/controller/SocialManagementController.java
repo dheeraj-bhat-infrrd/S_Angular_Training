@@ -29,11 +29,14 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import retrofit.mime.TypedByteArray;
 import twitter4j.Twitter;
 import twitter4j.TwitterException;
 import twitter4j.auth.AccessToken;
 import twitter4j.auth.RequestToken;
 
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
@@ -50,10 +53,13 @@ import com.realtech.socialsurvey.core.entities.SocialMediaTokens;
 import com.realtech.socialsurvey.core.entities.TwitterToken;
 import com.realtech.socialsurvey.core.entities.User;
 import com.realtech.socialsurvey.core.entities.UserSettings;
+import com.realtech.socialsurvey.core.entities.ZillowToken;
 import com.realtech.socialsurvey.core.enums.AccountType;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.exception.NoRecordsFetchedException;
 import com.realtech.socialsurvey.core.exception.NonFatalException;
+import com.realtech.socialsurvey.core.integration.zillow.ZillowIntegrationApi;
+import com.realtech.socialsurvey.core.integration.zillow.ZillowIntergrationApiBuilder;
 import com.realtech.socialsurvey.core.services.organizationmanagement.OrganizationManagementService;
 import com.realtech.socialsurvey.core.services.organizationmanagement.ProfileManagementService;
 import com.realtech.socialsurvey.core.services.organizationmanagement.UserManagementService;
@@ -97,6 +103,9 @@ public class SocialManagementController
 
     @Autowired
     private ProfileManagementService profileManagementService;
+
+    @Autowired
+    private ZillowIntergrationApiBuilder zillowIntergrationApiBuilder;
 
     @Autowired
     private RequestUtils requestUtils;
@@ -148,6 +157,9 @@ public class SocialManagementController
     private String googleShareUri;
     @Value ( "${GOOGLE_PROFILE_URI}")
     private String googleProfileUri;
+
+    @Value ( "${ZILLOW_WEBSERVICE_ID}")
+    private String zillowWebserviceId;
 
 
     /**
@@ -244,6 +256,8 @@ public class SocialManagementController
                 LOG.info( "Returning the google authorizationurl : " + googleAuth.toString() );
                 break;
 
+            case "zillow":
+                break;
             // TODO Building Yelp authUrl
             case "yelp":
                 break;
@@ -259,6 +273,8 @@ public class SocialManagementController
         model.addAttribute( CommonConstants.MESSAGE, CommonConstants.YES );
         if ( socialNetwork.equalsIgnoreCase( "facebook" ) )
             return JspResolver.SOCIAL_FACEBOOK_INTERMEDIATE;
+        else if ( socialNetwork.equalsIgnoreCase( "zillow" ) )
+            return JspResolver.SOCIAL_ZILLOW_INTERMEDIATE;
         else
             return JspResolver.SOCIAL_AUTH_MESSAGE;
     }
@@ -1158,6 +1174,32 @@ public class SocialManagementController
     }
 
 
+    private SocialMediaTokens updateZillow( SocialMediaTokens mediaTokens, String profileLink, String zillowScreenName )
+    {
+        LOG.debug( "Method updateGoogleToken() called from SocialManagementController" );
+        if ( mediaTokens == null ) {
+            LOG.debug( "Media tokens do not exist. Creating them and adding the Google access token" );
+            mediaTokens = new SocialMediaTokens();
+            mediaTokens.setZillowToken( new ZillowToken() );
+        } else {
+            LOG.debug( "Updating the existing media tokens for google plus" );
+            if ( mediaTokens.getZillowToken() == null ) {
+                mediaTokens.setZillowToken( new ZillowToken() );
+            }
+        }
+        if ( profileLink != null ) {
+            mediaTokens.getZillowToken().setZillowProfileLink( profileLink );
+        }
+        if ( zillowScreenName != null ) {
+            mediaTokens.getZillowToken().setZillowScreenName( zillowScreenName );
+        }
+
+
+        LOG.debug( "Method updateZillow() finished from SocialManagementController" );
+        return mediaTokens;
+    }
+
+
     @ResponseBody
     @RequestMapping ( value = "/postonfacebook", method = RequestMethod.GET)
     public String postToFacebook( HttpServletRequest request )
@@ -1494,6 +1536,172 @@ public class SocialManagementController
     }
 
 
+    @SuppressWarnings ( "unchecked")
+    @RequestMapping ( value = "/zillowSaveInfo")
+    public String saveZillowDetails( Model model, HttpServletRequest request )
+    {
+        LOG.info( "Method saveZillowDetails() called from SocialManagementController" );
+        HttpSession session = request.getSession( false );
+        ZillowIntegrationApi zillowIntegrationApi = zillowIntergrationApiBuilder.getZellowIntegrationApi();
+        User user = sessionHelper.getCurrentUser();
+        String zillowEmailAddress = request.getParameter( "zillowEmailAddress" );
+        String zillowFirstName = request.getParameter( "zillowFirstName" );
+        String zillowLastName = request.getParameter( "zillowLastName" );
+        if ( zillowEmailAddress == null && zillowFirstName == null && zillowLastName == null ) {
+            model.addAttribute( "Error", "Please provide either the zillow screen name or zillow emailadress" );
+        } else if ( zillowEmailAddress == "" && zillowFirstName == null && zillowLastName == null ) {
+            model.addAttribute( "Error", "Please provide either the zillow screen name or zillow emailadress" );
+        } else {
+            try {
+                String profileLink = null;
+                retrofit.client.Response response = null;
+                UserSettings userSettings = (UserSettings) session
+                    .getAttribute( CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION );
+                AccountType accountType = (AccountType) session.getAttribute( CommonConstants.ACCOUNT_TYPE_IN_SESSION );
+                long entityId = (long) session.getAttribute( CommonConstants.ENTITY_ID_COLUMN );
+                String entityType = (String) session.getAttribute( CommonConstants.ENTITY_TYPE_COLUMN );
+                if ( userSettings == null || entityType == null ) {
+                    throw new InvalidInputException( "No user settings found in session" );
+                }
+                String errorCode = request.getParameter( "error" );
+                if ( errorCode != null ) {
+                    LOG.error( "Error code : " + errorCode );
+                    model.addAttribute( CommonConstants.ERROR, CommonConstants.YES );
+                    return JspResolver.SOCIAL_AUTH_MESSAGE;
+                }
+                String jsonString = null;
+                String zillowScreenName = null;
+                if ( zillowFirstName != null && zillowFirstName != "" ) {
+                    zillowScreenName = zillowFirstName + " " + zillowLastName;
+                    zillowScreenName = zillowScreenName.trim();
+                    response = zillowIntegrationApi.fetchZillowReviewsByScreenname( zillowWebserviceId, zillowScreenName );
+                } else if ( zillowEmailAddress != null && zillowEmailAddress != "" ) {
+                    response = zillowIntegrationApi.fetchZillowReviewsByEmail( zillowWebserviceId, zillowEmailAddress );
+                }
+
+                Map<String, Object> map = null;
+                boolean updated = false;
+                if ( response != null ) {
+                    jsonString = new String( ( (TypedByteArray) response.getBody() ).getBytes() );
+                }
+                if ( jsonString != null ) {
+                    map = new ObjectMapper().readValue( jsonString, new TypeReference<HashMap<String, Object>>() {} );
+                }
+
+                Map<String, Object> responseMap = new HashMap<String, Object>();
+                Map<String, Object> resultMap = new HashMap<String, Object>();
+                Map<String, Object> proInfoMap = new HashMap<String, Object>();
+                if ( map != null ) {
+                    responseMap = (HashMap<String, Object>) map.get( "response" );
+                    if ( responseMap != null ) {
+                        resultMap = (HashMap<String, Object>) responseMap.get( "results" );
+                        if ( resultMap != null ) {
+                            proInfoMap = (HashMap<String, Object>) resultMap.get( "proInfo" );
+                            if ( proInfoMap != null ) {
+                                profileLink = (String) proInfoMap.get( "profileURL" );
+                            }
+                        }
+                    }
+                }
+                SocialMediaTokens mediaTokens;
+                int accountMasterId = accountType.getValue();
+                if ( entityType.equals( CommonConstants.COMPANY_ID_COLUMN ) ) {
+                    OrganizationUnitSettings companySettings = organizationManagementService.getCompanySettings( user
+                        .getCompany().getCompanyId() );
+                    if ( companySettings == null ) {
+                        throw new InvalidInputException( "No company settings found in current session" );
+                    }
+                    mediaTokens = companySettings.getSocialMediaTokens();
+                    mediaTokens = updateZillow( mediaTokens, profileLink, zillowScreenName );
+                    mediaTokens = socialManagementService.updateSocialMediaTokens(
+                        MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION, companySettings, mediaTokens );
+                    companySettings.setSocialMediaTokens( mediaTokens );
+                    for ( ProfileStage stage : companySettings.getProfileStages() ) {
+                        if ( stage.getProfileStageKey().equalsIgnoreCase( "ZILLOW_PRF" ) ) {
+                            stage.setStatus( CommonConstants.STATUS_INACTIVE );
+                        }
+                    }
+                    profileManagementService.updateProfileStages( companySettings.getProfileStages(), companySettings,
+                        MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION );
+                    userSettings.setCompanySettings( companySettings );
+                    updated = true;
+
+                } else if ( entityType.equals( CommonConstants.REGION_ID_COLUMN ) ) {
+                    OrganizationUnitSettings regionSettings = organizationManagementService.getRegionSettings( entityId );
+                    if ( regionSettings == null ) {
+                        throw new InvalidInputException( "No Region settings found in current session" );
+                    }
+                    mediaTokens = regionSettings.getSocialMediaTokens();
+                    mediaTokens = updateZillow( mediaTokens, profileLink, zillowScreenName );
+                    mediaTokens = socialManagementService.updateSocialMediaTokens(
+                        MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION, regionSettings, mediaTokens );
+                    regionSettings.setSocialMediaTokens( mediaTokens );
+                    for ( ProfileStage stage : regionSettings.getProfileStages() ) {
+                        if ( stage.getProfileStageKey().equalsIgnoreCase( "ZILLOW_PRF" ) ) {
+                            stage.setStatus( CommonConstants.STATUS_INACTIVE );
+                        }
+                    }
+                    profileManagementService.updateProfileStages( regionSettings.getProfileStages(), regionSettings,
+                        MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION );
+                    userSettings.getRegionSettings().put( entityId, regionSettings );
+                    updated = true;
+                } else if ( entityType.equals( CommonConstants.BRANCH_ID_COLUMN ) ) {
+                    OrganizationUnitSettings branchSettings = organizationManagementService.getBranchSettingsDefault( entityId );
+                    if ( branchSettings == null ) {
+                        throw new InvalidInputException( "No Branch settings found in current session" );
+                    }
+                    mediaTokens = branchSettings.getSocialMediaTokens();
+                    mediaTokens = updateZillow( mediaTokens, profileLink, zillowScreenName );
+                    mediaTokens = socialManagementService.updateSocialMediaTokens(
+                        MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION, branchSettings, mediaTokens );
+                    branchSettings.setSocialMediaTokens( mediaTokens );
+                    for ( ProfileStage stage : branchSettings.getProfileStages() ) {
+                        if ( stage.getProfileStageKey().equalsIgnoreCase( "ZILLOW_PRF" ) ) {
+                            stage.setStatus( CommonConstants.STATUS_INACTIVE );
+                        }
+                    }
+                    profileManagementService.updateProfileStages( branchSettings.getProfileStages(), branchSettings,
+                        MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION );
+                    userSettings.getBranchSettings().put( entityId, branchSettings );
+                    updated = true;
+                } else if ( entityType.equals( CommonConstants.AGENT_ID_COLUMN )
+                    || accountMasterId == CommonConstants.ACCOUNTS_MASTER_INDIVIDUAL ) {
+                    AgentSettings agentSettings = userManagementService.getUserSettings( entityId );
+                    if ( agentSettings == null ) {
+                        throw new InvalidInputException( "No Agent settings found in current session" );
+                    }
+
+                    mediaTokens = agentSettings.getSocialMediaTokens();
+                    mediaTokens = updateZillow( mediaTokens, profileLink, zillowScreenName );
+                    mediaTokens = socialManagementService.updateAgentSocialMediaTokens( agentSettings, mediaTokens );
+                    agentSettings.setSocialMediaTokens( mediaTokens );
+                    for ( ProfileStage stage : agentSettings.getProfileStages() ) {
+                        if ( stage.getProfileStageKey().equalsIgnoreCase( "ZILLOW_PRF" ) ) {
+                            stage.setStatus( CommonConstants.STATUS_INACTIVE );
+                        }
+                    }
+                    profileManagementService.updateProfileStages( agentSettings.getProfileStages(), agentSettings,
+                        MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION );
+                    userSettings.setAgentSettings( agentSettings );
+                    updated = true;
+                }
+                if ( !updated ) {
+                    throw new InvalidInputException( "Invalid input exception occurred while creating access token for google",
+                        DisplayMessageConstants.GENERAL_ERROR );
+                }
+
+
+            } catch ( Exception e ) {
+                session.removeAttribute( CommonConstants.SOCIAL_REQUEST_TOKEN );
+                LOG.error( "Exception while setting zillow profile link. Reason : " + e.getMessage(), e );
+                return JspResolver.SOCIAL_AUTH_MESSAGE;
+            }
+
+        }
+        return JspResolver.HEADER_SURVEY_INVITE_ADMIN;
+    }
+
+
     @ResponseBody
     @RequestMapping ( value = "/profileUrl")
     public String getProfileUrl( HttpServletRequest request )
@@ -1530,6 +1738,14 @@ public class SocialManagementController
                 && usersettings.getAgentSettings().getSocialMediaTokens().getGoogleToken() != null
                 && usersettings.getAgentSettings().getSocialMediaTokens().getGoogleToken().getProfileLink() != null ) {
                 profileUrl = usersettings.getAgentSettings().getSocialMediaTokens().getGoogleToken().getProfileLink();
+            }
+        } else if ( socialNetwork.equalsIgnoreCase( "zillow" ) ) {
+            if ( usersettings != null && usersettings.getAgentSettings() != null
+                && usersettings.getAgentSettings().getSocialMediaTokens() != null
+                && usersettings.getAgentSettings().getSocialMediaTokens().getZillowToken() != null ) {
+                if ( usersettings.getAgentSettings().getSocialMediaTokens().getZillowToken().getZillowProfileLink() != null ) {
+                    profileUrl = usersettings.getAgentSettings().getSocialMediaTokens().getZillowToken().getZillowProfileLink();
+                }
             }
         }
 
