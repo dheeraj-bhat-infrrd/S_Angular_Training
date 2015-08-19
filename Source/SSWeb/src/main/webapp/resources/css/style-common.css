@@ -4100,14 +4100,19 @@ img.prof-image {
 	font-size: 13px;
 	text-transform: initial;
 }
+
 .dash-btn-dl-sd-admin {
+	clear: both;
+	float: right;
+	margin-right: 10px;
 	color: #009FE0;
 	border-radius: 3px;
 	line-height: 32px;
-	margin-top: 6px;
 	border: 1px solid #009FE0;
 	height: 32px;
-	width: 410px;
+	width: 500px;
+	max-width: 90%;
+	max-width: calc(100% - 20px);
 	text-align: center;
 	font-size: 13px;
 	text-transform: initial;
@@ -6920,7 +6925,7 @@ a.sq-btn-post-social:hover, a.sq-btn-post-social:visited {
 .dash-download-sel-item {
 	background-color: #fff;
 	height: 30px;
-	width: 180px;
+	width: 45%;
 	border: none;
 	border-right: 1px solid #dcdcdc;
 	outline: none;

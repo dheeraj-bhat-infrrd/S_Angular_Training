@@ -232,8 +232,8 @@
 							<br />
 							&nbsp&nbsp&nbsp&nbsp[Name] : Customer Name,
 							&nbsp&nbsp&nbsp&nbsp[FirstName] : Customer First Name,
-							&nbsp&nbsp&nbsp&nbsp[AgentName] : Agent Name,
-							&nbsp&nbsp&nbsp&nbsp[AgentSignature] : Agent's Signature,
+							&nbsp&nbsp&nbsp&nbsp[AgentName] : User Name,
+							&nbsp&nbsp&nbsp&nbsp[AgentSignature] : User's Signature,
 							<br />
 							&nbsp&nbsp&nbsp&nbsp[RecipientEmail] : Receipient's Email,
 							&nbsp&nbsp&nbsp&nbsp[SenderEmail] : Sender's Email,
@@ -301,9 +301,9 @@
 										class="float-left st-header-txt-rt-icn margin-left-20 cursor-pointer icn-blue-ellipse"></div>
 								</div>
 								<div class="clearfix">
-									<div class="float-left settings-btn-text">Edit</div>
-									<div class="float-left settings-btn-text margin-left-20">Save</div>
-									<div class="float-left settings-btn-text margin-left-20">Reset</div>
+									<div class="float-left settings-btn-text"><spring:message code="label.edit.key" /></div>
+									<div class="float-left settings-btn-text margin-left-20"><spring:message code="label.save.key" /></div>
+									<div class="float-left settings-btn-text margin-left-20"><spring:message code="label.reset.key" /></div>
 								</div>
 							</div>
 						</div>
