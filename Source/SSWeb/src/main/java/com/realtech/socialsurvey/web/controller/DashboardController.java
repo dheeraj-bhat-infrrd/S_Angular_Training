@@ -4,6 +4,7 @@ package com.realtech.socialsurvey.web.controller;
 import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -15,9 +16,11 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
+
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.apache.solr.common.SolrDocument;
 import org.slf4j.Logger;
@@ -29,12 +32,14 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.type.TypeFactory;
 import com.google.gson.Gson;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.entities.AgentRankingReport;
 import com.realtech.socialsurvey.core.entities.AgentSettings;
+import com.realtech.socialsurvey.core.entities.MailContent;
 import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
 import com.realtech.socialsurvey.core.entities.ProfileStage;
 import com.realtech.socialsurvey.core.entities.SocialMediaTokens;
@@ -48,6 +53,7 @@ import com.realtech.socialsurvey.core.exception.NoRecordsFetchedException;
 import com.realtech.socialsurvey.core.exception.NonFatalException;
 import com.realtech.socialsurvey.core.services.generator.URLGenerator;
 import com.realtech.socialsurvey.core.services.mail.EmailServices;
+import com.realtech.socialsurvey.core.services.mail.UndeliveredEmailException;
 import com.realtech.socialsurvey.core.services.organizationmanagement.DashboardService;
 import com.realtech.socialsurvey.core.services.organizationmanagement.OrganizationManagementService;
 import com.realtech.socialsurvey.core.services.organizationmanagement.ProfileManagementService;
@@ -57,6 +63,7 @@ import com.realtech.socialsurvey.core.services.search.SolrSearchService;
 import com.realtech.socialsurvey.core.services.search.exception.SolrException;
 import com.realtech.socialsurvey.core.services.surveybuilder.SurveyHandler;
 import com.realtech.socialsurvey.core.utils.DisplayMessageConstants;
+import com.realtech.socialsurvey.core.utils.EmailFormatHelper;
 import com.realtech.socialsurvey.core.utils.MessageUtils;
 import com.realtech.socialsurvey.web.common.JspResolver;
 
@@ -99,6 +106,9 @@ public class DashboardController
     
     @Autowired
     private SurveyPreInitiationService surveyPreInitiationService;
+    
+    @Autowired
+    private EmailFormatHelper emailFormatHelper;
 
     @Value ( "${ENABLE_KAFKA}")
     private String enableKafka;
@@ -109,6 +119,12 @@ public class DashboardController
     @Value ( "${APPLICATION_ADMIN_NAME}")
     private String applicationAdminName;
 
+    @Value ( "${APPLICATION_LOGO_URL}")
+    private String appLogoUrl;
+    
+    @Value ( "${APPLICATION_BASE_URL}")
+    private String appBaseUrl;
+    
     private final String EXCEL_FORMAT = "application/vnd.ms-excel";
     private final String CONTENT_DISPOSITION_HEADER = "Content-Disposition";
     private final String EXCEL_FILE_EXTENSION = ".xlsx";
@@ -996,9 +1012,65 @@ public class DashboardController
                     emailServices.queueSurveyReminderMail( customerEmail, custFirstName, agentName, surveyLink, agentPhone,
                         agentTitle, companyName );
                 } else {
-                    emailServices.sendDefaultSurveyReminderMail( customerEmail, custFirstName, agentName, surveyLink,
-                        agentPhone, agentTitle, companyName );
-                }
+                	//TODO: SS-995 use modified survey reminder template
+                    /*emailServices.sendDefaultSurveyReminderMail( customerEmail, custFirstName, agentName, surveyLink,
+                        agentPhone, agentTitle, companyName );*/
+                	
+                	OrganizationUnitSettings companySettings = null;
+                	
+                	try {
+                        companySettings = organizationManagementService.getCompanySettings( user.getCompany().getCompanyId() );
+                    } catch ( InvalidInputException e ) {
+                        LOG.error( "InvalidInputException occured while trying to fetch company settings." );
+                    }
+                    
+                	if ( companySettings != null && companySettings.getMail_content() != null
+                            && companySettings.getMail_content().getTake_survey_reminder_mail() != null ) {
+                            MailContent mailContent = companySettings.getMail_content().getTake_survey_reminder_mail();
+                            
+                            String mailBody = emailFormatHelper.replaceEmailBodyWithParams( mailContent.getMail_body(),
+                                    mailContent.getParam_order() );
+                            String agentSignature = emailFormatHelper.buildAgentSignature( agentName, agentPhone, agentTitle, companyName );
+                            DateFormat dateFormat = new SimpleDateFormat( "yyyy/MM/dd" );
+                            String currentYear = String.valueOf( Calendar.getInstance().get( Calendar.YEAR ) );
+                            String fullAddress = "";
+                            
+                            mailBody = mailBody.replaceAll( "\\[LogoUrl\\]", appLogoUrl );
+                            mailBody = mailBody.replaceAll( "\\[BaseUrl\\]", appBaseUrl );
+                            mailBody = mailBody.replaceAll( "\\[AgentName\\]", "" );
+                            mailBody = mailBody.replaceAll( "\\[FirstName\\]", survey.getCustomerFirstName() );
+                            mailBody = mailBody.replaceAll( "\\[Name\\]", survey.getCustomerFirstName() + " " + survey.getCustomerLastName() );
+                            mailBody = mailBody.replaceAll( "\\[Link\\]", surveyLink );
+                            mailBody = mailBody.replaceAll( "\\[AgentSignature\\]", agentSignature );
+                            mailBody = mailBody.replaceAll( "\\[RecipientEmail\\]", survey.getCustomerEmailId() );
+                            mailBody = mailBody.replaceAll( "\\[SenderEmail\\]", user.getEmailId() );
+                            mailBody = mailBody.replaceAll( "\\[CompanyName\\]", companyName );
+                            mailBody = mailBody.replaceAll( "\\[InitiatedDate\\]", dateFormat.format( new Date() ) );
+                            mailBody = mailBody.replaceAll( "\\[CurrentYear\\]", currentYear );
+                            mailBody = mailBody.replaceAll( "\\[FullAddress\\]", fullAddress );
+                            mailBody = mailBody.replaceAll( "null", "" );
+                            String mailSubject = CommonConstants.REMINDER_MAIL_SUBJECT + agentName;
+                            if ( mailContent.getMail_subject() != null && !mailContent.getMail_subject().isEmpty() ) {
+                                mailSubject = mailContent.getMail_subject();
+                                mailSubject = mailSubject.replaceAll( "\\[AgentName\\]", agentName );
+                            }
+                            
+                            try {
+                                emailServices.sendSurveyReminderMail( survey.getCustomerEmailId(), mailSubject, mailBody );
+                            } catch ( InvalidInputException | UndeliveredEmailException e ) {
+                                LOG.error( "Exception caught while sending mail to " + survey.getCustomerEmailId() + " .Nested exception is ",
+                                    e );
+                            }
+                        } else {
+                            try {
+                                emailServices.sendDefaultSurveyReminderMail( survey.getCustomerEmailId(), survey.getCustomerFirstName(),
+                                    agentName, surveyLink, agentPhone, agentTitle, companyName );
+                            } catch ( InvalidInputException | UndeliveredEmailException e ) {
+                                LOG.error( "Exception caught in IncompleteSurveyReminderSender.main while trying to send reminder mail to "
+                                    + survey.getCustomerFirstName() + " for completion of survey. Nested exception is ", e );
+                            }
+                        }
+                	}
             } catch ( InvalidInputException e ) {
                 LOG.error( "Exception occurred while trying to send survey reminder mail to : " + customerEmail );
                 throw e;
