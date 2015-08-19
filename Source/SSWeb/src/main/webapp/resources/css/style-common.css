@@ -38,6 +38,15 @@ body {
 	font-size: 13px;
 }
 
+input[type='number'] {
+    -moz-appearance:textfield;
+}
+
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+}
+
 input,textarea {
 	outline: none;
 	resize: none !important;
@@ -7107,9 +7116,39 @@ label.fil-label {
 }
 
 .paginate-buttons-survey {
-	width: 100px;
+	width: 200px;
 	margin: 0 auto;
-	padding: 20px 0;
+	padding: 15px 0 0;
+	line-height: 20px;
+}
+
+.sur-paginate-btn {
+	width: 45px;
+	text-align: center;
+}
+
+.paginate-total-pages {
+	width: 30px;
+	display: inline-block;
+	text-align: center;
+}
+
+.sel-page {
+	width: 35px;
+	padding: 0 5px;
+	height: 20px;
+	line-height: normal;
+	border: 1px solid #e7e7e7;
+	border-radius: 3px;
+}
+
+.paginate-sel-box {
+	width: 110px;
+	padding: 0 10px;
+}
+
+span.paginate-divider {
+	padding: 0 6px;
 }
 
 .sur-icn-checkbox {
