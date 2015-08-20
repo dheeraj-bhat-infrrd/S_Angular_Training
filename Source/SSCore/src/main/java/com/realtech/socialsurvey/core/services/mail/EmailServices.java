@@ -1,12 +1,15 @@
 package com.realtech.socialsurvey.core.services.mail;
 
+import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
 import com.realtech.socialsurvey.core.entities.SurveyPreInitiation;
+import com.realtech.socialsurvey.core.entities.User;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 
 
 /**
  * Services for sending mails via application
  */
+
 public interface EmailServices
 {
     /**
@@ -235,7 +238,8 @@ public interface EmailServices
 
 
     /**
-     * Sends the message from the contact us page as a mail to the respective admin or agent
+     * Sends the message from the contact us page as a mail to the respective
+     * admin or agent
      * 
      * @param recipientEmailId
      * @param displayName
@@ -316,8 +320,8 @@ public interface EmailServices
         throws InvalidInputException, UndeliveredEmailException;
 
 
-    public void sendSurveyReminderMail( String recipientMailId, String subject, String mailBody ) throws InvalidInputException,
-        UndeliveredEmailException;
+    public void sendSurveyReminderMail( String recipientMailId, String subject, String mailBody, String senderName,
+        String senderEmailId ) throws InvalidInputException, UndeliveredEmailException;
 
 
     public void sendDefaultSurveyInvitationMail( String recipientMailId, String displayName, String agentName, String link,
@@ -350,7 +354,8 @@ public interface EmailServices
 
 
     public void sendReportAbuseMail( String recipientMailId, String displayName, String agentName, String customerName,
-        String customerEmail, String review, String reason, String reporterName, String reporterEmail ) throws InvalidInputException, UndeliveredEmailException;
+        String customerEmail, String review, String reason, String reporterName, String reporterEmail )
+        throws InvalidInputException, UndeliveredEmailException;
 
 
     public void sendSurveyReportMail( String recipientMailId, String displayName, String reason ) throws InvalidInputException,
@@ -371,4 +376,20 @@ public interface EmailServices
 
     public void sendAgentSurveyReminderMail( String recipientMailId, SurveyPreInitiation survey ) throws InvalidInputException,
         UndeliveredEmailException;
+
+
+    /**
+     * Method to send survey reminder when the resend button is manually clicked
+     * 
+     * @param user
+     * @param agentName
+     * @param agentPhone
+     * @param agentTitle
+     * @param companyName
+     * @param survey
+     * @param surveyLink
+     */
+    public void sendManualSurveyReminderMail( OrganizationUnitSettings companySettings, User user, String agentName,
+        String agentPhone, String agentTitle, String companyName, SurveyPreInitiation survey, String surveyLink );
+
 }
