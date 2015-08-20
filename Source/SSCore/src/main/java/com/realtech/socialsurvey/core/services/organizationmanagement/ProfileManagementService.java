@@ -188,6 +188,8 @@ public interface ProfileManagementService
      * @throws InvalidInputException
      */
     public List<AgentSettings> getIndividualsByBranchId( long branchId ) throws InvalidInputException;
+    
+    public List<AgentSettings> getIndividualsByBranchId( long branchId, int startIndex, int batchSize ) throws InvalidInputException;
 
 
     /**
