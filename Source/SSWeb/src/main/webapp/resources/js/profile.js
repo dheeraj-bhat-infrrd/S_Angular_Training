@@ -309,7 +309,7 @@ function paintBranchesForRegion(data) {
 		var result = $.parseJSON(responseJson.entity);
 		if(result != undefined && result.length > 0) {
 			$.each(result,function(i,branch) {
-				branchesHtml = branchesHtml +'<div class="bd-hr-item-l2 comp-region-branch" data-openstatus="closed" data-branchid="'+branch.branchId+'">';
+				branchesHtml = branchesHtml +'<div class="bd-hr-item-l2 comp-region-branch" data-openstatus="closed" data-start=0 data-batch=10 data-branchid="'+branch.branchId+'">';
 				branchesHtml = branchesHtml +'	<div class="bd-hr-item bd-lt-l2 clearfix">';
 				branchesHtml = branchesHtml +'		<div class="prf-public-txt bd-hr-txt cursor-pointer branch-link" data-profilename="'+branch.profileName+'">'+branch.branch+'</div>';
 				branchesHtml = branchesHtml +'	</div>';
@@ -349,7 +349,10 @@ function bindClickToFetchBranchIndividuals(bindingClass) {
 }
 
 function fetchIndividualsForBranch(branchId) {
-	var url=window.location.origin +'/rest/profile/branch/'+branchId+'/individuals';
+	var start = $('div[data-branchid="' + branchId + '"]').attr('data-start');
+	var rows = $('div[data-branchid="' + branchId + '"]').attr('data-batch');
+	var url = window.location.origin + '/rest/profile/branch/' + branchId
+			+ '/individuals?start=' + start + "&rows=" + rows;
 	$("#branchid-hidden").val(branchId);
 	callAjaxGET(url, paintIndividualForBranch, true);
 }
@@ -358,6 +361,8 @@ function paintIndividualForBranch(data) {
 	var responseJson = $.parseJSON(data);
 	var individualsHtml = "";
 	var branchId = $("#branchid-hidden").val();
+	var batchSize = $('div[data-branchid="' + branchId + '"]').attr('data-batch');
+	var start = $('div[data-branchid="' + branchId + '"]').attr('data-start');
 	if (responseJson != undefined && responseJson.entity != "") {
 		var result = $.parseJSON(responseJson.entity);
 		if (result != undefined && result.length > 0) {
@@ -376,12 +381,24 @@ function paintIndividualForBranch(data) {
 					individualsHtml += '</div>';
 				}
 			});
+			
+			var showMoreHtml = "";
+			if( start == 0 && result.length == batchSize ) {
+				showMoreHtml = '<div class="show-more-btn">Show More</div>';
+			}
+			
 			$("#branch-hierarchy").show();
 			if($("#branch-individuals").length > 0) {
 				$("#branch-individuals").html(individualsHtml);
+				if(showMoreHtml != "") {
+					$("#branch-individuals").append(showMoreHtml);	
+				}
 			}
 			else {
 				$("#comp-branch-individuals-"+branchId).html(individualsHtml).slideDown(200);
+				if(showMoreHtml != "") {
+					$("#comp-branch-individuals-"+branchId).append(showMoreHtml);	
+				}
 			}
 			
 			// paintProfileImage("comp-individual-prof-image");
@@ -500,7 +517,7 @@ function paintCompanyBranches(data) {
 		if(result != undefined && result.length > 0) {
 			var compBranchesHtml = "";
 			$.each(result,function(i,branch) {
-				compBranchesHtml = compBranchesHtml +'<div class="bd-hr-item-l1 comp-branch" data-openstatus="closed" data-branchid="'+branch.branchId+'">';
+				compBranchesHtml = compBranchesHtml +'<div class="bd-hr-item-l1 comp-branch" data-start=0 data-batch=10 data-openstatus="closed" data-branchid="'+branch.branchId+'">';
 				compBranchesHtml = compBranchesHtml +'	<div class="bd-hr-item bd-lt-l2 clearfix">';
 				compBranchesHtml = compBranchesHtml +'		<div class="prf-public-txt bd-hr-txt cursor-pointer branch-link" data-profilename="'+branch.profileName+'">'+branch.branch+'</div>';
 				compBranchesHtml = compBranchesHtml +'	</div>';
