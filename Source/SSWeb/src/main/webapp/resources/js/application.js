@@ -104,6 +104,7 @@ var yelpEnabled;
 var googleEnabled;
 var zillowEnabled;
 var lendingtreeEnabled;
+var realtorEnabled;
 var agentProfileLink;
 var agentFullProfileLink;
 var companyLogo;
@@ -216,37 +217,29 @@ $(document).on('click', '.restart-survey-mail-txt', function(e) {
 });
 
 $(document).on('click', '.report-abuse-txt', function(e) {
-	
-	var firstName = $(this).parent().parent().parent().parent().attr('data-firstname');
-	var lastName = $(this).parent().parent().parent().parent().attr('data-lastname');
-	var agentName = $(this).parent().parent().parent().parent().attr('data-agentname');
-	var customerEmail = $(this).parent().parent().parent().parent().attr('data-customeremail');
-	var agentId = $(this).parent().parent().parent().parent().attr('data-agentid');
-	var review = $(this).parent().parent().parent().parent().attr('data-review');
+	var reviewElement = $(this).parent().parent().parent().parent();
 	var payload = {
-			"customerEmail" : customerEmail,
-			"agentId" : agentId,
-			"firstName" : firstName,
-			"lastName" : lastName,
-			"agentName" : agentName,
-			"review" : review
+		"customerEmail" : reviewElement.attr('data-customeremail'),
+		"agentId" : reviewElement.attr('data-agentid'),
+		"firstName" : reviewElement.attr('data-cust-first-name'),
+		"lastName" : reviewElement.attr('data-cust-last-name'),
+		"agentName" : reviewElement.attr('data-agent-name'),
+		"review" : reviewElement.attr('data-review')
 	};
-	
 	$("#report-abuse-txtbox").val('');
 	
-	//Unbind click events for button
+	// Unbind click events for button
 	$('.rpa-cancel-btn').off('click');
 	$('.rpa-report-btn').off('click');
 	
-	
 	$('#report-abuse-overlay').show();
-	
-	$('.rpa-cancel-btn').on('click',function(){
+	$('.rpa-cancel-btn').on('click', function() {
 		$('#report-abuse-overlay').hide();
 	});
-	$('.rpa-report-btn').on('click',function(){
+	$('.rpa-report-btn').on('click', function() {
 		var reportText = $("#report-abuse-txtbox").val();
-		if(validateReportAbuseUserForm(reportText)){
+		if (validateReportAbuseUserForm(reportText)) {
+			showOverlay();
 			payload.reportText = reportText;
 			confirmUserReportAbuse(payload);
 		}
@@ -254,22 +247,25 @@ $(document).on('click', '.report-abuse-txt', function(e) {
 });
 
 function validateReportAbuseUserForm(reportText) {
-	
 	//check if report text is empty
-	if(reportText == undefined || reportText == ""){
+	if (reportText == undefined || reportText == "") {
 		$('#overlay-toast').html('Please enter why you want to report the review!');
 		showToast();
 		return false;
 	}
-	
 	return true;
 }
 
-
 function confirmUserReportAbuse(payload) {
-	callAjaxGetWithPayloadData('./reportabuse.do', function() {
+	callAjaxGetWithPayloadData('./reportabuse.do', function(status) {
 		$('#report-abuse-overlay').hide();
-		$('#overlay-toast').html('Reported Successfully!');
+		
+		if (status == 'success') {
+			$('#overlay-toast').html('Reported Successfully!');
+		} else {
+			$('#overlay-toast').html('Failed to report abuse, Please try again later');
+		}
+		hideOverlay();
 		showToast();
 	}, payload, true);
 }
@@ -4448,7 +4444,7 @@ function showProfileLink(source, profileUrl){
 function adjustTextContainerWidthOnResize() {
 	var parentWidth = $('.ctnt-list-item').width();
 	var imgWidth = $('.ctnt-list-item .ctnt-list-item-img').width();
-	var textContainerWidth = parentWidth - imgWidth - 20;
+	var textContainerWidth = parentWidth - imgWidth - 35;
 	$('.ctnt-list-item .ctnt-list-item-txt-wrap').width(textContainerWidth);
 }
 
@@ -4805,6 +4801,7 @@ function paintSurveyPage(jsonData) {
 	googleEnabled = Boolean(jsonData.responseJSON.googleEnabled);
 	zillowEnabled = Boolean(jsonData.responseJSON.zillowEnabled);
 	lendingtreeEnabled = Boolean(jsonData.responseJSON.lendingtreeEnabled);
+	realtorEnabled = Boolean(jsonData.responseJSON.realtorEnabled);
 	agentProfileLink = jsonData.responseJSON.agentProfileLink;
 	agentFullProfileLink = jsonData.responseJSON.agentFullProfileLink;
 	
@@ -4833,6 +4830,12 @@ function paintSurveyPage(jsonData) {
 		$('#lt-btn').attr("href", returnValidWebAddress(jsonData.responseJSON.lendingtreeLink));
 	} else {
 		$('#lt-btn').remove();
+	}
+	
+	if (realtorEnabled) {
+		$('#realtor-btn').attr("href", returnValidWebAddress(jsonData.responseJSON.realtorLink));
+	} else {
+		$('#realtor-btn').remove();
 	}
 	
 	companyLogo = jsonData.responseJSON.companyLogo;
@@ -5747,6 +5750,11 @@ $('#lt-btn').click(function(e) {
 	updateSharedOn("lendingtree", agentId, customerEmail);
 });
 
+$('#realtor-btn').click(function(e) {
+	//e.stopImmediatePropagation();
+	updateSharedOn("realtor", agentId, customerEmail);
+});
+
 $('#shr-post-chk-box').click(function(){
 	if($('#shr-post-chk-box').hasClass('bd-check-img-checked')){
 		$('#shr-post-chk-box').removeClass('bd-check-img-checked');
@@ -6128,7 +6136,8 @@ function callBackEditAddressDetails(data) {
 	});
 
 	$('.overlay-disable-wrapper').addClass('pu_arrow_rt');
-	$('body').css('overflow', 'hidden');
+	$('body').addClass('body-no-scroll');
+	//$('body').css('overflow', 'hidden');
 	$('body').scrollTop('0');
 }
 
@@ -6172,7 +6181,8 @@ function overlayRevert() {
 
 	$('#overlay-continue').unbind('click');
 
-	$('body').css('overflow', 'auto');
+	//$('body').css('overflow', 'auto');
+	$('body').removeClass('body-no-scroll');
 	$('.overlay-disable-wrapper').removeClass('pu_arrow_rt');
 }
 
@@ -6349,7 +6359,12 @@ $(document).on('click', '.lp-ach-item-img', function(e) {
 		updateAchievements();
 	} else if (type == 'license') {
 		updateLicenseAuthorizations();
-	}
+	} else if (type == 'expertise') {
+		updateExpertise();
+	} else if (type == 'hobby') {
+		updateHobbies();
+	}  
+			
 });
 
 // Function to update association/membership list
@@ -6887,6 +6902,29 @@ function updateLendingTreeLink(link) {
 	if (isValidUrl(link)) {
 		callAjaxPostWithPayloadData("./updatelendingtreelink.do", callBackUpdateSocialLink, payload);
         $('#icn-lendingtree').attr("data-link", link);
+	} else {
+		$('#overlay-toast').html("Enter a valid url");
+		showToast();
+	}
+}
+
+$('body').on('click', '#prof-edit-social-link .icn-realtor', function() {
+	$('#social-token-text').show();
+	var link = $(this).attr("data-link");
+	$('#social-token-text').attr({
+		"placeholder" : "Add Realtor link",
+		"onblur" : "updateRealtorLink(this.value);$('#social-token-text').hide();"
+	});
+	$('#social-token-text').val(link);
+});
+
+function updateRealtorLink(link) {
+	var payload = {
+		"realtorLink" : link
+	};
+	if (isValidUrl(link)) {
+		callAjaxPostWithPayloadData("./updateRealtorlink.do", callBackUpdateSocialLink, payload);
+        $('#icn-realtor').attr("data-link", link);
 	} else {
 		$('#overlay-toast').html("Enter a valid url");
 		showToast();
@@ -7552,6 +7590,15 @@ function getIncompleteSurveyCount(){
 	};
 	callAjaxGetWithPayloadData("./fetchdashboardincompletesurveycount.do", function(data) {
 		$('#icn-sur-popup-cont').attr("data-total", data);
+		var totalCount = parseInt(data);
+		var batchSize = parseInt($('#icn-sur-popup-cont').attr("data-batch")); 
+		var numPages = 0;
+		if(parseInt( totalCount % batchSize) == 0) {
+			numPages = parseInt( totalCount / batchSize);
+		}else {
+			numPages = parseInt(parseInt( totalCount / batchSize) + 1);
+		}
+		$('#paginate-total-pages').html(numPages);
 		var incompleteSurveystartIndex = $('#icn-sur-popup-cont').attr("data-start");
 		paintIncompleteSurveyListPopupResults(incompleteSurveystartIndex);
 	}, payload, true);
@@ -7578,6 +7625,42 @@ $(document).on('click', '#sur-previous.paginate-button',function(){
 	paintIncompleteSurveyListPopupResults(incompleteSurveyStartIndex);
 });
 
+
+$(document).on('keypress', '#sel-page', function(e) {
+	//if the letter is not digit then don't type anything
+	if (e.which != 8 && e.which != 0 && (e.which < 48 || e.which > 57)) {
+		return false;
+	}
+	var batchSize = parseInt($('#icn-sur-popup-cont').attr("data-batch"));
+	var total = parseInt($('#icn-sur-popup-cont').attr("data-total"));
+	var prevPageNoVal = parseInt($('#sel-page').val());
+	if(prevPageNoVal == NaN) {
+		prevPageNoVal = 0;
+	}
+	var pageNo = prevPageNoVal + String.fromCharCode(e.which);
+	pageNo = parseInt(pageNo);
+	var incompleteSurveyStartIndex = parseInt(pageNo-1) * batchSize;
+	if(incompleteSurveyStartIndex >= total || incompleteSurveyStartIndex <= 0) {
+		return false;
+	}
+});
+
+$(document).on('change', '#sel-page', function(e) {
+	delay(function() {
+		$('#sel-page').blur();
+		var pageNo = parseInt($('#sel-page').val());
+		if(pageNo == NaN || pageNo <= 0) {
+			return false;
+		}
+		var incompleteSurveyStartIndex = 0;
+		var batchSize = parseInt($('#icn-sur-popup-cont').attr("data-batch"));
+		incompleteSurveyStartIndex = parseInt(pageNo-1) * batchSize;
+		
+		$('#icn-sur-popup-cont').attr("data-start", incompleteSurveyStartIndex);
+		paintIncompleteSurveyListPopupResults(incompleteSurveyStartIndex);
+	}, 200);
+});
+
 function showIncompleteSurveyListPopup() {
 	var startIndex = $('#icn-sur-popup-cont').attr("data-start");
 	if(parseInt(startIndex) == 0){
@@ -7589,6 +7672,8 @@ function showIncompleteSurveyListPopup() {
 }
 
 function paintIncompleteSurveyListPopupResults(incompleteSurveystartIndex){
+	var incompleteSurveyBatchSize = parseInt($('#icn-sur-popup-cont').attr("data-batch"));
+	$('#sel-page').val((incompleteSurveystartIndex / incompleteSurveyBatchSize) + 1);
 	var payload = {
 		"columnName" : colName,
 		"columnValue" : colValue,
@@ -7638,12 +7723,25 @@ function removeMultipleIncompleteSurveyRequest(incompleteSurveyIds) {
 			var totalIncSurveys = $('#icn-sur-popup-cont').attr('data-total');
 			totalIncSurveys = totalIncSurveys - incompleteSurveyIds.length;
 			$('#icn-sur-popup-cont').attr('data-total', totalIncSurveys);
+			var batchSize = parseInt($('#icn-sur-popup-cont').attr('data-batch'));
+			var newTotalPages = 0;
+			if(totalIncSurveys % batchSize == 0) {
+				newTotalPages =  totalIncSurveys / batchSize;
+			} else {
+				newTotalPages =  parseInt(totalIncSurveys / batchSize) + 1;
+			}
+			$('#paginate-total-pages').html(newTotalPages);
 			for (var i=0; i < incompleteSurveyIds.length; i++) {
 				$('div[data-iden="sur-pre-'+incompleteSurveyIds[i]+'"]').remove();
 			}
 			
 			$('#overlay-toast').html('Survey reminder request deleted successfully');
 			showToast();
+			
+			//update the page
+			var incompleteSurveyStartIndex = parseInt($('#icn-sur-popup-cont').attr("data-start"));
+			paintIncompleteSurveyListPopupResults(incompleteSurveyStartIndex);
+			
 			$('#del-mult-sur-icn').removeClass('mult-sur-icn-active');
 			$('#resend-mult-sur-icn').removeClass('mult-sur-icn-active');
 		}
@@ -7732,4 +7830,229 @@ function bindDatePickerforIndividualSurveyDownload() {
         fromEndDate.setDate(fromEndDate.getDate(new Date(selected.date.valueOf())));
         $('#indv-dsh-start-date').datepicker('setEndDate', fromEndDate);
     });
+}
+
+function editPositions() {
+	callAjaxGET("/geteditpositions.do", function(data) {
+		createEditPositionsPopup("Edit positions", data);
+		
+		addDatePcikerForPositions();
+		$('.pos-edit-icn').click(function() {
+			$(this).parent().find('input').prop('readonly',false);
+		});
+		$('.add-pos-link').click(function() {
+			var htmlToAppned = "<div class='pos-cont margin-top-10 text-left'>" + 
+					"<div class='checkbox-input-cont'>" +
+					"<div class='checkbox-input checkbox-iscurrent' data-checked='false'></div>" +
+					"Current Employer</div>" +
+					"<input name='companyName' class='pos-input' placeholder='Company Name'>" +
+					"<input name='title' class='pos-input' placeholder='Job Title'>" +
+					"<input name='startTime' class='pos-input'placeholder='Start Date'>" +
+					"<input name='endTime' class='pos-input' placeholder='End Date'>" +
+					"<div class='pos-remove-icn'></div>" +
+					"</div>";
+			$(this).before(htmlToAppned);
+			//$(this).remove();
+			addDatePcikerForPositions();
+		});
+	}, true);
+	
+}
+
+$(document).on('click', '.checkbox-iscurrent', function(e){
+	var isCurrent = $(this).attr('data-checked');
+	if(isCurrent == "true") {
+		$(this).attr('data-checked',"false");
+		$(this).parent().parent().find('input[name="endTime"]').show();
+	} else {
+		$(this).attr('data-checked',"true");
+		$(this).parent().parent().find('input[name="endTime"]').hide();
+	}
+});
+
+$(document).on('click', '.pos-remove-icn', function(e){
+	$(this).parent().remove();
+	updatePositions();
+});
+
+function addDatePcikerForPositions() {
+	
+	var startDate;
+	var fromEndDate = new Date();
+	var toEndDate = new Date();
+	
+	$('input[name="endTime"]').datepicker({
+		orientation: "auto",
+		format: "mm-yyyy",
+	    startView: "months", 
+	    minViewMode: "months",
+	    endDate : toEndDate,
+	    todayHighlight: true,
+		clearBtn: true,
+		autoclose: true
+	}).on('changeDate', function(selected){
+        fromEndDate = new Date(selected.date.valueOf());
+        fromEndDate.setDate(fromEndDate.getDate(new Date(selected.date.valueOf())));
+        $(this).parent().find('input[name="startTime"]').datepicker('setEndDate', fromEndDate);
+    });
+	$('input[name="startTime"]').datepicker({
+		orientation: "auto",
+		format: "mm-yyyy",
+	    startView: "months", 
+	    minViewMode: "months",
+	    endDate : toEndDate,
+	    todayHighlight: true,
+		clearBtn: true,
+		autoclose: true
+	}).on('changeDate', function(selected){
+        startDate = new Date(selected.date.valueOf());
+        startDate.setDate(startDate.getDate(new Date(selected.date.valueOf())));
+        $(this).parent().find('input[name="endTime"]').datepicker('setStartDate', startDate);
+    });
+}
+
+function createEditPositionsPopup(header, body) {
+	$('#overlay-header').html(header);
+	$('#overlay-text').html(body);
+	$('#overlay-continue').html("Save");
+	$('#overlay-cancel').html("Cancel");
+	$('#overlay-continue').off();
+	$('#overlay-continue').click(function(){
+		updatePositions();
+	});
+	
+	$('#overlay-main').show();
+	$('body').addClass('body-no-scroll');
+}
+
+function updatePositions() {
+	var positions = [];
+	var isFormValid = true;
+	$('#prof-position-edit-container').find('.pos-cont').each(function() {
+		var position = {};
+		var companyName = $(this).find('input[name="companyName"]').val();
+		var title = $(this).find('input[name="title"]').val();
+		var startTime = $(this).find('input[name="startTime"]').val();
+		var endTime = $(this).find('input[name="endTime"]').val();
+		var startMonth, startYear, endMonth, endYear;
+		var isCurrent = false;
+		
+		var isCurrentString = $(this).find('.checkbox-input-cont').find('.checkbox-iscurrent').attr("data-checked");
+		
+		if(isCurrentString == "true") {
+			isCurrent = true;
+		}
+		
+		if(companyName == undefined || companyName == '') {
+			$(this).find('input[name="companyName"]').focus();
+			$('#overlay-toast').html("Please enter company name");
+			showToast();
+			isFormValid = false;
+			return false;
+		}
+		
+		if(title == undefined || title == '') {
+			$(this).find('input[name="title"]').focus();
+			$('#overlay-toast').html("Please enter title");
+			showToast();
+			isFormValid = false;
+			return false;
+		}
+		
+		if(startTime == undefined || startTime == '') {
+			$(this).find('input[name="startTime"]').focus();
+			$('#overlay-toast').html("Please enter start time");
+			showToast();
+			isFormValid = false;
+			return false;
+		} else {
+			var startDateSplit = startTime.split("-");
+			if(startDateSplit.length < 2) {
+				$('#overlay-toast').html("Please enter valid start time");
+				showToast();
+			}
+			startMonth = parseInt(startDateSplit[0]);
+			startYear = parseInt(startDateSplit[1]);
+		}
+		
+		position["name"] = companyName;
+		position["title"] = title;
+		position["startTime"] = startTime;
+		position["startMonth"] = startMonth;
+		position["startYear"] = startYear;
+		
+		if(!isCurrent) {
+			if(endTime == undefined || endTime == ''){
+				$(this).find('input[name="endTime"]').focus();
+				$('#overlay-toast').html("Please enter end time");
+				showToast();
+				isFormValid = false;
+				return false;
+			} else {
+				var endDateSplit = endTime.split("-");
+				if(endDateSplit.length < 2) {
+					$('#overlay-toast').html("Please enter valid end time");
+					showToast();
+					isFormValid = false;
+					return false;
+				}
+				endMonth = parseInt(endDateSplit[0]);
+				endYear = parseInt(endDateSplit[1]);
+				position["endTime"] = endTime;
+				position["endMonth"] = endMonth;
+				position["endYear"] = endYear;
+			}
+		} 
+		
+		position["isCurrent"] = isCurrent;
+		
+		positions.push(position);
+	});
+	
+	if (!isFormValid) {
+		return;
+	}
+	
+	if(positions.length > 0) {
+		positions = JSON.stringify(positions);
+	} else {
+		return false;
+		$('#overlay-toast').html("Add positions");
+		showToast();
+	}
+	
+	callAjaxPOSTWithTextData("/updatepositions.do?positions="+positions, function(data) {
+		if(data == "success") {
+			$('#overlay-toast').html("Positions updated successfully");
+			showToast();			
+			updatePositionInLeftSection(positions);
+			$('#overlay-cancel').click();
+		}
+		$('body').removeClass('body-no-scroll');
+	}, true, {});
+}
+
+
+function updatePositionInLeftSection(positions) {
+	var contentToAppend = "";
+	var positionsArray = [];
+	if(positions != undefined && positions != "")
+		positionsArray = JSON.parse(positions);
+	if(positionsArray.length > 0) {
+		for(var index in positionsArray) {
+			var position = positionsArray[index];
+			contentToAppend += '<div class="postions-content">';
+			contentToAppend += '<div class="lp-pos-row-1 lp-row clearfix">'+position.name+'</div>';
+			contentToAppend += '<div class="lp-pos-row-2 lp-row clearfix">'+position.title+'</div>';
+			if(position.isCurrent) {
+				contentToAppend += '<div class="lp-pos-row-3 lp-row clearfix">'+position.startTime + ' - Current' +'</div>';
+			} else {
+				contentToAppend += '<div class="lp-pos-row-3 lp-row clearfix">'+position.startTime + ' - ' + position.endTime +'</div>';
+			}
+		}
+	} else {
+		contentToAppend = "No positions added yet";
+	}
+	
+	$('#positions-container').html(contentToAppend);
 }

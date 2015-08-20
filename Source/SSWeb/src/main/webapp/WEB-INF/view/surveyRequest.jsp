@@ -1,5 +1,4 @@
-<%@ page language="java" contentType="text/html; charset=ISO-8859-1"
-	pageEncoding="UTF-8"%>
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ taglib prefix="spring" uri="http://www.springframework.org/tags"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions"%>
@@ -82,7 +81,7 @@
 				
 				var agentEmail = $('#req-prof-container').attr("data-agent-email");
 				if(agentEmail.toUpperCase() == customerEmail.toUpperCase()){
-					$('#overlay-toast').html('Agents can not take survey for themselves!');
+					$('#overlay-toast').html('Users can not take survey for themselves!');
 					showToast();
 					return;
 				}

@@ -18,6 +18,7 @@
 
 	<link rel="shortcut icon" href="/favicon.ico" sizes="16x16">
 	<link rel="stylesheet" href="${initParam.resourcesPath}/resources/css/bootstrap.min.css">
+	<link rel="stylesheet" href="${initParam.resourcesPath}/resources/css/datepicker3.css">
 	<link rel="stylesheet" href="${initParam.resourcesPath}/resources/jcrop/jquery.Jcrop.min.css">
 	<link rel="stylesheet" href="${initParam.resourcesPath}/resources/css/style.css">
 	<link rel="stylesheet" href="${initParam.resourcesPath}/resources/css/style-common.css">
@@ -49,11 +50,18 @@
 					<div id="del-mult-sur-icn" class="mult-sur-icn del-mult-sur-icn float-right"></div>
 				</div>
 			</div>
-			<div class="paginate-buttons-survey">
-				<div id="sur-previous" class="float-left">&lt; Prev</div>
-				<div id="sur-next" class="float-right">Next &gt;</div>
+			<div class="paginate-buttons-survey clearfix">
+				<div id="sur-previous" class="float-left sur-paginate-btn">&lt; Prev</div>
+				<div class="paginate-sel-box float-left">
+					<input id="sel-page" type="text" pattern="[0-9]*" class="sel-page"/>
+					<span class="paginate-divider">/</span>
+					<span id="paginate-total-pages" class="paginate-total-pages"></span>
+				</div>
+				<div id="sur-next" class="float-right sur-paginate-btn">Next &gt;</div>
 			</div>
 		</div>
+	</div>
+	<div id="overlay-edit-positions" class="overlay-login overlay-main hide">
 	</div>
 	<div id="toast-container" class="toast-container">
 	   <span id="overlay-toast" class="overlay-toast"></span>

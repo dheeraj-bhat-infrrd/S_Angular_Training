@@ -524,7 +524,7 @@ public class SolrSearchServiceImpl implements SolrSearchService {
 			}
 			solrQuery.setQuery(query);
 			solrQuery.addFilterQuery(CommonConstants.IS_AGENT_SOLR + ":" + CommonConstants.IS_AGENT_TRUE_SOLR);
-			solrQuery.addFilterQuery(CommonConstants.STATUS_SOLR + ":" + CommonConstants.STATUS_ACTIVE);
+			solrQuery.addFilterQuery("-" + CommonConstants.STATUS_SOLR + ":" + CommonConstants.STATUS_INACTIVE);
 			solrQuery.setStart(startIndex);
 			solrQuery.setRows(noOfRows);
 
@@ -1051,7 +1051,7 @@ public class SolrSearchServiceImpl implements SolrSearchService {
 				query.addFilterQuery(CommonConstants.IS_DEFAULT_BY_SYSTEM_SOLR + ":" + CommonConstants.IS_DEFAULT_BY_SYSTEM_NO);
 
 			query.addFilterQuery(searchColumn + ":" + searchKey);
-			query.addFilterQuery(CommonConstants.STATUS_SOLR + ":" + CommonConstants.STATUS_ACTIVE);
+			query.addFilterQuery("-" + CommonConstants.STATUS_SOLR + ":" + CommonConstants.STATUS_INACTIVE);
 
 			LOG.debug("Querying solr for searching " + searchColumn);
 			response = solrServer.query(query);

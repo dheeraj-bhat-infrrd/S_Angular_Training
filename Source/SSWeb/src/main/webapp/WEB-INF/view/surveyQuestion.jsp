@@ -1,4 +1,4 @@
-<%@ page language="java" contentType="text/html; charset=ISO-8859-1" pageEncoding="UTF-8"%>
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ taglib prefix="spring" uri="http://www.springframework.org/tags"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions"%>
@@ -327,6 +327,8 @@
 						<a id="zillow-btn" target="_blank" class="sq-btn-continue sq-btn-post-social-btn">Zillow</a>
 						<a id="lt-btn" target="_blank" class="sq-btn-continue sq-btn-post-social-btn">Lending Tree</a> 
 							<div class="ppl-share-wrapper clearfix rev-ppl-share-wrapper">
+						<!-- <a id="realtor-btn" target="_blank" class="sq-btn-continue sq-btn-post-social-btn">Realtor</a> 
+							<div class="ppl-share-wrapper clearfix rev-ppl-share-wrapper"> -->
 
 					<div class="float-left blue-text ppl-share-shr-txt"><spring:message code="label.share.key"/></div>
 					<div class="float-left clearfix ppl-share-social ">
