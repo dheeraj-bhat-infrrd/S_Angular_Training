@@ -7,17 +7,22 @@ import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
+
 import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.commons.EmailTemplateConstants;
 import com.realtech.socialsurvey.core.entities.EmailEntity;
 import com.realtech.socialsurvey.core.entities.FileContentReplacements;
+import com.realtech.socialsurvey.core.entities.MailContent;
+import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
 import com.realtech.socialsurvey.core.entities.SurveyPreInitiation;
+import com.realtech.socialsurvey.core.entities.User;
 import com.realtech.socialsurvey.core.enums.EmailHeader;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.services.mail.EmailSender;
@@ -46,6 +51,11 @@ public class EmailServicesImpl implements EmailServices
     @Autowired
     private EmailSender emailSender;
 
+    /*
+     * @Autowired private OrganizationManagementService
+     * organizationManagementService;
+     */
+
     @Value ( "${MAX_PAYMENT_RETRIES}")
     private int maxPaymentRetries;
 
@@ -60,8 +70,10 @@ public class EmailServicesImpl implements EmailServices
 
 
     /**
-     * @Value("${SENDGRID_SENDER_USERNAME ") private String sendgridSenderUsername;
-     * @Value("${SENDGRID_SENDER_PASSWORD ") private String sendgridSenderPassword;
+     * @Value("${SENDGRID_SENDER_USERNAME ") private String
+     *                                    sendgridSenderUsername;
+     * @Value("${SENDGRID_SENDER_PASSWORD ") private String
+     *                                    sendgridSenderPassword;
      * @Value("${SENDGRID_SENDER_NAME ") private String sendgridSenderName;
      */
 
@@ -167,7 +179,7 @@ public class EmailServicesImpl implements EmailServices
             + EmailTemplateConstants.AGENT_SURVEY_REMINDER_EMAIL_BODY );
         String customerName = survey.getCustomerFirstName() + " " + survey.getCustomerLastName();
         messageBodyReplacements.setReplacementArgs( Arrays.asList( appLogoUrl, survey.getAgentName(), customerName,
-            survey.getCustomerEmailId(), appBaseUrl, appBaseUrl, appBaseUrl ) );
+            survey.getCustomerEmailId(), customerName ) );
 
         LOG.debug( "Calling email sender to send mail" );
         emailSender.sendEmailWithBodyReplacements( emailEntity, subjectFileName, messageBodyReplacements );
@@ -246,7 +258,7 @@ public class EmailServicesImpl implements EmailServices
         messageBodyReplacements.setFileName( EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER
             + EmailTemplateConstants.RESET_PASSWORD_MAIL_BODY );
         messageBodyReplacements.setReplacementArgs( Arrays.asList( appLogoUrl, name, loginName, url, url, url, appBaseUrl,
-            appBaseUrl, appBaseUrl ) );
+            appBaseUrl ) );
 
         LOG.debug( "Calling email sender to send mail" );
         emailSender.sendEmailWithBodyReplacements( emailEntity, subjectFileName, messageBodyReplacements );
@@ -269,7 +281,8 @@ public class EmailServicesImpl implements EmailServices
             throw new InvalidInputException( "Name is empty or null for sending subscription charge mail " );
         }
 
-        // format for the subscription charge unsuccessful mail is RECIPIENT^^<comman separated
+        // format for the subscription charge unsuccessful mail is
+        // RECIPIENT^^<comman separated
         // recipients>$$NAME^^<name>$$RETRYDAYS^^<retryDays>
         StringBuilder contentBuilder = new StringBuilder();
         contentBuilder.append( CommonConstants.RECIPIENT_MARKER ).append( recipientMailId );
@@ -312,14 +325,14 @@ public class EmailServicesImpl implements EmailServices
             + EmailTemplateConstants.SUBSCRIPTION_UNSUCCESSFUL_MAIL_SUBJECT;
 
         /**
-         * Sequence of the replacement arguments in the list should be same as their sequence of
-         * occurrence in the template
+         * Sequence of the replacement arguments in the list should be same as
+         * their sequence of occurrence in the template
          */
         FileContentReplacements messageBodyReplacements = new FileContentReplacements();
         messageBodyReplacements.setFileName( EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER
             + EmailTemplateConstants.SUBSCRIPTION_UNSUCCESSFUL_MAIL_BODY );
         messageBodyReplacements.setReplacementArgs( Arrays.asList( appLogoUrl, name, retryDays, recipientMailId, appBaseUrl,
-            appBaseUrl, appBaseUrl ) );
+            appBaseUrl ) );
 
         LOG.info( "Sending the mail." );
         emailSender.sendEmailWithBodyReplacements( emailEntity, subjectFileName, messageBodyReplacements );
@@ -546,7 +559,6 @@ public class EmailServicesImpl implements EmailServices
         String subjectFileName = EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER
             + EmailTemplateConstants.COMPLETE_REGISTRATION_MAIL_SUBJECT;
 
-
         FileContentReplacements messageBodyReplacements = new FileContentReplacements();
         messageBodyReplacements.setFileName( EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER
             + EmailTemplateConstants.COMPLETE_REGISTRATION_MAIL_BODY );
@@ -675,7 +687,7 @@ public class EmailServicesImpl implements EmailServices
         FileContentReplacements messageBodyReplacements = new FileContentReplacements();
         messageBodyReplacements.setFileName( EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER
             + EmailTemplateConstants.RETRY_CHARGE_MAIL_BODY );
-        messageBodyReplacements.setReplacementArgs( Arrays.asList( appLogoUrl, displayName, loginName, appBaseUrl, appBaseUrl,
+        messageBodyReplacements.setReplacementArgs( Arrays.asList( appLogoUrl, displayName, recipientMailId, appBaseUrl,
             appBaseUrl ) );
 
         LOG.debug( "Calling email sender to send mail" );
@@ -735,7 +747,7 @@ public class EmailServicesImpl implements EmailServices
         FileContentReplacements messageBodyReplacements = new FileContentReplacements();
         messageBodyReplacements.setFileName( EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER
             + EmailTemplateConstants.RETRIES_EXHAUSTED_MAIL_BODY );
-        messageBodyReplacements.setReplacementArgs( Arrays.asList( appLogoUrl, displayName, loginName, appBaseUrl, appBaseUrl,
+        messageBodyReplacements.setReplacementArgs( Arrays.asList( appLogoUrl, displayName, recipientMailId, appBaseUrl,
             appBaseUrl ) );
 
         LOG.debug( "Calling email sender to send mail" );
@@ -795,7 +807,7 @@ public class EmailServicesImpl implements EmailServices
         FileContentReplacements messageBodyReplacements = new FileContentReplacements();
         messageBodyReplacements.setFileName( EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER
             + EmailTemplateConstants.ACCOUNT_DISABLED_MAIL_BODY );
-        messageBodyReplacements.setReplacementArgs( Arrays.asList( appLogoUrl, displayName, loginName, appBaseUrl, appBaseUrl,
+        messageBodyReplacements.setReplacementArgs( Arrays.asList( appLogoUrl, displayName, recipientMailId, appBaseUrl,
             appBaseUrl ) );
 
         LOG.debug( "Calling email sender to send mail" );
@@ -826,7 +838,7 @@ public class EmailServicesImpl implements EmailServices
         FileContentReplacements messageBodyReplacements = new FileContentReplacements();
         messageBodyReplacements.setFileName( EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER
             + EmailTemplateConstants.ACCOUNT_DELETED_MAIL_BODY );
-        messageBodyReplacements.setReplacementArgs( Arrays.asList( appLogoUrl, displayName, loginName, appBaseUrl ) );
+        messageBodyReplacements.setReplacementArgs( Arrays.asList( appLogoUrl, displayName, recipientMailId ) );
 
         LOG.debug( "Calling email sender to send mail" );
         emailSender.sendEmailWithBodyReplacements( emailEntity, subjectFileName, messageBodyReplacements );
@@ -886,7 +898,7 @@ public class EmailServicesImpl implements EmailServices
         messageBodyReplacements.setFileName( EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER
             + EmailTemplateConstants.ACCOUNT_UPGRADE_MAIL_BODY );
         messageBodyReplacements.setReplacementArgs( Arrays.asList( appLogoUrl, displayName, recipientMailId, appBaseUrl,
-            appBaseUrl, appBaseUrl ) );
+            appBaseUrl ) );
 
         LOG.debug( "Calling email sender to send mail" );
         emailSender.sendEmailWithBodyReplacements( emailEntity, subjectFileName, messageBodyReplacements );
@@ -950,7 +962,7 @@ public class EmailServicesImpl implements EmailServices
         messageBodyReplacements.setFileName( EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER
             + EmailTemplateConstants.SURVEY_COMPLETION_MAIL_BODY );
         messageBodyReplacements.setReplacementArgs( Arrays.asList( appLogoUrl, displayName, agentName, agentName, appBaseUrl,
-            agentProfileName, appBaseUrl, agentProfileName, agentName, appBaseUrl ) );
+            agentProfileName, appBaseUrl, agentProfileName, agentName ) );
 
         LOG.debug( "Calling email sender to send mail" );
         emailSender.sendEmailWithBodyReplacements( emailEntity, subjectFileName, messageBodyReplacements );
@@ -999,6 +1011,8 @@ public class EmailServicesImpl implements EmailServices
     public void sendDefaultSurveyReminderMail( String recipientMailId, String firstName, String agentName, String link,
         String agentPhone, String agentTitle, String companyName ) throws InvalidInputException, UndeliveredEmailException
     {
+        LOG.info( "Executing the sendDefaultSurveyReminderMail() method" );
+
         if ( recipientMailId == null || recipientMailId.isEmpty() ) {
             LOG.error( "Recipient email Id is empty or null for sending survey completion mail " );
             throw new InvalidInputException( "Recipient email Id is empty or null for sending survey completion mail " );
@@ -1024,9 +1038,9 @@ public class EmailServicesImpl implements EmailServices
         String currentYear = String.valueOf( Calendar.getInstance().get( Calendar.YEAR ) );
         DateFormat dateFormat = new SimpleDateFormat( "yyyy/MM/dd" );
         String fullAddress = "";
-        messageBodyReplacements.setReplacementArgs( Arrays.asList( appLogoUrl, firstName, link, link, link, "",
-            agentSignature, appBaseUrl, appBaseUrl, recipientMailId, companyName, dateFormat.format( new Date() ), "",
-            companyName, currentYear, fullAddress ) );
+        messageBodyReplacements.setReplacementArgs( Arrays.asList( appLogoUrl, firstName, link, link, link, "", agentSignature,
+            appBaseUrl, appBaseUrl, recipientMailId, companyName, dateFormat.format( new Date() ), "", companyName,
+            currentYear, fullAddress ) );
 
         LOG.debug( "Calling email sender to send mail" );
         emailSender.sendEmailWithSubjectAndBodyReplacements( emailEntity, subjectReplacements, messageBodyReplacements );
@@ -1036,9 +1050,11 @@ public class EmailServicesImpl implements EmailServices
 
     @Async
     @Override
-    public void sendSurveyReminderMail( String recipientMailId, String subject, String mailBody ) throws InvalidInputException,
-        UndeliveredEmailException
+    public void sendSurveyReminderMail( String recipientMailId, String subject, String mailBody, String senderName,
+        String senderEmailId ) throws InvalidInputException, UndeliveredEmailException
     {
+        LOG.info( "Executing the sendSurveyReminderMail() method" );
+
         if ( recipientMailId == null || recipientMailId.isEmpty() ) {
             LOG.error( "Recipient email Id is empty or null for sending survey completion mail " );
             throw new InvalidInputException( "Recipient email Id is empty or null for sending survey completion mail " );
@@ -1050,7 +1066,8 @@ public class EmailServicesImpl implements EmailServices
 
         LOG.info( "Sending survey reminder email to : " + recipientMailId );
         EmailEntity emailEntity = prepareEmailEntityForSendingEmail( recipientMailId );
-
+        emailEntity.setSenderName( senderName );
+        emailEntity.setSenderEmailId( senderEmailId );
         LOG.debug( "Calling email sender to send mail" );
         emailSender.sendEmail( emailEntity, subject, mailBody );
         LOG.info( "Successfully sent survey completion mail" );
@@ -1179,8 +1196,7 @@ public class EmailServicesImpl implements EmailServices
         FileContentReplacements messageBodyReplacements = new FileContentReplacements();
         messageBodyReplacements.setFileName( EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER
             + EmailTemplateConstants.SOCIALPOST_REMINDER_MAIL_BODY );
-        messageBodyReplacements.setReplacementArgs( Arrays.asList( appLogoUrl, displayName, links, agentName, agentSignature,
-            appBaseUrl ) );
+        messageBodyReplacements.setReplacementArgs( Arrays.asList( appLogoUrl, displayName, links, "", agentSignature ) );
 
         LOG.debug( "Calling email sender to send mail" );
         emailSender.sendEmailWithBodyReplacements( emailEntity, subjectFileName, messageBodyReplacements );
@@ -1189,7 +1205,8 @@ public class EmailServicesImpl implements EmailServices
 
 
     /**
-     * Sends the message from the contact us page as a mail to the respective admin or agent
+     * Sends the message from the contact us page as a mail to the respective
+     * admin or agent
      * 
      * @param recipientEmailId
      * @param displayName
@@ -1235,8 +1252,8 @@ public class EmailServicesImpl implements EmailServices
         FileContentReplacements messageBodyReplacements = new FileContentReplacements();
         messageBodyReplacements.setFileName( EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER
             + EmailTemplateConstants.CONTACT_US_MAIL_BODY );
-        messageBodyReplacements.setReplacementArgs( Arrays.asList( appLogoUrl, displayName, senderName, senderEmailId, message,
-            appBaseUrl ) );
+        messageBodyReplacements
+            .setReplacementArgs( Arrays.asList( appLogoUrl, displayName, senderName, senderEmailId, message ) );
 
         LOG.debug( "Calling email sender to send mail" );
         emailSender.sendEmailWithSubjectAndBodyReplacements( emailEntity, subjectReplacements, messageBodyReplacements );
@@ -1267,9 +1284,9 @@ public class EmailServicesImpl implements EmailServices
         FileContentReplacements messageBodyReplacements = new FileContentReplacements();
         messageBodyReplacements.setFileName( EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER
             + EmailTemplateConstants.SURVEY_INVITATION_MAIL_BODY );
-        messageBodyReplacements.setReplacementArgs( Arrays.asList( appLogoUrl, firstName, link, link, link, agentName,
-            agentSignature, appBaseUrl, recipientMailId, companyName, surveyInitiatedOn, agentEmailId, companyName,
-            currentYear, fullAddress ) );
+
+        messageBodyReplacements.setReplacementArgs( Arrays.asList( appLogoUrl, firstName, link, link, link, "", agentSignature,
+            recipientMailId, companyName, surveyInitiatedOn, agentEmailId, companyName, currentYear, fullAddress ) );
 
         LOG.debug( "Calling email sender to send mail" );
         emailSender.sendEmailWithBodyReplacements( emailEntity, subjectFileName, messageBodyReplacements );
@@ -1330,7 +1347,7 @@ public class EmailServicesImpl implements EmailServices
         FileContentReplacements messageBodyReplacements = new FileContentReplacements();
         messageBodyReplacements.setFileName( EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER
             + EmailTemplateConstants.ACCOUNT_BLOCKING_MAIL_BODY );
-        messageBodyReplacements.setReplacementArgs( Arrays.asList( appLogoUrl, displayName, loginName, appBaseUrl, appBaseUrl,
+        messageBodyReplacements.setReplacementArgs( Arrays.asList( appLogoUrl, displayName, recipientMailId, appBaseUrl,
             appBaseUrl ) );
 
         LOG.debug( "Calling email sender to send mail" );
@@ -1369,7 +1386,7 @@ public class EmailServicesImpl implements EmailServices
         FileContentReplacements messageBodyReplacements = new FileContentReplacements();
         messageBodyReplacements.setFileName( EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER
             + EmailTemplateConstants.ACCOUNT_REACTIVATION_MAIL_BODY );
-        messageBodyReplacements.setReplacementArgs( Arrays.asList( appLogoUrl, displayName, loginName, appBaseUrl, appBaseUrl,
+        messageBodyReplacements.setReplacementArgs( Arrays.asList( appLogoUrl, displayName, recipientMailId, appBaseUrl,
             appBaseUrl ) );
 
         LOG.debug( "Calling email sender to send mail" );
@@ -1414,7 +1431,7 @@ public class EmailServicesImpl implements EmailServices
         messageBodyReplacements.setFileName( EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER
             + EmailTemplateConstants.SUBSCRIPTION_PRICE_UPDATED_MAIL_BODY );
         messageBodyReplacements.setReplacementArgs( Arrays.asList( appLogoUrl, name, numOfUsers, oldAmount, revisedAmount,
-            recipientMailId, appBaseUrl, appBaseUrl, appBaseUrl ) );
+            recipientMailId, appBaseUrl, appBaseUrl ) );
 
         LOG.debug( "Calling email sender to send mail" );
         emailSender.sendEmailWithBodyReplacements( emailEntity, subjectFileName, messageBodyReplacements );
@@ -1485,7 +1502,7 @@ public class EmailServicesImpl implements EmailServices
         messageBodyReplacements.setFileName( EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER
             + EmailTemplateConstants.SURVEY_INVITATION_MAIL_CUSTOMER_BODY );
         messageBodyReplacements.setReplacementArgs( Arrays.asList( appLogoUrl, firstName, agentName, link, link, link,
-            appBaseUrl, appBaseUrl, appBaseUrl ) );
+            appBaseUrl, appBaseUrl ) );
 
         LOG.debug( "Calling email sender to send mail" );
         emailSender.sendEmailWithBodyReplacements( emailEntity, subjectFileName, messageBodyReplacements );
@@ -1538,8 +1555,8 @@ public class EmailServicesImpl implements EmailServices
         FileContentReplacements messageBodyReplacements = new FileContentReplacements();
         messageBodyReplacements.setFileName( EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER
             + EmailTemplateConstants.SURVEY_RESTART_MAIL_BODY );
-        messageBodyReplacements.setReplacementArgs( Arrays.asList( appLogoUrl, displayName, link, link, link, agentName,
-            agentSignature, appBaseUrl ) );
+        messageBodyReplacements.setReplacementArgs( Arrays.asList( appLogoUrl, displayName, link, link, link, "",
+            agentSignature ) );
 
         LOG.debug( "Calling email sender to send mail" );
         emailSender.sendEmailWithBodyReplacements( emailEntity, subjectFileName, messageBodyReplacements );
@@ -1569,7 +1586,7 @@ public class EmailServicesImpl implements EmailServices
         FileContentReplacements messageBodyReplacements = new FileContentReplacements();
         messageBodyReplacements.setFileName( EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER
             + EmailTemplateConstants.SOCIAL_CONNECT_MAIL_BODY );
-        messageBodyReplacements.setReplacementArgs( Arrays.asList( appLogoUrl, displayName, account, loginName, appBaseUrl,
+        messageBodyReplacements.setReplacementArgs( Arrays.asList( appLogoUrl, displayName, account, recipientMailId,
             appBaseUrl, appBaseUrl ) );
 
         LOG.debug( "Calling email sender to send mail" );
@@ -1577,65 +1594,76 @@ public class EmailServicesImpl implements EmailServices
         LOG.info( "Successfully sent social connect mail" );
     }
 
-	@Async
-	@Override
-	public void sendReportAbuseMail(String recipientMailId, String displayName, String agentName, String customerName, String customerEmail,
-			String review, String reason, String reporterName, String reporterEmail) throws InvalidInputException, UndeliveredEmailException {
-		if (recipientMailId == null || recipientMailId.isEmpty()) {
-			LOG.error("Recipient email Id is empty or null for sending survey completion mail ");
-			throw new InvalidInputException("Recipient email Id is empty or null for sending report abuse mail ");
-		}
-		if (displayName == null || displayName.isEmpty()) {
-			LOG.error("displayName parameter is empty or null for sending account upgrade mail ");
-			throw new InvalidInputException("displayName parameter is empty or null for sending report abuse mail ");
-		}
 
-		LOG.info("Sending report abuse email to : " + recipientMailId);
-		EmailEntity emailEntity = prepareEmailEntityForSendingEmail(recipientMailId);
-		String subjectFileName = EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER + EmailTemplateConstants.REPORT_ABUSE_MAIL_SUBJECT;
+    @Async
+    @Override
+    public void sendReportAbuseMail( String recipientMailId, String displayName, String agentName, String customerName,
+        String customerEmail, String review, String reason, String reporterName, String reporterEmail )
+        throws InvalidInputException, UndeliveredEmailException
+    {
+        if ( recipientMailId == null || recipientMailId.isEmpty() ) {
+            LOG.error( "Recipient email Id is empty or null for sending survey completion mail " );
+            throw new InvalidInputException( "Recipient email Id is empty or null for sending report abuse mail " );
+        }
+        if ( displayName == null || displayName.isEmpty() ) {
+            LOG.error( "displayName parameter is empty or null for sending account upgrade mail " );
+            throw new InvalidInputException( "displayName parameter is empty or null for sending report abuse mail " );
+        }
 
-		FileContentReplacements messageBodyReplacements = new FileContentReplacements();
-		
-		if(reporterName != null && reporterEmail != null){
-		    messageBodyReplacements.setFileName(EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER + EmailTemplateConstants.REPORT_ABUSE_MAIL_WITH_REVIEWER_BODY);
-		    messageBodyReplacements.setReplacementArgs(Arrays.asList(appLogoUrl, displayName, agentName, customerName, customerEmail, review,reporterName, reporterEmail, reason, 
-                appBaseUrl));
-		}else{
-		    messageBodyReplacements.setFileName(EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER + EmailTemplateConstants.REPORT_ABUSE_MAIL_BODY);
-		    messageBodyReplacements.setReplacementArgs(Arrays.asList(appLogoUrl, displayName, agentName, customerName, customerEmail, review, reason,
-                appBaseUrl));    
-		}
+        LOG.info( "Sending report abuse email to : " + recipientMailId );
+        EmailEntity emailEntity = prepareEmailEntityForSendingEmail( recipientMailId );
+        String subjectFileName = EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER
+            + EmailTemplateConstants.REPORT_ABUSE_MAIL_SUBJECT;
 
-		LOG.debug("Calling email sender to send mail");
-		emailSender.sendEmailWithBodyReplacements(emailEntity, subjectFileName, messageBodyReplacements);
-		LOG.info("Successfully sent social connect mail");
-	}
-	
-	@Async
-	@Override
-	public void sendSurveyReportMail(String recipientMailId, String displayName, String reason) throws InvalidInputException,
-			UndeliveredEmailException {
-		if (recipientMailId == null || recipientMailId.isEmpty()) {
-			LOG.error("Recipient email Id is empty or null for sending survey completion mail ");
-			throw new InvalidInputException("Recipient email Id is empty or null for sending survey completion mail ");
-		}
-		if (displayName == null || displayName.isEmpty()) {
-			LOG.error("displayName parameter is empty or null for sending account upgrade mail ");
-			throw new InvalidInputException("displayName parameter is empty or null for sending survey completion mail ");
-		}
+        FileContentReplacements messageBodyReplacements = new FileContentReplacements();
 
-		LOG.info("Sending survey completion email to : " + recipientMailId);
-		EmailEntity emailEntity = prepareEmailEntityForSendingEmail(recipientMailId);
-		String subjectFileName = EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER + EmailTemplateConstants.SURVEY_REPORT_MAIL_SUBJECT;
+        if ( reporterName != null && reporterEmail != null ) {
+            messageBodyReplacements.setFileName( EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER
+                + EmailTemplateConstants.REPORT_ABUSE_MAIL_WITH_REVIEWER_BODY );
+            messageBodyReplacements.setReplacementArgs( Arrays.asList( appLogoUrl, displayName, agentName, customerName,
+                customerEmail, review, reporterName, reporterEmail, reason, appBaseUrl ) );
+        } else {
+            messageBodyReplacements.setFileName( EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER
+                + EmailTemplateConstants.REPORT_ABUSE_MAIL_BODY );
+            messageBodyReplacements.setReplacementArgs( Arrays.asList( appLogoUrl, displayName, agentName, customerName,
+                customerEmail, review, reason, appBaseUrl ) );
+        }
 
-		FileContentReplacements messageBodyReplacements = new FileContentReplacements();
-		messageBodyReplacements.setFileName(EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER + EmailTemplateConstants.SURVEY_REPORT_MAIL_BODY);
-		messageBodyReplacements.setReplacementArgs(Arrays.asList(appLogoUrl, displayName, reason));
+        LOG.debug( "Calling email sender to send mail" );
+        emailSender.sendEmailWithBodyReplacements( emailEntity, subjectFileName, messageBodyReplacements );
+        LOG.info( "Successfully sent social connect mail" );
+    }
 
-		LOG.debug("Calling email sender to send mail");
-		emailSender.sendEmailWithBodyReplacements(emailEntity, subjectFileName, messageBodyReplacements);
-		LOG.info("Successfully sent survey completion mail");
-	}
+
+    @Async
+    @Override
+    public void sendSurveyReportMail( String recipientMailId, String displayName, String reason ) throws InvalidInputException,
+        UndeliveredEmailException
+    {
+        if ( recipientMailId == null || recipientMailId.isEmpty() ) {
+            LOG.error( "Recipient email Id is empty or null for sending survey completion mail " );
+            throw new InvalidInputException( "Recipient email Id is empty or null for sending survey completion mail " );
+        }
+        if ( displayName == null || displayName.isEmpty() ) {
+            LOG.error( "displayName parameter is empty or null for sending account upgrade mail " );
+            throw new InvalidInputException( "displayName parameter is empty or null for sending survey completion mail " );
+        }
+
+        LOG.info( "Sending survey completion email to : " + recipientMailId );
+        EmailEntity emailEntity = prepareEmailEntityForSendingEmail( recipientMailId );
+        String subjectFileName = EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER
+            + EmailTemplateConstants.SURVEY_REPORT_MAIL_SUBJECT;
+
+        FileContentReplacements messageBodyReplacements = new FileContentReplacements();
+        messageBodyReplacements.setFileName( EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER
+            + EmailTemplateConstants.SURVEY_REPORT_MAIL_BODY );
+        messageBodyReplacements.setReplacementArgs( Arrays.asList( appLogoUrl, displayName, reason ) );
+
+        LOG.debug( "Calling email sender to send mail" );
+        emailSender.sendEmailWithBodyReplacements( emailEntity, subjectFileName, messageBodyReplacements );
+        LOG.info( "Successfully sent survey completion mail" );
+    }
+
 
     @Override
     public void sendCorruptDataFromCrmNotificationMail( String firstName, String lastName, String recipientMailId,
@@ -1657,7 +1685,7 @@ public class EmailServicesImpl implements EmailServices
         FileContentReplacements messageBodyReplacements = new FileContentReplacements();
         messageBodyReplacements.setFileName( EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER
             + EmailTemplateConstants.CORRUPT_PREINITIATION_RECORD_MAIL_BODY );
-        messageBodyReplacements.setReplacementArgs( Arrays.asList( appLogoUrl, displayName, appBaseUrl ) );
+        messageBodyReplacements.setReplacementArgs( Arrays.asList( appLogoUrl, displayName ) );
 
         LOG.debug( "Calling email sender to send mail" );
         emailSender.sendEmailWithBodyReplacements( emailEntity, subjectFileName, messageBodyReplacements );
@@ -1685,8 +1713,8 @@ public class EmailServicesImpl implements EmailServices
         displayName.replaceAll( "null", "" );
         FileContentReplacements messageBodyReplacements = new FileContentReplacements();
         messageBodyReplacements.setFileName( EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER
-            + EmailTemplateConstants.RECORDS_NOT_UPLOADED_MAIL_SUBJECT );
-        messageBodyReplacements.setReplacementArgs( Arrays.asList( appLogoUrl, displayName, appBaseUrl ) );
+            + EmailTemplateConstants.RECORDS_NOT_UPLOADED_MAIL_BODY );
+        messageBodyReplacements.setReplacementArgs( Arrays.asList( appLogoUrl, displayName ) );
 
         LOG.debug( "Calling email sender to send mail" );
         emailSender.sendEmailWithBodyReplacements( emailEntity, subjectFileName, messageBodyReplacements );
@@ -1733,5 +1761,68 @@ public class EmailServicesImpl implements EmailServices
         return emailEntity;
     }
 
+
+    /**
+     * Method to send survey reminder when the resend button is manually clicked
+     * 
+     * @param user
+     * @param agentName
+     * @param agentPhone
+     * @param agentTitle
+     * @param companyName
+     * @param survey
+     * @param surveyLink
+     */
+    public void sendManualSurveyReminderMail( OrganizationUnitSettings companySettings, User user, String agentName,
+        String agentPhone, String agentTitle, String companyName, SurveyPreInitiation survey, String surveyLink )
+    {
+
+        if ( companySettings != null && companySettings.getMail_content() != null
+            && companySettings.getMail_content().getTake_survey_reminder_mail() != null ) {
+            MailContent mailContent = companySettings.getMail_content().getTake_survey_reminder_mail();
+
+            String mailBody = emailFormatHelper.replaceEmailBodyWithParams( mailContent.getMail_body(),
+                mailContent.getParam_order() );
+            String agentSignature = emailFormatHelper.buildAgentSignature( agentName, agentPhone, agentTitle, companyName );
+            DateFormat dateFormat = new SimpleDateFormat( "yyyy/MM/dd" );
+            String currentYear = String.valueOf( Calendar.getInstance().get( Calendar.YEAR ) );
+            String fullAddress = "";
+
+            mailBody = mailBody.replaceAll( "\\[LogoUrl\\]", appLogoUrl );
+            mailBody = mailBody.replaceAll( "\\[BaseUrl\\]", appBaseUrl );
+            mailBody = mailBody.replaceAll( "\\[AgentName\\]", "" );
+            mailBody = mailBody.replaceAll( "\\[FirstName\\]", survey.getCustomerFirstName() );
+            mailBody = mailBody.replaceAll( "\\[Name\\]", survey.getCustomerFirstName() + " " + survey.getCustomerLastName() );
+            mailBody = mailBody.replaceAll( "\\[Link\\]", surveyLink );
+            mailBody = mailBody.replaceAll( "\\[AgentSignature\\]", agentSignature );
+            mailBody = mailBody.replaceAll( "\\[RecipientEmail\\]", survey.getCustomerEmailId() );
+            mailBody = mailBody.replaceAll( "\\[SenderEmail\\]", user.getEmailId() );
+            mailBody = mailBody.replaceAll( "\\[CompanyName\\]", companyName );
+            mailBody = mailBody.replaceAll( "\\[InitiatedDate\\]", dateFormat.format( new Date() ) );
+            mailBody = mailBody.replaceAll( "\\[CurrentYear\\]", currentYear );
+            mailBody = mailBody.replaceAll( "\\[FullAddress\\]", fullAddress );
+            mailBody = mailBody.replaceAll( "null", "" );
+            String mailSubject = CommonConstants.REMINDER_MAIL_SUBJECT + agentName;
+            if ( mailContent.getMail_subject() != null && !mailContent.getMail_subject().isEmpty() ) {
+                mailSubject = mailContent.getMail_subject();
+                mailSubject = mailSubject.replaceAll( "\\[AgentName\\]", agentName );
+            }
+
+            try {
+                sendSurveyReminderMail( survey.getCustomerEmailId(), mailSubject, mailBody, agentName, user.getEmailId() );
+            } catch ( InvalidInputException | UndeliveredEmailException e ) {
+                LOG.error( "Exception caught while sending mail to " + survey.getCustomerEmailId() + " .Nested exception is ",
+                    e );
+            }
+        } else {
+            try {
+                sendDefaultSurveyReminderMail( survey.getCustomerEmailId(), survey.getCustomerFirstName(), agentName,
+                    surveyLink, agentPhone, agentTitle, companyName );
+            } catch ( InvalidInputException | UndeliveredEmailException e ) {
+                LOG.error( "Exception caught in IncompleteSurveyReminderSender.main while trying to send reminder mail to "
+                    + survey.getCustomerFirstName() + " for completion of survey. Nested exception is ", e );
+            }
+        }
+    }
 }
 // JIRA: SS-7: By RM02: EOC
