@@ -17,6 +17,11 @@ public interface ZillowIntegrationApi
     public Response fetchZillowReviewsByScreenname( @Query ( "zws-id") String zwsId, @Query ( "screenname") String screenname );
 
 
+    @GET ( "/webservice/ProReviews.htm?output=json&count=10")
+    public Response fetchZillowReviewsByScreennameWithMaxCount( @Query ( "zws-id") String zwsId,
+        @Query ( "screenname") String screenname );
+
+
     @GET ( "/webservice/ProReviews.htm?output=json")
     public Response fetchZillowReviewsByEmail( @Query ( "zws-id") String zwsId, @Query ( "email") String email );
 
