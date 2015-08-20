@@ -360,21 +360,24 @@ public class CsvUploadServiceImpl implements CsvUploadService {
 			contactDetailsSettings.setWeb_addresses(webAddressSettings);
 			agentSettings.setContact_details(contactDetailsSettings);
 
-			Licenses licenses = agentSettings.getLicenses();
-			if (licenses == null) {
-				licenses = new Licenses();
+			if (userUploadVO.getLicense() != null && !userUploadVO.getLicense().isEmpty()) {
+				Licenses licenses = agentSettings.getLicenses();
+				if (licenses == null) {
+					licenses = new Licenses();
+				}
+				List<String> authorizedIn = licenses.getAuthorized_in();
+				if (authorizedIn == null) {
+					authorizedIn = new ArrayList<String>();
+				}
+				licenses.setAuthorized_in(getAllStateLicenses(userUploadVO.getLicense(), authorizedIn));
+				agentSettings.setLicenses(licenses);
+				if (licenses != null && licenses.getAuthorized_in() != null && !licenses.getAuthorized_in().isEmpty()) {
+					organizationUnitSettingsDao.updateParticularKeyAgentSettings(MongoOrganizationUnitSettingDaoImpl.KEY_LICENCES, licenses,
+							agentSettings);
+				}
 			}
-			List<String> authorizedIn = licenses.getAuthorized_in();
-			if (authorizedIn == null) {
-				authorizedIn = new ArrayList<String>();
-			}
-			licenses.setAuthorized_in(getAllStateLicenses(userUploadVO.getLicense(), authorizedIn));
-			agentSettings.setLicenses(licenses);
 			agentSettings.setDisclaimer(userUploadVO.getLegalDisclaimer());
-			if (licenses != null && licenses.getAuthorized_in() != null && !licenses.getAuthorized_in().isEmpty()) {
-				organizationUnitSettingsDao.updateParticularKeyAgentSettings(MongoOrganizationUnitSettingDaoImpl.KEY_LICENCES, licenses,
-						agentSettings);
-			}
+
 			profileManagementService.updateAgentContactDetails(MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION, agentSettings,
 					contactDetailsSettings);
 
@@ -508,9 +511,10 @@ public class CsvUploadServiceImpl implements CsvUploadService {
 				else if (cellIndex == USER_BRANCH_ID_ADMIN_INDEX) {
 					if (cell.getCellType() != XSSFCell.CELL_TYPE_BLANK) {
 						String cellValue = null;
-						if(cell.getCellType() == XSSFCell.CELL_TYPE_STRING){
+						if (cell.getCellType() == XSSFCell.CELL_TYPE_STRING) {
 							cellValue = cell.getStringCellValue();
-						}else if(cell.getCellType() == XSSFCell.CELL_TYPE_NUMERIC){
+						}
+						else if (cell.getCellType() == XSSFCell.CELL_TYPE_NUMERIC) {
 							long lCellValue = (long) cell.getNumericCellValue();
 							cellValue = String.valueOf(lCellValue);
 						}
@@ -522,9 +526,10 @@ public class CsvUploadServiceImpl implements CsvUploadService {
 				else if (cellIndex == USER_REGION_ID_ADMIN_INDEX) {
 					if (cell.getCellType() != XSSFCell.CELL_TYPE_BLANK) {
 						String cellValue = null;
-						if(cell.getCellType() == XSSFCell.CELL_TYPE_STRING){
+						if (cell.getCellType() == XSSFCell.CELL_TYPE_STRING) {
 							cellValue = cell.getStringCellValue();
-						}else if(cell.getCellType() == XSSFCell.CELL_TYPE_NUMERIC){
+						}
+						else if (cell.getCellType() == XSSFCell.CELL_TYPE_NUMERIC) {
 							long lCellValue = (long) cell.getNumericCellValue();
 							cellValue = String.valueOf(lCellValue);
 						}
