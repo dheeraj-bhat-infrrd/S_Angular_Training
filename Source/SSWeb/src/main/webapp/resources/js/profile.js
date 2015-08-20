@@ -951,7 +951,7 @@ function fetchReviewsForBranchCallBack(data) {
 	}
 }
 
-function fetchReviewsCountForBranch(branchId,callBackFunction,maxScore) {
+function fetchReviewsCountForBranch(branchId,callBackFunction,minScore, maxScore) {
 	if(minScore == undefined){
 		minScore = -1;
 	}
