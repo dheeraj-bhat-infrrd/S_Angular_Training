@@ -179,7 +179,7 @@
 	}).autocomplete("instance")._renderItem = function(ul, item) {
 		return $("<li>").append(item.label).appendTo(ul);
   	};
-  	$("#region-country").keydown(function(e){
+  	/* $("#region-country").keydown(function(e){
   	    if( e.keyCode != $.ui.keyCode.TAB) return; 
   	    
    	   e.keyCode = $.ui.keyCode.DOWN;
@@ -187,7 +187,7 @@
 
    	   e.keyCode = $.ui.keyCode.ENTER;
    	   $(this).trigger(e);
-   	});
+   	}); */
   	$('#region-state-txt').on('change',function(e){
   		var stateId = $(this).find(":selected").attr('data-stateid');
   		callAjaxGET("./getzipcodesbystateid.do?stateId="+stateId, function(data){
