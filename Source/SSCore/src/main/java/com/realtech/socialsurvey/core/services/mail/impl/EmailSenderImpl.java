@@ -205,7 +205,7 @@ public final class EmailSenderImpl implements EmailSender
     public void sendEmail( EmailEntity emailEntity, String subject, String mailBody ) throws InvalidInputException,
         UndeliveredEmailException
     {
-        LOG.info( "Method sendEmailWithBodyReplacements called for subject : " + subject );
+        LOG.info( "Method sendEmail called for subject : " + subject );
 
         if ( subject == null || subject.isEmpty() ) {
             throw new InvalidInputException( "Subject is null for sending mail" );
@@ -223,7 +223,7 @@ public final class EmailSenderImpl implements EmailSender
         // Send the mail
         sendMail( emailEntity );
 
-        LOG.info( "Method sendEmailWithBodyReplacements completed successfully" );
+        LOG.info( "Method sendEmail completed successfully" );
 
     }
 

@@ -1051,7 +1051,7 @@ public class EmailServicesImpl implements EmailServices
     @Async
     @Override
     public void sendSurveyReminderMail( String recipientMailId, String subject, String mailBody, String senderName,
-        String senderEmailId ) throws InvalidInputException, UndeliveredEmailException
+        String senderEmailAddress ) throws InvalidInputException, UndeliveredEmailException
     {
         LOG.info( "Executing the sendSurveyReminderMail() method" );
 
@@ -1067,7 +1067,7 @@ public class EmailServicesImpl implements EmailServices
         LOG.info( "Sending survey reminder email to : " + recipientMailId );
         EmailEntity emailEntity = prepareEmailEntityForSendingEmail( recipientMailId );
         emailEntity.setSenderName( senderName );
-        emailEntity.setSenderEmailId( senderEmailId );
+        emailEntity.setSenderEmailId( senderEmailAddress );
         LOG.debug( "Calling email sender to send mail" );
         emailSender.sendEmail( emailEntity, subject, mailBody );
         LOG.info( "Successfully sent survey completion mail" );

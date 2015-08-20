@@ -951,7 +951,7 @@ function fetchReviewsForBranchCallBack(data) {
 	}
 }
 
-function fetchReviewsCountForBranch(branchId,callBackFunction,maxScore) {
+function fetchReviewsCountForBranch(branchId,callBackFunction,minScore, maxScore) {
 	if(minScore == undefined){
 		minScore = -1;
 	}
@@ -1374,15 +1374,48 @@ function constructDate(dateStr) {
 
 function getImageandCaption(index)
 {
+	var pictureandCaptionLink = "";
+	var imgid="";
+	var name = "";
+	var addrline1 = "";
+	var addrline2="";
 	var fblink = $("#fb_"+index).data('link');
-	var pictureandCaptionLink = "&picture="+document.getElementById("prof-image").getAttribute("src")+"&caption="+document.getElementsByClassName("prof-name")[0].innerHTML+","+document.getElementsByClassName("prof-addline2")[0].innerHTML+","+document.getElementsByClassName("prof-addline1")[0].innerHTML;
+	if(document.getElementById("prof-image")!= null && document.getElementById("prof-image").getAttribute("src")!= undefined)
+		{
+		imgid = document.getElementById("prof-image").getAttribute("src");
+		
+		}
+	if($(".prof-name")[0] != undefined && $(".prof-name")[0].innerHTML != undefined )
+		{
+		name= $(".prof-name")[0].innerHTML;
+	
+		}
+	
+	if($(".prof-addline2")[0] != undefined && $(".prof-addline2")[0].innerHTML != undefined )
+	{
+		addrline2= $(".prof-addline2")[0].innerHTML;
+		
+	}
+	
+	if($(".prof-addline1")[0] != undefined && $(".prof-addline1")[0].innerHTML != undefined )
+	{
+		addrline1= $(".prof-addline1")[0].innerHTML;
+	
+	}
+
+	 pictureandCaptionLink = "&picture="+imgid+"&caption="+name+","+addrline2+","+addrline1;
 	fblink = fblink.concat(pictureandCaptionLink);
-	document.getElementById('fb_'+index).setAttribute('data-link',fblink);
+	if(document.getElementById('fb_'+index) != null)
+		{
+		document.getElementById('fb_'+index).setAttribute('data-link',fblink);
+		
+		}
+
 
 }
 
 function twitterFn (loop) {
-	
+
   	var twitLink = $("#twitt_"+loop).data('link');
   	var String=twitLink.substring(twitLink.indexOf("=")+1,twitLink.lastIndexOf("&"));
 	var twitId = 'twttxt_'+loop;
@@ -1390,19 +1423,24 @@ function twitterFn (loop) {
 	var length = twitText.length;
 	if(length > 109)
 		{
-		var arr = twitLink.split('');
+
    		var twittStrnDot = "...";
 		var substringed = twitText.substring(0, 105);
 		var finalString = substringed.concat(twittStrnDot);
 		$("#"+twitId).val(finalString);
 		twitLink = twitLink.replace(String,finalString);
+		if(document.getElementById('twitt_'+loop) != null)
+			{
+			document.getElementById('twitt_'+loop).setAttribute('data-link',twitLink);
+			}
 		
-		document.getElementById('twitt_'+loop).setAttribute('data-link',twitLink);
 		}
-	(function() {
-		   var po = document.createElement('script'); po.type = 'text/javascript'; po.async = true;
-		   po.src = 'https://apis.google.com/js/client:plusone.js';
-		   var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(po, s);
-		 })();
+
 	
 }
+
+(function() {
+	   var po = document.createElement('script'); po.type = 'text/javascript'; po.async = true;
+	   po.src = 'https://apis.google.com/js/client:plusone.js';
+	   var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(po, s);
+	 })();
