@@ -1074,6 +1074,18 @@ public class SurveyManagementController {
 		catch (NullPointerException e) {
 			surveyAndStage.put("lendingtreeEnabled", false);
 		}
+		
+		try {
+            if (agentSettings.getSocialMediaTokens().getRealtorToken().getRealtorProfileLink() != null) {
+                surveyAndStage.put("realtorEnabled", true);
+                surveyAndStage.put("realtorLink", agentSettings.getSocialMediaTokens().getRealtorToken().getRealtorProfileLink());
+            }
+            else
+                surveyAndStage.put("realtorEnabled", false);
+        }
+        catch (NullPointerException e) {
+            surveyAndStage.put("realtorEnabled", false);
+        }
 
 		surveyAndStage.put("agentFullProfileLink", getApplicationBaseUrl() + CommonConstants.AGENT_PROFILE_FIXED_URL + agentSettings.getProfileUrl());
 		surveyAndStage.put("agentProfileLink", agentSettings.getProfileUrl());

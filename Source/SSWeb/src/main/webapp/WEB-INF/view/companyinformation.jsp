@@ -1,4 +1,4 @@
-<%@ page language="java" contentType="text/html; charset=ISO-8859-1" pageEncoding="UTF-8"%>
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ taglib prefix="spring" uri="http://www.springframework.org/tags"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions"%>
@@ -286,7 +286,7 @@ $(document).ready(function() {
 	}).autocomplete("instance")._renderItem = function(ul, item) {
 		return $("<li>").append(item.label).appendTo(ul);
   	};
-  	$("#com-country").keydown(function(e){
+  	/* $("#com-country").keydown(function(e){
   	    if( e.keyCode != $.ui.keyCode.TAB) return; 
   	    
    	   e.keyCode = $.ui.keyCode.DOWN;
@@ -294,7 +294,7 @@ $(document).ready(function() {
 
    	   e.keyCode = $.ui.keyCode.ENTER;
    	   $(this).trigger(e);
-   	});
+   	}); */
 });
 
 $('#com-state').on('change',function(e){
@@ -345,28 +345,6 @@ function uploadImageSuccessCallback(response) {
 		showInfo(response);
 	}
 }
-
-/* $('#com-address1').blur(function() {
-	if (validateAddress1(this.id)) {
-		hideError();
-	}
-});
-
-$('#com-address2').blur(function() {
-	validateAddress2(this.id);
-});
-
-$('#com-zipcode').blur(function() {
-	if (validateCountryZipcode(this.id)) {
-		hideError();
-	}
-});
-
-$('#com-contactno').blur(function() {
-	if (validatePhoneNumber(this.id)) {
-		hideError();
-	}
-}); */
 
 function validateCountry() {
 	var country = $.trim($('#com-country').val());

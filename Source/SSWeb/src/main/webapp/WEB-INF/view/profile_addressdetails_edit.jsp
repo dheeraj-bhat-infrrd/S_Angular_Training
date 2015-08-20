@@ -1,3 +1,4 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <%@ taglib uri="http://www.springframework.org/tags" prefix="spring"%>
 
@@ -78,7 +79,7 @@ $(document).ready(function(){
 	}).autocomplete("instance")._renderItem = function(ul, item) {
 		return $("<li>").append(item.label).appendTo(ul);
 	};
-	$("#prof-country").keydown(function(e){
+	/* $("#prof-country").keydown(function(e){
 	   if( e.keyCode != $.ui.keyCode.TAB) return; 
 
 	   e.keyCode = $.ui.keyCode.DOWN;
@@ -86,7 +87,7 @@ $(document).ready(function(){
 
    	   e.keyCode = $.ui.keyCode.ENTER;
    	   $(this).trigger(e);
-   	});
+   	}); */
 	$('#prof-state').on('change',function(e){
   		var stateId = $(this).find(":selected").attr('data-stateid');
   		callAjaxGET("./getzipcodesbystateid.do?stateId="+stateId, function(data){
@@ -102,33 +103,6 @@ $(document).ready(function(){
   		}
   	});
 	  	
-  	/* function initializeCityLookup(searchData){
-  		$('#prof-city').autocomplete({
-  			minLength : 0,
-  			source : searchData,
-  			focus : function(event, ui) {
-  				event.stopPropagation();
-  			},
-  			select : function(event, ui) {
-  				event.stopPropagation();
-  			},
-  			open : function() {
-  				$('.ui-autocomplete').perfectScrollbar({
-  					suppressScrollX : true
-  				});
-  				$('.ui-autocomplete').perfectScrollbar('update');
-  			}
-  		}).keydown(function(e){
-  	  	    if( e.keyCode != $.ui.keyCode.TAB) return; 
-  	  	    
-  	   	   e.keyCode = $.ui.keyCode.DOWN;
-  	   	   $(this).trigger(e);
-
-  	   	   e.keyCode = $.ui.keyCode.ENTER;
-  	   	   $(this).trigger(e);
-  	   	});
-  		
-  	} */
   	function showProfStateCityRow() {
   		$('#prof-state').show();
 		$('#prof-city').show();

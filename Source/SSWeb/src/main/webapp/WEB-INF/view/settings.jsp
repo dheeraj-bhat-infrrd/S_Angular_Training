@@ -1,3 +1,4 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <%@ taglib prefix="spring" uri="http://www.springframework.org/tags"%>
 <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions"%>
@@ -67,7 +68,7 @@
 	<div class="container">
 
 		<!-- Starting code for CRM details -->
-		<c:if test="${profilemasterid == 1 || accountMasterId == 1}">
+		<c:if test="${profilemasterid == 1}">
 			<!-- Select which CRM jsp to include -->
 			<c:if test="${not empty crmMappings }">
 				<form id="encompass-form">
@@ -231,8 +232,8 @@
 							<br />
 							&nbsp&nbsp&nbsp&nbsp[Name] : Customer Name,
 							&nbsp&nbsp&nbsp&nbsp[FirstName] : Customer First Name,
-							&nbsp&nbsp&nbsp&nbsp[AgentName] : Agent Name,
-							&nbsp&nbsp&nbsp&nbsp[AgentSignature] : Agent's Signature,
+							&nbsp&nbsp&nbsp&nbsp[AgentName] : User Name,
+							&nbsp&nbsp&nbsp&nbsp[AgentSignature] : User's Signature,
 							<br />
 							&nbsp&nbsp&nbsp&nbsp[RecipientEmail] : Receipient's Email,
 							&nbsp&nbsp&nbsp&nbsp[SenderEmail] : Sender's Email,
@@ -300,9 +301,9 @@
 										class="float-left st-header-txt-rt-icn margin-left-20 cursor-pointer icn-blue-ellipse"></div>
 								</div>
 								<div class="clearfix">
-									<div class="float-left settings-btn-text">Edit</div>
-									<div class="float-left settings-btn-text margin-left-20">Save</div>
-									<div class="float-left settings-btn-text margin-left-20">Reset</div>
+									<div class="float-left settings-btn-text"><spring:message code="label.edit.key" /></div>
+									<div class="float-left settings-btn-text margin-left-20"><spring:message code="label.save.key" /></div>
+									<div class="float-left settings-btn-text margin-left-20"><spring:message code="label.reset.key" /></div>
 								</div>
 							</div>
 						</div>
@@ -413,6 +414,11 @@
 $(document).ready(function() {
 	hideOverlay();
 	$(document).attr("title", "Edit Settings");
+	
+	$('.va-dd-wrapper').perfectScrollbar({
+		suppressScrollX : true
+	});
+	$('.va-dd-wrapper').perfectScrollbar('update');
 	
 	//social media urls
 	loadSocialMediaUrlInSettingsPage();

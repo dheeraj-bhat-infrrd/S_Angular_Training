@@ -1,3 +1,4 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <footer class="login-footer">
 	<div class="container login-footer-container">
 		<div class="footer-col-container row">

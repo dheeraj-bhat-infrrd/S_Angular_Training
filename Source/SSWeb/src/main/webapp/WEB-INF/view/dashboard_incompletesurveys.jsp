@@ -1,3 +1,4 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"%>
 <c:if test="${not empty incompleteSurveys}">
@@ -5,7 +6,7 @@
 		<div class="dash-lp-item clearfix"  data-iden="sur-pre-${survey.surveyPreIntitiationId }">
 			<div class="float-left dash-lp-txt">
 				${survey.customerFirstName} ${survey.customerLastName}
-					<div class="font-11 opensanslight" data-value="${survey.modifiedOn}">
+					<div class="font-11 opensanslight" data-value="<fmt:formatDate value="${survey.modifiedOn}" pattern="yyyy-MM-dd-H-mm-s-S"/>">
 					</div>
 			</div>
 			<div
@@ -21,7 +22,8 @@
 $(document).ready(function(){
 	$('.opensanslight').each(function(index, currentElement) {
 		var dateStr = $(this).attr('data-value');
-		var date = convertTimeStampToLocalTimeStamp(new Date(dateStr));
+		var dateSplit = dateStr.split("-");
+		var date = convertTimeStampToLocalTimeStamp(new Date(dateSplit[0],dateSplit[1],dateSplit[2],dateSplit[3],dateSplit[4],dateSplit[5],dateSplit[6]));
 		$(this).html(date);
 	});
 });
