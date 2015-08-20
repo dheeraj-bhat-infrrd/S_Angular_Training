@@ -2092,4 +2092,7 @@
         width: 33.33333333%;
         width: calc(66.666666% - 250px);
     }
+    .review-for-text-sm-screen {
+		display: none;
+	}
 }

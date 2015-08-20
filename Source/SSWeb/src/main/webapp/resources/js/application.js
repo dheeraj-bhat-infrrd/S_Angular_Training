@@ -4444,7 +4444,7 @@ function showProfileLink(source, profileUrl){
 function adjustTextContainerWidthOnResize() {
 	var parentWidth = $('.ctnt-list-item').width();
 	var imgWidth = $('.ctnt-list-item .ctnt-list-item-img').width();
-	var textContainerWidth = parentWidth - imgWidth - 20;
+	var textContainerWidth = parentWidth - imgWidth - 35;
 	$('.ctnt-list-item .ctnt-list-item-txt-wrap').width(textContainerWidth);
 }
 

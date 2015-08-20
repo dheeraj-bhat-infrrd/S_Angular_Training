@@ -223,7 +223,7 @@ $(document).ready(function(){
 	}).autocomplete("instance")._renderItem = function(ul, item) {
 		return $("<li>").append(item.label).appendTo(ul);
 	};
-	$("#office-country").keydown(function(e){
+	/* $("#office-country").keydown(function(e){
   	    if( e.keyCode != $.ui.keyCode.TAB) return; 
   	    
    	   e.keyCode = $.ui.keyCode.DOWN;
@@ -232,7 +232,7 @@ $(document).ready(function(){
    	   e.keyCode = $.ui.keyCode.ENTER;
    	   $(this).trigger(e);
    	});
-	
+ */	
 	$('#office-state-txt').on('change',function(e){
   		var stateId = $(this).find(":selected").attr('data-stateid');
   		callAjaxGET("./getzipcodesbystateid.do?stateId="+stateId, function(data){

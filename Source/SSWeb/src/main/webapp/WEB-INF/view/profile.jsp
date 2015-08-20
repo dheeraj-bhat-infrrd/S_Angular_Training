@@ -65,11 +65,11 @@
     <link rel="shortcut icon" href="/favicon.ico" sizes="16x16">
     <link rel="stylesheet" href="${initParam.resourcesPath}/resources/css/perfect-scrollbar.min.css">
     <link rel="stylesheet" href="${initParam.resourcesPath}/resources/css/bootstrap.min.css">
+    <link rel="stylesheet" href="${initParam.resourcesPath}/resources/css/rangeslider.css">
     <link rel="stylesheet" href="${initParam.resourcesPath}/resources/css/style.css">
     <link rel="stylesheet" href="${initParam.resourcesPath}/resources/css/style-common.css">
-    <link rel="stylesheet" href="${initParam.resourcesPath}/resources/css/style-resp.css">
-    <link rel="stylesheet" href="${initParam.resourcesPath}/resources/css/rangeslider.css">
     <link rel="stylesheet" href="${initParam.resourcesPath}/resources/css/style-common-1.1.css">
+    <link rel="stylesheet" href="${initParam.resourcesPath}/resources/css/style-resp.css">
     <link rel="stylesheet" href="${initParam.resourcesPath}/resources/css/style-resp-1.1.css">
     <script src='//www.google.com/recaptcha/api.js'></script>
     <c:if test="${not empty profile}">
@@ -532,13 +532,14 @@
                 <div class="people-say-wrapper rt-content-main hide" id="reviews-container">
                 	<div class="clearfix hide">
 	                    <div class="main-con-header float-left" id="prof-reviews-header">
-	                    	<span class="ppl-say-txt-st">What people are saying</span> about ${profName }
+	                    	<span class="ppl-say-txt-st"><spring:message code="label.peoplesayabout.key"/></span>
+	                    	<span class="review-for-text-sm-screen"><spring:message code="label.reviewsfor.key"/></span>
+	                    	&nbsp;${profName }
 	                    </div>
-	                    
 	                    <div id="prof-reviews-sort" class="prof-reviews-sort clearfix float-right hide">
-	                    	<div id="sort-by-feature" class="prof-review-sort-link float-left">Sort by Feature</div>
+	                    	<div id="sort-by-feature" class="prof-review-sort-link float-left"><spring:message code="label.sortbyfeature.key"/></div>
 	                    	<div class="prof-reviews-sort-divider float-left">|</div>
-	                    	<div id="sort-by-date" class="prof-review-sort-link float-right">Sort by Date</div>
+	                    	<div id="sort-by-date" class="prof-review-sort-link float-right"><spring:message code="label.sortbydate.key"/></div>
 	                    </div>
                     </div>
                     
