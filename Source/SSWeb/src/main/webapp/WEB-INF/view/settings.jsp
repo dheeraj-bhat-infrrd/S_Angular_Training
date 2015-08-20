@@ -415,6 +415,11 @@ $(document).ready(function() {
 	hideOverlay();
 	$(document).attr("title", "Edit Settings");
 	
+	$('.va-dd-wrapper').perfectScrollbar({
+		suppressScrollX : true
+	});
+	$('.va-dd-wrapper').perfectScrollbar('update');
+	
 	//social media urls
 	loadSocialMediaUrlInSettingsPage();
 	
