@@ -361,6 +361,7 @@ public interface CommonConstants
     public static final String LAST_NAME_REGEX = "[a-zA-Z0-9 ]+";
     public static final String FINDAPRO_FIRST_NAME_REGEX = "^[a-zA-Z]{2,}$";
     public static final String FINDAPRO_LAST_NAME_REGEX = "^[a-zA-Z]{2,}$";
+    public static final String URL_REGEX = "^(http(s)?:\\/\\/)?([\\da-z\\.-]+)\\.([a-z\\.]{2,6})([\\/\\w \\.-]*)*\\/?$";
 
     /**
      * Solr document related constants
@@ -589,8 +590,8 @@ public interface CommonConstants
     public static final String HEADER_REGISTRATION_DATE = "Registation Date";
 
     // Constants for Survey Results Report
-    public static final String HEADER_AGENT_FIRST_NAME = "Agent First Name";
-    public static final String HEADER_AGENT_LAST_NAME = "Agent Last Name";
+    public static final String HEADER_AGENT_FIRST_NAME = "User First Name";
+    public static final String HEADER_AGENT_LAST_NAME = "User Last Name";
     public static final String HEADER_CUSTOMER_FIRST_NAME = "Customer First Name";
     public static final String HEADER_CUSTOMER_LAST_NAME = "Customer Last Name";
     public static final String HEADER_SURVEY_SENT_DATE = "Survey Sent";

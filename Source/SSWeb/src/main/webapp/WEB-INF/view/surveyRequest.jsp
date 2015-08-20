@@ -81,7 +81,7 @@
 				
 				var agentEmail = $('#req-prof-container').attr("data-agent-email");
 				if(agentEmail.toUpperCase() == customerEmail.toUpperCase()){
-					$('#overlay-toast').html('Agents can not take survey for themselves!');
+					$('#overlay-toast').html('Users can not take survey for themselves!');
 					showToast();
 					return;
 				}

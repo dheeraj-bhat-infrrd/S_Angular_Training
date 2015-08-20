@@ -38,6 +38,15 @@ body {
 	font-size: 13px;
 }
 
+input[type='number'] {
+    -moz-appearance:textfield;
+}
+
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+}
+
 input,textarea {
 	outline: none;
 	resize: none !important;
@@ -1739,6 +1748,7 @@ button.paypal.is-active {
 
 .icn-gplus {
 	background: url(../images/gplus.png) no-repeat center;
+	border:0px;
 }
 
 .icn-tweet {
@@ -3835,6 +3845,7 @@ img.prof-image {
 	text-align: left;
 	top: 50px;
 	right: 5px;
+	max-height: 270px;
 }
 
 .pe-dd-item {
@@ -4099,14 +4110,19 @@ img.prof-image {
 	font-size: 13px;
 	text-transform: initial;
 }
+
 .dash-btn-dl-sd-admin {
+	clear: both;
+	float: right;
+	margin-right: 10px;
 	color: #009FE0;
 	border-radius: 3px;
 	line-height: 32px;
-	margin-top: 6px;
 	border: 1px solid #009FE0;
 	height: 32px;
-	width: 410px;
+	width: 500px;
+	max-width: 90%;
+	max-width: calc(100% - 20px);
 	text-align: center;
 	font-size: 13px;
 	text-transform: initial;
@@ -6812,6 +6828,7 @@ a.sq-btn-post-social:hover, a.sq-btn-post-social:visited {
     padding-right: 10px;
     width: 350px;
     z-index: 9;
+    padding-bottom: 20px;
 }
 
 .agent-dropdown-cont {
@@ -6819,10 +6836,12 @@ a.sq-btn-post-social:hover, a.sq-btn-post-social:visited {
 }
 
 .agent-dropdown-item {
-    line-height: 40px;
-    padding-left: 10px;
-    background-color: #fff;
-    cursor: pointer;
+	padding: 10px 0;
+	line-height: 20px;
+	padding-left: 10px;
+	background-color: #fff;
+	cursor: pointer;
+	word-break: break-all;
 }
 
 .agent-dropdown-item:hover {
@@ -6915,7 +6934,7 @@ a.sq-btn-post-social:hover, a.sq-btn-post-social:visited {
 .dash-download-sel-item {
 	background-color: #fff;
 	height: 30px;
-	width: 180px;
+	width: 45%;
 	border: none;
 	border-right: 1px solid #dcdcdc;
 	outline: none;
@@ -7101,9 +7120,39 @@ label.fil-label {
 }
 
 .paginate-buttons-survey {
-	width: 100px;
+	width: 200px;
 	margin: 0 auto;
-	padding: 20px 0;
+	padding: 15px 0 0;
+	line-height: 20px;
+}
+
+.sur-paginate-btn {
+	width: 45px;
+	text-align: center;
+}
+
+.paginate-total-pages {
+	width: 30px;
+	display: inline-block;
+	text-align: center;
+}
+
+.sel-page {
+	width: 35px;
+	padding: 0 5px;
+	height: 20px;
+	line-height: normal;
+	border: 1px solid #e7e7e7;
+	border-radius: 3px;
+}
+
+.paginate-sel-box {
+	width: 110px;
+	padding: 0 10px;
+}
+
+span.paginate-divider {
+	padding: 0 6px;
 }
 
 .sur-icn-checkbox {

@@ -148,10 +148,14 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
     @Value ( "${APPLICATION_BASE_URL}")
     private String applicationBaseUrl;
 
+    @Value ( "${FB_CLIENT_ID}")
+    private String facebookAppId;
+    
     @Value ( "${ENABLE_KAFKA}")
     private String enableKafka;
 
-
+    @Value ( "${GOOGLE_API_KEY}")
+    private String googlePlusId;
     @Override
     public void afterPropertiesSet() throws Exception
     {
@@ -1148,6 +1152,13 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
         OrganizationUnitSettings companySettings = organizationUnitSettingsDao.fetchOrganizationUnitSettingsById( companyId,
             MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION );
 
+        //Check if unit settings or company settings have any tokens
+        //if company social token and entity tokens are null return null
+        if(unitSettings.getSocialMediaTokens() == null && companySettings.getSocialMediaTokens() == null) {
+        	return null;
+        }
+        
+        
         // Aggregate urls
         SocialMediaTokens entityTokens = validateSocialMediaTokens( unitSettings );
 
@@ -1849,8 +1860,8 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 
         String profileImageUrl = organizationUnitSettings.getProfileImageUrl();
 
-        if ( ( profileImageUrl == null || profileImageUrl.trim().isEmpty() ) && linkedInProfileData.getPictureUrl() != null ) {
-            profileImageUrl = linkedInProfileData.getPictureUrl();
+        if ( ( profileImageUrl == null || profileImageUrl.trim().isEmpty() ) && linkedInProfileData.getPictureUrls() != null && linkedInProfileData.getPictureUrls().get_total() > 0 ) {
+            profileImageUrl = linkedInProfileData.getPictureUrls().getValues().get(0);
             organizationUnitSettingsDao.updateParticularKeyOrganizationUnitSettings(
                 MongoOrganizationUnitSettingDaoImpl.KEY_PROFILE_IMAGE, profileImageUrl, organizationUnitSettings,
                 collectionName );
@@ -1916,7 +1927,8 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
     {
         String profileUrl;
         String baseProfileUrl = applicationBaseUrl + CommonConstants.AGENT_PROFILE_FIXED_URL;
-
+        String facebookShareUrl = "app_id="+facebookAppId;
+        String googleApiKey = googlePlusId;
         if ( reviews != null && !reviews.isEmpty() ) {
             for ( SurveyDetails review : reviews ) {
 
@@ -1927,6 +1939,8 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
                     if ( documents != null && !documents.isEmpty() ) {
                         profileUrl = (String) documents.iterator().next().getProfileUrl();
                         review.setCompleteProfileUrl( baseProfileUrl + profileUrl );
+                        review.setGoogleApi(googleApiKey);
+                        review.setFaceBookShareUrl(facebookShareUrl);
                     }
                 } catch ( InvalidInputException | SolrException e ) {
                     LOG.error( "Exception caught in setAgentProfileUrlForReview() for agent : " + review.getAgentName()
