@@ -318,7 +318,7 @@ public interface EmailServices {
 			throws InvalidInputException, UndeliveredEmailException;
 
 	public void sendSurveyReminderMail(String recipientMailId, String subject,
-			String mailBody) throws InvalidInputException,
+			String mailBody, String senderName, String senderEmailId) throws InvalidInputException,
 			UndeliveredEmailException;
 
 	public void sendDefaultSurveyInvitationMail(String recipientMailId,
