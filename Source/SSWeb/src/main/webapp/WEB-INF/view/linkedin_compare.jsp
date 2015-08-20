@@ -244,7 +244,7 @@ $(document).ready(function() {
 	}).autocomplete("instance")._renderItem = function(ul, item) {
 		return $("<li>").append(item.label).appendTo(ul);
 	};
-	$("#com-country").keydown(function(e){
+	/* $("#com-country").keydown(function(e){
  	   if( e.keyCode != $.ui.keyCode.TAB) return; 
  	    
    	   e.keyCode = $.ui.keyCode.DOWN;
@@ -252,7 +252,7 @@ $(document).ready(function() {
 
    	   e.keyCode = $.ui.keyCode.ENTER;
    	   $(this).trigger(e);
-   	});
+   	}); */
 });
 
 // Profile image upload
