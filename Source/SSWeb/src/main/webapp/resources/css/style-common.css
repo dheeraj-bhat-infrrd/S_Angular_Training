@@ -3845,6 +3845,7 @@ img.prof-image {
 	text-align: left;
 	top: 50px;
 	right: 5px;
+	max-height: 270px;
 }
 
 .pe-dd-item {
