@@ -1,5 +1,6 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
-<!DOCTYPE">
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+<!DOCTYPE>
 <html>
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
@@ -18,6 +19,12 @@
 	<link rel="stylesheet" href="${initParam.resourcesPath}/resources/css/style-resp-1.1.css">
 	<script src='//www.google.com/recaptcha/api.js'></script>
 </head>
+
+<c:set var="user" value="${sessionScope.SPRING_SECURITY_CONTEXT.authentication.principal}" />
+
+<c:if test="${not empty user }">
+	<c:redirect url="/landing.do"></c:redirect>
+</c:if>
 
 <body class="index-body">
 	<div class="body-wrapper">
@@ -207,7 +214,7 @@
 <script src="${initParam.resourcesPath}/resources/js/index.js"></script>
 <script>
 $(document).ready(function(){
-	$.ajax({
+	/* $.ajax({
 		url : "./redirectifexistsactivesession.do",
 		type : "GET",
 		dataType : "html",
@@ -220,7 +227,7 @@ $(document).ready(function(){
 		error : function(e) {
 			redirectErrorpage();
 		}
-	});
+	}); */
 	
 	var captchaText=true;
 	resizeFunc();
