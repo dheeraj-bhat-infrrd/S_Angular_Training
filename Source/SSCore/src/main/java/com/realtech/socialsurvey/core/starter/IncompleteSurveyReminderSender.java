@@ -82,7 +82,7 @@ public class IncompleteSurveyReminderSender extends QuartzJobBean
                             sendEmail( emailServices, organizationManagementService, userManagementService, survey,
                                 company.getCompanyId(), reminder );
                             surveyHandler.markSurveyAsSent( survey );
-                            surveyHandler.updateReminderCount( survey.getSurveyPreIntitiationId(), reminder );
+                            surveyHandler.updateReminderCount( survey.getSurveyPreIntitiationId() , reminder);
                         } catch ( InvalidInputException e ) {
                             LOG.error(
                                 "InvalidInputException caught in executeInternal() method of IncompleteSurveyReminderSender. Nested exception is ",
@@ -195,8 +195,7 @@ public class IncompleteSurveyReminderSender extends QuartzJobBean
             }
 
             try {
-                emailServices.sendSurveyReminderMail( survey.getCustomerEmailId(), mailSubject, mailBody,
-                    agentName, user.getEmailId() );
+                emailServices.sendSurveyReminderMail( survey.getCustomerEmailId(), mailSubject, mailBody );
             } catch ( InvalidInputException | UndeliveredEmailException e ) {
                 LOG.error( "Exception caught while sending mail to " + survey.getCustomerEmailId() + " .Nested exception is ",
                     e );
