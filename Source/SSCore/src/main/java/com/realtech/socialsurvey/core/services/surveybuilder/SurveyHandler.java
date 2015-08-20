@@ -107,4 +107,6 @@ public interface SurveyHandler {
 	public Map<String, Integer> getReminderInformationForCompany(long companyId);
 
 	public Boolean checkIfTimeIntervalHasExpired(long lastRemindedTime, long systemTime, int reminderInterval);
+	
+	public SurveyPreInitiation getPreInitiatedSurveyById(long surveyPreInitiationId) throws NoRecordsFetchedException;
 }
