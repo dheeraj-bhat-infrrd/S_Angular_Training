@@ -726,6 +726,7 @@ $(document).on('click', '#wc-send-survey', function() {
 	callAjaxPostWithPayloadData("./sendmultiplesurveyinvites.do", function(data) {
 		$('#overlay-toast').html('Survey request sent successfully!');
 		showToast();
+		$('body').removeClass('body-no-scroll');
 	}, payload);
 });
 
