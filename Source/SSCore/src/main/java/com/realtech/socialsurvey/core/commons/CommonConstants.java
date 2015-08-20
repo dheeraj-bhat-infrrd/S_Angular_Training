@@ -361,6 +361,7 @@ public interface CommonConstants
     public static final String LAST_NAME_REGEX = "[a-zA-Z0-9 ]+";
     public static final String FINDAPRO_FIRST_NAME_REGEX = "^[a-zA-Z]{2,}$";
     public static final String FINDAPRO_LAST_NAME_REGEX = "^[a-zA-Z]{2,}$";
+    public static final String URL_REGEX = "^(http(s)?:\\/\\/)?([\\da-z\\.-]+)\\.([a-z\\.]{2,6})([\\/\\w \\.-]*)*\\/?$";
 
     /**
      * Solr document related constants

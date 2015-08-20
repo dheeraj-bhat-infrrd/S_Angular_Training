@@ -212,6 +212,13 @@
 
 <script>
 $(document).ready(function() {
+	
+	$('.va-dd-wrapper').perfectScrollbar({
+		suppressScrollX : true
+	});
+	
+	$('.va-dd-wrapper').perfectScrollbar('update');
+	
 	hideOverlay();
 	$(document).attr("title", "Dashboard");
 	
