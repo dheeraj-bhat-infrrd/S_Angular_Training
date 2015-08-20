@@ -4444,7 +4444,7 @@ function showProfileLink(source, profileUrl){
 function adjustTextContainerWidthOnResize() {
 	var parentWidth = $('.ctnt-list-item').width();
 	var imgWidth = $('.ctnt-list-item .ctnt-list-item-img').width();
-	var textContainerWidth = parentWidth - imgWidth - 20;
+	var textContainerWidth = parentWidth - imgWidth - 35;
 	$('.ctnt-list-item .ctnt-list-item-txt-wrap').width(textContainerWidth);
 }
 
@@ -7595,6 +7595,15 @@ function getIncompleteSurveyCount(){
 	};
 	callAjaxGetWithPayloadData("./fetchdashboardincompletesurveycount.do", function(data) {
 		$('#icn-sur-popup-cont').attr("data-total", data);
+		var totalCount = parseInt(data);
+		var batchSize = parseInt($('#icn-sur-popup-cont').attr("data-batch")); 
+		var numPages = 0;
+		if(parseInt( totalCount % batchSize) == 0) {
+			numPages = parseInt( totalCount / batchSize);
+		}else {
+			numPages = parseInt(parseInt( totalCount / batchSize) + 1);
+		}
+		$('#paginate-total-pages').html(numPages);
 		var incompleteSurveystartIndex = $('#icn-sur-popup-cont').attr("data-start");
 		paintIncompleteSurveyListPopupResults(incompleteSurveystartIndex);
 	}, payload, true);
@@ -7621,6 +7630,42 @@ $(document).on('click', '#sur-previous.paginate-button',function(){
 	paintIncompleteSurveyListPopupResults(incompleteSurveyStartIndex);
 });
 
+
+$(document).on('keypress', '#sel-page', function(e) {
+	//if the letter is not digit then don't type anything
+	if (e.which != 8 && e.which != 0 && (e.which < 48 || e.which > 57)) {
+		return false;
+	}
+	var batchSize = parseInt($('#icn-sur-popup-cont').attr("data-batch"));
+	var total = parseInt($('#icn-sur-popup-cont').attr("data-total"));
+	var prevPageNoVal = parseInt($('#sel-page').val());
+	if(prevPageNoVal == NaN) {
+		prevPageNoVal = 0;
+	}
+	var pageNo = prevPageNoVal + String.fromCharCode(e.which);
+	pageNo = parseInt(pageNo);
+	var incompleteSurveyStartIndex = parseInt(pageNo-1) * batchSize;
+	if(incompleteSurveyStartIndex >= total || incompleteSurveyStartIndex <= 0) {
+		return false;
+	}
+});
+
+$(document).on('change', '#sel-page', function(e) {
+	delay(function() {
+		$('#sel-page').blur();
+		var pageNo = parseInt($('#sel-page').val());
+		if(pageNo == NaN || pageNo <= 0) {
+			return false;
+		}
+		var incompleteSurveyStartIndex = 0;
+		var batchSize = parseInt($('#icn-sur-popup-cont').attr("data-batch"));
+		incompleteSurveyStartIndex = parseInt(pageNo-1) * batchSize;
+		
+		$('#icn-sur-popup-cont').attr("data-start", incompleteSurveyStartIndex);
+		paintIncompleteSurveyListPopupResults(incompleteSurveyStartIndex);
+	}, 200);
+});
+
 function showIncompleteSurveyListPopup() {
 	var startIndex = $('#icn-sur-popup-cont').attr("data-start");
 	if(parseInt(startIndex) == 0){
@@ -7632,6 +7677,8 @@ function showIncompleteSurveyListPopup() {
 }
 
 function paintIncompleteSurveyListPopupResults(incompleteSurveystartIndex){
+	var incompleteSurveyBatchSize = parseInt($('#icn-sur-popup-cont').attr("data-batch"));
+	$('#sel-page').val((incompleteSurveystartIndex / incompleteSurveyBatchSize) + 1);
 	var payload = {
 		"columnName" : colName,
 		"columnValue" : colValue,
@@ -7681,12 +7728,25 @@ function removeMultipleIncompleteSurveyRequest(incompleteSurveyIds) {
 			var totalIncSurveys = $('#icn-sur-popup-cont').attr('data-total');
 			totalIncSurveys = totalIncSurveys - incompleteSurveyIds.length;
 			$('#icn-sur-popup-cont').attr('data-total', totalIncSurveys);
+			var batchSize = parseInt($('#icn-sur-popup-cont').attr('data-batch'));
+			var newTotalPages = 0;
+			if(totalIncSurveys % batchSize == 0) {
+				newTotalPages =  totalIncSurveys / batchSize;
+			} else {
+				newTotalPages =  parseInt(totalIncSurveys / batchSize) + 1;
+			}
+			$('#paginate-total-pages').html(newTotalPages);
 			for (var i=0; i < incompleteSurveyIds.length; i++) {
 				$('div[data-iden="sur-pre-'+incompleteSurveyIds[i]+'"]').remove();
 			}
 			
 			$('#overlay-toast').html('Survey reminder request deleted successfully');
 			showToast();
+			
+			//update the page
+			var incompleteSurveyStartIndex = parseInt($('#icn-sur-popup-cont').attr("data-start"));
+			paintIncompleteSurveyListPopupResults(incompleteSurveyStartIndex);
+			
 			$('#del-mult-sur-icn').removeClass('mult-sur-icn-active');
 			$('#resend-mult-sur-icn').removeClass('mult-sur-icn-active');
 		}
