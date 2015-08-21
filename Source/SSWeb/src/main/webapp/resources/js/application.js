@@ -560,11 +560,12 @@ function showIncompleteSurvey(columnName, columnValue) {
 }
 
 $(document).on('click', '.dash-lp-rt-img', function() {
-	var agentId = $(this).data("agentid");
+	var surveyPreInitiationId = $(this).data("surveypreinitiationid");
+	/*var agentId = $(this).data("agentid");
 	var agentName = $(this).data("agentname");
-	var customerEmail = $(this).data("custemail");
+	var customerEmail = $(this).data("custemail");*/
 	var customerName = $(this).data("custname");
-	sendSurveyReminderMail(agentId, agentName, customerEmail, customerName);
+	sendSurveyReminderMail(surveyPreInitiationId, customerName);
 });
 
 function getReviewsCountAndShowReviews(columnName, columnValue) {
@@ -935,13 +936,10 @@ function searchBranchRegionOrAgent(searchKeyword, flow) {
 	}, payload, false);
 }
 
-function sendSurveyReminderMail(agentId, agentName, customerEmail, customerName) {
+function sendSurveyReminderMail(surveyPreInitiationId, customerName) {
 	var success = false;
 	var payload = {
-		"agentName" : agentName,
-		"customerEmail" : customerEmail,
-		"customerName" : customerName,
-		"agentId" : agentId
+		"surveyPreInitiationId" : surveyPreInitiationId
 	};
 	$.ajax({
 		url : "./sendsurveyremindermail.do",

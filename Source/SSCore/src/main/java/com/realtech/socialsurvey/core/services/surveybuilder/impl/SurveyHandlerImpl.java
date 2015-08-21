@@ -14,7 +14,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
@@ -24,7 +23,6 @@ import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
-
 import com.google.gson.Gson;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.dao.OrganizationUnitSettingsDao;
@@ -991,5 +989,19 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
             return false;
         }
     }
+    
+	@Override
+	@Transactional
+	public SurveyPreInitiation getPreInitiatedSurveyById(long surveyPreInitiationId) throws NoRecordsFetchedException {
+		LOG.debug("Method getPreInitiatedSurveyById() called");
+
+		SurveyPreInitiation surveyPreInitiation = surveyPreInitiationDao.findById(SurveyPreInitiation.class, surveyPreInitiationId);
+
+		if (surveyPreInitiation == null) {
+			throw new NoRecordsFetchedException("No records found for surveyPreInitiation with id : " + surveyPreInitiationId);
+		}
+
+		return surveyPreInitiation;
+	}
 }
 // JIRA SS-119 by RM-05:EOC
