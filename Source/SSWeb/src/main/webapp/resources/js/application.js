@@ -312,10 +312,10 @@ function paintDashboard(profileMasterId, newProfileName, newProfileValue, typeoO
 		showAgentFlow(newProfileName, newProfileValue);
 	}
 
-	$('#dsh-inc-dwnld').click(function() {
+	/*$('#dsh-inc-dwnld').click(function() {
 		window.location.href = "./downloaddashboardincompletesurvey.do?columnName="
 				+ colName + "&columnValue=" + colValue;
-	});
+	});*/
 
 	/*$('#dsh-dwnld-btn').click(function() {
 		var startDate = $('#indv-dsh-start-date').val();
