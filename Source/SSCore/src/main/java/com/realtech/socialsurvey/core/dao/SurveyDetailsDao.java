@@ -131,5 +131,5 @@ public interface SurveyDetailsDao
     public long noOfPreInitiatedSurveys( String columnName, long columnValue, Date startDate, Date endDate );
 
 
-    public SurveyDetails getSurveyBySourceSourceId( String surveySourceId );
+    public SurveyDetails getSurveyBySourceSourceIdAndMongoCollection( String surveySourceId, long iden, String collectionName );
 }

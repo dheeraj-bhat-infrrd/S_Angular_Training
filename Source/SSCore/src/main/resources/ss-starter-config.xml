@@ -208,7 +208,6 @@
 			<map>
 				<entry key="zws-id" value="${ZILLOW_WEBSERVICE_ID}" />
 				<entry key="zillowIntegrationApiBuilder" value-ref="zillowIntegrationApiBuilder" />
-				<entry key="userManagementService" value-ref="userManagementService" />
 				<entry key="organizationManagementService" value-ref="organizationManagementService" />
 				<entry key="surveyHandler" value-ref="surveyHandler" />
 			</map>
