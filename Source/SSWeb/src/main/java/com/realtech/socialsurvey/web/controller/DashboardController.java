@@ -931,12 +931,9 @@ public class DashboardController
     }
 
 
-    /**
-     * Method to resend multiple pre intiated survey reminders
-     * 
-     * @param model
-     * @param request
-     * @return
+    /*
+     * Method to send a reminder email to the customer if not completed survey
+     * already.
      */
     @ResponseBody
 	@RequestMapping(value = "/sendsurveyremindermail")
@@ -1023,6 +1020,90 @@ public class DashboardController
 		LOG.info("Method to send email to remind customer for survey sendReminderMailForSurvey() finished.");
 		return new Gson().toJson("success");
 	}
+
+
+    /**
+     * Method to resend multiple pre intiated survey reminders
+     * 
+     * @param model
+     * @param request
+     * @return
+     */
+    @ResponseBody
+    @RequestMapping ( value = "/resendmultipleincompletesurveyrequest")
+    public String sendMultipleSurveyReminders( Model model, HttpServletRequest request )
+    {
+        LOG.info( "Method sendMultipleSurveyReminders() called" );
+
+        String surveysSelectedStr = request.getParameter( "surveysSelected" );
+        String[] surveysSelectedArray = surveysSelectedStr.split( "," );
+        try {
+            for ( String incompleteSurveyIdStr : surveysSelectedArray ) {
+                try {
+                    long incompleteSurveyId = Long.parseLong( incompleteSurveyIdStr );
+                    SurveyPreInitiation survey = surveyHandler.getPreInitiatedSurvey( incompleteSurveyId );
+
+                    long agentId = survey.getAgentId();
+                    String customerEmail = survey.getCustomerEmailId();
+                    String custFirstName = survey.getCustomerFirstName();
+                    String custLastName = "";
+                    if ( survey.getCustomerLastName() != null ) {
+                        custLastName = survey.getCustomerLastName();
+                    }
+
+                    String surveyLink = "";
+                    if ( survey != null ) {
+                        surveyLink = surveyHandler.getSurveyUrl( agentId, customerEmail,
+                            surveyHandler.composeLink( agentId, customerEmail, custFirstName, custLastName ) );
+                    }
+
+                    AgentSettings agentSettings = userManagementService.getUserSettings( agentId );
+                    String agentName = "";
+                    String agentTitle = "";
+                    if ( agentSettings.getContact_details() != null && agentSettings.getContact_details().getTitle() != null ) {
+                        agentName = agentSettings.getContact_details().getName();
+                        agentTitle = agentSettings.getContact_details().getTitle();
+                    }
+
+                    String agentPhone = "";
+                    if ( agentSettings.getContact_details() != null
+                        && agentSettings.getContact_details().getContact_numbers() != null
+                        && agentSettings.getContact_details().getContact_numbers().getWork() != null ) {
+                        agentPhone = agentSettings.getContact_details().getContact_numbers().getWork();
+                    }
+
+                    User user = userManagementService.getUserByUserId( agentId );
+                    String companyName = user.getCompany().getCompany();
+
+                    if ( enableKafka.equals( CommonConstants.YES ) ) {
+                        emailServices.queueSurveyReminderMail( customerEmail, custFirstName, agentName, surveyLink, agentPhone,
+                            agentTitle, companyName );
+                    } else {
+                        // TODO: add call to emailservice method.
+                        OrganizationUnitSettings companySettings = null;
+                        try {
+                            companySettings = organizationManagementService.getCompanySettings( user.getCompany()
+                                .getCompanyId() );
+                        } catch ( InvalidInputException e ) {
+                            LOG.error( "InvalidInputException occured while trying to fetch company settings." );
+                        }
+                        emailServices.sendManualSurveyReminderMail( companySettings, user, agentName, agentPhone, agentTitle,
+                            companyName, survey, surveyLink );
+                    }
+
+                    surveyHandler.updateReminderCount( survey.getSurveyPreIntitiationId(), true );
+                } catch ( NumberFormatException e ) {
+                    throw new NonFatalException( "Number format exception occured while parsing incomplete survey id : "
+                        + incompleteSurveyIdStr, e );
+                }
+            }
+        } catch ( NonFatalException nonFatalException ) {
+            LOG.error( "Nonfatal exception occured in method sendMultipleSurveyReminders, reason : "
+                + nonFatalException.getMessage() );
+            return CommonConstants.ERROR;
+        }
+        return CommonConstants.SUCCESS_ATTRIBUTE;
+    }
 
 
     /*
