@@ -145,9 +145,6 @@
 			<c:choose>
 				<c:when test="${profilemasterid == 4 || accounttype == 'INDIVIDUAL' }">
 					<div class="float-right dash-btn-dl-sd dash-btn-dl-sd-admin">
-						<%-- <div id="dsh-dwnld-btn" class="dsh-dwnld-btn float-left cursor-pointer">
-							<spring:message code="label.downloadsurveydata.key" />
-						</div> --%>
 						<select id="download-survey-reports" class="float-left dash-download-sel-item">
 							<option value=2 data-report="survey-results"><spring:message code="label.downloadsurveydata.two.key" /></option>
 							<option value=4 data-report="incomplete-survey"><spring:message code="label.incompletesurveydata.key" /></option>
@@ -168,9 +165,9 @@
 							<option value=3 data-report="social-monitor"><spring:message code="label.downloadsurveydata.three.key" /></option>
 							<option value=4 data-report="incomplete-survey"><spring:message code="label.incompletesurveydata.key" /></option>
 						</select>
-						<input id="indv-dsh-start-date" class="dsh-date-picker" placeholder="<spring:message code="label.startdate.key" />">
+						<input id="dsh-start-date" class="dsh-date-picker" placeholder="<spring:message code="label.startdate.key" />">
 						<span>-</span>
-						<input id="indv-dsh-end-date" class="dsh-date-picker" placeholder="<spring:message code="label.enddate.key" />">
+						<input id="dsh-start-date" class="dsh-date-picker" placeholder="<spring:message code="label.enddate.key" />">
 						<div id="dsh-dwnld-report-btn" class="dash-down-go-button float-right cursor-pointer">
 							<spring:message code="label.downloadsurveydata.key.click" />
 						</div>
