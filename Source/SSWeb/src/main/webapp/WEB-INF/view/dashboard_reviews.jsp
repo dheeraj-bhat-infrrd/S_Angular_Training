@@ -114,11 +114,13 @@
 					<div class="float-right ppl-header-right">
 						<div class="st-rating-wrapper maring-0 clearfix review-ratings float-right" data-rating="${feedback.score}">
 						</div>
-						<div class="report-resend-icn-container clearfix float-right">
-							<div class="report-abuse-txt report-txt">Report</div>
-							|
-							<div class="restart-survey-mail-txt report-txt">Resend</div>
-						</div>
+						<c:if test="${feedback.source != 'Zillow'}">
+							<div class="report-resend-icn-container clearfix float-right">
+								<div class="report-abuse-txt report-txt">Report</div>
+								|
+								<div class="restart-survey-mail-txt report-txt">Resend</div>
+							</div>
+						</c:if>
 					</div>
 				</div>
 				<div class="ppl-content">${feedback.review}</div>
