@@ -296,12 +296,12 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
 
     @Override
     @Transactional
-    public SurveyDetails getSurveyDetailsBySourceId( String surveySourceId )
+    public SurveyDetails getSurveyDetailsBySourceIdAndMongoCollection( String surveySourceId, long iden, String collectionName )
     {
         LOG.debug( "Inside method getSurveyDetailsBySourceId" );
         SurveyDetails surveyDetails = null;
         if ( surveySourceId != null ) {
-            surveyDetails = surveyDetailsDao.getSurveyBySourceSourceId( surveySourceId );
+            surveyDetails = surveyDetailsDao.getSurveyBySourceSourceIdAndMongoCollection( surveySourceId, iden, collectionName );
         }
         return surveyDetails;
     }
