@@ -1423,9 +1423,19 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
 
 
     @Override
-    public SurveyDetails getSurveyBySourceSourceId( String surveySourceId )
+    public SurveyDetails getSurveyBySourceSourceIdAndMongoCollection( String surveySourceId, long iden, String collectionName )
     {
         Query query = new Query( Criteria.where( CommonConstants.SURVEY_SOURCE_ID_COLUMN ).is( surveySourceId ) );
+
+        if ( collectionName.equalsIgnoreCase( MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION ) ) {
+            query.addCriteria( Criteria.where( CommonConstants.COMPANY_ID_COLUMN ).is( iden ) );
+        } else if ( collectionName.equalsIgnoreCase( MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION ) ) {
+            query.addCriteria( Criteria.where( CommonConstants.REGION_ID_COLUMN ).is( iden ) );
+        } else if ( collectionName.equalsIgnoreCase( MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION ) ) {
+            query.addCriteria( Criteria.where( CommonConstants.BRANCH_ID_COLUMN ).is( iden ) );
+        } else if ( collectionName.equalsIgnoreCase( MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION ) ) {
+            query.addCriteria( Criteria.where( CommonConstants.AGENT_ID_COLUMN ).is( iden ) );
+        }
         List<SurveyDetails> surveys = mongoTemplate.find( query, SurveyDetails.class, SURVEY_DETAILS_COLLECTION );
         if ( surveys == null || surveys.size() == 0 )
             return null;
