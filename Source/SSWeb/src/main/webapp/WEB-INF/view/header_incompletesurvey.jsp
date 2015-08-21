@@ -20,6 +20,7 @@
 				title="Cancel Survey Reminder"
 				onclick="removeIncompleteSurveyRequest(${survey.surveyPreIntitiationId })"></div> --%>
 			<div title="Resend Survey"
+				data-surveypreinitiationid="${survey.surveyPreIntitiationId }"
 				data-custname="${survey.customerFirstName} ${survey.customerLastName}"
 				data-agentid="${survey.agentId}"
 				data-agentname="${survey.agentName}"

@@ -10,8 +10,9 @@
 					</div>
 			</div>
 			<div
+				data-surveypreinitiationid="${survey.surveyPreIntitiationId }"
 				data-custname="${survey.customerFirstName} ${survey.customerLastName}"
-				data-agentid="${survey.agentId}" data-agentname="${agentName}"
+				data-agentid="${survey.agentId}" data-agentname="${survey.agentName}"
 				data-custemail="${survey.customerEmailId}"
 				class="float-right dash-lp-rt-img cursor-pointer"
 				title="Resend Survey"></div>
