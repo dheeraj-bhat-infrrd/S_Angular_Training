@@ -459,14 +459,13 @@
 		$('.va-dd-wrapper').perfectScrollbar({
 			suppressScrollX : true
 		});
-		
 		$('.va-dd-wrapper').perfectScrollbar('update');
 		
 		hideOverlay();
 		countPosts();
 		$(document).attr("title", "Profile Settings");
 		
-		if ($("#pe-dd-wrapper-profiles > div").length <= 1) {
+		if ($("#pe-dd-wrapper-profiles").children('.pe-dd-item').length <= 1) {
 			$('#pe-dd-wrapper').remove();
 		}
 		

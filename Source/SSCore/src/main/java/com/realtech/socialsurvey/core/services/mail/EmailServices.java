@@ -8,6 +8,7 @@ import com.realtech.socialsurvey.core.exception.InvalidInputException;
 /**
  * Services for sending mails via application
  */
+
 public interface EmailServices {
 	/**
 	 * Queues the registration invite mail
@@ -318,7 +319,7 @@ public interface EmailServices {
 			throws InvalidInputException, UndeliveredEmailException;
 
 	public void sendSurveyReminderMail(String recipientMailId, String subject,
-			String mailBody) throws InvalidInputException,
+			String mailBody, String senderName, String senderEmailId) throws InvalidInputException,
 			UndeliveredEmailException;
 
 	public void sendDefaultSurveyInvitationMail(String recipientMailId,
@@ -394,4 +395,5 @@ public interface EmailServices {
 			OrganizationUnitSettings companySettings, User user,
 			String agentName, String agentPhone, String agentTitle,
 			String companyName, SurveyPreInitiation survey, String surveyLink);
+
 }
