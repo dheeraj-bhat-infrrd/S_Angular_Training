@@ -96,7 +96,7 @@ if(document.getElementById('fb_'+loop) != null)
 						<div class="ppl-head-1">${reviewItem.customerFirstName}
 							${reviewItem.customerLastName}</div>
 						<div class="ppl-head-2"
-							data-modifiedon="<fmt:formatDate type="date" pattern="yyyy-MM-dd-hh-mm-ss"
+							data-modifiedon="<fmt:formatDate type="date" pattern="yyyy-MM-dd-H-mm-ss"
 							value="${reviewItem.modifiedOn}" />"></div>
 					</div>
 					<div class="float-right ppl-header-right">
