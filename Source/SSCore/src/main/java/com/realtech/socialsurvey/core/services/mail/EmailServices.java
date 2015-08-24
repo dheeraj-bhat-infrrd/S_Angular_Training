@@ -197,8 +197,9 @@ public interface EmailServices {
 
 	public void sendDefaultSurveyReminderMail(String recipientMailId,
 			String displayName, String agentName, String link,
-			String agentPhone, String agentTitle, String companyName)
-			throws InvalidInputException, UndeliveredEmailException;
+			String agentEmailId, String agentPhone, String agentTitle,
+			String companyName) throws InvalidInputException,
+			UndeliveredEmailException;
 
 	/**
 	 * Queues the survey complete admin mail
@@ -319,8 +320,8 @@ public interface EmailServices {
 			throws InvalidInputException, UndeliveredEmailException;
 
 	public void sendSurveyReminderMail(String recipientMailId, String subject,
-			String mailBody, String senderName, String senderEmailId) throws InvalidInputException,
-			UndeliveredEmailException;
+			String mailBody, String senderName, String senderEmailId)
+			throws InvalidInputException, UndeliveredEmailException;
 
 	public void sendDefaultSurveyInvitationMail(String recipientMailId,
 			String displayName, String agentName, String link,
@@ -393,7 +394,8 @@ public interface EmailServices {
 	 */
 	public void sendManualSurveyReminderMail(
 			OrganizationUnitSettings companySettings, User user,
-			String agentName, String agentPhone, String agentTitle,
-			String companyName, SurveyPreInitiation survey, String surveyLink);
+			String agentName, String agentEmailId, String agentPhone,
+			String agentTitle, String companyName, SurveyPreInitiation survey,
+			String surveyLink);
 
 }
