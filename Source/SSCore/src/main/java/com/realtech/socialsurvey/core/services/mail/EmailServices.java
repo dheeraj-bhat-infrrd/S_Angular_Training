@@ -394,7 +394,8 @@ public interface EmailServices {
 	 */
 	public void sendManualSurveyReminderMail(
 			OrganizationUnitSettings companySettings, User user,
-			String agentName, String agentEmailId, String agentPhone, String agentTitle,
-			String companyName, SurveyPreInitiation survey, String surveyLink);
+			String agentName, String agentEmailId, String agentPhone,
+			String agentTitle, String companyName, SurveyPreInitiation survey,
+			String surveyLink);
 
 }
