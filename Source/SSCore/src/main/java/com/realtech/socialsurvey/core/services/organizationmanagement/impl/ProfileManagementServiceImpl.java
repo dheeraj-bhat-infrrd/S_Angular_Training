@@ -1401,6 +1401,38 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
         LOG.info( "Method getIndividualsByRegionId executed successfully" );
         return users;
     }
+    
+	@Override
+	@Transactional
+	public List<AgentSettings> getIndividualsByRegionId(long regionId, int startIndex, int batchSize) throws InvalidInputException,
+			NoRecordsFetchedException {
+		LOG.info("Method getIndividualsByRegionId called for regionId: " + regionId);
+		List<AgentSettings> users = null;
+		if (regionId <= 0l) {
+			throw new InvalidInputException("Region id is not set for getIndividualsByRegionId");
+		}
+		Branch defaultBranch = organizationManagementService.getDefaultBranchForRegion(regionId);
+
+		Map<String, Object> queries = new HashMap<String, Object>();
+		queries.put(CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_ACTIVE);
+		queries.put(CommonConstants.REGION_ID_COLUMN, regionId);
+		queries.put(CommonConstants.BRANCH_ID_COLUMN, defaultBranch.getBranchId());
+		queries.put(CommonConstants.PROFILE_MASTER_COLUMN,
+				userManagementService.getProfilesMasterById(CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID));
+
+		LOG.debug("calling method to fetch user profiles under region :" + regionId);
+		List<UserProfile> userProfiles = userProfileDao.findUserProfilesInBatch( queries, startIndex, batchSize);;
+
+		if (userProfiles != null && !userProfiles.isEmpty()) {
+			LOG.debug("Obtained userProfiles with size : " + userProfiles.size());
+			users = new ArrayList<AgentSettings>();
+			for (UserProfile userProfile : userProfiles) {
+				users.add(organizationUnitSettingsDao.fetchAgentSettingsById(userProfile.getUser().getUserId()));
+			}
+		}
+		LOG.info("Method getIndividualsByRegionId executed successfully");
+		return users;
+	}
 
 
     /**

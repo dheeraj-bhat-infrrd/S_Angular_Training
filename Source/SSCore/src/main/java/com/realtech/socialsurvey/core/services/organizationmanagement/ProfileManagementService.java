@@ -526,4 +526,7 @@ public interface ProfileManagementService
 
 
 	public void addOrUpdateAgentPositions(List<CompanyPositions> companyPositions, AgentSettings agentSettings);
+
+
+	public List<AgentSettings> getIndividualsByRegionId(long regionId, int startIndex, int batchSize) throws InvalidInputException, NoRecordsFetchedException;
 }
