@@ -970,11 +970,14 @@ public class UserManagementController
 		catch (NonFatalException e) {
 			LOG.error("NonFatalException in showCompleteRegistrationPage(). Reason : " + e.getMessage(), e);
 			model.addAttribute("message", messageUtils.getDisplayMessage(e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE));
-			return JspResolver.MESSAGE_HEADER;
+			return   JspResolver.LINK_EXPIRED;
 		}
 
 		return "redirect:/" + JspResolver.COMPLETE_REGISTRATION_PAGE + ".do";
 	}
+	
+	
+	
 	
 	@RequestMapping(value = "/completeregistrationpage")
 	public String initCompleteRegistrationPage() {

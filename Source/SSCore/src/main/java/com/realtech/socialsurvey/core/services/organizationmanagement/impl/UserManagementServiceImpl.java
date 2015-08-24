@@ -541,7 +541,7 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 
         List<User> users = userDao.findByKeyValue( User.class, queries );
         if ( users == null || users.isEmpty() ) {
-            throw new NoRecordsFetchedException( "No users found with the login name : {}", emailId );
+            throw new NoRecordsFetchedException( "No users found with the login name : {}", "USER_LINK_EXPIRED" );
         }
 
         LOG.info( "Method getUserByEmailAndCompany() finished from UserManagementService" );
