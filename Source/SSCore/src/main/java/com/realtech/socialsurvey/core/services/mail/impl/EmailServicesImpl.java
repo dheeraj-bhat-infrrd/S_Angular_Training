@@ -1995,9 +1995,10 @@ public class EmailServicesImpl implements EmailServices {
 	@Override
 	public void sendManualSurveyReminderMail(
 			OrganizationUnitSettings companySettings, User user,
-			String agentName, String agentEmailId, String agentPhone, String agentTitle,
-			String companyName, SurveyPreInitiation survey, String surveyLink) {
-
+			String agentName, String agentEmailId, String agentPhone,
+			String agentTitle, String companyName, SurveyPreInitiation survey,
+			String surveyLink) {
+		LOG.info("Sending manual survey reminder mail.");
 		if (companySettings != null
 				&& companySettings.getMail_content() != null
 				&& companySettings.getMail_content()
@@ -2057,8 +2058,8 @@ public class EmailServicesImpl implements EmailServices {
 		} else {
 			try {
 				sendDefaultSurveyReminderMail(survey.getCustomerEmailId(),
-						survey.getCustomerFirstName(), agentName, agentEmailId, surveyLink,
-						agentPhone, agentTitle, companyName);
+						survey.getCustomerFirstName(), agentName, agentEmailId,
+						surveyLink, agentPhone, agentTitle, companyName);
 			} catch (InvalidInputException | UndeliveredEmailException e) {
 				LOG.error(
 						"Exception caught in IncompleteSurveyReminderSender.main while trying to send reminder mail to "
