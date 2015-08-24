@@ -888,3 +888,9 @@ function hideStateCityRow(parentId, elementId) {
 		return $(this).find('option[disabled]').text();
 	});
 }
+
+function getDateStrToUTC(dateStr) {
+	var dateSplit = dateStr.split("-");
+	var date = convertTimeStampToLocalTimeStamp(new Date(dateSplit[0],parseInt(dateSplit[1]) - 1,dateSplit[2],dateSplit[3],dateSplit[4],dateSplit[5],dateSplit[6]));
+	return date;
+}
