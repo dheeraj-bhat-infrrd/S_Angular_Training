@@ -332,6 +332,10 @@ public class TopicConsumer implements Runnable {
 		String agentName = message.substring(messageParsedIndex + AGENTNAME_MARKER.length());
 		LOG.debug("agentName: " + agentName);
 
+		messageParsedIndex += NAME_MARKER.length() + name.length() + ELEMENTS_DELIMITER.length();
+		String agentEmailId = message.substring(messageParsedIndex + AGENTEMAIL_MARKER.length());
+		LOG.debug("agentEmailId: " + agentEmailId);
+		
 		messageParsedIndex += AGENTNAME_MARKER.length() + agentName.length() + ELEMENTS_DELIMITER.length();
 		String link = message.substring(messageParsedIndex + LINK_MARKER.length());
 		LOG.debug("link: " + link);
@@ -349,7 +353,7 @@ public class TopicConsumer implements Runnable {
 		LOG.debug("companyName: " + companyName);
 
 		LOG.debug("Sending retry exhausted mail");
-		emailServices.sendDefaultSurveyReminderMail(recipient, name, agentName, link, agentPhone, agentTitle, companyName);
+		emailServices.sendDefaultSurveyReminderMail(recipient, name, agentName,  agentEmailId, link, agentPhone, agentTitle, companyName);
 	}
 	
 	private void parseSurveyCompletionAdminMail(String message) throws NonFatalException {
