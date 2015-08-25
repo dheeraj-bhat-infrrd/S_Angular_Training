@@ -240,6 +240,7 @@ public interface CommonConstants
     public static final String FACEBOOK_SOCIAL_SITE = "facebook";
     public static final String TWITTER_SOCIAL_SITE = "twitter";
     public static final String LINKEDIN_SOCIAL_SITE = "linkedin";
+    public static final String ZILLOW_SOCIAL_SITE = "zillow";
     public static final String YELP_SOCIAL_SITE = "yelp";
     public static final String GOOGLE_SOCIAL_SITE = "google";
     public static final String TWITTER_BASE_URL = "www.twitter.com/";

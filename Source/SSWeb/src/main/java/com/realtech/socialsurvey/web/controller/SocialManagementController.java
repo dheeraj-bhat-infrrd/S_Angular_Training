@@ -1595,7 +1595,8 @@ public class SocialManagementController
                 if ( map != null ) {
                     responseMap = (HashMap<String, Object>) map.get( "response" );
                     messageMap = (HashMap<String, Object>) map.get( "message" );
-                    if ( messageMap.get( "code" ) != "0" ) {
+                    String code = (String) messageMap.get( "code" );
+                    if ( !code.equalsIgnoreCase( "0" ) ) {
                         throw new Exception( " Invalid Zillow Details Provided " );
                     }
                     if ( responseMap != null ) {
@@ -1698,12 +1699,17 @@ public class SocialManagementController
 
             } catch ( Exception e ) {
                 session.removeAttribute( CommonConstants.SOCIAL_REQUEST_TOKEN );
+                model.addAttribute( CommonConstants.ERROR, CommonConstants.YES );
                 LOG.error( "Exception while setting zillow profile link. Reason : " + e.getMessage(), e );
                 return JspResolver.SOCIAL_AUTH_MESSAGE;
             }
 
+            session.removeAttribute( CommonConstants.SOCIAL_REQUEST_TOKEN );
+            model.addAttribute( CommonConstants.SUCCESS_ATTRIBUTE, CommonConstants.YES );
+            model.addAttribute( "socialNetwork", "zillow" );
+
         }
-        return JspResolver.HEADER_SURVEY_INVITE_ADMIN;
+        return JspResolver.SOCIAL_AUTH_MESSAGE;
     }
 
 
@@ -1854,6 +1860,9 @@ public class SocialManagementController
                 }
                 if ( tokens.getLinkedInToken() != null && tokens.getLinkedInToken().getLinkedInPageLink() != null ) {
                     model.addAttribute( "linkedinLink", tokens.getLinkedInToken().getLinkedInPageLink() );
+                }
+                if ( tokens.getZillowToken() != null && tokens.getZillowToken().getZillowProfileLink() != null ) {
+                    model.addAttribute( "zillowLink", tokens.getZillowToken().getZillowProfileLink() );
                 }
             }
         } catch ( NonFatalException e ) {
