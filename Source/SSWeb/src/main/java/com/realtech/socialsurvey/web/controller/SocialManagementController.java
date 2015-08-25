@@ -1589,10 +1589,16 @@ public class SocialManagementController
                 }
 
                 Map<String, Object> responseMap = new HashMap<String, Object>();
+                Map<String, Object> messageMap = new HashMap<String, Object>();
                 Map<String, Object> resultMap = new HashMap<String, Object>();
                 Map<String, Object> proInfoMap = new HashMap<String, Object>();
                 if ( map != null ) {
                     responseMap = (HashMap<String, Object>) map.get( "response" );
+                    messageMap = (HashMap<String, Object>) map.get( "message" );
+                    String code = (String) messageMap.get( "code" );
+                    if ( !code.equalsIgnoreCase( "0" ) ) {
+                        throw new Exception( " Invalid Zillow Details Provided " );
+                    }
                     if ( responseMap != null ) {
                         resultMap = (HashMap<String, Object>) responseMap.get( "results" );
                         if ( resultMap != null ) {
@@ -1693,12 +1699,17 @@ public class SocialManagementController
 
             } catch ( Exception e ) {
                 session.removeAttribute( CommonConstants.SOCIAL_REQUEST_TOKEN );
+                model.addAttribute( CommonConstants.ERROR, CommonConstants.YES );
                 LOG.error( "Exception while setting zillow profile link. Reason : " + e.getMessage(), e );
                 return JspResolver.SOCIAL_AUTH_MESSAGE;
             }
 
+            session.removeAttribute( CommonConstants.SOCIAL_REQUEST_TOKEN );
+            model.addAttribute( CommonConstants.SUCCESS_ATTRIBUTE, CommonConstants.YES );
+            model.addAttribute( "socialNetwork", "zillow" );
+
         }
-        return JspResolver.HEADER_SURVEY_INVITE_ADMIN;
+        return JspResolver.SOCIAL_AUTH_MESSAGE;
     }
 
 
@@ -1849,6 +1860,9 @@ public class SocialManagementController
                 }
                 if ( tokens.getLinkedInToken() != null && tokens.getLinkedInToken().getLinkedInPageLink() != null ) {
                     model.addAttribute( "linkedinLink", tokens.getLinkedInToken().getLinkedInPageLink() );
+                }
+                if ( tokens.getZillowToken() != null && tokens.getZillowToken().getZillowProfileLink() != null ) {
+                    model.addAttribute( "zillowLink", tokens.getZillowToken().getZillowProfileLink() );
                 }
             }
         } catch ( NonFatalException e ) {
