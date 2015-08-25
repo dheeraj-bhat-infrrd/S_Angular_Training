@@ -1136,9 +1136,10 @@ public class EmailServicesImpl implements EmailServices {
 	@Async
 	@Override
 	public void sendDefaultSurveyReminderMail(String recipientMailId,
-			String firstName, String agentName, String link, String agentPhone,
-			String agentTitle, String companyName)
-			throws InvalidInputException, UndeliveredEmailException {
+			String firstName, String agentName, String link,
+			String agentEmailId, String agentPhone, String agentTitle,
+			String companyName) throws InvalidInputException,
+			UndeliveredEmailException {
 		LOG.info("Executing the sendDefaultSurveyReminderMail() method");
 
 		if (recipientMailId == null || recipientMailId.isEmpty()) {
@@ -1175,8 +1176,8 @@ public class EmailServicesImpl implements EmailServices {
 		messageBodyReplacements.setReplacementArgs(Arrays.asList(appLogoUrl,
 				firstName, link, link, link, "", agentSignature, appBaseUrl,
 				appBaseUrl, recipientMailId, companyName,
-				dateFormat.format(new Date()), "", companyName, currentYear,
-				fullAddress));
+				dateFormat.format(new Date()), agentEmailId, companyName,
+				currentYear, fullAddress));
 
 		LOG.debug("Calling email sender to send mail");
 		emailSender.sendEmailWithSubjectAndBodyReplacements(emailEntity,
@@ -1187,8 +1188,8 @@ public class EmailServicesImpl implements EmailServices {
 	@Async
 	@Override
 	public void sendSurveyReminderMail(String recipientMailId, String subject,
-			String mailBody) throws InvalidInputException,
-			UndeliveredEmailException {
+			String mailBody, String senderName, String senderEmailAddress)
+			throws InvalidInputException, UndeliveredEmailException {
 		LOG.info("Executing the sendSurveyReminderMail() method");
 
 		if (recipientMailId == null || recipientMailId.isEmpty()) {
@@ -1204,7 +1205,8 @@ public class EmailServicesImpl implements EmailServices {
 
 		LOG.info("Sending survey reminder email to : " + recipientMailId);
 		EmailEntity emailEntity = prepareEmailEntityForSendingEmail(recipientMailId);
-
+		emailEntity.setSenderName(senderName);
+		emailEntity.setSenderEmailId(senderEmailAddress);
 		LOG.debug("Calling email sender to send mail");
 		emailSender.sendEmail(emailEntity, subject, mailBody);
 		LOG.info("Successfully sent survey completion mail");
@@ -1990,11 +1992,13 @@ public class EmailServicesImpl implements EmailServices {
 	 * @param survey
 	 * @param surveyLink
 	 */
+	@Override
 	public void sendManualSurveyReminderMail(
 			OrganizationUnitSettings companySettings, User user,
-			String agentName, String agentPhone, String agentTitle,
-			String companyName, SurveyPreInitiation survey, String surveyLink) {
-
+			String agentName, String agentEmailId, String agentPhone,
+			String agentTitle, String companyName, SurveyPreInitiation survey,
+			String surveyLink) {
+		LOG.info("Sending manual survey reminder mail.");
 		if (companySettings != null
 				&& companySettings.getMail_content() != null
 				&& companySettings.getMail_content()
@@ -2044,7 +2048,7 @@ public class EmailServicesImpl implements EmailServices {
 
 			try {
 				sendSurveyReminderMail(survey.getCustomerEmailId(),
-						mailSubject, mailBody);
+						mailSubject, mailBody, agentName, user.getEmailId());
 			} catch (InvalidInputException | UndeliveredEmailException e) {
 				LOG.error(
 						"Exception caught while sending mail to "
@@ -2054,8 +2058,8 @@ public class EmailServicesImpl implements EmailServices {
 		} else {
 			try {
 				sendDefaultSurveyReminderMail(survey.getCustomerEmailId(),
-						survey.getCustomerFirstName(), agentName, surveyLink,
-						agentPhone, agentTitle, companyName);
+						survey.getCustomerFirstName(), agentName, agentEmailId,
+						surveyLink, agentPhone, agentTitle, companyName);
 			} catch (InvalidInputException | UndeliveredEmailException e) {
 				LOG.error(
 						"Exception caught in IncompleteSurveyReminderSender.main while trying to send reminder mail to "
