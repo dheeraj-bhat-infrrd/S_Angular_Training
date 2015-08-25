@@ -28,7 +28,7 @@
 					<div style="padding: 0px 20px;" class="clearfix">
 						<div style="margin-bottom: 10px; font-size: 19px; text-align: center; padding: 0px 10px;">
 						<div>
-						<form id="zillowForm">
+						<form id="zillowForm" action="/zillowSaveInfo.do" method="post">
 							<div class="zillow-input-container clearfix">
 								<label class="zillow-input-label float-left"><spring:message code="label.emailid.key"/></label>
 								<input class="zillow-input" name="zillowEmailAddress" type="email">
@@ -75,7 +75,10 @@ function saveZillowEmailAddress() {
 	if(!validateZillowForm()){
 		return false;
 	}
-	var payload = $('#zillowForm').serialize();
+	
+	$('#zillowForm').submit();
+	
+	/* var payload = $('#zillowForm').serialize();
 	$.ajax({
 		url : './zillowSaveInfo.do',
 		type : "POST",
@@ -93,7 +96,7 @@ function saveZillowEmailAddress() {
 			}
 			redirectErrorpage();
 		}
-	});
+	}); */
 }
 
 function validateZillowForm() {
@@ -103,8 +106,8 @@ function validateZillowForm() {
 	}
 	var zillowFirstName = $('input[name="zillowFirstName"]').val();
 	var zillowLastName = $('input[name="zillowLastName"]').val();
-	if(zillowFirstName == undefined ||  zillowFirstName == "" || zillowLastName == undefined || zillowLastName == "") {
-		$('#overlay-toast').text("Please enter a valid email address or valid first name and last name");
+	if(zillowFirstName == undefined ||  zillowFirstName == "") {
+		$('#overlay-toast').text("Please enter a valid email address or valid name");
 		showToast();
 		return false;
 	}else {
