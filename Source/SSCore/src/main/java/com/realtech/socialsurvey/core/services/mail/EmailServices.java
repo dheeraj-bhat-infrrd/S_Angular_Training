@@ -195,7 +195,7 @@ public interface EmailServices {
             throws InvalidInputException;
 
     public void sendDefaultSurveyReminderMail(String recipientMailId,
-            String displayName, String agentName, String link,
+            String displayName, String agentName, String agentEmailId, String link,
             String agentPhone, String agentTitle, String companyName)
             throws InvalidInputException, UndeliveredEmailException;
 
@@ -318,7 +318,7 @@ public interface EmailServices {
             throws InvalidInputException, UndeliveredEmailException;
 
     public void sendSurveyReminderMail(String recipientMailId, String subject,
-            String mailBody) throws InvalidInputException,
+            String mailBody,String name, String emailId) throws InvalidInputException,
             UndeliveredEmailException;
 
     public void sendDefaultSurveyInvitationMail(String recipientMailId,
@@ -392,6 +392,6 @@ public interface EmailServices {
      */
     public void sendManualSurveyReminderMail(
             OrganizationUnitSettings companySettings, User user,
-            String agentName, String agentPhone, String agentTitle,
+            String agentName, String agentEmailId, String agentPhone, String agentTitle,
             String companyName, SurveyPreInitiation survey, String surveyLink);
 }
