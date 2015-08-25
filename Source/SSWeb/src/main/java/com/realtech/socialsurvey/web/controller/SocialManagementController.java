@@ -1589,10 +1589,15 @@ public class SocialManagementController
                 }
 
                 Map<String, Object> responseMap = new HashMap<String, Object>();
+                Map<String, Object> messageMap = new HashMap<String, Object>();
                 Map<String, Object> resultMap = new HashMap<String, Object>();
                 Map<String, Object> proInfoMap = new HashMap<String, Object>();
                 if ( map != null ) {
                     responseMap = (HashMap<String, Object>) map.get( "response" );
+                    messageMap = (HashMap<String, Object>) map.get( "message" );
+                    if ( messageMap.get( "code" ) != "0" ) {
+                        throw new Exception( " Invalid Zillow Details Provided " );
+                    }
                     if ( responseMap != null ) {
                         resultMap = (HashMap<String, Object>) responseMap.get( "results" );
                         if ( resultMap != null ) {
