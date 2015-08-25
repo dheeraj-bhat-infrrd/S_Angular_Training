@@ -11,10 +11,12 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
 import javax.imageio.ImageIO;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import javax.ws.rs.QueryParam;
+
 import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrDocumentList;
 import org.slf4j.Logger;
@@ -29,7 +31,9 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
+
 import sun.misc.BASE64Decoder;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.type.TypeFactory;
 import com.google.gson.Gson;
@@ -55,6 +59,7 @@ import com.realtech.socialsurvey.core.entities.MiscValues;
 import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
 import com.realtech.socialsurvey.core.entities.ProListUser;
 import com.realtech.socialsurvey.core.entities.ProfileStage;
+import com.realtech.socialsurvey.core.entities.RealtorToken;
 import com.realtech.socialsurvey.core.entities.Region;
 import com.realtech.socialsurvey.core.entities.SocialMediaTokens;
 import com.realtech.socialsurvey.core.entities.SocialPost;
@@ -2629,6 +2634,121 @@ public class ProfileManagementController
         zillowToken.setZillowProfileLink( zillowLink );
         socialMediaTokens.setZillowToken( zillowToken );
         LOG.debug( "Method updateZillowLink() finished from ProfileManagementController" );
+        return socialMediaTokens;
+    }
+
+
+    @RequestMapping ( value = "/updateRealtorlink", method = RequestMethod.POST)
+    public String updateRealtorLink( Model model, HttpServletRequest request )
+    {
+        LOG.info( "Method updateRealtorLink() called from ProfileManagementController" );
+        User user = sessionHelper.getCurrentUser();
+        HttpSession session = request.getSession( false );
+        SocialMediaTokens socialMediaTokens = null;
+
+        try {
+            UserSettings userSettings = (UserSettings) session.getAttribute( CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION );
+            OrganizationUnitSettings profileSettings = (OrganizationUnitSettings) session
+                .getAttribute( CommonConstants.USER_PROFILE_SETTINGS );
+            long entityId = (long) session.getAttribute( CommonConstants.ENTITY_ID_COLUMN );
+            String entityType = (String) session.getAttribute( CommonConstants.ENTITY_TYPE_COLUMN );
+            if ( userSettings == null || profileSettings == null || entityType == null ) {
+                throw new InvalidInputException( "No user settings found in session", DisplayMessageConstants.GENERAL_ERROR );
+            }
+
+            String realtorLink = request.getParameter( "realtorLink" );
+            try {
+                if ( realtorLink == null || realtorLink.isEmpty() ) {
+                    throw new InvalidInputException( "realtorLink passed was null or empty",
+                        DisplayMessageConstants.GENERAL_ERROR );
+                }
+                urlValidationHelper.validateUrl( realtorLink );
+            } catch ( IOException ioException ) {
+                throw new InvalidInputException( "realtorLink passed was invalid", DisplayMessageConstants.GENERAL_ERROR,
+                    ioException );
+            }
+
+            if ( entityType.equals( CommonConstants.COMPANY_ID_COLUMN ) ) {
+                OrganizationUnitSettings companySettings = organizationManagementService.getCompanySettings( user );
+                if ( companySettings == null ) {
+                    throw new InvalidInputException( "No company settings found in current session" );
+                }
+                socialMediaTokens = companySettings.getSocialMediaTokens();
+                socialMediaTokens = updateRealtorLink( realtorLink, socialMediaTokens );
+                profileManagementService.updateSocialMediaTokens(
+                    MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION, companySettings, socialMediaTokens );
+                companySettings.setSocialMediaTokens( socialMediaTokens );
+                userSettings.setCompanySettings( companySettings );
+            } else if ( entityType.equals( CommonConstants.REGION_ID_COLUMN ) ) {
+                OrganizationUnitSettings regionSettings = organizationManagementService.getRegionSettings( entityId );
+                if ( regionSettings == null ) {
+                    throw new InvalidInputException( "No Region settings found in current session" );
+                }
+                socialMediaTokens = regionSettings.getSocialMediaTokens();
+                socialMediaTokens = updateRealtorLink( realtorLink, socialMediaTokens );
+                profileManagementService.updateSocialMediaTokens(
+                    MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION, regionSettings, socialMediaTokens );
+                regionSettings.setSocialMediaTokens( socialMediaTokens );
+                userSettings.getRegionSettings().put( entityId, regionSettings );
+            } else if ( entityType.equals( CommonConstants.BRANCH_ID_COLUMN ) ) {
+                OrganizationUnitSettings branchSettings = organizationManagementService.getBranchSettingsDefault( entityId );
+                if ( branchSettings == null ) {
+                    throw new InvalidInputException( "No Branch settings found in current session" );
+                }
+                socialMediaTokens = branchSettings.getSocialMediaTokens();
+                socialMediaTokens = updateRealtorLink( realtorLink, socialMediaTokens );
+                profileManagementService.updateSocialMediaTokens(
+                    MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION, branchSettings, socialMediaTokens );
+                branchSettings.setSocialMediaTokens( socialMediaTokens );
+                userSettings.getRegionSettings().put( entityId, branchSettings );
+            } else if ( entityType.equals( CommonConstants.AGENT_ID_COLUMN ) ) {
+                AgentSettings agentSettings = userManagementService.getUserSettings( entityId );
+                if ( agentSettings == null ) {
+                    throw new InvalidInputException( "No Agent settings found in current session" );
+                }
+                socialMediaTokens = agentSettings.getSocialMediaTokens();
+                socialMediaTokens = updateRealtorLink( realtorLink, socialMediaTokens );
+                profileManagementService.updateSocialMediaTokens(
+                    MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION, agentSettings, socialMediaTokens );
+                agentSettings.setSocialMediaTokens( socialMediaTokens );
+                userSettings.setAgentSettings( agentSettings );
+            } else {
+                throw new InvalidInputException( "Invalid input exception occurred in updating lendingTree token.",
+                    DisplayMessageConstants.GENERAL_ERROR );
+            }
+
+            profileSettings.setSocialMediaTokens( socialMediaTokens );
+
+            LOG.info( "realtor updated successfully" );
+            model.addAttribute( "message", messageUtils.getDisplayMessage(
+                DisplayMessageConstants.REALTOR_TOKEN_UPDATE_SUCCESSFUL, DisplayMessageType.SUCCESS_MESSAGE ) );
+        } catch ( NonFatalException nonFatalException ) {
+            LOG.error( "NonFatalException while updating ZillowLink in profile. Reason :" + nonFatalException.getMessage(),
+                nonFatalException );
+            model.addAttribute( "message", messageUtils.getDisplayMessage(
+                DisplayMessageConstants.REALTOR_TOKEN_UPDATE_UNSUCCESSFUL, DisplayMessageType.ERROR_MESSAGE ) );
+        }
+
+        LOG.info( "Method updateRealtorLink() finished from ProfileManagementController" );
+        return JspResolver.MESSAGE_HEADER;
+    }
+
+
+    private SocialMediaTokens updateRealtorLink( String realtorLink, SocialMediaTokens socialMediaTokens )
+    {
+        LOG.debug( "Method updateRealtorLink() called from ProfileManagementController" );
+        if ( socialMediaTokens == null ) {
+            LOG.debug( "No social media token in profile added" );
+            socialMediaTokens = new SocialMediaTokens();
+        }
+        if ( socialMediaTokens.getRealtorToken() == null ) {
+            socialMediaTokens.setRealtorToken( new RealtorToken() );
+        }
+
+        RealtorToken realtorToken = socialMediaTokens.getRealtorToken();
+        realtorToken.setRealtorProfileLink( realtorLink );
+        socialMediaTokens.setRealtorToken( realtorToken );
+        LOG.debug( "Method updateLendingTreeLink() finished from ProfileManagementController" );
         return socialMediaTokens;
     }
 
