@@ -938,7 +938,12 @@ public class UserManagementController
 
 			// checking status of user
 			String emailId = urlParams.get(CommonConstants.EMAIL_ID);
-			User newUser = userManagementService.getUserByEmailAndCompany(companyId, emailId);
+			User newUser = null;
+			try{
+				newUser = userManagementService.getUserByEmailAndCompany(companyId, emailId);
+			}catch(NoRecordsFetchedException e){
+				throw new NonFatalException( "No users found with the login name : {}" , DisplayMessageConstants.USER_LINK_EXPIRED );
+			}
 
 			if (newUser.getStatus() == CommonConstants.STATUS_NOT_VERIFIED) {
 				redirectAttributes.addFlashAttribute(CommonConstants.COMPANY, urlParams.get(CommonConstants.COMPANY));
@@ -969,7 +974,6 @@ public class UserManagementController
 		}
 		catch (NonFatalException e) {
 			LOG.error("NonFatalException in showCompleteRegistrationPage(). Reason : " + e.getMessage(), e);
-			model.addAttribute("message", messageUtils.getDisplayMessage(e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE));
 			return   JspResolver.LINK_EXPIRED;
 		}
 
