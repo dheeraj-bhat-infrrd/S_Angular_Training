@@ -979,6 +979,11 @@ public class DashboardController
 					agentPhone = agentSettings.getContact_details().getContact_numbers().getWork();
 				}
 
+				String agentEmailId = "";
+				if(agentSettings.getContact_details() != null && agentSettings.getContact_details().getMail_ids() != null && agentSettings.getContact_details().getMail_ids().getWork() != null){
+					agentEmailId = agentSettings.getContact_details().getMail_ids().getWork();
+				}
+					
 				User user = userManagementService.getUserByUserId(agentId);
 				String companyName = user.getCompany().getCompany();
 				String agentName = "";
@@ -999,7 +1004,7 @@ public class DashboardController
 					catch (InvalidInputException e) {
 						LOG.error("InvalidInputException occured while trying to fetch company settings.");
 					}
-					emailServices.sendManualSurveyReminderMail(companySettings, user, agentName, agentPhone, agentTitle, companyName, survey,
+					emailServices.sendManualSurveyReminderMail(companySettings, user, agentName, agentEmailId, agentPhone, agentTitle, companyName, survey,
 							surveyLink);
 				}
 			}
@@ -1065,6 +1070,11 @@ public class DashboardController
                         agentTitle = agentSettings.getContact_details().getTitle();
                     }
 
+                    String agentEmailId = "";
+    				if(agentSettings.getContact_details() != null && agentSettings.getContact_details().getMail_ids() != null && agentSettings.getContact_details().getMail_ids().getWork() != null){
+    					agentEmailId = agentSettings.getContact_details().getMail_ids().getWork();
+    				}
+    				
                     String agentPhone = "";
                     if ( agentSettings.getContact_details() != null
                         && agentSettings.getContact_details().getContact_numbers() != null
@@ -1087,7 +1097,7 @@ public class DashboardController
                         } catch ( InvalidInputException e ) {
                             LOG.error( "InvalidInputException occured while trying to fetch company settings." );
                         }
-                        emailServices.sendManualSurveyReminderMail( companySettings, user, agentName, agentPhone, agentTitle,
+                        emailServices.sendManualSurveyReminderMail( companySettings, user, agentName, agentEmailId, agentPhone, agentTitle,
                             companyName, survey, surveyLink );
                     }
 
