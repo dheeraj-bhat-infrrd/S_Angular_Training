@@ -1311,7 +1311,7 @@ $(document).on('click', '.bd-tab-mcq', function() {
 	$(this).parent().parent().parent().find('.bd-ans-type-mcq').show();
 	
 	var quesNum = $(this).closest('form').data('quesnum');
-	$(this).closest('form').find('#sb-question-type-' + quesNum).val($(this).data('id'));
+	$(this).closest('form').find('input[name="sb-question-type-' + quesNum+'"]').val($(this).data('id'));
 	showStatus('#bs-question-' + quesNum, 'Edited');
 	$('#bs-question-' + quesNum).attr('data-status', 'edited');
 });
@@ -1323,7 +1323,7 @@ $(document).on('click', '.bd-tab-com', function() {
 	$(this).parent().parent().parent().find('.bd-ans-type-com').show();
 
 	var quesNum = $(this).closest('form').data('quesnum');
-	$(this).closest('form').find('#sb-question-type-' + quesNum).val($(this).data('id'));
+	$(this).closest('form').find('input[name="sb-question-type-' + quesNum+'"]').val($(this).data('id'));
 	showStatus('#bs-question-' + quesNum, 'Edited');
 	$('#bs-question-' + quesNum).attr('data-status', 'edited');
 });
@@ -1333,7 +1333,7 @@ $(document).on('click', '.bd-ans-img-wrapper', function() {
 	$(this).find('.bd-ans-img').removeClass('bd-img-sel');
 
 	var quesNum = $(this).closest('form').data('quesnum');
-	$(this).closest('form').find('#sb-question-type-' + quesNum).val($(this).data('id'));
+	$(this).closest('form').find('input[name="sb-question-type-' + quesNum+'"]').val($(this).data('id'));
 	showStatus('#bs-question-' + quesNum, 'Edited');
 	$('#bs-question-' + quesNum).attr('data-status', 'edited');
 });
