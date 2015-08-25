@@ -15,7 +15,9 @@
 	<link rel="stylesheet" href="${initParam.resourcesPath}/resources/css/style-resp.css">
 </head>
 <body>
-<div id="overlay-toast" class="overlay-toast"></div>
+<div id="toast-container" class="toast-container">
+	   <span id="overlay-toast" class="overlay-toast"></span>
+    </div>
 <div class="overlay-loader hide"></div>
 <div class="login-main-wrapper padding-001 login-wrapper-min-height">
 	<div class="container login-container">
@@ -27,25 +29,25 @@
 						<div style="margin-bottom: 10px; font-size: 19px; text-align: center; padding: 0px 10px;">
 						<div>
 						<form id="zillowForm">
-							<div class="zillow-input-container">
-								<label class="zillow-input-label">Email Address</label>
+							<div class="zillow-input-container clearfix">
+								<label class="zillow-input-label float-left"><spring:message code="label.emailid.key"/></label>
 								<input class="zillow-input" name="zillowEmailAddress" type="email">
 							</div>
-							<div class="zillow-input-container">
-								<label class="zillow-input-label">First Name</label>
+							<div class="zillow-input-container text-center">
+							OR
+							</div>
+							<div class="zillow-input-container clearfix">
+								<label class="zillow-input-label float-left"><spring:message code="label.firstname.key"/></label>
 								<input class="zillow-input" name="zillowFirstName" type="text">
 							</div>
-							<div class="zillow-input-container">
-								<label class="zillow-input-label">Last Name</label>
+							<div class="zillow-input-container clearfix">
+								<label class="zillow-input-label float-left"><spring:message code="label.lastname.key"/></label>
 								<input class="zillow-input" name="zillowLastName" type="text">
 							</div>
 
-							<input type="button" value="Submit" onclick="saveZillowEmailAddress()">
+							<div class="zillow-sub-btn" onclick="saveZillowEmailAddress()"><spring:message code="label.submit.key"/></div>
 						</form>
 						</div>
-							<c:choose>
-								<c:when test="${message == 1}"><spring:message code="label.waitmessage.key" /></c:when>
-							</c:choose>
 						</div>
 					</div>
 					<div style="font-size: 11px; text-align: center;"></div>
@@ -68,44 +70,66 @@ $(document).ready(function() {
 	
 });
 
-function saveZillowEmailAddress()
-{
+
+function saveZillowEmailAddress() {
+	if(!validateZillowForm()){
+		return false;
+	}
 	var payload = $('#zillowForm').serialize();
 	$.ajax({
-	url : './zillowSaveInfo.do',
-	type : "POST",
-	data : payload,
-	async : false,
-	complete : function(data) {
-		setTimeout(function() {
-			window.close();
-		}, 3000);
-	},
-	error : function(e) {
-		if(e.status == 504) {
-			redirectToLoginPageOnSessionTimeOut(e.status);
-			return;
+		url : './zillowSaveInfo.do',
+		type : "POST",
+		data : payload,
+		async : false,
+		complete : function(data) {
+			setTimeout(function() {
+				window.close();
+			}, 3000);
+		},
+		error : function(e) {
+			if (e.status == 504) {
+				redirectToLoginPageOnSessionTimeOut(e.status);
+				return;
+			}
+			redirectErrorpage();
 		}
-		redirectErrorpage();
-	}
-});
-}
-$(window).on('unload', function(){
-	var parentWindow = null;
-	if (window.opener != null && !window.opener.closed) {
-		parentWindow = window.opener;
-	}
-	var payload = {
-		'socialNetwork' : "zillow"
-	};
-	fetchSocialProfileUrl(payload, function(data) {
-		parentWindow.showLinkedInProfileUrl(data);
-		parentWindow.showProfileLink("zillow", data);
-		parentWindow.showProfileLinkInEditProfilePage("zillow", data.responseText);	
 	});
-});
+}
 
-function fetchSocialProfileUrl(payload, callBackFunction){
+function validateZillowForm() {
+	var zillowEmailAddress = $('input[name="zillowEmailAddress"]').val();
+	if(zillowEmailAddress != undefined && zillowEmailAddress != "" && emailRegex.test(zillowEmailAddress)) {
+		return true;
+	}
+	var zillowFirstName = $('input[name="zillowFirstName"]').val();
+	var zillowLastName = $('input[name="zillowLastName"]').val();
+	if(zillowFirstName == undefined ||  zillowFirstName == "" || zillowLastName == undefined || zillowLastName == "") {
+		$('#overlay-toast').text("Please enter a valid email address or valid first name and last name");
+		showToast();
+		return false;
+	}else {
+		return true;
+	}
+}
+
+$(window).on('unload',
+		function() {
+			var parentWindow = null;
+			if (window.opener != null && !window.opener.closed) {
+				parentWindow = window.opener;
+			}
+			var payload = {
+				'socialNetwork' : "zillow"
+			};
+			fetchSocialProfileUrl(payload, function(data) {
+				parentWindow.showLinkedInProfileUrl(data);
+				parentWindow.showProfileLink("zillow", data);
+				parentWindow.showProfileLinkInEditProfilePage("zillow",
+						data.responseText);
+			});
+		});
+
+function fetchSocialProfileUrl(payload, callBackFunction) {
 	$.ajax({
 		url : './profileUrl.do',
 		type : "GET",
@@ -113,7 +137,7 @@ function fetchSocialProfileUrl(payload, callBackFunction){
 		async : false,
 		complete : callBackFunction,
 		error : function(e) {
-			if(e.status == 504) {
+			if (e.status == 504) {
 				redirectToLoginPageOnSessionTimeOut(e.status);
 				return;
 			}
