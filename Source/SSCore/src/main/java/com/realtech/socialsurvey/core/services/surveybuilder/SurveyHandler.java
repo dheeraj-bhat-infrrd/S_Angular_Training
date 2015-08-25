@@ -147,12 +147,11 @@ public interface SurveyHandler
     public Boolean checkIfTimeIntervalHasExpired( long lastRemindedTime, long systemTime, int reminderInterval );
 
 
-    public SurveyDetails getSurveyDetailsBySourceIdAndMongoCollection( String surveySourceId, long iden, String collectionName );
+    void insertSurveyDetails( SurveyDetails surveyDetails );
 
 
-    public void insertSurveyDetails( SurveyDetails surveyDetails );
+    SurveyDetails getSurveyDetailsBySourceIdAndMongoCollection( String surveySourceId, long iden, String collectionName );
 
 
-    public SurveyPreInitiation getPreInitiatedSurveyById( long surveyPreInitiationId ) throws NoRecordsFetchedException;
-
+    SurveyPreInitiation getPreInitiatedSurveyById( long surveyPreInitiationId ) throws NoRecordsFetchedException;
 }
