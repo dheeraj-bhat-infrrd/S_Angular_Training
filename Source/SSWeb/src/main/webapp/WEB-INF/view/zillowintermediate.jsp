@@ -106,8 +106,8 @@ function validateZillowForm() {
 	}
 	var zillowFirstName = $('input[name="zillowFirstName"]').val();
 	var zillowLastName = $('input[name="zillowLastName"]').val();
-	if(zillowFirstName == undefined ||  zillowFirstName == "" || zillowLastName == undefined || zillowLastName == "") {
-		$('#overlay-toast').text("Please enter a valid email address or valid first name and last name");
+	if(zillowFirstName == undefined ||  zillowFirstName == "") {
+		$('#overlay-toast').text("Please enter a valid email address or valid name");
 		showToast();
 		return false;
 	}else {
