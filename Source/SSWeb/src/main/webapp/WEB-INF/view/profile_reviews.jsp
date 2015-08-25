@@ -4,7 +4,7 @@
 <%@ taglib uri="http://www.springframework.org/tags" prefix="spring"%>
 
 <script type="text/javascript"
-	src="http://apis.google.com/js/plusone.js"></script>
+	src="//apis.google.com/js/plusone.js"></script>
 	<script type="text/javascript" async src="//platform.twitter.com/widgets.js"></script>
 <script type="text/javascript">
   (function() {
@@ -96,7 +96,7 @@ if(document.getElementById('fb_'+loop) != null)
 						<div class="ppl-head-1">${reviewItem.customerFirstName}
 							${reviewItem.customerLastName}</div>
 						<div class="ppl-head-2"
-							data-modifiedon="<fmt:formatDate type="date" pattern="yyyy-MM-dd-hh-mm-ss"
+							data-modifiedon="<fmt:formatDate type="date" pattern="yyyy-MM-dd-H-mm-ss"
 							value="${reviewItem.modifiedOn}" />"></div>
 					</div>
 					<div class="float-right ppl-header-right">
