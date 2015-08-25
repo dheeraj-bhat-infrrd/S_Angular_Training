@@ -20,6 +20,7 @@
 				title="Cancel Survey Reminder"
 				onclick="removeIncompleteSurveyRequest(${survey.surveyPreIntitiationId })"></div> --%>
 			<div title="Resend Survey"
+				data-surveypreinitiationid="${survey.surveyPreIntitiationId }"
 				data-custname="${survey.customerFirstName} ${survey.customerLastName}"
 				data-agentid="${survey.agentId}"
 				data-agentname="${survey.agentName}"
@@ -32,9 +33,7 @@
 	$(document).ready(function() {
 		$('.opensanslight.date-inc-sur').each(function(index, currentElement) {
 			var dateStr = $(this).attr('data-value');
-			var dateSplit = dateStr.split("-");
-			var date = convertTimeStampToLocalTimeStamp(new Date(dateSplit[0],dateSplit[1],dateSplit[2],dateSplit[3],dateSplit[4],dateSplit[5],dateSplit[6]));
-			$(this).html(date);
+			$(this).html(getDateStrToUTC(dateStr));
 		});
 		
 		$('.sur-icn-checkbox').each(function(index, currentElement) {

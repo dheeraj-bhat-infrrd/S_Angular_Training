@@ -423,7 +423,7 @@ $(document).ready(function() {
 	//social media urls
 	loadSocialMediaUrlInSettingsPage();
 	
-	if ($("#se-dd-wrapper-profiles > div").length <= 1) {
+	if ($("#se-dd-wrapper-profiles").children('.se-dd-item').length <= 1) {
 		$('#se-dd-wrapper').remove();
 	}
 	

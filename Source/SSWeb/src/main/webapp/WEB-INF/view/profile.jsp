@@ -313,7 +313,7 @@
 						</a>
 						</div>
 					</c:if> --%>
-					<div class="float-right hm-hr-row-right clearfix">
+					<div id="social-token-container" class="float-right hm-hr-row-right clearfix">
 						<c:if test="${not empty profile.socialMediaTokens}">
 							<div id="social-connect-txt" class="float-left social-connect-txt">Connect with ${profName }:</div>
 							<c:if test="${not empty profile.socialMediaTokens.facebookToken && not empty profile.socialMediaTokens.facebookToken.facebookPageLink}">
@@ -599,6 +599,11 @@
         adjustImage();
         var gaLabel;
         var gaName;
+        
+        
+        if($('#social-token-container').children('.social-item-icon').length == 0) {
+        	$('#social-token-container').remove();
+        }
         
         /**
 	    	If region profile name is mentioned, fetch the region profile 
