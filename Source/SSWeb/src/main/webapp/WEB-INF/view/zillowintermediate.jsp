@@ -29,22 +29,22 @@
 						<div style="margin-bottom: 10px; font-size: 19px; text-align: center; padding: 0px 10px;">
 						<div>
 						<form id="zillowForm" action="/zillowSaveInfo.do" method="post">
-							<div class="zillow-input-container clearfix">
+						<%-- 	<div class="zillow-input-container clearfix">
 								<label class="zillow-input-label float-left"><spring:message code="label.emailid.key"/></label>
 								<input class="zillow-input" name="zillowEmailAddress" type="email">
 							</div>
 							<div class="zillow-input-container text-center">
 							OR
+							</div> --%>				
+ 							<div class="zillow-input-container clearfix">
+								<label class="zillow-input-label float-left"><spring:message code="label.profilename.key"/></label>
+								<input class="zillow-input" name="zillowProfileName" type="text">
 							</div>
-							<div class="zillow-input-container clearfix">
-								<label class="zillow-input-label float-left"><spring:message code="label.firstname.key"/></label>
-								<input class="zillow-input" name="zillowFirstName" type="text">
-							</div>
-							<div class="zillow-input-container clearfix">
+						<%-- 	<div class="zillow-input-container clearfix">
 								<label class="zillow-input-label float-left"><spring:message code="label.lastname.key"/></label>
 								<input class="zillow-input" name="zillowLastName" type="text">
 							</div>
-
+ --%>
 							<div class="zillow-sub-btn" onclick="saveZillowEmailAddress()"><spring:message code="label.submit.key"/></div>
 						</form>
 						</div>
@@ -104,9 +104,8 @@ function validateZillowForm() {
 	if(zillowEmailAddress != undefined && zillowEmailAddress != "" && emailRegex.test(zillowEmailAddress)) {
 		return true;
 	}
-	var zillowFirstName = $('input[name="zillowFirstName"]').val();
-	var zillowLastName = $('input[name="zillowLastName"]').val();
-	if(zillowFirstName == undefined ||  zillowFirstName == "") {
+	var zillowProfileName = $('input[name="zillowProfileName"]').val();
+	if(zillowProfileName == undefined ||  zillowProfileName == "") {
 		$('#overlay-toast').text("Please enter a valid email address or valid name");
 		showToast();
 		return false;
