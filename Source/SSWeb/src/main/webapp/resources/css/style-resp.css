@@ -1508,6 +1508,9 @@
 	.reset-icon {
 	    margin: 15px 0 5px 0;
 	}
+	.lp-disclaimer-row {
+		padding-left: 15px;
+	} 
 }
 
 

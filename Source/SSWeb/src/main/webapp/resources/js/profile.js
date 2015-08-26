@@ -282,7 +282,7 @@ function paintCompanyRegions(data) {
 		if(result != undefined && result.length > 0) {
 			var regionsHtml = "";
 			$.each(result,function(i, region) {
-				regionsHtml = regionsHtml+'<div class="bd-hr-item-l1 comp-region" data-openstatus="closed" data-regionid = '+region.regionId+'>';
+				regionsHtml = regionsHtml+'<div class="bd-hr-item-l1 comp-region" data-start=0 data-batch=5 data-openstatus="closed" data-regionid = '+region.regionId+'>';
 				regionsHtml = regionsHtml+'	<div class="bd-hr-item bd-lt-l1 clearfix">';
 				regionsHtml = regionsHtml+'    <div class="prf-public-txt bd-hr-txt cursor-pointer region-link" data-profilename="'+region.profileName+'">'+region.region+'</div>';
 				regionsHtml = regionsHtml+'	</div>';
@@ -309,7 +309,7 @@ function paintBranchesForRegion(data) {
 		var result = $.parseJSON(responseJson.entity);
 		if(result != undefined && result.length > 0) {
 			$.each(result,function(i,branch) {
-				branchesHtml = branchesHtml +'<div class="bd-hr-item-l2 comp-region-branch" data-openstatus="closed" data-branchid="'+branch.branchId+'">';
+				branchesHtml = branchesHtml +'<div class="bd-hr-item-l2 comp-region-branch" data-openstatus="closed" data-start=0 data-batch=5 data-branchid="'+branch.branchId+'">';
 				branchesHtml = branchesHtml +'	<div class="bd-hr-item bd-lt-l2 clearfix">';
 				branchesHtml = branchesHtml +'		<div class="prf-public-txt bd-hr-txt cursor-pointer branch-link" data-profilename="'+branch.profileName+'">'+branch.branch+'</div>';
 				branchesHtml = branchesHtml +'	</div>';
@@ -349,7 +349,10 @@ function bindClickToFetchBranchIndividuals(bindingClass) {
 }
 
 function fetchIndividualsForBranch(branchId) {
-	var url=window.location.origin +'/rest/profile/branch/'+branchId+'/individuals';
+	var start = $('div[data-branchid="' + branchId + '"]').attr('data-start');
+	var rows = $('div[data-branchid="' + branchId + '"]').attr('data-batch');
+	var url = window.location.origin + '/rest/profile/branch/' + branchId
+			+ '/individuals?start=' + start + "&rows=" + rows;
 	$("#branchid-hidden").val(branchId);
 	callAjaxGET(url, paintIndividualForBranch, true);
 }
@@ -357,7 +360,9 @@ function fetchIndividualsForBranch(branchId) {
 function paintIndividualForBranch(data) {
 	var responseJson = $.parseJSON(data);
 	var individualsHtml = "";
-	var branchId = $("#branchid-hidden").val();
+	var branchId = parseInt($("#branchid-hidden").val());
+	var batchSize = parseInt($('div[data-branchid="' + branchId + '"]').attr('data-batch'));
+	var start = parseInt($('div[data-branchid="' + branchId + '"]').attr('data-start'));
 	if (responseJson != undefined && responseJson.entity != "") {
 		var result = $.parseJSON(responseJson.entity);
 		if (result != undefined && result.length > 0) {
@@ -376,19 +381,65 @@ function paintIndividualForBranch(data) {
 					individualsHtml += '</div>';
 				}
 			});
+			
+			var showMoreHtml = "";
+			$('div[data-branchid="' + branchId + '"]').attr('data-start',parseInt(start + result.length));
+			if( start == 0 && result.length == batchSize ) {
+				showMoreHtml = '<div class="show-more-btn">Show More</div>';
+			} else if (start != 0 && result.length < batchSize) {
+				if($("#branch-individuals").length > 0) {
+					$("#branch-individuals").find(".show-more-btn").remove();
+				}else {
+					$("#comp-branch-individuals-"+branchId).find(".show-more-btn").remove();
+				}
+			}
+			
 			$("#branch-hierarchy").show();
 			if($("#branch-individuals").length > 0) {
 				$("#branch-individuals").html(individualsHtml);
+				if($("#branch-individuals").children(".show-more-btn").length > 0){
+					$("#branch-individuals").find(".show-more-btn").before(individualsHtml);	
+				} else {
+					$("#branch-individuals").append(individualsHtml);
+				}
+				if(showMoreHtml != "") {
+					$("#branch-individuals").append(showMoreHtml);	
+				}
 			}
 			else {
-				$("#comp-branch-individuals-"+branchId).html(individualsHtml).slideDown(200);
+				if(start == 0) {
+					$("#comp-branch-individuals-"+branchId).html(individualsHtml).slideDown(200);
+				} else {
+					if($("#comp-branch-individuals-"+branchId).children(".show-more-btn").length > 0){
+						$("#comp-branch-individuals-"+branchId).find(".show-more-btn").before(individualsHtml);	
+					} else {
+						$("#comp-branch-individuals-"+branchId).append(individualsHtml);
+					}
+					
+				}
+				
+				if(showMoreHtml != "") {
+					$("#comp-branch-individuals-"+branchId).append(showMoreHtml);	
+				}
 			}
 			
 			// paintProfileImage("comp-individual-prof-image");
 			// bindClickToFetchIndividualProfile("branch-individual");
 		}
+	} else {
+		if($("#branch-individuals").length > 0) {
+			$("#branch-individuals").find(".show-more-btn").remove();
+		}else {
+			$("#comp-branch-individuals-"+branchId).find(".show-more-btn").remove();
+		}
 	}
 }
+
+// Attach onclick event on show more button
+$(document).on('click', '.show-more-btn', function(e) {
+	var branchId = $(this).parent().prev('div').attr('data-branchid');
+	fetchIndividualsForBranch(branchId);
+});
 
 function bindClickToFetchIndividualProfile(bindingClass) {
 	$("."+bindingClass).click(function(e){
@@ -400,7 +451,12 @@ function bindClickToFetchIndividualProfile(bindingClass) {
 }
 
 function fetchIndividualsForRegion(regionId) {
-	var url = window.location.origin +'/rest/profile/region/'+regionId+'/individuals';
+	var start = $('.comp-region[data-regionid="' + regionId + '"]').attr(
+			'data-start');
+	var rows = $('.comp-region[data-regionid="' + regionId + '"]').attr(
+			'data-batch');
+	var url = window.location.origin + '/rest/profile/region/' + regionId
+			+ '/individuals?start=' + start + "&rows=" + rows;
 	$("#regionid-hidden").val(regionId);
 	callAjaxGET(url, paintIndividualsForRegion, true);
 }
@@ -500,7 +556,7 @@ function paintCompanyBranches(data) {
 		if(result != undefined && result.length > 0) {
 			var compBranchesHtml = "";
 			$.each(result,function(i,branch) {
-				compBranchesHtml = compBranchesHtml +'<div class="bd-hr-item-l1 comp-branch" data-openstatus="closed" data-branchid="'+branch.branchId+'">';
+				compBranchesHtml = compBranchesHtml +'<div class="bd-hr-item-l1 comp-branch" data-start=0 data-batch=5 data-openstatus="closed" data-branchid="'+branch.branchId+'">';
 				compBranchesHtml = compBranchesHtml +'	<div class="bd-hr-item bd-lt-l2 clearfix">';
 				compBranchesHtml = compBranchesHtml +'		<div class="prf-public-txt bd-hr-txt cursor-pointer branch-link" data-profilename="'+branch.profileName+'">'+branch.branch+'</div>';
 				compBranchesHtml = compBranchesHtml +'	</div>';
@@ -562,7 +618,12 @@ function paintReviews(result){
 				+ reviewItem.customerEmail + '" data-agentid="' + reviewItem.agentId + '">';
 		reviewsHtml += '	<div class="ppl-header-wrapper clearfix">';
 		reviewsHtml += '		<div class="float-left ppl-header-left">';    
-		reviewsHtml += '			<div class="ppl-head-1">'+reviewItem.customerFirstName+' '+reviewItem.customerLastName+'</div>';
+		reviewsHtml += '			<div class="ppl-head-1">'+reviewItem.customerFirstName;
+		if(reviewItem.customerLastName != undefined){
+			reviewsHtml += ' '+reviewItem.customerLastName+'</div>';
+		}else {
+			reviewsHtml += '</div>';
+		}
 		if (date != null) {
 			date = convertUTCToUserDate(date);
 			reviewsHtml += '		<div class="ppl-head-2">' + date.getMonthName() + " " + date.getDate() + ", " + date.getFullYear() + '</div>'; 
@@ -1340,6 +1401,7 @@ $('body').on("click",".comp-branch,.comp-region-branch",function(e){
 	}else {
 		$('#comp-branch-individuals-'+$(this).data('branchid')).slideUp(200);
 		$(this).data("openstatus","closed");
+		$(this).attr('data-start',0);
 		$(this).attr("data-openstatus","closed");
 	}
 });

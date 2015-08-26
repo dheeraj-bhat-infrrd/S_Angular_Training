@@ -1311,7 +1311,7 @@ $(document).on('click', '.bd-tab-mcq', function() {
 	$(this).parent().parent().parent().find('.bd-ans-type-mcq').show();
 	
 	var quesNum = $(this).closest('form').data('quesnum');
-	$(this).closest('form').find('#sb-question-type-' + quesNum).val($(this).data('id'));
+	$(this).closest('form').find('input[name="sb-question-type-' + quesNum+'"]').val($(this).data('id'));
 	showStatus('#bs-question-' + quesNum, 'Edited');
 	$('#bs-question-' + quesNum).attr('data-status', 'edited');
 });
@@ -1323,7 +1323,7 @@ $(document).on('click', '.bd-tab-com', function() {
 	$(this).parent().parent().parent().find('.bd-ans-type-com').show();
 
 	var quesNum = $(this).closest('form').data('quesnum');
-	$(this).closest('form').find('#sb-question-type-' + quesNum).val($(this).data('id'));
+	$(this).closest('form').find('input[name="sb-question-type-' + quesNum+'"]').val($(this).data('id'));
 	showStatus('#bs-question-' + quesNum, 'Edited');
 	$('#bs-question-' + quesNum).attr('data-status', 'edited');
 });
@@ -1333,7 +1333,7 @@ $(document).on('click', '.bd-ans-img-wrapper', function() {
 	$(this).find('.bd-ans-img').removeClass('bd-img-sel');
 
 	var quesNum = $(this).closest('form').data('quesnum');
-	$(this).closest('form').find('#sb-question-type-' + quesNum).val($(this).data('id'));
+	$(this).closest('form').find('input[name="sb-question-type-' + quesNum+'"]').val($(this).data('id'));
 	showStatus('#bs-question-' + quesNum, 'Edited');
 	$('#bs-question-' + quesNum).attr('data-status', 'edited');
 });
@@ -6859,7 +6859,7 @@ function updateYelpLink(link) {
 }
 
 // Update Social links - zillow
-$('body').on('click', '#prof-edit-social-link .icn-zillow', function() {
+/*$('body').on('click', '#prof-edit-social-link .icn-zillow', function() {
 	$('#social-token-text').show();
 	var link = $(this).attr("data-link");
 	$('#social-token-text').attr({
@@ -6867,7 +6867,7 @@ $('body').on('click', '#prof-edit-social-link .icn-zillow', function() {
 		"onblur" : "updateZillowLink(this.value);$('#social-token-text').hide();"
 	});
 	$('#social-token-text').val(link);
-});
+});*/
 
 function updateZillowLink(link) {
 	var payload = {
@@ -7397,7 +7397,9 @@ function paintDashboardButtons(data){
 			var contentToDisplay = '';
 			if (stages[i].profileStageKey == 'FACEBOOK_PRF') {
 				contentToDisplay = 'Connect to Facebook';
-			} else if (stages[i].profileStageKey == 'GOOGLE_PRF') {
+			}else if (stages[i].profileStageKey == 'ZILLOW_PRF') {
+				contentToDisplay = 'Connect to Zillow';
+			}else if (stages[i].profileStageKey == 'GOOGLE_PRF') {
 				contentToDisplay = 'Connect to Google+';
 			} else if (stages[i].profileStageKey == 'TWITTER_PRF') {
 				contentToDisplay = 'Connect to Twitter';
@@ -7451,6 +7453,9 @@ function dashboardButtonAction(buttonId, task, columnName, columnValue){
 	}
 	else if(task=='GOOGLE_PRF'){
 		openAuthPageDashboard('google', columnName, columnValue);
+	}
+	else if(task=='ZILLOW_PRF'){
+		openAuthPageDashboard('zillow', columnName, columnValue);
 	}
 	else if(task=='YELP_PRF'){
 		showMainContent('./showprofilepage.do');

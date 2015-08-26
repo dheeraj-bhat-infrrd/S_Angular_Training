@@ -642,10 +642,11 @@ input#find-pro-submit{
 }
 
 .ads-container {
-	background: url('../images/temp_ad.png') no-repeat top center;
-	height: 1000px;
+	/* background: url('../images/temp_ad.png') no-repeat top center; */
+	/* height: 1000px; */
 	background-size: contain;
 	margin-top: 15px;
+	padding: 0;
 }
 
 .fp-txt-1 {
@@ -877,6 +878,10 @@ span.txt-highlight {
 
 .i-yelp{
 	background: url(../images/yelp_wide.png) no-repeat center;
+}
+
+.i-zillow{
+	background: url(../images/zillow_wide.png) no-repeat center;
 }
 
 .wc-icn-txt{

@@ -477,7 +477,7 @@
 								<div class="prof-left-ach">
 									<div class="left-ach-wrapper">
 										<div class="left-panel-content">
-											<div class="lp-ach-row lp-row clearfix">${profile.disclaimer}</div>
+											<div class="lp-disclaimer-row lp-row">${profile.disclaimer}</div>
 										</div>
 									</div>
 								</div>
