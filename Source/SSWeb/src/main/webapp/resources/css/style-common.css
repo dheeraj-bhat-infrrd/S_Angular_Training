@@ -7300,3 +7300,14 @@ input.zillow-input {
 .zillow-input-container {
     margin: 10px 0;
 }
+
+.mbs-highwayad {
+	margin: 0 auto;
+	display: block;
+	max-width: 100%;
+}
+
+.lp-disclaimer-row {
+	line-height: 20px;
+	text-align: justify;
+}
