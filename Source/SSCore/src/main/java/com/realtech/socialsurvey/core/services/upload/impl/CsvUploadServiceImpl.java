@@ -421,7 +421,9 @@ public class CsvUploadServiceImpl implements CsvUploadService {
 
 	private List<String> getAllStateLicenses(String licenses, List<String> authorizedIn) {
 		String toRemove = "Licensed State(s):";
-		licenses = licenses.substring(licenses.indexOf("Licensed State(s):") + toRemove.length(), licenses.length());
+		if(licenses.indexOf(toRemove) != -1){
+			licenses = licenses.substring(licenses.indexOf("Licensed State(s):") + toRemove.length(), licenses.length());
+		}
 		licenses = licenses.trim();
 		authorizedIn.add(licenses);
 		return authorizedIn;
