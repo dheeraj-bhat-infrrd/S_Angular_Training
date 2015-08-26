@@ -100,13 +100,13 @@ function saveZillowEmailAddress() {
 }
 
 function validateZillowForm() {
-	var zillowEmailAddress = $('input[name="zillowEmailAddress"]').val();
+	/* var zillowEmailAddress = $('input[name="zillowEmailAddress"]').val();
 	if(zillowEmailAddress != undefined && zillowEmailAddress != "" && emailRegex.test(zillowEmailAddress)) {
 		return true;
-	}
+	} */
 	var zillowProfileName = $('input[name="zillowProfileName"]').val();
 	if(zillowProfileName == undefined ||  zillowProfileName == "") {
-		$('#overlay-toast').text("Please enter a valid email address or valid name");
+		$('#overlay-toast').text("Please enter a valid profile name");
 		showToast();
 		return false;
 	}else {
