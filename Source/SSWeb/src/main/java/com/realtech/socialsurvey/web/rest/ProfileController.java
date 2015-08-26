@@ -450,7 +450,7 @@ public class ProfileController {
 
 	@ResponseBody
 	@RequestMapping(value = "/branch/{branchId}/individuals")
-	public Response getIndividualsByBranchId(@PathVariable long branchId) {
+	public Response getIndividualsByBranchId(@PathVariable long branchId, HttpServletRequest request) {
 		LOG.info("Service to fetch individuals for branch called for branchId:" + branchId);
 		Response response = null;
 		try {
@@ -461,7 +461,18 @@ public class ProfileController {
 						"branch id is invalid while fetching all individuals for the branch");
 			}
 			try {
-				List<AgentSettings> individuals = profileManagementService.getIndividualsByBranchId(branchId);
+				int startIndex = -1;
+				int batchSize = -1;
+				String startIndexStr = request.getParameter("start");
+				String batchSizeStr = request.getParameter("rows");
+				try {
+					startIndex = Integer.parseInt(startIndexStr);
+					batchSize = Integer.parseInt(batchSizeStr);
+				}
+				catch (NumberFormatException e) {
+					LOG.error("Invalid startIndex or batch size passed");
+				}
+				List<AgentSettings> individuals = profileManagementService.getIndividualsByBranchId(branchId, startIndex, batchSize);
 				String json = new Gson().toJson(individuals);
 				LOG.debug("individuals json : " + json);
 				response = Response.ok(json).build();
@@ -487,7 +498,7 @@ public class ProfileController {
 	 */
 	@ResponseBody
 	@RequestMapping(value = "/region/{regionId}/individuals")
-	public Response getIndividualsByRegionId(@PathVariable long regionId) {
+	public Response getIndividualsByRegionId(@PathVariable long regionId, HttpServletRequest request) {
 		LOG.info("Service to fetch individuals for region called for regionId:" + regionId);
 		Response response = null;
 		try {
@@ -497,8 +508,21 @@ public class ProfileController {
 						CommonConstants.SERVICE_CODE_FETCH_REGION_INDIVIDUALS, "Region id is invalid"),
 						"region id is invalid while fetching all individuals for the region");
 			}
+			
+			int startIndex = -1;
+			int batchSize = -1;
+			String startIndexStr = request.getParameter("start");
+			String batchSizeStr = request.getParameter("rows");
 			try {
-				List<AgentSettings> individuals = profileManagementService.getIndividualsByRegionId(regionId);
+				startIndex = Integer.parseInt(startIndexStr);
+				batchSize = Integer.parseInt(batchSizeStr);
+			}
+			catch (NumberFormatException e) {
+				LOG.error("Invalid startIndex or batch size passed");
+			}
+			
+			try {
+				List<AgentSettings> individuals = profileManagementService.getIndividualsByRegionId(regionId, startIndex, batchSize);
 				String json = new Gson().toJson(individuals);
 				LOG.debug("individuals json : " + json);
 				response = Response.ok(json).build();

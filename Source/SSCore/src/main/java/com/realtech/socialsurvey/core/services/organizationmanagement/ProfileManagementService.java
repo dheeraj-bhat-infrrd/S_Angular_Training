@@ -188,6 +188,8 @@ public interface ProfileManagementService
      * @throws InvalidInputException
      */
     public List<AgentSettings> getIndividualsByBranchId( long branchId ) throws InvalidInputException;
+    
+    public List<AgentSettings> getIndividualsByBranchId( long branchId, int startIndex, int batchSize ) throws InvalidInputException;
 
 
     /**
@@ -524,4 +526,7 @@ public interface ProfileManagementService
 
 
 	public void addOrUpdateAgentPositions(List<CompanyPositions> companyPositions, AgentSettings agentSettings);
+
+
+	public List<AgentSettings> getIndividualsByRegionId(long regionId, int startIndex, int batchSize) throws InvalidInputException, NoRecordsFetchedException;
 }

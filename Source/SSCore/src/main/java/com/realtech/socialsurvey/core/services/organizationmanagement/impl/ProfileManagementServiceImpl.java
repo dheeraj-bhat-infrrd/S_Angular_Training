@@ -11,9 +11,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
 import javax.annotation.Resource;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
@@ -23,7 +21,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.DependsOn;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
-
 import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.commons.Utils;
 import com.realtech.socialsurvey.core.dao.BranchDao;
@@ -32,6 +29,7 @@ import com.realtech.socialsurvey.core.dao.OrganizationUnitSettingsDao;
 import com.realtech.socialsurvey.core.dao.SocialPostDao;
 import com.realtech.socialsurvey.core.dao.SurveyDetailsDao;
 import com.realtech.socialsurvey.core.dao.SurveyPreInitiationDao;
+import com.realtech.socialsurvey.core.dao.UserProfileDao;
 import com.realtech.socialsurvey.core.dao.impl.MongoOrganizationUnitSettingDaoImpl;
 import com.realtech.socialsurvey.core.entities.Achievement;
 import com.realtech.socialsurvey.core.entities.AgentRankingReport;
@@ -100,7 +98,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
     private OrganizationManagementService organizationManagementService;
 
     @Autowired
-    private GenericDao<UserProfile, Long> userProfileDao;
+    private UserProfileDao userProfileDao;
 
     @Autowired
     private GenericDao<Company, Long> companyDao;
@@ -1323,6 +1321,36 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
         LOG.info( "Method getIndividualsByBranchId executed successfully" );
         return users;
     }
+    
+    /**
+     * Method to get individuals by branchId 
+     * @param branchId 
+     * @param startIndex
+     * @param batchSize
+     * 
+     * @return List of {AgentSettings}
+     */
+    @Override
+    @Transactional
+    public List<AgentSettings> getIndividualsByBranchId(long branchId, int startIndex, int batchSize) throws InvalidInputException {
+    	LOG.info( "Method getIndividualsByBranchId called for branchId:" + branchId + ", startIndex: " + startIndex + ", batchSize: " + batchSize);
+        List<AgentSettings> users = null;
+        Map<String, Object> queries = new HashMap<String, Object>();
+        queries.put( CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_ACTIVE );
+        queries.put( CommonConstants.BRANCH_ID_COLUMN, branchId );
+        queries.put( CommonConstants.PROFILE_MASTER_COLUMN,
+            userManagementService.getProfilesMasterById( CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID ) );
+        List<UserProfile> userProfiles = userProfileDao.findUserProfilesInBatch( queries, startIndex, batchSize);
+        if ( userProfiles != null && !userProfiles.isEmpty() ) {
+            users = new ArrayList<AgentSettings>();
+            for ( UserProfile userProfile : userProfiles ) {
+                users.add( organizationUnitSettingsDao.fetchAgentSettingsById( userProfile.getUser().getUserId() ) );
+            }
+            LOG.debug( "Returning :" + users.size() + " individuals for branch : " + branchId );
+        }
+        LOG.info( "Method getIndividualsByBranchId executed successfully" );
+        return users;
+    }
 
 
     @Override
@@ -1373,6 +1401,38 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
         LOG.info( "Method getIndividualsByRegionId executed successfully" );
         return users;
     }
+    
+	@Override
+	@Transactional
+	public List<AgentSettings> getIndividualsByRegionId(long regionId, int startIndex, int batchSize) throws InvalidInputException,
+			NoRecordsFetchedException {
+		LOG.info("Method getIndividualsByRegionId called for regionId: " + regionId);
+		List<AgentSettings> users = null;
+		if (regionId <= 0l) {
+			throw new InvalidInputException("Region id is not set for getIndividualsByRegionId");
+		}
+		Branch defaultBranch = organizationManagementService.getDefaultBranchForRegion(regionId);
+
+		Map<String, Object> queries = new HashMap<String, Object>();
+		queries.put(CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_ACTIVE);
+		queries.put(CommonConstants.REGION_ID_COLUMN, regionId);
+		queries.put(CommonConstants.BRANCH_ID_COLUMN, defaultBranch.getBranchId());
+		queries.put(CommonConstants.PROFILE_MASTER_COLUMN,
+				userManagementService.getProfilesMasterById(CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID));
+
+		LOG.debug("calling method to fetch user profiles under region :" + regionId);
+		List<UserProfile> userProfiles = userProfileDao.findUserProfilesInBatch( queries, startIndex, batchSize);;
+
+		if (userProfiles != null && !userProfiles.isEmpty()) {
+			LOG.debug("Obtained userProfiles with size : " + userProfiles.size());
+			users = new ArrayList<AgentSettings>();
+			for (UserProfile userProfile : userProfiles) {
+				users.add(organizationUnitSettingsDao.fetchAgentSettingsById(userProfile.getUser().getUserId()));
+			}
+		}
+		LOG.info("Method getIndividualsByRegionId executed successfully");
+		return users;
+	}
 
 
     /**
