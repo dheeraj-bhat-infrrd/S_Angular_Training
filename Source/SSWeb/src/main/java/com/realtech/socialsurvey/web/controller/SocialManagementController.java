@@ -1544,13 +1544,11 @@ public class SocialManagementController
         HttpSession session = request.getSession( false );
         ZillowIntegrationApi zillowIntegrationApi = zillowIntergrationApiBuilder.getZellowIntegrationApi();
         User user = sessionHelper.getCurrentUser();
-        String zillowEmailAddress = request.getParameter( "zillowEmailAddress" );
-        String zillowFirstName = request.getParameter( "zillowFirstName" );
-        String zillowLastName = request.getParameter( "zillowLastName" );
-        if ( zillowEmailAddress == null && zillowFirstName == null && zillowLastName == null ) {
+        String zillowScreenName = request.getParameter( "zillowProfileName" );
+
+        if ( zillowScreenName == null && zillowScreenName == "" ) {
             model.addAttribute( "Error", "Please provide either the zillow screen name or zillow emailadress" );
-        } else if ( zillowEmailAddress == "" && zillowFirstName == null && zillowLastName == null ) {
-            model.addAttribute( "Error", "Please provide either the zillow screen name or zillow emailadress" );
+
         } else {
             try {
                 String profileLink = null;
@@ -1570,14 +1568,9 @@ public class SocialManagementController
                     return JspResolver.SOCIAL_AUTH_MESSAGE;
                 }
                 String jsonString = null;
-                String zillowScreenName = null;
-                if ( zillowFirstName != null && zillowFirstName != "" ) {
-                    zillowScreenName = zillowFirstName + " " + zillowLastName;
-                    zillowScreenName = zillowScreenName.trim();
-                    response = zillowIntegrationApi.fetchZillowReviewsByScreenname( zillowWebserviceId, zillowScreenName );
-                } else if ( zillowEmailAddress != null && zillowEmailAddress != "" ) {
-                    response = zillowIntegrationApi.fetchZillowReviewsByEmail( zillowWebserviceId, zillowEmailAddress );
-                }
+
+                zillowScreenName = zillowScreenName.trim();
+                response = zillowIntegrationApi.fetchZillowReviewsByScreenname( zillowWebserviceId, zillowScreenName );
 
                 Map<String, Object> map = null;
                 boolean updated = false;
