@@ -50,6 +50,9 @@ public class UserProfile implements Serializable {
 	@Column(name = "IS_PROFILE_COMPLETE")
 	private int isProfileComplete;
 
+	@Column(name = "IS_PRIMARY")
+	private int isPrimary;
+
 	@Column(name = "PROFILE_COMPLETION_STAGE")
 	private String profileCompletionStage;
 
@@ -99,6 +102,14 @@ public class UserProfile implements Serializable {
 
 	public void setAgentId(long agentId) {
 		this.agentId = agentId;
+	}
+
+	public int getIsPrimary() {
+		return isPrimary;
+	}
+
+	public void setIsPrimary(int isPrimary) {
+		this.isPrimary = isPrimary;
 	}
 
 	public String getProfileCompletionStage() {
