@@ -42,6 +42,7 @@ public class SurveyDetails
     private String agreedToShare;
     private String googleApi;
     private String faceBookShareUrl;
+    private boolean isAbusive;
 
 
     public String getGoogleApi()
@@ -473,5 +474,17 @@ public class SurveyDetails
     public void setSourceId( String sourceId )
     {
         this.sourceId = sourceId;
+    }
+
+
+    public boolean isAbusive()
+    {
+        return isAbusive;
+    }
+
+
+    public void setAbusive( boolean isAbusive )
+    {
+        this.isAbusive = isAbusive;
     }
 }

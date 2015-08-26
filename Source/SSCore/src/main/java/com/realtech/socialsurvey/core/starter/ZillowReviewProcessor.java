@@ -184,6 +184,7 @@ public class ZillowReviewProcessor extends QuartzJobBean
                                                     surveyDetails.setModifiedOn( new Date( System.currentTimeMillis() ) );
                                                     surveyDetails.setCreatedOn( new Date( System.currentTimeMillis() ) );
                                                     surveyDetails.setAgreedToShare( "true" );
+                                                    surveyDetails.setAbusive( false );
                                                     surveyHandler.insertSurveyDetails( surveyDetails );
                                                 }
                                             }
