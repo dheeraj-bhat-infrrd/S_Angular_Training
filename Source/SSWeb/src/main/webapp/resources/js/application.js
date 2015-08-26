@@ -6859,7 +6859,7 @@ function updateYelpLink(link) {
 }
 
 // Update Social links - zillow
-$('body').on('click', '#prof-edit-social-link .icn-zillow', function() {
+/*$('body').on('click', '#prof-edit-social-link .icn-zillow', function() {
 	$('#social-token-text').show();
 	var link = $(this).attr("data-link");
 	$('#social-token-text').attr({
@@ -6867,7 +6867,7 @@ $('body').on('click', '#prof-edit-social-link .icn-zillow', function() {
 		"onblur" : "updateZillowLink(this.value);$('#social-token-text').hide();"
 	});
 	$('#social-token-text').val(link);
-});
+});*/
 
 function updateZillowLink(link) {
 	var payload = {
