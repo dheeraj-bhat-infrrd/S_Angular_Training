@@ -67,6 +67,7 @@ import com.realtech.socialsurvey.core.entities.ContactNumberSettings;
 import com.realtech.socialsurvey.core.entities.CrmBatchTracker;
 import com.realtech.socialsurvey.core.entities.DisabledAccount;
 import com.realtech.socialsurvey.core.entities.EncompassCrmInfo;
+import com.realtech.socialsurvey.core.entities.FeedIngestionEntity;
 import com.realtech.socialsurvey.core.entities.FileUpload;
 import com.realtech.socialsurvey.core.entities.LicenseDetail;
 import com.realtech.socialsurvey.core.entities.LockSettings;
@@ -4361,6 +4362,16 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
         }
 
         return workbook;
+    }
+
+
+    @Transactional
+    @Override
+    public List<FeedIngestionEntity> fetchSocialMediaTokens( String collectionName, int batchSize )
+    {
+        List<FeedIngestionEntity> fieldIngestionEntities = organizationUnitSettingsDao.fetchSocialMediaTokens( collectionName,
+            0, batchSize );
+        return fieldIngestionEntities;
     }
 
 }

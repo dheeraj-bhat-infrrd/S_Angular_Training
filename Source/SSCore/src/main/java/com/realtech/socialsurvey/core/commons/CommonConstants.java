@@ -150,7 +150,7 @@ public interface CommonConstants
     public static final String API_SECRET_COLUMN = "apiSecret";
     public static final String API_KEY_COLUMN = "apiKey";
     public static final String SURVEY_SOURCE_KEY_COLUMN = "surveySource";
-    public static final String SURVEY_SOURCE_ID_COLUMN = "surveySourceId";
+    public static final String SURVEY_SOURCE_ID_COLUMN = "sourceId";
     public static final String VERTICAL_NAME = "verticalName";
 
     /**
@@ -240,6 +240,7 @@ public interface CommonConstants
     public static final String FACEBOOK_SOCIAL_SITE = "facebook";
     public static final String TWITTER_SOCIAL_SITE = "twitter";
     public static final String LINKEDIN_SOCIAL_SITE = "linkedin";
+    public static final String ZILLOW_SOCIAL_SITE = "zillow";
     public static final String YELP_SOCIAL_SITE = "yelp";
     public static final String GOOGLE_SOCIAL_SITE = "google";
     public static final String TWITTER_BASE_URL = "www.twitter.com/";
@@ -630,6 +631,8 @@ public interface CommonConstants
     public static final String PATTERN_FIRST = "patternFirst";
 
     public static final String PATTERN_LAST = "patternLast";
+
+    public static final String SURVEY_SOURCE_ZILLOW = "Zillow";
     
     //Excel constants
     public final String EXCEL_FORMAT = "application/vnd.ms-excel";

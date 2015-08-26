@@ -7397,7 +7397,9 @@ function paintDashboardButtons(data){
 			var contentToDisplay = '';
 			if (stages[i].profileStageKey == 'FACEBOOK_PRF') {
 				contentToDisplay = 'Connect to Facebook';
-			} else if (stages[i].profileStageKey == 'GOOGLE_PRF') {
+			}else if (stages[i].profileStageKey == 'ZILLOW_PRF') {
+				contentToDisplay = 'Connect to Zillow';
+			}else if (stages[i].profileStageKey == 'GOOGLE_PRF') {
 				contentToDisplay = 'Connect to Google+';
 			} else if (stages[i].profileStageKey == 'TWITTER_PRF') {
 				contentToDisplay = 'Connect to Twitter';
@@ -7451,6 +7453,9 @@ function dashboardButtonAction(buttonId, task, columnName, columnValue){
 	}
 	else if(task=='GOOGLE_PRF'){
 		openAuthPageDashboard('google', columnName, columnValue);
+	}
+	else if(task=='ZILLOW_PRF'){
+		openAuthPageDashboard('zillow', columnName, columnValue);
 	}
 	else if(task=='YELP_PRF'){
 		showMainContent('./showprofilepage.do');
