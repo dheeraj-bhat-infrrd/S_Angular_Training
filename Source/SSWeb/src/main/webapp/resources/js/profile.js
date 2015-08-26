@@ -426,6 +426,12 @@ function paintIndividualForBranch(data) {
 			// paintProfileImage("comp-individual-prof-image");
 			// bindClickToFetchIndividualProfile("branch-individual");
 		}
+	} else {
+		if($("#branch-individuals").length > 0) {
+			$("#branch-individuals").find(".show-more-btn").remove();
+		}else {
+			$("#comp-branch-individuals-"+branchId).find(".show-more-btn").remove();
+		}
 	}
 }
 
