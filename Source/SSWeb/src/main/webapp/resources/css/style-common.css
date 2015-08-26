@@ -7262,3 +7262,10 @@ img.hr-ind-img {
 	margin-bottom: 40px;
 	position: relative;
 }
+
+.show-more-btn {
+	text-align: center;
+	cursor: pointer;
+	color: #428bca;
+	background-color: #fcfcfc;
+}
