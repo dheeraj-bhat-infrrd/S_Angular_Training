@@ -1063,13 +1063,15 @@ public class DashboardController
                     }
 
                     AgentSettings agentSettings = userManagementService.getUserSettings( agentId );
-                    String agentName = "";
                     String agentTitle = "";
                     if ( agentSettings.getContact_details() != null && agentSettings.getContact_details().getTitle() != null ) {
-                        agentName = agentSettings.getContact_details().getName();
                         agentTitle = agentSettings.getContact_details().getTitle();
                     }
-
+                    
+                    String agentName = "";
+                    if (agentSettings.getContact_details() != null && agentSettings.getContact_details().getName() != null){
+                    	agentName = agentSettings.getContact_details().getName();
+                    }
                     String agentEmailId = "";
     				if(agentSettings.getContact_details() != null && agentSettings.getContact_details().getMail_ids() != null && agentSettings.getContact_details().getMail_ids().getWork() != null){
     					agentEmailId = agentSettings.getContact_details().getMail_ids().getWork();
@@ -1081,7 +1083,7 @@ public class DashboardController
                         && agentSettings.getContact_details().getContact_numbers().getWork() != null ) {
                         agentPhone = agentSettings.getContact_details().getContact_numbers().getWork();
                     }
-
+                    
                     User user = userManagementService.getUserByUserId( agentId );
                     String companyName = user.getCompany().getCompany();
 
