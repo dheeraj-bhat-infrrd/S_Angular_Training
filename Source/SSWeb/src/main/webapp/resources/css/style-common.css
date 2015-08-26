@@ -5637,6 +5637,10 @@ tr.u-tbl-header td {
 	background: url(../images/rss_wide.png) no-repeat center;
 }
 
+.icn-wide-zillow {
+	background: url(../images/zillow_wide.png) no-repeat center;
+}
+
 .icn-wide-linkedin {
 	background: url(../images/linkedin_wide.png) no-repeat center;
 }
@@ -7263,9 +7267,36 @@ img.hr-ind-img {
 	position: relative;
 }
 
-.show-more-btn {
+label.zillow-input-label {
+    width: 160px;
+    text-align: right;
+    padding-right: 20px;
+    height: 35px;
+    float: left;
+}
+
+input.zillow-input {
+    width: 200px;
+    height: 35px;
+    line-height: normal;
+    padding: 5px 0 5px 10px;
+    border: 1px solid #dcdcdc;
+    border-radius: 3px;
+}
+
+.zillow-sub-btn {
+	background-color: #009FE0;
+	height: 40px;
+	line-height: 40px;
+	width: 160px;
 	text-align: center;
+	color: #fff;
+	border-radius: 3px;
+	margin: 10px auto;
+	font-size: 13px;
 	cursor: pointer;
-	color: #428bca;
-	background-color: #fcfcfc;
+}
+
+.zillow-input-container {
+    margin: 10px 0;
 }

@@ -879,6 +879,10 @@ span.txt-highlight {
 	background: url(../images/yelp_wide.png) no-repeat center;
 }
 
+.i-zillow{
+	background: url(../images/zillow_wide.png) no-repeat center;
+}
+
 .wc-icn-txt{
 	padding-left: 10px;
 	color: #3E9DCB;
