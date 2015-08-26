@@ -1568,7 +1568,9 @@ public class SocialManagementController
                     return JspResolver.SOCIAL_AUTH_MESSAGE;
                 }
                 String jsonString = null;
-
+                if ( zillowScreenName.contains( "-" ) ) {
+                    zillowScreenName = zillowScreenName.replace( "-", " " );
+                }
                 zillowScreenName = zillowScreenName.trim();
                 response = zillowIntegrationApi.fetchZillowReviewsByScreenname( zillowWebserviceId, zillowScreenName );
 
