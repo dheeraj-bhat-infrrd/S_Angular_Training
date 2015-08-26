@@ -7306,3 +7306,8 @@ input.zillow-input {
 	display: block;
 	max-width: 100%;
 }
+
+.lp-disclaimer-row {
+	line-height: 20px;
+	text-align: justify;
+}
