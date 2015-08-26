@@ -612,7 +612,12 @@ function paintReviews(result){
 				+ reviewItem.customerEmail + '" data-agentid="' + reviewItem.agentId + '">';
 		reviewsHtml += '	<div class="ppl-header-wrapper clearfix">';
 		reviewsHtml += '		<div class="float-left ppl-header-left">';    
-		reviewsHtml += '			<div class="ppl-head-1">'+reviewItem.customerFirstName+' '+reviewItem.customerLastName+'</div>';
+		reviewsHtml += '			<div class="ppl-head-1">'+reviewItem.customerFirstName;
+		if(reviewItem.customerLastName != undefined){
+			reviewsHtml += ' '+reviewItem.customerLastName+'</div>';
+		}else {
+			reviewsHtml += '</div>';
+		}
 		if (date != null) {
 			date = convertUTCToUserDate(date);
 			reviewsHtml += '		<div class="ppl-head-2">' + date.getMonthName() + " " + date.getDate() + ", " + date.getFullYear() + '</div>'; 
