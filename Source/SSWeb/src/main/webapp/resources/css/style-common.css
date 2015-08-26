@@ -3839,16 +3839,16 @@ img.prof-image {
 	border-top: 3px solid #5cc7ef;
 	background-color: #fff;
 	border-radius: 3px;
-	overflow: hidden;
-	width: 150px;
+	width: 200px;
 	color: #666;
 	text-align: left;
 	top: 50px;
 	right: 5px;
-	max-height: 270px;
+	max-height: 400px;
+	box-shadow: 3px 3px 30px #444;
 }
 
-.pe-dd-item {
+/* .pe-dd-item {
 	cursor: pointer;
 	font-size: 14px;
 	line-height: 30px;
@@ -3862,25 +3862,24 @@ img.prof-image {
 }
 .pe-dd-item:last-child {
 	border-bottom: 0;
+} */
+.pe-dd-item, .da-dd-item, .se-dd-item {
+	cursor: pointer;
+	font-size: 12px;
+	line-height: 15px;
+	padding: 3px 5px;
+	border-bottom: 1px solid #eee;
 }
 
-.da-dd-item {
-	cursor: pointer;
-	font-size: 14px;
-	line-height: 30px;
-	padding: 0 5px;
-	border-bottom: 1px solid #dcdcdc;
-}
-.da-dd-item:hover {
+.da-dd-item:hover, .pe-dd-item:hover, .se-dd-item:hover {
 	color: #fff;
 	background-color: #5cc7ef;
-	border-top: 1px solid #5cc7ef;
 }
-.da-dd-item:last-child {
+.da-dd-item:last-child, .se-dd-item:last-child, .pe-dd-item:last-child {
 	border-bottom: 0;
 }
 
-.se-dd-item {
+/* .se-dd-item {
 	cursor: pointer;
 	font-size: 14px;
 	line-height: 30px;
@@ -3894,7 +3893,7 @@ img.prof-image {
 }
 .se-dd-item:last-child {
 	border-bottom: 0;
-}
+}*/
 
 .dsh-name-wrapper {
 	font-size: 22px;
@@ -5637,6 +5636,10 @@ tr.u-tbl-header td {
 	background: url(../images/rss_wide.png) no-repeat center;
 }
 
+.icn-wide-zillow {
+	background: url(../images/zillow_wide.png) no-repeat center;
+}
+
 .icn-wide-linkedin {
 	background: url(../images/linkedin_wide.png) no-repeat center;
 }
@@ -7261,4 +7264,56 @@ img.hr-ind-img {
 .pos-cont {
 	margin-bottom: 40px;
 	position: relative;
+}
+
+label.zillow-input-label {
+    width: 160px;
+    text-align: right;
+    padding-right: 20px;
+    height: 35px;
+    float: left;
+}
+
+input.zillow-input {
+    width: 200px;
+    height: 35px;
+    line-height: normal;
+    padding: 5px 0 5px 10px;
+    border: 1px solid #dcdcdc;
+    border-radius: 3px;
+}
+
+.zillow-sub-btn {
+	background-color: #009FE0;
+	height: 40px;
+	line-height: 40px;
+	width: 160px;
+	text-align: center;
+	color: #fff;
+	border-radius: 3px;
+	margin: 10px auto;
+	font-size: 13px;
+	cursor: pointer;
+}
+
+.zillow-input-container {
+    margin: 10px 0;
+}
+
+.mbs-highwayad {
+	margin: 0 auto;
+	display: block;
+	max-width: 100%;
+}
+
+.lp-disclaimer-row {
+	line-height: 20px;
+	text-align: justify;
+}
+
+.show-more-btn {
+    text-align: center;
+    cursor: pointer;
+    color: #fff;
+    background-color: #5cc7ef;
 }

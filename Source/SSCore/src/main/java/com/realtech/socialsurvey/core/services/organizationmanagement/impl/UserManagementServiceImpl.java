@@ -1085,6 +1085,18 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
     }
 
 
+    @Transactional
+    @Override
+    public List<User> getAllActiveUsers()
+    {
+        Map<String, Object> queries = new HashMap<>();
+        queries.put( CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_ACTIVE );
+        List<User> users = userDao.findByKeyValue( User.class, queries );
+        return users;
+
+    }
+
+
     /*
      * Method to update the given user as active or inactive.
      */

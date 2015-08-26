@@ -38,25 +38,37 @@ public class SurveyDetails
     private String lendingTreeProfileUrl;
     private String realtorProfileUrl;
     private String source;
+    private String sourceId;
     private String agreedToShare;
     private String googleApi;
     private String faceBookShareUrl;
+    private boolean isAbusive;
 
-    public String getGoogleApi() {
-		return googleApi;
-	}
 
-	public void setGoogleApi(String googleApi) {
-		this.googleApi = googleApi;
-	}
-	public String getFaceBookShareUrl() {
-		return faceBookShareUrl;
-	}
+    public String getGoogleApi()
+    {
+        return googleApi;
+    }
 
-	public void setFaceBookShareUrl(String faceBookShareUrl) {
-		this.faceBookShareUrl = faceBookShareUrl;
-	}
-    
+
+    public void setGoogleApi( String googleApi )
+    {
+        this.googleApi = googleApi;
+    }
+
+
+    public String getFaceBookShareUrl()
+    {
+        return faceBookShareUrl;
+    }
+
+
+    public void setFaceBookShareUrl( String faceBookShareUrl )
+    {
+        this.faceBookShareUrl = faceBookShareUrl;
+    }
+
+
     public long getAgentId()
     {
         return agentId;
@@ -450,5 +462,29 @@ public class SurveyDetails
     public void setRealtorProfileUrl( String realtorProfileUrl )
     {
         this.realtorProfileUrl = realtorProfileUrl;
+    }
+
+
+    public String getSourceId()
+    {
+        return sourceId;
+    }
+
+
+    public void setSourceId( String sourceId )
+    {
+        this.sourceId = sourceId;
+    }
+
+
+    public boolean isAbusive()
+    {
+        return isAbusive;
+    }
+
+
+    public void setAbusive( boolean isAbusive )
+    {
+        this.isAbusive = isAbusive;
     }
 }

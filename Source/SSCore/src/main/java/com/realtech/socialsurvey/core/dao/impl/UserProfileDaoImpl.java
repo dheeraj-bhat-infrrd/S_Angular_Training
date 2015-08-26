@@ -3,10 +3,13 @@ package com.realtech.socialsurvey.core.dao.impl;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
 import org.hibernate.Query;
 import org.hibernate.criterion.Criterion;
+import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 import org.slf4j.Logger;
@@ -133,5 +136,32 @@ public class UserProfileDaoImpl extends GenericDaoImpl<UserProfile, Long> implem
 		query.setParameter(0, companyId);
 		query.executeUpdate();
 		LOG.info("Method deleteUserProfilesByCompany() finished.");
+	}
+	
+	@SuppressWarnings("unchecked")
+	@Override
+	public List<UserProfile> findUserProfilesInBatch(Map<String, Object> queries, int startIndex, int batchSize) {
+
+		LOG.info("Method findUserProfilesInBatch() called");
+
+		Criteria criteria = getSession().createCriteria(UserProfile.class);
+		try {
+			for (Entry<String, Object> query : queries.entrySet()) {
+				criteria.add(Restrictions.eq(query.getKey(), query.getValue()));
+			}
+			criteria.createAlias( "user", "alias" );
+			criteria.addOrder(Order.asc("alias.firstName"));
+			if(startIndex > -1) {
+				criteria.setFirstResult(startIndex);
+			}
+			if(batchSize > -1) {
+				criteria.setMaxResults(batchSize);
+			}
+		}
+		catch (HibernateException hibernateException) {
+			LOG.error("HibernateException caught in findByKeyValueAscendingWithAlias().", hibernateException);
+			throw new DatabaseException("HibernateException caught in findByKeyValueAscendingWithAlias().", hibernateException);
+		}
+		return criteria.list();
 	}
 }

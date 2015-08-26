@@ -81,7 +81,9 @@ $(document).ready(function() {
 	// close on error
 	var error = "${error}";
 	if (parseInt(error) == 1) {
-		window.close();
+		setTimeout(function() {
+			window.close();
+		}, 3000);
 	}
 	
 	// close on success

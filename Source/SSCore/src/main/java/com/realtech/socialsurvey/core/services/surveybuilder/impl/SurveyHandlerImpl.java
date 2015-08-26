@@ -185,6 +185,14 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
     }
 
 
+    @Override
+    @Transactional
+    public void insertSurveyDetails( SurveyDetails surveyDetails )
+    {
+        surveyDetailsDao.insertSurveyDetails( surveyDetails );
+    }
+
+
     /*
      * Method to generate survey URL to start a survey directly based upon agentId and customer
      * email id.
@@ -281,6 +289,19 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
             surveyPreInitiationDao.merge( survey );
         }
         LOG.info( "Method to increase reminder count by 1, updateReminderCount() finished." );
+    }
+
+
+    @Override
+    @Transactional
+    public SurveyDetails getSurveyDetailsBySourceIdAndMongoCollection( String surveySourceId, long iden, String collectionName )
+    {
+        LOG.debug( "Inside method getSurveyDetailsBySourceId" );
+        SurveyDetails surveyDetails = null;
+        if ( surveySourceId != null ) {
+            surveyDetails = surveyDetailsDao.getSurveyBySourceSourceIdAndMongoCollection( surveySourceId, iden, collectionName );
+        }
+        return surveyDetails;
     }
 
 

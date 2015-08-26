@@ -162,11 +162,18 @@ if(document.getElementById('fb_'+loop) != null)
 		</c:forEach>
 	</c:when>
 	<c:otherwise>
+	<span id="no-review-found" class="hide">
 		<spring:message code="label.noreviews.key" />
+		</span>
 	</c:otherwise>
 </c:choose>
 <script>
 $(document).ready(function(){
+	
+	if($('#prof-review-item').children('.ppl-review-item').length == 0) {
+		$('#no-review-found').show();
+	}
+	
 	$('.ppl-head-2').each(function(index, currentElement) {
 		var dateSplit = $(this).attr('data-modifiedon').split('-');
 		var date = convertUserDateToLocale(new Date(dateSplit[0], dateSplit[1]-1, dateSplit[2], dateSplit[3], dateSplit[4], dateSplit[5]));

@@ -936,95 +936,111 @@ public class DashboardController
      * already.
      */
     @ResponseBody
-	@RequestMapping(value = "/sendsurveyremindermail")
-	public String sendReminderMailForSurvey(Model model, HttpServletRequest request) {
-		LOG.info("Method to send email to remind customer for survey sendReminderMailForSurvey() started.");
+    @RequestMapping ( value = "/sendsurveyremindermail")
+    public String sendReminderMailForSurvey( Model model, HttpServletRequest request )
+    {
+        LOG.info( "Method to send email to remind customer for survey sendReminderMailForSurvey() started." );
 
-		try {
-			String surveyPreInitiationIdStr = request.getParameter("surveyPreInitiationId");
+        try {
+            String customerName = request.getParameter( "customerName" );
+            String custFirstName = "";
+            String custLastName = "";
+            String customerEmail = request.getParameter( "customerEmail" );
+            String agentName = request.getParameter( "agentName" );
 
-			if (surveyPreInitiationIdStr == null || surveyPreInitiationIdStr.isEmpty()) {
-				LOG.error("Invalid value (null/empty) passed for surveyPreInitiationIdStr.");
-				throw new InvalidInputException("Invalid value (null/empty) passed for surveyPreInitiationIdStr.");
-			}
+            if ( customerName == null || customerName.isEmpty() ) {
+                LOG.error( "Invalid value (null/empty) passed for customerName." );
+                throw new InvalidInputException( "Invalid value (null/empty) passed for customerName." );
+            }
+            if ( customerName.contains( " " ) ) {
+                String[] nameArray = customerName.split( " " );
+                custLastName = nameArray[nameArray.length - 1];
+                for ( int nameIdx = 0; nameIdx < nameArray.length - 1; nameIdx++ ) {
+                    custFirstName = custFirstName + nameArray[nameIdx] + " ";
+                }
+                custFirstName = custFirstName.trim();
+            }
+            if ( customerEmail == null || customerEmail.isEmpty() ) {
+                LOG.error( "Invalid value (null/empty) passed for customerEmail." );
+                throw new InvalidInputException( "Invalid value (null/empty) passed for customerEmail." );
+            }
 
-			String surveyLink = "";
-			long surveyPreInitiationId;
-			try {
-				surveyPreInitiationId = Integer.parseInt(surveyPreInitiationIdStr);
-			}
-			catch (NumberFormatException e) {
-				throw new InvalidInputException("Invalid surveyPreInitiationIdStr passed", e.getMessage(), e);
-			}
-			SurveyPreInitiation survey = surveyHandler.getPreInitiatedSurveyById(surveyPreInitiationId);
-			long agentId = survey.getAgentId();
-			String customerEmail = survey.getCustomerEmailId();
-			String custFirstName = survey.getCustomerFirstName();
-			String custLastName = survey.getCustomerLastName();
-			if (survey != null) {
-				surveyLink = surveyHandler.getSurveyUrl(agentId, customerEmail,
-						surveyHandler.composeLink(agentId, customerEmail, custFirstName, custLastName));
-			}
+            long agentId = 0;
+            try {
+                String agentIdStr = request.getParameter( "agentId" );
+                if ( agentIdStr == null || agentIdStr.isEmpty() ) {
+                    LOG.error( "Invalid value (null/empty) passed for agentIdStr." );
+                    throw new InvalidInputException( "Invalid value (null/empty) passed for agentIdStr." );
+                }
+                agentId = Long.parseLong( agentIdStr );
+            } catch ( NumberFormatException e ) {
+                LOG.error(
+                    "NumberFormatException caught while parsing agentId in sendReminderMailForSurvey(). Nested exception is ",
+                    e );
+                throw e;
+            }
 
-			try {
-				AgentSettings agentSettings = userManagementService.getUserSettings(agentId);
-				String agentTitle = "";
-				if (agentSettings.getContact_details() != null && agentSettings.getContact_details().getTitle() != null) {
-					agentTitle = agentSettings.getContact_details().getTitle();
-				}
+            String surveyLink = "";
+            SurveyPreInitiation survey = surveyHandler.getPreInitiatedSurvey( agentId, customerEmail, custFirstName,
+                custLastName );
+            if ( survey != null ) {
+                surveyLink = surveyHandler.getSurveyUrl( agentId, customerEmail,
+                    surveyHandler.composeLink( agentId, customerEmail, custFirstName, custLastName ) );
+            }
 
-				String agentPhone = "";
-				if (agentSettings.getContact_details() != null && agentSettings.getContact_details().getContact_numbers() != null
-						&& agentSettings.getContact_details().getContact_numbers().getWork() != null) {
-					agentPhone = agentSettings.getContact_details().getContact_numbers().getWork();
-				}
+            try {
+                AgentSettings agentSettings = userManagementService.getUserSettings( agentId );
+                String agentTitle = "";
+                if ( agentSettings.getContact_details() != null && agentSettings.getContact_details().getTitle() != null ) {
+                    agentTitle = agentSettings.getContact_details().getTitle();
+                }
 
-				String agentEmailId = "";
-				if(agentSettings.getContact_details() != null && agentSettings.getContact_details().getMail_ids() != null && agentSettings.getContact_details().getMail_ids().getWork() != null){
-					agentEmailId = agentSettings.getContact_details().getMail_ids().getWork();
-				}
-					
-				User user = userManagementService.getUserByUserId(agentId);
-				String companyName = user.getCompany().getCompany();
-				String agentName = "";
-				
-				if(agentSettings.getContact_details() != null && agentSettings.getContact_details().getName() != null) {
-					agentName = agentSettings.getContact_details().getName();	
-				}
-				
-				if (enableKafka.equals(CommonConstants.YES)) {
-					emailServices.queueSurveyReminderMail(customerEmail, custFirstName, agentName, surveyLink, agentPhone, agentTitle, companyName);
-				}
-				else {
-					// TODO: add call to emailservice method.
-					OrganizationUnitSettings companySettings = null;
-					try {
-						companySettings = organizationManagementService.getCompanySettings(user.getCompany().getCompanyId());
-					}
-					catch (InvalidInputException e) {
-						LOG.error("InvalidInputException occured while trying to fetch company settings.");
-					}
-					emailServices.sendManualSurveyReminderMail(companySettings, user, agentName, agentEmailId, agentPhone, agentTitle, companyName, survey,
-							surveyLink);
-				}
-			}
-			catch (InvalidInputException e) {
-				LOG.error("Exception occurred while trying to send survey reminder mail to : " + customerEmail);
-				throw e;
-			}
+                String agentEmailId = "";
+                if ( agentSettings.getContact_details() != null && agentSettings.getContact_details().getMail_ids() != null
+                    && agentSettings.getContact_details().getMail_ids().getWork() != null ) {
+                    agentEmailId = agentSettings.getContact_details().getMail_ids().getWork();
+                }
 
-			// Increasing value of reminder count by 1.
-			if (survey != null) {
-				surveyHandler.updateReminderCount(survey.getSurveyPreIntitiationId(), true);
-			}
-		}
-		catch (NonFatalException e) {
-			LOG.error("NonFatalException caught in sendReminderMailForSurvey() while sending mail. Nested exception is ", e);
-		}
+                String agentPhone = "";
+                if ( agentSettings.getContact_details() != null
+                    && agentSettings.getContact_details().getContact_numbers() != null
+                    && agentSettings.getContact_details().getContact_numbers().getWork() != null ) {
+                    agentPhone = agentSettings.getContact_details().getContact_numbers().getWork();
+                }
 
-		LOG.info("Method to send email to remind customer for survey sendReminderMailForSurvey() finished.");
-		return new Gson().toJson("success");
-	}
+                User user = userManagementService.getUserByUserId( agentId );
+                String companyName = user.getCompany().getCompany();
+
+                if ( enableKafka.equals( CommonConstants.YES ) ) {
+                    emailServices.queueSurveyReminderMail( customerEmail, custFirstName, agentName, surveyLink, agentPhone,
+                        agentTitle, companyName );
+                } else {
+                    // TODO: add call to emailservice method.
+                    OrganizationUnitSettings companySettings = null;
+                    try {
+                        companySettings = organizationManagementService.getCompanySettings( user.getCompany().getCompanyId() );
+                    } catch ( InvalidInputException e ) {
+                        LOG.error( "InvalidInputException occured while trying to fetch company settings." );
+                    }
+                    emailServices.sendManualSurveyReminderMail( companySettings, user, agentName, agentEmailId, agentPhone,
+                        agentTitle, companyName, survey, surveyLink );
+                }
+            } catch ( InvalidInputException e ) {
+                LOG.error( "Exception occurred while trying to send survey reminder mail to : " + customerEmail );
+                throw e;
+            }
+
+            // Increasing value of reminder count by 1.
+            if ( survey != null ) {
+                surveyHandler.updateReminderCount( survey.getSurveyPreIntitiationId(), true );
+            }
+        } catch ( NonFatalException e ) {
+            LOG.error( "NonFatalException caught in sendReminderMailForSurvey() while sending mail. Nested exception is ", e );
+        }
+
+        LOG.info( "Method to send email to remind customer for survey sendReminderMailForSurvey() finished." );
+        return new Gson().toJson( "success" );
+    }
 
 
     /**
@@ -1063,25 +1079,28 @@ public class DashboardController
                     }
 
                     AgentSettings agentSettings = userManagementService.getUserSettings( agentId );
-                    String agentName = "";
                     String agentTitle = "";
                     if ( agentSettings.getContact_details() != null && agentSettings.getContact_details().getTitle() != null ) {
-                        agentName = agentSettings.getContact_details().getName();
                         agentTitle = agentSettings.getContact_details().getTitle();
                     }
-
+                    
+                    String agentName = "";
+                    if (agentSettings.getContact_details() != null && agentSettings.getContact_details().getName() != null){
+                    	agentName = agentSettings.getContact_details().getName();
+                    }
                     String agentEmailId = "";
-    				if(agentSettings.getContact_details() != null && agentSettings.getContact_details().getMail_ids() != null && agentSettings.getContact_details().getMail_ids().getWork() != null){
-    					agentEmailId = agentSettings.getContact_details().getMail_ids().getWork();
-    				}
-    				
+                    if ( agentSettings.getContact_details() != null && agentSettings.getContact_details().getMail_ids() != null
+                        && agentSettings.getContact_details().getMail_ids().getWork() != null ) {
+                        agentEmailId = agentSettings.getContact_details().getMail_ids().getWork();
+                    }
+
                     String agentPhone = "";
                     if ( agentSettings.getContact_details() != null
                         && agentSettings.getContact_details().getContact_numbers() != null
                         && agentSettings.getContact_details().getContact_numbers().getWork() != null ) {
                         agentPhone = agentSettings.getContact_details().getContact_numbers().getWork();
                     }
-
+                    
                     User user = userManagementService.getUserByUserId( agentId );
                     String companyName = user.getCompany().getCompany();
 
@@ -1089,7 +1108,6 @@ public class DashboardController
                         emailServices.queueSurveyReminderMail( customerEmail, custFirstName, agentName, surveyLink, agentPhone,
                             agentTitle, companyName );
                     } else {
-                        // TODO: add call to emailservice method.
                         OrganizationUnitSettings companySettings = null;
                         try {
                             companySettings = organizationManagementService.getCompanySettings( user.getCompany()
@@ -1097,8 +1115,8 @@ public class DashboardController
                         } catch ( InvalidInputException e ) {
                             LOG.error( "InvalidInputException occured while trying to fetch company settings." );
                         }
-                        emailServices.sendManualSurveyReminderMail( companySettings, user, agentName, agentEmailId, agentPhone, agentTitle,
-                            companyName, survey, surveyLink );
+                        emailServices.sendManualSurveyReminderMail( companySettings, user, agentName, agentEmailId, agentPhone,
+                            agentTitle, companyName, survey, surveyLink );
                     }
 
                     surveyHandler.updateReminderCount( survey.getSurveyPreIntitiationId(), true );
@@ -1824,6 +1842,9 @@ public class DashboardController
             }
             if ( tokens.getLinkedInToken() != null && tokens.getLinkedInToken().getLinkedInPageLink() != null ) {
                 model.addAttribute( "linkedinProfileUrl", tokens.getLinkedInToken().getLinkedInPageLink() );
+            }
+            if ( tokens.getZillowToken() != null && tokens.getZillowToken().getZillowProfileLink() != null ) {
+                model.addAttribute( "zillowProfileUrl", tokens.getZillowToken().getZillowProfileLink() );
             }
         }
 
