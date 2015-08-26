@@ -3839,16 +3839,16 @@ img.prof-image {
 	border-top: 3px solid #5cc7ef;
 	background-color: #fff;
 	border-radius: 3px;
-	overflow: hidden;
-	width: 150px;
+	width: 200px;
 	color: #666;
 	text-align: left;
 	top: 50px;
 	right: 5px;
-	max-height: 270px;
+	max-height: 400px;
+	box-shadow: 3px 3px 30px #444;
 }
 
-.pe-dd-item {
+/* .pe-dd-item {
 	cursor: pointer;
 	font-size: 14px;
 	line-height: 30px;
@@ -3862,25 +3862,24 @@ img.prof-image {
 }
 .pe-dd-item:last-child {
 	border-bottom: 0;
+} */
+.pe-dd-item, .da-dd-item, .se-dd-item {
+	cursor: pointer;
+	font-size: 12px;
+	line-height: 15px;
+	padding: 3px 5px;
+	border-bottom: 1px solid #eee;
 }
 
-.da-dd-item {
-	cursor: pointer;
-	font-size: 14px;
-	line-height: 30px;
-	padding: 0 5px;
-	border-bottom: 1px solid #dcdcdc;
-}
-.da-dd-item:hover {
+.da-dd-item:hover, .pe-dd-item:hover, .se-dd-item:hover {
 	color: #fff;
 	background-color: #5cc7ef;
-	border-top: 1px solid #5cc7ef;
 }
-.da-dd-item:last-child {
+.da-dd-item:last-child, .se-dd-item:last-child, .pe-dd-item:last-child {
 	border-bottom: 0;
 }
 
-.se-dd-item {
+/* .se-dd-item {
 	cursor: pointer;
 	font-size: 14px;
 	line-height: 30px;
@@ -3894,7 +3893,7 @@ img.prof-image {
 }
 .se-dd-item:last-child {
 	border-bottom: 0;
-}
+}*/
 
 .dsh-name-wrapper {
 	font-size: 22px;
@@ -7310,4 +7309,11 @@ input.zillow-input {
 .lp-disclaimer-row {
 	line-height: 20px;
 	text-align: justify;
+}
+
+.show-more-btn {
+    text-align: center;
+    cursor: pointer;
+    color: #fff;
+    background-color: #5cc7ef;
 }
