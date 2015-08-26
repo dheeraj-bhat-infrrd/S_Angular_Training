@@ -1843,6 +1843,9 @@ public class DashboardController
             if ( tokens.getLinkedInToken() != null && tokens.getLinkedInToken().getLinkedInPageLink() != null ) {
                 model.addAttribute( "linkedinProfileUrl", tokens.getLinkedInToken().getLinkedInPageLink() );
             }
+            if ( tokens.getZillowToken() != null && tokens.getZillowToken().getZillowProfileLink() != null ) {
+                model.addAttribute( "zillowProfileUrl", tokens.getZillowToken().getZillowProfileLink() );
+            }
         }
 
         return JspResolver.LINKEDIN_IMPORT_SOCIAL_LINKS;
