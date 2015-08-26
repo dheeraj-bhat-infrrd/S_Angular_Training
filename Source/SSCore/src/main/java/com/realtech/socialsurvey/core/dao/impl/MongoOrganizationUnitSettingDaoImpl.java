@@ -380,6 +380,7 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
 		LOG.debug("Updating the unit settings");
 		mongoTemplate.updateFirst(query, update, OrganizationUnitSettings.class, collectionName);
 		unitSettings = mongoTemplate.findOne(query, OrganizationUnitSettings.class, collectionName);
+		setCompleteUrlForSettings(unitSettings, collectionName);
 		LOG.info("Method removeKeyInOrganizationSettings() finished.");
 		return unitSettings;
 	}
