@@ -148,5 +148,13 @@
 			<div id="user-assign-btn" class="user-edit-btn float-left">Assign</div>
 		</div>
 	</div>
-	<div id="btn-save-user-assignment" class="v-edt-btn-sav hide"><spring:message code="label.savechanges.key" /></div>
+	<div id="btn-save-user-assignment" class="user-edit-btn-row clearfix hide">
+		<div class="user-edit-btn-col float-left">
+			<div id="user-edit-save" class="user-edit-btn float-right">Save</div>
+		</div>
+		<div class="user-edit-btn-col float-left">
+			<div id="user-edit-cancel" class="user-edit-btn float-left">Cancel</div>
+		</div>
+	</div>
+	<%-- <div id="btn-save-user-assignment" class="v-edt-btn-sav hide"><spring:message code="label.savechanges.key" /></div> --%>
 </div>
