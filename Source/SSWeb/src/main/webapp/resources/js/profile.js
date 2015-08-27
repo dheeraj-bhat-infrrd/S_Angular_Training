@@ -631,15 +631,27 @@ function paintReviews(result){
 		
 		reviewsHtml += '		</div>';
 		reviewsHtml += '    	<div class="float-right ppl-header-right">';
-		reviewsHtml += '    	    <div class="st-rating-wrapper maring-0 clearfix review-ratings" data-rating="'+reviewItem.score+'"></div>';
+		reviewsHtml += '    	    <div class="st-rating-wrapper maring-0 clearfix review-ratings" data-source="'+reviewItem.source+'" data-rating="'+reviewItem.score+'"></div>';
 		reviewsHtml += '		</div>';
 		reviewsHtml += '	</div>';
 		
-		if (reviewItem.review.length > 250) {
-			reviewsHtml += '<div class="ppl-content"><span class="review-complete-txt">'+reviewItem.review+'</span><span class="review-less-text">' + reviewItem.review.substr(0,250) + '</span><span class="review-more-button">More</span></div>';			
+		reviewsHtml += '	<div class="review-source-text">source: ';
+		if(reviewItem.source != "Zillow") {
+			reviewsHtml += '<a class="review-source" href="https://socialsurvey.me/" target="_blank">Social Survey</a>';
 		} else {
-			reviewsHtml += '<div class="ppl-content">'+reviewItem.review+'</div>';
+			reviewsHtml += '<a class="review-source" href="http://www.zillow.com/" target="_blank">Zillow</a>';
 		}
+		reviewsHtml += '	</div>';
+		
+		if (reviewItem.review.length > 250) {
+			reviewsHtml += '<div class="ppl-content"><span class="review-complete-txt">'+reviewItem.review+'</span><span class="review-less-text">' + reviewItem.review.substr(0,250) + '</span><span class="review-more-button">More</span>';
+		} else {
+			reviewsHtml += '<div class="ppl-content">'+reviewItem.review;
+		}
+		if(reviewItem.source == "Zillow") {
+			reviewsHtml += '<a class="view-zillow-link" href="'+reviewItem.sourceId+'"  target="_blank">View on zillow</a>';
+		}
+		reviewsHtml += '	</div>';
 		
 		reviewsHtml += '	<div class="ppl-share-wrapper clearfix">';
 		reviewsHtml += '		<div class="float-left blue-text ppl-share-shr-txt">Share</div>';
@@ -665,7 +677,8 @@ function paintReviews(result){
 		}
 		reviewsHtml += '		</div>';
 		reviewsHtml += '		<div class="float-right" style="margin: 0 -5px;">';
-		reviewsHtml += '			<div class="report-abuse-txt report-txt prof-report-abuse-txt">Report Abuse</div>';
+		if(reviewItem.source != "Zillow")
+			reviewsHtml += '			<div class="report-abuse-txt report-txt prof-report-abuse-txt">Report Abuse</div>';
 		reviewsHtml += '		</div>';
 		reviewsHtml += '		<div class="float-left icn-share icn-remove icn-rem-size hide"></div>';
 		reviewsHtml += '	</div>';
@@ -684,7 +697,7 @@ function paintReviews(result){
 	
 	$("#prof-reviews-header").parent().show();
 	$(".review-ratings").each(function() {
-		changeRatingPattern($(this).data("rating"), $(this));
+		changeRatingPattern($(this).data("rating"), $(this), false, $(this).data("source"));
 	});
 	$('.icn-plus-open').click(function(){
         $(this).hide();
