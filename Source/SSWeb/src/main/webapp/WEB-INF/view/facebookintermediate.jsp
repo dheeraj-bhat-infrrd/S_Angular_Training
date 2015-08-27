@@ -11,6 +11,7 @@
 	<link rel="shortcut icon" href="/favicon.ico" sizes="16x16">
 	<link rel="stylesheet" href="${initParam.resourcesPath}/resources/css/bootstrap.min.css">
 	<link rel="stylesheet" href="${initParam.resourcesPath}/resources/css/style.css">
+	<link rel="stylesheet" href="${initParam.resourcesPath}/resources/css/style-common-1.1.css">	
 	<link rel="stylesheet" href="${initParam.resourcesPath}/resources/css/style-common.css">
 	<link rel="stylesheet" href="${initParam.resourcesPath}/resources/css/style-resp.css">
 </head>
@@ -21,7 +22,7 @@
 	<div class="container login-container">
 		<div class="row login-row">
 			<div class="login-wrapper-resp padding-001 margin-top-25 margin-bottom-25 login-wrapper bg-fff margin-0-auto col-xs-12">
-				<div class="logo login-logo margin-bottom-25 margin-top-25"></div>
+				<div class="ss-logo-blue login-logo margin-bottom-25 margin-top-25"></div>
 				<div class="login-txt text-center font-24 margin-bot-20">
 					<div style="padding: 0px 20px;" class="clearfix">
 						<div style="margin-bottom: 10px; font-size: 19px; text-align: center; padding: 0px 10px;">
