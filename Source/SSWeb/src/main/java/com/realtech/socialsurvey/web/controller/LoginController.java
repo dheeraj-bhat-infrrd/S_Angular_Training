@@ -195,7 +195,18 @@ public class LoginController {
 			if (user.isSuperAdmin()) {
 				return JspResolver.ADMIN_LANDING;
 			}
+			
+			try {
+				long realtechUserId = (long) session.getAttribute(CommonConstants.REALTECH_USER_ID);
 
+				if (realtechUserId > -1) {
+					session.setAttribute(CommonConstants.POPUP_FLAG_IN_SESSION, CommonConstants.NO_STRING);
+				}
+			}
+			catch (NullPointerException e) {
+				LOG.error("Realtech User id not present in session, direct user login");
+			}
+			
 			user = userManagementService.getUserByUserId(user.getUserId());
 			userManagementService.setProfilesOfUser(user);
 			List<LicenseDetail> licenseDetails = user.getCompany().getLicenseDetails();
