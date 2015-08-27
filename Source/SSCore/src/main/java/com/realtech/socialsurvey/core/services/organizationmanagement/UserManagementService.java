@@ -8,6 +8,7 @@ import com.realtech.socialsurvey.core.entities.Branch;
 import com.realtech.socialsurvey.core.entities.Company;
 import com.realtech.socialsurvey.core.entities.ProListUser;
 import com.realtech.socialsurvey.core.entities.ProfilesMaster;
+import com.realtech.socialsurvey.core.entities.Region;
 import com.realtech.socialsurvey.core.entities.User;
 import com.realtech.socialsurvey.core.entities.UserFromSearch;
 import com.realtech.socialsurvey.core.entities.UserProfile;
@@ -29,6 +30,7 @@ public interface UserManagementService
 {
 
     public List<User> getAllActiveUsers();
+
 
     public ProfilesMaster getProfilesMasterById( int profileId ) throws InvalidInputException;
 
@@ -173,7 +175,9 @@ public interface UserManagementService
     // Method to update status of the given user profile as active or inactive.
     public void updateUserProfile( User admin, long profileIdToUpdate, int status ) throws InvalidInputException;
 
-	public void updateUserProfilesStatus(User admin, long profileIdToUpdate) throws InvalidInputException;
+
+    public void updateUserProfilesStatus( User admin, long profileIdToUpdate ) throws InvalidInputException;
+
 
     /*
      * Sends an email to user with the link to complete registration. User has to provide password
@@ -369,10 +373,31 @@ public interface UserManagementService
     public User addCorporateAdmin( String firstName, String lastName, String emailId, String confirmPassword,
         boolean isDirectRegistration ) throws InvalidInputException, UserAlreadyExistsException, UndeliveredEmailException,
         SolrException;
-    
+
+
     public String generateIndividualProfileName( long userId, String name, String emailId ) throws InvalidInputException;
 
 
-    public User getUserObjByUserId(long userId) throws InvalidInputException;
+    public User getUserObjByUserId( long userId ) throws InvalidInputException;
+
+
+    public Company getCompanyById( long id );
+
+
+    public Region getRegionById( long id );
+
+
+    public Branch getBranchById( long id );
+
+
+    public void updateRegion( Region region );
+
+
+    public void updateBranch( Branch branch );
+
+
+    public void updateCompany( Company company );
+
+
 }
 // JIRA SS-34 BY RM02 BOC
