@@ -4066,8 +4066,8 @@ $(document).on('click','#user-edit-btn',function(e){
 	$('form input[data-editable="true"]').removeAttr("readonly");
 	$('#btn-save-user-assignment').show();
 	
-	$("#btn-save-user-assignment").off('click');
-	$("#btn-save-user-assignment").on('click',function(e){
+	$("#user-edit-save").off('click');
+	$("#user-edit-save").on('click',function(e){
 		if(validateUserDetailsUserManagement()){
 			saveUserDetailsByAdmin();
 			
@@ -4077,6 +4077,11 @@ $(document).on('click','#user-edit-btn',function(e){
 			}, 2000);
 		}
 	});
+	$('#user-edit-cancel').on('click',function(){
+		setTimeout(function() {
+			getUserAssignments($('#selected-userid-hidden').val());
+		}, 1000);
+	});
 });
 
 $(document).on('click','#user-assign-btn',function(e){
@@ -4085,8 +4090,8 @@ $(document).on('click','#user-assign-btn',function(e){
 	$('#user-assignment-cont').show();
 	$('#btn-save-user-assignment').show();
 	
-	$("#btn-save-user-assignment").off('click');
-	$("#btn-save-user-assignment").on('click',function(e){
+	$("#user-edit-save").off('click');
+	$("#user-edit-save").on('click',function(e){
 		if(validateIndividualForm()){
 			saveUserAssignment("user-assignment-form");
 			
@@ -4095,6 +4100,11 @@ $(document).on('click','#user-assign-btn',function(e){
 				getUserAssignments($('#selected-userid-hidden').val());
 			}, 2000);
 		}
+	});
+	$('#user-edit-cancel').on('click',function(){
+		setTimeout(function() {
+			getUserAssignments($('#selected-userid-hidden').val());
+		}, 1000);
 	});
 });
 
