@@ -2390,4 +2390,60 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 
         return user;
     }
+
+
+    @Override
+    @Transactional
+    public Company getCompanyById( long id )
+    {
+        Company company = companyDao.findById( Company.class, id );
+        return company;
+    }
+
+
+    @Override
+    @Transactional
+    public void updateCompany( Company company )
+    {
+        companyDao.update( company );
+
+    }
+
+
+    @Override
+    @Transactional
+    public void updateBranch( Branch branch )
+    {
+        branchDao.update( branch );
+
+    }
+
+
+    @Override
+    @Transactional
+    public void updateRegion( Region region )
+    {
+        regionDao.update( region );
+
+    }
+
+
+    @Override
+    @Transactional
+    public Region getRegionById( long id )
+    {
+        Region region = regionDao.findById( Region.class, id );
+        return region;
+    }
+
+
+    @Override
+    @Transactional
+    public Branch getBranchById( long id )
+    {
+        Branch branch = branchDao.findById( Branch.class, id );
+        return branch;
+    }
+
+
 }
