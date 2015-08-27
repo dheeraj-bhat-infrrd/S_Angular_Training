@@ -7328,3 +7328,8 @@ input.zillow-input {
 	color: #1EBEF0;
 	cursor: pointer;
 }
+
+.v-edt-tbl-wrapper {
+	overflow: hidden;
+	position: relative;
+}
