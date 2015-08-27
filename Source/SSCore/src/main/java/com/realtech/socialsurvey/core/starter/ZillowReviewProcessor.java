@@ -1,10 +1,14 @@
 package com.realtech.socialsurvey.core.starter;
 
 import java.io.IOException;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 import org.quartz.JobDataMap;
@@ -173,6 +177,7 @@ public class ZillowReviewProcessor extends QuartzJobBean
                                                         .equalsIgnoreCase( MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION ) ) {
                                                         surveyDetails.setAgentId( ingestionEntity.getIden() );
                                                     }
+                                                    String createdDate = (String) review.get( "reviewDate" );
                                                     surveyDetails.setCompleteProfileUrl( (String) review.get( "reviewerLink" ) );
                                                     surveyDetails.setCustomerFirstName( (String) review.get( "reviewer" ) );
                                                     surveyDetails.setReview( (String) review.get( "description" ) );
@@ -181,8 +186,8 @@ public class ZillowReviewProcessor extends QuartzJobBean
                                                     surveyDetails.setScore( Double.valueOf( (String) review.get( "rating" ) ) );
                                                     surveyDetails.setSource( CommonConstants.SURVEY_SOURCE_ZILLOW );
                                                     surveyDetails.setSourceId( sourceId );
-                                                    surveyDetails.setModifiedOn( new Date( System.currentTimeMillis() ) );
-                                                    surveyDetails.setCreatedOn( new Date( System.currentTimeMillis() ) );
+                                                    surveyDetails.setModifiedOn( convertStringToDate( createdDate ) );
+                                                    surveyDetails.setCreatedOn( convertStringToDate( createdDate ) );
                                                     surveyDetails.setAgreedToShare( "true" );
                                                     surveyDetails.setAbusive( false );
                                                     surveyHandler.insertSurveyDetails( surveyDetails );
@@ -200,6 +205,20 @@ public class ZillowReviewProcessor extends QuartzJobBean
         } else {
             LOG.error( "No social media token present for " + collectionName + " with iden: " + ingestionEntity.getIden() );
         }
+    }
+
+
+    private Date convertStringToDate( String dateString )
+    {
+
+        DateFormat format = new SimpleDateFormat( "MM/dd/yyyy", Locale.ENGLISH );
+        Date date;
+        try {
+            date = format.parse( dateString );
+        } catch ( ParseException e ) {
+            return null;
+        }
+        return date;
     }
 
 
