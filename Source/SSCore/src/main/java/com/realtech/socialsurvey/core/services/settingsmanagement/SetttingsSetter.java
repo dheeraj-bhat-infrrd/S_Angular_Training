@@ -30,7 +30,7 @@ public interface SetttingsSetter {
 	 * @return
 	 * @throws NonFatalException
 	 */
-	public Region setSettingsValueForCompany(Region region, SettingsForApplication settings, boolean hasBeenSet) throws NonFatalException;
+	public Region setSettingsValueForRegion(Region region, SettingsForApplication settings, boolean hasBeenSet) throws NonFatalException;
 	
 	/**
 	 * Sets the value of the set setting fields of the branch. The latest value of setter is set in the branch and returned.
@@ -40,7 +40,7 @@ public interface SetttingsSetter {
 	 * @return
 	 * @throws NonFatalException
 	 */
-	public Branch setSettingsValueForCompany(Branch branch, SettingsForApplication settings, boolean hasBeenSet) throws NonFatalException;
+	public Branch setSettingsValueForBranch(Branch branch, SettingsForApplication settings, boolean hasBeenSet) throws NonFatalException;
 	
 	/**
 	 * Check if the settings value is set for the organization unit

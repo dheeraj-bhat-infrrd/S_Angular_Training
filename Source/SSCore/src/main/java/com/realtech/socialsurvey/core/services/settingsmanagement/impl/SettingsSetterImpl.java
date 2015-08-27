@@ -30,7 +30,7 @@ public class SettingsSetterImpl implements SetttingsSetter {
 	}
 
 	@Override
-	public Region setSettingsValueForCompany(Region region, SettingsForApplication settings, boolean hasBeenSet) throws NonFatalException {
+	public Region setSettingsValueForRegion(Region region, SettingsForApplication settings, boolean hasBeenSet) throws NonFatalException {
 		// Get the set settings value for the corresponding unit and set the value according to the
 		// input sent
 		if (region == null || settings == null) {
@@ -44,7 +44,7 @@ public class SettingsSetterImpl implements SetttingsSetter {
 	}
 
 	@Override
-	public Branch setSettingsValueForCompany(Branch branch, SettingsForApplication settings, boolean hasBeenSet) throws NonFatalException {
+	public Branch setSettingsValueForBranch(Branch branch, SettingsForApplication settings, boolean hasBeenSet) throws NonFatalException {
 		// Get the set settings value for the corresponding unit and set the value according to the
 		// input sent
 		if (branch == null || settings == null) {
