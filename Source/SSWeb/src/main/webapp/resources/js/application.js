@@ -176,6 +176,27 @@ function retrieveState() {
 /*End of functions for history support*/
 
 
+/*
+ * Click event to close survey popup
+ */
+$(document).on('click',  function(e){
+	if($('#overlay-send-survey').is(':visible')){
+		$('#overlay-send-survey').hide();
+	}
+});
+
+$(document).on('keyup',  function(e){
+	if (e.keyCode == 27){
+		if($('#overlay-send-survey').is(':visible')){
+			$('#overlay-send-survey').hide();
+		}
+	}
+});
+
+$(document).on('click', '#welcome-popup-invite', function(e){
+	e.stopPropagation();
+});
+
 
 $(document).on('click', '.icn-plus-open', function() {
 	$(this).hide();
