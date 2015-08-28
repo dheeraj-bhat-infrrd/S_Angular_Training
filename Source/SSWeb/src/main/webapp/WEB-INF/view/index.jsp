@@ -1,11 +1,13 @@
-<%@ page language="java" contentType="text/html; charset=ISO-8859-1" pageEncoding="UTF-8"%>
-<!DOCTYPE">
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+<!DOCTYPE>
 <html>
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<title>Professional Reputation Management | SocialSurvey.me</title>
-	
+	<meta name="norton-safeweb-site-verification" 
+ 		 content="s97qgdn0xldafh23hpih0sd0qpc19jjqnb37xio342-fltqdwg1jjoe2o5mnkfonqua26k1hukucj52b7c6r8-2ts8zcwvh-zv42i5rcg06bimirv1mykg0ucoupvxr3" />
 	<meta name="keywords"
 		content="socialsurvey.me, socialsurvey, professional, online, reputation management, social, survey, reviews, rating">
 	<meta name="description"
@@ -17,6 +19,12 @@
 	<link rel="stylesheet" href="${initParam.resourcesPath}/resources/css/style-resp-1.1.css">
 	<script src='//www.google.com/recaptcha/api.js'></script>
 </head>
+
+<c:set var="user" value="${sessionScope.SPRING_SECURITY_CONTEXT.authentication.principal}" />
+
+<c:if test="${not empty user }">
+	<c:redirect url="/landing.do"></c:redirect>
+</c:if>
 
 <body class="index-body">
 	<div class="body-wrapper">
@@ -206,7 +214,7 @@
 <script src="${initParam.resourcesPath}/resources/js/index.js"></script>
 <script>
 $(document).ready(function(){
-	$.ajax({
+	/* $.ajax({
 		url : "./redirectifexistsactivesession.do",
 		type : "GET",
 		dataType : "html",
@@ -219,7 +227,7 @@ $(document).ready(function(){
 		error : function(e) {
 			redirectErrorpage();
 		}
-	});
+	}); */
 	
 	var captchaText=true;
 	resizeFunc();

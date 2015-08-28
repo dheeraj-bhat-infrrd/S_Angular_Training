@@ -19,6 +19,8 @@ import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.xssf.usermodel.XSSFDataFormat;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.joda.time.DateTime;
+import org.joda.time.Days;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
@@ -218,14 +220,11 @@ public class DashboardServiceImpl implements DashboardService, InitializingBean 
 		CellStyle style = workbook.createCellStyle();
 		style.setDataFormat(df.getFormat("d-mm-yyyy"));
 		Integer counter = 1;
-		int max = 0;
-		int internalMax = 0;
 
 		// This data needs to be written (List<Object>)
 		Map<String, List<Object>> data = new TreeMap<>();
 		List<Object> surveyDetailsToPopulate = new ArrayList<>();
 		for (SurveyPreInitiation survey : surveyDetails) {
-			internalMax = 0;
 			surveyDetailsToPopulate.add(survey.getCustomerFirstName());
 			surveyDetailsToPopulate.add(survey.getCustomerLastName());
 			surveyDetailsToPopulate.add(survey.getCustomerEmailId());
@@ -240,19 +239,14 @@ public class DashboardServiceImpl implements DashboardService, InitializingBean 
 			}
 			data.put((++counter).toString(), surveyDetailsToPopulate);
 			surveyDetailsToPopulate = new ArrayList<>();
-			if (internalMax > max)
-				max = internalMax;
 		}
+		
 		surveyDetailsToPopulate.add("First Name");
 		surveyDetailsToPopulate.add("Last Name");
 		surveyDetailsToPopulate.add("Email Id");
 		surveyDetailsToPopulate.add("Started On");
 		surveyDetailsToPopulate.add("Last Updated On");
 		surveyDetailsToPopulate.add("Link To Survey");
-		for (counter = 1; counter <= max; counter++) {
-			internalMax++;
-			surveyDetailsToPopulate.add("Question " + counter);
-		}
 
 		data.put("1", surveyDetailsToPopulate);
 
@@ -363,18 +357,23 @@ public class DashboardServiceImpl implements DashboardService, InitializingBean 
 		CellStyle style = workbook.createCellStyle();
 		style.setDataFormat(df.getFormat("d-mm-yyyy"));
 		Integer counter = 1;
-		int max = 0;
-		int internalMax = 0;
 
 		// Sorting SurveyResults
 		Collections.sort(surveyDetails, new SurveyResultsComparator());
 
+		// Finding max questions
+		int max = 0;
+		int internalMax = 0;
+		for (SurveyDetails survey : surveyDetails) {
+			internalMax = survey.getSurveyResponse().size();
+			if (internalMax > max)
+				max = internalMax;
+		}
+		
 		// This data needs to be written (List<Object>)
 		Map<String, List<Object>> data = new TreeMap<>();
 		List<Object> surveyDetailsToPopulate = new ArrayList<>();
 		for (SurveyDetails survey : surveyDetails) {
-			internalMax = 0;
-
 			String agentName = survey.getAgentName();
 			surveyDetailsToPopulate.add(agentName.substring(0, agentName.lastIndexOf(' ')));
 			surveyDetailsToPopulate.add(agentName.substring(agentName.lastIndexOf(' ') + 1));
@@ -382,6 +381,8 @@ public class DashboardServiceImpl implements DashboardService, InitializingBean 
 			surveyDetailsToPopulate.add(survey.getCustomerLastName());
 			surveyDetailsToPopulate.add(DATE_FORMATTER.format(survey.getCreatedOn()));
 			surveyDetailsToPopulate.add(DATE_FORMATTER.format(survey.getModifiedOn()));
+			surveyDetailsToPopulate.add(Days.daysBetween(new DateTime(survey.getCreatedOn()), new DateTime(survey.getModifiedOn())).getDays());
+			
 			if (survey.getSource() != null && !survey.getSource().isEmpty()) {
 				surveyDetailsToPopulate.add(survey.getSource());
 			}
@@ -391,7 +392,6 @@ public class DashboardServiceImpl implements DashboardService, InitializingBean 
 
 			surveyDetailsToPopulate.add(survey.getScore());
 			for (SurveyResponse response : survey.getSurveyResponse()) {
-				internalMax++;
 				surveyDetailsToPopulate.add(response.getAnswer());
 			}
 
@@ -417,8 +417,6 @@ public class DashboardServiceImpl implements DashboardService, InitializingBean 
 
 			data.put((++counter).toString(), surveyDetailsToPopulate);
 			surveyDetailsToPopulate = new ArrayList<>();
-			if (internalMax > max)
-				max = internalMax;
 		}
 
 		// Setting up headers
@@ -428,6 +426,7 @@ public class DashboardServiceImpl implements DashboardService, InitializingBean 
 		surveyDetailsToPopulate.add(CommonConstants.HEADER_CUSTOMER_LAST_NAME);
 		surveyDetailsToPopulate.add(CommonConstants.HEADER_SURVEY_SENT_DATE);
 		surveyDetailsToPopulate.add(CommonConstants.HEADER_SURVEY_COMPLETED_DATE);
+		surveyDetailsToPopulate.add(CommonConstants.HEADER_SURVEY_TIME_INTERVAL);
 		surveyDetailsToPopulate.add(CommonConstants.HEADER_SURVEY_SOURCE);
 		surveyDetailsToPopulate.add(CommonConstants.HEADER_SURVEY_SCORE);
 		for (counter = 1; counter <= max; counter++) {

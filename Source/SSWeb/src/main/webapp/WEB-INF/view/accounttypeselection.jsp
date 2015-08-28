@@ -1,11 +1,11 @@
-<%@ page language="java" contentType="text/html; charset=ISO-8859-1" pageEncoding="UTF-8"%>
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions"%>
 <%@ taglib prefix="spring" uri="http://www.springframework.org/tags"%>
 <c:set var="user" value="${sessionScope.SPRING_SECURITY_CONTEXT.authentication.principal}" />
 <c:choose>
 	<c:when test="${upgrade == 1}"></c:when>
-	<c:when test="${ paidUpgrade == 1 }">
+	<c:when test="${paidUpgrade == 1}">
 		<body>
 			<div class="overlay-payment overlay-main hide">
 				<div id="payment-section" class="payment-section">

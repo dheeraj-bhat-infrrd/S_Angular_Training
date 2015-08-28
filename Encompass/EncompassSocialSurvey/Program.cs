@@ -11,24 +11,20 @@ namespace EncompassSocialSurvey
         static void Main(string[] args)
         {
             log4net.Config.BasicConfigurator.Configure();
-            // Logger.XmlConfigure();
 
             Logger.Info("Entering into method: Program.Main()");
 
             try
             {
-                //var stringDecrypted = CommonUtility.Decrypt("", "86e25dfad40cfe35ad938bf82929f88c");
 
-                // var stringDecrypted = CommonUtility.Decrypt("86e25dfad40cfe35ad938bf82929f88c");
-
-                // get company details
+                Logger.Debug("Getting company details ");
                 CompanyCredentialService _ccService = new CompanyCredentialService();
                 var companyCredentials = _ccService.GetCompanyCredentials();
 
-                // it
+
                 Logger.Info("Company credentials count from mongodb: " + companyCredentials.Count);
 
-                // now process encompass loans
+                Logger.Debug("Processing loans for company ");
                 ProcessLoanForCompanies(companyCredentials);
             }
             catch (System.Exception ex)
@@ -48,54 +44,45 @@ namespace EncompassSocialSurvey
             Logger.Info("Entering the method ProcessLoanForCompanies.ProcessLoanForCompanies()");
             foreach (var forCompCredential in companyCredentials)
             {
+                LoanService loanSerivce = new LoanService();
 
-                Logger.Info("Strating loan processing for company: "
-                    + " companyId: " + forCompCredential.CompanyId
-                    + " : companyUserName : " + forCompCredential.UserName
-                    + " : password : " + forCompCredential.Password
-                    + " : companyURL : " + forCompCredential.EncompassUrl);
-                  
-                try
+                if (loanSerivce.isCompanyActive(forCompCredential.CompanyId))
                 {
-                    // do the login & create the login session 
-                    EncompassGlobal.GetUserLoginSesssion(forCompCredential);
+                    Logger.Debug("Starting loan processing for company: "
+                        + " companyId: " + forCompCredential.CompanyId
+                        + " : companyUserName : " + forCompCredential.UserName
+                        + " : companyURL : " + forCompCredential.EncompassUrl);
 
-                    // 1st Get all the folder
-                    LoanUtility _loanUtility = new LoanUtility();
-                    ArrayList loanFolder = _loanUtility.PopulateLoanFolderList();
-
-                    // get the ss_environment value
-                    var ssEnv = System.Configuration.ConfigurationManager.AppSettings["ss_environment"];
-                    string fieldId = forCompCredential.fieldId;
-                    string emailDomain = null;
-                    string emailPrefix = null;
-                    if (ssEnv.Equals("test"))
+                    try
                     {
-                        emailDomain = System.Configuration.ConfigurationManager.AppSettings["email_domain_to_replace"];
-                        emailPrefix = System.Configuration.ConfigurationManager.AppSettings["email_address_prefix"];
-                        Logger.Debug("Email Domain: " + emailDomain);
-                        Logger.Debug("Email Prefix: " + emailPrefix);
-                    }
+                        Logger.Debug("Logging into encompass");
+                        EncompassGlobal.GetUserLoginSesssion(forCompCredential);
 
-                    // process loan for each loan folder
-                    foreach (string folderName in loanFolder)
-                    {
-                        Logger.Info("Strating loan Folder:  : "
-                   + " companyId: " + forCompCredential.CompanyId
-                   + " : companyUserName : " + forCompCredential.UserName
-                    + " : folderName : " + folderName);
+                        var ssEnv = System.Configuration.ConfigurationManager.AppSettings[EncompassSocialSurverConstant.SETUP_ENVIRONMENT];
+                        Logger.Debug("SSEnv = " + ssEnv);
+                        string fieldId = forCompCredential.fieldId;
+                        string emailDomain = null;
+                        string emailPrefix = null;
+                        if (ssEnv.Equals(EncompassSocialSurverConstant.SETUP_ENVIRONMENT_TEST))
+                        {
+                            emailDomain = System.Configuration.ConfigurationManager.AppSettings[EncompassSocialSurverConstant.EMAIL_DOMAIN_REPLACEMENT];
+                            emailPrefix = System.Configuration.ConfigurationManager.AppSettings[EncompassSocialSurverConstant.EMAIL_DOMAIN_PREFIX];
+                            Logger.Debug("Email Domain: " + emailDomain);
+                            Logger.Debug("Email Prefix: " + emailPrefix);
+                        }
+
                         try
                         {
-                            // 1st Get loan VM
-                            var loansVM = _loanUtility.LopulateLoanList(EncompassGlobal.EncompassLoginSession.Loans.Folders[folderName], forCompCredential.CompanyId, fieldId, emailDomain, emailPrefix);
+                            LoanUtility _loanUtility = new LoanUtility();
 
-                            // 2nd if no loansVM continue
+                            var loansVM = _loanUtility.LopulateLoanList(forCompCredential.CompanyId, fieldId, emailDomain, emailPrefix);
+
                             if (null == loansVM) continue;
                             if (loansVM.Count <= 0) continue;
 
                             // process for insert
 
-                            LoanService loanSerivce = new LoanService();
+
                             loanSerivce.InsertLoans(loansVM);
                         }
                         catch (System.Exception ex)
@@ -105,31 +92,27 @@ namespace EncompassSocialSurvey
                             // TODO: Log the exception
                         }
 
-                        Logger.Info("Done loan Folder:  : "
-                + " companyId: " + forCompCredential.CompanyId
-                + " : companyUserName : " + forCompCredential.UserName
-                 + " : folderName : " + folderName);
                     }
+                    catch (System.Exception ex)
+                    {
+                        // Let's process the loan for other company
+                        Logger.Error("Caught an exception, companiesCredentials: Program.ProcessLoanForCompanies():", ex);
+                        // TODO: Log the exception
+                    }
+                    finally
+                    {
+                        // close the session
+                        if (null != EncompassGlobal.EncompassLoginSession)
+                            EncompassGlobal.EncompassLoginSession.End();
+                    }
+                    Logger.Info("Done loan processing for company: "
+                          + " companyId: " + forCompCredential.CompanyId
+                          + " : companyUserName : " + forCompCredential.UserName
+                          + " : companyURL : " + forCompCredential.EncompassUrl);
                 }
-                catch (System.Exception ex)
-                {
-                    // Let's process the loan for other company
-                    Logger.Error("Caught an exception, companiesCredentials: Program.ProcessLoanForCompanies():", ex);
-                    // TODO: Log the exception
-                }
-                finally
-                {
-                    // close the session
-                    if (null != EncompassGlobal.EncompassLoginSession)
-                        EncompassGlobal.EncompassLoginSession.End();
-                }
-                Logger.Info("Done loan processing for company: "
-                      + " companyId: " + forCompCredential.CompanyId
-                      + " : companyUserName : " + forCompCredential.UserName
-                      + " : companyURL : " + forCompCredential.EncompassUrl);
             }
 
-            //
+
             Logger.Info("Exiting the method ProcessLoanForCompanies.ProcessLoanForCompanies()");
         }
     }

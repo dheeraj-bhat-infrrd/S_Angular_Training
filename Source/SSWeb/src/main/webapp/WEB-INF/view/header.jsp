@@ -18,6 +18,7 @@
 
 	<link rel="shortcut icon" href="/favicon.ico" sizes="16x16">
 	<link rel="stylesheet" href="${initParam.resourcesPath}/resources/css/bootstrap.min.css">
+	<link rel="stylesheet" href="${initParam.resourcesPath}/resources/css/datepicker3.css">
 	<link rel="stylesheet" href="${initParam.resourcesPath}/resources/jcrop/jquery.Jcrop.min.css">
 	<link rel="stylesheet" href="${initParam.resourcesPath}/resources/css/style.css">
 	<link rel="stylesheet" href="${initParam.resourcesPath}/resources/css/style-common.css">
@@ -33,7 +34,35 @@
 	<div id="srv-req-pop" class="survey-request-popup-container hide">
 		<div class="survey-request-popup"></div>
 	</div>
-	<div id="overlay-incomplete-survey" class="overlay-login overlay-main hide"></div>
+	<div id="overlay-incomplete-survey"
+		class="overlay-login overlay-main hide">
+		<div class="welcome-popup-wrapper">
+			<div class="welcome-popup-hdr-wrapper clearfix">
+				<div class="float-left wc-hdr-txt">
+					<spring:message code="label.header.incompletesurvey.key" />
+				</div>
+				<div class="float-right popup-close-icn" onclick="hideIncompleteSurveyListPopup();"></div>
+			</div>
+			<div class="welcome-popup-body-wrapper clearfix icn-sur-popup-wrapper">
+				<div id="icn-sur-popup-cont" data-start="0" data-total="0" data-batch="5" class="icn-sur-popup-cont"></div>
+				<div class="mult-sur-icn-wrapper">
+					<div id="resend-mult-sur-icn" class="mult-sur-icn resend-mult-sur-icn float-left"></div>
+					<div id="del-mult-sur-icn" class="mult-sur-icn del-mult-sur-icn float-right"></div>
+				</div>
+			</div>
+			<div class="paginate-buttons-survey clearfix">
+				<div id="sur-previous" class="float-left sur-paginate-btn">&lt; Prev</div>
+				<div class="paginate-sel-box float-left">
+					<input id="sel-page" type="text" pattern="[0-9]*" class="sel-page"/>
+					<span class="paginate-divider">/</span>
+					<span id="paginate-total-pages" class="paginate-total-pages"></span>
+				</div>
+				<div id="sur-next" class="float-right sur-paginate-btn">Next &gt;</div>
+			</div>
+		</div>
+	</div>
+	<div id="overlay-edit-positions" class="overlay-login overlay-main hide">
+	</div>
 	<div id="toast-container" class="toast-container">
 	   <span id="overlay-toast" class="overlay-toast"></span>
     </div>

@@ -6,11 +6,9 @@ package com.realtech.socialsurvey.web.profile;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
-
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-
 import org.apache.solr.common.SolrDocument;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -24,11 +22,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
-
 import com.amazonaws.util.json.JSONException;
 import com.amazonaws.util.json.JSONObject;
 import com.google.gson.Gson;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
+import com.realtech.socialsurvey.core.entities.AgentSettings;
 import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
 import com.realtech.socialsurvey.core.entities.SocialMediaTokens;
 import com.realtech.socialsurvey.core.entities.SocialPost;
@@ -421,10 +419,13 @@ public class ProfileViewController
                 }
             }
 
-            OrganizationUnitSettings individualProfile = null;
+            AgentSettings individualProfile = null;
             try {
-                individualProfile = profileManagementService.getIndividualByProfileName( agentProfileName );
+                individualProfile = (AgentSettings) profileManagementService.getIndividualByProfileName( agentProfileName );
 
+                //set vertical name from the company
+                individualProfile.setVertical(user.getCompany().getVerticalsMaster().getVerticalName());
+                
                 // aggregated social profile urls
 				SocialMediaTokens agentTokens = profileManagementService.aggregateSocialProfiles(individualProfile, CommonConstants.AGENT_ID);
 				individualProfile.setSocialMediaTokens(agentTokens);
@@ -441,9 +442,9 @@ public class ProfileViewController
                     CommonConstants.PROFILE_LEVEL_INDIVIDUAL, false );
                 model.addAttribute( "averageRating", averageRating );
 
-                long reviewsCount = profileManagementService.getReviewsCount( agentId, CommonConstants.MIN_RATING_SCORE,
-                    CommonConstants.MAX_RATING_SCORE, CommonConstants.PROFILE_LEVEL_INDIVIDUAL, false );
-                model.addAttribute( "reviewsCount", reviewsCount );
+                /*long reviewsCount = profileManagementService.getReviewsCount( agentId, CommonConstants.MIN_RATING_SCORE,
+                    CommonConstants.MAX_RATING_SCORE, CommonConstants.PROFILE_LEVEL_INDIVIDUAL, false );*/
+                model.addAttribute( "reviewsCount", individualProfile.getReviewCount() );
 
                 if ( isBotRequest ) {
                     // TODO:remove hardcoding of start, end, minScore etc

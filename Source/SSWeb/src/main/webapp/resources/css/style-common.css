@@ -38,6 +38,15 @@ body {
 	font-size: 13px;
 }
 
+input[type='number'] {
+    -moz-appearance:textfield;
+}
+
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+}
+
 input,textarea {
 	outline: none;
 	resize: none !important;
@@ -1729,12 +1738,17 @@ button.paypal.is-active {
 	background: url(../images/lendingtree.png) no-repeat center;
 }
 
+.icn-realtor {
+	background: url(../images/realtor.png) no-repeat center;
+}
+
 .icn-tele-blue {
 	background: url(../images/tele_blue.png) no-repeat center;
 }
 
 .icn-gplus {
 	background: url(../images/gplus.png) no-repeat center;
+	border:0px;
 }
 
 .icn-tweet {
@@ -2068,6 +2082,7 @@ button.paypal.is-active {
 	overflow: auto;
 	z-index: 999999999;
 	min-height: 480px;
+	padding-bottom: 100px;
 	background-color: rgba(0, 0, 0, 0.5);
 }
 
@@ -2602,11 +2617,11 @@ button.paypal.is-active {
 
 .sq-top-img {
 	height: 70px;
-	margin-bottom: 20px;
-	background: url(../images/place-holder-individual.png) no-repeat center;
 	width: 70px;
+	background: url(../images/place-holder-individual.png) no-repeat center;
     margin: 0 auto;
-    border-radius: 50%;
+    margin-bottom: 20px;
+    background-size: 40px;
 }
 
 .sq-bord-bot-sm {
@@ -3830,6 +3845,7 @@ img.prof-image {
 	text-align: left;
 	top: 50px;
 	right: 5px;
+	max-height: 270px;
 }
 
 .pe-dd-item {
@@ -4094,14 +4110,19 @@ img.prof-image {
 	font-size: 13px;
 	text-transform: initial;
 }
+
 .dash-btn-dl-sd-admin {
+	clear: both;
+	float: right;
+	margin-right: 10px;
 	color: #009FE0;
 	border-radius: 3px;
 	line-height: 32px;
-	margin-top: 6px;
 	border: 1px solid #009FE0;
 	height: 32px;
-	width: 410px;
+	width: 500px;
+	max-width: 90%;
+	max-width: calc(100% - 20px);
 	text-align: center;
 	font-size: 13px;
 	text-transform: initial;
@@ -4112,12 +4133,16 @@ img.prof-image {
 	padding-left: 5px;
 }
 .dsh-date-picker {
+	position: relative;
+	top: -2px;
 	width: 20%;
 	padding: 0 0 0 5px;
 	height: 28px;
+	line-height: normal;
 	border: none;
 	color: #777;
 	font-size: 11px;
+	outline: none;
 }
 
 .dsh-date-picker:focus {
@@ -4611,7 +4636,7 @@ select.rfr_txt_fld,select.rfr_input_fld{
 
 .dsh-pers-default-img {
 	background: url(../images/place-holder-individual.png) no-repeat center;
-	background-size: auto !important;
+	background-size: 60% auto;
 }
 
 .dsh-region-default-img {
@@ -4631,7 +4656,7 @@ select.rfr_txt_fld,select.rfr_input_fld{
 
 .pers-default-big {
 	background: url(../images/place-holder-individual.png) no-repeat center #fff;
-	background-size: auto !important;
+	background-size: contain;
 	border: 1px dashed #ccc;
 	border-radius: 3px;
 }
@@ -6803,6 +6828,7 @@ a.sq-btn-post-social:hover, a.sq-btn-post-social:visited {
     padding-right: 10px;
     width: 350px;
     z-index: 9;
+    padding-bottom: 20px;
 }
 
 .agent-dropdown-cont {
@@ -6810,10 +6836,12 @@ a.sq-btn-post-social:hover, a.sq-btn-post-social:visited {
 }
 
 .agent-dropdown-item {
-    line-height: 40px;
-    padding-left: 10px;
-    background-color: #fff;
-    cursor: pointer;
+	padding: 10px 0;
+	line-height: 20px;
+	padding-left: 10px;
+	background-color: #fff;
+	cursor: pointer;
+	word-break: break-all;
 }
 
 .agent-dropdown-item:hover {
@@ -6906,7 +6934,7 @@ a.sq-btn-post-social:hover, a.sq-btn-post-social:visited {
 .dash-download-sel-item {
 	background-color: #fff;
 	height: 30px;
-	width: 180px;
+	width: 45%;
 	border: none;
 	border-right: 1px solid #dcdcdc;
 	outline: none;
@@ -6955,6 +6983,11 @@ a.sq-btn-post-social:hover, a.sq-btn-post-social:visited {
 	background: url(../images/disconnect.png) no-repeat center;
 	cursor: pointer;
 	background-size: contain;
+}
+
+.social-media-disconnect-disabled {
+	cursor: auto;
+	opacity: 0.5;
 }
 
 .bread-crum-row {
@@ -7084,4 +7117,148 @@ label.fil-label {
 	font-size: 13px;
 	line-height: 30px;
 	margin-bottom: 0;
+}
+
+.paginate-buttons-survey {
+	width: 200px;
+	margin: 0 auto;
+	padding: 15px 0 0;
+	line-height: 20px;
+}
+
+.sur-paginate-btn {
+	width: 45px;
+	text-align: center;
+}
+
+.paginate-total-pages {
+	width: 30px;
+	display: inline-block;
+	text-align: center;
+}
+
+.sel-page {
+	width: 35px;
+	padding: 0 5px;
+	height: 20px;
+	line-height: normal;
+	border: 1px solid #e7e7e7;
+	border-radius: 3px;
+}
+
+.paginate-sel-box {
+	width: 110px;
+	padding: 0 10px;
+}
+
+span.paginate-divider {
+	padding: 0 6px;
+}
+
+.sur-icn-checkbox {
+	width: 20px;
+	height: 20px;
+	margin: 0 10px 0 -10px;
+	background-position: center;
+}
+
+.mult-sur-icn-wrapper {
+	width: 80px;
+	margin: 0 auto;
+}
+
+.mult-sur-icn {
+	width: 30px;
+	height: 30px;
+	margin: 0 auto 10px;
+	border: 1px solid #EFDDDD;
+	border-radius: 50%;
+	opacity: 0.5;
+}
+
+.mult-sur-icn-active {
+	cursor: pointer;
+	opacity: 1;
+}
+
+.del-mult-sur-icn {
+	background: url(../images/delete.png) no-repeat center;
+}
+
+.resend-mult-sur-icn {
+	background: url(../images/fast_mail.png) no-repeat center;
+	background-size: contain;
+}
+
+img.hr-ind-img {
+	width: 100%;
+	height: 100%;
+	border-radius: 50%; 
+}
+
+.edit-pos-icn {
+	background: url(../images/edit-1.png) no-repeat center;
+	cursor: pointer;
+}
+
+.pos-edit-icn {
+	position: absolute;
+	top: 0;
+	right: 0;
+	width: 20px;
+	height: 20px;
+	background: url(../images/edit.png) no-repeat center;
+	cursor: pointer;
+}
+
+.pos-remove-icn {
+	position: absolute;
+	bottom: 0;
+	right: 0;
+	width: 20px;
+	height: 35px;
+	background: url(../images/delete.png) no-repeat center;
+	cursor: pointer;
+}
+
+.pos-input {
+    display: block;
+    width: 90%;
+    width: calc( 100% - 25px);
+    height: 35px;
+    padding-left: 10px;
+    margin-bottom: 5px;
+    border: 1px solid #dcdcdc;
+    border-radius : 3px;
+}
+.checkbox-input-cont  {
+	position: relative; 
+	height : 35px;
+	line-height: 35px;
+	padding-left: 20px;
+	margin-bottom: 5px;
+}
+
+.checkbox-input {
+	position: absolute;
+	left: 0; 
+	width : 20px;
+	height: 100%;
+	padding-left: 20px;
+	background: url(../images/checks.png) no-repeat left center;
+	background-position: -116px center;
+}
+
+.checkbox-input[data-checked="true"] {
+	background-position: left center;
+}
+.add-pos-link {
+	color: #5CC8EF;
+	cursor: pointer;
+	text-decoration: underline;
+}
+
+.pos-cont {
+	margin-bottom: 40px;
+	position: relative;
 }

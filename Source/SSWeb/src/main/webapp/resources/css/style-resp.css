@@ -1502,6 +1502,12 @@
 		margin-top: 0 !important;
 		margin-left: 2% !important;
 	}
+	.textarea-bd-mcq-txt {
+		width: 100%;
+	}
+	.reset-icon {
+	    margin: 15px 0 5px 0;
+	}
 }
 
 
@@ -2083,6 +2089,10 @@
         display: none;
     }
     .prof-name-wrapper{
-        width: 33.33333333% !important;
+        width: 33.33333333%;
+        width: calc(66.666666% - 250px);
     }
+    .review-for-text-sm-screen {
+		display: none;
+	}
 }

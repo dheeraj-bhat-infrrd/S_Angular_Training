@@ -1334,7 +1334,7 @@ public class ProfileController {
 
 				}
 			}
-			catch (InvalidInputException e) {
+			catch (InvalidInputException | NoRecordsFetchedException e) {
 				throw new InternalServerException(new ProfileServiceErrorCode(CommonConstants.ERROR_CODE_GENERAL,
 						CommonConstants.SERVICE_CODE_GENERAL, "Profile name for individual is invalid"), e.getMessage());
 			}
@@ -1380,7 +1380,7 @@ public class ProfileController {
 				LOG.debug("individual posts json : " + json);
 				response = Response.ok(json).build();
 			}
-			catch (InvalidInputException e) {
+			catch (InvalidInputException | NoRecordsFetchedException e) {
 				throw new InternalServerException(new ProfileServiceErrorCode(CommonConstants.ERROR_CODE_INDIVIDUAL_POSTS_FETCH_FAILURE,
 						CommonConstants.SERVICE_CODE_INDIVIDUAL_POSTS, "Profile name for individual is invalid"), e.getMessage());
 			}
@@ -1535,26 +1535,30 @@ public class ProfileController {
 
 	@ResponseBody
 	@RequestMapping(value = "/surveyreportabuse")
-	public void reportAbuse(HttpServletRequest request) {
-		String agentIdStr = request.getParameter("agentId");
+	public String reportAbuse(HttpServletRequest request) {
 		String customerEmail = request.getParameter("customerEmail");
 		String firstName = request.getParameter("firstName");
 		String lastName = request.getParameter("lastName");
 		String review = request.getParameter("review");
 		String reason = request.getParameter("reportText");
+		String reporterName = request.getParameter("reporterName");
+		String reporterEmail = request.getParameter("reporterEmail");
+		
 		try {
-			if (agentIdStr == null || agentIdStr.isEmpty()) {
-				throw new InvalidInputException("Invalid value (Null/Empty) found for agentId.");
-			}
 			long agentId = 0;
 			try {
+				String agentIdStr = request.getParameter("agentId");
+				if (agentIdStr == null || agentIdStr.isEmpty()) {
+					throw new InvalidInputException("Invalid value (Null/Empty) found for agentId.");
+				}
 				agentId = Long.parseLong(agentIdStr);
 			}
 			catch (NumberFormatException e) {
 				LOG.error("NumberFormatException caught in reportAbuse() while converting agentId.");
 				throw e;
 			}
-			String customerName = firstName + lastName;
+
+			String customerName = firstName  + " " + lastName;
 			String agentName = "";
 			try {
 				agentName = solrSearchService.getUserDisplayNameById(agentId);
@@ -1566,11 +1570,17 @@ public class ProfileController {
 
 			// Calling email services method to send mail to the Application level admin.
 			emailServices.sendReportAbuseMail(applicationAdminEmail, applicationAdminName, agentName, customerName.replaceAll("null", ""),
-					customerEmail, review, reason);
+					customerEmail, review, reason, reporterName, reporterEmail);
+			
+			// Calling email services method to send mail to the reporter
+			emailServices.sendSurveyReportMail(reporterEmail, reporterName, reason);
 		}
 		catch (NonFatalException e) {
-			LOG.error("NonfatalException caught in makeSurveyEditable(). Nested exception is ", e);
+			LOG.error("NonfatalException caught in reportAbuse(). Nested exception is ", e);
+			return CommonConstants.ERROR;
 		}
+		
+		return CommonConstants.SUCCESS_ATTRIBUTE;
 	}
 
 	/**
