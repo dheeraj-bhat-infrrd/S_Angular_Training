@@ -214,6 +214,9 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
     @Value ( "${PARAM_ORDER_TAKE_SURVEY_REMINDER}")
     String paramOrderTakeSurveyReminder;
 
+    @Value ( "${CDN_PATH}")
+    String cdnPath;
+
     @Autowired
     private ProfileCompletionList profileCompletionList;
 
@@ -865,7 +868,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
             branchSettings.setRegionId( regionId );
             branchSettings.setRegionName( branch.getRegion().getRegion() );
         } else {
-        	branchSettings.setRegionId( regionId );
+            branchSettings.setRegionId( regionId );
             branchSettings.setRegionName( branch.getRegion().getRegion() );
             LOG.debug( "Branch belongs to default region" );
         }
@@ -873,27 +876,31 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
         LOG.info( "Successfully fetched the branch settings for branch id: " + branchId + " returning : " + branchSettings );
         return branchSettings;
     }
-    
-	@Transactional
-	@Override
-	public OrganizationUnitSettings getBranchSettingsDefault(long branchId) throws InvalidInputException, NoRecordsFetchedException {
-		OrganizationUnitSettings organizationUnitSettings = null;
-		BranchSettings branchSettings = null;
-		if (branchId <= 0l) {
-			throw new InvalidInputException("Invalid branch id. :" + branchId);
-		}
-		LOG.info("Get the branch settings for branch id: " + branchId);
-		organizationUnitSettings = organizationUnitSettingsDao.fetchOrganizationUnitSettingsById(branchId,
-				MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION);
 
-		// Filter profile stages.
-		if (organizationUnitSettings != null && organizationUnitSettings.getProfileStages() != null) {
-			organizationUnitSettings.setProfileStages(profileCompletionList.getProfileCompletionList(organizationUnitSettings.getProfileStages()));
-		}
 
-		LOG.info("Successfully fetched the branch settings for branch id: " + branchId + " returning : " + branchSettings);
-		return organizationUnitSettings;
-	}
+    @Transactional
+    @Override
+    public OrganizationUnitSettings getBranchSettingsDefault( long branchId ) throws InvalidInputException,
+        NoRecordsFetchedException
+    {
+        OrganizationUnitSettings organizationUnitSettings = null;
+        BranchSettings branchSettings = null;
+        if ( branchId <= 0l ) {
+            throw new InvalidInputException( "Invalid branch id. :" + branchId );
+        }
+        LOG.info( "Get the branch settings for branch id: " + branchId );
+        organizationUnitSettings = organizationUnitSettingsDao.fetchOrganizationUnitSettingsById( branchId,
+            MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION );
+
+        // Filter profile stages.
+        if ( organizationUnitSettings != null && organizationUnitSettings.getProfileStages() != null ) {
+            organizationUnitSettings.setProfileStages( profileCompletionList.getProfileCompletionList( organizationUnitSettings
+                .getProfileStages() ) );
+        }
+
+        LOG.info( "Successfully fetched the branch settings for branch id: " + branchId + " returning : " + branchSettings );
+        return organizationUnitSettings;
+    }
 
 
     @Override
@@ -2383,29 +2390,32 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
         return branchList;
     }
 
-	@Override
-	@Transactional
-	public List<Branch> getAllBranchesForCompanyWithProjections(Company company) throws InvalidInputException {
-		if (company == null) {
-			LOG.error("Company object passed can not be null");
-			throw new InvalidInputException("Invalid Company passed");
-		}
-		LOG.info("Fetching the list of branches for company :" + company.getCompany());
-		
-		List<String> projections = new ArrayList<>();
-		projections.add(CommonConstants.BRANCH_ID_COLUMN);
-		projections.add(CommonConstants.BRANCH_NAME_COLUMN);
-		projections.add(CommonConstants.IS_DEFAULT_BY_SYSTEM);
 
-		Map<String, Object> queries = new HashMap<String, Object>();
-		queries.put(CommonConstants.COMPANY_COLUMN, company);
-		queries.put(CommonConstants.IS_DEFAULT_BY_SYSTEM, CommonConstants.STATUS_INACTIVE);
-		queries.put(CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_ACTIVE);
-		
-		List<Branch> branchList = branchDao.findProjectionsByKeyValue(Branch.class, projections, queries);
-		LOG.info("Branch list fetched for the company " + company);
-		return branchList;
-	}
+    @Override
+    @Transactional
+    public List<Branch> getAllBranchesForCompanyWithProjections( Company company ) throws InvalidInputException
+    {
+        if ( company == null ) {
+            LOG.error( "Company object passed can not be null" );
+            throw new InvalidInputException( "Invalid Company passed" );
+        }
+        LOG.info( "Fetching the list of branches for company :" + company.getCompany() );
+
+        List<String> projections = new ArrayList<>();
+        projections.add( CommonConstants.BRANCH_ID_COLUMN );
+        projections.add( CommonConstants.BRANCH_NAME_COLUMN );
+        projections.add( CommonConstants.IS_DEFAULT_BY_SYSTEM );
+
+        Map<String, Object> queries = new HashMap<String, Object>();
+        queries.put( CommonConstants.COMPANY_COLUMN, company );
+        queries.put( CommonConstants.IS_DEFAULT_BY_SYSTEM, CommonConstants.STATUS_INACTIVE );
+        queries.put( CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_ACTIVE );
+
+        List<Branch> branchList = branchDao.findProjectionsByKeyValue( Branch.class, projections, queries );
+        LOG.info( "Branch list fetched for the company " + company );
+        return branchList;
+    }
+
 
     /**
      * Fetch list of regions in a company
@@ -2433,30 +2443,32 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
         LOG.info( "Region list fetched for the company " + company );
         return regionList;
     }
-    
-	@Override
-	@Transactional
-	public List<Region> getAllRegionsForCompanyWithProjections(Company company) throws InvalidInputException {
-		if (company == null) {
-			LOG.error("Company object passed can not be null");
-			throw new InvalidInputException("Invalid Company passed");
-		}
-		LOG.info("Fetching the list of regions for company :" + company.getCompany());
 
-		List<String> projections = new ArrayList<>();
-		projections.add(CommonConstants.REGION_ID_COLUMN);
-		projections.add(CommonConstants.REGION_COLUMN);
-		projections.add(CommonConstants.IS_DEFAULT_BY_SYSTEM);
 
-		Map<String, Object> queries = new HashMap<String, Object>();
-		queries.put(CommonConstants.COMPANY_COLUMN, company);
-		queries.put(CommonConstants.IS_DEFAULT_BY_SYSTEM, CommonConstants.STATUS_INACTIVE);
-		queries.put(CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_ACTIVE);
+    @Override
+    @Transactional
+    public List<Region> getAllRegionsForCompanyWithProjections( Company company ) throws InvalidInputException
+    {
+        if ( company == null ) {
+            LOG.error( "Company object passed can not be null" );
+            throw new InvalidInputException( "Invalid Company passed" );
+        }
+        LOG.info( "Fetching the list of regions for company :" + company.getCompany() );
 
-		List<Region> regionList = regionDao.findProjectionsByKeyValue(Region.class, projections, queries);
-		LOG.info("Region list fetched for the company " + company);
-		return regionList;
-	}
+        List<String> projections = new ArrayList<>();
+        projections.add( CommonConstants.REGION_ID_COLUMN );
+        projections.add( CommonConstants.REGION_COLUMN );
+        projections.add( CommonConstants.IS_DEFAULT_BY_SYSTEM );
+
+        Map<String, Object> queries = new HashMap<String, Object>();
+        queries.put( CommonConstants.COMPANY_COLUMN, company );
+        queries.put( CommonConstants.IS_DEFAULT_BY_SYSTEM, CommonConstants.STATUS_INACTIVE );
+        queries.put( CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_ACTIVE );
+
+        List<Region> regionList = regionDao.findProjectionsByKeyValue( Region.class, projections, queries );
+        LOG.info( "Region list fetched for the company " + company );
+        return regionList;
+    }
 
 
     /**
@@ -2563,36 +2575,39 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
         return branchList;
     }
 
-	@Override
-	@Transactional
-	public List<Branch> getAllBranchesInRegionWithProjections(long regionId) throws InvalidInputException {
-		if (regionId <= 0l) {
-			throw new InvalidInputException("RegionId is not set in getAllBranchesForRegion");
-		}
-		
-		Region region = regionDao.findById(Region.class, regionId);
-		if (region == null) {
-			LOG.error("No region present with the region Id :" + regionId);
-			throw new InvalidInputException("No region present with the region Id :" + regionId);
-		}
-		LOG.info("Fetching the list of branches for region :" + region);
 
-		List<String> projections = new ArrayList<>();
-		projections.add(CommonConstants.BRANCH_ID_COLUMN);
-		projections.add(CommonConstants.BRANCH_NAME_COLUMN);
-		projections.add(CommonConstants.IS_DEFAULT_BY_SYSTEM);
+    @Override
+    @Transactional
+    public List<Branch> getAllBranchesInRegionWithProjections( long regionId ) throws InvalidInputException
+    {
+        if ( regionId <= 0l ) {
+            throw new InvalidInputException( "RegionId is not set in getAllBranchesForRegion" );
+        }
 
-		Map<String, Object> queries = new HashMap<String, Object>();
-		queries.put(CommonConstants.REGION_COLUMN, region);
-		queries.put(CommonConstants.IS_DEFAULT_BY_SYSTEM, CommonConstants.STATUS_INACTIVE);
-		queries.put(CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_ACTIVE);
-		
-		List<Branch> branchList = branchDao.findProjectionsByKeyValue(Branch.class, projections, queries);
+        Region region = regionDao.findById( Region.class, regionId );
+        if ( region == null ) {
+            LOG.error( "No region present with the region Id :" + regionId );
+            throw new InvalidInputException( "No region present with the region Id :" + regionId );
+        }
+        LOG.info( "Fetching the list of branches for region :" + region );
 
-		LOG.info("Branch list fetched for the region " + region);
-		return branchList;
-	}
-    
+        List<String> projections = new ArrayList<>();
+        projections.add( CommonConstants.BRANCH_ID_COLUMN );
+        projections.add( CommonConstants.BRANCH_NAME_COLUMN );
+        projections.add( CommonConstants.IS_DEFAULT_BY_SYSTEM );
+
+        Map<String, Object> queries = new HashMap<String, Object>();
+        queries.put( CommonConstants.REGION_COLUMN, region );
+        queries.put( CommonConstants.IS_DEFAULT_BY_SYSTEM, CommonConstants.STATUS_INACTIVE );
+        queries.put( CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_ACTIVE );
+
+        List<Branch> branchList = branchDao.findProjectionsByKeyValue( Branch.class, projections, queries );
+
+        LOG.info( "Branch list fetched for the region " + region );
+        return branchList;
+    }
+
+
     /**
      * Method to fetch count of branches in a company for a Region
      * 
@@ -3439,9 +3454,9 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
     public Map<Long, BranchFromSearch> fetchBranchesMapByCompany( long companyId ) throws InvalidInputException, SolrException,
         MalformedURLException
     {
-    	
-		long branchCount = solrSearchService.fetchBranchCountByCompany(companyId);
-		String branchesResult = solrSearchService.fetchBranchesByCompany(companyId, (int) branchCount);
+
+        long branchCount = solrSearchService.fetchBranchCountByCompany( companyId );
+        String branchesResult = solrSearchService.fetchBranchesByCompany( companyId, (int) branchCount );
 
         // convert branches to map
         Type searchedBranchesList = new TypeToken<List<BranchFromSearch>>() {}.getType();
@@ -3476,8 +3491,8 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
     public Map<Long, RegionFromSearch> fetchRegionsMapByCompany( long companyId ) throws InvalidInputException, SolrException,
         MalformedURLException
     {
-    	long regionsCount = solrSearchService.fetchRegionCountByCompany(companyId);
-        String regionsResult = solrSearchService.fetchRegionsByCompany( companyId , (int) regionsCount);
+        long regionsCount = solrSearchService.fetchRegionCountByCompany( companyId );
+        String regionsResult = solrSearchService.fetchRegionsByCompany( companyId, (int) regionsCount );
 
         // convert regions to map
         Type searchedRegionsList = new TypeToken<List<RegionFromSearch>>() {}.getType();
@@ -4073,6 +4088,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
     {
 
         String collectionName = "";
+        String regexpattern = "^((?!" + cdnPath + ").)*$";
         switch ( profileLevel ) {
             case CommonConstants.COMPANY:
                 collectionName = MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION;
@@ -4087,8 +4103,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
                 collectionName = MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION;
                 break;
         }
-        return organizationUnitSettingsDao.getSettingsMapWithLinkedinImageUrl( collectionName,
-            CommonConstants.LINKEDIN_URL_PART );
+        return organizationUnitSettingsDao.getSettingsMapWithLinkedinImageUrl( collectionName, regexpattern );
     }
 
 
@@ -4158,22 +4173,23 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 
         return unitSettings;
     }
-    
+
+
     @Transactional
     @Override
     public List<OrganizationUnitSettings> getAllActiveCompaniesFromMongo()
     {
         LOG.debug( "Method getAllCompaniesFromMongo() called" );
 
-        List<Company> companyList = companyDao.findAllActive(Company.class);
-        
+        List<Company> companyList = companyDao.findAllActive( Company.class );
+
         Set<Long> companyIds = new HashSet<>();
-        
-        for(Company company : companyList) {
-        	companyIds.add(company.getCompanyId());
+
+        for ( Company company : companyList ) {
+            companyIds.add( company.getCompanyId() );
         }
-        
-        List<OrganizationUnitSettings> unitSettings = organizationUnitSettingsDao.getCompanyListByIds(companyIds);
+
+        List<OrganizationUnitSettings> unitSettings = organizationUnitSettingsDao.getCompanyListByIds( companyIds );
 
         return unitSettings;
     }
@@ -4186,105 +4202,111 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
         List<OrganizationUnitSettings> unitSettings = organizationUnitSettingsDao.getCompanyListByKey( searchKey );
         return unitSettings;
     }
-    
-    @Transactional
-	@Override
-	public List<OrganizationUnitSettings> getCompaniesByKeyValueFromMongo(String searchKey, int accountType, int status) {
 
-		List<Company> companyList = companyDao.searchCompaniesByNameAndKeyValue(searchKey, accountType, status);
-		Set<Long> companyIds = new HashSet<>();
-		for (Company company : companyList) {
-			companyIds.add(company.getCompanyId());
-		}
-		LOG.debug("Method getCompaniesByNameFromMongo() called");
-		List<OrganizationUnitSettings> unitSettings = organizationUnitSettingsDao.getCompanyListByIds(companyIds);
-		return unitSettings;
-	}
-    
+
+    @Transactional
+    @Override
+    public List<OrganizationUnitSettings> getCompaniesByKeyValueFromMongo( String searchKey, int accountType, int status )
+    {
+
+        List<Company> companyList = companyDao.searchCompaniesByNameAndKeyValue( searchKey, accountType, status );
+        Set<Long> companyIds = new HashSet<>();
+        for ( Company company : companyList ) {
+            companyIds.add( company.getCompanyId() );
+        }
+        LOG.debug( "Method getCompaniesByNameFromMongo() called" );
+        List<OrganizationUnitSettings> unitSettings = organizationUnitSettingsDao.getCompanyListByIds( companyIds );
+        return unitSettings;
+    }
+
+
     /**
      * Method to get the company list by date range
      */
     @Override
     @Transactional
-    public List<Company> getCompaniesByDateRange(Date startDate, Date endDate) {
-    	Timestamp startTime = null;
+    public List<Company> getCompaniesByDateRange( Date startDate, Date endDate )
+    {
+        Timestamp startTime = null;
         Timestamp endTime = null;
         if ( startDate != null )
             startTime = new Timestamp( startDate.getTime() );
         if ( endDate != null )
             endTime = new Timestamp( endDate.getTime() );
-        
-        List<Company> companies = companyDao.getCompaniesByDateRange(startTime, endTime);
-        
-    	return companies;
+
+        List<Company> companies = companyDao.getCompaniesByDateRange( startTime, endTime );
+
+        return companies;
     }
-    
-	@Override
-	public XSSFWorkbook downloadCompanyReport(List<Company> companies, String fileName) {
-		XSSFWorkbook workbook = new XSSFWorkbook();
 
-		// Create a blank sheet
-		XSSFSheet sheet = workbook.createSheet();
-		XSSFDataFormat df = workbook.createDataFormat();
-		CellStyle style = workbook.createCellStyle();
-		style.setDataFormat(df.getFormat("d-mm-yyyy"));
-		Integer counter = 1;
-		int max = 0;
-		int internalMax = 0;
 
-		// This data needs to be written (List<Object>)
-		Map<String, List<Object>> data = new TreeMap<>();
-		List<Object> companyDetailsToPopulate = new ArrayList<>();
-		for (Company company : companies) {
-			internalMax = 0;
-			companyDetailsToPopulate.add(company.getCompany());
-			if(company.getLicenseDetails() != null && !company.getLicenseDetails().isEmpty())
-				companyDetailsToPopulate.add(company.getLicenseDetails().get(0).getAccountsMaster().getAccountName());
-			else
-				companyDetailsToPopulate.add("");
-			companyDetailsToPopulate.add(company.getCreatedOn());
-			companyDetailsToPopulate.add(company.getDisplayBillingMode());
-			if(company.getLicenseDetails() != null && !company.getLicenseDetails().isEmpty())
-				companyDetailsToPopulate.add("Registered");
-			else
-				companyDetailsToPopulate.add("Not registered");
-			data.put((++counter).toString(), companyDetailsToPopulate);
-			companyDetailsToPopulate = new ArrayList<>();
-			if (internalMax > max)
-				max = internalMax;
-		}
-		
-		companyDetailsToPopulate.add("Company Name");
-		companyDetailsToPopulate.add("Account Type");
-		companyDetailsToPopulate.add("Created on");
-		companyDetailsToPopulate.add("Billing mode");
-		companyDetailsToPopulate.add("Status");
+    @Override
+    public XSSFWorkbook downloadCompanyReport( List<Company> companies, String fileName )
+    {
+        XSSFWorkbook workbook = new XSSFWorkbook();
 
-		data.put("1", companyDetailsToPopulate);
-		
-		// Iterate over data and write to sheet
-		Set<String> keyset = data.keySet();
-		int rownum = 0;
-		for (String key : keyset) {
-			Row row = sheet.createRow(rownum++);
-			List<Object> objArr = data.get(key);
+        // Create a blank sheet
+        XSSFSheet sheet = workbook.createSheet();
+        XSSFDataFormat df = workbook.createDataFormat();
+        CellStyle style = workbook.createCellStyle();
+        style.setDataFormat( df.getFormat( "d-mm-yyyy" ) );
+        Integer counter = 1;
+        int max = 0;
+        int internalMax = 0;
 
-			int cellnum = 0;
-			for (Object obj : objArr) {
-				Cell cell = row.createCell(cellnum++);
-				if (obj instanceof String)
-					cell.setCellValue((String) obj);
-				else if (obj instanceof Integer)
-					cell.setCellValue((Integer) obj);
-				else if (obj instanceof Date) {
-					cell.setCellStyle(style);
-					cell.setCellValue((Date) obj);
-				}
-			}
-		}
+        // This data needs to be written (List<Object>)
+        Map<String, List<Object>> data = new TreeMap<>();
+        List<Object> companyDetailsToPopulate = new ArrayList<>();
+        for ( Company company : companies ) {
+            internalMax = 0;
+            companyDetailsToPopulate.add( company.getCompany() );
+            if ( company.getLicenseDetails() != null && !company.getLicenseDetails().isEmpty() )
+                companyDetailsToPopulate.add( company.getLicenseDetails().get( 0 ).getAccountsMaster().getAccountName() );
+            else
+                companyDetailsToPopulate.add( "" );
+            companyDetailsToPopulate.add( company.getCreatedOn() );
+            companyDetailsToPopulate.add( company.getDisplayBillingMode() );
+            if ( company.getLicenseDetails() != null && !company.getLicenseDetails().isEmpty() )
+                companyDetailsToPopulate.add( "Registered" );
+            else
+                companyDetailsToPopulate.add( "Not registered" );
+            data.put( ( ++counter ).toString(), companyDetailsToPopulate );
+            companyDetailsToPopulate = new ArrayList<>();
+            if ( internalMax > max )
+                max = internalMax;
+        }
 
-		return workbook;
-	}
-    
+        companyDetailsToPopulate.add( "Company Name" );
+        companyDetailsToPopulate.add( "Account Type" );
+        companyDetailsToPopulate.add( "Created on" );
+        companyDetailsToPopulate.add( "Billing mode" );
+        companyDetailsToPopulate.add( "Status" );
+
+        data.put( "1", companyDetailsToPopulate );
+
+        // Iterate over data and write to sheet
+        Set<String> keyset = data.keySet();
+        int rownum = 0;
+        for ( String key : keyset ) {
+            Row row = sheet.createRow( rownum++ );
+            List<Object> objArr = data.get( key );
+
+            int cellnum = 0;
+            for ( Object obj : objArr ) {
+                Cell cell = row.createCell( cellnum++ );
+                if ( obj instanceof String )
+                    cell.setCellValue( (String) obj );
+                else if ( obj instanceof Integer )
+                    cell.setCellValue( (Integer) obj );
+                else if ( obj instanceof Date ) {
+                    cell.setCellStyle( style );
+                    cell.setCellValue( (Date) obj );
+                }
+            }
+        }
+
+        return workbook;
+    }
+
 }
 // JIRA: SS-27: By RM05: EOC
