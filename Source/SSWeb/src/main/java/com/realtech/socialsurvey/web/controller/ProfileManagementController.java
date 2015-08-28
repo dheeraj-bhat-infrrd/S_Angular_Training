@@ -44,6 +44,7 @@ import com.realtech.socialsurvey.core.entities.Achievement;
 import com.realtech.socialsurvey.core.entities.AgentSettings;
 import com.realtech.socialsurvey.core.entities.Association;
 import com.realtech.socialsurvey.core.entities.Branch;
+import com.realtech.socialsurvey.core.entities.Company;
 import com.realtech.socialsurvey.core.entities.CompanyPositions;
 import com.realtech.socialsurvey.core.entities.ContactDetailsSettings;
 import com.realtech.socialsurvey.core.entities.ContactNumberSettings;
@@ -77,6 +78,7 @@ import com.realtech.socialsurvey.core.entities.YelpToken;
 import com.realtech.socialsurvey.core.entities.ZillowToken;
 import com.realtech.socialsurvey.core.enums.AccountType;
 import com.realtech.socialsurvey.core.enums.DisplayMessageType;
+import com.realtech.socialsurvey.core.enums.SettingsForApplication;
 import com.realtech.socialsurvey.core.exception.InternalServerException;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.exception.NoRecordsFetchedException;
@@ -89,6 +91,8 @@ import com.realtech.socialsurvey.core.services.organizationmanagement.ProfileNot
 import com.realtech.socialsurvey.core.services.organizationmanagement.UserManagementService;
 import com.realtech.socialsurvey.core.services.search.SolrSearchService;
 import com.realtech.socialsurvey.core.services.search.exception.SolrException;
+import com.realtech.socialsurvey.core.services.settingsmanagement.SetttingsSetter;
+import com.realtech.socialsurvey.core.services.settingsmanagement.impl.SettingsSetterImpl;
 import com.realtech.socialsurvey.core.services.upload.FileUploadService;
 import com.realtech.socialsurvey.core.services.upload.impl.UploadUtils;
 import com.realtech.socialsurvey.core.utils.DisplayMessageConstants;
@@ -148,6 +152,9 @@ public class ProfileManagementController
 
     @Autowired
     private BotRequestUtils botRequestUtils;
+
+    @Autowired
+    private SetttingsSetter settingsSetter;
 
 
     @Transactional
@@ -855,6 +862,12 @@ public class ProfileManagementController
                 contactDetailsSettings = companySettings.getContact_details();
                 contactDetailsSettings = updateAddressDetail( contactDetailsSettings, address1, address2, country, countryCode,
                     state, city, zipcode );
+
+                Company company = userManagementService.getCompanyById( companySettings.getIden() );
+                if ( company != null ) {
+                    settingsSetter.setSettingsValueForCompany( company, SettingsForApplication.ADDRESS, true );
+                    userManagementService.updateCompany( company );
+                }
                 contactDetailsSettings = profileManagementService.updateContactDetails(
                     MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION, companySettings, contactDetailsSettings );
                 companySettings.setContact_details( contactDetailsSettings );
@@ -867,6 +880,11 @@ public class ProfileManagementController
                 contactDetailsSettings = regionSettings.getContact_details();
                 contactDetailsSettings = updateAddressDetail( contactDetailsSettings, address1, address2, country, countryCode,
                     state, city, zipcode );
+                Region region = userManagementService.getRegionById( regionSettings.getIden() );
+                if ( region != null ) {
+                    settingsSetter.setSettingsValueForRegion( region, SettingsForApplication.ADDRESS, true );
+                    userManagementService.updateRegion( region );
+                }
                 contactDetailsSettings = profileManagementService.updateContactDetails(
                     MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION, regionSettings, contactDetailsSettings );
                 regionSettings.setContact_details( contactDetailsSettings );
@@ -879,6 +897,11 @@ public class ProfileManagementController
                 contactDetailsSettings = branchSettings.getContact_details();
                 contactDetailsSettings = updateAddressDetail( contactDetailsSettings, address1, address2, country, countryCode,
                     state, city, zipcode );
+                Branch branch = userManagementService.getBranchById( branchSettings.getIden() );
+                if ( branch != null ) {
+                    settingsSetter.setSettingsValueForBranch( branch, SettingsForApplication.ADDRESS, true );
+                    userManagementService.updateBranch( branch );
+                }
                 contactDetailsSettings = profileManagementService.updateContactDetails(
                     MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION, branchSettings, contactDetailsSettings );
                 branchSettings.setContact_details( contactDetailsSettings );
@@ -1109,6 +1132,13 @@ public class ProfileManagementController
                 }
                 contactDetailsSettings = companySettings.getContact_details();
                 contactDetailsSettings = updateSummaryDetail( contactDetailsSettings, industry, location, aboutme );
+                if ( location != null ) {
+                    Company company = userManagementService.getCompanyById( companySettings.getIden() );
+                    if ( company != null ) {
+                        settingsSetter.setSettingsValueForCompany( company, SettingsForApplication.LOCATION, true );
+                        userManagementService.updateCompany( company );
+                    }
+                }
                 contactDetailsSettings = profileManagementService.updateContactDetails(
                     MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION, companySettings, contactDetailsSettings );
                 companySettings.setContact_details( contactDetailsSettings );
@@ -1120,6 +1150,13 @@ public class ProfileManagementController
                 }
                 contactDetailsSettings = regionSettings.getContact_details();
                 contactDetailsSettings = updateSummaryDetail( contactDetailsSettings, industry, location, aboutme );
+                if ( location != null ) {
+                    Region region = userManagementService.getRegionById( regionSettings.getIden() );
+                    if ( region != null ) {
+                        settingsSetter.setSettingsValueForRegion( region, SettingsForApplication.LOCATION, true );
+                        userManagementService.updateRegion( region );
+                    }
+                }
                 contactDetailsSettings = profileManagementService.updateContactDetails(
                     MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION, regionSettings, contactDetailsSettings );
                 regionSettings.setContact_details( contactDetailsSettings );
@@ -1131,6 +1168,13 @@ public class ProfileManagementController
                 }
                 contactDetailsSettings = branchSettings.getContact_details();
                 contactDetailsSettings = updateSummaryDetail( contactDetailsSettings, industry, location, aboutme );
+                if ( location != null ) {
+                    Branch branch = userManagementService.getBranchById( branchSettings.getIden() );
+                    if ( branch != null ) {
+                        settingsSetter.setSettingsValueForBranch( branch, SettingsForApplication.LOCATION, true );
+                        userManagementService.updateBranch( branch );
+                    }
+                }
                 contactDetailsSettings = profileManagementService.updateContactDetails(
                     MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION, branchSettings, contactDetailsSettings );
                 branchSettings.setContact_details( contactDetailsSettings );
@@ -1237,6 +1281,13 @@ public class ProfileManagementController
                 }
                 profileManagementService.updateLogo( MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION,
                     companySettings, logoUrl );
+
+                Company company = userManagementService.getCompanyById( companySettings.getIden() );
+                if ( company != null ) {
+                    settingsSetter.setSettingsValueForCompany( company, SettingsForApplication.LOGO, true );
+                    userManagementService.updateCompany( company );
+                }
+
                 companySettings.setLogo( logoUrl );
                 userSettings.setCompanySettings( companySettings );
             } else if ( entityType.equals( CommonConstants.REGION_ID_COLUMN ) ) {
@@ -1246,6 +1297,12 @@ public class ProfileManagementController
                 }
                 profileManagementService.updateLogo( MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION,
                     regionSettings, logoUrl );
+                Region region = userManagementService.getRegionById( regionSettings.getIden() );
+                if ( region != null ) {
+                    settingsSetter.setSettingsValueForRegion( region, SettingsForApplication.LOGO, true );
+                    userManagementService.updateRegion( region );
+                }
+
                 regionSettings.setLogo( logoUrl );
                 userSettings.getRegionSettings().put( entityId, regionSettings );
             } else if ( entityType.equals( CommonConstants.BRANCH_ID_COLUMN ) ) {
@@ -1255,6 +1312,11 @@ public class ProfileManagementController
                 }
                 profileManagementService.updateLogo( MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION,
                     branchSettings, logoUrl );
+                Branch branch = userManagementService.getBranchById( branchSettings.getIden() );
+                if ( branch != null ) {
+                    settingsSetter.setSettingsValueForBranch( branch, SettingsForApplication.LOGO, true );
+                    userManagementService.updateBranch( branch );
+                }
                 branchSettings.setLogo( logoUrl );
                 userSettings.getRegionSettings().put( entityId, branchSettings );
             } else if ( entityType.equals( CommonConstants.AGENT_ID_COLUMN ) ) {
@@ -1679,6 +1741,11 @@ public class ProfileManagementController
                 }
                 contactDetailsSettings = companySettings.getContact_details();
                 contactDetailsSettings = updatePhoneNumbers( contactDetailsSettings, phoneNumbers );
+                Company company = userManagementService.getCompanyById( companySettings.getIden() );
+                if ( company != null ) {
+                    settingsSetter.setSettingsValueForCompany( company, SettingsForApplication.PHONE, true );
+                    userManagementService.updateCompany( company );
+                }
                 contactDetailsSettings = profileManagementService.updateContactDetails(
                     MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION, companySettings, contactDetailsSettings );
                 companySettings.setContact_details( contactDetailsSettings );
@@ -1690,6 +1757,11 @@ public class ProfileManagementController
                 }
                 contactDetailsSettings = regionSettings.getContact_details();
                 contactDetailsSettings = updatePhoneNumbers( contactDetailsSettings, phoneNumbers );
+                Region region = userManagementService.getRegionById( regionSettings.getIden() );
+                if ( region != null ) {
+                    settingsSetter.setSettingsValueForRegion( region, SettingsForApplication.PHONE, true );
+                    userManagementService.updateRegion( region );
+                }
                 contactDetailsSettings = profileManagementService.updateContactDetails(
                     MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION, regionSettings, contactDetailsSettings );
                 regionSettings.setContact_details( contactDetailsSettings );
@@ -1701,6 +1773,12 @@ public class ProfileManagementController
                 }
                 contactDetailsSettings = branchSettings.getContact_details();
                 contactDetailsSettings = updatePhoneNumbers( contactDetailsSettings, phoneNumbers );
+                Branch branch = userManagementService.getBranchById( branchSettings.getIden() );
+                if ( branch != null ) {
+                    settingsSetter.setSettingsValueForBranch( branch, SettingsForApplication.PHONE, true );
+                    userManagementService.updateBranch( branch );
+                }
+
                 contactDetailsSettings = profileManagementService.updateContactDetails(
                     MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION, branchSettings, contactDetailsSettings );
                 branchSettings.setContact_details( contactDetailsSettings );
