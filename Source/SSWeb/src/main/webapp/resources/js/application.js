@@ -176,6 +176,27 @@ function retrieveState() {
 /*End of functions for history support*/
 
 
+/*
+ * Click event to close survey popup
+ */
+$(document).on('click',  function(e){
+	if($('#overlay-send-survey').is(':visible')){
+		$('#overlay-send-survey').hide();
+	}
+});
+
+$(document).on('keyup',  function(e){
+	if (e.keyCode == 27){
+		if($('#overlay-send-survey').is(':visible')){
+			$('#overlay-send-survey').hide();
+		}
+	}
+});
+
+$(document).on('click', '#welcome-popup-invite', function(e){
+	e.stopPropagation();
+});
+
 
 $(document).on('click', '.icn-plus-open', function() {
 	$(this).hide();
@@ -4045,8 +4066,8 @@ $(document).on('click','#user-edit-btn',function(e){
 	$('form input[data-editable="true"]').removeAttr("readonly");
 	$('#btn-save-user-assignment').show();
 	
-	$("#btn-save-user-assignment").off('click');
-	$("#btn-save-user-assignment").on('click',function(e){
+	$("#user-edit-save").off('click');
+	$("#user-edit-save").on('click',function(e){
 		if(validateUserDetailsUserManagement()){
 			saveUserDetailsByAdmin();
 			
@@ -4056,6 +4077,11 @@ $(document).on('click','#user-edit-btn',function(e){
 			}, 2000);
 		}
 	});
+	$('#user-edit-cancel').on('click',function(){
+		setTimeout(function() {
+			getUserAssignments($('#selected-userid-hidden').val());
+		}, 1000);
+	});
 });
 
 $(document).on('click','#user-assign-btn',function(e){
@@ -4064,8 +4090,8 @@ $(document).on('click','#user-assign-btn',function(e){
 	$('#user-assignment-cont').show();
 	$('#btn-save-user-assignment').show();
 	
-	$("#btn-save-user-assignment").off('click');
-	$("#btn-save-user-assignment").on('click',function(e){
+	$("#user-edit-save").off('click');
+	$("#user-edit-save").on('click',function(e){
 		if(validateIndividualForm()){
 			saveUserAssignment("user-assignment-form");
 			
@@ -4074,6 +4100,11 @@ $(document).on('click','#user-assign-btn',function(e){
 				getUserAssignments($('#selected-userid-hidden').val());
 			}, 2000);
 		}
+	});
+	$('#user-edit-cancel').on('click',function(){
+		setTimeout(function() {
+			getUserAssignments($('#selected-userid-hidden').val());
+		}, 1000);
 	});
 });
 
