@@ -1,6 +1,9 @@
-<%@ page language="java" contentType="text/html; charset=ISO-8859-1" pageEncoding="UTF-8"%>
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ taglib prefix="spring" uri="http://www.springframework.org/tags"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions"%>
+<c:set var="user" value="${sessionScope.SPRING_SECURITY_CONTEXT.authentication.principal}" />
+
 <!DOCTYPE">
 <html>
 <head>
@@ -24,8 +27,14 @@
 		<div class="container hdr-container clearfix">
 			<div class="float-left hdr-logo"></div>
 			<div class="float-right clearfix hdr-btns-wrapper">
-				<div class="float-left hdr-log-btn hdr-log-reg-btn"><spring:message code="label.signin.key" /></div>
-				<div class="float-left hdr-reg-btn hdr-log-reg-btn"><spring:message code="label.joinus.key" /></div>
+				<div id="header-user-info" class="header-user-info float-right clearfix">
+					<div class="float-left user-info-initial">
+						<span id="usr-initl">${fn:substring(user.firstName, 0, 1)}</span>
+					</div>
+               		<div class="float-left user-info-sing-out">
+                   		<a class="" href="j_spring_security_logout"><spring:message code="label.logout.key" /></a>
+               		</div>
+				</div>
 			</div>
 		</div>
 	</div>
@@ -58,7 +67,10 @@
 						<div class="float-left rfr_txt">
 							<div class="rfr_icn icn-logo"></div>
 							<div class="icn-lname input-file-icn-left" id="input-file-icn-left"></div>
-							<div class="rfr_txt_fld"><input type="text" class="rfr_input_fld" id="com-logo-decoy" name="logoDecoyName" placeholder='<spring:message code="label.logo.placeholder.key"/>' value="${logoDecoyName}"></div>
+							<div class="rfr_txt_fld">
+								<input type="text" class="rfr_input_fld" id="com-logo-decoy" name="logoDecoyName"
+									 placeholder='<spring:message code="label.logo.placeholder.key"/>' value="${logoDecoyName}">
+							</div>
 							<div><input type="file" class="rfr_input_fld com-logo-comp-info" id="com-logo" name="logo"></div>
 							<div class="float-right input-icon-internal icn-file file-pick-logo file-pick-logo-adj" id="icn-file"></div>
 						</div>
@@ -274,7 +286,7 @@ $(document).ready(function() {
 	}).autocomplete("instance")._renderItem = function(ul, item) {
 		return $("<li>").append(item.label).appendTo(ul);
   	};
-  	$("#com-country").keydown(function(e){
+  	/* $("#com-country").keydown(function(e){
   	    if( e.keyCode != $.ui.keyCode.TAB) return; 
   	    
    	   e.keyCode = $.ui.keyCode.DOWN;
@@ -282,7 +294,7 @@ $(document).ready(function() {
 
    	   e.keyCode = $.ui.keyCode.ENTER;
    	   $(this).trigger(e);
-   	});
+   	}); */
 });
 
 $('#com-state').on('change',function(e){
@@ -333,28 +345,6 @@ function uploadImageSuccessCallback(response) {
 		showInfo(response);
 	}
 }
-
-/* $('#com-address1').blur(function() {
-	if (validateAddress1(this.id)) {
-		hideError();
-	}
-});
-
-$('#com-address2').blur(function() {
-	validateAddress2(this.id);
-});
-
-$('#com-zipcode').blur(function() {
-	if (validateCountryZipcode(this.id)) {
-		hideError();
-	}
-});
-
-$('#com-contactno').blur(function() {
-	if (validatePhoneNumber(this.id)) {
-		hideError();
-	}
-}); */
 
 function validateCountry() {
 	var country = $.trim($('#com-country').val());

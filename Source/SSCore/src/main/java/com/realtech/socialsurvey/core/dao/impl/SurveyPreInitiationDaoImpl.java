@@ -8,6 +8,7 @@ import java.util.Map;
 import java.util.Set;
 import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
+import org.hibernate.Query;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
@@ -102,6 +103,8 @@ public class SurveyPreInitiationDaoImpl extends GenericDaoImpl<SurveyPreInitiati
 							CommonConstants.COMPANY_ID_COLUMN, companyId));
 				}
 			}
+			long initialIndex = 0;
+			criteria.add(Restrictions.gt(CommonConstants.AGENT_ID_COLUMN, initialIndex));
 			criteria.addOrder(Order.desc(CommonConstants.MODIFIED_ON_COLUMN));
 			return criteria.list();
 		}
@@ -174,5 +177,14 @@ public class SurveyPreInitiationDaoImpl extends GenericDaoImpl<SurveyPreInitiati
 			agentReportData.put(survey.getAgentId(), agentRankingReport);
 		}
 		LOG.info("Method getIncompleteSurveysCount() finished");
+	}
+	
+	@Override
+	public void deleteSurveysWithIds(Set<Long> incompleteSurveyIds) {
+		LOG.info("Method getIncompleteSurveysCount() started");
+		String deleteQuery = "delete from SurveyPreInitiation where surveyPreIntitiationId in (:incompleteSurveyIds)";
+		Query query = getSession().createQuery(deleteQuery);
+		query.setParameterList("incompleteSurveyIds", incompleteSurveyIds);
+		query.executeUpdate();
 	}
 }

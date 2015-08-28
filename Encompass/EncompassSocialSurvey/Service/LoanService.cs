@@ -3,11 +3,80 @@ using EncompassSocialSurvey.Translator;
 using EncompassSocialSurvey.ViewModel;
 using System;
 using System.Collections.Generic;
+using EncompassSocialSurvey.Entity;
 
 namespace EncompassSocialSurvey.Service
 {
     public class LoanService
     {
+        public CRMBatchTrackerEntity getCrmBatchTracker(long companyId, string source)
+        {
+            Logger.Debug("Inside method getCrmBatchTracker");
+            LoanRepository loanRepo = new LoanRepository();
+            CRMBatchTrackerEntity entity = null;
+            try
+            {
+                entity = loanRepo.getCrmBatchTrackerByCompanyAndSource(companyId, source);
+            }
+            catch (Exception ex)
+            {
+                Logger.Error("Caught an exception: LoanService.getCrmBatchTracker(): ", ex);
+                throw;
+            }
+            return entity;
+        }
+
+        public Boolean isCompanyActive(long companyId)
+        {
+            Logger.Debug("Inside method getCompany");
+            LoanRepository loanRepo = new LoanRepository();
+            Company company = null;
+            try
+            {
+                company = loanRepo.getCompanyById(companyId);
+                if(company.status.Equals(EncompassSocialSurverConstant.COMPANY_INACTIVE)){
+                    return false;
+                }else{
+                    return true;
+                }
+            }
+            catch (Exception ex)
+            {
+                Logger.Error("Caught an exception: LoanService.getCompany(): ", ex);
+                throw;
+            }
+        }
+        public void UpdateCrmbatchTracker(CRMBatchTrackerEntity entity)
+        {
+            Logger.Debug("Inside method updateCrmBatchTracker");
+               LoanRepository loanRepo = new LoanRepository();
+            try {
+                loanRepo.UpdateCrmBatchTracker(entity);
+            }
+            catch (Exception ex)
+            {
+                Logger.Error("Caught an exception: LoanService.UpdateCrmbatchTracker(): ", ex);
+                throw;
+            }
+
+        }
+        public void InsertCrmBatchTracker(CRMBatchTrackerEntity entity)
+        {
+            Logger.Info("Inside methid InsertCrmBatchTracker for Company " + entity.CompanyId);
+            Logger.Debug("Insert the record into db");
+            LoanRepository loanRepo = new LoanRepository();
+            try {
+                loanRepo.InsertCRMBatchTracker(entity);
+            }
+            catch (Exception ex)
+            {
+                Logger.Error("Caught an exception: LoanService.InsertCrmBatchTracker(): ", ex);
+                throw;
+            }
+
+            
+
+        }
         public bool InsertLoans(List<LoanViewModel> loansVM)
         {
             Logger.Info("Entering the method LoanService.InsertLoans(List<>):");
@@ -15,14 +84,13 @@ namespace EncompassSocialSurvey.Service
 
             try
             {
-                // if no loans to process check for next loan folder
                 if (null == loansVM && loansVM.Count <= 0) return returnValue;
 
-                // 2nd convert loans vm to loanEntity
+                Logger.Debug("Convert loan object into laon entity ");
                 LoanTranslator loanTranslator = new LoanTranslator();
                 var loansEntity = loanTranslator.GetLoanEntity(loansVM);
 
-                // 3rd now insert the records into db
+                Logger.Debug("Insert the record into db");
                 LoanRepository loanRepo = new LoanRepository();
                 returnValue = loanRepo.InserLoan(loansEntity);
             }

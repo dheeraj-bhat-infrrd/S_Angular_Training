@@ -1,5 +1,4 @@
-<%@ page language="java" contentType="text/html; charset=ISO-8859-1"
-	pageEncoding="UTF-8"%>
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ taglib prefix="spring" uri="http://www.springframework.org/tags"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <!-- in highest roles comparison, 1 = companyAdmin, 2 = regionAdmin, 3 = branchAdmin, 4 = agent, 5 = no profile  -->
@@ -12,7 +11,6 @@
 			<div class="v-um-hdr-right float-right">
 				<label class="fil-label">Company Status : </label>
 				<select class="com-sel-filter" id="com-filter">
-					<option value="all">All</option>
 					<option value="active">Active</option>
 					<option value="inactive">Inactive</option>
 				</select>
@@ -39,7 +37,7 @@
 				class="um-search-icn"></span>
 		</div>
 	</div>
-	<div class="v-hr-tbl" style="margin-top: 0">
+	<div class="v-hr-tbl">
 		<div class="v-tbl-header comp-row" id="hierarchy-list-header">
 			<div class="v-tbl-line"></div>
 			<div class="v-tbl-name">Name</div>

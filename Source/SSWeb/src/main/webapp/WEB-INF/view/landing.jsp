@@ -1,3 +1,4 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <jsp:include page="header.jsp" />
 <div id="main-content"></div>
 <jsp:include page="scripts.jsp"/>
@@ -53,12 +54,15 @@ function landingFlow() {
 		parent.hide();
 		parent.next('.welcome-popup-wrapper').show();
 	});
-
+	
 	$('body').on('click', '.wc-final-skip', function(){
-		loadDisplayPicture();
 		$(this).closest('.overlay-login').hide().html('');
-		showDisplayPic();
 		$('body').removeClass('body-no-scroll');
+	});
+	
+	$('body').on('click', '.lnk-final-skip.wc-final-skip', function(){
+		loadDisplayPicture();
+		showDisplayPic();
 	});
 	
 	onpopstate = function(event) {

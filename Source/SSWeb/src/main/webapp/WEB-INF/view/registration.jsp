@@ -1,4 +1,4 @@
-<%@ page language="java" contentType="text/html; charset=ISO-8859-1" pageEncoding="UTF-8"%>
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ taglib prefix="spring" uri="http://www.springframework.org/tags"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <!DOCTYPE">
@@ -200,6 +200,7 @@ $(document).ready(function() {
     		if (isSmallScreen) {
     			return isRegistrationFormValid;
     		}
+    		return isRegistrationFormValid;
 		}
 		if (!validateLastName('reg-lname')) {
 			isRegistrationFormValid = false;
@@ -210,6 +211,7 @@ $(document).ready(function() {
     		if (isSmallScreen) {
     			return isRegistrationFormValid;
     		}
+    		return isRegistrationFormValid;
 		}
 		if (!validateEmailId('reg-email')) {
 			isRegistrationFormValid = false;
@@ -220,6 +222,7 @@ $(document).ready(function() {
     		if (isSmallScreen) {
     			return isRegistrationFormValid;
     		}
+    		return isRegistrationFormValid;
 		}
 		if (!validatePassword('reg-pwd')) {
 			isRegistrationFormValid = false;
@@ -230,6 +233,7 @@ $(document).ready(function() {
     		if (isSmallScreen) {
     			return isRegistrationFormValid;
     		}
+    		return isRegistrationFormValid;
 		}
 		if (!validateConfirmPassword('reg-pwd', 'reg-conf-pwd')) {
 			isRegistrationFormValid = false;
@@ -240,6 +244,7 @@ $(document).ready(function() {
     		if (isSmallScreen) {
     			return isRegistrationFormValid;
     		}
+    		return isRegistrationFormValid;
 		}
     	return isRegistrationFormValid;
 	}

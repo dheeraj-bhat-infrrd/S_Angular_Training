@@ -17,6 +17,27 @@ namespace EncompassSocialSurvey.DAL
         private const string SELECT_QUERY = @"SELECT spi.SURVEY_PRE_INITIATION_ID, spi.SURVEY_SOURCE_ID FROM SURVEY_PRE_INITIATION as  spi
                                         WHERE spi.SURVEY_SOURCE_ID = ?SURVEY_SOURCE_ID AND spi.CUSTOMER_EMAIL_ID = ?CUSTOMER_EMAIL_ID AND spi.CUSTOMER_FIRST_NAME = ?CUSTOMER_FIRST_NAME ;";
 
+        private const string CRM_BATCH_TRACKER_SELECT_QUERY = @"SELECT crmtrck.ID, crmtrck.SOURCE, crmtrck.COMPANY_ID, crmtrck.RECENT_RECORD_FETCHED_DATE, crmtrck.CREATED_ON, crmtrck.MODIFIED_ON FROM CRM_BATCH_TRACKER as  crmtrck WHERE crmtrck.COMPANY_ID = ?COMPANY_ID AND crmtrck.SOURCE = ?SOURCE ;";
+
+        private const string COMPANY_SELECT_QUERY = @"SELECT comp.COMPANY_ID, comp.COMPANY, comp.STATUS FROM COMPANY as  comp WHERE comp.COMPANY_ID = ?COMPANY_ID;";
+
+        private const string CRM_BATCH_TRACKER_UPDATE_QUERY = @"UPDATE CRM_BATCH_TRACKER SET RECENT_RECORD_FETCHED_DATE = ?RECENT_RECORD_FETCHED_DATE, MODIFIED_ON = ?MODIFIED_ON WHERE ID = ?ID";
+
+        private const string CRM_BATCH_TRACKER_INSERT_QUERY = @"INSERT INTO CRM_BATCH_TRACKER(  
+                                         
+                                         COMPANY_ID
+                                        , SOURCE
+                                        , RECENT_RECORD_FETCHED_DATE
+                                        , CREATED_ON
+                                        , MODIFIED_ON
+                                          )
+                                        VALUES(
+                                          ?COMPANY_ID
+                                        , ?SOURCE
+                                        , ?RECENT_RECORD_FETCHED_DATE
+                                        , ?CREATED_ON
+                                        , ?MODIFIED_ON
+                                        ) ;";
 
         private const string INSERT_QUERY = @"INSERT INTO SURVEY_PRE_INITIATION(  
                                           SURVEY_SOURCE
@@ -55,6 +76,74 @@ namespace EncompassSocialSurvey.DAL
                                         , ?MODIFIED_ON
                                         ) ;";
 
+        public bool UpdateCrmBatchTracker(CRMBatchTrackerEntity entity)
+        {
+            Logger.Info("Inside method UpdateCrmBatchTracker");
+            bool returnValue = false;
+            String updateQuery = CRM_BATCH_TRACKER_UPDATE_QUERY;
+              MySqlConnection mySqlDbConnection = null;
+             MySqlCommand commandToUpdate = null;
+             try
+             {
+                 mySqlDbConnection = _socialSurveryContext.DBConnnection;
+                 commandToUpdate = new MySqlCommand(updateQuery, mySqlDbConnection);
+
+                 // set the parameters
+                 commandToUpdate.Parameters.Add("?ID", MySqlDbType.Int32).Value = entity.Id;
+                 commandToUpdate.Parameters.Add("?MODIFIED_ON", MySqlDbType.DateTime).Value = entity.ModifiedOn;
+                 commandToUpdate.Parameters.Add("?RECENT_RECORD_FETCHED_DATE", MySqlDbType.DateTime).Value = entity.RecentRecordFetchedDate;
+                 commandToUpdate.ExecuteNonQuery();
+             }
+             catch (Exception ex)
+             {
+                 Logger.Error("Caught an exception: LoanRepository.UpdateCrmBatchTracker()", ex);
+                 throw ex;
+             }
+             finally
+             {
+                 if (null != commandToUpdate) { commandToUpdate.Dispose(); }
+                 if (null != mySqlDbConnection) { mySqlDbConnection.Close(); }
+             }
+
+             return returnValue;
+
+        }
+
+        public bool InsertCRMBatchTracker(CRMBatchTrackerEntity entity)
+        {
+            Logger.Info("Inside method InsertCRMBatchTracker");
+            bool returnValue = false;
+            string insertQuery = CRM_BATCH_TRACKER_INSERT_QUERY;
+             MySqlConnection mySqlDbConnection = null;
+             MySqlCommand commandToInsert = null;
+            try
+            {
+                mySqlDbConnection = _socialSurveryContext.DBConnnection;
+                commandToInsert = new MySqlCommand(insertQuery, mySqlDbConnection);
+
+                // set the parameters
+                commandToInsert.Parameters.Add("?SOURCE", MySqlDbType.VarChar, 100).Value = entity.Source;
+                commandToInsert.Parameters.Add("?COMPANY_ID", MySqlDbType.Int32).Value = entity.CompanyId;
+                commandToInsert.Parameters.Add("?RECENT_RECORD_FETCHED_DATE", MySqlDbType.DateTime).Value = entity.RecentRecordFetchedDate;
+                commandToInsert.Parameters.Add("?CREATED_ON", MySqlDbType.DateTime).Value = entity.CreatedOn;
+                commandToInsert.Parameters.Add("?MODIFIED_ON", MySqlDbType.DateTime).Value = DateTime.Now;
+
+                //
+                commandToInsert.ExecuteNonQuery();
+            }
+            catch (Exception ex)
+            {
+                Logger.Error("Caught an exception: LoanRepository.InsertLoan()", ex);
+                throw ex;
+            }
+            finally
+            {
+                if (null != commandToInsert) { commandToInsert.Dispose(); }
+                if (null != mySqlDbConnection) { mySqlDbConnection.Close(); }
+            }
+            return returnValue;
+        }
+
         public bool InsertLoan(LoanEntity loan, MySqlConnection mySqlDbConnection)
         {
             Logger.Info("Entering the method LoanRepository.InsertLoan(): LoanId:" + loan.SurveySourceId + " : CustomerEmailId : " + loan.CustomerEmailId);
@@ -65,10 +154,9 @@ namespace EncompassSocialSurvey.DAL
 
             try
             {
-                // if loand not present then and only then insert
+
                 if (false == IsSurveySourceIdExists(loan, mySqlDbConnection))
                 {
-                    //
                     commandToInsert = new MySqlCommand(insertQuery, mySqlDbConnection);
 
                     // set the parameters
@@ -108,6 +196,7 @@ namespace EncompassSocialSurvey.DAL
             return returnValue;
         }
 
+        
         public bool InserLoan(List<LoanEntity> loans)
         {
             Logger.Info("Entering the method LoanRepository.InsertLoan(List<>)");
@@ -119,6 +208,7 @@ namespace EncompassSocialSurvey.DAL
                 mySqlDbConnnection = _socialSurveryContext.DBConnnection;
                 foreach (var loanEntity in loans)
                 {
+                    Logger.Debug("Insert loan entity  with agent email address " + loanEntity.AgentEmailId + " into database ");
                     InsertLoan(loanEntity, mySqlDbConnnection);
                 }
             }
@@ -129,9 +219,10 @@ namespace EncompassSocialSurvey.DAL
             }
             finally
             {
-                // anyhow close the db connection
+
                 if (mySqlDbConnnection.State == System.Data.ConnectionState.Open)
                 {
+                    Logger.Debug("Closin database connection ");
                     mySqlDbConnnection.Close();
                     mySqlDbConnnection.Dispose();
                 }
@@ -140,6 +231,88 @@ namespace EncompassSocialSurvey.DAL
             //
             Logger.Info("Exiting the method LoanRepository.InsertLoan(List<>)");
             return returnValue;
+        }
+
+        public CRMBatchTrackerEntity getCrmBatchTrackerByCompanyAndSource(long companyId, string source)
+        {
+            Logger.Debug("Inside method getCrmBatchTrackerByCompanyAndSource");
+            String sqlQuery = CRM_BATCH_TRACKER_SELECT_QUERY;
+            MySqlCommand commandToSelect = null;
+            MySqlDataReader dataReader = null;
+            CRMBatchTrackerEntity crmBatchTracker = null;
+            MySqlConnection mySqlDbConnection = null;
+            try
+            {
+                mySqlDbConnection = _socialSurveryContext.DBConnnection;
+                commandToSelect = new MySqlCommand(sqlQuery, mySqlDbConnection);
+                commandToSelect.Parameters.Add("?COMPANY_ID", MySqlDbType.Int32).Value = companyId;
+                commandToSelect.Parameters.Add("?SOURCE", MySqlDbType.VarChar, 250).Value = source;
+                dataReader = commandToSelect.ExecuteReader();
+                while (dataReader.Read())
+                {
+                    crmBatchTracker = new CRMBatchTrackerEntity();
+                    crmBatchTracker.Id = dataReader.GetInt32("ID");
+                    crmBatchTracker.CompanyId = companyId;
+                    crmBatchTracker.RecentRecordFetchedDate = dataReader.GetDateTime("RECENT_RECORD_FETCHED_DATE");
+                    crmBatchTracker.Source = source;
+                    crmBatchTracker.CreatedOn = dataReader.GetDateTime("CREATED_ON");
+                    crmBatchTracker.ModifiedOn = dataReader.GetDateTime("MODIFIED_ON");
+
+                }
+            }
+            catch (Exception ex)
+            {
+                Logger.Error("Caught an exception: LoanRepository.getCrmBatchTrackerByCompanyAndSource(): ", ex);
+                throw ex;
+            }
+            finally
+            {
+                if (null != dataReader && dataReader.IsClosed == false) { dataReader.Close(); }
+                if (null != dataReader) { dataReader.Dispose(); }
+                if (null != commandToSelect) { commandToSelect.Dispose(); }
+                if (null != mySqlDbConnection) { mySqlDbConnection.Close(); }
+            }
+            return crmBatchTracker;
+        }
+
+        public Company getCompanyById(long companyId)
+        {
+            Logger.Debug("Inside method getCompanyById");
+            String sqlQuery = COMPANY_SELECT_QUERY;
+            MySqlCommand commandToSelect = null;
+            MySqlDataReader dataReader = null;
+            Company company = null;
+            MySqlConnection mySqlDbConnection = null;
+            try
+            {
+                mySqlDbConnection = _socialSurveryContext.DBConnnection;
+                commandToSelect = new MySqlCommand(sqlQuery, mySqlDbConnection);
+                commandToSelect.Parameters.Add("?COMPANY_ID", MySqlDbType.Int32).Value = companyId;
+                
+                dataReader = commandToSelect.ExecuteReader();
+                while (dataReader.Read())
+                {
+                    company = new Company();
+                    company.companyId = companyId;
+                    company.company = dataReader.GetString("COMPANY");
+                    company.status = dataReader.GetString("STATUS");
+                 
+
+                }
+            }
+            catch (Exception ex)
+            {
+                Logger.Error("Caught an exception: LoanRepository.getCrmBatchTrackerByCompanyAndSource(): ", ex);
+                throw ex;
+            }
+            finally
+            {
+                if (null != dataReader && dataReader.IsClosed == false) { dataReader.Close(); }
+                if (null != dataReader) { dataReader.Dispose(); }
+                if (null != commandToSelect) { commandToSelect.Dispose(); }
+                if (null != mySqlDbConnection) { mySqlDbConnection.Close(); }
+            }
+            return company;
         }
 
         public bool IsSurveySourceIdExists(LoanEntity loan, MySqlConnection mySqlDbConnection)

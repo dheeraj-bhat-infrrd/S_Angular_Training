@@ -2,6 +2,7 @@ package com.realtech.socialsurvey.core.services.organizationmanagement;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
 import com.realtech.socialsurvey.core.entities.SurveyPreInitiation;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 
@@ -22,5 +23,5 @@ public interface SurveyPreInitiationService {
 	public List<SurveyPreInitiation> getIncompleteSurvey(long iden, double startScore, double limitScore, int startIndex, int numOfRows,
 			String profileLevel, Date startDate, Date endDate, boolean realtechAdmin) throws InvalidInputException;
 
-	public void deleteSurveyReminder(long incompleteSurveyId);
+	public void deleteSurveyReminder(Set<Long> incompleteSurveyIds);
 }

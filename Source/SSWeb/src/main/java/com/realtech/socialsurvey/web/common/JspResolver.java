@@ -31,6 +31,7 @@ public interface JspResolver {
 	public static final String MESSAGE_HEADER = "messageheader";
 	public static final String ERROR_PAGE = "errorpage500";
 	public static final String NOT_FOUND_PAGE = "errorpage404";
+	public static final String FINDAPRO = "findapro";
 
 	// Password handling
 	public static final String CHANGE_PASSWORD = "changepassword";
@@ -89,7 +90,7 @@ public interface JspResolver {
 	// Edit Settings
 	public static final String EDIT_SETTINGS = "settings";
 	public static final String SOCIAL_AUTH_MESSAGE = "socialauthmessage";
-        public static final String SOCIAL_FACEBOOK_INTERMEDIATE = "facebookintermediate";
+	public static final String SOCIAL_FACEBOOK_INTERMEDIATE = "facebookintermediate";
 	public static final String LINKEDIN_ACCESS = "linkedinaccess";
 	public static final String SOCIAL_MEDIA_TOKENS = "settings_socialauth";
 
@@ -99,6 +100,7 @@ public interface JspResolver {
 	public static final String PROFILE_ABOUT_ME = "profile_aboutme";
 	public static final String PROFILE_ADDRESS_DETAILS = "profile_addressdetails";
 	public static final String PROFILE_ADDRESS_DETAILS_EDIT = "profile_addressdetails_edit";
+	public static final String PROFILE_POSITIONS_EDIT = "profile_position_edit";
 	public static final String PROFILE_BASIC_DETAILS = "profile_basicdetails";
 	public static final String PROFILE_IMAGE = "profile_profileimage";
 	public static final String PROFILE_LOGO = "profile_profilelogo";
@@ -117,6 +119,4 @@ public interface JspResolver {
 	public static final String ADMIN_COMPANY_LIST = "admin/admin_company_list";
 	public static final String ADMIN_REGION_HIERARCHY = "admin/admin_region_hierarchy";
 	public static final String ADMIN_BRANCH_HIERARCHY = "admin/admin_branch_hierarchy";
-	
-	public static final String FINDAPRO = "findapro";
 }
