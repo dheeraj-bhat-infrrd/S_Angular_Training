@@ -6,7 +6,9 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
 import javax.annotation.Resource;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
@@ -16,6 +18,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.DependsOn;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
+
 import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.commons.ProfileCompletionList;
 import com.realtech.socialsurvey.core.commons.Utils;
@@ -295,7 +298,7 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
             + CommonConstants.ADD_COMPANY_STAGE );
         UserProfile userProfile = createUserProfile( user, company, emailId, CommonConstants.DEFAULT_AGENT_ID,
             CommonConstants.DEFAULT_BRANCH_ID, CommonConstants.DEFAULT_REGION_ID,
-            CommonConstants.PROFILES_MASTER_COMPANY_ADMIN_PROFILE_ID, CommonConstants.ADD_COMPANY_STAGE,
+            CommonConstants.PROFILES_MASTER_COMPANY_ADMIN_PROFILE_ID, CommonConstants.IS_PRIMARY_FALSE ,  CommonConstants.ADD_COMPANY_STAGE,
             CommonConstants.STATUS_INACTIVE, String.valueOf( user.getUserId() ), String.valueOf( user.getUserId() ) );
         // add the company admin profile with the user object
         List<UserProfile> userProfiles = new ArrayList<UserProfile>();
@@ -880,7 +883,7 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
              */
             userProfile = createUserProfile( user, admin.getCompany(), user.getEmailId(), CommonConstants.DEFAULT_AGENT_ID,
                 branchId, CommonConstants.DEFAULT_REGION_ID, CommonConstants.PROFILES_MASTER_BRANCH_ADMIN_PROFILE_ID,
-                CommonConstants.DASHBOARD_STAGE, CommonConstants.STATUS_ACTIVE, String.valueOf( admin.getUserId() ),
+                CommonConstants.IS_PRIMARY_FALSE , CommonConstants.DASHBOARD_STAGE, CommonConstants.STATUS_ACTIVE, String.valueOf( admin.getUserId() ),
                 String.valueOf( admin.getUserId() ) );
             userProfileDao.save( userProfile );
         } else if ( userProfile.getStatus() == CommonConstants.STATUS_INACTIVE ) {
@@ -900,8 +903,8 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
     @Override
     @Transactional
     public UserProfile createUserProfile( User user, Company company, String emailId, long agentId, long branchId,
-        long regionId, int profileMasterId, String profileCompletionStage, int isProfileComplete, String createdBy,
-        String modifiedBy )
+            long regionId, int profileMasterId, int isPrimary, String profileCompletionStage, int isProfileComplete, String createdBy,
+            String modifiedBy )
     {
         LOG.debug( "Method createUserProfile called for username : " + user.getLoginName() );
         UserProfile userProfile = new UserProfile();
@@ -910,6 +913,7 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
         userProfile.setCompany( company );
         userProfile.setEmailId( emailId );
         userProfile.setIsProfileComplete( isProfileComplete );
+        userProfile.setIsPrimary(isPrimary);
         userProfile.setProfilesMaster( profilesMasterDao.findById( ProfilesMaster.class, profileMasterId ) );
         userProfile.setProfileCompletionStage( profileCompletionStage );
         userProfile.setRegionId( regionId );
@@ -1019,7 +1023,7 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
         if ( userProfiles == null || userProfiles.isEmpty() ) {
             // Create a new entry in UserProfile to map user to the branch.
             userProfile = createUserProfile( user, user.getCompany(), user.getEmailId(), userId, branchId, regionId,
-                CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID, CommonConstants.DASHBOARD_STAGE,
+                CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID, CommonConstants.IS_PRIMARY_FALSE, CommonConstants.DASHBOARD_STAGE,
                 CommonConstants.STATUS_INACTIVE, String.valueOf( admin.getUserId() ), String.valueOf( admin.getUserId() ) );
         } else {
             userProfile = userProfiles.get( CommonConstants.INITIAL_INDEX );
@@ -1837,7 +1841,7 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
         LOG.debug( "Updating the User Profile table" );
         userProfile = createUserProfile( user, user.getCompany(), user.getEmailId(), CommonConstants.DEFAULT_AGENT_ID,
             defaultBranch.getBranchId(), defaultRegion.getRegionId(), CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID,
-            CommonConstants.DASHBOARD_STAGE, CommonConstants.STATUS_INACTIVE, String.valueOf( admin.getUserId() ),
+            CommonConstants.IS_PRIMARY_FALSE, CommonConstants.DASHBOARD_STAGE, CommonConstants.STATUS_INACTIVE, String.valueOf( admin.getUserId() ),
             String.valueOf( admin.getUserId() ) );
 
         userProfileDao.saveOrUpdate( userProfile );
@@ -1951,7 +1955,7 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
         LOG.debug( "Updating the User Profile table" );
         userProfile = createUserProfile( user, user.getCompany(), user.getEmailId(), CommonConstants.DEFAULT_AGENT_ID,
             defaultBranch.getBranchId(), region.getRegionId(), CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID,
-            CommonConstants.DASHBOARD_STAGE, CommonConstants.STATUS_INACTIVE, String.valueOf( admin.getUserId() ),
+            CommonConstants.IS_PRIMARY_FALSE, CommonConstants.DASHBOARD_STAGE, CommonConstants.STATUS_INACTIVE, String.valueOf( admin.getUserId() ),
             String.valueOf( admin.getUserId() ) );
 
         userProfileDao.saveOrUpdate( userProfile );

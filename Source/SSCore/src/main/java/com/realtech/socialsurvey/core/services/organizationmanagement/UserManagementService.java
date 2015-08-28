@@ -288,7 +288,7 @@ public interface UserManagementService
      * @return
      */
     public UserProfile createUserProfile( User user, Company company, String emailId, long agentId, long branchId,
-        long regionId, int profileMasterId, String profileCompletionStage, int isProfileComplete, String createdBy,
+        long regionId, int profileMasterId, int isPrimary, String profileCompletionStage, int isProfileComplete, String createdBy,
         String modifiedBy );
 
 

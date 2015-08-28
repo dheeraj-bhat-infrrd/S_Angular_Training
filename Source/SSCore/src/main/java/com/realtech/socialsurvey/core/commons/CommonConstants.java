@@ -107,6 +107,9 @@ public interface CommonConstants
     public static final String YES_STRING = "Y";
     public static final String NO_STRING = "N";
     
+    public static final int IS_PRIMARY_FALSE = 0;
+    public static final int IS_PRIMARY_TRUE = 1;
+    
     public static final int SURVEY_STATUS_PRE_INITIATED = 1;
     public static final int STATUS_SURVEYPREINITIATION_PROCESSED = 1;
     public static final int SURVEY_STATUS_INITIATED = 2;
