@@ -296,10 +296,12 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 
         LOG.debug( "Creating user profile for :" + emailId + " with profile completion stage : "
             + CommonConstants.ADD_COMPANY_STAGE );
+        //the newlely creted profile will be primary because this is will be the first profile of user
         UserProfile userProfile = createUserProfile( user, company, emailId, CommonConstants.DEFAULT_AGENT_ID,
             CommonConstants.DEFAULT_BRANCH_ID, CommonConstants.DEFAULT_REGION_ID,
-            CommonConstants.PROFILES_MASTER_COMPANY_ADMIN_PROFILE_ID, CommonConstants.IS_PRIMARY_FALSE ,  CommonConstants.ADD_COMPANY_STAGE,
+            CommonConstants.PROFILES_MASTER_COMPANY_ADMIN_PROFILE_ID, CommonConstants.IS_PRIMARY_TRUE ,  CommonConstants.ADD_COMPANY_STAGE,
             CommonConstants.STATUS_INACTIVE, String.valueOf( user.getUserId() ), String.valueOf( user.getUserId() ) );
+        
         // add the company admin profile with the user object
         List<UserProfile> userProfiles = new ArrayList<UserProfile>();
         userProfiles.add( userProfile );
@@ -885,12 +887,18 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
                 branchId, CommonConstants.DEFAULT_REGION_ID, CommonConstants.PROFILES_MASTER_BRANCH_ADMIN_PROFILE_ID,
                 CommonConstants.IS_PRIMARY_FALSE , CommonConstants.DASHBOARD_STAGE, CommonConstants.STATUS_ACTIVE, String.valueOf( admin.getUserId() ),
                 String.valueOf( admin.getUserId() ) );
+            //check that new profile will be primary or not
+            int isPrimary = checkWillNewProfileBePrimary( userProfile , user.getUserProfiles());
+            userProfile.setIsPrimary(isPrimary);
             userProfileDao.save( userProfile );
         } else if ( userProfile.getStatus() == CommonConstants.STATUS_INACTIVE ) {
             LOG.info( "User profile for same user and branch already exists. Activating the same." );
             userProfile.setStatus( CommonConstants.STATUS_ACTIVE );
             userProfile.setModifiedBy( String.valueOf( admin.getUserId() ) );
             userProfile.setModifiedOn( new Timestamp( System.currentTimeMillis() ) );
+            //check that new profile will be primary or not
+            int isPrimary = checkWillNewProfileBePrimary( userProfile , user.getUserProfiles());
+            userProfile.setIsPrimary(isPrimary);
             userProfileDao.update( userProfile );
         }
 
@@ -1035,7 +1043,11 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
                 userProfile.setModifiedOn( new Timestamp( System.currentTimeMillis() ) );
             }
         }
+        //check if user profile will be primary or not
+        int isPrimary = checkWillNewProfileBePrimary( userProfile , user.getUserProfiles());
+        userProfile.setIsPrimary(isPrimary);
         userProfileDao.saveOrUpdate( userProfile );
+        
         if ( user.getIsAtleastOneUserprofileComplete() == CommonConstants.STATUS_INACTIVE ) {
             LOG.info( "Updating isAtleastOneProfileComplete as 1 for user : " + user.getFirstName() );
             user.setIsAtleastOneUserprofileComplete( CommonConstants.STATUS_ACTIVE );
@@ -1843,7 +1855,11 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
             defaultBranch.getBranchId(), defaultRegion.getRegionId(), CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID,
             CommonConstants.IS_PRIMARY_FALSE, CommonConstants.DASHBOARD_STAGE, CommonConstants.STATUS_INACTIVE, String.valueOf( admin.getUserId() ),
             String.valueOf( admin.getUserId() ) );
-
+        
+        //check if user profile will be primary or not
+        int isPrimary = checkWillNewProfileBePrimary( userProfile , user.getUserProfiles());
+        userProfile.setIsPrimary(isPrimary);
+        
         userProfileDao.saveOrUpdate( userProfile );
         LOG.debug( "UserProfile table updated" );
 
@@ -1958,6 +1974,10 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
             CommonConstants.IS_PRIMARY_FALSE, CommonConstants.DASHBOARD_STAGE, CommonConstants.STATUS_INACTIVE, String.valueOf( admin.getUserId() ),
             String.valueOf( admin.getUserId() ) );
 
+        //check if user profile will be primary or not
+        int isPrimary = checkWillNewProfileBePrimary( userProfile , user.getUserProfiles());
+        userProfile.setIsPrimary(isPrimary);
+        
         userProfileDao.saveOrUpdate( userProfile );
         LOG.debug( "UserProfile table updated" );
 
@@ -2393,6 +2413,73 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
         LOG.debug( "Added newly added user {} to solr", user.getFirstName() );
 
         return user;
+    }
+    
+    /***
+     * 
+     * @param userProfileNew
+     * @param userProfiles
+     * @return
+     */
+    private int checkWillNewProfileBePrimary(UserProfile userProfileNew , List<UserProfile> userProfiles){
+    	
+    	int isPrimary = CommonConstants.IS_PRIMARY_FALSE;
+    	
+    	if ( userProfiles != null && !userProfiles.isEmpty() ) {
+            for ( UserProfile profile : userProfiles ) {
+               
+            	if(profile.getIsPrimary() == CommonConstants.IS_PRIMARY_TRUE){
+            		
+            		boolean isOldProfileDefault = false;
+            		boolean isOldProfileAdmin = false;
+            		boolean isOldProfileAgent = false;
+            		//get the value of all three variables
+            		Branch branch = branchDao.findById(Branch.class, profile.getBranchId());
+                	if(branch != null && branch.getIsDefaultBySystem() == CommonConstants.IS_DEFAULT_BY_SYSTEM_YES){
+                		isOldProfileDefault = true;
+                	}
+                	
+                	if(profile.getProfilesMaster().getProfileId() == CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID){
+            			isOldProfileAgent = true;
+                	}else{
+                		isOldProfileAdmin = true;
+                	}
+                	//if old primary profile is default than remove primary from that and mark new profile as primary
+                	if(isOldProfileDefault){
+                		//check if new profile is for default branch
+                		Branch newProfileBranch = branchDao.findById(Branch.class, userProfileNew.getBranchId());
+                		//if new profile's branch is default than new profile will not be primary
+                		if(newProfileBranch != null && newProfileBranch.getIsDefaultBySystem() == CommonConstants.IS_DEFAULT_BY_SYSTEM_YES && userProfileNew.getProfilesMaster().getProfileId() == CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID ){
+                			isPrimary = CommonConstants.IS_PRIMARY_FALSE;
+                		// if new profile's branch is not default than make new profile as primary and change old one	
+                    	}else{
+                    		profile.setIsPrimary(CommonConstants.IS_PRIMARY_FALSE);
+                    		userProfileDao.update(profile);
+                    		isPrimary = CommonConstants.IS_PRIMARY_TRUE;
+                    	}
+                		
+                	}else if(isOldProfileAdmin){
+                		//if old profile is for admin and new is for agent than remove primary from old and mark new profile as primary
+                		if(userProfileNew.getProfilesMaster().getProfileId() == CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID){
+            				profile.setIsPrimary(CommonConstants.IS_PRIMARY_FALSE);
+                    		userProfileDao.update(profile);
+            				isPrimary = CommonConstants.IS_PRIMARY_TRUE;
+            			}else{
+            				isPrimary = CommonConstants.IS_PRIMARY_FALSE;
+            			}
+                	// if old profile is for agent and its not default than mark new profile as not primary
+                	}else if(isOldProfileAgent){
+                		isPrimary = CommonConstants.IS_PRIMARY_FALSE;
+                	}
+
+                }
+            }
+          //if no old profile is there for user than make new profile as primary
+        }else{
+        	isPrimary = CommonConstants.IS_PRIMARY_TRUE;
+        }
+    	
+    	return isPrimary;
     }
 
 
