@@ -101,7 +101,7 @@ if(document.getElementById('fb_'+loop) != null)
 					</div>
 					<div class="float-right ppl-header-right">
 						<div class="st-rating-wrapper maring-0 clearfix review-ratings"
-							data-rating="${reviewItem.score}">
+							data-rating="${reviewItem.score}" data-source="${reviewItem.source }">
 							<div class="rating-star icn-full-star"></div>
 							<div class="rating-star icn-full-star"></div>
 							<div class="rating-star icn-half-star"></div>
