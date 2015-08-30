@@ -2082,8 +2082,74 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 
         return validEmail;
     }
+    
+    /***
+     * 
+     * @param userProfileNew
+     * @param userProfiles
+     * @return
+     */
+    private int checkWillNewProfileBePrimary(UserProfile userProfileNew , List<UserProfile> userProfiles){
+    	
+    	int isPrimary = CommonConstants.IS_PRIMARY_FALSE;
+    	
+    	if ( userProfiles != null && !userProfiles.isEmpty() ) {
+            for ( UserProfile profile : userProfiles ) {
+               
+            	if(profile.getIsPrimary() == CommonConstants.IS_PRIMARY_TRUE){
+            		
+            		boolean isOldProfileDefault = false;
+            		boolean isOldProfileAdmin = false;
+            		boolean isOldProfileAgent = false;
+            		//get the value of all three variables
+            		Branch branch = branchDao.findById(Branch.class, profile.getBranchId());
+                	if(branch != null && branch.getIsDefaultBySystem() == CommonConstants.IS_DEFAULT_BY_SYSTEM_YES){
+                		isOldProfileDefault = true;
+                	}
+                	
+                	if(profile.getProfilesMaster().getProfileId() == CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID){
+            			isOldProfileAgent = true;
+                	}else{
+                		isOldProfileAdmin = true;
+                	}
+                	//if old primary profile is default than remove primary from that and mark new profile as primary
+                	if(isOldProfileDefault){
+                		//check if new profile is for default branch
+                		Branch newProfileBranch = branchDao.findById(Branch.class, userProfileNew.getBranchId());
+                		//if new profile's branch is default than new profile will not be primary
+                		if(newProfileBranch != null && newProfileBranch.getIsDefaultBySystem() == CommonConstants.IS_DEFAULT_BY_SYSTEM_YES && userProfileNew.getProfilesMaster().getProfileId() == CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID ){
+                			isPrimary = CommonConstants.IS_PRIMARY_FALSE;
+                		// if new profile's branch is not default than make new profile as primary and change old one	
+                    	}else{
+                    		profile.setIsPrimary(CommonConstants.IS_PRIMARY_FALSE);
+                    		userProfileDao.update(profile);
+                    		isPrimary = CommonConstants.IS_PRIMARY_TRUE;
+                    	}
+                		
+                	}else if(isOldProfileAdmin){
+                		//if old profile is for admin and new is for agent than remove primary from old and mark new profile as primary
+                		if(userProfileNew.getProfilesMaster().getProfileId() == CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID){
+            				profile.setIsPrimary(CommonConstants.IS_PRIMARY_FALSE);
+                    		userProfileDao.update(profile);
+            				isPrimary = CommonConstants.IS_PRIMARY_TRUE;
+            			}else{
+            				isPrimary = CommonConstants.IS_PRIMARY_FALSE;
+            			}
+                	// if old profile is for agent and its not default than mark new profile as not primary
+                	}else if(isOldProfileAgent){
+                		isPrimary = CommonConstants.IS_PRIMARY_FALSE;
+                	}
 
-
+                }
+            }
+          //if no old profile is there for user than make new profile as primary
+        }else{
+        	isPrimary = CommonConstants.IS_PRIMARY_TRUE;
+        }
+    	
+    	return isPrimary;
+    }
+    
     /**
      * Method to assign a region to a user
      * 
@@ -2126,7 +2192,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
             CommonConstants.IS_PRIMARY_FALSE, CommonConstants.DASHBOARD_STAGE, CommonConstants.STATUS_ACTIVE, String.valueOf( adminUser.getUserId() ),
             String.valueOf( adminUser.getUserId() ) );
 
-        int isPrimary = CommonConstants.IS_PRIMARY_FALSE;
+        
         // check if user profile already exists
         int indexToRemove = -1;
         if ( userProfiles != null && !userProfiles.isEmpty() ) {
@@ -2147,24 +2213,10 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
                     profile.setStatus( CommonConstants.STATUS_ACTIVE );
                     userProfileNew = profile;
                 }
-                //check if old profile is primary
-                if(profile.getIsPrimary() == 1){
-                	//check if old profile is default branch
-                	Branch branch = branchDao.findById(Branch.class, profile.getBranchId());
-                	if(branch != null && branch.getIsDefaultBySystem() == 1){
-                		profile.setIsPrimary(CommonConstants.IS_PRIMARY_TRUE);
-                		userProfileDao.update(profile);
-                		isPrimary = CommonConstants.IS_PRIMARY_TRUE;
-                	}
-                }
-                
-                
             }
-        }else{
-        	isPrimary = CommonConstants.IS_PRIMARY_TRUE;
-        	
         }
         
+        int isPrimary = checkWillNewProfileBePrimary( userProfileNew , userProfiles);
         userProfileNew.setIsPrimary(isPrimary);
         
         // Remove if the profile from list
@@ -2300,8 +2352,6 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
             CommonConstants.IS_PRIMARY_FALSE, CommonConstants.DASHBOARD_STAGE, CommonConstants.STATUS_ACTIVE, String.valueOf( adminUser.getUserId() ),
             String.valueOf( adminUser.getUserId() ) );
 
-        //check if new profile will be primary or not
-        int isPrimary = CommonConstants.IS_PRIMARY_FALSE;
         // check if user profile already exists
         int indexToRemove = -1;
         if ( userProfiles != null && !userProfiles.isEmpty() ) {
@@ -2320,22 +2370,10 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
                     profile.setStatus( CommonConstants.STATUS_ACTIVE );
                     userProfileNew = profile;
                 }
-                //check if old profile is primary
-                if(profile.getIsPrimary() == 1){
-                	Branch branch = branchDao.findById(Branch.class, profile.getBranchId());
-                	//if old primary branch is default than make it non primary
-                	if(branch != null && branch.getIsDefaultBySystem() == 1){
-                		profile.setIsPrimary(CommonConstants.IS_PRIMARY_FALSE);
-                		userProfileDao.update(profile);
-                		isPrimary = CommonConstants.IS_PRIMARY_TRUE;
-                	}
-                }
             }
-        }else{
-        	isPrimary = CommonConstants.IS_PRIMARY_TRUE;
-        	
         }
         
+        int isPrimary = checkWillNewProfileBePrimary( userProfileNew , userProfiles);
         userProfileNew.setIsPrimary(isPrimary);
         
         // Remove if the profile from list
