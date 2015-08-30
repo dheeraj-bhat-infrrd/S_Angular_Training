@@ -230,6 +230,9 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
     @Value ( "${PARAM_ORDER_TAKE_SURVEY_REMINDER}")
     String paramOrderTakeSurveyReminder;
 
+    @Value ( "${CDN_PATH}")
+    String cdnPath;
+
     @Autowired
     private ProfileCompletionList profileCompletionList;
 
@@ -4200,6 +4203,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
     {
 
         String collectionName = "";
+        String regexpattern = "^((?!" + cdnPath + ").)*$";
         switch ( profileLevel ) {
             case CommonConstants.COMPANY:
                 collectionName = MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION;
@@ -4214,8 +4218,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
                 collectionName = MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION;
                 break;
         }
-        return organizationUnitSettingsDao.getSettingsMapWithLinkedinImageUrl( collectionName,
-            CommonConstants.LINKEDIN_URL_PART );
+        return organizationUnitSettingsDao.getSettingsMapWithLinkedinImageUrl( collectionName, regexpattern );
     }
 
 
