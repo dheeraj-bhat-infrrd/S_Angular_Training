@@ -644,7 +644,7 @@ function showReviews(columnName, columnValue) {
 			$('#review-details').append(data);
 		
 		$(".review-ratings").each(function() {
-			changeRatingPattern($(this).data("rating"), $(this));
+			changeRatingPattern($(this).data("rating"), $(this), false, $(this).data("source"));
 		});
 		/*$('.icn-fb').unbind('click');
 		$(".icn-fb").click(function() {
@@ -3072,26 +3072,6 @@ function updatePostScoreCallBack(response) {
 	$("#overlay-toast").html(response);
 	showToast();
 }
-
-/*function changeRatingPattern(rating, ratingParent) {
-	var counter = 0;
-	ratingParent.children().each(function() {
-		$(this).addClass("icn-no-star");
-		$(this).removeClass("icn-half-star");
-		$(this).removeClass("icn-full-star");
-
-		if (rating >= counter) {
-			if (rating - counter >= 1) {
-				$(this).removeClass("icn-no-star");
-				$(this).addClass("icn-full-star");
-			} else if (rating - counter == 0.5) {
-				$(this).removeClass("icn-no-star");
-				$(this).addClass("icn-half-star");
-			}
-		}
-		counter++;
-	});
-}*/
 
 // Other settings
 function autoSetCheckboxStatus(on, off, status) {
@@ -7190,7 +7170,7 @@ function fetchReviews(attrName, attrVal, minScore, startIndex, numOfRows) {
 	callAjaxGET(url, function(data) {
 		$("#prof-review-item").append(data);
 		$(".review-ratings").each(function() {
-			changeRatingPattern($(this).attr("data-rating"), $(this));
+			changeRatingPattern($(this).attr("data-rating"), $(this), false, $(this).attr("data-source"));
 		});
 
 		$('.icn-plus-open').click(function() {

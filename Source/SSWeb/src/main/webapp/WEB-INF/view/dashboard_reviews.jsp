@@ -112,7 +112,7 @@
 						</div>
 					</div>
 					<div class="float-right ppl-header-right">
-						<div class="st-rating-wrapper maring-0 clearfix review-ratings float-right" data-rating="${feedback.score}">
+						<div class="st-rating-wrapper maring-0 clearfix review-ratings float-right" data-rating="${feedback.score}" data-source="${feedback.source }">
 						</div>
 						<c:if test="${feedback.source != 'Zillow'}">
 							<div class="report-resend-icn-container clearfix float-right">

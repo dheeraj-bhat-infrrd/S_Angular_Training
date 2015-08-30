@@ -635,14 +635,6 @@ function paintReviews(result){
 		reviewsHtml += '		</div>';
 		reviewsHtml += '	</div>';
 		
-		reviewsHtml += '	<div class="review-source-text">source: ';
-		if(reviewItem.source != "Zillow") {
-			reviewsHtml += '<a class="review-source" href="https://socialsurvey.me/" target="_blank">Social Survey</a>';
-		} else {
-			reviewsHtml += '<a class="review-source" href="http://www.zillow.com/" target="_blank">Zillow</a>';
-		}
-		reviewsHtml += '	</div>';
-		
 		if (reviewItem.review.length > 250) {
 			reviewsHtml += '<div class="ppl-content"><span class="review-complete-txt">'+reviewItem.review+'</span><span class="review-less-text">' + reviewItem.review.substr(0,250) + '</span><span class="review-more-button">More</span>';
 		} else {
