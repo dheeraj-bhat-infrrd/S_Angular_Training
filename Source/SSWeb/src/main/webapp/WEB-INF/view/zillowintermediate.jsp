@@ -37,8 +37,12 @@
 							OR
 							</div> --%>				
  							<div class="zillow-input-container clearfix">
-								<label class="zillow-input-label float-left"><spring:message code="label.profilename.key"/></label>
-								<input class="zillow-input" name="zillowProfileName" type="text">
+								<label class="zillow-input-label"><spring:message code="label.zillowconnect.key"/></label>
+								<div class="zillow-input-cont">
+									<span><spring:message code="label.zillowconnect.link.key"/></span>
+									<input class="zillow-input" name="zillowProfileName" type="text" autofocus="autofocus">
+									<span>/</span>
+								</div>
 							</div>
 						<%-- 	<div class="zillow-input-container clearfix">
 								<label class="zillow-input-label float-left"><spring:message code="label.lastname.key"/></label>
