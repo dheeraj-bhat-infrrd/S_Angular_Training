@@ -11,7 +11,7 @@ import com.realtech.socialsurvey.core.exception.NonFatalException;
  * Operates on setting of the settings
  *
  */
-public interface SetttingsSetter {
+public interface SettingsSetter {
 
 	/**
 	 * Sets the value of the set setting fields of the company. The latest value of setter is set in the company and returned.

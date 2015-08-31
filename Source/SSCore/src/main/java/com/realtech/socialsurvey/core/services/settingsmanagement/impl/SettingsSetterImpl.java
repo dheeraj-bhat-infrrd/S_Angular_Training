@@ -11,11 +11,11 @@ import com.realtech.socialsurvey.core.enums.SettingsForApplication;
 import com.realtech.socialsurvey.core.enums.OrganizationUnit;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.exception.NonFatalException;
-import com.realtech.socialsurvey.core.services.settingsmanagement.SetttingsSetter;
+import com.realtech.socialsurvey.core.services.settingsmanagement.SettingsSetter;
 
 
 @Component
-public class SettingsSetterImpl implements SetttingsSetter
+public class SettingsSetterImpl implements SettingsSetter
 {
 
     private static final Logger LOG = LoggerFactory.getLogger( SettingsSetterImpl.class );
