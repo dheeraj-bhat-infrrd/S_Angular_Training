@@ -418,7 +418,26 @@ public class OrganizationManagementController
         return returnPage;
     }
 
-
+    
+    @RequestMapping(value="/showemailsettings", method=RequestMethod.GET)
+    public String showEmailSettings(Model model, HttpServletRequest request) {
+    	LOG.info("Method showEmailSettings of OrganizationManagementController called");
+    	
+    	return JspResolver.EMAIL_SETTINGS;
+    }
+    
+    
+    @RequestMapping(value="/showapps", method=RequestMethod.GET)
+    public String showAppSettings(Model model, HttpServletRequest request) {
+    	LOG.info("Method showAppSettings of OrganizationManagementController called");
+    	
+		User user = sessionHelper.getCurrentUser();
+		List<VerticalCrmMapping> mappings = organizationManagementService.getCrmMapping(user);
+		model.addAttribute("crmMappings", mappings);
+    	
+    	return JspResolver.APP_SETTINGS;
+    }
+    
 	/**
 	 * Method to show Company settings on edit company
 	 * 
@@ -465,8 +484,8 @@ public class OrganizationManagementController
 		try {
 			if (entityType.equals(CommonConstants.COMPANY_ID_COLUMN) || accountMasterId == CommonConstants.ACCOUNTS_MASTER_INDIVIDUAL) {
 				unitSettings = organizationManagementService.getCompanySettings(user.getCompany().getCompanyId());
-				List<VerticalCrmMapping> mappings = organizationManagementService.getCrmMapping(user);
-				model.addAttribute("crmMappings", mappings);
+				/*List<VerticalCrmMapping> mappings = organizationManagementService.getCrmMapping(user);
+				model.addAttribute("crmMappings", mappings);*/
 				model.addAttribute("columnName", entityType);
 				model.addAttribute("columnValue", entityId);
 			}

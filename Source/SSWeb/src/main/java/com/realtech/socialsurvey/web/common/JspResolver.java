@@ -91,6 +91,8 @@ public interface JspResolver {
 
 	// Edit Settings
 	public static final String EDIT_SETTINGS = "settings";
+	public static final String EMAIL_SETTINGS = "email_settingss";
+	public static final String APP_SETTINGS = "app_settings";
 	public static final String SOCIAL_AUTH_MESSAGE = "socialauthmessage";
 	public static final String SOCIAL_FACEBOOK_INTERMEDIATE = "facebookintermediate";
 	public static final String SOCIAL_ZILLOW_INTERMEDIATE = "zillowintermediate";
