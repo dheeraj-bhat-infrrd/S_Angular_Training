@@ -7333,3 +7333,12 @@ input.zillow-input {
 	overflow: hidden;
 	position: relative;
 }
+
+.st-crm-container {
+	padding-bottom: 25px;
+	border-bottom: 1px solid #dcdcdc;
+}
+
+.st-crm-container:last-child {
+	border-bottom: none;
+}

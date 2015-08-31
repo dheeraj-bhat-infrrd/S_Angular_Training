@@ -201,6 +201,16 @@
 						<%-- <div class="initial-dd-item" id="profile-setting" onclick="showMainContent('./showprofilepage.do'); showOverlay();">
 							<spring:message code="label.editprofile.key" />
 						</div> --%>
+						<c:if test="${highestrole == 1 && accountMasterId != 5}">
+							<div class="initial-dd-item" id="change-password" onclick="showMainContent('./showemailsettings.do'); showOverlay();">
+								<spring:message code="label.emailsettings.key"/>
+							</div>
+						</c:if>
+						<c:if test="${highestrole == 1 && accountMasterId != 5}">
+							<div class="initial-dd-item" id="change-password" onclick="showMainContent('./showapps.do'); showOverlay();">
+								<spring:message code="label.appsettings.key"/>
+							</div>
+						</c:if>
 						<div class="initial-dd-item" id="change-password" onclick="showMainContent('./showchangepasswordpage.do'); showOverlay();">
 							<spring:message code="label.changepassword.key"/>
 						</div>
