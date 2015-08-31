@@ -1662,6 +1662,13 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
             if ( collection.equals( MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION ) ) {
                 updateCompanyEmail( iden, emailVerified );
             } else if ( collection.equals( MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION ) ) {
+            	
+            	//Update User login name and email id
+            	User user = userManagementService.getUserByUserId(iden);
+            	user.setEmailId(emailVerified);
+            	user.setLoginName(emailVerified);
+            	userManagementService.updateUser(user, iden, true);
+            	
                 updateIndividualEmail( iden, emailVerified );
             }
         } else if ( emailType.equals( CommonConstants.EMAIL_TYPE_PERSONAL ) ) {
