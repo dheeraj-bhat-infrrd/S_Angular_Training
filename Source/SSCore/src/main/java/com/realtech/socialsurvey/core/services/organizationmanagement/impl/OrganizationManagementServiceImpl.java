@@ -2091,12 +2091,16 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
      */
     private int checkWillNewProfileBePrimary(UserProfile userProfileNew , List<UserProfile> userProfiles){
     	
+    	LOG.debug( "Method checkWillNewProfileBePrimary called in OrganizationManagementService for email id" + userProfileNew.getEmailId() );
+    	
     	int isPrimary = CommonConstants.IS_PRIMARY_FALSE;
     	
     	if ( userProfiles != null && !userProfiles.isEmpty() ) {
             for ( UserProfile profile : userProfiles ) {
                
             	if(profile.getIsPrimary() == CommonConstants.IS_PRIMARY_TRUE){
+            		
+            		LOG.debug("An old primary profile founded for email id " + userProfileNew.getEmailId() );
             		
             		boolean isOldProfileDefault = false;
             		boolean isOldProfileAdmin = false;
@@ -2114,6 +2118,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
                 	}
                 	//if old primary profile is default than remove primary from that and mark new profile as primary
                 	if(isOldProfileDefault){
+                		LOG.debug("Old primary profile has a default branch ");
                 		//check if new profile is for default branch
                 		Branch newProfileBranch = branchDao.findById(Branch.class, userProfileNew.getBranchId());
                 		//if new profile's branch is default than new profile will not be primary
@@ -2127,6 +2132,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
                     	}
                 		
                 	}else if(isOldProfileAdmin){
+                		LOG.debug("Old primary profile is an admin profile of type " + profile.getProfilesMaster().getProfile());
                 		//if old profile is for admin and new is for agent than remove primary from old and mark new profile as primary
                 		if(userProfileNew.getProfilesMaster().getProfileId() == CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID){
             				profile.setIsPrimary(CommonConstants.IS_PRIMARY_FALSE);
@@ -2137,6 +2143,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
             			}
                 	// if old profile is for agent and its not default than mark new profile as not primary
                 	}else if(isOldProfileAgent){
+                		LOG.debug("old primary profile is an agent profile");
                 		isPrimary = CommonConstants.IS_PRIMARY_FALSE;
                 	}
 
@@ -2144,6 +2151,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
             }
           //if no old profile is there for user than make new profile as primary
         }else{
+        	LOG.debug("No old profile found for user. New Profile will be primary");
         	isPrimary = CommonConstants.IS_PRIMARY_TRUE;
         }
     	
@@ -2216,6 +2224,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
             }
         }
         
+        //check if new profile will be primary or not
         int isPrimary = checkWillNewProfileBePrimary( userProfileNew , userProfiles);
         userProfileNew.setIsPrimary(isPrimary);
         
@@ -2373,6 +2382,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
             }
         }
         
+        //check if profile will be primary or not
         int isPrimary = checkWillNewProfileBePrimary( userProfileNew , userProfiles);
         userProfileNew.setIsPrimary(isPrimary);
         
