@@ -7267,11 +7267,11 @@ img.hr-ind-img {
 }
 
 label.zillow-input-label {
-    width: 160px;
-    text-align: right;
-    padding-right: 20px;
-    height: 35px;
-    float: left;
+    min-height: 35px;
+}
+
+.zillow-input-cont {
+	
 }
 
 input.zillow-input {
