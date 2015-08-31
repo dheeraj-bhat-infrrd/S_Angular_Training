@@ -329,10 +329,11 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
         ProfilesMaster profilesMaster = userManagementService
             .getProfilesMasterById( CommonConstants.PROFILES_MASTER_REGION_ADMIN_PROFILE_ID );
 
+        //user profile for region admin will not be primary
         LOG.debug( "Creating user profile for region admin" );
         UserProfile userProfileRegionAdmin = userManagementService.createUserProfile( user, user.getCompany(),
             user.getEmailId(), CommonConstants.DEFAULT_AGENT_ID, CommonConstants.DEFAULT_BRANCH_ID, region.getRegionId(),
-            profilesMaster.getProfileId(), CommonConstants.PROFILE_STAGES_COMPLETE, CommonConstants.STATUS_ACTIVE,
+            profilesMaster.getProfileId(), CommonConstants.IS_PRIMARY_FALSE, CommonConstants.PROFILE_STAGES_COMPLETE, CommonConstants.STATUS_ACTIVE,
             String.valueOf( user.getUserId() ), String.valueOf( user.getUserId() ) );
         userProfileDao.save( userProfileRegionAdmin );
 
@@ -343,9 +344,19 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
         profilesMaster = userManagementService.getProfilesMasterById( CommonConstants.PROFILES_MASTER_BRANCH_ADMIN_PROFILE_ID );
 
         LOG.debug( "Creating user profile for branch admin" );
+        //these cases will be applicable for only new users
+        //in case of enterprise account make branch admin profile as isPrimary 
+        //and in case of individual account make agent profile as isPrimary
+        int isPrimaryprofile;
+        if ( accountType == AccountType.ENTERPRISE){
+        	isPrimaryprofile = CommonConstants.IS_PRIMARY_TRUE;
+        }else{
+        	isPrimaryprofile = CommonConstants.IS_PRIMARY_FALSE;
+        }
+        	
         UserProfile userProfileBranchAdmin = userManagementService.createUserProfile( user, user.getCompany(),
             user.getEmailId(), CommonConstants.DEFAULT_AGENT_ID, branch.getBranchId(), region.getRegionId(),
-            profilesMaster.getProfileId(), CommonConstants.PROFILE_STAGES_COMPLETE, CommonConstants.STATUS_ACTIVE,
+            profilesMaster.getProfileId(), isPrimaryprofile ,CommonConstants.PROFILE_STAGES_COMPLETE, CommonConstants.STATUS_ACTIVE,
             String.valueOf( user.getUserId() ), String.valueOf( user.getUserId() ) );
         userProfileDao.save( userProfileBranchAdmin );
 
@@ -357,7 +368,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 
             LOG.debug( "Creating user profile for agent" );
             UserProfile userProfileAgent = userManagementService.createUserProfile( user, user.getCompany(), user.getEmailId(),
-                user.getUserId(), branch.getBranchId(), region.getRegionId(), profilesMaster.getProfileId(),
+                user.getUserId(), branch.getBranchId(), region.getRegionId(), profilesMaster.getProfileId(), CommonConstants.IS_PRIMARY_TRUE ,
                 CommonConstants.PROFILE_STAGES_COMPLETE, CommonConstants.STATUS_ACTIVE, String.valueOf( user.getUserId() ),
                 String.valueOf( user.getUserId() ) );
             userProfileDao.save( userProfileAgent );
@@ -416,7 +427,9 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
         VerticalsMaster verticalsMaster = verticalMastersDao.findByColumn( VerticalsMaster.class,
             CommonConstants.VERTICALS_MASTER_NAME_COLUMN, vertical ).get( CommonConstants.INITIAL_INDEX );
         company.setVerticalsMaster( verticalsMaster );
-
+        //remove this code or remove hard coded status
+        company.setSettingsLockStatus("0");
+        company.setSettingsSetStatus("0");
         company.setCreatedBy( String.valueOf( user.getUserId() ) );
         company.setModifiedBy( String.valueOf( user.getUserId() ) );
         company.setCreatedOn( new Timestamp( System.currentTimeMillis() ) );
@@ -662,6 +675,9 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
         region.setCreatedBy( String.valueOf( user.getUserId() ) );
         region.setModifiedBy( String.valueOf( user.getUserId() ) );
         region.setCreatedOn( new Timestamp( System.currentTimeMillis() ) );
+        //TODO remove this code or remove hard coded status
+        region.setSettingsLockStatus("0");
+        region.setSettingsSetStatus("0");
         region.setModifiedOn( new Timestamp( System.currentTimeMillis() ) );
         region = regionDao.save( region );
         LOG.debug( "Method addRegion finished." );
@@ -692,6 +708,9 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
         branch.setModifiedBy( String.valueOf( user.getUserId() ) );
         branch.setCreatedOn( new Timestamp( System.currentTimeMillis() ) );
         branch.setModifiedOn( new Timestamp( System.currentTimeMillis() ) );
+        //TODO remove set lock status from here or remove hard coded status
+        branch.setSettingsLockStatus("0");
+        branch.setSettingsSetStatus("0");
         branch = branchDao.save( branch );
         LOG.debug( "Method addBranch finished." );
         return branch;
@@ -2063,8 +2082,82 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 
         return validEmail;
     }
+    
+    /***
+     * 
+     * @param userProfileNew
+     * @param userProfiles
+     * @return
+     */
+    private int checkWillNewProfileBePrimary(UserProfile userProfileNew , List<UserProfile> userProfiles){
+    	
+    	LOG.debug( "Method checkWillNewProfileBePrimary called in OrganizationManagementService for email id" + userProfileNew.getEmailId() );
+    	
+    	int isPrimary = CommonConstants.IS_PRIMARY_FALSE;
+    	
+    	if ( userProfiles != null && !userProfiles.isEmpty() ) {
+            for ( UserProfile profile : userProfiles ) {
+               
+            	if(profile.getIsPrimary() == CommonConstants.IS_PRIMARY_TRUE){
+            		
+            		LOG.debug("An old primary profile founded for email id " + userProfileNew.getEmailId() );
+            		
+            		boolean isOldProfileDefault = false;
+            		boolean isOldProfileAdmin = false;
+            		boolean isOldProfileAgent = false;
+            		//get the value of all three variables
+            		Branch branch = branchDao.findById(Branch.class, profile.getBranchId());
+                	if(branch != null && branch.getIsDefaultBySystem() == CommonConstants.IS_DEFAULT_BY_SYSTEM_YES){
+                		isOldProfileDefault = true;
+                	}
+                	
+                	if(profile.getProfilesMaster().getProfileId() == CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID){
+            			isOldProfileAgent = true;
+                	}else{
+                		isOldProfileAdmin = true;
+                	}
+                	//if old primary profile is default than remove primary from that and mark new profile as primary
+                	if(isOldProfileDefault){
+                		LOG.debug("Old primary profile has a default branch ");
+                		//check if new profile is for default branch
+                		Branch newProfileBranch = branchDao.findById(Branch.class, userProfileNew.getBranchId());
+                		//if new profile's branch is default than new profile will not be primary
+                		if(newProfileBranch != null && newProfileBranch.getIsDefaultBySystem() == CommonConstants.IS_DEFAULT_BY_SYSTEM_YES && userProfileNew.getProfilesMaster().getProfileId() == CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID ){
+                			isPrimary = CommonConstants.IS_PRIMARY_FALSE;
+                		// if new profile's branch is not default than make new profile as primary and change old one	
+                    	}else{
+                    		profile.setIsPrimary(CommonConstants.IS_PRIMARY_FALSE);
+                    		userProfileDao.update(profile);
+                    		isPrimary = CommonConstants.IS_PRIMARY_TRUE;
+                    	}
+                		
+                	}else if(isOldProfileAdmin){
+                		LOG.debug("Old primary profile is an admin profile of type " + profile.getProfilesMaster().getProfile());
+                		//if old profile is for admin and new is for agent than remove primary from old and mark new profile as primary
+                		if(userProfileNew.getProfilesMaster().getProfileId() == CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID){
+            				profile.setIsPrimary(CommonConstants.IS_PRIMARY_FALSE);
+                    		userProfileDao.update(profile);
+            				isPrimary = CommonConstants.IS_PRIMARY_TRUE;
+            			}else{
+            				isPrimary = CommonConstants.IS_PRIMARY_FALSE;
+            			}
+                	// if old profile is for agent and its not default than mark new profile as not primary
+                	}else if(isOldProfileAgent){
+                		LOG.debug("old primary profile is an agent profile");
+                		isPrimary = CommonConstants.IS_PRIMARY_FALSE;
+                	}
 
-
+                }
+            }
+          //if no old profile is there for user than make new profile as primary
+        }else{
+        	LOG.debug("No old profile found for user. New Profile will be primary");
+        	isPrimary = CommonConstants.IS_PRIMARY_TRUE;
+        }
+    	
+    	return isPrimary;
+    }
+    
     /**
      * Method to assign a region to a user
      * 
@@ -2104,9 +2197,10 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 
         UserProfile userProfileNew = userManagementService.createUserProfile( assigneeUser, adminUser.getCompany(),
             assigneeUser.getEmailId(), assigneeUser.getUserId(), defaultBranch.getBranchId(), regionId, profileMasterId,
-            CommonConstants.DASHBOARD_STAGE, CommonConstants.STATUS_ACTIVE, String.valueOf( adminUser.getUserId() ),
+            CommonConstants.IS_PRIMARY_FALSE, CommonConstants.DASHBOARD_STAGE, CommonConstants.STATUS_ACTIVE, String.valueOf( adminUser.getUserId() ),
             String.valueOf( adminUser.getUserId() ) );
 
+        
         // check if user profile already exists
         int indexToRemove = -1;
         if ( userProfiles != null && !userProfiles.isEmpty() ) {
@@ -2129,6 +2223,11 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
                 }
             }
         }
+        
+        //check if new profile will be primary or not
+        int isPrimary = checkWillNewProfileBePrimary( userProfileNew , userProfiles);
+        userProfileNew.setIsPrimary(isPrimary);
+        
         // Remove if the profile from list
         if ( indexToRemove != -1 ) {
             userProfiles.remove( indexToRemove );
@@ -2259,7 +2358,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 
         UserProfile userProfileNew = userManagementService.createUserProfile( assigneeUser, adminUser.getCompany(),
             assigneeUser.getEmailId(), assigneeUser.getUserId(), branchId, regionId, profileMasterId,
-            CommonConstants.DASHBOARD_STAGE, CommonConstants.STATUS_ACTIVE, String.valueOf( adminUser.getUserId() ),
+            CommonConstants.IS_PRIMARY_FALSE, CommonConstants.DASHBOARD_STAGE, CommonConstants.STATUS_ACTIVE, String.valueOf( adminUser.getUserId() ),
             String.valueOf( adminUser.getUserId() ) );
 
         // check if user profile already exists
@@ -2282,6 +2381,11 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
                 }
             }
         }
+        
+        //check if profile will be primary or not
+        int isPrimary = checkWillNewProfileBePrimary( userProfileNew , userProfiles);
+        userProfileNew.setIsPrimary(isPrimary);
+        
         // Remove if the profile from list
         if ( indexToRemove != -1 ) {
             userProfiles.remove( indexToRemove );
