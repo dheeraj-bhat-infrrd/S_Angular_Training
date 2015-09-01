@@ -865,5 +865,5 @@ public interface OrganizationManagementService
     public XSSFWorkbook downloadCompanyReport( List<Company> companies, String fileName );
 
 
-    public List<FeedIngestionEntity> fetchSocialMediaTokens( String collectionName, int batchSize );
+    public List<FeedIngestionEntity> fetchSocialMediaTokens( String collectionName, int skipCount, int batchSize );
 }
