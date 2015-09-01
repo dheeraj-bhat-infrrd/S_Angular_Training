@@ -630,9 +630,9 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
         OrganizationUnitSettings companySettings = organizationManagementService.getCompanySettings( user.getCompany()
             .getCompanyId() );
         if ( companySettings != null && companySettings.getMail_content() != null
-            && companySettings.getMail_content().getTake_survey_reminder_mail() != null ) {
+            && companySettings.getMail_content().getRestart_survey_mail() != null ) {
 
-            MailContent restartSurvey = companySettings.getMail_content().getTake_survey_reminder_mail();
+            MailContent restartSurvey = companySettings.getMail_content().getRestart_survey_mail();
             String mailBody = emailFormatHelper.replaceEmailBodyWithParams( restartSurvey.getMail_body(),
                 restartSurvey.getParam_order() );
 
@@ -879,9 +879,9 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
         OrganizationUnitSettings companySettings = organizationManagementService.getCompanySettings( user.getCompany()
             .getCompanyId() );
         if ( companySettings != null && companySettings.getMail_content() != null
-            && companySettings.getMail_content(). getRestart_survey_mail() != null ) {
+            && companySettings.getMail_content().getTake_survey_mail() != null ) {
 
-            MailContent takeSurvey = companySettings.getMail_content(). getRestart_survey_mail();
+            MailContent takeSurvey = companySettings.getMail_content().getTake_survey_mail();
             String mailBody = emailFormatHelper.replaceEmailBodyWithParams( takeSurvey.getMail_body(),
                 takeSurvey.getParam_order() );
 
