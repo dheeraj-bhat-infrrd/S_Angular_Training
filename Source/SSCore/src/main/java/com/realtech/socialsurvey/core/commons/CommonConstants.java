@@ -514,6 +514,11 @@ public interface CommonConstants
     public static final String BRANCH_SETTINGS_COLLECTION = "BRANCH_SETTINGS";
     public static final String AGENT_SETTINGS_COLLECTION = "AGENT_SETTINGS";
     public static final String SOCIAL_POST_COLLECTION = "SOCIAL_POST";
+    
+    /*
+     * Mongo social post Source
+     */
+    public static final String POST_SOURCE_SOCIAL_SURVEY = "SocialSurvey";
 
     /*
      * Constants related to Dash board profile.

@@ -11,6 +11,15 @@ public class SocialPost {
 	private String postText;
 	private String postedBy;
 	private String postUrl;
+	private String _id;
+	public String get_id() {
+		return _id;
+	}
+
+	public void set_id(String _id) {
+		this._id = _id;
+	}
+
 	public String getSource() {
 		return source;
 	}
