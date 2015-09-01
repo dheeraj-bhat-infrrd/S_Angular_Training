@@ -4303,6 +4303,27 @@ public class ProfileManagementController
         return "Added the status successfully";
     }
 
+    /*
+     * Method to delete status of the user.
+     */
+    @ResponseBody
+    @RequestMapping ( value = "/deletestatus")
+    public String deleteStatus( HttpServletRequest request, Model model )
+    {
+        LOG.info( "Method to delete status of the user started" );
+        
+        try {
+            String statusMongoId = request.getParameter( "statusmongoid" );
+            profileManagementService.deleteSocialPost( statusMongoId );
+        } catch ( NonFatalException nonFatalException ) {
+            LOG.error( "NonFatalException while deleting status of user. Reason :" + nonFatalException.getMessage(),
+                nonFatalException );
+            return  messageUtils.getDisplayMessage(DisplayMessageConstants.STATUS_CAN_NOT_BE_DELETED, DisplayMessageType.ERROR_MESSAGE).getMessage();
+        }
+        LOG.info( "Method to delete status of the user finished" );
+        return messageUtils.getDisplayMessage(DisplayMessageConstants.STATUS_DELETED_SUCCESSFULLY, DisplayMessageType.SUCCESS_MESSAGE).getMessage();
+    }
+
 
     /*
      * Method to fetch posts for the logged in user.
