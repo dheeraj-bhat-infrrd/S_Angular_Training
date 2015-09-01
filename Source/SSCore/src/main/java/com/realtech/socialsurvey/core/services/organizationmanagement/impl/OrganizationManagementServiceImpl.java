@@ -4481,10 +4481,10 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 
     @Transactional
     @Override
-    public List<FeedIngestionEntity> fetchSocialMediaTokens( String collectionName, int batchSize )
+    public List<FeedIngestionEntity> fetchSocialMediaTokens( String collectionName, int skipCount, int batchSize )
     {
         List<FeedIngestionEntity> fieldIngestionEntities = organizationUnitSettingsDao.fetchSocialMediaTokens( collectionName,
-            0, batchSize );
+            skipCount, batchSize );
         return fieldIngestionEntities;
     }
 
