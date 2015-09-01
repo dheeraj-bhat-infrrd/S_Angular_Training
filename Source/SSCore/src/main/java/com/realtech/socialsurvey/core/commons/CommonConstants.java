@@ -643,4 +643,8 @@ public interface CommonConstants
     public final String EXCEL_FILE_EXTENSION = ".xlsx";
     
     public final String EPOCH_REMINDER_TIME = "02/01/1970";
+
+    //Settings constants
+    public static final boolean SET_SETTINGS = true;
+    public static final boolean UNSET_SETTINGS = false;
 }
