@@ -866,4 +866,10 @@ public interface OrganizationManagementService
 
 
     public List<FeedIngestionEntity> fetchSocialMediaTokens( String collectionName, int batchSize );
+
+
+    public Company getPrimaryCompanyByRegion( long regionId );
+
+
+    public Region getPrimaryRegionByBranch( long branchId );
 }
