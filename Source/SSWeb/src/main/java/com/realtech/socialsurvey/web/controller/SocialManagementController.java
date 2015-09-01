@@ -1546,7 +1546,7 @@ public class SocialManagementController
         User user = sessionHelper.getCurrentUser();
         String zillowScreenName = request.getParameter( "zillowProfileName" );
 
-        if ( zillowScreenName == null && zillowScreenName == "" ) {
+        if ( zillowScreenName == null || zillowScreenName == "" ) {
             model.addAttribute( "Error", "Please provide either the zillow screen name or zillow emailadress" );
 
         } else {
@@ -1592,7 +1592,8 @@ public class SocialManagementController
                     messageMap = (HashMap<String, Object>) map.get( "message" );
                     String code = (String) messageMap.get( "code" );
                     if ( !code.equalsIgnoreCase( "0" ) ) {
-                        throw new Exception( " Invalid Zillow Details Provided " );
+                        String errorMessage = (String) messageMap.get( "text" );
+                        throw new NonFatalException( "Error code : " + code + " Error description : " + errorMessage );
                     }
                     if ( responseMap != null ) {
                         resultMap = (HashMap<String, Object>) responseMap.get( "results" );
