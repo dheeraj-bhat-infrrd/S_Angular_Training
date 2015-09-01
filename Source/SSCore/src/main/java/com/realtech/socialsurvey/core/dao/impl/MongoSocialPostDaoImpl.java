@@ -2,6 +2,7 @@ package com.realtech.socialsurvey.core.dao.impl;
 
 import java.util.Date;
 import java.util.List;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,6 +11,7 @@ import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Repository;
+
 import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.dao.SocialPostDao;
 import com.realtech.socialsurvey.core.entities.SocialPost;
@@ -30,6 +32,7 @@ public class MongoSocialPostDaoImpl implements SocialPostDao {
 	public static final String KEY_TIME_IN_MILLIS = "timeInMillis";
 	public static final String KEY_POST_URL = "postUrl";
 	public static final String KEY_SOURCE_SS = "SocialSurvey";
+	public static final String KEY_MONGO_ID = "_id";
 
 	@Autowired
 	private MongoTemplate mongoTemplate;
@@ -40,6 +43,21 @@ public class MongoSocialPostDaoImpl implements SocialPostDao {
 		LOG.info("Inserting into " + CommonConstants.SOCIAL_POST_COLLECTION + ". Object: " + socialPost.toString());
 		mongoTemplate.insert(socialPost, CommonConstants.SOCIAL_POST_COLLECTION);
 		LOG.info("Inserted into " + CommonConstants.SOCIAL_POST_COLLECTION);
+	}
+	
+	// Method to get a post by mongo object id
+	@Override
+	public SocialPost getPostByMongoObjectId(String mongoObjectId){
+		LOG.info("Fetching Social Post with with mongo id : " + mongoObjectId);
+		SocialPost socialPost = mongoTemplate.findById(mongoObjectId, SocialPost.class , CommonConstants.SOCIAL_POST_COLLECTION);
+		return socialPost;
+	}
+	
+	@Override
+	public void removePostFromUsersProfile(SocialPost socialPost) {
+		LOG.info("Deleting from " + CommonConstants.SOCIAL_POST_COLLECTION + ". Object: " + socialPost.toString());
+		mongoTemplate.remove(socialPost, CommonConstants.SOCIAL_POST_COLLECTION);
+		LOG.info("Deleting from " + CommonConstants.SOCIAL_POST_COLLECTION);
 	}
 
 	// Method to fetch social posts for a particular user.
@@ -53,6 +71,7 @@ public class MongoSocialPostDaoImpl implements SocialPostDao {
 		query.fields().include(KEY_SOURCE);
 		query.fields().include(KEY_TIME_IN_MILLIS);
 		query.fields().include(KEY_POST_URL);
+		query.fields().include(KEY_MONGO_ID);
 
 		if (skip != -1)
 			query.skip(skip);
