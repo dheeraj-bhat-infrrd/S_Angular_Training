@@ -1597,7 +1597,8 @@ button.paypal.is-active {
 
 .social-item-icon {
 	height: 50px;
-	width: 35px;
+	width: 28px;
+	margin: 0 3px;
 	cursor: pointer;
 }
 
@@ -1711,7 +1712,7 @@ button.paypal.is-active {
 }
 
 .icn-fb {
-	background: url(../images/fb.png) no-repeat center;
+	background: url(../images/icons_social.png) no-repeat 0 center;
 }
 
 .icn-twit {
@@ -1719,7 +1720,7 @@ button.paypal.is-active {
 }
 
 .icn-lin {
-	background: url(../images/linkdin.png) no-repeat center;
+	background: url(../images/icons_social.png) no-repeat -150px center;
 }
 
 .icn-ss {
@@ -1727,19 +1728,19 @@ button.paypal.is-active {
 }
 
 .icn-yelp {
-	background: url(../images/yelp.png) no-repeat center;
+	background: url(../images/icons_social.png) no-repeat -300px center;
 }
 
 .icn-zillow {
-	background: url(../images/zillow.png) no-repeat center;
+	background: url(../images/icons_social.png) no-repeat -250px center;
 }
 
 .icn-lendingtree {
-	background: url(../images/lendingtree.png) no-repeat center;
+	background: url(../images/icons_social.png) no-repeat -100px center;
 }
 
 .icn-realtor {
-	background: url(../images/realtor.png) no-repeat center;
+	background: url(../images/icons_social.png) no-repeat -200px center;
 }
 
 .icn-tele-blue {
@@ -1747,7 +1748,7 @@ button.paypal.is-active {
 }
 
 .icn-gplus {
-	background: url(../images/gplus.png) no-repeat center;
+	background: url(../images/icons_social.png) no-repeat -50px center;
 	border:0px;
 }
 
@@ -6263,7 +6264,7 @@ tr.u-tbl-header td {
 
 
 .rating-image {
-    width: 26px;
+    width: 28px;
     height: 30px;
 }
 
@@ -6281,23 +6282,23 @@ tr.u-tbl-header td {
 }
 
 .smiley-rat-1{
-	background: url(../images/smiley-rat-1.png) no-repeat center;
+	background: url(../images/smileys.png) no-repeat 0 center;
 }
 
 .smiley-rat-2{
-	background: url(../images/smiley-rat-2.png) no-repeat center;
+	background: url(../images/smileys.png) no-repeat -30px center;
 }
 
 .smiley-rat-3{
-	background: url(../images/smiley-rat-3.png) no-repeat center;
+	background: url(../images/smileys.png) no-repeat -60px center;
 }
 
 .smiley-rat-4{
-	background: url(../images/smiley-rat-4.png) no-repeat center;
+	background: url(../images/smileys.png) no-repeat -90px center;
 }
 
 .smiley-rat-5{
-	background: url(../images/smiley-rat-5.png) no-repeat center;
+	background: url(../images/smileys.png) no-repeat -120px center;
 }
 
 .smiley-bg-rat-1{
