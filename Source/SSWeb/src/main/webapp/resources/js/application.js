@@ -3515,6 +3515,7 @@ $(document).on('click', '#overlay-cancel', function() {
 	$('#overlay-main').hide();
 });
 
+
 function confirmDeleteUser(userId, adminId) {
 	if (userId == adminId) {
 		$('#overlay-continue').hide();
@@ -7359,7 +7360,18 @@ function paintPosts(posts) {
 				+ '<div class="tweet-text-link"><em>' + post.postedBy
 				+ '</em></div>' + '<div class="tweet-text-time"><em>'
 				+ convertUserDateToLocalWeekFormt(new Date(post.timeInMillis)) + '</em></div>'
-				+ '	</div>' + '</div>';
+				+ '</div>';
+		
+		if(post.source == "SocialSurvey"){
+			var divToDeleteSurvey = '<div class="dlt-survey-wrapper hide"><div surveymongoid=' + post._id + ' class="post-dlt-icon reg-err-pu-close float-left">'
+								+ '</div></div>';
+			divToPopulate += divToDeleteSurvey;
+		}
+		
+		divToPopulate += '</div>';
+		
+		
+		
 	});
 
 	if (proPostStartIndex == 0){
@@ -8080,3 +8092,20 @@ function updatePositionInLeftSection(positions) {
 	
 	$('#positions-container').html(contentToAppend);
 }
+
+$(document).on('click','#hdr-config-settings-dropdown', function(e) {
+	$('#hdr-link-item-dropdown').toggle();
+});
+
+$(document).on('mouseover','#hdr-link-item-config', function(e) {
+	$('#hdr-link-item-dropdown').show();
+});
+
+$(document).on('mouseout','#hdr-link-item-config', function(e) {
+	$('#hdr-link-item-dropdown').hide();
+});
+
+$(document).on('click','.hdr-link-item-dropdown-item',function(e) {
+	$('#hdr-link-item-dropdown').hide();
+	showOverlay();
+});
