@@ -1593,8 +1593,7 @@ public class SocialManagementController
                     String code = (String) messageMap.get( "code" );
                     if ( !code.equalsIgnoreCase( "0" ) ) {
                         String errorMessage = (String) messageMap.get( "text" );
-                        throw new NonFatalException( "Error code from zillow " + code + " detail error message is "
-                            + errorMessage );
+                        throw new NonFatalException( "Error code : " + code + " Error description : " + errorMessage );
                     }
                     if ( responseMap != null ) {
                         resultMap = (HashMap<String, Object>) responseMap.get( "results" );
