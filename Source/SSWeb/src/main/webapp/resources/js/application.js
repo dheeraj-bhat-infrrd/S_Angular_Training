@@ -8092,3 +8092,20 @@ function updatePositionInLeftSection(positions) {
 	
 	$('#positions-container').html(contentToAppend);
 }
+
+$(document).on('click','#hdr-config-settings-dropdown', function(e) {
+	$('#hdr-link-item-dropdown').toggle();
+});
+
+$(document).on('mouseover','#hdr-link-item-config', function(e) {
+	$('#hdr-link-item-dropdown').show();
+});
+
+$(document).on('mouseout','#hdr-link-item-config', function(e) {
+	$('#hdr-link-item-dropdown').hide();
+});
+
+$(document).on('click','.hdr-link-item-dropdown-item',function(e) {
+	$('#hdr-link-item-dropdown').hide();
+	showOverlay();
+});
