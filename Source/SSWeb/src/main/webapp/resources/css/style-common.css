@@ -1666,11 +1666,17 @@ button.paypal.is-active {
 }
 
 .tweet-txt {
-	width: 691px;
+	width: 645px;
 }
 
 .tweet-text-main {
 	line-height: 22px;
+}
+
+.post-dlt-icon {
+	width: 25px;
+    height: 25px;
+    margin-top: 25px;
 }
 
 .tweet-text-link {
