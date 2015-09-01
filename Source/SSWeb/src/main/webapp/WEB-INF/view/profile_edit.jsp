@@ -386,9 +386,12 @@
 							<div class="float-left left-panel-header"><spring:message code="label.disclaimer.key" /></div>
 						</div>
 						<div class="left-panel-content" id="disclaimer-container">
-							<input id="disclaimer-text" class="float-left lp-con-row-item blue-text prof-editable-disclaimer"
+							<%-- <input id="disclaimer-text" textarea class="float-left lp-con-row-item blue-text prof-editable-disclaimer"
 								value="${disclaimer}" placeholder='<spring:message code="label.disclaimer.placeholder.key"/>'>
-							<input id="disclaimer-default" type="hidden" value="${disclaimer}">
+							<input id="disclaimer-default" type="hidden" value="${disclaimer}"> --%>
+							<textarea class="pe-whitespace sb-txtarea" id="disclaimer-text" placeholder="Add a Disclaimer">
+								<c:out value="${disclaimer}" />
+							</textarea>
 						</div>
 					</div>
 				</div>
