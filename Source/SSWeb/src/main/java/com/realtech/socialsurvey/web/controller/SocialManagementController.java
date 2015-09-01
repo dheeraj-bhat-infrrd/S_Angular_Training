@@ -42,6 +42,8 @@ import com.google.gson.reflect.TypeToken;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.dao.impl.MongoOrganizationUnitSettingDaoImpl;
 import com.realtech.socialsurvey.core.entities.AgentSettings;
+import com.realtech.socialsurvey.core.entities.Branch;
+import com.realtech.socialsurvey.core.entities.Company;
 import com.realtech.socialsurvey.core.entities.FacebookPage;
 import com.realtech.socialsurvey.core.entities.FacebookToken;
 import com.realtech.socialsurvey.core.entities.GoogleToken;
@@ -49,12 +51,14 @@ import com.realtech.socialsurvey.core.entities.LinkedInToken;
 import com.realtech.socialsurvey.core.entities.LinkedinUserProfileResponse;
 import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
 import com.realtech.socialsurvey.core.entities.ProfileStage;
+import com.realtech.socialsurvey.core.entities.Region;
 import com.realtech.socialsurvey.core.entities.SocialMediaTokens;
 import com.realtech.socialsurvey.core.entities.TwitterToken;
 import com.realtech.socialsurvey.core.entities.User;
 import com.realtech.socialsurvey.core.entities.UserSettings;
 import com.realtech.socialsurvey.core.entities.ZillowToken;
 import com.realtech.socialsurvey.core.enums.AccountType;
+import com.realtech.socialsurvey.core.enums.SettingsForApplication;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.exception.NoRecordsFetchedException;
 import com.realtech.socialsurvey.core.exception.NonFatalException;
@@ -63,6 +67,7 @@ import com.realtech.socialsurvey.core.integration.zillow.ZillowIntergrationApiBu
 import com.realtech.socialsurvey.core.services.organizationmanagement.OrganizationManagementService;
 import com.realtech.socialsurvey.core.services.organizationmanagement.ProfileManagementService;
 import com.realtech.socialsurvey.core.services.organizationmanagement.UserManagementService;
+import com.realtech.socialsurvey.core.services.settingsmanagement.SettingsSetter;
 import com.realtech.socialsurvey.core.services.social.SocialAsyncService;
 import com.realtech.socialsurvey.core.services.social.SocialManagementService;
 import com.realtech.socialsurvey.core.utils.DisplayMessageConstants;
@@ -109,6 +114,9 @@ public class SocialManagementController
 
     @Autowired
     private RequestUtils requestUtils;
+    
+    @Autowired
+    private SettingsSetter settingsSetter;
 
     @Value ( "${APPLICATION_BASE_URL}")
     private String applicationBaseUrl;
@@ -366,6 +374,7 @@ public class SocialManagementController
                 profileManagementService.updateProfileStages( companySettings.getProfileStages(), companySettings,
                     MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION );
                 userSettings.setCompanySettings( companySettings );
+              
                 updated = true;
             } else if ( entityType.equals( CommonConstants.REGION_ID_COLUMN ) ) {
                 OrganizationUnitSettings regionSettings = organizationManagementService.getRegionSettings( entityId );
@@ -386,6 +395,7 @@ public class SocialManagementController
                 profileManagementService.updateProfileStages( regionSettings.getProfileStages(), regionSettings,
                     MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION );
                 userSettings.getRegionSettings().put( entityId, regionSettings );
+              
                 updated = true;
             } else if ( entityType.equals( CommonConstants.BRANCH_ID_COLUMN ) ) {
                 OrganizationUnitSettings branchSettings = organizationManagementService.getBranchSettingsDefault( entityId );
@@ -406,6 +416,7 @@ public class SocialManagementController
                 profileManagementService.updateProfileStages( branchSettings.getProfileStages(), branchSettings,
                     MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION );
                 userSettings.getBranchSettings().put( entityId, branchSettings );
+              
                 updated = true;
             } else if ( entityType.equals( CommonConstants.AGENT_ID_COLUMN )
                 || accountMasterId == CommonConstants.ACCOUNTS_MASTER_INDIVIDUAL ) {
@@ -488,6 +499,12 @@ public class SocialManagementController
                 mediaTokens.getFacebookToken().setFacebookPageLink( selectedProfileUrl );
                 socialManagementService.updateSocialMediaTokens(
                     MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION, companySettings, mediaTokens );
+              //update SETTINGS_SET_STATUS of COMPANY table to set.
+                Company company = userManagementService.getCompanyById( companySettings.getIden() );
+                if(company != null){
+                	settingsSetter.setSettingsValueForCompany(company, SettingsForApplication.FACEBOOK, CommonConstants.SET_SETTINGS);
+                	userManagementService.updateCompany( company );
+                }
                 updated = true;
             } else if ( entityType.equals( CommonConstants.REGION_ID_COLUMN ) ) {
                 OrganizationUnitSettings regionSettings = organizationManagementService.getRegionSettings( entityId );
@@ -499,6 +516,12 @@ public class SocialManagementController
                 mediaTokens.getFacebookToken().setFacebookPageLink( selectedProfileUrl );
                 socialManagementService.updateSocialMediaTokens(
                     MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION, regionSettings, mediaTokens );
+              //update SETTINGS_SET_STATUS of REGION table to set.
+                Region region = userManagementService.getRegionById( regionSettings.getIden() );
+                if(region != null){
+                	settingsSetter.setSettingsValueForRegion(region, SettingsForApplication.FACEBOOK, CommonConstants.SET_SETTINGS);
+                	userManagementService.updateRegion( region );
+                }
                 updated = true;
             } else if ( entityType.equals( CommonConstants.BRANCH_ID_COLUMN ) ) {
                 OrganizationUnitSettings branchSettings = organizationManagementService.getBranchSettingsDefault( entityId );
@@ -510,6 +533,13 @@ public class SocialManagementController
                 mediaTokens.getFacebookToken().setFacebookPageLink( selectedProfileUrl );
                 socialManagementService.updateSocialMediaTokens(
                     MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION, branchSettings, mediaTokens );
+              //update SETTINGS_SET_STATUS of BRANCH table to set.
+                Branch branch = userManagementService.getBranchById( branchSettings.getIden() );
+                if(branch !=  null){
+                	settingsSetter.setSettingsValueForBranch(branch, SettingsForApplication.FACEBOOK, CommonConstants.SET_SETTINGS);
+                	userManagementService.updateBranch( branch );
+                }
+                
                 updated = true;
             } else if ( entityType.equals( CommonConstants.AGENT_ID_COLUMN )
                 || accountMasterId == CommonConstants.ACCOUNTS_MASTER_INDIVIDUAL ) {
@@ -529,7 +559,9 @@ public class SocialManagementController
             }
         } catch ( InvalidInputException | NoRecordsFetchedException e ) {
             LOG.error( "Error while saving access token for facebook to post: " + e.getLocalizedMessage(), e );
-        }
+        } catch (NonFatalException e) {
+			LOG.error("Error setting settings value. Reason : " + e.getLocalizedMessage(), e);
+		}
         model.addAttribute( "socialNetwork", "facebook" );
         return JspResolver.SOCIAL_FACEBOOK_INTERMEDIATE;
     }
@@ -663,6 +695,13 @@ public class SocialManagementController
                 mediaTokens = socialManagementService.updateSocialMediaTokens(
                     MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION, companySettings, mediaTokens );
                 companySettings.setSocialMediaTokens( mediaTokens );
+              //update SETTINGS_SET_STATUS of COMPANY table to set.
+                Company company = userManagementService.getCompanyById( companySettings.getIden() );
+                if(company != null){
+                	settingsSetter.setSettingsValueForCompany(company, SettingsForApplication.TWITTER, CommonConstants.SET_SETTINGS);
+                	userManagementService.updateCompany( company );
+                }
+                
                 for ( ProfileStage stage : companySettings.getProfileStages() ) {
                     if ( stage.getProfileStageKey().equalsIgnoreCase( "TWITTER_PRF" ) ) {
                         stage.setStatus( CommonConstants.STATUS_INACTIVE );
@@ -682,6 +721,12 @@ public class SocialManagementController
                 mediaTokens = socialManagementService.updateSocialMediaTokens(
                     MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION, regionSettings, mediaTokens );
                 regionSettings.setSocialMediaTokens( mediaTokens );
+              //update SETTINGS_SET_STATUS of REGION table to set.
+                Region region = userManagementService.getRegionById( regionSettings.getIden() );
+                if(region != null){
+                	settingsSetter.setSettingsValueForRegion(region, SettingsForApplication.TWITTER, CommonConstants.SET_SETTINGS);
+                	userManagementService.updateRegion( region );
+                }
                 for ( ProfileStage stage : regionSettings.getProfileStages() ) {
                     if ( stage.getProfileStageKey().equalsIgnoreCase( "TWITTER_PRF" ) ) {
                         stage.setStatus( CommonConstants.STATUS_INACTIVE );
@@ -697,6 +742,12 @@ public class SocialManagementController
                     throw new InvalidInputException( "No Branch settings found in current session" );
                 }
                 mediaTokens = branchSettings.getSocialMediaTokens();
+              //update SETTINGS_SET_STATUS of BRANCH table to set.
+                Branch branch = userManagementService.getBranchById( branchSettings.getIden() );
+                if(branch != null){
+                	settingsSetter.setSettingsValueForBranch(branch, SettingsForApplication.TWITTER, CommonConstants.SET_SETTINGS);
+                	userManagementService.updateBranch( branch );
+                }
                 mediaTokens = updateTwitterToken( accessToken, mediaTokens, profileLink );
                 mediaTokens = socialManagementService.updateSocialMediaTokens(
                     MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION, branchSettings, mediaTokens );
@@ -861,6 +912,13 @@ public class SocialManagementController
                 profileManagementService.updateProfileStages( companySettings.getProfileStages(), companySettings,
                     MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION );
                 userSettings.setCompanySettings( companySettings );
+              //update SETTINGS_SET_STATUS of COMPANY table to set.
+                Company company = userManagementService.getCompanyById( companySettings.getIden() );
+                if(company != null){
+                	settingsSetter.setSettingsValueForCompany(company, SettingsForApplication.LINKED_IN, CommonConstants.SET_SETTINGS);
+                	userManagementService.updateCompany( company );
+                }
+                
                 updated = true;
             } else if ( entityType.equals( CommonConstants.REGION_ID_COLUMN ) ) {
                 OrganizationUnitSettings regionSettings = organizationManagementService.getRegionSettings( entityId );
@@ -872,6 +930,13 @@ public class SocialManagementController
                 mediaTokens = socialManagementService.updateSocialMediaTokens(
                     MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION, regionSettings, mediaTokens );
                 regionSettings.setSocialMediaTokens( mediaTokens );
+              //update SETTINGS_SET_STATUS of REGION table to set.
+                Region region = userManagementService.getRegionById( regionSettings.getIden() );
+                if(region != null){
+                	settingsSetter.setSettingsValueForRegion(region, SettingsForApplication.LINKED_IN, CommonConstants.SET_SETTINGS);
+                	userManagementService.updateRegion( region );
+                }
+                
                 for ( ProfileStage stage : regionSettings.getProfileStages() ) {
                     if ( stage.getProfileStageKey().equalsIgnoreCase( "LINKEDIN_PRF" ) ) {
                         stage.setStatus( CommonConstants.STATUS_INACTIVE );
@@ -891,6 +956,12 @@ public class SocialManagementController
                 mediaTokens = socialManagementService.updateSocialMediaTokens(
                     MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION, branchSettings, mediaTokens );
                 branchSettings.setSocialMediaTokens( mediaTokens );
+              //update SETTINGS_SET_STATUS of BRANCH table to set.
+                Branch branch = userManagementService.getBranchById( branchSettings.getIden() );
+                if(branch != null){
+                	settingsSetter.setSettingsValueForBranch(branch, SettingsForApplication.LINKED_IN, CommonConstants.SET_SETTINGS);
+                	userManagementService.updateBranch( branch );
+                }
                 for ( ProfileStage stage : branchSettings.getProfileStages() ) {
                     if ( stage.getProfileStageKey().equalsIgnoreCase( "LINKEDIN_PRF" ) ) {
                         stage.setStatus( CommonConstants.STATUS_INACTIVE );
@@ -1062,6 +1133,12 @@ public class SocialManagementController
                 mediaTokens = socialManagementService.updateSocialMediaTokens(
                     MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION, companySettings, mediaTokens );
                 companySettings.setSocialMediaTokens( mediaTokens );
+              //update SETTINGS_SET_STATUS of COMPANY table to set.
+                Company company = userManagementService.getCompanyById( companySettings.getIden() );
+                if(company != null){
+                	settingsSetter.setSettingsValueForCompany(company, SettingsForApplication.GOOGLE_PLUS, CommonConstants.SET_SETTINGS);
+                	userManagementService.updateCompany( company );
+                }
                 for ( ProfileStage stage : companySettings.getProfileStages() ) {
                     if ( stage.getProfileStageKey().equalsIgnoreCase( "GOOGLE_PRF" ) ) {
                         stage.setStatus( CommonConstants.STATUS_INACTIVE );
@@ -1081,6 +1158,13 @@ public class SocialManagementController
                 mediaTokens = socialManagementService.updateSocialMediaTokens(
                     MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION, regionSettings, mediaTokens );
                 regionSettings.setSocialMediaTokens( mediaTokens );
+              //update SETTINGS_SET_STATUS of REGION table to set.
+                Region region = userManagementService.getRegionById( regionSettings.getIden() );
+                if(region != null){
+                	settingsSetter.setSettingsValueForRegion(region, SettingsForApplication.GOOGLE_PLUS, CommonConstants.SET_SETTINGS);
+                	userManagementService.updateRegion( region );
+                }
+                
                 for ( ProfileStage stage : regionSettings.getProfileStages() ) {
                     if ( stage.getProfileStageKey().equalsIgnoreCase( "GOOGLE_PRF" ) ) {
                         stage.setStatus( CommonConstants.STATUS_INACTIVE );
@@ -1100,6 +1184,12 @@ public class SocialManagementController
                 mediaTokens = socialManagementService.updateSocialMediaTokens(
                     MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION, branchSettings, mediaTokens );
                 branchSettings.setSocialMediaTokens( mediaTokens );
+              //update SETTINGS_SET_STATUS of BRANCH table to set.
+                Branch branch = userManagementService.getBranchById( branchSettings.getIden() );
+                if(branch != null){
+                	settingsSetter.setSettingsValueForBranch(branch, SettingsForApplication.GOOGLE_PLUS, CommonConstants.SET_SETTINGS);
+                	userManagementService.updateBranch( branch );
+                }
                 for ( ProfileStage stage : branchSettings.getProfileStages() ) {
                     if ( stage.getProfileStageKey().equalsIgnoreCase( "GOOGLE_PRF" ) ) {
                         stage.setStatus( CommonConstants.STATUS_INACTIVE );
@@ -1400,7 +1490,6 @@ public class SocialManagementController
             sessionHelper.getCanonicalSettings( request.getSession( false ) );
             OrganizationUnitSettings settings = (OrganizationUnitSettings) request.getSession( false ).getAttribute(
                 CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION );
-
             if ( settings.getSocialMediaTokens() != null && settings.getSocialMediaTokens().getYelpToken() != null ) {
                 yelpUrl.put( "relativePath", settings.getSocialMediaTokens().getYelpToken().getYelpPageLink() );
             }
@@ -1617,6 +1706,12 @@ public class SocialManagementController
                     mediaTokens = socialManagementService.updateSocialMediaTokens(
                         MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION, companySettings, mediaTokens );
                     companySettings.setSocialMediaTokens( mediaTokens );
+                  //update SETTINGS_SET_STATUS of COMPANY table to set.
+                    Company company = userManagementService.getCompanyById( companySettings.getIden() );
+                    if(company != null){
+                    	settingsSetter.setSettingsValueForCompany(user.getCompany(), SettingsForApplication.ZILLOW, CommonConstants.SET_SETTINGS);
+                    	userManagementService.updateCompany( company );
+                    }
                     for ( ProfileStage stage : companySettings.getProfileStages() ) {
                         if ( stage.getProfileStageKey().equalsIgnoreCase( "ZILLOW_PRF" ) ) {
                             stage.setStatus( CommonConstants.STATUS_INACTIVE );
@@ -1637,6 +1732,12 @@ public class SocialManagementController
                     mediaTokens = socialManagementService.updateSocialMediaTokens(
                         MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION, regionSettings, mediaTokens );
                     regionSettings.setSocialMediaTokens( mediaTokens );
+                  //update SETTINGS_SET_STATUS of REGION table to set.
+                    Region region = userManagementService.getRegionById( regionSettings.getIden() );
+                    if(region != null){
+                    	settingsSetter.setSettingsValueForRegion(region, SettingsForApplication.ZILLOW, CommonConstants.SET_SETTINGS);
+                    	userManagementService.updateRegion( region );
+                    }
                     for ( ProfileStage stage : regionSettings.getProfileStages() ) {
                         if ( stage.getProfileStageKey().equalsIgnoreCase( "ZILLOW_PRF" ) ) {
                             stage.setStatus( CommonConstants.STATUS_INACTIVE );
@@ -1656,6 +1757,12 @@ public class SocialManagementController
                     mediaTokens = socialManagementService.updateSocialMediaTokens(
                         MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION, branchSettings, mediaTokens );
                     branchSettings.setSocialMediaTokens( mediaTokens );
+                  //update SETTINGS_SET_STATUS of BRANCH table to set.
+                    Branch branch = userManagementService.getBranchById( branchSettings.getIden() );
+                    if(branch != null){
+                    	settingsSetter.setSettingsValueForBranch(branch, SettingsForApplication.ZILLOW, CommonConstants.SET_SETTINGS);
+                    	userManagementService.updateBranch( branch );
+                    }
                     for ( ProfileStage stage : branchSettings.getProfileStages() ) {
                         if ( stage.getProfileStageKey().equalsIgnoreCase( "ZILLOW_PRF" ) ) {
                             stage.setStatus( CommonConstants.STATUS_INACTIVE );
@@ -1771,6 +1878,34 @@ public class SocialManagementController
                 throw new InvalidInputException( "Social media can not be null or empty" );
             }
 
+            boolean unset = CommonConstants.UNSET_SETTINGS;
+            SettingsForApplication settings;
+            
+            switch (socialMedia) {
+    		case CommonConstants.FACEBOOK_SOCIAL_SITE:
+    			settings = SettingsForApplication.FACEBOOK;
+    			break;
+    			
+    		case CommonConstants.TWITTER_SOCIAL_SITE:
+    			settings = SettingsForApplication.TWITTER;
+    			break;
+    			
+    		case CommonConstants.GOOGLE_SOCIAL_SITE:
+    			settings = SettingsForApplication.GOOGLE_PLUS;
+    			break;
+    			
+    		case CommonConstants.LINKEDIN_SOCIAL_SITE:
+    			settings = SettingsForApplication.LINKED_IN;
+    			break;
+    			
+    		case CommonConstants.ZILLOW_SOCIAL_SITE:
+    			settings = SettingsForApplication.ZILLOW;
+                break;
+
+    		default:
+    			throw new InvalidInputException("Invalid social media token entered");
+    		}
+            
             User user = sessionHelper.getCurrentUser();
             HttpSession session = request.getSession();
             UserSettings userSettings = (UserSettings) session.getAttribute( CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION );
@@ -1787,16 +1922,34 @@ public class SocialManagementController
                 unitSettings = socialManagementService.disconnectSocialNetwork( socialMedia, unitSettings,
                     MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION );
                 userSettings.setCompanySettings( unitSettings );
+                //update SETTINGS_SET_STATUS to unset in COMPANY table
+                Company company = user.getCompany();
+                if(company != null){
+                	settingsSetter.setSettingsValueForCompany(company, settings, unset);
+                	userManagementService.updateCompany( company );
+                }
             } else if ( entityType.equals( CommonConstants.REGION_ID_COLUMN ) ) {
                 unitSettings = organizationManagementService.getRegionSettings( entityId );
                 unitSettings = socialManagementService.disconnectSocialNetwork( socialMedia, unitSettings,
                     MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION );
                 userSettings.getRegionSettings().put( entityId, unitSettings );
+              //update SETTINGS_SET_STATUS to unset in REGION table
+                Region region = userManagementService.getRegionById(entityId);
+                if(region != null){
+                	settingsSetter.setSettingsValueForRegion(region, settings, unset);
+                	userManagementService.updateRegion( region );
+                }
             } else if ( entityType.equals( CommonConstants.BRANCH_ID_COLUMN ) ) {
                 unitSettings = organizationManagementService.getBranchSettingsDefault( entityId );
                 unitSettings = socialManagementService.disconnectSocialNetwork( socialMedia, unitSettings,
                     MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION );
                 userSettings.getBranchSettings().put( entityId, unitSettings );
+              //update SETTINGS_SET_STATUS to unset in BRANCH table
+                Branch branch = userManagementService.getBranchById(entityId);
+                if(branch != null){
+                	settingsSetter.setSettingsValueForBranch(branch, settings, unset);
+                	userManagementService.updateBranch( branch );
+                }
             }
             if ( entityType.equals( CommonConstants.AGENT_ID_COLUMN ) ) {
                 unitSettings = userManagementService.getUserSettings( entityId );
