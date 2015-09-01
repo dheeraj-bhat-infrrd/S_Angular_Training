@@ -155,6 +155,9 @@ public final class DisplayMessageConstants
     public static final String INVITATION_RESEND_SUCCESSFUL = "INVITATION_RESEND_SUCCESSFUL";
     public static final String PROFILE_UPDATE_SUCCESSFUL = "PROFILE_UPDATE_SUCCESSFUL";
     public static final String ACCOUNT_DELETION_SUCCESSFUL = "ACCOUNT_DELETION_SUCCESSFUL";
+    
+    public static final String STATUS_DELETED_SUCCESSFULLY = "STATUS_DELETED_SUCCESSFULLY";
+    public static final String STATUS_CAN_NOT_BE_DELETED = "STATUS_CAN_NOT_BE_DELETED";
 
     public static final String SURVEY_CREATION_SUCCESSFUL = "SURVEY_CREATION_SUCCESSFUL";
     public static final String SURVEY_ALREADY_EXISTS = "SURVEY_ALREADY_EXISTS";
