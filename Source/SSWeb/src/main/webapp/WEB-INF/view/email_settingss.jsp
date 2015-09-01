@@ -9,7 +9,7 @@
 	<div class="container">
 		<div class="hm-header-row clearfix">
 			<div class="float-left hm-header-row-left">
-				<spring:message code="label.title.appsettings.key" />
+				<spring:message code="label.title.emailsettings.key" />
 			</div>
 		</div>
 	</div>
