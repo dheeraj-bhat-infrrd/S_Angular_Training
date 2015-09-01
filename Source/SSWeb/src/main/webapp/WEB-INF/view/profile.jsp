@@ -313,7 +313,7 @@
 						</a>
 						</div>
 					</c:if> --%>
-					<div id="social-token-container" class="float-right hm-hr-row-right clearfix">
+					<div id="social-token-container" class="float-right hm-hr-row-right clearfix hide">
 						<c:if test="${not empty profile.socialMediaTokens}">
 							<div id="social-connect-txt" class="float-left social-connect-txt">Connect with ${profName }:</div>
 							<c:if test="${not empty profile.socialMediaTokens.facebookToken && not empty profile.socialMediaTokens.facebookToken.facebookPageLink}">
@@ -595,15 +595,16 @@
 <script src="${initParam.resourcesPath}/resources/js/perfect-scrollbar.jquery.min.js"></script>
 <script>
     $(document).ready(function(){
+    	if($('#social-token-container').children('.social-item-icon').length == 0) {
+        	$('#social-token-container').remove();
+        } else {
+        	$('#social-token-container').show();
+        }
+    	
     	profileJson = ${profileJson};
         adjustImage();
         var gaLabel;
         var gaName;
-        
-        
-        if($('#social-token-container').children('.social-item-icon').length == 0) {
-        	$('#social-token-container').remove();
-        }
         
         /**
 	    	If region profile name is mentioned, fetch the region profile 

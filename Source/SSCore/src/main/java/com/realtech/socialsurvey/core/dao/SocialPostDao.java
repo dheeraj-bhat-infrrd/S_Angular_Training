@@ -1,6 +1,7 @@
 package com.realtech.socialsurvey.core.dao;
 
 import java.util.List;
+
 import com.realtech.socialsurvey.core.entities.SocialPost;
 
 /**
@@ -27,4 +28,10 @@ public interface SocialPostDao {
 
 	// Method to purge older social posts
 	public void purgeOlderSocialPosts(long timeSpanInMilliSecs);
+
+	// Method to get a social post by mongoid
+	public SocialPost getPostByMongoObjectId(String mongoObjectId);
+
+	//method to delete a post
+	public void removePostFromUsersProfile(SocialPost socialPost);
 }
