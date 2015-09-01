@@ -219,16 +219,6 @@
 				<div id="hdr-usr-img" class="float-right user-info-initial">
 					<span id="usr-initl">${fn:substring(user.firstName, 0, 1)}</span>
 					<div class="initial-dd-wrapper hide blue-arrow-bot text-normal">
-						<c:if test="${highestrole == 1 && accountMasterId != 5}">
-							<div class="initial-dd-item" id="change-password" onclick="showMainContent('./showemailsettings.do'); showOverlay();">
-								<spring:message code="label.emailsettings.key"/>
-							</div>
-						</c:if>
-						<c:if test="${highestrole == 1 && accountMasterId != 5}">
-							<div class="initial-dd-item" id="change-password" onclick="showMainContent('./showapps.do'); showOverlay();">
-								<spring:message code="label.appsettings.key"/>
-							</div>
-						</c:if>
 						<div class="initial-dd-item" id="change-password" onclick="showMainContent('./showchangepasswordpage.do'); showOverlay();">
 							<spring:message code="label.changepassword.key"/>
 						</div>
