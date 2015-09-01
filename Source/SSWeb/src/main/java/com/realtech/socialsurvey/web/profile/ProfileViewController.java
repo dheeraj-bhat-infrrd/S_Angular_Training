@@ -207,8 +207,9 @@ public class ProfileViewController
             }
 
             // aggregated social profile urls
-			SocialMediaTokens regionTokens = profileManagementService.aggregateSocialProfiles(regionProfile, CommonConstants.REGION_ID);
-			regionProfile.setSocialMediaTokens(regionTokens);
+            SocialMediaTokens regionTokens = profileManagementService.aggregateSocialProfiles( regionProfile,
+                CommonConstants.REGION_ID );
+            regionProfile.setSocialMediaTokens( regionTokens );
 
             // aggregated disclaimer
             String disclaimer = profileManagementService.aggregateDisclaimer( regionProfile, CommonConstants.REGION_ID );
@@ -304,8 +305,9 @@ public class ProfileViewController
             }
 
             // aggregated social profile urls
-			SocialMediaTokens branchTokens = profileManagementService.aggregateSocialProfiles(branchProfile, CommonConstants.BRANCH_ID);
-			branchProfile.setSocialMediaTokens(branchTokens);
+            SocialMediaTokens branchTokens = profileManagementService.aggregateSocialProfiles( branchProfile,
+                CommonConstants.BRANCH_ID );
+            branchProfile.setSocialMediaTokens( branchTokens );
 
             // aggregated disclaimer
             String disclaimer = profileManagementService.aggregateDisclaimer( branchProfile, CommonConstants.BRANCH_ID );
@@ -424,11 +426,12 @@ public class ProfileViewController
                 individualProfile = (AgentSettings) profileManagementService.getIndividualByProfileName( agentProfileName );
 
                 //set vertical name from the company
-                individualProfile.setVertical(user.getCompany().getVerticalsMaster().getVerticalName());
-                
+                individualProfile.setVertical( user.getCompany().getVerticalsMaster().getVerticalName() );
+
                 // aggregated social profile urls
-				SocialMediaTokens agentTokens = profileManagementService.aggregateSocialProfiles(individualProfile, CommonConstants.AGENT_ID);
-				individualProfile.setSocialMediaTokens(agentTokens);
+                SocialMediaTokens agentTokens = profileManagementService.aggregateSocialProfiles( individualProfile,
+                    CommonConstants.AGENT_ID );
+                individualProfile.setSocialMediaTokens( agentTokens );
 
                 // aggregated disclaimer
                 String disclaimer = profileManagementService.aggregateDisclaimer( individualProfile, CommonConstants.AGENT_ID );
@@ -442,9 +445,9 @@ public class ProfileViewController
                     CommonConstants.PROFILE_LEVEL_INDIVIDUAL, false );
                 model.addAttribute( "averageRating", averageRating );
 
-                /*long reviewsCount = profileManagementService.getReviewsCount( agentId, CommonConstants.MIN_RATING_SCORE,
-                    CommonConstants.MAX_RATING_SCORE, CommonConstants.PROFILE_LEVEL_INDIVIDUAL, false );*/
-                model.addAttribute( "reviewsCount", individualProfile.getReviewCount() );
+                long reviewsCount = profileManagementService.getReviewsCount( agentId, CommonConstants.MIN_RATING_SCORE,
+                    CommonConstants.MAX_RATING_SCORE, CommonConstants.PROFILE_LEVEL_INDIVIDUAL, false );
+                model.addAttribute( "reviewsCount", reviewsCount );
 
                 if ( isBotRequest ) {
                     // TODO:remove hardcoding of start, end, minScore etc
