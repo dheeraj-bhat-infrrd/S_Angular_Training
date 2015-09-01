@@ -78,7 +78,7 @@ public class ZillowReviewProcessor extends QuartzJobBean
 
         LOG.debug( "Getting a list of entities with access tokens" );
         do {
-            tokens = organizationManagementService.fetchSocialMediaTokens( collectionName, BATCH_SIZE );
+            tokens = organizationManagementService.fetchSocialMediaTokens( collectionName, currentBatch, BATCH_SIZE );
             if ( tokens == null || tokens.size() == 0 ) {
                 LOG.debug( "No more tokens for " + collectionName );
                 break;
