@@ -576,5 +576,65 @@
 			$('#prof-basic-container .prof-edditable').removeClass('prof-name-edit');			
 		}
 	});
+	
+	$('#prof-posts').on('mouseover', '.tweet-panel-item' , function(e){
+		$(this).find('.dlt-survey-wrapper').removeClass('hide');
+	});
+
+	$('#prof-posts').on('mouseleave', '.tweet-panel-item', function(e){
+		$(this).find('.dlt-survey-wrapper').addClass('hide');
+	});
+
+	
+	$('#prof-posts').on('click' , '.post-dlt-icon' , function(e){
+		var surveyMongoId = $(this).attr('surveymongoid');
+		
+		$('#overlay-main').show();
+		$('#overlay-continue').show();
+		$('#overlay-continue').html("Delete");
+		$('#overlay-cancel').html("Cancel");
+		$('#overlay-header').html("Delete Post");
+		$('#overlay-text').html("Are you sure you want to delete the post ?");
+		$('#overlay-continue').attr("onclick", "removeUserPost('" + surveyMongoId + "');");
+
+	});
+
 });
+	
+	function removeUserPost(surveyMongoId){
+		
+		$('#overlay-continue').removeAttr("onclick");
+		$('#overlay-main').hide();
+		var payload = {
+				"statusmongoid" : surveyMongoId
+			};
+			$.ajax({
+				url : "./deletestatus.do",
+				type : "POST",
+				dataType : "text",
+				async : false,
+				data : payload,
+				success : function(data) {
+					if (data.errCode == undefined)
+						success = true;
+				},
+				complete : function(data) {
+					if (success) {
+						$('#overlay-toast').html(data.responseText);
+						showToast();
+						showPosts(true);
+					}else{
+						$('#overlay-toast').html(data.responseText);
+						showToast();
+					}
+				},
+				error : function(e) {
+					if(e.status == 504) {
+						redirectToLoginPageOnSessionTimeOut(e.status);
+						return;
+					}
+					redirectErrorpage();
+				}
+			});
+	};
 </script>

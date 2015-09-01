@@ -1861,6 +1861,26 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
         socialPostDao.addPostToUserProfile( socialPost );
         LOG.info( "Method to add post to a user's profile finished." );
     }
+    
+    /*
+     * Method to delete status of a user into the mongo.
+     */
+    @Override
+    public void deleteSocialPost( String postMongoId ) throws InvalidInputException
+    {
+        LOG.info( "Method to delete post to a user's profile started." );
+       SocialPost socialPost = socialPostDao.getPostByMongoObjectId(postMongoId);
+       if(socialPost == null){
+    	   throw new InvalidInputException( "No Status Found", DisplayMessageConstants.GENERAL_ERROR );
+       }
+       
+       if(!socialPost.getSource().equals(CommonConstants.POST_SOURCE_SOCIAL_SURVEY)){
+    	   throw new InvalidInputException( "Not a SocialSurvey Status", DisplayMessageConstants.GENERAL_ERROR );
+       }
+       
+       socialPostDao.removePostFromUsersProfile(socialPost);
+       LOG.info( "Method to delete post to a user's profile finished." );
+    }
 
 
     /*
