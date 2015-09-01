@@ -9,6 +9,7 @@ import com.realtech.socialsurvey.core.entities.Company;
 import com.realtech.socialsurvey.core.entities.ProListUser;
 import com.realtech.socialsurvey.core.entities.ProfilesMaster;
 import com.realtech.socialsurvey.core.entities.Region;
+import com.realtech.socialsurvey.core.entities.SettingsDetails;
 import com.realtech.socialsurvey.core.entities.User;
 import com.realtech.socialsurvey.core.entities.UserFromSearch;
 import com.realtech.socialsurvey.core.entities.UserProfile;
@@ -288,8 +289,8 @@ public interface UserManagementService
      * @return
      */
     public UserProfile createUserProfile( User user, Company company, String emailId, long agentId, long branchId,
-        long regionId, int profileMasterId, int isPrimary, String profileCompletionStage, int isProfileComplete, String createdBy,
-        String modifiedBy );
+        long regionId, int profileMasterId, int isPrimary, String profileCompletionStage, int isProfileComplete,
+        String createdBy, String modifiedBy );
 
 
     /**
@@ -397,6 +398,12 @@ public interface UserManagementService
 
 
     public void updateCompany( Company company );
+
+
+    public List<SettingsDetails> getSettingScoresById( long companyId, long regionId, long branchId );
+
+
+    public Map<String, Long> getPrimaryUserProfileByAgentId( long entityId );
 
 
 }
