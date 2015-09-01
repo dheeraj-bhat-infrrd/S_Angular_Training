@@ -301,7 +301,7 @@
 	<bean id="zillowcron"
 		class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
 		<property name="jobDetail" ref="zillowjobdetail" />
-		<property name="cronExpression" value="0 0 0/2 * * ?" />
+		<property name="cronExpression" value="0 25 0,2,4,6,8,10,12,14,16,18,20,22 * * ?" />
 	</bean>
 	
 	<!-- Scheduler factory -->
