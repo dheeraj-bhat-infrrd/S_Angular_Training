@@ -28,29 +28,27 @@
 					<div style="padding: 0px 20px;" class="clearfix">
 						<div style="margin-bottom: 10px; font-size: 19px; text-align: center; padding: 0px 10px;">
 						<div>
-						<form id="zillowForm" action="/zillowSaveInfo.do" method="post">
-						<%-- 	<div class="zillow-input-container clearfix">
-								<label class="zillow-input-label float-left"><spring:message code="label.emailid.key"/></label>
-								<input class="zillow-input" name="zillowEmailAddress" type="email">
-							</div>
-							<div class="zillow-input-container text-center">
-							OR
-							</div> --%>				
- 							<div class="zillow-input-container clearfix">
-								<label class="zillow-input-label"><spring:message code="label.zillowconnect.key"/></label>
-								<div class="zillow-input-cont">
-									<span><spring:message code="label.zillowconnect.link.key"/></span>
-									<input class="zillow-input" name="zillowProfileName" type="text" autofocus="autofocus">
-									<span>/</span>
+							<form id="zillowForm" action="/zillowSaveInfo.do" method="post">
+	 							<div class="zillow-input-container clearfix">
+									<label class="zillow-input-label"><spring:message code="label.zillowconnect.key"/></label>
+									<div class="zillow-input-cont">
+										<span><spring:message code="label.zillowconnect.link.key"/></span>
+										<input class="zillow-input" name="zillowProfileName" type="text" autofocus="autofocus" placeholder='<spring:message code="label.zillowconnect.profileName.key"/>'>
+										<span>/</span>
+									</div>
+								</div>
+								<div class="zillow-sub-btn" onclick="saveZillowEmailAddress()"><spring:message code="label.submit.key"/></div>
+							</form>
+							<div class="zillow-example-cont">
+								<div class="zillow-exm-url">
+									<span>eg.</span> 
+									<span class="zillow-url"><spring:message code="label.zillow.exampleurl.key" /></span>
+								</div>
+								<div class="zillow-exm-profile">
+									<span><spring:message code="label.zillow.exampleprofilename.text.key" /></span> 
+									<span class="zillow-exm-profilename"><spring:message code="label.zillow.exampleprofilename.key" /></span>
 								</div>
 							</div>
-						<%-- 	<div class="zillow-input-container clearfix">
-								<label class="zillow-input-label float-left"><spring:message code="label.lastname.key"/></label>
-								<input class="zillow-input" name="zillowLastName" type="text">
-							</div>
- --%>
-							<div class="zillow-sub-btn" onclick="saveZillowEmailAddress()"><spring:message code="label.submit.key"/></div>
-						</form>
 						</div>
 						</div>
 					</div>
