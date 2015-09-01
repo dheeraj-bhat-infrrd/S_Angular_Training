@@ -12,7 +12,9 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+
 import javax.annotation.Resource;
+
 import org.apache.poi.hssf.usermodel.HSSFSheet;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.Cell;
@@ -28,6 +30,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
+
 import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.dao.BranchDao;
 import com.realtech.socialsurvey.core.dao.GenericDao;
@@ -418,7 +421,9 @@ public class CsvUploadServiceImpl implements CsvUploadService {
 
 	private List<String> getAllStateLicenses(String licenses, List<String> authorizedIn) {
 		String toRemove = "Licensed State(s):";
-		licenses = licenses.substring(licenses.indexOf("Licensed State(s):") + toRemove.length(), licenses.length());
+		if(licenses.indexOf(toRemove) != -1){
+			licenses = licenses.substring(licenses.indexOf("Licensed State(s):") + toRemove.length(), licenses.length());
+		}
 		licenses = licenses.trim();
 		authorizedIn.add(licenses);
 		return authorizedIn;
@@ -450,7 +455,7 @@ public class CsvUploadServiceImpl implements CsvUploadService {
 				LOG.debug("Column " + cell.getColumnIndex());
 				if (cellIndex == USER_FIRST_NAME_INDEX) {
 					if (cell.getCellType() != XSSFCell.CELL_TYPE_BLANK) {
-						uploadedUser.setFirstName(cell.getStringCellValue());
+						uploadedUser.setFirstName(cell.getStringCellValue().trim());
 					}
 					else {
 						LOG.error("First name is not present");
@@ -460,12 +465,12 @@ public class CsvUploadServiceImpl implements CsvUploadService {
 				}
 				else if (cellIndex == USER_LAST_NAME_INDEX) {
 					if (cell.getCellType() != XSSFCell.CELL_TYPE_BLANK) {
-						uploadedUser.setLastName(cell.getStringCellValue());
+						uploadedUser.setLastName(cell.getStringCellValue().trim());
 					}
 				}
 				else if (cellIndex == USER_TITLE_INDEX) {
 					if (cell.getCellType() != XSSFCell.CELL_TYPE_BLANK) {
-						uploadedUser.setTitle(cell.getStringCellValue());
+						uploadedUser.setTitle(cell.getStringCellValue().trim());
 					}
 				}
 				else if (cellIndex == USER_BRANCH_ID_INDEX) {
@@ -540,7 +545,7 @@ public class CsvUploadServiceImpl implements CsvUploadService {
 				}
 				else if (cellIndex == USER_EMAIL_INDEX) {
 					if (cell.getCellType() != XSSFCell.CELL_TYPE_BLANK) {
-						String emailId = cell.getStringCellValue();
+						String emailId = cell.getStringCellValue().trim();
 						if (maskEmail.equals(CommonConstants.YES_STRING)) {
 							emailId = maskEmailAddress(emailId);
 							if (emailId != null) {
@@ -759,7 +764,7 @@ public class CsvUploadServiceImpl implements CsvUploadService {
 				}
 				else if (cellIndex == BRANCH_NAME_INDEX) {
 					if (cell.getCellType() != XSSFCell.CELL_TYPE_BLANK) {
-						uploadedBranch.setBranchName(cell.getStringCellValue());
+						uploadedBranch.setBranchName(cell.getStringCellValue().trim());
 					}
 					else {
 						LOG.error("branch name not present");
@@ -936,7 +941,7 @@ public class CsvUploadServiceImpl implements CsvUploadService {
 				}
 				else if (cellIndex == REGION_NAME_INDEX) {
 					if (cell.getCellType() != XSSFCell.CELL_TYPE_BLANK) {
-						uploadedRegion.setRegionName(cell.getStringCellValue());
+						uploadedRegion.setRegionName(cell.getStringCellValue().trim());
 					}
 					else {
 						LOG.error("Region name is not present");

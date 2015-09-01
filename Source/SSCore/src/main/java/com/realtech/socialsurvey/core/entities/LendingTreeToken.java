@@ -23,6 +23,6 @@ public class LendingTreeToken {
 
 	@Override
 	public String toString() {
-		return "YelpToken [lendingTreeId=" + lendingTreeId + ", lendingTreeProfileLink=" + lendingTreeProfileLink + "]";
+		return "LendingTreeToken [lendingTreeId=" + lendingTreeId + ", lendingTreeProfileLink=" + lendingTreeProfileLink + "]";
 	}
 }

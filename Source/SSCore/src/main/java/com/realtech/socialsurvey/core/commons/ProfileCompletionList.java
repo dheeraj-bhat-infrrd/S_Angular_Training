@@ -51,6 +51,12 @@ public class ProfileCompletionList {
 		profileStage.setProfileStageKey(ProfileStages.TWITTER_PRF.name());
 		profileStage.setStatus(CommonConstants.STATUS_ACTIVE);
 		profileStages.add(profileStage);
+		
+		profileStage = new ProfileStage();
+        profileStage.setOrder(ProfileStages.ZILLOW_PRF.getOrder());
+        profileStage.setProfileStageKey(ProfileStages.ZILLOW_PRF.name());
+        profileStage.setStatus(CommonConstants.STATUS_ACTIVE);
+        profileStages.add(profileStage);
 
 		profileStage = new ProfileStage();
 		profileStage.setOrder(ProfileStages.YELP_PRF.getOrder());

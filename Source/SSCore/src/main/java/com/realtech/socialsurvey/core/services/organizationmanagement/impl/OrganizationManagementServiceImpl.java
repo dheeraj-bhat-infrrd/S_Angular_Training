@@ -67,6 +67,7 @@ import com.realtech.socialsurvey.core.entities.ContactNumberSettings;
 import com.realtech.socialsurvey.core.entities.CrmBatchTracker;
 import com.realtech.socialsurvey.core.entities.DisabledAccount;
 import com.realtech.socialsurvey.core.entities.EncompassCrmInfo;
+import com.realtech.socialsurvey.core.entities.FeedIngestionEntity;
 import com.realtech.socialsurvey.core.entities.FileUpload;
 import com.realtech.socialsurvey.core.entities.LicenseDetail;
 import com.realtech.socialsurvey.core.entities.LockSettings;
@@ -228,6 +229,9 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
     String paramOrderTakeSurveyCustomer;
     @Value ( "${PARAM_ORDER_TAKE_SURVEY_REMINDER}")
     String paramOrderTakeSurveyReminder;
+
+    @Value ( "${CDN_PATH}")
+    String cdnPath;
 
     @Autowired
     private ProfileCompletionList profileCompletionList;
@@ -4143,6 +4147,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
     {
 
         String collectionName = "";
+        String regexpattern = "^((?!" + cdnPath + ").)*$";
         switch ( profileLevel ) {
             case CommonConstants.COMPANY:
                 collectionName = MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION;
@@ -4157,8 +4162,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
                 collectionName = MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION;
                 break;
         }
-        return organizationUnitSettingsDao.getSettingsMapWithLinkedinImageUrl( collectionName,
-            CommonConstants.LINKEDIN_URL_PART );
+        return organizationUnitSettingsDao.getSettingsMapWithLinkedinImageUrl( collectionName, regexpattern );
     }
 
 
@@ -4361,6 +4365,16 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
         }
 
         return workbook;
+    }
+
+
+    @Transactional
+    @Override
+    public List<FeedIngestionEntity> fetchSocialMediaTokens( String collectionName, int batchSize )
+    {
+        List<FeedIngestionEntity> fieldIngestionEntities = organizationUnitSettingsDao.fetchSocialMediaTokens( collectionName,
+            0, batchSize );
+        return fieldIngestionEntities;
     }
 
 }

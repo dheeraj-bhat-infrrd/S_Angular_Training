@@ -14,7 +14,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
@@ -24,7 +23,6 @@ import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
-
 import com.google.gson.Gson;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.dao.OrganizationUnitSettingsDao;
@@ -187,6 +185,14 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
     }
 
 
+    @Override
+    @Transactional
+    public void insertSurveyDetails( SurveyDetails surveyDetails )
+    {
+        surveyDetailsDao.insertSurveyDetails( surveyDetails );
+    }
+
+
     /*
      * Method to generate survey URL to start a survey directly based upon agentId and customer
      * email id.
@@ -283,6 +289,19 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
             surveyPreInitiationDao.merge( survey );
         }
         LOG.info( "Method to increase reminder count by 1, updateReminderCount() finished." );
+    }
+
+
+    @Override
+    @Transactional
+    public SurveyDetails getSurveyDetailsBySourceIdAndMongoCollection( String surveySourceId, long iden, String collectionName )
+    {
+        LOG.debug( "Inside method getSurveyDetailsBySourceId" );
+        SurveyDetails surveyDetails = null;
+        if ( surveySourceId != null ) {
+            surveyDetails = surveyDetailsDao.getSurveyBySourceSourceIdAndMongoCollection( surveySourceId, iden, collectionName );
+        }
+        return surveyDetails;
     }
 
 
@@ -991,5 +1010,19 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
             return false;
         }
     }
+    
+	@Override
+	@Transactional
+	public SurveyPreInitiation getPreInitiatedSurveyById(long surveyPreInitiationId) throws NoRecordsFetchedException {
+		LOG.debug("Method getPreInitiatedSurveyById() called");
+
+		SurveyPreInitiation surveyPreInitiation = surveyPreInitiationDao.findById(SurveyPreInitiation.class, surveyPreInitiationId);
+
+		if (surveyPreInitiation == null) {
+			throw new NoRecordsFetchedException("No records found for surveyPreInitiation with id : " + surveyPreInitiationId);
+		}
+
+		return surveyPreInitiation;
+	}
 }
 // JIRA SS-119 by RM-05:EOC

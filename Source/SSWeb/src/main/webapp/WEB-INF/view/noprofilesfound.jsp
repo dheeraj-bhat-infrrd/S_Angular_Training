@@ -10,6 +10,7 @@
     <title>No Profiles Found</title>
     <link rel="stylesheet" href="${initParam.resourcesPath}/resources/css/bootstrap.min.css">
     <link rel="stylesheet" href="${initParam.resourcesPath}/resources/css/style.css">
+	<link rel="stylesheet" href="${initParam.resourcesPath}/resources/css/style-common-1.1.css">
     <link rel="stylesheet" href="${initParam.resourcesPath}/resources/css/style-common.css">
     <link rel="stylesheet" href="${initParam.resourcesPath}/resources/css/style-resp.css">
 </head>
@@ -17,7 +18,7 @@
 	<div class="err-wrapper-main">
         <div class="header-main-wrapper err-header-wrapper">
             <div class="container clearfix">
-                <div class="header-logo float-left"></div>
+                <div class="hdr-logo-blue float-left"></div>
                 <div class="header-user-info float-right clearfix">
                     <c:if test="${displaylogo != null}">
                         <div class="float-left user-info-seperator"></div>
