@@ -7340,3 +7340,52 @@ input.zillow-input {
 	overflow: hidden;
 	position: relative;
 }
+
+.st-crm-container {
+	padding-bottom: 25px;
+	border-bottom: 1px solid #dcdcdc;
+}
+
+.st-crm-container:last-child {
+	border-bottom: none;
+}
+
+.hdr-link-item-dropdown {
+	position: absolute;
+	top: 61px;
+	left: 0;
+	width: 200px;
+	border-top: 3px solid #5cc7ef;
+	background-color: #fff;
+	color: #666;
+	box-shadow: 3px 3px 30px #444;
+}
+
+.hdr-link-item-dropdown-item {
+	line-height: 35px;
+	padding: 0 6px;
+	border-bottom: 1px solid #dcdcdc;
+	cursor: pointer;
+}
+
+.hdr-link-item-dropdown-item:last-child {
+	border-bottom: none;
+}
+
+.hdr-link-item-dropdown-item:hover {
+	color: #fff;
+	background-color: #5cc7ef;
+}
+
+.hdr-link-item-config {
+	padding-right: 20px !important;
+}
+
+.hdr-link-item-dropdown-icn {
+	position: absolute;
+	right: 7px;
+	top: 31px;
+	width: 10px;
+	height: 10px;
+	background: url(../images/arrow-down-white.png) no-repeat center;
+}
