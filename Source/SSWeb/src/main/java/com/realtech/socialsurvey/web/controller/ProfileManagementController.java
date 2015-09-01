@@ -89,8 +89,7 @@ import com.realtech.socialsurvey.core.services.organizationmanagement.ProfileNot
 import com.realtech.socialsurvey.core.services.organizationmanagement.UserManagementService;
 import com.realtech.socialsurvey.core.services.search.SolrSearchService;
 import com.realtech.socialsurvey.core.services.search.exception.SolrException;
-import com.realtech.socialsurvey.core.services.settingsmanagement.SetttingsSetter;
-import com.realtech.socialsurvey.core.services.settingsmanagement.impl.SettingsSetterImpl;
+import com.realtech.socialsurvey.core.services.settingsmanagement.SettingsSetter;
 import com.realtech.socialsurvey.core.services.upload.FileUploadService;
 import com.realtech.socialsurvey.core.services.upload.impl.UploadUtils;
 import com.realtech.socialsurvey.core.utils.DisplayMessageConstants;
@@ -152,7 +151,7 @@ public class ProfileManagementController
     private BotRequestUtils botRequestUtils;
 
     @Autowired
-    private SetttingsSetter settingsSetter;
+    private SettingsSetter settingsSetter;
 
 
     @Transactional
@@ -863,7 +862,7 @@ public class ProfileManagementController
 
                 Company company = userManagementService.getCompanyById( companySettings.getIden() );
                 if ( company != null ) {
-                    settingsSetter.setSettingsValueForCompany( company, SettingsForApplication.ADDRESS, true );
+                    settingsSetter.setSettingsValueForCompany( company, SettingsForApplication.ADDRESS, CommonConstants.SET_SETTINGS );
                     userManagementService.updateCompany( company );
                 }
                 contactDetailsSettings = profileManagementService.updateContactDetails(
@@ -880,7 +879,7 @@ public class ProfileManagementController
                     state, city, zipcode );
                 Region region = userManagementService.getRegionById( regionSettings.getIden() );
                 if ( region != null ) {
-                    settingsSetter.setSettingsValueForRegion( region, SettingsForApplication.ADDRESS, true );
+                    settingsSetter.setSettingsValueForRegion( region, SettingsForApplication.ADDRESS, CommonConstants.SET_SETTINGS );
                     userManagementService.updateRegion( region );
                 }
                 contactDetailsSettings = profileManagementService.updateContactDetails(
@@ -897,7 +896,7 @@ public class ProfileManagementController
                     state, city, zipcode );
                 Branch branch = userManagementService.getBranchById( branchSettings.getIden() );
                 if ( branch != null ) {
-                    settingsSetter.setSettingsValueForBranch( branch, SettingsForApplication.ADDRESS, true );
+                    settingsSetter.setSettingsValueForBranch( branch, SettingsForApplication.ADDRESS, CommonConstants.SET_SETTINGS );
                     userManagementService.updateBranch( branch );
                 }
                 contactDetailsSettings = profileManagementService.updateContactDetails(
@@ -1133,7 +1132,7 @@ public class ProfileManagementController
                 if ( location != null ) {
                     Company company = userManagementService.getCompanyById( companySettings.getIden() );
                     if ( company != null ) {
-                        settingsSetter.setSettingsValueForCompany( company, SettingsForApplication.LOCATION, true );
+                        settingsSetter.setSettingsValueForCompany( company, SettingsForApplication.LOCATION, CommonConstants.SET_SETTINGS );
                         userManagementService.updateCompany( company );
                     }
                 }
@@ -1151,7 +1150,7 @@ public class ProfileManagementController
                 if ( location != null ) {
                     Region region = userManagementService.getRegionById( regionSettings.getIden() );
                     if ( region != null ) {
-                        settingsSetter.setSettingsValueForRegion( region, SettingsForApplication.LOCATION, true );
+                        settingsSetter.setSettingsValueForRegion( region, SettingsForApplication.LOCATION, CommonConstants.SET_SETTINGS );
                         userManagementService.updateRegion( region );
                     }
                 }
@@ -1169,7 +1168,7 @@ public class ProfileManagementController
                 if ( location != null ) {
                     Branch branch = userManagementService.getBranchById( branchSettings.getIden() );
                     if ( branch != null ) {
-                        settingsSetter.setSettingsValueForBranch( branch, SettingsForApplication.LOCATION, true );
+                        settingsSetter.setSettingsValueForBranch( branch, SettingsForApplication.LOCATION, CommonConstants.SET_SETTINGS );
                         userManagementService.updateBranch( branch );
                     }
                 }
@@ -1282,7 +1281,7 @@ public class ProfileManagementController
 
                 Company company = userManagementService.getCompanyById( companySettings.getIden() );
                 if ( company != null ) {
-                    settingsSetter.setSettingsValueForCompany( company, SettingsForApplication.LOGO, true );
+                    settingsSetter.setSettingsValueForCompany( company, SettingsForApplication.LOGO, CommonConstants.SET_SETTINGS );
                     userManagementService.updateCompany( company );
                 }
 
@@ -1297,7 +1296,7 @@ public class ProfileManagementController
                     regionSettings, logoUrl );
                 Region region = userManagementService.getRegionById( regionSettings.getIden() );
                 if ( region != null ) {
-                    settingsSetter.setSettingsValueForRegion( region, SettingsForApplication.LOGO, true );
+                    settingsSetter.setSettingsValueForRegion( region, SettingsForApplication.LOGO, CommonConstants.SET_SETTINGS );
                     userManagementService.updateRegion( region );
                 }
 
@@ -1312,7 +1311,7 @@ public class ProfileManagementController
                     branchSettings, logoUrl );
                 Branch branch = userManagementService.getBranchById( branchSettings.getIden() );
                 if ( branch != null ) {
-                    settingsSetter.setSettingsValueForBranch( branch, SettingsForApplication.LOGO, true );
+                    settingsSetter.setSettingsValueForBranch( branch, SettingsForApplication.LOGO, CommonConstants.SET_SETTINGS );
                     userManagementService.updateBranch( branch );
                 }
                 branchSettings.setLogo( logoUrl );
@@ -1758,7 +1757,7 @@ public class ProfileManagementController
                 contactDetailsSettings = updatePhoneNumbers( contactDetailsSettings, phoneNumbers );
                 Company company = userManagementService.getCompanyById( companySettings.getIden() );
                 if ( company != null ) {
-                    settingsSetter.setSettingsValueForCompany( company, SettingsForApplication.PHONE, true );
+                    settingsSetter.setSettingsValueForCompany( company, SettingsForApplication.PHONE, CommonConstants.SET_SETTINGS );
                     userManagementService.updateCompany( company );
                 }
                 contactDetailsSettings = profileManagementService.updateContactDetails(
@@ -1774,7 +1773,7 @@ public class ProfileManagementController
                 contactDetailsSettings = updatePhoneNumbers( contactDetailsSettings, phoneNumbers );
                 Region region = userManagementService.getRegionById( regionSettings.getIden() );
                 if ( region != null ) {
-                    settingsSetter.setSettingsValueForRegion( region, SettingsForApplication.PHONE, true );
+                    settingsSetter.setSettingsValueForRegion( region, SettingsForApplication.PHONE, CommonConstants.SET_SETTINGS );
                     userManagementService.updateRegion( region );
                 }
                 contactDetailsSettings = profileManagementService.updateContactDetails(
@@ -1790,7 +1789,7 @@ public class ProfileManagementController
                 contactDetailsSettings = updatePhoneNumbers( contactDetailsSettings, phoneNumbers );
                 Branch branch = userManagementService.getBranchById( branchSettings.getIden() );
                 if ( branch != null ) {
-                    settingsSetter.setSettingsValueForBranch( branch, SettingsForApplication.PHONE, true );
+                    settingsSetter.setSettingsValueForBranch( branch, SettingsForApplication.PHONE, CommonConstants.SET_SETTINGS );
                     userManagementService.updateBranch( branch );
                 }
 
@@ -2057,6 +2056,12 @@ public class ProfileManagementController
                 profileManagementService.updateSocialMediaTokens(
                     MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION, companySettings, socialMediaTokens );
                 companySettings.setSocialMediaTokens( socialMediaTokens );
+              //update SETTINGS_SET_STATUS of COMPANY table to set.
+                Company company = userManagementService.getCompanyById( companySettings.getIden() );
+                if(company != null){
+                	settingsSetter.setSettingsValueForCompany(company, SettingsForApplication.FACEBOOK, CommonConstants.SET_SETTINGS);
+                	userManagementService.updateCompany( company );
+                }
                 userSettings.setCompanySettings( companySettings );
             } else if ( entityType.equals( CommonConstants.REGION_ID_COLUMN ) ) {
                 OrganizationUnitSettings regionSettings = organizationManagementService.getRegionSettings( entityId );
@@ -2068,6 +2073,12 @@ public class ProfileManagementController
                 profileManagementService.updateSocialMediaTokens(
                     MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION, regionSettings, socialMediaTokens );
                 regionSettings.setSocialMediaTokens( socialMediaTokens );
+              //update SETTINGS_SET_STATUS of REGION table to set.
+                Region region = userManagementService.getRegionById( regionSettings.getIden() );
+                if(region != null){
+                	settingsSetter.setSettingsValueForRegion(region, SettingsForApplication.FACEBOOK, CommonConstants.SET_SETTINGS);
+                	userManagementService.updateRegion( region );
+                }
                 userSettings.getRegionSettings().put( entityId, regionSettings );
             } else if ( entityType.equals( CommonConstants.BRANCH_ID_COLUMN ) ) {
                 OrganizationUnitSettings branchSettings = organizationManagementService.getBranchSettingsDefault( entityId );
@@ -2079,6 +2090,12 @@ public class ProfileManagementController
                 profileManagementService.updateSocialMediaTokens(
                     MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION, branchSettings, socialMediaTokens );
                 branchSettings.setSocialMediaTokens( socialMediaTokens );
+              //update SETTINGS_SET_STATUS of BRANCH table to set.
+                Branch branch = userManagementService.getBranchById( branchSettings.getIden() );
+                if(branch != null){
+                	settingsSetter.setSettingsValueForBranch(branch, SettingsForApplication.FACEBOOK, CommonConstants.SET_SETTINGS);
+                	userManagementService.updateBranch( branch );
+                }
                 userSettings.getRegionSettings().put( entityId, branchSettings );
             } else if ( entityType.equals( CommonConstants.AGENT_ID_COLUMN ) ) {
                 AgentSettings agentSettings = userManagementService.getUserSettings( entityId );
@@ -2171,6 +2188,12 @@ public class ProfileManagementController
                 profileManagementService.updateSocialMediaTokens(
                     MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION, companySettings, socialMediaTokens );
                 companySettings.setSocialMediaTokens( socialMediaTokens );
+              //update SETTINGS_SET_STATUS of COMPANY table to set.
+                Company company = userManagementService.getCompanyById( companySettings.getIden() );
+                if(company != null){
+                	settingsSetter.setSettingsValueForCompany(company, SettingsForApplication.TWITTER, CommonConstants.SET_SETTINGS);
+                	userManagementService.updateCompany( company );
+                }
                 userSettings.setCompanySettings( companySettings );
             } else if ( entityType.equals( CommonConstants.REGION_ID_COLUMN ) ) {
                 OrganizationUnitSettings regionSettings = organizationManagementService.getRegionSettings( entityId );
@@ -2182,6 +2205,12 @@ public class ProfileManagementController
                 profileManagementService.updateSocialMediaTokens(
                     MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION, regionSettings, socialMediaTokens );
                 regionSettings.setSocialMediaTokens( socialMediaTokens );
+              //update SETTINGS_SET_STATUS of REGION table to set.
+                Region region = userManagementService.getRegionById( regionSettings.getIden() );
+                if(region != null){
+                	settingsSetter.setSettingsValueForRegion(region, SettingsForApplication.TWITTER, CommonConstants.SET_SETTINGS);
+                	userManagementService.updateRegion( region );
+                }
                 userSettings.getRegionSettings().put( entityId, regionSettings );
             } else if ( entityType.equals( CommonConstants.BRANCH_ID_COLUMN ) ) {
                 OrganizationUnitSettings branchSettings = organizationManagementService.getBranchSettingsDefault( entityId );
@@ -2193,6 +2222,12 @@ public class ProfileManagementController
                 profileManagementService.updateSocialMediaTokens(
                     MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION, branchSettings, socialMediaTokens );
                 branchSettings.setSocialMediaTokens( socialMediaTokens );
+              //update SETTINGS_SET_STATUS of BRANCH table to set.
+                Branch branch = userManagementService.getBranchById( branchSettings.getIden() );
+                if(branch != null){
+                	settingsSetter.setSettingsValueForBranch(branch, SettingsForApplication.TWITTER, CommonConstants.SET_SETTINGS);
+                	userManagementService.updateBranch( branch );
+                }
                 userSettings.getRegionSettings().put( entityId, branchSettings );
             } else if ( entityType.equals( CommonConstants.AGENT_ID_COLUMN ) ) {
                 AgentSettings agentSettings = userManagementService.getUserSettings( entityId );
@@ -2285,6 +2320,12 @@ public class ProfileManagementController
                 profileManagementService.updateSocialMediaTokens(
                     MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION, companySettings, socialMediaTokens );
                 companySettings.setSocialMediaTokens( socialMediaTokens );
+              //update SETTINGS_SET_STATUS of COMPANY table to set.
+                Company company = userManagementService.getCompanyById( companySettings.getIden() );
+                if(company != null){
+                	settingsSetter.setSettingsValueForCompany(company, SettingsForApplication.LINKED_IN, CommonConstants.SET_SETTINGS);
+                	userManagementService.updateCompany( company );
+                }
                 userSettings.setCompanySettings( companySettings );
             } else if ( entityType.equals( CommonConstants.REGION_ID_COLUMN ) ) {
                 OrganizationUnitSettings regionSettings = organizationManagementService.getRegionSettings( entityId );
@@ -2296,6 +2337,12 @@ public class ProfileManagementController
                 profileManagementService.updateSocialMediaTokens(
                     MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION, regionSettings, socialMediaTokens );
                 regionSettings.setSocialMediaTokens( socialMediaTokens );
+              //update SETTINGS_SET_STATUS of REGION table to set.
+                Region region = userManagementService.getRegionById( regionSettings.getIden() );
+                if(region != null){
+                	settingsSetter.setSettingsValueForRegion(region, SettingsForApplication.LINKED_IN, CommonConstants.SET_SETTINGS);
+                	userManagementService.updateRegion( region );
+                }
                 userSettings.getRegionSettings().put( entityId, regionSettings );
             } else if ( entityType.equals( CommonConstants.BRANCH_ID_COLUMN ) ) {
                 OrganizationUnitSettings branchSettings = organizationManagementService.getBranchSettingsDefault( entityId );
@@ -2307,6 +2354,12 @@ public class ProfileManagementController
                 profileManagementService.updateSocialMediaTokens(
                     MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION, branchSettings, socialMediaTokens );
                 branchSettings.setSocialMediaTokens( socialMediaTokens );
+              //update SETTINGS_SET_STATUS of BRANCH table to set.
+                Branch branch = userManagementService.getBranchById( branchSettings.getIden() );
+                if(branch != null){
+                	settingsSetter.setSettingsValueForBranch(branch, SettingsForApplication.LINKED_IN, CommonConstants.SET_SETTINGS);
+                	userManagementService.updateBranch( branch );
+                }
                 userSettings.getRegionSettings().put( entityId, branchSettings );
             } else if ( entityType.equals( CommonConstants.AGENT_ID_COLUMN ) ) {
                 AgentSettings agentSettings = userManagementService.getUserSettings( entityId );
@@ -2406,6 +2459,12 @@ public class ProfileManagementController
                 profileManagementService.updateProfileStages( companySettings.getProfileStages(), companySettings,
                     MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION );
                 companySettings.setSocialMediaTokens( socialMediaTokens );
+              //update SETTINGS_SET_STATUS of COMPANY table to set.
+                Company company = userManagementService.getCompanyById( companySettings.getIden() );
+                if(company != null){
+                	settingsSetter.setSettingsValueForCompany(company, SettingsForApplication.YELP, CommonConstants.SET_SETTINGS);
+                	userManagementService.updateCompany( company );
+                }
                 userSettings.setCompanySettings( companySettings );
             } else if ( entityType.equals( CommonConstants.REGION_ID_COLUMN ) ) {
                 OrganizationUnitSettings regionSettings = organizationManagementService.getRegionSettings( entityId );
@@ -2424,6 +2483,12 @@ public class ProfileManagementController
                 profileManagementService.updateProfileStages( regionSettings.getProfileStages(), regionSettings,
                     MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION );
                 regionSettings.setSocialMediaTokens( socialMediaTokens );
+              //update SETTINGS_SET_STATUS of REGION table to set.
+                Region region = userManagementService.getRegionById( regionSettings.getIden() );
+                if(region != null){
+                	settingsSetter.setSettingsValueForRegion(region, SettingsForApplication.YELP, CommonConstants.SET_SETTINGS);
+                	userManagementService.updateRegion( region );
+                }
                 userSettings.getRegionSettings().put( entityId, regionSettings );
             } else if ( entityType.equals( CommonConstants.BRANCH_ID_COLUMN ) ) {
                 OrganizationUnitSettings branchSettings = organizationManagementService.getBranchSettingsDefault( entityId );
@@ -2441,6 +2506,12 @@ public class ProfileManagementController
                 }
                 profileManagementService.updateProfileStages( branchSettings.getProfileStages(), branchSettings,
                     MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION );
+              //update SETTINGS_SET_STATUS of BRANCH table to set.
+                Branch branch = userManagementService.getBranchById( branchSettings.getIden() );
+                if(branch != null){
+                	settingsSetter.setSettingsValueForBranch(branch, SettingsForApplication.YELP, CommonConstants.SET_SETTINGS);
+                	userManagementService.updateBranch( branch );
+                }
                 branchSettings.setSocialMediaTokens( socialMediaTokens );
                 userSettings.getRegionSettings().put( entityId, branchSettings );
             } else if ( entityType.equals( CommonConstants.AGENT_ID_COLUMN ) ) {
@@ -2541,6 +2612,12 @@ public class ProfileManagementController
                 profileManagementService.updateSocialMediaTokens(
                     MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION, companySettings, socialMediaTokens );
                 companySettings.setSocialMediaTokens( socialMediaTokens );
+              //update SETTINGS_SET_STATUS of COMPANY table to set.
+                Company company = userManagementService.getCompanyById( companySettings.getIden() );
+                if(company != null){
+                	settingsSetter.setSettingsValueForCompany(company, SettingsForApplication.GOOGLE_PLUS, CommonConstants.SET_SETTINGS);
+                	userManagementService.updateCompany( company );
+                }
                 userSettings.setCompanySettings( companySettings );
             } else if ( entityType.equals( CommonConstants.REGION_ID_COLUMN ) ) {
                 OrganizationUnitSettings regionSettings = organizationManagementService.getRegionSettings( entityId );
@@ -2552,6 +2629,12 @@ public class ProfileManagementController
                 profileManagementService.updateSocialMediaTokens(
                     MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION, regionSettings, socialMediaTokens );
                 regionSettings.setSocialMediaTokens( socialMediaTokens );
+              //update SETTINGS_SET_STATUS of REGION table to set.
+                Region region = userManagementService.getRegionById( regionSettings.getIden() );
+                if(region != null){
+                	settingsSetter.setSettingsValueForRegion(region, SettingsForApplication.GOOGLE_PLUS, CommonConstants.SET_SETTINGS);
+                	userManagementService.updateRegion( region );
+                }
                 userSettings.getRegionSettings().put( entityId, regionSettings );
             } else if ( entityType.equals( CommonConstants.BRANCH_ID_COLUMN ) ) {
                 OrganizationUnitSettings branchSettings = organizationManagementService.getBranchSettingsDefault( entityId );
@@ -2563,6 +2646,12 @@ public class ProfileManagementController
                 profileManagementService.updateSocialMediaTokens(
                     MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION, branchSettings, socialMediaTokens );
                 branchSettings.setSocialMediaTokens( socialMediaTokens );
+              //update SETTINGS_SET_STATUS of BRANCH table to set.
+                Branch branch = userManagementService.getBranchById( branchSettings.getIden() );
+                if(branch != null){
+                	settingsSetter.setSettingsValueForBranch(branch, SettingsForApplication.GOOGLE_PLUS, CommonConstants.SET_SETTINGS);
+                	userManagementService.updateBranch( branch );
+                }
                 userSettings.getRegionSettings().put( entityId, branchSettings );
             } else if ( entityType.equals( CommonConstants.AGENT_ID_COLUMN ) ) {
                 AgentSettings agentSettings = userManagementService.getUserSettings( entityId );
@@ -2656,6 +2745,12 @@ public class ProfileManagementController
                 profileManagementService.updateSocialMediaTokens(
                     MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION, companySettings, socialMediaTokens );
                 companySettings.setSocialMediaTokens( socialMediaTokens );
+              //update SETTINGS_SET_STATUS of COMPANY table to set.
+                Company company = userManagementService.getCompanyById( companySettings.getIden() );
+                if(company != null){
+                	settingsSetter.setSettingsValueForCompany(company, SettingsForApplication.ZILLOW, CommonConstants.SET_SETTINGS);
+                	userManagementService.updateCompany( company );
+                }
                 userSettings.setCompanySettings( companySettings );
             } else if ( entityType.equals( CommonConstants.REGION_ID_COLUMN ) ) {
                 OrganizationUnitSettings regionSettings = organizationManagementService.getRegionSettings( entityId );
@@ -2667,6 +2762,12 @@ public class ProfileManagementController
                 profileManagementService.updateSocialMediaTokens(
                     MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION, regionSettings, socialMediaTokens );
                 regionSettings.setSocialMediaTokens( socialMediaTokens );
+              //update SETTINGS_SET_STATUS of REGION table to set.
+                Region region = userManagementService.getRegionById( regionSettings.getIden() );
+                if(region != null){
+                	settingsSetter.setSettingsValueForRegion(region, SettingsForApplication.ZILLOW, CommonConstants.SET_SETTINGS);
+                	userManagementService.updateRegion( region );
+                }
                 userSettings.getRegionSettings().put( entityId, regionSettings );
             } else if ( entityType.equals( CommonConstants.BRANCH_ID_COLUMN ) ) {
                 OrganizationUnitSettings branchSettings = organizationManagementService.getBranchSettingsDefault( entityId );
@@ -2678,6 +2779,12 @@ public class ProfileManagementController
                 profileManagementService.updateSocialMediaTokens(
                     MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION, branchSettings, socialMediaTokens );
                 branchSettings.setSocialMediaTokens( socialMediaTokens );
+              //update SETTINGS_SET_STATUS of BRANCH table to set.
+                Branch branch = userManagementService.getBranchById( branchSettings.getIden() );
+                if(branch != null){
+                	settingsSetter.setSettingsValueForBranch(branch, SettingsForApplication.ZILLOW, CommonConstants.SET_SETTINGS);
+                	userManagementService.updateBranch( branch );
+                }
                 userSettings.getRegionSettings().put( entityId, branchSettings );
             } else if ( entityType.equals( CommonConstants.AGENT_ID_COLUMN ) ) {
                 AgentSettings agentSettings = userManagementService.getUserSettings( entityId );
@@ -2771,6 +2878,12 @@ public class ProfileManagementController
                 profileManagementService.updateSocialMediaTokens(
                     MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION, companySettings, socialMediaTokens );
                 companySettings.setSocialMediaTokens( socialMediaTokens );
+              //update SETTINGS_SET_STATUS of COMPANY table to set.
+                Company company = userManagementService.getCompanyById( companySettings.getIden() );
+                if(company != null){
+                	settingsSetter.setSettingsValueForCompany(company, SettingsForApplication.REALTOR, CommonConstants.SET_SETTINGS);
+                	userManagementService.updateCompany( company );
+                }
                 userSettings.setCompanySettings( companySettings );
             } else if ( entityType.equals( CommonConstants.REGION_ID_COLUMN ) ) {
                 OrganizationUnitSettings regionSettings = organizationManagementService.getRegionSettings( entityId );
@@ -2782,6 +2895,12 @@ public class ProfileManagementController
                 profileManagementService.updateSocialMediaTokens(
                     MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION, regionSettings, socialMediaTokens );
                 regionSettings.setSocialMediaTokens( socialMediaTokens );
+              //update SETTINGS_SET_STATUS of REGION table to set.
+                Region region = userManagementService.getRegionById( regionSettings.getIden() );
+                if(region != null){
+                	settingsSetter.setSettingsValueForRegion(region, SettingsForApplication.REALTOR, CommonConstants.SET_SETTINGS);
+                	userManagementService.updateRegion( region );
+                }
                 userSettings.getRegionSettings().put( entityId, regionSettings );
             } else if ( entityType.equals( CommonConstants.BRANCH_ID_COLUMN ) ) {
                 OrganizationUnitSettings branchSettings = organizationManagementService.getBranchSettingsDefault( entityId );
@@ -2793,6 +2912,12 @@ public class ProfileManagementController
                 profileManagementService.updateSocialMediaTokens(
                     MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION, branchSettings, socialMediaTokens );
                 branchSettings.setSocialMediaTokens( socialMediaTokens );
+              //update SETTINGS_SET_STATUS of BRANCH table to set.
+                Branch branch = userManagementService.getBranchById( branchSettings.getIden() );
+                if(branch != null){
+                	settingsSetter.setSettingsValueForBranch(branch, SettingsForApplication.REALTOR, CommonConstants.SET_SETTINGS);
+                	userManagementService.updateBranch( branch );
+                }
                 userSettings.getRegionSettings().put( entityId, branchSettings );
             } else if ( entityType.equals( CommonConstants.AGENT_ID_COLUMN ) ) {
                 AgentSettings agentSettings = userManagementService.getUserSettings( entityId );
@@ -2886,6 +3011,12 @@ public class ProfileManagementController
                 profileManagementService.updateSocialMediaTokens(
                     MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION, companySettings, socialMediaTokens );
                 companySettings.setSocialMediaTokens( socialMediaTokens );
+              //update SETTINGS_SET_STATUS of COMPANY table to set.
+                Company company = userManagementService.getCompanyById( companySettings.getIden() );
+                if(company != null){
+                	settingsSetter.setSettingsValueForCompany(company, SettingsForApplication.LENDING_TREE, CommonConstants.SET_SETTINGS);
+                	userManagementService.updateCompany( company );
+                }
                 userSettings.setCompanySettings( companySettings );
             } else if ( entityType.equals( CommonConstants.REGION_ID_COLUMN ) ) {
                 OrganizationUnitSettings regionSettings = organizationManagementService.getRegionSettings( entityId );
@@ -2897,6 +3028,12 @@ public class ProfileManagementController
                 profileManagementService.updateSocialMediaTokens(
                     MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION, regionSettings, socialMediaTokens );
                 regionSettings.setSocialMediaTokens( socialMediaTokens );
+              //update SETTINGS_SET_STATUS of REGION table to set.
+                Region region = userManagementService.getRegionById( regionSettings.getIden() );
+                if(region != null){
+                	settingsSetter.setSettingsValueForRegion(region, SettingsForApplication.LENDING_TREE, CommonConstants.SET_SETTINGS);
+                	userManagementService.updateRegion( region );
+                }
                 userSettings.getRegionSettings().put( entityId, regionSettings );
             } else if ( entityType.equals( CommonConstants.BRANCH_ID_COLUMN ) ) {
                 OrganizationUnitSettings branchSettings = organizationManagementService.getBranchSettingsDefault( entityId );
@@ -2908,6 +3045,12 @@ public class ProfileManagementController
                 profileManagementService.updateSocialMediaTokens(
                     MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION, branchSettings, socialMediaTokens );
                 branchSettings.setSocialMediaTokens( socialMediaTokens );
+              //update SETTINGS_SET_STATUS of BRANCH table to set.
+                Branch branch = userManagementService.getBranchById( branchSettings.getIden() );
+                if(branch != null){
+                	settingsSetter.setSettingsValueForBranch(branch, SettingsForApplication.LENDING_TREE, CommonConstants.SET_SETTINGS);
+                	userManagementService.updateBranch( branch );
+                }
                 userSettings.getRegionSettings().put( entityId, branchSettings );
             } else if ( entityType.equals( CommonConstants.AGENT_ID_COLUMN ) ) {
                 AgentSettings agentSettings = userManagementService.getUserSettings( entityId );
