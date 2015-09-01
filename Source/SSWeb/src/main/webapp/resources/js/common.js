@@ -244,7 +244,7 @@ function callAjaxGetWithPayloadData(url, callBackFunction, payload,isAsync){
 	});
 }*/
 
-function changeRatingPattern(rating, ratingParent, isOverallRating) {
+function changeRatingPattern(rating, ratingParent, isOverallRating, source) {
 	var ratingIntVal = 0;
 
 	if (ratingIntVal % 1 == 0) {
@@ -258,8 +258,13 @@ function changeRatingPattern(rating, ratingParent, isOverallRating) {
 	}
 
 	var roundedFloatingVal = parseFloat(rating).toFixed(3);
+	var ratingImgHtml = "";
+	if(source != undefined && source == "Zillow"){
+		ratingImgHtml = "<div class='rating-image float-left icn-zillow' title='Zillow'></div>";
+	}else {
+		ratingImgHtml = "<div class='rating-image float-left smiley-rat-" + ratingIntVal + "' title='Social Survey'></div>";		
+	}
 	
-	var ratingImgHtml = "<div class='rating-image float-left smiley-rat-" + ratingIntVal + "'></div>";
 	var ratingValHtml = "<div class='rating-rounded float-left'>" + roundedFloatingVal + "</div>";
 	if (isOverallRating) {
 		ratingValHtml = "<div class='rating-rounded float-left'>" + roundedFloatingVal + " - </div>";
@@ -887,4 +892,10 @@ function hideStateCityRow(parentId, elementId) {
 	$('#' + elementId).val(function() {
 		return $(this).find('option[disabled]').text();
 	});
+}
+
+function getDateStrToUTC(dateStr) {
+	var dateSplit = dateStr.split("-");
+	var date = convertTimeStampToLocalTimeStamp(new Date(dateSplit[0],parseInt(dateSplit[1]) - 1,dateSplit[2],dateSplit[3],dateSplit[4],dateSplit[5],dateSplit[6]));
+	return date;
 }

@@ -176,6 +176,27 @@ function retrieveState() {
 /*End of functions for history support*/
 
 
+/*
+ * Click event to close survey popup
+ */
+$(document).on('click',  function(e){
+	if($('#overlay-send-survey').is(':visible')){
+		$('#overlay-send-survey').hide();
+	}
+});
+
+$(document).on('keyup',  function(e){
+	if (e.keyCode == 27){
+		if($('#overlay-send-survey').is(':visible')){
+			$('#overlay-send-survey').hide();
+		}
+	}
+});
+
+$(document).on('click', '#welcome-popup-invite', function(e){
+	e.stopPropagation();
+});
+
 
 $(document).on('click', '.icn-plus-open', function() {
 	$(this).hide();
@@ -312,10 +333,10 @@ function paintDashboard(profileMasterId, newProfileName, newProfileValue, typeoO
 		showAgentFlow(newProfileName, newProfileValue);
 	}
 
-	$('#dsh-inc-dwnld').click(function() {
+	/*$('#dsh-inc-dwnld').click(function() {
 		window.location.href = "./downloaddashboardincompletesurvey.do?columnName="
 				+ colName + "&columnValue=" + colValue;
-	});
+	});*/
 
 	/*$('#dsh-dwnld-btn').click(function() {
 		var startDate = $('#indv-dsh-start-date').val();
@@ -560,11 +581,12 @@ function showIncompleteSurvey(columnName, columnValue) {
 }
 
 $(document).on('click', '.dash-lp-rt-img', function() {
-	var agentId = $(this).data("agentid");
+	var surveyPreInitiationId = $(this).data("surveypreinitiationid");
+	/*var agentId = $(this).data("agentid");
 	var agentName = $(this).data("agentname");
-	var customerEmail = $(this).data("custemail");
+	var customerEmail = $(this).data("custemail");*/
 	var customerName = $(this).data("custname");
-	sendSurveyReminderMail(agentId, agentName, customerEmail, customerName);
+	sendSurveyReminderMail(surveyPreInitiationId, customerName);
 });
 
 function getReviewsCountAndShowReviews(columnName, columnValue) {
@@ -622,7 +644,7 @@ function showReviews(columnName, columnValue) {
 			$('#review-details').append(data);
 		
 		$(".review-ratings").each(function() {
-			changeRatingPattern($(this).data("rating"), $(this));
+			changeRatingPattern($(this).data("rating"), $(this), false, $(this).data("source"));
 		});
 		/*$('.icn-fb').unbind('click');
 		$(".icn-fb").click(function() {
@@ -935,13 +957,10 @@ function searchBranchRegionOrAgent(searchKeyword, flow) {
 	}, payload, false);
 }
 
-function sendSurveyReminderMail(agentId, agentName, customerEmail, customerName) {
+function sendSurveyReminderMail(surveyPreInitiationId, customerName) {
 	var success = false;
 	var payload = {
-		"agentName" : agentName,
-		"customerEmail" : customerEmail,
-		"customerName" : customerName,
-		"agentId" : agentId
+		"surveyPreInitiationId" : surveyPreInitiationId
 	};
 	$.ajax({
 		url : "./sendsurveyremindermail.do",
@@ -1313,7 +1332,7 @@ $(document).on('click', '.bd-tab-mcq', function() {
 	$(this).parent().parent().parent().find('.bd-ans-type-mcq').show();
 	
 	var quesNum = $(this).closest('form').data('quesnum');
-	$(this).closest('form').find('#sb-question-type-' + quesNum).val($(this).data('id'));
+	$(this).closest('form').find('input[name="sb-question-type-' + quesNum+'"]').val($(this).data('id'));
 	showStatus('#bs-question-' + quesNum, 'Edited');
 	$('#bs-question-' + quesNum).attr('data-status', 'edited');
 });
@@ -1325,7 +1344,7 @@ $(document).on('click', '.bd-tab-com', function() {
 	$(this).parent().parent().parent().find('.bd-ans-type-com').show();
 
 	var quesNum = $(this).closest('form').data('quesnum');
-	$(this).closest('form').find('#sb-question-type-' + quesNum).val($(this).data('id'));
+	$(this).closest('form').find('input[name="sb-question-type-' + quesNum+'"]').val($(this).data('id'));
 	showStatus('#bs-question-' + quesNum, 'Edited');
 	$('#bs-question-' + quesNum).attr('data-status', 'edited');
 });
@@ -1335,7 +1354,7 @@ $(document).on('click', '.bd-ans-img-wrapper', function() {
 	$(this).find('.bd-ans-img').removeClass('bd-img-sel');
 
 	var quesNum = $(this).closest('form').data('quesnum');
-	$(this).closest('form').find('#sb-question-type-' + quesNum).val($(this).data('id'));
+	$(this).closest('form').find('input[name="sb-question-type-' + quesNum+'"]').val($(this).data('id'));
 	showStatus('#bs-question-' + quesNum, 'Edited');
 	$('#bs-question-' + quesNum).attr('data-status', 'edited');
 });
@@ -3054,26 +3073,6 @@ function updatePostScoreCallBack(response) {
 	showToast();
 }
 
-/*function changeRatingPattern(rating, ratingParent) {
-	var counter = 0;
-	ratingParent.children().each(function() {
-		$(this).addClass("icn-no-star");
-		$(this).removeClass("icn-half-star");
-		$(this).removeClass("icn-full-star");
-
-		if (rating >= counter) {
-			if (rating - counter >= 1) {
-				$(this).removeClass("icn-no-star");
-				$(this).addClass("icn-full-star");
-			} else if (rating - counter == 0.5) {
-				$(this).removeClass("icn-no-star");
-				$(this).addClass("icn-half-star");
-			}
-		}
-		counter++;
-	});
-}*/
-
 // Other settings
 function autoSetCheckboxStatus(on, off, status) {
 	if($(status).val() == 'true') {
@@ -4047,8 +4046,8 @@ $(document).on('click','#user-edit-btn',function(e){
 	$('form input[data-editable="true"]').removeAttr("readonly");
 	$('#btn-save-user-assignment').show();
 	
-	$("#btn-save-user-assignment").off('click');
-	$("#btn-save-user-assignment").on('click',function(e){
+	$("#user-edit-save").off('click');
+	$("#user-edit-save").on('click',function(e){
 		if(validateUserDetailsUserManagement()){
 			saveUserDetailsByAdmin();
 			
@@ -4058,6 +4057,11 @@ $(document).on('click','#user-edit-btn',function(e){
 			}, 2000);
 		}
 	});
+	$('#user-edit-cancel').on('click',function(){
+		setTimeout(function() {
+			getUserAssignments($('#selected-userid-hidden').val());
+		}, 1000);
+	});
 });
 
 $(document).on('click','#user-assign-btn',function(e){
@@ -4066,8 +4070,8 @@ $(document).on('click','#user-assign-btn',function(e){
 	$('#user-assignment-cont').show();
 	$('#btn-save-user-assignment').show();
 	
-	$("#btn-save-user-assignment").off('click');
-	$("#btn-save-user-assignment").on('click',function(e){
+	$("#user-edit-save").off('click');
+	$("#user-edit-save").on('click',function(e){
 		if(validateIndividualForm()){
 			saveUserAssignment("user-assignment-form");
 			
@@ -4076,6 +4080,11 @@ $(document).on('click','#user-assign-btn',function(e){
 				getUserAssignments($('#selected-userid-hidden').val());
 			}, 2000);
 		}
+	});
+	$('#user-edit-cancel').on('click',function(){
+		setTimeout(function() {
+			getUserAssignments($('#selected-userid-hidden').val());
+		}, 1000);
 	});
 });
 
@@ -4575,7 +4584,7 @@ function paintProList(usersList) {
 				var evenOddClass = (i % 2 == 0) ? '' : 'ctnt-list-item-even';
 				usersHtml = usersHtml + '<div class="ctnt-list-item clearfix ' + evenOddClass + '" data-profilename="' + user.profileUrl + '">';
 				
-				if (user.profileImageUrl != undefined) {
+				if (user.profileImageUrl != undefined && user.profileImageUrl.trim() != "") {
 					usersHtml = usersHtml + '<div class="float-left ctnt-list-item-img" style="background: url(' + user.profileImageUrl + ') no-repeat center; background-size: cover;"></div>';
 				} else {
 					usersHtml = usersHtml + '<div class="float-left ctnt-list-item-img pro-list-default-img"></div>';
@@ -6861,7 +6870,7 @@ function updateYelpLink(link) {
 }
 
 // Update Social links - zillow
-$('body').on('click', '#prof-edit-social-link .icn-zillow', function() {
+/*$('body').on('click', '#prof-edit-social-link .icn-zillow', function() {
 	$('#social-token-text').show();
 	var link = $(this).attr("data-link");
 	$('#social-token-text').attr({
@@ -6869,7 +6878,7 @@ $('body').on('click', '#prof-edit-social-link .icn-zillow', function() {
 		"onblur" : "updateZillowLink(this.value);$('#social-token-text').hide();"
 	});
 	$('#social-token-text').val(link);
-});
+});*/
 
 function updateZillowLink(link) {
 	var payload = {
@@ -7161,7 +7170,7 @@ function fetchReviews(attrName, attrVal, minScore, startIndex, numOfRows) {
 	callAjaxGET(url, function(data) {
 		$("#prof-review-item").append(data);
 		$(".review-ratings").each(function() {
-			changeRatingPattern($(this).attr("data-rating"), $(this));
+			changeRatingPattern($(this).attr("data-rating"), $(this), false, $(this).attr("data-source"));
 		});
 
 		$('.icn-plus-open').click(function() {
@@ -7399,7 +7408,9 @@ function paintDashboardButtons(data){
 			var contentToDisplay = '';
 			if (stages[i].profileStageKey == 'FACEBOOK_PRF') {
 				contentToDisplay = 'Connect to Facebook';
-			} else if (stages[i].profileStageKey == 'GOOGLE_PRF') {
+			}else if (stages[i].profileStageKey == 'ZILLOW_PRF') {
+				contentToDisplay = 'Connect to Zillow';
+			}else if (stages[i].profileStageKey == 'GOOGLE_PRF') {
 				contentToDisplay = 'Connect to Google+';
 			} else if (stages[i].profileStageKey == 'TWITTER_PRF') {
 				contentToDisplay = 'Connect to Twitter';
@@ -7453,6 +7464,9 @@ function dashboardButtonAction(buttonId, task, columnName, columnValue){
 	}
 	else if(task=='GOOGLE_PRF'){
 		openAuthPageDashboard('google', columnName, columnValue);
+	}
+	else if(task=='ZILLOW_PRF'){
+		openAuthPageDashboard('zillow', columnName, columnValue);
 	}
 	else if(task=='YELP_PRF'){
 		showMainContent('./showprofilepage.do');
@@ -7645,20 +7659,30 @@ $(document).on('keypress', '#sel-page', function(e) {
 	}
 });
 
+function paginateIncompleteSurvey(){
+	$('#sel-page').blur();
+	var pageNo = parseInt($('#sel-page').val());
+	if(pageNo == NaN || pageNo <= 0) {
+		return false;
+	}
+	var incompleteSurveyStartIndex = 0;
+	var batchSize = parseInt($('#icn-sur-popup-cont').attr("data-batch"));
+	incompleteSurveyStartIndex = parseInt(pageNo-1) * batchSize;
+	
+	$('#icn-sur-popup-cont').attr("data-start", incompleteSurveyStartIndex);
+	paintIncompleteSurveyListPopupResults(incompleteSurveyStartIndex);
+}
+
+$(document).on('keyup', '#sel-page', function(e) {
+	if(e.which == 13) {
+		paginateIncompleteSurvey();
+	}
+});
+
 $(document).on('change', '#sel-page', function(e) {
 	delay(function() {
-		$('#sel-page').blur();
-		var pageNo = parseInt($('#sel-page').val());
-		if(pageNo == NaN || pageNo <= 0) {
-			return false;
-		}
-		var incompleteSurveyStartIndex = 0;
-		var batchSize = parseInt($('#icn-sur-popup-cont').attr("data-batch"));
-		incompleteSurveyStartIndex = parseInt(pageNo-1) * batchSize;
-		
-		$('#icn-sur-popup-cont').attr("data-start", incompleteSurveyStartIndex);
-		paintIncompleteSurveyListPopupResults(incompleteSurveyStartIndex);
-	}, 200);
+		paginateIncompleteSurvey();
+	}, 100);
 });
 
 function showIncompleteSurveyListPopup() {

@@ -2,7 +2,7 @@
 <%@ taglib prefix="spring" uri="http://www.springframework.org/tags"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"%>
-<script type="text/javascript" src="http://apis.google.com/js/plusone.js"></script>
+<script type="text/javascript" src="//apis.google.com/js/plusone.js"></script>
 <script type="text/javascript" async src="//platform.twitter.com/widgets.js"></script>
 <script type="text/javascript">
   (function() {
@@ -107,18 +107,20 @@
 				<div class="ppl-header-wrapper clearfix">
 					<div class="float-left ppl-header-left">
 						<div class="ppl-head-1">${feedback.customerFirstName} ${feedback.customerLastName}</div>
-						<div class="ppl-head-2" data-modifiedon="<fmt:formatDate type="date" pattern="yyyy-MM-dd-hh-mm-ss"
+						<div class="ppl-head-2" data-modifiedon="<fmt:formatDate type="date" pattern="yyyy-MM-dd-H-mm-ss"
 							value="${feedback.modifiedOn}" />">
 						</div>
 					</div>
 					<div class="float-right ppl-header-right">
-						<div class="st-rating-wrapper maring-0 clearfix review-ratings float-right" data-rating="${feedback.score}">
+						<div class="st-rating-wrapper maring-0 clearfix review-ratings float-right" data-rating="${feedback.score}" data-source="${feedback.source }">
 						</div>
-						<div class="report-resend-icn-container clearfix float-right">
-							<div class="report-abuse-txt report-txt">Report</div>
-							|
-							<div class="restart-survey-mail-txt report-txt">Resend</div>
-						</div>
+						<c:if test="${feedback.source != 'Zillow'}">
+							<div class="report-resend-icn-container clearfix float-right">
+								<div class="report-abuse-txt report-txt">Report</div>
+								|
+								<div class="restart-survey-mail-txt report-txt">Resend</div>
+							</div>
+						</c:if>
 					</div>
 				</div>
 				<div class="ppl-content">${feedback.review}</div>

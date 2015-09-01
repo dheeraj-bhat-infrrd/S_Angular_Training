@@ -478,6 +478,22 @@ input#find-pro-submit{
     cursor: pointer;
 }
 
+.hdr-logo-blue {
+    height: 78px;
+    width: 160px;
+    background: url(../images/ss-logo-blue.png) no-repeat;
+    background-size: 100%;
+    background-position: left center;
+}
+
+.ss-logo-blue {
+    margin-left: 82px;
+    height: 50px;
+    width: 100%;
+    background: url(../images/ss-logo-blue.png) no-repeat;
+    background-size: 66%;
+}
+
 .hdr-reg-btn {
     border: 1px solid #fff;
     border-radius: 3px;
@@ -642,10 +658,11 @@ input#find-pro-submit{
 }
 
 .ads-container {
-	background: url('../images/temp_ad.png') no-repeat top center;
-	height: 1000px;
+	/* background: url('../images/temp_ad.png') no-repeat top center; */
+	/* height: 1000px; */
 	background-size: contain;
 	margin-top: 15px;
+	padding: 0;
 }
 
 .fp-txt-1 {
@@ -877,6 +894,10 @@ span.txt-highlight {
 
 .i-yelp{
 	background: url(../images/yelp_wide.png) no-repeat center;
+}
+
+.i-zillow{
+	background: url(../images/zillow_wide.png) no-repeat center;
 }
 
 .wc-icn-txt{

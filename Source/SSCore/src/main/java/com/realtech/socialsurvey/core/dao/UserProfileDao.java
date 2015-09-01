@@ -1,6 +1,7 @@
 package com.realtech.socialsurvey.core.dao;
 
 import java.util.List;
+import java.util.Map;
 import com.realtech.socialsurvey.core.entities.ProfilesMaster;
 import com.realtech.socialsurvey.core.entities.User;
 import com.realtech.socialsurvey.core.entities.UserProfile;
@@ -21,4 +22,6 @@ public interface UserProfileDao extends GenericDao<UserProfile, Long> {
 	public List<Long> getBranchesForAdmin(User user, List<ProfilesMaster> profilesMasters);
 
 	public void deleteUserProfilesByCompany(long companyId);
+
+	public List<UserProfile> findUserProfilesInBatch(Map<String, Object> queries, int startIndex, int batchSize);
 }

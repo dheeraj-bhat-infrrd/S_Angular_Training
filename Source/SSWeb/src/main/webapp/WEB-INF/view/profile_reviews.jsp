@@ -4,7 +4,7 @@
 <%@ taglib uri="http://www.springframework.org/tags" prefix="spring"%>
 
 <script type="text/javascript"
-	src="http://apis.google.com/js/plusone.js"></script>
+	src="//apis.google.com/js/plusone.js"></script>
 	<script type="text/javascript" async src="//platform.twitter.com/widgets.js"></script>
 <script type="text/javascript">
   (function() {
@@ -96,12 +96,12 @@ if(document.getElementById('fb_'+loop) != null)
 						<div class="ppl-head-1">${reviewItem.customerFirstName}
 							${reviewItem.customerLastName}</div>
 						<div class="ppl-head-2"
-							data-modifiedon="<fmt:formatDate type="date" pattern="yyyy-MM-dd-hh-mm-ss"
+							data-modifiedon="<fmt:formatDate type="date" pattern="yyyy-MM-dd-H-mm-ss"
 							value="${reviewItem.modifiedOn}" />"></div>
 					</div>
 					<div class="float-right ppl-header-right">
 						<div class="st-rating-wrapper maring-0 clearfix review-ratings"
-							data-rating="${reviewItem.score}">
+							data-rating="${reviewItem.score}" data-source="${reviewItem.source }">
 							<div class="rating-star icn-full-star"></div>
 							<div class="rating-star icn-full-star"></div>
 							<div class="rating-star icn-half-star"></div>
@@ -162,11 +162,18 @@ if(document.getElementById('fb_'+loop) != null)
 		</c:forEach>
 	</c:when>
 	<c:otherwise>
+	<span id="no-review-found" class="hide">
 		<spring:message code="label.noreviews.key" />
+		</span>
 	</c:otherwise>
 </c:choose>
 <script>
 $(document).ready(function(){
+	
+	if($('#prof-review-item').children('.ppl-review-item').length == 0) {
+		$('#no-review-found').show();
+	}
+	
 	$('.ppl-head-2').each(function(index, currentElement) {
 		var dateSplit = $(this).attr('data-modifiedon').split('-');
 		var date = convertUserDateToLocale(new Date(dateSplit[0], dateSplit[1]-1, dateSplit[2], dateSplit[3], dateSplit[4], dateSplit[5]));

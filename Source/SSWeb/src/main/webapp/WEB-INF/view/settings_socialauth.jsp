@@ -68,3 +68,20 @@
 	<div id="edt-prof-ggl-lnk" class="float-left soc-nw-icn-link"
 		data-social='google'>${googleLink}</div>
 </div>
+<!-- Zillow link -->
+<div class="soc-nw-icns-cont clearfix">
+	<c:choose>
+		<c:when test="${not empty zillowLink}">
+			<div class="social-media-disconnect float-left"
+				onclick="disconnectSocialMedia('zillow')" title="Disconnect"></div>
+		</c:when>
+		<c:otherwise>
+			<div class="social-media-disconnect social-media-disconnect-disabled float-left"></div>
+		</c:otherwise>
+	</c:choose>
+	<div
+		class="float-left soc-nw-icns cursor-pointer icn-wide-zillow soc-nw-adj"
+		onclick="openAuthPage('zillow');"></div>
+	<div id="edt-prof-ggl-lnk" class="float-left soc-nw-icn-link"
+		data-social='zillow'>${zillowLink}</div>
+</div>
