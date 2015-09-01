@@ -7275,7 +7275,7 @@ label.zillow-input-label {
 }
 
 input.zillow-input {
-    width: 200px;
+    width: 135px;
     height: 35px;
     line-height: normal;
     padding: 5px 0 5px 10px;
@@ -7294,6 +7294,29 @@ input.zillow-input {
 	margin: 10px auto;
 	font-size: 13px;
 	cursor: pointer;
+}
+
+.zillow-example-cont {
+    font-size: 15px;
+    margin: 10px 0;
+}
+
+.zillow-url {
+    color: #009FE0;
+}
+
+.zillow-exm-url {
+    margin: 5px 0;
+}
+
+.zillow-exm-profile {
+    margin: 10px 0;
+}
+
+.zillow-exm-profilename {
+	border: 1px solid #dcdcdc;
+	border-radius: 3px;
+	padding: 5px;
 }
 
 .zillow-input-container {
