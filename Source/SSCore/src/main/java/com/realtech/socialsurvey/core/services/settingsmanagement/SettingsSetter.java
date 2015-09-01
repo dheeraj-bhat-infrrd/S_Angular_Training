@@ -3,6 +3,7 @@ package com.realtech.socialsurvey.core.services.settingsmanagement;
 import com.realtech.socialsurvey.core.entities.Branch;
 import com.realtech.socialsurvey.core.entities.Company;
 import com.realtech.socialsurvey.core.entities.Region;
+import com.realtech.socialsurvey.core.entities.SettingsSetterLevel;
 import com.realtech.socialsurvey.core.enums.OrganizationUnit;
 import com.realtech.socialsurvey.core.enums.SettingsForApplication;
 import com.realtech.socialsurvey.core.exception.NonFatalException;
@@ -58,4 +59,12 @@ public interface SettingsSetter {
 	 * @return
 	 */
 	public boolean checkSettingsSetStatus(int settingNumber, OrganizationUnit organizationUnit);
+	
+	/**
+	 * Finds out all te level who have set the settings value
+	 * @param currentSetAggregateValue
+	 * @param settings
+	 * @return
+	 */
+	public SettingsSetterLevel getSettingsSetLevel(long currentSetAggregateValue, SettingsForApplication settings);
 }

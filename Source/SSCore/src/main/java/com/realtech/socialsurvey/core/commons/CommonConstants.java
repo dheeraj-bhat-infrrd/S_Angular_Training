@@ -652,4 +652,11 @@ public interface CommonConstants
     //Settings constants
     public static final boolean SET_SETTINGS = true;
     public static final boolean UNSET_SETTINGS = false;
+    public static final int SET_BY_COMPANY = 1;
+    public static final int SET_BY_REGION = 2;
+    public static final int SET_BY_COMPANY_N_REGION = 3;
+    public static final int SET_BY_BRANCH = 4;
+    public static final int SET_BY_COMPANY_N_BRANCH = 5;
+    public static final int SET_BY_REGION_N_BRANCH = 6;
+    public static final int SET_BY_COMPANY_N_REGION_N_BRANCH = 7;
 }
