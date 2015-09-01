@@ -299,7 +299,7 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
         //the newlely creted profile will be primary because this is will be the first profile of user
         UserProfile userProfile = createUserProfile( user, company, emailId, CommonConstants.DEFAULT_AGENT_ID,
             CommonConstants.DEFAULT_BRANCH_ID, CommonConstants.DEFAULT_REGION_ID,
-            CommonConstants.PROFILES_MASTER_COMPANY_ADMIN_PROFILE_ID, CommonConstants.IS_PRIMARY_TRUE ,  CommonConstants.ADD_COMPANY_STAGE,
+            CommonConstants.PROFILES_MASTER_COMPANY_ADMIN_PROFILE_ID, CommonConstants.IS_PRIMARY_FALSE ,  CommonConstants.ADD_COMPANY_STAGE,
             CommonConstants.STATUS_INACTIVE, String.valueOf( user.getUserId() ), String.valueOf( user.getUserId() ) );
         
         // add the company admin profile with the user object
