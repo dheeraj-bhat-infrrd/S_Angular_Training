@@ -131,6 +131,16 @@
 				</c:if>
 				<c:if test="${highestrole == 1 && accountMasterId != 5}">
 					<div class="header-links-item">
+						<a href="javascript:showMainContent('./showemailsettings.do')"><spring:message code="label.emailsettings.key" /></a>
+					</div>
+				</c:if>
+				<c:if test="${highestrole == 1 && accountMasterId != 5}">
+					<div class="header-links-item">
+						<a href="javascript:showMainContent('./showapps.do')"><spring:message code="label.appsettings.key" /></a>
+					</div>
+				</c:if>
+				<c:if test="${highestrole == 1 && accountMasterId != 5}">
+					<div class="header-links-item">
 						<a href="javascript:showMainContent('./viewhierarchy.do');"><spring:message code="label.viewcompanyhierachy.key" /></a>
 					</div>
 				</c:if>
@@ -169,20 +179,36 @@
 						<a href="javascript:showMainContent('./showusermangementpage.do')" onclick="showOverlay();"><spring:message code="label.header.usermanagement.key" /></a>
 					</div>
 				</c:if>
-				<%-- <c:if test="${(accountMasterId == 2 || accountMasterId == 3 || accountMasterId == 4) && (highestrole == 1 || highestrole == 2 || highestrole == 3)}">
-					<div class="hdr-link-item">
-						<a href="javascript:showMainContent('./showbuildhierarchypage.do')" onclick="showOverlay();"><spring:message code="label.header.buildhierarchy.key" /></a>
-					</div>
-				</c:if> --%>
 				<c:if test="${highestrole == 1 && accountMasterId != 5}">
 					<div class="hdr-link-item">
 						<a href="javascript:showMainContent('./showbuildsurveypage.do')" onclick="showOverlay();"><spring:message code="label.header.buildsurvey.key" /></a>
 					</div>
 				</c:if>
 				<c:if test="${accountMasterId != 5}">
-					<div class="hdr-link-item">
-						<a href="javascript:showMainContent('./showcompanysettings.do')" onclick="showOverlay();"><spring:message code="label.editsettings.key" /></a>
-					</div>
+					<c:choose>
+						<c:when test="${highestrole == 1}">
+							<div id="hdr-link-item-config" class="hdr-link-item hdr-link-item-config pos-relative">
+								<a href="javascript:showMainContent('./showcompanysettings.do')" onclick="showOverlay();"><spring:message code="label.configure.key" /></a>
+								<div id="hdr-config-settings-dropdown" class="hdr-link-item-dropdown-icn"></div>
+								<div id="hdr-link-item-dropdown" class="hdr-link-item-dropdown hide">
+									<div class="hdr-link-item-dropdown-item" onclick="showMainContent('./showcompanysettings.do');">
+										<spring:message code="label.settings.key" />
+									</div>
+									<div class="hdr-link-item-dropdown-item" onclick="showMainContent('./showemailsettings.do');">
+										<spring:message code="label.emailsettings.key" />
+									</div>
+									<div class="hdr-link-item-dropdown-item" onclick="showMainContent('./showapps.do');">
+										<spring:message code="label.appsettings.key" />
+									</div>
+								</div>
+							</div>
+						</c:when>
+						<c:otherwise>
+							<div class="hdr-link-item">
+								<a href="javascript:showMainContent('./showcompanysettings.do')" onclick="showOverlay();"><spring:message code="label.editsettings.key" /></a>
+							</div>
+						</c:otherwise>
+					</c:choose>
 				</c:if>
 				<div class="hdr-link-item">
 					<a href="javascript:showMainContent('./showprofilepage.do')" onclick="showOverlay();"><spring:message code="label.editprofile.key" /></a>
@@ -193,14 +219,6 @@
 				<div id="hdr-usr-img" class="float-right user-info-initial">
 					<span id="usr-initl">${fn:substring(user.firstName, 0, 1)}</span>
 					<div class="initial-dd-wrapper hide blue-arrow-bot text-normal">
-						<%-- <c:if test="${accountMasterId != 5}">
-							<div class="initial-dd-item" id="company-setting" onclick="showMainContent('./showcompanysettings.do'); showOverlay();">
-								<spring:message code="label.editsettings.key" />
-							</div>
-						</c:if> --%>
-						<%-- <div class="initial-dd-item" id="profile-setting" onclick="showMainContent('./showprofilepage.do'); showOverlay();">
-							<spring:message code="label.editprofile.key" />
-						</div> --%>
 						<c:if test="${highestrole == 1 && accountMasterId != 5}">
 							<div class="initial-dd-item" id="change-password" onclick="showMainContent('./showemailsettings.do'); showOverlay();">
 								<spring:message code="label.emailsettings.key"/>
