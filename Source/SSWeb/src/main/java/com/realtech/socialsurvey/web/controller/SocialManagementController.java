@@ -560,7 +560,6 @@ public class SocialManagementController
         } catch ( InvalidInputException | NoRecordsFetchedException e ) {
             LOG.error( "Error while saving access token for facebook to post: " + e.getLocalizedMessage(), e );
         } catch (NonFatalException e) {
-			// TODO Auto-generated catch block
 			LOG.error("Error setting settings value. Reason : " + e.getLocalizedMessage(), e);
 		}
         model.addAttribute( "socialNetwork", "facebook" );
