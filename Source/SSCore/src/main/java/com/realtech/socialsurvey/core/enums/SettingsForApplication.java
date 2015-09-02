@@ -24,4 +24,34 @@ public enum SettingsForApplication {
 	public int getIndex() {
 		return this.index;
 	}
+	
+	public static SettingsForApplication getSettingForApplicationFromIndex(int index){
+		if(index == 1){
+			return LOGO;
+		}else if(index == 2){
+			return ADDRESS;
+		}else if(index == 3){
+			return PHONE;
+		}else if(index == 4){
+			return LOCATION;
+		}else if(index == 5){
+			return FACEBOOK;
+		}else if(index == 6){
+			return TWITTER;
+		}else if(index == 7){
+			return LINKED_IN;
+		}else if(index == 8){
+			return GOOGLE_PLUS;
+		}else if(index == 9){
+			return YELP;
+		}else if(index == 10){
+			return ZILLOW;
+		}else if(index == 11){
+			return REALTOR;
+		}else if(index == 12){
+			return LENDING_TREE;
+		}else{
+			return null;
+		}
+	}
 }
