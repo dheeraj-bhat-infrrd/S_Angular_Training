@@ -1339,7 +1339,7 @@ function callBackPaintPublicPosts(data) {
 			+ '<div class="tweet-txt float-left">'
 				+ '<div class="tweet-text-main">' + linkify(post.postText) + '</div>'
 				+ '<div class="tweet-text-link"><em>' + post.postedBy + '</em></div>'
-				+ '<div class="tweet-text-time"><em>' + convertUserDateToLocalWeekFormt( new Date(post.timeInMillis) )+ '</em></div>'
+				+ '<div class="tweet-text-time"><em>' + convertUserDateToWeekFormt(new Date(post.timeInMillis)) + '</em></div>'
 			+ '	</div>'
 		+ '</div>';
 	});

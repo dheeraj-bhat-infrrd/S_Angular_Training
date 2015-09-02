@@ -1120,11 +1120,14 @@ $(document).on('click','#dashboard-sel',function(e){
 $(document).on('click','.da-dd-item',function(e){
 	$('#dashboard-sel').html($(this).html());
 	$('#da-dd-wrapper-profiles').slideToggle(200);
-	
+	$('#da-dd-wrapper-profiles').perfectScrollbar('update');
 	// update selected profile in session
 	updateCurrentProfile($(this).attr('data-column-type'), $(this).attr('data-column-value'));
 
-	showMainContent('./dashboard.do');
+	var selectedTab = window.location.hash.split("#")[1];
+	
+	showMainContent('./' + selectedTab + '.do');
+	//showMainContent('./dashboard.do');
 });
 
 $(document).click(function(){
@@ -7402,7 +7405,7 @@ function paintPosts(posts) {
 				+ '<div class="tweet-text-main">' + linkify(post.postText) + '</div>'
 				+ '<div class="tweet-text-link"><em>' + post.postedBy
 				+ '</em></div>' + '<div class="tweet-text-time"><em>'
-				+ convertUserDateToLocalWeekFormt(new Date(post.timeInMillis)) + '</em></div>'
+				+ convertUserDateToWeekFormt(new Date(post.timeInMillis)) + '</em></div>'
 				+ '</div>';
 		
 		if(post.source == "SocialSurvey"){
