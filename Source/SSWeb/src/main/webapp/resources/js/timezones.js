@@ -30,6 +30,19 @@ function convertUserDateToLocalWeekFormt(date){
 	return date4;
 }
 
+function convertUserDateToWeekFormt(date){
+	var days = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+	var date3= new Date(date.getTime());
+	var dayOftheweek = days[ date3.getDay() ];
+	var month=((date3.getMonth() + 1)<10)? "0"+(date3.getMonth() + 1) : (date3.getMonth() + 1);
+	var day=(date3.getDate()<10) ? "0"+(date3.getDate()) : (date3.getDate());
+	var minutes= (date3.getMinutes()<10) ? "0"+(date3.getMinutes()) : (date3.getMinutes());
+	var hours= (date3.getHours()<10) ? "0"+(date3.getHours()) : (date3.getHours());
+	var sec=  (date3.getSeconds()<10) ? "0"+(date3.getSeconds()) : (date3.getSeconds());
+	var date4=   dayOftheweek +" "+month+" "+day+" " + date3.getFullYear() +" "+hours+":"+minutes+":"+sec;
+	return date4;
+}
+
 function  convertTimeStampToLocalTimeStamp(generalTimestamp){
 	var convertedTimestamp= generalTimestamp.getTime() - offset;
 	var date3=new Date(convertedTimestamp);	
