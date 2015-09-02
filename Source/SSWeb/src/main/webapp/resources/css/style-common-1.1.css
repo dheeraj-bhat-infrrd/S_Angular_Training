@@ -1432,3 +1432,12 @@ span.footer-ul a:hover {
 .icn-sur-popup-cont{
 	padding: 20px;
 }
+
+.dd-tl {
+	font-size: 12px;
+	line-height: 15px;
+	padding: 3px 5px;
+	border-bottom: 1px solid #dcdcdc;
+	color: #fff;
+	background-color: #A9A9A9;
+}

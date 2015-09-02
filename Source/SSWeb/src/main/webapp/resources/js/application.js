@@ -1077,11 +1077,14 @@ $(document).on('click','#dashboard-sel',function(e){
 $(document).on('click','.da-dd-item',function(e){
 	$('#dashboard-sel').html($(this).html());
 	$('#da-dd-wrapper-profiles').slideToggle(200);
-	
+	$('#da-dd-wrapper-profiles').perfectScrollbar('update');
 	// update selected profile in session
 	updateCurrentProfile($(this).attr('data-column-type'), $(this).attr('data-column-value'));
 
-	showMainContent('./dashboard.do');
+	var selectedTab = window.location.hash.split("#")[1];
+	
+	showMainContent('./' + selectedTab + '.do');
+	//showMainContent('./dashboard.do');
 });
 
 $(document).click(function(){

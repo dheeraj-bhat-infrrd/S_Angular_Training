@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import javax.servlet.http.HttpServletResponse;
@@ -353,8 +354,8 @@ public class SessionHelper {
 	public UserHierarchyAssignments processAssignments(HttpSession session, User user) throws NonFatalException {
 		LOG.info("Method processAssignments() called from SessionHelper");
 		UserHierarchyAssignments assignments = new UserHierarchyAssignments();
-		Map<Long, String> regionsMap = new HashMap<Long, String>();
-		Map<Long, String> branchesMap = new HashMap<Long, String>();
+		Map<Long, String> regionsMap = new LinkedHashMap<>();
+		Map<Long, String> branchesMap = new LinkedHashMap<>();
 
 		user = userManagementService.getUserByUserId(user.getUserId());
 		userManagementService.setProfilesOfUser(user);
