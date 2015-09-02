@@ -659,6 +659,8 @@ public interface CommonConstants
     public static final int SET_BY_COMPANY_N_BRANCH = 5;
     public static final int SET_BY_REGION_N_BRANCH = 6;
     public static final int SET_BY_COMPANY_N_REGION_N_BRANCH = 7;
+    public static final int SET_BY_NONE = 0;
+    public static final int LOCKED_BY_NONE = 0;
     
     public static final String SETTING_SCORE = "setScore";
     
