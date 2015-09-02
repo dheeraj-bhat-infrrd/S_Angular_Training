@@ -5655,6 +5655,14 @@ tr.u-tbl-header td {
 	background: url(../images/yelp_wide.png) no-repeat center;
 }
 
+.icn-wide-lendingtree {
+	background: url(../images/lendingtree_wide.png) no-repeat center;
+}
+
+.icn-wide-realtor {
+	background: url(../images/realtor_wide.png) no-repeat center;
+}
+
 .dd-arrow-dn {
 	background: url(../images/sb-dd-icn-pd.png) no-repeat right center;
 }

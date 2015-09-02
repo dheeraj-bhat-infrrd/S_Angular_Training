@@ -2539,7 +2539,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
         queries.put( CommonConstants.IS_DEFAULT_BY_SYSTEM, CommonConstants.STATUS_INACTIVE );
         queries.put( CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_ACTIVE );
 
-        List<Branch> branchList = branchDao.findProjectionsByKeyValue( Branch.class, projections, queries );
+        List<Branch> branchList = branchDao.findProjectionsAscOrderByKeyValue( Branch.class, projections, queries, CommonConstants.BRANCH_OBJECT );
         LOG.info( "Branch list fetched for the company " + company );
         return branchList;
     }
@@ -2593,7 +2593,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
         queries.put( CommonConstants.IS_DEFAULT_BY_SYSTEM, CommonConstants.STATUS_INACTIVE );
         queries.put( CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_ACTIVE );
 
-        List<Region> regionList = regionDao.findProjectionsByKeyValue( Region.class, projections, queries );
+        List<Region> regionList = regionDao.findProjectionsAscOrderByKeyValue( Region.class, projections, queries, CommonConstants.REGION_OBJECT );
         LOG.info( "Region list fetched for the company " + company );
         return regionList;
     }

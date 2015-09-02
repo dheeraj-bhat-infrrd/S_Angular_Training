@@ -94,7 +94,9 @@
 	<div class="container">
 		<div class="hm-header-row hm-header-row-main clearfix">
 			<div class="float-left hm-header-row-left hm-header-row-left-edit-pr"><spring:message code="label.profileheader.key" /></div>
-			<c:if test="${not empty assignments}">
+			<!-- Add user assignment dropdown -->
+			<jsp:include page="user_assignment_dropdown.jsp"></jsp:include>
+			<%-- <c:if test="${not empty assignments}">
 				<div id="pe-dd-wrapper" class="float-right header-right clearfix hr-dsh-adj-rt hdr-prof-sel">
 					<div class="float-left hr-txt1"><spring:message code="label.viewas.key" /></div>
 					<div id="profile-sel" class="float-left hr-txt2 cursor-pointer">${entityName}</div>
@@ -121,7 +123,7 @@
 						</c:forEach>
 					</div>
 				</div>
-			</c:if>
+			</c:if> --%>
 		</div>
 	</div>
 </div>
@@ -468,8 +470,10 @@
 		countPosts();
 		$(document).attr("title", "Profile Settings");
 		
-		if ($("#pe-dd-wrapper-profiles").children('.pe-dd-item').length <= 1) {
-			$('#pe-dd-wrapper').remove();
+		if ($("#da-dd-wrapper-profiles").children('.da-dd-item').length <= 1) {
+			$('#da-dd-wrapper').remove();
+		} else {
+			$('#da-dd-wrapper').show();
 		}
 		
 		adjustImage();

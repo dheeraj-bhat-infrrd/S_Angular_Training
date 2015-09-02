@@ -27,7 +27,9 @@
 	<div class="container">
 		<div class="hm-header-row clearfix">
 			<div class="float-left hm-header-row-left"><spring:message code="label.title.settings.key" /></div>
-			<c:if test="${not empty assignments}">
+			<!-- Add user assignment dropdown -->
+			<jsp:include page="user_assignment_dropdown.jsp"></jsp:include>
+			<%-- <c:if test="${not empty assignments}">
 				<div id="se-dd-wrapper" class="float-right header-right clearfix hr-dsh-adj-rt hdr-prof-sel">
 					<div class="float-left hr-txt1"><spring:message code="label.viewas.key" /></div>
 					<div id="setting-sel" class="float-left hr-txt2 cursor-pointer">${entityName}</div>
@@ -54,7 +56,7 @@
 						</c:forEach>
 					</div>
 				</div>
-			</c:if>
+			</c:if> --%>
 		</div>
 	</div>
 </div>
@@ -247,8 +249,10 @@ $(document).ready(function() {
 	//social media urls
 	loadSocialMediaUrlInSettingsPage();
 	
-	if ($("#se-dd-wrapper-profiles").children('.se-dd-item').length <= 1) {
-		$('#se-dd-wrapper').remove();
+	if ($("#da-dd-wrapper-profiles").children('.da-dd-item').length <= 1) {
+		$('#da-dd-wrapper').remove();
+	} else {
+		$('#da-dd-wrapper').show();
 	}
 	
 	if("${autoPostEnabled}" == "false"){
