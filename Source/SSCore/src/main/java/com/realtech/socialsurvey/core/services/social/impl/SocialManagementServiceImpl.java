@@ -375,6 +375,18 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
 		case CommonConstants.ZILLOW_SOCIAL_SITE:
             keyToUpdate = MongoOrganizationUnitSettingDaoImpl.KEY_ZILLOW_SOCIAL_MEDIA_TOKEN;
             break;
+           
+		case CommonConstants.YELP_SOCIAL_SITE:
+            keyToUpdate = MongoOrganizationUnitSettingDaoImpl.KEY_YELP_SOCIAL_MEDIA_TOKEN;
+            break;
+            
+		case CommonConstants.LENDINGTREE_SOCIAL_SITE:
+            keyToUpdate = MongoOrganizationUnitSettingDaoImpl.KEY_LENDINGTREE_SOCIAL_MEDIA_TOKEN;
+            break;
+        
+		case CommonConstants.REALTOR_SOCIAL_SITE:
+            keyToUpdate = MongoOrganizationUnitSettingDaoImpl.KEY_REALTOR_SOCIAL_MEDIA_TOKEN;
+            break;
 
 		default:
 			throw new InvalidInputException("Invalid social media token entered");
