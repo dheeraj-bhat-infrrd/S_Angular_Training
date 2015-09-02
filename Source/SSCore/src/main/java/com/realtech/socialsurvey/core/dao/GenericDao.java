@@ -3,7 +3,6 @@ package com.realtech.socialsurvey.core.dao;
 import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
-
 import org.hibernate.criterion.Criterion;
 
 // JIRA: SS-8: By RM05: BOC
@@ -57,5 +56,7 @@ public interface GenericDao<T, ID extends Serializable> {
 
 	public List<T> findByKeyValueAscendingWithAlias(Class<T> dataClass,
 			Map<String, Object> queries, String ascendingColumn, String alias);
+
+	public List<T> findProjectionsAscOrderByKeyValue(Class<T> dataClass, List<String> columnNames, Map<String, Object> queries, String columnToOrder);
 }
 // JIRA: SS-8: By RM05: EOC

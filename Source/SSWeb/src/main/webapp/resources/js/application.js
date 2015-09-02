@@ -220,7 +220,10 @@ $(document).on('click', '.hr-dd-item', function(e) {
 
 $(document).on('click', '.restart-survey-mail-txt', function(e) {
 	
-	var firstName = $(this).parent().parent().parent().parent().attr('data-firstname');
+	confirmRetakeSurveyReminderMail(this);
+	
+	
+	/*var firstName = $(this).parent().parent().parent().parent().attr('data-firstname');
 	var lastName = $(this).parent().parent().parent().parent().attr('data-lastname');
 	var agentName = $(this).parent().parent().parent().parent().attr('data-agentname');
 	var customerEmail = $(this).parent().parent().parent().parent().attr('data-customeremail');
@@ -234,8 +237,48 @@ $(document).on('click', '.restart-survey-mail-txt', function(e) {
 	};
 	callAjaxGetWithPayloadData('./restartsurvey.do', '', payload, true);
 	$('#overlay-toast').html('Mail sent to '+firstName +' '+' to retake the survey for you.');
-	showToast();
+	showToast();*/
 });
+
+
+function confirmRetakeSurveyReminderMail(element) {
+	
+	
+		$('#overlay-header').html("Resend survey");
+		$('#overlay-text').html("Are you sure you want to delete this survey and send a request to the customer to retake their survey?");
+		$('#overlay-continue').html("Yes");
+		$('#overlay-cancel').html("No");
+		$('#overlay-continue').off();
+		$('#overlay-continue').click(function(){
+			retakeSurveyReminderMail(element);
+		});
+		
+		$('#overlay-main').show();
+		$('body').addClass('body-no-scroll');
+	}
+
+	
+
+
+
+function retakeSurveyReminderMail(element) {
+	var firstName = $(element).parent().parent().parent().parent().attr('data-firstname');
+	var lastName = $(element).parent().parent().parent().parent().attr('data-lastname');
+	var agentName = $(element).parent().parent().parent().parent().attr('data-agentname');
+	var customerEmail = $(element).parent().parent().parent().parent().attr('data-customeremail');
+	var agentId = $(element).parent().parent().parent().parent().attr('data-agentid');
+	var payload = {
+			"customerEmail" : customerEmail,
+			"agentId" : agentId,
+			"firstName" : firstName,
+			"lastName" : lastName,
+			"agentName" : agentName
+	};
+	callAjaxGetWithPayloadData('./restartsurvey.do', '', payload, true);
+	$('#overlay-toast').html('Mail sent to '+firstName +' '+' to retake the survey for you.');
+	showToast();
+	$('#overlay-cancel').click();
+}
 
 $(document).on('click', '.report-abuse-txt', function(e) {
 	var reviewElement = $(this).parent().parent().parent().parent();
@@ -1077,11 +1120,14 @@ $(document).on('click','#dashboard-sel',function(e){
 $(document).on('click','.da-dd-item',function(e){
 	$('#dashboard-sel').html($(this).html());
 	$('#da-dd-wrapper-profiles').slideToggle(200);
-	
+	$('#da-dd-wrapper-profiles').perfectScrollbar('update');
 	// update selected profile in session
 	updateCurrentProfile($(this).attr('data-column-type'), $(this).attr('data-column-value'));
 
-	showMainContent('./dashboard.do');
+	var selectedTab = window.location.hash.split("#")[1];
+	
+	showMainContent('./' + selectedTab + '.do');
+	//showMainContent('./dashboard.do');
 });
 
 $(document).click(function(){
@@ -7359,7 +7405,7 @@ function paintPosts(posts) {
 				+ '<div class="tweet-text-main">' + linkify(post.postText) + '</div>'
 				+ '<div class="tweet-text-link"><em>' + post.postedBy
 				+ '</em></div>' + '<div class="tweet-text-time"><em>'
-				+ convertUserDateToLocalWeekFormt(new Date(post.timeInMillis)) + '</em></div>'
+				+ convertUserDateToWeekFormt(new Date(post.timeInMillis)) + '</em></div>'
 				+ '</div>';
 		
 		if(post.source == "SocialSurvey"){
@@ -7960,6 +8006,8 @@ function createEditPositionsPopup(header, body) {
 	$('#overlay-main').show();
 	$('body').addClass('body-no-scroll');
 }
+
+
 
 function updatePositions() {
 	var positions = [];

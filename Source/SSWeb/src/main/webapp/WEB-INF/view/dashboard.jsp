@@ -22,34 +22,8 @@
 	<div class="container">
 		<div class="hm-header-row clearfix">
 			<div class="float-left hm-header-row-left hr-dsh-adj-lft"><spring:message code="label.header.dashboard.key" /></div>
-			<c:if test="${not empty assignments}">
-				<div id="da-dd-wrapper" class="float-right header-right clearfix hr-dsh-adj-rt hdr-prof-sel">
-					<div class="float-left hr-txt1"><spring:message code="label.viewas.key" /></div>
-					<div id="dashboard-sel" class="float-left hr-txt2 cursor-pointer">${entityName}</div>
-					<div id="da-dd-wrapper-profiles" class="va-dd-wrapper hide">
-						<c:forEach var="company" items="${assignments.companies}">
-							<div class="da-dd-item" data-column-type="companyId"
-								data-column-name="${company.value}"
-								data-column-value="${company.key}">${company.value}</div>
-						</c:forEach>
-						<c:forEach var="region" items="${assignments.regions}">
-							<div class="da-dd-item" data-column-type="regionId" 
-								data-column-name="${region.value}"
-								data-column-value="${region.key}">${region.value}</div>
-						</c:forEach>
-						<c:forEach var="branch" items="${assignments.branches}">
-							<div class="da-dd-item" data-column-type="branchId"
-								data-column-name="${branch.value}"
-								data-column-value="${branch.key}">${branch.value}</div>
-						</c:forEach>
-						<c:forEach var="agent" items="${assignments.agents}">
-							<div class="da-dd-item" data-column-type="agentId"
-								data-column-name="${agent.value}"
-								data-column-value="${agent.key}">${agent.value}</div>
-						</c:forEach>
-					</div>
-				</div>
-			</c:if>
+			<!-- Add user assignment dropdown -->
+			<jsp:include page="user_assignment_dropdown.jsp"></jsp:include>
 		</div>
 	</div>
 </div>
@@ -219,6 +193,8 @@ $(document).ready(function() {
 	
 	if ($("#da-dd-wrapper-profiles").children('.da-dd-item').length <= 1) {
 		$('#da-dd-wrapper').remove();
+	} else {
+		$('#da-dd-wrapper').show();
 	}
 	
 	var profileMasterId = $('#prof-container').attr('data-profile-master-id');

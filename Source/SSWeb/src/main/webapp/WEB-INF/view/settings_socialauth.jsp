@@ -85,3 +85,48 @@
 	<div id="edt-prof-ggl-lnk" class="float-left soc-nw-icn-link"
 		data-social='zillow'>${zillowLink}</div>
 </div>
+<%-- <!-- Yelp link -->
+<div class="soc-nw-icns-cont clearfix">
+	<c:choose>
+		<c:when test="${not empty yelpLink}">
+			<div class="social-media-disconnect float-left"
+				onclick="disconnectSocialMedia('yelp')" title="Disconnect"></div>
+		</c:when>
+		<c:otherwise>
+			<div class="social-media-disconnect social-media-disconnect-disabled float-left"></div>
+		</c:otherwise>
+	</c:choose>
+	<div class="float-left soc-nw-icns cursor-pointer icn-wide-yelp soc-nw-adj"></div>
+	<div id="edt-prof-ggl-lnk" class="float-left soc-nw-icn-link"
+		data-social='zillow'>${yelpLink}</div>
+</div>
+<!-- Lending Tree link -->
+<div class="soc-nw-icns-cont clearfix">
+	<c:choose>
+		<c:when test="${not empty lendingtreeLink}">
+			<div class="social-media-disconnect float-left"
+				onclick="disconnectSocialMedia('lendingtree')" title="Disconnect"></div>
+		</c:when>
+		<c:otherwise>
+			<div class="social-media-disconnect social-media-disconnect-disabled float-left"></div>
+		</c:otherwise>
+	</c:choose>
+	<div class="float-left soc-nw-icns cursor-pointer icn-wide-lendingtree soc-nw-adj"></div>
+	<div id="edt-prof-ggl-lnk" class="float-left soc-nw-icn-link"
+		data-social='zillow'>${lendingtreeLink}</div>
+</div>
+<!-- Realtor link -->
+<div class="soc-nw-icns-cont clearfix">
+	<c:choose>
+		<c:when test="${not empty realtorLink}">
+			<div class="social-media-disconnect float-left"
+				onclick="disconnectSocialMedia('realtor')" title="Disconnect"></div>
+		</c:when>
+		<c:otherwise>
+			<div class="social-media-disconnect social-media-disconnect-disabled float-left"></div>
+		</c:otherwise>
+	</c:choose>
+	<div class="float-left soc-nw-icns cursor-pointer icn-wide-realtor soc-nw-adj"></div>
+	<div id="edt-prof-ggl-lnk" class="float-left soc-nw-icn-link"
+		data-social='zillow'>${realtorLink}</div>
+</div> --%>
