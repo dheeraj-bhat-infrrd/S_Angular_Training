@@ -1,6 +1,7 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ taglib prefix="spring" uri="http://www.springframework.org/tags"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions"%>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"%>
 <script type="text/javascript" src="//apis.google.com/js/plusone.js"></script>
 <script type="text/javascript" async src="//platform.twitter.com/widgets.js"></script>
@@ -99,6 +100,15 @@
 <c:choose>
 	<c:when test="${not empty reviews}">
 		<c:forEach var="feedback" varStatus="loop" items="${reviews}">
+			<c:choose>
+				<c:when test="${not empty feedback.customerLastName}">
+					<c:set value="${feedback.customerFirstName} ${feedback.customerLastName}" var="customerName"></c:set>
+				</c:when>
+				<c:otherwise>
+					<c:set value="${feedback.customerFirstName}" var="customerName"></c:set>
+				</c:otherwise>
+			</c:choose>
+			<c:set var="customerNameParts" value="${fn:split(customerName, ' ')}"></c:set>
 			<c:set value="ppl-review-item" var="reviewitemclass"></c:set>
 			<div data-firstname="${feedback.customerFirstName}" data-lastname="${feedback.customerLastName}"
 				data-agentid="${feedback.agentId}" data-agentname="${feedback.agentName}" data-customeremail="${feedback.customerEmail}"
@@ -106,7 +116,12 @@
 				
 				<div class="ppl-header-wrapper clearfix">
 					<div class="float-left ppl-header-left">
-						<div class="ppl-head-1">${feedback.customerFirstName} ${feedback.customerLastName}</div>
+						<div class="ppl-head-1">
+							${customerNameParts[0]} 
+							<c:if test="${fn:length(customerNameParts) > 1}">
+							 	${fn:substring(customerNameParts[1], 0, 1)}
+							 </c:if>
+						</div>
 						<div class="ppl-head-2" data-modifiedon="<fmt:formatDate type="date" pattern="yyyy-MM-dd-H-mm-ss"
 							value="${feedback.modifiedOn}" />">
 						</div>

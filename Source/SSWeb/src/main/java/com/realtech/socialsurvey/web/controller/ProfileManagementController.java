@@ -3877,7 +3877,7 @@ public class ProfileManagementController
             // Setting agent's profile URL in each of the review.
             profileManagementService.setAgentProfileUrlForReview( reviewItems );
 
-            model.addAttribute( "reviewItems", reviewItems );
+            model.addAttribute( "reviews", reviewItems );
         } catch ( InvalidInputException e ) {
             throw new InternalServerException( new ProfileServiceErrorCode(
                 CommonConstants.ERROR_CODE_COMPANY_REVIEWS_FETCH_FAILURE, CommonConstants.SERVICE_CODE_COMPANY_REVIEWS,
