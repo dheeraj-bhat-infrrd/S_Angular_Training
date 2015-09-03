@@ -1,6 +1,7 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"%>
+<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions"%>
 <%@ taglib uri="http://www.springframework.org/tags" prefix="spring"%>
 
 <script type="text/javascript"
@@ -80,8 +81,17 @@ if(document.getElementById('fb_'+loop) != null)
 	}
 </script>
 <c:choose>
-	<c:when test="${not empty reviewItems}">
-		<c:forEach var="reviewItem" varStatus="loop" items="${reviewItems}">
+	<c:when test="${not empty reviews}">
+		<c:forEach var="reviewItem" varStatus="loop" items="${reviews}">
+			<c:choose>
+				<c:when test="${not empty reviewItem.customerLastName}">
+					<c:set value="${reviewItem.customerFirstName} ${reviewItem.customerLastName}" var="customerName"></c:set>
+				</c:when>
+				<c:otherwise>
+					<c:set value="${reviewItem.customerFirstName}" var="customerName"></c:set>
+				</c:otherwise>
+			</c:choose>
+			<c:set var="customerNameParts" value="${fn:split(customerName, ' ')}"></c:set>
 			<c:set value="ppl-review-item" var="reviewitemclass"></c:set>
 			<c:if test="${loop.last}">
 				<c:set value="ppl-review-item-last" var="reviewitemclass"></c:set>
@@ -93,8 +103,12 @@ if(document.getElementById('fb_'+loop) != null)
 
 				<div class="ppl-header-wrapper clearfix">
 					<div class="float-left ppl-header-left">
-						<div class="ppl-head-1">${reviewItem.customerFirstName}
-							${reviewItem.customerLastName}</div>
+						<div class="ppl-head-1">
+							${customerNameParts[0]} 
+							<c:if test="${fn:length(customerNameParts) > 1}">
+							 	${fn:substring(customerNameParts[1], 0, 1)}
+							 </c:if>
+						</div>
 						<div class="ppl-head-2"
 							data-modifiedon="<fmt:formatDate type="date" pattern="yyyy-MM-dd-H-mm-ss"
 							value="${reviewItem.modifiedOn}" />"></div>
