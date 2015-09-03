@@ -22,6 +22,10 @@
 		format('embedded-opentype'),url('../fonts/OpenSans-Semibold.ttf') format('truetype');
 }
 
+.opensans {
+	font-family: 'OpenSans';
+}
+
 * {
 	font-family: 'OpenSans';
 	font-weight: normal !important;
@@ -1780,6 +1784,11 @@ button.paypal.is-active {
 }
 
 .icn-share {
+	height: 36px;
+	width: 36px;
+}
+
+.icn-share-alt {
 	height: 36px;
 	width: 36px;
 }
@@ -4074,7 +4083,7 @@ img.prof-image {
 	padding-right: 12px;
 }
 
-.dash-lp-txt span {
+.dash-lp-txt>span {
 	font-size: 12px;
 	font-family: 'opensanslight';
 }
@@ -7217,6 +7226,8 @@ img.hr-ind-img {
 .edit-pos-icn {
 	background: url(../images/edit-1.png) no-repeat center;
 	cursor: pointer;
+	width : 30px;
+	height: 30px;
 }
 
 .pos-edit-icn {
@@ -7419,4 +7430,30 @@ input.zillow-input {
 	width: 10px;
 	height: 10px;
 	background: url(../images/arrow-down-white.png) no-repeat center;
+}
+
+.profile-url-sub-btn {
+	background-color: #009FE0;
+	height: 40px;
+	line-height: 40px;
+	width: 160px;
+	text-align: center;
+	color: #fff;
+	border-radius: 3px;
+	margin: 10px auto;
+	font-size: 13px;
+	cursor: pointer;
+}
+
+input.profile-url-input {
+    width: 200px;
+    height: 35px;
+    line-height: normal;
+    padding: 5px 0 5px 10px;
+    border: 1px solid #dcdcdc;
+    border-radius: 3px;
+}
+
+label.url-change-input-label {
+    min-height: 35px;
 }
