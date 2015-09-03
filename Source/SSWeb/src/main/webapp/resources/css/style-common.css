@@ -22,6 +22,10 @@
 		format('embedded-opentype'),url('../fonts/OpenSans-Semibold.ttf') format('truetype');
 }
 
+.opensans {
+	font-family: 'OpenSans';
+}
+
 * {
 	font-family: 'OpenSans';
 	font-weight: normal !important;
@@ -4079,7 +4083,7 @@ img.prof-image {
 	padding-right: 12px;
 }
 
-.dash-lp-txt span {
+.dash-lp-txt>span {
 	font-size: 12px;
 	font-family: 'opensanslight';
 }
