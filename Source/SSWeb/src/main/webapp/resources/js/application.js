@@ -7974,7 +7974,6 @@ function createEditProfileUrlPopup(header, body) {
 }
 
 function updateProfileUrl(){
-	//TODO : Implement this method...
 	window.open("./editprofileurl.do","_blank", "width=800,height=600,scrollbars=yes");
 }
 
