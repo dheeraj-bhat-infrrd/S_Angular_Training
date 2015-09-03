@@ -80,6 +80,7 @@ import com.realtech.socialsurvey.core.entities.YelpToken;
 import com.realtech.socialsurvey.core.entities.ZillowToken;
 import com.realtech.socialsurvey.core.enums.AccountType;
 import com.realtech.socialsurvey.core.enums.DisplayMessageType;
+import com.realtech.socialsurvey.core.enums.OrganizationUnit;
 import com.realtech.socialsurvey.core.enums.SettingsForApplication;
 import com.realtech.socialsurvey.core.exception.InternalServerException;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
@@ -96,6 +97,7 @@ import com.realtech.socialsurvey.core.services.search.SolrSearchService;
 import com.realtech.socialsurvey.core.services.search.exception.SolrException;
 import com.realtech.socialsurvey.core.services.settingsmanagement.SettingsManager;
 import com.realtech.socialsurvey.core.services.settingsmanagement.SettingsSetter;
+import com.realtech.socialsurvey.core.services.settingsmanagement.impl.InvalidSettingsStateException;
 import com.realtech.socialsurvey.core.services.upload.FileUploadService;
 import com.realtech.socialsurvey.core.services.upload.impl.UploadUtils;
 import com.realtech.socialsurvey.core.utils.DisplayMessageConstants;
@@ -180,6 +182,7 @@ public class ProfileManagementController
         if ( entityIdStr == null || entityIdStr.isEmpty() ) {
             entityId = (long) session.getAttribute( CommonConstants.ENTITY_ID_COLUMN );
         } else {
+
             try {
                 if ( entityIdStr != null && !entityIdStr.equals( "" ) ) {
                     entityId = Long.parseLong( entityIdStr );
@@ -195,7 +198,13 @@ public class ProfileManagementController
         if ( entityType == null || entityType.isEmpty() ) {
             entityType = (String) session.getAttribute( CommonConstants.ENTITY_TYPE_COLUMN );
         }
-
+        Map<SettingsForApplication, OrganizationUnit> map = null;
+        try {
+            map = getPrimaryHierarchyByEntity( entityType, entityId );
+        } catch ( InvalidInputException | InvalidSettingsStateException e1 ) {
+            // TODO Auto-generated catch block
+            LOG.error( "Invalid Settings Value for Organization Unit " );
+        }
         sessionHelper.updateSelectedProfile( session, entityId, entityType );
 
         // fetching details from profile
@@ -4546,7 +4555,8 @@ public class ProfileManagementController
     }
 
 
-    private Map<String, Long> getPrimaryHierarchyByEntity( String entityType, long entityId ) throws InvalidInputException
+    private Map<SettingsForApplication, OrganizationUnit> getPrimaryHierarchyByEntity( String entityType, long entityId )
+        throws InvalidInputException, InvalidSettingsStateException
     {
         LOG.info( "Inside method getPrimaryHeirarchyByEntity for entity " + entityType );
         Map<String, Long> hierarchyMap = new HashMap<String, Long>();
@@ -4589,8 +4599,10 @@ public class ProfileManagementController
 
         LOG.info( "Calculate lock and setting score " );
         Map<String, Long> totalScore = settingsManager.calculateSettingsScore( settingsDetailsList );
-        long lockScore = totalScore.get( CommonConstants.LOCK_SCORE );
+        long currentLockAggregateValue = totalScore.get( CommonConstants.LOCK_SCORE );
+        long currentSetAggregateValue = totalScore.get( CommonConstants.SETTING_SCORE );
+        return settingsManager.getClosestSettingLevel( String.valueOf( currentSetAggregateValue ),
+            String.valueOf( currentLockAggregateValue ) );
 
-        return totalScore;
     }
 }
