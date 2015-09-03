@@ -1784,6 +1784,11 @@ button.paypal.is-active {
 	width: 36px;
 }
 
+.icn-share-alt {
+	height: 36px;
+	width: 36px;
+}
+
 .icn-plus-open {
 	background: url(../images/iconPlus.png) no-repeat center;
 	background-size: 26px;
@@ -7217,6 +7222,8 @@ img.hr-ind-img {
 .edit-pos-icn {
 	background: url(../images/edit-1.png) no-repeat center;
 	cursor: pointer;
+	width : 30px;
+	height: 30px;
 }
 
 .pos-edit-icn {

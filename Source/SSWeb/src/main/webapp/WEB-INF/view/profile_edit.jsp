@@ -163,7 +163,7 @@
 								<a href="${completeProfileUrl}" target="_blank">${completeProfileUrl}</a>
 							</div>
 							<c:if test="${ profilemasterid != 1 }">
-								<div class="float-left icn-share-alt edit-pos-icn" onclick="editProfileUrl();" title="Edit"></div>
+								<div class="float-left edit-pos-icn" onclick="editProfileUrl();" title="Edit"></div>
 							</c:if>
 						</c:if>
 						
