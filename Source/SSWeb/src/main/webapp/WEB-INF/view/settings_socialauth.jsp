@@ -85,7 +85,7 @@
 	<div id="edt-prof-ggl-lnk" class="float-left soc-nw-icn-link"
 		data-social='zillow'>${zillowLink}</div>
 </div>
-<%-- <!-- Yelp link -->
+<!-- Yelp link -->
 <div class="soc-nw-icns-cont clearfix">
 	<c:choose>
 		<c:when test="${not empty yelpLink}">
@@ -98,7 +98,7 @@
 	</c:choose>
 	<div class="float-left soc-nw-icns cursor-pointer icn-wide-yelp soc-nw-adj"></div>
 	<div id="edt-prof-ggl-lnk" class="float-left soc-nw-icn-link"
-		data-social='zillow'>${yelpLink}</div>
+		data-social='yelp'>${yelpLink}</div>
 </div>
 <!-- Lending Tree link -->
 <div class="soc-nw-icns-cont clearfix">
@@ -113,7 +113,7 @@
 	</c:choose>
 	<div class="float-left soc-nw-icns cursor-pointer icn-wide-lendingtree soc-nw-adj"></div>
 	<div id="edt-prof-ggl-lnk" class="float-left soc-nw-icn-link"
-		data-social='zillow'>${lendingtreeLink}</div>
+		data-social='lendingtree'>${lendingtreeLink}</div>
 </div>
 <!-- Realtor link -->
 <div class="soc-nw-icns-cont clearfix">
@@ -128,5 +128,5 @@
 	</c:choose>
 	<div class="float-left soc-nw-icns cursor-pointer icn-wide-realtor soc-nw-adj"></div>
 	<div id="edt-prof-ggl-lnk" class="float-left soc-nw-icn-link"
-		data-social='zillow'>${realtorLink}</div>
-</div> --%>
+		data-social='realtor'>${realtorLink}</div>
+</div>
