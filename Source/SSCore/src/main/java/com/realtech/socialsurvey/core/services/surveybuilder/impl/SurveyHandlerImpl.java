@@ -639,7 +639,7 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
             mailBody = mailBody.replaceAll( "\\[BaseUrl\\]", applicationBaseUrl );
             mailBody = mailBody.replaceAll( "\\[LogoUrl\\]", appLogoUrl );
             mailBody = mailBody.replaceAll( "\\[Link\\]", surveyUrl );
-            mailBody = mailBody.replaceAll( "\\[Name\\]", custFirstName + " " + custLastName );
+            mailBody = mailBody.replaceAll( "\\[Name\\]", emailFormatHelper.getCustomerDisplayNameForEmail(custFirstName, custLastName) );
             mailBody = mailBody.replaceAll( "\\[AgentName\\]", agentName );
             mailBody = mailBody.replaceAll( "\\[AgentSignature\\]", agentSignature );
             mailBody = mailBody.replaceAll( "\\[RecipientEmail\\]", custEmail );
@@ -658,7 +658,7 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
                 LOG.error( "Exception caught while sending mail to " + custEmail + ". Nested exception is ", e );
             }
         } else {
-            emailServices.sendDefaultSurveyInvitationMail( custEmail, custFirstName + " " + custLastName, user.getFirstName()
+            emailServices.sendDefaultSurveyInvitationMail( custEmail, emailFormatHelper.getCustomerDisplayNameForEmail(custFirstName, custLastName), user.getFirstName()
                 + ( user.getLastName() != null ? " " + user.getLastName() : "" ), surveyUrl, user.getEmailId(), agentSignature,
                 companyName, dateFormat.format( new Date() ), currentYear, fullAddress );
         }
@@ -889,7 +889,7 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
             mailBody = mailBody.replaceAll( "\\[LogoUrl\\]", appLogoUrl );
             mailBody = mailBody.replaceAll( "\\[Link\\]", surveyUrl );
             mailBody = mailBody.replaceAll( "\\[FirstName\\]", custFirstName );
-            mailBody = mailBody.replaceAll( "\\[Name\\]", custFirstName + " " + custLastName );
+            mailBody = mailBody.replaceAll( "\\[Name\\]", emailFormatHelper.getCustomerDisplayNameForEmail(custFirstName, custLastName) );
             mailBody = mailBody.replaceAll( "\\[AgentName\\]", "" );
             mailBody = mailBody.replaceAll( "\\[AgentSignature\\]", agentSignature );
             mailBody = mailBody.replaceAll( "\\[RecipientEmail\\]", custEmail );
@@ -914,7 +914,7 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
                 LOG.error( "Exception caught while sending mail to " + custEmail + ". Nested exception is ", e );
             }
         } else {
-            emailServices.sendDefaultSurveyInvitationMail( custEmail, custFirstName + " " + custLastName, user.getFirstName()
+            emailServices.sendDefaultSurveyInvitationMail( custEmail, emailFormatHelper.getCustomerDisplayNameForEmail(custFirstName, custLastName), user.getFirstName()
                 + ( user.getLastName() != null ? " " + user.getLastName() : "" ), surveyUrl, user.getEmailId(), agentSignature,
                 companyName, dateFormat.format( new Date() ), currentYear, fullAddress );
         }
@@ -943,7 +943,7 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
             mailBody = mailBody.replaceAll( "\\[BaseUrl\\]", applicationBaseUrl );
             mailBody = mailBody.replaceAll( "\\[FirstName\\]", custFirstName );
             mailBody = mailBody.replaceAll( "\\[AgentName\\]", user.getFirstName() + " " + user.getLastName() );
-            mailBody = mailBody.replaceAll( "\\[Name\\]", custFirstName + " " + custLastName );
+            mailBody = mailBody.replaceAll( "\\[Name\\]", emailFormatHelper.getCustomerDisplayNameForEmail(custFirstName, custLastName) );
             mailBody = mailBody.replaceAll( "\\[Link\\]", link );
             mailBody = mailBody.replaceAll( "null", "" );
 

@@ -3,6 +3,7 @@ package com.realtech.socialsurvey.core.utils;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import org.apache.commons.lang.WordUtils;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.slf4j.Logger;
@@ -69,5 +70,19 @@ public class EmailFormatHelper {
 			textFormat = document.body().text();
 		}
 		return textFormat;
+	}
+	
+	public String getCustomerDisplayNameForEmail(String custFirstName, String custLastName) {
+		 String customerName = custFirstName;
+        if(custLastName != null && custLastName != ""){
+        	customerName += " " + custLastName;
+        }
+        
+        String[] custNameArray = customerName.split(" ");
+        String custDisplayName = custNameArray[0];
+        if(custDisplayName.length() > 1){
+        	custDisplayName += " " + custNameArray[1].substring(0, 1);
+        }
+        return WordUtils.capitalize(custDisplayName);
 	}
 }

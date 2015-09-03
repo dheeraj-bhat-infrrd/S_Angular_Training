@@ -49,6 +49,7 @@ import com.realtech.socialsurvey.core.services.social.SocialManagementService;
 import com.realtech.socialsurvey.core.services.surveybuilder.SurveyBuilder;
 import com.realtech.socialsurvey.core.services.surveybuilder.SurveyHandler;
 import com.realtech.socialsurvey.core.utils.DisplayMessageConstants;
+import com.realtech.socialsurvey.core.utils.EmailFormatHelper;
 import com.realtech.socialsurvey.core.utils.MessageUtils;
 import com.realtech.socialsurvey.core.utils.UrlValidationHelper;
 import com.realtech.socialsurvey.web.common.ErrorCodes;
@@ -97,6 +98,9 @@ public class SurveyManagementController {
 	@Autowired
 	private RequestUtils requestUtils;
 
+	@Autowired
+	private EmailFormatHelper emailFormatHelper;
+	
 	@Resource
 	@Qualifier("nocaptcha")
 	private CaptchaValidation captchaValidation;
@@ -198,10 +202,7 @@ public class SurveyManagementController {
 			// Sending email to the customer telling about successful completion of survey.
 			SurveyDetails survey = surveyHandler.getSurveyDetails(agentId, customerEmail, firstName, lastName);
 			try {
-				String customerName = survey.getCustomerFirstName();
-				if (survey.getCustomerLastName() != null && !survey.getCustomerLastName().isEmpty()) {
-					customerName = survey.getCustomerFirstName() + " " + survey.getCustomerLastName();
-				}
+				String customerName = emailFormatHelper.getCustomerDisplayNameForEmail(survey.getCustomerFirstName(), survey.getCustomerLastName());
 
 				User agent = userManagementService.getUserByUserId(agentId);
 				if (enableKafka.equals(CommonConstants.YES)) {
@@ -487,6 +488,8 @@ public class SurveyManagementController {
 			String feedback = request.getParameter("feedback");
 			String serverBaseUrl = requestUtils.getRequestServerName(request);
 
+			String customerDisplayName = emailFormatHelper.getCustomerDisplayNameForEmail(custFirstName, custLastName);
+			
 			long agentId = 0;
 			double rating = 0;
 			try {
@@ -513,7 +516,7 @@ public class SurveyManagementController {
 			AgentSettings agentSettings = userManagementService.getUserSettings(agentId);
 
 			// Facebook
-			String facebookMessage = rating + "-Star Survey Response from " + custFirstName + " " + custLastName + " for " + agentName
+			String facebookMessage = rating + "-Star Survey Response from " + customerDisplayName + " for " + agentName
 					+ " on Social Survey - view at " + getApplicationBaseUrl() + CommonConstants.AGENT_PROFILE_FIXED_URL + agentProfileLink;
 			facebookMessage += "\n Feedback : " + feedback;
 			try {
@@ -538,10 +541,10 @@ public class SurveyManagementController {
 			}
 
 			// LinkedIn
-			String linkedinMessage = rating + "-Star Survey Response from " + custFirstName + " " + custLastName + " for " + agentName
+			String linkedinMessage = rating + "-Star Survey Response from " + customerDisplayName + " for " + agentName
 					+ " on SocialSurvey ";
 			String linkedinProfileUrl = getApplicationBaseUrl() + CommonConstants.AGENT_PROFILE_FIXED_URL + agentProfileLink;
-			String linkedinMessageFeedback = "From : " + custFirstName + " " + custLastName + " - " + feedback;
+			String linkedinMessageFeedback = "From : " + customerDisplayName + " - " + feedback;
 			if (!socialManagementService.updateLinkedin(agentSettings, linkedinMessage, linkedinProfileUrl, linkedinMessageFeedback)) {
 				surveyHandler.updateSharedOn(CommonConstants.LINKEDIN_SOCIAL_SITE, agentId, customerEmail);
 			}
@@ -554,7 +557,7 @@ public class SurveyManagementController {
 			}
 			
 			// Twitter
-			String twitterMessage = rating + "-Star Survey Response from " + custFirstName + " " + custLastName + " for " + agentName
+			String twitterMessage = rating + "-Star Survey Response from " + customerDisplayName + " for " + agentName
 					+ " on @SocialSurveyMe - view at " + getApplicationBaseUrl() + CommonConstants.AGENT_PROFILE_FIXED_URL + agentProfileLink;
 			try {
 				if (!socialManagementService.tweet(agentSettings, twitterMessage)) {
@@ -600,6 +603,9 @@ public class SurveyManagementController {
 			String ratingStr = facebookDetails.get("rating");
 			String customerEmail = facebookDetails.get("customerEmail");
 			String serverBaseUrl = requestUtils.getRequestServerName(request);
+			
+			String customerDisplayName = emailFormatHelper.getCustomerDisplayNameForEmail(custFirstName, custLastName);
+			
 			long agentId = 0;
 			double rating = 0;
 			try {
@@ -612,7 +618,7 @@ public class SurveyManagementController {
 			}
 			List<OrganizationUnitSettings> settings = socialManagementService.getSettingsForBranchesAndRegionsInHierarchy(agentId);
 			AgentSettings agentSettings = userManagementService.getUserSettings(agentId);
-			String facebookMessage = rating + "-Star Survey Response from " + custFirstName + " " + custLastName + " for " + agentName
+			String facebookMessage = rating + "-Star Survey Response from " + customerDisplayName + " for " + agentName
 					+ " on Social Survey - view at " + getApplicationBaseUrl() + CommonConstants.AGENT_PROFILE_FIXED_URL + agentProfileLink;
 			try {
 				socialManagementService.updateStatusIntoFacebookPage(agentSettings, facebookMessage, serverBaseUrl);
@@ -651,6 +657,8 @@ public class SurveyManagementController {
 			String agentIdStr = twitterDetails.get("agentId");
 			String ratingStr = twitterDetails.get("rating");
 			String customerEmail = twitterDetails.get("customerEmail");
+			
+			String customerDisplayName = emailFormatHelper.getCustomerDisplayNameForEmail(custFirstName, custLastName);
 			long agentId = 0;
 			double rating = 0;
 			try {
@@ -663,7 +671,7 @@ public class SurveyManagementController {
 			}
 			List<OrganizationUnitSettings> settings = socialManagementService.getSettingsForBranchesAndRegionsInHierarchy(agentId);
 			AgentSettings agentSettings = userManagementService.getUserSettings(agentId);
-			String twitterMessage = rating + "-Star Survey Response from " + custFirstName + custLastName + " for " + agentName
+			String twitterMessage = rating + "-Star Survey Response from " + customerDisplayName + " for " + agentName
 					+ " on @SocialSurveyMe - view at " + getApplicationBaseUrl() + CommonConstants.AGENT_PROFILE_FIXED_URL + agentProfileLink;
 			try {
 				socialManagementService.tweet(agentSettings, twitterMessage);
@@ -703,6 +711,8 @@ public class SurveyManagementController {
 			String customerEmail = linkedinDetails.get("customerEmail");
 			String agentProfileLink = linkedinDetails.get("agentProfileLink");
 			String feedback = linkedinDetails.get("feedback");
+			
+			String customerDisplayName = emailFormatHelper.getCustomerDisplayNameForEmail(custFirstName, custLastName);
 			long agentId = 0;
 			double rating = 0;
 			try {
@@ -715,10 +725,10 @@ public class SurveyManagementController {
 			}
 			List<OrganizationUnitSettings> settings = socialManagementService.getSettingsForBranchesAndRegionsInHierarchy(agentId);
 			AgentSettings agentSettings = userManagementService.getUserSettings(agentId);
-			String message = rating + "-Star Survey Response from " + custFirstName + custLastName + " for " + agentName
+			String message = rating + "-Star Survey Response from " + customerDisplayName + " for " + agentName
 					+ " on SocialSurvey ";
 			String linkedinProfileUrl = getApplicationBaseUrl() + CommonConstants.AGENT_PROFILE_FIXED_URL + agentProfileLink;
-			String linkedinMessageFeedback = "From : " + custFirstName + " " + custLastName + " "+ feedback;
+			String linkedinMessageFeedback = "From : " + customerDisplayName + " "+ feedback;
 			socialManagementService.updateLinkedin(agentSettings, message, linkedinProfileUrl, linkedinMessageFeedback);
 			for (OrganizationUnitSettings setting : settings) {
 				socialManagementService.updateLinkedin(setting, message, linkedinProfileUrl, linkedinMessageFeedback);

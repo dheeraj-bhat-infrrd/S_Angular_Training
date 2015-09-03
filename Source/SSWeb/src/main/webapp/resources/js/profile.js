@@ -610,7 +610,11 @@ function paintReviews(result){
 		if (i == resultSize - 1) {
 			lastItemClass = "ppl-review-item-last";
         }
-		
+		var custName = reviewItem.customerFirstName;
+		if(reviewItem.customerLastName != undefined){
+			custName += ' ' + reviewItem.customerLastName;
+		}
+		var custNameArray = custName.split(' ');
 		reviewsHtml = reviewsHtml +
 			'<div class="' + lastItemClass + '" data-cust-first-name=' + reviewItem.customerFirstName
 				+ ' data-cust-last-name=' + reviewItem.customerLastName + ' data-agent-name=' + reviewItem.agentName
@@ -618,9 +622,9 @@ function paintReviews(result){
 				+ reviewItem.customerEmail + '" data-agentid="' + reviewItem.agentId + '">';
 		reviewsHtml += '	<div class="ppl-header-wrapper clearfix">';
 		reviewsHtml += '		<div class="float-left ppl-header-left">';    
-		reviewsHtml += '			<div class="ppl-head-1">'+reviewItem.customerFirstName;
-		if(reviewItem.customerLastName != undefined){
-			reviewsHtml += ' '+reviewItem.customerLastName+'</div>';
+		reviewsHtml += '			<div class="ppl-head-1">'+custNameArray[0];
+		if(custNameArray[1] != undefined){
+			reviewsHtml += ' '+custNameArray[1].substr(0,1)+'</div>';
 		}else {
 			reviewsHtml += '</div>';
 		}
