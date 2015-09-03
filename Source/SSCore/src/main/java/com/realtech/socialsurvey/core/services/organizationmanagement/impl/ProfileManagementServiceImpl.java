@@ -1053,6 +1053,10 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
         }
         OrganizationUnitSettings companySettings = organizationUnitSettingsDao.fetchOrganizationUnitSettingsByProfileName(
             profileName, MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION );
+        if(companySettings == null){
+        	LOG.error("Unable to find company settings with profile name : " + profileName);
+        	throw new ProfileNotFoundException("Unable to find company settings with profile name : " + profileName);
+        }
 
         LOG.info( "Successfully executed method getCompanyDetailsByProfileName. Returning :" + companySettings );
         return companySettings;
@@ -1272,8 +1276,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
      */
     @Override
     @Transactional
-    public User getUserByProfileName( String agentProfileName ) throws InvalidInputException, NoRecordsFetchedException,
-        ProfileNotFoundException
+    public User getUserByProfileName( String agentProfileName ) throws ProfileNotFoundException
     {
         LOG.info( "Method getUserProfilesByProfileName called for agentProfileName:" + agentProfileName );
 
