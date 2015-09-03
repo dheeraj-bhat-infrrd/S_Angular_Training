@@ -6,6 +6,7 @@ import java.util.Map;
 import com.realtech.socialsurvey.core.entities.AgentSettings;
 import com.realtech.socialsurvey.core.entities.Branch;
 import com.realtech.socialsurvey.core.entities.Company;
+import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
 import com.realtech.socialsurvey.core.entities.ProListUser;
 import com.realtech.socialsurvey.core.entities.ProfilesMaster;
 import com.realtech.socialsurvey.core.entities.User;
@@ -374,5 +375,18 @@ public interface UserManagementService
 
 
     public User getUserObjByUserId(long userId) throws InvalidInputException;
+
+	void updateProfileUrlInAgentSettings(String profileName, String profileUrl,
+			AgentSettings agentSettings);
+
+
+	void updateProfileUrlInBranchSettings(String profileName,
+			String profileUrl, OrganizationUnitSettings branchSettings);
+
+	void updateProfileUrlInRegionSettings(String profileName,
+			String profileUrl, OrganizationUnitSettings regionSettings);
+
+	void updateProfileUrlInCompanySettings(String profileName,
+			String profileUrl, OrganizationUnitSettings companySettings);
 }
 // JIRA SS-34 BY RM02 BOC
