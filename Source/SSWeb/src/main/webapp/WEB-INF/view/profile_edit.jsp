@@ -162,6 +162,9 @@
 							<div id="prof-header-url" class="rating-image-txt float-left">
 								<a href="${completeProfileUrl}" target="_blank">${completeProfileUrl}</a>
 							</div>
+							<c:if test="${ profilemasterid != 1 }">
+								<div class="float-left icn-share-alt edit-pos-icn" onclick="editProfileUrl();" title="Edit"></div>
+							</c:if>
 						</c:if>
 						
 					</div>
