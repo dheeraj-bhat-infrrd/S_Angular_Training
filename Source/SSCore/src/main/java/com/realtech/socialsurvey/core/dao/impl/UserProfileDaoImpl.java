@@ -191,16 +191,16 @@ public class UserProfileDaoImpl extends GenericDaoImpl<UserProfile, Long> implem
     {
         LOG.info( "Method findPrimaryUserProfileByAgentId() called for agent id : " + entityId );
         Map<String, Long> hierarchyMap = new HashMap<String, Long>();
-        String hqlQuery = "select u.companyId, u.regionid, u.branchId, u.agentId from UserProfile where agentId=? AND isPrimary = ?";
+        String hqlQuery = "select u.company.companyId, u.regionId, u.branchId, u.agentId from UserProfile u where u.agentId=? AND u.isPrimary = ?";
         Query query = getSession().createQuery( hqlQuery );
-        query.setParameter( 0, String.valueOf( entityId ) );
-        query.setParameter( 0, true );
-        List<Object[]> rows = query.list();
+        query.setParameter( 0, entityId );
+        query.setParameter( 1, 1 );
+        List<Object[]> rows = (List<Object[]>) query.list();
         for ( Object[] row : rows ) {
-            hierarchyMap.put( CommonConstants.COMPANY_ID_COLUMN, (long) row[0] );
-            hierarchyMap.put( CommonConstants.REGION_ID_COLUMN, (long) row[1] );
-            hierarchyMap.put( CommonConstants.BRANCH_ID_COLUMN, (long) row[2] );
-            hierarchyMap.put( CommonConstants.AGENT_ID_COLUMN, (long) row[3] );
+            hierarchyMap.put( CommonConstants.COMPANY_ID_COLUMN, Long.valueOf( String.valueOf( row[0] ) ) );
+            hierarchyMap.put( CommonConstants.REGION_ID_COLUMN, Long.valueOf( String.valueOf( row[1] ) ) );
+            hierarchyMap.put( CommonConstants.BRANCH_ID_COLUMN, Long.valueOf( String.valueOf( row[2] ) ) );
+            hierarchyMap.put( CommonConstants.AGENT_ID_COLUMN, Long.valueOf( String.valueOf( row[3] ) ) );
         }
         LOG.info( "Method deleteUserProfilesByCompany() finished." );
         return hierarchyMap;
