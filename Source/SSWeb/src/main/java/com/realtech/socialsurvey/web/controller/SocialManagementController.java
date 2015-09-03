@@ -4,10 +4,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
-
 import org.apache.http.NameValuePair;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
@@ -28,13 +26,11 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
-
 import retrofit.mime.TypedByteArray;
 import twitter4j.Twitter;
 import twitter4j.TwitterException;
 import twitter4j.auth.AccessToken;
 import twitter4j.auth.RequestToken;
-
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.Gson;
@@ -71,10 +67,10 @@ import com.realtech.socialsurvey.core.services.settingsmanagement.SettingsSetter
 import com.realtech.socialsurvey.core.services.social.SocialAsyncService;
 import com.realtech.socialsurvey.core.services.social.SocialManagementService;
 import com.realtech.socialsurvey.core.utils.DisplayMessageConstants;
+import com.realtech.socialsurvey.core.utils.EmailFormatHelper;
 import com.realtech.socialsurvey.web.common.ErrorResponse;
 import com.realtech.socialsurvey.web.common.JspResolver;
 import com.realtech.socialsurvey.web.util.RequestUtils;
-
 import facebook4j.Account;
 import facebook4j.Facebook;
 import facebook4j.FacebookException;
@@ -118,6 +114,9 @@ public class SocialManagementController
     @Autowired
     private SettingsSetter settingsSetter;
 
+    @Autowired
+    private EmailFormatHelper emailFormatHelper;
+    
     @Value ( "${APPLICATION_BASE_URL}")
     private String applicationBaseUrl;
 
@@ -1325,8 +1324,10 @@ public class SocialManagementController
         } catch ( InvalidInputException e ) {
             LOG.error( "InvalidInputException caught in postToFacebook(). Nested exception is ", e );
         }
+        
+        String custDisplayName = emailFormatHelper.getCustomerDisplayNameForEmail(custFirstName, custLastName);
 
-        String facebookMessage = rating + "-Star Survey Response from " + custFirstName + " " + custLastName + " for "
+        String facebookMessage = rating + "-Star Survey Response from " + custDisplayName + " for "
             + agentName + " on Social Survey - view at " + applicationBaseUrl + CommonConstants.AGENT_PROFILE_FIXED_URL
             + agentProfileLink;
         facebookMessage = facebookMessage.replaceAll( "null", "" );
@@ -1386,9 +1387,10 @@ public class SocialManagementController
             }
 
             User user = sessionHelper.getCurrentUser();
+            String custDisplayName = emailFormatHelper.getCustomerDisplayNameForEmail(custFirstName, custLastName);
             List<OrganizationUnitSettings> settings = socialManagementService.getBranchAndRegionSettingsForUser( user
                 .getUserId() );
-            String twitterMessage = rating + "-Star Survey Response from " + custFirstName + custLastName + " for " + agentName
+            String twitterMessage = rating + "-Star Survey Response from " + custDisplayName + " for " + agentName
                 + " on @SocialSurveyMe - view at " + applicationBaseUrl + CommonConstants.AGENT_PROFILE_FIXED_URL
                 + agentProfileLink;
             twitterMessage = twitterMessage.replaceAll( "null", "" );
@@ -1455,8 +1457,9 @@ public class SocialManagementController
         }
 
         User user = sessionHelper.getCurrentUser();
+        String custDisplayName = emailFormatHelper.getCustomerDisplayNameForEmail(custFirstName, custLastName);
         List<OrganizationUnitSettings> settings = socialManagementService.getBranchAndRegionSettingsForUser( user.getUserId() );
-        String message = rating + "-Star Survey Response from " + custFirstName + custLastName + " for " + agentName
+        String message = rating + "-Star Survey Response from " + custDisplayName + " for " + agentName
             + " on SocialSurvey ";
         String linkedinProfileUrl = applicationBaseUrl + CommonConstants.AGENT_PROFILE_FIXED_URL + agentProfileLink;
         message += linkedinProfileUrl;

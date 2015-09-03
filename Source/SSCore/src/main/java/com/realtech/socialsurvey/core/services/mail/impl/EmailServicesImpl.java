@@ -1784,7 +1784,7 @@ public class EmailServicesImpl implements EmailServices
             mailBody = mailBody.replaceAll( "\\[BaseUrl\\]", appBaseUrl );
             mailBody = mailBody.replaceAll( "\\[AgentName\\]", "" );
             mailBody = mailBody.replaceAll( "\\[FirstName\\]", survey.getCustomerFirstName() );
-            mailBody = mailBody.replaceAll( "\\[Name\\]", survey.getCustomerFirstName() + " " + survey.getCustomerLastName() );
+            mailBody = mailBody.replaceAll( "\\[Name\\]", emailFormatHelper.getCustomerDisplayNameForEmail(survey.getCustomerFirstName(), survey.getCustomerLastName()) );
             mailBody = mailBody.replaceAll( "\\[Link\\]", surveyLink );
             mailBody = mailBody.replaceAll( "\\[AgentSignature\\]", agentSignature );
             mailBody = mailBody.replaceAll( "\\[RecipientEmail\\]", survey.getCustomerEmailId() );

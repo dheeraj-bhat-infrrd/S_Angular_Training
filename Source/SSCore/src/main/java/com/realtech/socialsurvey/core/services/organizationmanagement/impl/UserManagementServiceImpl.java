@@ -2097,7 +2097,89 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
         return profileName;
     }
 
+    /**
+     * Method to update profile name and url in agent settings
+     * 
+     * @param profileName
+     * @param profileUrl
+     * @param agentSettings
+     */
+    @Override
+    public void updateProfileUrlInAgentSettings(String profileName, String profileUrl, AgentSettings agentSettings){
+    	LOG.info("Method to update profile name and url in AGENT SETTINGS started");
+    	organizationUnitSettingsDao.updateParticularKeyAgentSettings( MongoOrganizationUnitSettingDaoImpl.KEY_PROFILE_NAME,
+                profileName, agentSettings );
+    	organizationUnitSettingsDao.updateParticularKeyAgentSettings( MongoOrganizationUnitSettingDaoImpl.KEY_PROFILE_URL,
+                profileUrl, agentSettings );
+    	LOG.info("Method to update profile name and url in AGENT SETTINGS finished");
+    }
 
+    /**
+     * Method to update profile name and url in branch settings
+     * 
+     * @param profileName
+     * @param profileUrl
+     * @param branchSettings
+     */
+    @Override
+    public void updateProfileUrlInBranchSettings(String profileName, String profileUrl, OrganizationUnitSettings branchSettings){
+    	LOG.info("Method to update profile name and url in BRANCH SETTINGS started");
+    	
+    	organizationUnitSettingsDao.updateParticularKeyOrganizationUnitSettings(
+    			MongoOrganizationUnitSettingDaoImpl.KEY_PROFILE_NAME, profileName, branchSettings,
+                MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION );
+    	
+    	organizationUnitSettingsDao.updateParticularKeyOrganizationUnitSettings(
+    			MongoOrganizationUnitSettingDaoImpl.KEY_PROFILE_URL, profileUrl, branchSettings,
+                MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION );
+    	
+    	LOG.info("Method to update profile name and url in BRANCH SETTINGS finished");
+    }
+    
+    /**
+     * Method to update profile name and url in region settings
+     * 
+     * @param profileName
+     * @param profileUrl
+     * @param regionSettings
+     */
+    @Override
+    public void updateProfileUrlInRegionSettings(String profileName, String profileUrl, OrganizationUnitSettings regionSettings){
+    	LOG.info("Method to update profile name and url in REGION SETTINGS started");
+    	
+    	organizationUnitSettingsDao.updateParticularKeyOrganizationUnitSettings(
+    			MongoOrganizationUnitSettingDaoImpl.KEY_PROFILE_NAME, profileName, regionSettings,
+                MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION );
+    	
+    	organizationUnitSettingsDao.updateParticularKeyOrganizationUnitSettings(
+    			MongoOrganizationUnitSettingDaoImpl.KEY_PROFILE_URL, profileUrl, regionSettings,
+                MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION );
+    	
+    	LOG.info("Method to update profile name and url in REGION SETTINGS finished");
+    }
+    
+    /**
+     * Method to update profile name and url in company settings
+     * 
+     * @param profileName
+     * @param profileUrl
+     * @param companySettings
+     */
+    @Override
+    public void updateProfileUrlInCompanySettings(String profileName, String profileUrl, OrganizationUnitSettings companySettings){
+    	LOG.info("Method to update profile name and url in COMPANY SETTINGS started");
+    	
+    	organizationUnitSettingsDao.updateParticularKeyOrganizationUnitSettings(
+    			MongoOrganizationUnitSettingDaoImpl.KEY_PROFILE_NAME, profileName, companySettings,
+                MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION );
+    	
+    	organizationUnitSettingsDao.updateParticularKeyOrganizationUnitSettings(
+    			MongoOrganizationUnitSettingDaoImpl.KEY_PROFILE_URL, profileUrl, companySettings,
+                MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION );
+    	
+    	LOG.info("Method to update profile name and url in COMPANY SETTINGS finished");
+    }
+    
     /**
      * Method to check which all users can perform edit and set the boolean as true or false in user
      * objects
