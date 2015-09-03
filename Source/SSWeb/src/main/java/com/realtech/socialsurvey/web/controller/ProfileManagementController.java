@@ -5412,7 +5412,8 @@ public class ProfileManagementController {
 			response = "true";
 		} else {
 			LOG.info("Profile didn't exist");
-			response = "false";
+			String completeProfileUrl = profileSettings.getCompleteProfileUrl();
+			response = "<a href=\"" +completeProfileUrl + "\" target=\"_blank\">"+ completeProfileUrl +"</a>";
 			session.setAttribute(CommonConstants.USER_PROFILE_SETTINGS,
 					profileSettings);
 		}
