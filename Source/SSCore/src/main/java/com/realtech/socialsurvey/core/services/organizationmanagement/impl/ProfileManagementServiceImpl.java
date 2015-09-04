@@ -1926,10 +1926,10 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
      * Method to fetch social posts for a particular user.
      */
     @Override
-    public long getPostsCountForUser( long userId )
+    public long getPostsCountForUser( String columnName, long columnValue )
     {
         LOG.info( "Method to fetch count of social posts for a particular user, getPostsCountForUser() started." );
-        long postsCount = socialPostDao.getPostsCountByUserId( userId );
+        long postsCount = socialPostDao.getPostsCountByUserId( columnName, columnValue );
         LOG.info( "Method to fetch count of social posts for a particular user, getPostsCountForUser() finished." );
         return postsCount;
     }

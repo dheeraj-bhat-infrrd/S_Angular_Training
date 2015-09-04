@@ -1,7 +1,6 @@
 package com.realtech.socialsurvey.core.dao;
 
 import java.util.List;
-
 import com.realtech.socialsurvey.core.entities.SocialPost;
 
 /**
@@ -24,7 +23,7 @@ public interface SocialPostDao {
 	public List<SocialPost> getSocialPosts(long iden, String key, int skip, int limit);
 
 	// Method to get posts count for user
-	public long getPostsCountByUserId(long userId);
+	public long getPostsCountByUserId(String columnName, long columnValue);
 
 	// Method to purge older social posts
 	public void purgeOlderSocialPosts(long timeSpanInMilliSecs);
