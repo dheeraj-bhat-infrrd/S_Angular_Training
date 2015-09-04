@@ -41,61 +41,91 @@
 
 		
 
-		<div class="dash-stats-wrapper bord-bot-dc clearfix">
+		<div class="dash-stats-wrapper bord-bot-dc clearfix help">
 		
-		<form action="http://localhost:8080/landing.do#showhelppage" method="post" class="contact-form">
+		<form action="" method="post" class="contact-form"  name=f
+enctype="multipart/form-data"
+onsubmit="return check();">
 								<p class="half">
-					<label for="sender_name">Name</label><input name="sender_name" id="sender_name" value="">
-				</p>
-				
-					<p><label for="subect">Subject</label><input name="subject" id="help_subject" value="">
-					<!-- <span class="select"><span class="value"><span>Choose</span></span><select name="subject" id="subject" style="opacity: 0;">
-						<option value="0">Choose</option>
-												<option value="Support">Support</option>
-											</select></span> -->
-				</p> 
-				<p>
-					<label for="message">Message</label> <textarea name="message" id="message" rows="15" cols="20"></textarea>
-				</p>
-				<p><button name="send" type="submit" value="1">Send message</button></p>
-			</form>
+				<div class="bd-hr-form-item clearfix">
+	     <div class="float-left bd-frm-left">Name</div>
+	     <div class="float-left bd-frm-right">
+	         <input class="bd-frm-rt-txt" name="regionName" id="region-name-txt" placeholder="Write your name" value="">
+	     </div>
+	 </div>
+	 
+	 
+	 <div class="bd-hr-form-item clearfix">
+	     <div class="float-left bd-frm-left">Subject</div>
+	     <div class="float-left bd-frm-right">
+	         <input class="bd-frm-rt-txt" name="regionAddress1" id="region-address1-txt" placeholder="Write the subject" value="">
+	     </div>
+	 </div>
+	 
+	 
+	 <div id="bd-multiple" class="bd-hr-form-item clearfix hide" style="display: block;">
+	     <div class="float-left bd-frm-left">Message</div>
+	     <div class="float-left bd-frm-right">
+	         <textarea class="bd-frm-rt-txt-area" id="selected-user-txt-area" name="selectedUserEmailArray" placeholder="Type your message here"></textarea>
+	     </div>
+	     
+	    
+	 </div>
+	 
+	 
+	   
+	
+
+	 
+	 <div class="bd-hr-form-item clearfix">
+	     <div class="float-left bd-frm-left"></div>
+	    <!-- <input class ="" type="file"  size="40"
+accept="" name="file[]" multiple> -->
+
+<input type="file" name="attachment" id="attachment" onchange="document.getElementById('moreUploadsLink').style.display = 'block';" />
+<div id="moreUploads"></div>
+<div id="moreUploadsLink" style="display:none;"><a href="javascript:addFileInput();">Attach another File</a></div>
+
+		      	 <div id="send-button" style="margin:0 auto ; margin-top: 20px"  class="bd-btn-save cursor-pointer "
+		      	 >Send message</div>
+
+ </div>
+	 
+	 </form>
+	 
 			
 			
 			
 			
 		</div>
-		
+
 		
 	</div>
+	
+
 </div>
 
-<script>
-$(document).ready(function() {
-	
-	$('.va-dd-wrapper').perfectScrollbar({
-		suppressScrollX : true
-	});
-	$('.va-dd-wrapper').perfectScrollbar('update');
-	
-	hideOverlay();
-	$(document).attr("title", "Dashboard");
-	
-	if ($("#da-dd-wrapper-profiles").children('.da-dd-item').length <= 1) {
-		$('#da-dd-wrapper').remove();
-	}
-	
-	var profileMasterId = $('#prof-container').attr('data-profile-master-id');
-	var currentProfileName = $('#prof-container').attr('data-column-name');
-	var currentProfileValue = $('#prof-container').attr('data-column-value');
-	var accountType = $('#prof-container').attr('data-account-type');
-	
-	var popupStatus = "${popupStatus}";
-	var showSendSurveyPopupAdmin = "${showSendSurveyPopupAdmin}";
-	
-	if (showSendSurveyPopupAdmin == "true" && popupStatus == "Y") {
-		sendSurveyInvitationAdmin(currentProfileName, currentProfileValue);
-	}
-	
-	paintDashboard(profileMasterId, currentProfileName, currentProfileValue, accountType);
-});
+<!-- <script type="text/javascript" language="JavaScript">
+function check() {
+  var ext = document.f.pic.value;
+  ext = ext.substring(ext.length-3,ext.length);
+  ext = ext.toLowerCase();
+  if(ext != 'jpg') {
+    alert('You selected a .'+ext+
+          ' file; please select a .jpg file instead!');
+    return false; }
+  else
+    return true; }
+</script> -->
+<script type="text/javascript" >
+var upload_number = 2;
+function addFileInput() {
+ 	var d = document.createElement("div");
+ 	var file = document.createElement("input");
+ 	file.setAttribute("type", "file");
+ 	file.setAttribute("name", "attachment"+upload_number);
+ 	d.appendChild(file);
+ 	document.getElementById("moreUploads").appendChild(d);
+ 	upload_number++;
+}
 </script>
