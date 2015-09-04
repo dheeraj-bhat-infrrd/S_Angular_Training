@@ -2181,7 +2181,9 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
         Map<Long, AgentRankingReport> agentReportData = new HashMap<>();
         surveyDetailsDao.getAverageScore( startDate, endDate, agentReportData, columnName, iden );
         surveyDetailsDao.getCompletedSurveysCount( startDate, endDate, agentReportData, columnName, iden );
-        surveyPreInitiationDao.getIncompleteSurveysCount( startDate, endDate, agentReportData );
+        // FIX for JIRA: SS-1112: BOC
+        // surveyPreInitiationDao.getIncompleteSurveysCount( startDate, endDate, agentReportData );
+        // FIX for JIRA: SS-1112: EOC
         organizationUnitSettingsDao.setAgentDetails( agentReportData );
 
         LOG.info( "Method to get Agent's Report for a specific time and all time finished." );
