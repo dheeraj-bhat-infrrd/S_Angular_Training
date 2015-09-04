@@ -2,7 +2,6 @@ package com.realtech.socialsurvey.core.dao.impl;
 
 import java.util.Date;
 import java.util.List;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,7 +10,6 @@ import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Repository;
-
 import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.dao.SocialPostDao;
 import com.realtech.socialsurvey.core.entities.SocialPost;
@@ -86,8 +84,11 @@ public class MongoSocialPostDaoImpl implements SocialPostDao {
 
 	// Method to fetch count of social posts for a particular user.
 	@Override
-	public long getPostsCountByUserId(long userId) {
-		Query query = new Query(Criteria.where(CommonConstants.USER_ID).is(userId));
+	public long getPostsCountByUserId(String columnName, long columnValue) {
+		Query query = new Query();
+		if ( columnName != null ) {
+            query.addCriteria( Criteria.where( columnName ).is( columnValue ) );
+        }
 		return mongoTemplate.count(query, CommonConstants.SOCIAL_POST_COLLECTION);
 	}
 
