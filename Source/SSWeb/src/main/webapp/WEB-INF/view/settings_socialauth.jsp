@@ -85,7 +85,7 @@
 	<div id="edt-prof-ggl-lnk" class="float-left soc-nw-icn-link"
 		data-social='zillow'>${zillowLink}</div>
 </div>
-<!-- Yelp link -->
+<%-- <!-- Yelp link -->
 <div class="soc-nw-icns-cont clearfix">
 	<c:choose>
 		<c:when test="${not empty yelpLink}">
@@ -129,4 +129,4 @@
 	<div class="float-left soc-nw-icns cursor-pointer icn-wide-realtor soc-nw-adj"></div>
 	<div id="edt-prof-ggl-lnk" class="float-left soc-nw-icn-link"
 		data-social='realtor'>${realtorLink}</div>
-</div>
+</div> --%>
