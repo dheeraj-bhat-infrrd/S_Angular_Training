@@ -384,6 +384,13 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
             queries.put( CommonConstants.PROFILE_MASTER_COLUMN,
                 userManagementService.getProfilesMasterById( CommonConstants.PROFILES_MASTER_REGION_ADMIN_PROFILE_ID ) );
             admins.addAll( userProfileDao.findByKeyValue( UserProfile.class, queries ) );
+            queries.clear();
+            if ( agentProfile.getCompany() != null ) {
+                queries.put( CommonConstants.COMPANY_COLUMN, agentProfile.getCompany() );
+                queries.put( CommonConstants.PROFILE_MASTER_COLUMN,
+                    userManagementService.getProfilesMasterById( CommonConstants.PROFILES_MASTER_COMPANY_ADMIN_PROFILE_ID ) );
+                admins.addAll( userProfileDao.findByKeyValue( UserProfile.class, queries ) );
+            }
         }
         for ( UserProfile admin : admins ) {
             String name = admin.getUser().getFirstName();
@@ -639,7 +646,8 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
             mailBody = mailBody.replaceAll( "\\[BaseUrl\\]", applicationBaseUrl );
             mailBody = mailBody.replaceAll( "\\[LogoUrl\\]", appLogoUrl );
             mailBody = mailBody.replaceAll( "\\[Link\\]", surveyUrl );
-            mailBody = mailBody.replaceAll( "\\[Name\\]", emailFormatHelper.getCustomerDisplayNameForEmail(custFirstName, custLastName) );
+            mailBody = mailBody.replaceAll( "\\[Name\\]",
+                emailFormatHelper.getCustomerDisplayNameForEmail( custFirstName, custLastName ) );
             mailBody = mailBody.replaceAll( "\\[AgentName\\]", agentName );
             mailBody = mailBody.replaceAll( "\\[AgentSignature\\]", agentSignature );
             mailBody = mailBody.replaceAll( "\\[RecipientEmail\\]", custEmail );
@@ -658,9 +666,10 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
                 LOG.error( "Exception caught while sending mail to " + custEmail + ". Nested exception is ", e );
             }
         } else {
-            emailServices.sendDefaultSurveyInvitationMail( custEmail, emailFormatHelper.getCustomerDisplayNameForEmail(custFirstName, custLastName), user.getFirstName()
-                + ( user.getLastName() != null ? " " + user.getLastName() : "" ), surveyUrl, user.getEmailId(), agentSignature,
-                companyName, dateFormat.format( new Date() ), currentYear, fullAddress );
+            emailServices.sendDefaultSurveyInvitationMail( custEmail,
+                emailFormatHelper.getCustomerDisplayNameForEmail( custFirstName, custLastName ),
+                user.getFirstName() + ( user.getLastName() != null ? " " + user.getLastName() : "" ), surveyUrl,
+                user.getEmailId(), agentSignature, companyName, dateFormat.format( new Date() ), currentYear, fullAddress );
         }
         LOG.info( "sendSurveyRestartMail() finished." );
     }
@@ -889,7 +898,8 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
             mailBody = mailBody.replaceAll( "\\[LogoUrl\\]", appLogoUrl );
             mailBody = mailBody.replaceAll( "\\[Link\\]", surveyUrl );
             mailBody = mailBody.replaceAll( "\\[FirstName\\]", custFirstName );
-            mailBody = mailBody.replaceAll( "\\[Name\\]", emailFormatHelper.getCustomerDisplayNameForEmail(custFirstName, custLastName) );
+            mailBody = mailBody.replaceAll( "\\[Name\\]",
+                emailFormatHelper.getCustomerDisplayNameForEmail( custFirstName, custLastName ) );
             mailBody = mailBody.replaceAll( "\\[AgentName\\]", "" );
             mailBody = mailBody.replaceAll( "\\[AgentSignature\\]", agentSignature );
             mailBody = mailBody.replaceAll( "\\[RecipientEmail\\]", custEmail );
@@ -914,9 +924,10 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
                 LOG.error( "Exception caught while sending mail to " + custEmail + ". Nested exception is ", e );
             }
         } else {
-            emailServices.sendDefaultSurveyInvitationMail( custEmail, emailFormatHelper.getCustomerDisplayNameForEmail(custFirstName, custLastName), user.getFirstName()
-                + ( user.getLastName() != null ? " " + user.getLastName() : "" ), surveyUrl, user.getEmailId(), agentSignature,
-                companyName, dateFormat.format( new Date() ), currentYear, fullAddress );
+            emailServices.sendDefaultSurveyInvitationMail( custEmail,
+                emailFormatHelper.getCustomerDisplayNameForEmail( custFirstName, custLastName ),
+                user.getFirstName() + ( user.getLastName() != null ? " " + user.getLastName() : "" ), surveyUrl,
+                user.getEmailId(), agentSignature, companyName, dateFormat.format( new Date() ), currentYear, fullAddress );
         }
         LOG.debug( "sendInvitationMailByAgent() finished." );
     }
@@ -943,7 +954,8 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
             mailBody = mailBody.replaceAll( "\\[BaseUrl\\]", applicationBaseUrl );
             mailBody = mailBody.replaceAll( "\\[FirstName\\]", custFirstName );
             mailBody = mailBody.replaceAll( "\\[AgentName\\]", user.getFirstName() + " " + user.getLastName() );
-            mailBody = mailBody.replaceAll( "\\[Name\\]", emailFormatHelper.getCustomerDisplayNameForEmail(custFirstName, custLastName) );
+            mailBody = mailBody.replaceAll( "\\[Name\\]",
+                emailFormatHelper.getCustomerDisplayNameForEmail( custFirstName, custLastName ) );
             mailBody = mailBody.replaceAll( "\\[Link\\]", link );
             mailBody = mailBody.replaceAll( "null", "" );
 
@@ -1010,19 +1022,22 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
             return false;
         }
     }
-    
-	@Override
-	@Transactional
-	public SurveyPreInitiation getPreInitiatedSurveyById(long surveyPreInitiationId) throws NoRecordsFetchedException {
-		LOG.debug("Method getPreInitiatedSurveyById() called");
 
-		SurveyPreInitiation surveyPreInitiation = surveyPreInitiationDao.findById(SurveyPreInitiation.class, surveyPreInitiationId);
 
-		if (surveyPreInitiation == null) {
-			throw new NoRecordsFetchedException("No records found for surveyPreInitiation with id : " + surveyPreInitiationId);
-		}
+    @Override
+    @Transactional
+    public SurveyPreInitiation getPreInitiatedSurveyById( long surveyPreInitiationId ) throws NoRecordsFetchedException
+    {
+        LOG.debug( "Method getPreInitiatedSurveyById() called" );
 
-		return surveyPreInitiation;
-	}
+        SurveyPreInitiation surveyPreInitiation = surveyPreInitiationDao.findById( SurveyPreInitiation.class,
+            surveyPreInitiationId );
+
+        if ( surveyPreInitiation == null ) {
+            throw new NoRecordsFetchedException( "No records found for surveyPreInitiation with id : " + surveyPreInitiationId );
+        }
+
+        return surveyPreInitiation;
+    }
 }
 // JIRA SS-119 by RM-05:EOC
