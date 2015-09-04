@@ -161,9 +161,6 @@ public class ProfileManagementController
     @Autowired
     private SettingsSetter settingsSetter;
 
-    @Autowired
-    private SettingsManager settingsManager;
-
 
     @Transactional
     @RequestMapping ( value = "/showprofilepage", method = RequestMethod.GET)
@@ -197,13 +194,6 @@ public class ProfileManagementController
         String entityType = request.getParameter( "entityType" );
         if ( entityType == null || entityType.isEmpty() ) {
             entityType = (String) session.getAttribute( CommonConstants.ENTITY_TYPE_COLUMN );
-        }
-        Map<SettingsForApplication, OrganizationUnit> map = null;
-        try {
-            map = getPrimaryHierarchyByEntity( entityType, entityId );
-        } catch ( InvalidInputException | InvalidSettingsStateException e1 ) {
-            // TODO Auto-generated catch block
-            LOG.error( "Invalid Settings Value for Organization Unit " );
         }
         sessionHelper.updateSelectedProfile( session, entityId, entityType );
 
@@ -4554,55 +4544,4 @@ public class ProfileManagementController
         return CommonConstants.SUCCESS_ATTRIBUTE;
     }
 
-
-    private Map<SettingsForApplication, OrganizationUnit> getPrimaryHierarchyByEntity( String entityType, long entityId )
-        throws InvalidInputException, InvalidSettingsStateException
-    {
-        LOG.info( "Inside method getPrimaryHeirarchyByEntity for entity " + entityType );
-        Map<String, Long> hierarchyMap = new HashMap<String, Long>();
-        long companyId = 0;
-        long regionId = 0;
-        long branchId = 0;
-        if ( entityType.equalsIgnoreCase( CommonConstants.COMPANY_ID ) ) {
-            companyId = entityId;
-        } else if ( entityType.equalsIgnoreCase( CommonConstants.REGION_ID ) ) {
-            Company company = organizationManagementService.getPrimaryCompanyByRegion( entityId );
-            if ( company == null ) {
-                throw new InvalidInputException( "Company not found for this region " );
-            }
-            companyId = company.getCompanyId();
-            regionId = entityId;
-
-        } else if ( entityType.equalsIgnoreCase( CommonConstants.BRANCH_ID ) ) {
-            Region region = organizationManagementService.getPrimaryRegionByBranch( entityId );
-            if ( region == null ) {
-                throw new InvalidInputException( "Region not found for this branch " );
-            }
-            Company company = region.getCompany();
-            if ( company == null ) {
-                throw new InvalidInputException( "Company not found for this region " );
-            }
-            companyId = company.getCompanyId();
-            regionId = region.getRegionId();
-            branchId = entityId;
-        } else if ( entityType.equalsIgnoreCase( CommonConstants.AGENT_ID ) ) {
-            hierarchyMap = userManagementService.getPrimaryUserProfileByAgentId( entityId );
-            companyId = hierarchyMap.get( CommonConstants.COMPANY_ID_COLUMN );
-            regionId = hierarchyMap.get( CommonConstants.REGION_ID_COLUMN );
-            branchId = hierarchyMap.get( CommonConstants.BRANCH_ID_COLUMN );
-        } else {
-            throw new InvalidInputException( "Entity Type Is Invalid " );
-        }
-
-        List<SettingsDetails> settingsDetailsList = settingsManager
-            .getScoreForCompleteHeirarchy( companyId, branchId, regionId );
-
-        LOG.info( "Calculate lock and setting score " );
-        Map<String, Long> totalScore = settingsManager.calculateSettingsScore( settingsDetailsList );
-        long currentLockAggregateValue = totalScore.get( CommonConstants.LOCK_SCORE );
-        long currentSetAggregateValue = totalScore.get( CommonConstants.SETTING_SCORE );
-        return settingsManager.getClosestSettingLevel( String.valueOf( currentSetAggregateValue ),
-            String.valueOf( currentLockAggregateValue ) );
-
-    }
 }
