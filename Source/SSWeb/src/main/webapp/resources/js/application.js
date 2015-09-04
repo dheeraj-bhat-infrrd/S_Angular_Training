@@ -1121,6 +1121,10 @@ $(document).on('click','.da-dd-item',function(e){
 	$('#dashboard-sel').html($(this).html());
 	$('#da-dd-wrapper-profiles').slideToggle(200);
 	$('#da-dd-wrapper-profiles').perfectScrollbar('update');
+	
+	attrName = $(this).attr('data-column-type');
+	attrVal = $(this).attr('data-column-value');
+	
 	// update selected profile in session
 	updateCurrentProfile($(this).attr('data-column-type'), $(this).attr('data-column-value'));
 
@@ -7974,7 +7978,6 @@ function createEditProfileUrlPopup(header, body) {
 }
 
 function updateProfileUrl(){
-	//TODO : Implement this method...
 	window.open("./editprofileurl.do","_blank", "width=800,height=600,scrollbars=yes");
 }
 

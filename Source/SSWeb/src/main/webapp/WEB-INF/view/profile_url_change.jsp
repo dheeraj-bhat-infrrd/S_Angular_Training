@@ -33,7 +33,7 @@
 								<label class="url-change-input-label"><spring:message code="label.profileurlchange.key"/></label>
 								<div>
 									<span>${profileBaseUrl}</span>
-									<input class="profile-url-input" name="profileUrlBlock" type="text" autofocus="autofocus">
+									<input class="profile-url-input" name="profileUrlBlock" type="text" autofocus="autofocus" value = "${profileSettings.getProfileName()}">
 									<span>/</span>
 								</div>
 							</div>
@@ -87,16 +87,15 @@ function validateprofileUrlEditForm() {
 		async : true,
 		success : function(data) {
 			var profileExists = data;
-			console.log(profileExists);
 			if(profileExists == "true"){
 				$('#overlay-toast').text("The entered profile name already exists");
 				showToast();
 				return false;
 			}
-			else if(profileExists == "false"){
+			else{
 				$('#overlay-toast').text("Url updated successfully");
 				showToast();
-				window.opener.location.reload();
+				window.opener.$("#prof-header-url").html(data);
 				setTimeout(function(){
 				    window.close();
 				},3000);

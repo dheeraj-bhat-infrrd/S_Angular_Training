@@ -1926,10 +1926,10 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
      * Method to fetch social posts for a particular user.
      */
     @Override
-    public long getPostsCountForUser( long userId )
+    public long getPostsCountForUser( String columnName, long columnValue )
     {
         LOG.info( "Method to fetch count of social posts for a particular user, getPostsCountForUser() started." );
-        long postsCount = socialPostDao.getPostsCountByUserId( userId );
+        long postsCount = socialPostDao.getPostsCountByUserId( columnName, columnValue );
         LOG.info( "Method to fetch count of social posts for a particular user, getPostsCountForUser() finished." );
         return postsCount;
     }
@@ -2204,7 +2204,9 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
         Map<Long, AgentRankingReport> agentReportData = new HashMap<>();
         surveyDetailsDao.getAverageScore( startDate, endDate, agentReportData, columnName, iden );
         surveyDetailsDao.getCompletedSurveysCount( startDate, endDate, agentReportData, columnName, iden );
-        surveyPreInitiationDao.getIncompleteSurveysCount( startDate, endDate, agentReportData );
+        // FIX for JIRA: SS-1112: BOC
+        // surveyPreInitiationDao.getIncompleteSurveysCount( startDate, endDate, agentReportData );
+        // FIX for JIRA: SS-1112: EOC
         organizationUnitSettingsDao.setAgentDetails( agentReportData );
 
         LOG.info( "Method to get Agent's Report for a specific time and all time finished." );

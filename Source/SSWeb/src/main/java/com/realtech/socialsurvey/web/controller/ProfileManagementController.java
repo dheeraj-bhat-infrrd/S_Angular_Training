@@ -5098,11 +5098,12 @@ public class ProfileManagementController {
 	 */
 	@ResponseBody
 	@RequestMapping(value = "/postscountforuser")
-	public String getPostsCountForUser(HttpServletRequest request, Model model) {
+	public String getPostsCountForUser(HttpServletRequest request) {
 		LOG.info("Method to get posts for the user, getPostsCountForUser() started");
-		User user = sessionHelper.getCurrentUser();
-		long count = profileManagementService.getPostsCountForUser(user
-				.getUserId());
+		HttpSession session = request.getSession(false);
+		long entityId = (long) session.getAttribute(CommonConstants.ENTITY_ID_COLUMN);
+		String entityType = (String) session.getAttribute(CommonConstants.ENTITY_TYPE_COLUMN);
+		long count = profileManagementService.getPostsCountForUser(entityType, entityId);
 		LOG.info("Method to get posts for the user, getPostsCountForUser() finished");
 		return count + "";
 	}
@@ -5437,7 +5438,8 @@ public class ProfileManagementController {
 			response = "true";
 		} else {
 			LOG.info("Profile didn't exist");
-			response = "false";
+			String completeProfileUrl = profileSettings.getCompleteProfileUrl();
+			response = "<a href=\"" +completeProfileUrl + "\" target=\"_blank\">"+ completeProfileUrl +"</a>";
 			session.setAttribute(CommonConstants.USER_PROFILE_SETTINGS,
 					profileSettings);
 		}
