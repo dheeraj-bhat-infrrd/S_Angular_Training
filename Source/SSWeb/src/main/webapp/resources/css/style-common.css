@@ -6961,13 +6961,13 @@ a.sq-btn-post-social:hover, a.sq-btn-post-social:visited {
 .dash-download-sel-item {
 	background-color: #fff;
 	height: 30px;
-	width: 45%;
+	width: 40%;
 	border: none;
 	border-right: 1px solid #dcdcdc;
 	outline: none;
 }
 .dash-down-go-button{
-  width: 12.5%;
+  width: 14.5%;
   float: right;
   background-color: #009FE0;
   color: white;
