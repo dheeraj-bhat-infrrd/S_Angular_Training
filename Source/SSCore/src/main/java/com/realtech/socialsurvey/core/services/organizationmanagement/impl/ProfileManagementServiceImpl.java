@@ -2711,6 +2711,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 
 
     @Override
+    @Transactional
     public Map<SettingsForApplication, OrganizationUnit> getPrimaryHierarchyByEntity( String entityType, long entityId )
         throws InvalidInputException, InvalidSettingsStateException
     {
