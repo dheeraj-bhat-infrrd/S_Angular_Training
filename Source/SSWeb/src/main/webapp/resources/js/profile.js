@@ -630,7 +630,7 @@ function paintReviews(result){
 		}
 		if (date != null) {
 			date = convertUTCToUserDate(date);
-			reviewsHtml += '		<div class="ppl-head-2">' + date.getMonthName() + " " + date.getDate() + ", " + date.getFullYear() + '</div>'; 
+			reviewsHtml += '		<div class="ppl-head-2">' + date.toString("MMMM d, yyyy") + '</div>'; 
 		}
 		
 		reviewsHtml += '		</div>';
