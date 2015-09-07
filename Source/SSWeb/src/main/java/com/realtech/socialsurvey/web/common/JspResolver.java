@@ -113,6 +113,8 @@ public interface JspResolver {
 	public static final String PROFILE_HIERARCHY = "profile_hierarchy";
 	public static final String PROFILE_HIERARCHY_CLICK_REGION = "profile_hierarchy_region";
 	public static final String PROFILE_HIERARCHY_CLICK_BRANCH = "profile_hierarchy_branch";
+	public static final String PROFILE_URL_WARNING = "profile_url_warning";
+	public static final String PROFILE_URL_CHANGE = "profile_url_change";
 
 	// Admin pages
 	public static final String ADMIN_LOGIN = "admin/admin_login";

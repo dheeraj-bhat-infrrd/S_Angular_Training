@@ -40,6 +40,7 @@ import com.fasterxml.jackson.databind.type.TypeFactory;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
+import com.realtech.socialsurvey.core.commons.Utils;
 import com.realtech.socialsurvey.core.dao.impl.MongoOrganizationUnitSettingDaoImpl;
 import com.realtech.socialsurvey.core.entities.Achievement;
 import com.realtech.socialsurvey.core.entities.AgentSettings;
@@ -143,6 +144,9 @@ public class ProfileManagementController
     @Autowired
     private SolrSearchService solrSearchService;
 
+    @Autowired
+    private Utils utils;
+
     @Value ( "${APPLICATION_BASE_URL}")
     private String applicationBaseUrl;
 
@@ -161,6 +165,9 @@ public class ProfileManagementController
     @Autowired
     private SettingsSetter settingsSetter;
 
+    @Autowired
+    private SettingsManager settingsManager;
+
 
     @Transactional
     @RequestMapping ( value = "/showprofilepage", method = RequestMethod.GET)
@@ -169,7 +176,6 @@ public class ProfileManagementController
         LOG.info( "Method showProfileEditPage() called from ProfileManagementService" );
         HttpSession session = request.getSession( false );
         User user = sessionHelper.getCurrentUser();
-
         // getting session variables
         AccountType accountType = (AccountType) session.getAttribute( CommonConstants.ACCOUNT_TYPE_IN_SESSION );
         UserSettings userSettings = (UserSettings) session.getAttribute( CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION );
@@ -179,7 +185,6 @@ public class ProfileManagementController
         if ( entityIdStr == null || entityIdStr.isEmpty() ) {
             entityId = (long) session.getAttribute( CommonConstants.ENTITY_ID_COLUMN );
         } else {
-
             try {
                 if ( entityIdStr != null && !entityIdStr.equals( "" ) ) {
                     entityId = Long.parseLong( entityIdStr );
@@ -195,6 +200,8 @@ public class ProfileManagementController
         if ( entityType == null || entityType.isEmpty() ) {
             entityType = (String) session.getAttribute( CommonConstants.ENTITY_TYPE_COLUMN );
         }
+
+
         sessionHelper.updateSelectedProfile( session, entityId, entityType );
 
         // fetching details from profile
@@ -747,8 +754,8 @@ public class ProfileManagementController
                     throw new InvalidInputException( "No Agent settings found in current session" );
                 }
                 contactDetailsSettings = agentSettings.getContact_details();
-                //for individual set vertical/industry
-                //contactDetailsSettings.setIndustry(vertical);
+                // for individual set vertical/industry
+                // contactDetailsSettings.setIndustry(vertical);
                 contactDetailsSettings = updateBasicDetail( contactDetailsSettings, name, title, location );
                 contactDetailsSettings = profileManagementService.updateAgentContactDetails(
                     MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION, agentSettings, contactDetailsSettings );
@@ -757,8 +764,12 @@ public class ProfileManagementController
                 // update user name
                 profileManagementService.updateIndividualName( user.getUserId(), agentSettings.getIden(), name );
 
-                /*agentSettings.setVertical(vertical);
-                profileManagementService.updateVertical(MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION, agentSettings, vertical);*/
+                /*
+                 * agentSettings.setVertical(vertical);
+                 * profileManagementService.
+                 * updateVertical(MongoOrganizationUnitSettingDaoImpl
+                 * .AGENT_SETTINGS_COLLECTION, agentSettings, vertical);
+                 */
 
                 userSettings.setAgentSettings( agentSettings );
 
@@ -867,13 +878,6 @@ public class ProfileManagementController
                 contactDetailsSettings = companySettings.getContact_details();
                 contactDetailsSettings = updateAddressDetail( contactDetailsSettings, address1, address2, country, countryCode,
                     state, city, zipcode );
-
-                Company company = userManagementService.getCompanyById( companySettings.getIden() );
-                if ( company != null ) {
-                    settingsSetter.setSettingsValueForCompany( company, SettingsForApplication.ADDRESS,
-                        CommonConstants.SET_SETTINGS );
-                    userManagementService.updateCompany( company );
-                }
                 contactDetailsSettings = profileManagementService.updateContactDetails(
                     MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION, companySettings, contactDetailsSettings );
                 companySettings.setContact_details( contactDetailsSettings );
@@ -886,12 +890,6 @@ public class ProfileManagementController
                 contactDetailsSettings = regionSettings.getContact_details();
                 contactDetailsSettings = updateAddressDetail( contactDetailsSettings, address1, address2, country, countryCode,
                     state, city, zipcode );
-                Region region = userManagementService.getRegionById( regionSettings.getIden() );
-                if ( region != null ) {
-                    settingsSetter.setSettingsValueForRegion( region, SettingsForApplication.ADDRESS,
-                        CommonConstants.SET_SETTINGS );
-                    userManagementService.updateRegion( region );
-                }
                 contactDetailsSettings = profileManagementService.updateContactDetails(
                     MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION, regionSettings, contactDetailsSettings );
                 regionSettings.setContact_details( contactDetailsSettings );
@@ -904,12 +902,6 @@ public class ProfileManagementController
                 contactDetailsSettings = branchSettings.getContact_details();
                 contactDetailsSettings = updateAddressDetail( contactDetailsSettings, address1, address2, country, countryCode,
                     state, city, zipcode );
-                Branch branch = userManagementService.getBranchById( branchSettings.getIden() );
-                if ( branch != null ) {
-                    settingsSetter.setSettingsValueForBranch( branch, SettingsForApplication.ADDRESS,
-                        CommonConstants.SET_SETTINGS );
-                    userManagementService.updateBranch( branch );
-                }
                 contactDetailsSettings = profileManagementService.updateContactDetails(
                     MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION, branchSettings, contactDetailsSettings );
                 branchSettings.setContact_details( contactDetailsSettings );
@@ -1140,14 +1132,6 @@ public class ProfileManagementController
                 }
                 contactDetailsSettings = companySettings.getContact_details();
                 contactDetailsSettings = updateSummaryDetail( contactDetailsSettings, industry, location, aboutme );
-                if ( location != null ) {
-                    Company company = userManagementService.getCompanyById( companySettings.getIden() );
-                    if ( company != null ) {
-                        settingsSetter.setSettingsValueForCompany( company, SettingsForApplication.LOCATION,
-                            CommonConstants.SET_SETTINGS );
-                        userManagementService.updateCompany( company );
-                    }
-                }
                 contactDetailsSettings = profileManagementService.updateContactDetails(
                     MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION, companySettings, contactDetailsSettings );
                 companySettings.setContact_details( contactDetailsSettings );
@@ -1159,14 +1143,6 @@ public class ProfileManagementController
                 }
                 contactDetailsSettings = regionSettings.getContact_details();
                 contactDetailsSettings = updateSummaryDetail( contactDetailsSettings, industry, location, aboutme );
-                if ( location != null ) {
-                    Region region = userManagementService.getRegionById( regionSettings.getIden() );
-                    if ( region != null ) {
-                        settingsSetter.setSettingsValueForRegion( region, SettingsForApplication.LOCATION,
-                            CommonConstants.SET_SETTINGS );
-                        userManagementService.updateRegion( region );
-                    }
-                }
                 contactDetailsSettings = profileManagementService.updateContactDetails(
                     MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION, regionSettings, contactDetailsSettings );
                 regionSettings.setContact_details( contactDetailsSettings );
@@ -1178,14 +1154,6 @@ public class ProfileManagementController
                 }
                 contactDetailsSettings = branchSettings.getContact_details();
                 contactDetailsSettings = updateSummaryDetail( contactDetailsSettings, industry, location, aboutme );
-                if ( location != null ) {
-                    Branch branch = userManagementService.getBranchById( branchSettings.getIden() );
-                    if ( branch != null ) {
-                        settingsSetter.setSettingsValueForBranch( branch, SettingsForApplication.LOCATION,
-                            CommonConstants.SET_SETTINGS );
-                        userManagementService.updateBranch( branch );
-                    }
-                }
                 contactDetailsSettings = profileManagementService.updateContactDetails(
                     MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION, branchSettings, contactDetailsSettings );
                 branchSettings.setContact_details( contactDetailsSettings );
@@ -1292,14 +1260,6 @@ public class ProfileManagementController
                 }
                 profileManagementService.updateLogo( MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION,
                     companySettings, logoUrl );
-
-                Company company = userManagementService.getCompanyById( companySettings.getIden() );
-                if ( company != null ) {
-                    settingsSetter.setSettingsValueForCompany( company, SettingsForApplication.LOGO,
-                        CommonConstants.SET_SETTINGS );
-                    userManagementService.updateCompany( company );
-                }
-
                 companySettings.setLogo( logoUrl );
                 userSettings.setCompanySettings( companySettings );
             } else if ( entityType.equals( CommonConstants.REGION_ID_COLUMN ) ) {
@@ -1309,13 +1269,6 @@ public class ProfileManagementController
                 }
                 profileManagementService.updateLogo( MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION,
                     regionSettings, logoUrl );
-                Region region = userManagementService.getRegionById( regionSettings.getIden() );
-                if ( region != null ) {
-                    settingsSetter
-                        .setSettingsValueForRegion( region, SettingsForApplication.LOGO, CommonConstants.SET_SETTINGS );
-                    userManagementService.updateRegion( region );
-                }
-
                 regionSettings.setLogo( logoUrl );
                 userSettings.getRegionSettings().put( entityId, regionSettings );
             } else if ( entityType.equals( CommonConstants.BRANCH_ID_COLUMN ) ) {
@@ -1325,12 +1278,6 @@ public class ProfileManagementController
                 }
                 profileManagementService.updateLogo( MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION,
                     branchSettings, logoUrl );
-                Branch branch = userManagementService.getBranchById( branchSettings.getIden() );
-                if ( branch != null ) {
-                    settingsSetter
-                        .setSettingsValueForBranch( branch, SettingsForApplication.LOGO, CommonConstants.SET_SETTINGS );
-                    userManagementService.updateBranch( branch );
-                }
                 branchSettings.setLogo( logoUrl );
                 userSettings.getRegionSettings().put( entityId, branchSettings );
             } else if ( entityType.equals( CommonConstants.AGENT_ID_COLUMN ) ) {
@@ -1774,12 +1721,6 @@ public class ProfileManagementController
                 }
                 contactDetailsSettings = companySettings.getContact_details();
                 contactDetailsSettings = updatePhoneNumbers( contactDetailsSettings, phoneNumbers );
-                Company company = userManagementService.getCompanyById( companySettings.getIden() );
-                if ( company != null ) {
-                    settingsSetter.setSettingsValueForCompany( company, SettingsForApplication.PHONE,
-                        CommonConstants.SET_SETTINGS );
-                    userManagementService.updateCompany( company );
-                }
                 contactDetailsSettings = profileManagementService.updateContactDetails(
                     MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION, companySettings, contactDetailsSettings );
                 companySettings.setContact_details( contactDetailsSettings );
@@ -1791,12 +1732,6 @@ public class ProfileManagementController
                 }
                 contactDetailsSettings = regionSettings.getContact_details();
                 contactDetailsSettings = updatePhoneNumbers( contactDetailsSettings, phoneNumbers );
-                Region region = userManagementService.getRegionById( regionSettings.getIden() );
-                if ( region != null ) {
-                    settingsSetter.setSettingsValueForRegion( region, SettingsForApplication.PHONE,
-                        CommonConstants.SET_SETTINGS );
-                    userManagementService.updateRegion( region );
-                }
                 contactDetailsSettings = profileManagementService.updateContactDetails(
                     MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION, regionSettings, contactDetailsSettings );
                 regionSettings.setContact_details( contactDetailsSettings );
@@ -1808,13 +1743,6 @@ public class ProfileManagementController
                 }
                 contactDetailsSettings = branchSettings.getContact_details();
                 contactDetailsSettings = updatePhoneNumbers( contactDetailsSettings, phoneNumbers );
-                Branch branch = userManagementService.getBranchById( branchSettings.getIden() );
-                if ( branch != null ) {
-                    settingsSetter.setSettingsValueForBranch( branch, SettingsForApplication.PHONE,
-                        CommonConstants.SET_SETTINGS );
-                    userManagementService.updateBranch( branch );
-                }
-
                 contactDetailsSettings = profileManagementService.updateContactDetails(
                     MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION, branchSettings, contactDetailsSettings );
                 branchSettings.setContact_details( contactDetailsSettings );
@@ -2078,13 +2006,6 @@ public class ProfileManagementController
                 profileManagementService.updateSocialMediaTokens(
                     MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION, companySettings, socialMediaTokens );
                 companySettings.setSocialMediaTokens( socialMediaTokens );
-                //update SETTINGS_SET_STATUS of COMPANY table to set.
-                Company company = userManagementService.getCompanyById( companySettings.getIden() );
-                if ( company != null ) {
-                    settingsSetter.setSettingsValueForCompany( company, SettingsForApplication.FACEBOOK,
-                        CommonConstants.SET_SETTINGS );
-                    userManagementService.updateCompany( company );
-                }
                 userSettings.setCompanySettings( companySettings );
             } else if ( entityType.equals( CommonConstants.REGION_ID_COLUMN ) ) {
                 OrganizationUnitSettings regionSettings = organizationManagementService.getRegionSettings( entityId );
@@ -2096,13 +2017,6 @@ public class ProfileManagementController
                 profileManagementService.updateSocialMediaTokens(
                     MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION, regionSettings, socialMediaTokens );
                 regionSettings.setSocialMediaTokens( socialMediaTokens );
-                //update SETTINGS_SET_STATUS of REGION table to set.
-                Region region = userManagementService.getRegionById( regionSettings.getIden() );
-                if ( region != null ) {
-                    settingsSetter.setSettingsValueForRegion( region, SettingsForApplication.FACEBOOK,
-                        CommonConstants.SET_SETTINGS );
-                    userManagementService.updateRegion( region );
-                }
                 userSettings.getRegionSettings().put( entityId, regionSettings );
             } else if ( entityType.equals( CommonConstants.BRANCH_ID_COLUMN ) ) {
                 OrganizationUnitSettings branchSettings = organizationManagementService.getBranchSettingsDefault( entityId );
@@ -2114,13 +2028,6 @@ public class ProfileManagementController
                 profileManagementService.updateSocialMediaTokens(
                     MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION, branchSettings, socialMediaTokens );
                 branchSettings.setSocialMediaTokens( socialMediaTokens );
-                //update SETTINGS_SET_STATUS of BRANCH table to set.
-                Branch branch = userManagementService.getBranchById( branchSettings.getIden() );
-                if ( branch != null ) {
-                    settingsSetter.setSettingsValueForBranch( branch, SettingsForApplication.FACEBOOK,
-                        CommonConstants.SET_SETTINGS );
-                    userManagementService.updateBranch( branch );
-                }
                 userSettings.getRegionSettings().put( entityId, branchSettings );
             } else if ( entityType.equals( CommonConstants.AGENT_ID_COLUMN ) ) {
                 AgentSettings agentSettings = userManagementService.getUserSettings( entityId );
@@ -2213,13 +2120,6 @@ public class ProfileManagementController
                 profileManagementService.updateSocialMediaTokens(
                     MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION, companySettings, socialMediaTokens );
                 companySettings.setSocialMediaTokens( socialMediaTokens );
-                //update SETTINGS_SET_STATUS of COMPANY table to set.
-                Company company = userManagementService.getCompanyById( companySettings.getIden() );
-                if ( company != null ) {
-                    settingsSetter.setSettingsValueForCompany( company, SettingsForApplication.TWITTER,
-                        CommonConstants.SET_SETTINGS );
-                    userManagementService.updateCompany( company );
-                }
                 userSettings.setCompanySettings( companySettings );
             } else if ( entityType.equals( CommonConstants.REGION_ID_COLUMN ) ) {
                 OrganizationUnitSettings regionSettings = organizationManagementService.getRegionSettings( entityId );
@@ -2231,13 +2131,6 @@ public class ProfileManagementController
                 profileManagementService.updateSocialMediaTokens(
                     MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION, regionSettings, socialMediaTokens );
                 regionSettings.setSocialMediaTokens( socialMediaTokens );
-                //update SETTINGS_SET_STATUS of REGION table to set.
-                Region region = userManagementService.getRegionById( regionSettings.getIden() );
-                if ( region != null ) {
-                    settingsSetter.setSettingsValueForRegion( region, SettingsForApplication.TWITTER,
-                        CommonConstants.SET_SETTINGS );
-                    userManagementService.updateRegion( region );
-                }
                 userSettings.getRegionSettings().put( entityId, regionSettings );
             } else if ( entityType.equals( CommonConstants.BRANCH_ID_COLUMN ) ) {
                 OrganizationUnitSettings branchSettings = organizationManagementService.getBranchSettingsDefault( entityId );
@@ -2249,13 +2142,6 @@ public class ProfileManagementController
                 profileManagementService.updateSocialMediaTokens(
                     MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION, branchSettings, socialMediaTokens );
                 branchSettings.setSocialMediaTokens( socialMediaTokens );
-                //update SETTINGS_SET_STATUS of BRANCH table to set.
-                Branch branch = userManagementService.getBranchById( branchSettings.getIden() );
-                if ( branch != null ) {
-                    settingsSetter.setSettingsValueForBranch( branch, SettingsForApplication.TWITTER,
-                        CommonConstants.SET_SETTINGS );
-                    userManagementService.updateBranch( branch );
-                }
                 userSettings.getRegionSettings().put( entityId, branchSettings );
             } else if ( entityType.equals( CommonConstants.AGENT_ID_COLUMN ) ) {
                 AgentSettings agentSettings = userManagementService.getUserSettings( entityId );
@@ -2348,13 +2234,6 @@ public class ProfileManagementController
                 profileManagementService.updateSocialMediaTokens(
                     MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION, companySettings, socialMediaTokens );
                 companySettings.setSocialMediaTokens( socialMediaTokens );
-                //update SETTINGS_SET_STATUS of COMPANY table to set.
-                Company company = userManagementService.getCompanyById( companySettings.getIden() );
-                if ( company != null ) {
-                    settingsSetter.setSettingsValueForCompany( company, SettingsForApplication.LINKED_IN,
-                        CommonConstants.SET_SETTINGS );
-                    userManagementService.updateCompany( company );
-                }
                 userSettings.setCompanySettings( companySettings );
             } else if ( entityType.equals( CommonConstants.REGION_ID_COLUMN ) ) {
                 OrganizationUnitSettings regionSettings = organizationManagementService.getRegionSettings( entityId );
@@ -2366,13 +2245,6 @@ public class ProfileManagementController
                 profileManagementService.updateSocialMediaTokens(
                     MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION, regionSettings, socialMediaTokens );
                 regionSettings.setSocialMediaTokens( socialMediaTokens );
-                //update SETTINGS_SET_STATUS of REGION table to set.
-                Region region = userManagementService.getRegionById( regionSettings.getIden() );
-                if ( region != null ) {
-                    settingsSetter.setSettingsValueForRegion( region, SettingsForApplication.LINKED_IN,
-                        CommonConstants.SET_SETTINGS );
-                    userManagementService.updateRegion( region );
-                }
                 userSettings.getRegionSettings().put( entityId, regionSettings );
             } else if ( entityType.equals( CommonConstants.BRANCH_ID_COLUMN ) ) {
                 OrganizationUnitSettings branchSettings = organizationManagementService.getBranchSettingsDefault( entityId );
@@ -2384,13 +2256,6 @@ public class ProfileManagementController
                 profileManagementService.updateSocialMediaTokens(
                     MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION, branchSettings, socialMediaTokens );
                 branchSettings.setSocialMediaTokens( socialMediaTokens );
-                //update SETTINGS_SET_STATUS of BRANCH table to set.
-                Branch branch = userManagementService.getBranchById( branchSettings.getIden() );
-                if ( branch != null ) {
-                    settingsSetter.setSettingsValueForBranch( branch, SettingsForApplication.LINKED_IN,
-                        CommonConstants.SET_SETTINGS );
-                    userManagementService.updateBranch( branch );
-                }
                 userSettings.getRegionSettings().put( entityId, branchSettings );
             } else if ( entityType.equals( CommonConstants.AGENT_ID_COLUMN ) ) {
                 AgentSettings agentSettings = userManagementService.getUserSettings( entityId );
@@ -2490,13 +2355,6 @@ public class ProfileManagementController
                 profileManagementService.updateProfileStages( companySettings.getProfileStages(), companySettings,
                     MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION );
                 companySettings.setSocialMediaTokens( socialMediaTokens );
-                //update SETTINGS_SET_STATUS of COMPANY table to set.
-                Company company = userManagementService.getCompanyById( companySettings.getIden() );
-                if ( company != null ) {
-                    settingsSetter.setSettingsValueForCompany( company, SettingsForApplication.YELP,
-                        CommonConstants.SET_SETTINGS );
-                    userManagementService.updateCompany( company );
-                }
                 userSettings.setCompanySettings( companySettings );
             } else if ( entityType.equals( CommonConstants.REGION_ID_COLUMN ) ) {
                 OrganizationUnitSettings regionSettings = organizationManagementService.getRegionSettings( entityId );
@@ -2515,13 +2373,6 @@ public class ProfileManagementController
                 profileManagementService.updateProfileStages( regionSettings.getProfileStages(), regionSettings,
                     MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION );
                 regionSettings.setSocialMediaTokens( socialMediaTokens );
-                //update SETTINGS_SET_STATUS of REGION table to set.
-                Region region = userManagementService.getRegionById( regionSettings.getIden() );
-                if ( region != null ) {
-                    settingsSetter
-                        .setSettingsValueForRegion( region, SettingsForApplication.YELP, CommonConstants.SET_SETTINGS );
-                    userManagementService.updateRegion( region );
-                }
                 userSettings.getRegionSettings().put( entityId, regionSettings );
             } else if ( entityType.equals( CommonConstants.BRANCH_ID_COLUMN ) ) {
                 OrganizationUnitSettings branchSettings = organizationManagementService.getBranchSettingsDefault( entityId );
@@ -2539,13 +2390,6 @@ public class ProfileManagementController
                 }
                 profileManagementService.updateProfileStages( branchSettings.getProfileStages(), branchSettings,
                     MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION );
-                //update SETTINGS_SET_STATUS of BRANCH table to set.
-                Branch branch = userManagementService.getBranchById( branchSettings.getIden() );
-                if ( branch != null ) {
-                    settingsSetter
-                        .setSettingsValueForBranch( branch, SettingsForApplication.YELP, CommonConstants.SET_SETTINGS );
-                    userManagementService.updateBranch( branch );
-                }
                 branchSettings.setSocialMediaTokens( socialMediaTokens );
                 userSettings.getRegionSettings().put( entityId, branchSettings );
             } else if ( entityType.equals( CommonConstants.AGENT_ID_COLUMN ) ) {
@@ -2646,13 +2490,6 @@ public class ProfileManagementController
                 profileManagementService.updateSocialMediaTokens(
                     MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION, companySettings, socialMediaTokens );
                 companySettings.setSocialMediaTokens( socialMediaTokens );
-                //update SETTINGS_SET_STATUS of COMPANY table to set.
-                Company company = userManagementService.getCompanyById( companySettings.getIden() );
-                if ( company != null ) {
-                    settingsSetter.setSettingsValueForCompany( company, SettingsForApplication.GOOGLE_PLUS,
-                        CommonConstants.SET_SETTINGS );
-                    userManagementService.updateCompany( company );
-                }
                 userSettings.setCompanySettings( companySettings );
             } else if ( entityType.equals( CommonConstants.REGION_ID_COLUMN ) ) {
                 OrganizationUnitSettings regionSettings = organizationManagementService.getRegionSettings( entityId );
@@ -2664,13 +2501,6 @@ public class ProfileManagementController
                 profileManagementService.updateSocialMediaTokens(
                     MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION, regionSettings, socialMediaTokens );
                 regionSettings.setSocialMediaTokens( socialMediaTokens );
-                //update SETTINGS_SET_STATUS of REGION table to set.
-                Region region = userManagementService.getRegionById( regionSettings.getIden() );
-                if ( region != null ) {
-                    settingsSetter.setSettingsValueForRegion( region, SettingsForApplication.GOOGLE_PLUS,
-                        CommonConstants.SET_SETTINGS );
-                    userManagementService.updateRegion( region );
-                }
                 userSettings.getRegionSettings().put( entityId, regionSettings );
             } else if ( entityType.equals( CommonConstants.BRANCH_ID_COLUMN ) ) {
                 OrganizationUnitSettings branchSettings = organizationManagementService.getBranchSettingsDefault( entityId );
@@ -2682,13 +2512,6 @@ public class ProfileManagementController
                 profileManagementService.updateSocialMediaTokens(
                     MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION, branchSettings, socialMediaTokens );
                 branchSettings.setSocialMediaTokens( socialMediaTokens );
-                //update SETTINGS_SET_STATUS of BRANCH table to set.
-                Branch branch = userManagementService.getBranchById( branchSettings.getIden() );
-                if ( branch != null ) {
-                    settingsSetter.setSettingsValueForBranch( branch, SettingsForApplication.GOOGLE_PLUS,
-                        CommonConstants.SET_SETTINGS );
-                    userManagementService.updateBranch( branch );
-                }
                 userSettings.getRegionSettings().put( entityId, branchSettings );
             } else if ( entityType.equals( CommonConstants.AGENT_ID_COLUMN ) ) {
                 AgentSettings agentSettings = userManagementService.getUserSettings( entityId );
@@ -2782,13 +2605,6 @@ public class ProfileManagementController
                 profileManagementService.updateSocialMediaTokens(
                     MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION, companySettings, socialMediaTokens );
                 companySettings.setSocialMediaTokens( socialMediaTokens );
-                //update SETTINGS_SET_STATUS of COMPANY table to set.
-                Company company = userManagementService.getCompanyById( companySettings.getIden() );
-                if ( company != null ) {
-                    settingsSetter.setSettingsValueForCompany( company, SettingsForApplication.ZILLOW,
-                        CommonConstants.SET_SETTINGS );
-                    userManagementService.updateCompany( company );
-                }
                 userSettings.setCompanySettings( companySettings );
             } else if ( entityType.equals( CommonConstants.REGION_ID_COLUMN ) ) {
                 OrganizationUnitSettings regionSettings = organizationManagementService.getRegionSettings( entityId );
@@ -2800,13 +2616,6 @@ public class ProfileManagementController
                 profileManagementService.updateSocialMediaTokens(
                     MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION, regionSettings, socialMediaTokens );
                 regionSettings.setSocialMediaTokens( socialMediaTokens );
-                //update SETTINGS_SET_STATUS of REGION table to set.
-                Region region = userManagementService.getRegionById( regionSettings.getIden() );
-                if ( region != null ) {
-                    settingsSetter.setSettingsValueForRegion( region, SettingsForApplication.ZILLOW,
-                        CommonConstants.SET_SETTINGS );
-                    userManagementService.updateRegion( region );
-                }
                 userSettings.getRegionSettings().put( entityId, regionSettings );
             } else if ( entityType.equals( CommonConstants.BRANCH_ID_COLUMN ) ) {
                 OrganizationUnitSettings branchSettings = organizationManagementService.getBranchSettingsDefault( entityId );
@@ -2818,13 +2627,6 @@ public class ProfileManagementController
                 profileManagementService.updateSocialMediaTokens(
                     MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION, branchSettings, socialMediaTokens );
                 branchSettings.setSocialMediaTokens( socialMediaTokens );
-                //update SETTINGS_SET_STATUS of BRANCH table to set.
-                Branch branch = userManagementService.getBranchById( branchSettings.getIden() );
-                if ( branch != null ) {
-                    settingsSetter.setSettingsValueForBranch( branch, SettingsForApplication.ZILLOW,
-                        CommonConstants.SET_SETTINGS );
-                    userManagementService.updateBranch( branch );
-                }
                 userSettings.getRegionSettings().put( entityId, branchSettings );
             } else if ( entityType.equals( CommonConstants.AGENT_ID_COLUMN ) ) {
                 AgentSettings agentSettings = userManagementService.getUserSettings( entityId );
@@ -2918,13 +2720,6 @@ public class ProfileManagementController
                 profileManagementService.updateSocialMediaTokens(
                     MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION, companySettings, socialMediaTokens );
                 companySettings.setSocialMediaTokens( socialMediaTokens );
-                //update SETTINGS_SET_STATUS of COMPANY table to set.
-                Company company = userManagementService.getCompanyById( companySettings.getIden() );
-                if ( company != null ) {
-                    settingsSetter.setSettingsValueForCompany( company, SettingsForApplication.REALTOR,
-                        CommonConstants.SET_SETTINGS );
-                    userManagementService.updateCompany( company );
-                }
                 userSettings.setCompanySettings( companySettings );
             } else if ( entityType.equals( CommonConstants.REGION_ID_COLUMN ) ) {
                 OrganizationUnitSettings regionSettings = organizationManagementService.getRegionSettings( entityId );
@@ -2936,13 +2731,6 @@ public class ProfileManagementController
                 profileManagementService.updateSocialMediaTokens(
                     MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION, regionSettings, socialMediaTokens );
                 regionSettings.setSocialMediaTokens( socialMediaTokens );
-                //update SETTINGS_SET_STATUS of REGION table to set.
-                Region region = userManagementService.getRegionById( regionSettings.getIden() );
-                if ( region != null ) {
-                    settingsSetter.setSettingsValueForRegion( region, SettingsForApplication.REALTOR,
-                        CommonConstants.SET_SETTINGS );
-                    userManagementService.updateRegion( region );
-                }
                 userSettings.getRegionSettings().put( entityId, regionSettings );
             } else if ( entityType.equals( CommonConstants.BRANCH_ID_COLUMN ) ) {
                 OrganizationUnitSettings branchSettings = organizationManagementService.getBranchSettingsDefault( entityId );
@@ -2954,13 +2742,6 @@ public class ProfileManagementController
                 profileManagementService.updateSocialMediaTokens(
                     MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION, branchSettings, socialMediaTokens );
                 branchSettings.setSocialMediaTokens( socialMediaTokens );
-                //update SETTINGS_SET_STATUS of BRANCH table to set.
-                Branch branch = userManagementService.getBranchById( branchSettings.getIden() );
-                if ( branch != null ) {
-                    settingsSetter.setSettingsValueForBranch( branch, SettingsForApplication.REALTOR,
-                        CommonConstants.SET_SETTINGS );
-                    userManagementService.updateBranch( branch );
-                }
                 userSettings.getRegionSettings().put( entityId, branchSettings );
             } else if ( entityType.equals( CommonConstants.AGENT_ID_COLUMN ) ) {
                 AgentSettings agentSettings = userManagementService.getUserSettings( entityId );
@@ -3054,13 +2835,6 @@ public class ProfileManagementController
                 profileManagementService.updateSocialMediaTokens(
                     MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION, companySettings, socialMediaTokens );
                 companySettings.setSocialMediaTokens( socialMediaTokens );
-                //update SETTINGS_SET_STATUS of COMPANY table to set.
-                Company company = userManagementService.getCompanyById( companySettings.getIden() );
-                if ( company != null ) {
-                    settingsSetter.setSettingsValueForCompany( company, SettingsForApplication.LENDING_TREE,
-                        CommonConstants.SET_SETTINGS );
-                    userManagementService.updateCompany( company );
-                }
                 userSettings.setCompanySettings( companySettings );
             } else if ( entityType.equals( CommonConstants.REGION_ID_COLUMN ) ) {
                 OrganizationUnitSettings regionSettings = organizationManagementService.getRegionSettings( entityId );
@@ -3072,13 +2846,6 @@ public class ProfileManagementController
                 profileManagementService.updateSocialMediaTokens(
                     MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION, regionSettings, socialMediaTokens );
                 regionSettings.setSocialMediaTokens( socialMediaTokens );
-                //update SETTINGS_SET_STATUS of REGION table to set.
-                Region region = userManagementService.getRegionById( regionSettings.getIden() );
-                if ( region != null ) {
-                    settingsSetter.setSettingsValueForRegion( region, SettingsForApplication.LENDING_TREE,
-                        CommonConstants.SET_SETTINGS );
-                    userManagementService.updateRegion( region );
-                }
                 userSettings.getRegionSettings().put( entityId, regionSettings );
             } else if ( entityType.equals( CommonConstants.BRANCH_ID_COLUMN ) ) {
                 OrganizationUnitSettings branchSettings = organizationManagementService.getBranchSettingsDefault( entityId );
@@ -3090,13 +2857,6 @@ public class ProfileManagementController
                 profileManagementService.updateSocialMediaTokens(
                     MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION, branchSettings, socialMediaTokens );
                 branchSettings.setSocialMediaTokens( socialMediaTokens );
-                //update SETTINGS_SET_STATUS of BRANCH table to set.
-                Branch branch = userManagementService.getBranchById( branchSettings.getIden() );
-                if ( branch != null ) {
-                    settingsSetter.setSettingsValueForBranch( branch, SettingsForApplication.LENDING_TREE,
-                        CommonConstants.SET_SETTINGS );
-                    userManagementService.updateBranch( branch );
-                }
                 userSettings.getRegionSettings().put( entityId, branchSettings );
             } else if ( entityType.equals( CommonConstants.AGENT_ID_COLUMN ) ) {
                 AgentSettings agentSettings = userManagementService.getUserSettings( entityId );
@@ -3840,16 +3600,19 @@ public class ProfileManagementController
      * @return
      */
     /*
-     * @RequestMapping(value = "/companyprofile/{profileName}", method = RequestMethod.GET) public
-     * String initCompanyProfilePage(@PathVariable String profileName, Model model) {
-     * LOG.info("Service to initiate company profile page called"); String message = null; if
-     * (profileName == null || profileName.isEmpty()) { message =
-     * messageUtils.getDisplayMessage(DisplayMessageConstants.INVALID_COMPANY_PROFILENAME,
-     * DisplayMessageType.ERROR_MESSAGE) .getMessage(); model.addAttribute("message", message);
-     * return JspResolver.MESSAGE_HEADER; } model.addAttribute("companyProfileName", profileName);
-     * model.addAttribute("profileLevel", CommonConstants.PROFILE_LEVEL_COMPANY);
-     * LOG.info("Service to initiate company profile page executed successfully"); return
-     * JspResolver.PROFILE_PAGE; }
+     * @RequestMapping(value = "/companyprofile/{profileName}", method =
+     * RequestMethod.GET) public String initCompanyProfilePage(@PathVariable
+     * String profileName, Model model) {
+     * LOG.info("Service to initiate company profile page called"); String
+     * message = null; if (profileName == null || profileName.isEmpty()) {
+     * message = messageUtils.getDisplayMessage(DisplayMessageConstants.
+     * INVALID_COMPANY_PROFILENAME, DisplayMessageType.ERROR_MESSAGE)
+     * .getMessage(); model.addAttribute("message", message); return
+     * JspResolver.MESSAGE_HEADER; } model.addAttribute("companyProfileName",
+     * profileName); model.addAttribute("profileLevel",
+     * CommonConstants.PROFILE_LEVEL_COMPANY);
+     * LOG.info("Service to initiate company profile page executed successfully"
+     * ); return JspResolver.PROFILE_PAGE; }
      */
 
     /**
@@ -3861,22 +3624,27 @@ public class ProfileManagementController
      * @return
      */
     /*
-     * @RequestMapping(value = "/regionprofile/{companyProfileName}/region/{regionProfileName}")
-     * public String initRegionProfilePage(@PathVariable String companyProfileName, @PathVariable
-     * String regionProfileName, Model model) {
-     * LOG.info("Service to initiate region profile page called"); String message = null; if
-     * (companyProfileName == null || companyProfileName.isEmpty()) { message =
-     * messageUtils.getDisplayMessage(DisplayMessageConstants.INVALID_COMPANY_PROFILENAME,
-     * DisplayMessageType.ERROR_MESSAGE) .getMessage(); model.addAttribute("message", message);
-     * return JspResolver.MESSAGE_HEADER; } if (regionProfileName == null ||
+     * @RequestMapping(value =
+     * "/regionprofile/{companyProfileName}/region/{regionProfileName}") public
+     * String initRegionProfilePage(@PathVariable String companyProfileName,
+     * @PathVariable String regionProfileName, Model model) {
+     * LOG.info("Service to initiate region profile page called"); String
+     * message = null; if (companyProfileName == null ||
+     * companyProfileName.isEmpty()) { message =
+     * messageUtils.getDisplayMessage(DisplayMessageConstants
+     * .INVALID_COMPANY_PROFILENAME, DisplayMessageType.ERROR_MESSAGE)
+     * .getMessage(); model.addAttribute("message", message); return
+     * JspResolver.MESSAGE_HEADER; } if (regionProfileName == null ||
      * regionProfileName.isEmpty()) { message =
-     * messageUtils.getDisplayMessage(DisplayMessageConstants.INVALID_REGION_PROFILENAME,
-     * DisplayMessageType.ERROR_MESSAGE) .getMessage(); model.addAttribute("message", message);
-     * return JspResolver.MESSAGE_HEADER; } model.addAttribute("companyProfileName",
-     * companyProfileName); model.addAttribute("regionProfileName", regionProfileName);
-     * model.addAttribute("profileLevel", CommonConstants.PROFILE_LEVEL_REGION);
-     * LOG.info("Service to initiate region profile page executed successfully"); return
-     * JspResolver.PROFILE_PAGE; }
+     * messageUtils.getDisplayMessage(DisplayMessageConstants
+     * .INVALID_REGION_PROFILENAME, DisplayMessageType.ERROR_MESSAGE)
+     * .getMessage(); model.addAttribute("message", message); return
+     * JspResolver.MESSAGE_HEADER; } model.addAttribute("companyProfileName",
+     * companyProfileName); model.addAttribute("regionProfileName",
+     * regionProfileName); model.addAttribute("profileLevel",
+     * CommonConstants.PROFILE_LEVEL_REGION);
+     * LOG.info("Service to initiate region profile page executed successfully"
+     * ); return JspResolver.PROFILE_PAGE; }
      */
 
     /**
@@ -3888,22 +3656,27 @@ public class ProfileManagementController
      * @return
      */
     /*
-     * @RequestMapping(value = "/branchprofile/{companyProfileName}/branch/{branchProfileName}")
-     * public String initBranchProfilePage(@PathVariable String companyProfileName, @PathVariable
-     * String branchProfileName, Model model) {
-     * LOG.info("Service to initiate branch profile page called"); String message = null; if
-     * (companyProfileName == null || companyProfileName.isEmpty()) { message =
-     * messageUtils.getDisplayMessage(DisplayMessageConstants.INVALID_COMPANY_PROFILENAME,
-     * DisplayMessageType.ERROR_MESSAGE) .getMessage(); model.addAttribute("message", message);
-     * return JspResolver.MESSAGE_HEADER; } if (branchProfileName == null ||
+     * @RequestMapping(value =
+     * "/branchprofile/{companyProfileName}/branch/{branchProfileName}") public
+     * String initBranchProfilePage(@PathVariable String companyProfileName,
+     * @PathVariable String branchProfileName, Model model) {
+     * LOG.info("Service to initiate branch profile page called"); String
+     * message = null; if (companyProfileName == null ||
+     * companyProfileName.isEmpty()) { message =
+     * messageUtils.getDisplayMessage(DisplayMessageConstants
+     * .INVALID_COMPANY_PROFILENAME, DisplayMessageType.ERROR_MESSAGE)
+     * .getMessage(); model.addAttribute("message", message); return
+     * JspResolver.MESSAGE_HEADER; } if (branchProfileName == null ||
      * branchProfileName.isEmpty()) { message =
-     * messageUtils.getDisplayMessage(DisplayMessageConstants.INVALID_BRANCH_PROFILENAME,
-     * DisplayMessageType.ERROR_MESSAGE) .getMessage(); model.addAttribute("message", message);
-     * return JspResolver.MESSAGE_HEADER; } model.addAttribute("companyProfileName",
-     * companyProfileName); model.addAttribute("branchProfileName", branchProfileName);
-     * model.addAttribute("profileLevel", CommonConstants.PROFILE_LEVEL_BRANCH);
-     * LOG.info("Service to initiate branch profile page executed successfully"); return
-     * JspResolver.PROFILE_PAGE; }
+     * messageUtils.getDisplayMessage(DisplayMessageConstants
+     * .INVALID_BRANCH_PROFILENAME, DisplayMessageType.ERROR_MESSAGE)
+     * .getMessage(); model.addAttribute("message", message); return
+     * JspResolver.MESSAGE_HEADER; } model.addAttribute("companyProfileName",
+     * companyProfileName); model.addAttribute("branchProfileName",
+     * branchProfileName); model.addAttribute("profileLevel",
+     * CommonConstants.PROFILE_LEVEL_BRANCH);
+     * LOG.info("Service to initiate branch profile page executed successfully"
+     * ); return JspResolver.PROFILE_PAGE; }
      */
 
     /**
@@ -3914,17 +3687,19 @@ public class ProfileManagementController
      * @return
      */
     /*
-     * @RequestMapping(value = "/individualprofile/{agentProfileName}") public String
-     * initBranchProfilePage(@PathVariable String agentProfileName, Model model) {
-     * LOG.info("Service to initiate agent profile page called"); String message = null; if
-     * (agentProfileName == null || agentProfileName.isEmpty()) { message =
-     * messageUtils.getDisplayMessage(DisplayMessageConstants.INVALID_INDIVIDUAL_PROFILENAME,
-     * DisplayMessageType.ERROR_MESSAGE) .getMessage(); model.addAttribute("message", message);
-     * return JspResolver.MESSAGE_HEADER; } model.addAttribute("agentProfileName",
+     * @RequestMapping(value = "/individualprofile/{agentProfileName}") public
+     * String initBranchProfilePage(@PathVariable String agentProfileName, Model
+     * model) { LOG.info("Service to initiate agent profile page called");
+     * String message = null; if (agentProfileName == null ||
+     * agentProfileName.isEmpty()) { message =
+     * messageUtils.getDisplayMessage(DisplayMessageConstants
+     * .INVALID_INDIVIDUAL_PROFILENAME, DisplayMessageType.ERROR_MESSAGE)
+     * .getMessage(); model.addAttribute("message", message); return
+     * JspResolver.MESSAGE_HEADER; } model.addAttribute("agentProfileName",
      * agentProfileName); model.addAttribute("profileLevel",
      * CommonConstants.PROFILE_LEVEL_INDIVIDUAL);
-     * LOG.info("Service to initiate agent profile page executed successfully"); return
-     * JspResolver.PROFILE_PAGE; }
+     * LOG.info("Service to initiate agent profile page executed successfully");
+     * return JspResolver.PROFILE_PAGE; }
      */
 
     // Fetch Admin hierarchy
@@ -4144,7 +3919,7 @@ public class ProfileManagementController
             // Setting agent's profile URL in each of the review.
             profileManagementService.setAgentProfileUrlForReview( reviewItems );
 
-            model.addAttribute( "reviewItems", reviewItems );
+            model.addAttribute( "reviews", reviewItems );
         } catch ( InvalidInputException e ) {
             throw new InternalServerException( new ProfileServiceErrorCode(
                 CommonConstants.ERROR_CODE_COMPANY_REVIEWS_FETCH_FAILURE, CommonConstants.SERVICE_CODE_COMPANY_REVIEWS,
@@ -4414,11 +4189,13 @@ public class ProfileManagementController
      */
     @ResponseBody
     @RequestMapping ( value = "/postscountforuser")
-    public String getPostsCountForUser( HttpServletRequest request, Model model )
+    public String getPostsCountForUser( HttpServletRequest request )
     {
         LOG.info( "Method to get posts for the user, getPostsCountForUser() started" );
-        User user = sessionHelper.getCurrentUser();
-        long count = profileManagementService.getPostsCountForUser( user.getUserId() );
+        HttpSession session = request.getSession( false );
+        long entityId = (long) session.getAttribute( CommonConstants.ENTITY_ID_COLUMN );
+        String entityType = (String) session.getAttribute( CommonConstants.ENTITY_TYPE_COLUMN );
+        long count = profileManagementService.getPostsCountForUser( entityType, entityId );
         LOG.info( "Method to get posts for the user, getPostsCountForUser() finished" );
         return count + "";
     }
@@ -4524,6 +4301,46 @@ public class ProfileManagementController
     }
 
 
+    @RequestMapping ( value = "/showurleditwarning")
+    public String showUrlEditWarning( HttpServletRequest request, Model model )
+    {
+
+        LOG.info( "Method called to display profile url change warning" );
+        return JspResolver.PROFILE_URL_WARNING;
+    }
+
+
+    @RequestMapping ( value = "/editprofileurl")
+    public String getProfileUrlEditPage( Model model, HttpServletRequest request )
+    {
+        LOG.info( "Method called to display profile url change page" );
+        HttpSession session = request.getSession( false );
+        String entityType = (String) session.getAttribute( "entityType" );
+        String profileBaseUrl = applicationBaseUrl + "pages/";
+        UserSettings userSettings = (UserSettings) session.getAttribute( CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION );
+        String companyProfileUrl = userSettings.getCompanySettings().getProfileUrl();
+        switch ( entityType ) {
+            case CommonConstants.AGENT_ID_COLUMN:
+                break;
+
+            case CommonConstants.BRANCH_ID_COLUMN:
+                profileBaseUrl += "office" + companyProfileUrl;
+                break;
+
+            case CommonConstants.REGION_ID_COLUMN:
+                profileBaseUrl += "region" + companyProfileUrl;
+                break;
+
+            case CommonConstants.COMPANY_ID_COLUMN:
+                profileBaseUrl += "company";
+                break;
+
+        }
+        model.addAttribute( "profileBaseUrl", profileBaseUrl );
+        return JspResolver.PROFILE_URL_CHANGE;
+    }
+
+
     @ResponseBody
     @RequestMapping ( value = "/updatepositions")
     public String updatePositions( HttpServletRequest request, Model model )
@@ -4542,6 +4359,139 @@ public class ProfileManagementController
         profileManagementService.addOrUpdateAgentPositions( companyPositions, agentSettings );
         agentSettings.setPositions( companyPositions );
         return CommonConstants.SUCCESS_ATTRIBUTE;
+    }
+
+
+    @ResponseBody
+    @RequestMapping ( value = "/updateprofileurl", method = RequestMethod.GET)
+    public String validateAndUpdateProfileUrl( Model model, HttpServletRequest request )
+    {
+        LOG.info( "Method called to validate and update profile urls" );
+        String profileName = request.getParameter( "searchKey" );
+        String profileBaseUrl = applicationBaseUrl + "pages";
+        profileName = utils.prepareProfileName( profileName );
+        String profileUrl = "";
+        HttpSession session = request.getSession();
+        OrganizationUnitSettings profileSettings = (OrganizationUnitSettings) session
+            .getAttribute( CommonConstants.USER_PROFILE_SETTINGS );
+        long entityId = (long) session.getAttribute( CommonConstants.ENTITY_ID_COLUMN );
+        String entityType = (String) session.getAttribute( CommonConstants.ENTITY_TYPE_COLUMN );
+        UserSettings userSettings = (UserSettings) session.getAttribute( CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION );
+        LOG.debug( "Checking uniqueness of profileName:" + profileName );
+        String companyProfileName = userSettings.getCompanySettings().getProfileName();
+        LOG.info( "COMPANY PROFILE NAME : " + companyProfileName );
+        boolean profileExists = false;
+
+        switch ( entityType ) {
+            case CommonConstants.AGENT_ID_COLUMN:
+                try {
+                    profileManagementService.getUserByProfileName( profileName );
+                    profileExists = true;
+                } catch ( InvalidInputException | NoRecordsFetchedException e ) {
+                    LOG.error( "Error occured. Reason : " + e );
+                } catch ( ProfileNotFoundException e ) {
+                    LOG.info( "no such profile name exists." );
+                    AgentSettings agentSettings = userSettings.getAgentSettings();
+                    profileUrl = utils.generateAgentProfileUrl( profileName );
+                    agentSettings.setProfileName( profileName );
+                    agentSettings.setProfileUrl( profileUrl );
+                    userSettings.setAgentSettings( agentSettings );
+                    profileSettings.setProfileName( profileName );
+                    profileSettings.setProfileUrl( profileUrl );
+                    userManagementService.updateProfileUrlInAgentSettings( profileName, profileUrl, agentSettings );
+                    profileSettings.setCompleteProfileUrl( profileBaseUrl + profileUrl );
+                    try {
+                        solrSearchService.editUserInSolr( agentSettings.getIden(), CommonConstants.PROFILE_NAME_SOLR,
+                            profileName );
+                        solrSearchService
+                            .editUserInSolr( agentSettings.getIden(), CommonConstants.PROFILE_URL_SOLR, profileUrl );
+                    } catch ( SolrException e1 ) {
+                        LOG.error( "Error occured. Reason : " + e1 );
+                    }
+                }
+                break;
+
+            case CommonConstants.BRANCH_ID_COLUMN:
+
+                try {
+                    profileManagementService.getBranchByProfileName( companyProfileName, profileName );
+                    profileExists = true;
+                } catch ( InvalidInputException e ) {
+                    LOG.error( "Invalid input entered" );
+                } catch ( ProfileNotFoundException e ) {
+                    LOG.info( "no such profile name exists." );
+                    profileUrl = utils.generateBranchProfileUrl( companyProfileName, profileName );
+                    try {
+                        OrganizationUnitSettings branchSettings = organizationManagementService
+                            .getBranchSettingsDefault( entityId );
+                        branchSettings.setProfileName( profileName );
+                        branchSettings.setProfileUrl( profileUrl );
+                        userSettings.getBranchSettings().put( entityId, branchSettings );
+                        profileSettings.setProfileName( profileName );
+                        profileSettings.setProfileUrl( profileUrl );
+                        userManagementService.updateProfileUrlInBranchSettings( profileName, profileUrl, branchSettings );
+                        profileSettings.setCompleteProfileUrl( profileBaseUrl + profileUrl );
+                    } catch ( InvalidInputException | NoRecordsFetchedException e1 ) {
+                        LOG.error( "Error occured. Reason: " + e1 );
+                    }
+                }
+                break;
+
+            case CommonConstants.REGION_ID_COLUMN:
+                try {
+                    profileManagementService.getRegionByProfileName( companyProfileName, profileName );
+                    profileExists = true;
+                } catch ( InvalidInputException e ) {
+                    LOG.error( "Error occured. Reason : " + e );
+                } catch ( ProfileNotFoundException e ) {
+                    LOG.info( "no such profile name exists." );
+                    profileUrl = utils.generateRegionProfileUrl( companyProfileName, profileName );
+                    try {
+                        OrganizationUnitSettings regionSettings = organizationManagementService.getRegionSettings( entityId );
+                        regionSettings.setProfileName( profileName );
+                        regionSettings.setProfileUrl( profileUrl );
+                        userSettings.getRegionSettings().put( entityId, regionSettings );
+                        userManagementService.updateProfileUrlInRegionSettings( profileName, profileUrl, regionSettings );
+                        profileSettings.setProfileName( profileName );
+                        profileSettings.setProfileUrl( profileUrl );
+                        profileSettings.setCompleteProfileUrl( profileBaseUrl + profileUrl );
+                    } catch ( InvalidInputException e1 ) {
+                        LOG.error( "Error occured. Reason : " + e1 );
+                    }
+                }
+                break;
+
+            case CommonConstants.COMPANY_ID_COLUMN:
+                try {
+                    profileManagementService.getCompanyProfileByProfileName( profileName );
+                    profileExists = true;
+                } catch ( ProfileNotFoundException e ) {
+                    LOG.info( "no such profile name exists." );
+                    profileUrl = utils.generateCompanyProfileUrl( profileName );
+                    LOG.info( "PROFILE URL : " + profileUrl + "\n PROFILE NAME : " + profileName );
+                    OrganizationUnitSettings companySettings = userSettings.getCompanySettings();
+                    companySettings.setProfileName( profileName );
+                    companySettings.setProfileUrl( profileUrl );
+                    userSettings.setCompanySettings( companySettings );
+                    userManagementService.updateProfileUrlInCompanySettings( profileName, profileUrl, companySettings );
+                    profileSettings.setProfileName( profileName );
+                    profileSettings.setProfileUrl( profileUrl );
+                    profileSettings.setCompleteProfileUrl( profileBaseUrl + profileUrl );
+                }
+                break;
+        }
+        String response = "";
+        if ( profileExists ) {
+            LOG.info( "Profile already exists" );
+            response = "true";
+        } else {
+            LOG.info( "Profile didn't exist" );
+            String completeProfileUrl = profileSettings.getCompleteProfileUrl();
+            response = "<a href=\"" + completeProfileUrl + "\" target=\"_blank\">" + completeProfileUrl + "</a>";
+            session.setAttribute( CommonConstants.USER_PROFILE_SETTINGS, profileSettings );
+        }
+        return response;
+
     }
 
 }
