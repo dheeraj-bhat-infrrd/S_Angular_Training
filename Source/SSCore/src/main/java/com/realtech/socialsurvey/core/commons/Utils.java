@@ -19,6 +19,7 @@ public class Utils
 
     private final String REGION_PROFILE_URL_PATTERN = "/region/%s/%s";
     private final String BRANCH_PROFILE_URL_PATTERN = "/office/%s/%s";
+    private final String COMPANY_PROFILE_URL_PATTERN = "/company/%s";
     private final String AGENT_PROFILE_URL_PATTERN = "/%s";
     private static final String PROFILE_REGEX = "[^\\w]{1,}";
     private static final String PROFILE_REGEX_REPLACEMENT = "-";
@@ -78,7 +79,21 @@ public class Utils
         return profileUrl;
     }
 
-
+    /**
+     * Method to generate company profile url
+     * 
+     * @param companyProfileName
+     * @return
+     */
+    public String generateCompanyProfileUrl( String companyProfileName )
+    {
+        LOG.info( "Method generateCompanyProfileUrl called for companyProfileName:" + companyProfileName );
+        String profileUrl = null;
+        profileUrl = String.format( COMPANY_PROFILE_URL_PATTERN, companyProfileName );
+        LOG.info( "Method generateCompanyProfileUrl excecuted. Returning profile url:" + profileUrl );
+        return profileUrl;
+    }
+    
     /**
      * Generates profile name
      * @param input

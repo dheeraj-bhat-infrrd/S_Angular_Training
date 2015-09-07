@@ -432,7 +432,7 @@ public interface ProfileManagementService
         throws InvalidInputException;
 
 
-    public long getPostsCountForUser( long userId );
+    public long getPostsCountForUser( String columnName, long columnValue );
 
 
     /**
@@ -545,4 +545,29 @@ public interface ProfileManagementService
 
     public Map<SettingsForApplication, OrganizationUnit> getPrimaryHierarchyByEntity( String entityType, long entityId )
         throws InvalidInputException, InvalidSettingsStateException;
+
+
+    public OrganizationUnitSettings getRegionSettingsByProfileName( String companyProfileName, String regionProfileName )
+        throws ProfileNotFoundException, InvalidInputException;
+
+
+    public OrganizationUnitSettings getBranchSettingsByProfileName( String companyProfileName, String branchProfileName )
+        throws ProfileNotFoundException, InvalidInputException;
+
+
+    public OrganizationUnitSettings fillUnitSettings( OrganizationUnitSettings unitSettings, String currentProfileName,
+        OrganizationUnitSettings companyUnitSettings, OrganizationUnitSettings regionUnitSettings,
+        OrganizationUnitSettings branchUnitSettings, OrganizationUnitSettings agentUnitSettings,
+        Map<SettingsForApplication, OrganizationUnit> map );
+
+
+    public OrganizationUnitSettings getRegionProfileByBranch( OrganizationUnitSettings branchSettings )
+        throws ProfileNotFoundException;
+
+
+    public Map<String, Long> getPrimaryHierarchyByAgentProfile( OrganizationUnitSettings agentSettings );
+
+
+    public OrganizationUnitSettings getIndividualSettingsByProfileName( String agentProfileName )
+        throws ProfileNotFoundException, InvalidInputException, NoRecordsFetchedException;
 }

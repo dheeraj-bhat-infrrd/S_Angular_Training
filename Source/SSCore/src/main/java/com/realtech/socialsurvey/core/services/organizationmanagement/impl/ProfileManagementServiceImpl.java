@@ -991,8 +991,6 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
          */
         String profileUrl = utils.generateRegionProfileUrl( companyProfileName, regionProfileName );
 
-        //TODO New logic introduced, we will fetch records only if required.
-
         OrganizationUnitSettings regionSettings = organizationUnitSettingsDao.fetchOrganizationUnitSettingsByProfileUrl(
             profileUrl, MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION );
         if ( regionSettings == null ) {
@@ -1003,207 +1001,6 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
         regionSettings = aggregateRegionProfile( companySettings, regionSettings );
         LOG.info( "Method getRegionByProfileName excecuted successfully" );
         return regionSettings;
-    }
-
-
-    private OrganizationUnitSettings fillUnitSettings( OrganizationUnitSettings unitSettings, String currentProfileName,
-        String companyProfileName, String regionProfileName, String branchProfileName, String agentProfileName,
-        Map<SettingsForApplication, OrganizationUnit> map )
-    {
-        OrganizationUnitSettings companyUnitSettings = null;
-        OrganizationUnitSettings regionUnitSettings = null;
-        OrganizationUnitSettings branchUnitSettings = null;
-        OrganizationUnitSettings agentUnitSettings = null;
-
-        if ( currentProfileName.equalsIgnoreCase( MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION ) ) {
-            companyUnitSettings = unitSettings;
-            return companyUnitSettings;
-        } else if ( currentProfileName.equalsIgnoreCase( MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION ) ) {
-            regionUnitSettings = unitSettings;
-            if ( companyUnitSettings == null ) {
-                try {
-                    companyUnitSettings = getCompanyProfileByProfileName( companyProfileName );
-                } catch ( ProfileNotFoundException e ) {
-
-                }
-            }
-            regionUnitSettings = setAggregateBasicData( regionUnitSettings, companyUnitSettings );
-            return regionUnitSettings;
-        } else if ( currentProfileName.equalsIgnoreCase( MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION ) ) {
-            branchUnitSettings = unitSettings;
-            if ( regionUnitSettings == null ) {
-                try {
-                    regionUnitSettings = getRegionByProfileName( companyProfileName, regionProfileName );
-                } catch ( ProfileNotFoundException e ) {
-
-                } catch ( InvalidInputException e ) {
-
-                }
-            }
-            regionUnitSettings = setAggregateBasicData( branchUnitSettings, regionUnitSettings );
-            return branchUnitSettings;
-        } else if ( currentProfileName.equalsIgnoreCase( MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION ) ) {
-            agentUnitSettings = unitSettings;
-            return agentUnitSettings;
-        } else {
-            return null;
-        }
-
-
-    }
-
-
-    /* private OrganizationUnitSettings setAgentAggregateData(OrganizationUnitSettings agentProfile, OrganizationUnitSettings )*/
-
-
-    private OrganizationUnitSettings setAggregateBasicData( OrganizationUnitSettings userProfile,
-        OrganizationUnitSettings parentProfile )
-    {
-
-
-        if ( userProfile.getContact_details() == null ) {
-            userProfile.setContact_details( new ContactDetailsSettings() );
-        }
-        if ( userProfile.getContact_details().getWeb_addresses() == null ) {
-            userProfile.getContact_details().setWeb_addresses( new WebAddressSettings() );
-        }
-        if ( userProfile.getContact_details().getContact_numbers() == null ) {
-            userProfile.getContact_details().setContact_numbers( new ContactNumberSettings() );
-        }
-        if ( userProfile.getSurvey_settings() == null ) {
-            userProfile.setSurvey_settings( parentProfile.getSurvey_settings() );
-        }
-        return userProfile;
-    }
-
-
-    private OrganizationUnitSettings setAggregateProfileData( OrganizationUnitSettings userProfile,
-        OrganizationUnitSettings companyUnitSettings, OrganizationUnitSettings regionUnitSettings,
-        OrganizationUnitSettings branchUnitSettings, OrganizationUnitSettings agentUnitSettings,
-        Map<SettingsForApplication, OrganizationUnit> map )
-    {
-        for ( Map.Entry<SettingsForApplication, OrganizationUnit> entry : map.entrySet() ) {
-            if ( entry.getKey() == SettingsForApplication.LOGO ) {
-                if ( entry.getValue() == OrganizationUnit.COMPANY ) {
-                    userProfile.setLogo( companyUnitSettings.getLogo() );
-                } else if ( entry.getValue() == OrganizationUnit.REGION ) {
-                    userProfile.setLogo( regionUnitSettings.getLogo() );
-                } else if ( entry.getValue() == OrganizationUnit.BRANCH ) {
-                    userProfile.setLogo( branchUnitSettings.getLogo() );
-                } else if ( entry.getValue() == OrganizationUnit.AGENT ) {
-                    userProfile.setLogo( agentUnitSettings.getLogo() );
-                }
-
-
-            } else if ( entry.getKey() == SettingsForApplication.ADDRESS ) {
-
-                ContactDetailsSettings contactDetails = userProfile.getContact_details();
-                if ( contactDetails == null ) {
-                    contactDetails = new ContactDetailsSettings();
-                }
-
-                if ( entry.getValue() == OrganizationUnit.COMPANY ) {
-
-                } else if ( entry.getValue() == OrganizationUnit.REGION ) {
-
-                } else if ( entry.getValue() == OrganizationUnit.BRANCH ) {
-
-                } else if ( entry.getValue() == OrganizationUnit.AGENT ) {
-
-                }
-            } else if ( entry.getKey() == SettingsForApplication.LOCATION ) {
-                if ( entry.getValue() == OrganizationUnit.COMPANY ) {
-
-                } else if ( entry.getValue() == OrganizationUnit.REGION ) {
-
-                } else if ( entry.getValue() == OrganizationUnit.BRANCH ) {
-
-                } else if ( entry.getValue() == OrganizationUnit.AGENT ) {
-
-                }
-            } else if ( entry.getKey() == SettingsForApplication.PHONE ) {
-                if ( entry.getValue() == OrganizationUnit.COMPANY ) {
-
-                } else if ( entry.getValue() == OrganizationUnit.REGION ) {
-
-                } else if ( entry.getValue() == OrganizationUnit.BRANCH ) {
-
-                } else if ( entry.getValue() == OrganizationUnit.AGENT ) {
-
-                }
-            } else if ( entry.getKey() == SettingsForApplication.FACEBOOK ) {
-                if ( entry.getValue() == OrganizationUnit.COMPANY ) {
-
-                } else if ( entry.getValue() == OrganizationUnit.REGION ) {
-
-                } else if ( entry.getValue() == OrganizationUnit.BRANCH ) {
-
-                } else if ( entry.getValue() == OrganizationUnit.AGENT ) {
-
-                }
-            } else if ( entry.getKey() == SettingsForApplication.GOOGLE_PLUS ) {
-                if ( entry.getValue() == OrganizationUnit.COMPANY ) {
-
-                } else if ( entry.getValue() == OrganizationUnit.REGION ) {
-
-                } else if ( entry.getValue() == OrganizationUnit.BRANCH ) {
-
-                } else if ( entry.getValue() == OrganizationUnit.AGENT ) {
-
-                }
-            } else if ( entry.getKey() == SettingsForApplication.LINKED_IN ) {
-                if ( entry.getValue() == OrganizationUnit.COMPANY ) {
-
-                } else if ( entry.getValue() == OrganizationUnit.REGION ) {
-
-                } else if ( entry.getValue() == OrganizationUnit.BRANCH ) {
-
-                } else if ( entry.getValue() == OrganizationUnit.AGENT ) {
-
-                }
-            } else if ( entry.getKey() == SettingsForApplication.LENDING_TREE ) {
-                if ( entry.getValue() == OrganizationUnit.COMPANY ) {
-
-                } else if ( entry.getValue() == OrganizationUnit.REGION ) {
-
-                } else if ( entry.getValue() == OrganizationUnit.BRANCH ) {
-
-                } else if ( entry.getValue() == OrganizationUnit.AGENT ) {
-
-                }
-            } else if ( entry.getKey() == SettingsForApplication.YELP ) {
-                if ( entry.getValue() == OrganizationUnit.COMPANY ) {
-
-                } else if ( entry.getValue() == OrganizationUnit.REGION ) {
-
-                } else if ( entry.getValue() == OrganizationUnit.BRANCH ) {
-
-                } else if ( entry.getValue() == OrganizationUnit.AGENT ) {
-
-                }
-            } else if ( entry.getKey() == SettingsForApplication.REALTOR ) {
-                if ( entry.getValue() == OrganizationUnit.COMPANY ) {
-
-                } else if ( entry.getValue() == OrganizationUnit.REGION ) {
-
-                } else if ( entry.getValue() == OrganizationUnit.BRANCH ) {
-
-                } else if ( entry.getValue() == OrganizationUnit.AGENT ) {
-
-                }
-            } else if ( entry.getKey() == SettingsForApplication.ZILLOW ) {
-                if ( entry.getValue() == OrganizationUnit.COMPANY ) {
-
-                } else if ( entry.getValue() == OrganizationUnit.REGION ) {
-
-                } else if ( entry.getValue() == OrganizationUnit.BRANCH ) {
-
-                } else if ( entry.getValue() == OrganizationUnit.AGENT ) {
-
-                }
-            }
-        }
-        return userProfile;
     }
 
 
@@ -1254,8 +1051,8 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 
 
     /**
-     * JIRA:SS-117 by RM02 Method to get the company details based on profile name
-     */
+    * JIRA:SS-117 by RM02 Method to get the company details based on profile name
+    */
     @Override
     @Transactional
     public OrganizationUnitSettings getCompanyProfileByProfileName( String profileName ) throws ProfileNotFoundException
@@ -1266,6 +1063,10 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
         }
         OrganizationUnitSettings companySettings = organizationUnitSettingsDao.fetchOrganizationUnitSettingsByProfileName(
             profileName, MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION );
+        if ( companySettings == null ) {
+            LOG.error( "Unable to find company settings with profile name : " + profileName );
+            throw new ProfileNotFoundException( "Unable to find company settings with profile name : " + profileName );
+        }
 
         LOG.info( "Successfully executed method getCompanyDetailsByProfileName. Returning :" + companySettings );
         return companySettings;
@@ -1337,6 +1138,36 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 
         LOG.info( "Method getIndividualByProfileName executed successfully" );
         return agentSettings;
+    }
+
+
+    @Override
+    @Transactional
+    public OrganizationUnitSettings getIndividualSettingsByProfileName( String agentProfileName )
+        throws ProfileNotFoundException, InvalidInputException, NoRecordsFetchedException
+    {
+        LOG.info( "Method getIndividualByProfileName called for agentProfileName:" + agentProfileName );
+
+        OrganizationUnitSettings agentSettings = null;
+        if ( agentProfileName == null || agentProfileName.isEmpty() ) {
+            throw new ProfileNotFoundException( "agentProfileName is null or empty while getting agent settings" );
+        }
+        agentSettings = organizationUnitSettingsDao.fetchOrganizationUnitSettingsByProfileName( agentProfileName,
+            MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION );
+        if ( agentSettings == null ) {
+            throw new ProfileNotFoundException( "No settings found for agent while fetching agent profile" );
+        }
+        return agentSettings;
+    }
+
+
+    @Override
+    @Transactional
+    public Map<String, Long> getPrimaryHierarchyByAgentProfile( OrganizationUnitSettings agentSettings )
+    {
+        LOG.info( "Inside method getPrimaryHierarchyByAgentProfile " );
+        Map<String, Long> hierarchyMap = userManagementService.getPrimaryUserProfileByAgentId( agentSettings.getIden() );
+        return hierarchyMap;
     }
 
 
@@ -1485,8 +1316,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
      */
     @Override
     @Transactional
-    public User getUserByProfileName( String agentProfileName ) throws InvalidInputException, NoRecordsFetchedException,
-        ProfileNotFoundException
+    public User getUserByProfileName( String agentProfileName ) throws ProfileNotFoundException
     {
         LOG.info( "Method getUserProfilesByProfileName called for agentProfileName:" + agentProfileName );
 
@@ -2144,10 +1974,10 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
      * Method to fetch social posts for a particular user.
      */
     @Override
-    public long getPostsCountForUser( long userId )
+    public long getPostsCountForUser( String columnName, long columnValue )
     {
         LOG.info( "Method to fetch count of social posts for a particular user, getPostsCountForUser() started." );
-        long postsCount = socialPostDao.getPostsCountByUserId( userId );
+        long postsCount = socialPostDao.getPostsCountByUserId( columnName, columnValue );
         LOG.info( "Method to fetch count of social posts for a particular user, getPostsCountForUser() finished." );
         return postsCount;
     }
@@ -2423,7 +2253,9 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
         Map<Long, AgentRankingReport> agentReportData = new HashMap<>();
         surveyDetailsDao.getAverageScore( startDate, endDate, agentReportData, columnName, iden );
         surveyDetailsDao.getCompletedSurveysCount( startDate, endDate, agentReportData, columnName, iden );
-        surveyPreInitiationDao.getIncompleteSurveysCount( startDate, endDate, agentReportData );
+        // FIX for JIRA: SS-1112: BOC
+        // surveyPreInitiationDao.getIncompleteSurveysCount( startDate, endDate, agentReportData );
+        // FIX for JIRA: SS-1112: EOC
         organizationUnitSettingsDao.setAgentDetails( agentReportData );
 
         LOG.info( "Method to get Agent's Report for a specific time and all time finished." );
@@ -2929,4 +2761,314 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
             String.valueOf( currentLockAggregateValue ) );
 
     }
+
+
+    @Override
+    @Transactional
+    public OrganizationUnitSettings getRegionSettingsByProfileName( String companyProfileName, String regionProfileName )
+        throws ProfileNotFoundException, InvalidInputException
+    {
+        LOG.info( "Method getRegionByProfileName called for companyProfileName:" + companyProfileName
+            + " and regionProfileName:" + regionProfileName );
+        if ( regionProfileName == null || regionProfileName.isEmpty() ) {
+            throw new ProfileNotFoundException( "regionProfileName is null or empty in getRegionByProfileName" );
+        }
+        /**
+         * generate profileUrl and fetch the region by profileUrl since profileUrl for any region is
+         * unique, whereas profileName is unique only within a company
+         */
+        String profileUrl = utils.generateRegionProfileUrl( companyProfileName, regionProfileName );
+
+        OrganizationUnitSettings regionSettings = organizationUnitSettingsDao.fetchOrganizationUnitSettingsByProfileUrl(
+            profileUrl, MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION );
+
+        return regionSettings;
+    }
+
+
+    @Override
+    @Transactional
+    public OrganizationUnitSettings getBranchSettingsByProfileName( String companyProfileName, String branchProfileName )
+        throws ProfileNotFoundException, InvalidInputException
+    {
+        LOG.info( "Method getBranchSettingsByProfileName called for companyProfileName:" + companyProfileName
+            + " and branchProfileName:" + branchProfileName );
+
+        OrganizationUnitSettings companySettings = getCompanyProfileByProfileName( companyProfileName );
+        if ( companySettings == null ) {
+            LOG.error( "Unable to fetch company settings, invalid input provided by the user" );
+            throw new ProfileNotFoundException( "Unable to get company settings " );
+        }
+
+        /**
+         * generate profileUrl and fetch the branch by profileUrl since profileUrl for any branch is
+         * unique, whereas profileName is unique only within a company
+         */
+        String profileUrl = utils.generateBranchProfileUrl( companyProfileName, branchProfileName );
+        OrganizationUnitSettings branchSettings = organizationUnitSettingsDao.fetchOrganizationUnitSettingsByProfileUrl(
+            profileUrl, MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION );
+
+        if ( branchSettings == null ) {
+            LOG.error( "Unable to fetch branch settings, invalid input provided by the user" );
+            throw new ProfileNotFoundException( "Unable to get branch settings " );
+        }
+
+        return branchSettings;
+    }
+
+
+    @Override
+    @Transactional
+    public OrganizationUnitSettings getRegionProfileByBranch( OrganizationUnitSettings branchSettings )
+        throws ProfileNotFoundException
+    {
+
+        LOG.debug( "Fetching branch from db to identify the region" );
+        Branch branch = branchDao.findById( Branch.class, branchSettings.getIden() );
+        if ( branch == null ) {
+            LOG.error( "Unable to get branch with this iden " + branchSettings.getIden() );
+            throw new ProfileNotFoundException( "Unable to get branch with this iden " + branchSettings.getIden() );
+
+        }
+
+        OrganizationUnitSettings regionSettings = organizationUnitSettingsDao.fetchOrganizationUnitSettingsById( branch
+            .getRegion().getRegionId(), MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION );
+        return regionSettings;
+    }
+
+
+    @Override
+    public OrganizationUnitSettings fillUnitSettings( OrganizationUnitSettings unitSettings, String currentProfileName,
+        OrganizationUnitSettings companyUnitSettings, OrganizationUnitSettings regionUnitSettings,
+        OrganizationUnitSettings branchUnitSettings, OrganizationUnitSettings agentUnitSettings,
+        Map<SettingsForApplication, OrganizationUnit> map )
+    {
+
+        if ( currentProfileName.equalsIgnoreCase( MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION ) ) {
+            companyUnitSettings = unitSettings;
+            return companyUnitSettings;
+        } else if ( currentProfileName.equalsIgnoreCase( MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION ) ) {
+            regionUnitSettings = unitSettings;
+            regionUnitSettings = setAggregateBasicData( regionUnitSettings, companyUnitSettings );
+            regionUnitSettings = setAggregateProfileData( regionUnitSettings, companyUnitSettings, regionUnitSettings, null,
+                null, map );
+            return regionUnitSettings;
+        } else if ( currentProfileName.equalsIgnoreCase( MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION ) ) {
+            branchUnitSettings = setAggregateBasicData( branchUnitSettings, regionUnitSettings );
+            branchUnitSettings = setAggregateProfileData( branchUnitSettings, companyUnitSettings, regionUnitSettings,
+                branchUnitSettings, null, map );
+            return branchUnitSettings;
+        } else if ( currentProfileName.equalsIgnoreCase( MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION ) ) {
+            agentUnitSettings = setAggregateProfileData( agentUnitSettings, companyUnitSettings, regionUnitSettings,
+                branchUnitSettings, agentUnitSettings, map );
+            return agentUnitSettings;
+        } else {
+            return null;
+        }
+
+
+    }
+
+
+    private OrganizationUnitSettings setAggregateBasicData( OrganizationUnitSettings userProfile,
+        OrganizationUnitSettings parentProfile )
+    {
+
+
+        if ( userProfile.getContact_details() == null ) {
+            userProfile.setContact_details( new ContactDetailsSettings() );
+        }
+        if ( userProfile.getContact_details().getWeb_addresses() == null ) {
+            userProfile.getContact_details().setWeb_addresses( new WebAddressSettings() );
+        }
+        if ( userProfile.getContact_details().getContact_numbers() == null ) {
+            userProfile.getContact_details().setContact_numbers( new ContactNumberSettings() );
+        }
+        if ( userProfile.getSurvey_settings() == null ) {
+            userProfile.setSurvey_settings( parentProfile.getSurvey_settings() );
+        }
+        return userProfile;
+    }
+
+
+    private OrganizationUnitSettings setAggregateProfileData( OrganizationUnitSettings userProfile,
+        OrganizationUnitSettings companyUnitSettings, OrganizationUnitSettings regionUnitSettings,
+        OrganizationUnitSettings branchUnitSettings, OrganizationUnitSettings agentUnitSettings,
+        Map<SettingsForApplication, OrganizationUnit> map )
+    {
+        for ( Map.Entry<SettingsForApplication, OrganizationUnit> entry : map.entrySet() ) {
+            if ( entry.getKey() == SettingsForApplication.LOGO ) {
+                if ( entry.getValue() == OrganizationUnit.COMPANY ) {
+                    userProfile.setLogo( companyUnitSettings.getLogo() );
+                } else if ( entry.getValue() == OrganizationUnit.REGION ) {
+                    userProfile.setLogo( regionUnitSettings.getLogo() );
+                } else if ( entry.getValue() == OrganizationUnit.BRANCH ) {
+                    userProfile.setLogo( branchUnitSettings.getLogo() );
+                } else if ( entry.getValue() == OrganizationUnit.AGENT ) {
+                    userProfile.setLogo( agentUnitSettings.getLogo() );
+                }
+
+
+            } else if ( entry.getKey() == SettingsForApplication.ADDRESS ) {
+
+                ContactDetailsSettings contactDetails = userProfile.getContact_details();
+                if ( contactDetails == null ) {
+                    contactDetails = new ContactDetailsSettings();
+                }
+
+                if ( entry.getValue() == OrganizationUnit.COMPANY ) {
+
+                } else if ( entry.getValue() == OrganizationUnit.REGION ) {
+
+                } else if ( entry.getValue() == OrganizationUnit.BRANCH ) {
+
+                } else if ( entry.getValue() == OrganizationUnit.AGENT ) {
+
+                }
+                userProfile.setContact_details( contactDetails );
+            } else if ( entry.getKey() == SettingsForApplication.LOCATION ) {
+                ContactDetailsSettings contactDetails = userProfile.getContact_details();
+                if ( contactDetails == null ) {
+                    contactDetails = new ContactDetailsSettings();
+                }
+                if ( entry.getValue() == OrganizationUnit.COMPANY ) {
+                    contactDetails.setLocation( companyUnitSettings.getContact_details().getLocation() );
+                } else if ( entry.getValue() == OrganizationUnit.REGION ) {
+                    contactDetails.setLocation( regionUnitSettings.getContact_details().getLocation() );
+                } else if ( entry.getValue() == OrganizationUnit.BRANCH ) {
+                    contactDetails.setLocation( branchUnitSettings.getContact_details().getLocation() );
+                } else if ( entry.getValue() == OrganizationUnit.AGENT ) {
+                    contactDetails.setLocation( agentUnitSettings.getContact_details().getLocation() );
+                }
+                userProfile.setContact_details( contactDetails );
+            } else if ( entry.getKey() == SettingsForApplication.PHONE ) {
+                ContactDetailsSettings contactDetails = userProfile.getContact_details();
+                if ( contactDetails == null ) {
+                    contactDetails = new ContactDetailsSettings();
+                }
+                ContactNumberSettings contactNumberSettings = contactDetails.getContact_numbers();
+                if ( contactNumberSettings == null ) {
+                    contactNumberSettings = new ContactNumberSettings();
+                }
+                if ( entry.getValue() == OrganizationUnit.COMPANY ) {
+                    contactNumberSettings.setWork( companyUnitSettings.getContact_details().getContact_numbers().getWork() );
+                } else if ( entry.getValue() == OrganizationUnit.REGION ) {
+                    contactNumberSettings.setWork( regionUnitSettings.getContact_details().getContact_numbers().getWork() );
+                } else if ( entry.getValue() == OrganizationUnit.BRANCH ) {
+                    contactNumberSettings.setWork( branchUnitSettings.getContact_details().getContact_numbers().getWork() );
+                } else if ( entry.getValue() == OrganizationUnit.AGENT ) {
+                    contactNumberSettings.setWork( agentUnitSettings.getContact_details().getContact_numbers().getWork() );
+                }
+                contactDetails.setContact_numbers( contactNumberSettings );
+                userProfile.setContact_details( contactDetails );
+            } else if ( entry.getKey() == SettingsForApplication.FACEBOOK ) {
+                SocialMediaTokens socialMediaTokens = userProfile.getSocialMediaTokens();
+                if ( socialMediaTokens == null ) {
+                    socialMediaTokens = new SocialMediaTokens();
+                }
+                if ( entry.getValue() == OrganizationUnit.COMPANY ) {
+                    socialMediaTokens.setFacebookToken( companyUnitSettings.getSocialMediaTokens().getFacebookToken() );
+                } else if ( entry.getValue() == OrganizationUnit.REGION ) {
+                    socialMediaTokens.setFacebookToken( regionUnitSettings.getSocialMediaTokens().getFacebookToken() );
+                } else if ( entry.getValue() == OrganizationUnit.BRANCH ) {
+                    socialMediaTokens.setFacebookToken( branchUnitSettings.getSocialMediaTokens().getFacebookToken() );
+                } else if ( entry.getValue() == OrganizationUnit.AGENT ) {
+                    socialMediaTokens.setFacebookToken( agentUnitSettings.getSocialMediaTokens().getFacebookToken() );
+                }
+                userProfile.setSocialMediaTokens( socialMediaTokens );
+            } else if ( entry.getKey() == SettingsForApplication.GOOGLE_PLUS ) {
+                SocialMediaTokens socialMediaTokens = userProfile.getSocialMediaTokens();
+                if ( socialMediaTokens == null ) {
+                    socialMediaTokens = new SocialMediaTokens();
+                }
+                if ( entry.getValue() == OrganizationUnit.COMPANY ) {
+                    socialMediaTokens.setGoogleToken( companyUnitSettings.getSocialMediaTokens().getGoogleToken() );
+                } else if ( entry.getValue() == OrganizationUnit.REGION ) {
+                    socialMediaTokens.setGoogleToken( regionUnitSettings.getSocialMediaTokens().getGoogleToken() );
+                } else if ( entry.getValue() == OrganizationUnit.BRANCH ) {
+                    socialMediaTokens.setGoogleToken( branchUnitSettings.getSocialMediaTokens().getGoogleToken() );
+                } else if ( entry.getValue() == OrganizationUnit.AGENT ) {
+                    socialMediaTokens.setGoogleToken( agentUnitSettings.getSocialMediaTokens().getGoogleToken() );
+                }
+                userProfile.setSocialMediaTokens( socialMediaTokens );
+            } else if ( entry.getKey() == SettingsForApplication.LINKED_IN ) {
+                SocialMediaTokens socialMediaTokens = userProfile.getSocialMediaTokens();
+                if ( socialMediaTokens == null ) {
+                    socialMediaTokens = new SocialMediaTokens();
+                }
+                if ( entry.getValue() == OrganizationUnit.COMPANY ) {
+                    socialMediaTokens.setLinkedInToken( companyUnitSettings.getSocialMediaTokens().getLinkedInToken() );
+                } else if ( entry.getValue() == OrganizationUnit.REGION ) {
+                    socialMediaTokens.setLinkedInToken( regionUnitSettings.getSocialMediaTokens().getLinkedInToken() );
+                } else if ( entry.getValue() == OrganizationUnit.BRANCH ) {
+                    socialMediaTokens.setLinkedInToken( branchUnitSettings.getSocialMediaTokens().getLinkedInToken() );
+                } else if ( entry.getValue() == OrganizationUnit.AGENT ) {
+                    socialMediaTokens.setLinkedInToken( agentUnitSettings.getSocialMediaTokens().getLinkedInToken() );
+                }
+                userProfile.setSocialMediaTokens( socialMediaTokens );
+            } else if ( entry.getKey() == SettingsForApplication.LENDING_TREE ) {
+                SocialMediaTokens socialMediaTokens = userProfile.getSocialMediaTokens();
+                if ( socialMediaTokens == null ) {
+                    socialMediaTokens = new SocialMediaTokens();
+                }
+                if ( entry.getValue() == OrganizationUnit.COMPANY ) {
+                    socialMediaTokens.setLendingTreeToken( companyUnitSettings.getSocialMediaTokens().getLendingTreeToken() );
+                } else if ( entry.getValue() == OrganizationUnit.REGION ) {
+                    socialMediaTokens.setLendingTreeToken( regionUnitSettings.getSocialMediaTokens().getLendingTreeToken() );
+                } else if ( entry.getValue() == OrganizationUnit.BRANCH ) {
+                    socialMediaTokens.setLendingTreeToken( branchUnitSettings.getSocialMediaTokens().getLendingTreeToken() );
+                } else if ( entry.getValue() == OrganizationUnit.AGENT ) {
+                    socialMediaTokens.setLendingTreeToken( agentUnitSettings.getSocialMediaTokens().getLendingTreeToken() );
+                }
+                userProfile.setSocialMediaTokens( socialMediaTokens );
+            } else if ( entry.getKey() == SettingsForApplication.YELP ) {
+                SocialMediaTokens socialMediaTokens = userProfile.getSocialMediaTokens();
+                if ( socialMediaTokens == null ) {
+                    socialMediaTokens = new SocialMediaTokens();
+                }
+                if ( entry.getValue() == OrganizationUnit.COMPANY ) {
+                    socialMediaTokens.setYelpToken( companyUnitSettings.getSocialMediaTokens().getYelpToken() );
+                } else if ( entry.getValue() == OrganizationUnit.REGION ) {
+                    socialMediaTokens.setYelpToken( regionUnitSettings.getSocialMediaTokens().getYelpToken() );
+                } else if ( entry.getValue() == OrganizationUnit.BRANCH ) {
+                    socialMediaTokens.setYelpToken( branchUnitSettings.getSocialMediaTokens().getYelpToken() );
+                } else if ( entry.getValue() == OrganizationUnit.AGENT ) {
+                    socialMediaTokens.setYelpToken( agentUnitSettings.getSocialMediaTokens().getYelpToken() );
+                }
+                userProfile.setSocialMediaTokens( socialMediaTokens );
+            } else if ( entry.getKey() == SettingsForApplication.REALTOR ) {
+                SocialMediaTokens socialMediaTokens = userProfile.getSocialMediaTokens();
+                if ( socialMediaTokens == null ) {
+                    socialMediaTokens = new SocialMediaTokens();
+                }
+                if ( entry.getValue() == OrganizationUnit.COMPANY ) {
+                    socialMediaTokens.setRealtorToken( companyUnitSettings.getSocialMediaTokens().getRealtorToken() );
+                } else if ( entry.getValue() == OrganizationUnit.REGION ) {
+                    socialMediaTokens.setRealtorToken( regionUnitSettings.getSocialMediaTokens().getRealtorToken() );
+                } else if ( entry.getValue() == OrganizationUnit.BRANCH ) {
+                    socialMediaTokens.setRealtorToken( branchUnitSettings.getSocialMediaTokens().getRealtorToken() );
+                } else if ( entry.getValue() == OrganizationUnit.AGENT ) {
+                    socialMediaTokens.setRealtorToken( agentUnitSettings.getSocialMediaTokens().getRealtorToken() );
+                }
+                userProfile.setSocialMediaTokens( socialMediaTokens );
+            } else if ( entry.getKey() == SettingsForApplication.ZILLOW ) {
+                SocialMediaTokens socialMediaTokens = userProfile.getSocialMediaTokens();
+                if ( socialMediaTokens == null ) {
+                    socialMediaTokens = new SocialMediaTokens();
+                }
+                if ( entry.getValue() == OrganizationUnit.COMPANY ) {
+                    socialMediaTokens.setZillowToken( companyUnitSettings.getSocialMediaTokens().getZillowToken() );
+                } else if ( entry.getValue() == OrganizationUnit.REGION ) {
+                    socialMediaTokens.setZillowToken( regionUnitSettings.getSocialMediaTokens().getZillowToken() );
+                } else if ( entry.getValue() == OrganizationUnit.BRANCH ) {
+                    socialMediaTokens.setZillowToken( branchUnitSettings.getSocialMediaTokens().getZillowToken() );
+                } else if ( entry.getValue() == OrganizationUnit.AGENT ) {
+                    socialMediaTokens.setZillowToken( agentUnitSettings.getSocialMediaTokens().getZillowToken() );
+                }
+                userProfile.setSocialMediaTokens( socialMediaTokens );
+            }
+        }
+        return userProfile;
+    }
+
 }

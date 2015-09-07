@@ -2046,6 +2046,12 @@
         box-shadow: 0px 1px 20px 2px #7C7C7C;
     }
     
+    .profile-url-wrapper{
+    	width: 600px;
+        float: none;
+        box-shadow: 0px 1px 20px 2px #7C7C7C;
+    }
+    
     .error-wrapper{
         width: 365px;
         margin: 0 auto 10px;
