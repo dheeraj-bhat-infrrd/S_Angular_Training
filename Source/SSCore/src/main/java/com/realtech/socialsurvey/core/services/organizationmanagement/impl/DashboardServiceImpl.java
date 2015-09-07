@@ -232,7 +232,8 @@ public class DashboardServiceImpl implements DashboardService, InitializingBean 
 			surveyDetailsToPopulate.add(survey.getModifiedOn());
 
 			try {
-				surveyDetailsToPopulate.add(surveyHandler.composeLink(survey.getAgentId(), survey.getCustomerEmailId(), survey.getCustomerFirstName(), survey.getCustomerLastName()));
+				surveyDetailsToPopulate.add(surveyHandler.composeLink(survey.getAgentId(), survey.getCustomerEmailId(),
+						survey.getCustomerFirstName(), survey.getCustomerLastName()));
 			}
 			catch (InvalidInputException e) {
 				LOG.error("Invalid input exception caught in downloadIncompleteSurveyData(). Nested exception is ", e);
@@ -240,7 +241,7 @@ public class DashboardServiceImpl implements DashboardService, InitializingBean 
 			data.put((++counter).toString(), surveyDetailsToPopulate);
 			surveyDetailsToPopulate = new ArrayList<>();
 		}
-		
+
 		surveyDetailsToPopulate.add("First Name");
 		surveyDetailsToPopulate.add("Last Name");
 		surveyDetailsToPopulate.add("Email Id");
@@ -365,58 +366,64 @@ public class DashboardServiceImpl implements DashboardService, InitializingBean 
 		int max = 0;
 		int internalMax = 0;
 		for (SurveyDetails survey : surveyDetails) {
-			internalMax = survey.getSurveyResponse().size();
-			if (internalMax > max)
-				max = internalMax;
+			if (survey.getSurveyResponse() != null) {
+				internalMax = survey.getSurveyResponse().size();
+				if (internalMax > max) {
+					max = internalMax;
+				}
+			}
 		}
-		
+
 		// This data needs to be written (List<Object>)
 		Map<String, List<Object>> data = new TreeMap<>();
 		List<Object> surveyDetailsToPopulate = new ArrayList<>();
 		for (SurveyDetails survey : surveyDetails) {
-			String agentName = survey.getAgentName();
-			surveyDetailsToPopulate.add(agentName.substring(0, agentName.lastIndexOf(' ')));
-			surveyDetailsToPopulate.add(agentName.substring(agentName.lastIndexOf(' ') + 1));
-			surveyDetailsToPopulate.add(survey.getCustomerFirstName());
-			surveyDetailsToPopulate.add(survey.getCustomerLastName());
-			surveyDetailsToPopulate.add(DATE_FORMATTER.format(survey.getCreatedOn()));
-			surveyDetailsToPopulate.add(DATE_FORMATTER.format(survey.getModifiedOn()));
-			surveyDetailsToPopulate.add(Days.daysBetween(new DateTime(survey.getCreatedOn()), new DateTime(survey.getModifiedOn())).getDays());
-			
-			if (survey.getSource() != null && !survey.getSource().isEmpty()) {
-				surveyDetailsToPopulate.add(survey.getSource());
-			}
-			else {
-				surveyDetailsToPopulate.add(MongoSocialPostDaoImpl.KEY_SOURCE_SS);
-			}
+			// exclude reviews which dont have survey answers, like zillow
+			if (survey.getSurveyResponse() != null) {
+				String agentName = survey.getAgentName();
+				surveyDetailsToPopulate.add(agentName.substring(0, agentName.lastIndexOf(' ')));
+				surveyDetailsToPopulate.add(agentName.substring(agentName.lastIndexOf(' ') + 1));
+				surveyDetailsToPopulate.add(survey.getCustomerFirstName());
+				surveyDetailsToPopulate.add(survey.getCustomerLastName());
+				surveyDetailsToPopulate.add(DATE_FORMATTER.format(survey.getCreatedOn()));
+				surveyDetailsToPopulate.add(DATE_FORMATTER.format(survey.getModifiedOn()));
+				surveyDetailsToPopulate.add(Days.daysBetween(new DateTime(survey.getCreatedOn()), new DateTime(survey.getModifiedOn())).getDays());
 
-			surveyDetailsToPopulate.add(survey.getScore());
-			for (SurveyResponse response : survey.getSurveyResponse()) {
-				surveyDetailsToPopulate.add(response.getAnswer());
-			}
+				if (survey.getSource() != null && !survey.getSource().isEmpty()) {
+					surveyDetailsToPopulate.add(survey.getSource());
+				}
+				else {
+					surveyDetailsToPopulate.add(MongoSocialPostDaoImpl.KEY_SOURCE_SS);
+				}
 
-			surveyDetailsToPopulate.add(survey.getMood());
-			surveyDetailsToPopulate.add(survey.getReview());
-			if (survey.getAgreedToShare() != null && !survey.getAgreedToShare().isEmpty()) {
-				String status = survey.getAgreedToShare();
-				if (status.equals("true")) {
+				surveyDetailsToPopulate.add(survey.getScore());
+				for (SurveyResponse response : survey.getSurveyResponse()) {
+					surveyDetailsToPopulate.add(response.getAnswer());
+				}
+
+				surveyDetailsToPopulate.add(survey.getMood());
+				surveyDetailsToPopulate.add(survey.getReview());
+				if (survey.getAgreedToShare() != null && !survey.getAgreedToShare().isEmpty()) {
+					String status = survey.getAgreedToShare();
+					if (status.equals("true")) {
+						surveyDetailsToPopulate.add(CommonConstants.STATUS_YES);
+					}
+					else {
+						surveyDetailsToPopulate.add(CommonConstants.STATUS_NO);
+					}
+				}
+				else if (survey.getSharedOn() != null && !survey.getSharedOn().isEmpty()) {
 					surveyDetailsToPopulate.add(CommonConstants.STATUS_YES);
 				}
 				else {
 					surveyDetailsToPopulate.add(CommonConstants.STATUS_NO);
 				}
-			}
-			else if (survey.getSharedOn() != null && !survey.getSharedOn().isEmpty()) {
-				surveyDetailsToPopulate.add(CommonConstants.STATUS_YES);
-			}
-			else {
-				surveyDetailsToPopulate.add(CommonConstants.STATUS_NO);
-			}
 
-			surveyDetailsToPopulate.add(StringUtils.join(survey.getSharedOn(), ","));
+				surveyDetailsToPopulate.add(StringUtils.join(survey.getSharedOn(), ","));
 
-			data.put((++counter).toString(), surveyDetailsToPopulate);
-			surveyDetailsToPopulate = new ArrayList<>();
+				data.put((++counter).toString(), surveyDetailsToPopulate);
+				surveyDetailsToPopulate = new ArrayList<>();
+			}
 		}
 
 		// Setting up headers
