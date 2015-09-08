@@ -582,6 +582,7 @@ public interface CommonConstants
 
     //Default vertcial crm mapping id
     public static final long DEFAULT_VERTICAL_CRM_ID = -1;
+    public static final Integer DEFAULT_VERTICAL_ID = -1;
 
     public static final int EXPIRE_AFTER_DAYS = 3;
     public static final int DECIMALS_TO_ROUND_OFF = 3;
