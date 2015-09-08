@@ -19,7 +19,7 @@
 	</c:when>
 </c:choose>
 
-<div class="hm-header-main-wrapper hm-hdr-bord-bot">
+<div class="hm-header-main-wrapper ">
 	<div class="container">
 		<div class="hm-header-row clearfix">
 			<div class="float-left hm-header-row-left hr-dsh-adj-lft">
@@ -37,7 +37,7 @@
 		<div id="prof-container" data-profile-master-id="${profileMasterId}"
 			data-column-name="${columnName}" data-account-type="${accounttype}"
 			data-column-value="${columnValue}"
-			class="dash-top-info dash-prof-wrapper">
+			class=" dash-prof-wrapper">
 			<div id="dash-profile-detail-circles" class="row row-dash-top-adj">
 				<!-- Populated by dashboard_profiledetail.jsp -->
 			</div>
