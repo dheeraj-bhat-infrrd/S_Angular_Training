@@ -46,6 +46,8 @@ import com.realtech.socialsurvey.core.entities.SurveyPreInitiation;
 import com.realtech.socialsurvey.core.entities.SurveyRecipient;
 import com.realtech.socialsurvey.core.entities.User;
 import com.realtech.socialsurvey.core.enums.DisplayMessageType;
+import com.realtech.socialsurvey.core.enums.OrganizationUnit;
+import com.realtech.socialsurvey.core.enums.SettingsForApplication;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.exception.NoRecordsFetchedException;
 import com.realtech.socialsurvey.core.exception.NonFatalException;
@@ -58,6 +60,7 @@ import com.realtech.socialsurvey.core.services.organizationmanagement.SurveyPreI
 import com.realtech.socialsurvey.core.services.organizationmanagement.UserManagementService;
 import com.realtech.socialsurvey.core.services.search.SolrSearchService;
 import com.realtech.socialsurvey.core.services.search.exception.SolrException;
+import com.realtech.socialsurvey.core.services.settingsmanagement.impl.InvalidSettingsStateException;
 import com.realtech.socialsurvey.core.services.surveybuilder.SurveyHandler;
 import com.realtech.socialsurvey.core.utils.DisplayMessageConstants;
 import com.realtech.socialsurvey.core.utils.EmailFormatHelper;
@@ -936,95 +939,146 @@ public class DashboardController
      * already.
      */
     @ResponseBody
-	@RequestMapping(value = "/sendsurveyremindermail")
-	public String sendReminderMailForSurvey(Model model, HttpServletRequest request) {
-		LOG.info("Method to send email to remind customer for survey sendReminderMailForSurvey() started.");
+    @RequestMapping ( value = "/sendsurveyremindermail")
+    public String sendReminderMailForSurvey( Model model, HttpServletRequest request )
+    {
+        LOG.info( "Method to send email to remind customer for survey sendReminderMailForSurvey() started." );
 
-		try {
-			String surveyPreInitiationIdStr = request.getParameter("surveyPreInitiationId");
+        try {
+            String surveyPreInitiationIdStr = request.getParameter( "surveyPreInitiationId" );
 
-			if (surveyPreInitiationIdStr == null || surveyPreInitiationIdStr.isEmpty()) {
-				LOG.error("Invalid value (null/empty) passed for surveyPreInitiationIdStr.");
-				throw new InvalidInputException("Invalid value (null/empty) passed for surveyPreInitiationIdStr.");
-			}
+            if ( surveyPreInitiationIdStr == null || surveyPreInitiationIdStr.isEmpty() ) {
+                LOG.error( "Invalid value (null/empty) passed for surveyPreInitiationIdStr." );
+                throw new InvalidInputException( "Invalid value (null/empty) passed for surveyPreInitiationIdStr." );
+            }
+            Map<String, Long> hierarchyMap = null;
+            Map<SettingsForApplication, OrganizationUnit> map = null;
+            String logoUrl = null;
+            String surveyLink = "";
+            long surveyPreInitiationId;
+            try {
+                surveyPreInitiationId = Integer.parseInt( surveyPreInitiationIdStr );
+            } catch ( NumberFormatException e ) {
+                throw new InvalidInputException( "Invalid surveyPreInitiationIdStr passed", e.getMessage(), e );
+            }
+            SurveyPreInitiation survey = surveyHandler.getPreInitiatedSurveyById( surveyPreInitiationId );
+            long agentId = survey.getAgentId();
+            String customerEmail = survey.getCustomerEmailId();
+            String custFirstName = survey.getCustomerFirstName();
+            String custLastName = survey.getCustomerLastName();
+            if ( survey != null ) {
+                surveyLink = surveyHandler.getSurveyUrl( agentId, customerEmail,
+                    surveyHandler.composeLink( agentId, customerEmail, custFirstName, custLastName ) );
+            }
 
-			String surveyLink = "";
-			long surveyPreInitiationId;
-			try {
-				surveyPreInitiationId = Integer.parseInt(surveyPreInitiationIdStr);
-			}
-			catch (NumberFormatException e) {
-				throw new InvalidInputException("Invalid surveyPreInitiationIdStr passed", e.getMessage(), e);
-			}
-			SurveyPreInitiation survey = surveyHandler.getPreInitiatedSurveyById(surveyPreInitiationId);
-			long agentId = survey.getAgentId();
-			String customerEmail = survey.getCustomerEmailId();
-			String custFirstName = survey.getCustomerFirstName();
-			String custLastName = survey.getCustomerLastName();
-			if (survey != null) {
-				surveyLink = surveyHandler.getSurveyUrl(agentId, customerEmail,
-						surveyHandler.composeLink(agentId, customerEmail, custFirstName, custLastName));
-			}
+            try {
+                AgentSettings agentSettings = userManagementService.getUserSettings( agentId );
+                String agentTitle = "";
+                if ( agentSettings.getContact_details() != null && agentSettings.getContact_details().getTitle() != null ) {
+                    agentTitle = agentSettings.getContact_details().getTitle();
+                }
 
-			try {
-				AgentSettings agentSettings = userManagementService.getUserSettings(agentId);
-				String agentTitle = "";
-				if (agentSettings.getContact_details() != null && agentSettings.getContact_details().getTitle() != null) {
-					agentTitle = agentSettings.getContact_details().getTitle();
-				}
+                String agentPhone = "";
+                if ( agentSettings.getContact_details() != null
+                    && agentSettings.getContact_details().getContact_numbers() != null
+                    && agentSettings.getContact_details().getContact_numbers().getWork() != null ) {
+                    agentPhone = agentSettings.getContact_details().getContact_numbers().getWork();
+                }
 
-				String agentPhone = "";
-				if (agentSettings.getContact_details() != null && agentSettings.getContact_details().getContact_numbers() != null
-						&& agentSettings.getContact_details().getContact_numbers().getWork() != null) {
-					agentPhone = agentSettings.getContact_details().getContact_numbers().getWork();
-				}
+                String agentEmailId = "";
+                if ( agentSettings.getContact_details() != null && agentSettings.getContact_details().getMail_ids() != null
+                    && agentSettings.getContact_details().getMail_ids().getWork() != null ) {
+                    agentEmailId = agentSettings.getContact_details().getMail_ids().getWork();
+                }
 
-				String agentEmailId = "";
-				if(agentSettings.getContact_details() != null && agentSettings.getContact_details().getMail_ids() != null && agentSettings.getContact_details().getMail_ids().getWork() != null){
-					agentEmailId = agentSettings.getContact_details().getMail_ids().getWork();
-				}
-					
-				User user = userManagementService.getUserByUserId(agentId);
-				String companyName = user.getCompany().getCompany();
-				String agentName = "";
-				
-				if(agentSettings.getContact_details() != null && agentSettings.getContact_details().getName() != null) {
-					agentName = agentSettings.getContact_details().getName();	
-				}
-				
-				if (enableKafka.equals(CommonConstants.YES)) {
-					emailServices.queueSurveyReminderMail(customerEmail, custFirstName, agentName, surveyLink, agentPhone, agentTitle, companyName);
-				}
-				else {
-					// TODO: add call to emailservice method.
-					OrganizationUnitSettings companySettings = null;
-					try {
-						companySettings = organizationManagementService.getCompanySettings(user.getCompany().getCompanyId());
-					}
-					catch (InvalidInputException e) {
-						LOG.error("InvalidInputException occured while trying to fetch company settings.");
-					}
-					emailServices.sendManualSurveyReminderMail(companySettings, user, agentName, agentEmailId, agentPhone, agentTitle, companyName, survey,
-							surveyLink);
-				}
-			}
-			catch (InvalidInputException e) {
-				LOG.error("Exception occurred while trying to send survey reminder mail to : " + customerEmail);
-				throw e;
-			}
+                hierarchyMap = profileManagementService.getPrimaryHierarchyByAgentProfile( agentSettings );
 
-			// Increasing value of reminder count by 1.
-			if (survey != null) {
-				surveyHandler.updateReminderCount(survey.getSurveyPreIntitiationId(), true);
-			}
-		}
-		catch (NonFatalException e) {
-			LOG.error("NonFatalException caught in sendReminderMailForSurvey() while sending mail. Nested exception is ", e);
-		}
+                long companyId = hierarchyMap.get( CommonConstants.COMPANY_ID_COLUMN );
+                long regionId = hierarchyMap.get( CommonConstants.REGION_ID_COLUMN );
+                long branchId = hierarchyMap.get( CommonConstants.BRANCH_ID_COLUMN );
 
-		LOG.info("Method to send email to remind customer for survey sendReminderMailForSurvey() finished.");
-		return new Gson().toJson("success");
-	}
+
+                try {
+                    try {
+                        map = profileManagementService.getPrimaryHierarchyByEntity( CommonConstants.AGENT_ID_COLUMN,
+                            agentSettings.getIden() );
+                    } catch ( InvalidInputException e ) {
+                        // TODO Auto-generated catch block
+                        e.printStackTrace();
+                    }
+                } catch ( InvalidSettingsStateException e ) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                }
+
+
+                User user = userManagementService.getUserByUserId( agentId );
+                String companyName = user.getCompany().getCompany();
+                String agentName = "";
+
+                if ( agentSettings.getContact_details() != null && agentSettings.getContact_details().getName() != null ) {
+                    agentName = agentSettings.getContact_details().getName();
+                }
+
+                if ( enableKafka.equals( CommonConstants.YES ) ) {
+                    emailServices.queueSurveyReminderMail( customerEmail, custFirstName, agentName, surveyLink, agentPhone,
+                        agentTitle, companyName );
+                } else {
+                    // TODO: add call to emailservice method.
+                    OrganizationUnitSettings companySettings = null;
+                    try {
+                        companySettings = organizationManagementService.getCompanySettings( user.getCompany().getCompanyId() );
+                    } catch ( InvalidInputException e ) {
+                        LOG.error( "InvalidInputException occured while trying to fetch company settings." );
+                    }
+
+                    OrganizationUnit organizationUnit = map.get( SettingsForApplication.LOGO );
+                    if ( organizationUnit == OrganizationUnit.COMPANY ) {
+                        logoUrl = companySettings.getLogo();
+                    } else if ( organizationUnit == OrganizationUnit.REGION ) {
+                        OrganizationUnitSettings regionSettings = null;
+                        try {
+                            regionSettings = organizationManagementService.getRegionSettings( regionId );
+                        } catch ( InvalidInputException e ) {
+                            // TODO Auto-generated catch block
+                            e.printStackTrace();
+                        }
+                        if ( regionSettings != null )
+                            logoUrl = regionSettings.getLogo();
+                    } else if ( organizationUnit == OrganizationUnit.BRANCH ) {
+                        OrganizationUnitSettings branchSettings = null;
+                        try {
+                            branchSettings = organizationManagementService.getBranchSettingsDefault( branchId );
+                        } catch ( InvalidInputException | NoRecordsFetchedException e ) {
+                            // TODO Auto-generated catch block
+                            e.printStackTrace();
+                        }
+                        if ( branchSettings != null ) {
+                            logoUrl = branchSettings.getLogo();
+                        }
+                    } else if ( organizationUnit == OrganizationUnit.AGENT ) {
+                        logoUrl = agentSettings.getLogo();
+                    }
+
+                    emailServices.sendManualSurveyReminderMail( companySettings, user, agentName, agentEmailId, agentPhone,
+                        agentTitle, companyName, survey, surveyLink, logoUrl );
+                }
+            } catch ( InvalidInputException e ) {
+                LOG.error( "Exception occurred while trying to send survey reminder mail to : " + customerEmail );
+                throw e;
+            }
+
+            // Increasing value of reminder count by 1.
+            if ( survey != null ) {
+                surveyHandler.updateReminderCount( survey.getSurveyPreIntitiationId(), true );
+            }
+        } catch ( NonFatalException e ) {
+            LOG.error( "NonFatalException caught in sendReminderMailForSurvey() while sending mail. Nested exception is ", e );
+        }
+
+        LOG.info( "Method to send email to remind customer for survey sendReminderMailForSurvey() finished." );
+        return new Gson().toJson( "success" );
+    }
 
 
     /**
@@ -1047,7 +1101,9 @@ public class DashboardController
                 try {
                     long incompleteSurveyId = Long.parseLong( incompleteSurveyIdStr );
                     SurveyPreInitiation survey = surveyHandler.getPreInitiatedSurvey( incompleteSurveyId );
-
+                    Map<String, Long> hierarchyMap = null;
+                    Map<SettingsForApplication, OrganizationUnit> map = null;
+                    String logoUrl = null;
                     long agentId = survey.getAgentId();
                     String customerEmail = survey.getCustomerEmailId();
                     String custFirstName = survey.getCustomerFirstName();
@@ -1067,10 +1123,10 @@ public class DashboardController
                     if ( agentSettings.getContact_details() != null && agentSettings.getContact_details().getTitle() != null ) {
                         agentTitle = agentSettings.getContact_details().getTitle();
                     }
-                    
+
                     String agentName = "";
-                    if (agentSettings.getContact_details() != null && agentSettings.getContact_details().getName() != null){
-                    	agentName = agentSettings.getContact_details().getName();
+                    if ( agentSettings.getContact_details() != null && agentSettings.getContact_details().getName() != null ) {
+                        agentName = agentSettings.getContact_details().getName();
                     }
                     String agentEmailId = "";
                     if ( agentSettings.getContact_details() != null && agentSettings.getContact_details().getMail_ids() != null
@@ -1084,7 +1140,24 @@ public class DashboardController
                         && agentSettings.getContact_details().getContact_numbers().getWork() != null ) {
                         agentPhone = agentSettings.getContact_details().getContact_numbers().getWork();
                     }
-                    
+
+                    hierarchyMap = profileManagementService.getPrimaryHierarchyByAgentProfile( agentSettings );
+                    long companyId = hierarchyMap.get( CommonConstants.COMPANY_ID_COLUMN );
+                    long regionId = hierarchyMap.get( CommonConstants.REGION_ID_COLUMN );
+                    long branchId = hierarchyMap.get( CommonConstants.BRANCH_ID_COLUMN );
+                    try {
+                        try {
+                            map = profileManagementService.getPrimaryHierarchyByEntity( CommonConstants.AGENT_ID_COLUMN,
+                                agentSettings.getIden() );
+                        } catch ( InvalidInputException e ) {
+                            // TODO Auto-generated catch block
+                            e.printStackTrace();
+                        }
+                    } catch ( InvalidSettingsStateException e ) {
+                        // TODO Auto-generated catch block
+                        e.printStackTrace();
+                    }
+
                     User user = userManagementService.getUserByUserId( agentId );
                     String companyName = user.getCompany().getCompany();
 
@@ -1099,8 +1172,37 @@ public class DashboardController
                         } catch ( InvalidInputException e ) {
                             LOG.error( "InvalidInputException occured while trying to fetch company settings." );
                         }
+
+                        OrganizationUnit organizationUnit = map.get( SettingsForApplication.LOGO );
+                        if ( organizationUnit == OrganizationUnit.COMPANY ) {
+                            logoUrl = companySettings.getLogo();
+                        } else if ( organizationUnit == OrganizationUnit.REGION ) {
+                            OrganizationUnitSettings regionSettings = null;
+                            try {
+                                regionSettings = organizationManagementService.getRegionSettings( regionId );
+                            } catch ( InvalidInputException e ) {
+                                // TODO Auto-generated catch block
+                                e.printStackTrace();
+                            }
+                            if ( regionSettings != null )
+                                logoUrl = regionSettings.getLogo();
+                        } else if ( organizationUnit == OrganizationUnit.BRANCH ) {
+                            OrganizationUnitSettings branchSettings = null;
+                            try {
+                                branchSettings = organizationManagementService.getBranchSettingsDefault( branchId );
+                            } catch ( InvalidInputException | NoRecordsFetchedException e ) {
+                                // TODO Auto-generated catch block
+                                e.printStackTrace();
+                            }
+                            if ( branchSettings != null ) {
+                                logoUrl = branchSettings.getLogo();
+                            }
+                        } else if ( organizationUnit == OrganizationUnit.AGENT ) {
+                            logoUrl = agentSettings.getLogo();
+                        }
+
                         emailServices.sendManualSurveyReminderMail( companySettings, user, agentName, agentEmailId, agentPhone,
-                            agentTitle, companyName, survey, surveyLink );
+                            agentTitle, companyName, survey, surveyLink, logoUrl );
                     }
 
                     surveyHandler.updateReminderCount( survey.getSurveyPreIntitiationId(), true );
