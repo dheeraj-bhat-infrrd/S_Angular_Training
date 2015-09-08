@@ -76,20 +76,20 @@
 							name="selectedUserEmailArray"
 							placeholder="Type your message here"></textarea>
 					</div>
-				</div>
+			</div>
 				<div class="bd-hr-form-item clearfix">
 					<div class="float-left bd-frm-left"></div>
-					<input type="file" name="dummyAttachment" id="attachment" style="display:none"/>
+					<!-- <input type="file" name="dummyAttachment" id="attachment" style="display:none"/>
 					<input type="file"  style="display:none" name="attachment" id="files"> 
-					<div class="bd-btn-save" id="icn-file-upload">Upload</div>
+					<div class="bd-btn-save" id="icn-file-upload">Upload</div> -->
 					<div id="send-button" style="margin: 0px auto; margin-top: 20px"
 						class="bd-btn-save cursor-pointer ">Send message</div>
-				</div>
+				</div> 
 			</form>
 		</div>
 	</div>
 </div>
-<script>
+<!-- <script>
 	$(document).ready(function() {
 		int i;
 		$('#icn-file-upload').click(function() {
@@ -105,4 +105,4 @@
 			document.getElementById("files").files = files;
 		});
 	});
-</script>
+</script> -->
