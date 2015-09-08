@@ -823,7 +823,7 @@ public interface OrganizationManagementService
     public void updateCompany( Company company ) throws DatabaseException;
 
 
-    public List<VerticalCrmMapping> getCrmMapping( User user );
+    public List<VerticalCrmMapping> getCrmMapping( User user ) throws InvalidInputException;
 
 
     public Map<Long, OrganizationUnitSettings> getSettingsMapWithLinkedinImage( String string );
