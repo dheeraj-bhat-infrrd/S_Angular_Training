@@ -7,6 +7,7 @@ import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -17,6 +18,8 @@ import org.springframework.stereotype.Component;
 
 import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.commons.EmailTemplateConstants;
+import com.realtech.socialsurvey.core.dao.OrganizationUnitSettingsDao;
+import com.realtech.socialsurvey.core.entities.AgentSettings;
 import com.realtech.socialsurvey.core.entities.EmailEntity;
 import com.realtech.socialsurvey.core.entities.FileContentReplacements;
 import com.realtech.socialsurvey.core.entities.MailContent;
@@ -24,11 +27,17 @@ import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
 import com.realtech.socialsurvey.core.entities.SurveyPreInitiation;
 import com.realtech.socialsurvey.core.entities.User;
 import com.realtech.socialsurvey.core.enums.EmailHeader;
+import com.realtech.socialsurvey.core.enums.OrganizationUnit;
+import com.realtech.socialsurvey.core.enums.SettingsForApplication;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
+import com.realtech.socialsurvey.core.exception.NoRecordsFetchedException;
 import com.realtech.socialsurvey.core.services.mail.EmailSender;
 import com.realtech.socialsurvey.core.services.mail.EmailServices;
 import com.realtech.socialsurvey.core.services.mail.UndeliveredEmailException;
 import com.realtech.socialsurvey.core.services.mq.ProducerForQueue;
+import com.realtech.socialsurvey.core.services.organizationmanagement.OrganizationManagementService;
+import com.realtech.socialsurvey.core.services.organizationmanagement.ProfileManagementService;
+import com.realtech.socialsurvey.core.services.settingsmanagement.impl.InvalidSettingsStateException;
 import com.realtech.socialsurvey.core.utils.EmailFormatHelper;
 
 
@@ -50,6 +59,15 @@ public class EmailServicesImpl implements EmailServices
 
     @Autowired
     private EmailSender emailSender;
+
+    @Autowired
+    private OrganizationUnitSettingsDao organizationUnitSettingsDao;
+
+    @Autowired
+    private ProfileManagementService profileManagementService;
+
+    @Autowired
+    private OrganizationManagementService organizationManagementService;
 
     /*
      * @Autowired private OrganizationManagementService
@@ -1768,9 +1786,64 @@ public class EmailServicesImpl implements EmailServices
         String agentEmailId, String agentPhone, String agentTitle, String companyName, SurveyPreInitiation survey,
         String surveyLink )
     {
+        Map<String, Long> hierarchyMap = null;
+        Map<SettingsForApplication, OrganizationUnit> map = null;
+        String logoUrl = null;
+
+        AgentSettings agentSettings = organizationUnitSettingsDao.fetchAgentSettingsById( user.getUserId() );
+        hierarchyMap = profileManagementService.getPrimaryHierarchyByAgentProfile( agentSettings );
+
+        long companyId = hierarchyMap.get( CommonConstants.COMPANY_ID_COLUMN );
+        long regionId = hierarchyMap.get( CommonConstants.REGION_ID_COLUMN );
+        long branchId = hierarchyMap.get( CommonConstants.BRANCH_ID_COLUMN );
+
+        try {
+            try {
+                map = profileManagementService.getPrimaryHierarchyByEntity( CommonConstants.AGENT_ID_COLUMN, user.getUserId() );
+            } catch ( InvalidInputException e ) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
+        } catch ( InvalidSettingsStateException e ) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+
+
         LOG.info( "Sending manual survey reminder mail." );
         if ( companySettings != null && companySettings.getMail_content() != null
             && companySettings.getMail_content().getTake_survey_reminder_mail() != null ) {
+
+
+            OrganizationUnit organizationUnit = map.get( SettingsForApplication.LOGO );
+            if ( organizationUnit == OrganizationUnit.COMPANY ) {
+                logoUrl = companySettings.getLogo();
+            } else if ( organizationUnit == OrganizationUnit.REGION ) {
+                OrganizationUnitSettings regionSettings = null;
+                try {
+                    regionSettings = organizationManagementService.getRegionSettings( regionId );
+                } catch ( InvalidInputException e ) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                }
+                if ( regionSettings != null )
+                    logoUrl = regionSettings.getLogo();
+            } else if ( organizationUnit == OrganizationUnit.BRANCH ) {
+                OrganizationUnitSettings branchSettings = null;
+                try {
+                    branchSettings = organizationManagementService.getBranchSettingsDefault( branchId );
+                } catch ( InvalidInputException | NoRecordsFetchedException e ) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                }
+                if ( branchSettings != null ) {
+                    logoUrl = branchSettings.getLogo();
+                }
+            } else if ( organizationUnit == OrganizationUnit.AGENT ) {
+                logoUrl = agentSettings.getLogo();
+            }
+
+
             MailContent mailContent = companySettings.getMail_content().getTake_survey_reminder_mail();
 
             String mailBody = emailFormatHelper.replaceEmailBodyWithParams( mailContent.getMail_body(),
@@ -1780,11 +1853,19 @@ public class EmailServicesImpl implements EmailServices
             String currentYear = String.valueOf( Calendar.getInstance().get( Calendar.YEAR ) );
             String fullAddress = "";
 
-            mailBody = mailBody.replaceAll( "\\[LogoUrl\\]", appLogoUrl );
+            if ( logoUrl == null || logoUrl.equalsIgnoreCase( "" ) ) {
+                mailBody = mailBody.replaceAll( "\\[LogoUrl\\]", appLogoUrl );
+            } else {
+                mailBody = mailBody.replaceAll( "\\[LogoUrl\\]", logoUrl );
+            }
             mailBody = mailBody.replaceAll( "\\[BaseUrl\\]", appBaseUrl );
             mailBody = mailBody.replaceAll( "\\[AgentName\\]", "" );
             mailBody = mailBody.replaceAll( "\\[FirstName\\]", survey.getCustomerFirstName() );
-            mailBody = mailBody.replaceAll( "\\[Name\\]", emailFormatHelper.getCustomerDisplayNameForEmail(survey.getCustomerFirstName(), survey.getCustomerLastName()) );
+            mailBody = mailBody
+                .replaceAll(
+                    "\\[Name\\]",
+                    emailFormatHelper.getCustomerDisplayNameForEmail( survey.getCustomerFirstName(),
+                        survey.getCustomerLastName() ) );
             mailBody = mailBody.replaceAll( "\\[Link\\]", surveyLink );
             mailBody = mailBody.replaceAll( "\\[AgentSignature\\]", agentSignature );
             mailBody = mailBody.replaceAll( "\\[RecipientEmail\\]", survey.getCustomerEmailId() );

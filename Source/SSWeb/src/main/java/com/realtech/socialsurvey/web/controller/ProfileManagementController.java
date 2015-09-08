@@ -57,6 +57,8 @@ import com.realtech.socialsurvey.core.entities.LendingTreeToken;
 import com.realtech.socialsurvey.core.entities.Licenses;
 import com.realtech.socialsurvey.core.entities.LinkedInToken;
 import com.realtech.socialsurvey.core.entities.LockSettings;
+import com.realtech.socialsurvey.core.entities.MailContent;
+import com.realtech.socialsurvey.core.entities.MailContentSettings;
 import com.realtech.socialsurvey.core.entities.MailIdSettings;
 import com.realtech.socialsurvey.core.entities.MiscValues;
 import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
@@ -80,6 +82,7 @@ import com.realtech.socialsurvey.core.entities.YelpToken;
 import com.realtech.socialsurvey.core.entities.ZillowToken;
 import com.realtech.socialsurvey.core.enums.AccountType;
 import com.realtech.socialsurvey.core.enums.DisplayMessageType;
+import com.realtech.socialsurvey.core.enums.OrganizationUnit;
 import com.realtech.socialsurvey.core.enums.SettingsForApplication;
 import com.realtech.socialsurvey.core.exception.InternalServerException;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
@@ -94,6 +97,7 @@ import com.realtech.socialsurvey.core.services.organizationmanagement.ProfileNot
 import com.realtech.socialsurvey.core.services.organizationmanagement.UserManagementService;
 import com.realtech.socialsurvey.core.services.search.SolrSearchService;
 import com.realtech.socialsurvey.core.services.search.exception.SolrException;
+import com.realtech.socialsurvey.core.services.settingsmanagement.SettingsLocker;
 import com.realtech.socialsurvey.core.services.settingsmanagement.SettingsManager;
 import com.realtech.socialsurvey.core.services.settingsmanagement.SettingsSetter;
 import com.realtech.socialsurvey.core.services.upload.FileUploadService;
@@ -163,7 +167,7 @@ public class ProfileManagementController
     private SettingsSetter settingsSetter;
 
     @Autowired
-    private SettingsManager settingsManager;
+    private SettingsLocker settingsLocker;
 
 
     @Transactional
@@ -416,6 +420,24 @@ public class ProfileManagementController
                     MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION, companySettings, lockSettings );
                 companySettings.setLockSettings( lockSettings );
                 userSettings.setCompanySettings( companySettings );
+                Company company = userManagementService.getCompanyById( companySettings.getIden() );
+                if ( company != null ) {
+                    if ( fieldId.equalsIgnoreCase( "prof-logo-lock" ) ) {
+                        if ( fieldState ) {
+                            settingsLocker.lockSettingsValueForCompany( company, SettingsForApplication.LOGO, true );
+                        } else {
+                            settingsLocker.lockSettingsValueForCompany( company, SettingsForApplication.LOGO, false );
+                        }
+                    }
+                    if ( fieldId.equalsIgnoreCase( "phone-number-work-lock" ) ) {
+                        if ( fieldState ) {
+                            settingsLocker.lockSettingsValueForCompany( company, SettingsForApplication.PHONE, true );
+                        } else {
+                            settingsLocker.lockSettingsValueForCompany( company, SettingsForApplication.PHONE, false );
+                        }
+                    }
+                    userManagementService.updateCompany( company );
+                }
             } else if ( entityType.equals( CommonConstants.REGION_ID_COLUMN ) ) {
                 OrganizationUnitSettings regionSettings = organizationManagementService.getRegionSettings( entityId );
                 if ( regionSettings == null ) {
@@ -427,6 +449,24 @@ public class ProfileManagementController
                     MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION, regionSettings, lockSettings );
                 regionSettings.setLockSettings( lockSettings );
                 userSettings.getRegionSettings().put( entityId, regionSettings );
+                Region region = userManagementService.getRegionById( regionSettings.getIden() );
+                if ( region != null ) {
+                    if ( fieldId.equalsIgnoreCase( "prof-logo-lock" ) ) {
+                        if ( fieldState ) {
+                            settingsLocker.lockSettingsValueForRegion( region, SettingsForApplication.LOGO, true );
+                        } else {
+                            settingsLocker.lockSettingsValueForRegion( region, SettingsForApplication.LOGO, false );
+                        }
+                    }
+                    if ( fieldId.equalsIgnoreCase( "phone-number-work-lock" ) ) {
+                        if ( fieldState ) {
+                            settingsLocker.lockSettingsValueForRegion( region, SettingsForApplication.PHONE, true );
+                        } else {
+                            settingsLocker.lockSettingsValueForRegion( region, SettingsForApplication.PHONE, false );
+                        }
+                    }
+                    userManagementService.updateRegion( region );
+                }
             } else if ( entityType.equals( CommonConstants.BRANCH_ID_COLUMN ) ) {
                 OrganizationUnitSettings branchSettings = organizationManagementService.getBranchSettingsDefault( entityId );
                 if ( branchSettings == null ) {
@@ -438,6 +478,24 @@ public class ProfileManagementController
                     MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION, branchSettings, lockSettings );
                 branchSettings.setLockSettings( lockSettings );
                 userSettings.getBranchSettings().put( entityId, branchSettings );
+                Branch branch = userManagementService.getBranchById( branchSettings.getIden() );
+                if ( branch != null ) {
+                    if ( fieldId.equalsIgnoreCase( "prof-logo-lock" ) ) {
+                        if ( fieldState ) {
+                            settingsLocker.lockSettingsValueForBranch( branch, SettingsForApplication.LOGO, true );
+                        } else {
+                            settingsLocker.lockSettingsValueForBranch( branch, SettingsForApplication.LOGO, false );
+                        }
+                    }
+                    if ( fieldId.equalsIgnoreCase( "phone-number-work-lock" ) ) {
+                        if ( fieldState ) {
+                            settingsLocker.lockSettingsValueForBranch( branch, SettingsForApplication.PHONE, true );
+                        } else {
+                            settingsLocker.lockSettingsValueForBranch( branch, SettingsForApplication.PHONE, false );
+                        }
+                    }
+                    userManagementService.updateBranch( branch );
+                }
             } else {
                 throw new InvalidInputException( "Invalid input exception occurred in editing LockSettings.",
                     DisplayMessageConstants.GENERAL_ERROR );
@@ -1295,6 +1353,8 @@ public class ProfileManagementController
                     companySettings, logoUrl );
                 companySettings.setLogo( logoUrl );
                 userSettings.setCompanySettings( companySettings );
+
+
             } else if ( entityType.equals( CommonConstants.REGION_ID_COLUMN ) ) {
                 OrganizationUnitSettings regionSettings = organizationManagementService.getRegionSettings( entityId );
                 if ( regionSettings == null ) {
@@ -1310,6 +1370,8 @@ public class ProfileManagementController
                     settingsSetter.setSettingsValueForRegion( region, SettingsForApplication.LOGO, true );
                     userManagementService.updateRegion( region );
                 }
+
+
             } else if ( entityType.equals( CommonConstants.BRANCH_ID_COLUMN ) ) {
                 OrganizationUnitSettings branchSettings = organizationManagementService.getBranchSettingsDefault( entityId );
                 if ( branchSettings == null ) {
@@ -1324,6 +1386,7 @@ public class ProfileManagementController
                     settingsSetter.setSettingsValueForBranch( branch, SettingsForApplication.LOGO, true );
                     userManagementService.updateBranch( branch );
                 }
+
             } else if ( entityType.equals( CommonConstants.AGENT_ID_COLUMN ) ) {
                 AgentSettings agentSettings = userManagementService.getUserSettings( entityId );
                 if ( agentSettings == null ) {
@@ -1333,6 +1396,7 @@ public class ProfileManagementController
                     agentSettings, logoUrl );
                 agentSettings.setLogo( logoUrl );
                 userSettings.setAgentSettings( agentSettings );
+
             } else {
                 throw new InvalidInputException( "Invalid input exception occurred in uploading logo.",
                     DisplayMessageConstants.GENERAL_ERROR );
@@ -1340,7 +1404,6 @@ public class ProfileManagementController
 
             profileSettings.setLogo( logoUrl );
             sessionHelper.setLogoInSession( session, userSettings );
-
             LOG.info( "Logo uploaded successfully" );
             model.addAttribute( "message", messageUtils.getDisplayMessage( DisplayMessageConstants.LOGO_UPLOAD_SUCCESSFUL,
                 DisplayMessageType.SUCCESS_MESSAGE ) );
