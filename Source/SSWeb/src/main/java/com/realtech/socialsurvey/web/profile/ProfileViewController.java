@@ -6,9 +6,11 @@ package com.realtech.socialsurvey.web.profile;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
+
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
 import org.apache.solr.common.SolrDocument;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -22,10 +24,12 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+
 import com.amazonaws.util.json.JSONException;
 import com.amazonaws.util.json.JSONObject;
 import com.google.gson.Gson;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
+import com.realtech.socialsurvey.core.dao.impl.MongoOrganizationUnitSettingDaoImpl;
 import com.realtech.socialsurvey.core.entities.AgentSettings;
 import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
 import com.realtech.socialsurvey.core.entities.SocialMediaTokens;
@@ -34,6 +38,8 @@ import com.realtech.socialsurvey.core.entities.SurveyDetails;
 import com.realtech.socialsurvey.core.entities.User;
 import com.realtech.socialsurvey.core.entities.UserProfile;
 import com.realtech.socialsurvey.core.enums.DisplayMessageType;
+import com.realtech.socialsurvey.core.enums.OrganizationUnit;
+import com.realtech.socialsurvey.core.enums.SettingsForApplication;
 import com.realtech.socialsurvey.core.exception.InternalServerException;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.exception.NoRecordsFetchedException;
@@ -46,6 +52,7 @@ import com.realtech.socialsurvey.core.services.organizationmanagement.ProfileMan
 import com.realtech.socialsurvey.core.services.organizationmanagement.ProfileNotFoundException;
 import com.realtech.socialsurvey.core.services.search.SolrSearchService;
 import com.realtech.socialsurvey.core.services.search.exception.SolrException;
+import com.realtech.socialsurvey.core.services.settingsmanagement.impl.InvalidSettingsStateException;
 import com.realtech.socialsurvey.core.utils.DisplayMessageConstants;
 import com.realtech.socialsurvey.core.utils.MessageUtils;
 import com.realtech.socialsurvey.web.common.JspResolver;
@@ -181,6 +188,7 @@ public class ProfileViewController
     {
         LOG.info( "Service to initiate region profile page called" );
         String message = null;
+        Map<SettingsForApplication, OrganizationUnit> map = null;
         boolean isBotRequest = botRequestUtils.checkBotRequest( request );
         if ( companyProfileName == null || companyProfileName.isEmpty() ) {
             message = messageUtils.getDisplayMessage( DisplayMessageConstants.INVALID_COMPANY_PROFILENAME,
@@ -200,16 +208,28 @@ public class ProfileViewController
         regionProfileName = regionProfileName.toLowerCase();
 
         OrganizationUnitSettings regionProfile = null;
+        OrganizationUnitSettings companyProfile = null;
         try {
-            regionProfile = profileManagementService.getRegionByProfileName( companyProfileName, regionProfileName );
+            regionProfile = profileManagementService.getRegionSettingsByProfileName( companyProfileName, regionProfileName );
             if ( regionProfile == null ) {
                 throw new NoRecordsFetchedException( "No settings found for region while fetching region profile" );
             }
 
-            // aggregated social profile urls
-            SocialMediaTokens regionTokens = profileManagementService.aggregateSocialProfiles( regionProfile,
-                CommonConstants.REGION_ID );
-            regionProfile.setSocialMediaTokens( regionTokens );
+            companyProfile = profileManagementService.getCompanyProfileByProfileName( companyProfileName );
+            if ( companyProfile == null ) {
+                throw new NoRecordsFetchedException( "No settings found for company while fetching region profile" );
+            }
+
+            try {
+                map = profileManagementService.getPrimaryHierarchyByEntity( CommonConstants.REGION_ID, regionProfile.getIden() );
+            } catch ( InvalidSettingsStateException e ) {
+                throw new InternalServerException( new ProfileServiceErrorCode(
+                    CommonConstants.ERROR_CODE_REGION_PROFILE_SERVICE_FAILURE, CommonConstants.SERVICE_CODE_REGION_PROFILE,
+                    "Error occured while fetching region profile" ), e.getMessage() );
+            }
+
+            regionProfile = profileManagementService.fillUnitSettings( regionProfile,
+                MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION, companyProfile, regionProfile, null, null, map );
 
             // aggregated disclaimer
             String disclaimer = profileManagementService.aggregateDisclaimer( regionProfile, CommonConstants.REGION_ID );
@@ -279,6 +299,7 @@ public class ProfileViewController
     {
         LOG.info( "Service to initiate branch profile page called" );
         String message = null;
+        Map<SettingsForApplication, OrganizationUnit> map = null;
         boolean isBotRequest = botRequestUtils.checkBotRequest( request );
         if ( companyProfileName == null || companyProfileName.isEmpty() ) {
             message = messageUtils.getDisplayMessage( DisplayMessageConstants.INVALID_COMPANY_PROFILENAME,
@@ -297,12 +318,29 @@ public class ProfileViewController
         companyProfileName = companyProfileName.toLowerCase();
         branchProfileName = branchProfileName.toLowerCase();
 
+        OrganizationUnitSettings companyProfile = null;
         OrganizationUnitSettings branchProfile = null;
+        OrganizationUnitSettings regionProfile = null;
         try {
-            branchProfile = profileManagementService.getBranchByProfileName( companyProfileName, branchProfileName );
+            branchProfile = profileManagementService.getBranchSettingsByProfileName( companyProfileName, branchProfileName );
             if ( branchProfile == null ) {
                 throw new NoRecordsFetchedException( "No settings found for branch while fetching branch profile" );
             }
+
+            companyProfile = profileManagementService.getCompanyProfileByProfileName( companyProfileName );
+
+            regionProfile = profileManagementService.getRegionProfileByBranch( branchProfile );
+            try {
+                map = profileManagementService.getPrimaryHierarchyByEntity( CommonConstants.BRANCH_ID_COLUMN,
+                    branchProfile.getIden() );
+            } catch ( InvalidSettingsStateException e ) {
+                throw new InternalServerException( new ProfileServiceErrorCode(
+                    CommonConstants.ERROR_CODE_BRANCH_PROFILE_SERVICE_FAILURE, CommonConstants.SERVICE_CODE_BRANCH_PROFILE,
+                    "Error occured while fetching branch profile" ), e.getMessage() );
+            }
+            branchProfile = profileManagementService.fillUnitSettings( branchProfile,
+                MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION, companyProfile, regionProfile, branchProfile,
+                null, map );
 
             // aggregated social profile urls
             SocialMediaTokens branchTokens = profileManagementService.aggregateSocialProfiles( branchProfile,
@@ -376,6 +414,13 @@ public class ProfileViewController
     {
         LOG.info( "Service to initiate agent profile page called" );
         boolean isBotRequest = botRequestUtils.checkBotRequest( request );
+        long companyId = 0;
+        long branchId = 0;
+        long regionId = 0;
+        OrganizationUnitSettings companyProfile = null;
+        OrganizationUnitSettings regionProfile = null;
+        OrganizationUnitSettings branchProfile = null;
+        Map<SettingsForApplication, OrganizationUnit> map = null;
         if ( agentProfileName == null || agentProfileName.isEmpty() ) {
             model.addAttribute(
                 "message",
@@ -423,8 +468,27 @@ public class ProfileViewController
 
             AgentSettings individualProfile = null;
             try {
-                individualProfile = (AgentSettings) profileManagementService.getIndividualByProfileName( agentProfileName );
+                individualProfile = (AgentSettings) profileManagementService
+                    .getIndividualSettingsByProfileName( agentProfileName );
 
+                if ( individualProfile == null ) {
+                    throw new ProfileNotFoundException( "Unable to find agent profile for profile name " + agentProfileName );
+                }
+                Map<String, Long> hierarchyMap = profileManagementService.getPrimaryHierarchyByAgentProfile( individualProfile );
+                companyId = hierarchyMap.get( CommonConstants.COMPANY_ID_COLUMN );
+                regionId = hierarchyMap.get( CommonConstants.REGION_ID_COLUMN );
+                branchId = hierarchyMap.get( CommonConstants.BRANCH_ID_COLUMN );
+
+                companyProfile = organizationManagementService.getCompanySettings( companyId );
+                regionProfile = organizationManagementService.getRegionSettings( regionId );
+                branchProfile = organizationManagementService.getBranchSettingsDefault( branchId );
+
+                map = profileManagementService.getPrimaryHierarchyByEntity( CommonConstants.AGENT_ID_COLUMN,
+                    individualProfile.getIden() );
+
+                individualProfile = (AgentSettings) profileManagementService.fillUnitSettings( individualProfile,
+                    MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION, companyProfile, regionProfile,
+                    branchProfile, individualProfile, map );
                 //set vertical name from the company
                 individualProfile.setVertical( user.getCompany().getVerticalsMaster().getVerticalName() );
 
