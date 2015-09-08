@@ -7846,6 +7846,8 @@ function resendMultipleIncompleteSurveyRequests(incompleteSurveyIds) {
 			showToast();
 			$('#del-mult-sur-icn').removeClass('mult-sur-icn-active');
 			$('#resend-mult-sur-icn').removeClass('mult-sur-icn-active');
+			$('#icn-sur-popup-cont').data('selected-survey', []);
+			$('.sur-icn-checkbox').addClass('sb-q-chk-yes').removeClass('sb-q-chk-no');
 		}
 	}, true, {});
 }

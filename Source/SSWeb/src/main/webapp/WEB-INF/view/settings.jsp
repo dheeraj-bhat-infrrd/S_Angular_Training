@@ -431,18 +431,5 @@ $(document).ready(function() {
 			updateAutoPostSetting(false);
 		}
 	});
-	$('body').on('click',function(){
-		$('.crm-settings-dropdown-cont').slideUp(200);
-	});
-	$('.crm-settings-dropdown').on('click',function(e){
-		e.stopPropagation();
-		$('.crm-settings-dropdown-cont').slideToggle(200);
-	});
-	$('.crm-settings-dropdown-item').on('click',function(e){
-		var crmType = $(this).attr('data-crm-type');
-		$('#crm-settings-dropdown-sel-text').text(crmType);
-		$('.crm-setting-cont').hide();
-		$('.crm-setting-cont[data-crm-type="'+crmType+'"]').show();
-	});
 });
 </script>
