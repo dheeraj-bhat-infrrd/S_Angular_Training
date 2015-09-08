@@ -71,6 +71,7 @@
 				<entry key="emailServices" value-ref="emailServices" />
 				<entry key="userManagementService" value-ref="userManagementService" />
 				<entry key="organizationManagementService" value-ref="organizationManagementService" />
+				<entry key="profileManagementService" value-ref="profileManagementService" />
 				<entry key="emailFormatHelper" value-ref="emailFormatHelper" />
 				<entry key="applicationBaseUrl" value="${APPLICATION_BASE_URL}" />
 				<entry key="applicationLogoUrl" value="${APPLICATION_LOGO_URL}" />
@@ -198,7 +199,7 @@
 		</property>
 		<property name="durability" value="true" />
 	</bean>
-	
+
 	<!-- Setting zillow job detail -->
 	<bean id="zillowjobdetail"
 		class="org.springframework.scheduling.quartz.JobDetailFactoryBean">
@@ -214,7 +215,7 @@
 		</property>
 		<property name="durability" value="true" />
 	</bean>
-	
+
 	<!-- setting cron for Account deactivator -->
 	<bean id="sitemapgeneratorcron"
 		class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
@@ -295,15 +296,15 @@
 		<property name="repeatCount" value="0" />
 		<property name="startDelay" value="2000" />
 	</bean>
-	
-	
+
+
 	<!-- setting cron for loading image from linkedin to amazon server -->
 	<bean id="zillowcron"
 		class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
 		<property name="jobDetail" ref="zillowjobdetail" />
 		<property name="cronExpression" value="0 25 0,2,4,6,8,10,12,14,16,18,20,22 * * ?" />
 	</bean>
-	
+
 	<!-- Scheduler factory -->
 	<bean class="org.springframework.scheduling.quartz.SchedulerFactoryBean">
 		<property name="jobDetails">
@@ -364,7 +365,7 @@
 		class="com.realtech.socialsurvey.core.services.mail.impl.EmailServicesImpl" />
 	<bean id="userManagementService"
 		class="com.realtech.socialsurvey.core.services.organizationmanagement.impl.UserManagementServiceImpl" />
-		<bean id="zillowIntegrationApiBuilder"
+	<bean id="zillowIntegrationApiBuilder"
 		class="com.realtech.socialsurvey.core.integration.zillow.ZillowIntergrationApiBuilder" />
 	<bean id="organizationManagementService"
 		class="com.realtech.socialsurvey.core.services.organizationmanagement.impl.OrganizationManagementServiceImpl" />
@@ -403,7 +404,7 @@
 
 	<!-- Posts to wall -->
 	<bean id="postToWall" class="com.realtech.socialsurvey.core.utils.mongo.PostToWall" />
-	
+
 	<!-- Email reader -->
 	<bean id="uploadHandler" class="com.realtech.socialsurvey.core.handler.CSVUploadHandler" />
 </beans>

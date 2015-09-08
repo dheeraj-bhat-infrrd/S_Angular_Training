@@ -1,7 +1,9 @@
 package com.realtech.socialsurvey.core.services.organizationmanagement.impl;
 
+import java.io.IOException;
 import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Collection;
 import java.util.Collections;
@@ -52,6 +54,8 @@ import com.realtech.socialsurvey.core.entities.Licenses;
 import com.realtech.socialsurvey.core.entities.LinkedInProfileData;
 import com.realtech.socialsurvey.core.entities.LinkedInToken;
 import com.realtech.socialsurvey.core.entities.LockSettings;
+import com.realtech.socialsurvey.core.entities.MailContent;
+import com.realtech.socialsurvey.core.entities.MailContentSettings;
 import com.realtech.socialsurvey.core.entities.MailIdSettings;
 import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
 import com.realtech.socialsurvey.core.entities.ProfileStage;
@@ -89,6 +93,7 @@ import com.realtech.socialsurvey.core.services.search.exception.SolrException;
 import com.realtech.socialsurvey.core.services.settingsmanagement.SettingsManager;
 import com.realtech.socialsurvey.core.services.settingsmanagement.impl.InvalidSettingsStateException;
 import com.realtech.socialsurvey.core.utils.DisplayMessageConstants;
+import com.realtech.socialsurvey.core.utils.EmailFormatHelper;
 import com.realtech.socialsurvey.core.utils.UrlValidationHelper;
 
 
@@ -165,6 +170,16 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 
     @Value ( "${GOOGLE_API_KEY}")
     private String googlePlusId;
+
+    @Autowired
+    private EmailFormatHelper emailFormatHelper;
+
+    @Value ( "${PARAM_ORDER_TAKE_SURVEY}")
+    String paramOrderTakeSurvey;
+    @Value ( "${PARAM_ORDER_TAKE_SURVEY_CUSTOMER}")
+    String paramOrderTakeSurveyCustomer;
+    @Value ( "${PARAM_ORDER_TAKE_SURVEY_REMINDER}")
+    String paramOrderTakeSurveyReminder;
 
 
     @Override
@@ -3070,6 +3085,78 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
             }
         }
         return userProfile;
+    }
+
+
+    public void updateEmailsWithLogo( OrganizationUnitSettings unitSettings, String logoUrl, String collectionName )
+    {
+        LOG.debug( "Inside method updateEmailsWithLogo for UnitSettings " );
+        List<String> paramOrder = null;
+
+        MailContentSettings mailContentSettings = unitSettings.getMail_content();
+        if ( mailContentSettings != null ) {
+            MailContent takeSurveyMailContent = mailContentSettings.getTake_survey_mail();
+            if ( takeSurveyMailContent != null ) {
+                String mailBody = takeSurveyMailContent.getMail_body();
+                try {
+                    mailBody = organizationManagementService
+                        .readMailContentFromFile( CommonConstants.SURVEY_REQUEST_MAIL_FILENAME );
+                    paramOrder = new ArrayList<String>( Arrays.asList( paramOrderTakeSurvey.split( "," ) ) );
+                } catch ( IOException e ) {
+
+                }
+                mailBody = emailFormatHelper.replaceEmailBodyWithParams( mailBody, paramOrder );
+                mailBody = mailBody.replaceAll( "\\[LogoUrl\\]", logoUrl );
+                takeSurveyMailContent.setMail_body( mailBody );
+            }
+            mailContentSettings.setTake_survey_mail( takeSurveyMailContent );
+            MailContent takeSureyMailCustomerContent = mailContentSettings.getTake_survey_mail_customer();
+            if ( takeSureyMailCustomerContent != null ) {
+                String mailBody = takeSureyMailCustomerContent.getMail_body();
+                try {
+                    mailBody = organizationManagementService
+                        .readMailContentFromFile( CommonConstants.SURVEY_CUSTOMER_REQUEST_MAIL_FILENAME );
+                    paramOrder = new ArrayList<String>( Arrays.asList( paramOrderTakeSurveyCustomer.split( "," ) ) );
+                } catch ( IOException e ) {
+                }
+                mailBody = emailFormatHelper.replaceEmailBodyWithParams( mailBody, paramOrder );
+                mailBody = mailBody.replaceAll( "\\[LogoUrl\\]", logoUrl );
+                takeSureyMailCustomerContent.setMail_body( mailBody );
+            }
+            mailContentSettings.setTake_survey_mail_customer( takeSureyMailCustomerContent );
+            MailContent surveyReminderMailContent = mailContentSettings.getTake_survey_reminder_mail();
+            if ( surveyReminderMailContent != null ) {
+                String mailBody = surveyReminderMailContent.getMail_body();
+                try {
+                    mailBody = organizationManagementService
+                        .readMailContentFromFile( CommonConstants.SURVEY_REMINDER_MAIL_FILENAME );
+                    paramOrder = new ArrayList<String>( Arrays.asList( paramOrderTakeSurveyReminder.split( "," ) ) );
+                } catch ( IOException e ) {
+                }
+                mailBody = emailFormatHelper.replaceEmailBodyWithParams( mailBody, paramOrder );
+                mailBody = mailBody.replaceAll( "\\[LogoUrl\\]", logoUrl );
+                surveyReminderMailContent.setMail_body( mailBody );
+            }
+            mailContentSettings.setTake_survey_reminder_mail( surveyReminderMailContent );
+            MailContent restartSurveyMailContent = mailContentSettings.getRestart_survey_mail();
+            if ( restartSurveyMailContent != null ) {
+                String mailBody = restartSurveyMailContent.getMail_body();
+                try {
+                    mailBody = organizationManagementService
+                        .readMailContentFromFile( CommonConstants.SURVEY_REQUEST_MAIL_FILENAME );
+                    paramOrder = new ArrayList<String>( Arrays.asList( paramOrderTakeSurvey.split( "," ) ) );
+                } catch ( IOException e ) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                }
+                mailBody = emailFormatHelper.replaceEmailBodyWithParams( mailBody, paramOrder );
+                mailBody = mailBody.replaceAll( "\\[LogoUrl\\]", logoUrl );
+                restartSurveyMailContent.setMail_body( mailBody );
+            }
+            mailContentSettings.setRestart_survey_mail( restartSurveyMailContent );
+        }
+        unitSettings.setMail_content( mailContentSettings );
+        organizationManagementService.updateMailContentForOrganizationUnit( mailContentSettings, unitSettings, collectionName );
     }
 
 }
