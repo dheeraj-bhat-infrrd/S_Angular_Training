@@ -11,7 +11,9 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
 import javax.annotation.Resource;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
@@ -21,6 +23,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.DependsOn;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
+
 import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.commons.Utils;
 import com.realtech.socialsurvey.core.dao.BranchDao;
@@ -54,6 +57,7 @@ import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
 import com.realtech.socialsurvey.core.entities.ProfileStage;
 import com.realtech.socialsurvey.core.entities.RealtorToken;
 import com.realtech.socialsurvey.core.entities.Region;
+import com.realtech.socialsurvey.core.entities.SettingsDetails;
 import com.realtech.socialsurvey.core.entities.SocialMediaTokens;
 import com.realtech.socialsurvey.core.entities.SocialPost;
 import com.realtech.socialsurvey.core.entities.SocialProfileToken;
@@ -69,6 +73,8 @@ import com.realtech.socialsurvey.core.entities.WebAddressSettings;
 import com.realtech.socialsurvey.core.entities.YelpToken;
 import com.realtech.socialsurvey.core.entities.ZillowToken;
 import com.realtech.socialsurvey.core.enums.AccountType;
+import com.realtech.socialsurvey.core.enums.OrganizationUnit;
+import com.realtech.socialsurvey.core.enums.SettingsForApplication;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.exception.NoRecordsFetchedException;
 import com.realtech.socialsurvey.core.services.generator.URLGenerator;
@@ -80,6 +86,8 @@ import com.realtech.socialsurvey.core.services.organizationmanagement.ProfileNot
 import com.realtech.socialsurvey.core.services.organizationmanagement.UserManagementService;
 import com.realtech.socialsurvey.core.services.search.SolrSearchService;
 import com.realtech.socialsurvey.core.services.search.exception.SolrException;
+import com.realtech.socialsurvey.core.services.settingsmanagement.SettingsManager;
+import com.realtech.socialsurvey.core.services.settingsmanagement.impl.InvalidSettingsStateException;
 import com.realtech.socialsurvey.core.utils.DisplayMessageConstants;
 import com.realtech.socialsurvey.core.utils.UrlValidationHelper;
 
@@ -141,6 +149,9 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
     private URLGenerator urlGenerator;
 
     @Autowired
+    private SettingsManager settingsManager;
+
+    @Autowired
     private UrlValidationHelper urlValidationHelper;
 
     @Value ( "${APPLICATION_BASE_URL}")
@@ -148,12 +159,14 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 
     @Value ( "${FB_CLIENT_ID}")
     private String facebookAppId;
-    
+
     @Value ( "${ENABLE_KAFKA}")
     private String enableKafka;
 
     @Value ( "${GOOGLE_API_KEY}")
     private String googlePlusId;
+
+
     @Override
     public void afterPropertiesSet() throws Exception
     {
@@ -965,6 +978,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
     {
         LOG.info( "Method getRegionByProfileName called for companyProfileName:" + companyProfileName
             + " and regionProfileName:" + regionProfileName );
+        OrganizationUnitSettings companySettings = null;
         if ( companyProfileName == null || companyProfileName.isEmpty() ) {
             throw new ProfileNotFoundException( "companyProfileName is null or empty in getRegionByProfileName" );
         }
@@ -976,11 +990,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
          * unique, whereas profileName is unique only within a company
          */
         String profileUrl = utils.generateRegionProfileUrl( companyProfileName, regionProfileName );
-        OrganizationUnitSettings companySettings = getCompanyProfileByProfileName( companyProfileName );
-        if ( companySettings == null ) {
-            LOG.error( "Unable to get company settings " );
-            throw new ProfileNotFoundException( "Unable to get company settings " );
-        }
+
         OrganizationUnitSettings regionSettings = organizationUnitSettingsDao.fetchOrganizationUnitSettingsByProfileUrl(
             profileUrl, MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION );
         if ( regionSettings == null ) {
@@ -1041,8 +1051,8 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 
 
     /**
-     * JIRA:SS-117 by RM02 Method to get the company details based on profile name
-     */
+    * JIRA:SS-117 by RM02 Method to get the company details based on profile name
+    */
     @Override
     @Transactional
     public OrganizationUnitSettings getCompanyProfileByProfileName( String profileName ) throws ProfileNotFoundException
@@ -1053,9 +1063,9 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
         }
         OrganizationUnitSettings companySettings = organizationUnitSettingsDao.fetchOrganizationUnitSettingsByProfileName(
             profileName, MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION );
-        if(companySettings == null){
-        	LOG.error("Unable to find company settings with profile name : " + profileName);
-        	throw new ProfileNotFoundException("Unable to find company settings with profile name : " + profileName);
+        if ( companySettings == null ) {
+            LOG.error( "Unable to find company settings with profile name : " + profileName );
+            throw new ProfileNotFoundException( "Unable to find company settings with profile name : " + profileName );
         }
 
         LOG.info( "Successfully executed method getCompanyDetailsByProfileName. Returning :" + companySettings );
@@ -1133,6 +1143,36 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 
     @Override
     @Transactional
+    public OrganizationUnitSettings getIndividualSettingsByProfileName( String agentProfileName )
+        throws ProfileNotFoundException, InvalidInputException, NoRecordsFetchedException
+    {
+        LOG.info( "Method getIndividualByProfileName called for agentProfileName:" + agentProfileName );
+
+        OrganizationUnitSettings agentSettings = null;
+        if ( agentProfileName == null || agentProfileName.isEmpty() ) {
+            throw new ProfileNotFoundException( "agentProfileName is null or empty while getting agent settings" );
+        }
+        agentSettings = organizationUnitSettingsDao.fetchOrganizationUnitSettingsByProfileName( agentProfileName,
+            MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION );
+        if ( agentSettings == null ) {
+            throw new ProfileNotFoundException( "No settings found for agent while fetching agent profile" );
+        }
+        return agentSettings;
+    }
+
+
+    @Override
+    @Transactional
+    public Map<String, Long> getPrimaryHierarchyByAgentProfile( OrganizationUnitSettings agentSettings )
+    {
+        LOG.info( "Inside method getPrimaryHierarchyByAgentProfile " );
+        Map<String, Long> hierarchyMap = userManagementService.getPrimaryUserProfileByAgentId( agentSettings.getIden() );
+        return hierarchyMap;
+    }
+
+
+    @Override
+    @Transactional
     public SocialMediaTokens aggregateSocialProfiles( OrganizationUnitSettings unitSettings, String entity )
         throws InvalidInputException, NoRecordsFetchedException
     {
@@ -1156,11 +1196,11 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 
         //Check if unit settings or company settings have any tokens
         //if company social token and entity tokens are null return null
-        if(unitSettings.getSocialMediaTokens() == null && companySettings.getSocialMediaTokens() == null) {
-        	return null;
+        if ( unitSettings.getSocialMediaTokens() == null && companySettings.getSocialMediaTokens() == null ) {
+            return null;
         }
-        
-        
+
+
         // Aggregate urls
         SocialMediaTokens entityTokens = validateSocialMediaTokens( unitSettings );
 
@@ -1324,7 +1364,8 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
         LOG.info( "Method getIndividualsByBranchId executed successfully" );
         return users;
     }
-    
+
+
     /**
      * Method to get individuals by branchId 
      * @param branchId 
@@ -1335,15 +1376,18 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
      */
     @Override
     @Transactional
-    public List<AgentSettings> getIndividualsByBranchId(long branchId, int startIndex, int batchSize) throws InvalidInputException {
-    	LOG.info( "Method getIndividualsByBranchId called for branchId:" + branchId + ", startIndex: " + startIndex + ", batchSize: " + batchSize);
+    public List<AgentSettings> getIndividualsByBranchId( long branchId, int startIndex, int batchSize )
+        throws InvalidInputException
+    {
+        LOG.info( "Method getIndividualsByBranchId called for branchId:" + branchId + ", startIndex: " + startIndex
+            + ", batchSize: " + batchSize );
         List<AgentSettings> users = null;
         Map<String, Object> queries = new HashMap<String, Object>();
         queries.put( CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_ACTIVE );
         queries.put( CommonConstants.BRANCH_ID_COLUMN, branchId );
         queries.put( CommonConstants.PROFILE_MASTER_COLUMN,
             userManagementService.getProfilesMasterById( CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID ) );
-        List<UserProfile> userProfiles = userProfileDao.findUserProfilesInBatch( queries, startIndex, batchSize);
+        List<UserProfile> userProfiles = userProfileDao.findUserProfilesInBatch( queries, startIndex, batchSize );
         if ( userProfiles != null && !userProfiles.isEmpty() ) {
             users = new ArrayList<AgentSettings>();
             for ( UserProfile userProfile : userProfiles ) {
@@ -1404,38 +1448,41 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
         LOG.info( "Method getIndividualsByRegionId executed successfully" );
         return users;
     }
-    
-	@Override
-	@Transactional
-	public List<AgentSettings> getIndividualsByRegionId(long regionId, int startIndex, int batchSize) throws InvalidInputException,
-			NoRecordsFetchedException {
-		LOG.info("Method getIndividualsByRegionId called for regionId: " + regionId);
-		List<AgentSettings> users = null;
-		if (regionId <= 0l) {
-			throw new InvalidInputException("Region id is not set for getIndividualsByRegionId");
-		}
-		Branch defaultBranch = organizationManagementService.getDefaultBranchForRegion(regionId);
 
-		Map<String, Object> queries = new HashMap<String, Object>();
-		queries.put(CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_ACTIVE);
-		queries.put(CommonConstants.REGION_ID_COLUMN, regionId);
-		queries.put(CommonConstants.BRANCH_ID_COLUMN, defaultBranch.getBranchId());
-		queries.put(CommonConstants.PROFILE_MASTER_COLUMN,
-				userManagementService.getProfilesMasterById(CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID));
 
-		LOG.debug("calling method to fetch user profiles under region :" + regionId);
-		List<UserProfile> userProfiles = userProfileDao.findUserProfilesInBatch( queries, startIndex, batchSize);;
+    @Override
+    @Transactional
+    public List<AgentSettings> getIndividualsByRegionId( long regionId, int startIndex, int batchSize )
+        throws InvalidInputException, NoRecordsFetchedException
+    {
+        LOG.info( "Method getIndividualsByRegionId called for regionId: " + regionId );
+        List<AgentSettings> users = null;
+        if ( regionId <= 0l ) {
+            throw new InvalidInputException( "Region id is not set for getIndividualsByRegionId" );
+        }
+        Branch defaultBranch = organizationManagementService.getDefaultBranchForRegion( regionId );
 
-		if (userProfiles != null && !userProfiles.isEmpty()) {
-			LOG.debug("Obtained userProfiles with size : " + userProfiles.size());
-			users = new ArrayList<AgentSettings>();
-			for (UserProfile userProfile : userProfiles) {
-				users.add(organizationUnitSettingsDao.fetchAgentSettingsById(userProfile.getUser().getUserId()));
-			}
-		}
-		LOG.info("Method getIndividualsByRegionId executed successfully");
-		return users;
-	}
+        Map<String, Object> queries = new HashMap<String, Object>();
+        queries.put( CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_ACTIVE );
+        queries.put( CommonConstants.REGION_ID_COLUMN, regionId );
+        queries.put( CommonConstants.BRANCH_ID_COLUMN, defaultBranch.getBranchId() );
+        queries.put( CommonConstants.PROFILE_MASTER_COLUMN,
+            userManagementService.getProfilesMasterById( CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID ) );
+
+        LOG.debug( "calling method to fetch user profiles under region :" + regionId );
+        List<UserProfile> userProfiles = userProfileDao.findUserProfilesInBatch( queries, startIndex, batchSize );
+        ;
+
+        if ( userProfiles != null && !userProfiles.isEmpty() ) {
+            LOG.debug( "Obtained userProfiles with size : " + userProfiles.size() );
+            users = new ArrayList<AgentSettings>();
+            for ( UserProfile userProfile : userProfiles ) {
+                users.add( organizationUnitSettingsDao.fetchAgentSettingsById( userProfile.getUser().getUserId() ) );
+            }
+        }
+        LOG.info( "Method getIndividualsByRegionId executed successfully" );
+        return users;
+    }
 
 
     /**
@@ -1665,13 +1712,13 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
             if ( collection.equals( MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION ) ) {
                 updateCompanyEmail( iden, emailVerified );
             } else if ( collection.equals( MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION ) ) {
-            	
-            	//Update User login name and email id
-            	User user = userManagementService.getUserByUserId(iden);
-            	user.setEmailId(emailVerified);
-            	user.setLoginName(emailVerified);
-            	userManagementService.updateUser(user, iden, true);
-            	
+
+                //Update User login name and email id
+                User user = userManagementService.getUserByUserId( iden );
+                user.setEmailId( emailVerified );
+                user.setLoginName( emailVerified );
+                userManagementService.updateUser( user, iden, true );
+
                 updateIndividualEmail( iden, emailVerified );
             }
         } else if ( emailType.equals( CommonConstants.EMAIL_TYPE_PERSONAL ) ) {
@@ -1871,7 +1918,8 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
         socialPostDao.addPostToUserProfile( socialPost );
         LOG.info( "Method to add post to a user's profile finished." );
     }
-    
+
+
     /*
      * Method to delete status of a user into the mongo.
      */
@@ -1879,17 +1927,17 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
     public void deleteSocialPost( String postMongoId ) throws InvalidInputException
     {
         LOG.info( "Method to delete post to a user's profile started." );
-       SocialPost socialPost = socialPostDao.getPostByMongoObjectId(postMongoId);
-       if(socialPost == null){
-    	   throw new InvalidInputException( "No Status Found", DisplayMessageConstants.GENERAL_ERROR );
-       }
-       
-       if(!socialPost.getSource().equals(CommonConstants.POST_SOURCE_SOCIAL_SURVEY)){
-    	   throw new InvalidInputException( "Not a SocialSurvey Status", DisplayMessageConstants.GENERAL_ERROR );
-       }
-       
-       socialPostDao.removePostFromUsersProfile(socialPost);
-       LOG.info( "Method to delete post to a user's profile finished." );
+        SocialPost socialPost = socialPostDao.getPostByMongoObjectId( postMongoId );
+        if ( socialPost == null ) {
+            throw new InvalidInputException( "No Status Found", DisplayMessageConstants.GENERAL_ERROR );
+        }
+
+        if ( !socialPost.getSource().equals( CommonConstants.POST_SOURCE_SOCIAL_SURVEY ) ) {
+            throw new InvalidInputException( "Not a SocialSurvey Status", DisplayMessageConstants.GENERAL_ERROR );
+        }
+
+        socialPostDao.removePostFromUsersProfile( socialPost );
+        LOG.info( "Method to delete post to a user's profile finished." );
     }
 
 
@@ -1950,8 +1998,9 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 
         String profileImageUrl = organizationUnitSettings.getProfileImageUrl();
 
-        if ( ( profileImageUrl == null || profileImageUrl.trim().isEmpty() ) && linkedInProfileData.getPictureUrls() != null && linkedInProfileData.getPictureUrls().get_total() > 0 ) {
-            profileImageUrl = linkedInProfileData.getPictureUrls().getValues().get(0);
+        if ( ( profileImageUrl == null || profileImageUrl.trim().isEmpty() ) && linkedInProfileData.getPictureUrls() != null
+            && linkedInProfileData.getPictureUrls().get_total() > 0 ) {
+            profileImageUrl = linkedInProfileData.getPictureUrls().getValues().get( 0 );
             organizationUnitSettingsDao.updateParticularKeyOrganizationUnitSettings(
                 MongoOrganizationUnitSettingDaoImpl.KEY_PROFILE_IMAGE, profileImageUrl, organizationUnitSettings,
                 collectionName );
@@ -2017,7 +2066,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
     {
         String profileUrl;
         String baseProfileUrl = applicationBaseUrl + CommonConstants.AGENT_PROFILE_FIXED_URL;
-        String facebookShareUrl = "app_id="+facebookAppId;
+        String facebookShareUrl = "app_id=" + facebookAppId;
         String googleApiKey = googlePlusId;
         if ( reviews != null && !reviews.isEmpty() ) {
             for ( SurveyDetails review : reviews ) {
@@ -2029,8 +2078,8 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
                     if ( documents != null && !documents.isEmpty() ) {
                         profileUrl = (String) documents.iterator().next().getProfileUrl();
                         review.setCompleteProfileUrl( baseProfileUrl + profileUrl );
-                        review.setGoogleApi(googleApiKey);
-                        review.setFaceBookShareUrl(facebookShareUrl);
+                        review.setGoogleApi( googleApiKey );
+                        review.setFaceBookShareUrl( facebookShareUrl );
                     }
                 } catch ( InvalidInputException | SolrException e ) {
                     LOG.error( "Exception caught in setAgentProfileUrlForReview() for agent : " + review.getAgentName()
@@ -2649,10 +2698,378 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
         LOG.debug( "Method aggregateAgentDetails() finished from ProfileManagementService" );
         return ( agentSettings != null ? agentSettings : profileSettings );
     }
+
+
     @Override
-    public void addOrUpdateAgentPositions(List<CompanyPositions> companyPositions, AgentSettings agentSettings) {
-    	LOG.debug("Method addOrUpdateAgentPositions() called to update agent positions");
-    	
-    	organizationUnitSettingsDao.updateParticularKeyAgentSettings(MongoOrganizationUnitSettingDaoImpl.KEY_POSTIONS, companyPositions, agentSettings);
+    public void addOrUpdateAgentPositions( List<CompanyPositions> companyPositions, AgentSettings agentSettings )
+    {
+        LOG.debug( "Method addOrUpdateAgentPositions() called to update agent positions" );
+
+        organizationUnitSettingsDao.updateParticularKeyAgentSettings( MongoOrganizationUnitSettingDaoImpl.KEY_POSTIONS,
+            companyPositions, agentSettings );
     }
+
+
+    @Override
+    @Transactional
+    public Map<SettingsForApplication, OrganizationUnit> getPrimaryHierarchyByEntity( String entityType, long entityId )
+        throws InvalidInputException, InvalidSettingsStateException
+    {
+        LOG.info( "Inside method getPrimaryHeirarchyByEntity for entity " + entityType );
+        Map<String, Long> hierarchyMap = new HashMap<String, Long>();
+        long companyId = 0;
+        long regionId = 0;
+        long branchId = 0;
+        if ( entityType.equalsIgnoreCase( CommonConstants.COMPANY_ID ) ) {
+            companyId = entityId;
+        } else if ( entityType.equalsIgnoreCase( CommonConstants.REGION_ID ) ) {
+            Company company = organizationManagementService.getPrimaryCompanyByRegion( entityId );
+            if ( company == null ) {
+                throw new InvalidInputException( "Company not found for this region " );
+            }
+            companyId = company.getCompanyId();
+            regionId = entityId;
+
+        } else if ( entityType.equalsIgnoreCase( CommonConstants.BRANCH_ID ) ) {
+            Region region = organizationManagementService.getPrimaryRegionByBranch( entityId );
+            if ( region == null ) {
+                throw new InvalidInputException( "Region not found for this branch " );
+            }
+            Company company = region.getCompany();
+            if ( company == null ) {
+                throw new InvalidInputException( "Company not found for this region " );
+            }
+            companyId = company.getCompanyId();
+            regionId = region.getRegionId();
+            branchId = entityId;
+        } else if ( entityType.equalsIgnoreCase( CommonConstants.AGENT_ID ) ) {
+            hierarchyMap = userManagementService.getPrimaryUserProfileByAgentId( entityId );
+            companyId = hierarchyMap.get( CommonConstants.COMPANY_ID_COLUMN );
+            regionId = hierarchyMap.get( CommonConstants.REGION_ID_COLUMN );
+            branchId = hierarchyMap.get( CommonConstants.BRANCH_ID_COLUMN );
+        } else {
+            throw new InvalidInputException( "Entity Type Is Invalid " );
+        }
+
+        List<SettingsDetails> settingsDetailsList = settingsManager
+            .getScoreForCompleteHeirarchy( companyId, branchId, regionId );
+
+        LOG.info( "Calculate lock and setting score " );
+        Map<String, Long> totalScore = settingsManager.calculateSettingsScore( settingsDetailsList );
+        long currentLockAggregateValue = totalScore.get( CommonConstants.LOCK_SCORE );
+        long currentSetAggregateValue = totalScore.get( CommonConstants.SETTING_SCORE );
+        return settingsManager.getClosestSettingLevel( String.valueOf( currentSetAggregateValue ),
+            String.valueOf( currentLockAggregateValue ) );
+
+    }
+
+
+    @Override
+    @Transactional
+    public OrganizationUnitSettings getRegionSettingsByProfileName( String companyProfileName, String regionProfileName )
+        throws ProfileNotFoundException, InvalidInputException
+    {
+        LOG.info( "Method getRegionByProfileName called for companyProfileName:" + companyProfileName
+            + " and regionProfileName:" + regionProfileName );
+        if ( regionProfileName == null || regionProfileName.isEmpty() ) {
+            throw new ProfileNotFoundException( "regionProfileName is null or empty in getRegionByProfileName" );
+        }
+        /**
+         * generate profileUrl and fetch the region by profileUrl since profileUrl for any region is
+         * unique, whereas profileName is unique only within a company
+         */
+        String profileUrl = utils.generateRegionProfileUrl( companyProfileName, regionProfileName );
+
+        OrganizationUnitSettings regionSettings = organizationUnitSettingsDao.fetchOrganizationUnitSettingsByProfileUrl(
+            profileUrl, MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION );
+
+        return regionSettings;
+    }
+
+
+    @Override
+    @Transactional
+    public OrganizationUnitSettings getBranchSettingsByProfileName( String companyProfileName, String branchProfileName )
+        throws ProfileNotFoundException, InvalidInputException
+    {
+        LOG.info( "Method getBranchSettingsByProfileName called for companyProfileName:" + companyProfileName
+            + " and branchProfileName:" + branchProfileName );
+
+        OrganizationUnitSettings companySettings = getCompanyProfileByProfileName( companyProfileName );
+        if ( companySettings == null ) {
+            LOG.error( "Unable to fetch company settings, invalid input provided by the user" );
+            throw new ProfileNotFoundException( "Unable to get company settings " );
+        }
+
+        /**
+         * generate profileUrl and fetch the branch by profileUrl since profileUrl for any branch is
+         * unique, whereas profileName is unique only within a company
+         */
+        String profileUrl = utils.generateBranchProfileUrl( companyProfileName, branchProfileName );
+        OrganizationUnitSettings branchSettings = organizationUnitSettingsDao.fetchOrganizationUnitSettingsByProfileUrl(
+            profileUrl, MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION );
+
+        if ( branchSettings == null ) {
+            LOG.error( "Unable to fetch branch settings, invalid input provided by the user" );
+            throw new ProfileNotFoundException( "Unable to get branch settings " );
+        }
+
+        return branchSettings;
+    }
+
+
+    @Override
+    @Transactional
+    public OrganizationUnitSettings getRegionProfileByBranch( OrganizationUnitSettings branchSettings )
+        throws ProfileNotFoundException
+    {
+
+        LOG.debug( "Fetching branch from db to identify the region" );
+        Branch branch = branchDao.findById( Branch.class, branchSettings.getIden() );
+        if ( branch == null ) {
+            LOG.error( "Unable to get branch with this iden " + branchSettings.getIden() );
+            throw new ProfileNotFoundException( "Unable to get branch with this iden " + branchSettings.getIden() );
+
+        }
+
+        OrganizationUnitSettings regionSettings = organizationUnitSettingsDao.fetchOrganizationUnitSettingsById( branch
+            .getRegion().getRegionId(), MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION );
+        return regionSettings;
+    }
+
+
+    @Override
+    public OrganizationUnitSettings fillUnitSettings( OrganizationUnitSettings unitSettings, String currentProfileName,
+        OrganizationUnitSettings companyUnitSettings, OrganizationUnitSettings regionUnitSettings,
+        OrganizationUnitSettings branchUnitSettings, OrganizationUnitSettings agentUnitSettings,
+        Map<SettingsForApplication, OrganizationUnit> map )
+    {
+
+        if ( currentProfileName.equalsIgnoreCase( MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION ) ) {
+            companyUnitSettings = unitSettings;
+            return companyUnitSettings;
+        } else if ( currentProfileName.equalsIgnoreCase( MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION ) ) {
+            regionUnitSettings = unitSettings;
+            regionUnitSettings = setAggregateBasicData( regionUnitSettings, companyUnitSettings );
+            regionUnitSettings = setAggregateProfileData( regionUnitSettings, companyUnitSettings, regionUnitSettings, null,
+                null, map );
+            return regionUnitSettings;
+        } else if ( currentProfileName.equalsIgnoreCase( MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION ) ) {
+            branchUnitSettings = setAggregateBasicData( branchUnitSettings, regionUnitSettings );
+            branchUnitSettings = setAggregateProfileData( branchUnitSettings, companyUnitSettings, regionUnitSettings,
+                branchUnitSettings, null, map );
+            return branchUnitSettings;
+        } else if ( currentProfileName.equalsIgnoreCase( MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION ) ) {
+            agentUnitSettings = setAggregateProfileData( agentUnitSettings, companyUnitSettings, regionUnitSettings,
+                branchUnitSettings, agentUnitSettings, map );
+            return agentUnitSettings;
+        } else {
+            return null;
+        }
+
+
+    }
+
+
+    private OrganizationUnitSettings setAggregateBasicData( OrganizationUnitSettings userProfile,
+        OrganizationUnitSettings parentProfile )
+    {
+
+
+        if ( userProfile.getContact_details() == null ) {
+            userProfile.setContact_details( new ContactDetailsSettings() );
+        }
+        if ( userProfile.getContact_details().getWeb_addresses() == null ) {
+            userProfile.getContact_details().setWeb_addresses( new WebAddressSettings() );
+        }
+        if ( userProfile.getContact_details().getContact_numbers() == null ) {
+            userProfile.getContact_details().setContact_numbers( new ContactNumberSettings() );
+        }
+        if ( userProfile.getSurvey_settings() == null ) {
+            userProfile.setSurvey_settings( parentProfile.getSurvey_settings() );
+        }
+        return userProfile;
+    }
+
+
+    private OrganizationUnitSettings setAggregateProfileData( OrganizationUnitSettings userProfile,
+        OrganizationUnitSettings companyUnitSettings, OrganizationUnitSettings regionUnitSettings,
+        OrganizationUnitSettings branchUnitSettings, OrganizationUnitSettings agentUnitSettings,
+        Map<SettingsForApplication, OrganizationUnit> map )
+    {
+        for ( Map.Entry<SettingsForApplication, OrganizationUnit> entry : map.entrySet() ) {
+            if ( entry.getKey() == SettingsForApplication.LOGO ) {
+                if ( entry.getValue() == OrganizationUnit.COMPANY ) {
+                    userProfile.setLogo( companyUnitSettings.getLogo() );
+                } else if ( entry.getValue() == OrganizationUnit.REGION ) {
+                    userProfile.setLogo( regionUnitSettings.getLogo() );
+                } else if ( entry.getValue() == OrganizationUnit.BRANCH ) {
+                    userProfile.setLogo( branchUnitSettings.getLogo() );
+                } else if ( entry.getValue() == OrganizationUnit.AGENT ) {
+                    userProfile.setLogo( agentUnitSettings.getLogo() );
+                }
+
+
+            } else if ( entry.getKey() == SettingsForApplication.ADDRESS ) {
+
+                ContactDetailsSettings contactDetails = userProfile.getContact_details();
+                if ( contactDetails == null ) {
+                    contactDetails = new ContactDetailsSettings();
+                }
+
+                if ( entry.getValue() == OrganizationUnit.COMPANY ) {
+
+                } else if ( entry.getValue() == OrganizationUnit.REGION ) {
+
+                } else if ( entry.getValue() == OrganizationUnit.BRANCH ) {
+
+                } else if ( entry.getValue() == OrganizationUnit.AGENT ) {
+
+                }
+                userProfile.setContact_details( contactDetails );
+            } else if ( entry.getKey() == SettingsForApplication.LOCATION ) {
+                ContactDetailsSettings contactDetails = userProfile.getContact_details();
+                if ( contactDetails == null ) {
+                    contactDetails = new ContactDetailsSettings();
+                }
+                if ( entry.getValue() == OrganizationUnit.COMPANY ) {
+                    contactDetails.setLocation( companyUnitSettings.getContact_details().getLocation() );
+                } else if ( entry.getValue() == OrganizationUnit.REGION ) {
+                    contactDetails.setLocation( regionUnitSettings.getContact_details().getLocation() );
+                } else if ( entry.getValue() == OrganizationUnit.BRANCH ) {
+                    contactDetails.setLocation( branchUnitSettings.getContact_details().getLocation() );
+                } else if ( entry.getValue() == OrganizationUnit.AGENT ) {
+                    contactDetails.setLocation( agentUnitSettings.getContact_details().getLocation() );
+                }
+                userProfile.setContact_details( contactDetails );
+            } else if ( entry.getKey() == SettingsForApplication.PHONE ) {
+                ContactDetailsSettings contactDetails = userProfile.getContact_details();
+                if ( contactDetails == null ) {
+                    contactDetails = new ContactDetailsSettings();
+                }
+                ContactNumberSettings contactNumberSettings = contactDetails.getContact_numbers();
+                if ( contactNumberSettings == null ) {
+                    contactNumberSettings = new ContactNumberSettings();
+                }
+                if ( entry.getValue() == OrganizationUnit.COMPANY ) {
+                    contactNumberSettings.setWork( companyUnitSettings.getContact_details().getContact_numbers().getWork() );
+                } else if ( entry.getValue() == OrganizationUnit.REGION ) {
+                    contactNumberSettings.setWork( regionUnitSettings.getContact_details().getContact_numbers().getWork() );
+                } else if ( entry.getValue() == OrganizationUnit.BRANCH ) {
+                    contactNumberSettings.setWork( branchUnitSettings.getContact_details().getContact_numbers().getWork() );
+                } else if ( entry.getValue() == OrganizationUnit.AGENT ) {
+                    contactNumberSettings.setWork( agentUnitSettings.getContact_details().getContact_numbers().getWork() );
+                }
+                contactDetails.setContact_numbers( contactNumberSettings );
+                userProfile.setContact_details( contactDetails );
+            } else if ( entry.getKey() == SettingsForApplication.FACEBOOK ) {
+                SocialMediaTokens socialMediaTokens = userProfile.getSocialMediaTokens();
+                if ( socialMediaTokens == null ) {
+                    socialMediaTokens = new SocialMediaTokens();
+                }
+                if ( entry.getValue() == OrganizationUnit.COMPANY ) {
+                    socialMediaTokens.setFacebookToken( companyUnitSettings.getSocialMediaTokens().getFacebookToken() );
+                } else if ( entry.getValue() == OrganizationUnit.REGION ) {
+                    socialMediaTokens.setFacebookToken( regionUnitSettings.getSocialMediaTokens().getFacebookToken() );
+                } else if ( entry.getValue() == OrganizationUnit.BRANCH ) {
+                    socialMediaTokens.setFacebookToken( branchUnitSettings.getSocialMediaTokens().getFacebookToken() );
+                } else if ( entry.getValue() == OrganizationUnit.AGENT ) {
+                    socialMediaTokens.setFacebookToken( agentUnitSettings.getSocialMediaTokens().getFacebookToken() );
+                }
+                userProfile.setSocialMediaTokens( socialMediaTokens );
+            } else if ( entry.getKey() == SettingsForApplication.GOOGLE_PLUS ) {
+                SocialMediaTokens socialMediaTokens = userProfile.getSocialMediaTokens();
+                if ( socialMediaTokens == null ) {
+                    socialMediaTokens = new SocialMediaTokens();
+                }
+                if ( entry.getValue() == OrganizationUnit.COMPANY ) {
+                    socialMediaTokens.setGoogleToken( companyUnitSettings.getSocialMediaTokens().getGoogleToken() );
+                } else if ( entry.getValue() == OrganizationUnit.REGION ) {
+                    socialMediaTokens.setGoogleToken( regionUnitSettings.getSocialMediaTokens().getGoogleToken() );
+                } else if ( entry.getValue() == OrganizationUnit.BRANCH ) {
+                    socialMediaTokens.setGoogleToken( branchUnitSettings.getSocialMediaTokens().getGoogleToken() );
+                } else if ( entry.getValue() == OrganizationUnit.AGENT ) {
+                    socialMediaTokens.setGoogleToken( agentUnitSettings.getSocialMediaTokens().getGoogleToken() );
+                }
+                userProfile.setSocialMediaTokens( socialMediaTokens );
+            } else if ( entry.getKey() == SettingsForApplication.LINKED_IN ) {
+                SocialMediaTokens socialMediaTokens = userProfile.getSocialMediaTokens();
+                if ( socialMediaTokens == null ) {
+                    socialMediaTokens = new SocialMediaTokens();
+                }
+                if ( entry.getValue() == OrganizationUnit.COMPANY ) {
+                    socialMediaTokens.setLinkedInToken( companyUnitSettings.getSocialMediaTokens().getLinkedInToken() );
+                } else if ( entry.getValue() == OrganizationUnit.REGION ) {
+                    socialMediaTokens.setLinkedInToken( regionUnitSettings.getSocialMediaTokens().getLinkedInToken() );
+                } else if ( entry.getValue() == OrganizationUnit.BRANCH ) {
+                    socialMediaTokens.setLinkedInToken( branchUnitSettings.getSocialMediaTokens().getLinkedInToken() );
+                } else if ( entry.getValue() == OrganizationUnit.AGENT ) {
+                    socialMediaTokens.setLinkedInToken( agentUnitSettings.getSocialMediaTokens().getLinkedInToken() );
+                }
+                userProfile.setSocialMediaTokens( socialMediaTokens );
+            } else if ( entry.getKey() == SettingsForApplication.LENDING_TREE ) {
+                SocialMediaTokens socialMediaTokens = userProfile.getSocialMediaTokens();
+                if ( socialMediaTokens == null ) {
+                    socialMediaTokens = new SocialMediaTokens();
+                }
+                if ( entry.getValue() == OrganizationUnit.COMPANY ) {
+                    socialMediaTokens.setLendingTreeToken( companyUnitSettings.getSocialMediaTokens().getLendingTreeToken() );
+                } else if ( entry.getValue() == OrganizationUnit.REGION ) {
+                    socialMediaTokens.setLendingTreeToken( regionUnitSettings.getSocialMediaTokens().getLendingTreeToken() );
+                } else if ( entry.getValue() == OrganizationUnit.BRANCH ) {
+                    socialMediaTokens.setLendingTreeToken( branchUnitSettings.getSocialMediaTokens().getLendingTreeToken() );
+                } else if ( entry.getValue() == OrganizationUnit.AGENT ) {
+                    socialMediaTokens.setLendingTreeToken( agentUnitSettings.getSocialMediaTokens().getLendingTreeToken() );
+                }
+                userProfile.setSocialMediaTokens( socialMediaTokens );
+            } else if ( entry.getKey() == SettingsForApplication.YELP ) {
+                SocialMediaTokens socialMediaTokens = userProfile.getSocialMediaTokens();
+                if ( socialMediaTokens == null ) {
+                    socialMediaTokens = new SocialMediaTokens();
+                }
+                if ( entry.getValue() == OrganizationUnit.COMPANY ) {
+                    socialMediaTokens.setYelpToken( companyUnitSettings.getSocialMediaTokens().getYelpToken() );
+                } else if ( entry.getValue() == OrganizationUnit.REGION ) {
+                    socialMediaTokens.setYelpToken( regionUnitSettings.getSocialMediaTokens().getYelpToken() );
+                } else if ( entry.getValue() == OrganizationUnit.BRANCH ) {
+                    socialMediaTokens.setYelpToken( branchUnitSettings.getSocialMediaTokens().getYelpToken() );
+                } else if ( entry.getValue() == OrganizationUnit.AGENT ) {
+                    socialMediaTokens.setYelpToken( agentUnitSettings.getSocialMediaTokens().getYelpToken() );
+                }
+                userProfile.setSocialMediaTokens( socialMediaTokens );
+            } else if ( entry.getKey() == SettingsForApplication.REALTOR ) {
+                SocialMediaTokens socialMediaTokens = userProfile.getSocialMediaTokens();
+                if ( socialMediaTokens == null ) {
+                    socialMediaTokens = new SocialMediaTokens();
+                }
+                if ( entry.getValue() == OrganizationUnit.COMPANY ) {
+                    socialMediaTokens.setRealtorToken( companyUnitSettings.getSocialMediaTokens().getRealtorToken() );
+                } else if ( entry.getValue() == OrganizationUnit.REGION ) {
+                    socialMediaTokens.setRealtorToken( regionUnitSettings.getSocialMediaTokens().getRealtorToken() );
+                } else if ( entry.getValue() == OrganizationUnit.BRANCH ) {
+                    socialMediaTokens.setRealtorToken( branchUnitSettings.getSocialMediaTokens().getRealtorToken() );
+                } else if ( entry.getValue() == OrganizationUnit.AGENT ) {
+                    socialMediaTokens.setRealtorToken( agentUnitSettings.getSocialMediaTokens().getRealtorToken() );
+                }
+                userProfile.setSocialMediaTokens( socialMediaTokens );
+            } else if ( entry.getKey() == SettingsForApplication.ZILLOW ) {
+                SocialMediaTokens socialMediaTokens = userProfile.getSocialMediaTokens();
+                if ( socialMediaTokens == null ) {
+                    socialMediaTokens = new SocialMediaTokens();
+                }
+                if ( entry.getValue() == OrganizationUnit.COMPANY ) {
+                    socialMediaTokens.setZillowToken( companyUnitSettings.getSocialMediaTokens().getZillowToken() );
+                } else if ( entry.getValue() == OrganizationUnit.REGION ) {
+                    socialMediaTokens.setZillowToken( regionUnitSettings.getSocialMediaTokens().getZillowToken() );
+                } else if ( entry.getValue() == OrganizationUnit.BRANCH ) {
+                    socialMediaTokens.setZillowToken( branchUnitSettings.getSocialMediaTokens().getZillowToken() );
+                } else if ( entry.getValue() == OrganizationUnit.AGENT ) {
+                    socialMediaTokens.setZillowToken( agentUnitSettings.getSocialMediaTokens().getZillowToken() );
+                }
+                userProfile.setSocialMediaTokens( socialMediaTokens );
+            }
+        }
+        return userProfile;
+    }
+
 }
