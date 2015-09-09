@@ -90,6 +90,7 @@ import com.realtech.socialsurvey.core.entities.VerticalCrmMapping;
 import com.realtech.socialsurvey.core.entities.VerticalsMaster;
 import com.realtech.socialsurvey.core.entities.ZipCodeLookup;
 import com.realtech.socialsurvey.core.enums.AccountType;
+import com.realtech.socialsurvey.core.enums.SettingsForApplication;
 import com.realtech.socialsurvey.core.exception.DatabaseException;
 import com.realtech.socialsurvey.core.exception.FatalException;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
@@ -107,6 +108,8 @@ import com.realtech.socialsurvey.core.services.payment.Payment;
 import com.realtech.socialsurvey.core.services.payment.exception.PaymentException;
 import com.realtech.socialsurvey.core.services.search.SolrSearchService;
 import com.realtech.socialsurvey.core.services.search.exception.SolrException;
+import com.realtech.socialsurvey.core.services.settingsmanagement.SettingsLocker;
+import com.realtech.socialsurvey.core.services.settingsmanagement.SettingsSetter;
 import com.realtech.socialsurvey.core.utils.DisplayMessageConstants;
 import com.realtech.socialsurvey.core.utils.EmailFormatHelper;
 import com.realtech.socialsurvey.core.utils.EncryptionHelper;
@@ -238,6 +241,12 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 
     @Autowired
     private UtilityService utilityService;
+
+    @Autowired
+    private SettingsLocker settingsLocker;
+
+    @Autowired
+    private SettingsSetter settingsSetter;
 
 
     /**
@@ -499,6 +508,18 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
         companySettings.setIden( company.getCompanyId() );
         if ( organizationalDetails.get( CommonConstants.LOGO_NAME ) != null ) {
             companySettings.setLogo( organizationalDetails.get( CommonConstants.LOGO_NAME ) );
+
+            try {
+                settingsSetter.setSettingsValueForCompany( company, SettingsForApplication.LOGO, true );
+                settingsLocker.lockSettingsValueForCompany( company, SettingsForApplication.LOGO, true );
+            } catch ( NonFatalException e ) {
+                LOG.error( "Exception Caught " + e.getMessage() );
+            }
+
+            LockSettings lockSettings = new LockSettings();
+            lockSettings.setLogoLocked( true );
+            companySettings.setLockSettings( lockSettings );
+
         }
 
         ContactDetailsSettings contactDetailSettings = new ContactDetailsSettings();
@@ -532,9 +553,6 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
         companySettings.setModifiedOn( System.currentTimeMillis() );
         companySettings.setModifiedBy( String.valueOf( user.getUserId() ) );
 
-        LockSettings lockSettings = new LockSettings();
-        lockSettings.setLogoLocked( true );
-        companySettings.setLockSettings( lockSettings );
 
         // Adding default text for various flows of survey.
         SurveySettings surveySettings = new SurveySettings();
@@ -2539,7 +2557,8 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
         queries.put( CommonConstants.IS_DEFAULT_BY_SYSTEM, CommonConstants.STATUS_INACTIVE );
         queries.put( CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_ACTIVE );
 
-        List<Branch> branchList = branchDao.findProjectionsAscOrderByKeyValue( Branch.class, projections, queries, CommonConstants.BRANCH_OBJECT );
+        List<Branch> branchList = branchDao.findProjectionsAscOrderByKeyValue( Branch.class, projections, queries,
+            CommonConstants.BRANCH_OBJECT );
         LOG.info( "Branch list fetched for the company " + company );
         return branchList;
     }
@@ -2593,7 +2612,8 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
         queries.put( CommonConstants.IS_DEFAULT_BY_SYSTEM, CommonConstants.STATUS_INACTIVE );
         queries.put( CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_ACTIVE );
 
-        List<Region> regionList = regionDao.findProjectionsAscOrderByKeyValue( Region.class, projections, queries, CommonConstants.REGION_OBJECT );
+        List<Region> regionList = regionDao.findProjectionsAscOrderByKeyValue( Region.class, projections, queries,
+            CommonConstants.REGION_OBJECT );
         LOG.info( "Region list fetched for the company " + company );
         return regionList;
     }
@@ -3995,7 +4015,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
      * Method to read default survey mail content from EmailTemplate which will be store into the
      * Company Settings.
      */
-    private String readMailContentFromFile( String fileName ) throws IOException
+    public String readMailContentFromFile( String fileName ) throws IOException
     {
         LOG.debug( "readSurveyReminderMailContentFromFile() started" );
         BufferedReader reader = new BufferedReader( new InputStreamReader( this.getClass().getClassLoader()
@@ -4511,6 +4531,17 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
         }
 
         return region;
+    }
+
+
+    @Override
+    @Transactional
+    public void updateMailContentForOrganizationUnit( MailContentSettings mailContentSettings,
+        OrganizationUnitSettings organizationUnitSettings, String collectionName )
+    {
+        organizationUnitSettingsDao
+            .updateParticularKeyOrganizationUnitSettings( MongoOrganizationUnitSettingDaoImpl.KEY_MAIL_CONTENT,
+                mailContentSettings, organizationUnitSettings, collectionName );
     }
 
 

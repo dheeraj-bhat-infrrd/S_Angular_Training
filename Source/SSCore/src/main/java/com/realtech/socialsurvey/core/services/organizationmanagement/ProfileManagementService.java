@@ -570,4 +570,7 @@ public interface ProfileManagementService
 
     public OrganizationUnitSettings getIndividualSettingsByProfileName( String agentProfileName )
         throws ProfileNotFoundException, InvalidInputException, NoRecordsFetchedException;
+
+
+    public void updateEmailsWithLogo( OrganizationUnitSettings unitSettings, String logoUrl, String collectionName );
 }
