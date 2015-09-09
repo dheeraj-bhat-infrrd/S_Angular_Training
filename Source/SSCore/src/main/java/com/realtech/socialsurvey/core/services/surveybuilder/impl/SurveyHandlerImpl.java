@@ -14,6 +14,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
@@ -23,6 +24,7 @@ import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
+
 import com.google.gson.Gson;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.dao.OrganizationUnitSettingsDao;
@@ -41,15 +43,19 @@ import com.realtech.socialsurvey.core.entities.SurveyResponse;
 import com.realtech.socialsurvey.core.entities.SurveySettings;
 import com.realtech.socialsurvey.core.entities.User;
 import com.realtech.socialsurvey.core.entities.UserProfile;
+import com.realtech.socialsurvey.core.enums.OrganizationUnit;
+import com.realtech.socialsurvey.core.enums.SettingsForApplication;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.exception.NoRecordsFetchedException;
 import com.realtech.socialsurvey.core.services.generator.URLGenerator;
 import com.realtech.socialsurvey.core.services.mail.EmailServices;
 import com.realtech.socialsurvey.core.services.mail.UndeliveredEmailException;
 import com.realtech.socialsurvey.core.services.organizationmanagement.OrganizationManagementService;
+import com.realtech.socialsurvey.core.services.organizationmanagement.ProfileManagementService;
 import com.realtech.socialsurvey.core.services.organizationmanagement.UserManagementService;
 import com.realtech.socialsurvey.core.services.search.SolrSearchService;
 import com.realtech.socialsurvey.core.services.search.exception.SolrException;
+import com.realtech.socialsurvey.core.services.settingsmanagement.impl.InvalidSettingsStateException;
 import com.realtech.socialsurvey.core.services.surveybuilder.SurveyHandler;
 import com.realtech.socialsurvey.core.utils.EmailFormatHelper;
 
@@ -92,6 +98,9 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
 
     @Autowired
     SurveyPreInitiationDao surveyPreInitiationDao;
+
+    @Autowired
+    ProfileManagementService profileManagementService;
 
     @Autowired
     private EmailServices emailServices;
@@ -578,6 +587,9 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
         String custRelationWithAgent, User user, boolean isAgent, String source ) throws InvalidInputException, SolrException,
         NoRecordsFetchedException, UndeliveredEmailException
     {
+        Map<String, Long> hierarchyMap = null;
+        Map<SettingsForApplication, OrganizationUnit> map = null;
+        String logoUrl = null;
         LOG.debug( "Method sendSurveyInvitationMail() called from DashboardController." );
         if ( custFirstName == null || custFirstName.isEmpty() ) {
             LOG.error( "Null/Empty value found for customer's first name." );
@@ -596,7 +608,33 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
         //		storeInitialSurveyDetails(user.getUserId(), custEmail, custFirstName, custLastName, 0, custRelationWithAgent, link);
 
         //		if (isAgent)
-        sendInvitationMailByAgent( user, custFirstName, custLastName, custEmail, link );
+
+        AgentSettings agentSettings = organizationUnitSettingsDao.fetchAgentSettingsById( user.getUserId() );
+        hierarchyMap = profileManagementService.getPrimaryHierarchyByAgentProfile( agentSettings );
+
+        long companyId = hierarchyMap.get( CommonConstants.COMPANY_ID_COLUMN );
+        long regionId = hierarchyMap.get( CommonConstants.REGION_ID_COLUMN );
+        long branchId = hierarchyMap.get( CommonConstants.BRANCH_ID_COLUMN );
+        try {
+            map = profileManagementService.getPrimaryHierarchyByEntity( CommonConstants.AGENT_ID_COLUMN, user.getUserId() );
+        } catch ( InvalidSettingsStateException e ) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+        OrganizationUnit organizationUnit = map.get( SettingsForApplication.LOGO );
+        if ( organizationUnit == OrganizationUnit.COMPANY ) {
+            OrganizationUnitSettings companySettings = organizationManagementService.getCompanySettings( companyId );
+            logoUrl = companySettings.getLogo();
+        } else if ( organizationUnit == OrganizationUnit.REGION ) {
+            OrganizationUnitSettings regionSettings = organizationManagementService.getRegionSettings( regionId );
+            logoUrl = regionSettings.getLogo();
+        } else if ( organizationUnit == OrganizationUnit.BRANCH ) {
+            OrganizationUnitSettings branchSettings = organizationManagementService.getBranchSettingsDefault( branchId );
+            logoUrl = branchSettings.getLogo();
+        } else if ( organizationUnit == OrganizationUnit.AGENT ) {
+            logoUrl = agentSettings.getLogo();
+        }
+        sendInvitationMailByAgent( user, custFirstName, custLastName, custEmail, link, logoUrl );
         //		else
         //			sendInvitationMailByCustomer(user, custFirstName, custLastName, custEmail, link);
         LOG.debug( "Method sendSurveyInvitationMail() finished from DashboardController." );
@@ -611,6 +649,9 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
         String custRelationWithAgent, User user, String surveyUrl ) throws InvalidInputException, UndeliveredEmailException
     {
         LOG.info( "sendSurveyRestartMail() started." );
+        Map<String, Long> hierarchyMap = null;
+        Map<SettingsForApplication, OrganizationUnit> map = null;
+        String logoUrl = null;
         AgentSettings agentSettings = userManagementService.getUserSettings( user.getUserId() );
         String companyName = user.getCompany().getCompany();
         String agentTitle = "";
@@ -634,6 +675,40 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
         // TODO add address for mail footer
         String fullAddress = "";
 
+
+        hierarchyMap = profileManagementService.getPrimaryHierarchyByAgentProfile( agentSettings );
+
+        long companyId = hierarchyMap.get( CommonConstants.COMPANY_ID_COLUMN );
+        long regionId = hierarchyMap.get( CommonConstants.REGION_ID_COLUMN );
+        long branchId = hierarchyMap.get( CommonConstants.BRANCH_ID_COLUMN );
+        try {
+            map = profileManagementService.getPrimaryHierarchyByEntity( CommonConstants.AGENT_ID_COLUMN, user.getUserId() );
+        } catch ( InvalidSettingsStateException e ) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+        OrganizationUnit organizationUnit = map.get( SettingsForApplication.LOGO );
+        if ( organizationUnit == OrganizationUnit.COMPANY ) {
+            OrganizationUnitSettings companySettings = organizationManagementService.getCompanySettings( companyId );
+            logoUrl = companySettings.getLogo();
+        } else if ( organizationUnit == OrganizationUnit.REGION ) {
+            OrganizationUnitSettings regionSettings = organizationManagementService.getRegionSettings( regionId );
+            logoUrl = regionSettings.getLogo();
+        } else if ( organizationUnit == OrganizationUnit.BRANCH ) {
+            OrganizationUnitSettings branchSettings = null;
+            try {
+                branchSettings = organizationManagementService.getBranchSettingsDefault( branchId );
+            } catch ( NoRecordsFetchedException e ) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
+            if ( branchSettings != null ) {
+                logoUrl = branchSettings.getLogo();
+            }
+        } else if ( organizationUnit == OrganizationUnit.AGENT ) {
+            logoUrl = agentSettings.getLogo();
+        }
+
         OrganizationUnitSettings companySettings = organizationManagementService.getCompanySettings( user.getCompany()
             .getCompanyId() );
         if ( companySettings != null && companySettings.getMail_content() != null
@@ -644,8 +719,12 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
                 restartSurvey.getParam_order() );
 
             mailBody = mailBody.replaceAll( "\\[BaseUrl\\]", applicationBaseUrl );
-            mailBody = mailBody.replaceAll( "\\[LogoUrl\\]", appLogoUrl );
-            mailBody = mailBody.replaceAll( "\\[Link\\]", surveyUrl );
+            if ( logoUrl == null || logoUrl.equalsIgnoreCase( "" ) ) {
+                mailBody = mailBody.replaceAll( "\\[LogoUrl\\]", appLogoUrl );
+            } else {
+
+                mailBody = mailBody.replaceAll( "\\[Link\\]", surveyUrl );
+            }
             mailBody = mailBody.replaceAll( "\\[Name\\]",
                 emailFormatHelper.getCustomerDisplayNameForEmail( custFirstName, custLastName ) );
             mailBody = mailBody.replaceAll( "\\[AgentName\\]", agentName );
@@ -856,7 +935,7 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
      * Method to send email by agent to initiate survey.
      */
     private void sendInvitationMailByAgent( User user, String custFirstName, String custLastName, String custEmail,
-        String surveyUrl ) throws InvalidInputException, UndeliveredEmailException
+        String surveyUrl, String logoUrl ) throws InvalidInputException, UndeliveredEmailException
     {
         LOG.debug( "sendInvitationMailByAgent() started." );
 
@@ -895,7 +974,12 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
                 takeSurvey.getParam_order() );
 
             mailBody = mailBody.replaceAll( "\\[BaseUrl\\]", applicationBaseUrl );
-            mailBody = mailBody.replaceAll( "\\[LogoUrl\\]", appLogoUrl );
+            if ( logoUrl == null || logoUrl.equalsIgnoreCase( "" ) ) {
+                mailBody = mailBody.replaceAll( "\\[LogoUrl\\]", appLogoUrl );
+            } else {
+                mailBody = mailBody.replaceAll( "\\[LogoUrl\\]", logoUrl );
+            }
+
             mailBody = mailBody.replaceAll( "\\[Link\\]", surveyUrl );
             mailBody = mailBody.replaceAll( "\\[FirstName\\]", custFirstName );
             mailBody = mailBody.replaceAll( "\\[Name\\]",
