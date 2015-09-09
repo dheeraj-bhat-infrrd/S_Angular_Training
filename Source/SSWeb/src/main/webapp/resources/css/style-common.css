@@ -1726,7 +1726,7 @@ button.paypal.is-active {
 }
 
 .icn-twit {
-	background: url(../images/twitter.png) no-repeat center;
+	background: url(../images/icons_social.png) no-repeat -350px center;
 }
 
 .icn-lin {
@@ -3319,6 +3319,7 @@ button.paypal.is-active {
 	border-bottom: 1px solid #dcdcdc;
 	padding-bottom: 10px;
 	margin-top: 10px;
+	word-break: break-word;
 }
 
 .ppl-review-item:last-child {
