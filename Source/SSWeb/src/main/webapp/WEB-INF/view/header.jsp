@@ -151,7 +151,7 @@
 						<a href="javascript:showMainContent('./showusermangementpage.do')"><spring:message code="label.header.usermanagement.key" /></a>
 					</div>
 				</c:if>
-				<c:if test="${accountMasterId < 4}">
+				<c:if test="${accountMasterId < 4 }">	
 					<div class="header-links-item">
 						<a href="javascript:showMainContent('./upgradepage.do')"><spring:message code="label.header.upgrade.key" /></a>
 					</div>
@@ -227,9 +227,11 @@
 							<spring:message code="label.changepassword.key"/>
 						</div>
 						<c:if test="${accountMasterId < 4}">
-							<div class="initial-dd-item" id="upgrade-plan" onclick="showMainContent('./upgradepage.do')">
-								<spring:message	code="label.header.upgrade.key" />
-							</div>
+							<c:if test="${canUpgrade == 1}">	
+								<div class="initial-dd-item" id="upgrade-plan" onclick="showMainContent('./upgradepage.do')">
+									<spring:message	code="label.header.upgrade.key" />
+								</div>
+							</c:if>
 						</c:if>
 						<c:if test="${accountMasterId == 5}">
 							<div class="initial-dd-item" id="upgrade-plan" onclick="showMainContent('./upgradetopaidplanpage.do')">
