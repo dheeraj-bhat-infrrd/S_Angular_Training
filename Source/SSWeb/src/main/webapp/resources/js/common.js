@@ -638,20 +638,6 @@ $(document).on('click', '#wc-send-survey', function() {
 			if (dataName == 'agent-name') {
 				agentId = $(this).find('input.wc-review-agentname').first().attr('agent-id');
 
-				/*var name = $(this).find('input.wc-review-custname').first().val();
-				if(name!=undefined){
-				var name = $(this).find('input.wc-review-custname').first().val();
-				if (name != undefined) {
-					var nameParts = name.split(" ");
-					if (nameParts.length == 1) {
-						firstname = name;
-					} else {
-						for (var i = 0; i < nameParts.length-1; i++) {
-							firstname = firstname + nameParts[i];
-						}
-						lastname = nameParts[nameParts.length - 1];
-					}
-				}*/
 				if (idx == 0) {
 					columnName = $(this).find('input.wc-review-agentname').first().attr('column-name');
 					idx ++;
@@ -724,24 +710,25 @@ $(document).on('click', '#wc-send-survey', function() {
 		};
 	}
 
-	//loadDisplayPicture();
 	$(this).closest('.overlay-login').hide();
-	showDisplayPic();
-	
 	callAjaxPostWithPayloadData("./sendmultiplesurveyinvites.do", function(data) {
+		
+		//Update the incomplete survey on dashboard
+		getIncompleteSurveyCount(colName, colValue);
+		
 		$('#overlay-toast').html('Survey request sent successfully!');
 		showToast();
-		$('body').removeClass('body-no-scroll');
+		enableBodyScroll();
 	}, payload);
 });
 
 $(document).on('click', '#wc-skip-send-survey', function() {
 	$('#overlay-send-survey').html('');
-	$('body').removeClass('body-no-scroll');
+	enableBodyScroll();
 });
 
 function sendSurveyInvitation() {
-	$('body').addClass('body-no-scroll');
+	disableBodyScroll();
 	callAjaxGET("./sendsurveyinvitation.do", function(data) {
 		$('#overlay-send-survey').html(data);
 		if ($("#welcome-popup-invite").length) {
@@ -752,7 +739,7 @@ function sendSurveyInvitation() {
 }
 
 function sendSurveyInvitationAdmin(columnName, columnValue) {
-	$('body').addClass('body-no-scroll');
+	disableBodyScroll();
 	var payload = {
 			"columnName" : columnName,
 			"columnValue" : columnValue
@@ -767,7 +754,7 @@ function sendSurveyInvitationAdmin(columnName, columnValue) {
 }
 
 function linkedInDataImport() {
-	$('body').addClass('body-no-scroll');
+	disableBodyScroll();
 	callAjaxGET("./linkedindataimport.do", function(data) {
 		$('#overlay-linkedin-import').html(data);
 		if ($("#welocome-step1").length) {
@@ -883,6 +870,14 @@ function showStateCityRow(parentId, elementId) {
 			}
 		}
 	}
+}
+
+function enableBodyScroll() {
+	$('body').removeClass('body-no-scroll');
+}
+
+function disableBodyScroll() {
+	$('body').addClass('body-no-scroll');
 }
 
 function hideStateCityRow(parentId, elementId) {
