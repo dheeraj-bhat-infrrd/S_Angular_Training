@@ -723,7 +723,7 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
                 mailBody = mailBody.replaceAll( "\\[LogoUrl\\]", appLogoUrl );
             } else {
 
-                mailBody = mailBody.replaceAll( "\\[Link\\]", surveyUrl );
+                mailBody = mailBody.replaceAll( "\\[LogoUrl\\]", logoUrl );
             }
             mailBody = mailBody.replaceAll( "\\[Name\\]",
                 emailFormatHelper.getCustomerDisplayNameForEmail( custFirstName, custLastName ) );
