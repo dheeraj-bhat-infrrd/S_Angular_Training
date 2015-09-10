@@ -8143,3 +8143,250 @@ $(document).on('click','.hdr-link-item-dropdown-item',function(e) {
 	$('#hdr-link-item-dropdown').hide();
 	showOverlay();
 });
+
+
+//Disconnect social media
+function disconnectSocialMedia(socialMedia) {
+	if($('div[data-social="'+socialMedia+'"]').text() == undefined || $('div[data-social="'+socialMedia+'"]').text() == ''){
+		return;
+	}
+	
+	var payload = {
+		"socialMedia" : socialMedia	
+	};
+	
+	callAjaxPostWithPayloadData("/disconnectsocialmedia.do", function(data) {
+		if(data == "success"){
+			$('div[data-social="'+socialMedia+'"]').html('');
+			$('div[data-social="'+socialMedia+'"]').parent().find('.social-media-disconnect').addClass('social-media-disconnect-disabled').removeAttr("onclick").removeAttr("title");
+			$('#overlay-toast').html('Successfully disconnected ' + socialMedia);
+			showToast();
+		} else {
+			$('#overlay-toast').html('Some error occurred while disconnecting ' + socialMedia);
+			showToast();
+		}
+	}, payload, true);	
+}
+
+
+function showProfileLinkInEditProfilePage(source, profileUrl){
+	if(source=='facebook'){
+		$('#edt-prof-fb-lnk').html(profileUrl);
+	}
+	else if(source=='twitter'){
+		$('#edt-prof-twt-lnk').html(profileUrl);
+	}
+	else if(source=='linkedin'){
+		$('#edt-prof-linkedin-lnk').html(profileUrl);
+	}
+	else if(source=='google'){
+		$('#edt-prof-ggl-lnk').html(profileUrl);
+	}
+}
+
+// Send Survey Agent
+$(document).on('input', '#wc-review-table-inner[data-role="agent"] input', function() {
+	var parentDiv = $(this).parent().parent();
+	if (parentDiv.is(':last-child')) {
+		var htmlData = '<div class="wc-review-tr clearfix">'
+			+ '<div class="wc-review-tc1 float-left"><input class="wc-review-input wc-review-fname"></div>'
+			+ '<div class="wc-review-tc2 float-left"><input class="wc-review-input wc-review-lname"></div>'
+			+ '<div class="wc-review-tc3 float-left"><input class="wc-review-input wc-review-email"></div>'
+			+ '<div class="wc-review-tc4 float-left"><div class="wc-review-rmv-icn hide"></div></div>'
+		+ '</div>';
+		parentDiv.after(htmlData);
+		
+		// enable remove button
+		if ($('#wc-review-table-inner').children().length > 2) {
+			$('.wc-review-rmv-icn').show();
+		}
+		
+		// setting up perfect scrollbar
+		setTimeout(function() {
+			$('#wc-review-table').perfectScrollbar();
+			$('#wc-review-table').perfectScrollbar('update');
+		}, 1000);
+	}
+});
+
+//Send Survey Admin
+$(document).on('input', '#wc-review-table-inner[data-role="admin"] input', function() {
+	var parentDiv = $(this).parent().parent();
+	if (parentDiv.is(':last-child')) {
+		var htmlData = '<div class="wc-review-tr clearfix">'
+			+ '<div class="wc-review-tc1 float-left pos-relative"><input data-name="agent-name" class="wc-review-input wc-review-agentname"></div>'
+			+ '<div class="wc-review-tc2 float-left"><input class="wc-review-input wc-review-fname"></div>'
+			+ '<div class="wc-review-tc3 float-left"><input class="wc-review-input wc-review-lname"></div>'
+			+ '<div class="wc-review-tc4 float-left"><input class="wc-review-input wc-review-email"></div>'
+			+ '<div class="wc-review-tc5 float-left"><div class="wc-review-rmv-icn hide"></div></div>'
+		+ '</div>';
+		parentDiv.after(htmlData);
+		
+		// enable remove button
+		if ($('#wc-review-table-inner').children().length > 2) {
+			$('.wc-review-rmv-icn').show();
+		}
+		
+		// setting up perfect scrollbar
+		setTimeout(function() {
+			$('#wc-review-table').perfectScrollbar();
+			$('#wc-review-table').perfectScrollbar('update');
+		}, 1000);
+	}
+});
+
+$(document).on('click', '.wc-review-rmv-icn', function() {
+	var parentDiv = $('#wc-review-table-inner');
+	
+	// disable remove button
+	if (parentDiv.children().length <= 3) {
+		$('.wc-review-rmv-icn').hide();
+	}
+	$(this).parent().parent().remove();
+
+	// setting up perfect scrollbar
+	setTimeout(function() {
+		$('#wc-review-table').perfectScrollbar();
+		$('#wc-review-table').perfectScrollbar('update');
+	}, 1000);
+});
+
+$(document).on('click', '#wc-send-survey', function() {
+	var receiversList = [];
+	var agentId = undefined;
+	var columnName = undefined;
+	var firstname = "";
+	var lastname = "";
+	var idx=0;
+	var exit = false;
+	$('#wc-review-table-inner').children().each(function() {
+		if (!$(this).hasClass('wc-review-hdr')) {
+			var dataName = $(this).find('input.wc-review-agentname').first().attr('data-name');
+			if (dataName == 'agent-name') {
+				agentId = $(this).find('input.wc-review-agentname').first().attr('agent-id');
+
+				if (idx == 0) {
+					columnName = $(this).find('input.wc-review-agentname').first().attr('column-name');
+					idx ++;
+				}
+			}
+			
+			firstname = $(this).find('input.wc-review-fname').first().val();
+			lastname = $(this).find('input.wc-review-lname').first().val();
+			
+			var emailId = $(this).find('input.wc-review-email').first().val();
+			
+			if(firstname == "" && emailId != ""){
+				$('#overlay-toast').html('Please enter Firstname for all the customer');
+				showToast();
+				exit = true;
+				return false;
+			} else if (agentId != undefined && firstname == ""){
+				$('#overlay-toast').html('Please enter Firstname for all the customer');
+				showToast();
+				exit = true;
+				return false;
+			}
+			if (emailRegex.test(emailId)) {
+				var receiver = new Object();
+				receiver.firstname = firstname;
+				receiver.lastname = lastname;
+				receiver.emailId = emailId;
+				if (dataName == 'agent-name') {
+					receiver.agentId = agentId;
+					if(agentId == undefined){
+						$('#overlay-toast').html('Please enter Agent name for all survey requests');
+						showToast();
+						exit = true;
+						return false;					
+					}
+				}
+				receiversList.push(receiver);
+			} else if(firstname != ""){
+				$('#overlay-toast').html('Please enter valid email for ' + firstname);
+				showToast();
+				exit = true;
+				return false;
+			}
+		}
+	});
+
+	if(exit){
+		exit = false;
+		return false;
+	}
+	
+	//Check if recievers list empty
+	if(receiversList.length == 0){
+		$('#overlay-toast').html('Add customers to send survey request!');
+		showToast();
+		exit = false;
+		return false;
+	}
+	
+	receiversList = JSON.stringify(receiversList);
+	var payload = {
+		"receiversList" : receiversList,
+		"source" : 'agent'
+	};
+	if (columnName != undefined) {
+		payload = {
+			"receiversList" : receiversList,
+			"source" : 'admin',
+			"columnName" : columnName,
+		};
+	}
+
+	$(this).closest('.overlay-login').hide();
+	callAjaxPostWithPayloadData("./sendmultiplesurveyinvites.do", function(data) {
+		
+		//Update the incomplete survey on dashboard
+		getIncompleteSurveyCount(colName, colValue);
+		
+		$('#overlay-toast').html('Survey request sent successfully!');
+		showToast();
+		enableBodyScroll();
+	}, payload);
+});
+
+$(document).on('click', '#wc-skip-send-survey', function() {
+	$('#overlay-send-survey').html('');
+	enableBodyScroll();
+});
+
+function sendSurveyInvitation() {
+	disableBodyScroll();
+	callAjaxGET("./sendsurveyinvitation.do", function(data) {
+		$('#overlay-send-survey').html(data);
+		if ($("#welcome-popup-invite").length) {
+			$('#overlay-send-survey').removeClass("hide");
+			$('#overlay-send-survey').show();
+		}
+	}, true);
+}
+
+function sendSurveyInvitationAdmin(columnName, columnValue) {
+	disableBodyScroll();
+	var payload = {
+			"columnName" : columnName,
+			"columnValue" : columnValue
+	};
+	callAjaxGetWithPayloadData("./sendsurveyinvitationadmin.do", function(data) {
+		$('#overlay-send-survey').html(data);
+		if ($("#welcome-popup-invite").length) {
+			$('#overlay-send-survey').removeClass("hide");
+			$('#overlay-send-survey').show();
+		}
+	}, payload, true);
+}
+
+function linkedInDataImport() {
+	disableBodyScroll();
+	callAjaxGET("./linkedindataimport.do", function(data) {
+		$('#overlay-linkedin-import').html(data);
+		if ($("#welocome-step1").length) {
+			$('#overlay-linkedin-import').removeClass("hide");
+			$('#overlay-linkedin-import').show();
+		}
+	}, true);
+}
