@@ -1713,7 +1713,7 @@ public class SocialManagementController
                   //update SETTINGS_SET_STATUS of COMPANY table to set.
                     Company company = userManagementService.getCompanyById( companySettings.getIden() );
                     if(company != null){
-                    	settingsSetter.setSettingsValueForCompany(user.getCompany(), SettingsForApplication.ZILLOW, CommonConstants.SET_SETTINGS);
+                    	settingsSetter.setSettingsValueForCompany(company, SettingsForApplication.ZILLOW, CommonConstants.SET_SETTINGS);
                     	userManagementService.updateCompany( company );
                     }
                     for ( ProfileStage stage : companySettings.getProfileStages() ) {
