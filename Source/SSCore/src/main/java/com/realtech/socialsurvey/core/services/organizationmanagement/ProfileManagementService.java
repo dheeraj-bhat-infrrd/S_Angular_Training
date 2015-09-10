@@ -302,7 +302,7 @@ public interface ProfileManagementService
         throws InvalidInputException, NoRecordsFetchedException;
 
 
-    public User getUserByProfileName( String profileName ) throws InvalidInputException, NoRecordsFetchedException,
+    public User getUserByProfileName( String profileName, boolean checkStatus ) throws InvalidInputException, NoRecordsFetchedException,
         ProfileNotFoundException;
 
 
