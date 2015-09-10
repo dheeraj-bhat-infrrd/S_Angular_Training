@@ -595,7 +595,7 @@ public interface CommonConstants
     public static final String HEADER_LAST_NAME = "Last Name";
     public static final String HEADER_AVG_SCORE = "Avg Score";
     public static final String HEADER_SUM_SURVEYS = "Sum Surveys";
-    public static final String HEADER_REGISTRATION_DATE = "Registation Date";
+    public static final String HEADER_REGISTRATION_DATE = "Registration Date";
 
     // Constants for Survey Results Report
     public static final String HEADER_AGENT_FIRST_NAME = "User First Name";
