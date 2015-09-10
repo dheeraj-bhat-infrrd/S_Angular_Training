@@ -389,7 +389,7 @@ public class ProfileViewController
 
         // check for profiles and redirect to company if admin only
         try {
-            User user = profileManagementService.getUserByProfileName( agentProfileName );
+            User user = profileManagementService.getUserByProfileName( agentProfileName, true );
             List<UserProfile> userProfiles = user.getUserProfiles();
             if ( userProfiles == null || userProfiles.size() < 1 ) {
                 throw new NoRecordsFetchedException( DisplayMessageConstants.INVALID_INDIVIDUAL_PROFILENAME );
