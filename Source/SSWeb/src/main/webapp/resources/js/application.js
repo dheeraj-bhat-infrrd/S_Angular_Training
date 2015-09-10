@@ -1585,7 +1585,7 @@ function showStatus(formId, text) {
  */
 function displayMessage(data) {
 	$("#temp-message").html(data);
-	var displayMessageDiv = $("#display-msg-div");
+	var displayMessageDiv = $("#temp-message #display-msg-div");
 	if($(displayMessageDiv).hasClass("success-message")) {
 		showInfoMobileAndWeb($(displayMessageDiv).html());
 	}
@@ -7351,7 +7351,9 @@ function paintPosts(posts) {
 
 	if (proPostStartIndex == 0){
 		$('#prof-posts').html(divToPopulate);
-		$('#prof-posts').perfectScrollbar();
+		$('#prof-posts').perfectScrollbar({
+			suppressScrollX : true
+		});
 		$('#prof-posts').perfectScrollbar('update');
 	}
 	else{
