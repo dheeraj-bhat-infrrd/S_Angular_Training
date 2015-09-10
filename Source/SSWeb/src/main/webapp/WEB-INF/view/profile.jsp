@@ -536,7 +536,7 @@
 	                    	<span class="review-for-text-sm-screen"><spring:message code="label.reviewsfor.key"/></span>
 	                    	&nbsp;${profName }
 	                    </div>
-	                    <div id="prof-reviews-sort" class="prof-reviews-sort clearfix float-right hide">
+	                    <div id="prof-reviews-sort" class="prof-reviews-sort clearfix float-right">
 	                    	<div id="sort-by-feature" class="prof-review-sort-link float-left"><spring:message code="label.sortbyfeature.key"/></div>
 	                    	<div class="prof-reviews-sort-divider float-left">|</div>
 	                    	<div id="sort-by-date" class="prof-review-sort-link float-right"><spring:message code="label.sortbydate.key"/></div>
@@ -546,7 +546,7 @@
                     <div id="prof-review-item" class="prof-reviews">
 	                   <!--  reviews get populated here -->
                     </div>
-                    <div id="prof-hidden-review-count" class="prof-hidden-review-link">
+                    <div id="prof-hidden-review-count" class="prof-hidden-review-link" data-nr-review-count="0">
 	                   <!--  count of hidden reviews get populated here -->
                     </div>
                 </div>
@@ -614,17 +614,17 @@
         var branchProfileName = $("#branch-profile-name").val();
         var agentProfileName = $("#agent-profile-name").val();
         if(regionProfileName.length > 0) {
-        	fetchRegionProfile(regionProfileName);
+        	fetchRegionProfile();
         	gaLabel = 'region';
         	gaName = regionProfileName;
         }
         else if(branchProfileName.length > 0){
-        	fetchBranchProfile(branchProfileName);
+        	fetchBranchProfile();
         	gaLabel = 'office';
         	gaName = branchProfileName;
         }
         else if(agentProfileName.length > 0){
-        	fetchAgentProfile(agentProfileName);
+        	fetchAgentProfile();
         	gaLabel = 'individual';
         	gaName = agentProfileName;
         } 
@@ -742,10 +742,10 @@
         	}
         }
         
-        $(document).on('click','.vcard-download', function(){
+        /* $(document).on('click','.vcard-download', function(){
         	var agentName = $("#agent-profile-name").val();
         	downloadVCard(agentName);
-        });
+        }); */
         
     	// Google analytics for reviews
     	setTimeout(function() {
@@ -776,59 +776,6 @@
     		showOverlay();
     	}
     	
-    	
-    	
-    	var captchaText = true;
-    	/**try {
-    		
-    		Recaptcha.create('6LdlHOsSAAAAAM8ypy8W2KXvgMtY2dFsiQT3HVq-',
-    				'recaptcha', {
-    					theme : 'white',
-    					callback : captchaLoaded
-    				});
-    		console.log("Captcha loaded");
-    	} catch (error) {
-    		console.log("Could not load captcha");
-    	}*/
-    	
-    	function captchaLoaded() {
-    		var imgData = $(".recaptcha_image_cell").html();
-    		console.log("Captcha image data : " + imgData);
-    		var challenge = Recaptcha.get_challenge('6LdlHOsSAAAAAM8ypy8W2KXvgMtY2dFsiQT3HVq-');
-    		if(challenge == undefined){
-    			$(".reg-cap-reload").trigger('click');
-    		}else{
-    			$("#prof-captcha-img").html(imgData);
-    		}
-    	}
-
-    	$(".reg-cap-reload").click(function() {
-    		console.log("Captcha reload button clicked");
-    		Recaptcha.reload();
-    		console.log("Initiated the click of hidden reload");
-    	});
-
-    	$(".reg-cap-sound").click(function() {
-    		if (captchaText == true) {
-    			console.log("Captcha sound button clicked");
-    			$("#recaptcha_switch_audio").click();
-    			console.log("Initiated the click of hidden sound");
-    			captchaText = false;
-    			$(this).addClass('reg-cap-text');
-    		} else {
-    			console.log("Captcha text button clicked");
-    			$("#recaptcha_switch_img").click();
-    			console.log("Initiated the click of hidden text");
-    			captchaText = true;
-    			$(this).removeClass('reg-cap-text');
-    		}
-    	});
-
-    	$(".reg-cap-info").click(function() {
-    		console.log("Info button clicked");
-    		$("#recaptcha_whatsthis").click();
-    	});
-    	
     	// Contact us form validation functions
     	function validateMessage(elementId) {
     		if ($('#'+elementId).val() != "") {
@@ -857,7 +804,6 @@
         	isContactUsFormValid = true;
 
         	var isFocussed = false;
-        	var isSmallScreen = false;
         	if($(window).width() < 768){
         		isSmallScreen = true;
         	}

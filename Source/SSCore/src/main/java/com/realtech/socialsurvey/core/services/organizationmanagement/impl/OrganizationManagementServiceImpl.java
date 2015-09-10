@@ -4254,15 +4254,17 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 
     @Override
     @Transactional
-    public List<VerticalCrmMapping> getCrmMapping( User user )
+    public List<VerticalCrmMapping> getCrmMapping( User user ) throws InvalidInputException
     {
         user = userDao.findById( User.class, user.getUserId() );
         List<VerticalCrmMapping> mappings = user.getCompany().getVerticalsMaster().getVerticalCrmMappings();
 
         if ( mappings == null || mappings.isEmpty() ) {
-            VerticalCrmMapping defaultMapping = verticalCrmMappingDo.findById( VerticalCrmMapping.class,
-                CommonConstants.DEFAULT_VERTICAL_CRM_ID );
-            mappings.add( defaultMapping );
+        	Map<String, Object> queries= new HashMap<>();
+        	VerticalsMaster defaultVerticalMaster = verticalMastersDao.findById(VerticalsMaster.class, CommonConstants.DEFAULT_VERTICAL_ID);
+        	queries.put("verticalsMaster", defaultVerticalMaster);
+            List<VerticalCrmMapping> defaultMappings = verticalCrmMappingDo.findByKeyValue( VerticalCrmMapping.class, queries);
+            mappings.addAll(defaultMappings);
         }
 
         for ( VerticalCrmMapping mapping : mappings ) {
@@ -4506,6 +4508,27 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
         List<FeedIngestionEntity> fieldIngestionEntities = organizationUnitSettingsDao.fetchSocialMediaTokens( collectionName,
             skipCount, batchSize );
         return fieldIngestionEntities;
+    }
+    
+    @Transactional
+    @Override
+    public void updateBranchProfileName(long branchId, String profileName){
+    	LOG.info("Method updateBranchProfileName() started.");
+    	Branch branch = branchDao.findById( Branch.class, branchId );
+    	branch.setProfileName(profileName);
+    	branchDao.update(branch);
+    	LOG.info("Method updateBranchProfileName() finished.");
+    	
+    }
+    
+    @Transactional
+    @Override
+    public void updateRegionProfileName(long regionId, String profileName){
+    	LOG.info("Method updateRegionProfileName() started.");
+    	Region region = regionDao.findById(Region.class, regionId);
+    	region.setProfileName(profileName);
+    	regionDao.update(region);
+    	LOG.info("Method updateRegionProfileName() finished.");
     }
 
 
