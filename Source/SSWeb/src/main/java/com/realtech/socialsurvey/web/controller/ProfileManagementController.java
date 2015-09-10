@@ -5294,7 +5294,7 @@ public class ProfileManagementController {
 		switch (entityType) {
 		case CommonConstants.AGENT_ID_COLUMN:
 			try {
-				profileManagementService.getUserByProfileName(profileName);
+				profileManagementService.getUserByProfileName(profileName, false);
 				profileExists = true;
 			} catch (InvalidInputException | NoRecordsFetchedException e) {
 				LOG.error("Error occured. Reason : " + e);
