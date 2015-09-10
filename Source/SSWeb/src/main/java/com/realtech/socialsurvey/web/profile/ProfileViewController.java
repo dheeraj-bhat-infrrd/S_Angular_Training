@@ -40,6 +40,7 @@ import com.realtech.socialsurvey.core.entities.UserProfile;
 import com.realtech.socialsurvey.core.enums.DisplayMessageType;
 import com.realtech.socialsurvey.core.enums.OrganizationUnit;
 import com.realtech.socialsurvey.core.enums.SettingsForApplication;
+import com.realtech.socialsurvey.core.exception.FatalException;
 import com.realtech.socialsurvey.core.exception.InternalServerException;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.exception.NoRecordsFetchedException;
@@ -222,6 +223,10 @@ public class ProfileViewController
 
             try {
                 map = profileManagementService.getPrimaryHierarchyByEntity( CommonConstants.REGION_ID, regionProfile.getIden() );
+                if ( map == null ) {
+                    LOG.error( "Unable to fetch primary profile for this user " );
+                    throw new FatalException( "Unable to fetch primary profile this user " + regionProfile.getIden() );
+                }
             } catch ( InvalidSettingsStateException e ) {
                 throw new InternalServerException( new ProfileServiceErrorCode(
                     CommonConstants.ERROR_CODE_REGION_PROFILE_SERVICE_FAILURE, CommonConstants.SERVICE_CODE_REGION_PROFILE,
@@ -333,6 +338,11 @@ public class ProfileViewController
             try {
                 map = profileManagementService.getPrimaryHierarchyByEntity( CommonConstants.BRANCH_ID_COLUMN,
                     branchProfile.getIden() );
+                if ( map == null ) {
+                    LOG.error( "Unable to fetch primary profile for this user " );
+                    throw new FatalException( "Unable to fetch primary profile this user " + branchProfile.getIden() );
+                }
+
             } catch ( InvalidSettingsStateException e ) {
                 throw new InternalServerException( new ProfileServiceErrorCode(
                     CommonConstants.ERROR_CODE_BRANCH_PROFILE_SERVICE_FAILURE, CommonConstants.SERVICE_CODE_BRANCH_PROFILE,
@@ -343,9 +353,9 @@ public class ProfileViewController
                 null, map );
 
             // aggregated social profile urls
-        /*    SocialMediaTokens branchTokens = profileManagementService.aggregateSocialProfiles( branchProfile,
-                CommonConstants.BRANCH_ID );
-            branchProfile.setSocialMediaTokens( branchTokens );*/
+            /*    SocialMediaTokens branchTokens = profileManagementService.aggregateSocialProfiles( branchProfile,
+                    CommonConstants.BRANCH_ID );
+                branchProfile.setSocialMediaTokens( branchTokens );*/
 
             // aggregated disclaimer
             String disclaimer = profileManagementService.aggregateDisclaimer( branchProfile, CommonConstants.BRANCH_ID );
@@ -475,6 +485,10 @@ public class ProfileViewController
                     throw new ProfileNotFoundException( "Unable to find agent profile for profile name " + agentProfileName );
                 }
                 Map<String, Long> hierarchyMap = profileManagementService.getPrimaryHierarchyByAgentProfile( individualProfile );
+                if ( hierarchyMap == null ) {
+                    LOG.error( "Unable to fetch primary profile for this user " );
+                    throw new FatalException( "Unable to fetch primary profile this user " + individualProfile.getIden() );
+                }
                 companyId = hierarchyMap.get( CommonConstants.COMPANY_ID_COLUMN );
                 regionId = hierarchyMap.get( CommonConstants.REGION_ID_COLUMN );
                 branchId = hierarchyMap.get( CommonConstants.BRANCH_ID_COLUMN );
@@ -486,6 +500,11 @@ public class ProfileViewController
                 map = profileManagementService.getPrimaryHierarchyByEntity( CommonConstants.AGENT_ID_COLUMN,
                     individualProfile.getIden() );
 
+                if ( map == null ) {
+                    LOG.error( "Unable to fetch primary profile for this user " );
+                    throw new FatalException( "Unable to fetch primary profile this user " + individualProfile.getIden() );
+                }
+
                 individualProfile = (AgentSettings) profileManagementService.fillUnitSettings( individualProfile,
                     MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION, companyProfile, regionProfile,
                     branchProfile, individualProfile, map );
@@ -493,10 +512,10 @@ public class ProfileViewController
                 individualProfile.setVertical( user.getCompany().getVerticalsMaster().getVerticalName() );
 
                 // aggregated social profile urls
-/*                SocialMediaTokens agentTokens = profileManagementService.aggregateSocialProfiles( individualProfile,
-                    CommonConstants.AGENT_ID );
-                individualProfile.setSocialMediaTokens( agentTokens );
-*/
+                /*                SocialMediaTokens agentTokens = profileManagementService.aggregateSocialProfiles( individualProfile,
+                                    CommonConstants.AGENT_ID );
+                                individualProfile.setSocialMediaTokens( agentTokens );
+                */
                 // aggregated disclaimer
                 String disclaimer = profileManagementService.aggregateDisclaimer( individualProfile, CommonConstants.AGENT_ID );
                 individualProfile.setDisclaimer( disclaimer );
