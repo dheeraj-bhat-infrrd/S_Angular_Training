@@ -215,18 +215,20 @@
 							</div>
 							<div class="st-settings-text"><spring:message code="label.disable.account.des.key" /><span class="accounts-email"><spring:message code="label.account.email.key" /></span></div>
 						</div>
-						<div class="col-lg-4 col-md-4 col-sm-4 col-xs-12">
-							<div class="clearfix st-settings-item-wrapper">
-							   <div class="float-left st-settings-check-wrapper">
-									<div id="st-settings-payment-on" class="st-checkbox st-settings-checkbox st-checkbox-on hide"></div>
-									<div id="st-settings-payment-off" class="st-checkbox st-settings-checkbox st-checkbox-off"></div>
+						<c:if test="${billingMode == 'A'}">
+							<div class="col-lg-4 col-md-4 col-sm-4 col-xs-12">
+								<div class="clearfix st-settings-item-wrapper">
+							   		<div class="float-left st-settings-check-wrapper">
+										<div id="st-settings-payment-on" class="st-checkbox st-settings-checkbox st-checkbox-on hide"></div>
+										<div id="st-settings-payment-off" class="st-checkbox st-settings-checkbox st-checkbox-off"></div>
+									</div>
+									<div class="float-left st-check-txt-OR" id="st-chg-payment-info">
+										<spring:message code="label.change.payment.key" />
+									</div>
 								</div>
-								<div class="float-left st-check-txt-OR" id="st-chg-payment-info">
-									<spring:message code="label.change.payment.key" />
-								</div>
+								<div class="st-settings-text"><spring:message code="label.change.payment.desc.key" /></div>
 							</div>
-							<div class="st-settings-text"><spring:message code="label.change.payment.desc.key" /></div>
-						</div>
+						</c:if>
 					</div>
 				</form>
 			</div>
