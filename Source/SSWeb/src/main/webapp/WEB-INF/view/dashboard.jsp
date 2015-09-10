@@ -190,6 +190,14 @@ $(document).ready(function() {
 	
 	hideOverlay();
 	$(document).attr("title", "Dashboard");
+
+	$(document).scroll(function() {
+		if(window.location.hash.substr(1) == "dashboard") {
+			if ((window.innerHeight + window.pageYOffset) >= (document.body.offsetHeight) && startIndexCmp < totalReviews) {
+				showReviews(colName, colValue);
+			}			
+		}
+	});
 	
 	if ($("#da-dd-wrapper-profiles").children('.da-dd-item').length <= 1) {
 		$('#da-dd-wrapper').remove();
