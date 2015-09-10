@@ -22,6 +22,7 @@ import com.realtech.socialsurvey.core.entities.SurveyPreInitiation;
 import com.realtech.socialsurvey.core.entities.User;
 import com.realtech.socialsurvey.core.enums.OrganizationUnit;
 import com.realtech.socialsurvey.core.enums.SettingsForApplication;
+import com.realtech.socialsurvey.core.exception.FatalException;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.exception.NoRecordsFetchedException;
 import com.realtech.socialsurvey.core.services.mail.EmailServices;
@@ -159,6 +160,10 @@ public class IncompleteSurveyReminderSender extends QuartzJobBean
         hierarchyMap = profileManagementService.getPrimaryHierarchyByAgentProfile( agentSettings );
         try {
             map = profileManagementService.getPrimaryHierarchyByEntity( CommonConstants.AGENT_ID_COLUMN, user.getUserId() );
+            if ( map == null ) {
+                LOG.error( "Unable to fetch primary profile for this user " );
+                throw new FatalException( "Unable to fetch primary profile this user " + user.getUserId() );
+            }
         } catch ( InvalidSettingsStateException e ) {
             // TODO Auto-generated catch block
             e.printStackTrace();
