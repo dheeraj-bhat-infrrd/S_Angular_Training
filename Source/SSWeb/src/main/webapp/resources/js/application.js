@@ -338,16 +338,10 @@ $('body').click(function() {
 	$('#hr-dd-wrapper').slideUp(200);
 });
 
-$(document).scroll(function() {
-	if ((window.innerHeight + window.pageYOffset) >= (document.body.offsetHeight) && startIndexCmp < totalReviews) {
-		showReviews(colName, colValue);
-	}
-});
-
 function paintDashboard(profileMasterId, newProfileName, newProfileValue, typeoOfAccount) {
 	accountType = typeoOfAccount;
 	startIndexCmp = 0;
-	batchSizeCmp = 2;
+	batchSizeCmp = 5;
 	totalReviews = 0;
 	reviewsFetchedSoFar = 0;
 	startIndexInc = 0;
@@ -1118,6 +1112,7 @@ $(document).on('click','#dashboard-sel',function(e){
 });
 
 $(document).on('click','.da-dd-item',function(e){
+	showOverlay();
 	$('#dashboard-sel').html($(this).html());
 	$('#da-dd-wrapper-profiles').slideToggle(200);
 	$('#da-dd-wrapper-profiles').perfectScrollbar('update');
@@ -4574,14 +4569,6 @@ $('#find-pro-form input').keypress(function(e) {
 	}
 });
 
-$(window).scroll(function() {
-	var newIndex = startIndex + rowSize;
-	if ((window.innerHeight + window.pageYOffset) >= (document.body.offsetHeight) && newIndex < $('#srch-num').html()) {
-		startIndex = newIndex;
-		fetchUsers(newIndex);
-	}
-});
-
 /**
  * Method to fetch users list based on the criteria i.e if profile level is specified,
  *  bring all users of that level else search based on first/last name
@@ -6250,8 +6237,8 @@ function overlayRevert() {
 function callBackShowBasicDetails(response) {
 	$('#prof-basic-container').html(response);
 	adjustImage();
-	fetchAvgRating(attrName, attrVal);
-	fetchReviewCount(attrName, attrVal, minScore);
+	//fetchAvgRating(attrName, attrVal);
+	//fetchReviewCount(attrName, attrVal, minScore);
 }
 
 $(document).on('blur', '#prof-basic-container input', function() {
@@ -6288,8 +6275,8 @@ $(document).on('blur', '#prof-basic-container input', function() {
 function callBackUpdateBasicDetails(data) {
 	$('#prof-all-lock').val('locked');
 	$('#prof-message-header').html(data);
-	callAjaxGET("./fetchbasicdetails.do", callBackShowBasicDetails);
-	callAjaxGET("./fetchaddressdetails.do", callBackShowAddressDetails);
+	//callAjaxGET("./fetchbasicdetails.do", callBackShowBasicDetails);
+	//callAjaxGET("./fetchaddressdetails.do", callBackShowAddressDetails);
 
 	$('#overlay-toast').html($('#display-msg-div').text().trim());
 	showToast();
@@ -7076,7 +7063,7 @@ function paintForProfile() {
 		attrName = "agentId";
 		attrVal = agentId;
 	}
-
+	startIndex = 0;
 	// Common call for all cases
 	fetchAvgRating(attrName, attrVal);
 	fetchReviewCount(attrName, attrVal, minScore);
@@ -7194,25 +7181,6 @@ function paintProfImage(imgDivClass) {
 				}
 			});
 }
-
-// Fetch and paint Reviews
-$(window)
-		.scroll(
-				function() {
-					var newIndex = startIndex + numOfRows;
-					var totalReviews = $("#prof-company-review-count").html();
-					if (totalReviews != undefined) {
-						totalReviews = totalReviews.substr(0, totalReviews
-								.indexOf(' '));
-
-						if ((window.innerHeight + window.pageYOffset) >= (document.body.offsetHeight)
-								&& newIndex <= totalReviews) {
-							fetchReviews(attrName, attrVal, minScore, newIndex,
-									numOfRows);
-							startIndex = newIndex;
-						}
-					}
-				});
 
 function fetchReviews(attrName, attrVal, minScore, startIndex, numOfRows) {
 	var url = "./fetchreviews.do?" + attrName + "=" + attrVal + "&minScore="

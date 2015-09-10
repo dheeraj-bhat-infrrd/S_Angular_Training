@@ -78,4 +78,20 @@
 	} else {
 		initializeVerticalAutcomplete();		
 	}
+	
+	// Fetch and paint Reviews
+	$(window).scroll(function() {
+		var newIndex = startIndex + numOfRows;
+		var totalReviews = $("#prof-company-review-count")
+				.html();
+		if (totalReviews != undefined) {
+			totalReviews = totalReviews.substr(0, totalReviews
+					.indexOf(' '));
+			if ((window.innerHeight + window.pageYOffset) >= (document.body.offsetHeight)
+					&& newIndex <= totalReviews) {
+				fetchReviews(attrName, attrVal, minScore, newIndex, numOfRows);
+				startIndex = newIndex;
+			}
+		}
+	});
 </script>
