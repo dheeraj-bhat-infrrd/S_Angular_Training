@@ -866,4 +866,18 @@ public interface OrganizationManagementService
 
 
     public List<FeedIngestionEntity> fetchSocialMediaTokens( String collectionName, int skipCount, int batchSize );
+
+    /**
+     * Method to update the profile-name in the branch table.
+     * @param branchId
+     * @param profileName
+     */
+	void updateBranchProfileName(long branchId, String profileName);
+
+	/**
+	 * Method to update the profile-name in the region table.
+	 * @param regionId
+	 * @param profileName
+	 */
+	void updateRegionProfileName(long regionId, String profileName);
 }

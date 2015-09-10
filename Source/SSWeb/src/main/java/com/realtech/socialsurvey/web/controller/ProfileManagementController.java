@@ -5311,14 +5311,6 @@ public class ProfileManagementController {
 						profileName, profileUrl, agentSettings);
 				profileSettings.setCompleteProfileUrl(profileBaseUrl
 						+ profileUrl);
-				try {
-					solrSearchService.editUserInSolr(agentSettings.getIden(),
-							CommonConstants.PROFILE_NAME_SOLR, profileName);
-					solrSearchService.editUserInSolr(agentSettings.getIden(),
-							CommonConstants.PROFILE_URL_SOLR, profileUrl);
-				} catch (SolrException e1) {
-					LOG.error("Error occured. Reason : " + e1);
-				}
 			}
 			break;
 
@@ -5347,6 +5339,7 @@ public class ProfileManagementController {
 							profileName, profileUrl, branchSettings);
 					profileSettings.setCompleteProfileUrl(profileBaseUrl
 							+ profileUrl);
+					organizationManagementService.updateBranchProfileName(entityId, profileName);
 				} catch (InvalidInputException | NoRecordsFetchedException e1) {
 					LOG.error("Error occured. Reason: " + e1);
 				}
@@ -5377,6 +5370,7 @@ public class ProfileManagementController {
 					profileSettings.setProfileUrl(profileUrl);
 					profileSettings.setCompleteProfileUrl(profileBaseUrl
 							+ profileUrl);
+					organizationManagementService.updateRegionProfileName(entityId, profileName);
 				} catch (InvalidInputException e1) {
 					LOG.error("Error occured. Reason : " + e1);
 				}
