@@ -1276,7 +1276,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
      */
     @Override
     @Transactional
-    public User getUserByProfileName( String agentProfileName ) throws ProfileNotFoundException
+    public User getUserByProfileName( String agentProfileName, boolean checkStatus ) throws ProfileNotFoundException
     {
         LOG.info( "Method getUserProfilesByProfileName called for agentProfileName:" + agentProfileName );
 
@@ -1292,7 +1292,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
         }
 
         User user = userDao.findById( User.class, agentSettings.getIden() );
-        if ( user.getStatus() == CommonConstants.STATUS_INACTIVE ) {
+        if ( user.getStatus() == CommonConstants.STATUS_INACTIVE && checkStatus) {
             throw new ProfileNotFoundException( "No active agent found." );
         }
 
