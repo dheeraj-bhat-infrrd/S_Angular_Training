@@ -227,7 +227,7 @@
 							<spring:message code="label.changepassword.key"/>
 						</div>
 						<c:if test="${accountMasterId < 4}">
-							<c:if test="${canUpgrade == 1}">	
+							<c:if test="${billingMode == 'A'}">	
 								<div class="initial-dd-item" id="upgrade-plan" onclick="showMainContent('./upgradepage.do')">
 									<spring:message	code="label.header.upgrade.key" />
 								</div>

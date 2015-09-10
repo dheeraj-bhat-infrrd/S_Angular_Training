@@ -215,7 +215,7 @@
 							</div>
 							<div class="st-settings-text"><spring:message code="label.disable.account.des.key" /><span class="accounts-email"><spring:message code="label.account.email.key" /></span></div>
 						</div>
-						<c:if test="${canUpgrade == 1}">
+						<c:if test="${billingMode == 'A'}">
 							<div class="col-lg-4 col-md-4 col-sm-4 col-xs-12">
 								<div class="clearfix st-settings-item-wrapper">
 							   		<div class="float-left st-settings-check-wrapper">
