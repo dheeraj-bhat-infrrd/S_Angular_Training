@@ -116,6 +116,13 @@
 				adjustTextContainerWidthOnResize();
 			}
 		});
+		$(window).scroll(function() {
+			var newIndex = startIndex + rowSize;
+			if ((window.innerHeight + window.pageYOffset) >= ($('#ctnt-list-wrapper').offset().top + $('#ctnt-list-wrapper').height()) && newIndex < $('#srch-num').html()) {
+				startIndex = newIndex;
+				fetchUsers(newIndex);
+			}
+		});
 	});
 	</script>
 </body>
