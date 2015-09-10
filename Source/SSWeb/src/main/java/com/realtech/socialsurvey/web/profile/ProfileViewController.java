@@ -343,9 +343,9 @@ public class ProfileViewController
                 null, map );
 
             // aggregated social profile urls
-            SocialMediaTokens branchTokens = profileManagementService.aggregateSocialProfiles( branchProfile,
+        /*    SocialMediaTokens branchTokens = profileManagementService.aggregateSocialProfiles( branchProfile,
                 CommonConstants.BRANCH_ID );
-            branchProfile.setSocialMediaTokens( branchTokens );
+            branchProfile.setSocialMediaTokens( branchTokens );*/
 
             // aggregated disclaimer
             String disclaimer = profileManagementService.aggregateDisclaimer( branchProfile, CommonConstants.BRANCH_ID );
@@ -493,10 +493,10 @@ public class ProfileViewController
                 individualProfile.setVertical( user.getCompany().getVerticalsMaster().getVerticalName() );
 
                 // aggregated social profile urls
-                SocialMediaTokens agentTokens = profileManagementService.aggregateSocialProfiles( individualProfile,
+/*                SocialMediaTokens agentTokens = profileManagementService.aggregateSocialProfiles( individualProfile,
                     CommonConstants.AGENT_ID );
                 individualProfile.setSocialMediaTokens( agentTokens );
-
+*/
                 // aggregated disclaimer
                 String disclaimer = profileManagementService.aggregateDisclaimer( individualProfile, CommonConstants.AGENT_ID );
                 individualProfile.setDisclaimer( disclaimer );
