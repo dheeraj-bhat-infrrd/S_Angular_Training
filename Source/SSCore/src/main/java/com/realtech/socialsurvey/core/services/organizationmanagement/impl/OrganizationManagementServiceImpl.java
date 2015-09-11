@@ -4123,15 +4123,17 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 
     @Override
     @Transactional
-    public List<VerticalCrmMapping> getCrmMapping( User user )
+    public List<VerticalCrmMapping> getCrmMapping( User user ) throws InvalidInputException
     {
         user = userDao.findById( User.class, user.getUserId() );
         List<VerticalCrmMapping> mappings = user.getCompany().getVerticalsMaster().getVerticalCrmMappings();
 
         if ( mappings == null || mappings.isEmpty() ) {
-            VerticalCrmMapping defaultMapping = verticalCrmMappingDo.findById( VerticalCrmMapping.class,
-                CommonConstants.DEFAULT_VERTICAL_CRM_ID );
-            mappings.add( defaultMapping );
+        	Map<String, Object> queries= new HashMap<>();
+        	VerticalsMaster defaultVerticalMaster = verticalMastersDao.findById(VerticalsMaster.class, CommonConstants.DEFAULT_VERTICAL_ID);
+        	queries.put("verticalsMaster", defaultVerticalMaster);
+            List<VerticalCrmMapping> defaultMappings = verticalCrmMappingDo.findByKeyValue( VerticalCrmMapping.class, queries);
+            mappings.addAll(defaultMappings);
         }
 
         for ( VerticalCrmMapping mapping : mappings ) {
