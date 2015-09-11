@@ -1,5 +1,9 @@
 package com.realtech.socialsurvey.web.controller;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+
 import javax.servlet.http.HttpServletRequest;
 
 import org.slf4j.Logger;
@@ -11,11 +15,19 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.multipart.MultipartFile;
 
+import com.realtech.socialsurvey.core.entities.User;
+import com.realtech.socialsurvey.core.enums.DisplayMessageType;
+import com.realtech.socialsurvey.core.exception.NonFatalException;
 import com.realtech.socialsurvey.core.services.organizationmanagement.OrganizationManagementService;
 import com.realtech.socialsurvey.core.services.search.SolrSearchService;
+import com.realtech.socialsurvey.core.services.support.UserSupportService;
 import com.realtech.socialsurvey.core.services.upload.FileUploadService;
 import com.realtech.socialsurvey.core.services.upload.impl.UploadUtils;
+import com.realtech.socialsurvey.core.utils.DisplayMessageConstants;
 import com.realtech.socialsurvey.core.utils.MessageUtils;
 import com.realtech.socialsurvey.core.utils.UrlValidationHelper;
 import com.realtech.socialsurvey.web.common.JspResolver;
@@ -62,6 +74,9 @@ public class HelpController {
 
     @Autowired
     private BotRequestUtils botRequestUtils;
+    
+    @Autowired
+    private UserSupportService userSupportService;
 
 
     @Transactional
@@ -70,5 +85,25 @@ public class HelpController {
     {
         LOG.info( "Method showProfileEditPage() called from ProfileManagementService" );
         return JspResolver.HELP_EDIT;
-}
+    }
+    
+    
+    @ResponseBody
+    @RequestMapping ( value = "/sendreportbugmailtoadmin")
+    public String sendReportBugMailToAdmin( HttpServletRequest request,  @RequestParam String subject , @RequestParam String mailText ){
+    	LOG.info( "Method sendReportBugMailToAdmin() called" );
+    	User user = sessionHelper.getCurrentUser();
+    	try{
+    		List<MultipartFile> attachmentList = new ArrayList<MultipartFile>();
+    		Map<String , String > attachmentsDetails = userSupportService.saveAttachmentLocally(attachmentList);
+    		
+    		userSupportService.sendReportBugMailToAdmin(user , subject, mailText, attachmentsDetails);
+
+    	}catch(NonFatalException e){
+    		LOG.error("Erroe in sending the report bug mail : " + e.getMessage());
+    		return messageUtils.getDisplayMessage(DisplayMessageConstants.ERROR_IN_SENDING_HELP_MESSAGE, DisplayMessageType.ERROR_MESSAGE).getMessage();
+    	}
+		
+    	return messageUtils.getDisplayMessage(DisplayMessageConstants.HELP_MESSAGE_SUCCESSFULLY_SEND, DisplayMessageType.SUCCESS_MESSAGE).getMessage();
+    }
 }
