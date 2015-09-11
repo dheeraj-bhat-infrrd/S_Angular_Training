@@ -20,6 +20,7 @@
 	<link rel="stylesheet" href="${initParam.resourcesPath}/resources/css/style-resp.css">
 </head>
 <body>
+	<div class="overlay-loader hide"></div>
 	<div class="body-wrapper">
 		<div class="hdr-wrapper">
 			<div class="container hdr-container clearfix">
@@ -82,7 +83,7 @@
 											<input id="fp-last-name-pattern" type="hidden" value="${patternLast}">
 										</c:otherwise>
 									</c:choose>
-								<input id="fp-users-size" type="hidden">
+								<input id="fp-users-size" type="hidden" value="0">
 								<input id="fp-profile-level-fetch-info" data-searchcriteria="${searchCriteria}"
 									data-profile-level="${profileLevel}" data-iden="${iden}" type="hidden"/>
 							</div>
@@ -93,6 +94,16 @@
 						</div>
 						
 						<div id="ctnt-list-wrapper" class="ctnt-list-wrapper"></div>
+												
+						<div id="pro-paginate-btn" class="paginate-buttons-survey clearfix hide" data-start="0" data-total="0" data-batch="10">
+							<div id="pro-prev" class="float-left sur-paginate-btn">&lt; Prev</div>
+							<div class="paginate-sel-box float-left">
+								<input id="sel-page-prolist" type="text" pattern="[0-9]*" class="sel-page" value="0"/>
+								<span class="paginate-divider">/</span>
+								<span id="pro-total-pages" class="paginate-total-pages">0</span>
+							</div>
+							<div id="pro-next" class="float-right sur-paginate-btn">Next &gt;</div>
+						</div>
 					</div>
 					<div class="ctnt-right-item col-lg-3 col-md-3 col-sm-3 col-xs-12 ads-container">
 						<a href="http://mbshighway.com/sosur" target="_blank">
@@ -106,8 +117,7 @@
 	<jsp:include page="scripts.jsp"></jsp:include>
 	<script>
 	$(document).ready(function() {
-		$('#fp-users-size').val(0);
-		
+		startIndex = 0;
 		fetchUsers(startIndex);
 		adjustTextContainerWidthOnResize();
 		
@@ -116,13 +126,13 @@
 				adjustTextContainerWidthOnResize();
 			}
 		});
-		$(window).scroll(function() {
+		/* $(window).scroll(function() {
 			var newIndex = startIndex + rowSize;
 			if ((window.innerHeight + window.pageYOffset) >= ($('#ctnt-list-wrapper').offset().top + $('#ctnt-list-wrapper').height()) && newIndex < $('#srch-num').html()) {
 				startIndex = newIndex;
 				fetchUsers(newIndex);
 			}
-		});
+		}); */
 	});
 	</script>
 </body>
