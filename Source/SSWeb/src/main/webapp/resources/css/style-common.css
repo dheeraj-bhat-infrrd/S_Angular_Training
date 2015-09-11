@@ -1695,6 +1695,7 @@ button.paypal.is-active {
 .tweet-panel-item,.posts-panel-item {
 	padding-bottom: 10px;
 	margin-bottom: 0px;
+	word-break: break-word;
 }
 
 .tweet-panel-item:last-child {
