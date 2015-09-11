@@ -371,7 +371,6 @@ function paintIndividualForBranch(data) {
 			
 			$("#branch-hierarchy").show();
 			if($("#branch-individuals").length > 0) {
-				$("#branch-individuals").html(individualsHtml);
 				if($("#branch-individuals").children(".show-more-btn").length > 0){
 					$("#branch-individuals").find(".show-more-btn").before(individualsHtml);	
 				} else {
