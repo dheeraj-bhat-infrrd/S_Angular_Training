@@ -4532,11 +4532,12 @@ $('#find-pro-form input').keypress(function(e) {
  * @param newIndex
  */
 function fetchUsers(newIndex) {
+	showOverlay();
 	var profileLevel = $("#fp-profile-level-fetch-info").data("profile-level");
 	var iden = $("#fp-profile-level-fetch-info").data("iden");
 	
 	if (profileLevel != undefined && profileLevel != "") {
-		fetchUsersByProfileLevel(iden, profileLevel, startIndex);
+		fetchUsersByProfileLevel(iden, profileLevel, newIndex);
 	} else {
 		var formData = new FormData();
 		formData.append("find-pro-first-name", $('#fp-first-name-pattern').val());
@@ -4545,12 +4546,93 @@ function fetchUsers(newIndex) {
 		formData.append("find-pro-row-size", rowSize);
 		
 		if (!($('#find-pro-first-name').val() == "" && $('#find-pro-last-name').val() == ""))
-			callAjaxPOSTWithTextData("./findaproscroll.do", infiniteScrollCallback, true, formData);
+			callAjaxPOSTWithTextData("./findaproscroll.do", paginateUsersProList, true, formData);
 	}
 }
 
-function infiniteScrollCallback(response) {
+function updatePaginationBtnsForProList() {
+	var start = parseInt($('#pro-paginate-btn').attr("data-start"));
+	var total = parseInt($('#pro-paginate-btn').attr("data-total"));
+	var batch = parseInt($('#pro-paginate-btn').attr("data-batch"));
+	
+	//update previous button
+	if(start == 0) {
+		$('#pro-prev').removeClass('paginate-button');
+	} else {
+		$('#pro-prev').addClass('paginate-button');
+	}
+	
+	//update next button
+	if(start + batch >= total) {
+		$('#pro-next').removeClass('paginate-button');
+	} else {
+		$('#pro-next').addClass('paginate-button');
+	}
+	
+	//update page no
+	var pageNo = 0;
+	if(start < total){
+		pageNo = start / batch + 1;	
+	} else {
+		pageNo = start / batch;
+	}
+	$('#sel-page-prolist').val(pageNo);
+}
+
+//Click events proList pagination buttons
+$(document).on('click', '#pro-next.paginate-button', function(e) {
+	var start = parseInt($('#pro-paginate-btn').attr("data-start"));
+	var batch = parseInt($('#pro-paginate-btn').attr("data-batch"));
+	
+	start += batch;
+	$('#pro-paginate-btn').attr("data-start", start);
+	fetchUsers(start);
+});
+
+$(document).on('click', '#pro-prev.paginate-button', function(e) {
+	var start = parseInt($('#pro-paginate-btn').attr("data-start"));
+	var batch = parseInt($('#pro-paginate-btn').attr("data-batch"));
+	
+	start -= batch;
+	$('#pro-paginate-btn').attr("data-start", start);
+	fetchUsers(start);
+});
+
+$(document).on('keypress', '#sel-page-prolist', function(e) {
+	//if the letter is not digit then don't type anything
+	if (e.which != 8 && e.which != 0 && (e.which < 48 || e.which > 57)) {
+		return false;
+	}
+	var totalPage = parseInt($('#pro-total-pages').text());
+	var prevPageNoVal = parseInt($('#sel-page-prolist').val());
+	if(prevPageNoVal == NaN) {
+		prevPageNoVal = 0;
+	}
+	var pageNo = prevPageNoVal + String.fromCharCode(e.which);
+	pageNo = parseInt(pageNo);
+	if(pageNo >= totalPage || pageNo <= 0) {
+		return false;
+	}
+});
+
+$(document).on('keyup', '#sel-page-prolist', function(e) {
+	if(e.which == 13) {
+		$(this).trigger('blur');	
+	}
+});
+
+$(document).on('blur', '#sel-page-prolist', function(e) {
+	var batch = parseInt($('#pro-paginate-btn').attr("data-batch"));
+	var pageNoVal = parseInt($('#sel-page-prolist').val());
+	start = (pageNoVal - 1) * batch;
+	$('#pro-paginate-btn').attr("data-start", start);
+	fetchUsers(start);
+});
+
+function paginateUsersProList(response) {
 	var reponseJson = $.parseJSON(response);
+	var start = parseInt($('#pro-paginate-btn').attr("data-start"));
+	var batch = parseInt($('#pro-paginate-btn').attr("data-batch"));
 	
 	// error message
 	if (reponseJson.errMessage) {
@@ -4558,20 +4640,34 @@ function infiniteScrollCallback(response) {
 		$('#ctnt-list-wrapper').append("No Profiles found");
 	}
 	else {
-		var usersSize = reponseJson.userFound;
-		if (usersSize > 0) {
-			$('#srch-num').text(usersSize);
+		if(start == 0) {
+			var usersSize = reponseJson.userFound;
+			if (usersSize > 0) {
+				$('#srch-num').text(usersSize);
+				$('#pro-paginate-btn').show().attr("data-total", usersSize);
+				var totalPage = 0;
+				if (usersSize % batch == 0) {
+					totalPage = parseInt(usersSize / batch);
+				} else {
+					totalPage = parseInt(usersSize / batch + 1);
+				}
+				
+				$('#pro-total-pages').text(totalPage);
+			}			
 		}
 		paintProList(reponseJson.users);
 	}
+	updatePaginationBtnsForProList();
+	scrollToTop();
+	hideOverlay();
 }
 
 function paintProList(usersList) {
 	if (usersList != undefined) {
 		var usersSize = usersList.length;
-		if (usersSize > 0) {
+		/*if (usersSize > 0) {
 			$('#fp-users-size').val(usersSize);
-		}
+		}*/
 		
 		var usersHtml = "";
 		if (usersSize > 0) {
@@ -4618,7 +4714,7 @@ function paintProList(usersList) {
 				+ '</div>';
 				usersHtml = usersHtml + '</div>';
 			});
-			$('#ctnt-list-wrapper').append(usersHtml);
+			$('#ctnt-list-wrapper').html(usersHtml);
 			
 			$('.ctnt-review-score').each(function(){
 				changeRatingPattern($(this).attr("data-score"), $(this));
@@ -4648,10 +4744,7 @@ function fetchUsersByProfileLevel(iden, profileLevel, startIndex) {
 function fetchUsersByProfileLevelCallback(data) {
 	var response = $.parseJSON(data);
 	if (response != undefined) {
-		var usersList = $.parseJSON(response.entity);
-		if(usersList.userFound > 0)
-			$('#srch-num').text(usersList.userFound);
-		paintProList(usersList.users);
+		paginateUsersProList(response.entity);
 	}
 }
 
