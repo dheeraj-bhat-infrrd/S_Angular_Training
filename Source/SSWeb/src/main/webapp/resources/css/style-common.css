@@ -60,7 +60,7 @@ input:-webkit-autofill {
 	-webkit-box-shadow: 0 0 0 1000px white inset !important;
 }
 
-select:focus{
+select:focus, button:focus{
 	outline:none;
 }
 

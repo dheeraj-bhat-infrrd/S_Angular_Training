@@ -4,6 +4,7 @@ package com.realtech.socialsurvey.web.controller;
 import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.sql.Timestamp;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -1295,9 +1296,10 @@ public class DashboardController
             }
 
             try {
+            	Date date = new Date();
                 surveyDetails = profileManagementService.getIncompleteSurvey( iden, 0, 0, -1, -1, profileLevel, startDate,
                     endDate, realtechAdmin );
-                String fileName = "Incomplete_Survey_" + profileLevel + "_" + iden + EXCEL_FILE_EXTENSION;
+                String fileName = "Incomplete_Survey_" + profileLevel + "-" +user.getFirstName() + "_" + user.getLastName() + "-" + (new Timestamp(date.getTime())) + EXCEL_FILE_EXTENSION;
                 XSSFWorkbook workbook = dashboardService.downloadIncompleteSurveyData( surveyDetails, fileName );
                 response.setContentType( EXCEL_FORMAT );
                 String headerKey = CONTENT_DISPOSITION_HEADER;
@@ -1413,9 +1415,10 @@ public class DashboardController
             }
 
             try {
+            	Date date = new Date();
                 surveyDetails = profileManagementService.getReviews( iden, -1, -1, -1, -1, profileLevel, true, startDate,
                     endDate, null );
-                String fileName = "Survey_Results_" + profileLevel + "_" + iden + EXCEL_FILE_EXTENSION;
+                String fileName = "Survey_Results-" + profileLevel + "-" +user.getFirstName() + "_" + user.getLastName() + "-" + (new Timestamp(date.getTime())) + EXCEL_FILE_EXTENSION;
                 XSSFWorkbook workbook = dashboardService.downloadCustomerSurveyResultsData( surveyDetails, fileName );
                 response.setContentType( EXCEL_FORMAT );
                 String headerKey = CONTENT_DISPOSITION_HEADER;
@@ -1516,9 +1519,10 @@ public class DashboardController
             }
 
             try {
+            	Date date = new Date();
                 surveyDetails = profileManagementService.getReviews( iden, -1, -1, -1, -1, profileLevel, true, startDate,
                     endDate, null );
-                String fileName = "Social_Monitor_" + profileLevel + "_" + iden + EXCEL_FILE_EXTENSION;
+                String fileName = "Social_Monitor-" + profileLevel + "-" +user.getFirstName() + "_" + user.getLastName() + "-" + (new Timestamp(date.getTime()))+ EXCEL_FILE_EXTENSION;
                 XSSFWorkbook workbook = dashboardService.downloadSocialMonitorData( surveyDetails, fileName );
                 response.setContentType( EXCEL_FORMAT );
                 String headerKey = CONTENT_DISPOSITION_HEADER;
@@ -1616,8 +1620,9 @@ public class DashboardController
             }
 
             try {
+            	Date date = new Date();
                 agentRanking = profileManagementService.getAgentReport( iden, columnName, startDate, endDate, null );
-                String fileName = "User_Ranking_Report_" + profileLevel + "_" + iden + ".xlsx";
+                String fileName = "User_Ranking_Report-" + profileLevel + "-" +user.getFirstName() + "_" + user.getLastName() + "-" + (new Timestamp(date.getTime())) + EXCEL_FILE_EXTENSION;
                 XSSFWorkbook workbook = dashboardService.downloadAgentRankingData( agentRanking, fileName );
                 response.setContentType( EXCEL_FORMAT );
                 String headerKey = CONTENT_DISPOSITION_HEADER;

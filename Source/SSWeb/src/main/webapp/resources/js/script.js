@@ -203,12 +203,12 @@ $('#hm-item-dd-bottom').click(function(){
 $('#header-menu-icn').click(function(){
 //    $('#header-links').slideToggle(200);
     $('#header-slider-wrapper').addClass('rt-panel-slide');
-    $('body').addClass('body-no-scroll');
+    disableBodyScroll();
 });
 
 $('#header-slider-wrapper').click(function(){
     $('#header-slider-wrapper').removeClass('rt-panel-slide');
-    $('body').removeClass('body-no-scroll');
+    enableBodyScroll();
 });
 
 $('#header-links-slider, .header-slider').click(function(e){
@@ -580,13 +580,13 @@ $('body').click(function(){
 $(window).resize(function(){
    if($(window).width() > 767){
        $('#header-slider-wrapper').removeClass('rt-panel-slide');
-       $('body').removeClass('body-no-scroll');
+       enableBodyScroll();
    }
 });
 
 function closeMoblieScreenMenu() {
 	$('#header-slider-wrapper').removeClass('rt-panel-slide');
-	$('body').removeClass('body-no-scroll');
+	enableBodyScroll();
 }
 
 function upgradeToPaidPlan(){
