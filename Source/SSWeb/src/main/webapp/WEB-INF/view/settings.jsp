@@ -215,18 +215,20 @@
 							</div>
 							<div class="st-settings-text"><spring:message code="label.disable.account.des.key" /><span class="accounts-email"><spring:message code="label.account.email.key" /></span></div>
 						</div>
-						<div class="col-lg-4 col-md-4 col-sm-4 col-xs-12">
-							<div class="clearfix st-settings-item-wrapper">
-							   <div class="float-left st-settings-check-wrapper">
-									<div id="st-settings-payment-on" class="st-checkbox st-settings-checkbox st-checkbox-on hide"></div>
-									<div id="st-settings-payment-off" class="st-checkbox st-settings-checkbox st-checkbox-off"></div>
+						<c:if test="${billingMode == 'A'}">
+							<div class="col-lg-4 col-md-4 col-sm-4 col-xs-12">
+								<div class="clearfix st-settings-item-wrapper">
+							   		<div class="float-left st-settings-check-wrapper">
+										<div id="st-settings-payment-on" class="st-checkbox st-settings-checkbox st-checkbox-on hide"></div>
+										<div id="st-settings-payment-off" class="st-checkbox st-settings-checkbox st-checkbox-off"></div>
+									</div>
+									<div class="float-left st-check-txt-OR" id="st-chg-payment-info">
+										<spring:message code="label.change.payment.key" />
+									</div>
 								</div>
-								<div class="float-left st-check-txt-OR" id="st-chg-payment-info">
-									<spring:message code="label.change.payment.key" />
-								</div>
+								<div class="st-settings-text"><spring:message code="label.change.payment.desc.key" /></div>
 							</div>
-							<div class="st-settings-text"><spring:message code="label.change.payment.desc.key" /></div>
-						</div>
+						</c:if>
 					</div>
 				</form>
 			</div>
@@ -430,19 +432,6 @@ $(document).ready(function() {
 			$('#atpst-chk-box').addClass('bd-check-img-checked');
 			updateAutoPostSetting(false);
 		}
-	});
-	$('body').on('click',function(){
-		$('.crm-settings-dropdown-cont').slideUp(200);
-	});
-	$('.crm-settings-dropdown').on('click',function(e){
-		e.stopPropagation();
-		$('.crm-settings-dropdown-cont').slideToggle(200);
-	});
-	$('.crm-settings-dropdown-item').on('click',function(e){
-		var crmType = $(this).attr('data-crm-type');
-		$('#crm-settings-dropdown-sel-text').text(crmType);
-		$('.crm-setting-cont').hide();
-		$('.crm-setting-cont[data-crm-type="'+crmType+'"]').show();
 	});
 });
 </script>

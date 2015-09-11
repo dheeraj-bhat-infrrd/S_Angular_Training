@@ -390,7 +390,10 @@ public class DashboardServiceImpl implements DashboardService, InitializingBean 
 				surveyDetailsToPopulate.add(Days.daysBetween(new DateTime(survey.getCreatedOn()), new DateTime(survey.getModifiedOn())).getDays());
 
 				if (survey.getSource() != null && !survey.getSource().isEmpty()) {
-					surveyDetailsToPopulate.add(survey.getSource());
+					if(survey.getSource().equals(CommonConstants.SURVEY_REQUEST_AGENT))
+						surveyDetailsToPopulate.add("user");
+					else
+						surveyDetailsToPopulate.add(survey.getSource());
 				}
 				else {
 					surveyDetailsToPopulate.add(MongoSocialPostDaoImpl.KEY_SOURCE_SS);

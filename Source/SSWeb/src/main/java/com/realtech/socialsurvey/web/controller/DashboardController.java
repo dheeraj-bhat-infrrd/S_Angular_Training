@@ -1507,7 +1507,7 @@ public class DashboardController
 
             try {
                 agentRanking = profileManagementService.getAgentReport( iden, columnName, startDate, endDate, null );
-                String fileName = "Agent_Ranking_Report_" + profileLevel + "_" + iden + ".xlsx";
+                String fileName = "User_Ranking_Report_" + profileLevel + "_" + iden + ".xlsx";
                 XSSFWorkbook workbook = dashboardService.downloadAgentRankingData( agentRanking, fileName );
                 response.setContentType( EXCEL_FORMAT );
                 String headerKey = CONTENT_DISPOSITION_HEADER;

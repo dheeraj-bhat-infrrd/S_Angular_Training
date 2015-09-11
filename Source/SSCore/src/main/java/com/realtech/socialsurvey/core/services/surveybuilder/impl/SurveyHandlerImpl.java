@@ -636,6 +636,7 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
 
         OrganizationUnitSettings companySettings = organizationManagementService.getCompanySettings( user.getCompany()
             .getCompanyId() );
+        preInitiateSurvey( user, custEmail, custFirstName, custLastName, 0, custRelationWithAgent, CommonConstants.SURVEY_REQUEST_AGENT );
         if ( companySettings != null && companySettings.getMail_content() != null
             && companySettings.getMail_content().getRestart_survey_mail() != null ) {
 
