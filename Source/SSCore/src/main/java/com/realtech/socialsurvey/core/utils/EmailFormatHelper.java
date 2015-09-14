@@ -74,13 +74,13 @@ public class EmailFormatHelper {
 	
 	public String getCustomerDisplayNameForEmail(String custFirstName, String custLastName) {
 		 String customerName = custFirstName;
-        if(custLastName != null && custLastName != ""){
+        if(custLastName != null && !custLastName.isEmpty()){
         	customerName += " " + custLastName;
         }
         
         String[] custNameArray = customerName.split(" ");
         String custDisplayName = custNameArray[0];
-        if(custDisplayName.length() > 1){
+        if(custNameArray.length > 1){
         	custDisplayName += " " + custNameArray[1].substring(0, 1);
         }
         return WordUtils.capitalize(custDisplayName);

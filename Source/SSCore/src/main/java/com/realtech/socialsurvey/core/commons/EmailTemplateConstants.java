@@ -105,4 +105,7 @@ public final class EmailTemplateConstants {
 	
 	public static final String RECORDS_NOT_UPLOADED_MAIL_SUBJECT = "RecordsNotUploadedMailSubject.txt";
     public static final String RECORDS_NOT_UPLOADED_MAIL_BODY = "RecordsNotUploadedMailBody.html";
+    
+    public static final String REPORT_BUG_TO_SS_ADMIN_MAIL_SUBJECT = "ReportBugMailToSSAdminMailSubject.txt";
+    public static final String REPORT_BUG_TO_SS_ADMIN_MAIL_BODY = "ReportBugMailToSSAdminMailBody.html";
 }

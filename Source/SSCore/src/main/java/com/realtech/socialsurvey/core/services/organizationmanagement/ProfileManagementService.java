@@ -6,7 +6,6 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
 import com.realtech.socialsurvey.core.entities.Achievement;
 import com.realtech.socialsurvey.core.entities.AgentRankingReport;
 import com.realtech.socialsurvey.core.entities.AgentSettings;
@@ -427,7 +426,7 @@ public interface ProfileManagementService
         throws InvalidInputException;
 
 
-    public long getPostsCountForUser( long userId );
+    public long getPostsCountForUser( String columnName, long columnValue );
 
 
     /**

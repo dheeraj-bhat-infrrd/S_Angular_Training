@@ -46,8 +46,8 @@
 			<div class="welcome-popup-body-wrapper clearfix icn-sur-popup-wrapper">
 				<div id="icn-sur-popup-cont" data-start="0" data-total="0" data-batch="5" class="icn-sur-popup-cont"></div>
 				<div class="mult-sur-icn-wrapper">
-					<div id="resend-mult-sur-icn" class="mult-sur-icn resend-mult-sur-icn float-left"></div>
-					<div id="del-mult-sur-icn" class="mult-sur-icn del-mult-sur-icn float-right"></div>
+					<div id="resend-mult-sur-icn" class="mult-sur-icn resend-mult-sur-icn float-left" title="Resend"></div>
+					<div id="del-mult-sur-icn" class="mult-sur-icn del-mult-sur-icn float-right" title="Delete"></div>
 				</div>
 			</div>
 			<div class="paginate-buttons-survey clearfix">
@@ -151,7 +151,7 @@
 						<a href="javascript:showMainContent('./showusermangementpage.do')"><spring:message code="label.header.usermanagement.key" /></a>
 					</div>
 				</c:if>
-				<c:if test="${accountMasterId < 4}">
+				<c:if test="${accountMasterId < 4 }">	
 					<div class="header-links-item">
 						<a href="javascript:showMainContent('./upgradepage.do')"><spring:message code="label.header.upgrade.key" /></a>
 					</div>
@@ -217,6 +217,12 @@
 				<div class="hdr-link-item">
 					<a href="javascript:showMainContent('./showprofilepage.do')" onclick="showOverlay();"><spring:message code="label.editprofile.key" /></a>
 				</div>
+				
+				<div class="hdr-link-item">
+					<a href="javascript:showMainContent('./showhelppage.do')" onclick="showOverlay();"><spring:message code="label.help.key" /></a>
+				</div>
+				
+				
 			</div>
 			<div id="header-menu-icn" class="header-menu-icn icn-menu hide float-right"></div>
 			<div id="header-user-info" class="header-user-info float-right clearfix">
@@ -227,9 +233,11 @@
 							<spring:message code="label.changepassword.key"/>
 						</div>
 						<c:if test="${accountMasterId < 4}">
-							<div class="initial-dd-item" id="upgrade-plan" onclick="showMainContent('./upgradepage.do')">
-								<spring:message	code="label.header.upgrade.key" />
-							</div>
+							<c:if test="${billingMode == 'A'}">	
+								<div class="initial-dd-item" id="upgrade-plan" onclick="showMainContent('./upgradepage.do')">
+									<spring:message	code="label.header.upgrade.key" />
+								</div>
+							</c:if>
 						</c:if>
 						<c:if test="${accountMasterId == 5}">
 							<div class="initial-dd-item" id="upgrade-plan" onclick="showMainContent('./upgradetopaidplanpage.do')">
