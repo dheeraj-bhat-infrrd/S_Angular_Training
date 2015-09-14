@@ -113,8 +113,10 @@ public final class DisplayMessageConstants
     public static final String BANK_REJECTED = "BANK_REJECTED";
     public static final String ACCOUNT_DELETION_UNSUCCESSFUL = "ACCOUNT_DELETION_UNSUCCESSFUL";
     public static final String DISCLAIMER_UPDATE_UNSUCCESSFUL = "DISCLAIMER_UPDATE_UNSUCCESSFUL";
+    public static final String  ERROR_IN_SENDING_HELP_MESSAGE = "ERROR_IN_SENDING_HELP_MESSAGE";
 
     // success message constants
+    public static final String  HELP_MESSAGE_SUCCESSFULLY_SEND = "HELP_MESSAGE_SUCCESSFULLY_SEND";
     public static final String REGISTRATION_INVITE_SUCCESSFUL = "REGISTRATION_INVITE_SUCCESSFUL";
     public static final String USER_REGISTRATION_SUCCESSFUL = "USER_REGISTRATION_SUCCESSFUL";
     public static final String ACCOUNT_TYPE_SELECTION_SUCCESSFUL = "ACCOUNT_TYPE_SELECTION_SUCCESSFUL";

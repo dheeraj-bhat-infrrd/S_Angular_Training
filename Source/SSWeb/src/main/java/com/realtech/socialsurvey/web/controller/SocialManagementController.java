@@ -1863,6 +1863,15 @@ public class SocialManagementController
                 if ( tokens.getZillowToken() != null && tokens.getZillowToken().getZillowProfileLink() != null ) {
                     model.addAttribute( "zillowLink", tokens.getZillowToken().getZillowProfileLink() );
                 }
+                if ( tokens.getYelpToken() != null && tokens.getYelpToken().getYelpPageLink() != null ) {
+                    model.addAttribute( "yelpLink", tokens.getYelpToken().getYelpPageLink() );
+                }
+                if ( tokens.getLendingTreeToken() != null && tokens.getLendingTreeToken().getLendingTreeProfileLink() != null ) {
+                    model.addAttribute( "lendingtreeLink", tokens.getLendingTreeToken().getLendingTreeProfileLink() );
+                }
+                if ( tokens.getRealtorToken() != null && tokens.getRealtorToken().getRealtorProfileLink() != null ) {
+                    model.addAttribute( "realtorLink", tokens.getRealtorToken().getRealtorProfileLink() );
+                }
             }
         } catch ( NonFatalException e ) {
             LOG.error( "Exception occured in getSocialMediaTokenonSettingsPage()" );

@@ -427,16 +427,35 @@ public class OrganizationManagementController
     }
     
     
-    @RequestMapping(value="/showapps", method=RequestMethod.GET)
-    public String showAppSettings(Model model, HttpServletRequest request) {
-    	LOG.info("Method showAppSettings of OrganizationManagementController called");
-    	
+    /**
+     * Method to load the app settings page
+     * @param model
+     * @param request
+     * @return
+     */
+	@RequestMapping(value = "/showapps", method = RequestMethod.GET)
+	public String showAppSettings(Model model, HttpServletRequest request) {
+		LOG.info("Method showAppSettings of OrganizationManagementController called");
+
 		User user = sessionHelper.getCurrentUser();
-		List<VerticalCrmMapping> mappings = organizationManagementService.getCrmMapping(user);
+		List<VerticalCrmMapping> mappings;
+		try {
+			try {
+				mappings = organizationManagementService.getCrmMapping(user);
+			}
+			catch (InvalidInputException e) {
+				throw new InvalidInputException("Exception occured while fetching vertical crm mappings", e.getMessage(), e);
+			}
+		}
+		catch (NonFatalException e) {
+			LOG.error("NonfatalException while showing app settings. Reason: " + e.getMessage(), e);
+			model.addAttribute("message", messageUtils.getDisplayMessage(e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE));
+			return JspResolver.MESSAGE_HEADER;
+		}
 		model.addAttribute("crmMappings", mappings);
-    	
-    	return JspResolver.APP_SETTINGS;
-    }
+
+		return JspResolver.APP_SETTINGS;
+	}
     
 	/**
 	 * Method to show Company settings on edit company

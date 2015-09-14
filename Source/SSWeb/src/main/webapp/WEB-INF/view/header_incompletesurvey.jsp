@@ -26,6 +26,7 @@
 				 </c:if>
 				 </span>
 				 </div>
+				<div><spring:message code="label.custemail.key"/> - ${survey.customerEmailId}</div>
 				<div><spring:message code="label.agentname.key"/> - ${survey.agentName}</div>
 				<div><spring:message code="label.remindercount.key"/> - ${survey.reminderCounts}</div>
 				<div class="font-11 opensanslight date-inc-sur" data-value='<fmt:formatDate value="${survey.modifiedOn}" pattern="yyyy-MM-dd-H-mm-s-S"/>'>
