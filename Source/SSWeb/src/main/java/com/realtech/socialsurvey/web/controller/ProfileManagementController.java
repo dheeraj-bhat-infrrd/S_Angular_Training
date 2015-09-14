@@ -1299,6 +1299,123 @@ public class ProfileManagementController
     }
 
 
+    /**
+     * Method to add or update profile logo
+     * 
+     * @param model
+     * @param request
+     * @param fileLocal
+     */
+    @RequestMapping ( value = "/updatelogo", method = RequestMethod.POST)
+    public String updateLogo( Model model, HttpServletRequest request, @RequestParam ( "logo") MultipartFile fileLocal )
+    {
+        LOG.info( "Method updateLogo() called from ProfileManagementController" );
+        User user = sessionHelper.getCurrentUser();
+        HttpSession session = request.getSession( false );
+        String logoUrl = "";
+
+        try {
+            UserSettings userSettings = (UserSettings) session.getAttribute( CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION );
+            OrganizationUnitSettings profileSettings = (OrganizationUnitSettings) session
+                .getAttribute( CommonConstants.USER_PROFILE_SETTINGS );
+            long entityId = (long) session.getAttribute( CommonConstants.ENTITY_ID_COLUMN );
+            String entityType = (String) session.getAttribute( CommonConstants.ENTITY_TYPE_COLUMN );
+            if ( userSettings == null || profileSettings == null || entityType == null ) {
+                throw new InvalidInputException( "No user settings found in session" );
+            }
+
+            String logoFileName = request.getParameter( "logoFileName" );
+            try {
+                if ( logoFileName == null || logoFileName.isEmpty() ) {
+                    throw new InvalidInputException( "Logo passed is null or empty" );
+                }
+                logoUrl = fileUploadService.fileUploadHandler( fileLocal, logoFileName );
+                logoUrl = amazonEndpoint + CommonConstants.FILE_SEPARATOR + amazonLogoBucket + CommonConstants.FILE_SEPARATOR
+                    + logoUrl;
+            } catch ( NonFatalException e ) {
+                LOG.error( "NonFatalException while uploading Logo. Reason :" + e.getMessage(), e );
+                model.addAttribute( "message",
+                    messageUtils.getDisplayMessage( e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE ) );
+                return JspResolver.MESSAGE_HEADER;
+            }
+
+            if ( entityType.equals( CommonConstants.COMPANY_ID_COLUMN ) ) {
+                OrganizationUnitSettings companySettings = organizationManagementService.getCompanySettings( user );
+                if ( companySettings == null ) {
+                    throw new InvalidInputException( "No company settings found in current session" );
+                }
+                Company company = userManagementService.getCompanyById( companySettings.getIden() );
+                if ( company != null ) {
+                    settingsSetter.setSettingsValueForCompany( company, SettingsForApplication.LOGO, true );
+                    userManagementService.updateCompany( company );
+                }
+                profileManagementService.updateLogo( MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION,
+                    companySettings, logoUrl );
+                companySettings.setLogo( logoUrl );
+                userSettings.setCompanySettings( companySettings );
+
+
+            } else if ( entityType.equals( CommonConstants.REGION_ID_COLUMN ) ) {
+                OrganizationUnitSettings regionSettings = organizationManagementService.getRegionSettings( entityId );
+                if ( regionSettings == null ) {
+                    throw new InvalidInputException( "No Region settings found in current session" );
+                }
+                profileManagementService.updateLogo( MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION,
+                    regionSettings, logoUrl );
+                regionSettings.setLogo( logoUrl );
+                userSettings.getRegionSettings().put( entityId, regionSettings );
+
+                Region region = userManagementService.getRegionById( regionSettings.getIden() );
+                if ( region != null ) {
+                    settingsSetter.setSettingsValueForRegion( region, SettingsForApplication.LOGO, true );
+                    userManagementService.updateRegion( region );
+                }
+
+
+            } else if ( entityType.equals( CommonConstants.BRANCH_ID_COLUMN ) ) {
+                OrganizationUnitSettings branchSettings = organizationManagementService.getBranchSettingsDefault( entityId );
+                if ( branchSettings == null ) {
+                    throw new InvalidInputException( "No Branch settings found in current session" );
+                }
+                profileManagementService.updateLogo( MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION,
+                    branchSettings, logoUrl );
+                branchSettings.setLogo( logoUrl );
+                userSettings.getRegionSettings().put( entityId, branchSettings );
+                Branch branch = userManagementService.getBranchById( branchSettings.getIden() );
+                if ( branch != null ) {
+                    settingsSetter.setSettingsValueForBranch( branch, SettingsForApplication.LOGO, true );
+                    userManagementService.updateBranch( branch );
+                }
+
+            } else if ( entityType.equals( CommonConstants.AGENT_ID_COLUMN ) ) {
+                AgentSettings agentSettings = userManagementService.getUserSettings( entityId );
+                if ( agentSettings == null ) {
+                    throw new InvalidInputException( "No Agent settings found in current session" );
+                }
+                profileManagementService.updateLogo( MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION,
+                    agentSettings, logoUrl );
+                agentSettings.setLogo( logoUrl );
+                userSettings.setAgentSettings( agentSettings );
+
+            } else {
+                throw new InvalidInputException( "Invalid input exception occurred in uploading logo.",
+                    DisplayMessageConstants.GENERAL_ERROR );
+            }
+
+            profileSettings.setLogo( logoUrl );
+            sessionHelper.setLogoInSession( session, userSettings );
+            LOG.info( "Logo uploaded successfully" );
+            model.addAttribute( "message", messageUtils.getDisplayMessage( DisplayMessageConstants.LOGO_UPLOAD_SUCCESSFUL,
+                DisplayMessageType.SUCCESS_MESSAGE ) );
+        } catch ( NonFatalException nonFatalException ) {
+            LOG.error( "NonFatalException while uploading logo. Reason :" + nonFatalException.getMessage(), nonFatalException );
+            model.addAttribute( "message", messageUtils.getDisplayMessage( DisplayMessageConstants.LOGO_UPLOAD_UNSUCCESSFUL,
+                DisplayMessageType.ERROR_MESSAGE ) );
+        }
+
+        LOG.info( "Method updateLogo() finished from ProfileManagementController" );
+        return JspResolver.MESSAGE_HEADER;
+    }
 
 
     @RequestMapping ( value = "/updateprofileimage", method = RequestMethod.POST)
@@ -4493,149 +4610,126 @@ public class ProfileManagementController
 
 
     @ResponseBody
-    @RequestMapping(value = "/updateprofileurl", method = RequestMethod.GET)
-    public String validateAndUpdateProfileUrl(Model model,
-            HttpServletRequest request) {
-        LOG.info("Method called to validate and update profile urls");
-        String profileName = request.getParameter("searchKey");
+    @RequestMapping ( value = "/updateprofileurl", method = RequestMethod.GET)
+    public String validateAndUpdateProfileUrl( Model model, HttpServletRequest request )
+    {
+        LOG.info( "Method called to validate and update profile urls" );
+        String profileName = request.getParameter( "searchKey" );
         String profileBaseUrl = applicationBaseUrl + "pages";
-        profileName = utils.prepareProfileName(profileName);
+        profileName = utils.prepareProfileName( profileName );
         String profileUrl = "";
         HttpSession session = request.getSession();
         OrganizationUnitSettings profileSettings = (OrganizationUnitSettings) session
-                .getAttribute(CommonConstants.USER_PROFILE_SETTINGS);
-        long entityId = (long) session
-                .getAttribute(CommonConstants.ENTITY_ID_COLUMN);
-        String entityType = (String) session
-                .getAttribute(CommonConstants.ENTITY_TYPE_COLUMN);
-        UserSettings userSettings = (UserSettings) session
-                .getAttribute(CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION);
-        LOG.debug("Checking uniqueness of profileName:" + profileName);
-        String companyProfileName = userSettings.getCompanySettings()
-                .getProfileName();
-        LOG.info("COMPANY PROFILE NAME : " + companyProfileName);
+            .getAttribute( CommonConstants.USER_PROFILE_SETTINGS );
+        long entityId = (long) session.getAttribute( CommonConstants.ENTITY_ID_COLUMN );
+        String entityType = (String) session.getAttribute( CommonConstants.ENTITY_TYPE_COLUMN );
+        UserSettings userSettings = (UserSettings) session.getAttribute( CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION );
+        LOG.debug( "Checking uniqueness of profileName:" + profileName );
+        String companyProfileName = userSettings.getCompanySettings().getProfileName();
+        LOG.info( "COMPANY PROFILE NAME : " + companyProfileName );
         boolean profileExists = false;
 
-        switch (entityType) {
-        case CommonConstants.AGENT_ID_COLUMN:
-            try {
-                profileManagementService.getUserByProfileName(profileName, false);
-                profileExists = true;
-            } catch (InvalidInputException | NoRecordsFetchedException e) {
-                LOG.error("Error occured. Reason : " + e);
-            } catch (ProfileNotFoundException e) {
-                LOG.info("no such profile name exists.");
-                AgentSettings agentSettings = userSettings.getAgentSettings();
-                profileUrl = utils.generateAgentProfileUrl(profileName);
-                agentSettings.setProfileName(profileName);
-                agentSettings.setProfileUrl(profileUrl);
-                userSettings.setAgentSettings(agentSettings);
-                profileSettings.setProfileName(profileName);
-                profileSettings.setProfileUrl(profileUrl);
-                userManagementService.updateProfileUrlInAgentSettings(
-                        profileName, profileUrl, agentSettings);
-                profileSettings.setCompleteProfileUrl(profileBaseUrl
-                        + profileUrl);
-            }
-            break;
-
-        case CommonConstants.BRANCH_ID_COLUMN:
-
-            try {
-                profileManagementService.getBranchByProfileName(
-                        companyProfileName, profileName);
-                profileExists = true;
-            } catch (InvalidInputException e) {
-                LOG.error("Invalid input entered");
-            } catch (ProfileNotFoundException e) {
-                LOG.info("no such profile name exists.");
-                profileUrl = utils.generateBranchProfileUrl(companyProfileName,
-                        profileName);
+        switch ( entityType ) {
+            case CommonConstants.AGENT_ID_COLUMN:
                 try {
-                    OrganizationUnitSettings branchSettings = organizationManagementService
-                            .getBranchSettingsDefault(entityId);
-                    branchSettings.setProfileName(profileName);
-                    branchSettings.setProfileUrl(profileUrl);
-                    userSettings.getBranchSettings().put(entityId,
-                            branchSettings);
-                    profileSettings.setProfileName(profileName);
-                    profileSettings.setProfileUrl(profileUrl);
-                    userManagementService.updateProfileUrlInBranchSettings(
-                            profileName, profileUrl, branchSettings);
-                    profileSettings.setCompleteProfileUrl(profileBaseUrl
-                            + profileUrl);
-                    organizationManagementService.updateBranchProfileName(entityId, profileName);
-                } catch (InvalidInputException | NoRecordsFetchedException e1) {
-                    LOG.error("Error occured. Reason: " + e1);
+                    profileManagementService.getUserByProfileName( profileName, false );
+                    profileExists = true;
+                } catch ( InvalidInputException | NoRecordsFetchedException e ) {
+                    LOG.error( "Error occured. Reason : " + e );
+                } catch ( ProfileNotFoundException e ) {
+                    LOG.info( "no such profile name exists." );
+                    AgentSettings agentSettings = userSettings.getAgentSettings();
+                    profileUrl = utils.generateAgentProfileUrl( profileName );
+                    agentSettings.setProfileName( profileName );
+                    agentSettings.setProfileUrl( profileUrl );
+                    userSettings.setAgentSettings( agentSettings );
+                    profileSettings.setProfileName( profileName );
+                    profileSettings.setProfileUrl( profileUrl );
+                    userManagementService.updateProfileUrlInAgentSettings( profileName, profileUrl, agentSettings );
+                    profileSettings.setCompleteProfileUrl( profileBaseUrl + profileUrl );
                 }
-            }
-            break;
+                break;
 
-        case CommonConstants.REGION_ID_COLUMN:
-            try {
-                profileManagementService.getRegionByProfileName(
-                        companyProfileName, profileName);
-                profileExists = true;
-            } catch (InvalidInputException e) {
-                LOG.error("Error occured. Reason : " + e);
-            } catch (ProfileNotFoundException e) {
-                LOG.info("no such profile name exists.");
-                profileUrl = utils.generateRegionProfileUrl(companyProfileName,
-                        profileName);
+            case CommonConstants.BRANCH_ID_COLUMN:
+
                 try {
-                    OrganizationUnitSettings regionSettings = organizationManagementService
-                            .getRegionSettings(entityId);
-                    regionSettings.setProfileName(profileName);
-                    regionSettings.setProfileUrl(profileUrl);
-                    userSettings.getRegionSettings().put(entityId,
-                            regionSettings);
-                    userManagementService.updateProfileUrlInRegionSettings(
-                            profileName, profileUrl, regionSettings);
-                    profileSettings.setProfileName(profileName);
-                    profileSettings.setProfileUrl(profileUrl);
-                    profileSettings.setCompleteProfileUrl(profileBaseUrl
-                            + profileUrl);
-                    organizationManagementService.updateRegionProfileName(entityId, profileName);
-                } catch (InvalidInputException e1) {
-                    LOG.error("Error occured. Reason : " + e1);
+                    profileManagementService.getBranchByProfileName( companyProfileName, profileName );
+                    profileExists = true;
+                } catch ( InvalidInputException e ) {
+                    LOG.error( "Invalid input entered" );
+                } catch ( ProfileNotFoundException e ) {
+                    LOG.info( "no such profile name exists." );
+                    profileUrl = utils.generateBranchProfileUrl( companyProfileName, profileName );
+                    try {
+                        OrganizationUnitSettings branchSettings = organizationManagementService
+                            .getBranchSettingsDefault( entityId );
+                        branchSettings.setProfileName( profileName );
+                        branchSettings.setProfileUrl( profileUrl );
+                        userSettings.getBranchSettings().put( entityId, branchSettings );
+                        profileSettings.setProfileName( profileName );
+                        profileSettings.setProfileUrl( profileUrl );
+                        userManagementService.updateProfileUrlInBranchSettings( profileName, profileUrl, branchSettings );
+                        profileSettings.setCompleteProfileUrl( profileBaseUrl + profileUrl );
+                        organizationManagementService.updateBranchProfileName( entityId, profileName );
+                    } catch ( InvalidInputException | NoRecordsFetchedException e1 ) {
+                        LOG.error( "Error occured. Reason: " + e1 );
+                    }
                 }
-            }
-            break;
+                break;
 
-        case CommonConstants.COMPANY_ID_COLUMN:
-            try {
-                profileManagementService
-                        .getCompanyProfileByProfileName(profileName);
-                profileExists = true;
-            } catch (ProfileNotFoundException e) {
-                LOG.info("no such profile name exists.");
-                profileUrl = utils.generateCompanyProfileUrl(profileName);
-                LOG.info("PROFILE URL : " + profileUrl + "\n PROFILE NAME : "
-                        + profileName);
-                OrganizationUnitSettings companySettings = userSettings
-                        .getCompanySettings();
-                companySettings.setProfileName(profileName);
-                companySettings.setProfileUrl(profileUrl);
-                userSettings.setCompanySettings(companySettings);
-                userManagementService.updateProfileUrlInCompanySettings(
-                        profileName, profileUrl, companySettings);
-                profileSettings.setProfileName(profileName);
-                profileSettings.setProfileUrl(profileUrl);
-                profileSettings.setCompleteProfileUrl(profileBaseUrl
-                        + profileUrl);
-            }
-            break;
+            case CommonConstants.REGION_ID_COLUMN:
+                try {
+                    profileManagementService.getRegionByProfileName( companyProfileName, profileName );
+                    profileExists = true;
+                } catch ( InvalidInputException e ) {
+                    LOG.error( "Error occured. Reason : " + e );
+                } catch ( ProfileNotFoundException e ) {
+                    LOG.info( "no such profile name exists." );
+                    profileUrl = utils.generateRegionProfileUrl( companyProfileName, profileName );
+                    try {
+                        OrganizationUnitSettings regionSettings = organizationManagementService.getRegionSettings( entityId );
+                        regionSettings.setProfileName( profileName );
+                        regionSettings.setProfileUrl( profileUrl );
+                        userSettings.getRegionSettings().put( entityId, regionSettings );
+                        userManagementService.updateProfileUrlInRegionSettings( profileName, profileUrl, regionSettings );
+                        profileSettings.setProfileName( profileName );
+                        profileSettings.setProfileUrl( profileUrl );
+                        profileSettings.setCompleteProfileUrl( profileBaseUrl + profileUrl );
+                        organizationManagementService.updateRegionProfileName( entityId, profileName );
+                    } catch ( InvalidInputException e1 ) {
+                        LOG.error( "Error occured. Reason : " + e1 );
+                    }
+                }
+                break;
+
+            case CommonConstants.COMPANY_ID_COLUMN:
+                try {
+                    profileManagementService.getCompanyProfileByProfileName( profileName );
+                    profileExists = true;
+                } catch ( ProfileNotFoundException e ) {
+                    LOG.info( "no such profile name exists." );
+                    profileUrl = utils.generateCompanyProfileUrl( profileName );
+                    LOG.info( "PROFILE URL : " + profileUrl + "\n PROFILE NAME : " + profileName );
+                    OrganizationUnitSettings companySettings = userSettings.getCompanySettings();
+                    companySettings.setProfileName( profileName );
+                    companySettings.setProfileUrl( profileUrl );
+                    userSettings.setCompanySettings( companySettings );
+                    userManagementService.updateProfileUrlInCompanySettings( profileName, profileUrl, companySettings );
+                    profileSettings.setProfileName( profileName );
+                    profileSettings.setProfileUrl( profileUrl );
+                    profileSettings.setCompleteProfileUrl( profileBaseUrl + profileUrl );
+                }
+                break;
         }
         String response = "";
-        if (profileExists) {
-            LOG.info("Profile already exists");
+        if ( profileExists ) {
+            LOG.info( "Profile already exists" );
             response = "true";
         } else {
-            LOG.info("Profile didn't exist");
+            LOG.info( "Profile didn't exist" );
             String completeProfileUrl = profileSettings.getCompleteProfileUrl();
-            response = "<a href=\"" +completeProfileUrl + "\" target=\"_blank\">"+ completeProfileUrl +"</a>";
-            session.setAttribute(CommonConstants.USER_PROFILE_SETTINGS,
-                    profileSettings);
+            response = "<a href=\"" + completeProfileUrl + "\" target=\"_blank\">" + completeProfileUrl + "</a>";
+            session.setAttribute( CommonConstants.USER_PROFILE_SETTINGS, profileSettings );
         }
         return response;
 
