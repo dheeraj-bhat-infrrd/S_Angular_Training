@@ -47,14 +47,15 @@
 
 		<div class="dash-stats-wrapper bord-bot-dc clearfix help">
 
-			<form action="" method="post" class="contact-form" name=f
+			<form action="" method="post" class="contact-form" name=formSubmit  id="message-form"
 				enctype="multipart/form-data" onsubmit="return check();">
 				<p class="half">
 				<div class="bd-hr-form-item clearfix">
 					<div class="float-left bd-frm-left">Name</div>
 					<div class="float-left bd-frm-right">
-						<input class="bd-frm-rt-txt" name="regionName"
-							id="region-name-txt" placeholder="Write your name" value="">
+						<input class="bd-frm-rt-txt" name="userName"
+							id="user-name" placeholder="Write your name" value="${sessionScope.SPRING_SECURITY_CONTEXT.authentication.principal.firstName}"
+							readonly>
 					</div>
 				</div>
 
@@ -62,8 +63,8 @@
 				<div class="bd-hr-form-item clearfix">
 					<div class="float-left bd-frm-left">Subject</div>
 					<div class="float-left bd-frm-right">
-						<input class="bd-frm-rt-txt" name="regionAddress1"
-							id="region-address1-txt" placeholder="Write the subject" value="">
+						<input class="bd-frm-rt-txt" name="messageSubject"
+							id="subject-id" placeholder="Write the subject" value="" >
 					</div>
 				</div>
 
@@ -72,8 +73,8 @@
 					style="display: block;">
 					<div class="float-left bd-frm-left">Message</div>
 					<div class="float-left bd-frm-right">
-						<textarea class="bd-frm-rt-txt-area" id="selected-user-txt-area"
-							name="selectedUserEmailArray"
+						<textarea class="bd-frm-rt-txt-area" id="user-message"
+							name="userMessage"
 							placeholder="Type your message here"></textarea>
 					</div>
 			</div>
@@ -91,18 +92,9 @@
 </div>
 <!-- <script>
 	$(document).ready(function() {
-		int i;
-		$('#icn-file-upload').click(function() {
-			$('#attachment').trigger('click');
-		});
-		$('#attachment').change(function() {
-			var files = document.getElementById("files").files;
-			if(files == undefined){
-				files = [];
-			}
-			var fileUploaded = document.getElementById("attachment").files[i++];
-			files.push(fileUploaded);
-			document.getElementById("files").files = files;
-		});
+	
+		
+		
+		
 	});
-</script> -->
+</script>  -->

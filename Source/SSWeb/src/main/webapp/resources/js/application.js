@@ -8199,3 +8199,41 @@ $(document).on('click','.hdr-link-item-dropdown-item',function(e) {
 	$('#hdr-link-item-dropdown').hide();
 	showOverlay();
 });
+
+//Help page onclick function
+$(document).on( 'click', '#send-button', function() {
+	var subject = "";
+	var message = "";
+	
+	if ($("#subject-id").val() != undefined) {
+		subject = $("#subject-id").val().trim();
+	}
+
+	if ($("#user-message").val() != undefined) {
+		message = $("#user-message").val().trim();
+	}
+	if (subject == "" || subject == undefined) {
+		$('#overlay-toast').html('Add subject');
+		showToast();
+		return;
+	}
+
+	if ((message == "") || (message == undefined)) {
+		$('#overlay-toast').html('Enter the message');
+		showToast();
+		return;
+	}
+
+	var payload = {
+		"subject" : subject,
+		"mailText" : message
+	};
+
+	callAjaxPostWithPayloadData("./sendreportbugmailtoadmin.do",
+		function(data) {
+			$('#overlay-toast').html('Message sent successfully!');
+			$("#subject-id").val("");
+			$("#user-message").val("");
+			showToast();
+	}, payload);
+});
