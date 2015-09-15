@@ -1283,7 +1283,6 @@ public class SocialManagementController
             mediaTokens.getZillowToken().setZillowScreenName( zillowScreenName );
         }
 
-
         LOG.debug( "Method updateZillow() finished from SocialManagementController" );
         return mediaTokens;
     }
@@ -1707,6 +1706,7 @@ public class SocialManagementController
                     }
                     mediaTokens = companySettings.getSocialMediaTokens();
                     mediaTokens = updateZillow( mediaTokens, profileLink, zillowScreenName );
+                    mediaTokens = socialManagementService.checkOrAddZillowLastUpdated(mediaTokens);
                     mediaTokens = socialManagementService.updateSocialMediaTokens(
                         MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION, companySettings, mediaTokens );
                     companySettings.setSocialMediaTokens( mediaTokens );
@@ -1733,6 +1733,7 @@ public class SocialManagementController
                     }
                     mediaTokens = regionSettings.getSocialMediaTokens();
                     mediaTokens = updateZillow( mediaTokens, profileLink, zillowScreenName );
+                    mediaTokens = socialManagementService.checkOrAddZillowLastUpdated(mediaTokens);
                     mediaTokens = socialManagementService.updateSocialMediaTokens(
                         MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION, regionSettings, mediaTokens );
                     regionSettings.setSocialMediaTokens( mediaTokens );
@@ -1758,6 +1759,7 @@ public class SocialManagementController
                     }
                     mediaTokens = branchSettings.getSocialMediaTokens();
                     mediaTokens = updateZillow( mediaTokens, profileLink, zillowScreenName );
+                    mediaTokens = socialManagementService.checkOrAddZillowLastUpdated(mediaTokens);
                     mediaTokens = socialManagementService.updateSocialMediaTokens(
                         MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION, branchSettings, mediaTokens );
                     branchSettings.setSocialMediaTokens( mediaTokens );
@@ -1782,9 +1784,9 @@ public class SocialManagementController
                     if ( agentSettings == null ) {
                         throw new InvalidInputException( "No Agent settings found in current session" );
                     }
-
                     mediaTokens = agentSettings.getSocialMediaTokens();
                     mediaTokens = updateZillow( mediaTokens, profileLink, zillowScreenName );
+                    mediaTokens = socialManagementService.checkOrAddZillowLastUpdated(mediaTokens);
                     mediaTokens = socialManagementService.updateAgentSocialMediaTokens( agentSettings, mediaTokens );
                     agentSettings.setSocialMediaTokens( mediaTokens );
                     for ( ProfileStage stage : agentSettings.getProfileStages() ) {
@@ -1798,7 +1800,7 @@ public class SocialManagementController
                     updated = true;
                 }
                 if ( !updated ) {
-                    throw new InvalidInputException( "Invalid input exception occurred while creating access token for google",
+                    throw new InvalidInputException( "Invalid input exception occurred while creating access token for zillow",
                         DisplayMessageConstants.GENERAL_ERROR );
                 }
 
