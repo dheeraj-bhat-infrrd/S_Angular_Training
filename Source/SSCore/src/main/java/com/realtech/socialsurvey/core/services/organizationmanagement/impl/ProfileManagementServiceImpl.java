@@ -3193,12 +3193,12 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
      */
 
     @Override
-    public void updateZillowFeed( OrganizationUnitSettings profile, String collection ) throws InvalidInputException
-    {
-        LOG.info( "Method to update zillow feed called." );
-        SocialMediaTokens token = profile.getSocialMediaTokens();
-        token = socialManagementService.checkOrAddZillowLastUpdated( token );
-        profile.setSocialMediaTokens( token );
+
+    public void updateZillowFeed(OrganizationUnitSettings profile, String collection) throws InvalidInputException{
+    	LOG.info("Method to update zillow feed called for ID :" + profile.getIden() + " of collection : " + collection);
+    	SocialMediaTokens token = profile.getSocialMediaTokens();
+        token = socialManagementService.checkOrAddZillowLastUpdated(token);
+        profile.setSocialMediaTokens(token);
         String lastUpdated = token.getZillowToken().getLastUpdated();
         String currentTime = new Timestamp( System.currentTimeMillis() ).toString();
         long oneDay = 1 * 24 * 60 * 60 * 1000;
