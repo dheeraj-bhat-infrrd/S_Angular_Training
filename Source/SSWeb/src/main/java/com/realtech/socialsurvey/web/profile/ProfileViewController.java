@@ -130,7 +130,9 @@ public class ProfileViewController
                 throw new ProfileNotFoundException( "No settings found for company while fetching company profile" );
             }
 
-            profileManagementService.updateZillowFeed( companyProfile, CommonConstants.COMPANY_SETTINGS_COLLECTION );
+            if ( companyProfile.getSocialMediaTokens() != null
+                && companyProfile.getSocialMediaTokens().getZillowToken() != null )
+                profileManagementService.updateZillowFeed( companyProfile, CommonConstants.COMPANY_SETTINGS_COLLECTION );
 
             String json = new Gson().toJson( companyProfile );
             model.addAttribute( "profileJson", json );
@@ -221,6 +223,7 @@ public class ProfileViewController
             if ( regionProfile == null ) {
                 throw new NoRecordsFetchedException( "No settings found for region while fetching region profile" );
             }
+
             companyProfile = profileManagementService.getCompanyProfileByProfileName( companyProfileName );
             if ( companyProfile == null ) {
                 throw new NoRecordsFetchedException( "No settings found for company while fetching region profile" );
@@ -242,8 +245,8 @@ public class ProfileViewController
                 MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION, companyProfile, regionProfile, null, null, map );
 
 
-            profileManagementService.updateZillowFeed( regionProfile, CommonConstants.REGION_SETTINGS_COLLECTION );
-
+            if ( regionProfile.getSocialMediaTokens() != null && regionProfile.getSocialMediaTokens().getZillowToken() != null )
+                profileManagementService.updateZillowFeed( regionProfile, CommonConstants.REGION_SETTINGS_COLLECTION );
             // aggregated social profile urls
             /*SocialMediaTokens regionTokens = profileManagementService.aggregateSocialProfiles( regionProfile,
                 CommonConstants.REGION_ID );
@@ -346,7 +349,6 @@ public class ProfileViewController
                 throw new NoRecordsFetchedException( "No settings found for branch while fetching branch profile" );
             }
 
-
             companyProfile = profileManagementService.getCompanyProfileByProfileName( companyProfileName );
 
             regionProfile = profileManagementService.getRegionProfileByBranch( branchProfile );
@@ -367,9 +369,8 @@ public class ProfileViewController
                 MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION, companyProfile, regionProfile, branchProfile,
                 null, map );
 
-
-            profileManagementService.updateZillowFeed( branchProfile, CommonConstants.BRANCH_SETTINGS_COLLECTION );
-
+            if ( branchProfile.getSocialMediaTokens() != null && branchProfile.getSocialMediaTokens().getZillowToken() != null )
+                profileManagementService.updateZillowFeed( branchProfile, CommonConstants.BRANCH_SETTINGS_COLLECTION );
             // aggregated social profile urls
             /*    SocialMediaTokens branchTokens = profileManagementService.aggregateSocialProfiles( branchProfile,
                     CommonConstants.BRANCH_ID );
@@ -496,6 +497,7 @@ public class ProfileViewController
 
             AgentSettings individualProfile = null;
             try {
+
                 individualProfile = (AgentSettings) profileManagementService
                     .getIndividualSettingsByProfileName( agentProfileName );
 
@@ -527,7 +529,11 @@ public class ProfileViewController
                 individualProfile = (AgentSettings) profileManagementService.fillUnitSettings( individualProfile,
                     MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION, companyProfile, regionProfile,
                     branchProfile, individualProfile, map );
-                profileManagementService.updateZillowFeed( individualProfile, CommonConstants.AGENT_SETTINGS_COLLECTION );
+
+                individualProfile = (AgentSettings) profileManagementService.getIndividualByProfileName( agentProfileName );
+                if ( individualProfile.getSocialMediaTokens() != null
+                    && individualProfile.getSocialMediaTokens().getZillowToken() != null )
+                    profileManagementService.updateZillowFeed( individualProfile, CommonConstants.AGENT_SETTINGS_COLLECTION );
                 //set vertical name from the company
                 individualProfile.setVertical( user.getCompany().getVerticalsMaster().getVerticalName() );
 
