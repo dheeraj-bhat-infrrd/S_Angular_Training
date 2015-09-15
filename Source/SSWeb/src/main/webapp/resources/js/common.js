@@ -297,9 +297,6 @@ function shareOnFacebook(firstName, lastName, agentName, review, score, agentId)
 	};
 	
 	$.ajax({
-		
-		
-		
 		url : "./postonfacebook.do",
 		type : "GET",
 		dataType : "html",
@@ -627,9 +624,7 @@ $(document).on('click', '.wc-review-rmv-icn', function() {
 	}, 1000);
 });
 
-			
-$(document).on('click', '#wc-send-survey', function
-		() {
+$(document).on('click', '#wc-send-survey', function() {
 	var receiversList = [];
 	var agentId = undefined;
 	var columnName = undefined;
