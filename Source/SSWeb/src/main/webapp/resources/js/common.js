@@ -627,45 +627,7 @@ $(document).on('click', '.wc-review-rmv-icn', function() {
 	}, 1000);
 });
 
-$(document).on('click', '#send-button', function() {
-	var subject;
-	var message;
-	subject = $("#subject-id").val();
-	message =$("#user-message").val();
-	var success=false;
-	if(subject == "" && message != "")
-	{
-		$('#overlay-toast').html('Enter subject for all messages');
-		showToast();
-		return;
-		}
-	
-	if(subject != "" && message == ""){
-		$('#overlay-toast').html('Enter the message');
-		showToast();
-		return;
-		}
-	
-	if(subject == "" && message == ""){
-		$('#overlay-toast').html('Enter the subject and message');
-		showToast();
-		return;
-		}
-	var payload = {
-			"subject" : subject,
-			 "mailText" : message
-				 
-	};
-	
-	callAjaxPostWithPayloadData("./sendreportbugmailtoadmin.do", function(data) {
-		$('#overlay-toast').html('Message sent successfully!');
-		$("#subject-id").val("");
-		$("#user-message").val("");
-		showToast();
-		$('body').removeClass('body-no-scroll');
-	}, payload);
-});
-
+			
 $(document).on('click', '#wc-send-survey', function
 		() {
 	var receiversList = [];
