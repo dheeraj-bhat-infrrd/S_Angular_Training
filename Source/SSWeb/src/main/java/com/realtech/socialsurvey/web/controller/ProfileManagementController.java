@@ -57,8 +57,6 @@ import com.realtech.socialsurvey.core.entities.LendingTreeToken;
 import com.realtech.socialsurvey.core.entities.Licenses;
 import com.realtech.socialsurvey.core.entities.LinkedInToken;
 import com.realtech.socialsurvey.core.entities.LockSettings;
-import com.realtech.socialsurvey.core.entities.MailContent;
-import com.realtech.socialsurvey.core.entities.MailContentSettings;
 import com.realtech.socialsurvey.core.entities.MailIdSettings;
 import com.realtech.socialsurvey.core.entities.MiscValues;
 import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
@@ -82,7 +80,6 @@ import com.realtech.socialsurvey.core.entities.YelpToken;
 import com.realtech.socialsurvey.core.entities.ZillowToken;
 import com.realtech.socialsurvey.core.enums.AccountType;
 import com.realtech.socialsurvey.core.enums.DisplayMessageType;
-import com.realtech.socialsurvey.core.enums.OrganizationUnit;
 import com.realtech.socialsurvey.core.enums.SettingsForApplication;
 import com.realtech.socialsurvey.core.exception.InternalServerException;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
@@ -98,8 +95,8 @@ import com.realtech.socialsurvey.core.services.organizationmanagement.UserManage
 import com.realtech.socialsurvey.core.services.search.SolrSearchService;
 import com.realtech.socialsurvey.core.services.search.exception.SolrException;
 import com.realtech.socialsurvey.core.services.settingsmanagement.SettingsLocker;
-import com.realtech.socialsurvey.core.services.settingsmanagement.SettingsManager;
 import com.realtech.socialsurvey.core.services.settingsmanagement.SettingsSetter;
+import com.realtech.socialsurvey.core.services.social.SocialManagementService;
 import com.realtech.socialsurvey.core.services.upload.FileUploadService;
 import com.realtech.socialsurvey.core.services.upload.impl.UploadUtils;
 import com.realtech.socialsurvey.core.utils.DisplayMessageConstants;
@@ -144,6 +141,9 @@ public class ProfileManagementController
 
     @Autowired
     private SolrSearchService solrSearchService;
+    
+    @Autowired
+    private SocialManagementService socialManagementService;
 
     @Autowired
     private Utils utils;
@@ -2802,6 +2802,7 @@ public class ProfileManagementController
                     throw new InvalidInputException( "No company settings found in current session" );
                 }
                 socialMediaTokens = companySettings.getSocialMediaTokens();
+                socialMediaTokens = socialManagementService.checkOrAddZillowLastUpdated( socialMediaTokens );
                 socialMediaTokens = updateZillowLink( zillowlink, socialMediaTokens );
                 profileManagementService.updateSocialMediaTokens(
                     MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION, companySettings, socialMediaTokens );
@@ -2818,6 +2819,7 @@ public class ProfileManagementController
                     throw new InvalidInputException( "No Region settings found in current session" );
                 }
                 socialMediaTokens = regionSettings.getSocialMediaTokens();
+                socialMediaTokens = socialManagementService.checkOrAddZillowLastUpdated( socialMediaTokens );
                 socialMediaTokens = updateZillowLink( zillowlink, socialMediaTokens );
                 profileManagementService.updateSocialMediaTokens(
                     MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION, regionSettings, socialMediaTokens );
@@ -2834,6 +2836,7 @@ public class ProfileManagementController
                     throw new InvalidInputException( "No Branch settings found in current session" );
                 }
                 socialMediaTokens = branchSettings.getSocialMediaTokens();
+                socialMediaTokens = socialManagementService.checkOrAddZillowLastUpdated( socialMediaTokens );
                 socialMediaTokens = updateZillowLink( zillowlink, socialMediaTokens );
                 profileManagementService.updateSocialMediaTokens(
                     MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION, branchSettings, socialMediaTokens );
@@ -2850,6 +2853,7 @@ public class ProfileManagementController
                     throw new InvalidInputException( "No Agent settings found in current session" );
                 }
                 socialMediaTokens = agentSettings.getSocialMediaTokens();
+                socialMediaTokens = socialManagementService.checkOrAddZillowLastUpdated( socialMediaTokens );
                 socialMediaTokens = updateZillowLink( zillowlink, socialMediaTokens );
                 profileManagementService.updateSocialMediaTokens(
                     MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION, agentSettings, socialMediaTokens );
