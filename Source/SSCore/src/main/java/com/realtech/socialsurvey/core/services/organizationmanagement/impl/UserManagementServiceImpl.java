@@ -1484,8 +1484,8 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
         user.setLoginName( emailId );
         user.setLoginPassword( password );
         user.setEmailId( emailId );
-        user.setFirstName( firstName );
-        user.setLastName( lastName );
+        user.setFirstName( firstName.trim() );
+        user.setLastName( lastName.trim() );
         user.setSource( CommonConstants.DEFAULT_SOURCE_APPLICATION );
         user.setIsAtleastOneUserprofileComplete( isAtleastOneProfileComplete );
         user.setStatus( status );
