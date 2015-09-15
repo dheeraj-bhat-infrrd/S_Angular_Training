@@ -54,6 +54,7 @@ import com.realtech.socialsurvey.core.services.organizationmanagement.ProfileNot
 import com.realtech.socialsurvey.core.services.search.SolrSearchService;
 import com.realtech.socialsurvey.core.services.search.exception.SolrException;
 import com.realtech.socialsurvey.core.services.settingsmanagement.impl.InvalidSettingsStateException;
+import com.realtech.socialsurvey.core.services.social.SocialManagementService;
 import com.realtech.socialsurvey.core.utils.DisplayMessageConstants;
 import com.realtech.socialsurvey.core.utils.MessageUtils;
 import com.realtech.socialsurvey.web.common.JspResolver;
@@ -84,6 +85,9 @@ public class ProfileViewController
 
     @Autowired
     private BotRequestUtils botRequestUtils;
+
+    @Autowired
+    private SocialManagementService socialManagementService;
 
     @Value ( "${VALIDATE_CAPTCHA}")
     private String validateCaptcha;
@@ -125,6 +129,8 @@ public class ProfileViewController
             if ( companyProfile == null ) {
                 throw new ProfileNotFoundException( "No settings found for company while fetching company profile" );
             }
+
+            profileManagementService.updateZillowFeed( companyProfile, CommonConstants.COMPANY_SETTINGS_COLLECTION );
 
             String json = new Gson().toJson( companyProfile );
             model.addAttribute( "profileJson", json );
@@ -215,7 +221,6 @@ public class ProfileViewController
             if ( regionProfile == null ) {
                 throw new NoRecordsFetchedException( "No settings found for region while fetching region profile" );
             }
-
             companyProfile = profileManagementService.getCompanyProfileByProfileName( companyProfileName );
             if ( companyProfile == null ) {
                 throw new NoRecordsFetchedException( "No settings found for company while fetching region profile" );
@@ -235,6 +240,15 @@ public class ProfileViewController
 
             regionProfile = profileManagementService.fillUnitSettings( regionProfile,
                 MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION, companyProfile, regionProfile, null, null, map );
+
+
+            profileManagementService.updateZillowFeed( regionProfile, CommonConstants.REGION_SETTINGS_COLLECTION );
+
+            // aggregated social profile urls
+            /*SocialMediaTokens regionTokens = profileManagementService.aggregateSocialProfiles( regionProfile,
+                CommonConstants.REGION_ID );
+            regionProfile.setSocialMediaTokens( regionTokens );*/
+
 
             // aggregated disclaimer
             String disclaimer = profileManagementService.aggregateDisclaimer( regionProfile, CommonConstants.REGION_ID );
@@ -332,6 +346,7 @@ public class ProfileViewController
                 throw new NoRecordsFetchedException( "No settings found for branch while fetching branch profile" );
             }
 
+
             companyProfile = profileManagementService.getCompanyProfileByProfileName( companyProfileName );
 
             regionProfile = profileManagementService.getRegionProfileByBranch( branchProfile );
@@ -351,6 +366,9 @@ public class ProfileViewController
             branchProfile = profileManagementService.fillUnitSettings( branchProfile,
                 MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION, companyProfile, regionProfile, branchProfile,
                 null, map );
+
+
+            profileManagementService.updateZillowFeed( branchProfile, CommonConstants.BRANCH_SETTINGS_COLLECTION );
 
             // aggregated social profile urls
             /*    SocialMediaTokens branchTokens = profileManagementService.aggregateSocialProfiles( branchProfile,
@@ -481,6 +499,7 @@ public class ProfileViewController
                 individualProfile = (AgentSettings) profileManagementService
                     .getIndividualSettingsByProfileName( agentProfileName );
 
+
                 if ( individualProfile == null ) {
                     throw new ProfileNotFoundException( "Unable to find agent profile for profile name " + agentProfileName );
                 }
@@ -508,6 +527,7 @@ public class ProfileViewController
                 individualProfile = (AgentSettings) profileManagementService.fillUnitSettings( individualProfile,
                     MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION, companyProfile, regionProfile,
                     branchProfile, individualProfile, map );
+                profileManagementService.updateZillowFeed( individualProfile, CommonConstants.AGENT_SETTINGS_COLLECTION );
                 //set vertical name from the company
                 individualProfile.setVertical( user.getCompany().getVerticalsMaster().getVerticalName() );
 

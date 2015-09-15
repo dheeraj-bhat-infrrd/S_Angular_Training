@@ -308,8 +308,8 @@ public interface ProfileManagementService
         throws InvalidInputException, NoRecordsFetchedException;
 
 
-    public User getUserByProfileName( String profileName, boolean checkStatus ) throws InvalidInputException, NoRecordsFetchedException,
-        ProfileNotFoundException;
+    public User getUserByProfileName( String profileName, boolean checkStatus ) throws InvalidInputException,
+        NoRecordsFetchedException, ProfileNotFoundException;
 
 
     /**
@@ -540,9 +540,6 @@ public interface ProfileManagementService
         throws InvalidInputException, NoRecordsFetchedException;
 
 
-    public void deleteSocialPost( String postMongoId ) throws InvalidInputException;
-
-
     public Map<SettingsForApplication, OrganizationUnit> getPrimaryHierarchyByEntity( String entityType, long entityId )
         throws InvalidInputException, InvalidSettingsStateException;
 
@@ -573,4 +570,17 @@ public interface ProfileManagementService
 
 
     public void updateEmailsWithLogo( OrganizationUnitSettings unitSettings, String logoUrl, String collectionName );
+
+
+    public void deleteSocialPost( String postMongoId ) throws InvalidInputException;
+
+
+    /**
+     * Method to update zillow feed if required when the profile page is opened.
+     * @param profile
+     * @param collection
+     * @throws InvalidInputException
+     */
+    void updateZillowFeed( OrganizationUnitSettings profile, String collection ) throws InvalidInputException;
+
 }
