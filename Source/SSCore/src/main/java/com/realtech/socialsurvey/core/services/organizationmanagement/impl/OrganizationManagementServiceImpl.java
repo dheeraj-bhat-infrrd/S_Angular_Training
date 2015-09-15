@@ -505,6 +505,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 
         // create a organization settings object
         OrganizationUnitSettings companySettings = new OrganizationUnitSettings();
+        LockSettings lockSettings = new LockSettings();
         companySettings.setIden( company.getCompanyId() );
         if ( organizationalDetails.get( CommonConstants.LOGO_NAME ) != null ) {
             companySettings.setLogo( organizationalDetails.get( CommonConstants.LOGO_NAME ) );
@@ -516,12 +517,13 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
                 LOG.error( "Exception Caught " + e.getMessage() );
             }
 
-            LockSettings lockSettings = new LockSettings();
+
             lockSettings.setLogoLocked( true );
-            companySettings.setLockSettings( lockSettings );
+
 
         }
 
+        companySettings.setLockSettings( lockSettings );
         ContactDetailsSettings contactDetailSettings = new ContactDetailsSettings();
         contactDetailSettings.setName( company.getCompany() );
         contactDetailSettings.setAddress( organizationalDetails.get( CommonConstants.ADDRESS ) );
@@ -4260,11 +4262,12 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
         List<VerticalCrmMapping> mappings = user.getCompany().getVerticalsMaster().getVerticalCrmMappings();
 
         if ( mappings == null || mappings.isEmpty() ) {
-        	Map<String, Object> queries= new HashMap<>();
-        	VerticalsMaster defaultVerticalMaster = verticalMastersDao.findById(VerticalsMaster.class, CommonConstants.DEFAULT_VERTICAL_ID);
-        	queries.put("verticalsMaster", defaultVerticalMaster);
-            List<VerticalCrmMapping> defaultMappings = verticalCrmMappingDo.findByKeyValue( VerticalCrmMapping.class, queries);
-            mappings.addAll(defaultMappings);
+            Map<String, Object> queries = new HashMap<>();
+            VerticalsMaster defaultVerticalMaster = verticalMastersDao.findById( VerticalsMaster.class,
+                CommonConstants.DEFAULT_VERTICAL_ID );
+            queries.put( "verticalsMaster", defaultVerticalMaster );
+            List<VerticalCrmMapping> defaultMappings = verticalCrmMappingDo.findByKeyValue( VerticalCrmMapping.class, queries );
+            mappings.addAll( defaultMappings );
         }
 
         for ( VerticalCrmMapping mapping : mappings ) {
@@ -4509,26 +4512,30 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
             skipCount, batchSize );
         return fieldIngestionEntities;
     }
-    
+
+
     @Transactional
     @Override
-    public void updateBranchProfileName(long branchId, String profileName){
-    	LOG.info("Method updateBranchProfileName() started.");
-    	Branch branch = branchDao.findById( Branch.class, branchId );
-    	branch.setProfileName(profileName);
-    	branchDao.update(branch);
-    	LOG.info("Method updateBranchProfileName() finished.");
-    	
+    public void updateBranchProfileName( long branchId, String profileName )
+    {
+        LOG.info( "Method updateBranchProfileName() started." );
+        Branch branch = branchDao.findById( Branch.class, branchId );
+        branch.setProfileName( profileName );
+        branchDao.update( branch );
+        LOG.info( "Method updateBranchProfileName() finished." );
+
     }
-    
+
+
     @Transactional
     @Override
-    public void updateRegionProfileName(long regionId, String profileName){
-    	LOG.info("Method updateRegionProfileName() started.");
-    	Region region = regionDao.findById(Region.class, regionId);
-    	region.setProfileName(profileName);
-    	regionDao.update(region);
-    	LOG.info("Method updateRegionProfileName() finished.");
+    public void updateRegionProfileName( long regionId, String profileName )
+    {
+        LOG.info( "Method updateRegionProfileName() started." );
+        Region region = regionDao.findById( Region.class, regionId );
+        region.setProfileName( profileName );
+        regionDao.update( region );
+        LOG.info( "Method updateRegionProfileName() finished." );
     }
 
 
