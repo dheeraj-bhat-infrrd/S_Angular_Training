@@ -6,9 +6,11 @@ package com.realtech.socialsurvey.web.profile;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
+
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
 import org.apache.solr.common.SolrDocument;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -22,6 +24,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+
 import com.amazonaws.util.json.JSONException;
 import com.amazonaws.util.json.JSONObject;
 import com.google.gson.Gson;
@@ -46,6 +49,7 @@ import com.realtech.socialsurvey.core.services.organizationmanagement.ProfileMan
 import com.realtech.socialsurvey.core.services.organizationmanagement.ProfileNotFoundException;
 import com.realtech.socialsurvey.core.services.search.SolrSearchService;
 import com.realtech.socialsurvey.core.services.search.exception.SolrException;
+import com.realtech.socialsurvey.core.services.social.SocialManagementService;
 import com.realtech.socialsurvey.core.utils.DisplayMessageConstants;
 import com.realtech.socialsurvey.core.utils.MessageUtils;
 import com.realtech.socialsurvey.web.common.JspResolver;
@@ -76,6 +80,9 @@ public class ProfileViewController
 
     @Autowired
     private BotRequestUtils botRequestUtils;
+    
+    @Autowired
+    private SocialManagementService socialManagementService;
 
     @Value ( "${VALIDATE_CAPTCHA}")
     private String validateCaptcha;
@@ -117,7 +124,9 @@ public class ProfileViewController
             if ( companyProfile == null ) {
                 throw new ProfileNotFoundException( "No settings found for company while fetching company profile" );
             }
-
+            
+            profileManagementService.updateZillowFeed(companyProfile, CommonConstants.COMPANY_SETTINGS_COLLECTION);
+            
             String json = new Gson().toJson( companyProfile );
             model.addAttribute( "profileJson", json );
 
@@ -205,7 +214,9 @@ public class ProfileViewController
             if ( regionProfile == null ) {
                 throw new NoRecordsFetchedException( "No settings found for region while fetching region profile" );
             }
-
+            
+            profileManagementService.updateZillowFeed(regionProfile, CommonConstants.REGION_SETTINGS_COLLECTION);
+            
             // aggregated social profile urls
             SocialMediaTokens regionTokens = profileManagementService.aggregateSocialProfiles( regionProfile,
                 CommonConstants.REGION_ID );
@@ -304,6 +315,8 @@ public class ProfileViewController
                 throw new NoRecordsFetchedException( "No settings found for branch while fetching branch profile" );
             }
 
+            profileManagementService.updateZillowFeed(branchProfile, CommonConstants.BRANCH_SETTINGS_COLLECTION);
+            
             // aggregated social profile urls
             SocialMediaTokens branchTokens = profileManagementService.aggregateSocialProfiles( branchProfile,
                 CommonConstants.BRANCH_ID );
@@ -425,6 +438,7 @@ public class ProfileViewController
             try {
                 individualProfile = (AgentSettings) profileManagementService.getIndividualByProfileName( agentProfileName );
 
+                profileManagementService.updateZillowFeed(individualProfile, CommonConstants.AGENT_SETTINGS_COLLECTION);
                 //set vertical name from the company
                 individualProfile.setVertical( user.getCompany().getVerticalsMaster().getVerticalName() );
 

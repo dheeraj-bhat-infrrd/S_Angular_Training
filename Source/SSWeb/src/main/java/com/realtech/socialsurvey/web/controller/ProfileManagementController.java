@@ -92,6 +92,7 @@ import com.realtech.socialsurvey.core.services.organizationmanagement.ProfileNot
 import com.realtech.socialsurvey.core.services.organizationmanagement.UserManagementService;
 import com.realtech.socialsurvey.core.services.search.SolrSearchService;
 import com.realtech.socialsurvey.core.services.search.exception.SolrException;
+import com.realtech.socialsurvey.core.services.social.SocialManagementService;
 import com.realtech.socialsurvey.core.services.upload.FileUploadService;
 import com.realtech.socialsurvey.core.services.upload.impl.UploadUtils;
 import com.realtech.socialsurvey.core.utils.DisplayMessageConstants;
@@ -138,6 +139,9 @@ public class ProfileManagementController {
 
 	@Autowired
 	private Utils utils;
+	
+	@Autowired
+	private SocialManagementService socialManagementService;
 
 	@Value("${APPLICATION_BASE_URL}")
 	private String applicationBaseUrl;
@@ -3154,6 +3158,7 @@ public class ProfileManagementController {
 							"No company settings found in current session");
 				}
 				socialMediaTokens = companySettings.getSocialMediaTokens();
+				socialMediaTokens = socialManagementService.checkOrAddZillowLastUpdated(socialMediaTokens);
 				socialMediaTokens = updateZillowLink(zillowlink,
 						socialMediaTokens);
 				profileManagementService
@@ -3170,6 +3175,7 @@ public class ProfileManagementController {
 							"No Region settings found in current session");
 				}
 				socialMediaTokens = regionSettings.getSocialMediaTokens();
+				socialMediaTokens = socialManagementService.checkOrAddZillowLastUpdated(socialMediaTokens);
 				socialMediaTokens = updateZillowLink(zillowlink,
 						socialMediaTokens);
 				profileManagementService
@@ -3186,6 +3192,7 @@ public class ProfileManagementController {
 							"No Branch settings found in current session");
 				}
 				socialMediaTokens = branchSettings.getSocialMediaTokens();
+				socialMediaTokens = socialManagementService.checkOrAddZillowLastUpdated(socialMediaTokens);
 				socialMediaTokens = updateZillowLink(zillowlink,
 						socialMediaTokens);
 				profileManagementService
@@ -3202,6 +3209,7 @@ public class ProfileManagementController {
 							"No Agent settings found in current session");
 				}
 				socialMediaTokens = agentSettings.getSocialMediaTokens();
+				socialMediaTokens = socialManagementService.checkOrAddZillowLastUpdated(socialMediaTokens);
 				socialMediaTokens = updateZillowLink(zillowlink,
 						socialMediaTokens);
 				profileManagementService

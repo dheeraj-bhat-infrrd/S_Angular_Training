@@ -6,6 +6,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
 import com.realtech.socialsurvey.core.entities.Achievement;
 import com.realtech.socialsurvey.core.entities.AgentRankingReport;
 import com.realtech.socialsurvey.core.entities.AgentSettings;
@@ -532,4 +533,13 @@ public interface ProfileManagementService
 
 
 	public void deleteSocialPost(String postMongoId) throws InvalidInputException;
+
+	/**
+	 * Method to update zillow feed if required when the profile page is opened.
+	 * @param profile
+	 * @param collection
+	 * @throws InvalidInputException
+	 */
+	void updateZillowFeed(OrganizationUnitSettings profile, String collection)
+			throws InvalidInputException;
 }
