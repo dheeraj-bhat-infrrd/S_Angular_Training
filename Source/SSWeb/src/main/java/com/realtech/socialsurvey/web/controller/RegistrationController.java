@@ -363,6 +363,13 @@ public class RegistrationController
         String uniqueIdentifier = request.getParameter( "uniqueIdentifier" );
         String strIsDirectRegistration = request.getParameter( "isDirectRegistration" );
 
+        if(lastName != null && ! lastName.equals("")){
+        	lastName = lastName.trim();
+        }
+        if(firstName != null && ! firstName.equals("")){
+        	firstName = firstName.trim();
+        }
+        
         try {
             boolean isDirectRegistration = false;
             if ( strIsDirectRegistration != null && !strIsDirectRegistration.isEmpty() ) {
