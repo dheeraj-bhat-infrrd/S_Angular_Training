@@ -12,9 +12,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-
 import javax.annotation.Resource;
-
 import org.apache.poi.hssf.usermodel.HSSFSheet;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.Cell;
@@ -30,7 +28,6 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
-
 import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.dao.BranchDao;
 import com.realtech.socialsurvey.core.dao.GenericDao;
@@ -423,7 +420,7 @@ public class CsvUploadServiceImpl implements CsvUploadService {
 
 	private List<String> getAllStateLicenses(String licenses, List<String> authorizedIn) {
 		String toRemove = "Licensed State(s):";
-		if(licenses.indexOf(toRemove) != -1){
+		if (licenses.indexOf(toRemove) != -1) {
 			licenses = licenses.substring(licenses.indexOf("Licensed State(s):") + toRemove.length(), licenses.length());
 		}
 		licenses = licenses.trim();
@@ -478,7 +475,12 @@ public class CsvUploadServiceImpl implements CsvUploadService {
 				else if (cellIndex == USER_BRANCH_ID_INDEX) {
 					if (cell.getCellType() != XSSFCell.CELL_TYPE_BLANK) {
 						// map it with the region
-						long sourceBranchId = (long) cell.getNumericCellValue();
+						String sourceBranchId = null;
+						if(cell.getCellType() == XSSFCell.CELL_TYPE_NUMERIC){
+							sourceBranchId = String.valueOf(cell.getNumericCellValue());
+						}else  if(cell.getCellType() == XSSFCell.CELL_TYPE_STRING){
+							sourceBranchId = cell.getStringCellValue();
+						}
 						try {
 							long branchId = getBranchIdFromSourceId(uploadedBranches, sourceBranchId);
 							uploadedUser.setBranchId(branchId);
@@ -494,7 +496,12 @@ public class CsvUploadServiceImpl implements CsvUploadService {
 				else if (cellIndex == USER_REGION_ID_INDEX) {
 					if (cell.getCellType() != XSSFCell.CELL_TYPE_BLANK) {
 						// map it with the region
-						long sourceRegionId = (long) cell.getNumericCellValue();
+						String sourceRegionId = null;
+						if(cell.getCellType() == XSSFCell.CELL_TYPE_NUMERIC){
+							sourceRegionId = String.valueOf(cell.getNumericCellValue());
+						}else  if(cell.getCellType() == XSSFCell.CELL_TYPE_STRING){
+							sourceRegionId = cell.getStringCellValue();
+						}
 						try {
 							long regionId = getRegionIdFromSourceId(uploadedRegions, sourceRegionId);
 							uploadedUser.setRegionId(regionId);
@@ -579,8 +586,11 @@ public class CsvUploadServiceImpl implements CsvUploadService {
 				}
 				else if (cellIndex == USER_PHONE_NUMBER) {
 					if (cell.getCellType() != XSSFCell.CELL_TYPE_BLANK) {
-						String phoneNumber = cell.getStringCellValue();
-						uploadedUser.setPhoneNumber(phoneNumber);
+						if(cell.getCellType() == XSSFCell.CELL_TYPE_NUMERIC){
+							uploadedUser.setPhoneNumber(String.valueOf((long)cell.getNumericCellValue()));
+						}else{
+							uploadedUser.setPhoneNumber(cell.getStringCellValue());
+						}
 					}
 				}
 				else if (cellIndex == USER_WEBSITE) {
@@ -754,14 +764,18 @@ public class CsvUploadServiceImpl implements CsvUploadService {
 				cell = (XSSFCell) cells.next();
 				cellIndex = cell.getColumnIndex();
 				if (cellIndex == BRANCH_ID_INDEX) {
-					try {
-						uploadedBranch.setSourceBranchId((long) cell.getNumericCellValue());
-					}
-					catch (NumberFormatException nfe) {
-						// TODO: mark this record as error
-						LOG.error("Source branch id is not present");
-						rowContainsError = true;
-						break;
+					if (cell.getCellType() == XSSFCell.CELL_TYPE_NUMERIC) {
+						try {
+							uploadedBranch.setSourceBranchId(String.valueOf(cell.getNumericCellValue()));
+						}
+						catch (NumberFormatException nfe) {
+							// TODO: mark this record as error
+							LOG.error("Source branch id is not present");
+							rowContainsError = true;
+							break;
+						}
+					}else{
+						uploadedBranch.setSourceBranchId(cell.getStringCellValue());
 					}
 				}
 				else if (cellIndex == BRANCH_NAME_INDEX) {
@@ -777,7 +791,12 @@ public class CsvUploadServiceImpl implements CsvUploadService {
 				else if (cellIndex == BRANCH_REGION_ID_INDEX) {
 					if (cell.getCellType() != XSSFCell.CELL_TYPE_BLANK) {
 						// map it with the region
-						long sourceRegionId = (long) cell.getNumericCellValue();
+						String sourceRegionId = null;
+						if(cell.getCellType() == XSSFCell.CELL_TYPE_NUMERIC){
+							sourceRegionId = String.valueOf(cell.getNumericCellValue());
+						}else if(cell.getCellType() == XSSFCell.CELL_TYPE_STRING){
+							sourceRegionId = cell.getStringCellValue();
+						}
 						try {
 							long regionId = getRegionIdFromSourceId(uploadedRegions, sourceRegionId);
 							uploadedBranch.setRegionId(regionId);
@@ -864,11 +883,11 @@ public class CsvUploadServiceImpl implements CsvUploadService {
 		}
 	}
 
-	private long getRegionIdFromSourceId(List<RegionUploadVO> uploadedRegions, long regionSourceId) throws BranchAdditionException {
+	private long getRegionIdFromSourceId(List<RegionUploadVO> uploadedRegions, String regionSourceId) throws BranchAdditionException {
 		LOG.debug("Getting region id from source id");
 		long regionId = 0;
 		for (RegionUploadVO uploadedRegion : uploadedRegions) {
-			if (uploadedRegion.getSourceRegionId() == regionSourceId) {
+			if (uploadedRegion.getSourceRegionId().equals(regionSourceId)) {
 				regionId = uploadedRegion.getRegionId();
 				break;
 			}
@@ -879,11 +898,11 @@ public class CsvUploadServiceImpl implements CsvUploadService {
 		return regionId;
 	}
 
-	private long getBranchIdFromSourceId(List<BranchUploadVO> uploadedBranches, long regionBranchId) throws UserAdditionException {
+	private long getBranchIdFromSourceId(List<BranchUploadVO> uploadedBranches, String regionBranchId) throws UserAdditionException {
 		LOG.debug("Getting branch id from source id");
 		long branchId = 0;
 		for (BranchUploadVO uploadedBranch : uploadedBranches) {
-			if (uploadedBranch.getSourceBranchId() == regionBranchId) {
+			if (uploadedBranch.getSourceBranchId().equals(regionBranchId)) {
 				branchId = uploadedBranch.getBranchId();
 				break;
 			}
@@ -931,14 +950,19 @@ public class CsvUploadServiceImpl implements CsvUploadService {
 				cell = (XSSFCell) cells.next();
 				cellIndex = cell.getColumnIndex();
 				if (cellIndex == REGION_ID_INDEX) {
-					try {
-						uploadedRegion.setSourceRegionId((long) cell.getNumericCellValue());
+					if (cell.getCellType() == XSSFCell.CELL_TYPE_NUMERIC) {
+						try {
+							uploadedRegion.setSourceRegionId(String.valueOf(cell.getNumericCellValue()));
+						}
+						catch (NumberFormatException nfe) {
+							// TODO: mark this record as error
+							LOG.error("Source region id is not present");
+							rowContainsError = true;
+							break;
+						}
 					}
-					catch (NumberFormatException nfe) {
-						// TODO: mark this record as error
-						LOG.error("Source region id is not present");
-						rowContainsError = true;
-						break;
+					else {
+						uploadedRegion.setSourceRegionId(cell.getStringCellValue());
 					}
 				}
 				else if (cellIndex == REGION_NAME_INDEX) {
@@ -1362,10 +1386,10 @@ public class CsvUploadServiceImpl implements CsvUploadService {
 
 		if (organizationManagementService.isRegionAdditionAllowed(adminUser,
 				AccountType.getAccountType(licenseDetail.getAccountsMaster().getAccountsMasterId()))) {
-			if (!validateRegion(region, company)) {
+			/*if (!validateRegion(region, company)) {
 				LOG.error("Region with that name already exists!");
 				throw new RegionAdditionException("Region with that name already exists!");
-			}
+			}*/
 			LOG.debug("Adding region : " + region.getRegionName());
 			newRegion = organizationManagementService.addNewRegion(adminUser, region.getRegionName(), CommonConstants.NO, region.getRegionAddress1(),
 					region.getRegionAddress2(), region.getRegionCountry(), region.getRegionCountryCode(), region.getRegionState(),

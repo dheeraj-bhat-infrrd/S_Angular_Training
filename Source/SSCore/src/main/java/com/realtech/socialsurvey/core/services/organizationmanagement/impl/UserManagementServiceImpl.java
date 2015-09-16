@@ -776,7 +776,9 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
             user.setLocation( agentSettings.getContact_details().getLocation() );
             user.setIndustry( agentSettings.getContact_details().getIndustry() );
             user.setAboutMe( agentSettings.getContact_details().getAbout_me() );
-            user.setReviewCount( agentSettings.getReviewCount() );
+            //JIRA SS-1104 search results not updated with correct number of reviews
+            long reviewCount = profileManagementService.getReviewsCount(agentSettings.getIden(), 0, 5, CommonConstants.PROFILE_LEVEL_INDIVIDUAL, true);
+            user.setReviewCount(reviewCount);
             user.setReviewScore( surveyDetailsDao.getRatingForPastNdays( CommonConstants.AGENT_ID, agentSettings.getIden(),
                 CommonConstants.NO_LIMIT, true, false ) );
             users.add( user );
@@ -1479,6 +1481,14 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
         int isAtleastOneProfileComplete, int status, String createdBy )
     {
         LOG.debug( "Method createUser called for email-id : " + emailId + " and status : " + status );
+        
+        if(lastName != null && ! lastName.equals("")){
+        	lastName = lastName.trim();
+        }
+        if(firstName != null && ! firstName.equals("")){
+        	firstName = firstName.trim();
+        }
+        
         User user = new User();
         user.setCompany( company );
         user.setLoginName( emailId );
