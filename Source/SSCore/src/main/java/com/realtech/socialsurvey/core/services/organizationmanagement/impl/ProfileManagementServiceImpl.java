@@ -2952,23 +2952,6 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
                 }
 
 
-            } else if ( entry.getKey() == SettingsForApplication.ADDRESS ) {
-
-                ContactDetailsSettings contactDetails = userProfile.getContact_details();
-                if ( contactDetails == null ) {
-                    contactDetails = new ContactDetailsSettings();
-                }
-
-                if ( entry.getValue() == OrganizationUnit.COMPANY ) {
-                	
-                } else if ( entry.getValue() == OrganizationUnit.REGION ) {
-
-                } else if ( entry.getValue() == OrganizationUnit.BRANCH ) {
-
-                } else if ( entry.getValue() == OrganizationUnit.AGENT ) {
-
-                }
-                userProfile.setContact_details( contactDetails );
             } else if ( entry.getKey() == SettingsForApplication.LOCATION ) {
                 ContactDetailsSettings contactDetails = userProfile.getContact_details();
                 if ( contactDetails == null ) {
@@ -2990,17 +2973,17 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
                     contactDetails = new ContactDetailsSettings();
                 }
                 WebAddressSettings webAddressSettings = contactDetails.getWeb_addresses();
-                if(webAddressSettings == null){
+                if ( webAddressSettings == null ) {
                     webAddressSettings = new WebAddressSettings();
                 }
-                if (entry.getValue() == OrganizationUnit.COMPANY){
-                	webAddressSettings.setWork( companyUnitSettings.getContact_details().getWeb_addresses().getWork() );
-                } else if ( entry.getValue() == OrganizationUnit.REGION ){
-                	webAddressSettings.setWork( regionUnitSettings.getContact_details().getWeb_addresses().getWork() );
+                if ( entry.getValue() == OrganizationUnit.COMPANY ) {
+                    webAddressSettings.setWork( companyUnitSettings.getContact_details().getWeb_addresses().getWork() );
+                } else if ( entry.getValue() == OrganizationUnit.REGION ) {
+                    webAddressSettings.setWork( regionUnitSettings.getContact_details().getWeb_addresses().getWork() );
                 } else if ( entry.getValue() == OrganizationUnit.BRANCH ) {
-                	webAddressSettings.setWork( branchUnitSettings.getContact_details().getWeb_addresses().getWork() );
+                    webAddressSettings.setWork( branchUnitSettings.getContact_details().getWeb_addresses().getWork() );
                 } else if ( entry.getValue() == OrganizationUnit.AGENT ) {
-                	webAddressSettings.setWork( agentUnitSettings.getContact_details().getWeb_addresses().getWork() );
+                    webAddressSettings.setWork( agentUnitSettings.getContact_details().getWeb_addresses().getWork() );
                 }
                 contactDetails.setWeb_addresses( webAddressSettings );
                 userProfile.setContact_details( contactDetails );
@@ -3010,17 +2993,17 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
                     contactDetails = new ContactDetailsSettings();
                 }
                 WebAddressSettings webAddressSettings = contactDetails.getWeb_addresses();
-                if(webAddressSettings == null){
+                if ( webAddressSettings == null ) {
                     webAddressSettings = new WebAddressSettings();
                 }
-                if (entry.getValue() == OrganizationUnit.COMPANY){
-                	webAddressSettings.setBlogs( companyUnitSettings.getContact_details().getWeb_addresses().getBlogs() );
-                } else if ( entry.getValue() == OrganizationUnit.REGION ){
-                	webAddressSettings.setBlogs( regionUnitSettings.getContact_details().getWeb_addresses().getBlogs() );
+                if ( entry.getValue() == OrganizationUnit.COMPANY ) {
+                    webAddressSettings.setBlogs( companyUnitSettings.getContact_details().getWeb_addresses().getBlogs() );
+                } else if ( entry.getValue() == OrganizationUnit.REGION ) {
+                    webAddressSettings.setBlogs( regionUnitSettings.getContact_details().getWeb_addresses().getBlogs() );
                 } else if ( entry.getValue() == OrganizationUnit.BRANCH ) {
-                	webAddressSettings.setBlogs( branchUnitSettings.getContact_details().getWeb_addresses().getBlogs() );
+                    webAddressSettings.setBlogs( branchUnitSettings.getContact_details().getWeb_addresses().getBlogs() );
                 } else if ( entry.getValue() == OrganizationUnit.AGENT ) {
-                	webAddressSettings.setBlogs( agentUnitSettings.getContact_details().getWeb_addresses().getBlogs() );
+                    webAddressSettings.setBlogs( agentUnitSettings.getContact_details().getWeb_addresses().getBlogs() );
                 }
                 contactDetails.setWeb_addresses( webAddressSettings );
                 userProfile.setContact_details( contactDetails );
@@ -3030,17 +3013,17 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
                     contactDetails = new ContactDetailsSettings();
                 }
                 WebAddressSettings webAddressSettings = contactDetails.getWeb_addresses();
-                if(webAddressSettings == null){
+                if ( webAddressSettings == null ) {
                     webAddressSettings = new WebAddressSettings();
                 }
-                if (entry.getValue() == OrganizationUnit.COMPANY){
-                	webAddressSettings.setPersonal( companyUnitSettings.getContact_details().getWeb_addresses().getPersonal() );
-                } else if ( entry.getValue() == OrganizationUnit.REGION ){
-                	webAddressSettings.setPersonal( regionUnitSettings.getContact_details().getWeb_addresses().getPersonal() );
+                if ( entry.getValue() == OrganizationUnit.COMPANY ) {
+                    webAddressSettings.setPersonal( companyUnitSettings.getContact_details().getWeb_addresses().getPersonal() );
+                } else if ( entry.getValue() == OrganizationUnit.REGION ) {
+                    webAddressSettings.setPersonal( regionUnitSettings.getContact_details().getWeb_addresses().getPersonal() );
                 } else if ( entry.getValue() == OrganizationUnit.BRANCH ) {
-                	webAddressSettings.setPersonal( branchUnitSettings.getContact_details().getWeb_addresses().getPersonal() );
+                    webAddressSettings.setPersonal( branchUnitSettings.getContact_details().getWeb_addresses().getPersonal() );
                 } else if ( entry.getValue() == OrganizationUnit.AGENT ) {
-                	webAddressSettings.setPersonal( agentUnitSettings.getContact_details().getWeb_addresses().getPersonal() );
+                    webAddressSettings.setPersonal( agentUnitSettings.getContact_details().getWeb_addresses().getPersonal() );
                 }
                 contactDetails.setWeb_addresses( webAddressSettings );
                 userProfile.setContact_details( contactDetails );
@@ -3049,14 +3032,14 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
                 if ( contactDetails == null ) {
                     contactDetails = new ContactDetailsSettings();
                 }
-                if (entry.getValue() == OrganizationUnit.COMPANY){
-                	contactDetails.setAbout_me( companyUnitSettings.getContact_details().getAbout_me() );
-                } else if ( entry.getValue() == OrganizationUnit.REGION ){
-                	contactDetails.setAbout_me( regionUnitSettings.getContact_details().getAbout_me() );
+                if ( entry.getValue() == OrganizationUnit.COMPANY ) {
+                    contactDetails.setAbout_me( companyUnitSettings.getContact_details().getAbout_me() );
+                } else if ( entry.getValue() == OrganizationUnit.REGION ) {
+                    contactDetails.setAbout_me( regionUnitSettings.getContact_details().getAbout_me() );
                 } else if ( entry.getValue() == OrganizationUnit.BRANCH ) {
-                	contactDetails.setAbout_me( branchUnitSettings.getContact_details().getAbout_me() );
+                    contactDetails.setAbout_me( branchUnitSettings.getContact_details().getAbout_me() );
                 } else if ( entry.getValue() == OrganizationUnit.AGENT ) {
-                	contactDetails.setAbout_me( agentUnitSettings.getContact_details().getAbout_me() );
+                    contactDetails.setAbout_me( agentUnitSettings.getContact_details().getAbout_me() );
                 }
                 userProfile.setContact_details( contactDetails );
             } else if ( entry.getKey() == SettingsForApplication.EMAIL_ID_WORK ) {
@@ -3065,19 +3048,19 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
                     contactDetails = new ContactDetailsSettings();
                 }
                 MailIdSettings mailIdSettings = contactDetails.getMail_ids();
-                if(mailIdSettings == null){
+                if ( mailIdSettings == null ) {
                     mailIdSettings = new MailIdSettings();
                 }
-                if (entry.getValue() == OrganizationUnit.COMPANY){
-                	mailIdSettings.setWork( companyUnitSettings.getContact_details().getMail_ids().getWork() );
-                } else if ( entry.getValue() == OrganizationUnit.REGION ){
-                	mailIdSettings.setWork( regionUnitSettings.getContact_details().getMail_ids().getWork() );
+                if ( entry.getValue() == OrganizationUnit.COMPANY ) {
+                    mailIdSettings.setWork( companyUnitSettings.getContact_details().getMail_ids().getWork() );
+                } else if ( entry.getValue() == OrganizationUnit.REGION ) {
+                    mailIdSettings.setWork( regionUnitSettings.getContact_details().getMail_ids().getWork() );
                 } else if ( entry.getValue() == OrganizationUnit.BRANCH ) {
-                	mailIdSettings.setWork( branchUnitSettings.getContact_details().getMail_ids().getWork() );
+                    mailIdSettings.setWork( branchUnitSettings.getContact_details().getMail_ids().getWork() );
                 } else if ( entry.getValue() == OrganizationUnit.AGENT ) {
-                	mailIdSettings.setWork( agentUnitSettings.getContact_details().getMail_ids().getWork() );
+                    mailIdSettings.setWork( agentUnitSettings.getContact_details().getMail_ids().getWork() );
                 }
-                contactDetails.setMail_ids(mailIdSettings);
+                contactDetails.setMail_ids( mailIdSettings );
                 userProfile.setContact_details( contactDetails );
             } else if ( entry.getKey() == SettingsForApplication.EMAIL_ID_PERSONAL ) {
                 ContactDetailsSettings contactDetails = userProfile.getContact_details();
@@ -3085,33 +3068,33 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
                     contactDetails = new ContactDetailsSettings();
                 }
                 MailIdSettings mailIdSettings = contactDetails.getMail_ids();
-                if(mailIdSettings == null){
+                if ( mailIdSettings == null ) {
                     mailIdSettings = new MailIdSettings();
                 }
-                if (entry.getValue() == OrganizationUnit.COMPANY){
-                	mailIdSettings.setPersonal( companyUnitSettings.getContact_details().getMail_ids().getPersonal() );
-                } else if ( entry.getValue() == OrganizationUnit.REGION ){
-                	mailIdSettings.setPersonal( regionUnitSettings.getContact_details().getMail_ids().getPersonal() );
+                if ( entry.getValue() == OrganizationUnit.COMPANY ) {
+                    mailIdSettings.setPersonal( companyUnitSettings.getContact_details().getMail_ids().getPersonal() );
+                } else if ( entry.getValue() == OrganizationUnit.REGION ) {
+                    mailIdSettings.setPersonal( regionUnitSettings.getContact_details().getMail_ids().getPersonal() );
                 } else if ( entry.getValue() == OrganizationUnit.BRANCH ) {
-                	mailIdSettings.setPersonal( branchUnitSettings.getContact_details().getMail_ids().getPersonal() );
+                    mailIdSettings.setPersonal( branchUnitSettings.getContact_details().getMail_ids().getPersonal() );
                 } else if ( entry.getValue() == OrganizationUnit.AGENT ) {
-                	mailIdSettings.setPersonal( agentUnitSettings.getContact_details().getMail_ids().getPersonal() );
+                    mailIdSettings.setPersonal( agentUnitSettings.getContact_details().getMail_ids().getPersonal() );
                 }
-                contactDetails.setMail_ids(mailIdSettings);
+                contactDetails.setMail_ids( mailIdSettings );
                 userProfile.setContact_details( contactDetails );
             } else if ( entry.getKey() == SettingsForApplication.ADDRESS ) {
                 ContactDetailsSettings contactDetails = userProfile.getContact_details();
                 if ( contactDetails == null ) {
                     contactDetails = new ContactDetailsSettings();
                 }
-                if (entry.getValue() == OrganizationUnit.COMPANY){
-                	contactDetails.setAddress( companyUnitSettings.getContact_details().getAddress() );
-                } else if ( entry.getValue() == OrganizationUnit.REGION ){
-                	contactDetails.setAddress( regionUnitSettings.getContact_details().getAddress() );
+                if ( entry.getValue() == OrganizationUnit.COMPANY ) {
+                    contactDetails.setAddress( companyUnitSettings.getContact_details().getAddress() );
+                } else if ( entry.getValue() == OrganizationUnit.REGION ) {
+                    contactDetails.setAddress( regionUnitSettings.getContact_details().getAddress() );
                 } else if ( entry.getValue() == OrganizationUnit.BRANCH ) {
-                	contactDetails.setAddress( branchUnitSettings.getContact_details().getAddress() );
+                    contactDetails.setAddress( branchUnitSettings.getContact_details().getAddress() );
                 } else if ( entry.getValue() == OrganizationUnit.AGENT ) {
-                	contactDetails.setAddress( agentUnitSettings.getContact_details().getAddress() );
+                    contactDetails.setAddress( agentUnitSettings.getContact_details().getAddress() );
                 }
                 userProfile.setContact_details( contactDetails );
             } else if ( entry.getKey() == SettingsForApplication.PHONE ) {
