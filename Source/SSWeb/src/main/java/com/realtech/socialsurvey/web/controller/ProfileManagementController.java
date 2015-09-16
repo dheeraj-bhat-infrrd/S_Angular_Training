@@ -141,7 +141,7 @@ public class ProfileManagementController
 
     @Autowired
     private SolrSearchService solrSearchService;
-    
+
     @Autowired
     private SocialManagementService socialManagementService;
 
@@ -436,6 +436,29 @@ public class ProfileManagementController
                             settingsLocker.lockSettingsValueForCompany( company, SettingsForApplication.PHONE, false );
                         }
                     }
+                    if ( fieldId.equalsIgnoreCase( "web-address-work-lock" ) ) {
+                        if ( fieldState ) {
+                            settingsLocker.lockSettingsValueForCompany( company, SettingsForApplication.WEB_ADDRESS_WORK, true );
+                        } else {
+                            settingsLocker
+                                .lockSettingsValueForCompany( company, SettingsForApplication.WEB_ADDRESS_WORK, false );
+                        }
+                    }
+                    if ( fieldId.equalsIgnoreCase( "web-address-blogs-lock" ) ) {
+                        if ( fieldState ) {
+                            settingsLocker.lockSettingsValueForCompany( company, SettingsForApplication.WEB_ADDRESS_BLOG, true );
+                        } else {
+                            settingsLocker
+                                .lockSettingsValueForCompany( company, SettingsForApplication.WEB_ADDRESS_BLOG, false );
+                        }
+                    }
+                    if ( fieldId.equalsIgnoreCase( "aboutme-lock" ) ) {
+                        if ( fieldState ) {
+                            settingsLocker.lockSettingsValueForCompany( company, SettingsForApplication.ABOUT_ME, true );
+                        } else {
+                            settingsLocker.lockSettingsValueForCompany( company, SettingsForApplication.ABOUT_ME, false );
+                        }
+                    }
                     userManagementService.updateCompany( company );
                 }
             } else if ( entityType.equals( CommonConstants.REGION_ID_COLUMN ) ) {
@@ -465,6 +488,27 @@ public class ProfileManagementController
                             settingsLocker.lockSettingsValueForRegion( region, SettingsForApplication.PHONE, false );
                         }
                     }
+                    if ( fieldId.equalsIgnoreCase( "web-address-work-lock" ) ) {
+                        if ( fieldState ) {
+                            settingsLocker.lockSettingsValueForRegion( region, SettingsForApplication.WEB_ADDRESS_WORK, true );
+                        } else {
+                            settingsLocker.lockSettingsValueForRegion( region, SettingsForApplication.WEB_ADDRESS_WORK, false );
+                        }
+                    }
+                    if ( fieldId.equalsIgnoreCase( "web-address-blogs-lock" ) ) {
+                        if ( fieldState ) {
+                            settingsLocker.lockSettingsValueForRegion( region, SettingsForApplication.WEB_ADDRESS_BLOG, true );
+                        } else {
+                            settingsLocker.lockSettingsValueForRegion( region, SettingsForApplication.WEB_ADDRESS_BLOG, false );
+                        }
+                    }
+                    if ( fieldId.equalsIgnoreCase( "aboutme-lock" ) ) {
+                        if ( fieldState ) {
+                            settingsLocker.lockSettingsValueForRegion( region, SettingsForApplication.ABOUT_ME, true );
+                        } else {
+                            settingsLocker.lockSettingsValueForRegion( region, SettingsForApplication.ABOUT_ME, false );
+                        }
+                    }
                     userManagementService.updateRegion( region );
                 }
             } else if ( entityType.equals( CommonConstants.BRANCH_ID_COLUMN ) ) {
@@ -492,6 +536,27 @@ public class ProfileManagementController
                             settingsLocker.lockSettingsValueForBranch( branch, SettingsForApplication.PHONE, true );
                         } else {
                             settingsLocker.lockSettingsValueForBranch( branch, SettingsForApplication.PHONE, false );
+                        }
+                    }
+                    if ( fieldId.equalsIgnoreCase( "web-address-work-lock" ) ) {
+                        if ( fieldState ) {
+                            settingsLocker.lockSettingsValueForBranch( branch, SettingsForApplication.WEB_ADDRESS_WORK, true );
+                        } else {
+                            settingsLocker.lockSettingsValueForBranch( branch, SettingsForApplication.WEB_ADDRESS_WORK, false );
+                        }
+                    }
+                    if ( fieldId.equalsIgnoreCase( "web-address-blogs-lock" ) ) {
+                        if ( fieldState ) {
+                            settingsLocker.lockSettingsValueForBranch( branch, SettingsForApplication.WEB_ADDRESS_BLOG, true );
+                        } else {
+                            settingsLocker.lockSettingsValueForBranch( branch, SettingsForApplication.WEB_ADDRESS_BLOG, false );
+                        }
+                    }
+                    if ( fieldId.equalsIgnoreCase( "aboutme-lock" ) ) {
+                        if ( fieldState ) {
+                            settingsLocker.lockSettingsValueForBranch( branch, SettingsForApplication.ABOUT_ME, true );
+                        } else {
+                            settingsLocker.lockSettingsValueForBranch( branch, SettingsForApplication.ABOUT_ME, false );
                         }
                     }
                     userManagementService.updateBranch( branch );
@@ -1627,6 +1692,18 @@ public class ProfileManagementController
                     MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION, companySettings, contactDetailsSettings );
                 companySettings.setContact_details( contactDetailsSettings );
                 userSettings.setCompanySettings( companySettings );
+                Company company = userManagementService.getCompanyById( companySettings.getIden() );
+                if(company != null){
+                    for ( MiscValues mailId : mailIds ) {
+                        String key = mailId.getKey();
+                        if ( key.equalsIgnoreCase( CommonConstants.EMAIL_TYPE_WORK ) ) {
+                            settingsSetter.setSettingsValueForCompany( company, SettingsForApplication.EMAIL_ID_WORK, true );
+                        } else if ( key.equalsIgnoreCase( CommonConstants.EMAIL_TYPE_PERSONAL ) ) {
+                            settingsSetter.setSettingsValueForCompany( company, SettingsForApplication.EMAIL_ID_PERSONAL, true );
+                        }
+                    }
+                    userManagementService.updateCompany( company );
+                }
             } else if ( entityType.equals( CommonConstants.REGION_ID_COLUMN ) ) {
                 OrganizationUnitSettings regionSettings = organizationManagementService.getRegionSettings( entityId );
                 if ( regionSettings == null ) {
@@ -1644,6 +1721,18 @@ public class ProfileManagementController
                     MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION, regionSettings, contactDetailsSettings );
                 regionSettings.setContact_details( contactDetailsSettings );
                 userSettings.getRegionSettings().put( entityId, regionSettings );
+                Region region = userManagementService.getRegionById( regionSettings.getIden() );
+                if ( region != null ) {
+                    for ( MiscValues mailId : mailIds ) {
+                        String key = mailId.getKey();
+                        if ( key.equalsIgnoreCase( CommonConstants.EMAIL_TYPE_WORK ) ) {
+                            settingsSetter.setSettingsValueForRegion( region, SettingsForApplication.EMAIL_ID_WORK, true );
+                        } else if ( key.equalsIgnoreCase( CommonConstants.EMAIL_TYPE_PERSONAL ) ) {
+                            settingsSetter.setSettingsValueForRegion( region, SettingsForApplication.EMAIL_ID_PERSONAL, true );
+                        }
+                    }
+                    userManagementService.updateRegion( region );
+                }
             } else if ( entityType.equals( CommonConstants.BRANCH_ID_COLUMN ) ) {
                 OrganizationUnitSettings branchSettings = organizationManagementService.getBranchSettingsDefault( entityId );
                 if ( branchSettings == null ) {
@@ -1661,6 +1750,18 @@ public class ProfileManagementController
                     MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION, branchSettings, contactDetailsSettings );
                 branchSettings.setContact_details( contactDetailsSettings );
                 userSettings.getRegionSettings().put( entityId, branchSettings );
+                Branch branch = userManagementService.getBranchById( branchSettings.getIden() );
+                if ( branch != null ) {
+                    for ( MiscValues mailId : mailIds ) {
+                        String key = mailId.getKey();
+                        if ( key.equalsIgnoreCase( CommonConstants.EMAIL_TYPE_WORK ) ) {
+                            settingsSetter.setSettingsValueForBranch( branch, SettingsForApplication.EMAIL_ID_WORK, true );
+                        } else if ( key.equalsIgnoreCase( CommonConstants.EMAIL_TYPE_PERSONAL ) ) {
+                            settingsSetter.setSettingsValueForBranch( branch, SettingsForApplication.EMAIL_ID_PERSONAL, true );
+                        }
+                    }
+                    userManagementService.updateBranch( branch );
+                }
             } else if ( entityType.equals( CommonConstants.AGENT_ID_COLUMN ) ) {
                 AgentSettings agentSettings = userManagementService.getUserSettings( entityId );
                 if ( agentSettings == null ) {
@@ -1989,6 +2090,19 @@ public class ProfileManagementController
                     MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION, companySettings, contactDetailsSettings );
                 companySettings.setContact_details( contactDetailsSettings );
                 userSettings.setCompanySettings( companySettings );
+                Company company = userManagementService.getCompanyById( companySettings.getIden() );
+                if ( company != null ) {
+                    for ( MiscValues webAddress : webAddresses ) {
+                        String key = webAddress.getKey();
+                        if ( key.equalsIgnoreCase( "work" ) ) {
+                            settingsSetter.setSettingsValueForCompany( company, SettingsForApplication.WEB_ADDRESS_WORK, true );
+                        } else if ( key.equalsIgnoreCase( "personal" ) ) {
+                            settingsSetter.setSettingsValueForCompany( company, SettingsForApplication.WEB_ADDRESS_PERSONAL, true );
+                        } else if ( key.equalsIgnoreCase( "blogs" ) ) {
+                            settingsSetter.setSettingsValueForCompany( company, SettingsForApplication.WEB_ADDRESS_BLOG, true );
+                        }
+                    }
+                }
             } else if ( entityType.equals( CommonConstants.REGION_ID_COLUMN ) ) {
                 OrganizationUnitSettings regionSettings = organizationManagementService.getRegionSettings( entityId );
                 if ( regionSettings == null ) {
@@ -2000,6 +2114,20 @@ public class ProfileManagementController
                     MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION, regionSettings, contactDetailsSettings );
                 regionSettings.setContact_details( contactDetailsSettings );
                 userSettings.getRegionSettings().put( entityId, regionSettings );
+                Region region = userManagementService.getRegionById( regionSettings.getIden() );
+                if(region != null){
+                    for ( MiscValues webAddress : webAddresses ) {
+                        String key = webAddress.getKey();
+                        if ( key.equalsIgnoreCase( "work" ) ) {
+                            settingsSetter.setSettingsValueForRegion( region, SettingsForApplication.WEB_ADDRESS_WORK, true );
+                        } else if ( key.equalsIgnoreCase( "personal" ) ) {
+                            settingsSetter.setSettingsValueForRegion( region, SettingsForApplication.WEB_ADDRESS_PERSONAL, true );
+                        } else if ( key.equalsIgnoreCase( "blogs" ) ) {
+                            settingsSetter.setSettingsValueForRegion( region, SettingsForApplication.WEB_ADDRESS_BLOG, true );
+                        }
+                    }
+                    userManagementService.updateRegion( region );
+                }
             } else if ( entityType.equals( CommonConstants.BRANCH_ID_COLUMN ) ) {
                 OrganizationUnitSettings branchSettings = organizationManagementService.getBranchSettingsDefault( entityId );
                 if ( branchSettings == null ) {
@@ -2011,6 +2139,21 @@ public class ProfileManagementController
                     MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION, branchSettings, contactDetailsSettings );
                 branchSettings.setContact_details( contactDetailsSettings );
                 userSettings.getRegionSettings().put( entityId, branchSettings );
+                Branch branch = userManagementService.getBranchById( branchSettings.getIden() );
+                if ( branch != null ) {
+                    for ( MiscValues webAddress : webAddresses ) {
+                        String key = webAddress.getKey();
+                        if ( key.equalsIgnoreCase( "work" ) ) {
+                            settingsSetter.setSettingsValueForBranch( branch, SettingsForApplication.WEB_ADDRESS_WORK, true );
+                        } else if ( key.equalsIgnoreCase( "personal" ) ) {
+                            settingsSetter
+                                .setSettingsValueForBranch( branch, SettingsForApplication.WEB_ADDRESS_PERSONAL, true );
+                        } else if ( key.equalsIgnoreCase( "blogs" ) ) {
+                            settingsSetter.setSettingsValueForBranch( branch, SettingsForApplication.WEB_ADDRESS_BLOG, true );
+                        }
+                    }
+                }
+                userManagementService.updateBranch( branch );
             } else if ( entityType.equals( CommonConstants.AGENT_ID_COLUMN ) ) {
                 AgentSettings agentSettings = userManagementService.getUserSettings( entityId );
                 if ( agentSettings == null ) {

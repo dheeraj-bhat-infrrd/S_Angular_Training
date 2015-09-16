@@ -537,7 +537,14 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 
         // Add work phone number in contact details
         ContactNumberSettings contactNumberSettings = new ContactNumberSettings();
-        contactNumberSettings.setWork( organizationalDetails.get( CommonConstants.COMPANY_CONTACT_NUMBER ) );
+        if ( organizationalDetails.get( CommonConstants.COMPANY_CONTACT_NUMBER ) != null ) {
+            contactNumberSettings.setWork( organizationalDetails.get( CommonConstants.COMPANY_CONTACT_NUMBER ) );
+            try {
+                settingsSetter.setSettingsValueForCompany( company, SettingsForApplication.PHONE, true );
+            } catch ( NonFatalException e ) {
+                LOG.error( "Exception Caught " + e.getMessage() );
+            }
+        }
         contactDetailSettings.setContact_numbers( contactNumberSettings );
 
         // Add work Mail id in contact details
