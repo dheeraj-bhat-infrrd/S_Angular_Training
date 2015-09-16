@@ -6,7 +6,7 @@ package com.realtech.socialsurvey.core.entities;
 public class RegionUploadVO {
 
 	private long regionId;
-	private long sourceRegionId;
+	private String sourceRegionId;
 	private String regionName;
 	private String regionAddress1;
 	private String regionAddress2;
@@ -24,11 +24,11 @@ public class RegionUploadVO {
 		this.regionId = regionId;
 	}
 
-	public long getSourceRegionId() {
+	public String getSourceRegionId() {
 		return sourceRegionId;
 	}
 
-	public void setSourceRegionId(long sourceRegionId) {
+	public void setSourceRegionId(String sourceRegionId) {
 		this.sourceRegionId = sourceRegionId;
 	}
 

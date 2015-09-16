@@ -638,6 +638,13 @@ public class SolrSearchServiceImpl implements SolrSearchService {
 	}
 
 	private SolrInputDocument getSolrInputDocumentFromUser(User user, SolrInputDocument document) {
+		if(user.getLastName() != null && !(user.getLastName().equals(""))){
+			user.setLastName(user.getLastName().trim());
+        }
+        if(user.getFirstName() != null && ! (user.getFirstName().equals("") )){
+        	user.setFirstName(user.getFirstName().trim() );
+        }
+		
 		document.addField(CommonConstants.USER_ID_SOLR, user.getUserId());
 		document.addField(CommonConstants.USER_FIRST_NAME_SOLR, user.getFirstName());
 		document.addField(CommonConstants.USER_LAST_NAME_SOLR, user.getLastName());

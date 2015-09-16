@@ -5112,7 +5112,7 @@ function storeCustomerAnswer(customerResponse) {
 		},
 		complete : function(data) {
 			if (success) {
-				if (qno == (questions.length - 1)) {
+				if(swearWords.length <= 0) {
 					var parsed = data.responseJSON;
 					for ( var x in parsed) {
 						swearWords.push(parsed[x]);
@@ -5135,7 +5135,7 @@ function updateCustomerResponse(feedback, agreedToShare) {
 	isAbusive = false;
 	var feedbackArr = feedback.split(" ");
 	for (var i = 0; i < feedbackArr.length; i++) {
-		if ($.inArray(feedbackArr[i], swearWords) != -1) {
+		if ($.inArray((feedbackArr[i]).toLowerCase(), swearWords) != -1) {
 			isAbusive = true;
 		}
 	}
