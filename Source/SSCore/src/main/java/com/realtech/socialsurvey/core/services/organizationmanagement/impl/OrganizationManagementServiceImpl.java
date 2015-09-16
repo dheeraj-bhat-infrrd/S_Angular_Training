@@ -526,7 +526,14 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
         companySettings.setLockSettings( lockSettings );
         ContactDetailsSettings contactDetailSettings = new ContactDetailsSettings();
         contactDetailSettings.setName( company.getCompany() );
-        contactDetailSettings.setAddress( organizationalDetails.get( CommonConstants.ADDRESS ) );
+        if ( organizationalDetails.get( CommonConstants.ADDRESS ) != null ) {
+            try {
+                settingsSetter.setSettingsValueForCompany( company, SettingsForApplication.ADDRESS, true );
+            } catch ( NonFatalException e ) {
+                LOG.error( "Exception Caught " + e.getMessage() );
+            }
+            contactDetailSettings.setAddress( organizationalDetails.get( CommonConstants.ADDRESS ) );
+        }
         contactDetailSettings.setAddress1( organizationalDetails.get( CommonConstants.ADDRESS1 ) );
         contactDetailSettings.setAddress2( organizationalDetails.get( CommonConstants.ADDRESS2 ) );
         contactDetailSettings.setZipcode( organizationalDetails.get( CommonConstants.ZIPCODE ) );
