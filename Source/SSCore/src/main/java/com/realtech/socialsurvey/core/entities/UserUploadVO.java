@@ -9,9 +9,9 @@ public class UserUploadVO
     private String firstName;
     private String lastName;
     private String title;
-    private long sourceBranchId;
+    private String sourceBranchId;
     private long branchId;
-    private long sourceRegionId;
+    private String sourceRegionId;
     private long regionId;
     private boolean isAgent;
     private String emailId;
@@ -65,13 +65,13 @@ public class UserUploadVO
     }
 
 
-    public long getSourceBranchId()
+    public String getSourceBranchId()
     {
         return sourceBranchId;
     }
 
 
-    public void setSourceBranchId( long sourceBranchId )
+    public void setSourceBranchId( String sourceBranchId )
     {
         this.sourceBranchId = sourceBranchId;
     }
@@ -89,13 +89,13 @@ public class UserUploadVO
     }
 
 
-    public long getSourceRegionId()
+    public String getSourceRegionId()
     {
         return sourceRegionId;
     }
 
 
-    public void setSourceRegionId( long sourceRegionId )
+    public void setSourceRegionId( String sourceRegionId )
     {
         this.sourceRegionId = sourceRegionId;
     }
