@@ -89,18 +89,18 @@ public class HelpController {
     
     
     @ResponseBody
-    @RequestMapping ( value = "/sendreportbugmailtoadmin")
-    public String sendReportBugMailToAdmin( HttpServletRequest request,  @RequestParam String subject , @RequestParam String mailText ){
-    	LOG.info( "Method sendReportBugMailToAdmin() called" );
+    @RequestMapping ( value = "/sendhelpmailtoadmin")
+    public String sendHelpMailToAdmin( HttpServletRequest request,  @RequestParam String subject , @RequestParam String mailText ){
+    	LOG.info( "Method sendHelpMailToAdmin() called" );
     	User user = sessionHelper.getCurrentUser();
     	try{
     		List<MultipartFile> attachmentList = new ArrayList<MultipartFile>();
     		Map<String , String > attachmentsDetails = userSupportService.saveAttachmentLocally(attachmentList);
     		
-    		userSupportService.sendReportBugMailToAdmin(user , subject, mailText, attachmentsDetails);
+    		userSupportService.sendHelpMailToAdmin(user , subject, mailText, attachmentsDetails);
 
     	}catch(NonFatalException e){
-    		LOG.error("Erroe in sending the report bug mail : " + e.getMessage());
+    		LOG.error("Erroe in sending the help mail : " + e.getMessage());
     		return messageUtils.getDisplayMessage(DisplayMessageConstants.ERROR_IN_SENDING_HELP_MESSAGE, DisplayMessageType.ERROR_MESSAGE).getMessage();
     	}
 		

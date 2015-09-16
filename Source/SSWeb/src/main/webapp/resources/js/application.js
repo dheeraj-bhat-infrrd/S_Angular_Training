@@ -8213,13 +8213,13 @@ $(document).on( 'click', '#send-button', function() {
 		message = $("#user-message").val().trim();
 	}
 	if (subject == "" || subject == undefined) {
-		$('#overlay-toast').html('Add subject');
+		$('#overlay-toast').html('Please enter the subject');
 		showToast();
 		return;
 	}
 
 	if ((message == "") || (message == undefined)) {
-		$('#overlay-toast').html('Enter the message');
+		$('#overlay-toast').html('Please enter the message');
 		showToast();
 		return;
 	}
@@ -8229,7 +8229,7 @@ $(document).on( 'click', '#send-button', function() {
 		"mailText" : message
 	};
 
-	callAjaxPostWithPayloadData("./sendreportbugmailtoadmin.do",
+	callAjaxPostWithPayloadData("./sendhelpmailtoadmin.do",
 		function(data) {
 			$('#overlay-toast').html('Message sent successfully!');
 			$("#subject-id").val("");
