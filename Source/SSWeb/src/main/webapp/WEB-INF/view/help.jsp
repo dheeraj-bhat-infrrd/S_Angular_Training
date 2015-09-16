@@ -4,6 +4,7 @@
 <%@ taglib prefix="spring" uri="http://www.springframework.org/tags"%>
 <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions"%>
 
+<c:set var="user" value="${sessionScope.SPRING_SECURITY_CONTEXT.authentication.principal}" />
 <c:choose>
 	<c:when test="${columnName == 'companyId'}">
 		<c:set value="1" var="profilemasterid"></c:set>
@@ -54,7 +55,7 @@
 					<div class="float-left bd-frm-left">Name</div>
 					<div class="float-left bd-frm-right">
 						<input class="bd-frm-rt-txt" name="userName"
-							id="user-name" placeholder="Write your name" value="${sessionScope.SPRING_SECURITY_CONTEXT.authentication.principal.firstName}"
+							id="user-name" placeholder="Write your name" value="${user.firstName} ${user.lastName}"
 							readonly>
 					</div>
 				</div>
