@@ -44,18 +44,18 @@ public class UserSupportServiceImpl implements UserSupportService {
 	 * 
 	 */
 	@Override
-	public void sendReportBugMailToAdmin(User user , String mailSubject , String MailText , Map<String , String > attachmentsDetails) throws NonFatalException{
+	public void sendHelpMailToAdmin(User user , String mailSubject , String MailText , Map<String , String > attachmentsDetails) throws NonFatalException{
 		
-		LOG.info("Method sendReportBugMailToAdmin started.");
+		LOG.info("Method sendHelpMailToAdmin started.");
 		try {
-			emailServices.sendReportBugMailFromUser(user ,applicationAdminName, mailSubject, MailText, applicationAdminEmail, attachmentsDetails );
+			emailServices.sendHelpMailToAdmin(user ,applicationAdminName, mailSubject, MailText, applicationAdminEmail, attachmentsDetails );
 		} catch (InvalidInputException | UndeliveredEmailException e) {
 			// TODO Auto-generated catch block
 			LOG.info("Exception caught : " + e.getMessage());
 			throw new NonFatalException();
 		}
 		
-		LOG.info("Method sendReportBugMailToAdmin ended.");
+		LOG.info("Method sendHelpMailToAdmin ended.");
 	}
 	
 	/****

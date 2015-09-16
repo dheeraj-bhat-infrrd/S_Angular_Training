@@ -1727,35 +1727,36 @@ public class EmailServicesImpl implements EmailServices
      * 
      */
     @Override
-    public void sendReportBugMailFromUser( User user ,  String displayName ,  String mailSubject, String messageBodyText, String recipientMailId,
+    public void sendHelpMailToAdmin( User user ,  String displayName ,  String mailSubject, String messageBodyText, String recipientMailId,
     		Map<String , String > attachmentsDetails ) throws InvalidInputException, UndeliveredEmailException
     {
-        LOG.info( "Method sendReportBugMailFromUser() started." );
+        LOG.info( "Method sendHelpMailToAdmin() started." );
         if ( recipientMailId == null || recipientMailId.isEmpty() ) {
             LOG.error( "Recipient email Id is empty or null for sending sending report bug  mail " );
             throw new InvalidInputException(
                 "Recipient email Id is empty or null for sending report bug  mail " );
         }
 
+        LOG.info("Saving EmailEntity with recipient mail id : " + recipientMailId);
         EmailEntity emailEntity = prepareEmailEntityForSendingEmail( recipientMailId );
         //set the attachments detail
         emailEntity.setAttachmentDetail(attachmentsDetails);
         String subjectFileName = EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER
-            + EmailTemplateConstants.REPORT_BUG_TO_SS_ADMIN_MAIL_SUBJECT;
+            + EmailTemplateConstants.HELP_MAIL_TO_SS_ADMIN_SUBJECT;
         
         FileContentReplacements messageBodyReplacements = new FileContentReplacements();
         messageBodyReplacements.setFileName( EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER
-            + EmailTemplateConstants.REPORT_BUG_TO_SS_ADMIN_MAIL_BODY );
+            + EmailTemplateConstants.HELP_MAIL_TO_SS_ADMIN_BODY );
        
         String senderName = user.getFirstName() + " " + user.getLastName();
 		String senderEmail = user.getEmailId();
         
         messageBodyReplacements.setReplacementArgs( Arrays.asList( appLogoUrl, displayName , senderName , senderEmail , mailSubject , messageBodyText ) );
 
-        LOG.debug( "Calling email sender to send mail" );
+        LOG.info( "Calling email sender to send mail" );
         emailSender.sendEmailWithBodyReplacements( emailEntity, subjectFileName, messageBodyReplacements );
 
-        LOG.info( "Method sendReportBugMailFromUser() finished." );
+        LOG.info( "Method sendHelpMailToAdmin() finished." );
     }
 
 
