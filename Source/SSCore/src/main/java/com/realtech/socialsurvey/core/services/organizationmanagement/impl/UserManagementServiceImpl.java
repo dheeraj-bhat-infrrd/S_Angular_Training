@@ -1481,6 +1481,14 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
         int isAtleastOneProfileComplete, int status, String createdBy )
     {
         LOG.debug( "Method createUser called for email-id : " + emailId + " and status : " + status );
+        
+        if(lastName != null && ! lastName.equals("")){
+        	lastName = lastName.trim();
+        }
+        if(firstName != null && ! firstName.equals("")){
+        	firstName = firstName.trim();
+        }
+        
         User user = new User();
         user.setCompany( company );
         user.setLoginName( emailId );
