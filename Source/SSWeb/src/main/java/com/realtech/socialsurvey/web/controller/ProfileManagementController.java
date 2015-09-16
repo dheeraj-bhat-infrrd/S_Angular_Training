@@ -673,6 +673,11 @@ public class ProfileManagementController
                     MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION, companySettings, contactDetailsSettings );
                 companySettings.setContact_details( contactDetailsSettings );
                 userSettings.setCompanySettings( companySettings );
+                Company company = userManagementService.getCompanyById( companySettings.getIden() );
+                if ( company != null ) {
+                    settingsSetter.setSettingsValueForCompany( company, SettingsForApplication.ABOUT_ME, true );
+                    userManagementService.updateCompany( company );
+                }
             } else if ( entityType.equals( CommonConstants.REGION_ID_COLUMN ) ) {
                 OrganizationUnitSettings regionSettings = organizationManagementService.getRegionSettings( entityId );
                 if ( regionSettings == null ) {
@@ -684,6 +689,11 @@ public class ProfileManagementController
                     MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION, regionSettings, contactDetailsSettings );
                 regionSettings.setContact_details( contactDetailsSettings );
                 userSettings.getRegionSettings().put( entityId, regionSettings );
+                Region region = userManagementService.getRegionById( regionSettings.getIden() );
+                if ( region != null ) {
+                    settingsSetter.setSettingsValueForRegion( region, SettingsForApplication.ABOUT_ME, true );
+                    userManagementService.updateRegion( region );
+                }
             } else if ( entityType.equals( CommonConstants.BRANCH_ID_COLUMN ) ) {
                 OrganizationUnitSettings branchSettings = organizationManagementService.getBranchSettingsDefault( entityId );
                 if ( branchSettings == null ) {
@@ -695,6 +705,11 @@ public class ProfileManagementController
                     MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION, branchSettings, contactDetailsSettings );
                 branchSettings.setContact_details( contactDetailsSettings );
                 userSettings.getRegionSettings().put( entityId, branchSettings );
+                Branch branch = userManagementService.getBranchById( branchSettings.getIden() );
+                if ( branch != null ) {
+                    settingsSetter.setSettingsValueForBranch( branch, SettingsForApplication.ABOUT_ME, true );
+                    userManagementService.updateBranch( branch );
+                }
             } else if ( entityType.equals( CommonConstants.AGENT_ID_COLUMN ) ) {
                 AgentSettings agentSettings = userManagementService.getUserSettings( entityId );
                 if ( agentSettings == null ) {
@@ -1693,7 +1708,7 @@ public class ProfileManagementController
                 companySettings.setContact_details( contactDetailsSettings );
                 userSettings.setCompanySettings( companySettings );
                 Company company = userManagementService.getCompanyById( companySettings.getIden() );
-                if(company != null){
+                if ( company != null ) {
                     for ( MiscValues mailId : mailIds ) {
                         String key = mailId.getKey();
                         if ( key.equalsIgnoreCase( CommonConstants.EMAIL_TYPE_WORK ) ) {
@@ -2097,11 +2112,13 @@ public class ProfileManagementController
                         if ( key.equalsIgnoreCase( "work" ) ) {
                             settingsSetter.setSettingsValueForCompany( company, SettingsForApplication.WEB_ADDRESS_WORK, true );
                         } else if ( key.equalsIgnoreCase( "personal" ) ) {
-                            settingsSetter.setSettingsValueForCompany( company, SettingsForApplication.WEB_ADDRESS_PERSONAL, true );
+                            settingsSetter.setSettingsValueForCompany( company, SettingsForApplication.WEB_ADDRESS_PERSONAL,
+                                true );
                         } else if ( key.equalsIgnoreCase( "blogs" ) ) {
                             settingsSetter.setSettingsValueForCompany( company, SettingsForApplication.WEB_ADDRESS_BLOG, true );
                         }
                     }
+                    userManagementService.updateCompany( company );
                 }
             } else if ( entityType.equals( CommonConstants.REGION_ID_COLUMN ) ) {
                 OrganizationUnitSettings regionSettings = organizationManagementService.getRegionSettings( entityId );
@@ -2115,13 +2132,14 @@ public class ProfileManagementController
                 regionSettings.setContact_details( contactDetailsSettings );
                 userSettings.getRegionSettings().put( entityId, regionSettings );
                 Region region = userManagementService.getRegionById( regionSettings.getIden() );
-                if(region != null){
+                if ( region != null ) {
                     for ( MiscValues webAddress : webAddresses ) {
                         String key = webAddress.getKey();
                         if ( key.equalsIgnoreCase( "work" ) ) {
                             settingsSetter.setSettingsValueForRegion( region, SettingsForApplication.WEB_ADDRESS_WORK, true );
                         } else if ( key.equalsIgnoreCase( "personal" ) ) {
-                            settingsSetter.setSettingsValueForRegion( region, SettingsForApplication.WEB_ADDRESS_PERSONAL, true );
+                            settingsSetter
+                                .setSettingsValueForRegion( region, SettingsForApplication.WEB_ADDRESS_PERSONAL, true );
                         } else if ( key.equalsIgnoreCase( "blogs" ) ) {
                             settingsSetter.setSettingsValueForRegion( region, SettingsForApplication.WEB_ADDRESS_BLOG, true );
                         }
@@ -2152,8 +2170,9 @@ public class ProfileManagementController
                             settingsSetter.setSettingsValueForBranch( branch, SettingsForApplication.WEB_ADDRESS_BLOG, true );
                         }
                     }
+                    userManagementService.updateBranch( branch );
                 }
-                userManagementService.updateBranch( branch );
+
             } else if ( entityType.equals( CommonConstants.AGENT_ID_COLUMN ) ) {
                 AgentSettings agentSettings = userManagementService.getUserSettings( entityId );
                 if ( agentSettings == null ) {
