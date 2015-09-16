@@ -3099,6 +3099,21 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
                 }
                 contactDetails.setMail_ids(mailIdSettings);
                 userProfile.setContact_details( contactDetails );
+            } else if ( entry.getKey() == SettingsForApplication.ADDRESS ) {
+                ContactDetailsSettings contactDetails = userProfile.getContact_details();
+                if ( contactDetails == null ) {
+                    contactDetails = new ContactDetailsSettings();
+                }
+                if (entry.getValue() == OrganizationUnit.COMPANY){
+                	contactDetails.setAddress( companyUnitSettings.getContact_details().getAddress() );
+                } else if ( entry.getValue() == OrganizationUnit.REGION ){
+                	contactDetails.setAddress( regionUnitSettings.getContact_details().getAddress() );
+                } else if ( entry.getValue() == OrganizationUnit.BRANCH ) {
+                	contactDetails.setAddress( branchUnitSettings.getContact_details().getAddress() );
+                } else if ( entry.getValue() == OrganizationUnit.AGENT ) {
+                	contactDetails.setAddress( agentUnitSettings.getContact_details().getAddress() );
+                }
+                userProfile.setContact_details( contactDetails );
             } else if ( entry.getKey() == SettingsForApplication.PHONE ) {
                 ContactDetailsSettings contactDetails = userProfile.getContact_details();
                 if ( contactDetails == null ) {
