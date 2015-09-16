@@ -6,6 +6,15 @@ public class ZillowToken {
 	private String zillowProfileLink;
 	private String zillowScreenName;
 	private String zillowEmailAddress;
+	private String lastUpdated;
+
+	public String getLastUpdated() {
+		return lastUpdated;
+	}
+
+	public void setLastUpdated(String lastUpdated) {
+		this.lastUpdated = lastUpdated;
+	}
 
 	public String getZillowId() {
 		return zillowId;

@@ -200,7 +200,7 @@
 	</bean>
 	
 	<!-- Setting zillow job detail -->
-	<bean id="zillowjobdetail"
+<!-- 	<bean id="zillowjobdetail"
 		class="org.springframework.scheduling.quartz.JobDetailFactoryBean">
 		<property name="jobClass"
 			value="com.realtech.socialsurvey.core.starter.ZillowReviewProcessor" />
@@ -213,7 +213,7 @@
 			</map>
 		</property>
 		<property name="durability" value="true" />
-	</bean>
+	</bean> -->
 	
 	<!-- setting cron for Account deactivator -->
 	<bean id="sitemapgeneratorcron"
@@ -298,11 +298,11 @@
 	
 	
 	<!-- setting cron for loading image from linkedin to amazon server -->
-	<bean id="zillowcron"
+	<!-- <bean id="zillowcron"
 		class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
 		<property name="jobDetail" ref="zillowjobdetail" />
 		<property name="cronExpression" value="0 25 0,2,4,6,8,10,12,14,16,18,20,22 * * ?" />
-	</bean>
+	</bean> -->
 	
 	<!-- Scheduler factory -->
 	<bean class="org.springframework.scheduling.quartz.SchedulerFactoryBean">
@@ -319,7 +319,7 @@
 				<ref bean="crmdataagentidmapperjobdetail" />
 				<ref bean="imageloaderjobdetail" />
 				<ref bean="fileuploadjobdetail" />
-				<ref bean="zillowjobdetail" />
+				<!-- <ref bean="zillowjobdetail" /> -->
 			</list>
 		</property>
 
@@ -336,7 +336,7 @@
 				<ref bean="crmdataagentidmappercron" />
 				<ref bean="imageloadercron" />
 				<ref bean="fileuploadcron" />
-				<ref bean="zillowcron" />
+				<!-- <ref bean="zillowcron" /> -->
 			</list>
 		</property>
 		<property name="quartzProperties">

@@ -57,7 +57,7 @@ function landingFlow() {
 	
 	$('body').on('click', '.wc-final-skip', function(){
 		$(this).closest('.overlay-login').hide().html('');
-		$('body').removeClass('body-no-scroll');
+		enableBodyScroll();
 	});
 	
 	$('body').on('click', '.lnk-final-skip.wc-final-skip', function(){

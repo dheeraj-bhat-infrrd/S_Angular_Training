@@ -1009,6 +1009,14 @@ public class UserManagementController
 			String password = request.getParameter("password");
 			String confirmPassword = request.getParameter("confirmPassword");
 			String companyIdStr = request.getParameter("companyId");
+			
+			if(firstName != null && ! firstName.equals("")){
+				firstName = firstName.trim();
+			}
+			
+			if(lastName != null && ! lastName.equals("")){
+				lastName = lastName.trim();
+			}
 
 			// form parameters validation
 			validateCompleteRegistrationForm(firstName, lastName, emailId, password, companyIdStr, confirmPassword);

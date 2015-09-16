@@ -157,7 +157,7 @@
 						<div class="float-left"><spring:message code="label.incompletesurveys.key" /></div>
 						<div class="float-right dash-sur-link" onclick="showIncompleteSurveyListPopup()">View All</div>
 					</div>
-					<div id="dsh-inc-srvey" class="dash-lp-item-grp clearfix">
+					<div id="dsh-inc-srvey" class="dash-lp-item-grp clearfix" data-total="0">
 						<!-- Populated with dashboard_incompletesurveys.jsp -->
 					</div>
 					<%-- <div id="dsh-inc-dwnld" class="dash-btn-sur-data hide"><spring:message code="label.incompletesurveydata.key" /></div> --%>
@@ -182,7 +182,6 @@
 
 <script>
 $(document).ready(function() {
-	
 	$('.va-dd-wrapper').perfectScrollbar({
 		suppressScrollX : true
 	});
@@ -190,6 +189,27 @@ $(document).ready(function() {
 	
 	hideOverlay();
 	$(document).attr("title", "Dashboard");
+
+	$(document).scroll(function() {
+		if(window.location.hash.substr(1) == "dashboard") {
+			if ((window.innerHeight + window.pageYOffset) >= (document.body.offsetHeight) && startIndexCmp < totalReviews) {
+				showReviews(colName, colValue);
+			}			
+		}
+	});
+	
+	var scrollContainer = document.getElementById('dsh-inc-srvey');
+	scrollContainer.onscroll = function() {
+		var totalIncReviews = parseInt($('#dsh-inc-srvey').attr("data-total"));
+		if(totalIncReviews != NaN && startIndexInc < totalIncReviews) {
+			if (scrollContainer.scrollTop === scrollContainer.scrollHeight - scrollContainer.clientHeight) {
+				setTimeout(function() {
+					showIncompleteSurvey(colName, colValue);
+					$('#dsh-inc-srvey').perfectScrollbar('update');
+				}, 100);
+			}			
+		}
+	};
 	
 	if ($("#da-dd-wrapper-profiles").children('.da-dd-item').length <= 1) {
 		$('#da-dd-wrapper').remove();
