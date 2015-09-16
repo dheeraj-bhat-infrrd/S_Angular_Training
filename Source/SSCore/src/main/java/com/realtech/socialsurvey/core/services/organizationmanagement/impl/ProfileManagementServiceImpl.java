@@ -2984,6 +2984,18 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
                     contactDetails.setLocation( agentUnitSettings.getContact_details().getLocation() );
                 }
                 userProfile.setContact_details( contactDetails );
+            }else if ( entry.getKey() == SettingsForApplication.WEB_ADDRESS_WORK ) {
+                ContactDetailsSettings contactDetails = userProfile.getContact_details();
+                if ( contactDetails == null ) {
+                    contactDetails = new ContactDetailsSettings();
+                }
+                WebAddressSettings webAddressSettings = contactDetails.getWeb_addresses();
+                if(webAddressSettings == null){
+                    webAddressSettings = new WebAddressSettings();
+                }
+                
+                contactDetails.setWeb_addresses( webAddressSettings );
+                userProfile.setContact_details( contactDetails );
             } else if ( entry.getKey() == SettingsForApplication.PHONE ) {
                 ContactDetailsSettings contactDetails = userProfile.getContact_details();
                 if ( contactDetails == null ) {
@@ -3193,12 +3205,12 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
      */
 
     @Override
-
-    public void updateZillowFeed(OrganizationUnitSettings profile, String collection) throws InvalidInputException{
-    	LOG.info("Method to update zillow feed called for ID :" + profile.getIden() + " of collection : " + collection);
-    	SocialMediaTokens token = profile.getSocialMediaTokens();
-        token = socialManagementService.checkOrAddZillowLastUpdated(token);
-        profile.setSocialMediaTokens(token);
+    public void updateZillowFeed( OrganizationUnitSettings profile, String collection ) throws InvalidInputException
+    {
+        LOG.info( "Method to update zillow feed called for ID :" + profile.getIden() + " of collection : " + collection );
+        SocialMediaTokens token = profile.getSocialMediaTokens();
+        token = socialManagementService.checkOrAddZillowLastUpdated( token );
+        profile.setSocialMediaTokens( token );
         String lastUpdated = token.getZillowToken().getLastUpdated();
         String currentTime = new Timestamp( System.currentTimeMillis() ).toString();
         long oneDay = 1 * 24 * 60 * 60 * 1000;
