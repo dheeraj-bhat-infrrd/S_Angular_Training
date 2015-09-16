@@ -4378,6 +4378,27 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
             skipCount, batchSize );
         return fieldIngestionEntities;
     }
+    
+    @Transactional
+    @Override
+    public void updateBranchProfileName(long branchId, String profileName){
+    	LOG.info("Method updateBranchProfileName() started.");
+    	Branch branch = branchDao.findById( Branch.class, branchId );
+    	branch.setProfileName(profileName);
+    	branchDao.update(branch);
+    	LOG.info("Method updateBranchProfileName() finished.");
+    	
+    }
+    
+    @Transactional
+    @Override
+    public void updateRegionProfileName(long regionId, String profileName){
+    	LOG.info("Method updateRegionProfileName() started.");
+    	Region region = regionDao.findById(Region.class, regionId);
+    	region.setProfileName(profileName);
+    	regionDao.update(region);
+    	LOG.info("Method updateRegionProfileName() finished.");
+    }
 
 }
 // JIRA: SS-27: By RM05: EOC

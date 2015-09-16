@@ -398,4 +398,21 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
 	    
 	    return organizationUnitSettings;
 	}
+	
+	@Override
+	public SocialMediaTokens checkOrAddZillowLastUpdated(SocialMediaTokens mediaTokens) throws InvalidInputException{
+		if(mediaTokens == null){
+			throw new InvalidInputException("Invalid media token");
+		}
+		if(mediaTokens.getZillowToken() == null){
+			throw new InvalidInputException("zillow token not found");
+		}
+		
+		try{
+			mediaTokens.getZillowToken().getLastUpdated();
+		} catch(Exception e){
+			mediaTokens.getZillowToken().setLastUpdated("");
+		}
+		return mediaTokens;
+	}
 }
