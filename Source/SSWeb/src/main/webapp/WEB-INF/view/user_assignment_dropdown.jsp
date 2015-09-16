@@ -32,7 +32,7 @@
 				</c:forEach>
 			</c:if>
 			<c:if test="${not empty assignments.branches}">
-				<div class="dd-tl">Branch</div>
+				<div class="dd-tl">Office</div>
 				<c:forEach var="branch" items="${assignments.branches}">
 					<div class="da-dd-item" data-column-type="branchId"
 						data-column-name="${branch.value}"
