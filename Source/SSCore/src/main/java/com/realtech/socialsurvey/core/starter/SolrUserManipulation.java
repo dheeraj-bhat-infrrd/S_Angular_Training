@@ -1,4 +1,4 @@
-package com.realtech.socialsurvey.batch;
+package com.realtech.socialsurvey.core.starter;
 
 import java.io.IOException;
 import java.util.HashMap;

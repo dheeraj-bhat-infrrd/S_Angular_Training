@@ -109,6 +109,10 @@ public class OrganizationManagementController
 
     @Value ( "${APPLICATION_LOGO_URL}")
     private String applicationLogoUrl;
+    
+    @Value ( "${AMAZON_LOGO_BUCKET}")
+    private String logoBucket;
+    
 
 
     /**
@@ -134,7 +138,7 @@ public class OrganizationManagementController
         try {
             logoName = fileUploadService.fileUploadHandler( fileLocal, request.getParameter( "logo_name" ) );
             // Setting the complete logo url in session
-            logoName = endpoint + CommonConstants.FILE_SEPARATOR + logoName;
+            logoName = endpoint + CommonConstants.FILE_SEPARATOR + logoBucket + CommonConstants.FILE_SEPARATOR+ logoName;
 
             LOG.debug( "Setting Logo image name to Session" );
             request.getSession( false ).setAttribute( CommonConstants.LOGO_NAME, logoName );
