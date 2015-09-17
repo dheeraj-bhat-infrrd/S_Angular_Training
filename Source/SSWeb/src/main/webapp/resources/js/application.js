@@ -6350,8 +6350,6 @@ function callBackShowProfileLogo(data) {
 			"background-size" : "contain"
 		});
 		$('#header-user-info').append(userInfoDivider).append(userInfoLogo);
-	} else {
-		$('.user-info-logo').css("background-image", logoImageUrl);
 	}
 	adjustImage();
 	hideOverlay();
