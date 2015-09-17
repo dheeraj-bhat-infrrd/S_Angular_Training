@@ -21,6 +21,10 @@ public class SolrUserManipulation {
 	
 	private static final Logger LOG = LoggerFactory.getLogger(SolrUserManipulation.class);
 	
+	private static final String SOLR_LOCAL_URL = "http://localhost:8983/solr/ss-users/";
+	private static final String SOLR_DEMO_URL = "http://localhost:8983/solr/ss-users/";
+	private static final String SOLR_PROD_URL = "http://localhost:8983/solr/ss-users/";
+	
 	/***
 	 * method to trim the first and last name of users in solr
 	 * @param args
@@ -29,7 +33,18 @@ public class SolrUserManipulation {
 
 		
 		LOG.debug("main method started to trim the first and last name of users in solr");
-		String solrUserPackageURL = "http://localhost:8983/solr/ss-users/";
+		String solrUserPackageURL = null;
+		if(args.length > 0){
+			if(args[0].equals("dev")){
+				solrUserPackageURL = SOLR_LOCAL_URL;
+			}else if(args[0].equals("demo")){
+				solrUserPackageURL = SOLR_DEMO_URL;
+			}else if(args[0].equals("prod")){
+				solrUserPackageURL = SOLR_PROD_URL;
+			}
+		}else{
+			solrUserPackageURL = SOLR_LOCAL_URL;
+		}
 		int maxRow = 10000;
 		String SOLR_EDIT_REPLACE = "set";
 
