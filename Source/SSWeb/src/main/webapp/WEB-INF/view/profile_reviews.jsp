@@ -83,15 +83,6 @@ if(document.getElementById('fb_'+loop) != null)
 <c:choose>
 	<c:when test="${not empty reviews}">
 		<c:forEach var="reviewItem" varStatus="loop" items="${reviews}">
-			<c:choose>
-				<c:when test="${not empty reviewItem.customerLastName}">
-					<c:set value="${reviewItem.customerFirstName} ${reviewItem.customerLastName}" var="customerName"></c:set>
-				</c:when>
-				<c:otherwise>
-					<c:set value="${reviewItem.customerFirstName}" var="customerName"></c:set>
-				</c:otherwise>
-			</c:choose>
-			<c:set var="customerNameParts" value="${fn:split(customerName, ' ')}"></c:set>
 			<c:set value="ppl-review-item" var="reviewitemclass"></c:set>
 			<c:if test="${loop.last}">
 				<c:set value="ppl-review-item-last" var="reviewitemclass"></c:set>
@@ -104,10 +95,7 @@ if(document.getElementById('fb_'+loop) != null)
 				<div class="ppl-header-wrapper clearfix">
 					<div class="float-left ppl-header-left">
 						<div class="ppl-head-1">
-							${customerNameParts[0]} 
-							<c:if test="${fn:length(customerNameParts) > 1}">
-							 	${fn:substring(customerNameParts[1], 0, 1)}
-							 </c:if>
+							${reviewItem.customerFirstName} ${reviewItem.customerLastName}
 						</div>
 						<div class="ppl-head-2"
 							data-modifiedon="<fmt:formatDate type="date" pattern="yyyy-MM-dd-H-mm-ss"
