@@ -1170,7 +1170,7 @@ function paintIndividualDetails(result) {
 	if (result.expertise != undefined && result.expertise.length > 0) {
 		individualDetailsHtml = individualDetailsHtml + '<div class="prof-left-row prof-left-ach bord-bot-dc">';
 		individualDetailsHtml = individualDetailsHtml + '	<div class="left-ach-wrapper">';
-		individualDetailsHtml = individualDetailsHtml + '		<div class="left-panel-header lph-dd lph-dd-closed cursor-pointer lph-arrow-closed">Specialities</div>';
+		individualDetailsHtml = individualDetailsHtml + '		<div class="left-panel-header lph-dd lph-dd-closed cursor-pointer lph-arrow-closed">Specialties</div>';
 		individualDetailsHtml = individualDetailsHtml + '		<div class="left-panel-content lph-dd-content">';
 		for (var i = 0; i < result.expertise.length; i++) {
 			individualDetailsHtml = individualDetailsHtml + '<div class="lp-ach-row lp-row clearfix">' + result.expertise[i] + '</div>';
