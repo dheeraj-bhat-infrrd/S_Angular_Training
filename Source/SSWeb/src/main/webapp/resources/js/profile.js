@@ -61,13 +61,20 @@ function paintProfilePage(result) {
 		if (profileLevel == 'INDIVIDUAL') {
 			breadCrumUrl += 'individual/' + profileJson.iden;
 		} else if (profileLevel == 'BRANCH') {
-			breadCrumUrl += companyProfileName + '/branch/' + profileJson.profileName;
+			breadCrumUrl += '/branch/' + profileJson.iden;
 		} else if (profileLevel == 'REGION') {
-			breadCrumUrl += companyProfileName+'/region/' + profileJson.profileName;
+			breadCrumUrl += '/region/' + profileJson.iden;
 		}
 		
 		if(profileLevel != 'COMPANY'){
 			paintBreadCrums(breadCrumUrl);			
+		} else {
+			var htmlContent = '<a target="_blank" class="brd-crm brd-crm-link" href="'
+				+ '/findcompany.do?verticalName='
+				+ profileJson.vertical
+				+ '">'
+				+ profileJson.vertical + '</a>';
+			$('#bread-crum-cont').html(htmlContent);
 		}
 		
 		if (contactDetails != undefined) {
