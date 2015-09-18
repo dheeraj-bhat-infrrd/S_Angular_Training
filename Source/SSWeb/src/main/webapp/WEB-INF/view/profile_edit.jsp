@@ -74,7 +74,7 @@
 	<div>
 		<c:choose>
 			<c:when test="${profilemasterid == 1}">
-				<input type="hidden" id="prof-company-id" value="${entityId}">
+				<input type="hidden" id="prof-company-id" value="${profileSettings.iden}">
 				<input type="hidden" id="company-profile-name" value="${profileSettings.profileName}">
 			</c:when>
 			<c:when test="${profilemasterid == 2}">
@@ -87,7 +87,7 @@
 				<input type="hidden" id="prof-agent-id" value="${entityId}">
 			</c:when>
 		</c:choose>
-		<input type="hidden" id="profile-id" value="${profileSettings.iden}"/>
+		<input type="hidden" id="profile-id" value="${profile.userProfileId}"/>
 		<input type="hidden" id="profile-min-post-score" value="${profileSettings.survey_settings.show_survey_above_score}"/>
 	</div>
 	
