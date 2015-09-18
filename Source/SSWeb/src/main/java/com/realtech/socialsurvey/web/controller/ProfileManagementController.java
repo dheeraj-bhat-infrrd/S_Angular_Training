@@ -732,6 +732,7 @@ public class ProfileManagementController {
 						.updateVertical(
 								MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION,
 								companySettings, vertical);
+				userSettings.setCompanySettings(companySettings);
 			}
 
 			if (entityType.equals(CommonConstants.COMPANY_ID_COLUMN)) {
@@ -786,11 +787,11 @@ public class ProfileManagementController {
 						regionSettings.getIden(), name);
 				assignments.getRegions().put(entityId, name);
 
-				regionSettings.setVertical(vertical);
+				/*regionSettings.setVertical(vertical);
 				profileManagementService
 						.updateVertical(
 								MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION,
-								regionSettings, vertical);
+								regionSettings, vertical);*/
 
 				userSettings.getRegionSettings().put(entityId, regionSettings);
 			} else if (entityType.equals(CommonConstants.BRANCH_ID_COLUMN)) {
@@ -814,11 +815,11 @@ public class ProfileManagementController {
 						branchSettings.getIden(), name);
 				assignments.getBranches().put(entityId, name);
 
-				branchSettings.setVertical(vertical);
+				/*branchSettings.setVertical(vertical);
 				profileManagementService
 						.updateVertical(
 								MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION,
-								branchSettings, vertical);
+								branchSettings, vertical);*/
 
 				userSettings.getRegionSettings().put(entityId, branchSettings);
 			} else if (entityType.equals(CommonConstants.AGENT_ID_COLUMN)) {
