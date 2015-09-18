@@ -72,7 +72,6 @@ import com.realtech.socialsurvey.core.entities.User;
 import com.realtech.socialsurvey.core.entities.UserFromSearch;
 import com.realtech.socialsurvey.core.entities.UserHierarchyAssignments;
 import com.realtech.socialsurvey.core.entities.UserListFromSearch;
-import com.realtech.socialsurvey.core.entities.UserProfile;
 import com.realtech.socialsurvey.core.entities.UserSettings;
 import com.realtech.socialsurvey.core.entities.VerticalsMaster;
 import com.realtech.socialsurvey.core.entities.WebAddressSettings;
@@ -80,7 +79,9 @@ import com.realtech.socialsurvey.core.entities.YelpToken;
 import com.realtech.socialsurvey.core.entities.ZillowToken;
 import com.realtech.socialsurvey.core.enums.AccountType;
 import com.realtech.socialsurvey.core.enums.DisplayMessageType;
+import com.realtech.socialsurvey.core.enums.OrganizationUnit;
 import com.realtech.socialsurvey.core.enums.SettingsForApplication;
+import com.realtech.socialsurvey.core.exception.FatalException;
 import com.realtech.socialsurvey.core.exception.InternalServerException;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.exception.NoRecordsFetchedException;
@@ -96,6 +97,7 @@ import com.realtech.socialsurvey.core.services.search.SolrSearchService;
 import com.realtech.socialsurvey.core.services.search.exception.SolrException;
 import com.realtech.socialsurvey.core.services.settingsmanagement.SettingsLocker;
 import com.realtech.socialsurvey.core.services.settingsmanagement.SettingsSetter;
+import com.realtech.socialsurvey.core.services.settingsmanagement.impl.InvalidSettingsStateException;
 import com.realtech.socialsurvey.core.services.social.SocialManagementService;
 import com.realtech.socialsurvey.core.services.upload.FileUploadService;
 import com.realtech.socialsurvey.core.services.upload.impl.UploadUtils;
@@ -174,65 +176,247 @@ public class ProfileManagementController
     @RequestMapping ( value = "/showprofilepage", method = RequestMethod.GET)
     public String showProfileEditPage( Model model, HttpServletRequest request )
     {
-        LOG.info( "Method showProfileEditPage() called from ProfileManagementService" );
-        HttpSession session = request.getSession( false );
-        User user = sessionHelper.getCurrentUser();
-        // getting session variables
-        AccountType accountType = (AccountType) session.getAttribute( CommonConstants.ACCOUNT_TYPE_IN_SESSION );
-        UserSettings userSettings = (UserSettings) session.getAttribute( CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION );
+    	LOG.info( "Method showProfileEditPage() called from ProfileManagementService" );
+    	HttpSession session = request.getSession( false );
+    	User user = sessionHelper.getCurrentUser();
+    	long entityId = 0;
+    	String entityIdStr = request.getParameter( "entityId" );
+    	if ( entityIdStr == null || entityIdStr.isEmpty() ) {
+    		entityId = (long) session.getAttribute( CommonConstants.ENTITY_ID_COLUMN );
+    	} else {
+    		try {
+    			if ( entityIdStr != null && !entityIdStr.equals( "" ) ) {
+    				entityId = Long.parseLong( entityIdStr );
+    			} else {
+    				throw new NumberFormatException();
+    			}
+    		} catch ( NumberFormatException e ) {
+    			LOG.error( "Number format exception occurred while parsing the entity id. Reason :" + e.getMessage(), e );
+    		}
+    	}
 
-        long entityId = 0;
-        String entityIdStr = request.getParameter( "entityId" );
-        if ( entityIdStr == null || entityIdStr.isEmpty() ) {
-            entityId = (long) session.getAttribute( CommonConstants.ENTITY_ID_COLUMN );
-        } else {
-            try {
-                if ( entityIdStr != null && !entityIdStr.equals( "" ) ) {
-                    entityId = Long.parseLong( entityIdStr );
-                } else {
-                    throw new NumberFormatException();
-                }
-            } catch ( NumberFormatException e ) {
-                LOG.error( "Number format exception occurred while parsing the entity id. Reason :" + e.getMessage(), e );
-            }
-        }
+    	String entityType = request.getParameter( "entityType" );
+    	if ( entityType == null || entityType.isEmpty() ) {
+    		entityType = (String) session.getAttribute( CommonConstants.ENTITY_TYPE_COLUMN );
+    	}
 
-        String entityType = request.getParameter( "entityType" );
-        if ( entityType == null || entityType.isEmpty() ) {
-            entityType = (String) session.getAttribute( CommonConstants.ENTITY_TYPE_COLUMN );
-        }
+    	long branchId = 0;
+    	long regionId = 0;
+    	long companyId = 0;
+    	long agentId = 0;
+    	Map<SettingsForApplication, OrganizationUnit> map = null;
+    	//Get the hierarchy details associated with the current profile
+    	try {
+    		Map<String, Long> hierarchyDetails = profileManagementService.getHierarchyDetailsByEntity(entityType, entityId);
+    		if ( hierarchyDetails == null ) {
+    			LOG.error( "Unable to fetch primary profile for this user " );
+    			throw new FatalException( "Unable to fetch primary profile for type : " + entityType  + " and ID : " + entityId );
+    		}
+    		branchId = hierarchyDetails.get(CommonConstants.BRANCH_ID_COLUMN);
+    		regionId = hierarchyDetails.get(CommonConstants.REGION_ID_COLUMN);
+    		companyId = hierarchyDetails.get(CommonConstants.COMPANY_ID_COLUMN);
+    		agentId = hierarchyDetails.get(CommonConstants.AGENT_ID_COLUMN);
+    		LOG.debug("Company ID : " + companyId + " Region ID : " + regionId + " Branch ID : " + branchId + " Agent ID : " + agentId);
+    	} catch (InvalidInputException e) {
+    		LOG.error( "InvalidInputException while showing profile page. Reason :" + e.getMessage(), e );
+    		model.addAttribute( "message", messageUtils.getDisplayMessage( e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE ) );
+    	}
 
+    	sessionHelper.updateSelectedProfile( session, entityId, entityType );
 
-        sessionHelper.updateSelectedProfile( session, entityId, entityType );
+    	// fetching details from profile
+    	if ( entityType.equals( CommonConstants.COMPANY_ID_COLUMN ) ) {
+    		//If the profile is a company profile
+    		model.addAttribute( "columnName", entityType );
 
-        // fetching details from profile
-        long branchId = 0;
-        long regionId = 0;
-        int profilesMaster = 0;
-        if ( entityType.equals( CommonConstants.COMPANY_ID_COLUMN ) ) {
-            model.addAttribute( "columnName", entityType );
-            profilesMaster = CommonConstants.PROFILES_MASTER_COMPANY_ADMIN_PROFILE_ID;
-        } else if ( entityType.equals( CommonConstants.REGION_ID_COLUMN ) ) {
-            model.addAttribute( "columnName", entityType );
-            profilesMaster = CommonConstants.PROFILES_MASTER_REGION_ADMIN_PROFILE_ID;
-            regionId = entityId;
-        } else if ( entityType.equals( CommonConstants.BRANCH_ID_COLUMN ) ) {
-            model.addAttribute( "columnName", entityType );
-            profilesMaster = CommonConstants.PROFILES_MASTER_BRANCH_ADMIN_PROFILE_ID;
-            branchId = entityId;
-        } else if ( entityType.equals( CommonConstants.AGENT_ID_COLUMN ) ) {
-            model.addAttribute( "columnName", entityType );
-            profilesMaster = CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID;
+    		OrganizationUnitSettings companyProfile = null;
+    		try {
+    			companyProfile = organizationManagementService.getCompanySettings(companyId);
+    			String json = new Gson().toJson( companyProfile );
+    			model.addAttribute( "profileJson", json );
+    			double averageRating = profileManagementService.getAverageRatings( companyId,
+    					CommonConstants.PROFILE_LEVEL_COMPANY, false );
+    			model.addAttribute( "averageRating", averageRating );
 
-            for ( UserProfile userProfile : user.getUserProfiles() ) {
-                if ( userProfile.getProfilesMaster().getProfileId() == CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID ) {
-                    regionId = userProfile.getRegionId();
-                    branchId = userProfile.getBranchId();
-                }
-            }
-        }
+    			long reviewsCount = profileManagementService.getReviewsCount( companyId, CommonConstants.MIN_RATING_SCORE,
+    					CommonConstants.MAX_RATING_SCORE, CommonConstants.PROFILE_LEVEL_COMPANY, false );
+    			model.addAttribute( "reviewsCount", reviewsCount );
+    		}  catch ( InvalidInputException e ) {
+    			throw new InternalServerException( new ProfileServiceErrorCode(
+    					CommonConstants.ERROR_CODE_COMPANY_PROFILE_SERVICE_FAILURE, CommonConstants.SERVICE_CODE_COMPANY_PROFILE,
+    					"Error occured while fetching company profile" ), e.getMessage() );
+    		}
+    		model.addAttribute( "profile", companyProfile );
+    		model.addAttribute( "companyProfileName", companyProfile.getProfileName() );
+    		model.addAttribute( "profileLevel", CommonConstants.PROFILE_LEVEL_COMPANY );
+    	} else if ( entityType.equals( CommonConstants.REGION_ID_COLUMN ) ) {
+    		//If the profile is a region profile
+    		model.addAttribute( "columnName", entityType );
 
-        // Setting parentLock in session
+    		OrganizationUnitSettings regionProfile = null;
+    		OrganizationUnitSettings companyProfile = null;
+    		try {
+    			companyProfile = organizationManagementService.getCompanySettings(companyId);
+    			regionProfile = organizationManagementService.getRegionSettings(regionId);
+
+    			try {
+    				map = profileManagementService.getPrimaryHierarchyByEntity( CommonConstants.REGION_ID, regionProfile.getIden() );
+    				if ( map == null ) {
+    					LOG.error( "Unable to fetch primary profile for this user " );
+    					throw new FatalException( "Unable to fetch primary profile this user " + regionProfile.getIden() );
+    				}
+    			} catch ( InvalidSettingsStateException e ) {
+    				throw new InternalServerException( new ProfileServiceErrorCode(
+    						CommonConstants.ERROR_CODE_REGION_PROFILE_SERVICE_FAILURE, CommonConstants.SERVICE_CODE_REGION_PROFILE,
+    						"Error occured while fetching region profile" ), e.getMessage() );
+    			}
+
+    			regionProfile = profileManagementService.fillUnitSettings( regionProfile,
+    					MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION, companyProfile, regionProfile, null, null, map );
+
+    			// aggregated disclaimer
+    			String disclaimer = profileManagementService.aggregateDisclaimer( regionProfile, CommonConstants.REGION_ID );
+    			regionProfile.setDisclaimer( disclaimer );
+
+    			String json = new Gson().toJson( regionProfile );
+    			model.addAttribute( "profileJson", json );
+
+    			double averageRating = profileManagementService.getAverageRatings( regionId, CommonConstants.PROFILE_LEVEL_REGION,
+    					false );
+    			model.addAttribute( "averageRating", averageRating );
+
+    			long reviewsCount = profileManagementService.getReviewsCount( regionId, CommonConstants.MIN_RATING_SCORE,
+    					CommonConstants.MAX_RATING_SCORE, CommonConstants.PROFILE_LEVEL_REGION, false );
+    			model.addAttribute( "reviewsCount", reviewsCount );
+    		} catch ( InvalidInputException e ) {
+    			throw new InternalServerException( new ProfileServiceErrorCode(
+    					CommonConstants.ERROR_CODE_REGION_PROFILE_SERVICE_FAILURE, CommonConstants.SERVICE_CODE_REGION_PROFILE,
+    					"Error occured while fetching region profile" ), e.getMessage() );
+    		}
+    		model.addAttribute( "profile", regionProfile );
+    		model.addAttribute( "companyProfileName", companyProfile.getProfileName() );
+    		model.addAttribute( "regionProfileName", regionProfile.getProfileName() );
+    		model.addAttribute( "profileLevel", CommonConstants.PROFILE_LEVEL_REGION );
+
+    	} else if ( entityType.equals( CommonConstants.BRANCH_ID_COLUMN ) ) {
+    		//If the profile is a branch profile
+    		model.addAttribute( "columnName", entityType );
+
+    		OrganizationUnitSettings companyProfile = null;
+    		OrganizationUnitSettings branchProfile = null;
+    		OrganizationUnitSettings regionProfile = null;
+
+    		try {
+    			companyProfile = organizationManagementService.getCompanySettings(companyId);
+    			regionProfile = organizationManagementService.getRegionSettings(regionId);
+    			branchProfile = organizationManagementService.getBranchSettingsDefault(branchId);
+
+    			try {
+    				map = profileManagementService.getPrimaryHierarchyByEntity( CommonConstants.BRANCH_ID_COLUMN,
+    						branchProfile.getIden() );
+    				if ( map == null ) {
+    					LOG.error( "Unable to fetch primary profile for this user " );
+    					throw new FatalException( "Unable to fetch primary profile this user " + branchProfile.getIden() );
+    				}
+
+    			} catch ( InvalidSettingsStateException e ) {
+    				throw new InternalServerException( new ProfileServiceErrorCode(
+    						CommonConstants.ERROR_CODE_BRANCH_PROFILE_SERVICE_FAILURE, CommonConstants.SERVICE_CODE_BRANCH_PROFILE,
+    						"Error occured while fetching branch profile" ), e.getMessage() );
+    			}
+    			branchProfile = profileManagementService.fillUnitSettings( branchProfile,
+    					MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION, companyProfile, regionProfile, branchProfile,
+    					null, map );
+    			// aggregated disclaimer
+    			String disclaimer = profileManagementService.aggregateDisclaimer( branchProfile, CommonConstants.BRANCH_ID );
+    			branchProfile.setDisclaimer( disclaimer );
+
+    			String json = new Gson().toJson( branchProfile );
+    			model.addAttribute( "profileJson", json );
+
+    			double averageRating = profileManagementService.getAverageRatings( branchId, CommonConstants.PROFILE_LEVEL_BRANCH,
+    					false );
+    			model.addAttribute( "averageRating", averageRating );
+
+    			long reviewsCount = profileManagementService.getReviewsCount( branchId, CommonConstants.MIN_RATING_SCORE,
+    					CommonConstants.MAX_RATING_SCORE, CommonConstants.PROFILE_LEVEL_BRANCH, false );
+    			model.addAttribute( "reviewsCount", reviewsCount );
+    		} catch ( InvalidInputException e ) {
+    			throw new InternalServerException( new ProfileServiceErrorCode(
+    					CommonConstants.ERROR_CODE_BRANCH_PROFILE_SERVICE_FAILURE, CommonConstants.SERVICE_CODE_BRANCH_PROFILE,
+    					"Error occured while fetching branch profile" ), e.getMessage() );
+    		} catch ( NoRecordsFetchedException e ) {
+    			LOG.error( "NoRecordsFetchedException: message : " + e.getMessage(), e );
+    		}
+    		model.addAttribute( "profile", branchProfile );
+    		model.addAttribute( "companyProfileName", companyProfile.getProfileName() );
+    		model.addAttribute( "branchProfileName", branchProfile.getProfileName() );
+    		model.addAttribute( "profileLevel", CommonConstants.PROFILE_LEVEL_BRANCH ); 
+
+    	} else if ( entityType.equals( CommonConstants.AGENT_ID_COLUMN ) ) {
+    		//If the profile is a individual profile
+    		model.addAttribute( "columnName", entityType );
+
+    		OrganizationUnitSettings companyProfile = null;
+    		OrganizationUnitSettings regionProfile = null;
+    		OrganizationUnitSettings branchProfile = null;
+    		AgentSettings individualProfile = null;
+
+    		try {
+    			companyProfile = organizationManagementService.getCompanySettings(companyId);
+    			regionProfile = organizationManagementService.getRegionSettings(regionId);
+    			branchProfile = organizationManagementService.getBranchSettingsDefault(branchId);
+    			individualProfile = userManagementService.getAgentSettingsForUserProfiles(agentId);
+
+    			try {
+    				map = profileManagementService.getPrimaryHierarchyByEntity( CommonConstants.AGENT_ID_COLUMN,
+    						individualProfile.getIden() );
+    				if ( map == null ) {
+    					LOG.error( "Unable to fetch primary profile for this user " );
+    					throw new FatalException( "Unable to fetch primary profile this user " + branchProfile.getIden() );
+    				}
+
+    			} catch ( InvalidSettingsStateException e ) {
+    				LOG.error("Error occured while fetching branch profile" + e.getMessage());
+    			}
+
+    			if ( map == null ) {
+    				LOG.error( "Unable to fetch primary profile for this user " );
+    				throw new FatalException( "Unable to fetch primary profile this user " + individualProfile.getIden() );
+    			}
+
+    			individualProfile = (AgentSettings) profileManagementService.fillUnitSettings( individualProfile,
+    					MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION, companyProfile, regionProfile,
+    					branchProfile, individualProfile, map );
+    			individualProfile.setVertical( user.getCompany().getVerticalsMaster().getVerticalName() );
+    			String disclaimer = profileManagementService.aggregateDisclaimer( individualProfile, CommonConstants.AGENT_ID );
+    			individualProfile.setDisclaimer( disclaimer );
+
+    			String json = new Gson().toJson( individualProfile );
+    			model.addAttribute( "profileJson", json );
+
+    			double averageRating = profileManagementService.getAverageRatings( agentId,
+    					CommonConstants.PROFILE_LEVEL_INDIVIDUAL, false );
+    			model.addAttribute( "averageRating", averageRating );
+    			long reviewsCount = profileManagementService.getReviewsCount( agentId, CommonConstants.MIN_RATING_SCORE,
+    					CommonConstants.MAX_RATING_SCORE, CommonConstants.PROFILE_LEVEL_INDIVIDUAL, false );
+    			model.addAttribute( "reviewsCount", reviewsCount );
+
+    			model.addAttribute( "profile", individualProfile );
+    		} catch ( InvalidInputException e ) {
+    			LOG.error( "InvalidInputException: message : " + e.getMessage(), e );
+    			model.addAttribute(
+    					"message",
+    					messageUtils.getDisplayMessage( DisplayMessageConstants.INVALID_INDIVIDUAL_PROFILENAME,
+    							DisplayMessageType.ERROR_MESSAGE ).getMessage() );
+    			return JspResolver.NOT_FOUND_PAGE;
+    		} catch ( NoRecordsFetchedException e ) {
+    			LOG.error( "NoRecordsFetchedException: message : " + e.getMessage(), e );
+    		}
+
+    	}
+
+    	/*// Setting parentLock in session
         LockSettings parentLock = fetchParentLockSettings( model, user, accountType, userSettings, branchId, regionId,
             profilesMaster );
         session.setAttribute( CommonConstants.PARENT_LOCK, parentLock );
@@ -249,10 +433,10 @@ public class ProfileManagementController
                     messageUtils.getDisplayMessage( e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE ) );
             }
         }
-        session.setAttribute( CommonConstants.USER_PROFILE_SETTINGS, profileSettings );
+        session.setAttribute( CommonConstants.USER_PROFILE_SETTINGS, profileSettings );*/
 
-        LOG.info( "Method showProfileEditPage() finished from ProfileManagementService" );
-        return JspResolver.PROFILE_EDIT;
+    	LOG.info( "Method showProfileEditPage() finished from ProfileManagementService" );
+    	return JspResolver.PROFILE_EDIT;
     }
 
 
