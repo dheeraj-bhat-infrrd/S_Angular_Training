@@ -542,8 +542,8 @@ function paintReviews(result){
 		reviewsHtml += '	<div class="ppl-header-wrapper clearfix">';
 		reviewsHtml += '		<div class="float-left ppl-header-left">';    
 		reviewsHtml += '			<div class="ppl-head-1">'+custNameArray[0];
-		if(custNameArray[1] != undefined){
-			reviewsHtml += ' '+custNameArray[1].substr(0,1)+'</div>';
+		if(custNameArray[1] != undefined && custNameArray[1].trim() != ""){
+			reviewsHtml += ' '+custNameArray[1].substr(0,1)+'.</div>';
 		}else {
 			reviewsHtml += '</div>';
 		}
