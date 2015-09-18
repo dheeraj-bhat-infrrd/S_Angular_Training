@@ -331,9 +331,9 @@
 				<tbody>
 					<tr>
 						<th></th>
-						<th><strong><span class="currency">$</span>9.95</strong> /
+						<th><strong><span class="currency">$</span>29.95</strong> /
 							Month<div class="payment-acc-type-txt">Individual</div></th>
-						<th><strong><span class="currency">$</span>12.95</strong> /
+						<th><strong><span class="currency">$</span>19.95</strong> /
 							User / Month<div class="payment-acc-type-txt">Enterprise</div></th>
 					</tr>
 					<tr class="action">
