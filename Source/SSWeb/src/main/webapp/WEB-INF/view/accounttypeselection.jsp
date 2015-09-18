@@ -81,9 +81,9 @@
 				<tbody>
 					<tr>
 						<th></th>
-						<th><strong><span class="currency">$</span>9.95</strong> /
+						<th><strong><span class="currency">$</span>29.95</strong> /
 							Month<div class="payment-acc-type-txt">Individual</div></th>
-						<th><strong><span class="currency">$</span>12.95</strong> /
+						<th><strong><span class="currency">$</span>19.95</strong> /
 							User / Month<div class="payment-acc-type-txt">Enterprise</div></th>
 					</tr>
 					<tr>
@@ -109,17 +109,17 @@
 								<span class="payment-button payment-button-disabled">Start 30-Day Trial</span>
 							</c:when>
 							<c:otherwise>
-								<span class="payment-button" onclick="selectAccountType(1, '$9.95', ${skippayment});">Start 30-Day Trial</span>
+								<span class="payment-button" onclick="selectAccountType(1, '$29.95', ${skippayment});">Start 30-Day Trial</span>
 							</c:otherwise>
 							</c:choose>
 						</td>
 						<td>
 							<c:choose>
 							<c:when test="${ upgrade == 1 }">
-								<span class="payment-button" onclick="makePaidUpgrade(4, '$12.95')">Upgrade</span>
+								<span class="payment-button" onclick="makePaidUpgrade(4, '$19.95')">Upgrade</span>
 							</c:when>
 							<c:otherwise>
-								<span class="payment-button" onclick="selectAccountType(4, '$12.95', ${skippayment});">Start 30-Day Trial</span>
+								<span class="payment-button" onclick="selectAccountType(4, '$19.95', ${skippayment});">Start 30-Day Trial</span>
 							</c:otherwise>
 							</c:choose>
 						</td>
@@ -344,17 +344,17 @@
 								<span class="payment-button payment-button-disabled">Start 30-Day Trial</span>
 							</c:when>
 							<c:otherwise>
-								<span class="payment-button" onclick="selectAccountType(1, '$9.95', ${skippayment})">Start 30-Day Trial</span>
+								<span class="payment-button" onclick="selectAccountType(1, '$29.95', ${skippayment})">Start 30-Day Trial</span>
 							</c:otherwise>
 							</c:choose>
 						</td>
 						<td>
 							<c:choose>
 							<c:when test="${ upgrade == 1 }">
-								<span class="payment-button" onclick="makePaidUpgrade(4, '$12.95')">Upgrade</span>
+								<span class="payment-button" onclick="makePaidUpgrade(4, '$19.95')">Upgrade</span>
 							</c:when>
 							<c:otherwise>
-								<span class="payment-button" onclick="selectAccountType(4, '$12.95', ${skippayment})">Start 30-Day Trial</span>
+								<span class="payment-button" onclick="selectAccountType(4, '$19.95', ${skippayment})">Start 30-Day Trial</span>
 							</c:otherwise>
 							</c:choose>
 						</td>
