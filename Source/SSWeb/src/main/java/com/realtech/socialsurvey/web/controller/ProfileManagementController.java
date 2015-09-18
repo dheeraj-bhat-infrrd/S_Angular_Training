@@ -732,6 +732,7 @@ public class ProfileManagementController {
 						.updateVertical(
 								MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION,
 								companySettings, vertical);
+				userSettings.setCompanySettings(companySettings);
 			}
 
 			if (entityType.equals(CommonConstants.COMPANY_ID_COLUMN)) {
