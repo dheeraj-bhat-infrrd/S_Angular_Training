@@ -6,24 +6,12 @@
 
 <c:if test="${not empty incompleteSurveys}">
 	<c:forEach var="survey" items="${incompleteSurveys}">
-		<c:choose>
-			<c:when test="${not empty survey.customerLastName}">
-				<c:set value="${survey.customerFirstName} ${survey.customerLastName}" var="customerName"></c:set>
-			</c:when>
-			<c:otherwise>
-				<c:set value="${survey.customerFirstName}" var="customerName"></c:set>
-			</c:otherwise>
-		</c:choose>
-		<c:set var="customerNameParts" value="${fn:split(customerName, ' ')}"></c:set>
 		<div class="dash-lp-item clearfix" data-sur-iden="${survey.surveyPreIntitiationId}" 
 			data-iden="sur-pre-${survey.surveyPreIntitiationId}">
 			<div class="float-left sur-icn-checkbox sb-q-chk-no"></div>
 			<div class="float-left dash-lp-txt">
 				<div><spring:message code="label.customername.key"/>
-				 <span class="text-capitalize">- ${customerNameParts[0]} 
-				 <c:if test="${fn:length(customerNameParts) > 1}">
-				 	${fn:substring(customerNameParts[1], 0, 1)}
-				 </c:if>
+				 <span class="text-capitalize">- ${survey.customerFirstName} ${survey.customerLastName}
 				 </span>
 				 </div>
 				<div><spring:message code="label.custemail.key"/> - ${survey.customerEmailId}</div>
