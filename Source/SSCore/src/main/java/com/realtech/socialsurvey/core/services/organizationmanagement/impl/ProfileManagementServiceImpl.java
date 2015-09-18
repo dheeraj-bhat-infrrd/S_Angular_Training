@@ -2891,8 +2891,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
                 }
             }
         }
-        return settingsManager.getClosestSettingLevel( String.valueOf( currentSetAggregateValue ),
-            String.valueOf( currentLockAggregateValue ) );
+        return closestSettings;
 
     }
 
