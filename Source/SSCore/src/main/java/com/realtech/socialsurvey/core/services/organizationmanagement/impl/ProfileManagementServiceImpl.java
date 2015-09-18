@@ -2754,20 +2754,16 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
             companyPositions, agentSettings );
     }
 
-
     @Override
     @Transactional
-    public Map<SettingsForApplication, OrganizationUnit> getPrimaryHierarchyByEntity( String entityType, long entityId )
-        throws InvalidInputException, InvalidSettingsStateException
-    {
-        LOG.info( "Inside method getPrimaryHeirarchyByEntity for entity " + entityType );
-        Map<String, Long> hierarchyMap = new HashMap<String, Long>();
+    public Map<String, Long> getHierarchyDetailsByEntity( String entityType, long entityId ) throws InvalidInputException{
+    	Map<String, Long> hierarchyDetials = new HashMap<String, Long>();
+    	Map<String, Long> hierarchyMap = new HashMap<String, Long>();
         long companyId = 0;
         long regionId = 0;
         long branchId = 0;
-        boolean logoLocked = true;
-        boolean webAddressLocked = true;
-        boolean phoneNumberLocked = true;
+        long agentId = 0;
+        
         if ( entityType.equalsIgnoreCase( CommonConstants.COMPANY_ID ) ) {
             companyId = entityId;
         } else if ( entityType.equalsIgnoreCase( CommonConstants.REGION_ID ) ) {
@@ -2792,13 +2788,33 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
             branchId = entityId;
         } else if ( entityType.equalsIgnoreCase( CommonConstants.AGENT_ID ) ) {
             hierarchyMap = userManagementService.getPrimaryUserProfileByAgentId( entityId );
+            agentId = entityId;
             companyId = hierarchyMap.get( CommonConstants.COMPANY_ID_COLUMN );
             regionId = hierarchyMap.get( CommonConstants.REGION_ID_COLUMN );
             branchId = hierarchyMap.get( CommonConstants.BRANCH_ID_COLUMN );
         } else {
             throw new InvalidInputException( "Entity Type Is Invalid " );
         }
-
+        hierarchyDetials.put(CommonConstants.COMPANY_ID_COLUMN, companyId);
+        hierarchyDetials.put(CommonConstants.REGION_ID_COLUMN, regionId);
+        hierarchyDetials.put(CommonConstants.BRANCH_ID_COLUMN, branchId);
+        hierarchyDetials.put(CommonConstants.AGENT_ID_COLUMN, agentId);
+        return hierarchyDetials;
+    }
+    
+    @Override
+    @Transactional
+    public Map<SettingsForApplication, OrganizationUnit> getPrimaryHierarchyByEntity( String entityType, long entityId )
+        throws InvalidInputException, InvalidSettingsStateException
+    {
+        boolean logoLocked = true;
+        boolean webAddressLocked = true;
+        boolean phoneNumberLocked = true;
+        LOG.info( "Inside method getPrimaryHeirarchyByEntity for entity " + entityType );
+        Map<String, Long> hierarchyDetails = getHierarchyDetailsByEntity(entityType, entityId);
+        long companyId = hierarchyDetails.get(CommonConstants.COMPANY_ID_COLUMN);
+        long regionId = hierarchyDetails.get(CommonConstants.REGION_ID_COLUMN);
+        long branchId = hierarchyDetails.get(CommonConstants.BRANCH_ID_COLUMN);
         List<SettingsDetails> settingsDetailsList = settingsManager
             .getScoreForCompleteHeirarchy( companyId, branchId, regionId );
 
@@ -2837,6 +2853,9 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
             }
         }
         AgentSettings unitSettings = userManagementService.getAgentSettingsForUserProfiles( entityId );
+        if(unitSettings == null){
+        	LOG.error("unit settings is null");
+        }
         Map<SettingsForApplication, OrganizationUnit> closestSettings = settingsManager.getClosestSettingLevel(
             String.valueOf( currentSetAggregateValue ), String.valueOf( currentLockAggregateValue ) );
         if ( !logoLocked ) {
