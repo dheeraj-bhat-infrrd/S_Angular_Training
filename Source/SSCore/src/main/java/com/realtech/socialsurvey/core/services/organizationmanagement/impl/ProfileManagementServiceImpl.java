@@ -2751,16 +2751,18 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
             companyPositions, agentSettings );
     }
 
+
     @Override
     @Transactional
-    public Map<String, Long> getHierarchyDetailsByEntity( String entityType, long entityId ) throws InvalidInputException{
-    	Map<String, Long> hierarchyDetials = new HashMap<String, Long>();
-    	Map<String, Long> hierarchyMap = new HashMap<String, Long>();
+    public Map<String, Long> getHierarchyDetailsByEntity( String entityType, long entityId ) throws InvalidInputException
+    {
+        Map<String, Long> hierarchyDetials = new HashMap<String, Long>();
+        Map<String, Long> hierarchyMap = new HashMap<String, Long>();
         long companyId = 0;
         long regionId = 0;
         long branchId = 0;
         long agentId = 0;
-        
+
         if ( entityType.equalsIgnoreCase( CommonConstants.COMPANY_ID ) ) {
             companyId = entityId;
         } else if ( entityType.equalsIgnoreCase( CommonConstants.REGION_ID ) ) {
@@ -2792,13 +2794,14 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
         } else {
             throw new InvalidInputException( "Entity Type Is Invalid " );
         }
-        hierarchyDetials.put(CommonConstants.COMPANY_ID_COLUMN, companyId);
-        hierarchyDetials.put(CommonConstants.REGION_ID_COLUMN, regionId);
-        hierarchyDetials.put(CommonConstants.BRANCH_ID_COLUMN, branchId);
-        hierarchyDetials.put(CommonConstants.AGENT_ID_COLUMN, agentId);
+        hierarchyDetials.put( CommonConstants.COMPANY_ID_COLUMN, companyId );
+        hierarchyDetials.put( CommonConstants.REGION_ID_COLUMN, regionId );
+        hierarchyDetials.put( CommonConstants.BRANCH_ID_COLUMN, branchId );
+        hierarchyDetials.put( CommonConstants.AGENT_ID_COLUMN, agentId );
         return hierarchyDetials;
     }
-    
+
+
     @Override
     @Transactional
     public Map<SettingsForApplication, OrganizationUnit> getPrimaryHierarchyByEntity( String entityType, long entityId )
@@ -2807,11 +2810,12 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
         boolean logoLocked = true;
         boolean webAddressLocked = true;
         boolean phoneNumberLocked = true;
+        AgentSettings unitSettings = null;
         LOG.info( "Inside method getPrimaryHeirarchyByEntity for entity " + entityType );
-        Map<String, Long> hierarchyDetails = getHierarchyDetailsByEntity(entityType, entityId);
-        long companyId = hierarchyDetails.get(CommonConstants.COMPANY_ID_COLUMN);
-        long regionId = hierarchyDetails.get(CommonConstants.REGION_ID_COLUMN);
-        long branchId = hierarchyDetails.get(CommonConstants.BRANCH_ID_COLUMN);
+        Map<String, Long> hierarchyDetails = getHierarchyDetailsByEntity( entityType, entityId );
+        long companyId = hierarchyDetails.get( CommonConstants.COMPANY_ID_COLUMN );
+        long regionId = hierarchyDetails.get( CommonConstants.REGION_ID_COLUMN );
+        long branchId = hierarchyDetails.get( CommonConstants.BRANCH_ID_COLUMN );
         List<SettingsDetails> settingsDetailsList = settingsManager
             .getScoreForCompleteHeirarchy( companyId, branchId, regionId );
 
@@ -2819,63 +2823,70 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
         Map<String, Long> totalScore = settingsManager.calculateSettingsScore( settingsDetailsList );
         long currentLockAggregateValue = totalScore.get( CommonConstants.LOCK_SCORE );
         long currentSetAggregateValue = totalScore.get( CommonConstants.SETTING_SCORE );
-        if ( !settingsLocker.isSettingsValueLocked( OrganizationUnit.COMPANY, currentLockAggregateValue,
-            SettingsForApplication.LOGO ) ) {
-            if ( !settingsLocker.isSettingsValueLocked( OrganizationUnit.REGION, currentLockAggregateValue,
+
+        if ( entityType.equalsIgnoreCase( CommonConstants.AGENT_ID ) ) {
+            if ( !settingsLocker.isSettingsValueLocked( OrganizationUnit.COMPANY, currentLockAggregateValue,
                 SettingsForApplication.LOGO ) ) {
-                if ( !settingsLocker.isSettingsValueLocked( OrganizationUnit.BRANCH, currentLockAggregateValue,
+                if ( !settingsLocker.isSettingsValueLocked( OrganizationUnit.REGION, currentLockAggregateValue,
                     SettingsForApplication.LOGO ) ) {
-                    logoLocked = false;
-                }
-            }
-        }
-        if ( !settingsLocker.isSettingsValueLocked( OrganizationUnit.COMPANY, currentLockAggregateValue,
-            SettingsForApplication.PHONE ) ) {
-            if ( !settingsLocker.isSettingsValueLocked( OrganizationUnit.REGION, currentLockAggregateValue,
-                SettingsForApplication.PHONE ) ) {
-                if ( !settingsLocker.isSettingsValueLocked( OrganizationUnit.BRANCH, currentLockAggregateValue,
-                    SettingsForApplication.PHONE ) ) {
-                    webAddressLocked = false;
-                }
-            }
-        }
-        if ( !settingsLocker.isSettingsValueLocked( OrganizationUnit.COMPANY, currentLockAggregateValue,
-            SettingsForApplication.WEB_ADDRESS_WORK ) ) {
-            if ( !settingsLocker.isSettingsValueLocked( OrganizationUnit.REGION, currentLockAggregateValue,
-                SettingsForApplication.WEB_ADDRESS_WORK ) ) {
-                if ( !settingsLocker.isSettingsValueLocked( OrganizationUnit.BRANCH, currentLockAggregateValue,
-                    SettingsForApplication.WEB_ADDRESS_WORK ) ) {
-                    phoneNumberLocked = false;
-                }
-            }
-        }
-        AgentSettings unitSettings = userManagementService.getAgentSettingsForUserProfiles( entityId );
-        if(unitSettings == null){
-        	LOG.error("unit settings is null");
-        }
-        Map<SettingsForApplication, OrganizationUnit> closestSettings = settingsManager.getClosestSettingLevel(
-            String.valueOf( currentSetAggregateValue ), String.valueOf( currentLockAggregateValue ) );
-        if ( !logoLocked ) {
-            if ( unitSettings.getLogo() != null ) {
-                closestSettings.put( SettingsForApplication.LOGO, OrganizationUnit.AGENT );
-            }
-        }
-        if ( !webAddressLocked ) {
-            if ( unitSettings.getContact_details() != null ) {
-                if ( unitSettings.getContact_details().getWeb_addresses() != null ) {
-                    if ( unitSettings.getContact_details().getWeb_addresses().getWork() != null
-                        || !unitSettings.getContact_details().getWeb_addresses().getWork().isEmpty() ) {
-                        closestSettings.put( SettingsForApplication.WEB_ADDRESS_WORK, OrganizationUnit.AGENT );
+                    if ( !settingsLocker.isSettingsValueLocked( OrganizationUnit.BRANCH, currentLockAggregateValue,
+                        SettingsForApplication.LOGO ) ) {
+                        logoLocked = false;
                     }
                 }
             }
+            if ( !settingsLocker.isSettingsValueLocked( OrganizationUnit.COMPANY, currentLockAggregateValue,
+                SettingsForApplication.PHONE ) ) {
+                if ( !settingsLocker.isSettingsValueLocked( OrganizationUnit.REGION, currentLockAggregateValue,
+                    SettingsForApplication.PHONE ) ) {
+                    if ( !settingsLocker.isSettingsValueLocked( OrganizationUnit.BRANCH, currentLockAggregateValue,
+                        SettingsForApplication.PHONE ) ) {
+                        webAddressLocked = false;
+                    }
+                }
+            }
+            if ( !settingsLocker.isSettingsValueLocked( OrganizationUnit.COMPANY, currentLockAggregateValue,
+                SettingsForApplication.WEB_ADDRESS_WORK ) ) {
+                if ( !settingsLocker.isSettingsValueLocked( OrganizationUnit.REGION, currentLockAggregateValue,
+                    SettingsForApplication.WEB_ADDRESS_WORK ) ) {
+                    if ( !settingsLocker.isSettingsValueLocked( OrganizationUnit.BRANCH, currentLockAggregateValue,
+                        SettingsForApplication.WEB_ADDRESS_WORK ) ) {
+                        phoneNumberLocked = false;
+                    }
+                }
+            }
+            unitSettings = userManagementService.getAgentSettingsForUserProfiles( entityId );
+            if ( unitSettings == null ) {
+                LOG.error( "unit settings is null" );
+            }
         }
-        if ( !phoneNumberLocked ) {
-            if ( unitSettings.getContact_details() != null ) {
-                if ( unitSettings.getContact_details().getContact_numbers() != null ) {
-                    if ( unitSettings.getContact_details().getContact_numbers().getWork() != null
-                        || !unitSettings.getContact_details().getContact_numbers().getWork().isEmpty() ) {
-                        closestSettings.put( SettingsForApplication.PHONE, OrganizationUnit.AGENT );
+        Map<SettingsForApplication, OrganizationUnit> closestSettings = settingsManager.getClosestSettingLevel(
+            String.valueOf( currentSetAggregateValue ), String.valueOf( currentLockAggregateValue ) );
+        if ( entityType.equalsIgnoreCase( CommonConstants.AGENT_ID ) ) {
+            if ( unitSettings != null ) {
+                if ( !logoLocked ) {
+                    if ( unitSettings.getLogo() != null ) {
+                        closestSettings.put( SettingsForApplication.LOGO, OrganizationUnit.AGENT );
+                    }
+                }
+                if ( !webAddressLocked ) {
+                    if ( unitSettings.getContact_details() != null ) {
+                        if ( unitSettings.getContact_details().getWeb_addresses() != null ) {
+                            if ( unitSettings.getContact_details().getWeb_addresses().getWork() != null
+                                || !unitSettings.getContact_details().getWeb_addresses().getWork().isEmpty() ) {
+                                closestSettings.put( SettingsForApplication.WEB_ADDRESS_WORK, OrganizationUnit.AGENT );
+                            }
+                        }
+                    }
+                }
+                if ( !phoneNumberLocked ) {
+                    if ( unitSettings.getContact_details() != null ) {
+                        if ( unitSettings.getContact_details().getContact_numbers() != null ) {
+                            if ( unitSettings.getContact_details().getContact_numbers().getWork() != null
+                                || !unitSettings.getContact_details().getContact_numbers().getWork().isEmpty() ) {
+                                closestSettings.put( SettingsForApplication.PHONE, OrganizationUnit.AGENT );
+                            }
+                        }
                     }
                 }
             }
