@@ -276,6 +276,7 @@ function retakeSurveyReminderMail(element) {
 		showToast();
 		$('#overlay-cancel').click();
 		$(element).parent().parent().parent().parent().remove();
+		getIncompleteSurveyCount(colName, colValue);
 	}, payload, true);
 }
 
