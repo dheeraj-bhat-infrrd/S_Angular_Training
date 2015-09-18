@@ -141,7 +141,7 @@
 						</select>
 						<input id="dsh-start-date" class="dsh-date-picker" placeholder="<spring:message code="label.startdate.key" />">
 						<span>-</span>
-						<input id="dsh-start-date" class="dsh-date-picker" placeholder="<spring:message code="label.enddate.key" />">
+						<input id="dsh-end-date" class="dsh-date-picker" placeholder="<spring:message code="label.enddate.key" />">
 						<div id="dsh-dwnld-report-btn" class="dash-down-go-button float-right cursor-pointer">
 							<spring:message code="label.downloadsurveydata.key.click" />
 						</div>

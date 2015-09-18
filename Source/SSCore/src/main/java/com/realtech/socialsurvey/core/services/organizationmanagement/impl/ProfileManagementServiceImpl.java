@@ -2314,8 +2314,6 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
         List<BreadCrumb> breadCrumbList = new ArrayList<>();
 
         Region region = regionDao.findById( Region.class, regionProfile.getIden() );
-        updateCrumbListWithRegionName( breadCrumbList, region );
-
         Company company = region.getCompany();
         updateCrumbListWithCompanyName( breadCrumbList, company );
         updateCrumbListWithVerticalName( breadCrumbList, company );
@@ -2335,7 +2333,6 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
         List<BreadCrumb> breadCrumbList = new ArrayList<>();
 
         Branch branch = branchDao.findById( Branch.class, branchProfile.getIden() );
-        updateCrumbListWithBranchName( breadCrumbList, branch );
 
         Region region = branch.getRegion();
         updateCrumbListWithRegionName( breadCrumbList, region );
