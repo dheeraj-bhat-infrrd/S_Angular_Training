@@ -213,7 +213,7 @@ public class Company implements Serializable {
 		String billingModeStr = "";
 
 		if (this.billingMode.equals("A")) {
-			billingModeStr = "Auto Dedit";
+			billingModeStr = "Auto Debit";
 		}
 		else if (this.billingMode.equals("I")) {
 			billingModeStr = "Invoice";
