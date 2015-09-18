@@ -241,8 +241,8 @@ $(document).on('click', '.restart-survey-mail-txt', function(e) {
 function confirmRetakeSurveyReminderMail(element) {
 	
 	
-		$('#overlay-header').html("Resend survey");
-		$('#overlay-text').html("Are you sure you want to delete this survey and send a request to the customer to retake their survey?");
+		$('#overlay-header').html("Retake survey");
+		$('#overlay-text').html("This action will erase all the previous data of this survey and survey will be reset.");
 		$('#overlay-continue').html("Yes");
 		$('#overlay-cancel').html("No");
 		$('#overlay-continue').off();
@@ -271,10 +271,13 @@ function retakeSurveyReminderMail(element) {
 			"lastName" : lastName,
 			"agentName" : agentName
 	};
-	callAjaxGetWithPayloadData('./restartsurvey.do', '', payload, true);
-	$('#overlay-toast').html('Mail sent to '+firstName +' '+' to retake the survey for you.');
-	showToast();
-	$('#overlay-cancel').click();
+	callAjaxGetWithPayloadData('./restartsurvey.do', function() {
+		$('#overlay-toast').html('Mail sent to '+firstName +' '+' to retake the survey for you.');
+		showToast();
+		$('#overlay-cancel').click();
+		$(element).parent().parent().parent().parent().remove();
+		getIncompleteSurveyCount(colName, colValue);
+	}, payload, true);
 }
 
 $(document).on('click', '.report-abuse-txt', function(e) {
@@ -7698,6 +7701,9 @@ function getIncompleteSurveyCount(colName, colValue){
 		
 		//Show dashboard incomplete reviews
 		showIncompleteSurvey(colName, colValue);
+		$('#dsh-inc-srvey').perfectScrollbar({
+			suppressScrollX : true
+		});
 		$('#dsh-inc-srvey').perfectScrollbar('update');
 		
 	}, payload, true);
@@ -8179,8 +8185,7 @@ function updatePositions() {
 	if(positions.length > 0) {
 		positions = JSON.stringify(positions);
 	} else {
-		return false;
-		$('#overlay-toast').html("Add positions");
+		$('#overlay-toast').html("No positions added.");
 		showToast();
 	}
 	
