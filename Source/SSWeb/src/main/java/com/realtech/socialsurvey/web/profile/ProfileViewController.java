@@ -32,7 +32,6 @@ import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.dao.impl.MongoOrganizationUnitSettingDaoImpl;
 import com.realtech.socialsurvey.core.entities.AgentSettings;
 import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
-import com.realtech.socialsurvey.core.entities.SocialMediaTokens;
 import com.realtech.socialsurvey.core.entities.SocialPost;
 import com.realtech.socialsurvey.core.entities.SurveyDetails;
 import com.realtech.socialsurvey.core.entities.User;
@@ -508,7 +507,7 @@ public class ProfileViewController
                 Map<String, Long> hierarchyMap = profileManagementService.getPrimaryHierarchyByAgentProfile( individualProfile );
                 if ( hierarchyMap == null ) {
                     LOG.error( "Unable to fetch primary profile for this user " );
-                    throw new FatalException( "Unable to fetch primary profile this user " + individualProfile.getIden() );
+                    throw new FatalException( "Unable to fetch primary profile for this user " + individualProfile.getIden() );
                 }
                 companyId = hierarchyMap.get( CommonConstants.COMPANY_ID_COLUMN );
                 regionId = hierarchyMap.get( CommonConstants.REGION_ID_COLUMN );

@@ -6,16 +6,16 @@
 <!-- Setting common page variables -->
 <c:set value="${sessionScope.SPRING_SECURITY_CONTEXT.authentication.principal}" var="user" />
 <c:set value="${user.company.licenseDetails[0].accountsMaster.accountsMasterId}" var="accountMasterId"/>
-<c:if test="${not empty profile.completeProfileUrl}">
-	<c:set value="${profile.completeProfileUrl}" var="completeProfileUrl"></c:set>
+<c:if test="${not empty profileSettings.completeProfileUrl}">
+	<c:set value="${profileSettings.completeProfileUrl}" var="completeProfileUrl"></c:set>
 </c:if>
-<c:if test="${not empty profile && not empty profile.contact_details}">
-	<c:set value="${profile.lockSettings}" var="lock"></c:set>
-	<c:set value="${profile.logo}" var="profilelogo"></c:set>
-	<c:set value="${profile.profileImageUrl}" var="profileimage"></c:set>
-	<c:set value="${profile.contact_details}" var="contactdetail"></c:set>
-	<c:set value="${profile.socialMediaTokens}" var="socialMediaTokens"></c:set>
-	<c:set value="${profile.disclaimer}" var="disclaimer"></c:set>
+<c:if test="${not empty profileSettings && not empty profileSettings.contact_details}">
+	<c:set value="${profileSettings.lockSettings}" var="lock"></c:set>
+	<c:set value="${profileSettings.logo}" var="profilelogo"></c:set>
+	<c:set value="${profileSettings.profileImageUrl}" var="profileimage"></c:set>
+	<c:set value="${profileSettings.contact_details}" var="contactdetail"></c:set>
+	<c:set value="${profileSettings.socialMediaTokens}" var="socialMediaTokens"></c:set>
+	<c:set value="${profileSettings.disclaimer}" var="disclaimer"></c:set>
 </c:if>
 <c:if test="${not empty contactdetail}">
 	<c:set value="${contactdetail.mail_ids}" var="mailIds"></c:set>
@@ -49,23 +49,23 @@
 
 <!-- Setting agent page variables -->
 <c:if test="${profilemasterid == 4}">
-	<c:if test="${not empty profile && not empty profile.licenses}">
-		<c:set value="${profile.licenses.authorized_in}" var="authorisedInList"></c:set>
+	<c:if test="${not empty profileSettings && not empty profileSettings.licenses}">
+		<c:set value="${profileSettings.licenses.authorized_in}" var="authorisedInList"></c:set>
 	</c:if>
-	<c:if test="${not empty profile && not empty profile.positions}">
-		<c:set value="${profile.positions}" var="positions"></c:set>
+	<c:if test="${not empty profileSettings && not empty profileSettings.positions}">
+		<c:set value="${profileSettings.positions}" var="positions"></c:set>
 	</c:if>
-	<c:if test="${not empty profile && not empty profile.associations}">
-		<c:set value="${profile.associations}" var="associations"></c:set>
+	<c:if test="${not empty profileSettings && not empty profileSettings.associations}">
+		<c:set value="${profileSettings.associations}" var="associations"></c:set>
 	</c:if>
-	<c:if test="${not empty profile && not empty profile.expertise}">
-		<c:set value="${profile.expertise}" var="expertiseList"></c:set>
+	<c:if test="${not empty profileSettings && not empty profileSettings.expertise}">
+		<c:set value="${profileSettings.expertise}" var="expertiseList"></c:set>
 	</c:if>
-	<c:if test="${not empty profile && not empty profile.achievements}">
-		<c:set value="${profile.achievements}" var="achievements"></c:set>
+	<c:if test="${not empty profileSettings && not empty profileSettings.achievements}">
+		<c:set value="${profileSettings.achievements}" var="achievements"></c:set>
 	</c:if>
-	<c:if test="${not empty profile && not empty profile.hobbies}">
-		<c:set value="${profile.hobbies}" var="hobbies"></c:set>
+	<c:if test="${not empty profileSettings && not empty profileSettings.hobbies}">
+		<c:set value="${profileSettings.hobbies}" var="hobbies"></c:set>
 	</c:if>
 </c:if>
 
@@ -75,7 +75,7 @@
 		<c:choose>
 			<c:when test="${profilemasterid == 1}">
 				<input type="hidden" id="prof-company-id" value="${entityId}">
-				<input type="hidden" id="company-profile-name" value="${profile.profileName}">
+				<input type="hidden" id="company-profile-name" value="${profileSettings.profileName}">
 			</c:when>
 			<c:when test="${profilemasterid == 2}">
 				<input type="hidden" id="prof-region-id" value="${entityId}">
@@ -87,8 +87,8 @@
 				<input type="hidden" id="prof-agent-id" value="${entityId}">
 			</c:when>
 		</c:choose>
-		<input type="hidden" id="profile-id" value="${profile.iden}"/>
-		<input type="hidden" id="profile-min-post-score" value="${profile.survey_settings.show_survey_above_score}"/>
+		<input type="hidden" id="profile-id" value="${profileSettings.iden}"/>
+		<input type="hidden" id="profile-min-post-score" value="${profileSettings.survey_settings.show_survey_above_score}"/>
 	</div>
 	
 	<div class="container">

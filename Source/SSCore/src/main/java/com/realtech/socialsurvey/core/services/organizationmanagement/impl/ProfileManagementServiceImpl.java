@@ -104,6 +104,7 @@ import com.realtech.socialsurvey.core.services.organizationmanagement.UserManage
 import com.realtech.socialsurvey.core.services.search.SolrSearchService;
 import com.realtech.socialsurvey.core.services.search.exception.SolrException;
 import com.realtech.socialsurvey.core.services.settingsmanagement.SettingsManager;
+import com.realtech.socialsurvey.core.services.settingsmanagement.SettingsLocker;
 import com.realtech.socialsurvey.core.services.settingsmanagement.impl.InvalidSettingsStateException;
 import com.realtech.socialsurvey.core.services.social.SocialManagementService;
 import com.realtech.socialsurvey.core.services.surveybuilder.SurveyHandler;
@@ -172,6 +173,9 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 
     @Autowired
     private SettingsManager settingsManager;
+
+    @Autowired
+    private SettingsLocker settingsLocker;
 
     @Autowired
     private UrlValidationHelper urlValidationHelper;
@@ -2759,6 +2763,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
         long regionId = 0;
         long branchId = 0;
         long agentId = 0;
+        
         if ( entityType.equalsIgnoreCase( CommonConstants.COMPANY_ID ) ) {
             companyId = entityId;
         } else if ( entityType.equalsIgnoreCase( CommonConstants.REGION_ID ) ) {
@@ -2802,6 +2807,9 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
     public Map<SettingsForApplication, OrganizationUnit> getPrimaryHierarchyByEntity( String entityType, long entityId )
         throws InvalidInputException, InvalidSettingsStateException
     {
+        boolean logoLocked = true;
+        boolean webAddressLocked = true;
+        boolean phoneNumberLocked = true;
         LOG.info( "Inside method getPrimaryHeirarchyByEntity for entity " + entityType );
         Map<String, Long> hierarchyDetails = getHierarchyDetailsByEntity(entityType, entityId);
         long companyId = hierarchyDetails.get(CommonConstants.COMPANY_ID_COLUMN);
@@ -2814,6 +2822,67 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
         Map<String, Long> totalScore = settingsManager.calculateSettingsScore( settingsDetailsList );
         long currentLockAggregateValue = totalScore.get( CommonConstants.LOCK_SCORE );
         long currentSetAggregateValue = totalScore.get( CommonConstants.SETTING_SCORE );
+        if ( !settingsLocker.isSettingsValueLocked( OrganizationUnit.COMPANY, currentLockAggregateValue,
+            SettingsForApplication.LOGO ) ) {
+            if ( !settingsLocker.isSettingsValueLocked( OrganizationUnit.REGION, currentLockAggregateValue,
+                SettingsForApplication.LOGO ) ) {
+                if ( !settingsLocker.isSettingsValueLocked( OrganizationUnit.BRANCH, currentLockAggregateValue,
+                    SettingsForApplication.LOGO ) ) {
+                    logoLocked = false;
+                }
+            }
+        }
+        if ( !settingsLocker.isSettingsValueLocked( OrganizationUnit.COMPANY, currentLockAggregateValue,
+            SettingsForApplication.PHONE ) ) {
+            if ( !settingsLocker.isSettingsValueLocked( OrganizationUnit.REGION, currentLockAggregateValue,
+                SettingsForApplication.PHONE ) ) {
+                if ( !settingsLocker.isSettingsValueLocked( OrganizationUnit.BRANCH, currentLockAggregateValue,
+                    SettingsForApplication.PHONE ) ) {
+                    webAddressLocked = false;
+                }
+            }
+        }
+        if ( !settingsLocker.isSettingsValueLocked( OrganizationUnit.COMPANY, currentLockAggregateValue,
+            SettingsForApplication.WEB_ADDRESS_WORK ) ) {
+            if ( !settingsLocker.isSettingsValueLocked( OrganizationUnit.REGION, currentLockAggregateValue,
+                SettingsForApplication.WEB_ADDRESS_WORK ) ) {
+                if ( !settingsLocker.isSettingsValueLocked( OrganizationUnit.BRANCH, currentLockAggregateValue,
+                    SettingsForApplication.WEB_ADDRESS_WORK ) ) {
+                    phoneNumberLocked = false;
+                }
+            }
+        }
+        AgentSettings unitSettings = userManagementService.getAgentSettingsForUserProfiles( entityId );
+        if(unitSettings == null){
+        	LOG.error("unit settings is null");
+        }
+        Map<SettingsForApplication, OrganizationUnit> closestSettings = settingsManager.getClosestSettingLevel(
+            String.valueOf( currentSetAggregateValue ), String.valueOf( currentLockAggregateValue ) );
+        if ( !logoLocked ) {
+            if ( unitSettings.getLogo() != null ) {
+                closestSettings.put( SettingsForApplication.LOGO, OrganizationUnit.AGENT );
+            }
+        }
+        if ( !webAddressLocked ) {
+            if ( unitSettings.getContact_details() != null ) {
+                if ( unitSettings.getContact_details().getWeb_addresses() != null ) {
+                    if ( unitSettings.getContact_details().getWeb_addresses().getWork() != null
+                        || !unitSettings.getContact_details().getWeb_addresses().getWork().isEmpty() ) {
+                        closestSettings.put( SettingsForApplication.WEB_ADDRESS_WORK, OrganizationUnit.AGENT );
+                    }
+                }
+            }
+        }
+        if ( !phoneNumberLocked ) {
+            if ( unitSettings.getContact_details() != null ) {
+                if ( unitSettings.getContact_details().getContact_numbers() != null ) {
+                    if ( unitSettings.getContact_details().getContact_numbers().getWork() != null
+                        || !unitSettings.getContact_details().getContact_numbers().getWork().isEmpty() ) {
+                        closestSettings.put( SettingsForApplication.PHONE, OrganizationUnit.AGENT );
+                    }
+                }
+            }
+        }
         return settingsManager.getClosestSettingLevel( String.valueOf( currentSetAggregateValue ),
             String.valueOf( currentLockAggregateValue ) );
 
