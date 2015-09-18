@@ -64,6 +64,7 @@ import com.realtech.socialsurvey.core.entities.ProListUser;
 import com.realtech.socialsurvey.core.entities.ProfileStage;
 import com.realtech.socialsurvey.core.entities.RealtorToken;
 import com.realtech.socialsurvey.core.entities.Region;
+import com.realtech.socialsurvey.core.entities.SettingsDetails;
 import com.realtech.socialsurvey.core.entities.SocialMediaTokens;
 import com.realtech.socialsurvey.core.entities.SocialPost;
 import com.realtech.socialsurvey.core.entities.SurveyDetails;
@@ -96,6 +97,7 @@ import com.realtech.socialsurvey.core.services.organizationmanagement.UserManage
 import com.realtech.socialsurvey.core.services.search.SolrSearchService;
 import com.realtech.socialsurvey.core.services.search.exception.SolrException;
 import com.realtech.socialsurvey.core.services.settingsmanagement.SettingsLocker;
+import com.realtech.socialsurvey.core.services.settingsmanagement.SettingsManager;
 import com.realtech.socialsurvey.core.services.settingsmanagement.SettingsSetter;
 import com.realtech.socialsurvey.core.services.settingsmanagement.impl.InvalidSettingsStateException;
 import com.realtech.socialsurvey.core.services.social.SocialManagementService;
@@ -170,6 +172,9 @@ public class ProfileManagementController
 
     @Autowired
     private SettingsLocker settingsLocker;
+    
+    @Autowired
+    private SettingsManager settingsManager;
 
 
     @Transactional
@@ -204,6 +209,8 @@ public class ProfileManagementController
     	long regionId = 0;
     	long companyId = 0;
     	long agentId = 0;
+    	List<SettingsDetails> settingsDetailsList = null;
+    	OrganizationUnitSettings profileSettings = null;
     	Map<SettingsForApplication, OrganizationUnit> map = null;
     	//Get the hierarchy details associated with the current profile
     	try {
@@ -216,6 +223,8 @@ public class ProfileManagementController
     		regionId = hierarchyDetails.get(CommonConstants.REGION_ID_COLUMN);
     		companyId = hierarchyDetails.get(CommonConstants.COMPANY_ID_COLUMN);
     		agentId = hierarchyDetails.get(CommonConstants.AGENT_ID_COLUMN);
+    		settingsDetailsList = settingsManager
+                    .getScoreForCompleteHeirarchy( companyId, branchId, regionId );
     		LOG.debug("Company ID : " + companyId + " Region ID : " + regionId + " Branch ID : " + branchId + " Agent ID : " + agentId);
     	} catch (InvalidInputException e) {
     		LOG.error( "InvalidInputException while showing profile page. Reason :" + e.getMessage(), e );
@@ -246,7 +255,7 @@ public class ProfileManagementController
     					CommonConstants.ERROR_CODE_COMPANY_PROFILE_SERVICE_FAILURE, CommonConstants.SERVICE_CODE_COMPANY_PROFILE,
     					"Error occured while fetching company profile" ), e.getMessage() );
     		}
-    		model.addAttribute( "profile", companyProfile );
+    		profileSettings = companyProfile;
     		model.addAttribute( "companyProfileName", companyProfile.getProfileName() );
     		model.addAttribute( "profileLevel", CommonConstants.PROFILE_LEVEL_COMPANY );
     	} else if ( entityType.equals( CommonConstants.REGION_ID_COLUMN ) ) {
@@ -293,7 +302,7 @@ public class ProfileManagementController
     					CommonConstants.ERROR_CODE_REGION_PROFILE_SERVICE_FAILURE, CommonConstants.SERVICE_CODE_REGION_PROFILE,
     					"Error occured while fetching region profile" ), e.getMessage() );
     		}
-    		model.addAttribute( "profile", regionProfile );
+    		profileSettings = regionProfile;
     		model.addAttribute( "companyProfileName", companyProfile.getProfileName() );
     		model.addAttribute( "regionProfileName", regionProfile.getProfileName() );
     		model.addAttribute( "profileLevel", CommonConstants.PROFILE_LEVEL_REGION );
@@ -348,7 +357,7 @@ public class ProfileManagementController
     		} catch ( NoRecordsFetchedException e ) {
     			LOG.error( "NoRecordsFetchedException: message : " + e.getMessage(), e );
     		}
-    		model.addAttribute( "profile", branchProfile );
+    		profileSettings = branchProfile;
     		model.addAttribute( "companyProfileName", companyProfile.getProfileName() );
     		model.addAttribute( "branchProfileName", branchProfile.getProfileName() );
     		model.addAttribute( "profileLevel", CommonConstants.PROFILE_LEVEL_BRANCH ); 
@@ -402,7 +411,7 @@ public class ProfileManagementController
     					CommonConstants.MAX_RATING_SCORE, CommonConstants.PROFILE_LEVEL_INDIVIDUAL, false );
     			model.addAttribute( "reviewsCount", reviewsCount );
 
-    			model.addAttribute( "profile", individualProfile );
+    			profileSettings = individualProfile;
     		} catch ( InvalidInputException e ) {
     			LOG.error( "InvalidInputException: message : " + e.getMessage(), e );
     			model.addAttribute(
@@ -415,25 +424,11 @@ public class ProfileManagementController
     		}
 
     	}
-
-    	/*// Setting parentLock in session
-        LockSettings parentLock = fetchParentLockSettings( model, user, accountType, userSettings, branchId, regionId,
-            profilesMaster );
+    	model.addAttribute( "profileSettings", profileSettings );
+        session.setAttribute( CommonConstants.USER_PROFILE_SETTINGS, profileSettings );
+        
+        LockSettings parentLock = fetchParentLockSettings(model, settingsDetailsList);
         session.setAttribute( CommonConstants.PARENT_LOCK, parentLock );
-
-        // Setting userSettings in session
-        OrganizationUnitSettings profileSettings = fetchUserProfile( model, user, accountType, userSettings, branchId,
-            regionId, profilesMaster );
-        if ( entityType.equals( CommonConstants.AGENT_ID_COLUMN ) ) {
-            try {
-                profileManagementService.aggregateAgentDetails( user, profileSettings, parentLock );
-            } catch ( InvalidInputException | NoRecordsFetchedException e ) {
-                LOG.error( "InvalidInputException while updating profile. Reason :" + e.getMessage(), e );
-                model.addAttribute( "message",
-                    messageUtils.getDisplayMessage( e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE ) );
-            }
-        }
-        session.setAttribute( CommonConstants.USER_PROFILE_SETTINGS, profileSettings );*/
 
     	LOG.info( "Method showProfileEditPage() finished from ProfileManagementService" );
     	return JspResolver.PROFILE_EDIT;
@@ -485,20 +480,52 @@ public class ProfileManagementController
         return profile;
     }
 
-
-    private LockSettings fetchParentLockSettings( Model model, User user, AccountType accountType, UserSettings settings,
-        long branchId, long regionId, int profilesMaster )
+    //TODO: modify this method.
+    private LockSettings fetchParentLockSettings( Model model, List<SettingsDetails> settingsDetailsList )
     {
         LOG.debug( "Method fetchParentLockSettings() called from ProfileManagementService" );
-        LockSettings parentLock = null;
-        try {
-            parentLock = profileManagementService.aggregateParentLockSettings( user, accountType, settings, branchId, regionId,
-                profilesMaster );
-        } catch ( InvalidInputException | NoRecordsFetchedException e ) {
-            LOG.error( "InvalidInputException while fetching profile. Reason :" + e.getMessage(), e );
-            model
-                .addAttribute( "message", messageUtils.getDisplayMessage( e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE ) );
-        }
+        LockSettings parentLock = new LockSettings();
+        boolean logoLocked = true;
+        boolean webAddressLocked = true;
+        boolean phoneNumberLocked = true;
+        LOG.info( "Calculate lock and setting score " );
+		
+		Map<String, Long> totalScore = settingsManager.calculateSettingsScore( settingsDetailsList );
+		long currentLockAggregateValue = totalScore.get( CommonConstants.LOCK_SCORE );
+		long currentSetAggregateValue = totalScore.get( CommonConstants.SETTING_SCORE );
+		if ( !settingsLocker.isSettingsValueLocked( OrganizationUnit.COMPANY, currentLockAggregateValue,
+		    SettingsForApplication.LOGO ) ) {
+		    if ( !settingsLocker.isSettingsValueLocked( OrganizationUnit.REGION, currentLockAggregateValue,
+		        SettingsForApplication.LOGO ) ) {
+		        if ( !settingsLocker.isSettingsValueLocked( OrganizationUnit.BRANCH, currentLockAggregateValue,
+		            SettingsForApplication.LOGO ) ) {
+		            logoLocked = false;
+		        }
+		    }
+		}
+		if ( !settingsLocker.isSettingsValueLocked( OrganizationUnit.COMPANY, currentLockAggregateValue,
+		    SettingsForApplication.PHONE ) ) {
+		    if ( !settingsLocker.isSettingsValueLocked( OrganizationUnit.REGION, currentLockAggregateValue,
+		        SettingsForApplication.PHONE ) ) {
+		        if ( !settingsLocker.isSettingsValueLocked( OrganizationUnit.BRANCH, currentLockAggregateValue,
+		            SettingsForApplication.PHONE ) ) {
+		            webAddressLocked = false;
+		        }
+		    }
+		}
+		if ( !settingsLocker.isSettingsValueLocked( OrganizationUnit.COMPANY, currentLockAggregateValue,
+		    SettingsForApplication.WEB_ADDRESS_WORK ) ) {
+		    if ( !settingsLocker.isSettingsValueLocked( OrganizationUnit.REGION, currentLockAggregateValue,
+		        SettingsForApplication.WEB_ADDRESS_WORK ) ) {
+		        if ( !settingsLocker.isSettingsValueLocked( OrganizationUnit.BRANCH, currentLockAggregateValue,
+		            SettingsForApplication.WEB_ADDRESS_WORK ) ) {
+		            phoneNumberLocked = false;
+		        }
+		    }
+		}
+		parentLock.setLogoLocked(logoLocked);
+		parentLock.setWorkPhoneLocked(phoneNumberLocked);
+		parentLock.setWebAddressLocked(webAddressLocked);
         LOG.debug( "Method fetchParentLockSettings() finished from ProfileManagementService" );
         return parentLock;
     }
