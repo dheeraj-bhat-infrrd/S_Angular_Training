@@ -425,7 +425,7 @@
                   		 			<c:if test="${not empty profile.expertise }">
                		 					<div class="prof-left-row prof-left-auth bord-bot-dc">
                		 						<div class="left-auth-wrapper">
-               		 							<div class="left-panel-header lph-dd lph-dd-closed">Specialities</div>
+               		 							<div class="left-panel-header lph-dd lph-dd-closed">Specialties</div>
                		 							<div class="left-panel-content">
                 		 							<c:forEach items="${profile.expertise }" var="expertiseItem">
                 		 								<div class="lp-auth-row lp-row clearfix">${expertiseItem}</div>
