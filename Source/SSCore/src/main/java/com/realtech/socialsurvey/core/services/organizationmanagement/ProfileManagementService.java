@@ -583,4 +583,8 @@ public interface ProfileManagementService
      */
     void updateZillowFeed( OrganizationUnitSettings profile, String collection ) throws InvalidInputException;
 
+
+	Map<String, Long> getHierarchyDetailsByEntity(String entityType,
+			long entityId) throws InvalidInputException;
+
 }
