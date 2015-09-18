@@ -35,7 +35,6 @@ function fetchCompanyProfile() {
 	var result = profileJson;
 	paintProfilePage(result);
 	paintIndividualDetails(result);
-	paintAverageRatings();
 	fetchCompanyRegions();
 	fetchCompanyBranches();
 	fetchCompanyIndividuals();
@@ -240,11 +239,6 @@ function focusOnContact() {
 	      scrollTop: $('#prof-contact-hdr').offset().top
 	 }, 1000);
 	$('#prof-contact-form input:nth(0)').focus();		
-}
-
-function paintAverageRatings() {
-	var rating = $('input[name="averageRatings"]').val();
-	changeRatingPattern(rating, $("#rating-avg-comp"), true);
 }
 
 function fetchCompanyRegions() {
@@ -862,7 +856,6 @@ function fetchRegionProfile() {
 	var result = profileJson;
 	paintProfilePage(result);
 	paintIndividualDetails(result);
-	paintAverageRatings();
 	fetchBranchesForRegion(result.iden);
 	fetchIndividualsForRegion(result.iden);
 	if(result.survey_settings != undefined && result.survey_settings.show_survey_above_score != undefined) {
@@ -877,7 +870,6 @@ function fetchBranchProfile() {
 	var result = profileJson;
 	paintProfilePage(result);
 	paintIndividualDetails(result);
-	paintAverageRatings();
 	fetchIndividualsForBranch(result.iden);
 	if(result.survey_settings != undefined && result.survey_settings.show_survey_above_score != undefined) {
 		minScore = result.survey_settings.show_survey_above_score;
@@ -1015,7 +1007,6 @@ function fetchAgentProfile(){
 	var result = profileJson;
 	paintProfilePage(result);
 	paintIndividualDetails(result);
-	paintAverageRatings();
 	if(result.survey_settings != undefined && result.survey_settings.show_survey_above_score != undefined) {
 		minScore = result.survey_settings.show_survey_above_score;
 	}
