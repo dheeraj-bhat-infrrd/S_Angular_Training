@@ -8184,8 +8184,7 @@ function updatePositions() {
 	if(positions.length > 0) {
 		positions = JSON.stringify(positions);
 	} else {
-		return false;
-		$('#overlay-toast').html("Add positions");
+		$('#overlay-toast').html("No positions added.");
 		showToast();
 	}
 	

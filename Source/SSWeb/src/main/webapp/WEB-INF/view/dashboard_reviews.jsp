@@ -121,7 +121,7 @@
 							<div class="report-resend-icn-container clearfix float-right">
 								<div class="report-abuse-txt report-txt">Report</div>
 								|
-								<div class="restart-survey-mail-txt report-txt">Resend</div>
+								<div class="restart-survey-mail-txt report-txt">Retake</div>
 							</div>
 						</c:if>
 					</div>
