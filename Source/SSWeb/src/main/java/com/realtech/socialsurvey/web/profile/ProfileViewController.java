@@ -513,6 +513,7 @@ public class ProfileViewController
                 companyId = hierarchyMap.get( CommonConstants.COMPANY_ID_COLUMN );
                 regionId = hierarchyMap.get( CommonConstants.REGION_ID_COLUMN );
                 branchId = hierarchyMap.get( CommonConstants.BRANCH_ID_COLUMN );
+                LOG.debug("Company ID : " + companyId + " Region ID : " + regionId +" Branch ID : " + branchId);
 
                 companyProfile = organizationManagementService.getCompanySettings( companyId );
                 regionProfile = organizationManagementService.getRegionSettings( regionId );
@@ -530,7 +531,7 @@ public class ProfileViewController
                     MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION, companyProfile, regionProfile,
                     branchProfile, individualProfile, map );
 
-                individualProfile = (AgentSettings) profileManagementService.getIndividualByProfileName( agentProfileName );
+                //individualProfile = (AgentSettings) profileManagementService.getIndividualByProfileName( agentProfileName );
                 if ( individualProfile.getSocialMediaTokens() != null
                     && individualProfile.getSocialMediaTokens().getZillowToken() != null )
                     profileManagementService.updateZillowFeed( individualProfile, CommonConstants.AGENT_SETTINGS_COLLECTION );
