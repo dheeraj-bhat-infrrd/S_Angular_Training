@@ -1001,6 +1001,7 @@ public class ProfileManagementController
                 companySettings.setVertical( vertical );
                 profileManagementService.updateVertical( MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION,
                     companySettings, vertical );
+                userSettings.setCompanySettings( companySettings );
             }
 
             if ( entityType.equals( CommonConstants.COMPANY_ID_COLUMN ) ) {
@@ -1041,10 +1042,6 @@ public class ProfileManagementController
                 profileManagementService.updateRegionName( user.getUserId(), regionSettings.getIden(), name );
                 assignments.getRegions().put( entityId, name );
 
-                regionSettings.setVertical( vertical );
-                profileManagementService.updateVertical( MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION,
-                    regionSettings, vertical );
-
                 userSettings.getRegionSettings().put( entityId, regionSettings );
             } else if ( entityType.equals( CommonConstants.BRANCH_ID_COLUMN ) ) {
                 OrganizationUnitSettings branchSettings = organizationManagementService.getBranchSettingsDefault( entityId );
@@ -1061,11 +1058,7 @@ public class ProfileManagementController
                 profileManagementService.updateBranchName( user.getUserId(), branchSettings.getIden(), name );
                 assignments.getBranches().put( entityId, name );
 
-                branchSettings.setVertical( vertical );
-                profileManagementService.updateVertical( MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION,
-                    branchSettings, vertical );
-
-                userSettings.getRegionSettings().put( entityId, branchSettings );
+                                userSettings.getRegionSettings().put( entityId, branchSettings );
             } else if ( entityType.equals( CommonConstants.AGENT_ID_COLUMN ) ) {
                 AgentSettings agentSettings = userManagementService.getUserSettings( entityId );
                 if ( agentSettings == null ) {
