@@ -597,6 +597,7 @@ public interface CommonConstants
     public static final String SURVEY_REQUEST_ADMIN = "admin";
 
     // Constants for Agent Ranking Report
+    public static final String HEADER_AGENT_RANK = "User Rank";
     public static final String HEADER_FIRST_NAME = "First Name";
     public static final String HEADER_LAST_NAME = "Last Name";
     public static final String HEADER_AVG_SCORE = "Avg Score";
