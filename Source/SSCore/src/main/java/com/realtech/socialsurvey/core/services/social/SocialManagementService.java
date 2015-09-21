@@ -60,6 +60,8 @@ public interface SocialManagementService {
 	public boolean updateLinkedin(OrganizationUnitSettings agentSettings, String message, String linkedinProfileUrl, String linkedinMessageFeedback) throws NonFatalException;
 	
 	public OrganizationUnitSettings disconnectSocialNetwork(String socialMedia, OrganizationUnitSettings unitSettings, String collectionName) throws InvalidInputException;
+	
+	public SocialMediaTokens checkOrAddZillowLastUpdated(SocialMediaTokens mediaTokens) throws InvalidInputException;
 
 }
 // JIRA SS-34 BY RM02 BOC

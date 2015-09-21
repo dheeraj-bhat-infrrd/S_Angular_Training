@@ -2,7 +2,6 @@ package com.realtech.socialsurvey.core.entities;
 
 import java.io.Serializable;
 import java.sql.Timestamp;
-
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -41,6 +40,12 @@ public class Branch implements Serializable {
 	@Column(name = "IS_DEFAULT_BY_SYSTEM")
 	private int isDefaultBySystem;
 
+	@Column(name = "SETTINGS_LOCK_STATUS")
+	private String settingsLockStatus;
+
+	@Column(name = "SETTINGS_SET_STATUS")
+	private String settingsSetStatus;
+
 	@Column(name = "PROFILE_NAME")
 	private String profileName;
 
@@ -61,22 +66,21 @@ public class Branch implements Serializable {
 
 	@Transient
 	private String address2;
-	
+
 	@Transient
 	private String country;
-	
+
 	@Transient
 	private String countryCode;
-	
+
 	@Transient
 	private String state;
-	
+
 	@Transient
 	private String city;
-	
+
 	@Transient
 	private String zipcode;
-
 
 	// bi-directional many-to-one association to Company
 	@ManyToOne(fetch = FetchType.LAZY)
@@ -185,7 +189,7 @@ public class Branch implements Serializable {
 	public void setAddress2(String address2) {
 		this.address2 = address2;
 	}
-	
+
 	public String getCountry() {
 		return country;
 	}
@@ -228,6 +232,22 @@ public class Branch implements Serializable {
 
 	public static long getSerialversionuid() {
 		return serialVersionUID;
+	}
+
+	public String getSettingsLockStatus() {
+		return settingsLockStatus;
+	}
+
+	public void setSettingsLockStatus(String settingsLockStatus) {
+		this.settingsLockStatus = settingsLockStatus;
+	}
+
+	public String getSettingsSetStatus() {
+		return settingsSetStatus;
+	}
+
+	public void setSettingsSetStatus(String settingsSetStatus) {
+		this.settingsSetStatus = settingsSetStatus;
 	}
 
 	public String getProfileName() {

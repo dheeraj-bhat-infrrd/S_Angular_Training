@@ -17,6 +17,7 @@ import org.springframework.stereotype.Component;
 
 import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.commons.EmailTemplateConstants;
+import com.realtech.socialsurvey.core.dao.OrganizationUnitSettingsDao;
 import com.realtech.socialsurvey.core.entities.EmailEntity;
 import com.realtech.socialsurvey.core.entities.FileContentReplacements;
 import com.realtech.socialsurvey.core.entities.MailContent;
@@ -51,10 +52,9 @@ public class EmailServicesImpl implements EmailServices
     @Autowired
     private EmailSender emailSender;
 
-    /*
-     * @Autowired private OrganizationManagementService
-     * organizationManagementService;
-     */
+    @Autowired
+    private OrganizationUnitSettingsDao organizationUnitSettingsDao;
+
 
     @Value ( "${MAX_PAYMENT_RETRIES}")
     private int maxPaymentRetries;
@@ -1766,11 +1766,13 @@ public class EmailServicesImpl implements EmailServices
     @Override
     public void sendManualSurveyReminderMail( OrganizationUnitSettings companySettings, User user, String agentName,
         String agentEmailId, String agentPhone, String agentTitle, String companyName, SurveyPreInitiation survey,
-        String surveyLink )
+        String surveyLink, String logoUrl )
     {
+
         LOG.info( "Sending manual survey reminder mail." );
         if ( companySettings != null && companySettings.getMail_content() != null
             && companySettings.getMail_content().getTake_survey_reminder_mail() != null ) {
+
             MailContent mailContent = companySettings.getMail_content().getTake_survey_reminder_mail();
 
             String mailBody = emailFormatHelper.replaceEmailBodyWithParams( mailContent.getMail_body(),
@@ -1780,11 +1782,19 @@ public class EmailServicesImpl implements EmailServices
             String currentYear = String.valueOf( Calendar.getInstance().get( Calendar.YEAR ) );
             String fullAddress = "";
 
-            mailBody = mailBody.replaceAll( "\\[LogoUrl\\]", appLogoUrl );
+            if ( logoUrl == null || logoUrl.equalsIgnoreCase( "" ) ) {
+                mailBody = mailBody.replaceAll( "\\[LogoUrl\\]", appLogoUrl );
+            } else {
+                mailBody = mailBody.replaceAll( "\\[LogoUrl\\]", logoUrl );
+            }
             mailBody = mailBody.replaceAll( "\\[BaseUrl\\]", appBaseUrl );
             mailBody = mailBody.replaceAll( "\\[AgentName\\]", "" );
             mailBody = mailBody.replaceAll( "\\[FirstName\\]", survey.getCustomerFirstName() );
-            mailBody = mailBody.replaceAll( "\\[Name\\]", emailFormatHelper.getCustomerDisplayNameForEmail(survey.getCustomerFirstName(), survey.getCustomerLastName()) );
+            mailBody = mailBody
+                .replaceAll(
+                    "\\[Name\\]",
+                    emailFormatHelper.getCustomerDisplayNameForEmail( survey.getCustomerFirstName(),
+                        survey.getCustomerLastName() ) );
             mailBody = mailBody.replaceAll( "\\[Link\\]", surveyLink );
             mailBody = mailBody.replaceAll( "\\[AgentSignature\\]", agentSignature );
             mailBody = mailBody.replaceAll( "\\[RecipientEmail\\]", survey.getCustomerEmailId() );

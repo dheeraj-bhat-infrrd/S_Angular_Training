@@ -745,6 +745,15 @@ public class HierarchyManagementController {
 			catch (NumberFormatException e) {
 				throw new InvalidInputException("NumberFormatException while parsing branchId", DisplayMessageConstants.GENERAL_ERROR, e);
 			}
+			
+			//check if user is admin. if yes than not allow to assign
+			if(user.getUserId() == selectedUserId){
+				LOG.info("User is complay admin so can't assign it.");
+				DisplayMessage message = messageUtils.getDisplayMessage(DisplayMessageConstants.REDUNDANT_ASSIGNMANT,
+						DisplayMessageType.ERROR_MESSAGE);				
+				model.addAttribute("message", message);
+				return JspResolver.MESSAGE_HEADER;
+			}
 
 			try {
 				LOG.debug("Calling service to add/assign invidual(s)");

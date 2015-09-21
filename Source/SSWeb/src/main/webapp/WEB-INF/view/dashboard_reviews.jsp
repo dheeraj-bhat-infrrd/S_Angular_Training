@@ -100,15 +100,6 @@
 <c:choose>
 	<c:when test="${not empty reviews}">
 		<c:forEach var="feedback" varStatus="loop" items="${reviews}">
-			<c:choose>
-				<c:when test="${not empty feedback.customerLastName}">
-					<c:set value="${feedback.customerFirstName} ${feedback.customerLastName}" var="customerName"></c:set>
-				</c:when>
-				<c:otherwise>
-					<c:set value="${feedback.customerFirstName}" var="customerName"></c:set>
-				</c:otherwise>
-			</c:choose>
-			<c:set var="customerNameParts" value="${fn:split(customerName, ' ')}"></c:set>
 			<c:set value="ppl-review-item" var="reviewitemclass"></c:set>
 			<div data-firstname="${feedback.customerFirstName}" data-lastname="${feedback.customerLastName}"
 				data-agentid="${feedback.agentId}" data-agentname="${feedback.agentName}" data-customeremail="${feedback.customerEmail}"
@@ -117,10 +108,7 @@
 				<div class="ppl-header-wrapper clearfix">
 					<div class="float-left ppl-header-left">
 						<div class="ppl-head-1">
-							${customerNameParts[0]} 
-							<c:if test="${fn:length(customerNameParts) > 1}">
-							 	${fn:substring(customerNameParts[1], 0, 1)}
-							 </c:if>
+							${feedback.customerFirstName} ${feedback.customerLastName}
 						</div>
 						<div class="ppl-head-2" data-modifiedon="<fmt:formatDate type="date" pattern="yyyy-MM-dd-H-mm-ss"
 							value="${feedback.modifiedOn}" />">
@@ -133,7 +121,7 @@
 							<div class="report-resend-icn-container clearfix float-right">
 								<div class="report-abuse-txt report-txt">Report</div>
 								|
-								<div class="restart-survey-mail-txt report-txt">Resend</div>
+								<div class="restart-survey-mail-txt report-txt">Retake</div>
 							</div>
 						</c:if>
 					</div>
