@@ -4,9 +4,11 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,12 +22,14 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+
 import com.amazonaws.util.json.JSONException;
 import com.amazonaws.util.json.JSONObject;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.entities.AccountsMaster;
+import com.realtech.socialsurvey.core.entities.DotLoopCrmInfo;
 import com.realtech.socialsurvey.core.entities.EncompassCrmInfo;
 import com.realtech.socialsurvey.core.entities.LicenseDetail;
 import com.realtech.socialsurvey.core.entities.MailContentSettings;
@@ -109,10 +113,9 @@ public class OrganizationManagementController
 
     @Value ( "${APPLICATION_LOGO_URL}")
     private String applicationLogoUrl;
-    
+
     @Value ( "${AMAZON_LOGO_BUCKET}")
     private String logoBucket;
-    
 
 
     /**
@@ -138,7 +141,7 @@ public class OrganizationManagementController
         try {
             logoName = fileUploadService.fileUploadHandler( fileLocal, request.getParameter( "logo_name" ) );
             // Setting the complete logo url in session
-            logoName = endpoint + CommonConstants.FILE_SEPARATOR + logoBucket + CommonConstants.FILE_SEPARATOR+ logoName;
+            logoName = endpoint + CommonConstants.FILE_SEPARATOR + logoBucket + CommonConstants.FILE_SEPARATOR + logoName;
 
             LOG.debug( "Setting Logo image name to Session" );
             request.getSession( false ).setAttribute( CommonConstants.LOGO_NAME, logoName );
@@ -422,176 +425,241 @@ public class OrganizationManagementController
         return returnPage;
     }
 
-    
-    @RequestMapping(value="/showemailsettings", method=RequestMethod.GET)
-    public String showEmailSettings(Model model, HttpServletRequest request) {
-    	LOG.info("Method showEmailSettings of OrganizationManagementController called");
-    	
-    	return JspResolver.EMAIL_SETTINGS;
+
+    @RequestMapping ( value = "/showemailsettings", method = RequestMethod.GET)
+    public String showEmailSettings( Model model, HttpServletRequest request )
+    {
+        LOG.info( "Method showEmailSettings of OrganizationManagementController called" );
+
+        return JspResolver.EMAIL_SETTINGS;
     }
-    
-    
+
+
     /**
      * Method to load the app settings page
      * @param model
      * @param request
      * @return
      */
-	@RequestMapping(value = "/showapps", method = RequestMethod.GET)
-	public String showAppSettings(Model model, HttpServletRequest request) {
-		LOG.info("Method showAppSettings of OrganizationManagementController called");
+    @RequestMapping ( value = "/showapps", method = RequestMethod.GET)
+    public String showAppSettings( Model model, HttpServletRequest request )
+    {
+        LOG.info( "Method showAppSettings of OrganizationManagementController called" );
 
-		User user = sessionHelper.getCurrentUser();
-		List<VerticalCrmMapping> mappings;
-		try {
-			try {
-				mappings = organizationManagementService.getCrmMapping(user);
-			}
-			catch (InvalidInputException e) {
-				throw new InvalidInputException("Exception occured while fetching vertical crm mappings", e.getMessage(), e);
-			}
-		}
-		catch (NonFatalException e) {
-			LOG.error("NonfatalException while showing app settings. Reason: " + e.getMessage(), e);
-			model.addAttribute("message", messageUtils.getDisplayMessage(e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE));
-			return JspResolver.MESSAGE_HEADER;
-		}
-		model.addAttribute("crmMappings", mappings);
+        User user = sessionHelper.getCurrentUser();
+        List<VerticalCrmMapping> mappings;
+        try {
+            try {
+                mappings = organizationManagementService.getCrmMapping( user );
+            } catch ( InvalidInputException e ) {
+                throw new InvalidInputException( "Exception occured while fetching vertical crm mappings", e.getMessage(), e );
+            }
+        } catch ( NonFatalException e ) {
+            LOG.error( "NonfatalException while showing app settings. Reason: " + e.getMessage(), e );
+            model
+                .addAttribute( "message", messageUtils.getDisplayMessage( e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE ) );
+            return JspResolver.MESSAGE_HEADER;
+        }
+        model.addAttribute( "crmMappings", mappings );
 
-		return JspResolver.APP_SETTINGS;
-	}
-    
-	/**
-	 * Method to show Company settings on edit company
-	 * 
-	 * @param model
-	 * @param request
-	 * @return
-	 */
-	@RequestMapping(value = "/showcompanysettings", method = RequestMethod.GET)
-	public String showCompanySettings(Model model, HttpServletRequest request) {
-		LOG.info("Method showCompanySettings of UserManagementController called");
-		HttpSession session = request.getSession(false);
-		User user = sessionHelper.getCurrentUser();
-
-		AccountType accountType = (AccountType) session.getAttribute(CommonConstants.ACCOUNT_TYPE_IN_SESSION);
-
-		long entityId = 0;
-		String entityIdStr = request.getParameter("entityId");
-		if (entityIdStr == null || entityIdStr.isEmpty()) {
-			entityId = (long) session.getAttribute(CommonConstants.ENTITY_ID_COLUMN);
-		}
-		else {
-			try {
-				if (entityIdStr != null && !entityIdStr.equals("")) {
-					entityId = Long.parseLong(entityIdStr);
-				}
-				else {
-					throw new NumberFormatException();
-				}
-			}
-			catch (NumberFormatException e) {
-				LOG.error("Number format exception occurred while parsing the entity id. Reason :" + e.getMessage(), e);
-			}
-		}
-		
-		String entityType = request.getParameter("entityType");
-		if (entityType == null || entityType.isEmpty()) {
-			entityType = (String) session.getAttribute(CommonConstants.ENTITY_TYPE_COLUMN);
-		}
-		
-		sessionHelper.updateSelectedProfile(session, entityId, entityType);
-		
-		OrganizationUnitSettings unitSettings = null;
-		int accountMasterId = accountType.getValue();
-		try {
-			if (entityType.equals(CommonConstants.COMPANY_ID_COLUMN) || accountMasterId == CommonConstants.ACCOUNTS_MASTER_INDIVIDUAL) {
-				unitSettings = organizationManagementService.getCompanySettings(user.getCompany().getCompanyId());
-				/*List<VerticalCrmMapping> mappings = organizationManagementService.getCrmMapping(user);
-				model.addAttribute("crmMappings", mappings);*/
-				model.addAttribute("columnName", entityType);
-				model.addAttribute("columnValue", entityId);
-			}
-			else if (entityType.equals(CommonConstants.REGION_ID_COLUMN)) {
-				unitSettings = organizationManagementService.getRegionSettings(entityId);
-				model.addAttribute("columnName", entityType);
-				model.addAttribute("columnValue", entityId);
-			}
-			else if (entityType.equals(CommonConstants.BRANCH_ID_COLUMN)) {
-				unitSettings = organizationManagementService.getBranchSettingsDefault(entityId);
-				model.addAttribute("columnName", entityType);
-				model.addAttribute("columnValue", entityId);
-			}
-			else if (entityType.equals(CommonConstants.AGENT_ID_COLUMN)) {
-				unitSettings = userManagementService.getUserSettings(user.getUserId());
-				model.addAttribute("columnName", CommonConstants.AGENT_ID_COLUMN);
-				model.addAttribute("columnValue", entityId);
-			}
-		}
-		catch (InvalidInputException | NoRecordsFetchedException e) {
-			LOG.error("NonFatalException while fetching profile details. Reason :" + e.getMessage(), e);
-			model.addAttribute("message", messageUtils.getDisplayMessage(DisplayMessageConstants.GENERAL_ERROR, DisplayMessageType.ERROR_MESSAGE));
-			return JspResolver.MESSAGE_HEADER;
-		}
-		
-		model.addAttribute("autoPostEnabled", false);
-		if (unitSettings != null && unitSettings.getSurvey_settings() != null) {
-			model.addAttribute("autoPostEnabled", unitSettings.getSurvey_settings().isAutoPostEnabled());
-		}
-		SurveySettings surveySettings = organizationManagementService.retrieveDefaultSurveyProperties();
-		model.addAttribute("defaultSurveyProperties", surveySettings);
-		session.setAttribute(CommonConstants.USER_ACCOUNT_SETTINGS, unitSettings);
-		return JspResolver.EDIT_SETTINGS;
-	}
+        return JspResolver.APP_SETTINGS;
+    }
 
 
-	/**
-	 * Method to save encompass details / CRM info
-	 * 
-	 * @param model
-	 * @param request
-	 * @return
-	 */
-	@RequestMapping(value = "/saveencompassdetails", method = RequestMethod.POST)
-	@ResponseBody
-	public String saveEncompassDetails(Model model, HttpServletRequest request) {
-		LOG.info("Saving encompass details");
-		User user = sessionHelper.getCurrentUser();
-		request.setAttribute("saveencompassdetails", "true");
-		String message;
+    /**
+     * Method to show Company settings on edit company
+     * 
+     * @param model
+     * @param request
+     * @return
+     */
+    @RequestMapping ( value = "/showcompanysettings", method = RequestMethod.GET)
+    public String showCompanySettings( Model model, HttpServletRequest request )
+    {
+        LOG.info( "Method showCompanySettings of UserManagementController called" );
+        HttpSession session = request.getSession( false );
+        User user = sessionHelper.getCurrentUser();
 
-		try {
-			testEncompassConnection(model, request);
+        AccountType accountType = (AccountType) session.getAttribute( CommonConstants.ACCOUNT_TYPE_IN_SESSION );
 
-			// Encrypting the password
-			String plainPassword = request.getParameter("encompass-password");
-			String cipherPassword = plainPassword;
+        long entityId = 0;
+        String entityIdStr = request.getParameter( "entityId" );
+        if ( entityIdStr == null || entityIdStr.isEmpty() ) {
+            entityId = (long) session.getAttribute( CommonConstants.ENTITY_ID_COLUMN );
+        } else {
+            try {
+                if ( entityIdStr != null && !entityIdStr.equals( "" ) ) {
+                    entityId = Long.parseLong( entityIdStr );
+                } else {
+                    throw new NumberFormatException();
+                }
+            } catch ( NumberFormatException e ) {
+                LOG.error( "Number format exception occurred while parsing the entity id. Reason :" + e.getMessage(), e );
+            }
+        }
 
-			EncompassCrmInfo encompassCrmInfo = new EncompassCrmInfo();
-			encompassCrmInfo.setCrm_source(CommonConstants.CRM_INFO_SOURCE_ENCOMPASS);
-			encompassCrmInfo.setCrm_username(request.getParameter("encompass-username"));
-			encompassCrmInfo.setCrm_fieldId(request.getParameter("encompass-fieldId"));
-			encompassCrmInfo.setCrm_password(cipherPassword);
-			encompassCrmInfo.setUrl(request.getParameter("encompass-url"));
-			encompassCrmInfo.setConnection_successful(true);
+        String entityType = request.getParameter( "entityType" );
+        if ( entityType == null || entityType.isEmpty() ) {
+            entityType = (String) session.getAttribute( CommonConstants.ENTITY_TYPE_COLUMN );
+        }
 
-			OrganizationUnitSettings companySettings = organizationManagementService.getCompanySettings(user.getCompany().getCompanyId());
-			encompassCrmInfo.setCompanyId(companySettings.getIden());
-			organizationManagementService.updateCRMDetails(companySettings, encompassCrmInfo,
-					"com.realtech.socialsurvey.core.entities.EncompassCrmInfo");
+        sessionHelper.updateSelectedProfile( session, entityId, entityType );
 
-			// set the updated settings value in session with plain password
-			encompassCrmInfo.setCrm_password(plainPassword);
-			companySettings.setCrm_info(encompassCrmInfo);
-			message = messageUtils.getDisplayMessage(DisplayMessageConstants.ENCOMPASS_DATA_UPDATE_SUCCESSFUL, DisplayMessageType.SUCCESS_MESSAGE)
-					.getMessage();
-		}
-		catch (NonFatalException e) {
-			LOG.error("NonFatalException while testing encompass detials. Reason : " + e.getMessage(), e);
-			message = messageUtils.getDisplayMessage(e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE).getMessage();
-		}
-		return message;
-	}
+        OrganizationUnitSettings unitSettings = null;
+        int accountMasterId = accountType.getValue();
+        try {
+            if ( entityType.equals( CommonConstants.COMPANY_ID_COLUMN )
+                || accountMasterId == CommonConstants.ACCOUNTS_MASTER_INDIVIDUAL ) {
+                unitSettings = organizationManagementService.getCompanySettings( user.getCompany().getCompanyId() );
+                /*List<VerticalCrmMapping> mappings = organizationManagementService.getCrmMapping(user);
+                model.addAttribute("crmMappings", mappings);*/
+                model.addAttribute( "columnName", entityType );
+                model.addAttribute( "columnValue", entityId );
+            } else if ( entityType.equals( CommonConstants.REGION_ID_COLUMN ) ) {
+                unitSettings = organizationManagementService.getRegionSettings( entityId );
+                model.addAttribute( "columnName", entityType );
+                model.addAttribute( "columnValue", entityId );
+            } else if ( entityType.equals( CommonConstants.BRANCH_ID_COLUMN ) ) {
+                unitSettings = organizationManagementService.getBranchSettingsDefault( entityId );
+                model.addAttribute( "columnName", entityType );
+                model.addAttribute( "columnValue", entityId );
+            } else if ( entityType.equals( CommonConstants.AGENT_ID_COLUMN ) ) {
+                unitSettings = userManagementService.getUserSettings( user.getUserId() );
+                model.addAttribute( "columnName", CommonConstants.AGENT_ID_COLUMN );
+                model.addAttribute( "columnValue", entityId );
+            }
+        } catch ( InvalidInputException | NoRecordsFetchedException e ) {
+            LOG.error( "NonFatalException while fetching profile details. Reason :" + e.getMessage(), e );
+            model.addAttribute( "message",
+                messageUtils.getDisplayMessage( DisplayMessageConstants.GENERAL_ERROR, DisplayMessageType.ERROR_MESSAGE ) );
+            return JspResolver.MESSAGE_HEADER;
+        }
+
+        model.addAttribute( "autoPostEnabled", false );
+        if ( unitSettings != null && unitSettings.getSurvey_settings() != null ) {
+            model.addAttribute( "autoPostEnabled", unitSettings.getSurvey_settings().isAutoPostEnabled() );
+        }
+        SurveySettings surveySettings = organizationManagementService.retrieveDefaultSurveyProperties();
+        model.addAttribute( "defaultSurveyProperties", surveySettings );
+        session.setAttribute( CommonConstants.USER_ACCOUNT_SETTINGS, unitSettings );
+        return JspResolver.EDIT_SETTINGS;
+    }
+
+
+    /**
+     * Method to save encompass details / CRM info
+     * 
+     * @param model
+     * @param request
+     * @return
+     */
+    @RequestMapping ( value = "/saveencompassdetails", method = RequestMethod.POST)
+    @ResponseBody
+    public String saveEncompassDetails( Model model, HttpServletRequest request )
+    {
+        LOG.info( "Saving encompass details" );
+        User user = sessionHelper.getCurrentUser();
+        request.setAttribute( "saveencompassdetails", "true" );
+        String message;
+
+        try {
+            testEncompassConnection( model, request );
+
+            // Encrypting the password
+            String plainPassword = request.getParameter( "encompass-password" );
+            String cipherPassword = plainPassword;
+
+            EncompassCrmInfo encompassCrmInfo = new EncompassCrmInfo();
+            encompassCrmInfo.setCrm_source( CommonConstants.CRM_INFO_SOURCE_ENCOMPASS );
+            encompassCrmInfo.setCrm_username( request.getParameter( "encompass-username" ) );
+            encompassCrmInfo.setCrm_fieldId( request.getParameter( "encompass-fieldId" ) );
+            encompassCrmInfo.setCrm_password( cipherPassword );
+            encompassCrmInfo.setUrl( request.getParameter( "encompass-url" ) );
+            encompassCrmInfo.setConnection_successful( true );
+
+            OrganizationUnitSettings companySettings = organizationManagementService.getCompanySettings( user.getCompany()
+                .getCompanyId() );
+            encompassCrmInfo.setCompanyId( companySettings.getIden() );
+            organizationManagementService.updateCRMDetails( companySettings, encompassCrmInfo,
+                "com.realtech.socialsurvey.core.entities.EncompassCrmInfo" );
+
+            // set the updated settings value in session with plain password
+            encompassCrmInfo.setCrm_password( plainPassword );
+            companySettings.setCrm_info( encompassCrmInfo );
+            message = messageUtils.getDisplayMessage( DisplayMessageConstants.ENCOMPASS_DATA_UPDATE_SUCCESSFUL,
+                DisplayMessageType.SUCCESS_MESSAGE ).getMessage();
+        } catch ( NonFatalException e ) {
+            LOG.error( "NonFatalException while testing encompass detials. Reason : " + e.getMessage(), e );
+            message = messageUtils.getDisplayMessage( e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE ).getMessage();
+        }
+        return message;
+    }
+
+
+    /**
+     * @param model
+     * @param request
+     * @return
+     */
+    @RequestMapping ( value = "/savedotloopdetails", method = RequestMethod.POST)
+    @ResponseBody
+    public String saveDotloopDetails( Model model, HttpServletRequest request )
+    {
+        LOG.info( "Inside method saveDotLoopDetails " );
+        User user = sessionHelper.getCurrentUser();
+        request.setAttribute( "saveencompassdetails", "true" );
+        String message = null;
+
+        try {
+            // Encrypting the password
+            String apiKey = request.getParameter( "dotloop-api" );
+            if ( apiKey != null && !apiKey.isEmpty() ) {
+                DotLoopCrmInfo dotLoopCrmInfo = new DotLoopCrmInfo();
+                dotLoopCrmInfo.setCrm_source( CommonConstants.CRM_SOURCE_DOTLOOP );
+                dotLoopCrmInfo.setApi( apiKey );
+
+                OrganizationUnitSettings companySettings = organizationManagementService.getCompanySettings( user.getCompany()
+                    .getCompanyId() );
+                dotLoopCrmInfo.setCompanyId( companySettings.getIden() );
+                organizationManagementService.updateCRMDetails( companySettings, dotLoopCrmInfo,
+                    "com.realtech.socialsurvey.core.entities.DotLoopCrmInfo" );
+
+                companySettings.setCrm_info( dotLoopCrmInfo );
+                message = messageUtils.getDisplayMessage( DisplayMessageConstants.ENCOMPASS_DATA_UPDATE_SUCCESSFUL,
+                    DisplayMessageType.SUCCESS_MESSAGE ).getMessage();
+            }
+        } catch ( NonFatalException e ) {
+            LOG.error( "NonFatalException while testing encompass detials. Reason : " + e.getMessage(), e );
+            message = messageUtils.getDisplayMessage( e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE ).getMessage();
+        }
+        return message;
+
+    }
+
+
+    @RequestMapping ( value = "/testdotloopconnection", method = RequestMethod.POST)
+    @ResponseBody
+    public String testDotloopConnection( Model model, HttpServletRequest request ) throws NonFatalException
+    {
+        LOG.info( "Testing connections" );
+        String message;
+        try {
+            // validate the parameters
+            if ( !validateDotloopParameters( request ) ) {
+                // TODO: code to test connection
+            }
+            message = messageUtils.getDisplayMessage( DisplayMessageConstants.DOT_LOOP_CONNECTION_SUCCESSFUL,
+                DisplayMessageType.SUCCESS_MESSAGE ).getMessage();
+        } catch ( NonFatalException e ) {
+            if ( request.getAttribute( "savedotloopdetails" ) != null ) {
+                throw e;
+            } else {
+                LOG.error( "NonFatalException while testing encompass detials. Reason : " + e.getMessage(), e );
+            }
+            message = messageUtils.getDisplayMessage( e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE ).getMessage();
+        }
+        return message;
+    }
 
 
     /**
@@ -626,6 +694,19 @@ public class OrganizationManagementController
     }
 
 
+    private boolean validateDotloopParameters( HttpServletRequest request ) throws InvalidInputException
+    {
+        LOG.debug( "Validating encompass parameters" );
+        String apiKey = request.getParameter( "dotloop-apikey" );
+        if ( apiKey == null || apiKey.isEmpty() ) {
+            LOG.warn( "Encompass validation failed" );
+            throw new InvalidInputException( "All fields not set for dotloop", DisplayMessageConstants.GENERAL_ERROR );
+        }
+        LOG.debug( "Encompass validation passed." );
+        return true;
+    }
+
+
     /**
      * Method to validate encompass details / CRM info
      * 
@@ -647,87 +728,94 @@ public class OrganizationManagementController
     }
 
 
-	/**
-	 * Method to save survey Mailbody content
-	 * 
-	 * @param model
-	 * @param request
-	 * @return
-	 */
-	@ResponseBody
-	@RequestMapping(value = "/savesurveyparticipationmail", method = RequestMethod.POST)
-	public String updateSurveyParticipationMailBody(Model model, HttpServletRequest request) {
-		LOG.info("Saving survey participation mail body");
-		User user = sessionHelper.getCurrentUser();
-		HttpSession session = request.getSession(false);
-		String mailCategory = request.getParameter("mailcategory");
-		String mailSubject = null;
-		String mailBody = null;
-		String message = "";
+    /**
+     * Method to save survey Mailbody content
+     * 
+     * @param model
+     * @param request
+     * @return
+     */
+    @ResponseBody
+    @RequestMapping ( value = "/savesurveyparticipationmail", method = RequestMethod.POST)
+    public String updateSurveyParticipationMailBody( Model model, HttpServletRequest request )
+    {
+        LOG.info( "Saving survey participation mail body" );
+        User user = sessionHelper.getCurrentUser();
+        HttpSession session = request.getSession( false );
+        String mailCategory = request.getParameter( "mailcategory" );
+        String mailSubject = null;
+        String mailBody = null;
+        String message = "";
 
-		try {
-			OrganizationUnitSettings companySettings = organizationManagementService.getCompanySettings(user.getCompany().getCompanyId());
-			MailContentSettings updatedMailContentSettings = null;
-			if (mailCategory != null && mailCategory.equals("participationmail")) {
+        try {
+            OrganizationUnitSettings companySettings = organizationManagementService.getCompanySettings( user.getCompany()
+                .getCompanyId() );
+            MailContentSettings updatedMailContentSettings = null;
+            if ( mailCategory != null && mailCategory.equals( "participationmail" ) ) {
 
-				mailSubject = request.getParameter("survey-mailcontent-subject");
-				if (mailSubject == null || mailSubject.isEmpty()) {
-					LOG.warn("Survey participation mail subject is blank.");
-					throw new InvalidInputException("Survey participation mail subject is blank.", DisplayMessageConstants.GENERAL_ERROR);
-				}
+                mailSubject = request.getParameter( "survey-mailcontent-subject" );
+                if ( mailSubject == null || mailSubject.isEmpty() ) {
+                    LOG.warn( "Survey participation mail subject is blank." );
+                    throw new InvalidInputException( "Survey participation mail subject is blank.",
+                        DisplayMessageConstants.GENERAL_ERROR );
+                }
 
-				mailBody = request.getParameter("survey-participation-mailcontent");
-				if (mailBody == null || mailBody.isEmpty()) {
-					LOG.warn("Survey participation mail body is blank.");
-					throw new InvalidInputException("Survey participation mail body is blank.", DisplayMessageConstants.GENERAL_ERROR);
-				}
+                mailBody = request.getParameter( "survey-participation-mailcontent" );
+                if ( mailBody == null || mailBody.isEmpty() ) {
+                    LOG.warn( "Survey participation mail body is blank." );
+                    throw new InvalidInputException( "Survey participation mail body is blank.",
+                        DisplayMessageConstants.GENERAL_ERROR );
+                }
 
-				updatedMailContentSettings = organizationManagementService.updateSurveyParticipationMailBody(companySettings, mailSubject, mailBody,
-						CommonConstants.SURVEY_MAIL_BODY_CATEGORY);
+                updatedMailContentSettings = organizationManagementService.updateSurveyParticipationMailBody( companySettings,
+                    mailSubject, mailBody, CommonConstants.SURVEY_MAIL_BODY_CATEGORY );
 
-				// set the value back in session
-				session.setAttribute(CommonConstants.SURVEY_PARTICIPATION_MAIL_SUBJECT_IN_SESSION, mailSubject);
-				session.setAttribute(CommonConstants.SURVEY_PARTICIPATION_MAIL_BODY_IN_SESSION, mailBody);
+                // set the value back in session
+                session.setAttribute( CommonConstants.SURVEY_PARTICIPATION_MAIL_SUBJECT_IN_SESSION, mailSubject );
+                session.setAttribute( CommonConstants.SURVEY_PARTICIPATION_MAIL_BODY_IN_SESSION, mailBody );
 
-				message = messageUtils.getDisplayMessage(DisplayMessageConstants.SURVEY_PARTICIPATION_MAILBODY_UPDATE_SUCCESSFUL,
-						DisplayMessageType.SUCCESS_MESSAGE).getMessage();
-			}
+                message = messageUtils
+                    .getDisplayMessage( DisplayMessageConstants.SURVEY_PARTICIPATION_MAILBODY_UPDATE_SUCCESSFUL,
+                        DisplayMessageType.SUCCESS_MESSAGE ).getMessage();
+            }
 
-			else if (mailCategory != null && mailCategory.equals("participationremindermail")) {
+            else if ( mailCategory != null && mailCategory.equals( "participationremindermail" ) ) {
 
-				mailSubject = request.getParameter("survey-mailreminder-subject");
-				if (mailSubject == null || mailSubject.isEmpty()) {
-					LOG.warn("Survey participation reminder mail subject is blank.");
-					throw new InvalidInputException("Survey participation reminder mail subject is blank.", DisplayMessageConstants.GENERAL_ERROR);
-				}
+                mailSubject = request.getParameter( "survey-mailreminder-subject" );
+                if ( mailSubject == null || mailSubject.isEmpty() ) {
+                    LOG.warn( "Survey participation reminder mail subject is blank." );
+                    throw new InvalidInputException( "Survey participation reminder mail subject is blank.",
+                        DisplayMessageConstants.GENERAL_ERROR );
+                }
 
-				mailBody = request.getParameter("survey-participation-reminder-mailcontent");
-				if (mailBody == null || mailBody.isEmpty()) {
-					LOG.warn("Survey participation reminder mail body is blank.");
-					throw new InvalidInputException("Survey participation reminder mail body is blank.", DisplayMessageConstants.GENERAL_ERROR);
-				}
+                mailBody = request.getParameter( "survey-participation-reminder-mailcontent" );
+                if ( mailBody == null || mailBody.isEmpty() ) {
+                    LOG.warn( "Survey participation reminder mail body is blank." );
+                    throw new InvalidInputException( "Survey participation reminder mail body is blank.",
+                        DisplayMessageConstants.GENERAL_ERROR );
+                }
 
-				updatedMailContentSettings = organizationManagementService.updateSurveyParticipationMailBody(companySettings, mailSubject, mailBody,
-						CommonConstants.SURVEY_REMINDER_MAIL_BODY_CATEGORY);
+                updatedMailContentSettings = organizationManagementService.updateSurveyParticipationMailBody( companySettings,
+                    mailSubject, mailBody, CommonConstants.SURVEY_REMINDER_MAIL_BODY_CATEGORY );
 
-				// set the value back in session
-				session.setAttribute(CommonConstants.SURVEY_PARTICIPATION_REMINDER_MAIL_SUBJECT_IN_SESSION, mailSubject);
-				session.setAttribute(CommonConstants.SURVEY_PARTICIPATION_REMINDER_MAIL_BODY_IN_SESSION, mailBody);
+                // set the value back in session
+                session.setAttribute( CommonConstants.SURVEY_PARTICIPATION_REMINDER_MAIL_SUBJECT_IN_SESSION, mailSubject );
+                session.setAttribute( CommonConstants.SURVEY_PARTICIPATION_REMINDER_MAIL_BODY_IN_SESSION, mailBody );
 
-				message = messageUtils.getDisplayMessage(DisplayMessageConstants.SURVEY_PARTICIPATION_REMINDERMAILBODY_UPDATE_SUCCESSFUL,
-						DisplayMessageType.SUCCESS_MESSAGE).getMessage();
-			}
+                message = messageUtils.getDisplayMessage(
+                    DisplayMessageConstants.SURVEY_PARTICIPATION_REMINDERMAILBODY_UPDATE_SUCCESSFUL,
+                    DisplayMessageType.SUCCESS_MESSAGE ).getMessage();
+            }
 
-			// update the mail content settings in session
-			companySettings.setMail_content(updatedMailContentSettings);
-		}
-		catch (NonFatalException e) {
-			LOG.error("NonFatalException while saving survey participation mail body. Reason : " + e.getMessage(), e);
-			message = messageUtils.getDisplayMessage(e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE).getMessage();
-		}
+            // update the mail content settings in session
+            companySettings.setMail_content( updatedMailContentSettings );
+        } catch ( NonFatalException e ) {
+            LOG.error( "NonFatalException while saving survey participation mail body. Reason : " + e.getMessage(), e );
+            message = messageUtils.getDisplayMessage( e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE ).getMessage();
+        }
 
-		return message;
-	}
+        return message;
+    }
 
 
     /**
@@ -742,15 +830,16 @@ public class OrganizationManagementController
     public String revertSurveyParticipationMailBody( Model model, HttpServletRequest request )
     {
         LOG.info( "Reverting survey participation mail body" );
-		User user = sessionHelper.getCurrentUser();
-		HttpSession session = request.getSession( false );
+        User user = sessionHelper.getCurrentUser();
+        HttpSession session = request.getSession( false );
         String mailCategory = request.getParameter( "mailcategory" );
         String mailSubject = null;
         String mailBody = null;
         String message = "";
 
         try {
-			OrganizationUnitSettings companySettings = organizationManagementService.getCompanySettings(user.getCompany().getCompanyId());
+            OrganizationUnitSettings companySettings = organizationManagementService.getCompanySettings( user.getCompany()
+                .getCompanyId() );
             MailContentSettings updatedMailContentSettings = null;
             if ( mailCategory != null && mailCategory.equals( "participationmail" ) ) {
                 updatedMailContentSettings = organizationManagementService.revertSurveyParticipationMailBody( companySettings,
@@ -818,8 +907,9 @@ public class OrganizationManagementController
 
         try {
             boolean isAutopostEnabled = Boolean.parseBoolean( autopost );
-    		User user = sessionHelper.getCurrentUser();
-			OrganizationUnitSettings companySettings = organizationManagementService.getCompanySettings(user.getCompany().getCompanyId());
+            User user = sessionHelper.getCurrentUser();
+            OrganizationUnitSettings companySettings = organizationManagementService.getCompanySettings( user.getCompany()
+                .getCompanyId() );
 
             if ( ratingCategory != null && ratingCategory.equals( "rating-auto-post" ) ) {
                 double autopostRating = Double.parseDouble( request.getParameter( "rating-auto-post" ) );
@@ -877,8 +967,9 @@ public class OrganizationManagementController
             boolean isAutoPostEnabled = false;
             if ( autopost != null && !autopost.isEmpty() ) {
                 isAutoPostEnabled = Boolean.parseBoolean( autopost );
-        		User user = sessionHelper.getCurrentUser();
-    			OrganizationUnitSettings companySettings = organizationManagementService.getCompanySettings(user.getCompany().getCompanyId());
+                User user = sessionHelper.getCurrentUser();
+                OrganizationUnitSettings companySettings = organizationManagementService.getCompanySettings( user.getCompany()
+                    .getCompanyId() );
                 SurveySettings surveySettings = companySettings.getSurvey_settings();
                 surveySettings.setAutoPostEnabled( isAutoPostEnabled );
                 if ( organizationManagementService.updateSurveySettings( companySettings, surveySettings ) ) {
@@ -915,8 +1006,9 @@ public class OrganizationManagementController
         String message = "";
 
         try {
-    		User user = sessionHelper.getCurrentUser();
-			OrganizationUnitSettings companySettings = organizationManagementService.getCompanySettings(user.getCompany().getCompanyId());
+            User user = sessionHelper.getCurrentUser();
+            OrganizationUnitSettings companySettings = organizationManagementService.getCompanySettings( user.getCompany()
+                .getCompanyId() );
 
             if ( mailCategory != null && mailCategory.equals( "reminder-interval" ) ) {
                 int reminderInterval = Integer.parseInt( request.getParameter( "reminder-interval" ) );
@@ -978,8 +1070,9 @@ public class OrganizationManagementController
         String message = "";
 
         try {
-    		User user = sessionHelper.getCurrentUser();
-			OrganizationUnitSettings companySettings = organizationManagementService.getCompanySettings(user.getCompany().getCompanyId());
+            User user = sessionHelper.getCurrentUser();
+            OrganizationUnitSettings companySettings = organizationManagementService.getCompanySettings( user.getCompany()
+                .getCompanyId() );
 
             if ( otherCategory != null && otherCategory.equals( "other-location" ) ) {
                 boolean isLocationEnabled = Boolean.parseBoolean( request.getParameter( "other-location" ) );
@@ -1280,7 +1373,7 @@ public class OrganizationManagementController
                 session.setAttribute( CommonConstants.ACCOUNT_TYPE_IN_SESSION, accountType );
                 sessionHelper.getCanonicalSettings( session );
                 sessionHelper.setSettingVariablesInSession( session );
-                sessionHelper.processAssignments(session, user);
+                sessionHelper.processAssignments( session, user );
             } catch ( InvalidInputException e ) {
                 throw new InvalidInputException( "InvalidInputException in addAccountType. Reason :" + e.getMessage(),
                     DisplayMessageConstants.GENERAL_ERROR, e );
@@ -1473,44 +1566,46 @@ public class OrganizationManagementController
         return usStateZipcodeList;
     }
 
-	// Method to delete all the records of a company.
-	@RequestMapping(value = "/deletecompany", method = RequestMethod.GET)
-	public String deleteCompany(HttpServletRequest request, Model model, RedirectAttributes redirectAttributes) throws NonFatalException {
-		User user = sessionHelper.getCurrentUser();
-		String message = "";
 
-		try {
-			if (user != null && user.isCompanyAdmin()) {
-				// Add an entry into Disabled_Accounts table with disable_date as current date
-				// and status as inactive.
-				try {
-					organizationManagementService.addDisabledAccount(user.getCompany().getCompanyId(), true);
-				}
-				catch (NoRecordsFetchedException | PaymentException e) {
-					LOG.error("Exception caught in deleteCompany() of OrganizationManagementController. Nested exception is ", e);
-					throw e;
-				}
+    // Method to delete all the records of a company.
+    @RequestMapping ( value = "/deletecompany", method = RequestMethod.GET)
+    public String deleteCompany( HttpServletRequest request, Model model, RedirectAttributes redirectAttributes )
+        throws NonFatalException
+    {
+        User user = sessionHelper.getCurrentUser();
+        String message = "";
 
-				// Modify the company status to inactive.
-				user.getCompany().setStatus(CommonConstants.STATUS_INACTIVE);
-				organizationManagementService.updateCompany(user.getCompany());
+        try {
+            if ( user != null && user.isCompanyAdmin() ) {
+                // Add an entry into Disabled_Accounts table with disable_date as current date
+                // and status as inactive.
+                try {
+                    organizationManagementService.addDisabledAccount( user.getCompany().getCompanyId(), true );
+                } catch ( NoRecordsFetchedException | PaymentException e ) {
+                    LOG.error( "Exception caught in deleteCompany() of OrganizationManagementController. Nested exception is ",
+                        e );
+                    throw e;
+                }
 
-				LOG.info("Company deactivated successfully, logging out now.");
-				request.getSession(false).invalidate();
-				SecurityContextHolder.clearContext();
-				
-				message = messageUtils.getDisplayMessage(DisplayMessageConstants.ACCOUNT_DELETION_SUCCESSFUL, DisplayMessageType.SUCCESS_MESSAGE)
-						.toString();
-			}
-		}
-		catch (InvalidInputException e) {
-			LOG.error("InvalidInputException caught in purgeCompany(). Nested exception is ", e);
-			message = messageUtils.getDisplayMessage(DisplayMessageConstants.ACCOUNT_DELETION_UNSUCCESSFUL, DisplayMessageType.ERROR_MESSAGE)
-					.toString();
-		}
+                // Modify the company status to inactive.
+                user.getCompany().setStatus( CommonConstants.STATUS_INACTIVE );
+                organizationManagementService.updateCompany( user.getCompany() );
 
-		redirectAttributes.addFlashAttribute(CommonConstants.MESSAGE, message);
-		return "redirect:/" + JspResolver.LOGIN + ".do";
-	}
+                LOG.info( "Company deactivated successfully, logging out now." );
+                request.getSession( false ).invalidate();
+                SecurityContextHolder.clearContext();
+
+                message = messageUtils.getDisplayMessage( DisplayMessageConstants.ACCOUNT_DELETION_SUCCESSFUL,
+                    DisplayMessageType.SUCCESS_MESSAGE ).toString();
+            }
+        } catch ( InvalidInputException e ) {
+            LOG.error( "InvalidInputException caught in purgeCompany(). Nested exception is ", e );
+            message = messageUtils.getDisplayMessage( DisplayMessageConstants.ACCOUNT_DELETION_UNSUCCESSFUL,
+                DisplayMessageType.ERROR_MESSAGE ).toString();
+        }
+
+        redirectAttributes.addFlashAttribute( CommonConstants.MESSAGE, message );
+        return "redirect:/" + JspResolver.LOGIN + ".do";
+    }
 }
 // JIRA: SS-24 BY RM02 EOC
