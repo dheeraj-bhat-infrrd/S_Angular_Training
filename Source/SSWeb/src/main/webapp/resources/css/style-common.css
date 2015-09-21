@@ -696,6 +696,10 @@ html.is-modern.card-root.js.no-touch.csstransitions.svg.inlinesvg.placeholder
 	margin: 0 auto 10px;
 }
 
+.hm-item-dl {
+	margin: 0 auto 10px;
+}
+
 .hm-item-row-left {
 	width: 115px;
 	float: left;
