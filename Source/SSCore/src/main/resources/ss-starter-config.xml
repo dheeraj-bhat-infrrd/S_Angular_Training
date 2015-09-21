@@ -215,6 +215,23 @@
         <property name="durability" value="true" />
     </bean> -->
     
+    
+     <!-- Setting dotloop job detail -->
+    <bean id="dotloopjobdetail"
+        class="org.springframework.scheduling.quartz.JobDetailFactoryBean">
+        <property name="jobClass"
+            value="com.realtech.socialsurvey.core.starter.DotloopReviewProcessor" />
+        <property name="jobDataAsMap">
+            <map>
+                <entry key="dotloopIntegrationApiBuilder" value-ref="zillowIntegrationApiBuilder" />
+                <entry key="organizationManagementService" value-ref="organizationManagementService" />
+                <entry key="userManagementService" value-ref="userManagementService" />
+                <entry key="surveyHandler" value-ref="surveyHandler" />
+            </map>
+        </property>
+        <property name="durability" value="true" />
+    </bean> 
+    
     <!-- setting cron for Account deactivator -->
     <bean id="sitemapgeneratorcron"
         class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
@@ -304,6 +321,12 @@
         <property name="cronExpression" value="0 25 0,2,4,6,8,10,12,14,16,18,20,22 * * ?" />
     </bean> -->
     
+    <bean id="dotloopcron"
+        class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
+        <property name="jobDetail" ref="dotloopjobdetail" />
+        <property name="cronExpression" value="0 0/1 * * * ?" />
+    </bean>
+    
     <!-- Scheduler factory -->
     <bean class="org.springframework.scheduling.quartz.SchedulerFactoryBean">
         <property name="jobDetails">
@@ -320,6 +343,7 @@
                 <ref bean="imageloaderjobdetail" />
                 <ref bean="fileuploadjobdetail" />
                 <!-- <ref bean="zillowjobdetail" /> -->
+                <!-- <ref bean="dotloopjobdetail" /> -->
             </list>
         </property>
 
@@ -336,6 +360,7 @@
                 <ref bean="crmdataagentidmappercron" />
                 <ref bean="imageloadercron" />
                 <ref bean="fileuploadcron" />
+                <!-- <ref bean="dotloopcron" /> -->
                 <!-- <ref bean="zillowcron" /> -->
             </list>
         </property>
@@ -366,6 +391,8 @@
         class="com.realtech.socialsurvey.core.services.organizationmanagement.impl.UserManagementServiceImpl" />
         <bean id="zillowIntegrationApiBuilder"
         class="com.realtech.socialsurvey.core.integration.zillow.ZillowIntergrationApiBuilder" />
+        <bean id="dotloopIntegrationApiBuilder"
+        class="com.realtech.socialsurvey.core.integration.dotloop.DotloopIntergrationApiBuilder" />
     <bean id="organizationManagementService"
         class="com.realtech.socialsurvey.core.services.organizationmanagement.impl.OrganizationManagementServiceImpl" />
     <bean id="solrSearchService"
