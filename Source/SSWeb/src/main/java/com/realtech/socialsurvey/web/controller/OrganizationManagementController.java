@@ -1529,7 +1529,7 @@ public class OrganizationManagementController {
                     "com.realtech.socialsurvey.core.entities.DotLoopCrmInfo" );
 
                 companySettings.setCrm_info( dotLoopCrmInfo );
-                message = messageUtils.getDisplayMessage( DisplayMessageConstants.ENCOMPASS_DATA_UPDATE_SUCCESSFUL,
+                message = messageUtils.getDisplayMessage( DisplayMessageConstants.DOTLOOP_CONNECTION_SUCCESSFUL,
                     DisplayMessageType.SUCCESS_MESSAGE ).getMessage();
             }
         } catch ( NonFatalException e ) {
@@ -1552,7 +1552,7 @@ public class OrganizationManagementController {
             if ( !validateDotloopParameters( request ) ) {
                 // TODO: code to test connection
             }
-            message = messageUtils.getDisplayMessage( DisplayMessageConstants.DOT_LOOP_CONNECTION_SUCCESSFUL,
+            message = messageUtils.getDisplayMessage( DisplayMessageConstants.DOTLOOP_DATA_UPDATE_SUCCESSFUL,
                 DisplayMessageType.SUCCESS_MESSAGE ).getMessage();
         } catch ( NonFatalException e ) {
             if ( request.getAttribute( "savedotloopdetails" ) != null ) {
