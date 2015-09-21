@@ -461,7 +461,7 @@ public class AdminController
             }
 
             List<Company> companyList = organizationManagementService.getCompaniesByDateRange( startDate, endDate );
-            String fileName = "Company_Registation_Report" + CommonConstants.EXCEL_FILE_EXTENSION;
+            String fileName = "Company_Registration_Report" + CommonConstants.EXCEL_FILE_EXTENSION;
 
             XSSFWorkbook workbook = organizationManagementService.downloadCompanyReport( companyList, fileName );
             response.setContentType( CommonConstants.EXCEL_FORMAT );

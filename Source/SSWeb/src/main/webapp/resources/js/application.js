@@ -3034,6 +3034,36 @@ function validateEncompassInput(elementId) {
 	return isEncompassValid;
 }
 
+//validate dotloop form
+function validateDotloopInput() {
+	
+	if(!validateDotloopKey('encompass-apikey')){
+		$('#encompass-username').focus();
+		return false;
+	}
+	return true;
+}
+
+//Dotloop function
+function saveDotloopDetails(formid) {
+	if (validateDotloopInput()) {
+		var url = "./savedotloopdetails.do";
+		callAjaxFormSubmit(url, function(response) {
+			$("#overlay-toast").html(response);
+			showToast();
+		}, formid);
+	}
+}
+
+function testDotloopConnection(formid) {
+	if (validateDotloopInput(formid)) {
+		var url = "./testdotloopconnection.do";
+		callAjaxFormSubmit(url, function(response) {
+			$("#overlay-toast").html(response);
+			showToast();
+		}, formid);
+	}
+}
 
 // Mail content
 function updateMailContent(formid){
