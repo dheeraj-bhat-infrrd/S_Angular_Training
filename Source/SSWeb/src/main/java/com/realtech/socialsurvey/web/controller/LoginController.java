@@ -190,6 +190,7 @@ public class LoginController {
 
 			HttpSession session = request.getSession(true);
 			user = sessionHelper.getCurrentUser();
+			
 
 			// Check if super admin is logged in
 			if (user.isSuperAdmin()) {
@@ -272,7 +273,18 @@ public class LoginController {
 
 					if (redirectTo.equals(JspResolver.LANDING)) {
 						setSession(session);
-
+						
+						if(sessionHelper.getCurrentUser() != null && sessionHelper.getCurrentUser().getCompany() != null){
+							String billingMode = sessionHelper.getCurrentUser().getCompany().getBillingMode();
+							if(billingMode.equals(CommonConstants.BILLING_MODE_AUTO)){
+								session.setAttribute(CommonConstants.BILLING_MODE_ATTRIBUTE_IN_SESSION, CommonConstants.BILLING_MODE_AUTO);
+							}else{
+								session.setAttribute(CommonConstants.BILLING_MODE_ATTRIBUTE_IN_SESSION , CommonConstants.BILLING_MODE_INVOICE);								
+							}
+						}else{
+							session.setAttribute( CommonConstants.BILLING_MODE_ATTRIBUTE_IN_SESSION , CommonConstants.BILLING_MODE_AUTO);
+						}
+						
 						// Setting session variable to show linkedin signup and sendsurvey popups
 						// only once
 
