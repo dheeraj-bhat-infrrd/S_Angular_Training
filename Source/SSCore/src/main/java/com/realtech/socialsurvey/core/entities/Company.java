@@ -56,6 +56,12 @@ public class Company implements Serializable {
 	@Column(name = "BILLING_MODE")
 	private String billingMode;
 
+	@Column(name = "SETTINGS_LOCK_STATUS")
+	private String settingsLockStatus;
+
+	@Column(name = "SETTINGS_SET_STATUS")
+	private String settingsSetStatus;
+
 	@ManyToOne
 	@JoinColumn(name = "VERTICAL_ID")
 	private VerticalsMaster verticalsMaster;
@@ -186,12 +192,28 @@ public class Company implements Serializable {
 		this.billingMode = billingMode;
 	}
 
+	public String getSettingsLockStatus() {
+		return settingsLockStatus;
+	}
+
+	public void setSettingsLockStatus(String settingsLockStatus) {
+		this.settingsLockStatus = settingsLockStatus;
+	}
+
+	public String getSettingsSetStatus() {
+		return settingsSetStatus;
+	}
+
+	public void setSettingsSetStatus(String settingsSetStatus) {
+		this.settingsSetStatus = settingsSetStatus;
+	}
+
 	public String getDisplayBillingMode() {
 
 		String billingModeStr = "";
 
 		if (this.billingMode.equals("A")) {
-			billingModeStr = "Auto Dedit";
+			billingModeStr = "Auto Debit";
 		}
 		else if (this.billingMode.equals("I")) {
 			billingModeStr = "Invoice";
@@ -199,7 +221,7 @@ public class Company implements Serializable {
 
 		return billingModeStr;
 	}
-	
+
 	public List<Branch> getBranches() {
 		return this.branches;
 	}

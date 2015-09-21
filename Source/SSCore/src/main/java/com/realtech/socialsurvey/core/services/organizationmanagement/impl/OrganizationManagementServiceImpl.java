@@ -90,6 +90,7 @@ import com.realtech.socialsurvey.core.entities.VerticalCrmMapping;
 import com.realtech.socialsurvey.core.entities.VerticalsMaster;
 import com.realtech.socialsurvey.core.entities.ZipCodeLookup;
 import com.realtech.socialsurvey.core.enums.AccountType;
+import com.realtech.socialsurvey.core.enums.SettingsForApplication;
 import com.realtech.socialsurvey.core.exception.DatabaseException;
 import com.realtech.socialsurvey.core.exception.FatalException;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
@@ -107,6 +108,8 @@ import com.realtech.socialsurvey.core.services.payment.Payment;
 import com.realtech.socialsurvey.core.services.payment.exception.PaymentException;
 import com.realtech.socialsurvey.core.services.search.SolrSearchService;
 import com.realtech.socialsurvey.core.services.search.exception.SolrException;
+import com.realtech.socialsurvey.core.services.settingsmanagement.SettingsLocker;
+import com.realtech.socialsurvey.core.services.settingsmanagement.SettingsSetter;
 import com.realtech.socialsurvey.core.utils.DisplayMessageConstants;
 import com.realtech.socialsurvey.core.utils.EmailFormatHelper;
 import com.realtech.socialsurvey.core.utils.EncryptionHelper;
@@ -239,6 +242,12 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
     @Autowired
     private UtilityService utilityService;
 
+    @Autowired
+    private SettingsLocker settingsLocker;
+
+    @Autowired
+    private SettingsSetter settingsSetter;
+
 
     /**
      * This method adds a new company and updates the same for current user and all its user
@@ -329,11 +338,12 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
         ProfilesMaster profilesMaster = userManagementService
             .getProfilesMasterById( CommonConstants.PROFILES_MASTER_REGION_ADMIN_PROFILE_ID );
 
+        //user profile for region admin will not be primary
         LOG.debug( "Creating user profile for region admin" );
         UserProfile userProfileRegionAdmin = userManagementService.createUserProfile( user, user.getCompany(),
             user.getEmailId(), CommonConstants.DEFAULT_AGENT_ID, CommonConstants.DEFAULT_BRANCH_ID, region.getRegionId(),
-            profilesMaster.getProfileId(), CommonConstants.PROFILE_STAGES_COMPLETE, CommonConstants.STATUS_ACTIVE,
-            String.valueOf( user.getUserId() ), String.valueOf( user.getUserId() ) );
+            profilesMaster.getProfileId(), CommonConstants.IS_PRIMARY_FALSE, CommonConstants.PROFILE_STAGES_COMPLETE,
+            CommonConstants.STATUS_ACTIVE, String.valueOf( user.getUserId() ), String.valueOf( user.getUserId() ) );
         userProfileDao.save( userProfileRegionAdmin );
 
         LOG.debug( "Adding the default branch" );
@@ -343,10 +353,20 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
         profilesMaster = userManagementService.getProfilesMasterById( CommonConstants.PROFILES_MASTER_BRANCH_ADMIN_PROFILE_ID );
 
         LOG.debug( "Creating user profile for branch admin" );
+        //these cases will be applicable for only new users
+        //in case of enterprise account make branch admin profile as isPrimary 
+        //and in case of individual account make agent profile as isPrimary
+        int isPrimaryprofile;
+        if ( accountType == AccountType.ENTERPRISE ) {
+            isPrimaryprofile = CommonConstants.IS_PRIMARY_TRUE;
+        } else {
+            isPrimaryprofile = CommonConstants.IS_PRIMARY_FALSE;
+        }
+
         UserProfile userProfileBranchAdmin = userManagementService.createUserProfile( user, user.getCompany(),
             user.getEmailId(), CommonConstants.DEFAULT_AGENT_ID, branch.getBranchId(), region.getRegionId(),
-            profilesMaster.getProfileId(), CommonConstants.PROFILE_STAGES_COMPLETE, CommonConstants.STATUS_ACTIVE,
-            String.valueOf( user.getUserId() ), String.valueOf( user.getUserId() ) );
+            profilesMaster.getProfileId(), isPrimaryprofile, CommonConstants.PROFILE_STAGES_COMPLETE,
+            CommonConstants.STATUS_ACTIVE, String.valueOf( user.getUserId() ), String.valueOf( user.getUserId() ) );
         userProfileDao.save( userProfileBranchAdmin );
 
         /**
@@ -358,8 +378,8 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
             LOG.debug( "Creating user profile for agent" );
             UserProfile userProfileAgent = userManagementService.createUserProfile( user, user.getCompany(), user.getEmailId(),
                 user.getUserId(), branch.getBranchId(), region.getRegionId(), profilesMaster.getProfileId(),
-                CommonConstants.PROFILE_STAGES_COMPLETE, CommonConstants.STATUS_ACTIVE, String.valueOf( user.getUserId() ),
-                String.valueOf( user.getUserId() ) );
+                CommonConstants.IS_PRIMARY_TRUE, CommonConstants.PROFILE_STAGES_COMPLETE, CommonConstants.STATUS_ACTIVE,
+                String.valueOf( user.getUserId() ), String.valueOf( user.getUserId() ) );
             userProfileDao.save( userProfileAgent );
 
         }
@@ -416,7 +436,9 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
         VerticalsMaster verticalsMaster = verticalMastersDao.findByColumn( VerticalsMaster.class,
             CommonConstants.VERTICALS_MASTER_NAME_COLUMN, vertical ).get( CommonConstants.INITIAL_INDEX );
         company.setVerticalsMaster( verticalsMaster );
-
+        //remove this code or remove hard coded status
+        company.setSettingsLockStatus( "0" );
+        company.setSettingsSetStatus( "0" );
         company.setCreatedBy( String.valueOf( user.getUserId() ) );
         company.setModifiedBy( String.valueOf( user.getUserId() ) );
         company.setCreatedOn( new Timestamp( System.currentTimeMillis() ) );
@@ -483,14 +505,35 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 
         // create a organization settings object
         OrganizationUnitSettings companySettings = new OrganizationUnitSettings();
+        LockSettings lockSettings = new LockSettings();
         companySettings.setIden( company.getCompanyId() );
         if ( organizationalDetails.get( CommonConstants.LOGO_NAME ) != null ) {
             companySettings.setLogo( organizationalDetails.get( CommonConstants.LOGO_NAME ) );
+
+            try {
+                settingsSetter.setSettingsValueForCompany( company, SettingsForApplication.LOGO, true );
+                settingsLocker.lockSettingsValueForCompany( company, SettingsForApplication.LOGO, true );
+            } catch ( NonFatalException e ) {
+                LOG.error( "Exception Caught " + e.getMessage() );
+            }
+
+
+            lockSettings.setLogoLocked( true );
+
+
         }
 
+        companySettings.setLockSettings( lockSettings );
         ContactDetailsSettings contactDetailSettings = new ContactDetailsSettings();
         contactDetailSettings.setName( company.getCompany() );
-        contactDetailSettings.setAddress( organizationalDetails.get( CommonConstants.ADDRESS ) );
+        if ( organizationalDetails.get( CommonConstants.ADDRESS ) != null ) {
+            try {
+                settingsSetter.setSettingsValueForCompany( company, SettingsForApplication.ADDRESS, true );
+            } catch ( NonFatalException e ) {
+                LOG.error( "Exception Caught " + e.getMessage() );
+            }
+            contactDetailSettings.setAddress( organizationalDetails.get( CommonConstants.ADDRESS ) );
+        }
         contactDetailSettings.setAddress1( organizationalDetails.get( CommonConstants.ADDRESS1 ) );
         contactDetailSettings.setAddress2( organizationalDetails.get( CommonConstants.ADDRESS2 ) );
         contactDetailSettings.setZipcode( organizationalDetails.get( CommonConstants.ZIPCODE ) );
@@ -501,7 +544,14 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 
         // Add work phone number in contact details
         ContactNumberSettings contactNumberSettings = new ContactNumberSettings();
-        contactNumberSettings.setWork( organizationalDetails.get( CommonConstants.COMPANY_CONTACT_NUMBER ) );
+        if ( organizationalDetails.get( CommonConstants.COMPANY_CONTACT_NUMBER ) != null ) {
+            contactNumberSettings.setWork( organizationalDetails.get( CommonConstants.COMPANY_CONTACT_NUMBER ) );
+            try {
+                settingsSetter.setSettingsValueForCompany( company, SettingsForApplication.PHONE, true );
+            } catch ( NonFatalException e ) {
+                LOG.error( "Exception Caught " + e.getMessage() );
+            }
+        }
         contactDetailSettings.setContact_numbers( contactNumberSettings );
 
         // Add work Mail id in contact details
@@ -519,9 +569,6 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
         companySettings.setModifiedOn( System.currentTimeMillis() );
         companySettings.setModifiedBy( String.valueOf( user.getUserId() ) );
 
-        LockSettings lockSettings = new LockSettings();
-        lockSettings.setLogoLocked( true );
-        companySettings.setLockSettings( lockSettings );
 
         // Adding default text for various flows of survey.
         SurveySettings surveySettings = new SurveySettings();
@@ -662,6 +709,9 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
         region.setCreatedBy( String.valueOf( user.getUserId() ) );
         region.setModifiedBy( String.valueOf( user.getUserId() ) );
         region.setCreatedOn( new Timestamp( System.currentTimeMillis() ) );
+        //TODO remove this code or remove hard coded status
+        region.setSettingsLockStatus( "0" );
+        region.setSettingsSetStatus( "0" );
         region.setModifiedOn( new Timestamp( System.currentTimeMillis() ) );
         region = regionDao.save( region );
         LOG.debug( "Method addRegion finished." );
@@ -692,6 +742,9 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
         branch.setModifiedBy( String.valueOf( user.getUserId() ) );
         branch.setCreatedOn( new Timestamp( System.currentTimeMillis() ) );
         branch.setModifiedOn( new Timestamp( System.currentTimeMillis() ) );
+        //TODO remove set lock status from here or remove hard coded status
+        branch.setSettingsLockStatus( "0" );
+        branch.setSettingsSetStatus( "0" );
         branch = branchDao.save( branch );
         LOG.debug( "Method addBranch finished." );
         return branch;
@@ -2065,6 +2118,87 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
     }
 
 
+    /***
+     * 
+     * @param userProfileNew
+     * @param userProfiles
+     * @return
+     */
+    private int checkWillNewProfileBePrimary( UserProfile userProfileNew, List<UserProfile> userProfiles )
+    {
+
+        LOG.debug( "Method checkWillNewProfileBePrimary called in OrganizationManagementService for email id"
+            + userProfileNew.getEmailId() );
+
+        int isPrimary = CommonConstants.IS_PRIMARY_FALSE;
+
+        if ( userProfiles != null && !userProfiles.isEmpty() ) {
+            for ( UserProfile profile : userProfiles ) {
+
+                if ( profile.getIsPrimary() == CommonConstants.IS_PRIMARY_TRUE ) {
+
+                    LOG.debug( "An old primary profile founded for email id " + userProfileNew.getEmailId() );
+
+                    boolean isOldProfileDefault = false;
+                    boolean isOldProfileAdmin = false;
+                    boolean isOldProfileAgent = false;
+                    //get the value of all three variables
+                    Branch branch = branchDao.findById( Branch.class, profile.getBranchId() );
+                    if ( branch != null && branch.getIsDefaultBySystem() == CommonConstants.IS_DEFAULT_BY_SYSTEM_YES ) {
+                        isOldProfileDefault = true;
+                    }
+
+                    if ( profile.getProfilesMaster().getProfileId() == CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID ) {
+                        isOldProfileAgent = true;
+                    } else {
+                        isOldProfileAdmin = true;
+                    }
+                    //if old primary profile is default than remove primary from that and mark new profile as primary
+                    if ( isOldProfileDefault ) {
+                        LOG.debug( "Old primary profile has a default branch " );
+                        //check if new profile is for default branch
+                        Branch newProfileBranch = branchDao.findById( Branch.class, userProfileNew.getBranchId() );
+                        //if new profile's branch is default than new profile will not be primary
+                        if ( newProfileBranch != null
+                            && newProfileBranch.getIsDefaultBySystem() == CommonConstants.IS_DEFAULT_BY_SYSTEM_YES
+                            && userProfileNew.getProfilesMaster().getProfileId() == CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID ) {
+                            isPrimary = CommonConstants.IS_PRIMARY_FALSE;
+                            // if new profile's branch is not default than make new profile as primary and change old one	
+                        } else {
+                            profile.setIsPrimary( CommonConstants.IS_PRIMARY_FALSE );
+                            userProfileDao.update( profile );
+                            isPrimary = CommonConstants.IS_PRIMARY_TRUE;
+                        }
+
+                    } else if ( isOldProfileAdmin ) {
+                        LOG.debug( "Old primary profile is an admin profile of type "
+                            + profile.getProfilesMaster().getProfile() );
+                        //if old profile is for admin and new is for agent than remove primary from old and mark new profile as primary
+                        if ( userProfileNew.getProfilesMaster().getProfileId() == CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID ) {
+                            profile.setIsPrimary( CommonConstants.IS_PRIMARY_FALSE );
+                            userProfileDao.update( profile );
+                            isPrimary = CommonConstants.IS_PRIMARY_TRUE;
+                        } else {
+                            isPrimary = CommonConstants.IS_PRIMARY_FALSE;
+                        }
+                        // if old profile is for agent and its not default than mark new profile as not primary
+                    } else if ( isOldProfileAgent ) {
+                        LOG.debug( "old primary profile is an agent profile" );
+                        isPrimary = CommonConstants.IS_PRIMARY_FALSE;
+                    }
+
+                }
+            }
+            //if no old profile is there for user than make new profile as primary
+        } else {
+            LOG.debug( "No old profile found for user. New Profile will be primary" );
+            isPrimary = CommonConstants.IS_PRIMARY_TRUE;
+        }
+
+        return isPrimary;
+    }
+
+
     /**
      * Method to assign a region to a user
      * 
@@ -2104,8 +2238,9 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 
         UserProfile userProfileNew = userManagementService.createUserProfile( assigneeUser, adminUser.getCompany(),
             assigneeUser.getEmailId(), assigneeUser.getUserId(), defaultBranch.getBranchId(), regionId, profileMasterId,
-            CommonConstants.DASHBOARD_STAGE, CommonConstants.STATUS_ACTIVE, String.valueOf( adminUser.getUserId() ),
-            String.valueOf( adminUser.getUserId() ) );
+            CommonConstants.IS_PRIMARY_FALSE, CommonConstants.DASHBOARD_STAGE, CommonConstants.STATUS_ACTIVE,
+            String.valueOf( adminUser.getUserId() ), String.valueOf( adminUser.getUserId() ) );
+
 
         // check if user profile already exists
         int indexToRemove = -1;
@@ -2129,6 +2264,11 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
                 }
             }
         }
+
+        //check if new profile will be primary or not
+        int isPrimary = checkWillNewProfileBePrimary( userProfileNew, userProfiles );
+        userProfileNew.setIsPrimary( isPrimary );
+
         // Remove if the profile from list
         if ( indexToRemove != -1 ) {
             userProfiles.remove( indexToRemove );
@@ -2259,8 +2399,8 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 
         UserProfile userProfileNew = userManagementService.createUserProfile( assigneeUser, adminUser.getCompany(),
             assigneeUser.getEmailId(), assigneeUser.getUserId(), branchId, regionId, profileMasterId,
-            CommonConstants.DASHBOARD_STAGE, CommonConstants.STATUS_ACTIVE, String.valueOf( adminUser.getUserId() ),
-            String.valueOf( adminUser.getUserId() ) );
+            CommonConstants.IS_PRIMARY_FALSE, CommonConstants.DASHBOARD_STAGE, CommonConstants.STATUS_ACTIVE,
+            String.valueOf( adminUser.getUserId() ), String.valueOf( adminUser.getUserId() ) );
 
         // check if user profile already exists
         int indexToRemove = -1;
@@ -2282,6 +2422,11 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
                 }
             }
         }
+
+        //check if profile will be primary or not
+        int isPrimary = checkWillNewProfileBePrimary( userProfileNew, userProfiles );
+        userProfileNew.setIsPrimary( isPrimary );
+
         // Remove if the profile from list
         if ( indexToRemove != -1 ) {
             userProfiles.remove( indexToRemove );
@@ -2428,7 +2573,8 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
         queries.put( CommonConstants.IS_DEFAULT_BY_SYSTEM, CommonConstants.STATUS_INACTIVE );
         queries.put( CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_ACTIVE );
 
-        List<Branch> branchList = branchDao.findProjectionsAscOrderByKeyValue( Branch.class, projections, queries, CommonConstants.BRANCH_OBJECT );
+        List<Branch> branchList = branchDao.findProjectionsAscOrderByKeyValue( Branch.class, projections, queries,
+            CommonConstants.BRANCH_OBJECT );
         LOG.info( "Branch list fetched for the company " + company );
         return branchList;
     }
@@ -2482,7 +2628,8 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
         queries.put( CommonConstants.IS_DEFAULT_BY_SYSTEM, CommonConstants.STATUS_INACTIVE );
         queries.put( CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_ACTIVE );
 
-        List<Region> regionList = regionDao.findProjectionsAscOrderByKeyValue( Region.class, projections, queries, CommonConstants.REGION_OBJECT );
+        List<Region> regionList = regionDao.findProjectionsAscOrderByKeyValue( Region.class, projections, queries,
+            CommonConstants.REGION_OBJECT );
         LOG.info( "Region list fetched for the company " + company );
         return regionList;
     }
@@ -3884,7 +4031,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
      * Method to read default survey mail content from EmailTemplate which will be store into the
      * Company Settings.
      */
-    private String readMailContentFromFile( String fileName ) throws IOException
+    public String readMailContentFromFile( String fileName ) throws IOException
     {
         LOG.debug( "readSurveyReminderMailContentFromFile() started" );
         BufferedReader reader = new BufferedReader( new InputStreamReader( this.getClass().getClassLoader()
@@ -4123,15 +4270,18 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 
     @Override
     @Transactional
-    public List<VerticalCrmMapping> getCrmMapping( User user )
+    public List<VerticalCrmMapping> getCrmMapping( User user ) throws InvalidInputException
     {
         user = userDao.findById( User.class, user.getUserId() );
         List<VerticalCrmMapping> mappings = user.getCompany().getVerticalsMaster().getVerticalCrmMappings();
 
         if ( mappings == null || mappings.isEmpty() ) {
-            VerticalCrmMapping defaultMapping = verticalCrmMappingDo.findById( VerticalCrmMapping.class,
-                CommonConstants.DEFAULT_VERTICAL_CRM_ID );
-            mappings.add( defaultMapping );
+            Map<String, Object> queries = new HashMap<>();
+            VerticalsMaster defaultVerticalMaster = verticalMastersDao.findById( VerticalsMaster.class,
+                CommonConstants.DEFAULT_VERTICAL_ID );
+            queries.put( "verticalsMaster", defaultVerticalMaster );
+            List<VerticalCrmMapping> defaultMappings = verticalCrmMappingDo.findByKeyValue( VerticalCrmMapping.class, queries );
+            mappings.addAll( defaultMappings );
         }
 
         for ( VerticalCrmMapping mapping : mappings ) {
@@ -4376,6 +4526,68 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
             skipCount, batchSize );
         return fieldIngestionEntities;
     }
+
+
+    @Transactional
+    @Override
+    public void updateBranchProfileName( long branchId, String profileName )
+    {
+        LOG.info( "Method updateBranchProfileName() started." );
+        Branch branch = branchDao.findById( Branch.class, branchId );
+        branch.setProfileName( profileName );
+        branchDao.update( branch );
+        LOG.info( "Method updateBranchProfileName() finished." );
+
+    }
+
+
+    @Transactional
+    @Override
+    public void updateRegionProfileName( long regionId, String profileName )
+    {
+        LOG.info( "Method updateRegionProfileName() started." );
+        Region region = regionDao.findById( Region.class, regionId );
+        region.setProfileName( profileName );
+        regionDao.update( region );
+        LOG.info( "Method updateRegionProfileName() finished." );
+    }
+
+
+    @Override
+    public Company getPrimaryCompanyByRegion( long regionId )
+    {
+        Region region = regionDao.findById( Region.class, regionId );
+        Company company = null;
+        if ( region != null ) {
+            company = region.getCompany();
+        }
+        return company;
+    }
+
+
+    @Override
+    public Region getPrimaryRegionByBranch( long branchId )
+    {
+        Region region = null;
+        Branch branch = branchDao.findById( Branch.class, branchId );
+        if ( branch != null ) {
+            region = branch.getRegion();
+        }
+
+        return region;
+    }
+
+
+    @Override
+    @Transactional
+    public void updateMailContentForOrganizationUnit( MailContentSettings mailContentSettings,
+        OrganizationUnitSettings organizationUnitSettings, String collectionName )
+    {
+        organizationUnitSettingsDao
+            .updateParticularKeyOrganizationUnitSettings( MongoOrganizationUnitSettingDaoImpl.KEY_MAIL_CONTENT,
+                mailContentSettings, organizationUnitSettings, collectionName );
+    }
+
 
 }
 // JIRA: SS-27: By RM05: EOC
