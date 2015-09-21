@@ -41,6 +41,12 @@ public class Region implements Serializable {
 	@Column(name = "IS_DEFAULT_BY_SYSTEM")
 	private int isDefaultBySystem;
 
+	@Column(name = "SETTINGS_LOCK_STATUS")
+	private String settingsLockStatus;
+
+	@Column(name = "SETTINGS_SET_STATUS")
+	private String settingsSetStatus;
+
 	@Column(name = "MODIFIED_BY")
 	private String modifiedBy;
 
@@ -64,19 +70,19 @@ public class Region implements Serializable {
 
 	@Transient
 	private String address2;
-	
+
 	@Transient
 	private String country;
-	
+
 	@Transient
 	private String countryCode;
-	
+
 	@Transient
 	private String state;
-	
+
 	@Transient
 	private String city;
-	
+
 	@Transient
 	private String zipcode;
 
@@ -121,6 +127,22 @@ public class Region implements Serializable {
 
 	public void setIsDefaultBySystem(int isDefaultBySystem) {
 		this.isDefaultBySystem = isDefaultBySystem;
+	}
+
+	public String getSettingsLockStatus() {
+		return settingsLockStatus;
+	}
+
+	public void setSettingsLockStatus(String settingsLockStatus) {
+		this.settingsLockStatus = settingsLockStatus;
+	}
+
+	public String getSettingsSetStatus() {
+		return settingsSetStatus;
+	}
+
+	public void setSettingsSetStatus(String settingsSetStatus) {
+		this.settingsSetStatus = settingsSetStatus;
 	}
 
 	public String getModifiedBy() {
@@ -178,7 +200,7 @@ public class Region implements Serializable {
 	public void setAddress2(String address2) {
 		this.address2 = address2;
 	}
-	
+
 	public String getCountry() {
 		return country;
 	}
