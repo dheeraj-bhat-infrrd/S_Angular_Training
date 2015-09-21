@@ -670,4 +670,6 @@ public interface CommonConstants
     public static final String SETTING_SCORE = "setScore";
     
     public static final String LOCK_SCORE = "lockScore";
+    
+    public static final String AUTHORIZATION_HEADER = "Authorization: Bearer ";
 }
