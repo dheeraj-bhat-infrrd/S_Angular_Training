@@ -1335,7 +1335,7 @@ public class SocialManagementController
             try {
                 if ( setting != null )
                     if ( !socialManagementService.updateStatusIntoFacebookPage( setting, facebookMessage,
-                        requestUtils.getRequestServerName( request ) ) )
+                        requestUtils.getRequestServerName( request ) , user.getCompany().getCompanyId()) )
                         facebookNotSetup = false;
             } catch ( FacebookException | InvalidInputException e ) {
                 LOG.error(
