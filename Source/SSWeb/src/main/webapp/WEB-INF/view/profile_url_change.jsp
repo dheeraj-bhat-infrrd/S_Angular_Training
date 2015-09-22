@@ -83,6 +83,7 @@ function validateprofileUrlEditForm() {
 	$.ajax({
 		url : "./updateprofileurl.do?searchKey=" + profileUrl,
 		type : "GET",
+		cache : false,
 		dataType : "html",
 		async : true,
 		success : function(data) {
@@ -103,7 +104,6 @@ function validateprofileUrlEditForm() {
 			}
 		},
 		error : function(e) {
-			console.log("Failure!");
 			if(e.status == 504) {
 				redirectToLoginPageOnSessionTimeOut(e.status);
 				return;
