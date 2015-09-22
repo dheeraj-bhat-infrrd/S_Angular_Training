@@ -1050,9 +1050,9 @@ function showDisplayPic() {
 	});
 }
 
-function updateCurrentProfile(entityType, entityValue) {
+function updateCurrentProfile(entityType, entityValue, callbackFunction) {
 	var url = "./updatecurrentprofile.do?entityId=" + entityValue + "&entityType=" + entityType;
-	callAjaxGET(url, function(data) {}, true);
+	callAjaxGET(url, callbackFunction, true);
 }
 
 function showSurveyRequestPage(){
@@ -1081,12 +1081,11 @@ $(document).on('click','.da-dd-item',function(e){
 	attrVal = $(this).attr('data-column-value');
 	
 	// update selected profile in session
-	updateCurrentProfile($(this).attr('data-column-type'), $(this).attr('data-column-value'));
-
-	var selectedTab = window.location.hash.split("#")[1];
-	
-	showMainContent('./' + selectedTab + '.do');
-	//showMainContent('./dashboard.do');
+	updateCurrentProfile($(this).attr('data-column-type'), $(this)
+			.attr('data-column-value'), function() {
+		var selectedTab = window.location.hash.split("#")[1];
+		showMainContent('./' + selectedTab + '.do');
+	});
 });
 
 $(document).click(function(){
@@ -4550,6 +4549,8 @@ function fetchUsers(newIndex) {
 		
 		if (!($('#find-pro-first-name').val() == "" && $('#find-pro-last-name').val() == ""))
 			callAjaxPOSTWithTextData("./findaproscroll.do", paginateUsersProList, true, formData);
+		else
+			hideOverlay();
 	}
 }
 
