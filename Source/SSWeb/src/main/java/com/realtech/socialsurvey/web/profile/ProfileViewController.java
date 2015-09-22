@@ -546,6 +546,9 @@ public class ProfileViewController
                 String disclaimer = profileManagementService.aggregateDisclaimer( individualProfile, CommonConstants.AGENT_ID );
                 individualProfile.setDisclaimer( disclaimer );
 
+                //set survey settings in individual profile
+                individualProfile.setSurvey_settings(companyProfile.getSurvey_settings());
+                
                 String json = new Gson().toJson( individualProfile );
                 model.addAttribute( "profileJson", json );
 
