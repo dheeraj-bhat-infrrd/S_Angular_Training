@@ -216,7 +216,6 @@
 		<property name="jobDataAsMap">
 			<map>
 				<entry key="organizationManagementService" value-ref="organizationManagementService" />
-				<entry key="userManagementService" value-ref="userManagementService" />
 			</map>
 		</property>
 		<property name="durability" value="true" />
