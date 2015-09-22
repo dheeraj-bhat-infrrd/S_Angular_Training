@@ -3179,12 +3179,32 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
                 }
                 if ( entry.getValue() == OrganizationUnit.COMPANY ) {
                     contactDetails.setAddress( companyUnitSettings.getContact_details().getAddress() );
+                    contactDetails.setAddress1( companyUnitSettings.getContact_details().getAddress1());
+                    contactDetails.setAddress2( companyUnitSettings.getContact_details().getAddress2());
+                    contactDetails.setZipcode(companyUnitSettings.getContact_details().getZipcode());
+                    contactDetails.setState(companyUnitSettings.getContact_details().getState());
+                    contactDetails.setCity(companyUnitSettings.getContact_details().getCity());
                 } else if ( entry.getValue() == OrganizationUnit.REGION ) {
                     contactDetails.setAddress( regionUnitSettings.getContact_details().getAddress() );
+                    contactDetails.setAddress1( regionUnitSettings.getContact_details().getAddress1());
+                    contactDetails.setAddress2( regionUnitSettings.getContact_details().getAddress2());
+                    contactDetails.setZipcode(regionUnitSettings.getContact_details().getZipcode());
+                    contactDetails.setState(regionUnitSettings.getContact_details().getState());
+                    contactDetails.setCity(regionUnitSettings.getContact_details().getCity());
                 } else if ( entry.getValue() == OrganizationUnit.BRANCH ) {
                     contactDetails.setAddress( branchUnitSettings.getContact_details().getAddress() );
+                    contactDetails.setAddress1( branchUnitSettings.getContact_details().getAddress1());
+                    contactDetails.setAddress2( branchUnitSettings.getContact_details().getAddress2());
+                    contactDetails.setZipcode(branchUnitSettings.getContact_details().getZipcode());
+                    contactDetails.setState(branchUnitSettings.getContact_details().getState());
+                    contactDetails.setCity(branchUnitSettings.getContact_details().getCity());
                 } else if ( entry.getValue() == OrganizationUnit.AGENT ) {
                     contactDetails.setAddress( agentUnitSettings.getContact_details().getAddress() );
+                    contactDetails.setAddress1( agentUnitSettings.getContact_details().getAddress1());
+                    contactDetails.setAddress2( agentUnitSettings.getContact_details().getAddress2());
+                    contactDetails.setZipcode(agentUnitSettings.getContact_details().getZipcode());
+                    contactDetails.setState(agentUnitSettings.getContact_details().getState());
+                    contactDetails.setCity(agentUnitSettings.getContact_details().getCity());
                 }
                 userProfile.setContact_details( contactDetails );
             } else if ( entry.getKey() == SettingsForApplication.PHONE ) {
