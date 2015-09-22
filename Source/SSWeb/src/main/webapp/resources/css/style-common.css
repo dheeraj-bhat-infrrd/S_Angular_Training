@@ -2197,6 +2197,12 @@ button.paypal.is-active {
 	border-radius: 3px;
 }
 
+.disclaimer-text {
+	height: 90px;
+	overflow-x:hidden;
+	padding: 5px;
+}
+
 .sb-dd-wrapper {
 	border-radius: 0 0 3px 3px;
 	overflow: hidden;

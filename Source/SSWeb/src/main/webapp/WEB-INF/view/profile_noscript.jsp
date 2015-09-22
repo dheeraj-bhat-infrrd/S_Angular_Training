@@ -203,7 +203,7 @@
 							<div class='rating-image float-left smiley-rat-${integerAverageRating }'></div>
 							<div class='rating-rounded float-left'><span itemprop="ratingValue">${floatingAverageRating}</span>  - </div>
 						</div>
-						<div class="float-left review-count-left cursor-pointer" id="prof-company-review-count"><span itemprop="ratingCount">${reviewsCount }</span> Reviews(s)</div>
+						<div class="float-left review-count-left cursor-pointer" id="prof-company-review-count"><span itemprop="reviewCount">${reviewsCount }</span> Reviews(s)</div>
 					</div>
 					<div class="prof-btn-wrapper clearfix">
 						<div class="prof-btn-contact float-left" onclick="focusOnContact()" >Contact
@@ -607,22 +607,25 @@
                     			<c:if test="${integerRating == 0}">
 					    			<c:set var="integerRating" value="1"></c:set>
 					    		</c:if>
-								<div class="ppl-review-item" data-cust-first-name="${reviewItem.customerFirstName }"
+								<div itemprop="review" itemscope itemtype="http://schema.org/Review" class="ppl-review-item" data-cust-first-name="${reviewItem.customerFirstName }"
 									data-cust-last-name="${reviewItem.customerLastName }" data-agent-name="${reviewItem.agentName }"
 									data-rating="${reviewItem.score }" data-review="${reviewItem.review}">
+									<div itemprop="itemReviewed" itemscope itemtype="http://schema.org/Product">
+										<meta itemprop="name" content="${reviewItem.agentName}">
+									</div>
 									<div class="ppl-header-wrapper clearfix">
 										<div class="float-left ppl-header-left">
-											<div class="ppl-head-1">${reviewItem.customerFirstName } ${reviewItem.customerLastName }</div>
+											<div itemprop="author" itemscope itemtype="http://schema.org/Person" class="ppl-head-1"><span itemprop="name">${reviewItem.customerFirstName } ${reviewItem.customerLastName }</span></div>
 											<div class="ppl-head-2"><fmt:formatDate value="${reviewItem.modifiedOn}" pattern="d MMM yyyy"/></div>
 										</div>
 										<div class="float-right ppl-header-right">
 											<div class="st-rating-wrapper maring-0 clearfix review-ratings" data-rating="${reviewItem.score}">
 												<div class="rating-image float-left smiley-rat-${integerRating}"></div>
-												<div class="rating-rounded float-left"><fmt:formatNumber maxFractionDigits="2" minFractionDigits="2" value="${reviewItem.score}"/></div>
+												<div itemprop="reviewRating" itemscope itemtype="http://schema.org/Rating" class="rating-rounded float-left"><span itemprop="ratingValue"><fmt:formatNumber maxFractionDigits="2" minFractionDigits="2" value="${reviewItem.score}"/></span></div>
 											</div>
 										</div>
 									</div>
-									<div class="ppl-content">${reviewItem.review}</div>
+									<div class="ppl-content" itemprop="reviewBody">${reviewItem.review}</div>
 									<div class="ppl-share-wrapper clearfix">
 										<div class="float-left blue-text ppl-share-shr-txt">Share</div>
 										<div class="float-left clearfix ppl-share-social">
