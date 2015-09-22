@@ -2162,8 +2162,16 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
                         if ( newProfileBranch != null
                             && newProfileBranch.getIsDefaultBySystem() == CommonConstants.IS_DEFAULT_BY_SYSTEM_YES
                             && userProfileNew.getProfilesMaster().getProfileId() == CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID ) {
-                            isPrimary = CommonConstants.IS_PRIMARY_FALSE;
-                            // if new profile's branch is not default than make new profile as primary and change old one	
+                        	
+                        	Region newProfileRegion = regionDao.findById(Region.class, userProfileNew.getRegionId());
+                        	
+                        	// if both branches are default and if new profiles region is not default than make new profile as primary
+                        	if(newProfileRegion != null && newProfileRegion.getIsDefaultBySystem() != CommonConstants.IS_DEFAULT_BY_SYSTEM_YES){
+                        		isPrimary = CommonConstants.IS_PRIMARY_TRUE;
+                        	}else{
+                        		 isPrimary = CommonConstants.IS_PRIMARY_FALSE;
+                        	}
+                         // if new profile's branch is not default than make new profile as primary and change old one  	
                         } else {
                             profile.setIsPrimary( CommonConstants.IS_PRIMARY_FALSE );
                             userProfileDao.update( profile );
