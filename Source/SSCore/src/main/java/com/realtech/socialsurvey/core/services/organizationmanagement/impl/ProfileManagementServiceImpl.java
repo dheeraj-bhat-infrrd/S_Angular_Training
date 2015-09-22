@@ -2841,7 +2841,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
                     SettingsForApplication.PHONE ) ) {
                     if ( !settingsLocker.isSettingsValueLocked( OrganizationUnit.BRANCH, currentLockAggregateValue,
                         SettingsForApplication.PHONE ) ) {
-                        webAddressLocked = false;
+                        phoneNumberLocked = false;
                     }
                 }
             }
@@ -2851,7 +2851,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
                     SettingsForApplication.WEB_ADDRESS_WORK ) ) {
                     if ( !settingsLocker.isSettingsValueLocked( OrganizationUnit.BRANCH, currentLockAggregateValue,
                         SettingsForApplication.WEB_ADDRESS_WORK ) ) {
-                        phoneNumberLocked = false;
+                        webAddressLocked = false;
                     }
                 }
             }
