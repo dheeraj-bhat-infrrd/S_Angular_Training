@@ -288,7 +288,8 @@ $(document).on('click', '.report-abuse-txt', function(e) {
 		"firstName" : reviewElement.attr('data-cust-first-name'),
 		"lastName" : reviewElement.attr('data-cust-last-name'),
 		"agentName" : reviewElement.attr('data-agent-name'),
-		"review" : reviewElement.attr('data-review')
+		"review" : reviewElement.attr('data-review'),
+		"surveyMongoId" : reviewElement.attr('survey-mongo-id')
 	};
 	$("#report-abuse-txtbox").val('');
 	
