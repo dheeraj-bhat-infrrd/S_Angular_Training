@@ -132,4 +132,7 @@ public interface SurveyDetailsDao
 
 
     public SurveyDetails getSurveyBySourceSourceIdAndMongoCollection( String surveySourceId, long iden, String collectionName );
+
+
+	void updateSurveyAsAbusive(String surveyMongoId);
 }

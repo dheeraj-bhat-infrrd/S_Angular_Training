@@ -192,6 +192,21 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
         LOG.info( "Method to calculate and update final score based upon rating questions finished." );
     }
 
+    
+    @Override
+    public void updateSurveyAsAbusive( String surveyMongoId )
+    {
+        LOG.info( "Method updateSurveyAsAbusive() to mark survey as abusive started." );
+        Query query = new Query();
+        query.addCriteria( Criteria.where( CommonConstants.DEFAULT_MONGO_ID_COLUMN ).is( surveyMongoId ) );
+        Update update = new Update();
+        update.set( CommonConstants.IS_ABUSIVE_COLUMN, true );
+        update.set( CommonConstants.CREATED_ON, new Date() );
+        update.set( CommonConstants.MODIFIED_ON_COLUMN, new Date() );
+        mongoTemplate.updateMulti( query, update, SURVEY_DETAILS_COLLECTION );
+        LOG.info( "Method updateSurveyAsAbusive() to mark survey as abusive finished." );
+    }
+
 
     @Override
     public void updateSurveyAsClicked( long agentId, String customerEmail )

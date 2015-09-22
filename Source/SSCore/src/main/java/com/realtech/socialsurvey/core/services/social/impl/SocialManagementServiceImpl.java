@@ -1,6 +1,8 @@
 package com.realtech.socialsurvey.core.services.social.impl;
 
 import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -43,6 +45,7 @@ import com.realtech.socialsurvey.core.services.social.SocialManagementService;
 import facebook4j.Facebook;
 import facebook4j.FacebookException;
 import facebook4j.FacebookFactory;
+import facebook4j.PostUpdate;
 import facebook4j.auth.AccessToken;
 
 /**
@@ -87,16 +90,19 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
 	// Linkedin
 	@Value("${LINKED_IN_REST_API_URI}")
 	private String linkedInRestApiUri;
-	
+
 	@Value("${APPLICATION_BASE_URL}")
 	private String applicationBaseUrl;
-	
+
 	@Value("${APPLICATION_LOGO_URL}")
 	private String applicationLogoUrl;
-	
+
 	@Value("${APPLICATION_LOGO_LINKEDIN_URL}")
 	private String applicationLogoUrlForLinkedin;
 	
+	@Value("${CUSTOM_SOCIALNETWORK_POST_COMPANY_ID}")
+	private String customisedSocialNetworkCompanyId;
+
 	/**
 	 * Returns the Twitter request token for a particular URL
 	 * 
@@ -106,7 +112,7 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
 	@Override
 	public RequestToken getTwitterRequestToken(String serverBaseUrl) throws TwitterException {
 		Twitter twitter = getTwitterInstance();
-		RequestToken requestToken = twitter.getOAuthRequestToken(serverBaseUrl+twitterRedirectUri);
+		RequestToken requestToken = twitter.getOAuthRequestToken(serverBaseUrl + twitterRedirectUri);
 		return requestToken;
 	}
 
@@ -131,7 +137,7 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
 		facebook4j.conf.ConfigurationBuilder confBuilder = new facebook4j.conf.ConfigurationBuilder();
 		confBuilder.setOAuthAppId(facebookClientId);
 		confBuilder.setOAuthAppSecret(facebookAppSecret);
-		confBuilder.setOAuthCallbackURL(serverBaseUrl+facebookRedirectUri);
+		confBuilder.setOAuthCallbackURL(serverBaseUrl + facebookRedirectUri);
 		confBuilder.setOAuthPermissions(facebookScope);
 		facebook4j.conf.Configuration configuration = confBuilder.build();
 
@@ -170,7 +176,7 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
 	}
 
 	@Override
-	public boolean updateStatusIntoFacebookPage(OrganizationUnitSettings agentSettings, String message, String serverBaseUrl)
+	public boolean updateStatusIntoFacebookPage(OrganizationUnitSettings agentSettings, String message, String serverBaseUrl, long companyId)
 			throws InvalidInputException, FacebookException {
 		if (agentSettings == null) {
 			throw new InvalidInputException("AgentSettings can not be null");
@@ -182,20 +188,41 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
 			if (agentSettings.getSocialMediaTokens() != null) {
 				if (agentSettings.getSocialMediaTokens().getFacebookToken() != null
 						&& agentSettings.getSocialMediaTokens().getFacebookToken().getFacebookAccessToken() != null) {
-					if(agentSettings.getSocialMediaTokens().getFacebookToken().getFacebookAccessTokenToPost()!=null)
-						facebook.setOAuthAccessToken(new AccessToken(agentSettings.getSocialMediaTokens().getFacebookToken().getFacebookAccessTokenToPost(),
-								null));
+					if (agentSettings.getSocialMediaTokens().getFacebookToken().getFacebookAccessTokenToPost() != null)
+						facebook.setOAuthAccessToken(new AccessToken(agentSettings.getSocialMediaTokens().getFacebookToken()
+								.getFacebookAccessTokenToPost(), null));
 					else
-						facebook.setOAuthAccessToken(new AccessToken(agentSettings.getSocialMediaTokens().getFacebookToken().getFacebookAccessToken(),
-								null));
+						facebook.setOAuthAccessToken(new AccessToken(
+								agentSettings.getSocialMediaTokens().getFacebookToken().getFacebookAccessToken(), null));
+					try {
+						facebookNotSetup = false;
+						// Updating customised data
+						PostUpdate postUpdate = new PostUpdate(message);
+						postUpdate.setCaption(agentSettings.getCompleteProfileUrl());
 						try {
-							facebookNotSetup = false;
-							facebook.postStatusMessage(message);
+							postUpdate.setLink(new URL(agentSettings.getCompleteProfileUrl()));
 						}
-						catch (RuntimeException e) {
-							LOG.error("Runtime exception caught while trying to post on facebook. Nested exception is ", e);
+						catch (MalformedURLException e1) {
+							// TODO Auto-generated catch block
+							e1.printStackTrace();
 						}
-					
+						// TODO: Hard coded bad code: DELETE: BEGIN
+						if(companyId == Long.parseLong(customisedSocialNetworkCompanyId)){
+							try {
+								postUpdate.setPicture(new URL("https://don7n2as2v6aa.cloudfront.net/remax-facebook-image.png"));
+							}
+							catch (MalformedURLException e) {
+								LOG.warn("Could not set the URL");
+							}
+						}
+						// TODO: Hard coded bad code: DELETE: END
+						facebook.postFeed(postUpdate);
+						//facebook.postStatusMessage(message);
+					}
+					catch (RuntimeException e) {
+						LOG.error("Runtime exception caught while trying to post on facebook. Nested exception is ", e);
+					}
+
 				}
 			}
 		}
@@ -213,8 +240,8 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
 		Twitter twitter = getTwitterInstance();
 		if (agentSettings != null) {
 			if (agentSettings.getSocialMediaTokens() != null) {
-				if (agentSettings.getSocialMediaTokens().getTwitterToken() != null &&
-						agentSettings.getSocialMediaTokens().getTwitterToken().getTwitterAccessTokenSecret() != null) {
+				if (agentSettings.getSocialMediaTokens().getTwitterToken() != null
+						&& agentSettings.getSocialMediaTokens().getTwitterToken().getTwitterAccessTokenSecret() != null) {
 
 					twitter.setOAuthAccessToken(new twitter4j.auth.AccessToken(agentSettings.getSocialMediaTokens().getTwitterToken()
 							.getTwitterAccessToken(), agentSettings.getSocialMediaTokens().getTwitterToken().getTwitterAccessTokenSecret()));
@@ -233,7 +260,8 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
 	}
 
 	@Override
-	public boolean updateLinkedin(OrganizationUnitSettings agentSettings, String message, String linkedinProfileUrl, String linkedinMessageFeedback) throws NonFatalException {
+	public boolean updateLinkedin(OrganizationUnitSettings agentSettings, String message, String linkedinProfileUrl, String linkedinMessageFeedback)
+			throws NonFatalException {
 		if (agentSettings == null) {
 			throw new InvalidInputException("AgentSettings can not be null");
 		}
@@ -241,8 +269,8 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
 		LOG.info("updateLinkedin() started.");
 		if (agentSettings != null) {
 			if (agentSettings.getSocialMediaTokens() != null) {
-				if (agentSettings.getSocialMediaTokens().getLinkedInToken() != null &&
-						agentSettings.getSocialMediaTokens().getLinkedInToken().getLinkedInAccessToken() !=null ) {
+				if (agentSettings.getSocialMediaTokens().getLinkedInToken() != null
+						&& agentSettings.getSocialMediaTokens().getLinkedInToken().getLinkedInAccessToken() != null) {
 					linkedinNotSetup = false;
 					String linkedInPost = new StringBuilder(linkedInRestApiUri).substring(0, linkedInRestApiUri.length() - 1);
 					linkedInPost += "/shares?oauth2_access_token=" + agentSettings.getSocialMediaTokens().getLinkedInToken().getLinkedInAccessToken();
@@ -253,12 +281,9 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
 
 						// add header
 						post.setHeader("Content-Type", "application/json");
-						String a="{\"comment\": \"\",\"content\": {"
-								  +  "\"title\": \"\","
-								  +  "\"description\": \"" + message + "-" + linkedinMessageFeedback + "\","
-								  +  "\"submitted-url\": \"" + linkedinProfileUrl + "\",  "
-								  +  "\"submitted-image-url\": \"" + applicationLogoUrlForLinkedin + "\"},"
-								  +  "\"visibility\": {\"code\": \"anyone\" }}";
+						String a = "{\"comment\": \"\",\"content\": {" + "\"title\": \"\"," + "\"description\": \"" + message + "-"
+								+ linkedinMessageFeedback + "\"," + "\"submitted-url\": \"" + linkedinProfileUrl + "\",  "
+								+ "\"submitted-image-url\": \"" + applicationLogoUrlForLinkedin + "\"}," + "\"visibility\": {\"code\": \"anyone\" }}";
 						StringEntity entity = new StringEntity(a);
 						post.setEntity(entity);
 						try {
@@ -305,7 +330,7 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
 		for (Long regionId : regionIds) {
 			settings.add(organizationUnitSettingsDao.fetchOrganizationUnitSettingsById(regionId, CommonConstants.REGION_SETTINGS_COLLECTION));
 		}
-		
+
 		for (Long companyId : companyIds) {
 			settings.add(organizationUnitSettingsDao.fetchOrganizationUnitSettingsById(companyId, CommonConstants.COMPANY_SETTINGS_COLLECTION));
 		}
@@ -348,54 +373,74 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
 		return settings;
 
 	}
-	
-	@Override
-	public OrganizationUnitSettings disconnectSocialNetwork(String socialMedia, OrganizationUnitSettings unitSettings, String collectionName) throws InvalidInputException {
-	    LOG.debug("Method disconnectSocialNetwork() called");
-	    
-	    String keyToUpdate = null;
-	    
-	    switch (socialMedia) {
-		case CommonConstants.FACEBOOK_SOCIAL_SITE:
-			keyToUpdate = MongoOrganizationUnitSettingDaoImpl.KEY_FACEBOOK_SOCIAL_MEDIA_TOKEN;
-			break;
-			
-		case CommonConstants.TWITTER_SOCIAL_SITE:
-			keyToUpdate = MongoOrganizationUnitSettingDaoImpl.KEY_TWITTER_SOCIAL_MEDIA_TOKEN;
-			break;
-			
-		case CommonConstants.GOOGLE_SOCIAL_SITE:
-			keyToUpdate = MongoOrganizationUnitSettingDaoImpl.KEY_GOOGLE_SOCIAL_MEDIA_TOKEN;
-			break;
-			
-		case CommonConstants.LINKEDIN_SOCIAL_SITE:
-			keyToUpdate = MongoOrganizationUnitSettingDaoImpl.KEY_LINKEDIN_SOCIAL_MEDIA_TOKEN;
-			break;
-			
-		case CommonConstants.ZILLOW_SOCIAL_SITE:
-            keyToUpdate = MongoOrganizationUnitSettingDaoImpl.KEY_ZILLOW_SOCIAL_MEDIA_TOKEN;
-            break;
-           
-		case CommonConstants.YELP_SOCIAL_SITE:
-            keyToUpdate = MongoOrganizationUnitSettingDaoImpl.KEY_YELP_SOCIAL_MEDIA_TOKEN;
-            break;
-            
-		case CommonConstants.LENDINGTREE_SOCIAL_SITE:
-            keyToUpdate = MongoOrganizationUnitSettingDaoImpl.KEY_LENDINGTREE_SOCIAL_MEDIA_TOKEN;
-            break;
-        
-		case CommonConstants.REALTOR_SOCIAL_SITE:
-            keyToUpdate = MongoOrganizationUnitSettingDaoImpl.KEY_REALTOR_SOCIAL_MEDIA_TOKEN;
-            break;
 
-		default:
-			throw new InvalidInputException("Invalid social media token entered");
+	@Override
+	public OrganizationUnitSettings disconnectSocialNetwork(String socialMedia, OrganizationUnitSettings unitSettings, String collectionName)
+			throws InvalidInputException {
+		LOG.debug("Method disconnectSocialNetwork() called");
+
+		String keyToUpdate = null;
+
+		switch (socialMedia) {
+			case CommonConstants.FACEBOOK_SOCIAL_SITE:
+				keyToUpdate = MongoOrganizationUnitSettingDaoImpl.KEY_FACEBOOK_SOCIAL_MEDIA_TOKEN;
+				break;
+
+			case CommonConstants.TWITTER_SOCIAL_SITE:
+				keyToUpdate = MongoOrganizationUnitSettingDaoImpl.KEY_TWITTER_SOCIAL_MEDIA_TOKEN;
+				break;
+
+			case CommonConstants.GOOGLE_SOCIAL_SITE:
+				keyToUpdate = MongoOrganizationUnitSettingDaoImpl.KEY_GOOGLE_SOCIAL_MEDIA_TOKEN;
+				break;
+
+			case CommonConstants.LINKEDIN_SOCIAL_SITE:
+				keyToUpdate = MongoOrganizationUnitSettingDaoImpl.KEY_LINKEDIN_SOCIAL_MEDIA_TOKEN;
+				break;
+
+			case CommonConstants.ZILLOW_SOCIAL_SITE:
+				keyToUpdate = MongoOrganizationUnitSettingDaoImpl.KEY_ZILLOW_SOCIAL_MEDIA_TOKEN;
+				break;
+
+			case CommonConstants.YELP_SOCIAL_SITE:
+				keyToUpdate = MongoOrganizationUnitSettingDaoImpl.KEY_YELP_SOCIAL_MEDIA_TOKEN;
+				break;
+
+			case CommonConstants.LENDINGTREE_SOCIAL_SITE:
+				keyToUpdate = MongoOrganizationUnitSettingDaoImpl.KEY_LENDINGTREE_SOCIAL_MEDIA_TOKEN;
+				break;
+
+			case CommonConstants.REALTOR_SOCIAL_SITE:
+				keyToUpdate = MongoOrganizationUnitSettingDaoImpl.KEY_REALTOR_SOCIAL_MEDIA_TOKEN;
+				break;
+
+			default:
+				throw new InvalidInputException("Invalid social media token entered");
 		}
-	    
-	    OrganizationUnitSettings organizationUnitSettings = organizationUnitSettingsDao.removeKeyInOrganizationSettings(unitSettings, keyToUpdate, collectionName);
-	    
-	    LOG.debug("Method disconnectSocialNetwork() finished");
-	    
-	    return organizationUnitSettings;
+
+		OrganizationUnitSettings organizationUnitSettings = organizationUnitSettingsDao.removeKeyInOrganizationSettings(unitSettings, keyToUpdate,
+				collectionName);
+
+		LOG.debug("Method disconnectSocialNetwork() finished");
+
+		return organizationUnitSettings;
+	}
+
+	@Override
+	public SocialMediaTokens checkOrAddZillowLastUpdated(SocialMediaTokens mediaTokens) throws InvalidInputException {
+		if (mediaTokens == null) {
+			throw new InvalidInputException("Invalid media token");
+		}
+		if (mediaTokens.getZillowToken() == null) {
+			throw new InvalidInputException("zillow token not found");
+		}
+
+		try {
+			mediaTokens.getZillowToken().getLastUpdated();
+		}
+		catch (Exception e) {
+			mediaTokens.getZillowToken().setLastUpdated("");
+		}
+		return mediaTokens;
 	}
 }

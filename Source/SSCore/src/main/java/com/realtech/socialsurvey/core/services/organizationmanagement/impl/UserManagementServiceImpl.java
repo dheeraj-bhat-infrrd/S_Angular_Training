@@ -6,7 +6,9 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
 import javax.annotation.Resource;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
@@ -16,12 +18,14 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.DependsOn;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
+
 import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.commons.ProfileCompletionList;
 import com.realtech.socialsurvey.core.commons.Utils;
 import com.realtech.socialsurvey.core.dao.BranchDao;
 import com.realtech.socialsurvey.core.dao.GenericDao;
 import com.realtech.socialsurvey.core.dao.OrganizationUnitSettingsDao;
+import com.realtech.socialsurvey.core.dao.SettingsSetterDao;
 import com.realtech.socialsurvey.core.dao.SurveyDetailsDao;
 import com.realtech.socialsurvey.core.dao.UserDao;
 import com.realtech.socialsurvey.core.dao.UserInviteDao;
@@ -39,6 +43,7 @@ import com.realtech.socialsurvey.core.entities.ProListUser;
 import com.realtech.socialsurvey.core.entities.ProfilesMaster;
 import com.realtech.socialsurvey.core.entities.Region;
 import com.realtech.socialsurvey.core.entities.RemovedUser;
+import com.realtech.socialsurvey.core.entities.SettingsDetails;
 import com.realtech.socialsurvey.core.entities.User;
 import com.realtech.socialsurvey.core.entities.UserApiKey;
 import com.realtech.socialsurvey.core.entities.UserFromSearch;
@@ -84,6 +89,9 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 
     @Autowired
     private EmailServices emailServices;
+
+    @Autowired
+    private SettingsSetterDao settingsSetterDao;
 
     @Autowired
     private EncryptionHelper encryptionHelper;
@@ -293,10 +301,14 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 
         LOG.debug( "Creating user profile for :" + emailId + " with profile completion stage : "
             + CommonConstants.ADD_COMPANY_STAGE );
+        //the newlely creted profile will be primary because this is will be the first profile of user
         UserProfile userProfile = createUserProfile( user, company, emailId, CommonConstants.DEFAULT_AGENT_ID,
             CommonConstants.DEFAULT_BRANCH_ID, CommonConstants.DEFAULT_REGION_ID,
-            CommonConstants.PROFILES_MASTER_COMPANY_ADMIN_PROFILE_ID, CommonConstants.ADD_COMPANY_STAGE,
-            CommonConstants.STATUS_INACTIVE, String.valueOf( user.getUserId() ), String.valueOf( user.getUserId() ) );
+            CommonConstants.PROFILES_MASTER_COMPANY_ADMIN_PROFILE_ID, CommonConstants.IS_PRIMARY_FALSE,
+            CommonConstants.ADD_COMPANY_STAGE, CommonConstants.STATUS_INACTIVE, String.valueOf( user.getUserId() ),
+            String.valueOf( user.getUserId() ) );
+
+
         // add the company admin profile with the user object
         List<UserProfile> userProfiles = new ArrayList<UserProfile>();
         userProfiles.add( userProfile );
@@ -776,7 +788,9 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
             user.setLocation( agentSettings.getContact_details().getLocation() );
             user.setIndustry( agentSettings.getContact_details().getIndustry() );
             user.setAboutMe( agentSettings.getContact_details().getAbout_me() );
-            user.setReviewCount( agentSettings.getReviewCount() );
+            //JIRA SS-1104 search results not updated with correct number of reviews
+            long reviewCount = profileManagementService.getReviewsCount(agentSettings.getIden(), 0, 5, CommonConstants.PROFILE_LEVEL_INDIVIDUAL, true);
+            user.setReviewCount(reviewCount);
             user.setReviewScore( surveyDetailsDao.getRatingForPastNdays( CommonConstants.AGENT_ID, agentSettings.getIden(),
                 CommonConstants.NO_LIMIT, true, false ) );
             users.add( user );
@@ -880,14 +894,20 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
              */
             userProfile = createUserProfile( user, admin.getCompany(), user.getEmailId(), CommonConstants.DEFAULT_AGENT_ID,
                 branchId, CommonConstants.DEFAULT_REGION_ID, CommonConstants.PROFILES_MASTER_BRANCH_ADMIN_PROFILE_ID,
-                CommonConstants.DASHBOARD_STAGE, CommonConstants.STATUS_ACTIVE, String.valueOf( admin.getUserId() ),
-                String.valueOf( admin.getUserId() ) );
+                CommonConstants.IS_PRIMARY_FALSE, CommonConstants.DASHBOARD_STAGE, CommonConstants.STATUS_ACTIVE,
+                String.valueOf( admin.getUserId() ), String.valueOf( admin.getUserId() ) );
+            //check that new profile will be primary or not
+            int isPrimary = checkWillNewProfileBePrimary( userProfile, user.getUserProfiles() );
+            userProfile.setIsPrimary( isPrimary );
             userProfileDao.save( userProfile );
         } else if ( userProfile.getStatus() == CommonConstants.STATUS_INACTIVE ) {
             LOG.info( "User profile for same user and branch already exists. Activating the same." );
             userProfile.setStatus( CommonConstants.STATUS_ACTIVE );
             userProfile.setModifiedBy( String.valueOf( admin.getUserId() ) );
             userProfile.setModifiedOn( new Timestamp( System.currentTimeMillis() ) );
+            //check that new profile will be primary or not
+            int isPrimary = checkWillNewProfileBePrimary( userProfile, user.getUserProfiles() );
+            userProfile.setIsPrimary( isPrimary );
             userProfileDao.update( userProfile );
         }
 
@@ -900,8 +920,8 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
     @Override
     @Transactional
     public UserProfile createUserProfile( User user, Company company, String emailId, long agentId, long branchId,
-        long regionId, int profileMasterId, String profileCompletionStage, int isProfileComplete, String createdBy,
-        String modifiedBy )
+        long regionId, int profileMasterId, int isPrimary, String profileCompletionStage, int isProfileComplete,
+        String createdBy, String modifiedBy )
     {
         LOG.debug( "Method createUserProfile called for username : " + user.getLoginName() );
         UserProfile userProfile = new UserProfile();
@@ -910,6 +930,7 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
         userProfile.setCompany( company );
         userProfile.setEmailId( emailId );
         userProfile.setIsProfileComplete( isProfileComplete );
+        userProfile.setIsPrimary( isPrimary );
         userProfile.setProfilesMaster( profilesMasterDao.findById( ProfilesMaster.class, profileMasterId ) );
         userProfile.setProfileCompletionStage( profileCompletionStage );
         userProfile.setRegionId( regionId );
@@ -1019,8 +1040,9 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
         if ( userProfiles == null || userProfiles.isEmpty() ) {
             // Create a new entry in UserProfile to map user to the branch.
             userProfile = createUserProfile( user, user.getCompany(), user.getEmailId(), userId, branchId, regionId,
-                CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID, CommonConstants.DASHBOARD_STAGE,
-                CommonConstants.STATUS_INACTIVE, String.valueOf( admin.getUserId() ), String.valueOf( admin.getUserId() ) );
+                CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID, CommonConstants.IS_PRIMARY_FALSE,
+                CommonConstants.DASHBOARD_STAGE, CommonConstants.STATUS_INACTIVE, String.valueOf( admin.getUserId() ),
+                String.valueOf( admin.getUserId() ) );
         } else {
             userProfile = userProfiles.get( CommonConstants.INITIAL_INDEX );
             if ( userProfile.getStatus() == CommonConstants.STATUS_INACTIVE ) {
@@ -1031,7 +1053,11 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
                 userProfile.setModifiedOn( new Timestamp( System.currentTimeMillis() ) );
             }
         }
+        //check if user profile will be primary or not
+        int isPrimary = checkWillNewProfileBePrimary( userProfile, user.getUserProfiles() );
+        userProfile.setIsPrimary( isPrimary );
         userProfileDao.saveOrUpdate( userProfile );
+
         if ( user.getIsAtleastOneUserprofileComplete() == CommonConstants.STATUS_INACTIVE ) {
             LOG.info( "Updating isAtleastOneProfileComplete as 1 for user : " + user.getFirstName() );
             user.setIsAtleastOneUserprofileComplete( CommonConstants.STATUS_ACTIVE );
@@ -1479,6 +1505,14 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
         int isAtleastOneProfileComplete, int status, String createdBy )
     {
         LOG.debug( "Method createUser called for email-id : " + emailId + " and status : " + status );
+        
+        if(lastName != null && ! lastName.equals("")){
+        	lastName = lastName.trim();
+        }
+        if(firstName != null && ! firstName.equals("")){
+        	firstName = firstName.trim();
+        }
+        
         User user = new User();
         user.setCompany( company );
         user.setLoginName( emailId );
@@ -1837,8 +1871,12 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
         LOG.debug( "Updating the User Profile table" );
         userProfile = createUserProfile( user, user.getCompany(), user.getEmailId(), CommonConstants.DEFAULT_AGENT_ID,
             defaultBranch.getBranchId(), defaultRegion.getRegionId(), CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID,
-            CommonConstants.DASHBOARD_STAGE, CommonConstants.STATUS_INACTIVE, String.valueOf( admin.getUserId() ),
-            String.valueOf( admin.getUserId() ) );
+            CommonConstants.IS_PRIMARY_FALSE, CommonConstants.DASHBOARD_STAGE, CommonConstants.STATUS_INACTIVE,
+            String.valueOf( admin.getUserId() ), String.valueOf( admin.getUserId() ) );
+
+        //check if user profile will be primary or not
+        int isPrimary = checkWillNewProfileBePrimary( userProfile, user.getUserProfiles() );
+        userProfile.setIsPrimary( isPrimary );
 
         userProfileDao.saveOrUpdate( userProfile );
         LOG.debug( "UserProfile table updated" );
@@ -1951,8 +1989,12 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
         LOG.debug( "Updating the User Profile table" );
         userProfile = createUserProfile( user, user.getCompany(), user.getEmailId(), CommonConstants.DEFAULT_AGENT_ID,
             defaultBranch.getBranchId(), region.getRegionId(), CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID,
-            CommonConstants.DASHBOARD_STAGE, CommonConstants.STATUS_INACTIVE, String.valueOf( admin.getUserId() ),
-            String.valueOf( admin.getUserId() ) );
+            CommonConstants.IS_PRIMARY_FALSE, CommonConstants.DASHBOARD_STAGE, CommonConstants.STATUS_INACTIVE,
+            String.valueOf( admin.getUserId() ), String.valueOf( admin.getUserId() ) );
+
+        //check if user profile will be primary or not
+        int isPrimary = checkWillNewProfileBePrimary( userProfile, user.getUserProfiles() );
+        userProfile.setIsPrimary( isPrimary );
 
         userProfileDao.saveOrUpdate( userProfile );
         LOG.debug( "UserProfile table updated" );
@@ -2472,4 +2514,159 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 
         return user;
     }
+
+
+    /***
+     * 
+     * @param userProfileNew
+     * @param userProfiles
+     * @return
+     */
+    private int checkWillNewProfileBePrimary( UserProfile userProfileNew, List<UserProfile> userProfiles )
+    {
+
+        LOG.debug( "Method checkWillNewProfileBePrimary called in UserManagemetService for email id"
+            + userProfileNew.getEmailId() );
+
+        int isPrimary = CommonConstants.IS_PRIMARY_FALSE;
+
+        if ( userProfiles != null && !userProfiles.isEmpty() ) {
+            for ( UserProfile profile : userProfiles ) {
+
+                if ( profile.getIsPrimary() == CommonConstants.IS_PRIMARY_TRUE ) {
+
+                    LOG.debug( "An old primary profile founded for email id " + userProfileNew.getEmailId() );
+
+                    boolean isOldProfileDefault = false;
+                    boolean isOldProfileAdmin = false;
+                    boolean isOldProfileAgent = false;
+                    //get the value of all three variables
+                    Branch branch = branchDao.findById( Branch.class, profile.getBranchId() );
+                    if ( branch != null && branch.getIsDefaultBySystem() == CommonConstants.IS_DEFAULT_BY_SYSTEM_YES ) {
+                        isOldProfileDefault = true;
+                    }
+
+                    if ( profile.getProfilesMaster().getProfileId() == CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID ) {
+                        isOldProfileAgent = true;
+                    } else {
+                        isOldProfileAdmin = true;
+                    }
+                    //if old primary profile is default than remove primary from that and mark new profile as primary
+                    if ( isOldProfileDefault ) {
+                        LOG.debug( "Old primary profile has a default branch " );
+                        //check if new profile is for default branch
+                        Branch newProfileBranch = branchDao.findById( Branch.class, userProfileNew.getBranchId() );
+                        //if new profile's branch is default than new profile will not be primary
+                        if ( newProfileBranch != null
+                            && newProfileBranch.getIsDefaultBySystem() == CommonConstants.IS_DEFAULT_BY_SYSTEM_YES
+                            && userProfileNew.getProfilesMaster().getProfileId() == CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID ) {
+                            isPrimary = CommonConstants.IS_PRIMARY_FALSE;
+                            // if new profile's branch is not default than make new profile as primary and change old one	
+                        } else {
+                            profile.setIsPrimary( CommonConstants.IS_PRIMARY_FALSE );
+                            userProfileDao.update( profile );
+                            isPrimary = CommonConstants.IS_PRIMARY_TRUE;
+                        }
+
+                    } else if ( isOldProfileAdmin ) {
+                        LOG.debug( "Old primary profile is an admin profile of type "
+                            + profile.getProfilesMaster().getProfile() );
+                        //if old profile is for admin and new is for agent than remove primary from old and mark new profile as primary
+                        if ( userProfileNew.getProfilesMaster().getProfileId() == CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID ) {
+                            profile.setIsPrimary( CommonConstants.IS_PRIMARY_FALSE );
+                            userProfileDao.update( profile );
+                            isPrimary = CommonConstants.IS_PRIMARY_TRUE;
+                        } else {
+                            isPrimary = CommonConstants.IS_PRIMARY_FALSE;
+                        }
+                        // if old profile is for agent and its not default than mark new profile as not primary
+                    } else if ( isOldProfileAgent ) {
+                        LOG.debug( "old primary profile is an agent profile" );
+                        isPrimary = CommonConstants.IS_PRIMARY_FALSE;
+                    }
+
+                }
+            }
+            //if no old profile is there for user than make new profile as primary
+        } else {
+            LOG.debug( "No old profile found for user. New Profile will be primary" );
+            isPrimary = CommonConstants.IS_PRIMARY_TRUE;
+        }
+
+        return isPrimary;
+    }
+
+
+    @Override
+    @Transactional
+    public List<SettingsDetails> getSettingScoresById( long companyId, long regionId, long branchId )
+    {
+        LOG.info( "Inside method getSettingScoresById for company " + companyId + " region " + regionId + " branch " + branchId );
+        return settingsSetterDao.getScoresById( companyId, regionId, branchId );
+    }
+
+
+    @Override
+    @Transactional
+    public Company getCompanyById( long id )
+    {
+        Company company = companyDao.findById( Company.class, id );
+        return company;
+    }
+
+
+    @Override
+    @Transactional
+    public void updateCompany( Company company )
+    {
+        companyDao.update( company );
+
+    }
+
+
+    @Override
+    @Transactional
+    public void updateBranch( Branch branch )
+    {
+        branchDao.update( branch );
+
+    }
+
+
+    @Override
+    @Transactional
+    public void updateRegion( Region region )
+    {
+        regionDao.update( region );
+
+    }
+
+
+    @Override
+    @Transactional
+    public Region getRegionById( long id )
+    {
+        Region region = regionDao.findById( Region.class, id );
+        return region;
+    }
+
+
+    @Override
+    @Transactional
+    public Branch getBranchById( long id )
+    {
+        Branch branch = branchDao.findById( Branch.class, id );
+        return branch;
+    }
+
+
+    @Override
+    @Transactional
+    public Map<String, Long> getPrimaryUserProfileByAgentId( long entityId )
+    {
+        return userProfileDao.findPrimaryUserProfileByAgentId( entityId );
+
+    }
+
+
 }

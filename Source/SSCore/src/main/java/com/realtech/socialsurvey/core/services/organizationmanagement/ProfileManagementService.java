@@ -27,10 +27,13 @@ import com.realtech.socialsurvey.core.entities.User;
 import com.realtech.socialsurvey.core.entities.UserFromSearch;
 import com.realtech.socialsurvey.core.entities.UserSettings;
 import com.realtech.socialsurvey.core.enums.AccountType;
+import com.realtech.socialsurvey.core.enums.OrganizationUnit;
+import com.realtech.socialsurvey.core.enums.SettingsForApplication;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.exception.NoRecordsFetchedException;
 import com.realtech.socialsurvey.core.services.mail.UndeliveredEmailException;
 import com.realtech.socialsurvey.core.services.search.exception.SolrException;
+import com.realtech.socialsurvey.core.services.settingsmanagement.impl.InvalidSettingsStateException;
 
 
 public interface ProfileManagementService
@@ -189,8 +192,10 @@ public interface ProfileManagementService
      * @throws InvalidInputException
      */
     public List<AgentSettings> getIndividualsByBranchId( long branchId ) throws InvalidInputException;
-    
-    public List<AgentSettings> getIndividualsByBranchId( long branchId, int startIndex, int batchSize ) throws InvalidInputException;
+
+
+    public List<AgentSettings> getIndividualsByBranchId( long branchId, int startIndex, int batchSize )
+        throws InvalidInputException;
 
 
     /**
@@ -303,8 +308,8 @@ public interface ProfileManagementService
         throws InvalidInputException, NoRecordsFetchedException;
 
 
-    public User getUserByProfileName( String profileName ) throws InvalidInputException, NoRecordsFetchedException,
-        ProfileNotFoundException;
+    public User getUserByProfileName( String profileName, boolean checkStatus ) throws InvalidInputException,
+        NoRecordsFetchedException, ProfileNotFoundException;
 
 
     /**
@@ -427,7 +432,7 @@ public interface ProfileManagementService
         throws InvalidInputException;
 
 
-    public long getPostsCountForUser( long userId );
+    public long getPostsCountForUser( String columnName, long columnValue );
 
 
     /**
@@ -505,7 +510,8 @@ public interface ProfileManagementService
         throws InvalidInputException;
 
 
-	public List<BreadCrumb> getIndividualsBreadCrumb(Long userId) throws InvalidInputException, NoRecordsFetchedException, ProfileNotFoundException;
+    public List<BreadCrumb> getIndividualsBreadCrumb( Long userId ) throws InvalidInputException, NoRecordsFetchedException,
+        ProfileNotFoundException;
 
 
     public List<BreadCrumb> getRegionsBreadCrumb( OrganizationUnitSettings regionProfile ) throws InvalidInputException,
@@ -521,16 +527,64 @@ public interface ProfileManagementService
 
 
     public Map<String, String> findNamesfromProfileName( String profileName );
-    
-	public OrganizationUnitSettings aggregateAgentDetails(User user, OrganizationUnitSettings profileSettings, LockSettings parentLockSettings)
-			throws InvalidInputException, NoRecordsFetchedException;
 
 
-	public void addOrUpdateAgentPositions(List<CompanyPositions> companyPositions, AgentSettings agentSettings);
+    public OrganizationUnitSettings aggregateAgentDetails( User user, OrganizationUnitSettings profileSettings,
+        LockSettings parentLockSettings ) throws InvalidInputException, NoRecordsFetchedException;
 
 
-	public List<AgentSettings> getIndividualsByRegionId(long regionId, int startIndex, int batchSize) throws InvalidInputException, NoRecordsFetchedException;
+    public void addOrUpdateAgentPositions( List<CompanyPositions> companyPositions, AgentSettings agentSettings );
 
 
-	public void deleteSocialPost(String postMongoId) throws InvalidInputException;
+    public List<AgentSettings> getIndividualsByRegionId( long regionId, int startIndex, int batchSize )
+        throws InvalidInputException, NoRecordsFetchedException;
+
+
+    public Map<SettingsForApplication, OrganizationUnit> getPrimaryHierarchyByEntity( String entityType, long entityId )
+        throws InvalidInputException, InvalidSettingsStateException;
+
+
+    public OrganizationUnitSettings getRegionSettingsByProfileName( String companyProfileName, String regionProfileName )
+        throws ProfileNotFoundException, InvalidInputException;
+
+
+    public OrganizationUnitSettings getBranchSettingsByProfileName( String companyProfileName, String branchProfileName )
+        throws ProfileNotFoundException, InvalidInputException;
+
+
+    public OrganizationUnitSettings fillUnitSettings( OrganizationUnitSettings unitSettings, String currentProfileName,
+        OrganizationUnitSettings companyUnitSettings, OrganizationUnitSettings regionUnitSettings,
+        OrganizationUnitSettings branchUnitSettings, OrganizationUnitSettings agentUnitSettings,
+        Map<SettingsForApplication, OrganizationUnit> map );
+
+
+    public OrganizationUnitSettings getRegionProfileByBranch( OrganizationUnitSettings branchSettings )
+        throws ProfileNotFoundException;
+
+
+    public Map<String, Long> getPrimaryHierarchyByAgentProfile( OrganizationUnitSettings agentSettings );
+
+
+    public OrganizationUnitSettings getIndividualSettingsByProfileName( String agentProfileName )
+        throws ProfileNotFoundException, InvalidInputException, NoRecordsFetchedException;
+
+
+    public void updateEmailsWithLogo( OrganizationUnitSettings unitSettings, String logoUrl, String collectionName );
+
+
+    public void deleteSocialPost( String postMongoId ) throws InvalidInputException;
+
+
+    /**
+     * Method to update zillow feed if required when the profile page is opened.
+     * @param profile
+     * @param collection
+     * @throws InvalidInputException
+     */
+    void updateZillowFeed( OrganizationUnitSettings profile, String collection ) throws InvalidInputException;
+
+
+	Map<String, Long> getHierarchyDetailsByEntity(String entityType,
+			long entityId) throws InvalidInputException;
+
 }

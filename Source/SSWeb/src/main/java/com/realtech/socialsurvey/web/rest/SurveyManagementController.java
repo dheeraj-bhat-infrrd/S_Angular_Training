@@ -520,7 +520,7 @@ public class SurveyManagementController {
 					+ " on Social Survey - view at " + getApplicationBaseUrl() + CommonConstants.AGENT_PROFILE_FIXED_URL + agentProfileLink;
 			facebookMessage += "\n Feedback : " + feedback;
 			try {
-				if (!socialManagementService.updateStatusIntoFacebookPage(agentSettings, facebookMessage, serverBaseUrl)) {
+				if (!socialManagementService.updateStatusIntoFacebookPage(agentSettings, facebookMessage, serverBaseUrl, agent.getCompany().getCompanyId())) {
 					surveyHandler.updateSharedOn(CommonConstants.FACEBOOK_SOCIAL_SITE, agentId, customerEmail);
 				}
 			}
@@ -530,7 +530,7 @@ public class SurveyManagementController {
 			if (accountMasterId != CommonConstants.ACCOUNTS_MASTER_INDIVIDUAL) {
 				for (OrganizationUnitSettings setting : settings) {
 					try {
-						if (!socialManagementService.updateStatusIntoFacebookPage(setting, facebookMessage, serverBaseUrl)) {
+						if (!socialManagementService.updateStatusIntoFacebookPage(setting, facebookMessage, serverBaseUrl, agent.getCompany().getCompanyId())) {
 							surveyHandler.updateSharedOn(CommonConstants.FACEBOOK_SOCIAL_SITE, agentId, customerEmail);
 						}
 					}
@@ -620,8 +620,12 @@ public class SurveyManagementController {
 			AgentSettings agentSettings = userManagementService.getUserSettings(agentId);
 			String facebookMessage = rating + "-Star Survey Response from " + customerDisplayName + " for " + agentName
 					+ " on Social Survey - view at " + getApplicationBaseUrl() + CommonConstants.AGENT_PROFILE_FIXED_URL + agentProfileLink;
+			// TODO: Bad code: DELETE: BEGIN
+			// get the company id of the agent
+			User user = userManagementService.getUserObjByUserId(agentId);
 			try {
-				socialManagementService.updateStatusIntoFacebookPage(agentSettings, facebookMessage, serverBaseUrl);
+				socialManagementService.updateStatusIntoFacebookPage(agentSettings, facebookMessage, serverBaseUrl, user.getCompany().getCompanyId());
+				// TODO: Bad code: Remove the comany id from the parameter: End
 				surveyHandler.updateSharedOn(CommonConstants.FACEBOOK_SOCIAL_SITE, agentId, customerEmail);
 			}
 			catch (FacebookException e) {
@@ -629,7 +633,7 @@ public class SurveyManagementController {
 			}
 			for (OrganizationUnitSettings setting : settings) {
 				try {
-					socialManagementService.updateStatusIntoFacebookPage(setting, facebookMessage, serverBaseUrl);
+					socialManagementService.updateStatusIntoFacebookPage(setting, facebookMessage, serverBaseUrl, user.getCompany().getCompanyId());
 				}
 				catch (FacebookException e) {
 					LOG.error("FacebookException caught in postToSocialMedia() while trying to post to facebook. Nested excption is ", e);

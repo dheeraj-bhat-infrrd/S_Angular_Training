@@ -444,6 +444,25 @@ public class HierarchyManagementController {
 			String selectedUserIdStr = request.getParameter("selectedUserId");
 			String userSelectionType = request.getParameter("userSelectionType");
 
+			if(regionName != null && !regionName.isEmpty() ){
+				regionName = regionName.trim();
+        	}
+			if(regionAddress1 != null && !regionAddress1.isEmpty() ){
+				regionAddress1 = regionAddress1.trim();
+        	}
+			if(regionAddress2 != null && !regionAddress2.isEmpty() ){
+				regionAddress2 = regionAddress2.trim();
+        	}
+			if(regionCity != null && !regionCity.isEmpty() ){
+				regionCity = regionCity.trim();
+        	}
+			if(regionState != null && !regionState.isEmpty() ){
+				regionState = regionState.trim();
+        	}
+			if(regionCountry != null && !regionCountry.isEmpty() ){
+				regionCountry = regionCountry.trim();
+        	}
+			
 			String selectedUserEmail = "";
 			if (userSelectionType != null) {
 				if (userSelectionType.equalsIgnoreCase(CommonConstants.USER_SELECTION_TYPE_SINGLE)) {
@@ -571,6 +590,25 @@ public class HierarchyManagementController {
 			String selectedUserIdStr = request.getParameter("selectedUserId");
 			String userSelectionType = request.getParameter("userSelectionType");
 
+			if(branchName != null && !branchName.isEmpty() ){
+				branchName = branchName.trim();
+        	}
+			if(branchAddress1 != null && !branchAddress1.isEmpty() ){
+				branchAddress1 = branchAddress1.trim();
+        	}
+			if(branchAddress2 != null && !branchAddress2.isEmpty() ){
+				branchAddress2 = branchAddress2.trim();
+        	}
+			if(branchCity != null && !branchCity.isEmpty() ){
+				branchCity = branchCity.trim();
+        	}
+			if(branchState != null && !branchState.isEmpty() ){
+				branchState = branchState.trim();
+        	}
+			if(branchCountry != null && !branchCountry.isEmpty() ){
+				branchCountry = branchCountry.trim();
+        	}
+			
 			String selectedUserEmail = "";
 			if (userSelectionType != null) {
 				if (userSelectionType.equalsIgnoreCase(CommonConstants.USER_SELECTION_TYPE_SINGLE)) {
@@ -744,6 +782,15 @@ public class HierarchyManagementController {
 			}
 			catch (NumberFormatException e) {
 				throw new InvalidInputException("NumberFormatException while parsing branchId", DisplayMessageConstants.GENERAL_ERROR, e);
+			}
+			
+			//check if user is admin. if yes than not allow to assign
+			if(user.getUserId() == selectedUserId){
+				LOG.info("User is complay admin so can't assign it.");
+				DisplayMessage message = messageUtils.getDisplayMessage(DisplayMessageConstants.REDUNDANT_ASSIGNMANT,
+						DisplayMessageType.ERROR_MESSAGE);				
+				model.addAttribute("message", message);
+				return JspResolver.MESSAGE_HEADER;
 			}
 
 			try {

@@ -154,4 +154,7 @@ public interface SurveyHandler
 
 
     SurveyPreInitiation getPreInitiatedSurveyById( long surveyPreInitiationId ) throws NoRecordsFetchedException;
+
+
+	void updateSurveyAsAbusive(String surveymongoId);
 }

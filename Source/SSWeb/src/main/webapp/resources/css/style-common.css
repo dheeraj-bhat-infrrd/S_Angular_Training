@@ -60,7 +60,7 @@ input:-webkit-autofill {
 	-webkit-box-shadow: 0 0 0 1000px white inset !important;
 }
 
-select:focus{
+select:focus, button:focus{
 	outline:none;
 }
 
@@ -1717,6 +1717,7 @@ button.paypal.is-active {
 .tweet-panel-item,.posts-panel-item {
 	padding-bottom: 10px;
 	margin-bottom: 0px;
+	word-break: break-word;
 }
 
 .tweet-panel-item:last-child {
@@ -1748,7 +1749,7 @@ button.paypal.is-active {
 }
 
 .icn-twit {
-	background: url(../images/twitter.png) no-repeat center;
+	background: url(../images/icons_social.png) no-repeat -350px center;
 }
 
 .icn-lin {
@@ -3341,6 +3342,7 @@ button.paypal.is-active {
 	border-bottom: 1px solid #dcdcdc;
 	padding-bottom: 10px;
 	margin-top: 10px;
+	word-break: break-word;
 }
 
 .ppl-review-item:last-child {
@@ -4128,7 +4130,7 @@ img.prof-image {
 }
 
 .dash-lp-txt {
-	max-width: 300px;
+	max-width: 80%;
 	overflow: hidden;
 	text-overflow: ellipsis;
 	white-space: nowrap;
