@@ -4587,6 +4587,22 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
             .updateParticularKeyOrganizationUnitSettings( MongoOrganizationUnitSettingDaoImpl.KEY_MAIL_CONTENT,
                 mailContentSettings, organizationUnitSettings, collectionName );
     }
+    
+    @Override
+    @Transactional
+    public void updateRegion(Region region){
+    	LOG.info( "Method to change region details updateRegion() started." );
+        regionDao.merge( region );
+        LOG.info( "Method to change region details updateRegion() finished." );
+    }
+    
+    @Override
+    @Transactional
+    public void updateBranch(Branch branch){
+    	LOG.info( "Method to change branch details updateBranch() started." );
+        branchDao.merge( branch );
+        LOG.info( "Method to change branch details updateBranch() finished." );
+    }
 
 
 }
