@@ -10,7 +10,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.quartz.QuartzJobBean;
 
-import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.entities.Branch;
 import com.realtech.socialsurvey.core.entities.Company;
 import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
@@ -19,7 +18,6 @@ import com.realtech.socialsurvey.core.enums.SettingsForApplication;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.exception.NoRecordsFetchedException;
 import com.realtech.socialsurvey.core.services.organizationmanagement.OrganizationManagementService;
-import com.realtech.socialsurvey.core.services.organizationmanagement.UserManagementService;
 
 
 /**
@@ -32,8 +30,6 @@ public class HierarchySettingsCorrector extends QuartzJobBean
 
     private OrganizationManagementService organizationManagementService;
 
-    private UserManagementService userManagementService;
-
 
     @Override
     protected void executeInternal( JobExecutionContext jobExecutionContext ) throws JobExecutionException
@@ -41,9 +37,7 @@ public class HierarchySettingsCorrector extends QuartzJobBean
         initializeDependencies( jobExecutionContext.getMergedJobDataMap() );
         // get a list of all the companies and find all the values set
         Set<Company> companyList = organizationManagementService.getAllCompanies();
-        List<OrganizationUnitSettings> companySettings = organizationManagementService.getCompaniesByKeyValueFromMongo( "", -1,
-            CommonConstants.STATUS_ACTIVE );
-        LOG.debug( "Got " + companySettings.size() + " companies" );
+        LOG.debug( "Got " + companyList.size() + " companies" );
         for ( Company company : companyList ) {
             OrganizationUnitSettings companySetting = null;
             try {
@@ -400,8 +394,6 @@ public class HierarchySettingsCorrector extends QuartzJobBean
 
     private void initializeDependencies( JobDataMap jobMap )
     {
-
         organizationManagementService = (OrganizationManagementService) jobMap.get( "organizationManagementService" );
-        userManagementService = (UserManagementService) jobMap.get( "userManagementService" );
     }
 }
