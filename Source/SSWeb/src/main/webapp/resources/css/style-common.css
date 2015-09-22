@@ -590,13 +590,25 @@ html.is-modern.card-root.js.no-touch.csstransitions.svg.inlinesvg.placeholder
 } */
 
 
+.user-error-logo {
+	height: 60px;
+	width: 145px;
+	margin: 6px 0;
+	background: url(../images/userInfoLogo.png) no-repeat center;
+    background-size: 100% auto; 
+   /*  background-size: contain !important; */
+}
+
+
+
+
 .user-info-logo {
 	height: 60px;
 	width: 145px;
-	    margin: 6px 0;
-	/*  background: url(../images/userInfoLogo.png) no-repeat center;
-    background-size: 100% auto; */
-    background-size: contain !important;
+	
+	background: url(../images/userInfoLogo.png) no-repeat center;
+    background-size: 100% auto; 
+   /*  background-size: contain !important; */
 }
 
 .user-info-seperator {
