@@ -47,8 +47,17 @@ public interface SocialManagementService {
 
 	public SocialMediaTokens updateAgentSocialMediaTokens(AgentSettings agentSettings, SocialMediaTokens mediaTokens)
 			throws InvalidInputException;
-	
-	public boolean updateStatusIntoFacebookPage(OrganizationUnitSettings agentSettings, String message, String serverBaseUrl) throws InvalidInputException,
+	/**
+	 * Posts the survey on facebook
+	 * @param agentSettings
+	 * @param message
+	 * @param serverBaseUrl
+	 * @param companyId
+	 * @return
+	 * @throws InvalidInputException
+	 * @throws FacebookException
+	 */
+	public boolean updateStatusIntoFacebookPage(OrganizationUnitSettings agentSettings, String message, String serverBaseUrl, long companyId) throws InvalidInputException,
 			FacebookException;
 
 	public boolean tweet(OrganizationUnitSettings agentSettings, String message) throws InvalidInputException, TwitterException;
@@ -60,6 +69,8 @@ public interface SocialManagementService {
 	public boolean updateLinkedin(OrganizationUnitSettings agentSettings, String message, String linkedinProfileUrl, String linkedinMessageFeedback) throws NonFatalException;
 	
 	public OrganizationUnitSettings disconnectSocialNetwork(String socialMedia, OrganizationUnitSettings unitSettings, String collectionName) throws InvalidInputException;
+	
+	public SocialMediaTokens checkOrAddZillowLastUpdated(SocialMediaTokens mediaTokens) throws InvalidInputException;
 
 }
 // JIRA SS-34 BY RM02 BOC

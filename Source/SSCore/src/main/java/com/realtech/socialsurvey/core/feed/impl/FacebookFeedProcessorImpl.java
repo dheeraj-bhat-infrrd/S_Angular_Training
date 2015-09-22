@@ -248,27 +248,19 @@ public class FacebookFeedProcessorImpl implements SocialNetworkDataProcessor<Pos
 
 		FacebookSocialPost feed;
 		for (Post post : posts) {
-			// skipping empty or deleted status from fetched feed
-			if (post.getMessage() == null && post.getName() == null && post.getStory() == null) {
+			
+			//skip the post if it contains no message.
+			if(post.getMessage() == null || post.getMessage() == "")
 				continue;
-			}
-
+			
 			if (lastFetchedTill.before(post.getUpdatedTime())) {
 				lastFetchedTill = post.getUpdatedTime();
 			}
 
 			feed = new FacebookSocialPost();
 			feed.setPost(post);
-
-			if (post.getMessage() != null) {
-				feed.setPostText(post.getMessage());
-			}
-			else if (post.getName() != null) {
-				feed.setPostText(post.getName());
-			}
-			else {
-				feed.setPostText(post.getStory());
-			}
+			
+			feed.setPostText(post.getMessage());
 
 			feed.setSource(FEED_SOURCE);
 			feed.setPostId(post.getId());

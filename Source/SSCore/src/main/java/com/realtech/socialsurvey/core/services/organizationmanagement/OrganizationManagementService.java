@@ -1,5 +1,6 @@
 package com.realtech.socialsurvey.core.services.organizationmanagement;
 
+import java.io.IOException;
 import java.net.MalformedURLException;
 import java.util.ArrayList;
 import java.util.Date;
@@ -36,6 +37,10 @@ import com.realtech.socialsurvey.core.services.payment.exception.PaymentExceptio
 import com.realtech.socialsurvey.core.services.search.exception.SolrException;
 
 
+/**
+ * @author Ustav
+ *
+ */
 public interface OrganizationManagementService
 {
 
@@ -441,7 +446,7 @@ public interface OrganizationManagementService
 
 
     /**
-     *  Method to add a new branch anassigneeUserd assign the user to the newly created branch if
+     * Method to add a new branch anassigneeUserd assign the user to the newly created branch if
      * userId or emailId is provided
      * 
      * @param user
@@ -495,7 +500,7 @@ public interface OrganizationManagementService
      * @param regionId
      * @param emailIdsArray
      * @param isAdmin
-     * @return 
+     * @return
      * @throws InvalidInputException
      * @throws NoRecordsFetchedException
      * @throws SolrException
@@ -805,65 +810,202 @@ public interface OrganizationManagementService
         throws InvalidInputException, NoRecordsFetchedException, SolrException;
 
 
+    /**
+     * @return
+     */
     public List<StateLookup> getUsStateList();
 
 
+    /**
+     * @param stateId
+     * @return
+     */
     public String getZipCodesByStateId( int stateId );
 
 
+    /**
+     * @param maxDisableDate
+     * @return
+     */
     public List<DisabledAccount> disableAccounts( Date maxDisableDate );
 
 
+    /**
+     * @param graceSpan
+     * @return
+     */
     public List<DisabledAccount> getAccountsForPurge( int graceSpan );
 
 
+    /**
+     * @param company
+     * @throws InvalidInputException
+     * @throws SolrException
+     */
     public void purgeCompany( Company company ) throws InvalidInputException, SolrException;
 
 
+    /**
+     * @param company
+     * @throws DatabaseException
+     */
     public void updateCompany( Company company ) throws DatabaseException;
 
 
-    public List<VerticalCrmMapping> getCrmMapping( User user );
+    /**
+     * @param user
+     * @return
+     * @throws InvalidInputException
+     */
+    public List<VerticalCrmMapping> getCrmMapping( User user ) throws InvalidInputException;
 
 
+    /**
+     * @param string
+     * @return
+     */
     public Map<Long, OrganizationUnitSettings> getSettingsMapWithLinkedinImage( String string );
 
 
+    /**
+     * @param idToRemove
+     * @param collectionName
+     */
     public void removeOrganizationUnitSettings( Long idToRemove, String collectionName );
 
 
+    /**
+     * @param idsToRemove
+     * @param collectionName
+     */
     public void removeOrganizationUnitSettings( List<Long> idsToRemove, String collectionName );
 
 
+    /**
+     * @return
+     */
     public SurveySettings retrieveDefaultSurveyProperties();
 
 
+    /**
+     * @param surveySettings
+     * @param mood
+     * @return
+     */
     public String resetDefaultSurveyText( SurveySettings surveySettings, String mood );
 
 
+    /**
+     * @param searchKey
+     * @return
+     */
     public List<Company> getCompaniesByName( String searchKey );
 
 
+    /**
+     * @param companyId
+     * @return
+     */
     public Company getCompanyById( long companyId );
 
 
+    /**
+     * @return
+     */
     public List<OrganizationUnitSettings> getAllActiveCompaniesFromMongo();
 
 
+    /**
+     * @return
+     */
     public List<OrganizationUnitSettings> getAllCompaniesFromMongo();
 
 
+    /**
+     * @param searchKey
+     * @return
+     */
     public List<OrganizationUnitSettings> getCompaniesByNameFromMongo( String searchKey );
 
 
+    /**
+     * @param searchKey
+     * @param accountType
+     * @param status
+     * @return
+     */
     public List<OrganizationUnitSettings> getCompaniesByKeyValueFromMongo( String searchKey, int accountType, int status );
 
 
+    /**
+     * @param startDate
+     * @param endDate
+     * @return
+     */
     public List<Company> getCompaniesByDateRange( Date startDate, Date endDate );
 
 
+    /**
+     * @param companies
+     * @param fileName
+     * @return
+     */
     public XSSFWorkbook downloadCompanyReport( List<Company> companies, String fileName );
 
 
+    /**
+     * @param regionId
+     * @return
+     */
+    public Company getPrimaryCompanyByRegion( long regionId );
+
+
+    /**
+     * @param branchId
+     * @return
+     */
+    public Region getPrimaryRegionByBranch( long branchId );
+
+
+    /**
+     * @param collectionName
+     * @param skipCount
+     * @param batchSize
+     * @return
+     */
     public List<FeedIngestionEntity> fetchSocialMediaTokens( String collectionName, int skipCount, int batchSize );
+
+
+    /**
+     * @param mailContentSettings
+     * @param organizationUnitSettings
+     * @param collectionName
+     */
+    public void updateMailContentForOrganizationUnit( MailContentSettings mailContentSettings,
+        OrganizationUnitSettings organizationUnitSettings, String collectionName );
+
+
+    /**
+     * @param fileName
+     * @return
+     * @throws IOException
+     */
+    public String readMailContentFromFile( String fileName ) throws IOException;
+
+
+    /**
+     * Method to update the profile-name in the branch table.
+     * @param branchId
+     * @param profileName
+     */
+    void updateBranchProfileName( long branchId, String profileName );
+
+
+    /**
+     * Method to update the profile-name in the region table.
+     * @param regionId
+     * @param profileName
+     */
+    void updateRegionProfileName( long regionId, String profileName );
+
 }

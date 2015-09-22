@@ -107,6 +107,9 @@ public interface CommonConstants
     public static final String YES_STRING = "Y";
     public static final String NO_STRING = "N";
     
+    public static final int IS_PRIMARY_FALSE = 0;
+    public static final int IS_PRIMARY_TRUE = 1;
+    
     public static final int SURVEY_STATUS_PRE_INITIATED = 1;
     public static final int STATUS_SURVEYPREINITIATION_PROCESSED = 1;
     public static final int SURVEY_STATUS_INITIATED = 2;
@@ -254,6 +257,8 @@ public interface CommonConstants
     public static final String POPUP_FLAG_IN_SESSION = "popupStatus";
     public static final String ACTIVE_SESSIONS_FOUND = "activeSessionFound";
 
+    public static final String BILLING_MODE_ATTRIBUTE_IN_SESSION = "billingMode";
+    
     public static final String USER_ASSIGNMENTS = "assignments";
     public static final String ENTITY_ID_COLUMN = "entityId";
     public static final String ENTITY_NAME_COLUMN = "entityName";
@@ -582,6 +587,7 @@ public interface CommonConstants
 
     //Default vertcial crm mapping id
     public static final long DEFAULT_VERTICAL_CRM_ID = -1;
+    public static final Integer DEFAULT_VERTICAL_ID = -1;
 
     public static final int EXPIRE_AFTER_DAYS = 3;
     public static final int DECIMALS_TO_ROUND_OFF = 3;
@@ -591,6 +597,7 @@ public interface CommonConstants
     public static final String SURVEY_REQUEST_ADMIN = "admin";
 
     // Constants for Agent Ranking Report
+    public static final String HEADER_AGENT_RANK = "User Rank";
     public static final String HEADER_FIRST_NAME = "First Name";
     public static final String HEADER_LAST_NAME = "Last Name";
     public static final String HEADER_AVG_SCORE = "Avg Score";
@@ -647,4 +654,21 @@ public interface CommonConstants
     public final String EXCEL_FILE_EXTENSION = ".xlsx";
     
     public final String EPOCH_REMINDER_TIME = "02/01/1970";
+
+    //Settings constants
+    public static final boolean SET_SETTINGS = true;
+    public static final boolean UNSET_SETTINGS = false;
+    public static final int SET_BY_COMPANY = 1;
+    public static final int SET_BY_REGION = 2;
+    public static final int SET_BY_COMPANY_N_REGION = 3;
+    public static final int SET_BY_BRANCH = 4;
+    public static final int SET_BY_COMPANY_N_BRANCH = 5;
+    public static final int SET_BY_REGION_N_BRANCH = 6;
+    public static final int SET_BY_COMPANY_N_REGION_N_BRANCH = 7;
+    public static final int SET_BY_NONE = 0;
+    public static final int LOCKED_BY_NONE = 0;
+    
+    public static final String SETTING_SCORE = "setScore";
+    
+    public static final String LOCK_SCORE = "lockScore";
 }

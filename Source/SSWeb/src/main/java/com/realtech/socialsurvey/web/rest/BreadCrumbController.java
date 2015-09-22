@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import com.google.gson.Gson;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
+import com.realtech.socialsurvey.core.entities.BranchSettings;
 import com.realtech.socialsurvey.core.entities.BreadCrumb;
 import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
 import com.realtech.socialsurvey.core.exception.BaseRestException;
@@ -21,6 +22,7 @@ import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.exception.NoRecordsFetchedException;
 import com.realtech.socialsurvey.core.exception.ProfileServiceErrorCode;
 import com.realtech.socialsurvey.core.exception.RestErrorResponse;
+import com.realtech.socialsurvey.core.services.organizationmanagement.OrganizationManagementService;
 import com.realtech.socialsurvey.core.services.organizationmanagement.ProfileManagementService;
 import com.realtech.socialsurvey.core.services.organizationmanagement.ProfileNotFoundException;
 import com.realtech.socialsurvey.core.services.organizationmanagement.UserManagementService;
@@ -32,6 +34,9 @@ public class BreadCrumbController {
 	@Autowired
 	private ProfileManagementService profileManagementService;
 
+	@Autowired
+    private OrganizationManagementService organizationManagementService;
+	
 	@Autowired
 	private UserManagementService userManagementService;
 
@@ -123,24 +128,20 @@ public class BreadCrumbController {
 	 */
 
 	@ResponseBody
-	@RequestMapping(value = "/{companyProfileName}/region/{regionProfileName}")
-	public Response getRegionBreadCrumb(@PathVariable String companyProfileName, @PathVariable String regionProfileName)
+	@RequestMapping(value = "/region/{regionId}")
+	public Response getRegionBreadCrumb(@PathVariable Long regionId)
 			throws ProfileNotFoundException, NoRecordsFetchedException {
-		LOG.info("Service to get breadcrumb of  regionProfileName:" + regionProfileName);
+		LOG.info("Service to get breadcrumb of  regionId:" + regionId);
 		Response response = null;
 		try {
-			if (companyProfileName == null || companyProfileName.isEmpty()) {
-				throw new InputValidationException(new ProfileServiceErrorCode(CommonConstants.ERROR_CODE_BRANCH_PROFILE_PRECONDITION_FAILURE,
-						CommonConstants.SERVICE_CODE_BRANCH_PROFILE, "Profile name for company is invalid"), "company profile name is null or empty");
-			}
 
-			if (regionProfileName == null || regionProfileName.isEmpty()) {
+			if (regionId == null) {
 				throw new InputValidationException(new ProfileServiceErrorCode(CommonConstants.ERROR_CODE_REGION_PROFILE_PRECONDITION_FAILURE,
-						CommonConstants.SERVICE_CODE_REGION_PROFILE, "Profile name for region is invalid"), "region profile name is null or empty");
+						CommonConstants.SERVICE_CODE_REGION_PROFILE, "Profile name for region is invalid"), "region id is invalid");
 			}
 			OrganizationUnitSettings regionProfile = null;
 			try {
-				regionProfile = profileManagementService.getRegionByProfileName(companyProfileName, regionProfileName);
+				regionProfile = organizationManagementService.getRegionSettings(regionId);
 				if (regionProfile == null) {
 					throw new ProfileNotFoundException("No records found ");
 				}
@@ -171,28 +172,24 @@ public class BreadCrumbController {
 	 * @throws NoRecordsFetchedException
 	 */
 	@ResponseBody
-	@RequestMapping(value = "/{companyProfileName}/branch/{branchProfileName}")
-	public Response getBranchBreadCrumb(@PathVariable String companyProfileName, @PathVariable String branchProfileName)
+	@RequestMapping(value = "/branch/{branchId}")
+	public Response getBranchBreadCrumb(@PathVariable Long branchId)
 			throws ProfileNotFoundException, NoRecordsFetchedException {
-		LOG.info("Service to get branch breadcrumb called for branchProfileName:" + branchProfileName);
+		LOG.info("Service to get branch breadcrumb called for branchId:" + branchId);
 		Response response = null;
 		try {
-			if (companyProfileName == null || companyProfileName.isEmpty()) {
+			if (branchId == null) {
 				throw new InputValidationException(new ProfileServiceErrorCode(CommonConstants.ERROR_CODE_BRANCH_PROFILE_PRECONDITION_FAILURE,
 						CommonConstants.SERVICE_CODE_BRANCH_PROFILE, "Profile name for company is invalid"), "company profile name is null or empty");
 			}
-			if (branchProfileName == null || branchProfileName.isEmpty()) {
-				throw new InputValidationException(new ProfileServiceErrorCode(CommonConstants.ERROR_CODE_BRANCH_PROFILE_PRECONDITION_FAILURE,
-						CommonConstants.SERVICE_CODE_BRANCH_PROFILE, "Profile name for branch is invalid"), "branch profile name is null or empty");
-			}
-			OrganizationUnitSettings branchProfile = null;
+			BranchSettings branchProfile = null;
 			try {
-				branchProfile = profileManagementService.getBranchByProfileName(companyProfileName, branchProfileName);
+				branchProfile = organizationManagementService.getBranchSettings(branchId);
 				if (branchProfile == null) {
 					throw new ProfileNotFoundException("No records found ");
 				}
 
-				List<BreadCrumb> branchBreadCrumb = profileManagementService.getBranchsBreadCrumb(branchProfile);
+				List<BreadCrumb> branchBreadCrumb = profileManagementService.getBranchsBreadCrumb(branchProfile.getOrganizationUnitSettings());
 				String json = new Gson().toJson(branchBreadCrumb);
 				LOG.debug("branchProfile json : " + json);
 				response = Response.ok(json).build();

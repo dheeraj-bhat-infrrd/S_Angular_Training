@@ -7,9 +7,9 @@ package com.realtech.socialsurvey.core.entities;
 public class BranchUploadVO {
 
 	private long branchId;
-	private long sourceBranchId;
+	private String sourceBranchId;
 	private long regionId;
-	private long sourceRegionId;
+	private String sourceRegionId;
 	private String branchName;
 	private String branchAddress1;
 	private String branchAddress2;
@@ -29,11 +29,11 @@ public class BranchUploadVO {
 		this.branchId = branchId;
 	}
 
-	public long getSourceBranchId() {
+	public String getSourceBranchId() {
 		return sourceBranchId;
 	}
 
-	public void setSourceBranchId(long sourceBranchId) {
+	public void setSourceBranchId(String sourceBranchId) {
 		this.sourceBranchId = sourceBranchId;
 	}
 
@@ -45,11 +45,11 @@ public class BranchUploadVO {
 		this.regionId = regionId;
 	}
 
-	public long getSourceRegionId() {
+	public String getSourceRegionId() {
 		return sourceRegionId;
 	}
 
-	public void setSourceRegionId(long sourceRegionId) {
+	public void setSourceRegionId(String sourceRegionId) {
 		this.sourceRegionId = sourceRegionId;
 	}
 
