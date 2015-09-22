@@ -36,6 +36,7 @@ import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.dao.CompanyDao;
 import com.realtech.socialsurvey.core.entities.BranchFromSearch;
 import com.realtech.socialsurvey.core.entities.Company;
+import com.realtech.socialsurvey.core.entities.ContactDetailsSettings;
 import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
 import com.realtech.socialsurvey.core.entities.RegionFromSearch;
 import com.realtech.socialsurvey.core.entities.User;
@@ -159,7 +160,18 @@ public class AdminController
                 LOG.debug( "fetching users under company from solr" );
                 users = organizationManagementService.getUsersUnderCompanyFromSolr( company, start );
             } catch ( NoRecordsFetchedException e ) {
+            	OrganizationUnitSettings companySettings = organizationManagementService.getCompanySettings(companyId);
+            	if(companySettings != null && companySettings.getContact_details() != null){
+            		ContactDetailsSettings companyContactDetail =  companySettings.getContact_details();
+            		if(companyContactDetail.getContact_numbers() != null){
+            			model.addAttribute("workContactNo" ,companyContactDetail.getContact_numbers().getWork() );
+            		}
+            		if(companyContactDetail.getMail_ids() != null){
+            			model.addAttribute("workContactNo" ,companyContactDetail.getMail_ids().getWork() );
+            		}
+            	}
                 LOG.error( "No records found for company branch or region, reason : " + e.getMessage() );
+                //TODO : return a new jsp instead of header message.
                 throw new NonFatalException( "No defaul branch or region found for company " + company.getCompany(),
                     DisplayMessageConstants.COMPANY_NOT_REGISTERD, e );
             }
