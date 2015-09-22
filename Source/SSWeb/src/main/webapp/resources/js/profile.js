@@ -545,7 +545,7 @@ function paintReviews(result){
 			'<div class="' + lastItemClass + '" data-cust-first-name=' + reviewItem.customerFirstName
 				+ ' data-cust-last-name=' + reviewItem.customerLastName + ' data-agent-name=' + reviewItem.agentName
 				+ ' data-rating=' + reviewItem.score + ' data-review="' + reviewItem.review + '" data-customeremail="'
-				+ reviewItem.customerEmail + '" data-agentid="' + reviewItem.agentId + '">';
+				+ reviewItem.customerEmail + '" data-agentid="' + reviewItem.agentId + '" survey-mongo-id="' + reviewItem._id + '">';
 		reviewsHtml += '	<div class="ppl-header-wrapper clearfix">';
 		reviewsHtml += '		<div class="float-left ppl-header-left">';    
 		reviewsHtml += '			<div class="ppl-head-1">'+custNameArray[0];
@@ -657,7 +657,8 @@ $(document).on('click', '.prof-report-abuse-txt', function(e) {
 		"firstName" : reviewElement.attr('data-cust-first-name'),
 		"lastName" : reviewElement.attr('data-cust-last-name'),
 		"agentName" : reviewElement.attr('data-agent-name'),
-		"review" : reviewElement.attr('data-review')
+		"review" : reviewElement.attr('data-review'),
+		"surveyMongoId" : reviewElement.attr('survey-mongo-id')
 	};
 	$("#report-abuse-txtbox").val('');
 	$('#report-abuse-cus-name').val('');
