@@ -2865,21 +2865,16 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
         if ( entityType.equalsIgnoreCase( CommonConstants.AGENT_ID ) ) {
             if ( unitSettings != null ) {
                 if ( !logoLocked ) {
-                    if ( unitSettings.getLogo() != null ) {
-                        if ( !unitSettings.getLogo().isEmpty() ) {
-                            closestSettings.put( SettingsForApplication.LOGO, OrganizationUnit.AGENT );
-                        }
+                    if ( unitSettings.getLogo() != null && !unitSettings.getLogo().isEmpty() ) {
+                        closestSettings.put( SettingsForApplication.LOGO, OrganizationUnit.AGENT );
                     }
                 }
                 if ( !webAddressLocked ) {
                     if ( unitSettings.getContact_details() != null ) {
                         if ( unitSettings.getContact_details().getWeb_addresses() != null ) {
-                            if ( unitSettings.getContact_details().getWeb_addresses() != null ) {
-                                if ( unitSettings.getContact_details().getWeb_addresses().getWork() != null ) {
-                                    if ( !unitSettings.getContact_details().getWeb_addresses().getWork().isEmpty() ) {
-                                        closestSettings.put( SettingsForApplication.WEB_ADDRESS_WORK, OrganizationUnit.AGENT );
-                                    }
-                                }
+                            if ( unitSettings.getContact_details().getWeb_addresses().getWork() != null
+                                && !unitSettings.getContact_details().getWeb_addresses().getWork().isEmpty() ) {
+                                closestSettings.put( SettingsForApplication.WEB_ADDRESS_WORK, OrganizationUnit.AGENT );
                             }
                         }
                     }
@@ -2887,10 +2882,9 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
                 if ( !phoneNumberLocked ) {
                     if ( unitSettings.getContact_details() != null ) {
                         if ( unitSettings.getContact_details().getContact_numbers() != null ) {
-                            if ( unitSettings.getContact_details().getContact_numbers().getWork() != null ) {
-                                if ( !unitSettings.getContact_details().getContact_numbers().getWork().isEmpty() ) {
-                                    closestSettings.put( SettingsForApplication.PHONE, OrganizationUnit.AGENT );
-                                }
+                            if ( unitSettings.getContact_details().getContact_numbers().getWork() != null
+                                && !unitSettings.getContact_details().getContact_numbers().getWork().isEmpty() ) {
+                                closestSettings.put( SettingsForApplication.PHONE, OrganizationUnit.AGENT );
                             }
                         }
                     }
