@@ -211,7 +211,6 @@ function paintBreadCrums(url) {
 		var jsonData = $.parseJSON(data);
 		if(jsonData.entity) {
 			var entityJson = $.parseJSON(jsonData.entity);
-			console.log(JSON.stringify(entityJson));
 			var htmlContent = '<a target="_blank" class="brd-crm brd-crm-link" href="'
 					+ window.location.origin
 					+ '/findcompany.do?verticalName='

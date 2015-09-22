@@ -66,7 +66,6 @@ $(document).ready(function() {
 			location.href = authUrl;
 		}
 		else {
-			console.log("authUrl not found!");
 		}
 	}
 	
@@ -76,7 +75,6 @@ $(document).ready(function() {
 		parentWindow = window.opener;
 	}
 	else {
-		console.log("Unable to access parent window!");
 	}
 	
 	// close on error
@@ -141,6 +139,7 @@ function fetchSocialProfileUrl(payload, callBackFunction){
 	$.ajax({
 		url : './profileUrl.do',
 		type : "GET",
+		cache : false,
 		data : payload,
 		async : false,
 		complete : callBackFunction,
