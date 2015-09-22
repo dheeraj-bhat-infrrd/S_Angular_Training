@@ -7599,7 +7599,10 @@ $(document).on('blur', '#disclaimer-text', function() {
 		callAjaxPostWithPayloadData("./updatedisclaimer.do", function(data) {
 			$('#prof-message-header').html(data);
 			if ($('#prof-message-header #display-msg-div').hasClass('success-message')) {
-				$('#disclaimer-default').val(disclaimer);
+				if(disclaimer != undefined){
+					$('#disclaimer-default').val(disclaimer.trim());
+					$('#disclaimer-text').val(disclaimer.trim());
+				}
 			}
 
 			$('#overlay-toast').html($('#display-msg-div').text().trim());
