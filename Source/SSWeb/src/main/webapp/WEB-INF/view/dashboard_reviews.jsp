@@ -16,14 +16,12 @@
 <script type="text/javascript">
 
     function twitterFn (loop,twitterElement) {
-    	console.log("in twitterFn");
     	var twitText = "";
       	var twitLink = $("#twitt_"+loop).data('link');
       	var String=twitLink.substring(twitLink.indexOf("=")+1,twitLink.lastIndexOf("&"));
     	var twitId = 'twttxt_'+loop;
     	if($("#"+twitId) != undefined)
     		{
-    		console.log("twittId not null");
     		 twitText = $("#"+twitId).val();
     		}
     	
@@ -48,7 +46,6 @@
     }
     function getImageandCaption(loop)
     {
-    	console.log("inside imagCaption- dashboard");
     	var name = "";
     	var designation = "";
     	var company = "";
@@ -58,7 +55,6 @@
     		{
     		
     		fblink = $("#fb_"+loop).data('link');	
-    		console.log("fb id is not undefined");
     		}
    
     var imgId= "";
@@ -68,24 +64,20 @@
      var imgIdFirstIndex = imgId.indexOf("(");
      var imgIdlastIndex = imgId.lastIndexOf(")");
      imgId = imgId.substring(imgIdFirstIndex+1, imgIdlastIndex);
-     console.log("imgId id is not undefined");
     	}
     
 	    if(document.getElementById("name") != null)
 		{
 		  name = document.getElementById("name").innerHTML;
-		  console.log("name id is not undefined");
 		}
 
 		if(document.getElementById("designation") != null)
 		{
-			 console.log("designation id is not undefined");
 		designation = document.getElementById("designation").innerHTML;
 		}
 		
 		if(document.getElementById("company") != null)
 		{
-			console.log("company id is not undefined");
 			company = document.getElementById("company").innerHTML;
 		
 		}
@@ -94,7 +86,6 @@
     fblink = fblink.concat(pictureandCaptionLink);
     if(document.getElementById('fb_'+loop) != null)
     document.getElementById('fb_'+loop).setAttribute('data-link',fblink);
-    console.log("exit dashboard get img");
     	}
 </script>
 <c:choose>

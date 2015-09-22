@@ -590,7 +590,6 @@ function closeMoblieScreenMenu() {
 }
 
 function upgradeToPaidPlan(){
-	 console.log("upgrade plan button clicked");
 	 var url = "./upgradetopaidplanpage.do";
 	    
 	 callAjaxGET(url, function(data){
@@ -605,7 +604,6 @@ function loadDisplayPicture(profileMasterId){
 	};
 	callAjaxGETWithTextData("./getdisplaypiclocation.do", function(data) {
 		if (data != undefined){
-			console.log("Image location : " + data);
 			if(data != undefined && data != ""){
 				var imageUrl = JSON.parse(data);
 				if (imageUrl != undefined && imageUrl != "undefined"

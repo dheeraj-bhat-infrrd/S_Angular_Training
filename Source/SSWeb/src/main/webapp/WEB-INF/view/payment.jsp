@@ -147,38 +147,28 @@
 			   	pageInitialized=false;
 		   });
 		   
-		   console.log("pageInitialized : " + pageInitialized);
 		   if(pageInitialized){
-			   console.log("Not executing ready function!");
 			   return;
 		   }
-		   console.log("Loading braintree");
 		   var paymentChangeStatus = '<c:out value="${paymentChange}"/>';
            var paidUpgrade = '<c:out value="${paidUpgrade}"/>';
 		   if(paymentChangeStatus == 1 && paidUpgrade!=1 ){
-			   console.log("Setting up the payment form for payment change");
 				braintree.setup('${clienttoken}', 'dropin', {
 					container : 'dropin',
 					paymentMethodNonceReceived : makeAjaxCallToUpgrade
 				});
-			   console.log("Braintree loaded");
 		   }else if(paymentChangeStatus != 1 && paidUpgrade==1 ){
-			   console.log("Setting up the payment form upgrading to paid plan");
 				braintree.setup('${clienttoken}', 'dropin', {
 					container : 'dropin',
 					paymentMethodNonceReceived : makeAjaxCallToPlanUpgrade
 				});
-			   console.log("Braintree loaded");
 		   }
 		   else if(paymentChangeStatus != 1 && paidUpgrade!=1 ){
-			   console.log("Setting up the payment form");
 				braintree.setup('${clienttoken}', 'dropin', {
 					container : 'dropin'
 				});
-			   console.log("Braintree loaded");
 		   }
 		   else{
-			   console.log("Payment status flags not properly set!");
 		   }
 		   
 		   pageInitialized = true;
@@ -209,10 +199,7 @@
 	   function makeAjaxCallToPlanUpgrade(event,nonce){
 		   hidePayment();
 		   showOverlay();
-		   console.log("making ajax call with nonce: " + nonce);
-		   console.log(event);
 		   var data = "payment_method_nonce=" + nonce+"&accounttype=" + $('#account-type').val();
-		   console.log(data);
 
 		   var url = "./upgradeplan.do";
 		   
@@ -221,29 +208,20 @@
 	   
 	   function showMessage(data){
        	var jsonData = JSON.parse(data);
-       	console.log("Data recieved : " + jsonData);
        	if(jsonData["success"] == 1){
-       		console.log("Account upgrade successful. Redirecting to dashboard");
            	$('#overlay-toast').html(jsonData["message"]);
-	    		console.log("Added toast message. Showing it now");
 	    		showToast();
-	    		console.log("Finished showing the toast");
            	setTimeout(function (){location.href = "./landing.do";},4000);
        	}
        	else{
-       		console.error("Error occured while upgrading. ");
 	        	$('.overlay-payment').hide();
 	        	hideOverlay();
                $('#overlay-toast').html(jsonData["message"]);
-	    		console.log("Added toast message. Showing it now");
 	    		showToast();
-	    		console.log("Finished showing the toast");
        	}
        }
 	   
 	   function makeAjaxCallToUpgrade(event,nonce){
-		   console.log("making ajax call with nonce: " + nonce);
-		   console.log(event);
 		   showOverlay();
 		   var data = "payment_method_nonce=" + nonce;
 		   var url = "./paymentupgrade.do";
@@ -255,15 +233,11 @@
 		    hidePayment();
 			hideOverlay();
 			pageInitialized=false;
-		   	console.log("Message recieved. Hiding Payment popup");
-			console.log("Removing no-scroll class from body");
 	   		$('body').removeClass('body-no-scroll');
 	   		$('#st-settings-payment-off').show();
 		   	$('#st-settings-payment-on').hide();
 	   		$('#overlay-toast').html(data);
-	   		console.log("Added toast message. Showing it now");
 	   		showToast();
-	   		console.log("Finished showing the toast");
 	   }	
 	</script>
    
