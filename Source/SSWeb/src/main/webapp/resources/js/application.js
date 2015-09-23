@@ -8147,6 +8147,44 @@ $(document).on('click','.hdr-link-item-dropdown-item',function(e) {
 	showOverlay();
 });
 
+//Help page onclick function
+$(document).on( 'click', '#send-button', function() {
+	var subject = "";
+	var message = "";
+	
+	if ($("#subject-id").val() != undefined) {
+		subject = $("#subject-id").val().trim();
+	}
+
+	if ($("#user-message").val() != undefined) {
+		message = $("#user-message").val().trim();
+	}
+	if (subject == "" || subject == undefined) {
+		$('#overlay-toast').html('Please enter the subject');
+		showToast();
+		return;
+	}
+
+	if ((message == "") || (message == undefined)) {
+		$('#overlay-toast').html('Please enter the message');
+		showToast();
+		return;
+	}
+
+	var payload = {
+		"subject" : subject,
+		"mailText" : message
+	};
+
+	callAjaxPostWithPayloadData("./sendhelpmailtoadmin.do",
+		function(data) {
+			$('#overlay-toast').html('Message sent successfully!');
+			$("#subject-id").val("");
+			$("#user-message").val("");
+			showToast();
+	}, payload);
+});
+
 
 //Disconnect social media
 function disconnectSocialMedia(socialMedia) {
