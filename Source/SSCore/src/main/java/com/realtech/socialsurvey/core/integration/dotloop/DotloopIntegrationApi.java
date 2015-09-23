@@ -4,6 +4,7 @@ import retrofit.client.Response;
 import retrofit.http.GET;
 import retrofit.http.Header;
 import retrofit.http.Path;
+import retrofit.http.Query;
 
 
 /**
@@ -12,11 +13,12 @@ import retrofit.http.Path;
  */
 public interface DotloopIntegrationApi
 {
-    @GET ( "/profiles")
-    public Response fetchdotloopProfiles( @Header ( "authorizationHeader") String authorizationHeader );
+    @GET ( "/profile")
+    public Response fetchdotloopProfiles( @Header ( "Authorization") String authorizationHeader );
 
 
-    @GET ( "/profile/{profile-id}/loop")
-    public Response fetchZillowReviewsByScreennameWithMaxCount( @Path ( "profile-id") String profileId );
+    @GET ( "/profile/{profile-id}/loop?statusIds=4")
+    public Response fetchClosedProfiles( @Header ( "Authorization") String authorizationHeader,
+        @Path ( "profile-id") String profileId, @Query ( "batchNumber") int batchNumber );
 
 }

@@ -8,8 +8,6 @@ import org.springframework.stereotype.Component;
 
 import retrofit.RestAdapter;
 
-import com.realtech.socialsurvey.core.integration.zillow.errorhandlers.ZillowHttpErrorHandler;
-
 
 @Component
 public class DotloopIntergrationApiBuilder implements InitializingBean
@@ -34,7 +32,7 @@ public class DotloopIntergrationApiBuilder implements InitializingBean
     {
         LOG.info( "Initialising rest builder" );
         RestAdapter dotloopAdapter = new RestAdapter.Builder().setLogLevel( RestAdapter.LogLevel.FULL )
-            .setEndpoint( dotloopEndpoint ).setErrorHandler( new ZillowHttpErrorHandler() ).build();
+            .setEndpoint( dotloopEndpoint ).build();
         dotloopIntegrationApi = dotloopAdapter.create( DotloopIntegrationApi.class );
     }
 }

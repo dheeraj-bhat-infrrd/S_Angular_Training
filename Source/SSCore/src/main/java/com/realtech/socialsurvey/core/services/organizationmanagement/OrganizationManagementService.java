@@ -15,8 +15,10 @@ import com.realtech.socialsurvey.core.entities.BranchFromSearch;
 import com.realtech.socialsurvey.core.entities.BranchSettings;
 import com.realtech.socialsurvey.core.entities.CRMInfo;
 import com.realtech.socialsurvey.core.entities.Company;
+import com.realtech.socialsurvey.core.entities.CompanyDotloopProfileMapping;
 import com.realtech.socialsurvey.core.entities.DisabledAccount;
 import com.realtech.socialsurvey.core.entities.FeedIngestionEntity;
+import com.realtech.socialsurvey.core.entities.LoopProfileMapping;
 import com.realtech.socialsurvey.core.entities.MailContentSettings;
 import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
 import com.realtech.socialsurvey.core.entities.Region;
@@ -1007,5 +1009,47 @@ public interface OrganizationManagementService
      * @param profileName
      */
     void updateRegionProfileName( long regionId, String profileName );
+
+
+    /**
+     * @param profileId
+     * @return
+     */
+    public List<LoopProfileMapping> getLoopsByProfile( String profileId );
+
+
+    /**
+     * @param loopProfileMapping
+     */
+    public void saveLoopsForProfile( LoopProfileMapping loopProfileMapping );
+
+
+    /**
+     * @param companyId
+     * @return
+     */
+    public CompanyDotloopProfileMapping getCompanyDotloopMappingByCompanyIdAndProfileId( long companyId, String profileId );
+
+
+    /**
+     * @param profileId
+     * @return
+     */
+    public CompanyDotloopProfileMapping getCompanyDotloopMappingByProfileId( String profileId );
+
+
+    /**
+     * @param companyDotloopProfileMapping
+     */
+    public CompanyDotloopProfileMapping saveCompanyDotLoopProfileMapping(
+        CompanyDotloopProfileMapping companyDotloopProfileMapping );
+
+
+    /**
+     * @param companyDotloopProfileMapping
+     * @return
+     */
+    public void updateCompanyDotLoopProfileMapping( CompanyDotloopProfileMapping companyDotloopProfileMapping );
+
 
 }

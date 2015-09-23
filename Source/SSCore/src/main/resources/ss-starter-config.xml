@@ -223,7 +223,7 @@
             value="com.realtech.socialsurvey.core.starter.DotloopReviewProcessor" />
         <property name="jobDataAsMap">
             <map>
-                <entry key="dotloopIntegrationApiBuilder" value-ref="zillowIntegrationApiBuilder" />
+                <entry key="dotloopIntegrationApiBuilder" value-ref="dotloopIntegrationApiBuilder" />
                 <entry key="organizationManagementService" value-ref="organizationManagementService" />
                 <entry key="userManagementService" value-ref="userManagementService" />
                 <entry key="surveyHandler" value-ref="surveyHandler" />
@@ -343,7 +343,7 @@
                 <ref bean="imageloaderjobdetail" />
                 <ref bean="fileuploadjobdetail" />
                 <!-- <ref bean="zillowjobdetail" /> -->
-                <!-- <ref bean="dotloopjobdetail" /> -->
+                <ref bean="dotloopjobdetail" />
             </list>
         </property>
 
@@ -360,7 +360,7 @@
                 <ref bean="crmdataagentidmappercron" />
                 <ref bean="imageloadercron" />
                 <ref bean="fileuploadcron" />
-                <!-- <ref bean="dotloopcron" /> -->
+                <ref bean="dotloopcron" />
                 <!-- <ref bean="zillowcron" /> -->
             </list>
         </property>
