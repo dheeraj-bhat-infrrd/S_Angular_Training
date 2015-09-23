@@ -600,7 +600,7 @@ function getReviewsCountAndShowReviews(columnName, columnValue) {
 				$("#review-details").html('');
 				return;
 			} else {
-				$("#review-desc").html("What people say about " + name.substring(1, name.length - 1));
+				$("#review-desc").html("What people say about " + name);
 				if (colName != "agentId"){
 					$("#dsh-cmp-dwnld").hide();
 					$("#dsh-admin-cmp-dwnld").show();
