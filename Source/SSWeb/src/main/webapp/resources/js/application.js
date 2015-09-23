@@ -3602,6 +3602,8 @@ function paintUserListInUserManagement(startIndex) {
 		dataType : "html",
 		success : function(data) {
 			$('#user-list').html(data);
+			var numFound = $('#u-tbl-header').attr("data-num-found");
+			$('#users-count').val(numFound);
 			userStartIndex = startIndex;
 			updatePaginateButtons();
 			bindEditUserClick();
@@ -3820,95 +3822,33 @@ function validateAssignToBranchName() {
 $(document).on('keyup', '#search-users-key', function(e) {
 	// detect enter
 	if (e.keyCode == 13) {
+		userStartIndex = 0;
 		searchUsersByNameEmailLoginId($(this).val());
 	}
 });
 
 $(document).on('click', '#um-search-icn', function(e) {
+	userStartIndex = 0;
 	searchUsersByNameEmailLoginId($('#search-users-key').val());
 });
 
 function searchUsersByNameEmailLoginId(searchKey) {
-	userStartIndex = 0;
 	var url = "./findusers.do";
 	var payload = {
-		"searchKey" : searchKey
+		"searchKey" : searchKey,
+		"startIndex" : userStartIndex,
+		"batchSize" : userBatchSize
 	};
 	callAjaxGetWithPayloadData(url, searchUsersByNameEmailLoginIdCallBack, payload, true);
 }
 
 function searchUsersByNameEmailLoginIdCallBack(data) {
+	var numFound = $('#u-tbl-header').attr("data-num-found");
+	$('#users-count').val(numFound);
 	$('#user-list').html(data);
+	updatePaginateButtons();
 	bindEditUserClick();
 }
-
-/*function paintUsersList(data) {
-	if (userStartIndex == 0) {
-		$('#um-user-list').find('tbody').html("");
-	}
-	userStartIndex += data.length;
-	var searchResult = data;
-	if (searchResult != null) {
-		var len = searchResult.length;
-		if (len > 0) {
-			$.each(searchResult, function(i, user) {
-				var row = $('<tr>').attr({
-					"id" : "um-user-" + user.userId,
-					"class" : "um-user-row"
-				});
-				
-				var col1 = $('<td>').attr({
-					"class" : "col-username um-table-content"
-				}).html(user.firstName + " " + user.lastName);
-				
-				var col2 = $('<td>').attr({
-					"class" : "col-email um-table-content"
-				}).html(user.emailId);
-				
-				var col3 = $('<td>').attr({
-					"class" : "col-loanoff um-table-content clearfix"
-				});
-				
-				if (user.isAgent) {
-					var colImage = $('<div>').attr({
-						"class" : "float-left tm-table-tick-icn icn-right-tick"
-					});
-					col3.append(colImage);
-				}
-				
-				var col4 = $('<td>').attr({
-					"class" : "col-status um-table-content clearfix"
-				});
-				
-				if (user.status == 1) {
-					var statusIcon = $('<div>').attr({
-						"class" : "tm-table-status-icn icn-green-col float-left"
-					});
-					col4.append(statusIcon);
-				} else if (user.status == 3) {
-					var statusIcon = $('<div>').attr({
-						"class" : "tm-table-status-icn icn-green-brown float-left"
-					});
-					col4.append(statusIcon);
-				}
-				
-				var col5 = $('<td>').attr({
-					"class" : "col-remove um-table-content clearfix"
-				});
-				
-				var iconRemove = $('<div>').attr({
-					"class" : "tm-table-remove-icn icn-remove-user float-left cursor-pointer"
-				});
-				
-				col5.append(iconRemove);
-				row.append(col1).append(col2).append(col3).append(col4).append(col5);
-				$('#um-user-list').find('tbody').append(row);
-			});
-		} else {
-			$('#um-user-list').find('tbody').append("No results found");
-		}
-	}
-}*/
 
 function paginateUsersList() {
 	if (!doStopAjaxRequestForUsersList) {
@@ -4264,15 +4204,27 @@ function bindEditUserClick(){
 
 $(document).on('click', '#page-previous.paginate-button', function(){
 	var newIndex = userStartIndex - userBatchSize;
+	var searchKey = $('#search-users-key').val();
 	if (newIndex < $('#users-count').val()) {
-		paintUserListInUserManagement(newIndex);
+		if(searchKey == undefined || searchKey == "") {
+			paintUserListInUserManagement(newIndex);			
+		} else {
+			userStartIndex = newIndex;
+			searchUsersByNameEmailLoginId(searchKey);
+		}
 	}
 });
 
 $(document).on('click', '#page-next.paginate-button', function(){
 	var newIndex = userStartIndex + userBatchSize;
+	var searchKey = $('#search-users-key').val();
 	if (newIndex < $('#users-count').val()) {
-		paintUserListInUserManagement(newIndex);
+		if(searchKey == undefined || searchKey == "") {
+			paintUserListInUserManagement(newIndex);			
+		} else {
+			userStartIndex = newIndex;
+			searchUsersByNameEmailLoginId(searchKey);
+		}
 	}
 });
 
@@ -4481,7 +4433,7 @@ function validateFindProForm() {
 function submitFindAProForm() {
 	if (validateFindProForm()) {
 		$('#find-pro-form').submit();
-		showOverlay();
+		//showOverlay();
 	} else {
 		if (!($('#find-pro-first-name').val() == "" && $('#find-pro-last-name').val() == ""))
 			showError("Please enter either a valid First Name or Last Name to search for");
