@@ -1978,7 +1978,7 @@ function disableOfficeSelector(){
 	$("#selected-office-txt").prop("disabled",true);
 	$("#selected-office-txt").val("");
 	$('#selected-office-id-hidden').val("");
-	$('#selected-region-id-hidden').val("");
+	//$('#selected-region-id-hidden').val("");
 	$("#bd-office-selector").hide();
 }
 
@@ -2773,12 +2773,31 @@ function updateRegionCallBack(data,regionId) {
 }
 
 function updateBranch(formId,branchId) {
-	var url = "./updatebranch.do";
-	var selectedType = $('.bd-cust-rad-img-checked').attr("data-type");
-	$('input[name="userSelectionType"]').val(selectedType);
-	callAjaxFormSubmit(url, function(data){
-		updateBranchCallBack(data,branchId);
-	}, formId);
+	if(validateBranchForm()) {
+		var url = "./updatebranch.do";
+		var selectedType = $('.bd-cust-rad-img-checked').attr("data-type");
+		$('input[name="userSelectionType"]').val(selectedType);
+		callAjaxFormSubmit(url, function(data){
+			updateBranchCallBack(data,branchId);
+		}, formId);
+	}
+}
+
+function validateBranchForm() {
+	//check for region dropdown open
+	if($('#selected-region-txt').is(':visible')) {
+		if($('#selected-region-txt').val() == undefined || $('#selected-region-txt').val().trim() == "") {
+			$('#selected-region-txt').focus();
+			showErrorMobileAndWeb("Please enter region name");
+			return false;
+		}
+		if($('#selected-region-id-hidden').val() == undefined || isNaN(parseInt($('#selected-region-id-hidden').val()))) {
+			$('#selected-region-txt').focus();
+			showErrorMobileAndWeb("Please enter region name");
+			return false;
+		}
+	}
+	return true;
 }
 
 function updateBranchCallBack(data,branchId) {
