@@ -4481,7 +4481,7 @@ function validateFindProForm() {
 function submitFindAProForm() {
 	if (validateFindProForm()) {
 		$('#find-pro-form').submit();
-		showOverlay();
+		//showOverlay();
 	} else {
 		if (!($('#find-pro-first-name').val() == "" && $('#find-pro-last-name').val() == ""))
 			showError("Please enter either a valid First Name or Last Name to search for");
