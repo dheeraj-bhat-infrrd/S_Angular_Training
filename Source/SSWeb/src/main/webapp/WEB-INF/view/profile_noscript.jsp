@@ -103,16 +103,6 @@
     </c:if>
 </head>
 <body>
-	<%-- <div class="hide" itemscope itemtype="http://schema.org/Product">
-		<span itemprop="name">${profName}</span> 
-		<span id="agent-desc" itemprop="title"></span>
-		<div itemprop="aggregateRating" itemscope
-			itemtype="http://schema.org/AggregateRating">
-			Rated <span id="prof-schema-agent-rating" itemprop="ratingValue">${floatingAverageGoogleRating }</span>/5
-			based on <span id="prof-schema-reviews" itemprop="reviewCount">${reviewsCount}</span>
-			reviews
-		</div>
-	</div> --%>
 	<div id="contact-us-pu-wrapper" class="bd-srv-pu hide">
         <div class="container cntct-us-container">
             <div class="contact-us-pu">
@@ -174,7 +164,7 @@
 </div>
 
 <div id="profile-main-content" class="prof-main-content-wrapper margin-top-10 margin-bottom-25">
-    <div class="">
+    <div itemscope itemtype="http://schema.org/Product" class="">
     	<div class="container">
         <div class="row prof-pic-name-wrapper">
 			<c:if test="${not empty profile.profileImageUrl }">
@@ -188,7 +178,7 @@
 				<c:set var="profileNameClass" value="profile-name-img-wrapper"></c:set>
 			</c:if>
             <div class="col-lg-4 col-md-4 col-sm-4 col-xs-6 prof-wrapper pos-relative prof-name-wrapper ${profileNameClass}">
-                <div itemscope itemtype="http://schema.org/Product" class="prof-name-container">
+                <div class="prof-name-container">
                 	<div itemprop="name" class="prof-name">${profName}</div>
                 	<div class="prof-address">
                 		<c:if test="${not empty profile.vertical}">

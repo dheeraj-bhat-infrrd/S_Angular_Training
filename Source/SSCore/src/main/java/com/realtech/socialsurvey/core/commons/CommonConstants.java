@@ -1,5 +1,7 @@
 package com.realtech.socialsurvey.core.commons;
 
+import java.text.DecimalFormat;
+
 /**
  * Holds application level constants
  */
@@ -671,4 +673,8 @@ public interface CommonConstants
     public static final String SETTING_SCORE = "setScore";
     
     public static final String LOCK_SCORE = "lockScore";
+    
+    // Social media message template constants
+    public static final DecimalFormat RANKING_FORMAT_TWITTER= new DecimalFormat("#.#");
+    public static final String TWITTER_MESSAGE = "%s Star Survey Response from %s for %s on %s ";
 }
