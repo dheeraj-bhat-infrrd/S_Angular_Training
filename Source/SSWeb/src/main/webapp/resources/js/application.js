@@ -3602,6 +3602,8 @@ function paintUserListInUserManagement(startIndex) {
 		dataType : "html",
 		success : function(data) {
 			$('#user-list').html(data);
+			var numFound = $('#u-tbl-header').attr("data-num-found");
+			$('#users-count').val(numFound);
 			userStartIndex = startIndex;
 			updatePaginateButtons();
 			bindEditUserClick();
