@@ -268,7 +268,9 @@ public class CsvUploadServiceImpl implements CsvUploadService {
 		}
 		if (excelCreated) {
 			try {
-				emailServices.sendRecordsNotUploadedCrmNotificationMail(adminName, "", adminEmailId, filePath);
+				Map<String , String > attachmentsDetails = new HashMap<String, String>();
+				attachmentsDetails.put("CorruptRecords.xls", filePath);
+				emailServices.sendRecordsNotUploadedCrmNotificationMail(adminName, "", adminEmailId, attachmentsDetails );
 			}
 			catch (InvalidInputException e) {
 				LOG.error("Exception caught " + e.getMessage());
