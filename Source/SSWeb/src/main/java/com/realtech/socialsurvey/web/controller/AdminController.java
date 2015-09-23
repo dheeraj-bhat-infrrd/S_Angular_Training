@@ -167,13 +167,14 @@ public class AdminController
             			model.addAttribute("workContactNo" ,companyContactDetail.getContact_numbers().getWork() );
             		}
             		if(companyContactDetail.getMail_ids() != null){
-            			model.addAttribute("workContactNo" ,companyContactDetail.getMail_ids().getWork() );
+            			model.addAttribute("workMailId" ,companyContactDetail.getMail_ids().getWork() );
             		}
             	}
                 LOG.error( "No records found for company branch or region, reason : " + e.getMessage() );
-                //TODO : return a new jsp instead of header message.
-                throw new NonFatalException( "No defaul branch or region found for company " + company.getCompany(),
-                    DisplayMessageConstants.COMPANY_NOT_REGISTERD, e );
+                model.addAttribute( "message", messageUtils.getDisplayMessage( DisplayMessageConstants.COMPANY_NOT_REGISTERD,
+                        DisplayMessageType.SUCCESS_MESSAGE ).getMessage() );
+                
+                return JspResolver.ADMIN_COMPANY_NOT_REGISTERED;
             }
             model.addAttribute( "companyObj", company );
 
