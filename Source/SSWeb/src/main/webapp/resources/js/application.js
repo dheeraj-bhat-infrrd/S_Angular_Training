@@ -162,7 +162,7 @@ function saveState(url) {
 
 function retrieveState() {
 	if (!refreshSupport) {
-		console.log('refresh not supported');
+		//refresh not supported
 		return;
 	}
 	var newLocation = window.location.hash.substring(1);
@@ -491,7 +491,6 @@ function bindSelectButtons() {
 		if($('#dsh-srch-survey-div').is(':visible')){
 			columnName = lastColNameForCount;
 			columnValue = lastColValueForCount;
-			console.info("lastColNameForCount:"+lastColNameForCount+" lastColValueForCount:"+lastColValueForCount);
 		}
 		showSurveyStatistics(columnName, columnValue);
 	});
@@ -565,7 +564,6 @@ function showIncompleteSurvey(columnName, columnValue) {
 	
 	callAjaxGetWithPayloadData("./fetchdashboardincompletesurvey.do", function(data) {
 		if (startIndexInc == 0) {
-			console.info("startIndex ==0:"+startIndexInc);
 			$('#dsh-inc-srvey').html(data);
 			$("#dsh-inc-dwnld").show();
 		}
@@ -690,7 +688,6 @@ function showReviews(columnName, columnValue) {
 }
 
 $(document).on('scroll', '#dsh-inc-srvey', function() {
-	console.log($('.ps-scrollbar-y').css('top'));
 });
 
 function showSurveyStatisticsGraphically(columnName, columnValue) {
@@ -710,6 +707,7 @@ function showSurveyGraph(columnName, columnValue, numberOfDays) {
 		url : "./surveydetailsforgraph.do",
 		type : "GET",
 		dataType : "JSON",
+		cache : false,
 		data : payload,
 		success : function(data) {
 			if (data.errCode == undefined)
@@ -726,7 +724,6 @@ function showSurveyGraph(columnName, columnValue, numberOfDays) {
 				redirectToLoginPageOnSessionTimeOut(e.status);
 				return;
 			}
-			console.error("error : " + e.responseText);
 			$('#overlay-toast').html(e.responseText);
 			showToast();
 		}
@@ -853,7 +850,6 @@ function paintSurveyGraph() {
 		nestedInternalData.push(allTimeslots[itr], sentSurvey, clickedSurvey, completedSurvey, socialPost);
 		internalData.push(nestedInternalData);
 	}
-	console.log(internalData);
 
 	var data = google.visualization.arrayToDataTable(internalData);
 	var options = {
@@ -964,6 +960,7 @@ function sendSurveyReminderMail(surveyPreInitiationId, customerName) {
 		url : "./sendsurveyremindermail.do",
 		type : "GET",
 		dataType : "JSON",
+		cache : false,
 		data : payload,
 		success : function(data) {
 			if (data.errCode == undefined)
@@ -980,7 +977,6 @@ function sendSurveyReminderMail(surveyPreInitiationId, customerName) {
 				redirectToLoginPageOnSessionTimeOut(e.status);
 				return;
 			}
-			console.error("error : " + e.responseText);
 			$('#overlay-toast').html('Something went wrong while sending mail. Please try again after sometime.');
 			showToast();
 		}
@@ -1011,13 +1007,13 @@ function showDisplayPic() {
 	$.ajax({
 		url : "./getdisplaypiclocation.do",
 		type : "GET",
+		cache : false,
 		dataType : "JSON",
 		success : function(data) {
 			
 		},
 		complete : function(data) {
 			if (data.errCode == undefined){
-				console.log("Image location : " + data.responseJSON);
 				var imageUrl = data.responseJSON;
 				if (imageUrl != undefined && imageUrl != "undefined" && imageUrl.trim() != "") {
 					$("#dsh-prsn-img").removeClass('dsh-pers-default-img');
@@ -1036,7 +1032,6 @@ function showDisplayPic() {
 				redirectToLoginPageOnSessionTimeOut(e.status);
 				return;
 			}
-			console.log("Logged in id as : "+colName);
 			$("#dsh-prsn-img").removeClass('person-img');
 			if (colName == 'agentId') {
 				$("#dsh-prsn-img").addClass('dsh-pers-default-img');
@@ -1051,9 +1046,9 @@ function showDisplayPic() {
 	});
 }
 
-function updateCurrentProfile(entityType, entityValue) {
+function updateCurrentProfile(entityType, entityValue, callbackFunction) {
 	var url = "./updatecurrentprofile.do?entityId=" + entityValue + "&entityType=" + entityType;
-	callAjaxGET(url, function(data) {}, true);
+	callAjaxGET(url, callbackFunction, true);
 }
 
 function showSurveyRequestPage(){
@@ -1076,18 +1071,17 @@ $(document).on('click','.da-dd-item',function(e){
 	showOverlay();
 	$('#dashboard-sel').html($(this).html());
 	$('#da-dd-wrapper-profiles').slideToggle(200);
-	$('#da-dd-wrapper-profiles').perfectScrollbar('update');
+	//$('#da-dd-wrapper-profiles').perfectScrollbar('update');
 	
 	attrName = $(this).attr('data-column-type');
 	attrVal = $(this).attr('data-column-value');
 	
 	// update selected profile in session
-	updateCurrentProfile($(this).attr('data-column-type'), $(this).attr('data-column-value'));
-
-	var selectedTab = window.location.hash.split("#")[1];
-	
-	showMainContent('./' + selectedTab + '.do');
-	//showMainContent('./dashboard.do');
+	updateCurrentProfile($(this).attr('data-column-type'), $(this)
+			.attr('data-column-value'), function() {
+		var selectedTab = window.location.hash.split("#")[1];
+		showMainContent('./' + selectedTab + '.do');
+	});
 });
 
 $(document).click(function(){
@@ -1930,7 +1924,6 @@ function bindAdminCheckBoxClick(){
  * @param assignToOption
  */
 function showSelectorsByAssignToOption(assignToOption) {
-	console.log("selector----------"+assignToOption);
 	switch(assignToOption) {
 	case 'company':
 		disableRegionSelector();
@@ -2306,7 +2299,6 @@ function addOfficeCallBack(data) {
  * @param regionPattern
  */
 function populateRegionsSelector(regionPattern) {
-	console.log("Method populateRegionsSelector called for regionPattern : "+regionPattern);
 	var url = "./searchregions.do?regionPattern="+regionPattern+"&start=0&rows=-1";
 	callAjaxGET(url, populateRegionsSelectorCallBack, true);
 }
@@ -2320,7 +2312,6 @@ function populateRegionsSelectorCallBack(data) {
 	if(searchResult != null) {
 		var len = searchResult.length;
 		var htmlData = "";
-		console.log("searchResult is "+searchResult);
 		if(len > 0) {
 			$.each(searchResult,function(i,region) {
 					htmlData = htmlData +'<div data-regionId="'+region.regionId+'" class="bd-frm-rt-dd-item dd-com-item hm-dd-hover hm-region-option">'+region.regionName+'</div>';
@@ -2465,7 +2456,6 @@ function addIndividualCallBack(data) {
  * @param officePattern
  */
 function populateOfficesSelector(officePattern) {
-	console.log("Method populateOfficesSelector called for officePattern : "+officePattern);
 	var url = "./searchbranches.do?branchPattern="+officePattern+"&start=0&rows=-1";
 	callAjaxGET(url, populateOfficesSelectorCallBack, true);
 }
@@ -2479,7 +2469,6 @@ function populateOfficesSelectorCallBack(data) {
 	if(searchResult != null) {
 		var len = searchResult.length;
 		var htmlData = "";
-		console.log("searchResult is "+searchResult);
 		if(len > 0) {
 			$.each(searchResult,function(i,branch) {
 					htmlData = htmlData +'<div data-regionid="'+branch.regionId+'" data-officeid="'+branch.branchId+'" class="bd-frm-rt-dd-item dd-com-item hm-dd-hover hm-office-option">'+branch.branchName+'</div>';
@@ -2509,7 +2498,6 @@ function populateOfficesSelectorCallBack(data) {
 }
 
 function bindArrowKeysWithSelector(e,textBoxId,dropListId,populatorFunction,hiddenFieldId,attrName) {
-	console.log(e.which);
 	if(e.which == 40) {
 		var text = $("#"+textBoxId).val();
 		if(text == undefined) {
@@ -2951,6 +2939,7 @@ function resendVerificationMail(){
 	$.ajax({
 		url : "./sendverificationmail.do",
 		type : "GET",
+		cache : false,
 		dataType : "text",
 		success : function(data) {
 			if (data.errCode == undefined){
@@ -2971,7 +2960,6 @@ function resendVerificationMail(){
 				redirectToLoginPageOnSessionTimeOut(e.status);
 				return;
 			}
-			console.error("error : " + e.responseText);
 			$('#overlay-toast').html(e.responseText);
 			showToast();
 		}
@@ -3174,7 +3162,6 @@ function createPopupConfirm(header, body) {
 }*/
 
 function showPaymentOptions() {
-	console.log("Calling payment controller for payment upgrade page");	
 	disableBodyScroll();
 	var url = "./paymentchange.do";
     showOverlay();
@@ -3182,26 +3169,21 @@ function showPaymentOptions() {
 }
 
 function displayPopup(data){
-	console.log("display message called :data "+data);
 	$("#temp-div").html(data);
 	
 	var displayMessageDiv = $("#display-msg-div");
 	if($(displayMessageDiv).hasClass("message")) {
-		console.log("Error occured. Hiding Overlay");
 		hideOverlay();
 		$('#st-settings-payment-off').show();
    		$('#st-settings-payment-on').hide();
-		console.log("Removing no-scroll class from body");
 		enableBodyScroll();
 		$("#overlay-toast").html($(displayMessageDiv).html());
 		showToast();
 	}	
 	else{
 		$('.overlay-payment').html(data);
-    	console.log("Html content loaded");
     	hideOverlay();
     	$('.overlay-payment').show();
-    	console.log("Showing popup");
     }
 	$("#temp-div").html("");
 }
@@ -3282,7 +3264,6 @@ function paintTextForMood(happyText, neutralText, sadText, happyTextComplete, ne
 $(document).on('click', '.um-user-row', function() {
 	if (!isUserManagementAuthorized)
 		return false;
-	console.log("user row clicked");
 	isAddUser = false;
 	var userId = this.id;
 	userId = userId.substr("um-user-".length);
@@ -3400,7 +3381,6 @@ function assignUserToBranch(userId, branchId) {
 				redirectToLoginPageOnSessionTimeOut(e.status);
 				return;
 			}
-			console.error("error : " + e);
 		}
 	});
 }
@@ -3431,8 +3411,6 @@ function unassignUserFromBranch(userId, branchId) {
 			$('#overlay-cancel').click();
 			hideOverlay();
 			if (success) {
-				console.log("User successfully unassigned from branch "
-						+ branchId);
 				$('#branch-to-unassign-' + branchId).remove();
 				
 				// check if there are any assigned branches left
@@ -3450,7 +3428,6 @@ function unassignUserFromBranch(userId, branchId) {
 				redirectToLoginPageOnSessionTimeOut(e.status);
 				return;
 			}
-			console.error("error : " + e);
 		}
 	});
 }
@@ -3501,7 +3478,6 @@ function inviteUser() {
 				redirectToLoginPageOnSessionTimeOut(e.status);
 				return;
 			}
-			console.error("error : " + e);
 		}
 	});
 }
@@ -3576,7 +3552,6 @@ function deleteUser(userId) {
 				redirectToLoginPageOnSessionTimeOut(e.status);
 				return;
 			}
-			console.error("error : " + e);
 		}
 	});
 }
@@ -3606,7 +3581,6 @@ function paintUserDetailsForm(userId) {
 				redirectToLoginPageOnSessionTimeOut(e.status);
 				return;
 			}
-			console.error("error : " + e);
 		}
 	});
 }
@@ -3623,6 +3597,7 @@ function paintUserListInUserManagement(startIndex) {
 	$.ajax({
 		url : "./findusersforcompany.do",
 		type : "GET",
+		cache : false,
 		data : payload,
 		dataType : "html",
 		success : function(data) {
@@ -3636,7 +3611,6 @@ function paintUserListInUserManagement(startIndex) {
 				redirectToLoginPageOnSessionTimeOut(e.status);
 				return;
 			}
-			console.error("error : " + e);
 		}
 	});
 }
@@ -3688,14 +3662,12 @@ function activateOrDeactivateUser(isActive, userId) {
 				redirectToLoginPageOnSessionTimeOut(e.status);
 				return;
 			}
-			console.error("error : " + e);
 		}
 	});
 }
 
 // function to validate input fields before sending the user invite
 function validateUserInviteDetails() {
-	console.log("Validating user invite input fields");
 	var isFormValid = true;
 	var isFocussed = false;
 	var isSmallScreen = false;
@@ -3848,7 +3820,6 @@ function validateAssignToBranchName() {
 $(document).on('keyup', '#search-users-key', function(e) {
 	// detect enter
 	if (e.keyCode == 13) {
-		console.log("Enter");
 		searchUsersByNameEmailLoginId($(this).val());
 	}
 });
@@ -3959,6 +3930,7 @@ function searchBranchesForUser(branchPattern) {
 	$.ajax({
 		url : url,
 		type : "GET",
+		cache : false,
 		dataType : "JSON",
 		success : function(data) {
 			if (data.errCode == undefined)
@@ -4508,7 +4480,6 @@ function validateFindProForm() {
 
 function submitFindAProForm() {
 	if (validateFindProForm()) {
-		console.log("Submitting Find a Profile form");
 		$('#find-pro-form').submit();
 		showOverlay();
 	} else {
@@ -4551,6 +4522,8 @@ function fetchUsers(newIndex) {
 		
 		if (!($('#find-pro-first-name').val() == "" && $('#find-pro-last-name').val() == ""))
 			callAjaxPOSTWithTextData("./findaproscroll.do", paginateUsersProList, true, formData);
+		else
+			hideOverlay();
 	}
 }
 
@@ -4737,7 +4710,6 @@ function paintProList(usersList) {
 
 function fetchUsersByProfileLevel(iden, profileLevel, startIndex) {
 	if (iden == undefined) {
-		console.log("iden is undefined for fetchUsersByProfileLevel");
 		return;
 	}
 	var url = window.location.origin + "/rest/profile/individuals/" + iden
@@ -4788,24 +4760,6 @@ function initSurvey(firstName, lastName, email, agentId, agentName, grecaptchare
 	}
 	
 	$('#survey-request-form').submit();
-	
-	/*$.ajax({
-		url : window.location.origin + surveyUrl + "triggersurvey",
-		type : "GET",
-		dataType : "TEXT",
-		data : payload,
-		success : function(data) {			
-			$('#overlay-toast').html(data);
-			$("#recaptcha_reload").click();
-			showToast();
-			clearForm();
-		},
-		error : function(e) {
-			console.error("error : " + e.responseText);
-			$('#overlay-toast').html(e.responseText);
-			showToast();
-		}
-	});*/
 }
 
 function initSurveyWithUrl(q) {
@@ -4816,6 +4770,7 @@ function initSurveyWithUrl(q) {
 	$.ajax({
 		url : window.location.origin + surveyUrl + "triggersurveywithurl",
 		type : "GET",
+		cache : false,
 		dataType : "JSON",
 		data : payload,
 		success : function(data) {
@@ -4862,6 +4817,7 @@ function loadAgentPic(agentId){
 		url : window.location.origin + surveyUrl + "displaypiclocationofagent",
 		type : "GET",
 		dataType : "text",
+		cache : false,
 		data : payload,
 		success : function(data) {
 			if (data.errCode == undefined)
@@ -4880,7 +4836,6 @@ function loadAgentPic(agentId){
 				redirectToLoginPageOnSessionTimeOut(e.status);
 				return;
 			}
-			console.error("error : " + e.responseText);
 		}
 	});
 }
@@ -5108,6 +5063,7 @@ function storeCustomerAnswer(customerResponse) {
 	$.ajax({
 		url : window.location.origin + surveyUrl + "data/storeAnswer",
 		type : "GET",
+		cache : false,
 		data : payload,
 		dataType : "JSON",
 		success : function(data) {
@@ -5129,7 +5085,6 @@ function storeCustomerAnswer(customerResponse) {
 				redirectToLoginPageOnSessionTimeOut(e.status);
 				return;
 			}
-			console.error("error : ");
 		}
 	});
 }
@@ -5157,6 +5112,7 @@ function updateCustomerResponse(feedback, agreedToShare) {
 	$.ajax({
 		url : window.location.origin + surveyUrl + "data/storeFeedback",
 		type : "GET",
+		cache : false,
 		data : payload,
 		dataType : "TEXT",
 		success : function(data) {
@@ -5165,7 +5121,6 @@ function updateCustomerResponse(feedback, agreedToShare) {
 		},
 		complete : function(data) {
 			if (success) {
-				console.log(data);
 			}
 		},
 		error : function(e) {
@@ -5173,7 +5128,6 @@ function updateCustomerResponse(feedback, agreedToShare) {
 				redirectToLoginPageOnSessionTimeOut(e.status);
 				return;
 			}
-			console.error("error : "+e);
 		}
 	});
 }
@@ -5370,6 +5324,7 @@ function postToSocialMedia(feedback){
 	$.ajax({
 		url : window.location.origin + surveyUrl + "posttosocialnetwork",
 		type : "GET",
+		cache : false,
 		dataType : "TEXT",
 		data : payload,
 		success : function(data) {
@@ -5385,7 +5340,6 @@ function postToSocialMedia(feedback){
 				redirectToLoginPageOnSessionTimeOut(e.status);
 				return;
 			}
-			console.error("error : " + e.responseText);
 			$('#overlay-toast').html(e.responseText);
 			showToast();
 		}
@@ -5402,6 +5356,7 @@ function updateSharedOn(socialSite, agentId, customerEmail){
 	$.ajax({
 		url : window.location.origin + surveyUrl + "updatesharedon",
 		type : "GET",
+		cache : false,
 		dataType : "TEXT",
 		data : payload,
 		success : function(data) {
@@ -5417,7 +5372,6 @@ function updateSharedOn(socialSite, agentId, customerEmail){
 				redirectToLoginPageOnSessionTimeOut(e.status);
 				return;
 			}
-			console.error("error : " + e.responseText);
 			$('#overlay-toast').html(e.responseText);
 			showToast();
 		}
@@ -7337,6 +7291,7 @@ function countPosts() {
 	$.ajax({
 		url : "./postscountforuser.do",
 		type : "GET",
+		cache : false,
 		dataType : "text",
 		async : false,
 		success : function(data) {
@@ -7354,7 +7309,6 @@ function countPosts() {
 				redirectToLoginPageOnSessionTimeOut(e.status);
 				return;
 			}
-			console.error(e.responseText);
 		}
 	});
 }
@@ -7372,6 +7326,7 @@ function showPosts(fromStart) {
 	$.ajax({
 		url : "./postsforuser.do",
 		type : "GET",
+		cache : false,
 		dataType : "JSON",
 		data : payload,
 		async : false,
@@ -7467,8 +7422,6 @@ function paintPosts(posts) {
 }
 
 function showDashboardButtons(columnName, columnValue){
-	console.log(columnName);
-	console.log(columnValue);
 	var payload={
 			"columnName" : columnName,
 			"columnValue" : columnValue
@@ -7599,7 +7552,10 @@ $(document).on('blur', '#disclaimer-text', function() {
 		callAjaxPostWithPayloadData("./updatedisclaimer.do", function(data) {
 			$('#prof-message-header').html(data);
 			if ($('#prof-message-header #display-msg-div').hasClass('success-message')) {
-				$('#disclaimer-default').val(disclaimer);
+				if(disclaimer != undefined){
+					$('#disclaimer-default').val(disclaimer.trim());
+					$('#disclaimer-text').val(disclaimer.trim());
+				}
 			}
 
 			$('#overlay-toast').html($('#display-msg-div').text().trim());
@@ -7621,22 +7577,18 @@ $(document).on('click','#dsh-dwnld-report-btn',function(){
 	var key = parseInt(selectedValue);
 	switch (key) {
 	case 1:
-		console.log("agent-ranking");
 		window.location.href = "/downloadagentrankingreport.do?columnName=" + colName + "&columnValue=" + colValue
 			+ "&startDate=" + startDate + "&endDate=" + endDate;
 		break;
 	case 2:
-		console.log("survey-results");
 		window.location.href = "/downloadcustomersurveyresults.do?columnName=" + colName + "&columnValue=" + colValue
 			+ "&startDate=" + startDate + "&endDate=" + endDate;
 		break;
 	case 3:
-		console.log("social-monitor");
 		window.location.href = "/downloaddashboardsocialmonitor.do?columnName=" + colName + "&columnValue=" + colValue
 			+ "&startDate=" + startDate + "&endDate=" + endDate;
 		break;
 	case 4:
-		console.log("incomplete-survey");
 		window.location.href = "/downloaddashboardincompletesurvey.do?columnName=" + colName + "&columnValue=" + colValue
 			+ "&startDate=" + startDate + "&endDate=" + endDate;
 		break;

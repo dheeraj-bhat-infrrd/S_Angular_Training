@@ -84,6 +84,7 @@ $(document).ready(function(){
 		$.ajax({
 			url : './fetchagentsforadmin.do',
 			type : "GET",
+			cache : false,
 			data : payload,
 			dataType : 'JSON',
 			async : true,
