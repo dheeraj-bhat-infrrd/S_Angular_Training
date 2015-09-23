@@ -600,6 +600,9 @@
 								<div itemprop="review" itemscope itemtype="http://schema.org/Review" class="ppl-review-item" data-cust-first-name="${reviewItem.customerFirstName }"
 									data-cust-last-name="${reviewItem.customerLastName }" data-agent-name="${reviewItem.agentName }"
 									data-rating="${reviewItem.score }" data-review="${reviewItem.review}">
+									<div itemprop="itemReviewed" itemscope itemtype="http://schema.org/Product">
+										<meta itemprop="name" content="${reviewItem.agentName}">
+									</div>
 									<div class="ppl-header-wrapper clearfix">
 										<div class="float-left ppl-header-left">
 											<div itemprop="author" itemscope itemtype="http://schema.org/Person" class="ppl-head-1"><span itemprop="name">${reviewItem.customerFirstName } ${reviewItem.customerLastName }</span></div>
