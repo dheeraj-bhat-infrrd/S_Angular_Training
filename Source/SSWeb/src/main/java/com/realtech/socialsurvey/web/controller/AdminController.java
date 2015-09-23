@@ -168,6 +168,11 @@ public class AdminController
             		}
             		if(companyContactDetail.getMail_ids() != null){
             			model.addAttribute("workMailId" ,companyContactDetail.getMail_ids().getWork() );
+            			// Get the user user name
+            			if(companyContactDetail.getMail_ids().getWork() != null && !companyContactDetail.getMail_ids().getWork().isEmpty()){
+            				User user = userManagementService.getUserByEmail(companyContactDetail.getMail_ids().getWork());
+            				model.addAttribute("userName", user.getFirstName()+" "+(user.getLastName()!=null?user.getLastName():""));
+            			}
             		}
             	}
                 LOG.error( "No records found for company branch or region, reason : " + e.getMessage() );
