@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
+
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrQuery.ORDER;
 import org.apache.solr.client.solrj.SolrServer;
@@ -27,6 +28,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
+
 import com.google.gson.Gson;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.dao.OrganizationUnitSettingsDao;
@@ -960,8 +962,9 @@ public class SolrSearchServiceImpl implements SolrSearchService {
 			solrQuery.addFilterQuery(CommonConstants.STATUS_COLUMN + ":" + CommonConstants.STATUS_ACTIVE);
 			response = solrServer.query(solrQuery);
 			SolrDocumentList results = response.getResults();
-			if (results.size() != 0)
-				regionName = (String) results.get(CommonConstants.INITIAL_INDEX).getFieldValue(CommonConstants.REGION_NAME_COLUMN);
+			if (results.size() != 0){
+				regionName = (String) results.get(CommonConstants.INITIAL_INDEX).getFieldValue(CommonConstants.REGION_NAME_SOLR);				
+			}
 		}
 		catch (SolrServerException e) {
 			LOG.error("UnsupportedEncodingException while performing region search");
@@ -995,7 +998,7 @@ public class SolrSearchServiceImpl implements SolrSearchService {
 			response = solrServer.query(solrQuery);
 			SolrDocumentList results = response.getResults();
 			if (results.size() != 0)
-				branchName = (String) results.get(CommonConstants.INITIAL_INDEX).getFieldValue(CommonConstants.BRANCH_NAME_COLUMN);
+				branchName = (String) results.get(CommonConstants.INITIAL_INDEX).getFieldValue(CommonConstants.BRANCH_NAME_SOLR);
 		}
 		catch (SolrServerException e) {
 			LOG.error("UnsupportedEncodingException while performing branch search");
