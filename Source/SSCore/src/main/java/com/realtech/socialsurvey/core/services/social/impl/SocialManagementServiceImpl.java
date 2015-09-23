@@ -247,6 +247,11 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
 							.getTwitterAccessToken(), agentSettings.getSocialMediaTokens().getTwitterToken().getTwitterAccessTokenSecret()));
 					try {
 						twitterNotSetup = false;
+						// TODO: Hard coded bad code: DELETE: BEGIN
+						if(companyId == Long.parseLong(customisedSocialNetworkCompanyId)){
+							message = message.replace("@SocialSurveyMe", "#REMAXagentreviews");
+						}
+						// TODO: Hard coded bad code: DELETE: END
 						StatusUpdate statusUpdate = new StatusUpdate(message);
 						// TODO: Hard coded bad code: DELETE: BEGIN
 						if (companyId == Long.parseLong(customisedSocialNetworkCompanyId)) {
