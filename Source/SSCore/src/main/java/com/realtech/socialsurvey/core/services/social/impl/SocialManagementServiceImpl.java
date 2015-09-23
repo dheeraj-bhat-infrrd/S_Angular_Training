@@ -22,6 +22,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.DependsOn;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
+import twitter4j.StatusUpdate;
 import twitter4j.Twitter;
 import twitter4j.TwitterException;
 import twitter4j.TwitterFactory;
@@ -99,7 +100,7 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
 
 	@Value("${APPLICATION_LOGO_LINKEDIN_URL}")
 	private String applicationLogoUrlForLinkedin;
-	
+
 	@Value("${CUSTOM_SOCIALNETWORK_POST_COMPANY_ID}")
 	private String customisedSocialNetworkCompanyId;
 
@@ -207,7 +208,7 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
 							e1.printStackTrace();
 						}
 						// TODO: Hard coded bad code: DELETE: BEGIN
-						if(companyId == Long.parseLong(customisedSocialNetworkCompanyId)){
+						if (companyId == Long.parseLong(customisedSocialNetworkCompanyId)) {
 							try {
 								postUpdate.setPicture(new URL("https://don7n2as2v6aa.cloudfront.net/remax-facebook-image.png"));
 							}
@@ -217,7 +218,7 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
 						}
 						// TODO: Hard coded bad code: DELETE: END
 						facebook.postFeed(postUpdate);
-						//facebook.postStatusMessage(message);
+						// facebook.postStatusMessage(message);
 					}
 					catch (RuntimeException e) {
 						LOG.error("Runtime exception caught while trying to post on facebook. Nested exception is ", e);
@@ -231,23 +232,42 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
 	}
 
 	@Override
-	public boolean tweet(OrganizationUnitSettings agentSettings, String message) throws InvalidInputException, TwitterException {
+	public boolean tweet(OrganizationUnitSettings agentSettings, String message, long companyId) throws InvalidInputException, TwitterException {
 		if (agentSettings == null) {
 			throw new InvalidInputException("AgentSettings can not be null");
 		}
 		LOG.info("Getting Social Tokens information");
 		boolean twitterNotSetup = true;
-		Twitter twitter = getTwitterInstance();
 		if (agentSettings != null) {
 			if (agentSettings.getSocialMediaTokens() != null) {
 				if (agentSettings.getSocialMediaTokens().getTwitterToken() != null
 						&& agentSettings.getSocialMediaTokens().getTwitterToken().getTwitterAccessTokenSecret() != null) {
-
+					Twitter twitter = getTwitterInstance();
 					twitter.setOAuthAccessToken(new twitter4j.auth.AccessToken(agentSettings.getSocialMediaTokens().getTwitterToken()
 							.getTwitterAccessToken(), agentSettings.getSocialMediaTokens().getTwitterToken().getTwitterAccessTokenSecret()));
 					try {
 						twitterNotSetup = false;
-						twitter.updateStatus(message);
+						// TODO: Hard coded bad code: DELETE: BEGIN
+						if(companyId == Long.parseLong(customisedSocialNetworkCompanyId)){
+							message = message.replace("@SocialSurveyMe", "#REMAXagentreviews");
+						}
+						// TODO: Hard coded bad code: DELETE: END
+						StatusUpdate statusUpdate = new StatusUpdate(message);
+						// TODO: Hard coded bad code: DELETE: BEGIN
+						if (companyId == Long.parseLong(customisedSocialNetworkCompanyId)) {
+							try {
+								statusUpdate.setMedia("Picture",
+										new URL("https://don7n2as2v6aa.cloudfront.net/remax-twitter-image.jpg?imgmax=800").openStream());
+							}
+							catch (MalformedURLException e) {
+								LOG.error("error while posting image on twitter: " + e.getMessage(), e);
+							}
+							catch (IOException e) {
+								LOG.error("error while posting image on twitter: " + e.getMessage(), e);
+							}
+						}
+						twitter.updateStatus(statusUpdate);
+						// twitter.updateStatus(message);
 					}
 					catch (RuntimeException e) {
 						LOG.error("Runtime exception caught while trying to tweet. Nested exception is ", e);

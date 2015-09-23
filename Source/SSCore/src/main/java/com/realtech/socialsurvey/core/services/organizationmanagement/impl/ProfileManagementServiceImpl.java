@@ -2889,6 +2889,81 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
                         }
                     }
                 }
+                               
+                if(unitSettings.getContact_details() != null){
+                	if((unitSettings.getContact_details().getAddress1() != null && !unitSettings.getContact_details().getAddress1().isEmpty()) || (unitSettings.getContact_details().getAddress2() != null && !unitSettings.getContact_details().getAddress2().isEmpty())){
+                		closestSettings.put(SettingsForApplication.ADDRESS, OrganizationUnit.AGENT);
+                	}
+                }
+                if(unitSettings.getContact_details() != null){
+                	if(unitSettings.getContact_details().getLocation() != null && !unitSettings.getContact_details().getLocation().isEmpty()){
+                		closestSettings.put(SettingsForApplication.LOCATION, OrganizationUnit.AGENT);
+                	}
+                }
+                
+                if(unitSettings.getContact_details() != null){
+                	if(unitSettings.getContact_details().getAbout_me() != null && !unitSettings.getContact_details().getAbout_me().isEmpty()){
+                		closestSettings.put(SettingsForApplication.ABOUT_ME, OrganizationUnit.AGENT);
+                	}
+                }
+                
+                if(unitSettings.getContact_details() != null){
+                	if(unitSettings.getContact_details().getMail_ids() != null){
+                		if(unitSettings.getContact_details().getMail_ids().getWork() != null && !unitSettings.getContact_details().getMail_ids().getWork().isEmpty()){
+                			closestSettings.put(SettingsForApplication.EMAIL_ID_WORK, OrganizationUnit.AGENT);
+                		}
+                	}
+                }
+                
+                if(unitSettings.getContact_details() != null){
+                	if(unitSettings.getContact_details().getMail_ids() != null){
+                		if(unitSettings.getContact_details().getMail_ids().getPersonal() != null && !unitSettings.getContact_details().getMail_ids().getPersonal().isEmpty()){
+                			closestSettings.put(SettingsForApplication.EMAIL_ID_PERSONAL, OrganizationUnit.AGENT);
+                		}
+                	}
+                }
+                
+                if(unitSettings.getSocialMediaTokens() != null){
+                	if(unitSettings.getSocialMediaTokens().getFacebookToken() != null){
+                		closestSettings.put(SettingsForApplication.FACEBOOK, OrganizationUnit.AGENT);
+                	}
+                }
+                if(unitSettings.getSocialMediaTokens() != null){
+                	if(unitSettings.getSocialMediaTokens().getTwitterToken() != null){
+                		closestSettings.put(SettingsForApplication.TWITTER, OrganizationUnit.AGENT);
+                	}
+                }
+                if(unitSettings.getSocialMediaTokens() != null){
+                	if(unitSettings.getSocialMediaTokens().getLinkedInToken() != null){
+                		closestSettings.put(SettingsForApplication.LINKED_IN, OrganizationUnit.AGENT);
+                	}
+                }
+                if(unitSettings.getSocialMediaTokens() != null){
+                	if(unitSettings.getSocialMediaTokens().getGoogleToken() != null){
+                		closestSettings.put(SettingsForApplication.GOOGLE_PLUS, OrganizationUnit.AGENT);
+                	}
+                }
+                if(unitSettings.getSocialMediaTokens() != null){
+                	if(unitSettings.getSocialMediaTokens().getYelpToken() != null){
+                		closestSettings.put(SettingsForApplication.YELP, OrganizationUnit.AGENT);
+                	}
+                }
+                if(unitSettings.getSocialMediaTokens() != null){
+                	if(unitSettings.getSocialMediaTokens().getZillowToken() != null){
+                		closestSettings.put(SettingsForApplication.ZILLOW, OrganizationUnit.AGENT);
+                	}
+                }
+                if(unitSettings.getSocialMediaTokens() != null){
+                	if(unitSettings.getSocialMediaTokens().getRealtorToken() != null){
+                		closestSettings.put(SettingsForApplication.REALTOR, OrganizationUnit.AGENT);
+                	}
+                }
+                if(unitSettings.getSocialMediaTokens() != null){
+                	if(unitSettings.getSocialMediaTokens().getLendingTreeToken() != null){
+                		closestSettings.put(SettingsForApplication.LENDING_TREE, OrganizationUnit.AGENT);
+                	}
+                }
+                
             }
         }
         return closestSettings;
@@ -3117,21 +3192,6 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
                 }
                 contactDetails.setWeb_addresses( webAddressSettings );
                 userProfile.setContact_details( contactDetails );
-            } else if ( entry.getKey() == SettingsForApplication.ABOUT_ME ) {
-                ContactDetailsSettings contactDetails = userProfile.getContact_details();
-                if ( contactDetails == null ) {
-                    contactDetails = new ContactDetailsSettings();
-                }
-                if ( entry.getValue() == OrganizationUnit.COMPANY ) {
-                    contactDetails.setAbout_me( companyUnitSettings.getContact_details().getAbout_me() );
-                } else if ( entry.getValue() == OrganizationUnit.REGION ) {
-                    contactDetails.setAbout_me( regionUnitSettings.getContact_details().getAbout_me() );
-                } else if ( entry.getValue() == OrganizationUnit.BRANCH ) {
-                    contactDetails.setAbout_me( branchUnitSettings.getContact_details().getAbout_me() );
-                } else if ( entry.getValue() == OrganizationUnit.AGENT ) {
-                    contactDetails.setAbout_me( agentUnitSettings.getContact_details().getAbout_me() );
-                }
-                userProfile.setContact_details( contactDetails );
             } else if ( entry.getKey() == SettingsForApplication.EMAIL_ID_WORK ) {
                 ContactDetailsSettings contactDetails = userProfile.getContact_details();
                 if ( contactDetails == null ) {
@@ -3179,32 +3239,32 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
                 }
                 if ( entry.getValue() == OrganizationUnit.COMPANY ) {
                     contactDetails.setAddress( companyUnitSettings.getContact_details().getAddress() );
-                    contactDetails.setAddress1( companyUnitSettings.getContact_details().getAddress1());
-                    contactDetails.setAddress2( companyUnitSettings.getContact_details().getAddress2());
-                    contactDetails.setZipcode(companyUnitSettings.getContact_details().getZipcode());
-                    contactDetails.setState(companyUnitSettings.getContact_details().getState());
-                    contactDetails.setCity(companyUnitSettings.getContact_details().getCity());
+                    contactDetails.setAddress1( companyUnitSettings.getContact_details().getAddress1() );
+                    contactDetails.setAddress2( companyUnitSettings.getContact_details().getAddress2() );
+                    contactDetails.setZipcode( companyUnitSettings.getContact_details().getZipcode() );
+                    contactDetails.setState( companyUnitSettings.getContact_details().getState() );
+                    contactDetails.setCity( companyUnitSettings.getContact_details().getCity() );
                 } else if ( entry.getValue() == OrganizationUnit.REGION ) {
                     contactDetails.setAddress( regionUnitSettings.getContact_details().getAddress() );
-                    contactDetails.setAddress1( regionUnitSettings.getContact_details().getAddress1());
-                    contactDetails.setAddress2( regionUnitSettings.getContact_details().getAddress2());
-                    contactDetails.setZipcode(regionUnitSettings.getContact_details().getZipcode());
-                    contactDetails.setState(regionUnitSettings.getContact_details().getState());
-                    contactDetails.setCity(regionUnitSettings.getContact_details().getCity());
+                    contactDetails.setAddress1( regionUnitSettings.getContact_details().getAddress1() );
+                    contactDetails.setAddress2( regionUnitSettings.getContact_details().getAddress2() );
+                    contactDetails.setZipcode( regionUnitSettings.getContact_details().getZipcode() );
+                    contactDetails.setState( regionUnitSettings.getContact_details().getState() );
+                    contactDetails.setCity( regionUnitSettings.getContact_details().getCity() );
                 } else if ( entry.getValue() == OrganizationUnit.BRANCH ) {
                     contactDetails.setAddress( branchUnitSettings.getContact_details().getAddress() );
-                    contactDetails.setAddress1( branchUnitSettings.getContact_details().getAddress1());
-                    contactDetails.setAddress2( branchUnitSettings.getContact_details().getAddress2());
-                    contactDetails.setZipcode(branchUnitSettings.getContact_details().getZipcode());
-                    contactDetails.setState(branchUnitSettings.getContact_details().getState());
-                    contactDetails.setCity(branchUnitSettings.getContact_details().getCity());
+                    contactDetails.setAddress1( branchUnitSettings.getContact_details().getAddress1() );
+                    contactDetails.setAddress2( branchUnitSettings.getContact_details().getAddress2() );
+                    contactDetails.setZipcode( branchUnitSettings.getContact_details().getZipcode() );
+                    contactDetails.setState( branchUnitSettings.getContact_details().getState() );
+                    contactDetails.setCity( branchUnitSettings.getContact_details().getCity() );
                 } else if ( entry.getValue() == OrganizationUnit.AGENT ) {
                     contactDetails.setAddress( agentUnitSettings.getContact_details().getAddress() );
-                    contactDetails.setAddress1( agentUnitSettings.getContact_details().getAddress1());
-                    contactDetails.setAddress2( agentUnitSettings.getContact_details().getAddress2());
-                    contactDetails.setZipcode(agentUnitSettings.getContact_details().getZipcode());
-                    contactDetails.setState(agentUnitSettings.getContact_details().getState());
-                    contactDetails.setCity(agentUnitSettings.getContact_details().getCity());
+                    contactDetails.setAddress1( agentUnitSettings.getContact_details().getAddress1() );
+                    contactDetails.setAddress2( agentUnitSettings.getContact_details().getAddress2() );
+                    contactDetails.setZipcode( agentUnitSettings.getContact_details().getZipcode() );
+                    contactDetails.setState( agentUnitSettings.getContact_details().getState() );
+                    contactDetails.setCity( agentUnitSettings.getContact_details().getCity() );
                 }
                 userProfile.setContact_details( contactDetails );
             } else if ( entry.getKey() == SettingsForApplication.PHONE ) {
@@ -3255,6 +3315,21 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
                     socialMediaTokens.setGoogleToken( branchUnitSettings.getSocialMediaTokens().getGoogleToken() );
                 } else if ( entry.getValue() == OrganizationUnit.AGENT ) {
                     socialMediaTokens.setGoogleToken( agentUnitSettings.getSocialMediaTokens().getGoogleToken() );
+                }
+                userProfile.setSocialMediaTokens( socialMediaTokens );
+            } else if ( entry.getKey() == SettingsForApplication.TWITTER ) {
+                SocialMediaTokens socialMediaTokens = userProfile.getSocialMediaTokens();
+                if ( socialMediaTokens == null ) {
+                    socialMediaTokens = new SocialMediaTokens();
+                }
+                if ( entry.getValue() == OrganizationUnit.COMPANY ) {
+                    socialMediaTokens.setTwitterToken( companyUnitSettings.getSocialMediaTokens().getTwitterToken() );
+                } else if ( entry.getValue() == OrganizationUnit.REGION ) {
+                    socialMediaTokens.setTwitterToken( regionUnitSettings.getSocialMediaTokens().getTwitterToken() );
+                } else if ( entry.getValue() == OrganizationUnit.BRANCH ) {
+                    socialMediaTokens.setTwitterToken( branchUnitSettings.getSocialMediaTokens().getTwitterToken() );
+                } else if ( entry.getValue() == OrganizationUnit.AGENT ) {
+                    socialMediaTokens.setTwitterToken( agentUnitSettings.getSocialMediaTokens().getTwitterToken() );
                 }
                 userProfile.setSocialMediaTokens( socialMediaTokens );
             } else if ( entry.getKey() == SettingsForApplication.LINKED_IN ) {

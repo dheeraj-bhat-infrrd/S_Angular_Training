@@ -60,7 +60,16 @@ public interface SocialManagementService {
 	public boolean updateStatusIntoFacebookPage(OrganizationUnitSettings agentSettings, String message, String serverBaseUrl, long companyId) throws InvalidInputException,
 			FacebookException;
 
-	public boolean tweet(OrganizationUnitSettings agentSettings, String message) throws InvalidInputException, TwitterException;
+	/**
+	 * Post a tweet on behalf of the authorized user
+	 * @param agentSettings
+	 * @param message
+	 * @param companyId
+	 * @return
+	 * @throws InvalidInputException
+	 * @throws TwitterException
+	 */
+	public boolean tweet(OrganizationUnitSettings agentSettings, String message, long companyId) throws InvalidInputException, TwitterException;
 	
 	public List<OrganizationUnitSettings> getSettingsForBranchesAndRegionsInHierarchy(long agentId) throws InvalidInputException;
 	
