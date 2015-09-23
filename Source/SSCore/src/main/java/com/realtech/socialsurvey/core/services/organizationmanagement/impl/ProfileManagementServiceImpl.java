@@ -2889,6 +2889,81 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
                         }
                     }
                 }
+                               
+                if(unitSettings.getContact_details() != null){
+                	if((unitSettings.getContact_details().getAddress1() != null && !unitSettings.getContact_details().getAddress1().isEmpty()) || (unitSettings.getContact_details().getAddress2() != null && !unitSettings.getContact_details().getAddress2().isEmpty())){
+                		closestSettings.put(SettingsForApplication.ADDRESS, OrganizationUnit.AGENT);
+                	}
+                }
+                if(unitSettings.getContact_details() != null){
+                	if(unitSettings.getContact_details().getLocation() != null && !unitSettings.getContact_details().getLocation().isEmpty()){
+                		closestSettings.put(SettingsForApplication.LOCATION, OrganizationUnit.AGENT);
+                	}
+                }
+                
+                if(unitSettings.getContact_details() != null){
+                	if(unitSettings.getContact_details().getAbout_me() != null && !unitSettings.getContact_details().getAbout_me().isEmpty()){
+                		closestSettings.put(SettingsForApplication.ABOUT_ME, OrganizationUnit.AGENT);
+                	}
+                }
+                
+                if(unitSettings.getContact_details() != null){
+                	if(unitSettings.getContact_details().getMail_ids() != null){
+                		if(unitSettings.getContact_details().getMail_ids().getWork() != null && !unitSettings.getContact_details().getMail_ids().getWork().isEmpty()){
+                			closestSettings.put(SettingsForApplication.EMAIL_ID_WORK, OrganizationUnit.AGENT);
+                		}
+                	}
+                }
+                
+                if(unitSettings.getContact_details() != null){
+                	if(unitSettings.getContact_details().getMail_ids() != null){
+                		if(unitSettings.getContact_details().getMail_ids().getPersonal() != null && !unitSettings.getContact_details().getMail_ids().getPersonal().isEmpty()){
+                			closestSettings.put(SettingsForApplication.EMAIL_ID_PERSONAL, OrganizationUnit.AGENT);
+                		}
+                	}
+                }
+                
+                if(unitSettings.getSocialMediaTokens() != null){
+                	if(unitSettings.getSocialMediaTokens().getFacebookToken() != null){
+                		closestSettings.put(SettingsForApplication.FACEBOOK, OrganizationUnit.AGENT);
+                	}
+                }
+                if(unitSettings.getSocialMediaTokens() != null){
+                	if(unitSettings.getSocialMediaTokens().getTwitterToken() != null){
+                		closestSettings.put(SettingsForApplication.TWITTER, OrganizationUnit.AGENT);
+                	}
+                }
+                if(unitSettings.getSocialMediaTokens() != null){
+                	if(unitSettings.getSocialMediaTokens().getLinkedInToken() != null){
+                		closestSettings.put(SettingsForApplication.LINKED_IN, OrganizationUnit.AGENT);
+                	}
+                }
+                if(unitSettings.getSocialMediaTokens() != null){
+                	if(unitSettings.getSocialMediaTokens().getGoogleToken() != null){
+                		closestSettings.put(SettingsForApplication.GOOGLE_PLUS, OrganizationUnit.AGENT);
+                	}
+                }
+                if(unitSettings.getSocialMediaTokens() != null){
+                	if(unitSettings.getSocialMediaTokens().getYelpToken() != null){
+                		closestSettings.put(SettingsForApplication.YELP, OrganizationUnit.AGENT);
+                	}
+                }
+                if(unitSettings.getSocialMediaTokens() != null){
+                	if(unitSettings.getSocialMediaTokens().getZillowToken() != null){
+                		closestSettings.put(SettingsForApplication.ZILLOW, OrganizationUnit.AGENT);
+                	}
+                }
+                if(unitSettings.getSocialMediaTokens() != null){
+                	if(unitSettings.getSocialMediaTokens().getRealtorToken() != null){
+                		closestSettings.put(SettingsForApplication.REALTOR, OrganizationUnit.AGENT);
+                	}
+                }
+                if(unitSettings.getSocialMediaTokens() != null){
+                	if(unitSettings.getSocialMediaTokens().getLendingTreeToken() != null){
+                		closestSettings.put(SettingsForApplication.LENDING_TREE, OrganizationUnit.AGENT);
+                	}
+                }
+                
             }
         }
         return closestSettings;
