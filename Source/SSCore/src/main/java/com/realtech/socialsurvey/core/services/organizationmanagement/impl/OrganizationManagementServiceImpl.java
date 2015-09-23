@@ -3051,7 +3051,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
         branch.setCountryCode( branchCountryCode );
         branch.setBranchName( branchName );
 
-        if ( branch != null ) {
+        if ( (branchAddress1 != null && !branchAddress1.isEmpty()) || (branchAddress2 != null && !branchAddress2.isEmpty()) ) {
             try {
 				settingsSetter.setSettingsValueForBranch( branch, SettingsForApplication.ADDRESS, true );
 			} catch (NonFatalException nonFatalException) {
@@ -3304,7 +3304,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
         region.setCity( city );
         region.setZipcode( zipcode );
         
-        if ( region != null ) {
+        if ( (address1 != null && !address1.isEmpty()) || (address2 != null && !address2.isEmpty()) ) {
             try {
 				settingsSetter.setSettingsValueForRegion( region, SettingsForApplication.ADDRESS, true );
 			} catch (NonFatalException nonFatalException) {
