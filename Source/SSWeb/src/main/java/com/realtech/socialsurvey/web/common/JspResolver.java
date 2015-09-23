@@ -99,6 +99,9 @@ public interface JspResolver {
 	public static final String LINKEDIN_ACCESS = "linkedinaccess";
 	public static final String SOCIAL_MEDIA_TOKENS = "settings_socialauth";
 
+	//Help Settings
+	public static final String HELP_EDIT="help";
+	
 	// Profile Settings
 	public static final String PROFILE_EDIT = "profile_edit";
 	public static final String PROFILE_CONTACT_DETAILS = "profile_contactdetails";

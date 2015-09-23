@@ -3,6 +3,7 @@ package com.realtech.socialsurvey.core.entities;
 import java.io.Serializable;
 // JIRA: SS-7: By RM02: BOC
 import java.util.List;
+import java.util.Map;
 
 
 /**
@@ -30,10 +31,21 @@ public class EmailEntity implements Serializable
     private String senderEmailId;
     private String senderName;
     private String senderPassword;
-    private String attachmentLocation;
+    
+    private Map<String , String> attachmentDetail;
 
 
-    public List<String> getRecipients()
+
+	public Map<String, String> getAttachmentDetail() {
+		return attachmentDetail;
+	}
+
+
+	public void setAttachmentDetail(Map<String, String> attachmentDetail) {
+		this.attachmentDetail = attachmentDetail;
+	}
+
+	public List<String> getRecipients()
     {
         return recipients;
     }
@@ -114,18 +126,6 @@ public class EmailEntity implements Serializable
     public void setSenderPassword( String senderPassword )
     {
         this.senderPassword = senderPassword;
-    }
-
-
-    public String getAttachmentLocation()
-    {
-        return attachmentLocation;
-    }
-
-
-    public void setAttachmentLocation( String attachmentLocation )
-    {
-        this.attachmentLocation = attachmentLocation;
     }
 
 
