@@ -332,7 +332,7 @@
 				<ref bean="crmdataagentidmapperjobdetail" />
 				<ref bean="imageloaderjobdetail" />
 				<ref bean="fileuploadjobdetail" />
-				<ref bean="hierarchysettingsjobdetail" />
+				<!-- <ref bean="hierarchysettingsjobdetail" /> -->
 				<!-- <ref bean="zillowjobdetail" /> -->
 			</list>
 		</property>
@@ -350,7 +350,7 @@
 				<ref bean="crmdataagentidmappercron" />
 				<ref bean="imageloadercron" />
 				<ref bean="fileuploadcron" />
-				<ref bean="hierarchysettingscron" />
+				<!-- <ref bean="hierarchysettingscron" /> -->
 				<!-- <ref bean="zillowcron" /> -->
 			</list>
 		</property>
