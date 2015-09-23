@@ -106,10 +106,10 @@ public interface CommonConstants
     public static final double MAX_RATING_SCORE = 5;
     public static final String YES_STRING = "Y";
     public static final String NO_STRING = "N";
-    
+
     public static final int IS_PRIMARY_FALSE = 0;
     public static final int IS_PRIMARY_TRUE = 1;
-    
+
     public static final int SURVEY_STATUS_PRE_INITIATED = 1;
     public static final int STATUS_SURVEYPREINITIATION_PROCESSED = 1;
     public static final int SURVEY_STATUS_INITIATED = 2;
@@ -258,7 +258,7 @@ public interface CommonConstants
     public static final String ACTIVE_SESSIONS_FOUND = "activeSessionFound";
 
     public static final String BILLING_MODE_ATTRIBUTE_IN_SESSION = "billingMode";
-    
+
     public static final String USER_ASSIGNMENTS = "assignments";
     public static final String ENTITY_ID_COLUMN = "entityId";
     public static final String ENTITY_NAME_COLUMN = "entityName";
@@ -519,7 +519,7 @@ public interface CommonConstants
     public static final String BRANCH_SETTINGS_COLLECTION = "BRANCH_SETTINGS";
     public static final String AGENT_SETTINGS_COLLECTION = "AGENT_SETTINGS";
     public static final String SOCIAL_POST_COLLECTION = "SOCIAL_POST";
-    
+
     /*
      * Mongo social post Source
      */
@@ -646,12 +646,12 @@ public interface CommonConstants
     public static final String PATTERN_LAST = "patternLast";
 
     public static final String SURVEY_SOURCE_ZILLOW = "Zillow";
-    
+
     //Excel constants
     public final String EXCEL_FORMAT = "application/vnd.ms-excel";
     public final String CONTENT_DISPOSITION_HEADER = "Content-Disposition";
     public final String EXCEL_FILE_EXTENSION = ".xlsx";
-    
+
     public final String EPOCH_REMINDER_TIME = "02/01/1970";
 
     //Settings constants
@@ -666,10 +666,22 @@ public interface CommonConstants
     public static final int SET_BY_COMPANY_N_REGION_N_BRANCH = 7;
     public static final int SET_BY_NONE = 0;
     public static final int LOCKED_BY_NONE = 0;
-    
+
     public static final String SETTING_SCORE = "setScore";
-    
+
     public static final String LOCK_SCORE = "lockScore";
-    
-    public static final String AUTHORIZATION_HEADER = "Authorization: Bearer ";
+
+    public static final String AUTHORIZATION_HEADER = "Bearer ";
+
+    public static final String DOTLOOP_PROFILE_ID = "profileId";
+
+    public static final String DOTLOOP_PROFILE_ACTIVE = "active";
+
+    public static final String DOTLOOP_PROFILE_EMAIL_ADDRESS = "emailAddress";
+
+    public static final String DOTLOOP_PROFILE_NAME = "name";
+
+    public static final String DOTLOOP_PROFILE_LOOP_ID = "loopId";
+
+    public static final String DOTLOOP_PROFILE_LOOP_VIEW_ID = "loopViewId";
 }

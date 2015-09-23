@@ -33,16 +33,10 @@ public class CrmBatchTracker implements Serializable
     @Column ( name = "RECENT_RECORD_FETCHED_DATE")
     private Timestamp recentRecordFetchedDate;
 
-    @Column ( name = "CRM_NAME")
-    private String crmName;
-
-    @Column ( name = "MODIFIED_BY")
-    private String modifiedBy;
-
     @Column ( name = "MODIFIED_ON")
     private Timestamp modifiedOn;
 
-    @Column(name = "COMPANY_ID")
+    @Column ( name = "COMPANY_ID")
     private long companyId;
 
 
@@ -98,30 +92,6 @@ public class CrmBatchTracker implements Serializable
     }
 
 
-    public String getCrmName()
-    {
-        return crmName;
-    }
-
-
-    public void setCrmName( String crmName )
-    {
-        this.crmName = crmName;
-    }
-
-
-    public String getModifiedBy()
-    {
-        return modifiedBy;
-    }
-
-
-    public void setModifiedBy( String modifiedBy )
-    {
-        this.modifiedBy = modifiedBy;
-    }
-
-
     public Timestamp getModifiedOn()
     {
         return modifiedOn;
@@ -145,7 +115,5 @@ public class CrmBatchTracker implements Serializable
         this.companyId = companyId;
     }
 
-
-    
 
 }

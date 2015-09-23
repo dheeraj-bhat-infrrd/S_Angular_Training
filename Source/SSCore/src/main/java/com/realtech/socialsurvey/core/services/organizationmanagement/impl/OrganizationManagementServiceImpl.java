@@ -62,6 +62,7 @@ import com.realtech.socialsurvey.core.entities.BranchFromSearch;
 import com.realtech.socialsurvey.core.entities.BranchSettings;
 import com.realtech.socialsurvey.core.entities.CRMInfo;
 import com.realtech.socialsurvey.core.entities.Company;
+import com.realtech.socialsurvey.core.entities.CompanyDotloopProfileMapping;
 import com.realtech.socialsurvey.core.entities.ContactDetailsSettings;
 import com.realtech.socialsurvey.core.entities.ContactNumberSettings;
 import com.realtech.socialsurvey.core.entities.CrmBatchTracker;
@@ -71,6 +72,7 @@ import com.realtech.socialsurvey.core.entities.FeedIngestionEntity;
 import com.realtech.socialsurvey.core.entities.FileUpload;
 import com.realtech.socialsurvey.core.entities.LicenseDetail;
 import com.realtech.socialsurvey.core.entities.LockSettings;
+import com.realtech.socialsurvey.core.entities.LoopProfileMapping;
 import com.realtech.socialsurvey.core.entities.MailContent;
 import com.realtech.socialsurvey.core.entities.MailContentSettings;
 import com.realtech.socialsurvey.core.entities.MailIdSettings;
@@ -247,6 +249,12 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 
     @Autowired
     private SettingsSetter settingsSetter;
+
+    @Autowired
+    private GenericDao<CompanyDotloopProfileMapping, Long> companyDotloopProfileMappingDao;
+
+    @Autowired
+    private GenericDao<LoopProfileMapping, Long> loopProfileMappingDao;
 
 
     /**
@@ -4588,6 +4596,81 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
                 mailContentSettings, organizationUnitSettings, collectionName );
     }
 
+
+    @Override
+    @Transactional
+    public List<LoopProfileMapping> getLoopsByProfile( String profileId )
+    {
+        LOG.debug( "Inside method getLoopsByProfile for profileId " + profileId );
+        List<LoopProfileMapping> loopProfileMappingList = loopProfileMappingDao.findByColumn( LoopProfileMapping.class,
+            "profileId", profileId );
+        return loopProfileMappingList;
+    }
+
+
+    @Override
+    @Transactional
+    public void saveLoopsForProfile( LoopProfileMapping loopProfileMapping )
+    {
+        LOG.debug( "Inside method saveLoopsForProfile " );
+        loopProfileMappingDao.save( loopProfileMapping );
+
+    }
+
+
+    @Override
+    @Transactional
+    public CompanyDotloopProfileMapping getCompanyDotloopMappingByCompanyIdAndProfileId( long companyId, String profileId )
+    {
+        LOG.debug( "Inside method getCompanyDotloopMappingByCompanyId for company " + companyId );
+
+        Map<String, Object> queries = new HashMap<String, Object>();
+        queries.put( "companyId", companyId );
+        queries.put( "profileId", profileId );
+        List<CompanyDotloopProfileMapping> companyDotLoopProfileMappingList = companyDotloopProfileMappingDao.findByKeyValue(
+            CompanyDotloopProfileMapping.class, queries );
+        if ( companyDotLoopProfileMappingList == null || companyDotLoopProfileMappingList.isEmpty() ) {
+            return null;
+        } else {
+            return companyDotLoopProfileMappingList.get( 0 );
+        }
+
+    }
+
+
+    @Override
+    @Transactional
+    public CompanyDotloopProfileMapping saveCompanyDotLoopProfileMapping(
+        CompanyDotloopProfileMapping companyDotloopProfileMapping )
+    {
+        LOG.debug( "Inside method saveCompanyDotloopProfileMapping " );
+        return companyDotloopProfileMappingDao.save( companyDotloopProfileMapping );
+
+    }
+
+
+    @Override
+    @Transactional
+    public void updateCompanyDotLoopProfileMapping( CompanyDotloopProfileMapping companyDotloopProfileMapping )
+    {
+        LOG.debug( "Inside method saveCompanyDotloopProfileMapping " );
+        companyDotloopProfileMappingDao.update( companyDotloopProfileMapping );
+
+    }
+
+
+    @Override
+    @Transactional
+    public CompanyDotloopProfileMapping getCompanyDotloopMappingByProfileId( String profileId )
+    {
+        List<CompanyDotloopProfileMapping> companyDotloopProfileMappingList = companyDotloopProfileMappingDao.findByColumn(
+            CompanyDotloopProfileMapping.class, "profileId", profileId );
+        if ( companyDotloopProfileMappingList.isEmpty() ) {
+            return null;
+        } else {
+            return companyDotloopProfileMappingList.get( 0 );
+        }
+    }
 
 }
 // JIRA: SS-27: By RM05: EOC
