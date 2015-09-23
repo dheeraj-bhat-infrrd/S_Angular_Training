@@ -248,8 +248,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
     @Autowired
     private SettingsSetter settingsSetter;
 
-
-    /**
+     /**
      * This method adds a new company and updates the same for current user and all its user
      * profiles.
      * 
@@ -3052,6 +3051,16 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
         branch.setCountryCode( branchCountryCode );
         branch.setBranchName( branchName );
 
+        if ( branch != null ) {
+            try {
+				settingsSetter.setSettingsValueForBranch( branch, SettingsForApplication.ADDRESS, true );
+			} catch (NonFatalException nonFatalException) {
+				LOG.error( "NonFatalException while updating profile address details. Reason :" + nonFatalException.getMessage(),
+		                nonFatalException );
+			}
+            userManagementService.updateBranch( branch );
+        }
+        
         LOG.debug( "Updating branch table with profile name" );
         branchDao.update( branch );
 
@@ -3294,7 +3303,17 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
         region.setState( state );
         region.setCity( city );
         region.setZipcode( zipcode );
-
+        
+        if ( region != null ) {
+            try {
+				settingsSetter.setSettingsValueForRegion( region, SettingsForApplication.ADDRESS, true );
+			} catch (NonFatalException nonFatalException) {
+				LOG.error( "NonFatalException while updating profile address details. Reason :" + nonFatalException.getMessage(),
+		                nonFatalException );
+			}
+            userManagementService.updateRegion( region );
+        }
+        
         LOG.debug( "Calling method to insert region settings" );
         try {
             insertRegionSettings( region );
