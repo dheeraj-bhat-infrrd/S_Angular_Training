@@ -340,5 +340,7 @@ public interface UserManagementService {
 	void updateProfileUrlInRegionSettings(String profileName, String profileUrl, OrganizationUnitSettings regionSettings);
 
 	void updateProfileUrlInCompanySettings(String profileName, String profileUrl, OrganizationUnitSettings companySettings);
+
+	void updatePrimaryProfileOfUser(long userid, long profileId);
 }
 // JIRA SS-34 BY RM02 BOC
