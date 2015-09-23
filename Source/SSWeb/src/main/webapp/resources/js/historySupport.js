@@ -23,7 +23,6 @@ function saveState(url) {
 
 function retrieveState() {
 	if (!refreshSupport) {
-		console.log('refresh not supported');
 		return;
 	}
 	var newLocation = window.location.hash.substring(1);

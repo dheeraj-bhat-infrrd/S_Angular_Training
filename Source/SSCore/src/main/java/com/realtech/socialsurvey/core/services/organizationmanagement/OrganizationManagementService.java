@@ -1007,5 +1007,17 @@ public interface OrganizationManagementService
      * @param profileName
      */
     void updateRegionProfileName( long regionId, String profileName );
+    
+    /**
+     * Updates the region
+     * @param region
+     */
+    public void updateRegion(Region region);
+    
+    /**
+     * Updates the branch
+     * @param branch
+     */
+    public void updateBranch(Branch branch);
 
 }

@@ -142,7 +142,6 @@ $(document).ready(function() {
 	});
 
 	function submitRegistrationForm() {
-		console.log("submitting registration form");
 		if (validateRegistrationForm('reg-form')) {
 			$('#registration-form').submit();
 			showOverlay();

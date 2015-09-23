@@ -80,7 +80,6 @@ $(document).ready(function() {
 
 	function submitForgotPasswordForm() {
 		if (validateForgotPasswordForm('forgot-pwd-form')) {
-			console.log("submitting forgot password form");
 			$('#forgot-pwd-form').submit();
 		}
 	}

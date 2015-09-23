@@ -1542,6 +1542,10 @@
     .user-info-logo{
         width: 105px;
     }
+    
+     .user-error-logo{
+        width: 105px;
+    }
     .hm-item-row{
         width: 100%
     }

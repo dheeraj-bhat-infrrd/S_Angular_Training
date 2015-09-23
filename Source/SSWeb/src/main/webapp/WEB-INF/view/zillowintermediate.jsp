@@ -138,6 +138,7 @@ function fetchSocialProfileUrl(payload, callBackFunction) {
 	$.ajax({
 		url : './profileUrl.do',
 		type : "GET",
+		cache : false,
 		data : payload,
 		async : false,
 		complete : callBackFunction,

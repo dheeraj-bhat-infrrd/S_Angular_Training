@@ -209,7 +209,6 @@
 			
 			
 			function loginUser() {
-				console.log("submitting login form");
 				if (validateLoginForm('login-form')) {
 					$('#login-form').submit();
 					showOverlay();
@@ -217,7 +216,6 @@
 			}
 
 			function submitRegistrationForm() {
-				console.log("submitting registration form");
 				if(validatePreRegistrationForm('reg-form')){
 					$('#registration-form').submit();
 					showOverlay();
