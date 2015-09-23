@@ -68,6 +68,9 @@ $(document).ready(function(){
 		fillAgents(e.target, $(this).val());
 	});
 	
+	var oldRequest = "";
+	var isOldRequestInProcess = false;
+	
 	function fillAgents(element, searchKey) {
 		if (searchKey == undefined || searchKey == "") {
 			return;
@@ -81,7 +84,11 @@ $(document).ready(function(){
 		};
 		
 		var success = false;
-		$.ajax({
+		if(isOldRequestInProcess && oldRequest != undefined) {
+			oldRequest.abort();
+		}
+		isOldRequestInProcess = true;
+		oldRequest = $.ajax({
 			url : './fetchagentsforadmin.do',
 			type : "GET",
 			data : payload,
@@ -89,6 +96,7 @@ $(document).ready(function(){
 			async : true,
 			success : function() {
 				success = true;
+				isOldRequestInProcess = false;
 			},
 			complete: function(data) {
 				if (success) {
@@ -96,6 +104,7 @@ $(document).ready(function(){
 				}
 			},
 			error : function(e) {
+				if(e.statusText == "abort") return; //Return is request is aborted
 				if(e.status == 504) {
 					redirectToLoginPageOnSessionTimeOut(e.status);
 					return;
