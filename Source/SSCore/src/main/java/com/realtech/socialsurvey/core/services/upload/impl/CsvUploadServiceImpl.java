@@ -268,7 +268,9 @@ public class CsvUploadServiceImpl implements CsvUploadService {
 		}
 		if (excelCreated) {
 			try {
-				emailServices.sendRecordsNotUploadedCrmNotificationMail(adminName, "", adminEmailId, filePath);
+				Map<String , String > attachmentsDetails = new HashMap<String, String>();
+				attachmentsDetails.put("CorruptRecords.xls", filePath);
+				emailServices.sendRecordsNotUploadedCrmNotificationMail(adminName, "", adminEmailId, attachmentsDetails );
 			}
 			catch (InvalidInputException e) {
 				LOG.error("Exception caught " + e.getMessage());
@@ -810,11 +812,13 @@ public class CsvUploadServiceImpl implements CsvUploadService {
 				else if (cellIndex == BRANCH_ADDRESS1_INDEX) {
 					if (cell.getCellType() != XSSFCell.CELL_TYPE_BLANK) {
 						uploadedBranch.setBranchAddress1(cell.getStringCellValue());
+						uploadedBranch.setAddressSet(true);
 					}
 				}
 				else if (cellIndex == BRANCH_ADDRESS2_INDEX) {
 					if (cell.getCellType() != XSSFCell.CELL_TYPE_BLANK) {
 						uploadedBranch.setBranchAddress2(cell.getStringCellValue());
+						uploadedBranch.setAddressSet(true);
 					}
 				}
 				else if (cellIndex == BRANCH_CITY_INDEX) {
@@ -976,11 +980,13 @@ public class CsvUploadServiceImpl implements CsvUploadService {
 				else if (cellIndex == REGION_ADDRESS1_INDEX) {
 					if (cell.getCellType() != XSSFCell.CELL_TYPE_BLANK) {
 						uploadedRegion.setRegionAddress1(cell.getStringCellValue());
+						uploadedRegion.setAddressSet(true);
 					}
 				}
 				else if (cellIndex == REGION_ADDRESS2_INDEX) {
 					if (cell.getCellType() != XSSFCell.CELL_TYPE_BLANK) {
 						uploadedRegion.setRegionAddress2(cell.getStringCellValue());
+						uploadedRegion.setAddressSet(true);
 					}
 				}
 				else if (cellIndex == REGION_CITY_INDEX) {

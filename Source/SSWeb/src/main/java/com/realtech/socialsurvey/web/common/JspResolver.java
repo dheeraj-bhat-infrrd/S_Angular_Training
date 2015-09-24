@@ -99,6 +99,9 @@ public interface JspResolver {
 	public static final String LINKEDIN_ACCESS = "linkedinaccess";
 	public static final String SOCIAL_MEDIA_TOKENS = "settings_socialauth";
 
+	//Help Settings
+	public static final String HELP_EDIT="help";
+	
 	// Profile Settings
 	public static final String PROFILE_EDIT = "profile_edit";
 	public static final String PROFILE_CONTACT_DETAILS = "profile_contactdetails";
@@ -126,4 +129,5 @@ public interface JspResolver {
 	public static final String ADMIN_COMPANY_LIST = "admin/admin_company_list";
 	public static final String ADMIN_REGION_HIERARCHY = "admin/admin_region_hierarchy";
 	public static final String ADMIN_BRANCH_HIERARCHY = "admin/admin_branch_hierarchy";
+	public static final String ADMIN_COMPANY_NOT_REGISTERED = "admin/company_not_registered";
 }

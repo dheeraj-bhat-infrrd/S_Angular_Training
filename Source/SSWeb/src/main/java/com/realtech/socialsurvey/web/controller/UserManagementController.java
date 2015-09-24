@@ -380,6 +380,8 @@ public class UserManagementController
     {
         LOG.info( "Method to find users by email id called." );
         String users = "";
+        int startIndex = 0;
+		int batchSize = 0;
         try {
             String searchKey = request.getParameter( "searchKey" );
             if ( searchKey == null ) {
@@ -387,6 +389,16 @@ public class UserManagementController
                 throw new InvalidInputException( "Invalid searchKey passed in method findUserByEmail()." );
             }
 
+            String startIndexStr = request.getParameter("startIndex");
+			String batchSizeStr = request.getParameter("batchSize");
+			try {
+				startIndex = Integer.parseInt(startIndexStr);
+				batchSize = Integer.parseInt(batchSizeStr);
+			}
+			catch (NumberFormatException e) {
+				LOG.error("NumberFormatException while searching for user id. Reason : " + e.getMessage(), e);
+			}
+            
             User user = sessionHelper.getCurrentUser();
             if ( user == null ) {
                 LOG.error( "No user found in current session in findUserByEmail()." );
@@ -394,7 +406,10 @@ public class UserManagementController
             }
 
             try {
-                users = solrSearchService.searchUsersByLoginNameOrName( searchKey, user.getCompany().getCompanyId() );
+            	SolrDocumentList usersResult = solrSearchService.searchUsersByLoginNameOrName( searchKey, user.getCompany().getCompanyId(), startIndex, batchSize);
+                users = new Gson().toJson(solrSearchService.getUsersFromSolrDocuments(usersResult));
+    			LOG.debug("User search result is : " + usersResult);
+                model.addAttribute("numFound", usersResult.getNumFound());
             } catch ( InvalidInputException invalidInputException ) {
                 throw new InvalidInputException( invalidInputException.getMessage(), invalidInputException );
             } catch ( MalformedURLException e ) {

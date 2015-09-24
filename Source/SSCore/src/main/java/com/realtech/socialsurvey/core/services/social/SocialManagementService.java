@@ -47,11 +47,29 @@ public interface SocialManagementService {
 
 	public SocialMediaTokens updateAgentSocialMediaTokens(AgentSettings agentSettings, SocialMediaTokens mediaTokens)
 			throws InvalidInputException;
-	
-	public boolean updateStatusIntoFacebookPage(OrganizationUnitSettings agentSettings, String message, String serverBaseUrl) throws InvalidInputException,
+	/**
+	 * Posts the survey on facebook
+	 * @param agentSettings
+	 * @param message
+	 * @param serverBaseUrl
+	 * @param companyId
+	 * @return
+	 * @throws InvalidInputException
+	 * @throws FacebookException
+	 */
+	public boolean updateStatusIntoFacebookPage(OrganizationUnitSettings agentSettings, String message, String serverBaseUrl, long companyId) throws InvalidInputException,
 			FacebookException;
 
-	public boolean tweet(OrganizationUnitSettings agentSettings, String message) throws InvalidInputException, TwitterException;
+	/**
+	 * Post a tweet on behalf of the authorized user
+	 * @param agentSettings
+	 * @param message
+	 * @param companyId
+	 * @return
+	 * @throws InvalidInputException
+	 * @throws TwitterException
+	 */
+	public boolean tweet(OrganizationUnitSettings agentSettings, String message, long companyId) throws InvalidInputException, TwitterException;
 	
 	public List<OrganizationUnitSettings> getSettingsForBranchesAndRegionsInHierarchy(long agentId) throws InvalidInputException;
 	
