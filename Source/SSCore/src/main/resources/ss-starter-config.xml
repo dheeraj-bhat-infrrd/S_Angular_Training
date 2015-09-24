@@ -199,6 +199,19 @@
 		</property>
 		<property name="durability" value="true" />
 	</bean>
+	
+	<!-- Setting survey file upload job detail -->
+	<bean id="surveyfileuploadjobdetail"
+		class="org.springframework.scheduling.quartz.JobDetailFactoryBean">
+		<property name="jobClass"
+			value="com.realtech.socialsurvey.core.starter.CSVBulkSurveyUploader" />
+		<property name="jobDataAsMap">
+			<map>
+				<entry key="surveyuploadHandler" value-ref="surveyuploadHandler" />
+			</map>
+		</property>
+		<property name="durability" value="true" />
+	</bean>
 
 	<!-- Setting zillow job detail -->
 	<!-- <bean id="zillowjobdetail" class="org.springframework.scheduling.quartz.JobDetailFactoryBean"> 
@@ -303,10 +316,18 @@
 		<property name="cronExpression" value="0 45 7 * * ?" />
 	</bean>
 
-	<!-- setting cron for email reader -->
+	<!-- setting cron for file upload -->
 	<bean id="fileuploadcron"
 		class="org.springframework.scheduling.quartz.SimpleTriggerFactoryBean">
 		<property name="jobDetail" ref="fileuploadjobdetail" />
+		<property name="repeatCount" value="0" />
+		<property name="startDelay" value="2000" />
+	</bean>
+	
+	<!-- setting cron for survey file upload -->
+	<bean id="surveyfileuploadcron"
+		class="org.springframework.scheduling.quartz.SimpleTriggerFactoryBean">
+		<property name="jobDetail" ref="surveyfileuploadjobdetail" />
 		<property name="repeatCount" value="0" />
 		<property name="startDelay" value="2000" />
 	</bean>
@@ -332,6 +353,7 @@
 				<ref bean="crmdataagentidmapperjobdetail" />
 				<ref bean="imageloaderjobdetail" />
 				<ref bean="fileuploadjobdetail" />
+				<ref bean="surveyfileuploadjobdetail" />
 				<!-- <ref bean="hierarchysettingsjobdetail" /> -->
 				<!-- <ref bean="zillowjobdetail" /> -->
 			</list>
@@ -350,6 +372,7 @@
 				<ref bean="crmdataagentidmappercron" />
 				<ref bean="imageloadercron" />
 				<ref bean="fileuploadcron" />
+				<ref bean="surveyfileuploadcron" />
 				<!-- <ref bean="hierarchysettingscron" /> -->
 				<!-- <ref bean="zillowcron" /> -->
 			</list>
@@ -419,6 +442,9 @@
 	<!-- Posts to wall -->
 	<bean id="postToWall" class="com.realtech.socialsurvey.core.utils.mongo.PostToWall" />
 
-	<!-- Email reader -->
+	<!-- CSV Upload reader -->
 	<bean id="uploadHandler" class="com.realtech.socialsurvey.core.handler.CSVUploadHandler" />
+	
+	<!-- CSV Upload reader -->
+	<bean id="surveyuploadHandler" class="com.realtech.socialsurvey.core.handler.CSVBulkSurveyInitiatorHandler" />
 </beans>
