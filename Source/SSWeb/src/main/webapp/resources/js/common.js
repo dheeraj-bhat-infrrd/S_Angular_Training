@@ -19,8 +19,7 @@ function redirectToLoginPageOnSessionTimeOut(status) {
  * @param isAsync
  */
 function callAjaxGET(url, callBackFunction, isAsync) {
-	console.log("ajax get called for url :" + url);
-	if (typeof isAsync === "undefined") {
+	if (isAsync == "undefined") {
 		isAsync = true;
 	}
 	$.ajax({
@@ -28,6 +27,7 @@ function callAjaxGET(url, callBackFunction, isAsync) {
 		type : "GET",
 		dataType : "html",
 		async : isAsync,
+		cache : false,
 		success : callBackFunction,
 		error : function(e) {
 			if(e.status == 504) {
@@ -47,7 +47,6 @@ function callAjaxGET(url, callBackFunction, isAsync) {
  * @param isAsync
  */
 function callAjaxPOST(url, callBackFunction, isAsync) {
-	console.log("ajax post called for url :" + url);
 	if (typeof isAsync === "undefined") {
 		isAsync = true;
 	}
@@ -75,7 +74,6 @@ function callAjaxPOST(url, callBackFunction, isAsync) {
  * @param isAsync
  */
 function callAjaxPOSTWithTextData(url, callBackFunction, isAsync, formData) {
-	console.log("ajax post called for url :" + url);
 	if (typeof isAsync === "undefined") {
 		isAsync = true;
 	}
@@ -110,7 +108,6 @@ function callAjaxPOSTWithTextData(url, callBackFunction, isAsync, formData) {
  * @param isAsync
  */
 function callAjaxGETWithTextData(url, callBackFunction, isAsync, formData) {
-	console.log("ajax post called for url :" + url);
 	if (typeof isAsync === "undefined") {
 		isAsync = true;
 	}
@@ -120,6 +117,7 @@ function callAjaxGETWithTextData(url, callBackFunction, isAsync, formData) {
 		dataType : "text",
 		data : formData,
 		async : isAsync,
+		cache : false,
 		success : callBackFunction,
 		complete: function(){
 			hideOverlay();
@@ -143,10 +141,8 @@ function callAjaxGETWithTextData(url, callBackFunction, isAsync, formData) {
  * @param formId
  */
 function callAjaxFormSubmit(url, callBackFunction, formId) {
-	console.log("ajax form submit called for url :" + url + " and formId : " + formId);
 	var $form = $("#" + formId);
 	var payLoad = $form.serialize();
-	console.log("payload is --" + payLoad);
 	$.ajax({
 		url : url,
 		type : "POST",
@@ -177,7 +173,6 @@ function redirectErrorpage(){
  * @param payload
  */
 function callAjaxPostWithPayloadData(url, callBackFunction, payload, isAsync){
-	console.log("callAjaxPostWithPayloadData for payload--"+payload+" url--"+url);
 	if (typeof isAsync === "undefined") {
 		isAsync = true;
 	}
@@ -201,7 +196,6 @@ function callAjaxPostWithPayloadData(url, callBackFunction, payload, isAsync){
 }
 
 function callAjaxGetWithPayloadData(url, callBackFunction, payload,isAsync){
-	console.log("callAjaxGetWithPayloadData for payload--"+payload+" url--"+url);
 	if (typeof isAsync === "undefined") {
 		isAsync = true;
 	}
@@ -210,6 +204,7 @@ function callAjaxGetWithPayloadData(url, callBackFunction, payload,isAsync){
 		type : "GET",
 		data : payload,
 		async : isAsync,
+		cache : false,
 		success : callBackFunction,
 		complete: function(){
 			hideOverlay();
@@ -280,6 +275,7 @@ function shareOnFacebook(firstName, lastName, agentName, review, score, agentId)
 		url : "./postonfacebook.do",
 		type : "GET",
 		dataType : "html",
+		cache : false,
 		data : payload,
 		success : function(data) {
 			if (data.errCode == undefined)
@@ -300,7 +296,6 @@ function shareOnFacebook(firstName, lastName, agentName, review, score, agentId)
 				redirectToLoginPageOnSessionTimeOut(e.status);
 				return;
 			}
-			console.error("error : " + e.responseText);
 			$('#overlay-toast').html(e.responseText);
 			showToast(e.responseText);
 		}
@@ -321,6 +316,7 @@ function shareOnTwitter(firstName, lastName, agentName, review, score, agentId){
 			url : "./postontwitter.do",
 			type : "GET",
 			dataType : "html",
+			cache : false,
 			data : payload,
 			success : function(data) {
 				if (data.errCode == undefined)
@@ -341,7 +337,6 @@ function shareOnTwitter(firstName, lastName, agentName, review, score, agentId){
 					redirectToLoginPageOnSessionTimeOut(e.status);
 					return;
 				}
-				console.error("error : " + e.responseText);
 				$('#overlay-toast').html(e.responseText);
 				showToast(e.responseText);
 			}
@@ -362,6 +357,7 @@ function shareOnLinkedin(firstName, lastName, agentName, review, score, agentId)
 			url : "./postonlinkedin.do",
 			type : "GET",
 			dataType : "html",
+			cache : false,
 			data : payload,
 			success : function(data) {
 				if (data.errCode == undefined)
@@ -382,7 +378,6 @@ function shareOnLinkedin(firstName, lastName, agentName, review, score, agentId)
 					redirectToLoginPageOnSessionTimeOut(e.status);
 					return;
 				}
-				console.error("error : " + e.responseText);
 				$('#overlay-toast').html(e.responseText);
 				showToast(e.responseText);
 			}
@@ -398,6 +393,7 @@ function shareOnYelp(agentId, location, yelpElement){
 		url : location + "getyelplinkrest",
 		type : "GET",
 		dataType : "json",
+		cache : false,
 		data : payload,
 		success : function(data) {
 			if (data.errCode == undefined)
@@ -423,7 +419,6 @@ function shareOnYelp(agentId, location, yelpElement){
 				redirectToLoginPageOnSessionTimeOut(e.status);
 				return;
 			}
-			console.error("error : " + e.responseText);
 			$('#overlay-toast').html(e.responseText);
 			showToast(e.responseText);
 		}
@@ -439,6 +434,7 @@ function shareOnGooglePlus(agentId, location, googleElement){
 		url : location + "getgooglepluslinkrest",
 		type : "GET",
 		dataType : "json",
+		cache : false,
 		data : payload,
 		success : function(data) {
 			if (data.errCode == undefined)
@@ -466,7 +462,6 @@ function shareOnGooglePlus(agentId, location, googleElement){
 				redirectToLoginPageOnSessionTimeOut(e.status);
 				return;
 			}
-			console.error("error : " + e.responseText);
 			$('#overlay-toast').html(e.responseText);
 			showToast(e.responseText);
 		}

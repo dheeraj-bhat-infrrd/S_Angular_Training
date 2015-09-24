@@ -313,7 +313,6 @@ $('#com-city').bind('focus', function(){
 });
 
 function submitCompanyInfoForm() {
-	console.log("submitting company information form");
 	if (validateCompanyInformationForm('company-info-div')) {
 		$('#company-info-form').submit();
 	}

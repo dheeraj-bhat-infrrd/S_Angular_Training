@@ -1,5 +1,8 @@
 package com.realtech.socialsurvey.core.commons;
 
+import java.text.DecimalFormat;
+
+
 /**
  * Holds application level constants
  */
@@ -597,6 +600,7 @@ public interface CommonConstants
     public static final String SURVEY_REQUEST_ADMIN = "admin";
 
     // Constants for Agent Ranking Report
+    public static final String HEADER_AGENT_RANK = "User Rank";
     public static final String HEADER_FIRST_NAME = "First Name";
     public static final String HEADER_LAST_NAME = "Last Name";
     public static final String HEADER_AVG_SCORE = "Avg Score";
@@ -671,6 +675,7 @@ public interface CommonConstants
 
     public static final String LOCK_SCORE = "lockScore";
 
+
     public static final String AUTHORIZATION_HEADER = "Bearer ";
 
     public static final String DOTLOOP_PROFILE_ID = "profileId";
@@ -684,4 +689,10 @@ public interface CommonConstants
     public static final String DOTLOOP_PROFILE_LOOP_ID = "loopId";
 
     public static final String DOTLOOP_PROFILE_LOOP_VIEW_ID = "loopViewId";
+
+    // Social media message template constants
+    public static final DecimalFormat RANKING_FORMAT_TWITTER = new DecimalFormat( "#.#" );
+
+    public static final String TWITTER_MESSAGE = "%s Star Survey Response from %s for %s on %s ";
+
 }

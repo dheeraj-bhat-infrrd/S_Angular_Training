@@ -265,6 +265,14 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
         return surveyDetails;
     }
 
+    @Override
+    public void updateSurveyAsAbusive( String surveymongoId )
+    {
+        LOG.info( "Method updateSurveyAsAbusive() to mark the survey as abusive, started" );
+        surveyDetailsDao.updateSurveyAsAbusive(surveymongoId);
+        LOG.info( "Method updateSurveyAsAbusive() to mark the survey as abusive, finished" );
+    }
+
 
     /*
      * Method to update a survey as clicked when user triggers the survey and page of the first

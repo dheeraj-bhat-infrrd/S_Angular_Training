@@ -7,8 +7,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
+
 import org.apache.commons.lang.StringUtils;
 import org.apache.solr.common.SolrDocument;
 import org.slf4j.Logger;
@@ -22,7 +24,9 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
+
 import twitter4j.TwitterException;
+
 import com.google.gson.Gson;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.dao.impl.MongoSocialPostDaoImpl;
@@ -56,6 +60,7 @@ import com.realtech.socialsurvey.web.common.ErrorCodes;
 import com.realtech.socialsurvey.web.common.ErrorResponse;
 import com.realtech.socialsurvey.web.common.JspResolver;
 import com.realtech.socialsurvey.web.util.RequestUtils;
+
 import facebook4j.FacebookException;
 
 // JIRA SS-119 by RM-05 : BOC
@@ -78,8 +83,8 @@ public class SurveyManagementController {
 	private URLGenerator urlGenerator;
 
 	@Autowired
-    private UrlValidationHelper urlValidationHelper;
-	
+	private UrlValidationHelper urlValidationHelper;
+
 	@Autowired
 	private SolrSearchService solrSearchService;
 
@@ -94,13 +99,13 @@ public class SurveyManagementController {
 
 	@Autowired
 	private UserManagementService userManagementService;
-	
+
 	@Autowired
 	private RequestUtils requestUtils;
 
 	@Autowired
 	private EmailFormatHelper emailFormatHelper;
-	
+
 	@Resource
 	@Qualifier("nocaptcha")
 	private CaptchaValidation captchaValidation;
@@ -148,8 +153,8 @@ public class SurveyManagementController {
 			String feedback = request.getParameter("feedback");
 			String mood = request.getParameter("mood");
 			String customerEmail = request.getParameter("customerEmail");
-            String firstName = request.getParameter("firstName");
-            String lastName = request.getParameter("lastName");
+			String firstName = request.getParameter("firstName");
+			String lastName = request.getParameter("lastName");
 			String agreedToShare = request.getParameter("agreedToShare");
 
 			long agentId = 0;
@@ -168,7 +173,7 @@ public class SurveyManagementController {
 			boolean isAbusive = Boolean.parseBoolean(request.getParameter("isAbusive"));
 			surveyHandler.updateGatewayQuestionResponseAndScore(agentId, customerEmail, mood, feedback, isAbusive, agreedToShare);
 			surveyHandler.increaseSurveyCountForAgent(agentId);
-			SurveyPreInitiation surveyPreInitiation = surveyHandler.getPreInitiatedSurvey(agentId, customerEmail, firstName, lastName );
+			SurveyPreInitiation surveyPreInitiation = surveyHandler.getPreInitiatedSurvey(agentId, customerEmail, firstName, lastName);
 			surveyHandler.deleteSurveyPreInitiationDetailsPermanently(surveyPreInitiation);
 
 			// TODO Search Engine Optimization
@@ -203,15 +208,17 @@ public class SurveyManagementController {
 			SurveyDetails survey = surveyHandler.getSurveyDetails(agentId, customerEmail, firstName, lastName);
 			try {
 				String customerName = emailFormatHelper.getCustomerDisplayNameForEmail(survey.getCustomerFirstName(), survey.getCustomerLastName());
-
 				User agent = userManagementService.getUserByUserId(agentId);
+				
+				String logoUrl = userManagementService.fetchAppropriateLogoUrlFromHierarchyForUser(agent.getUserId());
+				LOG.info("logourl is : " + logoUrl + " for user " + agent.getUserId());
 				if (enableKafka.equals(CommonConstants.YES)) {
 					emailServices.queueSurveyCompletionMail(customerEmail, customerName, survey.getAgentName(), agent.getEmailId(),
 							agent.getProfileName());
 				}
 				else {
 					emailServices.sendSurveyCompletionMail(customerEmail, customerName, survey.getAgentName(), agent.getEmailId(),
-							agent.getProfileName());
+							agent.getProfileName() , logoUrl);
 				}
 
 				// Generate the text as in mail
@@ -270,12 +277,12 @@ public class SurveyManagementController {
 		else {
 			surveyDetail.append("<br />").append("Share Checkbox: ").append("No");
 		}
-		
+
 		surveyDetail.append("<br />");
-		if(isAbusive){
+		if (isAbusive) {
 			surveyDetail.append("<br />").append("Contains abusive words : ").append("Yes");
 		}
-		else{
+		else {
 			surveyDetail.append("<br />").append("Contains abusive words: ").append("No");
 		}
 
@@ -389,11 +396,11 @@ public class SurveyManagementController {
 			model.addAttribute("source", source);
 
 			User user = userManagementService.getUserByUserId(agentId);
-			SurveyPreInitiation preInitiatedSurvey = surveyHandler.getPreInitiatedSurvey(agentId, customerEmail, firstName, lastName );
+			SurveyPreInitiation preInitiatedSurvey = surveyHandler.getPreInitiatedSurvey(agentId, customerEmail, firstName, lastName);
 			SurveyDetails survey = surveyHandler.getSurveyDetails(agentId, customerEmail, firstName, lastName);
 
 			// Code to be executed when survey has already been taken.
-			if (preInitiatedSurvey == null && survey!=null && survey.getStage() == -1) {
+			if (preInitiatedSurvey == null && survey != null && survey.getStage() == -1) {
 				model.addAttribute("surveyCompleted", "yes");
 				model.addAttribute("agentName", agentName);
 				return JspResolver.SURVEY_INVITE_SUCCESSFUL;
@@ -435,9 +442,9 @@ public class SurveyManagementController {
 			if (urlParams != null) {
 				long agentId = Long.parseLong(urlParams.get(CommonConstants.AGENT_ID_COLUMN));
 				String customerEmail = urlParams.get(CommonConstants.CUSTOMER_EMAIL_COLUMN);
-                String custFirstName = urlParams.get(CommonConstants.FIRST_NAME);
-                String custLastName = urlParams.get(CommonConstants.LAST_NAME);
-				
+				String custFirstName = urlParams.get(CommonConstants.FIRST_NAME);
+				String custLastName = urlParams.get(CommonConstants.LAST_NAME);
+
 				SurveyPreInitiation surveyPreInitiation = surveyHandler.getPreInitiatedSurvey(agentId, customerEmail, custFirstName, custLastName);
 				if (surveyPreInitiation == null) {
 					surveyAndStage = getSurvey(agentId, customerEmail, custFirstName, custLastName, 0, null,
@@ -448,14 +455,14 @@ public class SurveyManagementController {
 							surveyPreInitiation.getCustomerFirstName(), surveyPreInitiation.getCustomerLastName(),
 							surveyPreInitiation.getReminderCounts(), surveyPreInitiation.getCustomerInteractionDetails(),
 							surveyHandler.composeLink(agentId, customerEmail, custFirstName, custLastName), surveyPreInitiation.getSurveySource());
-					
+
 					surveyHandler.markSurveyAsStarted(surveyPreInitiation);
 				}
-				
+
 				// fetching company logo
 				User user = userManagementService.getUserByUserId(agentId);
 				OrganizationUnitSettings companySettings = organizationManagementService.getCompanySettings(user);
-				if (companySettings != null && companySettings.getLogo() != null){
+				if (companySettings != null && companySettings.getLogo() != null) {
 					surveyAndStage.put("companyLogo", companySettings.getLogo());
 				}
 			}
@@ -489,7 +496,7 @@ public class SurveyManagementController {
 			String serverBaseUrl = requestUtils.getRequestServerName(request);
 
 			String customerDisplayName = emailFormatHelper.getCustomerDisplayNameForEmail(custFirstName, custLastName);
-			
+
 			long agentId = 0;
 			double rating = 0;
 			try {
@@ -520,7 +527,8 @@ public class SurveyManagementController {
 					+ " on Social Survey - view at " + getApplicationBaseUrl() + CommonConstants.AGENT_PROFILE_FIXED_URL + agentProfileLink;
 			facebookMessage += "\n Feedback : " + feedback;
 			try {
-				if (!socialManagementService.updateStatusIntoFacebookPage(agentSettings, facebookMessage, serverBaseUrl)) {
+				if (!socialManagementService.updateStatusIntoFacebookPage(agentSettings, facebookMessage, serverBaseUrl, agent.getCompany()
+						.getCompanyId())) {
 					surveyHandler.updateSharedOn(CommonConstants.FACEBOOK_SOCIAL_SITE, agentId, customerEmail);
 				}
 			}
@@ -530,7 +538,8 @@ public class SurveyManagementController {
 			if (accountMasterId != CommonConstants.ACCOUNTS_MASTER_INDIVIDUAL) {
 				for (OrganizationUnitSettings setting : settings) {
 					try {
-						if (!socialManagementService.updateStatusIntoFacebookPage(setting, facebookMessage, serverBaseUrl)) {
+						if (!socialManagementService.updateStatusIntoFacebookPage(setting, facebookMessage, serverBaseUrl, agent.getCompany()
+								.getCompanyId())) {
 							surveyHandler.updateSharedOn(CommonConstants.FACEBOOK_SOCIAL_SITE, agentId, customerEmail);
 						}
 					}
@@ -541,8 +550,7 @@ public class SurveyManagementController {
 			}
 
 			// LinkedIn
-			String linkedinMessage = rating + "-Star Survey Response from " + customerDisplayName + " for " + agentName
-					+ " on SocialSurvey ";
+			String linkedinMessage = rating + "-Star Survey Response from " + customerDisplayName + " for " + agentName + " on SocialSurvey ";
 			String linkedinProfileUrl = getApplicationBaseUrl() + CommonConstants.AGENT_PROFILE_FIXED_URL + agentProfileLink;
 			String linkedinMessageFeedback = "From : " + customerDisplayName + " - " + feedback;
 			if (!socialManagementService.updateLinkedin(agentSettings, linkedinMessage, linkedinProfileUrl, linkedinMessageFeedback)) {
@@ -555,12 +563,20 @@ public class SurveyManagementController {
 					}
 				}
 			}
-			
+
 			// Twitter
-			String twitterMessage = rating + "-Star Survey Response from " + customerDisplayName + " for " + agentName
-					+ " on @SocialSurveyMe - view at " + getApplicationBaseUrl() + CommonConstants.AGENT_PROFILE_FIXED_URL + agentProfileLink;
+			/*
+			 * String twitterMessage = rating + "-Star Survey Response from " + customerDisplayName
+			 * + " for " + agentName + " on @SocialSurveyMe - view at " + getApplicationBaseUrl() +
+			 * CommonConstants.AGENT_PROFILE_FIXED_URL + agentProfileLink;
+			 */
+			String twitterMessage = String.format(CommonConstants.TWITTER_MESSAGE, CommonConstants.RANKING_FORMAT_TWITTER.format(rating),
+					customerDisplayName, agentName, "@SocialSurveyMe")
+					+ getApplicationBaseUrl()
+					+ CommonConstants.AGENT_PROFILE_FIXED_URL
+					+ agentProfileLink;
 			try {
-				if (!socialManagementService.tweet(agentSettings, twitterMessage)) {
+				if (!socialManagementService.tweet(agentSettings, twitterMessage, agent.getCompany().getCompanyId())) {
 					surveyHandler.updateSharedOn(CommonConstants.TWITTER_SOCIAL_SITE, agentId, customerEmail);
 				}
 			}
@@ -570,7 +586,7 @@ public class SurveyManagementController {
 			if (accountMasterId != CommonConstants.ACCOUNTS_MASTER_INDIVIDUAL) {
 				for (OrganizationUnitSettings setting : settings) {
 					try {
-						if (!socialManagementService.tweet(setting, twitterMessage)) {
+						if (!socialManagementService.tweet(setting, twitterMessage, agent.getCompany().getCompanyId())) {
 							surveyHandler.updateSharedOn(CommonConstants.TWITTER_SOCIAL_SITE, agentId, customerEmail);
 						}
 					}
@@ -603,9 +619,9 @@ public class SurveyManagementController {
 			String ratingStr = facebookDetails.get("rating");
 			String customerEmail = facebookDetails.get("customerEmail");
 			String serverBaseUrl = requestUtils.getRequestServerName(request);
-			
+
 			String customerDisplayName = emailFormatHelper.getCustomerDisplayNameForEmail(custFirstName, custLastName);
-			
+
 			long agentId = 0;
 			double rating = 0;
 			try {
@@ -620,8 +636,12 @@ public class SurveyManagementController {
 			AgentSettings agentSettings = userManagementService.getUserSettings(agentId);
 			String facebookMessage = rating + "-Star Survey Response from " + customerDisplayName + " for " + agentName
 					+ " on Social Survey - view at " + getApplicationBaseUrl() + CommonConstants.AGENT_PROFILE_FIXED_URL + agentProfileLink;
+			// TODO: Bad code: DELETE: BEGIN
+			// get the company id of the agent
+			User user = userManagementService.getUserObjByUserId(agentId);
 			try {
-				socialManagementService.updateStatusIntoFacebookPage(agentSettings, facebookMessage, serverBaseUrl);
+				socialManagementService.updateStatusIntoFacebookPage(agentSettings, facebookMessage, serverBaseUrl, user.getCompany().getCompanyId());
+				// TODO: Bad code: Remove the comany id from the parameter: End
 				surveyHandler.updateSharedOn(CommonConstants.FACEBOOK_SOCIAL_SITE, agentId, customerEmail);
 			}
 			catch (FacebookException e) {
@@ -629,7 +649,7 @@ public class SurveyManagementController {
 			}
 			for (OrganizationUnitSettings setting : settings) {
 				try {
-					socialManagementService.updateStatusIntoFacebookPage(setting, facebookMessage, serverBaseUrl);
+					socialManagementService.updateStatusIntoFacebookPage(setting, facebookMessage, serverBaseUrl, user.getCompany().getCompanyId());
 				}
 				catch (FacebookException e) {
 					LOG.error("FacebookException caught in postToSocialMedia() while trying to post to facebook. Nested excption is ", e);
@@ -657,7 +677,7 @@ public class SurveyManagementController {
 			String agentIdStr = twitterDetails.get("agentId");
 			String ratingStr = twitterDetails.get("rating");
 			String customerEmail = twitterDetails.get("customerEmail");
-			
+
 			String customerDisplayName = emailFormatHelper.getCustomerDisplayNameForEmail(custFirstName, custLastName);
 			long agentId = 0;
 			double rating = 0;
@@ -671,10 +691,21 @@ public class SurveyManagementController {
 			}
 			List<OrganizationUnitSettings> settings = socialManagementService.getSettingsForBranchesAndRegionsInHierarchy(agentId);
 			AgentSettings agentSettings = userManagementService.getUserSettings(agentId);
-			String twitterMessage = rating + "-Star Survey Response from " + customerDisplayName + " for " + agentName
-					+ " on @SocialSurveyMe - view at " + getApplicationBaseUrl() + CommonConstants.AGENT_PROFILE_FIXED_URL + agentProfileLink;
+			/*
+			 * String twitterMessage = rating + "-Star Survey Response from " + customerDisplayName
+			 * + " for " + agentName + " on @SocialSurveyMe - view at " + getApplicationBaseUrl() +
+			 * CommonConstants.AGENT_PROFILE_FIXED_URL + agentProfileLink;
+			 */
+			String twitterMessage = String.format(CommonConstants.TWITTER_MESSAGE, CommonConstants.RANKING_FORMAT_TWITTER.format(rating),
+					customerDisplayName, agentName, "@SocialSurveyMe")
+					+ getApplicationBaseUrl()
+					+ CommonConstants.AGENT_PROFILE_FIXED_URL
+					+ agentProfileLink;
+			// TODO: Bad code: DELETE: BEGIN
+			// get the company id of the agent
+			User user = userManagementService.getUserObjByUserId(agentId);
 			try {
-				socialManagementService.tweet(agentSettings, twitterMessage);
+				socialManagementService.tweet(agentSettings, twitterMessage, user.getCompany().getCompanyId());
 				surveyHandler.updateSharedOn(CommonConstants.TWITTER_SOCIAL_SITE, agentId, customerEmail);
 			}
 			catch (TwitterException e) {
@@ -682,7 +713,7 @@ public class SurveyManagementController {
 			}
 			for (OrganizationUnitSettings setting : settings) {
 				try {
-					socialManagementService.tweet(setting, twitterMessage);
+					socialManagementService.tweet(setting, twitterMessage, user.getCompany().getCompanyId());
 				}
 				catch (TwitterException e) {
 					LOG.error("TwitterException caught in postToTwitter() while trying to post to twitter. Nested excption is ", e);
@@ -711,7 +742,7 @@ public class SurveyManagementController {
 			String customerEmail = linkedinDetails.get("customerEmail");
 			String agentProfileLink = linkedinDetails.get("agentProfileLink");
 			String feedback = linkedinDetails.get("feedback");
-			
+
 			String customerDisplayName = emailFormatHelper.getCustomerDisplayNameForEmail(custFirstName, custLastName);
 			long agentId = 0;
 			double rating = 0;
@@ -725,10 +756,9 @@ public class SurveyManagementController {
 			}
 			List<OrganizationUnitSettings> settings = socialManagementService.getSettingsForBranchesAndRegionsInHierarchy(agentId);
 			AgentSettings agentSettings = userManagementService.getUserSettings(agentId);
-			String message = rating + "-Star Survey Response from " + customerDisplayName + " for " + agentName
-					+ " on SocialSurvey ";
+			String message = rating + "-Star Survey Response from " + customerDisplayName + " for " + agentName + " on SocialSurvey ";
 			String linkedinProfileUrl = getApplicationBaseUrl() + CommonConstants.AGENT_PROFILE_FIXED_URL + agentProfileLink;
-			String linkedinMessageFeedback = "From : " + customerDisplayName + " "+ feedback;
+			String linkedinMessageFeedback = "From : " + customerDisplayName + " " + feedback;
 			socialManagementService.updateLinkedin(agentSettings, message, linkedinProfileUrl, linkedinMessageFeedback);
 			for (OrganizationUnitSettings setting : settings) {
 				socialManagementService.updateLinkedin(setting, message, linkedinProfileUrl, linkedinMessageFeedback);
@@ -938,7 +968,7 @@ public class SurveyManagementController {
 				throw new InvalidInputException("Invalid value (Null/Empty) found for agentId.");
 			}
 			long agentId = Long.parseLong(agentIdStr);
-			SurveyPreInitiation survey = surveyHandler.getPreInitiatedSurvey(agentId, customerEmail, firstName, lastName );
+			SurveyPreInitiation survey = surveyHandler.getPreInitiatedSurvey(agentId, customerEmail, firstName, lastName);
 			User user = userManagementService.getUserByUserId(agentId);
 			surveyHandler.sendSurveyRestartMail(firstName, lastName, customerEmail, survey.getCustomerInteractionDetails(), user,
 					surveyHandler.composeLink(agentId, customerEmail, firstName, lastName));
@@ -1032,7 +1062,7 @@ public class SurveyManagementController {
 		}
 
 		AgentSettings agentSettings = userManagementService.getUserSettings(agentId);
-		
+
 		// Fetching Yelp Url
 		try {
 			if (agentSettings.getSocialMediaTokens().getYelpToken().getYelpPageLink() != null) {
@@ -1084,18 +1114,18 @@ public class SurveyManagementController {
 		catch (NullPointerException e) {
 			surveyAndStage.put("lendingtreeEnabled", false);
 		}
-		
+
 		try {
-            if (agentSettings.getSocialMediaTokens().getRealtorToken().getRealtorProfileLink() != null) {
-                surveyAndStage.put("realtorEnabled", true);
-                surveyAndStage.put("realtorLink", agentSettings.getSocialMediaTokens().getRealtorToken().getRealtorProfileLink());
-            }
-            else
-                surveyAndStage.put("realtorEnabled", false);
-        }
-        catch (NullPointerException e) {
-            surveyAndStage.put("realtorEnabled", false);
-        }
+			if (agentSettings.getSocialMediaTokens().getRealtorToken().getRealtorProfileLink() != null) {
+				surveyAndStage.put("realtorEnabled", true);
+				surveyAndStage.put("realtorLink", agentSettings.getSocialMediaTokens().getRealtorToken().getRealtorProfileLink());
+			}
+			else
+				surveyAndStage.put("realtorEnabled", false);
+		}
+		catch (NullPointerException e) {
+			surveyAndStage.put("realtorEnabled", false);
+		}
 
 		surveyAndStage.put("agentFullProfileLink", getApplicationBaseUrl() + CommonConstants.AGENT_PROFILE_FIXED_URL + agentSettings.getProfileUrl());
 		surveyAndStage.put("agentProfileLink", agentSettings.getProfileUrl());

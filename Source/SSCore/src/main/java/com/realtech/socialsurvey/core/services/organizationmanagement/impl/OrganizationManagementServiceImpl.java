@@ -2170,8 +2170,17 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
                         if ( newProfileBranch != null
                             && newProfileBranch.getIsDefaultBySystem() == CommonConstants.IS_DEFAULT_BY_SYSTEM_YES
                             && userProfileNew.getProfilesMaster().getProfileId() == CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID ) {
-                            isPrimary = CommonConstants.IS_PRIMARY_FALSE;
-                            // if new profile's branch is not default than make new profile as primary and change old one	
+
+                            Region newProfileRegion = regionDao.findById( Region.class, userProfileNew.getRegionId() );
+
+                            // if both branches are default and if new profiles region is not default than make new profile as primary
+                            if ( newProfileRegion != null
+                                && newProfileRegion.getIsDefaultBySystem() != CommonConstants.IS_DEFAULT_BY_SYSTEM_YES ) {
+                                isPrimary = CommonConstants.IS_PRIMARY_TRUE;
+                            } else {
+                                isPrimary = CommonConstants.IS_PRIMARY_FALSE;
+                            }
+                            // if new profile's branch is not default than make new profile as primary and change old one  	
                         } else {
                             profile.setIsPrimary( CommonConstants.IS_PRIMARY_FALSE );
                             userProfileDao.update( profile );
@@ -3052,6 +3061,17 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
         branch.setCountryCode( branchCountryCode );
         branch.setBranchName( branchName );
 
+        if ( ( branchAddress1 != null && !branchAddress1.isEmpty() ) || ( branchAddress2 != null && !branchAddress2.isEmpty() ) ) {
+            try {
+                settingsSetter.setSettingsValueForBranch( branch, SettingsForApplication.ADDRESS, true );
+            } catch ( NonFatalException nonFatalException ) {
+                LOG.error(
+                    "NonFatalException while updating profile address details. Reason :" + nonFatalException.getMessage(),
+                    nonFatalException );
+            }
+            userManagementService.updateBranch( branch );
+        }
+
         LOG.debug( "Updating branch table with profile name" );
         branchDao.update( branch );
 
@@ -3294,6 +3314,17 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
         region.setState( state );
         region.setCity( city );
         region.setZipcode( zipcode );
+
+        if ( ( address1 != null && !address1.isEmpty() ) || ( address2 != null && !address2.isEmpty() ) ) {
+            try {
+                settingsSetter.setSettingsValueForRegion( region, SettingsForApplication.ADDRESS, true );
+            } catch ( NonFatalException nonFatalException ) {
+                LOG.error(
+                    "NonFatalException while updating profile address details. Reason :" + nonFatalException.getMessage(),
+                    nonFatalException );
+            }
+            userManagementService.updateRegion( region );
+        }
 
         LOG.debug( "Calling method to insert region settings" );
         try {
@@ -4594,6 +4625,26 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
         organizationUnitSettingsDao
             .updateParticularKeyOrganizationUnitSettings( MongoOrganizationUnitSettingDaoImpl.KEY_MAIL_CONTENT,
                 mailContentSettings, organizationUnitSettings, collectionName );
+    }
+
+
+    @Override
+    @Transactional
+    public void updateRegion( Region region )
+    {
+        LOG.info( "Method to change region details updateRegion() started." );
+        regionDao.merge( region );
+        LOG.info( "Method to change region details updateRegion() finished." );
+    }
+
+
+    @Override
+    @Transactional
+    public void updateBranch( Branch branch )
+    {
+        LOG.info( "Method to change branch details updateBranch() started." );
+        branchDao.merge( branch );
+        LOG.info( "Method to change branch details updateBranch() finished." );
     }
 
 

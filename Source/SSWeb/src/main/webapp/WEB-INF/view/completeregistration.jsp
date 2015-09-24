@@ -128,7 +128,6 @@ $(document).ready(function(){
 
 	function submitCompleteRegistrationForm() {
 		if(validateCompleteRegistrationForm()){
-			console.log("submitting complete registration form");
 			$('#complete-registration-form').submit();
 		}
 	}

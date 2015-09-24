@@ -160,4 +160,7 @@ public interface SurveyHandler
      * @param surveyPreInitiation
      */
     public void saveSurveyPreInitiationObject( SurveyPreInitiation surveyPreInitiation );
+
+
+    void updateSurveyAsAbusive( String surveymongoId );
 }

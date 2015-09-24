@@ -43,9 +43,20 @@ public class SurveyDetails
     private String googleApi;
     private String faceBookShareUrl;
     private boolean isAbusive;
+    private String _id;
 
 
-    public String getGoogleApi()
+    public String get_id() {
+		return _id;
+	}
+
+
+	public void set_id(String _id) {
+		this._id = _id;
+	}
+
+
+	public String getGoogleApi()
     {
         return googleApi;
     }

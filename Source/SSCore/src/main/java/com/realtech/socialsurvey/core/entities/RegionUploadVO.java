@@ -15,6 +15,7 @@ public class RegionUploadVO {
 	private String regionState;
 	private String regionCity;
 	private String regionZipcode;
+	private boolean isAddressSet;
 
 	public long getRegionId() {
 		return regionId;
@@ -94,6 +95,14 @@ public class RegionUploadVO {
 
 	public void setRegionZipcode(String regionZipcode) {
 		this.regionZipcode = regionZipcode;
+	}
+
+	public boolean isAddressSet() {
+		return isAddressSet;
+	}
+
+	public void setAddressSet(boolean isAddressSet) {
+		this.isAddressSet = isAddressSet;
 	}
 
 }

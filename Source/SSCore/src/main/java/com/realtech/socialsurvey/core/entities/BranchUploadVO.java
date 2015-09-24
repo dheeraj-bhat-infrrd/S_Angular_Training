@@ -20,6 +20,7 @@ public class BranchUploadVO {
 	private String branchZipcode;
 	private boolean assignToCompany;
 	private String assignedRegionName;
+	private boolean isAddressSet;
 
 	public long getBranchId() {
 		return branchId;
@@ -132,4 +133,13 @@ public class BranchUploadVO {
 	public void setAssignedRegionName(String assignedBranchName) {
 		this.assignedRegionName = assignedBranchName;
 	}
+
+	public boolean isAddressSet() {
+		return isAddressSet;
+	}
+
+	public void setAddressSet(boolean isAddressSet) {
+		this.isAddressSet = isAddressSet;
+	}
+
 }
