@@ -8324,11 +8324,14 @@ $(document).on('click', '#wc-send-survey', function() {
 			var dataName = $(this).find('input.wc-review-agentname').first().attr('data-name');
 			if (dataName == 'agent-name') {
 				agentId = $(this).find('input.wc-review-agentname').first().attr('agent-id');
+				var agentEmailId = $(this).find('input.wc-review-agentname').first().attr('email-id');
 
 				if (idx == 0) {
 					columnName = $(this).find('input.wc-review-agentname').first().attr('column-name');
 					idx ++;
 				}
+			}else{
+				agentEmailId = $("#wc-review-table-inner").attr('user-email-id');
 			}
 			
 			firstname = $(this).find('input.wc-review-fname').first().val();
@@ -8360,6 +8363,13 @@ $(document).on('click', '#wc-send-survey', function() {
 						exit = true;
 						return false;					
 					}
+				}
+				//check if agent mail id is not same as recipient mail id
+				if(emailId == agentEmailId ){
+					$('#overlay-toast').html("You can't a send survey request to the agent initiating the survey");
+					showToast();
+					exit = true;
+					return false;
 				}
 				receiversList.push(receiver);
 			} else if(firstname != ""){
@@ -8402,8 +8412,12 @@ $(document).on('click', '#wc-send-survey', function() {
 		
 		//Update the incomplete survey on dashboard
 		getIncompleteSurveyCount(colName, colValue);
+		if(data == "error"){
+			$('#overlay-toast').html('Error while sending survey request!');
+		}else{
+			$('#overlay-toast').html('Survey request sent successfully!');
+		}
 		
-		$('#overlay-toast').html('Survey request sent successfully!');
 		showToast();
 		enableBodyScroll();
 	}, payload);
