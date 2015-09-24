@@ -21,4 +21,9 @@ public interface DotloopIntegrationApi
     public Response fetchClosedProfiles( @Header ( "Authorization") String authorizationHeader,
         @Path ( "profile-id") String profileId, @Query ( "batchNumber") int batchNumber );
 
+
+    @GET ( "/profile/{profile-id}/loop/{loop-id}/detail")
+    public Response fetchLoopProfileDetail( @Header ( "Authorization") String authorizationHeader,
+        @Path ( "profile-id") String profileId, @Path ( "loop-id") String loopId );
+
 }
