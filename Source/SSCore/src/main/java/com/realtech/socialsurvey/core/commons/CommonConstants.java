@@ -157,6 +157,7 @@ public interface CommonConstants
     public static final String SURVEY_SOURCE_KEY_COLUMN = "surveySource";
     public static final String SURVEY_SOURCE_ID_COLUMN = "sourceId";
     public static final String VERTICAL_NAME = "verticalName";
+    public static final String CUSTOMER_EMAIL_ID_KEY_COLUMN = "customerEmailId";
 
     /**
      * Mongo entities and column name constants
@@ -265,6 +266,8 @@ public interface CommonConstants
     public static final String ENTITY_ID_COLUMN = "entityId";
     public static final String ENTITY_NAME_COLUMN = "entityName";
     public static final String ENTITY_TYPE_COLUMN = "entityType";
+    
+    public static final String FILE_UPLOAD_TYPE_COLUMN = "uploadType";
 
     /**
      * Batch Constants
@@ -355,6 +358,7 @@ public interface CommonConstants
     public static final String CRM_INFO_SOURCE_ENCOMPASS = "encompass";
     public static final String CRM_SOURCE_ENCOMPASS = "ENCOMPASS";
     public static final String CRM_SOURCE_DOTLOOP = "DOTLOOP";
+    public static final String SURVEY_SOURCE_FILE_UPLOAD = "upload";
 
     // mail content
     public static final String SURVEY_MAIL_BODY_CATEGORY = "SURVEY_MAIL_BODY_CATEGORY";
@@ -676,4 +680,8 @@ public interface CommonConstants
     // Social media message template constants
     public static final DecimalFormat RANKING_FORMAT_TWITTER= new DecimalFormat("#.#");
     public static final String TWITTER_MESSAGE = "%s Star Survey Response from %s for %s on %s ";
+    
+    // file upload types
+    public static final int FILE_UPLOAD_HIERARCHY_TYPE = 1;
+    public static final int FILE_UPLOAD_SURVEY_TYPE = 2;
 }

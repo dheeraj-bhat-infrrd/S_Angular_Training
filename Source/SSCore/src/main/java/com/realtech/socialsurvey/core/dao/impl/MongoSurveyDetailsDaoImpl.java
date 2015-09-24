@@ -70,8 +70,12 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
         LOG.info( "Method getSurveyByAgentIdAndCustomerEmail() to insert details of survey started." );
         Query query = new Query( Criteria.where( CommonConstants.AGENT_ID_COLUMN ).is( agentId ) );
         query.addCriteria( Criteria.where( CommonConstants.CUSTOMER_EMAIL_COLUMN ).is( customerEmail ) );
-        query.addCriteria( Criteria.where( "customerFirstName" ).is( firstName ) );
-        query.addCriteria( Criteria.where( "customerLastName" ).is( lastName ) );
+        if(firstName != null && !firstName.isEmpty()){
+        	query.addCriteria( Criteria.where( "customerFirstName" ).is( firstName ) );
+        }
+        if(lastName != null && !lastName.isEmpty()){
+        	query.addCriteria( Criteria.where( "customerLastName" ).is( lastName ) );
+        }
         List<SurveyDetails> surveys = mongoTemplate.find( query, SurveyDetails.class, SURVEY_DETAILS_COLLECTION );
         if ( surveys == null || surveys.size() == 0 )
             return null;
