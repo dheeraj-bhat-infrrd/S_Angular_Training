@@ -378,7 +378,7 @@ public class TopicConsumer implements Runnable {
 
 		LOG.debug("Sending account completion mail");
 		emailServices.sendSurveyCompletionMail(recipient, name, agentName,
-				agentEmail, agentProfile);
+				agentEmail, agentProfile , null );
 	}
 
 	private void parseMailWithRecipientAndAgentDetails(String message)
