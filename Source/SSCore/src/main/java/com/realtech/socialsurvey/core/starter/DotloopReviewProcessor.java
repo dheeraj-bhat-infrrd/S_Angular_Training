@@ -249,7 +249,7 @@ public class DotloopReviewProcessor extends QuartzJobBean
                                 LOG.info( "Fetching records for the first time " );
                                 for ( LoopProfileMapping loopDetails : dotloopProfileMappingList ) {
                                     organizationManagementService.saveLoopsForProfile( loopDetails );
-                                    saveSurveyPreInititation( unitSettings.getIden(), authorizationHeader, loopDetails );
+                                   /* saveSurveyPreInititation( unitSettings.getIden(), authorizationHeader, loopDetails );*/
                                 }
                             } else {
                                 for ( LoopProfileMapping loopDetails : dotloopProfileMappingList ) {
