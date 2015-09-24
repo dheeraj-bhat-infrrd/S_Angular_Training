@@ -1637,7 +1637,8 @@ public class SocialManagementController
         ZillowIntegrationApi zillowIntegrationApi = zillowIntergrationApiBuilder.getZellowIntegrationApi();
         User user = sessionHelper.getCurrentUser();
         String zillowScreenName = request.getParameter( "zillowProfileName" );
-
+        OrganizationUnitSettings profileSettings = (OrganizationUnitSettings) session
+                .getAttribute( CommonConstants.USER_PROFILE_SETTINGS );
         if ( zillowScreenName == null || zillowScreenName == "" ) {
             model.addAttribute( "Error", "Please provide either the zillow screen name or zillow emailadress" );
 
@@ -1725,6 +1726,7 @@ public class SocialManagementController
                     profileManagementService.updateProfileStages( companySettings.getProfileStages(), companySettings,
                         MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION );
                     userSettings.setCompanySettings( companySettings );
+                    profileSettings.setSocialMediaTokens(companySettings.getSocialMediaTokens());
                     updated = true;
 
                 } else if ( entityType.equals( CommonConstants.REGION_ID_COLUMN ) ) {
@@ -1752,6 +1754,7 @@ public class SocialManagementController
                     profileManagementService.updateProfileStages( regionSettings.getProfileStages(), regionSettings,
                         MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION );
                     userSettings.getRegionSettings().put( entityId, regionSettings );
+                    profileSettings.setSocialMediaTokens(regionSettings.getSocialMediaTokens());
                     updated = true;
                 } else if ( entityType.equals( CommonConstants.BRANCH_ID_COLUMN ) ) {
                     OrganizationUnitSettings branchSettings = organizationManagementService.getBranchSettingsDefault( entityId );
@@ -1778,6 +1781,7 @@ public class SocialManagementController
                     profileManagementService.updateProfileStages( branchSettings.getProfileStages(), branchSettings,
                         MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION );
                     userSettings.getBranchSettings().put( entityId, branchSettings );
+                    profileSettings.setSocialMediaTokens(branchSettings.getSocialMediaTokens());
                     updated = true;
                 } else if ( entityType.equals( CommonConstants.AGENT_ID_COLUMN )
                     || accountMasterId == CommonConstants.ACCOUNTS_MASTER_INDIVIDUAL ) {
@@ -1798,6 +1802,7 @@ public class SocialManagementController
                     profileManagementService.updateProfileStages( agentSettings.getProfileStages(), agentSettings,
                         MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION );
                     userSettings.setAgentSettings( agentSettings );
+                    profileSettings.setSocialMediaTokens(agentSettings.getSocialMediaTokens());
                     updated = true;
                 }
                 if ( !updated ) {
@@ -1816,7 +1821,7 @@ public class SocialManagementController
             session.removeAttribute( CommonConstants.SOCIAL_REQUEST_TOKEN );
             model.addAttribute( CommonConstants.SUCCESS_ATTRIBUTE, CommonConstants.YES );
             model.addAttribute( "socialNetwork", "zillow" );
-
+            session.setAttribute( CommonConstants.USER_PROFILE_SETTINGS, profileSettings );
         }
         return JspResolver.SOCIAL_AUTH_MESSAGE;
     }
@@ -1879,7 +1884,9 @@ public class SocialManagementController
     public String disconnectSocialMedia( HttpServletRequest request )
     {
         String socialMedia = request.getParameter( "socialMedia" );
-
+        HttpSession session = request.getSession();
+        OrganizationUnitSettings profileSettings = (OrganizationUnitSettings) session
+                .getAttribute( CommonConstants.USER_PROFILE_SETTINGS );
         try {
             if ( socialMedia == null || socialMedia.isEmpty() ) {
                 throw new InvalidInputException( "Social media can not be null or empty" );
@@ -1914,7 +1921,6 @@ public class SocialManagementController
     		}
             
             User user = sessionHelper.getCurrentUser();
-            HttpSession session = request.getSession();
             UserSettings userSettings = (UserSettings) session.getAttribute( CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION );
             long entityId = (long) session.getAttribute( CommonConstants.ENTITY_ID_COLUMN );
             String entityType = (String) session.getAttribute( CommonConstants.ENTITY_TYPE_COLUMN );
@@ -1964,11 +1970,12 @@ public class SocialManagementController
                     MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION );
                 userSettings.setAgentSettings( (AgentSettings) unitSettings );
             }
+            profileSettings.setSocialMediaTokens(unitSettings.getSocialMediaTokens());
         } catch ( NonFatalException e ) {
             LOG.error( "Exception occured in disconnectSocialNetwork() while disconnecting with the social Media." );
             return "failue";
         }
-
+        session.setAttribute( CommonConstants.USER_PROFILE_SETTINGS, profileSettings );
         return "success";
     }
 
