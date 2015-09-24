@@ -154,4 +154,10 @@ public interface SurveyHandler
 
 
     SurveyPreInitiation getPreInitiatedSurveyById( long surveyPreInitiationId ) throws NoRecordsFetchedException;
+
+
+    /**
+     * @param surveyPreInitiation
+     */
+    public void saveSurveyPreInitiationObject( SurveyPreInitiation surveyPreInitiation );
 }

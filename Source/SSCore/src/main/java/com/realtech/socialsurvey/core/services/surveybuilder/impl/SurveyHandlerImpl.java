@@ -720,7 +720,8 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
 
         OrganizationUnitSettings companySettings = organizationManagementService.getCompanySettings( user.getCompany()
             .getCompanyId() );
-        preInitiateSurvey( user, custEmail, custFirstName, custLastName, 0, custRelationWithAgent, CommonConstants.SURVEY_REQUEST_AGENT );
+        preInitiateSurvey( user, custEmail, custFirstName, custLastName, 0, custRelationWithAgent,
+            CommonConstants.SURVEY_REQUEST_AGENT );
         if ( companySettings != null && companySettings.getMail_content() != null
             && companySettings.getMail_content().getRestart_survey_mail() != null ) {
 
@@ -1132,6 +1133,15 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
         }
 
         return surveyPreInitiation;
+    }
+
+
+    @Override
+    @Transactional
+    public void saveSurveyPreInitiationObject( SurveyPreInitiation surveyPreInitiation )
+    {
+        LOG.debug( "Inside method saveSurveyPreInitiationObject " );
+        surveyPreInitiationDao.save( surveyPreInitiation );
     }
 }
 // JIRA SS-119 by RM-05:EOC

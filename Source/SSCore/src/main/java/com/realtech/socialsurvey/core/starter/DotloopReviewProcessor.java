@@ -34,6 +34,7 @@ import com.realtech.socialsurvey.core.entities.CompanyDotloopProfileMapping;
 import com.realtech.socialsurvey.core.entities.DotLoopCrmInfo;
 import com.realtech.socialsurvey.core.entities.LoopProfileMapping;
 import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
+import com.realtech.socialsurvey.core.entities.SurveyPreInitiation;
 import com.realtech.socialsurvey.core.entities.User;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.integration.dotloop.DotloopIntegrationApi;
@@ -248,6 +249,7 @@ public class DotloopReviewProcessor extends QuartzJobBean
                                 LOG.info( "Fetching records for the first time " );
                                 for ( LoopProfileMapping loopDetails : dotloopProfileMappingList ) {
                                     organizationManagementService.saveLoopsForProfile( loopDetails );
+                                    saveSurveyPreInititation( unitSettings.getIden(), authorizationHeader, loopDetails );
                                 }
                             } else {
                                 for ( LoopProfileMapping loopDetails : dotloopProfileMappingList ) {
@@ -262,6 +264,7 @@ public class DotloopReviewProcessor extends QuartzJobBean
                                     if ( !profileFound ) {
                                         loopDetails.setLoopClosedTime( new Timestamp( System.currentTimeMillis() ) );
                                         organizationManagementService.saveLoopsForProfile( loopDetails );
+                                        saveSurveyPreInititation( unitSettings.getIden(), authorizationHeader, loopDetails );
                                     }
                                 }
                             }
@@ -274,12 +277,136 @@ public class DotloopReviewProcessor extends QuartzJobBean
     }
 
 
+    private void saveSurveyPreInititation( long companyId, String authorizationHeader, LoopProfileMapping loopProfileMapping )
+    {
+        LOG.debug( "Insid method saveSurveyPreInititation" );
+        DotloopIntegrationApi dotloopIntegrationApi = dotloopIntegrationApiBuilder.getDotloopIntegrationApi();
+        Response loopDetailResponse = null;
+        try {
+            loopDetailResponse = dotloopIntegrationApi.fetchLoopProfileDetail( authorizationHeader,
+                loopProfileMapping.getProfileId(), loopProfileMapping.getProfileViewId() );
+        } catch ( Exception e ) {
+            LOG.error( "Unable to access this profile loop " );
+            loopDetailResponse = null;
+        }
+        String loopResponseString = null;
+        if ( loopDetailResponse != null ) {
+            loopResponseString = new String( ( (TypedByteArray) loopDetailResponse.getBody() ).getBytes() );
+        }
+
+        if ( loopResponseString != null ) {
+
+            Map<String, Object> loopMapList = null;
+            try {
+                loopMapList = convertJsonStringToMap( loopResponseString );
+            } catch ( JsonParseException e ) {
+                LOG.error( "Exception caught " + e.getMessage() );
+            } catch ( JsonMappingException e ) {
+                LOG.error( "Exception caught " + e.getMessage() );
+            } catch ( IOException e ) {
+                LOG.error( "Exception caught " + e.getMessage() );
+            }
+
+            if ( loopMapList != null ) {
+
+                String engagementClosedTime = null;
+                String customerFirstName = "";
+                String customerLastName = "";
+                String agentName = null;
+                String agentEmailAddress = null;
+                String customerEmailAddress = null;
+                Map<String, LinkedHashMap<String, String>> sectionsMap = (Map<String, LinkedHashMap<String, String>>) loopMapList
+                    .get( "sections" );
+
+                if ( sectionsMap != null ) {
+                    Map<String, String> contractDates = sectionsMap.get( "Contract Dates" );
+                    Map<String, String> buyerMap = sectionsMap.get( "Buyer" );
+                    Map<String, String> buyingAgentMap = sectionsMap.get( "Buying Agent" );
+                    if ( contractDates != null ) {
+                        engagementClosedTime = contractDates.get( "closingDate" );
+                    }
+                    if ( buyerMap != null ) {
+                        String fullName = buyerMap.get( "Name" );
+                        customerEmailAddress = buyerMap.get( "Email" );
+                        if ( fullName != null && !fullName.isEmpty() ) {
+                            String[] nameArray = fullName.split( " " );
+                            if ( nameArray.length == 1 ) {
+                                customerFirstName = nameArray[nameArray.length - 1];
+                                customerLastName = null;
+                            } else {
+                                for ( int i = 0; i < nameArray.length - 1; i++ ) {
+                                    customerFirstName = customerFirstName + nameArray[i];
+                                }
+                                customerFirstName = customerFirstName.trim();
+                                customerLastName = nameArray[nameArray.length - 1];
+                            }
+
+
+                        } else {
+                            customerFirstName = null;
+                            customerLastName = null;
+                        }
+                    }
+                    if ( buyingAgentMap != null ) {
+                        agentName = buyingAgentMap.get( "Name" );
+                        agentEmailAddress = buyingAgentMap.get( "Email" );
+                    }
+                }
+
+                SurveyPreInitiation surveyPreInitiation = new SurveyPreInitiation();
+                surveyPreInitiation.setAgentEmailId( agentEmailAddress );
+                surveyPreInitiation.setAgentName( agentName );
+                surveyPreInitiation.setCompanyId( companyId );
+                surveyPreInitiation.setCreatedOn( new Timestamp( System.currentTimeMillis() ) );
+                surveyPreInitiation.setAgentId( 0 );
+                surveyPreInitiation.setCustomerEmailId( customerEmailAddress );
+                surveyPreInitiation.setCustomerFirstName( customerFirstName );
+                surveyPreInitiation.setCustomerLastName( customerLastName );
+                if ( engagementClosedTime != null ) {
+                    surveyPreInitiation.setEngagementClosedTime( convertStringToDate( engagementClosedTime ) );
+                } else {
+                    surveyPreInitiation.setEngagementClosedTime( convertEpochDateToTimestamp() );
+                }
+                surveyPreInitiation.setStatus( CommonConstants.STATUS_SURVEYPREINITIATION_NOT_PROCESSED );
+                surveyPreInitiation.setSurveySource( CommonConstants.CRM_SOURCE_DOTLOOP );
+                try {
+                    surveyHandler.saveSurveyPreInitiationObject( surveyPreInitiation );
+                } catch ( Exception e ) {
+                    LOG.error( "Unable to insert this record ", e );
+                }
+
+
+            }
+
+        }
+
+    }
+
+
+    private Timestamp convertStringToDate( String dateString )
+    {
+        DateFormat format = new SimpleDateFormat( "MM/dd/yyyy", Locale.ENGLISH );
+        Date date = null;
+
+        try {
+            date = format.parse( dateString );
+        } catch ( ParseException e ) {
+            LOG.error( "Exception caught ", e );
+        }
+        Calendar cal = Calendar.getInstance();
+        cal.setTime( date );
+        cal.set( Calendar.MILLISECOND, 0 );
+
+        return ( new java.sql.Timestamp( cal.getTimeInMillis() ) );
+    }
+
+
     private Timestamp convertEpochDateToTimestamp()
     {
         String string = "January 2, 1970";
         DateFormat format = new SimpleDateFormat( "MMMM d, yyyy", Locale.ENGLISH );
         Date date = null;
-        ;
+
         try {
             date = format.parse( string );
         } catch ( ParseException e ) {
