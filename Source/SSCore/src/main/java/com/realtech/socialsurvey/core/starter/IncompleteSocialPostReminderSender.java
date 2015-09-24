@@ -6,17 +6,20 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
 import org.quartz.JobDataMap;
 import org.quartz.JobExecutionContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.quartz.QuartzJobBean;
+
 import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.entities.AgentSettings;
 import com.realtech.socialsurvey.core.entities.Company;
 import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
 import com.realtech.socialsurvey.core.entities.SurveyDetails;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
+import com.realtech.socialsurvey.core.exception.NoRecordsFetchedException;
 import com.realtech.socialsurvey.core.services.generator.URLGenerator;
 import com.realtech.socialsurvey.core.services.mail.EmailServices;
 import com.realtech.socialsurvey.core.services.mail.UndeliveredEmailException;
@@ -99,8 +102,17 @@ public class IncompleteSocialPostReminderSender extends QuartzJobBean {
 								companyName = company.getCompany();
 							}
 						}
+						
+						String logoUrl = null;
+						try {
+							logoUrl = userManagementService.fetchAppropriateLogoUrlFromHierarchyForUser(survey.getAgentId());
+						} catch (NoRecordsFetchedException e) {
+							LOG.error("Error while fatching logo for user with id : " + survey.getAgentId() , e);
+						}
+						
+						
 						emailServices.sendSocialPostReminderMail(survey.getCustomerEmail(), phoneNo, title, companyName,
-								survey.getCustomerFirstName() + " " + survey.getCustomerLastName(), survey.getAgentName(), links.toString());
+								survey.getCustomerFirstName() + " " + survey.getCustomerLastName(), survey.getAgentName(), links.toString() , logoUrl);
 						surveyHandler.updateReminderCountForSocialPosts(survey.getAgentId(), survey.getCustomerEmail());
 					}
 					catch (InvalidInputException | UndeliveredEmailException e) {

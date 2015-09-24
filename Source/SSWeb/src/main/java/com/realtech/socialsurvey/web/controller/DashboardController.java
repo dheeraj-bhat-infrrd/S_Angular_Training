@@ -1730,6 +1730,12 @@ public class DashboardController
                         throw new InvalidInputException( "Agent id can not be null" );
                     }
                     User currentUser = userManagementService.getUserByUserId( currentAgentId );
+                    String currentUserEmailId = currentUser.getEmailId();
+                    //check if agent mail id is not same as recipent email id
+                    if(currentUserEmailId.equals(recipient.getEmailId())){
+                    	LOG.error("agent email id and recipent email id is same for agent " +currentUser.getFirstName());
+                    	throw new InvalidInputException( "Recipent email id can not be same as agent email id" );
+                    }
                     if ( surveyHandler.getPreInitiatedSurvey( agentId, recipient.getEmailId(), recipient.getFirstname(),
                         recipient.getLastname() ) == null )
                         surveyHandler.sendSurveyInvitationMail( recipient.getFirstname(), recipient.getLastname(),

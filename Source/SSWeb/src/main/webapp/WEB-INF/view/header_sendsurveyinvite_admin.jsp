@@ -1,6 +1,5 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ taglib prefix="spring" uri="http://www.springframework.org/tags"%>
-
 <div id="welcome-popup-invite" class="welcome-popup-wrapper">
 	<div class="welcome-popup-hdr-wrapper clearfix">
 		<div class="float-left wc-hdr-txt"><spring:message code="label.sendsurvey.key" /></div>
@@ -9,7 +8,7 @@
 	<div class="welcome-popup-body-wrapper clearfix">
 		<div class="wc-popup-body-hdr"><spring:message code="label.happyreviews.key" /></div>
 		<div id="wc-review-table" class="wc-popup-body-cont wc-review-table-cont wc-admin-table">
-			<div id="wc-review-table-inner" class="wc-review-table" data-role="admin">
+			<div id="wc-review-table-inner" class="wc-review-table" data-role="admin" user-email-id="${sessionScope.SPRING_SECURITY_CONTEXT.authentication.principal.emailId}">
 				<div class="wc-review-tr wc-review-hdr clearfix">
 					<div class="wc-review-th1 float-left"><spring:message code="label.agentname.key" /></div>
 					<div class="wc-review-th2 float-left"><spring:message code="label.firstname.key" /></div>
@@ -120,7 +119,7 @@ $(document).ready(function(){
 		var htmlData = '<div class="agent-dropdown-wrapper">';
 		htmlData += '<div class="agent-dropdown-cont">';
 		for (var index = 0; index < data.length; index++) {
-			htmlData += '<div column-name="' + columnName + '" attr="' + data[index].userId
+			htmlData += '<div  email-id="' + data[index].emailId + '" column-name="' + columnName + '" attr="' + data[index].userId
 				+ '" class="agent-dropdown-item">' + data[index].displayName + ' &lt;' + data[index].emailId + '&gt;</div>';
 		}
 		htmlData += '</div></div>';
@@ -133,6 +132,7 @@ $(document).ready(function(){
 		element.val($(this).text());
 		element.attr('agent-id', $(this).attr('attr'));
 		element.attr('column-name', $(this).attr('column-name'));
+		element.attr('email-id', $(this).attr('email-id'));
 		$('.agent-dropdown-cont').remove();
 	});
 	

@@ -943,7 +943,7 @@ public class EmailServicesImpl implements EmailServices
     @Async
     @Override
     public void sendSurveyCompletionMail( String recipientMailId, String displayName, String agentName, String agentEmail,
-        String agentProfileName ) throws InvalidInputException, UndeliveredEmailException
+        String agentProfileName , String logoUrl ) throws InvalidInputException, UndeliveredEmailException
     {
         if ( recipientMailId == null || recipientMailId.isEmpty() ) {
             LOG.error( "Recipient email Id is empty or null for sending survey completion mail " );
@@ -962,8 +962,14 @@ public class EmailServicesImpl implements EmailServices
         FileContentReplacements messageBodyReplacements = new FileContentReplacements();
         messageBodyReplacements.setFileName( EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER
             + EmailTemplateConstants.SURVEY_COMPLETION_MAIL_BODY );
-        messageBodyReplacements.setReplacementArgs( Arrays.asList( appLogoUrl, displayName, agentName, agentName, appBaseUrl,
-            agentProfileName, appBaseUrl, agentProfileName, agentName ) );
+        if(logoUrl != null && !logoUrl.isEmpty()){
+        	messageBodyReplacements.setReplacementArgs( Arrays.asList( logoUrl, displayName, agentName, agentName, appBaseUrl,
+                    agentProfileName, appBaseUrl, agentProfileName, agentName ) );
+        }else{
+        	messageBodyReplacements.setReplacementArgs( Arrays.asList( appLogoUrl, displayName, agentName, agentName, appBaseUrl,
+                    agentProfileName, appBaseUrl, agentProfileName, agentName ) );
+        }
+        
 
         LOG.debug( "Calling email sender to send mail" );
         emailSender.sendEmailWithBodyReplacements( emailEntity, subjectFileName, messageBodyReplacements );
@@ -1177,7 +1183,7 @@ public class EmailServicesImpl implements EmailServices
     @Async
     @Override
     public void sendSocialPostReminderMail( String recipientMailId, String agentPhone, String agentTitle, String companyName,
-        String displayName, String agentName, String links ) throws InvalidInputException, UndeliveredEmailException
+        String displayName, String agentName, String links , String logoUrl ) throws InvalidInputException, UndeliveredEmailException
     {
         if ( recipientMailId == null || recipientMailId.isEmpty() ) {
             LOG.error( "Recipient email Id is empty or null for sending survey completion mail " );
@@ -1198,7 +1204,11 @@ public class EmailServicesImpl implements EmailServices
         FileContentReplacements messageBodyReplacements = new FileContentReplacements();
         messageBodyReplacements.setFileName( EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER
             + EmailTemplateConstants.SOCIALPOST_REMINDER_MAIL_BODY );
-        messageBodyReplacements.setReplacementArgs( Arrays.asList( appLogoUrl, displayName, links, "", agentSignature ) );
+        if(logoUrl != null && !logoUrl.isEmpty()){
+            messageBodyReplacements.setReplacementArgs( Arrays.asList( logoUrl, displayName, links, "", agentSignature ) );        	
+        }else{
+            messageBodyReplacements.setReplacementArgs( Arrays.asList( appLogoUrl, displayName, links, "", agentSignature ) );        	
+        }
 
         LOG.debug( "Calling email sender to send mail" );
         emailSender.sendEmailWithBodyReplacements( emailEntity, subjectFileName, messageBodyReplacements );
