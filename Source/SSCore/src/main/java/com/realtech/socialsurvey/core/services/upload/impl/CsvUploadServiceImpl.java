@@ -1568,8 +1568,10 @@ public class CsvUploadServiceImpl implements CsvUploadService {
 	@Override
 	public List<FileUpload> getFilesToBeUploaded() throws NoRecordsFetchedException {
 		LOG.info("Check if files need to be uploaded");
-		List<FileUpload> filesToBeUploaded = fileUploadDao.findByColumn(FileUpload.class, CommonConstants.STATUS_COLUMN,
-				CommonConstants.STATUS_ACTIVE);
+		Map<String, Object> queries = new HashMap<>();
+		queries.put(CommonConstants.FILE_UPLOAD_TYPE_COLUMN, CommonConstants.FILE_UPLOAD_HIERARCHY_TYPE);
+		queries.put(CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_ACTIVE);
+		List<FileUpload> filesToBeUploaded = fileUploadDao.findByKeyValue(FileUpload.class, queries);
 		if (filesToBeUploaded == null || filesToBeUploaded.isEmpty()) {
 			throw new NoRecordsFetchedException("No files to be uploaded");
 		}
