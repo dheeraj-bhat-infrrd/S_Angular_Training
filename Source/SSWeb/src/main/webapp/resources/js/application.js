@@ -2680,6 +2680,8 @@ function hideRegionEdit(regionId) {
 function showBranchEdit(branchId) {
 	var url = "./getofficeeditpage.do?branchId="+branchId;
 	callAjaxGET(url, function(data){
+		$('.td-branch-edit').parent().hide();
+		$('.td-branch-edit').html('');
 		showBranchEditCallBack(data, branchId);
 	}, true);
 }
