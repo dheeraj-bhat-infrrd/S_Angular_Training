@@ -4,11 +4,13 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
+
 import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrDocumentList;
 import org.slf4j.Logger;
@@ -20,6 +22,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
+
 import com.google.gson.Gson;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.entities.AgentSettings;
@@ -48,8 +51,10 @@ import com.realtech.socialsurvey.core.services.organizationmanagement.ProfileNot
 import com.realtech.socialsurvey.core.services.organizationmanagement.UserManagementService;
 import com.realtech.socialsurvey.core.services.search.SolrSearchService;
 import com.realtech.socialsurvey.core.services.search.exception.SolrException;
+import com.realtech.socialsurvey.core.services.surveybuilder.SurveyHandler;
 import com.realtech.socialsurvey.web.common.ErrorCodes;
 import com.realtech.socialsurvey.web.common.ErrorResponse;
+
 import ezvcard.Ezvcard;
 import ezvcard.VCard;
 import ezvcard.VCardVersion;
@@ -76,6 +81,8 @@ public class ProfileController {
 	private UserManagementService userManagementService;
 	@Autowired
 	private SolrSearchService solrSearchService;
+	@Autowired
+    private SurveyHandler surveyHandler;
 
 	@Autowired
 	private EmailServices emailServices;
@@ -1567,6 +1574,7 @@ public class ProfileController {
 		String reason = request.getParameter("reportText");
 		String reporterName = request.getParameter("reporterName");
 		String reporterEmail = request.getParameter("reporterEmail");
+		String surveyMongoId = request.getParameter("surveyMongoId");
 		
 		try {
 			long agentId = 0;
@@ -1581,6 +1589,10 @@ public class ProfileController {
 				LOG.error("NumberFormatException caught in reportAbuse() while converting agentId.");
 				throw e;
 			}
+			
+			if (surveyMongoId == null || surveyMongoId.isEmpty()) {
+				throw new InvalidInputException("Invalid value (Null/Empty) found for surveyMongoId.");
+			}
 
 			String customerName = firstName  + " " + lastName;
 			String agentName = "";
@@ -1591,6 +1603,9 @@ public class ProfileController {
 				LOG.info("Solr Exception occured while fetching agent name. Nested exception is ", e);
 				throw e;
 			}
+			
+			//make survey as abusive
+			surveyHandler.updateSurveyAsAbusive(surveyMongoId);
 
 			// Calling email services method to send mail to the Application level admin.
 			emailServices.sendReportAbuseMail(applicationAdminEmail, applicationAdminName, agentName, customerName.replaceAll("null", ""),

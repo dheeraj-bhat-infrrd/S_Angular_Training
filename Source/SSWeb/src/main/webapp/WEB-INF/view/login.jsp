@@ -105,7 +105,6 @@ $(document).ready(function(){
 	});
 	
 	function loginUser() {
-		console.log("submitting login form");
 		if(validateLoginForm('login-form')){
 			$('#frm-login').submit();
 			showOverlay();

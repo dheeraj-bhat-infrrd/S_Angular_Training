@@ -96,6 +96,7 @@
 				$.ajax({
 					url : "./sendsurveyinvite.do",
 					type : "GET",
+					cache : false,
 					data : payload,
 					dataType : "text",
 					async : true,
