@@ -1335,7 +1335,7 @@ public class SocialManagementController
             try {
                 if ( setting != null )
                     if ( !socialManagementService.updateStatusIntoFacebookPage( setting, facebookMessage,
-                        requestUtils.getRequestServerName( request ) ) )
+                        requestUtils.getRequestServerName( request ) , user.getCompany().getCompanyId()) )
                         facebookNotSetup = false;
             } catch ( FacebookException | InvalidInputException e ) {
                 LOG.error(
@@ -1389,15 +1389,16 @@ public class SocialManagementController
             String custDisplayName = emailFormatHelper.getCustomerDisplayNameForEmail(custFirstName, custLastName);
             List<OrganizationUnitSettings> settings = socialManagementService.getBranchAndRegionSettingsForUser( user
                 .getUserId() );
-            String twitterMessage = rating + "-Star Survey Response from " + custDisplayName + " for " + agentName
+            /*String twitterMessage = rating + "-Star Survey Response from " + custDisplayName + " for " + agentName
                 + " on @SocialSurveyMe - view at " + applicationBaseUrl + CommonConstants.AGENT_PROFILE_FIXED_URL
-                + agentProfileLink;
+                + agentProfileLink;*/
+            String twitterMessage = String.format(CommonConstants.TWITTER_MESSAGE, CommonConstants.RANKING_FORMAT_TWITTER.format(rating), custDisplayName, agentName, "@SocialSurveyMe") + applicationBaseUrl + CommonConstants.AGENT_PROFILE_FIXED_URL + agentProfileLink;
             twitterMessage = twitterMessage.replaceAll( "null", "" );
 
             for ( OrganizationUnitSettings setting : settings ) {
                 try {
                     if ( setting != null )
-                        if ( !socialManagementService.tweet( setting, twitterMessage ) )
+                        if ( !socialManagementService.tweet( setting, twitterMessage, user.getCompany().getCompanyId() ) )
                             twitterNotSetup = false;
                 } catch ( TwitterException e ) {
                     LOG.error(

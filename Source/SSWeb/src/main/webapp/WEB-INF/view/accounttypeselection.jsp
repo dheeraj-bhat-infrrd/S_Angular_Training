@@ -388,7 +388,6 @@
 	<script>
 		$(document).ready(function(){
 			var message = '<c:out value="${message}"/>';
-			console.log("Showing toast message : " + message);
 			showErrorMobileAndWeb(message);
 		});
 	</script>
@@ -401,10 +400,8 @@ function selectAccountType(accountType, paymentAmount, skippayment) {
 	if ($(this).attr('data-status') == 'disabled') {
 		return;
 	}
-	console.log("selecting and saving account type");
 	$('#account-type').val(accountType);
 
-	console.log("skip payment "+skippayment);
 	var url = "./addaccounttype.do";
 	var $form = $("#account-type-selection-form");
 	var payLoad = $form.serialize();
@@ -415,10 +412,8 @@ function selectAccountType(accountType, paymentAmount, skippayment) {
 		data : payLoad,
 		success : function(data) {
 			if(skippayment == undefined || Boolean(skippayment) != true){
-				console.log("showing payment screen");
 				selectAccountTypeCallBack(data, accountType, paymentAmount);
 			}else{
-				console.log("skipping payment");
             	location.href="./landing.do";
 			}
 		},
@@ -435,7 +430,6 @@ function selectAccountType(accountType, paymentAmount, skippayment) {
 function makePaidUpgrade(accountType,paymentAmount){
 	/* show the progress icon */
     showOverlay();
-	console.log("upgrading to paid account");
     $('#account-type').val(accountType);
     
     var url = "./paymentpage.do";
@@ -454,17 +448,14 @@ function makePaidUpgrade(accountType,paymentAmount){
 				redirectToLoginPageOnSessionTimeOut(e.status);
 				return;
 			}
-            console.error("error : " + e);
         }
     });
 }
 
 function selectAccountTypeCallBack(data,accountType,paymentAmount) {
 	showOverlay();
-	console.log("callback for selectAccountType called");
 	var paidUpgrade = '<c:out value="${upgrade}"/>';
     if(accountType == 5 && data == ""){
-    	console.log("Subscribing for a free account");
     	var url = "./subscribe.do";
         var $form = $("#account-type-selection-form");
         var payLoad = $form.serialize();
@@ -497,7 +488,6 @@ function selectAccountTypeCallBack(data,accountType,paymentAmount) {
         $("#pu-acc-type-val").html(selectedAccountType);
         $("#pu-acc-amount-val").html(paymentAmount);
     }
-    console.log("callback for selectAccountType finished");
 }
 
 function confirmUpgradation(accountType){
@@ -505,7 +495,6 @@ function confirmUpgradation(accountType){
 		return;
 	}
 
-	console.log("Returning the upgrade confirmation page");
 	data = "accounttype=" + String(accountType);
    	$('.overlay-payment').hide();
 	$('#payment-section').html("");
@@ -537,7 +526,6 @@ function confirmUpgradation(accountType){
 }
 
 function upgradeAccountType(accountType) {
-	console.log("selecting and upgrading account type");
 	data = "accounttype=" + String(accountType);
 	var url = "./upgradeplan.do";
 
@@ -563,23 +551,16 @@ function upgradeAccountType(accountType) {
 
 function showMessage(data){
 	var jsonData = JSON.parse(data);
-	console.log("Data recieved : " + jsonData);
 	if(jsonData["success"] == 1){
-		console.log("Account upgrade successful. Redirecting to dashboard");
 		$('#overlay-toast').html(jsonData["message"]);
-		console.log("Added toast message. Showing it now");
 		showToast();
-		console.log("Finished showing the toast");
 		setTimeout(function (){location.href = "./landing.do";}, 4000);
 	}
 	else{
-		console.error("Error occured while upgrading. ");
 		$('.overlay-payment').hide();
 		hideOverlay();
 		$('#overlay-toast').html(jsonData["message"]);
-		console.log("Added toast message. Showing it now");
 		showToast();
-		console.log("Finished showing the toast");
 	}
 }
 

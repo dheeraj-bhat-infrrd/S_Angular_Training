@@ -191,6 +191,23 @@ public class OrganizationManagementController {
 			}
 			catch (InvalidInputException e) {
 				try {
+					
+					if(companyName != null && !companyName.isEmpty() ){
+                		companyName = companyName.trim();
+                	}
+                	if(address1 != null && !address1.isEmpty() ){
+                		address1 = address1.trim();
+                	}
+                	if(address2 != null && !address2.isEmpty() ){
+                		address2 = address2.trim();
+                	}
+                	if(state != null && !state.isEmpty() ){
+                		state = state.trim();
+                	}
+                	if(country != null && !country.isEmpty() ){
+                		country = country.trim();
+                	}
+					
 					redirectAttributes.addFlashAttribute("verticals", organizationManagementService.getAllVerticalsMaster());
 					redirectAttributes.addFlashAttribute("companyName", companyName);
 					redirectAttributes.addFlashAttribute("address1", address1);

@@ -100,7 +100,7 @@ public interface SolrSearchService
     public void addUserToSolr( User user ) throws SolrException;
 
 
-    public String searchUsersByLoginNameOrName( String pattern, long companyId ) throws InvalidInputException, SolrException,
+    public SolrDocumentList searchUsersByLoginNameOrName( String pattern, long companyId, int startIndex, int batchSize ) throws InvalidInputException, SolrException,
         MalformedURLException;
 
 

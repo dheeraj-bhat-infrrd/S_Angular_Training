@@ -394,9 +394,10 @@
 							<%-- <input id="disclaimer-text" textarea class="float-left lp-con-row-item blue-text prof-editable-disclaimer"
 								value="${disclaimer}" placeholder='<spring:message code="label.disclaimer.placeholder.key"/>'>
 							<input id="disclaimer-default" type="hidden" value="${disclaimer}"> --%>
-							<textarea class="pe-whitespace sb-txtarea" id="disclaimer-text" placeholder="Add a Disclaimer">
-								<c:out value="${disclaimer}" />
-							</textarea>
+							<c:if test="${not empty disclaimer }">
+								<c:set value="${fn:trim(disclaimer)}" var="disclaimerVal"></c:set>
+							</c:if>
+							<textarea class="pe-whitespace sb-txtarea disclaimer-text" id="disclaimer-text" placeholder="Add a Disclaimer">${disclaimerVal}</textarea>
 						</div>
 					</div>
 				</div>

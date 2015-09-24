@@ -1730,6 +1730,12 @@ public class DashboardController
                         throw new InvalidInputException( "Agent id can not be null" );
                     }
                     User currentUser = userManagementService.getUserByUserId( currentAgentId );
+                    String currentUserEmailId = currentUser.getEmailId();
+                    //check if agent mail id is not same as recipent email id
+                    if(currentUserEmailId.equals(recipient.getEmailId())){
+                    	LOG.error("agent email id and recipent email id is same for agent " +currentUser.getFirstName());
+                    	throw new InvalidInputException( "Recipent email id can not be same as agent email id" );
+                    }
                     if ( surveyHandler.getPreInitiatedSurvey( agentId, recipient.getEmailId(), recipient.getFirstname(),
                         recipient.getLastname() ) == null )
                         surveyHandler.sendSurveyInvitationMail( recipient.getFirstname(), recipient.getLastname(),
@@ -1877,7 +1883,8 @@ public class DashboardController
         String lastName = request.getParameter( "lastName" );
         String review = request.getParameter( "review" );
         String reason = request.getParameter( "reportText" );
-
+        String surveyMongoId = request.getParameter("surveyMongoId");
+        
         try {
             long agentId = 0;
             try {
@@ -1890,6 +1897,10 @@ public class DashboardController
                 LOG.error( "NumberFormatException caught in reportAbuse() while converting agentId." );
                 throw e;
             }
+            
+            if (surveyMongoId == null || surveyMongoId.isEmpty()) {
+				throw new InvalidInputException("Invalid value (Null/Empty) found for surveyMongoId.");
+			}
 
             String customerName = firstName + " " + lastName;
             String agentName = "";
@@ -1899,6 +1910,9 @@ public class DashboardController
                 LOG.info( "Solr Exception occured while fetching agent name. Nested exception is ", e );
                 throw e;
             }
+            
+            //make survey as abusive
+			surveyHandler.updateSurveyAsAbusive(surveyMongoId);
 
             // Calling email services method to send mail to the Application
             // level admin.

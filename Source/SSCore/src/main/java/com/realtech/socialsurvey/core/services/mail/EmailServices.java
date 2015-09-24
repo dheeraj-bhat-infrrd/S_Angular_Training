@@ -1,5 +1,7 @@
 package com.realtech.socialsurvey.core.services.mail;
 
+import java.util.Map;
+
 import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
 import com.realtech.socialsurvey.core.entities.SurveyPreInitiation;
 import com.realtech.socialsurvey.core.entities.User;
@@ -178,7 +180,7 @@ public interface EmailServices {
 
     public void sendSurveyCompletionMail(String recipientMailId,
             String displayName, String agentName, String agentEmail,
-            String agentProfileName) throws InvalidInputException,
+            String agentProfileName , String logoUrl) throws InvalidInputException,
             UndeliveredEmailException;
 
     /**
@@ -230,7 +232,7 @@ public interface EmailServices {
 
     public void sendSocialPostReminderMail(String recipientMailId,
             String agentPhone, String agentTitle, String companyName,
-            String displayName, String agentName, String links)
+            String displayName, String agentName, String links  , String logoUrl)
             throws InvalidInputException, UndeliveredEmailException;
 
     /**
@@ -368,16 +370,18 @@ public interface EmailServices {
             UndeliveredEmailException;
 
     public void sendCorruptDataFromCrmNotificationMail(String firstName,
-            String lastName, String recipientEmail, String attachmentPath)
+            String lastName, String recipientEmail, Map<String , String > attachmentsDetails)
             throws InvalidInputException, UndeliveredEmailException;
 
     public void sendRecordsNotUploadedCrmNotificationMail(String firstName,
-            String lastName, String recipientEmail, String attachmentPath)
+            String lastName, String recipientEmail, Map<String , String > attachmentsDetails)
             throws InvalidInputException, UndeliveredEmailException;
 
     public void sendAgentSurveyReminderMail(String recipientMailId,
             SurveyPreInitiation survey) throws InvalidInputException,
             UndeliveredEmailException;
+    
+    public void sendHelpMailToAdmin( User user ,  String displayName ,  String mailSubject, String messageBodyText, String recipientMailId, Map<String , String > attachmentsDetails ) throws InvalidInputException, UndeliveredEmailException;
 
     /**
      * Method to send survey reminder when the resend button is manually clicked
