@@ -118,13 +118,17 @@ $(document).ready(function(){
 	function appendAgentDropDown(data, element, columnName) {
 		$('.agent-dropdown-wrapper').remove();
 		var htmlData = '<div class="agent-dropdown-wrapper">';
-		htmlData += '<div class="agent-dropdown-cont">';
+		htmlData += '<div id="agent-dropdown-cont" class="agent-dropdown-cont">';
 		for (var index = 0; index < data.length; index++) {
 			htmlData += '<div column-name="' + columnName + '" attr="' + data[index].userId
 				+ '" class="agent-dropdown-item">' + data[index].displayName + ' &lt;' + data[index].emailId + '&gt;</div>';
 		}
 		htmlData += '</div></div>';
 		$(element).parent().append(htmlData);
+		$('#agent-dropdown-cont').perfectScrollbar({
+			suppressScrollX : true
+		});
+		$('#agent-dropdown-cont').perfectScrollbar('update');
 	}
 	
 	$(document).on('click', '.agent-dropdown-item', function(e) {
