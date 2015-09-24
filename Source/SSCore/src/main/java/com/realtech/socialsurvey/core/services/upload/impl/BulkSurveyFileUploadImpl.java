@@ -24,6 +24,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
+import com.realtech.socialsurvey.core.commons.Utils;
 import com.realtech.socialsurvey.core.dao.GenericDao;
 import com.realtech.socialsurvey.core.entities.FileUpload;
 import com.realtech.socialsurvey.core.entities.SurveyUploadVO;
@@ -50,6 +51,9 @@ public class BulkSurveyFileUploadImpl implements BulkSurveyFileUpload {
 
 	@Value("${FILEUPLOAD_DIRECTORY_LOCATION}")
 	private String fileDirectory;
+	
+	@Value("${MASK_EMAIL_ADDRESS}")
+	private String maskEmail;
 
 	@Autowired
 	private SurveyHandler surveyHandler;
@@ -59,6 +63,9 @@ public class BulkSurveyFileUploadImpl implements BulkSurveyFileUpload {
 
 	@Autowired
 	private GenericDao<FileUpload, Long> fileUploadDao;
+	
+	@Autowired
+	private Utils utils;
 
 	private List<String> uploadErrors;
 
@@ -148,7 +155,11 @@ public class BulkSurveyFileUploadImpl implements BulkSurveyFileUpload {
 					else if (cell.getColumnIndex() == CUSTOMER_EMAIL_INDEX) {
 						if (cell.getCellType() != XSSFCell.CELL_TYPE_BLANK) {
 							if (!cell.getStringCellValue().isEmpty()) {
-								surveyUploadVO.setCustomerEmailId(cell.getStringCellValue().trim());
+								String emailId = cell.getStringCellValue().trim();
+								if(maskEmail.equals(CommonConstants.YES_STRING)){
+									emailId = utils.maskEmailAddress(emailId); 
+								}
+								surveyUploadVO.setCustomerEmailId(emailId);
 							}
 							else {
 								LOG.error("Customer email address is not present");
