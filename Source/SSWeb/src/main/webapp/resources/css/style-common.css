@@ -6894,6 +6894,8 @@ a.sq-btn-post-social:hover, a.sq-btn-post-social:visited {
 
 .agent-dropdown-cont {
 	border: 1px solid #dcdcdc;
+	max-height: 300px;
+	position: relative;
 }
 
 .agent-dropdown-item {
