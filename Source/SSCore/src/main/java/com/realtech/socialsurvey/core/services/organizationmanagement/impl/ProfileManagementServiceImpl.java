@@ -3328,20 +3328,19 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 
 	@Override
 	public void updateZillowFeed(OrganizationUnitSettings profile, String collection) throws InvalidInputException {
+		if (profile == null || collection == null || collection.isEmpty()) {
+			LOG.info("Invalid parameters passed to updateZillowFeed for fetching zillow feed");
+			throw new InvalidInputException("Invalid parameters passed to updateZillowFeed for fetching zillow feed");
+		}
 		LOG.info("Method to update zillow feed called for ID :" + profile.getIden() + " of collection : " + collection);
-		SocialMediaTokens token = profile.getSocialMediaTokens();
-		token = socialManagementService.checkOrAddZillowLastUpdated(token);
-		profile.setSocialMediaTokens(token);
-		String lastUpdated = token.getZillowToken().getLastUpdated();
-		String currentTime = new Timestamp(System.currentTimeMillis()).toString();
-		long oneDay = 1 * 24 * 60 * 60 * 1000;
-		Timestamp oneDayBack = new Timestamp(System.currentTimeMillis() - oneDay);
-		if (lastUpdated == null || lastUpdated.isEmpty() || Timestamp.valueOf(lastUpdated).before(oneDayBack)) {
-			LOG.debug("Updating zillow feed.");
+		if (profile.getSocialMediaTokens() != null && profile.getSocialMediaTokens().getZillowToken() != null) {
+			// fetching zillow feed
+			LOG.debug("Fetching zillow feed for " + profile.getId() + " from " + collection);
 			fetchFeedFromZillow(profile, collection);
-			token.getZillowToken().setLastUpdated(currentTime);
-			token = socialManagementService.updateSocialMediaTokens(collection, profile, token);
-			profile.setSocialMediaTokens(token);
+		}
+		else {
+			LOG.info("Zillow is not added for the profile");
+			throw new InvalidInputException("Zillow is not added for the profile");
 		}
 		LOG.info("Method to update zillow feed finished.");
 	}
@@ -3365,79 +3364,85 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 					String responseString = null;
 					ZillowToken zillowToken = token.getZillowToken();
 					String zillowScreenName = zillowToken.getZillowScreenName();
-					Response response = zillowIntegrationApi.fetchZillowReviewsByScreennameWithMaxCount(zwsId, zillowScreenName);
-					if (response != null) {
-						responseString = new String(((TypedByteArray) response.getBody()).getBytes());
+					if (zillowScreenName == null || zillowScreenName.isEmpty()) {
+						LOG.debug("Old zillow url. Modify and get the proper screen name. But for now bypass and do nothing");
+						// TODO: Convert to proper format from the old url format
 					}
-					if (responseString != null) {
-						Map<String, Object> map = null;
-						try {
-							map = convertJsonStringToMap(responseString);
+					else {
+						Response response = zillowIntegrationApi.fetchZillowReviewsByScreennameWithMaxCount(zwsId, zillowScreenName);
+						if (response != null) {
+							responseString = new String(((TypedByteArray) response.getBody()).getBytes());
 						}
-						catch (JsonParseException e) {
-							LOG.error("Exception caught " + e.getMessage());
-						}
-						catch (JsonMappingException e) {
-							LOG.error("Exception caught " + e.getMessage());
-						}
-						catch (IOException e) {
-							LOG.error("Exception caught " + e.getMessage());
-						}
+						if (responseString != null) {
+							Map<String, Object> map = null;
+							try {
+								map = convertJsonStringToMap(responseString);
+							}
+							catch (JsonParseException e) {
+								LOG.error("Exception caught " + e.getMessage());
+							}
+							catch (JsonMappingException e) {
+								LOG.error("Exception caught " + e.getMessage());
+							}
+							catch (IOException e) {
+								LOG.error("Exception caught " + e.getMessage());
+							}
 
-						if (map != null) {
-							Map<String, Object> responseMap = new HashMap<String, Object>();
-							Map<String, Object> resultMap = new HashMap<String, Object>();
-							Map<String, Object> proReviews = new HashMap<String, Object>();
-							List<HashMap<String, Object>> reviews = new ArrayList<HashMap<String, Object>>();
-							responseMap = (HashMap<String, Object>) map.get("response");
-							if (responseMap != null) {
-								resultMap = (HashMap<String, Object>) responseMap.get("results");
-								if (resultMap != null) {
-									proReviews = (HashMap<String, Object>) resultMap.get("proReviews");
-									if (proReviews != null) {
-										reviews = (List<HashMap<String, Object>>) proReviews.get("review");
-										if (reviews != null) {
-											for (HashMap<String, Object> review : reviews) {
-												String sourceId = (String) review.get("reviewURL");
-												SurveyDetails surveyDetails = surveyHandler.getSurveyDetailsBySourceIdAndMongoCollection(sourceId,
-														profile.getIden(), collectionName);
-												if (surveyDetails == null) {
-													surveyDetails = new SurveyDetails();
-													if (collectionName
-															.equalsIgnoreCase(MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION)) {
-														surveyDetails.setCompanyId(profile.getIden());
+							if (map != null) {
+								Map<String, Object> responseMap = new HashMap<String, Object>();
+								Map<String, Object> resultMap = new HashMap<String, Object>();
+								Map<String, Object> proReviews = new HashMap<String, Object>();
+								List<HashMap<String, Object>> reviews = new ArrayList<HashMap<String, Object>>();
+								responseMap = (HashMap<String, Object>) map.get("response");
+								if (responseMap != null) {
+									resultMap = (HashMap<String, Object>) responseMap.get("results");
+									if (resultMap != null) {
+										proReviews = (HashMap<String, Object>) resultMap.get("proReviews");
+										if (proReviews != null) {
+											reviews = (List<HashMap<String, Object>>) proReviews.get("review");
+											if (reviews != null) {
+												for (HashMap<String, Object> review : reviews) {
+													String sourceId = (String) review.get("reviewURL");
+													SurveyDetails surveyDetails = surveyHandler.getSurveyDetailsBySourceIdAndMongoCollection(
+															sourceId, profile.getIden(), collectionName);
+													if (surveyDetails == null) {
+														surveyDetails = new SurveyDetails();
+														if (collectionName
+																.equalsIgnoreCase(MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION)) {
+															surveyDetails.setCompanyId(profile.getIden());
+														}
+														else if (collectionName
+																.equalsIgnoreCase(MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION)) {
+															surveyDetails.setRegionId(profile.getIden());
+														}
+														else if (collectionName
+																.equalsIgnoreCase(MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION)) {
+															surveyDetails.setBranchId(profile.getIden());
+														}
+														else if (collectionName
+																.equalsIgnoreCase(MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION)) {
+															surveyDetails.setAgentId(profile.getIden());
+														}
+														String createdDate = (String) review.get("reviewDate");
+														surveyDetails.setCompleteProfileUrl((String) review.get("reviewerLink"));
+														surveyDetails.setCustomerFirstName((String) review.get("reviewer"));
+														surveyDetails.setReview((String) review.get("description"));
+														surveyDetails.setEditable(false);
+														surveyDetails.setStage(CommonConstants.SURVEY_STAGE_COMPLETE);
+														surveyDetails.setScore(Double.valueOf((String) review.get("rating")));
+														surveyDetails.setSource(CommonConstants.SURVEY_SOURCE_ZILLOW);
+														surveyDetails.setSourceId(sourceId);
+														surveyDetails.setModifiedOn(convertStringToDate(createdDate));
+														surveyDetails.setCreatedOn(convertStringToDate(createdDate));
+														surveyDetails.setAgreedToShare("true");
+														surveyDetails.setAbusive(false);
+														surveyHandler.insertSurveyDetails(surveyDetails);
 													}
-													else if (collectionName
-															.equalsIgnoreCase(MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION)) {
-														surveyDetails.setRegionId(profile.getIden());
-													}
-													else if (collectionName
-															.equalsIgnoreCase(MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION)) {
-														surveyDetails.setBranchId(profile.getIden());
-													}
-													else if (collectionName
-															.equalsIgnoreCase(MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION)) {
-														surveyDetails.setAgentId(profile.getIden());
-													}
-													String createdDate = (String) review.get("reviewDate");
-													surveyDetails.setCompleteProfileUrl((String) review.get("reviewerLink"));
-													surveyDetails.setCustomerFirstName((String) review.get("reviewer"));
-													surveyDetails.setReview((String) review.get("description"));
-													surveyDetails.setEditable(false);
-													surveyDetails.setStage(CommonConstants.SURVEY_STAGE_COMPLETE);
-													surveyDetails.setScore(Double.valueOf((String) review.get("rating")));
-													surveyDetails.setSource(CommonConstants.SURVEY_SOURCE_ZILLOW);
-													surveyDetails.setSourceId(sourceId);
-													surveyDetails.setModifiedOn(convertStringToDate(createdDate));
-													surveyDetails.setCreatedOn(convertStringToDate(createdDate));
-													surveyDetails.setAgreedToShare("true");
-													surveyDetails.setAbusive(false);
-													surveyHandler.insertSurveyDetails(surveyDetails);
 												}
 											}
 										}
-									}
 
+									}
 								}
 							}
 						}
