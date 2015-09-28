@@ -592,4 +592,7 @@ public interface ProfileManagementService
 	LockSettings fetchHierarchyLockSettings(long companyId, long branchId,
 			long regionId, String entityType) throws NonFatalException;
 
+
+	Date convertStringToDate(String dateString);
+
 }
