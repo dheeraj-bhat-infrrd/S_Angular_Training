@@ -144,7 +144,7 @@
                            <span class="label">share</span>
                        </button>
                         </span>
-						<c:if test="${not empty feedback.yelpProfileUrl}">
+						<!-- <c:if test="${not empty feedback.yelpProfileUrl}">
 							<span class="float-left ppl-share-icns icn-yelp" title="Yelp" data-link="${feedback.yelpProfileUrl}"></span>
 						</c:if>
 						<c:if test="${not empty feedback.zillowProfileUrl}">
@@ -155,7 +155,7 @@
 						</c:if>
 						<c:if test="${not empty feedback.realtorProfileUrl}">
 							<span class="float-left ppl-share-icns icn-realtor" title="Realtor" data-link="${feedback.realtorProfileUrl}"></span>
-						</c:if>
+						</c:if> -->
 					</div>
 					<div class="float-left icn-share icn-remove icn-rem-size hide" style="display: none;"></div>
 				</div>

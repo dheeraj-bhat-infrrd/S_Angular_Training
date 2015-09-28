@@ -1363,7 +1363,7 @@ public class CsvUploadServiceImpl implements CsvUploadService {
 					region.getRegionAddress2(), region.getRegionCountry(), region.getRegionCountryCode(), region.getRegionState(),
 					region.getRegionCity(), region.getRegionZipcode());
 			organizationManagementService.addNewBranch(adminUser, newRegion.getRegionId(), CommonConstants.YES, CommonConstants.DEFAULT_BRANCH_NAME,
-					CommonConstants.DEFAULT_ADDRESS, null, null, null, null, null, null);
+					null, null, null, null, null, null, null);
 		}
 		else {
 			LOG.error("admin user : " + adminUser.getEmailId() + " is not authorized to add regions");

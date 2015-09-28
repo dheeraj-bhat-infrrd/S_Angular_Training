@@ -339,7 +339,8 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
         LOG.debug( "Adding the default region" );
         // TODO:adding default comapany,state,city,zipcode as null
         Region region = addNewRegion( user, CommonConstants.DEFAULT_REGION_NAME, CommonConstants.YES,
-            CommonConstants.DEFAULT_ADDRESS, null, null, null, null, null, null );
+            null, null, null, null, null, null, null );
+        
         ProfilesMaster profilesMaster = userManagementService
             .getProfilesMasterById( CommonConstants.PROFILES_MASTER_REGION_ADMIN_PROFILE_ID );
 
@@ -354,7 +355,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
         LOG.debug( "Adding the default branch" );
         // TODO:setting default country,state,city,zipcode null
         Branch branch = addNewBranch( user, region.getRegionId(), CommonConstants.YES, CommonConstants.DEFAULT_BRANCH_NAME,
-            CommonConstants.DEFAULT_ADDRESS, null, null, null, null, null, null );
+            null, null, null, null, null, null, null );
         profilesMaster = userManagementService.getProfilesMasterById( CommonConstants.PROFILES_MASTER_BRANCH_ADMIN_PROFILE_ID );
 
         LOG.debug( "Creating user profile for branch admin" );
@@ -1891,7 +1892,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 
         LOG.debug( "Adding default branch for the new region created" );
         addNewBranch( user, region.getRegionId(), CommonConstants.YES, CommonConstants.DEFAULT_BRANCH_NAME,
-            CommonConstants.DEFAULT_ADDRESS, null, null, null, null, null, null );
+            null, null, null, null, null, null, null );
 
         /**
          * If userId or email is provided, call the service for adding and assigning user to the
@@ -3019,9 +3020,9 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
         if ( branchName == null || branchName.isEmpty() ) {
             throw new InvalidInputException( "Branch name is null in addNewBranch" );
         }
-        if ( branchAddress1 == null || branchAddress1.isEmpty() ) {
+        /*if ( branchAddress1 == null || branchAddress1.isEmpty() ) {
             throw new InvalidInputException( "Branch address is null in addNewBranch" );
-        }
+        }*/
         LOG.info( "Method add new branch called for regionId : " + regionId + " and branchName : " + branchName );
         Region region = null;
         LOG.debug( "Fetching region for branch to be added" );
