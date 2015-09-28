@@ -7,9 +7,9 @@
 		<div class="um-top-row cleafix">
 			<div class="clearfix um-top-form-wrapper">
 				<!-- set encompass details -->
-				<c:if test="${accountSettings != null && accountSettings.crm_info != null}">
+				<c:if test="${appSettings != null && appSettings.crm_info != null && appSettings.crm_info.crm_source == 'DOTLOOP'}">
 					<c:set var="dotloopapi"
-						value="${accountSettings.crm_info.api}" />
+						value="${appSettings.crm_info.api}" />
 				</c:if>
 				<form id="dotloop-form">
 					<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 um-panel-item">
