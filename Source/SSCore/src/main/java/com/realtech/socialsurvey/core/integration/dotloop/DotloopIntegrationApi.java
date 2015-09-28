@@ -26,4 +26,6 @@ public interface DotloopIntegrationApi
     public Response fetchLoopProfileDetail( @Header ( "Authorization") String authorizationHeader,
         @Path ( "profile-id") String profileId, @Path ( "loop-id") String loopId );
 
+    @GET("/profile/{profile-id}/loop/{loop-id}/participant")
+    public Response fetchLoopViewParticipants(@Header ("Authorization") String authorizationHeader, @Path ( "profile-id") String profileId, @Path ( "loop-id") String loopId);
 }

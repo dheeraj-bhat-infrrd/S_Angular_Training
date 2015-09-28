@@ -19,9 +19,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
-
 import javax.annotation.Resource;
-
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellStyle;
 import org.apache.poi.ss.usermodel.Row;
@@ -37,7 +35,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.DependsOn;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
-
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
@@ -4650,29 +4647,62 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 
     @Override
     @Transactional
-    public List<LoopProfileMapping> getLoopsByProfile( String profileId )
+    public long getLoopsCountByProfile( String profileId ) throws InvalidInputException
     {
+    	if(profileId == null || profileId.isEmpty()){
+    		LOG.error("Profile id is not passed to get loop count");
+    		throw new InvalidInputException("Profile id is not passed to get loop count");
+    	}
         LOG.debug( "Inside method getLoopsByProfile for profileId " + profileId );
-        List<LoopProfileMapping> loopProfileMappingList = loopProfileMappingDao.findByColumn( LoopProfileMapping.class,
-            "profileId", profileId );
-        return loopProfileMappingList;
+        Map<String, Object> queries = new HashMap<>();
+        queries.put(CommonConstants.KEY_DOTLOOP_PROFILE_ID_COLUMN, profileId);
+        long numberOfLoops = loopProfileMappingDao.findNumberOfRowsByKeyValue( LoopProfileMapping.class,
+            queries);
+        return numberOfLoops;
     }
 
 
     @Override
     @Transactional
-    public void saveLoopsForProfile( LoopProfileMapping loopProfileMapping )
+    public void saveLoopsForProfile( LoopProfileMapping loopProfileMapping ) throws InvalidInputException
     {
+    	if(loopProfileMapping == null){
+    		LOG.error("null loop profile mapping sent for insert");
+    		throw new InvalidInputException("null loop profile mapping sent for insert");
+    	}
         LOG.debug( "Inside method saveLoopsForProfile " );
         loopProfileMappingDao.save( loopProfileMapping );
 
     }
+    
+    @Override
+    @Transactional
+    public LoopProfileMapping getLoopByProfileAndLoopId(String profileId, String loopId) throws InvalidInputException{
+    	if(profileId == null || profileId.isEmpty() || loopId == null || loopId.isEmpty()){
+    		LOG.error("Profile id/ loop id is not set to fetch loop profile data");
+    		throw new InvalidInputException("Profile id/ loop id is not set to fetch loop profile data");
+    	}
+    	LOG.info("Getting loop for profile id: "+profileId+" and loop id: "+loopId);
+    	LoopProfileMapping loop = null;
+    	Map<String, Object> queries = new HashMap<>();
+    	queries.put(CommonConstants.KEY_DOTLOOP_PROFILE_ID_COLUMN, profileId);
+    	queries.put(CommonConstants.KEY_DOTLOOP_PROFILE_LOOP_ID_COLUMN, loopId);
+    	List<LoopProfileMapping> loops = loopProfileMappingDao.findByKeyValue(LoopProfileMapping.class, queries);
+    	if(loops != null && loops.size() > 0){
+    		loop = loops.get(CommonConstants.INITIAL_INDEX);
+    	}
+    	return loop;
+    }
 
 
     @Override
     @Transactional
-    public CompanyDotloopProfileMapping getCompanyDotloopMappingByCompanyIdAndProfileId( long companyId, String profileId )
+    public CompanyDotloopProfileMapping getCompanyDotloopMappingByCompanyIdAndProfileId( long companyId, String profileId ) throws InvalidInputException
     {
+    	if(companyId <= 0l || profileId == null || profileId.isEmpty()){
+    		LOG.error("Company id/ profile id is not provided to get company dotloop mapping");
+    		throw new InvalidInputException("Company id/ profile id is not provided to get company dotloop mapping");
+    	}
         LOG.debug( "Inside method getCompanyDotloopMappingByCompanyId for company " + companyId );
 
         Map<String, Object> queries = new HashMap<String, Object>();
@@ -4683,7 +4713,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
         if ( companyDotLoopProfileMappingList == null || companyDotLoopProfileMappingList.isEmpty() ) {
             return null;
         } else {
-            return companyDotLoopProfileMappingList.get( 0 );
+            return companyDotLoopProfileMappingList.get( CommonConstants.INITIAL_INDEX );
         }
 
     }
@@ -4692,8 +4722,12 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
     @Override
     @Transactional
     public CompanyDotloopProfileMapping saveCompanyDotLoopProfileMapping(
-        CompanyDotloopProfileMapping companyDotloopProfileMapping )
+        CompanyDotloopProfileMapping companyDotloopProfileMapping ) throws InvalidInputException
     {
+    	if(companyDotloopProfileMapping ==  null){
+    		LOG.error("Company dotloop profile mapping is null for insert");
+    		throw new InvalidInputException("Company dotloop profile mapping is null for insert");
+    	}
         LOG.debug( "Inside method saveCompanyDotloopProfileMapping " );
         return companyDotloopProfileMappingDao.save( companyDotloopProfileMapping );
 
@@ -4702,8 +4736,12 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 
     @Override
     @Transactional
-    public void updateCompanyDotLoopProfileMapping( CompanyDotloopProfileMapping companyDotloopProfileMapping )
+    public void updateCompanyDotLoopProfileMapping( CompanyDotloopProfileMapping companyDotloopProfileMapping ) throws InvalidInputException
     {
+    	if(companyDotloopProfileMapping == null){
+    		LOG.error("Company dotloop profile mapping is null for update");
+    		throw new InvalidInputException("Company dotloop profile mapping is null for update");
+    	}
         LOG.debug( "Inside method saveCompanyDotloopProfileMapping " );
         companyDotloopProfileMappingDao.update( companyDotloopProfileMapping );
 
@@ -4712,8 +4750,12 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 
     @Override
     @Transactional
-    public CompanyDotloopProfileMapping getCompanyDotloopMappingByProfileId( String profileId )
+    public CompanyDotloopProfileMapping getCompanyDotloopMappingByProfileId( String profileId ) throws InvalidInputException
     {
+    	if(profileId == null || profileId.isEmpty()){
+    		LOG.error("Profile id is null to fetch company dot loop mapping");
+    		throw new InvalidInputException("Profile id is null to fetch company dot loop mapping");
+    	}
         List<CompanyDotloopProfileMapping> companyDotloopProfileMappingList = companyDotloopProfileMappingDao.findByColumn(
             CompanyDotloopProfileMapping.class, "profileId", profileId );
         if ( companyDotloopProfileMappingList.isEmpty() ) {
@@ -4721,6 +4763,16 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
         } else {
             return companyDotloopProfileMappingList.get( 0 );
         }
+    }
+    
+    @Override
+    @Transactional
+    public List<OrganizationUnitSettings> getOrganizationUnitSettingsForCRMSource(String crmSource, String collectionName) throws InvalidInputException, NoRecordsFetchedException{
+    	LOG.info("Getting list of crm info for source: "+crmSource);
+    	List<OrganizationUnitSettings> organizationUnitSettingsList = null;
+    	organizationUnitSettingsList = organizationUnitSettingsDao.getOrganizationUnitListWithCRMSource(crmSource, collectionName);
+    	LOG.info("Returning organization unit settings list with provided crm list");
+    	return organizationUnitSettingsList;
     }
 
 }

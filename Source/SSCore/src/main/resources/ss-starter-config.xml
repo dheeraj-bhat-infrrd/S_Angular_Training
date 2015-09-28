@@ -244,8 +244,9 @@
 			<map>
 				<entry key="dotloopIntegrationApiBuilder" value-ref="dotloopIntegrationApiBuilder" />
 				<entry key="organizationManagementService" value-ref="organizationManagementService" />
-				<entry key="userManagementService" value-ref="userManagementService" />
 				<entry key="surveyHandler" value-ref="surveyHandler" />
+				<entry key="utils" value-ref="utils" />
+				<entry key="maskEmail" value="${MASK_EMAIL_ADDRESS}" />
 			</map>
 		</property>
 		<property name="durability" value="true" />
@@ -474,4 +475,7 @@
 	
 	<!-- CSV Upload reader -->
 	<bean id="surveyuploadHandler" class="com.realtech.socialsurvey.core.handler.CSVBulkSurveyInitiatorHandler" />
+	
+	<!-- Utils dependency -->
+	<bean id="utils" class="com.realtech.socialsurvey.core.commons.Utils" />
 </beans>

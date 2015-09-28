@@ -682,17 +682,9 @@ public interface CommonConstants
 
     public static final String AUTHORIZATION_HEADER = "Bearer ";
 
-    public static final String DOTLOOP_PROFILE_ID = "profileId";
-
-    public static final String DOTLOOP_PROFILE_ACTIVE = "active";
-
-    public static final String DOTLOOP_PROFILE_EMAIL_ADDRESS = "emailAddress";
-
-    public static final String DOTLOOP_PROFILE_NAME = "name";
-
-    public static final String DOTLOOP_PROFILE_LOOP_ID = "loopId";
-
-    public static final String DOTLOOP_PROFILE_LOOP_VIEW_ID = "loopViewId";
+    // dotloop db keys
+    public static final String KEY_DOTLOOP_PROFILE_ID_COLUMN = "profileId";
+    public static final String KEY_DOTLOOP_PROFILE_LOOP_ID_COLUMN = "loopId";
 
     // Social media message template constants
     public static final DecimalFormat RANKING_FORMAT_TWITTER = new DecimalFormat( "#.#" );

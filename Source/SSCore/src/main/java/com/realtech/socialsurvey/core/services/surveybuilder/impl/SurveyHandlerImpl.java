@@ -258,8 +258,12 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean {
 
     @Override
     @Transactional
-    public void saveSurveyPreInitiationObject( SurveyPreInitiation surveyPreInitiation )
+    public void saveSurveyPreInitiationObject( SurveyPreInitiation surveyPreInitiation ) throws InvalidInputException
     {
+    	if(surveyPreInitiation == null){
+    		LOG.info("SurveyPreInitiation object passed null for insert");
+    		throw new InvalidInputException("SurveyPreInitiation object passed null for insert");
+    	}
         LOG.debug( "Inside method saveSurveyPreInitiationObject " );
         surveyPreInitiationDao.save( surveyPreInitiation );
     }
