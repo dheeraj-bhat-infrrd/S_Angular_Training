@@ -1592,6 +1592,45 @@ public class UserManagementController
         LOG.info( "Method updateUserProfile() finished from UserManagementController" );
         return new Gson().toJson( statusMap );
     }
+    
+	@ResponseBody
+	@RequestMapping(value = "/deleteuserprofile", method = RequestMethod.POST)
+	public String deleteUserProfile(Model model, HttpServletRequest request) {
+		LOG.info("Method deleteUserProfile() called from UserManagementController");
+		try {
+			try {
+				User user = sessionHelper.getCurrentUser();
+				long profileId = Long.parseLong(request.getParameter("profileId"));
+				int status = CommonConstants.STATUS_INACTIVE;
+
+				userManagementService.updateUserProfile(user, profileId, status);
+				userManagementService.updateUserProfilesStatus(user, profileId);
+
+				// update user profiles in session if current user
+				User updatedUser = userManagementService.getUserByProfileId(profileId);
+				if (user.getUserId() == updatedUser.getUserId()) {
+					try {
+						sessionHelper.processAssignments(request.getSession(false), user);
+					}
+					catch (NonFatalException e) {
+						throw new NonFatalException("Exception occurred while processing user assignments in. Reason : " + e.getMessage(), e);
+					}
+				}
+			}
+			catch (NumberFormatException e) {
+				throw new NonFatalException("NumberFormatException while parsing profileId. Reason : " + e.getMessage(), e);
+			}
+			catch (InvalidInputException e) {
+				throw new NonFatalException("InvalidInputException while deleting profile. Reason : " + e.getMessage(), e);
+			}
+		}
+		catch (NonFatalException e) {
+			LOG.error("NonFatalException occurred while deleting UserProfile in UserManagementController. Reason : " + e.getMessage(), e);
+			return CommonConstants.ERROR;
+		}
+		LOG.info("Method deleteUserProfile() finished from UserManagementController");
+		return CommonConstants.SUCCESS_ATTRIBUTE;
+	}
 
 
     @ResponseBody
