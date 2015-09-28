@@ -3556,6 +3556,16 @@ function confirmDeleteUser(userId, adminId) {
 	$('#overlay-continue').attr("onclick", "deleteUser('" + userId + "');");
 }
 
+function confirmDeleteUserProfile(profileId) {
+	$('#overlay-main').show();
+	$('#overlay-continue').show();
+	$('#overlay-continue').html("Delete");
+	$('#overlay-cancel').html("Cancel");
+	$('#overlay-header').html("Delete User Profile");
+	$('#overlay-text').html("Are you sure you want to delete user profile?");
+	$('#overlay-continue').attr("onclick", "deleteUserProfile('" + profileId + "');");
+}
+
 /*
  * Function to deactivate a user and remove from company
  */
@@ -3598,6 +3608,23 @@ function deleteUser(userId) {
 	});
 }
 
+
+//Function to delete user profile
+function deleteUserProfile(profileId) {
+	showOverlay();
+	var payload = {
+		"profileId" : profileId
+	};
+	callAjaxPostWithPayloadData("./deleteuserprofile.do", function(data) {
+		if (data == "success") {
+			
+			//close the popup
+			$('#overlay-cancel').click();
+			// remove the tab from UI
+			$('#v-edt-tbl-row-' + profileId).remove();
+		}
+	}, payload, true);
+} 
 /*
  * Paint the user details form in the user management page
  */
@@ -3991,9 +4018,9 @@ function getUserAssignments(userId, element) {
             updateUserProfile(profileId, 1);
         });
 		
-		setTimeout(function() {
+		/*setTimeout(function() {
 			$('#profile-tbl-wrapper-' + userId).perfectScrollbar();
-		}, 1000);
+		}, 1000);*/
 
 		$(document).on('click', 'body', function() {
             $('.dd-droplist').slideUp(200);
@@ -4115,7 +4142,23 @@ function saveUserAssignmentCallBack(data) {
 	displayMessage(data);
 }
 
-// remove user
+// remove user profile
+$(document).on('click', '.v-icn-rem-userprofile', function() {
+	if ($(this).hasClass('v-tbl-icn-disabled')) {
+		return;
+	}
+
+	if($(this).parent().parent().children('.v-edt-tbl-row').length <= 1) {
+		$('#overlay-toast').html("One user assignment compulsory");
+		showToast();
+		return;
+	}
+	
+	var profileId = $(this).parent().data('profile-id');
+    confirmDeleteUserProfile(profileId);
+});
+
+//remove user
 $(document).on('click', '.v-icn-rem-user', function() {
 	if ($(this).hasClass('v-tbl-icn-disabled')) {
 		return;

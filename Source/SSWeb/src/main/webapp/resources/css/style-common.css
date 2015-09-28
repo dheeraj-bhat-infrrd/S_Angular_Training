@@ -5437,6 +5437,10 @@ tr.u-tbl-header td {
 	background: url(../images/rem_user.png) no-repeat center;
 }
 
+.v-icn-rem-userprofile {
+	background: url(../images/rem_user.png) no-repeat center;
+}
+
 .v-icn-edit-user {
 	background: url(../images/edit_user.png) no-repeat center;
 }
@@ -5545,7 +5549,7 @@ tr.u-tbl-header td {
 }
 
 .v-edt-tbl-assign-to {
-	width: 50%;
+	width: 65%;
 }
 
 .v-edt-tbl-role {
