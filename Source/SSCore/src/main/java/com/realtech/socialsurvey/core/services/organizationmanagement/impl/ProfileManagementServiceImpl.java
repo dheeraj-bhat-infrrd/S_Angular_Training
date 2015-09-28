@@ -3351,6 +3351,24 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 			// fetching zillow feed
 			LOG.debug("Fetching zillow feed for " + profile.getId() + " from " + collection);
 			fetchFeedFromZillow(profile, collection);
+			String entityType = "";
+			if (collection
+					.equalsIgnoreCase(MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION)) {
+				entityType = CommonConstants.COMPANY_ID_COLUMN;
+			}
+			else if (collection
+					.equalsIgnoreCase(MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION)) {
+				entityType = CommonConstants.REGION_ID_COLUMN;
+			}
+			else if (collection
+					.equalsIgnoreCase(MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION)) {
+				entityType = CommonConstants.BRANCH_ID_COLUMN;
+			}
+			else if (collection
+					.equalsIgnoreCase(MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION)) {
+				entityType = CommonConstants.AGENT_ID_COLUMN;
+			}
+			surveyHandler.deleteExcessZillowSurveysByEntity(entityType, profile.getIden());
 		}
 		else {
 			LOG.info("Zillow is not added for the profile");
@@ -3469,7 +3487,8 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 		}
 	}
 
-	private Date convertStringToDate(String dateString) {
+	@Override
+	public Date convertStringToDate(String dateString) {
 
 		DateFormat format = new SimpleDateFormat("MM/dd/yyyy", Locale.ENGLISH);
 		Date date;

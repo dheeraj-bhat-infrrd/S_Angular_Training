@@ -132,4 +132,10 @@ public interface SurveyDetailsDao
 
 
     public SurveyDetails getSurveyBySourceSourceIdAndMongoCollection( String surveySourceId, long iden, String collectionName );
+
+
+	void removeZillowSurveysByEntity(String entityType, long entityId);
+
+
+	void removeExcessZillowSurveysByEntity(String entityType, long entityId);
 }

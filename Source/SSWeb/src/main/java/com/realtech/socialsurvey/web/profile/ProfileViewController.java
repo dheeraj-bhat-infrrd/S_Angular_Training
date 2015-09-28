@@ -533,7 +533,9 @@ public class ProfileViewController
                 //individualProfile = (AgentSettings) profileManagementService.getIndividualByProfileName( agentProfileName );
                 if ( individualProfile.getSocialMediaTokens() != null
                     && individualProfile.getSocialMediaTokens().getZillowToken() != null )
-                    profileManagementService.updateZillowFeed( individualProfile, CommonConstants.AGENT_SETTINGS_COLLECTION );
+					profileManagementService.updateZillowFeed(
+							individualProfile,
+							CommonConstants.AGENT_SETTINGS_COLLECTION);
                 //set vertical name from the company
                 individualProfile.setVertical( user.getCompany().getVerticalsMaster().getVerticalName() );
 

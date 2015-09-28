@@ -4,8 +4,10 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
+
 import org.apache.http.NameValuePair;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
@@ -26,11 +28,13 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
+
 import retrofit.mime.TypedByteArray;
 import twitter4j.Twitter;
 import twitter4j.TwitterException;
 import twitter4j.auth.AccessToken;
 import twitter4j.auth.RequestToken;
+
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.Gson;
@@ -49,6 +53,7 @@ import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
 import com.realtech.socialsurvey.core.entities.ProfileStage;
 import com.realtech.socialsurvey.core.entities.Region;
 import com.realtech.socialsurvey.core.entities.SocialMediaTokens;
+import com.realtech.socialsurvey.core.entities.SurveyDetails;
 import com.realtech.socialsurvey.core.entities.TwitterToken;
 import com.realtech.socialsurvey.core.entities.User;
 import com.realtech.socialsurvey.core.entities.UserSettings;
@@ -66,11 +71,13 @@ import com.realtech.socialsurvey.core.services.organizationmanagement.UserManage
 import com.realtech.socialsurvey.core.services.settingsmanagement.SettingsSetter;
 import com.realtech.socialsurvey.core.services.social.SocialAsyncService;
 import com.realtech.socialsurvey.core.services.social.SocialManagementService;
+import com.realtech.socialsurvey.core.services.surveybuilder.SurveyHandler;
 import com.realtech.socialsurvey.core.utils.DisplayMessageConstants;
 import com.realtech.socialsurvey.core.utils.EmailFormatHelper;
 import com.realtech.socialsurvey.web.common.ErrorResponse;
 import com.realtech.socialsurvey.web.common.JspResolver;
 import com.realtech.socialsurvey.web.util.RequestUtils;
+
 import facebook4j.Account;
 import facebook4j.Facebook;
 import facebook4j.FacebookException;
@@ -168,6 +175,8 @@ public class SocialManagementController
     @Value ( "${ZILLOW_WEBSERVICE_ID}")
     private String zillowWebserviceId;
 
+    @Autowired
+	private SurveyHandler surveyHandler;
 
     /**
      * Returns the social authorization page
@@ -1638,7 +1647,7 @@ public class SocialManagementController
         User user = sessionHelper.getCurrentUser();
         String zillowScreenName = request.getParameter( "zillowProfileName" );
         OrganizationUnitSettings profileSettings = (OrganizationUnitSettings) session
-                .getAttribute( CommonConstants.USER_PROFILE_SETTINGS );
+                .getAttribute( CommonConstants.USER_ACCOUNT_SETTINGS );
         if ( zillowScreenName == null || zillowScreenName == "" ) {
             model.addAttribute( "Error", "Please provide either the zillow screen name or zillow emailadress" );
 
@@ -1651,7 +1660,9 @@ public class SocialManagementController
                 AccountType accountType = (AccountType) session.getAttribute( CommonConstants.ACCOUNT_TYPE_IN_SESSION );
                 long entityId = (long) session.getAttribute( CommonConstants.ENTITY_ID_COLUMN );
                 String entityType = (String) session.getAttribute( CommonConstants.ENTITY_TYPE_COLUMN );
-                if ( userSettings == null || entityType == null ) {
+                String collectionName = "";
+                
+                if ( userSettings == null || entityType == null || profileSettings == null) {
                     throw new InvalidInputException( "No user settings found in session" );
                 }
                 String errorCode = request.getParameter( "error" );
@@ -1660,12 +1671,34 @@ public class SocialManagementController
                     model.addAttribute( CommonConstants.ERROR, CommonConstants.YES );
                     return JspResolver.SOCIAL_AUTH_MESSAGE;
                 }
+                
+                LOG.debug("Deleting old zillow feed for company ID : " + entityId);
+                surveyHandler.deleteZillowSurveysByEntity(entityType, entityId);
+                
+                switch ( entityType ) {
+                case CommonConstants.AGENT_ID_COLUMN:
+                    collectionName = MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION;
+                    break;
+
+                case CommonConstants.BRANCH_ID_COLUMN:
+                	collectionName = MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION;
+                    break;
+
+                case CommonConstants.REGION_ID_COLUMN:
+                	collectionName = MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION;
+                    break;
+
+                case CommonConstants.COMPANY_ID_COLUMN:
+                	collectionName = MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION;
+                    break;
+
+            }
                 String jsonString = null;
                 if ( zillowScreenName.contains( "-" ) ) {
                     zillowScreenName = zillowScreenName.replace( "-", " " );
                 }
                 zillowScreenName = zillowScreenName.trim();
-                response = zillowIntegrationApi.fetchZillowReviewsByScreenname( zillowWebserviceId, zillowScreenName );
+                response = zillowIntegrationApi.fetchZillowReviewsByScreennameWithMaxCount( zillowWebserviceId, zillowScreenName );
 
                 Map<String, Object> map = null;
                 boolean updated = false;
@@ -1680,6 +1713,8 @@ public class SocialManagementController
                 Map<String, Object> messageMap = new HashMap<String, Object>();
                 Map<String, Object> resultMap = new HashMap<String, Object>();
                 Map<String, Object> proInfoMap = new HashMap<String, Object>();
+                Map<String, Object> proReviews = new HashMap<String, Object>();
+                List<HashMap<String, Object>> reviews = new ArrayList<HashMap<String, Object>>();
                 if ( map != null ) {
                     responseMap = (HashMap<String, Object>) map.get( "response" );
                     messageMap = (HashMap<String, Object>) map.get( "message" );
@@ -1695,6 +1730,50 @@ public class SocialManagementController
                             if ( proInfoMap != null ) {
                                 profileLink = (String) proInfoMap.get( "profileURL" );
                             }
+                            proReviews = (HashMap<String, Object>) resultMap.get("proReviews");
+							if (proReviews != null) {
+								reviews = (List<HashMap<String, Object>>) proReviews.get("review");
+								if (reviews != null) {
+									for (HashMap<String, Object> review : reviews) {
+										String sourceId = (String) review.get("reviewURL");
+										SurveyDetails surveyDetails = surveyHandler.getSurveyDetailsBySourceIdAndMongoCollection(
+												sourceId, entityId, collectionName);
+										if (surveyDetails == null) {
+											surveyDetails = new SurveyDetails();
+											if (collectionName
+													.equalsIgnoreCase(MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION)) {
+												surveyDetails.setCompanyId(entityId);
+											}
+											else if (collectionName
+													.equalsIgnoreCase(MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION)) {
+												surveyDetails.setRegionId(entityId);
+											}
+											else if (collectionName
+													.equalsIgnoreCase(MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION)) {
+												surveyDetails.setBranchId(entityId);
+											}
+											else if (collectionName
+													.equalsIgnoreCase(MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION)) {
+												surveyDetails.setAgentId(entityId);
+											}
+											String createdDate = (String) review.get("reviewDate");
+											surveyDetails.setCompleteProfileUrl((String) review.get("reviewerLink"));
+											surveyDetails.setCustomerFirstName((String) review.get("reviewer"));
+											surveyDetails.setReview((String) review.get("description"));
+											surveyDetails.setEditable(false);
+											surveyDetails.setStage(CommonConstants.SURVEY_STAGE_COMPLETE);
+											surveyDetails.setScore(Double.valueOf((String) review.get("rating")));
+											surveyDetails.setSource(CommonConstants.SURVEY_SOURCE_ZILLOW);
+											surveyDetails.setSourceId(sourceId);
+											surveyDetails.setModifiedOn(profileManagementService.convertStringToDate(createdDate));
+											surveyDetails.setCreatedOn(profileManagementService.convertStringToDate(createdDate));
+											surveyDetails.setAgreedToShare("true");
+											surveyDetails.setAbusive(false);
+											surveyHandler.insertSurveyDetails(surveyDetails);
+										}
+									}
+								}
+							}
                         }
                     }
                 }
@@ -1821,7 +1900,7 @@ public class SocialManagementController
             session.removeAttribute( CommonConstants.SOCIAL_REQUEST_TOKEN );
             model.addAttribute( CommonConstants.SUCCESS_ATTRIBUTE, CommonConstants.YES );
             model.addAttribute( "socialNetwork", "zillow" );
-            session.setAttribute( CommonConstants.USER_PROFILE_SETTINGS, profileSettings );
+            session.setAttribute( CommonConstants.USER_ACCOUNT_SETTINGS, profileSettings );
         }
         return JspResolver.SOCIAL_AUTH_MESSAGE;
     }
@@ -1886,7 +1965,7 @@ public class SocialManagementController
         String socialMedia = request.getParameter( "socialMedia" );
         HttpSession session = request.getSession();
         OrganizationUnitSettings profileSettings = (OrganizationUnitSettings) session
-                .getAttribute( CommonConstants.USER_PROFILE_SETTINGS );
+                .getAttribute( CommonConstants.USER_ACCOUNT_SETTINGS );
         try {
             if ( socialMedia == null || socialMedia.isEmpty() ) {
                 throw new InvalidInputException( "Social media can not be null or empty" );
@@ -1971,11 +2050,17 @@ public class SocialManagementController
                 userSettings.setAgentSettings( (AgentSettings) unitSettings );
             }
             profileSettings.setSocialMediaTokens(unitSettings.getSocialMediaTokens());
+            
+            //Remove zillow reviews on disconnect.
+            if(socialMedia.equals(CommonConstants.ZILLOW_SOCIAL_SITE)){
+            	LOG.debug("Deleting zillow feed for agent ID : " + entityId);
+                surveyHandler.deleteZillowSurveysByEntity(entityType, entityId);
+            }
         } catch ( NonFatalException e ) {
             LOG.error( "Exception occured in disconnectSocialNetwork() while disconnecting with the social Media." );
             return "failue";
         }
-        session.setAttribute( CommonConstants.USER_PROFILE_SETTINGS, profileSettings );
+        session.setAttribute( CommonConstants.USER_ACCOUNT_SETTINGS, profileSettings );
         return "success";
     }
 

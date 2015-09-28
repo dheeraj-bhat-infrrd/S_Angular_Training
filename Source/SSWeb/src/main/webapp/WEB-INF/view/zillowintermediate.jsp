@@ -34,7 +34,7 @@
 									<label class="zillow-input-label"><spring:message code="label.zillowconnect.key"/></label>
 									<div class="zillow-input-cont">
 										<span><spring:message code="label.zillowconnect.link.key"/></span>
-										<input class="zillow-input" name="zillowProfileName" type="text" autofocus="autofocus" placeholder='<spring:message code="label.zillowconnect.profileName.key"/>' value = "${ profileSettings.socialMediaTokens.zillowToken.zillowScreenName }">
+										<input class="zillow-input" name="zillowProfileName" type="text" autofocus="autofocus" placeholder='<spring:message code="label.zillowconnect.profileName.key"/>' value = "${ accountSettings.socialMediaTokens.zillowToken.zillowScreenName }">
 										<span>/</span>
 									</div>
 								</div>
