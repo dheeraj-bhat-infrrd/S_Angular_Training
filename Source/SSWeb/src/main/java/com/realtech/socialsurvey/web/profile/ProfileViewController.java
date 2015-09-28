@@ -533,13 +533,13 @@ public class ProfileViewController
                     branchProfile, individualProfile, settingsByOrganizationUnitMap );
                 LOG.debug("Finished filling the unit settings in the profile");
                 //TODO: delink the zillow call from here
-                LOG.debug("Getting zillow feed");
+                /**LOG.debug("Getting zillow feed");
                 if ( individualProfile.getSocialMediaTokens() != null
                     && individualProfile.getSocialMediaTokens().getZillowToken() != null )
 					profileManagementService.updateZillowFeed(
 							individualProfile,
 							CommonConstants.AGENT_SETTINGS_COLLECTION);
-                LOG.debug("Fetched zillow feed");
+                LOG.debug("Fetched zillow feed");*/
                 //set vertical name from the company
                 individualProfile.setVertical( user.getCompany().getVerticalsMaster().getVerticalName() );
 
