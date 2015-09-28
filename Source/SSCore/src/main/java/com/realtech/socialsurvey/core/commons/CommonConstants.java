@@ -235,6 +235,7 @@ public interface CommonConstants
     public static final String USER_PROFILE_MAP = "profileMap";
     public static final String USER_PROFILE_SETTINGS = "profileSettings";
     public static final String USER_ACCOUNT_SETTINGS = "accountSettings";
+    public static final String USER_APP_SETTINGS = "appSettings";
     public static final String ERROR = "error";
     public static final String MESSAGE = "message";
     public static final String EMAIL_TYPE = "emailtype";
