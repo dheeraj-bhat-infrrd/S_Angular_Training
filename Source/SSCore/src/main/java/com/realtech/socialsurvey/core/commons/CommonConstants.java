@@ -146,6 +146,7 @@ public interface CommonConstants
     public static final String SUBSCRIPTION_ID_COLUMN = "subscriptionId";
     public static final String REGION_NAME_COLUMN = "region";
     public static final String SURVEY_QUESTION_COLUMN = "surveyQuestion";
+    public static final String SURVEY_SOURCE_COLUMN = "source";
     public static final String SURVEY_COLUMN = "survey";
     public static final String SURVEY_COMPANY_COLUMN = "company";
     public static final String SURVEY_QUESTION_ORDER_COLUMN = "questionOrder";
