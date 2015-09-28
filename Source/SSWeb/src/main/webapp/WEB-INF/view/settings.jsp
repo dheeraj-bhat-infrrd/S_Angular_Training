@@ -110,6 +110,25 @@
 			</div>
 		</c:if>
 		
+		<!-- Starting code for Social Authentication -->
+		<c:if test="${profilemasterid == 1}">
+			<c:set var="containerclass" value="um-top-container"/>
+		</c:if>
+		<div class="${containerclass}">
+			<div class="um-header margin-top-25"><spring:message code="label.socialconnect.key" /></div>
+			<div class="clearfix st-score-wrapper">
+				<div class="float-left st-social-score col-lg-4 col-md-4 col-sm-4 col-xs-12">
+					<spring:message code="label.socialconnect.desc.key" />
+				</div>
+				<input type="hidden" name="ratingcategory" id="ratingcategory">
+				<div class="clearfix float-right col-lg-8 col-md-8 col-sm-8 col-xs-12">
+					<div id="social-media-token-cont" class="soc-nw-wrapper clearfix">
+						<%-- <jsp:include page="settings_socialauth.jsp"></jsp:include> --%>
+					</div>
+				</div>
+			</div>
+		</div>
+		
 		<!-- Starting code for Text for Happy/Neutral/Sad flow -->
 		<c:if test="${profilemasterid == 1 || accountMasterId == 1}">
 			<div class="um-top-container">
@@ -158,25 +177,6 @@
 				</div>
 			</div>
 		</c:if>
-		
-		<!-- Starting code for Social Authentication -->
-		<c:if test="${profilemasterid == 1}">
-			<c:set var="containerclass" value="um-top-container"/>
-		</c:if>
-		<div class="${containerclass}">
-			<div class="um-header margin-top-25"><spring:message code="label.socialconnect.key" /></div>
-			<div class="clearfix st-score-wrapper">
-				<div class="float-left st-social-score col-lg-4 col-md-4 col-sm-4 col-xs-12">
-					<spring:message code="label.socialconnect.desc.key" />
-				</div>
-				<input type="hidden" name="ratingcategory" id="ratingcategory">
-				<div class="clearfix float-right col-lg-8 col-md-8 col-sm-8 col-xs-12">
-					<div id="social-media-token-cont" class="soc-nw-wrapper clearfix">
-						<%-- <jsp:include page="settings_socialauth.jsp"></jsp:include> --%>
-					</div>
-				</div>
-			</div>
-		</div>
 		
 		<!-- Starting code for Other settings -->
 		<c:if test="${profilemasterid == 1 || accountMasterId == 1}">
