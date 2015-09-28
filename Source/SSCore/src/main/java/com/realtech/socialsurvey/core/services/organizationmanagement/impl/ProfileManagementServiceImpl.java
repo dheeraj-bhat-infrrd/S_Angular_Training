@@ -17,7 +17,9 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
+
 import javax.annotation.Resource;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
@@ -27,8 +29,10 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.DependsOn;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
+
 import retrofit.client.Response;
 import retrofit.mime.TypedByteArray;
+
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonMappingException;
@@ -88,6 +92,7 @@ import com.realtech.socialsurvey.core.enums.OrganizationUnit;
 import com.realtech.socialsurvey.core.enums.SettingsForApplication;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.exception.NoRecordsFetchedException;
+import com.realtech.socialsurvey.core.exception.NonFatalException;
 import com.realtech.socialsurvey.core.integration.zillow.ZillowIntegrationApi;
 import com.realtech.socialsurvey.core.integration.zillow.ZillowIntergrationApiBuilder;
 import com.realtech.socialsurvey.core.services.generator.URLGenerator;
@@ -3047,6 +3052,8 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 					contactDetails.setZipcode(companyUnitSettings.getContact_details().getZipcode());
 					contactDetails.setState(companyUnitSettings.getContact_details().getState());
 					contactDetails.setCity(companyUnitSettings.getContact_details().getCity());
+					contactDetails.setCountry(companyUnitSettings.getContact_details().getCountry());
+					contactDetails.setCountryCode(companyUnitSettings.getContact_details().getCountryCode());
 				}
 				else if (entry.getValue() == OrganizationUnit.REGION) {
 					contactDetails.setAddress(regionUnitSettings.getContact_details().getAddress());
@@ -3055,6 +3062,9 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 					contactDetails.setZipcode(regionUnitSettings.getContact_details().getZipcode());
 					contactDetails.setState(regionUnitSettings.getContact_details().getState());
 					contactDetails.setCity(regionUnitSettings.getContact_details().getCity());
+					contactDetails.setCountry(regionUnitSettings.getContact_details().getCountry());
+					contactDetails.setCountryCode(regionUnitSettings.getContact_details().getCountryCode());
+					
 				}
 				else if (entry.getValue() == OrganizationUnit.BRANCH) {
 					contactDetails.setAddress(branchUnitSettings.getContact_details().getAddress());
@@ -3063,6 +3073,8 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 					contactDetails.setZipcode(branchUnitSettings.getContact_details().getZipcode());
 					contactDetails.setState(branchUnitSettings.getContact_details().getState());
 					contactDetails.setCity(branchUnitSettings.getContact_details().getCity());
+					contactDetails.setCountry(branchUnitSettings.getContact_details().getCountry());
+					contactDetails.setCountryCode(branchUnitSettings.getContact_details().getCountryCode());
 				}
 				else if (entry.getValue() == OrganizationUnit.AGENT) {
 					contactDetails.setAddress(agentUnitSettings.getContact_details().getAddress());
@@ -3071,6 +3083,8 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 					contactDetails.setZipcode(agentUnitSettings.getContact_details().getZipcode());
 					contactDetails.setState(agentUnitSettings.getContact_details().getState());
 					contactDetails.setCity(agentUnitSettings.getContact_details().getCity());
+					contactDetails.setCountry(agentUnitSettings.getContact_details().getCountry());
+					contactDetails.setCountryCode(agentUnitSettings.getContact_details().getCountryCode());
 				}
 				userProfile.setContact_details(contactDetails);
 			}
@@ -3337,6 +3351,24 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 			// fetching zillow feed
 			LOG.debug("Fetching zillow feed for " + profile.getId() + " from " + collection);
 			fetchFeedFromZillow(profile, collection);
+			String entityType = "";
+			if (collection
+					.equalsIgnoreCase(MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION)) {
+				entityType = CommonConstants.COMPANY_ID_COLUMN;
+			}
+			else if (collection
+					.equalsIgnoreCase(MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION)) {
+				entityType = CommonConstants.REGION_ID_COLUMN;
+			}
+			else if (collection
+					.equalsIgnoreCase(MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION)) {
+				entityType = CommonConstants.BRANCH_ID_COLUMN;
+			}
+			else if (collection
+					.equalsIgnoreCase(MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION)) {
+				entityType = CommonConstants.AGENT_ID_COLUMN;
+			}
+			surveyHandler.deleteExcessZillowSurveysByEntity(entityType, profile.getIden());
 		}
 		else {
 			LOG.info("Zillow is not added for the profile");
@@ -3455,7 +3487,8 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 		}
 	}
 
-	private Date convertStringToDate(String dateString) {
+	@Override
+	public Date convertStringToDate(String dateString) {
 
 		DateFormat format = new SimpleDateFormat("MM/dd/yyyy", Locale.ENGLISH);
 		Date date;
@@ -3468,4 +3501,143 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 		return date;
 	}
 
+    @Override
+    public LockSettings fetchHierarchyLockSettings( long companyId, long branchId, long regionId, String entityType )
+            throws NonFatalException
+        {
+            LOG.debug( "Method fetchHierarchyLockSettings() called from ProfileManagementService" );
+            boolean logoLocked = true;
+            boolean webAddressLocked = true;
+            boolean phoneNumberLocked = true;
+            List<SettingsDetails> settingsDetailsList = settingsManager
+                .getScoreForCompleteHeirarchy( companyId, branchId, regionId );
+            Map<String, Long> totalScore = settingsManager.calculateSettingsScore( settingsDetailsList );
+            long currentLockAggregateValue = totalScore.get( CommonConstants.LOCK_SCORE );
+            LockSettings parentLock = new LockSettings();
+
+            if ( entityType.equalsIgnoreCase( CommonConstants.COMPANY_ID_COLUMN ) ) {
+                logoLocked = false;
+                webAddressLocked = false;
+                phoneNumberLocked = false;
+            } else if ( entityType.equalsIgnoreCase( CommonConstants.REGION_ID_COLUMN ) ) {
+                if ( !checkIfSettingLockedByOrganization( OrganizationUnit.COMPANY, SettingsForApplication.LOGO,
+                    currentLockAggregateValue ) ) {
+                    logoLocked = false;
+                }
+                if ( !checkIfSettingLockedByOrganization( OrganizationUnit.COMPANY, SettingsForApplication.WEB_ADDRESS_WORK,
+                    currentLockAggregateValue ) ) {
+                    webAddressLocked = false;
+                }
+                if ( !checkIfSettingLockedByOrganization( OrganizationUnit.COMPANY, SettingsForApplication.PHONE,
+                    currentLockAggregateValue ) ) {
+                    phoneNumberLocked = false;
+                }
+
+            } else if ( entityType.equalsIgnoreCase( CommonConstants.BRANCH_ID_COLUMN ) ) {
+
+                if ( !checkIfSettingLockedByOrganization( OrganizationUnit.COMPANY, SettingsForApplication.LOGO,
+                    currentLockAggregateValue ) ) {
+                    logoLocked = false;
+                }
+                if ( !checkIfSettingLockedByOrganization( OrganizationUnit.COMPANY, SettingsForApplication.WEB_ADDRESS_WORK,
+                    currentLockAggregateValue ) ) {
+                    webAddressLocked = false;
+                }
+                if ( !checkIfSettingLockedByOrganization( OrganizationUnit.COMPANY, SettingsForApplication.PHONE,
+                    currentLockAggregateValue ) ) {
+                    phoneNumberLocked = false;
+                }
+
+                if ( !logoLocked ) {
+                    if ( !checkIfSettingLockedByOrganization( OrganizationUnit.REGION, SettingsForApplication.LOGO,
+                        currentLockAggregateValue ) ) {
+                        logoLocked = false;
+                    }
+                }
+                if ( !webAddressLocked ) {
+                    if ( !checkIfSettingLockedByOrganization( OrganizationUnit.COMPANY, SettingsForApplication.WEB_ADDRESS_WORK,
+                        currentLockAggregateValue ) ) {
+                        webAddressLocked = false;
+                    }
+                }
+                if ( !phoneNumberLocked ) {
+                    if ( !checkIfSettingLockedByOrganization( OrganizationUnit.COMPANY, SettingsForApplication.PHONE,
+                        currentLockAggregateValue ) ) {
+                        phoneNumberLocked = false;
+                    }
+                }
+
+            } else if ( entityType.equalsIgnoreCase( CommonConstants.AGENT_ID_COLUMN ) ) {
+                if ( !checkIfSettingLockedByOrganization( OrganizationUnit.COMPANY, SettingsForApplication.LOGO,
+                    currentLockAggregateValue ) ) {
+                    logoLocked = false;
+                }
+                if ( !checkIfSettingLockedByOrganization( OrganizationUnit.COMPANY, SettingsForApplication.WEB_ADDRESS_WORK,
+                    currentLockAggregateValue ) ) {
+                    webAddressLocked = false;
+                }
+                if ( !checkIfSettingLockedByOrganization( OrganizationUnit.COMPANY, SettingsForApplication.PHONE,
+                    currentLockAggregateValue ) ) {
+                    phoneNumberLocked = false;
+                }
+
+                if ( !logoLocked ) {
+                    if ( !checkIfSettingLockedByOrganization( OrganizationUnit.REGION, SettingsForApplication.LOGO,
+                        currentLockAggregateValue ) ) {
+                        logoLocked = false;
+                    }
+
+                }
+                if ( !webAddressLocked ) {
+                    if ( !checkIfSettingLockedByOrganization( OrganizationUnit.REGION, SettingsForApplication.WEB_ADDRESS_WORK,
+                        currentLockAggregateValue ) ) {
+                        webAddressLocked = false;
+                    }
+                }
+                if ( !phoneNumberLocked ) {
+                    if ( !checkIfSettingLockedByOrganization( OrganizationUnit.REGION, SettingsForApplication.PHONE,
+                        currentLockAggregateValue ) ) {
+                        phoneNumberLocked = false;
+                    }
+                }
+
+
+                if ( !logoLocked ) {
+                    if ( !checkIfSettingLockedByOrganization( OrganizationUnit.BRANCH, SettingsForApplication.LOGO,
+                        currentLockAggregateValue ) ) {
+                        logoLocked = false;
+                    }
+
+                }
+                if ( !webAddressLocked ) {
+                    if ( !checkIfSettingLockedByOrganization( OrganizationUnit.BRANCH, SettingsForApplication.WEB_ADDRESS_WORK,
+                        currentLockAggregateValue ) ) {
+                        webAddressLocked = false;
+                    }
+                }
+                if ( !phoneNumberLocked ) {
+                    if ( !checkIfSettingLockedByOrganization( OrganizationUnit.BRANCH, SettingsForApplication.PHONE,
+                        currentLockAggregateValue ) ) {
+                        phoneNumberLocked = false;
+                    }
+
+                }
+
+            }
+            parentLock.setLogoLocked( logoLocked );
+            parentLock.setWebAddressLocked( webAddressLocked );
+            parentLock.setWorkPhoneLocked( phoneNumberLocked );
+
+            return parentLock;
+        }
+    
+    private boolean checkIfSettingLockedByOrganization( OrganizationUnit unit, SettingsForApplication settingsforApplications,
+            long currentLockValue ){
+    	LOG.debug( "Inside method getLogoLockedByCompany " );
+    	if ( settingsLocker.isSettingsValueLocked( unit, currentLockValue, settingsforApplications ) ) {
+    		return true;
+    		} else {
+    		return false;
+        }
+    }
 }

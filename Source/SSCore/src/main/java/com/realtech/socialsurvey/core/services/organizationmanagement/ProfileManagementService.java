@@ -31,6 +31,7 @@ import com.realtech.socialsurvey.core.enums.OrganizationUnit;
 import com.realtech.socialsurvey.core.enums.SettingsForApplication;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.exception.NoRecordsFetchedException;
+import com.realtech.socialsurvey.core.exception.NonFatalException;
 import com.realtech.socialsurvey.core.services.mail.UndeliveredEmailException;
 import com.realtech.socialsurvey.core.services.search.exception.SolrException;
 import com.realtech.socialsurvey.core.services.settingsmanagement.impl.InvalidSettingsStateException;
@@ -586,5 +587,12 @@ public interface ProfileManagementService
 
 	Map<String, Long> getHierarchyDetailsByEntity(String entityType,
 			long entityId) throws InvalidInputException;
+
+
+	LockSettings fetchHierarchyLockSettings(long companyId, long branchId,
+			long regionId, String entityType) throws NonFatalException;
+
+
+	Date convertStringToDate(String dateString);
 
 }
