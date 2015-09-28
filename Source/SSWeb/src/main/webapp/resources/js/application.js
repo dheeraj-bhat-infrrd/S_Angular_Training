@@ -1658,13 +1658,7 @@ function getEditSection() {
 	var highestRole = $("#highest-role").val();
 	switch(accountType){
     case 'Enterprise':
-    	if(highestRole == 1) {
-    		getRegionEditPage();
-    	}
-    	else if(highestRole == 2) {
-    		getOfficeEditPage();
-    	}
-    	else if(highestRole == 3){
+    	if(highestRole == 1 || highestRole == 2 || highestRole == 3) {
     		getIndividualEditPage();
     	}
     	else {
@@ -1672,10 +1666,7 @@ function getEditSection() {
     	}
         break;
     case 'Company': 
-    	if(highestRole == 1 || highestRole == 2) {
-    		getOfficeEditPage();
-    	}
-    	else if(highestRole == 3){
+    	if(highestRole == 1 || highestRole == 2 || highestRole == 3) {
     		getIndividualEditPage();
     	}
     	else {
