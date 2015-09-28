@@ -6,4 +6,4 @@
    `PROFILE_NAME` varchar(100) , 
    `PROFILE_ACTIVE` tinyint(4) , 
    PRIMARY KEY (`COMPANY_PROFILE_MAPPING_ID`)
- )
+ );

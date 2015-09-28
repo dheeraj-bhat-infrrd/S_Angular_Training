@@ -1,431 +1,329 @@
 package com.realtech.socialsurvey.core.starter;
 
-import java.io.IOException;
 import java.sql.Timestamp;
-import java.text.DateFormat;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
 import java.util.HashMap;
-import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
-
 import org.quartz.JobDataMap;
 import org.quartz.JobExecutionContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.quartz.QuartzJobBean;
 import org.springframework.stereotype.Component;
-
 import retrofit.client.Response;
 import retrofit.mime.TypedByteArray;
-
-import com.fasterxml.jackson.core.JsonParseException;
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.JsonMappingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.gson.Gson;
+import com.google.gson.JsonSyntaxException;
+import com.google.gson.reflect.TypeToken;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
-import com.realtech.socialsurvey.core.entities.CRMInfo;
+import com.realtech.socialsurvey.core.commons.Utils;
 import com.realtech.socialsurvey.core.entities.CompanyDotloopProfileMapping;
 import com.realtech.socialsurvey.core.entities.DotLoopCrmInfo;
+import com.realtech.socialsurvey.core.entities.DotLoopParticipant;
+import com.realtech.socialsurvey.core.entities.DotLoopProfileEntity;
 import com.realtech.socialsurvey.core.entities.LoopProfileMapping;
 import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
 import com.realtech.socialsurvey.core.entities.SurveyPreInitiation;
-import com.realtech.socialsurvey.core.entities.User;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
+import com.realtech.socialsurvey.core.exception.NoRecordsFetchedException;
 import com.realtech.socialsurvey.core.integration.dotloop.DotloopIntegrationApi;
 import com.realtech.socialsurvey.core.integration.dotloop.DotloopIntergrationApiBuilder;
+import com.realtech.socialsurvey.core.integration.pos.errorhandlers.DotLoopAccessForbiddenException;
 import com.realtech.socialsurvey.core.services.organizationmanagement.OrganizationManagementService;
-import com.realtech.socialsurvey.core.services.organizationmanagement.UserManagementService;
 import com.realtech.socialsurvey.core.services.surveybuilder.SurveyHandler;
-
 
 /**
  * Ingester for social feed
  */
-@Component ( "dotloopreviewprocessor")
-public class DotloopReviewProcessor extends QuartzJobBean
-{
+@Component("dotloopreviewprocessor")
+public class DotloopReviewProcessor extends QuartzJobBean {
 
-    private static final Logger LOG = LoggerFactory.getLogger( ZillowReviewProcessor.class );
+	private static final Logger LOG = LoggerFactory.getLogger(ZillowReviewProcessor.class);
 
+	private DotloopIntergrationApiBuilder dotloopIntegrationApiBuilder;
 
-    private DotloopIntergrationApiBuilder dotloopIntegrationApiBuilder;
+	private SurveyHandler surveyHandler;
 
-    private UserManagementService userManagementService;
+	private OrganizationManagementService organizationManagementService;
 
-    private SurveyHandler surveyHandler;
+	private DotloopIntegrationApi dotloopIntegrationApi;
 
-    private OrganizationManagementService organizationManagementService;
+	private Utils utils;
 
+	private String maskEmail;
 
-    @Override
-    protected void executeInternal( JobExecutionContext jobExecutionContext )
-    {
-        LOG.info( "Executing dotloop review processor" );
-        initializeDependencies( jobExecutionContext.getMergedJobDataMap() );
-        List<User> userList = userManagementService.getAllActiveUsers();
-        for ( User user : userList ) {
-            LOG.debug( "Fetching company settings for user " + user.getEmailId() );
-            OrganizationUnitSettings organizationUnitSettings = null;
-            try {
-                organizationUnitSettings = organizationManagementService.getCompanySettings( user );
-            } catch ( InvalidInputException e ) {
+	private static final String BUYING_AGENT_ROLE = "Buying Agent";
+	private static final String SELLING_AGENT_ROLE = "Selling Agent";
+	private static final String LISTING_AGENT_ROLE = "Listing Agent";
 
-            }
+	private static final String SELLER_ROLE = "Seller";
+	private static final String BUYER_ROLE = "Buyer";
 
-            if ( organizationUnitSettings != null ) {
-                CRMInfo crmInfo = organizationUnitSettings.getCrm_info();
-                if ( crmInfo != null ) {
-                    if ( crmInfo.getCrm_source().equalsIgnoreCase( CommonConstants.CRM_SOURCE_DOTLOOP ) ) {
-                        DotLoopCrmInfo dotLoop = (DotLoopCrmInfo) crmInfo;
-                        String apiKey = dotLoop.getApi();
-                        if ( apiKey != null && !apiKey.isEmpty() ) {
-                            LOG.debug( "API key is " + apiKey );
-                            fetchReviewfromDotloop( apiKey, organizationUnitSettings );
-                        }
-                    }
-                }
-            }
-        }
+	@Override
+	protected void executeInternal(JobExecutionContext jobExecutionContext) {
+		LOG.info("Executing dotloop review processor");
+		initializeDependencies(jobExecutionContext.getMergedJobDataMap());
+		try {
+			List<OrganizationUnitSettings> organizationUnitSettingsList = organizationManagementService.getOrganizationUnitSettingsForCRMSource(
+					CommonConstants.CRM_SOURCE_DOTLOOP, CommonConstants.COMPANY_SETTINGS_COLLECTION);
+			if (organizationUnitSettingsList != null && !organizationUnitSettingsList.isEmpty()) {
+				LOG.info("Looping through crm list of size: " + organizationUnitSettingsList.size());
+				for (OrganizationUnitSettings organizationUnitSettings : organizationUnitSettingsList) {
+					LOG.info("Getting dotloop records for company id: " + organizationUnitSettings.getId());
+					DotLoopCrmInfo dotLoopCrmInfo = (DotLoopCrmInfo) organizationUnitSettings.getCrm_info();
+					if (dotLoopCrmInfo.getApi() != null && !dotLoopCrmInfo.getApi().isEmpty()) {
+						LOG.debug("API key is " + dotLoopCrmInfo.getApi());
+						fetchReviewfromDotloop(dotLoopCrmInfo.getApi(), organizationUnitSettings);
+					}
+				}
+			}
+		}
+		catch (InvalidInputException | NoRecordsFetchedException e1) {
+			LOG.info("Could not get list of dotloop records");
+		}
+	}
 
+	// Gets list of profiles for a given api key
+	private List<DotLoopProfileEntity> getDotLoopProfiles(String authorizationHeader, String apiKey) {
+		LOG.debug("Getting dotloop profile list for api key: " + apiKey);
+		List<DotLoopProfileEntity> profiles = null;
+		if (dotloopIntegrationApi != null) {
+			Response dotloopResponse = dotloopIntegrationApi.fetchdotloopProfiles(authorizationHeader);
+			String responseString = null;
+			if (dotloopResponse != null) {
+				responseString = new String(((TypedByteArray) dotloopResponse.getBody()).getBytes());
+			}
+			if (responseString != null) {
+				profiles = new Gson().fromJson(responseString, new TypeToken<List<DotLoopProfileEntity>>() {}.getType());
+			}
+		}
+		LOG.debug("Returning dotloop profile list.");
+		return profiles;
 
-    }
+	}
 
+	// check if the profile is entered in the system already as inactive
+	private boolean isProfilePresentAsInactive(OrganizationUnitSettings unitSettings, DotLoopProfileEntity dotLoopProfile)
+			throws InvalidInputException {
+		LOG.debug("Checking dotLoopProfile presence in the system as inactive: " + dotLoopProfile.toString());
+		boolean isAccountPresentInSystem = false;
+		String profileId = String.valueOf(dotLoopProfile.getProfileId());
+		CompanyDotloopProfileMapping companyDotloopProfileMapping = organizationManagementService.getCompanyDotloopMappingByCompanyIdAndProfileId(
+				unitSettings.getIden(), profileId);
+		if (companyDotloopProfileMapping != null) {
+			LOG.debug("Profile is already present in the system as inactive.");
+			isAccountPresentInSystem = true;
+		}
+		return isAccountPresentInSystem;
+	}
 
-    private List<Map<String, String>> convertJsonStringToList( String jsonString ) throws JsonParseException,
-        JsonMappingException, IOException
-    {
-        List<Map<String, String>> listofMap = new ObjectMapper().readValue( jsonString,
-            new TypeReference<List<Map<String, String>>>() {} );
-        return listofMap;
-    }
+	private void insertCompanyDotloopProfile(DotLoopProfileEntity profileEntity, OrganizationUnitSettings unitSettings) throws InvalidInputException {
+		LOG.debug("Inserting into dotloop profile entity");
+		CompanyDotloopProfileMapping companyDotloopProfileMapping = new CompanyDotloopProfileMapping();
+		companyDotloopProfileMapping.setActive(false);
+		companyDotloopProfileMapping.setProfileEmailAddress(profileEntity.getEmailAddress());
+		companyDotloopProfileMapping.setProfileName(profileEntity.getName());
+		companyDotloopProfileMapping.setProfileId(String.valueOf(profileEntity.getProfileId()));
+		companyDotloopProfileMapping.setCompanyId(unitSettings.getIden());
+		companyDotloopProfileMapping = organizationManagementService.saveCompanyDotLoopProfileMapping(companyDotloopProfileMapping);
+	}
 
+	private void processLoopEntites(List<LoopProfileMapping> loops, String profileId, boolean byPassRecords, String authorizationHeader,
+			long organizationUnitId) {
+		// if by pass is true, then add all the records in tracker without processing. Otherwise get
+		// new records and then add the new record.
+		LOG.debug("Processing loops for profile id: " + profileId + " and byPassRecords flag: " + byPassRecords);
+		for (LoopProfileMapping loop : loops) {
+			// Setting profile id for the loop
+			loop.setProfileId(profileId);
+			if (!byPassRecords) {
+				// check if the record is present in the database then skip the loop. if not, then
+				// process it
+				LoopProfileMapping loopFromSystem = null;
+				try {
+					loopFromSystem = organizationManagementService.getLoopByProfileAndLoopId(profileId, loop.getLoopId());
+				}
+				catch (InvalidInputException e) {
+					LOG.error("Could not get loop details from database for loop id " + loop.getLoopId() + " for profile " + profileId, e);
+					continue;
+				}
+				if (loopFromSystem == null) {
+					LOG.info("Loop " + loop.getLoopId() + " for profile " + profileId + " is not present. Hence processing.");
+					processLoop(loop, authorizationHeader, organizationUnitId);
+				}
+				else {
+					// record is present. process next record
+					LOG.info("Loop " + loop.getLoopId() + " for profile " + profileId + " is present. Hence skipping.");
+					continue;
+				}
+			}
+			LOG.debug("Insert into tracker.");
+			try {
+				organizationManagementService.saveLoopsForProfile(loop);
+			}
+			catch (InvalidInputException e) {
+				LOG.warn("Could not insert loop " + loop.getLoopId() + " for profile " + loop.getProfileId());
+			}
+		}
+	}
 
-    private List<Object> convertJsonStringToListObject( String jsonString ) throws JsonParseException, JsonMappingException,
-        IOException
-    {
-        List<Object> listofMap = new ObjectMapper().readValue( jsonString, new TypeReference<List<Object>>() {} );
-        return listofMap;
-    }
+	// processes the details of the loop
+	private void processLoop(LoopProfileMapping loop, String authorizationHeader, long organizationUnitId) {
+		LOG.debug("Processing details of loop view id: " + loop.getLoopViewId() + " for profile id: " + loop.getProfileId());
+		Response response = null;
+		String responseString = null;
+		List<DotLoopParticipant> participants = null;
+		try {
+			response = dotloopIntegrationApi.fetchLoopViewParticipants(authorizationHeader, loop.getProfileId(), loop.getLoopViewId());
+			if (response != null) {
+				responseString = new String(((TypedByteArray) response.getBody()).getBytes());
+				participants = new Gson().fromJson(responseString, new TypeToken<List<DotLoopParticipant>>() {}.getType());
+				Map<String, String> customerMapping = null;
+				String agentEmailId = null;
+				for (DotLoopParticipant participant : participants) {
+					if (participant.getRole() != null
+							&& (participant.getRole().equalsIgnoreCase(BUYING_AGENT_ROLE)
+									|| participant.getRole().equalsIgnoreCase(SELLING_AGENT_ROLE) || participant.getRole().equalsIgnoreCase(
+									LISTING_AGENT_ROLE)) && participant.getMemberOfMyTeam() != null
+							&& participant.getMemberOfMyTeam().equals(CommonConstants.YES_STRING)) {
+						agentEmailId = participant.getEmail();
+						if (maskEmail.equals(CommonConstants.YES_STRING)) {
+							agentEmailId = utils.maskEmailAddress(agentEmailId);
+						}
+					}
+					if (participant.getRole() != null
+							&& (participant.getRole().equalsIgnoreCase(BUYER_ROLE) || participant.getRole().equalsIgnoreCase(SELLER_ROLE))
+							&& participant.getMemberOfMyTeam().equalsIgnoreCase(CommonConstants.NO_STRING)) {
+						if (participant.getEmail() != null && !participant.getEmail().isEmpty()) {
+							if (customerMapping == null) {
+								customerMapping = new HashMap<>();
+							}
+							String customerEmailId = participant.getEmail().trim();
+							if (maskEmail.equals(CommonConstants.YES_STRING)) {
+								customerEmailId = utils.maskEmailAddress(customerEmailId);
+							}
+							customerMapping.put(customerEmailId, participant.getName());
+						}
+					}
+				}
+				if (customerMapping != null && customerMapping.size() > 0 && agentEmailId != null && !agentEmailId.isEmpty()) {
+					SurveyPreInitiation surveyPreInitiation = null;
+					for (String customerMappingKey : customerMapping.keySet()) {
+						surveyPreInitiation = new SurveyPreInitiation();
+						surveyPreInitiation.setCompanyId(organizationUnitId);
+						surveyPreInitiation.setCreatedOn(new Timestamp(System.currentTimeMillis()));
+						surveyPreInitiation.setAgentId(0);
+						surveyPreInitiation.setCustomerEmailId(customerMappingKey);
+						surveyPreInitiation.setCustomerFirstName(customerMapping.get(customerMappingKey));
+						surveyPreInitiation.setEngagementClosedTime(new Timestamp(System.currentTimeMillis()));
+						surveyPreInitiation.setStatus(CommonConstants.STATUS_SURVEYPREINITIATION_NOT_PROCESSED);
+						surveyPreInitiation.setSurveySource(CommonConstants.CRM_SOURCE_DOTLOOP);
+						try {
+							surveyHandler.saveSurveyPreInitiationObject(surveyPreInitiation);
+						}
+						catch (InvalidInputException e) {
+							LOG.error("Unable to insert this record ", e);
+						}
+					}
+				}
+				else {
+					LOG.warn("Incomplete details from participants call for loop view id");
+				}
+			}
+			else {
+				LOG.info("No response fetched for loop details " + loop.getLoopViewId() + " for profile id: " + loop.getProfileId());
+			}
 
+		}
+		catch (DotLoopAccessForbiddenException e) {
+			LOG.error("Could not fetch loop details for " + loop.getLoopViewId() + " for profile id: " + loop.getProfileId());
+		}
+	}
 
-    private Map<String, Object> convertJsonStringToMap( String jsonString ) throws JsonParseException, JsonMappingException,
-        IOException
-    {
-        Map<String, Object> map = new ObjectMapper().readValue( jsonString, new TypeReference<HashMap<String, Object>>() {} );
-        return map;
-    }
+	/**
+	 * Fetches records from dot loop
+	 * 
+	 * @param apiKey
+	 * @param unitSettings
+	 */
+	public void fetchReviewfromDotloop(String apiKey, OrganizationUnitSettings unitSettings) {
+		LOG.debug("Fetching reviews for api key: " + apiKey + " with id: " + unitSettings.getIden());
+		String authorizationHeader = CommonConstants.AUTHORIZATION_HEADER + apiKey;
+		// get list of profiles
+		List<DotLoopProfileEntity> profileList = getDotLoopProfiles(authorizationHeader, apiKey);
+		if (profileList != null && !profileList.isEmpty()) {
+			LOG.debug("Got " + profileList.size() + " profiles.");
+			for (DotLoopProfileEntity profile : profileList) {
+				String profileId = String.valueOf(profile.getProfileId());
+				try {
+					if (profile.isActive() && !isProfilePresentAsInactive(unitSettings, profile)) {
+						// check for loop ids with status closed (4)
+						Response loopResponse = null;
+						int batchNumber = 1;
+						String loopResponseString = null;
+						// List<LoopProfileMapping> dotloopProfileMappingList = null;
+						List<LoopProfileMapping> loopEntities = null;
+						boolean byPassRecords = false; // checks if the system has processed the
+														// profile ever before.
+						try {
+							if (organizationManagementService.getLoopsCountByProfile(profileId) > 0) {
+								LOG.info("Records for profile id: " + profileId + " is already present");
+								byPassRecords = false;
+							}
+							else {
+								LOG.info("Proile id is not processed for profile id: " + profileId
+										+ ". Bypassing all records. Just adding into tracker");
+								byPassRecords = true;
+							}
+							do {
+								LOG.debug("Gettig batch " + batchNumber + " for closed records for profile " + profileId);
+								loopResponse = dotloopIntegrationApi.fetchClosedProfiles(authorizationHeader, profileId, batchNumber);
+								if (loopResponse != null) {
+									loopResponseString = new String(((TypedByteArray) loopResponse.getBody()).getBytes());
+									if (loopResponseString == null || loopResponseString.equals("[]")) {
+										// no more records
+										LOG.debug("No more loops ids for profile: " + profileId);
+										break;
+									}
+									else {
+										LOG.debug("Processing batch: " + batchNumber + " for profile: " + profileId);
+										loopEntities = new Gson()
+												.fromJson(loopResponseString, new TypeToken<List<LoopProfileMapping>>() {}.getType());
+										// process loop entites. If there are no records for the
+										// profile id in the tracker
+										processLoopEntites(loopEntities, profileId, byPassRecords, authorizationHeader, unitSettings.getIden());
+									}
+								}
+								else {
+									// no more records
+									LOG.debug("No more loops ids for profile: " + profileId);
+									break;
+								}
+								batchNumber++;
+							}
+							while (true);
+						}
+						catch (DotLoopAccessForbiddenException dafe) {
+							// insert into tracker table
+							LOG.info("Inactive profile. Inserting into Dot loop profile mapping.");
+							insertCompanyDotloopProfile(profile, unitSettings);
+						}
+					}
+				}
+				catch (JsonSyntaxException | InvalidInputException e) {
+					LOG.error("Could not process " + profileId, e);
+				}
+			}
+		}
+	}
 
+	private void initializeDependencies(JobDataMap jobMap) {
+		dotloopIntegrationApiBuilder = (DotloopIntergrationApiBuilder) jobMap.get("dotloopIntegrationApiBuilder");
+		dotloopIntegrationApi = dotloopIntegrationApiBuilder.getDotloopIntegrationApi();
+		surveyHandler = (SurveyHandler) jobMap.get("surveyHandler");
+		organizationManagementService = (OrganizationManagementService) jobMap.get("organizationManagementService");
+		utils = (Utils) jobMap.get("utils");
+		maskEmail = (String) jobMap.get("maskEmail");
+	}
 
-    @SuppressWarnings ( "unchecked")
-    public void fetchReviewfromDotloop( String apiKey, OrganizationUnitSettings unitSettings )
-    {
-
-        DotloopIntegrationApi dotloopIntegrationApi = dotloopIntegrationApiBuilder.getDotloopIntegrationApi();
-        if ( dotloopIntegrationApi != null ) {
-            String authorizationHeader = CommonConstants.AUTHORIZATION_HEADER + apiKey;
-            Response dotloopResponse = dotloopIntegrationApi.fetchdotloopProfiles( authorizationHeader );
-            String responseString = null;
-            if ( dotloopResponse != null ) {
-                responseString = new String( ( (TypedByteArray) dotloopResponse.getBody() ).getBytes() );
-            }
-            if ( responseString != null ) {
-                List<Map<String, String>> profileList = null;
-                try {
-                    profileList = convertJsonStringToList( responseString );
-                } catch ( JsonParseException e ) {
-                    LOG.error( "Exception caught " + e.getMessage() );
-                } catch ( JsonMappingException e ) {
-                    LOG.error( "Exception caught " + e.getMessage() );
-                } catch ( IOException e ) {
-                    LOG.error( "Exception caught " + e.getMessage() );
-                }
-
-                if ( profileList != null ) {
-                    for ( Map<String, String> profile : profileList ) {
-
-                        LOG.debug( "looping profile with statusId as 4 " );
-                        String profileId = profile.get( CommonConstants.DOTLOOP_PROFILE_ID );
-                        boolean active = Boolean.valueOf( profile.get( CommonConstants.DOTLOOP_PROFILE_ACTIVE ) );
-                        String profileEmailAddress = profile.get( CommonConstants.DOTLOOP_PROFILE_EMAIL_ADDRESS );
-                        String profileName = profile.get( CommonConstants.DOTLOOP_PROFILE_NAME );
-
-                        CompanyDotloopProfileMapping companyDotloopProfileMapping = organizationManagementService
-                            .getCompanyDotloopMappingByCompanyIdAndProfileId( unitSettings.getIden(), profileId );
-
-                        if ( companyDotloopProfileMapping == null ) {
-                            companyDotloopProfileMapping = new CompanyDotloopProfileMapping();
-                            companyDotloopProfileMapping.setActive( active );
-                            companyDotloopProfileMapping.setProfileEmailAddress( profileEmailAddress );
-                            companyDotloopProfileMapping.setProfileName( profileName );
-                            companyDotloopProfileMapping.setProfileId( profileId );
-                            companyDotloopProfileMapping.setCompanyId( unitSettings.getIden() );
-                            companyDotloopProfileMapping = organizationManagementService
-                                .saveCompanyDotLoopProfileMapping( companyDotloopProfileMapping );
-
-
-                        }
-                        companyDotloopProfileMapping = organizationManagementService
-                            .getCompanyDotloopMappingByProfileId( profileId );
-
-                        if ( companyDotloopProfileMapping.isActive() ) {
-
-                            LOG.debug( "The profile is active  " + profileId );
-                            Response loopResponse = null;
-                            int batchNumber = 1;
-                            String loopResponseString = null;
-                            List<LoopProfileMapping> dotloopProfileMappingList = new ArrayList<LoopProfileMapping>();
-                            do {
-                                try {
-                                    loopResponse = dotloopIntegrationApi.fetchClosedProfiles( authorizationHeader, profileId,
-                                        batchNumber );
-                                } catch ( Exception e ) {
-                                    LOG.error( "exception caught while fetching this profile, hence marking it as inactive ", e );
-                                    loopResponse = null;
-                                }
-                                if ( loopResponse != null ) {
-                                    loopResponseString = new String( ( (TypedByteArray) loopResponse.getBody() ).getBytes() );
-                                }
-
-                                if ( loopResponseString != null ) {
-
-                                    List<Object> loopMapList = null;
-                                    try {
-                                        loopMapList = convertJsonStringToListObject( loopResponseString );
-                                    } catch ( JsonParseException e ) {
-                                        LOG.error( "Exception caught " + e.getMessage() );
-                                    } catch ( JsonMappingException e ) {
-                                        LOG.error( "Exception caught " + e.getMessage() );
-                                    } catch ( IOException e ) {
-                                        LOG.error( "Exception caught " + e.getMessage() );
-                                    }
-
-                                    if ( loopMapList != null ) {
-                                        for ( Object loopDetails : loopMapList ) {
-                                            loopDetails = (Map<Object, LinkedHashMap<String, String>>) loopDetails;
-
-                                            String loopId = String.valueOf( ( (LinkedHashMap<String, Object>) loopDetails )
-                                                .get( CommonConstants.DOTLOOP_PROFILE_LOOP_ID ) );
-                                            String loopviewId = String.valueOf( ( (LinkedHashMap<String, Object>) loopDetails )
-                                                .get( CommonConstants.DOTLOOP_PROFILE_LOOP_VIEW_ID ) );
-                                            LoopProfileMapping loopProfileMapping = new LoopProfileMapping();
-                                            loopProfileMapping.setProfileId( profileId );
-                                            loopProfileMapping.setProfileLoopId( loopId );
-                                            loopProfileMapping.setProfileViewId( loopviewId );
-                                            loopProfileMapping.setLoopClosedTime( convertEpochDateToTimestamp() );
-                                            dotloopProfileMappingList.add( loopProfileMapping );
-
-                                        }
-                                    } else {
-                                        LOG.debug( "Marking profile as inactive" );
-                                        companyDotloopProfileMapping.setActive( false );
-                                        organizationManagementService
-                                            .updateCompanyDotLoopProfileMapping( companyDotloopProfileMapping );
-                                        break;
-                                    }
-
-                                    if ( loopResponseString.equalsIgnoreCase( "[]" ) ) {
-                                        break;
-                                    }
-                                    batchNumber++;
-                                } else {
-                                    LOG.debug( "Marking profile as inactive" );
-                                    companyDotloopProfileMapping.setActive( false );
-                                    organizationManagementService
-                                        .updateCompanyDotLoopProfileMapping( companyDotloopProfileMapping );
-                                    break;
-
-                                }
-                            } while ( true );
-
-                            List<LoopProfileMapping> loopProfileMappingList = organizationManagementService
-                                .getLoopsByProfile( profileId );
-                            if ( loopProfileMappingList == null || loopProfileMappingList.isEmpty() ) {
-                                LOG.info( "Fetching records for the first time " );
-                                for ( LoopProfileMapping loopDetails : dotloopProfileMappingList ) {
-                                    organizationManagementService.saveLoopsForProfile( loopDetails );
-                                   /* saveSurveyPreInititation( unitSettings.getIden(), authorizationHeader, loopDetails );*/
-                                }
-                            } else {
-                                for ( LoopProfileMapping loopDetails : dotloopProfileMappingList ) {
-                                    boolean profileFound = false;
-                                    for ( LoopProfileMapping loopProfileMapping : loopProfileMappingList ) {
-                                        if ( loopDetails.getProfileLoopId().equalsIgnoreCase(
-                                            loopProfileMapping.getProfileLoopId() ) ) {
-                                            profileFound = true;
-                                            break;
-                                        }
-                                    }
-                                    if ( !profileFound ) {
-                                        loopDetails.setLoopClosedTime( new Timestamp( System.currentTimeMillis() ) );
-                                        organizationManagementService.saveLoopsForProfile( loopDetails );
-                                        saveSurveyPreInititation( unitSettings.getIden(), authorizationHeader, loopDetails );
-                                    }
-                                }
-                            }
-                        }
-
-                    }
-                }
-            }
-        }
-    }
-
-
-    private void saveSurveyPreInititation( long companyId, String authorizationHeader, LoopProfileMapping loopProfileMapping )
-    {
-        LOG.debug( "Insid method saveSurveyPreInititation" );
-        DotloopIntegrationApi dotloopIntegrationApi = dotloopIntegrationApiBuilder.getDotloopIntegrationApi();
-        Response loopDetailResponse = null;
-        try {
-            loopDetailResponse = dotloopIntegrationApi.fetchLoopProfileDetail( authorizationHeader,
-                loopProfileMapping.getProfileId(), loopProfileMapping.getProfileViewId() );
-        } catch ( Exception e ) {
-            LOG.error( "Unable to access this profile loop " );
-            loopDetailResponse = null;
-        }
-        String loopResponseString = null;
-        if ( loopDetailResponse != null ) {
-            loopResponseString = new String( ( (TypedByteArray) loopDetailResponse.getBody() ).getBytes() );
-        }
-
-        if ( loopResponseString != null ) {
-
-            Map<String, Object> loopMapList = null;
-            try {
-                loopMapList = convertJsonStringToMap( loopResponseString );
-            } catch ( JsonParseException e ) {
-                LOG.error( "Exception caught " + e.getMessage() );
-            } catch ( JsonMappingException e ) {
-                LOG.error( "Exception caught " + e.getMessage() );
-            } catch ( IOException e ) {
-                LOG.error( "Exception caught " + e.getMessage() );
-            }
-
-            if ( loopMapList != null ) {
-
-                String engagementClosedTime = null;
-                String customerFirstName = "";
-                String customerLastName = "";
-                String agentName = null;
-                String agentEmailAddress = null;
-                String customerEmailAddress = null;
-                Map<String, LinkedHashMap<String, String>> sectionsMap = (Map<String, LinkedHashMap<String, String>>) loopMapList
-                    .get( "sections" );
-
-                if ( sectionsMap != null ) {
-                    Map<String, String> contractDates = sectionsMap.get( "Contract Dates" );
-                    Map<String, String> buyerMap = sectionsMap.get( "Buyer" );
-                    Map<String, String> buyingAgentMap = sectionsMap.get( "Buying Agent" );
-                    if ( contractDates != null ) {
-                        engagementClosedTime = contractDates.get( "closingDate" );
-                    }
-                    if ( buyerMap != null ) {
-                        String fullName = buyerMap.get( "Name" );
-                        customerEmailAddress = buyerMap.get( "Email" );
-                        if ( fullName != null && !fullName.isEmpty() ) {
-                            String[] nameArray = fullName.split( " " );
-                            if ( nameArray.length == 1 ) {
-                                customerFirstName = nameArray[nameArray.length - 1];
-                                customerLastName = null;
-                            } else {
-                                for ( int i = 0; i < nameArray.length - 1; i++ ) {
-                                    customerFirstName = customerFirstName + nameArray[i];
-                                }
-                                customerFirstName = customerFirstName.trim();
-                                customerLastName = nameArray[nameArray.length - 1];
-                            }
-
-
-                        } else {
-                            customerFirstName = null;
-                            customerLastName = null;
-                        }
-                    }
-                    if ( buyingAgentMap != null ) {
-                        agentName = buyingAgentMap.get( "Name" );
-                        agentEmailAddress = buyingAgentMap.get( "Email" );
-                    }
-                }
-
-                SurveyPreInitiation surveyPreInitiation = new SurveyPreInitiation();
-                surveyPreInitiation.setAgentEmailId( agentEmailAddress );
-                surveyPreInitiation.setAgentName( agentName );
-                surveyPreInitiation.setCompanyId( companyId );
-                surveyPreInitiation.setCreatedOn( new Timestamp( System.currentTimeMillis() ) );
-                surveyPreInitiation.setAgentId( 0 );
-                surveyPreInitiation.setCustomerEmailId( customerEmailAddress );
-                surveyPreInitiation.setCustomerFirstName( customerFirstName );
-                surveyPreInitiation.setCustomerLastName( customerLastName );
-                if ( engagementClosedTime != null ) {
-                    surveyPreInitiation.setEngagementClosedTime( convertStringToDate( engagementClosedTime ) );
-                } else {
-                    surveyPreInitiation.setEngagementClosedTime( convertEpochDateToTimestamp() );
-                }
-                surveyPreInitiation.setStatus( CommonConstants.STATUS_SURVEYPREINITIATION_NOT_PROCESSED );
-                surveyPreInitiation.setSurveySource( CommonConstants.CRM_SOURCE_DOTLOOP );
-                try {
-                    surveyHandler.saveSurveyPreInitiationObject( surveyPreInitiation );
-                } catch ( Exception e ) {
-                    LOG.error( "Unable to insert this record ", e );
-                }
-
-
-            }
-
-        }
-
-    }
-
-
-    private Timestamp convertStringToDate( String dateString )
-    {
-        DateFormat format = new SimpleDateFormat( "MM/dd/yyyy", Locale.ENGLISH );
-        Date date = null;
-
-        try {
-            date = format.parse( dateString );
-        } catch ( ParseException e ) {
-            LOG.error( "Exception caught ", e );
-        }
-        Calendar cal = Calendar.getInstance();
-        cal.setTime( date );
-        cal.set( Calendar.MILLISECOND, 0 );
-
-        return ( new java.sql.Timestamp( cal.getTimeInMillis() ) );
-    }
-
-
-    private Timestamp convertEpochDateToTimestamp()
-    {
-        String string = "January 2, 1970";
-        DateFormat format = new SimpleDateFormat( "MMMM d, yyyy", Locale.ENGLISH );
-        Date date = null;
-
-        try {
-            date = format.parse( string );
-        } catch ( ParseException e ) {
-            LOG.error( "Exception caught ", e );
-        }
-        Calendar cal = Calendar.getInstance();
-        cal.setTime( date );
-        cal.set( Calendar.MILLISECOND, 0 );
-
-        return ( new java.sql.Timestamp( cal.getTimeInMillis() ) );
-    }
-
-
-    private void initializeDependencies( JobDataMap jobMap )
-    {
-        dotloopIntegrationApiBuilder = (DotloopIntergrationApiBuilder) jobMap.get( "dotloopIntegrationApiBuilder" );
-        surveyHandler = (SurveyHandler) jobMap.get( "surveyHandler" );
-        organizationManagementService = (OrganizationManagementService) jobMap.get( "organizationManagementService" );
-        userManagementService = (UserManagementService) jobMap.get( "userManagementService" );
-
-    }
 }

@@ -159,7 +159,7 @@ public interface SurveyHandler
     /**
      * @param surveyPreInitiation
      */
-    public void saveSurveyPreInitiationObject( SurveyPreInitiation surveyPreInitiation );
+    public void saveSurveyPreInitiationObject( SurveyPreInitiation surveyPreInitiation ) throws InvalidInputException;
 
 
 	void updateSurveyAsAbusive(String surveymongoId);

@@ -5,7 +5,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
-
+import com.realtech.socialsurvey.core.integration.pos.errorhandlers.DotLoopHttpErrorHandler;
 import retrofit.RestAdapter;
 
 
@@ -32,7 +32,7 @@ public class DotloopIntergrationApiBuilder implements InitializingBean
     {
         LOG.info( "Initialising rest builder" );
         RestAdapter dotloopAdapter = new RestAdapter.Builder().setLogLevel( RestAdapter.LogLevel.FULL )
-            .setEndpoint( dotloopEndpoint ).build();
+            .setEndpoint( dotloopEndpoint ).setErrorHandler(new DotLoopHttpErrorHandler()).build();
         dotloopIntegrationApi = dotloopAdapter.create( DotloopIntegrationApi.class );
     }
 }
