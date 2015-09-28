@@ -978,6 +978,23 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
     }
 
 
+    @Transactional
+    @Override
+    public AgentSettings getAgentSettings(long agentId) throws InvalidInputException, NoRecordsFetchedException{
+    	LOG.info("Getting agent settings for id: "+agentId);
+    	AgentSettings agentSettings = null;
+    	if(agentId <= 0l){
+    		LOG.error("Agent id is not passed to fetch the agent settings");
+    		throw new InvalidInputException("Agent id is not passed to fetch the agent settings");
+    	}
+    	agentSettings = organizationUnitSettingsDao.fetchAgentSettingsById(agentId);
+    	if(agentSettings == null){
+    		LOG.error("Could not find agent settings for id: "+agentId);
+    		throw new NoRecordsFetchedException("Could not find agent settings for id: "+agentId);
+    	}
+    	return agentSettings;
+    }
+    
     @Override
     public void updateCRMDetails( OrganizationUnitSettings companySettings, CRMInfo crmInfo, String fullyQualifiedClass )
         throws InvalidInputException
