@@ -8,8 +8,10 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,6 +24,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
+
 import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.commons.EmailTemplateConstants;
 import com.realtech.socialsurvey.core.commons.UserProfileComparator;
@@ -84,9 +87,19 @@ public class SessionHelper {
 
 	@Value("${APPLICATION_LOGO_URL}")
 	private String applicationLogoUrl;
-
-	@Value("${PARAM_ORDER_TAKE_SURVEY_REMINDER}")
-	String paramOrderTakeSurveyReminder;
+	
+	@Value ( "${PARAM_ORDER_TAKE_SURVEY}")
+    String paramOrderTakeSurvey;
+    @Value ( "${PARAM_ORDER_TAKE_SURVEY_CUSTOMER}")
+    String paramOrderTakeSurveyCustomer;
+    @Value ( "${PARAM_ORDER_TAKE_SURVEY_REMINDER}")
+    String paramOrderTakeSurveyReminder;
+    @Value ( "${PARAM_ORDER_SURVEY_COPLETION_MAIL}")
+    String paramOrderSurveyCompletionMail;
+    @Value ( "${PARAM_ORDER_SOCIAL_POST_REMINDER}")
+    String paramOrderSocialPostReminder;
+    @Value ( "${PARAM_ORDER_INCOMPLETE_SURVEY_REMINDER}")
+    String paramOrderIncompleteSurveyReminder;
 
 	@Transactional
 	public void getCanonicalSettings(HttpSession session) throws InvalidInputException, NoRecordsFetchedException {
@@ -200,7 +213,9 @@ public class SessionHelper {
 			}
 			else {
 				try {
-					List<String> paramOrder = new ArrayList<String>(Arrays.asList(paramOrderTakeSurveyReminder.split(",")));
+					List<String> paramOrder = new ArrayList<String>(Arrays.asList(paramOrderTakeSurvey.split(",")));
+					replacements = new FileContentReplacements();
+					replacements.setFileName(EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER + EmailTemplateConstants.SURVEY_PARTICIPATION_MAIL_BODY);
 					body = fileOperations.replaceFileContents(replacements);
 					body = emailFormatHelper.replaceEmailBodyWithParams(body, paramOrder);
 					/*body = body.replaceAll("\\[LogoUrl\\]", applicationLogoUrl);*/
@@ -213,6 +228,7 @@ public class SessionHelper {
 				}
 			}
 
+			//survey reminder mail
 			if (userSettings.getCompanySettings().getMail_content().getTake_survey_reminder_mail() != null) {
 				MailContent mailContent = mailSettings.getTake_survey_reminder_mail();
 				String mailBody = emailFormatHelper.replaceEmailBodyWithParams(mailContent.getMail_body(), mailContent.getParam_order());
@@ -228,15 +244,104 @@ public class SessionHelper {
 			else {
 				try {
 					List<String> paramOrder = new ArrayList<String>(Arrays.asList(paramOrderTakeSurveyReminder.split(",")));
+					replacements = new FileContentReplacements();
+					replacements.setFileName(EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER + EmailTemplateConstants.SURVEY_REMINDER_MAIL_BODY);
 					body = fileOperations.replaceFileContents(replacements);
 					body = emailFormatHelper.replaceEmailBodyWithParams(body, paramOrder);
 					/*body = body.replaceAll("\\[LogoUrl\\]", applicationLogoUrl);*/
 					session.setAttribute(CommonConstants.SURVEY_PARTICIPATION_REMINDER_MAIL_BODY_IN_SESSION, body);
-					session.setAttribute(CommonConstants.SURVEY_PARTICIPATION_REMINDER_MAIL_SUBJECT_IN_SESSION, CommonConstants.SURVEY_MAIL_SUBJECT
+					session.setAttribute(CommonConstants.SURVEY_PARTICIPATION_REMINDER_MAIL_SUBJECT_IN_SESSION, CommonConstants.REMINDER_MAIL_SUBJECT
 							+ "[AgentName]");
 				}
 				catch (InvalidInputException e) {
 					LOG.warn("Could not set mail content for survey participation reminder");
+				}
+			}
+			
+			// incomplete survey reminder mail
+			if (userSettings.getCompanySettings().getMail_content().getRestart_survey_mail() != null) {
+				MailContent mailContent = mailSettings.getRestart_survey_mail();
+				String mailBody = emailFormatHelper.replaceEmailBodyWithParams(mailContent.getMail_body(), mailContent.getParam_order());
+				/*mailBody = mailBody.replaceAll("\\[LogoUrl\\]", applicationLogoUrl);*/
+				mailSettings.getRestart_survey_mail().setMail_body(mailBody);
+				session.setAttribute(CommonConstants.INCOMPLETE_SURVEY_REMINDER_MAIL_BODY_IN_SESSION, mailBody);
+				String incompleteSurveyReminderMailSubject = CommonConstants.INCOMPLETE_SURVEY_REMINDER_MAIL_SUBJECT;
+				if (mailContent.getMail_subject() != null) {
+					incompleteSurveyReminderMailSubject = mailContent.getMail_subject();
+				}
+				session.setAttribute(CommonConstants.INCOMPLETE_SURVEY_REMINDER_MAIL_SUBJECT_IN_SESSION, incompleteSurveyReminderMailSubject);
+			}
+			else {
+				try {
+					List<String> paramOrder = new ArrayList<String>(Arrays.asList(paramOrderIncompleteSurveyReminder.split(",")));
+					replacements = new FileContentReplacements();
+					replacements.setFileName(EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER + EmailTemplateConstants.SURVEY_RESTART_MAIL_BODY);
+					body = fileOperations.replaceFileContents(replacements);
+					body = emailFormatHelper.replaceEmailBodyWithParams(body, paramOrder);
+					/*body = body.replaceAll("\\[LogoUrl\\]", applicationLogoUrl);*/
+					session.setAttribute(CommonConstants.INCOMPLETE_SURVEY_REMINDER_MAIL_BODY_IN_SESSION, body);
+					session.setAttribute(CommonConstants.INCOMPLETE_SURVEY_REMINDER_MAIL_SUBJECT_IN_SESSION, CommonConstants.INCOMPLETE_SURVEY_REMINDER_MAIL_SUBJECT);
+				}
+				catch (InvalidInputException e) {
+					LOG.warn("Could not set mail content for incomplete survey reminder");
+				}
+			}
+			
+			//survey completion mail
+			if (userSettings.getCompanySettings().getMail_content().getSurvey_completion_mail() != null) {
+				MailContent mailContent = mailSettings.getSurvey_completion_mail();
+				String mailBody = emailFormatHelper.replaceEmailBodyWithParams(mailContent.getMail_body(), mailContent.getParam_order());
+				/*mailBody = mailBody.replaceAll("\\[LogoUrl\\]", applicationLogoUrl);*/
+				mailSettings.getSurvey_completion_mail().setMail_body(mailBody);
+				session.setAttribute(CommonConstants.SURVEY_COMPLETION_MAIL_BODY_IN_SESSION, mailBody);
+				String surveyCompletionMailSubject = CommonConstants.SURVEY_COMPLETION_MAIL_SUBJECT;
+				if (mailContent.getMail_subject() != null) {
+					surveyCompletionMailSubject = mailContent.getMail_subject();
+				}
+				session.setAttribute(CommonConstants.SURVEY_COMPLETION_MAIL_SUBJECT_IN_SESSION, surveyCompletionMailSubject);
+			}
+			else {
+				try {
+					List<String> paramOrder = new ArrayList<String>(Arrays.asList(paramOrderSurveyCompletionMail.split(",")));
+					replacements = new FileContentReplacements();
+					replacements.setFileName(EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER + EmailTemplateConstants.SURVEY_COMPLETION_MAIL_BODY);
+					body = fileOperations.replaceFileContents(replacements);
+					body = emailFormatHelper.replaceEmailBodyWithParams(body, paramOrder);
+					/*body = body.replaceAll("\\[LogoUrl\\]", applicationLogoUrl);*/
+					session.setAttribute(CommonConstants.SURVEY_COMPLETION_MAIL_BODY_IN_SESSION, body);
+					session.setAttribute(CommonConstants.SURVEY_COMPLETION_MAIL_SUBJECT_IN_SESSION, CommonConstants.SURVEY_COMPLETION_MAIL_SUBJECT);
+				}
+				catch (InvalidInputException e) {
+					LOG.warn("Could not set mail content for survey completion mail");
+				}
+			}
+			
+			//social post reminder mail
+			if (userSettings.getCompanySettings().getMail_content().getSocial_post_reminder_mail() != null) {
+				MailContent mailContent = mailSettings.getSocial_post_reminder_mail();
+				String mailBody = emailFormatHelper.replaceEmailBodyWithParams(mailContent.getMail_body(), mailContent.getParam_order());
+				/*mailBody = mailBody.replaceAll("\\[LogoUrl\\]", applicationLogoUrl);*/
+				mailSettings.getSocial_post_reminder_mail().setMail_body(mailBody);
+				session.setAttribute(CommonConstants.SOCIAL_POST_REMINDER_MAIL_BODY_IN_SESSION, mailBody);
+				String socialPostReminderMailSubject = CommonConstants.SOCIAL_POST_REMINDER_MAIL_SUBJECT;
+				if (mailContent.getMail_subject() != null) {
+					socialPostReminderMailSubject = mailContent.getMail_subject();
+				}
+				session.setAttribute(CommonConstants.SOCIAL_POST_REMINDER_MAIL_SUBJECT_IN_SESSION, socialPostReminderMailSubject);
+			}
+			else {
+				try {
+					List<String> paramOrder = new ArrayList<String>(Arrays.asList(paramOrderSocialPostReminder.split(",")));
+					replacements = new FileContentReplacements();
+					replacements.setFileName(EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER + EmailTemplateConstants.SOCIALPOST_REMINDER_MAIL_BODY);
+					body = fileOperations.replaceFileContents(replacements);
+					body = emailFormatHelper.replaceEmailBodyWithParams(body, paramOrder);
+					/*body = body.replaceAll("\\[LogoUrl\\]", applicationLogoUrl);*/
+					session.setAttribute(CommonConstants.SOCIAL_POST_REMINDER_MAIL_BODY_IN_SESSION, body);
+					session.setAttribute(CommonConstants.SOCIAL_POST_REMINDER_MAIL_SUBJECT_IN_SESSION, CommonConstants.SOCIAL_POST_REMINDER_MAIL_SUBJECT);
+				}
+				catch (InvalidInputException e) {
+					LOG.warn("Could not set mail content for social post reminder reminder");
 				}
 			}
 		}

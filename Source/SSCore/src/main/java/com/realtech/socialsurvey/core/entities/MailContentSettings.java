@@ -9,6 +9,24 @@ public class MailContentSettings {
 	private MailContent take_survey_mail_customer;
 	private MailContent take_survey_reminder_mail;
 	private MailContent restart_survey_mail;
+	private MailContent survey_completion_mail;
+	private MailContent social_post_reminder_mail;
+
+	public MailContent getSocial_post_reminder_mail() {
+		return social_post_reminder_mail;
+	}
+
+	public void setSocial_post_reminder_mail(MailContent social_post_reminder_mail) {
+		this.social_post_reminder_mail = social_post_reminder_mail;
+	}
+
+	public MailContent getSurvey_completion_mail() {
+		return survey_completion_mail;
+	}
+
+	public void setSurvey_completion_mail(MailContent survey_completion_mail) {
+		this.survey_completion_mail = survey_completion_mail;
+	}
 
 	public MailContent getTake_survey_mail() {
 		return take_survey_mail;
