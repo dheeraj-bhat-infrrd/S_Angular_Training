@@ -106,13 +106,13 @@
 	</div>
 	
 	<div class="v-edit-rt col-lg-6 col-md-6 col-sm-6 col-xs-12">
-		<div id="profile-tbl-wrapper-${userId}" class="v-edt-tbl-wrapper" style="max-height: 205px;">
+		<div id="profile-tbl-wrapper-${userId}" class="v-edt-tbl-wrapper">
 			<table class="v-edt-tbl">
 				<tr class="v-edt-tbl-header">
 					<td class="v-edt-tbl-assign-to"><spring:message code="label.assignedto.key" /></td>
 					<td class="v-edt-tbl-role"><spring:message code="label.role.key" /></td>
-					<td class="v-edt-tbl-status"><spring:message code="label.status.key" /></td>
-					<!-- <td class="v-edt-tbl-rem"></td> -->
+					<%-- <td class="v-edt-tbl-status"><spring:message code="label.status.key" /></td> --%>
+					<td class="v-edt-tbl-rem"><spring:message code="label.action.key" /></td>
 				</tr>
 				
 				<c:choose>
@@ -121,15 +121,15 @@
 							<tr class="v-edt-tbl-row" id="v-edt-tbl-row-${profile.profileId}" data-profile-id="${profile.profileId}">
 								<td class="v-edt-tbl-assign-to">${profile.entityName}</td>
 								<td class="v-edt-tbl-role">${profile.role}</td>
-								<c:choose>
+								<%-- <c:choose>
 									<c:when test="${profile.status == 1}">
 										<td class="v-edt-tbl-status v-edt-tbl-icn v-edt-tbl-switch tbl-switch-on" title="<spring:message code="label.active.key" />"></td>
 									</c:when>
 									<c:otherwise>
 										<td class="v-edt-tbl-status v-edt-tbl-icn v-edt-tbl-switch tbl-switch-off" title="<spring:message code="label.inactive.key" />"></td>
 									</c:otherwise>
-								</c:choose>
-								<!-- <td class="v-edt-tbl-rem v-edt-tbl-icn v-icn-rem-user"></td> -->
+								</c:choose> --%>
+								<td class="v-edt-tbl-rem v-edt-tbl-icn v-icn-rem-userprofile"></td>
 							</tr>
 						</c:forEach>
 					</c:when>
