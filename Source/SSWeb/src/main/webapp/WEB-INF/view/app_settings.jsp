@@ -8,7 +8,9 @@
 <c:set
 	value="${sessionScope.SPRING_SECURITY_CONTEXT.authentication.principal}"
 	var="user" />
-
+<c:if test="${appSettings != null && appSettings.crm_info != null}">
+	<input type="hidden" id="crm-source" value="${appSettings.crm_info.crm_source}"/>
+</c:if>
 <div class="hm-header-main-wrapper">
 	<div class="container">
 		<div class="hm-header-row clearfix">
@@ -106,6 +108,11 @@
 			$('.crm-setting-cont[data-crm-type="'+crmType+'"]').show();
 		});
 		
+		//check for crm source and show the corresponding app
+		var crmSource = $('#crm-source').val();
+		if(crmSource && crmSource.toUpperCase() == "DOTLOOP") {
+			$('.crm-settings-dropdown-item[data-crm-type="Dotloop"]').click();
+		}
 		
 		//dotloop function
 		$('#dotloop-apikey').blur(function() {

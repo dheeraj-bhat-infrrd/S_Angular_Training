@@ -478,6 +478,11 @@ public class OrganizationManagementController {
 			catch (InvalidInputException e) {
 				throw new InvalidInputException("Exception occured while fetching vertical crm mappings", e.getMessage(), e);
 			}
+			//Set the app settings in model
+			OrganizationUnitSettings unitSettings = null;
+			unitSettings = organizationManagementService.getCompanySettings(user.getCompany().getCompanyId());
+			model.addAttribute(CommonConstants.USER_APP_SETTINGS, unitSettings);
+
 		}
 		catch (NonFatalException e) {
 			LOG.error("NonfatalException while showing app settings. Reason: " + e.getMessage(), e);
