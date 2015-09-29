@@ -795,108 +795,164 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean {
 	}
 
 	// Method to update agentId in SurveyPreInitiation table for each of the unmapped agent.
-	@Override
-	@Transactional
-	public Map<String, Object> mapAgentsInSurveyPreInitiation() {
+    @Override
+    @Transactional
+    public Map<String, Object> mapAgentsInSurveyPreInitiation()
+    {
 
-		LOG.debug("Inside method mapAgentsInSurveyPreInitiation ");
-		List<SurveyPreInitiation> surveys = surveyPreInitiationDao.findByColumn(SurveyPreInitiation.class, CommonConstants.STATUS_COLUMN,
-				CommonConstants.STATUS_SURVEYPREINITIATION_NOT_PROCESSED);
-		List<SurveyPreInitiation> unavailableAgents = new ArrayList<>();
-		List<SurveyPreInitiation> invalidAgents = new ArrayList<>();
-		List<SurveyPreInitiation> customersWithoutName = new ArrayList<>();
-		List<SurveyPreInitiation> customersWithoutEmailId = new ArrayList<>();
-		Set<Long> companies = new HashSet<>();
-		for (SurveyPreInitiation survey : surveys) {
-			int status = CommonConstants.STATUS_SURVEYPREINITIATION_PROCESSED;
-			User user = null;
-			if (survey.getAgentEmailId() != null) {
-				List<User> userList = userDao.findByColumn(User.class, CommonConstants.AGENT_EMAIL_ID_COLUMN, survey.getAgentEmailId());
-				if (userList != null && !userList.isEmpty()) {
-					user = userList.get(0);
-					if (user != null) {
-						LOG.debug("Mapping the agent to this survey ");
-						survey.setAgentId(user.getUserId());
-						surveyPreInitiationDao.update(survey);
-						if (survey.getSurveySource().equalsIgnoreCase(CommonConstants.CRM_INFO_SOURCE_ENCOMPASS)) {
-							if (user.getLoginPassword() != null) {
-								if (user.getCreatedOn().after(survey.getEngagementClosedTime())) {
-									status = CommonConstants.STATUS_SURVEYPREINITIATION_CORRUPT_RECORD;
-								}
-							}
-							else {
-								LOG.debug("Only a user invite has been sent so far, hence can't mark it as an old record for user "
-										+ user.getUserId());
-							}
+        LOG.debug( "Inside method mapAgentsInSurveyPreInitiation " );
+        List<SurveyPreInitiation> surveys = surveyPreInitiationDao.findByColumn( SurveyPreInitiation.class,
+            CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_SURVEYPREINITIATION_NOT_PROCESSED );
+        List<SurveyPreInitiation> unavailableAgents = new ArrayList<>();
+        List<SurveyPreInitiation> invalidAgents = new ArrayList<>();
+        List<SurveyPreInitiation> customersWithoutName = new ArrayList<>();
+        List<SurveyPreInitiation> customersWithoutEmailId = new ArrayList<>();
+        Set<Long> companies = new HashSet<>();
+        for ( SurveyPreInitiation survey : surveys ) {
+            int status = CommonConstants.STATUS_SURVEYPREINITIATION_PROCESSED;
+            User user = null;
+            if ( survey.getAgentEmailId() != null ) {
+                List<User> userList = userDao.findByColumn( User.class, CommonConstants.AGENT_EMAIL_ID_COLUMN,
+                    survey.getAgentEmailId() );
+                if ( userList != null && !userList.isEmpty() ) {
+                    user = userList.get( 0 );
+                    if ( user != null ) {
+                        LOG.debug( "Mapping the agent to this survey " );
+                        survey.setAgentId( user.getUserId() );
+                        surveyPreInitiationDao.update( survey );
+                        if ( survey.getSurveySource().equalsIgnoreCase( CommonConstants.CRM_INFO_SOURCE_ENCOMPASS ) ) {
+                            if ( user.getLoginPassword() != null ) {
+                                if ( user.getCreatedOn().after( survey.getEngagementClosedTime() ) ) {
+                                    status = CommonConstants.STATUS_SURVEYPREINITIATION_CORRUPT_RECORD;
+                                }
+                            } else {
+                                LOG.debug( "Only a user invite has been sent so far, hence can't mark it as an old record for user "
+                                    + user.getUserId() );
+                            }
 
-							long surveyClosedTime = survey.getEngagementClosedTime().getTime();
-							long currentTime = System.currentTimeMillis();
-							if (checkIfRecordHasExpired(surveyClosedTime, currentTime, validSurveyInterval)) {
-								status = CommonConstants.STATUS_SURVEYPREINITIATION_CORRUPT_RECORD;
-							}
-						}
-					}
-				}
-			}
-			if (survey.getAgentEmailId() == null || survey.getAgentEmailId().isEmpty()) {
-				LOG.error("Agent email not found , invalid survey " + survey.getSurveyPreIntitiationId());
-				status = CommonConstants.STATUS_SURVEYPREINITIATION_CORRUPT_RECORD;
-				unavailableAgents.add(survey);
-				companies.add(survey.getCompanyId());
-			}
-			else if (survey.getCustomerFirstName() == null || survey.getCustomerFirstName().isEmpty()) {
-				if (survey.getCustomerLastName() == null || survey.getCustomerLastName().isEmpty()) {
-					LOG.error("No Name found for customer, hence this is an invalid survey " + survey.getSurveyPreIntitiationId());
-					status = CommonConstants.STATUS_SURVEYPREINITIATION_CORRUPT_RECORD;
-					customersWithoutName.add(survey);
-				}
+                            long surveyClosedTime = survey.getEngagementClosedTime().getTime();
+                            long currentTime = System.currentTimeMillis();
+                            if ( checkIfRecordHasExpired( surveyClosedTime, currentTime, validSurveyInterval ) ) {
+                                status = CommonConstants.STATUS_SURVEYPREINITIATION_CORRUPT_RECORD;
+                            }
+                        }
+                    }
+                }
+            }
+            if ( survey.getAgentEmailId() == null || survey.getAgentEmailId().isEmpty() ) {
+                LOG.error( "Agent email not found , invalid survey " + survey.getSurveyPreIntitiationId() );
+                status = CommonConstants.STATUS_SURVEYPREINITIATION_CORRUPT_RECORD;
+                unavailableAgents.add( survey );
+                companies.add( survey.getCompanyId() );
+            } else if ( survey.getCustomerFirstName() == null || survey.getCustomerFirstName().isEmpty() ) {
+                if ( survey.getCustomerLastName() == null || survey.getCustomerLastName().isEmpty() ) {
+                    LOG.error( "No Name found for customer, hence this is an invalid survey "
+                        + survey.getSurveyPreIntitiationId() );
+                    status = CommonConstants.STATUS_SURVEYPREINITIATION_CORRUPT_RECORD;
+                    customersWithoutName.add( survey );
+                }
 
-			}
-			else if (survey.getCustomerLastName() == null || survey.getCustomerLastName().isEmpty()) {
-				if (survey.getCustomerFirstName() == null || survey.getCustomerFirstName().isEmpty()) {
-					LOG.error("No Name found for customer, hence this is an invalid survey " + survey.getSurveyPreIntitiationId());
-					status = CommonConstants.STATUS_SURVEYPREINITIATION_CORRUPT_RECORD;
-					customersWithoutName.add(survey);
-					companies.add(survey.getCompanyId());
-				}
-			}
-			else if (survey.getCustomerEmailId() == null || survey.getCustomerEmailId().isEmpty()) {
-				LOG.error("No customer email id found, invalid survey " + survey.getSurveyPreIntitiationId());
-				status = CommonConstants.STATUS_SURVEYPREINITIATION_CORRUPT_RECORD;
-				customersWithoutEmailId.add(survey);
-				companies.add(survey.getCompanyId());
-			}
-			else if (user == null) {
-				LOG.error("no agent found with this email id");
-				status = CommonConstants.STATUS_SURVEYPREINITIATION_CORRUPT_RECORD;
-				invalidAgents.add(survey);
-				companies.add(survey.getCompanyId());
-			}
-			else if (user.getCompany() == null) {
-				LOG.error("Agent doesnt have an company associated with it ");
-				status = CommonConstants.STATUS_SURVEYPREINITIATION_CORRUPT_RECORD;
-				invalidAgents.add(survey);
-				companies.add(survey.getCompanyId());
-			}
-			else if (user.getCompany().getCompanyId() != survey.getCompanyId()) {
-				status = CommonConstants.STATUS_SURVEYPREINITIATION_CORRUPT_RECORD;
-				unavailableAgents.add(survey);
-				companies.add(survey.getCompanyId());
-			}
-			survey.setStatus(status);
-			survey.setModifiedOn(new Timestamp(System.currentTimeMillis()));
-			surveyPreInitiationDao.merge(survey);
-		}
+            } else if ( survey.getCustomerLastName() == null || survey.getCustomerLastName().isEmpty() ) {
+                if ( survey.getCustomerFirstName() == null || survey.getCustomerFirstName().isEmpty() ) {
+                    LOG.error( "No Name found for customer, hence this is an invalid survey "
+                        + survey.getSurveyPreIntitiationId() );
+                    status = CommonConstants.STATUS_SURVEYPREINITIATION_CORRUPT_RECORD;
+                    customersWithoutName.add( survey );
+                    companies.add( survey.getCompanyId() );
+                }
+            } else if ( survey.getCustomerEmailId() == null || survey.getCustomerEmailId().isEmpty() ) {
+                LOG.error( "No customer email id found, invalid survey " + survey.getSurveyPreIntitiationId() );
+                status = CommonConstants.STATUS_SURVEYPREINITIATION_CORRUPT_RECORD;
+                customersWithoutEmailId.add( survey );
+                companies.add( survey.getCompanyId() );
+            } else if ( user == null ) {
+                LOG.error( "no agent found with this email id" );
+                status = CommonConstants.STATUS_SURVEYPREINITIATION_CORRUPT_RECORD;
+                invalidAgents.add( survey );
+                companies.add( survey.getCompanyId() );
+            } else if ( user.getCompany() == null ) {
+                LOG.error( "Agent doesnt have an company associated with it " );
+                status = CommonConstants.STATUS_SURVEYPREINITIATION_CORRUPT_RECORD;
+                invalidAgents.add( survey );
+                companies.add( survey.getCompanyId() );
+            } else if ( user.getCompany().getCompanyId() != survey.getCompanyId() ) {
+                status = CommonConstants.STATUS_SURVEYPREINITIATION_CORRUPT_RECORD;
+                unavailableAgents.add( survey );
+                companies.add( survey.getCompanyId() );
+            }
 
-		Map<String, Object> corruptRecords = new HashMap<>();
-		corruptRecords.put("unavailableAgents", unavailableAgents);
-		corruptRecords.put("customersWithoutName", customersWithoutName);
-		corruptRecords.put("customersWithoutEmailId", customersWithoutEmailId);
-		corruptRecords.put("invalidAgents", invalidAgents);
-		corruptRecords.put("companies", companies);
-		return corruptRecords;
-	}
+            if ( survey.getSurveySource().equalsIgnoreCase( CommonConstants.CRM_SOURCE_DOTLOOP ) ) {
+                status = validateUnitsettingsForDotloop( user, survey );
+                if ( status == CommonConstants.STATUS_SURVEYPREINITIATION_CORRUPT_RECORD ) {
+                    unavailableAgents.add( survey );
+                    companies.add( survey.getCompanyId() );
+                }
+            }
+            survey.setStatus( status );
+            survey.setModifiedOn( new Timestamp( System.currentTimeMillis() ) );
+            surveyPreInitiationDao.merge( survey );
+        }
 
+        Map<String, Object> corruptRecords = new HashMap<>();
+        corruptRecords.put( "unavailableAgents", unavailableAgents );
+        corruptRecords.put( "customersWithoutName", customersWithoutName );
+        corruptRecords.put( "customersWithoutEmailId", customersWithoutEmailId );
+        corruptRecords.put( "invalidAgents", invalidAgents );
+        corruptRecords.put( "companies", companies );
+        return corruptRecords;
+    }
+    
+    private int validateUnitsettingsForDotloop( User user, SurveyPreInitiation surveyPreInitiation )
+    {
+        LOG.info( "Inside method validateUnitSettingsForDotloop " );
+        int status = CommonConstants.STATUS_SURVEYPREINITIATION_PROCESSED;
+        if ( surveyPreInitiation != null ) {
+            boolean found = false;
+            if ( surveyPreInitiation.getCompanyId() == user.getCompany().getCompanyId() ) {
+                LOG.debug( "Though the company id is same, the region or branch might be different " );
+                if ( surveyPreInitiation.getCollectionName().equalsIgnoreCase(
+                    MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION ) ) {
+                    LOG.debug( "The user region should be same " );
+                    long regionId = surveyPreInitiation.getRegionCollectionId();
+                    List<UserProfile> userProfileList = user.getUserProfiles();
+                    if ( userProfileList != null ) {
+                        for ( UserProfile userProfile : userProfileList ) {
+                            long userRegionId = userProfile.getRegionId();
+                            if ( regionId == userRegionId ) {
+                                found = true;
+                                break;
+                            }
+                        }
+                    }
+                    status = CommonConstants.STATUS_SURVEYPREINITIATION_CORRUPT_RECORD;
+                } else if ( surveyPreInitiation.getCollectionName().equalsIgnoreCase(
+                    MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION ) ) {
+                    LOG.debug( "The user region should be same " );
+                    long branchId = surveyPreInitiation.getBranchCollectionId();
+                    List<UserProfile> userProfileList = user.getUserProfiles();
+                    if ( userProfileList != null ) {
+                        for ( UserProfile userProfile : userProfileList ) {
+                            long userBranchId = userProfile.getBranchId();
+                            if ( branchId == userBranchId ) {
+                                found = true;
+                                break;
+                            }
+                        }
+                    }
+
+                } else if ( surveyPreInitiation.getCollectionName().equalsIgnoreCase(
+                    MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION ) ) {
+                    found = true;
+                }
+            }
+            if ( !found ) {
+                status = CommonConstants.STATUS_SURVEYPREINITIATION_CORRUPT_RECORD;
+            }
+        }
+
+        return status;
+    }
+    
 	/*
 	 * Method to send email by agent to initiate survey.
 	 */
