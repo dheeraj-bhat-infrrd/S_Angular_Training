@@ -3050,6 +3050,7 @@ function saveDotloopDetails(formid) {
 	if (validateDotloopInput()) {
 		var url = "./savedotloopdetails.do";
 		callAjaxFormSubmit(url, function(response) {
+			hideOverlay();
 			$("#overlay-toast").html(response);
 			showToast();
 		}, formid);
