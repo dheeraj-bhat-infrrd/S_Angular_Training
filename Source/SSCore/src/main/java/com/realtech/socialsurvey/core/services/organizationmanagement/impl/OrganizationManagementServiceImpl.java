@@ -231,6 +231,12 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
     String paramOrderTakeSurveyCustomer;
     @Value ( "${PARAM_ORDER_TAKE_SURVEY_REMINDER}")
     String paramOrderTakeSurveyReminder;
+    @Value ( "${PARAM_ORDER_SURVEY_COPLETION_MAIL}")
+    String paramOrderSurveyCompletionMail;
+    @Value ( "${PARAM_ORDER_SOCIAL_POST_REMINDER}")
+    String paramOrderSocialPostReminder;
+    @Value ( "${PARAM_ORDER_INCOMPLETE_SURVEY_REMINDER}")
+    String paramOrderIncompleteSurveyReminder;
 
     @Value ( "${CDN_PATH}")
     String cdnPath;
@@ -599,18 +605,30 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
         String takeSurveyMail = "";
         String takeSurveyReminderMail = "";
         String takeSurveyByCustomerMail = "";
-
+        String surveyCompletionMail = "";
+        String socialPostReminderMail = "";
+        String incompleteSurveyReminderMail = "";
+        
         String takeSurveyMailSubj = "";
         String takeSurveyReminderMailSubj = "";
         String takeSurveyByCustomerMailSubj = "";
+        String surveyCompletionMailSubj = "";
+        String socialPostReminderMailSubj = "";
+        String incompleteSurveyReminderMailSubj = "";
         try {
             takeSurveyMail = readMailContentFromFile( CommonConstants.SURVEY_REQUEST_MAIL_FILENAME );
             takeSurveyByCustomerMail = readMailContentFromFile( CommonConstants.SURVEY_CUSTOMER_REQUEST_MAIL_FILENAME );
             takeSurveyReminderMail = readMailContentFromFile( CommonConstants.SURVEY_REMINDER_MAIL_FILENAME );
-
+            surveyCompletionMail =  readMailContentFromFile( CommonConstants.SURVEY_COMPLETION_MAIL_FILENAME );
+            socialPostReminderMail = readMailContentFromFile( CommonConstants.SOCIAL_POST_REMINDER_MAIL_FILENAME );
+            incompleteSurveyReminderMail = readMailContentFromFile( CommonConstants.INCOMPLETE_SURVEY_REMINDER_MAIL_FILENAME );
+            
             takeSurveyMailSubj = CommonConstants.SURVEY_MAIL_SUBJECT + "[AgentName]";
             takeSurveyByCustomerMailSubj = CommonConstants.SURVEY_MAIL_SUBJECT_CUSTOMER;
             takeSurveyReminderMailSubj = CommonConstants.REMINDER_MAIL_SUBJECT + "[AgentName]";
+            surveyCompletionMailSubj = CommonConstants.SURVEY_COMPLETION_MAIL_SUBJECT;
+            socialPostReminderMailSubj = CommonConstants.SOCIAL_POST_REMINDER_MAIL_SUBJECT;
+            incompleteSurveyReminderMailSubj =  CommonConstants.INCOMPLETE_SURVEY_REMINDER_MAIL_SUBJECT;
         } catch ( IOException e ) {
             LOG.error(
                 "IOException occured in addOrganizationalDetails while copying default Email content. Nested exception is ", e );
@@ -634,6 +652,24 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
         mailContent.setMail_body( takeSurveyReminderMail );
         mailContent.setParam_order( new ArrayList<String>( Arrays.asList( paramOrderTakeSurveyReminder.split( "," ) ) ) );
         mailContentSettings.setTake_survey_reminder_mail( mailContent );
+        
+        mailContent = new MailContent();
+        mailContent.setMail_subject( surveyCompletionMailSubj );
+        mailContent.setMail_body( surveyCompletionMail );
+        mailContent.setParam_order( new ArrayList<String>( Arrays.asList( paramOrderSurveyCompletionMail.split( "," ) ) ) );
+        mailContentSettings.setSurvey_completion_mail(mailContent);
+        
+        mailContent = new MailContent();
+        mailContent.setMail_subject( socialPostReminderMailSubj );
+        mailContent.setMail_body( socialPostReminderMail );
+        mailContent.setParam_order( new ArrayList<String>( Arrays.asList( paramOrderSocialPostReminder.split( "," ) ) ) );
+        mailContentSettings.setSocial_post_reminder_mail(mailContent);
+        
+        mailContent = new MailContent();
+        mailContent.setMail_subject( incompleteSurveyReminderMailSubj );
+        mailContent.setMail_body( incompleteSurveyReminderMail );
+        mailContent.setParam_order( new ArrayList<String>( Arrays.asList( paramOrderIncompleteSurveyReminder.split( "," ) ) ) );
+        mailContentSettings.setRestart_survey_mail(mailContent);
 
         companySettings.setMail_content( mailContentSettings );
 
@@ -1096,6 +1132,12 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
             originalContentSettings.setTake_survey_mail( mailContent );
         } else if ( mailCategory.equals( CommonConstants.SURVEY_REMINDER_MAIL_BODY_CATEGORY ) ) {
             originalContentSettings.setTake_survey_reminder_mail( mailContent );
+        } else if ( mailCategory.equals( CommonConstants.SURVEY_COMPLETION_MAIL_BODY_CATEGORY ) ) {
+            originalContentSettings.setSurvey_completion_mail(mailContent);
+        } else if ( mailCategory.equals( CommonConstants.SOCIAL_POST_REMINDER_MAIL_BODY_CATEGORY ) ) {
+            originalContentSettings.setSocial_post_reminder_mail(mailContent);
+        } else if ( mailCategory.equals( CommonConstants.INCOMPLETE_SURVEY_REMINDER_MAIL_BODY_CATEGORY ) ) {
+            originalContentSettings.setRestart_survey_mail(mailContent);
         } else {
             throw new InvalidInputException( "Invalid mail category" );
         }
@@ -1160,6 +1202,54 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
             mailContent.setParam_order( paramOrder );
 
             originalContentSettings.setTake_survey_reminder_mail( mailContent );
+        } else if ( mailCategory.equals( CommonConstants.SURVEY_COMPLETION_MAIL_BODY_CATEGORY ) ) {
+            mailSubject = CommonConstants.SURVEY_COMPLETION_MAIL_SUBJECT;
+            try {
+                mailBody = readMailContentFromFile( CommonConstants.SURVEY_COMPLETION_MAIL_FILENAME );
+            } catch ( IOException e ) {
+                throw new NonFatalException( "Error occurred while parsing mail content.",
+                    DisplayMessageConstants.GENERAL_ERROR, e );
+            }
+            paramOrder = new ArrayList<String>( Arrays.asList( paramOrderSurveyCompletionMail.split( "," ) ) );
+
+            MailContent mailContent = new MailContent();
+            mailContent.setMail_subject( mailSubject );
+            mailContent.setMail_body( mailBody );
+            mailContent.setParam_order( paramOrder );
+
+            originalContentSettings.setSurvey_completion_mail( mailContent );
+        } else if ( mailCategory.equals( CommonConstants.SOCIAL_POST_REMINDER_MAIL_BODY_CATEGORY ) ) {
+            mailSubject = CommonConstants.SOCIAL_POST_REMINDER_MAIL_SUBJECT;
+            try {
+                mailBody = readMailContentFromFile( CommonConstants.SOCIAL_POST_REMINDER_MAIL_FILENAME );
+            } catch ( IOException e ) {
+                throw new NonFatalException( "Error occurred while parsing mail content.",
+                    DisplayMessageConstants.GENERAL_ERROR, e );
+            }
+            paramOrder = new ArrayList<String>( Arrays.asList( paramOrderSocialPostReminder.split( "," ) ) );
+
+            MailContent mailContent = new MailContent();
+            mailContent.setMail_subject( mailSubject );
+            mailContent.setMail_body( mailBody );
+            mailContent.setParam_order( paramOrder );
+
+            originalContentSettings.setSocial_post_reminder_mail( mailContent );
+        } else if ( mailCategory.equals( CommonConstants.INCOMPLETE_SURVEY_REMINDER_MAIL_BODY_CATEGORY ) ) {
+            mailSubject = CommonConstants.INCOMPLETE_SURVEY_REMINDER_MAIL_SUBJECT;
+            try {
+                mailBody = readMailContentFromFile( CommonConstants.INCOMPLETE_SURVEY_REMINDER_MAIL_FILENAME );
+            } catch ( IOException e ) {
+                throw new NonFatalException( "Error occurred while parsing mail content.",
+                    DisplayMessageConstants.GENERAL_ERROR, e );
+            }
+            paramOrder = new ArrayList<String>( Arrays.asList( paramOrderIncompleteSurveyReminder.split( "," ) ) );
+
+            MailContent mailContent = new MailContent();
+            mailContent.setMail_subject( mailSubject );
+            mailContent.setMail_body( mailBody );
+            mailContent.setParam_order( paramOrder );
+
+            originalContentSettings.setRestart_survey_mail( mailContent );
         } else {
             throw new InvalidInputException( "Invalid mail category" );
         }
@@ -1181,6 +1271,12 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
             return new ArrayList<String>( Arrays.asList( paramOrderTakeSurvey.split( "," ) ) );
         } else if ( mailCategory.equals( CommonConstants.SURVEY_REMINDER_MAIL_BODY_CATEGORY ) ) {
             return new ArrayList<String>( Arrays.asList( paramOrderTakeSurveyReminder.split( "," ) ) );
+        }else if ( mailCategory.equals( CommonConstants.SURVEY_COMPLETION_MAIL_BODY_CATEGORY ) ) {
+            return new ArrayList<String>( Arrays.asList( paramOrderSurveyCompletionMail.split( "," ) ) );
+        }else if ( mailCategory.equals( CommonConstants.SOCIAL_POST_REMINDER_MAIL_BODY_CATEGORY ) ) {
+            return new ArrayList<String>( Arrays.asList( paramOrderSocialPostReminder.split( "," ) ) );
+        }else if ( mailCategory.equals( CommonConstants.INCOMPLETE_SURVEY_REMINDER_MAIL_BODY_CATEGORY ) ) {
+            return new ArrayList<String>( Arrays.asList( paramOrderIncompleteSurveyReminder.split( "," ) ) );
         } else {
             throw new InvalidInputException( "Invalid mail category" );
         }
