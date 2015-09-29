@@ -675,7 +675,7 @@ $(document).on('click', '.hdr-log-btn', function() {
 	window.location = "/login.do";
 });
 $(document).on('click', '.hdr-reg-btn', function() {
-	window.location = "/";
+	window.location = "/signup.do";
 });
 $(document).on('click', '.hdr-logo', function() {
 	showOverlay();
@@ -761,4 +761,30 @@ function toTitleCase(str) {
 	return str.replace(/\w\S*/g, function(txt) {
 		return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();
 	});
+}
+
+
+//Sign up page functions
+function signupUser() {
+	if(validateSignUpForm()){
+		$('#frm-signup').submit();
+		showOverlay();
+	}
+}
+
+function validateSignUpForm(){
+	hideError();
+	if(!validateFirstName('sign-fname')) {
+		$('sign-fname').focus();
+		return false;
+	}
+	if(!validateLastName('sign-lname')) {
+		$('sign-lname').focus();
+		return false;
+	}
+	if(!validateEmailId('sign-email')) {
+		$('sign-email').focus();
+		return false;
+	}
+	return true;
 }
