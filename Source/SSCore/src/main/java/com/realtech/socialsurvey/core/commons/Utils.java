@@ -5,8 +5,16 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.sql.Timestamp;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.Locale;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -177,4 +185,26 @@ public class Utils
 		}
 		return maskedEmailAddress;
 	}
+    
+    /**
+     * @return
+     */
+    public Timestamp convertEpochDateToTimestamp()
+    {
+        String string = "January 2, 1970";
+        DateFormat format = new SimpleDateFormat( "MMMM d, yyyy", Locale.ENGLISH );
+        Date date = null;
+
+        try {
+            date = format.parse( string );
+        } catch ( ParseException e ) {
+            LOG.error( "Exception caught ", e );
+        }
+        Calendar cal = Calendar.getInstance();
+        cal.setTime( date );
+        cal.set( Calendar.MILLISECOND, 0 );
+
+        return ( new java.sql.Timestamp( cal.getTimeInMillis() ) );
+    }
+
 }
