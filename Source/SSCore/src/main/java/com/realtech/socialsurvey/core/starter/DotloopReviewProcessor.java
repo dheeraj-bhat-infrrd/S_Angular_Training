@@ -42,7 +42,7 @@ import com.realtech.socialsurvey.core.services.surveybuilder.SurveyHandler;
 
 
 /**
- * Ingester for social feed
+ * Ingester for dot loop
  */
 @Component ( "dotloopreviewprocessor")
 public class DotloopReviewProcessor extends QuartzJobBean
