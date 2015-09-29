@@ -332,11 +332,6 @@ $(document).ready(function(){
 	$('#header-search-icn').click(function(e) {
 		$('#pro-wrapper-top').slideToggle(200);
 	});
-	
-	$('iframe').load( function() {
-	    $('iframe').contents().find("head")
-	      .append($("<style type='text/css'>  .rc-anchor-item:last-child{float: right;margin-right: 10px;}.rc-anchor.rc-anchor-standard{width: 100%}  </style>"));
-	});
 });
 </script>
 

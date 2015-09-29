@@ -29,34 +29,6 @@
 			<div class="float-left hm-header-row-left"><spring:message code="label.title.settings.key" /></div>
 			<!-- Add user assignment dropdown -->
 			<jsp:include page="user_assignment_dropdown.jsp"></jsp:include>
-			<%-- <c:if test="${not empty assignments}">
-				<div id="se-dd-wrapper" class="float-right header-right clearfix hr-dsh-adj-rt hdr-prof-sel">
-					<div class="float-left hr-txt1"><spring:message code="label.viewas.key" /></div>
-					<div id="setting-sel" class="float-left hr-txt2 cursor-pointer">${entityName}</div>
-					<div id="se-dd-wrapper-profiles" class="va-dd-wrapper hide">
-						<c:forEach var="company" items="${assignments.companies}">
-							<div class="se-dd-item" data-column-type="companyId"
-								data-column-name="${company.value}"
-								data-column-value="${company.key}">${company.value}</div>
-						</c:forEach>
-						<c:forEach var="region" items="${assignments.regions}">
-							<div class="se-dd-item" data-column-type="regionId" 
-								data-column-name="${region.value}"
-								data-column-value="${region.key}">${region.value}</div>
-						</c:forEach>
-						<c:forEach var="branch" items="${assignments.branches}">
-							<div class="se-dd-item" data-column-type="branchId"
-								data-column-name="${branch.value}"
-								data-column-value="${branch.key}">${branch.value}</div>
-						</c:forEach>
-						<c:forEach var="agent" items="${assignments.agents}">
-							<div class="se-dd-item" data-column-type="agentId"
-								data-column-name="${agent.value}"
-								data-column-value="${agent.key}">${agent.value}</div>
-						</c:forEach>
-					</div>
-				</div>
-			</c:if> --%>
 		</div>
 	</div>
 </div>
@@ -242,11 +214,6 @@
 $(document).ready(function() {
 	hideOverlay();
 	$(document).attr("title", "Edit Settings");
-	
-	$('.va-dd-wrapper').perfectScrollbar({
-		suppressScrollX : true
-	});
-	$('.va-dd-wrapper').perfectScrollbar('update');
 	
 	//social media urls
 	loadSocialMediaUrlInSettingsPage();

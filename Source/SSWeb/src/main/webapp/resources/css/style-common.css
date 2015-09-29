@@ -2017,6 +2017,7 @@ button.paypal.is-active {
 	padding: 0;
 	border-radius: 0 0 3px 3px;
 	border: 1px solid #dcdcdc;
+	z-index: 2;
 }
 
 .st-dd-item {
@@ -4439,6 +4440,11 @@ img.prof-image {
 	border: 1px solid #dcdcdc;
 	margin-right: 30px;
 	font-size: 12px;
+}
+
+.signup-inp-cont {
+	width: 302px;
+	margin-right: 0;
 }
 
 select.rfr_txt_fld,select.rfr_input_fld{
