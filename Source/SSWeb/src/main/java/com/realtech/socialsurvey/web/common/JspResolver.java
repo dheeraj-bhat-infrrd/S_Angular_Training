@@ -7,6 +7,7 @@ public interface JspResolver {
 	// Registration
 	public static final String INVITATION = "invitation";
 	public static final String REGISTRATION = "registration";
+	public static final String SIGNUP = "signup";
 	public static final String REGISTRATION_PAGE = "registrationpage";
 	public static final String COMPANY_INFORMATION = "companyinformation";
 	public static final String COMPANY_INFORMATION_PAGE = "companyinformationpage";

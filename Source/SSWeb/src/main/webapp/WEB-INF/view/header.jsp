@@ -136,7 +136,7 @@
 					</div>
 				</c:if>
 				<!-- show apps for company admin other then individual/free account -->
-				<c:if test="${highestrole == 1 && accountMasterId > 1 && accountMasterId != 5}">
+				<c:if test="${accountMasterId > 1 && accountMasterId != 5}">
 					<div class="header-links-item">
 						<a href="javascript:showMainContent('./showapps.do')"><spring:message code="label.appsettings.key" /></a>
 					</div>
@@ -199,7 +199,7 @@
 									<spring:message code="label.emailsettings.key" />
 								</div>
 							</c:if>
-							<c:if test="${highestrole == 1 && accountMasterId > 1}">
+							<c:if test="${accountMasterId > 1 && accountMasterId != 5}">
 								<div class="hdr-link-item-dropdown-item" onclick="showMainContent('./showapps.do');">
 									<spring:message code="label.appsettings.key" />
 								</div>
