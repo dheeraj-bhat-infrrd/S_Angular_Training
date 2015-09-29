@@ -1751,23 +1751,23 @@ public class OrganizationManagementController
                 dotLoopCrmInfo.setCrm_source( CommonConstants.CRM_SOURCE_DOTLOOP );
                 dotLoopCrmInfo.setApi( apiKey );
                 OrganizationUnitSettings unitSettings = null;
-                if ( entityType.equalsIgnoreCase( MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION ) ) {
+                if ( entityType.equalsIgnoreCase( CommonConstants.COMPANY_ID ) ) {
                     unitSettings = organizationManagementService.getCompanySettings( entityId );
                     if ( unitSettings != null ) {
                         dotLoopCrmInfo.setCompanyId( unitSettings.getIden() );
                     }
 
-                } else if ( entityType.equalsIgnoreCase( MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION ) ) {
+                } else if ( entityType.equalsIgnoreCase( CommonConstants.REGION_ID ) ) {
                     unitSettings = organizationManagementService.getRegionSettings( entityId );
                     if ( unitSettings != null ) {
                         dotLoopCrmInfo.setRegionId( unitSettings.getIden() );
                     }
-                } else if ( entityType.equalsIgnoreCase( MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION ) ) {
+                } else if ( entityType.equalsIgnoreCase( CommonConstants.BRANCH_ID ) ) {
                     unitSettings = organizationManagementService.getBranchSettingsDefault( entityId );
                     if ( unitSettings != null ) {
                         dotLoopCrmInfo.setBranchId( unitSettings.getIden() );
                     }
-                } else if ( entityType.equalsIgnoreCase( MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION ) ) {
+                } else if ( entityType.equalsIgnoreCase( CommonConstants.AGENT_ID ) ) {
                     unitSettings = organizationManagementService.getAgentSettings( entityId );
                     dotLoopCrmInfo.setAgentId( unitSettings.getIden() );
                 } else {

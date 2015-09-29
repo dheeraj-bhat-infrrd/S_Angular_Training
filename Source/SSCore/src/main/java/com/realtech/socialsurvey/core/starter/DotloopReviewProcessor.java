@@ -137,9 +137,9 @@ public class DotloopReviewProcessor extends QuartzJobBean
         LOG.debug( "Checking dotLoopProfile presence in the system as inactive: " + dotLoopProfile.toString() );
         boolean isAccountPresentInSystem = false;
         String profileId = String.valueOf( dotLoopProfile.getProfileId() );
-        CollectionDotloopProfileMapping companyDotloopProfileMapping = organizationManagementService
+        CollectionDotloopProfileMapping collectionDotloopProfileMapping = organizationManagementService
             .getCollectionDotloopMappingByCollectionIdAndProfileId( collectionName, unitSettings.getIden(), profileId );
-        if ( companyDotloopProfileMapping != null ) {
+        if ( collectionDotloopProfileMapping != null ) {
             LOG.debug( "Profile is already present in the system as inactive." );
             isAccountPresentInSystem = true;
         }
@@ -166,7 +166,7 @@ public class DotloopReviewProcessor extends QuartzJobBean
             collectionDotloopProfileMapping.setAgentId( unitSettings.getIden() );
         }
         collectionDotloopProfileMapping = organizationManagementService
-            .saveCompanyDotLoopProfileMapping( collectionDotloopProfileMapping );
+            .saveCollectionDotLoopProfileMapping( collectionDotloopProfileMapping );
     }
 
 

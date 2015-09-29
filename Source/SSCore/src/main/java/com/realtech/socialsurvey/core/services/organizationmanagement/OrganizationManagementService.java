@@ -1071,21 +1071,26 @@ public interface OrganizationManagementService
      * @param profileId
      * @return
      */
-    public CollectionDotloopProfileMapping getCompanyDotloopMappingByProfileId( String profileId ) throws InvalidInputException;
+    public CollectionDotloopProfileMapping getCollectionDotloopMappingByProfileId( String profileId ) throws InvalidInputException;
 
 
-    /**
-     * @param companyDotloopProfileMapping
-     */
-    public CollectionDotloopProfileMapping saveCompanyDotLoopProfileMapping(
-        CollectionDotloopProfileMapping companyDotloopProfileMapping ) throws InvalidInputException;
-
-
+ 
+   
     /**
      * @param companyDotloopProfileMapping
      * @return
+     * @throws InvalidInputException
      */
-    public void updateCompanyDotLoopProfileMapping( CollectionDotloopProfileMapping companyDotloopProfileMapping )
+    public CollectionDotloopProfileMapping saveCollectionDotLoopProfileMapping(
+        CollectionDotloopProfileMapping collectionDotloopProfileMapping ) throws InvalidInputException;
+
+
+  
+    /**
+     * @param collectionDotloopProfileMapping
+     * @throws InvalidInputException
+     */
+    public void updateCollectionDotLoopProfileMapping( CollectionDotloopProfileMapping collectionDotloopProfileMapping )
         throws InvalidInputException;
 
 
