@@ -522,7 +522,7 @@ public class OrganizationManagementController
                     LOG.error( "Number format exception occurred while parsing the entity id. Reason :" + e.getMessage(), e );
                 }
             }
-            
+
             //Set the app settings in model
             AccountType accountType = (AccountType) session.getAttribute( CommonConstants.ACCOUNT_TYPE_IN_SESSION );
             OrganizationUnitSettings unitSettings = null;
@@ -1774,29 +1774,36 @@ public class OrganizationManagementController
                 dotLoopCrmInfo.setCrm_source( CommonConstants.CRM_SOURCE_DOTLOOP );
                 dotLoopCrmInfo.setApi( apiKey );
                 OrganizationUnitSettings unitSettings = null;
+                String collectionName = "";
                 if ( entityType.equalsIgnoreCase( CommonConstants.COMPANY_ID ) ) {
+                    collectionName = MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION;
                     unitSettings = organizationManagementService.getCompanySettings( entityId );
                     if ( unitSettings != null ) {
                         dotLoopCrmInfo.setCompanyId( unitSettings.getIden() );
                     }
 
                 } else if ( entityType.equalsIgnoreCase( CommonConstants.REGION_ID ) ) {
+                    collectionName = MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION;
                     unitSettings = organizationManagementService.getRegionSettings( entityId );
                     if ( unitSettings != null ) {
                         dotLoopCrmInfo.setRegionId( unitSettings.getIden() );
                     }
                 } else if ( entityType.equalsIgnoreCase( CommonConstants.BRANCH_ID ) ) {
+                    collectionName = MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION;
                     unitSettings = organizationManagementService.getBranchSettingsDefault( entityId );
                     if ( unitSettings != null ) {
                         dotLoopCrmInfo.setBranchId( unitSettings.getIden() );
                     }
                 } else if ( entityType.equalsIgnoreCase( CommonConstants.AGENT_ID ) ) {
+                    collectionName = MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION;
                     unitSettings = organizationManagementService.getAgentSettings( entityId );
                     dotLoopCrmInfo.setAgentId( unitSettings.getIden() );
                 } else {
                     throw new InvalidInputException( "Invalid entity type" );
                 }
-                organizationManagementService.updateCRMDetails( unitSettings, dotLoopCrmInfo,
+
+
+                organizationManagementService.updateCRMDetailsForAnyUnitSettings( unitSettings, collectionName, dotLoopCrmInfo,
                     "com.realtech.socialsurvey.core.entities.DotLoopCrmInfo" );
 
                 unitSettings.setCrm_info( dotLoopCrmInfo );
