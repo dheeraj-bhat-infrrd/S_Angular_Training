@@ -44,6 +44,7 @@ function fetchCompanyProfile() {
 	}
 	fetchReviewsCountBasedOnProfileLevel('COMPANY',result.iden,paintHiddenReviewsCount,0,minScore);
 	fetchReviewsBasedOnProfileLevel('COMPANY', result.iden,startIndex,numOfRows,minScore);	
+	fetchZillowReviewsBasedOnProfile('COMPANY',result.iden);
 }
 
 function paintProfilePage(result) {
@@ -893,6 +894,7 @@ function fetchRegionProfile() {
 	startIndex = 0;
 	fetchReviewsBasedOnProfileLevel('REGION', result.iden,startIndex,numOfRows,minScore);
 	fetchReviewsCountBasedOnProfileLevel('REGION',result.iden, paintHiddenReviewsCount, 0, minScore);
+	fetchZillowReviewsBasedOnProfile('REGION',result.iden);
 }
 
 function fetchBranchProfile() {
@@ -906,6 +908,7 @@ function fetchBranchProfile() {
 	startIndex = 0;
 	fetchReviewsBasedOnProfileLevel('BRANCH', result.iden, startIndex, numOfRows, minScore);
 	fetchReviewsCountBasedOnProfileLevel('BRANCH',result.iden, paintHiddenReviewsCount, 0, minScore);
+	fetchZillowReviewsBasedOnProfile('BRANCH',result.iden);
 }
 
 function paintIndividualDetails(result) {
