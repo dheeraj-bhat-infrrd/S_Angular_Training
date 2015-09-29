@@ -749,7 +749,81 @@ public class OrganizationManagementController {
 				message = messageUtils.getDisplayMessage(DisplayMessageConstants.SURVEY_PARTICIPATION_REMINDERMAILBODY_UPDATE_SUCCESSFUL,
 						DisplayMessageType.SUCCESS_MESSAGE).getMessage();
 			}
+			
+			else if (mailCategory != null && mailCategory.equals("surveycompletionmail")) {
 
+				mailSubject = request.getParameter("survey-completion-subject");
+				if (mailSubject == null || mailSubject.isEmpty()) {
+					LOG.warn("Survey Completion  mail subject is blank.");
+					throw new InvalidInputException("Survey completion mail subject is blank.", DisplayMessageConstants.GENERAL_ERROR);
+				}
+
+				mailBody = request.getParameter("survey-completion-mailcontent");
+				if (mailBody == null || mailBody.isEmpty()) {
+					LOG.warn("Survey Completion mail body is blank.");
+					throw new InvalidInputException("Survey completion mail body is blank.", DisplayMessageConstants.GENERAL_ERROR);
+				}
+
+				updatedMailContentSettings = organizationManagementService.updateSurveyParticipationMailBody(companySettings, mailSubject, mailBody,
+						CommonConstants.SURVEY_COMPLETION_MAIL_BODY_CATEGORY);
+
+				// set the value back in session
+				session.setAttribute(CommonConstants.SURVEY_COMPLETION_MAIL_SUBJECT_IN_SESSION, mailSubject);
+				session.setAttribute(CommonConstants.SURVEY_COMPLETION_MAIL_BODY_IN_SESSION, mailBody);
+
+				message = messageUtils.getDisplayMessage(DisplayMessageConstants.SURVEY_COMPLETION_MAILBODY_UPDATE_SUCCESSFUL,
+						DisplayMessageType.SUCCESS_MESSAGE).getMessage();
+			}
+			
+			else if (mailCategory != null && mailCategory.equals("socialpostremindermail")) {
+
+				mailSubject = request.getParameter("social-post-reminder-subject");
+				if (mailSubject == null || mailSubject.isEmpty()) {
+					LOG.warn("Social post reminder mail subject is blank.");
+					throw new InvalidInputException("Social post reminder mail subject is blank.", DisplayMessageConstants.GENERAL_ERROR);
+				}
+
+				mailBody = request.getParameter("social-post-reminder-mailcontent");
+				if (mailBody == null || mailBody.isEmpty()) {
+					LOG.warn("Social post reminder mail body is blank.");
+					throw new InvalidInputException("Social post reminder mail body is blank.", DisplayMessageConstants.GENERAL_ERROR);
+				}
+
+				updatedMailContentSettings = organizationManagementService.updateSurveyParticipationMailBody(companySettings, mailSubject, mailBody,
+						CommonConstants.SOCIAL_POST_REMINDER_MAIL_BODY_CATEGORY);
+
+				// set the value back in session
+				session.setAttribute(CommonConstants.SOCIAL_POST_REMINDER_MAIL_SUBJECT_IN_SESSION, mailSubject);
+				session.setAttribute(CommonConstants.SOCIAL_POST_REMINDER_MAIL_BODY_IN_SESSION, mailBody);
+
+				message = messageUtils.getDisplayMessage(DisplayMessageConstants.SOCIAL_POST_REMINDER_MAILBODY_UPDATE_SUCCESSFUL,
+						DisplayMessageType.SUCCESS_MESSAGE).getMessage();
+			}
+
+			else if (mailCategory != null && mailCategory.equals("incompletesurveyremindermail")) {
+
+				mailSubject = request.getParameter("incomplete-survey-mailreminder-subject");
+				if (mailSubject == null || mailSubject.isEmpty()) {
+					LOG.warn("Incomplete survey reminder  mail subject is blank.");
+					throw new InvalidInputException("Incomplete survey reminder mail subject is blank.", DisplayMessageConstants.GENERAL_ERROR);
+				}
+
+				mailBody = request.getParameter("incomplete-survey-reminder-mailcontent");
+				if (mailBody == null || mailBody.isEmpty()) {
+					LOG.warn("Incomplete survey reminder mail body is blank.");
+					throw new InvalidInputException("Incomplete survey reminder mail body is blank.", DisplayMessageConstants.GENERAL_ERROR);
+				}
+
+				updatedMailContentSettings = organizationManagementService.updateSurveyParticipationMailBody(companySettings, mailSubject, mailBody,
+						CommonConstants.INCOMPLETE_SURVEY_REMINDER_MAIL_BODY_CATEGORY);
+
+				// set the value back in session
+				session.setAttribute(CommonConstants.INCOMPLETE_SURVEY_REMINDER_MAIL_SUBJECT_IN_SESSION, mailSubject);
+				session.setAttribute(CommonConstants.INCOMPLETE_SURVEY_REMINDER_MAIL_BODY_IN_SESSION, mailBody);
+
+				message = messageUtils.getDisplayMessage(DisplayMessageConstants.INCOMPLETE_SURVEY_REMINDER_MAILBODY_UPDATE_SUCCESSFUL,
+						DisplayMessageType.SUCCESS_MESSAGE).getMessage();
+			}
 			// update the mail content settings in session
 			companySettings.setMail_content(updatedMailContentSettings);
 		}
@@ -789,7 +863,7 @@ public class OrganizationManagementController {
 				mailBody = updatedMailContentSettings.getTake_survey_mail().getMail_body();
 				mailBody = emailFormatHelper.replaceEmailBodyWithParams(mailBody,
 						organizationManagementService.getSurveyParamOrder(CommonConstants.SURVEY_MAIL_BODY_CATEGORY));
-				mailBody = mailBody.replaceAll("\\[LogoUrl\\]", applicationLogoUrl);
+				//mailBody = mailBody.replaceAll("\\[LogoUrl\\]", applicationLogoUrl);
 
 				mailSubject = updatedMailContentSettings.getTake_survey_mail().getMail_subject();
 				message = messageUtils.getDisplayMessage(DisplayMessageConstants.SURVEY_PARTICIPATION_MAILBODY_UPDATE_SUCCESSFUL,
@@ -806,7 +880,7 @@ public class OrganizationManagementController {
 				mailBody = updatedMailContentSettings.getTake_survey_reminder_mail().getMail_body();
 				mailBody = emailFormatHelper.replaceEmailBodyWithParams(mailBody,
 						organizationManagementService.getSurveyParamOrder(CommonConstants.SURVEY_REMINDER_MAIL_BODY_CATEGORY));
-				mailBody = mailBody.replaceAll("\\[LogoUrl\\]", applicationLogoUrl);
+				//mailBody = mailBody.replaceAll("\\[LogoUrl\\]", applicationLogoUrl);
 
 				mailSubject = updatedMailContentSettings.getTake_survey_reminder_mail().getMail_subject();
 				message = messageUtils.getDisplayMessage(DisplayMessageConstants.SURVEY_PARTICIPATION_REMINDERMAILBODY_UPDATE_SUCCESSFUL,
@@ -814,6 +888,57 @@ public class OrganizationManagementController {
 
 				session.setAttribute(CommonConstants.SURVEY_PARTICIPATION_REMINDER_MAIL_BODY_IN_SESSION, mailBody);
 				session.setAttribute(CommonConstants.SURVEY_PARTICIPATION_REMINDER_MAIL_SUBJECT_IN_SESSION, mailSubject);
+			}
+			
+			else if (mailCategory != null && mailCategory.equals("surveycompletionmail")) {
+				updatedMailContentSettings = organizationManagementService.revertSurveyParticipationMailBody(companySettings,
+						CommonConstants.SURVEY_COMPLETION_MAIL_BODY_CATEGORY);
+
+				mailBody = updatedMailContentSettings.getSurvey_completion_mail().getMail_body();
+				mailBody = emailFormatHelper.replaceEmailBodyWithParams(mailBody,
+						organizationManagementService.getSurveyParamOrder(CommonConstants.SURVEY_COMPLETION_MAIL_BODY_CATEGORY));
+				//mailBody = mailBody.replaceAll("\\[LogoUrl\\]", applicationLogoUrl);
+
+				mailSubject = updatedMailContentSettings.getSurvey_completion_mail().getMail_subject();
+				message = messageUtils.getDisplayMessage(DisplayMessageConstants.SURVEY_COMPLETION_MAILBODY_UPDATE_SUCCESSFUL,
+						DisplayMessageType.SUCCESS_MESSAGE).getMessage();
+
+				session.setAttribute(CommonConstants.SURVEY_COMPLETION_MAIL_BODY_IN_SESSION, mailBody);
+				session.setAttribute(CommonConstants.SURVEY_COMPLETION_MAIL_SUBJECT_IN_SESSION, mailSubject);
+			}
+			
+			else if (mailCategory != null && mailCategory.equals("socialpostremindermail")) {
+				updatedMailContentSettings = organizationManagementService.revertSurveyParticipationMailBody(companySettings,
+						CommonConstants.SOCIAL_POST_REMINDER_MAIL_BODY_CATEGORY);
+
+				mailBody = updatedMailContentSettings.getSocial_post_reminder_mail().getMail_body();
+				mailBody = emailFormatHelper.replaceEmailBodyWithParams(mailBody,
+						organizationManagementService.getSurveyParamOrder(CommonConstants.SOCIAL_POST_REMINDER_MAIL_BODY_CATEGORY));
+				//mailBody = mailBody.replaceAll("\\[LogoUrl\\]", applicationLogoUrl);
+
+				mailSubject = updatedMailContentSettings.getSocial_post_reminder_mail().getMail_subject();
+				message = messageUtils.getDisplayMessage(DisplayMessageConstants.SOCIAL_POST_REMINDER_MAILBODY_UPDATE_SUCCESSFUL,
+						DisplayMessageType.SUCCESS_MESSAGE).getMessage();
+
+				session.setAttribute(CommonConstants.SOCIAL_POST_REMINDER_MAIL_BODY_IN_SESSION, mailBody);
+				session.setAttribute(CommonConstants.SOCIAL_POST_REMINDER_MAIL_SUBJECT_IN_SESSION, mailSubject);
+			}
+
+			else if (mailCategory != null && mailCategory.equals("incompletesurveyremindermail")) {
+				updatedMailContentSettings = organizationManagementService.revertSurveyParticipationMailBody(companySettings,
+						CommonConstants.INCOMPLETE_SURVEY_REMINDER_MAIL_BODY_CATEGORY);
+
+				mailBody = updatedMailContentSettings.getRestart_survey_mail().getMail_body();
+				mailBody = emailFormatHelper.replaceEmailBodyWithParams(mailBody,
+						organizationManagementService.getSurveyParamOrder(CommonConstants.INCOMPLETE_SURVEY_REMINDER_MAIL_BODY_CATEGORY));
+				//mailBody = mailBody.replaceAll("\\[LogoUrl\\]", applicationLogoUrl);
+
+				mailSubject = updatedMailContentSettings.getRestart_survey_mail().getMail_subject();
+				message = messageUtils.getDisplayMessage(DisplayMessageConstants.INCOMPLETE_SURVEY_REMINDER_MAILBODY_UPDATE_SUCCESSFUL,
+						DisplayMessageType.SUCCESS_MESSAGE).getMessage();
+
+				session.setAttribute(CommonConstants.INCOMPLETE_SURVEY_REMINDER_MAIL_BODY_IN_SESSION, mailBody);
+				session.setAttribute(CommonConstants.INCOMPLETE_SURVEY_REMINDER_MAIL_SUBJECT_IN_SESSION, mailSubject);
 			}
 
 			// update the mail content settings in session

@@ -187,6 +187,7 @@ public interface CommonConstants
     public static final String REVIEW_COUNT_MONGO = "reviewCount";
     public static final String EDITABLE_SURVEY_COLUMN = "editable";
     public static final String AGREE_SHARE_COLUMN = "agreedToShare";
+    public static final String SUBSCRIPTION_ID_SOURCE_BRAINTREE = "Braintree";
 
     /**
      * Constants to be used in code for referencing variables(i.e in maps or session attributes)
@@ -212,6 +213,16 @@ public interface CommonConstants
     public static final String SURVEY_PARTICIPATION_MAIL_SUBJECT_IN_SESSION = "surveymailsubject";
     public static final String SURVEY_PARTICIPATION_REMINDER_MAIL_BODY_IN_SESSION = "surveyremindermailbody";
     public static final String SURVEY_PARTICIPATION_REMINDER_MAIL_SUBJECT_IN_SESSION = "surveyremindermailsubject";
+
+    public static final String SURVEY_COMPLETION_MAIL_BODY_IN_SESSION = "surveycompletionmailbody";
+    public static final String SURVEY_COMPLETION_MAIL_SUBJECT_IN_SESSION = "surveycompletionmailsubject";
+    
+    public static final String SOCIAL_POST_REMINDER_MAIL_BODY_IN_SESSION = "socialpostremindermailbody";
+    public static final String SOCIAL_POST_REMINDER_MAIL_SUBJECT_IN_SESSION = "socialpostremindermailsubject";
+    
+    public static final String INCOMPLETE_SURVEY_REMINDER_MAIL_BODY_IN_SESSION = "incompletesurveyremindermailbody";
+    public static final String INCOMPLETE_SURVEY_REMINDER_MAIL_SUBJECT_IN_SESSION = "incompletesurveyremindermailsubject";
+    
     public static final String LOGIN_NAME = "loginName";
     public static final String HIGHEST_ROLE_ID_IN_SESSION = "highestrole";
     public static final String PAYMENT_NONCE = "payment_method_nonce";
@@ -311,6 +322,9 @@ public interface CommonConstants
     public static final String REMINDER_MAIL_SUBJECT = "Quick Thank You from ";
     public static final String SURVEY_MAIL_SUBJECT = "Transaction with ";
     public static final String SURVEY_MAIL_SUBJECT_CUSTOMER = "Invitation to take survey";
+    public static final String SURVEY_COMPLETION_MAIL_SUBJECT = "Survey completed successfully";
+    public static final String SOCIAL_POST_REMINDER_MAIL_SUBJECT = "Thanks again!";
+    public static final String INCOMPLETE_SURVEY_REMINDER_MAIL_SUBJECT = "Invitation to update existing survey ";
     public static final String AGENT_PROFILE_FIXED_URL = "pages";
     public static final String BRANCH_PROFILE_FIXED_URL = "pages";
     public static final String REGION_PROFILE_FIXED_URL = "pages";
@@ -332,6 +346,9 @@ public interface CommonConstants
     public static final String SURVEY_REQUEST_MAIL_FILENAME = "EmailTemplates/SurveyInvitationMailBody.html";
     public static final String SURVEY_CUSTOMER_REQUEST_MAIL_FILENAME = "EmailTemplates/SurveyCustomerInvitationMailBody.html";
     public static final String SURVEY_REMINDER_MAIL_FILENAME = "EmailTemplates/SurveyReminderMailBody.html";
+    public static final String SURVEY_COMPLETION_MAIL_FILENAME = "EmailTemplates/SurveyCompletionMailBody.html";
+    public static final String SOCIAL_POST_REMINDER_MAIL_FILENAME = "EmailTemplates/SocialPostReminderMailBody.html";
+    public static final String INCOMPLETE_SURVEY_REMINDER_MAIL_FILENAME = "EmailTemplates/SurveyRestartMailBody.html";
 
     /**
      * Logo related config
@@ -366,6 +383,9 @@ public interface CommonConstants
     // mail content
     public static final String SURVEY_MAIL_BODY_CATEGORY = "SURVEY_MAIL_BODY_CATEGORY";
     public static final String SURVEY_REMINDER_MAIL_BODY_CATEGORY = "SURVEY_REMINDER_MAIL_BODY_CATEGORY";
+    public static final String SURVEY_COMPLETION_MAIL_BODY_CATEGORY = "SURVEY_COMPLETION_MAIL_BODY_CATEGORY";
+    public static final String SOCIAL_POST_REMINDER_MAIL_BODY_CATEGORY = "SOCIAL_POST_REMINDER_MAIL_BODY_CATEGORY";
+    public static final String INCOMPLETE_SURVEY_REMINDER_MAIL_BODY_CATEGORY = "INCOMPLETE_SURVEY_REMINDER_MAIL_BODY_CATEGORY";
 
     // regular expressions
     public static final String PASSWORD_REG_EX = "^(?=.*[a-zA-Z0-9])(?=.*[!@#$%&*()_+=|<>?{}~-]).{6,}$";
