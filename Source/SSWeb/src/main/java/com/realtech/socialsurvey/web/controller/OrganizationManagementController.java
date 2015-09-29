@@ -1736,7 +1736,6 @@ public class OrganizationManagementController
     public String saveDotloopDetails( Model model, HttpServletRequest request )
     {
         LOG.info( "Inside method saveDotLoopDetails " );
-        User user = sessionHelper.getCurrentUser();
         HttpSession session = request.getSession( false );
         long entityId = (long) session.getAttribute( CommonConstants.ENTITY_ID_COLUMN );
         String entityType = (String) session.getAttribute( CommonConstants.ENTITY_TYPE_COLUMN );
