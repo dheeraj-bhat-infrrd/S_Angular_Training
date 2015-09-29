@@ -499,6 +499,7 @@ public class OrganizationManagementController
         LOG.info( "Method showAppSettings of OrganizationManagementController called" );
 
         User user = sessionHelper.getCurrentUser();
+        HttpSession session = request.getSession( false );
         List<VerticalCrmMapping> mappings;
         try {
             try {
@@ -506,9 +507,37 @@ public class OrganizationManagementController
             } catch ( InvalidInputException e ) {
                 throw new InvalidInputException( "Exception occured while fetching vertical crm mappings", e.getMessage(), e );
             }
+            long entityId = 0;
+            String entityIdStr = request.getParameter( "entityId" );
+            if ( entityIdStr == null || entityIdStr.isEmpty() ) {
+                entityId = (long) session.getAttribute( CommonConstants.ENTITY_ID_COLUMN );
+            } else {
+                try {
+                    if ( entityIdStr != null && !entityIdStr.equals( "" ) ) {
+                        entityId = Long.parseLong( entityIdStr );
+                    } else {
+                        throw new NumberFormatException();
+                    }
+                } catch ( NumberFormatException e ) {
+                    LOG.error( "Number format exception occurred while parsing the entity id. Reason :" + e.getMessage(), e );
+                }
+            }
+            
             //Set the app settings in model
+            AccountType accountType = (AccountType) session.getAttribute( CommonConstants.ACCOUNT_TYPE_IN_SESSION );
             OrganizationUnitSettings unitSettings = null;
-            unitSettings = organizationManagementService.getCompanySettings( user.getCompany().getCompanyId() );
+            String entityType = (String) session.getAttribute( CommonConstants.ENTITY_TYPE_COLUMN );
+            int accountMasterId = accountType.getValue();
+            if ( entityType.equals( CommonConstants.COMPANY_ID_COLUMN )
+                || accountMasterId == CommonConstants.ACCOUNTS_MASTER_INDIVIDUAL ) {
+                unitSettings = organizationManagementService.getCompanySettings( user.getCompany().getCompanyId() );
+            } else if ( entityType.equals( CommonConstants.REGION_ID_COLUMN ) ) {
+                unitSettings = organizationManagementService.getRegionSettings( entityId );
+            } else if ( entityType.equals( CommonConstants.BRANCH_ID_COLUMN ) ) {
+                unitSettings = organizationManagementService.getBranchSettingsDefault( entityId );
+            } else if ( entityType.equals( CommonConstants.AGENT_ID_COLUMN ) ) {
+                unitSettings = userManagementService.getUserSettings( user.getUserId() );
+            }
             model.addAttribute( CommonConstants.USER_APP_SETTINGS, unitSettings );
 
         } catch ( NonFatalException e ) {
@@ -568,11 +597,6 @@ public class OrganizationManagementController
             if ( entityType.equals( CommonConstants.COMPANY_ID_COLUMN )
                 || accountMasterId == CommonConstants.ACCOUNTS_MASTER_INDIVIDUAL ) {
                 unitSettings = organizationManagementService.getCompanySettings( user.getCompany().getCompanyId() );
-                /*
-                 * List<VerticalCrmMapping> mappings =
-                 * organizationManagementService.getCrmMapping(user);
-                 * model.addAttribute("crmMappings", mappings);
-                 */
                 model.addAttribute( "columnName", entityType );
                 model.addAttribute( "columnValue", entityId );
             } else if ( entityType.equals( CommonConstants.REGION_ID_COLUMN ) ) {
