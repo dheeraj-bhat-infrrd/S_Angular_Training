@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import com.realtech.socialsurvey.core.entities.AgentSettings;
 import com.realtech.socialsurvey.core.entities.Branch;
 import com.realtech.socialsurvey.core.entities.BranchFromSearch;
 import com.realtech.socialsurvey.core.entities.BranchSettings;
@@ -131,6 +132,15 @@ public interface OrganizationManagementService
     public OrganizationUnitSettings getBranchSettingsDefault( long branchId ) throws InvalidInputException,
         NoRecordsFetchedException;
 
+    
+    /**
+     * Gets agent settings for the id passed
+     * @param agentId
+     * @return
+     * @throws InvalidInputException
+     * @throws NoRecordsFetchedException
+     */
+    public AgentSettings getAgentSettings(long agentId) throws InvalidInputException, NoRecordsFetchedException;
 
     /**
      * Updates the crm info in the settings
