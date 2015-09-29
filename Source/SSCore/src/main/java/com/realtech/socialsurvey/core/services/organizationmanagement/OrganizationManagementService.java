@@ -14,7 +14,7 @@ import com.realtech.socialsurvey.core.entities.BranchFromSearch;
 import com.realtech.socialsurvey.core.entities.BranchSettings;
 import com.realtech.socialsurvey.core.entities.CRMInfo;
 import com.realtech.socialsurvey.core.entities.Company;
-import com.realtech.socialsurvey.core.entities.CompanyDotloopProfileMapping;
+import com.realtech.socialsurvey.core.entities.CollectionDotloopProfileMapping;
 import com.realtech.socialsurvey.core.entities.DisabledAccount;
 import com.realtech.socialsurvey.core.entities.FeedIngestionEntity;
 import com.realtech.socialsurvey.core.entities.LoopProfileMapping;
@@ -132,7 +132,7 @@ public interface OrganizationManagementService
     public OrganizationUnitSettings getBranchSettingsDefault( long branchId ) throws InvalidInputException,
         NoRecordsFetchedException;
 
-    
+
     /**
      * Gets agent settings for the id passed
      * @param agentId
@@ -140,7 +140,8 @@ public interface OrganizationManagementService
      * @throws InvalidInputException
      * @throws NoRecordsFetchedException
      */
-    public AgentSettings getAgentSettings(long agentId) throws InvalidInputException, NoRecordsFetchedException;
+    public AgentSettings getAgentSettings( long agentId ) throws InvalidInputException, NoRecordsFetchedException;
+
 
     /**
      * Updates the crm info in the settings
@@ -1017,18 +1018,20 @@ public interface OrganizationManagementService
      * @param profileName
      */
     void updateRegionProfileName( long regionId, String profileName );
-    
+
+
     /**
      * Updates the region
      * @param region
      */
-    public void updateRegion(Region region);
-    
+    public void updateRegion( Region region );
+
+
     /**
      * Updates the branch
      * @param branch
      */
-    public void updateBranch(Branch branch);
+    public void updateBranch( Branch branch );
 
 
     /**
@@ -1041,7 +1044,7 @@ public interface OrganizationManagementService
     /**
      * @param loopProfileMapping
      */
-    public void saveLoopsForProfile( LoopProfileMapping loopProfileMapping )  throws InvalidInputException;
+    public void saveLoopsForProfile( LoopProfileMapping loopProfileMapping ) throws InvalidInputException;
 
 
     /**
@@ -1051,34 +1054,40 @@ public interface OrganizationManagementService
      * @return
      * @throws InvalidInputException
      */
-    public LoopProfileMapping getLoopByProfileAndLoopId(String profileId, String loopId) throws InvalidInputException;
-    
+    public LoopProfileMapping getLoopByProfileAndLoopId( String profileId, String loopId ) throws InvalidInputException;
+
+
     /**
-     * @param companyId
+     * @param organizationUnitId
+     * @param profileId
      * @return
+     * @throws InvalidInputException
      */
-    public CompanyDotloopProfileMapping getCompanyDotloopMappingByCompanyIdAndProfileId( long companyId, String profileId ) throws InvalidInputException;
+    public CollectionDotloopProfileMapping getCollectionDotloopMappingByCollectionIdAndProfileId( String collectionName,
+        long organizationUnitId, String profileId ) throws InvalidInputException;
 
 
     /**
      * @param profileId
      * @return
      */
-    public CompanyDotloopProfileMapping getCompanyDotloopMappingByProfileId( String profileId ) throws InvalidInputException;
+    public CollectionDotloopProfileMapping getCompanyDotloopMappingByProfileId( String profileId ) throws InvalidInputException;
 
 
     /**
      * @param companyDotloopProfileMapping
      */
-    public CompanyDotloopProfileMapping saveCompanyDotLoopProfileMapping(
-        CompanyDotloopProfileMapping companyDotloopProfileMapping ) throws InvalidInputException;
+    public CollectionDotloopProfileMapping saveCompanyDotLoopProfileMapping(
+        CollectionDotloopProfileMapping companyDotloopProfileMapping ) throws InvalidInputException;
 
 
     /**
      * @param companyDotloopProfileMapping
      * @return
      */
-    public void updateCompanyDotLoopProfileMapping( CompanyDotloopProfileMapping companyDotloopProfileMapping ) throws InvalidInputException;
+    public void updateCompanyDotLoopProfileMapping( CollectionDotloopProfileMapping companyDotloopProfileMapping )
+        throws InvalidInputException;
+
 
     /**
      * Gets the organization unit settings list based on crm source and mongo collection name
@@ -1088,6 +1097,7 @@ public interface OrganizationManagementService
      * @throws InvalidInputException
      * @throws NoRecordsFetchedException
      */
-    public List<OrganizationUnitSettings> getOrganizationUnitSettingsForCRMSource(String crmSource, String collectionName) throws InvalidInputException, NoRecordsFetchedException;
+    public List<OrganizationUnitSettings> getOrganizationUnitSettingsForCRMSource( String crmSource, String collectionName )
+        throws InvalidInputException, NoRecordsFetchedException;
 
 }

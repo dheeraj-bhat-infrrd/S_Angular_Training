@@ -13,18 +13,18 @@ import javax.persistence.Table;
  * The persistent class for the crm_master database table.
  */
 @Entity
-@Table ( name = "COMPANY_DOTLOOP_PROFILEMAPPING")
-@NamedQuery ( name = "CompanyDotloopProfileMapping.findAll", query = "SELECT cdpm FROM CompanyDotloopProfileMapping cdpm")
-public class CompanyDotloopProfileMapping implements Serializable
+@Table ( name = "COLLECTION_DOTLOOP_PROFILEMAPPING")
+@NamedQuery ( name = "CollectionDotloopProfileMapping.findAll", query = "SELECT cdpm FROM CompanyDotloopProfileMapping cdpm")
+public class CollectionDotloopProfileMapping implements Serializable
 {
     private static final long serialVersionUID = 1L;
 
 
-    public CompanyDotloopProfileMapping()
+    public CollectionDotloopProfileMapping()
     {}
 
     @Id
-    @Column ( name = "COMPANY_PROFILE_MAPPING_ID")
+    @Column ( name = "COLLECTION_PROFILE_MAPPING_ID")
     private int id;
 
     @Column ( name = "COMPANY_ID")
@@ -41,6 +41,15 @@ public class CompanyDotloopProfileMapping implements Serializable
 
     @Column ( name = "PROFILE_ACTIVE")
     private boolean active;
+
+    @Column ( name = "REGION_ID")
+    private long regionId;
+
+    @Column ( name = "BRANCH_ID")
+    private long branchId;
+
+    @Column ( name = "AGENT_ID")
+    private long agentId;
 
 
     public int getId()
@@ -112,6 +121,42 @@ public class CompanyDotloopProfileMapping implements Serializable
     public void setCompanyId( long companyId )
     {
         this.companyId = companyId;
+    }
+
+
+    public long getRegionId()
+    {
+        return regionId;
+    }
+
+
+    public void setRegionId( long regionId )
+    {
+        this.regionId = regionId;
+    }
+
+
+    public long getBranchId()
+    {
+        return branchId;
+    }
+
+
+    public void setBranchId( long branchId )
+    {
+        this.branchId = branchId;
+    }
+
+
+    public long getAgentId()
+    {
+        return agentId;
+    }
+
+
+    public void setAgentId( long agentId )
+    {
+        this.agentId = agentId;
     }
 
 
