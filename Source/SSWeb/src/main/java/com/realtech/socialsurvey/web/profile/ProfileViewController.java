@@ -124,10 +124,10 @@ public class ProfileViewController
             if ( companyProfile == null ) {
                 throw new ProfileNotFoundException( "No settings found for company while fetching company profile" );
             }
-
-            if ( companyProfile.getSocialMediaTokens() != null
+            
+            /*if ( companyProfile.getSocialMediaTokens() != null
                 && companyProfile.getSocialMediaTokens().getZillowToken() != null )
-                profileManagementService.updateZillowFeed( companyProfile, CommonConstants.COMPANY_SETTINGS_COLLECTION );
+                profileManagementService.updateZillowFeed( companyProfile, CommonConstants.COMPANY_SETTINGS_COLLECTION );*/
 
             String json = new Gson().toJson( companyProfile );
             model.addAttribute( "profileJson", json );
@@ -240,8 +240,8 @@ public class ProfileViewController
                 MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION, companyProfile, regionProfile, null, null, map );
 
 
-            if ( regionProfile.getSocialMediaTokens() != null && regionProfile.getSocialMediaTokens().getZillowToken() != null )
-                profileManagementService.updateZillowFeed( regionProfile, CommonConstants.REGION_SETTINGS_COLLECTION );
+            /*if ( regionProfile.getSocialMediaTokens() != null && regionProfile.getSocialMediaTokens().getZillowToken() != null )
+                profileManagementService.updateZillowFeed( regionProfile, CommonConstants.REGION_SETTINGS_COLLECTION );*/
             // aggregated social profile urls
             /*SocialMediaTokens regionTokens = profileManagementService.aggregateSocialProfiles( regionProfile,
                 CommonConstants.REGION_ID );
@@ -363,9 +363,9 @@ public class ProfileViewController
             branchProfile = profileManagementService.fillUnitSettings( branchProfile,
                 MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION, companyProfile, regionProfile, branchProfile,
                 null, map );
-
-            if ( branchProfile.getSocialMediaTokens() != null && branchProfile.getSocialMediaTokens().getZillowToken() != null )
-                profileManagementService.updateZillowFeed( branchProfile, CommonConstants.BRANCH_SETTINGS_COLLECTION );
+            
+            /*if ( branchProfile.getSocialMediaTokens() != null && branchProfile.getSocialMediaTokens().getZillowToken() != null )
+                profileManagementService.updateZillowFeed( branchProfile, CommonConstants.BRANCH_SETTINGS_COLLECTION );*/
             // aggregated social profile urls
             /*    SocialMediaTokens branchTokens = profileManagementService.aggregateSocialProfiles( branchProfile,
                     CommonConstants.BRANCH_ID );
