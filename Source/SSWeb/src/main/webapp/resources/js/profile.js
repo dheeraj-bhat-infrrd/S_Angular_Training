@@ -584,7 +584,7 @@ function paintReviews(result){
 		reviewsHtml += '			<span class="float-left ppl-share-icns icn-lin icn-lin-pp" title="LinkedIn" data-link="https://www.linkedin.com/shareArticle?mini=true&url=' + reviewItem.completeProfileUrl + '&title=&summary=' + reviewItem.score + '-star response from ' + reviewItem.customerFirstName+' '+reviewItem.customerLastName + ' for ' + reviewItem.agentName +' at SocialSurvey - ' + reviewItem.review + '&source="></span>';
 		reviewsHtml += '			<span class="float-left ppl-share-icns icn-gplus" title="Google+"> <button class="g-interactivepost float-left ppl-share-icns icn-gplus" data-contenturl="' + reviewItem.completeProfileUrl + '" data-clientid="' + reviewItem.googleApi + '"data-cookiepolicy="single_host_origin" data-prefilltext="' + reviewItem.score + '-star response from ' + reviewItem.customerFirstName + ' ' + reviewItem.customerLastName + ' for ' + reviewItem.agentName + 'at SocialSurvey - ' + reviewItem.review + '" data-calltoactionlabel="USE"'+''+'data-calltoactionurl=" ' + reviewItem.completeProfileUrl + '"> <span class="icon">&nbsp;</span> <span class="label">share</span> </button> </span>';
 		
-		if (reviewItem.yelpProfileUrl != null && reviewItem.yelpProfileUrl != "") {
+		/*if (reviewItem.yelpProfileUrl != null && reviewItem.yelpProfileUrl != "") {
 			reviewsHtml += '		<span class="float-left ppl-share-icns icn-yelp" title="Yelp" data-link="' + returnValidWebAddress(reviewItem.yelpProfileUrl) + '"></span>';
 		}
 		if (reviewItem.zillowProfileUrl != null && reviewItem.zillowProfileUrl != "") {
@@ -595,7 +595,7 @@ function paintReviews(result){
 		}
 		if (reviewItem.realtorProfileUrl != null && reviewItem.realtorProfileUrl != "") {
 			reviewsHtml += '		<span class="float-left ppl-share-icns icn-realtor" title="Realtor" data-link="' + returnValidWebAddress(reviewItem.realtorProfileUrl) + '"></span>';
-		}
+		}*/
 		reviewsHtml += '		</div>';
 		reviewsHtml += '		<div class="float-right" style="margin: 0 -5px;">';
 		if(reviewItem.source != "Zillow")
@@ -738,6 +738,28 @@ $(document).scroll(function(){
 		}
 	}
 });
+
+function fetchZillowReviewsBasedOnProfile(profileLevel, currentProfileIden){
+	if (currentProfileIden == undefined || currentProfileIden == "") {
+		return;
+	}
+	var url = "/rest/profile/";
+	if (profileLevel == 'COMPANY') {
+		url += "company/";
+	} else if (profileLevel == 'REGION') {
+		url += "region/";
+	} else if (profileLevel == 'BRANCH') {
+		url += "branch/";
+	} else if (profileLevel == 'INDIVIDUAL') {
+		url += "individual/";
+	}
+	url += currentProfileIden + "/zillowreviews";
+	callAjaxGET(url, fetchZillowReviewsCallBack, true);
+}
+
+function fetchZillowReviewsCallBack(data) {
+	
+}
 
 function fetchReviewsBasedOnProfileLevel(profileLevel, currentProfileIden,
 		startIndex, numRows, minScore) {
@@ -1020,6 +1042,7 @@ function fetchAgentProfile(){
 	startIndex = 0;
 	fetchReviewsBasedOnProfileLevel('INDIVIDUAL', result.iden, startIndex, numOfRows, minScore);
 	fetchReviewsCountBasedOnProfileLevel('INDIVIDUAL',result.iden, paintHiddenReviewsCount, 0, minScore);
+	fetchZillowReviewsBasedOnProfile('INDIVIDUAL',result.iden);
 }
 
 function findProList(iden,searchcritrianame){

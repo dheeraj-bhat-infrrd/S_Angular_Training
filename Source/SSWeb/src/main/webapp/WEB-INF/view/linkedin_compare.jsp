@@ -19,10 +19,11 @@
 </c:choose>
 <c:if test="${not empty profileSettings && not empty profileSettings.contact_details}">
 	<c:set value="${profileSettings.linkedInProfileData}" var="linkedInData"></c:set>
+	<c:set value="${profileSettings.contact_details}" var="contactdetail"></c:set>
 </c:if>
-<c:if test="${not empty cannonicalusersettings}">
+<%-- <c:if test="${not empty cannonicalusersettings}">
 	<c:set value="${cannonicalusersettings.companySettings.contact_details}" var="contactdetail"></c:set>
-</c:if>
+</c:if> --%>
 
 <div class="welcome-popup-hdr-wrapper clearfix">
 	<div class="float-left wc-hdr-txt"><spring:message code="label.aboutbusiness.key" /></div>

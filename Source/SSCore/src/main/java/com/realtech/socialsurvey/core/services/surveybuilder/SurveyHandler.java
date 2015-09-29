@@ -2,7 +2,9 @@ package com.realtech.socialsurvey.core.services.surveybuilder;
 
 import java.util.List;
 import java.util.Map;
+
 import org.apache.solr.client.solrj.SolrServerException;
+
 import com.realtech.socialsurvey.core.entities.Company;
 import com.realtech.socialsurvey.core.entities.SurveyDetails;
 import com.realtech.socialsurvey.core.entities.SurveyPreInitiation;
@@ -179,4 +181,12 @@ public interface SurveyHandler
      * @throws UndeliveredEmailException
      */
     public void initiateSurveyRequest(long agentId, String recipientEmailId, String recipientFirstname, String recipientLastname, String source) throws DuplicateSurveyRequestException, InvalidInputException, SelfSurveyInitiationException, SolrException, NoRecordsFetchedException, UndeliveredEmailException;
+
+
+	void deleteZillowSurveysByEntity(String entityType, long entityId)
+			throws InvalidInputException;
+
+
+	void deleteExcessZillowSurveysByEntity(String entityType, long entityId)
+			throws InvalidInputException;
 }

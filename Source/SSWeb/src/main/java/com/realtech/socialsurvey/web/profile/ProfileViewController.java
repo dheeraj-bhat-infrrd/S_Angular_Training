@@ -6,12 +6,9 @@ package com.realtech.socialsurvey.web.profile;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
-
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-
-import org.apache.solr.common.SolrDocument;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,7 +21,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
-
 import com.amazonaws.util.json.JSONException;
 import com.amazonaws.util.json.JSONObject;
 import com.google.gson.Gson;
@@ -35,6 +31,7 @@ import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
 import com.realtech.socialsurvey.core.entities.SocialPost;
 import com.realtech.socialsurvey.core.entities.SurveyDetails;
 import com.realtech.socialsurvey.core.entities.User;
+import com.realtech.socialsurvey.core.entities.UserCompositeEntity;
 import com.realtech.socialsurvey.core.entities.UserProfile;
 import com.realtech.socialsurvey.core.enums.DisplayMessageType;
 import com.realtech.socialsurvey.core.enums.OrganizationUnit;
@@ -51,7 +48,6 @@ import com.realtech.socialsurvey.core.services.organizationmanagement.Organizati
 import com.realtech.socialsurvey.core.services.organizationmanagement.ProfileManagementService;
 import com.realtech.socialsurvey.core.services.organizationmanagement.ProfileNotFoundException;
 import com.realtech.socialsurvey.core.services.search.SolrSearchService;
-import com.realtech.socialsurvey.core.services.search.exception.SolrException;
 import com.realtech.socialsurvey.core.services.settingsmanagement.impl.InvalidSettingsStateException;
 import com.realtech.socialsurvey.core.services.social.SocialManagementService;
 import com.realtech.socialsurvey.core.utils.DisplayMessageConstants;
@@ -448,7 +444,7 @@ public class ProfileViewController
         OrganizationUnitSettings companyProfile = null;
         OrganizationUnitSettings regionProfile = null;
         OrganizationUnitSettings branchProfile = null;
-        Map<SettingsForApplication, OrganizationUnit> map = null;
+        Map<SettingsForApplication, OrganizationUnit> settingsByOrganizationUnitMap = null;
         if ( agentProfileName == null || agentProfileName.isEmpty() ) {
             model.addAttribute(
                 "message",
@@ -459,10 +455,13 @@ public class ProfileViewController
 
         // making case insensitive
         agentProfileName = agentProfileName.toLowerCase();
+        UserCompositeEntity userCompositeObject = null;
 
         // check for profiles and redirect to company if admin only
         try {
-            User user = profileManagementService.getUserByProfileName( agentProfileName, true );
+        	// get the user composite object
+        	userCompositeObject = profileManagementService.getCompositeUserObjectByProfileName(agentProfileName, true);
+            User user = userCompositeObject.getUser();
             List<UserProfile> userProfiles = user.getUserProfiles();
             if ( userProfiles == null || userProfiles.size() < 1 ) {
                 throw new NoRecordsFetchedException( DisplayMessageConstants.INVALID_INDIVIDUAL_PROFILENAME );
@@ -472,6 +471,7 @@ public class ProfileViewController
             for ( UserProfile profile : userProfiles ) {
                 if ( profile.getProfilesMaster().getProfileId() == CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID ) {
                     hasAgentProfile = true;
+                    break;
                 }
             }
 
@@ -497,14 +497,14 @@ public class ProfileViewController
             AgentSettings individualProfile = null;
             try {
 
-                individualProfile = (AgentSettings) profileManagementService
-                    .getIndividualSettingsByProfileName( agentProfileName );
+                individualProfile = userCompositeObject.getAgentSettings();
 
 
                 if ( individualProfile == null ) {
                     throw new ProfileNotFoundException( "Unable to find agent profile for profile name " + agentProfileName );
                 }
                 Map<String, Long> hierarchyMap = profileManagementService.getPrimaryHierarchyByAgentProfile( individualProfile );
+                LOG.debug("Got the primary hierarchy.");
                 if ( hierarchyMap == null ) {
                     LOG.error( "Unable to fetch primary profile for this user " );
                     throw new FatalException( "Unable to fetch primary profile for this user " + individualProfile.getIden() );
@@ -518,22 +518,28 @@ public class ProfileViewController
                 regionProfile = organizationManagementService.getRegionSettings( regionId );
                 branchProfile = organizationManagementService.getBranchSettingsDefault( branchId );
 
-                map = profileManagementService.getPrimaryHierarchyByEntity( CommonConstants.AGENT_ID_COLUMN,
+                LOG.debug("Getting settings by organization unit map");
+                settingsByOrganizationUnitMap = profileManagementService.getPrimaryHierarchyByEntity( CommonConstants.AGENT_ID_COLUMN,
                     individualProfile.getIden() );
-
-                if ( map == null ) {
+                LOG.debug("Extracted settings by organization unit map");
+                if ( settingsByOrganizationUnitMap == null ) {
                     LOG.error( "Unable to fetch primary profile for this user " );
                     throw new FatalException( "Unable to fetch primary profile this user " + individualProfile.getIden() );
                 }
 
+                LOG.debug("Filling the unit settings in the profile");
                 individualProfile = (AgentSettings) profileManagementService.fillUnitSettings( individualProfile,
                     MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION, companyProfile, regionProfile,
-                    branchProfile, individualProfile, map );
-
-                //individualProfile = (AgentSettings) profileManagementService.getIndividualByProfileName( agentProfileName );
+                    branchProfile, individualProfile, settingsByOrganizationUnitMap );
+                LOG.debug("Finished filling the unit settings in the profile");
+                //TODO: delink the zillow call from here
+                /**LOG.debug("Getting zillow feed");
                 if ( individualProfile.getSocialMediaTokens() != null
                     && individualProfile.getSocialMediaTokens().getZillowToken() != null )
-                    profileManagementService.updateZillowFeed( individualProfile, CommonConstants.AGENT_SETTINGS_COLLECTION );
+					profileManagementService.updateZillowFeed(
+							individualProfile,
+							CommonConstants.AGENT_SETTINGS_COLLECTION);
+                LOG.debug("Fetched zillow feed");*/
                 //set vertical name from the company
                 individualProfile.setVertical( user.getCompany().getVerticalsMaster().getVerticalName() );
 
@@ -543,8 +549,8 @@ public class ProfileViewController
                                 individualProfile.setSocialMediaTokens( agentTokens );
                 */
                 // aggregated disclaimer
-                String disclaimer = profileManagementService.aggregateDisclaimer( individualProfile, CommonConstants.AGENT_ID );
-                individualProfile.setDisclaimer( disclaimer );
+                //String disclaimer = profileManagementService.aggregateDisclaimer( individualProfile, CommonConstants.AGENT_ID );
+                //individualProfile.setDisclaimer( disclaimer );
 
                 //set survey settings in individual profile
                 individualProfile.setSurvey_settings(companyProfile.getSurvey_settings());
@@ -552,7 +558,7 @@ public class ProfileViewController
                 String json = new Gson().toJson( individualProfile );
                 model.addAttribute( "profileJson", json );
 
-                Long agentId = user.getUserId();
+                long agentId = user.getUserId();
                 double averageRating = profileManagementService.getAverageRatings( agentId,
                     CommonConstants.PROFILE_LEVEL_INDIVIDUAL, false );
                 model.addAttribute( "averageRating", averageRating );
@@ -573,7 +579,8 @@ public class ProfileViewController
                     model.addAttribute( "posts", posts );
                 }
 
-                SolrDocument solrDocument;
+                model.addAttribute( "agentFirstName", individualProfile.getContact_details().getFirstName() );
+                /*SolrDocument solrDocument;
                 try {
                     solrDocument = solrSearchService.getUserByUniqueId( individualProfile.getIden() );
                     if ( solrDocument == null || solrDocument.isEmpty() ) {
@@ -586,7 +593,7 @@ public class ProfileViewController
                     LOG.error( "SolrException while searching for user id. Reason : " + e.getMessage(), e );
                     throw new NonFatalException( "SolrException while searching for user id.",
                         DisplayMessageConstants.GENERAL_ERROR, e );
-                }
+                }*/
                 model.addAttribute( "profile", individualProfile );
             } catch ( ProfileNotFoundException e ) {
                 LOG.error( "Excpetion caught " + e.getMessage() );

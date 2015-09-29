@@ -231,6 +231,12 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
     String paramOrderTakeSurveyCustomer;
     @Value ( "${PARAM_ORDER_TAKE_SURVEY_REMINDER}")
     String paramOrderTakeSurveyReminder;
+    @Value ( "${PARAM_ORDER_SURVEY_COPLETION_MAIL}")
+    String paramOrderSurveyCompletionMail;
+    @Value ( "${PARAM_ORDER_SOCIAL_POST_REMINDER}")
+    String paramOrderSocialPostReminder;
+    @Value ( "${PARAM_ORDER_INCOMPLETE_SURVEY_REMINDER}")
+    String paramOrderIncompleteSurveyReminder;
 
     @Value ( "${CDN_PATH}")
     String cdnPath;
@@ -339,7 +345,8 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
         LOG.debug( "Adding the default region" );
         // TODO:adding default comapany,state,city,zipcode as null
         Region region = addNewRegion( user, CommonConstants.DEFAULT_REGION_NAME, CommonConstants.YES,
-            CommonConstants.DEFAULT_ADDRESS, null, null, null, null, null, null );
+            null, null, null, null, null, null, null );
+        
         ProfilesMaster profilesMaster = userManagementService
             .getProfilesMasterById( CommonConstants.PROFILES_MASTER_REGION_ADMIN_PROFILE_ID );
 
@@ -354,7 +361,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
         LOG.debug( "Adding the default branch" );
         // TODO:setting default country,state,city,zipcode null
         Branch branch = addNewBranch( user, region.getRegionId(), CommonConstants.YES, CommonConstants.DEFAULT_BRANCH_NAME,
-            CommonConstants.DEFAULT_ADDRESS, null, null, null, null, null, null );
+            null, null, null, null, null, null, null );
         profilesMaster = userManagementService.getProfilesMasterById( CommonConstants.PROFILES_MASTER_BRANCH_ADMIN_PROFILE_ID );
 
         LOG.debug( "Creating user profile for branch admin" );
@@ -598,18 +605,30 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
         String takeSurveyMail = "";
         String takeSurveyReminderMail = "";
         String takeSurveyByCustomerMail = "";
-
+        String surveyCompletionMail = "";
+        String socialPostReminderMail = "";
+        String incompleteSurveyReminderMail = "";
+        
         String takeSurveyMailSubj = "";
         String takeSurveyReminderMailSubj = "";
         String takeSurveyByCustomerMailSubj = "";
+        String surveyCompletionMailSubj = "";
+        String socialPostReminderMailSubj = "";
+        String incompleteSurveyReminderMailSubj = "";
         try {
             takeSurveyMail = readMailContentFromFile( CommonConstants.SURVEY_REQUEST_MAIL_FILENAME );
             takeSurveyByCustomerMail = readMailContentFromFile( CommonConstants.SURVEY_CUSTOMER_REQUEST_MAIL_FILENAME );
             takeSurveyReminderMail = readMailContentFromFile( CommonConstants.SURVEY_REMINDER_MAIL_FILENAME );
-
+            surveyCompletionMail =  readMailContentFromFile( CommonConstants.SURVEY_COMPLETION_MAIL_FILENAME );
+            socialPostReminderMail = readMailContentFromFile( CommonConstants.SOCIAL_POST_REMINDER_MAIL_FILENAME );
+            incompleteSurveyReminderMail = readMailContentFromFile( CommonConstants.INCOMPLETE_SURVEY_REMINDER_MAIL_FILENAME );
+            
             takeSurveyMailSubj = CommonConstants.SURVEY_MAIL_SUBJECT + "[AgentName]";
             takeSurveyByCustomerMailSubj = CommonConstants.SURVEY_MAIL_SUBJECT_CUSTOMER;
             takeSurveyReminderMailSubj = CommonConstants.REMINDER_MAIL_SUBJECT + "[AgentName]";
+            surveyCompletionMailSubj = CommonConstants.SURVEY_COMPLETION_MAIL_SUBJECT;
+            socialPostReminderMailSubj = CommonConstants.SOCIAL_POST_REMINDER_MAIL_SUBJECT;
+            incompleteSurveyReminderMailSubj =  CommonConstants.INCOMPLETE_SURVEY_REMINDER_MAIL_SUBJECT;
         } catch ( IOException e ) {
             LOG.error(
                 "IOException occured in addOrganizationalDetails while copying default Email content. Nested exception is ", e );
@@ -633,6 +652,24 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
         mailContent.setMail_body( takeSurveyReminderMail );
         mailContent.setParam_order( new ArrayList<String>( Arrays.asList( paramOrderTakeSurveyReminder.split( "," ) ) ) );
         mailContentSettings.setTake_survey_reminder_mail( mailContent );
+        
+        mailContent = new MailContent();
+        mailContent.setMail_subject( surveyCompletionMailSubj );
+        mailContent.setMail_body( surveyCompletionMail );
+        mailContent.setParam_order( new ArrayList<String>( Arrays.asList( paramOrderSurveyCompletionMail.split( "," ) ) ) );
+        mailContentSettings.setSurvey_completion_mail(mailContent);
+        
+        mailContent = new MailContent();
+        mailContent.setMail_subject( socialPostReminderMailSubj );
+        mailContent.setMail_body( socialPostReminderMail );
+        mailContent.setParam_order( new ArrayList<String>( Arrays.asList( paramOrderSocialPostReminder.split( "," ) ) ) );
+        mailContentSettings.setSocial_post_reminder_mail(mailContent);
+        
+        mailContent = new MailContent();
+        mailContent.setMail_subject( incompleteSurveyReminderMailSubj );
+        mailContent.setMail_body( incompleteSurveyReminderMail );
+        mailContent.setParam_order( new ArrayList<String>( Arrays.asList( paramOrderIncompleteSurveyReminder.split( "," ) ) ) );
+        mailContentSettings.setRestart_survey_mail(mailContent);
 
         companySettings.setMail_content( mailContentSettings );
 
@@ -977,6 +1014,23 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
     }
 
 
+    @Transactional
+    @Override
+    public AgentSettings getAgentSettings(long agentId) throws InvalidInputException, NoRecordsFetchedException{
+    	LOG.info("Getting agent settings for id: "+agentId);
+    	AgentSettings agentSettings = null;
+    	if(agentId <= 0l){
+    		LOG.error("Agent id is not passed to fetch the agent settings");
+    		throw new InvalidInputException("Agent id is not passed to fetch the agent settings");
+    	}
+    	agentSettings = organizationUnitSettingsDao.fetchAgentSettingsById(agentId);
+    	if(agentSettings == null){
+    		LOG.error("Could not find agent settings for id: "+agentId);
+    		throw new NoRecordsFetchedException("Could not find agent settings for id: "+agentId);
+    	}
+    	return agentSettings;
+    }
+    
     @Override
     public void updateCRMDetails( OrganizationUnitSettings companySettings, CRMInfo crmInfo, String fullyQualifiedClass )
         throws InvalidInputException
@@ -1078,6 +1132,12 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
             originalContentSettings.setTake_survey_mail( mailContent );
         } else if ( mailCategory.equals( CommonConstants.SURVEY_REMINDER_MAIL_BODY_CATEGORY ) ) {
             originalContentSettings.setTake_survey_reminder_mail( mailContent );
+        } else if ( mailCategory.equals( CommonConstants.SURVEY_COMPLETION_MAIL_BODY_CATEGORY ) ) {
+            originalContentSettings.setSurvey_completion_mail(mailContent);
+        } else if ( mailCategory.equals( CommonConstants.SOCIAL_POST_REMINDER_MAIL_BODY_CATEGORY ) ) {
+            originalContentSettings.setSocial_post_reminder_mail(mailContent);
+        } else if ( mailCategory.equals( CommonConstants.INCOMPLETE_SURVEY_REMINDER_MAIL_BODY_CATEGORY ) ) {
+            originalContentSettings.setRestart_survey_mail(mailContent);
         } else {
             throw new InvalidInputException( "Invalid mail category" );
         }
@@ -1142,6 +1202,54 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
             mailContent.setParam_order( paramOrder );
 
             originalContentSettings.setTake_survey_reminder_mail( mailContent );
+        } else if ( mailCategory.equals( CommonConstants.SURVEY_COMPLETION_MAIL_BODY_CATEGORY ) ) {
+            mailSubject = CommonConstants.SURVEY_COMPLETION_MAIL_SUBJECT;
+            try {
+                mailBody = readMailContentFromFile( CommonConstants.SURVEY_COMPLETION_MAIL_FILENAME );
+            } catch ( IOException e ) {
+                throw new NonFatalException( "Error occurred while parsing mail content.",
+                    DisplayMessageConstants.GENERAL_ERROR, e );
+            }
+            paramOrder = new ArrayList<String>( Arrays.asList( paramOrderSurveyCompletionMail.split( "," ) ) );
+
+            MailContent mailContent = new MailContent();
+            mailContent.setMail_subject( mailSubject );
+            mailContent.setMail_body( mailBody );
+            mailContent.setParam_order( paramOrder );
+
+            originalContentSettings.setSurvey_completion_mail( mailContent );
+        } else if ( mailCategory.equals( CommonConstants.SOCIAL_POST_REMINDER_MAIL_BODY_CATEGORY ) ) {
+            mailSubject = CommonConstants.SOCIAL_POST_REMINDER_MAIL_SUBJECT;
+            try {
+                mailBody = readMailContentFromFile( CommonConstants.SOCIAL_POST_REMINDER_MAIL_FILENAME );
+            } catch ( IOException e ) {
+                throw new NonFatalException( "Error occurred while parsing mail content.",
+                    DisplayMessageConstants.GENERAL_ERROR, e );
+            }
+            paramOrder = new ArrayList<String>( Arrays.asList( paramOrderSocialPostReminder.split( "," ) ) );
+
+            MailContent mailContent = new MailContent();
+            mailContent.setMail_subject( mailSubject );
+            mailContent.setMail_body( mailBody );
+            mailContent.setParam_order( paramOrder );
+
+            originalContentSettings.setSocial_post_reminder_mail( mailContent );
+        } else if ( mailCategory.equals( CommonConstants.INCOMPLETE_SURVEY_REMINDER_MAIL_BODY_CATEGORY ) ) {
+            mailSubject = CommonConstants.INCOMPLETE_SURVEY_REMINDER_MAIL_SUBJECT;
+            try {
+                mailBody = readMailContentFromFile( CommonConstants.INCOMPLETE_SURVEY_REMINDER_MAIL_FILENAME );
+            } catch ( IOException e ) {
+                throw new NonFatalException( "Error occurred while parsing mail content.",
+                    DisplayMessageConstants.GENERAL_ERROR, e );
+            }
+            paramOrder = new ArrayList<String>( Arrays.asList( paramOrderIncompleteSurveyReminder.split( "," ) ) );
+
+            MailContent mailContent = new MailContent();
+            mailContent.setMail_subject( mailSubject );
+            mailContent.setMail_body( mailBody );
+            mailContent.setParam_order( paramOrder );
+
+            originalContentSettings.setRestart_survey_mail( mailContent );
         } else {
             throw new InvalidInputException( "Invalid mail category" );
         }
@@ -1163,6 +1271,12 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
             return new ArrayList<String>( Arrays.asList( paramOrderTakeSurvey.split( "," ) ) );
         } else if ( mailCategory.equals( CommonConstants.SURVEY_REMINDER_MAIL_BODY_CATEGORY ) ) {
             return new ArrayList<String>( Arrays.asList( paramOrderTakeSurveyReminder.split( "," ) ) );
+        }else if ( mailCategory.equals( CommonConstants.SURVEY_COMPLETION_MAIL_BODY_CATEGORY ) ) {
+            return new ArrayList<String>( Arrays.asList( paramOrderSurveyCompletionMail.split( "," ) ) );
+        }else if ( mailCategory.equals( CommonConstants.SOCIAL_POST_REMINDER_MAIL_BODY_CATEGORY ) ) {
+            return new ArrayList<String>( Arrays.asList( paramOrderSocialPostReminder.split( "," ) ) );
+        }else if ( mailCategory.equals( CommonConstants.INCOMPLETE_SURVEY_REMINDER_MAIL_BODY_CATEGORY ) ) {
+            return new ArrayList<String>( Arrays.asList( paramOrderIncompleteSurveyReminder.split( "," ) ) );
         } else {
             throw new InvalidInputException( "Invalid mail category" );
         }
@@ -1891,7 +2005,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 
         LOG.debug( "Adding default branch for the new region created" );
         addNewBranch( user, region.getRegionId(), CommonConstants.YES, CommonConstants.DEFAULT_BRANCH_NAME,
-            CommonConstants.DEFAULT_ADDRESS, null, null, null, null, null, null );
+            null, null, null, null, null, null, null );
 
         /**
          * If userId or email is provided, call the service for adding and assigning user to the
@@ -3019,9 +3133,9 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
         if ( branchName == null || branchName.isEmpty() ) {
             throw new InvalidInputException( "Branch name is null in addNewBranch" );
         }
-        if ( branchAddress1 == null || branchAddress1.isEmpty() ) {
+        /*if ( branchAddress1 == null || branchAddress1.isEmpty() ) {
             throw new InvalidInputException( "Branch address is null in addNewBranch" );
-        }
+        }*/
         LOG.info( "Method add new branch called for regionId : " + regionId + " and branchName : " + branchName );
         Region region = null;
         LOG.debug( "Fetching region for branch to be added" );

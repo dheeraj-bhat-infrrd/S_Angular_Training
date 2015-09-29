@@ -2715,6 +2715,7 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
     @Transactional
     public Map<String, Long> getPrimaryUserProfileByAgentId( long entityId )
     {
+    	LOG.info("Getting user primary profile for id: "+entityId);
         return userProfileDao.findPrimaryUserProfileByAgentId( entityId );
 
     }
