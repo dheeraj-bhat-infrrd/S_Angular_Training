@@ -7,14 +7,16 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+
 import com.realtech.socialsurvey.core.entities.AgentSettings;
 import com.realtech.socialsurvey.core.entities.Branch;
 import com.realtech.socialsurvey.core.entities.BranchFromSearch;
 import com.realtech.socialsurvey.core.entities.BranchSettings;
 import com.realtech.socialsurvey.core.entities.CRMInfo;
-import com.realtech.socialsurvey.core.entities.Company;
 import com.realtech.socialsurvey.core.entities.CollectionDotloopProfileMapping;
+import com.realtech.socialsurvey.core.entities.Company;
 import com.realtech.socialsurvey.core.entities.DisabledAccount;
 import com.realtech.socialsurvey.core.entities.FeedIngestionEntity;
 import com.realtech.socialsurvey.core.entities.LoopProfileMapping;
@@ -1071,11 +1073,10 @@ public interface OrganizationManagementService
      * @param profileId
      * @return
      */
-    public CollectionDotloopProfileMapping getCollectionDotloopMappingByProfileId( String profileId ) throws InvalidInputException;
+    public CollectionDotloopProfileMapping getCollectionDotloopMappingByProfileId( String profileId )
+        throws InvalidInputException;
 
 
- 
-   
     /**
      * @param companyDotloopProfileMapping
      * @return
@@ -1085,7 +1086,6 @@ public interface OrganizationManagementService
         CollectionDotloopProfileMapping collectionDotloopProfileMapping ) throws InvalidInputException;
 
 
-  
     /**
      * @param collectionDotloopProfileMapping
      * @throws InvalidInputException
@@ -1104,5 +1104,16 @@ public interface OrganizationManagementService
      */
     public List<OrganizationUnitSettings> getOrganizationUnitSettingsForCRMSource( String crmSource, String collectionName )
         throws InvalidInputException, NoRecordsFetchedException;
+
+
+    /**
+     * @param unitSettings
+     * @param collectionName
+     * @param crmInfo
+     * @param fullyQualifiedClass
+     * @throws InvalidInputException
+     */
+    public void updateCRMDetailsForAnyUnitSettings( OrganizationUnitSettings unitSettings, String collectionName,
+        CRMInfo crmInfo, String fullyQualifiedClass ) throws InvalidInputException;
 
 }

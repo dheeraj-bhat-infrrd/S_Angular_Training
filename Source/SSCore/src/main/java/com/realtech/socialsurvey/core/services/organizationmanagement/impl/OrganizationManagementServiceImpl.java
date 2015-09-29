@@ -1052,6 +1052,27 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
             MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION );
         LOG.info( "Updated the record successfully" );
     }
+    
+    
+    @Override
+    public void updateCRMDetailsForAnyUnitSettings( OrganizationUnitSettings unitSettings, String collectionName, CRMInfo crmInfo, String fullyQualifiedClass )
+        throws InvalidInputException
+    {
+        if ( unitSettings == null ) {
+            throw new InvalidInputException( "Unit settings cannot be null." );
+        }
+        if ( crmInfo == null ) {
+            throw new InvalidInputException( "CRM info cannot be null." );
+        }
+        LOG.info( "Updating unitSettings: " + unitSettings + " with crm info: " + crmInfo );
+        organizationUnitSettingsDao.updateParticularKeyOrganizationUnitSettings(
+            MongoOrganizationUnitSettingDaoImpl.KEY_CRM_INFO, crmInfo, unitSettings,
+            collectionName );
+        organizationUnitSettingsDao.updateParticularKeyOrganizationUnitSettings(
+            MongoOrganizationUnitSettingDaoImpl.KEY_CRM_INFO_CLASS, fullyQualifiedClass, unitSettings,
+            collectionName);
+        LOG.info( "Updated the record successfully" );
+    }
 
 
     @Override
