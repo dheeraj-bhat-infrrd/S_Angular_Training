@@ -22,7 +22,7 @@ import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.commons.Utils;
 import com.realtech.socialsurvey.core.dao.impl.MongoOrganizationUnitSettingDaoImpl;
 import com.realtech.socialsurvey.core.entities.Company;
-import com.realtech.socialsurvey.core.entities.CompanyDotloopProfileMapping;
+import com.realtech.socialsurvey.core.entities.CollectionDotloopProfileMapping;
 import com.realtech.socialsurvey.core.entities.DotLoopCrmInfo;
 import com.realtech.socialsurvey.core.entities.DotLoopParticipant;
 import com.realtech.socialsurvey.core.entities.DotLoopProfileEntity;
@@ -131,15 +131,15 @@ public class DotloopReviewProcessor extends QuartzJobBean
 
 
     // check if the profile is entered in the system already as inactive
-    private boolean isProfilePresentAsInactive( OrganizationUnitSettings unitSettings, DotLoopProfileEntity dotLoopProfile )
-        throws InvalidInputException
+    private boolean isProfilePresentAsInactive( String collectionName, OrganizationUnitSettings unitSettings,
+        DotLoopProfileEntity dotLoopProfile ) throws InvalidInputException
     {
         LOG.debug( "Checking dotLoopProfile presence in the system as inactive: " + dotLoopProfile.toString() );
         boolean isAccountPresentInSystem = false;
         String profileId = String.valueOf( dotLoopProfile.getProfileId() );
-        CompanyDotloopProfileMapping companyDotloopProfileMapping = organizationManagementService
-            .getCompanyDotloopMappingByCompanyIdAndProfileId( unitSettings.getIden(), profileId );
-        if ( companyDotloopProfileMapping != null ) {
+        CollectionDotloopProfileMapping collectionDotloopProfileMapping = organizationManagementService
+            .getCollectionDotloopMappingByCollectionIdAndProfileId( collectionName, unitSettings.getIden(), profileId );
+        if ( collectionDotloopProfileMapping != null ) {
             LOG.debug( "Profile is already present in the system as inactive." );
             isAccountPresentInSystem = true;
         }
@@ -147,18 +147,26 @@ public class DotloopReviewProcessor extends QuartzJobBean
     }
 
 
-    private void insertCompanyDotloopProfile( DotLoopProfileEntity profileEntity, OrganizationUnitSettings unitSettings )
-        throws InvalidInputException
+    private void insertCompanyDotloopProfile( String collectionName, DotLoopProfileEntity profileEntity,
+        OrganizationUnitSettings unitSettings ) throws InvalidInputException
     {
         LOG.debug( "Inserting into dotloop profile entity" );
-        CompanyDotloopProfileMapping companyDotloopProfileMapping = new CompanyDotloopProfileMapping();
-        companyDotloopProfileMapping.setActive( false );
-        companyDotloopProfileMapping.setProfileEmailAddress( profileEntity.getEmailAddress() );
-        companyDotloopProfileMapping.setProfileName( profileEntity.getName() );
-        companyDotloopProfileMapping.setProfileId( String.valueOf( profileEntity.getProfileId() ) );
-        companyDotloopProfileMapping.setCompanyId( unitSettings.getIden() );
-        companyDotloopProfileMapping = organizationManagementService
-            .saveCompanyDotLoopProfileMapping( companyDotloopProfileMapping );
+        CollectionDotloopProfileMapping collectionDotloopProfileMapping = new CollectionDotloopProfileMapping();
+        collectionDotloopProfileMapping.setActive( false );
+        collectionDotloopProfileMapping.setProfileEmailAddress( profileEntity.getEmailAddress() );
+        collectionDotloopProfileMapping.setProfileName( profileEntity.getName() );
+        collectionDotloopProfileMapping.setProfileId( String.valueOf( profileEntity.getProfileId() ) );
+        if ( collectionName.equalsIgnoreCase( MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION ) ) {
+            collectionDotloopProfileMapping.setCompanyId( unitSettings.getIden() );
+        } else if ( collectionName.equalsIgnoreCase( MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION ) ) {
+            collectionDotloopProfileMapping.setRegionId( unitSettings.getIden() );
+        } else if ( collectionName.equalsIgnoreCase( MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION ) ) {
+            collectionDotloopProfileMapping.setBranchId( unitSettings.getIden() );
+        } else if ( collectionName.equalsIgnoreCase( MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION ) ) {
+            collectionDotloopProfileMapping.setAgentId( unitSettings.getIden() );
+        }
+        collectionDotloopProfileMapping = organizationManagementService
+            .saveCollectionDotLoopProfileMapping( collectionDotloopProfileMapping );
     }
 
 
@@ -336,7 +344,7 @@ public class DotloopReviewProcessor extends QuartzJobBean
             for ( DotLoopProfileEntity profile : profileList ) {
                 String profileId = String.valueOf( profile.getProfileId() );
                 try {
-                    if ( profile.isActive() && !isProfilePresentAsInactive( unitSettings, profile ) ) {
+                    if ( profile.isActive() && !isProfilePresentAsInactive( collectionName, unitSettings, profile ) ) {
                         // check for loop ids with status closed (4)
                         Response loopResponse = null;
                         int batchNumber = 1;
@@ -383,7 +391,7 @@ public class DotloopReviewProcessor extends QuartzJobBean
                         } catch ( DotLoopAccessForbiddenException dafe ) {
                             // insert into tracker table
                             LOG.info( "Inactive profile. Inserting into Dot loop profile mapping." );
-                            insertCompanyDotloopProfile( profile, unitSettings );
+                            insertCompanyDotloopProfile( collectionName, profile, unitSettings );
                         }
                     }
                 } catch ( JsonSyntaxException | InvalidInputException e ) {
