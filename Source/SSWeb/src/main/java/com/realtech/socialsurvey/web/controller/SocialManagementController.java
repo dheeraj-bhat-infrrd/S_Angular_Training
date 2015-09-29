@@ -1648,6 +1648,10 @@ public class SocialManagementController
         String zillowScreenName = request.getParameter( "zillowProfileName" );
         OrganizationUnitSettings profileSettings = (OrganizationUnitSettings) session
                 .getAttribute( CommonConstants.USER_ACCOUNT_SETTINGS );
+        if(profileSettings == null){
+        	profileSettings = (OrganizationUnitSettings) session
+                    .getAttribute( CommonConstants.USER_PROFILE_SETTINGS );
+        }
         if ( zillowScreenName == null || zillowScreenName == "" ) {
             model.addAttribute( "Error", "Please provide either the zillow screen name or zillow emailadress" );
 
@@ -1901,6 +1905,7 @@ public class SocialManagementController
             model.addAttribute( CommonConstants.SUCCESS_ATTRIBUTE, CommonConstants.YES );
             model.addAttribute( "socialNetwork", "zillow" );
             session.setAttribute( CommonConstants.USER_ACCOUNT_SETTINGS, profileSettings );
+            session.setAttribute( CommonConstants.USER_PROFILE_SETTINGS, profileSettings );
         }
         return JspResolver.SOCIAL_AUTH_MESSAGE;
     }
