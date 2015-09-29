@@ -739,6 +739,28 @@ $(document).scroll(function(){
 	}
 });
 
+function fetchZillowReviewsBasedOnProfile(profileLevel, currentProfileIden){
+	if (currentProfileIden == undefined || currentProfileIden == "") {
+		return;
+	}
+	var url = "/rest/profile/";
+	if (profileLevel == 'COMPANY') {
+		url += "company/";
+	} else if (profileLevel == 'REGION') {
+		url += "region/";
+	} else if (profileLevel == 'BRANCH') {
+		url += "branch/";
+	} else if (profileLevel == 'INDIVIDUAL') {
+		url += "individual/";
+	}
+	url += currentProfileIden + "/zillowreviews";
+	callAjaxGET(url, fetchZillowReviewsCallBack, true);
+}
+
+function fetchZillowReviewsCallBack(data) {
+	
+}
+
 function fetchReviewsBasedOnProfileLevel(profileLevel, currentProfileIden,
 		startIndex, numRows, minScore) {
 	if (currentProfileIden == undefined || currentProfileIden == "") {
@@ -1020,6 +1042,7 @@ function fetchAgentProfile(){
 	startIndex = 0;
 	fetchReviewsBasedOnProfileLevel('INDIVIDUAL', result.iden, startIndex, numOfRows, minScore);
 	fetchReviewsCountBasedOnProfileLevel('INDIVIDUAL',result.iden, paintHiddenReviewsCount, 0, minScore);
+	fetchZillowReviewsBasedOnProfile('INDIVIDUAL',result.iden);
 }
 
 function findProList(iden,searchcritrianame){

@@ -6,7 +6,6 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
 import com.realtech.socialsurvey.core.entities.Achievement;
 import com.realtech.socialsurvey.core.entities.AgentRankingReport;
 import com.realtech.socialsurvey.core.entities.AgentSettings;
@@ -24,6 +23,7 @@ import com.realtech.socialsurvey.core.entities.SocialPost;
 import com.realtech.socialsurvey.core.entities.SurveyDetails;
 import com.realtech.socialsurvey.core.entities.SurveyPreInitiation;
 import com.realtech.socialsurvey.core.entities.User;
+import com.realtech.socialsurvey.core.entities.UserCompositeEntity;
 import com.realtech.socialsurvey.core.entities.UserFromSearch;
 import com.realtech.socialsurvey.core.entities.UserSettings;
 import com.realtech.socialsurvey.core.enums.AccountType;
@@ -313,6 +313,14 @@ public interface ProfileManagementService
         NoRecordsFetchedException, ProfileNotFoundException;
 
 
+    /**
+     * Gets the user and the agent setting objects based on profile name.
+     * @param agentProfileName
+     * @param checkStatus
+     * @return
+     * @throws ProfileNotFoundException
+     */
+    public UserCompositeEntity getCompositeUserObjectByProfileName(String agentProfileName, boolean checkStatus) throws ProfileNotFoundException ;
     /**
      * Method to fetch reviews based on the profile level specified, iden is one of
      * agentId/branchId/regionId or companyId based on the profile level

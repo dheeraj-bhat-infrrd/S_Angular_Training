@@ -4,13 +4,11 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
-
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
-
 import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrDocumentList;
 import org.slf4j.Logger;
@@ -22,7 +20,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
-
 import com.google.gson.Gson;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.entities.AgentSettings;
@@ -54,7 +51,6 @@ import com.realtech.socialsurvey.core.services.search.exception.SolrException;
 import com.realtech.socialsurvey.core.services.surveybuilder.SurveyHandler;
 import com.realtech.socialsurvey.web.common.ErrorCodes;
 import com.realtech.socialsurvey.web.common.ErrorResponse;
-
 import ezvcard.Ezvcard;
 import ezvcard.VCard;
 import ezvcard.VCardVersion;
@@ -92,6 +88,11 @@ public class ProfileController {
 
 	@Value("${APPLICATION_ADMIN_NAME}")
 	private String applicationAdminName;
+	
+	private static final String PROFILE_TYPE_COMPANY = "company";
+	private static final String PROFILE_TYPE_REGION = "region";
+	private static final String PROFILE_TYPE_BRANCH = "branch";
+	private static final String PROFILE_TYPE_INDIVIDUAL = "individual";
 
 	/**
 	 * Service to get company details along with all regions based on profile name
@@ -1561,6 +1562,81 @@ public class ProfileController {
 			response = getErrorResponse(e);
 		}
 		LOG.info("Service to get posts of branch finished");
+		return response;
+	}
+	
+	@ResponseBody
+	@RequestMapping(value = "/{profileType}/{iden}/zillowreviews")
+	public Response getZillowReviews(@PathVariable String profileType, @PathVariable long iden) throws ProfileNotFoundException {
+		LOG.info("Getting zillow reviews for profile type: " + profileType + " and id: " + iden);
+		Response response = null;
+		if (profileType.equals(PROFILE_TYPE_COMPANY)) {
+			try {
+				// get the company details
+				OrganizationUnitSettings companyProfile = organizationManagementService.getCompanySettings(iden);
+				if (companyProfile.getSocialMediaTokens() != null && companyProfile.getSocialMediaTokens().getZillowToken() != null){
+					LOG.info("Fetcing zillow reviews for company id: "+iden);
+					profileManagementService.updateZillowFeed(companyProfile, CommonConstants.COMPANY_SETTINGS_COLLECTION);
+					LOG.info("Done fetching zillow reviews for company id: "+iden);
+				}
+			}
+			catch (InvalidInputException e) {
+				LOG.error("Could not fetch unit settings for company: " + iden, e);
+				throw new ProfileNotFoundException("Could not fetch unit settings for company: " + iden, e);
+			}
+		}else if (profileType.equals(PROFILE_TYPE_REGION)) {
+			try {
+				// get the region details
+				OrganizationUnitSettings regionProfile = organizationManagementService.getRegionSettings(iden);
+				if (regionProfile.getSocialMediaTokens() != null && regionProfile.getSocialMediaTokens().getZillowToken() != null){
+					LOG.info("Fetcing zillow reviews for region id: "+iden);
+					profileManagementService.updateZillowFeed(regionProfile, CommonConstants.REGION_SETTINGS_COLLECTION);
+					LOG.info("Done fetching zillow reviews for region id: "+iden);
+				}
+			}
+			catch (InvalidInputException e) {
+				LOG.error("Could not fetch unit settings for region: " + iden, e);
+				throw new ProfileNotFoundException("Could not fetch unit settings for region: " + iden, e);
+			}
+		}else if (profileType.equals(PROFILE_TYPE_BRANCH)) {
+			try {
+				// get the branch details
+				OrganizationUnitSettings branchProfile = organizationManagementService.getBranchSettingsDefault(iden);
+				if (branchProfile.getSocialMediaTokens() != null && branchProfile.getSocialMediaTokens().getZillowToken() != null){
+					LOG.info("Fetcing zillow reviews for branch id: "+iden);
+					profileManagementService.updateZillowFeed(branchProfile, CommonConstants.BRANCH_SETTINGS_COLLECTION);
+					LOG.info("Done fetching zillow reviews for branch id: "+iden);
+				}
+			}
+			catch (InvalidInputException e) {
+				LOG.error("Could not fetch unit settings for branch: " + iden, e);
+				throw new ProfileNotFoundException("Could not fetch unit settings for branch: " + iden, e);
+			}
+			catch (NoRecordsFetchedException e) {
+				LOG.error("Could not fetch unit settings for branch: " + iden, e);
+				throw new ProfileNotFoundException("Could not fetch unit settings for branch: " + iden, e);
+			}
+		}else if (profileType.equals(PROFILE_TYPE_INDIVIDUAL)) {
+			try {
+				// get the individual details
+				AgentSettings individualProfile = organizationManagementService.getAgentSettings(iden);
+				if (individualProfile.getSocialMediaTokens() != null && individualProfile.getSocialMediaTokens().getZillowToken() != null){
+					LOG.info("Fetcing zillow reviews for agent id: "+iden);
+					profileManagementService.updateZillowFeed(individualProfile, CommonConstants.AGENT_SETTINGS_COLLECTION);
+					LOG.info("Done fetching zillow reviews for agent id: "+iden);
+				}
+			}
+			catch (InvalidInputException e) {
+				LOG.error("Could not fetch unit settings for agent: " + iden, e);
+				throw new ProfileNotFoundException("Could not fetch unit settings for agent: " + iden, e);
+			}
+			catch (NoRecordsFetchedException e) {
+				LOG.error("Could not fetch unit settings for agent: " + iden, e);
+				throw new ProfileNotFoundException("Could not fetch unit settings for agent: " + iden, e);
+			}
+		}
+		LOG.info("Fetched zillow reviews for profile type: " + profileType + " and id: " + iden);
+		response = Response.ok().build();
 		return response;
 	}
 

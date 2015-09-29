@@ -17,9 +17,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
-
 import javax.annotation.Resource;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
@@ -29,10 +27,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.DependsOn;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
-
 import retrofit.client.Response;
 import retrofit.mime.TypedByteArray;
-
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonMappingException;
@@ -80,6 +76,7 @@ import com.realtech.socialsurvey.core.entities.SurveyDetails;
 import com.realtech.socialsurvey.core.entities.SurveyPreInitiation;
 import com.realtech.socialsurvey.core.entities.TwitterToken;
 import com.realtech.socialsurvey.core.entities.User;
+import com.realtech.socialsurvey.core.entities.UserCompositeEntity;
 import com.realtech.socialsurvey.core.entities.UserFromSearch;
 import com.realtech.socialsurvey.core.entities.UserProfile;
 import com.realtech.socialsurvey.core.entities.UserSettings;
@@ -1125,6 +1122,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 	public Map<String, Long> getPrimaryHierarchyByAgentProfile(OrganizationUnitSettings agentSettings) {
 		LOG.info("Inside method getPrimaryHierarchyByAgentProfile ");
 		Map<String, Long> hierarchyMap = userManagementService.getPrimaryUserProfileByAgentId(agentSettings.getIden());
+		LOG.info("Returning from getPrimaryHierarchyByAgentProfile ");
 		return hierarchyMap;
 	}
 
@@ -1280,6 +1278,35 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 
 		LOG.info("Method getUserProfilesByProfileName executed successfully");
 		return user;
+	}
+	
+	@Override
+	@Transactional
+	public UserCompositeEntity getCompositeUserObjectByProfileName(String agentProfileName, boolean checkStatus) throws ProfileNotFoundException {
+		LOG.info("Getting the user composite object by profile name: "+agentProfileName+" and check status: "+checkStatus);
+		if(agentProfileName == null || agentProfileName.isEmpty()){
+			LOG.error("agentProfileName is null or empty while getting agent settings");
+			throw new ProfileNotFoundException("agentProfileName is null or empty while getting agent settings");
+		}
+		UserCompositeEntity compositeUserObject = null;
+		AgentSettings agentSettings = null;
+		User user = null;
+		OrganizationUnitSettings organizationUnitSettings = organizationUnitSettingsDao.fetchOrganizationUnitSettingsByProfileName(agentProfileName,
+				MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION);
+		if(organizationUnitSettings != null){
+			LOG.debug("Found the setting. Converting into agent settings");
+			agentSettings = (AgentSettings)organizationUnitSettings;
+			user = userDao.findById(User.class, agentSettings.getIden());
+			if (user == null || (user.getStatus() == CommonConstants.STATUS_INACTIVE && checkStatus)) {
+				LOG.error("No active agent found.");
+				throw new ProfileNotFoundException("No active agent found.");
+			}
+			compositeUserObject = new UserCompositeEntity();
+			compositeUserObject.setUser(user);
+			compositeUserObject.setAgentSettings(agentSettings);
+		}
+		LOG.info("Returning the user composite object.");
+		return compositeUserObject;
 	}
 
 	@Override
