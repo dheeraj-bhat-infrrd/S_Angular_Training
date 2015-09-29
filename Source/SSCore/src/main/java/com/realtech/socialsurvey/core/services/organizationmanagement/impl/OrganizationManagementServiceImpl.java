@@ -59,7 +59,7 @@ import com.realtech.socialsurvey.core.entities.BranchFromSearch;
 import com.realtech.socialsurvey.core.entities.BranchSettings;
 import com.realtech.socialsurvey.core.entities.CRMInfo;
 import com.realtech.socialsurvey.core.entities.Company;
-import com.realtech.socialsurvey.core.entities.CompanyDotloopProfileMapping;
+import com.realtech.socialsurvey.core.entities.CollectionDotloopProfileMapping;
 import com.realtech.socialsurvey.core.entities.ContactDetailsSettings;
 import com.realtech.socialsurvey.core.entities.ContactNumberSettings;
 import com.realtech.socialsurvey.core.entities.CrmBatchTracker;
@@ -254,7 +254,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
     private SettingsSetter settingsSetter;
 
     @Autowired
-    private GenericDao<CompanyDotloopProfileMapping, Long> companyDotloopProfileMappingDao;
+    private GenericDao<CollectionDotloopProfileMapping, Long> collectionDotloopProfileMappingDao;
 
     @Autowired
     private GenericDao<LoopProfileMapping, Long> loopProfileMappingDao;
@@ -344,9 +344,9 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 
         LOG.debug( "Adding the default region" );
         // TODO:adding default comapany,state,city,zipcode as null
-        Region region = addNewRegion( user, CommonConstants.DEFAULT_REGION_NAME, CommonConstants.YES,
-            null, null, null, null, null, null, null );
-        
+        Region region = addNewRegion( user, CommonConstants.DEFAULT_REGION_NAME, CommonConstants.YES, null, null, null, null,
+            null, null, null );
+
         ProfilesMaster profilesMaster = userManagementService
             .getProfilesMasterById( CommonConstants.PROFILES_MASTER_REGION_ADMIN_PROFILE_ID );
 
@@ -608,7 +608,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
         String surveyCompletionMail = "";
         String socialPostReminderMail = "";
         String incompleteSurveyReminderMail = "";
-        
+
         String takeSurveyMailSubj = "";
         String takeSurveyReminderMailSubj = "";
         String takeSurveyByCustomerMailSubj = "";
@@ -619,16 +619,16 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
             takeSurveyMail = readMailContentFromFile( CommonConstants.SURVEY_REQUEST_MAIL_FILENAME );
             takeSurveyByCustomerMail = readMailContentFromFile( CommonConstants.SURVEY_CUSTOMER_REQUEST_MAIL_FILENAME );
             takeSurveyReminderMail = readMailContentFromFile( CommonConstants.SURVEY_REMINDER_MAIL_FILENAME );
-            surveyCompletionMail =  readMailContentFromFile( CommonConstants.SURVEY_COMPLETION_MAIL_FILENAME );
+            surveyCompletionMail = readMailContentFromFile( CommonConstants.SURVEY_COMPLETION_MAIL_FILENAME );
             socialPostReminderMail = readMailContentFromFile( CommonConstants.SOCIAL_POST_REMINDER_MAIL_FILENAME );
             incompleteSurveyReminderMail = readMailContentFromFile( CommonConstants.INCOMPLETE_SURVEY_REMINDER_MAIL_FILENAME );
-            
+
             takeSurveyMailSubj = CommonConstants.SURVEY_MAIL_SUBJECT + "[AgentName]";
             takeSurveyByCustomerMailSubj = CommonConstants.SURVEY_MAIL_SUBJECT_CUSTOMER;
             takeSurveyReminderMailSubj = CommonConstants.REMINDER_MAIL_SUBJECT + "[AgentName]";
             surveyCompletionMailSubj = CommonConstants.SURVEY_COMPLETION_MAIL_SUBJECT;
             socialPostReminderMailSubj = CommonConstants.SOCIAL_POST_REMINDER_MAIL_SUBJECT;
-            incompleteSurveyReminderMailSubj =  CommonConstants.INCOMPLETE_SURVEY_REMINDER_MAIL_SUBJECT;
+            incompleteSurveyReminderMailSubj = CommonConstants.INCOMPLETE_SURVEY_REMINDER_MAIL_SUBJECT;
         } catch ( IOException e ) {
             LOG.error(
                 "IOException occured in addOrganizationalDetails while copying default Email content. Nested exception is ", e );
@@ -652,24 +652,24 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
         mailContent.setMail_body( takeSurveyReminderMail );
         mailContent.setParam_order( new ArrayList<String>( Arrays.asList( paramOrderTakeSurveyReminder.split( "," ) ) ) );
         mailContentSettings.setTake_survey_reminder_mail( mailContent );
-        
+
         mailContent = new MailContent();
         mailContent.setMail_subject( surveyCompletionMailSubj );
         mailContent.setMail_body( surveyCompletionMail );
         mailContent.setParam_order( new ArrayList<String>( Arrays.asList( paramOrderSurveyCompletionMail.split( "," ) ) ) );
-        mailContentSettings.setSurvey_completion_mail(mailContent);
-        
+        mailContentSettings.setSurvey_completion_mail( mailContent );
+
         mailContent = new MailContent();
         mailContent.setMail_subject( socialPostReminderMailSubj );
         mailContent.setMail_body( socialPostReminderMail );
         mailContent.setParam_order( new ArrayList<String>( Arrays.asList( paramOrderSocialPostReminder.split( "," ) ) ) );
-        mailContentSettings.setSocial_post_reminder_mail(mailContent);
-        
+        mailContentSettings.setSocial_post_reminder_mail( mailContent );
+
         mailContent = new MailContent();
         mailContent.setMail_subject( incompleteSurveyReminderMailSubj );
         mailContent.setMail_body( incompleteSurveyReminderMail );
         mailContent.setParam_order( new ArrayList<String>( Arrays.asList( paramOrderIncompleteSurveyReminder.split( "," ) ) ) );
-        mailContentSettings.setRestart_survey_mail(mailContent);
+        mailContentSettings.setRestart_survey_mail( mailContent );
 
         companySettings.setMail_content( mailContentSettings );
 
@@ -1016,21 +1016,23 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 
     @Transactional
     @Override
-    public AgentSettings getAgentSettings(long agentId) throws InvalidInputException, NoRecordsFetchedException{
-    	LOG.info("Getting agent settings for id: "+agentId);
-    	AgentSettings agentSettings = null;
-    	if(agentId <= 0l){
-    		LOG.error("Agent id is not passed to fetch the agent settings");
-    		throw new InvalidInputException("Agent id is not passed to fetch the agent settings");
-    	}
-    	agentSettings = organizationUnitSettingsDao.fetchAgentSettingsById(agentId);
-    	if(agentSettings == null){
-    		LOG.error("Could not find agent settings for id: "+agentId);
-    		throw new NoRecordsFetchedException("Could not find agent settings for id: "+agentId);
-    	}
-    	return agentSettings;
+    public AgentSettings getAgentSettings( long agentId ) throws InvalidInputException, NoRecordsFetchedException
+    {
+        LOG.info( "Getting agent settings for id: " + agentId );
+        AgentSettings agentSettings = null;
+        if ( agentId <= 0l ) {
+            LOG.error( "Agent id is not passed to fetch the agent settings" );
+            throw new InvalidInputException( "Agent id is not passed to fetch the agent settings" );
+        }
+        agentSettings = organizationUnitSettingsDao.fetchAgentSettingsById( agentId );
+        if ( agentSettings == null ) {
+            LOG.error( "Could not find agent settings for id: " + agentId );
+            throw new NoRecordsFetchedException( "Could not find agent settings for id: " + agentId );
+        }
+        return agentSettings;
     }
-    
+
+
     @Override
     public void updateCRMDetails( OrganizationUnitSettings companySettings, CRMInfo crmInfo, String fullyQualifiedClass )
         throws InvalidInputException
@@ -1133,11 +1135,11 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
         } else if ( mailCategory.equals( CommonConstants.SURVEY_REMINDER_MAIL_BODY_CATEGORY ) ) {
             originalContentSettings.setTake_survey_reminder_mail( mailContent );
         } else if ( mailCategory.equals( CommonConstants.SURVEY_COMPLETION_MAIL_BODY_CATEGORY ) ) {
-            originalContentSettings.setSurvey_completion_mail(mailContent);
+            originalContentSettings.setSurvey_completion_mail( mailContent );
         } else if ( mailCategory.equals( CommonConstants.SOCIAL_POST_REMINDER_MAIL_BODY_CATEGORY ) ) {
-            originalContentSettings.setSocial_post_reminder_mail(mailContent);
+            originalContentSettings.setSocial_post_reminder_mail( mailContent );
         } else if ( mailCategory.equals( CommonConstants.INCOMPLETE_SURVEY_REMINDER_MAIL_BODY_CATEGORY ) ) {
-            originalContentSettings.setRestart_survey_mail(mailContent);
+            originalContentSettings.setRestart_survey_mail( mailContent );
         } else {
             throw new InvalidInputException( "Invalid mail category" );
         }
@@ -1271,11 +1273,11 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
             return new ArrayList<String>( Arrays.asList( paramOrderTakeSurvey.split( "," ) ) );
         } else if ( mailCategory.equals( CommonConstants.SURVEY_REMINDER_MAIL_BODY_CATEGORY ) ) {
             return new ArrayList<String>( Arrays.asList( paramOrderTakeSurveyReminder.split( "," ) ) );
-        }else if ( mailCategory.equals( CommonConstants.SURVEY_COMPLETION_MAIL_BODY_CATEGORY ) ) {
+        } else if ( mailCategory.equals( CommonConstants.SURVEY_COMPLETION_MAIL_BODY_CATEGORY ) ) {
             return new ArrayList<String>( Arrays.asList( paramOrderSurveyCompletionMail.split( "," ) ) );
-        }else if ( mailCategory.equals( CommonConstants.SOCIAL_POST_REMINDER_MAIL_BODY_CATEGORY ) ) {
+        } else if ( mailCategory.equals( CommonConstants.SOCIAL_POST_REMINDER_MAIL_BODY_CATEGORY ) ) {
             return new ArrayList<String>( Arrays.asList( paramOrderSocialPostReminder.split( "," ) ) );
-        }else if ( mailCategory.equals( CommonConstants.INCOMPLETE_SURVEY_REMINDER_MAIL_BODY_CATEGORY ) ) {
+        } else if ( mailCategory.equals( CommonConstants.INCOMPLETE_SURVEY_REMINDER_MAIL_BODY_CATEGORY ) ) {
             return new ArrayList<String>( Arrays.asList( paramOrderIncompleteSurveyReminder.split( "," ) ) );
         } else {
             throw new InvalidInputException( "Invalid mail category" );
@@ -2004,8 +2006,8 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
             city, zipcode );
 
         LOG.debug( "Adding default branch for the new region created" );
-        addNewBranch( user, region.getRegionId(), CommonConstants.YES, CommonConstants.DEFAULT_BRANCH_NAME,
-            null, null, null, null, null, null, null );
+        addNewBranch( user, region.getRegionId(), CommonConstants.YES, CommonConstants.DEFAULT_BRANCH_NAME, null, null, null,
+            null, null, null, null );
 
         /**
          * If userId or email is provided, call the service for adding and assigning user to the
@@ -4763,15 +4765,14 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
     @Transactional
     public long getLoopsCountByProfile( String profileId ) throws InvalidInputException
     {
-    	if(profileId == null || profileId.isEmpty()){
-    		LOG.error("Profile id is not passed to get loop count");
-    		throw new InvalidInputException("Profile id is not passed to get loop count");
-    	}
+        if ( profileId == null || profileId.isEmpty() ) {
+            LOG.error( "Profile id is not passed to get loop count" );
+            throw new InvalidInputException( "Profile id is not passed to get loop count" );
+        }
         LOG.debug( "Inside method getLoopsByProfile for profileId " + profileId );
         Map<String, Object> queries = new HashMap<>();
-        queries.put(CommonConstants.KEY_DOTLOOP_PROFILE_ID_COLUMN, profileId);
-        long numberOfLoops = loopProfileMappingDao.findNumberOfRowsByKeyValue( LoopProfileMapping.class,
-            queries);
+        queries.put( CommonConstants.KEY_DOTLOOP_PROFILE_ID_COLUMN, profileId );
+        long numberOfLoops = loopProfileMappingDao.findNumberOfRowsByKeyValue( LoopProfileMapping.class, queries );
         return numberOfLoops;
     }
 
@@ -4780,54 +4781,68 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
     @Transactional
     public void saveLoopsForProfile( LoopProfileMapping loopProfileMapping ) throws InvalidInputException
     {
-    	if(loopProfileMapping == null){
-    		LOG.error("null loop profile mapping sent for insert");
-    		throw new InvalidInputException("null loop profile mapping sent for insert");
-    	}
+        if ( loopProfileMapping == null ) {
+            LOG.error( "null loop profile mapping sent for insert" );
+            throw new InvalidInputException( "null loop profile mapping sent for insert" );
+        }
         LOG.debug( "Inside method saveLoopsForProfile " );
         loopProfileMappingDao.save( loopProfileMapping );
 
     }
-    
+
+
     @Override
     @Transactional
-    public LoopProfileMapping getLoopByProfileAndLoopId(String profileId, String loopId) throws InvalidInputException{
-    	if(profileId == null || profileId.isEmpty() || loopId == null || loopId.isEmpty()){
-    		LOG.error("Profile id/ loop id is not set to fetch loop profile data");
-    		throw new InvalidInputException("Profile id/ loop id is not set to fetch loop profile data");
-    	}
-    	LOG.info("Getting loop for profile id: "+profileId+" and loop id: "+loopId);
-    	LoopProfileMapping loop = null;
-    	Map<String, Object> queries = new HashMap<>();
-    	queries.put(CommonConstants.KEY_DOTLOOP_PROFILE_ID_COLUMN, profileId);
-    	queries.put(CommonConstants.KEY_DOTLOOP_PROFILE_LOOP_ID_COLUMN, loopId);
-    	List<LoopProfileMapping> loops = loopProfileMappingDao.findByKeyValue(LoopProfileMapping.class, queries);
-    	if(loops != null && loops.size() > 0){
-    		loop = loops.get(CommonConstants.INITIAL_INDEX);
-    	}
-    	return loop;
+    public LoopProfileMapping getLoopByProfileAndLoopId( String profileId, String loopId ) throws InvalidInputException
+    {
+        if ( profileId == null || profileId.isEmpty() || loopId == null || loopId.isEmpty() ) {
+            LOG.error( "Profile id/ loop id is not set to fetch loop profile data" );
+            throw new InvalidInputException( "Profile id/ loop id is not set to fetch loop profile data" );
+        }
+        LOG.info( "Getting loop for profile id: " + profileId + " and loop id: " + loopId );
+        LoopProfileMapping loop = null;
+        Map<String, Object> queries = new HashMap<>();
+        queries.put( CommonConstants.KEY_DOTLOOP_PROFILE_ID_COLUMN, profileId );
+        queries.put( CommonConstants.KEY_DOTLOOP_PROFILE_LOOP_ID_COLUMN, loopId );
+        List<LoopProfileMapping> loops = loopProfileMappingDao.findByKeyValue( LoopProfileMapping.class, queries );
+        if ( loops != null && loops.size() > 0 ) {
+            loop = loops.get( CommonConstants.INITIAL_INDEX );
+        }
+        return loop;
     }
 
 
     @Override
     @Transactional
-    public CompanyDotloopProfileMapping getCompanyDotloopMappingByCompanyIdAndProfileId( long companyId, String profileId ) throws InvalidInputException
+    public CollectionDotloopProfileMapping getCollectionDotloopMappingByCollectionIdAndProfileId( String collectionName,
+        long organizationUnitId, String profileId ) throws InvalidInputException
     {
-    	if(companyId <= 0l || profileId == null || profileId.isEmpty()){
-    		LOG.error("Company id/ profile id is not provided to get company dotloop mapping");
-    		throw new InvalidInputException("Company id/ profile id is not provided to get company dotloop mapping");
-    	}
-        LOG.debug( "Inside method getCompanyDotloopMappingByCompanyId for company " + companyId );
+        if ( organizationUnitId <= 0l || profileId == null || profileId.isEmpty() ) {
+            LOG.error( "Company id/ profile id is not provided to get company dotloop mapping" );
+            throw new InvalidInputException( "Company id/ profile id is not provided to get company dotloop mapping" );
+        }
+        LOG.debug( "Inside method getCollectionDotloopMappingByCollectionIdAndProfileId for unit " + organizationUnitId );
 
         Map<String, Object> queries = new HashMap<String, Object>();
-        queries.put( "companyId", companyId );
         queries.put( "profileId", profileId );
-        List<CompanyDotloopProfileMapping> companyDotLoopProfileMappingList = companyDotloopProfileMappingDao.findByKeyValue(
-            CompanyDotloopProfileMapping.class, queries );
-        if ( companyDotLoopProfileMappingList == null || companyDotLoopProfileMappingList.isEmpty() ) {
+
+        if ( collectionName.equalsIgnoreCase( MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION ) ) {
+            queries.put( "companyId", organizationUnitId );
+        } else if ( collectionName.equalsIgnoreCase( MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION ) ) {
+            queries.put( "regionId", organizationUnitId );
+        } else if ( collectionName.equalsIgnoreCase( MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION ) ) {
+            queries.put( "branchId", organizationUnitId );
+        } else if ( collectionName.equalsIgnoreCase( MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION ) ) {
+            queries.put( "agentId", organizationUnitId );
+        }
+
+
+        List<CollectionDotloopProfileMapping> collectionDotLoopProfileMappingList = collectionDotloopProfileMappingDao
+            .findByKeyValue( CollectionDotloopProfileMapping.class, queries );
+        if ( collectionDotLoopProfileMappingList == null || collectionDotLoopProfileMappingList.isEmpty() ) {
             return null;
         } else {
-            return companyDotLoopProfileMappingList.get( CommonConstants.INITIAL_INDEX );
+            return collectionDotLoopProfileMappingList.get( CommonConstants.INITIAL_INDEX );
         }
 
     }
@@ -4835,58 +4850,63 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 
     @Override
     @Transactional
-    public CompanyDotloopProfileMapping saveCompanyDotLoopProfileMapping(
-        CompanyDotloopProfileMapping companyDotloopProfileMapping ) throws InvalidInputException
+    public CollectionDotloopProfileMapping saveCollectionDotLoopProfileMapping(
+        CollectionDotloopProfileMapping collectionDotloopProfileMapping ) throws InvalidInputException
     {
-    	if(companyDotloopProfileMapping ==  null){
-    		LOG.error("Company dotloop profile mapping is null for insert");
-    		throw new InvalidInputException("Company dotloop profile mapping is null for insert");
-    	}
-        LOG.debug( "Inside method saveCompanyDotloopProfileMapping " );
-        return companyDotloopProfileMappingDao.save( companyDotloopProfileMapping );
+        if ( collectionDotloopProfileMapping == null ) {
+            LOG.error( "Company dotloop profile mapping is null for insert" );
+            throw new InvalidInputException( "Company dotloop profile mapping is null for insert" );
+        }
+        LOG.debug( "Inside method saveCollectionDotloopProfileMapping " );
+        return collectionDotloopProfileMappingDao.save( collectionDotloopProfileMapping );
 
     }
 
 
     @Override
     @Transactional
-    public void updateCompanyDotLoopProfileMapping( CompanyDotloopProfileMapping companyDotloopProfileMapping ) throws InvalidInputException
+    public void updateCollectionDotLoopProfileMapping( CollectionDotloopProfileMapping collectionDotloopProfileMapping )
+        throws InvalidInputException
     {
-    	if(companyDotloopProfileMapping == null){
-    		LOG.error("Company dotloop profile mapping is null for update");
-    		throw new InvalidInputException("Company dotloop profile mapping is null for update");
-    	}
-        LOG.debug( "Inside method saveCompanyDotloopProfileMapping " );
-        companyDotloopProfileMappingDao.update( companyDotloopProfileMapping );
+        if ( collectionDotloopProfileMapping == null ) {
+            LOG.error( "Company dotloop profile mapping is null for update" );
+            throw new InvalidInputException( "Company dotloop profile mapping is null for update" );
+        }
+        LOG.debug( "Inside method savecollectionDotloopProfileMapping " );
+        collectionDotloopProfileMappingDao.update( collectionDotloopProfileMapping );
 
     }
 
 
     @Override
     @Transactional
-    public CompanyDotloopProfileMapping getCompanyDotloopMappingByProfileId( String profileId ) throws InvalidInputException
+    public CollectionDotloopProfileMapping getCollectionDotloopMappingByProfileId( String profileId ) throws InvalidInputException
     {
-    	if(profileId == null || profileId.isEmpty()){
-    		LOG.error("Profile id is null to fetch company dot loop mapping");
-    		throw new InvalidInputException("Profile id is null to fetch company dot loop mapping");
-    	}
-        List<CompanyDotloopProfileMapping> companyDotloopProfileMappingList = companyDotloopProfileMappingDao.findByColumn(
-            CompanyDotloopProfileMapping.class, "profileId", profileId );
-        if ( companyDotloopProfileMappingList.isEmpty() ) {
+        if ( profileId == null || profileId.isEmpty() ) {
+            LOG.error( "Profile id is null to fetch company dot loop mapping" );
+            throw new InvalidInputException( "Profile id is null to fetch company dot loop mapping" );
+        }
+        List<CollectionDotloopProfileMapping> collectionDotloopProfileMappingList = collectionDotloopProfileMappingDao.findByColumn(
+            CollectionDotloopProfileMapping.class, "profileId", profileId );
+        if ( collectionDotloopProfileMappingList.isEmpty() ) {
             return null;
         } else {
-            return companyDotloopProfileMappingList.get( 0 );
+            return collectionDotloopProfileMappingList.get( 0 );
         }
     }
-    
+
+
     @Override
     @Transactional
-    public List<OrganizationUnitSettings> getOrganizationUnitSettingsForCRMSource(String crmSource, String collectionName) throws InvalidInputException, NoRecordsFetchedException{
-    	LOG.info("Getting list of crm info for source: "+crmSource);
-    	List<OrganizationUnitSettings> organizationUnitSettingsList = null;
-    	organizationUnitSettingsList = organizationUnitSettingsDao.getOrganizationUnitListWithCRMSource(crmSource, collectionName);
-    	LOG.info("Returning organization unit settings list with provided crm list");
-    	return organizationUnitSettingsList;
+    public List<OrganizationUnitSettings> getOrganizationUnitSettingsForCRMSource( String crmSource, String collectionName )
+        throws InvalidInputException, NoRecordsFetchedException
+    {
+        LOG.info( "Getting list of crm info for source: " + crmSource );
+        List<OrganizationUnitSettings> organizationUnitSettingsList = null;
+        organizationUnitSettingsList = organizationUnitSettingsDao.getOrganizationUnitListWithCRMSource( crmSource,
+            collectionName );
+        LOG.info( "Returning organization unit settings list with provided crm list" );
+        return organizationUnitSettingsList;
     }
 
 }
