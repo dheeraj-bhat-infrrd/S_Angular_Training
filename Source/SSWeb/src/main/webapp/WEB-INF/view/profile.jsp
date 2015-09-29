@@ -113,16 +113,6 @@
     </c:if>
 </head>
 <body>
-	<%-- <div class="hide" itemscope itemtype="http://schema.org/Product">
-		<span itemprop="name">${profName}</span> 
-		<span id="agent-desc" itemprop="title"></span>
-		<div itemprop="aggregateRating" itemscope
-			itemtype="http://schema.org/AggregateRating">
-			Rated <span id="prof-schema-agent-rating" itemprop="ratingValue">${floatingAverageGoogleRating}</span>/5
-			based on <span id="prof-schema-reviews" itemprop="reviewCount">${reviewsCount}</span>
-			reviews
-		</div>
-	</div> --%>
     <div id="toast-container" class="toast-container">
 	   <span id="overlay-toast" class="overlay-toast"></span>
     </div>
