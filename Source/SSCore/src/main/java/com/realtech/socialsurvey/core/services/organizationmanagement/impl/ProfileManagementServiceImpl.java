@@ -76,6 +76,7 @@ import com.realtech.socialsurvey.core.entities.SurveyDetails;
 import com.realtech.socialsurvey.core.entities.SurveyPreInitiation;
 import com.realtech.socialsurvey.core.entities.TwitterToken;
 import com.realtech.socialsurvey.core.entities.User;
+import com.realtech.socialsurvey.core.entities.UserCompositeEntity;
 import com.realtech.socialsurvey.core.entities.UserFromSearch;
 import com.realtech.socialsurvey.core.entities.UserProfile;
 import com.realtech.socialsurvey.core.entities.UserSettings;
@@ -88,6 +89,7 @@ import com.realtech.socialsurvey.core.enums.OrganizationUnit;
 import com.realtech.socialsurvey.core.enums.SettingsForApplication;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.exception.NoRecordsFetchedException;
+import com.realtech.socialsurvey.core.exception.NonFatalException;
 import com.realtech.socialsurvey.core.integration.zillow.ZillowIntegrationApi;
 import com.realtech.socialsurvey.core.integration.zillow.ZillowIntergrationApiBuilder;
 import com.realtech.socialsurvey.core.services.generator.URLGenerator;
@@ -1120,6 +1122,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 	public Map<String, Long> getPrimaryHierarchyByAgentProfile(OrganizationUnitSettings agentSettings) {
 		LOG.info("Inside method getPrimaryHierarchyByAgentProfile ");
 		Map<String, Long> hierarchyMap = userManagementService.getPrimaryUserProfileByAgentId(agentSettings.getIden());
+		LOG.info("Returning from getPrimaryHierarchyByAgentProfile ");
 		return hierarchyMap;
 	}
 
@@ -1275,6 +1278,35 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 
 		LOG.info("Method getUserProfilesByProfileName executed successfully");
 		return user;
+	}
+	
+	@Override
+	@Transactional
+	public UserCompositeEntity getCompositeUserObjectByProfileName(String agentProfileName, boolean checkStatus) throws ProfileNotFoundException {
+		LOG.info("Getting the user composite object by profile name: "+agentProfileName+" and check status: "+checkStatus);
+		if(agentProfileName == null || agentProfileName.isEmpty()){
+			LOG.error("agentProfileName is null or empty while getting agent settings");
+			throw new ProfileNotFoundException("agentProfileName is null or empty while getting agent settings");
+		}
+		UserCompositeEntity compositeUserObject = null;
+		AgentSettings agentSettings = null;
+		User user = null;
+		OrganizationUnitSettings organizationUnitSettings = organizationUnitSettingsDao.fetchOrganizationUnitSettingsByProfileName(agentProfileName,
+				MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION);
+		if(organizationUnitSettings != null){
+			LOG.debug("Found the setting. Converting into agent settings");
+			agentSettings = (AgentSettings)organizationUnitSettings;
+			user = userDao.findById(User.class, agentSettings.getIden());
+			if (user == null || (user.getStatus() == CommonConstants.STATUS_INACTIVE && checkStatus)) {
+				LOG.error("No active agent found.");
+				throw new ProfileNotFoundException("No active agent found.");
+			}
+			compositeUserObject = new UserCompositeEntity();
+			compositeUserObject.setUser(user);
+			compositeUserObject.setAgentSettings(agentSettings);
+		}
+		LOG.info("Returning the user composite object.");
+		return compositeUserObject;
 	}
 
 	@Override
@@ -3047,6 +3079,8 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 					contactDetails.setZipcode(companyUnitSettings.getContact_details().getZipcode());
 					contactDetails.setState(companyUnitSettings.getContact_details().getState());
 					contactDetails.setCity(companyUnitSettings.getContact_details().getCity());
+					contactDetails.setCountry(companyUnitSettings.getContact_details().getCountry());
+					contactDetails.setCountryCode(companyUnitSettings.getContact_details().getCountryCode());
 				}
 				else if (entry.getValue() == OrganizationUnit.REGION) {
 					contactDetails.setAddress(regionUnitSettings.getContact_details().getAddress());
@@ -3055,6 +3089,9 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 					contactDetails.setZipcode(regionUnitSettings.getContact_details().getZipcode());
 					contactDetails.setState(regionUnitSettings.getContact_details().getState());
 					contactDetails.setCity(regionUnitSettings.getContact_details().getCity());
+					contactDetails.setCountry(regionUnitSettings.getContact_details().getCountry());
+					contactDetails.setCountryCode(regionUnitSettings.getContact_details().getCountryCode());
+					
 				}
 				else if (entry.getValue() == OrganizationUnit.BRANCH) {
 					contactDetails.setAddress(branchUnitSettings.getContact_details().getAddress());
@@ -3063,6 +3100,8 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 					contactDetails.setZipcode(branchUnitSettings.getContact_details().getZipcode());
 					contactDetails.setState(branchUnitSettings.getContact_details().getState());
 					contactDetails.setCity(branchUnitSettings.getContact_details().getCity());
+					contactDetails.setCountry(branchUnitSettings.getContact_details().getCountry());
+					contactDetails.setCountryCode(branchUnitSettings.getContact_details().getCountryCode());
 				}
 				else if (entry.getValue() == OrganizationUnit.AGENT) {
 					contactDetails.setAddress(agentUnitSettings.getContact_details().getAddress());
@@ -3071,6 +3110,8 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 					contactDetails.setZipcode(agentUnitSettings.getContact_details().getZipcode());
 					contactDetails.setState(agentUnitSettings.getContact_details().getState());
 					contactDetails.setCity(agentUnitSettings.getContact_details().getCity());
+					contactDetails.setCountry(agentUnitSettings.getContact_details().getCountry());
+					contactDetails.setCountryCode(agentUnitSettings.getContact_details().getCountryCode());
 				}
 				userProfile.setContact_details(contactDetails);
 			}
@@ -3328,20 +3369,37 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 
 	@Override
 	public void updateZillowFeed(OrganizationUnitSettings profile, String collection) throws InvalidInputException {
+		if (profile == null || collection == null || collection.isEmpty()) {
+			LOG.info("Invalid parameters passed to updateZillowFeed for fetching zillow feed");
+			throw new InvalidInputException("Invalid parameters passed to updateZillowFeed for fetching zillow feed");
+		}
 		LOG.info("Method to update zillow feed called for ID :" + profile.getIden() + " of collection : " + collection);
-		SocialMediaTokens token = profile.getSocialMediaTokens();
-		token = socialManagementService.checkOrAddZillowLastUpdated(token);
-		profile.setSocialMediaTokens(token);
-		String lastUpdated = token.getZillowToken().getLastUpdated();
-		String currentTime = new Timestamp(System.currentTimeMillis()).toString();
-		long oneDay = 1 * 24 * 60 * 60 * 1000;
-		Timestamp oneDayBack = new Timestamp(System.currentTimeMillis() - oneDay);
-		if (lastUpdated == null || lastUpdated.isEmpty() || Timestamp.valueOf(lastUpdated).before(oneDayBack)) {
-			LOG.debug("Updating zillow feed.");
+		if (profile.getSocialMediaTokens() != null && profile.getSocialMediaTokens().getZillowToken() != null) {
+			// fetching zillow feed
+			LOG.debug("Fetching zillow feed for " + profile.getId() + " from " + collection);
 			fetchFeedFromZillow(profile, collection);
-			token.getZillowToken().setLastUpdated(currentTime);
-			token = socialManagementService.updateSocialMediaTokens(collection, profile, token);
-			profile.setSocialMediaTokens(token);
+			String entityType = "";
+			if (collection
+					.equalsIgnoreCase(MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION)) {
+				entityType = CommonConstants.COMPANY_ID_COLUMN;
+			}
+			else if (collection
+					.equalsIgnoreCase(MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION)) {
+				entityType = CommonConstants.REGION_ID_COLUMN;
+			}
+			else if (collection
+					.equalsIgnoreCase(MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION)) {
+				entityType = CommonConstants.BRANCH_ID_COLUMN;
+			}
+			else if (collection
+					.equalsIgnoreCase(MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION)) {
+				entityType = CommonConstants.AGENT_ID_COLUMN;
+			}
+			surveyHandler.deleteExcessZillowSurveysByEntity(entityType, profile.getIden());
+		}
+		else {
+			LOG.info("Zillow is not added for the profile");
+			throw new InvalidInputException("Zillow is not added for the profile");
 		}
 		LOG.info("Method to update zillow feed finished.");
 	}
@@ -3365,79 +3423,85 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 					String responseString = null;
 					ZillowToken zillowToken = token.getZillowToken();
 					String zillowScreenName = zillowToken.getZillowScreenName();
-					Response response = zillowIntegrationApi.fetchZillowReviewsByScreennameWithMaxCount(zwsId, zillowScreenName);
-					if (response != null) {
-						responseString = new String(((TypedByteArray) response.getBody()).getBytes());
+					if (zillowScreenName == null || zillowScreenName.isEmpty()) {
+						LOG.debug("Old zillow url. Modify and get the proper screen name. But for now bypass and do nothing");
+						// TODO: Convert to proper format from the old url format
 					}
-					if (responseString != null) {
-						Map<String, Object> map = null;
-						try {
-							map = convertJsonStringToMap(responseString);
+					else {
+						Response response = zillowIntegrationApi.fetchZillowReviewsByScreennameWithMaxCount(zwsId, zillowScreenName);
+						if (response != null) {
+							responseString = new String(((TypedByteArray) response.getBody()).getBytes());
 						}
-						catch (JsonParseException e) {
-							LOG.error("Exception caught " + e.getMessage());
-						}
-						catch (JsonMappingException e) {
-							LOG.error("Exception caught " + e.getMessage());
-						}
-						catch (IOException e) {
-							LOG.error("Exception caught " + e.getMessage());
-						}
+						if (responseString != null) {
+							Map<String, Object> map = null;
+							try {
+								map = convertJsonStringToMap(responseString);
+							}
+							catch (JsonParseException e) {
+								LOG.error("Exception caught " + e.getMessage());
+							}
+							catch (JsonMappingException e) {
+								LOG.error("Exception caught " + e.getMessage());
+							}
+							catch (IOException e) {
+								LOG.error("Exception caught " + e.getMessage());
+							}
 
-						if (map != null) {
-							Map<String, Object> responseMap = new HashMap<String, Object>();
-							Map<String, Object> resultMap = new HashMap<String, Object>();
-							Map<String, Object> proReviews = new HashMap<String, Object>();
-							List<HashMap<String, Object>> reviews = new ArrayList<HashMap<String, Object>>();
-							responseMap = (HashMap<String, Object>) map.get("response");
-							if (responseMap != null) {
-								resultMap = (HashMap<String, Object>) responseMap.get("results");
-								if (resultMap != null) {
-									proReviews = (HashMap<String, Object>) resultMap.get("proReviews");
-									if (proReviews != null) {
-										reviews = (List<HashMap<String, Object>>) proReviews.get("review");
-										if (reviews != null) {
-											for (HashMap<String, Object> review : reviews) {
-												String sourceId = (String) review.get("reviewURL");
-												SurveyDetails surveyDetails = surveyHandler.getSurveyDetailsBySourceIdAndMongoCollection(sourceId,
-														profile.getIden(), collectionName);
-												if (surveyDetails == null) {
-													surveyDetails = new SurveyDetails();
-													if (collectionName
-															.equalsIgnoreCase(MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION)) {
-														surveyDetails.setCompanyId(profile.getIden());
+							if (map != null) {
+								Map<String, Object> responseMap = new HashMap<String, Object>();
+								Map<String, Object> resultMap = new HashMap<String, Object>();
+								Map<String, Object> proReviews = new HashMap<String, Object>();
+								List<HashMap<String, Object>> reviews = new ArrayList<HashMap<String, Object>>();
+								responseMap = (HashMap<String, Object>) map.get("response");
+								if (responseMap != null) {
+									resultMap = (HashMap<String, Object>) responseMap.get("results");
+									if (resultMap != null) {
+										proReviews = (HashMap<String, Object>) resultMap.get("proReviews");
+										if (proReviews != null) {
+											reviews = (List<HashMap<String, Object>>) proReviews.get("review");
+											if (reviews != null) {
+												for (HashMap<String, Object> review : reviews) {
+													String sourceId = (String) review.get("reviewURL");
+													SurveyDetails surveyDetails = surveyHandler.getSurveyDetailsBySourceIdAndMongoCollection(
+															sourceId, profile.getIden(), collectionName);
+													if (surveyDetails == null) {
+														surveyDetails = new SurveyDetails();
+														if (collectionName
+																.equalsIgnoreCase(MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION)) {
+															surveyDetails.setCompanyId(profile.getIden());
+														}
+														else if (collectionName
+																.equalsIgnoreCase(MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION)) {
+															surveyDetails.setRegionId(profile.getIden());
+														}
+														else if (collectionName
+																.equalsIgnoreCase(MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION)) {
+															surveyDetails.setBranchId(profile.getIden());
+														}
+														else if (collectionName
+																.equalsIgnoreCase(MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION)) {
+															surveyDetails.setAgentId(profile.getIden());
+														}
+														String createdDate = (String) review.get("reviewDate");
+														surveyDetails.setCompleteProfileUrl((String) review.get("reviewerLink"));
+														surveyDetails.setCustomerFirstName((String) review.get("reviewer"));
+														surveyDetails.setReview((String) review.get("description"));
+														surveyDetails.setEditable(false);
+														surveyDetails.setStage(CommonConstants.SURVEY_STAGE_COMPLETE);
+														surveyDetails.setScore(Double.valueOf((String) review.get("rating")));
+														surveyDetails.setSource(CommonConstants.SURVEY_SOURCE_ZILLOW);
+														surveyDetails.setSourceId(sourceId);
+														surveyDetails.setModifiedOn(convertStringToDate(createdDate));
+														surveyDetails.setCreatedOn(convertStringToDate(createdDate));
+														surveyDetails.setAgreedToShare("true");
+														surveyDetails.setAbusive(false);
+														surveyHandler.insertSurveyDetails(surveyDetails);
 													}
-													else if (collectionName
-															.equalsIgnoreCase(MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION)) {
-														surveyDetails.setRegionId(profile.getIden());
-													}
-													else if (collectionName
-															.equalsIgnoreCase(MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION)) {
-														surveyDetails.setBranchId(profile.getIden());
-													}
-													else if (collectionName
-															.equalsIgnoreCase(MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION)) {
-														surveyDetails.setAgentId(profile.getIden());
-													}
-													String createdDate = (String) review.get("reviewDate");
-													surveyDetails.setCompleteProfileUrl((String) review.get("reviewerLink"));
-													surveyDetails.setCustomerFirstName((String) review.get("reviewer"));
-													surveyDetails.setReview((String) review.get("description"));
-													surveyDetails.setEditable(false);
-													surveyDetails.setStage(CommonConstants.SURVEY_STAGE_COMPLETE);
-													surveyDetails.setScore(Double.valueOf((String) review.get("rating")));
-													surveyDetails.setSource(CommonConstants.SURVEY_SOURCE_ZILLOW);
-													surveyDetails.setSourceId(sourceId);
-													surveyDetails.setModifiedOn(convertStringToDate(createdDate));
-													surveyDetails.setCreatedOn(convertStringToDate(createdDate));
-													surveyDetails.setAgreedToShare("true");
-													surveyDetails.setAbusive(false);
-													surveyHandler.insertSurveyDetails(surveyDetails);
 												}
 											}
 										}
-									}
 
+									}
 								}
 							}
 						}
@@ -3450,7 +3514,8 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 		}
 	}
 
-	private Date convertStringToDate(String dateString) {
+	@Override
+	public Date convertStringToDate(String dateString) {
 
 		DateFormat format = new SimpleDateFormat("MM/dd/yyyy", Locale.ENGLISH);
 		Date date;
@@ -3463,4 +3528,143 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 		return date;
 	}
 
+    @Override
+    public LockSettings fetchHierarchyLockSettings( long companyId, long branchId, long regionId, String entityType )
+            throws NonFatalException
+        {
+            LOG.debug( "Method fetchHierarchyLockSettings() called from ProfileManagementService" );
+            boolean logoLocked = true;
+            boolean webAddressLocked = true;
+            boolean phoneNumberLocked = true;
+            List<SettingsDetails> settingsDetailsList = settingsManager
+                .getScoreForCompleteHeirarchy( companyId, branchId, regionId );
+            Map<String, Long> totalScore = settingsManager.calculateSettingsScore( settingsDetailsList );
+            long currentLockAggregateValue = totalScore.get( CommonConstants.LOCK_SCORE );
+            LockSettings parentLock = new LockSettings();
+
+            if ( entityType.equalsIgnoreCase( CommonConstants.COMPANY_ID_COLUMN ) ) {
+                logoLocked = false;
+                webAddressLocked = false;
+                phoneNumberLocked = false;
+            } else if ( entityType.equalsIgnoreCase( CommonConstants.REGION_ID_COLUMN ) ) {
+                if ( !checkIfSettingLockedByOrganization( OrganizationUnit.COMPANY, SettingsForApplication.LOGO,
+                    currentLockAggregateValue ) ) {
+                    logoLocked = false;
+                }
+                if ( !checkIfSettingLockedByOrganization( OrganizationUnit.COMPANY, SettingsForApplication.WEB_ADDRESS_WORK,
+                    currentLockAggregateValue ) ) {
+                    webAddressLocked = false;
+                }
+                if ( !checkIfSettingLockedByOrganization( OrganizationUnit.COMPANY, SettingsForApplication.PHONE,
+                    currentLockAggregateValue ) ) {
+                    phoneNumberLocked = false;
+                }
+
+            } else if ( entityType.equalsIgnoreCase( CommonConstants.BRANCH_ID_COLUMN ) ) {
+
+                if ( !checkIfSettingLockedByOrganization( OrganizationUnit.COMPANY, SettingsForApplication.LOGO,
+                    currentLockAggregateValue ) ) {
+                    logoLocked = false;
+                }
+                if ( !checkIfSettingLockedByOrganization( OrganizationUnit.COMPANY, SettingsForApplication.WEB_ADDRESS_WORK,
+                    currentLockAggregateValue ) ) {
+                    webAddressLocked = false;
+                }
+                if ( !checkIfSettingLockedByOrganization( OrganizationUnit.COMPANY, SettingsForApplication.PHONE,
+                    currentLockAggregateValue ) ) {
+                    phoneNumberLocked = false;
+                }
+
+                if ( !logoLocked ) {
+                    if ( !checkIfSettingLockedByOrganization( OrganizationUnit.REGION, SettingsForApplication.LOGO,
+                        currentLockAggregateValue ) ) {
+                        logoLocked = false;
+                    }
+                }
+                if ( !webAddressLocked ) {
+                    if ( !checkIfSettingLockedByOrganization( OrganizationUnit.COMPANY, SettingsForApplication.WEB_ADDRESS_WORK,
+                        currentLockAggregateValue ) ) {
+                        webAddressLocked = false;
+                    }
+                }
+                if ( !phoneNumberLocked ) {
+                    if ( !checkIfSettingLockedByOrganization( OrganizationUnit.COMPANY, SettingsForApplication.PHONE,
+                        currentLockAggregateValue ) ) {
+                        phoneNumberLocked = false;
+                    }
+                }
+
+            } else if ( entityType.equalsIgnoreCase( CommonConstants.AGENT_ID_COLUMN ) ) {
+                if ( !checkIfSettingLockedByOrganization( OrganizationUnit.COMPANY, SettingsForApplication.LOGO,
+                    currentLockAggregateValue ) ) {
+                    logoLocked = false;
+                }
+                if ( !checkIfSettingLockedByOrganization( OrganizationUnit.COMPANY, SettingsForApplication.WEB_ADDRESS_WORK,
+                    currentLockAggregateValue ) ) {
+                    webAddressLocked = false;
+                }
+                if ( !checkIfSettingLockedByOrganization( OrganizationUnit.COMPANY, SettingsForApplication.PHONE,
+                    currentLockAggregateValue ) ) {
+                    phoneNumberLocked = false;
+                }
+
+                if ( !logoLocked ) {
+                    if ( !checkIfSettingLockedByOrganization( OrganizationUnit.REGION, SettingsForApplication.LOGO,
+                        currentLockAggregateValue ) ) {
+                        logoLocked = false;
+                    }
+
+                }
+                if ( !webAddressLocked ) {
+                    if ( !checkIfSettingLockedByOrganization( OrganizationUnit.REGION, SettingsForApplication.WEB_ADDRESS_WORK,
+                        currentLockAggregateValue ) ) {
+                        webAddressLocked = false;
+                    }
+                }
+                if ( !phoneNumberLocked ) {
+                    if ( !checkIfSettingLockedByOrganization( OrganizationUnit.REGION, SettingsForApplication.PHONE,
+                        currentLockAggregateValue ) ) {
+                        phoneNumberLocked = false;
+                    }
+                }
+
+
+                if ( !logoLocked ) {
+                    if ( !checkIfSettingLockedByOrganization( OrganizationUnit.BRANCH, SettingsForApplication.LOGO,
+                        currentLockAggregateValue ) ) {
+                        logoLocked = false;
+                    }
+
+                }
+                if ( !webAddressLocked ) {
+                    if ( !checkIfSettingLockedByOrganization( OrganizationUnit.BRANCH, SettingsForApplication.WEB_ADDRESS_WORK,
+                        currentLockAggregateValue ) ) {
+                        webAddressLocked = false;
+                    }
+                }
+                if ( !phoneNumberLocked ) {
+                    if ( !checkIfSettingLockedByOrganization( OrganizationUnit.BRANCH, SettingsForApplication.PHONE,
+                        currentLockAggregateValue ) ) {
+                        phoneNumberLocked = false;
+                    }
+
+                }
+
+            }
+            parentLock.setLogoLocked( logoLocked );
+            parentLock.setWebAddressLocked( webAddressLocked );
+            parentLock.setWorkPhoneLocked( phoneNumberLocked );
+
+            return parentLock;
+        }
+    
+    private boolean checkIfSettingLockedByOrganization( OrganizationUnit unit, SettingsForApplication settingsforApplications,
+            long currentLockValue ){
+    	LOG.debug( "Inside method getLogoLockedByCompany " );
+    	if ( settingsLocker.isSettingsValueLocked( unit, currentLockValue, settingsforApplications ) ) {
+    		return true;
+    		} else {
+    		return false;
+        }
+    }
 }

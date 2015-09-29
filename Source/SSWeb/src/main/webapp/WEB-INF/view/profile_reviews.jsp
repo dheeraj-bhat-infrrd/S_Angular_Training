@@ -141,7 +141,7 @@ if(document.getElementById('fb_'+loop) != null)
 								<span class="icon">&nbsp;</span> <span class="label">share</span>
 							</button>
 						</span>
-						<c:if test="${not empty reviewItem.yelpProfileUrl}">
+						<!-- <c:if test="${not empty reviewItem.yelpProfileUrl}">
 							<span class="float-left ppl-share-icns icn-yelp" title="Yelp"
 								data-link="${reviewItem.yelpProfileUrl}"></span>
 						</c:if>
@@ -156,7 +156,7 @@ if(document.getElementById('fb_'+loop) != null)
 						</c:if>
 						<c:if test="${not empty reviewItem.realtorProfileUrl}">
 							<span class="float-left ppl-share-icns icn-realtor" title="Realtor" data-link="${reviewItem.realtorProfileUrl}"></span>
-						</c:if>
+						</c:if> -->
 					</div>
 					<div class="float-left icn-share icn-remove icn-rem-size hide"></div>
 				</div>
