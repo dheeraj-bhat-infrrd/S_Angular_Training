@@ -71,6 +71,7 @@
 				<entry key="emailServices" value-ref="emailServices" />
 				<entry key="userManagementService" value-ref="userManagementService" />
 				<entry key="organizationManagementService" value-ref="organizationManagementService" />
+				<entry key="profileManagementService" value-ref="profileManagementService" />
 				<entry key="emailFormatHelper" value-ref="emailFormatHelper" />
 				<entry key="applicationBaseUrl" value="${APPLICATION_BASE_URL}" />
 				<entry key="applicationLogoUrl" value="${APPLICATION_LOGO_URL}" />
@@ -244,6 +245,7 @@
 			<map>
 				<entry key="dotloopIntegrationApiBuilder" value-ref="dotloopIntegrationApiBuilder" />
 				<entry key="organizationManagementService" value-ref="organizationManagementService" />
+				<entry key="userManagementService" value-ref="userManagementService" />
 				<entry key="surveyHandler" value-ref="surveyHandler" />
 				<entry key="utils" value-ref="utils" />
 				<entry key="maskEmail" value="${MASK_EMAIL_ADDRESS}" />
