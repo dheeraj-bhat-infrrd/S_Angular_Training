@@ -235,6 +235,14 @@ public class RegistrationController
         LOG.info( "Registration Page started" );
         return JspResolver.REGISTRATION;
     }
+    
+    @RequestMapping ( value = "/signup")
+    public String initSignUpPage()
+    {
+        LOG.info( "Sign up Page started" );
+        return JspResolver.SIGNUP;
+    }
+
 
 
     /**
@@ -286,6 +294,7 @@ public class RegistrationController
                 DisplayMessageConstants.REGISTRATION_INVITE_SUCCESSFUL, DisplayMessageType.SUCCESS_MESSAGE ) );
             return JspResolver.REGISTRATION_INVITE_SUCCESSFUL;
         } catch ( UserAlreadyExistsException e ) {
+        	redirectAttributes.addFlashAttribute( "status", DisplayMessageType.ERROR_MESSAGE );
             redirectAttributes.addFlashAttribute( "message", messageUtils.getDisplayMessage(
                 DisplayMessageConstants.USERNAME_ALREADY_TAKEN, DisplayMessageType.ERROR_MESSAGE ) );
             redirectAttributes.addFlashAttribute( "firstname", firstName );
@@ -293,6 +302,7 @@ public class RegistrationController
             redirectAttributes.addFlashAttribute( "emailid", emailId );
         } catch ( NonFatalException e ) {
             LOG.error( "NonFatalException while showing registration page. Reason : " + e.getMessage(), e );
+            redirectAttributes.addFlashAttribute( "status", DisplayMessageType.ERROR_MESSAGE );
             redirectAttributes.addFlashAttribute( "message",
                 messageUtils.getDisplayMessage( DisplayMessageConstants.INVALID_CAPTCHA, DisplayMessageType.ERROR_MESSAGE ) );
             redirectAttributes.addFlashAttribute( "firstname", firstName );
@@ -300,7 +310,7 @@ public class RegistrationController
             redirectAttributes.addFlashAttribute( "emailid", emailId );
         }
 
-        return "redirect:/" + JspResolver.INDEX + ".do";
+        return "redirect:/" + JspResolver.SIGNUP + ".do";
     }
 
 
