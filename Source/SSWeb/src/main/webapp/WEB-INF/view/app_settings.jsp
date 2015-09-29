@@ -138,7 +138,7 @@
 		if(crmSource && crmSource.toUpperCase() == "DOTLOOP") {
 			$('.crm-settings-dropdown-item[data-crm-type="Dotloop"]').click();
 		} else {
-			$('#crm-settings-dropdown-cont').first('.crm-settings-dropdown-item').click();
+			$('#crm-settings-dropdown-cont').children('.crm-settings-dropdown-item:first').click();
 		}
 		
 		//dotloop function
@@ -147,6 +147,7 @@
 		});
 		$('body').on('click', '#dotloop-save', function() {
 			if (validateDotloopInput()) {
+				showOverlay();
 				saveDotloopDetails("dotloop-form");
 			}
 		});
