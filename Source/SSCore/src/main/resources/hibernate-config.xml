@@ -72,7 +72,7 @@
 				<value>com.realtech.socialsurvey.core.entities.ZipCodeLookup</value>
 				<value>com.realtech.socialsurvey.core.entities.StateLookup</value>
 				<value>com.realtech.socialsurvey.core.entities.FileUpload</value>
-				<value>com.realtech.socialsurvey.core.entities.CompanyDotloopProfileMapping</value>
+				<value>com.realtech.socialsurvey.core.entities.CollectionDotloopProfileMapping</value>
 				<value>com.realtech.socialsurvey.core.entities.LoopProfileMapping</value>
 			</list>
 		</property>

@@ -254,7 +254,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
     private SettingsSetter settingsSetter;
 
     @Autowired
-    private GenericDao<CollectionDotloopProfileMapping, Long> companyDotloopProfileMappingDao;
+    private GenericDao<CollectionDotloopProfileMapping, Long> collectionDotloopProfileMappingDao;
 
     @Autowired
     private GenericDao<LoopProfileMapping, Long> loopProfileMappingDao;
@@ -4837,12 +4837,12 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
         }
 
 
-        List<CollectionDotloopProfileMapping> companyDotLoopProfileMappingList = companyDotloopProfileMappingDao
+        List<CollectionDotloopProfileMapping> collectionDotLoopProfileMappingList = collectionDotloopProfileMappingDao
             .findByKeyValue( CollectionDotloopProfileMapping.class, queries );
-        if ( companyDotLoopProfileMappingList == null || companyDotLoopProfileMappingList.isEmpty() ) {
+        if ( collectionDotLoopProfileMappingList == null || collectionDotLoopProfileMappingList.isEmpty() ) {
             return null;
         } else {
-            return companyDotLoopProfileMappingList.get( CommonConstants.INITIAL_INDEX );
+            return collectionDotLoopProfileMappingList.get( CommonConstants.INITIAL_INDEX );
         }
 
     }
@@ -4850,48 +4850,48 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 
     @Override
     @Transactional
-    public CollectionDotloopProfileMapping saveCompanyDotLoopProfileMapping(
-        CollectionDotloopProfileMapping companyDotloopProfileMapping ) throws InvalidInputException
+    public CollectionDotloopProfileMapping saveCollectionDotLoopProfileMapping(
+        CollectionDotloopProfileMapping collectionDotloopProfileMapping ) throws InvalidInputException
     {
-        if ( companyDotloopProfileMapping == null ) {
+        if ( collectionDotloopProfileMapping == null ) {
             LOG.error( "Company dotloop profile mapping is null for insert" );
             throw new InvalidInputException( "Company dotloop profile mapping is null for insert" );
         }
-        LOG.debug( "Inside method saveCompanyDotloopProfileMapping " );
-        return companyDotloopProfileMappingDao.save( companyDotloopProfileMapping );
+        LOG.debug( "Inside method saveCollectionDotloopProfileMapping " );
+        return collectionDotloopProfileMappingDao.save( collectionDotloopProfileMapping );
 
     }
 
 
     @Override
     @Transactional
-    public void updateCompanyDotLoopProfileMapping( CollectionDotloopProfileMapping companyDotloopProfileMapping )
+    public void updateCollectionDotLoopProfileMapping( CollectionDotloopProfileMapping collectionDotloopProfileMapping )
         throws InvalidInputException
     {
-        if ( companyDotloopProfileMapping == null ) {
+        if ( collectionDotloopProfileMapping == null ) {
             LOG.error( "Company dotloop profile mapping is null for update" );
             throw new InvalidInputException( "Company dotloop profile mapping is null for update" );
         }
-        LOG.debug( "Inside method saveCompanyDotloopProfileMapping " );
-        companyDotloopProfileMappingDao.update( companyDotloopProfileMapping );
+        LOG.debug( "Inside method savecollectionDotloopProfileMapping " );
+        collectionDotloopProfileMappingDao.update( collectionDotloopProfileMapping );
 
     }
 
 
     @Override
     @Transactional
-    public CollectionDotloopProfileMapping getCompanyDotloopMappingByProfileId( String profileId ) throws InvalidInputException
+    public CollectionDotloopProfileMapping getCollectionDotloopMappingByProfileId( String profileId ) throws InvalidInputException
     {
         if ( profileId == null || profileId.isEmpty() ) {
             LOG.error( "Profile id is null to fetch company dot loop mapping" );
             throw new InvalidInputException( "Profile id is null to fetch company dot loop mapping" );
         }
-        List<CollectionDotloopProfileMapping> companyDotloopProfileMappingList = companyDotloopProfileMappingDao.findByColumn(
+        List<CollectionDotloopProfileMapping> collectionDotloopProfileMappingList = collectionDotloopProfileMappingDao.findByColumn(
             CollectionDotloopProfileMapping.class, "profileId", profileId );
-        if ( companyDotloopProfileMappingList.isEmpty() ) {
+        if ( collectionDotloopProfileMappingList.isEmpty() ) {
             return null;
         } else {
-            return companyDotloopProfileMappingList.get( 0 );
+            return collectionDotloopProfileMappingList.get( 0 );
         }
     }
 

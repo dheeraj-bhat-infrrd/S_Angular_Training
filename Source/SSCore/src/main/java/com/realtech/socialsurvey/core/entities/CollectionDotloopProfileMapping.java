@@ -14,7 +14,7 @@ import javax.persistence.Table;
  */
 @Entity
 @Table ( name = "COLLECTION_DOTLOOP_PROFILEMAPPING")
-@NamedQuery ( name = "CollectionDotloopProfileMapping.findAll", query = "SELECT cdpm FROM CompanyDotloopProfileMapping cdpm")
+@NamedQuery ( name = "CollectionDotloopProfileMapping.findAll", query = "SELECT cdpm FROM CollectionDotloopProfileMapping cdpm")
 public class CollectionDotloopProfileMapping implements Serializable
 {
     private static final long serialVersionUID = 1L;
