@@ -82,7 +82,7 @@ public class CrmDataAgentIdMapper extends QuartzJobBean
 
                 if ( survey.getCompanyId() == companyId ) {
                     Row row = sheet.createRow( rownum++ );
-                    row = fillCellsInRow( row, survey, count++, "Agent Not Available For This Company " );
+                    row = fillCellsInRow( row, survey, count++, "Agent Not Available For This Organization " );
                 }
             }
             for ( SurveyPreInitiation survey : invalidAgents ) {
@@ -135,10 +135,10 @@ public class CrmDataAgentIdMapper extends QuartzJobBean
             }
             try {
                 if ( excelCreated ) {
-                	Map<String , String > attachmentsDetails = new HashMap<String, String>();
-    				attachmentsDetails.put("CorruptRecords.xls", filePath);
-                    
-    				if ( companyAdminEnabled == "1" ) {
+                    Map<String, String> attachmentsDetails = new HashMap<String, String>();
+                    attachmentsDetails.put( "CorruptRecords.xls", filePath );
+
+                    if ( companyAdminEnabled == "1" ) {
                         User companyAdmin = userManagementService.getCompanyAdmin( companyId );
                         if ( companyAdmin != null ) {
                             emailServices.sendCorruptDataFromCrmNotificationMail( companyAdmin.getFirstName(),
