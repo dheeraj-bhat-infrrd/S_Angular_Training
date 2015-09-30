@@ -5,6 +5,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
+import com.realtech.socialsurvey.core.entities.AbusiveSurveyReportWrapper;
 import com.realtech.socialsurvey.core.entities.AgentRankingReport;
 import com.realtech.socialsurvey.core.entities.SurveyDetails;
 import com.realtech.socialsurvey.core.entities.SurveyResponse;
@@ -133,8 +134,13 @@ public interface SurveyDetailsDao
 
     public SurveyDetails getSurveyBySourceSourceIdAndMongoCollection( String surveySourceId, long iden, String collectionName );
 
-	void updateSurveyAsAbusive(String surveyMongoId);
+	void updateSurveyAsAbusive(String surveyMongoId, String reporterEmail, String reporterName);
 	void removeZillowSurveysByEntity(String entityType, long entityId);
 
 	void removeExcessZillowSurveysByEntity(String entityType, long entityId);
+
+    public List<AbusiveSurveyReportWrapper> getSurveysReporetedAsAbusive( int start, int rows );
+
+    
+    public long getSurveysReporetedAsAbusiveCount();
 }
