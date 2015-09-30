@@ -1873,5 +1873,37 @@ public class EmailServicesImpl implements EmailServices
         }
 
     }
+    
+    
+    /**
+     * 
+     */
+    @Override
+    public void sendReportBugMailToAdmin( String displayName , String errorMsg, String recipientMailId ) throws InvalidInputException, UndeliveredEmailException
+    {
+        LOG.info( "Method sendReportBugMailToAdmin() started." );
+        if ( recipientMailId == null || recipientMailId.isEmpty() ) {
+            LOG.error( "Recipient email Id is empty or null for sending sending report bug  mail " );
+            throw new InvalidInputException(
+                "Recipient email Id is empty or null for sending report bug  mail " );
+        }
+
+        LOG.info("Saving EmailEntity with recipient mail id : " + recipientMailId);
+        EmailEntity emailEntity = prepareEmailEntityForSendingEmail( recipientMailId );
+       
+        String subjectFileName = EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER
+            + EmailTemplateConstants.REPORT_BUG_MAIL_TO_ADMIN_SUBJECT;
+        
+        FileContentReplacements messageBodyReplacements = new FileContentReplacements();
+        messageBodyReplacements.setFileName( EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER
+            + EmailTemplateConstants.REPORT_BUG_MAIL_TO_ADMIN_BODY );
+        
+        messageBodyReplacements.setReplacementArgs( Arrays.asList( appLogoUrl, displayName , errorMsg ) );
+
+        LOG.info( "Calling email sender to send mail" );
+        emailSender.sendEmailWithBodyReplacements( emailEntity, subjectFileName, messageBodyReplacements );
+
+        LOG.info( "Method sendReportBugMailToAdmin() finished." );
+    }
 }
 // JIRA: SS-7: By RM02: EOC

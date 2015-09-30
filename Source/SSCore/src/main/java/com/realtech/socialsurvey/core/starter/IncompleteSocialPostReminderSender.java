@@ -24,6 +24,7 @@ import com.realtech.socialsurvey.core.services.generator.URLGenerator;
 import com.realtech.socialsurvey.core.services.mail.EmailServices;
 import com.realtech.socialsurvey.core.services.mail.UndeliveredEmailException;
 import com.realtech.socialsurvey.core.services.organizationmanagement.OrganizationManagementService;
+import com.realtech.socialsurvey.core.services.organizationmanagement.ProfileNotFoundException;
 import com.realtech.socialsurvey.core.services.organizationmanagement.UserManagementService;
 import com.realtech.socialsurvey.core.services.social.SocialManagementService;
 import com.realtech.socialsurvey.core.services.surveybuilder.SurveyHandler;
@@ -107,6 +108,8 @@ public class IncompleteSocialPostReminderSender extends QuartzJobBean {
 						try {
 							logoUrl = userManagementService.fetchAppropriateLogoUrlFromHierarchyForUser(survey.getAgentId());
 						} catch (NoRecordsFetchedException e) {
+							LOG.error("Error while fatching logo for user with id : " + survey.getAgentId() , e);
+						} catch (ProfileNotFoundException e) {
 							LOG.error("Error while fatching logo for user with id : " + survey.getAgentId() , e);
 						}
 						
