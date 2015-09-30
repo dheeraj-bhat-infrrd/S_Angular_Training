@@ -281,3 +281,21 @@ function downloadCompanyReport() {
 	window.location.href = "/downloadcompanyregistrationreport.do?startDate="
 			+ startDate + "&endDate=" + endDate;
 }
+
+function showAbusiveReviews(startIndexCmp,batchSizeCmp) {
+	var payload = {
+		"startIndex" : startIndexCmp,
+		"batchSize" : batchSizeCmp
+	};
+	callAjaxGetWithPayloadData("./fetchsurveybyabuse.do", function(data) {
+		if (startIndexCmp == 0)
+			$('#admin-abs-sur-list').html(data);
+		else
+			$('#admin-abs-sur-list').append(data);
+		
+		startIndexCmp += batchSizeCmp;
+	}, payload, false);
+}
+
+$(document).on('scroll', '#dsh-inc-srvey', function() {
+});
