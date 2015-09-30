@@ -233,7 +233,10 @@ public class ProfileManagementController
             LOG.error( "InvalidInputException while showing profile page. Reason :" + e.getMessage(), e );
             model
                 .addAttribute( "message", messageUtils.getDisplayMessage( e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE ) );
-        }
+        }  catch (ProfileNotFoundException e) {
+       	 	LOG.error( "No profile found for the user " , e );
+			return JspResolver.NO_PROFILES_FOUND;
+		}
 
         sessionHelper.updateSelectedProfile( session, entityId, entityType );
 
@@ -283,7 +286,10 @@ public class ProfileManagementController
                     throw new InternalServerException( new ProfileServiceErrorCode(
                         CommonConstants.ERROR_CODE_REGION_PROFILE_SERVICE_FAILURE, CommonConstants.SERVICE_CODE_REGION_PROFILE,
                         "Error occured while fetching region profile" ), e.getMessage() );
-                }
+                }  catch (ProfileNotFoundException e) {
+                	LOG.error( "No profile found for the user " , e );
+					return JspResolver.NO_PROFILES_FOUND;
+				}
 
                 regionProfile = profileManagementService.fillUnitSettings( regionProfile,
                     MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION, companyProfile, regionProfile, null, null,
@@ -338,7 +344,10 @@ public class ProfileManagementController
                     throw new InternalServerException( new ProfileServiceErrorCode(
                         CommonConstants.ERROR_CODE_BRANCH_PROFILE_SERVICE_FAILURE, CommonConstants.SERVICE_CODE_BRANCH_PROFILE,
                         "Error occured while fetching branch profile" ), e.getMessage() );
-                }
+                } catch (ProfileNotFoundException e) {
+                	 LOG.error( "No profile found for the user " , e );
+ 					return JspResolver.NO_PROFILES_FOUND;
+				}
                 branchProfile = profileManagementService.fillUnitSettings( branchProfile,
                     MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION, companyProfile, regionProfile,
                     branchProfile, null, map );
@@ -393,7 +402,10 @@ public class ProfileManagementController
 
                 } catch ( InvalidSettingsStateException e ) {
                     LOG.error( "Error occured while fetching branch profile" + e.getMessage() );
-                }
+                } catch (ProfileNotFoundException e) {
+                	 LOG.error( "No profile found for the user " );
+					return JspResolver.NO_PROFILES_FOUND;
+				}
 
                 if ( map == null ) {
                     LOG.error( "Unable to fetch primary profile for this user " );

@@ -61,6 +61,7 @@ import com.realtech.socialsurvey.core.services.generator.URLGenerator;
 import com.realtech.socialsurvey.core.services.mail.UndeliveredEmailException;
 import com.realtech.socialsurvey.core.services.organizationmanagement.OrganizationManagementService;
 import com.realtech.socialsurvey.core.services.organizationmanagement.ProfileManagementService;
+import com.realtech.socialsurvey.core.services.organizationmanagement.ProfileNotFoundException;
 import com.realtech.socialsurvey.core.services.organizationmanagement.UserManagementService;
 import com.realtech.socialsurvey.core.services.search.SolrSearchService;
 import com.realtech.socialsurvey.core.services.search.exception.SolrException;
@@ -1183,7 +1184,7 @@ public class UserManagementController
             agentId = hierarchyDetails.get( CommonConstants.AGENT_ID_COLUMN );
             LOG.debug( "Company ID : " + companyId + " Region ID : " + regionId + " Branch ID : " + branchId + " Agent ID : "
                 + agentId );
-        } catch ( InvalidInputException e ) {
+        } catch ( InvalidInputException | ProfileNotFoundException e ) {
             LOG.error( "InvalidInputException while showing profile page. Reason :" + e.getMessage(), e );
             model
                 .addAttribute( "message", messageUtils.getDisplayMessage( e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE ) );
@@ -1220,7 +1221,7 @@ public class UserManagementController
                         LOG.error( "Unable to fetch primary profile for this user " );
                         throw new FatalException( "Unable to fetch primary profile this user " + regionProfile.getIden() );
                     }
-                } catch ( InvalidSettingsStateException e ) {
+                } catch ( InvalidSettingsStateException | ProfileNotFoundException e ) {
                 	LOG.error("Error occured while fetching region profile", e);
                 }
                 regionProfile = profileManagementService.fillUnitSettings( regionProfile,
@@ -1253,7 +1254,7 @@ public class UserManagementController
                         throw new FatalException( "Unable to fetch primary profile this user " + branchProfile.getIden() );
                     }
 
-                } catch ( InvalidSettingsStateException e ) {
+                } catch ( InvalidSettingsStateException | ProfileNotFoundException e ) {
                 	LOG.error("Error occured while fetching branch profile", e);
                 }
                 branchProfile = profileManagementService.fillUnitSettings( branchProfile,
@@ -1289,7 +1290,7 @@ public class UserManagementController
                         throw new FatalException( "Unable to fetch primary profile this user " + branchProfile.getIden() );
                     }
 
-                } catch ( InvalidSettingsStateException e ) {
+                } catch ( InvalidSettingsStateException | ProfileNotFoundException e ) {
                     LOG.error( "Error occured while fetching branch profile" + e.getMessage() );
                 }
 

@@ -1122,7 +1122,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 
 	@Override
 	@Transactional
-	public Map<String, Long> getPrimaryHierarchyByAgentProfile(OrganizationUnitSettings agentSettings) {
+	public Map<String, Long> getPrimaryHierarchyByAgentProfile(OrganizationUnitSettings agentSettings) throws InvalidInputException, ProfileNotFoundException {
 		LOG.info("Inside method getPrimaryHierarchyByAgentProfile ");
 		Map<String, Long> hierarchyMap = userManagementService.getPrimaryUserProfileByAgentId(agentSettings.getIden());
 		return hierarchyMap;
@@ -2556,7 +2556,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 
 	@Override
 	@Transactional
-	public Map<String, Long> getHierarchyDetailsByEntity(String entityType, long entityId) throws InvalidInputException {
+	public Map<String, Long> getHierarchyDetailsByEntity(String entityType, long entityId) throws InvalidInputException, ProfileNotFoundException {
 		Map<String, Long> hierarchyDetials = new HashMap<String, Long>();
 		Map<String, Long> hierarchyMap = new HashMap<String, Long>();
 		long companyId = 0;
@@ -2609,7 +2609,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 	@Override
 	@Transactional
 	public Map<SettingsForApplication, OrganizationUnit> getPrimaryHierarchyByEntity(String entityType, long entityId) throws InvalidInputException,
-			InvalidSettingsStateException {
+			InvalidSettingsStateException, ProfileNotFoundException {
 		boolean logoLocked = true;
 		boolean webAddressLocked = true;
 		boolean phoneNumberLocked = true;
