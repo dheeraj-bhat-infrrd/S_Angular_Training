@@ -343,5 +343,9 @@ public interface UserManagementService {
 	void updateProfileUrlInCompanySettings(String profileName, String profileUrl, OrganizationUnitSettings companySettings);
 
 	public String fetchAppropriateLogoUrlFromHierarchyForUser(long userId) throws InvalidInputException, NoRecordsFetchedException;
+
+	void updatePrimaryProfileOfUser(User user) throws InvalidInputException;
+
+	void removeUserProfile(long profileIdToDelete) throws InvalidInputException;
 }
 // JIRA SS-34 BY RM02 BOC
