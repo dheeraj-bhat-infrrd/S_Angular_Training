@@ -115,6 +115,7 @@ public final class DisplayMessageConstants
     public static final String ACCOUNT_DELETION_UNSUCCESSFUL = "ACCOUNT_DELETION_UNSUCCESSFUL";
     public static final String DISCLAIMER_UPDATE_UNSUCCESSFUL = "DISCLAIMER_UPDATE_UNSUCCESSFUL";
     public static final String  ERROR_IN_SENDING_HELP_MESSAGE = "ERROR_IN_SENDING_HELP_MESSAGE";
+    public static final String  NOT_ABLE_TO_DELETE_USER_PRIFILE = "NOT_ABLE_TO_DELETE_USER_PRIFILE";
 
     // success message constants
     public static final String  HELP_MESSAGE_SUCCESSFULLY_SEND = "HELP_MESSAGE_SUCCESSFULLY_SEND";

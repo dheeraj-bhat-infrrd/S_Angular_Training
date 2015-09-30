@@ -625,7 +625,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 
             takeSurveyMailSubj = CommonConstants.SURVEY_MAIL_SUBJECT + "[AgentName]";
             takeSurveyByCustomerMailSubj = CommonConstants.SURVEY_MAIL_SUBJECT_CUSTOMER;
-            takeSurveyReminderMailSubj = CommonConstants.REMINDER_MAIL_SUBJECT + "[AgentName]";
+            takeSurveyReminderMailSubj = CommonConstants.REMINDER_MAIL_SUBJECT;
             surveyCompletionMailSubj = CommonConstants.SURVEY_COMPLETION_MAIL_SUBJECT;
             socialPostReminderMailSubj = CommonConstants.SOCIAL_POST_REMINDER_MAIL_SUBJECT;
             incompleteSurveyReminderMailSubj = CommonConstants.INCOMPLETE_SURVEY_REMINDER_MAIL_SUBJECT;
@@ -1210,7 +1210,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 
             originalContentSettings.setTake_survey_mail( mailContent );
         } else if ( mailCategory.equals( CommonConstants.SURVEY_REMINDER_MAIL_BODY_CATEGORY ) ) {
-            mailSubject = CommonConstants.REMINDER_MAIL_SUBJECT + "[AgentName]";
+            mailSubject = CommonConstants.REMINDER_MAIL_SUBJECT;
             try {
                 mailBody = readMailContentFromFile( CommonConstants.SURVEY_REMINDER_MAIL_FILENAME );
             } catch ( IOException e ) {
@@ -2273,6 +2273,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
             + userProfileNew.getEmailId() );
 
         int isPrimary = CommonConstants.IS_PRIMARY_FALSE;
+        boolean noOldProfileIsPrimary = true;
 
         if ( userProfiles != null && !userProfiles.isEmpty() ) {
             for ( UserProfile profile : userProfiles ) {
@@ -2280,6 +2281,8 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
                 if ( profile.getIsPrimary() == CommonConstants.IS_PRIMARY_TRUE ) {
 
                     LOG.debug( "An old primary profile founded for email id " + userProfileNew.getEmailId() );
+                    
+                    noOldProfileIsPrimary = false;
 
                     boolean isOldProfileDefault = false;
                     boolean isOldProfileAdmin = false;
@@ -2346,6 +2349,11 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
             isPrimary = CommonConstants.IS_PRIMARY_TRUE;
         }
 
+        // if no old profile is primary than also new profile will be primary
+        if(noOldProfileIsPrimary){
+        	LOG.debug("No old profile is primary for user so new profile will be primary" );
+        	isPrimary = CommonConstants.IS_PRIMARY_TRUE;
+        }
         return isPrimary;
     }
 
