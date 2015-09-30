@@ -9,6 +9,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpPost;
@@ -22,6 +23,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.DependsOn;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
+
 import twitter4j.StatusUpdate;
 import twitter4j.Twitter;
 import twitter4j.TwitterException;
@@ -29,8 +31,10 @@ import twitter4j.TwitterFactory;
 import twitter4j.auth.RequestToken;
 import twitter4j.conf.Configuration;
 import twitter4j.conf.ConfigurationBuilder;
+
 import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.dao.OrganizationUnitSettingsDao;
+import com.realtech.socialsurvey.core.dao.SurveyDetailsDao;
 import com.realtech.socialsurvey.core.dao.UserDao;
 import com.realtech.socialsurvey.core.dao.UserProfileDao;
 import com.realtech.socialsurvey.core.dao.impl.MongoOrganizationUnitSettingDaoImpl;
@@ -43,6 +47,7 @@ import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.exception.NonFatalException;
 import com.realtech.socialsurvey.core.services.organizationmanagement.UserManagementService;
 import com.realtech.socialsurvey.core.services.social.SocialManagementService;
+
 import facebook4j.Facebook;
 import facebook4j.FacebookException;
 import facebook4j.FacebookFactory;
@@ -69,6 +74,9 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
 
 	@Autowired
 	private UserDao userDao;
+	
+	@Autowired
+	private SurveyDetailsDao surveyDetailsDao;
 
 	// Facebook
 	@Value("${FB_CLIENT_ID}")
@@ -462,5 +470,19 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
 			mediaTokens.getZillowToken().setLastUpdated("");
 		}
 		return mediaTokens;
+	}
+	
+	@Override
+	public void resetZillowCallCount(){
+	    LOG.info( "Method resetZillowCallCount() started" );
+	    surveyDetailsDao.resetZillowCallCount();
+	    LOG.info( "Method resetZillowCallCount() finished" );
+	}
+	
+	@Override
+	public void updateZillowCallCount(){
+	    LOG.info( "Method updateZillowCallCount() started" );
+	    surveyDetailsDao.updateZillowCallCount();
+	    LOG.info( "Method updateZillowCallCount() finished" );
 	}
 }

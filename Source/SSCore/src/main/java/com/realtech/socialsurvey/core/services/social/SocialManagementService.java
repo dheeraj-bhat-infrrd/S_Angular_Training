@@ -80,6 +80,8 @@ public interface SocialManagementService {
 	public OrganizationUnitSettings disconnectSocialNetwork(String socialMedia, OrganizationUnitSettings unitSettings, String collectionName) throws InvalidInputException;
 	
 	public SocialMediaTokens checkOrAddZillowLastUpdated(SocialMediaTokens mediaTokens) throws InvalidInputException;
+    void resetZillowCallCount();
+    void updateZillowCallCount();
 
 }
 // JIRA SS-34 BY RM02 BOC
