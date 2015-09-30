@@ -7,14 +7,14 @@
 		<div class="um-top-row cleafix">
 			<div class="clearfix um-top-form-wrapper">
 				<!-- set encompass details -->
-				<c:if test="${accountSettings != null && accountSettings.crm_info != null}">
+				<c:if test="${appSettings != null && appSettings.crm_info != null && appSettings.crm_info.crm_source == 'ENCOMPASS'}">
 					<c:set var="encompassusername"
-						value="${accountSettings.crm_info.crm_username}" />
+						value="${appSettings.crm_info.crm_username}" />
 					<c:set var="encompasspassword"
-						value="${accountSettings.crm_info.crm_password}" />
-					<c:set var="encompassurl" value="${accountSettings.crm_info.url}" />
+						value="${appSettings.crm_info.crm_password}" />
+					<c:set var="encompassurl" value="${appSettings.crm_info.url}" />
 					<c:set var="encompassfieldid"
-						value="${accountSettings.crm_info.crm_fieldId}" />
+						value="${appSettings.crm_info.crm_fieldId}" />
 				</c:if>
 				<div class="col-lg-6 col-md-6 col-sm-12 col-xs-12 um-panel-item">
 					<div class="hm-item-row item-row-OR clearfix float-left">

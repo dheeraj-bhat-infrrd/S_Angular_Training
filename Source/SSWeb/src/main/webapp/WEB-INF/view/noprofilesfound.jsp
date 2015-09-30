@@ -22,7 +22,7 @@
                 <div class="header-user-info float-right clearfix">
                     <c:if test="${displaylogo != null}">
                         <div class="float-left user-info-seperator"></div>
-                        <div class="float-left user-info-logo" style="background: url(${displaylogo}) no-repeat center; background-size: 100% auto;"></div>
+                        <div class="float-left user-error-logo" style="background: url(${displaylogo}) no-repeat center; background-size: 100% auto;"></div>
                     </c:if>
                 </div>			
             </div>

@@ -720,11 +720,8 @@
         
         function showMessage(data){
         	var jsonData = JSON.parse(data);
-        	console.log("Data recieved : " + jsonData);
         	if(jsonData["success"] == 1){
-        		console.log("Added toast message. Showing it now");
 	    		showInfoMobileAndWeb(jsonData["message"]);
-        		console.log("Finished showing the toast");
     			$(".reg-cap-reload").click();
     			
     			// resetting contact form and captcha
@@ -735,17 +732,10 @@
     	        setInterval(function () { recaptchaframe[0].src = recaptchaSoure; }, 500);
         	}
         	else{
-        		console.error("Error occured while sending contact us message. ");
         		showErrorMobileAndWeb(jsonData["message"]);
-        		console.log("Finished showing the toast");
     			$(".reg-cap-reload").click();
         	}
         }
-        
-        /* $(document).on('click','.vcard-download', function(){
-        	var agentName = $("#agent-profile-name").val();
-        	downloadVCard(agentName);
-        }); */
         
     	// Google analytics for reviews
     	setTimeout(function() {
@@ -771,7 +761,6 @@
     	});
     	
     	function submitFindProForm() {
-    		console.log("Submitting Find a Profile form");
 			$('#find-pro-form').submit();
     		showOverlay();
     	}

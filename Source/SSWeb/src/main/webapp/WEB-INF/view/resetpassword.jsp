@@ -98,7 +98,6 @@ $(document).ready(function(){
 	
 	function submitResetPasswordForm() {
 		if(validateResetPasswordForm('reset-pwd-form')){
-			console.log("submitting reset password form");
 			$('#reset-pwd-form').submit();
 		}
 	}

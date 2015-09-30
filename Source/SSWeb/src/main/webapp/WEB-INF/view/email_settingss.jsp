@@ -157,14 +157,12 @@
 			$('#survey-participation-reminder-mailcontent').ckeditor();
 			$('#survey-participation-reminder-mailcontent').ckeditorGet().config.readOnly = true;
 		} catch(e) {
-			console.log("ckeditor not supported for the environment");
 		}
 		
 		$('#edit-participation-mail-content').click(function() {
 			try {
 				$('#survey-participation-mailcontent').ckeditorGet().setReadOnly(false);
 			} catch(e) {
-				console.log("ckeditor not supported for the environment");
 			}
 			$('#survey-mailcontent-subject').attr("readonly", false);
 			
@@ -181,7 +179,6 @@
 			try {
 				$('#survey-participation-mailcontent').ckeditorGet().setReadOnly(true);
 			} catch(e) {
-				console.log("ckeditor not supported for the environment");
 			}
 			$('#survey-mailcontent-subject').attr("readonly", true);
 			
@@ -199,7 +196,6 @@
 			try {
 				$('#survey-participation-reminder-mailcontent').ckeditorGet().setReadOnly(false);
 			} catch(e) {
-				console.log("ckeditor not supported for the environment");
 			}
 			$('#survey-mailreminder-subject').attr("readonly", false);
 			
@@ -216,7 +212,6 @@
 			try { 
 				$('#survey-participation-reminder-mailcontent').ckeditorGet().setReadOnly(true);
 			} catch(e) {
-				console.log("ckeditor not supported for the environment");
 			}
 			$('#survey-mailreminder-subject').attr("readonly", true);
 			

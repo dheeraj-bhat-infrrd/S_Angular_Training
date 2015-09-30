@@ -7,16 +7,16 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
-
 import com.realtech.socialsurvey.core.entities.Branch;
 import com.realtech.socialsurvey.core.entities.BranchFromSearch;
 import com.realtech.socialsurvey.core.entities.BranchSettings;
 import com.realtech.socialsurvey.core.entities.CRMInfo;
 import com.realtech.socialsurvey.core.entities.Company;
+import com.realtech.socialsurvey.core.entities.CompanyDotloopProfileMapping;
 import com.realtech.socialsurvey.core.entities.DisabledAccount;
 import com.realtech.socialsurvey.core.entities.FeedIngestionEntity;
+import com.realtech.socialsurvey.core.entities.LoopProfileMapping;
 import com.realtech.socialsurvey.core.entities.MailContentSettings;
 import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
 import com.realtech.socialsurvey.core.entities.Region;
@@ -1019,5 +1019,65 @@ public interface OrganizationManagementService
      * @param branch
      */
     public void updateBranch(Branch branch);
+
+
+    /**
+     * @param profileId
+     * @return
+     */
+    public long getLoopsCountByProfile( String profileId ) throws InvalidInputException;
+
+
+    /**
+     * @param loopProfileMapping
+     */
+    public void saveLoopsForProfile( LoopProfileMapping loopProfileMapping )  throws InvalidInputException;
+
+
+    /**
+     * Gets loop profile mapping object by profile id and loop id
+     * @param profileId
+     * @param loopId
+     * @return
+     * @throws InvalidInputException
+     */
+    public LoopProfileMapping getLoopByProfileAndLoopId(String profileId, String loopId) throws InvalidInputException;
+    
+    /**
+     * @param companyId
+     * @return
+     */
+    public CompanyDotloopProfileMapping getCompanyDotloopMappingByCompanyIdAndProfileId( long companyId, String profileId ) throws InvalidInputException;
+
+
+    /**
+     * @param profileId
+     * @return
+     */
+    public CompanyDotloopProfileMapping getCompanyDotloopMappingByProfileId( String profileId ) throws InvalidInputException;
+
+
+    /**
+     * @param companyDotloopProfileMapping
+     */
+    public CompanyDotloopProfileMapping saveCompanyDotLoopProfileMapping(
+        CompanyDotloopProfileMapping companyDotloopProfileMapping ) throws InvalidInputException;
+
+
+    /**
+     * @param companyDotloopProfileMapping
+     * @return
+     */
+    public void updateCompanyDotLoopProfileMapping( CompanyDotloopProfileMapping companyDotloopProfileMapping ) throws InvalidInputException;
+
+    /**
+     * Gets the organization unit settings list based on crm source and mongo collection name
+     * @param crmSource
+     * @param collectionName
+     * @return
+     * @throws InvalidInputException
+     * @throws NoRecordsFetchedException
+     */
+    public List<OrganizationUnitSettings> getOrganizationUnitSettingsForCRMSource(String crmSource, String collectionName) throws InvalidInputException, NoRecordsFetchedException;
 
 }

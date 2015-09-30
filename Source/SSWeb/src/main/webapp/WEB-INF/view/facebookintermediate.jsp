@@ -57,7 +57,6 @@ $(document).ready(function() {
 			location.href = authUrl;
 		}
 		else {
-			console.log("authUrl not found!");
 		}
 	}
 	
@@ -67,7 +66,6 @@ $(document).ready(function() {
 		parentWindow = window.opener;
 	}
 	else {
-		console.log("Unable to access parent window!");
 	}
 	
 	var radioButtonDiv= $("<div style='text-align:left;margin-left:130px;'>")
@@ -98,6 +96,7 @@ $(document).ready(function() {
 		$.ajax({
 			url : './saveSelectedAccessFacebookToken.do',
 			type : "GET",
+			cache : false,
 			data : facebookToken,
 			async : false,
 			complete :function(e){
@@ -160,6 +159,7 @@ function fetchSocialProfileUrl(payload, callBackFunction){
 		type : "GET",
 		data : payload,
 		async : false,
+		cache : false,
 		complete : callBackFunction,
 		error : function(e) {
 			if(e.status == 504) {

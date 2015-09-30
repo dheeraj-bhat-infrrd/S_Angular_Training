@@ -70,8 +70,12 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
         LOG.info( "Method getSurveyByAgentIdAndCustomerEmail() to insert details of survey started." );
         Query query = new Query( Criteria.where( CommonConstants.AGENT_ID_COLUMN ).is( agentId ) );
         query.addCriteria( Criteria.where( CommonConstants.CUSTOMER_EMAIL_COLUMN ).is( customerEmail ) );
-        query.addCriteria( Criteria.where( "customerFirstName" ).is( firstName ) );
-        query.addCriteria( Criteria.where( "customerLastName" ).is( lastName ) );
+        if ( firstName != null && !firstName.isEmpty() ) {
+            query.addCriteria( Criteria.where( "customerFirstName" ).is( firstName ) );
+        }
+        if ( lastName != null && !lastName.isEmpty() ) {
+            query.addCriteria( Criteria.where( "customerLastName" ).is( lastName ) );
+        }
         List<SurveyDetails> surveys = mongoTemplate.find( query, SurveyDetails.class, SURVEY_DETAILS_COLLECTION );
         if ( surveys == null || surveys.size() == 0 )
             return null;
@@ -190,6 +194,21 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
         update.set( CommonConstants.MODIFIED_ON_COLUMN, new Date() );
         mongoTemplate.updateMulti( query, update, SURVEY_DETAILS_COLLECTION );
         LOG.info( "Method to calculate and update final score based upon rating questions finished." );
+    }
+
+    
+    @Override
+    public void updateSurveyAsAbusive( String surveyMongoId )
+    {
+        LOG.info( "Method updateSurveyAsAbusive() to mark survey as abusive started." );
+        Query query = new Query();
+        query.addCriteria( Criteria.where( CommonConstants.DEFAULT_MONGO_ID_COLUMN ).is( surveyMongoId ) );
+        Update update = new Update();
+        update.set( CommonConstants.IS_ABUSIVE_COLUMN, true );
+        update.set( CommonConstants.CREATED_ON, new Date() );
+        update.set( CommonConstants.MODIFIED_ON_COLUMN, new Date() );
+        mongoTemplate.updateMulti( query, update, SURVEY_DETAILS_COLLECTION );
+        LOG.info( "Method updateSurveyAsAbusive() to mark survey as abusive finished." );
     }
 
 
@@ -1441,5 +1460,37 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
             return null;
         LOG.info( "Method insertSurveyDetails() to insert details of survey finished." );
         return surveys.get( CommonConstants.INITIAL_INDEX );
+    }
+
+
+    @Override
+    public void removeZillowSurveysByEntity( String entityType, long entityId )
+    {
+        LOG.info( "Method removeZillowSurveysByEntity() started" );
+        Query query = new Query( Criteria.where( CommonConstants.SURVEY_SOURCE_COLUMN ).is(
+            CommonConstants.SURVEY_SOURCE_ZILLOW ) );
+        query.addCriteria( Criteria.where( entityType ).is( entityId ) );
+        mongoTemplate.remove( query, SURVEY_DETAILS_COLLECTION );
+        LOG.info( "Method removeZillowSurveysByEntity() finished" );
+    }
+
+
+    @Override
+    public void removeExcessZillowSurveysByEntity( String entityType, long entityId )
+    {
+        LOG.info( "Method removeExcessZillowSurveysByEntity() started" );
+        Query query = new Query( Criteria.where( CommonConstants.SURVEY_SOURCE_COLUMN ).is(
+            CommonConstants.SURVEY_SOURCE_ZILLOW ) );
+        query.addCriteria( Criteria.where( entityType ).is( entityId ) );
+        query.with( new Sort( Sort.Direction.ASC, "createdOn" ) );
+        List<DBObject> surveys = mongoTemplate.find( query, DBObject.class, SURVEY_DETAILS_COLLECTION );
+        int count = surveys.size();
+        if ( count > 10 ) {
+            int noOfSurveysToRemove = count - 10;
+            for ( int i = 0; i < noOfSurveysToRemove; i++ ) {
+                mongoTemplate.remove( surveys.get( i ), SURVEY_DETAILS_COLLECTION );
+            }
+        }
+        LOG.info( "Method removeExcessZillowSurveysByEntity() finished" );
     }
 }

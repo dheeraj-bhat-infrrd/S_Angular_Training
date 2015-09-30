@@ -52,6 +52,8 @@ import com.realtech.socialsurvey.core.entities.UserProfile;
 import com.realtech.socialsurvey.core.entities.UserSettings;
 import com.realtech.socialsurvey.core.entities.UsercountModificationNotification;
 import com.realtech.socialsurvey.core.enums.AccountType;
+import com.realtech.socialsurvey.core.enums.OrganizationUnit;
+import com.realtech.socialsurvey.core.enums.SettingsForApplication;
 import com.realtech.socialsurvey.core.exception.DatabaseException;
 import com.realtech.socialsurvey.core.exception.FatalException;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
@@ -67,6 +69,7 @@ import com.realtech.socialsurvey.core.services.organizationmanagement.UserManage
 import com.realtech.socialsurvey.core.services.organizationmanagement.UtilityService;
 import com.realtech.socialsurvey.core.services.search.SolrSearchService;
 import com.realtech.socialsurvey.core.services.search.exception.SolrException;
+import com.realtech.socialsurvey.core.services.settingsmanagement.impl.InvalidSettingsStateException;
 import com.realtech.socialsurvey.core.utils.EncryptionHelper;
 
 
@@ -2616,7 +2619,47 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 
         return isPrimary;
     }
+    
+    @Override
+    @Transactional
+    public String fetchAppropriateLogoUrlFromHierarchyForUser(long userId) throws InvalidInputException, NoRecordsFetchedException{
+    	
+    	String logoUrl = null;
+		//get the appropriate logo url from hierarchy 
+		Map<String, Long> hierarchyMap = null;
+        Map<SettingsForApplication, OrganizationUnit> map = null;
+		AgentSettings agentSettings = organizationUnitSettingsDao.fetchAgentSettingsById( userId );
+        hierarchyMap = profileManagementService.getPrimaryHierarchyByAgentProfile( agentSettings );
 
+        long companyId = hierarchyMap.get( CommonConstants.COMPANY_ID_COLUMN );
+        long regionId = hierarchyMap.get( CommonConstants.REGION_ID_COLUMN );
+        long branchId = hierarchyMap.get( CommonConstants.BRANCH_ID_COLUMN );
+        try {
+            map = profileManagementService.getPrimaryHierarchyByEntity( CommonConstants.AGENT_ID_COLUMN, userId );
+            if ( map == null ) {
+                LOG.error( "Unable to fetch primary profile for this user " );
+                throw new FatalException( "Unable to fetch primary profile this user " + userId );
+            }
+        } catch ( InvalidSettingsStateException e ) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+        OrganizationUnit organizationUnit = map.get( SettingsForApplication.LOGO );
+        if ( organizationUnit == OrganizationUnit.COMPANY ) {
+            OrganizationUnitSettings companySettings = organizationManagementService.getCompanySettings( companyId );
+            logoUrl = companySettings.getLogo();
+        } else if ( organizationUnit == OrganizationUnit.REGION ) {
+            OrganizationUnitSettings regionSettings = organizationManagementService.getRegionSettings( regionId );
+            logoUrl = regionSettings.getLogo();
+        } else if ( organizationUnit == OrganizationUnit.BRANCH ) {
+            OrganizationUnitSettings branchSettings = organizationManagementService.getBranchSettingsDefault( branchId );
+            logoUrl = branchSettings.getLogo();
+        } else if ( organizationUnit == OrganizationUnit.AGENT ) {
+            logoUrl = agentSettings.getLogo();
+        }
+        
+        return logoUrl;
+    }
 
     @Override
     @Transactional

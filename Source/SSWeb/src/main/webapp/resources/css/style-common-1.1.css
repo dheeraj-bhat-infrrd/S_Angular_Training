@@ -1441,3 +1441,13 @@ span.footer-ul a:hover {
 	color: #fff;
 	background-color: #A9A9A9;
 }
+
+/*changes for help page*/
+.help
+{
+	width:800px;
+	margin: 0 auto;
+	max-width:100%;
+	
+}
+

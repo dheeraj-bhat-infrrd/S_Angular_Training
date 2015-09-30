@@ -29,6 +29,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
+import com.realtech.socialsurvey.core.commons.Utils;
 import com.realtech.socialsurvey.core.dao.BranchDao;
 import com.realtech.socialsurvey.core.dao.GenericDao;
 import com.realtech.socialsurvey.core.dao.OrganizationUnitSettingsDao;
@@ -146,18 +147,15 @@ public class CsvUploadServiceImpl implements CsvUploadService {
 
 	@Autowired
 	private FileUploadService fileUploadService;
+	
+	@Autowired
+	private Utils utils;
 
 	@Value("${FILEUPLOAD_DIRECTORY_LOCATION}")
 	private String fileDirectory;
 
 	@Value("${MASK_EMAIL_ADDRESS}")
 	private String maskEmail;
-
-	@Value("${EMAIL_MASKING_PREFIX}")
-	private String maskingPrefix;
-
-	@Value("${EMAIL_MASKING_SUFFIX}")
-	private String maskingSuffix;
 
 	@Value("${FILE_DIRECTORY_LOCATION}")
 	private String fileDirectoryLocation;
@@ -268,7 +266,9 @@ public class CsvUploadServiceImpl implements CsvUploadService {
 		}
 		if (excelCreated) {
 			try {
-				emailServices.sendRecordsNotUploadedCrmNotificationMail(adminName, "", adminEmailId, filePath);
+				Map<String , String > attachmentsDetails = new HashMap<String, String>();
+				attachmentsDetails.put("CorruptRecords.xls", filePath);
+				emailServices.sendRecordsNotUploadedCrmNotificationMail(adminName, "", adminEmailId, attachmentsDetails );
 			}
 			catch (InvalidInputException e) {
 				LOG.error("Exception caught " + e.getMessage());
@@ -554,7 +554,7 @@ public class CsvUploadServiceImpl implements CsvUploadService {
 					if (cell.getCellType() != XSSFCell.CELL_TYPE_BLANK) {
 						String emailId = cell.getStringCellValue().trim();
 						if (maskEmail.equals(CommonConstants.YES_STRING)) {
-							emailId = maskEmailAddress(emailId);
+							emailId = utils.maskEmailAddress(emailId);
 							if (emailId != null) {
 								uploadedUser.setEmailId(uploadedUser.getFirstName()
 										+ (uploadedUser.getLastName() != null ? " " + uploadedUser.getLastName() : "") + " <" + emailId + ">");
@@ -705,23 +705,6 @@ public class CsvUploadServiceImpl implements CsvUploadService {
 		userMap.put("InvalidUser", userErrors);
 		return userMap;
 
-	}
-
-	private String maskEmailAddress(String emailAddress) {
-		LOG.debug("Masking email address: " + emailAddress);
-		String maskedEmailAddress = null;
-		// replace @ with +
-		maskedEmailAddress = emailAddress.replace("@", "+");
-		if (maskingPrefix != null && !maskingPrefix.isEmpty()) {
-			maskedEmailAddress = maskingPrefix + "+" + maskedEmailAddress;
-		}
-		if (maskingSuffix == null || maskingSuffix.isEmpty()) {
-			return null;
-		}
-		else {
-			maskedEmailAddress = maskedEmailAddress + maskingSuffix;
-		}
-		return maskedEmailAddress;
 	}
 
 	private List<BranchUploadVO> parseAndUploadBranches(FileUpload fileUpload, XSSFWorkbook workBook, List<String> branchErrors,
@@ -1058,23 +1041,6 @@ public class CsvUploadServiceImpl implements CsvUploadService {
 		return status;
 	}
 
-	private boolean validateRegion(RegionUploadVO regionUploadVO, Company company) {
-
-		List<Region> regions = null;
-		boolean status = false;
-
-		Map<String, Object> queries = new HashMap<String, Object>();
-		queries.put(CommonConstants.REGION_NAME_COLUMN, regionUploadVO.getRegionName());
-		queries.put(CommonConstants.COMPANY_COLUMN, company);
-		regions = regionDao.findByKeyValue(Region.class, queries);
-
-		if (regions == null || regions.isEmpty()) {
-			status = true;
-		}
-
-		return status;
-	}
-
 	private Company getCompany(User user) throws InvalidInputException {
 		Company company = user.getCompany();
 		if (company == null) {
@@ -1397,7 +1363,7 @@ public class CsvUploadServiceImpl implements CsvUploadService {
 					region.getRegionAddress2(), region.getRegionCountry(), region.getRegionCountryCode(), region.getRegionState(),
 					region.getRegionCity(), region.getRegionZipcode());
 			organizationManagementService.addNewBranch(adminUser, newRegion.getRegionId(), CommonConstants.YES, CommonConstants.DEFAULT_BRANCH_NAME,
-					CommonConstants.DEFAULT_ADDRESS, null, null, null, null, null, null);
+					null, null, null, null, null, null, null);
 		}
 		else {
 			LOG.error("admin user : " + adminUser.getEmailId() + " is not authorized to add regions");
@@ -1568,8 +1534,10 @@ public class CsvUploadServiceImpl implements CsvUploadService {
 	@Override
 	public List<FileUpload> getFilesToBeUploaded() throws NoRecordsFetchedException {
 		LOG.info("Check if files need to be uploaded");
-		List<FileUpload> filesToBeUploaded = fileUploadDao.findByColumn(FileUpload.class, CommonConstants.STATUS_COLUMN,
-				CommonConstants.STATUS_ACTIVE);
+		Map<String, Object> queries = new HashMap<>();
+		queries.put(CommonConstants.FILE_UPLOAD_TYPE_COLUMN, CommonConstants.FILE_UPLOAD_HIERARCHY_TYPE);
+		queries.put(CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_ACTIVE);
+		List<FileUpload> filesToBeUploaded = fileUploadDao.findByKeyValue(FileUpload.class, queries);
 		if (filesToBeUploaded == null || filesToBeUploaded.isEmpty()) {
 			throw new NoRecordsFetchedException("No files to be uploaded");
 		}

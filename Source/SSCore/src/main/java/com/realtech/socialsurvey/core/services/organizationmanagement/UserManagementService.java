@@ -2,6 +2,7 @@ package com.realtech.socialsurvey.core.services.organizationmanagement;
 
 import java.util.List;
 import java.util.Map;
+
 import com.realtech.socialsurvey.core.entities.AgentSettings;
 import com.realtech.socialsurvey.core.entities.Branch;
 import com.realtech.socialsurvey.core.entities.Company;
@@ -342,5 +343,7 @@ public interface UserManagementService {
 	void updateProfileUrlInCompanySettings(String profileName, String profileUrl, OrganizationUnitSettings companySettings);
 
 	void updatePrimaryProfileOfUser(long userid, long profileId);
+	
+	public String fetchAppropriateLogoUrlFromHierarchyForUser(long userId) throws InvalidInputException, NoRecordsFetchedException;
 }
 // JIRA SS-34 BY RM02 BOC

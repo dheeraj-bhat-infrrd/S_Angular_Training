@@ -9,7 +9,7 @@
 	<div class="welcome-popup-body-wrapper clearfix">
 		<div class="wc-popup-body-hdr"><spring:message code="label.happyreviews.key" /></div>
 		<div id="wc-review-table" class="wc-popup-body-cont wc-review-table-cont">
-			<div id="wc-review-table-inner" class="wc-review-table" data-role="agent">
+			<div id="wc-review-table-inner" class="wc-review-table" data-role="agent" user-email-id="${sessionScope.SPRING_SECURITY_CONTEXT.authentication.principal.emailId}">
 				<div class="wc-review-tr wc-review-hdr clearfix">
 					<div class="wc-review-th1 float-left"><spring:message code="label.firstname.key" /></div>
 					<div class="wc-review-th2 float-left"><spring:message code="label.lastname.key" /></div>

@@ -2,6 +2,7 @@ package com.realtech.socialsurvey.core.commons;
 
 import java.text.DecimalFormat;
 
+
 /**
  * Holds application level constants
  */
@@ -108,10 +109,10 @@ public interface CommonConstants
     public static final double MAX_RATING_SCORE = 5;
     public static final String YES_STRING = "Y";
     public static final String NO_STRING = "N";
-    
+
     public static final int IS_PRIMARY_FALSE = 0;
     public static final int IS_PRIMARY_TRUE = 1;
-    
+
     public static final int SURVEY_STATUS_PRE_INITIATED = 1;
     public static final int STATUS_SURVEYPREINITIATION_PROCESSED = 1;
     public static final int SURVEY_STATUS_INITIATED = 2;
@@ -145,6 +146,7 @@ public interface CommonConstants
     public static final String SUBSCRIPTION_ID_COLUMN = "subscriptionId";
     public static final String REGION_NAME_COLUMN = "region";
     public static final String SURVEY_QUESTION_COLUMN = "surveyQuestion";
+    public static final String SURVEY_SOURCE_COLUMN = "source";
     public static final String SURVEY_COLUMN = "survey";
     public static final String SURVEY_COMPANY_COLUMN = "company";
     public static final String SURVEY_QUESTION_ORDER_COLUMN = "questionOrder";
@@ -157,6 +159,7 @@ public interface CommonConstants
     public static final String SURVEY_SOURCE_KEY_COLUMN = "surveySource";
     public static final String SURVEY_SOURCE_ID_COLUMN = "sourceId";
     public static final String VERTICAL_NAME = "verticalName";
+    public static final String CUSTOMER_EMAIL_ID_KEY_COLUMN = "customerEmailId";
 
     /**
      * Mongo entities and column name constants
@@ -233,6 +236,7 @@ public interface CommonConstants
     public static final String USER_PROFILE_MAP = "profileMap";
     public static final String USER_PROFILE_SETTINGS = "profileSettings";
     public static final String USER_ACCOUNT_SETTINGS = "accountSettings";
+    public static final String USER_APP_SETTINGS = "appSettings";
     public static final String ERROR = "error";
     public static final String MESSAGE = "message";
     public static final String EMAIL_TYPE = "emailtype";
@@ -260,11 +264,13 @@ public interface CommonConstants
     public static final String ACTIVE_SESSIONS_FOUND = "activeSessionFound";
 
     public static final String BILLING_MODE_ATTRIBUTE_IN_SESSION = "billingMode";
-    
+
     public static final String USER_ASSIGNMENTS = "assignments";
     public static final String ENTITY_ID_COLUMN = "entityId";
     public static final String ENTITY_NAME_COLUMN = "entityName";
     public static final String ENTITY_TYPE_COLUMN = "entityType";
+    
+    public static final String FILE_UPLOAD_TYPE_COLUMN = "uploadType";
 
     /**
      * Batch Constants
@@ -355,6 +361,7 @@ public interface CommonConstants
     public static final String CRM_INFO_SOURCE_ENCOMPASS = "encompass";
     public static final String CRM_SOURCE_ENCOMPASS = "ENCOMPASS";
     public static final String CRM_SOURCE_DOTLOOP = "DOTLOOP";
+    public static final String SURVEY_SOURCE_FILE_UPLOAD = "upload";
 
     // mail content
     public static final String SURVEY_MAIL_BODY_CATEGORY = "SURVEY_MAIL_BODY_CATEGORY";
@@ -521,7 +528,7 @@ public interface CommonConstants
     public static final String BRANCH_SETTINGS_COLLECTION = "BRANCH_SETTINGS";
     public static final String AGENT_SETTINGS_COLLECTION = "AGENT_SETTINGS";
     public static final String SOCIAL_POST_COLLECTION = "SOCIAL_POST";
-    
+
     /*
      * Mongo social post Source
      */
@@ -599,6 +606,7 @@ public interface CommonConstants
     public static final String SURVEY_REQUEST_ADMIN = "admin";
 
     // Constants for Agent Ranking Report
+    public static final String HEADER_AGENT_RANK = "User Rank";
     public static final String HEADER_FIRST_NAME = "First Name";
     public static final String HEADER_LAST_NAME = "Last Name";
     public static final String HEADER_AVG_SCORE = "Avg Score";
@@ -648,12 +656,12 @@ public interface CommonConstants
     public static final String PATTERN_LAST = "patternLast";
 
     public static final String SURVEY_SOURCE_ZILLOW = "Zillow";
-    
+
     //Excel constants
     public final String EXCEL_FORMAT = "application/vnd.ms-excel";
     public final String CONTENT_DISPOSITION_HEADER = "Content-Disposition";
     public final String EXCEL_FILE_EXTENSION = ".xlsx";
-    
+
     public final String EPOCH_REMINDER_TIME = "02/01/1970";
 
     //Settings constants
@@ -668,12 +676,24 @@ public interface CommonConstants
     public static final int SET_BY_COMPANY_N_REGION_N_BRANCH = 7;
     public static final int SET_BY_NONE = 0;
     public static final int LOCKED_BY_NONE = 0;
-    
+
     public static final String SETTING_SCORE = "setScore";
-    
+
     public static final String LOCK_SCORE = "lockScore";
-    
+
+
+    public static final String AUTHORIZATION_HEADER = "Bearer ";
+
+    // dotloop db keys
+    public static final String KEY_DOTLOOP_PROFILE_ID_COLUMN = "profileId";
+    public static final String KEY_DOTLOOP_PROFILE_LOOP_ID_COLUMN = "loopId";
+
     // Social media message template constants
-    public static final DecimalFormat RANKING_FORMAT_TWITTER= new DecimalFormat("#.#");
+    public static final DecimalFormat RANKING_FORMAT_TWITTER = new DecimalFormat( "#.#" );
+
     public static final String TWITTER_MESSAGE = "%s Star Survey Response from %s for %s on %s ";
+    
+    // file upload types
+    public static final int FILE_UPLOAD_HIERARCHY_TYPE = 1;
+    public static final int FILE_UPLOAD_SURVEY_TYPE = 2;
 }

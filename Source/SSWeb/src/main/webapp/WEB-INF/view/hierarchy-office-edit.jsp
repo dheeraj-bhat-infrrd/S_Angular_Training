@@ -53,7 +53,7 @@
     <div class="float-left bd-frm-left"><spring:message code="label.selectregion.key"/></div>
     <div class="float-left bd-frm-right pos-relative" id="region-selector">
         <input id="selected-region-txt" value="${branchSettings.regionName}" class="bd-frm-rt-txt bd-frm-rt-dd bd-frm-rt-dd-adj dd-com-main bd-dd-img" placeholder='<spring:message code="label.regionselector.placeholder.key"/>'/>
-        <input type="hidden" name="regionId" id="selected-region-id-hidden" value="${branchSettings.regionId}"/>
+        <input type="text" class="hide" name="regionId" id="selected-region-id-hidden" value="${branchSettings.regionId}"/>
         <div id="regions-droplist" class="bd-frm-rt-dd-list dd-com-list hide">
         	<!-- regions list get populated here  -->
         </div>

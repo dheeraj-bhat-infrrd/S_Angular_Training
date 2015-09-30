@@ -14,7 +14,6 @@
 <script type="text/javascript">
 $(document).ready(function(){
 	onpopstate = function(event) {
-	    console.log('history modified');
 	    if(location.hash.trim()!=''){
 	        historyCallback= true;
 	        refreshSupport=true;

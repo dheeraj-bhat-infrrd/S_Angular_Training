@@ -5,9 +5,11 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
 import org.apache.poi.hssf.usermodel.HSSFSheet;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.Cell;
@@ -18,6 +20,7 @@ import org.quartz.JobExecutionException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.quartz.QuartzJobBean;
+
 import com.realtech.socialsurvey.core.entities.SurveyPreInitiation;
 import com.realtech.socialsurvey.core.entities.User;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
@@ -132,14 +135,17 @@ public class CrmDataAgentIdMapper extends QuartzJobBean
             }
             try {
                 if ( excelCreated ) {
-                    if ( companyAdminEnabled == "1" ) {
+                	Map<String , String > attachmentsDetails = new HashMap<String, String>();
+    				attachmentsDetails.put("CorruptRecords.xls", filePath);
+                    
+    				if ( companyAdminEnabled == "1" ) {
                         User companyAdmin = userManagementService.getCompanyAdmin( companyId );
                         if ( companyAdmin != null ) {
                             emailServices.sendCorruptDataFromCrmNotificationMail( companyAdmin.getFirstName(),
-                                companyAdmin.getLastName(), companyAdmin.getEmailId(), filePath );
+                                companyAdmin.getLastName(), companyAdmin.getEmailId(), attachmentsDetails );
                         }
                     } else {
-                        emailServices.sendCorruptDataFromCrmNotificationMail( adminName, "", adminEmailId, filePath );
+                        emailServices.sendCorruptDataFromCrmNotificationMail( adminName, "", adminEmailId, attachmentsDetails );
                     }
                 }
             } catch ( InvalidInputException | UndeliveredEmailException e ) {

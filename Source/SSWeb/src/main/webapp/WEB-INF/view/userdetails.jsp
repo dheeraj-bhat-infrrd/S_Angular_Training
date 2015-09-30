@@ -211,7 +211,6 @@
 
 	$(document).ready(function() {
 		/* var branchListHtml = $('#branch-list').html();
-		console.log($('#branch-list > div').html);
 		if($('#branch-list > div > div').length == 0) {
 			$('#um-assignto').prop("disabled",true);
 			$('#um-assignto').attr("placeholder","Please add a branch");

@@ -7,8 +7,10 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
+
 import org.apache.solr.common.SolrDocumentList;
 import org.noggit.JSONUtil;
 import org.slf4j.Logger;
@@ -22,6 +24,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+
 import com.amazonaws.util.json.JSONException;
 import com.amazonaws.util.json.JSONObject;
 import com.google.gson.Gson;
@@ -44,9 +47,14 @@ import com.realtech.socialsurvey.core.entities.UserProfile;
 import com.realtech.socialsurvey.core.entities.UserSettings;
 import com.realtech.socialsurvey.core.enums.AccountType;
 import com.realtech.socialsurvey.core.enums.DisplayMessageType;
+import com.realtech.socialsurvey.core.enums.OrganizationUnit;
+import com.realtech.socialsurvey.core.enums.SettingsForApplication;
+import com.realtech.socialsurvey.core.exception.FatalException;
+import com.realtech.socialsurvey.core.exception.InternalServerException;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.exception.NoRecordsFetchedException;
 import com.realtech.socialsurvey.core.exception.NonFatalException;
+import com.realtech.socialsurvey.core.exception.ProfileServiceErrorCode;
 import com.realtech.socialsurvey.core.exception.UserAlreadyExistsException;
 import com.realtech.socialsurvey.core.services.authentication.AuthenticationService;
 import com.realtech.socialsurvey.core.services.generator.URLGenerator;
@@ -56,6 +64,7 @@ import com.realtech.socialsurvey.core.services.organizationmanagement.ProfileMan
 import com.realtech.socialsurvey.core.services.organizationmanagement.UserManagementService;
 import com.realtech.socialsurvey.core.services.search.SolrSearchService;
 import com.realtech.socialsurvey.core.services.search.exception.SolrException;
+import com.realtech.socialsurvey.core.services.settingsmanagement.impl.InvalidSettingsStateException;
 import com.realtech.socialsurvey.core.utils.DisplayMessageConstants;
 import com.realtech.socialsurvey.core.utils.MessageUtils;
 import com.realtech.socialsurvey.web.common.ErrorCodes;
@@ -380,6 +389,8 @@ public class UserManagementController
     {
         LOG.info( "Method to find users by email id called." );
         String users = "";
+        int startIndex = 0;
+		int batchSize = 0;
         try {
             String searchKey = request.getParameter( "searchKey" );
             if ( searchKey == null ) {
@@ -387,6 +398,16 @@ public class UserManagementController
                 throw new InvalidInputException( "Invalid searchKey passed in method findUserByEmail()." );
             }
 
+            String startIndexStr = request.getParameter("startIndex");
+			String batchSizeStr = request.getParameter("batchSize");
+			try {
+				startIndex = Integer.parseInt(startIndexStr);
+				batchSize = Integer.parseInt(batchSizeStr);
+			}
+			catch (NumberFormatException e) {
+				LOG.error("NumberFormatException while searching for user id. Reason : " + e.getMessage(), e);
+			}
+            
             User user = sessionHelper.getCurrentUser();
             if ( user == null ) {
                 LOG.error( "No user found in current session in findUserByEmail()." );
@@ -394,7 +415,10 @@ public class UserManagementController
             }
 
             try {
-                users = solrSearchService.searchUsersByLoginNameOrName( searchKey, user.getCompany().getCompanyId() );
+            	SolrDocumentList usersResult = solrSearchService.searchUsersByLoginNameOrName( searchKey, user.getCompany().getCompanyId(), startIndex, batchSize);
+                users = new Gson().toJson(solrSearchService.getUsersFromSolrDocuments(usersResult));
+    			LOG.debug("User search result is : " + usersResult);
+                model.addAttribute("numFound", usersResult.getNumFound());
             } catch ( InvalidInputException invalidInputException ) {
                 throw new InvalidInputException( invalidInputException.getMessage(), invalidInputException );
             } catch ( MalformedURLException e ) {
@@ -1141,47 +1165,161 @@ public class UserManagementController
 
 		long branchId = 0;
 		long regionId = 0;
+		long companyId = 0;
+        long agentId = 0;
+        OrganizationUnitSettings profileSettings = null;
+        Map<SettingsForApplication, OrganizationUnit> map = null;
+        
+      //Get the hierarchy details associated with the current profile
+        try {
+            Map<String, Long> hierarchyDetails = profileManagementService.getHierarchyDetailsByEntity( entityType, entityId );
+            if ( hierarchyDetails == null ) {
+                LOG.error( "Unable to fetch primary profile for this user " );
+                throw new FatalException( "Unable to fetch primary profile for type : " + entityType + " and ID : " + entityId );
+            }
+            branchId = hierarchyDetails.get( CommonConstants.BRANCH_ID_COLUMN );
+            regionId = hierarchyDetails.get( CommonConstants.REGION_ID_COLUMN );
+            companyId = hierarchyDetails.get( CommonConstants.COMPANY_ID_COLUMN );
+            agentId = hierarchyDetails.get( CommonConstants.AGENT_ID_COLUMN );
+            LOG.debug( "Company ID : " + companyId + " Region ID : " + regionId + " Branch ID : " + branchId + " Agent ID : "
+                + agentId );
+        } catch ( InvalidInputException e ) {
+            LOG.error( "InvalidInputException while showing profile page. Reason :" + e.getMessage(), e );
+            model
+                .addAttribute( "message", messageUtils.getDisplayMessage( e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE ) );
+        }
+        
 		int profilesMaster = 0;
 		if (entityType.equals(CommonConstants.COMPANY_ID_COLUMN)) {
 			model.addAttribute("columnName", entityType);
 			profilesMaster = CommonConstants.PROFILES_MASTER_COMPANY_ADMIN_PROFILE_ID;
+			
+			OrganizationUnitSettings companyProfile = null;
+			try {
+				companyProfile = organizationManagementService.getCompanySettings( companyId );
+			} catch (InvalidInputException e) {
+				LOG.error("Error occured while fetching company profile", e);
+			}
+			profileSettings = companyProfile;
+			
 		}
 		else if (entityType.equals(CommonConstants.REGION_ID_COLUMN)) {
 			model.addAttribute("columnName", entityType);
 			profilesMaster = CommonConstants.PROFILES_MASTER_REGION_ADMIN_PROFILE_ID;
-			regionId = entityId;
+			
+			OrganizationUnitSettings regionProfile = null;
+            OrganizationUnitSettings companyProfile = null;
+            try {
+                companyProfile = organizationManagementService.getCompanySettings( companyId );
+                regionProfile = organizationManagementService.getRegionSettings( regionId );
+
+                try {
+                    map = profileManagementService.getPrimaryHierarchyByEntity( CommonConstants.REGION_ID,
+                        regionProfile.getIden() );
+                    if ( map == null ) {
+                        LOG.error( "Unable to fetch primary profile for this user " );
+                        throw new FatalException( "Unable to fetch primary profile this user " + regionProfile.getIden() );
+                    }
+                } catch ( InvalidSettingsStateException e ) {
+                	LOG.error("Error occured while fetching region profile", e);
+                }
+                regionProfile = profileManagementService.fillUnitSettings( regionProfile,
+                        MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION, companyProfile, regionProfile, null, null,
+                        map );
+            } catch ( InvalidInputException e ) {
+                LOG.error("Error occured while fetching region profile", e);
+            }
+            profileSettings = regionProfile;
+			
 		}
 		else if (entityType.equals(CommonConstants.BRANCH_ID_COLUMN)) {
 			model.addAttribute("columnName", entityType);
 			profilesMaster = CommonConstants.PROFILES_MASTER_BRANCH_ADMIN_PROFILE_ID;
-			branchId = entityId;
+			
+			OrganizationUnitSettings companyProfile = null;
+            OrganizationUnitSettings branchProfile = null;
+            OrganizationUnitSettings regionProfile = null;
+
+            try {
+                companyProfile = organizationManagementService.getCompanySettings( companyId );
+                regionProfile = organizationManagementService.getRegionSettings( regionId );
+                branchProfile = organizationManagementService.getBranchSettingsDefault( branchId );
+
+                try {
+                    map = profileManagementService.getPrimaryHierarchyByEntity( CommonConstants.BRANCH_ID_COLUMN,
+                        branchProfile.getIden() );
+                    if ( map == null ) {
+                        LOG.error( "Unable to fetch primary profile for this user " );
+                        throw new FatalException( "Unable to fetch primary profile this user " + branchProfile.getIden() );
+                    }
+
+                } catch ( InvalidSettingsStateException e ) {
+                	LOG.error("Error occured while fetching branch profile", e);
+                }
+                branchProfile = profileManagementService.fillUnitSettings( branchProfile,
+                        MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION, companyProfile, regionProfile,
+                        branchProfile, null, map );
+            } catch ( InvalidInputException e ) {
+            	LOG.error("Error occured while fetching branch profile", e);
+            } catch ( NoRecordsFetchedException e ) {
+                LOG.error( "NoRecordsFetchedException: message : " + e.getMessage(), e );
+            }
+            profileSettings = branchProfile;
 		}
 		else if (entityType.equals(CommonConstants.AGENT_ID_COLUMN)) {
 			model.addAttribute("columnName", CommonConstants.AGENT_ID_COLUMN);
 			profilesMaster = CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID;
+			
+			OrganizationUnitSettings companyProfile = null;
+            OrganizationUnitSettings regionProfile = null;
+            OrganizationUnitSettings branchProfile = null;
+            AgentSettings individualProfile = null;
+
+            try {
+                companyProfile = organizationManagementService.getCompanySettings( companyId );
+                regionProfile = organizationManagementService.getRegionSettings( regionId );
+                branchProfile = organizationManagementService.getBranchSettingsDefault( branchId );
+                individualProfile = userManagementService.getAgentSettingsForUserProfiles( agentId );
+
+                try {
+                    map = profileManagementService.getPrimaryHierarchyByEntity( CommonConstants.AGENT_ID_COLUMN,
+                        individualProfile.getIden() );
+                    if ( map == null ) {
+                        LOG.error( "Unable to fetch primary profile for this user " );
+                        throw new FatalException( "Unable to fetch primary profile this user " + branchProfile.getIden() );
+                    }
+
+                } catch ( InvalidSettingsStateException e ) {
+                    LOG.error( "Error occured while fetching branch profile" + e.getMessage() );
+                }
+
+                if ( map == null ) {
+                    LOG.error( "Unable to fetch primary profile for this user " );
+                    throw new FatalException( "Unable to fetch primary profile this user " + individualProfile.getIden() );
+                }
+
+                individualProfile = (AgentSettings) profileManagementService.fillUnitSettings( individualProfile,
+                    MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION, companyProfile, regionProfile,
+                    branchProfile, individualProfile, map );
+            } catch ( InvalidInputException e ) {
+            	LOG.error( "InvalidInputException: message : " + e.getMessage(), e );
+            } catch ( NoRecordsFetchedException e ) {
+                LOG.error( "NoRecordsFetchedException: message : " + e.getMessage(), e );
+            }
+            profileSettings = individualProfile;
 		}
 
-		// Setting userSettings in session
-		OrganizationUnitSettings profileSettings = null;
-		try {
-			profileSettings = profileManagementService.aggregateUserProfile(user, accountType, userSettings, branchId, regionId, profilesMaster);
-		}
-		catch (InvalidInputException | NoRecordsFetchedException e) {
-			LOG.error("InvalidInputException while fetching profile. Reason :" + e.getMessage(), e);
-			model.addAttribute("message", messageUtils.getDisplayMessage(e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE));
-		}
+		model.addAttribute( "profileSettings", profileSettings );
 		session.setAttribute(CommonConstants.USER_PROFILE_SETTINGS, profileSettings);
 
 		// Setting parentLock in session
 		LockSettings parentLock = null;
-		try {
-			parentLock = profileManagementService.aggregateParentLockSettings(user, accountType, userSettings, branchId, regionId, profilesMaster);
-		}
-		catch (InvalidInputException | NoRecordsFetchedException e) {
-			LOG.error("InvalidInputException while fetching profile. Reason :" + e.getMessage(), e);
-			model.addAttribute("message", messageUtils.getDisplayMessage(e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE));
-		}
-		session.setAttribute(CommonConstants.PARENT_LOCK, parentLock);
+        try {
+            parentLock = profileManagementService.fetchHierarchyLockSettings( companyId, branchId, regionId, entityType );
+        } catch ( NonFatalException e ) {
+            LOG.error( "Unable to fetch lock values", e );
+        }
+        session.setAttribute( CommonConstants.PARENT_LOCK, parentLock );
 
 		LOG.info("Method showLinkedInDataCompare() finished");
 		return JspResolver.LINKEDIN_COMPARE;
@@ -1582,6 +1720,45 @@ public class UserManagementController
         LOG.info( "Method updateUserProfile() finished from UserManagementController" );
         return new Gson().toJson( statusMap );
     }
+    
+	@ResponseBody
+	@RequestMapping(value = "/deleteuserprofile", method = RequestMethod.POST)
+	public String deleteUserProfile(Model model, HttpServletRequest request) {
+		LOG.info("Method deleteUserProfile() called from UserManagementController");
+		try {
+			try {
+				User user = sessionHelper.getCurrentUser();
+				long profileId = Long.parseLong(request.getParameter("profileId"));
+				int status = CommonConstants.STATUS_INACTIVE;
+
+				userManagementService.updateUserProfile(user, profileId, status);
+				userManagementService.updateUserProfilesStatus(user, profileId);
+
+				// update user profiles in session if current user
+				User updatedUser = userManagementService.getUserByProfileId(profileId);
+				if (user.getUserId() == updatedUser.getUserId()) {
+					try {
+						sessionHelper.processAssignments(request.getSession(false), user);
+					}
+					catch (NonFatalException e) {
+						throw new NonFatalException("Exception occurred while processing user assignments in. Reason : " + e.getMessage(), e);
+					}
+				}
+			}
+			catch (NumberFormatException e) {
+				throw new NonFatalException("NumberFormatException while parsing profileId. Reason : " + e.getMessage(), e);
+			}
+			catch (InvalidInputException e) {
+				throw new NonFatalException("InvalidInputException while deleting profile. Reason : " + e.getMessage(), e);
+			}
+		}
+		catch (NonFatalException e) {
+			LOG.error("NonFatalException occurred while deleting UserProfile in UserManagementController. Reason : " + e.getMessage(), e);
+			return CommonConstants.ERROR;
+		}
+		LOG.info("Method deleteUserProfile() finished from UserManagementController");
+		return CommonConstants.SUCCESS_ATTRIBUTE;
+	}
 
 
     @ResponseBody

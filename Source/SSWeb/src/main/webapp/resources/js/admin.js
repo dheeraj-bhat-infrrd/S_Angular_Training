@@ -21,15 +21,12 @@ $(document).on('click','#dsh-admin-report-dwn-btn',function(){
 	var key = parseInt(selectedValue);
 	switch (key) {
 	case 1:
-		console.log("loan-officer-ranking");
 		window.location.href = "/downloadagentrankingreport.do?columnName="+selectedProf+"&columnValue="+idenVal+"&startDate="+startDate+"&endDate="+endDate;
 		break;
 	case 2:
-		console.log("customer-survey");
 		window.location.href = "/downloadcustomersurveyresults.do?columnName="+selectedProf+"&columnValue="+idenVal+"&startDate="+startDate+"&endDate="+endDate;
 		break;
 	case 3:
-		console.log("social-monitor");
 		window.location.href = "/downloaddashboardsocialmonitor.do?columnName="+selectedProf+"&columnValue="+idenVal+"&startDate="+startDate+"&endDate="+endDate;
 		break;
 	default:

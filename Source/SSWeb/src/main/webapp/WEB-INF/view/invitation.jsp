@@ -140,8 +140,6 @@
 								Function for submitting invitation form
 							 */
 							function submitInvitationForm() {
-								console
-										.log("Method to submit Invitation form called");
 								if (!$('#serverSideerror').hasClass("hide"))
 									$('#serverSideerror').addClass("hide");
 								var url = "./corporateinvite.do";
@@ -149,8 +147,6 @@
 								callAjaxFormSubmit(url,
 										submitInvitationFormCallBack,
 										"invitation-form");
-								console
-										.log("Method to submit Invitation form finished");
 							}
 
 							/*
@@ -170,7 +166,6 @@
 							$('#inv-submit').click(function(e) {
 								if (validateForm('inv-form')) {
 									/* ===== FORM VALIDATED ===== */
-									console.log("form validated !!");
 									submitInvitationForm();
 								}
 							});

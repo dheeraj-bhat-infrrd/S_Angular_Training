@@ -38,22 +38,22 @@
             <div class="bd-hr-rt-header"><i><spring:message code="label.woulduliketoadd.key"/> <strong><spring:message code="label.new.key"/></strong></i></div>
             <div class="bd-hr-tabs-wrapper">
                 <div class="bd-hr-tabs-header clearfix">
-                	<c:if test="${isRegionAdditionAllowed}">
-	                    <div class="bd-hr-tabs-header-item float-left">
-	                        <span id="hr-region-tab" data-tab="region" class="bd-hdr-span bd-hdr-active-arr bd-hdr-active"><spring:message code="label.region.key"/></span>
-	                    </div>
-                   </c:if>
-                   <c:if test="${isBranchAdditionAllowed}">
-	                    <div class="bd-hr-tabs-header-item float-left">
-	                        <span id="hr-office-tab" data-tab="office" class="bd-hdr-span"><spring:message code="label.office.key"/></span>
-	                    </div>
+                	<div class="bd-hr-tabs-header-item float-left">
+                        <span id="hr-individual-tab" data-tab="individual" class="bd-hdr-span"><spring:message code="label.individual.key"/></span>
+                    </div>
+                    <c:if test="${isBranchAdditionAllowed}">
+                    <div class="bd-hr-tabs-header-item float-left">
+                        <span id="hr-office-tab" data-tab="office" class="bd-hdr-span"><spring:message code="label.office.key"/></span>
+                    </div>
                     </c:if>
-	                    <div class="bd-hr-tabs-header-item float-left">
-	                        <span id="hr-individual-tab" data-tab="individual" class="bd-hdr-span"><spring:message code="label.individual.key"/></span>
-	                    </div>
-	                    <%-- <div class="bd-hr-tabs-header-item hdr-txt-rt-adj float-left">
-	                        <span data-tab="csv" class="bd-hdr-span"><spring:message code="label.uploadcsv.key"/></span>
-	                    </div> --%>
+                    <c:if test="${isRegionAdditionAllowed}">
+                    <div class="bd-hr-tabs-header-item float-left">
+                        <span id="hr-region-tab" data-tab="region" class="bd-hdr-span bd-hdr-active-arr bd-hdr-active"><spring:message code="label.region.key"/></span>
+                    </div>
+                    </c:if>
+                    <%-- <div class="bd-hr-tabs-header-item hdr-txt-rt-adj float-left">
+                        <span data-tab="csv" class="bd-hdr-span"><spring:message code="label.uploadcsv.key"/></span>
+                    </div> --%>
                 </div>
             </div>
             <div id="bd-edit-form-section" class="bd-hr-form-wrapper">

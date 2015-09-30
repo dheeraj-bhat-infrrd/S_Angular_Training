@@ -86,6 +86,7 @@
 				url : window.location.origin + "/resendRegistrationMail.do",
 				data : payload,
 				type : "GET",
+				cache : false,
 				dataType : "TEXT",
 				success : function(data){
 					$('#overlay-toast').html(data);

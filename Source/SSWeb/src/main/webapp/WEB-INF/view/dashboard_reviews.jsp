@@ -16,14 +16,12 @@
 <script type="text/javascript">
 
     function twitterFn (loop,twitterElement) {
-    	console.log("in twitterFn");
     	var twitText = "";
       	var twitLink = $("#twitt_"+loop).data('link');
       	var String=twitLink.substring(twitLink.indexOf("=")+1,twitLink.lastIndexOf("&"));
     	var twitId = 'twttxt_'+loop;
     	if($("#"+twitId) != undefined)
     		{
-    		console.log("twittId not null");
     		 twitText = $("#"+twitId).val();
     		}
     	
@@ -48,7 +46,6 @@
     }
     function getImageandCaption(loop)
     {
-    	console.log("inside imagCaption- dashboard");
     	var name = "";
     	var designation = "";
     	var company = "";
@@ -58,7 +55,6 @@
     		{
     		
     		fblink = $("#fb_"+loop).data('link');	
-    		console.log("fb id is not undefined");
     		}
    
     var imgId= "";
@@ -68,24 +64,20 @@
      var imgIdFirstIndex = imgId.indexOf("(");
      var imgIdlastIndex = imgId.lastIndexOf(")");
      imgId = imgId.substring(imgIdFirstIndex+1, imgIdlastIndex);
-     console.log("imgId id is not undefined");
     	}
     
 	    if(document.getElementById("name") != null)
 		{
 		  name = document.getElementById("name").innerHTML;
-		  console.log("name id is not undefined");
 		}
 
 		if(document.getElementById("designation") != null)
 		{
-			 console.log("designation id is not undefined");
 		designation = document.getElementById("designation").innerHTML;
 		}
 		
 		if(document.getElementById("company") != null)
 		{
-			console.log("company id is not undefined");
 			company = document.getElementById("company").innerHTML;
 		
 		}
@@ -94,7 +86,6 @@
     fblink = fblink.concat(pictureandCaptionLink);
     if(document.getElementById('fb_'+loop) != null)
     document.getElementById('fb_'+loop).setAttribute('data-link',fblink);
-    console.log("exit dashboard get img");
     	}
 </script>
 <c:choose>
@@ -103,7 +94,7 @@
 			<c:set value="ppl-review-item" var="reviewitemclass"></c:set>
 			<div data-firstname="${feedback.customerFirstName}" data-lastname="${feedback.customerLastName}"
 				data-agentid="${feedback.agentId}" data-agentname="${feedback.agentName}" data-customeremail="${feedback.customerEmail}"
-				data-review="${feedback.review}" data-score="${feedback.score}" class="${reviewitemclass}">
+				data-review="${feedback.review}" data-score="${feedback.score}" survey-mongo-id="${feedback._id}" class="${reviewitemclass}">
 				
 				<div class="ppl-header-wrapper clearfix">
 					<div class="float-left ppl-header-left">
@@ -153,7 +144,7 @@
                            <span class="label">share</span>
                        </button>
                         </span>
-						<c:if test="${not empty feedback.yelpProfileUrl}">
+						<!-- <c:if test="${not empty feedback.yelpProfileUrl}">
 							<span class="float-left ppl-share-icns icn-yelp" title="Yelp" data-link="${feedback.yelpProfileUrl}"></span>
 						</c:if>
 						<c:if test="${not empty feedback.zillowProfileUrl}">
@@ -164,7 +155,7 @@
 						</c:if>
 						<c:if test="${not empty feedback.realtorProfileUrl}">
 							<span class="float-left ppl-share-icns icn-realtor" title="Realtor" data-link="${feedback.realtorProfileUrl}"></span>
-						</c:if>
+						</c:if> -->
 					</div>
 					<div class="float-left icn-share icn-remove icn-rem-size hide" style="display: none;"></div>
 				</div>
