@@ -27,6 +27,8 @@ import com.realtech.socialsurvey.core.entities.AgentSettings;
 import com.realtech.socialsurvey.core.entities.FeedIngestionEntity;
 import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
 import com.realtech.socialsurvey.core.entities.ProfileUrlEntity;
+import com.realtech.socialsurvey.core.exception.InvalidInputException;
+import com.realtech.socialsurvey.core.exception.NoRecordsFetchedException;
 
 /**
  * Mongo implementation of settings
@@ -39,6 +41,7 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
 	public static final String BRANCH_SETTINGS_COLLECTION = "BRANCH_SETTINGS";
 	public static final String AGENT_SETTINGS_COLLECTION = "AGENT_SETTINGS";
 	public static final String KEY_CRM_INFO = "crm_info";
+	public static final String KEY_CRM_INFO_SOURCE = "crm_info.crm_source";
 	public static final String KEY_IDEN = "iden";
 	public static final String KEY_CRM_INFO_CLASS = "crm_info._class";
 	public static final String KEY_MAIL_CONTENT = "mail_content";
@@ -484,5 +487,26 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
         setCompleteUrlForSettings(organizationUnitSettings, collectionName);
         LOG.info("Successfully executed method fetchOrganizationUnitSettingsByProfileName");
         return organizationUnitSettings;
+    }
+    
+    @Override
+    public List<OrganizationUnitSettings> getOrganizationUnitListWithCRMSource(String source, String collectionName) throws InvalidInputException, NoRecordsFetchedException {
+    	LOG.info("Getting Organization Unit Settings List from "+collectionName+" for crm source "+source);
+    	if(collectionName == null || collectionName.isEmpty()){
+    		LOG.info("Collection name is not present to fetch crm info list.");
+    		throw new InvalidInputException("Collection name is not present to fetch crm info list.");
+    	}
+    	List<OrganizationUnitSettings> organizationUnitsSettingsList = null;
+    	Query query = new Query();
+    	if(source != null && !source.isEmpty()){
+    		query.addCriteria(Criteria.where(KEY_CRM_INFO).exists(true).andOperator(Criteria.where(KEY_CRM_INFO_SOURCE).is(source)));
+    	}
+    	organizationUnitsSettingsList = mongoTemplate.find(query,OrganizationUnitSettings.class, collectionName);
+    	if(organizationUnitsSettingsList == null || organizationUnitsSettingsList.isEmpty()){
+    		LOG.info("No records found for crm source: "+source);
+    		throw new NoRecordsFetchedException("No records found for crm source: "+source);
+    	}
+    	LOG.info("Successfully found unit settings for source "+source);
+    	return organizationUnitsSettingsList;
     }
 }

@@ -1,14 +1,16 @@
 package com.realtech.socialsurvey.core.starter;
 
 import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 
-import org.apache.poi.hssf.usermodel.HSSFWorkbook;
+import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
@@ -102,32 +104,47 @@ public class EmailProcessor implements Runnable, InitializingBean
         email.setSubject( emailEntity.getSubject() );
         email.setHtml( emailEntity.getBody() );
         email.setText( emailFormatHelper.getEmailTextFormat( emailEntity.getBody() ) );
-        if ( emailEntity.getAttachmentLocation() != null && !emailEntity.getAttachmentLocation().isEmpty() ) {
-            File file = null;
-            FileInputStream fileInputStream = null;
-            try {
-                file = new File( emailEntity.getAttachmentLocation() );
-                fileInputStream = new FileInputStream( file );
-                HSSFWorkbook workbook = new HSSFWorkbook( fileInputStream );
-                ByteArrayOutputStream baos = new ByteArrayOutputStream();
-                workbook.write( baos );
-                InputStream inputStream = new ByteArrayInputStream( baos.toByteArray() );
-                email.addAttachment( "CorruptRecords.xls", inputStream );
+        
+        if(emailEntity.getAttachmentDetail() != null){
+        	Iterator<Map.Entry<String, String>> entries = emailEntity.getAttachmentDetail().entrySet().iterator();
+            while (entries.hasNext()) {
+            	Entry<String, String> entry = entries.next();
+            	if ( entry.getKey() != null && entry.getValue() != null ) {
+                    File file = null;
+                    FileInputStream fileInputStream = null;
+                    try {
+                        file = new File( entry.getValue() );
+                        fileInputStream = new FileInputStream( file );
+                         InputStream inputStream = null;
+                        	
+                         /*HSSFWorkbook workbook = new HSSFWorkbook( fileInputStream );
+                         ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                         workbook.write( baos );
+                         inputStream = new ByteArrayInputStream( baos.toByteArray() );
+                         email.addAttachment( "CorruptRecords.xls", inputStream );*/
+                        
+                         inputStream = new ByteArrayInputStream(FileUtils.readFileToByteArray(file));
+                         email.addAttachment( entry.getKey()  , inputStream );
 
-            } catch ( IOException e ) {
-                // TODO Auto-generated catch block
-                LOG.error( "Exception caught " + e.getMessage() );
-            } finally {
-                if ( file != null ) {
-                    if ( file.exists() ) {
-                        file.delete();
+                    } catch ( IOException e ) {
+                        // TODO Auto-generated catch block
+                        LOG.error( "Exception caught " + e.getMessage() );
+                    } catch(Exception e) {
+                    	LOG.error( "Exception caught " + e.getMessage() );
                     }
-                }
-                if ( fileInputStream != null ) {
-                    fileInputStream.close();
+                    finally {
+                        if ( file != null ) {
+                            if ( file.exists() ) {
+                                file.delete();
+                            }
+                        }
+                        if ( fileInputStream != null ) {
+                            fileInputStream.close();
+                        }
+                    }
+
                 }
             }
-
         }
 
         Response response = null;

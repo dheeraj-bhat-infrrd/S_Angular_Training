@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
+
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrQuery.ORDER;
 import org.apache.solr.client.solrj.SolrServer;
@@ -27,6 +28,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
+
 import com.google.gson.Gson;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.dao.OrganizationUnitSettingsDao;
@@ -462,13 +464,13 @@ public class SolrSearchServiceImpl implements SolrSearchService {
 	 * @throws UnsupportedEncodingException
 	 */
 	@Override
-	public String searchUsersByLoginNameOrName(String pattern, long companyId) throws InvalidInputException, SolrException, MalformedURLException {
+	public SolrDocumentList searchUsersByLoginNameOrName(String pattern, long companyId, int startIndex, int batchSize) throws InvalidInputException, SolrException, MalformedURLException {
 		LOG.info("Method searchUsersByLoginNameOrName called for pattern :" + pattern);
 		if (pattern == null) {
 			throw new InvalidInputException("Pattern is null or empty while searching for Users");
 		}
 		LOG.info("Method searchUsersByLoginNameOrName() called for parameter : " + pattern);
-		String usersResult = null;
+		SolrDocumentList results;
 		QueryResponse response = null;
 		pattern = pattern + "*";
 		try {
@@ -481,18 +483,23 @@ public class SolrSearchServiceImpl implements SolrSearchService {
 					+ CommonConstants.STATUS_NOT_VERIFIED + " OR " + CommonConstants.STATUS_SOLR + ":" + CommonConstants.STATUS_TEMPORARILY_INACTIVE);
 			solrQuery.addSort(CommonConstants.USER_DISPLAY_NAME_SOLR, ORDER.asc);
 			LOG.debug("Querying solr for searching users");
+			if(startIndex > -1) {
+				solrQuery.setStart(startIndex);
+			}
+			if(batchSize > 0) {
+				solrQuery.setRows(batchSize);
+			}
+			
 			response = solrServer.query(solrQuery);
-			SolrDocumentList results = response.getResults();
-			usersResult = new Gson().toJson(getUsersFromSolrDocuments(results));
-			LOG.debug("User search result is : " + usersResult);
+			results = response.getResults();
 		}
 		catch (SolrServerException e) {
 			LOG.error("SolrServerException while performing User search");
 			throw new SolrException("Exception while performing search for user. Reason : " + e.getMessage(), e);
 		}
 
-		LOG.info("Method searchUsersByLoginNameOrName finished for pattern :" + pattern + " returning : " + usersResult);
-		return usersResult;
+		LOG.info("Method searchUsersByLoginNameOrName finished for pattern :" + pattern + " returning : " + results);
+		return results;
 	}
 
 	@Override
@@ -960,8 +967,9 @@ public class SolrSearchServiceImpl implements SolrSearchService {
 			solrQuery.addFilterQuery(CommonConstants.STATUS_COLUMN + ":" + CommonConstants.STATUS_ACTIVE);
 			response = solrServer.query(solrQuery);
 			SolrDocumentList results = response.getResults();
-			if (results.size() != 0)
-				regionName = (String) results.get(CommonConstants.INITIAL_INDEX).getFieldValue(CommonConstants.REGION_NAME_COLUMN);
+			if (results.size() != 0){
+				regionName = (String) results.get(CommonConstants.INITIAL_INDEX).getFieldValue(CommonConstants.REGION_NAME_SOLR);				
+			}
 		}
 		catch (SolrServerException e) {
 			LOG.error("UnsupportedEncodingException while performing region search");
@@ -995,7 +1003,7 @@ public class SolrSearchServiceImpl implements SolrSearchService {
 			response = solrServer.query(solrQuery);
 			SolrDocumentList results = response.getResults();
 			if (results.size() != 0)
-				branchName = (String) results.get(CommonConstants.INITIAL_INDEX).getFieldValue(CommonConstants.BRANCH_NAME_COLUMN);
+				branchName = (String) results.get(CommonConstants.INITIAL_INDEX).getFieldValue(CommonConstants.BRANCH_NAME_SOLR);
 		}
 		catch (SolrServerException e) {
 			LOG.error("UnsupportedEncodingException while performing branch search");

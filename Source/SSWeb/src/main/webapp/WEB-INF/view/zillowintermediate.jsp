@@ -15,6 +15,14 @@
 	<link rel="stylesheet" href="${initParam.resourcesPath}/resources/css/style-common.css">
 	<link rel="stylesheet" href="${initParam.resourcesPath}/resources/css/style-resp.css">
 </head>
+<c:if test="${not empty accountSettings}">
+	<c:set var = "profile" value = "${ accountSettings }"></c:set>
+</c:if>
+<c:if test="${empty accountSettings}">
+	<c:if test="${ not empty profileSettings }">
+		<c:set var = "profile" value = "${ profileSettings }"></c:set>
+	</c:if>
+</c:if>
 <body>
 <div id="toast-container" class="toast-container">
 	   <span id="overlay-toast" class="overlay-toast"></span>
@@ -34,7 +42,7 @@
 									<label class="zillow-input-label"><spring:message code="label.zillowconnect.key"/></label>
 									<div class="zillow-input-cont">
 										<span><spring:message code="label.zillowconnect.link.key"/></span>
-										<input class="zillow-input" name="zillowProfileName" type="text" autofocus="autofocus" placeholder='<spring:message code="label.zillowconnect.profileName.key"/>'>
+										<input class="zillow-input" name="zillowProfileName" type="text" autofocus="autofocus" placeholder='<spring:message code="label.zillowconnect.profileName.key"/>' value = "${ profile.socialMediaTokens.zillowToken.zillowScreenName }">
 										<span>/</span>
 									</div>
 								</div>
@@ -138,6 +146,7 @@ function fetchSocialProfileUrl(payload, callBackFunction) {
 	$.ajax({
 		url : './profileUrl.do',
 		type : "GET",
+		cache : false,
 		data : payload,
 		async : false,
 		complete : callBackFunction,

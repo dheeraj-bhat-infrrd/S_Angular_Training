@@ -13,6 +13,8 @@ import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.exception.NoRecordsFetchedException;
 import com.realtech.socialsurvey.core.services.mail.UndeliveredEmailException;
 import com.realtech.socialsurvey.core.services.search.exception.SolrException;
+import com.realtech.socialsurvey.core.services.surveybuilder.impl.DuplicateSurveyRequestException;
+import com.realtech.socialsurvey.core.services.surveybuilder.impl.SelfSurveyInitiationException;
 
 
 public interface SurveyHandler
@@ -154,4 +156,37 @@ public interface SurveyHandler
 
 
     SurveyPreInitiation getPreInitiatedSurveyById( long surveyPreInitiationId ) throws NoRecordsFetchedException;
+
+
+    /**
+     * @param surveyPreInitiation
+     */
+    public void saveSurveyPreInitiationObject( SurveyPreInitiation surveyPreInitiation ) throws InvalidInputException;
+
+
+	void updateSurveyAsAbusive(String surveymongoId);
+    
+    /**
+     * Sends survey request to the customer on behalf of agent.
+     * @param agentId
+     * @param recipientEmailId
+     * @param recipientFirstname
+     * @param recipientLastname
+     * @param source
+     * @throws DuplicateSurveyRequestException
+     * @throws InvalidInputException
+     * @throws SelfSurveyInitiationException
+     * @throws SolrException
+     * @throws NoRecordsFetchedException
+     * @throws UndeliveredEmailException
+     */
+    public void initiateSurveyRequest(long agentId, String recipientEmailId, String recipientFirstname, String recipientLastname, String source) throws DuplicateSurveyRequestException, InvalidInputException, SelfSurveyInitiationException, SolrException, NoRecordsFetchedException, UndeliveredEmailException;
+
+
+	void deleteZillowSurveysByEntity(String entityType, long entityId)
+			throws InvalidInputException;
+
+
+	void deleteExcessZillowSurveysByEntity(String entityType, long entityId)
+			throws InvalidInputException;
 }

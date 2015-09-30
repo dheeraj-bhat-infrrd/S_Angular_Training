@@ -494,7 +494,9 @@ public class DashboardServiceImpl implements DashboardService, InitializingBean 
 		// This data needs to be written (List<Object>)
 		Map<String, List<Object>> data = new TreeMap<>();
 		List<Object> surveyDetailsToPopulate = new ArrayList<>();
+		int agentRank = 1;
 		for (AgentRankingReport agentDetail : agentDetails) {
+			surveyDetailsToPopulate.add(agentRank++);
 			surveyDetailsToPopulate.add(agentDetail.getAgentFirstName());
 			surveyDetailsToPopulate.add(agentDetail.getAgentLastName());
 			surveyDetailsToPopulate.add(agentDetail.getAverageScore());
@@ -509,6 +511,7 @@ public class DashboardServiceImpl implements DashboardService, InitializingBean 
 		}
 
 		// Setting up headers
+		surveyDetailsToPopulate.add(CommonConstants.HEADER_AGENT_RANK);
 		surveyDetailsToPopulate.add(CommonConstants.HEADER_FIRST_NAME);
 		surveyDetailsToPopulate.add(CommonConstants.HEADER_LAST_NAME);
 		surveyDetailsToPopulate.add(CommonConstants.HEADER_AVG_SCORE);

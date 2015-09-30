@@ -3,13 +3,13 @@ package com.realtech.socialsurvey.core.dao;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
 import com.realtech.socialsurvey.core.entities.AgentRankingReport;
 import com.realtech.socialsurvey.core.entities.AgentSettings;
 import com.realtech.socialsurvey.core.entities.FeedIngestionEntity;
 import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
 import com.realtech.socialsurvey.core.entities.ProfileUrlEntity;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
+import com.realtech.socialsurvey.core.exception.NoRecordsFetchedException;
 
 
 /**
@@ -184,4 +184,14 @@ public interface OrganizationUnitSettingsDao
 
 
 	public List<OrganizationUnitSettings> getCompanyListByIds(Set<Long> companyIds);
+	
+	/**
+	 * Gets a list of organisation unit settings with give crm info details from a given collection
+	 * @param source
+	 * @param collectionName
+	 * @return
+	 * @throws InvalidInputException
+	 * @throws NoRecordsFetchedException
+	 */
+	public List<OrganizationUnitSettings> getOrganizationUnitListWithCRMSource(String source, String collectionName) throws InvalidInputException, NoRecordsFetchedException;
 }

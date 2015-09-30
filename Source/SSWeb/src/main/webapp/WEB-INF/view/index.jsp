@@ -214,21 +214,6 @@
 <script src="${initParam.resourcesPath}/resources/js/index.js"></script>
 <script>
 $(document).ready(function(){
-	/* $.ajax({
-		url : "./redirectifexistsactivesession.do",
-		type : "GET",
-		dataType : "html",
-		async : false,
-		success : function(activeSessionFound){
-			if (activeSessionFound == "true") {
-				window.location.href = "./userlogin.do";
-			}
-		},
-		error : function(e) {
-			redirectErrorpage();
-		}
-	}); */
-	
 	var captchaText=true;
 	resizeFunc();
 	$(window).resize(resizeFunc);
@@ -250,16 +235,6 @@ $(document).ready(function(){
 		}
 	}
 	
-	/**try {
-		Recaptcha.create('6LdlHOsSAAAAAM8ypy8W2KXvgMtY2dFsiQT3HVq-', 'recaptcha', {
-			theme : 'white',
-			callback : captchaLoaded
-		});
-		console.log("Captcha loaded");
-  	} catch(error) {
-  			console.log("Could not load captcha");
-  	}*/
-	
   	// Login form
   	$('#login-form input').on('keyup',function(e){
 		  if(e.which == 13){
@@ -270,16 +245,8 @@ $(document).ready(function(){
 	$('#login-submit').click(function(){
 		loginUser();
 	});
-   
-	/* $('#login-user-id').blur(function() {
-		validateUserId(this.id);
-	});
-	$('#login-pwd').blur(function(){
-		validateLoginPassword(this.id);
-	}); */
 	
 	function loginUser() {
-		console.log("submitting login form");
 		if (validateLoginForm('login-form')) {
 			$('#login-form').submit();
 			showOverlay();
@@ -303,27 +270,8 @@ $(document).ready(function(){
 		}
 	});
 	
-	/* $('#reg-fname').blur(function() {
-		if (validateRegFirstName(this.id)) {
-			hideRegErr();
-		}
-	});
-	
-	$('#reg-lname').blur(function() {
-		if (validateRegLastName(this.id)) {
-			hideRegErr();
-		}
-	});
-	
-	$('#reg-email').blur(function() {
-		if (validateRegEmailId(this.id)) {
-			hideRegErr();
-		}
-	}); */
-	
 	function submitRegistrationForm() {
 		if (validatePreRegistrationForm('reg-form')) {
-			console.log("submitting registration form");
 			$('#registration-form').submit();
 			showOverlay();
 		}
@@ -331,7 +279,6 @@ $(document).ready(function(){
 	
 	function captchaLoaded() {
 		var imgData = $(".recaptcha_image_cell").html();
-		console.log("Captcha image data : " + imgData);
 		var challenge = Recaptcha.get_challenge('6LdlHOsSAAAAAM8ypy8W2KXvgMtY2dFsiQT3HVq-');
 		if(challenge == undefined){
 			Recaptcha.reload();
@@ -341,30 +288,23 @@ $(document).ready(function(){
 	}
 	
 	$(".reg-cap-reload").click(function(){
-		console.log("Captcha reload button clicked");
 		Recaptcha.reload();
-		console.log("Initiated the click of hidden reload");
 	});
 	
 	$(".reg-cap-sound").click(function(){
 		if (captchaText == true) {
-			console.log("Captcha sound button clicked");
 			$("#recaptcha_switch_audio").click();
-			console.log("Initiated the click of hidden sound");
 			captchaText=false;
 			$(this).addClass('reg-cap-text');
 		}
 		else {
-			console.log("Captcha text button clicked");
 			$("#recaptcha_switch_img").click();
-			console.log("Initiated the click of hidden text");
 			captchaText=true;
 			$(this).removeClass('reg-cap-text');
 		}
 	});
 	
 	$(".reg-cap-info").click(function(){
-		console.log("Info button clicked");
 		$("#recaptcha_whatsthis").click();
 	});
 	
@@ -379,7 +319,6 @@ $(document).ready(function(){
 	});
 
 	function submitFindProForm() {
-		console.log("Submitting Find a Profile form");
 		$('#find-pro-form').submit();
 		showOverlay();
 	}

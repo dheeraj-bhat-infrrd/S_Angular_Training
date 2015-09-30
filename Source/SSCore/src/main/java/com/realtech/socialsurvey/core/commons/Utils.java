@@ -7,9 +7,9 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 
@@ -26,6 +26,11 @@ public class Utils
     private static final Pattern PATTERN = Pattern.compile( PROFILE_REGEX );
     private static final Logger LOG = LoggerFactory.getLogger( Utils.class );
 
+    @Value("${EMAIL_MASKING_PREFIX}")
+	private String maskingPrefix;
+
+	@Value("${EMAIL_MASKING_SUFFIX}")
+	private String maskingSuffix;
 
     /**
      * Method to generate region profile url based on company profile name and region profile name
@@ -155,4 +160,21 @@ public class Utils
         return object;
 
     }
+    
+    public String maskEmailAddress(String emailAddress) {
+		LOG.debug("Masking email address: " + emailAddress);
+		String maskedEmailAddress = null;
+		// replace @ with +
+		maskedEmailAddress = emailAddress.replace("@", "+");
+		if (maskingPrefix != null && !maskingPrefix.isEmpty()) {
+			maskedEmailAddress = maskingPrefix + "+" + maskedEmailAddress;
+		}
+		if (maskingSuffix == null || maskingSuffix.isEmpty()) {
+			return null;
+		}
+		else {
+			maskedEmailAddress = maskedEmailAddress + maskingSuffix;
+		}
+		return maskedEmailAddress;
+	}
 }

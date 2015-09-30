@@ -211,7 +211,6 @@ function paintBreadCrums(url) {
 		var jsonData = $.parseJSON(data);
 		if(jsonData.entity) {
 			var entityJson = $.parseJSON(jsonData.entity);
-			console.log(JSON.stringify(entityJson));
 			var htmlContent = '<a target="_blank" class="brd-crm brd-crm-link" href="'
 					+ window.location.origin
 					+ '/findcompany.do?verticalName='
@@ -545,7 +544,7 @@ function paintReviews(result){
 			'<div class="' + lastItemClass + '" data-cust-first-name=' + reviewItem.customerFirstName
 				+ ' data-cust-last-name=' + reviewItem.customerLastName + ' data-agent-name=' + reviewItem.agentName
 				+ ' data-rating=' + reviewItem.score + ' data-review="' + reviewItem.review + '" data-customeremail="'
-				+ reviewItem.customerEmail + '" data-agentid="' + reviewItem.agentId + '">';
+				+ reviewItem.customerEmail + '" data-agentid="' + reviewItem.agentId + '" survey-mongo-id="' + reviewItem._id + '">';
 		reviewsHtml += '	<div class="ppl-header-wrapper clearfix">';
 		reviewsHtml += '		<div class="float-left ppl-header-left">';    
 		reviewsHtml += '			<div class="ppl-head-1">'+custNameArray[0];
@@ -585,7 +584,7 @@ function paintReviews(result){
 		reviewsHtml += '			<span class="float-left ppl-share-icns icn-lin icn-lin-pp" title="LinkedIn" data-link="https://www.linkedin.com/shareArticle?mini=true&url=' + reviewItem.completeProfileUrl + '&title=&summary=' + reviewItem.score + '-star response from ' + reviewItem.customerFirstName+' '+reviewItem.customerLastName + ' for ' + reviewItem.agentName +' at SocialSurvey - ' + reviewItem.review + '&source="></span>';
 		reviewsHtml += '			<span class="float-left ppl-share-icns icn-gplus" title="Google+"> <button class="g-interactivepost float-left ppl-share-icns icn-gplus" data-contenturl="' + reviewItem.completeProfileUrl + '" data-clientid="' + reviewItem.googleApi + '"data-cookiepolicy="single_host_origin" data-prefilltext="' + reviewItem.score + '-star response from ' + reviewItem.customerFirstName + ' ' + reviewItem.customerLastName + ' for ' + reviewItem.agentName + 'at SocialSurvey - ' + reviewItem.review + '" data-calltoactionlabel="USE"'+''+'data-calltoactionurl=" ' + reviewItem.completeProfileUrl + '"> <span class="icon">&nbsp;</span> <span class="label">share</span> </button> </span>';
 		
-		if (reviewItem.yelpProfileUrl != null && reviewItem.yelpProfileUrl != "") {
+		/*if (reviewItem.yelpProfileUrl != null && reviewItem.yelpProfileUrl != "") {
 			reviewsHtml += '		<span class="float-left ppl-share-icns icn-yelp" title="Yelp" data-link="' + returnValidWebAddress(reviewItem.yelpProfileUrl) + '"></span>';
 		}
 		if (reviewItem.zillowProfileUrl != null && reviewItem.zillowProfileUrl != "") {
@@ -596,7 +595,7 @@ function paintReviews(result){
 		}
 		if (reviewItem.realtorProfileUrl != null && reviewItem.realtorProfileUrl != "") {
 			reviewsHtml += '		<span class="float-left ppl-share-icns icn-realtor" title="Realtor" data-link="' + returnValidWebAddress(reviewItem.realtorProfileUrl) + '"></span>';
-		}
+		}*/
 		reviewsHtml += '		</div>';
 		reviewsHtml += '		<div class="float-right" style="margin: 0 -5px;">';
 		if(reviewItem.source != "Zillow")
@@ -657,7 +656,8 @@ $(document).on('click', '.prof-report-abuse-txt', function(e) {
 		"firstName" : reviewElement.attr('data-cust-first-name'),
 		"lastName" : reviewElement.attr('data-cust-last-name'),
 		"agentName" : reviewElement.attr('data-agent-name'),
-		"review" : reviewElement.attr('data-review')
+		"review" : reviewElement.attr('data-review'),
+		"surveyMongoId" : reviewElement.attr('survey-mongo-id')
 	};
 	$("#report-abuse-txtbox").val('');
 	$('#report-abuse-cus-name').val('');

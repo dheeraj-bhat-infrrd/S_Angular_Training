@@ -581,12 +581,34 @@ html.is-modern.card-root.js.no-touch.csstransitions.svg.inlinesvg.placeholder
 	margin-left: 50px;
 }
 
+
+/* 
+.helper {
+    display: inline-block;
+    height: 100%;
+    vertical-align: middle;
+} */
+
+
+.user-error-logo {
+	height: 60px;
+	width: 145px;
+	margin: 6px 0;
+	background: url(../images/userInfoLogo.png) no-repeat center;
+    background-size: 100% auto; 
+   /*  background-size: contain !important; */
+}
+
+
+
+
 .user-info-logo {
 	height: 60px;
 	width: 145px;
-	/*  background: url(../images/userInfoLogo.png) no-repeat center;
-    background-size: 100% auto; */
-    background-size: contain !important;
+	
+	background: url(../images/userInfoLogo.png) no-repeat center;
+    background-size: 100% auto; 
+   /*  background-size: contain !important; */
 }
 
 .user-info-seperator {
@@ -693,6 +715,10 @@ html.is-modern.card-root.js.no-touch.csstransitions.svg.inlinesvg.placeholder
 
 .hm-item-row {
 	width: 480px;
+	margin: 0 auto 10px;
+}
+
+.hm-item-dl {
 	margin: 0 auto 10px;
 }
 
@@ -5295,24 +5321,41 @@ td.v-tbl-spacer {
 	font-size: 16px;
 }
 
+.v-um-hdr-search {
+	position: relative;
+	width: 200px;
+	border: 1px solid #dcdcdc;
+    border-radius: 3px;
+    padding: 0 5px;
+} 
+
 .v-um-inp {
-	width: 100px;
+	width: 145px;
 	border: 0;
 	box-shadow: none;
 	height: 32px;
-	/* padding: 0 25px 0 0;
-	background: url(../images/search.png) no-repeat;
-	background-position: right center; */
 }
 
 .um-search-icn {
 	display: block;
 	float: right;
-	width : 25px;
-	height : 32px;
+	width: 20px;
+	height: 24px;
+	margin: 4px 0;
 	background: url(../images/search.png) no-repeat;
 	background-position: right center;
 	cursor: pointer;
+	border-left: 1px solid #dcdcdc;
+}
+
+.um-clear-input-icn {
+	position: absolute;
+	right: 28px;
+	top: 6px;
+	width: 20px;
+	height: 20px;
+	cursor: pointer;
+	background: url(../images/clear_input.png) no-repeat center;
 }
 
 .v-tbl-uname {
@@ -5408,6 +5451,10 @@ tr.u-tbl-header td {
 }
 
 .v-icn-rem-user {
+	background: url(../images/rem_user.png) no-repeat center;
+}
+
+.v-icn-rem-userprofile {
 	background: url(../images/rem_user.png) no-repeat center;
 }
 
@@ -5519,7 +5566,7 @@ tr.u-tbl-header td {
 }
 
 .v-edt-tbl-assign-to {
-	width: 50%;
+	width: 65%;
 }
 
 .v-edt-tbl-role {
@@ -6868,6 +6915,8 @@ a.sq-btn-post-social:hover, a.sq-btn-post-social:visited {
 
 .agent-dropdown-cont {
 	border: 1px solid #dcdcdc;
+	max-height: 300px;
+	position: relative;
 }
 
 .agent-dropdown-item {

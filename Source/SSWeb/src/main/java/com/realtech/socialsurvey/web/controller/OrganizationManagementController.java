@@ -26,6 +26,7 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.entities.AccountsMaster;
+import com.realtech.socialsurvey.core.entities.DotLoopCrmInfo;
 import com.realtech.socialsurvey.core.entities.EncompassCrmInfo;
 import com.realtech.socialsurvey.core.entities.LicenseDetail;
 import com.realtech.socialsurvey.core.entities.MailContentSettings;
@@ -190,6 +191,23 @@ public class OrganizationManagementController {
 			}
 			catch (InvalidInputException e) {
 				try {
+					
+					if(companyName != null && !companyName.isEmpty() ){
+                		companyName = companyName.trim();
+                	}
+                	if(address1 != null && !address1.isEmpty() ){
+                		address1 = address1.trim();
+                	}
+                	if(address2 != null && !address2.isEmpty() ){
+                		address2 = address2.trim();
+                	}
+                	if(state != null && !state.isEmpty() ){
+                		state = state.trim();
+                	}
+                	if(country != null && !country.isEmpty() ){
+                		country = country.trim();
+                	}
+					
 					redirectAttributes.addFlashAttribute("verticals", organizationManagementService.getAllVerticalsMaster());
 					redirectAttributes.addFlashAttribute("companyName", companyName);
 					redirectAttributes.addFlashAttribute("address1", address1);
@@ -460,6 +478,11 @@ public class OrganizationManagementController {
 			catch (InvalidInputException e) {
 				throw new InvalidInputException("Exception occured while fetching vertical crm mappings", e.getMessage(), e);
 			}
+			//Set the app settings in model
+			OrganizationUnitSettings unitSettings = null;
+			unitSettings = organizationManagementService.getCompanySettings(user.getCompany().getCompanyId());
+			model.addAttribute(CommonConstants.USER_APP_SETTINGS, unitSettings);
+
 		}
 		catch (NonFatalException e) {
 			LOG.error("NonfatalException while showing app settings. Reason: " + e.getMessage(), e);
@@ -1498,5 +1521,82 @@ public class OrganizationManagementController {
 		redirectAttributes.addFlashAttribute(CommonConstants.MESSAGE, message);
 		return "redirect:/" + JspResolver.LOGIN + ".do";
 	}
+	
+	/**
+     * @param model
+     * @param request
+     * @return
+     */
+    @RequestMapping ( value = "/savedotloopdetails", method = RequestMethod.POST)
+    @ResponseBody
+    public String saveDotloopDetails( Model model, HttpServletRequest request )
+    {
+        LOG.info( "Inside method saveDotLoopDetails " );
+        User user = sessionHelper.getCurrentUser();
+        request.setAttribute( "saveencompassdetails", "true" );
+        String message = null;
+
+        try {
+            // Encrypting the password
+            String apiKey = request.getParameter( "dotloop-api" );
+            if ( apiKey != null && !apiKey.isEmpty() ) {
+                DotLoopCrmInfo dotLoopCrmInfo = new DotLoopCrmInfo();
+                dotLoopCrmInfo.setCrm_source( CommonConstants.CRM_SOURCE_DOTLOOP );
+                dotLoopCrmInfo.setApi( apiKey );
+
+                OrganizationUnitSettings companySettings = organizationManagementService.getCompanySettings( user.getCompany()
+                    .getCompanyId() );
+                dotLoopCrmInfo.setCompanyId( companySettings.getIden() );
+                organizationManagementService.updateCRMDetails( companySettings, dotLoopCrmInfo,
+                    "com.realtech.socialsurvey.core.entities.DotLoopCrmInfo" );
+
+                companySettings.setCrm_info( dotLoopCrmInfo );
+                message = messageUtils.getDisplayMessage( DisplayMessageConstants.DOTLOOP_CONNECTION_SUCCESSFUL,
+                    DisplayMessageType.SUCCESS_MESSAGE ).getMessage();
+            }
+        } catch ( NonFatalException e ) {
+            LOG.error( "NonFatalException while testing encompass detials. Reason : " + e.getMessage(), e );
+            message = messageUtils.getDisplayMessage( e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE ).getMessage();
+        }
+        return message;
+
+    }
+
+
+    @RequestMapping ( value = "/testdotloopconnection", method = RequestMethod.POST)
+    @ResponseBody
+    public String testDotloopConnection( Model model, HttpServletRequest request ) throws NonFatalException
+    {
+        LOG.info( "Testing connections" );
+        String message;
+        try {
+            // validate the parameters
+            if ( !validateDotloopParameters( request ) ) {
+                // TODO: code to test connection
+            }
+            message = messageUtils.getDisplayMessage( DisplayMessageConstants.DOTLOOP_DATA_UPDATE_SUCCESSFUL,
+                DisplayMessageType.SUCCESS_MESSAGE ).getMessage();
+        } catch ( NonFatalException e ) {
+            if ( request.getAttribute( "savedotloopdetails" ) != null ) {
+                throw e;
+            } else {
+                LOG.error( "NonFatalException while testing encompass detials. Reason : " + e.getMessage(), e );
+            }
+            message = messageUtils.getDisplayMessage( e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE ).getMessage();
+        }
+        return message;
+    }
+    
+    private boolean validateDotloopParameters( HttpServletRequest request ) throws InvalidInputException
+    {
+        LOG.debug( "Validating encompass parameters" );
+        String apiKey = request.getParameter( "dotloop-apikey" );
+        if ( apiKey == null || apiKey.isEmpty() ) {
+            LOG.warn( "Encompass validation failed" );
+            throw new InvalidInputException( "All fields not set for dotloop", DisplayMessageConstants.GENERAL_ERROR );
+        }
+        LOG.debug( "Encompass validation passed." );
+        return true;
+    }
 }
 // JIRA: SS-24 BY RM02 EOC

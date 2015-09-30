@@ -549,6 +549,29 @@ function validateURL(elementId){
 	}
 }
 
+//Function to validate the api key
+function validateDotloopKey(elementId){
+	if($(window).width()<768){
+		if ($('#'+elementId).val() != "") {
+			$('#'+elementId).next('.hm-item-err-2').hide();
+			return true;
+		} else {
+			$('#overlay-toast').html('Please enter valid api key');
+			showToast();
+			return false;
+		}
+	}else{
+    	if ($('#'+elementId).val() != "") {
+			$('#'+elementId).next('.hm-item-err-2').hide();
+			return true;
+		} else {
+			$('#'+elementId).next('.hm-item-err-2').html('Please enter valid api key');
+			$('#'+elementId).next('.hm-item-err-2').show();
+			return false;
+		}
+	}
+}
+
 function validateReminderInterval(elementId) {
 	if ($('#'+elementId).val() != "") {
 		if (numberRegEx.test($('#'+elementId).val())) {
@@ -590,7 +613,6 @@ function closeMoblieScreenMenu() {
 }
 
 function upgradeToPaidPlan(){
-	 console.log("upgrade plan button clicked");
 	 var url = "./upgradetopaidplanpage.do";
 	    
 	 callAjaxGET(url, function(data){
@@ -605,7 +627,6 @@ function loadDisplayPicture(profileMasterId){
 	};
 	callAjaxGETWithTextData("./getdisplaypiclocation.do", function(data) {
 		if (data != undefined){
-			console.log("Image location : " + data);
 			if(data != undefined && data != ""){
 				var imageUrl = JSON.parse(data);
 				if (imageUrl != undefined && imageUrl != "undefined"

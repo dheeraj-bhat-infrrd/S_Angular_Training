@@ -379,21 +379,9 @@ $(document).ready(function() {
 		}
 	}
 	var q = $('#prof-container').attr("data-q");
-	/**console.log("Loading captcha");
-	try {
-		Recaptcha.create('6LdlHOsSAAAAAM8ypy8W2KXvgMtY2dFsiQT3HVq-',
-				'recaptcha', {
-					theme : 'white',
-					callback : captchaLoaded
-				});
-		console.log("Captcha loaded");
-	} catch (error) {
-		console.log("Could not load captcha");
-	}*/
 	
 	function captchaLoaded() {
 		var imgData = $(".recaptcha_image_cell").html();
-		console.log("Captcha image data : " + imgData);
 		var challenge = Recaptcha.get_challenge('6LdlHOsSAAAAAM8ypy8W2KXvgMtY2dFsiQT3HVq-');
 		if(challenge == undefined){
 			Recaptcha.reload();
@@ -403,29 +391,22 @@ $(document).ready(function() {
 	}
 
 	$(".reg-cap-reload").click(function() {
-		console.log("Captcha reload button clicked");
 		$("#recaptcha_reload").click();
-		console.log("Initiated the click of hidden reload");
 	});
 
 	$(".reg-cap-sound").click(function() {
 		if (captchaText == true) {
-			console.log("Captcha sound button clicked");
 			$("#recaptcha_switch_audio").click();
-			console.log("Initiated the click of hidden sound");
 			captchaText = false;
 			$(this).addClass('reg-cap-text');
 		} else {
-			console.log("Captcha text button clicked");
 			$("#recaptcha_switch_img").click();
-			console.log("Initiated the click of hidden text");
 			captchaText = true;
 			$(this).removeClass('reg-cap-text');
 		}
 	});
 
 	$(".reg-cap-info").click(function() {
-		console.log("Info button clicked");
 		$("#recaptcha_whatsthis").click();
 	});
 	// Code for captcha validation.

@@ -34,9 +34,10 @@
 	<div class="container v-um-container">
 		<div class="v-um-header clearfix">
 			<div class="v-um-hdr-left float-left"><spring:message code="label.usermanagement.head.browseruser.key" /></div>
-			<div class="v-um-hdr-right float-right">
+			<div class="v-um-hdr-right v-um-hdr-search float-right">
 				<input id="search-users-key" class="v-um-inp" placeholder="<spring:message code="label.searchuser.key" />">
 				<span id="um-search-icn" class="um-search-icn"></span>
+				<div id="um-clear-input-icn" class="um-clear-input-icn hide" title="clear"></div>
 				<input type="hidden" id="users-count" value="${usersCount}">
 			</div>
 		</div>
@@ -74,6 +75,21 @@ $(document).ready(function() {
 		e.stopPropagation();
 		$(this).parent().prev('.v-ed-txt-dd').val($(this).html());
 		$(this).parent().slideToggle(200);
+	});
+	
+	$('#search-users-key').keyup(function() {
+		var val = $(this).val();
+		if(val == "undefined" || val.trim() == "") {
+			$('#um-clear-input-icn').hide();
+		} else {
+			$('#um-clear-input-icn').show();
+		}
+	});
+	
+	$('#um-clear-input-icn').click(function() {
+		$('#search-users-key').val('');
+		$(this).hide();
+		initUserManagementPage();
 	});
 });
 </script>

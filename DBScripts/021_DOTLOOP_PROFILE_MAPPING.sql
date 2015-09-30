@@ -1,0 +1,9 @@
+create table `ss_user`.`DOTLOOP_PROFILE_LOOP_MAPPING`( 
+   `PROFILE_LOOP_MAPPING_ID` bigint(11) NOT NULL AUTO_INCREMENT , 
+   `PROFILE_ID` varchar(255) NOT NULL , 
+   `PROFILE_LOOP_ID` varchar(255) NOT NULL , 
+   `PROFILE_LOOP_VIEW_ID` varchar(255) NOT NULL , 
+   `LOOP_CLOSED_TIME` timestamp , 
+   PRIMARY KEY (`PROFILE_LOOP_MAPPING_ID`)
+ );
+ 

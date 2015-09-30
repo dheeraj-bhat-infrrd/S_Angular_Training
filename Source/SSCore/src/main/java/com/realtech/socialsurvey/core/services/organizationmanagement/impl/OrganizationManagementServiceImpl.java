@@ -19,9 +19,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
-
 import javax.annotation.Resource;
-
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellStyle;
 import org.apache.poi.ss.usermodel.Row;
@@ -37,7 +35,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.DependsOn;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
-
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
@@ -62,6 +59,7 @@ import com.realtech.socialsurvey.core.entities.BranchFromSearch;
 import com.realtech.socialsurvey.core.entities.BranchSettings;
 import com.realtech.socialsurvey.core.entities.CRMInfo;
 import com.realtech.socialsurvey.core.entities.Company;
+import com.realtech.socialsurvey.core.entities.CompanyDotloopProfileMapping;
 import com.realtech.socialsurvey.core.entities.ContactDetailsSettings;
 import com.realtech.socialsurvey.core.entities.ContactNumberSettings;
 import com.realtech.socialsurvey.core.entities.CrmBatchTracker;
@@ -71,6 +69,7 @@ import com.realtech.socialsurvey.core.entities.FeedIngestionEntity;
 import com.realtech.socialsurvey.core.entities.FileUpload;
 import com.realtech.socialsurvey.core.entities.LicenseDetail;
 import com.realtech.socialsurvey.core.entities.LockSettings;
+import com.realtech.socialsurvey.core.entities.LoopProfileMapping;
 import com.realtech.socialsurvey.core.entities.MailContent;
 import com.realtech.socialsurvey.core.entities.MailContentSettings;
 import com.realtech.socialsurvey.core.entities.MailIdSettings;
@@ -248,6 +247,12 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
     @Autowired
     private SettingsSetter settingsSetter;
 
+    @Autowired
+    private GenericDao<CompanyDotloopProfileMapping, Long> companyDotloopProfileMappingDao;
+
+    @Autowired
+    private GenericDao<LoopProfileMapping, Long> loopProfileMappingDao;
+
 
     /**
      * This method adds a new company and updates the same for current user and all its user
@@ -334,7 +339,8 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
         LOG.debug( "Adding the default region" );
         // TODO:adding default comapany,state,city,zipcode as null
         Region region = addNewRegion( user, CommonConstants.DEFAULT_REGION_NAME, CommonConstants.YES,
-            CommonConstants.DEFAULT_ADDRESS, null, null, null, null, null, null );
+            null, null, null, null, null, null, null );
+        
         ProfilesMaster profilesMaster = userManagementService
             .getProfilesMasterById( CommonConstants.PROFILES_MASTER_REGION_ADMIN_PROFILE_ID );
 
@@ -349,7 +355,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
         LOG.debug( "Adding the default branch" );
         // TODO:setting default country,state,city,zipcode null
         Branch branch = addNewBranch( user, region.getRegionId(), CommonConstants.YES, CommonConstants.DEFAULT_BRANCH_NAME,
-            CommonConstants.DEFAULT_ADDRESS, null, null, null, null, null, null );
+            null, null, null, null, null, null, null );
         profilesMaster = userManagementService.getProfilesMasterById( CommonConstants.PROFILES_MASTER_BRANCH_ADMIN_PROFILE_ID );
 
         LOG.debug( "Creating user profile for branch admin" );
@@ -1886,7 +1892,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 
         LOG.debug( "Adding default branch for the new region created" );
         addNewBranch( user, region.getRegionId(), CommonConstants.YES, CommonConstants.DEFAULT_BRANCH_NAME,
-            CommonConstants.DEFAULT_ADDRESS, null, null, null, null, null, null );
+            null, null, null, null, null, null, null );
 
         /**
          * If userId or email is provided, call the service for adding and assigning user to the
@@ -2162,16 +2168,17 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
                         if ( newProfileBranch != null
                             && newProfileBranch.getIsDefaultBySystem() == CommonConstants.IS_DEFAULT_BY_SYSTEM_YES
                             && userProfileNew.getProfilesMaster().getProfileId() == CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID ) {
-                        	
-                        	Region newProfileRegion = regionDao.findById(Region.class, userProfileNew.getRegionId());
-                        	
-                        	// if both branches are default and if new profiles region is not default than make new profile as primary
-                        	if(newProfileRegion != null && newProfileRegion.getIsDefaultBySystem() != CommonConstants.IS_DEFAULT_BY_SYSTEM_YES){
-                        		isPrimary = CommonConstants.IS_PRIMARY_TRUE;
-                        	}else{
-                        		 isPrimary = CommonConstants.IS_PRIMARY_FALSE;
-                        	}
-                         // if new profile's branch is not default than make new profile as primary and change old one  	
+
+                            Region newProfileRegion = regionDao.findById( Region.class, userProfileNew.getRegionId() );
+
+                            // if both branches are default and if new profiles region is not default than make new profile as primary
+                            if ( newProfileRegion != null
+                                && newProfileRegion.getIsDefaultBySystem() != CommonConstants.IS_DEFAULT_BY_SYSTEM_YES ) {
+                                isPrimary = CommonConstants.IS_PRIMARY_TRUE;
+                            } else {
+                                isPrimary = CommonConstants.IS_PRIMARY_FALSE;
+                            }
+                            // if new profile's branch is not default than make new profile as primary and change old one  	
                         } else {
                             profile.setIsPrimary( CommonConstants.IS_PRIMARY_FALSE );
                             userProfileDao.update( profile );
@@ -3013,9 +3020,9 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
         if ( branchName == null || branchName.isEmpty() ) {
             throw new InvalidInputException( "Branch name is null in addNewBranch" );
         }
-        if ( branchAddress1 == null || branchAddress1.isEmpty() ) {
+        /*if ( branchAddress1 == null || branchAddress1.isEmpty() ) {
             throw new InvalidInputException( "Branch address is null in addNewBranch" );
-        }
+        }*/
         LOG.info( "Method add new branch called for regionId : " + regionId + " and branchName : " + branchName );
         Region region = null;
         LOG.debug( "Fetching region for branch to be added" );
@@ -3051,6 +3058,17 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
         branch.setZipcode( branchZipcode );
         branch.setCountryCode( branchCountryCode );
         branch.setBranchName( branchName );
+
+        if ( ( branchAddress1 != null && !branchAddress1.isEmpty() ) || ( branchAddress2 != null && !branchAddress2.isEmpty() ) ) {
+            try {
+                settingsSetter.setSettingsValueForBranch( branch, SettingsForApplication.ADDRESS, true );
+            } catch ( NonFatalException nonFatalException ) {
+                LOG.error(
+                    "NonFatalException while updating profile address details. Reason :" + nonFatalException.getMessage(),
+                    nonFatalException );
+            }
+            userManagementService.updateBranch( branch );
+        }
 
         LOG.debug( "Updating branch table with profile name" );
         branchDao.update( branch );
@@ -3294,6 +3312,17 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
         region.setState( state );
         region.setCity( city );
         region.setZipcode( zipcode );
+
+        if ( ( address1 != null && !address1.isEmpty() ) || ( address2 != null && !address2.isEmpty() ) ) {
+            try {
+                settingsSetter.setSettingsValueForRegion( region, SettingsForApplication.ADDRESS, true );
+            } catch ( NonFatalException nonFatalException ) {
+                LOG.error(
+                    "NonFatalException while updating profile address details. Reason :" + nonFatalException.getMessage(),
+                    nonFatalException );
+            }
+            userManagementService.updateRegion( region );
+        }
 
         LOG.debug( "Calling method to insert region settings" );
         try {
@@ -4595,23 +4624,157 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
             .updateParticularKeyOrganizationUnitSettings( MongoOrganizationUnitSettingDaoImpl.KEY_MAIL_CONTENT,
                 mailContentSettings, organizationUnitSettings, collectionName );
     }
-    
+
+
     @Override
     @Transactional
-    public void updateRegion(Region region){
-    	LOG.info( "Method to change region details updateRegion() started." );
+    public void updateRegion( Region region )
+    {
+        LOG.info( "Method to change region details updateRegion() started." );
         regionDao.merge( region );
         LOG.info( "Method to change region details updateRegion() finished." );
     }
-    
+
+
     @Override
     @Transactional
-    public void updateBranch(Branch branch){
-    	LOG.info( "Method to change branch details updateBranch() started." );
+    public void updateBranch( Branch branch )
+    {
+        LOG.info( "Method to change branch details updateBranch() started." );
         branchDao.merge( branch );
         LOG.info( "Method to change branch details updateBranch() finished." );
     }
 
+
+    @Override
+    @Transactional
+    public long getLoopsCountByProfile( String profileId ) throws InvalidInputException
+    {
+    	if(profileId == null || profileId.isEmpty()){
+    		LOG.error("Profile id is not passed to get loop count");
+    		throw new InvalidInputException("Profile id is not passed to get loop count");
+    	}
+        LOG.debug( "Inside method getLoopsByProfile for profileId " + profileId );
+        Map<String, Object> queries = new HashMap<>();
+        queries.put(CommonConstants.KEY_DOTLOOP_PROFILE_ID_COLUMN, profileId);
+        long numberOfLoops = loopProfileMappingDao.findNumberOfRowsByKeyValue( LoopProfileMapping.class,
+            queries);
+        return numberOfLoops;
+    }
+
+
+    @Override
+    @Transactional
+    public void saveLoopsForProfile( LoopProfileMapping loopProfileMapping ) throws InvalidInputException
+    {
+    	if(loopProfileMapping == null){
+    		LOG.error("null loop profile mapping sent for insert");
+    		throw new InvalidInputException("null loop profile mapping sent for insert");
+    	}
+        LOG.debug( "Inside method saveLoopsForProfile " );
+        loopProfileMappingDao.save( loopProfileMapping );
+
+    }
+    
+    @Override
+    @Transactional
+    public LoopProfileMapping getLoopByProfileAndLoopId(String profileId, String loopId) throws InvalidInputException{
+    	if(profileId == null || profileId.isEmpty() || loopId == null || loopId.isEmpty()){
+    		LOG.error("Profile id/ loop id is not set to fetch loop profile data");
+    		throw new InvalidInputException("Profile id/ loop id is not set to fetch loop profile data");
+    	}
+    	LOG.info("Getting loop for profile id: "+profileId+" and loop id: "+loopId);
+    	LoopProfileMapping loop = null;
+    	Map<String, Object> queries = new HashMap<>();
+    	queries.put(CommonConstants.KEY_DOTLOOP_PROFILE_ID_COLUMN, profileId);
+    	queries.put(CommonConstants.KEY_DOTLOOP_PROFILE_LOOP_ID_COLUMN, loopId);
+    	List<LoopProfileMapping> loops = loopProfileMappingDao.findByKeyValue(LoopProfileMapping.class, queries);
+    	if(loops != null && loops.size() > 0){
+    		loop = loops.get(CommonConstants.INITIAL_INDEX);
+    	}
+    	return loop;
+    }
+
+
+    @Override
+    @Transactional
+    public CompanyDotloopProfileMapping getCompanyDotloopMappingByCompanyIdAndProfileId( long companyId, String profileId ) throws InvalidInputException
+    {
+    	if(companyId <= 0l || profileId == null || profileId.isEmpty()){
+    		LOG.error("Company id/ profile id is not provided to get company dotloop mapping");
+    		throw new InvalidInputException("Company id/ profile id is not provided to get company dotloop mapping");
+    	}
+        LOG.debug( "Inside method getCompanyDotloopMappingByCompanyId for company " + companyId );
+
+        Map<String, Object> queries = new HashMap<String, Object>();
+        queries.put( "companyId", companyId );
+        queries.put( "profileId", profileId );
+        List<CompanyDotloopProfileMapping> companyDotLoopProfileMappingList = companyDotloopProfileMappingDao.findByKeyValue(
+            CompanyDotloopProfileMapping.class, queries );
+        if ( companyDotLoopProfileMappingList == null || companyDotLoopProfileMappingList.isEmpty() ) {
+            return null;
+        } else {
+            return companyDotLoopProfileMappingList.get( CommonConstants.INITIAL_INDEX );
+        }
+
+    }
+
+
+    @Override
+    @Transactional
+    public CompanyDotloopProfileMapping saveCompanyDotLoopProfileMapping(
+        CompanyDotloopProfileMapping companyDotloopProfileMapping ) throws InvalidInputException
+    {
+    	if(companyDotloopProfileMapping ==  null){
+    		LOG.error("Company dotloop profile mapping is null for insert");
+    		throw new InvalidInputException("Company dotloop profile mapping is null for insert");
+    	}
+        LOG.debug( "Inside method saveCompanyDotloopProfileMapping " );
+        return companyDotloopProfileMappingDao.save( companyDotloopProfileMapping );
+
+    }
+
+
+    @Override
+    @Transactional
+    public void updateCompanyDotLoopProfileMapping( CompanyDotloopProfileMapping companyDotloopProfileMapping ) throws InvalidInputException
+    {
+    	if(companyDotloopProfileMapping == null){
+    		LOG.error("Company dotloop profile mapping is null for update");
+    		throw new InvalidInputException("Company dotloop profile mapping is null for update");
+    	}
+        LOG.debug( "Inside method saveCompanyDotloopProfileMapping " );
+        companyDotloopProfileMappingDao.update( companyDotloopProfileMapping );
+
+    }
+
+
+    @Override
+    @Transactional
+    public CompanyDotloopProfileMapping getCompanyDotloopMappingByProfileId( String profileId ) throws InvalidInputException
+    {
+    	if(profileId == null || profileId.isEmpty()){
+    		LOG.error("Profile id is null to fetch company dot loop mapping");
+    		throw new InvalidInputException("Profile id is null to fetch company dot loop mapping");
+    	}
+        List<CompanyDotloopProfileMapping> companyDotloopProfileMappingList = companyDotloopProfileMappingDao.findByColumn(
+            CompanyDotloopProfileMapping.class, "profileId", profileId );
+        if ( companyDotloopProfileMappingList.isEmpty() ) {
+            return null;
+        } else {
+            return companyDotloopProfileMappingList.get( 0 );
+        }
+    }
+    
+    @Override
+    @Transactional
+    public List<OrganizationUnitSettings> getOrganizationUnitSettingsForCRMSource(String crmSource, String collectionName) throws InvalidInputException, NoRecordsFetchedException{
+    	LOG.info("Getting list of crm info for source: "+crmSource);
+    	List<OrganizationUnitSettings> organizationUnitSettingsList = null;
+    	organizationUnitSettingsList = organizationUnitSettingsDao.getOrganizationUnitListWithCRMSource(crmSource, collectionName);
+    	LOG.info("Returning organization unit settings list with provided crm list");
+    	return organizationUnitSettingsList;
+    }
 
 }
 // JIRA: SS-27: By RM05: EOC

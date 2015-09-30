@@ -199,6 +199,19 @@
 		</property>
 		<property name="durability" value="true" />
 	</bean>
+	
+	<!-- Setting survey file upload job detail -->
+	<bean id="surveyfileuploadjobdetail"
+		class="org.springframework.scheduling.quartz.JobDetailFactoryBean">
+		<property name="jobClass"
+			value="com.realtech.socialsurvey.core.starter.CSVBulkSurveyUploader" />
+		<property name="jobDataAsMap">
+			<map>
+				<entry key="surveyuploadHandler" value-ref="surveyuploadHandler" />
+			</map>
+		</property>
+		<property name="durability" value="true" />
+	</bean>
 
 	<!-- Setting zillow job detail -->
 	<!-- <bean id="zillowjobdetail" class="org.springframework.scheduling.quartz.JobDetailFactoryBean"> 
@@ -220,6 +233,25 @@
 		</property>
 		<property name="durability" value="true" />
 	</bean>
+
+
+	<!-- Setting dotloop job detail -->
+	<bean id="dotloopjobdetail"
+		class="org.springframework.scheduling.quartz.JobDetailFactoryBean">
+		<property name="jobClass"
+			value="com.realtech.socialsurvey.core.starter.DotloopReviewProcessor" />
+		<property name="jobDataAsMap">
+			<map>
+				<entry key="dotloopIntegrationApiBuilder" value-ref="dotloopIntegrationApiBuilder" />
+				<entry key="organizationManagementService" value-ref="organizationManagementService" />
+				<entry key="surveyHandler" value-ref="surveyHandler" />
+				<entry key="utils" value-ref="utils" />
+				<entry key="maskEmail" value="${MASK_EMAIL_ADDRESS}" />
+			</map>
+		</property>
+		<property name="durability" value="true" />
+	</bean>
+
 
 	<!-- setting cron for Account deactivator -->
 	<bean id="sitemapgeneratorcron"
@@ -303,12 +335,26 @@
 		<property name="cronExpression" value="0 45 7 * * ?" />
 	</bean>
 
-	<!-- setting cron for email reader -->
+	<!-- setting cron for file upload -->
 	<bean id="fileuploadcron"
 		class="org.springframework.scheduling.quartz.SimpleTriggerFactoryBean">
 		<property name="jobDetail" ref="fileuploadjobdetail" />
 		<property name="repeatCount" value="0" />
 		<property name="startDelay" value="2000" />
+	</bean>
+	
+	<!-- setting cron for survey file upload -->
+	<bean id="surveyfileuploadcron"
+		class="org.springframework.scheduling.quartz.SimpleTriggerFactoryBean">
+		<property name="jobDetail" ref="surveyfileuploadjobdetail" />
+		<property name="repeatCount" value="0" />
+		<property name="startDelay" value="2000" />
+	</bean>
+
+	<bean id="dotloopcron"
+		class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
+		<property name="jobDetail" ref="dotloopjobdetail" />
+		<property name="cronExpression" value="0 0 1 * * ?" />
 	</bean>
 
 
@@ -332,7 +378,9 @@
 				<ref bean="crmdataagentidmapperjobdetail" />
 				<ref bean="imageloaderjobdetail" />
 				<ref bean="fileuploadjobdetail" />
-				<ref bean="hierarchysettingsjobdetail" />
+				<ref bean="dotloopjobdetail" />
+				<ref bean="surveyfileuploadjobdetail" />
+				<!-- <ref bean="hierarchysettingsjobdetail" /> -->
 				<!-- <ref bean="zillowjobdetail" /> -->
 			</list>
 		</property>
@@ -350,7 +398,9 @@
 				<ref bean="crmdataagentidmappercron" />
 				<ref bean="imageloadercron" />
 				<ref bean="fileuploadcron" />
-				<ref bean="hierarchysettingscron" />
+				<ref bean="dotloopcron" />
+				<ref bean="surveyfileuploadcron" />
+				<!-- <ref bean="hierarchysettingscron" /> -->
 				<!-- <ref bean="zillowcron" /> -->
 			</list>
 		</property>
@@ -407,7 +457,8 @@
 		class="com.realtech.socialsurvey.core.services.upload.impl.CloudUploadServiceImpl" />
 	<bean id="profileManagementService"
 		class="com.realtech.socialsurvey.core.services.organizationmanagement.impl.ProfileManagementServiceImpl" />
-
+	<bean id="dotloopIntegrationApiBuilder"
+	class="com.realtech.socialsurvey.core.integration.dotloop.DotloopIntergrationApiBuilder" />
 	<bean id="regionsFullImport"
 		class="com.realtech.socialsurvey.core.utils.solr.RegionsFullImport" />
 	<bean id="branchesFullImport"
@@ -419,6 +470,12 @@
 	<!-- Posts to wall -->
 	<bean id="postToWall" class="com.realtech.socialsurvey.core.utils.mongo.PostToWall" />
 
-	<!-- Email reader -->
+	<!-- CSV Upload reader -->
 	<bean id="uploadHandler" class="com.realtech.socialsurvey.core.handler.CSVUploadHandler" />
+	
+	<!-- CSV Upload reader -->
+	<bean id="surveyuploadHandler" class="com.realtech.socialsurvey.core.handler.CSVBulkSurveyInitiatorHandler" />
+	
+	<!-- Utils dependency -->
+	<bean id="utils" class="com.realtech.socialsurvey.core.commons.Utils" />
 </beans>

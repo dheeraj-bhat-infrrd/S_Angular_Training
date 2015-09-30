@@ -7,8 +7,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
+
 import org.apache.commons.lang.StringUtils;
 import org.apache.solr.common.SolrDocument;
 import org.slf4j.Logger;
@@ -22,7 +24,9 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
+
 import twitter4j.TwitterException;
+
 import com.google.gson.Gson;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.dao.impl.MongoSocialPostDaoImpl;
@@ -56,6 +60,7 @@ import com.realtech.socialsurvey.web.common.ErrorCodes;
 import com.realtech.socialsurvey.web.common.ErrorResponse;
 import com.realtech.socialsurvey.web.common.JspResolver;
 import com.realtech.socialsurvey.web.util.RequestUtils;
+
 import facebook4j.FacebookException;
 
 // JIRA SS-119 by RM-05 : BOC
@@ -203,15 +208,17 @@ public class SurveyManagementController {
 			SurveyDetails survey = surveyHandler.getSurveyDetails(agentId, customerEmail, firstName, lastName);
 			try {
 				String customerName = emailFormatHelper.getCustomerDisplayNameForEmail(survey.getCustomerFirstName(), survey.getCustomerLastName());
-
 				User agent = userManagementService.getUserByUserId(agentId);
+				
+				String logoUrl = userManagementService.fetchAppropriateLogoUrlFromHierarchyForUser(agent.getUserId());
+				LOG.info("logourl is : " + logoUrl + " for user " + agent.getUserId());
 				if (enableKafka.equals(CommonConstants.YES)) {
 					emailServices.queueSurveyCompletionMail(customerEmail, customerName, survey.getAgentName(), agent.getEmailId(),
 							agent.getProfileName());
 				}
 				else {
 					emailServices.sendSurveyCompletionMail(customerEmail, customerName, survey.getAgentName(), agent.getEmailId(),
-							agent.getProfileName());
+							agent.getProfileName() , logoUrl);
 				}
 
 				// Generate the text as in mail

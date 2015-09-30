@@ -58,7 +58,7 @@
 					<select id="survey-count-days" class="float-left dash-sel-item">
 						<option value="30"><spring:message code="label.duration.one.key" /></option>
 						<option value="60"><spring:message code="label.duration.two.key" /></option>
-						<option value="90"><spring:message code="label.duration.three.key" /></option>
+						<option value="90" selected><spring:message code="label.duration.three.key" /></option>
 						<option value="365"><spring:message code="label.duration.four.key" /></option>
 					</select>
 				</div>
@@ -88,7 +88,7 @@
 					<select id="dsh-grph-format" class="float-left dash-sel-item">
 						<option value="30"><spring:message code="label.duration.one.key" /></option>
 						<option value="60"><spring:message code="label.duration.two.key" /></option>
-						<option value="90"><spring:message code="label.duration.three.key" /></option>
+						<option value="90" selected><spring:message code="label.duration.three.key" /></option>
 						<option value="365"><spring:message code="label.duration.four.key" /></option>
 						<%-- <option value="weekly"><spring:message code="label.format.one.key" /></option>
 						<option value="monthly"><spring:message code="label.format.two.key" /></option>

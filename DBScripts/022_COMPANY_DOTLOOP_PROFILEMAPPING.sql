@@ -1,0 +1,9 @@
+  create table `ss_user`.`COMPANY_DOTLOOP_PROFILEMAPPING`( 
+   `COMPANY_PROFILE_MAPPING_ID` bigint(11) NOT NULL AUTO_INCREMENT , 
+   `COMPANY_ID` bigint(11) NOT NULL , 
+   `PROFILE_ID` varchar(255) NOT NULL , 
+   `PROFILE_EMAIL_ADDRESS` varchar(100) , 
+   `PROFILE_NAME` varchar(100) , 
+   `PROFILE_ACTIVE` tinyint(4) , 
+   PRIMARY KEY (`COMPANY_PROFILE_MAPPING_ID`)
+ );

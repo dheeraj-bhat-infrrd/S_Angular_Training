@@ -138,6 +138,7 @@
 				url : window.location.origin + "/rest/survey/restartsurvey",
 				data : payload,
 				type : "GET",
+				cache : false,
 				dataType : "TEXT",
 				success : function(){
 					$('#overlay-toast').html('Mail sent to your registered email id for retaking the survey for ' + "${agentName}");

@@ -44,7 +44,6 @@ function landingFlow() {
 		
 		if ($(this).closest('.welcome-popup-wrapper').attr('data-page') == 'two') {
 			callAjaxGET("./finalizeprofileimage.do", function(data) {
-				console.log(data);
 			}, false);
 			
 			$('#wc-address-submit').trigger('click');
@@ -66,7 +65,6 @@ function landingFlow() {
 	});
 	
 	onpopstate = function(event) {
-        console.log('history modified');
         if(location.hash.trim()!=''){
             historyCallback= true;
             refreshSupport=true;
