@@ -321,7 +321,14 @@
 			$('#edit-participation-mail-content-disabled').hide();
 		});
 		$('#revert-participation-mail').click(function() {
-			revertMailContent('participationmail');
+			$('#overlay-main').show();
+			$('#overlay-continue').show();
+			$('#overlay-continue').html("Reset");
+			$('#overlay-cancel').html("Cancel");
+			$('#overlay-header').html("Reset Mail Template");
+			$('#overlay-text').html("Are you sure you want to reset the mail template ?");
+			$('#overlay-continue').attr("onclick", "revertMailContent('participationmail');");
+			
 		});
 		
 		//survey reminder mail
@@ -355,7 +362,13 @@
 			$('#edit-participation-reminder-mail-content-disabled').hide();
 		});
 		$('#revert-participation-reminder-mail').click(function() {
-			revertMailContent('participationremindermail');
+			$('#overlay-main').show();
+			$('#overlay-continue').show();
+			$('#overlay-continue').html("Reset");
+			$('#overlay-cancel').html("Cancel");
+			$('#overlay-header').html("Reset Mail Template");
+			$('#overlay-text').html("Are you sure you want to reset the mail template ?");
+			$('#overlay-continue').attr("onclick", "revertMailContent('participationremindermail');");
 		});
 		
 		//for survey completion mail
@@ -389,7 +402,13 @@
 			$('#edit-survey-completion-mail-content-disabled').hide();
 		});
 		$('#revert-survey-completion-mail').click(function() {
-			revertMailContent('surveycompletionmail');
+			$('#overlay-main').show();
+			$('#overlay-continue').show();
+			$('#overlay-continue').html("Reset");
+			$('#overlay-cancel').html("Cancel");
+			$('#overlay-header').html("Reset Mail Template");
+			$('#overlay-text').html("Are you sure you want to reset the mail template ?");
+			$('#overlay-continue').attr("onclick", "revertMailContent('surveycompletionmail');");
 		});
 		
 		//social post reminder mail
@@ -423,7 +442,13 @@
 			$('#edit-social-post-reminder-mail-content-disabled').hide();
 		});
 		$('#revert-social-post-reminder-mail').click(function() {
-			revertMailContent('socialpostremindermail');
+			$('#overlay-main').show();
+			$('#overlay-continue').show();
+			$('#overlay-continue').html("Reset");
+			$('#overlay-cancel').html("Cancel");
+			$('#overlay-header').html("Reset Mail Template");
+			$('#overlay-text').html("Are you sure you want to reset the mail template ?");
+			$('#overlay-continue').attr("onclick", "revertMailContent('socialpostremindermail');");
 		});
 		
 		//incomplete survey reminder mail
@@ -457,21 +482,16 @@
 			$('#edit-incomplete-survey-reminder-mail-content-disabled').hide();
 		});
 		$('#revert-incomplete-survey-reminder-mail').click(function() {
-			revertMailContent('incompletesurveyremindermail');
+			$('#overlay-main').show();
+			$('#overlay-continue').show();
+			$('#overlay-continue').html("Reset");
+			$('#overlay-cancel').html("Cancel");
+			$('#overlay-header').html("Reset Mail Template");
+			$('#overlay-text').html("Are you sure you want to reset the mail template ?");
+			$('#overlay-continue').attr("onclick", "revertMailContent('incompletesurveyremindermail');");
 		});
 		
-		function revertMailContent(mailcategory) {
-		    showOverlay();
-			var payload = {
-				"mailcategory" : mailcategory
-			};
-			callAjaxPostWithPayloadData('./revertsurveyparticipationmail.do', function (data) {
-				showMainContent('./showemailsettings.do');
-				hideOverlay();
-				$("#overlay-toast").html(data);
-				showToast();
-			}, payload, true);
-		}
+		
 		
 		$('#reminder-interval').change(function() {
 			$('#mailcategory').val('reminder-interval');
