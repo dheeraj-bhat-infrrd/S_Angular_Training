@@ -1686,11 +1686,6 @@ public class UserManagementController
             long profileId = Long.parseLong( request.getParameter( "profileId" ) );
             int status = Integer.parseInt( request.getParameter( "status" ) );
 
-            //TODO if user profile is primary than make any other profile as primary for the user
-            if(status == 0){
-            	
-            }
-            
             userManagementService.updateUserProfile( user, profileId, status );
             userManagementService.updateUserProfilesStatus( user, profileId );
 

@@ -2525,18 +2525,6 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
         return user;
     }
     
-    /*
-     * (non-Javadoc)
-     * @see com.realtech.socialsurvey.core.services.organizationmanagement.UserManagementService#updatePrimaryProfileOfUser(long, long)
-     */
-    @Override
-    public void updatePrimaryProfileOfUser(long userid , long profileId){
-    	LOG.info("inside updatePrimaryProfileOfUser() method for user,  userid : " + userid);
-    	UserProfile profile = userProfileDao.findById(UserProfile.class, profileId);
-    	if(profile == null){
-    		
-    	}
-    }
 
 
     /***
@@ -2602,8 +2590,8 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
                     } else if ( isOldProfileAdmin ) {
                         LOG.debug( "Old primary profile is an admin profile of type "
                             + profile.getProfilesMaster().getProfile() );
-                        //if old profile is for admin and have low priority than make new profile as primary
-                        if ( userProfileNew.getProfilesMaster().getProfileId() > profile.getProfilesMaster().getProfileId() ) {
+                        //if old profile is for admin and new is for agent than remove primary from old and mark new profile as primary
+                        if ( userProfileNew.getProfilesMaster().getProfileId() == CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID ) {
                             profile.setIsPrimary( CommonConstants.IS_PRIMARY_FALSE );
                             userProfileDao.update( profile );
                             isPrimary = CommonConstants.IS_PRIMARY_TRUE;
