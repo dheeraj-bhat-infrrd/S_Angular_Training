@@ -29,8 +29,8 @@ public class UserSupportServiceImpl implements UserSupportService {
 	@Value("${FILE_DIRECTORY_LOCATION}")
 	private String fileDirectoryLocation;
 	
-	@Value ( "${APPLICATION_ADMIN_EMAIL}")
-    private String applicationAdminEmail;
+	@Value ( "${APPLICATION_SUPPORT_EMAIL}")
+    private String applicationSupportEmail;
 
     @Value ( "${APPLICATION_ADMIN_NAME}")
     private String applicationAdminName;
@@ -48,7 +48,7 @@ public class UserSupportServiceImpl implements UserSupportService {
 		
 		LOG.info("Method sendHelpMailToAdmin started.");
 		try {
-			emailServices.sendHelpMailToAdmin(user ,applicationAdminName, mailSubject, MailText, applicationAdminEmail, attachmentsDetails );
+			emailServices.sendHelpMailToAdmin(user ,applicationAdminName, mailSubject, MailText, applicationSupportEmail, attachmentsDetails );
 		} catch (InvalidInputException | UndeliveredEmailException e) {
 			// TODO Auto-generated catch block
 			LOG.info("Exception caught : " + e.getMessage());

@@ -246,7 +246,7 @@ public class IncompleteSurveyReminderSender extends QuartzJobBean
             mailBody = mailBody.replaceAll( "\\[CurrentYear\\]", currentYear );
             mailBody = mailBody.replaceAll( "\\[FullAddress\\]", fullAddress );
             mailBody = mailBody.replaceAll( "null", "" );
-            String mailSubject = CommonConstants.REMINDER_MAIL_SUBJECT + agentName;
+            String mailSubject = CommonConstants.REMINDER_MAIL_SUBJECT;
             if ( mailContent.getMail_subject() != null && !mailContent.getMail_subject().isEmpty() ) {
                 mailSubject = mailContent.getMail_subject();
                 mailSubject = mailSubject.replaceAll( "\\[AgentName\\]", agentName );
