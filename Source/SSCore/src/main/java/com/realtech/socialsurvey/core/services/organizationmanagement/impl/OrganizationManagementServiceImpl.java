@@ -3779,6 +3779,11 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
         organizationSettings.setContact_details( contactSettings );
         organizationSettings.setLockSettings( new LockSettings() );
 
+        if ( organizationSettings.getSurvey_settings() == null ) {
+            SurveySettings surveySettings = new SurveySettings();
+            organizationSettings.setSurvey_settings( surveySettings );
+        }
+
         // set default profile stages.
         organizationSettings.setProfileStages( profileCompletionList.getDefaultProfileCompletionList( false ) );
 
@@ -3816,6 +3821,11 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
         // Calling method to generate and set profile name and profile url
         generateAndSetBranchProfileNameAndUrl( branch, organizationSettings );
 
+        if ( organizationSettings.getSurvey_settings() == null ) {
+            SurveySettings surveySettings = new SurveySettings();
+            organizationSettings.setSurvey_settings( surveySettings );
+        }
+        
         ContactDetailsSettings contactSettings = getContactDetailsSettingsFromBranch( branch );
         organizationSettings.setContact_details( contactSettings );
         organizationSettings.setLockSettings( new LockSettings() );

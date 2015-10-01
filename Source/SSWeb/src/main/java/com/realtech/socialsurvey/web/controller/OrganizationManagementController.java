@@ -1244,12 +1244,13 @@ public class OrganizationManagementController
         try {
             OrganizationUnitSettings unitSettings = null;
             String collectionName = "";
+            boolean status = false;
             if ( entityType.equalsIgnoreCase( CommonConstants.COMPANY_ID ) ) {
                 collectionName = MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION;
                 unitSettings = organizationManagementService.getCompanySettings( entityId );
                 Company company = userManagementService.getCompanyById( entityId );
                 if ( company != null ) {
-                    settingsSetter.setSettingsValueForCompany( company, SettingsForApplication.MIN_SCORE, true );
+                    settingsLocker.lockSettingsValueForCompany( company, SettingsForApplication.MIN_SCORE, minScoreLocked );
                     userManagementService.updateCompany( company );
                 }
             } else if ( entityType.equalsIgnoreCase( CommonConstants.REGION_ID ) ) {
@@ -1257,7 +1258,7 @@ public class OrganizationManagementController
                 unitSettings = organizationManagementService.getRegionSettings( entityId );
                 Region region = userManagementService.getRegionById( entityId );
                 if ( region != null ) {
-                    settingsSetter.setSettingsValueForRegion( region, SettingsForApplication.MIN_SCORE, true );
+                    settingsLocker.lockSettingsValueForRegion( region, SettingsForApplication.MIN_SCORE, minScoreLocked );
                     userManagementService.updateRegion( region );
                 }
             } else if ( entityType.equalsIgnoreCase( CommonConstants.BRANCH_ID ) ) {
@@ -1265,7 +1266,7 @@ public class OrganizationManagementController
                 unitSettings = organizationManagementService.getBranchSettingsDefault( entityId );
                 Branch branch = userManagementService.getBranchById( entityId );
                 if ( branch != null ) {
-                    settingsSetter.setSettingsValueForBranch( branch, SettingsForApplication.MIN_SCORE, true );
+                    settingsLocker.lockSettingsValueForBranch( branch, SettingsForApplication.MIN_SCORE, minScoreLocked );
                     userManagementService.updateBranch( branch );
                 }
             } else if ( entityType.equalsIgnoreCase( CommonConstants.AGENT_ID ) ) {
@@ -1275,6 +1276,10 @@ public class OrganizationManagementController
                 throw new InvalidInputException( "Invalid Collection Type" );
             }
             lockSettings = unitSettings.getLockSettings();
+            lockSettings = updateLockSettings( parentLock, lockSettings, minScoreLocked );
+            lockSettings = profileManagementService.updateLockSettings( collectionName, unitSettings, lockSettings );
+            unitSettings.setLockSettings( lockSettings );
+
             message = "Settings locked ";
         } catch ( Exception e ) {
             LOG.error( "Exception caught ", e.getMessage() );
