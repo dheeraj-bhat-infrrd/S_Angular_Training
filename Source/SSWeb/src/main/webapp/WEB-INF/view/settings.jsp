@@ -42,7 +42,7 @@
 	<div class="container">
 
 		<!-- Starting code for Autopost Score -->
-		<c:if test="${profilemasterid == 1 || accountMasterId == 1}">
+		<c:if test="${accountMasterId != 5}">
 			<div class="um-top-container">
 				<div class="um-header margin-top-25"><spring:message code="label.scorepost.key" /></div>
 				<div class="clearfix st-score-wrapper">
@@ -54,14 +54,10 @@
 							<div class="st-score-rt-top"><spring:message code="label.scorepost.min.key" /></div>
 							<div class="st-score-rt-line2 clearfix">
 								<div class="st-rating-wrapper settings-rating-wrapper float-left clearfix" id="rating-min-post-parent">
-									<div class="rating-star icn-full-star"></div>
-									<div class="rating-star icn-full-star"></div>
-									<div class="rating-star icn-half-star"></div>
-									<div class="rating-star icn-no-star"></div>
-									<div class="rating-star icn-no-star"></div>
 								</div>
 								<div class="st-rating-txt float-left">
 									<!-- set the min rating -->
+									<c:set var="minpostscore" value="0"/>
 									<c:if test="${accountSettings != null && accountSettings.survey_settings!= null
 										&& accountSettings.survey_settings.show_survey_above_score != null}">
 										<c:set var="minpostscore" value="${accountSettings.survey_settings.show_survey_above_score}"/>
@@ -228,9 +224,8 @@ $(document).ready(function() {
 		$('#atpst-chk-box').addClass('bd-check-img-checked');
 	}
 	
-	var profileMasterId = "${profilemasterid}";
 	var accountMasterId = "${accountMasterId}";
-	if (profileMasterId == 1 || accountMasterId == 1) {
+	if (accountMasterId != 5) {
 		
 		autoAppendRatingDropdown('#st-dd-wrapper-min-post', "st-dd-item st-dd-item-min-post");
 		changeRatingPattern($('#rating-min-post').val(), $('#rating-min-post-parent'));
