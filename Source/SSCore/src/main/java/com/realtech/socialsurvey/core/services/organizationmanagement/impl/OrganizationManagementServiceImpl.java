@@ -560,6 +560,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
             contactNumberSettings.setWork( organizationalDetails.get( CommonConstants.COMPANY_CONTACT_NUMBER ) );
             try {
                 settingsSetter.setSettingsValueForCompany( company, SettingsForApplication.PHONE, true );
+
             } catch ( NonFatalException e ) {
                 LOG.error( "Exception Caught " + e.getMessage() );
             }
@@ -592,6 +593,11 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
         surveySettings.setSadTextComplete( sadTextComplete );
         surveySettings.setAutoPostEnabled( true );
         surveySettings.setShow_survey_above_score( CommonConstants.DEFAULT_AUTOPOST_SCORE );
+        try {
+            settingsSetter.setSettingsValueForCompany( company, SettingsForApplication.MIN_SCORE, true );
+        } catch ( NonFatalException e1 ) {
+            LOG.error( "Exception caught ", e1 );
+        }
         surveySettings.setSurvey_reminder_interval_in_days( CommonConstants.DEFAULT_REMINDERMAIL_INTERVAL );
         companySettings.setSurvey_settings( surveySettings );
 
@@ -635,7 +641,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
         }
 
         MailContentSettings mailContentSettings = new MailContentSettings();
-        
+
         //commented the code because it saves the mail templates in company settings. 
         /*MailContent mailContent = new MailContent();
         mailContent.setMail_subject( takeSurveyMailSubj );
@@ -1191,6 +1197,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
         return originalContentSettings;
     }
 
+
     @Override
     public MailContent deleteMailBodyFromSetting( OrganizationUnitSettings companySettings, String mailCategory )
         throws NonFatalException
@@ -1302,6 +1309,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 
         return mailContent;
     }
+
 
     @Override
     public MailContentSettings revertSurveyParticipationMailBody( OrganizationUnitSettings companySettings, String mailCategory )
@@ -2409,7 +2417,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
                 if ( profile.getIsPrimary() == CommonConstants.IS_PRIMARY_TRUE ) {
 
                     LOG.debug( "An old primary profile founded for email id " + userProfileNew.getEmailId() );
-                    
+
                     noOldProfileIsPrimary = false;
 
                     boolean isOldProfileDefault = false;
@@ -2478,9 +2486,9 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
         }
 
         // if no old profile is primary than also new profile will be primary
-        if(noOldProfileIsPrimary){
-        	LOG.debug("No old profile is primary for user so new profile will be primary" );
-        	isPrimary = CommonConstants.IS_PRIMARY_TRUE;
+        if ( noOldProfileIsPrimary ) {
+            LOG.debug( "No old profile is primary for user so new profile will be primary" );
+            isPrimary = CommonConstants.IS_PRIMARY_TRUE;
         }
         return isPrimary;
     }
