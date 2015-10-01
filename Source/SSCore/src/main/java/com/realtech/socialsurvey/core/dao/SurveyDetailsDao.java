@@ -143,4 +143,12 @@ public interface SurveyDetailsDao
 
     
     public long getSurveysReporetedAsAbusiveCount();
+
+    void updateZillowCallCount();
+
+
+    int fetchZillowCallCount();
+
+
+    void resetZillowCallCount();
 }

@@ -65,6 +65,7 @@ import com.realtech.socialsurvey.core.exception.NoRecordsFetchedException;
 import com.realtech.socialsurvey.core.exception.NonFatalException;
 import com.realtech.socialsurvey.core.integration.zillow.ZillowIntegrationApi;
 import com.realtech.socialsurvey.core.integration.zillow.ZillowIntergrationApiBuilder;
+import com.realtech.socialsurvey.core.services.mail.EmailServices;
 import com.realtech.socialsurvey.core.services.organizationmanagement.OrganizationManagementService;
 import com.realtech.socialsurvey.core.services.organizationmanagement.ProfileManagementService;
 import com.realtech.socialsurvey.core.services.organizationmanagement.UserManagementService;
@@ -123,6 +124,9 @@ public class SocialManagementController
 
     @Autowired
     private EmailFormatHelper emailFormatHelper;
+    
+    @Autowired
+    private EmailServices emailServices;
     
     @Value ( "${APPLICATION_BASE_URL}")
     private String applicationBaseUrl;
@@ -1725,7 +1729,18 @@ public class SocialManagementController
                     String code = (String) messageMap.get( "code" );
                     if ( !code.equalsIgnoreCase( "0" ) ) {
                         String errorMessage = (String) messageMap.get( "text" );
+                        
+                        if( errorMessage.contains("You exceeded the maximum API requests per day.") ){
+                        	int count = socialManagementService.fetchZillowCallCount();
+                        	if ( count != 0 ){
+	                        	LOG.debug("Zillow API call count exceeded limit. Sending mail to admin.");
+	                        	emailServices.sendZillowCallExceededMailToAdmin( count );
+	                        	socialManagementService.resetZillowCallCount();
+                        	}
+                        }
                         throw new NonFatalException( "Error code : " + code + " Error description : " + errorMessage );
+                    } else {
+                    	socialManagementService.updateZillowCallCount();
                     }
                     if ( responseMap != null ) {
                         resultMap = (HashMap<String, Object>) responseMap.get( "results" );
