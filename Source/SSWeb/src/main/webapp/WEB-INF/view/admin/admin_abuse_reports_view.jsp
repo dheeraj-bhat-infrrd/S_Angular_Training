@@ -13,24 +13,18 @@
 </div>
 &nbsp;
 <div class="abuse-report-wrapper">
-	<div class="container"></div>
+	<div class="container">
+		<div class="abuse-review-row abuse-review-hdr-row row">
+			<div class="abuse-report-col col-lg-3 col-md-3 col-sm-3 col-xs-3">Agent Name</div>
+			<div class="abuse-report-col col-lg-3 col-md-3 col-sm-3 col-xs-3">Survey</div>
+			<div class="abuse-report-col col-lg-3 col-md-3 col-sm-3 col-xs-3">Reporter Name</div>
+			<div class="abuse-report-col col-lg-3 col-md-3 col-sm-3 col-xs-3">Reporter Email</div>
+		</div>
+		<div id="admin-abs-sur-list">
+			<!-- Get the Abusive Survey list from the JavaScript -->
+		</div>
+	</div>
 </div>
-<table  align="center">
-	<thead>
-		<tr>
-			<th align="left" width="15%">Agent Name</th>
-			<th width="3%"></th>
-			<th align="left" width="30%">Survey</th>
-			<th width="3%"></th>
-			<th align="left" width="15%">Reporter Name</th>
-			<th width="3%"></th>
-			<th align="left" width="30%">Reporter Email</th>
-		</tr>
-	</thead>
-</table>
-<table id="admin-abs-sur-list" align="center">
-	<!-- Get the Abusive Survey list from the JavaScript -->
-</table>
 
 <div id="temp-message" class="hide"></div>
 <script>
