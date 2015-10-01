@@ -1731,9 +1731,12 @@ public class SocialManagementController
                         String errorMessage = (String) messageMap.get( "text" );
                         
                         if( errorMessage.contains("You exceeded the maximum API requests per day.") ){
-                        	LOG.debug("Zillow API call count exceeded limit. Sending mail to admin.");
-                        	emailServices.sendZillowCallExceededMailToAdmin();
-                        	socialManagementService.resetZillowCallCount();
+                        	int count = socialManagementService.fetchZillowCallCount();
+                        	if ( count != 0 ){
+	                        	LOG.debug("Zillow API call count exceeded limit. Sending mail to admin.");
+	                        	emailServices.sendZillowCallExceededMailToAdmin( count );
+	                        	socialManagementService.resetZillowCallCount();
+                        	}
                         }
                         throw new NonFatalException( "Error code : " + code + " Error description : " + errorMessage );
                     } else {

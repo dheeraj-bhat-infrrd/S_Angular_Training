@@ -3464,15 +3464,18 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 			                    if ( !code.equalsIgnoreCase( "0" ) ) {
 			                        String errorMessage = (String) messageMap.get( "text" );
 			                        if( errorMessage.contains("You exceeded the maximum API requests per day.") ){
-			                            LOG.debug("Zillow API call count exceeded limit. Sending mail to admin.");
-			                            try {
-                                            emailServices.sendZillowCallExceededMailToAdmin();
-                                            surveyDetailsDao.resetZillowCallCount();
-                                        } catch ( InvalidInputException e ) {
-                                            LOG.error( "Sending the mail to the admin failed due to invalid input. Reason : ", e );
-                                        } catch ( UndeliveredEmailException e ) {
-                                            LOG.error( "The email failed to get delivered. Reason : ", e );
-                                        }
+			                            int count = socialManagementService.fetchZillowCallCount();
+			                            if ( count != 0 ){
+    			                            LOG.debug("Zillow API call count exceeded limit. Sending mail to admin.");
+    			                            try {
+                                                emailServices.sendZillowCallExceededMailToAdmin( count );
+                                                surveyDetailsDao.resetZillowCallCount();
+                                            } catch ( InvalidInputException e ) {
+                                                LOG.error( "Sending the mail to the admin failed due to invalid input. Reason : ", e );
+                                            } catch ( UndeliveredEmailException e ) {
+                                                LOG.error( "The email failed to get delivered. Reason : ", e );
+                                            }
+			                            }
 			                        }
 			                        LOG.error( "Error code : " + code + " Error description : " + errorMessage );
 			                    } else {

@@ -399,5 +399,5 @@ public interface EmailServices {
             String agentName, String agentEmailId, String agentPhone, String agentTitle,
             String companyName, SurveyPreInitiation survey, String surveyLink, String logoUrl);
 
-    void sendZillowCallExceededMailToAdmin() throws InvalidInputException, UndeliveredEmailException;
+    void sendZillowCallExceededMailToAdmin( int count ) throws InvalidInputException, UndeliveredEmailException;
 }
