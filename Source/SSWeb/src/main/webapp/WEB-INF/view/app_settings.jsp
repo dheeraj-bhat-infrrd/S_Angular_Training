@@ -93,40 +93,6 @@
 		} else {
 			$('#da-dd-wrapper').show();
 		}
-		
-		$('#encompass-username').blur(function() {
-			validateEncompassUserName(this.id);
-		});
-		$('#encompass-password').blur(function() {
-			validateEncompassPassword(this.id);
-		});
-		$('#encompass-url').blur(function() {
-			validateURL(this.id);
-		});
-		
-		$('body').on('click', '#encompass-save', function() {
-			if (validateEncompassInput('encompass-form-div')) {
-				saveEncompassDetails("encompass-form");
-			}
-		});
-		$('body').on('click', '#encompass-testconnection', function() {
-			if (validateEncompassInput('encompass-form-div')) {
-				testEncompassConnection("encompass-form");
-			}
-		});
-		$('body').on('click',function(){
-			$('.crm-settings-dropdown-cont').slideUp(200);
-		});
-		$('.crm-settings-dropdown').on('click',function(e){
-			e.stopPropagation();
-			$('.crm-settings-dropdown-cont').slideToggle(200);
-		});
-		$('.crm-settings-dropdown-item').on('click',function(e){
-			var crmType = $(this).attr('data-crm-type');
-			$('#crm-settings-dropdown-sel-text').text(crmType);
-			$('.crm-setting-cont').hide();
-			$('.crm-setting-cont[data-crm-type="'+crmType+'"]').show();
-		});
 
 		//Remove the dropdown icon if only one option for app available
 		if($('#crm-settings-dropdown-cont').children('.crm-settings-dropdown-item').length <= 1) {
@@ -140,21 +106,5 @@
 		} else {
 			$('#crm-settings-dropdown-cont').children('.crm-settings-dropdown-item:first').click();
 		}
-		
-		//dotloop function
-		$('#dotloop-apikey').blur(function() {
-			validateDotloopKey(this.id);
-		});
-		$('body').on('click', '#dotloop-save', function() {
-			if (validateDotloopInput()) {
-				showOverlay();
-				saveDotloopDetails("dotloop-form");
-			}
-		});
-		$('body').on('click', '#dotloop-testconnection', function() {
-			if (validateDotloopInput()) {
-				testDotloopConnection("dotloop-form");
-			}
-		});
 	});
 </script>
