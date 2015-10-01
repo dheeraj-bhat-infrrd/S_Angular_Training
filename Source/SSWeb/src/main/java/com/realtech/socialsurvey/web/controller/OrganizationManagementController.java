@@ -30,12 +30,17 @@ import com.google.gson.GsonBuilder;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.dao.impl.MongoOrganizationUnitSettingDaoImpl;
 import com.realtech.socialsurvey.core.entities.AccountsMaster;
+import com.realtech.socialsurvey.core.entities.Branch;
+import com.realtech.socialsurvey.core.entities.Company;
 import com.realtech.socialsurvey.core.entities.DotLoopCrmInfo;
 import com.realtech.socialsurvey.core.entities.EncompassCrmInfo;
 import com.realtech.socialsurvey.core.entities.LicenseDetail;
+import com.realtech.socialsurvey.core.entities.LockSettings;
 import com.realtech.socialsurvey.core.entities.MailContent;
 import com.realtech.socialsurvey.core.entities.MailContentSettings;
 import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
+import com.realtech.socialsurvey.core.entities.Region;
+import com.realtech.socialsurvey.core.entities.SettingsDetails;
 import com.realtech.socialsurvey.core.entities.StateLookup;
 import com.realtech.socialsurvey.core.entities.SurveySettings;
 import com.realtech.socialsurvey.core.entities.User;
@@ -46,12 +51,16 @@ import com.realtech.socialsurvey.core.enums.AccountType;
 import com.realtech.socialsurvey.core.enums.DisplayMessageType;
 import com.realtech.socialsurvey.core.enums.OrganizationUnit;
 import com.realtech.socialsurvey.core.enums.SettingsForApplication;
+import com.realtech.socialsurvey.core.exception.FatalException;
+import com.realtech.socialsurvey.core.exception.InternalServerException;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.exception.NoRecordsFetchedException;
 import com.realtech.socialsurvey.core.exception.NonFatalException;
+import com.realtech.socialsurvey.core.exception.ProfileServiceErrorCode;
 import com.realtech.socialsurvey.core.services.mail.UndeliveredEmailException;
 import com.realtech.socialsurvey.core.services.organizationmanagement.OrganizationManagementService;
 import com.realtech.socialsurvey.core.services.organizationmanagement.ProfileManagementService;
+import com.realtech.socialsurvey.core.services.organizationmanagement.ProfileNotFoundException;
 import com.realtech.socialsurvey.core.services.organizationmanagement.UserManagementService;
 import com.realtech.socialsurvey.core.services.payment.Payment;
 import com.realtech.socialsurvey.core.services.payment.exception.CreditCardException;
@@ -61,7 +70,9 @@ import com.realtech.socialsurvey.core.services.payment.exception.SubscriptionUns
 import com.realtech.socialsurvey.core.services.payment.exception.SubscriptionUpgradeUnsuccessfulException;
 import com.realtech.socialsurvey.core.services.search.exception.SolrException;
 import com.realtech.socialsurvey.core.services.settingsmanagement.SettingsLocker;
+import com.realtech.socialsurvey.core.services.settingsmanagement.SettingsManager;
 import com.realtech.socialsurvey.core.services.settingsmanagement.SettingsSetter;
+import com.realtech.socialsurvey.core.services.settingsmanagement.impl.InvalidSettingsStateException;
 import com.realtech.socialsurvey.core.services.surveybuilder.SurveyBuilder;
 import com.realtech.socialsurvey.core.services.upload.FileUploadService;
 import com.realtech.socialsurvey.core.utils.DisplayMessageConstants;
@@ -128,6 +139,9 @@ public class OrganizationManagementController
 
     @Value ( "${AMAZON_LOGO_BUCKET}")
     private String logoBucket;
+
+    @Autowired
+    private SettingsManager settingsManager;
 
 
     /**
@@ -590,39 +604,122 @@ public class OrganizationManagementController
         }
 
         sessionHelper.updateSelectedProfile( session, entityId, entityType );
-
+        long branchId = 0;
+        long regionId = 0;
+        long companyId = 0;
+        long agentId = 0;
         OrganizationUnitSettings unitSettings = null;
         int accountMasterId = accountType.getValue();
+        List<SettingsDetails> settingsDetailsList = null;
         try {
+
+            Map<String, Long> hierarchyDetails = profileManagementService.getHierarchyDetailsByEntity( entityType, entityId );
+            if ( hierarchyDetails == null ) {
+                LOG.error( "Unable to fetch primary profile for this user " );
+                throw new FatalException( "Unable to fetch primary profile for type : " + entityType + " and ID : " + entityId );
+            }
+            branchId = hierarchyDetails.get( CommonConstants.BRANCH_ID_COLUMN );
+            regionId = hierarchyDetails.get( CommonConstants.REGION_ID_COLUMN );
+            companyId = hierarchyDetails.get( CommonConstants.COMPANY_ID_COLUMN );
+            agentId = hierarchyDetails.get( CommonConstants.AGENT_ID_COLUMN );
+            OrganizationUnitSettings companyUnitSettings = null;
+            OrganizationUnitSettings regionUnitSettings = null;
+            OrganizationUnitSettings branchUnitSettings = null;
+
+            Map<SettingsForApplication, OrganizationUnit> map = null;
+            settingsDetailsList = settingsManager.getScoreForCompleteHeirarchy( companyId, branchId, regionId );
+            LOG.debug( "Company ID : " + companyId + " Region ID : " + regionId + " Branch ID : " + branchId + " Agent ID : "
+                + agentId );
+
             if ( entityType.equals( CommonConstants.COMPANY_ID_COLUMN )
                 || accountMasterId == CommonConstants.ACCOUNTS_MASTER_INDIVIDUAL ) {
                 unitSettings = organizationManagementService.getCompanySettings( user.getCompany().getCompanyId() );
-                model.addAttribute( "columnName", entityType );
-                model.addAttribute( "columnValue", entityId );
             } else if ( entityType.equals( CommonConstants.REGION_ID_COLUMN ) ) {
                 unitSettings = organizationManagementService.getRegionSettings( entityId );
-                model.addAttribute( "columnName", entityType );
-                model.addAttribute( "columnValue", entityId );
+                try {
+                    map = profileManagementService.getPrimaryHierarchyByEntity( CommonConstants.REGION_ID,
+                        unitSettings.getIden() );
+                    if ( map == null ) {
+                        LOG.error( "Unable to fetch primary profile for this user " );
+                        throw new FatalException( "Unable to fetch primary profile this user " + unitSettings.getIden() );
+                    }
+                } catch ( InvalidSettingsStateException e ) {
+                    throw new InternalServerException( new ProfileServiceErrorCode(
+                        CommonConstants.ERROR_CODE_REGION_PROFILE_SERVICE_FAILURE, CommonConstants.SERVICE_CODE_REGION_PROFILE,
+                        "Error occured while fetching region profile" ), e.getMessage() );
+                }
+
+                companyUnitSettings = organizationManagementService.getCompanySettings( companyId );
+                unitSettings = profileManagementService.getAutoPostScoreBasedOnHierarchy(
+                    MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION, unitSettings, companyUnitSettings,
+                    regionUnitSettings, null, null, map );
             } else if ( entityType.equals( CommonConstants.BRANCH_ID_COLUMN ) ) {
                 unitSettings = organizationManagementService.getBranchSettingsDefault( entityId );
-                model.addAttribute( "columnName", entityType );
-                model.addAttribute( "columnValue", entityId );
+                try {
+                    map = profileManagementService.getPrimaryHierarchyByEntity( CommonConstants.BRANCH_ID,
+                        unitSettings.getIden() );
+                    if ( map == null ) {
+                        LOG.error( "Unable to fetch primary profile for this user " );
+                        throw new FatalException( "Unable to fetch primary profile this user " + unitSettings.getIden() );
+                    }
+                } catch ( InvalidSettingsStateException e ) {
+                    throw new InternalServerException( new ProfileServiceErrorCode(
+                        CommonConstants.ERROR_CODE_REGION_PROFILE_SERVICE_FAILURE, CommonConstants.SERVICE_CODE_REGION_PROFILE,
+                        "Error occured while fetching region profile" ), e.getMessage() );
+                } catch ( ProfileNotFoundException e ) {
+                    throw new FatalException( "Unable to fetch primary profile this user " + unitSettings.getIden() );
+                }
+                companyUnitSettings = organizationManagementService.getCompanySettings( companyId );
+                regionUnitSettings = organizationManagementService.getRegionSettings( regionId );
+                unitSettings = profileManagementService.getAutoPostScoreBasedOnHierarchy(
+                    MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION, unitSettings, companyUnitSettings,
+                    regionUnitSettings, branchUnitSettings, null, map );
             } else if ( entityType.equals( CommonConstants.AGENT_ID_COLUMN ) ) {
                 unitSettings = userManagementService.getUserSettings( user.getUserId() );
-                model.addAttribute( "columnName", CommonConstants.AGENT_ID_COLUMN );
-                model.addAttribute( "columnValue", entityId );
+                try {
+                    map = profileManagementService.getPrimaryHierarchyByEntity( CommonConstants.AGENT_ID,
+                        unitSettings.getIden() );
+                    if ( map == null ) {
+                        LOG.error( "Unable to fetch primary profile for this user " );
+                        throw new FatalException( "Unable to fetch primary profile this user " + unitSettings.getIden() );
+                    }
+                } catch ( InvalidSettingsStateException e ) {
+                    throw new InternalServerException( new ProfileServiceErrorCode(
+                        CommonConstants.ERROR_CODE_REGION_PROFILE_SERVICE_FAILURE, CommonConstants.SERVICE_CODE_REGION_PROFILE,
+                        "Error occured while fetching region profile" ), e.getMessage() );
+                } catch ( ProfileNotFoundException e ) {
+                    throw new FatalException( "Unable to fetch primary profile this user " + unitSettings.getIden() );
+                }
+                companyUnitSettings = organizationManagementService.getCompanySettings( companyId );
+                regionUnitSettings = organizationManagementService.getRegionSettings( regionId );
+                branchUnitSettings = organizationManagementService.getBranchSettingsDefault( branchId );
+                unitSettings = profileManagementService.getAutoPostScoreBasedOnHierarchy(
+                    MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION, unitSettings, companyUnitSettings,
+                    regionUnitSettings, branchUnitSettings, unitSettings, map );
             }
+
+            model.addAttribute( "columnName", entityType );
+            model.addAttribute( "columnValue", entityId );
         } catch ( InvalidInputException | NoRecordsFetchedException e ) {
             LOG.error( "NonFatalException while fetching profile details. Reason :" + e.getMessage(), e );
             model.addAttribute( "message",
                 messageUtils.getDisplayMessage( DisplayMessageConstants.GENERAL_ERROR, DisplayMessageType.ERROR_MESSAGE ) );
             return JspResolver.MESSAGE_HEADER;
+        } catch ( ProfileNotFoundException e1 ) {
+            throw new FatalException( "Unable to fetch primary profile this user " + unitSettings.getIden() );
         }
 
         model.addAttribute( "autoPostEnabled", false );
         if ( unitSettings != null && unitSettings.getSurvey_settings() != null ) {
             model.addAttribute( "autoPostEnabled", unitSettings.getSurvey_settings().isAutoPostEnabled() );
         }
+        LockSettings parentLock = null;
+        try {
+            parentLock = profileManagementService.fetchHierarchyLockSettings( companyId, branchId, regionId, entityType );
+        } catch ( NonFatalException e ) {
+            LOG.error( "Unable to fetch lock values", e );
+        }
+        session.setAttribute( CommonConstants.PARENT_LOCK, parentLock );
         SurveySettings surveySettings = organizationManagementService.retrieveDefaultSurveyProperties();
         model.addAttribute( "defaultSurveyProperties", surveySettings );
         session.setAttribute( CommonConstants.USER_ACCOUNT_SETTINGS, unitSettings );
@@ -890,8 +987,7 @@ public class OrganizationManagementController
                 session.setAttribute( CommonConstants.RESTART_SURVEY_MAIL_SUBJECT_IN_SESSION, mailSubject );
                 session.setAttribute( CommonConstants.RESTART_SURVEY_MAIL_BODY_IN_SESSION, mailBody );
 
-                message = messageUtils.getDisplayMessage(
-                    DisplayMessageConstants.RESTART_SURVEY_MAILBODY_UPDATE_SUCCESSFUL,
+                message = messageUtils.getDisplayMessage( DisplayMessageConstants.RESTART_SURVEY_MAILBODY_UPDATE_SUCCESSFUL,
                     DisplayMessageType.SUCCESS_MESSAGE ).getMessage();
             }
             // update the mail content settings in session
@@ -929,7 +1025,7 @@ public class OrganizationManagementController
                 .getCompanyId() );
             MailContent defaultMailContent = null;
             if ( mailCategory != null && mailCategory.equals( "participationmail" ) ) {
-            	defaultMailContent = organizationManagementService.deleteMailBodyFromSetting( companySettings,
+                defaultMailContent = organizationManagementService.deleteMailBodyFromSetting( companySettings,
                     CommonConstants.SURVEY_MAIL_BODY_CATEGORY );
 
                 mailBody = defaultMailContent.getMail_body();
@@ -947,7 +1043,7 @@ public class OrganizationManagementController
             }
 
             else if ( mailCategory != null && mailCategory.equals( "participationremindermail" ) ) {
-            	defaultMailContent = organizationManagementService.deleteMailBodyFromSetting( companySettings,
+                defaultMailContent = organizationManagementService.deleteMailBodyFromSetting( companySettings,
                     CommonConstants.SURVEY_REMINDER_MAIL_BODY_CATEGORY );
 
                 mailBody = defaultMailContent.getMail_body();
@@ -965,7 +1061,7 @@ public class OrganizationManagementController
             }
 
             else if ( mailCategory != null && mailCategory.equals( "surveycompletionmail" ) ) {
-            	defaultMailContent = organizationManagementService.deleteMailBodyFromSetting( companySettings,
+                defaultMailContent = organizationManagementService.deleteMailBodyFromSetting( companySettings,
                     CommonConstants.SURVEY_COMPLETION_MAIL_BODY_CATEGORY );
 
                 mailBody = defaultMailContent.getMail_body();
@@ -982,7 +1078,7 @@ public class OrganizationManagementController
             }
 
             else if ( mailCategory != null && mailCategory.equals( "socialpostremindermail" ) ) {
-            	defaultMailContent = organizationManagementService.deleteMailBodyFromSetting( companySettings,
+                defaultMailContent = organizationManagementService.deleteMailBodyFromSetting( companySettings,
                     CommonConstants.SOCIAL_POST_REMINDER_MAIL_BODY_CATEGORY );
 
                 mailBody = defaultMailContent.getMail_body();
@@ -1001,17 +1097,16 @@ public class OrganizationManagementController
             }
 
             else if ( mailCategory != null && mailCategory.equals( "restartsurveymail" ) ) {
-            	defaultMailContent = organizationManagementService.deleteMailBodyFromSetting( companySettings,
+                defaultMailContent = organizationManagementService.deleteMailBodyFromSetting( companySettings,
                     CommonConstants.RESTART_SURVEY_MAIL_BODY_CATEGORY );
 
                 mailBody = defaultMailContent.getMail_body();
-                mailBody = emailFormatHelper.replaceEmailBodyWithParams( mailBody, organizationManagementService
-                    .getSurveyParamOrder( CommonConstants.RESTART_SURVEY_MAIL_BODY_CATEGORY ) );
+                mailBody = emailFormatHelper.replaceEmailBodyWithParams( mailBody,
+                    organizationManagementService.getSurveyParamOrder( CommonConstants.RESTART_SURVEY_MAIL_BODY_CATEGORY ) );
                 //mailBody = mailBody.replaceAll("\\[LogoUrl\\]", applicationLogoUrl);
 
                 mailSubject = defaultMailContent.getMail_subject();
-                message = messageUtils.getDisplayMessage(
-                    DisplayMessageConstants.RESTART_SURVEY_MAILBODY_UPDATE_SUCCESSFUL,
+                message = messageUtils.getDisplayMessage( DisplayMessageConstants.RESTART_SURVEY_MAILBODY_UPDATE_SUCCESSFUL,
                     DisplayMessageType.SUCCESS_MESSAGE ).getMessage();
 
                 session.setAttribute( CommonConstants.RESTART_SURVEY_MAIL_BODY_IN_SESSION, mailBody );
@@ -1043,12 +1138,44 @@ public class OrganizationManagementController
         String autopost = request.getParameter( "autopost" );
         SurveySettings originalSurveySettings = null;
         String message = "";
-
+        HttpSession session = request.getSession();
+        long entityId = (long) session.getAttribute( CommonConstants.ENTITY_ID_COLUMN );
+        String entityType = (String) session.getAttribute( CommonConstants.ENTITY_TYPE_COLUMN );
         try {
             boolean isAutopostEnabled = Boolean.parseBoolean( autopost );
-            User user = sessionHelper.getCurrentUser();
-            OrganizationUnitSettings companySettings = organizationManagementService.getCompanySettings( user.getCompany()
-                .getCompanyId() );
+            OrganizationUnitSettings unitSettings = null;
+            String collectionName = "";
+            if ( entityType.equalsIgnoreCase( CommonConstants.COMPANY_ID ) ) {
+                collectionName = MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION;
+                unitSettings = organizationManagementService.getCompanySettings( entityId );
+                Company company = userManagementService.getCompanyById( entityId );
+                if ( company != null ) {
+                    settingsSetter.setSettingsValueForCompany( company, SettingsForApplication.MIN_SCORE, true );
+                    userManagementService.updateCompany( company );
+                }
+            } else if ( entityType.equalsIgnoreCase( CommonConstants.REGION_ID ) ) {
+                collectionName = MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION;
+                unitSettings = organizationManagementService.getRegionSettings( entityId );
+                Region region = userManagementService.getRegionById( entityId );
+                if ( region != null ) {
+                    settingsSetter.setSettingsValueForRegion( region, SettingsForApplication.MIN_SCORE, true );
+                    userManagementService.updateRegion( region );
+                }
+            } else if ( entityType.equalsIgnoreCase( CommonConstants.BRANCH_ID ) ) {
+                collectionName = MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION;
+                unitSettings = organizationManagementService.getBranchSettingsDefault( entityId );
+                Branch branch = userManagementService.getBranchById( entityId );
+                if ( branch != null ) {
+                    settingsSetter.setSettingsValueForBranch( branch, SettingsForApplication.MIN_SCORE, true );
+                    userManagementService.updateBranch( branch );
+                }
+            } else if ( entityType.equalsIgnoreCase( CommonConstants.AGENT_ID ) ) {
+                collectionName = MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION;
+                unitSettings = organizationManagementService.getAgentSettings( entityId );
+            } else {
+                throw new InvalidInputException( "Invalid Collection Type" );
+            }
+
 
             if ( ratingCategory != null && ratingCategory.equals( "rating-auto-post" ) ) {
                 double autopostRating = Double.parseDouble( request.getParameter( "rating-auto-post" ) );
@@ -1057,11 +1184,13 @@ public class OrganizationManagementController
                     throw new InvalidInputException( "Auto Post rating score is 0.", DisplayMessageConstants.GENERAL_ERROR );
                 }
 
-                originalSurveySettings = companySettings.getSurvey_settings();
-                if ( originalSurveySettings != null ) {
-                    originalSurveySettings.setAutoPostEnabled( isAutopostEnabled );
-                    originalSurveySettings.setAuto_post_score( (float) autopostRating );
+                originalSurveySettings = unitSettings.getSurvey_settings();
+                if ( originalSurveySettings == null ) {
+                    originalSurveySettings = new SurveySettings();
                 }
+                originalSurveySettings.setAutoPostEnabled( isAutopostEnabled );
+                originalSurveySettings.setAuto_post_score( (float) autopostRating );
+
                 LOG.info( "Updating Survey Settings Post score" );
                 message = messageUtils.getDisplayMessage( DisplayMessageConstants.SURVEY_AUTO_POST_SCORE_UPDATE_SUCCESSFUL,
                     DisplayMessageType.SUCCESS_MESSAGE ).getMessage();
@@ -1074,25 +1203,105 @@ public class OrganizationManagementController
                     throw new InvalidInputException( "Mimimum Post rating score is 0.", DisplayMessageConstants.GENERAL_ERROR );
                 }
 
-                originalSurveySettings = companySettings.getSurvey_settings();
-                if ( originalSurveySettings != null ) {
-                    originalSurveySettings.setAutoPostEnabled( isAutopostEnabled );
-                    originalSurveySettings.setShow_survey_above_score( (float) minPostRating );
+                originalSurveySettings = unitSettings.getSurvey_settings();
+                if ( originalSurveySettings == null ) {
+                    originalSurveySettings = new SurveySettings();
                 }
+                originalSurveySettings.setAutoPostEnabled( isAutopostEnabled );
+                originalSurveySettings.setShow_survey_above_score( (float) minPostRating );
+
                 LOG.info( "Updating Survey Settings Min score" );
                 message = messageUtils.getDisplayMessage( DisplayMessageConstants.SURVEY_MIN_POST_SCORE_UPDATE_SUCCESSFUL,
                     DisplayMessageType.SUCCESS_MESSAGE ).getMessage();
             }
 
-            if ( organizationManagementService.updateSurveySettings( companySettings, originalSurveySettings ) ) {
-                companySettings.setSurvey_settings( originalSurveySettings );
+            if ( organizationManagementService.updateScoreForSurvey( collectionName, unitSettings, originalSurveySettings ) ) {
+                unitSettings.setSurvey_settings( originalSurveySettings );
                 LOG.info( "Updated Survey Settings" );
             }
         } catch ( NonFatalException e ) {
             LOG.error( "NonFatalException while updating survey settings. Reason : " + e.getMessage(), e );
             message = messageUtils.getDisplayMessage( e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE ).getMessage();
         }
+
         return message;
+    }
+
+
+    /**
+     * Method to update Survey Settings
+     * 
+     * @param model
+     * @param request
+     * @return
+     */
+    @RequestMapping ( value = "/updateSurveyScoreLockSettings", method = RequestMethod.POST)
+    @ResponseBody
+    public String updateSurveyScoreLockSettings( Model model, HttpServletRequest request )
+    {
+        LOG.info( "Updating Survey Settings" );
+        String minScoreLockedValue = request.getParameter( "rating-min-post" );
+        Boolean minScoreLocked = Boolean.valueOf( minScoreLockedValue );
+        String message = "";
+        LockSettings lockSettings = null;
+        HttpSession session = request.getSession();
+        long entityId = (long) session.getAttribute( CommonConstants.ENTITY_ID_COLUMN );
+        String entityType = (String) session.getAttribute( CommonConstants.ENTITY_TYPE_COLUMN );
+        LockSettings parentLock = (LockSettings) session.getAttribute( CommonConstants.PARENT_LOCK );
+        try {
+            OrganizationUnitSettings unitSettings = null;
+            String collectionName = "";
+            boolean status = false;
+            if ( entityType.equalsIgnoreCase( CommonConstants.COMPANY_ID ) ) {
+                collectionName = MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION;
+                unitSettings = organizationManagementService.getCompanySettings( entityId );
+                Company company = userManagementService.getCompanyById( entityId );
+                if ( company != null ) {
+                    settingsLocker.lockSettingsValueForCompany( company, SettingsForApplication.MIN_SCORE, minScoreLocked );
+                    userManagementService.updateCompany( company );
+                }
+            } else if ( entityType.equalsIgnoreCase( CommonConstants.REGION_ID ) ) {
+                collectionName = MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION;
+                unitSettings = organizationManagementService.getRegionSettings( entityId );
+                Region region = userManagementService.getRegionById( entityId );
+                if ( region != null ) {
+                    settingsLocker.lockSettingsValueForRegion( region, SettingsForApplication.MIN_SCORE, minScoreLocked );
+                    userManagementService.updateRegion( region );
+                }
+            } else if ( entityType.equalsIgnoreCase( CommonConstants.BRANCH_ID ) ) {
+                collectionName = MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION;
+                unitSettings = organizationManagementService.getBranchSettingsDefault( entityId );
+                Branch branch = userManagementService.getBranchById( entityId );
+                if ( branch != null ) {
+                    settingsLocker.lockSettingsValueForBranch( branch, SettingsForApplication.MIN_SCORE, minScoreLocked );
+                    userManagementService.updateBranch( branch );
+                }
+            } else if ( entityType.equalsIgnoreCase( CommonConstants.AGENT_ID ) ) {
+                collectionName = MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION;
+                unitSettings = organizationManagementService.getAgentSettings( entityId );
+            } else {
+                throw new InvalidInputException( "Invalid Collection Type" );
+            }
+            lockSettings = unitSettings.getLockSettings();
+            lockSettings = updateLockSettings( parentLock, lockSettings, minScoreLocked );
+            lockSettings = profileManagementService.updateLockSettings( collectionName, unitSettings, lockSettings );
+            unitSettings.setLockSettings( lockSettings );
+
+            message = "Settings locked ";
+        } catch ( Exception e ) {
+            LOG.error( "Exception caught ", e.getMessage() );
+            message = "Unable to lock the setting, please try again later";
+        }
+        return message;
+    }
+
+
+    private LockSettings updateLockSettings( LockSettings parentLock, LockSettings lockSettings, boolean status )
+    {
+        if ( !parentLock.getIsLogoLocked() ) {
+            lockSettings.setLogoLocked( status );
+        }
+        return lockSettings;
     }
 
 
@@ -1101,18 +1310,40 @@ public class OrganizationManagementController
     public String updateAutoPostForSurvey( HttpServletRequest request )
     {
         LOG.info( "Method to update autopost for a survey started" );
+        HttpSession session = request.getSession();
+        long entityId = (long) session.getAttribute( CommonConstants.ENTITY_ID_COLUMN );
+        String entityType = (String) session.getAttribute( CommonConstants.ENTITY_TYPE_COLUMN );
+
         try {
             String autopost = request.getParameter( "autopost" );
+            String collectionName = "";
             boolean isAutoPostEnabled = false;
             if ( autopost != null && !autopost.isEmpty() ) {
                 isAutoPostEnabled = Boolean.parseBoolean( autopost );
                 User user = sessionHelper.getCurrentUser();
-                OrganizationUnitSettings companySettings = organizationManagementService.getCompanySettings( user.getCompany()
-                    .getCompanyId() );
-                SurveySettings surveySettings = companySettings.getSurvey_settings();
+                OrganizationUnitSettings unitSettings = null;
+                /*OrganizationUnitSettings companySettings = organizationManagementService.getCompanySettings( user.getCompany()
+                    .getCompanyId() );*/
+                if ( entityType.equalsIgnoreCase( CommonConstants.COMPANY_ID ) ) {
+                    collectionName = MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION;
+                    unitSettings = organizationManagementService.getCompanySettings( entityId );
+                } else if ( entityType.equalsIgnoreCase( CommonConstants.REGION_ID ) ) {
+                    collectionName = MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION;
+                    unitSettings = organizationManagementService.getRegionSettings( entityId );
+                } else if ( entityType.equalsIgnoreCase( CommonConstants.BRANCH_ID ) ) {
+                    collectionName = MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION;
+                    unitSettings = organizationManagementService.getBranchSettingsDefault( entityId );
+                } else if ( entityType.equalsIgnoreCase( CommonConstants.AGENT_ID ) ) {
+                    collectionName = MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION;
+                    unitSettings = organizationManagementService.getAgentSettings( entityId );
+                } else {
+                    throw new InvalidInputException( "Invalid Collection Type" );
+                }
+
+                SurveySettings surveySettings = unitSettings.getSurvey_settings();
                 surveySettings.setAutoPostEnabled( isAutoPostEnabled );
-                if ( organizationManagementService.updateSurveySettings( companySettings, surveySettings ) ) {
-                    companySettings.setSurvey_settings( surveySettings );
+                if ( organizationManagementService.updateScoreForSurvey( collectionName, unitSettings, surveySettings ) ) {
+                    unitSettings.setSurvey_settings( surveySettings );
                     LOG.info( "Updated Survey Settings" );
                 }
             }
