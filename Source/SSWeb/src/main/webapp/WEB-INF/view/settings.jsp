@@ -214,6 +214,11 @@ $(document).ready(function() {
 	//social media urls
 	loadSocialMediaUrlInSettingsPage();
 	
+	$('.va-dd-wrapper').perfectScrollbar({
+		suppressScrollX : true
+	});
+	$('.va-dd-wrapper').perfectScrollbar('update');
+	
 	if ($("#da-dd-wrapper-profiles").children('.da-dd-item').length <= 1) {
 		$('#da-dd-wrapper').remove();
 	} else {
@@ -229,7 +234,8 @@ $(document).ready(function() {
 		
 		autoAppendRatingDropdown('#st-dd-wrapper-min-post', "st-dd-item st-dd-item-min-post");
 		changeRatingPattern($('#rating-min-post').val(), $('#rating-min-post-parent'));
-		$('#rating-min-post').click(function(){
+		$('#rating-min-post').off('click');
+		$('#rating-min-post').on('click', function(){
 			$('#st-dd-wrapper-min-post').slideToggle(200);
 		});
 		
@@ -266,134 +272,5 @@ $(document).ready(function() {
 		paintTextForMood(happyTxt, nuTxt,sadTxt,happyTxtComplete, nuTxtComplete,sadTxtComplete);		
 	}
 	
-	$('body').on('click','.st-dd-item-auto-post',function() {
-		$('#rating-auto-post').val($(this).html());
-		$('#st-dd-wrapper-auto-post').slideToggle(200);
-
-		$('#ratingcategory').val('rating-auto-post');
-		var rating = $('#rating-auto-post').val();
-		var ratingParent = $('#rating-auto-post-parent');
-
-		changeRatingPattern(rating, ratingParent);
-		updatePostScore("rating-settings-form");
-	});
-
-	$('body').on('click','.st-dd-item-min-post',function() {
-		$('#rating-min-post').val($(this).html());
-		$('#st-dd-wrapper-min-post').slideToggle(200);
-		
-		$('#ratingcategory').val('rating-min-post');
-		
-		var rating = $('#rating-min-post').val();
-		var ratingParent = $('#rating-min-post-parent');
-		changeRatingPattern(rating, ratingParent);
-		
-		updatePostScore("rating-settings-form");
-	});
-	
-	$('#st-settings-location-on').click(function() {
-		$('#othercategory').val('other-location');
-		$('#other-location').val('false');
-		
-		$('#st-settings-location-off').show();
-		$(this).hide();
-		
-		updateOtherSettings("other-settings-form");
-	});
-	$('#st-settings-location-off').click(function() {
-		$('#othercategory').val('other-location');
-		$('#other-location').val('true');
-
-		$('#st-settings-location-on').show();
-		$(this).hide();
-		
-		updateOtherSettings("other-settings-form");
-	});
-
-
-	$('#st-settings-payment-on').click(function() {
-		$('#st-settings-payment-off').show();
-		$(this).hide();
-	});
-	$('#st-settings-payment-off').click(function() {
-		$('#st-settings-payment-on').show();
-		$(this).hide();
-		showPaymentOptions();
-	});
-
-	$('#st-delete-account').click(function() {
-		$('#other-account').val('true');
-		createPopupConfirm("Delete Account",
-			"This action cannot be undone.<br/>All user setting will be permanently deleted and your subscription will terminate permanently immediately.");
-		overlayDeleteAccount();
-	});
-
-	$('#st-settings-account-on').click(function() {
-		$('#other-account').val('false');
-		createPopupConfirm("Enable Account", "Do you want to Continue?");
-		overlayAccount();
-	});
-	$('#st-settings-account-off').click(function() {
-		$('#other-account').val('true');
-		createPopupConfirm("Disable Account", "You will not be able to access your SocialSurvey profile after the current billing cycle. Also for Branch or Company Accounts, this will disable all accounts in your hierarchy under this account.<br/> Do you want to Continue?");
-		overlayAccount();
-	});
-
-	$('#happy-text').blur(function() {
-		saveTextForMoodFlow($("#happy-text").val(), "happy");
-	});
-	$('#neutral-text').blur(function() {
-		saveTextForMoodFlow($("#neutral-text").val(), "neutral");
-	});
-	$('#sad-text').blur(function() {
-		saveTextForMoodFlow($("#sad-text").val(), "sad");
-	});
-
-	$('#happy-text-complete').blur(function() {
-		saveTextForMoodFlow($("#happy-text-complete").val(), "happyComplete");
-	});
-	$('#neutral-text-complete').blur(function() {
-		saveTextForMoodFlow($("#neutral-text-complete").val(), "neutralComplete");
-	});
-	$('#sad-text-complete').blur(function() {
-		saveTextForMoodFlow($("#sad-text-complete").val(), "sadComplete");
-	});
-
-	$('.reset-icon').click(function() {
-		var resetId = $(this).prev().attr('id');
-		var resetTag = "";
-		
-		if (resetId == 'happy-text') {
-			resetTag = 'happy';
-		}
-		else if (resetId == 'neutral-text') {
-			resetTag = 'neutral';
-		}
-		else if (resetId == 'sad-text') {
-			resetTag = 'sad';
-		}
-		else if (resetId == 'happy-text-complete') {
-			resetTag = 'happyComplete';
-		}
-		else if (resetId == 'neutral-text-complete') {
-			resetTag = 'neutralComplete';
-		}
-		else if (resetId == 'sad-text-complete') {
-			resetTag = 'sadComplete';
-		}
-		
-	    showOverlay();
-		resetTextForMoodFlow(resetTag, resetId);
-	});
-	
-	$('#atpst-chk-box').click(function() {
-		if ($('#atpst-chk-box').hasClass('bd-check-img-checked')) {
-			$('#atpst-chk-box').removeClass('bd-check-img-checked');
-			updateAutoPostSetting(true);
-		} else {
-			$('#atpst-chk-box').addClass('bd-check-img-checked');
-			updateAutoPostSetting(false);
-		}
-	});
 });
 </script>
