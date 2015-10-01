@@ -66,6 +66,7 @@ import com.realtech.socialsurvey.core.services.mail.EmailServices;
 import com.realtech.socialsurvey.core.services.mail.UndeliveredEmailException;
 import com.realtech.socialsurvey.core.services.organizationmanagement.OrganizationManagementService;
 import com.realtech.socialsurvey.core.services.organizationmanagement.ProfileManagementService;
+import com.realtech.socialsurvey.core.services.organizationmanagement.ProfileNotFoundException;
 import com.realtech.socialsurvey.core.services.organizationmanagement.UserManagementService;
 import com.realtech.socialsurvey.core.services.organizationmanagement.UtilityService;
 import com.realtech.socialsurvey.core.services.search.SolrSearchService;
@@ -151,6 +152,12 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 
     @Value ( "${ENABLE_KAFKA}")
     private String enableKafka;
+
+    @Value ( "${APPLICATION_ADMIN_EMAIL}")
+    private String applicationAdminEmail;
+
+    @Value ( "${APPLICATION_ADMIN_NAME}")
+    private String applicationAdminName;
 
     @Autowired
     private ProfileManagementService profileManagementService;
@@ -2711,7 +2718,8 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
     @Override
     @Transactional
     public String fetchAppropriateLogoUrlFromHierarchyForUser( long userId ) throws InvalidInputException,
-        NoRecordsFetchedException
+        NoRecordsFetchedException, ProfileNotFoundException
+
     {
 
         String logoUrl = null;
@@ -2749,6 +2757,79 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
         }
 
         return logoUrl;
+    }
+
+
+    @Transactional
+    private void makeAProfileAsPrimaryOfAUser( long userId ) throws InvalidInputException, ProfileNotFoundException
+    {
+        LOG.debug( "method makeAProfileAsPrimaryOfAUser started with userid : " + userId );
+        User user = userDao.findById( User.class, userId );
+        if ( user == null ) {
+            LOG.error( "User Is passed was null" );
+            throw new InvalidInputException( "Passed User id is null" );
+        }
+
+        String errorMessage = "No primary user profile found for user " + user.getFirstName() + user.getLastName()
+            + ", with user id : " + user.getUserId();
+        try {
+            emailServices.sendReportBugMailToAdmin( applicationAdminName, errorMessage, applicationAdminEmail );
+        } catch ( UndeliveredEmailException e ) {
+            LOG.error( "error while sending report bug mail to admin ", e );
+        }
+
+        //List<UserProfile> userProfileList = userProfileDao.findByColumn(UserProfile.class, CommonConstants.USER_COLUMN, user);
+        List<UserProfile> userProfileList = user.getUserProfiles();
+        if ( userProfileList == null || userProfileList.isEmpty() ) {
+            throw new ProfileNotFoundException( "No profile found for user with id : " + user.getUserId() );
+        }
+
+
+        UserProfile profileToMakePrimary = null;
+
+        UserProfile agentProfileWithoutDefaultBranch = null;
+        UserProfile agentProfileWithDefaultBranch = null;
+        UserProfile branchAdminProfile = null;
+        UserProfile regionAdminProfile = null;
+        UserProfile companyAdminProfile = null;
+
+        for ( UserProfile currentProfile : userProfileList ) {
+            Branch branch = branchDao.findById( Branch.class, currentProfile.getBranchId() );
+
+            if ( currentProfile.getProfilesMaster().getProfileId() == CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID
+                && branch.getIsDefaultBySystem() == CommonConstants.IS_DEFAULT_BY_SYSTEM_NO ) {
+                agentProfileWithoutDefaultBranch = currentProfile;
+            } else if ( currentProfile.getProfilesMaster().getProfileId() == CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID
+                && branch.getIsDefaultBySystem() == CommonConstants.IS_DEFAULT_BY_SYSTEM_YES ) {
+                agentProfileWithDefaultBranch = currentProfile;
+            } else if ( currentProfile.getProfilesMaster().getProfileId() == CommonConstants.PROFILES_MASTER_BRANCH_ADMIN_PROFILE_ID ) {
+                branchAdminProfile = currentProfile;
+            } else if ( currentProfile.getProfilesMaster().getProfileId() == CommonConstants.PROFILES_MASTER_REGION_ADMIN_PROFILE_ID ) {
+                regionAdminProfile = currentProfile;
+            } else if ( currentProfile.getProfilesMaster().getProfileId() == CommonConstants.PROFILES_MASTER_COMPANY_ADMIN_PROFILE_ID ) {
+                companyAdminProfile = currentProfile;
+            }
+        }
+
+        if ( agentProfileWithoutDefaultBranch != null ) {
+            profileToMakePrimary = agentProfileWithoutDefaultBranch;
+        } else if ( agentProfileWithDefaultBranch != null ) {
+            profileToMakePrimary = agentProfileWithDefaultBranch;
+        } else if ( branchAdminProfile != null ) {
+            profileToMakePrimary = branchAdminProfile;
+        } else if ( regionAdminProfile != null ) {
+            profileToMakePrimary = regionAdminProfile;
+        } else if ( companyAdminProfile != null ) {
+            profileToMakePrimary = companyAdminProfile;
+        }
+
+        profileToMakePrimary.setIsPrimary( CommonConstants.IS_PRIMARY_TRUE );
+        userProfileDao.update( profileToMakePrimary );
+        LOG.debug( "marked a profile with profile id " + profileToMakePrimary.getUserProfileId()
+            + "  as primary for user with user id " + user.getUserId() );
+
+        LOG.debug( "method makeAProfileAsPrimaryOfAUser ended for user with userid : " + user.getUserId() );
+
     }
 
 
@@ -2817,11 +2898,20 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 
     @Override
     @Transactional
-    public Map<String, Long> getPrimaryUserProfileByAgentId( long entityId )
+    public Map<String, Long> getPrimaryUserProfileByAgentId( long entityId ) throws InvalidInputException,
+        ProfileNotFoundException
     {
-        LOG.info( "Getting user primary profile for id: " + entityId );
-        return userProfileDao.findPrimaryUserProfileByAgentId( entityId );
+        LOG.debug( "method getPrimaryUserProfileByAgentId started with user id " + entityId );
+        Map<String, Long> userProfileDetailMap = userProfileDao.findPrimaryUserProfileByAgentId( entityId );
+        if ( userProfileDetailMap == null || userProfileDetailMap.isEmpty() ) {
+            LOG.warn( "No primary profile found for the user with id " + entityId );
+            makeAProfileAsPrimaryOfAUser( entityId );
+            // after making a profile primary, again fetch the data
+            userProfileDetailMap = userProfileDao.findPrimaryUserProfileByAgentId( entityId );
+        }
 
+        LOG.debug( "method getPrimaryUserProfileByAgentId ended with user id " + entityId );
+        return userProfileDetailMap;
     }
 
 

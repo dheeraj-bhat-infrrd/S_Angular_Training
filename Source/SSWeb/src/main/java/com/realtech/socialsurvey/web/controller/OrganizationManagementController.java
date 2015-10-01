@@ -60,6 +60,7 @@ import com.realtech.socialsurvey.core.exception.ProfileServiceErrorCode;
 import com.realtech.socialsurvey.core.services.mail.UndeliveredEmailException;
 import com.realtech.socialsurvey.core.services.organizationmanagement.OrganizationManagementService;
 import com.realtech.socialsurvey.core.services.organizationmanagement.ProfileManagementService;
+import com.realtech.socialsurvey.core.services.organizationmanagement.ProfileNotFoundException;
 import com.realtech.socialsurvey.core.services.organizationmanagement.UserManagementService;
 import com.realtech.socialsurvey.core.services.payment.Payment;
 import com.realtech.socialsurvey.core.services.payment.exception.CreditCardException;
@@ -665,6 +666,8 @@ public class OrganizationManagementController
                     throw new InternalServerException( new ProfileServiceErrorCode(
                         CommonConstants.ERROR_CODE_REGION_PROFILE_SERVICE_FAILURE, CommonConstants.SERVICE_CODE_REGION_PROFILE,
                         "Error occured while fetching region profile" ), e.getMessage() );
+                } catch ( ProfileNotFoundException e ) {
+                    throw new FatalException( "Unable to fetch primary profile this user " + unitSettings.getIden() );
                 }
                 companyUnitSettings = organizationManagementService.getCompanySettings( companyId );
                 regionUnitSettings = organizationManagementService.getRegionSettings( regionId );
@@ -684,6 +687,8 @@ public class OrganizationManagementController
                     throw new InternalServerException( new ProfileServiceErrorCode(
                         CommonConstants.ERROR_CODE_REGION_PROFILE_SERVICE_FAILURE, CommonConstants.SERVICE_CODE_REGION_PROFILE,
                         "Error occured while fetching region profile" ), e.getMessage() );
+                } catch ( ProfileNotFoundException e ) {
+                    throw new FatalException( "Unable to fetch primary profile this user " + unitSettings.getIden() );
                 }
                 companyUnitSettings = organizationManagementService.getCompanySettings( companyId );
                 regionUnitSettings = organizationManagementService.getRegionSettings( regionId );
@@ -700,6 +705,8 @@ public class OrganizationManagementController
             model.addAttribute( "message",
                 messageUtils.getDisplayMessage( DisplayMessageConstants.GENERAL_ERROR, DisplayMessageType.ERROR_MESSAGE ) );
             return JspResolver.MESSAGE_HEADER;
+        } catch ( ProfileNotFoundException e1 ) {
+            throw new FatalException( "Unable to fetch primary profile this user " + unitSettings.getIden() );
         }
 
         model.addAttribute( "autoPostEnabled", false );

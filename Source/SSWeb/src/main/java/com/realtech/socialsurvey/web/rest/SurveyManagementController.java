@@ -51,6 +51,7 @@ import com.realtech.socialsurvey.core.services.generator.URLGenerator;
 import com.realtech.socialsurvey.core.services.mail.EmailServices;
 import com.realtech.socialsurvey.core.services.organizationmanagement.OrganizationManagementService;
 import com.realtech.socialsurvey.core.services.organizationmanagement.ProfileManagementService;
+import com.realtech.socialsurvey.core.services.organizationmanagement.ProfileNotFoundException;
 import com.realtech.socialsurvey.core.services.organizationmanagement.UserManagementService;
 import com.realtech.socialsurvey.core.services.search.SolrSearchService;
 import com.realtech.socialsurvey.core.services.search.exception.SolrException;
@@ -1055,7 +1056,7 @@ public class SurveyManagementController
 
     private Map<String, Object> getSurvey( long agentId, String customerEmail, String firstName, String lastName,
         int reminderCount, String custRelationWithAgent, String url, String source ) throws InvalidInputException,
-        SolrException, NoRecordsFetchedException
+        SolrException, NoRecordsFetchedException, ProfileNotFoundException
     {
         Integer stage = null;
         Map<String, Object> surveyAndStage = new HashMap<>();

@@ -14,6 +14,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
@@ -23,6 +24,7 @@ import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
+
 import com.google.gson.Gson;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.dao.OrganizationUnitSettingsDao;
@@ -51,6 +53,7 @@ import com.realtech.socialsurvey.core.services.mail.EmailServices;
 import com.realtech.socialsurvey.core.services.mail.UndeliveredEmailException;
 import com.realtech.socialsurvey.core.services.organizationmanagement.OrganizationManagementService;
 import com.realtech.socialsurvey.core.services.organizationmanagement.ProfileManagementService;
+import com.realtech.socialsurvey.core.services.organizationmanagement.ProfileNotFoundException;
 import com.realtech.socialsurvey.core.services.organizationmanagement.UserManagementService;
 import com.realtech.socialsurvey.core.services.search.SolrSearchService;
 import com.realtech.socialsurvey.core.services.search.exception.SolrException;
@@ -606,7 +609,7 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
     @Transactional
     public void sendSurveyInvitationMail( String custFirstName, String custLastName, String custEmail,
         String custRelationWithAgent, User user, boolean isAgent, String source ) throws InvalidInputException, SolrException,
-        NoRecordsFetchedException, UndeliveredEmailException
+        NoRecordsFetchedException, UndeliveredEmailException, ProfileNotFoundException
     {
         Map<String, Long> hierarchyMap = null;
         Map<SettingsForApplication, OrganizationUnit> map = null;
@@ -672,7 +675,8 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
      */
     @Override
     public void sendSurveyRestartMail( String custFirstName, String custLastName, String custEmail,
-        String custRelationWithAgent, User user, String surveyUrl ) throws InvalidInputException, UndeliveredEmailException
+        String custRelationWithAgent, User user, String surveyUrl ) throws InvalidInputException, UndeliveredEmailException,
+        ProfileNotFoundException
     {
         LOG.info( "sendSurveyRestartMail() started." );
         Map<String, Long> hierarchyMap = null;
@@ -1222,7 +1226,8 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
     @Transactional
     public void initiateSurveyRequest( long agentId, String recipientEmailId, String recipientFirstname,
         String recipientLastname, String source ) throws DuplicateSurveyRequestException, InvalidInputException,
-        SelfSurveyInitiationException, SolrException, NoRecordsFetchedException, UndeliveredEmailException
+        SelfSurveyInitiationException, SolrException, NoRecordsFetchedException, UndeliveredEmailException,
+        ProfileNotFoundException
     {
         LOG.info( "Sending survey request for agent id: " + agentId + " recipientEmailId: " + recipientEmailId
             + " recipientFirstname: " + recipientFirstname + " recipientLastname: " + recipientLastname );

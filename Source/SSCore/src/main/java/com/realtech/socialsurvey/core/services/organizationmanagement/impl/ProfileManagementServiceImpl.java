@@ -1212,7 +1212,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 
     @Override
     @Transactional
-    public Map<String, Long> getPrimaryHierarchyByAgentProfile( OrganizationUnitSettings agentSettings )
+    public Map<String, Long> getPrimaryHierarchyByAgentProfile( OrganizationUnitSettings agentSettings ) throws InvalidInputException, ProfileNotFoundException
     {
         LOG.info( "Inside method getPrimaryHierarchyByAgentProfile " );
         Map<String, Long> hierarchyMap = userManagementService.getPrimaryUserProfileByAgentId( agentSettings.getIden() );
@@ -1602,28 +1602,28 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 
         // This is not needed. Commenting out
         /*for (SurveyDetails review : surveyDetails) {
-        	OrganizationUnitSettings agentSettings = organizationUnitSettingsDao.fetchAgentSettingsById(review.getAgentId());
-        	if (agentSettings != null && agentSettings.getSocialMediaTokens() != null) {
-        		SocialMediaTokens mediaTokens = agentSettings.getSocialMediaTokens();
+            OrganizationUnitSettings agentSettings = organizationUnitSettingsDao.fetchAgentSettingsById(review.getAgentId());
+            if (agentSettings != null && agentSettings.getSocialMediaTokens() != null) {
+                SocialMediaTokens mediaTokens = agentSettings.getSocialMediaTokens();
 
-        		// adding yelpUrl
-        		if (mediaTokens.getYelpToken() != null && mediaTokens.getYelpToken().getYelpPageLink() != null) {
-        			review.setYelpProfileUrl(mediaTokens.getYelpToken().getYelpPageLink());
-        		}
+                // adding yelpUrl
+                if (mediaTokens.getYelpToken() != null && mediaTokens.getYelpToken().getYelpPageLink() != null) {
+                    review.setYelpProfileUrl(mediaTokens.getYelpToken().getYelpPageLink());
+                }
 
-        		// adding zillowUrl
-        		if (mediaTokens.getZillowToken() != null && mediaTokens.getZillowToken().getZillowProfileLink() != null) {
-        			review.setZillowProfileUrl(mediaTokens.getZillowToken().getZillowProfileLink());
-        		}
+                // adding zillowUrl
+                if (mediaTokens.getZillowToken() != null && mediaTokens.getZillowToken().getZillowProfileLink() != null) {
+                    review.setZillowProfileUrl(mediaTokens.getZillowToken().getZillowProfileLink());
+                }
 
-        		// adding lendingTreeUrl
-        		if (mediaTokens.getLendingTreeToken() != null && mediaTokens.getLendingTreeToken().getLendingTreeProfileLink() != null) {
-        			review.setLendingTreeProfileUrl(mediaTokens.getLendingTreeToken().getLendingTreeProfileLink());
-        		}
-        		if (mediaTokens.getRealtorToken() != null && mediaTokens.getRealtorToken().getRealtorProfileLink() != null) {
-        			review.setRealtorProfileUrl(mediaTokens.getRealtorToken().getRealtorProfileLink());
-        		}
-        	}
+                // adding lendingTreeUrl
+                if (mediaTokens.getLendingTreeToken() != null && mediaTokens.getLendingTreeToken().getLendingTreeProfileLink() != null) {
+                    review.setLendingTreeProfileUrl(mediaTokens.getLendingTreeToken().getLendingTreeProfileLink());
+                }
+                if (mediaTokens.getRealtorToken() != null && mediaTokens.getRealtorToken().getRealtorProfileLink() != null) {
+                    review.setRealtorProfileUrl(mediaTokens.getRealtorToken().getRealtorProfileLink());
+                }
+            }
         }*/
 
         return surveyDetails;
@@ -2803,7 +2803,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 
     @Override
     @Transactional
-    public Map<String, Long> getHierarchyDetailsByEntity( String entityType, long entityId ) throws InvalidInputException
+    public Map<String, Long> getHierarchyDetailsByEntity( String entityType, long entityId ) throws InvalidInputException, ProfileNotFoundException
     {
         Map<String, Long> hierarchyDetials = new HashMap<String, Long>();
         Map<String, Long> hierarchyMap = new HashMap<String, Long>();
@@ -2854,7 +2854,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
     @Override
     @Transactional
     public Map<SettingsForApplication, OrganizationUnit> getPrimaryHierarchyByEntity( String entityType, long entityId )
-        throws InvalidInputException, InvalidSettingsStateException
+        throws InvalidInputException, InvalidSettingsStateException, ProfileNotFoundException
     {
         boolean logoLocked = true;
         boolean webAddressLocked = true;

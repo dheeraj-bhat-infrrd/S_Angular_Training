@@ -11,6 +11,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.xssf.usermodel.XSSFCell;
@@ -23,6 +24,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
+
 import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.commons.Utils;
 import com.realtech.socialsurvey.core.dao.GenericDao;
@@ -32,6 +34,7 @@ import com.realtech.socialsurvey.core.entities.User;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.exception.NoRecordsFetchedException;
 import com.realtech.socialsurvey.core.services.mail.UndeliveredEmailException;
+import com.realtech.socialsurvey.core.services.organizationmanagement.ProfileNotFoundException;
 import com.realtech.socialsurvey.core.services.organizationmanagement.UserManagementService;
 import com.realtech.socialsurvey.core.services.search.exception.SolrException;
 import com.realtech.socialsurvey.core.services.surveybuilder.SurveyHandler;
@@ -70,7 +73,7 @@ public class BulkSurveyFileUploadImpl implements BulkSurveyFileUpload {
 	private List<String> uploadErrors;
 
 	@Override
-	public void uploadBulkSurveyFile(FileUpload fileUpload) throws InvalidInputException {
+	public void uploadBulkSurveyFile(FileUpload fileUpload) throws InvalidInputException, ProfileNotFoundException {
 		LOG.info("Uploading file for bulk survey");
 		if (fileUpload == null || fileUpload.getFileName() == null || fileUpload.getFileName().isEmpty() || fileUpload.getCompany() == null) {
 			LOG.error("Invalid file upload for bulk survey upload");
@@ -223,7 +226,7 @@ public class BulkSurveyFileUploadImpl implements BulkSurveyFileUpload {
 		return true;
 	}
 
-	private void initiateSurvey(List<SurveyUploadVO> surveyUploadList, long companyId) {
+	private void initiateSurvey(List<SurveyUploadVO> surveyUploadList, long companyId) throws ProfileNotFoundException {
 		LOG.debug("Sending survey reminders");
 		for (SurveyUploadVO surveyUpload : surveyUploadList) {
 			LOG.debug("Sending survey request to " + surveyUpload.getCustomerFirstName() + " at " + surveyUpload.getCustomerEmailId());
