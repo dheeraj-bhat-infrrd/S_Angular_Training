@@ -400,4 +400,8 @@ public interface EmailServices {
             String companyName, SurveyPreInitiation survey, String surveyLink, String logoUrl);
 
     void sendZillowCallExceededMailToAdmin( int count ) throws InvalidInputException, UndeliveredEmailException;
+
+	void sendReportBugMailToAdmin(String displayName, String errorMsg,
+			String recipientMailId) throws InvalidInputException,
+			UndeliveredEmailException;
 }
