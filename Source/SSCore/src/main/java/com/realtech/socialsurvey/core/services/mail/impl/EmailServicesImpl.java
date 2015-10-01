@@ -1778,12 +1778,11 @@ public class EmailServicesImpl implements EmailServices
     }
 
     @Override
-    public void sendZillowCallExceededMailToAdmin() throws InvalidInputException, UndeliveredEmailException{
+    public void sendZillowCallExceededMailToAdmin(int count) throws InvalidInputException, UndeliveredEmailException{
         LOG.info( "Method sendZillowCallExceededMailToAdmin() started" );
         LOG.info("Saving EmailEntity with recipient mail id : " + applicationAdminEmail);
         EmailEntity emailEntity = prepareEmailEntityForSendingEmail( applicationAdminEmail );
         String subject = "Zillow API call exceeded for the day";
-        int count = surveyDetailsDao.fetchZillowCallCount();
         String mailBody = "Zillow API call exceeded for the day. Call count : " + count;
         LOG.info( "Calling email sender to send mail" );
         emailSender.sendEmail( emailEntity, subject, mailBody );

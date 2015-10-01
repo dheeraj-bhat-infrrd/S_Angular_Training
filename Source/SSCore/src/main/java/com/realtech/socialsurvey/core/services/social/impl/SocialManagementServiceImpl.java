@@ -480,6 +480,14 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
 	}
 	
 	@Override
+	public int fetchZillowCallCount(){
+	    LOG.info( "Method fetchZillowCallCount() started" );
+	    int count = surveyDetailsDao.fetchZillowCallCount();
+	    LOG.info( "Method fetchZillowCallCount() finished" );
+	    return count;
+	}
+	
+	@Override
 	public void updateZillowCallCount(){
 	    LOG.info( "Method updateZillowCallCount() started" );
 	    surveyDetailsDao.updateZillowCallCount();
