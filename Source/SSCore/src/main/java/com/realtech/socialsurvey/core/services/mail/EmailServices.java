@@ -398,4 +398,8 @@ public interface EmailServices {
             OrganizationUnitSettings companySettings, User user,
             String agentName, String agentEmailId, String agentPhone, String agentTitle,
             String companyName, SurveyPreInitiation survey, String surveyLink, String logoUrl);
+
+	void sendReportBugMailToAdmin(String displayName, String errorMsg,
+			String recipientMailId) throws InvalidInputException,
+			UndeliveredEmailException;
 }

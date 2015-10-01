@@ -1,14 +1,17 @@
 package com.realtech.socialsurvey.core.starter;
 
 import java.util.List;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+
 import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.entities.FileUpload;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.exception.NoRecordsFetchedException;
+import com.realtech.socialsurvey.core.services.organizationmanagement.ProfileNotFoundException;
 import com.realtech.socialsurvey.core.services.upload.BulkSurveyFileUpload;
 
 @Component
@@ -41,6 +44,8 @@ public class CSVBulkSurveyInitiatorProcessor implements Runnable {
 					catch (InvalidInputException e) {
 						LOG.debug("Error updating the status");
 						continue;
+					} catch (ProfileNotFoundException e) {
+						LOG.error("error while upload bulk survey " , e);
 					}
 				}
 			}

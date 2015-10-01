@@ -332,7 +332,7 @@ public interface UserManagementService {
 
 	public List<SettingsDetails> getSettingScoresById(long companyId, long regionId, long branchId);
 
-	public Map<String, Long> getPrimaryUserProfileByAgentId(long entityId);
+	public Map<String, Long> getPrimaryUserProfileByAgentId(long entityId) throws InvalidInputException, ProfileNotFoundException;
 
 	void updateProfileUrlInAgentSettings(String profileName, String profileUrl, AgentSettings agentSettings);
 
@@ -341,7 +341,7 @@ public interface UserManagementService {
 	void updateProfileUrlInRegionSettings(String profileName, String profileUrl, OrganizationUnitSettings regionSettings);
 
 	void updateProfileUrlInCompanySettings(String profileName, String profileUrl, OrganizationUnitSettings companySettings);
-
-	public String fetchAppropriateLogoUrlFromHierarchyForUser(long userId) throws InvalidInputException, NoRecordsFetchedException;
+	
+	public String fetchAppropriateLogoUrlFromHierarchyForUser(long userId) throws InvalidInputException, NoRecordsFetchedException, ProfileNotFoundException;
 }
 // JIRA SS-34 BY RM02 BOC
