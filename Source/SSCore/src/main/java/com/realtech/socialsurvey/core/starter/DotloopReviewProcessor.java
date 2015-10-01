@@ -257,7 +257,7 @@ public class DotloopReviewProcessor extends QuartzJobBean
                         surveyPreInitiation = new SurveyPreInitiation();
                         surveyPreInitiation = setCollectionDetails( surveyPreInitiation, collectionName, organizationUnitId );
                         surveyPreInitiation.setCreatedOn( new Timestamp( System.currentTimeMillis() ) );
-                        surveyPreInitiation.setAgentId( 0 );
+
                         surveyPreInitiation.setCustomerEmailId( customerMappingKey );
                         surveyPreInitiation.setCustomerFirstName( customerMapping.get( customerMappingKey ) );
                         surveyPreInitiation.setLastReminderTime( utils.convertEpochDateToTimestamp() );
@@ -290,12 +290,14 @@ public class DotloopReviewProcessor extends QuartzJobBean
         LOG.debug( "Inside method setCollectionDetails " );
         if ( collectionName.equalsIgnoreCase( MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION ) ) {
             surveyPreInitiation.setCompanyId( organizationUnitId );
+            surveyPreInitiation.setAgentId( 0 );
         } else if ( collectionName.equalsIgnoreCase( MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION ) ) {
             Company company = organizationManagementService.getPrimaryCompanyByRegion( organizationUnitId );
             if ( company != null ) {
                 surveyPreInitiation.setCompanyId( company.getCompanyId() );
             }
             surveyPreInitiation.setRegionCollectionId( organizationUnitId );
+            surveyPreInitiation.setAgentId( 0 );
         } else if ( collectionName.equalsIgnoreCase( MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION ) ) {
             Region region = organizationManagementService.getPrimaryRegionByBranch( organizationUnitId );
             if ( region != null ) {
@@ -306,6 +308,7 @@ public class DotloopReviewProcessor extends QuartzJobBean
                 surveyPreInitiation.setRegionCollectionId( region.getRegionId() );
             }
             surveyPreInitiation.setBranchCollectionId( organizationUnitId );
+            surveyPreInitiation.setAgentId( 0 );
         } else if ( collectionName.equals( MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION ) ) {
             User user = null;
             try {
@@ -318,7 +321,7 @@ public class DotloopReviewProcessor extends QuartzJobBean
                 if ( company != null ) {
                     surveyPreInitiation.setCompanyId( company.getCompanyId() );
                 }
-                surveyPreInitiation.setAgentCollectionId( organizationUnitId );
+                surveyPreInitiation.setAgentId( organizationUnitId );
             }
 
         }
