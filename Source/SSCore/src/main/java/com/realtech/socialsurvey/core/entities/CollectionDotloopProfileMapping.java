@@ -17,7 +17,7 @@ import javax.persistence.Table;
 @NamedQuery ( name = "CollectionDotloopProfileMapping.findAll", query = "SELECT cdpm FROM CollectionDotloopProfileMapping cdpm")
 public class CollectionDotloopProfileMapping implements Serializable
 {
-    private static final Long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
 
     public CollectionDotloopProfileMapping()
@@ -28,7 +28,7 @@ public class CollectionDotloopProfileMapping implements Serializable
     private int id;
 
     @Column ( name = "COMPANY_ID")
-    private Long companyId;
+    private long companyId;
 
     @Column ( name = "PROFILE_ID")
     private String profileId;
@@ -43,13 +43,13 @@ public class CollectionDotloopProfileMapping implements Serializable
     private boolean active;
 
     @Column ( name = "REGION_ID")
-    private Long regionId;
+    private long regionId;
 
     @Column ( name = "BRANCH_ID")
-    private Long branchId;
+    private long branchId;
 
     @Column ( name = "AGENT_ID")
-    private Long agentId;
+    private long agentId;
 
 
     public int getId()
@@ -112,49 +112,49 @@ public class CollectionDotloopProfileMapping implements Serializable
     }
 
 
-    public Long getCompanyId()
+    public long getCompanyId()
     {
         return companyId;
     }
 
 
-    public void setCompanyId( Long companyId )
+    public void setCompanyId( long companyId )
     {
         this.companyId = companyId;
     }
 
 
-    public Long getRegionId()
+    public long getRegionId()
     {
         return regionId;
     }
 
 
-    public void setRegionId( Long regionId )
+    public void setRegionId( long regionId )
     {
         this.regionId = regionId;
     }
 
 
-    public Long getBranchId()
+    public long getBranchId()
     {
         return branchId;
     }
 
 
-    public void setBranchId( Long branchId )
+    public void setBranchId( long branchId )
     {
         this.branchId = branchId;
     }
 
 
-    public Long getAgentId()
+    public long getAgentId()
     {
         return agentId;
     }
 
 
-    public void setAgentId( Long agentId )
+    public void setAgentId( long agentId )
     {
         this.agentId = agentId;
     }
