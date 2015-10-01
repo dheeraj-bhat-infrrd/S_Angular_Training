@@ -20,6 +20,7 @@ import com.realtech.socialsurvey.core.entities.Company;
 import com.realtech.socialsurvey.core.entities.DisabledAccount;
 import com.realtech.socialsurvey.core.entities.FeedIngestionEntity;
 import com.realtech.socialsurvey.core.entities.LoopProfileMapping;
+import com.realtech.socialsurvey.core.entities.MailContent;
 import com.realtech.socialsurvey.core.entities.MailContentSettings;
 import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
 import com.realtech.socialsurvey.core.entities.Region;
@@ -1115,5 +1116,20 @@ public interface OrganizationManagementService
      */
     public void updateCRMDetailsForAnyUnitSettings( OrganizationUnitSettings unitSettings, String collectionName,
         CRMInfo crmInfo, String fullyQualifiedClass ) throws InvalidInputException;
+
+
+    MailContent deleteMailBodyFromSetting( OrganizationUnitSettings companySettings, String mailCategory )
+        throws NonFatalException;
+
+
+    /**
+     * @param collectionName
+     * @param unitSettings
+     * @param surveySettings
+     * @return
+     * @throws InvalidInputException
+     */
+    public boolean updateScoreForSurvey( String collectionName, OrganizationUnitSettings unitSettings,
+        SurveySettings surveySettings ) throws InvalidInputException;
 
 }

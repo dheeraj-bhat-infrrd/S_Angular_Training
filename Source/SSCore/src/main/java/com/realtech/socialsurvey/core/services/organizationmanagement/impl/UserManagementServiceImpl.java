@@ -1185,6 +1185,21 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
         LOG.info( "Method to update a user finished for user : " + profileIdToUpdate );
     }
 
+    @Transactional
+    @Override
+    public void removeUserProfile( long profileIdToDelete) throws InvalidInputException
+    {
+        LOG.info( "Method to delete a profile called for user profile: " + profileIdToDelete );
+        
+        UserProfile userProfile = userProfileDao.findById( UserProfile.class, profileIdToDelete );
+        if ( userProfile == null ) {
+            throw new InvalidInputException( "No user profile present for the specified profileId" );
+        }
+
+
+        userProfileDao.delete(userProfile);
+        LOG.info( "Method to delete a profile finished for profile : " + profileIdToDelete );
+    }
 
     /*
      * Method to update the given user as active based on profiles completed
@@ -1218,6 +1233,61 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 
         userDao.update( user );
         LOG.info( "Method to update a user finished for user : " + profileIdToUpdate );
+    }
+    
+    
+    @Override
+    @Transactional
+    public void updatePrimaryProfileOfUser(User user )throws InvalidInputException{
+    	
+    	if(user == null){
+    		LOG.error( "User object passed was be null" );
+            throw new InvalidInputException( "Passed User object is null" );
+    	}
+    	LOG.debug("method updatePrimaryProfileOfUser started for user with userid : " + user.getUserId());
+    	List<UserProfile> userProfileList = userProfileDao.findByColumn(UserProfile.class, CommonConstants.USER_COLUMN, user);
+    	if(userProfileList != null &&  ! userProfileList.isEmpty()){
+			UserProfile profileToMakePrimary = null;
+    		
+    		UserProfile agentProfileWithoutDefaultBranch = null;
+    		UserProfile agentProfileWithDefaultBranch = null;
+    		UserProfile branchAdminProfile = null;
+    		UserProfile regionAdminProfile = null;
+    		UserProfile companyAdminProfile = null;
+    		
+			for(UserProfile currentProfile : userProfileList){
+    			Branch branch = branchDao.findById(Branch.class, currentProfile.getBranchId());
+    			
+    			if(currentProfile.getProfilesMaster().getProfileId() == CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID && branch.getIsDefaultBySystem() == CommonConstants.IS_DEFAULT_BY_SYSTEM_NO){
+    				agentProfileWithoutDefaultBranch = currentProfile;
+    			}else if(currentProfile.getProfilesMaster().getProfileId() == CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID && branch.getIsDefaultBySystem() == CommonConstants.IS_DEFAULT_BY_SYSTEM_YES){
+    				agentProfileWithDefaultBranch = currentProfile;
+    			}else if(currentProfile.getProfilesMaster().getProfileId() == CommonConstants.PROFILES_MASTER_BRANCH_ADMIN_PROFILE_ID){
+    				branchAdminProfile = currentProfile;
+    			}else if(currentProfile.getProfilesMaster().getProfileId() == CommonConstants.PROFILES_MASTER_REGION_ADMIN_PROFILE_ID){
+    				regionAdminProfile = currentProfile;
+    			}else if(currentProfile.getProfilesMaster().getProfileId() == CommonConstants.PROFILES_MASTER_COMPANY_ADMIN_PROFILE_ID){
+    				companyAdminProfile = currentProfile;
+    			}
+    		}
+    		
+    		if(agentProfileWithoutDefaultBranch != null){
+    			profileToMakePrimary = agentProfileWithoutDefaultBranch;
+    		}else if(agentProfileWithDefaultBranch != null){
+    			profileToMakePrimary = agentProfileWithDefaultBranch;
+    		}else if(branchAdminProfile != null){
+    			profileToMakePrimary = branchAdminProfile;
+    		}else if(regionAdminProfile != null){
+    			profileToMakePrimary = regionAdminProfile;
+    		}else if(companyAdminProfile != null){
+    			profileToMakePrimary = companyAdminProfile;
+    		}
+    		
+    		profileToMakePrimary.setIsPrimary(CommonConstants.IS_PRIMARY_TRUE);
+    		userProfileDao.update(profileToMakePrimary);
+    		
+    		LOG.debug("method updatePrimaryProfileOfUser ended for user with userid : " + user.getUserId());
+		}
     }
 
 
@@ -2237,7 +2307,7 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
         LOG.info( "Method checkUserCanEdit executed successfully" );
         return users;
     }
-
+    
 
     /**
      * Method to update user details on completing registration
@@ -2528,10 +2598,11 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
     private int checkWillNewProfileBePrimary( UserProfile userProfileNew, List<UserProfile> userProfiles )
     {
 
-        LOG.debug( "Method checkWillNewProfileBePrimary called in UserManagemetService for email id"
+        LOG.debug( "Method checkWillNewProfileBePrimary called in UserManagementService for email id"
             + userProfileNew.getEmailId() );
 
         int isPrimary = CommonConstants.IS_PRIMARY_FALSE;
+        boolean noOldProfileIsPrimary = true;
 
         if ( userProfiles != null && !userProfiles.isEmpty() ) {
             for ( UserProfile profile : userProfiles ) {
@@ -2539,6 +2610,8 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
                 if ( profile.getIsPrimary() == CommonConstants.IS_PRIMARY_TRUE ) {
 
                     LOG.debug( "An old primary profile founded for email id " + userProfileNew.getEmailId() );
+                    
+                    noOldProfileIsPrimary = false;
 
                     boolean isOldProfileDefault = false;
                     boolean isOldProfileAdmin = false;
@@ -2563,16 +2636,17 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
                         if ( newProfileBranch != null
                             && newProfileBranch.getIsDefaultBySystem() == CommonConstants.IS_DEFAULT_BY_SYSTEM_YES
                             && userProfileNew.getProfilesMaster().getProfileId() == CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID ) {
-                        	
-                        	Region newProfileRegion = regionDao.findById(Region.class, userProfileNew.getRegionId());
-                        	
-                        	// if both branches are default and if new profiles region is not default than make new profile as primary
-                        	if(newProfileRegion != null && newProfileRegion.getIsDefaultBySystem() != CommonConstants.IS_DEFAULT_BY_SYSTEM_YES){
-                        		isPrimary = CommonConstants.IS_PRIMARY_TRUE;
-                        	}else{
-                        		 isPrimary = CommonConstants.IS_PRIMARY_FALSE;
-                        	}
-                         // if new profile's branch is not default than make new profile as primary and change old one  	
+
+                            Region newProfileRegion = regionDao.findById( Region.class, userProfileNew.getRegionId() );
+
+                            // if both branches are default and if new profiles region is not default than make new profile as primary
+                            if ( newProfileRegion != null
+                                && newProfileRegion.getIsDefaultBySystem() != CommonConstants.IS_DEFAULT_BY_SYSTEM_YES ) {
+                                isPrimary = CommonConstants.IS_PRIMARY_TRUE;
+                            } else {
+                                isPrimary = CommonConstants.IS_PRIMARY_FALSE;
+                            }
+                            // if new profile's branch is not default than make new profile as primary and change old one  	
                         } else {
                             profile.setIsPrimary( CommonConstants.IS_PRIMARY_FALSE );
                             userProfileDao.update( profile );
@@ -2604,6 +2678,11 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
             isPrimary = CommonConstants.IS_PRIMARY_TRUE;
         }
 
+        // if no old profile is primary than also new profile will be primary
+        if(noOldProfileIsPrimary){
+        	LOG.debug("No old profile is primary for user so new profile will be primary" );
+        	isPrimary = CommonConstants.IS_PRIMARY_TRUE;
+        }
         return isPrimary;
     }
     

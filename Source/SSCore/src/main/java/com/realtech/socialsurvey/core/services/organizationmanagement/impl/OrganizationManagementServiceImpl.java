@@ -621,21 +621,23 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
             takeSurveyReminderMail = readMailContentFromFile( CommonConstants.SURVEY_REMINDER_MAIL_FILENAME );
             surveyCompletionMail = readMailContentFromFile( CommonConstants.SURVEY_COMPLETION_MAIL_FILENAME );
             socialPostReminderMail = readMailContentFromFile( CommonConstants.SOCIAL_POST_REMINDER_MAIL_FILENAME );
-            incompleteSurveyReminderMail = readMailContentFromFile( CommonConstants.INCOMPLETE_SURVEY_REMINDER_MAIL_FILENAME );
+            incompleteSurveyReminderMail = readMailContentFromFile( CommonConstants.RESTART_SURVEY_MAIL_FILENAME );
 
             takeSurveyMailSubj = CommonConstants.SURVEY_MAIL_SUBJECT + "[AgentName]";
             takeSurveyByCustomerMailSubj = CommonConstants.SURVEY_MAIL_SUBJECT_CUSTOMER;
-            takeSurveyReminderMailSubj = CommonConstants.REMINDER_MAIL_SUBJECT + "[AgentName]";
+            takeSurveyReminderMailSubj = CommonConstants.REMINDER_MAIL_SUBJECT;
             surveyCompletionMailSubj = CommonConstants.SURVEY_COMPLETION_MAIL_SUBJECT;
             socialPostReminderMailSubj = CommonConstants.SOCIAL_POST_REMINDER_MAIL_SUBJECT;
-            incompleteSurveyReminderMailSubj = CommonConstants.INCOMPLETE_SURVEY_REMINDER_MAIL_SUBJECT;
+            incompleteSurveyReminderMailSubj = CommonConstants.RESTART_SURVEY_MAIL_SUBJECT;
         } catch ( IOException e ) {
             LOG.error(
                 "IOException occured in addOrganizationalDetails while copying default Email content. Nested exception is ", e );
         }
 
         MailContentSettings mailContentSettings = new MailContentSettings();
-        MailContent mailContent = new MailContent();
+        
+        //commented the code because it saves the mail templates in company settings. 
+        /*MailContent mailContent = new MailContent();
         mailContent.setMail_subject( takeSurveyMailSubj );
         mailContent.setMail_body( takeSurveyMail );
         mailContent.setParam_order( new ArrayList<String>( Arrays.asList( paramOrderTakeSurvey.split( "," ) ) ) );
@@ -669,7 +671,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
         mailContent.setMail_subject( incompleteSurveyReminderMailSubj );
         mailContent.setMail_body( incompleteSurveyReminderMail );
         mailContent.setParam_order( new ArrayList<String>( Arrays.asList( paramOrderIncompleteSurveyReminder.split( "," ) ) ) );
-        mailContentSettings.setRestart_survey_mail( mailContent );
+        mailContentSettings.setRestart_survey_mail( mailContent );*/
 
         companySettings.setMail_content( mailContentSettings );
 
@@ -1052,11 +1054,11 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
             MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION );
         LOG.info( "Updated the record successfully" );
     }
-    
-    
+
+
     @Override
-    public void updateCRMDetailsForAnyUnitSettings( OrganizationUnitSettings unitSettings, String collectionName, CRMInfo crmInfo, String fullyQualifiedClass )
-        throws InvalidInputException
+    public void updateCRMDetailsForAnyUnitSettings( OrganizationUnitSettings unitSettings, String collectionName,
+        CRMInfo crmInfo, String fullyQualifiedClass ) throws InvalidInputException
     {
         if ( unitSettings == null ) {
             throw new InvalidInputException( "Unit settings cannot be null." );
@@ -1066,11 +1068,9 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
         }
         LOG.info( "Updating unitSettings: " + unitSettings + " with crm info: " + crmInfo );
         organizationUnitSettingsDao.updateParticularKeyOrganizationUnitSettings(
-            MongoOrganizationUnitSettingDaoImpl.KEY_CRM_INFO, crmInfo, unitSettings,
-            collectionName );
+            MongoOrganizationUnitSettingDaoImpl.KEY_CRM_INFO, crmInfo, unitSettings, collectionName );
         organizationUnitSettingsDao.updateParticularKeyOrganizationUnitSettings(
-            MongoOrganizationUnitSettingDaoImpl.KEY_CRM_INFO_CLASS, fullyQualifiedClass, unitSettings,
-            collectionName);
+            MongoOrganizationUnitSettingDaoImpl.KEY_CRM_INFO_CLASS, fullyQualifiedClass, unitSettings, collectionName );
         LOG.info( "Updated the record successfully" );
     }
 
@@ -1087,6 +1087,23 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
         organizationUnitSettingsDao.updateParticularKeyOrganizationUnitSettings(
             MongoOrganizationUnitSettingDaoImpl.KEY_SURVEY_SETTINGS, surveySettings, companySettings,
             MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION );
+        LOG.info( "Updated the record successfully" );
+
+        return true;
+    }
+
+
+    @Override
+    public boolean updateScoreForSurvey( String collectionName, OrganizationUnitSettings unitSettings,
+        SurveySettings surveySettings ) throws InvalidInputException
+    {
+        if ( unitSettings == null ) {
+            throw new InvalidInputException( "Company settings cannot be null." );
+        }
+
+        LOG.info( "Updating unitSettings: " + unitSettings + " with surveySettings: " + surveySettings );
+        organizationUnitSettingsDao.updateParticularKeyOrganizationUnitSettings(
+            MongoOrganizationUnitSettingDaoImpl.KEY_SURVEY_SETTINGS, surveySettings, unitSettings, collectionName );
         LOG.info( "Updated the record successfully" );
 
         return true;
@@ -1159,7 +1176,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
             originalContentSettings.setSurvey_completion_mail( mailContent );
         } else if ( mailCategory.equals( CommonConstants.SOCIAL_POST_REMINDER_MAIL_BODY_CATEGORY ) ) {
             originalContentSettings.setSocial_post_reminder_mail( mailContent );
-        } else if ( mailCategory.equals( CommonConstants.INCOMPLETE_SURVEY_REMINDER_MAIL_BODY_CATEGORY ) ) {
+        } else if ( mailCategory.equals( CommonConstants.RESTART_SURVEY_MAIL_BODY_CATEGORY ) ) {
             originalContentSettings.setRestart_survey_mail( mailContent );
         } else {
             throw new InvalidInputException( "Invalid mail category" );
@@ -1174,6 +1191,117 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
         return originalContentSettings;
     }
 
+    @Override
+    public MailContent deleteMailBodyFromSetting( OrganizationUnitSettings companySettings, String mailCategory )
+        throws NonFatalException
+    {
+        if ( companySettings == null ) {
+            throw new InvalidInputException( "Company settings cannot be null." );
+        }
+        if ( mailCategory == null ) {
+            throw new InvalidInputException( "Invalid mail category." );
+        }
+        LOG.debug( "Deleting " + mailCategory + " for settings: " + companySettings.toString() );
+
+        MailContent mailContent = new MailContent();
+        String mailBody = null;
+        String mailSubject = null;
+        List<String> paramOrder = null;
+
+        // TODO updating mail details
+        MailContentSettings originalContentSettings = companySettings.getMail_content();
+        if ( mailCategory.equals( CommonConstants.SURVEY_MAIL_BODY_CATEGORY ) ) {
+            mailSubject = CommonConstants.SURVEY_MAIL_SUBJECT + "[AgentName]";
+            try {
+                mailBody = readMailContentFromFile( CommonConstants.SURVEY_REQUEST_MAIL_FILENAME );
+            } catch ( IOException e ) {
+                throw new NonFatalException( "Error occurred while parsing mail content.",
+                    DisplayMessageConstants.GENERAL_ERROR, e );
+            }
+            paramOrder = new ArrayList<String>( Arrays.asList( paramOrderTakeSurvey.split( "," ) ) );
+
+            mailContent = new MailContent();
+            mailContent.setMail_subject( mailSubject );
+            mailContent.setMail_body( mailBody );
+            mailContent.setParam_order( paramOrder );
+
+            originalContentSettings.setTake_survey_mail( null );
+        } else if ( mailCategory.equals( CommonConstants.SURVEY_REMINDER_MAIL_BODY_CATEGORY ) ) {
+            mailSubject = CommonConstants.REMINDER_MAIL_SUBJECT;
+            try {
+                mailBody = readMailContentFromFile( CommonConstants.SURVEY_REMINDER_MAIL_FILENAME );
+            } catch ( IOException e ) {
+                throw new NonFatalException( "Error occurred while parsing mail content.",
+                    DisplayMessageConstants.GENERAL_ERROR, e );
+            }
+            paramOrder = new ArrayList<String>( Arrays.asList( paramOrderTakeSurveyReminder.split( "," ) ) );
+
+            mailContent = new MailContent();
+            mailContent.setMail_subject( mailSubject );
+            mailContent.setMail_body( mailBody );
+            mailContent.setParam_order( paramOrder );
+
+            originalContentSettings.setTake_survey_reminder_mail( null );
+        } else if ( mailCategory.equals( CommonConstants.SURVEY_COMPLETION_MAIL_BODY_CATEGORY ) ) {
+            mailSubject = CommonConstants.SURVEY_COMPLETION_MAIL_SUBJECT;
+            try {
+                mailBody = readMailContentFromFile( CommonConstants.SURVEY_COMPLETION_MAIL_FILENAME );
+            } catch ( IOException e ) {
+                throw new NonFatalException( "Error occurred while parsing mail content.",
+                    DisplayMessageConstants.GENERAL_ERROR, e );
+            }
+            paramOrder = new ArrayList<String>( Arrays.asList( paramOrderSurveyCompletionMail.split( "," ) ) );
+
+            mailContent = new MailContent();
+            mailContent.setMail_subject( mailSubject );
+            mailContent.setMail_body( mailBody );
+            mailContent.setParam_order( paramOrder );
+
+            originalContentSettings.setSurvey_completion_mail( null );
+        } else if ( mailCategory.equals( CommonConstants.SOCIAL_POST_REMINDER_MAIL_BODY_CATEGORY ) ) {
+            mailSubject = CommonConstants.SOCIAL_POST_REMINDER_MAIL_SUBJECT;
+            try {
+                mailBody = readMailContentFromFile( CommonConstants.SOCIAL_POST_REMINDER_MAIL_FILENAME );
+            } catch ( IOException e ) {
+                throw new NonFatalException( "Error occurred while parsing mail content.",
+                    DisplayMessageConstants.GENERAL_ERROR, e );
+            }
+            paramOrder = new ArrayList<String>( Arrays.asList( paramOrderSocialPostReminder.split( "," ) ) );
+
+            mailContent = new MailContent();
+            mailContent.setMail_subject( mailSubject );
+            mailContent.setMail_body( mailBody );
+            mailContent.setParam_order( paramOrder );
+
+            originalContentSettings.setSocial_post_reminder_mail( null );
+        } else if ( mailCategory.equals( CommonConstants.RESTART_SURVEY_MAIL_BODY_CATEGORY ) ) {
+            mailSubject = CommonConstants.RESTART_SURVEY_MAIL_SUBJECT;
+            try {
+                mailBody = readMailContentFromFile( CommonConstants.RESTART_SURVEY_MAIL_FILENAME );
+            } catch ( IOException e ) {
+                throw new NonFatalException( "Error occurred while parsing mail content.",
+                    DisplayMessageConstants.GENERAL_ERROR, e );
+            }
+            paramOrder = new ArrayList<String>( Arrays.asList( paramOrderIncompleteSurveyReminder.split( "," ) ) );
+
+            mailContent = new MailContent();
+            mailContent.setMail_subject( mailSubject );
+            mailContent.setMail_body( mailBody );
+            mailContent.setParam_order( paramOrder );
+
+            originalContentSettings.setRestart_survey_mail( null );
+        } else {
+            throw new InvalidInputException( "Invalid mail category" );
+        }
+
+        LOG.info( "Deleting company settings mail content" );
+        organizationUnitSettingsDao.updateParticularKeyOrganizationUnitSettings(
+            MongoOrganizationUnitSettingDaoImpl.KEY_MAIL_CONTENT, originalContentSettings, companySettings,
+            MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION );
+        LOG.info( "Deleting company settings mail content" );
+
+        return mailContent;
+    }
 
     @Override
     public MailContentSettings revertSurveyParticipationMailBody( OrganizationUnitSettings companySettings, String mailCategory )
@@ -1210,7 +1338,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 
             originalContentSettings.setTake_survey_mail( mailContent );
         } else if ( mailCategory.equals( CommonConstants.SURVEY_REMINDER_MAIL_BODY_CATEGORY ) ) {
-            mailSubject = CommonConstants.REMINDER_MAIL_SUBJECT + "[AgentName]";
+            mailSubject = CommonConstants.REMINDER_MAIL_SUBJECT;
             try {
                 mailBody = readMailContentFromFile( CommonConstants.SURVEY_REMINDER_MAIL_FILENAME );
             } catch ( IOException e ) {
@@ -1257,10 +1385,10 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
             mailContent.setParam_order( paramOrder );
 
             originalContentSettings.setSocial_post_reminder_mail( mailContent );
-        } else if ( mailCategory.equals( CommonConstants.INCOMPLETE_SURVEY_REMINDER_MAIL_BODY_CATEGORY ) ) {
-            mailSubject = CommonConstants.INCOMPLETE_SURVEY_REMINDER_MAIL_SUBJECT;
+        } else if ( mailCategory.equals( CommonConstants.RESTART_SURVEY_MAIL_BODY_CATEGORY ) ) {
+            mailSubject = CommonConstants.RESTART_SURVEY_MAIL_SUBJECT;
             try {
-                mailBody = readMailContentFromFile( CommonConstants.INCOMPLETE_SURVEY_REMINDER_MAIL_FILENAME );
+                mailBody = readMailContentFromFile( CommonConstants.RESTART_SURVEY_MAIL_FILENAME );
             } catch ( IOException e ) {
                 throw new NonFatalException( "Error occurred while parsing mail content.",
                     DisplayMessageConstants.GENERAL_ERROR, e );
@@ -1298,7 +1426,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
             return new ArrayList<String>( Arrays.asList( paramOrderSurveyCompletionMail.split( "," ) ) );
         } else if ( mailCategory.equals( CommonConstants.SOCIAL_POST_REMINDER_MAIL_BODY_CATEGORY ) ) {
             return new ArrayList<String>( Arrays.asList( paramOrderSocialPostReminder.split( "," ) ) );
-        } else if ( mailCategory.equals( CommonConstants.INCOMPLETE_SURVEY_REMINDER_MAIL_BODY_CATEGORY ) ) {
+        } else if ( mailCategory.equals( CommonConstants.RESTART_SURVEY_MAIL_BODY_CATEGORY ) ) {
             return new ArrayList<String>( Arrays.asList( paramOrderIncompleteSurveyReminder.split( "," ) ) );
         } else {
             throw new InvalidInputException( "Invalid mail category" );
@@ -2273,6 +2401,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
             + userProfileNew.getEmailId() );
 
         int isPrimary = CommonConstants.IS_PRIMARY_FALSE;
+        boolean noOldProfileIsPrimary = true;
 
         if ( userProfiles != null && !userProfiles.isEmpty() ) {
             for ( UserProfile profile : userProfiles ) {
@@ -2280,6 +2409,8 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
                 if ( profile.getIsPrimary() == CommonConstants.IS_PRIMARY_TRUE ) {
 
                     LOG.debug( "An old primary profile founded for email id " + userProfileNew.getEmailId() );
+                    
+                    noOldProfileIsPrimary = false;
 
                     boolean isOldProfileDefault = false;
                     boolean isOldProfileAdmin = false;
@@ -2346,6 +2477,11 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
             isPrimary = CommonConstants.IS_PRIMARY_TRUE;
         }
 
+        // if no old profile is primary than also new profile will be primary
+        if(noOldProfileIsPrimary){
+        	LOG.debug("No old profile is primary for user so new profile will be primary" );
+        	isPrimary = CommonConstants.IS_PRIMARY_TRUE;
+        }
         return isPrimary;
     }
 
@@ -4901,14 +5037,15 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 
     @Override
     @Transactional
-    public CollectionDotloopProfileMapping getCollectionDotloopMappingByProfileId( String profileId ) throws InvalidInputException
+    public CollectionDotloopProfileMapping getCollectionDotloopMappingByProfileId( String profileId )
+        throws InvalidInputException
     {
         if ( profileId == null || profileId.isEmpty() ) {
             LOG.error( "Profile id is null to fetch company dot loop mapping" );
             throw new InvalidInputException( "Profile id is null to fetch company dot loop mapping" );
         }
-        List<CollectionDotloopProfileMapping> collectionDotloopProfileMappingList = collectionDotloopProfileMappingDao.findByColumn(
-            CollectionDotloopProfileMapping.class, "profileId", profileId );
+        List<CollectionDotloopProfileMapping> collectionDotloopProfileMappingList = collectionDotloopProfileMappingDao
+            .findByColumn( CollectionDotloopProfileMapping.class, "profileId", profileId );
         if ( collectionDotloopProfileMappingList.isEmpty() ) {
             return null;
         } else {
