@@ -19,6 +19,7 @@ import org.springframework.stereotype.Component;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.commons.EmailTemplateConstants;
 import com.realtech.socialsurvey.core.dao.OrganizationUnitSettingsDao;
+import com.realtech.socialsurvey.core.dao.SurveyDetailsDao;
 import com.realtech.socialsurvey.core.entities.EmailEntity;
 import com.realtech.socialsurvey.core.entities.FileContentReplacements;
 import com.realtech.socialsurvey.core.entities.MailContent;
@@ -56,7 +57,8 @@ public class EmailServicesImpl implements EmailServices
     @Autowired
     private OrganizationUnitSettingsDao organizationUnitSettingsDao;
 
-
+    @Autowired
+    private SurveyDetailsDao surveyDetailsDao;
     @Value ( "${MAX_PAYMENT_RETRIES}")
     private int maxPaymentRetries;
 
@@ -68,6 +70,12 @@ public class EmailServicesImpl implements EmailServices
 
     @Value ( "${APPLICATION_LOGO_URL}")
     private String appLogoUrl;
+    
+    @Value ( "${APPLICATION_ADMIN_EMAIL}")
+    private String applicationAdminEmail;
+
+    @Value ( "${APPLICATION_ADMIN_NAME}")
+    private String applicationAdminName;
 
 
     /**
@@ -1769,6 +1777,17 @@ public class EmailServicesImpl implements EmailServices
         LOG.info( "Method sendHelpMailToAdmin() finished." );
     }
 
+    @Override
+    public void sendZillowCallExceededMailToAdmin(int count) throws InvalidInputException, UndeliveredEmailException{
+        LOG.info( "Method sendZillowCallExceededMailToAdmin() started" );
+        LOG.info("Saving EmailEntity with recipient mail id : " + applicationAdminEmail);
+        EmailEntity emailEntity = prepareEmailEntityForSendingEmail( applicationAdminEmail );
+        String subject = "Zillow API call exceeded for the day";
+        String mailBody = "Zillow API call exceeded for the day. Call count : " + count;
+        LOG.info( "Calling email sender to send mail" );
+        emailSender.sendEmail( emailEntity, subject, mailBody );
+        LOG.info( "Method sendZillowCallExceededMailToAdmin() finished" );
+    }
 
     /**
      * Method to prepare email entity required to send email

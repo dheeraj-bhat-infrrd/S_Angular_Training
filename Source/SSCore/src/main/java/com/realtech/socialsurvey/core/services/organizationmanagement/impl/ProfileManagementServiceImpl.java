@@ -17,7 +17,9 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
+
 import javax.annotation.Resource;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
@@ -27,8 +29,10 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.DependsOn;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
+
 import retrofit.client.Response;
 import retrofit.mime.TypedByteArray;
+
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonMappingException;
@@ -3452,8 +3456,31 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 								Map<String, Object> responseMap = new HashMap<String, Object>();
 								Map<String, Object> resultMap = new HashMap<String, Object>();
 								Map<String, Object> proReviews = new HashMap<String, Object>();
+								Map<String, Object> messageMap = new HashMap<String, Object>();
 								List<HashMap<String, Object>> reviews = new ArrayList<HashMap<String, Object>>();
 								responseMap = (HashMap<String, Object>) map.get("response");
+								messageMap = (HashMap<String, Object>) map.get( "message" );
+								String code = (String) messageMap.get( "code" );
+			                    if ( !code.equalsIgnoreCase( "0" ) ) {
+			                        String errorMessage = (String) messageMap.get( "text" );
+			                        if( errorMessage.contains("You exceeded the maximum API requests per day.") ){
+			                            int count = socialManagementService.fetchZillowCallCount();
+			                            if ( count != 0 ){
+    			                            LOG.debug("Zillow API call count exceeded limit. Sending mail to admin.");
+    			                            try {
+                                                emailServices.sendZillowCallExceededMailToAdmin( count );
+                                                surveyDetailsDao.resetZillowCallCount();
+                                            } catch ( InvalidInputException e ) {
+                                                LOG.error( "Sending the mail to the admin failed due to invalid input. Reason : ", e );
+                                            } catch ( UndeliveredEmailException e ) {
+                                                LOG.error( "The email failed to get delivered. Reason : ", e );
+                                            }
+			                            }
+			                        }
+			                        LOG.error( "Error code : " + code + " Error description : " + errorMessage );
+			                    } else {
+			                        surveyDetailsDao.updateZillowCallCount();
+			                    }
 								if (responseMap != null) {
 									resultMap = (HashMap<String, Object>) responseMap.get("results");
 									if (resultMap != null) {
