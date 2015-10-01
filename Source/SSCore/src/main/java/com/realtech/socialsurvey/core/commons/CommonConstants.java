@@ -188,6 +188,8 @@ public interface CommonConstants
     public static final String EDITABLE_SURVEY_COLUMN = "editable";
     public static final String AGREE_SHARE_COLUMN = "agreedToShare";
     public static final String SUBSCRIPTION_ID_SOURCE_BRAINTREE = "Braintree";
+    public static final String SURVEY_ID_COLUMN = "surveyId";
+    public static final String ABUSE_REPORTERS_COLUMN = "abuseReporters";
 
     /**
      * Constants to be used in code for referencing variables(i.e in maps or session attributes)
@@ -716,4 +718,5 @@ public interface CommonConstants
     // file upload types
     public static final int FILE_UPLOAD_HIERARCHY_TYPE = 1;
     public static final int FILE_UPLOAD_SURVEY_TYPE = 2;
+   
 }
