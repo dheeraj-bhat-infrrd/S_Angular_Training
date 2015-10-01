@@ -1054,11 +1054,11 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
             MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION );
         LOG.info( "Updated the record successfully" );
     }
-    
-    
+
+
     @Override
-    public void updateCRMDetailsForAnyUnitSettings( OrganizationUnitSettings unitSettings, String collectionName, CRMInfo crmInfo, String fullyQualifiedClass )
-        throws InvalidInputException
+    public void updateCRMDetailsForAnyUnitSettings( OrganizationUnitSettings unitSettings, String collectionName,
+        CRMInfo crmInfo, String fullyQualifiedClass ) throws InvalidInputException
     {
         if ( unitSettings == null ) {
             throw new InvalidInputException( "Unit settings cannot be null." );
@@ -1068,11 +1068,9 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
         }
         LOG.info( "Updating unitSettings: " + unitSettings + " with crm info: " + crmInfo );
         organizationUnitSettingsDao.updateParticularKeyOrganizationUnitSettings(
-            MongoOrganizationUnitSettingDaoImpl.KEY_CRM_INFO, crmInfo, unitSettings,
-            collectionName );
+            MongoOrganizationUnitSettingDaoImpl.KEY_CRM_INFO, crmInfo, unitSettings, collectionName );
         organizationUnitSettingsDao.updateParticularKeyOrganizationUnitSettings(
-            MongoOrganizationUnitSettingDaoImpl.KEY_CRM_INFO_CLASS, fullyQualifiedClass, unitSettings,
-            collectionName);
+            MongoOrganizationUnitSettingDaoImpl.KEY_CRM_INFO_CLASS, fullyQualifiedClass, unitSettings, collectionName );
         LOG.info( "Updated the record successfully" );
     }
 
@@ -1089,6 +1087,23 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
         organizationUnitSettingsDao.updateParticularKeyOrganizationUnitSettings(
             MongoOrganizationUnitSettingDaoImpl.KEY_SURVEY_SETTINGS, surveySettings, companySettings,
             MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION );
+        LOG.info( "Updated the record successfully" );
+
+        return true;
+    }
+
+
+    @Override
+    public boolean updateScoreForSurvey( String collectionName, OrganizationUnitSettings unitSettings,
+        SurveySettings surveySettings ) throws InvalidInputException
+    {
+        if ( unitSettings == null ) {
+            throw new InvalidInputException( "Company settings cannot be null." );
+        }
+
+        LOG.info( "Updating unitSettings: " + unitSettings + " with surveySettings: " + surveySettings );
+        organizationUnitSettingsDao.updateParticularKeyOrganizationUnitSettings(
+            MongoOrganizationUnitSettingDaoImpl.KEY_SURVEY_SETTINGS, surveySettings, unitSettings, collectionName );
         LOG.info( "Updated the record successfully" );
 
         return true;
@@ -5022,14 +5037,15 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 
     @Override
     @Transactional
-    public CollectionDotloopProfileMapping getCollectionDotloopMappingByProfileId( String profileId ) throws InvalidInputException
+    public CollectionDotloopProfileMapping getCollectionDotloopMappingByProfileId( String profileId )
+        throws InvalidInputException
     {
         if ( profileId == null || profileId.isEmpty() ) {
             LOG.error( "Profile id is null to fetch company dot loop mapping" );
             throw new InvalidInputException( "Profile id is null to fetch company dot loop mapping" );
         }
-        List<CollectionDotloopProfileMapping> collectionDotloopProfileMappingList = collectionDotloopProfileMappingDao.findByColumn(
-            CollectionDotloopProfileMapping.class, "profileId", profileId );
+        List<CollectionDotloopProfileMapping> collectionDotloopProfileMappingList = collectionDotloopProfileMappingDao
+            .findByColumn( CollectionDotloopProfileMapping.class, "profileId", profileId );
         if ( collectionDotloopProfileMappingList.isEmpty() ) {
             return null;
         } else {
