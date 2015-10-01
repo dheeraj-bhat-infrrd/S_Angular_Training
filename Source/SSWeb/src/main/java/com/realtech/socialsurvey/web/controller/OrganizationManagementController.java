@@ -1330,7 +1330,7 @@ public class OrganizationManagementController
 
                 SurveySettings surveySettings = unitSettings.getSurvey_settings();
                 surveySettings.setAutoPostEnabled( isAutoPostEnabled );
-                if ( organizationManagementService.updateSurveySettings( unitSettings, surveySettings ) ) {
+                if ( organizationManagementService.updateScoreForSurvey( collectionName, unitSettings, surveySettings ) ) {
                     unitSettings.setSurvey_settings( surveySettings );
                     LOG.info( "Updated Survey Settings" );
                 }
