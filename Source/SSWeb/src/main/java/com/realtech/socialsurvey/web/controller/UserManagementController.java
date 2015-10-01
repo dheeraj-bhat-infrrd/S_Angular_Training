@@ -50,11 +50,9 @@ import com.realtech.socialsurvey.core.enums.DisplayMessageType;
 import com.realtech.socialsurvey.core.enums.OrganizationUnit;
 import com.realtech.socialsurvey.core.enums.SettingsForApplication;
 import com.realtech.socialsurvey.core.exception.FatalException;
-import com.realtech.socialsurvey.core.exception.InternalServerException;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.exception.NoRecordsFetchedException;
 import com.realtech.socialsurvey.core.exception.NonFatalException;
-import com.realtech.socialsurvey.core.exception.ProfileServiceErrorCode;
 import com.realtech.socialsurvey.core.exception.UserAlreadyExistsException;
 import com.realtech.socialsurvey.core.services.authentication.AuthenticationService;
 import com.realtech.socialsurvey.core.services.generator.URLGenerator;
@@ -1726,11 +1724,20 @@ public class UserManagementController
 				long profileId = Long.parseLong(request.getParameter("profileId"));
 				int status = CommonConstants.STATUS_INACTIVE;
 
-				userManagementService.updateUserProfile(user, profileId, status);
-				userManagementService.updateUserProfilesStatus(user, profileId);
-
 				// update user profiles in session if current user
 				User updatedUser = userManagementService.getUserByProfileId(profileId);
+				
+				List<UserProfile> userprofileList = userManagementService.getAllUserProfilesForUser(updatedUser);
+				if(userprofileList.size() == 1 && userprofileList.get(0).getUserProfileId() == profileId){
+					return  messageUtils.getDisplayMessage( DisplayMessageConstants.NOT_ABLE_TO_DELETE_USER_PRIFILE,  DisplayMessageType.ERROR_MESSAGE ).getMessage(); 
+				}
+				
+				userManagementService.updateUserProfile(user, profileId, status);
+				userManagementService.updateUserProfilesStatus(user, profileId);
+				userManagementService.removeUserProfile(profileId);
+				userManagementService.updatePrimaryProfileOfUser(updatedUser);
+
+				updatedUser = userManagementService.getUserByUserId(updatedUser.getUserId());
 				if (user.getUserId() == updatedUser.getUserId()) {
 					try {
 						sessionHelper.processAssignments(request.getSession(false), user);
