@@ -32,7 +32,10 @@ import com.mongodb.BasicDBObject;
 import com.mongodb.DBObject;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.dao.SurveyDetailsDao;
+import com.realtech.socialsurvey.core.entities.AbuseReporterDetails;
+import com.realtech.socialsurvey.core.entities.AbusiveSurveyReportWrapper;
 import com.realtech.socialsurvey.core.entities.AgentRankingReport;
+import com.realtech.socialsurvey.core.entities.ReporterDetail;
 import com.realtech.socialsurvey.core.entities.SurveyDetails;
 import com.realtech.socialsurvey.core.entities.SurveyPreInitiation;
 import com.realtech.socialsurvey.core.entities.SurveyResponse;
@@ -52,6 +55,7 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
     private static final Logger LOG = LoggerFactory.getLogger( MongoSurveyDetailsDaoImpl.class );
 
     public static final String SURVEY_DETAILS_COLLECTION = "SURVEY_DETAILS";
+    public static final String ABS_REPORTER_DETAILS_COLLECTION = "ABUSE_REPORTER_DETAILS";
 
     public static final String ZILLOW_CALL_COUNT = "ZILLOW_CALL_COUNT";
     
@@ -200,7 +204,7 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
 
     
     @Override
-    public void updateSurveyAsAbusive( String surveyMongoId )
+    public void updateSurveyAsAbusive( String surveyMongoId, String reporterEmail, String reporterName)
     {
         LOG.info( "Method updateSurveyAsAbusive() to mark survey as abusive started." );
         Query query = new Query();
@@ -210,6 +214,13 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
         update.set( CommonConstants.CREATED_ON, new Date() );
         update.set( CommonConstants.MODIFIED_ON_COLUMN, new Date() );
         mongoTemplate.updateMulti( query, update, SURVEY_DETAILS_COLLECTION );
+        
+        query = new Query();
+        query.addCriteria( Criteria.where( CommonConstants.SURVEY_ID_COLUMN ).is( surveyMongoId ) );
+        update = new Update();
+        update.set( CommonConstants.SURVEY_ID_COLUMN, surveyMongoId );
+        update.push(CommonConstants.ABUSE_REPORTERS_COLUMN, new ReporterDetail( reporterName, reporterEmail ));
+        mongoTemplate.upsert(query,update, ABS_REPORTER_DETAILS_COLLECTION );
         LOG.info( "Method updateSurveyAsAbusive() to mark survey as abusive finished." );
     }
 
@@ -1495,7 +1506,75 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
         }
         LOG.info( "Method removeExcessZillowSurveysByEntity() finished" );
     }
-    
+
+    @Override
+    public long getSurveysReporetedAsAbusiveCount()
+    {
+        LOG.info( "Method getSurveysReporetedAsAbusiveCount() to get count of surveys marked as abusive started." );
+        long count = mongoTemplate.getCollection( ABS_REPORTER_DETAILS_COLLECTION ).getCount();
+        LOG.info( "Method getSurveysReporetedAsAbusiveCount() to get count of surveys marked as abusive finished." );
+        return count;
+    }
+
+
+    @Override
+    public List<AbusiveSurveyReportWrapper> getSurveysReporetedAsAbusive( int start, int rows )
+    {
+        LOG.info( "Method getSurveysReporetedAsAbusive() to retrieve surveys marked as abusive started." );
+        Query query = new Query( Criteria.where( CommonConstants.IS_ABUSIVE_COLUMN ).is( true ) );
+        query.with( new Sort( Sort.Direction.ASC, CommonConstants.DEFAULT_MONGO_ID_COLUMN ) );
+        if ( start > -1 ) {
+            query.skip( start );
+        }
+        if ( rows > -1 ) {
+            query.limit( rows );
+        }
+
+        List<SurveyDetails> surveys = mongoTemplate.find( query, SurveyDetails.class, SURVEY_DETAILS_COLLECTION );
+        if ( surveys == null || surveys.size() == 0 )
+            return null;
+
+        List<String> surveyIds = new ArrayList<String>();
+        for ( SurveyDetails survey : surveys ) {
+            surveyIds.add( survey.get_id() );
+        }
+
+        query = new Query( Criteria.where( CommonConstants.SURVEY_ID_COLUMN ).in( surveyIds ) );
+        query.with( new Sort( Sort.Direction.ASC, CommonConstants.SURVEY_ID_COLUMN ) );
+        if ( start > -1 ) {
+            query.skip( start );
+        }
+        if ( rows > -1 ) {
+            query.limit( rows );
+        }
+
+        List<AbuseReporterDetails> absReporterDetails = mongoTemplate.find( query, AbuseReporterDetails.class,
+            ABS_REPORTER_DETAILS_COLLECTION );
+
+        List<AbusiveSurveyReportWrapper> abusiveSurveyReports = new ArrayList<AbusiveSurveyReportWrapper>();
+        for ( SurveyDetails survey : surveys ) {
+            if ( absReporterDetails != null && absReporterDetails.size() > 0 ) {
+                boolean reporterDetailsFound = false;
+                for ( AbuseReporterDetails absReporterDetail : absReporterDetails ) {
+                    if ( absReporterDetail.getSurveyId().equals(survey.get_id()) ) {
+                        abusiveSurveyReports.add( new AbusiveSurveyReportWrapper( survey, absReporterDetail ) );
+                        reporterDetailsFound = true;
+                        break;
+                    }
+                }
+                if(!reporterDetailsFound)
+                 // to handle existing surveys where reporter info not saved
+                    abusiveSurveyReports.add( new AbusiveSurveyReportWrapper( survey, null ) );
+            } else {
+                // to handle existing surveys where reporter info not saved
+                abusiveSurveyReports.add( new AbusiveSurveyReportWrapper( survey, null ) );
+            }
+        }
+
+        LOG.info( "Method getSurveysReporetedAsAbusive() to retrieve surveys marked as abusive finished." );
+        return abusiveSurveyReports;
+    }
+        
     @Override
     public int fetchZillowCallCount(){
         LOG.info( "Method fetchZillowCallCount() started" );
