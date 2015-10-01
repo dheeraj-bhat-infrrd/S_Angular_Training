@@ -137,4 +137,13 @@ public interface SurveyDetailsDao
 	void removeZillowSurveysByEntity(String entityType, long entityId);
 
 	void removeExcessZillowSurveysByEntity(String entityType, long entityId);
+
+
+    void updateZillowCallCount();
+
+
+    int fetchZillowCallCount();
+
+
+    void resetZillowCallCount();
 }

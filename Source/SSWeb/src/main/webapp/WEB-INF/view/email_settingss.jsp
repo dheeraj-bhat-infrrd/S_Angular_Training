@@ -203,7 +203,7 @@
 				<!-- incomplete survey reminder mail -->
 				<div class="clearfix st-bottom-wrapper margin-top-50">
 					<div class="st-header-txt-lft-rt clearfix margin-top-25">
-						<div class="float-left st-header-txt-lft"><spring:message code="label.header.incomplete.survey.reminder.mailer.content.key" /></div>
+						<div class="float-left st-header-txt-lft"><spring:message code="label.header.restart.survey.mailer.content.key" /></div>
 						<div class="float-right clearfix st-header-txt-rt">
 							<div class="clearfix">
 								<div id="edit-incomplete-survey-reminder-mail-content"
@@ -227,15 +227,15 @@
 						</div>
 					</div>
 					<div class="st-subject-cont clearfix">
-						<div class="st-subject-label float-left"><spring:message code="label.subject.incomplete.survey.reminder.text" /></div>
+						<div class="st-subject-label float-left"><spring:message code="label.subject.restart.survey.text" /></div>
 						<div class="st-subject-input-cont float-left">
 							<input type="text" id="incomplete-survey-mailreminder-subject" name="incomplete-survey-mailreminder-subject"
-								class="st-subject-input" value="${incompletesurveyremindermailsubject}" readonly>
+								class="st-subject-input" value="${restartsurveymailsubject}" readonly>
 						</div>
 					</div>
 					<div class="st-header-txt-wrapper">
 						<textarea id="incomplete-survey-reminder-mailcontent" name="incomplete-survey-reminder-mailcontent"
-							class="st-header-txt-input">${incompletesurveyremindermailbody}</textarea>
+							class="st-header-txt-input">${restartsurveymailbody}</textarea>
 					</div>
 				</div>
 				
@@ -321,7 +321,14 @@
 			$('#edit-participation-mail-content-disabled').hide();
 		});
 		$('#revert-participation-mail').click(function() {
-			revertMailContent('participationmail');
+			$('#overlay-main').show();
+			$('#overlay-continue').show();
+			$('#overlay-continue').html("Reset");
+			$('#overlay-cancel').html("Cancel");
+			$('#overlay-header').html("Reset Mail Template");
+			$('#overlay-text').html("Are you sure you want to reset the mail template ?");
+			$('#overlay-continue').attr("onclick", "revertMailContent('participationmail');");
+			
 		});
 		
 		//survey reminder mail
@@ -355,7 +362,13 @@
 			$('#edit-participation-reminder-mail-content-disabled').hide();
 		});
 		$('#revert-participation-reminder-mail').click(function() {
-			revertMailContent('participationremindermail');
+			$('#overlay-main').show();
+			$('#overlay-continue').show();
+			$('#overlay-continue').html("Reset");
+			$('#overlay-cancel').html("Cancel");
+			$('#overlay-header').html("Reset Mail Template");
+			$('#overlay-text').html("Are you sure you want to reset the mail template ?");
+			$('#overlay-continue').attr("onclick", "revertMailContent('participationremindermail');");
 		});
 		
 		//for survey completion mail
@@ -389,7 +402,13 @@
 			$('#edit-survey-completion-mail-content-disabled').hide();
 		});
 		$('#revert-survey-completion-mail').click(function() {
-			revertMailContent('surveycompletionmail');
+			$('#overlay-main').show();
+			$('#overlay-continue').show();
+			$('#overlay-continue').html("Reset");
+			$('#overlay-cancel').html("Cancel");
+			$('#overlay-header').html("Reset Mail Template");
+			$('#overlay-text').html("Are you sure you want to reset the mail template ?");
+			$('#overlay-continue').attr("onclick", "revertMailContent('surveycompletionmail');");
 		});
 		
 		//social post reminder mail
@@ -423,7 +442,13 @@
 			$('#edit-social-post-reminder-mail-content-disabled').hide();
 		});
 		$('#revert-social-post-reminder-mail').click(function() {
-			revertMailContent('socialpostremindermail');
+			$('#overlay-main').show();
+			$('#overlay-continue').show();
+			$('#overlay-continue').html("Reset");
+			$('#overlay-cancel').html("Cancel");
+			$('#overlay-header').html("Reset Mail Template");
+			$('#overlay-text').html("Are you sure you want to reset the mail template ?");
+			$('#overlay-continue').attr("onclick", "revertMailContent('socialpostremindermail');");
 		});
 		
 		//incomplete survey reminder mail
@@ -441,7 +466,7 @@
 			$(this).hide();
 		});
 		$('#save-incomplete-survey-reminder-mail-content').click(function() {
-			$('#mailcategory').val('incompletesurveyremindermail');
+			$('#mailcategory').val('restartsurveymail');
 			updateMailContent("mail-body-settings-form");
 			
 			try { 
@@ -457,21 +482,16 @@
 			$('#edit-incomplete-survey-reminder-mail-content-disabled').hide();
 		});
 		$('#revert-incomplete-survey-reminder-mail').click(function() {
-			revertMailContent('incompletesurveyremindermail');
+			$('#overlay-main').show();
+			$('#overlay-continue').show();
+			$('#overlay-continue').html("Reset");
+			$('#overlay-cancel').html("Cancel");
+			$('#overlay-header').html("Reset Mail Template");
+			$('#overlay-text').html("Are you sure you want to reset the mail template ?");
+			$('#overlay-continue').attr("onclick", "revertMailContent('restartsurveymail');");
 		});
 		
-		function revertMailContent(mailcategory) {
-		    showOverlay();
-			var payload = {
-				"mailcategory" : mailcategory
-			};
-			callAjaxPostWithPayloadData('./revertsurveyparticipationmail.do', function (data) {
-				showMainContent('./showemailsettings.do');
-				hideOverlay();
-				$("#overlay-toast").html(data);
-				showToast();
-			}, payload, true);
-		}
+		
 		
 		$('#reminder-interval').change(function() {
 			$('#mailcategory').val('reminder-interval');

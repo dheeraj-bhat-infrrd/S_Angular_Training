@@ -215,7 +215,7 @@ public class SessionHelper {
 				try {
 					List<String> paramOrder = new ArrayList<String>(Arrays.asList(paramOrderTakeSurvey.split(",")));
 					replacements = new FileContentReplacements();
-					replacements.setFileName(EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER + EmailTemplateConstants.SURVEY_PARTICIPATION_MAIL_BODY);
+					replacements.setFileName(EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER + EmailTemplateConstants.SURVEY_INVITATION_MAIL_BODY);
 					body = fileOperations.replaceFileContents(replacements);
 					body = emailFormatHelper.replaceEmailBodyWithParams(body, paramOrder);
 					/*body = body.replaceAll("\\[LogoUrl\\]", applicationLogoUrl);*/
@@ -235,7 +235,7 @@ public class SessionHelper {
 				/*mailBody = mailBody.replaceAll("\\[LogoUrl\\]", applicationLogoUrl);*/
 				mailSettings.getTake_survey_reminder_mail().setMail_body(mailBody);
 				session.setAttribute(CommonConstants.SURVEY_PARTICIPATION_REMINDER_MAIL_BODY_IN_SESSION, mailBody);
-				String remainderSubject = CommonConstants.REMINDER_MAIL_SUBJECT + "[AgentName]";
+				String remainderSubject = CommonConstants.REMINDER_MAIL_SUBJECT;
 				if (mailContent.getMail_subject() != null) {
 					remainderSubject = mailContent.getMail_subject();
 				}
@@ -250,8 +250,7 @@ public class SessionHelper {
 					body = emailFormatHelper.replaceEmailBodyWithParams(body, paramOrder);
 					/*body = body.replaceAll("\\[LogoUrl\\]", applicationLogoUrl);*/
 					session.setAttribute(CommonConstants.SURVEY_PARTICIPATION_REMINDER_MAIL_BODY_IN_SESSION, body);
-					session.setAttribute(CommonConstants.SURVEY_PARTICIPATION_REMINDER_MAIL_SUBJECT_IN_SESSION, CommonConstants.REMINDER_MAIL_SUBJECT
-							+ "[AgentName]");
+					session.setAttribute(CommonConstants.SURVEY_PARTICIPATION_REMINDER_MAIL_SUBJECT_IN_SESSION, CommonConstants.REMINDER_MAIL_SUBJECT);
 				}
 				catch (InvalidInputException e) {
 					LOG.warn("Could not set mail content for survey participation reminder");
@@ -264,12 +263,12 @@ public class SessionHelper {
 				String mailBody = emailFormatHelper.replaceEmailBodyWithParams(mailContent.getMail_body(), mailContent.getParam_order());
 				/*mailBody = mailBody.replaceAll("\\[LogoUrl\\]", applicationLogoUrl);*/
 				mailSettings.getRestart_survey_mail().setMail_body(mailBody);
-				session.setAttribute(CommonConstants.INCOMPLETE_SURVEY_REMINDER_MAIL_BODY_IN_SESSION, mailBody);
-				String incompleteSurveyReminderMailSubject = CommonConstants.INCOMPLETE_SURVEY_REMINDER_MAIL_SUBJECT;
+				session.setAttribute(CommonConstants.RESTART_SURVEY_MAIL_BODY_IN_SESSION, mailBody);
+				String incompleteSurveyReminderMailSubject = CommonConstants.RESTART_SURVEY_MAIL_SUBJECT;
 				if (mailContent.getMail_subject() != null) {
 					incompleteSurveyReminderMailSubject = mailContent.getMail_subject();
 				}
-				session.setAttribute(CommonConstants.INCOMPLETE_SURVEY_REMINDER_MAIL_SUBJECT_IN_SESSION, incompleteSurveyReminderMailSubject);
+				session.setAttribute(CommonConstants.RESTART_SURVEY_MAIL_SUBJECT_IN_SESSION, incompleteSurveyReminderMailSubject);
 			}
 			else {
 				try {
@@ -279,8 +278,8 @@ public class SessionHelper {
 					body = fileOperations.replaceFileContents(replacements);
 					body = emailFormatHelper.replaceEmailBodyWithParams(body, paramOrder);
 					/*body = body.replaceAll("\\[LogoUrl\\]", applicationLogoUrl);*/
-					session.setAttribute(CommonConstants.INCOMPLETE_SURVEY_REMINDER_MAIL_BODY_IN_SESSION, body);
-					session.setAttribute(CommonConstants.INCOMPLETE_SURVEY_REMINDER_MAIL_SUBJECT_IN_SESSION, CommonConstants.INCOMPLETE_SURVEY_REMINDER_MAIL_SUBJECT);
+					session.setAttribute(CommonConstants.RESTART_SURVEY_MAIL_BODY_IN_SESSION, body);
+					session.setAttribute(CommonConstants.RESTART_SURVEY_MAIL_SUBJECT_IN_SESSION, CommonConstants.RESTART_SURVEY_MAIL_SUBJECT);
 				}
 				catch (InvalidInputException e) {
 					LOG.warn("Could not set mail content for incomplete survey reminder");
