@@ -3045,6 +3045,56 @@ function validateDotloopInput() {
 	return true;
 }
 
+//app settings event binding
+$('body').on('click', '#encompass-save', function() {
+	if (validateEncompassInput('encompass-form-div')) {
+		saveEncompassDetails("encompass-form");
+	}
+});
+$('body').on('click', '#encompass-testconnection', function() {
+	if (validateEncompassInput('encompass-form-div')) {
+		testEncompassConnection("encompass-form");
+	}
+});
+$('body').on('click',function(){
+	$('.crm-settings-dropdown-cont').slideUp(200);
+});
+$('body').on('click','.crm-settings-dropdown',function(e){
+	e.stopPropagation();
+	$('.crm-settings-dropdown-cont').slideToggle(200);
+});
+$('body').on('click','.crm-settings-dropdown-item',function(e){
+	var crmType = $(this).attr('data-crm-type');
+	$('#crm-settings-dropdown-sel-text').text(crmType);
+	$('.crm-setting-cont').hide();
+	$('.crm-setting-cont[data-crm-type="'+crmType+'"]').show();
+});
+
+$('body').on('blur', '#encompass-username',function() {
+	validateEncompassUserName(this.id);
+});
+$('body').on('blur', '#encompass-password',function() {
+	validateEncompassPassword(this.id);
+});
+$('body').on('blur', '#encompass-url',function() {
+	validateURL(this.id);
+});
+
+$('#dotloop-apikey').blur(function() {
+	validateDotloopKey(this.id);
+});
+$('body').on('click', '#dotloop-save', function() {
+	if (validateDotloopInput()) {
+		showOverlay();
+		saveDotloopDetails("dotloop-form");
+	}
+});
+$('body').on('click', '#dotloop-testconnection', function() {
+	if (validateDotloopInput()) {
+		testDotloopConnection("dotloop-form");
+	}
+});
+
 //Dotloop function
 function saveDotloopDetails(formid) {
 	if (validateDotloopInput()) {
@@ -3064,6 +3114,29 @@ function testDotloopConnection(formid) {
 			$("#overlay-toast").html(response);
 			showToast();
 		}, formid);
+	}
+}
+
+//Function to validate the api key
+function validateDotloopKey(elementId){
+	if($(window).width()<768){
+		if ($('#'+elementId).val() != "") {
+			$('#'+elementId).next('.hm-item-err-2').hide();
+			return true;
+		} else {
+			$('#overlay-toast').html('Please enter valid api key');
+			showToast();
+			return false;
+		}
+	}else{
+    	if ($('#'+elementId).val() != "") {
+			$('#'+elementId).next('.hm-item-err-2').hide();
+			return true;
+		} else {
+			$('#'+elementId).next('.hm-item-err-2').html('Please enter valid api key');
+			$('#'+elementId).next('.hm-item-err-2').show();
+			return false;
+		}
 	}
 }
 
