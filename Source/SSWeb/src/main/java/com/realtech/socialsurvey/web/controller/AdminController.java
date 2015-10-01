@@ -34,12 +34,14 @@ import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.dao.CompanyDao;
+import com.realtech.socialsurvey.core.entities.AbusiveSurveyReportWrapper;
 import com.realtech.socialsurvey.core.entities.BranchFromSearch;
 import com.realtech.socialsurvey.core.entities.Company;
 import com.realtech.socialsurvey.core.entities.ContactDetailsSettings;
 import com.realtech.socialsurvey.core.entities.LicenseDetail;
 import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
 import com.realtech.socialsurvey.core.entities.RegionFromSearch;
+import com.realtech.socialsurvey.core.entities.SurveyDetails;
 import com.realtech.socialsurvey.core.entities.User;
 import com.realtech.socialsurvey.core.entities.UserFromSearch;
 import com.realtech.socialsurvey.core.enums.DisplayMessageType;
@@ -53,6 +55,7 @@ import com.realtech.socialsurvey.core.services.payment.Payment;
 import com.realtech.socialsurvey.core.services.payment.exception.SubscriptionCancellationUnsuccessfulException;
 import com.realtech.socialsurvey.core.services.search.SolrSearchService;
 import com.realtech.socialsurvey.core.services.search.exception.SolrException;
+import com.realtech.socialsurvey.core.services.surveybuilder.SurveyHandler;
 import com.realtech.socialsurvey.core.utils.DisplayMessageConstants;
 import com.realtech.socialsurvey.core.utils.MessageUtils;
 import com.realtech.socialsurvey.web.common.JspResolver;
@@ -87,6 +90,9 @@ public class AdminController
 
     @Autowired
     private Payment payment;
+    
+    @Autowired
+    private SurveyHandler surveyHandler;
 
     @RequestMapping ( value = "/admindashboard")
     public String adminDashboard( Model model, HttpServletRequest request )
@@ -468,8 +474,7 @@ public class AdminController
 
         return JspResolver.ADMIN_INVITE_VIEW;
     }
-
-
+ 
     @RequestMapping ( value = "/downloadcompanyregistrationreport")
     public void downloadCompanyRegistrationReport( HttpServletRequest request, HttpServletResponse response )
     {
@@ -525,5 +530,33 @@ public class AdminController
         } catch ( NonFatalException e ) {
             LOG.error( "Non fatal exception occured while downloading the company report , reason " + e.getMessage() );
         }
+    }
+    
+    @RequestMapping ( value = "/showabusereports", method = RequestMethod.GET)
+    public String showAbuseReports()
+    {
+        LOG.info( "Inside showAbuseReports() method" );
+        
+        return JspResolver.ADMIN_ABUSE_REPORTS_VIEW;
+    }
+    
+
+    @RequestMapping ( value = "/fetchsurveybyabuse", method = RequestMethod.GET)
+    public String fetchSurveyByAbuse( Model model, HttpServletRequest request )
+    {
+        LOG.info( "Method to get abusive surveys fetchSurveyByAbuse() finished." );
+        try {
+            String startIndexStr = request.getParameter( "startIndex" );
+            String batchSizeStr = request.getParameter( "batchSize" );
+            int startIndex = Integer.parseInt( startIndexStr );
+            int batchSize = Integer.parseInt( batchSizeStr );
+            List<AbusiveSurveyReportWrapper> abusiveSurveyReports = surveyHandler.getSurveysReporetedAsAbusive( startIndex, batchSize );
+            model.addAttribute( "abusiveReviewReportList", abusiveSurveyReports );
+        } catch ( NumberFormatException e ) {
+            LOG.error( "NumberFormat exception caught in fetchSurveyByAbuse() while fetching abusive reviews. Nested exception is ", e );
+            model.addAttribute( "message", e.getMessage() );
+        }
+        LOG.info( "Method to get abusive surveys fetchSurveyByAbuse() finished." );
+        return JspResolver.ADMIN_ABUSIVE_REPORTS;
     }
 }

@@ -126,6 +126,8 @@ public interface JspResolver {
 	public static final String ADMIN_DASHBOARD = "admin/admin_dashboard";
 	public static final String ADMIN_HIERARCHY_VIEW = "admin/admin_hierarchy_view";
 	public static final String ADMIN_INVITE_VIEW = "admin/admin_invite_view";
+	public static final String ADMIN_ABUSE_REPORTS_VIEW = "admin/admin_abuse_reports_view";
+	public static final String ADMIN_ABUSIVE_REPORTS = "admin/admin_abusive_reports";
 	public static final String ADMIN_COMPANY_HIERARCHY = "admin/company_hierarchy";
 	public static final String ADMIN_COMPANY_LIST = "admin/admin_company_list";
 	public static final String ADMIN_REGION_HIERARCHY = "admin/admin_region_hierarchy";
