@@ -53,6 +53,8 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
 
     public static final String SURVEY_DETAILS_COLLECTION = "SURVEY_DETAILS";
 
+    public static final String ZILLOW_CALL_COUNT = "ZILLOW_CALL_COUNT";
+    
     @Autowired
     private MongoTemplate mongoTemplate;
 
@@ -1492,5 +1494,43 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
             }
         }
         LOG.info( "Method removeExcessZillowSurveysByEntity() finished" );
+    }
+    
+    @Override
+    public int fetchZillowCallCount(){
+        LOG.info( "Method fetchZillowCallCount() started" );
+        Query query = new Query();
+        int count = 0;
+        DBObject zillowCallCount = mongoTemplate.findOne( query, DBObject.class, ZILLOW_CALL_COUNT );
+        if(zillowCallCount == null){
+            LOG.debug( "Count not found. Setting count to 0");
+        } else {
+            count = (int) zillowCallCount.get( "count" );
+            LOG.debug( "Count value : " + count );
+        }
+        LOG.info( "Method fetchZillowCallCount() finished" );
+        return count;
+    }
+    
+    @Override
+    public void resetZillowCallCount(){
+        LOG.info( "Method resetZillowCallCount() started" );
+        Query query = new Query();
+        LOG.debug( "Resetting count value" );
+        Update update = new Update().set( "count", 0 );
+        mongoTemplate.upsert( query, update, ZILLOW_CALL_COUNT );
+        LOG.info( "Method resetZillowCallCount() finished" );
+    }
+    @Override
+    public void updateZillowCallCount(){
+        LOG.info( "Method updateZillowCallCount() started" );
+        int count = 0;
+        LOG.debug( "Fetching the latest value of count." );
+        Query query = new Query();
+        count = fetchZillowCallCount() + 1;
+        LOG.debug( "Updating count value" );
+        Update update = new Update().set( "count", count );
+        mongoTemplate.upsert( query, update, ZILLOW_CALL_COUNT );
+        LOG.info( "Method updateZillowCallCount() finished" );
     }
 }

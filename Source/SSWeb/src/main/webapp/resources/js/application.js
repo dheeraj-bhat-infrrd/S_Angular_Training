@@ -8531,3 +8531,17 @@ function linkedInDataImport() {
 		}
 	}, true);
 }
+
+function revertMailContent(mailcategory) {
+    showOverlay();
+	var payload = {
+		"mailcategory" : mailcategory
+	};
+	callAjaxPostWithPayloadData('./revertsurveyparticipationmail.do', function (data) {
+		showMainContent('./showemailsettings.do');
+		hideOverlay();
+		$('#overlay-main').hide();
+		$("#overlay-toast").html(data);
+		showToast();
+	}, payload, true);
+}
