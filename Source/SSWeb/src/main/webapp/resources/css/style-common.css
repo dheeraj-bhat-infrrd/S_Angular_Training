@@ -7520,3 +7520,21 @@ input.profile-url-input {
 label.url-change-input-label {
     min-height: 35px;
 }
+
+.abuse-review-row {
+    line-height: 20px;
+    padding: 10px 0;
+    border-bottom: 1px solid #dcdcdc;
+}
+
+.abuse-review-hdr-row .abuse-report-col {
+    font-family: 'opensanssemibold';
+}
+
+.abuse-review-row.row:last-child {
+    border-bottom: none;
+}
+
+.abuse-report-wrapper {
+    padding-bottom: 10px;
+}
