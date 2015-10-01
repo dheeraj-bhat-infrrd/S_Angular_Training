@@ -8618,3 +8618,135 @@ function revertMailContent(mailcategory) {
 		showToast();
 	}, payload, true);
 }
+
+
+//settings page event binding
+$('body').on('click','.st-dd-item-auto-post',function() {
+	$('#rating-auto-post').val($(this).html());
+	$('#st-dd-wrapper-auto-post').slideToggle(200);
+
+	$('#ratingcategory').val('rating-auto-post');
+	var rating = $('#rating-auto-post').val();
+	var ratingParent = $('#rating-auto-post-parent');
+
+	changeRatingPattern(rating, ratingParent);
+	updatePostScore("rating-settings-form");
+});
+
+$('body').on('click','.st-dd-item-min-post',function() {
+	$('#rating-min-post').val($(this).html());
+	$('#st-dd-wrapper-min-post').slideToggle(200);
+	
+	$('#ratingcategory').val('rating-min-post');
+	
+	var rating = $('#rating-min-post').val();
+	var ratingParent = $('#rating-min-post-parent');
+	changeRatingPattern(rating, ratingParent);
+	
+	updatePostScore("rating-settings-form");
+});
+
+$('body').on('click', '#st-settings-location-on', function() {
+	$('#othercategory').val('other-location');
+	$('#other-location').val('false');
+	
+	$('#st-settings-location-off').show();
+	$(this).hide();
+	
+	updateOtherSettings("other-settings-form");
+});
+$('body').on('click', '#st-settings-location-off', function() {
+	$('#othercategory').val('other-location');
+	$('#other-location').val('true');
+
+	$('#st-settings-location-on').show();
+	$(this).hide();
+	
+	updateOtherSettings("other-settings-form");
+});
+
+
+$('body').on('click', '#st-settings-payment-on', function() {
+	$('#st-settings-payment-off').show();
+	$(this).hide();
+});
+$('body').on('click', '#st-settings-payment-off', function() {
+	$('#st-settings-payment-on').show();
+	$(this).hide();
+	showPaymentOptions();
+});
+
+$('body').on('click', '#st-delete-account', function() {
+	$('#other-account').val('true');
+	createPopupConfirm("Delete Account",
+		"This action cannot be undone.<br/>All user setting will be permanently deleted and your subscription will terminate permanently immediately.");
+	overlayDeleteAccount();
+});
+
+$('body').on('click', '#st-settings-account-on', function() {
+	$('#other-account').val('false');
+	createPopupConfirm("Enable Account", "Do you want to Continue?");
+	overlayAccount();
+});
+$('body').on('click', '#st-settings-account-off', function() {
+	$('#other-account').val('true');
+	createPopupConfirm("Disable Account", "You will not be able to access your SocialSurvey profile after the current billing cycle. Also for Branch or Company Accounts, this will disable all accounts in your hierarchy under this account.<br/> Do you want to Continue?");
+	overlayAccount();
+});
+
+$('body').on('blur', '#happy-text', function() {
+	saveTextForMoodFlow($("#happy-text").val(), "happy");
+});
+$('body').on('blur', '#neutral-text', function() {
+	saveTextForMoodFlow($("#neutral-text").val(), "neutral");
+});
+$('body').on('blur', '#sad-text', function() {
+	saveTextForMoodFlow($("#sad-text").val(), "sad");
+});
+
+$('body').on('blur', '#happy-text-complete', function() {
+	saveTextForMoodFlow($("#happy-text-complete").val(), "happyComplete");
+});
+$('body').on('blur', '#neutral-text-complete', function() {
+	saveTextForMoodFlow($("#neutral-text-complete").val(), "neutralComplete");
+});
+$('body').on('blur', '#sad-text-complete', function() {
+	saveTextForMoodFlow($("#sad-text-complete").val(), "sadComplete");
+});
+
+$('body').on('click','.reset-icon', function() {
+	var resetId = $(this).prev().attr('id');
+	var resetTag = "";
+	
+	if (resetId == 'happy-text') {
+		resetTag = 'happy';
+	}
+	else if (resetId == 'neutral-text') {
+		resetTag = 'neutral';
+	}
+	else if (resetId == 'sad-text') {
+		resetTag = 'sad';
+	}
+	else if (resetId == 'happy-text-complete') {
+		resetTag = 'happyComplete';
+	}
+	else if (resetId == 'neutral-text-complete') {
+		resetTag = 'neutralComplete';
+	}
+	else if (resetId == 'sad-text-complete') {
+		resetTag = 'sadComplete';
+	}
+	
+    showOverlay();
+	resetTextForMoodFlow(resetTag, resetId);
+});
+
+$('body').on('click', '#atpst-chk-box', function() {
+	if ($('#atpst-chk-box').hasClass('bd-check-img-checked')) {
+		$('#atpst-chk-box').removeClass('bd-check-img-checked');
+		updateAutoPostSetting(true);
+	} else {
+		$('#atpst-chk-box').addClass('bd-check-img-checked');
+		updateAutoPostSetting(false);
+	}
+});
