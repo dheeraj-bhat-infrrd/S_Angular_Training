@@ -4,7 +4,17 @@
 <div id="server-message" class="hide">
 	<jsp:include page="../messageheader.jsp"></jsp:include>
 </div>
+<div class="hm-header-main-wrapper hm-hdr-bord-bot">
+	<div class="container">
+		<div class="hm-header-row clearfix">
+			<div class="float-left hm-header-row-left hr-dsh-adj-lft"><spring:message code="label.abusereports.header.key" /></div>
+		</div>
+	</div>
+</div>
 &nbsp;
+<div class="abuse-report-wrapper">
+	<div class="container"></div>
+</div>
 <table  align="center">
 	<thead>
 		<tr>
