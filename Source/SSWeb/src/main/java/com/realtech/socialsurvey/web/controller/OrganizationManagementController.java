@@ -1221,23 +1221,117 @@ public class OrganizationManagementController
     }
 
 
+    /**
+     * Method to update Survey Settings
+     * 
+     * @param model
+     * @param request
+     * @return
+     */
+    @RequestMapping ( value = "/updateSurveyScoreLockSettings", method = RequestMethod.POST)
+    @ResponseBody
+    public String updateSurveyScoreLockSettings( Model model, HttpServletRequest request )
+    {
+        LOG.info( "Updating Survey Settings" );
+        String minScoreLockedValue = request.getParameter( "rating-min-post" );
+        Boolean minScoreLocked = Boolean.valueOf( minScoreLockedValue );
+        String message = "";
+        LockSettings lockSettings = null;
+        HttpSession session = request.getSession();
+        long entityId = (long) session.getAttribute( CommonConstants.ENTITY_ID_COLUMN );
+        String entityType = (String) session.getAttribute( CommonConstants.ENTITY_TYPE_COLUMN );
+        LockSettings parentLock = (LockSettings) session.getAttribute( CommonConstants.PARENT_LOCK );
+        try {
+            OrganizationUnitSettings unitSettings = null;
+            String collectionName = "";
+            if ( entityType.equalsIgnoreCase( CommonConstants.COMPANY_ID ) ) {
+                collectionName = MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION;
+                unitSettings = organizationManagementService.getCompanySettings( entityId );
+                Company company = userManagementService.getCompanyById( entityId );
+                if ( company != null ) {
+                    settingsSetter.setSettingsValueForCompany( company, SettingsForApplication.MIN_SCORE, true );
+                    userManagementService.updateCompany( company );
+                }
+            } else if ( entityType.equalsIgnoreCase( CommonConstants.REGION_ID ) ) {
+                collectionName = MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION;
+                unitSettings = organizationManagementService.getRegionSettings( entityId );
+                Region region = userManagementService.getRegionById( entityId );
+                if ( region != null ) {
+                    settingsSetter.setSettingsValueForRegion( region, SettingsForApplication.MIN_SCORE, true );
+                    userManagementService.updateRegion( region );
+                }
+            } else if ( entityType.equalsIgnoreCase( CommonConstants.BRANCH_ID ) ) {
+                collectionName = MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION;
+                unitSettings = organizationManagementService.getBranchSettingsDefault( entityId );
+                Branch branch = userManagementService.getBranchById( entityId );
+                if ( branch != null ) {
+                    settingsSetter.setSettingsValueForBranch( branch, SettingsForApplication.MIN_SCORE, true );
+                    userManagementService.updateBranch( branch );
+                }
+            } else if ( entityType.equalsIgnoreCase( CommonConstants.AGENT_ID ) ) {
+                collectionName = MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION;
+                unitSettings = organizationManagementService.getAgentSettings( entityId );
+            } else {
+                throw new InvalidInputException( "Invalid Collection Type" );
+            }
+            lockSettings = unitSettings.getLockSettings();
+            message = "Settings locked ";
+        } catch ( Exception e ) {
+            LOG.error( "Exception caught ", e.getMessage() );
+            message = "Unable to lock the setting, please try again later";
+        }
+        return message;
+    }
+
+
+    private LockSettings updateLockSettings( LockSettings parentLock, LockSettings lockSettings, boolean status )
+    {
+        if ( !parentLock.getIsLogoLocked() ) {
+            lockSettings.setLogoLocked( status );
+        }
+        return lockSettings;
+    }
+
+
     @RequestMapping ( value = "/updateautopostforsurvey", method = RequestMethod.POST)
     @ResponseBody
     public String updateAutoPostForSurvey( HttpServletRequest request )
     {
         LOG.info( "Method to update autopost for a survey started" );
+        HttpSession session = request.getSession();
+        long entityId = (long) session.getAttribute( CommonConstants.ENTITY_ID_COLUMN );
+        String entityType = (String) session.getAttribute( CommonConstants.ENTITY_TYPE_COLUMN );
+
         try {
             String autopost = request.getParameter( "autopost" );
+            String collectionName = "";
             boolean isAutoPostEnabled = false;
             if ( autopost != null && !autopost.isEmpty() ) {
                 isAutoPostEnabled = Boolean.parseBoolean( autopost );
                 User user = sessionHelper.getCurrentUser();
-                OrganizationUnitSettings companySettings = organizationManagementService.getCompanySettings( user.getCompany()
-                    .getCompanyId() );
-                SurveySettings surveySettings = companySettings.getSurvey_settings();
+                OrganizationUnitSettings unitSettings = null;
+                /*OrganizationUnitSettings companySettings = organizationManagementService.getCompanySettings( user.getCompany()
+                    .getCompanyId() );*/
+                if ( entityType.equalsIgnoreCase( CommonConstants.COMPANY_ID ) ) {
+                    collectionName = MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION;
+                    unitSettings = organizationManagementService.getCompanySettings( entityId );
+                } else if ( entityType.equalsIgnoreCase( CommonConstants.REGION_ID ) ) {
+                    collectionName = MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION;
+                    unitSettings = organizationManagementService.getRegionSettings( entityId );
+                } else if ( entityType.equalsIgnoreCase( CommonConstants.BRANCH_ID ) ) {
+                    collectionName = MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION;
+                    unitSettings = organizationManagementService.getBranchSettingsDefault( entityId );
+                } else if ( entityType.equalsIgnoreCase( CommonConstants.AGENT_ID ) ) {
+                    collectionName = MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION;
+                    unitSettings = organizationManagementService.getAgentSettings( entityId );
+                } else {
+                    throw new InvalidInputException( "Invalid Collection Type" );
+                }
+
+                SurveySettings surveySettings = unitSettings.getSurvey_settings();
                 surveySettings.setAutoPostEnabled( isAutoPostEnabled );
-                if ( organizationManagementService.updateSurveySettings( companySettings, surveySettings ) ) {
-                    companySettings.setSurvey_settings( surveySettings );
+                if ( organizationManagementService.updateSurveySettings( unitSettings, surveySettings ) ) {
+                    unitSettings.setSurvey_settings( surveySettings );
                     LOG.info( "Updated Survey Settings" );
                 }
             }
