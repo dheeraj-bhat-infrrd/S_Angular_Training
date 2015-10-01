@@ -1118,8 +1118,18 @@ public interface OrganizationManagementService
         CRMInfo crmInfo, String fullyQualifiedClass ) throws InvalidInputException;
 
 
-    MailContent deleteMailBodyFromSetting(
-			OrganizationUnitSettings companySettings, String mailCategory)
-			throws NonFatalException;
+    MailContent deleteMailBodyFromSetting( OrganizationUnitSettings companySettings, String mailCategory )
+        throws NonFatalException;
+
+
+    /**
+     * @param collectionName
+     * @param unitSettings
+     * @param surveySettings
+     * @return
+     * @throws InvalidInputException
+     */
+    public boolean updateScoreForSurvey( String collectionName, OrganizationUnitSettings unitSettings,
+        SurveySettings surveySettings ) throws InvalidInputException;
 
 }
