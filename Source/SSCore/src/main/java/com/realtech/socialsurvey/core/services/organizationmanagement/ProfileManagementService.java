@@ -550,7 +550,7 @@ public interface ProfileManagementService
 
 
     public Map<SettingsForApplication, OrganizationUnit> getPrimaryHierarchyByEntity( String entityType, long entityId )
-        throws InvalidInputException, InvalidSettingsStateException;
+        throws InvalidInputException, InvalidSettingsStateException, ProfileNotFoundException;
 
 
     public OrganizationUnitSettings getRegionSettingsByProfileName( String companyProfileName, String regionProfileName )
@@ -571,7 +571,7 @@ public interface ProfileManagementService
         throws ProfileNotFoundException;
 
 
-    public Map<String, Long> getPrimaryHierarchyByAgentProfile( OrganizationUnitSettings agentSettings );
+    public Map<String, Long> getPrimaryHierarchyByAgentProfile( OrganizationUnitSettings agentSettings ) throws InvalidInputException, ProfileNotFoundException;
 
 
     public OrganizationUnitSettings getIndividualSettingsByProfileName( String agentProfileName )
@@ -594,7 +594,7 @@ public interface ProfileManagementService
 
 
 	Map<String, Long> getHierarchyDetailsByEntity(String entityType,
-			long entityId) throws InvalidInputException;
+			long entityId) throws InvalidInputException, ProfileNotFoundException;
 
 
 	LockSettings fetchHierarchyLockSettings(long companyId, long branchId,

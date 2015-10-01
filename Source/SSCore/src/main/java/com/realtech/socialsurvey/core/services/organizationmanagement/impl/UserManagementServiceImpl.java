@@ -65,6 +65,7 @@ import com.realtech.socialsurvey.core.services.mail.EmailServices;
 import com.realtech.socialsurvey.core.services.mail.UndeliveredEmailException;
 import com.realtech.socialsurvey.core.services.organizationmanagement.OrganizationManagementService;
 import com.realtech.socialsurvey.core.services.organizationmanagement.ProfileManagementService;
+import com.realtech.socialsurvey.core.services.organizationmanagement.ProfileNotFoundException;
 import com.realtech.socialsurvey.core.services.organizationmanagement.UserManagementService;
 import com.realtech.socialsurvey.core.services.organizationmanagement.UtilityService;
 import com.realtech.socialsurvey.core.services.search.SolrSearchService;
@@ -150,6 +151,12 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 
     @Value ( "${ENABLE_KAFKA}")
     private String enableKafka;
+
+    @Value ( "${APPLICATION_ADMIN_EMAIL}")
+    private String applicationAdminEmail;
+
+    @Value ( "${APPLICATION_ADMIN_NAME}")
+    private String applicationAdminName;
 
     @Autowired
     private ProfileManagementService profileManagementService;
@@ -792,8 +799,9 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
             user.setIndustry( agentSettings.getContact_details().getIndustry() );
             user.setAboutMe( agentSettings.getContact_details().getAbout_me() );
             //JIRA SS-1104 search results not updated with correct number of reviews
-            long reviewCount = profileManagementService.getReviewsCount(agentSettings.getIden(), 0, 5, CommonConstants.PROFILE_LEVEL_INDIVIDUAL, true);
-            user.setReviewCount(reviewCount);
+            long reviewCount = profileManagementService.getReviewsCount( agentSettings.getIden(), 0, 5,
+                CommonConstants.PROFILE_LEVEL_INDIVIDUAL, true );
+            user.setReviewCount( reviewCount );
             user.setReviewScore( surveyDetailsDao.getRatingForPastNdays( CommonConstants.AGENT_ID, agentSettings.getIden(),
                 CommonConstants.NO_LIMIT, true, false ) );
             users.add( user );
@@ -1185,21 +1193,23 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
         LOG.info( "Method to update a user finished for user : " + profileIdToUpdate );
     }
 
+
     @Transactional
     @Override
-    public void removeUserProfile( long profileIdToDelete) throws InvalidInputException
+    public void removeUserProfile( long profileIdToDelete ) throws InvalidInputException
     {
         LOG.info( "Method to delete a profile called for user profile: " + profileIdToDelete );
-        
+
         UserProfile userProfile = userProfileDao.findById( UserProfile.class, profileIdToDelete );
         if ( userProfile == null ) {
             throw new InvalidInputException( "No user profile present for the specified profileId" );
         }
 
 
-        userProfileDao.delete(userProfile);
+        userProfileDao.delete( userProfile );
         LOG.info( "Method to delete a profile finished for profile : " + profileIdToDelete );
     }
+
 
     /*
      * Method to update the given user as active based on profiles completed
@@ -1234,60 +1244,63 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
         userDao.update( user );
         LOG.info( "Method to update a user finished for user : " + profileIdToUpdate );
     }
-    
-    
+
+
     @Override
     @Transactional
-    public void updatePrimaryProfileOfUser(User user )throws InvalidInputException{
-    	
-    	if(user == null){
-    		LOG.error( "User object passed was be null" );
+    public void updatePrimaryProfileOfUser( User user ) throws InvalidInputException
+    {
+
+        if ( user == null ) {
+            LOG.error( "User object passed was be null" );
             throw new InvalidInputException( "Passed User object is null" );
-    	}
-    	LOG.debug("method updatePrimaryProfileOfUser started for user with userid : " + user.getUserId());
-    	List<UserProfile> userProfileList = userProfileDao.findByColumn(UserProfile.class, CommonConstants.USER_COLUMN, user);
-    	if(userProfileList != null &&  ! userProfileList.isEmpty()){
-			UserProfile profileToMakePrimary = null;
-    		
-    		UserProfile agentProfileWithoutDefaultBranch = null;
-    		UserProfile agentProfileWithDefaultBranch = null;
-    		UserProfile branchAdminProfile = null;
-    		UserProfile regionAdminProfile = null;
-    		UserProfile companyAdminProfile = null;
-    		
-			for(UserProfile currentProfile : userProfileList){
-    			Branch branch = branchDao.findById(Branch.class, currentProfile.getBranchId());
-    			
-    			if(currentProfile.getProfilesMaster().getProfileId() == CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID && branch.getIsDefaultBySystem() == CommonConstants.IS_DEFAULT_BY_SYSTEM_NO){
-    				agentProfileWithoutDefaultBranch = currentProfile;
-    			}else if(currentProfile.getProfilesMaster().getProfileId() == CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID && branch.getIsDefaultBySystem() == CommonConstants.IS_DEFAULT_BY_SYSTEM_YES){
-    				agentProfileWithDefaultBranch = currentProfile;
-    			}else if(currentProfile.getProfilesMaster().getProfileId() == CommonConstants.PROFILES_MASTER_BRANCH_ADMIN_PROFILE_ID){
-    				branchAdminProfile = currentProfile;
-    			}else if(currentProfile.getProfilesMaster().getProfileId() == CommonConstants.PROFILES_MASTER_REGION_ADMIN_PROFILE_ID){
-    				regionAdminProfile = currentProfile;
-    			}else if(currentProfile.getProfilesMaster().getProfileId() == CommonConstants.PROFILES_MASTER_COMPANY_ADMIN_PROFILE_ID){
-    				companyAdminProfile = currentProfile;
-    			}
-    		}
-    		
-    		if(agentProfileWithoutDefaultBranch != null){
-    			profileToMakePrimary = agentProfileWithoutDefaultBranch;
-    		}else if(agentProfileWithDefaultBranch != null){
-    			profileToMakePrimary = agentProfileWithDefaultBranch;
-    		}else if(branchAdminProfile != null){
-    			profileToMakePrimary = branchAdminProfile;
-    		}else if(regionAdminProfile != null){
-    			profileToMakePrimary = regionAdminProfile;
-    		}else if(companyAdminProfile != null){
-    			profileToMakePrimary = companyAdminProfile;
-    		}
-    		
-    		profileToMakePrimary.setIsPrimary(CommonConstants.IS_PRIMARY_TRUE);
-    		userProfileDao.update(profileToMakePrimary);
-    		
-    		LOG.debug("method updatePrimaryProfileOfUser ended for user with userid : " + user.getUserId());
-		}
+        }
+        LOG.debug( "method updatePrimaryProfileOfUser started for user with userid : " + user.getUserId() );
+        List<UserProfile> userProfileList = userProfileDao.findByColumn( UserProfile.class, CommonConstants.USER_COLUMN, user );
+        if ( userProfileList != null && !userProfileList.isEmpty() ) {
+            UserProfile profileToMakePrimary = null;
+
+            UserProfile agentProfileWithoutDefaultBranch = null;
+            UserProfile agentProfileWithDefaultBranch = null;
+            UserProfile branchAdminProfile = null;
+            UserProfile regionAdminProfile = null;
+            UserProfile companyAdminProfile = null;
+
+            for ( UserProfile currentProfile : userProfileList ) {
+                Branch branch = branchDao.findById( Branch.class, currentProfile.getBranchId() );
+
+                if ( currentProfile.getProfilesMaster().getProfileId() == CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID
+                    && branch.getIsDefaultBySystem() == CommonConstants.IS_DEFAULT_BY_SYSTEM_NO ) {
+                    agentProfileWithoutDefaultBranch = currentProfile;
+                } else if ( currentProfile.getProfilesMaster().getProfileId() == CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID
+                    && branch.getIsDefaultBySystem() == CommonConstants.IS_DEFAULT_BY_SYSTEM_YES ) {
+                    agentProfileWithDefaultBranch = currentProfile;
+                } else if ( currentProfile.getProfilesMaster().getProfileId() == CommonConstants.PROFILES_MASTER_BRANCH_ADMIN_PROFILE_ID ) {
+                    branchAdminProfile = currentProfile;
+                } else if ( currentProfile.getProfilesMaster().getProfileId() == CommonConstants.PROFILES_MASTER_REGION_ADMIN_PROFILE_ID ) {
+                    regionAdminProfile = currentProfile;
+                } else if ( currentProfile.getProfilesMaster().getProfileId() == CommonConstants.PROFILES_MASTER_COMPANY_ADMIN_PROFILE_ID ) {
+                    companyAdminProfile = currentProfile;
+                }
+            }
+
+            if ( agentProfileWithoutDefaultBranch != null ) {
+                profileToMakePrimary = agentProfileWithoutDefaultBranch;
+            } else if ( agentProfileWithDefaultBranch != null ) {
+                profileToMakePrimary = agentProfileWithDefaultBranch;
+            } else if ( branchAdminProfile != null ) {
+                profileToMakePrimary = branchAdminProfile;
+            } else if ( regionAdminProfile != null ) {
+                profileToMakePrimary = regionAdminProfile;
+            } else if ( companyAdminProfile != null ) {
+                profileToMakePrimary = companyAdminProfile;
+            }
+
+            profileToMakePrimary.setIsPrimary( CommonConstants.IS_PRIMARY_TRUE );
+            userProfileDao.update( profileToMakePrimary );
+
+            LOG.debug( "method updatePrimaryProfileOfUser ended for user with userid : " + user.getUserId() );
+        }
     }
 
 
@@ -1578,14 +1591,14 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
         int isAtleastOneProfileComplete, int status, String createdBy )
     {
         LOG.debug( "Method createUser called for email-id : " + emailId + " and status : " + status );
-        
-        if(lastName != null && ! lastName.equals("")){
-        	lastName = lastName.trim();
+
+        if ( lastName != null && !lastName.equals( "" ) ) {
+            lastName = lastName.trim();
         }
-        if(firstName != null && ! firstName.equals("")){
-        	firstName = firstName.trim();
+        if ( firstName != null && !firstName.equals( "" ) ) {
+            firstName = firstName.trim();
         }
-        
+
         User user = new User();
         user.setCompany( company );
         user.setLoginName( emailId );
@@ -2180,6 +2193,7 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
         return profileName;
     }
 
+
     /**
      * Method to update profile name and url in agent settings
      * 
@@ -2188,14 +2202,16 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
      * @param agentSettings
      */
     @Override
-    public void updateProfileUrlInAgentSettings(String profileName, String profileUrl, AgentSettings agentSettings){
-    	LOG.info("Method to update profile name and url in AGENT SETTINGS started");
-    	organizationUnitSettingsDao.updateParticularKeyAgentSettings( MongoOrganizationUnitSettingDaoImpl.KEY_PROFILE_NAME,
-                profileName, agentSettings );
-    	organizationUnitSettingsDao.updateParticularKeyAgentSettings( MongoOrganizationUnitSettingDaoImpl.KEY_PROFILE_URL,
-                profileUrl, agentSettings );
-    	LOG.info("Method to update profile name and url in AGENT SETTINGS finished");
+    public void updateProfileUrlInAgentSettings( String profileName, String profileUrl, AgentSettings agentSettings )
+    {
+        LOG.info( "Method to update profile name and url in AGENT SETTINGS started" );
+        organizationUnitSettingsDao.updateParticularKeyAgentSettings( MongoOrganizationUnitSettingDaoImpl.KEY_PROFILE_NAME,
+            profileName, agentSettings );
+        organizationUnitSettingsDao.updateParticularKeyAgentSettings( MongoOrganizationUnitSettingDaoImpl.KEY_PROFILE_URL,
+            profileUrl, agentSettings );
+        LOG.info( "Method to update profile name and url in AGENT SETTINGS finished" );
     }
+
 
     /**
      * Method to update profile name and url in branch settings
@@ -2205,20 +2221,22 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
      * @param branchSettings
      */
     @Override
-    public void updateProfileUrlInBranchSettings(String profileName, String profileUrl, OrganizationUnitSettings branchSettings){
-    	LOG.info("Method to update profile name and url in BRANCH SETTINGS started");
-    	
-    	organizationUnitSettingsDao.updateParticularKeyOrganizationUnitSettings(
-    			MongoOrganizationUnitSettingDaoImpl.KEY_PROFILE_NAME, profileName, branchSettings,
-                MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION );
-    	
-    	organizationUnitSettingsDao.updateParticularKeyOrganizationUnitSettings(
-    			MongoOrganizationUnitSettingDaoImpl.KEY_PROFILE_URL, profileUrl, branchSettings,
-                MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION );
-    	
-    	LOG.info("Method to update profile name and url in BRANCH SETTINGS finished");
+    public void updateProfileUrlInBranchSettings( String profileName, String profileUrl, OrganizationUnitSettings branchSettings )
+    {
+        LOG.info( "Method to update profile name and url in BRANCH SETTINGS started" );
+
+        organizationUnitSettingsDao.updateParticularKeyOrganizationUnitSettings(
+            MongoOrganizationUnitSettingDaoImpl.KEY_PROFILE_NAME, profileName, branchSettings,
+            MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION );
+
+        organizationUnitSettingsDao.updateParticularKeyOrganizationUnitSettings(
+            MongoOrganizationUnitSettingDaoImpl.KEY_PROFILE_URL, profileUrl, branchSettings,
+            MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION );
+
+        LOG.info( "Method to update profile name and url in BRANCH SETTINGS finished" );
     }
-    
+
+
     /**
      * Method to update profile name and url in region settings
      * 
@@ -2227,20 +2245,22 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
      * @param regionSettings
      */
     @Override
-    public void updateProfileUrlInRegionSettings(String profileName, String profileUrl, OrganizationUnitSettings regionSettings){
-    	LOG.info("Method to update profile name and url in REGION SETTINGS started");
-    	
-    	organizationUnitSettingsDao.updateParticularKeyOrganizationUnitSettings(
-    			MongoOrganizationUnitSettingDaoImpl.KEY_PROFILE_NAME, profileName, regionSettings,
-                MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION );
-    	
-    	organizationUnitSettingsDao.updateParticularKeyOrganizationUnitSettings(
-    			MongoOrganizationUnitSettingDaoImpl.KEY_PROFILE_URL, profileUrl, regionSettings,
-                MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION );
-    	
-    	LOG.info("Method to update profile name and url in REGION SETTINGS finished");
+    public void updateProfileUrlInRegionSettings( String profileName, String profileUrl, OrganizationUnitSettings regionSettings )
+    {
+        LOG.info( "Method to update profile name and url in REGION SETTINGS started" );
+
+        organizationUnitSettingsDao.updateParticularKeyOrganizationUnitSettings(
+            MongoOrganizationUnitSettingDaoImpl.KEY_PROFILE_NAME, profileName, regionSettings,
+            MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION );
+
+        organizationUnitSettingsDao.updateParticularKeyOrganizationUnitSettings(
+            MongoOrganizationUnitSettingDaoImpl.KEY_PROFILE_URL, profileUrl, regionSettings,
+            MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION );
+
+        LOG.info( "Method to update profile name and url in REGION SETTINGS finished" );
     }
-    
+
+
     /**
      * Method to update profile name and url in company settings
      * 
@@ -2249,20 +2269,23 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
      * @param companySettings
      */
     @Override
-    public void updateProfileUrlInCompanySettings(String profileName, String profileUrl, OrganizationUnitSettings companySettings){
-    	LOG.info("Method to update profile name and url in COMPANY SETTINGS started");
-    	
-    	organizationUnitSettingsDao.updateParticularKeyOrganizationUnitSettings(
-    			MongoOrganizationUnitSettingDaoImpl.KEY_PROFILE_NAME, profileName, companySettings,
-                MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION );
-    	
-    	organizationUnitSettingsDao.updateParticularKeyOrganizationUnitSettings(
-    			MongoOrganizationUnitSettingDaoImpl.KEY_PROFILE_URL, profileUrl, companySettings,
-                MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION );
-    	
-    	LOG.info("Method to update profile name and url in COMPANY SETTINGS finished");
+    public void updateProfileUrlInCompanySettings( String profileName, String profileUrl,
+        OrganizationUnitSettings companySettings )
+    {
+        LOG.info( "Method to update profile name and url in COMPANY SETTINGS started" );
+
+        organizationUnitSettingsDao.updateParticularKeyOrganizationUnitSettings(
+            MongoOrganizationUnitSettingDaoImpl.KEY_PROFILE_NAME, profileName, companySettings,
+            MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION );
+
+        organizationUnitSettingsDao.updateParticularKeyOrganizationUnitSettings(
+            MongoOrganizationUnitSettingDaoImpl.KEY_PROFILE_URL, profileUrl, companySettings,
+            MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION );
+
+        LOG.info( "Method to update profile name and url in COMPANY SETTINGS finished" );
     }
-    
+
+
     /**
      * Method to check which all users can perform edit and set the boolean as true or false in user
      * objects
@@ -2307,7 +2330,7 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
         LOG.info( "Method checkUserCanEdit executed successfully" );
         return users;
     }
-    
+
 
     /**
      * Method to update user details on completing registration
@@ -2610,7 +2633,7 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
                 if ( profile.getIsPrimary() == CommonConstants.IS_PRIMARY_TRUE ) {
 
                     LOG.debug( "An old primary profile founded for email id " + userProfileNew.getEmailId() );
-                    
+
                     noOldProfileIsPrimary = false;
 
                     boolean isOldProfileDefault = false;
@@ -2679,22 +2702,25 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
         }
 
         // if no old profile is primary than also new profile will be primary
-        if(noOldProfileIsPrimary){
-        	LOG.debug("No old profile is primary for user so new profile will be primary" );
-        	isPrimary = CommonConstants.IS_PRIMARY_TRUE;
+        if ( noOldProfileIsPrimary ) {
+            LOG.debug( "No old profile is primary for user so new profile will be primary" );
+            isPrimary = CommonConstants.IS_PRIMARY_TRUE;
         }
         return isPrimary;
     }
-    
+
+
     @Override
     @Transactional
-    public String fetchAppropriateLogoUrlFromHierarchyForUser(long userId) throws InvalidInputException, NoRecordsFetchedException{
-    	
-    	String logoUrl = null;
-		//get the appropriate logo url from hierarchy 
-		Map<String, Long> hierarchyMap = null;
+    public String fetchAppropriateLogoUrlFromHierarchyForUser( long userId ) throws InvalidInputException,
+        NoRecordsFetchedException, ProfileNotFoundException
+    {
+
+        String logoUrl = null;
+        //get the appropriate logo url from hierarchy 
+        Map<String, Long> hierarchyMap = null;
         Map<SettingsForApplication, OrganizationUnit> map = null;
-		AgentSettings agentSettings = organizationUnitSettingsDao.fetchAgentSettingsById( userId );
+        AgentSettings agentSettings = organizationUnitSettingsDao.fetchAgentSettingsById( userId );
         hierarchyMap = profileManagementService.getPrimaryHierarchyByAgentProfile( agentSettings );
 
         long companyId = hierarchyMap.get( CommonConstants.COMPANY_ID_COLUMN );
@@ -2723,9 +2749,83 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
         } else if ( organizationUnit == OrganizationUnit.AGENT ) {
             logoUrl = agentSettings.getLogo();
         }
-        
+
         return logoUrl;
     }
+
+
+    @Transactional
+    private void makeAProfileAsPrimaryOfAUser( long userId ) throws InvalidInputException, ProfileNotFoundException
+    {
+        LOG.debug( "method makeAProfileAsPrimaryOfAUser started with userid : " + userId );
+        User user = userDao.findById( User.class, userId );
+        if ( user == null ) {
+            LOG.error( "User Is passed was null" );
+            throw new InvalidInputException( "Passed User id is null" );
+        }
+
+        String errorMessage = "No primary user profile found for user " + user.getFirstName() + user.getLastName()
+            + ", with user id : " + user.getUserId();
+        try {
+            emailServices.sendReportBugMailToAdmin( applicationAdminName, errorMessage, applicationAdminEmail );
+        } catch ( UndeliveredEmailException e ) {
+            LOG.error( "error while sending report bug mail to admin ", e );
+        }
+
+        //List<UserProfile> userProfileList = userProfileDao.findByColumn(UserProfile.class, CommonConstants.USER_COLUMN, user);
+        List<UserProfile> userProfileList = user.getUserProfiles();
+        if ( userProfileList == null || userProfileList.isEmpty() ) {
+            throw new ProfileNotFoundException( "No profile found for user with id : " + user.getUserId() );
+        }
+
+
+        UserProfile profileToMakePrimary = null;
+
+        UserProfile agentProfileWithoutDefaultBranch = null;
+        UserProfile agentProfileWithDefaultBranch = null;
+        UserProfile branchAdminProfile = null;
+        UserProfile regionAdminProfile = null;
+        UserProfile companyAdminProfile = null;
+
+        for ( UserProfile currentProfile : userProfileList ) {
+            Branch branch = branchDao.findById( Branch.class, currentProfile.getBranchId() );
+
+            if ( currentProfile.getProfilesMaster().getProfileId() == CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID
+                && branch.getIsDefaultBySystem() == CommonConstants.IS_DEFAULT_BY_SYSTEM_NO ) {
+                agentProfileWithoutDefaultBranch = currentProfile;
+            } else if ( currentProfile.getProfilesMaster().getProfileId() == CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID
+                && branch.getIsDefaultBySystem() == CommonConstants.IS_DEFAULT_BY_SYSTEM_YES ) {
+                agentProfileWithDefaultBranch = currentProfile;
+            } else if ( currentProfile.getProfilesMaster().getProfileId() == CommonConstants.PROFILES_MASTER_BRANCH_ADMIN_PROFILE_ID ) {
+                branchAdminProfile = currentProfile;
+            } else if ( currentProfile.getProfilesMaster().getProfileId() == CommonConstants.PROFILES_MASTER_REGION_ADMIN_PROFILE_ID ) {
+                regionAdminProfile = currentProfile;
+            } else if ( currentProfile.getProfilesMaster().getProfileId() == CommonConstants.PROFILES_MASTER_COMPANY_ADMIN_PROFILE_ID ) {
+                companyAdminProfile = currentProfile;
+            }
+        }
+
+        if ( agentProfileWithoutDefaultBranch != null ) {
+            profileToMakePrimary = agentProfileWithoutDefaultBranch;
+        } else if ( agentProfileWithDefaultBranch != null ) {
+            profileToMakePrimary = agentProfileWithDefaultBranch;
+        } else if ( branchAdminProfile != null ) {
+            profileToMakePrimary = branchAdminProfile;
+        } else if ( regionAdminProfile != null ) {
+            profileToMakePrimary = regionAdminProfile;
+        } else if ( companyAdminProfile != null ) {
+            profileToMakePrimary = companyAdminProfile;
+        }
+
+        profileToMakePrimary.setIsPrimary( CommonConstants.IS_PRIMARY_TRUE );
+        userProfileDao.update( profileToMakePrimary );
+        LOG.debug( "marked a profile with profile id " + profileToMakePrimary.getUserProfileId()
+            + "  as primary for user with user id " + user.getUserId() );
+
+        LOG.debug( "method makeAProfileAsPrimaryOfAUser ended for user with userid : " + user.getUserId() );
+
+    }
+
 
     @Override
     @Transactional
@@ -2792,11 +2892,20 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 
     @Override
     @Transactional
-    public Map<String, Long> getPrimaryUserProfileByAgentId( long entityId )
+    public Map<String, Long> getPrimaryUserProfileByAgentId( long entityId ) throws InvalidInputException,
+        ProfileNotFoundException
     {
-    	LOG.info("Getting user primary profile for id: "+entityId);
-        return userProfileDao.findPrimaryUserProfileByAgentId( entityId );
+        LOG.debug( "method getPrimaryUserProfileByAgentId started with user id " + entityId );
+        Map<String, Long> userProfileDetailMap = userProfileDao.findPrimaryUserProfileByAgentId( entityId );
+        if ( userProfileDetailMap == null || userProfileDetailMap.isEmpty() ) {
+            LOG.warn( "No primary profile found for the user with id " + entityId );
+            makeAProfileAsPrimaryOfAUser( entityId );
+            // after making a profile primary, again fetch the data
+            userProfileDetailMap = userProfileDao.findPrimaryUserProfileByAgentId( entityId );
+        }
 
+        LOG.debug( "method getPrimaryUserProfileByAgentId ended with user id " + entityId );
+        return userProfileDetailMap;
     }
 
 
