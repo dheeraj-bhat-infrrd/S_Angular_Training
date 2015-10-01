@@ -44,6 +44,7 @@ import com.realtech.socialsurvey.core.entities.ProfilesMaster;
 import com.realtech.socialsurvey.core.entities.Region;
 import com.realtech.socialsurvey.core.entities.RemovedUser;
 import com.realtech.socialsurvey.core.entities.SettingsDetails;
+import com.realtech.socialsurvey.core.entities.SurveySettings;
 import com.realtech.socialsurvey.core.entities.User;
 import com.realtech.socialsurvey.core.entities.UserApiKey;
 import com.realtech.socialsurvey.core.entities.UserFromSearch;
@@ -2126,6 +2127,10 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
             contactSettings.setName( user.getFirstName() );
             contactSettings.setFirstName( user.getFirstName() );
         }
+        if ( agentSettings.getSurvey_settings() == null ) {
+            SurveySettings surveySettings = new SurveySettings();
+            agentSettings.setSurvey_settings( surveySettings );
+        }
 
         MailIdSettings mail_ids = new MailIdSettings();
         mail_ids.setWork( user.getEmailId() );
@@ -2714,6 +2719,7 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
     @Transactional
     public String fetchAppropriateLogoUrlFromHierarchyForUser( long userId ) throws InvalidInputException,
         NoRecordsFetchedException, ProfileNotFoundException
+
     {
 
         String logoUrl = null;

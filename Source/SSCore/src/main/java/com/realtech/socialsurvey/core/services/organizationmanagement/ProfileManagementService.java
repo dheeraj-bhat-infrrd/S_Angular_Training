@@ -6,6 +6,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
 import com.realtech.socialsurvey.core.entities.Achievement;
 import com.realtech.socialsurvey.core.entities.AgentRankingReport;
 import com.realtech.socialsurvey.core.entities.AgentSettings;
@@ -320,7 +321,10 @@ public interface ProfileManagementService
      * @return
      * @throws ProfileNotFoundException
      */
-    public UserCompositeEntity getCompositeUserObjectByProfileName(String agentProfileName, boolean checkStatus) throws ProfileNotFoundException ;
+    public UserCompositeEntity getCompositeUserObjectByProfileName( String agentProfileName, boolean checkStatus )
+        throws ProfileNotFoundException;
+
+
     /**
      * Method to fetch reviews based on the profile level specified, iden is one of
      * agentId/branchId/regionId or companyId based on the profile level
@@ -571,7 +575,8 @@ public interface ProfileManagementService
         throws ProfileNotFoundException;
 
 
-    public Map<String, Long> getPrimaryHierarchyByAgentProfile( OrganizationUnitSettings agentSettings ) throws InvalidInputException, ProfileNotFoundException;
+    public Map<String, Long> getPrimaryHierarchyByAgentProfile( OrganizationUnitSettings agentSettings )
+        throws InvalidInputException, ProfileNotFoundException;
 
 
     public OrganizationUnitSettings getIndividualSettingsByProfileName( String agentProfileName )
@@ -593,14 +598,30 @@ public interface ProfileManagementService
     void updateZillowFeed( OrganizationUnitSettings profile, String collection ) throws InvalidInputException;
 
 
-	Map<String, Long> getHierarchyDetailsByEntity(String entityType,
-			long entityId) throws InvalidInputException, ProfileNotFoundException;
+    Map<String, Long> getHierarchyDetailsByEntity( String entityType, long entityId ) throws InvalidInputException,
+        ProfileNotFoundException;
 
 
-	LockSettings fetchHierarchyLockSettings(long companyId, long branchId,
-			long regionId, String entityType) throws NonFatalException;
+    LockSettings fetchHierarchyLockSettings( long companyId, long branchId, long regionId, String entityType )
+        throws NonFatalException;
 
 
-	Date convertStringToDate(String dateString);
+    Date convertStringToDate( String dateString );
+
+
+    /**
+     * @param collectionName
+     * @param userProfile
+     * @param companyUnitSettings
+     * @param regionUnitSettings
+     * @param branchUnitSettings
+     * @param agentUnitSettings
+     * @param map
+     * @return
+     */
+    public OrganizationUnitSettings getAutoPostScoreBasedOnHierarchy( String collectionName,
+        OrganizationUnitSettings userProfile, OrganizationUnitSettings companyUnitSettings,
+        OrganizationUnitSettings regionUnitSettings, OrganizationUnitSettings branchUnitSettings,
+        OrganizationUnitSettings agentUnitSettings, Map<SettingsForApplication, OrganizationUnit> map );
 
 }
