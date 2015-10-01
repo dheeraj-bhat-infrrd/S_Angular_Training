@@ -5,6 +5,7 @@ import java.util.Map;
 
 import org.apache.solr.client.solrj.SolrServerException;
 
+import com.realtech.socialsurvey.core.entities.AbusiveSurveyReportWrapper;
 import com.realtech.socialsurvey.core.entities.Company;
 import com.realtech.socialsurvey.core.entities.SurveyDetails;
 import com.realtech.socialsurvey.core.entities.SurveyPreInitiation;
@@ -164,7 +165,7 @@ public interface SurveyHandler
     public void saveSurveyPreInitiationObject( SurveyPreInitiation surveyPreInitiation ) throws InvalidInputException;
 
 
-	void updateSurveyAsAbusive(String surveymongoId);
+	void updateSurveyAsAbusive(String surveymongoId, String reporterEmail, String reporterName);
     
     /**
      * Sends survey request to the customer on behalf of agent.
@@ -189,4 +190,7 @@ public interface SurveyHandler
 
 	void deleteExcessZillowSurveysByEntity(String entityType, long entityId)
 			throws InvalidInputException;
+
+
+    public List<AbusiveSurveyReportWrapper> getSurveysReporetedAsAbusive( int startIndex, int numOfRows );
 }

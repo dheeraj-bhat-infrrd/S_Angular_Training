@@ -14,6 +14,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
@@ -23,6 +24,7 @@ import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
+
 import com.google.gson.Gson;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.dao.OrganizationUnitSettingsDao;
@@ -31,6 +33,7 @@ import com.realtech.socialsurvey.core.dao.SurveyPreInitiationDao;
 import com.realtech.socialsurvey.core.dao.UserDao;
 import com.realtech.socialsurvey.core.dao.UserProfileDao;
 import com.realtech.socialsurvey.core.dao.impl.MongoOrganizationUnitSettingDaoImpl;
+import com.realtech.socialsurvey.core.entities.AbusiveSurveyReportWrapper;
 import com.realtech.socialsurvey.core.entities.AgentSettings;
 import com.realtech.socialsurvey.core.entities.Company;
 import com.realtech.socialsurvey.core.entities.MailContent;
@@ -214,7 +217,6 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
         return urlGenerator.generateUrl( urlParam, baseUrl );
     }
 
-
     /*
      * Method to update answers to all the questions and current stage in MongoDB.
      * @param agentId
@@ -265,10 +267,10 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
 
 
     @Override
-    public void updateSurveyAsAbusive( String surveymongoId )
+    public void updateSurveyAsAbusive( String surveymongoId, String reporterEmail, String reporterName )
     {
         LOG.info( "Method updateSurveyAsAbusive() to mark the survey as abusive, started" );
-        surveyDetailsDao.updateSurveyAsAbusive( surveymongoId );
+        surveyDetailsDao.updateSurveyAsAbusive(surveymongoId, reporterEmail, reporterName);
         LOG.info( "Method updateSurveyAsAbusive() to mark the survey as abusive, finished" );
     }
 
@@ -1296,6 +1298,15 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
         }
         surveyDetailsDao.removeExcessZillowSurveysByEntity( entityType, entityId );
         LOG.info( "Method deleteExcessZillowSurveysByEntity() finished" );
+    }
+
+    @Override
+    public List<AbusiveSurveyReportWrapper> getSurveysReporetedAsAbusive( int startIndex, int numOfRows )
+    {
+        LOG.info( "Method getSurveysReporetedAsAbusive() to retrieve surveys marked as abusive, started" );
+        List<AbusiveSurveyReportWrapper> abusiveSurveyReports = surveyDetailsDao.getSurveysReporetedAsAbusive( startIndex, numOfRows );
+        LOG.info( "Method getSurveysReporetedAsAbusive() to retrieve surveys marked as abusive, finished" );
+        return abusiveSurveyReports;
     }
 }
 // JIRA SS-119 by RM-05:EOC
