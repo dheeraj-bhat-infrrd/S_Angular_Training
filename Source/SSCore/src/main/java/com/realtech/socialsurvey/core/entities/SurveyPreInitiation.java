@@ -48,8 +48,6 @@ public class SurveyPreInitiation implements Serializable
     @Column ( name = "BRANCH_COLLECTION_ID")
     private long branchCollectionId;
 
-    @Column ( name = "AGENT_COLLECTION_ID")
-    private long agentCollectionId;
 
     @Column ( name = "AGENT_NAME")
     private String agentName;
@@ -170,18 +168,6 @@ public class SurveyPreInitiation implements Serializable
     public void setBranchCollectionId( long branchCollectionId )
     {
         this.branchCollectionId = branchCollectionId;
-    }
-
-
-    public long getAgentCollectionId()
-    {
-        return agentCollectionId;
-    }
-
-
-    public void setAgentCollectionId( long agentCollectionId )
-    {
-        this.agentCollectionId = agentCollectionId;
     }
 
 

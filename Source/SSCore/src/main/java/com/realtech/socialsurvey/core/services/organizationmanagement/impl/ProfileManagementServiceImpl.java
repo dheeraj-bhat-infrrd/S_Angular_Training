@@ -1466,7 +1466,8 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 		surveyDetails = surveyDetailsDao.getFeedbacks(idenColumnName, iden, startIndex, numOfRows, startScore, limitScore, fetchAbusive, startDate,
 				endDate, sortCriteria);
 
-		for (SurveyDetails review : surveyDetails) {
+		// This is not needed. Commenting out
+		/*for (SurveyDetails review : surveyDetails) {
 			OrganizationUnitSettings agentSettings = organizationUnitSettingsDao.fetchAgentSettingsById(review.getAgentId());
 			if (agentSettings != null && agentSettings.getSocialMediaTokens() != null) {
 				SocialMediaTokens mediaTokens = agentSettings.getSocialMediaTokens();
@@ -1489,7 +1490,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 					review.setRealtorProfileUrl(mediaTokens.getRealtorToken().getRealtorProfileLink());
 				}
 			}
-		}
+		}*/
 
 		return surveyDetails;
 	}
