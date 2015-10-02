@@ -595,6 +595,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
         surveySettings.setShow_survey_above_score( CommonConstants.DEFAULT_AUTOPOST_SCORE );
         try {
             settingsSetter.setSettingsValueForCompany( company, SettingsForApplication.MIN_SCORE, true );
+            settingsSetter.setSettingsValueForCompany( company, SettingsForApplication.AUTO_POST_ENABLED, true );
         } catch ( NonFatalException e1 ) {
             LOG.error( "Exception caught ", e1 );
         }

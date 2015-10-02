@@ -53,7 +53,7 @@ public class HierarchySettingsCorrector extends QuartzJobBean
                         // get region settings
                         OrganizationUnitSettings regionSetting = organizationManagementService.getRegionSettings( region
                             .getRegionId() );
-                        processRegion( regionSetting, region );
+                        //  processRegion( regionSetting, region );
                     }
 
                 } catch ( InvalidInputException e ) {
@@ -286,7 +286,7 @@ public class HierarchySettingsCorrector extends QuartzJobBean
     private void processCompany( OrganizationUnitSettings companySetting )
     {
         long setterValue = 0l;
-        String lockValue = "0";
+        /* String lockValue = "0";*/
         // get a the company id and get the company from SQL
         LOG.debug( "Getting details of company: " + companySetting.getIden() );
         Company company = organizationManagementService.getCompanyById( companySetting.getIden() );
@@ -295,7 +295,7 @@ public class HierarchySettingsCorrector extends QuartzJobBean
             LOG.debug( "Logo is set" );
             setterValue += SettingsForApplication.LOGO.getOrder() * 1;
             // lock the logo
-            lockValue = "1";
+            /* lockValue = "1";*/
         } else {
             LOG.debug( "Logo is not set" );
         }
@@ -383,10 +383,18 @@ public class HierarchySettingsCorrector extends QuartzJobBean
                 LOG.debug( "Lending tree is not set" );
             }
         }
+        if ( companySetting.getSurvey_settings() != null ) {
+            if ( companySetting.getSurvey_settings().getShow_survey_above_score() > 0 ) {
+                setterValue += SettingsForApplication.MIN_SCORE.getOrder() * 1;
+            }
+
+            setterValue += SettingsForApplication.AUTO_POST_ENABLED.getOrder() * 1;
+
+        }
         LOG.debug( "Final Settings setter value : " + setterValue );
-        LOG.debug( "Final Settings locker value : " + lockValue );
+        /*    LOG.debug( "Final Settings locker value : " + lockValue );*/
         company.setSettingsSetStatus( String.valueOf( setterValue ) );
-        company.setSettingsLockStatus( lockValue );
+        /* company.setSettingsLockStatus( lockValue );*/
         // update the values to company
         organizationManagementService.updateCompany( company );
     }
