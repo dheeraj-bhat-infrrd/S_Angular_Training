@@ -1313,22 +1313,41 @@ public class OrganizationManagementController
             boolean isAutoPostEnabled = false;
             if ( autopost != null && !autopost.isEmpty() ) {
                 isAutoPostEnabled = Boolean.parseBoolean( autopost );
-                User user = sessionHelper.getCurrentUser();
+               
                 OrganizationUnitSettings unitSettings = null;
                 /*OrganizationUnitSettings companySettings = organizationManagementService.getCompanySettings( user.getCompany()
                     .getCompanyId() );*/
                 if ( entityType.equalsIgnoreCase( CommonConstants.COMPANY_ID ) ) {
                     collectionName = MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION;
                     unitSettings = organizationManagementService.getCompanySettings( entityId );
+                    Company company = userManagementService.getCompanyById( entityId );
+                    if ( company != null ) {
+                        settingsSetter.setSettingsValueForCompany( company, SettingsForApplication.AUTO_POST_ENABLED,
+                            isAutoPostEnabled );
+                        userManagementService.updateCompany( company );
+                    }
                 } else if ( entityType.equalsIgnoreCase( CommonConstants.REGION_ID ) ) {
                     collectionName = MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION;
                     unitSettings = organizationManagementService.getRegionSettings( entityId );
+                    Region region = userManagementService.getRegionById( entityId );
+                    if ( region != null ) {
+                        settingsSetter.setSettingsValueForRegion( region, SettingsForApplication.AUTO_POST_ENABLED,
+                            isAutoPostEnabled );
+                        userManagementService.updateRegion( region );
+                    }
                 } else if ( entityType.equalsIgnoreCase( CommonConstants.BRANCH_ID ) ) {
                     collectionName = MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION;
                     unitSettings = organizationManagementService.getBranchSettingsDefault( entityId );
+                    Branch branch = userManagementService.getBranchById( entityId );
+                    if ( branch != null ) {
+                        settingsSetter.setSettingsValueForBranch( branch, SettingsForApplication.AUTO_POST_ENABLED,
+                            isAutoPostEnabled );
+                        userManagementService.updateBranch( branch );
+                    }
                 } else if ( entityType.equalsIgnoreCase( CommonConstants.AGENT_ID ) ) {
                     collectionName = MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION;
                     unitSettings = organizationManagementService.getAgentSettings( entityId );
+
                 } else {
                     throw new InvalidInputException( "Invalid Collection Type" );
                 }
