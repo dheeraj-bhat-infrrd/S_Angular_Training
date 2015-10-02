@@ -114,7 +114,8 @@
 		function resendSurveyActivationLink() {
 			var payload = $('#survey-form').serialize();
 			$.ajax({
-				url : window.location.origin + "/rest/survey/resendsurveylink",
+				// url : window.location.origin + "/rest/survey/resendsurveylink",
+				url : getLocationOrigin() + "/rest/survey/resendsurveylink",
 				data : payload,
 				type : "POST",
 				dataType : "TEXT",
@@ -135,7 +136,8 @@
 		function retakeSurveyLink(){
 			var payload = $('#survey-form').serialize();
 			$.ajax({
-				url : window.location.origin + "/rest/survey/restartsurvey",
+				// url : window.location.origin + "/rest/survey/restartsurvey",
+				url : getLocationOrigin() + "/rest/survey/restartsurvey",
 				data : payload,
 				type : "GET",
 				cache : false,

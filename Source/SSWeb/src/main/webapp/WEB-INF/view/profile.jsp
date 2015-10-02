@@ -689,7 +689,8 @@
         $('.lp-button').click(function(event){
         	
         	if(validateContactUsForm()){
-        		url = window.location.origin + "/pages/profile/sendmail.do";
+        		//url = window.location.origin + "/pages/profile/sendmail.do";
+        		url = getLocationOrigin() + "/pages/profile/sendmail.do";
     			data = "";
     			if($("#agent-profile-name").val() != ""){
     				data += "profilename=" + $("#agent-profile-name").val();
