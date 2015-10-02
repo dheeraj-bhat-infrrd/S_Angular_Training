@@ -4737,7 +4737,8 @@ function paintProList(usersList) {
 			
 			$(".ctnt-list-item").click(function(e){
 				var agentProfileName = $(this).attr("data-profilename");
-				var url = window.location.origin + "/pages" + agentProfileName;
+				// var url = window.location.origin + "/pages" + agentProfileName;
+				var url = getLocationOrigin() + "/pages" + agentProfileName;
 				window.open(url);
 			});
 		}
@@ -4749,8 +4750,10 @@ function fetchUsersByProfileLevel(iden, profileLevel, startIndex) {
 	if (iden == undefined) {
 		return;
 	}
-	var url = window.location.origin + "/rest/profile/individuals/" + iden
-			+ "?profileLevel=" + profileLevel + "&start=" + startIndex;
+	//var url = window.location.origin + "/rest/profile/individuals/" + iden
+	//		+ "?profileLevel=" + profileLevel + "&start=" + startIndex;
+	var url = getLocationOrigin() + "/rest/profile/individuals/" + iden
+	+ "?profileLevel=" + profileLevel + "&start=" + startIndex;
 	callAjaxGET(url, fetchUsersByProfileLevelCallback, false);
 }
 
@@ -4805,7 +4808,8 @@ function initSurveyWithUrl(q) {
 		"q" : q
 	};
 	$.ajax({
-		url : window.location.origin + surveyUrl + "triggersurveywithurl",
+		//url : window.location.origin + surveyUrl + "triggersurveywithurl",
+		url : getLocationOrigin() + surveyUrl + "triggersurveywithurl",
 		type : "GET",
 		cache : false,
 		dataType : "JSON",
@@ -4841,7 +4845,8 @@ function initSurveyWithUrl(q) {
 }
 
 function showPageNotFoundError(){
-	window.location = window.location.origin + surveyUrl + "notfound";
+	//window.location = window.location.origin + surveyUrl + "notfound";
+	window.location = getLocationOrigin() + surveyUrl + "notfound";
 }
 
 function loadAgentPic(agentId){
@@ -4851,7 +4856,8 @@ function loadAgentPic(agentId){
 		"agentId" : agentId
 	};
 	$.ajax({
-		url : window.location.origin + surveyUrl + "displaypiclocationofagent",
+		//url : window.location.origin + surveyUrl + "displaypiclocationofagent",
+		url : getLocationOrigin() + surveyUrl + "displaypiclocationofagent",
 		type : "GET",
 		dataType : "text",
 		cache : false,
@@ -4902,7 +4908,8 @@ function paintSurveyPage(jsonData) {
 	//If social token availiable populate the links
 	if (googleEnabled) {
 		var googleElement = document.getElementById('ggl-btn');
-		shareOnGooglePlus(agentId, window.location.origin + "/rest/survey/", googleElement);
+		//shareOnGooglePlus(agentId, window.location.origin + "/rest/survey/", googleElement);
+		shareOnGooglePlus(agentId, getLocationOrigin() + "/rest/survey/", googleElement);
 	} else {
 		$('#ggl-btn').remove();
 	}
@@ -5077,7 +5084,8 @@ function retakeSurveyRequest(){
 			"lastName" : lastName,
 			"agentName" : agentName
 	};
-	callAjaxGetWithPayloadData(window.location.origin + surveyUrl + 'restartsurvey', '', payload, true);
+	//callAjaxGetWithPayloadData(window.location.origin + surveyUrl + 'restartsurvey', '', payload, true);
+	callAjaxGetWithPayloadData(getLocationOrigin() + surveyUrl + 'restartsurvey', '', payload, true);
 	$('#overlay-toast').html('Mail sent to your registered email id for retaking the survey for '+agentName);
 	showToast();
 }
@@ -5098,7 +5106,8 @@ function storeCustomerAnswer(customerResponse) {
 	};
 	questionDetails.customerResponse = customerResponse;
 	$.ajax({
-		url : window.location.origin + surveyUrl + "data/storeAnswer",
+		//url : window.location.origin + surveyUrl + "data/storeAnswer",
+		url : getLocationOrigin() + surveyUrl + "data/storeAnswer",
 		type : "GET",
 		cache : false,
 		data : payload,
@@ -5147,7 +5156,8 @@ function updateCustomerResponse(feedback, agreedToShare) {
 	};
 	questionDetails.customerResponse = customerResponse;
 	$.ajax({
-		url : window.location.origin + surveyUrl + "data/storeFeedback",
+		//url : window.location.origin + surveyUrl + "data/storeFeedback",
+		url : getLocationOrigin() + surveyUrl + "data/storeFeedback",
 		type : "GET",
 		cache : false,
 		data : payload,
@@ -5359,7 +5369,8 @@ function postToSocialMedia(feedback){
 		"agentProfileLink" : agentProfileLink
 	};
 	$.ajax({
-		url : window.location.origin + surveyUrl + "posttosocialnetwork",
+		//url : window.location.origin + surveyUrl + "posttosocialnetwork",
+		url : getLocationOrigin() + surveyUrl + "posttosocialnetwork",
 		type : "GET",
 		cache : false,
 		dataType : "TEXT",
@@ -5391,7 +5402,8 @@ function updateSharedOn(socialSite, agentId, customerEmail){
 		"socialSite" : socialSite
 	};
 	$.ajax({
-		url : window.location.origin + surveyUrl + "updatesharedon",
+		//url : window.location.origin + surveyUrl + "updatesharedon",
+		url : getLocationOrigin() + surveyUrl + "updatesharedon",
 		type : "GET",
 		cache : false,
 		dataType : "TEXT",
@@ -7638,7 +7650,8 @@ $(document).on('click','#dsh-dwnld-report-btn',function(){
 function userSwitchToAdmin() {
 	callAjaxGET("/switchtoadmin.do", function(data){
 		if(data == "success") {
-			window.location = window.location.origin + '/userlogin.do';
+			//window.location = window.location.origin + '/userlogin.do';
+			window.location = getLocationOrigin() + '/userlogin.do';
 		}
 	}, true);
 }

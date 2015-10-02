@@ -65,7 +65,8 @@
                 $('.error-main-wrapper').css('min-height',minH+'px');
             }
             $('.err-page-btn').click(function() {
-				window.open(window.location.origin,'_self');
+				// window.open(window.location.origin,'_self');
+            	window.open(getLocationOrigin(),'_self');
 			});
         });
     </script>
