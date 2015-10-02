@@ -19,7 +19,7 @@ public enum SettingsForApplication
     REALTOR( 10000000000l, 11 ),
     LENDING_TREE( 100000000000l, 12 ),
     WEB_ADDRESS_WORK( 1000000000000l, 13 ),
-    WEB_ADDRESS_BLOG( 10000000000000l, 14 ),
+    AUTO_POST_ENABLED( 10000000000000l, 14 ),
     WEB_ADDRESS_PERSONAL( 100000000000000l, 15 ),
     ABOUT_ME( 1000000000000000l, 16 ),
     EMAIL_ID_PERSONAL( 10000000000000000l, 17 ),
@@ -79,7 +79,7 @@ public enum SettingsForApplication
         } else if ( index == 13 ) {
             return WEB_ADDRESS_WORK;
         } else if ( index == 14 ) {
-            return WEB_ADDRESS_BLOG;
+            return AUTO_POST_ENABLED;
         } else if ( index == 15 ) {
             return WEB_ADDRESS_PERSONAL;
         } else if ( index == 16 ) {

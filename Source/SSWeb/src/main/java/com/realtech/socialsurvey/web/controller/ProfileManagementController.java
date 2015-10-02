@@ -641,14 +641,7 @@ public class ProfileManagementController
                                 .lockSettingsValueForCompany( company, SettingsForApplication.WEB_ADDRESS_WORK, false );
                         }
                     }
-                    if ( fieldId.equalsIgnoreCase( "web-address-blogs-lock" ) ) {
-                        if ( fieldState ) {
-                            settingsLocker.lockSettingsValueForCompany( company, SettingsForApplication.WEB_ADDRESS_BLOG, true );
-                        } else {
-                            settingsLocker
-                                .lockSettingsValueForCompany( company, SettingsForApplication.WEB_ADDRESS_BLOG, false );
-                        }
-                    }
+                 
                     if ( fieldId.equalsIgnoreCase( "aboutme-lock" ) ) {
                         if ( fieldState ) {
                             settingsLocker.lockSettingsValueForCompany( company, SettingsForApplication.ABOUT_ME, true );
@@ -692,13 +685,7 @@ public class ProfileManagementController
                             settingsLocker.lockSettingsValueForRegion( region, SettingsForApplication.WEB_ADDRESS_WORK, false );
                         }
                     }
-                    if ( fieldId.equalsIgnoreCase( "web-address-blogs-lock" ) ) {
-                        if ( fieldState ) {
-                            settingsLocker.lockSettingsValueForRegion( region, SettingsForApplication.WEB_ADDRESS_BLOG, true );
-                        } else {
-                            settingsLocker.lockSettingsValueForRegion( region, SettingsForApplication.WEB_ADDRESS_BLOG, false );
-                        }
-                    }
+
                     if ( fieldId.equalsIgnoreCase( "aboutme-lock" ) ) {
                         if ( fieldState ) {
                             settingsLocker.lockSettingsValueForRegion( region, SettingsForApplication.ABOUT_ME, true );
@@ -742,13 +729,7 @@ public class ProfileManagementController
                             settingsLocker.lockSettingsValueForBranch( branch, SettingsForApplication.WEB_ADDRESS_WORK, false );
                         }
                     }
-                    if ( fieldId.equalsIgnoreCase( "web-address-blogs-lock" ) ) {
-                        if ( fieldState ) {
-                            settingsLocker.lockSettingsValueForBranch( branch, SettingsForApplication.WEB_ADDRESS_BLOG, true );
-                        } else {
-                            settingsLocker.lockSettingsValueForBranch( branch, SettingsForApplication.WEB_ADDRESS_BLOG, false );
-                        }
-                    }
+
                     if ( fieldId.equalsIgnoreCase( "aboutme-lock" ) ) {
                         if ( fieldState ) {
                             settingsLocker.lockSettingsValueForBranch( branch, SettingsForApplication.ABOUT_ME, true );
@@ -2304,9 +2285,7 @@ public class ProfileManagementController
                         } else if ( key.equalsIgnoreCase( "personal" ) ) {
                             settingsSetter.setSettingsValueForCompany( company, SettingsForApplication.WEB_ADDRESS_PERSONAL,
                                 true );
-                        } else if ( key.equalsIgnoreCase( "blogs" ) ) {
-                            settingsSetter.setSettingsValueForCompany( company, SettingsForApplication.WEB_ADDRESS_BLOG, true );
-                        }
+                        } 
                     }
                     userManagementService.updateCompany( company );
                 }
@@ -2330,9 +2309,7 @@ public class ProfileManagementController
                         } else if ( key.equalsIgnoreCase( "personal" ) ) {
                             settingsSetter
                                 .setSettingsValueForRegion( region, SettingsForApplication.WEB_ADDRESS_PERSONAL, true );
-                        } else if ( key.equalsIgnoreCase( "blogs" ) ) {
-                            settingsSetter.setSettingsValueForRegion( region, SettingsForApplication.WEB_ADDRESS_BLOG, true );
-                        }
+                        } 
                     }
                     userManagementService.updateRegion( region );
                 }
@@ -2356,8 +2333,6 @@ public class ProfileManagementController
                         } else if ( key.equalsIgnoreCase( "personal" ) ) {
                             settingsSetter
                                 .setSettingsValueForBranch( branch, SettingsForApplication.WEB_ADDRESS_PERSONAL, true );
-                        } else if ( key.equalsIgnoreCase( "blogs" ) ) {
-                            settingsSetter.setSettingsValueForBranch( branch, SettingsForApplication.WEB_ADDRESS_BLOG, true );
                         }
                     }
                     userManagementService.updateBranch( branch );
