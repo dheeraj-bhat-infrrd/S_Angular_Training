@@ -8,7 +8,10 @@ var apikey;
 $(document).ready(function() {
 	
 	if (typeof apikey === 'undefined') {
-		fetchGoogleMapApi();
+		//fetchGoogleMapApi();
+		callAjaxGET("/fetchgooglemapapikey.do", function(data) {
+			apikey = data;
+		}, true);
 	}
 });
 
