@@ -213,7 +213,8 @@ function paintBreadCrums(url) {
 		if(jsonData.entity) {
 			var entityJson = $.parseJSON(jsonData.entity);
 			var htmlContent = '<a target="_blank" class="brd-crm brd-crm-link" href="'
-					+ window.location.origin
+					//+ window.location.origin
+					+ getLocationOrigin()
 					+ '/findcompany.do?verticalName='
 					+ entityJson[0].breadCrumbProfile
 					+ '">'
@@ -249,7 +250,8 @@ function focusOnContact() {
 }
 
 function fetchCompanyRegions() {
-	var url = window.location.origin +'/rest/profile/'+companyProfileName+'/regions';
+	//var url = window.location.origin +'/rest/profile/'+companyProfileName+'/regions';
+	var url = getLocationOrigin() +'/rest/profile/'+companyProfileName+'/regions';
 	callAjaxGET(url, paintCompanyRegions, true);
 }
 
@@ -274,7 +276,8 @@ function paintCompanyRegions(data) {
 }
 
 function fetchBranchesForRegion(regionId) {
-	var url = window.location.origin +'/rest/profile/region/'+regionId+'/branches';
+	//var url = window.location.origin +'/rest/profile/region/'+regionId+'/branches';
+	var url = getLocationOrigin() +'/rest/profile/region/'+regionId+'/branches';
 	$("#regionid-hidden").val(regionId);
 	callAjaxGET(url, paintBranchesForRegion, true);
 }
@@ -327,7 +330,9 @@ function bindClickToFetchBranchIndividuals(bindingClass) {
 function fetchIndividualsForBranch(branchId) {
 	var start = $('div[data-branchid="' + branchId + '"]').attr('data-start');
 	var rows = $('div[data-branchid="' + branchId + '"]').attr('data-batch');
-	var url = window.location.origin + '/rest/profile/branch/' + branchId
+	//var url = window.location.origin + '/rest/profile/branch/' + branchId
+	//		+ '/individuals?start=' + start + "&rows=" + rows;
+	var url = getLocationOrigin() + '/rest/profile/branch/' + branchId
 			+ '/individuals?start=' + start + "&rows=" + rows;
 	$("#branchid-hidden").val(branchId);
 	callAjaxGET(url, paintIndividualForBranch, true);
@@ -417,7 +422,8 @@ function bindClickToFetchIndividualProfile(bindingClass) {
 	$("."+bindingClass).click(function(e){
 		e.stopPropagation();
 		var agentProfileName = $(this).data("profilename");
-		var url = window.location.origin +"/pages/"+agentProfileName;
+		//var url = window.location.origin +"/pages/"+agentProfileName;
+		var url = getLocationOrigin() +"/pages/"+agentProfileName;
 		window.open(url, "_blank");				
 	});
 }
@@ -427,8 +433,10 @@ function fetchIndividualsForRegion(regionId) {
 			'data-start');
 	var rows = $('.comp-region[data-regionid="' + regionId + '"]').attr(
 			'data-batch');
-	var url = window.location.origin + '/rest/profile/region/' + regionId
-			+ '/individuals?start=' + start + "&rows=" + rows;
+	//var url = window.location.origin + '/rest/profile/region/' + regionId
+	//		+ '/individuals?start=' + start + "&rows=" + rows;
+	var url = getLocationOrigin() + '/rest/profile/region/' + regionId
+	+ '/individuals?start=' + start + "&rows=" + rows;
 	$("#regionid-hidden").val(regionId);
 	callAjaxGET(url, paintIndividualsForRegion, true);
 }
@@ -467,7 +475,8 @@ function paintIndividualsForRegion(data) {
 }
 
 function fetchCompanyIndividuals() {
-	var url = window.location.origin +'/rest/profile/'+companyProfileName+'/individuals';
+	//var url = window.location.origin +'/rest/profile/'+companyProfileName+'/individuals';
+	var url = getLocationOrigin() +'/rest/profile/'+companyProfileName+'/individuals';
 	callAjaxGET(url, paintCompanyIndividuals, true);
 }
 
@@ -500,7 +509,8 @@ function paintCompanyIndividuals(data) {
 }
 
 function fetchCompanyBranches() {
-	var url = window.location.origin +'/rest/profile/'+companyProfileName+'/branches';
+	//var url = window.location.origin +'/rest/profile/'+companyProfileName+'/branches';
+	var url = getLocationOrigin() +'/rest/profile/'+companyProfileName+'/branches';
 	callAjaxGET(url, paintCompanyBranches, true);
 }
 
@@ -1057,7 +1067,8 @@ function findProList(iden,searchcritrianame){
 	if(profileLevel == 'INDIVIDUAL'){
 		initSurveyReview(iden);
 	}else {
-		 url = window.location.origin +"/initfindapro.do?profileLevel="+profileLevel+"&iden="+iden+"&searchCriteria="+searchcritrianame;
+		 //url = window.location.origin +"/initfindapro.do?profileLevel="+profileLevel+"&iden="+iden+"&searchCriteria="+searchcritrianame;
+		url = getLocationOrigin() +"/initfindapro.do?profileLevel="+profileLevel+"&iden="+iden+"&searchCriteria="+searchcritrianame;
 		 window.open(url, "_blank");
 	}
 	
@@ -1067,7 +1078,8 @@ function downloadVCard(agentName){
 	if(agentName == undefined || agentName == ""){
 		return;
 	}
-	var url = window.location.origin + "/rest/profile/downloadvcard/"+agentName;
+	//var url = window.location.origin + "/rest/profile/downloadvcard/"+agentName;
+	var url = getLocationOrigin() + "/rest/profile/downloadvcard/"+agentName;
 	window.open(url, "_blank");
 }
 
@@ -1076,7 +1088,8 @@ function paintPublicPosts() {
 	doStopPublicPostPagination = false;
 	var profileLevel = $("#profile-fetch-info").attr("profile-level");
 	
-	var url = window.location.origin + "/rest/profile/";
+	//var url = window.location.origin + "/rest/profile/";
+	var url = getLocationOrigin() + "/rest/profile/";
 	if(profileLevel == 'COMPANY'){
 		//Fectch the reviews for company
 		url += "company/"+currentProfileName+"/posts?start="+publicPostStartIndex+"&numRows="+publicPostNumRows;
@@ -1170,21 +1183,24 @@ $('#prof-posts').on('scroll',function(){
 $('body').on('click',".branch-link",function(e) {
 	e.stopPropagation();
 	var branchProfileName = $(this).data("profilename");
-	var url = window.location.origin +"/pages/office/"+companyProfileName+"/"+branchProfileName;
+	//var url = window.location.origin +"/pages/office/"+companyProfileName+"/"+branchProfileName;
+	var url = getLocationOrigin() +"/pages/office/"+companyProfileName+"/"+branchProfileName;
 	window.open(url, "_blank");
 });
 
 $('body').on('click',".individual-link",function(e) {
 	e.stopPropagation();
 	var agentProfileName = $(this).data("profilename");
-	var url = window.location.origin +"/pages/"+agentProfileName;
+	//var url = window.location.origin +"/pages/"+agentProfileName;
+	var url = getLocationOrigin() +"/pages/"+agentProfileName;
 	window.open(url, "_blank");
 });
 
 $('body').on('click',".region-link",function(e) {
 	e.stopPropagation();
 	var regionProfileName = $(this).data("profilename");
-	var url = window.location.origin +"/pages/region/"+companyProfileName+"/"+regionProfileName;
+	//var url = window.location.origin +"/pages/region/"+companyProfileName+"/"+regionProfileName;
+	var url = getLocationOrigin() +"/pages/region/"+companyProfileName+"/"+regionProfileName;
 	window.open(url, "_blank");
 });
 

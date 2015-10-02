@@ -631,7 +631,8 @@ function displayPicCallback(data){
  * Method to redirect to error page
  */
 function redirectTo404ErrorPage(){
-	location.href =  window.location.origin + "/error";
+	//location.href =  window.location.origin + "/error";
+	location.href =  getLocationOrigin() + "/error";
 }
 
 function sendVerificationMail(emailUrl){
