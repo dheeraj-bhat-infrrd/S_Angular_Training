@@ -70,7 +70,7 @@ public class EmailServicesImpl implements EmailServices
 
     @Value ( "${APPLICATION_LOGO_URL}")
     private String appLogoUrl;
-    
+
     @Value ( "${APPLICATION_ADMIN_EMAIL}")
     private String applicationAdminEmail;
 
@@ -951,7 +951,7 @@ public class EmailServicesImpl implements EmailServices
     @Async
     @Override
     public void sendSurveyCompletionMail( String recipientMailId, String displayName, String agentName, String agentEmail,
-        String agentProfileName , String logoUrl ) throws InvalidInputException, UndeliveredEmailException
+        String agentProfileName, String logoUrl ) throws InvalidInputException, UndeliveredEmailException
     {
         if ( recipientMailId == null || recipientMailId.isEmpty() ) {
             LOG.error( "Recipient email Id is empty or null for sending survey completion mail " );
@@ -970,14 +970,14 @@ public class EmailServicesImpl implements EmailServices
         FileContentReplacements messageBodyReplacements = new FileContentReplacements();
         messageBodyReplacements.setFileName( EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER
             + EmailTemplateConstants.SURVEY_COMPLETION_MAIL_BODY );
-        if(logoUrl != null && !logoUrl.isEmpty()){
-        	messageBodyReplacements.setReplacementArgs( Arrays.asList( logoUrl, displayName, agentName, agentName, appBaseUrl,
-                    agentProfileName, appBaseUrl, agentProfileName, agentName ) );
-        }else{
-        	messageBodyReplacements.setReplacementArgs( Arrays.asList( appLogoUrl, displayName, agentName, agentName, appBaseUrl,
-                    agentProfileName, appBaseUrl, agentProfileName, agentName ) );
+        if ( logoUrl != null && !logoUrl.isEmpty() ) {
+            messageBodyReplacements.setReplacementArgs( Arrays.asList( logoUrl, displayName, agentName, agentName, appBaseUrl,
+                agentProfileName, appBaseUrl, agentProfileName, agentName ) );
+        } else {
+            messageBodyReplacements.setReplacementArgs( Arrays.asList( appLogoUrl, displayName, agentName, agentName,
+                appBaseUrl, agentProfileName, appBaseUrl, agentProfileName, agentName ) );
         }
-        
+
 
         LOG.debug( "Calling email sender to send mail" );
         emailSender.sendEmailWithBodyReplacements( emailEntity, subjectFileName, messageBodyReplacements );
@@ -1191,7 +1191,8 @@ public class EmailServicesImpl implements EmailServices
     @Async
     @Override
     public void sendSocialPostReminderMail( String recipientMailId, String agentPhone, String agentTitle, String companyName,
-        String displayName, String agentName, String links , String logoUrl ) throws InvalidInputException, UndeliveredEmailException
+        String displayName, String agentName, String links, String logoUrl ) throws InvalidInputException,
+        UndeliveredEmailException
     {
         if ( recipientMailId == null || recipientMailId.isEmpty() ) {
             LOG.error( "Recipient email Id is empty or null for sending survey completion mail " );
@@ -1212,10 +1213,10 @@ public class EmailServicesImpl implements EmailServices
         FileContentReplacements messageBodyReplacements = new FileContentReplacements();
         messageBodyReplacements.setFileName( EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER
             + EmailTemplateConstants.SOCIALPOST_REMINDER_MAIL_BODY );
-        if(logoUrl != null && !logoUrl.isEmpty()){
-            messageBodyReplacements.setReplacementArgs( Arrays.asList( logoUrl, displayName, links, "", agentSignature ) );        	
-        }else{
-            messageBodyReplacements.setReplacementArgs( Arrays.asList( appLogoUrl, displayName, links, "", agentSignature ) );        	
+        if ( logoUrl != null && !logoUrl.isEmpty() ) {
+            messageBodyReplacements.setReplacementArgs( Arrays.asList( logoUrl, displayName, links, "", agentSignature ) );
+        } else {
+            messageBodyReplacements.setReplacementArgs( Arrays.asList( appLogoUrl, displayName, links, "", agentSignature ) );
         }
 
         LOG.debug( "Calling email sender to send mail" );
@@ -1686,7 +1687,8 @@ public class EmailServicesImpl implements EmailServices
 
 
     @Override
-    public void sendCorruptDataFromCrmNotificationMail( String firstName, String lastName, String recipientMailId, Map<String , String > attachmentsDetails ) throws InvalidInputException, UndeliveredEmailException
+    public void sendCorruptDataFromCrmNotificationMail( String firstName, String lastName, String recipientMailId,
+        Map<String, String> attachmentsDetails ) throws InvalidInputException, UndeliveredEmailException
     {
         LOG.info( "Method sendCorruptDataFromCrmNotificationMail() started." );
         if ( recipientMailId == null || recipientMailId.isEmpty() ) {
@@ -1696,7 +1698,7 @@ public class EmailServicesImpl implements EmailServices
         }
 
         EmailEntity emailEntity = prepareEmailEntityForSendingEmail( recipientMailId );
-        emailEntity.setAttachmentDetail(attachmentsDetails);
+        emailEntity.setAttachmentDetail( attachmentsDetails );
         String subjectFileName = EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER
             + EmailTemplateConstants.CORRUPT_PREINITIATION_RECORD_MAIL_SUBJECT;
         String displayName = firstName + " " + lastName;
@@ -1715,7 +1717,7 @@ public class EmailServicesImpl implements EmailServices
 
     @Override
     public void sendRecordsNotUploadedCrmNotificationMail( String firstName, String lastName, String recipientMailId,
-    	Map<String , String > attachmentsDetails ) throws InvalidInputException, UndeliveredEmailException
+        Map<String, String> attachmentsDetails ) throws InvalidInputException, UndeliveredEmailException
     {
         LOG.info( "Method sendCorruptDataFromCrmNotificationMail() started." );
         if ( recipientMailId == null || recipientMailId.isEmpty() ) {
@@ -1725,7 +1727,7 @@ public class EmailServicesImpl implements EmailServices
         }
 
         EmailEntity emailEntity = prepareEmailEntityForSendingEmail( recipientMailId );
-        emailEntity.setAttachmentDetail(attachmentsDetails);
+        emailEntity.setAttachmentDetail( attachmentsDetails );
         String subjectFileName = EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER
             + EmailTemplateConstants.RECORDS_NOT_UPLOADED_MAIL_SUBJECT;
         String displayName = firstName + " " + lastName;
@@ -1741,35 +1743,37 @@ public class EmailServicesImpl implements EmailServices
         LOG.info( "Method sendCorruptDataFromCrmNotificationMail() finished." );
     }
 
+
     /**
      * 
      */
     @Override
-    public void sendHelpMailToAdmin( User user ,  String displayName ,  String mailSubject, String messageBodyText, String recipientMailId,
-    		Map<String , String > attachmentsDetails ) throws InvalidInputException, UndeliveredEmailException
+    public void sendHelpMailToAdmin( User user, String displayName, String mailSubject, String messageBodyText,
+        String recipientMailId, Map<String, String> attachmentsDetails ) throws InvalidInputException,
+        UndeliveredEmailException
     {
         LOG.info( "Method sendHelpMailToAdmin() started." );
         if ( recipientMailId == null || recipientMailId.isEmpty() ) {
             LOG.error( "Recipient email Id is empty or null for sending sending report bug  mail " );
-            throw new InvalidInputException(
-                "Recipient email Id is empty or null for sending report bug  mail " );
+            throw new InvalidInputException( "Recipient email Id is empty or null for sending report bug  mail " );
         }
 
-        LOG.info("Saving EmailEntity with recipient mail id : " + recipientMailId);
+        LOG.info( "Saving EmailEntity with recipient mail id : " + recipientMailId );
         EmailEntity emailEntity = prepareEmailEntityForSendingEmail( recipientMailId );
         //set the attachments detail
-        emailEntity.setAttachmentDetail(attachmentsDetails);
+        emailEntity.setAttachmentDetail( attachmentsDetails );
         String subjectFileName = EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER
             + EmailTemplateConstants.HELP_MAIL_TO_SS_ADMIN_SUBJECT;
-        
+
         FileContentReplacements messageBodyReplacements = new FileContentReplacements();
         messageBodyReplacements.setFileName( EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER
             + EmailTemplateConstants.HELP_MAIL_TO_SS_ADMIN_BODY );
-       
+
         String senderName = user.getFirstName() + " " + user.getLastName();
-		String senderEmail = user.getEmailId();
-        
-        messageBodyReplacements.setReplacementArgs( Arrays.asList( appLogoUrl, displayName , senderName , senderEmail , mailSubject , messageBodyText ) );
+        String senderEmail = user.getEmailId();
+
+        messageBodyReplacements.setReplacementArgs( Arrays.asList( appLogoUrl, displayName, senderName, senderEmail,
+            mailSubject, messageBodyText ) );
 
         LOG.info( "Calling email sender to send mail" );
         emailSender.sendEmailWithBodyReplacements( emailEntity, subjectFileName, messageBodyReplacements );
@@ -1777,10 +1781,12 @@ public class EmailServicesImpl implements EmailServices
         LOG.info( "Method sendHelpMailToAdmin() finished." );
     }
 
+
     @Override
-    public void sendZillowCallExceededMailToAdmin(int count) throws InvalidInputException, UndeliveredEmailException{
+    public void sendZillowCallExceededMailToAdmin( int count ) throws InvalidInputException, UndeliveredEmailException
+    {
         LOG.info( "Method sendZillowCallExceededMailToAdmin() started" );
-        LOG.info("Saving EmailEntity with recipient mail id : " + applicationAdminEmail);
+        LOG.info( "Saving EmailEntity with recipient mail id : " + applicationAdminEmail );
         EmailEntity emailEntity = prepareEmailEntityForSendingEmail( applicationAdminEmail );
         String subject = "Zillow API call exceeded for the day";
         String mailBody = "Zillow API call exceeded for the day. Call count : " + count;
@@ -1788,6 +1794,7 @@ public class EmailServicesImpl implements EmailServices
         emailSender.sendEmail( emailEntity, subject, mailBody );
         LOG.info( "Method sendZillowCallExceededMailToAdmin() finished" );
     }
+
 
     /**
      * Method to prepare email entity required to send email
@@ -1891,6 +1898,38 @@ public class EmailServicesImpl implements EmailServices
             }
         }
 
+    }
+
+
+    /**
+     * 
+     */
+    @Override
+    public void sendReportBugMailToAdmin( String displayName, String errorMsg, String recipientMailId )
+        throws InvalidInputException, UndeliveredEmailException
+    {
+        LOG.info( "Method sendReportBugMailToAdmin() started." );
+        if ( recipientMailId == null || recipientMailId.isEmpty() ) {
+            LOG.error( "Recipient email Id is empty or null for sending sending report bug  mail " );
+            throw new InvalidInputException( "Recipient email Id is empty or null for sending report bug  mail " );
+        }
+
+        LOG.info( "Saving EmailEntity with recipient mail id : " + recipientMailId );
+        EmailEntity emailEntity = prepareEmailEntityForSendingEmail( recipientMailId );
+
+        String subjectFileName = EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER
+            + EmailTemplateConstants.REPORT_BUG_MAIL_TO_ADMIN_SUBJECT;
+
+        FileContentReplacements messageBodyReplacements = new FileContentReplacements();
+        messageBodyReplacements.setFileName( EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER
+            + EmailTemplateConstants.REPORT_BUG_MAIL_TO_ADMIN_BODY );
+
+        messageBodyReplacements.setReplacementArgs( Arrays.asList( appLogoUrl, displayName, errorMsg ) );
+
+        LOG.info( "Calling email sender to send mail" );
+        emailSender.sendEmailWithBodyReplacements( emailEntity, subjectFileName, messageBodyReplacements );
+
+        LOG.info( "Method sendReportBugMailToAdmin() finished." );
     }
 }
 // JIRA: SS-7: By RM02: EOC

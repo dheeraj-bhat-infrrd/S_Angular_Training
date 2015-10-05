@@ -5,36 +5,21 @@
 
 <c:if test="${not empty abusiveReviewReportList}">
 	<c:forEach items="${abusiveReviewReportList}" var="abusiveReviewReportItem">
-		<tr>
-			<td align="left" width="15%">
-				<c:if test="${not empty abusiveReviewReportItem.survey.agentName }">
-					${abusiveReviewReportItem.survey.agentName}
-				</c:if>
-			</td>
-			<td width="3%"></td>
-			<td align="left" width="30%">
-				<c:if test="${not empty abusiveReviewReportItem.survey.review }">
-					${abusiveReviewReportItem.survey.review}
-				</c:if>
-			</td>
-			<td width="3%"></td>
-			<c:if test="${not empty abusiveReviewReportItem.abuseReporterDetails}">
-			    <%! int counter = 0; %>
-				<c:forEach items="${abusiveReviewReportItem.abuseReporterDetails.abuseReporters}" var="reporterDetailItem">
-					<td align="left" width="15%">${reporterDetailItem.reporterName}</td>
-					<td width="3%"></td>
-					<td align="left" width="30%">${reporterDetailItem.reporterEmail}</td>
-					</tr>
-					<% counter++; %>
-					<c:if test="${fn:length(companies) ne counter}">
-						<tr>
-						<td align="left" width="15%"></td>
-						<td width="3%"></td>
-						<td align="left" width="15%"></td>
-						<td width="3%"></td>
+		<c:forEach items="${abusiveReviewReportItem.abuseReporterDetails.abuseReporters}" var="reporterDetailItem">
+			<div class="abuse-review-row row">
+				<div class="abuse-report-col capitalize col-lg-3 col-md-3 col-sm-3 col-xs-3">
+					<c:if test="${not empty abusiveReviewReportItem.survey.agentName }">
+						${abusiveReviewReportItem.survey.agentName}
 					</c:if>
-				</c:forEach>
-			</c:if>
-		</tr>
+				</div>
+				<div class="abuse-report-col col-lg-3 col-md-3 col-sm-3 col-xs-3">
+					<c:if test="${not empty abusiveReviewReportItem.survey.review }">
+						${abusiveReviewReportItem.survey.review}
+					</c:if>
+				</div>
+				<div class="abuse-report-col capitalize col-lg-3 col-md-3 col-sm-3 col-xs-3">${reporterDetailItem.reporterName}</div>
+				<div class="abuse-report-col col-lg-3 col-md-3 col-sm-3 col-xs-3">${reporterDetailItem.reporterEmail}</div>
+			</div>
+		</c:forEach>
 	</c:forEach>
 </c:if>
