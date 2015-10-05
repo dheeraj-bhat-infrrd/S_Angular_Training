@@ -2358,7 +2358,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
         List<UserProfile> userProfiles = user.getUserProfiles();
         UserProfile userProfile = null;
         for ( UserProfile element : userProfiles ) {
-            if ( element.getProfilesMaster().getProfileId() == CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID ) {
+            if ( element.getIsPrimary() == CommonConstants.IS_PRIMARY_TRUE ) {
                 userProfile = element;
                 break;
             }
