@@ -1558,6 +1558,7 @@ button.paypal.is-active {
 }
 
 .prof-btn-survey {
+	display: block;
 	background-color: #3E9DCB;
 	font-size: 14px;
 	height: 35px;
