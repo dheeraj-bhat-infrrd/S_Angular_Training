@@ -770,6 +770,7 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
             mailBody = mailBody.replaceAll( "\\[InitiatedDate\\]", dateFormat.format( new Date() ) );
             mailBody = mailBody.replaceAll( "\\[CurrentYear\\]", currentYear );
             mailBody = mailBody.replaceAll( "\\[FullAddress\\]", fullAddress );
+            mailBody = mailBody.replaceAll( "\\[Link\\]", surveyUrl );
             mailBody = mailBody.replaceAll( "null", "" );
 
             String mailSubject = CommonConstants.RESTART_SURVEY_MAIL_SUBJECT;
@@ -1002,6 +1003,7 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
             mailBody = mailBody.replaceAll( "\\[InitiatedDate\\]", dateFormat.format( new Date() ) );
             mailBody = mailBody.replaceAll( "\\[CurrentYear\\]", currentYear );
             mailBody = mailBody.replaceAll( "\\[FullAddress\\]", fullAddress );
+            mailBody = mailBody.replaceAll( "\\[Links\\]", links );
             mailBody = mailBody.replaceAll( "null", "" );
 
             String mailSubject = CommonConstants.SOCIAL_POST_REMINDER_MAIL_SUBJECT;

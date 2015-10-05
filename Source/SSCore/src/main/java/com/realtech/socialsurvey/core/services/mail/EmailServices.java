@@ -381,7 +381,7 @@ public interface EmailServices {
             SurveyPreInitiation survey) throws InvalidInputException,
             UndeliveredEmailException;
     
-    public void sendHelpMailToAdmin( User user ,  String displayName ,  String mailSubject, String messageBodyText, String recipientMailId, Map<String , String > attachmentsDetails ) throws InvalidInputException, UndeliveredEmailException;
+    public void sendHelpMailToAdmin( String  senderEmail , String senderName,  String displayName ,  String mailSubject, String messageBodyText, String recipientMailId, Map<String , String > attachmentsDetails ) throws InvalidInputException, UndeliveredEmailException;
 
     /**
      * Method to send survey reminder when the resend button is manually clicked
