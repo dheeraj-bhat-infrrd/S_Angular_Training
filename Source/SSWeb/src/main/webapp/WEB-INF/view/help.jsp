@@ -60,6 +60,13 @@
 					</div>
 				</div>
 
+				<div class="bd-hr-form-item clearfix">
+					<div class="float-left bd-frm-left">Email Address</div>
+					<div class="float-left bd-frm-right">
+						<input class="bd-frm-rt-txt" name="emailId"
+							id="email-id" placeholder="Write your name" value="${user.emailId}" >
+					</div>
+				</div>
 
 				<div class="bd-hr-form-item clearfix">
 					<div class="float-left bd-frm-left">Subject</div>
@@ -84,7 +91,7 @@
 					<!-- <input type="file" name="dummyAttachment" id="attachment" style="display:none"/>
 					<input type="file"  style="display:none" name="attachment" id="files"> 
 					<div class="bd-btn-save" id="icn-file-upload">Upload</div> -->
-					<div id="send-button" style="margin: 0px auto; margin-top: 20px"
+					<div id="send-help-mail-button" style="margin: 0px auto; margin-top: 20px"
 						class="bd-btn-save cursor-pointer ">Send message</div>
 				</div> 
 			</form>
