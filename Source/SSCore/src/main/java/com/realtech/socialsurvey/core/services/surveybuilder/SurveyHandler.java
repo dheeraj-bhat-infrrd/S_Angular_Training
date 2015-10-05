@@ -195,4 +195,12 @@ public interface SurveyHandler
 
 
     public List<AbusiveSurveyReportWrapper> getSurveysReporetedAsAbusive( int startIndex, int numOfRows );
+
+    void sendSurveyCompletionMail( String custEmail, String custFirstName, String custLastName, User user )
+        throws InvalidInputException, UndeliveredEmailException, ProfileNotFoundException;
+
+
+    void sendSocialPostReminderMail( String custEmail, String custFirstName, String custLastName, User user, String links )
+        throws InvalidInputException, UndeliveredEmailException, ProfileNotFoundException;
+
 }

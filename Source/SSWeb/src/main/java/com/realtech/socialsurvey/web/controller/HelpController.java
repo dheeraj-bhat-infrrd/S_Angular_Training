@@ -36,7 +36,7 @@ import com.realtech.socialsurvey.web.util.BotRequestUtils;
 @Controller
 public class HelpController {
 
-	private static final Logger LOG = LoggerFactory.getLogger( ProfileManagementController.class );
+	private static final Logger LOG = LoggerFactory.getLogger( HelpController.class );
 
     // JIRA SS-97 by RM-06 : BOC
     @Autowired

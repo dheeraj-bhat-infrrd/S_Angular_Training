@@ -772,7 +772,7 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
             mailBody = mailBody.replaceAll( "\\[FullAddress\\]", fullAddress );
             mailBody = mailBody.replaceAll( "null", "" );
 
-            String mailSubject = CommonConstants.SURVEY_MAIL_SUBJECT + agentName;
+            String mailSubject = CommonConstants.RESTART_SURVEY_MAIL_SUBJECT;
             try {
                 emailServices.sendSurveyInvitationMail( custEmail, mailSubject, mailBody, user.getEmailId(),
                     user.getFirstName() + ( user.getLastName() != null ? " " + user.getLastName() : "" ) );
@@ -780,12 +780,242 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
                 LOG.error( "Exception caught while sending mail to " + custEmail + ". Nested exception is ", e );
             }
         } else {
-            emailServices.sendDefaultSurveyInvitationMail( custEmail,
+            emailServices.sendDefaultSurveyRestartMail( custEmail,
                 emailFormatHelper.getCustomerDisplayNameForEmail( custFirstName, custLastName ),
                 user.getFirstName() + ( user.getLastName() != null ? " " + user.getLastName() : "" ), surveyUrl,
-                user.getEmailId(), agentSignature, companyName, dateFormat.format( new Date() ), currentYear, fullAddress );
+                user.getEmailId(), agentSignature );
         }
         LOG.info( "sendSurveyRestartMail() finished." );
+    }
+
+
+    @Override
+    public void sendSurveyCompletionMail( String custEmail, String custFirstName, String custLastName, User user )
+        throws InvalidInputException, UndeliveredEmailException, ProfileNotFoundException
+    {
+        LOG.info( "sendSurveyCompletionMail() started." );
+        Map<String, Long> hierarchyMap = null;
+        Map<SettingsForApplication, OrganizationUnit> map = null;
+        String logoUrl = null;
+        AgentSettings agentSettings = userManagementService.getUserSettings( user.getUserId() );
+        String companyName = user.getCompany().getCompany();
+        String agentTitle = "";
+        if ( agentSettings.getContact_details() != null && agentSettings.getContact_details().getTitle() != null ) {
+            agentTitle = agentSettings.getContact_details().getTitle();
+        }
+
+        String agentPhone = "";
+        if ( agentSettings.getContact_details() != null && agentSettings.getContact_details().getContact_numbers() != null
+            && agentSettings.getContact_details().getContact_numbers().getWork() != null ) {
+            agentPhone = agentSettings.getContact_details().getContact_numbers().getWork();
+        }
+
+        String agentName = user.getFirstName();
+        if ( user.getLastName() != null && !user.getLastName().isEmpty() ) {
+            agentName = user.getFirstName() + " " + user.getLastName();
+        }
+        String agentSignature = emailFormatHelper.buildAgentSignature( agentName, agentPhone, agentTitle, companyName );
+        String currentYear = String.valueOf( Calendar.getInstance().get( Calendar.YEAR ) );
+        DateFormat dateFormat = new SimpleDateFormat( "yyyy/MM/dd" );
+        // TODO add address for mail footer
+        String fullAddress = "";
+
+        hierarchyMap = profileManagementService.getPrimaryHierarchyByAgentProfile( agentSettings );
+
+        long companyId = hierarchyMap.get( CommonConstants.COMPANY_ID_COLUMN );
+        long regionId = hierarchyMap.get( CommonConstants.REGION_ID_COLUMN );
+        long branchId = hierarchyMap.get( CommonConstants.BRANCH_ID_COLUMN );
+        try {
+            map = profileManagementService.getPrimaryHierarchyByEntity( CommonConstants.AGENT_ID_COLUMN, user.getUserId() );
+            if ( map == null ) {
+                LOG.error( "Unable to fetch primary profile for this user " );
+                throw new FatalException( "Unable to fetch primary profile this user " + user.getUserId() );
+            }
+        } catch ( InvalidSettingsStateException e ) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+        OrganizationUnit organizationUnit = map.get( SettingsForApplication.LOGO );
+        if ( organizationUnit == OrganizationUnit.COMPANY ) {
+            OrganizationUnitSettings companySettings = organizationManagementService.getCompanySettings( companyId );
+            logoUrl = companySettings.getLogo();
+        } else if ( organizationUnit == OrganizationUnit.REGION ) {
+            OrganizationUnitSettings regionSettings = organizationManagementService.getRegionSettings( regionId );
+            logoUrl = regionSettings.getLogo();
+        } else if ( organizationUnit == OrganizationUnit.BRANCH ) {
+            OrganizationUnitSettings branchSettings = null;
+            try {
+                branchSettings = organizationManagementService.getBranchSettingsDefault( branchId );
+            } catch ( NoRecordsFetchedException e ) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
+            if ( branchSettings != null ) {
+                logoUrl = branchSettings.getLogo();
+            }
+        } else if ( organizationUnit == OrganizationUnit.AGENT ) {
+            logoUrl = agentSettings.getLogo();
+        }
+
+        OrganizationUnitSettings companySettings = organizationManagementService.getCompanySettings( user.getCompany()
+            .getCompanyId() );
+
+        if ( companySettings != null && companySettings.getMail_content() != null
+            && companySettings.getMail_content().getSurvey_completion_mail() != null ) {
+
+            MailContent surveyCompletion = companySettings.getMail_content().getSurvey_completion_mail();
+            String mailBody = emailFormatHelper.replaceEmailBodyWithParams( surveyCompletion.getMail_body(),
+                surveyCompletion.getParam_order() );
+
+            mailBody = mailBody.replaceAll( "\\[BaseUrl\\]", applicationBaseUrl );
+            if ( logoUrl == null || logoUrl.equalsIgnoreCase( "" ) ) {
+                mailBody = mailBody.replaceAll( "\\[LogoUrl\\]", appLogoUrl );
+            } else {
+
+                mailBody = mailBody.replaceAll( "\\[LogoUrl\\]", logoUrl );
+            }
+            mailBody = mailBody.replaceAll( "\\[Name\\]",
+                emailFormatHelper.getCustomerDisplayNameForEmail( custFirstName, custLastName ) );
+            mailBody = mailBody.replaceAll( "\\[AgentName\\]", agentName );
+            mailBody = mailBody.replaceAll( "\\[AgentSignature\\]", agentSignature );
+            mailBody = mailBody.replaceAll( "\\[AppBaseUrl\\]", applicationBaseUrl );
+            mailBody = mailBody.replaceAll( "\\[RecipientEmail\\]", custEmail );
+            mailBody = mailBody.replaceAll( "\\[AgentProfileName\\]", user.getProfileName() );
+            mailBody = mailBody.replaceAll( "\\[SenderEmail\\]", user.getEmailId() );
+            mailBody = mailBody.replaceAll( "\\[CompanyName\\]", companyName );
+            mailBody = mailBody.replaceAll( "\\[InitiatedDate\\]", dateFormat.format( new Date() ) );
+            mailBody = mailBody.replaceAll( "\\[CurrentYear\\]", currentYear );
+            mailBody = mailBody.replaceAll( "\\[FullAddress\\]", fullAddress );
+            mailBody = mailBody.replaceAll( "null", "" );
+
+            String mailSubject = CommonConstants.SURVEY_COMPLETION_MAIL_SUBJECT;
+            try {
+                emailServices.sendSurveyInvitationMail( custEmail, mailSubject, mailBody, user.getEmailId(),
+                    user.getFirstName() + ( user.getLastName() != null ? " " + user.getLastName() : "" ) );
+            } catch ( InvalidInputException | UndeliveredEmailException e ) {
+                LOG.error( "Exception caught while sending mail to " + custEmail + ". Nested exception is ", e );
+            }
+        } else {
+
+            emailServices.sendDefaultSurveyCompletionMail( custEmail,
+                emailFormatHelper.getCustomerDisplayNameForEmail( custFirstName, custLastName ), agentName, user.getEmailId(),
+                user.getProfileName(), logoUrl );
+        }
+        LOG.info( "sendSurveyCompletionMail() finished." );
+    }
+
+
+    @Override
+    public void sendSocialPostReminderMail( String custEmail, String custFirstName, String custLastName, User user , String links )
+        throws InvalidInputException, UndeliveredEmailException, ProfileNotFoundException
+    {
+        LOG.info( "sendSocialPostReminderMail() started." );
+        Map<String, Long> hierarchyMap = null;
+        Map<SettingsForApplication, OrganizationUnit> map = null;
+        String logoUrl = null;
+        AgentSettings agentSettings = userManagementService.getUserSettings( user.getUserId() );
+        String companyName = user.getCompany().getCompany();
+        String agentTitle = "";
+        if ( agentSettings.getContact_details() != null && agentSettings.getContact_details().getTitle() != null ) {
+            agentTitle = agentSettings.getContact_details().getTitle();
+        }
+
+        String agentPhone = "";
+        if ( agentSettings.getContact_details() != null && agentSettings.getContact_details().getContact_numbers() != null
+            && agentSettings.getContact_details().getContact_numbers().getWork() != null ) {
+            agentPhone = agentSettings.getContact_details().getContact_numbers().getWork();
+        }
+
+        String agentName = user.getFirstName();
+        if ( user.getLastName() != null && !user.getLastName().isEmpty() ) {
+            agentName = user.getFirstName() + " " + user.getLastName();
+        }
+        String agentSignature = emailFormatHelper.buildAgentSignature( agentName, agentPhone, agentTitle, companyName );
+        String currentYear = String.valueOf( Calendar.getInstance().get( Calendar.YEAR ) );
+        DateFormat dateFormat = new SimpleDateFormat( "yyyy/MM/dd" );
+        // TODO add address for mail footer
+        String fullAddress = "";
+
+        hierarchyMap = profileManagementService.getPrimaryHierarchyByAgentProfile( agentSettings );
+
+        long companyId = hierarchyMap.get( CommonConstants.COMPANY_ID_COLUMN );
+        long regionId = hierarchyMap.get( CommonConstants.REGION_ID_COLUMN );
+        long branchId = hierarchyMap.get( CommonConstants.BRANCH_ID_COLUMN );
+        try {
+            map = profileManagementService.getPrimaryHierarchyByEntity( CommonConstants.AGENT_ID_COLUMN, user.getUserId() );
+            if ( map == null ) {
+                LOG.error( "Unable to fetch primary profile for this user " );
+                throw new FatalException( "Unable to fetch primary profile this user " + user.getUserId() );
+            }
+        } catch ( InvalidSettingsStateException e ) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+        OrganizationUnit organizationUnit = map.get( SettingsForApplication.LOGO );
+        if ( organizationUnit == OrganizationUnit.COMPANY ) {
+            OrganizationUnitSettings companySettings = organizationManagementService.getCompanySettings( companyId );
+            logoUrl = companySettings.getLogo();
+        } else if ( organizationUnit == OrganizationUnit.REGION ) {
+            OrganizationUnitSettings regionSettings = organizationManagementService.getRegionSettings( regionId );
+            logoUrl = regionSettings.getLogo();
+        } else if ( organizationUnit == OrganizationUnit.BRANCH ) {
+            OrganizationUnitSettings branchSettings = null;
+            try {
+                branchSettings = organizationManagementService.getBranchSettingsDefault( branchId );
+            } catch ( NoRecordsFetchedException e ) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
+            if ( branchSettings != null ) {
+                logoUrl = branchSettings.getLogo();
+            }
+        } else if ( organizationUnit == OrganizationUnit.AGENT ) {
+            logoUrl = agentSettings.getLogo();
+        }
+
+        OrganizationUnitSettings companySettings = organizationManagementService.getCompanySettings( user.getCompany()
+            .getCompanyId() );
+
+        if ( companySettings != null && companySettings.getMail_content() != null
+            && companySettings.getMail_content().getSocial_post_reminder_mail() != null ) {
+
+            MailContent socialPostReminder = companySettings.getMail_content().getSocial_post_reminder_mail();
+            String mailBody = emailFormatHelper.replaceEmailBodyWithParams( socialPostReminder.getMail_body(),
+                socialPostReminder.getParam_order() );
+
+            mailBody = mailBody.replaceAll( "\\[BaseUrl\\]", applicationBaseUrl );
+            if ( logoUrl == null || logoUrl.equalsIgnoreCase( "" ) ) {
+                mailBody = mailBody.replaceAll( "\\[LogoUrl\\]", appLogoUrl );
+            } else {
+
+                mailBody = mailBody.replaceAll( "\\[LogoUrl\\]", logoUrl );
+            }
+            mailBody = mailBody.replaceAll( "\\[Name\\]",
+                emailFormatHelper.getCustomerDisplayNameForEmail( custFirstName, custLastName ) );
+            mailBody = mailBody.replaceAll( "\\[AgentName\\]", agentName );
+            mailBody = mailBody.replaceAll( "\\[AgentSignature\\]", agentSignature );
+            mailBody = mailBody.replaceAll( "\\[AppBaseUrl\\]", applicationBaseUrl );
+            mailBody = mailBody.replaceAll( "\\[RecipientEmail\\]", custEmail );
+            mailBody = mailBody.replaceAll( "\\[AgentProfileName\\]", user.getProfileName() );
+            mailBody = mailBody.replaceAll( "\\[SenderEmail\\]", user.getEmailId() );
+            mailBody = mailBody.replaceAll( "\\[CompanyName\\]", companyName );
+            mailBody = mailBody.replaceAll( "\\[InitiatedDate\\]", dateFormat.format( new Date() ) );
+            mailBody = mailBody.replaceAll( "\\[CurrentYear\\]", currentYear );
+            mailBody = mailBody.replaceAll( "\\[FullAddress\\]", fullAddress );
+            mailBody = mailBody.replaceAll( "null", "" );
+
+            String mailSubject = CommonConstants.SOCIAL_POST_REMINDER_MAIL_SUBJECT;
+            try {
+                emailServices.sendSurveyInvitationMail( custEmail, mailSubject, mailBody, user.getEmailId(),
+                    user.getFirstName() + ( user.getLastName() != null ? " " + user.getLastName() : "" ) );
+            } catch ( InvalidInputException | UndeliveredEmailException e ) {
+                LOG.error( "Exception caught while sending mail to " + custEmail + ". Nested exception is ", e );
+            }
+        } else {
+            emailServices.sendDefaultSocialPostReminderMail( custEmail, agentPhone, agentTitle, companyName,
+                emailFormatHelper.getCustomerDisplayNameForEmail( custFirstName, custLastName ), agentName, links, logoUrl );
+        }
+        LOG.info( "sendSocialPostReminderMail() finished." );
     }
 
 
