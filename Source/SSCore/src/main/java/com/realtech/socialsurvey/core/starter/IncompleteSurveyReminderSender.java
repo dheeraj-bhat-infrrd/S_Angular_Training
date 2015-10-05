@@ -29,6 +29,7 @@ import com.realtech.socialsurvey.core.services.mail.EmailServices;
 import com.realtech.socialsurvey.core.services.mail.UndeliveredEmailException;
 import com.realtech.socialsurvey.core.services.organizationmanagement.OrganizationManagementService;
 import com.realtech.socialsurvey.core.services.organizationmanagement.ProfileManagementService;
+import com.realtech.socialsurvey.core.services.organizationmanagement.ProfileNotFoundException;
 import com.realtech.socialsurvey.core.services.organizationmanagement.UserManagementService;
 import com.realtech.socialsurvey.core.services.settingsmanagement.impl.InvalidSettingsStateException;
 import com.realtech.socialsurvey.core.services.surveybuilder.SurveyHandler;
@@ -96,7 +97,9 @@ public class IncompleteSurveyReminderSender extends QuartzJobBean
                             LOG.error(
                                 "InvalidInputException caught in executeInternal() method of IncompleteSurveyReminderSender. Nested exception is ",
                                 e );
-                        }
+                        } catch (ProfileNotFoundException e) {
+							LOG.error("Error while sending incomplete survey mail " , e);
+						}
                     }
                 } else {
                     LOG.debug( "This survey " + survey.getSurveyPreIntitiationId() + " has exceeded the reminder count " );
@@ -132,7 +135,7 @@ public class IncompleteSurveyReminderSender extends QuartzJobBean
 
     private void sendEmail( EmailServices emailServices, OrganizationManagementService organizationManagementService,
         UserManagementService userManagementService, SurveyPreInitiation survey, long companyId, boolean reminderMail )
-        throws InvalidInputException
+        throws InvalidInputException, ProfileNotFoundException
     {
         // Send email to complete survey to each customer.
         OrganizationUnitSettings companySettings = null;

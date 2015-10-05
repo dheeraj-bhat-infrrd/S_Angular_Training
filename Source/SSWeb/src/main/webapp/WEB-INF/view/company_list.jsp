@@ -100,7 +100,8 @@
 		
 		$('.ctnt-list-item').on('click',function(e){
 			var profLink = $(this).attr('data-profilename');
-			window.open(window.location.origin + '/pages/company/'+profLink , '_blank');
+			//window.open(window.location.origin + '/pages/company/'+profLink , '_blank');
+			window.open(getLocationOrigin() + '/pages/company/'+profLink , '_blank');
 		});
 		
 		

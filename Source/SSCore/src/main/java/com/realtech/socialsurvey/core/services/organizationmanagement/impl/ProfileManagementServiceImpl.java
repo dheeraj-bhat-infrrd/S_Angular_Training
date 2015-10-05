@@ -1212,7 +1212,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 
     @Override
     @Transactional
-    public Map<String, Long> getPrimaryHierarchyByAgentProfile( OrganizationUnitSettings agentSettings )
+    public Map<String, Long> getPrimaryHierarchyByAgentProfile( OrganizationUnitSettings agentSettings ) throws InvalidInputException, ProfileNotFoundException
     {
         LOG.info( "Inside method getPrimaryHierarchyByAgentProfile " );
         Map<String, Long> hierarchyMap = userManagementService.getPrimaryUserProfileByAgentId( agentSettings.getIden() );
@@ -1602,28 +1602,28 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 
         // This is not needed. Commenting out
         /*for (SurveyDetails review : surveyDetails) {
-        	OrganizationUnitSettings agentSettings = organizationUnitSettingsDao.fetchAgentSettingsById(review.getAgentId());
-        	if (agentSettings != null && agentSettings.getSocialMediaTokens() != null) {
-        		SocialMediaTokens mediaTokens = agentSettings.getSocialMediaTokens();
+            OrganizationUnitSettings agentSettings = organizationUnitSettingsDao.fetchAgentSettingsById(review.getAgentId());
+            if (agentSettings != null && agentSettings.getSocialMediaTokens() != null) {
+                SocialMediaTokens mediaTokens = agentSettings.getSocialMediaTokens();
 
-        		// adding yelpUrl
-        		if (mediaTokens.getYelpToken() != null && mediaTokens.getYelpToken().getYelpPageLink() != null) {
-        			review.setYelpProfileUrl(mediaTokens.getYelpToken().getYelpPageLink());
-        		}
+                // adding yelpUrl
+                if (mediaTokens.getYelpToken() != null && mediaTokens.getYelpToken().getYelpPageLink() != null) {
+                    review.setYelpProfileUrl(mediaTokens.getYelpToken().getYelpPageLink());
+                }
 
-        		// adding zillowUrl
-        		if (mediaTokens.getZillowToken() != null && mediaTokens.getZillowToken().getZillowProfileLink() != null) {
-        			review.setZillowProfileUrl(mediaTokens.getZillowToken().getZillowProfileLink());
-        		}
+                // adding zillowUrl
+                if (mediaTokens.getZillowToken() != null && mediaTokens.getZillowToken().getZillowProfileLink() != null) {
+                    review.setZillowProfileUrl(mediaTokens.getZillowToken().getZillowProfileLink());
+                }
 
-        		// adding lendingTreeUrl
-        		if (mediaTokens.getLendingTreeToken() != null && mediaTokens.getLendingTreeToken().getLendingTreeProfileLink() != null) {
-        			review.setLendingTreeProfileUrl(mediaTokens.getLendingTreeToken().getLendingTreeProfileLink());
-        		}
-        		if (mediaTokens.getRealtorToken() != null && mediaTokens.getRealtorToken().getRealtorProfileLink() != null) {
-        			review.setRealtorProfileUrl(mediaTokens.getRealtorToken().getRealtorProfileLink());
-        		}
-        	}
+                // adding lendingTreeUrl
+                if (mediaTokens.getLendingTreeToken() != null && mediaTokens.getLendingTreeToken().getLendingTreeProfileLink() != null) {
+                    review.setLendingTreeProfileUrl(mediaTokens.getLendingTreeToken().getLendingTreeProfileLink());
+                }
+                if (mediaTokens.getRealtorToken() != null && mediaTokens.getRealtorToken().getRealtorProfileLink() != null) {
+                    review.setRealtorProfileUrl(mediaTokens.getRealtorToken().getRealtorProfileLink());
+                }
+            }
         }*/
 
         return surveyDetails;
@@ -2803,7 +2803,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 
     @Override
     @Transactional
-    public Map<String, Long> getHierarchyDetailsByEntity( String entityType, long entityId ) throws InvalidInputException
+    public Map<String, Long> getHierarchyDetailsByEntity( String entityType, long entityId ) throws InvalidInputException, ProfileNotFoundException
     {
         Map<String, Long> hierarchyDetials = new HashMap<String, Long>();
         Map<String, Long> hierarchyMap = new HashMap<String, Long>();
@@ -2854,7 +2854,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
     @Override
     @Transactional
     public Map<SettingsForApplication, OrganizationUnit> getPrimaryHierarchyByEntity( String entityType, long entityId )
-        throws InvalidInputException, InvalidSettingsStateException
+        throws InvalidInputException, InvalidSettingsStateException, ProfileNotFoundException
     {
         boolean logoLocked = true;
         boolean webAddressLocked = true;
@@ -3169,24 +3169,46 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
         } else if ( collectionName.equalsIgnoreCase( MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION ) ) {
             agentUnitSettings = userProfile;
         }
+        SurveySettings surveySettings = userProfile.getSurvey_settings();
+        if ( surveySettings == null ) {
+            surveySettings = new SurveySettings();
+        }
         for ( Map.Entry<SettingsForApplication, OrganizationUnit> entry : map.entrySet() ) {
             if ( entry.getKey() == SettingsForApplication.MIN_SCORE ) {
-                SurveySettings surveySettings = userProfile.getSurvey_settings();
+
+                if ( entry.getValue() == OrganizationUnit.COMPANY ) {
+                    surveySettings.setShow_survey_above_score( companyUnitSettings.getSurvey_settings()
+                        .getShow_survey_above_score() );
+                } else if ( entry.getValue() == OrganizationUnit.REGION ) {
+                    surveySettings.setShow_survey_above_score( regionUnitSettings.getSurvey_settings()
+                        .getShow_survey_above_score() );
+                } else if ( entry.getValue() == OrganizationUnit.BRANCH ) {
+                    surveySettings.setShow_survey_above_score( branchUnitSettings.getSurvey_settings()
+                        .getShow_survey_above_score() );
+                } else if ( entry.getValue() == OrganizationUnit.AGENT ) {
+                    surveySettings.setShow_survey_above_score( agentUnitSettings.getSurvey_settings()
+                        .getShow_survey_above_score() );
+                }
+
+            } else if ( entry.getKey() == SettingsForApplication.AUTO_POST_ENABLED ) {
+                surveySettings = userProfile.getSurvey_settings();
                 if ( surveySettings == null ) {
                     surveySettings = new SurveySettings();
                 }
                 if ( entry.getValue() == OrganizationUnit.COMPANY ) {
-                    surveySettings.setShow_survey_above_score ( companyUnitSettings.getSurvey_settings().getShow_survey_above_score() );
+                    surveySettings.setAutoPostEnabled( companyUnitSettings.getSurvey_settings().isAutoPostEnabled() );
                 } else if ( entry.getValue() == OrganizationUnit.REGION ) {
-                    surveySettings.setShow_survey_above_score ( regionUnitSettings.getSurvey_settings().getShow_survey_above_score() );
+                    surveySettings.setAutoPostEnabled( regionUnitSettings.getSurvey_settings().isAutoPostEnabled() );
                 } else if ( entry.getValue() == OrganizationUnit.BRANCH ) {
-                    surveySettings.setShow_survey_above_score ( branchUnitSettings.getSurvey_settings().getShow_survey_above_score() );
+                    surveySettings.setAutoPostEnabled( branchUnitSettings.getSurvey_settings().isAutoPostEnabled() );
                 } else if ( entry.getValue() == OrganizationUnit.AGENT ) {
-                    surveySettings.setShow_survey_above_score ( agentUnitSettings.getSurvey_settings().getShow_survey_above_score() );
+                    surveySettings.setAutoPostEnabled( agentUnitSettings.getSurvey_settings().isAutoPostEnabled() );
                 }
-                userProfile.setSurvey_settings( surveySettings );
+
             }
+
         }
+        userProfile.setSurvey_settings( surveySettings );
         return userProfile;
     }
 
@@ -3240,26 +3262,6 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
                     webAddressSettings.setWork( branchUnitSettings.getContact_details().getWeb_addresses().getWork() );
                 } else if ( entry.getValue() == OrganizationUnit.AGENT ) {
                     webAddressSettings.setWork( agentUnitSettings.getContact_details().getWeb_addresses().getWork() );
-                }
-                contactDetails.setWeb_addresses( webAddressSettings );
-                userProfile.setContact_details( contactDetails );
-            } else if ( entry.getKey() == SettingsForApplication.WEB_ADDRESS_BLOG ) {
-                ContactDetailsSettings contactDetails = userProfile.getContact_details();
-                if ( contactDetails == null ) {
-                    contactDetails = new ContactDetailsSettings();
-                }
-                WebAddressSettings webAddressSettings = contactDetails.getWeb_addresses();
-                if ( webAddressSettings == null ) {
-                    webAddressSettings = new WebAddressSettings();
-                }
-                if ( entry.getValue() == OrganizationUnit.COMPANY ) {
-                    webAddressSettings.setBlogs( companyUnitSettings.getContact_details().getWeb_addresses().getBlogs() );
-                } else if ( entry.getValue() == OrganizationUnit.REGION ) {
-                    webAddressSettings.setBlogs( regionUnitSettings.getContact_details().getWeb_addresses().getBlogs() );
-                } else if ( entry.getValue() == OrganizationUnit.BRANCH ) {
-                    webAddressSettings.setBlogs( branchUnitSettings.getContact_details().getWeb_addresses().getBlogs() );
-                } else if ( entry.getValue() == OrganizationUnit.AGENT ) {
-                    webAddressSettings.setBlogs( agentUnitSettings.getContact_details().getWeb_addresses().getBlogs() );
                 }
                 contactDetails.setWeb_addresses( webAddressSettings );
                 userProfile.setContact_details( contactDetails );
@@ -3752,7 +3754,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
         } else {
             LOG.error( "No social media token present for " + collectionName + " with iden: " + profile.getIden() );
         }
-    }   
+    }
 
 
     @Override

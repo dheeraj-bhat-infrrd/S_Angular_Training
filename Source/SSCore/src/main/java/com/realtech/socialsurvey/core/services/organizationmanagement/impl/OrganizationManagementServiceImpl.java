@@ -595,6 +595,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
         surveySettings.setShow_survey_above_score( CommonConstants.DEFAULT_AUTOPOST_SCORE );
         try {
             settingsSetter.setSettingsValueForCompany( company, SettingsForApplication.MIN_SCORE, true );
+            settingsSetter.setSettingsValueForCompany( company, SettingsForApplication.AUTO_POST_ENABLED, true );
         } catch ( NonFatalException e1 ) {
             LOG.error( "Exception caught ", e1 );
         }
@@ -3779,6 +3780,11 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
         organizationSettings.setContact_details( contactSettings );
         organizationSettings.setLockSettings( new LockSettings() );
 
+        if ( organizationSettings.getSurvey_settings() == null ) {
+            SurveySettings surveySettings = new SurveySettings();
+            organizationSettings.setSurvey_settings( surveySettings );
+        }
+
         // set default profile stages.
         organizationSettings.setProfileStages( profileCompletionList.getDefaultProfileCompletionList( false ) );
 
@@ -3816,6 +3822,11 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
         // Calling method to generate and set profile name and profile url
         generateAndSetBranchProfileNameAndUrl( branch, organizationSettings );
 
+        if ( organizationSettings.getSurvey_settings() == null ) {
+            SurveySettings surveySettings = new SurveySettings();
+            organizationSettings.setSurvey_settings( surveySettings );
+        }
+        
         ContactDetailsSettings contactSettings = getContactDetailsSettingsFromBranch( branch );
         organizationSettings.setContact_details( contactSettings );
         organizationSettings.setLockSettings( new LockSettings() );

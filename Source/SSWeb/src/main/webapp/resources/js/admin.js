@@ -209,7 +209,8 @@ function bindUserLoginEvent() {
 			"colValue" : $(this).attr('data-iden')
 		};
 		callAjaxGETWithTextData("/loginadminas.do", function(data) {
-			window.location = window.location.origin + '/userlogin.do';
+			// window.location = window.location.origin + '/userlogin.do';
+			window.location = getLocationOrigin() + '/userlogin.do';
 		}, true, payload);
 	});
 }
@@ -281,3 +282,21 @@ function downloadCompanyReport() {
 	window.location.href = "/downloadcompanyregistrationreport.do?startDate="
 			+ startDate + "&endDate=" + endDate;
 }
+
+function showAbusiveReviews(startIndexCmp,batchSizeCmp) {
+	var payload = {
+		"startIndex" : startIndexCmp,
+		"batchSize" : batchSizeCmp
+	};
+	callAjaxGetWithPayloadData("./fetchsurveybyabuse.do", function(data) {
+		if (startIndexCmp == 0)
+			$('#admin-abs-sur-list').html(data);
+		else
+			$('#admin-abs-sur-list').append(data);
+		
+		startIndexCmp += batchSizeCmp;
+	}, payload, false);
+}
+
+$(document).on('scroll', '#dsh-inc-srvey', function() {
+});

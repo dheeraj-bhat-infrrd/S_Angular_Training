@@ -60,6 +60,7 @@ import com.realtech.socialsurvey.core.exception.ProfileServiceErrorCode;
 import com.realtech.socialsurvey.core.services.mail.UndeliveredEmailException;
 import com.realtech.socialsurvey.core.services.organizationmanagement.OrganizationManagementService;
 import com.realtech.socialsurvey.core.services.organizationmanagement.ProfileManagementService;
+import com.realtech.socialsurvey.core.services.organizationmanagement.ProfileNotFoundException;
 import com.realtech.socialsurvey.core.services.organizationmanagement.UserManagementService;
 import com.realtech.socialsurvey.core.services.payment.Payment;
 import com.realtech.socialsurvey.core.services.payment.exception.CreditCardException;
@@ -665,6 +666,8 @@ public class OrganizationManagementController
                     throw new InternalServerException( new ProfileServiceErrorCode(
                         CommonConstants.ERROR_CODE_REGION_PROFILE_SERVICE_FAILURE, CommonConstants.SERVICE_CODE_REGION_PROFILE,
                         "Error occured while fetching region profile" ), e.getMessage() );
+                } catch ( ProfileNotFoundException e ) {
+                    throw new FatalException( "Unable to fetch primary profile this user " + unitSettings.getIden() );
                 }
                 companyUnitSettings = organizationManagementService.getCompanySettings( companyId );
                 regionUnitSettings = organizationManagementService.getRegionSettings( regionId );
@@ -684,6 +687,8 @@ public class OrganizationManagementController
                     throw new InternalServerException( new ProfileServiceErrorCode(
                         CommonConstants.ERROR_CODE_REGION_PROFILE_SERVICE_FAILURE, CommonConstants.SERVICE_CODE_REGION_PROFILE,
                         "Error occured while fetching region profile" ), e.getMessage() );
+                } catch ( ProfileNotFoundException e ) {
+                    throw new FatalException( "Unable to fetch primary profile this user " + unitSettings.getIden() );
                 }
                 companyUnitSettings = organizationManagementService.getCompanySettings( companyId );
                 regionUnitSettings = organizationManagementService.getRegionSettings( regionId );
@@ -700,6 +705,8 @@ public class OrganizationManagementController
             model.addAttribute( "message",
                 messageUtils.getDisplayMessage( DisplayMessageConstants.GENERAL_ERROR, DisplayMessageType.ERROR_MESSAGE ) );
             return JspResolver.MESSAGE_HEADER;
+        } catch ( ProfileNotFoundException e1 ) {
+            throw new FatalException( "Unable to fetch primary profile this user " + unitSettings.getIden() );
         }
 
         model.addAttribute( "autoPostEnabled", false );
@@ -1244,12 +1251,13 @@ public class OrganizationManagementController
         try {
             OrganizationUnitSettings unitSettings = null;
             String collectionName = "";
+            boolean status = false;
             if ( entityType.equalsIgnoreCase( CommonConstants.COMPANY_ID ) ) {
                 collectionName = MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION;
                 unitSettings = organizationManagementService.getCompanySettings( entityId );
                 Company company = userManagementService.getCompanyById( entityId );
                 if ( company != null ) {
-                    settingsSetter.setSettingsValueForCompany( company, SettingsForApplication.MIN_SCORE, true );
+                    settingsLocker.lockSettingsValueForCompany( company, SettingsForApplication.MIN_SCORE, minScoreLocked );
                     userManagementService.updateCompany( company );
                 }
             } else if ( entityType.equalsIgnoreCase( CommonConstants.REGION_ID ) ) {
@@ -1257,7 +1265,7 @@ public class OrganizationManagementController
                 unitSettings = organizationManagementService.getRegionSettings( entityId );
                 Region region = userManagementService.getRegionById( entityId );
                 if ( region != null ) {
-                    settingsSetter.setSettingsValueForRegion( region, SettingsForApplication.MIN_SCORE, true );
+                    settingsLocker.lockSettingsValueForRegion( region, SettingsForApplication.MIN_SCORE, minScoreLocked );
                     userManagementService.updateRegion( region );
                 }
             } else if ( entityType.equalsIgnoreCase( CommonConstants.BRANCH_ID ) ) {
@@ -1265,7 +1273,7 @@ public class OrganizationManagementController
                 unitSettings = organizationManagementService.getBranchSettingsDefault( entityId );
                 Branch branch = userManagementService.getBranchById( entityId );
                 if ( branch != null ) {
-                    settingsSetter.setSettingsValueForBranch( branch, SettingsForApplication.MIN_SCORE, true );
+                    settingsLocker.lockSettingsValueForBranch( branch, SettingsForApplication.MIN_SCORE, minScoreLocked );
                     userManagementService.updateBranch( branch );
                 }
             } else if ( entityType.equalsIgnoreCase( CommonConstants.AGENT_ID ) ) {
@@ -1275,6 +1283,10 @@ public class OrganizationManagementController
                 throw new InvalidInputException( "Invalid Collection Type" );
             }
             lockSettings = unitSettings.getLockSettings();
+            lockSettings = updateLockSettings( parentLock, lockSettings, minScoreLocked );
+            lockSettings = profileManagementService.updateLockSettings( collectionName, unitSettings, lockSettings );
+            unitSettings.setLockSettings( lockSettings );
+
             message = "Settings locked ";
         } catch ( Exception e ) {
             LOG.error( "Exception caught ", e.getMessage() );
@@ -1308,22 +1320,41 @@ public class OrganizationManagementController
             boolean isAutoPostEnabled = false;
             if ( autopost != null && !autopost.isEmpty() ) {
                 isAutoPostEnabled = Boolean.parseBoolean( autopost );
-                User user = sessionHelper.getCurrentUser();
+               
                 OrganizationUnitSettings unitSettings = null;
                 /*OrganizationUnitSettings companySettings = organizationManagementService.getCompanySettings( user.getCompany()
                     .getCompanyId() );*/
                 if ( entityType.equalsIgnoreCase( CommonConstants.COMPANY_ID ) ) {
                     collectionName = MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION;
                     unitSettings = organizationManagementService.getCompanySettings( entityId );
+                    Company company = userManagementService.getCompanyById( entityId );
+                    if ( company != null ) {
+                        settingsSetter.setSettingsValueForCompany( company, SettingsForApplication.AUTO_POST_ENABLED,
+                            isAutoPostEnabled );
+                        userManagementService.updateCompany( company );
+                    }
                 } else if ( entityType.equalsIgnoreCase( CommonConstants.REGION_ID ) ) {
                     collectionName = MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION;
                     unitSettings = organizationManagementService.getRegionSettings( entityId );
+                    Region region = userManagementService.getRegionById( entityId );
+                    if ( region != null ) {
+                        settingsSetter.setSettingsValueForRegion( region, SettingsForApplication.AUTO_POST_ENABLED,
+                            isAutoPostEnabled );
+                        userManagementService.updateRegion( region );
+                    }
                 } else if ( entityType.equalsIgnoreCase( CommonConstants.BRANCH_ID ) ) {
                     collectionName = MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION;
                     unitSettings = organizationManagementService.getBranchSettingsDefault( entityId );
+                    Branch branch = userManagementService.getBranchById( entityId );
+                    if ( branch != null ) {
+                        settingsSetter.setSettingsValueForBranch( branch, SettingsForApplication.AUTO_POST_ENABLED,
+                            isAutoPostEnabled );
+                        userManagementService.updateBranch( branch );
+                    }
                 } else if ( entityType.equalsIgnoreCase( CommonConstants.AGENT_ID ) ) {
                     collectionName = MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION;
                     unitSettings = organizationManagementService.getAgentSettings( entityId );
+
                 } else {
                     throw new InvalidInputException( "Invalid Collection Type" );
                 }
