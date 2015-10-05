@@ -178,7 +178,7 @@ public interface EmailServices {
             String displayName, String agentName, String agentEmail,
             String agentProfileName) throws InvalidInputException;
 
-    public void sendSurveyCompletionMail(String recipientMailId,
+    public void sendDefaultSurveyCompletionMail(String recipientMailId,
             String displayName, String agentName, String agentEmail,
             String agentProfileName , String logoUrl) throws InvalidInputException,
             UndeliveredEmailException;
@@ -230,7 +230,7 @@ public interface EmailServices {
             String displayName, String agentName, String links)
             throws InvalidInputException;
 
-    public void sendSocialPostReminderMail(String recipientMailId,
+    public void sendDefaultSocialPostReminderMail(String recipientMailId,
             String agentPhone, String agentTitle, String companyName,
             String displayName, String agentName, String links  , String logoUrl)
             throws InvalidInputException, UndeliveredEmailException;
@@ -381,7 +381,7 @@ public interface EmailServices {
             SurveyPreInitiation survey) throws InvalidInputException,
             UndeliveredEmailException;
     
-    public void sendHelpMailToAdmin( User user ,  String displayName ,  String mailSubject, String messageBodyText, String recipientMailId, Map<String , String > attachmentsDetails ) throws InvalidInputException, UndeliveredEmailException;
+    public void sendHelpMailToAdmin( String  senderEmail , String senderName,  String displayName ,  String mailSubject, String messageBodyText, String recipientMailId, Map<String , String > attachmentsDetails ) throws InvalidInputException, UndeliveredEmailException;
 
     /**
      * Method to send survey reminder when the resend button is manually clicked

@@ -675,14 +675,22 @@ public class OrganizationManagementController
                     MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION, unitSettings, companyUnitSettings,
                     regionUnitSettings, branchUnitSettings, null, map );
             } else if ( entityType.equals( CommonConstants.AGENT_ID_COLUMN ) ) {
+                long currentLockAggregateValue = 0;
+                boolean minScoreLocked = true;
                 unitSettings = userManagementService.getUserSettings( user.getUserId() );
                 try {
+
+                    LOG.info( "Calculate lock and setting score " );
+                    Map<String, Long> totalScore = settingsManager.calculateSettingsScore( settingsDetailsList );
+                    currentLockAggregateValue = totalScore.get( CommonConstants.LOCK_SCORE );
+
                     map = profileManagementService.getPrimaryHierarchyByEntity( CommonConstants.AGENT_ID,
                         unitSettings.getIden() );
                     if ( map == null ) {
                         LOG.error( "Unable to fetch primary profile for this user " );
                         throw new FatalException( "Unable to fetch primary profile this user " + unitSettings.getIden() );
                     }
+
                 } catch ( InvalidSettingsStateException e ) {
                     throw new InternalServerException( new ProfileServiceErrorCode(
                         CommonConstants.ERROR_CODE_REGION_PROFILE_SERVICE_FAILURE, CommonConstants.SERVICE_CODE_REGION_PROFILE,
@@ -690,13 +698,45 @@ public class OrganizationManagementController
                 } catch ( ProfileNotFoundException e ) {
                     throw new FatalException( "Unable to fetch primary profile this user " + unitSettings.getIden() );
                 }
+
+                if ( !settingsLocker.isSettingsValueLocked( OrganizationUnit.COMPANY, currentLockAggregateValue,
+                    SettingsForApplication.MIN_SCORE ) ) {
+                    if ( !settingsLocker.isSettingsValueLocked( OrganizationUnit.REGION, currentLockAggregateValue,
+                        SettingsForApplication.MIN_SCORE ) ) {
+                        if ( !settingsLocker.isSettingsValueLocked( OrganizationUnit.BRANCH, currentLockAggregateValue,
+                            SettingsForApplication.MIN_SCORE ) ) {
+                            minScoreLocked = false;
+                        }
+                    }
+                }
+
                 companyUnitSettings = organizationManagementService.getCompanySettings( companyId );
                 regionUnitSettings = organizationManagementService.getRegionSettings( regionId );
                 branchUnitSettings = organizationManagementService.getBranchSettingsDefault( branchId );
-                unitSettings = profileManagementService.getAutoPostScoreBasedOnHierarchy(
-                    MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION, unitSettings, companyUnitSettings,
-                    regionUnitSettings, branchUnitSettings, unitSettings, map );
+                if ( !minScoreLocked ) {
+                    if ( unitSettings.getSurvey_settings() != null ) {
+                        if ( unitSettings.getSurvey_settings().getShow_survey_above_score() > 0 ) {
+                            unitSettings.getSurvey_settings().setShow_survey_above_score(
+                                unitSettings.getSurvey_settings().getShow_survey_above_score() );
+                        } else {
+                            unitSettings = profileManagementService.getAutoPostScoreBasedOnHierarchy(
+                                MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION, unitSettings,
+                                companyUnitSettings, regionUnitSettings, branchUnitSettings, unitSettings, map );
+                        }
+                    } else {
+                        unitSettings = profileManagementService.getAutoPostScoreBasedOnHierarchy(
+                            MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION, unitSettings, companyUnitSettings,
+                            regionUnitSettings, branchUnitSettings, unitSettings, map );
+                    }
+                } else {
+                    unitSettings = profileManagementService.getAutoPostScoreBasedOnHierarchy(
+                        MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION, unitSettings, companyUnitSettings,
+                        regionUnitSettings, branchUnitSettings, unitSettings, map );
+                }
+
+
             }
+
 
             model.addAttribute( "columnName", entityType );
             model.addAttribute( "columnValue", entityId );
@@ -1320,7 +1360,7 @@ public class OrganizationManagementController
             boolean isAutoPostEnabled = false;
             if ( autopost != null && !autopost.isEmpty() ) {
                 isAutoPostEnabled = Boolean.parseBoolean( autopost );
-               
+
                 OrganizationUnitSettings unitSettings = null;
                 /*OrganizationUnitSettings companySettings = organizationManagementService.getCompanySettings( user.getCompany()
                     .getCompanyId() );*/

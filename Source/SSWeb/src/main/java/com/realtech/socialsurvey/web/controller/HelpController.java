@@ -21,6 +21,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.realtech.socialsurvey.core.entities.User;
 import com.realtech.socialsurvey.core.enums.DisplayMessageType;
+import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.exception.NonFatalException;
 import com.realtech.socialsurvey.core.services.organizationmanagement.OrganizationManagementService;
 import com.realtech.socialsurvey.core.services.search.SolrSearchService;
@@ -36,7 +37,7 @@ import com.realtech.socialsurvey.web.util.BotRequestUtils;
 @Controller
 public class HelpController {
 
-	private static final Logger LOG = LoggerFactory.getLogger( ProfileManagementController.class );
+	private static final Logger LOG = LoggerFactory.getLogger( HelpController.class );
 
     // JIRA SS-97 by RM-06 : BOC
     @Autowired
@@ -90,14 +91,26 @@ public class HelpController {
     
     @ResponseBody
     @RequestMapping ( value = "/sendhelpmailtoadmin")
-    public String sendHelpMailToAdmin( HttpServletRequest request,  @RequestParam String subject , @RequestParam String mailText ){
+    public String sendHelpMailToAdmin( HttpServletRequest request,  @RequestParam String subject , @RequestParam String mailText , @RequestParam String emailId ){
     	LOG.info( "Method sendHelpMailToAdmin() called" );
     	User user = sessionHelper.getCurrentUser();
     	try{
+    	    if(subject.isEmpty() || subject == null){
+    	        throw new InvalidInputException( "Mail Subject can't be empty" );
+    	    }
+    	    
+    	    if(mailText.isEmpty() || mailText == null){
+                throw new InvalidInputException( "Mail Body can't be empty" );
+            }
+    	    
+            if(emailId.isEmpty() || emailId == null){
+                throw new InvalidInputException( "Email Address can't be empty" );
+            }
+    	    
     		List<MultipartFile> attachmentList = new ArrayList<MultipartFile>();
     		Map<String , String > attachmentsDetails = userSupportService.saveAttachmentLocally(attachmentList);
     		
-    		userSupportService.sendHelpMailToAdmin(user , subject, mailText, attachmentsDetails);
+    		userSupportService.sendHelpMailToAdmin( emailId, user.getFirstName() + ( user.getLastName() != null ? " " + user.getLastName() : "" ), subject, mailText, attachmentsDetails );
 
     	}catch(NonFatalException e){
     		LOG.error("Erroe in sending the help mail : " + e.getMessage());

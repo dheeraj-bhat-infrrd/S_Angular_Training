@@ -950,7 +950,7 @@ public class EmailServicesImpl implements EmailServices
 
     @Async
     @Override
-    public void sendSurveyCompletionMail( String recipientMailId, String displayName, String agentName, String agentEmail,
+    public void sendDefaultSurveyCompletionMail( String recipientMailId, String displayName, String agentName, String agentEmail,
         String agentProfileName, String logoUrl ) throws InvalidInputException, UndeliveredEmailException
     {
         if ( recipientMailId == null || recipientMailId.isEmpty() ) {
@@ -1190,7 +1190,7 @@ public class EmailServicesImpl implements EmailServices
 
     @Async
     @Override
-    public void sendSocialPostReminderMail( String recipientMailId, String agentPhone, String agentTitle, String companyName,
+    public void sendDefaultSocialPostReminderMail( String recipientMailId, String agentPhone, String agentTitle, String companyName,
         String displayName, String agentName, String links, String logoUrl ) throws InvalidInputException,
         UndeliveredEmailException
     {
@@ -1748,7 +1748,7 @@ public class EmailServicesImpl implements EmailServices
      * 
      */
     @Override
-    public void sendHelpMailToAdmin( User user, String displayName, String mailSubject, String messageBodyText,
+    public void sendHelpMailToAdmin(  String  senderEmail , String senderName , String displayName, String mailSubject, String messageBodyText,
         String recipientMailId, Map<String, String> attachmentsDetails ) throws InvalidInputException,
         UndeliveredEmailException
     {
@@ -1768,9 +1768,6 @@ public class EmailServicesImpl implements EmailServices
         FileContentReplacements messageBodyReplacements = new FileContentReplacements();
         messageBodyReplacements.setFileName( EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER
             + EmailTemplateConstants.HELP_MAIL_TO_SS_ADMIN_BODY );
-
-        String senderName = user.getFirstName() + " " + user.getLastName();
-        String senderEmail = user.getEmailId();
 
         messageBodyReplacements.setReplacementArgs( Arrays.asList( appLogoUrl, displayName, senderName, senderEmail,
             mailSubject, messageBodyText ) );

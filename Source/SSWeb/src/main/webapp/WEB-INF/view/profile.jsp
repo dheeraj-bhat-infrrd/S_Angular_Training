@@ -242,7 +242,14 @@
 							<c:otherwise> ${profName}</c:otherwise>
 						</c:choose>
 						</div>
-						<div class="prof-btn-survey float-left" id="read-write-share-btn">Write a Review</div>
+						<c:choose>
+						<c:when test="${profileLevel == 'INDIVIDUAL'}">
+							<a href="/rest/survey/showsurveypage/${profile.iden}" target="_blank"><span class="prof-btn-survey float-left" id="read-write-share-btn">Write a Review</span></a>
+						</c:when>
+						<c:otherwise>
+							<a href="/initfindapro.do?profileLevel=${profileLevel}&iden=${profile.iden}&searchCriteria=${profile.contact_details.name}" target="_blank"><span class="prof-btn-survey float-left" id="read-write-share-btn">Write a Review</span></a>
+						</c:otherwise>
+						</c:choose>
 					</div>
             	</div>
             </div>
@@ -270,7 +277,14 @@
 						</div>
                     </div>
                     <div class="mob-contact-btn float-left">
-                        <div id="mob-review-btn" class="mob-prof-contact-btn float-left">Write a review</div>
+                    	<c:choose>
+						<c:when test="${profileLevel == 'INDIVIDUAL'}">
+							<a href="/rest/survey/showsurveypage/${profile.iden}" target="_blank"><span class="mob-prof-contact-btn float-left" id="mob-review-btn">Write a Review</span></a>
+						</c:when>
+						<c:otherwise>
+							<a href="/initfindapro.do?profileLevel=${profileLevel}&iden=${profile.iden}&searchCriteria=${profile.contact_details.name}" target="_blank"><span class="mob-prof-contact-btn float-left" id="mob-review-btn">Write a Review</span></a>
+						</c:otherwise>
+						</c:choose>
                     </div>
                 </div>
                 <!-- <div class="vcard-download cursor-pointer">Download Contact</div> -->

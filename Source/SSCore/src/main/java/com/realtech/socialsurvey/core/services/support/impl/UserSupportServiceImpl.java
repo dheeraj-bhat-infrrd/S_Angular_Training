@@ -44,11 +44,20 @@ public class UserSupportServiceImpl implements UserSupportService {
 	 * 
 	 */
 	@Override
-	public void sendHelpMailToAdmin(User user , String mailSubject , String MailText , Map<String , String > attachmentsDetails) throws NonFatalException{
+	public void sendHelpMailToAdmin( String  senderEmail , String senderName , String mailSubject , String MailText , Map<String , String > attachmentsDetails) throws NonFatalException{
 		
 		LOG.info("Method sendHelpMailToAdmin started.");
+		if(senderEmail.isEmpty() || senderEmail == null){
+		    throw new InvalidInputException("Sender Email Address is not valid");
+		}
+		
+		if(senderName.isEmpty() || senderName == null){
+            throw new InvalidInputException("Sender Name is not valid");
+        }
+		
+		
 		try {
-			emailServices.sendHelpMailToAdmin(user ,applicationAdminName, mailSubject, MailText, applicationSupportEmail, attachmentsDetails );
+			emailServices.sendHelpMailToAdmin( senderEmail , senderName ,applicationAdminName, mailSubject, MailText, applicationSupportEmail, attachmentsDetails );
 		} catch (InvalidInputException | UndeliveredEmailException e) {
 			// TODO Auto-generated catch block
 			LOG.info("Exception caught : " + e.getMessage());
