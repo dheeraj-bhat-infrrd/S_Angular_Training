@@ -7,7 +7,8 @@
 
 //Function to redirect to login page if session time out
 function redirectToLoginPageOnSessionTimeOut(status) {
-	window.location = window.location.origin + '/login.do?s=sessionerror';
+	//window.location = window.location.origin + '/login.do?s=sessionerror';
+	window.location = getLocationOrigin() + '/login.do?s=sessionerror';
 }
 
 
@@ -162,7 +163,8 @@ function callAjaxFormSubmit(url, callBackFunction, formId) {
  * Generic function to be used for making form submission with ajax post
  */
 function redirectErrorpage(){
-	window.open(window.location.origin + "/errorpage.do",'_self');
+	//window.open(window.location.origin + "/errorpage.do",'_self');
+	window.open(getLocationOrigin() + "/errorpage.do",'_self');
 }
 
 /**
@@ -628,4 +630,9 @@ function scrollToTop() {
 	var body = $("html, body");
 	body.stop().animate({scrollTop:0}, '500', 'swing', function() { 
 	});
+}
+
+function getLocationOrigin(){
+	var origin = window.location.protocol + "//" + window.location.hostname + (window.location.port ? ':' + window.location.port: '');
+	return origin;
 }

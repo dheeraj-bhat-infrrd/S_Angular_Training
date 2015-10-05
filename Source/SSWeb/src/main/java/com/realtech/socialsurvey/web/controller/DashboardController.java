@@ -1903,6 +1903,11 @@ public class DashboardController
 			}
 
             String customerName = firstName + " " + lastName;
+            if(firstName == null || firstName.isEmpty()) {
+                User user = sessionHelper.getCurrentUser();
+                customerName = user.getFirstName() + " " + user.getLastName(); 
+            }   
+            
             String agentName = "";
             try {
                 agentName = solrSearchService.getUserDisplayNameById( agentId );
@@ -1912,7 +1917,7 @@ public class DashboardController
             }
             
             //make survey as abusive
-			surveyHandler.updateSurveyAsAbusive(surveyMongoId);
+			surveyHandler.updateSurveyAsAbusive(surveyMongoId, customerEmail, customerName);
 
             // Calling email services method to send mail to the Application
             // level admin.
