@@ -950,7 +950,7 @@ public class EmailServicesImpl implements EmailServices
 
     @Async
     @Override
-    public void sendSurveyCompletionMail( String recipientMailId, String displayName, String agentName, String agentEmail,
+    public void sendDefaultSurveyCompletionMail( String recipientMailId, String displayName, String agentName, String agentEmail,
         String agentProfileName, String logoUrl ) throws InvalidInputException, UndeliveredEmailException
     {
         if ( recipientMailId == null || recipientMailId.isEmpty() ) {
@@ -1190,7 +1190,7 @@ public class EmailServicesImpl implements EmailServices
 
     @Async
     @Override
-    public void sendSocialPostReminderMail( String recipientMailId, String agentPhone, String agentTitle, String companyName,
+    public void sendDefaultSocialPostReminderMail( String recipientMailId, String agentPhone, String agentTitle, String companyName,
         String displayName, String agentName, String links, String logoUrl ) throws InvalidInputException,
         UndeliveredEmailException
     {

@@ -178,7 +178,7 @@ public interface EmailServices {
             String displayName, String agentName, String agentEmail,
             String agentProfileName) throws InvalidInputException;
 
-    public void sendSurveyCompletionMail(String recipientMailId,
+    public void sendDefaultSurveyCompletionMail(String recipientMailId,
             String displayName, String agentName, String agentEmail,
             String agentProfileName , String logoUrl) throws InvalidInputException,
             UndeliveredEmailException;
@@ -230,7 +230,7 @@ public interface EmailServices {
             String displayName, String agentName, String links)
             throws InvalidInputException;
 
-    public void sendSocialPostReminderMail(String recipientMailId,
+    public void sendDefaultSocialPostReminderMail(String recipientMailId,
             String agentPhone, String agentTitle, String companyName,
             String displayName, String agentName, String links  , String logoUrl)
             throws InvalidInputException, UndeliveredEmailException;
