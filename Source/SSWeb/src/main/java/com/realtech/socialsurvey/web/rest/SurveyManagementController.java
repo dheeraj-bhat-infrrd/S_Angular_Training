@@ -234,8 +234,7 @@ public class SurveyManagementController
                     emailServices.queueSurveyCompletionMail( customerEmail, customerName, survey.getAgentName(),
                         agent.getEmailId(), agent.getProfileName() );
                 } else {
-                    emailServices.sendSurveyCompletionMail( customerEmail, customerName, survey.getAgentName(),
-                        agent.getEmailId(), agent.getProfileName(), logoUrl );
+                    surveyHandler.sendSurveyCompletionMail( customerEmail, survey.getCustomerFirstName(), survey.getCustomerLastName() , agent );
                 }
 
                 // Generate the text as in mail
@@ -1056,7 +1055,7 @@ public class SurveyManagementController
 
     private Map<String, Object> getSurvey( long agentId, String customerEmail, String firstName, String lastName,
         int reminderCount, String custRelationWithAgent, String url, String source ) throws InvalidInputException,
-        SolrException, NoRecordsFetchedException, ProfileNotFoundException
+        SolrException, NoRecordsFetchedException
     {
         Integer stage = null;
         Map<String, Object> surveyAndStage = new HashMap<>();
@@ -1094,7 +1093,13 @@ public class SurveyManagementController
 
         /*OrganizationUnitSettings companySettings = organizationManagementService.getCompanySettings(userManagementService.getUserByUserId(agentId));*/
         OrganizationUnitSettings unitSettings = organizationManagementService.getAgentSettings( agentId );
-        Map<String, Long> hierarchyMap = profileManagementService.getPrimaryHierarchyByAgentProfile( unitSettings );
+        Map<String, Long> hierarchyMap = null;
+        try {
+            hierarchyMap = profileManagementService.getPrimaryHierarchyByAgentProfile( unitSettings );
+        } catch ( ProfileNotFoundException e1 ) {
+            LOG.error( "Unable to fetch primary profile for this user " );
+            throw new FatalException( "Unable to fetch primary profile this user " + agentId );
+        }
         long companyId = 0;
         long regionId = 0;
         long branchId = 0;
@@ -1112,6 +1117,10 @@ public class SurveyManagementController
             }
         } catch ( InvalidSettingsStateException e ) {
             LOG.error( "Invalid settings for score ", e );
+
+        } catch ( ProfileNotFoundException e ) {
+            LOG.error( "Unable to fetch primary profile for this user " );
+            throw new FatalException( "Unable to fetch primary profile this user " + agentId );
         }
         OrganizationUnitSettings companySettings = organizationManagementService.getCompanySettings( companyId );
         OrganizationUnitSettings regionSettings = organizationManagementService.getRegionSettings( regionId );

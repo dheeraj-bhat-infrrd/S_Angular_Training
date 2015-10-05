@@ -377,7 +377,7 @@
 				$('#survey-completion-mailcontent').ckeditorGet().setReadOnly(false);
 			} catch(e) {
 			}
-			$('#survey-completion-mailcontent-subject').attr("readonly", false);
+			$('#survey-completion-subject').attr("readonly", false);
 			
 			$('#save-survey-completion-mail-content').show();
 			$('#save-survey-completion-mail-content-disabled').hide();
