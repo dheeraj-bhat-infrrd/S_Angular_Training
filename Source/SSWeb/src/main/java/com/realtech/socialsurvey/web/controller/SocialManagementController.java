@@ -1339,7 +1339,7 @@ public class SocialManagementController
         
         String custDisplayName = emailFormatHelper.getCustomerDisplayNameForEmail(custFirstName, custLastName);
 
-        String facebookMessage = rating + "-Star Survey Response from " + custDisplayName + " for "
+        String facebookMessage = CommonConstants.SOCIAL_RANKING_FORMAT.format( rating ) + "-Star Survey Response from " + custDisplayName + " for "
             + agentName + " on Social Survey - view at " + applicationBaseUrl + CommonConstants.AGENT_PROFILE_FIXED_URL
             + agentProfileLink;
         facebookMessage = facebookMessage.replaceAll( "null", "" );
@@ -1472,7 +1472,7 @@ public class SocialManagementController
         User user = sessionHelper.getCurrentUser();
         String custDisplayName = emailFormatHelper.getCustomerDisplayNameForEmail(custFirstName, custLastName);
         List<OrganizationUnitSettings> settings = socialManagementService.getBranchAndRegionSettingsForUser( user.getUserId() );
-        String message = rating + "-Star Survey Response from " + custDisplayName + " for " + agentName
+        String message = CommonConstants.SOCIAL_RANKING_FORMAT.format( rating ) + "-Star Survey Response from " + custDisplayName + " for " + agentName
             + " on SocialSurvey ";
         String linkedinProfileUrl = applicationBaseUrl + CommonConstants.AGENT_PROFILE_FIXED_URL + agentProfileLink;
         message += linkedinProfileUrl;

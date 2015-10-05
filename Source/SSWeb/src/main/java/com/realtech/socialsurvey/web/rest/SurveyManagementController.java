@@ -551,7 +551,7 @@ public class SurveyManagementController
             AgentSettings agentSettings = userManagementService.getUserSettings( agentId );
 
             // Facebook
-            String facebookMessage = rating + "-Star Survey Response from " + customerDisplayName + " for " + agentName
+            String facebookMessage = CommonConstants.SOCIAL_RANKING_FORMAT.format( rating ) + "-Star Survey Response from " + customerDisplayName + " for " + agentName
                 + " on Social Survey - view at " + getApplicationBaseUrl() + CommonConstants.AGENT_PROFILE_FIXED_URL
                 + agentProfileLink;
             facebookMessage += "\n Feedback : " + feedback;
@@ -580,7 +580,7 @@ public class SurveyManagementController
             }
 
             // LinkedIn
-            String linkedinMessage = rating + "-Star Survey Response from " + customerDisplayName + " for " + agentName
+            String linkedinMessage = CommonConstants.SOCIAL_RANKING_FORMAT.format( rating ) + "-Star Survey Response from " + customerDisplayName + " for " + agentName
                 + " on SocialSurvey ";
             String linkedinProfileUrl = getApplicationBaseUrl() + CommonConstants.AGENT_PROFILE_FIXED_URL + agentProfileLink;
             String linkedinMessageFeedback = "From : " + customerDisplayName + " - " + feedback;
@@ -671,7 +671,7 @@ public class SurveyManagementController
             List<OrganizationUnitSettings> settings = socialManagementService
                 .getSettingsForBranchesAndRegionsInHierarchy( agentId );
             AgentSettings agentSettings = userManagementService.getUserSettings( agentId );
-            String facebookMessage = rating + "-Star Survey Response from " + customerDisplayName + " for " + agentName
+            String facebookMessage = CommonConstants.SOCIAL_RANKING_FORMAT.format( rating ) + "-Star Survey Response from " + customerDisplayName + " for " + agentName
                 + " on Social Survey - view at " + getApplicationBaseUrl() + CommonConstants.AGENT_PROFILE_FIXED_URL
                 + agentProfileLink;
             // TODO: Bad code: DELETE: BEGIN
@@ -800,7 +800,7 @@ public class SurveyManagementController
             List<OrganizationUnitSettings> settings = socialManagementService
                 .getSettingsForBranchesAndRegionsInHierarchy( agentId );
             AgentSettings agentSettings = userManagementService.getUserSettings( agentId );
-            String message = rating + "-Star Survey Response from " + customerDisplayName + " for " + agentName
+            String message = CommonConstants.SOCIAL_RANKING_FORMAT.format( rating ) + "-Star Survey Response from " + customerDisplayName + " for " + agentName
                 + " on SocialSurvey ";
             String linkedinProfileUrl = getApplicationBaseUrl() + CommonConstants.AGENT_PROFILE_FIXED_URL + agentProfileLink;
             String linkedinMessageFeedback = "From : " + customerDisplayName + " " + feedback;
