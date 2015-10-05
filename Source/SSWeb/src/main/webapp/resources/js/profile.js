@@ -192,15 +192,15 @@ function paintProfilePage(result) {
     		window.open(returnValidWebAddress(link), '_blank');
     	});
     	
-    	$("#read-write-share-btn").click(function(e){
+    	/*$("#read-write-share-btn").click(function(e){
         	e.stopPropagation();
         	findProList(result.iden,result.contact_details.name);
-        });
+        });*/
         
-        $('#mob-review-btn').click(function(e) {
+        /*$('#mob-review-btn').click(function(e) {
         	e.stopPropagation();
         	findProList(result.iden,result.contact_details.name);
-        });
+        });*/
 	}
 }
 
