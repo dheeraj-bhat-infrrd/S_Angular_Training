@@ -234,8 +234,7 @@ public class SurveyManagementController
                     emailServices.queueSurveyCompletionMail( customerEmail, customerName, survey.getAgentName(),
                         agent.getEmailId(), agent.getProfileName() );
                 } else {
-                    emailServices.sendSurveyCompletionMail( customerEmail, customerName, survey.getAgentName(),
-                        agent.getEmailId(), agent.getProfileName(), logoUrl );
+                    surveyHandler.sendSurveyCompletionMail( customerEmail, survey.getCustomerFirstName(), survey.getCustomerLastName() , agent );
                 }
 
                 // Generate the text as in mail
