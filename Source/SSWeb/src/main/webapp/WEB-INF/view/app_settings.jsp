@@ -102,9 +102,9 @@
 		//check for crm source and show the corresponding app
 		var crmSource = $('#crm-source').val();
 		if(crmSource && crmSource.toUpperCase() == "DOTLOOP") {
-			$('.crm-settings-dropdown-item[data-crm-type="Dotloop"]').click();
+			$('.crm-settings-dropdown-item[data-crm-type="Dotloop"]').trigger('click');
 		} else {
-			$('#crm-settings-dropdown-cont').children('.crm-settings-dropdown-item:first').click();
+			$('#crm-settings-dropdown-cont').children('.crm-settings-dropdown-item:first').trigger('click');
 		}
 	});
 </script>

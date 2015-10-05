@@ -4811,7 +4811,8 @@ function paintProList(usersList) {
 			
 			$(".ctnt-list-item").click(function(e){
 				var agentProfileName = $(this).attr("data-profilename");
-				var url = window.location.origin + "/pages" + agentProfileName;
+				// var url = window.location.origin + "/pages" + agentProfileName;
+				var url = getLocationOrigin() + "/pages" + agentProfileName;
 				window.open(url);
 			});
 		}
@@ -4823,8 +4824,10 @@ function fetchUsersByProfileLevel(iden, profileLevel, startIndex) {
 	if (iden == undefined) {
 		return;
 	}
-	var url = window.location.origin + "/rest/profile/individuals/" + iden
-			+ "?profileLevel=" + profileLevel + "&start=" + startIndex;
+	//var url = window.location.origin + "/rest/profile/individuals/" + iden
+	//		+ "?profileLevel=" + profileLevel + "&start=" + startIndex;
+	var url = getLocationOrigin() + "/rest/profile/individuals/" + iden
+	+ "?profileLevel=" + profileLevel + "&start=" + startIndex;
 	callAjaxGET(url, fetchUsersByProfileLevelCallback, false);
 }
 
@@ -4879,7 +4882,8 @@ function initSurveyWithUrl(q) {
 		"q" : q
 	};
 	$.ajax({
-		url : window.location.origin + surveyUrl + "triggersurveywithurl",
+		//url : window.location.origin + surveyUrl + "triggersurveywithurl",
+		url : getLocationOrigin() + surveyUrl + "triggersurveywithurl",
 		type : "GET",
 		cache : false,
 		dataType : "JSON",
@@ -4915,7 +4919,8 @@ function initSurveyWithUrl(q) {
 }
 
 function showPageNotFoundError(){
-	window.location = window.location.origin + surveyUrl + "notfound";
+	//window.location = window.location.origin + surveyUrl + "notfound";
+	window.location = getLocationOrigin() + surveyUrl + "notfound";
 }
 
 function loadAgentPic(agentId){
@@ -4925,7 +4930,8 @@ function loadAgentPic(agentId){
 		"agentId" : agentId
 	};
 	$.ajax({
-		url : window.location.origin + surveyUrl + "displaypiclocationofagent",
+		//url : window.location.origin + surveyUrl + "displaypiclocationofagent",
+		url : getLocationOrigin() + surveyUrl + "displaypiclocationofagent",
 		type : "GET",
 		dataType : "text",
 		cache : false,
@@ -4976,7 +4982,8 @@ function paintSurveyPage(jsonData) {
 	//If social token availiable populate the links
 	if (googleEnabled) {
 		var googleElement = document.getElementById('ggl-btn');
-		shareOnGooglePlus(agentId, window.location.origin + "/rest/survey/", googleElement);
+		//shareOnGooglePlus(agentId, window.location.origin + "/rest/survey/", googleElement);
+		shareOnGooglePlus(agentId, getLocationOrigin() + "/rest/survey/", googleElement);
 	} else {
 		$('#ggl-btn').remove();
 	}
@@ -5151,7 +5158,8 @@ function retakeSurveyRequest(){
 			"lastName" : lastName,
 			"agentName" : agentName
 	};
-	callAjaxGetWithPayloadData(window.location.origin + surveyUrl + 'restartsurvey', '', payload, true);
+	//callAjaxGetWithPayloadData(window.location.origin + surveyUrl + 'restartsurvey', '', payload, true);
+	callAjaxGetWithPayloadData(getLocationOrigin() + surveyUrl + 'restartsurvey', '', payload, true);
 	$('#overlay-toast').html('Mail sent to your registered email id for retaking the survey for '+agentName);
 	showToast();
 }
@@ -5172,7 +5180,8 @@ function storeCustomerAnswer(customerResponse) {
 	};
 	questionDetails.customerResponse = customerResponse;
 	$.ajax({
-		url : window.location.origin + surveyUrl + "data/storeAnswer",
+		//url : window.location.origin + surveyUrl + "data/storeAnswer",
+		url : getLocationOrigin() + surveyUrl + "data/storeAnswer",
 		type : "GET",
 		cache : false,
 		data : payload,
@@ -5221,7 +5230,8 @@ function updateCustomerResponse(feedback, agreedToShare) {
 	};
 	questionDetails.customerResponse = customerResponse;
 	$.ajax({
-		url : window.location.origin + surveyUrl + "data/storeFeedback",
+		//url : window.location.origin + surveyUrl + "data/storeFeedback",
+		url : getLocationOrigin() + surveyUrl + "data/storeFeedback",
 		type : "GET",
 		cache : false,
 		data : payload,
@@ -5433,7 +5443,8 @@ function postToSocialMedia(feedback){
 		"agentProfileLink" : agentProfileLink
 	};
 	$.ajax({
-		url : window.location.origin + surveyUrl + "posttosocialnetwork",
+		//url : window.location.origin + surveyUrl + "posttosocialnetwork",
+		url : getLocationOrigin() + surveyUrl + "posttosocialnetwork",
 		type : "GET",
 		cache : false,
 		dataType : "TEXT",
@@ -5465,7 +5476,8 @@ function updateSharedOn(socialSite, agentId, customerEmail){
 		"socialSite" : socialSite
 	};
 	$.ajax({
-		url : window.location.origin + surveyUrl + "updatesharedon",
+		//url : window.location.origin + surveyUrl + "updatesharedon",
+		url : getLocationOrigin() + surveyUrl + "updatesharedon",
 		type : "GET",
 		cache : false,
 		dataType : "TEXT",
@@ -7712,7 +7724,8 @@ $(document).on('click','#dsh-dwnld-report-btn',function(){
 function userSwitchToAdmin() {
 	callAjaxGET("/switchtoadmin.do", function(data){
 		if(data == "success") {
-			window.location = window.location.origin + '/userlogin.do';
+			//window.location = window.location.origin + '/userlogin.do';
+			window.location = getLocationOrigin() + '/userlogin.do';
 		}
 	}, true);
 }
@@ -8618,3 +8631,135 @@ function revertMailContent(mailcategory) {
 		showToast();
 	}, payload, true);
 }
+
+
+//settings page event binding
+$('body').on('click','.st-dd-item-auto-post',function() {
+	$('#rating-auto-post').val($(this).html());
+	$('#st-dd-wrapper-auto-post').slideToggle(200);
+
+	$('#ratingcategory').val('rating-auto-post');
+	var rating = $('#rating-auto-post').val();
+	var ratingParent = $('#rating-auto-post-parent');
+
+	changeRatingPattern(rating, ratingParent);
+	updatePostScore("rating-settings-form");
+});
+
+$('body').on('click','.st-dd-item-min-post',function() {
+	$('#rating-min-post').val($(this).html());
+	$('#st-dd-wrapper-min-post').slideToggle(200);
+	
+	$('#ratingcategory').val('rating-min-post');
+	
+	var rating = $('#rating-min-post').val();
+	var ratingParent = $('#rating-min-post-parent');
+	changeRatingPattern(rating, ratingParent);
+	
+	updatePostScore("rating-settings-form");
+});
+
+$('body').on('click', '#st-settings-location-on', function() {
+	$('#othercategory').val('other-location');
+	$('#other-location').val('false');
+	
+	$('#st-settings-location-off').show();
+	$(this).hide();
+	
+	updateOtherSettings("other-settings-form");
+});
+$('body').on('click', '#st-settings-location-off', function() {
+	$('#othercategory').val('other-location');
+	$('#other-location').val('true');
+
+	$('#st-settings-location-on').show();
+	$(this).hide();
+	
+	updateOtherSettings("other-settings-form");
+});
+
+
+$('body').on('click', '#st-settings-payment-on', function() {
+	$('#st-settings-payment-off').show();
+	$(this).hide();
+});
+$('body').on('click', '#st-settings-payment-off', function() {
+	$('#st-settings-payment-on').show();
+	$(this).hide();
+	showPaymentOptions();
+});
+
+$('body').on('click', '#st-delete-account', function() {
+	$('#other-account').val('true');
+	createPopupConfirm("Delete Account",
+		"This action cannot be undone.<br/>All user setting will be permanently deleted and your subscription will terminate permanently immediately.");
+	overlayDeleteAccount();
+});
+
+$('body').on('click', '#st-settings-account-on', function() {
+	$('#other-account').val('false');
+	createPopupConfirm("Enable Account", "Do you want to Continue?");
+	overlayAccount();
+});
+$('body').on('click', '#st-settings-account-off', function() {
+	$('#other-account').val('true');
+	createPopupConfirm("Disable Account", "You will not be able to access your SocialSurvey profile after the current billing cycle. Also for Branch or Company Accounts, this will disable all accounts in your hierarchy under this account.<br/> Do you want to Continue?");
+	overlayAccount();
+});
+
+$('body').on('blur', '#happy-text', function() {
+	saveTextForMoodFlow($("#happy-text").val(), "happy");
+});
+$('body').on('blur', '#neutral-text', function() {
+	saveTextForMoodFlow($("#neutral-text").val(), "neutral");
+});
+$('body').on('blur', '#sad-text', function() {
+	saveTextForMoodFlow($("#sad-text").val(), "sad");
+});
+
+$('body').on('blur', '#happy-text-complete', function() {
+	saveTextForMoodFlow($("#happy-text-complete").val(), "happyComplete");
+});
+$('body').on('blur', '#neutral-text-complete', function() {
+	saveTextForMoodFlow($("#neutral-text-complete").val(), "neutralComplete");
+});
+$('body').on('blur', '#sad-text-complete', function() {
+	saveTextForMoodFlow($("#sad-text-complete").val(), "sadComplete");
+});
+
+$('body').on('click','.reset-icon', function() {
+	var resetId = $(this).prev().attr('id');
+	var resetTag = "";
+	
+	if (resetId == 'happy-text') {
+		resetTag = 'happy';
+	}
+	else if (resetId == 'neutral-text') {
+		resetTag = 'neutral';
+	}
+	else if (resetId == 'sad-text') {
+		resetTag = 'sad';
+	}
+	else if (resetId == 'happy-text-complete') {
+		resetTag = 'happyComplete';
+	}
+	else if (resetId == 'neutral-text-complete') {
+		resetTag = 'neutralComplete';
+	}
+	else if (resetId == 'sad-text-complete') {
+		resetTag = 'sadComplete';
+	}
+	
+    showOverlay();
+	resetTextForMoodFlow(resetTag, resetId);
+});
+
+$('body').on('click', '#atpst-chk-box', function() {
+	if ($('#atpst-chk-box').hasClass('bd-check-img-checked')) {
+		$('#atpst-chk-box').removeClass('bd-check-img-checked');
+		updateAutoPostSetting(true);
+	} else {
+		$('#atpst-chk-box').addClass('bd-check-img-checked');
+		updateAutoPostSetting(false);
+	}
+});

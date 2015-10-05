@@ -82,7 +82,8 @@
 		function resendActivationLink() {
 			var payload = $('#registration-form').serialize();
 			$.ajax({
-				url : window.location.origin + "/resendRegistrationMail.do",
+				//url : window.location.origin + "/resendRegistrationMail.do",
+				url : getLocationOrigin() + "/resendRegistrationMail.do",
 				data : payload,
 				type : "GET",
 				cache : false,
@@ -101,7 +102,8 @@
 			});
 		}
 		function redirectToLoginpage() {
-			window.open( window.location.origin + "/login.do", '_self' );
+			// window.open( window.location.origin + "/login.do", '_self' );
+			window.open( getLocationOrigin() + "/login.do", '_self' );
 		}
 	</script>
 </body>
