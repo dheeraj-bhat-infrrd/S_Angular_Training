@@ -712,6 +712,7 @@ public interface CommonConstants
 
     // Social media message template constants
     public static final DecimalFormat RANKING_FORMAT_TWITTER = new DecimalFormat( "#.#" );
+    public static final DecimalFormat SOCIAL_RANKING_FORMAT = new DecimalFormat( "#.#" );
 
     public static final String TWITTER_MESSAGE = "%s Star Survey Response from %s for %s on %s ";
     

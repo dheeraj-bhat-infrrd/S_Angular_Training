@@ -120,22 +120,22 @@ if(document.getElementById('fb_'+loop) != null)
 					<div class="float-left icn-share icn-plus-open"></div>
 					<div class="float-left clearfix ppl-share-social hide">
 						<span id = "fb_${loop.index}"class="float-left ppl-share-icns icn-fb" title="Facebook" onclick = "getImageandCaption(${loop.index});"
-							data-link="https://www.facebook.com/dialog/feed?${reviewItem.faceBookShareUrl}&link=${reviewItem.completeProfileUrl}&description=${reviewItem.score}-star response from ${reviewItem.customerFirstName} ${reviewItem.customerLastName.substring( 0, 1 ).toUpperCase()} for ${reviewItem.agentName} at SocialSurvey - ${reviewItem.review} .&redirect_uri=https://www.facebook.com"></span>
+							data-link="https://www.facebook.com/dialog/feed?${reviewItem.faceBookShareUrl}&link=${reviewItem.completeProfileUrl}&description=<fmt:formatNumber type="number" pattern="#.#" value="${reviewItem.score}" />-star response from ${reviewItem.customerFirstName} ${reviewItem.customerLastName.substring( 0, 1 ).toUpperCase()} for ${reviewItem.agentName} at SocialSurvey - ${reviewItem.review} .&redirect_uri=https://www.facebook.com"></span>
 						
 						
-						    <input type="hidden" id="twttxt_${loop.index}" class ="twitterText_loop" value ="${reviewItem.score}-star response from ${reviewItem.customerFirstName} ${reviewItem.customerLastName.substring( 0, 1 ).toUpperCase()} for ${reviewItem.agentName} at SocialSurvey - ${reviewItem.review}"/>
+						    <input type="hidden" id="twttxt_${loop.index}" class ="twitterText_loop" value ="<fmt:formatNumber type="number" pattern="#.#" value="${reviewItem.score}" />-star response from ${reviewItem.customerFirstName} ${reviewItem.customerLastName.substring( 0, 1 ).toUpperCase()} for ${reviewItem.agentName} at SocialSurvey - ${reviewItem.review}"/>
 							
-							<span class="float-left ppl-share-icns icn-twit" id ="twitt_${loop.index}" onclick="twitterFn(${loop.index},this);" data-link="https://twitter.com/intent/tweet?text=${reviewItem.score}-star response from ${reviewItem.customerFirstName} ${reviewItem.customerLastName.substring( 0, 1 ).toUpperCase()} for ${reviewItem.agentName} at SocialSurvey - ${reviewItem.review}&url=${reviewItem.completeProfileUrl}"></span>
+							<span class="float-left ppl-share-icns icn-twit" id ="twitt_${loop.index}" onclick="twitterFn(${loop.index},this);" data-link="https://twitter.com/intent/tweet?text=<fmt:formatNumber type="number" pattern="#.#" value="${reviewItem.score}" />-star response from ${reviewItem.customerFirstName} ${reviewItem.customerLastName.substring( 0, 1 ).toUpperCase()} for ${reviewItem.agentName} at SocialSurvey - ${reviewItem.review}&url=${reviewItem.completeProfileUrl}"></span>
 							 <span
 							class="float-left ppl-share-icns icn-lin" title="LinkedIn"
-							data-link="https://www.linkedin.com/shareArticle?mini=true&url=${reviewItem.completeProfileUrl} &title=&summary=${reviewItem.score}-star response from ${reviewItem.customerFirstName} ${reviewItem.customerLastName.substring( 0, 1 ).toUpperCase()} for ${reviewItem.agentName} at SocialSurvey - ${reviewItem.review} + &source="></span>
+							data-link="https://www.linkedin.com/shareArticle?mini=true&url=${reviewItem.completeProfileUrl} &title=&summary=<fmt:formatNumber type="number" pattern="#.#" value="${reviewItem.score}" />-star response from ${reviewItem.customerFirstName} ${reviewItem.customerLastName.substring( 0, 1 ).toUpperCase()} for ${reviewItem.agentName} at SocialSurvey - ${reviewItem.review} + &source="></span>
 						<span class="float-left ppl-share-icns icn-gplus" title="Google+">
 							<button
 								class="g-interactivepost float-left ppl-share-icns icn-gplus"
 								data-contenturl="${reviewItem.completeProfileUrl}"
 								data-clientid="${reviewItem.googleApi}"
 								data-cookiepolicy="single_host_origin"
-								data-prefilltext="${reviewItem.score}-star response from ${reviewItem.customerFirstName} ${reviewItem.customerLastName.substring( 0, 1 ).toUpperCase()} for ${reviewItem.agentName} at SocialSurvey - ${reviewItem.review}"
+								data-prefilltext="<fmt:formatNumber type="number" pattern="#.#" value="${reviewItem.score}" />-star response from ${reviewItem.customerFirstName} ${reviewItem.customerLastName.substring( 0, 1 ).toUpperCase()} for ${reviewItem.agentName} at SocialSurvey - ${reviewItem.review}"
 								data-calltoactionlabel="USE"
 								data-calltoactionurl="${reviewItem.completeProfileUrl}">
 								<span class="icon">&nbsp;</span> <span class="label">share</span>
