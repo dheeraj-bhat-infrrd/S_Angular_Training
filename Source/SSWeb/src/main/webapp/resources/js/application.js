@@ -8320,9 +8320,14 @@ $(document).on('click','.hdr-link-item-dropdown-item',function(e) {
 });
 
 //Help page onclick function
-$(document).on( 'click', '#send-button', function() {
+$(document).on( 'click', '#send-help-mail-button', function() {
 	var subject = "";
 	var message = "";
+	var emailId = "";
+	
+	if ($("#email-id").val() != undefined) {
+		emailId = $("#email-id").val().trim();
+	}
 	
 	if ($("#subject-id").val() != undefined) {
 		subject = $("#subject-id").val().trim();
@@ -8331,6 +8336,19 @@ $(document).on( 'click', '#send-button', function() {
 	if ($("#user-message").val() != undefined) {
 		message = $("#user-message").val().trim();
 	}
+	
+	if ((emailId == "") || (emailId == undefined)) {
+		$('#overlay-toast').html('Please enter a valid email address');
+		showToast();
+		return;
+	}
+	
+	if (emailRegex.test(emailId) != true){
+		$('#overlay-toast').html('Please enter a valid email address');
+		showToast();
+		return;
+	}
+	
 	if (subject == "" || subject == undefined) {
 		$('#overlay-toast').html('Please enter the subject');
 		showToast();
@@ -8345,7 +8363,8 @@ $(document).on( 'click', '#send-button', function() {
 
 	var payload = {
 		"subject" : subject,
-		"mailText" : message
+		"mailText" : message,
+		"emailId" : emailId
 	};
 
 	callAjaxPostWithPayloadData("./sendhelpmailtoadmin.do",
