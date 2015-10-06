@@ -69,6 +69,7 @@
 	</div>
 	<script
 		src="//ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+	<script src="${initParam.resourcesPath}/resources/js/common.js"></script>
 	<script>
 		if (!window.jQuery) {
 			document.write('<script src="${initParam.resourcesPath}/resources/js/jquery-2.1.1.min.js""><\/script>');
