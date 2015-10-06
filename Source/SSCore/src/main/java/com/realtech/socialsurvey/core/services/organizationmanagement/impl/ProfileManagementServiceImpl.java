@@ -1212,7 +1212,8 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 
     @Override
     @Transactional
-    public Map<String, Long> getPrimaryHierarchyByAgentProfile( OrganizationUnitSettings agentSettings ) throws InvalidInputException, ProfileNotFoundException
+    public Map<String, Long> getPrimaryHierarchyByAgentProfile( OrganizationUnitSettings agentSettings )
+        throws InvalidInputException, ProfileNotFoundException
     {
         LOG.info( "Inside method getPrimaryHierarchyByAgentProfile " );
         Map<String, Long> hierarchyMap = userManagementService.getPrimaryUserProfileByAgentId( agentSettings.getIden() );
@@ -2803,7 +2804,8 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 
     @Override
     @Transactional
-    public Map<String, Long> getHierarchyDetailsByEntity( String entityType, long entityId ) throws InvalidInputException, ProfileNotFoundException
+    public Map<String, Long> getHierarchyDetailsByEntity( String entityType, long entityId ) throws InvalidInputException,
+        ProfileNotFoundException
     {
         Map<String, Long> hierarchyDetials = new HashMap<String, Long>();
         Map<String, Long> hierarchyMap = new HashMap<String, Long>();
@@ -3191,10 +3193,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
                 }
 
             } else if ( entry.getKey() == SettingsForApplication.AUTO_POST_ENABLED ) {
-                surveySettings = userProfile.getSurvey_settings();
-                if ( surveySettings == null ) {
-                    surveySettings = new SurveySettings();
-                }
+
                 if ( entry.getValue() == OrganizationUnit.COMPANY ) {
                     surveySettings.setAutoPostEnabled( companyUnitSettings.getSurvey_settings().isAutoPostEnabled() );
                 } else if ( entry.getValue() == OrganizationUnit.REGION ) {
