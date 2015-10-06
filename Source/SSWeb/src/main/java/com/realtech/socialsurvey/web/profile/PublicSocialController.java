@@ -1,5 +1,6 @@
 package com.realtech.socialsurvey.web.profile;
 
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -238,8 +239,11 @@ public class PublicSocialController {
 			facebook.setOAuthAccessToken(new AccessToken(accessToken.getToken(), null));
 			String ratingStr = (String) session.getAttribute( "rating" );
 			double rating = Double.parseDouble( ratingStr );
-			
-			String message = CommonConstants.SOCIAL_RANKING_FORMAT.format( rating ) + "-Star Survey Response from " + session.getAttribute("firstName") + " "
+			DecimalFormat ratingFormat = CommonConstants.SOCIAL_RANKING_FORMAT;
+	        if ( rating % 1 == 0 ) {
+	            ratingFormat = CommonConstants.SOCIAL_RANKING_WHOLE_FORMAT;
+	        }
+			String message = ratingFormat.format( rating ) + "-Star Survey Response from " + session.getAttribute("firstName") + " "
 					+ session.getAttribute("lastName") + " for " + session.getAttribute("agentName")
 					+ " on Social Survey. Below is the feedback :\n " + session.getAttribute("review");
 			message = message.replaceAll("null", "");
@@ -300,9 +304,12 @@ public class PublicSocialController {
 			
 			String ratingStr = (String) session.getAttribute( "rating" );
             double rating = Double.parseDouble( ratingStr );
-			
+            DecimalFormat ratingFormat = CommonConstants.SOCIAL_RANKING_FORMAT;
+            if ( rating % 1 == 0 ) {
+                ratingFormat = CommonConstants.SOCIAL_RANKING_WHOLE_FORMAT;
+            }
 			// Tweeting
-			String twitterMessage = CommonConstants.SOCIAL_RANKING_FORMAT.format( rating ) + "-Star Survey Response from " + session.getAttribute("firstName") + " "
+			String twitterMessage = ratingFormat.format( rating ) + "-Star Survey Response from " + session.getAttribute("firstName") + " "
 					+ session.getAttribute("lastName") + " for " + session.getAttribute("agentName")
 					+ " on @Social Survey. Below is the feedback :\n " + session.getAttribute("review");
 			twitterMessage = twitterMessage.replaceAll("null", "");
@@ -362,9 +369,12 @@ public class PublicSocialController {
 
 			String ratingStr = (String) session.getAttribute( "rating" );
             double rating = Double.parseDouble( ratingStr );
-			
+            DecimalFormat ratingFormat = CommonConstants.SOCIAL_RANKING_FORMAT;
+            if ( rating % 1 == 0 ) {
+                ratingFormat = CommonConstants.SOCIAL_RANKING_WHOLE_FORMAT;
+            }
 			// Post on linkedin
-			String message = CommonConstants.SOCIAL_RANKING_FORMAT.format( rating ) + "-Star Survey Response from " + session.getAttribute("firstName") + " "
+			String message = ratingFormat.format( rating ) + "-Star Survey Response from " + session.getAttribute("firstName") + " "
 					+ session.getAttribute("lastName") + " for " + session.getAttribute("agentName")
 					+ " on Social Survey. Below is the feedback :\n " + session.getAttribute("review");
 			message = message.replaceAll("null", "");
