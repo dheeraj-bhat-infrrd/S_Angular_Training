@@ -41,6 +41,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
+import com.realtech.socialsurvey.core.dao.SocialPostDao;
 import com.realtech.socialsurvey.core.dao.impl.MongoOrganizationUnitSettingDaoImpl;
 import com.realtech.socialsurvey.core.entities.AgentSettings;
 import com.realtech.socialsurvey.core.entities.Branch;
@@ -54,6 +55,7 @@ import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
 import com.realtech.socialsurvey.core.entities.ProfileStage;
 import com.realtech.socialsurvey.core.entities.Region;
 import com.realtech.socialsurvey.core.entities.SocialMediaTokens;
+import com.realtech.socialsurvey.core.entities.SocialUpdateAction;
 import com.realtech.socialsurvey.core.entities.SurveyDetails;
 import com.realtech.socialsurvey.core.entities.TwitterToken;
 import com.realtech.socialsurvey.core.entities.User;
@@ -69,6 +71,7 @@ import com.realtech.socialsurvey.core.integration.zillow.ZillowIntergrationApiBu
 import com.realtech.socialsurvey.core.services.mail.EmailServices;
 import com.realtech.socialsurvey.core.services.organizationmanagement.OrganizationManagementService;
 import com.realtech.socialsurvey.core.services.organizationmanagement.ProfileManagementService;
+import com.realtech.socialsurvey.core.services.organizationmanagement.ProfileNotFoundException;
 import com.realtech.socialsurvey.core.services.organizationmanagement.UserManagementService;
 import com.realtech.socialsurvey.core.services.settingsmanagement.SettingsSetter;
 import com.realtech.socialsurvey.core.services.social.SocialAsyncService;
@@ -183,6 +186,8 @@ public class SocialManagementController
     @Autowired
 	private SurveyHandler surveyHandler;
 
+    @Autowired
+    private SocialPostDao socialPostDao;
     /**
      * Returns the social authorization page
      * 
@@ -332,7 +337,7 @@ public class SocialManagementController
             if ( userSettings == null || entityType == null ) {
                 throw new InvalidInputException( "No user settings found in session" );
             }
-
+            
             // On auth error
             String errorCode = request.getParameter( "error" );
             if ( errorCode != null ) {
@@ -480,7 +485,10 @@ public class SocialManagementController
         LOG.info( "Method saveSelectedAccessFacebookToken() called from SocialManagementController" );
         String selectedAccessFacebookToken = request.getParameter( "selectedAccessFacebookToken" );
         String selectedProfileUrl = request.getParameter( "selectedProfileUrl" );
-
+        long branchId = 0;
+        long regionId = 0;
+        long companyId = 0;
+        long agentId = 0;
         User user = sessionHelper.getCurrentUser();
         HttpSession session = request.getSession( false );
         AccountType accountType = (AccountType) session.getAttribute( CommonConstants.ACCOUNT_TYPE_IN_SESSION );
@@ -501,6 +509,16 @@ public class SocialManagementController
         boolean updated = false;
         SocialMediaTokens mediaTokens = null;
         try {
+            try {
+                Map<String, Long> hierarchyDetails = profileManagementService.getHierarchyDetailsByEntity( entityType, entityId );
+                branchId = hierarchyDetails.get( CommonConstants.BRANCH_ID_COLUMN );
+                regionId = hierarchyDetails.get( CommonConstants.REGION_ID_COLUMN );
+                companyId = hierarchyDetails.get( CommonConstants.COMPANY_ID_COLUMN );
+                agentId = hierarchyDetails.get( CommonConstants.AGENT_ID_COLUMN );
+            } catch ( ProfileNotFoundException e ) {
+                LOG.error( "Profile not found for user id : " + entityId + " of type : " + entityType, e );
+            }
+            
             if ( entityType.equals( CommonConstants.COMPANY_ID_COLUMN ) ) {
                 OrganizationUnitSettings companySettings = organizationManagementService.getCompanySettings( user.getCompany()
                     .getCompanyId() );
@@ -575,6 +593,18 @@ public class SocialManagementController
         } catch (NonFatalException e) {
 			LOG.error("Error setting settings value. Reason : " + e.getLocalizedMessage(), e);
 		}
+        
+        //Add action to social connection history
+        String action = "connected";
+        SocialUpdateAction socialUpdateAction = new SocialUpdateAction();
+        socialUpdateAction.setAction( action );
+        socialUpdateAction.setAgentId( agentId );
+        socialUpdateAction.setBranchId( branchId );
+        socialUpdateAction.setRegionId( regionId );
+        socialUpdateAction.setCompanyId( companyId );
+        socialUpdateAction.setSocialMediaSource( CommonConstants.FACEBOOK_SOCIAL_SITE );
+        
+        socialPostDao.addActionToSocialConnectionHistory( socialUpdateAction );
         model.addAttribute( "socialNetwork", "facebook" );
         return JspResolver.SOCIAL_FACEBOOK_INTERMEDIATE;
     }
@@ -647,6 +677,10 @@ public class SocialManagementController
         User user = sessionHelper.getCurrentUser();
         HttpSession session = request.getSession( false );
         AccountType accountType = (AccountType) session.getAttribute( CommonConstants.ACCOUNT_TYPE_IN_SESSION );
+        long branchId = 0;
+        long regionId = 0;
+        long companyId = 0;
+        long agentId = 0;
         if ( session.getAttribute( "columnName" ) != null ) {
             String columnName = (String) session.getAttribute( "columnName" );
             String columnValue = (String) session.getAttribute( "columnValue" );
@@ -662,6 +696,16 @@ public class SocialManagementController
             String entityType = (String) session.getAttribute( CommonConstants.ENTITY_TYPE_COLUMN );
             if ( userSettings == null || entityType == null ) {
                 throw new InvalidInputException( "No user settings found in session" );
+            }
+            
+            try {
+                Map<String, Long> hierarchyDetails = profileManagementService.getHierarchyDetailsByEntity( entityType, entityId );
+                branchId = hierarchyDetails.get( CommonConstants.BRANCH_ID_COLUMN );
+                regionId = hierarchyDetails.get( CommonConstants.REGION_ID_COLUMN );
+                companyId = hierarchyDetails.get( CommonConstants.COMPANY_ID_COLUMN );
+                agentId = hierarchyDetails.get( CommonConstants.AGENT_ID_COLUMN );
+            } catch ( ProfileNotFoundException e ) {
+                LOG.error( "Profile not found for user id : " + entityId + " of type : " + entityType, e );
             }
 
             // On auth error
@@ -805,6 +849,18 @@ public class SocialManagementController
             return JspResolver.SOCIAL_AUTH_MESSAGE;
         }
 
+        //Add action to social connection history
+        String action = "connected";
+        SocialUpdateAction socialUpdateAction = new SocialUpdateAction();
+        socialUpdateAction.setAction( action );
+        socialUpdateAction.setAgentId( agentId );
+        socialUpdateAction.setBranchId( branchId );
+        socialUpdateAction.setRegionId( regionId );
+        socialUpdateAction.setCompanyId( companyId );
+        socialUpdateAction.setSocialMediaSource( CommonConstants.TWITTER_SOCIAL_SITE );
+        
+        socialPostDao.addActionToSocialConnectionHistory( socialUpdateAction );
+        
         // Updating attributes
         session.removeAttribute( CommonConstants.SOCIAL_REQUEST_TOKEN );
         model.addAttribute( CommonConstants.SUCCESS_ATTRIBUTE, CommonConstants.YES );
@@ -854,6 +910,10 @@ public class SocialManagementController
         User user = sessionHelper.getCurrentUser();
         HttpSession session = request.getSession( false );
         AccountType accountType = (AccountType) session.getAttribute( CommonConstants.ACCOUNT_TYPE_IN_SESSION );
+        long branchId = 0;
+        long regionId = 0;
+        long companyId = 0;
+        long agentId = 0;
         if ( session.getAttribute( "columnName" ) != null ) {
             String columnName = (String) session.getAttribute( "columnName" );
             String columnValue = (String) session.getAttribute( "columnValue" );
@@ -870,7 +930,17 @@ public class SocialManagementController
             if ( userSettings == null || entityType == null ) {
                 throw new InvalidInputException( "No user settings found in session" );
             }
-
+            
+            try {
+                Map<String, Long> hierarchyDetails = profileManagementService.getHierarchyDetailsByEntity( entityType, entityId );
+                branchId = hierarchyDetails.get( CommonConstants.BRANCH_ID_COLUMN );
+                regionId = hierarchyDetails.get( CommonConstants.REGION_ID_COLUMN );
+                companyId = hierarchyDetails.get( CommonConstants.COMPANY_ID_COLUMN );
+                agentId = hierarchyDetails.get( CommonConstants.AGENT_ID_COLUMN );
+            } catch ( ProfileNotFoundException e ) {
+                LOG.error( "Profile not found for user id : " + entityId + " of type : " + entityType, e );
+            }
+            
             // On auth error
             String errorCode = request.getParameter( "error" );
             if ( errorCode != null ) {
@@ -1024,7 +1094,19 @@ public class SocialManagementController
             LOG.error( "Exception while getting linkedin access token. Reason : " + e.getMessage(), e );
             return JspResolver.SOCIAL_AUTH_MESSAGE;
         }
-
+        
+        //Add action to social connection history
+        String action = "connected";
+        SocialUpdateAction socialUpdateAction = new SocialUpdateAction();
+        socialUpdateAction.setAction( action );
+        socialUpdateAction.setAgentId( agentId );
+        socialUpdateAction.setBranchId( branchId );
+        socialUpdateAction.setRegionId( regionId );
+        socialUpdateAction.setCompanyId( companyId );
+        socialUpdateAction.setSocialMediaSource( CommonConstants.LINKEDIN_SOCIAL_SITE );
+        
+        socialPostDao.addActionToSocialConnectionHistory( socialUpdateAction );
+        
         // Updating attributes
         model.addAttribute( CommonConstants.SUCCESS_ATTRIBUTE, CommonConstants.YES );
         model.addAttribute( "socialNetwork", "linkedin" );
@@ -1073,6 +1155,10 @@ public class SocialManagementController
         User user = sessionHelper.getCurrentUser();
         HttpSession session = request.getSession( false );
         AccountType accountType = (AccountType) session.getAttribute( CommonConstants.ACCOUNT_TYPE_IN_SESSION );
+        long branchId = 0;
+        long regionId = 0;
+        long companyId = 0;
+        long agentId = 0;
         if ( session.getAttribute( "columnName" ) != null ) {
             String columnName = (String) session.getAttribute( "columnName" );
             String columnValue = (String) session.getAttribute( "columnValue" );
@@ -1089,7 +1175,17 @@ public class SocialManagementController
             if ( userSettings == null || entityType == null ) {
                 throw new InvalidInputException( "No user settings found in session" );
             }
-
+            
+            try {
+                Map<String, Long> hierarchyDetails = profileManagementService.getHierarchyDetailsByEntity( entityType, entityId );
+                branchId = hierarchyDetails.get( CommonConstants.BRANCH_ID_COLUMN );
+                regionId = hierarchyDetails.get( CommonConstants.REGION_ID_COLUMN );
+                companyId = hierarchyDetails.get( CommonConstants.COMPANY_ID_COLUMN );
+                agentId = hierarchyDetails.get( CommonConstants.AGENT_ID_COLUMN );
+            } catch ( ProfileNotFoundException e ) {
+                LOG.error( "Profile not found for user id : " + entityId + " of type : " + entityType, e );
+            }
+            
             // On auth error
             String errorCode = request.getParameter( "error" );
             if ( errorCode != null ) {
@@ -1243,6 +1339,18 @@ public class SocialManagementController
             return JspResolver.SOCIAL_AUTH_MESSAGE;
         }
 
+        //Add action to social connection history
+        String action = "connected";
+        SocialUpdateAction socialUpdateAction = new SocialUpdateAction();
+        socialUpdateAction.setAction( action );
+        socialUpdateAction.setAgentId( agentId );
+        socialUpdateAction.setBranchId( branchId );
+        socialUpdateAction.setRegionId( regionId );
+        socialUpdateAction.setCompanyId( companyId );
+        socialUpdateAction.setSocialMediaSource( CommonConstants.GOOGLE_SOCIAL_SITE );
+        
+        socialPostDao.addActionToSocialConnectionHistory( socialUpdateAction );
+        
         // Updating attributes
         session.removeAttribute( CommonConstants.SOCIAL_REQUEST_TOKEN );
         model.addAttribute( CommonConstants.SUCCESS_ATTRIBUTE, CommonConstants.YES );
@@ -1661,6 +1769,10 @@ public class SocialManagementController
         ZillowIntegrationApi zillowIntegrationApi = zillowIntergrationApiBuilder.getZellowIntegrationApi();
         User user = sessionHelper.getCurrentUser();
         String zillowScreenName = request.getParameter( "zillowProfileName" );
+        long branchId = 0;
+        long regionId = 0;
+        long companyId = 0;
+        long agentId = 0;
         OrganizationUnitSettings profileSettings = (OrganizationUnitSettings) session
                 .getAttribute( CommonConstants.USER_ACCOUNT_SETTINGS );
         if(profileSettings == null){
@@ -1684,6 +1796,17 @@ public class SocialManagementController
                 if ( userSettings == null || entityType == null || profileSettings == null) {
                     throw new InvalidInputException( "No user settings found in session" );
                 }
+                
+                try {
+                    Map<String, Long> hierarchyDetails = profileManagementService.getHierarchyDetailsByEntity( entityType, entityId );
+                    branchId = hierarchyDetails.get( CommonConstants.BRANCH_ID_COLUMN );
+                    regionId = hierarchyDetails.get( CommonConstants.REGION_ID_COLUMN );
+                    companyId = hierarchyDetails.get( CommonConstants.COMPANY_ID_COLUMN );
+                    agentId = hierarchyDetails.get( CommonConstants.AGENT_ID_COLUMN );
+                } catch ( ProfileNotFoundException e ) {
+                    LOG.error( "Profile not found for user id : " + entityId + " of type : " + entityType, e );
+                }
+                
                 String errorCode = request.getParameter( "error" );
                 if ( errorCode != null ) {
                     LOG.error( "Error code : " + errorCode );
@@ -1927,6 +2050,18 @@ public class SocialManagementController
                 return JspResolver.SOCIAL_AUTH_MESSAGE;
             }
 
+            //Add action to social connection history
+            String action = "connected";
+            SocialUpdateAction socialUpdateAction = new SocialUpdateAction();
+            socialUpdateAction.setAction( action );
+            socialUpdateAction.setAgentId( agentId );
+            socialUpdateAction.setBranchId( branchId );
+            socialUpdateAction.setRegionId( regionId );
+            socialUpdateAction.setCompanyId( companyId );
+            socialUpdateAction.setSocialMediaSource( CommonConstants.ZILLOW_SOCIAL_SITE );
+            
+            socialPostDao.addActionToSocialConnectionHistory( socialUpdateAction );
+            
             session.removeAttribute( CommonConstants.SOCIAL_REQUEST_TOKEN );
             model.addAttribute( CommonConstants.SUCCESS_ATTRIBUTE, CommonConstants.YES );
             model.addAttribute( "socialNetwork", "zillow" );
@@ -1997,6 +2132,10 @@ public class SocialManagementController
         HttpSession session = request.getSession();
         OrganizationUnitSettings profileSettings = (OrganizationUnitSettings) session
                 .getAttribute( CommonConstants.USER_ACCOUNT_SETTINGS );
+        long branchId = 0;
+        long regionId = 0;
+        long companyId = 0;
+        long agentId = 0;
         try {
             if ( socialMedia == null || socialMedia.isEmpty() ) {
                 throw new InvalidInputException( "Social media can not be null or empty" );
@@ -2029,7 +2168,6 @@ public class SocialManagementController
     		default:
     			throw new InvalidInputException("Invalid social media token entered");
     		}
-            
             User user = sessionHelper.getCurrentUser();
             UserSettings userSettings = (UserSettings) session.getAttribute( CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION );
             long entityId = (long) session.getAttribute( CommonConstants.ENTITY_ID_COLUMN );
@@ -2037,7 +2175,17 @@ public class SocialManagementController
             if ( userSettings == null || entityType == null ) {
                 throw new InvalidInputException( "No user settings found in session" );
             }
-
+            
+            try {
+                Map<String, Long> hierarchyDetails = profileManagementService.getHierarchyDetailsByEntity( entityType, entityId );
+                branchId = hierarchyDetails.get( CommonConstants.BRANCH_ID_COLUMN );
+                regionId = hierarchyDetails.get( CommonConstants.REGION_ID_COLUMN );
+                companyId = hierarchyDetails.get( CommonConstants.COMPANY_ID_COLUMN );
+                agentId = hierarchyDetails.get( CommonConstants.AGENT_ID_COLUMN );
+            } catch ( ProfileNotFoundException e ) {
+                LOG.error( "Profile not found for user id : " + entityId + " of type : " + entityType, e );
+            }
+            
             // Check for the collection to update
             OrganizationUnitSettings unitSettings = null;
             if ( entityType.equals( CommonConstants.COMPANY_ID_COLUMN ) ) {
@@ -2091,6 +2239,19 @@ public class SocialManagementController
             LOG.error( "Exception occured in disconnectSocialNetwork() while disconnecting with the social Media." );
             return "failue";
         }
+        
+        //Add action to social connection history
+        String action = "disconnected";
+        SocialUpdateAction socialUpdateAction = new SocialUpdateAction();
+        socialUpdateAction.setAction( action );
+        socialUpdateAction.setAgentId( agentId );
+        socialUpdateAction.setBranchId( branchId );
+        socialUpdateAction.setRegionId( regionId );
+        socialUpdateAction.setCompanyId( companyId );
+        socialUpdateAction.setSocialMediaSource( socialMedia );
+        
+        socialPostDao.addActionToSocialConnectionHistory( socialUpdateAction ); 
+        
         session.setAttribute( CommonConstants.USER_ACCOUNT_SETTINGS, profileSettings );
         return "success";
     }
