@@ -287,11 +287,13 @@ public class SurveyManagementController
         surveyDetail.append( "<br />" ).append( "Customer Comments: " ).append( survey.getReview() );
 
         surveyDetail.append( "<br />" );
-        if ( survey.getSharedOn() != null && !survey.getSharedOn().isEmpty() ) {
-            surveyDetail.append( "<br />" ).append( "Share Checkbox: " ).append( "Yes" );
-            surveyDetail.append( "<br />" ).append( "Shared on: " ).append( StringUtils.join( survey.getSharedOn(), ", " ) );
-        } else {
-            surveyDetail.append( "<br />" ).append( "Share Checkbox: " ).append( "No" );
+        if(survey.getAgreedToShare() != null && survey.getAgreedToShare().equalsIgnoreCase("true")){
+        	surveyDetail.append( "<br />" ).append( "Share Checkbox: " ).append( "Yes" );
+        	if ( survey.getSharedOn() != null && !survey.getSharedOn().isEmpty() ) {
+        		surveyDetail.append( "<br />" ).append( "Shared on: " ).append( StringUtils.join( survey.getSharedOn(), ", " ) );
+        	}
+        }else{
+        	surveyDetail.append( "<br />" ).append( "Share Checkbox: " ).append( "No" );
         }
 
         surveyDetail.append( "<br />" );
