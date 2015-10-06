@@ -19,7 +19,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 import javax.annotation.Resource;
+
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellStyle;
 import org.apache.poi.ss.usermodel.Row;
@@ -35,6 +39,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.DependsOn;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
+
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
@@ -58,8 +63,8 @@ import com.realtech.socialsurvey.core.entities.Branch;
 import com.realtech.socialsurvey.core.entities.BranchFromSearch;
 import com.realtech.socialsurvey.core.entities.BranchSettings;
 import com.realtech.socialsurvey.core.entities.CRMInfo;
-import com.realtech.socialsurvey.core.entities.Company;
 import com.realtech.socialsurvey.core.entities.CollectionDotloopProfileMapping;
+import com.realtech.socialsurvey.core.entities.Company;
 import com.realtech.socialsurvey.core.entities.ContactDetailsSettings;
 import com.realtech.socialsurvey.core.entities.ContactNumberSettings;
 import com.realtech.socialsurvey.core.entities.CrmBatchTracker;
@@ -2389,10 +2394,9 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
     {
         boolean validEmail = true;
         LOG.info( "Method validateAndParseEmailIds called" );
-        if ( !emailId.trim().matches( CommonConstants.EMAIL_REGEX ) ) {
-            validEmail = false;
-        }
-
+        Pattern pattern = Pattern.compile( CommonConstants.EMAIL_REGEX, Pattern.CASE_INSENSITIVE );
+        Matcher matcher = pattern.matcher( emailId );
+        validEmail = matcher.matches();
         return validEmail;
     }
 
@@ -3826,7 +3830,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
             SurveySettings surveySettings = new SurveySettings();
             organizationSettings.setSurvey_settings( surveySettings );
         }
-        
+
         ContactDetailsSettings contactSettings = getContactDetailsSettingsFromBranch( branch );
         organizationSettings.setContact_details( contactSettings );
         organizationSettings.setLockSettings( new LockSettings() );
