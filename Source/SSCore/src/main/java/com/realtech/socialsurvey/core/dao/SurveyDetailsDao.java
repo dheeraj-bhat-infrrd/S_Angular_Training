@@ -151,4 +151,7 @@ public interface SurveyDetailsDao
 
 
     void resetZillowCallCount();
+
+
+    public void updateSurveyDetails( SurveyDetails surveyDetails );
 }

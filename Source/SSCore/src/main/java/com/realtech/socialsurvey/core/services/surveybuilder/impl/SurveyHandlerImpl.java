@@ -26,7 +26,6 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.google.gson.Gson;
-import com.mongodb.util.Hash;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.dao.OrganizationUnitSettingsDao;
 import com.realtech.socialsurvey.core.dao.SurveyDetailsDao;
@@ -1508,6 +1507,7 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
 
 
     @Override
+    @Transactional
     public void deleteZillowSurveysByEntity( String entityType, long entityId ) throws InvalidInputException
     {
         LOG.info( "Method deleteZillowSurveysByEntity() started" );
@@ -1523,6 +1523,7 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
 
 
     @Override
+    @Transactional
     public void deleteExcessZillowSurveysByEntity( String entityType, long entityId ) throws InvalidInputException
     {
         LOG.info( "Method deleteExcessZillowSurveysByEntity() started" );
@@ -1538,6 +1539,7 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
 
 
     @Override
+    @Transactional(readOnly = true)
     public List<AbusiveSurveyReportWrapper> getSurveysReporetedAsAbusive( int startIndex, int numOfRows )
     {
         LOG.info( "Method getSurveysReporetedAsAbusive() to retrieve surveys marked as abusive, started" );
@@ -1563,9 +1565,16 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
     }
 
 
+    @Override
     public SocialPostShared calcualteFinalCount( SocialPostShared socialPostShared, Map<Long, List<String>> agentSharedOn,
         Map<Long, List<String>> branchSharedOn, Map<Long, List<String>> regionSharedOn, Map<Long, List<String>> companySharedOn )
     {
+        long finalAgentCount = 0;
+        long finalRegionCount = 0;
+        long finalBranchCount = 0;
+        long finalCompanyCount = 0;
+
+
         Map<Long, Long> agentMap = socialPostShared.getAgentCountMap();
         if ( agentMap == null ) {
             agentMap = new HashMap<Long, Long>();
@@ -1586,8 +1595,61 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
 
         for ( Map.Entry<Long, List<String>> entry : agentSharedOn.entrySet() ) {
             long agentCount = agentMap.get( entry.getKey() );
-            
+            List<String> sharedOnList = entry.getValue();
+            if ( sharedOnList != null ) {
+                agentCount = agentCount + sharedOnList.size();
+            }
+            finalAgentCount = finalAgentCount + agentCount;
+            agentMap.put( entry.getKey(), agentCount );
+
         }
+        for ( Map.Entry<Long, List<String>> entry : branchSharedOn.entrySet() ) {
+            long branchCount = branchMap.get( entry.getKey() );
+            List<String> sharedOnList = entry.getValue();
+            if ( sharedOnList != null ) {
+                branchCount = branchCount + sharedOnList.size();
+            }
+            finalBranchCount += branchCount;
+            agentMap.put( entry.getKey(), branchCount + finalAgentCount );
+
+        }
+        for ( Map.Entry<Long, List<String>> entry : regionSharedOn.entrySet() ) {
+            long regionCount = regionMap.get( entry.getKey() );
+            List<String> sharedOnList = entry.getValue();
+            if ( sharedOnList != null ) {
+                regionCount = regionCount + sharedOnList.size();
+            }
+            finalRegionCount += regionCount;
+            agentMap.put( entry.getKey(), regionCount + finalBranchCount + finalAgentCount );
+
+        }
+
+        for ( Map.Entry<Long, List<String>> entry : companySharedOn.entrySet() ) {
+            long companyCount = companyMap.get( entry.getKey() );
+            List<String> sharedOnList = entry.getValue();
+            if ( sharedOnList != null ) {
+                companyCount = companyCount + sharedOnList.size();
+            }
+            finalCompanyCount += companyCount;
+            companyMap.put( entry.getKey(), companyCount + finalRegionCount + finalBranchCount + finalAgentCount );
+
+        }
+        socialPostShared.setAgentCountMap( agentMap );
+        socialPostShared.setBranchCountMap( branchMap );
+        socialPostShared.setRegionCountMap( regionMap );
+        socialPostShared.setCompanyCountMap( companyMap );
+        socialPostShared.setTotalCount( finalCompanyCount + finalRegionCount + finalBranchCount + finalAgentCount );
+
+        return socialPostShared;
+    }
+
+
+    @Override
+    @Transactional
+    public void updateSurveyDetails( SurveyDetails surveyDetails )
+    {
+        surveyDetailsDao.updateSurveyDetails( surveyDetails );
+        
     }
 }
 // JIRA SS-119 by RM-05:EOC

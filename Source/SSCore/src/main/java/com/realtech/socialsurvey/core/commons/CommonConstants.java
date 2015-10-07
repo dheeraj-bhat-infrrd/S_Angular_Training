@@ -187,6 +187,7 @@ public interface CommonConstants
     public static final String REVIEW_COUNT_MONGO = "reviewCount";
     public static final String EDITABLE_SURVEY_COLUMN = "editable";
     public static final String AGREE_SHARE_COLUMN = "agreedToShare";
+    public static final String SOCIAL_POST_SHARED_COLUMN = "socialPostShared";
     public static final String SUBSCRIPTION_ID_SOURCE_BRAINTREE = "Braintree";
     public static final String SURVEY_ID_COLUMN = "surveyId";
     public static final String ABUSE_REPORTERS_COLUMN = "abuseReporters";
