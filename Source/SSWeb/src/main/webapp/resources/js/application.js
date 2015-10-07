@@ -4625,14 +4625,15 @@ function fetchUsers(newIndex) {
 	if (profileLevel != undefined && profileLevel != "") {
 		fetchUsersByProfileLevel(iden, profileLevel, newIndex);
 	} else {
-		var formData = new FormData();
-		formData.append("find-pro-first-name", $('#fp-first-name-pattern').val());
-		formData.append("find-pro-last-name", $('#fp-last-name-pattern').val());
-		formData.append("find-pro-start-index", newIndex);
-		formData.append("find-pro-row-size", rowSize);
+		var payload = {
+			"find-pro-first-name" : $('#fp-first-name-pattern').val(),
+			"find-pro-last-name" : $('#fp-last-name-pattern').val(),
+			"find-pro-start-index" : newIndex,
+			"find-pro-row-size" : rowSize
+		};
 		
 		if (!($('#find-pro-first-name').val() == "" && $('#find-pro-last-name').val() == ""))
-			callAjaxPOSTWithTextData("./findaproscroll.do", paginateUsersProList, true, formData);
+			callAjaxPostWithPayloadData("./findaproscroll.do", paginateUsersProList, payload, true);
 		else
 			hideOverlay();
 	}
@@ -8527,6 +8528,7 @@ $(document).on('click', '#wc-send-survey', function() {
 				receiver.firstname = firstname;
 				receiver.lastname = lastname;
 				receiver.emailId = emailId;
+				receiver.agentEmailId = agentEmailId;
 				if (dataName == 'agent-name') {
 					receiver.agentId = agentId;
 					if(agentId == undefined){
@@ -8552,16 +8554,30 @@ $(document).on('click', '#wc-send-survey', function() {
 			}
 		}
 	});
-
-	if(exit){
-		exit = false;
-		return false;
-	}
 	
 	//Check if recievers list empty
 	if(receiversList.length == 0){
 		$('#overlay-toast').html('Add customers to send survey request!');
 		showToast();
+		exit = false;
+		return false;
+	}
+	
+	//check if there is no duplicate entries
+	var receiversListLength = receiversList.length;
+	
+	for (var i = 0; i < receiversListLength; i++){
+		for (var j = i+1; j < receiversListLength; j++){
+			if( receiversList[i].emailId == receiversList[j].emailId && receiversList[i].agentEmailId == receiversList[j].agentEmailId ){
+				$('#overlay-toast').html("Can't enter same email address multiple times for same user");
+				showToast();
+				exit = true;
+				return false;
+			}
+		}
+	}
+
+	if(exit){
 		exit = false;
 		return false;
 	}
