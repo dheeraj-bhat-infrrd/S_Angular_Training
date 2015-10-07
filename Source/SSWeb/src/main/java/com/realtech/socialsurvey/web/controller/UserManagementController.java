@@ -93,9 +93,9 @@ public class UserManagementController
 
     @Autowired
     private OrganizationManagementService organizationManagementService;
-    
+
     @Autowired
-	private OrganizationUnitSettingsDao organizationUnitSettingsDao;
+    private OrganizationUnitSettingsDao organizationUnitSettingsDao;
 
     @Autowired
     private ProfileManagementService profileManagementService;
@@ -115,7 +115,7 @@ public class UserManagementController
 
     @Autowired
     private Utils utils;
-    
+
     private final static int SOLR_BATCH_SIZE = 20;
 
 
@@ -300,83 +300,84 @@ public class UserManagementController
     }
 
 
-	/*
-	 * Method to fetch list of all the users who belong to the same as that of current user. Current
-	 * user is company admin who can assign different roles to other users.
-	 */
-	@RequestMapping(value = "/findusersforcompany", method = RequestMethod.GET)
-	public String findUsersForCompany(Model model, HttpServletRequest request) {
-		LOG.info("Method to fetch user by user, findUserByUserId() started.");
-		int startIndex = 0;
-		int batchSize = 0;
+    /*
+     * Method to fetch list of all the users who belong to the same as that of current user. Current
+     * user is company admin who can assign different roles to other users.
+     */
+    @RequestMapping ( value = "/findusersforcompany", method = RequestMethod.GET)
+    public String findUsersForCompany( Model model, HttpServletRequest request )
+    {
+        LOG.info( "Method to fetch user by user, findUserByUserId() started." );
+        int startIndex = 0;
+        int batchSize = 0;
 
-		try {
-			String startIndexStr = request.getParameter("startIndex");
-			String batchSizeStr = request.getParameter("batchSize");
-			try {
-				if (startIndexStr == null || startIndexStr.isEmpty()) {
-					LOG.error("Invalid value found in startIndex. It cannot be null or empty.");
-					throw new InvalidInputException("Invalid value found in startIndex. It cannot be null or empty.");
-				}
-				if (batchSizeStr == null || batchSizeStr.isEmpty()) {
-					LOG.error("Invalid value found in batchSizeStr. It cannot be null or empty.");
-					batchSize = SOLR_BATCH_SIZE;
-				}
+        try {
+            String startIndexStr = request.getParameter( "startIndex" );
+            String batchSizeStr = request.getParameter( "batchSize" );
+            try {
+                if ( startIndexStr == null || startIndexStr.isEmpty() ) {
+                    LOG.error( "Invalid value found in startIndex. It cannot be null or empty." );
+                    throw new InvalidInputException( "Invalid value found in startIndex. It cannot be null or empty." );
+                }
+                if ( batchSizeStr == null || batchSizeStr.isEmpty() ) {
+                    LOG.error( "Invalid value found in batchSizeStr. It cannot be null or empty." );
+                    batchSize = SOLR_BATCH_SIZE;
+                }
 
-				startIndex = Integer.parseInt(startIndexStr);
-				batchSize = Integer.parseInt(batchSizeStr);
-			}
-			catch (NumberFormatException e) {
-				LOG.error("NumberFormatException while searching for user id. Reason : " + e.getMessage(), e);
-				throw new NonFatalException("NumberFormatException while searching for user id", e);
-			}
+                startIndex = Integer.parseInt( startIndexStr );
+                batchSize = Integer.parseInt( batchSizeStr );
+            } catch ( NumberFormatException e ) {
+                LOG.error( "NumberFormatException while searching for user id. Reason : " + e.getMessage(), e );
+                throw new NonFatalException( "NumberFormatException while searching for user id", e );
+            }
 
-			User admin = sessionHelper.getCurrentUser();
-			if (admin == null) {
-				LOG.error("No user found in session");
-				throw new InvalidInputException("No user found in session", DisplayMessageConstants.NO_USER_IN_SESSION);
-			}
+            User admin = sessionHelper.getCurrentUser();
+            if ( admin == null ) {
+                LOG.error( "No user found in session" );
+                throw new InvalidInputException( "No user found in session", DisplayMessageConstants.NO_USER_IN_SESSION );
+            }
 
-			// fetching admin details
-			UserFromSearch adminUser;
-			try {
-				String adminUserDoc = JSONUtil.toJSON(solrSearchService.getUserByUniqueId(admin.getUserId()));
-				Type searchedUser = new TypeToken<UserFromSearch>() {}.getType();
-				adminUser = new Gson().fromJson(adminUserDoc.toString(), searchedUser);
-			}
-			catch (SolrException e) {
-				LOG.error("SolrException while searching for user id. Reason : " + e.getMessage(), e);
-				throw new NonFatalException("SolrException while searching for user id.", e);
-			}
+            // fetching admin details
+            UserFromSearch adminUser;
+            try {
+                String adminUserDoc = JSONUtil.toJSON( solrSearchService.getUserByUniqueId( admin.getUserId() ) );
+                Type searchedUser = new TypeToken<UserFromSearch>() {}.getType();
+                adminUser = new Gson().fromJson( adminUserDoc.toString(), searchedUser );
+            } catch ( SolrException e ) {
+                LOG.error( "SolrException while searching for user id. Reason : " + e.getMessage(), e );
+                throw new NonFatalException( "SolrException while searching for user id.", e );
+            }
 
-			// fetching users from solr
-			try {
-				SolrDocumentList results = solrSearchService.searchUsersByCompany(admin.getCompany().getCompanyId(), startIndex, batchSize);
-				
-				String users = new Gson().toJson(solrSearchService.getUsersFromSolrDocuments(results));
-				Type searchedUsersList = new TypeToken<List<UserFromSearch>>() {}.getType();
-				List<UserFromSearch> usersList = new Gson().fromJson(users, searchedUsersList);
+            // fetching users from solr
+            try {
+                SolrDocumentList results = solrSearchService.searchUsersByCompany( admin.getCompany().getCompanyId(),
+                    startIndex, batchSize );
 
-				usersList = userManagementService.checkUserCanEdit(admin, adminUser, usersList);
-				model.addAttribute("userslist", usersList);
-				
-				model.addAttribute("numFound", results.getNumFound());
-				LOG.debug("Users List: " + usersList.toString());
-			}
-			catch (MalformedURLException e) {
-				LOG.error("MalformedURLException while searching for user id. Reason : " + e.getMessage(), e);
-				throw new NonFatalException("MalformedURLException while searching for user id.", DisplayMessageConstants.GENERAL_ERROR, e);
-			}
-		}
-		catch (NonFatalException nonFatalException) {
-			LOG.error("NonFatalException while searching for user id. Reason : " + nonFatalException.getStackTrace(), nonFatalException);
-			model.addAttribute("message", messageUtils.getDisplayMessage(nonFatalException.getErrorCode(), DisplayMessageType.ERROR_MESSAGE));
-			return JspResolver.MESSAGE_HEADER;
-		}
+                String users = new Gson().toJson( solrSearchService.getUsersFromSolrDocuments( results ) );
+                Type searchedUsersList = new TypeToken<List<UserFromSearch>>() {}.getType();
+                List<UserFromSearch> usersList = new Gson().fromJson( users, searchedUsersList );
 
-		LOG.info("Method to fetch users by company , findUsersForCompany() finished.");
-		return JspResolver.USER_LIST_FOR_MANAGEMENT;
-	}
+                usersList = userManagementService.checkUserCanEdit( admin, adminUser, usersList );
+                model.addAttribute( "userslist", usersList );
+
+                model.addAttribute( "numFound", results.getNumFound() );
+                LOG.debug( "Users List: " + usersList.toString() );
+            } catch ( MalformedURLException e ) {
+                LOG.error( "MalformedURLException while searching for user id. Reason : " + e.getMessage(), e );
+                throw new NonFatalException( "MalformedURLException while searching for user id.",
+                    DisplayMessageConstants.GENERAL_ERROR, e );
+            }
+        } catch ( NonFatalException nonFatalException ) {
+            LOG.error( "NonFatalException while searching for user id. Reason : " + nonFatalException.getStackTrace(),
+                nonFatalException );
+            model.addAttribute( "message",
+                messageUtils.getDisplayMessage( nonFatalException.getErrorCode(), DisplayMessageType.ERROR_MESSAGE ) );
+            return JspResolver.MESSAGE_HEADER;
+        }
+
+        LOG.info( "Method to fetch users by company , findUsersForCompany() finished." );
+        return JspResolver.USER_LIST_FOR_MANAGEMENT;
+    }
 
 
     /*
@@ -389,7 +390,7 @@ public class UserManagementController
         LOG.info( "Method to find users by email id called." );
         String users = "";
         int startIndex = 0;
-		int batchSize = 0;
+        int batchSize = 0;
         try {
             String searchKey = request.getParameter( "searchKey" );
             if ( searchKey == null ) {
@@ -397,16 +398,15 @@ public class UserManagementController
                 throw new InvalidInputException( "Invalid searchKey passed in method findUserByEmail()." );
             }
 
-            String startIndexStr = request.getParameter("startIndex");
-			String batchSizeStr = request.getParameter("batchSize");
-			try {
-				startIndex = Integer.parseInt(startIndexStr);
-				batchSize = Integer.parseInt(batchSizeStr);
-			}
-			catch (NumberFormatException e) {
-				LOG.error("NumberFormatException while searching for user id. Reason : " + e.getMessage(), e);
-			}
-            
+            String startIndexStr = request.getParameter( "startIndex" );
+            String batchSizeStr = request.getParameter( "batchSize" );
+            try {
+                startIndex = Integer.parseInt( startIndexStr );
+                batchSize = Integer.parseInt( batchSizeStr );
+            } catch ( NumberFormatException e ) {
+                LOG.error( "NumberFormatException while searching for user id. Reason : " + e.getMessage(), e );
+            }
+
             User user = sessionHelper.getCurrentUser();
             if ( user == null ) {
                 LOG.error( "No user found in current session in findUserByEmail()." );
@@ -414,10 +414,11 @@ public class UserManagementController
             }
 
             try {
-            	SolrDocumentList usersResult = solrSearchService.searchUsersByLoginNameOrName( searchKey, user.getCompany().getCompanyId(), startIndex, batchSize);
-                users = new Gson().toJson(solrSearchService.getUsersFromSolrDocuments(usersResult));
-    			LOG.debug("User search result is : " + usersResult);
-                model.addAttribute("numFound", usersResult.getNumFound());
+                SolrDocumentList usersResult = solrSearchService.searchUsersByLoginNameOrName( searchKey, user.getCompany()
+                    .getCompanyId(), startIndex, batchSize );
+                users = new Gson().toJson( solrSearchService.getUsersFromSolrDocuments( usersResult ) );
+                LOG.debug( "User search result is : " + usersResult );
+                model.addAttribute( "numFound", usersResult.getNumFound() );
             } catch ( InvalidInputException invalidInputException ) {
                 throw new InvalidInputException( invalidInputException.getMessage(), invalidInputException );
             } catch ( MalformedURLException e ) {
@@ -917,259 +918,256 @@ public class UserManagementController
     }
 
 
-	/**
-	 * Method to show registration completion page to the user. User can update first name, last
-	 * name here. User must update the password for completion of registration.
-	 * 
-	 * @param model
-	 * @param request
-	 * @return
-	 * @throws InvalidInputException
-	 */
-	@RequestMapping(value = "/showcompleteregistrationpage", method = RequestMethod.GET)
-	public String showCompleteRegistrationPage(HttpServletRequest request, @RequestParam("q") String encryptedUrlParams, Model model,
-			RedirectAttributes redirectAttributes) {
-		LOG.info("Method showCompleteRegistrationPage() to complete registration of user started.");
+    /**
+     * Method to show registration completion page to the user. User can update first name, last
+     * name here. User must update the password for completion of registration.
+     * 
+     * @param model
+     * @param request
+     * @return
+     * @throws InvalidInputException
+     */
+    @RequestMapping ( value = "/showcompleteregistrationpage", method = RequestMethod.GET)
+    public String showCompleteRegistrationPage( HttpServletRequest request, @RequestParam ( "q") String encryptedUrlParams,
+        Model model, RedirectAttributes redirectAttributes )
+    {
+        LOG.info( "Method showCompleteRegistrationPage() to complete registration of user started." );
 
-		// Check for existing session
-		if (sessionHelper.isUserActiveSessionExists()) {
-			LOG.info("Existing Active Session detected");
+        // Check for existing session
+        if ( sessionHelper.isUserActiveSessionExists() ) {
+            LOG.info( "Existing Active Session detected" );
 
-			// Invalidate session in browser
-			request.getSession(false).invalidate();
-			SecurityContextHolder.clearContext();
-		}
+            // Invalidate session in browser
+            request.getSession( false ).invalidate();
+            SecurityContextHolder.clearContext();
+        }
 
-		try {
-			Map<String, String> urlParams = null;
-			try {
-				urlParams = urlGenerator.decryptParameters(encryptedUrlParams);
-			}
-			catch (InvalidInputException e) {
-				LOG.error("Invalid Input exception in decrypting url parameters in showCompleteRegistrationPage(). Reason " + e.getMessage(), e);
-				throw new InvalidInputException(e.getMessage(), DisplayMessageConstants.GENERAL_ERROR, e);
-			}
+        try {
+            Map<String, String> urlParams = null;
+            try {
+                urlParams = urlGenerator.decryptParameters( encryptedUrlParams );
+            } catch ( InvalidInputException e ) {
+                LOG.error( "Invalid Input exception in decrypting url parameters in showCompleteRegistrationPage(). Reason "
+                    + e.getMessage(), e );
+                throw new InvalidInputException( e.getMessage(), DisplayMessageConstants.GENERAL_ERROR, e );
+            }
 
-			// fetching details from urlparams
-			long companyId;
-			try {
-				companyId = Long.parseLong(urlParams.get(CommonConstants.COMPANY));
-			}
-			catch (NumberFormatException e) {
-				throw new NonFatalException(e.getMessage(), DisplayMessageConstants.INVALID_REGISTRATION_INVITE, e);
-			}
+            // fetching details from urlparams
+            long companyId;
+            try {
+                companyId = Long.parseLong( urlParams.get( CommonConstants.COMPANY ) );
+            } catch ( NumberFormatException e ) {
+                throw new NonFatalException( e.getMessage(), DisplayMessageConstants.INVALID_REGISTRATION_INVITE, e );
+            }
 
-			// checking status of user
-			String emailId = urlParams.get(CommonConstants.EMAIL_ID);
-			User newUser = null;
-			try{
-				newUser = userManagementService.getUserByEmailAndCompany(companyId, emailId);
-			}catch(NoRecordsFetchedException e){
-				throw new NonFatalException( "No users found with the login name : {}" , DisplayMessageConstants.USER_LINK_EXPIRED );
-			}
+            // checking status of user
+            String emailId = urlParams.get( CommonConstants.EMAIL_ID );
+            User newUser = null;
+            try {
+                newUser = userManagementService.getUserByEmailAndCompany( companyId, emailId );
+            } catch ( NoRecordsFetchedException e ) {
+                throw new NonFatalException( "No users found with the login name : {}",
+                    DisplayMessageConstants.USER_LINK_EXPIRED );
+            }
 
-			if (newUser.getStatus() == CommonConstants.STATUS_NOT_VERIFIED) {
-				redirectAttributes.addFlashAttribute(CommonConstants.COMPANY, urlParams.get(CommonConstants.COMPANY));
-				redirectAttributes.addFlashAttribute(CommonConstants.FIRST_NAME, urlParams.get(CommonConstants.FIRST_NAME));
-				redirectAttributes.addFlashAttribute(CommonConstants.EMAIL_ID, emailId);
-				redirectAttributes.addFlashAttribute("q", encryptedUrlParams);
+            if ( newUser.getStatus() == CommonConstants.STATUS_NOT_VERIFIED ) {
+                redirectAttributes.addFlashAttribute( CommonConstants.COMPANY, urlParams.get( CommonConstants.COMPANY ) );
+                redirectAttributes.addFlashAttribute( CommonConstants.FIRST_NAME, urlParams.get( CommonConstants.FIRST_NAME ) );
+                redirectAttributes.addFlashAttribute( CommonConstants.EMAIL_ID, emailId );
+                redirectAttributes.addFlashAttribute( "q", encryptedUrlParams );
 
-				User user = userManagementService.getUserByEmail(emailId);
-				AgentSettings agentSettings = userManagementService.getAgentSettingsForUserProfiles(user.getUserId());
-				if (agentSettings == null) {
-					throw new InvalidInputException("Settings not found for the given user.");
-				}
-				redirectAttributes.addFlashAttribute("profileUrl", agentSettings.getCompleteProfileUrl());
+                User user = userManagementService.getUserByEmail( emailId );
+                AgentSettings agentSettings = userManagementService.getAgentSettingsForUserProfiles( user.getUserId() );
+                if ( agentSettings == null ) {
+                    throw new InvalidInputException( "Settings not found for the given user." );
+                }
+                redirectAttributes.addFlashAttribute( "profileUrl", agentSettings.getCompleteProfileUrl() );
 
-				String lastName = urlParams.get(CommonConstants.LAST_NAME);
-				if (lastName != null && !lastName.isEmpty()) {
-					redirectAttributes.addFlashAttribute(CommonConstants.LAST_NAME, lastName);
-				}
-				LOG.debug("Validation of url completed. Service returning params to be prepopulated in registration page");
-			}
-			else {
-				LOG.debug("The registration url had been used earlier");
-				redirectAttributes.addFlashAttribute("message", "The registration url is no longer valid");
-				redirectAttributes.addFlashAttribute("status", DisplayMessageType.ERROR_MESSAGE);
-				return "redirect:/" + JspResolver.LOGIN + ".do";
-			}
-			LOG.info("Method showCompleteRegistrationPage() to complete registration of user finished.");
-		}
-		catch (NonFatalException e) {
-			LOG.error("NonFatalException in showCompleteRegistrationPage(). Reason : " + e.getMessage(), e);
-			return   JspResolver.LINK_EXPIRED;
-		}
+                String lastName = urlParams.get( CommonConstants.LAST_NAME );
+                if ( lastName != null && !lastName.isEmpty() ) {
+                    redirectAttributes.addFlashAttribute( CommonConstants.LAST_NAME, lastName );
+                }
+                LOG.debug( "Validation of url completed. Service returning params to be prepopulated in registration page" );
+            } else {
+                LOG.debug( "The registration url had been used earlier" );
+                redirectAttributes.addFlashAttribute( "message", "The registration url is no longer valid" );
+                redirectAttributes.addFlashAttribute( "status", DisplayMessageType.ERROR_MESSAGE );
+                return "redirect:/" + JspResolver.LOGIN + ".do";
+            }
+            LOG.info( "Method showCompleteRegistrationPage() to complete registration of user finished." );
+        } catch ( NonFatalException e ) {
+            LOG.error( "NonFatalException in showCompleteRegistrationPage(). Reason : " + e.getMessage(), e );
+            return JspResolver.LINK_EXPIRED;
+        }
 
-		return "redirect:/" + JspResolver.COMPLETE_REGISTRATION_PAGE + ".do";
-	}
-	
-	
-	
-	
-	@RequestMapping(value = "/completeregistrationpage")
-	public String initCompleteRegistrationPage() {
-		LOG.info("CompleteRegistration Page started");
-		return JspResolver.COMPLETE_REGISTRATION;
-	}
-	
-	/**
-	 * Method to complete registration of the user.
-	 * 
-	 * @param model
-	 * @param request
-	 * @return
-	 * @throws InvalidInputException
-	 */
-	@RequestMapping(value = "/completeregistration", method = RequestMethod.POST)
-	public String completeRegistration(HttpServletRequest request, RedirectAttributes redirectAttributes) {
-		LOG.info("Method completeRegistration() to complete registration of user started.");
-		User user = null;
+        return "redirect:/" + JspResolver.COMPLETE_REGISTRATION_PAGE + ".do";
+    }
 
-		try {
-			String firstName = request.getParameter(CommonConstants.FIRST_NAME);
-			String lastName = request.getParameter(CommonConstants.LAST_NAME);
-			String emailId = request.getParameter(CommonConstants.EMAIL_ID);
-			String password = request.getParameter("password");
-			String confirmPassword = request.getParameter("confirmPassword");
-			String companyIdStr = request.getParameter("companyId");
-			
-			if(firstName != null && ! firstName.equals("")){
-				firstName = firstName.trim();
-			}
-			
-			if(lastName != null && ! lastName.equals("")){
-				lastName = lastName.trim();
-			}
 
-			// form parameters validation
-			validateCompleteRegistrationForm(firstName, lastName, emailId, password, companyIdStr, confirmPassword);
+    @RequestMapping ( value = "/completeregistrationpage")
+    public String initCompleteRegistrationPage()
+    {
+        LOG.info( "CompleteRegistration Page started" );
+        return JspResolver.COMPLETE_REGISTRATION;
+    }
 
-			// Decrypting URL parameters
-			Map<String, String> urlParams = new HashMap<>();
-			try {
-				String encryptedUrlParameters = request.getParameter("q");
-				urlParams = urlGenerator.decryptParameters(encryptedUrlParameters);
-			}
-			catch (InvalidInputException e) {
-				throw new InvalidInputException(e.getMessage(), DisplayMessageConstants.GENERAL_ERROR, e);
-			}
 
-			// check if email address entered matches with the one in the encrypted url
-			if (!urlParams.get("emailId").equalsIgnoreCase(emailId)) {
-				LOG.error("Invalid Input exception. Reason emailId entered does not match with the one to which the mail was sent");
-				throw new InvalidInputException("Invalid Input exception", DisplayMessageConstants.INVALID_EMAILID);
-			}
+    /**
+     * Method to complete registration of the user.
+     * 
+     * @param model
+     * @param request
+     * @return
+     * @throws InvalidInputException
+     */
+    @RequestMapping ( value = "/completeregistration", method = RequestMethod.POST)
+    public String completeRegistration( HttpServletRequest request, RedirectAttributes redirectAttributes )
+    {
+        LOG.info( "Method completeRegistration() to complete registration of user started." );
+        User user = null;
 
-			long companyId = 0;
-			try {
-				companyId = Long.parseLong(companyIdStr);
-			}
-			catch (NumberFormatException e) {
-				throw new InvalidInputException("NumberFormat exception parsing companyId. Reason : " + e.getMessage(),
-						DisplayMessageConstants.GENERAL_ERROR, e);
-			}
+        try {
+            String firstName = request.getParameter( CommonConstants.FIRST_NAME );
+            String lastName = request.getParameter( CommonConstants.LAST_NAME );
+            String emailId = request.getParameter( CommonConstants.EMAIL_ID );
+            String password = request.getParameter( "password" );
+            String confirmPassword = request.getParameter( "confirmPassword" );
+            String companyIdStr = request.getParameter( "companyId" );
 
-			try {
-				// fetch user object with email Id
-				user = authenticationService.getUserWithLoginNameAndCompanyId(emailId, companyId);
+            if ( firstName != null && !firstName.equals( "" ) ) {
+                firstName = firstName.trim();
+            }
 
-				// calling service to update user details on registration
-				user = userManagementService.updateUserOnCompleteRegistration(user, emailId, companyId, firstName, lastName, password);
-			}
-			catch (InvalidInputException e) {
-				throw new InvalidInputException(e.getMessage(), DisplayMessageConstants.USER_NOT_PRESENT, e);
-			}
+            if ( lastName != null && !lastName.equals( "" ) ) {
+                lastName = lastName.trim();
+            }
 
-			LOG.debug("Adding newly registered user to principal session");
-			sessionHelper.loginOnRegistration(emailId, password);
-			LOG.debug("Successfully added registered user to principal session");
+            // form parameters validation
+            validateCompleteRegistrationForm( firstName, lastName, emailId, password, companyIdStr, confirmPassword );
 
-			AccountType accountType = null;
-			HttpSession session = request.getSession(true);
-			List<LicenseDetail> licenseDetails = user.getCompany().getLicenseDetails();
-			if (licenseDetails != null && !licenseDetails.isEmpty()) {
-				LicenseDetail licenseDetail = licenseDetails.get(0);
-				accountType = AccountType.getAccountType(licenseDetail.getAccountsMaster().getAccountsMasterId());
-				LOG.debug("Adding account type in session");
-				session.setAttribute(CommonConstants.ACCOUNT_TYPE_IN_SESSION, accountType);
-			}
-			else {
-				LOG.debug("License details not found for the user's company");
-			}
+            // Decrypting URL parameters
+            Map<String, String> urlParams = new HashMap<>();
+            try {
+                String encryptedUrlParameters = request.getParameter( "q" );
+                urlParams = urlGenerator.decryptParameters( encryptedUrlParameters );
+            } catch ( InvalidInputException e ) {
+                throw new InvalidInputException( e.getMessage(), DisplayMessageConstants.GENERAL_ERROR, e );
+            }
 
-			// updating the flags for user profiles
-			if (user.getIsAtleastOneUserprofileComplete() == CommonConstants.PROCESS_COMPLETE) {
-				// get the user's canonical settings
-				LOG.info("Fetching the user's canonical settings and setting it in session");
-				sessionHelper.getCanonicalSettings(session);
-				sessionHelper.setSettingVariablesInSession(session);
-				LOG.debug("Updating user count modification notification");
-				userManagementService.updateUserCountModificationNotification(user.getCompany());
-			}
-			else {
-				LOG.info("No User profile present");
-				return "redirect:/" + JspResolver.NO_ACTIVE_PROFILES + ".do";
-			}
+            // check if email address entered matches with the one in the encrypted url
+            if ( !urlParams.get( "emailId" ).equalsIgnoreCase( emailId ) ) {
+                LOG.error( "Invalid Input exception. Reason emailId entered does not match with the one to which the mail was sent" );
+                throw new InvalidInputException( "Invalid Input exception", DisplayMessageConstants.INVALID_EMAILID );
+            }
 
-			// Setting session variable to show linkedin signup and sendsurvey popups only once
-			String popupStatus = (String) session.getAttribute(CommonConstants.POPUP_FLAG_IN_SESSION);
-			if (popupStatus == null) {
-				session.setAttribute(CommonConstants.POPUP_FLAG_IN_SESSION, CommonConstants.YES_STRING);
-			}
-			else if (popupStatus.equals(CommonConstants.YES_STRING)) {
-				session.setAttribute(CommonConstants.POPUP_FLAG_IN_SESSION, CommonConstants.NO_STRING);
-			}
+            long companyId = 0;
+            try {
+                companyId = Long.parseLong( companyIdStr );
+            } catch ( NumberFormatException e ) {
+                throw new InvalidInputException( "NumberFormat exception parsing companyId. Reason : " + e.getMessage(),
+                    DisplayMessageConstants.GENERAL_ERROR, e );
+            }
 
-			// updating session with signup path params
-			LOG.debug("Updating session with selected user profile if not set");
-			boolean showLinkedInPopup = false;
-			boolean showSendSurveyPopup = false;
-			List<UserProfile> profiles = userManagementService.getAllUserProfilesForUser(user);
-			for (UserProfile profile : profiles) {
-				if (profile.getProfilesMaster().getProfileId() == CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID) {
-					showLinkedInPopup = true;
-					showSendSurveyPopup = true;
-					break;
-				}
-			}
-			redirectAttributes.addFlashAttribute("showLinkedInPopup", String.valueOf(showLinkedInPopup));
-			redirectAttributes.addFlashAttribute("showSendSurveyPopup", String.valueOf(showSendSurveyPopup));
+            try {
+                // fetch user object with email Id
+                user = authenticationService.getUserWithLoginNameAndCompanyId( emailId, companyId );
 
-			// updating session with aggregated user profiles, if not set
-			sessionHelper.processAssignments(session, user);
+                // calling service to update user details on registration
+                user = userManagementService.updateUserOnCompleteRegistration( user, emailId, companyId, firstName, lastName,
+                    password );
+            } catch ( InvalidInputException e ) {
+                throw new InvalidInputException( e.getMessage(), DisplayMessageConstants.USER_NOT_PRESENT, e );
+            }
 
-			// update the last login time and number of logins
-			userManagementService.updateUserLoginTimeAndNum(user);
-		}
-		catch (NonFatalException e) {
-			LOG.error("NonFatalException while setting new Password. Reason : " + e.getMessage(), e);
-			redirectAttributes.addFlashAttribute("message", messageUtils.getDisplayMessage(e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE));
-			return "redirect:/" + JspResolver.COMPLETE_REGISTRATION_PAGE + ".do";
-		}
+            LOG.debug( "Adding newly registered user to principal session" );
+            sessionHelper.loginOnRegistration( emailId, password );
+            LOG.debug( "Successfully added registered user to principal session" );
 
-		LOG.info("Method completeRegistration() to complete registration of user finished.");
-		return "redirect:/" + JspResolver.LANDING + ".do";
-	}
+            AccountType accountType = null;
+            HttpSession session = request.getSession( true );
+            List<LicenseDetail> licenseDetails = user.getCompany().getLicenseDetails();
+            if ( licenseDetails != null && !licenseDetails.isEmpty() ) {
+                LicenseDetail licenseDetail = licenseDetails.get( 0 );
+                accountType = AccountType.getAccountType( licenseDetail.getAccountsMaster().getAccountsMasterId() );
+                LOG.debug( "Adding account type in session" );
+                session.setAttribute( CommonConstants.ACCOUNT_TYPE_IN_SESSION, accountType );
+            } else {
+                LOG.debug( "License details not found for the user's company" );
+            }
 
-	@RequestMapping(value = "/showlinkedindatacompare")
-	public String showLinkedInDataCompare(Model model, HttpServletRequest request) {
-		LOG.info("Method showLinkedInDataCompare() called");
-		HttpSession session = request.getSession(false);
+            // updating the flags for user profiles
+            if ( user.getIsAtleastOneUserprofileComplete() == CommonConstants.PROCESS_COMPLETE ) {
+                // get the user's canonical settings
+                LOG.info( "Fetching the user's canonical settings and setting it in session" );
+                sessionHelper.getCanonicalSettings( session );
+                sessionHelper.setSettingVariablesInSession( session );
+                LOG.debug( "Updating user count modification notification" );
+                userManagementService.updateUserCountModificationNotification( user.getCompany() );
+            } else {
+                LOG.info( "No User profile present" );
+                return "redirect:/" + JspResolver.NO_ACTIVE_PROFILES + ".do";
+            }
 
-		User user = sessionHelper.getCurrentUser();
-		AccountType accountType = (AccountType) session.getAttribute(CommonConstants.ACCOUNT_TYPE_IN_SESSION);
-		UserSettings userSettings = (UserSettings) session.getAttribute(CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION);
-		long entityId = (long) session.getAttribute(CommonConstants.ENTITY_ID_COLUMN);
-		String entityType = (String) session.getAttribute(CommonConstants.ENTITY_TYPE_COLUMN);
+            // Setting session variable to show linkedin signup and sendsurvey popups only once
+            String popupStatus = (String) session.getAttribute( CommonConstants.POPUP_FLAG_IN_SESSION );
+            if ( popupStatus == null ) {
+                session.setAttribute( CommonConstants.POPUP_FLAG_IN_SESSION, CommonConstants.YES_STRING );
+            } else if ( popupStatus.equals( CommonConstants.YES_STRING ) ) {
+                session.setAttribute( CommonConstants.POPUP_FLAG_IN_SESSION, CommonConstants.NO_STRING );
+            }
 
-		long branchId = 0;
-		long regionId = 0;
-		long companyId = 0;
+            // updating session with signup path params
+            LOG.debug( "Updating session with selected user profile if not set" );
+            boolean showLinkedInPopup = false;
+            boolean showSendSurveyPopup = false;
+            List<UserProfile> profiles = userManagementService.getAllUserProfilesForUser( user );
+            for ( UserProfile profile : profiles ) {
+                if ( profile.getProfilesMaster().getProfileId() == CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID ) {
+                    showLinkedInPopup = true;
+                    showSendSurveyPopup = true;
+                    break;
+                }
+            }
+            redirectAttributes.addFlashAttribute( "showLinkedInPopup", String.valueOf( showLinkedInPopup ) );
+            redirectAttributes.addFlashAttribute( "showSendSurveyPopup", String.valueOf( showSendSurveyPopup ) );
+
+            // updating session with aggregated user profiles, if not set
+            sessionHelper.processAssignments( session, user );
+
+            // update the last login time and number of logins
+            userManagementService.updateUserLoginTimeAndNum( user );
+        } catch ( NonFatalException e ) {
+            LOG.error( "NonFatalException while setting new Password. Reason : " + e.getMessage(), e );
+            redirectAttributes.addFlashAttribute( "message",
+                messageUtils.getDisplayMessage( e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE ) );
+            return "redirect:/" + JspResolver.COMPLETE_REGISTRATION_PAGE + ".do";
+        }
+
+        LOG.info( "Method completeRegistration() to complete registration of user finished." );
+        return "redirect:/" + JspResolver.LANDING + ".do";
+    }
+
+
+    @RequestMapping ( value = "/showlinkedindatacompare")
+    public String showLinkedInDataCompare( Model model, HttpServletRequest request )
+    {
+        LOG.info( "Method showLinkedInDataCompare() called" );
+        HttpSession session = request.getSession( false );
+
+        User user = sessionHelper.getCurrentUser();
+        AccountType accountType = (AccountType) session.getAttribute( CommonConstants.ACCOUNT_TYPE_IN_SESSION );
+        UserSettings userSettings = (UserSettings) session.getAttribute( CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION );
+        long entityId = (long) session.getAttribute( CommonConstants.ENTITY_ID_COLUMN );
+        String entityType = (String) session.getAttribute( CommonConstants.ENTITY_TYPE_COLUMN );
+
+        long branchId = 0;
+        long regionId = 0;
+        long companyId = 0;
         long agentId = 0;
         OrganizationUnitSettings profileSettings = null;
         Map<SettingsForApplication, OrganizationUnit> map = null;
-        
-      //Get the hierarchy details associated with the current profile
+
+        //Get the hierarchy details associated with the current profile
         try {
             Map<String, Long> hierarchyDetails = profileManagementService.getHierarchyDetailsByEntity( entityType, entityId );
             if ( hierarchyDetails == null ) {
@@ -1187,26 +1185,25 @@ public class UserManagementController
             model
                 .addAttribute( "message", messageUtils.getDisplayMessage( e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE ) );
         }
-        
-		int profilesMaster = 0;
-		if (entityType.equals(CommonConstants.COMPANY_ID_COLUMN)) {
-			model.addAttribute("columnName", entityType);
-			profilesMaster = CommonConstants.PROFILES_MASTER_COMPANY_ADMIN_PROFILE_ID;
-			
-			OrganizationUnitSettings companyProfile = null;
-			try {
-				companyProfile = organizationManagementService.getCompanySettings( companyId );
-			} catch (InvalidInputException e) {
-				LOG.error("Error occured while fetching company profile", e);
-			}
-			profileSettings = companyProfile;
-			
-		}
-		else if (entityType.equals(CommonConstants.REGION_ID_COLUMN)) {
-			model.addAttribute("columnName", entityType);
-			profilesMaster = CommonConstants.PROFILES_MASTER_REGION_ADMIN_PROFILE_ID;
-			
-			OrganizationUnitSettings regionProfile = null;
+
+        int profilesMaster = 0;
+        if ( entityType.equals( CommonConstants.COMPANY_ID_COLUMN ) ) {
+            model.addAttribute( "columnName", entityType );
+            profilesMaster = CommonConstants.PROFILES_MASTER_COMPANY_ADMIN_PROFILE_ID;
+
+            OrganizationUnitSettings companyProfile = null;
+            try {
+                companyProfile = organizationManagementService.getCompanySettings( companyId );
+            } catch ( InvalidInputException e ) {
+                LOG.error( "Error occured while fetching company profile", e );
+            }
+            profileSettings = companyProfile;
+
+        } else if ( entityType.equals( CommonConstants.REGION_ID_COLUMN ) ) {
+            model.addAttribute( "columnName", entityType );
+            profilesMaster = CommonConstants.PROFILES_MASTER_REGION_ADMIN_PROFILE_ID;
+
+            OrganizationUnitSettings regionProfile = null;
             OrganizationUnitSettings companyProfile = null;
             try {
                 companyProfile = organizationManagementService.getCompanySettings( companyId );
@@ -1220,22 +1217,21 @@ public class UserManagementController
                         throw new FatalException( "Unable to fetch primary profile this user " + regionProfile.getIden() );
                     }
                 } catch ( InvalidSettingsStateException | ProfileNotFoundException e ) {
-                	LOG.error("Error occured while fetching region profile", e);
+                    LOG.error( "Error occured while fetching region profile", e );
                 }
                 regionProfile = profileManagementService.fillUnitSettings( regionProfile,
-                        MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION, companyProfile, regionProfile, null, null,
-                        map );
+                    MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION, companyProfile, regionProfile, null, null,
+                    map );
             } catch ( InvalidInputException e ) {
-                LOG.error("Error occured while fetching region profile", e);
+                LOG.error( "Error occured while fetching region profile", e );
             }
             profileSettings = regionProfile;
-			
-		}
-		else if (entityType.equals(CommonConstants.BRANCH_ID_COLUMN)) {
-			model.addAttribute("columnName", entityType);
-			profilesMaster = CommonConstants.PROFILES_MASTER_BRANCH_ADMIN_PROFILE_ID;
-			
-			OrganizationUnitSettings companyProfile = null;
+
+        } else if ( entityType.equals( CommonConstants.BRANCH_ID_COLUMN ) ) {
+            model.addAttribute( "columnName", entityType );
+            profilesMaster = CommonConstants.PROFILES_MASTER_BRANCH_ADMIN_PROFILE_ID;
+
+            OrganizationUnitSettings companyProfile = null;
             OrganizationUnitSettings branchProfile = null;
             OrganizationUnitSettings regionProfile = null;
 
@@ -1253,23 +1249,22 @@ public class UserManagementController
                     }
 
                 } catch ( InvalidSettingsStateException | ProfileNotFoundException e ) {
-                	LOG.error("Error occured while fetching branch profile", e);
+                    LOG.error( "Error occured while fetching branch profile", e );
                 }
                 branchProfile = profileManagementService.fillUnitSettings( branchProfile,
-                        MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION, companyProfile, regionProfile,
-                        branchProfile, null, map );
+                    MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION, companyProfile, regionProfile,
+                    branchProfile, null, map );
             } catch ( InvalidInputException e ) {
-            	LOG.error("Error occured while fetching branch profile", e);
+                LOG.error( "Error occured while fetching branch profile", e );
             } catch ( NoRecordsFetchedException e ) {
                 LOG.error( "NoRecordsFetchedException: message : " + e.getMessage(), e );
             }
             profileSettings = branchProfile;
-		}
-		else if (entityType.equals(CommonConstants.AGENT_ID_COLUMN)) {
-			model.addAttribute("columnName", CommonConstants.AGENT_ID_COLUMN);
-			profilesMaster = CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID;
-			
-			OrganizationUnitSettings companyProfile = null;
+        } else if ( entityType.equals( CommonConstants.AGENT_ID_COLUMN ) ) {
+            model.addAttribute( "columnName", CommonConstants.AGENT_ID_COLUMN );
+            profilesMaster = CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID;
+
+            OrganizationUnitSettings companyProfile = null;
             OrganizationUnitSettings regionProfile = null;
             OrganizationUnitSettings branchProfile = null;
             AgentSettings individualProfile = null;
@@ -1301,18 +1296,18 @@ public class UserManagementController
                     MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION, companyProfile, regionProfile,
                     branchProfile, individualProfile, map );
             } catch ( InvalidInputException e ) {
-            	LOG.error( "InvalidInputException: message : " + e.getMessage(), e );
+                LOG.error( "InvalidInputException: message : " + e.getMessage(), e );
             } catch ( NoRecordsFetchedException e ) {
                 LOG.error( "NoRecordsFetchedException: message : " + e.getMessage(), e );
             }
             profileSettings = individualProfile;
-		}
+        }
 
-		model.addAttribute( "profileSettings", profileSettings );
-		session.setAttribute(CommonConstants.USER_PROFILE_SETTINGS, profileSettings);
+        model.addAttribute( "profileSettings", profileSettings );
+        session.setAttribute( CommonConstants.USER_PROFILE_SETTINGS, profileSettings );
 
-		// Setting parentLock in session
-		LockSettings parentLock = null;
+        // Setting parentLock in session
+        LockSettings parentLock = null;
         try {
             parentLock = profileManagementService.fetchHierarchyLockSettings( companyId, branchId, regionId, entityType );
         } catch ( NonFatalException e ) {
@@ -1320,9 +1315,9 @@ public class UserManagementController
         }
         session.setAttribute( CommonConstants.PARENT_LOCK, parentLock );
 
-		LOG.info("Method showLinkedInDataCompare() finished");
-		return JspResolver.LINKEDIN_COMPARE;
-	}
+        LOG.info( "Method showLinkedInDataCompare() finished" );
+        return JspResolver.LINKEDIN_COMPARE;
+    }
 
 
     @ResponseBody
@@ -1359,7 +1354,7 @@ public class UserManagementController
             LOG.error( "Last name invalid" );
             throw new InvalidInputException( "Last name invalid", DisplayMessageConstants.INVALID_LASTNAME );
         }
-        if ( emailId == null || emailId.isEmpty() || !emailId.trim().matches( CommonConstants.EMAIL_REGEX ) ) {
+        if ( emailId == null || emailId.isEmpty() || !organizationManagementService.validateEmail( emailId ) ) {
             LOG.error( "EmailId not valid" );
             throw new InvalidInputException( "EmailId not valid", DisplayMessageConstants.INVALID_EMAILID );
         }
@@ -1437,239 +1432,240 @@ public class UserManagementController
     }
 
 
-	@RequestMapping(value = "/finduserassignments", method = RequestMethod.GET)
-	public String getUserAssignments(Model model, HttpServletRequest request) {
-		LOG.info("Method getUserAssignments() called from UserManagementController");
-		HttpSession session = request.getSession();
+    @RequestMapping ( value = "/finduserassignments", method = RequestMethod.GET)
+    public String getUserAssignments( Model model, HttpServletRequest request )
+    {
+        LOG.info( "Method getUserAssignments() called from UserManagementController" );
+        HttpSession session = request.getSession();
 
-		try {
-			long userId = 0l;
-			try {
-				userId = Long.parseLong(request.getParameter("userId"));
-			}
-			catch (NumberFormatException e) {
-				throw new InvalidInputException("NumberFormatException while parsing userId.Reason: " + e.getMessage(),
-						DisplayMessageConstants.GENERAL_ERROR, e);
-			}
-			User user = null;
-			try {
-				user = userManagementService.getUserByUserId(userId);
-			}
-			catch (InvalidInputException e) {
-				throw new InvalidInputException("InvalidInputException while getting user.Reason: " + e.getMessage(),
-						DisplayMessageConstants.GENERAL_ERROR, e);
-			}
+        try {
+            long userId = 0l;
+            try {
+                userId = Long.parseLong( request.getParameter( "userId" ) );
+            } catch ( NumberFormatException e ) {
+                throw new InvalidInputException( "NumberFormatException while parsing userId.Reason: " + e.getMessage(),
+                    DisplayMessageConstants.GENERAL_ERROR, e );
+            }
+            User user = null;
+            try {
+                user = userManagementService.getUserByUserId( userId );
+            } catch ( InvalidInputException e ) {
+                throw new InvalidInputException( "InvalidInputException while getting user.Reason: " + e.getMessage(),
+                    DisplayMessageConstants.GENERAL_ERROR, e );
+            }
 
-			UserHierarchyAssignments assignments = (UserHierarchyAssignments) session.getAttribute(CommonConstants.USER_ASSIGNMENTS);
-			Map<Long, String> regions = assignments.getRegions();
-			Map<Long, String> branches = assignments.getBranches();
+            UserHierarchyAssignments assignments = (UserHierarchyAssignments) session
+                .getAttribute( CommonConstants.USER_ASSIGNMENTS );
+            Map<Long, String> regions = assignments.getRegions();
+            Map<Long, String> branches = assignments.getBranches();
 
-			String branchName = "";
-			String regionName = "";
-			List<UserAssignment> userAssignments = new ArrayList<UserAssignment>();
-			for (UserProfile userProfile : user.getUserProfiles()) {
-				// Check if profile is complete
-				if (userProfile.getIsProfileComplete() != CommonConstants.PROCESS_COMPLETE
-						|| userProfile.getStatus() != CommonConstants.STATUS_ACTIVE) {
-					continue;
-				}
-				UserAssignment assignment = new UserAssignment();
-				assignment.setUserId(user.getUserId());
-				assignment.setProfileId(userProfile.getUserProfileId());
-				assignment.setStatus(userProfile.getStatus());
+            String branchName = "";
+            String regionName = "";
+            List<UserAssignment> userAssignments = new ArrayList<UserAssignment>();
+            for ( UserProfile userProfile : user.getUserProfiles() ) {
+                // Check if profile is complete
+                if ( userProfile.getIsProfileComplete() != CommonConstants.PROCESS_COMPLETE
+                    || userProfile.getStatus() != CommonConstants.STATUS_ACTIVE ) {
+                    continue;
+                }
+                UserAssignment assignment = new UserAssignment();
+                assignment.setUserId( user.getUserId() );
+                assignment.setProfileId( userProfile.getUserProfileId() );
+                assignment.setStatus( userProfile.getStatus() );
 
-				long regionId;
-				long branchId;
-				int profileMaster = userProfile.getProfilesMaster().getProfileId();
-				switch (profileMaster) {
-					case CommonConstants.PROFILES_MASTER_REGION_ADMIN_PROFILE_ID:
-						regionId = userProfile.getRegionId();
-						if (regionId == 0l) {
-							continue;
-						}
+                long regionId;
+                long branchId;
+                int profileMaster = userProfile.getProfilesMaster().getProfileId();
+                switch ( profileMaster ) {
+                    case CommonConstants.PROFILES_MASTER_REGION_ADMIN_PROFILE_ID:
+                        regionId = userProfile.getRegionId();
+                        if ( regionId == 0l ) {
+                            continue;
+                        }
 
-						// if region is not default
-						regionName = regions.get(regionId);
-						if (regionName != null) {
-							assignment.setEntityId(regionId);
-							assignment.setEntityName(regionName);
-						}
-						// if region is default
-						else {
-							continue;
-						}
-						assignment.setRole(ROLE_ADMIN);
+                        // if region is not default
+                        regionName = regions.get( regionId );
+                        if ( regionName != null ) {
+                            assignment.setEntityId( regionId );
+                            assignment.setEntityName( regionName );
+                        }
+                        // if region is default
+                        else {
+                            continue;
+                        }
+                        assignment.setRole( ROLE_ADMIN );
 
-						break;
+                        break;
 
-					case CommonConstants.PROFILES_MASTER_BRANCH_ADMIN_PROFILE_ID:
-						branchId = userProfile.getBranchId();
-						if (branchId == 0l) {
-							continue;
-						}
+                    case CommonConstants.PROFILES_MASTER_BRANCH_ADMIN_PROFILE_ID:
+                        branchId = userProfile.getBranchId();
+                        if ( branchId == 0l ) {
+                            continue;
+                        }
 
-						// if branch is not default
-						branchName = branches.get(branchId);
-						if (branchName != null) {
-							assignment.setEntityId(branchId);
-							assignment.setEntityName(branchName);
-						}
-						// if branch is default
-						else {
-							continue;
-						}
-						assignment.setRole(ROLE_ADMIN);
+                        // if branch is not default
+                        branchName = branches.get( branchId );
+                        if ( branchName != null ) {
+                            assignment.setEntityId( branchId );
+                            assignment.setEntityName( branchName );
+                        }
+                        // if branch is default
+                        else {
+                            continue;
+                        }
+                        assignment.setRole( ROLE_ADMIN );
 
-						break;
+                        break;
 
-					case CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID:
-						branchId = userProfile.getBranchId();
-						if (branchId == 0l) {
-							continue;
-						}
+                    case CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID:
+                        branchId = userProfile.getBranchId();
+                        if ( branchId == 0l ) {
+                            continue;
+                        }
 
-						// if branch is not default
-						branchName = branches.get(branchId);
-						if (branchName != null) {
-							assignment.setEntityId(branchId);
-							assignment.setEntityName(branchName);
-						}
-						// if branch is default
-						else {
-							regionId = userProfile.getRegionId();
-							if (regionId == 0l) {
-								continue;
-							}
+                        // if branch is not default
+                        branchName = branches.get( branchId );
+                        if ( branchName != null ) {
+                            assignment.setEntityId( branchId );
+                            assignment.setEntityName( branchName );
+                        }
+                        // if branch is default
+                        else {
+                            regionId = userProfile.getRegionId();
+                            if ( regionId == 0l ) {
+                                continue;
+                            }
 
-							// if region is not default
-							regionName = regions.get(regionId);
-							if (regionName != null) {
-								assignment.setEntityId(regionId);
-								assignment.setEntityName(regionName);
-							}
-							// if region is default
-							else {
-								assignment.setEntityId(user.getCompany().getCompanyId());
-								assignment.setEntityName(user.getCompany().getCompany());
-							}
-						}
-						assignment.setRole(ROLE_USER);
-						break;
+                            // if region is not default
+                            regionName = regions.get( regionId );
+                            if ( regionName != null ) {
+                                assignment.setEntityId( regionId );
+                                assignment.setEntityName( regionName );
+                            }
+                            // if region is default
+                            else {
+                                assignment.setEntityId( user.getCompany().getCompanyId() );
+                                assignment.setEntityName( user.getCompany().getCompany() );
+                            }
+                        }
+                        assignment.setRole( ROLE_USER );
+                        break;
 
-					default:
-				}
-				userAssignments.add(assignment);
-			}
+                    default:
+                }
+                userAssignments.add( assignment );
+            }
 
-			// set the request parameters in model
-			model.addAttribute("firstName", user.getFirstName());
-			model.addAttribute("lastName", user.getLastName());
-			model.addAttribute("emailId", user.getEmailId());
-			model.addAttribute("userId", user.getUserId());
-			model.addAttribute("status", user.getStatus());
+            // set the request parameters in model
+            model.addAttribute( "firstName", user.getFirstName() );
+            model.addAttribute( "lastName", user.getLastName() );
+            model.addAttribute( "emailId", user.getEmailId() );
+            model.addAttribute( "userId", user.getUserId() );
+            model.addAttribute( "status", user.getStatus() );
 
-			// returning in descending order
-			Collections.reverse(userAssignments);
-			model.addAttribute("profiles", userAssignments);
-		}
-		catch (NonFatalException e) {
-			LOG.error("NonFatalException while finding user assignments Reason : " + e.getMessage(), e);
-			model.addAttribute("message", messageUtils.getDisplayMessage(e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE));
-			return JspResolver.MESSAGE_HEADER;
-		}
+            // returning in descending order
+            Collections.reverse( userAssignments );
+            model.addAttribute( "profiles", userAssignments );
+        } catch ( NonFatalException e ) {
+            LOG.error( "NonFatalException while finding user assignments Reason : " + e.getMessage(), e );
+            model
+                .addAttribute( "message", messageUtils.getDisplayMessage( e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE ) );
+            return JspResolver.MESSAGE_HEADER;
+        }
 
-		LOG.info("Method getUserAssignments() finished from UserManagementController");
-		return JspResolver.USER_MANAGEMENT_EDIT_USER_DETAILS;
-	}
+        LOG.info( "Method getUserAssignments() finished from UserManagementController" );
+        return JspResolver.USER_MANAGEMENT_EDIT_USER_DETAILS;
+    }
 
 
-	@ResponseBody
-	@RequestMapping(value = "/updateuserbyadmin", method = RequestMethod.POST)
-	public String updateUserByAdmin(Model model, HttpServletRequest request) {
-		LOG.info("Method updateUserByAdmin() called from UserManagementController");
-		String userIdStr = request.getParameter("userId");
-		String firstName = request.getParameter("firstName");
-		String lastName = request.getParameter("lastName");
-		String emailId = request.getParameter("emailId");
+    @ResponseBody
+    @RequestMapping ( value = "/updateuserbyadmin", method = RequestMethod.POST)
+    public String updateUserByAdmin( Model model, HttpServletRequest request )
+    {
+        LOG.info( "Method updateUserByAdmin() called from UserManagementController" );
+        String userIdStr = request.getParameter( "userId" );
+        String firstName = request.getParameter( "firstName" );
+        String lastName = request.getParameter( "lastName" );
+        String emailId = request.getParameter( "emailId" );
 
-		String fullName = firstName;
-		if (lastName != null && lastName != "") {
-			fullName += " " + lastName;
-		}
+        String fullName = firstName;
+        if ( lastName != null && lastName != "" ) {
+            fullName += " " + lastName;
+        }
 
-		try {
-			long userId = 0;
-			try {
-				userId = Long.parseLong(userIdStr);
-			}
-			catch (NumberFormatException e) {
-				LOG.error("NumberFormatException while parsing user id. Reason : " + e.getMessage(), e);
-				throw e;
-			}
-			
-			// Check for email in DB for other users
-			try {
-				User existingUser = userManagementService.getUserByEmail(emailId);
-				if (existingUser != null && existingUser.getUserId() != userId) {
-					return "Email address is already in use";
-				}
-			}
-			catch (InvalidInputException | NoRecordsFetchedException e) {
-				LOG.warn("No users found with given emailId");
-			}
-			
-			// Update AgentSetting in MySQL
-			User user = userManagementService.getUserByUserId(userId);
-			user.setFirstName(firstName);
-			user.setLastName(lastName);
-			user.setEmailId(emailId);
-			user.setLoginName(emailId);
+        try {
+            long userId = 0;
+            try {
+                userId = Long.parseLong( userIdStr );
+            } catch ( NumberFormatException e ) {
+                LOG.error( "NumberFormatException while parsing user id. Reason : " + e.getMessage(), e );
+                throw e;
+            }
 
-			// update in solr
-			Map<String, Object> userMap = new HashMap<>();
-			userMap.put(CommonConstants.USER_DISPLAY_NAME_SOLR, fullName);
-			userMap.put(CommonConstants.USER_FIRST_NAME_SOLR, firstName);
-			userMap.put(CommonConstants.USER_LAST_NAME_SOLR, lastName);
-			userMap.put(CommonConstants.USER_EMAIL_ID_SOLR, emailId);
-			userMap.put(CommonConstants.USER_LOGIN_NAME_SOLR, emailId);
-			userManagementService.updateUser(user, userMap);
+            // Check for email in DB for other users
+            try {
+                User existingUser = userManagementService.getUserByEmail( emailId );
+                if ( existingUser != null && existingUser.getUserId() != userId ) {
+                    return "Email address is already in use";
+                }
+            } catch ( InvalidInputException | NoRecordsFetchedException e ) {
+                LOG.warn( "No users found with given emailId" );
+            }
 
-			// Update AgentSetting in MongoDB
-			AgentSettings agentSettings = userManagementService.getAgentSettingsForUserProfiles(user.getUserId());
-			ContactDetailsSettings contactDetails = agentSettings.getContact_details();
-			contactDetails.setFirstName(firstName);
-			contactDetails.setLastName(lastName);
-			contactDetails.setName(fullName);
-			contactDetails.getMail_ids().setWork(emailId);
-			if (user.getStatus() == CommonConstants.STATUS_ACCOUNT_DISABLED) {
-				String profileName = userManagementService.generateIndividualProfileName(user.getUserId(), contactDetails.getName(),
-						user.getEmailId());
-				agentSettings.setProfileName(profileName);
+            // Update AgentSetting in MySQL
+            User user = userManagementService.getUserByUserId( userId );
+            user.setFirstName( firstName );
+            user.setLastName( lastName );
+            user.setEmailId( emailId );
+            user.setLoginName( emailId );
 
-				String profileUrl = utils.generateAgentProfileUrl(profileName);
-				agentSettings.setProfileUrl(profileUrl);
-				userManagementService.sendRegistrationCompletionLink(emailId, firstName, lastName, user.getCompany().getCompanyId(), profileName,
-						user.getLoginName());
-				
-				// Update the profile pic URL
-				organizationUnitSettingsDao.updateParticularKeyOrganizationUnitSettings(MongoOrganizationUnitSettingDaoImpl.KEY_PROFILE_URL,
-						agentSettings.getProfileUrl(), agentSettings, MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION);
+            // update in solr
+            Map<String, Object> userMap = new HashMap<>();
+            userMap.put( CommonConstants.USER_DISPLAY_NAME_SOLR, fullName );
+            userMap.put( CommonConstants.USER_FIRST_NAME_SOLR, firstName );
+            userMap.put( CommonConstants.USER_LAST_NAME_SOLR, lastName );
+            userMap.put( CommonConstants.USER_EMAIL_ID_SOLR, emailId );
+            userMap.put( CommonConstants.USER_LOGIN_NAME_SOLR, emailId );
+            userManagementService.updateUser( user, userMap );
 
-				organizationUnitSettingsDao.updateParticularKeyOrganizationUnitSettings(MongoOrganizationUnitSettingDaoImpl.KEY_PROFILE_NAME,
-						agentSettings.getProfileName(), agentSettings, MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION);
-			}
-			
-			profileManagementService.updateContactDetails(MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION, agentSettings,
-					contactDetails);
-		}
-		catch (NonFatalException e) {
-			LOG.error("NonFatalException caught in updateUserByAdmin(). Nested exception is ", e);
-			return e.getMessage();
-		}
-		
-		LOG.info("Method updateUserByAdmin() finished from UserManagementController");
-		return "User details updated successfully";
-	}
+            // Update AgentSetting in MongoDB
+            AgentSettings agentSettings = userManagementService.getAgentSettingsForUserProfiles( user.getUserId() );
+            ContactDetailsSettings contactDetails = agentSettings.getContact_details();
+            contactDetails.setFirstName( firstName );
+            contactDetails.setLastName( lastName );
+            contactDetails.setName( fullName );
+            contactDetails.getMail_ids().setWork( emailId );
+            if ( user.getStatus() == CommonConstants.STATUS_ACCOUNT_DISABLED ) {
+                String profileName = userManagementService.generateIndividualProfileName( user.getUserId(),
+                    contactDetails.getName(), user.getEmailId() );
+                agentSettings.setProfileName( profileName );
+
+                String profileUrl = utils.generateAgentProfileUrl( profileName );
+                agentSettings.setProfileUrl( profileUrl );
+                userManagementService.sendRegistrationCompletionLink( emailId, firstName, lastName, user.getCompany()
+                    .getCompanyId(), profileName, user.getLoginName() );
+
+                // Update the profile pic URL
+                organizationUnitSettingsDao.updateParticularKeyOrganizationUnitSettings(
+                    MongoOrganizationUnitSettingDaoImpl.KEY_PROFILE_URL, agentSettings.getProfileUrl(), agentSettings,
+                    MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION );
+
+                organizationUnitSettingsDao.updateParticularKeyOrganizationUnitSettings(
+                    MongoOrganizationUnitSettingDaoImpl.KEY_PROFILE_NAME, agentSettings.getProfileName(), agentSettings,
+                    MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION );
+            }
+
+            profileManagementService.updateContactDetails( MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION,
+                agentSettings, contactDetails );
+        } catch ( NonFatalException e ) {
+            LOG.error( "NonFatalException caught in updateUserByAdmin(). Nested exception is ", e );
+            return e.getMessage();
+        }
+
+        LOG.info( "Method updateUserByAdmin() finished from UserManagementController" );
+        return "User details updated successfully";
+    }
+
 
     @ResponseBody
     @RequestMapping ( value = "/updateuserprofile", method = RequestMethod.POST)
@@ -1714,54 +1710,56 @@ public class UserManagementController
         LOG.info( "Method updateUserProfile() finished from UserManagementController" );
         return new Gson().toJson( statusMap );
     }
-    
-	@ResponseBody
-	@RequestMapping(value = "/deleteuserprofile", method = RequestMethod.POST)
-	public String deleteUserProfile(Model model, HttpServletRequest request) {
-		LOG.info("Method deleteUserProfile() called from UserManagementController");
-		try {
-			try {
-				User user = sessionHelper.getCurrentUser();
-				long profileId = Long.parseLong(request.getParameter("profileId"));
-				int status = CommonConstants.STATUS_INACTIVE;
 
-				// update user profiles in session if current user
-				User updatedUser = userManagementService.getUserByProfileId(profileId);
-				
-				List<UserProfile> userprofileList = userManagementService.getAllUserProfilesForUser(updatedUser);
-				if(userprofileList.size() == 1 && userprofileList.get(0).getUserProfileId() == profileId){
-					return  messageUtils.getDisplayMessage( DisplayMessageConstants.NOT_ABLE_TO_DELETE_USER_PRIFILE,  DisplayMessageType.ERROR_MESSAGE ).getMessage(); 
-				}
-				
-				userManagementService.updateUserProfile(user, profileId, status);
-				userManagementService.updateUserProfilesStatus(user, profileId);
-				userManagementService.removeUserProfile(profileId);
-				userManagementService.updatePrimaryProfileOfUser(updatedUser);
 
-				updatedUser = userManagementService.getUserByUserId(updatedUser.getUserId());
-				if (user.getUserId() == updatedUser.getUserId()) {
-					try {
-						sessionHelper.processAssignments(request.getSession(false), user);
-					}
-					catch (NonFatalException e) {
-						throw new NonFatalException("Exception occurred while processing user assignments in. Reason : " + e.getMessage(), e);
-					}
-				}
-			}
-			catch (NumberFormatException e) {
-				throw new NonFatalException("NumberFormatException while parsing profileId. Reason : " + e.getMessage(), e);
-			}
-			catch (InvalidInputException e) {
-				throw new NonFatalException("InvalidInputException while deleting profile. Reason : " + e.getMessage(), e);
-			}
-		}
-		catch (NonFatalException e) {
-			LOG.error("NonFatalException occurred while deleting UserProfile in UserManagementController. Reason : " + e.getMessage(), e);
-			return CommonConstants.ERROR;
-		}
-		LOG.info("Method deleteUserProfile() finished from UserManagementController");
-		return CommonConstants.SUCCESS_ATTRIBUTE;
-	}
+    @ResponseBody
+    @RequestMapping ( value = "/deleteuserprofile", method = RequestMethod.POST)
+    public String deleteUserProfile( Model model, HttpServletRequest request )
+    {
+        LOG.info( "Method deleteUserProfile() called from UserManagementController" );
+        try {
+            try {
+                User user = sessionHelper.getCurrentUser();
+                long profileId = Long.parseLong( request.getParameter( "profileId" ) );
+                int status = CommonConstants.STATUS_INACTIVE;
+
+                // update user profiles in session if current user
+                User updatedUser = userManagementService.getUserByProfileId( profileId );
+
+                List<UserProfile> userprofileList = userManagementService.getAllUserProfilesForUser( updatedUser );
+                if ( userprofileList.size() == 1 && userprofileList.get( 0 ).getUserProfileId() == profileId ) {
+                    return messageUtils.getDisplayMessage( DisplayMessageConstants.NOT_ABLE_TO_DELETE_USER_PRIFILE,
+                        DisplayMessageType.ERROR_MESSAGE ).getMessage();
+                }
+
+                userManagementService.updateUserProfile( user, profileId, status );
+                userManagementService.updateUserProfilesStatus( user, profileId );
+                userManagementService.removeUserProfile( profileId );
+                userManagementService.updatePrimaryProfileOfUser( updatedUser );
+
+                updatedUser = userManagementService.getUserByUserId( updatedUser.getUserId() );
+                if ( user.getUserId() == updatedUser.getUserId() ) {
+                    try {
+                        sessionHelper.processAssignments( request.getSession( false ), user );
+                    } catch ( NonFatalException e ) {
+                        throw new NonFatalException( "Exception occurred while processing user assignments in. Reason : "
+                            + e.getMessage(), e );
+                    }
+                }
+            } catch ( NumberFormatException e ) {
+                throw new NonFatalException( "NumberFormatException while parsing profileId. Reason : " + e.getMessage(), e );
+            } catch ( InvalidInputException e ) {
+                throw new NonFatalException( "InvalidInputException while deleting profile. Reason : " + e.getMessage(), e );
+            }
+        } catch ( NonFatalException e ) {
+            LOG.error(
+                "NonFatalException occurred while deleting UserProfile in UserManagementController. Reason : " + e.getMessage(),
+                e );
+            return CommonConstants.ERROR;
+        }
+        LOG.info( "Method deleteUserProfile() finished from UserManagementController" );
+        return CommonConstants.SUCCESS_ATTRIBUTE;
+    }
 
 
     @ResponseBody
