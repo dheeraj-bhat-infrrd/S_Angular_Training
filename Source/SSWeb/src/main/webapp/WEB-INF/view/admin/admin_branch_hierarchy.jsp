@@ -1,6 +1,7 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ taglib prefix="spring" uri="http://www.springframework.org/tags"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions"%>
 <!-- in highest roles comparison, 1 = companyAdmin, 2 = regionAdmin, 3 = branchAdmin, 4 = agent, 5 = no profile  -->
 <c:if test="${not empty users}">
 	<c:forEach var="branchUser" items="${users}">
@@ -10,6 +11,20 @@
 			<td class="v-tbl-line">
 				<div class="v-line-ind"></div>
 			</td>
+			<td class="v-tbl-img">
+           		<c:choose>
+    				<c:when test="${not empty branchUser.profileImageUrl}">
+        				<div  class="float-left profile-image-display" style="background: url(${branchUser.profileImageUrl}) 50% 50% / cover no-repeat;">
+							<span></span>
+						</div> 
+    				</c:when>    
+    				<c:otherwise>
+        				<div id="" class="float-left profile-image-display" style="">
+							<span id="">${fn:substring(branchUser.displayName, 0, 1)}</span>
+						</div> 
+    				</c:otherwise>
+				</c:choose>
+           	</td>
 			<td class="v-tbl-name">${branchUser.displayName}</td>
 			<td class="v-tbl-add"><c:if
 					test="${not empty branchUser.emailId}">${branchUser.emailId}</c:if></td>

@@ -8,8 +8,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.StringTokenizer;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
+
 import org.noggit.JSONUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -19,6 +21,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
+
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
@@ -1476,6 +1479,17 @@ public class HierarchyManagementController {
 			}
 
 			users = userManagementService.checkUserCanEdit(admin, adminUser, users);
+			
+			//add profile image url
+            for(BranchFromSearch branch : branches){
+                OrganizationUnitSettings branchSetting =  organizationManagementService.getBranchSettingsDefault( branch.getBranchId() );
+                branch.setProfileImageUrl( branchSetting.getProfileImageUrl() );
+            }
+            
+            for(UserFromSearch user : users){
+                OrganizationUnitSettings userSetting =  organizationManagementService.getAgentSettings( user.getUserId() );
+                user.setProfileImageUrl( userSetting.getProfileImageUrl() );
+            }
 
 			model.addAttribute("branches", branches);
 			model.addAttribute("individuals", users);
@@ -1539,6 +1553,12 @@ public class HierarchyManagementController {
 			}
 
 			usersList = userManagementService.checkUserCanEdit(admin, adminUser, usersList);
+			
+			//add profile image url
+            for(UserFromSearch user : usersList){
+                OrganizationUnitSettings userSetting =  organizationManagementService.getAgentSettings( user.getUserId() );
+                user.setProfileImageUrl( userSetting.getProfileImageUrl() );
+            }
 
 			model.addAttribute("users", usersList);
 			model.addAttribute("branchId", branchId);
@@ -1629,6 +1649,22 @@ public class HierarchyManagementController {
 			else {
 				throw new InvalidInputException("not aurhorised to view hierarchy", DisplayMessageConstants.HIERARCHY_EDIT_NOT_AUTHORIZED);
 			}
+			
+			//add profile image url
+			for(RegionFromSearch region : regions){
+			    OrganizationUnitSettings regionSetting =  organizationManagementService.getRegionSettings( region.getRegionId() );
+			    region.setProfileImageUrl( regionSetting.getProfileImageUrl() );
+			}
+			
+			for(BranchFromSearch branch : branches){
+                OrganizationUnitSettings branchSetting =  organizationManagementService.getBranchSettingsDefault( branch.getBranchId() );
+                branch.setProfileImageUrl( branchSetting.getProfileImageUrl() );
+            }
+			
+			for(UserFromSearch user : users){
+                OrganizationUnitSettings userSetting =  organizationManagementService.getAgentSettings( user.getUserId() );
+                user.setProfileImageUrl( userSetting.getProfileImageUrl() );
+            }
 			
 			model.addAttribute("regions", regions);
 			model.addAttribute("branches", branches);
