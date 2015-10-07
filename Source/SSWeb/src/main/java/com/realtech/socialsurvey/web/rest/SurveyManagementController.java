@@ -1,6 +1,7 @@
 package com.realtech.socialsurvey.web.rest;
 
 import java.io.IOException;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -286,11 +287,13 @@ public class SurveyManagementController
         surveyDetail.append( "<br />" ).append( "Customer Comments: " ).append( survey.getReview() );
 
         surveyDetail.append( "<br />" );
-        if ( survey.getSharedOn() != null && !survey.getSharedOn().isEmpty() ) {
-            surveyDetail.append( "<br />" ).append( "Share Checkbox: " ).append( "Yes" );
-            surveyDetail.append( "<br />" ).append( "Shared on: " ).append( StringUtils.join( survey.getSharedOn(), ", " ) );
-        } else {
-            surveyDetail.append( "<br />" ).append( "Share Checkbox: " ).append( "No" );
+        if(survey.getAgreedToShare() != null && survey.getAgreedToShare().equalsIgnoreCase("true")){
+        	surveyDetail.append( "<br />" ).append( "Share Checkbox: " ).append( "Yes" );
+        	if ( survey.getSharedOn() != null && !survey.getSharedOn().isEmpty() ) {
+        		surveyDetail.append( "<br />" ).append( "Shared on: " ).append( StringUtils.join( survey.getSharedOn(), ", " ) );
+        	}
+        }else{
+        	surveyDetail.append( "<br />" ).append( "Share Checkbox: " ).append( "No" );
         }
 
         surveyDetail.append( "<br />" );
@@ -535,7 +538,10 @@ public class SurveyManagementController
                     e );
                 return e.getMessage();
             }
-
+            DecimalFormat ratingFormat = CommonConstants.SOCIAL_RANKING_FORMAT;
+            if ( rating % 1 == 0 ) {
+                ratingFormat = CommonConstants.SOCIAL_RANKING_WHOLE_FORMAT;
+            }
             User agent = userManagementService.getUserByUserId( agentId );
             int accountMasterId = 0;
             try {
@@ -551,7 +557,7 @@ public class SurveyManagementController
             AgentSettings agentSettings = userManagementService.getUserSettings( agentId );
 
             // Facebook
-            String facebookMessage = rating + "-Star Survey Response from " + customerDisplayName + " for " + agentName
+            String facebookMessage = ratingFormat.format( rating ) + "-Star Survey Response from " + customerDisplayName + " for " + agentName
                 + " on Social Survey - view at " + getApplicationBaseUrl() + CommonConstants.AGENT_PROFILE_FIXED_URL
                 + agentProfileLink;
             facebookMessage += "\n Feedback : " + feedback;
@@ -580,7 +586,7 @@ public class SurveyManagementController
             }
 
             // LinkedIn
-            String linkedinMessage = rating + "-Star Survey Response from " + customerDisplayName + " for " + agentName
+            String linkedinMessage = ratingFormat.format( rating ) + "-Star Survey Response from " + customerDisplayName + " for " + agentName
                 + " on SocialSurvey ";
             String linkedinProfileUrl = getApplicationBaseUrl() + CommonConstants.AGENT_PROFILE_FIXED_URL + agentProfileLink;
             String linkedinMessageFeedback = "From : " + customerDisplayName + " - " + feedback;
@@ -604,7 +610,7 @@ public class SurveyManagementController
              * CommonConstants.AGENT_PROFILE_FIXED_URL + agentProfileLink;
              */
             String twitterMessage = String.format( CommonConstants.TWITTER_MESSAGE,
-                CommonConstants.RANKING_FORMAT_TWITTER.format( rating ), customerDisplayName, agentName, "@SocialSurveyMe" )
+                ratingFormat.format( rating ), customerDisplayName, agentName, "@SocialSurveyMe" )
                 + getApplicationBaseUrl() + CommonConstants.AGENT_PROFILE_FIXED_URL + agentProfileLink;
             try {
                 if ( !socialManagementService.tweet( agentSettings, twitterMessage, agent.getCompany().getCompanyId() ) ) {
@@ -668,10 +674,14 @@ public class SurveyManagementController
                     e );
                 return e.getMessage();
             }
+            DecimalFormat ratingFormat = CommonConstants.SOCIAL_RANKING_FORMAT;
+            if ( rating % 1 == 0 ) {
+                ratingFormat = CommonConstants.SOCIAL_RANKING_WHOLE_FORMAT;
+            }
             List<OrganizationUnitSettings> settings = socialManagementService
                 .getSettingsForBranchesAndRegionsInHierarchy( agentId );
             AgentSettings agentSettings = userManagementService.getUserSettings( agentId );
-            String facebookMessage = rating + "-Star Survey Response from " + customerDisplayName + " for " + agentName
+            String facebookMessage = ratingFormat.format( rating ) + "-Star Survey Response from " + customerDisplayName + " for " + agentName
                 + " on Social Survey - view at " + getApplicationBaseUrl() + CommonConstants.AGENT_PROFILE_FIXED_URL
                 + agentProfileLink;
             // TODO: Bad code: DELETE: BEGIN
@@ -732,6 +742,10 @@ public class SurveyManagementController
                     e );
                 return e.getMessage();
             }
+            DecimalFormat ratingFormat = CommonConstants.SOCIAL_RANKING_FORMAT;
+            if ( rating % 1 == 0 ) {
+                ratingFormat = CommonConstants.SOCIAL_RANKING_WHOLE_FORMAT;
+            }
             List<OrganizationUnitSettings> settings = socialManagementService
                 .getSettingsForBranchesAndRegionsInHierarchy( agentId );
             AgentSettings agentSettings = userManagementService.getUserSettings( agentId );
@@ -741,7 +755,7 @@ public class SurveyManagementController
              * CommonConstants.AGENT_PROFILE_FIXED_URL + agentProfileLink;
              */
             String twitterMessage = String.format( CommonConstants.TWITTER_MESSAGE,
-                CommonConstants.RANKING_FORMAT_TWITTER.format( rating ), customerDisplayName, agentName, "@SocialSurveyMe" )
+                ratingFormat.format( rating ), customerDisplayName, agentName, "@SocialSurveyMe" )
                 + getApplicationBaseUrl() + CommonConstants.AGENT_PROFILE_FIXED_URL + agentProfileLink;
             // TODO: Bad code: DELETE: BEGIN
             // get the company id of the agent
@@ -797,10 +811,14 @@ public class SurveyManagementController
                     e );
                 return e.getMessage();
             }
+            DecimalFormat ratingFormat = CommonConstants.SOCIAL_RANKING_FORMAT;
+            if ( rating % 1 == 0 ) {
+                ratingFormat = CommonConstants.SOCIAL_RANKING_WHOLE_FORMAT;
+            }
             List<OrganizationUnitSettings> settings = socialManagementService
                 .getSettingsForBranchesAndRegionsInHierarchy( agentId );
             AgentSettings agentSettings = userManagementService.getUserSettings( agentId );
-            String message = rating + "-Star Survey Response from " + customerDisplayName + " for " + agentName
+            String message = ratingFormat.format( rating ) + "-Star Survey Response from " + customerDisplayName + " for " + agentName
                 + " on SocialSurvey ";
             String linkedinProfileUrl = getApplicationBaseUrl() + CommonConstants.AGENT_PROFILE_FIXED_URL + agentProfileLink;
             String linkedinMessageFeedback = "From : " + customerDisplayName + " " + feedback;

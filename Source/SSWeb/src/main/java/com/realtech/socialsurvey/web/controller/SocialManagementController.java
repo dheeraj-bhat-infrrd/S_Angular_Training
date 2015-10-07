@@ -1,5 +1,6 @@
 package com.realtech.socialsurvey.web.controller;
 
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -1322,7 +1323,11 @@ public class SocialManagementController
                 "Number format exception caught in postToFacebook() while trying to convert agent Id. Nested exception is ", e );
             return e.getMessage();
         }
-
+        DecimalFormat ratingFormat = CommonConstants.SOCIAL_RANKING_FORMAT;
+        if ( rating % 1 == 0 ) {
+            ratingFormat = CommonConstants.SOCIAL_RANKING_WHOLE_FORMAT;
+        }
+        
         User user = sessionHelper.getCurrentUser();
         List<OrganizationUnitSettings> settings = socialManagementService.getBranchAndRegionSettingsForUser( user.getUserId() );
 
@@ -1339,7 +1344,7 @@ public class SocialManagementController
         
         String custDisplayName = emailFormatHelper.getCustomerDisplayNameForEmail(custFirstName, custLastName);
 
-        String facebookMessage = rating + "-Star Survey Response from " + custDisplayName + " for "
+        String facebookMessage = ratingFormat.format( rating ) + "-Star Survey Response from " + custDisplayName + " for "
             + agentName + " on Social Survey - view at " + applicationBaseUrl + CommonConstants.AGENT_PROFILE_FIXED_URL
             + agentProfileLink;
         facebookMessage = facebookMessage.replaceAll( "null", "" );
@@ -1386,7 +1391,10 @@ public class SocialManagementController
                     e );
                 return e.getMessage();
             }
-
+            DecimalFormat ratingFormat = CommonConstants.SOCIAL_RANKING_FORMAT;
+            if ( rating % 1 == 0 ) {
+                ratingFormat = CommonConstants.SOCIAL_RANKING_WHOLE_FORMAT;
+            }
             String agentProfileLink = "";
             AgentSettings agentSettings;
             try {
@@ -1405,7 +1413,7 @@ public class SocialManagementController
             /*String twitterMessage = rating + "-Star Survey Response from " + custDisplayName + " for " + agentName
                 + " on @SocialSurveyMe - view at " + applicationBaseUrl + CommonConstants.AGENT_PROFILE_FIXED_URL
                 + agentProfileLink;*/
-            String twitterMessage = String.format(CommonConstants.TWITTER_MESSAGE, CommonConstants.RANKING_FORMAT_TWITTER.format(rating), custDisplayName, agentName, "@SocialSurveyMe") + applicationBaseUrl + CommonConstants.AGENT_PROFILE_FIXED_URL + agentProfileLink;
+            String twitterMessage = String.format(CommonConstants.TWITTER_MESSAGE, ratingFormat.format(rating), custDisplayName, agentName, "@SocialSurveyMe") + applicationBaseUrl + CommonConstants.AGENT_PROFILE_FIXED_URL + agentProfileLink;
             twitterMessage = twitterMessage.replaceAll( "null", "" );
 
             for ( OrganizationUnitSettings setting : settings ) {
@@ -1457,7 +1465,10 @@ public class SocialManagementController
                 "Number format exception caught in postToLinkedin() while trying to convert agent Id. Nested exception is ", e );
             return e.getMessage();
         }
-
+        DecimalFormat ratingFormat = CommonConstants.SOCIAL_RANKING_FORMAT;
+        if ( rating % 1 == 0 ) {
+            ratingFormat = CommonConstants.SOCIAL_RANKING_WHOLE_FORMAT;
+        }
         String agentProfileLink = "";
         AgentSettings agentSettings;
         try {
@@ -1472,7 +1483,7 @@ public class SocialManagementController
         User user = sessionHelper.getCurrentUser();
         String custDisplayName = emailFormatHelper.getCustomerDisplayNameForEmail(custFirstName, custLastName);
         List<OrganizationUnitSettings> settings = socialManagementService.getBranchAndRegionSettingsForUser( user.getUserId() );
-        String message = rating + "-Star Survey Response from " + custDisplayName + " for " + agentName
+        String message = ratingFormat.format( rating ) + "-Star Survey Response from " + custDisplayName + " for " + agentName
             + " on SocialSurvey ";
         String linkedinProfileUrl = applicationBaseUrl + CommonConstants.AGENT_PROFILE_FIXED_URL + agentProfileLink;
         message += linkedinProfileUrl;

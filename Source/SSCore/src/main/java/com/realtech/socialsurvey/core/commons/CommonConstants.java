@@ -395,7 +395,7 @@ public interface CommonConstants
     public static final String PHONENUMBER_REGEX = "^((\\+)|(00)|(\\*)|())[0-9]{3,14}((\\#)|())$";
     public static final String ZIPCODE_REGEX = "\\d{5}(-\\d{4})?";
     public static final String COMPANY_NAME_REGEX = "^[a-zA-Z0-9 ]+$";
-    public static final String EMAIL_REGEX = "^[\\w-_\\.+]*[\\w-_\\.]\\@([\\w]+\\.)+[\\w]+[\\w]$";
+    public static final String EMAIL_REGEX = "^[A-Z0-9._%+-]+@[A-Z0-9.-]+\\.[A-Z]{2,6}$";
     public static final String FIRST_NAME_REGEX = "[a-zA-Z ]+";
     public static final String LAST_NAME_REGEX = "[a-zA-Z0-9 ]+";
     public static final String FINDAPRO_FIRST_NAME_REGEX = "^[a-zA-Z]{2,}$";
@@ -712,7 +712,9 @@ public interface CommonConstants
 
     // Social media message template constants
     public static final DecimalFormat RANKING_FORMAT_TWITTER = new DecimalFormat( "#.#" );
-
+    public static final DecimalFormat SOCIAL_RANKING_FORMAT = new DecimalFormat( "#.#" );
+    public static final DecimalFormat SOCIAL_RANKING_WHOLE_FORMAT = new DecimalFormat( "#" );
+    
     public static final String TWITTER_MESSAGE = "%s Star Survey Response from %s for %s on %s ";
     
     // file upload types
