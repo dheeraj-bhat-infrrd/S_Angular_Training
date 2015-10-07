@@ -26,6 +26,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.google.gson.Gson;
+import com.mongodb.util.Hash;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.dao.OrganizationUnitSettingsDao;
 import com.realtech.socialsurvey.core.dao.SurveyDetailsDao;
@@ -38,6 +39,7 @@ import com.realtech.socialsurvey.core.entities.AgentSettings;
 import com.realtech.socialsurvey.core.entities.Company;
 import com.realtech.socialsurvey.core.entities.MailContent;
 import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
+import com.realtech.socialsurvey.core.entities.SocialPostShared;
 import com.realtech.socialsurvey.core.entities.SurveyDetails;
 import com.realtech.socialsurvey.core.entities.SurveyPreInitiation;
 import com.realtech.socialsurvey.core.entities.SurveyResponse;
@@ -218,6 +220,7 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
         return urlGenerator.generateUrl( urlParam, baseUrl );
     }
 
+
     /*
      * Method to update answers to all the questions and current stage in MongoDB.
      * @param agentId
@@ -271,7 +274,7 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
     public void updateSurveyAsAbusive( String surveymongoId, String reporterEmail, String reporterName )
     {
         LOG.info( "Method updateSurveyAsAbusive() to mark the survey as abusive, started" );
-        surveyDetailsDao.updateSurveyAsAbusive(surveymongoId, reporterEmail, reporterName);
+        surveyDetailsDao.updateSurveyAsAbusive( surveymongoId, reporterEmail, reporterName );
         LOG.info( "Method updateSurveyAsAbusive() to mark the survey as abusive, finished" );
     }
 
@@ -906,7 +909,7 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
 
 
     @Override
-    public void sendSocialPostReminderMail( String custEmail, String custFirstName, String custLastName, User user , String links )
+    public void sendSocialPostReminderMail( String custEmail, String custFirstName, String custLastName, User user, String links )
         throws InvalidInputException, UndeliveredEmailException, ProfileNotFoundException
     {
         LOG.info( "sendSocialPostReminderMail() started." );
@@ -1533,13 +1536,58 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
         LOG.info( "Method deleteExcessZillowSurveysByEntity() finished" );
     }
 
+
     @Override
     public List<AbusiveSurveyReportWrapper> getSurveysReporetedAsAbusive( int startIndex, int numOfRows )
     {
         LOG.info( "Method getSurveysReporetedAsAbusive() to retrieve surveys marked as abusive, started" );
-        List<AbusiveSurveyReportWrapper> abusiveSurveyReports = surveyDetailsDao.getSurveysReporetedAsAbusive( startIndex, numOfRows );
+        List<AbusiveSurveyReportWrapper> abusiveSurveyReports = surveyDetailsDao.getSurveysReporetedAsAbusive( startIndex,
+            numOfRows );
         LOG.info( "Method getSurveysReporetedAsAbusive() to retrieve surveys marked as abusive, finished" );
         return abusiveSurveyReports;
+    }
+
+
+    @Override
+    public SocialPostShared getSocialPostSharedBySurveyDetails( SurveyDetails surveyDetails )
+    {
+        SocialPostShared socialPostShared = null;
+        if ( surveyDetails != null ) {
+            socialPostShared = surveyDetails.getSocialPostShared();
+            if ( socialPostShared == null ) {
+                socialPostShared = new SocialPostShared();
+            }
+
+        }
+        return socialPostShared;
+    }
+
+
+    public SocialPostShared calcualteFinalCount( SocialPostShared socialPostShared, Map<Long, List<String>> agentSharedOn,
+        Map<Long, List<String>> branchSharedOn, Map<Long, List<String>> regionSharedOn, Map<Long, List<String>> companySharedOn )
+    {
+        Map<Long, Long> agentMap = socialPostShared.getAgentCountMap();
+        if ( agentMap == null ) {
+            agentMap = new HashMap<Long, Long>();
+        }
+        Map<Long, Long> regionMap = socialPostShared.getRegionCountMap();
+        if ( regionMap == null ) {
+            regionMap = new HashMap<Long, Long>();
+        }
+
+        Map<Long, Long> branchMap = socialPostShared.getAgentCountMap();
+        if ( branchMap == null ) {
+            branchMap = new HashMap<Long, Long>();
+        }
+        Map<Long, Long> companyMap = socialPostShared.getAgentCountMap();
+        if ( companyMap == null ) {
+            companyMap = new HashMap<Long, Long>();
+        }
+
+        for ( Map.Entry<Long, List<String>> entry : agentSharedOn.entrySet() ) {
+            long agentCount = agentMap.get( entry.getKey() );
+            
+        }
     }
 }
 // JIRA SS-119 by RM-05:EOC
