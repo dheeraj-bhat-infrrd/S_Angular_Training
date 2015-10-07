@@ -19,8 +19,19 @@ public class BranchFromSearch {
 	private String state;
 	private String city;
 	private String zipcode;
+	private String profileImageUrl;
 
-	public long getBranchId() {
+	public String getProfileImageUrl()
+    {
+        return profileImageUrl;
+    }
+
+    public void setProfileImageUrl( String profileImageUrl )
+    {
+        this.profileImageUrl = profileImageUrl;
+    }
+
+    public long getBranchId() {
 		return branchId;
 	}
 
