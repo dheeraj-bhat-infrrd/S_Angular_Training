@@ -1,6 +1,7 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ taglib prefix="spring" uri="http://www.springframework.org/tags"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions"%>
 <!-- in highest roles comparison, 1 = companyAdmin, 2 = regionAdmin, 3 = branchAdmin, 4 = agent, 5 = no profile  -->
 <c:if test="${not empty branches}">
 	<c:forEach var="branch" items="${branches}">
@@ -11,6 +12,20 @@
 			<td class="v-tbl-line">
 				<div class="v-line-brnch"></div>
 			</td>
+			<td class="v-tbl-img">
+           		<c:choose>
+    				<c:when test="${not empty branch.profileImageUrl}">
+        				<div  class="float-left profile-image-display" style="background: url(${branch.profileImageUrl}) 50% 50% / cover no-repeat;">
+							<span></span>
+						</div> 
+    				</c:when>    
+    				<c:otherwise>
+        				<div id="" class="float-left profile-image-display" style="">
+							<span id="">${fn:substring(branch.regionName, 0, 1)}</span>
+						</div> 
+    				</c:otherwise>
+				</c:choose>
+           	</td>
 			<td class="v-tbl-name">${branch.branchName}</td>
 			<td class="v-tbl-add"><c:if test="${not empty branch.address1}">${branch.address1}</c:if>&nbsp;<c:if
 					test="${not empty branch.address2}">${branch.address2}</c:if></td>
@@ -41,6 +56,20 @@
 			<td class="v-tbl-line">
 				<div class="v-line-ind v-line-region-ind"></div>
 			</td>
+			<td class="v-tbl-img">
+           		<c:choose>
+    				<c:when test="${not empty regionUser.profileImageUrl}">
+        				<div  class="float-left profile-image-display" style="background: url(${regionUser.profileImageUrl}) 50% 50% / cover no-repeat;">
+							<span></span>
+						</div> 
+    				</c:when>    
+    				<c:otherwise>
+        				<div id="" class="float-left profile-image-display" style="">
+							<span id="">${fn:substring(regionUser.displayName, 0, 1)}</span>
+						</div> 
+    				</c:otherwise>
+				</c:choose>
+           	</td>
 			<td class="v-tbl-name">${regionUser.displayName}</td>
 			<td class="v-tbl-add"><c:if
 					test="${not empty regionUser.emailId}">${regionUser.emailId}</c:if></td>
