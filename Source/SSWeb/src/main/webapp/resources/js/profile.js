@@ -551,6 +551,10 @@ function paintReviews(result){
 			custName += ' ' + reviewItem.customerLastName;
 		}
 		var custNameArray = custName.split(' ');
+		var custDispName = custNameArray[0];
+		if(custNameArray[1] != undefined && custNameArray[1].trim() != ""){
+			custDispName += ' '+custNameArray[1].substr(0,1).toUpperCase()+'.';
+		}
 		reviewsHtml = reviewsHtml +
 			'<div class="' + lastItemClass + '" data-cust-first-name=' + reviewItem.customerFirstName
 				+ ' data-cust-last-name=' + reviewItem.customerLastName + ' data-agent-name=' + reviewItem.agentName
@@ -558,12 +562,12 @@ function paintReviews(result){
 				+ reviewItem.customerEmail + '" data-agentid="' + reviewItem.agentId + '" survey-mongo-id="' + reviewItem._id + '">';
 		reviewsHtml += '	<div class="ppl-header-wrapper clearfix">';
 		reviewsHtml += '		<div class="float-left ppl-header-left">';    
-		reviewsHtml += '			<div class="ppl-head-1">'+custNameArray[0];
-		if(custNameArray[1] != undefined && custNameArray[1].trim() != ""){
+		reviewsHtml += '			<div class="ppl-head-1">'+custDispName+'</div>';
+		/* if(custNameArray[1] != undefined && custNameArray[1].trim() != ""){
 			reviewsHtml += ' '+custNameArray[1].substr(0,1)+'.</div>';
 		}else {
 			reviewsHtml += '</div>';
-		}
+		}*/
 		if (date != null) {
 			date = convertUTCToUserDate(date);
 			reviewsHtml += '		<div class="ppl-head-2">' + date.toString("MMMM d, yyyy") + '</div>'; 
@@ -589,11 +593,11 @@ function paintReviews(result){
 		reviewsHtml += '		<div class="float-left blue-text ppl-share-shr-txt">Share</div>';
 		reviewsHtml += '		<div class="float-left icn-share icn-plus-open"></div>';
 		reviewsHtml += '		<div class="float-left clearfix ppl-share-social hide">';
-		reviewsHtml += '			<span id ="fb_' + i + '"class="float-left ppl-share-icns icn-fb icn-fb-pp" onclick="getImageandCaption(' + i + ');" title="Facebook" data-link="https://www.facebook.com/dialog/feed?' + reviewItem.faceBookShareUrl + '&link=' + reviewItem.completeProfileUrl + '&description=' + reviewItem.score + '-star response from ' + reviewItem.customerFirstName + ' ' + reviewItem.customerLastName.substring( 0, 1 ).toUpperCase() + ' for ' + reviewItem.agentName + ' at SocialSurvey - ' + reviewItem.review + ' .&redirect_uri=https://www.facebook.com"></span>';
-		reviewsHtml += '            <input type="hidden" id="twttxt_' + i + '" class ="twitterText_loop" value ="' + reviewItem.score + '-star response from ' + reviewItem.customerFirstName + ' ' + reviewItem.customerLastName.substring( 0, 1 ).toUpperCase() + ' for ' + reviewItem.agentName + ' at SocialSurvey - ' + reviewItem.review + '"/></input>';
-		reviewsHtml += '			<span id ="twitt_' + i + '" class="float-left ppl-share-icns icn-twit icn-twit-pp" onclick="twitterFn(' + i + ');" title="Twitter" data-link="https://twitter.com/intent/tweet?text=' + reviewItem.score + '-star response from ' + reviewItem.customerFirstName + ' ' + reviewItem.customerLastName.substring( 0, 1 ).toUpperCase() + ' for ' + reviewItem.agentName + ' at SocialSurvey - ' + reviewItem.review + ' &url='+ reviewItem.completeProfileUrl +'"></span>';	
-		reviewsHtml += '			<span class="float-left ppl-share-icns icn-lin icn-lin-pp" title="LinkedIn" data-link="https://www.linkedin.com/shareArticle?mini=true&url=' + reviewItem.completeProfileUrl + '&title=&summary=' + reviewItem.score + '-star response from ' + reviewItem.customerFirstName+' '+reviewItem.customerLastName.substring( 0, 1 ).toUpperCase() + ' for ' + reviewItem.agentName +' at SocialSurvey - ' + reviewItem.review + '&source="></span>';
-		reviewsHtml += '			<span class="float-left ppl-share-icns icn-gplus" title="Google+"> <button class="g-interactivepost float-left ppl-share-icns icn-gplus" data-contenturl="' + reviewItem.completeProfileUrl + '" data-clientid="' + reviewItem.googleApi + '"data-cookiepolicy="single_host_origin" data-prefilltext="' + reviewItem.score + '-star response from ' + reviewItem.customerFirstName + ' ' + reviewItem.customerLastName.substring( 0, 1 ).toUpperCase() + ' for ' + reviewItem.agentName + 'at SocialSurvey - ' + reviewItem.review + '" data-calltoactionlabel="USE"'+''+'data-calltoactionurl=" ' + reviewItem.completeProfileUrl + '"> <span class="icon">&nbsp;</span> <span class="label">share</span> </button> </span>';
+		reviewsHtml += '			<span id ="fb_' + i + '"class="float-left ppl-share-icns icn-fb icn-fb-pp" onclick="getImageandCaption(' + i + ');" title="Facebook" data-link="https://www.facebook.com/dialog/feed?' + reviewItem.faceBookShareUrl + '&link=' + reviewItem.completeProfileUrl + '&description=' + reviewItem.score + '-star response from ' + custDispName + ' for ' + reviewItem.agentName + ' at SocialSurvey - ' + reviewItem.review + ' .&redirect_uri=https://www.facebook.com"></span>';
+		reviewsHtml += '            <input type="hidden" id="twttxt_' + i + '" class ="twitterText_loop" value ="' + reviewItem.score + '-star response from ' + custDispName + ' for ' + reviewItem.agentName + ' at SocialSurvey - ' + reviewItem.review + '"/></input>';
+		reviewsHtml += '			<span id ="twitt_' + i + '" class="float-left ppl-share-icns icn-twit icn-twit-pp" onclick="twitterFn(' + i + ');" title="Twitter" data-link="https://twitter.com/intent/tweet?text=' + reviewItem.score + '-star response from ' + custDispName + ' for ' + reviewItem.agentName + ' at SocialSurvey - ' + reviewItem.review + ' &url='+ reviewItem.completeProfileUrl +'"></span>';	
+		reviewsHtml += '			<span class="float-left ppl-share-icns icn-lin icn-lin-pp" title="LinkedIn" data-link="https://www.linkedin.com/shareArticle?mini=true&url=' + reviewItem.completeProfileUrl + '&title=&summary=' + reviewItem.score + '-star response from ' + custDispName + ' for ' + reviewItem.agentName +' at SocialSurvey - ' + reviewItem.review + '&source="></span>';
+		reviewsHtml += '			<span class="float-left ppl-share-icns icn-gplus" title="Google+"> <button class="g-interactivepost float-left ppl-share-icns icn-gplus" data-contenturl="' + reviewItem.completeProfileUrl + '" data-clientid="' + reviewItem.googleApi + '"data-cookiepolicy="single_host_origin" data-prefilltext="' + reviewItem.score + '-star response from ' + custDispName + ' for ' + reviewItem.agentName + 'at SocialSurvey - ' + reviewItem.review + '" data-calltoactionlabel="USE"'+''+'data-calltoactionurl=" ' + reviewItem.completeProfileUrl + '"> <span class="icon">&nbsp;</span> <span class="label">share</span> </button> </span>';
 		
 		/*if (reviewItem.yelpProfileUrl != null && reviewItem.yelpProfileUrl != "") {
 			reviewsHtml += '		<span class="float-left ppl-share-icns icn-yelp" title="Yelp" data-link="' + returnValidWebAddress(reviewItem.yelpProfileUrl) + '"></span>';
