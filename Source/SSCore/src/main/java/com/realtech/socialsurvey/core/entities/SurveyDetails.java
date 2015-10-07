@@ -44,19 +44,22 @@ public class SurveyDetails
     private String faceBookShareUrl;
     private boolean isAbusive;
     private String _id;
+    private SocialPostShared socialPostShared;
 
 
-    public String get_id() {
-		return _id;
-	}
+    public String get_id()
+    {
+        return _id;
+    }
 
 
-	public void set_id(String _id) {
-		this._id = _id;
-	}
+    public void set_id( String _id )
+    {
+        this._id = _id;
+    }
 
 
-	public String getGoogleApi()
+    public String getGoogleApi()
     {
         return googleApi;
     }
@@ -497,5 +500,17 @@ public class SurveyDetails
     public void setAbusive( boolean isAbusive )
     {
         this.isAbusive = isAbusive;
+    }
+
+
+    public SocialPostShared getSocialPostShared()
+    {
+        return socialPostShared;
+    }
+
+
+    public void setSocialPostShared( SocialPostShared socialPostShared )
+    {
+        this.socialPostShared = socialPostShared;
     }
 }

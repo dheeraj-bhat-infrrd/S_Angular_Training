@@ -7,6 +7,7 @@ import org.apache.solr.client.solrj.SolrServerException;
 
 import com.realtech.socialsurvey.core.entities.AbusiveSurveyReportWrapper;
 import com.realtech.socialsurvey.core.entities.Company;
+import com.realtech.socialsurvey.core.entities.SocialPostShared;
 import com.realtech.socialsurvey.core.entities.SurveyDetails;
 import com.realtech.socialsurvey.core.entities.SurveyPreInitiation;
 import com.realtech.socialsurvey.core.entities.User;
@@ -202,5 +203,7 @@ public interface SurveyHandler
 
     void sendSocialPostReminderMail( String custEmail, String custFirstName, String custLastName, User user, String links )
         throws InvalidInputException, UndeliveredEmailException, ProfileNotFoundException;
+    
+    public SocialPostShared getSocialPostSharedBySurveyDetails( SurveyDetails surveyDetails );
 
 }
