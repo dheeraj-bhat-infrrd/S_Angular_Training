@@ -6,8 +6,19 @@ public class SurveyRecipient {
 	private String firstname;
 	private String lastname;
 	private String emailId;
+	private String agentEmailId;
 
-	public String getFirstname() {
+	public String getAgentEmailId()
+    {
+        return agentEmailId;
+    }
+
+    public void setAgentEmailId( String agentEmailId )
+    {
+        this.agentEmailId = agentEmailId;
+    }
+
+    public String getFirstname() {
 		return firstname;
 	}
 

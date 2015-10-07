@@ -1,6 +1,7 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ taglib prefix="spring" uri="http://www.springframework.org/tags"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions"%>
 
 <div class="v-hr-tbl-wrapper">
 	<table class="v-hr-tbl" style="margin-top: 0">
@@ -12,6 +13,20 @@
 					<td class="v-tbl-line">
 						<div class="v-line-rgn"></div>
 					</td>
+					<td class="v-tbl-img">
+           				<c:choose>
+    						<c:when test="${not empty region.profileImageUrl}">
+        						<div  class="float-left profile-image-display" style="background: url(${region.profileImageUrl}) 50% 50% / cover no-repeat;">
+								<span></span>
+								</div> 
+    						</c:when>    
+    					<c:otherwise>
+        					<div id="" class="float-left profile-image-display" style="">
+								<span id="">${fn:substring(region.regionName, 0, 1)}</span>
+							</div> 
+    					</c:otherwise>
+						</c:choose>
+           			</td>
 					<td class="v-tbl-name">${region.regionName}</td>
 					<td class="v-tbl-add"><c:if
 							test="${not empty region.address1}">${region.address1}</c:if>&nbsp;<c:if
@@ -45,6 +60,20 @@
 					<td class="v-tbl-line">
 						<div class="v-line-brnch v-line-comp-brnch"></div>
 					</td>
+					<td class="v-tbl-img">
+           				<c:choose>
+    						<c:when test="${not empty branch.profileImageUrl}">
+        						<div  class="float-left profile-image-display" style="background: url(${branch.profileImageUrl}) 50% 50% / cover no-repeat;">
+								<span></span>
+								</div> 
+    						</c:when>    
+    					<c:otherwise>
+        					<div id="" class="float-left profile-image-display" style="">
+								<span id="">${fn:substring(branch.branchName, 0, 1)}</span>
+							</div> 
+    					</c:otherwise>
+						</c:choose>
+           			</td>
 					<td class="v-tbl-name">${branch.branchName}</td>
 					<td class="v-tbl-add"><c:if
 							test="${not empty branch.address1}">${branch.address1}</c:if>&nbsp;<c:if
@@ -78,6 +107,20 @@
 					<td class="v-tbl-line">
 						<div class="v-line-ind v-line-comp-ind"></div>
 					</td>
+					<td class="v-tbl-img">
+           			<c:choose>
+    					<c:when test="${not empty compUser.profileImageUrl}">
+        					<div  class="float-left profile-image-display" style="background: url(${compUser.profileImageUrl}) 50% 50% / cover no-repeat;">
+								<span></span>
+							</div> 
+    					</c:when>    
+    					<c:otherwise>
+        					<div id="" class="float-left profile-image-display" style="">
+								<span id="">${fn:substring(compUser.displayName, 0, 1)}</span>
+							</div> 
+    					</c:otherwise>
+					</c:choose>
+        		   	</td>
 					<td class="v-tbl-name">${compUser.displayName}</td>
 					<td class="v-tbl-add"><c:if
 							test="${not empty compUser.emailId}">${compUser.emailId}</c:if></td>
