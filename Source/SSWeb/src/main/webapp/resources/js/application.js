@@ -8528,6 +8528,7 @@ $(document).on('click', '#wc-send-survey', function() {
 				receiver.firstname = firstname;
 				receiver.lastname = lastname;
 				receiver.emailId = emailId;
+				receiver.agentEmailId = agentEmailId;
 				if (dataName == 'agent-name') {
 					receiver.agentId = agentId;
 					if(agentId == undefined){
@@ -8553,16 +8554,30 @@ $(document).on('click', '#wc-send-survey', function() {
 			}
 		}
 	});
-
-	if(exit){
-		exit = false;
-		return false;
-	}
 	
 	//Check if recievers list empty
 	if(receiversList.length == 0){
 		$('#overlay-toast').html('Add customers to send survey request!');
 		showToast();
+		exit = false;
+		return false;
+	}
+	
+	//check if there is no duplicate entries
+	var receiversListLength = receiversList.length;
+	
+	for (var i = 0; i < receiversListLength; i++){
+		for (var j = i+1; j < receiversListLength; j++){
+			if( receiversList[i].emailId == receiversList[j].emailId && receiversList[i].agentEmailId == receiversList[j].agentEmailId ){
+				$('#overlay-toast').html("Can't enter same email address multiple times for same user");
+				showToast();
+				exit = true;
+				return false;
+			}
+		}
+	}
+
+	if(exit){
 		exit = false;
 		return false;
 	}
