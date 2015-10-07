@@ -91,6 +91,14 @@
 <c:choose>
 	<c:when test="${not empty reviews}">
 		<c:forEach var="feedback" varStatus="loop" items="${reviews}">
+			<c:choose>
+				<c:when test="${ feedback.score % 1 == 0 }">
+					<c:set value = "#" var = "scoreformat"></c:set>
+				</c:when>
+				<c:otherwise>
+					<c:set value = "#.#" var = "scoreformat"></c:set>
+				</c:otherwise>
+			</c:choose>
 			<c:set value="ppl-review-item" var="reviewitemclass"></c:set>
 			<div data-firstname="${feedback.customerFirstName}" data-lastname="${feedback.customerLastName}"
 				data-agentid="${feedback.agentId}" data-agentname="${feedback.agentName}" data-customeremail="${feedback.customerEmail}"
@@ -123,20 +131,20 @@
 					<div class="float-left icn-share icn-plus-open" style="display: block;"></div>
 					<div class="float-left clearfix ppl-share-social hide" style="display: none;">
 					
-						<span id ="fb_${loop.index}"class="float-left ppl-share-icns icn-fb" title="Facebook" onclick ="getImageandCaption(${loop.index})" data-link="https://www.facebook.com/dialog/feed?${feedback.faceBookShareUrl}&link=${feedback.completeProfileUrl}&description=${feedback.score}-star response from ${feedback.customerFirstName} ${feedback.customerLastName.substring( 0, 1 ).toUpperCase()} for ${feedback.agentName} at SocialSurvey - ${feedback.review} .&redirect_uri=https://www.facebook.com"></span>
+						<span id ="fb_${loop.index}"class="float-left ppl-share-icns icn-fb" title="Facebook" onclick ="getImageandCaption(${loop.index})" data-link="https://www.facebook.com/dialog/feed?${feedback.faceBookShareUrl}&link=${feedback.completeProfileUrl}&description=<fmt:formatNumber type="number" pattern="${ scoreformat }" value="${feedback.score}" />-star response from ${feedback.customerFirstName} ${feedback.customerLastName.substring( 0, 1 ).toUpperCase()} for ${feedback.agentName} at SocialSurvey - ${feedback.review} .&redirect_uri=https://www.facebook.com"></span>
 						
-						<input type="hidden" id="twttxt_${loop.index}" class ="twitterText_loop" value ="${feedback.score}-star response from ${feedback.customerFirstName} ${reviewItem.customerLastName.substring( 0, 1 ).toUpperCase()} for ${feedback.agentName} at SocialSurvey - ${feedback.review}"/>
-						<span class="float-left ppl-share-icns icn-twit" id ="twitt_${loop.index}" onclick="twitterFn(${loop.index},this);" data-link="https://twitter.com/intent/tweet?text=${feedback.score}-star response from ${feedback.customerFirstName} ${feedback.customerLastName.substring( 0, 1 ).toUpperCase()} for ${feedback.agentName} at SocialSurvey - ${feedback.review}&url=${feedback.completeProfileUrl}"></span>
+						<input type="hidden" id="twttxt_${loop.index}" class ="twitterText_loop" value ="<fmt:formatNumber type="number" pattern="${ scoreformat }" value="${feedback.score}" />-star response from ${feedback.customerFirstName} ${reviewItem.customerLastName.substring( 0, 1 ).toUpperCase()} for ${feedback.agentName} at SocialSurvey - ${feedback.review}"/>
+						<span class="float-left ppl-share-icns icn-twit" id ="twitt_${loop.index}" onclick="twitterFn(${loop.index},this);" data-link="https://twitter.com/intent/tweet?text=<fmt:formatNumber type="number" pattern="${ scoreformat }" value="${feedback.score}" />-star response from ${feedback.customerFirstName} ${feedback.customerLastName.substring( 0, 1 ).toUpperCase()} for ${feedback.agentName} at SocialSurvey - ${feedback.review}&url=${feedback.completeProfileUrl}"></span>
 						 <span
 							class="float-left ppl-share-icns icn-lin" title="LinkedIn"
-							data-link="https://www.linkedin.com/shareArticle?mini=true&url=${feedback.completeProfileUrl} &title=&summary=${feedback.score}-star response from ${feedback.customerFirstName} ${feedback.customerLastName.substring( 0, 1 ).toUpperCase()} for ${feedback.agentName} at SocialSurvey - ${feedback.review} + &source="></span>
+							data-link="https://www.linkedin.com/shareArticle?mini=true&url=${feedback.completeProfileUrl} &title=&summary=<fmt:formatNumber type="number" pattern="${ scoreformat }" value="${feedback.score}" />-star response from ${feedback.customerFirstName} ${feedback.customerLastName.substring( 0, 1 ).toUpperCase()} for ${feedback.agentName} at SocialSurvey - ${feedback.review} + &source="></span>
                         <span class="float-left ppl-share-icns icn-gplus" title="Google+">
                         <button 
                             class="g-interactivepost float-left ppl-share-icns icn-gplus"
                             data-contenturl="${feedback.completeProfileUrl}"
                             data-clientid="${feedback.googleApi}"
                             data-cookiepolicy="single_host_origin"
-                            data-prefilltext="${feedback.score}-star response from ${feedback.customerFirstName} ${feedback.customerLastName.substring( 0, 1 ).toUpperCase()} for ${feedback.agentName} at SocialSurvey - ${feedback.review}"
+                            data-prefilltext="<fmt:formatNumber type="number" pattern="${ scoreformat }" value="${feedback.score}" />-star response from ${feedback.customerFirstName} ${feedback.customerLastName.substring( 0, 1 ).toUpperCase()} for ${feedback.agentName} at SocialSurvey - ${feedback.review}"
                             data-calltoactionlabel="USE"
                             data-calltoactionurl="${feedback.completeProfileUrl}"
                          >

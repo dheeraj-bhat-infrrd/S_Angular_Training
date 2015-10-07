@@ -234,7 +234,10 @@ function changeRatingPattern(rating, ratingParent, isOverallRating, source) {
 		ratingIntVal = 1;
 	}
 
-	var roundedFloatingVal = parseFloat(rating).toFixed(3);
+	var roundedFloatingVal = parseFloat(rating).toFixed(1);
+	if (roundedFloatingVal % 1 == 0) {
+		roundedFloatingVal = parseFloat(rating).toFixed(0);
+	}
 	var ratingImgHtml = "";
 	if(source != undefined && source == "Zillow"){
 		ratingImgHtml = "<div class='rating-image float-left icn-zillow' title='Zillow'></div>";
