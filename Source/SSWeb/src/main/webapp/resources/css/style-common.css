@@ -635,6 +635,20 @@ html.is-modern.card-root.js.no-touch.csstransitions.svg.inlinesvg.placeholder
 	font-weight: bold !important;
 }
 
+.profile-image-display {
+	height: 30px;
+	width: 30px;
+	background-color: #5cc7ef;
+	border-radius: 50%;
+	text-align: center;
+	line-height: 30px;
+	position: relative;
+	color: #fff;
+	text-transform: uppercase;
+	z-index: 999999;
+	font-weight: bold !important;
+}
+
 .text-normal {
 	text-transform: none;
 }
@@ -5230,8 +5244,13 @@ td.v-tbl-line {
 	width: 9%;
 }
 
+td.v-tbl-img {
+	width: 5%;
+}
+
+
 td.v-tbl-name {
-	width: 26%;
+	width: 21%;
 }
 
 td.v-tbl-add {
@@ -7128,8 +7147,12 @@ div.v-tbl-line {
 	width: 9%;
 }
 
+div.v-tbl-img {
+	width: 5%;
+}
+
 div.v-tbl-name {
-	width: 26%;
+	width: 21%;
 }
 
 div.v-tbl-add {

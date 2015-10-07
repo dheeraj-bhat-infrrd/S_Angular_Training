@@ -1,6 +1,7 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <%@ taglib uri="http://www.springframework.org/tags" prefix="spring"%>
+<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions"%>
 <c:set value="${sessionScope.SPRING_SECURITY_CONTEXT.authentication.principal}" var="user" />
 <div class="bd-hr-lp-content-wrapper">
 	<!-- Regions -->
@@ -9,7 +10,10 @@
 			<c:forEach var="region" items="${regions}">
 				<div class="bd-hr-item-l1 comp-region" data-openstatus="closed" data-regionid="${region.regionId}">
 					<div class="bd-hr-item bd-lt-l1 clearfix">
-						<div class="bd-hr-txt">${region.region}</div>
+						<div id="" class="float-left profile-image-display" style="">
+							<span id="">${fn:substring(region.region, 0, 1)}</span>
+						</div>
+						<div class="float-left margin-left-10 bd-hr-txt">${region.region}</div>
 					</div>
 					<div class="bd-hr-item-l2 hide" id="comp-region-branches-${region.regionId}"></div>
 				</div>
@@ -23,7 +27,10 @@
 			<c:forEach var="branch" items="${branches}">
 				<div class="bd-hr-item-l1 comp-branch" data-openstatus="closed" data-branchid="${branch.branchId}">
 					<div class="bd-hr-item bd-lt-l2 clearfix">
-						<div class="bd-hr-txt">${branch.branch}</div>
+						<div id="" class="float-left profile-image-display" style="">
+							<span id="">${fn:substring(branch.branch, 0, 1)}</span>
+						</div>
+						<div class="float-left margin-left-10 bd-hr-txt">${branch.branch}</div>
 					</div>
 					<div class="bd-hr-item-l2 hide" id="comp-branch-individuals-${branch.branchId}"></div>
 				</div>
