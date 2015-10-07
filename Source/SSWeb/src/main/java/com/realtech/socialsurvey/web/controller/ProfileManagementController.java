@@ -11,12 +11,11 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
 import javax.imageio.ImageIO;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import javax.ws.rs.QueryParam;
-
+import javax.ws.rs.core.Response;
 import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrDocumentList;
 import org.slf4j.Logger;
@@ -32,9 +31,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
-
 import sun.misc.BASE64Decoder;
-
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.type.TypeFactory;
 import com.google.gson.Gson;
@@ -4088,7 +4085,7 @@ public class ProfileManagementController
 
 
     @ResponseBody
-    @RequestMapping ( value = "/findaproscroll", method = RequestMethod.POST)
+    @RequestMapping ( value = "/findaproscroll", method = RequestMethod.POST, produces = {"text/plain; charset=UTF-8","*/*;charset=UTF-8"})
     public String findAProfileScroll( Model model, HttpServletRequest request )
     {
         LOG.info( "Method findAProfileScroll called." );
@@ -4136,6 +4133,7 @@ public class ProfileManagementController
 
                 userList.setUsers( users );
                 userList.setUserFound( results.getNumFound() );
+                
             } catch ( MalformedURLException e ) {
                 LOG.error( "Error occured while searching in findAProfileScroll(). Reason is ", e );
                 throw new NonFatalException( "Error occured while searching in findAProfileScroll()", e );

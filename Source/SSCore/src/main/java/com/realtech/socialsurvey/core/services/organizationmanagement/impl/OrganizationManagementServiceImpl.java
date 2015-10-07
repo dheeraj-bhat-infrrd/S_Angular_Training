@@ -2390,7 +2390,8 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
      * @return
      * @throws InvalidInputException
      */
-    private Boolean validateEmail( String emailId ) throws InvalidInputException
+    @Override
+    public Boolean validateEmail( String emailId ) throws InvalidInputException
     {
         boolean validEmail = true;
         LOG.info( "Method validateAndParseEmailIds called" );
