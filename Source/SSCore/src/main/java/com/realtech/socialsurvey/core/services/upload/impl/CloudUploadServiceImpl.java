@@ -3,7 +3,8 @@ package com.realtech.socialsurvey.core.services.upload.impl;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Date;
+import java.util.Arrays;
+import java.util.Calendar;
 import java.util.List;
 
 import javax.imageio.ImageIO;
@@ -22,6 +23,7 @@ import com.amazonaws.regions.Region;
 import com.amazonaws.regions.Regions;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.AmazonS3Client;
+import com.amazonaws.services.s3.model.BucketLifecycleConfiguration;
 import com.amazonaws.services.s3.model.CannedAccessControlList;
 import com.amazonaws.services.s3.model.ListObjectsRequest;
 import com.amazonaws.services.s3.model.ObjectListing;
@@ -44,6 +46,8 @@ public class CloudUploadServiceImpl implements FileUploadService
 
     private static final Logger LOG = LoggerFactory.getLogger( CloudUploadServiceImpl.class );
     private static final String CACHE_PUBLIC = "public";
+    private static final String CACHE_MAX_AGE = "max-age=";
+    private static final String CACHE_VALUE_SEPERATOR = ", ";
 
     @Autowired
     private EncryptionHelper encryptionHelper;
@@ -149,21 +153,30 @@ public class CloudUploadServiceImpl implements FileUploadService
             throw new InvalidInputException( "Either file or file name is not present" );
         }
 
+        Calendar cal = Calendar.getInstance();
+        cal.set(Calendar.DATE, 19);
+        cal.set(Calendar.MONTH, Calendar.JANUARY);
+        cal.set(Calendar.YEAR, 2038);
+        
+        int maxAgeValue = (int) ( ( cal.getTimeInMillis() - System.currentTimeMillis() ) / 1000 ) ;
+
         ObjectMetadata metadata = new ObjectMetadata();
-        metadata.setCacheControl( CACHE_PUBLIC );
+        metadata.setCacheControl( CACHE_MAX_AGE + maxAgeValue + CACHE_VALUE_SEPERATOR + CACHE_PUBLIC );
         // TODO: set expiration date properly later
-        metadata.setExpirationTime( new Date( System.currentTimeMillis() ) );
+        metadata.setExpirationTime( cal.getTime() );
         PutObjectRequest putObjectRequest = new PutObjectRequest( bucket, fileName, file );
         putObjectRequest.setMetadata( metadata );
         putObjectRequest.withCannedAcl( CannedAccessControlList.PublicRead );
 
         AmazonS3 s3Client = createAmazonClient( endpoint, bucket );
+        addExpirationTime( s3Client, (int) ( maxAgeValue / ( 24 * 60 * 60 ) ), bucket );
+
         PutObjectResult result = s3Client.putObject( putObjectRequest );
 
         LOG.info( "Amazon Upload Etag: " + result.getETag() );
         LOG.info( "Uploaded " + fileName + " to Amazon s3" );
     }
-
+   
 
     /**
      * Method that returns a list of all the keys in a bucket.
@@ -253,4 +266,19 @@ public class CloudUploadServiceImpl implements FileUploadService
         LOG.debug( "Returning Amazon S3 Client" );
         return s3Client;
     }
+
+
+    private void addExpirationTime( AmazonS3 s3Client, int days, String bucket )
+    {
+
+        BucketLifecycleConfiguration.Rule picExpirationRule = new BucketLifecycleConfiguration.Rule()
+            .withId( "PicExpirationRule" ).withExpirationInDays(days).withStatus( BucketLifecycleConfiguration.ENABLED.toString() );
+
+        BucketLifecycleConfiguration configuration = new BucketLifecycleConfiguration().withRules( Arrays
+            .asList( picExpirationRule ) );
+
+        s3Client.setBucketLifecycleConfiguration( bucket, configuration );
+
+    }
+
 }
