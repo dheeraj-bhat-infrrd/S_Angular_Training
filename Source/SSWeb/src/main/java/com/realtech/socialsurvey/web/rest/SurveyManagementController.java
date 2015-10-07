@@ -792,6 +792,10 @@ public class SurveyManagementController
                     }
                 }
             }
+            socialPostShared = surveyHandler.calcualteFinalCount( socialPostShared, agentSharedOn, branchSharedOn,
+                regionSharedOn, companySharedOn );
+            surveyDetails.setSocialPostShared( socialPostShared );
+            surveyHandler.updateSurveyDetails( surveyDetails );
         } catch ( NonFatalException e ) {
             LOG.error(
                 "Non fatal Exception caught in postToSocialMedia() while trying to post to social networking sites. Nested excption is ",
