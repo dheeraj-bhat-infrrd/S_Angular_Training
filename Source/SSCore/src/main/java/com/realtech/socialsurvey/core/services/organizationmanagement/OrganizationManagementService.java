@@ -1132,4 +1132,7 @@ public interface OrganizationManagementService
     public boolean updateScoreForSurvey( String collectionName, OrganizationUnitSettings unitSettings,
         SurveySettings surveySettings ) throws InvalidInputException;
 
+
+    public Boolean validateEmail( String emailId ) throws InvalidInputException;
+
 }
