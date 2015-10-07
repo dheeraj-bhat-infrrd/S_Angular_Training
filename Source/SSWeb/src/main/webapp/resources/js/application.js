@@ -4625,14 +4625,15 @@ function fetchUsers(newIndex) {
 	if (profileLevel != undefined && profileLevel != "") {
 		fetchUsersByProfileLevel(iden, profileLevel, newIndex);
 	} else {
-		var formData = new FormData();
-		formData.append("find-pro-first-name", $('#fp-first-name-pattern').val());
-		formData.append("find-pro-last-name", $('#fp-last-name-pattern').val());
-		formData.append("find-pro-start-index", newIndex);
-		formData.append("find-pro-row-size", rowSize);
+		var payload = {
+			"find-pro-first-name" : $('#fp-first-name-pattern').val(),
+			"find-pro-last-name" : $('#fp-last-name-pattern').val(),
+			"find-pro-start-index" : newIndex,
+			"find-pro-row-size" : rowSize
+		};
 		
 		if (!($('#find-pro-first-name').val() == "" && $('#find-pro-last-name').val() == ""))
-			callAjaxPOSTWithTextData("./findaproscroll.do", paginateUsersProList, true, formData);
+			callAjaxPostWithPayloadData("./findaproscroll.do", paginateUsersProList, payload, true);
 		else
 			hideOverlay();
 	}

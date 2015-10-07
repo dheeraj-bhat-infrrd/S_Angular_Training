@@ -60,8 +60,11 @@ public class SocialFeedIngestionKickStarter {
 	@Transactional
 	public void startOlderFeedPurging() {
 		LOG.info("Kick starting older feed Purging");
-		long timeSpanInMilliSecs = TimeUnit.MILLISECONDS.convert(socialPostSpanDays, TimeUnit.DAYS);
-		socialPostDao.purgeOlderSocialPosts(timeSpanInMilliSecs);
+		// check to avoid purging
+		if(socialPostSpanDays > 0l){
+			long timeSpanInMilliSecs = TimeUnit.MILLISECONDS.convert(socialPostSpanDays, TimeUnit.DAYS);
+			socialPostDao.purgeOlderSocialPosts(timeSpanInMilliSecs);
+		}
 	}
 	
 	/**

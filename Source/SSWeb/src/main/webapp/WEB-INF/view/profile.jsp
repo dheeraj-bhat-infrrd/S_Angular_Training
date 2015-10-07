@@ -110,6 +110,14 @@
     			<c:set var="integerAverageRating" value="5"></c:set>
     		</c:if>
     	</c:if>
+    	<c:choose>
+			<c:when test="${ floatingAverageRating % 1 == 0 }">
+				<fmt:formatNumber var="floatingAverageRating" type="number" value="${averageRating}" maxFractionDigits="0"/>
+			</c:when>
+			<c:otherwise>
+				<fmt:formatNumber var="floatingAverageRating" type="number" value="${averageRating}" maxFractionDigits="1" minFractionDigits="1"/>
+			</c:otherwise>
+		</c:choose>
     </c:if>
 </head>
 <body>
