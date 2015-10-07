@@ -597,6 +597,10 @@ public class SocialManagementController
         //Add action to social connection history
         String action = "connected";
         SocialUpdateAction socialUpdateAction = new SocialUpdateAction();
+        if ( ( mediaTokens != null ) && ( mediaTokens.getFacebookToken() != null )
+            && ( mediaTokens.getFacebookToken().getFacebookPageLink() != null )
+            && !( mediaTokens.getFacebookToken().getFacebookPageLink().isEmpty() ) )
+            socialUpdateAction.setLink( mediaTokens.getFacebookToken().getFacebookPageLink() );
         socialUpdateAction.setAction( action );
         socialUpdateAction.setAgentId( agentId );
         socialUpdateAction.setBranchId( branchId );
@@ -690,6 +694,7 @@ public class SocialManagementController
             model.addAttribute( "columnValue", columnValue );
             model.addAttribute( "fromDashboard", 1 );
         }
+        SocialMediaTokens mediaTokens = null;
         try {
             UserSettings userSettings = (UserSettings) session.getAttribute( CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION );
             long entityId = (long) session.getAttribute( CommonConstants.ENTITY_ID_COLUMN );
@@ -739,7 +744,6 @@ public class SocialManagementController
             boolean updated = false;
 
             // Storing token
-            SocialMediaTokens mediaTokens;
             int accountMasterId = accountType.getValue();
             if ( entityType.equals( CommonConstants.COMPANY_ID_COLUMN ) ) {
                 OrganizationUnitSettings companySettings = organizationManagementService.getCompanySettings( user.getCompany()
@@ -852,6 +856,10 @@ public class SocialManagementController
         //Add action to social connection history
         String action = "connected";
         SocialUpdateAction socialUpdateAction = new SocialUpdateAction();
+        if ( ( mediaTokens != null ) && ( mediaTokens.getTwitterToken() != null )
+            && ( mediaTokens.getTwitterToken().getTwitterPageLink() != null )
+            && !( mediaTokens.getTwitterToken().getTwitterPageLink().isEmpty() ) )
+            socialUpdateAction.setLink( mediaTokens.getTwitterToken().getTwitterPageLink() );
         socialUpdateAction.setAction( action );
         socialUpdateAction.setAgentId( agentId );
         socialUpdateAction.setBranchId( branchId );
@@ -923,6 +931,7 @@ public class SocialManagementController
             model.addAttribute( "columnValue", columnValue );
             model.addAttribute( "fromDashboard", 1 );
         }
+        SocialMediaTokens mediaTokens = null;
         try {
             UserSettings userSettings = (UserSettings) session.getAttribute( CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION );
             long entityId = (long) session.getAttribute( CommonConstants.ENTITY_ID_COLUMN );
@@ -973,7 +982,6 @@ public class SocialManagementController
             LinkedinUserProfileResponse profileData = new Gson().fromJson( basicProfileStr, LinkedinUserProfileResponse.class );
             String profileLink = (String) profileData.getSiteStandardProfileRequest().getUrl();
 
-            SocialMediaTokens mediaTokens;
             boolean updated = false;
             int accountMasterId = accountType.getValue();
             if ( entityType.equals( CommonConstants.COMPANY_ID_COLUMN ) ) {
@@ -1098,6 +1106,10 @@ public class SocialManagementController
         //Add action to social connection history
         String action = "connected";
         SocialUpdateAction socialUpdateAction = new SocialUpdateAction();
+        if ( ( mediaTokens != null ) && ( mediaTokens.getLinkedInToken() != null )
+            && ( mediaTokens.getLinkedInToken().getLinkedInPageLink() != null )
+            && !( mediaTokens.getLinkedInToken().getLinkedInPageLink().isEmpty() ) )
+            socialUpdateAction.setLink( mediaTokens.getLinkedInToken().getLinkedInPageLink() );
         socialUpdateAction.setAction( action );
         socialUpdateAction.setAgentId( agentId );
         socialUpdateAction.setBranchId( branchId );
@@ -1168,6 +1180,7 @@ public class SocialManagementController
             model.addAttribute( "columnValue", columnValue );
             model.addAttribute( "fromDashboard", 1 );
         }
+        SocialMediaTokens mediaTokens = null;
         try {
             UserSettings userSettings = (UserSettings) session.getAttribute( CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION );
             long entityId = (long) session.getAttribute( CommonConstants.ENTITY_ID_COLUMN );
@@ -1229,7 +1242,6 @@ public class SocialManagementController
             boolean updated = false;
 
             // Storing access token
-            SocialMediaTokens mediaTokens;
             int accountMasterId = accountType.getValue();
             if ( entityType.equals( CommonConstants.COMPANY_ID_COLUMN ) ) {
                 OrganizationUnitSettings companySettings = organizationManagementService.getCompanySettings( user.getCompany()
@@ -1342,6 +1354,10 @@ public class SocialManagementController
         //Add action to social connection history
         String action = "connected";
         SocialUpdateAction socialUpdateAction = new SocialUpdateAction();
+        if ( ( mediaTokens != null ) && ( mediaTokens.getGoogleToken() != null )
+            && ( mediaTokens.getGoogleToken().getProfileLink() != null )
+            && !( mediaTokens.getGoogleToken().getProfileLink().isEmpty() ) )
+            socialUpdateAction.setLink( mediaTokens.getGoogleToken().getProfileLink() );
         socialUpdateAction.setAction( action );
         socialUpdateAction.setAgentId( agentId );
         socialUpdateAction.setBranchId( branchId );
@@ -1773,6 +1789,7 @@ public class SocialManagementController
         long regionId = 0;
         long companyId = 0;
         long agentId = 0;
+        SocialMediaTokens mediaTokens = null;
         OrganizationUnitSettings profileSettings = (OrganizationUnitSettings) session
                 .getAttribute( CommonConstants.USER_ACCOUNT_SETTINGS );
         if(profileSettings == null){
@@ -1930,7 +1947,6 @@ public class SocialManagementController
                         }
                     }
                 }
-                SocialMediaTokens mediaTokens;
                 int accountMasterId = accountType.getValue();
                 if ( entityType.equals( CommonConstants.COMPANY_ID_COLUMN ) ) {
                     OrganizationUnitSettings companySettings = organizationManagementService.getCompanySettings( user
@@ -2053,6 +2069,10 @@ public class SocialManagementController
             //Add action to social connection history
             String action = "connected";
             SocialUpdateAction socialUpdateAction = new SocialUpdateAction();
+            if ( ( mediaTokens != null ) && ( mediaTokens.getZillowToken() != null )
+                && ( mediaTokens.getZillowToken().getZillowProfileLink() != null )
+                && !( mediaTokens.getZillowToken().getZillowProfileLink().isEmpty() ) )
+                socialUpdateAction.setLink( mediaTokens.getZillowToken().getZillowProfileLink() );
             socialUpdateAction.setAction( action );
             socialUpdateAction.setAgentId( agentId );
             socialUpdateAction.setBranchId( branchId );
@@ -2136,7 +2156,15 @@ public class SocialManagementController
         long regionId = 0;
         long companyId = 0;
         long agentId = 0;
+        SocialMediaTokens mediaTokens = null;
         try {
+            User user = sessionHelper.getCurrentUser();
+            UserSettings userSettings = (UserSettings) session.getAttribute( CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION );
+            long entityId = (long) session.getAttribute( CommonConstants.ENTITY_ID_COLUMN );
+            String entityType = (String) session.getAttribute( CommonConstants.ENTITY_TYPE_COLUMN );
+            if ( userSettings == null || entityType == null ) {
+                throw new InvalidInputException( "No user settings found in session" );
+            }
             if ( socialMedia == null || socialMedia.isEmpty() ) {
                 throw new InvalidInputException( "Social media can not be null or empty" );
             }
@@ -2168,13 +2196,6 @@ public class SocialManagementController
     		default:
     			throw new InvalidInputException("Invalid social media token entered");
     		}
-            User user = sessionHelper.getCurrentUser();
-            UserSettings userSettings = (UserSettings) session.getAttribute( CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION );
-            long entityId = (long) session.getAttribute( CommonConstants.ENTITY_ID_COLUMN );
-            String entityType = (String) session.getAttribute( CommonConstants.ENTITY_TYPE_COLUMN );
-            if ( userSettings == null || entityType == null ) {
-                throw new InvalidInputException( "No user settings found in session" );
-            }
             
             try {
                 Map<String, Long> hierarchyDetails = profileManagementService.getHierarchyDetailsByEntity( entityType, entityId );
@@ -2190,6 +2211,7 @@ public class SocialManagementController
             OrganizationUnitSettings unitSettings = null;
             if ( entityType.equals( CommonConstants.COMPANY_ID_COLUMN ) ) {
                 unitSettings = organizationManagementService.getCompanySettings( user.getCompany().getCompanyId() );
+                mediaTokens = unitSettings.getSocialMediaTokens();
                 unitSettings = socialManagementService.disconnectSocialNetwork( socialMedia, unitSettings,
                     MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION );
                 userSettings.setCompanySettings( unitSettings );
@@ -2201,6 +2223,7 @@ public class SocialManagementController
                 }
             } else if ( entityType.equals( CommonConstants.REGION_ID_COLUMN ) ) {
                 unitSettings = organizationManagementService.getRegionSettings( entityId );
+                mediaTokens = unitSettings.getSocialMediaTokens();
                 unitSettings = socialManagementService.disconnectSocialNetwork( socialMedia, unitSettings,
                     MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION );
                 userSettings.getRegionSettings().put( entityId, unitSettings );
@@ -2212,6 +2235,7 @@ public class SocialManagementController
                 }
             } else if ( entityType.equals( CommonConstants.BRANCH_ID_COLUMN ) ) {
                 unitSettings = organizationManagementService.getBranchSettingsDefault( entityId );
+                mediaTokens = unitSettings.getSocialMediaTokens();
                 unitSettings = socialManagementService.disconnectSocialNetwork( socialMedia, unitSettings,
                     MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION );
                 userSettings.getBranchSettings().put( entityId, unitSettings );
@@ -2224,6 +2248,7 @@ public class SocialManagementController
             }
             if ( entityType.equals( CommonConstants.AGENT_ID_COLUMN ) ) {
                 unitSettings = userManagementService.getUserSettings( entityId );
+                mediaTokens = unitSettings.getSocialMediaTokens();
                 unitSettings = socialManagementService.disconnectSocialNetwork( socialMedia, unitSettings,
                     MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION );
                 userSettings.setAgentSettings( (AgentSettings) unitSettings );
@@ -2243,6 +2268,68 @@ public class SocialManagementController
         //Add action to social connection history
         String action = "disconnected";
         SocialUpdateAction socialUpdateAction = new SocialUpdateAction();
+        
+        if ( mediaTokens != null ) {
+            switch ( socialMedia ) {
+                case CommonConstants.FACEBOOK_SOCIAL_SITE:
+                    if ( ( mediaTokens.getFacebookToken() != null )
+                        && ( mediaTokens.getFacebookToken().getFacebookPageLink() != null )
+                        && !( mediaTokens.getFacebookToken().getFacebookPageLink().isEmpty() ) )
+                        socialUpdateAction.setLink( mediaTokens.getFacebookToken().getFacebookPageLink() );
+                    break;
+
+                case CommonConstants.TWITTER_SOCIAL_SITE:
+                    if ( ( mediaTokens.getTwitterToken() != null )
+                        && ( mediaTokens.getTwitterToken().getTwitterPageLink() != null )
+                        && !( mediaTokens.getTwitterToken().getTwitterPageLink().isEmpty() ) )
+                        socialUpdateAction.setLink( mediaTokens.getTwitterToken().getTwitterPageLink() );
+                    break;
+
+                case CommonConstants.GOOGLE_SOCIAL_SITE:
+                    if ( ( mediaTokens.getGoogleToken() != null ) && ( mediaTokens.getGoogleToken().getProfileLink() != null )
+                        && !( mediaTokens.getGoogleToken().getProfileLink().isEmpty() ) )
+                        socialUpdateAction.setLink( mediaTokens.getGoogleToken().getProfileLink() );
+                    break;
+
+                case CommonConstants.LINKEDIN_SOCIAL_SITE:
+                    if ( ( mediaTokens.getLinkedInToken() != null )
+                        && ( mediaTokens.getLinkedInToken().getLinkedInPageLink() != null )
+                        && !( mediaTokens.getLinkedInToken().getLinkedInPageLink().isEmpty() ) )
+                        socialUpdateAction.setLink( mediaTokens.getLinkedInToken().getLinkedInPageLink() );
+                    break;
+
+                case CommonConstants.ZILLOW_SOCIAL_SITE:
+                    if ( ( mediaTokens.getZillowToken() != null )
+                        && ( mediaTokens.getZillowToken().getZillowProfileLink() != null )
+                        && !( mediaTokens.getZillowToken().getZillowProfileLink().isEmpty() ) )
+                        socialUpdateAction.setLink( mediaTokens.getZillowToken().getZillowProfileLink() );
+                    break;
+
+                case CommonConstants.YELP_SOCIAL_SITE:
+                    if ( ( mediaTokens.getYelpToken() != null ) && ( mediaTokens.getYelpToken().getYelpPageLink() != null )
+                        && !( mediaTokens.getYelpToken().getYelpPageLink().isEmpty() ) )
+                        socialUpdateAction.setLink( mediaTokens.getYelpToken().getYelpPageLink() );
+                    break;
+
+                case CommonConstants.REALTOR_SOCIAL_SITE:
+                    if ( ( mediaTokens.getRealtorToken() != null )
+                        && ( mediaTokens.getRealtorToken().getRealtorProfileLink() != null )
+                        && !( mediaTokens.getRealtorToken().getRealtorProfileLink().isEmpty() ) )
+                        socialUpdateAction.setLink( mediaTokens.getRealtorToken().getRealtorProfileLink() );
+                    break;
+
+                case CommonConstants.LENDINGTREE_SOCIAL_SITE:
+                    if ( ( mediaTokens.getLendingTreeToken() != null )
+                        && ( mediaTokens.getLendingTreeToken().getLendingTreeProfileLink() != null )
+                        && !( mediaTokens.getLendingTreeToken().getLendingTreeProfileLink().isEmpty() ) )
+                        socialUpdateAction.setLink( mediaTokens.getLendingTreeToken().getLendingTreeProfileLink() );
+                    break;
+
+                default:
+                    LOG.error( "Invalid social media token entered" );
+            }
+        }
+        
         socialUpdateAction.setAction( action );
         socialUpdateAction.setAgentId( agentId );
         socialUpdateAction.setBranchId( branchId );

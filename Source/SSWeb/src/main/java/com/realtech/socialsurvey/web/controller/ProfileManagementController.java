@@ -2962,6 +2962,10 @@ public class ProfileManagementController
             //Add action to social connection history
             String action = "connected";
             SocialUpdateAction socialUpdateAction = new SocialUpdateAction();
+            if ( ( socialMediaTokens != null ) && ( socialMediaTokens.getYelpToken() != null )
+                && ( socialMediaTokens.getYelpToken().getYelpPageLink() != null )
+                && !( socialMediaTokens.getYelpToken().getYelpPageLink().isEmpty() ) )
+                socialUpdateAction.setLink( socialMediaTokens.getYelpToken().getYelpPageLink() );
             socialUpdateAction.setAction( action );
             socialUpdateAction.setAgentId( agentId );
             socialUpdateAction.setBranchId( branchId );
@@ -3380,6 +3384,10 @@ public class ProfileManagementController
             //Add action to social connection history
             String action = "connected";
             SocialUpdateAction socialUpdateAction = new SocialUpdateAction();
+            if ( ( socialMediaTokens != null ) && ( socialMediaTokens.getRealtorToken() != null )
+                && ( socialMediaTokens.getRealtorToken().getRealtorProfileLink() != null )
+                && !( socialMediaTokens.getRealtorToken().getRealtorProfileLink().isEmpty() ) )
+                socialUpdateAction.setLink( socialMediaTokens.getRealtorToken().getRealtorProfileLink() );
             socialUpdateAction.setAction( action );
             socialUpdateAction.setAgentId( agentId );
             socialUpdateAction.setBranchId( branchId );
@@ -3537,6 +3545,10 @@ public class ProfileManagementController
             //Add action to social connection history
             String action = "connected";
             SocialUpdateAction socialUpdateAction = new SocialUpdateAction();
+            if ( ( socialMediaTokens != null ) && ( socialMediaTokens.getLendingTreeToken() != null )
+                && ( socialMediaTokens.getLendingTreeToken().getLendingTreeProfileLink() != null )
+                && !( socialMediaTokens.getLendingTreeToken().getLendingTreeProfileLink().isEmpty() ) )
+                socialUpdateAction.setLink( socialMediaTokens.getLendingTreeToken().getLendingTreeProfileLink() );
             socialUpdateAction.setAction( action );
             socialUpdateAction.setAgentId( agentId );
             socialUpdateAction.setBranchId( branchId );
