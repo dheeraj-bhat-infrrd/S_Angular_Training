@@ -8601,8 +8601,10 @@ $(document).on('click', '#wc-send-survey', function() {
 		getIncompleteSurveyCount(colName, colValue);
 		if(data == "error"){
 			$('#overlay-toast').html('Error while sending survey request!');
-		}else{
+		}else if(data == "Success"){
 			$('#overlay-toast').html('Survey request sent successfully!');
+		}else{
+			$('#overlay-toast').html(data);
 		}
 		
 		showToast();

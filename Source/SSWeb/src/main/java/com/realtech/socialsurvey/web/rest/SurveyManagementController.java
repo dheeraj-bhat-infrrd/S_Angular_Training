@@ -55,6 +55,8 @@ import com.realtech.socialsurvey.core.services.search.exception.SolrException;
 import com.realtech.socialsurvey.core.services.social.SocialManagementService;
 import com.realtech.socialsurvey.core.services.surveybuilder.SurveyBuilder;
 import com.realtech.socialsurvey.core.services.surveybuilder.SurveyHandler;
+import com.realtech.socialsurvey.core.services.surveybuilder.impl.DuplicateSurveyRequestException;
+import com.realtech.socialsurvey.core.services.surveybuilder.impl.SelfSurveyInitiationException;
 import com.realtech.socialsurvey.core.utils.DisplayMessageConstants;
 import com.realtech.socialsurvey.core.utils.EmailFormatHelper;
 import com.realtech.socialsurvey.core.utils.MessageUtils;
@@ -388,6 +390,7 @@ public class SurveyManagementController
         // custRelationWithAgent = request.getParameter("relationship");
         // TODO:remove customer relation with agent
         custRelationWithAgent = "transacted";
+        String errorMsg = null;
         try {
             try {
                 String agentIdStr = request.getParameter( CommonConstants.AGENT_ID_COLUMN );
@@ -401,7 +404,7 @@ public class SurveyManagementController
                 if ( !captchaValidation.isCaptchaValid( request.getRemoteAddr(), captchaSecretKey,
                     request.getParameter( "g-recaptcha-response" ) ) ) {
                     LOG.error( "Captcha Validation failed!" );
-                    String errorMsg = messageUtils.getDisplayMessage( DisplayMessageConstants.INVALID_CAPTCHA,
+                    errorMsg = messageUtils.getDisplayMessage( DisplayMessageConstants.INVALID_CAPTCHA,
                         DisplayMessageType.ERROR_MESSAGE ).getMessage();
                     throw new InvalidInputException( errorMsg, DisplayMessageConstants.INVALID_CAPTCHA );
                 }
@@ -432,14 +435,24 @@ public class SurveyManagementController
                 model.addAttribute( "agentName", agentName );
                 return JspResolver.SURVEY_INVITE_SUCCESSFUL;
             }
-            surveyHandler.sendSurveyInvitationMail( firstName, lastName, customerEmail, custRelationWithAgent, user, false,
-                source );
+            
+            try{
+                surveyHandler.initiateSurveyRequest( user.getUserId(), customerEmail, firstName, lastName, source );
+            }catch(SelfSurveyInitiationException e){
+                errorMsg = messageUtils.getDisplayMessage( DisplayMessageConstants.SELF_SURVEY_INITIATION,
+                    DisplayMessageType.ERROR_MESSAGE ).getMessage();
+            }catch(DuplicateSurveyRequestException e){
+                errorMsg = messageUtils.getDisplayMessage( DisplayMessageConstants.DUPLICATE_SURVEY_REQUEST,
+                    DisplayMessageType.ERROR_MESSAGE ).getMessage();
+            }
 
         } catch ( NonFatalException e ) {
             LOG.error( "Exception caught in getSurvey() method of SurveyManagementController." );
             model.addAttribute( "status", DisplayMessageType.ERROR_MESSAGE );
-            model.addAttribute( "message",
-                messageUtils.getDisplayMessage( DisplayMessageConstants.INVALID_CAPTCHA, DisplayMessageType.ERROR_MESSAGE ) );
+            if(errorMsg != null)
+                model.addAttribute( "message", errorMsg );
+            else
+                model.addAttribute( "message", messageUtils.getDisplayMessage( DisplayMessageConstants.INVALID_CAPTCHA, DisplayMessageType.ERROR_MESSAGE ) );
             model.addAttribute( "agentId", agentId );
             model.addAttribute( "agentName", agentName );
             model.addAttribute( "firstName", firstName );
