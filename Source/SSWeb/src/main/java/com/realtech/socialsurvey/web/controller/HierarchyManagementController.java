@@ -1886,7 +1886,7 @@ public class HierarchyManagementController {
 					String indivName = "";
 					for (String inputStrIndiv : inputTokensIndivDetail) {
 
-						if (inputStrIndiv.trim().matches(CommonConstants.EMAIL_REGEX)) {
+						if (organizationManagementService.validateEmail( inputStrIndiv.trim() )) {
 							// Setting EmailId
 							if (userEntity.getEmailId() == null || userEntity.getEmailId().isEmpty()) {
 								userEntity.setEmailId(inputStrIndiv);

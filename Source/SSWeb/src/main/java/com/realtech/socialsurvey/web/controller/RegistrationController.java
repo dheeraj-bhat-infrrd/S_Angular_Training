@@ -644,7 +644,7 @@ public class RegistrationController
         }
 
         // check if email Id isEmpty, null or whether it matches the regular expression or not
-        if ( emailId == null || emailId.isEmpty() || !emailId.matches( CommonConstants.EMAIL_REGEX ) ) {
+        if ( emailId == null || emailId.isEmpty() || !organizationManagementService.validateEmail( emailId ) ) {
             throw new InvalidInputException( "Email address is invalid in registration",
                 DisplayMessageConstants.INVALID_EMAILID );
         }
