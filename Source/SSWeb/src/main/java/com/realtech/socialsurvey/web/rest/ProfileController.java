@@ -33,10 +33,10 @@ import com.realtech.socialsurvey.core.entities.ContactDetailsSettings;
 import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
 import com.realtech.socialsurvey.core.entities.ProListUser;
 import com.realtech.socialsurvey.core.entities.Region;
-import com.realtech.socialsurvey.core.entities.SettingsDetails;
 import com.realtech.socialsurvey.core.entities.SocialMediaTokens;
 import com.realtech.socialsurvey.core.entities.SocialPost;
 import com.realtech.socialsurvey.core.entities.SurveyDetails;
+import com.realtech.socialsurvey.core.entities.SurveySettings;
 import com.realtech.socialsurvey.core.entities.UserListFromSearch;
 import com.realtech.socialsurvey.core.enums.OrganizationUnit;
 import com.realtech.socialsurvey.core.enums.SettingsForApplication;
@@ -771,10 +771,7 @@ public class ProfileController
             + " and maxscore:" + maxScore );
         Response response = null;
 
-        long companyId = 0;
-        long branchId = 0;
-        Map<SettingsForApplication, OrganizationUnit> map = null;
-        OrganizationUnitSettings companyProfile = null;
+
         OrganizationUnitSettings regionProfile = null;
         try {
             if ( regionId <= 0l ) {
@@ -800,41 +797,31 @@ public class ProfileController
             }
             try {
 
-                Map<String, Long> hierarchyDetails = profileManagementService.getHierarchyDetailsByEntity(
-                    CommonConstants.REGION_ID_COLUMN, regionId );
-                if ( hierarchyDetails == null ) {
-                    LOG.error( "Unable to fetch primary profile for this user " );
-                    throw new FatalException( "Unable to fetch primary profile for type : " + CommonConstants.REGION_ID_COLUMN
-                        + " and ID : " + regionId );
-                }
-                branchId = hierarchyDetails.get( CommonConstants.BRANCH_ID_COLUMN );
-                regionId = hierarchyDetails.get( CommonConstants.REGION_ID_COLUMN );
-                companyId = hierarchyDetails.get( CommonConstants.COMPANY_ID_COLUMN );
 
-                companyProfile = organizationManagementService.getCompanySettings( companyId );
                 regionProfile = organizationManagementService.getRegionSettings( regionId );
-                try {
-                    map = profileManagementService.getPrimaryHierarchyByEntity( CommonConstants.REGION_ID,
-                        regionProfile.getIden() );
-                    if ( map == null ) {
-                        LOG.error( "Unable to fetch primary profile for this user " );
-                        throw new FatalException( "Unable to fetch primary profile this user " + regionProfile.getIden() );
+                if ( regionProfile.getSurvey_settings() == null ) {
+                    SurveySettings surveySettings = new SurveySettings();
+                    surveySettings.setAutoPostEnabled( true );
+                    surveySettings.setShow_survey_above_score( CommonConstants.DEFAULT_AUTOPOST_SCORE );
+                    organizationManagementService.updateScoreForSurvey(
+                        MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION, regionProfile, surveySettings );
+                } else {
+                    if ( regionProfile.getSurvey_settings().getShow_survey_above_score() <= 0 ) {
+                        regionProfile.getSurvey_settings().setAutoPostEnabled( true );
+                        regionProfile.getSurvey_settings().setShow_survey_above_score( CommonConstants.DEFAULT_AUTOPOST_SCORE );
+                        organizationManagementService.updateScoreForSurvey(
+                            MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION, regionProfile,
+                            regionProfile.getSurvey_settings() );
                     }
-                } catch ( InvalidSettingsStateException e ) {
-                    throw new InternalServerException( new ProfileServiceErrorCode(
-                        CommonConstants.ERROR_CODE_REGION_PROFILE_SERVICE_FAILURE, CommonConstants.SERVICE_CODE_REGION_PROFILE,
-                        "Error occured while fetching region profile" ), e.getMessage() );
                 }
-                regionProfile = profileManagementService.getAutoPostScoreBasedOnHierarchy(
-                    MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION, regionProfile, companyProfile,
-                    regionProfile, null, null, map );
+
                 List<SurveyDetails> reviews = profileManagementService.getReviews( regionId, regionProfile.getSurvey_settings()
                     .getShow_survey_above_score(), maxScore, start, numRows, CommonConstants.PROFILE_LEVEL_REGION, false, null,
                     null, sortCriteria );
                 String json = new Gson().toJson( reviews );
                 LOG.debug( "reviews json : " + json );
                 response = Response.ok( json ).build();
-            } catch ( InvalidInputException | ProfileNotFoundException e ) {
+            } catch ( InvalidInputException e ) {
                 throw new InternalServerException( new ProfileServiceErrorCode(
                     CommonConstants.ERROR_CODE_REGION_REVIEWS_FETCH_FAILURE, CommonConstants.SERVICE_CODE_REGION_REVIEWS,
                     "Something went wrong while fetching reviews for a region" ), e.getMessage() );
@@ -1136,8 +1123,6 @@ public class ProfileController
         long regionId = 0;
 
         Map<SettingsForApplication, OrganizationUnit> map = null;
-        OrganizationUnitSettings companyProfile = null;
-        OrganizationUnitSettings regionProfile = null;
         OrganizationUnitSettings branchProfile = null;
         try {
             if ( branchId <= 0l ) {
@@ -1162,34 +1147,23 @@ public class ProfileController
                 sortCriteria = "date";
             }
             try {
-                Map<String, Long> hierarchyDetails = profileManagementService.getHierarchyDetailsByEntity(
-                    CommonConstants.BRANCH_ID_COLUMN, branchId );
-                if ( hierarchyDetails == null ) {
-                    LOG.error( "Unable to fetch primary profile for this user " );
-                    throw new FatalException( "Unable to fetch primary profile for type : " + CommonConstants.REGION_ID_COLUMN
-                        + " and ID : " + regionId );
-                }
 
-                regionId = hierarchyDetails.get( CommonConstants.REGION_ID_COLUMN );
-                companyId = hierarchyDetails.get( CommonConstants.COMPANY_ID_COLUMN );
-                companyProfile = organizationManagementService.getCompanySettings( companyId );
-                regionProfile = organizationManagementService.getRegionSettings( regionId );
                 branchProfile = organizationManagementService.getBranchSettingsDefault( branchId );
-                try {
-                    map = profileManagementService.getPrimaryHierarchyByEntity( CommonConstants.BRANCH_ID,
-                        branchProfile.getIden() );
-                    if ( map == null ) {
-                        LOG.error( "Unable to fetch primary profile for this user " );
-                        throw new FatalException( "Unable to fetch primary profile this user " + regionProfile.getIden() );
+                if ( branchProfile.getSurvey_settings() == null ) {
+                    SurveySettings surveySettings = new SurveySettings();
+                    surveySettings.setShow_survey_above_score( CommonConstants.DEFAULT_AUTOPOST_SCORE );
+                    surveySettings.setAutoPostEnabled( true );
+                    organizationManagementService.updateScoreForSurvey(
+                        MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION, branchProfile, surveySettings );
+                } else {
+                    if ( branchProfile.getSurvey_settings().getShow_survey_above_score() <= 0 ) {
+                        branchProfile.getSurvey_settings().setAutoPostEnabled( true );
+                        branchProfile.getSurvey_settings().setShow_survey_above_score( CommonConstants.DEFAULT_AUTOPOST_SCORE );
+                        organizationManagementService.updateScoreForSurvey(
+                            MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION, branchProfile,
+                            branchProfile.getSurvey_settings() );
                     }
-                } catch ( InvalidSettingsStateException e ) {
-                    throw new InternalServerException( new ProfileServiceErrorCode(
-                        CommonConstants.ERROR_CODE_REGION_PROFILE_SERVICE_FAILURE, CommonConstants.SERVICE_CODE_REGION_PROFILE,
-                        "Error occured while fetching region profile" ), e.getMessage() );
                 }
-                branchProfile = profileManagementService.getAutoPostScoreBasedOnHierarchy(
-                    MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION, branchProfile, companyProfile,
-                    regionProfile, branchProfile, null, map );
                 List<SurveyDetails> reviews = profileManagementService.getReviews( branchId, branchProfile.getSurvey_settings()
                     .getShow_survey_above_score(), maxScore, start, numRows, CommonConstants.PROFILE_LEVEL_BRANCH, false, null,
                     null, sortCriteria );
@@ -1202,8 +1176,6 @@ public class ProfileController
                     "Something went wrong while fetching reviews for a branch" ), e.getMessage() );
             } catch ( NoRecordsFetchedException e1 ) {
                 LOG.error( "Branch Profile Not Found ", e1 );
-            } catch ( ProfileNotFoundException pe ) {
-                throw new FatalException( "Unable to find user profile ", pe );
             }
         } catch ( BaseRestException e ) {
             response = getErrorResponse( e );
@@ -1322,17 +1294,9 @@ public class ProfileController
         LOG.info( "Service to fetch reviews of an agent called for agentId:" + agentId + " ,minScore:" + minScore
             + " and maxscore:" + maxScore );
         Response response = null;
-        long companyId = 0;
-        long regionId = 0;
-        long branchId = 0;
-        boolean minScoreLocked = true;
-        long currentLockAggregateValue = 0;
-        List<SettingsDetails> settingsDetailsList = null;
-        Map<SettingsForApplication, OrganizationUnit> map = null;
-        OrganizationUnitSettings companyProfile = null;
-        OrganizationUnitSettings regionProfile = null;
-        OrganizationUnitSettings branchProfile = null;
+
         OrganizationUnitSettings agentProfile = null;
+
         try {
             if ( agentId <= 0l ) {
                 throw new InputValidationException( new ProfileServiceErrorCode(
@@ -1355,87 +1319,37 @@ public class ProfileController
             if ( sortCriteria == null || sortCriteria.equalsIgnoreCase( CommonConstants.REVIEWS_SORT_CRITERIA_DEFAULT ) ) {
                 sortCriteria = CommonConstants.REVIEWS_SORT_CRITERIA_DATE;
             }
-            try {
-                Map<String, Long> hierarchyDetails = profileManagementService.getHierarchyDetailsByEntity(
-                    CommonConstants.AGENT_ID_COLUMN, agentId );
-                if ( hierarchyDetails == null ) {
-                    LOG.error( "Unable to fetch primary profile for this user " );
-                    throw new FatalException( "Unable to fetch primary profile for type : " + CommonConstants.AGENT_ID_COLUMN
-                        + " and ID : " + regionId );
-                }
+            agentProfile = organizationManagementService.getAgentSettings( agentId );
 
-                regionId = hierarchyDetails.get( CommonConstants.REGION_ID_COLUMN );
-                companyId = hierarchyDetails.get( CommonConstants.COMPANY_ID_COLUMN );
-                branchId = hierarchyDetails.get( CommonConstants.BRANCH_ID_COLUMN );
-                settingsDetailsList = settingsManager.getScoreForCompleteHeirarchy( companyId, branchId, regionId );
-                companyProfile = organizationManagementService.getCompanySettings( companyId );
-                regionProfile = organizationManagementService.getRegionSettings( regionId );
-                branchProfile = organizationManagementService.getBranchSettingsDefault( branchId );
-                agentProfile = organizationManagementService.getAgentSettings( agentId );
-                try {
-                    LOG.info( "Calculate lock and setting score " );
-                    Map<String, Long> totalScore = settingsManager.calculateSettingsScore( settingsDetailsList );
-                    currentLockAggregateValue = totalScore.get( CommonConstants.LOCK_SCORE );
-                    map = profileManagementService.getPrimaryHierarchyByEntity( CommonConstants.AGENT_ID_COLUMN,
-                        agentProfile.getIden() );
-                    if ( map == null ) {
-                        LOG.error( "Unable to fetch primary profile for this user " );
-                        throw new FatalException( "Unable to fetch primary profile this user " + regionProfile.getIden() );
-                    }
-                } catch ( InvalidSettingsStateException e ) {
-                    throw new InternalServerException( new ProfileServiceErrorCode(
-                        CommonConstants.ERROR_CODE_REGION_PROFILE_SERVICE_FAILURE, CommonConstants.SERVICE_CODE_REGION_PROFILE,
-                        "Error occured while fetching region profile" ), e.getMessage() );
+            if ( agentProfile.getSurvey_settings() != null ) {
+                if ( agentProfile.getSurvey_settings().getShow_survey_above_score() <= 0 ) {
+                    agentProfile.getSurvey_settings().setShow_survey_above_score( CommonConstants.DEFAULT_AUTOPOST_SCORE );
+                    agentProfile.getSurvey_settings().setAutoPostEnabled( true );
+                    organizationManagementService.updateScoreForSurvey(
+                        MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION, agentProfile,
+                        agentProfile.getSurvey_settings() );
                 }
-                if ( !settingsLocker.isSettingsValueLocked( OrganizationUnit.COMPANY, currentLockAggregateValue,
-                    SettingsForApplication.MIN_SCORE ) ) {
-                    if ( !settingsLocker.isSettingsValueLocked( OrganizationUnit.REGION, currentLockAggregateValue,
-                        SettingsForApplication.MIN_SCORE ) ) {
-                        if ( !settingsLocker.isSettingsValueLocked( OrganizationUnit.BRANCH, currentLockAggregateValue,
-                            SettingsForApplication.MIN_SCORE ) ) {
-                            minScoreLocked = false;
-                        }
-                    }
-                }
-
-                if ( !minScoreLocked ) {
-                    if ( agentProfile.getSurvey_settings() != null ) {
-                        if ( agentProfile.getSurvey_settings().getShow_survey_above_score() > 0 ) {
-                            agentProfile.getSurvey_settings().setShow_survey_above_score(
-                                agentProfile.getSurvey_settings().getShow_survey_above_score() );
-                        } else {
-                            agentProfile = profileManagementService.getAutoPostScoreBasedOnHierarchy(
-                                MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION, agentProfile, companyProfile,
-                                regionProfile, branchProfile, agentProfile, map );
-                        }
-                    } else {
-                        agentProfile = profileManagementService.getAutoPostScoreBasedOnHierarchy(
-                            MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION, agentProfile, companyProfile,
-                            regionProfile, branchProfile, agentProfile, map );
-                    }
-                } else {
-                    agentProfile = profileManagementService.getAutoPostScoreBasedOnHierarchy(
-                        MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION, agentProfile, companyProfile,
-                        regionProfile, branchProfile, agentProfile, map );
-                }
-                List<SurveyDetails> reviews = profileManagementService.getReviews( agentId, agentProfile.getSurvey_settings()
-                    .getShow_survey_above_score(), maxScore, start, numRows, CommonConstants.PROFILE_LEVEL_INDIVIDUAL, false,
-                    null, null, sortCriteria );
-                profileManagementService.setAgentProfileUrlForReview( reviews );
-                String json = new Gson().toJson( reviews );
-                LOG.debug( "reviews json : " + json );
-                response = Response.ok( json ).build();
-            } catch ( InvalidInputException e ) {
-                throw new InternalServerException( new ProfileServiceErrorCode(
-                    CommonConstants.ERROR_CODE_REGION_REVIEWS_FETCH_FAILURE, CommonConstants.SERVICE_CODE_REGION_REVIEWS,
-                    "Something went wrong while fetching reviews for a agent" ), e.getMessage() );
-            } catch ( ProfileNotFoundException e1 ) {
-                throw new FatalException( "User profile not found ", e1 );
-            } catch ( NoRecordsFetchedException e1 ) {
-                throw new FatalException( "Unable to find primary profile for thos agent ", e1 );
+            } else {
+                SurveySettings surveySettings = new SurveySettings();
+                surveySettings.setShow_survey_above_score( CommonConstants.DEFAULT_AUTOPOST_SCORE );
+                surveySettings.setAutoPostEnabled( true );
+                organizationManagementService.updateScoreForSurvey(
+                    MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION, agentProfile, surveySettings );
             }
+            List<SurveyDetails> reviews = profileManagementService.getReviews( agentId, agentProfile.getSurvey_settings()
+                .getShow_survey_above_score(), maxScore, start, numRows, CommonConstants.PROFILE_LEVEL_INDIVIDUAL, false, null,
+                null, sortCriteria );
+            profileManagementService.setAgentProfileUrlForReview( reviews );
+            String json = new Gson().toJson( reviews );
+            LOG.debug( "reviews json : " + json );
+            response = Response.ok( json ).build();
+
         } catch ( BaseRestException e ) {
             response = getErrorResponse( e );
+        } catch ( InvalidInputException e ) {
+            throw new FatalException( "Exception caught ", e );
+        } catch ( NoRecordsFetchedException e ) {
+            throw new FatalException( "Exception caught ", e );
         }
 
         LOG.info( "Service to fetch reviews of agent completed successfully" );
