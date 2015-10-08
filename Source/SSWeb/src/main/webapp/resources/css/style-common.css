@@ -32,6 +32,14 @@
 	-webkit-tap-highlight-color: rgba(0, 0, 0, 0);
 }
 
+.disable-scroll {
+	left: 0;
+    -webkit-overflow-scrolling: touch;
+    position: fixed;
+    top: 0;
+    width: 100%;
+}
+
 body {
 	/*
     -webkit-touch-callout: none;                
