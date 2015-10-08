@@ -19,12 +19,10 @@ public enum SettingsForApplication
     REALTOR( 10000000000l, 11 ),
     LENDING_TREE( 100000000000l, 12 ),
     WEB_ADDRESS_WORK( 1000000000000l, 13 ),
-    AUTO_POST_ENABLED( 10000000000000l, 14 ),
     WEB_ADDRESS_PERSONAL( 100000000000000l, 15 ),
     ABOUT_ME( 1000000000000000l, 16 ),
     EMAIL_ID_PERSONAL( 10000000000000000l, 17 ),
-    EMAIL_ID_WORK( 100000000000000000l, 18 ),
-    MIN_SCORE( 1000000000000000000l, 19 );
+    EMAIL_ID_WORK( 100000000000000000l, 18 );
 
     private final long order;
     private final int index; // the order is the not the index. 1 means units, 2 means tens decimal
@@ -78,8 +76,6 @@ public enum SettingsForApplication
             return LENDING_TREE;
         } else if ( index == 13 ) {
             return WEB_ADDRESS_WORK;
-        } else if ( index == 14 ) {
-            return AUTO_POST_ENABLED;
         } else if ( index == 15 ) {
             return WEB_ADDRESS_PERSONAL;
         } else if ( index == 16 ) {
@@ -88,8 +84,7 @@ public enum SettingsForApplication
             return EMAIL_ID_PERSONAL;
         } else if ( index == 18 ) {
             return EMAIL_ID_WORK;
-        } else if ( index == 19 ) {
-            return MIN_SCORE;
+
         } else {
             return null;
         }
