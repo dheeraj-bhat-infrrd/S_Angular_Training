@@ -146,6 +146,9 @@ function callAjaxFormSubmit(url, callBackFunction, formId) {
 	var payLoad = $form.serialize();
 	$.ajax({
 		url : url,
+		headers: {          
+            Accept : "text/plain; charset=utf-8"   
+		},
 		type : "POST",
 		data : payLoad,
 		success : callBackFunction,
@@ -180,6 +183,9 @@ function callAjaxPostWithPayloadData(url, callBackFunction, payload, isAsync){
 	}
 	$.ajax({
 		url : url,
+		headers: {          
+            Accept : "text/plain; charset=utf-8"   
+		},
 		type : "POST",
 		data : payload,
 		async : isAsync,
