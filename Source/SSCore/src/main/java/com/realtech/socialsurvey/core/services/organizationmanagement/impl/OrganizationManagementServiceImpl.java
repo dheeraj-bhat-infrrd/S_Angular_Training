@@ -598,12 +598,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
         surveySettings.setSadTextComplete( sadTextComplete );
         surveySettings.setAutoPostEnabled( true );
         surveySettings.setShow_survey_above_score( CommonConstants.DEFAULT_AUTOPOST_SCORE );
-        try {
-            settingsSetter.setSettingsValueForCompany( company, SettingsForApplication.MIN_SCORE, true );
-            settingsSetter.setSettingsValueForCompany( company, SettingsForApplication.AUTO_POST_ENABLED, true );
-        } catch ( NonFatalException e1 ) {
-            LOG.error( "Exception caught ", e1 );
-        }
+
         surveySettings.setSurvey_reminder_interval_in_days( CommonConstants.DEFAULT_REMINDERMAIL_INTERVAL );
         companySettings.setSurvey_settings( surveySettings );
 
@@ -3787,6 +3782,8 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 
         if ( organizationSettings.getSurvey_settings() == null ) {
             SurveySettings surveySettings = new SurveySettings();
+            surveySettings.setShow_survey_above_score( CommonConstants.DEFAULT_AUTOPOST_SCORE );
+            surveySettings.setAutoPostEnabled( true );
             organizationSettings.setSurvey_settings( surveySettings );
         }
 
@@ -3829,6 +3826,8 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 
         if ( organizationSettings.getSurvey_settings() == null ) {
             SurveySettings surveySettings = new SurveySettings();
+            surveySettings.setShow_survey_above_score( CommonConstants.DEFAULT_AUTOPOST_SCORE );
+            surveySettings.setAutoPostEnabled( true );
             organizationSettings.setSurvey_settings( surveySettings );
         }
 
