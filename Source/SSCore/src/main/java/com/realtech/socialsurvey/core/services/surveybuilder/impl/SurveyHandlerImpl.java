@@ -218,6 +218,7 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
         return urlGenerator.generateUrl( urlParam, baseUrl );
     }
 
+
     /*
      * Method to update answers to all the questions and current stage in MongoDB.
      * @param agentId
@@ -271,7 +272,7 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
     public void updateSurveyAsAbusive( String surveymongoId, String reporterEmail, String reporterName )
     {
         LOG.info( "Method updateSurveyAsAbusive() to mark the survey as abusive, started" );
-        surveyDetailsDao.updateSurveyAsAbusive(surveymongoId, reporterEmail, reporterName);
+        surveyDetailsDao.updateSurveyAsAbusive( surveymongoId, reporterEmail, reporterName );
         LOG.info( "Method updateSurveyAsAbusive() to mark the survey as abusive, finished" );
     }
 
@@ -907,7 +908,7 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
 
 
     @Override
-    public void sendSocialPostReminderMail( String custEmail, String custFirstName, String custLastName, User user , String links )
+    public void sendSocialPostReminderMail( String custEmail, String custFirstName, String custLastName, User user, String links )
         throws InvalidInputException, UndeliveredEmailException, ProfileNotFoundException
     {
         LOG.info( "sendSocialPostReminderMail() started." );
@@ -1468,7 +1469,7 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
             throw new InvalidInputException( "Agent id is invalid" );
         }
         if ( recipientEmailId == null || recipientEmailId.isEmpty()
-            || !recipientEmailId.trim().matches( CommonConstants.EMAIL_REGEX ) ) {
+            || !organizationManagementService.validateEmail( recipientEmailId ) ) {
             LOG.warn( "Recipent email id should be passed." );
             throw new InvalidInputException( "Recipent email id is invalid" );
         }
@@ -1535,11 +1536,13 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
         LOG.info( "Method deleteExcessZillowSurveysByEntity() finished" );
     }
 
+
     @Override
     public List<AbusiveSurveyReportWrapper> getSurveysReporetedAsAbusive( int startIndex, int numOfRows )
     {
         LOG.info( "Method getSurveysReporetedAsAbusive() to retrieve surveys marked as abusive, started" );
-        List<AbusiveSurveyReportWrapper> abusiveSurveyReports = surveyDetailsDao.getSurveysReporetedAsAbusive( startIndex, numOfRows );
+        List<AbusiveSurveyReportWrapper> abusiveSurveyReports = surveyDetailsDao.getSurveysReporetedAsAbusive( startIndex,
+            numOfRows );
         LOG.info( "Method getSurveysReporetedAsAbusive() to retrieve surveys marked as abusive, finished" );
         return abusiveSurveyReports;
     }
