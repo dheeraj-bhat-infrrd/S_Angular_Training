@@ -27,7 +27,6 @@
 			<link rel="stylesheet" href="${initParam.resourcesPath}/resources/css/style-common.css">
 			<link rel="stylesheet" href="${initParam.resourcesPath}/resources/css/style-resp.css">
 			<link rel="stylesheet" href="${initParam.resourcesPath}/resources/css/rangeslider.css">
-			<link rel="stylesheet" href="${initParam.resourcesPath}/resources/css/bootstrap.min.css">
 			<link rel="stylesheet" href="${initParam.resourcesPath}/resources/css/style-common-1.1.css">
 			<link rel="stylesheet" href="${initParam.resourcesPath}/resources/css/style-resp-1.1.css">
 		</head>
@@ -397,6 +396,8 @@
 function selectAccountType(accountType, paymentAmount, skippayment) {
 	// show the progress icon
 	showOverlay();
+	disableBodyScroll();
+	$('body').addClass("disable-scroll");
 	if ($(this).attr('data-status') == 'disabled') {
 		return;
 	}
