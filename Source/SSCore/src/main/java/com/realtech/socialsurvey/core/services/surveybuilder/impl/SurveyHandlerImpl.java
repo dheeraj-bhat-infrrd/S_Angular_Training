@@ -1584,11 +1584,11 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
             regionMap = new HashMap<Long, Long>();
         }
 
-        Map<Long, Long> branchMap = socialPostShared.getAgentCountMap();
+        Map<Long, Long> branchMap = socialPostShared.getBranchCountMap();
         if ( branchMap == null ) {
             branchMap = new HashMap<Long, Long>();
         }
-        Map<Long, Long> companyMap = socialPostShared.getAgentCountMap();
+        Map<Long, Long> companyMap = socialPostShared.getCompanyCountMap();
         if ( companyMap == null ) {
             companyMap = new HashMap<Long, Long>();
         }
