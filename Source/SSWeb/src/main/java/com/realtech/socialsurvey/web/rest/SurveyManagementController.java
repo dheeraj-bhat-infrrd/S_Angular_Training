@@ -871,6 +871,27 @@ public class SurveyManagementController
             if ( surveyDetails != null ) {
                 socialPostShared = surveyHandler.getSocialPostSharedBySurveyDetails( surveyDetails );
             }
+            Map<String, Map<Long, List<String>>> postSharedOn = socialPostShared.getPostSharedOn();
+            if ( postSharedOn == null ) {
+                postSharedOn = new HashMap<String, Map<Long, List<String>>>();
+            }
+            Map<Long, List<String>> companySharedOn = postSharedOn.get( CommonConstants.COMPANY_ID_COLUMN );
+            if ( companySharedOn == null ) {
+                companySharedOn = new HashMap<Long, List<String>>();
+            }
+            Map<Long, List<String>> regionSharedOn = postSharedOn.get( CommonConstants.REGION_ID_COLUMN );
+            if ( regionSharedOn == null ) {
+                regionSharedOn = new HashMap<Long, List<String>>();
+            }
+            Map<Long, List<String>> branchSharedOn = postSharedOn.get( CommonConstants.BRANCH_ID_COLUMN );
+            if ( branchSharedOn == null ) {
+                branchSharedOn = new HashMap<Long, List<String>>();
+            }
+            Map<Long, List<String>> agentSharedOn = postSharedOn.get( CommonConstants.AGENT_ID_COLUMN );
+            if ( agentSharedOn == null ) {
+                agentSharedOn = new HashMap<Long, List<String>>();
+            }
+
             Map<String, List<OrganizationUnitSettings>> settingsMap = socialManagementService
                 .getSettingsForBranchesAndRegionsInHierarchy( agentId );
             List<OrganizationUnitSettings> companySettings = settingsMap
@@ -891,6 +912,14 @@ public class SurveyManagementController
                     .getCompany().getCompanyId() );
                 // TODO: Bad code: Remove the comany id from the parameter: End
                 surveyHandler.updateSharedOn( CommonConstants.FACEBOOK_SOCIAL_SITE, agentId, customerEmail );
+                List<String> socialSiteSharedOn = agentSharedOn.get( agentId );
+                if ( socialSiteSharedOn == null ) {
+                    socialSiteSharedOn = new ArrayList<String>();
+                }
+                if ( !socialSiteSharedOn.contains( CommonConstants.FACEBOOK_SOCIAL_SITE ) ) {
+                    socialSiteSharedOn.add( CommonConstants.FACEBOOK_SOCIAL_SITE );
+                }
+                agentSharedOn.put( agentId, socialSiteSharedOn );
             } catch ( FacebookException e ) {
                 LOG.error(
                     "FacebookException caught in postToSocialMedia() while trying to post to facebook. Nested excption is ", e );
@@ -899,6 +928,16 @@ public class SurveyManagementController
                 try {
                     socialManagementService.updateStatusIntoFacebookPage( setting, facebookMessage, serverBaseUrl, user
                         .getCompany().getCompanyId() );
+                    List<String> socialSiteSharedOn = companySharedOn.get( setting.getIden() );
+                    if ( socialSiteSharedOn == null ) {
+                        socialSiteSharedOn = new ArrayList<String>();
+                    }
+                    if ( !socialSiteSharedOn.contains( CommonConstants.FACEBOOK_SOCIAL_SITE ) ) {
+                        socialSiteSharedOn.add( CommonConstants.FACEBOOK_SOCIAL_SITE );
+                    }
+                    companySharedOn.put( setting.getIden(), socialSiteSharedOn );
+
+
                 } catch ( FacebookException e ) {
                     LOG.error(
                         "FacebookException caught in postToSocialMedia() while trying to post to facebook. Nested excption is ",
@@ -909,6 +948,14 @@ public class SurveyManagementController
                 try {
                     socialManagementService.updateStatusIntoFacebookPage( setting, facebookMessage, serverBaseUrl, user
                         .getCompany().getCompanyId() );
+                    List<String> socialSiteSharedOn = regionSharedOn.get( setting.getIden() );
+                    if ( socialSiteSharedOn == null ) {
+                        socialSiteSharedOn = new ArrayList<String>();
+                    }
+                    if ( !socialSiteSharedOn.contains( CommonConstants.FACEBOOK_SOCIAL_SITE ) ) {
+                        socialSiteSharedOn.add( CommonConstants.FACEBOOK_SOCIAL_SITE );
+                    }
+                    regionSharedOn.put( setting.getIden(), socialSiteSharedOn );
                 } catch ( FacebookException e ) {
                     LOG.error(
                         "FacebookException caught in postToSocialMedia() while trying to post to facebook. Nested excption is ",
@@ -919,12 +966,24 @@ public class SurveyManagementController
                 try {
                     socialManagementService.updateStatusIntoFacebookPage( setting, facebookMessage, serverBaseUrl, user
                         .getCompany().getCompanyId() );
+                    List<String> socialSiteSharedOn = branchSharedOn.get( setting.getIden() );
+                    if ( socialSiteSharedOn == null ) {
+                        socialSiteSharedOn = new ArrayList<String>();
+                    }
+                    if ( !socialSiteSharedOn.contains( CommonConstants.FACEBOOK_SOCIAL_SITE ) ) {
+                        socialSiteSharedOn.add( CommonConstants.FACEBOOK_SOCIAL_SITE );
+                    }
+                    branchSharedOn.put( setting.getIden(), socialSiteSharedOn );
                 } catch ( FacebookException e ) {
                     LOG.error(
                         "FacebookException caught in postToSocialMedia() while trying to post to facebook. Nested excption is ",
                         e );
                 }
             }
+            socialPostShared = surveyHandler.calcualteFinalCount( socialPostShared, agentSharedOn, branchSharedOn,
+                regionSharedOn, companySharedOn );
+            surveyDetails.setSocialPostShared( socialPostShared );
+            surveyHandler.updateSurveyDetails( surveyDetails );
         } catch ( NonFatalException e ) {
             LOG.error( "NonFatalException caught in postToFacebook(). Nested exception is ", e );
         }
@@ -961,6 +1020,31 @@ public class SurveyManagementController
                     e );
                 return e.getMessage();
             }
+            SurveyDetails surveyDetails = surveyHandler.getSurveyDetails( agentId, customerEmail, custFirstName, custLastName );
+            SocialPostShared socialPostShared = null;
+            if ( surveyDetails != null ) {
+                socialPostShared = surveyHandler.getSocialPostSharedBySurveyDetails( surveyDetails );
+            }
+            Map<String, Map<Long, List<String>>> postSharedOn = socialPostShared.getPostSharedOn();
+            if ( postSharedOn == null ) {
+                postSharedOn = new HashMap<String, Map<Long, List<String>>>();
+            }
+            Map<Long, List<String>> companySharedOn = postSharedOn.get( CommonConstants.COMPANY_ID_COLUMN );
+            if ( companySharedOn == null ) {
+                companySharedOn = new HashMap<Long, List<String>>();
+            }
+            Map<Long, List<String>> regionSharedOn = postSharedOn.get( CommonConstants.REGION_ID_COLUMN );
+            if ( regionSharedOn == null ) {
+                regionSharedOn = new HashMap<Long, List<String>>();
+            }
+            Map<Long, List<String>> branchSharedOn = postSharedOn.get( CommonConstants.BRANCH_ID_COLUMN );
+            if ( branchSharedOn == null ) {
+                branchSharedOn = new HashMap<Long, List<String>>();
+            }
+            Map<Long, List<String>> agentSharedOn = postSharedOn.get( CommonConstants.AGENT_ID_COLUMN );
+            if ( agentSharedOn == null ) {
+                agentSharedOn = new HashMap<Long, List<String>>();
+            }
             Map<String, List<OrganizationUnitSettings>> settingsMap = socialManagementService
                 .getSettingsForBranchesAndRegionsInHierarchy( agentId );
             List<OrganizationUnitSettings> companySettings = settingsMap
@@ -984,12 +1068,30 @@ public class SurveyManagementController
             try {
                 socialManagementService.tweet( agentSettings, twitterMessage, user.getCompany().getCompanyId() );
                 surveyHandler.updateSharedOn( CommonConstants.TWITTER_SOCIAL_SITE, agentId, customerEmail );
+                List<String> socialSiteSharedOn = agentSharedOn.get( agentId );
+                if ( socialSiteSharedOn == null ) {
+                    socialSiteSharedOn = new ArrayList<String>();
+                }
+                if ( !socialSiteSharedOn.contains( CommonConstants.TWITTER_SOCIAL_SITE ) ) {
+                    socialSiteSharedOn.add( CommonConstants.TWITTER_SOCIAL_SITE );
+                }
+                agentSharedOn.put( agentId, socialSiteSharedOn );
+
             } catch ( TwitterException e ) {
                 LOG.error( "TwitterException caught in postToTwitter() while trying to post to twitter. Nested excption is ", e );
             }
             for ( OrganizationUnitSettings setting : companySettings ) {
                 try {
                     socialManagementService.tweet( setting, twitterMessage, user.getCompany().getCompanyId() );
+                    List<String> socialSiteSharedOn = companySharedOn.get( setting.getIden() );
+                    if ( socialSiteSharedOn == null ) {
+                        socialSiteSharedOn = new ArrayList<String>();
+                    }
+                    if ( !socialSiteSharedOn.contains( CommonConstants.TWITTER_SOCIAL_SITE ) ) {
+                        socialSiteSharedOn.add( CommonConstants.TWITTER_SOCIAL_SITE );
+                    }
+                    companySharedOn.put( setting.getIden(), socialSiteSharedOn );
+
                 } catch ( TwitterException e ) {
                     LOG.error(
                         "TwitterException caught in postToTwitter() while trying to post to twitter. Nested excption is ", e );
@@ -998,6 +1100,15 @@ public class SurveyManagementController
             for ( OrganizationUnitSettings setting : regionSettings ) {
                 try {
                     socialManagementService.tweet( setting, twitterMessage, user.getCompany().getCompanyId() );
+                    List<String> socialSiteSharedOn = regionSharedOn.get( setting.getIden() );
+                    if ( socialSiteSharedOn == null ) {
+                        socialSiteSharedOn = new ArrayList<String>();
+                    }
+                    if ( !socialSiteSharedOn.contains( CommonConstants.TWITTER_SOCIAL_SITE ) ) {
+                        socialSiteSharedOn.add( CommonConstants.TWITTER_SOCIAL_SITE );
+                    }
+                    regionSharedOn.put( setting.getIden(), socialSiteSharedOn );
+
                 } catch ( TwitterException e ) {
                     LOG.error(
                         "TwitterException caught in postToTwitter() while trying to post to twitter. Nested excption is ", e );
@@ -1006,11 +1117,24 @@ public class SurveyManagementController
             for ( OrganizationUnitSettings setting : branchSettings ) {
                 try {
                     socialManagementService.tweet( setting, twitterMessage, user.getCompany().getCompanyId() );
+                    List<String> socialSiteSharedOn = branchSharedOn.get( setting.getIden() );
+                    if ( socialSiteSharedOn == null ) {
+                        socialSiteSharedOn = new ArrayList<String>();
+                    }
+                    if ( !socialSiteSharedOn.contains( CommonConstants.TWITTER_SOCIAL_SITE ) ) {
+                        socialSiteSharedOn.add( CommonConstants.TWITTER_SOCIAL_SITE );
+                    }
+                    branchSharedOn.put( setting.getIden(), socialSiteSharedOn );
                 } catch ( TwitterException e ) {
                     LOG.error(
                         "TwitterException caught in postToTwitter() while trying to post to twitter. Nested excption is ", e );
                 }
             }
+
+            socialPostShared = surveyHandler.calcualteFinalCount( socialPostShared, agentSharedOn, branchSharedOn,
+                regionSharedOn, companySharedOn );
+            surveyDetails.setSocialPostShared( socialPostShared );
+            surveyHandler.updateSurveyDetails( surveyDetails );
         } catch ( NonFatalException e ) {
             LOG.error( "NonFatalException caught in postToTwitter(). Nested exception is ", e );
         }
@@ -1048,6 +1172,32 @@ public class SurveyManagementController
                     e );
                 return e.getMessage();
             }
+            SurveyDetails surveyDetails = surveyHandler.getSurveyDetails( agentId, customerEmail, custFirstName, custLastName );
+            SocialPostShared socialPostShared = null;
+            if ( surveyDetails != null ) {
+                socialPostShared = surveyHandler.getSocialPostSharedBySurveyDetails( surveyDetails );
+            }
+
+            Map<String, Map<Long, List<String>>> postSharedOn = socialPostShared.getPostSharedOn();
+            if ( postSharedOn == null ) {
+                postSharedOn = new HashMap<String, Map<Long, List<String>>>();
+            }
+            Map<Long, List<String>> companySharedOn = postSharedOn.get( CommonConstants.COMPANY_ID_COLUMN );
+            if ( companySharedOn == null ) {
+                companySharedOn = new HashMap<Long, List<String>>();
+            }
+            Map<Long, List<String>> regionSharedOn = postSharedOn.get( CommonConstants.REGION_ID_COLUMN );
+            if ( regionSharedOn == null ) {
+                regionSharedOn = new HashMap<Long, List<String>>();
+            }
+            Map<Long, List<String>> branchSharedOn = postSharedOn.get( CommonConstants.BRANCH_ID_COLUMN );
+            if ( branchSharedOn == null ) {
+                branchSharedOn = new HashMap<Long, List<String>>();
+            }
+            Map<Long, List<String>> agentSharedOn = postSharedOn.get( CommonConstants.AGENT_ID_COLUMN );
+            if ( agentSharedOn == null ) {
+                agentSharedOn = new HashMap<Long, List<String>>();
+            }
             Map<String, List<OrganizationUnitSettings>> settingsMap = socialManagementService
                 .getSettingsForBranchesAndRegionsInHierarchy( agentId );
             List<OrganizationUnitSettings> companySettings = settingsMap
@@ -1062,14 +1212,48 @@ public class SurveyManagementController
             String linkedinProfileUrl = getApplicationBaseUrl() + CommonConstants.AGENT_PROFILE_FIXED_URL + agentProfileLink;
             String linkedinMessageFeedback = "From : " + customerDisplayName + " " + feedback;
             socialManagementService.updateLinkedin( agentSettings, message, linkedinProfileUrl, linkedinMessageFeedback );
+            List<String> agentSocialSiteSharedOn = agentSharedOn.get( agentId );
+            if ( agentSocialSiteSharedOn == null ) {
+                agentSocialSiteSharedOn = new ArrayList<String>();
+            }
+            if ( !agentSocialSiteSharedOn.contains( CommonConstants.LINKEDIN_SOCIAL_SITE ) ) {
+                agentSocialSiteSharedOn.add( CommonConstants.LINKEDIN_SOCIAL_SITE );
+            }
+            agentSharedOn.put( agentId, agentSocialSiteSharedOn );
+
             for ( OrganizationUnitSettings setting : companySettings ) {
                 socialManagementService.updateLinkedin( setting, message, linkedinProfileUrl, linkedinMessageFeedback );
+                List<String> socialSiteSharedOn = companySharedOn.get( setting.getIden() );
+                if ( socialSiteSharedOn == null ) {
+                    socialSiteSharedOn = new ArrayList<String>();
+                }
+                if ( !socialSiteSharedOn.contains( CommonConstants.LINKEDIN_SOCIAL_SITE ) ) {
+                    socialSiteSharedOn.add( CommonConstants.LINKEDIN_SOCIAL_SITE );
+                }
+                companySharedOn.put( setting.getIden(), socialSiteSharedOn );
+
             }
             for ( OrganizationUnitSettings setting : regionSettings ) {
                 socialManagementService.updateLinkedin( setting, message, linkedinProfileUrl, linkedinMessageFeedback );
+                List<String> socialSiteSharedOn = regionSharedOn.get( setting.getIden() );
+                if ( socialSiteSharedOn == null ) {
+                    socialSiteSharedOn = new ArrayList<String>();
+                }
+                if ( !socialSiteSharedOn.contains( CommonConstants.LINKEDIN_SOCIAL_SITE ) ) {
+                    socialSiteSharedOn.add( CommonConstants.LINKEDIN_SOCIAL_SITE );
+                }
+                regionSharedOn.put( setting.getIden(), socialSiteSharedOn );
             }
             for ( OrganizationUnitSettings setting : branchSettings ) {
                 socialManagementService.updateLinkedin( setting, message, linkedinProfileUrl, linkedinMessageFeedback );
+                List<String> socialSiteSharedOn = branchSharedOn.get( setting.getIden() );
+                if ( socialSiteSharedOn == null ) {
+                    socialSiteSharedOn = new ArrayList<String>();
+                }
+                if ( !socialSiteSharedOn.contains( CommonConstants.LINKEDIN_SOCIAL_SITE ) ) {
+                    socialSiteSharedOn.add( CommonConstants.LINKEDIN_SOCIAL_SITE );
+                }
+                branchSharedOn.put( setting.getIden(), socialSiteSharedOn );
             }
             surveyHandler.updateSharedOn( CommonConstants.LINKEDIN_SOCIAL_SITE, agentId, customerEmail );
         } catch ( NonFatalException e ) {
