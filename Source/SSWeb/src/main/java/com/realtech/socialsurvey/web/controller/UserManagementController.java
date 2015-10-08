@@ -186,7 +186,7 @@ public class UserManagementController
                 LOG.error( "Last name invalid" );
                 throw new InvalidInputException( "Last name invalid", DisplayMessageConstants.INVALID_LASTNAME );
             }
-            if ( emailId == null || emailId.isEmpty() || !emailId.matches( CommonConstants.EMAIL_REGEX ) ) {
+            if ( emailId == null || emailId.isEmpty() || !organizationManagementService.validateEmail( emailId ) ) {
                 LOG.error( "EmailId not valid" );
                 throw new InvalidInputException( "EmailId not valid", DisplayMessageConstants.INVALID_EMAILID );
             }
