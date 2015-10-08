@@ -81,7 +81,7 @@ public class EmailFormatHelper {
         String[] custNameArray = customerName.split(" ");
         String custDisplayName = custNameArray[0];
         if(custNameArray.length > 1){
-        	custDisplayName += " " + custNameArray[1].substring(0, 1);
+        	custDisplayName += " " + custNameArray[1].substring(0, 1) + ".";
         }
         return WordUtils.capitalize(custDisplayName);
 	}
