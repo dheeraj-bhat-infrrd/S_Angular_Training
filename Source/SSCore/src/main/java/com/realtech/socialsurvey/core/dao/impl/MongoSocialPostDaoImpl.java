@@ -2,6 +2,7 @@ package com.realtech.socialsurvey.core.dao.impl;
 
 import java.util.Date;
 import java.util.List;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,9 +11,11 @@ import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Repository;
+
 import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.dao.SocialPostDao;
 import com.realtech.socialsurvey.core.entities.SocialPost;
+import com.realtech.socialsurvey.core.entities.SocialUpdateAction;
 
 @Repository
 public class MongoSocialPostDaoImpl implements SocialPostDao {
@@ -99,5 +102,24 @@ public class MongoSocialPostDaoImpl implements SocialPostDao {
 
 		Query query = new Query(Criteria.where(KEY_SOURCE).ne(KEY_SOURCE_SS).and(KEY_TIME_IN_MILLIS).lte(priorTimeInMilliSecs));
 		mongoTemplate.remove(query, SocialPost.class, CommonConstants.SOCIAL_POST_COLLECTION);
+	}
+	
+	@Override
+	public void addActionToSocialConnectionHistory(SocialUpdateAction action){
+	    Date date = new Date();
+	    action.setUpdateTime( date );
+	    LOG.info("Inserting into " + CommonConstants.SOCIAL_HISTORY_COLLECTION + ". Object: " + action.toString());
+        mongoTemplate.insert(action, CommonConstants.SOCIAL_HISTORY_COLLECTION);
+        LOG.info("Inserted into " + CommonConstants.SOCIAL_HISTORY_COLLECTION);
+	}
+	
+	@Override
+	public List<SocialUpdateAction> getSocialConnectionHistoryByEntity(String entityType, long entityId){
+	    Query query = new Query();
+	    if ( entityType != null ) {
+            query.addCriteria( Criteria.where( entityType ).is( entityId ) );
+        }
+	    List<SocialUpdateAction> actions = mongoTemplate.find( query, SocialUpdateAction.class, CommonConstants.SOCIAL_HISTORY_COLLECTION );
+	    return actions;
 	}
 }
