@@ -472,6 +472,9 @@
     .payment-details-wrapper, .overlay-payment{
         padding: 10px;
     }
+    .overlay-payment{
+        padding-bottom: 300px;
+    }
     .btn-payment{
         width: 100%;
         margin-bottom: 20px;
