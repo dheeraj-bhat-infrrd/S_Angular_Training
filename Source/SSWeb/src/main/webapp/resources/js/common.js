@@ -203,6 +203,9 @@ function callAjaxGetWithPayloadData(url, callBackFunction, payload,isAsync){
 	}
 	$.ajax({
 		url : url,
+		headers: {          
+            Accept : "text/plain; charset=utf-8"   
+		},
 		type : "GET",
 		data : payload,
 		async : isAsync,
@@ -212,6 +215,8 @@ function callAjaxGetWithPayloadData(url, callBackFunction, payload,isAsync){
 			hideOverlay();
 		},
 		error : function(e) {
+			alert(url);
+			if(e.status == 0) return;
 			if(e.status == 504) {
 				redirectToLoginPageOnSessionTimeOut(e.status);
 				return;

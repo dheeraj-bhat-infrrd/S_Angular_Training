@@ -395,7 +395,7 @@ public interface CommonConstants
     public static final String PHONENUMBER_REGEX = "^((\\+)|(00)|(\\*)|())[0-9]{3,14}((\\#)|())$";
     public static final String ZIPCODE_REGEX = "\\d{5}(-\\d{4})?";
     public static final String COMPANY_NAME_REGEX = "^[a-zA-Z0-9 ]+$";
-    public static final String EMAIL_REGEX = "^[A-Z0-9._%+-]+@[A-Z0-9.-]+\\.[A-Z]{2,6}$";
+    public static final String EMAIL_REGEX = "^[_A-Za-z0-9-\\+]+(\\.[_A-Za-z0-9-]+)*@[A-Za-z0-9-]+(\\.[A-Za-z0-9]+)*(\\.[A-Za-z]{2,})$";
     public static final String FIRST_NAME_REGEX = "[a-zA-Z ]+";
     public static final String LAST_NAME_REGEX = "[a-zA-Z0-9 ]+";
     public static final String FINDAPRO_FIRST_NAME_REGEX = "^[a-zA-Z]{2,}$";
@@ -550,6 +550,7 @@ public interface CommonConstants
     public static final String BRANCH_SETTINGS_COLLECTION = "BRANCH_SETTINGS";
     public static final String AGENT_SETTINGS_COLLECTION = "AGENT_SETTINGS";
     public static final String SOCIAL_POST_COLLECTION = "SOCIAL_POST";
+    public static final String SOCIAL_HISTORY_COLLECTION = "SOCIAL_CONNECTION_HISTORY";
 
     /*
      * Mongo social post Source

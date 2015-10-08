@@ -1,7 +1,9 @@
 package com.realtech.socialsurvey.core.dao;
 
 import java.util.List;
+
 import com.realtech.socialsurvey.core.entities.SocialPost;
+import com.realtech.socialsurvey.core.entities.SocialUpdateAction;
 
 /**
  * This interface contains methods to interact
@@ -33,4 +35,8 @@ public interface SocialPostDao {
 
 	//method to delete a post
 	public void removePostFromUsersProfile(SocialPost socialPost);
+
+    void addActionToSocialConnectionHistory( SocialUpdateAction action );
+
+    List<SocialUpdateAction> getSocialConnectionHistoryByEntity( String entityType, long entityId );
 }
