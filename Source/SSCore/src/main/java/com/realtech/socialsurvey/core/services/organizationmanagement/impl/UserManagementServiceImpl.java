@@ -1197,7 +1197,7 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 
     @Transactional
     @Override
-    public void removeUserProfile( long profileIdToDelete ) throws InvalidInputException
+    public void removeUserProfile( long profileIdToDelete ) throws InvalidInputException, SolrException
     {
         LOG.info( "Method to delete a profile called for user profile: " + profileIdToDelete );
 
@@ -1206,8 +1206,13 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
             throw new InvalidInputException( "No user profile present for the specified profileId" );
         }
 
-
+        long userId = userProfile.getUser().getUserId();
         userProfileDao.delete( userProfile );
+        //update user in solr
+        User user = userDao.findById( User.class, userId );
+        solrSearchService.addUserToSolr( user );
+        
+        
         LOG.info( "Method to delete a profile finished for profile : " + profileIdToDelete );
     }
 
