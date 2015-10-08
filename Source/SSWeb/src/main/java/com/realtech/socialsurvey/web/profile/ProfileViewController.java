@@ -686,14 +686,19 @@ public class ProfileViewController
             String message = request.getParameter( "message" );
 
             if ( validateCaptcha.equals( CommonConstants.YES_STRING ) ) {
-
-                if ( !captchaValidation.isCaptchaValid( request.getRemoteAddr(), captchaSecretKey,
-                    request.getParameter( "g-recaptcha-response" ) ) ) {
-                    LOG.error( "Captcha Validation failed!" );
-                    returnMessage = messageUtils.getDisplayMessage( DisplayMessageConstants.INVALID_CAPTCHA,
-                        DisplayMessageType.SUCCESS_MESSAGE ).toString();
-                    return makeJsonMessage( CommonConstants.STATUS_INACTIVE, returnMessage );
-                }
+            	
+            	try {
+	                if ( !captchaValidation.isCaptchaValid( request.getRemoteAddr(), captchaSecretKey,
+	                    request.getParameter( "g-recaptcha-response" ) ) ) {
+	                    LOG.error( "Captcha Validation failed!" );
+	                    throw new InvalidInputException( "Captcha Validation failed!", DisplayMessageConstants.INVALID_CAPTCHA );
+	                    
+	                }
+            	} catch (InvalidInputException e) {
+            		returnMessage = messageUtils.getDisplayMessage( DisplayMessageConstants.INVALID_CAPTCHA,
+	                        DisplayMessageType.SUCCESS_MESSAGE ).toString();
+	                    return makeJsonMessage( CommonConstants.STATUS_INACTIVE, returnMessage );
+            	}
             }
 
             LOG.debug( "Sending mail to :  " + profileName + " from : " + senderMailId );
