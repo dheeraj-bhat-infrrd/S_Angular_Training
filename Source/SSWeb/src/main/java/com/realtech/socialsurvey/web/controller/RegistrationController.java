@@ -304,7 +304,7 @@ public class RegistrationController
             LOG.error( "NonFatalException while showing registration page. Reason : " + e.getMessage(), e );
             redirectAttributes.addFlashAttribute( "status", DisplayMessageType.ERROR_MESSAGE );
             redirectAttributes.addFlashAttribute( "message",
-                messageUtils.getDisplayMessage( DisplayMessageConstants.INVALID_CAPTCHA, DisplayMessageType.ERROR_MESSAGE ) );
+                messageUtils.getDisplayMessage( e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE ) );
             redirectAttributes.addFlashAttribute( "firstname", firstName );
             redirectAttributes.addFlashAttribute( "lastname", lastName );
             redirectAttributes.addFlashAttribute( "emailid", emailId );
