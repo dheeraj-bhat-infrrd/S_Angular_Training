@@ -374,7 +374,7 @@ public class LoginController {
 		User user = null;
 		try {
 			String emailId = request.getParameter("emailId");
-			if (emailId == null || emailId.isEmpty() || !emailId.matches(CommonConstants.EMAIL_REGEX)) {
+			if (emailId == null || emailId.isEmpty() || !organizationManagementService.validateEmail( emailId )) {
 				LOG.error("Invalid email id passed");
 				throw new InvalidInputException("Invalid email id passed", DisplayMessageConstants.INVALID_EMAILID);
 			}
@@ -595,7 +595,7 @@ public class LoginController {
 	 */
 	private void validateResetPasswordFormParameters(String emailId, String password, String confirmPassword) throws InvalidInputException {
 		LOG.debug("Validating reset password form paramters");
-		if (emailId == null || emailId.isEmpty() || !emailId.matches(CommonConstants.EMAIL_REGEX)) {
+		if (emailId == null || emailId.isEmpty() || !organizationManagementService.validateEmail( emailId )) {
 			LOG.error("Invalid email id passed");
 			throw new InvalidInputException("Invalid email id passed", DisplayMessageConstants.INVALID_EMAILID);
 		}
