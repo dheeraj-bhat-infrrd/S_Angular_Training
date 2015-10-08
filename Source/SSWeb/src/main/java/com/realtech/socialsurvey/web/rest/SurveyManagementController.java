@@ -598,7 +598,9 @@ public class SurveyManagementController
                     if ( socialSiteSharedOn == null ) {
                         socialSiteSharedOn = new ArrayList<String>();
                     }
-                    socialSiteSharedOn.add( CommonConstants.FACEBOOK_SOCIAL_SITE );
+                    if ( !socialSiteSharedOn.contains( CommonConstants.FACEBOOK_SOCIAL_SITE ) ) {
+                        socialSiteSharedOn.add( CommonConstants.FACEBOOK_SOCIAL_SITE );
+                    }
                     agentSharedOn.put( agentId, socialSiteSharedOn );
                 }
             } catch ( FacebookException e ) {
@@ -615,7 +617,9 @@ public class SurveyManagementController
                             if ( socialSiteSharedOn == null ) {
                                 socialSiteSharedOn = new ArrayList<String>();
                             }
-                            socialSiteSharedOn.add( CommonConstants.FACEBOOK_SOCIAL_SITE );
+                            if ( !socialSiteSharedOn.contains( CommonConstants.FACEBOOK_SOCIAL_SITE ) ) {
+                                socialSiteSharedOn.add( CommonConstants.FACEBOOK_SOCIAL_SITE );
+                            }
                             companySharedOn.put( setting.getIden(), socialSiteSharedOn );
                         }
                     } catch ( FacebookException e ) {
@@ -633,7 +637,9 @@ public class SurveyManagementController
                             if ( socialSiteSharedOn == null ) {
                                 socialSiteSharedOn = new ArrayList<String>();
                             }
-                            socialSiteSharedOn.add( CommonConstants.FACEBOOK_SOCIAL_SITE );
+                            if ( !socialSiteSharedOn.contains( CommonConstants.FACEBOOK_SOCIAL_SITE ) ) {
+                                socialSiteSharedOn.add( CommonConstants.FACEBOOK_SOCIAL_SITE );
+                            }
                             regionSharedOn.put( setting.getIden(), socialSiteSharedOn );
                         }
                     } catch ( FacebookException e ) {
@@ -651,7 +657,9 @@ public class SurveyManagementController
                             if ( socialSiteSharedOn == null ) {
                                 socialSiteSharedOn = new ArrayList<String>();
                             }
-                            socialSiteSharedOn.add( CommonConstants.FACEBOOK_SOCIAL_SITE );
+                            if ( !socialSiteSharedOn.contains( CommonConstants.FACEBOOK_SOCIAL_SITE ) ) {
+                                socialSiteSharedOn.add( CommonConstants.FACEBOOK_SOCIAL_SITE );
+                            }
                             branchSharedOn.put( setting.getIden(), socialSiteSharedOn );
                         }
                     } catch ( FacebookException e ) {
@@ -674,7 +682,9 @@ public class SurveyManagementController
                 if ( socialSiteSharedOn == null ) {
                     socialSiteSharedOn = new ArrayList<String>();
                 }
-                socialSiteSharedOn.add( CommonConstants.LINKEDIN_SOCIAL_SITE );
+                if ( !socialSiteSharedOn.contains( CommonConstants.LINKEDIN_SOCIAL_SITE ) ) {
+                    socialSiteSharedOn.add( CommonConstants.LINKEDIN_SOCIAL_SITE );
+                }
                 agentSharedOn.put( agentId, socialSiteSharedOn );
             }
             if ( accountMasterId != CommonConstants.ACCOUNTS_MASTER_INDIVIDUAL ) {
@@ -686,7 +696,9 @@ public class SurveyManagementController
                         if ( socialSiteSharedOn == null ) {
                             socialSiteSharedOn = new ArrayList<String>();
                         }
-                        socialSiteSharedOn.add( CommonConstants.LINKEDIN_SOCIAL_SITE );
+                        if ( !socialSiteSharedOn.contains( CommonConstants.LINKEDIN_SOCIAL_SITE ) ) {
+                            socialSiteSharedOn.add( CommonConstants.LINKEDIN_SOCIAL_SITE );
+                        }
                         companySharedOn.put( setting.getIden(), socialSiteSharedOn );
                     }
                 }
@@ -698,7 +710,10 @@ public class SurveyManagementController
                         if ( socialSiteSharedOn == null ) {
                             socialSiteSharedOn = new ArrayList<String>();
                         }
-                        socialSiteSharedOn.add( CommonConstants.LINKEDIN_SOCIAL_SITE );
+                        if ( !socialSiteSharedOn.contains( CommonConstants.LINKEDIN_SOCIAL_SITE ) ) {
+                            socialSiteSharedOn.add( CommonConstants.LINKEDIN_SOCIAL_SITE );
+                        }
+
                         regionSharedOn.put( setting.getIden(), socialSiteSharedOn );
                     }
                 }
@@ -710,7 +725,10 @@ public class SurveyManagementController
                         if ( socialSiteSharedOn == null ) {
                             socialSiteSharedOn = new ArrayList<String>();
                         }
-                        socialSiteSharedOn.add( CommonConstants.LINKEDIN_SOCIAL_SITE );
+                        if ( !socialSiteSharedOn.contains( CommonConstants.LINKEDIN_SOCIAL_SITE ) ) {
+                            socialSiteSharedOn.add( CommonConstants.LINKEDIN_SOCIAL_SITE );
+                        }
+
                         branchSharedOn.put( setting.getIden(), socialSiteSharedOn );
                     }
                 }
@@ -732,7 +750,10 @@ public class SurveyManagementController
                     if ( socialSiteSharedOn == null ) {
                         socialSiteSharedOn = new ArrayList<String>();
                     }
-                    socialSiteSharedOn.add( CommonConstants.TWITTER_SOCIAL_SITE );
+                    if ( !socialSiteSharedOn.contains( CommonConstants.TWITTER_SOCIAL_SITE ) ) {
+                        socialSiteSharedOn.add( CommonConstants.TWITTER_SOCIAL_SITE );
+                    }
+
                     agentSharedOn.put( agentId, socialSiteSharedOn );
                 }
             } catch ( TwitterException e ) {
@@ -748,7 +769,10 @@ public class SurveyManagementController
                             if ( socialSiteSharedOn == null ) {
                                 socialSiteSharedOn = new ArrayList<String>();
                             }
-                            socialSiteSharedOn.add( CommonConstants.TWITTER_SOCIAL_SITE );
+                            if ( !socialSiteSharedOn.contains( CommonConstants.TWITTER_SOCIAL_SITE ) ) {
+                                socialSiteSharedOn.add( CommonConstants.TWITTER_SOCIAL_SITE );
+                            }
+
                             companySharedOn.put( setting.getIden(), socialSiteSharedOn );
                         }
                     } catch ( TwitterException e ) {
@@ -765,7 +789,10 @@ public class SurveyManagementController
                             if ( socialSiteSharedOn == null ) {
                                 socialSiteSharedOn = new ArrayList<String>();
                             }
-                            socialSiteSharedOn.add( CommonConstants.TWITTER_SOCIAL_SITE );
+                            if ( !socialSiteSharedOn.contains( CommonConstants.TWITTER_SOCIAL_SITE ) ) {
+                                socialSiteSharedOn.add( CommonConstants.TWITTER_SOCIAL_SITE );
+                            }
+
                             regionSharedOn.put( setting.getIden(), socialSiteSharedOn );
                         }
                     } catch ( TwitterException e ) {
@@ -782,7 +809,9 @@ public class SurveyManagementController
                             if ( socialSiteSharedOn == null ) {
                                 socialSiteSharedOn = new ArrayList<String>();
                             }
-                            socialSiteSharedOn.add( CommonConstants.TWITTER_SOCIAL_SITE );
+                            if ( !socialSiteSharedOn.contains( CommonConstants.TWITTER_SOCIAL_SITE ) ) {
+                                socialSiteSharedOn.add( CommonConstants.TWITTER_SOCIAL_SITE );
+                            }
                             branchSharedOn.put( setting.getIden(), socialSiteSharedOn );
                         }
                     } catch ( TwitterException e ) {
@@ -836,6 +865,11 @@ public class SurveyManagementController
                     "Number format exception caught in postToSocialMedia() while trying to convert agent Id. Nested exception is ",
                     e );
                 return e.getMessage();
+            }
+            SurveyDetails surveyDetails = surveyHandler.getSurveyDetails( agentId, customerEmail, custFirstName, custLastName );
+            SocialPostShared socialPostShared = null;
+            if ( surveyDetails != null ) {
+                socialPostShared = surveyHandler.getSocialPostSharedBySurveyDetails( surveyDetails );
             }
             Map<String, List<OrganizationUnitSettings>> settingsMap = socialManagementService
                 .getSettingsForBranchesAndRegionsInHierarchy( agentId );

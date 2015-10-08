@@ -1539,7 +1539,7 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
 
 
     @Override
-    @Transactional(readOnly = true)
+    @Transactional ( readOnly = true)
     public List<AbusiveSurveyReportWrapper> getSurveysReporetedAsAbusive( int startIndex, int numOfRows )
     {
         LOG.info( "Method getSurveysReporetedAsAbusive() to retrieve surveys marked as abusive, started" );
@@ -1604,28 +1604,37 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
 
         }
         for ( Map.Entry<Long, List<String>> entry : branchSharedOn.entrySet() ) {
-            long branchCount = branchMap.get( entry.getKey() );
+            long branchCount = 0;
+            if ( !branchMap.isEmpty() ) {
+                branchCount = branchMap.get( entry.getKey() );
+            }
             List<String> sharedOnList = entry.getValue();
             if ( sharedOnList != null ) {
                 branchCount = branchCount + sharedOnList.size();
             }
             finalBranchCount += branchCount;
-            agentMap.put( entry.getKey(), branchCount + finalAgentCount );
+            branchMap.put( entry.getKey(), branchCount + finalAgentCount );
 
         }
         for ( Map.Entry<Long, List<String>> entry : regionSharedOn.entrySet() ) {
-            long regionCount = regionMap.get( entry.getKey() );
+            long regionCount = 0;
+            if ( !regionMap.isEmpty() ) {
+                regionCount = regionMap.get( entry.getKey() );
+            }
             List<String> sharedOnList = entry.getValue();
             if ( sharedOnList != null ) {
                 regionCount = regionCount + sharedOnList.size();
             }
             finalRegionCount += regionCount;
-            agentMap.put( entry.getKey(), regionCount + finalBranchCount + finalAgentCount );
+            regionMap.put( entry.getKey(), regionCount + finalBranchCount + finalAgentCount );
 
         }
 
         for ( Map.Entry<Long, List<String>> entry : companySharedOn.entrySet() ) {
-            long companyCount = companyMap.get( entry.getKey() );
+            long companyCount = 0;
+            if ( !companyMap.isEmpty() ) {
+                companyCount = companyMap.get( entry.getKey() );
+            }
             List<String> sharedOnList = entry.getValue();
             if ( sharedOnList != null ) {
                 companyCount = companyCount + sharedOnList.size();
@@ -1649,7 +1658,7 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
     public void updateSurveyDetails( SurveyDetails surveyDetails )
     {
         surveyDetailsDao.updateSurveyDetails( surveyDetails );
-        
+
     }
 }
 // JIRA SS-119 by RM-05:EOC
