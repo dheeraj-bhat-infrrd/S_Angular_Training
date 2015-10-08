@@ -383,14 +383,7 @@ public class HierarchySettingsCorrector extends QuartzJobBean
                 LOG.debug( "Lending tree is not set" );
             }
         }
-        if ( companySetting.getSurvey_settings() != null ) {
-            if ( companySetting.getSurvey_settings().getShow_survey_above_score() > 0 ) {
-                setterValue += SettingsForApplication.MIN_SCORE.getOrder() * 1;
-            }
 
-            setterValue += SettingsForApplication.AUTO_POST_ENABLED.getOrder() * 1;
-
-        }
         LOG.debug( "Final Settings setter value : " + setterValue );
         /*    LOG.debug( "Final Settings locker value : " + lockValue );*/
         company.setSettingsSetStatus( String.valueOf( setterValue ) );

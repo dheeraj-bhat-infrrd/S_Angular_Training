@@ -41,9 +41,6 @@ import com.realtech.socialsurvey.core.entities.SurveyResponse;
 import com.realtech.socialsurvey.core.entities.SurveySettings;
 import com.realtech.socialsurvey.core.entities.User;
 import com.realtech.socialsurvey.core.enums.DisplayMessageType;
-import com.realtech.socialsurvey.core.enums.OrganizationUnit;
-import com.realtech.socialsurvey.core.enums.SettingsForApplication;
-import com.realtech.socialsurvey.core.exception.FatalException;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.exception.NoRecordsFetchedException;
 import com.realtech.socialsurvey.core.exception.NonFatalException;
@@ -52,11 +49,9 @@ import com.realtech.socialsurvey.core.services.generator.URLGenerator;
 import com.realtech.socialsurvey.core.services.mail.EmailServices;
 import com.realtech.socialsurvey.core.services.organizationmanagement.OrganizationManagementService;
 import com.realtech.socialsurvey.core.services.organizationmanagement.ProfileManagementService;
-import com.realtech.socialsurvey.core.services.organizationmanagement.ProfileNotFoundException;
 import com.realtech.socialsurvey.core.services.organizationmanagement.UserManagementService;
 import com.realtech.socialsurvey.core.services.search.SolrSearchService;
 import com.realtech.socialsurvey.core.services.search.exception.SolrException;
-import com.realtech.socialsurvey.core.services.settingsmanagement.impl.InvalidSettingsStateException;
 import com.realtech.socialsurvey.core.services.social.SocialManagementService;
 import com.realtech.socialsurvey.core.services.surveybuilder.SurveyBuilder;
 import com.realtech.socialsurvey.core.services.surveybuilder.SurveyHandler;
@@ -235,7 +230,8 @@ public class SurveyManagementController
                     emailServices.queueSurveyCompletionMail( customerEmail, customerName, survey.getAgentName(),
                         agent.getEmailId(), agent.getProfileName() );
                 } else {
-                    surveyHandler.sendSurveyCompletionMail( customerEmail, survey.getCustomerFirstName(), survey.getCustomerLastName() , agent );
+                    surveyHandler.sendSurveyCompletionMail( customerEmail, survey.getCustomerFirstName(),
+                        survey.getCustomerLastName(), agent );
                 }
 
                 // Generate the text as in mail
@@ -287,13 +283,13 @@ public class SurveyManagementController
         surveyDetail.append( "<br />" ).append( "Customer Comments: " ).append( survey.getReview() );
 
         surveyDetail.append( "<br />" );
-        if(survey.getAgreedToShare() != null && survey.getAgreedToShare().equalsIgnoreCase("true")){
-        	surveyDetail.append( "<br />" ).append( "Share Checkbox: " ).append( "Yes" );
-        	if ( survey.getSharedOn() != null && !survey.getSharedOn().isEmpty() ) {
-        		surveyDetail.append( "<br />" ).append( "Shared on: " ).append( StringUtils.join( survey.getSharedOn(), ", " ) );
-        	}
-        }else{
-        	surveyDetail.append( "<br />" ).append( "Share Checkbox: " ).append( "No" );
+        if ( survey.getAgreedToShare() != null && survey.getAgreedToShare().equalsIgnoreCase( "true" ) ) {
+            surveyDetail.append( "<br />" ).append( "Share Checkbox: " ).append( "Yes" );
+            if ( survey.getSharedOn() != null && !survey.getSharedOn().isEmpty() ) {
+                surveyDetail.append( "<br />" ).append( "Shared on: " ).append( StringUtils.join( survey.getSharedOn(), ", " ) );
+            }
+        } else {
+            surveyDetail.append( "<br />" ).append( "Share Checkbox: " ).append( "No" );
         }
 
         surveyDetail.append( "<br />" );
@@ -557,9 +553,9 @@ public class SurveyManagementController
             AgentSettings agentSettings = userManagementService.getUserSettings( agentId );
 
             // Facebook
-            String facebookMessage = ratingFormat.format( rating ) + "-Star Survey Response from " + customerDisplayName + " for " + agentName
-                + " on Social Survey - view at " + getApplicationBaseUrl() + CommonConstants.AGENT_PROFILE_FIXED_URL
-                + agentProfileLink;
+            String facebookMessage = ratingFormat.format( rating ) + "-Star Survey Response from " + customerDisplayName
+                + " for " + agentName + " on Social Survey - view at " + getApplicationBaseUrl()
+                + CommonConstants.AGENT_PROFILE_FIXED_URL + agentProfileLink;
             facebookMessage += "\n Feedback : " + feedback;
             try {
                 if ( !socialManagementService.updateStatusIntoFacebookPage( agentSettings, facebookMessage, serverBaseUrl,
@@ -586,8 +582,8 @@ public class SurveyManagementController
             }
 
             // LinkedIn
-            String linkedinMessage = ratingFormat.format( rating ) + "-Star Survey Response from " + customerDisplayName + " for " + agentName
-                + " on SocialSurvey ";
+            String linkedinMessage = ratingFormat.format( rating ) + "-Star Survey Response from " + customerDisplayName
+                + " for " + agentName + " on SocialSurvey ";
             String linkedinProfileUrl = getApplicationBaseUrl() + CommonConstants.AGENT_PROFILE_FIXED_URL + agentProfileLink;
             String linkedinMessageFeedback = "From : " + customerDisplayName + " - " + feedback;
             if ( !socialManagementService.updateLinkedin( agentSettings, linkedinMessage, linkedinProfileUrl,
@@ -609,9 +605,10 @@ public class SurveyManagementController
              * + " for " + agentName + " on @SocialSurveyMe - view at " + getApplicationBaseUrl() +
              * CommonConstants.AGENT_PROFILE_FIXED_URL + agentProfileLink;
              */
-            String twitterMessage = String.format( CommonConstants.TWITTER_MESSAGE,
-                ratingFormat.format( rating ), customerDisplayName, agentName, "@SocialSurveyMe" )
-                + getApplicationBaseUrl() + CommonConstants.AGENT_PROFILE_FIXED_URL + agentProfileLink;
+            String twitterMessage = String.format( CommonConstants.TWITTER_MESSAGE, ratingFormat.format( rating ),
+                customerDisplayName, agentName, "@SocialSurveyMe" )
+                + getApplicationBaseUrl()
+                + CommonConstants.AGENT_PROFILE_FIXED_URL + agentProfileLink;
             try {
                 if ( !socialManagementService.tweet( agentSettings, twitterMessage, agent.getCompany().getCompanyId() ) ) {
                     surveyHandler.updateSharedOn( CommonConstants.TWITTER_SOCIAL_SITE, agentId, customerEmail );
@@ -681,9 +678,9 @@ public class SurveyManagementController
             List<OrganizationUnitSettings> settings = socialManagementService
                 .getSettingsForBranchesAndRegionsInHierarchy( agentId );
             AgentSettings agentSettings = userManagementService.getUserSettings( agentId );
-            String facebookMessage = ratingFormat.format( rating ) + "-Star Survey Response from " + customerDisplayName + " for " + agentName
-                + " on Social Survey - view at " + getApplicationBaseUrl() + CommonConstants.AGENT_PROFILE_FIXED_URL
-                + agentProfileLink;
+            String facebookMessage = ratingFormat.format( rating ) + "-Star Survey Response from " + customerDisplayName
+                + " for " + agentName + " on Social Survey - view at " + getApplicationBaseUrl()
+                + CommonConstants.AGENT_PROFILE_FIXED_URL + agentProfileLink;
             // TODO: Bad code: DELETE: BEGIN
             // get the company id of the agent
             User user = userManagementService.getUserObjByUserId( agentId );
@@ -754,9 +751,10 @@ public class SurveyManagementController
              * + " for " + agentName + " on @SocialSurveyMe - view at " + getApplicationBaseUrl() +
              * CommonConstants.AGENT_PROFILE_FIXED_URL + agentProfileLink;
              */
-            String twitterMessage = String.format( CommonConstants.TWITTER_MESSAGE,
-                ratingFormat.format( rating ), customerDisplayName, agentName, "@SocialSurveyMe" )
-                + getApplicationBaseUrl() + CommonConstants.AGENT_PROFILE_FIXED_URL + agentProfileLink;
+            String twitterMessage = String.format( CommonConstants.TWITTER_MESSAGE, ratingFormat.format( rating ),
+                customerDisplayName, agentName, "@SocialSurveyMe" )
+                + getApplicationBaseUrl()
+                + CommonConstants.AGENT_PROFILE_FIXED_URL + agentProfileLink;
             // TODO: Bad code: DELETE: BEGIN
             // get the company id of the agent
             User user = userManagementService.getUserObjByUserId( agentId );
@@ -818,8 +816,8 @@ public class SurveyManagementController
             List<OrganizationUnitSettings> settings = socialManagementService
                 .getSettingsForBranchesAndRegionsInHierarchy( agentId );
             AgentSettings agentSettings = userManagementService.getUserSettings( agentId );
-            String message = ratingFormat.format( rating ) + "-Star Survey Response from " + customerDisplayName + " for " + agentName
-                + " on SocialSurvey ";
+            String message = ratingFormat.format( rating ) + "-Star Survey Response from " + customerDisplayName + " for "
+                + agentName + " on SocialSurvey ";
             String linkedinProfileUrl = getApplicationBaseUrl() + CommonConstants.AGENT_PROFILE_FIXED_URL + agentProfileLink;
             String linkedinMessageFeedback = "From : " + customerDisplayName + " " + feedback;
             socialManagementService.updateLinkedin( agentSettings, message, linkedinProfileUrl, linkedinMessageFeedback );
@@ -1111,41 +1109,21 @@ public class SurveyManagementController
 
         /*OrganizationUnitSettings companySettings = organizationManagementService.getCompanySettings(userManagementService.getUserByUserId(agentId));*/
         OrganizationUnitSettings unitSettings = organizationManagementService.getAgentSettings( agentId );
-        Map<String, Long> hierarchyMap = null;
-        try {
-            hierarchyMap = profileManagementService.getPrimaryHierarchyByAgentProfile( unitSettings );
-        } catch ( ProfileNotFoundException e1 ) {
-            LOG.error( "Unable to fetch primary profile for this user " );
-            throw new FatalException( "Unable to fetch primary profile this user " + agentId );
-        }
-        long companyId = 0;
-        long regionId = 0;
-        long branchId = 0;
-        Map<SettingsForApplication, OrganizationUnit> map = null;
-        if ( hierarchyMap != null ) {
-            companyId = hierarchyMap.get( CommonConstants.COMPANY_ID_COLUMN );
-            regionId = hierarchyMap.get( CommonConstants.REGION_ID_COLUMN );
-            branchId = hierarchyMap.get( CommonConstants.BRANCH_ID_COLUMN );
-        }
-        try {
-            map = profileManagementService.getPrimaryHierarchyByEntity( CommonConstants.AGENT_ID_COLUMN, agentId );
-            if ( map == null ) {
-                LOG.error( "Unable to fetch primary profile for this user " );
-                throw new FatalException( "Unable to fetch primary profile this user " + agentId );
+        if ( unitSettings.getSurvey_settings() == null ) {
+            SurveySettings surveySettings = new SurveySettings();
+            surveySettings.setAutoPostEnabled( true );
+            surveySettings.setShow_survey_above_score( CommonConstants.DEFAULT_AUTOPOST_SCORE );
+            organizationManagementService.updateScoreForSurvey( MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION,
+                unitSettings, surveySettings );
+        } else {
+            if ( unitSettings.getSurvey_settings().getShow_survey_above_score() <= 0 ) {
+                unitSettings.getSurvey_settings().setAutoPostEnabled( true );
+                unitSettings.getSurvey_settings().setShow_survey_above_score( CommonConstants.DEFAULT_AUTOPOST_SCORE );
+                organizationManagementService.updateScoreForSurvey(
+                    MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION, unitSettings,
+                    unitSettings.getSurvey_settings() );
             }
-        } catch ( InvalidSettingsStateException e ) {
-            LOG.error( "Invalid settings for score ", e );
-
-        } catch ( ProfileNotFoundException e ) {
-            LOG.error( "Unable to fetch primary profile for this user " );
-            throw new FatalException( "Unable to fetch primary profile this user " + agentId );
         }
-        OrganizationUnitSettings companySettings = organizationManagementService.getCompanySettings( companyId );
-        OrganizationUnitSettings regionSettings = organizationManagementService.getRegionSettings( regionId );
-        OrganizationUnitSettings branchSettings = organizationManagementService.getBranchSettingsDefault( branchId );
-        unitSettings = profileManagementService.getAutoPostScoreBasedOnHierarchy(
-            MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION, unitSettings, companySettings, regionSettings,
-            branchSettings, unitSettings, map );
         SurveySettings defaultSurveySettings = organizationManagementService.retrieveDefaultSurveyProperties();
         surveyAndStage.put( "happyText", defaultSurveySettings.getHappyText() );
         surveyAndStage.put( "neutralText", defaultSurveySettings.getNeutralText() );
