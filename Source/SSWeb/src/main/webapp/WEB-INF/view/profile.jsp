@@ -109,6 +109,9 @@
     		<c:if test="${integerAverageRating == 6}">
     			<c:set var="integerAverageRating" value="5"></c:set>
     		</c:if>
+    		<c:if test="${integerAverageRating == 0}">
+    			<c:set var="integerAverageRating" value="1"></c:set>
+    		</c:if>
     	</c:if>
     	<c:choose>
 			<c:when test="${ floatingAverageRating % 1 == 0 }">

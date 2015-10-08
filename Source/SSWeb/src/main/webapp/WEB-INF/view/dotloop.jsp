@@ -66,6 +66,6 @@
 			until you move the loop into Closed status.</i>
 	</p>
 
-	<iframe src="//player.vimeo.com/video/116064341" width="500"
+	<iframe class="dotloop-iframe" src="//player.vimeo.com/video/116064341" width="500"
 		height="281" frameborder="0" allowfullscreen=""></iframe>
 </div>

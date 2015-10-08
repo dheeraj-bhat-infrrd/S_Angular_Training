@@ -1,6 +1,6 @@
 /* ============== SMARTPHONES ==============*/
 @media (max-width: 767px) {
-    body{
+	body{
         font-size: 12px;
         -webkit-user-select: none;   
         overflow-x:hidden;                
@@ -471,6 +471,9 @@
     }
     .payment-details-wrapper, .overlay-payment{
         padding: 10px;
+    }
+    .overlay-payment{
+        padding-bottom: 300px;
     }
     .btn-payment{
         width: 100%;
