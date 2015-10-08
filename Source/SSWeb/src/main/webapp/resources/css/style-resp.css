@@ -1,6 +1,6 @@
 /* ============== SMARTPHONES ==============*/
 @media (max-width: 767px) {
-    body{
+	body{
         font-size: 12px;
         -webkit-user-select: none;   
         overflow-x:hidden;                

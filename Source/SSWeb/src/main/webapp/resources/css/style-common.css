@@ -7570,3 +7570,7 @@ label.url-change-input-label {
 .abuse-report-wrapper {
     padding-bottom: 10px;
 }
+
+.dotloop-iframe {
+	max-width: 100%;
+}
