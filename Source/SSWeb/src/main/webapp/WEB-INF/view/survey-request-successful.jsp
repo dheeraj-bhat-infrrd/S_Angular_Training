@@ -46,8 +46,8 @@
 	</div>
 	<div class="hm-header-main-wrapper">
 		<div class="container">
-			<div class="hm-header-row hm-header-row-main clearfix">
-				<div class="hm-header-row-left text-center">
+			<div class="hm-header-row hm-header-row-main clearfix hm-header-row-sur">
+				<div class="hm-header-row-left hm-header-row-left-sur text-center">
 					<spring:message code="label.surveyrequestsuccessful.title.key" />
 				</div>
 			</div>
