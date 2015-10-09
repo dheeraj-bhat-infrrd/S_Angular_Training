@@ -1256,12 +1256,16 @@ public class SurveyManagementController
     private void reportBug( String socAppName, String name, Exception e )
     {
         try {
+            LOG.info( "Building error message for the auto post failure" );
             String errorMsg = "<br>" + e.getMessage() + "<br><br>";
             if ( socAppName.length() > 0 )
                 errorMsg += "Social Application : " + socAppName;
             errorMsg += "<br>Agent Name : " + name + "<br>";
             errorMsg += "<br>StackTrace : <br>" + ExceptionUtils.getStackTrace( e ).replaceAll("\n","<br>") + "<br>";
+            LOG.info( "Error message built for the auto post failure" );
+            LOG.info( "Sending bug mail to admin for the auto post failure" );
             emailServices.sendReportBugMailToAdmin( applicationAdminName, errorMsg, applicationSupportEmail );
+            LOG.info( "Sent bug mail to admin for the auto post failure" );
         } catch ( UndeliveredEmailException ude ) {
             LOG.error( "error while sending report bug mail to admin ", ude );
         } catch ( InvalidInputException iie ) {
