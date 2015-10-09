@@ -13,6 +13,7 @@ import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang.exception.ExceptionUtils;
 import org.apache.solr.common.SolrDocument;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -32,6 +33,7 @@ import com.google.gson.Gson;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.dao.impl.MongoOrganizationUnitSettingDaoImpl;
 import com.realtech.socialsurvey.core.dao.impl.MongoSocialPostDaoImpl;
+import com.realtech.socialsurvey.core.entities.AccountsMaster;
 import com.realtech.socialsurvey.core.entities.AgentSettings;
 import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
 import com.realtech.socialsurvey.core.entities.SurveyDetails;
@@ -47,6 +49,7 @@ import com.realtech.socialsurvey.core.exception.NonFatalException;
 import com.realtech.socialsurvey.core.services.authentication.CaptchaValidation;
 import com.realtech.socialsurvey.core.services.generator.URLGenerator;
 import com.realtech.socialsurvey.core.services.mail.EmailServices;
+import com.realtech.socialsurvey.core.services.mail.UndeliveredEmailException;
 import com.realtech.socialsurvey.core.services.organizationmanagement.OrganizationManagementService;
 import com.realtech.socialsurvey.core.services.organizationmanagement.ProfileManagementService;
 import com.realtech.socialsurvey.core.services.organizationmanagement.UserManagementService;
@@ -131,6 +134,12 @@ public class SurveyManagementController
 
     @Value ( "${GATEWAY_QUESTION}")
     private String gatewayQuestion;
+    
+    @Value ( "${APPLICATION_SUPPORT_EMAIL}")
+    private String applicationSupportEmail;
+
+    @Value ( "${APPLICATION_ADMIN_NAME}")
+    private String applicationAdminName;
 
 
     /*
@@ -553,9 +562,12 @@ public class SurveyManagementController
             }
             User agent = userManagementService.getUserByUserId( agentId );
             int accountMasterId = 0;
+            String accountMasterName = "";
             try {
-                accountMasterId = agent.getCompany().getLicenseDetails().get( CommonConstants.INITIAL_INDEX )
-                    .getAccountsMaster().getAccountsMasterId();
+                AccountsMaster masterAccount = agent.getCompany().getLicenseDetails().get( CommonConstants.INITIAL_INDEX )
+                    .getAccountsMaster();
+                accountMasterId = masterAccount.getAccountsMasterId();
+                accountMasterName = masterAccount.getAccountName();
             } catch ( NullPointerException e ) {
                 LOG.error( "NullPointerException caught in postToSocialMedia() while fetching account master id for agent "
                     + agent.getFirstName() );
@@ -578,6 +590,7 @@ public class SurveyManagementController
             } catch ( FacebookException e ) {
                 LOG.error(
                     "FacebookException caught in postToSocialMedia() while trying to post to facebook. Nested excption is ", e );
+                reportBug( "Facebook", agentSettings.getContact_details().getName(), e );
             }
             if ( accountMasterId != CommonConstants.ACCOUNTS_MASTER_INDIVIDUAL ) {
                 for ( OrganizationUnitSettings setting : settings ) {
@@ -590,6 +603,7 @@ public class SurveyManagementController
                         LOG.error(
                             "FacebookException caught in postToSocialMedia() while trying to post to facebook. Nested excption is ",
                             e );
+                        reportBug( "Facebook", accountMasterName, e );
                     }
                 }
             }
@@ -622,6 +636,7 @@ public class SurveyManagementController
                 customerDisplayName, agentName, "@SocialSurveyMe" )
                 + getApplicationBaseUrl()
                 + CommonConstants.AGENT_PROFILE_FIXED_URL + agentProfileLink;
+
             try {
                 if ( !socialManagementService.tweet( agentSettings, twitterMessage, agent.getCompany().getCompanyId() ) ) {
                     surveyHandler.updateSharedOn( CommonConstants.TWITTER_SOCIAL_SITE, agentId, customerEmail );
@@ -629,6 +644,7 @@ public class SurveyManagementController
             } catch ( TwitterException e ) {
                 LOG.error(
                     "TwitterException caught in postToSocialMedia() while trying to post to twitter. Nested excption is ", e );
+                reportBug( "Twitter", agentSettings.getContact_details().getName(), e );
             }
             if ( accountMasterId != CommonConstants.ACCOUNTS_MASTER_INDIVIDUAL ) {
                 for ( OrganizationUnitSettings setting : settings ) {
@@ -640,6 +656,7 @@ public class SurveyManagementController
                         LOG.error(
                             "TwitterException caught in postToSocialMedia() while trying to post to twitter. Nested excption is ",
                             e );
+                        reportBug( "Twitter", accountMasterName, e );
                     }
                 }
             }
@@ -839,9 +856,9 @@ public class SurveyManagementController
             }
             surveyHandler.updateSharedOn( CommonConstants.LINKEDIN_SOCIAL_SITE, agentId, customerEmail );
         } catch ( NonFatalException e ) {
-            LOG.error( "NonFatalException caught in postToTwitter(). Nested exception is ", e );
+            LOG.error( "NonFatalException caught in postToLinkedin(). Nested exception is ", e );
         }
-        LOG.info( "Method to post feedback of customer to twitter finished." );
+        LOG.info( "Method to post feedback of customer to Linkedin finished." );
         return "";
     }
 
@@ -1233,6 +1250,27 @@ public class SurveyManagementController
         surveyAndStage.put( "editable", editable );
         surveyAndStage.put( "source", source );
         return surveyAndStage;
+    }
+    
+
+    private void reportBug( String socAppName, String name, Exception e )
+    {
+        try {
+            LOG.info( "Building error message for the auto post failure" );
+            String errorMsg = "<br>" + e.getMessage() + "<br><br>";
+            if ( socAppName.length() > 0 )
+                errorMsg += "Social Application : " + socAppName;
+            errorMsg += "<br>Agent Name : " + name + "<br>";
+            errorMsg += "<br>StackTrace : <br>" + ExceptionUtils.getStackTrace( e ).replaceAll("\n","<br>") + "<br>";
+            LOG.info( "Error message built for the auto post failure" );
+            LOG.info( "Sending bug mail to admin for the auto post failure" );
+            emailServices.sendReportBugMailToAdmin( applicationAdminName, errorMsg, applicationSupportEmail );
+            LOG.info( "Sent bug mail to admin for the auto post failure" );
+        } catch ( UndeliveredEmailException ude ) {
+            LOG.error( "error while sending report bug mail to admin ", ude );
+        } catch ( InvalidInputException iie ) {
+            LOG.error( "error while sending report bug mail to admin ", iie );
+        }
     }
 }
 // JIRA SS-119 by RM-05 : EOC
