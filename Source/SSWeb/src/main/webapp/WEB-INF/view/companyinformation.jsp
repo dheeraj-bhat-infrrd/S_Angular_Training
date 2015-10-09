@@ -4,7 +4,7 @@
 <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions"%>
 <c:set var="user" value="${sessionScope.SPRING_SECURITY_CONTEXT.authentication.principal}" />
 
-<!DOCTYPE">
+<!DOCTYPE>
 <html>
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
@@ -23,6 +23,9 @@
 </head>
 
 <body>
+	<div id="toast-container" class="toast-container">
+		<span id="overlay-toast" class="overlay-toast"></span>
+	</div>
 	<div class="hdr-wrapper">
 		<div class="container hdr-container clearfix">
 			<div class="float-left hdr-logo"></div>

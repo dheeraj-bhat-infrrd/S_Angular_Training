@@ -782,7 +782,7 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
                 LOG.error( "Exception caught while sending mail to " + custEmail + ". Nested exception is ", e );
             }
         } else {
-            emailServices.sendDefaultSurveyRestartMail( custEmail,
+            emailServices.sendDefaultSurveyRestartMail( custEmail, logoUrl,
                 emailFormatHelper.getCustomerDisplayNameForEmail( custFirstName, custLastName ),
                 user.getFirstName() + ( user.getLastName() != null ? " " + user.getLastName() : "" ), surveyUrl,
                 user.getEmailId(), agentSignature );
@@ -1121,6 +1121,27 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
                 if ( userList != null && !userList.isEmpty() ) {
                     user = userList.get( 0 );
                     if ( user != null ) {
+                        // check if survey has already been sent to the email id
+                        // check the pre-initiation and then the survey table
+                        HashMap<String, Object> queries = new HashMap<>();
+                        queries.put( CommonConstants.AGENT_ID_COLUMN, user.getUserId() );
+                        queries.put( CommonConstants.CUSTOMER_EMAIL_ID_KEY_COLUMN, survey.getCustomerEmailId() );
+                        List<SurveyPreInitiation> incompleteSurveyCustomers = surveyPreInitiationDao.findByKeyValue(
+                            SurveyPreInitiation.class, queries );
+                        if ( incompleteSurveyCustomers != null && incompleteSurveyCustomers.size() > 0 ) {
+                            LOG.warn( "Survey request already sent" );
+                            status = CommonConstants.STATUS_SURVEYPREINITIATION_DUPLICATE_RECORD;
+                            survey.setStatus( status );
+                        }
+                        // check the survey collection
+                        SurveyDetails surveyDetail = surveyDetailsDao.getSurveyByAgentIdAndCustomerEmail( user.getUserId(),
+                            survey.getCustomerEmailId(), null, null );
+                        if ( surveyDetail != null ) {
+                            LOG.warn( "Survey request already sent and completed" );
+                            status = CommonConstants.STATUS_SURVEYPREINITIATION_DUPLICATE_RECORD;
+                            survey.setStatus( status );
+                        }
+
                         LOG.debug( "Mapping the agent to this survey " );
                         if ( survey.getAgentId() == 0 ) {
                             survey.setAgentId( user.getUserId() );
@@ -1338,7 +1359,7 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
                 LOG.error( "Exception caught while sending mail to " + custEmail + ". Nested exception is ", e );
             }
         } else {
-            emailServices.sendDefaultSurveyInvitationMail( custEmail,
+            emailServices.sendDefaultSurveyInvitationMail( custEmail, logoUrl,
                 emailFormatHelper.getCustomerDisplayNameForEmail( custFirstName, custLastName ),
                 user.getFirstName() + ( user.getLastName() != null ? " " + user.getLastName() : "" ), surveyUrl,
                 user.getEmailId(), agentSignature, companyName, dateFormat.format( new Date() ), currentYear, fullAddress );

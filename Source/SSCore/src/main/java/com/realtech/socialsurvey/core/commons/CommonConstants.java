@@ -118,6 +118,7 @@ public interface CommonConstants
     public static final int SURVEY_STATUS_INITIATED = 2;
     public static final int STATUS_SURVEYPREINITIATION_CORRUPT_RECORD = 3;
     public static final int STATUS_SURVEYPREINITIATION_NOT_PROCESSED = 4;
+    public static final int STATUS_SURVEYPREINITIATION_DUPLICATE_RECORD = 5;
 
     /**
      * Hibernate entities and column name constants
@@ -395,8 +396,7 @@ public interface CommonConstants
     public static final String PHONENUMBER_REGEX = "^((\\+)|(00)|(\\*)|())[0-9]{3,14}((\\#)|())$";
     public static final String ZIPCODE_REGEX = "\\d{5}(-\\d{4})?";
     public static final String COMPANY_NAME_REGEX = "^[a-zA-Z0-9 ]+$";
-    /*public static final String EMAIL_REGEX = "^[_A-Za-z0-9-\\+]+(\\.[_A-Za-z0-9-]+)*@[A-Za-z0-9-]+(\\.[A-Za-z0-9]+)*(\\.[A-Za-z]{2,})$";*/
-    public static final String EMAIL_REGEX = "^[\\w-_\\.+]*[\\w-_\\.]\\@([\\w]+\\.)+[\\w]+[\\w]$";
+    public static final String EMAIL_REGEX = "^[_A-Za-z0-9-\\+\\.]+(\\.[_A-Za-z0-9-]+)*@[A-Za-z0-9-]+(\\.[A-Za-z0-9]+)*(\\.[A-Za-z]{2,})$";
     public static final String FIRST_NAME_REGEX = "[a-zA-Z ]+";
     public static final String LAST_NAME_REGEX = "[a-zA-Z0-9 ]+";
     public static final String FINDAPRO_FIRST_NAME_REGEX = "^[a-zA-Z]{2,}$";
