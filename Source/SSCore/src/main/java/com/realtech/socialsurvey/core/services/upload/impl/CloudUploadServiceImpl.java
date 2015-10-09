@@ -2,8 +2,8 @@ package com.realtech.socialsurvey.core.services.upload.impl;
 
 import java.io.File;
 import java.io.IOException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Calendar;
 import java.util.List;
 
@@ -23,7 +23,6 @@ import com.amazonaws.regions.Region;
 import com.amazonaws.regions.Regions;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.AmazonS3Client;
-import com.amazonaws.services.s3.model.BucketLifecycleConfiguration;
 import com.amazonaws.services.s3.model.CannedAccessControlList;
 import com.amazonaws.services.s3.model.ListObjectsRequest;
 import com.amazonaws.services.s3.model.ObjectListing;
@@ -157,6 +156,10 @@ public class CloudUploadServiceImpl implements FileUploadService
         cal.set(Calendar.DATE, 19);
         cal.set(Calendar.MONTH, Calendar.JANUARY);
         cal.set(Calendar.YEAR, 2038);
+        cal.set(Calendar.HOUR_OF_DAY, 23);
+        cal.set(Calendar.MINUTE, 59);
+        cal.set(Calendar.SECOND, 59);
+        cal.set(Calendar.MILLISECOND, 0);
         
         int maxAgeValue = (int) ( ( cal.getTimeInMillis() - System.currentTimeMillis() ) / 1000 ) ;
 
@@ -164,13 +167,13 @@ public class CloudUploadServiceImpl implements FileUploadService
         metadata.setCacheControl( CACHE_MAX_AGE + maxAgeValue + CACHE_VALUE_SEPERATOR + CACHE_PUBLIC );
         // TODO: set expiration date properly later
         metadata.setExpirationTime( cal.getTime() );
+        metadata.setHeader( "Expires", new SimpleDateFormat( "EEE, dd MMM yyyy HH:mm:ss z" ).format( cal.getTime() ) );
         PutObjectRequest putObjectRequest = new PutObjectRequest( bucket, fileName, file );
         putObjectRequest.setMetadata( metadata );
         putObjectRequest.withCannedAcl( CannedAccessControlList.PublicRead );
 
         AmazonS3 s3Client = createAmazonClient( endpoint, bucket );
-        addExpirationTime( s3Client, (int) ( maxAgeValue / ( 24 * 60 * 60 ) ), bucket );
-
+        
         PutObjectResult result = s3Client.putObject( putObjectRequest );
 
         LOG.info( "Amazon Upload Etag: " + result.getETag() );
@@ -265,20 +268,6 @@ public class CloudUploadServiceImpl implements FileUploadService
         }
         LOG.debug( "Returning Amazon S3 Client" );
         return s3Client;
-    }
-
-
-    private void addExpirationTime( AmazonS3 s3Client, int days, String bucket )
-    {
-
-        BucketLifecycleConfiguration.Rule picExpirationRule = new BucketLifecycleConfiguration.Rule()
-            .withId( "PicExpirationRule" ).withExpirationInDays(days).withStatus( BucketLifecycleConfiguration.ENABLED.toString() );
-
-        BucketLifecycleConfiguration configuration = new BucketLifecycleConfiguration().withRules( Arrays
-            .asList( picExpirationRule ) );
-
-        s3Client.setBucketLifecycleConfiguration( bucket, configuration );
-
     }
 
 }
