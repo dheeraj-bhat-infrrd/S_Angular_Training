@@ -427,32 +427,17 @@ public class SurveyManagementController
             model.addAttribute( "source", source );
 
             User user = userManagementService.getUserByUserId( agentId );
-            SurveyPreInitiation preInitiatedSurvey = surveyHandler.getPreInitiatedSurvey( agentId, customerEmail, firstName,
-                lastName );
-            SurveyDetails survey = surveyHandler.getSurveyDetails( agentId, customerEmail, firstName, lastName );
-
-            // Code to be executed when survey has already been taken.
-            if ( preInitiatedSurvey == null && survey != null && survey.getStage() == -1 ) {
-                model.addAttribute( "surveyCompleted", "yes" );
-                model.addAttribute( "agentName", agentName );
-                return JspResolver.SURVEY_INVITE_SUCCESSFUL;
-            }
-            // Code to be executed when survey request has already been sent but survey is not
-            // completed.
-            else if ( preInitiatedSurvey != null ) {
-                model.addAttribute( "surveyRequestSent", "yes" );
-                model.addAttribute( "agentName", agentName );
-                return JspResolver.SURVEY_INVITE_SUCCESSFUL;
-            }
             
             try{
                 surveyHandler.initiateSurveyRequest( user.getUserId(), customerEmail, firstName, lastName, source );
             }catch(SelfSurveyInitiationException e){
                 errorMsg = messageUtils.getDisplayMessage( DisplayMessageConstants.SELF_SURVEY_INITIATION,
                     DisplayMessageType.ERROR_MESSAGE ).getMessage();
+                throw new NonFatalException( e.getMessage() , e.getErrorCode() );
             }catch(DuplicateSurveyRequestException e){
                 errorMsg = messageUtils.getDisplayMessage( DisplayMessageConstants.DUPLICATE_SURVEY_REQUEST,
                     DisplayMessageType.ERROR_MESSAGE ).getMessage();
+                throw new NonFatalException( e.getMessage() , e.getErrorCode() );
             }
 
         } catch ( NonFatalException e ) {
