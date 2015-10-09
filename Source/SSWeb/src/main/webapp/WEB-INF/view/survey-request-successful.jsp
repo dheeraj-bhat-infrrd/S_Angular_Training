@@ -94,6 +94,7 @@
 			document.write('<script src="${initParam.resourcesPath}/resources/js/jquery-2.1.1.min.js""><\/script>');
 		}
 	</script>
+	<script src="${initParam.resourcesPath}/resources/js/common.js"></script>
 	<script src="${initParam.resourcesPath}/resources/js/script.js"></script>
 	<script type="text/javascript">
 		$(document).ready(function(){
