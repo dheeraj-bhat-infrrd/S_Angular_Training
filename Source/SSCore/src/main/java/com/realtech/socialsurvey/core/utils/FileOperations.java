@@ -5,9 +5,12 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.List;
+import java.util.regex.Matcher;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
+
 import com.realtech.socialsurvey.core.entities.FileContentReplacements;
 import com.realtech.socialsurvey.core.exception.FatalException;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
@@ -83,7 +86,7 @@ public final class FileOperations {
 		if (replacementArgs != null && !replacementArgs.isEmpty()) {
 			LOG.trace("Replacing the file contents with replacement arguments");
 			for (String replacementArg : replacementArgs) {
-				replacedContent = replacedContent.replaceFirst("%s", replacementArg);
+				replacedContent = replacedContent.replaceFirst("%s", Matcher.quoteReplacement(replacementArg));
 			}
 		}
 		else {

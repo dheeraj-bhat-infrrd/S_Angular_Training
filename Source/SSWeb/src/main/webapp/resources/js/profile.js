@@ -1219,7 +1219,7 @@ $('body').on('click',".region-link",function(e) {
 });
 
 
-$('body').on("click",".comp-branch,.comp-region-branch",function(e){
+$('body').on("click touchstart",".comp-branch,.comp-region-branch",function(e){
 	e.preventDefault();
 	if($(this).data("openstatus") == "closed") {
 		fetchIndividualsForBranch($(this).data('branchid'));
@@ -1233,7 +1233,7 @@ $('body').on("click",".comp-branch,.comp-region-branch",function(e){
 	}
 });
 
-$('body').on("click",".comp-region",function(){
+$('body').on("click touchstart",".comp-region",function(){
 	if($(this).data("openstatus") == "closed") {
 		$('#comp-region-branches-'+$(this).data('regionid')).html("");
 		fetchBranchesForRegion($(this).data('regionid'));
