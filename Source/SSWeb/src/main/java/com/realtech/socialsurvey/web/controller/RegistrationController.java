@@ -304,7 +304,7 @@ public class RegistrationController
             LOG.error( "NonFatalException while showing registration page. Reason : " + e.getMessage(), e );
             redirectAttributes.addFlashAttribute( "status", DisplayMessageType.ERROR_MESSAGE );
             redirectAttributes.addFlashAttribute( "message",
-                messageUtils.getDisplayMessage( DisplayMessageConstants.INVALID_CAPTCHA, DisplayMessageType.ERROR_MESSAGE ) );
+                messageUtils.getDisplayMessage( e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE ) );
             redirectAttributes.addFlashAttribute( "firstname", firstName );
             redirectAttributes.addFlashAttribute( "lastname", lastName );
             redirectAttributes.addFlashAttribute( "emailid", emailId );
@@ -644,7 +644,7 @@ public class RegistrationController
         }
 
         // check if email Id isEmpty, null or whether it matches the regular expression or not
-        if ( emailId == null || emailId.isEmpty() || !emailId.matches( CommonConstants.EMAIL_REGEX ) ) {
+        if ( emailId == null || emailId.isEmpty() || !organizationManagementService.validateEmail( emailId ) ) {
             throw new InvalidInputException( "Email address is invalid in registration",
                 DisplayMessageConstants.INVALID_EMAILID );
         }

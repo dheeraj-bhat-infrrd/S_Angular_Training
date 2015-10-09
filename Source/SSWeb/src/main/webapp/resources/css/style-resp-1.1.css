@@ -531,4 +531,9 @@
 	.sur-com-logo {
 		display: none;
 	}
+	.hm-header-right {
+		margin-left: 5px;
+		padding: 0px 8px;
+		font-size: 12px;
+	}
 }
