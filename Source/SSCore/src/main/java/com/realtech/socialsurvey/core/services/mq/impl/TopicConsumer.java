@@ -437,7 +437,7 @@ public class TopicConsumer implements Runnable {
 		LOG.debug("companyName: " + companyName);
 
 		LOG.debug("Sending retry exhausted mail");
-		emailServices.sendDefaultSurveyReminderMail(recipient, name, agentName,
+		emailServices.sendDefaultSurveyReminderMail(recipient, null,  name, agentName,
 				agentEmailId, link, agentPhone, agentTitle, companyName);
 	}
 

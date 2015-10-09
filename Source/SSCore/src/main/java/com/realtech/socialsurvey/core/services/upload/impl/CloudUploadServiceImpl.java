@@ -2,8 +2,9 @@ package com.realtech.socialsurvey.core.services.upload.impl;
 
 import java.io.File;
 import java.io.IOException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
+import java.util.Calendar;
 import java.util.List;
 
 import javax.imageio.ImageIO;
@@ -44,6 +45,8 @@ public class CloudUploadServiceImpl implements FileUploadService
 
     private static final Logger LOG = LoggerFactory.getLogger( CloudUploadServiceImpl.class );
     private static final String CACHE_PUBLIC = "public";
+    private static final String CACHE_MAX_AGE = "max-age=";
+    private static final String CACHE_VALUE_SEPERATOR = ", ";
 
     @Autowired
     private EncryptionHelper encryptionHelper;
@@ -149,21 +152,34 @@ public class CloudUploadServiceImpl implements FileUploadService
             throw new InvalidInputException( "Either file or file name is not present" );
         }
 
+        Calendar cal = Calendar.getInstance();
+        cal.set(Calendar.DATE, 19);
+        cal.set(Calendar.MONTH, Calendar.JANUARY);
+        cal.set(Calendar.YEAR, 2038);
+        cal.set(Calendar.HOUR_OF_DAY, 23);
+        cal.set(Calendar.MINUTE, 59);
+        cal.set(Calendar.SECOND, 59);
+        cal.set(Calendar.MILLISECOND, 0);
+        
+        int maxAgeValue = (int) ( ( cal.getTimeInMillis() - System.currentTimeMillis() ) / 1000 ) ;
+
         ObjectMetadata metadata = new ObjectMetadata();
-        metadata.setCacheControl( CACHE_PUBLIC );
+        metadata.setCacheControl( CACHE_MAX_AGE + maxAgeValue + CACHE_VALUE_SEPERATOR + CACHE_PUBLIC );
         // TODO: set expiration date properly later
-        metadata.setExpirationTime( new Date( System.currentTimeMillis() ) );
+        metadata.setExpirationTime( cal.getTime() );
+        metadata.setHeader( "Expires", new SimpleDateFormat( "EEE, dd MMM yyyy HH:mm:ss z" ).format( cal.getTime() ) );
         PutObjectRequest putObjectRequest = new PutObjectRequest( bucket, fileName, file );
         putObjectRequest.setMetadata( metadata );
         putObjectRequest.withCannedAcl( CannedAccessControlList.PublicRead );
 
         AmazonS3 s3Client = createAmazonClient( endpoint, bucket );
+        
         PutObjectResult result = s3Client.putObject( putObjectRequest );
 
         LOG.info( "Amazon Upload Etag: " + result.getETag() );
         LOG.info( "Uploaded " + fileName + " to Amazon s3" );
     }
-
+   
 
     /**
      * Method that returns a list of all the keys in a bucket.
@@ -253,4 +269,5 @@ public class CloudUploadServiceImpl implements FileUploadService
         LOG.debug( "Returning Amazon S3 Client" );
         return s3Client;
     }
+
 }

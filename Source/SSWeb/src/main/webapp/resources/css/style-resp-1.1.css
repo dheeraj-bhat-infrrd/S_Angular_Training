@@ -289,6 +289,20 @@
     input#find-pro-last-name {
 		float: right;
 	}
+	.payment-button {
+		padding: 0 7px;
+		font-size: 13px;
+	}
+	table.payment-pricing th strong {
+		font-size: 15px;
+		line-height: 24px;
+	}
+	.payment-acc-type-txt {
+		line-height: normal;
+		display: table;
+		text-align: center;
+		width: 100%;
+	}
 }
 
 

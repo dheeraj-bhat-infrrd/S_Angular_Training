@@ -90,8 +90,8 @@ public class IncompleteSurveyReminderSender extends QuartzJobBean
                              * sendMailToAgent( survey ); }
                              */
                             if ( reminder ) {
-                                sendSurveyReminderEmail( emailServices, organizationManagementService, userManagementService, survey,
-                                    company.getCompanyId() );
+                                sendSurveyReminderEmail( emailServices, organizationManagementService, userManagementService,
+                                    survey, company.getCompanyId() );
                             } else {
                                 sendSurveyInitiationEmail( emailServices, organizationManagementService, userManagementService,
                                     survey, company.getCompanyId() );
@@ -139,9 +139,9 @@ public class IncompleteSurveyReminderSender extends QuartzJobBean
     }
 
 
-    private void sendSurveyReminderEmail( EmailServices emailServices, OrganizationManagementService organizationManagementService,
-        UserManagementService userManagementService, SurveyPreInitiation survey, long companyId ) throws InvalidInputException,
-        ProfileNotFoundException
+    private void sendSurveyReminderEmail( EmailServices emailServices,
+        OrganizationManagementService organizationManagementService, UserManagementService userManagementService,
+        SurveyPreInitiation survey, long companyId ) throws InvalidInputException, ProfileNotFoundException
     {
         // Send email to complete survey to each customer.
         OrganizationUnitSettings companySettings = null;
@@ -269,7 +269,7 @@ public class IncompleteSurveyReminderSender extends QuartzJobBean
             }
         } else {
             try {
-                emailServices.sendDefaultSurveyReminderMail( survey.getCustomerEmailId(), survey.getCustomerFirstName(),
+                emailServices.sendDefaultSurveyReminderMail( survey.getCustomerEmailId(), logoUrl , survey.getCustomerFirstName(),
                     agentName, agentEmailId, surveyLink, agentPhone, agentTitle, companyName );
 
             } catch ( InvalidInputException | UndeliveredEmailException e ) {
@@ -280,9 +280,9 @@ public class IncompleteSurveyReminderSender extends QuartzJobBean
     }
 
 
-    private void sendSurveyInitiationEmail( EmailServices emailServices, OrganizationManagementService organizationManagementService,
-        UserManagementService userManagementService, SurveyPreInitiation survey, long companyId ) throws InvalidInputException,
-        ProfileNotFoundException
+    private void sendSurveyInitiationEmail( EmailServices emailServices,
+        OrganizationManagementService organizationManagementService, UserManagementService userManagementService,
+        SurveyPreInitiation survey, long companyId ) throws InvalidInputException, ProfileNotFoundException
     {
         // Send email to complete survey to each customer.
         OrganizationUnitSettings companySettings = null;
@@ -411,7 +411,7 @@ public class IncompleteSurveyReminderSender extends QuartzJobBean
         } else {
             try {
                 emailServices.sendDefaultSurveyInvitationMail(
-                    survey.getCustomerEmailId(),
+                    survey.getCustomerEmailId(), logoUrl,
                     emailFormatHelper.getCustomerDisplayNameForEmail( survey.getCustomerFirstName(),
                         survey.getCustomerLastName() ),
                     user.getFirstName() + ( user.getLastName() != null ? " " + user.getLastName() : "" ), surveyLink,
