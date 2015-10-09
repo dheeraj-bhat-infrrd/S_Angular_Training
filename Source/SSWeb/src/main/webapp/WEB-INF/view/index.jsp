@@ -23,7 +23,7 @@
 <c:set var="user" value="${sessionScope.SPRING_SECURITY_CONTEXT.authentication.principal}" />
 
 <c:if test="${not empty user }">
-	<c:redirect url="/landing.do"></c:redirect>
+	<c:redirect url="/userlogin.do"></c:redirect>
 </c:if>
 
 <body class="index-body">
