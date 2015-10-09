@@ -346,6 +346,6 @@ public interface UserManagementService {
 
 	void updatePrimaryProfileOfUser(User user) throws InvalidInputException;
 
-	void removeUserProfile(long profileIdToDelete) throws InvalidInputException;
+	void removeUserProfile(long profileIdToDelete) throws InvalidInputException, SolrException;
 }
 // JIRA SS-34 BY RM02 BOC

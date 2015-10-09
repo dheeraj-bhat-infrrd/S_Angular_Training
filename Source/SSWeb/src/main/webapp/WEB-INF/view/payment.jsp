@@ -140,7 +140,8 @@
 		   
 		   //attach click event to close btn
 		   $('.payment-close').click(function(){
-			   $('body').removeClass('body-no-scroll');
+			   	enableBodyScroll();
+			   	$('body').removeClass("disable-scroll");
 		   		$('#st-settings-payment-off').show();
 		   		$('#st-settings-payment-on').hide();
 			   	hidePayment();

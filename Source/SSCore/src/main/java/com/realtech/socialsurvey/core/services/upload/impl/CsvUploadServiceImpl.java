@@ -1236,7 +1236,7 @@ public class CsvUploadServiceImpl implements CsvUploadService {
 				throw new UserAdditionException("Max number of users added! Cannot add more users.");
 			}
 			else {
-				if (!user.getEmailId().matches(CommonConstants.EMAIL_REGEX)) {
+				if (!organizationManagementService.validateEmail( user.getEmailId() )) {
 					LOG.error("Email id for the user is invalid!");
 					throw new UserAdditionException("Email id for the user is invalid!");
 				}
