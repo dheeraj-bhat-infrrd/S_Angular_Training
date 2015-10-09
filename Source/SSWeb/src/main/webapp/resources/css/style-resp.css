@@ -172,6 +172,10 @@
     .hm-header-row{
         height: 48px;
     }
+    .hm-header-row-sur {
+        display: table;
+    	width: 100%;
+    }
     .hm-header-row-left{
         color: #555;
         font-size: 16px;
@@ -181,7 +185,14 @@
         line-height: 48px;
         border-bottom: 1px solid #dcdcdc;
     }
-    .hm-header-row-left-edit-pr {
+    .hm-header-row-left-sur {
+		display: table-cell;
+		vertical-align: middle;
+		line-height: 24px;
+		padding: 12px 0;
+		border-bottom: none;
+	}
+	.hm-header-row-left-edit-pr {
     	width: auto;
         float: left;
         border-bottom: none;

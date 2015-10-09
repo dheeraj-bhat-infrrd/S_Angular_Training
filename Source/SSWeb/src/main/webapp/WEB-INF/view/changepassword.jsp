@@ -55,7 +55,6 @@
 </div>
 
 <script>
-var isChangePasswordFormValid;
 $(document).ready(function() {
 	hideOverlay();
 	isChangePasswordFormValid = false;
@@ -113,43 +112,22 @@ $(document).ready(function() {
 	
 	function validateChangePasswordForm(){
 		$("#serverSideerror").hide();
-		isChangePasswordFormValid=true;
-    	var isFocussed = false;
-    	var isSmallScreen = false;
     	if($(window).width()<768){
     		isSmallScreen = true;
     	}
 		if (!validatePassword('current-pwd')) {
-			isChangePasswordFormValid = false;
-			if (!isFocussed) {
-				$('#current-pwd').focus();
-				isFocussed = true;
-			}
-			if (isSmallScreen) {
-				return isChangePasswordFormValid;
-			}
+			$('#current-pwd').focus();
+			return false;
 		}
 		if (!validatePassword('new-pwd')) {
-			isChangePasswordFormValid = false;
-			if (!isFocussed) {
-				$('#new-pwd').focus();
-				isFocussed = true;
-			}
-			if (isSmallScreen) {
-				return isChangePasswordFormValid;
-			}
+			$('#new-pwd').focus();
+			return false;
 		}
 		if (!validateConfirmPassword('new-pwd', 'confnw-pwd')) {
-			isChangePasswordFormValid = false;
-			if (!isFocussed) {
-				$('#confnw-pwd').focus();
-				isFocussed = true;
-			}
-			if (isSmallScreen) {
-				return isChangePasswordFormValid;
-			}
+			$('#confnw-pwd').focus();
+			return false;
 		}
-		return isChangePasswordFormValid;
+		return true;
 	}
 });
 </script>
