@@ -118,6 +118,7 @@ public interface CommonConstants
     public static final int SURVEY_STATUS_INITIATED = 2;
     public static final int STATUS_SURVEYPREINITIATION_CORRUPT_RECORD = 3;
     public static final int STATUS_SURVEYPREINITIATION_NOT_PROCESSED = 4;
+    public static final int STATUS_SURVEYPREINITIATION_DUPLICATE_RECORD = 5;
 
     /**
      * Hibernate entities and column name constants
