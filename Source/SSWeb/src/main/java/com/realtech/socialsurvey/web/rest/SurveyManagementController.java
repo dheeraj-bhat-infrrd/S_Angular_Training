@@ -13,6 +13,7 @@ import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang.exception.ExceptionUtils;
 import org.apache.solr.common.SolrDocument;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -1267,6 +1268,7 @@ public class SurveyManagementController
             if ( socAppName.length() > 0 )
                 errorMsg += "Social Application : " + socAppName;
             errorMsg += "<br>Agent Name : " + name + "<br>";
+            errorMsg += "<br>StackTrace : <br>" + ExceptionUtils.getStackTrace( e ).replaceAll("\n","<br>") + "<br>";
             emailServices.sendReportBugMailToAdmin( applicationAdminName, errorMsg, applicationSupportEmail );
         } catch ( UndeliveredEmailException ude ) {
             LOG.error( "error while sending report bug mail to admin ", ude );
