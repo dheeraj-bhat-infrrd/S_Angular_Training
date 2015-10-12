@@ -37,6 +37,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.type.TypeFactory;
 import com.google.gson.Gson;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
+import com.realtech.socialsurvey.core.dao.impl.MongoOrganizationUnitSettingDaoImpl;
 import com.realtech.socialsurvey.core.entities.AgentRankingReport;
 import com.realtech.socialsurvey.core.entities.AgentSettings;
 import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
@@ -198,19 +199,20 @@ public class DashboardController
         String columnName = request.getParameter( "columnName" );
         String realtechAdminStr = request.getParameter( "realtechAdmin" );
         boolean realtechAdmin = false;
-
+        String collectionName = "";
         OrganizationUnitSettings unitSettings = null;
         long columnValue = 0;
         try {
             if ( columnName.equalsIgnoreCase( CommonConstants.COMPANY_ID_COLUMN ) ) {
                 columnValue = user.getCompany().getCompanyId();
-
+                collectionName = MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION;
                 unitSettings = organizationManagementService.getCompanySettings( user );
                 if ( unitSettings.getContact_details() != null && unitSettings.getContact_details().getName() != null ) {
                     model.addAttribute( "name", unitSettings.getContact_details().getName() );
                 }
                 model.addAttribute( "title", unitSettings.getContact_details().getTitle() );
             } else if ( columnName.equalsIgnoreCase( CommonConstants.REGION_ID_COLUMN ) ) {
+                collectionName = MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION;
                 try {
                     columnValue = Long.parseLong( request.getParameter( "columnValue" ) );
                 } catch ( NumberFormatException e ) {
@@ -225,6 +227,7 @@ public class DashboardController
                 model.addAttribute( "title", unitSettings.getContact_details().getTitle() );
                 model.addAttribute( "company", user.getCompany().getCompany() );
             } else if ( columnName.equalsIgnoreCase( CommonConstants.BRANCH_ID_COLUMN ) ) {
+                collectionName = MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION;
                 try {
                     columnValue = Long.parseLong( request.getParameter( "columnValue" ) );
                 } catch ( NumberFormatException e ) {
@@ -240,7 +243,7 @@ public class DashboardController
                 model.addAttribute( "company", user.getCompany().getCompany() );
             } else if ( columnName.equalsIgnoreCase( CommonConstants.AGENT_ID_COLUMN ) ) {
                 columnValue = user.getUserId();
-
+                collectionName = MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION;
                 unitSettings = userManagementService.getUserSettings( columnValue );
                 model
                     .addAttribute( "name", user.getFirstName() + " " + ( user.getLastName() != null ? user.getLastName() : "" ) );
@@ -272,7 +275,8 @@ public class DashboardController
         double surveyScore = (double) Math.round( dashboardService.getSurveyScore( columnName, columnValue, numberOfDays,
             realtechAdmin ) * 1000.0 ) / 1000.0;
         int sentSurveyCount = (int) dashboardService.getAllSurveyCountForPastNdays( columnName, columnValue, numberOfDays );
-        int socialPostsCount = (int) dashboardService.getSocialPostsForPastNdays( columnName, columnValue, numberOfDays );
+        int socialPostsCount = (int) dashboardService.getSocialPostsForPastNdaysWithHierarchy( collectionName, columnValue,
+            user.getCompany().getCompanyId(), numberOfDays );
         int profileCompleteness = 0;
         if ( !realtechAdmin )
             profileCompleteness = dashboardService.getProfileCompletionPercentage( user, columnName, columnValue, unitSettings );
@@ -312,6 +316,19 @@ public class DashboardController
         long columnValue = 0;
         User user = sessionHelper.getCurrentUser();
         boolean realtechAdmin = user.isSuperAdmin();
+        HttpSession session = request.getSession( false );
+        long entityId = (long) session.getAttribute( CommonConstants.ENTITY_ID_COLUMN );
+        String entityType = (String) session.getAttribute( CommonConstants.ENTITY_TYPE_COLUMN );
+        String collectionName = "";
+        if ( entityType.equals( CommonConstants.COMPANY_ID_COLUMN ) ) {
+            collectionName = MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION;
+        } else if ( entityType.equalsIgnoreCase( CommonConstants.REGION_ID_COLUMN ) ) {
+            collectionName = MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION;
+        } else if ( entityType.equalsIgnoreCase( CommonConstants.BRANCH_ID_COLUMN ) ) {
+            collectionName = MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION;
+        } else if ( entityType.equalsIgnoreCase( CommonConstants.AGENT_ID_COLUMN ) ) {
+            collectionName = MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION;
+        }
         try {
             String columnValueStr = request.getParameter( "columnValue" );
             columnValue = Long.parseLong( columnValueStr );
@@ -340,8 +357,8 @@ public class DashboardController
             dashboardService.getCompletedSurveyCountForPastNdays( columnName, columnValue, numberOfDays ) );
         model.addAttribute( "clickedSurvey",
             dashboardService.getClickedSurveyCountForPastNdays( columnName, columnValue, numberOfDays ) );
-        model
-            .addAttribute( "socialPosts", dashboardService.getSocialPostsForPastNdays( columnName, columnValue, numberOfDays ) );
+        model.addAttribute( "socialPosts", dashboardService.getSocialPostsForPastNdaysWithHierarchy( collectionName, entityId,
+            user.getCompany().getCompanyId(), numberOfDays ) );
 
         LOG.info( "Method to get count of all, completed and clicked surveys, getSurveyCount() finished" );
         return JspResolver.DASHBOARD_SURVEYSTATUS;
@@ -1296,10 +1313,11 @@ public class DashboardController
             }
 
             try {
-            	Date date = new Date();
+                Date date = new Date();
                 surveyDetails = profileManagementService.getIncompleteSurvey( iden, 0, 0, -1, -1, profileLevel, startDate,
                     endDate, realtechAdmin );
-                String fileName = "Incomplete_Survey_" + profileLevel + "-" +user.getFirstName() + "_" + user.getLastName() + "-" + (new Timestamp(date.getTime())) + EXCEL_FILE_EXTENSION;
+                String fileName = "Incomplete_Survey_" + profileLevel + "-" + user.getFirstName() + "_" + user.getLastName()
+                    + "-" + ( new Timestamp( date.getTime() ) ) + EXCEL_FILE_EXTENSION;
                 XSSFWorkbook workbook = dashboardService.downloadIncompleteSurveyData( surveyDetails, fileName );
                 response.setContentType( EXCEL_FORMAT );
                 String headerKey = CONTENT_DISPOSITION_HEADER;
@@ -1415,10 +1433,11 @@ public class DashboardController
             }
 
             try {
-            	Date date = new Date();
+                Date date = new Date();
                 surveyDetails = profileManagementService.getReviews( iden, -1, -1, -1, -1, profileLevel, true, startDate,
                     endDate, null );
-                String fileName = "Survey_Results-" + profileLevel + "-" +user.getFirstName() + "_" + user.getLastName() + "-" + (new Timestamp(date.getTime())) + EXCEL_FILE_EXTENSION;
+                String fileName = "Survey_Results-" + profileLevel + "-" + user.getFirstName() + "_" + user.getLastName() + "-"
+                    + ( new Timestamp( date.getTime() ) ) + EXCEL_FILE_EXTENSION;
                 XSSFWorkbook workbook = dashboardService.downloadCustomerSurveyResultsData( surveyDetails, fileName );
                 response.setContentType( EXCEL_FORMAT );
                 String headerKey = CONTENT_DISPOSITION_HEADER;
@@ -1519,10 +1538,11 @@ public class DashboardController
             }
 
             try {
-            	Date date = new Date();
+                Date date = new Date();
                 surveyDetails = profileManagementService.getReviews( iden, -1, -1, -1, -1, profileLevel, true, startDate,
                     endDate, null );
-                String fileName = "Social_Monitor-" + profileLevel + "-" +user.getFirstName() + "_" + user.getLastName() + "-" + (new Timestamp(date.getTime()))+ EXCEL_FILE_EXTENSION;
+                String fileName = "Social_Monitor-" + profileLevel + "-" + user.getFirstName() + "_" + user.getLastName() + "-"
+                    + ( new Timestamp( date.getTime() ) ) + EXCEL_FILE_EXTENSION;
                 XSSFWorkbook workbook = dashboardService.downloadSocialMonitorData( surveyDetails, fileName );
                 response.setContentType( EXCEL_FORMAT );
                 String headerKey = CONTENT_DISPOSITION_HEADER;
@@ -1620,9 +1640,10 @@ public class DashboardController
             }
 
             try {
-            	Date date = new Date();
+                Date date = new Date();
                 agentRanking = profileManagementService.getAgentReport( iden, columnName, startDate, endDate, null );
-                String fileName = "User_Ranking_Report-" + profileLevel + "-" +user.getFirstName() + "_" + user.getLastName() + "-" + (new Timestamp(date.getTime())) + EXCEL_FILE_EXTENSION;
+                String fileName = "User_Ranking_Report-" + profileLevel + "-" + user.getFirstName() + "_" + user.getLastName()
+                    + "-" + ( new Timestamp( date.getTime() ) ) + EXCEL_FILE_EXTENSION;
                 XSSFWorkbook workbook = dashboardService.downloadAgentRankingData( agentRanking, fileName );
                 response.setContentType( EXCEL_FORMAT );
                 String headerKey = CONTENT_DISPOSITION_HEADER;
@@ -1732,9 +1753,9 @@ public class DashboardController
                     User currentUser = userManagementService.getUserByUserId( currentAgentId );
                     String currentUserEmailId = currentUser.getEmailId();
                     //check if agent mail id is not same as recipent email id
-                    if(currentUserEmailId.equals(recipient.getEmailId())){
-                    	LOG.error("agent email id and recipent email id is same for agent " +currentUser.getFirstName());
-                    	throw new InvalidInputException( "Recipent email id can not be same as agent email id" );
+                    if ( currentUserEmailId.equals( recipient.getEmailId() ) ) {
+                        LOG.error( "agent email id and recipent email id is same for agent " + currentUser.getFirstName() );
+                        throw new InvalidInputException( "Recipent email id can not be same as agent email id" );
                     }
                     if ( surveyHandler.getPreInitiatedSurvey( agentId, recipient.getEmailId(), recipient.getFirstname(),
                         recipient.getLastname() ) == null )
@@ -1883,8 +1904,8 @@ public class DashboardController
         String lastName = request.getParameter( "lastName" );
         String review = request.getParameter( "review" );
         String reason = request.getParameter( "reportText" );
-        String surveyMongoId = request.getParameter("surveyMongoId");
-        
+        String surveyMongoId = request.getParameter( "surveyMongoId" );
+
         try {
             long agentId = 0;
             try {
@@ -1897,17 +1918,17 @@ public class DashboardController
                 LOG.error( "NumberFormatException caught in reportAbuse() while converting agentId." );
                 throw e;
             }
-            
-            if (surveyMongoId == null || surveyMongoId.isEmpty()) {
-				throw new InvalidInputException("Invalid value (Null/Empty) found for surveyMongoId.");
-			}
+
+            if ( surveyMongoId == null || surveyMongoId.isEmpty() ) {
+                throw new InvalidInputException( "Invalid value (Null/Empty) found for surveyMongoId." );
+            }
 
             String customerName = firstName + " " + lastName;
-            if(firstName == null || firstName.isEmpty()) {
+            if ( firstName == null || firstName.isEmpty() ) {
                 User user = sessionHelper.getCurrentUser();
-                customerName = user.getFirstName() + " " + user.getLastName(); 
-            }   
-            
+                customerName = user.getFirstName() + " " + user.getLastName();
+            }
+
             String agentName = "";
             try {
                 agentName = solrSearchService.getUserDisplayNameById( agentId );
@@ -1915,9 +1936,9 @@ public class DashboardController
                 LOG.info( "Solr Exception occured while fetching agent name. Nested exception is ", e );
                 throw e;
             }
-            
+
             //make survey as abusive
-			surveyHandler.updateSurveyAsAbusive(surveyMongoId, customerEmail, customerName);
+            surveyHandler.updateSurveyAsAbusive( surveyMongoId, customerEmail, customerName );
 
             // Calling email services method to send mail to the Application
             // level admin.
