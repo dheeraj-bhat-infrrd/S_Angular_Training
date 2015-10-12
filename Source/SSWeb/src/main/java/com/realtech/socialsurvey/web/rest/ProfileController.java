@@ -805,6 +805,8 @@ public class ProfileController
                     surveySettings.setShow_survey_above_score( CommonConstants.DEFAULT_AUTOPOST_SCORE );
                     organizationManagementService.updateScoreForSurvey(
                         MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION, regionProfile, surveySettings );
+                    // update survey settings in the profile object
+                    regionProfile.setSurvey_settings(surveySettings);
                 } else {
                     if ( regionProfile.getSurvey_settings().getShow_survey_above_score() <= 0 ) {
                         regionProfile.getSurvey_settings().setAutoPostEnabled( true );
@@ -1155,6 +1157,8 @@ public class ProfileController
                     surveySettings.setAutoPostEnabled( true );
                     organizationManagementService.updateScoreForSurvey(
                         MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION, branchProfile, surveySettings );
+                    // update survey settings in the profile object
+                    branchProfile.setSurvey_settings(surveySettings);
                 } else {
                     if ( branchProfile.getSurvey_settings().getShow_survey_above_score() <= 0 ) {
                         branchProfile.getSurvey_settings().setAutoPostEnabled( true );
@@ -1335,6 +1339,8 @@ public class ProfileController
                 surveySettings.setAutoPostEnabled( true );
                 organizationManagementService.updateScoreForSurvey(
                     MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION, agentProfile, surveySettings );
+                // update survey settings in the profile object
+                agentProfile.setSurvey_settings(surveySettings);
             }
             List<SurveyDetails> reviews = profileManagementService.getReviews( agentId, agentProfile.getSurvey_settings()
                 .getShow_survey_above_score(), maxScore, start, numRows, CommonConstants.PROFILE_LEVEL_INDIVIDUAL, false, null,

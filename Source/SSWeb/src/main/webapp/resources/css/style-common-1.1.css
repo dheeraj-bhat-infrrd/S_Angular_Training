@@ -1332,6 +1332,10 @@ table.payment-pricing td:nth-child(2n+2) {
     border-bottom: 1px solid #E0E0E0;
 }
 
+.payment-acc-hdr-row {
+	border-bottom: none !important;
+}
+
 .payment-button {
 	display: inline-block;
 	padding: 0 25px;
