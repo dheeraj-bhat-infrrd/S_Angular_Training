@@ -38,6 +38,7 @@ import com.realtech.socialsurvey.core.entities.AgentSettings;
 import com.realtech.socialsurvey.core.entities.Company;
 import com.realtech.socialsurvey.core.entities.MailContent;
 import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
+import com.realtech.socialsurvey.core.entities.SocialPostShared;
 import com.realtech.socialsurvey.core.entities.SurveyDetails;
 import com.realtech.socialsurvey.core.entities.SurveyPreInitiation;
 import com.realtech.socialsurvey.core.entities.SurveyResponse;
@@ -265,6 +266,16 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
         surveyDetails = surveyDetailsDao.getSurveyByAgentIdAndCustomerEmail( agentId, customerEmail, firstName, lastName );
         LOG.info( "Method getSurveyDetails() to return survey details by agent id and customer email finished." );
         return surveyDetails;
+    }
+
+
+    @Override
+    public List<SurveyDetails> getSurveyDetailsByAgentAndCompany( long companyId )
+    {
+        LOG.info( "Method getSurveyDetails() to return survey details by agent id and customer email started." );
+        List<SurveyDetails> surveys = surveyDetailsDao.getSurveyDetailsByAgentAndCompany( companyId );
+        LOG.info( "Method getSurveyDetails() to return survey details by agent id and customer email finished." );
+        return surveys;
     }
 
 
@@ -1529,6 +1540,7 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
 
 
     @Override
+    @Transactional
     public void deleteZillowSurveysByEntity( String entityType, long entityId ) throws InvalidInputException
     {
         LOG.info( "Method deleteZillowSurveysByEntity() started" );
@@ -1544,6 +1556,7 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
 
 
     @Override
+    @Transactional
     public void deleteExcessZillowSurveysByEntity( String entityType, long entityId ) throws InvalidInputException
     {
         LOG.info( "Method deleteExcessZillowSurveysByEntity() started" );
@@ -1559,6 +1572,7 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
 
 
     @Override
+    @Transactional ( readOnly = true)
     public List<AbusiveSurveyReportWrapper> getSurveysReporetedAsAbusive( int startIndex, int numOfRows )
     {
         LOG.info( "Method getSurveysReporetedAsAbusive() to retrieve surveys marked as abusive, started" );
@@ -1566,6 +1580,137 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
             numOfRows );
         LOG.info( "Method getSurveysReporetedAsAbusive() to retrieve surveys marked as abusive, finished" );
         return abusiveSurveyReports;
+    }
+
+
+    @Override
+    public SocialPostShared getSocialPostSharedBySurveyDetails( SurveyDetails surveyDetails )
+    {
+        SocialPostShared socialPostShared = null;
+        if ( surveyDetails != null ) {
+            socialPostShared = surveyDetails.getSocialPostShared();
+            if ( socialPostShared == null ) {
+                socialPostShared = new SocialPostShared();
+            }
+
+        }
+        return socialPostShared;
+    }
+
+
+    @Override
+    public SocialPostShared calcualteFinalCount( SocialPostShared socialPostShared, Map<Long, List<String>> agentSharedOn,
+        Map<Long, List<String>> branchSharedOn, Map<Long, List<String>> regionSharedOn,
+        Map<Long, List<String>> companySharedOn, List<OrganizationUnitSettings> regionSettings,
+        List<OrganizationUnitSettings> branchSettings )
+    {
+        long finalAgentCount = 0;
+        long finalRegionCount = 0;
+        long finalBranchCount = 0;
+        long finalCompanyCount = 0;
+
+
+        Map<Long, Long> agentMap = socialPostShared.getAgentCountMap();
+        if ( agentMap == null ) {
+            agentMap = new HashMap<Long, Long>();
+        }
+        Map<Long, Long> regionMap = socialPostShared.getRegionCountMap();
+        if ( regionMap == null ) {
+            regionMap = new HashMap<Long, Long>();
+        }
+
+        Map<Long, Long> branchMap = socialPostShared.getBranchCountMap();
+        if ( branchMap == null ) {
+            branchMap = new HashMap<Long, Long>();
+        }
+
+
+        for ( Map.Entry<Long, List<String>> entry : agentSharedOn.entrySet() ) {
+            long agentCount = 0;
+            if ( !agentMap.isEmpty() ) {
+                if ( agentMap.get( entry.getKey() ) != null ) {
+                    agentCount = agentMap.get( entry.getKey() );
+                }
+            }
+            List<String> sharedOnList = entry.getValue();
+            if ( sharedOnList != null ) {
+                agentCount = sharedOnList.size();
+            }
+            finalAgentCount = agentCount;
+            agentMap.put( entry.getKey(), agentCount );
+
+        }
+        for ( Map.Entry<Long, List<String>> entry : branchSharedOn.entrySet() ) {
+            long branchCount = 0;
+            if ( !branchMap.isEmpty() ) {
+                if ( branchMap.get( entry.getKey() ) != null ) {
+                    branchCount = branchMap.get( entry.getKey() );
+                }
+            }
+            List<String> sharedOnList = entry.getValue();
+            if ( sharedOnList != null ) {
+                branchCount = sharedOnList.size();
+            }
+            finalBranchCount += branchCount;
+            branchMap.put( entry.getKey(), branchCount );
+
+        }
+        for ( OrganizationUnitSettings unitSettings : branchSettings ) {
+            long count = 0;
+            if ( branchMap.get( unitSettings.getIden() ) != null ) {
+                count = branchMap.get( unitSettings.getIden() );
+            }
+            count = count + finalAgentCount;
+            finalBranchCount = finalBranchCount + finalAgentCount;
+            branchMap.put( unitSettings.getIden(), count );
+        }
+        for ( Map.Entry<Long, List<String>> entry : regionSharedOn.entrySet() ) {
+            long regionCount = 0;
+            if ( !regionMap.isEmpty() ) {
+                if ( regionMap.get( entry.getKey() ) != null ) {
+                    regionCount = regionMap.get( entry.getKey() );
+                }
+            }
+            List<String> sharedOnList = entry.getValue();
+            if ( sharedOnList != null ) {
+                regionCount = sharedOnList.size();
+            }
+            finalRegionCount += regionCount;
+            regionMap.put( entry.getKey(), regionCount );
+
+        }
+        for ( OrganizationUnitSettings unitSettings : regionSettings ) {
+            long count = 0;
+            if ( regionMap.get( unitSettings.getIden() ) != null ) {
+                count = regionMap.get( unitSettings.getIden() );
+            }
+            count = count + finalBranchCount + finalAgentCount;
+            finalRegionCount = finalRegionCount + finalBranchCount + finalAgentCount;
+            regionMap.put( unitSettings.getIden(), count );
+        }
+        long companyCount = 0;
+
+        List<String> sharedOnList = companySharedOn.get( socialPostShared.getCompanyId() );
+        if ( sharedOnList != null ) {
+            companyCount = sharedOnList.size();
+        }
+        finalCompanyCount = socialPostShared.getCompanyCount() + companyCount;
+
+        socialPostShared.setAgentCountMap( agentMap );
+        socialPostShared.setBranchCountMap( branchMap );
+        socialPostShared.setRegionCountMap( regionMap );
+        socialPostShared.setCompanyCount( finalCompanyCount + finalRegionCount + finalBranchCount + finalAgentCount );
+
+        return socialPostShared;
+    }
+
+
+    @Override
+    @Transactional
+    public void updateSurveyDetails( SurveyDetails surveyDetails )
+    {
+        surveyDetailsDao.updateSurveyDetails( surveyDetails );
+
     }
 }
 // JIRA SS-119 by RM-05:EOC

@@ -7,6 +7,8 @@ import org.apache.solr.client.solrj.SolrServerException;
 
 import com.realtech.socialsurvey.core.entities.AbusiveSurveyReportWrapper;
 import com.realtech.socialsurvey.core.entities.Company;
+import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
+import com.realtech.socialsurvey.core.entities.SocialPostShared;
 import com.realtech.socialsurvey.core.entities.SurveyDetails;
 import com.realtech.socialsurvey.core.entities.SurveyPreInitiation;
 import com.realtech.socialsurvey.core.entities.User;
@@ -119,7 +121,8 @@ public interface SurveyHandler
 
 
     public void sendSurveyRestartMail( String custFirstName, String custLastName, String custEmail,
-        String custRelationWithAgent, User user, String link ) throws InvalidInputException, UndeliveredEmailException, ProfileNotFoundException;
+        String custRelationWithAgent, User user, String link ) throws InvalidInputException, UndeliveredEmailException,
+        ProfileNotFoundException;
 
 
     public SurveyPreInitiation getPreInitiatedSurvey( long agentId, String customerEmail, String custFirstName,
@@ -166,8 +169,9 @@ public interface SurveyHandler
     public void saveSurveyPreInitiationObject( SurveyPreInitiation surveyPreInitiation ) throws InvalidInputException;
 
 
-	void updateSurveyAsAbusive(String surveymongoId, String reporterEmail, String reporterName);
-    
+    void updateSurveyAsAbusive( String surveymongoId, String reporterEmail, String reporterName );
+
+
     /**
      * Sends survey request to the customer on behalf of agent.
      * @param agentId
@@ -183,18 +187,20 @@ public interface SurveyHandler
      * @throws UndeliveredEmailException
      * @throws ProfileNotFoundException 
      */
-    public void initiateSurveyRequest(long agentId, String recipientEmailId, String recipientFirstname, String recipientLastname, String source) throws DuplicateSurveyRequestException, InvalidInputException, SelfSurveyInitiationException, SolrException, NoRecordsFetchedException, UndeliveredEmailException, ProfileNotFoundException;
+    public void initiateSurveyRequest( long agentId, String recipientEmailId, String recipientFirstname,
+        String recipientLastname, String source ) throws DuplicateSurveyRequestException, InvalidInputException,
+        SelfSurveyInitiationException, SolrException, NoRecordsFetchedException, UndeliveredEmailException,
+        ProfileNotFoundException;
 
 
-	void deleteZillowSurveysByEntity(String entityType, long entityId)
-			throws InvalidInputException;
+    void deleteZillowSurveysByEntity( String entityType, long entityId ) throws InvalidInputException;
 
 
-	void deleteExcessZillowSurveysByEntity(String entityType, long entityId)
-			throws InvalidInputException;
+    void deleteExcessZillowSurveysByEntity( String entityType, long entityId ) throws InvalidInputException;
 
 
     public List<AbusiveSurveyReportWrapper> getSurveysReporetedAsAbusive( int startIndex, int numOfRows );
+
 
     void sendSurveyCompletionMail( String custEmail, String custFirstName, String custLastName, User user )
         throws InvalidInputException, UndeliveredEmailException, ProfileNotFoundException;
@@ -202,5 +208,32 @@ public interface SurveyHandler
 
     void sendSocialPostReminderMail( String custEmail, String custFirstName, String custLastName, User user, String links )
         throws InvalidInputException, UndeliveredEmailException, ProfileNotFoundException;
+
+
+    /**
+     * @param surveyDetails
+     * @return
+     */
+    public SocialPostShared getSocialPostSharedBySurveyDetails( SurveyDetails surveyDetails );
+
+
+    /**
+     * @param socialPostShared
+     * @param agentSharedOn
+     * @param branchSharedOn
+     * @param regionSharedOn
+     * @param companySharedOn
+     * @return
+     */
+    public SocialPostShared calcualteFinalCount( SocialPostShared socialPostShared, Map<Long, List<String>> agentSharedOn,
+        Map<Long, List<String>> branchSharedOn, Map<Long, List<String>> regionSharedOn,
+        Map<Long, List<String>> companySharedOn, List<OrganizationUnitSettings> regionSettings,
+        List<OrganizationUnitSettings> branchSettings );
+
+
+    void updateSurveyDetails( SurveyDetails surveyDetails );
+
+
+    public List<SurveyDetails> getSurveyDetailsByAgentAndCompany( long companyId );
 
 }
