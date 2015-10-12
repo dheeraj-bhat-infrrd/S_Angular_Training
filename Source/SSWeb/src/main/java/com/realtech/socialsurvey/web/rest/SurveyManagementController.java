@@ -1,6 +1,7 @@
 package com.realtech.socialsurvey.web.rest;
 
 import java.io.IOException;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -12,6 +13,7 @@ import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang.exception.ExceptionUtils;
 import org.apache.solr.common.SolrDocument;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -31,6 +33,7 @@ import com.google.gson.Gson;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.dao.impl.MongoOrganizationUnitSettingDaoImpl;
 import com.realtech.socialsurvey.core.dao.impl.MongoSocialPostDaoImpl;
+import com.realtech.socialsurvey.core.entities.AccountsMaster;
 import com.realtech.socialsurvey.core.entities.AgentSettings;
 import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
 import com.realtech.socialsurvey.core.entities.SocialPostShared;
@@ -41,25 +44,23 @@ import com.realtech.socialsurvey.core.entities.SurveyResponse;
 import com.realtech.socialsurvey.core.entities.SurveySettings;
 import com.realtech.socialsurvey.core.entities.User;
 import com.realtech.socialsurvey.core.enums.DisplayMessageType;
-import com.realtech.socialsurvey.core.enums.OrganizationUnit;
-import com.realtech.socialsurvey.core.enums.SettingsForApplication;
-import com.realtech.socialsurvey.core.exception.FatalException;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.exception.NoRecordsFetchedException;
 import com.realtech.socialsurvey.core.exception.NonFatalException;
 import com.realtech.socialsurvey.core.services.authentication.CaptchaValidation;
 import com.realtech.socialsurvey.core.services.generator.URLGenerator;
 import com.realtech.socialsurvey.core.services.mail.EmailServices;
+import com.realtech.socialsurvey.core.services.mail.UndeliveredEmailException;
 import com.realtech.socialsurvey.core.services.organizationmanagement.OrganizationManagementService;
 import com.realtech.socialsurvey.core.services.organizationmanagement.ProfileManagementService;
-import com.realtech.socialsurvey.core.services.organizationmanagement.ProfileNotFoundException;
 import com.realtech.socialsurvey.core.services.organizationmanagement.UserManagementService;
 import com.realtech.socialsurvey.core.services.search.SolrSearchService;
 import com.realtech.socialsurvey.core.services.search.exception.SolrException;
-import com.realtech.socialsurvey.core.services.settingsmanagement.impl.InvalidSettingsStateException;
 import com.realtech.socialsurvey.core.services.social.SocialManagementService;
 import com.realtech.socialsurvey.core.services.surveybuilder.SurveyBuilder;
 import com.realtech.socialsurvey.core.services.surveybuilder.SurveyHandler;
+import com.realtech.socialsurvey.core.services.surveybuilder.impl.DuplicateSurveyRequestException;
+import com.realtech.socialsurvey.core.services.surveybuilder.impl.SelfSurveyInitiationException;
 import com.realtech.socialsurvey.core.utils.DisplayMessageConstants;
 import com.realtech.socialsurvey.core.utils.EmailFormatHelper;
 import com.realtech.socialsurvey.core.utils.MessageUtils;
@@ -134,6 +135,12 @@ public class SurveyManagementController
 
     @Value ( "${GATEWAY_QUESTION}")
     private String gatewayQuestion;
+
+    @Value ( "${APPLICATION_SUPPORT_EMAIL}")
+    private String applicationSupportEmail;
+
+    @Value ( "${APPLICATION_ADMIN_NAME}")
+    private String applicationAdminName;
 
 
     /*
@@ -288,9 +295,11 @@ public class SurveyManagementController
         surveyDetail.append( "<br />" ).append( "Customer Comments: " ).append( survey.getReview() );
 
         surveyDetail.append( "<br />" );
-        if ( survey.getSharedOn() != null && !survey.getSharedOn().isEmpty() ) {
+        if ( survey.getAgreedToShare() != null && survey.getAgreedToShare().equalsIgnoreCase( "true" ) ) {
             surveyDetail.append( "<br />" ).append( "Share Checkbox: " ).append( "Yes" );
-            surveyDetail.append( "<br />" ).append( "Shared on: " ).append( StringUtils.join( survey.getSharedOn(), ", " ) );
+            if ( survey.getSharedOn() != null && !survey.getSharedOn().isEmpty() ) {
+                surveyDetail.append( "<br />" ).append( "Shared on: " ).append( StringUtils.join( survey.getSharedOn(), ", " ) );
+            }
         } else {
             surveyDetail.append( "<br />" ).append( "Share Checkbox: " ).append( "No" );
         }
@@ -391,6 +400,7 @@ public class SurveyManagementController
         // custRelationWithAgent = request.getParameter("relationship");
         // TODO:remove customer relation with agent
         custRelationWithAgent = "transacted";
+        String errorMsg = null;
         try {
             try {
                 String agentIdStr = request.getParameter( CommonConstants.AGENT_ID_COLUMN );
@@ -404,7 +414,7 @@ public class SurveyManagementController
                 if ( !captchaValidation.isCaptchaValid( request.getRemoteAddr(), captchaSecretKey,
                     request.getParameter( "g-recaptcha-response" ) ) ) {
                     LOG.error( "Captcha Validation failed!" );
-                    String errorMsg = messageUtils.getDisplayMessage( DisplayMessageConstants.INVALID_CAPTCHA,
+                    errorMsg = messageUtils.getDisplayMessage( DisplayMessageConstants.INVALID_CAPTCHA,
                         DisplayMessageType.ERROR_MESSAGE ).getMessage();
                     throw new InvalidInputException( errorMsg, DisplayMessageConstants.INVALID_CAPTCHA );
                 }
@@ -418,31 +428,28 @@ public class SurveyManagementController
             model.addAttribute( "source", source );
 
             User user = userManagementService.getUserByUserId( agentId );
-            SurveyPreInitiation preInitiatedSurvey = surveyHandler.getPreInitiatedSurvey( agentId, customerEmail, firstName,
-                lastName );
-            SurveyDetails survey = surveyHandler.getSurveyDetails( agentId, customerEmail, firstName, lastName );
 
-            // Code to be executed when survey has already been taken.
-            if ( preInitiatedSurvey == null && survey != null && survey.getStage() == -1 ) {
-                model.addAttribute( "surveyCompleted", "yes" );
-                model.addAttribute( "agentName", agentName );
-                return JspResolver.SURVEY_INVITE_SUCCESSFUL;
+            try {
+                surveyHandler.initiateSurveyRequest( user.getUserId(), customerEmail, firstName, lastName, source );
+            } catch ( SelfSurveyInitiationException e ) {
+                errorMsg = messageUtils.getDisplayMessage( DisplayMessageConstants.SELF_SURVEY_INITIATION,
+                    DisplayMessageType.ERROR_MESSAGE ).getMessage();
+                throw new NonFatalException( e.getMessage(), e.getErrorCode() );
+            } catch ( DuplicateSurveyRequestException e ) {
+                errorMsg = messageUtils.getDisplayMessage( DisplayMessageConstants.DUPLICATE_SURVEY_REQUEST,
+                    DisplayMessageType.ERROR_MESSAGE ).getMessage();
+                throw new NonFatalException( e.getMessage(), e.getErrorCode() );
             }
-            // Code to be executed when survey request has already been sent but survey is not
-            // completed.
-            else if ( preInitiatedSurvey != null ) {
-                model.addAttribute( "surveyRequestSent", "yes" );
-                model.addAttribute( "agentName", agentName );
-                return JspResolver.SURVEY_INVITE_SUCCESSFUL;
-            }
-            surveyHandler.sendSurveyInvitationMail( firstName, lastName, customerEmail, custRelationWithAgent, user, false,
-                source );
 
         } catch ( NonFatalException e ) {
             LOG.error( "Exception caught in getSurvey() method of SurveyManagementController." );
             model.addAttribute( "status", DisplayMessageType.ERROR_MESSAGE );
-            model.addAttribute( "message",
-                messageUtils.getDisplayMessage( DisplayMessageConstants.INVALID_CAPTCHA, DisplayMessageType.ERROR_MESSAGE ) );
+            if ( errorMsg != null )
+                model.addAttribute( "message", errorMsg );
+            else
+                model
+                    .addAttribute( "message", messageUtils.getDisplayMessage( DisplayMessageConstants.INVALID_CAPTCHA,
+                        DisplayMessageType.ERROR_MESSAGE ) );
             model.addAttribute( "agentId", agentId );
             model.addAttribute( "agentName", agentName );
             model.addAttribute( "firstName", firstName );
@@ -537,12 +544,18 @@ public class SurveyManagementController
                     e );
                 return e.getMessage();
             }
-
+            DecimalFormat ratingFormat = CommonConstants.SOCIAL_RANKING_FORMAT;
+            if ( rating % 1 == 0 ) {
+                ratingFormat = CommonConstants.SOCIAL_RANKING_WHOLE_FORMAT;
+            }
             User agent = userManagementService.getUserByUserId( agentId );
             int accountMasterId = 0;
+            String accountMasterName = "";
             try {
-                accountMasterId = agent.getCompany().getLicenseDetails().get( CommonConstants.INITIAL_INDEX )
-                    .getAccountsMaster().getAccountsMasterId();
+                AccountsMaster masterAccount = agent.getCompany().getLicenseDetails().get( CommonConstants.INITIAL_INDEX )
+                    .getAccountsMaster();
+                accountMasterId = masterAccount.getAccountsMasterId();
+                accountMasterName = masterAccount.getAccountName();
             } catch ( NullPointerException e ) {
                 LOG.error( "NullPointerException caught in postToSocialMedia() while fetching account master id for agent "
                     + agent.getFirstName() );
@@ -595,9 +608,9 @@ public class SurveyManagementController
             }
 
             // Facebook
-            String facebookMessage = rating + "-Star Survey Response from " + customerDisplayName + " for " + agentName
-                + " on Social Survey - view at " + getApplicationBaseUrl() + CommonConstants.AGENT_PROFILE_FIXED_URL
-                + agentProfileLink;
+            String facebookMessage = ratingFormat.format( rating ) + "-Star Survey Response from " + customerDisplayName
+                + " for " + agentName + " on Social Survey - view at " + getApplicationBaseUrl()
+                + CommonConstants.AGENT_PROFILE_FIXED_URL + agentProfileLink;
             facebookMessage += "\n Feedback : " + feedback;
             try {
                 if ( !socialManagementService.updateStatusIntoFacebookPage( agentSettings, facebookMessage, serverBaseUrl,
@@ -615,6 +628,7 @@ public class SurveyManagementController
             } catch ( FacebookException e ) {
                 LOG.error(
                     "FacebookException caught in postToSocialMedia() while trying to post to facebook. Nested excption is ", e );
+                reportBug( "Facebook", agentSettings.getContact_details().getName(), e );
             }
             if ( accountMasterId != CommonConstants.ACCOUNTS_MASTER_INDIVIDUAL ) {
                 for ( OrganizationUnitSettings setting : companySettings ) {
@@ -675,13 +689,14 @@ public class SurveyManagementController
                         LOG.error(
                             "FacebookException caught in postToSocialMedia() while trying to post to facebook. Nested excption is ",
                             e );
+                        reportBug( "Facebook", accountMasterName, e );
                     }
                 }
             }
 
             // LinkedIn
-            String linkedinMessage = rating + "-Star Survey Response from " + customerDisplayName + " for " + agentName
-                + " on SocialSurvey ";
+            String linkedinMessage = ratingFormat.format( rating ) + "-Star Survey Response from " + customerDisplayName
+                + " for " + agentName + " on SocialSurvey ";
             String linkedinProfileUrl = getApplicationBaseUrl() + CommonConstants.AGENT_PROFILE_FIXED_URL + agentProfileLink;
             String linkedinMessageFeedback = "From : " + customerDisplayName + " - " + feedback;
             if ( !socialManagementService.updateLinkedin( agentSettings, linkedinMessage, linkedinProfileUrl,
@@ -749,9 +764,11 @@ public class SurveyManagementController
              * + " for " + agentName + " on @SocialSurveyMe - view at " + getApplicationBaseUrl() +
              * CommonConstants.AGENT_PROFILE_FIXED_URL + agentProfileLink;
              */
-            String twitterMessage = String.format( CommonConstants.TWITTER_MESSAGE,
-                CommonConstants.RANKING_FORMAT_TWITTER.format( rating ), customerDisplayName, agentName, "@SocialSurveyMe" )
-                + getApplicationBaseUrl() + CommonConstants.AGENT_PROFILE_FIXED_URL + agentProfileLink;
+            String twitterMessage = String.format( CommonConstants.TWITTER_MESSAGE, ratingFormat.format( rating ),
+                customerDisplayName, agentName, "@SocialSurveyMe" )
+                + getApplicationBaseUrl()
+                + CommonConstants.AGENT_PROFILE_FIXED_URL + agentProfileLink;
+
             try {
                 if ( !socialManagementService.tweet( agentSettings, twitterMessage, agent.getCompany().getCompanyId() ) ) {
                     surveyHandler.updateSharedOn( CommonConstants.TWITTER_SOCIAL_SITE, agentId, customerEmail );
@@ -768,6 +785,7 @@ public class SurveyManagementController
             } catch ( TwitterException e ) {
                 LOG.error(
                     "TwitterException caught in postToSocialMedia() while trying to post to twitter. Nested excption is ", e );
+                reportBug( "Twitter", agentSettings.getContact_details().getName(), e );
             }
             if ( accountMasterId != CommonConstants.ACCOUNTS_MASTER_INDIVIDUAL ) {
                 for ( OrganizationUnitSettings setting : companySettings ) {
@@ -827,6 +845,7 @@ public class SurveyManagementController
                         LOG.error(
                             "TwitterException caught in postToSocialMedia() while trying to post to twitter. Nested excption is ",
                             e );
+                        reportBug( "Twitter", accountMasterName, e );
                     }
                 }
             }
@@ -878,6 +897,11 @@ public class SurveyManagementController
                 return e.getMessage();
             }
 
+            DecimalFormat ratingFormat = CommonConstants.SOCIAL_RANKING_FORMAT;
+            if ( rating % 1 == 0 ) {
+                ratingFormat = CommonConstants.SOCIAL_RANKING_WHOLE_FORMAT;
+            }
+
 
             Map<String, List<OrganizationUnitSettings>> settingsMap = socialManagementService
                 .getSettingsForBranchesAndRegionsInHierarchy( agentId );
@@ -888,6 +912,7 @@ public class SurveyManagementController
             List<OrganizationUnitSettings> branchSettings = settingsMap
                 .get( MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION );
             AgentSettings agentSettings = userManagementService.getUserSettings( agentId );
+
             List<SurveyDetails> surveys = surveyHandler.getSurveyDetailsByAgentAndCompany( companySettings.get( 0 ).getIden() );
             SocialPostShared socialPostShared = null;
             for ( SurveyDetails surveyDetail : surveys ) {
@@ -921,9 +946,10 @@ public class SurveyManagementController
                 agentSharedOn = new HashMap<Long, List<String>>();
             }
 
-            String facebookMessage = rating + "-Star Survey Response from " + customerDisplayName + " for " + agentName
-                + " on Social Survey - view at " + getApplicationBaseUrl() + CommonConstants.AGENT_PROFILE_FIXED_URL
-                + agentProfileLink;
+            String facebookMessage = ratingFormat.format( rating ) + "-Star Survey Response from " + customerDisplayName
+                + " for " + agentName + " on Social Survey - view at " + getApplicationBaseUrl()
+                + CommonConstants.AGENT_PROFILE_FIXED_URL + agentProfileLink;
+
             // TODO: Bad code: DELETE: BEGIN
             // get the company id of the agent
             User user = userManagementService.getUserObjByUserId( agentId );
@@ -1042,6 +1068,13 @@ public class SurveyManagementController
                     e );
                 return e.getMessage();
             }
+
+
+            DecimalFormat ratingFormat = CommonConstants.SOCIAL_RANKING_FORMAT;
+            if ( rating % 1 == 0 ) {
+                ratingFormat = CommonConstants.SOCIAL_RANKING_WHOLE_FORMAT;
+            }
+
             Map<String, List<OrganizationUnitSettings>> settingsMap = socialManagementService
                 .getSettingsForBranchesAndRegionsInHierarchy( agentId );
             List<OrganizationUnitSettings> companySettings = settingsMap
@@ -1089,9 +1122,10 @@ public class SurveyManagementController
              * + " for " + agentName + " on @SocialSurveyMe - view at " + getApplicationBaseUrl() +
              * CommonConstants.AGENT_PROFILE_FIXED_URL + agentProfileLink;
              */
-            String twitterMessage = String.format( CommonConstants.TWITTER_MESSAGE,
-                CommonConstants.RANKING_FORMAT_TWITTER.format( rating ), customerDisplayName, agentName, "@SocialSurveyMe" )
-                + getApplicationBaseUrl() + CommonConstants.AGENT_PROFILE_FIXED_URL + agentProfileLink;
+            String twitterMessage = String.format( CommonConstants.TWITTER_MESSAGE, ratingFormat.format( rating ),
+                customerDisplayName, agentName, "@SocialSurveyMe" )
+                + getApplicationBaseUrl()
+                + CommonConstants.AGENT_PROFILE_FIXED_URL + agentProfileLink;
             // TODO: Bad code: DELETE: BEGIN
             // get the company id of the agent
             User user = userManagementService.getUserObjByUserId( agentId );
@@ -1204,6 +1238,12 @@ public class SurveyManagementController
                     e );
                 return e.getMessage();
             }
+
+
+            DecimalFormat ratingFormat = CommonConstants.SOCIAL_RANKING_FORMAT;
+            if ( rating % 1 == 0 ) {
+                ratingFormat = CommonConstants.SOCIAL_RANKING_WHOLE_FORMAT;
+            }
             Map<String, List<OrganizationUnitSettings>> settingsMap = socialManagementService
                 .getSettingsForBranchesAndRegionsInHierarchy( agentId );
             List<OrganizationUnitSettings> companySettings = settingsMap
@@ -1213,6 +1253,7 @@ public class SurveyManagementController
             List<OrganizationUnitSettings> branchSettings = settingsMap
                 .get( MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION );
             AgentSettings agentSettings = userManagementService.getUserSettings( agentId );
+
             List<SurveyDetails> surveys = surveyHandler.getSurveyDetailsByAgentAndCompany( companySettings.get( 0 ).getIden() );
             SocialPostShared socialPostShared = null;
             for ( SurveyDetails surveyDetail : surveys ) {
@@ -1245,8 +1286,10 @@ public class SurveyManagementController
             if ( agentSharedOn == null ) {
                 agentSharedOn = new HashMap<Long, List<String>>();
             }
-            String message = rating + "-Star Survey Response from " + customerDisplayName + " for " + agentName
-                + " on SocialSurvey ";
+
+            String message = ratingFormat.format( rating ) + "-Star Survey Response from " + customerDisplayName + " for "
+                + agentName + " on SocialSurvey ";
+
             String linkedinProfileUrl = getApplicationBaseUrl() + CommonConstants.AGENT_PROFILE_FIXED_URL + agentProfileLink;
             String linkedinMessageFeedback = "From : " + customerDisplayName + " " + feedback;
             socialManagementService.updateLinkedin( agentSettings, message, linkedinProfileUrl, linkedinMessageFeedback );
@@ -1301,9 +1344,9 @@ public class SurveyManagementController
                 surveyHandler.updateSurveyDetails( surveyDetails );
             }
         } catch ( NonFatalException e ) {
-            LOG.error( "NonFatalException caught in postToTwitter(). Nested exception is ", e );
+            LOG.error( "NonFatalException caught in postToLinkedin(). Nested exception is ", e );
         }
-        LOG.info( "Method to post feedback of customer to twitter finished." );
+        LOG.info( "Method to post feedback of customer to Linkedin finished." );
         return "";
     }
 
@@ -1584,41 +1627,21 @@ public class SurveyManagementController
 
         /*OrganizationUnitSettings companySettings = organizationManagementService.getCompanySettings(userManagementService.getUserByUserId(agentId));*/
         OrganizationUnitSettings unitSettings = organizationManagementService.getAgentSettings( agentId );
-        Map<String, Long> hierarchyMap = null;
-        try {
-            hierarchyMap = profileManagementService.getPrimaryHierarchyByAgentProfile( unitSettings );
-        } catch ( ProfileNotFoundException e1 ) {
-            LOG.error( "Unable to fetch primary profile for this user " );
-            throw new FatalException( "Unable to fetch primary profile this user " + agentId );
-        }
-        long companyId = 0;
-        long regionId = 0;
-        long branchId = 0;
-        Map<SettingsForApplication, OrganizationUnit> map = null;
-        if ( hierarchyMap != null ) {
-            companyId = hierarchyMap.get( CommonConstants.COMPANY_ID_COLUMN );
-            regionId = hierarchyMap.get( CommonConstants.REGION_ID_COLUMN );
-            branchId = hierarchyMap.get( CommonConstants.BRANCH_ID_COLUMN );
-        }
-        try {
-            map = profileManagementService.getPrimaryHierarchyByEntity( CommonConstants.AGENT_ID_COLUMN, agentId );
-            if ( map == null ) {
-                LOG.error( "Unable to fetch primary profile for this user " );
-                throw new FatalException( "Unable to fetch primary profile this user " + agentId );
+        if ( unitSettings.getSurvey_settings() == null ) {
+            SurveySettings surveySettings = new SurveySettings();
+            surveySettings.setAutoPostEnabled( true );
+            surveySettings.setShow_survey_above_score( CommonConstants.DEFAULT_AUTOPOST_SCORE );
+            organizationManagementService.updateScoreForSurvey( MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION,
+                unitSettings, surveySettings );
+        } else {
+            if ( unitSettings.getSurvey_settings().getShow_survey_above_score() <= 0 ) {
+                unitSettings.getSurvey_settings().setAutoPostEnabled( true );
+                unitSettings.getSurvey_settings().setShow_survey_above_score( CommonConstants.DEFAULT_AUTOPOST_SCORE );
+                organizationManagementService.updateScoreForSurvey(
+                    MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION, unitSettings,
+                    unitSettings.getSurvey_settings() );
             }
-        } catch ( InvalidSettingsStateException e ) {
-            LOG.error( "Invalid settings for score ", e );
-
-        } catch ( ProfileNotFoundException e ) {
-            LOG.error( "Unable to fetch primary profile for this user " );
-            throw new FatalException( "Unable to fetch primary profile this user " + agentId );
         }
-        OrganizationUnitSettings companySettings = organizationManagementService.getCompanySettings( companyId );
-        OrganizationUnitSettings regionSettings = organizationManagementService.getRegionSettings( regionId );
-        OrganizationUnitSettings branchSettings = organizationManagementService.getBranchSettingsDefault( branchId );
-        unitSettings = profileManagementService.getAutoPostScoreBasedOnHierarchy(
-            MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION, unitSettings, companySettings, regionSettings,
-            branchSettings, unitSettings, map );
         SurveySettings defaultSurveySettings = organizationManagementService.retrieveDefaultSurveyProperties();
         surveyAndStage.put( "happyText", defaultSurveySettings.getHappyText() );
         surveyAndStage.put( "neutralText", defaultSurveySettings.getNeutralText() );
@@ -1715,6 +1738,27 @@ public class SurveyManagementController
         surveyAndStage.put( "editable", editable );
         surveyAndStage.put( "source", source );
         return surveyAndStage;
+    }
+
+
+    private void reportBug( String socAppName, String name, Exception e )
+    {
+        try {
+            LOG.info( "Building error message for the auto post failure" );
+            String errorMsg = "<br>" + e.getMessage() + "<br><br>";
+            if ( socAppName.length() > 0 )
+                errorMsg += "Social Application : " + socAppName;
+            errorMsg += "<br>Agent Name : " + name + "<br>";
+            errorMsg += "<br>StackTrace : <br>" + ExceptionUtils.getStackTrace( e ).replaceAll( "\n", "<br>" ) + "<br>";
+            LOG.info( "Error message built for the auto post failure" );
+            LOG.info( "Sending bug mail to admin for the auto post failure" );
+            emailServices.sendReportBugMailToAdmin( applicationAdminName, errorMsg, applicationSupportEmail );
+            LOG.info( "Sent bug mail to admin for the auto post failure" );
+        } catch ( UndeliveredEmailException ude ) {
+            LOG.error( "error while sending report bug mail to admin ", ude );
+        } catch ( InvalidInputException iie ) {
+            LOG.error( "error while sending report bug mail to admin ", iie );
+        }
     }
 }
 // JIRA SS-119 by RM-05 : EOC

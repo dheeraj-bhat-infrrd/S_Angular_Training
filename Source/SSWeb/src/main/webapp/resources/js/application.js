@@ -8320,9 +8320,14 @@ $(document).on('click','.hdr-link-item-dropdown-item',function(e) {
 });
 
 //Help page onclick function
-$(document).on( 'click', '#send-button', function() {
+$(document).on( 'click', '#send-help-mail-button', function() {
 	var subject = "";
 	var message = "";
+	var emailId = "";
+	
+	if ($("#email-id").val() != undefined) {
+		emailId = $("#email-id").val().trim();
+	}
 	
 	if ($("#subject-id").val() != undefined) {
 		subject = $("#subject-id").val().trim();
@@ -8331,6 +8336,19 @@ $(document).on( 'click', '#send-button', function() {
 	if ($("#user-message").val() != undefined) {
 		message = $("#user-message").val().trim();
 	}
+	
+	if ((emailId == "") || (emailId == undefined)) {
+		$('#overlay-toast').html('Please enter a valid email address');
+		showToast();
+		return;
+	}
+	
+	if (emailRegex.test(emailId) != true){
+		$('#overlay-toast').html('Please enter a valid email address');
+		showToast();
+		return;
+	}
+	
 	if (subject == "" || subject == undefined) {
 		$('#overlay-toast').html('Please enter the subject');
 		showToast();
@@ -8345,7 +8363,8 @@ $(document).on( 'click', '#send-button', function() {
 
 	var payload = {
 		"subject" : subject,
-		"mailText" : message
+		"mailText" : message,
+		"emailId" : emailId
 	};
 
 	callAjaxPostWithPayloadData("./sendhelpmailtoadmin.do",
@@ -8508,6 +8527,7 @@ $(document).on('click', '#wc-send-survey', function() {
 				receiver.firstname = firstname;
 				receiver.lastname = lastname;
 				receiver.emailId = emailId;
+				receiver.agentEmailId = agentEmailId;
 				if (dataName == 'agent-name') {
 					receiver.agentId = agentId;
 					if(agentId == undefined){
@@ -8533,16 +8553,30 @@ $(document).on('click', '#wc-send-survey', function() {
 			}
 		}
 	});
-
-	if(exit){
-		exit = false;
-		return false;
-	}
 	
 	//Check if recievers list empty
 	if(receiversList.length == 0){
 		$('#overlay-toast').html('Add customers to send survey request!');
 		showToast();
+		exit = false;
+		return false;
+	}
+	
+	//check if there is no duplicate entries
+	var receiversListLength = receiversList.length;
+	
+	for (var i = 0; i < receiversListLength; i++){
+		for (var j = i+1; j < receiversListLength; j++){
+			if( receiversList[i].emailId == receiversList[j].emailId && receiversList[i].agentEmailId == receiversList[j].agentEmailId ){
+				$('#overlay-toast').html("Can't enter same email address multiple times for same user");
+				showToast();
+				exit = true;
+				return false;
+			}
+		}
+	}
+
+	if(exit){
 		exit = false;
 		return false;
 	}
@@ -8567,8 +8601,10 @@ $(document).on('click', '#wc-send-survey', function() {
 		getIncompleteSurveyCount(colName, colValue);
 		if(data == "error"){
 			$('#overlay-toast').html('Error while sending survey request!');
-		}else{
+		}else if(data == "Success"){
 			$('#overlay-toast').html('Survey request sent successfully!');
+		}else{
+			$('#overlay-toast').html(data);
 		}
 		
 		showToast();

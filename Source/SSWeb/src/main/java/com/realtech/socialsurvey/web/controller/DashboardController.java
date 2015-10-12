@@ -65,6 +65,8 @@ import com.realtech.socialsurvey.core.services.search.SolrSearchService;
 import com.realtech.socialsurvey.core.services.search.exception.SolrException;
 import com.realtech.socialsurvey.core.services.settingsmanagement.impl.InvalidSettingsStateException;
 import com.realtech.socialsurvey.core.services.surveybuilder.SurveyHandler;
+import com.realtech.socialsurvey.core.services.surveybuilder.impl.DuplicateSurveyRequestException;
+import com.realtech.socialsurvey.core.services.surveybuilder.impl.SelfSurveyInitiationException;
 import com.realtech.socialsurvey.core.utils.DisplayMessageConstants;
 import com.realtech.socialsurvey.core.utils.EmailFormatHelper;
 import com.realtech.socialsurvey.core.utils.MessageUtils;
@@ -1692,12 +1694,26 @@ public class DashboardController
         String custEmail = request.getParameter( "email" );
         String custRelationWithAgent = request.getParameter( "relation" );
         User user = sessionHelper.getCurrentUser();
-
+        String errorMsg = null;
         try {
-            surveyHandler.sendSurveyInvitationMail( custFirstName, custLastName, custEmail, custRelationWithAgent, user, true,
-                "customer" );
+            try {
+                surveyHandler.initiateSurveyRequest( user.getUserId(), custEmail, custFirstName, custLastName, "customer" );
+            } catch ( SelfSurveyInitiationException e ) {
+                errorMsg = messageUtils.getDisplayMessage( DisplayMessageConstants.SELF_SURVEY_INITIATION,
+                    DisplayMessageType.ERROR_MESSAGE ).getMessage();
+                throw new NonFatalException( e.getMessage(), e.getErrorCode() );
+            } catch ( DuplicateSurveyRequestException e ) {
+                errorMsg = messageUtils.getDisplayMessage( DisplayMessageConstants.DUPLICATE_SURVEY_REQUEST,
+                    DisplayMessageType.ERROR_MESSAGE ).getMessage();
+                throw new NonFatalException( e.getMessage(), e.getErrorCode() );
+            }
+
+
         } catch ( NonFatalException e ) {
             LOG.error( "NonFatalException caught in sendSurveyInvitation(). Nested exception is ", e );
+            if ( errorMsg == null )
+                errorMsg = "error";
+            return errorMsg;
         }
 
         LOG.info( "Method sendSurveyInvitation() finished from DashboardController." );
@@ -1713,6 +1729,7 @@ public class DashboardController
         User user = sessionHelper.getCurrentUser();
         List<SurveyRecipient> surveyRecipients = null;
         long agentId = 0;
+        String errorMsg = null;
 
         try {
             String source = request.getParameter( "source" );
@@ -1739,6 +1756,20 @@ public class DashboardController
                 agentId = user.getUserId();
             }
 
+            //check if no duplicate entries in list
+            if ( !surveyRecipients.isEmpty() ) {
+                for ( int i = 0; i < surveyRecipients.size(); i++ ) {
+                    for ( int j = i + 1; j < surveyRecipients.size(); j++ ) {
+                        if ( surveyRecipients.get( i ).getEmailId().equalsIgnoreCase( surveyRecipients.get( j ).getEmailId() ) ) {
+                            if ( surveyRecipients.get( i ).getAgentEmailId()
+                                .equalsIgnoreCase( surveyRecipients.get( j ).getAgentEmailId() ) ) {
+                                throw new InvalidInputException( "Can't enter same email address multiple times for same user" );
+                            }
+                        }
+                    }
+                }
+            }
+
             // sending mails on traversing the list
             if ( !surveyRecipients.isEmpty() ) {
                 for ( SurveyRecipient recipient : surveyRecipients ) {
@@ -1750,22 +1781,30 @@ public class DashboardController
                     } else {
                         throw new InvalidInputException( "Agent id can not be null" );
                     }
-                    User currentUser = userManagementService.getUserByUserId( currentAgentId );
-                    String currentUserEmailId = currentUser.getEmailId();
-                    //check if agent mail id is not same as recipent email id
-                    if ( currentUserEmailId.equals( recipient.getEmailId() ) ) {
-                        LOG.error( "agent email id and recipent email id is same for agent " + currentUser.getFirstName() );
-                        throw new InvalidInputException( "Recipent email id can not be same as agent email id" );
+
+
+                    try {
+                        surveyHandler.initiateSurveyRequest( currentAgentId, recipient.getEmailId(), recipient.getFirstname(),
+                            recipient.getLastname(), source );
+                    } catch ( SelfSurveyInitiationException e ) {
+                        errorMsg = messageUtils.getDisplayMessage( DisplayMessageConstants.SELF_SURVEY_INITIATION,
+                            DisplayMessageType.ERROR_MESSAGE ).getMessage();
+                        throw new NonFatalException( e.getMessage(), e.getErrorCode() );
+                    } catch ( DuplicateSurveyRequestException e ) {
+                        errorMsg = messageUtils.getDisplayMessage( DisplayMessageConstants.DUPLICATE_SURVEY_REQUEST,
+                            DisplayMessageType.ERROR_MESSAGE ).getMessage();
+                        throw new NonFatalException( e.getMessage(), e.getErrorCode() );
+
                     }
-                    if ( surveyHandler.getPreInitiatedSurvey( agentId, recipient.getEmailId(), recipient.getFirstname(),
-                        recipient.getLastname() ) == null )
-                        surveyHandler.sendSurveyInvitationMail( recipient.getFirstname(), recipient.getLastname(),
-                            recipient.getEmailId(), null, currentUser, true, source );
+
                 }
             }
         } catch ( NonFatalException e ) {
             LOG.error( "NonFatalException caught in sendMultipleSurveyInvitations(). Nested exception is ", e );
-            return "error";
+            if ( errorMsg == null )
+                errorMsg = "error";
+            return errorMsg;
+
         }
 
         LOG.info( "Method sendMultipleSurveyInvitations() finished from DashboardController." );

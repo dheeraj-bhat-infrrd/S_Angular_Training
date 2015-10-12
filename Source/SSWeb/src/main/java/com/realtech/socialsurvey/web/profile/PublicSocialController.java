@@ -1,10 +1,13 @@
 package com.realtech.socialsurvey.web.profile;
 
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
+
 import org.apache.http.NameValuePair;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
@@ -21,9 +24,11 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+
 import twitter4j.Twitter;
 import twitter4j.TwitterException;
 import twitter4j.auth.RequestToken;
+
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
@@ -31,6 +36,7 @@ import com.realtech.socialsurvey.core.exception.NonFatalException;
 import com.realtech.socialsurvey.core.services.social.SocialManagementService;
 import com.realtech.socialsurvey.web.common.JspResolver;
 import com.realtech.socialsurvey.web.util.RequestUtils;
+
 import facebook4j.Facebook;
 import facebook4j.FacebookException;
 import facebook4j.auth.AccessToken;
@@ -231,7 +237,13 @@ public class PublicSocialController {
 
 			// Share On facebook using newly generated token of end user
 			facebook.setOAuthAccessToken(new AccessToken(accessToken.getToken(), null));
-			String message = session.getAttribute("rating") + "-Star Survey Response from " + session.getAttribute("firstName") + " "
+			String ratingStr = (String) session.getAttribute( "rating" );
+			double rating = Double.parseDouble( ratingStr );
+			DecimalFormat ratingFormat = CommonConstants.SOCIAL_RANKING_FORMAT;
+	        if ( rating % 1 == 0 ) {
+	            ratingFormat = CommonConstants.SOCIAL_RANKING_WHOLE_FORMAT;
+	        }
+			String message = ratingFormat.format( rating ) + "-Star Survey Response from " + session.getAttribute("firstName") + " "
 					+ session.getAttribute("lastName") + " for " + session.getAttribute("agentName")
 					+ " on Social Survey. Below is the feedback :\n " + session.getAttribute("review");
 			message = message.replaceAll("null", "");
@@ -290,8 +302,14 @@ public class PublicSocialController {
 				throw new NonFatalException("Unable to procure twitter access token");
 			}
 			
+			String ratingStr = (String) session.getAttribute( "rating" );
+            double rating = Double.parseDouble( ratingStr );
+            DecimalFormat ratingFormat = CommonConstants.SOCIAL_RANKING_FORMAT;
+            if ( rating % 1 == 0 ) {
+                ratingFormat = CommonConstants.SOCIAL_RANKING_WHOLE_FORMAT;
+            }
 			// Tweeting
-			String twitterMessage = session.getAttribute("rating") + "-Star Survey Response from " + session.getAttribute("firstName") + " "
+			String twitterMessage = ratingFormat.format( rating ) + "-Star Survey Response from " + session.getAttribute("firstName") + " "
 					+ session.getAttribute("lastName") + " for " + session.getAttribute("agentName")
 					+ " on @Social Survey. Below is the feedback :\n " + session.getAttribute("review");
 			twitterMessage = twitterMessage.replaceAll("null", "");
@@ -349,8 +367,14 @@ public class PublicSocialController {
 			Map<String, Object> map = new Gson().fromJson(accessTokenStr, new TypeToken<Map<String, String>>() {}.getType());
 			String accessToken = (String) map.get("access_token");
 
+			String ratingStr = (String) session.getAttribute( "rating" );
+            double rating = Double.parseDouble( ratingStr );
+            DecimalFormat ratingFormat = CommonConstants.SOCIAL_RANKING_FORMAT;
+            if ( rating % 1 == 0 ) {
+                ratingFormat = CommonConstants.SOCIAL_RANKING_WHOLE_FORMAT;
+            }
 			// Post on linkedin
-			String message = session.getAttribute("rating") + "-Star Survey Response from " + session.getAttribute("firstName") + " "
+			String message = ratingFormat.format( rating ) + "-Star Survey Response from " + session.getAttribute("firstName") + " "
 					+ session.getAttribute("lastName") + " for " + session.getAttribute("agentName")
 					+ " on Social Survey. Below is the feedback :\n " + session.getAttribute("review");
 			message = message.replaceAll("null", "");

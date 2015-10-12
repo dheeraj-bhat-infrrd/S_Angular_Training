@@ -27,7 +27,6 @@
 			<link rel="stylesheet" href="${initParam.resourcesPath}/resources/css/style-common.css">
 			<link rel="stylesheet" href="${initParam.resourcesPath}/resources/css/style-resp.css">
 			<link rel="stylesheet" href="${initParam.resourcesPath}/resources/css/rangeslider.css">
-			<link rel="stylesheet" href="${initParam.resourcesPath}/resources/css/bootstrap.min.css">
 			<link rel="stylesheet" href="${initParam.resourcesPath}/resources/css/style-common-1.1.css">
 			<link rel="stylesheet" href="${initParam.resourcesPath}/resources/css/style-resp-1.1.css">
 		</head>
@@ -82,23 +81,28 @@
 					<tr>
 						<th></th>
 						<th><strong><span class="currency">$</span>29.95</strong> /
-							Month<div class="payment-acc-type-txt">Individual</div></th>
+							Month<div class="payment-acc-type-txt"><spring:message code="label.payment.type.individual"/></div></th>
 						<th><strong><span class="currency">$</span>19.95</strong> /
-							User / Month<div class="payment-acc-type-txt">Enterprise</div></th>
+							User / Month<div class="payment-acc-type-txt"><spring:message code="label.payment.type.smallbusiness"/></div></th>
+						<th><strong><span class="currency">$</span>19.95</strong> /
+							User / Month<div class="payment-acc-type-txt"><spring:message code="label.payment.type.enterprise"/></div></th>
 					</tr>
 					<tr>
-						<td>Special</td>
-						<td>Free 30-Day Trial</td>
-						<td>Free 30-Day Trial</td>
+						<td><spring:message code="label.payment.row.header.special"/></td>
+						<td><spring:message code="label.payment.freetrial"/></td>
+						<td><spring:message code="label.payment.freetrial"/></td>
+						<td><spring:message code="label.payment.freetrial"/></td>
 					</tr>
 					<tr>
-						<td>Purpose</td>
+						<td><spring:message code="label.payment.row.header.purpose"/></td>
 						<td>Single User</td>
+						<td>Multi-User</td>
 						<td>Multi-User</td>
 					</tr>
 					<tr>
-						<td>Users</td>
+						<td><spring:message code="label.payment.row.header.users"/></td>
 						<td>1</td>
+						<td>5-19</td>
 						<td>Unlimited</td>
 					</tr>
 					<tr class="action">
@@ -123,6 +127,16 @@
 							</c:otherwise>
 							</c:choose>
 						</td>
+						<td>
+							<c:choose>
+							<c:when test="${ upgrade == 1 }">
+								<span class="payment-button" onclick="makePaidUpgrade(4, '$19.95')">Upgrade</span>
+							</c:when>
+							<c:otherwise>
+								<span class="payment-button" onclick="selectAccountType(4, '$19.95', ${skippayment});">Start 30-Day Trial</span>
+							</c:otherwise>
+							</c:choose>
+						</td>
 					</tr>
 				</tbody>
 			</table>
@@ -131,97 +145,116 @@
 			<table class="payment-pricing">
 				<tbody>
 					<tr>
-						<th><strong>Basic Features</strong></th>
-						<th><div class="payment-acc-type-txt">Individual</div></th>
-						<th><div class="payment-acc-type-txt">Enterprise</div></th>
+						<th><strong><spring:message code="label.payment.row.header.basicfeature"/></strong></th>
+						<th><div class="payment-acc-type-txt"><spring:message code="label.payment.type.individual"/></div></th>
+						<th><div class="payment-acc-type-txt"><spring:message code="label.payment.type.smallbusiness"/></div></th>
+						<th><div class="payment-acc-type-txt"><spring:message code="label.payment.type.enterprise"/></div></th>
 					</tr>
 					<tr>
-						<td>Free 30-Day Trial</td>
+						<td><spring:message code="label.payment.freetrial"/></td>
+						<td><span class="payment-icn payment-tick-icn"></span></td>
 						<td><span class="payment-icn payment-tick-icn"></span></td>
 						<td><span class="payment-icn payment-tick-icn"></span></td>
 					</tr>
 					<tr>
-						<td>Users</td>
+						<td><spring:message code="label.payment.row.header.users"/></td>
 						<td>1</td>
+						<td>5-19</td>
 						<td>Unlimited</td>
 					</tr>
 					<tr>
-						<td>Find a Pro Public Search Page</td>
+						<td><spring:message code="label.payment.row.header.prosearch"/></td>
 						<td><span class="payment-icn payment-tick-icn"></span></td>
-						<td><span class="payment-icn payment-tick-icn"></span></td>
-					</tr>
-					<tr>
-						<td>Individual Public Profile Page</td>
 						<td><span class="payment-icn payment-tick-icn"></span></td>
 						<td><span class="payment-icn payment-tick-icn"></span></td>
 					</tr>
 					<tr>
-						<td>Company Public Profile Pages</td>
+						<td><spring:message code="label.payment.row.header.individualprofile"/></td>
+						<td><span class="payment-icn payment-tick-icn"></span></td>
+						<td><span class="payment-icn payment-tick-icn"></span></td>
+						<td><span class="payment-icn payment-tick-icn"></span></td>
+					</tr>
+					<tr>
+						<td><spring:message code="label.payment.row.header.companyprofile"/></td>
 						<td><span class="payment-icn payment-close-icn"></span></td>
 						<td><span class="payment-icn payment-tick-icn"></span></td>
-					</tr>
-					<tr>
-						<td>Mobile Ready Pages</td>
-						<td><span class="payment-icn payment-tick-icn"></span></td>
 						<td><span class="payment-icn payment-tick-icn"></span></td>
 					</tr>
 					<tr>
-						<td>Automated SEO with Star Rating</td>
+						<td><spring:message code="label.payment.row.header.mobileready"/></td>
+						<td><span class="payment-icn payment-tick-icn"></span></td>
 						<td><span class="payment-icn payment-tick-icn"></span></td>
 						<td><span class="payment-icn payment-tick-icn"></span></td>
 					</tr>
 					<tr>
-						<td>Feature Specific Reviews on Your Public Pages</td>
+						<td><spring:message code="label.payment.row.header.seorating"/></td>
 						<td><span class="payment-icn payment-tick-icn"></span></td>
-						<td><span class="payment-icn payment-tick-icn"></span></td>
-					</tr>
-					<tr>
-						<td>Pre-Written Surveys for Your Business Vertical</td>
 						<td><span class="payment-icn payment-tick-icn"></span></td>
 						<td><span class="payment-icn payment-tick-icn"></span></td>
 					</tr>
 					<tr>
-						<td>Create your account by using your Linkedin ID</td>
+						<td><spring:message code="label.payment.row.header.featurereviews"/></td>
 						<td><span class="payment-icn payment-tick-icn"></span></td>
-						<td><span class="payment-icn payment-tick-icn"></span></td>
-					</tr>
-					<tr>
-						<td>Unlimited Surveys</td>
 						<td><span class="payment-icn payment-tick-icn"></span></td>
 						<td><span class="payment-icn payment-tick-icn"></span></td>
 					</tr>
 					<tr>
-						<td>Unlimited Survey Questions</td>
+						<td><spring:message code="label.payment.row.header.prewrittensurveyvertical"/></td>
 						<td><span class="payment-icn payment-tick-icn"></span></td>
-						<td><span class="payment-icn payment-tick-icn"></span></td>
-					</tr>
-					<tr>
-						<td>User Dashboard</td>
 						<td><span class="payment-icn payment-tick-icn"></span></td>
 						<td><span class="payment-icn payment-tick-icn"></span></td>
 					</tr>
 					<tr>
-						<td>User Scorecards</td>
+						<td><spring:message code="label.payment.row.header.linkedinid"/></td>
+						<td><span class="payment-icn payment-tick-icn"></span></td>
 						<td><span class="payment-icn payment-tick-icn"></span></td>
 						<td><span class="payment-icn payment-tick-icn"></span></td>
 					</tr>
 					<tr>
-						<td>Office, Region and Company Scorecards</td>
+						<td><spring:message code="label.payment.row.header.unlimitedsurvey"/></td>
+						<td><span class="payment-icn payment-tick-icn"></span></td>
+						<td><span class="payment-icn payment-tick-icn"></span></td>
+						<td><span class="payment-icn payment-tick-icn"></span></td>
+					</tr>
+					<tr>
+						<td><spring:message code="label.payment.row.header.unlimitedsurveyquestion"/></td>
+						<td><span class="payment-icn payment-tick-icn"></span></td>
+						<td><span class="payment-icn payment-tick-icn"></span></td>
+						<td><span class="payment-icn payment-tick-icn"></span></td>
+					</tr>
+					<tr>
+						<td><spring:message code="label.payment.row.header.userdashboard"/></td>
+						<td><span class="payment-icn payment-tick-icn"></span></td>
+						<td><span class="payment-icn payment-tick-icn"></span></td>
+						<td><span class="payment-icn payment-tick-icn"></span></td>
+					</tr>
+					<tr>
+						<td><spring:message code="label.payment.row.header.userscorecard"/></td>
+						<td><span class="payment-icn payment-tick-icn"></span></td>
+						<td><span class="payment-icn payment-tick-icn"></span></td>
+						<td><span class="payment-icn payment-tick-icn"></span></td>
+					</tr>
+					<tr>
+						<td><spring:message code="label.payment.row.header.hierarchyscorecard"/></td>
 						<td><span class="payment-icn payment-close-icn"></span></td>
 						<td><span class="payment-icn payment-tick-icn"></span></td>
-					</tr>
-					<tr>
-						<td>Pre-Written Surveys for Your Business Vertical</td>
-						<td><span class="payment-icn payment-tick-icn"></span></td>
 						<td><span class="payment-icn payment-tick-icn"></span></td>
 					</tr>
 					<tr>
-						<td>Licensing and Compliance Integration</td>
+						<td><spring:message code="label.payment.row.header.prewrittensurveyvertical"/></td>
+						<td><span class="payment-icn payment-tick-icn"></span></td>
 						<td><span class="payment-icn payment-tick-icn"></span></td>
 						<td><span class="payment-icn payment-tick-icn"></span></td>
 					</tr>
 					<tr>
-						<td>SSL Security</td>
+						<td><spring:message code="label.payment.row.header.licencing" /></td>
+						<td><span class="payment-icn payment-tick-icn"></span></td>
+						<td><span class="payment-icn payment-tick-icn"></span></td>
+						<td><span class="payment-icn payment-tick-icn"></span></td>
+					</tr>
+					<tr>
+						<td><spring:message code="label.payment.row.header.ssl"/></td>
+						<td><span class="payment-icn payment-tick-icn"></span></td>
 						<td><span class="payment-icn payment-tick-icn"></span></td>
 						<td><span class="payment-icn payment-tick-icn"></span></td>
 					</tr>
@@ -232,42 +265,50 @@
 			<table class="payment-pricing">
 				<tbody>
 					<tr>
-						<th><strong>Advanced Workflow</strong></th>
-						<th><div class="payment-acc-type-txt">Individual</div></th>
-						<th><div class="payment-acc-type-txt">Enterprise</div></th>
+						<th><strong><spring:message code="label.payment.table.header.advancedworkflow"/></strong></th>
+						<th><div class="payment-acc-type-txt"><spring:message code="label.payment.type.individual"/></div></th>
+						<th><div class="payment-acc-type-txt"><spring:message code="label.payment.type.smallbusiness"/></div></th>
+						<th><div class="payment-acc-type-txt"><spring:message code="label.payment.type.enterprise"/></div></th>
 					</tr>
 					<tr>
-						<td>Create and Edit Survey Builder Tool</td>
+						<td><spring:message code="label.payment.row.header.editsurvey"/></td>
+						<td><span class="payment-icn payment-tick-icn"></span></td>
 						<td><span class="payment-icn payment-tick-icn"></span></td>
 						<td><span class="payment-icn payment-tick-icn"></span></td>
 					</tr>
 					<tr>
-						<td>Automatically Send Requests from Your Point of Sale System</td>
+						<td><spring:message code="label.payment.row.header.automaticsurvey"/></td>
 						<td><span class="payment-icn payment-close-icn"></span></td>
 						<td><span class="payment-icn payment-tick-icn"></span></td>
-					</tr>
-					<tr>
-						<td>Syndicate and Share Happy Customer Comments</td>
-						<td><span class="payment-icn payment-tick-icn"></span></td>
 						<td><span class="payment-icn payment-tick-icn"></span></td>
 					</tr>
 					<tr>
-						<td>Surveys are White Labeled</td>
+						<td><spring:message code="label.payment.row.header.customerflow"/></td>
+						<td><span class="payment-icn payment-tick-icn"></span></td>
 						<td><span class="payment-icn payment-tick-icn"></span></td>
 						<td><span class="payment-icn payment-tick-icn"></span></td>
 					</tr>
 					<tr>
-						<td>Multiple Survey Question Types</td>
+						<td><spring:message code="label.payment.row.header.surveylabel"/></td>
 						<td><span class="payment-icn payment-tick-icn"></span></td>
-						<td><span class="payment-icn payment-tick-icn"></span></td>
-					</tr>
-					<tr>
-						<td>Collect Optional Customer Comments</td>
 						<td><span class="payment-icn payment-tick-icn"></span></td>
 						<td><span class="payment-icn payment-tick-icn"></span></td>
 					</tr>
 					<tr>
-						<td>Edit Outbound Emails and Workflow</td>
+						<td><spring:message code="label.payment.row.header.multiplesurvey"/></td>
+						<td><span class="payment-icn payment-tick-icn"></span></td>
+						<td><span class="payment-icn payment-tick-icn"></span></td>
+						<td><span class="payment-icn payment-tick-icn"></span></td>
+					</tr>
+					<tr>
+						<td><spring:message code="label.payment.row.header.customercomment"/></td>
+						<td><span class="payment-icn payment-tick-icn"></span></td>
+						<td><span class="payment-icn payment-tick-icn"></span></td>
+						<td><span class="payment-icn payment-tick-icn"></span></td>
+					</tr>
+					<tr>
+						<td><spring:message code="label.payment.row.header.editemail"/></td>
+						<td><span class="payment-icn payment-tick-icn"></span></td>
 						<td><span class="payment-icn payment-tick-icn"></span></td>
 						<td><span class="payment-icn payment-tick-icn"></span></td>
 					</tr>
@@ -278,49 +319,57 @@
 			<table class="payment-pricing">
 				<tbody>
 					<tr>
-						<th><strong>Advanced Tools</strong></th>
-						<th><div class="payment-acc-type-txt">Individual</div></th>
-						<th><div class="payment-acc-type-txt">Enterprise</div></th>
+						<th><strong><spring:message code="label.payment.table.header.advancedtool"/></strong></th>
+						<th><div class="payment-acc-type-txt"><spring:message code="label.payment.type.individual"/></div></th>
+						<th><div class="payment-acc-type-txt"><spring:message code="label.payment.type.smallbusiness"/></div></th>
+						<th><div class="payment-acc-type-txt"><spring:message code="label.payment.type.enterprise"/></div></th>
 					</tr>
 					<tr>
-						<td>Easily Import thousands of Users in Your Enterprise
-							Hierarchy</td>
+						<td><spring:message code="label.payment.row.header.importusers"/></td>
 						<td><span class="payment-icn payment-close-icn"></span></td>
 						<td><span class="payment-icn payment-tick-icn"></span></td>
-					</tr>
-					<tr>
-						<td>Import Leads</td>
-						<td><span class="payment-icn payment-tick-icn"></span></td>
 						<td><span class="payment-icn payment-tick-icn"></span></td>
 					</tr>
 					<tr>
-						<td>Development API</td>
+						<td><spring:message code="label.payment.row.header.importleads"/></td>
+						<td><span class="payment-icn payment-tick-icn"></span></td>
+						<td><span class="payment-icn payment-tick-icn"></span></td>
+						<td><span class="payment-icn payment-tick-icn"></span></td>
+					</tr>
+					<tr>
+						<td><spring:message code="label.payment.row.header.developmentapi"/></td>
 						<td><span class="payment-icn payment-close-icn"></span></td>
-						<td>Minimum 250 Users / Coming in Late 2015</td>
+						<td>250 User Minimum</td>
+						<td>250 User Minimum</td>
 					</tr>
 					<tr>
-						<td>Custom Development and Widgets</td>
+						<td><spring:message code="label.payment.row.header.customwidget"/></td>
 						<td><span class="payment-icn payment-close-icn"></span></td>
-						<td>Minimum 250 Users / Coming in Late 2015</td>
+						<td>250 User Minimum</td>
+						<td>250 User Minimum</td>
 					</tr>
 					<tr>
-						<td>Manage User Permissions and Workflow Within Your Hierarchy</td>
+						<td><spring:message code="label.payment.row.header.userpermission"/></td>
 						<td><span class="payment-icn payment-close-icn"></span></td>
 						<td><span class="payment-icn payment-tick-icn"></span></td>
-					</tr>
-					<tr>
-						<td>Export Survey Results</td>
-						<td><span class="payment-icn payment-tick-icn"></span></td>
 						<td><span class="payment-icn payment-tick-icn"></span></td>
 					</tr>
 					<tr>
-						<td>Support Ticket System</td>
+						<td><spring:message code="label.payment.row.header.exportsurvey"/></td>
+						<td><span class="payment-icn payment-tick-icn"></span></td>
 						<td><span class="payment-icn payment-tick-icn"></span></td>
 						<td><span class="payment-icn payment-tick-icn"></span></td>
 					</tr>
 					<tr>
-						<td>Advanced Reporting and Company Admin Access</td>
+						<td><spring:message code="label.payment.row.header.support"/></td>
+						<td><span class="payment-icn payment-tick-icn"></span></td>
+						<td><span class="payment-icn payment-tick-icn"></span></td>
+						<td><span class="payment-icn payment-tick-icn"></span></td>
+					</tr>
+					<tr>
+						<td><spring:message code="label.payment.row.header.reportingaccess"/></td>
 						<td><span class="payment-icn payment-close-icn"></span></td>
+						<td><span class="payment-icn payment-tick-icn"></span></td>
 						<td><span class="payment-icn payment-tick-icn"></span></td>
 					</tr>
 				</tbody>
@@ -332,9 +381,11 @@
 					<tr>
 						<th></th>
 						<th><strong><span class="currency">$</span>29.95</strong> /
-							Month<div class="payment-acc-type-txt">Individual</div></th>
+							Month<div class="payment-acc-type-txt"><spring:message code="label.payment.type.individual"/></div></th>
 						<th><strong><span class="currency">$</span>19.95</strong> /
-							User / Month<div class="payment-acc-type-txt">Enterprise</div></th>
+							User / Month<div class="payment-acc-type-txt"><spring:message code="label.payment.type.smallbusiness"/></div></th>
+						<th><strong><span class="currency">$</span>19.95</strong> /
+							User / Month<div class="payment-acc-type-txt"><spring:message code="label.payment.type.enterprise"/></div></th>							
 					</tr>
 					<tr class="action">
 						<td></td>
@@ -345,6 +396,16 @@
 							</c:when>
 							<c:otherwise>
 								<span class="payment-button" onclick="selectAccountType(1, '$29.95', ${skippayment})">Start 30-Day Trial</span>
+							</c:otherwise>
+							</c:choose>
+						</td>
+						<td>
+							<c:choose>
+							<c:when test="${ upgrade == 1 }">
+								<span class="payment-button" onclick="makePaidUpgrade(4, '$19.95')">Upgrade</span>
+							</c:when>
+							<c:otherwise>
+								<span class="payment-button" onclick="selectAccountType(4, '$19.95', ${skippayment})">Start 30-Day Trial</span>
 							</c:otherwise>
 							</c:choose>
 						</td>
@@ -397,6 +458,8 @@
 function selectAccountType(accountType, paymentAmount, skippayment) {
 	// show the progress icon
 	showOverlay();
+	disableBodyScroll();
+	$('body').addClass("disable-scroll");
 	if ($(this).attr('data-status') == 'disabled') {
 		return;
 	}

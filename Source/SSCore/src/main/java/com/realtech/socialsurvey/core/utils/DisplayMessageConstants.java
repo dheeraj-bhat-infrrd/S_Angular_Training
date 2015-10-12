@@ -17,6 +17,8 @@ public final class DisplayMessageConstants
     public static final String INVALID_EMAILID = "INVALID_EMAILID";
     public static final String INVALID_ACCOUNT = "INVALID_ACCOUNT";
     public static final String INVALID_CAPTCHA = "INVALID_CAPTCHA";
+    public static final String SELF_SURVEY_INITIATION = "SELF_SURVEY_INITIATION";
+    public static final String DUPLICATE_SURVEY_REQUEST = "DUPLICATE_SURVEY_REQUEST";
     public static final String REGISTRATION_INVITE_GENERAL_ERROR = "REGISTRATION_INVITE_GENERAL_ERROR";
     public static final String GENERAL_ERROR = "GENERAL_ERROR";
     public static final String INVALID_USERNAME = "INVALID_USERNAME";

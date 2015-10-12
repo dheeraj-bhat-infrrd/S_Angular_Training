@@ -78,7 +78,6 @@ import com.realtech.socialsurvey.core.entities.SocialPost;
 import com.realtech.socialsurvey.core.entities.SocialProfileToken;
 import com.realtech.socialsurvey.core.entities.SurveyDetails;
 import com.realtech.socialsurvey.core.entities.SurveyPreInitiation;
-import com.realtech.socialsurvey.core.entities.SurveySettings;
 import com.realtech.socialsurvey.core.entities.TwitterToken;
 import com.realtech.socialsurvey.core.entities.User;
 import com.realtech.socialsurvey.core.entities.UserCompositeEntity;
@@ -1212,7 +1211,8 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 
     @Override
     @Transactional
-    public Map<String, Long> getPrimaryHierarchyByAgentProfile( OrganizationUnitSettings agentSettings ) throws InvalidInputException, ProfileNotFoundException
+    public Map<String, Long> getPrimaryHierarchyByAgentProfile( OrganizationUnitSettings agentSettings )
+        throws InvalidInputException, ProfileNotFoundException
     {
         LOG.info( "Inside method getPrimaryHierarchyByAgentProfile " );
         Map<String, Long> hierarchyMap = userManagementService.getPrimaryUserProfileByAgentId( agentSettings.getIden() );
@@ -2803,7 +2803,8 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 
     @Override
     @Transactional
-    public Map<String, Long> getHierarchyDetailsByEntity( String entityType, long entityId ) throws InvalidInputException, ProfileNotFoundException
+    public Map<String, Long> getHierarchyDetailsByEntity( String entityType, long entityId ) throws InvalidInputException,
+        ProfileNotFoundException
     {
         Map<String, Long> hierarchyDetials = new HashMap<String, Long>();
         Map<String, Long> hierarchyMap = new HashMap<String, Long>();
@@ -3149,66 +3150,6 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
         if ( userProfile.getSurvey_settings() == null ) {
             userProfile.setSurvey_settings( parentProfile.getSurvey_settings() );
         }
-        return userProfile;
-    }
-
-
-    public OrganizationUnitSettings getAutoPostScoreBasedOnHierarchy( String collectionName,
-        OrganizationUnitSettings userProfile, OrganizationUnitSettings companyUnitSettings,
-        OrganizationUnitSettings regionUnitSettings, OrganizationUnitSettings branchUnitSettings,
-        OrganizationUnitSettings agentUnitSettings, Map<SettingsForApplication, OrganizationUnit> map )
-    {
-
-
-        if ( collectionName.equalsIgnoreCase( MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION ) ) {
-            companyUnitSettings = userProfile;
-        } else if ( collectionName.equalsIgnoreCase( MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION ) ) {
-            regionUnitSettings = userProfile;
-        } else if ( collectionName.equalsIgnoreCase( MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION ) ) {
-            branchUnitSettings = userProfile;
-        } else if ( collectionName.equalsIgnoreCase( MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION ) ) {
-            agentUnitSettings = userProfile;
-        }
-        SurveySettings surveySettings = userProfile.getSurvey_settings();
-        if ( surveySettings == null ) {
-            surveySettings = new SurveySettings();
-        }
-        for ( Map.Entry<SettingsForApplication, OrganizationUnit> entry : map.entrySet() ) {
-            if ( entry.getKey() == SettingsForApplication.MIN_SCORE ) {
-
-                if ( entry.getValue() == OrganizationUnit.COMPANY ) {
-                    surveySettings.setShow_survey_above_score( companyUnitSettings.getSurvey_settings()
-                        .getShow_survey_above_score() );
-                } else if ( entry.getValue() == OrganizationUnit.REGION ) {
-                    surveySettings.setShow_survey_above_score( regionUnitSettings.getSurvey_settings()
-                        .getShow_survey_above_score() );
-                } else if ( entry.getValue() == OrganizationUnit.BRANCH ) {
-                    surveySettings.setShow_survey_above_score( branchUnitSettings.getSurvey_settings()
-                        .getShow_survey_above_score() );
-                } else if ( entry.getValue() == OrganizationUnit.AGENT ) {
-                    surveySettings.setShow_survey_above_score( agentUnitSettings.getSurvey_settings()
-                        .getShow_survey_above_score() );
-                }
-
-            } else if ( entry.getKey() == SettingsForApplication.AUTO_POST_ENABLED ) {
-                surveySettings = userProfile.getSurvey_settings();
-                if ( surveySettings == null ) {
-                    surveySettings = new SurveySettings();
-                }
-                if ( entry.getValue() == OrganizationUnit.COMPANY ) {
-                    surveySettings.setAutoPostEnabled( companyUnitSettings.getSurvey_settings().isAutoPostEnabled() );
-                } else if ( entry.getValue() == OrganizationUnit.REGION ) {
-                    surveySettings.setAutoPostEnabled( regionUnitSettings.getSurvey_settings().isAutoPostEnabled() );
-                } else if ( entry.getValue() == OrganizationUnit.BRANCH ) {
-                    surveySettings.setAutoPostEnabled( branchUnitSettings.getSurvey_settings().isAutoPostEnabled() );
-                } else if ( entry.getValue() == OrganizationUnit.AGENT ) {
-                    surveySettings.setAutoPostEnabled( agentUnitSettings.getSurvey_settings().isAutoPostEnabled() );
-                }
-
-            }
-
-        }
-        userProfile.setSurvey_settings( surveySettings );
         return userProfile;
     }
 
