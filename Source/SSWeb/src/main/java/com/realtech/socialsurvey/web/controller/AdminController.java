@@ -211,7 +211,7 @@ public class AdminController
             model.addAttribute( "companyObj", company );
             
           //add profile image url
-            for(RegionFromSearch region : regions){
+            /*for(RegionFromSearch region : regions){
                 OrganizationUnitSettings regionSetting =  organizationManagementService.getRegionSettings( region.getRegionId() );
                 region.setProfileImageUrl( regionSetting.getProfileImageUrl() );
             }
@@ -224,7 +224,7 @@ public class AdminController
             for(UserFromSearch user : users){
                 OrganizationUnitSettings userSetting =  organizationManagementService.getAgentSettings( user.getUserId() );
                 user.setProfileImageUrl( userSetting.getProfileImageUrl() );
-            }
+            }*/
             
             model.addAttribute( "regions", regions );
             model.addAttribute( "branches", branches );
@@ -328,7 +328,7 @@ public class AdminController
             users = userManagementService.checkUserCanEdit( admin, adminUser, users );
             
           //add profile image url            
-            for(BranchFromSearch branch : branches){
+            /*for(BranchFromSearch branch : branches){
                 OrganizationUnitSettings branchSetting =  organizationManagementService.getBranchSettingsDefault( branch.getBranchId() );
                 branch.setProfileImageUrl( branchSetting.getProfileImageUrl() );
             }
@@ -336,7 +336,7 @@ public class AdminController
             for(UserFromSearch user : users){
                 OrganizationUnitSettings userSetting =  organizationManagementService.getAgentSettings( user.getUserId() );
                 user.setProfileImageUrl( userSetting.getProfileImageUrl() );
-            }
+            }*/
             
             model.addAttribute( "branches", branches );
             model.addAttribute( "individuals", users );
@@ -404,10 +404,10 @@ public class AdminController
             usersList = userManagementService.checkUserCanEdit( admin, adminUser, usersList );
             
           //add profile image url
-            for(UserFromSearch user : usersList){
+            /*for(UserFromSearch user : usersList){
                 OrganizationUnitSettings userSetting =  organizationManagementService.getAgentSettings( user.getUserId() );
                 user.setProfileImageUrl( userSetting.getProfileImageUrl() );
-            }
+            }*/
             
 
             model.addAttribute( "users", usersList );
