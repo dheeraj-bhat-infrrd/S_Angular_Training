@@ -1634,7 +1634,7 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
             }
             List<String> sharedOnList = entry.getValue();
             if ( sharedOnList != null ) {
-                agentCount = sharedOnList.size();
+                agentCount = agentCount + sharedOnList.size();
             }
             finalAgentCount = agentCount;
             agentMap.put( entry.getKey(), agentCount );
@@ -1649,7 +1649,7 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
             }
             List<String> sharedOnList = entry.getValue();
             if ( sharedOnList != null ) {
-                branchCount = sharedOnList.size();
+                branchCount = branchCount + sharedOnList.size();
             }
             finalBranchCount += branchCount;
             branchMap.put( entry.getKey(), branchCount );
@@ -1661,14 +1661,14 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
                 count = branchMap.get( unitSettings.getIden() );
             }
             count = count + finalAgentCount;
-            finalBranchCount = finalBranchCount + finalAgentCount;
+            finalBranchCount = count;
             branchMap.put( unitSettings.getIden(), count );
         }
         for ( Map.Entry<Long, List<String>> entry : regionSharedOn.entrySet() ) {
             long regionCount = 0;
             if ( !regionMap.isEmpty() ) {
                 if ( regionMap.get( entry.getKey() ) != null ) {
-                    regionCount = regionMap.get( entry.getKey() );
+                    regionCount = regionCount + regionMap.get( entry.getKey() );
                 }
             }
             List<String> sharedOnList = entry.getValue();
