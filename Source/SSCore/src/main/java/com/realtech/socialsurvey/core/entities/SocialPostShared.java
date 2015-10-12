@@ -7,7 +7,7 @@ import java.util.Map;
 public class SocialPostShared
 {
 
-    private long totalCount;
+    private long companyCount;
 
     //firt string denotes collection name
     // map is the mapping between id for that collection and list will tell what all places it has been posted too. 
@@ -18,20 +18,20 @@ public class SocialPostShared
 
     private Map<Long, Long> agentCountMap;
 
-    private Map<Long, Long> companyCountMap;
+    private long companyId;
 
     private Map<Long, Long> branchCountMap;
 
 
-    public long getTotalCount()
+    public long getCompanyCount()
     {
-        return totalCount;
+        return companyCount;
     }
 
 
-    public void setTotalCount( long totalCount )
+    public void setCompanyCount( long companyCount )
     {
-        this.totalCount = totalCount;
+        this.companyCount = companyCount;
     }
 
 
@@ -71,18 +71,6 @@ public class SocialPostShared
     }
 
 
-    public Map<Long, Long> getCompanyCountMap()
-    {
-        return companyCountMap;
-    }
-
-
-    public void setCompanyCountMap( Map<Long, Long> companyCountMap )
-    {
-        this.companyCountMap = companyCountMap;
-    }
-
-
     public Map<Long, Long> getBranchCountMap()
     {
         return branchCountMap;
@@ -92,6 +80,18 @@ public class SocialPostShared
     public void setBranchCountMap( Map<Long, Long> branchCountMap )
     {
         this.branchCountMap = branchCountMap;
+    }
+
+
+    public long getCompanyId()
+    {
+        return companyId;
+    }
+
+
+    public void setCompanyId( long companyId )
+    {
+        this.companyId = companyId;
     }
 
 

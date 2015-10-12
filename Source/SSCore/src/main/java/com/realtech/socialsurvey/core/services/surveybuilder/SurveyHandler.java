@@ -7,6 +7,7 @@ import org.apache.solr.client.solrj.SolrServerException;
 
 import com.realtech.socialsurvey.core.entities.AbusiveSurveyReportWrapper;
 import com.realtech.socialsurvey.core.entities.Company;
+import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
 import com.realtech.socialsurvey.core.entities.SocialPostShared;
 import com.realtech.socialsurvey.core.entities.SurveyDetails;
 import com.realtech.socialsurvey.core.entities.SurveyPreInitiation;
@@ -225,8 +226,14 @@ public interface SurveyHandler
      * @return
      */
     public SocialPostShared calcualteFinalCount( SocialPostShared socialPostShared, Map<Long, List<String>> agentSharedOn,
-        Map<Long, List<String>> branchSharedOn, Map<Long, List<String>> regionSharedOn, Map<Long, List<String>> companySharedOn );
-    
+        Map<Long, List<String>> branchSharedOn, Map<Long, List<String>> regionSharedOn,
+        Map<Long, List<String>> companySharedOn, List<OrganizationUnitSettings> regionSettings,
+        List<OrganizationUnitSettings> branchSettings );
+
+
     void updateSurveyDetails( SurveyDetails surveyDetails );
+
+
+    public List<SurveyDetails> getSurveyDetailsByAgentAndCompany( long companyId );
 
 }

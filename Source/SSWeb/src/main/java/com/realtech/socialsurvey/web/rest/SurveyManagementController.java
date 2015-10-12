@@ -558,11 +558,20 @@ public class SurveyManagementController
                 .get( MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION );
 
             AgentSettings agentSettings = userManagementService.getUserSettings( agentId );
-            SurveyDetails surveyDetails = surveyHandler.getSurveyDetails( agentId, customerEmail, custFirstName, custLastName );
+            List<SurveyDetails> surveys = surveyHandler.getSurveyDetailsByAgentAndCompany( companySettings.get( 0 ).getIden() );
             SocialPostShared socialPostShared = null;
-            if ( surveyDetails != null ) {
-                socialPostShared = surveyHandler.getSocialPostSharedBySurveyDetails( surveyDetails );
+            for ( SurveyDetails surveyDetail : surveys ) {
+                if ( surveyDetail.getSocialPostShared() != null ) {
+                    socialPostShared = surveyDetail.getSocialPostShared();
+                    break;
+                }
             }
+
+            if ( socialPostShared == null ) {
+                socialPostShared = new SocialPostShared();
+                socialPostShared.setCompanyId( companySettings.get( 0 ).getIden() );
+            }
+
 
             Map<String, Map<Long, List<String>>> postSharedOn = socialPostShared.getPostSharedOn();
             if ( postSharedOn == null ) {
@@ -822,9 +831,11 @@ public class SurveyManagementController
                 }
             }
             socialPostShared = surveyHandler.calcualteFinalCount( socialPostShared, agentSharedOn, branchSharedOn,
-                regionSharedOn, companySharedOn );
-            surveyDetails.setSocialPostShared( socialPostShared );
-            surveyHandler.updateSurveyDetails( surveyDetails );
+                regionSharedOn, companySharedOn, regionSettings, branchSettings );
+            for ( SurveyDetails surveyDetails : surveys ) {
+                surveyDetails.setSocialPostShared( socialPostShared );
+                surveyHandler.updateSurveyDetails( surveyDetails );
+            }
         } catch ( NonFatalException e ) {
             LOG.error(
                 "Non fatal Exception caught in postToSocialMedia() while trying to post to social networking sites. Nested excption is ",
@@ -866,10 +877,28 @@ public class SurveyManagementController
                     e );
                 return e.getMessage();
             }
-            SurveyDetails surveyDetails = surveyHandler.getSurveyDetails( agentId, customerEmail, custFirstName, custLastName );
+
+
+            Map<String, List<OrganizationUnitSettings>> settingsMap = socialManagementService
+                .getSettingsForBranchesAndRegionsInHierarchy( agentId );
+            List<OrganizationUnitSettings> companySettings = settingsMap
+                .get( MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION );
+            List<OrganizationUnitSettings> regionSettings = settingsMap
+                .get( MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION );
+            List<OrganizationUnitSettings> branchSettings = settingsMap
+                .get( MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION );
+            AgentSettings agentSettings = userManagementService.getUserSettings( agentId );
+            List<SurveyDetails> surveys = surveyHandler.getSurveyDetailsByAgentAndCompany( companySettings.get( 0 ).getIden() );
             SocialPostShared socialPostShared = null;
-            if ( surveyDetails != null ) {
-                socialPostShared = surveyHandler.getSocialPostSharedBySurveyDetails( surveyDetails );
+            for ( SurveyDetails surveyDetail : surveys ) {
+                if ( surveyDetail.getSocialPostShared() != null ) {
+                    socialPostShared = surveyDetail.getSocialPostShared();
+                    break;
+                }
+            }
+            if ( socialPostShared == null ) {
+                socialPostShared = new SocialPostShared();
+                socialPostShared.setCompanyId( companySettings.get( 0 ).getIden() );
             }
             Map<String, Map<Long, List<String>>> postSharedOn = socialPostShared.getPostSharedOn();
             if ( postSharedOn == null ) {
@@ -892,15 +921,6 @@ public class SurveyManagementController
                 agentSharedOn = new HashMap<Long, List<String>>();
             }
 
-            Map<String, List<OrganizationUnitSettings>> settingsMap = socialManagementService
-                .getSettingsForBranchesAndRegionsInHierarchy( agentId );
-            List<OrganizationUnitSettings> companySettings = settingsMap
-                .get( MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION );
-            List<OrganizationUnitSettings> regionSettings = settingsMap
-                .get( MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION );
-            List<OrganizationUnitSettings> branchSettings = settingsMap
-                .get( MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION );
-            AgentSettings agentSettings = userManagementService.getUserSettings( agentId );
             String facebookMessage = rating + "-Star Survey Response from " + customerDisplayName + " for " + agentName
                 + " on Social Survey - view at " + getApplicationBaseUrl() + CommonConstants.AGENT_PROFILE_FIXED_URL
                 + agentProfileLink;
@@ -981,9 +1001,11 @@ public class SurveyManagementController
                 }
             }
             socialPostShared = surveyHandler.calcualteFinalCount( socialPostShared, agentSharedOn, branchSharedOn,
-                regionSharedOn, companySharedOn );
-            surveyDetails.setSocialPostShared( socialPostShared );
-            surveyHandler.updateSurveyDetails( surveyDetails );
+                regionSharedOn, companySharedOn, regionSettings, branchSettings );
+            for ( SurveyDetails surveyDetails : surveys ) {
+                surveyDetails.setSocialPostShared( socialPostShared );
+                surveyHandler.updateSurveyDetails( surveyDetails );
+            }
         } catch ( NonFatalException e ) {
             LOG.error( "NonFatalException caught in postToFacebook(). Nested exception is ", e );
         }
@@ -1020,10 +1042,26 @@ public class SurveyManagementController
                     e );
                 return e.getMessage();
             }
-            SurveyDetails surveyDetails = surveyHandler.getSurveyDetails( agentId, customerEmail, custFirstName, custLastName );
+            Map<String, List<OrganizationUnitSettings>> settingsMap = socialManagementService
+                .getSettingsForBranchesAndRegionsInHierarchy( agentId );
+            List<OrganizationUnitSettings> companySettings = settingsMap
+                .get( MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION );
+            List<OrganizationUnitSettings> regionSettings = settingsMap
+                .get( MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION );
+            List<OrganizationUnitSettings> branchSettings = settingsMap
+                .get( MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION );
+            AgentSettings agentSettings = userManagementService.getUserSettings( agentId );
+            List<SurveyDetails> surveys = surveyHandler.getSurveyDetailsByAgentAndCompany( companySettings.get( 0 ).getIden() );
             SocialPostShared socialPostShared = null;
-            if ( surveyDetails != null ) {
-                socialPostShared = surveyHandler.getSocialPostSharedBySurveyDetails( surveyDetails );
+            for ( SurveyDetails surveyDetail : surveys ) {
+                if ( surveyDetail.getSocialPostShared() != null ) {
+                    socialPostShared = surveyDetail.getSocialPostShared();
+                    break;
+                }
+            }
+            if ( socialPostShared == null ) {
+                socialPostShared = new SocialPostShared();
+                socialPostShared.setCompanyId( companySettings.get( 0 ).getIden() );
             }
             Map<String, Map<Long, List<String>>> postSharedOn = socialPostShared.getPostSharedOn();
             if ( postSharedOn == null ) {
@@ -1045,15 +1083,7 @@ public class SurveyManagementController
             if ( agentSharedOn == null ) {
                 agentSharedOn = new HashMap<Long, List<String>>();
             }
-            Map<String, List<OrganizationUnitSettings>> settingsMap = socialManagementService
-                .getSettingsForBranchesAndRegionsInHierarchy( agentId );
-            List<OrganizationUnitSettings> companySettings = settingsMap
-                .get( MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION );
-            List<OrganizationUnitSettings> regionSettings = settingsMap
-                .get( MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION );
-            List<OrganizationUnitSettings> branchSettings = settingsMap
-                .get( MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION );
-            AgentSettings agentSettings = userManagementService.getUserSettings( agentId );
+
             /*
              * String twitterMessage = rating + "-Star Survey Response from " + customerDisplayName
              * + " for " + agentName + " on @SocialSurveyMe - view at " + getApplicationBaseUrl() +
@@ -1132,9 +1162,11 @@ public class SurveyManagementController
             }
 
             socialPostShared = surveyHandler.calcualteFinalCount( socialPostShared, agentSharedOn, branchSharedOn,
-                regionSharedOn, companySharedOn );
-            surveyDetails.setSocialPostShared( socialPostShared );
-            surveyHandler.updateSurveyDetails( surveyDetails );
+                regionSharedOn, companySharedOn, regionSettings, branchSettings );
+            for ( SurveyDetails surveyDetails : surveys ) {
+                surveyDetails.setSocialPostShared( socialPostShared );
+                surveyHandler.updateSurveyDetails( surveyDetails );
+            }
         } catch ( NonFatalException e ) {
             LOG.error( "NonFatalException caught in postToTwitter(). Nested exception is ", e );
         }
@@ -1172,12 +1204,27 @@ public class SurveyManagementController
                     e );
                 return e.getMessage();
             }
-            SurveyDetails surveyDetails = surveyHandler.getSurveyDetails( agentId, customerEmail, custFirstName, custLastName );
+            Map<String, List<OrganizationUnitSettings>> settingsMap = socialManagementService
+                .getSettingsForBranchesAndRegionsInHierarchy( agentId );
+            List<OrganizationUnitSettings> companySettings = settingsMap
+                .get( MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION );
+            List<OrganizationUnitSettings> regionSettings = settingsMap
+                .get( MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION );
+            List<OrganizationUnitSettings> branchSettings = settingsMap
+                .get( MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION );
+            AgentSettings agentSettings = userManagementService.getUserSettings( agentId );
+            List<SurveyDetails> surveys = surveyHandler.getSurveyDetailsByAgentAndCompany( companySettings.get( 0 ).getIden() );
             SocialPostShared socialPostShared = null;
-            if ( surveyDetails != null ) {
-                socialPostShared = surveyHandler.getSocialPostSharedBySurveyDetails( surveyDetails );
+            for ( SurveyDetails surveyDetail : surveys ) {
+                if ( surveyDetail.getSocialPostShared() != null ) {
+                    socialPostShared = surveyDetail.getSocialPostShared();
+                    break;
+                }
             }
-
+            if ( socialPostShared == null ) {
+                socialPostShared = new SocialPostShared();
+                socialPostShared.setCompanyId( companySettings.get( 0 ).getIden() );
+            }
             Map<String, Map<Long, List<String>>> postSharedOn = socialPostShared.getPostSharedOn();
             if ( postSharedOn == null ) {
                 postSharedOn = new HashMap<String, Map<Long, List<String>>>();
@@ -1198,15 +1245,6 @@ public class SurveyManagementController
             if ( agentSharedOn == null ) {
                 agentSharedOn = new HashMap<Long, List<String>>();
             }
-            Map<String, List<OrganizationUnitSettings>> settingsMap = socialManagementService
-                .getSettingsForBranchesAndRegionsInHierarchy( agentId );
-            List<OrganizationUnitSettings> companySettings = settingsMap
-                .get( MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION );
-            List<OrganizationUnitSettings> regionSettings = settingsMap
-                .get( MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION );
-            List<OrganizationUnitSettings> branchSettings = settingsMap
-                .get( MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION );
-            AgentSettings agentSettings = userManagementService.getUserSettings( agentId );
             String message = rating + "-Star Survey Response from " + customerDisplayName + " for " + agentName
                 + " on SocialSurvey ";
             String linkedinProfileUrl = getApplicationBaseUrl() + CommonConstants.AGENT_PROFILE_FIXED_URL + agentProfileLink;
@@ -1256,6 +1294,12 @@ public class SurveyManagementController
                 branchSharedOn.put( setting.getIden(), socialSiteSharedOn );
             }
             surveyHandler.updateSharedOn( CommonConstants.LINKEDIN_SOCIAL_SITE, agentId, customerEmail );
+            socialPostShared = surveyHandler.calcualteFinalCount( socialPostShared, agentSharedOn, branchSharedOn,
+                regionSharedOn, companySharedOn, regionSettings, branchSettings );
+            for ( SurveyDetails surveyDetails : surveys ) {
+                surveyDetails.setSocialPostShared( socialPostShared );
+                surveyHandler.updateSurveyDetails( surveyDetails );
+            }
         } catch ( NonFatalException e ) {
             LOG.error( "NonFatalException caught in postToTwitter(). Nested exception is ", e );
         }

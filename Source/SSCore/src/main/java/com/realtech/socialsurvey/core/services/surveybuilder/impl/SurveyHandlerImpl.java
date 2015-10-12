@@ -270,6 +270,16 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
 
 
     @Override
+    public List<SurveyDetails> getSurveyDetailsByAgentAndCompany( long companyId )
+    {
+        LOG.info( "Method getSurveyDetails() to return survey details by agent id and customer email started." );
+        List<SurveyDetails> surveys = surveyDetailsDao.getSurveyDetailsByAgentAndCompany( companyId );
+        LOG.info( "Method getSurveyDetails() to return survey details by agent id and customer email finished." );
+        return surveys;
+    }
+
+
+    @Override
     public void updateSurveyAsAbusive( String surveymongoId, String reporterEmail, String reporterName )
     {
         LOG.info( "Method updateSurveyAsAbusive() to mark the survey as abusive, started" );
@@ -1567,7 +1577,9 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
 
     @Override
     public SocialPostShared calcualteFinalCount( SocialPostShared socialPostShared, Map<Long, List<String>> agentSharedOn,
-        Map<Long, List<String>> branchSharedOn, Map<Long, List<String>> regionSharedOn, Map<Long, List<String>> companySharedOn )
+        Map<Long, List<String>> branchSharedOn, Map<Long, List<String>> regionSharedOn,
+        Map<Long, List<String>> companySharedOn, List<OrganizationUnitSettings> regionSettings,
+        List<OrganizationUnitSettings> branchSettings )
     {
         long finalAgentCount = 0;
         long finalRegionCount = 0;
@@ -1588,66 +1600,83 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
         if ( branchMap == null ) {
             branchMap = new HashMap<Long, Long>();
         }
-        Map<Long, Long> companyMap = socialPostShared.getCompanyCountMap();
-        if ( companyMap == null ) {
-            companyMap = new HashMap<Long, Long>();
-        }
+
 
         for ( Map.Entry<Long, List<String>> entry : agentSharedOn.entrySet() ) {
-            long agentCount = agentMap.get( entry.getKey() );
+            long agentCount = 0;
+            if ( !agentMap.isEmpty() ) {
+                if ( agentMap.get( entry.getKey() ) != null ) {
+                    agentCount = agentMap.get( entry.getKey() );
+                }
+            }
             List<String> sharedOnList = entry.getValue();
             if ( sharedOnList != null ) {
-                agentCount = agentCount + sharedOnList.size();
+                agentCount = sharedOnList.size();
             }
-            finalAgentCount = finalAgentCount + agentCount;
+            finalAgentCount = agentCount;
             agentMap.put( entry.getKey(), agentCount );
 
         }
         for ( Map.Entry<Long, List<String>> entry : branchSharedOn.entrySet() ) {
             long branchCount = 0;
             if ( !branchMap.isEmpty() ) {
-                branchCount = branchMap.get( entry.getKey() );
+                if ( branchMap.get( entry.getKey() ) != null ) {
+                    branchCount = branchMap.get( entry.getKey() );
+                }
             }
             List<String> sharedOnList = entry.getValue();
             if ( sharedOnList != null ) {
-                branchCount = branchCount + sharedOnList.size();
+                branchCount = sharedOnList.size();
             }
             finalBranchCount += branchCount;
-            branchMap.put( entry.getKey(), branchCount + finalAgentCount );
+            branchMap.put( entry.getKey(), branchCount );
 
+        }
+        for ( OrganizationUnitSettings unitSettings : branchSettings ) {
+            long count = 0;
+            if ( branchMap.get( unitSettings.getIden() ) != null ) {
+                count = branchMap.get( unitSettings.getIden() );
+            }
+            count = count + finalAgentCount;
+            finalBranchCount = finalBranchCount + finalAgentCount;
+            branchMap.put( unitSettings.getIden(), count );
         }
         for ( Map.Entry<Long, List<String>> entry : regionSharedOn.entrySet() ) {
             long regionCount = 0;
             if ( !regionMap.isEmpty() ) {
-                regionCount = regionMap.get( entry.getKey() );
+                if ( regionMap.get( entry.getKey() ) != null ) {
+                    regionCount = regionMap.get( entry.getKey() );
+                }
             }
             List<String> sharedOnList = entry.getValue();
             if ( sharedOnList != null ) {
-                regionCount = regionCount + sharedOnList.size();
+                regionCount = sharedOnList.size();
             }
             finalRegionCount += regionCount;
-            regionMap.put( entry.getKey(), regionCount + finalBranchCount + finalAgentCount );
+            regionMap.put( entry.getKey(), regionCount );
 
         }
-
-        for ( Map.Entry<Long, List<String>> entry : companySharedOn.entrySet() ) {
-            long companyCount = 0;
-            if ( !companyMap.isEmpty() ) {
-                companyCount = companyMap.get( entry.getKey() );
+        for ( OrganizationUnitSettings unitSettings : regionSettings ) {
+            long count = 0;
+            if ( regionMap.get( unitSettings.getIden() ) != null ) {
+                count = regionMap.get( unitSettings.getIden() );
             }
-            List<String> sharedOnList = entry.getValue();
-            if ( sharedOnList != null ) {
-                companyCount = companyCount + sharedOnList.size();
-            }
-            finalCompanyCount += companyCount;
-            companyMap.put( entry.getKey(), companyCount + finalRegionCount + finalBranchCount + finalAgentCount );
-
+            count = count + finalBranchCount + finalAgentCount;
+            finalRegionCount = finalRegionCount + finalBranchCount + finalAgentCount;
+            regionMap.put( unitSettings.getIden(), count );
         }
+        long companyCount = 0;
+
+        List<String> sharedOnList = companySharedOn.get( socialPostShared.getCompanyId() );
+        if ( sharedOnList != null ) {
+            companyCount = sharedOnList.size();
+        }
+        finalCompanyCount = socialPostShared.getCompanyCount() + companyCount;
+
         socialPostShared.setAgentCountMap( agentMap );
         socialPostShared.setBranchCountMap( branchMap );
         socialPostShared.setRegionCountMap( regionMap );
-        socialPostShared.setCompanyCountMap( companyMap );
-        socialPostShared.setTotalCount( finalCompanyCount + finalRegionCount + finalBranchCount + finalAgentCount );
+        socialPostShared.setCompanyCount( finalCompanyCount + finalRegionCount + finalBranchCount + finalAgentCount );
 
         return socialPostShared;
     }
