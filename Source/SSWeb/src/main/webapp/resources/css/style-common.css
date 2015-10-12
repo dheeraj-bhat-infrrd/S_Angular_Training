@@ -226,6 +226,10 @@ a,a:hover,a:visited {
 	cursor: pointer;
 }
 
+.vertical-top {
+	vertical-align: top;
+}
+
 .margin-bottom-50 {
 	margin-bottom: 50px;
 }
@@ -4792,6 +4796,8 @@ select.rfr_txt_fld,select.rfr_input_fld{
 	overflow: hidden;
 	text-overflow: ellipsis;
 	white-space: nowrap;
+	width: 80%;
+	width: calc(100% - 40px);
 }
 
 .bd-hr-rt-panel {
@@ -4803,6 +4809,10 @@ select.rfr_txt_fld,select.rfr_input_fld{
 	line-height: 78px;
 	text-align: center;
 	font-size: 18px;
+}
+
+.bd-lt-l3 .bd-hr-txt{
+	width: calc(100% - 50px);
 }
 
 .bd-hr-rt-header strong {
@@ -5172,6 +5182,7 @@ tr.v-tbl-header {
 .v-hr-tbl {
 	width: 100%;
 	margin-top: 10px;
+	table-layout: fixed;
 }
 
 tr.v-tbl-row {
@@ -5187,7 +5198,7 @@ tr.v-tbl-row {
 .v-line-rgn {
 	border-left: 3px solid #6296D9;
 	border-bottom: 1px solid #dcdcdc;
-	height: 41px;
+	height: 100%;
 	position: absolute;
 	top: 0;
 	width: 100%;
@@ -5197,7 +5208,7 @@ tr.v-tbl-row {
 .v-line-brnch {
 	border-left: 3px solid #61A64B;
 	border-bottom: 1px solid #dcdcdc;
-	height: 41px;
+	height: 100%;
 	position: absolute;
 	top: 0;
 	width: 100%;
@@ -5234,7 +5245,7 @@ td.td-region-edit,td.td-branch-edit,td.td-user-edit {
 .v-line-ind {
 	border-left: 3px solid #D7D7D7;
 	border-bottom: 1px solid #dcdcdc;
-	height: 41px;
+	height: 100%;
 	position: absolute;
 	top: 0;
 	width: 100%;
@@ -6440,10 +6451,15 @@ tr.u-tbl-header td {
 }
 
 .rating-image-txt {
+    width: 80%;
+    width: calc(100% - 28px);
     padding-left: 5px;
     line-height: 30px;
     font-size:12px;
     font-family:'opensanssemibold';
+    text-overflow: ellipsis;
+    overflow: hidden;
+    white-space: nowrap;
 }
 
 .web-address-txt {
@@ -6478,6 +6494,8 @@ tr.u-tbl-header td {
 
 .prof-link-header{
 	padding-top: 5px;
+	height: 40px;
+	max-width: 100%;
 }
 
 .web-addr-header{
