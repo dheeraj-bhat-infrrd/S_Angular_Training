@@ -46,8 +46,8 @@
 	</div>
 	<div class="hm-header-main-wrapper">
 		<div class="container">
-			<div class="hm-header-row hm-header-row-main clearfix">
-				<div class="hm-header-row-left text-center">
+			<div class="hm-header-row hm-header-row-main clearfix hm-header-row-sur">
+				<div class="hm-header-row-left hm-header-row-left-sur text-center">
 					<spring:message code="label.surveyrequestsuccessful.title.key" />
 				</div>
 			</div>
@@ -94,6 +94,7 @@
 			document.write('<script src="${initParam.resourcesPath}/resources/js/jquery-2.1.1.min.js""><\/script>');
 		}
 	</script>
+	<script src="${initParam.resourcesPath}/resources/js/common.js"></script>
 	<script src="${initParam.resourcesPath}/resources/js/script.js"></script>
 	<script type="text/javascript">
 		$(document).ready(function(){

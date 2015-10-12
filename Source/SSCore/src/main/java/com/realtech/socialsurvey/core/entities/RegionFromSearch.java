@@ -17,8 +17,19 @@ public class RegionFromSearch {
 	private String state;
 	private String city;
 	private String zipcode;
+	private String profileImageUrl;
 
-	public long getRegionId() {
+	public String getProfileImageUrl()
+    {
+        return profileImageUrl;
+    }
+
+    public void setProfileImageUrl( String profileImageUrl )
+    {
+        this.profileImageUrl = profileImageUrl;
+    }
+
+    public long getRegionId() {
 		return regionId;
 	}
 

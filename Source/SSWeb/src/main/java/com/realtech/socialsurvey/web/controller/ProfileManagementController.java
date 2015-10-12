@@ -11,12 +11,11 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
 import javax.imageio.ImageIO;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import javax.ws.rs.QueryParam;
-
+import javax.ws.rs.core.Response;
 import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrDocumentList;
 import org.slf4j.Logger;
@@ -32,15 +31,14 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
-
 import sun.misc.BASE64Decoder;
-
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.type.TypeFactory;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.commons.Utils;
+import com.realtech.socialsurvey.core.dao.SocialPostDao;
 import com.realtech.socialsurvey.core.dao.impl.MongoOrganizationUnitSettingDaoImpl;
 import com.realtech.socialsurvey.core.entities.Achievement;
 import com.realtech.socialsurvey.core.entities.AgentSettings;
@@ -67,6 +65,7 @@ import com.realtech.socialsurvey.core.entities.Region;
 import com.realtech.socialsurvey.core.entities.SettingsDetails;
 import com.realtech.socialsurvey.core.entities.SocialMediaTokens;
 import com.realtech.socialsurvey.core.entities.SocialPost;
+import com.realtech.socialsurvey.core.entities.SocialUpdateAction;
 import com.realtech.socialsurvey.core.entities.SurveyDetails;
 import com.realtech.socialsurvey.core.entities.TwitterToken;
 import com.realtech.socialsurvey.core.entities.User;
@@ -176,7 +175,8 @@ public class ProfileManagementController
     @Autowired
     private SettingsManager settingsManager;
 
-
+    @Autowired
+    private SocialPostDao socialPostDao;
     @Transactional
     @RequestMapping ( value = "/showprofilepage", method = RequestMethod.GET)
     public String showProfileEditPage( Model model, HttpServletRequest request )
@@ -2823,7 +2823,11 @@ public class ProfileManagementController
         User user = sessionHelper.getCurrentUser();
         HttpSession session = request.getSession( false );
         SocialMediaTokens socialMediaTokens = null;
-
+        long branchId = 0;
+        long regionId = 0;
+        long companyId = 0;
+        long agentId = 0;
+        
         try {
             UserSettings userSettings = (UserSettings) session.getAttribute( CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION );
             OrganizationUnitSettings profileSettings = (OrganizationUnitSettings) session
@@ -2845,7 +2849,17 @@ public class ProfileManagementController
                 throw new InvalidInputException( "Yelp link passed was invalid", DisplayMessageConstants.GENERAL_ERROR,
                     ioException );
             }
-
+            
+            try {
+                Map<String, Long> hierarchyDetails = profileManagementService.getHierarchyDetailsByEntity( entityType, entityId );
+                branchId = hierarchyDetails.get( CommonConstants.BRANCH_ID_COLUMN );
+                regionId = hierarchyDetails.get( CommonConstants.REGION_ID_COLUMN );
+                companyId = hierarchyDetails.get( CommonConstants.COMPANY_ID_COLUMN );
+                agentId = hierarchyDetails.get( CommonConstants.AGENT_ID_COLUMN );
+            } catch ( ProfileNotFoundException e ) {
+                LOG.error( "Profile not found for user id : " + entityId + " of type : " + entityType, e );
+            }
+            
             if ( entityType.equals( CommonConstants.COMPANY_ID_COLUMN ) ) {
                 OrganizationUnitSettings companySettings = organizationManagementService.getCompanySettings( user );
                 if ( companySettings == null ) {
@@ -2942,6 +2956,21 @@ public class ProfileManagementController
 
             profileSettings.setSocialMediaTokens( socialMediaTokens );
 
+            //Add action to social connection history
+            String action = "connected";
+            SocialUpdateAction socialUpdateAction = new SocialUpdateAction();
+            if ( ( socialMediaTokens != null ) && ( socialMediaTokens.getYelpToken() != null )
+                && ( socialMediaTokens.getYelpToken().getYelpPageLink() != null )
+                && !( socialMediaTokens.getYelpToken().getYelpPageLink().isEmpty() ) )
+                socialUpdateAction.setLink( socialMediaTokens.getYelpToken().getYelpPageLink() );
+            socialUpdateAction.setAction( action );
+            socialUpdateAction.setAgentId( agentId );
+            socialUpdateAction.setBranchId( branchId );
+            socialUpdateAction.setRegionId( regionId );
+            socialUpdateAction.setCompanyId( companyId );
+            socialUpdateAction.setSocialMediaSource( CommonConstants.YELP_SOCIAL_SITE );
+            socialPostDao.addActionToSocialConnectionHistory( socialUpdateAction );
+            
             LOG.info( "YelpLinked in link updated successfully" );
             model.addAttribute( "message", messageUtils.getDisplayMessage(
                 DisplayMessageConstants.YELP_TOKEN_UPDATE_SUCCESSFUL, DisplayMessageType.SUCCESS_MESSAGE ) );
@@ -3246,7 +3275,11 @@ public class ProfileManagementController
         User user = sessionHelper.getCurrentUser();
         HttpSession session = request.getSession( false );
         SocialMediaTokens socialMediaTokens = null;
-
+        long branchId = 0;
+        long regionId = 0;
+        long companyId = 0;
+        long agentId = 0;
+        
         try {
             UserSettings userSettings = (UserSettings) session.getAttribute( CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION );
             OrganizationUnitSettings profileSettings = (OrganizationUnitSettings) session
@@ -3256,7 +3289,17 @@ public class ProfileManagementController
             if ( userSettings == null || profileSettings == null || entityType == null ) {
                 throw new InvalidInputException( "No user settings found in session", DisplayMessageConstants.GENERAL_ERROR );
             }
-
+            
+            try {
+                Map<String, Long> hierarchyDetails = profileManagementService.getHierarchyDetailsByEntity( entityType, entityId );
+                branchId = hierarchyDetails.get( CommonConstants.BRANCH_ID_COLUMN );
+                regionId = hierarchyDetails.get( CommonConstants.REGION_ID_COLUMN );
+                companyId = hierarchyDetails.get( CommonConstants.COMPANY_ID_COLUMN );
+                agentId = hierarchyDetails.get( CommonConstants.AGENT_ID_COLUMN );
+            } catch ( ProfileNotFoundException e ) {
+                LOG.error( "Profile not found for user id : " + entityId + " of type : " + entityType, e );
+            }
+            
             String realtorLink = request.getParameter( "realtorLink" );
             try {
                 if ( realtorLink == null || realtorLink.isEmpty() ) {
@@ -3335,11 +3378,27 @@ public class ProfileManagementController
 
             profileSettings.setSocialMediaTokens( socialMediaTokens );
 
+            //Add action to social connection history
+            String action = "connected";
+            SocialUpdateAction socialUpdateAction = new SocialUpdateAction();
+            if ( ( socialMediaTokens != null ) && ( socialMediaTokens.getRealtorToken() != null )
+                && ( socialMediaTokens.getRealtorToken().getRealtorProfileLink() != null )
+                && !( socialMediaTokens.getRealtorToken().getRealtorProfileLink().isEmpty() ) )
+                socialUpdateAction.setLink( socialMediaTokens.getRealtorToken().getRealtorProfileLink() );
+            socialUpdateAction.setAction( action );
+            socialUpdateAction.setAgentId( agentId );
+            socialUpdateAction.setBranchId( branchId );
+            socialUpdateAction.setRegionId( regionId );
+            socialUpdateAction.setCompanyId( companyId );
+            socialUpdateAction.setSocialMediaSource( CommonConstants.REALTOR_SOCIAL_SITE );
+            
+            socialPostDao.addActionToSocialConnectionHistory( socialUpdateAction );
+            
             LOG.info( "realtor updated successfully" );
             model.addAttribute( "message", messageUtils.getDisplayMessage(
                 DisplayMessageConstants.REALTOR_TOKEN_UPDATE_SUCCESSFUL, DisplayMessageType.SUCCESS_MESSAGE ) );
         } catch ( NonFatalException nonFatalException ) {
-            LOG.error( "NonFatalException while updating ZillowLink in profile. Reason :" + nonFatalException.getMessage(),
+            LOG.error( "NonFatalException while updating RealtorLink in profile. Reason :" + nonFatalException.getMessage(),
                 nonFatalException );
             model.addAttribute( "message", messageUtils.getDisplayMessage(
                 DisplayMessageConstants.REALTOR_TOKEN_UPDATE_UNSUCCESSFUL, DisplayMessageType.ERROR_MESSAGE ) );
@@ -3376,7 +3435,11 @@ public class ProfileManagementController
         User user = sessionHelper.getCurrentUser();
         HttpSession session = request.getSession( false );
         SocialMediaTokens socialMediaTokens = null;
-
+        long branchId = 0;
+        long regionId = 0;
+        long companyId = 0;
+        long agentId = 0;
+        
         try {
             UserSettings userSettings = (UserSettings) session.getAttribute( CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION );
             OrganizationUnitSettings profileSettings = (OrganizationUnitSettings) session
@@ -3386,7 +3449,17 @@ public class ProfileManagementController
             if ( userSettings == null || profileSettings == null || entityType == null ) {
                 throw new InvalidInputException( "No user settings found in session", DisplayMessageConstants.GENERAL_ERROR );
             }
-
+            
+            try {
+                Map<String, Long> hierarchyDetails = profileManagementService.getHierarchyDetailsByEntity( entityType, entityId );
+                branchId = hierarchyDetails.get( CommonConstants.BRANCH_ID_COLUMN );
+                regionId = hierarchyDetails.get( CommonConstants.REGION_ID_COLUMN );
+                companyId = hierarchyDetails.get( CommonConstants.COMPANY_ID_COLUMN );
+                agentId = hierarchyDetails.get( CommonConstants.AGENT_ID_COLUMN );
+            } catch ( ProfileNotFoundException e ) {
+                LOG.error( "Profile not found for user id : " + entityId + " of type : " + entityType, e );
+            }
+            
             String lendingTreeLink = request.getParameter( "lendingTreeLink" );
             try {
                 if ( lendingTreeLink == null || lendingTreeLink.isEmpty() ) {
@@ -3466,6 +3539,22 @@ public class ProfileManagementController
 
             profileSettings.setSocialMediaTokens( socialMediaTokens );
 
+            //Add action to social connection history
+            String action = "connected";
+            SocialUpdateAction socialUpdateAction = new SocialUpdateAction();
+            if ( ( socialMediaTokens != null ) && ( socialMediaTokens.getLendingTreeToken() != null )
+                && ( socialMediaTokens.getLendingTreeToken().getLendingTreeProfileLink() != null )
+                && !( socialMediaTokens.getLendingTreeToken().getLendingTreeProfileLink().isEmpty() ) )
+                socialUpdateAction.setLink( socialMediaTokens.getLendingTreeToken().getLendingTreeProfileLink() );
+            socialUpdateAction.setAction( action );
+            socialUpdateAction.setAgentId( agentId );
+            socialUpdateAction.setBranchId( branchId );
+            socialUpdateAction.setRegionId( regionId );
+            socialUpdateAction.setCompanyId( companyId );
+            socialUpdateAction.setSocialMediaSource( CommonConstants.LENDINGTREE_SOCIAL_SITE );
+            
+            socialPostDao.addActionToSocialConnectionHistory( socialUpdateAction );
+            
             LOG.info( "lendingTree updated successfully" );
             model.addAttribute( "message", messageUtils.getDisplayMessage(
                 DisplayMessageConstants.LENDINGTREE_TOKEN_UPDATE_SUCCESSFUL, DisplayMessageType.SUCCESS_MESSAGE ) );
@@ -3996,7 +4085,7 @@ public class ProfileManagementController
 
 
     @ResponseBody
-    @RequestMapping ( value = "/findaproscroll", method = RequestMethod.POST)
+    @RequestMapping ( value = "/findaproscroll", method = RequestMethod.POST, produces = {"text/plain; charset=UTF-8","*/*;charset=UTF-8"})
     public String findAProfileScroll( Model model, HttpServletRequest request )
     {
         LOG.info( "Method findAProfileScroll called." );
@@ -4044,6 +4133,7 @@ public class ProfileManagementController
 
                 userList.setUsers( users );
                 userList.setUserFound( results.getNumFound() );
+                
             } catch ( MalformedURLException e ) {
                 LOG.error( "Error occured while searching in findAProfileScroll(). Reason is ", e );
                 throw new NonFatalException( "Error occured while searching in findAProfileScroll()", e );

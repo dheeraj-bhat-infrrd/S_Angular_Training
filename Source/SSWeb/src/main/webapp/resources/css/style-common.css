@@ -32,6 +32,14 @@
 	-webkit-tap-highlight-color: rgba(0, 0, 0, 0);
 }
 
+.disable-scroll {
+	left: 0;
+    -webkit-overflow-scrolling: touch;
+    position: fixed;
+    top: 0;
+    width: 100%;
+}
+
 body {
 	/*
     -webkit-touch-callout: none;                
@@ -632,6 +640,20 @@ html.is-modern.card-root.js.no-touch.csstransitions.svg.inlinesvg.placeholder
 	text-transform: uppercase;
 	z-index: 999999;
 	cursor: pointer;
+	font-weight: bold !important;
+}
+
+.profile-image-display {
+	height: 30px;
+	width: 30px;
+	background-color: #5cc7ef;
+	border-radius: 50%;
+	text-align: center;
+	line-height: 30px;
+	position: relative;
+	color: #fff;
+	text-transform: uppercase;
+	z-index: 999999;
 	font-weight: bold !important;
 }
 
@@ -1558,6 +1580,7 @@ button.paypal.is-active {
 }
 
 .prof-btn-survey {
+	display: block;
 	background-color: #3E9DCB;
 	font-size: 14px;
 	height: 35px;
@@ -5229,8 +5252,13 @@ td.v-tbl-line {
 	width: 9%;
 }
 
+td.v-tbl-img {
+	width: 5%;
+}
+
+
 td.v-tbl-name {
-	width: 26%;
+	width: 21%;
 }
 
 td.v-tbl-add {
@@ -7127,8 +7155,12 @@ div.v-tbl-line {
 	width: 9%;
 }
 
+div.v-tbl-img {
+	width: 5%;
+}
+
 div.v-tbl-name {
-	width: 26%;
+	width: 21%;
 }
 
 div.v-tbl-add {
@@ -7537,4 +7569,8 @@ label.url-change-input-label {
 
 .abuse-report-wrapper {
     padding-bottom: 10px;
+}
+
+.dotloop-iframe {
+	max-width: 100%;
 }

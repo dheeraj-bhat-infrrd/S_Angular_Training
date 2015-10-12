@@ -146,6 +146,9 @@ function callAjaxFormSubmit(url, callBackFunction, formId) {
 	var payLoad = $form.serialize();
 	$.ajax({
 		url : url,
+		headers: {          
+            Accept : "text/plain; charset=utf-8"   
+		},
 		type : "POST",
 		data : payLoad,
 		success : callBackFunction,
@@ -180,6 +183,9 @@ function callAjaxPostWithPayloadData(url, callBackFunction, payload, isAsync){
 	}
 	$.ajax({
 		url : url,
+		headers: {          
+            Accept : "text/plain; charset=utf-8"   
+		},
 		type : "POST",
 		data : payload,
 		async : isAsync,
@@ -203,6 +209,9 @@ function callAjaxGetWithPayloadData(url, callBackFunction, payload,isAsync){
 	}
 	$.ajax({
 		url : url,
+		headers: {          
+            Accept : "text/plain; charset=utf-8"   
+		},
 		type : "GET",
 		data : payload,
 		async : isAsync,
@@ -212,6 +221,8 @@ function callAjaxGetWithPayloadData(url, callBackFunction, payload,isAsync){
 			hideOverlay();
 		},
 		error : function(e) {
+			alert(url);
+			if(e.status == 0) return;
 			if(e.status == 504) {
 				redirectToLoginPageOnSessionTimeOut(e.status);
 				return;
@@ -234,7 +245,10 @@ function changeRatingPattern(rating, ratingParent, isOverallRating, source) {
 		ratingIntVal = 1;
 	}
 
-	var roundedFloatingVal = parseFloat(rating).toFixed(3);
+	var roundedFloatingVal = parseFloat(rating).toFixed(1);
+	if (roundedFloatingVal % 1 == 0) {
+		roundedFloatingVal = parseFloat(rating).toFixed(0);
+	}
 	var ratingImgHtml = "";
 	if(source != undefined && source == "Zillow"){
 		ratingImgHtml = "<div class='rating-image float-left icn-zillow' title='Zillow'></div>";

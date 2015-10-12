@@ -609,19 +609,4 @@ public interface ProfileManagementService
     Date convertStringToDate( String dateString );
 
 
-    /**
-     * @param collectionName
-     * @param userProfile
-     * @param companyUnitSettings
-     * @param regionUnitSettings
-     * @param branchUnitSettings
-     * @param agentUnitSettings
-     * @param map
-     * @return
-     */
-    public OrganizationUnitSettings getAutoPostScoreBasedOnHierarchy( String collectionName,
-        OrganizationUnitSettings userProfile, OrganizationUnitSettings companyUnitSettings,
-        OrganizationUnitSettings regionUnitSettings, OrganizationUnitSettings branchUnitSettings,
-        OrganizationUnitSettings agentUnitSettings, Map<SettingsForApplication, OrganizationUnit> map );
-
 }
