@@ -36,6 +36,7 @@ import com.realtech.socialsurvey.core.dao.impl.MongoSocialPostDaoImpl;
 import com.realtech.socialsurvey.core.entities.AccountsMaster;
 import com.realtech.socialsurvey.core.entities.AgentSettings;
 import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
+import com.realtech.socialsurvey.core.entities.SocialPostShared;
 import com.realtech.socialsurvey.core.entities.SurveyDetails;
 import com.realtech.socialsurvey.core.entities.SurveyPreInitiation;
 import com.realtech.socialsurvey.core.entities.SurveyQuestionDetails;
@@ -134,7 +135,7 @@ public class SurveyManagementController
 
     @Value ( "${GATEWAY_QUESTION}")
     private String gatewayQuestion;
-    
+
     @Value ( "${APPLICATION_SUPPORT_EMAIL}")
     private String applicationSupportEmail;
 
@@ -427,26 +428,28 @@ public class SurveyManagementController
             model.addAttribute( "source", source );
 
             User user = userManagementService.getUserByUserId( agentId );
-            
-            try{
+
+            try {
                 surveyHandler.initiateSurveyRequest( user.getUserId(), customerEmail, firstName, lastName, source );
-            }catch(SelfSurveyInitiationException e){
+            } catch ( SelfSurveyInitiationException e ) {
                 errorMsg = messageUtils.getDisplayMessage( DisplayMessageConstants.SELF_SURVEY_INITIATION,
                     DisplayMessageType.ERROR_MESSAGE ).getMessage();
-                throw new NonFatalException( e.getMessage() , e.getErrorCode() );
-            }catch(DuplicateSurveyRequestException e){
+                throw new NonFatalException( e.getMessage(), e.getErrorCode() );
+            } catch ( DuplicateSurveyRequestException e ) {
                 errorMsg = messageUtils.getDisplayMessage( DisplayMessageConstants.DUPLICATE_SURVEY_REQUEST,
                     DisplayMessageType.ERROR_MESSAGE ).getMessage();
-                throw new NonFatalException( e.getMessage() , e.getErrorCode() );
+                throw new NonFatalException( e.getMessage(), e.getErrorCode() );
             }
 
         } catch ( NonFatalException e ) {
             LOG.error( "Exception caught in getSurvey() method of SurveyManagementController." );
             model.addAttribute( "status", DisplayMessageType.ERROR_MESSAGE );
-            if(errorMsg != null)
+            if ( errorMsg != null )
                 model.addAttribute( "message", errorMsg );
             else
-                model.addAttribute( "message", messageUtils.getDisplayMessage( DisplayMessageConstants.INVALID_CAPTCHA, DisplayMessageType.ERROR_MESSAGE ) );
+                model
+                    .addAttribute( "message", messageUtils.getDisplayMessage( DisplayMessageConstants.INVALID_CAPTCHA,
+                        DisplayMessageType.ERROR_MESSAGE ) );
             model.addAttribute( "agentId", agentId );
             model.addAttribute( "agentName", agentName );
             model.addAttribute( "firstName", firstName );
@@ -558,9 +561,51 @@ public class SurveyManagementController
                     + agent.getFirstName() );
             }
 
-            List<OrganizationUnitSettings> settings = socialManagementService
+            Map<String, List<OrganizationUnitSettings>> settingsMap = socialManagementService
                 .getSettingsForBranchesAndRegionsInHierarchy( agentId );
+            List<OrganizationUnitSettings> companySettings = settingsMap
+                .get( MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION );
+            List<OrganizationUnitSettings> regionSettings = settingsMap
+                .get( MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION );
+            List<OrganizationUnitSettings> branchSettings = settingsMap
+                .get( MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION );
+
             AgentSettings agentSettings = userManagementService.getUserSettings( agentId );
+            List<SurveyDetails> surveys = surveyHandler.getSurveyDetailsByAgentAndCompany( companySettings.get( 0 ).getIden() );
+            SocialPostShared socialPostShared = null;
+            for ( SurveyDetails surveyDetail : surveys ) {
+                if ( surveyDetail.getSocialPostShared() != null ) {
+                    socialPostShared = surveyDetail.getSocialPostShared();
+                    break;
+                }
+            }
+
+            if ( socialPostShared == null ) {
+                socialPostShared = new SocialPostShared();
+                socialPostShared.setCompanyId( companySettings.get( 0 ).getIden() );
+            }
+
+
+            Map<String, Map<Long, List<String>>> postSharedOn = socialPostShared.getPostSharedOn();
+            if ( postSharedOn == null ) {
+                postSharedOn = new HashMap<String, Map<Long, List<String>>>();
+            }
+            Map<Long, List<String>> companySharedOn = postSharedOn.get( CommonConstants.COMPANY_ID_COLUMN );
+            if ( companySharedOn == null ) {
+                companySharedOn = new HashMap<Long, List<String>>();
+            }
+            Map<Long, List<String>> regionSharedOn = postSharedOn.get( CommonConstants.REGION_ID_COLUMN );
+            if ( regionSharedOn == null ) {
+                regionSharedOn = new HashMap<Long, List<String>>();
+            }
+            Map<Long, List<String>> branchSharedOn = postSharedOn.get( CommonConstants.BRANCH_ID_COLUMN );
+            if ( branchSharedOn == null ) {
+                branchSharedOn = new HashMap<Long, List<String>>();
+            }
+            Map<Long, List<String>> agentSharedOn = postSharedOn.get( CommonConstants.AGENT_ID_COLUMN );
+            if ( agentSharedOn == null ) {
+                agentSharedOn = new HashMap<Long, List<String>>();
+            }
 
             // Facebook
             String facebookMessage = ratingFormat.format( rating ) + "-Star Survey Response from " + customerDisplayName
@@ -571,6 +616,14 @@ public class SurveyManagementController
                 if ( !socialManagementService.updateStatusIntoFacebookPage( agentSettings, facebookMessage, serverBaseUrl,
                     agent.getCompany().getCompanyId() ) ) {
                     surveyHandler.updateSharedOn( CommonConstants.FACEBOOK_SOCIAL_SITE, agentId, customerEmail );
+                    List<String> socialSiteSharedOn = agentSharedOn.get( agentId );
+                    if ( socialSiteSharedOn == null ) {
+                        socialSiteSharedOn = new ArrayList<String>();
+                    }
+                    if ( !socialSiteSharedOn.contains( CommonConstants.FACEBOOK_SOCIAL_SITE ) ) {
+                        socialSiteSharedOn.add( CommonConstants.FACEBOOK_SOCIAL_SITE );
+                    }
+                    agentSharedOn.put( agentId, socialSiteSharedOn );
                 }
             } catch ( FacebookException e ) {
                 LOG.error(
@@ -578,11 +631,59 @@ public class SurveyManagementController
                 reportBug( "Facebook", agentSettings.getContact_details().getName(), e );
             }
             if ( accountMasterId != CommonConstants.ACCOUNTS_MASTER_INDIVIDUAL ) {
-                for ( OrganizationUnitSettings setting : settings ) {
+                for ( OrganizationUnitSettings setting : companySettings ) {
                     try {
                         if ( !socialManagementService.updateStatusIntoFacebookPage( setting, facebookMessage, serverBaseUrl,
                             agent.getCompany().getCompanyId() ) ) {
                             surveyHandler.updateSharedOn( CommonConstants.FACEBOOK_SOCIAL_SITE, agentId, customerEmail );
+                            List<String> socialSiteSharedOn = companySharedOn.get( setting.getIden() );
+                            if ( socialSiteSharedOn == null ) {
+                                socialSiteSharedOn = new ArrayList<String>();
+                            }
+                            if ( !socialSiteSharedOn.contains( CommonConstants.FACEBOOK_SOCIAL_SITE ) ) {
+                                socialSiteSharedOn.add( CommonConstants.FACEBOOK_SOCIAL_SITE );
+                            }
+                            companySharedOn.put( setting.getIden(), socialSiteSharedOn );
+                        }
+                    } catch ( FacebookException e ) {
+                        LOG.error(
+                            "FacebookException caught in postToSocialMedia() while trying to post to facebook. Nested excption is ",
+                            e );
+                    }
+                }
+                for ( OrganizationUnitSettings setting : regionSettings ) {
+                    try {
+                        if ( !socialManagementService.updateStatusIntoFacebookPage( setting, facebookMessage, serverBaseUrl,
+                            agent.getCompany().getCompanyId() ) ) {
+                            surveyHandler.updateSharedOn( CommonConstants.FACEBOOK_SOCIAL_SITE, agentId, customerEmail );
+                            List<String> socialSiteSharedOn = regionSharedOn.get( setting.getIden() );
+                            if ( socialSiteSharedOn == null ) {
+                                socialSiteSharedOn = new ArrayList<String>();
+                            }
+                            if ( !socialSiteSharedOn.contains( CommonConstants.FACEBOOK_SOCIAL_SITE ) ) {
+                                socialSiteSharedOn.add( CommonConstants.FACEBOOK_SOCIAL_SITE );
+                            }
+                            regionSharedOn.put( setting.getIden(), socialSiteSharedOn );
+                        }
+                    } catch ( FacebookException e ) {
+                        LOG.error(
+                            "FacebookException caught in postToSocialMedia() while trying to post to facebook. Nested excption is ",
+                            e );
+                    }
+                }
+                for ( OrganizationUnitSettings setting : branchSettings ) {
+                    try {
+                        if ( !socialManagementService.updateStatusIntoFacebookPage( setting, facebookMessage, serverBaseUrl,
+                            agent.getCompany().getCompanyId() ) ) {
+                            surveyHandler.updateSharedOn( CommonConstants.FACEBOOK_SOCIAL_SITE, agentId, customerEmail );
+                            List<String> socialSiteSharedOn = branchSharedOn.get( setting.getIden() );
+                            if ( socialSiteSharedOn == null ) {
+                                socialSiteSharedOn = new ArrayList<String>();
+                            }
+                            if ( !socialSiteSharedOn.contains( CommonConstants.FACEBOOK_SOCIAL_SITE ) ) {
+                                socialSiteSharedOn.add( CommonConstants.FACEBOOK_SOCIAL_SITE );
+                            }
+                            branchSharedOn.put( setting.getIden(), socialSiteSharedOn );
                         }
                     } catch ( FacebookException e ) {
                         LOG.error(
@@ -601,12 +702,58 @@ public class SurveyManagementController
             if ( !socialManagementService.updateLinkedin( agentSettings, linkedinMessage, linkedinProfileUrl,
                 linkedinMessageFeedback ) ) {
                 surveyHandler.updateSharedOn( CommonConstants.LINKEDIN_SOCIAL_SITE, agentId, customerEmail );
+                List<String> socialSiteSharedOn = agentSharedOn.get( agentId );
+                if ( socialSiteSharedOn == null ) {
+                    socialSiteSharedOn = new ArrayList<String>();
+                }
+                if ( !socialSiteSharedOn.contains( CommonConstants.LINKEDIN_SOCIAL_SITE ) ) {
+                    socialSiteSharedOn.add( CommonConstants.LINKEDIN_SOCIAL_SITE );
+                }
+                agentSharedOn.put( agentId, socialSiteSharedOn );
             }
             if ( accountMasterId != CommonConstants.ACCOUNTS_MASTER_INDIVIDUAL ) {
-                for ( OrganizationUnitSettings setting : settings ) {
+                for ( OrganizationUnitSettings setting : companySettings ) {
                     if ( !socialManagementService.updateLinkedin( setting, linkedinMessage, linkedinProfileUrl,
                         linkedinMessageFeedback ) ) {
                         surveyHandler.updateSharedOn( CommonConstants.LINKEDIN_SOCIAL_SITE, agentId, customerEmail );
+                        List<String> socialSiteSharedOn = companySharedOn.get( setting.getIden() );
+                        if ( socialSiteSharedOn == null ) {
+                            socialSiteSharedOn = new ArrayList<String>();
+                        }
+                        if ( !socialSiteSharedOn.contains( CommonConstants.LINKEDIN_SOCIAL_SITE ) ) {
+                            socialSiteSharedOn.add( CommonConstants.LINKEDIN_SOCIAL_SITE );
+                        }
+                        companySharedOn.put( setting.getIden(), socialSiteSharedOn );
+                    }
+                }
+                for ( OrganizationUnitSettings setting : regionSettings ) {
+                    if ( !socialManagementService.updateLinkedin( setting, linkedinMessage, linkedinProfileUrl,
+                        linkedinMessageFeedback ) ) {
+                        surveyHandler.updateSharedOn( CommonConstants.LINKEDIN_SOCIAL_SITE, agentId, customerEmail );
+                        List<String> socialSiteSharedOn = regionSharedOn.get( setting.getIden() );
+                        if ( socialSiteSharedOn == null ) {
+                            socialSiteSharedOn = new ArrayList<String>();
+                        }
+                        if ( !socialSiteSharedOn.contains( CommonConstants.LINKEDIN_SOCIAL_SITE ) ) {
+                            socialSiteSharedOn.add( CommonConstants.LINKEDIN_SOCIAL_SITE );
+                        }
+
+                        regionSharedOn.put( setting.getIden(), socialSiteSharedOn );
+                    }
+                }
+                for ( OrganizationUnitSettings setting : branchSettings ) {
+                    if ( !socialManagementService.updateLinkedin( setting, linkedinMessage, linkedinProfileUrl,
+                        linkedinMessageFeedback ) ) {
+                        surveyHandler.updateSharedOn( CommonConstants.LINKEDIN_SOCIAL_SITE, agentId, customerEmail );
+                        List<String> socialSiteSharedOn = branchSharedOn.get( setting.getIden() );
+                        if ( socialSiteSharedOn == null ) {
+                            socialSiteSharedOn = new ArrayList<String>();
+                        }
+                        if ( !socialSiteSharedOn.contains( CommonConstants.LINKEDIN_SOCIAL_SITE ) ) {
+                            socialSiteSharedOn.add( CommonConstants.LINKEDIN_SOCIAL_SITE );
+                        }
+
+                        branchSharedOn.put( setting.getIden(), socialSiteSharedOn );
                     }
                 }
             }
@@ -625,6 +772,15 @@ public class SurveyManagementController
             try {
                 if ( !socialManagementService.tweet( agentSettings, twitterMessage, agent.getCompany().getCompanyId() ) ) {
                     surveyHandler.updateSharedOn( CommonConstants.TWITTER_SOCIAL_SITE, agentId, customerEmail );
+                    List<String> socialSiteSharedOn = agentSharedOn.get( agentId );
+                    if ( socialSiteSharedOn == null ) {
+                        socialSiteSharedOn = new ArrayList<String>();
+                    }
+                    if ( !socialSiteSharedOn.contains( CommonConstants.TWITTER_SOCIAL_SITE ) ) {
+                        socialSiteSharedOn.add( CommonConstants.TWITTER_SOCIAL_SITE );
+                    }
+
+                    agentSharedOn.put( agentId, socialSiteSharedOn );
                 }
             } catch ( TwitterException e ) {
                 LOG.error(
@@ -632,10 +788,58 @@ public class SurveyManagementController
                 reportBug( "Twitter", agentSettings.getContact_details().getName(), e );
             }
             if ( accountMasterId != CommonConstants.ACCOUNTS_MASTER_INDIVIDUAL ) {
-                for ( OrganizationUnitSettings setting : settings ) {
+                for ( OrganizationUnitSettings setting : companySettings ) {
                     try {
                         if ( !socialManagementService.tweet( setting, twitterMessage, agent.getCompany().getCompanyId() ) ) {
                             surveyHandler.updateSharedOn( CommonConstants.TWITTER_SOCIAL_SITE, agentId, customerEmail );
+                            List<String> socialSiteSharedOn = companySharedOn.get( setting.getIden() );
+                            if ( socialSiteSharedOn == null ) {
+                                socialSiteSharedOn = new ArrayList<String>();
+                            }
+                            if ( !socialSiteSharedOn.contains( CommonConstants.TWITTER_SOCIAL_SITE ) ) {
+                                socialSiteSharedOn.add( CommonConstants.TWITTER_SOCIAL_SITE );
+                            }
+
+                            companySharedOn.put( setting.getIden(), socialSiteSharedOn );
+                        }
+                    } catch ( TwitterException e ) {
+                        LOG.error(
+                            "TwitterException caught in postToSocialMedia() while trying to post to twitter. Nested excption is ",
+                            e );
+                    }
+                }
+                for ( OrganizationUnitSettings setting : regionSettings ) {
+                    try {
+                        if ( !socialManagementService.tweet( setting, twitterMessage, agent.getCompany().getCompanyId() ) ) {
+                            surveyHandler.updateSharedOn( CommonConstants.TWITTER_SOCIAL_SITE, agentId, customerEmail );
+                            List<String> socialSiteSharedOn = regionSharedOn.get( setting.getIden() );
+                            if ( socialSiteSharedOn == null ) {
+                                socialSiteSharedOn = new ArrayList<String>();
+                            }
+                            if ( !socialSiteSharedOn.contains( CommonConstants.TWITTER_SOCIAL_SITE ) ) {
+                                socialSiteSharedOn.add( CommonConstants.TWITTER_SOCIAL_SITE );
+                            }
+
+                            regionSharedOn.put( setting.getIden(), socialSiteSharedOn );
+                        }
+                    } catch ( TwitterException e ) {
+                        LOG.error(
+                            "TwitterException caught in postToSocialMedia() while trying to post to twitter. Nested excption is ",
+                            e );
+                    }
+                }
+                for ( OrganizationUnitSettings setting : branchSettings ) {
+                    try {
+                        if ( !socialManagementService.tweet( setting, twitterMessage, agent.getCompany().getCompanyId() ) ) {
+                            surveyHandler.updateSharedOn( CommonConstants.TWITTER_SOCIAL_SITE, agentId, customerEmail );
+                            List<String> socialSiteSharedOn = branchSharedOn.get( setting.getIden() );
+                            if ( socialSiteSharedOn == null ) {
+                                socialSiteSharedOn = new ArrayList<String>();
+                            }
+                            if ( !socialSiteSharedOn.contains( CommonConstants.TWITTER_SOCIAL_SITE ) ) {
+                                socialSiteSharedOn.add( CommonConstants.TWITTER_SOCIAL_SITE );
+                            }
+                            branchSharedOn.put( setting.getIden(), socialSiteSharedOn );
                         }
                     } catch ( TwitterException e ) {
                         LOG.error(
@@ -644,6 +848,12 @@ public class SurveyManagementController
                         reportBug( "Twitter", accountMasterName, e );
                     }
                 }
+            }
+            socialPostShared = surveyHandler.calcualteFinalCount( socialPostShared, agentSharedOn, branchSharedOn,
+                regionSharedOn, companySharedOn, regionSettings, branchSettings );
+            for ( SurveyDetails surveyDetails : surveys ) {
+                surveyDetails.setSocialPostShared( socialPostShared );
+                surveyHandler.updateSurveyDetails( surveyDetails );
             }
         } catch ( NonFatalException e ) {
             LOG.error(
@@ -686,16 +896,60 @@ public class SurveyManagementController
                     e );
                 return e.getMessage();
             }
+
             DecimalFormat ratingFormat = CommonConstants.SOCIAL_RANKING_FORMAT;
             if ( rating % 1 == 0 ) {
                 ratingFormat = CommonConstants.SOCIAL_RANKING_WHOLE_FORMAT;
             }
-            List<OrganizationUnitSettings> settings = socialManagementService
+
+
+            Map<String, List<OrganizationUnitSettings>> settingsMap = socialManagementService
                 .getSettingsForBranchesAndRegionsInHierarchy( agentId );
+            List<OrganizationUnitSettings> companySettings = settingsMap
+                .get( MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION );
+            List<OrganizationUnitSettings> regionSettings = settingsMap
+                .get( MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION );
+            List<OrganizationUnitSettings> branchSettings = settingsMap
+                .get( MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION );
             AgentSettings agentSettings = userManagementService.getUserSettings( agentId );
+
+            List<SurveyDetails> surveys = surveyHandler.getSurveyDetailsByAgentAndCompany( companySettings.get( 0 ).getIden() );
+            SocialPostShared socialPostShared = null;
+            for ( SurveyDetails surveyDetail : surveys ) {
+                if ( surveyDetail.getSocialPostShared() != null ) {
+                    socialPostShared = surveyDetail.getSocialPostShared();
+                    break;
+                }
+            }
+            if ( socialPostShared == null ) {
+                socialPostShared = new SocialPostShared();
+                socialPostShared.setCompanyId( companySettings.get( 0 ).getIden() );
+            }
+            Map<String, Map<Long, List<String>>> postSharedOn = socialPostShared.getPostSharedOn();
+            if ( postSharedOn == null ) {
+                postSharedOn = new HashMap<String, Map<Long, List<String>>>();
+            }
+            Map<Long, List<String>> companySharedOn = postSharedOn.get( CommonConstants.COMPANY_ID_COLUMN );
+            if ( companySharedOn == null ) {
+                companySharedOn = new HashMap<Long, List<String>>();
+            }
+            Map<Long, List<String>> regionSharedOn = postSharedOn.get( CommonConstants.REGION_ID_COLUMN );
+            if ( regionSharedOn == null ) {
+                regionSharedOn = new HashMap<Long, List<String>>();
+            }
+            Map<Long, List<String>> branchSharedOn = postSharedOn.get( CommonConstants.BRANCH_ID_COLUMN );
+            if ( branchSharedOn == null ) {
+                branchSharedOn = new HashMap<Long, List<String>>();
+            }
+            Map<Long, List<String>> agentSharedOn = postSharedOn.get( CommonConstants.AGENT_ID_COLUMN );
+            if ( agentSharedOn == null ) {
+                agentSharedOn = new HashMap<Long, List<String>>();
+            }
+
             String facebookMessage = ratingFormat.format( rating ) + "-Star Survey Response from " + customerDisplayName
                 + " for " + agentName + " on Social Survey - view at " + getApplicationBaseUrl()
                 + CommonConstants.AGENT_PROFILE_FIXED_URL + agentProfileLink;
+
             // TODO: Bad code: DELETE: BEGIN
             // get the company id of the agent
             User user = userManagementService.getUserObjByUserId( agentId );
@@ -704,19 +958,79 @@ public class SurveyManagementController
                     .getCompany().getCompanyId() );
                 // TODO: Bad code: Remove the comany id from the parameter: End
                 surveyHandler.updateSharedOn( CommonConstants.FACEBOOK_SOCIAL_SITE, agentId, customerEmail );
+                List<String> socialSiteSharedOn = agentSharedOn.get( agentId );
+                if ( socialSiteSharedOn == null ) {
+                    socialSiteSharedOn = new ArrayList<String>();
+                }
+                if ( !socialSiteSharedOn.contains( CommonConstants.FACEBOOK_SOCIAL_SITE ) ) {
+                    socialSiteSharedOn.add( CommonConstants.FACEBOOK_SOCIAL_SITE );
+                }
+                agentSharedOn.put( agentId, socialSiteSharedOn );
             } catch ( FacebookException e ) {
                 LOG.error(
                     "FacebookException caught in postToSocialMedia() while trying to post to facebook. Nested excption is ", e );
             }
-            for ( OrganizationUnitSettings setting : settings ) {
+            for ( OrganizationUnitSettings setting : companySettings ) {
                 try {
                     socialManagementService.updateStatusIntoFacebookPage( setting, facebookMessage, serverBaseUrl, user
                         .getCompany().getCompanyId() );
+                    List<String> socialSiteSharedOn = companySharedOn.get( setting.getIden() );
+                    if ( socialSiteSharedOn == null ) {
+                        socialSiteSharedOn = new ArrayList<String>();
+                    }
+                    if ( !socialSiteSharedOn.contains( CommonConstants.FACEBOOK_SOCIAL_SITE ) ) {
+                        socialSiteSharedOn.add( CommonConstants.FACEBOOK_SOCIAL_SITE );
+                    }
+                    companySharedOn.put( setting.getIden(), socialSiteSharedOn );
+
+
                 } catch ( FacebookException e ) {
                     LOG.error(
                         "FacebookException caught in postToSocialMedia() while trying to post to facebook. Nested excption is ",
                         e );
                 }
+            }
+            for ( OrganizationUnitSettings setting : regionSettings ) {
+                try {
+                    socialManagementService.updateStatusIntoFacebookPage( setting, facebookMessage, serverBaseUrl, user
+                        .getCompany().getCompanyId() );
+                    List<String> socialSiteSharedOn = regionSharedOn.get( setting.getIden() );
+                    if ( socialSiteSharedOn == null ) {
+                        socialSiteSharedOn = new ArrayList<String>();
+                    }
+                    if ( !socialSiteSharedOn.contains( CommonConstants.FACEBOOK_SOCIAL_SITE ) ) {
+                        socialSiteSharedOn.add( CommonConstants.FACEBOOK_SOCIAL_SITE );
+                    }
+                    regionSharedOn.put( setting.getIden(), socialSiteSharedOn );
+                } catch ( FacebookException e ) {
+                    LOG.error(
+                        "FacebookException caught in postToSocialMedia() while trying to post to facebook. Nested excption is ",
+                        e );
+                }
+            }
+            for ( OrganizationUnitSettings setting : branchSettings ) {
+                try {
+                    socialManagementService.updateStatusIntoFacebookPage( setting, facebookMessage, serverBaseUrl, user
+                        .getCompany().getCompanyId() );
+                    List<String> socialSiteSharedOn = branchSharedOn.get( setting.getIden() );
+                    if ( socialSiteSharedOn == null ) {
+                        socialSiteSharedOn = new ArrayList<String>();
+                    }
+                    if ( !socialSiteSharedOn.contains( CommonConstants.FACEBOOK_SOCIAL_SITE ) ) {
+                        socialSiteSharedOn.add( CommonConstants.FACEBOOK_SOCIAL_SITE );
+                    }
+                    branchSharedOn.put( setting.getIden(), socialSiteSharedOn );
+                } catch ( FacebookException e ) {
+                    LOG.error(
+                        "FacebookException caught in postToSocialMedia() while trying to post to facebook. Nested excption is ",
+                        e );
+                }
+            }
+            socialPostShared = surveyHandler.calcualteFinalCount( socialPostShared, agentSharedOn, branchSharedOn,
+                regionSharedOn, companySharedOn, regionSettings, branchSettings );
+            for ( SurveyDetails surveyDetails : surveys ) {
+                surveyDetails.setSocialPostShared( socialPostShared );
+                surveyHandler.updateSurveyDetails( surveyDetails );
             }
         } catch ( NonFatalException e ) {
             LOG.error( "NonFatalException caught in postToFacebook(). Nested exception is ", e );
@@ -754,13 +1068,55 @@ public class SurveyManagementController
                     e );
                 return e.getMessage();
             }
+
+
             DecimalFormat ratingFormat = CommonConstants.SOCIAL_RANKING_FORMAT;
             if ( rating % 1 == 0 ) {
                 ratingFormat = CommonConstants.SOCIAL_RANKING_WHOLE_FORMAT;
             }
-            List<OrganizationUnitSettings> settings = socialManagementService
+
+            Map<String, List<OrganizationUnitSettings>> settingsMap = socialManagementService
                 .getSettingsForBranchesAndRegionsInHierarchy( agentId );
+            List<OrganizationUnitSettings> companySettings = settingsMap
+                .get( MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION );
+            List<OrganizationUnitSettings> regionSettings = settingsMap
+                .get( MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION );
+            List<OrganizationUnitSettings> branchSettings = settingsMap
+                .get( MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION );
             AgentSettings agentSettings = userManagementService.getUserSettings( agentId );
+            List<SurveyDetails> surveys = surveyHandler.getSurveyDetailsByAgentAndCompany( companySettings.get( 0 ).getIden() );
+            SocialPostShared socialPostShared = null;
+            for ( SurveyDetails surveyDetail : surveys ) {
+                if ( surveyDetail.getSocialPostShared() != null ) {
+                    socialPostShared = surveyDetail.getSocialPostShared();
+                    break;
+                }
+            }
+            if ( socialPostShared == null ) {
+                socialPostShared = new SocialPostShared();
+                socialPostShared.setCompanyId( companySettings.get( 0 ).getIden() );
+            }
+            Map<String, Map<Long, List<String>>> postSharedOn = socialPostShared.getPostSharedOn();
+            if ( postSharedOn == null ) {
+                postSharedOn = new HashMap<String, Map<Long, List<String>>>();
+            }
+            Map<Long, List<String>> companySharedOn = postSharedOn.get( CommonConstants.COMPANY_ID_COLUMN );
+            if ( companySharedOn == null ) {
+                companySharedOn = new HashMap<Long, List<String>>();
+            }
+            Map<Long, List<String>> regionSharedOn = postSharedOn.get( CommonConstants.REGION_ID_COLUMN );
+            if ( regionSharedOn == null ) {
+                regionSharedOn = new HashMap<Long, List<String>>();
+            }
+            Map<Long, List<String>> branchSharedOn = postSharedOn.get( CommonConstants.BRANCH_ID_COLUMN );
+            if ( branchSharedOn == null ) {
+                branchSharedOn = new HashMap<Long, List<String>>();
+            }
+            Map<Long, List<String>> agentSharedOn = postSharedOn.get( CommonConstants.AGENT_ID_COLUMN );
+            if ( agentSharedOn == null ) {
+                agentSharedOn = new HashMap<Long, List<String>>();
+            }
+
             /*
              * String twitterMessage = rating + "-Star Survey Response from " + customerDisplayName
              * + " for " + agentName + " on @SocialSurveyMe - view at " + getApplicationBaseUrl() +
@@ -776,16 +1132,74 @@ public class SurveyManagementController
             try {
                 socialManagementService.tweet( agentSettings, twitterMessage, user.getCompany().getCompanyId() );
                 surveyHandler.updateSharedOn( CommonConstants.TWITTER_SOCIAL_SITE, agentId, customerEmail );
+                List<String> socialSiteSharedOn = agentSharedOn.get( agentId );
+                if ( socialSiteSharedOn == null ) {
+                    socialSiteSharedOn = new ArrayList<String>();
+                }
+                if ( !socialSiteSharedOn.contains( CommonConstants.TWITTER_SOCIAL_SITE ) ) {
+                    socialSiteSharedOn.add( CommonConstants.TWITTER_SOCIAL_SITE );
+                }
+                agentSharedOn.put( agentId, socialSiteSharedOn );
+
             } catch ( TwitterException e ) {
                 LOG.error( "TwitterException caught in postToTwitter() while trying to post to twitter. Nested excption is ", e );
             }
-            for ( OrganizationUnitSettings setting : settings ) {
+            for ( OrganizationUnitSettings setting : companySettings ) {
                 try {
                     socialManagementService.tweet( setting, twitterMessage, user.getCompany().getCompanyId() );
+                    List<String> socialSiteSharedOn = companySharedOn.get( setting.getIden() );
+                    if ( socialSiteSharedOn == null ) {
+                        socialSiteSharedOn = new ArrayList<String>();
+                    }
+                    if ( !socialSiteSharedOn.contains( CommonConstants.TWITTER_SOCIAL_SITE ) ) {
+                        socialSiteSharedOn.add( CommonConstants.TWITTER_SOCIAL_SITE );
+                    }
+                    companySharedOn.put( setting.getIden(), socialSiteSharedOn );
+
                 } catch ( TwitterException e ) {
                     LOG.error(
                         "TwitterException caught in postToTwitter() while trying to post to twitter. Nested excption is ", e );
                 }
+            }
+            for ( OrganizationUnitSettings setting : regionSettings ) {
+                try {
+                    socialManagementService.tweet( setting, twitterMessage, user.getCompany().getCompanyId() );
+                    List<String> socialSiteSharedOn = regionSharedOn.get( setting.getIden() );
+                    if ( socialSiteSharedOn == null ) {
+                        socialSiteSharedOn = new ArrayList<String>();
+                    }
+                    if ( !socialSiteSharedOn.contains( CommonConstants.TWITTER_SOCIAL_SITE ) ) {
+                        socialSiteSharedOn.add( CommonConstants.TWITTER_SOCIAL_SITE );
+                    }
+                    regionSharedOn.put( setting.getIden(), socialSiteSharedOn );
+
+                } catch ( TwitterException e ) {
+                    LOG.error(
+                        "TwitterException caught in postToTwitter() while trying to post to twitter. Nested excption is ", e );
+                }
+            }
+            for ( OrganizationUnitSettings setting : branchSettings ) {
+                try {
+                    socialManagementService.tweet( setting, twitterMessage, user.getCompany().getCompanyId() );
+                    List<String> socialSiteSharedOn = branchSharedOn.get( setting.getIden() );
+                    if ( socialSiteSharedOn == null ) {
+                        socialSiteSharedOn = new ArrayList<String>();
+                    }
+                    if ( !socialSiteSharedOn.contains( CommonConstants.TWITTER_SOCIAL_SITE ) ) {
+                        socialSiteSharedOn.add( CommonConstants.TWITTER_SOCIAL_SITE );
+                    }
+                    branchSharedOn.put( setting.getIden(), socialSiteSharedOn );
+                } catch ( TwitterException e ) {
+                    LOG.error(
+                        "TwitterException caught in postToTwitter() while trying to post to twitter. Nested excption is ", e );
+                }
+            }
+
+            socialPostShared = surveyHandler.calcualteFinalCount( socialPostShared, agentSharedOn, branchSharedOn,
+                regionSharedOn, companySharedOn, regionSettings, branchSettings );
+            for ( SurveyDetails surveyDetails : surveys ) {
+                surveyDetails.setSocialPostShared( socialPostShared );
+                surveyHandler.updateSurveyDetails( surveyDetails );
             }
         } catch ( NonFatalException e ) {
             LOG.error( "NonFatalException caught in postToTwitter(). Nested exception is ", e );
@@ -824,22 +1238,111 @@ public class SurveyManagementController
                     e );
                 return e.getMessage();
             }
+
+
             DecimalFormat ratingFormat = CommonConstants.SOCIAL_RANKING_FORMAT;
             if ( rating % 1 == 0 ) {
                 ratingFormat = CommonConstants.SOCIAL_RANKING_WHOLE_FORMAT;
             }
-            List<OrganizationUnitSettings> settings = socialManagementService
+            Map<String, List<OrganizationUnitSettings>> settingsMap = socialManagementService
                 .getSettingsForBranchesAndRegionsInHierarchy( agentId );
+            List<OrganizationUnitSettings> companySettings = settingsMap
+                .get( MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION );
+            List<OrganizationUnitSettings> regionSettings = settingsMap
+                .get( MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION );
+            List<OrganizationUnitSettings> branchSettings = settingsMap
+                .get( MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION );
             AgentSettings agentSettings = userManagementService.getUserSettings( agentId );
+
+            List<SurveyDetails> surveys = surveyHandler.getSurveyDetailsByAgentAndCompany( companySettings.get( 0 ).getIden() );
+            SocialPostShared socialPostShared = null;
+            for ( SurveyDetails surveyDetail : surveys ) {
+                if ( surveyDetail.getSocialPostShared() != null ) {
+                    socialPostShared = surveyDetail.getSocialPostShared();
+                    break;
+                }
+            }
+            if ( socialPostShared == null ) {
+                socialPostShared = new SocialPostShared();
+                socialPostShared.setCompanyId( companySettings.get( 0 ).getIden() );
+            }
+            Map<String, Map<Long, List<String>>> postSharedOn = socialPostShared.getPostSharedOn();
+            if ( postSharedOn == null ) {
+                postSharedOn = new HashMap<String, Map<Long, List<String>>>();
+            }
+            Map<Long, List<String>> companySharedOn = postSharedOn.get( CommonConstants.COMPANY_ID_COLUMN );
+            if ( companySharedOn == null ) {
+                companySharedOn = new HashMap<Long, List<String>>();
+            }
+            Map<Long, List<String>> regionSharedOn = postSharedOn.get( CommonConstants.REGION_ID_COLUMN );
+            if ( regionSharedOn == null ) {
+                regionSharedOn = new HashMap<Long, List<String>>();
+            }
+            Map<Long, List<String>> branchSharedOn = postSharedOn.get( CommonConstants.BRANCH_ID_COLUMN );
+            if ( branchSharedOn == null ) {
+                branchSharedOn = new HashMap<Long, List<String>>();
+            }
+            Map<Long, List<String>> agentSharedOn = postSharedOn.get( CommonConstants.AGENT_ID_COLUMN );
+            if ( agentSharedOn == null ) {
+                agentSharedOn = new HashMap<Long, List<String>>();
+            }
+
             String message = ratingFormat.format( rating ) + "-Star Survey Response from " + customerDisplayName + " for "
                 + agentName + " on SocialSurvey ";
+
             String linkedinProfileUrl = getApplicationBaseUrl() + CommonConstants.AGENT_PROFILE_FIXED_URL + agentProfileLink;
             String linkedinMessageFeedback = "From : " + customerDisplayName + " " + feedback;
             socialManagementService.updateLinkedin( agentSettings, message, linkedinProfileUrl, linkedinMessageFeedback );
-            for ( OrganizationUnitSettings setting : settings ) {
+            List<String> agentSocialSiteSharedOn = agentSharedOn.get( agentId );
+            if ( agentSocialSiteSharedOn == null ) {
+                agentSocialSiteSharedOn = new ArrayList<String>();
+            }
+            if ( !agentSocialSiteSharedOn.contains( CommonConstants.LINKEDIN_SOCIAL_SITE ) ) {
+                agentSocialSiteSharedOn.add( CommonConstants.LINKEDIN_SOCIAL_SITE );
+            }
+            agentSharedOn.put( agentId, agentSocialSiteSharedOn );
+
+            for ( OrganizationUnitSettings setting : companySettings ) {
                 socialManagementService.updateLinkedin( setting, message, linkedinProfileUrl, linkedinMessageFeedback );
+                List<String> socialSiteSharedOn = companySharedOn.get( setting.getIden() );
+                if ( socialSiteSharedOn == null ) {
+                    socialSiteSharedOn = new ArrayList<String>();
+                }
+                if ( !socialSiteSharedOn.contains( CommonConstants.LINKEDIN_SOCIAL_SITE ) ) {
+                    socialSiteSharedOn.add( CommonConstants.LINKEDIN_SOCIAL_SITE );
+                }
+                companySharedOn.put( setting.getIden(), socialSiteSharedOn );
+
+            }
+            for ( OrganizationUnitSettings setting : regionSettings ) {
+                socialManagementService.updateLinkedin( setting, message, linkedinProfileUrl, linkedinMessageFeedback );
+                List<String> socialSiteSharedOn = regionSharedOn.get( setting.getIden() );
+                if ( socialSiteSharedOn == null ) {
+                    socialSiteSharedOn = new ArrayList<String>();
+                }
+                if ( !socialSiteSharedOn.contains( CommonConstants.LINKEDIN_SOCIAL_SITE ) ) {
+                    socialSiteSharedOn.add( CommonConstants.LINKEDIN_SOCIAL_SITE );
+                }
+                regionSharedOn.put( setting.getIden(), socialSiteSharedOn );
+            }
+            for ( OrganizationUnitSettings setting : branchSettings ) {
+                socialManagementService.updateLinkedin( setting, message, linkedinProfileUrl, linkedinMessageFeedback );
+                List<String> socialSiteSharedOn = branchSharedOn.get( setting.getIden() );
+                if ( socialSiteSharedOn == null ) {
+                    socialSiteSharedOn = new ArrayList<String>();
+                }
+                if ( !socialSiteSharedOn.contains( CommonConstants.LINKEDIN_SOCIAL_SITE ) ) {
+                    socialSiteSharedOn.add( CommonConstants.LINKEDIN_SOCIAL_SITE );
+                }
+                branchSharedOn.put( setting.getIden(), socialSiteSharedOn );
             }
             surveyHandler.updateSharedOn( CommonConstants.LINKEDIN_SOCIAL_SITE, agentId, customerEmail );
+            socialPostShared = surveyHandler.calcualteFinalCount( socialPostShared, agentSharedOn, branchSharedOn,
+                regionSharedOn, companySharedOn, regionSettings, branchSettings );
+            for ( SurveyDetails surveyDetails : surveys ) {
+                surveyDetails.setSocialPostShared( socialPostShared );
+                surveyHandler.updateSurveyDetails( surveyDetails );
+            }
         } catch ( NonFatalException e ) {
             LOG.error( "NonFatalException caught in postToLinkedin(). Nested exception is ", e );
         }
@@ -1236,7 +1739,7 @@ public class SurveyManagementController
         surveyAndStage.put( "source", source );
         return surveyAndStage;
     }
-    
+
 
     private void reportBug( String socAppName, String name, Exception e )
     {
@@ -1246,7 +1749,7 @@ public class SurveyManagementController
             if ( socAppName.length() > 0 )
                 errorMsg += "Social Application : " + socAppName;
             errorMsg += "<br>Agent Name : " + name + "<br>";
-            errorMsg += "<br>StackTrace : <br>" + ExceptionUtils.getStackTrace( e ).replaceAll("\n","<br>") + "<br>";
+            errorMsg += "<br>StackTrace : <br>" + ExceptionUtils.getStackTrace( e ).replaceAll( "\n", "<br>" ) + "<br>";
             LOG.info( "Error message built for the auto post failure" );
             LOG.info( "Sending bug mail to admin for the auto post failure" );
             emailServices.sendReportBugMailToAdmin( applicationAdminName, errorMsg, applicationSupportEmail );

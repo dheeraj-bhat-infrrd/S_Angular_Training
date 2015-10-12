@@ -87,6 +87,12 @@ public class DashboardServiceImpl implements DashboardService, InitializingBean 
 	public long getSocialPostsForPastNdays(String columnName, long columnValue, int numberOfDays) {
 		return surveyDetailsDao.getSocialPostsCount(columnName, columnValue, numberOfDays);
 	}
+	
+	@Override
+    public long getSocialPostsForPastNdaysWithHierarchy( String collectionName, long collectionId, long companyId,
+        int numberOfDays ) {
+        return surveyDetailsDao.getSocialPostsCountBasedOnHierarchy( numberOfDays, companyId, collectionName, collectionId );
+    }
 
 	@Override
 	public double getSurveyScore(String columnName, long columnValue, int numberOfDays, boolean realtechAdmin) {
