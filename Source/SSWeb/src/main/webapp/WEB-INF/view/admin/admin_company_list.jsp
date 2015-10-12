@@ -11,7 +11,7 @@
 			<div class="v-tbl-line">
 				<div class="v-line-comp"></div>
 			</div>
-			<div class="v-tbl-img">
+			<%-- <div class="v-tbl-img">
            		<c:choose>
     				<c:when test="${not empty companyItem.profileImageUrl}">
         				<div  class="margin-top-5 float-left profile-image-display" style="background: url(${companyItem.profileImageUrl}) 50% 50% / cover no-repeat;">
@@ -24,7 +24,7 @@
 						</div> 
     				</c:otherwise>
 				</c:choose>
-           	</div>
+           	</div> --%>
 			<div class="v-tbl-name">
 				<c:if
 					test="${not empty companyItem.contact_details && not empty companyItem.contact_details.name }">
