@@ -36,7 +36,6 @@ import com.realtech.socialsurvey.core.entities.AbuseReporterDetails;
 import com.realtech.socialsurvey.core.entities.AbusiveSurveyReportWrapper;
 import com.realtech.socialsurvey.core.entities.AgentRankingReport;
 import com.realtech.socialsurvey.core.entities.ReporterDetail;
-import com.realtech.socialsurvey.core.entities.SocialPostShared;
 import com.realtech.socialsurvey.core.entities.SurveyDetails;
 import com.realtech.socialsurvey.core.entities.SurveyPreInitiation;
 import com.realtech.socialsurvey.core.entities.SurveyResponse;
@@ -595,8 +594,7 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
 
 
     @Override
-    public long getSocialPostsCountBasedOnHierarchy( int numberOfDays, long companyId, String collectionName,
-        long collectionId )
+    public long getSocialPostsCountBasedOnHierarchy( int numberOfDays, long companyId, String collectionName, long collectionId )
     {
         LOG.info( "Method to count number of social posts by customers, getSocialPostsCount() started." );
         Date endDate = Calendar.getInstance().getTime();
@@ -604,33 +602,34 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
 
         Query query = new Query();
         long socialPostCount = 0;
-        query.addCriteria( Criteria.where( CommonConstants.COMPANY_ID_COLUMN ).is( companyId ) );
-        query.addCriteria( Criteria.where( CommonConstants.SOCIAL_POST_SHARED_COLUMN ).ne( null ) );
-        query.addCriteria( Criteria.where( CommonConstants.MODIFIED_ON_COLUMN ).gte( startDate ).lte( endDate ) );
-        SurveyDetails surveyDetails = mongoTemplate.findOne( query, SurveyDetails.class, SURVEY_DETAILS_COLLECTION );
-        SocialPostShared socialPostShared = surveyDetails.getSocialPostShared();
-        if ( socialPostShared != null ) {
-            if ( collectionName.equalsIgnoreCase( MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION ) ) {
-                socialPostCount = socialPostShared.getCompanyCount();
+        /* query.addCriteria( Criteria.where( CommonConstants.COMPANY_ID_COLUMN ).is( companyId ) );
+         query.addCriteria( Criteria.where( CommonConstants.SOCIAL_POST_SHARED_COLUMN ).ne( null ) );
+         query.addCriteria( Criteria.where( CommonConstants.MODIFIED_ON_COLUMN ).gte( startDate ).lte( endDate ) );
+         SurveyDetails surveyDetails = mongoTemplate.findOne( query, SurveyDetails.class, SURVEY_DETAILS_COLLECTION );
+         if ( surveyDetails != null ) {
+             SocialPostShared socialPostShared = surveyDetails.getSocialPostShared();
+             if ( socialPostShared != null ) {
+                 if ( collectionName.equalsIgnoreCase( MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION ) ) {
+                     socialPostCount = socialPostShared.getCompanyCount();
 
-            } else if ( collectionName.equalsIgnoreCase( MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION ) ) {
-                Map<Long, Long> regionMap = socialPostShared.getRegionCountMap();
-                if ( regionMap.get( collectionId ) != null ) {
-                    socialPostCount = regionMap.get( collectionId );
-                }
-            } else if ( collectionName.equalsIgnoreCase( MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION ) ) {
-                Map<Long, Long> branchMap = socialPostShared.getBranchCountMap();
-                if ( branchMap.get( collectionId ) != null ) {
-                    socialPostCount = branchMap.get( collectionId );
-                }
-            } else if ( collectionName.equalsIgnoreCase( MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION ) ) {
-                Map<Long, Long> agentMap = socialPostShared.getAgentCountMap();
-                if ( agentMap.get( collectionId ) != null ) {
-                    socialPostCount = agentMap.get( collectionId );
-                }
-            }
-        }
-
+                 } else if ( collectionName.equalsIgnoreCase( MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION ) ) {
+                     Map<Long, Long> regionMap = socialPostShared.getRegionCountMap();
+                     if ( regionMap.get( collectionId ) != null ) {
+                         socialPostCount = regionMap.get( collectionId );
+                     }
+                 } else if ( collectionName.equalsIgnoreCase( MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION ) ) {
+                     Map<Long, Long> branchMap = socialPostShared.getBranchCountMap();
+                     if ( branchMap.get( collectionId ) != null ) {
+                         socialPostCount = branchMap.get( collectionId );
+                     }
+                 } else if ( collectionName.equalsIgnoreCase( MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION ) ) {
+                     Map<Long, Long> agentMap = socialPostShared.getAgentCountMap();
+                     if ( agentMap.get( collectionId ) != null ) {
+                         socialPostCount = agentMap.get( collectionId );
+                     }
+                 }
+             }
+         }*/
         return socialPostCount;
     }
 
@@ -1672,7 +1671,7 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
         query.addCriteria( Criteria.where( CommonConstants.AGENT_ID_COLUMN ).is( surveyDetails.getAgentId() ) );
         query.addCriteria( Criteria.where( CommonConstants.CUSTOMER_EMAIL_COLUMN ).is( surveyDetails.getCustomerEmail() ) );
         Update update = new Update();
-        update.set( CommonConstants.SOCIAL_POST_SHARED_COLUMN, surveyDetails.getSocialPostShared() );
+        update.set( CommonConstants.SOCIAL_MEDIA_POST_DETAILS_COLUMN, surveyDetails.getSocialMediaPostDetails() );
         mongoTemplate.updateMulti( query, update, SURVEY_DETAILS_COLLECTION );
         LOG.info( "Method insertSurveyDetails() to insert details of survey finished." );
 
