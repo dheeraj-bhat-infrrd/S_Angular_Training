@@ -226,6 +226,10 @@ a,a:hover,a:visited {
 	cursor: pointer;
 }
 
+.vertical-top {
+	vertical-align: top;
+}
+
 .margin-bottom-50 {
 	margin-bottom: 50px;
 }

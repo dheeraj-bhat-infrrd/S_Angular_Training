@@ -1413,6 +1413,18 @@
 	  height: 48px;
 	  line-height: 48px;
 	}
+	.hr-txt1 {
+		padding-left: 10px;
+		width: 20%;
+	}
+	.hr-txt2 {
+		width: 75%;
+		overflow: hidden;
+		text-overflow: ellipsis;
+		white-space: nowrap;
+		margin-left: 0;
+		padding-left: 10px;
+	}
 	.bd-hr-rt-panel{
 		border-left: none;
 	}
@@ -1533,6 +1545,9 @@
 	} 
 	.social-connect-txt{
     	display: none;
+    }
+    .payment-acc-th {
+    	line-height: 22px !important;
     }
 }
 
