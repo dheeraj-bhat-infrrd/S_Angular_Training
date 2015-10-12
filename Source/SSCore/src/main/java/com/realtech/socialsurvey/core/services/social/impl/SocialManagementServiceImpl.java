@@ -39,7 +39,9 @@ import com.realtech.socialsurvey.core.dao.UserDao;
 import com.realtech.socialsurvey.core.dao.UserProfileDao;
 import com.realtech.socialsurvey.core.dao.impl.MongoOrganizationUnitSettingDaoImpl;
 import com.realtech.socialsurvey.core.entities.AgentSettings;
+import com.realtech.socialsurvey.core.entities.Branch;
 import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
+import com.realtech.socialsurvey.core.entities.Region;
 import com.realtech.socialsurvey.core.entities.SocialMediaTokens;
 import com.realtech.socialsurvey.core.entities.User;
 import com.realtech.socialsurvey.core.entities.UserProfile;
@@ -359,22 +361,40 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
         throws InvalidInputException
     {
         LOG.info( "Method to get settings of branches and regions current agent belongs to, getSettingsForBranchesAndRegionsInHierarchy() started." );
+        User user = userDao.findById( User.class, agentId );
         Map<String, List<OrganizationUnitSettings>> map = new HashMap<String, List<OrganizationUnitSettings>>();
         List<OrganizationUnitSettings> companySettings = new ArrayList<>();
         List<OrganizationUnitSettings> branchSettings = new ArrayList<>();
         List<OrganizationUnitSettings> regionSettings = new ArrayList<>();
         Set<Long> branchIds = new HashSet<>();
         Set<Long> regionIds = new HashSet<>();
-        Set<Long> companyIds = new HashSet<>();
         Map<String, Object> queries = new HashMap<>();
-        queries.put( CommonConstants.USER_COLUMN, userDao.findById( User.class, agentId ) );
+        queries.put( CommonConstants.USER_COLUMN, user );
         queries.put( CommonConstants.PROFILE_MASTER_COLUMN,
             userManagementService.getProfilesMasterById( CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID ) );
         List<UserProfile> userProfiles = userProfileDao.findByKeyValue( UserProfile.class, queries );
         for ( UserProfile userProfile : userProfiles ) {
-            branchIds.add( userProfile.getBranchId() );
-            regionIds.add( userProfile.getRegionId() );
-            companyIds.add( userProfile.getCompany().getCompanyId() );
+            long branchId = userProfile.getBranchId();
+            if ( branchId > 0 ) {
+                Branch branch = userManagementService.getBranchById( branchId );
+                if ( branch != null ) {
+                    if ( branch.getIsDefaultBySystem() == CommonConstants.IS_DEFAULT_BY_SYSTEM_NO ) {
+                        LOG.debug( "This agent belongs to branch " );
+                        branchIds.add( userProfile.getBranchId() );
+                    } else {
+                        long regionId = userProfile.getRegionId();
+                        if ( regionId > 0 ) {
+                            Region region = userManagementService.getRegionById( regionId );
+                            if ( region != null ) {
+                                LOG.info( "This agent belongs to region " );
+                                if ( region.getIsDefaultBySystem() == CommonConstants.IS_DEFAULT_BY_SYSTEM_NO ) {
+                                    regionIds.add( regionId );
+                                }
+                            }
+                        }
+                    }
+                }
+            }
         }
 
         for ( Long branchId : branchIds ) {
@@ -387,16 +407,16 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
                 CommonConstants.REGION_SETTINGS_COLLECTION ) );
         }
 
-        for ( Long companyId : companyIds ) {
-            companySettings.add( organizationUnitSettingsDao.fetchOrganizationUnitSettingsById( companyId,
-                CommonConstants.COMPANY_SETTINGS_COLLECTION ) );
-        }
+
+        companySettings.add( organizationUnitSettingsDao.fetchOrganizationUnitSettingsById( user.getCompany().getCompanyId(),
+            CommonConstants.COMPANY_SETTINGS_COLLECTION ) );
+
 
         map.put( MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION, companySettings );
         map.put( MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION, regionSettings );
         map.put( MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION, branchSettings );
         LOG.info( "Method to get settings of branches and regions current agent belongs to, getSettingsForBranchesAndRegionsInHierarchy() finished." );
-        
+
         return map;
     }
 

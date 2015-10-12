@@ -8,7 +8,7 @@ import org.apache.solr.client.solrj.SolrServerException;
 import com.realtech.socialsurvey.core.entities.AbusiveSurveyReportWrapper;
 import com.realtech.socialsurvey.core.entities.Company;
 import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
-import com.realtech.socialsurvey.core.entities.SocialPostShared;
+import com.realtech.socialsurvey.core.entities.SocialMediaPostDetails;
 import com.realtech.socialsurvey.core.entities.SurveyDetails;
 import com.realtech.socialsurvey.core.entities.SurveyPreInitiation;
 import com.realtech.socialsurvey.core.entities.User;
@@ -210,25 +210,9 @@ public interface SurveyHandler
         throws InvalidInputException, UndeliveredEmailException, ProfileNotFoundException;
 
 
-    /**
-     * @param surveyDetails
-     * @return
-     */
-    public SocialPostShared getSocialPostSharedBySurveyDetails( SurveyDetails surveyDetails );
-
-
-    /**
-     * @param socialPostShared
-     * @param agentSharedOn
-     * @param branchSharedOn
-     * @param regionSharedOn
-     * @param companySharedOn
-     * @return
-     */
-    public SocialPostShared calcualteFinalCount( SocialPostShared socialPostShared, Map<Long, List<String>> agentSharedOn,
-        Map<Long, List<String>> branchSharedOn, Map<Long, List<String>> regionSharedOn,
-        Map<Long, List<String>> companySharedOn, List<OrganizationUnitSettings> regionSettings,
-        List<OrganizationUnitSettings> branchSettings );
+    public SocialMediaPostDetails getSocialMediaPostDetailsBySurvey( SurveyDetails surveyDetails,
+        OrganizationUnitSettings companyUnitSettings, List<OrganizationUnitSettings> regionUnitSettings,
+        List<OrganizationUnitSettings> branchUnitSettings );
 
 
     void updateSurveyDetails( SurveyDetails surveyDetails );

@@ -34,11 +34,15 @@ import com.realtech.socialsurvey.core.dao.UserDao;
 import com.realtech.socialsurvey.core.dao.UserProfileDao;
 import com.realtech.socialsurvey.core.dao.impl.MongoOrganizationUnitSettingDaoImpl;
 import com.realtech.socialsurvey.core.entities.AbusiveSurveyReportWrapper;
+import com.realtech.socialsurvey.core.entities.AgentMediaPostDetails;
 import com.realtech.socialsurvey.core.entities.AgentSettings;
+import com.realtech.socialsurvey.core.entities.BranchMediaPostDetails;
 import com.realtech.socialsurvey.core.entities.Company;
+import com.realtech.socialsurvey.core.entities.CompanyMediaPostDetails;
 import com.realtech.socialsurvey.core.entities.MailContent;
 import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
-import com.realtech.socialsurvey.core.entities.SocialPostShared;
+import com.realtech.socialsurvey.core.entities.RegionMediaPostDetails;
+import com.realtech.socialsurvey.core.entities.SocialMediaPostDetails;
 import com.realtech.socialsurvey.core.entities.SurveyDetails;
 import com.realtech.socialsurvey.core.entities.SurveyPreInitiation;
 import com.realtech.socialsurvey.core.entities.SurveyResponse;
@@ -1584,133 +1588,112 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
 
 
     @Override
-    public SocialPostShared getSocialPostSharedBySurveyDetails( SurveyDetails surveyDetails )
-    {
-        SocialPostShared socialPostShared = null;
-        if ( surveyDetails != null ) {
-            socialPostShared = surveyDetails.getSocialPostShared();
-            if ( socialPostShared == null ) {
-                socialPostShared = new SocialPostShared();
-            }
-
-        }
-        return socialPostShared;
-    }
-
-
-    @Override
-    public SocialPostShared calcualteFinalCount( SocialPostShared socialPostShared, Map<Long, List<String>> agentSharedOn,
-        Map<Long, List<String>> branchSharedOn, Map<Long, List<String>> regionSharedOn,
-        Map<Long, List<String>> companySharedOn, List<OrganizationUnitSettings> regionSettings,
-        List<OrganizationUnitSettings> branchSettings )
-    {
-        long finalAgentCount = 0;
-        long finalRegionCount = 0;
-        long finalBranchCount = 0;
-        long finalCompanyCount = 0;
-
-
-        Map<Long, Long> agentMap = socialPostShared.getAgentCountMap();
-        if ( agentMap == null ) {
-            agentMap = new HashMap<Long, Long>();
-        }
-        Map<Long, Long> regionMap = socialPostShared.getRegionCountMap();
-        if ( regionMap == null ) {
-            regionMap = new HashMap<Long, Long>();
-        }
-
-        Map<Long, Long> branchMap = socialPostShared.getBranchCountMap();
-        if ( branchMap == null ) {
-            branchMap = new HashMap<Long, Long>();
-        }
-
-
-        for ( Map.Entry<Long, List<String>> entry : agentSharedOn.entrySet() ) {
-            long agentCount = 0;
-            if ( !agentMap.isEmpty() ) {
-                if ( agentMap.get( entry.getKey() ) != null ) {
-                    agentCount = agentMap.get( entry.getKey() );
-                }
-            }
-            List<String> sharedOnList = entry.getValue();
-            if ( sharedOnList != null ) {
-                agentCount = agentCount + sharedOnList.size();
-            }
-            finalAgentCount = agentCount;
-            agentMap.put( entry.getKey(), agentCount );
-
-        }
-        for ( Map.Entry<Long, List<String>> entry : branchSharedOn.entrySet() ) {
-            long branchCount = 0;
-            if ( !branchMap.isEmpty() ) {
-                if ( branchMap.get( entry.getKey() ) != null ) {
-                    branchCount = branchMap.get( entry.getKey() );
-                }
-            }
-            List<String> sharedOnList = entry.getValue();
-            if ( sharedOnList != null ) {
-                branchCount = branchCount + sharedOnList.size();
-            }
-            finalBranchCount += branchCount;
-            branchMap.put( entry.getKey(), branchCount );
-
-        }
-        for ( OrganizationUnitSettings unitSettings : branchSettings ) {
-            long count = 0;
-            if ( branchMap.get( unitSettings.getIden() ) != null ) {
-                count = branchMap.get( unitSettings.getIden() );
-            }
-            count = count + finalAgentCount;
-            finalBranchCount = count;
-            branchMap.put( unitSettings.getIden(), count );
-        }
-        for ( Map.Entry<Long, List<String>> entry : regionSharedOn.entrySet() ) {
-            long regionCount = 0;
-            if ( !regionMap.isEmpty() ) {
-                if ( regionMap.get( entry.getKey() ) != null ) {
-                    regionCount = regionCount + regionMap.get( entry.getKey() );
-                }
-            }
-            List<String> sharedOnList = entry.getValue();
-            if ( sharedOnList != null ) {
-                regionCount = sharedOnList.size();
-            }
-            finalRegionCount += regionCount;
-            regionMap.put( entry.getKey(), regionCount );
-
-        }
-        for ( OrganizationUnitSettings unitSettings : regionSettings ) {
-            long count = 0;
-            if ( regionMap.get( unitSettings.getIden() ) != null ) {
-                count = regionMap.get( unitSettings.getIden() );
-            }
-            count = count + finalBranchCount + finalAgentCount;
-            finalRegionCount = finalRegionCount + finalBranchCount + finalAgentCount;
-            regionMap.put( unitSettings.getIden(), count );
-        }
-        long companyCount = 0;
-
-        List<String> sharedOnList = companySharedOn.get( socialPostShared.getCompanyId() );
-        if ( sharedOnList != null ) {
-            companyCount = sharedOnList.size();
-        }
-        finalCompanyCount = socialPostShared.getCompanyCount() + companyCount;
-
-        socialPostShared.setAgentCountMap( agentMap );
-        socialPostShared.setBranchCountMap( branchMap );
-        socialPostShared.setRegionCountMap( regionMap );
-        socialPostShared.setCompanyCount( finalCompanyCount + finalRegionCount + finalBranchCount + finalAgentCount );
-
-        return socialPostShared;
-    }
-
-
-    @Override
     @Transactional
     public void updateSurveyDetails( SurveyDetails surveyDetails )
     {
         surveyDetailsDao.updateSurveyDetails( surveyDetails );
 
+    }
+
+
+    @Override
+    public SocialMediaPostDetails getSocialMediaPostDetailsBySurvey( SurveyDetails surveyDetails,
+        OrganizationUnitSettings companyUnitSettings, List<OrganizationUnitSettings> regionUnitSettings,
+        List<OrganizationUnitSettings> branchUnitSettings )
+    {
+        SocialMediaPostDetails socialMediaPostDetails = null;
+        AgentMediaPostDetails agentMediaPostDetails = null;
+        CompanyMediaPostDetails companyMediaPostDetails = null;
+        List<BranchMediaPostDetails> branchMediaPostDetailsList = null;
+        List<RegionMediaPostDetails> regionMediaPostDetailsList = null;
+        if ( surveyDetails == null ) {
+            throw new FatalException( "Survey cannot be null  " );
+        } else {
+            socialMediaPostDetails = surveyDetails.getSocialMediaPostDetails();
+            if ( socialMediaPostDetails == null ) {
+                socialMediaPostDetails = new SocialMediaPostDetails();
+            }
+            agentMediaPostDetails = socialMediaPostDetails.getAgentMediaPostDetails();
+            if ( agentMediaPostDetails == null ) {
+                agentMediaPostDetails = new AgentMediaPostDetails();
+                agentMediaPostDetails.setAgentId( surveyDetails.getAgentId() );
+
+            }
+            companyMediaPostDetails = socialMediaPostDetails.getCompanyMediaPostDetails();
+            if ( companyMediaPostDetails == null ) {
+                companyMediaPostDetails = new CompanyMediaPostDetails();
+                companyMediaPostDetails.setCompanyId( surveyDetails.getCompanyId() );
+
+            }
+            regionMediaPostDetailsList = socialMediaPostDetails.getRegionMediaPostDetailsList();
+            if ( regionMediaPostDetailsList == null ) {
+                regionMediaPostDetailsList = new ArrayList<RegionMediaPostDetails>();
+            }
+            for ( OrganizationUnitSettings setting : regionUnitSettings ) {
+                boolean found = false;
+                for ( int i = 0; i < regionMediaPostDetailsList.size(); i++ ) {
+
+                    RegionMediaPostDetails regionMediaPostDetails = regionMediaPostDetailsList.get( i );
+                    if ( regionMediaPostDetails.getRegionId() == setting.getIden() ) {
+                        found = true;
+                        break;
+                    }
+                }
+                if ( !found ) {
+                    RegionMediaPostDetails regionMediaPostDetails = new RegionMediaPostDetails();
+                    regionMediaPostDetails.setRegionId( setting.getIden() );
+                    regionMediaPostDetailsList.add( regionMediaPostDetails );
+                }
+            }
+            branchMediaPostDetailsList = socialMediaPostDetails.getBranchMediaPostDetailsList();
+            if ( branchMediaPostDetailsList == null ) {
+                branchMediaPostDetailsList = new ArrayList<BranchMediaPostDetails>();
+            }
+            for ( OrganizationUnitSettings setting : branchUnitSettings ) {
+                boolean found = false;
+                for ( int i = 0; i < branchMediaPostDetailsList.size(); i++ ) {
+
+                    BranchMediaPostDetails branchMediaPostDetails = branchMediaPostDetailsList.get( i );
+                    if ( branchMediaPostDetails.getBranchId() == setting.getIden() ) {
+                        found = true;
+                        break;
+                    }
+                }
+                if ( !found ) {
+                    BranchMediaPostDetails branchMediaPostDetails = new BranchMediaPostDetails();
+                    branchMediaPostDetails.setBranchId( setting.getIden() );
+                    branchMediaPostDetailsList.add( branchMediaPostDetails );
+                }
+
+                LOG.debug( "Adding the region this branch belongs too " );
+                try {
+                    OrganizationUnitSettings regionSetting = profileManagementService.getRegionProfileByBranch( setting );
+                    boolean regionFound = false;
+                    for ( int i = 0; i < regionMediaPostDetailsList.size(); i++ ) {
+
+                        RegionMediaPostDetails regionMediaPostDetails = regionMediaPostDetailsList.get( i );
+                        if ( regionMediaPostDetails.getRegionId() == regionSetting.getIden() ) {
+                            regionFound = true;
+                            break;
+                        }
+                    }
+                    if ( !regionFound ) {
+                        RegionMediaPostDetails regionMediaPostDetails = new RegionMediaPostDetails();
+                        regionMediaPostDetails.setRegionId( setting.getIden() );
+                        regionMediaPostDetailsList.add( regionMediaPostDetails );
+                    }
+                } catch ( ProfileNotFoundException e ) {
+                    LOG.error( "Unable to find the profile", e );
+                }
+
+            }
+            socialMediaPostDetails.setAgentMediaPostDetails( agentMediaPostDetails );
+            socialMediaPostDetails.setBranchMediaPostDetailsList( branchMediaPostDetailsList );
+            socialMediaPostDetails.setRegionMediaPostDetailsList( regionMediaPostDetailsList );
+            socialMediaPostDetails.setCompanyMediaPostDetails( companyMediaPostDetails );
+
+        }
+        return socialMediaPostDetails;
     }
 }
 // JIRA SS-119 by RM-05:EOC

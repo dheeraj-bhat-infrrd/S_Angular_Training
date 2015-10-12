@@ -44,7 +44,7 @@ public class SurveyDetails
     private String faceBookShareUrl;
     private boolean isAbusive;
     private String _id;
-    private SocialPostShared socialPostShared;
+    private SocialMediaPostDetails socialMediaPostDetails;
 
 
     public String get_id()
@@ -503,14 +503,14 @@ public class SurveyDetails
     }
 
 
-    public SocialPostShared getSocialPostShared()
+    public SocialMediaPostDetails getSocialMediaPostDetails()
     {
-        return socialPostShared;
+        return socialMediaPostDetails;
     }
 
 
-    public void setSocialPostShared( SocialPostShared socialPostShared )
+    public void setSocialMediaPostDetails( SocialMediaPostDetails socialMediaPostDetails )
     {
-        this.socialPostShared = socialPostShared;
+        this.socialMediaPostDetails = socialMediaPostDetails;
     }
 }
