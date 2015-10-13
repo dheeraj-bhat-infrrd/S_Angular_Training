@@ -61,7 +61,6 @@ public interface DashboardService
         throws IOException;
 
 
-    public long getSocialPostsForPastNdaysWithHierarchy( String collectionName, long collectionId, long companyId,
-        int numberOfDays );
+    public long getSocialPostsForPastNdaysWithHierarchy( String coumnName, long columnValue, int numberOfDays );
 }
 // JIRA SS-137 BY RM05:EOC

@@ -220,4 +220,7 @@ public interface SurveyHandler
 
     public List<SurveyDetails> getSurveyDetailsByAgentAndCompany( long companyId );
 
+
+    public Boolean canPostOnSocialMedia( OrganizationUnitSettings unitSetting, Double rating );
+
 }
