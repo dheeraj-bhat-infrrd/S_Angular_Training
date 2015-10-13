@@ -165,6 +165,5 @@ public interface SurveyDetailsDao
     public List<SurveyDetails> getSurveyDetailsByAgentAndCompany( long companyId );
 
 
-    public long getSocialPostsCountBasedOnHierarchy( int numberOfDays, long companyId, String collectionName,
-        long collectionId );
+    public long getSocialPostsCountBasedOnHierarchy( int numberOfDays, String collectionName, long collectionId );
 }

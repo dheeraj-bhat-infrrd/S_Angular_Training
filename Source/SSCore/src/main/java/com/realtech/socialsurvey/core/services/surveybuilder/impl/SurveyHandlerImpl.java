@@ -1679,7 +1679,7 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
                     }
                     if ( !regionFound ) {
                         RegionMediaPostDetails regionMediaPostDetails = new RegionMediaPostDetails();
-                        regionMediaPostDetails.setRegionId( setting.getIden() );
+                        regionMediaPostDetails.setRegionId( regionSetting.getIden() );
                         regionMediaPostDetailsList.add( regionMediaPostDetails );
                     }
                 } catch ( ProfileNotFoundException e ) {
@@ -1694,6 +1694,31 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
 
         }
         return socialMediaPostDetails;
+    }
+
+
+    @Override
+    public Boolean canPostOnSocialMedia( OrganizationUnitSettings unitSetting, Double rating )
+    {
+        boolean canPost = false;
+        if ( unitSetting != null ) {
+            if ( unitSetting.getSurvey_settings() != null ) {
+                if ( unitSetting.getSurvey_settings().getAuto_post_score() < rating ) {
+                    canPost = true;
+                }
+            } else {
+                if ( CommonConstants.DEFAULT_AUTOPOST_SCORE < rating ) {
+                    canPost = true;
+
+                }
+            }
+        } else {
+            if ( CommonConstants.DEFAULT_AUTOPOST_SCORE < rating ) {
+                canPost = true;
+
+            }
+        }
+        return canPost;
     }
 }
 // JIRA SS-119 by RM-05:EOC

@@ -37,7 +37,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.type.TypeFactory;
 import com.google.gson.Gson;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
-import com.realtech.socialsurvey.core.dao.impl.MongoOrganizationUnitSettingDaoImpl;
 import com.realtech.socialsurvey.core.entities.AgentRankingReport;
 import com.realtech.socialsurvey.core.entities.AgentSettings;
 import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
@@ -201,20 +200,20 @@ public class DashboardController
         String columnName = request.getParameter( "columnName" );
         String realtechAdminStr = request.getParameter( "realtechAdmin" );
         boolean realtechAdmin = false;
-        String collectionName = "";
+
         OrganizationUnitSettings unitSettings = null;
         long columnValue = 0;
         try {
             if ( columnName.equalsIgnoreCase( CommonConstants.COMPANY_ID_COLUMN ) ) {
                 columnValue = user.getCompany().getCompanyId();
-                collectionName = MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION;
+
                 unitSettings = organizationManagementService.getCompanySettings( user );
                 if ( unitSettings.getContact_details() != null && unitSettings.getContact_details().getName() != null ) {
                     model.addAttribute( "name", unitSettings.getContact_details().getName() );
                 }
                 model.addAttribute( "title", unitSettings.getContact_details().getTitle() );
             } else if ( columnName.equalsIgnoreCase( CommonConstants.REGION_ID_COLUMN ) ) {
-                collectionName = MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION;
+
                 try {
                     columnValue = Long.parseLong( request.getParameter( "columnValue" ) );
                 } catch ( NumberFormatException e ) {
@@ -229,7 +228,7 @@ public class DashboardController
                 model.addAttribute( "title", unitSettings.getContact_details().getTitle() );
                 model.addAttribute( "company", user.getCompany().getCompany() );
             } else if ( columnName.equalsIgnoreCase( CommonConstants.BRANCH_ID_COLUMN ) ) {
-                collectionName = MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION;
+
                 try {
                     columnValue = Long.parseLong( request.getParameter( "columnValue" ) );
                 } catch ( NumberFormatException e ) {
@@ -245,7 +244,7 @@ public class DashboardController
                 model.addAttribute( "company", user.getCompany().getCompany() );
             } else if ( columnName.equalsIgnoreCase( CommonConstants.AGENT_ID_COLUMN ) ) {
                 columnValue = user.getUserId();
-                collectionName = MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION;
+
                 unitSettings = userManagementService.getUserSettings( columnValue );
                 model
                     .addAttribute( "name", user.getFirstName() + " " + ( user.getLastName() != null ? user.getLastName() : "" ) );
@@ -277,8 +276,8 @@ public class DashboardController
         double surveyScore = (double) Math.round( dashboardService.getSurveyScore( columnName, columnValue, numberOfDays,
             realtechAdmin ) * 1000.0 ) / 1000.0;
         int sentSurveyCount = (int) dashboardService.getAllSurveyCountForPastNdays( columnName, columnValue, numberOfDays );
-        int socialPostsCount = (int) dashboardService.getSocialPostsForPastNdaysWithHierarchy( collectionName, columnValue,
-            user.getCompany().getCompanyId(), numberOfDays );
+        int socialPostsCount = (int) dashboardService.getSocialPostsForPastNdaysWithHierarchy( columnName, columnValue,
+            numberOfDays );
         int profileCompleteness = 0;
         if ( !realtechAdmin )
             profileCompleteness = dashboardService.getProfileCompletionPercentage( user, columnName, columnValue, unitSettings );
@@ -321,16 +320,7 @@ public class DashboardController
         HttpSession session = request.getSession( false );
         long entityId = (long) session.getAttribute( CommonConstants.ENTITY_ID_COLUMN );
         String entityType = (String) session.getAttribute( CommonConstants.ENTITY_TYPE_COLUMN );
-        String collectionName = "";
-        if ( entityType.equals( CommonConstants.COMPANY_ID_COLUMN ) ) {
-            collectionName = MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION;
-        } else if ( entityType.equalsIgnoreCase( CommonConstants.REGION_ID_COLUMN ) ) {
-            collectionName = MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION;
-        } else if ( entityType.equalsIgnoreCase( CommonConstants.BRANCH_ID_COLUMN ) ) {
-            collectionName = MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION;
-        } else if ( entityType.equalsIgnoreCase( CommonConstants.AGENT_ID_COLUMN ) ) {
-            collectionName = MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION;
-        }
+
         try {
             String columnValueStr = request.getParameter( "columnValue" );
             columnValue = Long.parseLong( columnValueStr );
@@ -359,8 +349,8 @@ public class DashboardController
             dashboardService.getCompletedSurveyCountForPastNdays( columnName, columnValue, numberOfDays ) );
         model.addAttribute( "clickedSurvey",
             dashboardService.getClickedSurveyCountForPastNdays( columnName, columnValue, numberOfDays ) );
-        model.addAttribute( "socialPosts", dashboardService.getSocialPostsForPastNdaysWithHierarchy( collectionName, entityId,
-            user.getCompany().getCompanyId(), numberOfDays ) );
+        model.addAttribute( "socialPosts",
+            dashboardService.getSocialPostsForPastNdaysWithHierarchy( entityType, entityId, numberOfDays ) );
 
         LOG.info( "Method to get count of all, completed and clicked surveys, getSurveyCount() finished" );
         return JspResolver.DASHBOARD_SURVEYSTATUS;
