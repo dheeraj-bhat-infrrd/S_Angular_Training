@@ -6,16 +6,12 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
-
-import javax.imageio.ImageIO;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
-
 import com.amazonaws.AmazonClientException;
 import com.amazonaws.auth.AWSCredentials;
 import com.amazonaws.auth.BasicAWSCredentials;
@@ -77,9 +73,9 @@ public class CloudUploadServiceImpl implements FileUploadService
 
 
     @Override
-    public String fileUploadHandler( File file, String imageName ) throws InvalidInputException
+    public String uploadProfileImageFile( File file, String imageName ) throws InvalidInputException
     {
-        LOG.info( "Method fileUploadHandler inside AmazonUploadServiceImpl called" );
+        LOG.info( "Method uploadProfileImageFile inside AmazonUploadServiceImpl called" );
         try {
             return uploadImage( file, imageName, bucket + CommonConstants.FILE_SEPARATOR + imageBucket );
         } catch ( InvalidInputException e ) {
@@ -88,9 +84,19 @@ public class CloudUploadServiceImpl implements FileUploadService
         }
     }
 
-
     @Override
-    public String fileUploadHandler( MultipartFile fileLocal, String logoName ) throws InvalidInputException
+    public String uploadLogoImageFile(File file, String imageName) throws InvalidInputException{
+    	LOG.info( "Method uploadLogoImageFile inside AmazonUploadServiceImpl called" );
+        try {
+            return uploadImage( file, imageName, bucket + CommonConstants.FILE_SEPARATOR + logoBucket );
+        } catch ( InvalidInputException e ) {
+            LOG.error( "IOException occured while reading file. Reason : " + e.getMessage(), e );
+            throw new FatalException( "IOException occured while reading file. Reason : " + e.getMessage(), e );
+        }
+    }
+    
+    @Override
+    public String uploadLogo( MultipartFile fileLocal, String logoName ) throws InvalidInputException
     {
         LOG.info( "Method fileUploadHandler inside AmazonUploadServiceImpl called" );
 

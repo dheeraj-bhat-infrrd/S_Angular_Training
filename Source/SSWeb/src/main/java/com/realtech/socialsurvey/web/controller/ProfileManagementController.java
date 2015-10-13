@@ -1592,7 +1592,7 @@ public class ProfileManagementController
                 if ( logoFileName == null || logoFileName.isEmpty() ) {
                     throw new InvalidInputException( "Logo passed is null or empty" );
                 }
-                logoUrl = fileUploadService.fileUploadHandler( fileLocal, logoFileName );
+                logoUrl = fileUploadService.uploadLogo( fileLocal, logoFileName );
                 logoUrl = amazonEndpoint + CommonConstants.FILE_SEPARATOR + amazonLogoBucket + CommonConstants.FILE_SEPARATOR
                     + logoUrl;
             } catch ( NonFatalException e ) {
@@ -1746,7 +1746,7 @@ public class ProfileManagementController
 
                 // uploading image
                 File fileLocal = new File( filePath );
-                profileImageUrl = fileUploadService.fileUploadHandler( fileLocal, imageFileName );
+                profileImageUrl = fileUploadService.uploadProfileImageFile( fileLocal, imageFileName );
                 profileImageUrl = amazonEndpoint + CommonConstants.FILE_SEPARATOR + amazonImageBucket
                     + CommonConstants.FILE_SEPARATOR + profileImageUrl;
             } catch ( NonFatalException e ) {

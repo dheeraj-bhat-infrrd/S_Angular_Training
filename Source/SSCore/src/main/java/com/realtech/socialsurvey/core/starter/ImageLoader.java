@@ -168,7 +168,7 @@ public class ImageLoader extends QuartzJobBean
                     } else if ( imageName.endsWith( ".png" ) || imageName.endsWith( ".PNG" ) ) {
                         ImageIO.write( image, "png", tempImage );
                     }
-                    fileName = fileUploadService.fileUploadHandler( tempImage, imageName );
+                    fileName = fileUploadService.uploadProfileImageFile( tempImage, imageName );
                     FileUtils
                         .deleteQuietly( new File( CommonConstants.TEMP_FOLDER + CommonConstants.FILE_SEPARATOR + imageName ) );
                     LOG.info( "Successfully retrieved photo of contact" );

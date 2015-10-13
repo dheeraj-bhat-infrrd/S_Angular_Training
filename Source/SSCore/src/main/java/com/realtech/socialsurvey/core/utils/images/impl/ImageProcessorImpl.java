@@ -4,22 +4,41 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
+import java.sql.Timestamp;
 import javax.imageio.ImageIO;
+import org.apache.commons.io.FileUtils;
 import org.imgscalr.Scalr;
 import org.imgscalr.Scalr.Mode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.entities.ImagesCollection;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
+import com.realtech.socialsurvey.core.services.upload.FileUploadService;
 import com.realtech.socialsurvey.core.utils.images.ImageProcessor;
 
 /**
  * Image processing using scalr
  */
+@Component
 public class ImageProcessorImpl implements ImageProcessor {
 
 	private static Logger LOG = LoggerFactory.getLogger(ImageProcessorImpl.class);
+
+	@Value("${CDN_PATH}")
+	private String amazonEndpoint;
+
+	@Value("${AMAZON_IMAGE_BUCKET}")
+	private String amazonImageBucket;
+
+	@Value("${AMAZON_LOGO_BUCKET}")
+	private String amazonLogoBucket;
+
+	@Autowired
+	private FileUploadService fileUploadService;
 
 	@Override
 	public ImagesCollection processAndUpdateImageForAllDimensions(String imageFileName, ImagesCollection imagesCollection, String imageType)
@@ -29,11 +48,15 @@ public class ImageProcessorImpl implements ImageProcessor {
 		BufferedImage sourceImage = getImageFromCloud(imageFileName);
 		// process thumbnail
 		LOG.info("Processing image for thumbnail " + imageFileName);
-		String extension = imageFileName.substring(imageFileName.lastIndexOf(".")).toLowerCase();
+		String extension = imageFileName.substring(imageFileName.lastIndexOf(".") + 1).toLowerCase();
 		File processedImage = processImage(sourceImage, THUMBNAIL_WIDTH, THUMBNAIL_HEIGHT, extension);
 		// name the file that needs to be uploaded
-		
-		return null;
+		String thumbnailImageName = getThumbnailImageName(imageFileName, extension);
+		String uploadedFileName = writeImage(thumbnailImageName, processedImage, imageType);
+		deleteTempFile(processedImage);
+		imagesCollection.getThumbnailImage().setImageName(uploadedFileName);
+		imagesCollection.getThumbnailImage().setProcessedOn(new Timestamp(System.currentTimeMillis()));
+		return imagesCollection;
 	}
 
 	@Override
@@ -45,12 +68,17 @@ public class ImageProcessorImpl implements ImageProcessor {
 		}
 		LOG.info("Processing image for width " + width + " and length " + height);
 		BufferedImage scaledImage = null;
+		File f = new File(".");
+		LOG.debug("File path: "+f.getAbsolutePath());
 		File processedFile = null;
 		scaledImage = Scalr.resize(image, Mode.AUTOMATIC, width, height);
 		processedFile = new File(CommonConstants.TEMP_FOLDER + CommonConstants.FILE_SEPARATOR + String.valueOf(System.currentTimeMillis()) + "-"
 				+ width + "-" + height + "." + imageExtension);
 		try {
-			ImageIO.write(scaledImage, imageExtension, processedFile);
+			processedFile.createNewFile();
+			if (processedFile.exists()) {
+				ImageIO.write(scaledImage, imageExtension, processedFile);
+			}
 		}
 		catch (IOException e) {
 			LOG.error("Error while processing image.", e);
@@ -80,9 +108,35 @@ public class ImageProcessorImpl implements ImageProcessor {
 	}
 
 	@Override
-	public void writeImage(String destFileName, File image) throws ImageProcessingException {
-		// TODO Auto-generated method stub
+	public String writeImage(String destFileName, File image, String imageType) throws ImageProcessingException, InvalidInputException {
+		if (image == null || destFileName == null || destFileName.isEmpty() || imageType == null || imageType.isEmpty()) {
+			LOG.error("Invalid details provided to upload image to S3");
+			throw new InvalidInputException("Invalid details provided to upload image to S3");
+		}
+		LOG.info("Uploading " + destFileName + " to cloud");
+		String cloudFrontUrl = null;
+		if (imageType.equals(ImageProcessor.IMAGE_TYPE_PROFILE)) {
+			LOG.debug("Uploading profile pic");
+			fileUploadService.uploadProfileImageFile(image, destFileName);
+			cloudFrontUrl = amazonEndpoint + CommonConstants.FILE_SEPARATOR + amazonImageBucket + CommonConstants.FILE_SEPARATOR + destFileName;
+		}
+		else if (imageType.equals(ImageProcessor.IMAGE_TYPE_LOGO)) {
+			LOG.debug("Uploading logo");
+			fileUploadService.uploadProfileImageFile(image, destFileName);
+			cloudFrontUrl = amazonEndpoint + CommonConstants.FILE_SEPARATOR + amazonLogoBucket + CommonConstants.FILE_SEPARATOR + destFileName;
+		}
+		LOG.debug("Returning image name: " + cloudFrontUrl);
+		return cloudFrontUrl;
+	}
 
+	private String getThumbnailImageName(String originalImageName, String extension) {
+		LOG.debug("Getting thumbnail name for " + originalImageName);
+		return originalImageName.substring(originalImageName.lastIndexOf("/")+1, originalImageName.lastIndexOf("." + extension)) + "-t." + extension;
+	}
+
+	private void deleteTempFile(File file) {
+		LOG.debug("Deleting file: " + file.getAbsolutePath());
+		FileUtils.deleteQuietly(file);
 	}
 
 }

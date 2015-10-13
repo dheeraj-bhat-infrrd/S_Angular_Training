@@ -5,12 +5,10 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.List;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.multipart.MultipartFile;
-
 import com.amazonaws.services.s3.AmazonS3;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.exception.FatalException;
@@ -34,7 +32,7 @@ public class FileUploadServiceImpl implements FileUploadService {
 	private UploadUtils uploadUtils;
 
 	@Override
-	public String fileUploadHandler(MultipartFile fileLocal, String logoName) throws InvalidInputException {
+	public String uploadLogo(MultipartFile fileLocal, String logoName) throws InvalidInputException {
 		LOG.info("Method imageUploadHandler inside ImageUploadServiceImpl called");
 
 		BufferedOutputStream stream = null;
@@ -107,7 +105,7 @@ public class FileUploadServiceImpl implements FileUploadService {
 	}
 
 	@Override
-	public String fileUploadHandler(File file, String imageName) throws InvalidInputException {
+	public String uploadProfileImageFile(File file, String imageName) throws InvalidInputException {
 		// TODO Auto-generated method stub
 		return null;
 	}
@@ -115,5 +113,11 @@ public class FileUploadServiceImpl implements FileUploadService {
 	@Override
 	public void uploadFileAtDefautBucket(File file, String fileName) {
 		// TODO Auto-generated method stub
+	}
+
+	@Override
+	public String uploadLogoImageFile(File file, String imageName) throws InvalidInputException {
+		// TODO Auto-generated method stub
+		return null;
 	}
 }

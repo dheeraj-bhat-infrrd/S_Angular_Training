@@ -54,9 +54,12 @@ public interface ImageProcessor {
 	 * Writes image to the destination
 	 * @param destFileName
 	 * @param image
+	 * @param imageType
+	 * @return uploaded image destination
 	 * @throws ImageProcessingException
+	 * @throws InvalidInputException
 	 */
-	public void writeImage(String destFileName, File image) throws ImageProcessingException;
+	public String writeImage(String destFileName, File image, String imageType) throws ImageProcessingException, InvalidInputException;
 	
 	
 }
