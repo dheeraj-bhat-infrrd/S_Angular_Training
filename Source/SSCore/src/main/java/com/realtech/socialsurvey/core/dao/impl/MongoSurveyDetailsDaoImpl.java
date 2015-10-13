@@ -691,26 +691,17 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
                                 }
                             }
                         }
-                        /* if ( survey.getSocialMediaPostDetails().getBranchMediaPostDetailsList() != null ) {
-                             for ( BranchMediaPostDetails branchMediaPostDetails : survey.getSocialMediaPostDetails()
-                                 .getBranchMediaPostDetailsList() ) {
-                                 LOG.debug( "Check to see if this branch belongs to this region " );
-                                 long branchId = branchMediaPostDetails.getBranchId();
-                                 Branch branch = branchDao.findById( Branch.class, branchId );
-                                 if ( branch != null ) {
-                                     OrganizationUnitSettings regionSettings = organizationUnitSettingsDao
-                                         .fetchOrganizationUnitSettingsById( branch.getRegion().getRegionId(),
-                                             MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION );
-                                     if ( regionSettings.getIden() == columnValue ) {
-                                         LOG.debug( "This branch belongs to this region hence updating social count" );
-                                         if ( branchMediaPostDetails.getSharedOn() != null ) {
-                                             socialPostCount += branchMediaPostDetails.getSharedOn().size();
-                                         }
-                                     }
-                                 }
+                        if ( survey.getSocialMediaPostDetails().getBranchMediaPostDetailsList() != null ) {
+                            for ( BranchMediaPostDetails branchMediaPostDetails : survey.getSocialMediaPostDetails()
+                                .getBranchMediaPostDetailsList() ) {
+                                if ( branchMediaPostDetails.getRegionId() == columnValue ) {
+                                    if ( branchMediaPostDetails.getSharedOn() != null ) {
+                                        socialPostCount += branchMediaPostDetails.getSharedOn().size();
+                                    }
+                                }
+                            }
+                        }
 
-                             }
-                         }*/
                     } else if ( columnName.equalsIgnoreCase( CommonConstants.BRANCH_ID_COLUMN ) ) {
                         List<String> sharedOnAgent = survey.getSocialMediaPostDetails().getAgentMediaPostDetails()
                             .getSharedOn();
