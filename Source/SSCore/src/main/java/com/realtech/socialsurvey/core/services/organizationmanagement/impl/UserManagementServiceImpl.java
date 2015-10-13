@@ -1211,8 +1211,8 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
         //update user in solr
         User user = userDao.findById( User.class, userId );
         solrSearchService.addUserToSolr( user );
-        
-        
+
+
         LOG.info( "Method to delete a profile finished for profile : " + profileIdToDelete );
     }
 
@@ -2134,6 +2134,8 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
         }
         if ( agentSettings.getSurvey_settings() == null ) {
             SurveySettings surveySettings = new SurveySettings();
+            surveySettings.setShow_survey_above_score( CommonConstants.DEFAULT_AUTOPOST_SCORE );
+            surveySettings.setAutoPostEnabled( true );
             agentSettings.setSurvey_settings( surveySettings );
         }
 
@@ -2157,6 +2159,7 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 
         // Set default profile stages.
         agentSettings.setProfileStages( profileCompletionList.getDefaultProfileCompletionList( true ) );
+
 
         organizationUnitSettingsDao.insertAgentSettings( agentSettings );
         LOG.info( "Inserted into agent settings" );
