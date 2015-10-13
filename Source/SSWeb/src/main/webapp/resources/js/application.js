@@ -7372,6 +7372,8 @@ function paintAvgRating(avgRating) {
 $(document).on('blur', '#contant-info-container input[data-email]', function() {
 	if (!$(this).val() || !emailRegex.test(this.value)
 			|| ($(this).val() == $('#' + $(this).attr("id") + '-old').val())) {
+		$('#overlay-toast').html("Please enter valid email address");
+		showToast();
 		return;
 	}
 	

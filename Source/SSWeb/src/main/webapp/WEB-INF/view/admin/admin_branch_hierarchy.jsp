@@ -11,7 +11,7 @@
 			<td class="v-tbl-line">
 				<div class="v-line-ind"></div>
 			</td>
-			<td class="v-tbl-img">
+			<%-- <td class="v-tbl-img">
            		<c:choose>
     				<c:when test="${not empty branchUser.profileImageUrl}">
         				<div  class="float-left profile-image-display" style="background: url(${branchUser.profileImageUrl}) 50% 50% / cover no-repeat;">
@@ -24,7 +24,7 @@
 						</div> 
     				</c:otherwise>
 				</c:choose>
-           	</td>
+           	</td> --%>
 			<td class="v-tbl-name">${branchUser.displayName}</td>
 			<td class="v-tbl-add"><c:if
 					test="${not empty branchUser.emailId}">${branchUser.emailId}</c:if></td>

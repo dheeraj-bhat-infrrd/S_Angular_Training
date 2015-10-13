@@ -40,7 +40,7 @@
 	<div class="v-hr-tbl">
 		<div class="v-tbl-header comp-row" id="hierarchy-list-header">
 			<div class="v-tbl-line"></div>
-			<div class="v-tbl-img"></div>
+			<!-- <div class="v-tbl-img"></div> -->
 			<div class="v-tbl-name">Name</div>
 			<div class="v-tbl-add">Email Address</div>
 			<div class="v-tbl-role">Role</div>
