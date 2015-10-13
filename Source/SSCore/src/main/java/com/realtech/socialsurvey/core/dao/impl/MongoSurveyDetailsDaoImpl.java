@@ -35,6 +35,7 @@ import com.realtech.socialsurvey.core.dao.SurveyDetailsDao;
 import com.realtech.socialsurvey.core.entities.AbuseReporterDetails;
 import com.realtech.socialsurvey.core.entities.AbusiveSurveyReportWrapper;
 import com.realtech.socialsurvey.core.entities.AgentRankingReport;
+import com.realtech.socialsurvey.core.entities.BranchMediaPostDetails;
 import com.realtech.socialsurvey.core.entities.RegionMediaPostDetails;
 import com.realtech.socialsurvey.core.entities.ReporterDetail;
 import com.realtech.socialsurvey.core.entities.SurveyDetails;
@@ -62,6 +63,7 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
 
     @Autowired
     private MongoTemplate mongoTemplate;
+
 
     @Autowired
     private SurveyPreInitiationService surveyPreInitiationService;
@@ -606,24 +608,32 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
         } else {
             query.addCriteria( Criteria.where( CommonConstants.SOCIAL_MEDIA_POST_DETAILS_COLUMN ).ne( null ) );
             if ( columnName.equalsIgnoreCase( CommonConstants.COMPANY_ID_COLUMN ) ) {
-                query.addCriteria( Criteria.where( CommonConstants.COMPANY_MEDIA_POST_DETAILS_COLUMN ).ne( null ) );
                 query.addCriteria( Criteria.where(
-                    CommonConstants.COMPANY_MEDIA_POST_DETAILS_COLUMN + "." + CommonConstants.COMPANY_ID_COLUMN ).is(
-                    columnValue ) );
+                    CommonConstants.SOCIAL_MEDIA_POST_DETAILS_COLUMN + "." + CommonConstants.COMPANY_MEDIA_POST_DETAILS_COLUMN )
+                    .ne( null ) );
+                query.addCriteria( Criteria.where(
+                    CommonConstants.SOCIAL_MEDIA_POST_DETAILS_COLUMN + "." + CommonConstants.COMPANY_MEDIA_POST_DETAILS_COLUMN
+                        + "." + CommonConstants.COMPANY_ID_COLUMN ).is( columnValue ) );
             } else if ( columnName.equalsIgnoreCase( CommonConstants.REGION_ID_COLUMN ) ) {
-                query.addCriteria( Criteria.where( CommonConstants.REGION_MEDIA_POST_DETAILS_COLUMN ).ne( null ) );
                 query.addCriteria( Criteria.where(
-                    CommonConstants.REGION_MEDIA_POST_DETAILS_COLUMN + "." + CommonConstants.REGION_ID_COLUMN )
-                    .is( columnValue ) );
+                    CommonConstants.SOCIAL_MEDIA_POST_DETAILS_COLUMN + "." + CommonConstants.REGION_MEDIA_POST_DETAILS_COLUMN )
+                    .ne( null ) );
+                query.addCriteria( Criteria.where(
+                    CommonConstants.SOCIAL_MEDIA_POST_DETAILS_COLUMN + "." + CommonConstants.REGION_MEDIA_POST_DETAILS_COLUMN
+                        + "." + CommonConstants.REGION_ID_COLUMN ).is( columnValue ) );
 
             } else if ( columnName.equalsIgnoreCase( CommonConstants.BRANCH_ID_COLUMN ) ) {
-                query.addCriteria( Criteria.where( CommonConstants.BRANCH_MEDIA_POST_DETAILS_COLUMN ).ne( null ) );
                 query.addCriteria( Criteria.where(
-                    CommonConstants.BRANCH_MEDIA_POST_DETAILS_COLUMN + "." + CommonConstants.BRANCH_ID_COLUMN )
-                    .is( columnValue ) );
+                    CommonConstants.SOCIAL_MEDIA_POST_DETAILS_COLUMN + "." + CommonConstants.BRANCH_MEDIA_POST_DETAILS_COLUMN )
+                    .ne( null ) );
+                query.addCriteria( Criteria.where(
+                    CommonConstants.SOCIAL_MEDIA_POST_DETAILS_COLUMN + "." + CommonConstants.BRANCH_MEDIA_POST_DETAILS_COLUMN
+                        + "." + CommonConstants.BRANCH_ID_COLUMN ).is( columnValue ) );
             } else if ( columnName.equalsIgnoreCase( CommonConstants.AGENT_ID_COLUMN ) ) {
 
-                query.addCriteria( Criteria.where( CommonConstants.AGENT_MEDIA_POST_DETAILS_COLUMN ).ne( null ) );
+                query.addCriteria( Criteria.where(
+                    CommonConstants.SOCIAL_MEDIA_POST_DETAILS_COLUMN + "." + CommonConstants.AGENT_MEDIA_POST_DETAILS_COLUMN )
+                    .ne( null ) );
                 query
                     .addCriteria( Criteria.where(
                         CommonConstants.AGENT_MEDIA_POST_DETAILS_COLUMN + "." + CommonConstants.AGENT_ID_COLUMN ).is(
@@ -638,6 +648,34 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
             if ( surveyDetails != null ) {
                 for ( SurveyDetails survey : surveyDetails ) {
                     if ( columnName.equalsIgnoreCase( CommonConstants.COMPANY_ID_COLUMN ) ) {
+                        List<String> sharedOnAgent = survey.getSocialMediaPostDetails().getAgentMediaPostDetails()
+                            .getSharedOn();
+                        if ( sharedOnAgent != null ) {
+                            socialPostCount += sharedOnAgent.size();
+                        }
+                        if ( survey.getSocialMediaPostDetails().getBranchMediaPostDetailsList() != null ) {
+                            for ( BranchMediaPostDetails branchMediaPostDetails : survey.getSocialMediaPostDetails()
+                                .getBranchMediaPostDetailsList() ) {
+                                if ( branchMediaPostDetails.getSharedOn() != null ) {
+                                    socialPostCount += branchMediaPostDetails.getSharedOn().size();
+                                }
+                            }
+                        }
+                        if ( survey.getSocialMediaPostDetails().getRegionMediaPostDetailsList() != null ) {
+                            for ( RegionMediaPostDetails regionMediaPostDetails : survey.getSocialMediaPostDetails()
+                                .getRegionMediaPostDetailsList() ) {
+                                if ( regionMediaPostDetails.getSharedOn() != null ) {
+                                    socialPostCount += regionMediaPostDetails.getSharedOn().size();
+                                }
+                            }
+                        }
+                        if ( survey.getSocialMediaPostDetails().getCompanyMediaPostDetails() != null ) {
+                            List<String> sharedOnCompany = survey.getSocialMediaPostDetails().getCompanyMediaPostDetails()
+                                .getSharedOn();
+                            if ( sharedOnCompany != null ) {
+                                socialPostCount += sharedOnCompany.size();
+                            }
+                        }
 
                     } else if ( columnName.equalsIgnoreCase( CommonConstants.REGION_ID_COLUMN ) ) {
                         List<String> sharedOnAgent = survey.getSocialMediaPostDetails().getAgentMediaPostDetails()
@@ -645,28 +683,44 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
                         if ( sharedOnAgent != null ) {
                             socialPostCount += sharedOnAgent.size();
                         }
-                        /*List<String> sharedOnBranch = survey.getSocialMediaPostDetails().getBranchMediaPostDetailsList().getSharedOn();
-                        if ( sharedOnBranch != null ) {
-                            socialPostCount += sharedOnBranch.size();
-                        }*/
-                        /* List<RegionMediaPostDetails> regionmediaPostDetailsList = survey.getSocialMediaPostDetails().getRegionMediaPostDetailsList();
-                         for(RegionMediaPostDetails regionMediaDetails : regionmediaPostDetailsList){
-                             regionMediaDetails
+                        if ( survey.getSocialMediaPostDetails().getRegionMediaPostDetailsList() != null ) {
+                            for ( RegionMediaPostDetails regionMediaPostDetails : survey.getSocialMediaPostDetails()
+                                .getRegionMediaPostDetailsList() ) {
+                                if ( regionMediaPostDetails.getSharedOn() != null ) {
+                                    socialPostCount += regionMediaPostDetails.getSharedOn().size();
+                                }
+                            }
+                        }
+                        /* if ( survey.getSocialMediaPostDetails().getBranchMediaPostDetailsList() != null ) {
+                             for ( BranchMediaPostDetails branchMediaPostDetails : survey.getSocialMediaPostDetails()
+                                 .getBranchMediaPostDetailsList() ) {
+                                 LOG.debug( "Check to see if this branch belongs to this region " );
+                                 long branchId = branchMediaPostDetails.getBranchId();
+                                 Branch branch = branchDao.findById( Branch.class, branchId );
+                                 if ( branch != null ) {
+                                     OrganizationUnitSettings regionSettings = organizationUnitSettingsDao
+                                         .fetchOrganizationUnitSettingsById( branch.getRegion().getRegionId(),
+                                             MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION );
+                                     if ( regionSettings.getIden() == columnValue ) {
+                                         LOG.debug( "This branch belongs to this region hence updating social count" );
+                                         if ( branchMediaPostDetails.getSharedOn() != null ) {
+                                             socialPostCount += branchMediaPostDetails.getSharedOn().size();
+                                         }
+                                     }
+                                 }
+
+                             }
                          }*/
-                        /*   List<String> sharedOnRegion = survey.getSocialMediaPostDetails().getRegionMediaPostDetailsList().getSharedOn();
-                           if ( sharedOnRegion != null ) {
-                               socialPostCount += sharedOnBranch.size();
-                           }*/
                     } else if ( columnName.equalsIgnoreCase( CommonConstants.BRANCH_ID_COLUMN ) ) {
                         List<String> sharedOnAgent = survey.getSocialMediaPostDetails().getAgentMediaPostDetails()
                             .getSharedOn();
                         if ( sharedOnAgent != null ) {
                             socialPostCount += sharedOnAgent.size();
-                        } /*    
-                             List<String> sharedOnBranch = survey.getSocialMediaPostDetails().getBranchMediaPostDetailsList()().getSharedOn();
-                             if ( sharedOnBranch != null ) {
-                                 socialPostCount += sharedOnBranch.size();
-                             }*/
+                        }
+                        for ( BranchMediaPostDetails branchMediaPostDetails : survey.getSocialMediaPostDetails()
+                            .getBranchMediaPostDetailsList() ) {
+                            socialPostCount += branchMediaPostDetails.getSharedOn().size();
+                        }
 
                     } else if ( columnName.equalsIgnoreCase( CommonConstants.AGENT_ID_COLUMN ) ) {
 
