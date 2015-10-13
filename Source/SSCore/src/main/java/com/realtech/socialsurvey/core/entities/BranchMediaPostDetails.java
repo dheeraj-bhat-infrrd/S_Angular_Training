@@ -7,6 +7,8 @@ public class BranchMediaPostDetails
 {
     private long branchId;
 
+    private long regionId;
+
     private List<String> sharedOn;
 
 
@@ -31,6 +33,18 @@ public class BranchMediaPostDetails
     public void setSharedOn( List<String> sharedOn )
     {
         this.sharedOn = sharedOn;
+    }
+
+
+    public long getRegionId()
+    {
+        return regionId;
+    }
+
+
+    public void setRegionId( long regionId )
+    {
+        this.regionId = regionId;
     }
 
 
