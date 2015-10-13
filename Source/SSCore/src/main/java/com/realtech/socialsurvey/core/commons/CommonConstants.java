@@ -726,8 +726,8 @@ public interface CommonConstants
 
 
     public static final String AGENT_MEDIA_POST_DETAILS_COLUMN = "agentMediaPostDetails";
-    public static final String BRANCH_MEDIA_POST_DETAILS_COLUMN = "branchtMediaPostDetails";
+    public static final String BRANCH_MEDIA_POST_DETAILS_COLUMN = "branchMediaPostDetailsList";
     public static final String COMPANY_MEDIA_POST_DETAILS_COLUMN = "companyMediaPostDetails";
-    public static final String REGION_MEDIA_POST_DETAILS_COLUMN = "regionMediaPostDetails";
+    public static final String REGION_MEDIA_POST_DETAILS_COLUMN = "regionMediaPostDetailsList";
 
 }
