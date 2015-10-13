@@ -1679,7 +1679,7 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
                     }
                     if ( !regionFound ) {
                         RegionMediaPostDetails regionMediaPostDetails = new RegionMediaPostDetails();
-                        regionMediaPostDetails.setRegionId( setting.getIden() );
+                        regionMediaPostDetails.setRegionId( regionSetting.getIden() );
                         regionMediaPostDetailsList.add( regionMediaPostDetails );
                     }
                 } catch ( ProfileNotFoundException e ) {

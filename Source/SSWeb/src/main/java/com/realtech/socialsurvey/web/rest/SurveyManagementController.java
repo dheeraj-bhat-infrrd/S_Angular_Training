@@ -658,13 +658,16 @@ public class SurveyManagementController
                     try {
                         OrganizationUnitSettings setting = organizationManagementService
                             .getBranchSettingsDefault( branchMediaPostDetails.getBranchId() );
-                        if ( surveyHandler.canPostOnSocialMedia( setting, rating ) ) {
-                            if ( !socialManagementService.updateStatusIntoFacebookPage( setting, facebookMessage,
-                                serverBaseUrl, agent.getCompany().getCompanyId() ) ) {
-                                surveyHandler.updateSharedOn( CommonConstants.FACEBOOK_SOCIAL_SITE, agentId, customerEmail );
-                                List<String> branchSocialList = branchMediaPostDetails.getSharedOn();
-                                branchSocialList.add( CommonConstants.FACEBOOK_SOCIAL_SITE );
-                                branchMediaPostDetails.setSharedOn( branchSocialList );
+                        if ( setting != null ) {
+
+                            if ( surveyHandler.canPostOnSocialMedia( setting, rating ) ) {
+                                if ( !socialManagementService.updateStatusIntoFacebookPage( setting, facebookMessage,
+                                    serverBaseUrl, agent.getCompany().getCompanyId() ) ) {
+                                    surveyHandler.updateSharedOn( CommonConstants.FACEBOOK_SOCIAL_SITE, agentId, customerEmail );
+                                    List<String> branchSocialList = branchMediaPostDetails.getSharedOn();
+                                    branchSocialList.add( CommonConstants.FACEBOOK_SOCIAL_SITE );
+                                    branchMediaPostDetails.setSharedOn( branchSocialList );
+                                }
                             }
                         }
                     } catch ( FacebookException e ) {
@@ -714,13 +717,16 @@ public class SurveyManagementController
                 for ( BranchMediaPostDetails branchMediaPostDetails : socialMediaPostDetails.getBranchMediaPostDetailsList() ) {
                     OrganizationUnitSettings setting = organizationManagementService
                         .getBranchSettingsDefault( branchMediaPostDetails.getBranchId() );
-                    if ( surveyHandler.canPostOnSocialMedia( setting, rating ) ) {
-                        if ( !socialManagementService.updateLinkedin( setting, linkedinMessage, linkedinProfileUrl,
-                            linkedinMessageFeedback ) ) {
-                            surveyHandler.updateSharedOn( CommonConstants.LINKEDIN_SOCIAL_SITE, agentId, customerEmail );
-                            List<String> branchSocialList = branchMediaPostDetails.getSharedOn();
-                            branchSocialList.add( CommonConstants.LINKEDIN_SOCIAL_SITE );
-                            branchMediaPostDetails.setSharedOn( branchSocialList );
+                    if ( setting != null ) {
+
+                        if ( surveyHandler.canPostOnSocialMedia( setting, rating ) ) {
+                            if ( !socialManagementService.updateLinkedin( setting, linkedinMessage, linkedinProfileUrl,
+                                linkedinMessageFeedback ) ) {
+                                surveyHandler.updateSharedOn( CommonConstants.LINKEDIN_SOCIAL_SITE, agentId, customerEmail );
+                                List<String> branchSocialList = branchMediaPostDetails.getSharedOn();
+                                branchSocialList.add( CommonConstants.LINKEDIN_SOCIAL_SITE );
+                                branchMediaPostDetails.setSharedOn( branchSocialList );
+                            }
                         }
                     }
                 }
@@ -786,12 +792,16 @@ public class SurveyManagementController
                     try {
                         OrganizationUnitSettings setting = organizationManagementService
                             .getBranchSettingsDefault( branchMediaPostDetails.getBranchId() );
-                        if ( surveyHandler.canPostOnSocialMedia( setting, rating ) ) {
-                            if ( !socialManagementService.tweet( setting, twitterMessage, agent.getCompany().getCompanyId() ) ) {
-                                surveyHandler.updateSharedOn( CommonConstants.TWITTER_SOCIAL_SITE, agentId, customerEmail );
-                                List<String> branchSocialList = branchMediaPostDetails.getSharedOn();
-                                branchSocialList.add( CommonConstants.TWITTER_SOCIAL_SITE );
-                                branchMediaPostDetails.setSharedOn( branchSocialList );
+                        if ( setting != null ) {
+
+                            if ( surveyHandler.canPostOnSocialMedia( setting, rating ) ) {
+                                if ( !socialManagementService
+                                    .tweet( setting, twitterMessage, agent.getCompany().getCompanyId() ) ) {
+                                    surveyHandler.updateSharedOn( CommonConstants.TWITTER_SOCIAL_SITE, agentId, customerEmail );
+                                    List<String> branchSocialList = branchMediaPostDetails.getSharedOn();
+                                    branchSocialList.add( CommonConstants.TWITTER_SOCIAL_SITE );
+                                    branchMediaPostDetails.setSharedOn( branchSocialList );
+                                }
                             }
                         }
                     } catch ( TwitterException e ) {
@@ -940,12 +950,16 @@ public class SurveyManagementController
                 try {
                     OrganizationUnitSettings setting = organizationManagementService
                         .getBranchSettingsDefault( branchMediaPostDetails.getBranchId() );
-                    if ( surveyHandler.canPostOnSocialMedia( setting, rating ) ) {
-                        socialManagementService.updateStatusIntoFacebookPage( setting, facebookMessage, serverBaseUrl, user
-                            .getCompany().getCompanyId() );
-                        List<String> branchSocialList = branchMediaPostDetails.getSharedOn();
-                        branchSocialList.add( CommonConstants.FACEBOOK_SOCIAL_SITE );
-                        branchMediaPostDetails.setSharedOn( branchSocialList );
+                    if ( setting != null ) {
+
+
+                        if ( surveyHandler.canPostOnSocialMedia( setting, rating ) ) {
+                            socialManagementService.updateStatusIntoFacebookPage( setting, facebookMessage, serverBaseUrl, user
+                                .getCompany().getCompanyId() );
+                            List<String> branchSocialList = branchMediaPostDetails.getSharedOn();
+                            branchSocialList.add( CommonConstants.FACEBOOK_SOCIAL_SITE );
+                            branchMediaPostDetails.setSharedOn( branchSocialList );
+                        }
                     }
                 } catch ( FacebookException e ) {
                     LOG.error(
@@ -1084,11 +1098,14 @@ public class SurveyManagementController
                 try {
                     OrganizationUnitSettings setting = organizationManagementService
                         .getBranchSettingsDefault( branchMediaPostDetails.getBranchId() );
-                    if ( surveyHandler.canPostOnSocialMedia( setting, rating ) ) {
-                        socialManagementService.tweet( setting, twitterMessage, user.getCompany().getCompanyId() );
-                        List<String> branchSocialList = branchMediaPostDetails.getSharedOn();
-                        branchSocialList.add( CommonConstants.FACEBOOK_SOCIAL_SITE );
-                        branchMediaPostDetails.setSharedOn( branchSocialList );
+                    if ( setting != null ) {
+
+                        if ( surveyHandler.canPostOnSocialMedia( setting, rating ) ) {
+                            socialManagementService.tweet( setting, twitterMessage, user.getCompany().getCompanyId() );
+                            List<String> branchSocialList = branchMediaPostDetails.getSharedOn();
+                            branchSocialList.add( CommonConstants.TWITTER_SOCIAL_SITE );
+                            branchMediaPostDetails.setSharedOn( branchSocialList );
+                        }
                     }
                 } catch ( TwitterException e ) {
                     LOG.error(
@@ -1206,11 +1223,14 @@ public class SurveyManagementController
             for ( BranchMediaPostDetails branchMediaPostDetails : socialMediaPostDetails.getBranchMediaPostDetailsList() ) {
                 OrganizationUnitSettings setting = organizationManagementService
                     .getBranchSettingsDefault( branchMediaPostDetails.getBranchId() );
-                if ( surveyHandler.canPostOnSocialMedia( setting, rating ) ) {
-                    socialManagementService.updateLinkedin( setting, message, linkedinProfileUrl, linkedinMessageFeedback );
-                    List<String> branchSocialList = branchMediaPostDetails.getSharedOn();
-                    branchSocialList.add( CommonConstants.LINKEDIN_SOCIAL_SITE );
-                    branchMediaPostDetails.setSharedOn( branchSocialList );
+                if ( setting != null ) {
+
+                    if ( surveyHandler.canPostOnSocialMedia( setting, rating ) ) {
+                        socialManagementService.updateLinkedin( setting, message, linkedinProfileUrl, linkedinMessageFeedback );
+                        List<String> branchSocialList = branchMediaPostDetails.getSharedOn();
+                        branchSocialList.add( CommonConstants.LINKEDIN_SOCIAL_SITE );
+                        branchMediaPostDetails.setSharedOn( branchSocialList );
+                    }
                 }
             }
             surveyHandler.updateSharedOn( CommonConstants.LINKEDIN_SOCIAL_SITE, agentId, customerEmail );

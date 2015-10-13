@@ -2,6 +2,7 @@ package com.realtech.socialsurvey.core.entities;
 
 import java.util.List;
 
+
 public class BranchMediaPostDetails
 {
     private long branchId;
@@ -31,4 +32,6 @@ public class BranchMediaPostDetails
     {
         this.sharedOn = sharedOn;
     }
+
+
 }
