@@ -129,7 +129,7 @@ public final class EmailSenderImpl implements EmailSender
      * @throws UndeliveredEmailException
      */
     public void sendEmailWithBodyReplacements( EmailEntity emailEntity, String subjectFileName,
-        FileContentReplacements messageBodyReplacements ) throws InvalidInputException, UndeliveredEmailException
+        FileContentReplacements messageBodyReplacements, boolean isImmediate ) throws InvalidInputException, UndeliveredEmailException
     {
         LOG.info( "Method sendEmailWithBodyReplacements called for emailEntity : " + emailEntity + " subjectFileName : "
             + subjectFileName + " and messageBodyReplacements : " + messageBodyReplacements );
@@ -161,7 +161,7 @@ public final class EmailSenderImpl implements EmailSender
 
 
     public void sendEmailWithSubjectAndBodyReplacements( EmailEntity emailEntity, FileContentReplacements subjectReplacements,
-        FileContentReplacements messageBodyReplacements ) throws InvalidInputException, UndeliveredEmailException
+        FileContentReplacements messageBodyReplacements, boolean isImmediate ) throws InvalidInputException, UndeliveredEmailException
     {
         LOG.info( "Method sendEmailWithBodyReplacements called for emailEntity : " + emailEntity + " subjectReplacements : "
             + subjectReplacements + " and messageBodyReplacements : " + messageBodyReplacements );
@@ -202,7 +202,7 @@ public final class EmailSenderImpl implements EmailSender
      * @throws UndeliveredEmailException
      */
     @Override
-    public void sendEmail( EmailEntity emailEntity, String subject, String mailBody ) throws InvalidInputException,
+    public void sendEmail( EmailEntity emailEntity, String subject, String mailBody, boolean isImmediate ) throws InvalidInputException,
         UndeliveredEmailException
     {
         LOG.info( "Method sendEmail called for subject : " + subject );
