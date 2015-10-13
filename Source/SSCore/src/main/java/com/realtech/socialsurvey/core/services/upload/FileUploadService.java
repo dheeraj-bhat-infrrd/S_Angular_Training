@@ -2,9 +2,7 @@ package com.realtech.socialsurvey.core.services.upload;
 
 import java.io.File;
 import java.util.List;
-
 import org.springframework.web.multipart.MultipartFile;
-
 import com.amazonaws.services.s3.AmazonS3;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.exception.NonFatalException;
@@ -19,8 +17,8 @@ public interface FileUploadService {
 	 * 
 	 * @throws InvalidInputException
 	 */
-	public String fileUploadHandler(MultipartFile fileLocal, String logoName) throws InvalidInputException;
-	public String fileUploadHandler(File file, String imageName) throws InvalidInputException;
+	public String uploadLogo(MultipartFile fileLocal, String logoName) throws InvalidInputException;
+	public String uploadProfileImageFile(File file, String imageName) throws InvalidInputException;
 	
 	/**
 	 * Method that returns a list of all the keys in a bucket.
@@ -40,5 +38,14 @@ public interface FileUploadService {
 	 */
 	public AmazonS3 createAmazonClient(String endpoint, String bucket);
 	public void uploadFileAtDefautBucket(File file, String fileName) throws NonFatalException;
+	
+	/**
+	 * Uploads logo file
+	 * @param file
+	 * @param imageName
+	 * @return
+	 * @throws InvalidInputException
+	 */
+	public String uploadLogoImageFile(File file, String imageName) throws InvalidInputException;
 
 }
