@@ -1651,18 +1651,17 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
             }
             for ( OrganizationUnitSettings setting : branchUnitSettings ) {
                 boolean found = false;
+                BranchMediaPostDetails branchMediaPostDetails = null;
                 for ( int i = 0; i < branchMediaPostDetailsList.size(); i++ ) {
-
-                    BranchMediaPostDetails branchMediaPostDetails = branchMediaPostDetailsList.get( i );
-                    if ( branchMediaPostDetails.getBranchId() == setting.getIden() ) {
+                    BranchMediaPostDetails branchMediaPostDetailsObject = branchMediaPostDetailsList.get( i );
+                    if ( branchMediaPostDetailsObject.getBranchId() == setting.getIden() ) {
                         found = true;
                         break;
                     }
                 }
                 if ( !found ) {
-                    BranchMediaPostDetails branchMediaPostDetails = new BranchMediaPostDetails();
+                    branchMediaPostDetails = new BranchMediaPostDetails();
                     branchMediaPostDetails.setBranchId( setting.getIden() );
-                    branchMediaPostDetailsList.add( branchMediaPostDetails );
                 }
 
                 LOG.debug( "Adding the region this branch belongs too " );
@@ -1682,9 +1681,12 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
                         regionMediaPostDetails.setRegionId( regionSetting.getIden() );
                         regionMediaPostDetailsList.add( regionMediaPostDetails );
                     }
+                    branchMediaPostDetails.setRegionId( regionSetting.getIden() );
                 } catch ( ProfileNotFoundException e ) {
                     LOG.error( "Unable to find the profile", e );
                 }
+
+                branchMediaPostDetailsList.add( branchMediaPostDetails );
 
             }
             socialMediaPostDetails.setAgentMediaPostDetails( agentMediaPostDetails );
