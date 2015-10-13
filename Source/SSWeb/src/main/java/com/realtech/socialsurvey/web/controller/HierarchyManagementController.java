@@ -1,6 +1,7 @@
 package com.realtech.socialsurvey.web.controller;
 
 import java.lang.reflect.Type;
+import java.net.MalformedURLException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
@@ -8,10 +9,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.StringTokenizer;
-
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
-
 import org.noggit.JSONUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,7 +20,6 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
-
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
@@ -1230,6 +1228,44 @@ public class HierarchyManagementController {
 		LOG.info("Method to search region completed successfully. Returning json : " + searchRegionJson);
 		return searchRegionJson;
 	}
+	
+	@ResponseBody
+	@RequestMapping(value = "/fetchregions", method = RequestMethod.GET)
+	public String fetchRegions(Model model, HttpServletRequest request) {
+		LOG.info("Method to fetch region  called in controller");
+		User user = sessionHelper.getCurrentUser();
+		HttpSession session = request.getSession();
+		String searchRegionJson = "";
+		Set<Long> regionIds = null;
+		int defaultRowSize = 1000; //TODO:remove hardcoding for max rows
+		try {
+
+			try {
+				int highestRole = (int) session.getAttribute(CommonConstants.HIGHEST_ROLE_ID_IN_SESSION);
+				if (highestRole == CommonConstants.PROFILES_MASTER_COMPANY_ADMIN_PROFILE_ID) {
+					searchRegionJson = organizationManagementService.fetchRegionsByCompany(user.getCompany().getCompanyId());
+				}
+				else if (highestRole == CommonConstants.PROFILES_MASTER_REGION_ADMIN_PROFILE_ID) {
+					regionIds = organizationManagementService.getRegionIdsForUser(user, highestRole);
+					searchRegionJson = solrSearchService.searchRegions("", user.getCompany(), regionIds, 0, defaultRowSize);
+				}
+			}
+			catch (InvalidInputException e) {
+				throw new InvalidInputException(e.getMessage(), DisplayMessageConstants.GENERAL_ERROR, e);
+			}
+			catch (MalformedURLException e) {
+				throw new InvalidInputException(e.getMessage(), DisplayMessageConstants.GENERAL_ERROR, e);
+			}
+
+		}
+		catch (NonFatalException e) {
+			LOG.error("NonFatalException while fetching regions for company. Reason : " + e.getMessage(), e);
+			model.addAttribute("message", messageUtils.getDisplayMessage(e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE));
+		}
+
+		LOG.info("Method to fetch region completed successfully. Returning json : " + searchRegionJson);
+		return searchRegionJson;
+	}
 
 	/**
 	 * Method to fetch branches from solr for a given pattern, if no pattern is provided fetches all
@@ -1321,6 +1357,51 @@ public class HierarchyManagementController {
 		return searchBranchJson;
 	}
 
+	
+	@ResponseBody
+	@RequestMapping(value = "/fetchbranches", method = RequestMethod.GET)
+	public String fetchBranches(Model model, HttpServletRequest request) {
+		LOG.info("Method to search branches called in controller");
+		User user = sessionHelper.getCurrentUser();
+		String searchBranchJson = "";
+		HttpSession session = request.getSession(false);
+		int defaultRowSize = 1000; //TODO:remove hardcoding for max rows
+		Set<Long> ids = null;
+		try {
+			int highestRole = (int) session.getAttribute(CommonConstants.HIGHEST_ROLE_ID_IN_SESSION);
+			String idColumnName = null;
+			/**
+			 * Selective fetch of branches is done in the case of region admin or branch admin
+			 */
+			try {
+				if (highestRole == CommonConstants.PROFILES_MASTER_COMPANY_ADMIN_PROFILE_ID) {
+					searchBranchJson = organizationManagementService.fetchBranchesByCompany(user.getCompany().getCompanyId());
+				}
+				else if (highestRole == CommonConstants.PROFILES_MASTER_REGION_ADMIN_PROFILE_ID) {
+					ids = organizationManagementService.getRegionIdsForUser(user, highestRole);
+					idColumnName = CommonConstants.REGION_ID_SOLR;
+					searchBranchJson = solrSearchService.searchBranches("", user.getCompany(), idColumnName, ids, 0, defaultRowSize);
+				}
+				else if (highestRole == CommonConstants.PROFILES_MASTER_BRANCH_ADMIN_PROFILE_ID) {
+					ids = organizationManagementService.getBranchIdsForUser(user, highestRole);
+					idColumnName = CommonConstants.BRANCH_ID_SOLR;
+					searchBranchJson = solrSearchService.searchBranches("", user.getCompany(), idColumnName, ids, 0, defaultRowSize);
+				}
+			}
+			catch (InvalidInputException | NoRecordsFetchedException | MalformedURLException e) {
+				LOG.error("Exception occured while getting branchIds for user.Reason:" + e.getMessage());
+				throw new InvalidInputException(e.getMessage(), DisplayMessageConstants.GENERAL_ERROR, e);
+			}
+		}
+		catch (NonFatalException e) {
+			LOG.error("NonFatalException while searching branches. Reason : " + e.getMessage(), e);
+			model.addAttribute("message", messageUtils.getDisplayMessage(e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE));
+		}
+
+		LOG.info("Method to search branches completed successfully.");
+		return searchBranchJson;
+	}
+	
 	/**
 	 * Method to fetch a region details based on id
 	 * 
