@@ -9,6 +9,7 @@ import java.util.Map;
 
 import javax.annotation.Resource;
 
+import org.apache.http.impl.client.NoopUserTokenHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
@@ -1274,20 +1275,22 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 
             for ( UserProfile currentProfile : userProfileList ) {
                 Branch branch = branchDao.findById( Branch.class, currentProfile.getBranchId() );
-
-                if ( currentProfile.getProfilesMaster().getProfileId() == CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID
-                    && branch.getIsDefaultBySystem() == CommonConstants.IS_DEFAULT_BY_SYSTEM_NO ) {
-                    agentProfileWithoutDefaultBranch = currentProfile;
-                } else if ( currentProfile.getProfilesMaster().getProfileId() == CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID
-                    && branch.getIsDefaultBySystem() == CommonConstants.IS_DEFAULT_BY_SYSTEM_YES ) {
-                    agentProfileWithDefaultBranch = currentProfile;
-                } else if ( currentProfile.getProfilesMaster().getProfileId() == CommonConstants.PROFILES_MASTER_BRANCH_ADMIN_PROFILE_ID ) {
-                    branchAdminProfile = currentProfile;
-                } else if ( currentProfile.getProfilesMaster().getProfileId() == CommonConstants.PROFILES_MASTER_REGION_ADMIN_PROFILE_ID ) {
-                    regionAdminProfile = currentProfile;
-                } else if ( currentProfile.getProfilesMaster().getProfileId() == CommonConstants.PROFILES_MASTER_COMPANY_ADMIN_PROFILE_ID ) {
-                    companyAdminProfile = currentProfile;
+                if(currentProfile.getStatus() == CommonConstants.STATUS_ACTIVE){
+                    if ( currentProfile.getProfilesMaster().getProfileId() == CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID
+                        && branch.getIsDefaultBySystem() == CommonConstants.IS_DEFAULT_BY_SYSTEM_NO ) {
+                        agentProfileWithoutDefaultBranch = currentProfile;
+                    } else if ( currentProfile.getProfilesMaster().getProfileId() == CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID
+                        && branch.getIsDefaultBySystem() == CommonConstants.IS_DEFAULT_BY_SYSTEM_YES ) {
+                        agentProfileWithDefaultBranch = currentProfile;
+                    } else if ( currentProfile.getProfilesMaster().getProfileId() == CommonConstants.PROFILES_MASTER_BRANCH_ADMIN_PROFILE_ID ) {
+                        branchAdminProfile = currentProfile;
+                    } else if ( currentProfile.getProfilesMaster().getProfileId() == CommonConstants.PROFILES_MASTER_REGION_ADMIN_PROFILE_ID ) {
+                        regionAdminProfile = currentProfile;
+                    } else if ( currentProfile.getProfilesMaster().getProfileId() == CommonConstants.PROFILES_MASTER_COMPANY_ADMIN_PROFILE_ID ) {
+                        companyAdminProfile = currentProfile;
+                    }
                 }
+                
             }
 
             if ( agentProfileWithoutDefaultBranch != null ) {
@@ -1302,6 +1305,9 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
                 profileToMakePrimary = companyAdminProfile;
             }
 
+            if(profileToMakePrimary == null){
+                throw new InvalidInputException( "No user profile present for the specified userId" );
+            }
             profileToMakePrimary.setIsPrimary( CommonConstants.IS_PRIMARY_TRUE );
             userProfileDao.update( profileToMakePrimary );
 
