@@ -17,6 +17,7 @@ public class SurveySettings {
 	private String happyTextComplete;
 	private String neutralTextComplete;
 	private String sadTextComplete;
+	private ComplaintRegistrationSettings complaint_reg_settings;
 
 	public float getAuto_post_score() {
 		return auto_post_score;
@@ -114,10 +115,20 @@ public class SurveySettings {
 		this.sadTextComplete = sadTextComplete;
 	}
 
+    public ComplaintRegistrationSettings getComplaint_reg_settings()
+    {
+        return complaint_reg_settings;
+    }
+
+    public void setComplaint_reg_settings( ComplaintRegistrationSettings complaint_reg_settings )
+    {
+        this.complaint_reg_settings = complaint_reg_settings;
+    }
+    
 	@Override
 	public String toString() {
 		return "auto_post_score: " + auto_post_score + "\t show_survey_above_score: " + show_survey_above_score
 				+ "\t survey_reminder_interval_in_days: " + survey_reminder_interval_in_days + "\t max_number_of_survey_reminders: "
-				+ max_number_of_survey_reminders;
+				+ max_number_of_survey_reminders + "\t complaint_reg_settings: " + complaint_reg_settings;
 	}
 }

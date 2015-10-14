@@ -9,6 +9,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.lang.WordUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -1946,6 +1947,40 @@ public class EmailServicesImpl implements EmailServices
         emailSender.sendEmailWithBodyReplacements( emailEntity, subjectFileName, messageBodyReplacements );
 
         LOG.info( "Method sendReportBugMailToAdmin() finished." );
+    }
+    
+
+    @Async
+    @Override
+    public void sendComplaintHandlingMail( String recipientMailId, String customerName, String customerMailId, String mood,
+        String rating ) throws InvalidInputException, UndeliveredEmailException
+    {
+        if ( recipientMailId == null || recipientMailId.isEmpty() ) {
+            LOG.error( "Recipient email Id is empty or null for sending survey completion mail " );
+            throw new InvalidInputException( "Recipient email Id is empty or null for sending survey completion mail " );
+        }
+
+        if ( customerMailId == null || customerMailId.isEmpty() ) {
+            LOG.error( "Customer email Id is empty or null " );
+            throw new InvalidInputException( "Customer email Id is empty or null " );
+        }
+
+        String recipientName = recipientMailId.split( "@" )[0].replaceAll( "\\.", " " ).replaceAll( "_", " " );
+        String recipientFirstName = WordUtils.capitalizeFully( recipientName ).split( " " )[0];
+
+        LOG.info( "Sending complaint handler email to : " + recipientMailId );
+        EmailEntity emailEntity = prepareEmailEntityForSendingEmail( recipientMailId );
+
+        FileContentReplacements messageBodyReplacements = new FileContentReplacements();
+        messageBodyReplacements.setFileName( EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER
+            + EmailTemplateConstants.SURVEY_COMPLAINT_HANDLER_MAIL_BODY );
+        messageBodyReplacements.setReplacementArgs( Arrays.asList( appLogoUrl, recipientFirstName, customerName, customerName,
+            customerMailId, mood, rating ) );
+
+        LOG.debug( "Calling email sender to send mail" );
+        emailSender.sendEmailWithBodyReplacements( emailEntity, EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER
+            + EmailTemplateConstants.SURVEY_COMPLAINT_HANDLER_MAIL_SUBJECT, messageBodyReplacements );
+        LOG.info( "Successfully sent survey completion mail" );
     }
 }
 // JIRA: SS-7: By RM02: EOC

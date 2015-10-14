@@ -12,13 +12,14 @@ public class ComplaintRegistrationSettings
     private float rating;
     private String mailId;
     private String mood;
-
+    private boolean enabled;
     
     public ComplaintRegistrationSettings()
     {
         rating = CommonConstants.DEFAULT_AUTOPOST_SCORE;
         mailId = "";
         mood = "Unpleasant";
+        enabled = false;
     }
 
 
@@ -58,6 +59,18 @@ public class ComplaintRegistrationSettings
     }
 
 
+    public boolean isEnabled()
+    {
+        return enabled;
+    }
+
+
+    public void setEnabled( boolean enabled )
+    {
+        this.enabled = enabled;
+    }
+
+
     public List<String> getMoodList()
     {
         List<String> moodList = new ArrayList<String>();
@@ -71,7 +84,7 @@ public class ComplaintRegistrationSettings
     
     @Override
     public String toString() {
-        return "mail_id: " + mailId + "\tcut_off_rating: " + rating + "\tcut_off_review_mood: " + mood;
+        return "mail_id: " + mailId + "\tcut_off_rating: " + rating + "\tcut_off_review_mood: " + mood + "\tcomplaint_handling_enabled" + enabled;
         
     }
 }

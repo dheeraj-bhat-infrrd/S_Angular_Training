@@ -99,7 +99,10 @@ public interface JspResolver {
 	public static final String SOCIAL_ZILLOW_INTERMEDIATE = "zillowintermediate";
 	public static final String LINKEDIN_ACCESS = "linkedinaccess";
 	public static final String SOCIAL_MEDIA_TOKENS = "settings_socialauth";
-
+	public static final String COMPLAINT_REGISTRATION_SETTINGS = "complaintregistrionsettings";
+	public static final String REVIEWS_UNDER_RESOLUTION_REPORTS = "reviewsunderresolution";
+	public static final String ABUSIVE_REVIEWS_REPORTS = "abusivereviewsreports";
+	
 	//Help Settings
 	public static final String HELP_EDIT="help";
 	
