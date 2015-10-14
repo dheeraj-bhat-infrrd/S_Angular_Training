@@ -122,11 +122,11 @@ public interface SurveyDetailsDao
 
 
     public void getAverageScore( Date startDate, Date endDate, Map<Long, AgentRankingReport> agentReportData,
-        String columnName, long columnValue );
+        String columnName, long columnValue , boolean fetchAbusive );
 
 
     public void getCompletedSurveysCount( Date startDate, Date endDate, Map<Long, AgentRankingReport> agentReportData,
-        String colunmName, long columnValue );
+        String colunmName, long columnValue, boolean fetchAbusive  );
 
 
     public long noOfPreInitiatedSurveys( String columnName, long columnValue, Date startDate, Date endDate );
