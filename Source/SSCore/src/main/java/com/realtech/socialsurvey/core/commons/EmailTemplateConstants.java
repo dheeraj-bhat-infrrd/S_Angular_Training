@@ -112,4 +112,6 @@ public final class EmailTemplateConstants {
     public static final String REPORT_BUG_MAIL_TO_ADMIN_SUBJECT = "ReportBugToAdminMailSubject.txt";
     public static final String REPORT_BUG_MAIL_TO_ADMIN_BODY = "ReportBugToAdminMailBody.html";
     
+    public static final String SURVEY_COMPLAINT_HANDLER_MAIL_SUBJECT = "SurveyComplaintHandlerMailSubject.txt";
+    public static final String SURVEY_COMPLAINT_HANDLER_MAIL_BODY = "SurveyComplaintHandlerMailBody.html";
 }
