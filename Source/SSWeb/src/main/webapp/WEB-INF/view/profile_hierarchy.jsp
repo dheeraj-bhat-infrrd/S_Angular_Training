@@ -10,10 +10,7 @@
 			<c:forEach var="region" items="${regions}">
 				<div class="bd-hr-item-l1 comp-region" data-openstatus="closed" data-regionid="${region.regionId}">
 					<div class="bd-hr-item bd-lt-l1 clearfix">
-						<div id="" class="float-left profile-image-display" style="">
-							<span id="">${fn:substring(region.region, 0, 1)}</span>
-						</div>
-						<div class="float-left margin-left-10 bd-hr-txt">${region.region}</div>
+						<div class="bd-hr-txt">${region.region}</div>
 					</div>
 					<div class="bd-hr-item-l2 hide" id="comp-region-branches-${region.regionId}"></div>
 				</div>
@@ -27,10 +24,7 @@
 			<c:forEach var="branch" items="${branches}">
 				<div class="bd-hr-item-l1 comp-branch" data-openstatus="closed" data-branchid="${branch.branchId}">
 					<div class="bd-hr-item bd-lt-l2 clearfix">
-						<div id="" class="float-left profile-image-display" style="">
-							<span id="">${fn:substring(branch.branch, 0, 1)}</span>
-						</div>
-						<div class="float-left margin-left-10 bd-hr-txt">${branch.branch}</div>
+						<div class="bd-hr-txt">${branch.branch}</div>
 					</div>
 					<div class="bd-hr-item-l2 hide" id="comp-branch-individuals-${branch.branchId}"></div>
 				</div>
