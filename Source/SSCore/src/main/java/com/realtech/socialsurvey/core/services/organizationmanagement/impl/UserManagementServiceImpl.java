@@ -2166,6 +2166,7 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
         // Set default profile stages.
         agentSettings.setProfileStages( profileCompletionList.getDefaultProfileCompletionList( true ) );
 
+
         organizationUnitSettingsDao.insertAgentSettings( agentSettings );
         LOG.info( "Inserted into agent settings" );
     }
