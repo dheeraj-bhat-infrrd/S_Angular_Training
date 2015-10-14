@@ -16,11 +16,9 @@ function convertUserDateToLocale(date){
 }
 function convertUserDateToLocalWeekFormt(date){
 	var days = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
-	var months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
 	var convertedTimestamp= date.getTime() + offset;
 	var date3= new Date(convertedTimestamp);
 	var dayOftheweek = days[ date3.getDay() ];
-	var month = months[ date3.getMonth() ];
 	var month=((date3.getMonth() + 1)<10)? "0"+(date3.getMonth() + 1) : (date3.getMonth() + 1);
 	var day=(date3.getDate()<10) ? "0"+(date3.getDate()) : (date3.getDate());
 	var minutes= (date3.getMinutes()<10) ? "0"+(date3.getMinutes()) : (date3.getMinutes());
@@ -30,16 +28,23 @@ function convertUserDateToLocalWeekFormt(date){
 	return date4;
 }
 
-function convertUserDateToWeekFormt(date){
-	var days = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
-	var date3= new Date(date.getTime());
-	var dayOftheweek = days[ date3.getDay() ];
-	var month=((date3.getMonth() + 1)<10)? "0"+(date3.getMonth() + 1) : (date3.getMonth() + 1);
-	var day=(date3.getDate()<10) ? "0"+(date3.getDate()) : (date3.getDate());
-	var minutes= (date3.getMinutes()<10) ? "0"+(date3.getMinutes()) : (date3.getMinutes());
-	var hours= (date3.getHours()<10) ? "0"+(date3.getHours()) : (date3.getHours());
-	var sec=  (date3.getSeconds()<10) ? "0"+(date3.getSeconds()) : (date3.getSeconds());
-	var date4=   dayOftheweek +" "+month+" "+day+" " + date3.getFullYear() +" "+hours+":"+minutes+":"+sec;
+function convertUserDateToWeekFormt(date) {
+	var days = [ 'Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat' ];
+	var months = [ 'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug',
+			'Sep', 'Oct', 'Nov', 'Dec' ];
+	var date3 = new Date(date.getTime());
+	var dayOftheweek = days[date3.getDay()];
+	var month = months[date3.getMonth()];
+	var day = (date3.getDate() < 10) ? "0" + (date3.getDate()) : (date3
+			.getDate());
+	var minutes = (date3.getMinutes() < 10) ? "0" + (date3.getMinutes())
+			: (date3.getMinutes());
+	var hours = date3.getHours();
+	var ampm = hours >= 12 ? 'pm' : 'am';
+	hours = hours % 12;
+	hours = hours ? hours : 12;
+	var date4 = dayOftheweek + ", " + month + " " + day + ", "
+			+ date3.getFullYear() + " at " + hours + ":" + minutes + " " + ampm;
 	return date4;
 }
 
