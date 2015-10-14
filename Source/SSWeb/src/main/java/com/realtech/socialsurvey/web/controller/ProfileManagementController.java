@@ -15,7 +15,6 @@ import javax.imageio.ImageIO;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import javax.ws.rs.QueryParam;
-import javax.ws.rs.core.Response;
 import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrDocumentList;
 import org.slf4j.Logger;
@@ -184,8 +183,6 @@ public class ProfileManagementController
         LOG.info( "Method showProfileEditPage() called from ProfileManagementService" );
         HttpSession session = request.getSession( false );
         User user = sessionHelper.getCurrentUser();
-        AccountType accountType = (AccountType) session.getAttribute( CommonConstants.ACCOUNT_TYPE_IN_SESSION );
-        UserSettings userSettings = (UserSettings) session.getAttribute( CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION );
         long entityId = 0;
         String entityIdStr = request.getParameter( "entityId" );
         if ( entityIdStr == null || entityIdStr.isEmpty() ) {
@@ -490,42 +487,6 @@ public class ProfileManagementController
             response = new Gson().toJson( errorResponse );
         }
         return response;
-    }
-
-
-    private OrganizationUnitSettings fetchUserProfile( Model model, User user, AccountType accountType, UserSettings settings,
-        long branchId, long regionId, int profilesMaster )
-    {
-        LOG.debug( "Method fetchUserProfile() called from ProfileManagementService" );
-        OrganizationUnitSettings profile = null;
-        try {
-            profile = profileManagementService.aggregateUserProfile( user, accountType, settings, branchId, regionId,
-                profilesMaster );
-        } catch ( InvalidInputException | NoRecordsFetchedException e ) {
-            LOG.error( "InvalidInputException while fetching profile. Reason :" + e.getMessage(), e );
-            model
-                .addAttribute( "message", messageUtils.getDisplayMessage( e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE ) );
-        }
-        LOG.debug( "Method fetchUserProfile() finished from ProfileManagementService" );
-        return profile;
-    }
-
-
-    private LockSettings fetchParentLockSettings( Model model, User user, AccountType accountType, UserSettings settings,
-        long branchId, long regionId, int profilesMaster )
-    {
-        LOG.debug( "Method fetchParentLockSettings() called from ProfileManagementService" );
-        LockSettings parentLock = null;
-        try {
-            parentLock = profileManagementService.aggregateParentLockSettings( user, accountType, settings, branchId, regionId,
-                profilesMaster );
-        } catch ( InvalidInputException | NoRecordsFetchedException e ) {
-            LOG.error( "InvalidInputException while fetching profile. Reason :" + e.getMessage(), e );
-            model
-                .addAttribute( "message", messageUtils.getDisplayMessage( e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE ) );
-        }
-        LOG.debug( "Method fetchParentLockSettings() finished from ProfileManagementService" );
-        return parentLock;
     }
 
 
@@ -1592,7 +1553,7 @@ public class ProfileManagementController
                 if ( logoFileName == null || logoFileName.isEmpty() ) {
                     throw new InvalidInputException( "Logo passed is null or empty" );
                 }
-                logoUrl = fileUploadService.fileUploadHandler( fileLocal, logoFileName );
+                logoUrl = fileUploadService.uploadLogo( fileLocal, logoFileName );
                 logoUrl = amazonEndpoint + CommonConstants.FILE_SEPARATOR + amazonLogoBucket + CommonConstants.FILE_SEPARATOR
                     + logoUrl;
             } catch ( NonFatalException e ) {
@@ -1746,7 +1707,7 @@ public class ProfileManagementController
 
                 // uploading image
                 File fileLocal = new File( filePath );
-                profileImageUrl = fileUploadService.fileUploadHandler( fileLocal, imageFileName );
+                profileImageUrl = fileUploadService.uploadProfileImageFile( fileLocal, imageFileName, false );
                 profileImageUrl = amazonEndpoint + CommonConstants.FILE_SEPARATOR + amazonImageBucket
                     + CommonConstants.FILE_SEPARATOR + profileImageUrl;
             } catch ( NonFatalException e ) {
