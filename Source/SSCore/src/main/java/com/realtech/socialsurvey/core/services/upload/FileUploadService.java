@@ -18,7 +18,15 @@ public interface FileUploadService {
 	 * @throws InvalidInputException
 	 */
 	public String uploadLogo(MultipartFile fileLocal, String logoName) throws InvalidInputException;
-	public String uploadProfileImageFile(File file, String imageName) throws InvalidInputException;
+	/**
+	 * Uploads profile image
+	 * @param file
+	 * @param imageName
+	 * @param preserveFileName sets the file name that is being sent in the parameter
+	 * @return
+	 * @throws InvalidInputException
+	 */
+	public String uploadProfileImageFile(File file, String imageName, boolean preserveFileName) throws InvalidInputException;
 	
 	/**
 	 * Method that returns a list of all the keys in a bucket.
@@ -43,9 +51,10 @@ public interface FileUploadService {
 	 * Uploads logo file
 	 * @param file
 	 * @param imageName
+	 * @param preserveFileName sets the file name that is being sent in the parameter
 	 * @return
 	 * @throws InvalidInputException
 	 */
-	public String uploadLogoImageFile(File file, String imageName) throws InvalidInputException;
+	public String uploadLogoImageFile(File file, String imageName, boolean preserveFileName) throws InvalidInputException;
 
 }

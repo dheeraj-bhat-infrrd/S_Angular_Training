@@ -8,6 +8,7 @@ import java.sql.Timestamp;
 import javax.imageio.ImageIO;
 import org.apache.commons.io.FileUtils;
 import org.imgscalr.Scalr;
+import org.imgscalr.Scalr.Method;
 import org.imgscalr.Scalr.Mode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -71,7 +72,7 @@ public class ImageProcessorImpl implements ImageProcessor {
 		File f = new File(".");
 		LOG.debug("File path: "+f.getAbsolutePath());
 		File processedFile = null;
-		scaledImage = Scalr.resize(image, Mode.AUTOMATIC, width, height);
+		scaledImage = Scalr.resize(image, Method.SPEED, Mode.AUTOMATIC, width, height);
 		processedFile = new File(CommonConstants.TEMP_FOLDER + CommonConstants.FILE_SEPARATOR + String.valueOf(System.currentTimeMillis()) + "-"
 				+ width + "-" + height + "." + imageExtension);
 		try {
@@ -117,12 +118,12 @@ public class ImageProcessorImpl implements ImageProcessor {
 		String cloudFrontUrl = null;
 		if (imageType.equals(ImageProcessor.IMAGE_TYPE_PROFILE)) {
 			LOG.debug("Uploading profile pic");
-			fileUploadService.uploadProfileImageFile(image, destFileName);
+			fileUploadService.uploadProfileImageFile(image, destFileName, true);
 			cloudFrontUrl = amazonEndpoint + CommonConstants.FILE_SEPARATOR + amazonImageBucket + CommonConstants.FILE_SEPARATOR + destFileName;
 		}
 		else if (imageType.equals(ImageProcessor.IMAGE_TYPE_LOGO)) {
 			LOG.debug("Uploading logo");
-			fileUploadService.uploadProfileImageFile(image, destFileName);
+			fileUploadService.uploadProfileImageFile(image, destFileName, true);
 			cloudFrontUrl = amazonEndpoint + CommonConstants.FILE_SEPARATOR + amazonLogoBucket + CommonConstants.FILE_SEPARATOR + destFileName;
 		}
 		LOG.debug("Returning image name: " + cloudFrontUrl);
