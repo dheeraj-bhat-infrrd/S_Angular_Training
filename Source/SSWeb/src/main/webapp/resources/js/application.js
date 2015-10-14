@@ -1023,6 +1023,7 @@ function showDisplayPic() {
 					
 					$("#dsh-prsn-img").css("background", "url(" + imageUrl + ") no-repeat center");
 					$("#dsh-prsn-img").css("background-size", "cover");
+					$("#dsh-prsn-img").attr("data-img",imageUrl);
 				}
 				return data.responseJSON;
 			}
@@ -8873,3 +8874,126 @@ $('body').on('click', '#atpst-chk-box', function() {
 		updateAutoPostSetting(false);
 	}
 });
+
+//Dashboard fb and twitter share
+function getDashboardImageandCaption(loop) {
+	var name = "";
+	var designation = "";
+	var company = "";
+	var pictureandCaptionLink = "";
+	var fblink = "";
+	if ($("#fb_" + loop) != undefined) {
+
+		fblink = $("#fb_" + loop).data('link');
+	}
+
+	var imgId = $('#dsh-prsn-img').attr('data-img') || "";
+
+	if (document.getElementById("name") != null) {
+		name = document.getElementById("name").innerHTML;
+	}
+
+	if (document.getElementById("designation") != null) {
+		designation = document.getElementById("designation").innerHTML;
+	}
+
+	if (document.getElementById("company") != null) {
+		company = document.getElementById("company").innerHTML;
+
+	}
+
+	pictureandCaptionLink = "&picture=" + imgId + "&caption=" + name + ","
+			+ designation + "," + company;
+	fblink = fblink.concat(pictureandCaptionLink);
+	if (document.getElementById('fb_' + loop) != null)
+		document.getElementById('fb_' + loop).setAttribute('data-link', fblink);
+}
+
+function twitterDashboardFn(loop, twitterElement) {
+	var twitText = "";
+	var twitLink = $("#twitt_" + loop).data('link');
+	var String = twitLink.substring(twitLink.indexOf("=") + 1, twitLink
+			.lastIndexOf("&"));
+	var twitId = 'twttxt_' + loop;
+	if ($("#" + twitId) != undefined) {
+		twitText = $("#" + twitId).val();
+	}
+
+	var length = twitText.length;
+	if (length > 109) {
+		var arr = twitLink.split('');
+		var twittStrnDot = "...";
+		var substringed = twitText.substring(0, 105);
+		var finalString = substringed.concat(twittStrnDot);
+		if ($("#" + twitId) != undefined) {
+			$("#" + twitId).val(finalString);
+		}
+
+		twitLink = twitLink.replace(String, finalString);
+		if (document.getElementById('twitt_' + loop) != undefined)
+			document.getElementById('twitt_' + loop).setAttribute('data-link',
+					twitLink);
+	}
+
+}
+
+
+//Edit profile fb and twitter share functions
+function twitterProfileFn(loop, twitterElement) {
+
+	var twitLink = $("#twitt_" + loop).data('link');
+	var String = twitLink.substring(twitLink.indexOf("=") + 1, twitLink
+			.lastIndexOf("&"));
+	var twitId = 'twttxt_' + loop;
+	var twitText = $("#" + twitId).val();
+	var length = twitText.length;
+	if (length > 109) {
+		var arr = twitLink.split('');
+		var twittStrnDot = "...";
+		var substringed = twitText.substring(0, 105);
+		var finalString = substringed.concat(twittStrnDot);
+		$("#" + twitId).val(finalString);
+		twitLink = twitLink.replace(String, finalString);
+
+		if (document.getElementById('twitt_' + loop) != null) {
+
+			document.getElementById('twitt_' + loop).setAttribute('data-link',
+					twitLink);
+		}
+
+	}
+
+}
+function getImageandCaptionProfile(loop) {
+
+	var pictureandCaptionLink = "";
+	var fblink = $("#fb_" + loop).data('link');
+	var name = "";
+	var title = "";
+	var vertical = "";
+	var imgid = "";
+	if (document.getElementById("prof-image-edit") != null
+			&& document.getElementById("prof-image-edit").getAttribute("src") != null) {
+
+		imgid = document.getElementById("prof-image-edit").getAttribute("src");
+	}
+	if ($("#prof-name") != undefined) {
+		name = $("#prof-name").val();
+	}
+	if ($("#prof-title") != undefined) {
+
+		title = $("#prof-title").val();
+	}
+	if ($("#prof-vertical") != undefined) {
+
+		vertical = $("#prof-vertical").val();
+	}
+	pictureandCaptionLink = "&picture=" + imgid + "&caption=" + name + ","
+			+ title + "," + vertical;
+
+	fblink = fblink.concat(pictureandCaptionLink);
+	if (document.getElementById('fb_' + loop) != null) {
+		document.getElementById('fb_' + loop).setAttribute('data-link', fblink);
+	}
+
+}
