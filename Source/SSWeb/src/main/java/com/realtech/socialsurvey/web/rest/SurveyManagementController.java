@@ -35,6 +35,7 @@ import com.realtech.socialsurvey.core.dao.impl.MongoOrganizationUnitSettingDaoIm
 import com.realtech.socialsurvey.core.dao.impl.MongoSocialPostDaoImpl;
 import com.realtech.socialsurvey.core.entities.AccountsMaster;
 import com.realtech.socialsurvey.core.entities.AgentSettings;
+import com.realtech.socialsurvey.core.entities.ComplaintRegistrationSettings;
 import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
 import com.realtech.socialsurvey.core.entities.SurveyDetails;
 import com.realtech.socialsurvey.core.entities.SurveyPreInitiation;
@@ -258,6 +259,20 @@ public class SurveyManagementController
                         emailServices.sendSurveyCompletionMailToAdminsAndAgent( admin.getValue(), admin.getKey(), surveyDetail,
                             customerName, surveyScore );
                     }
+                }
+                
+                OrganizationUnitSettings companySettings  = organizationManagementService.getCompanySettings( survey.getCompanyId() );
+                if(companySettings.getSurvey_settings().getComplaint_reg_settings() != null)
+                {
+                    ComplaintRegistrationSettings complaintRegistrationSettings = companySettings.getSurvey_settings().getComplaint_reg_settings();
+                    
+                    if ( complaintRegistrationSettings.isEnabled() && ( (survey.getScore() > 0d && survey.getScore() < complaintRegistrationSettings
+                        .getRating()) || complaintRegistrationSettings.getMoodList().contains( mood ) ) ) {
+                         survey.setUnderResolution( true );
+                         surveyHandler.updateSurveyAsUnderResolution(survey.get_id());
+                         emailServices.sendComplaintHandlingMail( complaintRegistrationSettings.getMailId(), customerName, customerEmail, mood, surveyScore );
+                    }
+                        
                 }
             } catch ( InvalidInputException e ) {
                 LOG.error( "Exception occurred while trying to send survey completion mail to : " + customerEmail );
