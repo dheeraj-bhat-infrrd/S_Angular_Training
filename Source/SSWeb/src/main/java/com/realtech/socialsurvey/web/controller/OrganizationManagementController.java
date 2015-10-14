@@ -622,6 +622,7 @@ public class OrganizationManagementController
             }
             if ( surveySettings.getShow_survey_above_score() == 0f ) {
                 surveySettings.setShow_survey_above_score( CommonConstants.DEFAULT_AUTOPOST_SCORE );
+                surveySettings.setAutoPostEnabled( true );
                 unitSettings.setSurvey_settings( surveySettings );
                 organizationManagementService.updateScoreForSurvey( collectionName, unitSettings, surveySettings );
             }
