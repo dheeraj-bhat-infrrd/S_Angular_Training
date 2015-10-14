@@ -156,7 +156,7 @@ public class OrganizationManagementController
         }
 
         try {
-            logoName = fileUploadService.fileUploadHandler( fileLocal, request.getParameter( "logo_name" ) );
+            logoName = fileUploadService.uploadLogo( fileLocal, request.getParameter( "logo_name" ) );
             // Setting the complete logo url in session
             logoName = endpoint + CommonConstants.FILE_SEPARATOR + logoBucket + CommonConstants.FILE_SEPARATOR + logoName;
 

@@ -17,6 +17,204 @@ $(document).ajaxStop(function() {
 	adjustImage();
 });
 
+//Profile page event binding
+$(document).on("click", "#prof-company-review-count",function(){
+	if(window.innerWidth < 768){
+		$('.icn-star-smile').click();					
+	}
+	$('html, body').animate({
+		scrollTop : $('#reviews-container').offset().top
+	},500);
+});
+
+//Find a pro
+$(document).on('keyup', '#find-pro-form input', function(e) {
+	if(e.which == 13)
+		submitFindProForm();
+});
+
+$(document).on("click", '#find-pro-submit', function(e) {
+	e.preventDefault();
+	submitFindProForm();
+});
+
+function submitFindProForm() {
+	$('#find-pro-form').submit();
+	showOverlay();
+}
+
+// Contact us form validation functions
+function validateMessage(elementId) {
+	if ($('#'+elementId).val() != "") {
+		return true;
+	} else {
+		showErrorMobileAndWeb('Please enter your message!');
+		return false;
+	}
+}
+
+function validateName(elementId){
+	if ($('#'+elementId).val() != "") {
+		if (nameRegex.test($('#'+elementId).val()) == true) {
+			return true;
+		} else {
+			showErrorMobileAndWeb('Please enter your valid name!');
+			return false;
+		}
+	} else {
+		showErrorMobileAndWeb('Please enter your valid name!');
+		return false;
+	}
+}
+
+function validateContactUsForm() {
+	isContactUsFormValid = true;
+
+	var isFocussed = false;
+	if($(window).width() < 768){
+		isSmallScreen = true;
+	}
+	
+	// Validate form input elements
+	if (!validateName('lp-input-name')) {
+		isContactUsFormValid = false;
+		if (!isFocussed) {
+			$('#lp-input-name').focus();
+			isFocussed=true;
+		}
+		return isContactUsFormValid;
+	}
+	
+	if (!validateEmailId('lp-input-email')) {
+		isContactUsFormValid = false;
+		if (!isFocussed) {
+			$('#lp-input-email').focus();
+			isFocussed=true;
+		}
+		return isContactUsFormValid;
+	}
+	
+	if (!validateMessage('lp-input-message')) {
+		isContactUsFormValid = false;
+		if (!isFocussed) {
+			$('#lp-input-message').focus();
+			isFocussed=true;
+		}
+		return isContactUsFormValid;
+	}
+	
+	if (!validateMessage('captcha-text')) {
+		isContactUsFormValid = false;
+		if (!isFocussed) {
+			$('#captcha-text').focus();
+			isFocussed=true;
+		}
+		return isContactUsFormValid;
+	}
+	
+	return isContactUsFormValid;
+} 
+
+$(document).on('click', '.icn-person', function() {
+    $('.mob-icn').removeClass('mob-icn-active');
+    $(this).addClass('mob-icn-active');
+    $('#prof-company-intro').show();
+    $('#contact-info').show();
+    $('#prof-agent-container').hide();
+    $('#reviews-container').hide();
+    $('#recent-post-container').hide();
+});
+
+$(document).on('click', '.icn-ppl', function() {
+    $('.mob-icn').removeClass('mob-icn-active');
+    $(this).addClass('mob-icn-active');
+    $('#recent-post-container').show();
+    $('#contact-info').hide();
+    $('#prof-agent-container').hide();
+    $('#prof-company-intro').hide();
+    $('#reviews-container').hide();
+});
+
+$(document).on('click', '.icn-star-smile', function() {
+    $('.mob-icn').removeClass('mob-icn-active');
+    $(this).addClass('mob-icn-active');
+    $('#reviews-container').show();
+    $('#contact-info').hide();
+    $('#prof-agent-container').hide();
+    $('#prof-company-intro').hide();
+    $('#recent-post-container').hide();
+});
+
+$(document).on('click', '.inc-more', function() {
+    $('.mob-icn').removeClass('mob-icn-active');
+    $(this).addClass('mob-icn-active');
+    $('#prof-agent-container').show();
+    $('#prof-company-intro').hide();
+    $('#contact-info').hide();
+    $('#reviews-container').hide();
+    $('#recent-post-container').hide();
+});
+
+$(document).on('click','.bd-q-contact-us',function(){
+    $('#contact-us-pu-wrapper').show();
+    $('body').addClass('body-no-scroll-y');
+});
+
+$(document).on('click','.bd-q-btn-cancel',function(){
+    $('#contact-us-pu-wrapper').hide();
+    $('body').removeClass('body-no-scroll-y');
+});
+
+$(document).on('click', '.lp-button', function(event){
+	if(validateContactUsForm()){
+		url = getLocationOrigin() + "/pages/profile/sendmail.do";
+		data = "";
+		if($("#agent-profile-name").val() != ""){
+			data += "profilename=" + $("#agent-profile-name").val();
+			data += "&profiletype=" + $("#profile-fetch-info").attr("profile-level");
+		}
+		else if($("#company-profile-name").val() != ""){
+			data += "profilename=" + $("#company-profile-name").val();
+			data += "&profiletype=" + $("#profile-fetch-info").attr("profile-level");
+		}
+		else if($("#region-profile-name").val() != ""){
+			data += "profilename=" + $("#region-profile-name").val();
+			data += "&profiletype=" + $("#profile-fetch-info").attr("profile-level");
+		}
+		else if($("#branch-profile-name").val() != ""){
+			data += "profilename=" + $("#branch-profile-name").val();
+			data += "&profiletype=" + $("#profile-fetch-info").attr("profile-level");
+		}
+		
+		data += "&name=" + $('#lp-input-name').val();
+		data += "&email=" + $('#lp-input-email').val();
+		data += "&message=" + $('#lp-input-message').val();
+		data += "&g-recaptcha-response=" + $('#g-recaptcha-response').val();
+		//data += "&recaptcha_input=" + $('#captcha-text').val();
+		showOverlay();
+		callAjaxPostWithPayloadData(url,showMessage,data,true);
+	}			
+});
+
+function showMessage(data){
+	var jsonData = JSON.parse(data);
+	if(jsonData["success"] == 1){
+		showInfoMobileAndWeb(jsonData["message"]);
+		$(".reg-cap-reload").click();
+		
+		// resetting contact form and captcha
+		$('#prof-contact-form')[0].reset();
+		var recaptchaframe = $('.g-recaptcha iframe');
+        var recaptchaSoure = recaptchaframe[0].src;
+        recaptchaframe[0].src = '';
+        setInterval(function () { recaptchaframe[0].src = recaptchaSoure; }, 500);
+	}
+	else{
+		showErrorMobileAndWeb(jsonData["message"]);
+		$(".reg-cap-reload").click();
+	}
+}
+
 function adjustImage(){
     $('.mobile-tabs').children('.mob-icn-active').click();
     var windW = $(window).width();
