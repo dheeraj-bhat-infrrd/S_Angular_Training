@@ -25,7 +25,7 @@ public class ImageProcessingStarter extends QuartzJobBean {
 		ImagesCollection imageCollection = new ImagesCollection();
 		imageCollection.setThumbnailImage(new ImageDetails());
 		try {
-			imageProcessor.processAndUpdateImageForAllDimensions("https://s3-us-west-1.amazonaws.com/agent-survey/dev/userprofilepics/d-83bcd094541e74bc4c4c13b8f5ba6d332b28e343ed4f10be95e2a277e9aff18c99a16be051319e919e3abde93a08b4c085f014e71edf59a5de209cc8656d8334.jpg", imageCollection, ImageProcessor.IMAGE_TYPE_PROFILE);
+			imageProcessor.processAndUpdateImageForAllDimensions("https://don7n2as2v6aa.cloudfront.net/userprofilepics/P-ae12f4d2e10a5437b18dbc58c55170737b409c7dd5aa3a5121f77757f94d5acd71b277130acdb9a08b3ea8169734c834aaee0c036840e20915ca0873e8d0ae19.png", imageCollection, ImageProcessor.IMAGE_TYPE_PROFILE);
 		}
 		catch (ImageProcessingException | InvalidInputException e) {
 			LOG.error("Could not process image", e);

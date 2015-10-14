@@ -73,11 +73,11 @@ public class CloudUploadServiceImpl implements FileUploadService
 
 
     @Override
-    public String uploadProfileImageFile( File file, String imageName ) throws InvalidInputException
+    public String uploadProfileImageFile( File file, String imageName, boolean preserveFileName ) throws InvalidInputException
     {
         LOG.info( "Method uploadProfileImageFile inside AmazonUploadServiceImpl called" );
         try {
-            return uploadImage( file, imageName, bucket + CommonConstants.FILE_SEPARATOR + imageBucket );
+            return uploadImage( file, imageName, bucket + CommonConstants.FILE_SEPARATOR + imageBucket, preserveFileName );
         } catch ( InvalidInputException e ) {
             LOG.error( "IOException occured while reading file. Reason : " + e.getMessage(), e );
             throw new FatalException( "IOException occured while reading file. Reason : " + e.getMessage(), e );
@@ -85,10 +85,10 @@ public class CloudUploadServiceImpl implements FileUploadService
     }
 
     @Override
-    public String uploadLogoImageFile(File file, String imageName) throws InvalidInputException{
+    public String uploadLogoImageFile(File file, String imageName, boolean preserveFileName) throws InvalidInputException{
     	LOG.info( "Method uploadLogoImageFile inside AmazonUploadServiceImpl called" );
         try {
-            return uploadImage( file, imageName, bucket + CommonConstants.FILE_SEPARATOR + logoBucket );
+            return uploadImage( file, imageName, bucket + CommonConstants.FILE_SEPARATOR + logoBucket, preserveFileName );
         } catch ( InvalidInputException e ) {
             LOG.error( "IOException occured while reading file. Reason : " + e.getMessage(), e );
             throw new FatalException( "IOException occured while reading file. Reason : " + e.getMessage(), e );
@@ -105,7 +105,7 @@ public class CloudUploadServiceImpl implements FileUploadService
                 File convFile = new File( CommonConstants.IMAGE_NAME );
                 fileLocal.transferTo( convFile );
 
-                return uploadImage( convFile, logoName, bucket + CommonConstants.FILE_SEPARATOR + logoBucket );
+                return uploadImage( convFile, logoName, bucket + CommonConstants.FILE_SEPARATOR + logoBucket, false );
             } catch ( IOException e ) {
                 LOG.error( "IOException occured while reading file. Reason : " + e.getMessage(), e );
                 throw new FatalException( "IOException occured while reading file. Reason : " + e.getMessage(), e );
@@ -125,29 +125,38 @@ public class CloudUploadServiceImpl implements FileUploadService
     }
 
 
-    private String uploadImage( File convFile, String logoName, String bucket ) throws InvalidInputException
+    private String uploadImage( File convFile, String logoName, String bucket, boolean preserveFileName ) throws InvalidInputException
     {
+    	LOG.debug("Uploading file. preserving file name: "+preserveFileName);
         uploadUtils.validateFile( convFile );
 
-        StringBuilder amazonFileName = new StringBuilder( envPrefix ).append( CommonConstants.SYMBOL_HYPHEN );
-
-        amazonFileName.append( encryptionHelper.encryptSHA512( logoName + ( System.currentTimeMillis() ) ) );
-        if ( logoName.endsWith( ".jpg" ) || logoName.endsWith( ".JPG" ) ) {
-            amazonFileName.append( CommonConstants.SYMBOL_FULLSTOP + "jpg" );
-        } else if ( logoName.endsWith( ".jpeg" ) || logoName.endsWith( ".JPEG" ) ) {
-            amazonFileName.append( CommonConstants.SYMBOL_FULLSTOP + "jpeg" );
-        } else if ( logoName.endsWith( ".png" ) || logoName.endsWith( ".PNG" ) ) {
-            amazonFileName.append( CommonConstants.SYMBOL_FULLSTOP + "png" );
+        String fileName = null;
+        StringBuilder amazonFileName = null;
+        
+        if(!preserveFileName){
+	        amazonFileName = new StringBuilder( envPrefix ).append( CommonConstants.SYMBOL_HYPHEN );
+	
+	        amazonFileName.append( encryptionHelper.encryptSHA512( logoName + ( System.currentTimeMillis() ) ) );
+	        if ( logoName.endsWith( ".jpg" ) || logoName.endsWith( ".JPG" ) ) {
+	            amazonFileName.append( CommonConstants.SYMBOL_FULLSTOP + "jpg" );
+	        } else if ( logoName.endsWith( ".jpeg" ) || logoName.endsWith( ".JPEG" ) ) {
+	            amazonFileName.append( CommonConstants.SYMBOL_FULLSTOP + "jpeg" );
+	        } else if ( logoName.endsWith( ".png" ) || logoName.endsWith( ".PNG" ) ) {
+	            amazonFileName.append( CommonConstants.SYMBOL_FULLSTOP + "png" );
+	        }
+	        fileName = amazonFileName.toString();
+        }else{
+        	fileName = logoName;
         }
 
         try {
-            uploadFile( convFile, amazonFileName.toString(), bucket );
+            uploadFile( convFile, fileName, bucket );
         } catch ( NonFatalException e ) {
             throw new InvalidInputException( "Could not upload file: " + e.getMessage(), e );
         }
 
-        LOG.info( "Amazon file Name: " + amazonFileName.toString() );
-        return amazonFileName.toString();
+        LOG.info( "Amazon file Name: " + fileName );
+        return fileName;
     }
 
 

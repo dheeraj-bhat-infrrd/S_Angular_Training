@@ -105,7 +105,7 @@ public class FileUploadServiceImpl implements FileUploadService {
 	}
 
 	@Override
-	public String uploadProfileImageFile(File file, String imageName) throws InvalidInputException {
+	public String uploadProfileImageFile(File file, String imageName, boolean preserveFileName) throws InvalidInputException {
 		// TODO Auto-generated method stub
 		return null;
 	}
@@ -116,7 +116,7 @@ public class FileUploadServiceImpl implements FileUploadService {
 	}
 
 	@Override
-	public String uploadLogoImageFile(File file, String imageName) throws InvalidInputException {
+	public String uploadLogoImageFile(File file, String imageName, boolean preserveFileName) throws InvalidInputException {
 		// TODO Auto-generated method stub
 		return null;
 	}
