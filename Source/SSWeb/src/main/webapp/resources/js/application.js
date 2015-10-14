@@ -1816,7 +1816,43 @@ function bindUserSelector() {
  * binds the click and keyup of region selector
  */
 function bindRegionSelectorEvents(){
-	$("#selected-region-txt").keyup(function(e) {
+	callAjaxGET("/fetchregions.do", function(data) {
+		var regionList = [];
+		if(data != undefined && data != "")
+			regionList = $.parseJSON(data);
+		var searchData = [];
+		for(var i=0, j=0; i<regionList.length; i++) {
+			if(regionList[i].isDefaultBySystem == 0) {
+				searchData[j] = {};
+				searchData[j].label = regionList[i].regionName;
+				searchData[j].regionId = regionList[i].regionId;
+				j++;				
+			}
+		}
+		$("#selected-region-txt").autocomplete({
+			source : searchData,
+			minLength: 0,
+			delay : 0,
+			autoFocus : true,
+			select: function(event, ui) {
+				$("#selected-region-txt").val(ui.item.label);
+				$('#selected-region-id-hidden').val(ui.item.regionId);
+				return false;
+			},
+			close: function(event, ui) {},
+			create: function(event, ui) {
+		        $('.ui-helper-hidden-accessible').remove();
+			}
+		}).autocomplete("instance")._renderItem = function(ul, item) {
+			return $("<li>").append(item.label).appendTo(ul);
+	  	};
+	  	$("#selected-region-txt").off('focus');
+		$("#selected-region-txt").focus(function(){            
+            $(this).autocomplete('search');
+        });
+	}, true);
+	
+	/*$("#selected-region-txt").keyup(function(e) {
 		if(e.which != 38 && e.which != 40 && e.which != 13) {
 			var text = $("#selected-region-txt").val();
 			if (text.length > 0) {
@@ -1838,14 +1874,50 @@ function bindRegionSelectorEvents(){
 			}
 			populateRegionsSelector(regionPattern);
 		}		
-	});
+	});*/
 }
 
 /**
  * binds the click and keyup of office selector
  */
 function bindOfficeSelectorEvents(){
-	$("#office-selector").click(function(e){
+	callAjaxGET("/fetchbranches.do", function(data) {
+		var branchList = [];
+		if(data != undefined && data != "")
+		branchList = $.parseJSON(data);
+		var searchData = [];
+		for(var i=0,j=0; i<branchList.length; i++) {
+			if(branchList[i].isDefaultBySystem == 0) {
+				searchData[j] = {};
+				searchData[j].label = branchList[i].branchName;
+				searchData[j].branchId = branchList[i].branchId;
+				j++;
+			}
+		}
+		$("#selected-office-txt").autocomplete({
+			source : searchData,
+			minLength: 0,
+			delay : 0,
+			autoFocus : true,
+			select: function(event, ui) {
+				$("#selected-office-txt").val(ui.item.label);
+				$('#selected-office-id-hidden').val(ui.item.branchId);
+				return false;
+			},
+			close: function(event, ui) {},
+			create: function(event, ui) {
+		        $('.ui-helper-hidden-accessible').remove();
+			}
+		}).autocomplete("instance")._renderItem = function(ul, item) {
+			return $("<li>").append(item.label).appendTo(ul);
+	  	};
+	  	$("#selected-office-txt").off('focus');
+		$("#selected-office-txt").focus(function(){            
+            $(this).autocomplete('search');
+        });
+	}, true);
+	
+	/*$("#office-selector").click(function(e){
 		e.stopPropagation();
 		if(!$('#selected-office-txt').is(':disabled')){
 			var officePattern = $("#selected-office-txt").val();
@@ -1865,7 +1937,7 @@ function bindOfficeSelectorEvents(){
 		}else {
 			$("#offices-droplist").slideUp(200);
 		}
-	});
+	});*/
 }
 
 /**
@@ -7372,6 +7444,8 @@ function paintAvgRating(avgRating) {
 $(document).on('blur', '#contant-info-container input[data-email]', function() {
 	if (!$(this).val() || !emailRegex.test(this.value)
 			|| ($(this).val() == $('#' + $(this).attr("id") + '-old').val())) {
+		$('#overlay-toast').html("Please enter valid email address");
+		showToast();
 		return;
 	}
 	

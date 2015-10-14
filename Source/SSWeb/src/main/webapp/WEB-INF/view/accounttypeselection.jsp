@@ -78,14 +78,20 @@
 		<div class="payment-table">
 			<table class="payment-pricing">
 				<tbody>
+					<tr class="payment-acc-hdr-row">
+						<th></th>
+						<th class="vertical-top payment-acc-th"><strong><span class="currency">$</span>29.95</strong> /
+							Month</th>
+						<th class="vertical-top payment-acc-th"><strong><span class="currency">$</span>19.95</strong> /
+							User / Month</th>
+						<th class="vertical-top payment-acc-th"><strong><span class="currency">$</span>19.95</strong> /
+							User / Month</th>
+					</tr>
 					<tr>
 						<th></th>
-						<th><strong><span class="currency">$</span>29.95</strong> /
-							Month<div class="payment-acc-type-txt"><spring:message code="label.payment.type.individual"/></div></th>
-						<th><strong><span class="currency">$</span>19.95</strong> /
-							User / Month<div class="payment-acc-type-txt"><spring:message code="label.payment.type.smallbusiness"/></div></th>
-						<th><strong><span class="currency">$</span>19.95</strong> /
-							User / Month<div class="payment-acc-type-txt"><spring:message code="label.payment.type.enterprise"/></div></th>
+						<th><div class="payment-acc-type-txt"><spring:message code="label.payment.type.individual"/></div></th>
+						<th><div class="payment-acc-type-txt"><spring:message code="label.payment.type.smallbusiness"/></div></th>
+						<th><div class="payment-acc-type-txt"><spring:message code="label.payment.type.enterprise"/></div></th>
 					</tr>
 					<tr>
 						<td><spring:message code="label.payment.row.header.special"/></td>
