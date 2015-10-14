@@ -17,7 +17,6 @@
 	<link rel="stylesheet" href="${initParam.resourcesPath}/resources/css/bootstrap.min.css">
 	<link rel="stylesheet" href="${initParam.resourcesPath}/resources/css/style-common-1.1.css">
 	<link rel="stylesheet" href="${initParam.resourcesPath}/resources/css/style-resp-1.1.css">
-	<script src='//www.google.com/recaptcha/api.js'></script>
 </head>
 
 <c:set var="user" value="${sessionScope.SPRING_SECURITY_CONTEXT.authentication.principal}" />
@@ -196,22 +195,15 @@
 			</div>
 		</div>
 	</div>
-	<%-- <jsp:include page="footer_new.jsp"></jsp:include> --%>
-<!-- <div style="display: none">
-	<script src="https://www.google.com/recaptcha/api/challenge?k=6LdlHOsSAAAAAM8ypy8W2KXvgMtY2dFsiQT3HVq-"></script>
-</div>
- -->
  
- 
+<script src='//www.google.com/recaptcha/api.js'></script>
 <script src="//ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
 <script>
 	if (!window.jQuery) { document.write('<script src="${initParam.resourcesPath}/resources/js/jquery-2.1.1.min.js""><\/script>'); }
 </script>
 <script src="${initParam.resourcesPath}/resources/js/bootstrap.min.js"></script>
-<script src="${initParam.resourcesPath}/resources/js/script-1.1.js"></script>
 <script src="${initParam.resourcesPath}/resources/js/common.js"></script>
 <script src="${initParam.resourcesPath}/resources/js/script.js"></script>
-<script src="${initParam.resourcesPath}/resources/js/index.js"></script>
 <script>
 $(document).ready(function(){
 	var captchaText=true;

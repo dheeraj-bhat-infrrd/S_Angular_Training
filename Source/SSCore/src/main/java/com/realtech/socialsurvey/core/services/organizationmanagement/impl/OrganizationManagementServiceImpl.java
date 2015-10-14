@@ -21,9 +21,7 @@ import java.util.Set;
 import java.util.TreeMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
 import javax.annotation.Resource;
-
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellStyle;
 import org.apache.poi.ss.usermodel.Row;
@@ -39,7 +37,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.DependsOn;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
-
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
@@ -65,6 +62,7 @@ import com.realtech.socialsurvey.core.entities.BranchSettings;
 import com.realtech.socialsurvey.core.entities.CRMInfo;
 import com.realtech.socialsurvey.core.entities.CollectionDotloopProfileMapping;
 import com.realtech.socialsurvey.core.entities.Company;
+import com.realtech.socialsurvey.core.entities.ComplaintRegistrationSettings;
 import com.realtech.socialsurvey.core.entities.ContactDetailsSettings;
 import com.realtech.socialsurvey.core.entities.ContactNumberSettings;
 import com.realtech.socialsurvey.core.entities.CrmBatchTracker;
@@ -3982,6 +3980,17 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
         return branches;
     }
 
+    @Override
+    public String fetchBranchesByCompany( long companyId ) throws InvalidInputException, SolrException,
+        MalformedURLException
+    {
+
+        long branchCount = solrSearchService.fetchBranchCountByCompany( companyId );
+        String branchesResult = "";
+        if(branchCount > 0) 
+        	branchesResult = solrSearchService.fetchBranchesByCompany( companyId, (int) branchCount );
+        return branchesResult;
+    }
 
     @Override
     public Map<Long, RegionFromSearch> fetchRegionsMapByCompany( long companyId ) throws InvalidInputException, SolrException,
@@ -3999,6 +4008,18 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
             regions.put( region.getRegionId(), region );
         }
         return regions;
+    }
+    
+    @Override
+    public String fetchRegionsByCompany( long companyId ) throws InvalidInputException, SolrException,
+        MalformedURLException
+    {
+    	LOG.info("Method called to fetch the regions by company for company id : " + companyId);
+        long regionsCount = solrSearchService.fetchRegionCountByCompany( companyId );
+        String regionsResult = "";
+        if(regionsCount > 0)
+        	regionsResult = solrSearchService.fetchRegionsByCompany( companyId, (int) regionsCount );
+        return regionsResult;
     }
 
 
