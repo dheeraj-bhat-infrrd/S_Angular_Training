@@ -31,7 +31,7 @@
 
 	<div>
 		<div>
-			<input type="checkbox" name="enabled">
+			<input type="checkbox" name="enabled" value="enable">
 		</div>
 	
 		<!-- set the min rating -->
@@ -59,13 +59,13 @@
 		<div>
 			<div id="sq-neutral-smile" class="sq-smile-icn-container">
 				<div id="neutral-smile" star-no="2" class="sq-smile-icn-wrapper sq-neutral-smile"></div>
-				<div class="sq-smile-icn-text sq-smile-neutral-text float-left">
+				<div class="sq-smile-icn-text sq-smile-neutral-text float-left" name="mood">
 					<spring:message code="label.smile.neutral.text"/>
 				</div>
 			</div>
 			<div id="sq-sad-smile" class="sq-smile-icn-container">
 				<div id="sad-smile" star-no="3" class="sq-smile-icn-wrapper sq-sad-smile"></div>
-				<div class="sq-smile-icn-text sq-smile-sad-text float-left">
+				<div class="sq-smile-icn-text sq-smile-sad-text float-left" name="mood">
 					<spring:message code="label.smile.sad.text"/>
 				</div>
 			</div>
@@ -90,7 +90,7 @@
 		<div><spring:message code="label.complaintreg.mood.text" /> : ${complaintRegSettings.mood}</div>
 	</c:if>
 	<div id="sur-under-res-list">
-		<!-- Javascript will display surveys under Complaint resolution 
+		<!-- Javascript will display reviews under Complaint resolution 
 	</div>
 </div>
 -->
