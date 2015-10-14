@@ -1,15 +1,7 @@
 package com.realtech.socialsurvey.core.services.mail.impl;
 
-import java.io.ByteArrayInputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
-import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Properties;
 
 import javax.mail.Address;
@@ -21,12 +13,9 @@ import javax.mail.internet.AddressException;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 
-import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.realtech.socialsurvey.core.dao.GenericDao;
@@ -37,19 +26,14 @@ import com.realtech.socialsurvey.core.entities.SmtpSettings;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.services.mail.EmailSender;
 import com.realtech.socialsurvey.core.services.mail.UndeliveredEmailException;
-import com.realtech.socialsurvey.core.utils.EmailFormatHelper;
 import com.realtech.socialsurvey.core.utils.FileOperations;
-import com.sendgrid.SendGrid;
-import com.sendgrid.SendGrid.Email;
-import com.sendgrid.SendGrid.Response;
-import com.sendgrid.SendGridException;
 
 
 // JIRA: SS-7: By RM02: BOC
 /**
  * Class with utility methods to send mails
  */
-public final class EmailSenderImpl implements EmailSender, InitializingBean
+public final class EmailSenderImpl implements EmailSender
 {
 
     private static final Logger LOG = LoggerFactory.getLogger( EmailSenderImpl.class );
@@ -63,118 +47,11 @@ public final class EmailSenderImpl implements EmailSender, InitializingBean
     @Autowired
     private GenericDao<EmailObject, Long> emailDao;
 
-    @Value ( "${SENDGRID_SENDER_NAME}")
-    private String defaultSendName;
-
-    @Value ( "${DEFAULT_EMAIL_FROM_ADDRESS}")
-    private String defaultFromAddress;
-
-    @Value ( "${SEND_MAIL}")
-    private String sendMail;
-
-    @Autowired
-    private EmailFormatHelper emailFormatHelper;
-
-    @Value ( "${SENDGRID_SENDER_USERNAME}")
-    private String sendGridUserName;
-
-    @Value ( "${SENDGRID_SENDER_PASSWORD}")
-    private String sendGridPassword;
-
-    private SendGrid sendGrid;
-
 
     @Override
     public boolean sendEmailByEmailEntity( EmailEntity emailEntity ) throws InvalidInputException
     {
-
-        LOG.debug( "metod sendEmail started" );
-
-        if ( emailEntity.getSenderEmailId() == null || emailEntity.getSenderEmailId().isEmpty() ) {
-            LOG.debug( "Setting default from email id" );
-            emailEntity.setSenderEmailId( defaultFromAddress );
-        }
-        if ( emailEntity.getSenderName() == null || emailEntity.getSenderName().isEmpty() ) {
-            LOG.debug( "Setting default sender name" );
-            emailEntity.setSenderName( defaultSendName );
-        }
-        if ( emailEntity.getRecipients() == null || emailEntity.getRecipients().isEmpty() ) {
-            throw new InvalidInputException( "No recipients to send mail" );
-        }
-        if ( emailEntity.getBody() == null || emailEntity.getBody().isEmpty() ) {
-            throw new InvalidInputException( "Email body is blank." );
-        }
-        if ( emailEntity.getSubject() == null || emailEntity.getSubject().isEmpty() ) {
-            throw new InvalidInputException( "Email subject is blank." );
-        }
-        List<String> recipients = emailEntity.getRecipients();
-        if ( recipients == null || recipients.isEmpty() ) {
-            LOG.error( "Recipient list is empty for sending mail" );
-            throw new InvalidInputException( "Recipient list is empty for sending mail" );
-        }
-
-        boolean mailSent = true;
-        Email email = new Email();
-        email.addTo( emailEntity.getRecipients().toArray( new String[emailEntity.getRecipients().size()] ) );
-        email.setFrom( emailEntity.getSenderEmailId() );
-        email.setFromName( emailEntity.getSenderName() );
-        email.setSubject( emailEntity.getSubject() );
-        email.setHtml( emailEntity.getBody() );
-        email.setText( emailFormatHelper.getEmailTextFormat( emailEntity.getBody() ) );
-
-        if ( emailEntity.getAttachmentDetail() != null ) {
-            Iterator<Map.Entry<String, String>> entries = emailEntity.getAttachmentDetail().entrySet().iterator();
-            while ( entries.hasNext() ) {
-                Entry<String, String> entry = entries.next();
-                if ( entry.getKey() != null && entry.getValue() != null ) {
-                    File file = null;
-                    FileInputStream fileInputStream = null;
-                    try {
-                        file = new File( entry.getValue() );
-                        fileInputStream = new FileInputStream( file );
-
-                        InputStream inputStream = null;
-                        inputStream = new ByteArrayInputStream( FileUtils.readFileToByteArray( file ) );
-                        email.addAttachment( entry.getKey(), inputStream );
-
-                    } catch ( IOException e ) {
-                        LOG.error( "Exception caught " + e.getMessage() );
-                    } finally {
-                        if ( file != null ) {
-                            if ( file.exists() ) {
-                                file.delete();
-                            }
-                        }
-                        if ( fileInputStream != null ) {
-                            try {
-                                fileInputStream.close();
-                            } catch ( IOException e ) {
-                                LOG.error( "Exception caught " + e.getMessage() );
-                            }
-                        }
-                    }
-                }
-            }
-        }
-
-        Response response = null;
-        try {
-            LOG.debug( "About to send mail. " + emailEntity.toString() );
-            response = sendGrid.send( email );
-            LOG.debug( "Sent the mail. " + emailEntity.toString() );
-        } catch ( SendGridException e ) {
-            LOG.error( "Exception while sending the mail. " + emailEntity.toString(), e );
-            mailSent = false;
-        }
-
-        if ( response.getStatus() ) {
-            LOG.debug( "Mail sent successfully to " + emailEntity.toString() );
-        } else {
-            LOG.error( "Could not send mail to " + emailEntity.toString() + ". Reason: " + response.getMessage() );
-            mailSent = false;
-        }
-        return mailSent;
-
+        return false;
     }
 
 
@@ -455,17 +332,4 @@ public final class EmailSenderImpl implements EmailSender, InitializingBean
 
     }
 
-
-    @Override
-    public void afterPropertiesSet() throws Exception
-    {
-        LOG.info( "Settings Up sendGrid gateway" );
-
-        if ( sendGrid == null ) {
-            LOG.info( "Initialising Sendgrid gateway with " + sendGridUserName + " and " + sendGridPassword );
-            sendGrid = new SendGrid( sendGridUserName, sendGridPassword );
-            LOG.info( "Sendgrid gateway initialised!" );
-        }
-
-    }
 }
