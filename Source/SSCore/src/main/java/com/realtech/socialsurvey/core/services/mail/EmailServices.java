@@ -408,6 +408,6 @@ public interface EmailServices
     void sendReportBugMailToAdmin( String displayName, String errorMsg, String recipientMailId ) throws InvalidInputException,
         UndeliveredEmailException;
 
-void sendComplaintHandlingMail( String recipientMailId, String customerName, String customerMailId,
+void sendComplaintHandleMail( String recipientMailId, String customerName, String customerMailId,
         String mood, String rating ) throws InvalidInputException, UndeliveredEmailException;
 }

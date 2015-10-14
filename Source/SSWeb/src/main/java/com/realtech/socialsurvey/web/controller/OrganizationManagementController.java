@@ -25,6 +25,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.amazonaws.util.json.JSONException;
 import com.amazonaws.util.json.JSONObject;
+import com.braintreegateway.exceptions.AuthorizationException;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
@@ -1944,6 +1945,9 @@ public class OrganizationManagementController
         HttpSession session = request.getSession( false );
         User user = sessionHelper.getCurrentUser();
 
+        if(!user.isCompanyAdmin())
+            throw new AuthorizationException( "User is not authorized to access this page");
+        
         OrganizationUnitSettings unitSettings = null;
         long entityId = user.getCompany().getCompanyId();
         try {
@@ -1978,29 +1982,54 @@ public class OrganizationManagementController
         String ratingText = request.getParameter( "rating" );
         String moodText = request.getParameter( "mood" );
         String mailId = request.getParameter( "mailId" );
+        String enabled = request.getParameter( "enabled" );
+        boolean isComplaintHandlingEnabled = false;
 
+        long entityId = 0;
+        String message = "";
+        String mailIDStr = new String();
+        HttpSession session = request.getSession();
         User user = sessionHelper.getCurrentUser();
         ComplaintRegistrationSettings originalComplaintRegSettings = new ComplaintRegistrationSettings();
-        String message = "";
-        HttpSession session = request.getSession();
-        long entityId = 0;
 
+        if(!user.isCompanyAdmin())
+            throw new AuthorizationException( "User is not authorized to access this page");
+        
+        if ( mailId == null || mailId.isEmpty() ) {
+            throw new InvalidInputException( "Mail Id(s) of Complaint Handler(s) is null", DisplayMessageConstants.GENERAL_ERROR );
+        }
+        
+        if ( !mailId.contains( "," ) ) {
+            if ( !organizationManagementService.validateEmail( mailId ) )
+                throw new InvalidInputException( mailId + " entered as send alert to input is invalid",
+                    DisplayMessageConstants.GENERAL_ERROR );
+            else 
+                mailIDStr = mailId;
+        } else {
+            String mailIds[] = mailId.split( "," );
+            for ( String mailID : mailIds ) {
+                if ( !organizationManagementService.validateEmail( mailID.trim() ) )
+                    throw new InvalidInputException( mailID + " entered as send alert to input is invalid",
+                        DisplayMessageConstants.GENERAL_ERROR );
+                else 
+                    mailIDStr += mailID.trim() + " , ";
+            }
+            mailIDStr = mailIDStr.substring( 0, mailIDStr.length() - 2);
+        }
+        
+        if ( enabled == null || enabled.isEmpty() ) {
+            isComplaintHandlingEnabled = false;
+        } else if ( enabled.equalsIgnoreCase( "enable" ) )
+            isComplaintHandlingEnabled = true;
+        
         if ( ratingText == null || ratingText.isEmpty() ) {
             throw new InvalidInputException( "Rating selected is null", DisplayMessageConstants.GENERAL_ERROR );
         }
+        
         if ( moodText == null || moodText.isEmpty() ) {
             throw new InvalidInputException( "Mood text selected is null", DisplayMessageConstants.GENERAL_ERROR );
         }
-
-        if ( mailId == null || mailId.isEmpty() ) {
-            throw new InvalidInputException( "Mail Id of Complaint Handler is null", DisplayMessageConstants.GENERAL_ERROR );
-        }
-
-        if ( !organizationManagementService.validateEmail( mailId ) ) {
-            throw new InvalidInputException( "Invalid email id entered for Complaint Handler Mail Id",
-                DisplayMessageConstants.GENERAL_ERROR );
-        }
-
+        
         if ( entityIdStr == null || entityIdStr.isEmpty() ) {
             entityId = (long) session.getAttribute( CommonConstants.ENTITY_ID_COLUMN );
         } else {
@@ -2036,6 +2065,7 @@ public class OrganizationManagementController
             originalComplaintRegSettings.setRating( (float) rating );
             originalComplaintRegSettings.setMood( moodText );
             originalComplaintRegSettings.setMailId( mailId );
+            originalComplaintRegSettings.setEnabled( isComplaintHandlingEnabled );
 
             unitSettings.getSurvey_settings().setComplaint_reg_settings( originalComplaintRegSettings );
 
