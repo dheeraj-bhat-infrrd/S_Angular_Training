@@ -16,9 +16,11 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
+
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.apache.solr.common.SolrDocument;
 import org.slf4j.Logger;
@@ -30,6 +32,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.type.TypeFactory;
 import com.google.gson.Gson;
@@ -275,6 +278,7 @@ public class DashboardController
         int sentSurveyCount = (int) dashboardService.getAllSurveyCountForPastNdays( columnName, columnValue, numberOfDays );
         int socialPostsCount = (int) dashboardService.getSocialPostsForPastNdaysWithHierarchy( columnName, columnValue,
             numberOfDays );
+        socialPostsCount += (int) dashboardService.getSocialPostsForPastNdays( columnName, columnValue, numberOfDays );
         int profileCompleteness = 0;
         if ( !realtechAdmin )
             profileCompleteness = dashboardService.getProfileCompletionPercentage( user, columnName, columnValue, unitSettings );
@@ -346,8 +350,8 @@ public class DashboardController
             dashboardService.getCompletedSurveyCountForPastNdays( columnName, columnValue, numberOfDays ) );
         model.addAttribute( "clickedSurvey",
             dashboardService.getClickedSurveyCountForPastNdays( columnName, columnValue, numberOfDays ) );
-        model.addAttribute( "socialPosts",
-            dashboardService.getSocialPostsForPastNdaysWithHierarchy( entityType, entityId, numberOfDays ) );
+        model.addAttribute( "socialPosts", dashboardService.getSocialPostsForPastNdays( columnName, columnValue, numberOfDays )
+            + dashboardService.getSocialPostsForPastNdaysWithHierarchy( entityType, entityId, numberOfDays ) );
 
         LOG.info( "Method to get count of all, completed and clicked surveys, getSurveyCount() finished" );
         return JspResolver.DASHBOARD_SURVEYSTATUS;
@@ -1424,8 +1428,8 @@ public class DashboardController
 
             try {
                 Date date = new Date();
-                surveyDetails = profileManagementService.getReviews( iden, -1, -1, -1, -1, profileLevel, fetchAbusive , startDate,
-                    endDate, null );
+                surveyDetails = profileManagementService.getReviews( iden, -1, -1, -1, -1, profileLevel, fetchAbusive,
+                    startDate, endDate, null );
                 String fileName = "Survey_Results-" + profileLevel + "-" + user.getFirstName() + "_" + user.getLastName() + "-"
                     + ( new Timestamp( date.getTime() ) ) + EXCEL_FILE_EXTENSION;
                 XSSFWorkbook workbook = dashboardService.downloadCustomerSurveyResultsData( surveyDetails, fileName );
