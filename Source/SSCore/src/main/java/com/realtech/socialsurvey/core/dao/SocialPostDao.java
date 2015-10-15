@@ -1,7 +1,6 @@
 package com.realtech.socialsurvey.core.dao;
 
 import java.util.List;
-
 import com.realtech.socialsurvey.core.entities.SocialPost;
 import com.realtech.socialsurvey.core.entities.SocialUpdateAction;
 

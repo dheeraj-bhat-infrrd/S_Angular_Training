@@ -4,7 +4,6 @@ import java.text.ParseException;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
-
 import com.realtech.socialsurvey.core.entities.AbusiveSurveyReportWrapper;
 import com.realtech.socialsurvey.core.entities.AgentRankingReport;
 import com.realtech.socialsurvey.core.entities.SurveyDetails;
@@ -122,11 +121,11 @@ public interface SurveyDetailsDao
 
 
     public void getAverageScore( Date startDate, Date endDate, Map<Long, AgentRankingReport> agentReportData,
-        String columnName, long columnValue );
+        String columnName, long columnValue , boolean fetchAbusive );
 
 
     public void getCompletedSurveysCount( Date startDate, Date endDate, Map<Long, AgentRankingReport> agentReportData,
-        String colunmName, long columnValue );
+        String colunmName, long columnValue, boolean fetchAbusive  );
 
 
     public long noOfPreInitiatedSurveys( String columnName, long columnValue, Date startDate, Date endDate );
