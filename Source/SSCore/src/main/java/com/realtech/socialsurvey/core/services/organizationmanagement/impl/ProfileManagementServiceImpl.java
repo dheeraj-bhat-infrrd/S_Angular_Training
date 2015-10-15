@@ -1484,13 +1484,13 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 
 
     @Override
-    public long getReviewsCountForCompany( long companyId, double minScore, double maxScore, boolean fetchAbusive )
+    public long getReviewsCountForCompany( long companyId, double minScore, double maxScore, boolean fetchAbusive, boolean notRecommended )
     {
         LOG.info( "Method getReviewsCountForCompany called for companyId:" + companyId + " minscore:" + minScore + " maxscore:"
             + maxScore );
         long reviewsCount = 0;
         reviewsCount = surveyDetailsDao.getFeedBacksCount( CommonConstants.COMPANY_ID_COLUMN, companyId, minScore, maxScore,
-            fetchAbusive );
+            fetchAbusive, notRecommended );
         LOG.info( "Method getReviewsCountForCompany executed successfully" );
         return reviewsCount;
     }
@@ -1692,7 +1692,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
      * score specified
      */
     @Override
-    public long getReviewsCount( long iden, double minScore, double maxScore, String profileLevel, boolean fetchAbusive )
+    public long getReviewsCount( long iden, double minScore, double maxScore, String profileLevel, boolean fetchAbusive, boolean notRecommended )
         throws InvalidInputException
     {
         LOG.info( "Method getReviewsCount called for iden:" + iden + " minscore:" + minScore + " maxscore:" + maxScore
@@ -1702,7 +1702,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
         }
         long reviewsCount = 0;
         String idenColumnName = getIdenColumnNameFromProfileLevel( profileLevel );
-        reviewsCount = surveyDetailsDao.getFeedBacksCount( idenColumnName, iden, minScore, maxScore, fetchAbusive );
+        reviewsCount = surveyDetailsDao.getFeedBacksCount( idenColumnName, iden, minScore, maxScore, fetchAbusive, notRecommended );
 
         LOG.info( "Method getReviewsCount executed successfully. Returning reviewsCount:" + reviewsCount );
         return reviewsCount;

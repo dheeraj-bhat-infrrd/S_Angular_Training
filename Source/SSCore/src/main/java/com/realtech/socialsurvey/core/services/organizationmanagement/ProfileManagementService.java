@@ -366,7 +366,7 @@ public interface ProfileManagementService
      * @param maxScore
      * @return
      */
-    public long getReviewsCountForCompany( long companyId, double minScore, double maxScore, boolean fetchAbusive );
+    public long getReviewsCountForCompany( long companyId, double minScore, double maxScore, boolean fetchAbusive, boolean notRecommended );
 
 
     /**
@@ -381,7 +381,7 @@ public interface ProfileManagementService
      * @return
      * @throws InvalidInputException
      */
-    public long getReviewsCount( long iden, double minScore, double maxScore, String profileLevel, boolean fetchAbusive )
+    public long getReviewsCount( long iden, double minScore, double maxScore, String profileLevel, boolean fetchAbusive, boolean notRecommended )
         throws InvalidInputException;
 
 
