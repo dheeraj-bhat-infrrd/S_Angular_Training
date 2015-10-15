@@ -225,6 +225,9 @@ public interface CommonConstants
 
     public static final String RESTART_SURVEY_MAIL_BODY_IN_SESSION = "restartsurveymailbody";
     public static final String RESTART_SURVEY_MAIL_SUBJECT_IN_SESSION = "restartsurveymailsubject";
+    
+    public static final String SURVEY_COMPLETION_UNPLEASANT_MAIL_BODY_IN_SESSION = "surveycompletionunpleasantmailbody";
+    public static final String SURVEY_COMPLETION_UNPLEASANT_MAIL_SUBJECT_IN_SESSION = "surveycompletionunpleasantmailsubject";
 
     public static final String LOGIN_NAME = "loginName";
     public static final String HIGHEST_ROLE_ID_IN_SESSION = "highestrole";
@@ -326,6 +329,7 @@ public interface CommonConstants
     public static final String SURVEY_MAIL_SUBJECT = "Transaction with ";
     public static final String SURVEY_MAIL_SUBJECT_CUSTOMER = "Invitation to take survey";
     public static final String SURVEY_COMPLETION_MAIL_SUBJECT = "Survey completed successfully";
+    public static final String SURVEY_COMPLETION_UNPLEASANT_MAIL_SUBJECT = "Survey completed successfully";
     public static final String SOCIAL_POST_REMINDER_MAIL_SUBJECT = "Thanks again!";
     public static final String RESTART_SURVEY_MAIL_SUBJECT = "Invitation to update existing survey ";
     public static final String AGENT_PROFILE_FIXED_URL = "pages";
@@ -352,7 +356,8 @@ public interface CommonConstants
     public static final String SURVEY_COMPLETION_MAIL_FILENAME = "EmailTemplates/SurveyCompletionMailBody.html";
     public static final String SOCIAL_POST_REMINDER_MAIL_FILENAME = "EmailTemplates/SocialPostReminderMailBody.html";
     public static final String RESTART_SURVEY_MAIL_FILENAME = "EmailTemplates/SurveyRestartMailBody.html";
-
+    public static final String SURVEY_COMPLETION_UNPLEASANT_MAIL_FILENAME = "EmailTemplates/SurveyCompletionUnpleasantMailBody.html";
+    
     /**
      * Logo related config
      */
@@ -389,7 +394,8 @@ public interface CommonConstants
     public static final String SURVEY_COMPLETION_MAIL_BODY_CATEGORY = "SURVEY_COMPLETION_MAIL_BODY_CATEGORY";
     public static final String SOCIAL_POST_REMINDER_MAIL_BODY_CATEGORY = "SOCIAL_POST_REMINDER_MAIL_BODY_CATEGORY";
     public static final String RESTART_SURVEY_MAIL_BODY_CATEGORY = "RESTART_SURVEY_MAIL_BODY_CATEGORY";
-
+    public static final String SURVEY_COMPLETION_UNPLEASANT_MAIL_BODY_CATEGORY = "SURVEY_COMPLETION_UNPLEASANT_MAIL_BODY_CATEGORY";
+    
     // regular expressions
     public static final String PASSWORD_REG_EX = "^(?=.*[a-zA-Z0-9])(?=.*[!@#$%&*()_+=|<>?{}~-]).{6,}$";
     public static final int PASSWORD_LENGTH = 6;

@@ -196,6 +196,9 @@ public interface SurveyHandler
 
     void sendSurveyCompletionMail( String custEmail, String custFirstName, String custLastName, User user )
         throws InvalidInputException, UndeliveredEmailException, ProfileNotFoundException;
+    
+    void sendSurveyCompletionUnpleasantMail( String custEmail, String custFirstName, String custLastName, User user )
+        throws InvalidInputException, UndeliveredEmailException, ProfileNotFoundException;
 
 
     void sendSocialPostReminderMail( String custEmail, String custFirstName, String custLastName, User user, String links )
