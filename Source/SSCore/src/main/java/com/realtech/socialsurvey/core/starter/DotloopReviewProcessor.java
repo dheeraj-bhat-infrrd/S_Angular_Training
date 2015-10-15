@@ -254,7 +254,7 @@ public class DotloopReviewProcessor extends QuartzJobBean
                         surveyPreInitiation = new SurveyPreInitiation();
                         surveyPreInitiation = setCollectionDetails( surveyPreInitiation, collectionName, organizationUnitId );
                         surveyPreInitiation.setCreatedOn( new Timestamp( System.currentTimeMillis() ) );
-
+                        surveyPreInitiation.setModifiedOn( new Timestamp( System.currentTimeMillis() ) );
                         surveyPreInitiation.setCustomerEmailId( customerMappingKey );
                         surveyPreInitiation.setCustomerFirstName( customerMapping.get( customerMappingKey ) );
                         surveyPreInitiation.setLastReminderTime( utils.convertEpochDateToTimestamp() );
