@@ -9,8 +9,19 @@ public class AgentSettings extends OrganizationUnitSettings {
 	private long reviewCount;
 	private List<CompanyPositions> positions;
 	private CompanyProfileData companyProfileData;
+	private String surveyUrl;
 
-	public List<String> getExpertise() {
+	public String getSurveyUrl()
+    {
+        return surveyUrl;
+    }
+
+    public void setSurveyUrl( String surveyUrl )
+    {
+        this.surveyUrl = surveyUrl;
+    }
+
+    public List<String> getExpertise() {
 		return expertise;
 	}
 

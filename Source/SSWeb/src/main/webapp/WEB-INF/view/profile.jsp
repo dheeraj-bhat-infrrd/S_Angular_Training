@@ -246,7 +246,14 @@
 						</div>
 						<c:choose>
 						<c:when test="${profileLevel == 'INDIVIDUAL'}">
-							<a href="/rest/survey/showsurveypage/${profile.iden}" target="_blank"><span class="prof-btn-survey float-left" id="read-write-share-btn">Write a Review</span></a>
+							<c:choose>
+								<c:when test="${not empty profile.surveyUrl}">
+									<a href="${profile.surveyUrl}" target="_blank"><span class="prof-btn-survey float-left" id="read-write-share-btn">Write a Review</span></a>
+								</c:when>
+								 <c:otherwise>
+									<a href="/rest/survey/showsurveypage/${profile.iden}" target="_blank"><span class="prof-btn-survey float-left" id="read-write-share-btn">Write a Review</span></a>
+								</c:otherwise>						
+							</c:choose>
 						</c:when>
 						<c:otherwise>
 							<a href="/initfindapro.do?profileLevel=${profileLevel}&iden=${profile.iden}&searchCriteria=${profile.contact_details.name}" target="_blank"><span class="prof-btn-survey float-left" id="read-write-share-btn">Write a Review</span></a>
