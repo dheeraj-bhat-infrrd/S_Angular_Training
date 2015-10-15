@@ -104,8 +104,8 @@
 		<div class="dash-lp-header" id="incomplete-survey-header"><spring:message code="label.noincompletesurveys.key" /></div>
 	</c:otherwise>
 </c:choose>
-
-</html>
+<script type="text/javascript" src="//apis.google.com/js/client:plusone.js" async="async"></script>
+<script type="text/javascript" src="//apis.google.com/js/plusone.js" async="async"></script>
 <script>
 $(document).ready(function(){
 	$('.ppl-head-2').each(function(index, currentElement) {
