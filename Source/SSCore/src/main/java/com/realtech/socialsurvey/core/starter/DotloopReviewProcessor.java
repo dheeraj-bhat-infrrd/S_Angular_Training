@@ -162,6 +162,10 @@ public class DotloopReviewProcessor extends QuartzJobBean
         } else if ( collectionName.equalsIgnoreCase( MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION ) ) {
             collectionDotloopProfileMapping.setAgentId( unitSettings.getIden() );
         }
+        collectionDotloopProfileMapping.setCreatedOn( new Timestamp( System.currentTimeMillis() ) );
+        collectionDotloopProfileMapping.setModifiedOn( new Timestamp( System.currentTimeMillis() ) );
+        collectionDotloopProfileMapping.setCreatedBy( CommonConstants.ADMIN_USER_NAME );
+        collectionDotloopProfileMapping.setModifiedBy( CommonConstants.ADMIN_USER_NAME );
         collectionDotloopProfileMapping = organizationManagementService
             .saveCollectionDotLoopProfileMapping( collectionDotloopProfileMapping );
     }
