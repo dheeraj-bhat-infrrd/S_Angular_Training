@@ -239,6 +239,8 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
     String paramOrderSocialPostReminder;
     @Value ( "${PARAM_ORDER_INCOMPLETE_SURVEY_REMINDER}")
     String paramOrderIncompleteSurveyReminder;
+    @Value ( "${PARAM_ORDER_SURVEY_COMPLETION_UNPLEASANT_MAIL}")
+    String paramOrderSurveyCompletionUnpleasantMail;
 
     @Value ( "${CDN_PATH}")
     String cdnPath;
@@ -1178,6 +1180,8 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
             originalContentSettings.setTake_survey_reminder_mail( mailContent );
         } else if ( mailCategory.equals( CommonConstants.SURVEY_COMPLETION_MAIL_BODY_CATEGORY ) ) {
             originalContentSettings.setSurvey_completion_mail( mailContent );
+        } else if ( mailCategory.equals( CommonConstants.SURVEY_COMPLETION_UNPLEASANT_MAIL_BODY_CATEGORY ) ) {
+            originalContentSettings.setSurvey_completion_unpleasant_mail( mailContent );
         } else if ( mailCategory.equals( CommonConstants.SOCIAL_POST_REMINDER_MAIL_BODY_CATEGORY ) ) {
             originalContentSettings.setSocial_post_reminder_mail( mailContent );
         } else if ( mailCategory.equals( CommonConstants.RESTART_SURVEY_MAIL_BODY_CATEGORY ) ) {
@@ -1263,6 +1267,22 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
             mailContent.setParam_order( paramOrder );
 
             originalContentSettings.setSurvey_completion_mail( null );
+        } else if ( mailCategory.equals( CommonConstants.SURVEY_COMPLETION_UNPLEASANT_MAIL_BODY_CATEGORY ) ) {
+            mailSubject = CommonConstants.SURVEY_COMPLETION_UNPLEASANT_MAIL_SUBJECT;
+            try {
+                mailBody = readMailContentFromFile( CommonConstants.SURVEY_COMPLETION_UNPLEASANT_MAIL_FILENAME );
+            } catch ( IOException e ) {
+                throw new NonFatalException( "Error occurred while parsing mail content.",
+                    DisplayMessageConstants.GENERAL_ERROR, e );
+            }
+            paramOrder = new ArrayList<String>( Arrays.asList( paramOrderSurveyCompletionUnpleasantMail.split( "," ) ) );
+
+            mailContent = new MailContent();
+            mailContent.setMail_subject( mailSubject );
+            mailContent.setMail_body( mailBody );
+            mailContent.setParam_order( paramOrder );
+
+            originalContentSettings.setSurvey_completion_unpleasant_mail( null );
         } else if ( mailCategory.equals( CommonConstants.SOCIAL_POST_REMINDER_MAIL_BODY_CATEGORY ) ) {
             mailSubject = CommonConstants.SOCIAL_POST_REMINDER_MAIL_SUBJECT;
             try {
@@ -1430,6 +1450,8 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
             return new ArrayList<String>( Arrays.asList( paramOrderTakeSurveyReminder.split( "," ) ) );
         } else if ( mailCategory.equals( CommonConstants.SURVEY_COMPLETION_MAIL_BODY_CATEGORY ) ) {
             return new ArrayList<String>( Arrays.asList( paramOrderSurveyCompletionMail.split( "," ) ) );
+        } else if ( mailCategory.equals( CommonConstants.SURVEY_COMPLETION_UNPLEASANT_MAIL_BODY_CATEGORY ) ) {
+            return new ArrayList<String>( Arrays.asList( paramOrderSurveyCompletionUnpleasantMail.split( "," ) ) );
         } else if ( mailCategory.equals( CommonConstants.SOCIAL_POST_REMINDER_MAIL_BODY_CATEGORY ) ) {
             return new ArrayList<String>( Arrays.asList( paramOrderSocialPostReminder.split( "," ) ) );
         } else if ( mailCategory.equals( CommonConstants.RESTART_SURVEY_MAIL_BODY_CATEGORY ) ) {
