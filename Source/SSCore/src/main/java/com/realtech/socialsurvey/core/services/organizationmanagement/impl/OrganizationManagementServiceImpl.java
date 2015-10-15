@@ -21,7 +21,9 @@ import java.util.Set;
 import java.util.TreeMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
 import javax.annotation.Resource;
+
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellStyle;
 import org.apache.poi.ss.usermodel.Row;
@@ -37,6 +39,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.DependsOn;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
+
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
@@ -4001,17 +4004,18 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
         return branches;
     }
 
+
     @Override
-    public String fetchBranchesByCompany( long companyId ) throws InvalidInputException, SolrException,
-        MalformedURLException
+    public String fetchBranchesByCompany( long companyId ) throws InvalidInputException, SolrException, MalformedURLException
     {
 
         long branchCount = solrSearchService.fetchBranchCountByCompany( companyId );
         String branchesResult = "";
-        if(branchCount > 0) 
-        	branchesResult = solrSearchService.fetchBranchesByCompany( companyId, (int) branchCount );
+        if ( branchCount > 0 )
+            branchesResult = solrSearchService.fetchBranchesByCompany( companyId, (int) branchCount );
         return branchesResult;
     }
+
 
     @Override
     public Map<Long, RegionFromSearch> fetchRegionsMapByCompany( long companyId ) throws InvalidInputException, SolrException,
@@ -4030,16 +4034,16 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
         }
         return regions;
     }
-    
+
+
     @Override
-    public String fetchRegionsByCompany( long companyId ) throws InvalidInputException, SolrException,
-        MalformedURLException
+    public String fetchRegionsByCompany( long companyId ) throws InvalidInputException, SolrException, MalformedURLException
     {
-    	LOG.info("Method called to fetch the regions by company for company id : " + companyId);
+        LOG.info( "Method called to fetch the regions by company for company id : " + companyId );
         long regionsCount = solrSearchService.fetchRegionCountByCompany( companyId );
         String regionsResult = "";
-        if(regionsCount > 0)
-        	regionsResult = solrSearchService.fetchRegionsByCompany( companyId, (int) regionsCount );
+        if ( regionsCount > 0 )
+            regionsResult = solrSearchService.fetchRegionsByCompany( companyId, (int) regionsCount );
         return regionsResult;
     }
 
@@ -4928,6 +4932,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 
 
     @Override
+    @Transactional
     public Company getPrimaryCompanyByRegion( long regionId )
     {
         Region region = regionDao.findById( Region.class, regionId );
@@ -4940,6 +4945,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 
 
     @Override
+    @Transactional
     public Region getPrimaryRegionByBranch( long branchId )
     {
         Region region = null;
@@ -4985,7 +4991,8 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 
     @Override
     @Transactional
-    public long getLoopsCountByProfile( String profileId ) throws InvalidInputException
+    public long getLoopsCountByProfile( String profileId, String collectionName, long collectionId )
+        throws InvalidInputException
     {
         if ( profileId == null || profileId.isEmpty() ) {
             LOG.error( "Profile id is not passed to get loop count" );
@@ -4994,6 +5001,15 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
         LOG.debug( "Inside method getLoopsByProfile for profileId " + profileId );
         Map<String, Object> queries = new HashMap<>();
         queries.put( CommonConstants.KEY_DOTLOOP_PROFILE_ID_COLUMN, profileId );
+        if ( collectionName.equalsIgnoreCase( MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION ) ) {
+            queries.put( "companyId", collectionId );
+        } else if ( collectionName.equalsIgnoreCase( MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION ) ) {
+            queries.put( "regionId", collectionId );
+        } else if ( collectionName.equalsIgnoreCase( MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION ) ) {
+            queries.put( "branchId", collectionId );
+        } else if ( collectionName.equalsIgnoreCase( MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION ) ) {
+            queries.put( "agentId", collectionId );
+        }
         long numberOfLoops = loopProfileMappingDao.findNumberOfRowsByKeyValue( LoopProfileMapping.class, queries );
         return numberOfLoops;
     }
@@ -5015,7 +5031,8 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 
     @Override
     @Transactional
-    public LoopProfileMapping getLoopByProfileAndLoopId( String profileId, String loopId ) throws InvalidInputException
+    public LoopProfileMapping getLoopByProfileAndLoopId( String profileId, String loopId, String collectionName,
+        long collectionId ) throws InvalidInputException
     {
         if ( profileId == null || profileId.isEmpty() || loopId == null || loopId.isEmpty() ) {
             LOG.error( "Profile id/ loop id is not set to fetch loop profile data" );
@@ -5026,6 +5043,15 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
         Map<String, Object> queries = new HashMap<>();
         queries.put( CommonConstants.KEY_DOTLOOP_PROFILE_ID_COLUMN, profileId );
         queries.put( CommonConstants.KEY_DOTLOOP_PROFILE_LOOP_ID_COLUMN, loopId );
+        if ( collectionName.equalsIgnoreCase( MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION ) ) {
+            queries.put( "companyId", collectionId );
+        } else if ( collectionName.equalsIgnoreCase( MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION ) ) {
+            queries.put( "regionId", collectionId );
+        } else if ( collectionName.equalsIgnoreCase( MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION ) ) {
+            queries.put( "branchId", collectionId );
+        } else if ( collectionName.equalsIgnoreCase( MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION ) ) {
+            queries.put( "agentId", collectionId );
+        }
         List<LoopProfileMapping> loops = loopProfileMappingDao.findByKeyValue( LoopProfileMapping.class, queries );
         if ( loops != null && loops.size() > 0 ) {
             loop = loops.get( CommonConstants.INITIAL_INDEX );
