@@ -690,7 +690,7 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
 
     @Override
     public long getFeedBacksCount( String columnName, long columnValue, double startScore, double limitScore,
-        boolean fetchAbusive )
+        boolean fetchAbusive, boolean notRecommended )
     {
         LOG.info( "Method getFeedBacksCount started for columnName:" + columnName + " columnValue:" + columnValue
             + " startScore:" + startScore + " limitScore:" + limitScore + " and fetchAbusive:" + fetchAbusive );
@@ -715,8 +715,15 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
          * adding limit for score if specified
          */
         if ( startScore > -1 && limitScore > -1 ) {
-            query.addCriteria( new Criteria().andOperator( Criteria.where( CommonConstants.SCORE_COLUMN ).gte( startScore ),
-                Criteria.where( CommonConstants.SCORE_COLUMN ).lte( limitScore ) ) );
+            if ( notRecommended ) {
+                query.addCriteria( new Criteria().andOperator(
+                    Criteria.where( CommonConstants.SCORE_COLUMN ).gte( startScore ),
+                    Criteria.where( CommonConstants.SCORE_COLUMN ).lt( limitScore ) ) );
+            } else {
+                query.addCriteria( new Criteria().andOperator(
+                    Criteria.where( CommonConstants.SCORE_COLUMN ).gte( startScore ),
+                    Criteria.where( CommonConstants.SCORE_COLUMN ).lte( limitScore ) ) );
+            }
         }
 
         long feedBackCount = mongoTemplate.count( query, SURVEY_DETAILS_COLLECTION );

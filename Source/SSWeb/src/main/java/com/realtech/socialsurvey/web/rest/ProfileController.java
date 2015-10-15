@@ -883,7 +883,7 @@ public class ProfileController
     @ResponseBody
     @RequestMapping ( value = "/company/{companyId}/reviewcount")
     public Response getReviewCountForCompany( @PathVariable long companyId, @QueryParam ( value = "minScore") Double minScore,
-        @QueryParam ( value = "maxScore") Double maxScore )
+        @QueryParam ( value = "maxScore") Double maxScore, @QueryParam ( value = "notRecommended") Boolean notRecommended )
     {
         LOG.info( "Service to fetch the reviews count called for companyId :" + companyId + " ,minScore:" + minScore
             + " and maxScore:" + maxScore );
@@ -901,10 +901,13 @@ public class ProfileController
             if ( maxScore == null ) {
                 maxScore = CommonConstants.MAX_RATING_SCORE;
             }
+            if ( notRecommended == null ) {
+                notRecommended = false;
+            }
             long reviewsCount = 0;
             try {
                 reviewsCount = profileManagementService.getReviewsCount( companyId, minScore, maxScore,
-                    CommonConstants.PROFILE_LEVEL_COMPANY, false );
+                    CommonConstants.PROFILE_LEVEL_COMPANY, false, notRecommended );
                 String json = new Gson().toJson( reviewsCount );
                 LOG.debug( "reviews count json : " + json );
                 response = Response.ok( json ).build();
@@ -972,7 +975,7 @@ public class ProfileController
     @ResponseBody
     @RequestMapping ( value = "/region/{regionId}/reviewcount")
     public Response getReviewCountForRegion( @PathVariable long regionId, @QueryParam ( value = "minScore") Double minScore,
-        @QueryParam ( value = "maxScore") Double maxScore )
+        @QueryParam ( value = "maxScore") Double maxScore, @QueryParam ( value = "notRecommended") Boolean notRecommended )
     {
         LOG.info( "Service to fetch the reviews count called for regionId :" + regionId + " ,minScore:" + minScore
             + " and maxScore:" + maxScore );
@@ -990,10 +993,13 @@ public class ProfileController
             if ( maxScore == null ) {
                 maxScore = CommonConstants.MAX_RATING_SCORE;
             }
+            if ( notRecommended ==  null ) {
+                notRecommended = false;
+            }
             long reviewsCount = 0;
             try {
                 reviewsCount = profileManagementService.getReviewsCount( regionId, minScore, maxScore,
-                    CommonConstants.PROFILE_LEVEL_REGION, false );
+                    CommonConstants.PROFILE_LEVEL_REGION, false, notRecommended );
                 String json = new Gson().toJson( reviewsCount );
                 LOG.debug( "reviews count json : " + json );
                 response = Response.ok( json ).build();
@@ -1060,7 +1066,7 @@ public class ProfileController
     @ResponseBody
     @RequestMapping ( value = "/branch/{branchId}/reviewcount")
     public Response getReviewCountForBranch( @PathVariable long branchId, @QueryParam ( value = "minScore") Double minScore,
-        @QueryParam ( value = "maxScore") Double maxScore )
+        @QueryParam ( value = "maxScore") Double maxScore, @QueryParam ( value = "notRecommended") Boolean notRecommended )
     {
         LOG.info( "Service to fetch the reviews count called for branchId :" + branchId + " ,minScore:" + minScore
             + " and maxScore:" + maxScore );
@@ -1078,10 +1084,13 @@ public class ProfileController
             if ( maxScore == null ) {
                 maxScore = CommonConstants.MAX_RATING_SCORE;
             }
+            if ( notRecommended == null ) {
+                notRecommended = false;
+            }
             long reviewsCount = 0;
             try {
                 reviewsCount = profileManagementService.getReviewsCount( branchId, minScore, maxScore,
-                    CommonConstants.PROFILE_LEVEL_BRANCH, false );
+                    CommonConstants.PROFILE_LEVEL_BRANCH, false, notRecommended );
                 String json = new Gson().toJson( reviewsCount );
                 LOG.debug( "reviews count json : " + json );
                 response = Response.ok( json ).build();
@@ -1238,7 +1247,7 @@ public class ProfileController
     @ResponseBody
     @RequestMapping ( value = "/individual/{agentId}/reviewcount")
     public Response getReviewCountForAgent( @PathVariable long agentId, @QueryParam ( value = "minScore") Double minScore,
-        @QueryParam ( value = "maxScore") Double maxScore )
+        @QueryParam ( value = "maxScore") Double maxScore, @QueryParam ( value = "notRecommended") Boolean notRecommended )
     {
         LOG.info( "Service to fetch the reviews count called for agentId :" + agentId + " ,minScore:" + minScore
             + " and maxScore:" + maxScore );
@@ -1256,10 +1265,13 @@ public class ProfileController
             if ( maxScore == null ) {
                 maxScore = CommonConstants.MAX_RATING_SCORE;
             }
+            if ( notRecommended == null ) {
+                notRecommended = false;
+            }
             long reviewsCount = 0;
             try {
                 reviewsCount = profileManagementService.getReviewsCount( agentId, minScore, maxScore,
-                    CommonConstants.PROFILE_LEVEL_INDIVIDUAL, false );
+                    CommonConstants.PROFILE_LEVEL_INDIVIDUAL, false, notRecommended );
                 String json = new Gson().toJson( reviewsCount );
                 LOG.debug( "reviews count json : " + json );
                 response = Response.ok( json ).build();
