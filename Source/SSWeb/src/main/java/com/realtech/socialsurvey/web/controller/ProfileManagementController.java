@@ -4529,7 +4529,7 @@ public class ProfileManagementController
         HttpSession session = request.getSession( false );
         User user = sessionHelper.getCurrentUser();
 
-        boolean fetchAbusive = true;
+        boolean fetchAbusive = false;
         List<SurveyDetails> reviewItems = null;
         try {
             long entityId = (long) session.getAttribute( CommonConstants.ENTITY_ID_COLUMN );
@@ -4578,7 +4578,7 @@ public class ProfileManagementController
     {
         LOG.info( "Method fetchReviewCount() called from ProfileManagementController" );
 
-        boolean fetchAbusive = true;
+        boolean fetchAbusive = false;
         boolean notRecommended;
         long reviewCount = 0l;
         try {

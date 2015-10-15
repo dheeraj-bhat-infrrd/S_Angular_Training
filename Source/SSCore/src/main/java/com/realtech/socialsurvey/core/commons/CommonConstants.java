@@ -722,5 +722,6 @@ public interface CommonConstants
     // file upload types
     public static final int FILE_UPLOAD_HIERARCHY_TYPE = 1;
     public static final int FILE_UPLOAD_SURVEY_TYPE = 2;
+    
 
 }

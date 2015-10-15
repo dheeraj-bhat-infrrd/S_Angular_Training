@@ -14,7 +14,6 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,7 +26,6 @@ import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Repository;
-
 import com.mongodb.BasicDBObject;
 import com.mongodb.DBObject;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
@@ -58,7 +56,7 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
     public static final String ABS_REPORTER_DETAILS_COLLECTION = "ABUSE_REPORTER_DETAILS";
 
     public static final String ZILLOW_CALL_COUNT = "ZILLOW_CALL_COUNT";
-    
+
     @Autowired
     private MongoTemplate mongoTemplate;
 
@@ -202,9 +200,9 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
         LOG.info( "Method to calculate and update final score based upon rating questions finished." );
     }
 
-    
+
     @Override
-    public void updateSurveyAsAbusive( String surveyMongoId, String reporterEmail, String reporterName)
+    public void updateSurveyAsAbusive( String surveyMongoId, String reporterEmail, String reporterName )
     {
         LOG.info( "Method updateSurveyAsAbusive() to mark survey as abusive started." );
         Query query = new Query();
@@ -214,13 +212,13 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
         update.set( CommonConstants.CREATED_ON, new Date() );
         update.set( CommonConstants.MODIFIED_ON_COLUMN, new Date() );
         mongoTemplate.updateMulti( query, update, SURVEY_DETAILS_COLLECTION );
-        
+
         query = new Query();
         query.addCriteria( Criteria.where( CommonConstants.SURVEY_ID_COLUMN ).is( surveyMongoId ) );
         update = new Update();
         update.set( CommonConstants.SURVEY_ID_COLUMN, surveyMongoId );
-        update.push(CommonConstants.ABUSE_REPORTERS_COLUMN, new ReporterDetail( reporterName, reporterEmail ));
-        mongoTemplate.upsert(query,update, ABS_REPORTER_DETAILS_COLLECTION );
+        update.push( CommonConstants.ABUSE_REPORTERS_COLUMN, new ReporterDetail( reporterName, reporterEmail ) );
+        mongoTemplate.upsert( query, update, ABS_REPORTER_DETAILS_COLLECTION );
         LOG.info( "Method updateSurveyAsAbusive() to mark survey as abusive finished." );
     }
 
@@ -1331,29 +1329,31 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
 
     @Override
     public void getAverageScore( Date startDate, Date endDate, Map<Long, AgentRankingReport> agentReportData,
-        String columnName, long columnValue )
+        String columnName, long columnValue, boolean fetchAbusive )
     {
 
         TypedAggregation<SurveyDetails> aggregation;
         if ( startDate != null && endDate != null ) {
             aggregation = new TypedAggregation<SurveyDetails>( SurveyDetails.class, Aggregation.match( Criteria.where(
                 columnName ).is( columnValue ) ), Aggregation.match( Criteria.where( CommonConstants.CREATED_ON ).gte(
-                startDate ) ), Aggregation.match( Criteria.where( CommonConstants.CREATED_ON ).lte( endDate ) ), Aggregation
-                .group( CommonConstants.AGENT_ID_COLUMN ).avg( CommonConstants.SCORE_COLUMN ).as( "score" ) );
-        } else if ( startDate != null && endDate == null )
-            aggregation = new TypedAggregation<SurveyDetails>( SurveyDetails.class, Aggregation.match( Criteria.where(
-                columnName ).is( columnValue ) ), Aggregation.match( Criteria.where( CommonConstants.CREATED_ON ).gte(
-                startDate ) ), Aggregation.group( CommonConstants.AGENT_ID_COLUMN ).avg( CommonConstants.SCORE_COLUMN )
-                .as( "score" ) );
-        else if ( startDate == null && endDate != null )
-            aggregation = new TypedAggregation<SurveyDetails>( SurveyDetails.class, Aggregation.match( Criteria.where(
-                columnName ).is( columnValue ) ),
+                startDate ) ), Aggregation.match( Criteria.where( CommonConstants.IS_ABUSIVE_COLUMN ).is( fetchAbusive ) ),
                 Aggregation.match( Criteria.where( CommonConstants.CREATED_ON ).lte( endDate ) ), Aggregation
                     .group( CommonConstants.AGENT_ID_COLUMN ).avg( CommonConstants.SCORE_COLUMN ).as( "score" ) );
+        } else if ( startDate != null && endDate == null )
+            aggregation = new TypedAggregation<SurveyDetails>( SurveyDetails.class, Aggregation.match( Criteria.where(
+                columnName ).is( columnValue ) ), Aggregation.match( Criteria.where( CommonConstants.IS_ABUSIVE_COLUMN ).is(
+                fetchAbusive ) ), Aggregation.match( Criteria.where( CommonConstants.CREATED_ON ).gte( startDate ) ),
+                Aggregation.group( CommonConstants.AGENT_ID_COLUMN ).avg( CommonConstants.SCORE_COLUMN ).as( "score" ) );
+        else if ( startDate == null && endDate != null )
+            aggregation = new TypedAggregation<SurveyDetails>( SurveyDetails.class, Aggregation.match( Criteria.where(
+                columnName ).is( columnValue ) ), Aggregation.match( Criteria.where( CommonConstants.IS_ABUSIVE_COLUMN ).is(
+                fetchAbusive ) ), Aggregation.match( Criteria.where( CommonConstants.CREATED_ON ).lte( endDate ) ), Aggregation
+                .group( CommonConstants.AGENT_ID_COLUMN ).avg( CommonConstants.SCORE_COLUMN ).as( "score" ) );
         else {
             aggregation = new TypedAggregation<SurveyDetails>( SurveyDetails.class, Aggregation.match( Criteria.where(
-                columnName ).is( columnValue ) ), Aggregation.group( CommonConstants.AGENT_ID_COLUMN )
-                .avg( CommonConstants.SCORE_COLUMN ).as( "score" ) );
+                columnName ).is( columnValue ) ), Aggregation.match( Criteria.where( CommonConstants.IS_ABUSIVE_COLUMN ).is(
+                fetchAbusive ) ), Aggregation.group( CommonConstants.AGENT_ID_COLUMN ).avg( CommonConstants.SCORE_COLUMN )
+                .as( "score" ) );
         }
 
         AggregationResults<SurveyDetails> result = mongoTemplate.aggregate( aggregation, SURVEY_DETAILS_COLLECTION,
@@ -1384,26 +1384,26 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
 
     @Override
     public void getCompletedSurveysCount( Date startDate, Date endDate, Map<Long, AgentRankingReport> agentReportData,
-        String columnName, long columnValue )
+        String columnName, long columnValue, boolean fetchAbusive )
     {
         TypedAggregation<SurveyDetails> aggregation;
         if ( startDate != null && endDate != null ) {
             aggregation = new TypedAggregation<SurveyDetails>( SurveyDetails.class, Aggregation.match( Criteria.where(
-                columnName ).is( columnValue ) ), Aggregation.match( Criteria.where( CommonConstants.CREATED_ON ).gte(
+                columnName ).is( columnValue ) ),Aggregation.match( Criteria.where( CommonConstants.IS_ABUSIVE_COLUMN ).is( fetchAbusive ) ), Aggregation.match( Criteria.where( CommonConstants.CREATED_ON ).gte(
                 startDate ) ), Aggregation.match( Criteria.where( CommonConstants.CREATED_ON ).lte( endDate ) ), Aggregation
                 .group( CommonConstants.AGENT_ID_COLUMN ).count().as( "count" ) );
         } else if ( startDate != null && endDate == null )
             aggregation = new TypedAggregation<SurveyDetails>( SurveyDetails.class, Aggregation.match( Criteria.where(
-                columnName ).is( columnValue ) ), Aggregation.match( Criteria.where( CommonConstants.CREATED_ON ).gte(
+                columnName ).is( columnValue ) ),Aggregation.match( Criteria.where( CommonConstants.IS_ABUSIVE_COLUMN ).is( fetchAbusive ) ), Aggregation.match( Criteria.where( CommonConstants.CREATED_ON ).gte(
                 startDate ) ), Aggregation.group( CommonConstants.AGENT_ID_COLUMN ).count().as( "count" ) );
         else if ( startDate == null && endDate != null )
             aggregation = new TypedAggregation<SurveyDetails>( SurveyDetails.class, Aggregation.match( Criteria.where(
-                columnName ).is( columnValue ) ),
+                columnName ).is( columnValue ) ),Aggregation.match( Criteria.where( CommonConstants.IS_ABUSIVE_COLUMN ).is( fetchAbusive ) ),
                 Aggregation.match( Criteria.where( CommonConstants.CREATED_ON ).lte( endDate ) ), Aggregation
                     .group( CommonConstants.AGENT_ID_COLUMN ).count().as( "count" ) );
         else {
             aggregation = new TypedAggregation<SurveyDetails>( SurveyDetails.class, Aggregation.match( Criteria.where(
-                columnName ).is( columnValue ) ), Aggregation.group( CommonConstants.AGENT_ID_COLUMN ).count().as( "count" ) );
+                columnName ).is( columnValue ) ),Aggregation.match( Criteria.where( CommonConstants.IS_ABUSIVE_COLUMN ).is( fetchAbusive ) ), Aggregation.group( CommonConstants.AGENT_ID_COLUMN ).count().as( "count" ) );
         }
 
         AggregationResults<SurveyDetails> result = mongoTemplate.aggregate( aggregation, SURVEY_DETAILS_COLLECTION,
@@ -1514,6 +1514,7 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
         LOG.info( "Method removeExcessZillowSurveysByEntity() finished" );
     }
 
+
     @Override
     public long getSurveysReporetedAsAbusiveCount()
     {
@@ -1563,14 +1564,14 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
             if ( absReporterDetails != null && absReporterDetails.size() > 0 ) {
                 boolean reporterDetailsFound = false;
                 for ( AbuseReporterDetails absReporterDetail : absReporterDetails ) {
-                    if ( absReporterDetail.getSurveyId().equals(survey.get_id()) ) {
+                    if ( absReporterDetail.getSurveyId().equals( survey.get_id() ) ) {
                         abusiveSurveyReports.add( new AbusiveSurveyReportWrapper( survey, absReporterDetail ) );
                         reporterDetailsFound = true;
                         break;
                     }
                 }
-                if(!reporterDetailsFound)
-                 // to handle existing surveys where reporter info not saved
+                if ( !reporterDetailsFound )
+                    // to handle existing surveys where reporter info not saved
                     abusiveSurveyReports.add( new AbusiveSurveyReportWrapper( survey, null ) );
             } else {
                 // to handle existing surveys where reporter info not saved
@@ -1581,15 +1582,17 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
         LOG.info( "Method getSurveysReporetedAsAbusive() to retrieve surveys marked as abusive finished." );
         return abusiveSurveyReports;
     }
-        
+
+
     @Override
-    public int fetchZillowCallCount(){
+    public int fetchZillowCallCount()
+    {
         LOG.info( "Method fetchZillowCallCount() started" );
         Query query = new Query();
         int count = 0;
         DBObject zillowCallCount = mongoTemplate.findOne( query, DBObject.class, ZILLOW_CALL_COUNT );
-        if(zillowCallCount == null){
-            LOG.debug( "Count not found. Setting count to 0");
+        if ( zillowCallCount == null ) {
+            LOG.debug( "Count not found. Setting count to 0" );
         } else {
             count = (int) zillowCallCount.get( "count" );
             LOG.debug( "Count value : " + count );
@@ -1597,9 +1600,11 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
         LOG.info( "Method fetchZillowCallCount() finished" );
         return count;
     }
-    
+
+
     @Override
-    public void resetZillowCallCount(){
+    public void resetZillowCallCount()
+    {
         LOG.info( "Method resetZillowCallCount() started" );
         Query query = new Query();
         LOG.debug( "Resetting count value" );
@@ -1607,8 +1612,11 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
         mongoTemplate.upsert( query, update, ZILLOW_CALL_COUNT );
         LOG.info( "Method resetZillowCallCount() finished" );
     }
+
+
     @Override
-    public void updateZillowCallCount(){
+    public void updateZillowCallCount()
+    {
         LOG.info( "Method updateZillowCallCount() started" );
         int count = 0;
         LOG.debug( "Fetching the latest value of count." );
