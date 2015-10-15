@@ -8,8 +8,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
+
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.apache.solr.common.SolrDocument;
@@ -24,12 +26,15 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
+
 import twitter4j.TwitterException;
+
 import com.google.gson.Gson;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.dao.impl.MongoOrganizationUnitSettingDaoImpl;
 import com.realtech.socialsurvey.core.dao.impl.MongoSocialPostDaoImpl;
 import com.realtech.socialsurvey.core.entities.AccountsMaster;
+import com.realtech.socialsurvey.core.entities.AgentMediaPostDetails;
 import com.realtech.socialsurvey.core.entities.AgentSettings;
 import com.realtech.socialsurvey.core.entities.BranchMediaPostDetails;
 import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
@@ -67,6 +72,7 @@ import com.realtech.socialsurvey.web.common.ErrorCodes;
 import com.realtech.socialsurvey.web.common.ErrorResponse;
 import com.realtech.socialsurvey.web.common.JspResolver;
 import com.realtech.socialsurvey.web.util.RequestUtils;
+
 import facebook4j.FacebookException;
 
 
@@ -618,7 +624,6 @@ public class SurveyManagementController
                 if ( surveyHandler.canPostOnSocialMedia( agentSettings, rating ) ) {
                     if ( !socialManagementService.updateStatusIntoFacebookPage( agentSettings, facebookMessage, serverBaseUrl,
                         agent.getCompany().getCompanyId() ) ) {
-                        surveyHandler.updateSharedOn( CommonConstants.FACEBOOK_SOCIAL_SITE, agentId, customerEmail );
                         agentSocialList.add( CommonConstants.FACEBOOK_SOCIAL_SITE );
 
                     }
@@ -636,7 +641,6 @@ public class SurveyManagementController
                     if ( surveyHandler.canPostOnSocialMedia( companySetting, rating ) ) {
                         if ( !socialManagementService.updateStatusIntoFacebookPage( companySetting, facebookMessage,
                             serverBaseUrl, companySetting.getIden() ) ) {
-                            surveyHandler.updateSharedOn( CommonConstants.FACEBOOK_SOCIAL_SITE, agentId, customerEmail );
                             companySocialList.add( CommonConstants.FACEBOOK_SOCIAL_SITE );
 
                         }
@@ -654,8 +658,6 @@ public class SurveyManagementController
                         if ( surveyHandler.canPostOnSocialMedia( setting, rating ) ) {
                             if ( !socialManagementService.updateStatusIntoFacebookPage( setting, facebookMessage,
                                 serverBaseUrl, agent.getCompany().getCompanyId() ) ) {
-                                surveyHandler.updateSharedOn( CommonConstants.FACEBOOK_SOCIAL_SITE, agentId, customerEmail );
-
                                 List<String> regionSocialList = regionMediaPostDetails.getSharedOn();
                                 regionSocialList.add( CommonConstants.FACEBOOK_SOCIAL_SITE );
                                 regionMediaPostDetails.setSharedOn( regionSocialList );
@@ -676,7 +678,6 @@ public class SurveyManagementController
                             if ( surveyHandler.canPostOnSocialMedia( setting, rating ) ) {
                                 if ( !socialManagementService.updateStatusIntoFacebookPage( setting, facebookMessage,
                                     serverBaseUrl, agent.getCompany().getCompanyId() ) ) {
-                                    surveyHandler.updateSharedOn( CommonConstants.FACEBOOK_SOCIAL_SITE, agentId, customerEmail );
                                     List<String> branchSocialList = branchMediaPostDetails.getSharedOn();
                                     branchSocialList.add( CommonConstants.FACEBOOK_SOCIAL_SITE );
                                     branchMediaPostDetails.setSharedOn( branchSocialList );
@@ -700,7 +701,6 @@ public class SurveyManagementController
             if ( surveyHandler.canPostOnSocialMedia( agentSettings, rating ) ) {
                 if ( !socialManagementService.updateLinkedin( agentSettings, linkedinMessage, linkedinProfileUrl,
                     linkedinMessageFeedback ) ) {
-                    surveyHandler.updateSharedOn( CommonConstants.LINKEDIN_SOCIAL_SITE, agentId, customerEmail );
                     agentSocialList.add( CommonConstants.LINKEDIN_SOCIAL_SITE );
                 }
             }
@@ -709,7 +709,6 @@ public class SurveyManagementController
                     if ( surveyHandler.canPostOnSocialMedia( setting, rating ) ) {
                         if ( !socialManagementService.updateLinkedin( setting, linkedinMessage, linkedinProfileUrl,
                             linkedinMessageFeedback ) ) {
-                            surveyHandler.updateSharedOn( CommonConstants.LINKEDIN_SOCIAL_SITE, agentId, customerEmail );
                             companySocialList.add( CommonConstants.LINKEDIN_SOCIAL_SITE );
                         }
                     }
@@ -720,7 +719,6 @@ public class SurveyManagementController
                     if ( surveyHandler.canPostOnSocialMedia( setting, rating ) ) {
                         if ( !socialManagementService.updateLinkedin( setting, linkedinMessage, linkedinProfileUrl,
                             linkedinMessageFeedback ) ) {
-                            surveyHandler.updateSharedOn( CommonConstants.LINKEDIN_SOCIAL_SITE, agentId, customerEmail );
                             List<String> regionSocialList = regionMediaPostDetails.getSharedOn();
                             regionSocialList.add( CommonConstants.LINKEDIN_SOCIAL_SITE );
                             regionMediaPostDetails.setSharedOn( regionSocialList );
@@ -735,7 +733,6 @@ public class SurveyManagementController
                         if ( surveyHandler.canPostOnSocialMedia( setting, rating ) ) {
                             if ( !socialManagementService.updateLinkedin( setting, linkedinMessage, linkedinProfileUrl,
                                 linkedinMessageFeedback ) ) {
-                                surveyHandler.updateSharedOn( CommonConstants.LINKEDIN_SOCIAL_SITE, agentId, customerEmail );
                                 List<String> branchSocialList = branchMediaPostDetails.getSharedOn();
                                 branchSocialList.add( CommonConstants.LINKEDIN_SOCIAL_SITE );
                                 branchMediaPostDetails.setSharedOn( branchSocialList );
@@ -759,7 +756,6 @@ public class SurveyManagementController
             try {
                 if ( surveyHandler.canPostOnSocialMedia( agentSettings, rating ) ) {
                     if ( !socialManagementService.tweet( agentSettings, twitterMessage, agent.getCompany().getCompanyId() ) ) {
-                        surveyHandler.updateSharedOn( CommonConstants.TWITTER_SOCIAL_SITE, agentId, customerEmail );
                         agentSocialList.add( CommonConstants.TWITTER_SOCIAL_SITE );
                     }
                 }
@@ -773,7 +769,6 @@ public class SurveyManagementController
                     try {
                         if ( surveyHandler.canPostOnSocialMedia( setting, rating ) ) {
                             if ( !socialManagementService.tweet( setting, twitterMessage, agent.getCompany().getCompanyId() ) ) {
-                                surveyHandler.updateSharedOn( CommonConstants.TWITTER_SOCIAL_SITE, agentId, customerEmail );
                                 companySocialList.add( CommonConstants.TWITTER_SOCIAL_SITE );
                             }
                         }
@@ -789,7 +784,6 @@ public class SurveyManagementController
                             .getRegionSettings( regionMediaPostDetails.getRegionId() );
                         if ( surveyHandler.canPostOnSocialMedia( setting, rating ) ) {
                             if ( !socialManagementService.tweet( setting, twitterMessage, agent.getCompany().getCompanyId() ) ) {
-                                surveyHandler.updateSharedOn( CommonConstants.TWITTER_SOCIAL_SITE, agentId, customerEmail );
                                 List<String> regionSocialList = regionMediaPostDetails.getSharedOn();
                                 regionSocialList.add( CommonConstants.TWITTER_SOCIAL_SITE );
                                 regionMediaPostDetails.setSharedOn( regionSocialList );
@@ -810,7 +804,6 @@ public class SurveyManagementController
                             if ( surveyHandler.canPostOnSocialMedia( setting, rating ) ) {
                                 if ( !socialManagementService
                                     .tweet( setting, twitterMessage, agent.getCompany().getCompanyId() ) ) {
-                                    surveyHandler.updateSharedOn( CommonConstants.TWITTER_SOCIAL_SITE, agentId, customerEmail );
                                     List<String> branchSocialList = branchMediaPostDetails.getSharedOn();
                                     branchSocialList.add( CommonConstants.TWITTER_SOCIAL_SITE );
                                     branchMediaPostDetails.setSharedOn( branchSocialList );
@@ -922,7 +915,6 @@ public class SurveyManagementController
                     socialManagementService.updateStatusIntoFacebookPage( agentSettings, facebookMessage, serverBaseUrl, user
                         .getCompany().getCompanyId() );
                     // TODO: Bad code: Remove the comany id from the parameter: End
-                    surveyHandler.updateSharedOn( CommonConstants.FACEBOOK_SOCIAL_SITE, agentId, customerEmail );
                     agentSocialList.add( CommonConstants.FACEBOOK_SOCIAL_SITE );
                 }
             } catch ( FacebookException e ) {
@@ -1074,7 +1066,6 @@ public class SurveyManagementController
             try {
                 if ( surveyHandler.canPostOnSocialMedia( agentSettings, rating ) ) {
                     socialManagementService.tweet( agentSettings, twitterMessage, user.getCompany().getCompanyId() );
-                    surveyHandler.updateSharedOn( CommonConstants.TWITTER_SOCIAL_SITE, agentId, customerEmail );
                     agentSocialList.add( CommonConstants.TWITTER_SOCIAL_SITE );
                 }
             } catch ( TwitterException e ) {
@@ -1246,8 +1237,6 @@ public class SurveyManagementController
                     }
                 }
             }
-            surveyHandler.updateSharedOn( CommonConstants.LINKEDIN_SOCIAL_SITE, agentId, customerEmail );
-
             socialMediaPostDetails.getAgentMediaPostDetails().setSharedOn( agentSocialList );
             socialMediaPostDetails.getCompanyMediaPostDetails().setSharedOn( companySocialList );
             surveyDetails.setSocialMediaPostDetails( socialMediaPostDetails );
@@ -1411,8 +1400,28 @@ public class SurveyManagementController
                     "NumberFormatException caught while trying to convert agentId in getYelpLink(). Nested exception is ", e );
                 throw e;
             }
-            surveyHandler.updateSharedOn( socialSite, agentId, customerEmail );
 
+
+            SurveyDetails surveyDetails = surveyHandler.getSurveyDetails( agentId, customerEmail, null, null );
+            SocialMediaPostDetails socialMediaPostDetails = null;
+            if ( surveyDetails.getSocialMediaPostDetails() == null ) {
+                socialMediaPostDetails = new SocialMediaPostDetails();
+
+            }
+            AgentMediaPostDetails agentMediaPostDetails = socialMediaPostDetails.getAgentMediaPostDetails();
+            if ( agentMediaPostDetails == null ) {
+                agentMediaPostDetails = new AgentMediaPostDetails();
+                agentMediaPostDetails.setAgentId( agentId );
+            }
+            if ( agentMediaPostDetails.getSharedOn() == null ) {
+                agentMediaPostDetails.setSharedOn( new ArrayList<String>() );
+            }
+            List<String> agentSocialList = agentMediaPostDetails.getSharedOn();
+            agentSocialList.add( socialSite );
+            agentMediaPostDetails.setSharedOn( agentSocialList );
+            socialMediaPostDetails.setAgentMediaPostDetails( agentMediaPostDetails );
+            surveyDetails.setSocialMediaPostDetails( socialMediaPostDetails );
+            surveyHandler.updateSurveyDetails( surveyDetails );
         } catch ( NonFatalException e ) {
             LOG.error( "Exception occured in updateSharedOn() while trying to post into Google." );
             ErrorResponse response = new ErrorResponse();
