@@ -1205,12 +1205,13 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
                 unavailableAgents.add( survey );
                 companies.add( survey.getCompanyId() );
             }
-
-            if ( survey.getSurveySource().equalsIgnoreCase( CommonConstants.CRM_SOURCE_DOTLOOP ) ) {
-                status = validateUnitsettingsForDotloop( user, survey );
-                if ( status == CommonConstants.STATUS_SURVEYPREINITIATION_CORRUPT_RECORD ) {
-                    unavailableAgents.add( survey );
-                    companies.add( survey.getCompanyId() );
+            if ( status != CommonConstants.STATUS_SURVEYPREINITIATION_CORRUPT_RECORD ) {
+                if ( survey.getSurveySource().equalsIgnoreCase( CommonConstants.CRM_SOURCE_DOTLOOP ) ) {
+                    status = validateUnitsettingsForDotloop( user, survey );
+                    if ( status == CommonConstants.STATUS_SURVEYPREINITIATION_CORRUPT_RECORD ) {
+                        unavailableAgents.add( survey );
+                        companies.add( survey.getCompanyId() );
+                    }
                 }
             }
             survey.setStatus( status );
