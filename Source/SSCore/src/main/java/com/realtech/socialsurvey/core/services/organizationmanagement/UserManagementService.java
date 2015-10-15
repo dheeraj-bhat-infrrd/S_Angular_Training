@@ -2,7 +2,6 @@ package com.realtech.socialsurvey.core.services.organizationmanagement;
 
 import java.util.List;
 import java.util.Map;
-
 import com.realtech.socialsurvey.core.entities.AgentSettings;
 import com.realtech.socialsurvey.core.entities.Branch;
 import com.realtech.socialsurvey.core.entities.Company;
