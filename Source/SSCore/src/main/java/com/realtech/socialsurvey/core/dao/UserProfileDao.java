@@ -2,7 +2,6 @@ package com.realtech.socialsurvey.core.dao;
 
 import java.util.List;
 import java.util.Map;
-
 import com.realtech.socialsurvey.core.entities.ProfilesMaster;
 import com.realtech.socialsurvey.core.entities.User;
 import com.realtech.socialsurvey.core.entities.UserProfile;
