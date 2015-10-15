@@ -7,7 +7,9 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+
 import com.realtech.socialsurvey.core.entities.AgentSettings;
 import com.realtech.socialsurvey.core.entities.Branch;
 import com.realtech.socialsurvey.core.entities.BranchFromSearch;
@@ -772,14 +774,17 @@ public interface OrganizationManagementService
     public Map<Long, BranchFromSearch> fetchBranchesMapByCompany( long companyId ) throws InvalidInputException, SolrException,
         MalformedURLException;
 
-	public String fetchBranchesByCompany(long companyId) throws InvalidInputException, SolrException, MalformedURLException;
-    
+
+    public String fetchBranchesByCompany( long companyId ) throws InvalidInputException, SolrException, MalformedURLException;
+
+
     public Map<Long, RegionFromSearch> fetchRegionsMapByCompany( long companyId ) throws InvalidInputException, SolrException,
         MalformedURLException;
 
-    public String fetchRegionsByCompany( long companyId ) throws InvalidInputException, SolrException,
-    MalformedURLException;
-    
+
+    public String fetchRegionsByCompany( long companyId ) throws InvalidInputException, SolrException, MalformedURLException;
+
+
     /**
      * Method to get the list of branches from solr which are directly assigned to the company
      * 
@@ -1040,9 +1045,13 @@ public interface OrganizationManagementService
 
     /**
      * @param profileId
+     * @param collectionName
+     * @param collectionId
      * @return
+     * @throws InvalidInputException
      */
-    public long getLoopsCountByProfile( String profileId ) throws InvalidInputException;
+    public long getLoopsCountByProfile( String profileId, String collectionName, long collectionId )
+        throws InvalidInputException;
 
 
     /**
@@ -1051,14 +1060,17 @@ public interface OrganizationManagementService
     public void saveLoopsForProfile( LoopProfileMapping loopProfileMapping ) throws InvalidInputException;
 
 
+
     /**
-     * Gets loop profile mapping object by profile id and loop id
      * @param profileId
      * @param loopId
+     * @param collectionName
+     * @param collectionId
      * @return
      * @throws InvalidInputException
      */
-    public LoopProfileMapping getLoopByProfileAndLoopId( String profileId, String loopId ) throws InvalidInputException;
+    public LoopProfileMapping getLoopByProfileAndLoopId( String profileId, String loopId, String collectionName,
+        long collectionId ) throws InvalidInputException;
 
 
     /**
