@@ -16,11 +16,9 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
-
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.apache.solr.common.SolrDocument;
 import org.slf4j.Logger;
@@ -32,7 +30,6 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
-
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.type.TypeFactory;
 import com.google.gson.Gson;
@@ -458,7 +455,7 @@ public class DashboardController
             }
 
             try {
-                surveyDetails = profileManagementService.getReviews( iden, -1, -1, startIndex, batchSize, profileLevel, true,
+                surveyDetails = profileManagementService.getReviews( iden, -1, -1, startIndex, batchSize, profileLevel, false,
                     null, null, "date" );
                 profileManagementService.setAgentProfileUrlForReview( surveyDetails );
             } catch ( InvalidInputException e ) {
@@ -520,7 +517,7 @@ public class DashboardController
 
             // Calling service method to count number of reviews stored in
             // database.
-            reviewCount = profileManagementService.getReviewsCount( iden, -1, -1, profileLevel, true );
+            reviewCount = profileManagementService.getReviewsCount( iden, -1, -1, profileLevel, false );
         } catch ( NonFatalException e ) {
             LOG.error( "Non fatal exception caught in getReviewCount() while fetching reviews count. Nested exception is ", e );
             return new Gson().toJson( e.getMessage() );
@@ -1358,6 +1355,7 @@ public class DashboardController
         LOG.info( "Method to get file containg customer survey results getCustomerSurveyResultsFile() started." );
         User user = sessionHelper.getCurrentUser();
         boolean realTechAdmin = user.isSuperAdmin();
+        boolean fetchAbusive = false;
         List<SurveyDetails> surveyDetails = new ArrayList<>();
 
         try {
@@ -1426,7 +1424,7 @@ public class DashboardController
 
             try {
                 Date date = new Date();
-                surveyDetails = profileManagementService.getReviews( iden, -1, -1, -1, -1, profileLevel, true, startDate,
+                surveyDetails = profileManagementService.getReviews( iden, -1, -1, -1, -1, profileLevel, fetchAbusive , startDate,
                     endDate, null );
                 String fileName = "Survey_Results-" + profileLevel + "-" + user.getFirstName() + "_" + user.getLastName() + "-"
                     + ( new Timestamp( date.getTime() ) ) + EXCEL_FILE_EXTENSION;
