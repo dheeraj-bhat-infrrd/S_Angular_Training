@@ -852,6 +852,33 @@ public class OrganizationManagementController
                 message = messageUtils.getDisplayMessage( DisplayMessageConstants.SURVEY_COMPLETION_MAILBODY_UPDATE_SUCCESSFUL,
                     DisplayMessageType.SUCCESS_MESSAGE ).getMessage();
             }
+            
+            else if ( mailCategory != null && mailCategory.equals( "surveycompletionunpleasantmail" ) ) {
+
+                mailSubject = request.getParameter( "survey-completion-unpleasant-subject" );
+                if ( mailSubject == null || mailSubject.isEmpty() ) {
+                    LOG.warn( "Survey Completion Unpleasant mail subject is blank." );
+                    throw new InvalidInputException( "Survey completion unpleasant mail subject is blank.",
+                        DisplayMessageConstants.GENERAL_ERROR );
+                }
+
+                mailBody = request.getParameter( "survey-completion-unpleasant-mailcontent" );
+                if ( mailBody == null || mailBody.isEmpty() ) {
+                    LOG.warn( "Survey Completion Unpleasant mail body is blank." );
+                    throw new InvalidInputException( "Survey completion Unpleasant mail body is blank.",
+                        DisplayMessageConstants.GENERAL_ERROR );
+                }
+
+                updatedMailContentSettings = organizationManagementService.updateSurveyParticipationMailBody( companySettings,
+                    mailSubject, mailBody, CommonConstants.SURVEY_COMPLETION_UNPLEASANT_MAIL_BODY_CATEGORY );
+
+                // set the value back in session
+                session.setAttribute( CommonConstants.SURVEY_COMPLETION_UNPLEASANT_MAIL_SUBJECT_IN_SESSION, mailSubject );
+                session.setAttribute( CommonConstants.SURVEY_COMPLETION_UNPLEASANT_MAIL_BODY_IN_SESSION, mailBody );
+
+                message = messageUtils.getDisplayMessage( DisplayMessageConstants.SURVEY_COMPLETION_UNPLEASANT_MAILBODY_UPDATE_SUCCESSFUL,
+                    DisplayMessageType.SUCCESS_MESSAGE ).getMessage();
+            }
 
             else if ( mailCategory != null && mailCategory.equals( "socialpostremindermail" ) ) {
 
@@ -992,6 +1019,23 @@ public class OrganizationManagementController
 
                 session.setAttribute( CommonConstants.SURVEY_COMPLETION_MAIL_BODY_IN_SESSION, mailBody );
                 session.setAttribute( CommonConstants.SURVEY_COMPLETION_MAIL_SUBJECT_IN_SESSION, mailSubject );
+            }
+            
+            else if ( mailCategory != null && mailCategory.equals( "surveycompletionunpleasantmail" ) ) {
+                defaultMailContent = organizationManagementService.deleteMailBodyFromSetting( companySettings,
+                    CommonConstants.SURVEY_COMPLETION_UNPLEASANT_MAIL_BODY_CATEGORY );
+
+                mailBody = defaultMailContent.getMail_body();
+                mailBody = emailFormatHelper.replaceEmailBodyWithParams( mailBody,
+                    organizationManagementService.getSurveyParamOrder( CommonConstants.SURVEY_COMPLETION_UNPLEASANT_MAIL_BODY_CATEGORY ) );
+                //mailBody = mailBody.replaceAll("\\[LogoUrl\\]", applicationLogoUrl);
+
+                mailSubject = defaultMailContent.getMail_subject();
+                message = messageUtils.getDisplayMessage( DisplayMessageConstants.SURVEY_COMPLETION_UNPLEASANT_MAILBODY_UPDATE_SUCCESSFUL,
+                    DisplayMessageType.SUCCESS_MESSAGE ).getMessage();
+
+                session.setAttribute( CommonConstants.SURVEY_COMPLETION_UNPLEASANT_MAIL_BODY_IN_SESSION, mailBody );
+                session.setAttribute( CommonConstants.SURVEY_COMPLETION_UNPLEASANT_MAIL_SUBJECT_IN_SESSION, mailSubject );
             }
 
             else if ( mailCategory != null && mailCategory.equals( "socialpostremindermail" ) ) {
