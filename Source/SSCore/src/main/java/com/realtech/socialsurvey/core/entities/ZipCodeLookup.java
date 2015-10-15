@@ -1,7 +1,6 @@
 package com.realtech.socialsurvey.core.entities;
 
 import java.io.Serializable;
-
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;

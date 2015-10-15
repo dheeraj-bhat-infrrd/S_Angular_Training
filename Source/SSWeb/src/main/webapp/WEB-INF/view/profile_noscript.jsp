@@ -172,18 +172,16 @@
 </div>
 
 <div id="profile-main-content" class="prof-main-content-wrapper margin-top-10 margin-bottom-25">
-    <div itemscope itemtype="http://schema.org/Product" class="">
+    <div itemscope itemtype="https://schema.org/LocalBusiness" class="">
     	<div class="container">
         <div class="row prof-pic-name-wrapper">
 			<c:if test="${not empty profile.profileImageUrl }">
+				<c:set var="profileNameClass" value="profile-name-img-wrapper"></c:set>
 				<div id="prog-img-container" class="col-lg-4 col-md-4 col-sm-4 col-xs-6 prof-wrapper prof-img-wrapper prog-img-container">
 					<div class="prog-img-container">
-			            <img id="prof-image" class="prof-image pos-relative" src="${profile.profileImageUrl}"></img>
+			            <img itemprop="image" class="prof-image pos-relative" src="${profile.profileImageUrl}" alt="Photo of ${profName}"></img>
 		            </div>
 	            </div>
-			</c:if>
-			<c:if test="${not empty profile.profileImageUrl }">
-				<c:set var="profileNameClass" value="profile-name-img-wrapper"></c:set>
 			</c:if>
             <div class="col-lg-4 col-md-4 col-sm-4 col-xs-6 prof-wrapper pos-relative prof-name-wrapper ${profileNameClass}">
                 <div class="prof-name-container">
@@ -196,13 +194,27 @@
                 			<div class="prof-addline2">${profile.contact_details.title}</div>
                 		</c:if>
                 	</div>
-					<div itemprop="aggregateRating" itemscope itemtype="http://schema.org/AggregateRating" class="prof-rating clearfix">
+                	<!-- Apply aggregate rating only when we have reviews -->
+                	<c:choose>
+                	<c:when test="${reviewsCount > 0 }">
+                		<div itemprop="aggregateRating" itemscope itemtype="http://schema.org/AggregateRating" class="prof-rating clearfix">
 						<div class="prof-rating-wrapper maring-0 clearfix float-left" id="rating-avg-comp">
 							<div class='rating-image float-left smiley-rat-${integerAverageRating }'></div>
 							<div class='rating-rounded float-left'><span itemprop="ratingValue">${floatingAverageRating}</span>  - </div>
 						</div>
 						<div class="float-left review-count-left cursor-pointer" id="prof-company-review-count"><span itemprop="reviewCount">${reviewsCount }</span> Reviews(s)</div>
 					</div>
+                	</c:when>
+                	<c:otherwise>
+                		<div class="prof-rating clearfix">
+						<div class="prof-rating-wrapper maring-0 clearfix float-left" id="rating-avg-comp">
+							<div class='rating-image float-left smiley-rat-${integerAverageRating }'></div>
+							<div class='rating-rounded float-left'><span>${floatingAverageRating}</span>  - </div>
+						</div>
+						<div class="float-left review-count-left cursor-pointer" id="prof-company-review-count"><span>${reviewsCount }</span> Reviews(s)</div>
+					</div>
+                	</c:otherwise>
+                	</c:choose>
 					<div class="prof-btn-wrapper clearfix">
 						<div class="prof-btn-contact float-left" onclick="focusOnContact()" >Contact
 						<c:choose>
@@ -223,9 +235,36 @@
             			<div class="prof-user-logo" id="prof-company-logo"></div>
             		</c:otherwise>
             	</c:choose>
-                <div class="prof-user-address" id="prof-company-address">
-                    <!-- address comes here -->
+            	<c:if test="${not empty contact_details}">
+                <div class="prof-user-address" itemprop="address" itemscope itemtype="http://schema.org/PostalAddress">
+                	<c:if test="${not empty contact_details.address1 || not empty contact_details.address2 }">
+                		<div itemprop="streetAddress">
+		                	<c:if test="${not empty  contact_details.address1}">
+		                		<div class="prof-user-addline1">${contact_details.address1}</div>
+		                	</c:if>
+		                	<c:if test="${not empty  contact_details.address2}">
+		                		<div class="prof-user-addline2">${contact_details.address2}</div>
+		                	</c:if>
+	                	</div>
+                	</c:if>
+                	<c:if test="${not empty contact_details.zipcode || not empty contact_details.city || not empty contact_details.state }">
+                		<div class="prof-user-addline2">
+                			<c:if test="${not empty contact_details.city}">
+                				<span itemprop="addressLocality">${contact_details.city}</span>
+                			</c:if>
+                			<c:if test="${not empty contact_details.state}">
+                				<span itemprop="addressRegion">${contact_details.state}</span>
+                			</c:if>
+                			<c:if test="${not empty contact_details.zipcode}">
+                				<span itemprop="postalCode">${contact_details.zipcode}</span>
+                			</c:if>
+                		</div>
+                		<c:if test="${not empty contact_details.country}">
+                			<meta itemprop="addressCountry" content="${contact_details.country}"/>
+                		</c:if>
+                	</c:if>
                 </div>
+                </c:if>
             </div>
             <div class="mob-contact-btn-wrapper">
                 <div class="mob-contact-btn-row clearfix">
@@ -315,7 +354,7 @@
 									<c:if test="${not empty profile.contact_details.contact_numbers && not empty profile.contact_details.contact_numbers.work}">
 										<div class="lp-con-row lp-row clearfix">
 											<div class="float-left lp-con-icn icn-phone"></div>
-											<div class="float-left lp-con-row-item">${profile.contact_details.contact_numbers.work}</div>
+											<div class="float-left lp-con-row-item" itemprop="telephone">${profile.contact_details.contact_numbers.work}</div>
 										</div>
 									</c:if>
 								</div>
