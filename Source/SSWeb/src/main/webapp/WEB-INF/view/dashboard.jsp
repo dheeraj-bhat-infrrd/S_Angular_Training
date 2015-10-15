@@ -2,7 +2,6 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <%@ taglib prefix="spring" uri="http://www.springframework.org/tags"%>
 <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions"%>
-
 <c:choose>
 	<c:when test="${columnName == 'companyId'}">
 		<c:set value="1" var="profilemasterid"></c:set>
@@ -179,7 +178,6 @@
 		</div>
 	</div>
 </div>
-
 <script>
 $(document).ready(function() {
 	$('.va-dd-wrapper').perfectScrollbar({
