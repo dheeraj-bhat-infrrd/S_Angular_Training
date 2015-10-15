@@ -4,25 +4,22 @@ import java.sql.Timestamp;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
 import org.quartz.JobDataMap;
 import org.quartz.JobExecutionContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.quartz.QuartzJobBean;
 import org.springframework.stereotype.Component;
-
 import retrofit.client.Response;
 import retrofit.mime.TypedByteArray;
-
 import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
 import com.google.gson.reflect.TypeToken;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.commons.Utils;
 import com.realtech.socialsurvey.core.dao.impl.MongoOrganizationUnitSettingDaoImpl;
-import com.realtech.socialsurvey.core.entities.Company;
 import com.realtech.socialsurvey.core.entities.CollectionDotloopProfileMapping;
+import com.realtech.socialsurvey.core.entities.Company;
 import com.realtech.socialsurvey.core.entities.DotLoopCrmInfo;
 import com.realtech.socialsurvey.core.entities.DotLoopParticipant;
 import com.realtech.socialsurvey.core.entities.DotLoopProfileEntity;
