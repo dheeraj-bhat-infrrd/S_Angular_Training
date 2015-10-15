@@ -75,7 +75,7 @@ public interface SurveyDetailsDao
 
 
     public long getFeedBacksCount( String columnName, long columnValue, double startScore, double limitScore,
-        boolean fetchAbusive );
+        boolean fetchAbusive, boolean notRecommended );
 
 
     public List<SurveyDetails> getIncompleteSurvey( String columnName, long columNValue, int start, int rows,

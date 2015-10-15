@@ -138,7 +138,7 @@ public class ProfileViewController
             model.addAttribute( "averageRating", averageRating );
 
             long reviewsCount = profileManagementService.getReviewsCount( companyId, CommonConstants.MIN_RATING_SCORE,
-                CommonConstants.MAX_RATING_SCORE, CommonConstants.PROFILE_LEVEL_COMPANY, false );
+                CommonConstants.MAX_RATING_SCORE, CommonConstants.PROFILE_LEVEL_COMPANY, false, false );
             model.addAttribute( "reviewsCount", reviewsCount );
 
             if ( isBotRequest ) {
@@ -261,7 +261,7 @@ public class ProfileViewController
             model.addAttribute( "averageRating", averageRating );
 
             long reviewsCount = profileManagementService.getReviewsCount( regionId, CommonConstants.MIN_RATING_SCORE,
-                CommonConstants.MAX_RATING_SCORE, CommonConstants.PROFILE_LEVEL_REGION, false );
+                CommonConstants.MAX_RATING_SCORE, CommonConstants.PROFILE_LEVEL_REGION, false, false );
             model.addAttribute( "reviewsCount", reviewsCount );
 
             if ( isBotRequest ) {
@@ -384,7 +384,7 @@ public class ProfileViewController
             model.addAttribute( "averageRating", averageRating );
 
             long reviewsCount = profileManagementService.getReviewsCount( branchId, CommonConstants.MIN_RATING_SCORE,
-                CommonConstants.MAX_RATING_SCORE, CommonConstants.PROFILE_LEVEL_BRANCH, false );
+                CommonConstants.MAX_RATING_SCORE, CommonConstants.PROFILE_LEVEL_BRANCH, false, false );
             model.addAttribute( "reviewsCount", reviewsCount );
 
             if ( isBotRequest ) {
@@ -565,7 +565,7 @@ public class ProfileViewController
                 model.addAttribute( "averageRating", averageRating );
 
                 long reviewsCount = profileManagementService.getReviewsCount( agentId, CommonConstants.MIN_RATING_SCORE,
-                    CommonConstants.MAX_RATING_SCORE, CommonConstants.PROFILE_LEVEL_INDIVIDUAL, false );
+                    CommonConstants.MAX_RATING_SCORE, CommonConstants.PROFILE_LEVEL_INDIVIDUAL, false, false );
                 model.addAttribute( "reviewsCount", reviewsCount );
 
                 if ( isBotRequest ) {
