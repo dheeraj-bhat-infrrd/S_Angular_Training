@@ -34,7 +34,7 @@ public class WidgetController
     private static final String PROFILE_TYPE_REGION = "region";
     private static final String PROFILE_TYPE_BRANCH = "branch";
     private static final String PROFILE_TYPE_INDIVIDUAL = "individual";
-
+    private static final int WIDGET_MAX_REVIEWS = 3;
     @Autowired
     OrganizationManagementService organizationManagementService;
     @Autowired
@@ -60,7 +60,7 @@ public class WidgetController
             averageRating = profileManagementService.getAverageRatings( iden, CommonConstants.PROFILE_LEVEL_COMPANY, false );
             reviewsCount = profileManagementService.getReviewsCount( iden, CommonConstants.MIN_RATING_SCORE,
                 CommonConstants.MAX_RATING_SCORE, CommonConstants.PROFILE_LEVEL_COMPANY, false );
-            surveys = profileManagementService.getReviews( iden, -1, -1, -1, 3, CommonConstants.PROFILE_LEVEL_COMPANY, false,
+            surveys = profileManagementService.getReviews( iden, -1, -1, -1, WIDGET_MAX_REVIEWS, CommonConstants.PROFILE_LEVEL_COMPANY, false,
                 null, null, CommonConstants.REVIEWS_SORT_CRITERIA_FEATURE );
             model.addAttribute( "profile", companySettings );
         } else if ( profileType.equals( PROFILE_TYPE_REGION ) ) {
@@ -68,7 +68,7 @@ public class WidgetController
             averageRating = profileManagementService.getAverageRatings( iden, CommonConstants.PROFILE_LEVEL_REGION, false );
             reviewsCount = profileManagementService.getReviewsCount( iden, CommonConstants.MIN_RATING_SCORE,
                 CommonConstants.MAX_RATING_SCORE, CommonConstants.PROFILE_LEVEL_REGION, false );
-            surveys = profileManagementService.getReviews( iden, -1, -1, -1, 3, CommonConstants.PROFILE_LEVEL_REGION, false,
+            surveys = profileManagementService.getReviews( iden, -1, -1, -1, WIDGET_MAX_REVIEWS, CommonConstants.PROFILE_LEVEL_REGION, false,
                 null, null, CommonConstants.REVIEWS_SORT_CRITERIA_FEATURE );
             model.addAttribute( "profile", regionSettings );
         } else if ( profileType.equals( PROFILE_TYPE_BRANCH ) ) {
@@ -76,7 +76,7 @@ public class WidgetController
             averageRating = profileManagementService.getAverageRatings( iden, CommonConstants.PROFILE_LEVEL_BRANCH, false );
             reviewsCount = profileManagementService.getReviewsCount( iden, CommonConstants.MIN_RATING_SCORE,
                 CommonConstants.MAX_RATING_SCORE, CommonConstants.PROFILE_LEVEL_BRANCH, false );
-            surveys = profileManagementService.getReviews( iden, -1, -1, -1, 3, CommonConstants.PROFILE_LEVEL_BRANCH, false,
+            surveys = profileManagementService.getReviews( iden, -1, -1, -1, WIDGET_MAX_REVIEWS, CommonConstants.PROFILE_LEVEL_BRANCH, false,
                 null, null, CommonConstants.REVIEWS_SORT_CRITERIA_FEATURE );
             model.addAttribute( "profile", branchSettings );
         } else if ( profileType.equals( PROFILE_TYPE_INDIVIDUAL ) ) {
@@ -84,7 +84,7 @@ public class WidgetController
             averageRating = profileManagementService.getAverageRatings( iden, CommonConstants.PROFILE_LEVEL_INDIVIDUAL, false );
             reviewsCount = profileManagementService.getReviewsCount( iden, CommonConstants.MIN_RATING_SCORE,
                 CommonConstants.MAX_RATING_SCORE, CommonConstants.PROFILE_LEVEL_INDIVIDUAL, false );
-            surveys = profileManagementService.getReviews( iden, -1, -1, -1, 3, CommonConstants.PROFILE_LEVEL_INDIVIDUAL,
+            surveys = profileManagementService.getReviews( iden, -1, -1, -1, WIDGET_MAX_REVIEWS, CommonConstants.PROFILE_LEVEL_INDIVIDUAL,
                 false, null, null, CommonConstants.REVIEWS_SORT_CRITERIA_FEATURE );
             model.addAttribute( "profile", agentSettings );
         } else {
