@@ -47,7 +47,12 @@
 
 
 		<div class="dash-stats-wrapper bord-bot-dc clearfix help">
-
+	
+			<div class="contact-div">
+				<h4>Contact us</h4>
+				<p>You may contact our support department at 1-888-701-4512.</p>
+			</div>
+			
 			<form action="" method="post" class="contact-form" name=formSubmit  id="message-form"
 				enctype="multipart/form-data" onsubmit="return check();">
 				<p class="half">
