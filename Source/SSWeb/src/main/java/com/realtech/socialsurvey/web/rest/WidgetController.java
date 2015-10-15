@@ -59,7 +59,7 @@ public class WidgetController
             OrganizationUnitSettings companySettings = organizationManagementService.getCompanySettings( iden );
             averageRating = profileManagementService.getAverageRatings( iden, CommonConstants.PROFILE_LEVEL_COMPANY, false );
             reviewsCount = profileManagementService.getReviewsCount( iden, CommonConstants.MIN_RATING_SCORE,
-                CommonConstants.MAX_RATING_SCORE, CommonConstants.PROFILE_LEVEL_COMPANY, false );
+                CommonConstants.MAX_RATING_SCORE, CommonConstants.PROFILE_LEVEL_COMPANY, false, false );
             surveys = profileManagementService.getReviews( iden, -1, -1, -1, WIDGET_MAX_REVIEWS, CommonConstants.PROFILE_LEVEL_COMPANY, false,
                 null, null, CommonConstants.REVIEWS_SORT_CRITERIA_FEATURE );
             model.addAttribute( "profile", companySettings );
@@ -67,7 +67,7 @@ public class WidgetController
             OrganizationUnitSettings regionSettings = organizationManagementService.getRegionSettings( iden );
             averageRating = profileManagementService.getAverageRatings( iden, CommonConstants.PROFILE_LEVEL_REGION, false );
             reviewsCount = profileManagementService.getReviewsCount( iden, CommonConstants.MIN_RATING_SCORE,
-                CommonConstants.MAX_RATING_SCORE, CommonConstants.PROFILE_LEVEL_REGION, false );
+                CommonConstants.MAX_RATING_SCORE, CommonConstants.PROFILE_LEVEL_REGION, false, false );
             surveys = profileManagementService.getReviews( iden, -1, -1, -1, WIDGET_MAX_REVIEWS, CommonConstants.PROFILE_LEVEL_REGION, false,
                 null, null, CommonConstants.REVIEWS_SORT_CRITERIA_FEATURE );
             model.addAttribute( "profile", regionSettings );
@@ -75,7 +75,7 @@ public class WidgetController
             OrganizationUnitSettings branchSettings = organizationManagementService.getBranchSettingsDefault( iden );
             averageRating = profileManagementService.getAverageRatings( iden, CommonConstants.PROFILE_LEVEL_BRANCH, false );
             reviewsCount = profileManagementService.getReviewsCount( iden, CommonConstants.MIN_RATING_SCORE,
-                CommonConstants.MAX_RATING_SCORE, CommonConstants.PROFILE_LEVEL_BRANCH, false );
+                CommonConstants.MAX_RATING_SCORE, CommonConstants.PROFILE_LEVEL_BRANCH, false, false );
             surveys = profileManagementService.getReviews( iden, -1, -1, -1, WIDGET_MAX_REVIEWS, CommonConstants.PROFILE_LEVEL_BRANCH, false,
                 null, null, CommonConstants.REVIEWS_SORT_CRITERIA_FEATURE );
             model.addAttribute( "profile", branchSettings );
@@ -83,7 +83,7 @@ public class WidgetController
             OrganizationUnitSettings agentSettings = organizationManagementService.getAgentSettings( iden );
             averageRating = profileManagementService.getAverageRatings( iden, CommonConstants.PROFILE_LEVEL_INDIVIDUAL, false );
             reviewsCount = profileManagementService.getReviewsCount( iden, CommonConstants.MIN_RATING_SCORE,
-                CommonConstants.MAX_RATING_SCORE, CommonConstants.PROFILE_LEVEL_INDIVIDUAL, false );
+                CommonConstants.MAX_RATING_SCORE, CommonConstants.PROFILE_LEVEL_INDIVIDUAL, false, false );
             surveys = profileManagementService.getReviews( iden, -1, -1, -1, WIDGET_MAX_REVIEWS, CommonConstants.PROFILE_LEVEL_INDIVIDUAL,
                 false, null, null, CommonConstants.REVIEWS_SORT_CRITERIA_FEATURE );
             model.addAttribute( "profile", agentSettings );
