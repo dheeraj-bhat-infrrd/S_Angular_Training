@@ -11,6 +11,9 @@
 	});
 </script>
 <script src="${initParam.resourcesPath}/resources/js/activesession.js"></script>
+<script type="text/javascript" src="https://apis.google.com/js/client:plusone.js" async="async"></script>
+<script type="text/javascript" src="//apis.google.com/js/plusone.js" async="async"></script>
+<script type="text/javascript" async src="//platform.twitter.com/widgets.js" async="async"></script>
 <script type="text/javascript">
 $(document).ready(function() {
 	// Show popup if any active session found

@@ -1,7 +1,6 @@
 package com.realtech.socialsurvey.core.services.upload;
 
 import java.util.List;
-
 import com.realtech.socialsurvey.core.entities.FileUpload;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.exception.NoRecordsFetchedException;
