@@ -18,63 +18,59 @@
 </div>
 
 <div id="toast-container" class="toast-container">
-	   <span id="overlay-toast" class="overlay-toast"></span>
+	<span id="overlay-toast" class="overlay-toast"></span>
 </div>
 
-<form action="./updatecomplaintregsettings.do" method="post">
-	<!-- Mail Id Input -->
-	<div>
-	 	<spring:message code="label.complaintreg.mail.text" />
-		<input type="text" name="mailId" value="${complaintRegSettings.mailId}">
-	</div>
 
-
-	<div>
-		<div>
-			<input type="checkbox" name="enabled" value="enable">
-		</div>
-	
-		<!-- set the min rating -->
-		<div>
-			<spring:message code="label.complaintreg.rating.text" />
-			<select name="rating">
-				<option value="5">5</option>
-				<option value="4.5">4.5</option>
-				<option value="4">4</option>
-				<option value="3.5" selected>3.5</option>
-				<option value="3">3</option>			
-				<option value="2.5">2.5</option>	
-				<option value="2">2</option>		
-				<option value="1.5">1.5</option>
-				<option value="1">1</option>
-				<option value="0.5">0.5</option>
-				<option value="0">0</option>
-			</select>
-		</div>
-	</div>
-	
-	<!-- Mood selection -->
-	<div>
-		<spring:message code="label.complaintreg.mood.text" />
-		<div>
-			<div id="sq-neutral-smile" class="sq-smile-icn-container">
-				<div id="neutral-smile" star-no="2" class="sq-smile-icn-wrapper sq-neutral-smile"></div>
-				<div class="sq-smile-icn-text sq-smile-neutral-text float-left" name="mood">
-					<spring:message code="label.smile.neutral.text"/>
+<div class="prof-main-content-wrapper margin-top-25 margin-bottom-25">
+	<div class="container">
+		<div class="complaint-cont">
+			<form action="./updatecomplaintregsettings.do" method="post">
+				<!-- Mail Id Input -->
+				<div class="bd-hr-form-item clearfix">
+					<div class="float-left bd-frm-left"><spring:message code="label.complaintreg.mail.text" /></div>
+					<div class="float-left bd-frm-right"><input class="bd-frm-rt-txt" type="text" name="mailId"
+						value="${complaintRegSettings.mailId}"></div>
 				</div>
-			</div>
-			<div id="sq-sad-smile" class="sq-smile-icn-container">
-				<div id="sad-smile" star-no="3" class="sq-smile-icn-wrapper sq-sad-smile"></div>
-				<div class="sq-smile-icn-text sq-smile-sad-text float-left" name="mood">
-					<spring:message code="label.smile.sad.text"/>
+				<div>
+					<input type="checkbox" name="enabled" value="enable"> <label
+						for="enabled"><spring:message
+							code="label.complaintreg.rating.text" /></label>
+					<!-- set the min rating -->
+					<div class="clearfix">
+						<div class="float-left">
+							<input type="text" name="rating-min-post" id="rating-min-post"
+								class="st-item-row-txt cursor-pointer dd-arrow-dn"
+								autocomplete="off" value="${minpostscore}">
+							<div class="st-dd-wrapper hide" id="st-dd-wrapper-min-post"></div>
+						</div>
+					</div>
 				</div>
-			</div>
+	
+				<!-- Mood selection -->
+				<div class="mood-text">
+					<spring:message code="label.complaintreg.mood.text" />
+				</div>
+				<div class="clearfix">
+					<div class="sq-smile-icn-container compl-input-cont opacity-red" data-mood="ok">
+						<div id="neutral-smile" class="sq-smile-icn-wrapper sq-neutral-smile"></div>
+						<div class="sq-smile-icn-text sq-smile-neutral-text float-left">
+							<spring:message code="label.smile.neutral.text" />
+						</div>
+					</div>
+					<div class="sq-smile-icn-container compl-input-cont opacity-red" data-mood="unpleasant">
+						<div id="sad-smile" class="sq-smile-icn-wrapper sq-sad-smile"></div>
+						<div class="sq-smile-icn-text sq-smile-sad-text float-left">
+							<spring:message code="label.smile.sad.text" />
+						</div>
+					</div>
+				</div>
+				<input type="hidden" id="survey-mood" name="mood"/> 
+				<div class="bd-btn-save cursor-pointer">Save</div>
+			</form>
 		</div>
 	</div>
-	<div>
-		<input type="submit" value="Save"/>
-	</div>
-</form>
+</div>
 
 
 <!-- window to display reviews flagged as under resolution  
@@ -96,7 +92,42 @@
 -->
 
 <script>
-///$(document).ready(function() {
-//	showSurveysUnderResolution(0,10);
-//});
+	$(document).ready(function() {
+		autoAppendRatingDropdown('#st-dd-wrapper-min-post',
+				"st-dd-item st-dd-item-min-post");
+		$('#rating-min-post').off('click');
+		$('#rating-min-post').on('click', function() {
+			$('#st-dd-wrapper-min-post').slideToggle(200);
+		});
+		$('.sq-smile-icn-container').off('click');
+		$('.sq-smile-icn-container').on('click', function() {
+			var mood = $(this).attr("data-mood");
+			var currentMood = $('#survey-mood').val();
+			
+			//check for toggle state
+			
+			//set the mood
+			if($(this).hasClass('opacity-red')) {
+				$('#survey-mood').val(mood);
+				if(mood.toLowerCase() == "ok") {
+					$('.sq-smile-icn-container').removeClass('opacity-red');
+				} else if (mood.toLowerCase() == "unpleasant") {
+					$(this).removeClass('opacity-red');
+				}
+			} else {
+				$('#survey-mood').val('');
+				
+				if(mood.toLowerCase() == "ok") {
+					$('.sq-smile-icn-container').addClass('opacity-red');
+				} else if (mood.toLowerCase() == "unpleasant") {
+					if(currentMood == "ok") {
+						$('.sq-smile-icn-container[data-mood="ok"]').addClass('opacity-red');
+						$('#survey-mood').val(mood);
+					} else if(currentMood == "unpleasant"){
+						$(this).addClass('opacity-red');
+					}
+				}
+			}
+		});
+	});
 </script>

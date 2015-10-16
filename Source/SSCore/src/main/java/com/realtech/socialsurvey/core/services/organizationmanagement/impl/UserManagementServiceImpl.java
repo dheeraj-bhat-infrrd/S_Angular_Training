@@ -6,9 +6,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
 import javax.annotation.Resource;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
@@ -18,7 +16,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.DependsOn;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
-
 import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.commons.ProfileCompletionList;
 import com.realtech.socialsurvey.core.commons.Utils;
@@ -801,7 +798,7 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
             user.setAboutMe( agentSettings.getContact_details().getAbout_me() );
             //JIRA SS-1104 search results not updated with correct number of reviews
             long reviewCount = profileManagementService.getReviewsCount( agentSettings.getIden(), 0, 5,
-                CommonConstants.PROFILE_LEVEL_INDIVIDUAL, true );
+                CommonConstants.PROFILE_LEVEL_INDIVIDUAL, true, false );
             user.setReviewCount( reviewCount );
             user.setReviewScore( surveyDetailsDao.getRatingForPastNdays( CommonConstants.AGENT_ID, agentSettings.getIden(),
                 CommonConstants.NO_LIMIT, true, false ) );
@@ -1274,20 +1271,22 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 
             for ( UserProfile currentProfile : userProfileList ) {
                 Branch branch = branchDao.findById( Branch.class, currentProfile.getBranchId() );
-
-                if ( currentProfile.getProfilesMaster().getProfileId() == CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID
-                    && branch.getIsDefaultBySystem() == CommonConstants.IS_DEFAULT_BY_SYSTEM_NO ) {
-                    agentProfileWithoutDefaultBranch = currentProfile;
-                } else if ( currentProfile.getProfilesMaster().getProfileId() == CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID
-                    && branch.getIsDefaultBySystem() == CommonConstants.IS_DEFAULT_BY_SYSTEM_YES ) {
-                    agentProfileWithDefaultBranch = currentProfile;
-                } else if ( currentProfile.getProfilesMaster().getProfileId() == CommonConstants.PROFILES_MASTER_BRANCH_ADMIN_PROFILE_ID ) {
-                    branchAdminProfile = currentProfile;
-                } else if ( currentProfile.getProfilesMaster().getProfileId() == CommonConstants.PROFILES_MASTER_REGION_ADMIN_PROFILE_ID ) {
-                    regionAdminProfile = currentProfile;
-                } else if ( currentProfile.getProfilesMaster().getProfileId() == CommonConstants.PROFILES_MASTER_COMPANY_ADMIN_PROFILE_ID ) {
-                    companyAdminProfile = currentProfile;
+                if(currentProfile.getStatus() == CommonConstants.STATUS_ACTIVE){
+                    if ( currentProfile.getProfilesMaster().getProfileId() == CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID
+                        && branch.getIsDefaultBySystem() == CommonConstants.IS_DEFAULT_BY_SYSTEM_NO ) {
+                        agentProfileWithoutDefaultBranch = currentProfile;
+                    } else if ( currentProfile.getProfilesMaster().getProfileId() == CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID
+                        && branch.getIsDefaultBySystem() == CommonConstants.IS_DEFAULT_BY_SYSTEM_YES ) {
+                        agentProfileWithDefaultBranch = currentProfile;
+                    } else if ( currentProfile.getProfilesMaster().getProfileId() == CommonConstants.PROFILES_MASTER_BRANCH_ADMIN_PROFILE_ID ) {
+                        branchAdminProfile = currentProfile;
+                    } else if ( currentProfile.getProfilesMaster().getProfileId() == CommonConstants.PROFILES_MASTER_REGION_ADMIN_PROFILE_ID ) {
+                        regionAdminProfile = currentProfile;
+                    } else if ( currentProfile.getProfilesMaster().getProfileId() == CommonConstants.PROFILES_MASTER_COMPANY_ADMIN_PROFILE_ID ) {
+                        companyAdminProfile = currentProfile;
+                    }
                 }
+                
             }
 
             if ( agentProfileWithoutDefaultBranch != null ) {
@@ -1302,6 +1301,9 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
                 profileToMakePrimary = companyAdminProfile;
             }
 
+            if(profileToMakePrimary == null){
+                throw new InvalidInputException( "No user profile present for the specified userId" );
+            }
             profileToMakePrimary.setIsPrimary( CommonConstants.IS_PRIMARY_TRUE );
             userProfileDao.update( profileToMakePrimary );
 
@@ -2159,6 +2161,7 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 
         // Set default profile stages.
         agentSettings.setProfileStages( profileCompletionList.getDefaultProfileCompletionList( true ) );
+
 
         organizationUnitSettingsDao.insertAgentSettings( agentSettings );
         LOG.info( "Inserted into agent settings" );
