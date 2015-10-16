@@ -147,6 +147,11 @@
 		<div class="user-edit-btn-col float-left">
 			<div id="user-assign-btn" class="user-edit-btn float-left">Assign</div>
 		</div>
+		<div class="user-edit-btn-col float-left">
+			<div id="generate-widget-btn" class="user-edit-btn float-left"
+				onclick="generateWidget(${ userId }, 'individual');">Generate
+				Widget</div>
+		</div>
 	</div>
 	<div id="btn-save-user-assignment" class="user-edit-btn-row clearfix hide">
 		<div class="user-edit-btn-col float-left">
