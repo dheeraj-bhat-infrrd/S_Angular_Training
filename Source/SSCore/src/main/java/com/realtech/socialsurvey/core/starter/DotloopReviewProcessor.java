@@ -98,9 +98,15 @@ public class DotloopReviewProcessor extends QuartzJobBean
                     DotLoopCrmInfo dotLoopCrmInfo = (DotLoopCrmInfo) organizationUnitSettings.getCrm_info();
                     if ( dotLoopCrmInfo.getApi() != null && !dotLoopCrmInfo.getApi().isEmpty() ) {
                         LOG.debug( "API key is " + dotLoopCrmInfo.getApi() );
-                        fetchReviewfromDotloop( dotLoopCrmInfo, collectionName, organizationUnitSettings );
+                        try {
+                            fetchReviewfromDotloop( dotLoopCrmInfo, collectionName, organizationUnitSettings );
+                        } catch ( Exception e ) {
+                            LOG.error( "Exception caught for collection " + collectionName + "having iden as "
+                                + organizationUnitSettings.getIden(), e );
+                        }
                         if ( !dotLoopCrmInfo.isRecordsBeenFetched() ) {
                             LOG.debug( "This was the first fetch hence updating recordsFetched to true " );
+                            dotLoopCrmInfo.setRecordsBeenFetched( true );
                             updateDotLoopCrmInfo( collectionName, organizationUnitSettings, dotLoopCrmInfo );
                         }
                     }
