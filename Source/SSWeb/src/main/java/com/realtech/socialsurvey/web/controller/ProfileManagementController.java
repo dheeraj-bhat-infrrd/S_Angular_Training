@@ -11,10 +11,12 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
 import javax.imageio.ImageIO;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import javax.ws.rs.QueryParam;
+
 import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrDocumentList;
 import org.slf4j.Logger;
@@ -30,7 +32,9 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
+
 import sun.misc.BASE64Decoder;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.type.TypeFactory;
 import com.google.gson.Gson;
@@ -4987,7 +4991,31 @@ public class ProfileManagementController
         return JspResolver.PROFILE_URL_CHANGE;
     }
 
-
+    /**
+     * Method to show the widget popup
+     * 
+     * @param iden
+     * @param accountType
+     * @return
+     */
+    @RequestMapping ( value = "/showwidgetpage", method = RequestMethod.GET)
+    public String showWidgetPage( Model model, HttpServletRequest request, @QueryParam ( value = "iden") long iden,
+        @QueryParam ( value = "profileLevel") String profileLevel )
+    {
+        LOG.info( "Method called to show widget page" );
+        if ( iden <= 0l ) {
+            LOG.error( "iden is empty" );
+        } else {
+            model.addAttribute( "iden", iden );
+        }
+        if ( profileLevel == null || profileLevel.isEmpty() ) {
+            LOG.error( "account type is empty" );
+        }
+        model.addAttribute( "profileLevel", profileLevel );
+        LOG.info( "Method to show widget page finished" );
+        return JspResolver.WIDGET_CODE_PAGE;
+    }
+    
     @ResponseBody
     @RequestMapping ( value = "/updatepositions")
     public String updatePositions( HttpServletRequest request, Model model )

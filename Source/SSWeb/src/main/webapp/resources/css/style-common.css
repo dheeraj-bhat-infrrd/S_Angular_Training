@@ -72,6 +72,11 @@ select:focus, button:focus{
 	outline:none;
 }
 
+code {
+	color: #000;
+	background: #FFF;
+}
+
 .input-error {
 	border: 1px solid red !important;
 	margin-top: -1px !important;
@@ -7057,7 +7062,7 @@ a.sq-btn-post-social:hover, a.sq-btn-post-social:visited {
 }
 
 .user-edit-btn-col {
-	width: 50%;
+	width: 33%;
 }
 
 .user-edit-btn-row {
