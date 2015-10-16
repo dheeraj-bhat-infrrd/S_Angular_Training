@@ -11,6 +11,8 @@ public class DotLoopCrmInfo extends CRMInfo
 
     private long agentId;
 
+    private boolean recordsBeenFetched;
+
 
     public String getApi()
     {
@@ -57,6 +59,18 @@ public class DotLoopCrmInfo extends CRMInfo
     public void setAgentId( long agentId )
     {
         this.agentId = agentId;
+    }
+
+
+    public boolean isRecordsBeenFetched()
+    {
+        return recordsBeenFetched;
+    }
+
+
+    public void setRecordsBeenFetched( boolean recordsBeenFetched )
+    {
+        this.recordsBeenFetched = recordsBeenFetched;
     }
 
 
