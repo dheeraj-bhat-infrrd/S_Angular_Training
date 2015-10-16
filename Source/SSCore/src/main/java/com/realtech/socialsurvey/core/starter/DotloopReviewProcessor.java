@@ -4,14 +4,17 @@ import java.sql.Timestamp;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
 import org.quartz.JobDataMap;
 import org.quartz.JobExecutionContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.quartz.QuartzJobBean;
 import org.springframework.stereotype.Component;
+
 import retrofit.client.Response;
 import retrofit.mime.TypedByteArray;
+
 import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
 import com.google.gson.reflect.TypeToken;
@@ -95,7 +98,17 @@ public class DotloopReviewProcessor extends QuartzJobBean
                     DotLoopCrmInfo dotLoopCrmInfo = (DotLoopCrmInfo) organizationUnitSettings.getCrm_info();
                     if ( dotLoopCrmInfo.getApi() != null && !dotLoopCrmInfo.getApi().isEmpty() ) {
                         LOG.debug( "API key is " + dotLoopCrmInfo.getApi() );
-                        fetchReviewfromDotloop( dotLoopCrmInfo.getApi(), collectionName, organizationUnitSettings );
+                        try {
+                            fetchReviewfromDotloop( dotLoopCrmInfo, collectionName, organizationUnitSettings );
+                        } catch ( Exception e ) {
+                            LOG.error( "Exception caught for collection " + collectionName + "having iden as "
+                                + organizationUnitSettings.getIden(), e );
+                        }
+                        if ( !dotLoopCrmInfo.isRecordsBeenFetched() ) {
+                            LOG.debug( "This was the first fetch hence updating recordsFetched to true " );
+                            dotLoopCrmInfo.setRecordsBeenFetched( true );
+                            updateDotLoopCrmInfo( collectionName, organizationUnitSettings, dotLoopCrmInfo );
+                        }
                     }
                 }
             }
@@ -162,6 +175,10 @@ public class DotloopReviewProcessor extends QuartzJobBean
         } else if ( collectionName.equalsIgnoreCase( MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION ) ) {
             collectionDotloopProfileMapping.setAgentId( unitSettings.getIden() );
         }
+        collectionDotloopProfileMapping.setCreatedOn( new Timestamp( System.currentTimeMillis() ) );
+        collectionDotloopProfileMapping.setModifiedOn( new Timestamp( System.currentTimeMillis() ) );
+        collectionDotloopProfileMapping.setCreatedBy( CommonConstants.ADMIN_USER_NAME );
+        collectionDotloopProfileMapping.setModifiedBy( CommonConstants.ADMIN_USER_NAME );
         collectionDotloopProfileMapping = organizationManagementService
             .saveCollectionDotLoopProfileMapping( collectionDotloopProfileMapping );
     }
@@ -181,7 +198,8 @@ public class DotloopReviewProcessor extends QuartzJobBean
                 // process it
                 LoopProfileMapping loopFromSystem = null;
                 try {
-                    loopFromSystem = organizationManagementService.getLoopByProfileAndLoopId( profileId, loop.getLoopId() );
+                    loopFromSystem = organizationManagementService.getLoopByProfileAndLoopId( profileId, loop.getLoopId(),
+                        collectionName, organizationUnitId );
                 } catch ( InvalidInputException e ) {
                     LOG.error( "Could not get loop details from database for loop id " + loop.getLoopId() + " for profile "
                         + profileId, e );
@@ -198,11 +216,30 @@ public class DotloopReviewProcessor extends QuartzJobBean
             }
             LOG.debug( "Insert into tracker." );
             try {
+                loop = setHierarchyInformationInLoop( loop, collectionName, organizationUnitId );
                 organizationManagementService.saveLoopsForProfile( loop );
             } catch ( InvalidInputException e ) {
                 LOG.warn( "Could not insert loop " + loop.getLoopId() + " for profile " + loop.getProfileId() );
             }
         }
+    }
+
+
+    private LoopProfileMapping setHierarchyInformationInLoop( LoopProfileMapping loop, String collectionName,
+        long organizationUnitId )
+    {
+        LOG.debug( "Inside method  setHierarchyInformationInLoop for loop " + loop.getProfileId() );
+        if ( collectionName.equalsIgnoreCase( MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION ) ) {
+            loop.setCompanyId( organizationUnitId );
+        } else if ( collectionName.equalsIgnoreCase( MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION ) ) {
+            loop.setRegionId( organizationUnitId );
+        } else if ( collectionName.equalsIgnoreCase( MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION ) ) {
+            loop.setBranchId( organizationUnitId );
+        } else if ( collectionName.equalsIgnoreCase( MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION ) ) {
+            loop.setAgentId( organizationUnitId );
+        }
+        loop.setCollectionName( collectionName );
+        return loop;
     }
 
 
@@ -254,10 +291,11 @@ public class DotloopReviewProcessor extends QuartzJobBean
                         surveyPreInitiation = new SurveyPreInitiation();
                         surveyPreInitiation = setCollectionDetails( surveyPreInitiation, collectionName, organizationUnitId );
                         surveyPreInitiation.setCreatedOn( new Timestamp( System.currentTimeMillis() ) );
-
+                        surveyPreInitiation.setModifiedOn( new Timestamp( System.currentTimeMillis() ) );
                         surveyPreInitiation.setCustomerEmailId( customerMappingKey );
                         surveyPreInitiation.setCustomerFirstName( customerMapping.get( customerMappingKey ) );
                         surveyPreInitiation.setLastReminderTime( utils.convertEpochDateToTimestamp() );
+                        surveyPreInitiation.setAgentEmailId( agentEmailId );
                         surveyPreInitiation.setEngagementClosedTime( new Timestamp( System.currentTimeMillis() ) );
                         surveyPreInitiation.setStatus( CommonConstants.STATUS_SURVEYPREINITIATION_NOT_PROCESSED );
                         surveyPreInitiation.setSurveySource( CommonConstants.CRM_SOURCE_DOTLOOP );
@@ -327,14 +365,29 @@ public class DotloopReviewProcessor extends QuartzJobBean
     }
 
 
+    private void updateDotLoopCrmInfo( String collectionName, OrganizationUnitSettings unitSettings,
+        DotLoopCrmInfo dotLoopCrmInfo )
+    {
+        LOG.debug( "Updating dotloop crm for  collection " + collectionName + "having id as " + unitSettings.getIden() );
+        try {
+            organizationManagementService.updateCRMDetailsForAnyUnitSettings( unitSettings, collectionName, dotLoopCrmInfo,
+                "com.realtech.socialsurvey.core.entities.DotLoopCrmInfo" );
+        } catch ( InvalidInputException e ) {
+            LOG.error( "Unable to update dotloop ", e );
+        }
+    }
+
+
     /**
      * Fetches records from dot loop
      * 
      * @param apiKey
      * @param unitSettings
      */
-    public void fetchReviewfromDotloop( String apiKey, String collectionName, OrganizationUnitSettings unitSettings )
+    public void fetchReviewfromDotloop( DotLoopCrmInfo dotloopCrmInfo, String collectionName,
+        OrganizationUnitSettings unitSettings )
     {
+        String apiKey = dotloopCrmInfo.getApi();
         LOG.debug( "Fetching reviews for api key: " + apiKey + " with id: " + unitSettings.getIden() );
         String authorizationHeader = CommonConstants.AUTHORIZATION_HEADER + apiKey;
         // get list of profiles
@@ -354,7 +407,10 @@ public class DotloopReviewProcessor extends QuartzJobBean
                         boolean byPassRecords = false; // checks if the system has processed the
                                                        // profile ever before.
                         try {
-                            if ( organizationManagementService.getLoopsCountByProfile( profileId ) > 0 ) {
+
+                            if ( dotloopCrmInfo.isRecordsBeenFetched()
+                                && organizationManagementService.getLoopsCountByProfile( profileId, collectionName,
+                                    unitSettings.getIden() ) > 0 ) {
                                 LOG.info( "Records for profile id: " + profileId + " is already present" );
                                 byPassRecords = false;
                             } else {
