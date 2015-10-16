@@ -5,10 +5,12 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.sql.Timestamp;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+
 import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -16,6 +18,7 @@ import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
+
 import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.commons.Utils;
 import com.realtech.socialsurvey.core.dao.EmailDao;
@@ -195,6 +198,10 @@ public class SendGridEmailSenderImpl implements EmailSender, InitializingBean
         } catch ( IOException ie ) {
             LOG.error( "Exception caught " + ie.getMessage() );
         }
+        emailObject.setCreatedOn( new Timestamp( System.currentTimeMillis() ) );
+        emailObject.setModifiedOn( new Timestamp( System.currentTimeMillis() ) );
+        emailObject.setCreatedBy( CommonConstants.ADMIN_USER_NAME );
+        emailObject.setModifiedBy( CommonConstants.ADMIN_USER_NAME );
         emailObject.setEmailBinaryObject( emailBinaryObject );
 
         saveEmailInDb( emailObject );
