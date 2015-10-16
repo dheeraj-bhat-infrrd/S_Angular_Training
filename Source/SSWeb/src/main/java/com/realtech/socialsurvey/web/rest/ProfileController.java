@@ -812,10 +812,12 @@ public class ProfileController
                             regionProfile.getSurvey_settings() );
                     }
                 }
+                if ( minScore != 0.0 ) {
+                    minScore = (double) regionProfile.getSurvey_settings().getShow_survey_above_score();
+                }
 
-                List<SurveyDetails> reviews = profileManagementService.getReviews( regionId, regionProfile.getSurvey_settings()
-                    .getShow_survey_above_score(), maxScore, start, numRows, CommonConstants.PROFILE_LEVEL_REGION, false, null,
-                    null, sortCriteria );
+                List<SurveyDetails> reviews = profileManagementService.getReviews( regionId, minScore, maxScore, start,
+                    numRows, CommonConstants.PROFILE_LEVEL_REGION, false, null, null, sortCriteria );
                 String json = new Gson().toJson( reviews );
                 LOG.debug( "reviews json : " + json );
                 response = Response.ok( json ).build();
@@ -883,7 +885,7 @@ public class ProfileController
     @ResponseBody
     @RequestMapping ( value = "/company/{companyId}/reviewcount")
     public Response getReviewCountForCompany( @PathVariable long companyId, @QueryParam ( value = "minScore") Double minScore,
-        @QueryParam ( value = "maxScore") Double maxScore )
+        @QueryParam ( value = "maxScore") Double maxScore, @QueryParam ( value = "notRecommended") Boolean notRecommended )
     {
         LOG.info( "Service to fetch the reviews count called for companyId :" + companyId + " ,minScore:" + minScore
             + " and maxScore:" + maxScore );
@@ -901,10 +903,13 @@ public class ProfileController
             if ( maxScore == null ) {
                 maxScore = CommonConstants.MAX_RATING_SCORE;
             }
+            if ( notRecommended == null ) {
+                notRecommended = false;
+            }
             long reviewsCount = 0;
             try {
                 reviewsCount = profileManagementService.getReviewsCount( companyId, minScore, maxScore,
-                    CommonConstants.PROFILE_LEVEL_COMPANY, false );
+                    CommonConstants.PROFILE_LEVEL_COMPANY, false, notRecommended );
                 String json = new Gson().toJson( reviewsCount );
                 LOG.debug( "reviews count json : " + json );
                 response = Response.ok( json ).build();
@@ -972,7 +977,7 @@ public class ProfileController
     @ResponseBody
     @RequestMapping ( value = "/region/{regionId}/reviewcount")
     public Response getReviewCountForRegion( @PathVariable long regionId, @QueryParam ( value = "minScore") Double minScore,
-        @QueryParam ( value = "maxScore") Double maxScore )
+        @QueryParam ( value = "maxScore") Double maxScore, @QueryParam ( value = "notRecommended") Boolean notRecommended )
     {
         LOG.info( "Service to fetch the reviews count called for regionId :" + regionId + " ,minScore:" + minScore
             + " and maxScore:" + maxScore );
@@ -990,10 +995,13 @@ public class ProfileController
             if ( maxScore == null ) {
                 maxScore = CommonConstants.MAX_RATING_SCORE;
             }
+            if ( notRecommended ==  null ) {
+                notRecommended = false;
+            }
             long reviewsCount = 0;
             try {
                 reviewsCount = profileManagementService.getReviewsCount( regionId, minScore, maxScore,
-                    CommonConstants.PROFILE_LEVEL_REGION, false );
+                    CommonConstants.PROFILE_LEVEL_REGION, false, notRecommended );
                 String json = new Gson().toJson( reviewsCount );
                 LOG.debug( "reviews count json : " + json );
                 response = Response.ok( json ).build();
@@ -1060,7 +1068,7 @@ public class ProfileController
     @ResponseBody
     @RequestMapping ( value = "/branch/{branchId}/reviewcount")
     public Response getReviewCountForBranch( @PathVariable long branchId, @QueryParam ( value = "minScore") Double minScore,
-        @QueryParam ( value = "maxScore") Double maxScore )
+        @QueryParam ( value = "maxScore") Double maxScore, @QueryParam ( value = "notRecommended") Boolean notRecommended )
     {
         LOG.info( "Service to fetch the reviews count called for branchId :" + branchId + " ,minScore:" + minScore
             + " and maxScore:" + maxScore );
@@ -1078,10 +1086,13 @@ public class ProfileController
             if ( maxScore == null ) {
                 maxScore = CommonConstants.MAX_RATING_SCORE;
             }
+            if ( notRecommended == null ) {
+                notRecommended = false;
+            }
             long reviewsCount = 0;
             try {
                 reviewsCount = profileManagementService.getReviewsCount( branchId, minScore, maxScore,
-                    CommonConstants.PROFILE_LEVEL_BRANCH, false );
+                    CommonConstants.PROFILE_LEVEL_BRANCH, false, notRecommended );
                 String json = new Gson().toJson( reviewsCount );
                 LOG.debug( "reviews count json : " + json );
                 response = Response.ok( json ).build();
@@ -1156,7 +1167,7 @@ public class ProfileController
 
                     branchProfile.setSurvey_settings( surveySettings );
                     // update survey settings in the profile object
-                    branchProfile.setSurvey_settings(surveySettings);
+                    branchProfile.setSurvey_settings( surveySettings );
                 } else {
                     if ( branchProfile.getSurvey_settings().getShow_survey_above_score() <= 0 ) {
                         branchProfile.getSurvey_settings().setAutoPostEnabled( true );
@@ -1166,9 +1177,11 @@ public class ProfileController
                             branchProfile.getSurvey_settings() );
                     }
                 }
-                List<SurveyDetails> reviews = profileManagementService.getReviews( branchId, branchProfile.getSurvey_settings()
-                    .getShow_survey_above_score(), maxScore, start, numRows, CommonConstants.PROFILE_LEVEL_BRANCH, false, null,
-                    null, sortCriteria );
+                if ( minScore != 0.0 ) {
+                    minScore = (double) branchProfile.getSurvey_settings().getShow_survey_above_score();
+                }
+                List<SurveyDetails> reviews = profileManagementService.getReviews( branchId, minScore, maxScore, start,
+                    numRows, CommonConstants.PROFILE_LEVEL_BRANCH, false, null, null, sortCriteria );
                 String json = new Gson().toJson( reviews );
                 LOG.debug( "reviews json : " + json );
                 response = Response.ok( json ).build();
@@ -1238,7 +1251,7 @@ public class ProfileController
     @ResponseBody
     @RequestMapping ( value = "/individual/{agentId}/reviewcount")
     public Response getReviewCountForAgent( @PathVariable long agentId, @QueryParam ( value = "minScore") Double minScore,
-        @QueryParam ( value = "maxScore") Double maxScore )
+        @QueryParam ( value = "maxScore") Double maxScore, @QueryParam ( value = "notRecommended") Boolean notRecommended )
     {
         LOG.info( "Service to fetch the reviews count called for agentId :" + agentId + " ,minScore:" + minScore
             + " and maxScore:" + maxScore );
@@ -1256,10 +1269,13 @@ public class ProfileController
             if ( maxScore == null ) {
                 maxScore = CommonConstants.MAX_RATING_SCORE;
             }
+            if ( notRecommended == null ) {
+                notRecommended = false;
+            }
             long reviewsCount = 0;
             try {
                 reviewsCount = profileManagementService.getReviewsCount( agentId, minScore, maxScore,
-                    CommonConstants.PROFILE_LEVEL_INDIVIDUAL, false );
+                    CommonConstants.PROFILE_LEVEL_INDIVIDUAL, false, notRecommended );
                 String json = new Gson().toJson( reviewsCount );
                 LOG.debug( "reviews count json : " + json );
                 response = Response.ok( json ).build();
@@ -1339,11 +1355,13 @@ public class ProfileController
                     MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION, agentProfile, surveySettings );
 
                 // update survey settings in the profile object
-                agentProfile.setSurvey_settings(surveySettings);
+                agentProfile.setSurvey_settings( surveySettings );
             }
-            List<SurveyDetails> reviews = profileManagementService.getReviews( agentId, agentProfile.getSurvey_settings()
-                .getShow_survey_above_score(), maxScore, start, numRows, CommonConstants.PROFILE_LEVEL_INDIVIDUAL, false, null,
-                null, sortCriteria );
+            if ( minScore != 0.0 ) {
+                minScore = (double) agentProfile.getSurvey_settings().getShow_survey_above_score();
+            }
+            List<SurveyDetails> reviews = profileManagementService.getReviews( agentId, minScore, maxScore, start, numRows,
+                CommonConstants.PROFILE_LEVEL_INDIVIDUAL, false, null, null, sortCriteria );
             profileManagementService.setAgentProfileUrlForReview( reviews );
             String json = new Gson().toJson( reviews );
             LOG.debug( "reviews json : " + json );

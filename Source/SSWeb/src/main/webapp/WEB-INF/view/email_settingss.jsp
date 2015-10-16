@@ -161,6 +161,46 @@
 					</div>
 				</div>
 				
+				<!-- survey completion unpleasent mail -->
+				
+				<div class="clearfix st-bottom-wrapper margin-top-50">
+					<div class="st-header-txt-lft-rt clearfix margin-top-25">
+						<div class="float-left st-header-txt-lft"><spring:message code="label.header.survey.completion.unpleasant.mailer.content.key" /></div>
+						<div class="float-right clearfix st-header-txt-rt">
+							<div class="clearfix">
+								<div id="edit-survey-completion-unpleasant-mail-content"
+									class="float-left st-header-txt-rt-icn icn-pen cursor-pointer icn-pen-blue"></div>
+								<div id="edit-survey-completion-unpleasant-mail-content-disabled"
+									class="float-left st-header-txt-rt-icn icn-pen hide"></div>
+		
+								<div id="save-survey-completion-unpleasant-mail-content"
+									class="float-left st-header-txt-rt-icn icn-blue-tick margin-left-20 cursor-pointer hide"></div>
+								<div id="save-survey-completion-unpleasant-mail-content-disabled"
+									class="float-left st-header-txt-rt-icn margin-left-20 icn-grey-tick"></div>
+									
+								<div id="revert-survey-completion-unpleasant-mail"
+									class="float-left st-header-txt-rt-icn margin-left-20 cursor-pointer icn-blue-ellipse"></div>
+							</div>
+							<div class="clearfix">
+								<div class="float-left settings-btn-text"><spring:message code="label.edit.key" /></div>
+								<div class="float-left settings-btn-text margin-left-20"><spring:message code="label.save.key" /></div>
+								<div class="float-left settings-btn-text margin-left-20"><spring:message code="label.reset.key" /></div>
+							</div>
+						</div>
+					</div>
+					<div class="st-subject-cont clearfix">
+						<div class="st-subject-label float-left"><spring:message code="label.subject.survey.completion.unpleasant.text" /></div>
+						<div class="st-subject-input-cont float-left">
+							<input type="text" id="survey-completion-unpleasant-subject" name="survey-completion-unpleasant-subject"
+								class="st-subject-input" value="${surveycompletionunpleasantmailsubject}" readonly>
+						</div>
+					</div>
+					<div class="st-header-txt-wrapper">
+						<textarea id="survey-completion-unpleasant-mailcontent" name="survey-completion-unpleasant-mailcontent"
+							class="st-header-txt-input">${surveycompletionunpleasantmailbody}</textarea>
+					</div>
+				</div>
+				
 				<!-- social post reminder mail -->
 				<div class="clearfix st-bottom-wrapper margin-top-50">
 					<div class="st-header-txt-lft-rt clearfix margin-top-25">
@@ -282,6 +322,9 @@
 			
 			$('#survey-completion-mailcontent').ckeditor();
 			$('#survey-completion-mailcontent').ckeditorGet().config.readOnly = true;
+			
+			$('#survey-completion-unpleasant-mailcontent').ckeditor();
+			$('#survey-completion-unpleasant-mailcontent').ckeditorGet().config.readOnly = true;
 			
 			$('#social-post-reminder-mailcontent').ckeditor();
 			$('#social-post-reminder-mailcontent').ckeditorGet().config.readOnly = true;
@@ -409,6 +452,46 @@
 			$('#overlay-header').html("Reset Mail Template");
 			$('#overlay-text').html("Are you sure you want to reset the mail template ?");
 			$('#overlay-continue').attr("onclick", "revertMailContent('surveycompletionmail');");
+		});
+		
+		//for survey completion unpleasant mail
+		$('#edit-survey-completion-unpleasant-mail-content').click(function() {
+			try {
+				$('#survey-completion-unpleasant-mailcontent').ckeditorGet().setReadOnly(false);
+			} catch(e) {
+			}
+			$('#survey-completion-unpleasant-subject').attr("readonly", false);
+			
+			$('#save-survey-completion-unpleasant-mail-content').show();
+			$('#save-survey-completion-unpleasant-mail-content-disabled').hide();
+			
+			$('#edit-survey-completion-unpleasant-mail-content-disabled').show();
+			$(this).hide();
+		});
+		$('#save-survey-completion-unpleasant-mail-content').click(function() {
+			$('#mailcategory').val('surveycompletionunpleasantmail');
+			updateMailContent("mail-body-settings-form");
+			
+			try {
+				$('#survey-completion-unpleasant-mailcontent').ckeditorGet().setReadOnly(true);
+			} catch(e) {
+			}
+			$('#survey-completion-unpleasant-subject').attr("readonly", true);
+			
+			$(this).hide();
+			$('#save-survey-completion-unpleasant-mail-content-disabled').show();
+
+			$('#edit-survey-completion-unpleasant-mail-content').show();
+			$('#edit-survey-completion-unpleasant-mail-content-disabled').hide();
+		});
+		$('#revert-survey-completion-unpleasant-mail').click(function() {
+			$('#overlay-main').show();
+			$('#overlay-continue').show();
+			$('#overlay-continue').html("Reset");
+			$('#overlay-cancel').html("Cancel");
+			$('#overlay-header').html("Reset Mail Template");
+			$('#overlay-text').html("Are you sure you want to reset the mail template ?");
+			$('#overlay-continue').attr("onclick", "revertMailContent('surveycompletionunpleasantmail');");
 		});
 		
 		//social post reminder mail

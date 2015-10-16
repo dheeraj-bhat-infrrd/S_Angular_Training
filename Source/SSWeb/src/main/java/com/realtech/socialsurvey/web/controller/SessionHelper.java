@@ -97,6 +97,8 @@ public class SessionHelper {
     String paramOrderSocialPostReminder;
     @Value ( "${PARAM_ORDER_INCOMPLETE_SURVEY_REMINDER}")
     String paramOrderIncompleteSurveyReminder;
+    @Value ( "${PARAM_ORDER_SURVEY_COMPLETION_UNPLEASANT_MAIL}")
+    String paramOrderSurveyCompletionUnpleasantMail;
 
 	@Transactional
 	public void getCanonicalSettings(HttpSession session) throws InvalidInputException, NoRecordsFetchedException {
@@ -340,6 +342,35 @@ public class SessionHelper {
 					LOG.warn("Could not set mail content for social post reminder reminder");
 				}
 			}
+			
+			//survey completion unpleasant mail
+            if (userSettings.getCompanySettings().getMail_content().getSurvey_completion_unpleasant_mail() != null) {
+                MailContent mailContent = mailSettings.getSurvey_completion_unpleasant_mail();
+                String mailBody = emailFormatHelper.replaceEmailBodyWithParams(mailContent.getMail_body(), mailContent.getParam_order());
+                /*mailBody = mailBody.replaceAll("\\[LogoUrl\\]", applicationLogoUrl);*/
+                mailSettings.getSurvey_completion_unpleasant_mail().setMail_body(mailBody);
+                session.setAttribute(CommonConstants.SURVEY_COMPLETION_UNPLEASANT_MAIL_BODY_IN_SESSION, mailBody);
+                String surveyCompletionMailSubject = CommonConstants.SURVEY_COMPLETION_UNPLEASANT_MAIL_SUBJECT;
+                if (mailContent.getMail_subject() != null) {
+                    surveyCompletionMailSubject = mailContent.getMail_subject();
+                }
+                session.setAttribute(CommonConstants.SURVEY_COMPLETION_UNPLEASANT_MAIL_SUBJECT_IN_SESSION, surveyCompletionMailSubject);
+            }
+            else {
+                try {
+                    List<String> paramOrder = new ArrayList<String>(Arrays.asList(paramOrderSurveyCompletionUnpleasantMail.split(",")));
+                    replacements = new FileContentReplacements();
+                    replacements.setFileName(EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER + EmailTemplateConstants.SURVEY_COMPLETION_UNPLEASANT_MAIL_BODY);
+                    body = fileOperations.replaceFileContents(replacements);
+                    body = emailFormatHelper.replaceEmailBodyWithParams(body, paramOrder);
+                    /*body = body.replaceAll("\\[LogoUrl\\]", applicationLogoUrl);*/
+                    session.setAttribute(CommonConstants.SURVEY_COMPLETION_UNPLEASANT_MAIL_BODY_IN_SESSION, body);
+                    session.setAttribute(CommonConstants.SURVEY_COMPLETION_UNPLEASANT_MAIL_SUBJECT_IN_SESSION, CommonConstants.SURVEY_COMPLETION_UNPLEASANT_MAIL_SUBJECT);
+                }
+                catch (InvalidInputException e) {
+                    LOG.warn("Could not set mail content for survey completion mail");
+                }
+            }
 		}
 	}
 

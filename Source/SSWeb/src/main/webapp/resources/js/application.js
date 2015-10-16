@@ -1892,6 +1892,7 @@ function bindOfficeSelectorEvents(){
 				searchData[j] = {};
 				searchData[j].label = branchList[i].branchName;
 				searchData[j].branchId = branchList[i].branchId;
+				searchData[j].regionId = branchList[i].regionId;
 				j++;
 			}
 		}
@@ -1903,6 +1904,7 @@ function bindOfficeSelectorEvents(){
 			select: function(event, ui) {
 				$("#selected-office-txt").val(ui.item.label);
 				$('#selected-office-id-hidden').val(ui.item.branchId);
+				$('#selected-region-id-hidden').val(ui.item.regionId);
 				return false;
 			},
 			close: function(event, ui) {},

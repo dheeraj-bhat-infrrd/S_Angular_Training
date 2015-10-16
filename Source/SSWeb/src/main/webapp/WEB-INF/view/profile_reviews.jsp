@@ -114,6 +114,8 @@
 		</span>
 	</c:otherwise>
 </c:choose>
+<script type="text/javascript" src="//apis.google.com/js/client:plusone.js" async="async"></script>
+<script type="text/javascript" src="//apis.google.com/js/plusone.js" async="async"></script>
 <script>
 $(document).ready(function(){
 	

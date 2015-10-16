@@ -245,8 +245,12 @@ public class SurveyManagementController
                     emailServices.queueSurveyCompletionMail( customerEmail, customerName, survey.getAgentName(),
                         agent.getEmailId(), agent.getProfileName() );
                 } else {
-                    surveyHandler.sendSurveyCompletionMail( customerEmail, survey.getCustomerFirstName(),
-                        survey.getCustomerLastName(), agent );
+                    if ( survey.getMood().equalsIgnoreCase( "Unpleasant" ) )
+                        surveyHandler.sendSurveyCompletionUnpleasantMail( customerEmail, survey.getCustomerFirstName(),
+                            survey.getCustomerLastName(), agent );
+                    else
+                        surveyHandler.sendSurveyCompletionMail( customerEmail, survey.getCustomerFirstName(),
+                            survey.getCustomerLastName(), agent );
                 }
 
                 double surveyScoreValue = survey.getScore();
