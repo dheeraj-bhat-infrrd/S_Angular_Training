@@ -57,6 +57,9 @@
 							<div class="float-left v-tbl-icn-disabled v-icn-edit"></div>
 						</c:otherwise>
 				   </c:choose>
+				   <c:if test="${user.userId != branchUser.userId}">
+				   		<div class="float-right v-tbl-icn v-icn-login user-login-icn" data-iden="${branchUser.userId}" title="login as"></div>
+				   </c:if>
                </div>
            </td>
            <td class="v-tbl-spacer"></td>
@@ -68,3 +71,6 @@
        </tr>
     </c:forEach>
 </c:if> 
+<script>
+	bindUserLoginEvent();
+</script>
