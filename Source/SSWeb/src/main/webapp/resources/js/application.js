@@ -8493,6 +8493,21 @@ function showProfileLinkInEditProfilePage(source, profileUrl){
 	}
 }
 
+function showSurveysUnderResolution(startIndexCmp, batchSizeCmp){
+	var payload = {
+			"startIndex" : startIndexCmp,
+			"batchSize" : batchSizeCmp
+		};
+		callAjaxGetWithPayloadData("./fetchsurveysunderresolution.do", function(data) {
+			if (startIndexCmp == 0)
+				$('#sur-under-res-list').html(data);
+			else
+				$('#sur-under-res-list').append(data);
+			
+			startIndexCmp += batchSizeCmp;
+		}, payload, false);
+}
+
 // Send Survey Agent
 $(document).on('input', '#wc-review-table-inner[data-role="agent"] input', function() {
 	var parentDiv = $(this).parent().parent();

@@ -8,6 +8,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import org.apache.commons.lang.WordUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,6 +38,7 @@ import com.realtech.socialsurvey.core.utils.EmailFormatHelper;
 /**
  * Implementation file for the email services
  */
+
 @Component
 public class EmailServicesImpl implements EmailServices
 {
@@ -1854,10 +1856,23 @@ public class EmailServicesImpl implements EmailServices
      */
     private EmailEntity prepareEmailEntityForSendingEmail( String recipientMailId )
     {
-        LOG.debug( "Preparing email entity for registration invitation for recipientMailId " + recipientMailId );
         List<String> recipients = new ArrayList<String>();
         recipients.add( recipientMailId );
-
+        
+        return prepareEmailEntityForSendingEmail( recipients );
+    }
+   
+    
+    /**
+     * Method to prepare email entity required to send email
+     * 
+     * @param recipients
+     * @return
+     */
+    private EmailEntity prepareEmailEntityForSendingEmail( List<String> recipients )
+    {
+        LOG.debug( "Preparing email entity for registration invitation for recipientMailId " + recipients );
+        
         EmailEntity emailEntity = new EmailEntity();
         emailEntity.setRecipients( recipients );
         emailEntity.setRecipientType( EmailEntity.RECIPIENT_TYPE_TO );
@@ -1980,6 +1995,44 @@ public class EmailServicesImpl implements EmailServices
         emailSender.sendEmailWithBodyReplacements( emailEntity, subjectFileName, messageBodyReplacements, false );
 
         LOG.info( "Method sendReportBugMailToAdmin() finished." );
+    }
+    
+
+    @Async
+    @Override
+    public void sendComplaintHandleMail( String recipientMailId, String customerName, String customerMailId, String mood,
+        String rating ) throws InvalidInputException, UndeliveredEmailException
+    {
+        if ( recipientMailId == null || recipientMailId.isEmpty() ) {
+            LOG.error( "Recipient email Id is empty or null for sending survey completion mail " );
+            throw new InvalidInputException( "Recipient email Id is empty or null for sending survey complaint handler mail " );
+        }
+
+        if ( customerMailId == null || customerMailId.isEmpty() ) {
+            LOG.error( "Customer email Id is empty or null " );
+            throw new InvalidInputException( "Customer email Id is empty or null " );
+        }
+
+        String[] mailIds = recipientMailId.split( "," );
+        List<String> mailIdList = new ArrayList<String>();
+
+        for ( String mailId : mailIds ) {
+            mailIdList.add( mailId.trim() );
+        }
+
+        LOG.info( "Sending complaint handle email to : " + recipientMailId );
+        EmailEntity emailEntity = prepareEmailEntityForSendingEmail( mailIdList );
+
+        FileContentReplacements messageBodyReplacements = new FileContentReplacements();
+        messageBodyReplacements.setFileName( EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER
+            + EmailTemplateConstants.SURVEY_COMPLAINT_HANDLER_MAIL_BODY );
+        messageBodyReplacements.setReplacementArgs( Arrays.asList( appLogoUrl, customerName, customerName, customerMailId,
+            mood, rating ) );
+
+        LOG.debug( "Calling email sender to send mail" );
+        emailSender.sendEmailWithBodyReplacements( emailEntity, EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER
+            + EmailTemplateConstants.SURVEY_COMPLAINT_HANDLER_MAIL_SUBJECT, messageBodyReplacements, false );
+        LOG.info( "Successfully sent survey completion mail" );
     }
 }
 // JIRA: SS-7: By RM02: EOC

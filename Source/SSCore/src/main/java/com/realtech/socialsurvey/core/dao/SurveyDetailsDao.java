@@ -150,4 +150,19 @@ public interface SurveyDetailsDao
 
 
     void resetZillowCallCount();
+
+
+    public void updateSurveyAsUnderResolution( String surveyId );
+
+
+    public List<AbusiveSurveyReportWrapper> getSurveysReporetedAsAbusive( long companyId, int start, int rows );
+
+    
+    public long getSurveysUnderResolutionCount( long companyId );
+    
+    
+    public List<SurveyDetails> getSurveysUnderResolution( long companyId, int start, int rows );
+
+
+    long getSurveysReporetedAsAbusiveCount( long companyId );
 }

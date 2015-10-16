@@ -191,6 +191,9 @@ public interface CommonConstants
     public static final String SUBSCRIPTION_ID_SOURCE_BRAINTREE = "Braintree";
     public static final String SURVEY_ID_COLUMN = "surveyId";
     public static final String ABUSE_REPORTERS_COLUMN = "abuseReporters";
+    public static final String UNDER_RESOLUTION_COLUMN = "underResolution";
+    public static final String IS_ABUSIVE_REPORTED_BY_USER_COLUMN = "isAbuseRepByUser";
+    public static final String IS_UNDER_RESOLUTION_COLUMN = "underResolution";
 
     /**
      * Constants to be used in code for referencing variables(i.e in maps or session attributes)
@@ -254,6 +257,7 @@ public interface CommonConstants
     public static final String USER_PROFILE_SETTINGS = "profileSettings";
     public static final String USER_ACCOUNT_SETTINGS = "accountSettings";
     public static final String USER_APP_SETTINGS = "appSettings";
+    public static final String COMPLAIN_REG_SETTINGS= "complaintRegSettings";
     public static final String ERROR = "error";
     public static final String MESSAGE = "message";
     public static final String EMAIL_TYPE = "emailtype";
