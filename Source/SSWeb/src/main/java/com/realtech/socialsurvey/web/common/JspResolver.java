@@ -136,4 +136,6 @@ public interface JspResolver {
 	
 	// Widget
 	public static final String WIDGET_PAGE = "widget/widget";
+	public static final String WIDGET_CODE_PAGE = "widget/widgetcodepage";
+	public static final String WIDGET_SELECTION_PAGE = "widget/widgetselectionpage";
 }
