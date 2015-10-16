@@ -17,9 +17,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
-
 import javax.annotation.Resource;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
@@ -29,10 +27,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.DependsOn;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
-
 import retrofit.client.Response;
 import retrofit.mime.TypedByteArray;
-
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonMappingException;
@@ -1484,13 +1480,13 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 
 
     @Override
-    public long getReviewsCountForCompany( long companyId, double minScore, double maxScore, boolean fetchAbusive )
+    public long getReviewsCountForCompany( long companyId, double minScore, double maxScore, boolean fetchAbusive, boolean notRecommended )
     {
         LOG.info( "Method getReviewsCountForCompany called for companyId:" + companyId + " minscore:" + minScore + " maxscore:"
             + maxScore );
         long reviewsCount = 0;
         reviewsCount = surveyDetailsDao.getFeedBacksCount( CommonConstants.COMPANY_ID_COLUMN, companyId, minScore, maxScore,
-            fetchAbusive );
+            fetchAbusive, notRecommended );
         LOG.info( "Method getReviewsCountForCompany executed successfully" );
         return reviewsCount;
     }
@@ -1692,7 +1688,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
      * score specified
      */
     @Override
-    public long getReviewsCount( long iden, double minScore, double maxScore, String profileLevel, boolean fetchAbusive )
+    public long getReviewsCount( long iden, double minScore, double maxScore, String profileLevel, boolean fetchAbusive, boolean notRecommended )
         throws InvalidInputException
     {
         LOG.info( "Method getReviewsCount called for iden:" + iden + " minscore:" + minScore + " maxscore:" + maxScore
@@ -1702,7 +1698,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
         }
         long reviewsCount = 0;
         String idenColumnName = getIdenColumnNameFromProfileLevel( profileLevel );
-        reviewsCount = surveyDetailsDao.getFeedBacksCount( idenColumnName, iden, minScore, maxScore, fetchAbusive );
+        reviewsCount = surveyDetailsDao.getFeedBacksCount( idenColumnName, iden, minScore, maxScore, fetchAbusive, notRecommended );
 
         LOG.info( "Method getReviewsCount executed successfully. Returning reviewsCount:" + reviewsCount );
         return reviewsCount;
@@ -2336,8 +2332,8 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
             throw new InvalidInputException( "Invalid value passed for iden of profile level." );
         }
         Map<Long, AgentRankingReport> agentReportData = new HashMap<>();
-        surveyDetailsDao.getAverageScore( startDate, endDate, agentReportData, columnName, iden );
-        surveyDetailsDao.getCompletedSurveysCount( startDate, endDate, agentReportData, columnName, iden );
+        surveyDetailsDao.getAverageScore( startDate, endDate, agentReportData, columnName, iden , false );
+        surveyDetailsDao.getCompletedSurveysCount( startDate, endDate, agentReportData, columnName, iden, false );
         // FIX for JIRA: SS-1112: BOC
         // surveyPreInitiationDao.getIncompleteSurveysCount( startDate, endDate, agentReportData );
         // FIX for JIRA: SS-1112: EOC

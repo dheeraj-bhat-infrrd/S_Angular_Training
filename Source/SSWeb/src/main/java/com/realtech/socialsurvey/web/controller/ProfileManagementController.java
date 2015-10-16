@@ -252,7 +252,7 @@ public class ProfileManagementController
                 model.addAttribute( "averageRating", averageRating );
 
                 long reviewsCount = profileManagementService.getReviewsCount( companyId, CommonConstants.MIN_RATING_SCORE,
-                    CommonConstants.MAX_RATING_SCORE, CommonConstants.PROFILE_LEVEL_COMPANY, false );
+                    CommonConstants.MAX_RATING_SCORE, CommonConstants.PROFILE_LEVEL_COMPANY, false, false );
                 model.addAttribute( "reviewsCount", reviewsCount );
             } catch ( InvalidInputException e ) {
                 throw new InternalServerException( new ProfileServiceErrorCode(
@@ -304,7 +304,7 @@ public class ProfileManagementController
                 model.addAttribute( "averageRating", averageRating );
 
                 long reviewsCount = profileManagementService.getReviewsCount( regionId, CommonConstants.MIN_RATING_SCORE,
-                    CommonConstants.MAX_RATING_SCORE, CommonConstants.PROFILE_LEVEL_REGION, false );
+                    CommonConstants.MAX_RATING_SCORE, CommonConstants.PROFILE_LEVEL_REGION, false, false  );
                 model.addAttribute( "reviewsCount", reviewsCount );
             } catch ( InvalidInputException e ) {
                 throw new InternalServerException( new ProfileServiceErrorCode(
@@ -360,7 +360,7 @@ public class ProfileManagementController
                 model.addAttribute( "averageRating", averageRating );
 
                 long reviewsCount = profileManagementService.getReviewsCount( branchId, CommonConstants.MIN_RATING_SCORE,
-                    CommonConstants.MAX_RATING_SCORE, CommonConstants.PROFILE_LEVEL_BRANCH, false );
+                    CommonConstants.MAX_RATING_SCORE, CommonConstants.PROFILE_LEVEL_BRANCH, false, false  );
                 model.addAttribute( "reviewsCount", reviewsCount );
             } catch ( InvalidInputException e ) {
                 throw new InternalServerException( new ProfileServiceErrorCode(
@@ -423,7 +423,7 @@ public class ProfileManagementController
                     CommonConstants.PROFILE_LEVEL_INDIVIDUAL, false );
                 model.addAttribute( "averageRating", averageRating );
                 long reviewsCount = profileManagementService.getReviewsCount( agentId, CommonConstants.MIN_RATING_SCORE,
-                    CommonConstants.MAX_RATING_SCORE, CommonConstants.PROFILE_LEVEL_INDIVIDUAL, false );
+                    CommonConstants.MAX_RATING_SCORE, CommonConstants.PROFILE_LEVEL_INDIVIDUAL, false, false  );
                 model.addAttribute( "reviewsCount", reviewsCount );
 
                 profileSettings = individualProfile;
@@ -4529,7 +4529,7 @@ public class ProfileManagementController
         HttpSession session = request.getSession( false );
         User user = sessionHelper.getCurrentUser();
 
-        boolean fetchAbusive = true;
+        boolean fetchAbusive = false;
         List<SurveyDetails> reviewItems = null;
         try {
             long entityId = (long) session.getAttribute( CommonConstants.ENTITY_ID_COLUMN );
@@ -4578,7 +4578,8 @@ public class ProfileManagementController
     {
         LOG.info( "Method fetchReviewCount() called from ProfileManagementController" );
 
-        boolean fetchAbusive = true;
+        boolean fetchAbusive = false;
+        boolean notRecommended;
         long reviewCount = 0l;
         try {
             String entityType = (String) request.getSession( false ).getAttribute( CommonConstants.ENTITY_TYPE_COLUMN );
@@ -4588,7 +4589,12 @@ public class ProfileManagementController
 
             double maxScore = CommonConstants.MAX_RATING_SCORE;
             double minScore = Double.parseDouble( request.getParameter( "minScore" ) );
-
+            String notRecommendedStr = request.getParameter( "notRecommended" );
+            if ( notRecommendedStr == null || notRecommendedStr.isEmpty() ) {
+                notRecommended = false;
+            } else {
+                notRecommended = Boolean.parseBoolean( notRecommendedStr );
+            }
             if ( entityType.equals( CommonConstants.COMPANY_ID_COLUMN ) ) {
                 long companyId = Long.parseLong( request.getParameter( "companyId" ) );
                 if ( companyId == 0l ) {
@@ -4597,7 +4603,7 @@ public class ProfileManagementController
                 }
 
                 reviewCount = profileManagementService.getReviewsCount( companyId, minScore, maxScore,
-                    CommonConstants.PROFILE_LEVEL_COMPANY, fetchAbusive );
+                    CommonConstants.PROFILE_LEVEL_COMPANY, fetchAbusive, notRecommended );
             } else if ( entityType.equals( CommonConstants.REGION_ID_COLUMN ) ) {
                 long regionId = Long.parseLong( request.getParameter( "regionId" ) );
                 if ( regionId == 0l ) {
@@ -4606,7 +4612,7 @@ public class ProfileManagementController
                 }
 
                 reviewCount = profileManagementService.getReviewsCount( regionId, minScore, maxScore,
-                    CommonConstants.PROFILE_LEVEL_REGION, fetchAbusive );
+                    CommonConstants.PROFILE_LEVEL_REGION, fetchAbusive, notRecommended );
             } else if ( entityType.equals( CommonConstants.BRANCH_ID_COLUMN ) ) {
                 long branchId = Long.parseLong( request.getParameter( "branchId" ) );
                 if ( branchId == 0l ) {
@@ -4615,7 +4621,7 @@ public class ProfileManagementController
                 }
 
                 reviewCount = profileManagementService.getReviewsCount( branchId, minScore, maxScore,
-                    CommonConstants.PROFILE_LEVEL_BRANCH, fetchAbusive );
+                    CommonConstants.PROFILE_LEVEL_BRANCH, fetchAbusive, notRecommended );
             } else if ( entityType.equals( CommonConstants.AGENT_ID_COLUMN ) ) {
                 long agentId = Long.parseLong( request.getParameter( "agentId" ) );
                 if ( agentId == 0l ) {
@@ -4624,7 +4630,7 @@ public class ProfileManagementController
                 }
 
                 reviewCount = profileManagementService.getReviewsCount( agentId, minScore, maxScore,
-                    CommonConstants.PROFILE_LEVEL_INDIVIDUAL, fetchAbusive );
+                    CommonConstants.PROFILE_LEVEL_INDIVIDUAL, fetchAbusive, notRecommended );
             }
         } catch ( InvalidInputException e ) {
             throw new InternalServerException( new ProfileServiceErrorCode(

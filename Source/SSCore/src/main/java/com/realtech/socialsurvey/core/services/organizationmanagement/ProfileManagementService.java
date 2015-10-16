@@ -6,7 +6,6 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
 import com.realtech.socialsurvey.core.entities.Achievement;
 import com.realtech.socialsurvey.core.entities.AgentRankingReport;
 import com.realtech.socialsurvey.core.entities.AgentSettings;
@@ -366,7 +365,7 @@ public interface ProfileManagementService
      * @param maxScore
      * @return
      */
-    public long getReviewsCountForCompany( long companyId, double minScore, double maxScore, boolean fetchAbusive );
+    public long getReviewsCountForCompany( long companyId, double minScore, double maxScore, boolean fetchAbusive, boolean notRecommended );
 
 
     /**
@@ -381,7 +380,7 @@ public interface ProfileManagementService
      * @return
      * @throws InvalidInputException
      */
-    public long getReviewsCount( long iden, double minScore, double maxScore, String profileLevel, boolean fetchAbusive )
+    public long getReviewsCount( long iden, double minScore, double maxScore, String profileLevel, boolean fetchAbusive, boolean notRecommended )
         throws InvalidInputException;
 
 

@@ -1,6 +1,7 @@
 package com.realtech.socialsurvey.core.entities;
 
 import java.io.Serializable;
+import java.sql.Timestamp;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -50,6 +51,18 @@ public class CollectionDotloopProfileMapping implements Serializable
 
     @Column ( name = "AGENT_ID")
     private long agentId;
+
+    @Column ( name = "MODIFIED_ON")
+    private Timestamp modifiedOn;
+
+    @Column ( name = "CREATED_ON")
+    private Timestamp createdOn;
+
+    @Column ( name = "MODIFIED_BY")
+    private String modifiedBy;
+
+    @Column ( name = "CREATED_BY")
+    private String createdBy;
 
 
     public int getId()
@@ -157,6 +170,54 @@ public class CollectionDotloopProfileMapping implements Serializable
     public void setAgentId( long agentId )
     {
         this.agentId = agentId;
+    }
+
+
+    public Timestamp getModifiedOn()
+    {
+        return modifiedOn;
+    }
+
+
+    public void setModifiedOn( Timestamp modifiedOn )
+    {
+        this.modifiedOn = modifiedOn;
+    }
+
+
+    public Timestamp getCreatedOn()
+    {
+        return createdOn;
+    }
+
+
+    public void setCreatedOn( Timestamp createdOn )
+    {
+        this.createdOn = createdOn;
+    }
+
+
+    public String getModifiedBy()
+    {
+        return modifiedBy;
+    }
+
+
+    public void setModifiedBy( String modifiedBy )
+    {
+        this.modifiedBy = modifiedBy;
+    }
+
+
+    public String getCreatedBy()
+    {
+        return createdBy;
+    }
+
+
+    public void setCreatedBy( String createdBy )
+    {
+        this.createdBy = createdBy;
     }
 
 

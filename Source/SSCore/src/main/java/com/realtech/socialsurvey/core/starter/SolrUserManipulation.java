@@ -3,7 +3,6 @@ package com.realtech.socialsurvey.core.starter;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
-
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrServer;
 import org.apache.solr.client.solrj.SolrServerException;
@@ -14,7 +13,6 @@ import org.apache.solr.common.SolrDocumentList;
 import org.apache.solr.common.SolrInputDocument;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import com.realtech.socialsurvey.core.commons.CommonConstants;
 
 public class SolrUserManipulation {

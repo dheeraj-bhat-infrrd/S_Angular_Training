@@ -79,6 +79,10 @@ select:focus, button:focus{
 	position: relative;
 }
 
+.clear-both {
+	clear: both;
+}
+
 .box-border-box {
 	box-sizing: border-box;
 	-webkit-box-sizing: border-box;
@@ -1788,7 +1792,7 @@ button.paypal.is-active {
 }
 
 .icn-ss {
-	background: url(../images/smiley-rat-5.png) no-repeat center;
+	background: url(../images/smileys.png) no-repeat -120px center;
 }
 
 .icn-yelp {
@@ -6995,12 +6999,12 @@ a.sq-btn-post-social:hover, a.sq-btn-post-social:visited {
 }
 
 .st-subject-label {
-    width: 25%;
+    width: 30%;
     font-size: 15px;
 }
 
 .st-subject-input-cont {
-    width: 75%;
+    width: 70%;
 }
 
 .st-subject-input {
@@ -7591,4 +7595,26 @@ label.url-change-input-label {
 
 .dotloop-iframe {
 	max-width: 100%;
+}
+
+.contact-div {
+	margin-left: 220px;
+    margin-bottom: 40px;
+}
+
+.complaint-cont {
+	width: 500px;
+	max-width: 100%;
+	margin: 0 auto;
+}
+
+.mood-text {
+    line-height: 55px;
+    margin-top: 10px;
+    font-size: 24px;
+    font-family: 'opensanssemibold';
+}
+
+.compl-input-cont {
+	width: 300px !important;
 }
