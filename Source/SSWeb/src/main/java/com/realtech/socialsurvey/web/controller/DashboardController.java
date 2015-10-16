@@ -521,7 +521,8 @@ public class DashboardController
 
             // Calling service method to count number of reviews stored in
             // database.
-            reviewCount = profileManagementService.getReviewsCount( iden, -1, -1, profileLevel, false );
+            reviewCount = profileManagementService.getReviewsCount( iden, -1, -1, profileLevel, false, false );
+
         } catch ( NonFatalException e ) {
             LOG.error( "Non fatal exception caught in getReviewCount() while fetching reviews count. Nested exception is ", e );
             return new Gson().toJson( e.getMessage() );

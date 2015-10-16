@@ -1788,7 +1788,7 @@ button.paypal.is-active {
 }
 
 .icn-ss {
-	background: url(../images/smiley-rat-5.png) no-repeat center;
+	background: url(../images/smileys.png) no-repeat -120px center;
 }
 
 .icn-yelp {
@@ -6995,12 +6995,12 @@ a.sq-btn-post-social:hover, a.sq-btn-post-social:visited {
 }
 
 .st-subject-label {
-    width: 25%;
+    width: 30%;
     font-size: 15px;
 }
 
 .st-subject-input-cont {
-    width: 75%;
+    width: 70%;
 }
 
 .st-subject-input {
@@ -7591,4 +7591,9 @@ label.url-change-input-label {
 
 .dotloop-iframe {
 	max-width: 100%;
+}
+
+.contact-div {
+	margin-left: 220px;
+    margin-bottom: 40px;
 }
