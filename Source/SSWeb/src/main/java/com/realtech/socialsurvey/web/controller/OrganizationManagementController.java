@@ -4,9 +4,11 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,6 +22,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+
 import com.amazonaws.util.json.JSONException;
 import com.amazonaws.util.json.JSONObject;
 import com.google.gson.Gson;
@@ -852,7 +855,7 @@ public class OrganizationManagementController
                 message = messageUtils.getDisplayMessage( DisplayMessageConstants.SURVEY_COMPLETION_MAILBODY_UPDATE_SUCCESSFUL,
                     DisplayMessageType.SUCCESS_MESSAGE ).getMessage();
             }
-            
+
             else if ( mailCategory != null && mailCategory.equals( "surveycompletionunpleasantmail" ) ) {
 
                 mailSubject = request.getParameter( "survey-completion-unpleasant-subject" );
@@ -876,7 +879,8 @@ public class OrganizationManagementController
                 session.setAttribute( CommonConstants.SURVEY_COMPLETION_UNPLEASANT_MAIL_SUBJECT_IN_SESSION, mailSubject );
                 session.setAttribute( CommonConstants.SURVEY_COMPLETION_UNPLEASANT_MAIL_BODY_IN_SESSION, mailBody );
 
-                message = messageUtils.getDisplayMessage( DisplayMessageConstants.SURVEY_COMPLETION_UNPLEASANT_MAILBODY_UPDATE_SUCCESSFUL,
+                message = messageUtils.getDisplayMessage(
+                    DisplayMessageConstants.SURVEY_COMPLETION_UNPLEASANT_MAILBODY_UPDATE_SUCCESSFUL,
                     DisplayMessageType.SUCCESS_MESSAGE ).getMessage();
             }
 
@@ -1020,18 +1024,19 @@ public class OrganizationManagementController
                 session.setAttribute( CommonConstants.SURVEY_COMPLETION_MAIL_BODY_IN_SESSION, mailBody );
                 session.setAttribute( CommonConstants.SURVEY_COMPLETION_MAIL_SUBJECT_IN_SESSION, mailSubject );
             }
-            
+
             else if ( mailCategory != null && mailCategory.equals( "surveycompletionunpleasantmail" ) ) {
                 defaultMailContent = organizationManagementService.deleteMailBodyFromSetting( companySettings,
                     CommonConstants.SURVEY_COMPLETION_UNPLEASANT_MAIL_BODY_CATEGORY );
 
                 mailBody = defaultMailContent.getMail_body();
-                mailBody = emailFormatHelper.replaceEmailBodyWithParams( mailBody,
-                    organizationManagementService.getSurveyParamOrder( CommonConstants.SURVEY_COMPLETION_UNPLEASANT_MAIL_BODY_CATEGORY ) );
+                mailBody = emailFormatHelper.replaceEmailBodyWithParams( mailBody, organizationManagementService
+                    .getSurveyParamOrder( CommonConstants.SURVEY_COMPLETION_UNPLEASANT_MAIL_BODY_CATEGORY ) );
                 //mailBody = mailBody.replaceAll("\\[LogoUrl\\]", applicationLogoUrl);
 
                 mailSubject = defaultMailContent.getMail_subject();
-                message = messageUtils.getDisplayMessage( DisplayMessageConstants.SURVEY_COMPLETION_UNPLEASANT_MAILBODY_UPDATE_SUCCESSFUL,
+                message = messageUtils.getDisplayMessage(
+                    DisplayMessageConstants.SURVEY_COMPLETION_UNPLEASANT_MAILBODY_UPDATE_SUCCESSFUL,
                     DisplayMessageType.SUCCESS_MESSAGE ).getMessage();
 
                 session.setAttribute( CommonConstants.SURVEY_COMPLETION_UNPLEASANT_MAIL_BODY_IN_SESSION, mailBody );
@@ -1888,6 +1893,7 @@ public class OrganizationManagementController
                 DotLoopCrmInfo dotLoopCrmInfo = new DotLoopCrmInfo();
                 dotLoopCrmInfo.setCrm_source( CommonConstants.CRM_SOURCE_DOTLOOP );
                 dotLoopCrmInfo.setApi( apiKey );
+                dotLoopCrmInfo.setRecordsBeenFetched( false );
                 OrganizationUnitSettings unitSettings = null;
                 String collectionName = "";
                 if ( entityType.equalsIgnoreCase( CommonConstants.COMPANY_ID ) ) {
