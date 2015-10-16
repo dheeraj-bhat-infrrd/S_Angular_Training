@@ -137,7 +137,10 @@
 		                    <div class="float-left v-tbl-icn-disabled v-icn-edit"></div>
 						</c:otherwise>
 				   </c:choose>
-               </div>
+				   <c:if test="${user.userId != compUser.userId}">
+				   		<div class="float-right v-tbl-icn v-icn-login user-login-icn" data-iden="${compUser.userId}" title="login as"></div>
+				   </c:if>
+			   </div>
            </td>
            <td class="v-tbl-spacer"></td>
        </tr>
@@ -148,3 +151,6 @@
        </tr>
 	</c:forEach>
 </c:if> 
+<script>
+	bindUserLoginEvent();
+</script>
