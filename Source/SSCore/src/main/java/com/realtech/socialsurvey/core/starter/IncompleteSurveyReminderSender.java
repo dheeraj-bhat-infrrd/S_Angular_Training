@@ -237,7 +237,11 @@ public class IncompleteSurveyReminderSender extends QuartzJobBean
             }
             mailBody = mailBody.replaceAll( "\\[BaseUrl\\]", applicationBaseUrl );
             mailBody = mailBody.replaceAll( "\\[AgentName\\]", "" );
-            mailBody = mailBody.replaceAll( "\\[FirstName\\]", survey.getCustomerFirstName() );
+            mailBody = mailBody
+                .replaceAll(
+                    "\\[FirstName\\]",
+                    emailFormatHelper.getCustomerDisplayNameForEmail( survey.getCustomerFirstName(),
+                        survey.getCustomerLastName() ) );
             mailBody = mailBody
                 .replaceAll(
                     "\\[Name\\]",
@@ -267,8 +271,9 @@ public class IncompleteSurveyReminderSender extends QuartzJobBean
             }
         } else {
             try {
-                emailServices.sendDefaultSurveyReminderMail( survey.getCustomerEmailId(), logoUrl , survey.getCustomerFirstName(),
-                    agentName, agentEmailId, surveyLink, agentPhone, agentTitle, companyName );
+                emailServices.sendDefaultSurveyReminderMail(survey.getCustomerEmailId(),logoUrl,
+                    emailFormatHelper.getCustomerDisplayNameForEmail( survey.getCustomerFirstName(),
+                        survey.getCustomerLastName() ), agentName, agentEmailId, surveyLink, agentPhone, agentTitle, companyName );
 
             } catch ( InvalidInputException | UndeliveredEmailException e ) {
                 LOG.error( "Exception caught in IncompleteSurveyReminderSender.main while trying to send reminder mail to "
@@ -409,7 +414,8 @@ public class IncompleteSurveyReminderSender extends QuartzJobBean
         } else {
             try {
                 emailServices.sendDefaultSurveyInvitationMail(
-                    survey.getCustomerEmailId(), logoUrl,
+                    survey.getCustomerEmailId(),
+                    logoUrl,
                     emailFormatHelper.getCustomerDisplayNameForEmail( survey.getCustomerFirstName(),
                         survey.getCustomerLastName() ),
                     user.getFirstName() + ( user.getLastName() != null ? " " + user.getLastName() : "" ), surveyLink,
