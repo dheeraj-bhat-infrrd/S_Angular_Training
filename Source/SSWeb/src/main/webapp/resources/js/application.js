@@ -7806,6 +7806,30 @@ function userSwitchToAdmin() {
 	}, true);
 }
 
+//function to switch to company admin 
+function userSwitchToCompAdmin() {
+	callAjaxGET("/switchtocompanyadmin.do", function(data){
+		if(data == "success") {
+			//window.location = window.location.origin + '/userlogin.do';
+			window.location = getLocationOrigin() + '/userlogin.do';
+		}
+	}, true);
+}
+
+function bindUserLoginEvent() {
+	$('.user-login-icn').on('click', function(e) {
+		e.stopImmediatePropagation();
+		var payload = {
+			"colName" : "userId",
+			"colValue" : $(this).attr('data-iden')
+		};
+		callAjaxGETWithTextData("/logincompanyadminas.do", function(data) {
+			// window.location = window.location.origin + '/userlogin.do';
+			window.location = getLocationOrigin() + '/userlogin.do';
+		}, true, payload);
+	});
+}
+
 function initializeVerticalAutcomplete() {
 	$('#prof-vertical').autocomplete({
 		minLength: 1,

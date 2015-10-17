@@ -5097,14 +5097,14 @@ select.rfr_txt_fld,select.rfr_input_fld{
 .v-tbl-icn {
 	cursor: pointer;
 	height: 39px;
-	width: 50%;
+	width: 33.33%;
 }
 
 .v-tbl-icn-disabled {
 	cursor: auto;
 	opacity: 0.3;
 	height: 39px;
-	width: 50%;
+	width: 33.33%;
 }
 
 .hm-header-right {

@@ -1965,6 +1965,85 @@ public class OrganizationManagementController
     }
 
 
+    @ResponseBody
+    @RequestMapping ( value = "/logincompanyadminas", method = RequestMethod.GET)
+    public String loginCompanyAdminAsUser( Model model, HttpServletRequest request )
+    {
+
+        LOG.info( "Inside loginCompanyAdminAsUser() method in organization management controller" );
+
+        String columnName = request.getParameter( "colName" );
+        String columnValue = request.getParameter( "colValue" );
+
+        try {
+
+            if ( columnName == null || columnName.isEmpty() ) {
+                throw new InvalidInputException( "Column name passed null/empty" );
+            }
+
+            if ( columnValue == null || columnValue.isEmpty() ) {
+                throw new InvalidInputException( "Column value passed null/empty" );
+            }
+
+            long id = 01;
+
+            try {
+                id = Long.parseLong( columnValue );
+            } catch ( NumberFormatException e ) {
+                throw new InvalidInputException( "Invalid id was passed", e );
+            }
+
+            HttpSession session = request.getSession();
+            Long superAdminUserId = (Long) session.getAttribute( CommonConstants.REALTECH_USER_ID );
+            User companyAdminUser = sessionHelper.getCurrentUser();
+            session.invalidate();
+
+            User newUser = userManagementService.getUserByUserId( id );
+
+            HttpSession newSession = request.getSession( true );
+            newSession.setAttribute( CommonConstants.COMPANY_ADMIN_SWITCH_USER_ID, companyAdminUser.getUserId() );
+            if ( superAdminUserId != null )
+                newSession.setAttribute( CommonConstants.REALTECH_USER_ID, superAdminUserId );
+            sessionHelper.loginAdminAs( newUser.getLoginName(), CommonConstants.BYPASS_PWD );
+
+        } catch ( NonFatalException e ) {
+            LOG.error( "NonFatalException occurred in loginCompanyAdminAsUser(), reason : " + e.getMessage() );
+        }
+        return "success";
+    }
+
+
+    @ResponseBody
+    @RequestMapping ( value = "/switchtocompanyadmin", method = RequestMethod.GET)
+    public String switchToCompanyAdminUser( Model model, HttpServletRequest request )
+    {
+
+        HttpSession session = request.getSession();
+        Long companyAdminUserid = (Long) session.getAttribute( CommonConstants.COMPANY_ADMIN_SWITCH_USER_ID );
+
+        // Logout current user
+        session.invalidate();
+        SecurityContextHolder.clearContext();
+
+        session = request.getSession( true );
+
+        try {
+            User companyAdminUser = userManagementService.getUserByUserId( companyAdminUserid );
+
+            // Added as details are fetched in lazy mode
+            int isOwnerValue = companyAdminUser.getIsOwner();
+            if ( isOwnerValue != 1 ) {
+                throw new InvalidInputException( "Admin user in session is not company admin" );
+            }
+            sessionHelper.loginAdminAs( companyAdminUser.getLoginName(), CommonConstants.BYPASS_PWD );
+        } catch ( NonFatalException e ) {
+            LOG.error( "Exception occurred in switchToAdminUser() method , reason : " + e.getMessage() );
+            return "failure";
+        }
+        return "success";
+    }
+
+
     private boolean validateDotloopParameters( HttpServletRequest request ) throws InvalidInputException
     {
         LOG.debug( "Validating encompass parameters" );
