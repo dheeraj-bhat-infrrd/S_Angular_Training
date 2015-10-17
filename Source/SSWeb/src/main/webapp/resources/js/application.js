@@ -8152,18 +8152,66 @@ function editProfileUrl() {
 	
 }
 // Get all the required elements and show popup
+
 function generateWidget(iden, profileLevel) {
-	window.open("./showwidgetpage.do?profileLevel=" + profileLevel + "&iden="
-			+ iden, "_blank", "width=800,height=600,scrollbars=yes");
+	callAjaxGET("./showwidgetpage.do?profileLevel=" + profileLevel + "&iden="
+			+ iden, callBackShowWidget);
 }
 
-function getWidgetGenerationPage(){
-	var url = "./getwidgetselectionpage.do";
-	callAjaxGET(url, paintEditSection, true);
+function callBackShowWidget(data) {
+	var header = "Widget";
+	createWidgetPopup(header, data);
+
+	$('#overlay-continue').click(function() {
+		copyToClipboard("widget-code-area");
+		$('#overlay-continue').unbind('click');
+	});
+
+	$('.overlay-disable-wrapper').addClass('pu_arrow_rt');
+	disableBodyScroll();
+	//$('body').css('overflow', 'hidden');
+	$('body').scrollTop('0');
 }
 
+function createWidgetPopup(header, body) {
+	$('#overlay-header').html(header);
+	$('#overlay-text').html(body);
+	$('#overlay-continue').html("Copy to clipboard");
+	$('#overlay-cancel').html("Close");
+
+	$('#overlay-main').show();
+}
+
+function copyToClipboard(elementId) {
+
+	// Create a "hidden" input
+	var aux = document.createElement("input");
+
+	// Assign it the value of the specified element
+	var encoded = document.getElementById(elementId).innerHTML;
+	var decoded = $("<div/>").html(encoded).text();
+	aux.setAttribute("value", decoded);
+
+	// Append it to the body
+	document.body.appendChild(aux);
+
+	// Highlight its content
+	aux.select();
+
+	// Copy the highlighted text
+	document.execCommand("copy");
+
+	// Remove it from the body
+	document.body.removeChild(aux);
+
+	// Show toast
+	$('#overlay-toast').html("Copied to clipboard");
+	showToast();
+
+}
 /**
  * Warning popup
+ * 
  * @param header
  * @param body
  */
