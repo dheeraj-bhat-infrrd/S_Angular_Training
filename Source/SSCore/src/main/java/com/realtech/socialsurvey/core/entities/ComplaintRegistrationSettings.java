@@ -18,7 +18,7 @@ public class ComplaintRegistrationSettings
     {
         rating = CommonConstants.DEFAULT_AUTOPOST_SCORE;
         mailId = "";
-        mood = "Unpleasant";
+        mood = "";
         enabled = false;
     }
 
@@ -74,11 +74,11 @@ public class ComplaintRegistrationSettings
     public List<String> getMoodList()
     {
         List<String> moodList = new ArrayList<String>();
-        if ( mood.equalsIgnoreCase( "OK" ) ) {
-            moodList.add( "OK" );
-            moodList.add( "Unpleasant" );
+        if ( mood.equalsIgnoreCase( "ok" ) ) {
+            moodList.add( "ok" );
+            moodList.add( "unpleasant" );
         } else
-            moodList.add( "Unpleasant" );
+            moodList.add( "unpleasant" );
         return moodList;
     }
     

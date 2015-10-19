@@ -284,7 +284,7 @@ public class SurveyManagementController
 
                     if ( complaintRegistrationSettings.isEnabled()
                         && ( ( survey.getScore() > 0d && complaintRegistrationSettings.getRating() > 0d && survey.getScore() < complaintRegistrationSettings
-                            .getRating() ) || complaintRegistrationSettings.getMoodList().contains( mood ) ) ) {
+                            .getRating() ) || (!complaintRegistrationSettings.getMood().trim().isEmpty() && complaintRegistrationSettings.getMoodList().contains( mood.toLowerCase() ) ) ) ) {
                         survey.setUnderResolution( true );
                         surveyHandler.updateSurveyAsUnderResolution( survey.get_id() );
                         emailServices.sendComplaintHandleMail( complaintRegistrationSettings.getMailId(), customerName,

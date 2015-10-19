@@ -4,9 +4,11 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,6 +22,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+
 import com.amazonaws.util.json.JSONException;
 import com.amazonaws.util.json.JSONObject;
 import com.braintreegateway.exceptions.AuthorizationException;
@@ -860,7 +863,7 @@ public class OrganizationManagementController
                 message = messageUtils.getDisplayMessage( DisplayMessageConstants.SURVEY_COMPLETION_MAILBODY_UPDATE_SUCCESSFUL,
                     DisplayMessageType.SUCCESS_MESSAGE ).getMessage();
             }
-            
+
             else if ( mailCategory != null && mailCategory.equals( "surveycompletionunpleasantmail" ) ) {
 
                 mailSubject = request.getParameter( "survey-completion-unpleasant-subject" );
@@ -884,7 +887,8 @@ public class OrganizationManagementController
                 session.setAttribute( CommonConstants.SURVEY_COMPLETION_UNPLEASANT_MAIL_SUBJECT_IN_SESSION, mailSubject );
                 session.setAttribute( CommonConstants.SURVEY_COMPLETION_UNPLEASANT_MAIL_BODY_IN_SESSION, mailBody );
 
-                message = messageUtils.getDisplayMessage( DisplayMessageConstants.SURVEY_COMPLETION_UNPLEASANT_MAILBODY_UPDATE_SUCCESSFUL,
+                message = messageUtils.getDisplayMessage(
+                    DisplayMessageConstants.SURVEY_COMPLETION_UNPLEASANT_MAILBODY_UPDATE_SUCCESSFUL,
                     DisplayMessageType.SUCCESS_MESSAGE ).getMessage();
             }
 
@@ -1028,18 +1032,19 @@ public class OrganizationManagementController
                 session.setAttribute( CommonConstants.SURVEY_COMPLETION_MAIL_BODY_IN_SESSION, mailBody );
                 session.setAttribute( CommonConstants.SURVEY_COMPLETION_MAIL_SUBJECT_IN_SESSION, mailSubject );
             }
-            
+
             else if ( mailCategory != null && mailCategory.equals( "surveycompletionunpleasantmail" ) ) {
                 defaultMailContent = organizationManagementService.deleteMailBodyFromSetting( companySettings,
                     CommonConstants.SURVEY_COMPLETION_UNPLEASANT_MAIL_BODY_CATEGORY );
 
                 mailBody = defaultMailContent.getMail_body();
-                mailBody = emailFormatHelper.replaceEmailBodyWithParams( mailBody,
-                    organizationManagementService.getSurveyParamOrder( CommonConstants.SURVEY_COMPLETION_UNPLEASANT_MAIL_BODY_CATEGORY ) );
+                mailBody = emailFormatHelper.replaceEmailBodyWithParams( mailBody, organizationManagementService
+                    .getSurveyParamOrder( CommonConstants.SURVEY_COMPLETION_UNPLEASANT_MAIL_BODY_CATEGORY ) );
                 //mailBody = mailBody.replaceAll("\\[LogoUrl\\]", applicationLogoUrl);
 
                 mailSubject = defaultMailContent.getMail_subject();
-                message = messageUtils.getDisplayMessage( DisplayMessageConstants.SURVEY_COMPLETION_UNPLEASANT_MAILBODY_UPDATE_SUCCESSFUL,
+                message = messageUtils.getDisplayMessage(
+                    DisplayMessageConstants.SURVEY_COMPLETION_UNPLEASANT_MAILBODY_UPDATE_SUCCESSFUL,
                     DisplayMessageType.SUCCESS_MESSAGE ).getMessage();
 
                 session.setAttribute( CommonConstants.SURVEY_COMPLETION_UNPLEASANT_MAIL_BODY_IN_SESSION, mailBody );
@@ -1896,6 +1901,7 @@ public class OrganizationManagementController
                 DotLoopCrmInfo dotLoopCrmInfo = new DotLoopCrmInfo();
                 dotLoopCrmInfo.setCrm_source( CommonConstants.CRM_SOURCE_DOTLOOP );
                 dotLoopCrmInfo.setApi( apiKey );
+                dotLoopCrmInfo.setRecordsBeenFetched( false );
                 OrganizationUnitSettings unitSettings = null;
                 String collectionName = "";
                 if ( entityType.equalsIgnoreCase( CommonConstants.COMPANY_ID ) ) {
@@ -1967,6 +1973,85 @@ public class OrganizationManagementController
     }
 
 
+    @ResponseBody
+    @RequestMapping ( value = "/logincompanyadminas", method = RequestMethod.GET)
+    public String loginCompanyAdminAsUser( Model model, HttpServletRequest request )
+    {
+
+        LOG.info( "Inside loginCompanyAdminAsUser() method in organization management controller" );
+
+        String columnName = request.getParameter( "colName" );
+        String columnValue = request.getParameter( "colValue" );
+
+        try {
+
+            if ( columnName == null || columnName.isEmpty() ) {
+                throw new InvalidInputException( "Column name passed null/empty" );
+            }
+
+            if ( columnValue == null || columnValue.isEmpty() ) {
+                throw new InvalidInputException( "Column value passed null/empty" );
+            }
+
+            long id = 01;
+
+            try {
+                id = Long.parseLong( columnValue );
+            } catch ( NumberFormatException e ) {
+                throw new InvalidInputException( "Invalid id was passed", e );
+            }
+
+            HttpSession session = request.getSession();
+            Long superAdminUserId = (Long) session.getAttribute( CommonConstants.REALTECH_USER_ID );
+            User companyAdminUser = sessionHelper.getCurrentUser();
+            session.invalidate();
+
+            User newUser = userManagementService.getUserByUserId( id );
+
+            HttpSession newSession = request.getSession( true );
+            newSession.setAttribute( CommonConstants.COMPANY_ADMIN_SWITCH_USER_ID, companyAdminUser.getUserId() );
+            if ( superAdminUserId != null )
+                newSession.setAttribute( CommonConstants.REALTECH_USER_ID, superAdminUserId );
+            sessionHelper.loginAdminAs( newUser.getLoginName(), CommonConstants.BYPASS_PWD );
+
+        } catch ( NonFatalException e ) {
+            LOG.error( "NonFatalException occurred in loginCompanyAdminAsUser(), reason : " + e.getMessage() );
+        }
+        return "success";
+    }
+
+
+    @ResponseBody
+    @RequestMapping ( value = "/switchtocompanyadmin", method = RequestMethod.GET)
+    public String switchToCompanyAdminUser( Model model, HttpServletRequest request )
+    {
+
+        HttpSession session = request.getSession();
+        Long companyAdminUserid = (Long) session.getAttribute( CommonConstants.COMPANY_ADMIN_SWITCH_USER_ID );
+
+        // Logout current user
+        session.invalidate();
+        SecurityContextHolder.clearContext();
+
+        session = request.getSession( true );
+
+        try {
+            User companyAdminUser = userManagementService.getUserByUserId( companyAdminUserid );
+
+            // Added as details are fetched in lazy mode
+            int isOwnerValue = companyAdminUser.getIsOwner();
+            if ( isOwnerValue != 1 ) {
+                throw new InvalidInputException( "Admin user in session is not company admin" );
+            }
+            sessionHelper.loginAdminAs( companyAdminUser.getLoginName(), CommonConstants.BYPASS_PWD );
+        } catch ( NonFatalException e ) {
+            LOG.error( "Exception occurred in switchToAdminUser() method , reason : " + e.getMessage() );
+            return "failure";
+        }
+        return "success";
+    }
+
+
     private boolean validateDotloopParameters( HttpServletRequest request ) throws InvalidInputException
     {
         LOG.debug( "Validating encompass parameters" );
@@ -2016,100 +2101,92 @@ public class OrganizationManagementController
 
     @RequestMapping ( value = "/updatecomplaintregsettings", method = RequestMethod.POST)
     @ResponseBody
-    public String updateComplaintRegistrationsettings( Model model, HttpServletRequest request ) throws InvalidInputException
+    public String updateComplaintRegistrationsettings( Model model, HttpServletRequest request )
     {
         LOG.info( "Updating Complaint Registration Settings" );
-        String entityType = request.getParameter( "columnName" );
-        String entityIdStr = request.getParameter( "columnValue" );
         String ratingText = request.getParameter( "rating" );
         String moodText = request.getParameter( "mood" );
         String mailId = request.getParameter( "mailId" );
         String enabled = request.getParameter( "enabled" );
         boolean isComplaintHandlingEnabled = false;
 
-        long entityId = 0;
         String message = "";
         String mailIDStr = new String();
         HttpSession session = request.getSession();
         User user = sessionHelper.getCurrentUser();
+        OrganizationUnitSettings unitSettings = null;
         ComplaintRegistrationSettings originalComplaintRegSettings = new ComplaintRegistrationSettings();
 
-        if(!user.isCompanyAdmin())
-            throw new AuthorizationException( "User is not authorized to access this page");
-        
-        if ( mailId == null || mailId.isEmpty() ) {
-            throw new InvalidInputException( "Mail Id(s) of Complaint Handler(s) is null", DisplayMessageConstants.GENERAL_ERROR );
-        }
-        
-        if ( !mailId.contains( "," ) ) {
-            if ( !organizationManagementService.validateEmail( mailId ) )
-                throw new InvalidInputException( mailId + " entered as send alert to input is invalid",
-                    DisplayMessageConstants.GENERAL_ERROR );
-            else 
-                mailIDStr = mailId;
-        } else {
-            String mailIds[] = mailId.split( "," );
-            for ( String mailID : mailIds ) {
-                if ( !organizationManagementService.validateEmail( mailID.trim() ) )
-                    throw new InvalidInputException( mailID + " entered as send alert to input is invalid",
-                        DisplayMessageConstants.GENERAL_ERROR );
-                else 
-                    mailIDStr += mailID.trim() + " , ";
-            }
-            mailIDStr = mailIDStr.substring( 0, mailIDStr.length() - 2);
-        }
-        
-        if ( enabled == null || enabled.isEmpty() ) {
-            isComplaintHandlingEnabled = false;
-        } else if ( enabled.equalsIgnoreCase( "enable" ) )
-            isComplaintHandlingEnabled = true;
-        
-        if ( ratingText == null || ratingText.isEmpty() ) {
-            throw new InvalidInputException( "Rating selected is null", DisplayMessageConstants.GENERAL_ERROR );
-        }
-        
-        if ( moodText == null || moodText.isEmpty() ) {
-            throw new InvalidInputException( "Mood text selected is null", DisplayMessageConstants.GENERAL_ERROR );
-        }
-        
-        if ( entityIdStr == null || entityIdStr.isEmpty() ) {
-            entityId = (long) session.getAttribute( CommonConstants.ENTITY_ID_COLUMN );
-        } else {
-            try {
-                if ( entityIdStr != null && !entityIdStr.equals( "" ) ) {
-                    entityId = Long.parseLong( entityIdStr );
-                } else {
-                    throw new NumberFormatException();
-                }
-            } catch ( NumberFormatException e ) {
-                LOG.error( "Number format exception occurred while parsing the entity id. Reason :" + e.getMessage(), e );
-            }
-        }
-
-        if ( entityType == null || entityType.isEmpty() ) {
-            entityType = (String) session.getAttribute( CommonConstants.ENTITY_TYPE_COLUMN );
-        }
-
         try {
-            OrganizationUnitSettings unitSettings = null;
-            if ( entityType.equalsIgnoreCase( CommonConstants.COMPANY_ID ) )
-                unitSettings = organizationManagementService.getCompanySettings( entityId );
 
-            double rating = Double.parseDouble( ratingText );
-            if ( rating == 0 ) {
-                LOG.warn( "Rating score is 0." );
-                throw new InvalidInputException( "Rating score is 0.", DisplayMessageConstants.GENERAL_ERROR );
-            }
+            if ( !user.isCompanyAdmin() )
+                throw new AuthorizationException( "User is not authorized to access this page" );
+
+            if ( enabled == null || enabled.isEmpty() ) {
+                isComplaintHandlingEnabled = false;
+            } else if ( enabled.equalsIgnoreCase( "enable" ) )
+                isComplaintHandlingEnabled = true;
+
+            long entityId = (long) session.getAttribute( CommonConstants.ENTITY_ID_COLUMN );
+            
+            unitSettings = organizationManagementService.getCompanySettings( entityId );
 
             if ( unitSettings.getSurvey_settings().getComplaint_reg_settings() != null )
                 originalComplaintRegSettings = unitSettings.getSurvey_settings().getComplaint_reg_settings();
 
-            originalComplaintRegSettings.setRating( (float) rating );
-            originalComplaintRegSettings.setMood( moodText );
-            originalComplaintRegSettings.setMailId( mailId );
-            originalComplaintRegSettings.setEnabled( isComplaintHandlingEnabled );
+            if ( isComplaintHandlingEnabled ) {
+                if ( mailId == null || mailId.isEmpty() ) {
+                    throw new InvalidInputException( "Mail Id(s) of Complaint Handler(s) is null",
+                        DisplayMessageConstants.GENERAL_ERROR );
+                }
 
+                if ( !mailId.contains( "," ) ) {
+                    if ( !organizationManagementService.validateEmail( mailId ) )
+                        throw new InvalidInputException( "Mail id - " + mailId + " entered as send alert to input is invalid",
+                            DisplayMessageConstants.GENERAL_ERROR );
+                    else
+                        mailIDStr = mailId;
+                } else {
+                    String mailIds[] = mailId.split( "," );
+                    
+                    if(mailIds.length == 0)
+                        throw new InvalidInputException( "Mail id - " + mailId + " entered as send alert to input is empty",
+                        DisplayMessageConstants.GENERAL_ERROR );
+                    
+                    for ( String mailID : mailIds ) {
+                        if ( !organizationManagementService.validateEmail( mailID.trim() ) )
+                            throw new InvalidInputException( "Mail id - " + mailID + " entered amongst the mail ids as send alert to input is invalid",
+                                DisplayMessageConstants.GENERAL_ERROR );
+                        else
+                            mailIDStr += mailID.trim() + " , ";
+                    }
+                    mailIDStr = mailIDStr.substring( 0, mailIDStr.length() - 2 );
+                }
+
+                if ( ( ratingText == null || ratingText.isEmpty() ) && ( moodText == null || moodText.isEmpty() ) ) {
+                    throw new InvalidInputException( "Please select a Rating value and Review Mood selected.", DisplayMessageConstants.GENERAL_ERROR );
+                }
+                
+                if ( ratingText == null || ratingText.isEmpty() ) {
+                    ratingText = "0";
+                }
+
+                if ( moodText == null || moodText.isEmpty() ) {
+                    moodText = "";
+                }
+
+                double rating = Double.parseDouble( ratingText );
+
+                originalComplaintRegSettings.setRating( (float) rating );
+                originalComplaintRegSettings.setMood( moodText );
+                originalComplaintRegSettings.setMailId( mailId );
+            }
+
+            originalComplaintRegSettings.setEnabled( isComplaintHandlingEnabled );
             unitSettings.getSurvey_settings().setComplaint_reg_settings( originalComplaintRegSettings );
+            
+            if( !isComplaintHandlingEnabled && originalComplaintRegSettings.getMailId().trim().isEmpty() )
+                return "";
 
             LOG.info( "Updating Complaint Registration Settings" );
 
