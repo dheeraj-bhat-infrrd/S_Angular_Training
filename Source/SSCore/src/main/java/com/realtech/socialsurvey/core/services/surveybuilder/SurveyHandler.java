@@ -2,8 +2,11 @@ package com.realtech.socialsurvey.core.services.surveybuilder;
 
 import java.util.List;
 import java.util.Map;
+
 import org.apache.solr.client.solrj.SolrServerException;
+
 import com.realtech.socialsurvey.core.entities.AbusiveSurveyReportWrapper;
+import com.realtech.socialsurvey.core.entities.BulkSurveyDetail;
 import com.realtech.socialsurvey.core.entities.Company;
 import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
 import com.realtech.socialsurvey.core.entities.SocialMediaPostDetails;
@@ -202,7 +205,8 @@ public interface SurveyHandler
 
     void sendSurveyCompletionMail( String custEmail, String custFirstName, String custLastName, User user )
         throws InvalidInputException, UndeliveredEmailException, ProfileNotFoundException;
-    
+
+
     void sendSurveyCompletionUnpleasantMail( String custEmail, String custFirstName, String custLastName, User user )
         throws InvalidInputException, UndeliveredEmailException, ProfileNotFoundException;
 
@@ -223,5 +227,21 @@ public interface SurveyHandler
 
 
     public Boolean canPostOnSocialMedia( OrganizationUnitSettings unitSetting, Double rating );
+
+
+    /**
+     * @param params
+     * @return
+     */
+    public boolean validateDecryptedApiParams( Map<String, String> params );
+
+
+    /**
+     * @param bulkSurveyDetailList
+     * @param companyId
+     * @return
+     */
+    public Map<BulkSurveyDetail, String> processBulkSurvey( List<BulkSurveyDetail> bulkSurveyDetailList, long companyId );
+
 
 }
