@@ -5012,6 +5012,7 @@ public class ProfileManagementController
             LOG.error( "account type is empty" );
         }
         model.addAttribute( "profileLevel", profileLevel );
+        model.addAttribute( "applicationBaseUrl", applicationBaseUrl );
         LOG.info( "Method to show widget page finished" );
         return JspResolver.WIDGET_CODE_PAGE;
     }
