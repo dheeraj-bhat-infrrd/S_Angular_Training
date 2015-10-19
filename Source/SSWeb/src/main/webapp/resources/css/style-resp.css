@@ -1214,6 +1214,7 @@
     }
     .srv-tbl-txt {
         font-size: 13px;
+        margin-right: 0;
     }
     .float-left.srv-tbl-rem, .float-left.srv-tbl-edit{
         float: left !important;
@@ -1414,8 +1415,9 @@
 	  line-height: 48px;
 	}
 	.hr-txt1 {
-		padding-left: 10px;
+		padding-left: 5px;
 		width: 25%;
+		font-size: 12px;
 	}
 	.hr-txt2 {
 		width: 75%;
@@ -1549,6 +1551,15 @@
     .payment-acc-th {
     	line-height: 22px !important;
     }
+    .st-subject-label {
+		font-size: 13px;
+		display: table-cell;
+		line-height: normal;
+		vertical-align: middle;
+	}
+	.st-subject-cont {
+		display: table;
+	}
 }
 
 

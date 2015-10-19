@@ -7014,6 +7014,7 @@ a.sq-btn-post-social:hover, a.sq-btn-post-social:visited {
 
 .st-subject-input {
     width: 250px;
+    max-width: 100%;
     height: 40px;
     line-height: 20px;
     padding: 10px;
