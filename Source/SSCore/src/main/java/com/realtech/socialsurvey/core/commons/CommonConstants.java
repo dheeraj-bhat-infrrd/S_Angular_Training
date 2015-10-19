@@ -167,6 +167,7 @@ public interface CommonConstants
      */
     public static final String AGENT_ID_COLUMN = "agentId";
     public static final String AGENT_EMAIL_ID_COLUMN = "emailId";
+    public static final String SURVEY_AGENT_EMAIL_ID_COLUMN = "agentEmailId";
     public static final String CUSTOMER_EMAIL_COLUMN = "customerEmail";
     public static final String CREATED_ON = "createdOn";
     public static final String CREATED_BY = "createdBy";
@@ -226,7 +227,7 @@ public interface CommonConstants
 
     public static final String RESTART_SURVEY_MAIL_BODY_IN_SESSION = "restartsurveymailbody";
     public static final String RESTART_SURVEY_MAIL_SUBJECT_IN_SESSION = "restartsurveymailsubject";
-    
+
     public static final String SURVEY_COMPLETION_UNPLEASANT_MAIL_BODY_IN_SESSION = "surveycompletionunpleasantmailbody";
     public static final String SURVEY_COMPLETION_UNPLEASANT_MAIL_SUBJECT_IN_SESSION = "surveycompletionunpleasantmailsubject";
 
@@ -358,7 +359,7 @@ public interface CommonConstants
     public static final String SOCIAL_POST_REMINDER_MAIL_FILENAME = "EmailTemplates/SocialPostReminderMailBody.html";
     public static final String RESTART_SURVEY_MAIL_FILENAME = "EmailTemplates/SurveyRestartMailBody.html";
     public static final String SURVEY_COMPLETION_UNPLEASANT_MAIL_FILENAME = "EmailTemplates/SurveyCompletionUnpleasantMailBody.html";
-    
+
     /**
      * Logo related config
      */
@@ -387,6 +388,7 @@ public interface CommonConstants
     public static final String CRM_INFO_SOURCE_ENCOMPASS = "encompass";
     public static final String CRM_SOURCE_ENCOMPASS = "ENCOMPASS";
     public static final String CRM_SOURCE_DOTLOOP = "DOTLOOP";
+    public static final String SURVEY_SOURCE_BULK_UPLOAD = "bulk";
     public static final String SURVEY_SOURCE_FILE_UPLOAD = "upload";
 
     // mail content
@@ -396,7 +398,7 @@ public interface CommonConstants
     public static final String SOCIAL_POST_REMINDER_MAIL_BODY_CATEGORY = "SOCIAL_POST_REMINDER_MAIL_BODY_CATEGORY";
     public static final String RESTART_SURVEY_MAIL_BODY_CATEGORY = "RESTART_SURVEY_MAIL_BODY_CATEGORY";
     public static final String SURVEY_COMPLETION_UNPLEASANT_MAIL_BODY_CATEGORY = "SURVEY_COMPLETION_UNPLEASANT_MAIL_BODY_CATEGORY";
-    
+
     // regular expressions
     public static final String PASSWORD_REG_EX = "^(?=.*[a-zA-Z0-9])(?=.*[!@#$%&*()_+=|<>?{}~-]).{6,}$";
     public static final int PASSWORD_LENGTH = 6;
@@ -730,7 +732,7 @@ public interface CommonConstants
     // file upload types
     public static final int FILE_UPLOAD_HIERARCHY_TYPE = 1;
     public static final int FILE_UPLOAD_SURVEY_TYPE = 2;
-    
+
 
 
     public static final String AGENT_MEDIA_POST_DETAILS_COLUMN = "agentMediaPostDetails";
