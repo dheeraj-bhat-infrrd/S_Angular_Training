@@ -1116,7 +1116,7 @@ function resizeAdjBuildSurvey(){
 }
 
 // On Hover
-$(document).on('click', '.bd-srv-tbl-row', function() {
+$(document).on('click touchstart', '.bd-srv-tbl-row', function() {
 	if ($(window).width() < 768) {
 		if ($(this).find('.srv-tbl-rem').css('display') == 'none') {
 			$(this).find('.srv-tbl-rem').show();

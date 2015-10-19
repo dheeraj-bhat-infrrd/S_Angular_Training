@@ -982,45 +982,7 @@ public class EmailServicesImpl implements EmailServices
         LOG.info( "Successfully sent survey completion mail" );
     }
 
-
-    @Async
-    @Override
-    public void sendDefaultSurveyCompletionUnpleasantMail( String recipientMailId, String displayName, String agentName,
-        String agentEmail, String companyName, String logoUrl ) throws InvalidInputException, UndeliveredEmailException
-    {
-        if ( recipientMailId == null || recipientMailId.isEmpty() ) {
-            LOG.error( "Recipient email Id is empty or null for sending survey completion unpleasant mail " );
-            throw new InvalidInputException(
-                "Recipient email Id is empty or null for sending survey completion unpleasant mail " );
-        }
-        if ( displayName == null || displayName.isEmpty() ) {
-            LOG.error( "displayName parameter is empty or null for sending account upgrade mail " );
-            throw new InvalidInputException(
-                "displayName parameter is empty or null for sending survey completion unpleasant mail " );
-        }
-
-        LOG.info( "Sending survey completion email to : " + recipientMailId );
-        EmailEntity emailEntity = prepareEmailEntityForSendingEmail( recipientMailId, agentEmail, agentName );
-        String subjectFileName = EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER
-            + EmailTemplateConstants.SURVEY_COMPLETION_MAIL_SUBJECT;
-
-        FileContentReplacements messageBodyReplacements = new FileContentReplacements();
-        messageBodyReplacements.setFileName( EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER
-            + EmailTemplateConstants.SURVEY_COMPLETION_UNPLEASANT_MAIL_BODY );
-        if ( logoUrl == null || logoUrl.equalsIgnoreCase( "" ) ) {
-            messageBodyReplacements.setReplacementArgs( Arrays.asList( appLogoUrl, displayName, agentName, companyName ) );
-        } else {
-            messageBodyReplacements
-                .setReplacementArgs( Arrays.asList( logoUrl, displayName, agentName, agentName, companyName ) );
-        }
-
-
-        LOG.debug( "Calling email sender to send mail" );
-        emailSender.sendEmailWithBodyReplacements( emailEntity, subjectFileName, messageBodyReplacements, false );
-        LOG.info( "Successfully sent survey completion mail" );
-    }
-
-
+    
     @Async
     @Override
     public void queueSurveyReminderMail( String recipientMailId, String displayName, String agentName, String link,
