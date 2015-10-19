@@ -12,9 +12,11 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
+
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.noggit.JSONUtil;
 import org.slf4j.Logger;
@@ -27,6 +29,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
+
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
@@ -35,7 +38,6 @@ import com.realtech.socialsurvey.core.entities.AbusiveSurveyReportWrapper;
 import com.realtech.socialsurvey.core.entities.BranchFromSearch;
 import com.realtech.socialsurvey.core.entities.Company;
 import com.realtech.socialsurvey.core.entities.ContactDetailsSettings;
-import com.realtech.socialsurvey.core.entities.LicenseDetail;
 import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
 import com.realtech.socialsurvey.core.entities.RegionFromSearch;
 import com.realtech.socialsurvey.core.entities.User;
@@ -48,7 +50,7 @@ import com.realtech.socialsurvey.core.services.admin.AdminAuthenticationService;
 import com.realtech.socialsurvey.core.services.organizationmanagement.OrganizationManagementService;
 import com.realtech.socialsurvey.core.services.organizationmanagement.UserManagementService;
 import com.realtech.socialsurvey.core.services.payment.Payment;
-import com.realtech.socialsurvey.core.services.payment.exception.SubscriptionCancellationUnsuccessfulException;
+import com.realtech.socialsurvey.core.services.payment.exception.CustomerDeletionUnsuccessfulException;
 import com.realtech.socialsurvey.core.services.search.SolrSearchService;
 import com.realtech.socialsurvey.core.services.search.exception.SolrException;
 import com.realtech.socialsurvey.core.services.surveybuilder.SurveyHandler;
@@ -105,23 +107,15 @@ public class AdminController
     {
         Company company = organizationManagementService.getCompanyById( companyId );
         String message = CommonConstants.SUCCESS_ATTRIBUTE;
-        // unsubscribe company from braintree
-        List<LicenseDetail> licenseDetailList = company.getLicenseDetails();
-        if(licenseDetailList != null){
-        	for(LicenseDetail detail : licenseDetailList){
-        		String subscriptionId = detail.getSubscriptionId();
-        		if(detail.getSubscriptionIdSource().equals(CommonConstants.SUBSCRIPTION_ID_SOURCE_BRAINTREE)){
-        			try {
-						payment.unsubscribe(subscriptionId);
-					} catch (SubscriptionCancellationUnsuccessfulException | InvalidInputException e) {
-						LOG.error( "Exception Caught " + e.getMessage() );
-	                    message = CommonConstants.ERROR;
-					}
-        		}
-        	}
-        }
+        // delete company from braintree
         
         if ( company != null ) {
+            try {
+                payment.deleteCustomer(Long.toString( company.getCompanyId() ));
+            } catch (CustomerDeletionUnsuccessfulException | InvalidInputException e) {
+                LOG.error( "Exception Caught " + e.getMessage() );
+                message = CommonConstants.ERROR;
+            }
             if ( company.getStatus() == CommonConstants.STATUS_INACTIVE ) {
                 try {
                     organizationManagementService.purgeCompany( company );
