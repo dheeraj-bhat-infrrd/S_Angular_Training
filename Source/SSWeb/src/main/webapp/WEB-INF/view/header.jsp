@@ -243,6 +243,11 @@
 									<spring:message code="label.switch.key" />
 								</div>
 							</c:when>
+							<c:when test="${not empty companyAdminSwitchId }">
+								<div class="initial-dd-item" onclick="userSwitchToCompAdmin();">
+									<spring:message code="label.switch.key" />
+								</div>
+							</c:when>
 							<c:otherwise>
 								<div class="initial-dd-item" onclick="userLogout();">
 									<spring:message code="label.logout.key" />
