@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.sql.Timestamp;
 import java.text.DateFormat;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -12,8 +13,10 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
@@ -23,8 +26,10 @@ import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
+
 import com.google.gson.Gson;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
+import com.realtech.socialsurvey.core.commons.Utils;
 import com.realtech.socialsurvey.core.dao.OrganizationUnitSettingsDao;
 import com.realtech.socialsurvey.core.dao.SurveyDetailsDao;
 import com.realtech.socialsurvey.core.dao.SurveyPreInitiationDao;
@@ -34,7 +39,9 @@ import com.realtech.socialsurvey.core.dao.impl.MongoOrganizationUnitSettingDaoIm
 import com.realtech.socialsurvey.core.entities.AbusiveSurveyReportWrapper;
 import com.realtech.socialsurvey.core.entities.AgentMediaPostDetails;
 import com.realtech.socialsurvey.core.entities.AgentSettings;
+
 import com.realtech.socialsurvey.core.entities.BranchMediaPostDetails;
+import com.realtech.socialsurvey.core.entities.BulkSurveyDetail;
 import com.realtech.socialsurvey.core.entities.Company;
 import com.realtech.socialsurvey.core.entities.CompanyMediaPostDetails;
 import com.realtech.socialsurvey.core.entities.MailContent;
@@ -137,6 +144,9 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
 
     @Value ( "${SOCIAL_POST_REMINDER_INTERVAL}")
     private int socialPostReminderInterval;
+
+    @Autowired
+    private Utils utils;
 
 
     /**
@@ -802,8 +812,8 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
         }
         LOG.info( "sendSurveyRestartMail() finished." );
     }
-    
-    
+
+
     @Override
     public void sendSurveyCompletionMail( String custEmail, String custFirstName, String custLastName, User user )
         throws InvalidInputException, UndeliveredEmailException, ProfileNotFoundException
@@ -918,7 +928,8 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
         }
         LOG.info( "sendSurveyCompletionMail() finished." );
     }
-    
+
+
     @Override
     public void sendSurveyCompletionUnpleasantMail( String custEmail, String custFirstName, String custLastName, User user )
         throws InvalidInputException, UndeliveredEmailException, ProfileNotFoundException
@@ -994,13 +1005,14 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
             && companySettings.getMail_content().getSurvey_completion_unpleasant_mail() != null ) {
 
             MailContent surveyCompletionUnpleasant = companySettings.getMail_content().getSurvey_completion_unpleasant_mail();
-            
+
             // If Mail Body is empty redirect to survey completion mail method
-            if ( surveyCompletionUnpleasant.getMail_body() == null || surveyCompletionUnpleasant.getMail_body().trim().length() == 0 ) {
-                sendSurveyCompletionMail( custEmail, custFirstName, custLastName, user );  
+            if ( surveyCompletionUnpleasant.getMail_body() == null
+                || surveyCompletionUnpleasant.getMail_body().trim().length() == 0 ) {
+                sendSurveyCompletionMail( custEmail, custFirstName, custLastName, user );
                 return;
             }
-                
+
             String mailBody = emailFormatHelper.replaceEmailBodyWithParams( surveyCompletionUnpleasant.getMail_body(),
                 surveyCompletionUnpleasant.getParam_order() );
 
@@ -1035,7 +1047,8 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
         } else {
 
             emailServices.sendDefaultSurveyCompletionMail( custEmail,
-                emailFormatHelper.getCustomerDisplayNameForEmail( custFirstName, custLastName ), agentName, user.getEmailId(), companyName, logoUrl );
+                emailFormatHelper.getCustomerDisplayNameForEmail( custFirstName, custLastName ), agentName, user.getEmailId(),
+                companyName, logoUrl );
         }
         LOG.info( "sendSurveyCompletionUnpleasantMail() finished." );
     }
@@ -1712,6 +1725,27 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
     public void updateSurveyDetails( SurveyDetails surveyDetails )
     {
         surveyDetailsDao.updateSurveyDetails( surveyDetails );
+    }
+
+
+    public boolean validateDecryptedApiParams( Map<String, String> params )
+    {
+        boolean valid = false;
+        if ( params != null ) {
+            String comapnyId = params.get( CommonConstants.COMPANY_ID_COLUMN );
+            String apiKey = params.get( CommonConstants.API_KEY_COLUMN );
+            String apiSecret = params.get( CommonConstants.API_SECRET_COLUMN );
+            try {
+                if ( userManagementService.validateUserApiKey( apiKey, apiSecret, Long.valueOf( comapnyId ) ) ) {
+                    valid = true;
+                }
+            } catch ( NumberFormatException e ) {
+                LOG.error( "Exception caught ", e );
+            } catch ( InvalidInputException e ) {
+                LOG.error( "Exception caught ", e );
+            }
+        }
+        return valid;
 
     }
 
@@ -1841,6 +1875,114 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
             }
         }
         return canPost;
+    }
+
+
+    @Transactional
+    public Map<BulkSurveyDetail, String> processBulkSurvey( List<BulkSurveyDetail> bulkSurveyDetailList, long companyId )
+    {
+        Map<BulkSurveyDetail, String> map = new HashMap<BulkSurveyDetail, String>();
+        LOG.debug( "Inside method processBulkSurvey " );
+
+        for ( BulkSurveyDetail bulkSurveyDetail : bulkSurveyDetailList ) {
+            boolean error = false;
+            String message = "";
+            if ( bulkSurveyDetail != null ) {
+                LOG.debug( "processing survey for agent " + bulkSurveyDetail.getAgentFirstName() );
+                if ( bulkSurveyDetail.getAgentFirstName() == null || bulkSurveyDetail.getAgentFirstName().isEmpty() ) {
+                    message = "Invalid Agent Name ";
+                    error = true;
+                } else if ( bulkSurveyDetail.getAgentEmailId() == null || bulkSurveyDetail.getAgentEmailId().isEmpty() ) {
+                    message = "Agent Email Address Not Found ";
+                    error = true;
+                } else if ( bulkSurveyDetail.getCustomerFirstName() == null
+                    || bulkSurveyDetail.getCustomerFirstName().isEmpty() ) {
+                    message = "Customer name Not Found ";
+                    error = true;
+                } else if ( bulkSurveyDetail.getCustomerEmailId() == null || bulkSurveyDetail.getCustomerEmailId().isEmpty() ) {
+                    message = "Customer Email Address Not Found ";
+                    error = true;
+                }
+                if ( !error ) {
+                    LOG.debug( "This survey contains valid data " );
+                    message = "Valid Survey";
+                    SurveyPreInitiation surveyPreInitiation = createSurveyPreInitiationFromBulkSurvey( bulkSurveyDetail,
+                        companyId );
+                    try {
+                        HashMap<String, Object> queries = new HashMap<>();
+                        queries.put( CommonConstants.SURVEY_AGENT_EMAIL_ID_COLUMN, surveyPreInitiation.getAgentEmailId() );
+                        queries.put( CommonConstants.CUSTOMER_EMAIL_ID_KEY_COLUMN, surveyPreInitiation.getCustomerEmailId() );
+                        List<SurveyPreInitiation> incompleteSurveyCustomers = surveyPreInitiationDao.findByKeyValue(
+                            SurveyPreInitiation.class, queries );
+                        if ( incompleteSurveyCustomers != null && incompleteSurveyCustomers.size() > 0 ) {
+                            LOG.warn( "Survey request already sent" );
+                            surveyPreInitiation.setStatus( CommonConstants.STATUS_SURVEYPREINITIATION_DUPLICATE_RECORD );
+                            message = "Duplicate Survey";
+                        }
+                        saveSurveyPreInitiationObject( surveyPreInitiation );
+                    } catch ( InvalidInputException e ) {
+                        message = "Not Able to store this survey ";
+                    }
+                }
+                map.put( bulkSurveyDetail, message );
+            }
+
+        }
+        return map;
+    }
+
+
+    private SurveyPreInitiation createSurveyPreInitiationFromBulkSurvey( BulkSurveyDetail bulkSurveyDetail, long companyId )
+    {
+        LOG.info( "Inside method bulkSurveyDetail" );
+        SurveyPreInitiation surveyPreInitiation = new SurveyPreInitiation();
+
+        surveyPreInitiation.setCreatedOn( new Timestamp( System.currentTimeMillis() ) );
+        surveyPreInitiation.setModifiedOn( new Timestamp( System.currentTimeMillis() ) );
+        surveyPreInitiation.setCustomerEmailId( bulkSurveyDetail.getCustomerEmailId() );
+        surveyPreInitiation.setCustomerFirstName( bulkSurveyDetail.getCustomerFirstName() );
+        surveyPreInitiation.setLastReminderTime( utils.convertEpochDateToTimestamp() );
+        if ( bulkSurveyDetail.getLoanClosedDate() == null || bulkSurveyDetail.getLoanClosedDate().isEmpty() ) {
+            surveyPreInitiation.setEngagementClosedTime( new Timestamp( System.currentTimeMillis() ) );
+        } else {
+            surveyPreInitiation.setEngagementClosedTime( convertStringToTimestamp( bulkSurveyDetail.getLoanClosedDate() ) );
+        }
+        surveyPreInitiation.setAgentId( 0 );
+        surveyPreInitiation.setAgentEmailId( bulkSurveyDetail.getAgentEmailId() );
+        surveyPreInitiation.setCollectionName( MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION );
+        surveyPreInitiation.setCompanyId( companyId );
+        if ( bulkSurveyDetail.getCustomerLastName() != null ) {
+            surveyPreInitiation.setCustomerLastName( bulkSurveyDetail.getCustomerLastName() );
+        }
+        if ( bulkSurveyDetail.getAgentLastName() != null ) {
+            surveyPreInitiation.setAgentName( bulkSurveyDetail.getAgentFirstName() + " " + bulkSurveyDetail.getAgentLastName() );
+        } else {
+            surveyPreInitiation.setAgentName( bulkSurveyDetail.getAgentFirstName() );
+        }
+        surveyPreInitiation.setStatus( CommonConstants.STATUS_SURVEYPREINITIATION_NOT_PROCESSED );
+        surveyPreInitiation.setSurveySource( CommonConstants.SURVEY_SOURCE_BULK_UPLOAD );
+        return surveyPreInitiation;
+
+
+    }
+
+
+    private Timestamp convertStringToTimestamp( String dateString )
+    {
+        DateFormat format = new SimpleDateFormat( "MMMM d, yyyy", Locale.ENGLISH );
+        Date date = null;
+
+        try {
+            date = format.parse( dateString );
+        } catch ( ParseException e ) {
+            LOG.error( "Exception caught ", e );
+        }
+        Calendar cal = Calendar.getInstance();
+        cal.setTime( date );
+        cal.set( Calendar.MILLISECOND, 0 );
+
+        return ( new java.sql.Timestamp( cal.getTimeInMillis() ) );
+
     }
 }
 // JIRA SS-119 by RM-05:EOC
