@@ -994,6 +994,13 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
             && companySettings.getMail_content().getSurvey_completion_unpleasant_mail() != null ) {
 
             MailContent surveyCompletionUnpleasant = companySettings.getMail_content().getSurvey_completion_unpleasant_mail();
+            
+            // If Mail Body is empty redirect to survey completion mail method
+            if ( surveyCompletionUnpleasant.getMail_body() == null || surveyCompletionUnpleasant.getMail_body().trim().length() == 0 ) {
+                sendSurveyCompletionMail( custEmail, custFirstName, custLastName, user );  
+                return;
+            }
+                
             String mailBody = emailFormatHelper.replaceEmailBodyWithParams( surveyCompletionUnpleasant.getMail_body(),
                 surveyCompletionUnpleasant.getParam_order() );
 
@@ -1027,7 +1034,7 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
             }
         } else {
 
-            emailServices.sendDefaultSurveyCompletionUnpleasantMail( custEmail,
+            emailServices.sendDefaultSurveyCompletionMail( custEmail,
                 emailFormatHelper.getCustomerDisplayNameForEmail( custFirstName, custLastName ), agentName, user.getEmailId(), companyName, logoUrl );
         }
         LOG.info( "sendSurveyCompletionUnpleasantMail() finished." );
