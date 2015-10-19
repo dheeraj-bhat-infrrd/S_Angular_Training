@@ -1116,7 +1116,7 @@ function resizeAdjBuildSurvey(){
 }
 
 // On Hover
-$(document).on('click', '.bd-srv-tbl-row', function() {
+$(document).on('click touchstart', '.bd-srv-tbl-row', function() {
 	if ($(window).width() < 768) {
 		if ($(this).find('.srv-tbl-rem').css('display') == 'none') {
 			$(this).find('.srv-tbl-rem').show();
@@ -4461,7 +4461,6 @@ $(document).on('click', '#page-next.paginate-button', function(){
 		}
 	}
 });
-
 function updatePaginateButtons() {
 	var numFound = $('#u-tbl-header').attr('data-num-found');
 	if (numFound > userBatchSize) {
@@ -7807,6 +7806,30 @@ function userSwitchToAdmin() {
 	}, true);
 }
 
+//function to switch to company admin 
+function userSwitchToCompAdmin() {
+	callAjaxGET("/switchtocompanyadmin.do", function(data){
+		if(data == "success") {
+			//window.location = window.location.origin + '/userlogin.do';
+			window.location = getLocationOrigin() + '/userlogin.do';
+		}
+	}, true);
+}
+
+function bindUserLoginEvent() {
+	$('.user-login-icn').on('click', function(e) {
+		e.stopImmediatePropagation();
+		var payload = {
+			"colName" : "userId",
+			"colValue" : $(this).attr('data-iden')
+		};
+		callAjaxGETWithTextData("/logincompanyadminas.do", function(data) {
+			// window.location = window.location.origin + '/userlogin.do';
+			window.location = getLocationOrigin() + '/userlogin.do';
+		}, true, payload);
+	});
+}
+
 function initializeVerticalAutcomplete() {
 	$('#prof-vertical').autocomplete({
 		minLength: 1,
@@ -8152,9 +8175,67 @@ function editProfileUrl() {
 	}, true);
 	
 }
+// Get all the required elements and show popup
 
+function generateWidget(iden, profileLevel) {
+	callAjaxGET("./showwidgetpage.do?profileLevel=" + profileLevel + "&iden="
+			+ iden, callBackShowWidget);
+}
+
+function callBackShowWidget(data) {
+	var header = "Widget";
+	createWidgetPopup(header, data);
+
+	$('#overlay-continue').click(function() {
+		copyToClipboard("widget-code-area");
+		$('#overlay-continue').unbind('click');
+	});
+
+	$('.overlay-disable-wrapper').addClass('pu_arrow_rt');
+	disableBodyScroll();
+	//$('body').css('overflow', 'hidden');
+	$('body').scrollTop('0');
+}
+
+function createWidgetPopup(header, body) {
+	$('#overlay-header').html(header);
+	$('#overlay-text').html(body);
+	$('#overlay-continue').html("Copy to clipboard");
+	$('#overlay-cancel').html("Close");
+
+	$('#overlay-main').show();
+}
+
+function copyToClipboard(elementId) {
+
+	// Create a "hidden" input
+	var aux = document.createElement("input");
+
+	// Assign it the value of the specified element
+	var encoded = document.getElementById(elementId).innerHTML;
+	var decoded = $("<div/>").html(encoded).text();
+	aux.setAttribute("value", decoded);
+
+	// Append it to the body
+	document.body.appendChild(aux);
+
+	// Highlight its content
+	aux.select();
+
+	// Copy the highlighted text
+	document.execCommand("copy");
+
+	// Remove it from the body
+	document.body.removeChild(aux);
+
+	// Show toast
+	$('#overlay-toast').html("Copied to clipboard");
+	showToast();
+
+}
 /**
  * Warning popup
+ * 
  * @param header
  * @param body
  */
@@ -8165,7 +8246,6 @@ function createEditProfileUrlPopup(header, body) {
 	$('#overlay-cancel').html("Cancel");
 	$('#overlay-continue').off();
 	$('#overlay-continue').click(function(){
-		//Add method to show the zillow type popup
 		$('#overlay-continue').unbind('click');
 		$('#overlay-cancel').unbind('click');
 		updateProfileUrl();
@@ -8175,7 +8255,6 @@ function createEditProfileUrlPopup(header, body) {
 	$('#overlay-main').show();
 	disableBodyScroll();
 }
-
 function updateProfileUrl(){
 	window.open("./editprofileurl.do","_blank", "width=800,height=600,scrollbars=yes");
 }
