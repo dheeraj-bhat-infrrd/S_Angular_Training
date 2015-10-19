@@ -112,6 +112,9 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
     private GenericDao<ProfilesMaster, Integer> profilesMasterDao;
 
     @Autowired
+    private GenericDao<UserApiKey, Long> userApiKeyDao;
+
+    @Autowired
     private GenericDao<UsercountModificationNotification, Long> userCountModificationDao;
 
     @Autowired
@@ -1271,7 +1274,7 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 
             for ( UserProfile currentProfile : userProfileList ) {
                 Branch branch = branchDao.findById( Branch.class, currentProfile.getBranchId() );
-                if(currentProfile.getStatus() == CommonConstants.STATUS_ACTIVE){
+                if ( currentProfile.getStatus() == CommonConstants.STATUS_ACTIVE ) {
                     if ( currentProfile.getProfilesMaster().getProfileId() == CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID
                         && branch.getIsDefaultBySystem() == CommonConstants.IS_DEFAULT_BY_SYSTEM_NO ) {
                         agentProfileWithoutDefaultBranch = currentProfile;
@@ -1286,7 +1289,7 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
                         companyAdminProfile = currentProfile;
                     }
                 }
-                
+
             }
 
             if ( agentProfileWithoutDefaultBranch != null ) {
@@ -1301,7 +1304,7 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
                 profileToMakePrimary = companyAdminProfile;
             }
 
-            if(profileToMakePrimary == null){
+            if ( profileToMakePrimary == null ) {
                 throw new InvalidInputException( "No user profile present for the specified userId" );
             }
             profileToMakePrimary.setIsPrimary( CommonConstants.IS_PRIMARY_TRUE );
@@ -2922,6 +2925,36 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 
         LOG.debug( "method getPrimaryUserProfileByAgentId ended with user id " + entityId );
         return userProfileDetailMap;
+    }
+
+
+    @Override
+    @Transactional
+    public boolean validateUserApiKey( String apiKey, String apiSecret, long companyId ) throws InvalidInputException
+    {
+        boolean valid = false;
+        LOG.debug( "Validating whether the values provided are valid for company " + companyId );
+        if ( apiSecret == null || apiSecret.isEmpty() ) {
+            LOG.warn( "Api Secret is null" );
+            throw new InvalidInputException( "Invalid api secret" );
+        }
+        if ( apiKey == null || apiKey.isEmpty() ) {
+            LOG.warn( "Api key is null" );
+            throw new InvalidInputException( "Invalid api key" );
+        }
+
+        Map<String, Object> queryMap = new HashMap<String, Object>();
+        queryMap.put( CommonConstants.API_SECRET_COLUMN, apiSecret.trim() );
+        queryMap.put( CommonConstants.API_KEY_COLUMN, apiKey.trim() );
+        queryMap.put( CommonConstants.COMPANY_ID_COLUMN, companyId );
+        queryMap.put( CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_ACTIVE );
+        long count = apiKeyDao.findNumberOfRowsByKeyValue( UserApiKey.class, queryMap );
+        LOG.debug( "Found " + count + " records from the api keys" );
+        if ( count > 0l ) {
+            LOG.info( "API key is valid" );
+            valid = true;
+        }
+        return valid;
     }
 
 

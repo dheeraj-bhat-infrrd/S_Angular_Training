@@ -8,8 +8,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
+
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.apache.solr.common.SolrDocument;
@@ -24,13 +26,17 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
+
 import twitter4j.TwitterException;
+
 import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.dao.impl.MongoOrganizationUnitSettingDaoImpl;
 import com.realtech.socialsurvey.core.dao.impl.MongoSocialPostDaoImpl;
 import com.realtech.socialsurvey.core.entities.AccountsMaster;
 import com.realtech.socialsurvey.core.entities.AgentSettings;
+import com.realtech.socialsurvey.core.entities.BulkSurveyDetail;
 import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
 import com.realtech.socialsurvey.core.entities.SurveyDetails;
 import com.realtech.socialsurvey.core.entities.SurveyPreInitiation;
@@ -58,12 +64,14 @@ import com.realtech.socialsurvey.core.services.surveybuilder.impl.DuplicateSurve
 import com.realtech.socialsurvey.core.services.surveybuilder.impl.SelfSurveyInitiationException;
 import com.realtech.socialsurvey.core.utils.DisplayMessageConstants;
 import com.realtech.socialsurvey.core.utils.EmailFormatHelper;
+import com.realtech.socialsurvey.core.utils.EncryptionHelper;
 import com.realtech.socialsurvey.core.utils.MessageUtils;
 import com.realtech.socialsurvey.core.utils.UrlValidationHelper;
 import com.realtech.socialsurvey.web.common.ErrorCodes;
 import com.realtech.socialsurvey.web.common.ErrorResponse;
 import com.realtech.socialsurvey.web.common.JspResolver;
 import com.realtech.socialsurvey.web.util.RequestUtils;
+
 import facebook4j.FacebookException;
 
 
@@ -135,6 +143,9 @@ public class SurveyManagementController
 
     @Value ( "${APPLICATION_ADMIN_NAME}")
     private String applicationAdminName;
+
+    @Autowired
+    private EncryptionHelper encryptionHelper;
 
 
     /*
@@ -1275,6 +1286,62 @@ public class SurveyManagementController
         } catch ( InvalidInputException iie ) {
             LOG.error( "error while sending report bug mail to admin ", iie );
         }
+    }
+
+
+    @ResponseBody
+    @RequestMapping ( value = "/bulk/uploadSurvey", method = RequestMethod.POST)
+    public String bulkUploadSurvey( HttpServletRequest request )
+    {
+        String authorizationHeader = request.getHeader( "Authorization" );
+        Map<String, String> params = new HashMap<String, String>();
+        String message = "";
+        String surveyJsonString = "";
+        boolean error = false;
+        long companyId = 0;
+
+        if ( authorizationHeader == null || authorizationHeader.isEmpty() ) {
+            message = DisplayMessageConstants.INVALID_AUTHORIZATION_HEADER;
+            error = true;
+        }
+        if ( !error ) {
+            LOG.debug( "Validating authroization header " );
+            try {
+                String plainText = encryptionHelper.decryptAES( authorizationHeader, "" );
+                String keyValuePairs[] = plainText.split( "&" );
+
+                for ( int counter = 0; counter < keyValuePairs.length; counter += 1 ) {
+                    String[] keyValuePair = keyValuePairs[counter].split( "=" );
+                    params.put( keyValuePair[0], keyValuePair[1] );
+                }
+            } catch ( InvalidInputException e ) {
+                message = DisplayMessageConstants.INVALID_AUTHORIZATION_HEADER;
+                error = true;
+            }
+        }
+        if ( !error ) {
+            if ( !surveyHandler.validateDecryptedApiParams( params ) ) {
+                error = true;
+            } else {
+                companyId = Long.valueOf( params.get( CommonConstants.COMPANY_ID_COLUMN ) );
+            }
+        }
+        if ( !error ) {
+            LOG.debug( "The authorization header is valid " );
+            surveyJsonString = request.getParameter( "SurveyList" );
+            if ( surveyJsonString == null || surveyJsonString.isEmpty() ) {
+                message = DisplayMessageConstants.INVALID_SURVEY_JSON;
+                error = true;
+            }
+        }
+        List<BulkSurveyDetail> bulkSurveyList = new ArrayList<BulkSurveyDetail>();
+
+        if ( !error ) {
+            bulkSurveyList = new Gson().fromJson( surveyJsonString, new TypeToken<List<BulkSurveyDetail>>() {}.getType() );
+            Map<BulkSurveyDetail, String> map = surveyHandler.processBulkSurvey( bulkSurveyList, companyId );
+            message = new Gson().toJson( map );
+        }
+        return message;
     }
 }
 // JIRA SS-119 by RM-05 : EOC
