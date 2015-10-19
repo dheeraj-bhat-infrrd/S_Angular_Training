@@ -14,6 +14,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
@@ -23,9 +24,13 @@ import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
+
 import com.google.gson.Gson;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
+import com.realtech.socialsurvey.core.dao.BranchDao;
+import com.realtech.socialsurvey.core.dao.CompanyDao;
 import com.realtech.socialsurvey.core.dao.OrganizationUnitSettingsDao;
+import com.realtech.socialsurvey.core.dao.RegionDao;
 import com.realtech.socialsurvey.core.dao.SurveyDetailsDao;
 import com.realtech.socialsurvey.core.dao.SurveyPreInitiationDao;
 import com.realtech.socialsurvey.core.dao.UserDao;
@@ -33,9 +38,11 @@ import com.realtech.socialsurvey.core.dao.UserProfileDao;
 import com.realtech.socialsurvey.core.dao.impl.MongoOrganizationUnitSettingDaoImpl;
 import com.realtech.socialsurvey.core.entities.AbusiveSurveyReportWrapper;
 import com.realtech.socialsurvey.core.entities.AgentSettings;
+import com.realtech.socialsurvey.core.entities.Branch;
 import com.realtech.socialsurvey.core.entities.Company;
 import com.realtech.socialsurvey.core.entities.MailContent;
 import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
+import com.realtech.socialsurvey.core.entities.Region;
 import com.realtech.socialsurvey.core.entities.SurveyDetails;
 import com.realtech.socialsurvey.core.entities.SurveyPreInitiation;
 import com.realtech.socialsurvey.core.entities.SurveyResponse;
@@ -78,6 +85,15 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
 
     @Autowired
     private UserDao userDao;
+
+    @Autowired
+    private CompanyDao companyDao;
+
+    @Autowired
+    private BranchDao branchDao;
+
+    @Autowired
+    private RegionDao regionDao;
 
     @Autowired
     private UserProfileDao userProfileDao;
@@ -787,8 +803,8 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
         }
         LOG.info( "sendSurveyRestartMail() finished." );
     }
-    
-    
+
+
     @Override
     public void sendSurveyCompletionMail( String custEmail, String custFirstName, String custLastName, User user )
         throws InvalidInputException, UndeliveredEmailException, ProfileNotFoundException
@@ -903,7 +919,8 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
         }
         LOG.info( "sendSurveyCompletionMail() finished." );
     }
-    
+
+
     @Override
     public void sendSurveyCompletionUnpleasantMail( String custEmail, String custFirstName, String custLastName, User user )
         throws InvalidInputException, UndeliveredEmailException, ProfileNotFoundException
@@ -979,13 +996,14 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
             && companySettings.getMail_content().getSurvey_completion_unpleasant_mail() != null ) {
 
             MailContent surveyCompletionUnpleasant = companySettings.getMail_content().getSurvey_completion_unpleasant_mail();
-            
+
             // If Mail Body is empty redirect to survey completion mail method
-            if ( surveyCompletionUnpleasant.getMail_body() == null || surveyCompletionUnpleasant.getMail_body().trim().length() == 0 ) {
-                sendSurveyCompletionMail( custEmail, custFirstName, custLastName, user );  
+            if ( surveyCompletionUnpleasant.getMail_body() == null
+                || surveyCompletionUnpleasant.getMail_body().trim().length() == 0 ) {
+                sendSurveyCompletionMail( custEmail, custFirstName, custLastName, user );
                 return;
             }
-                
+
             String mailBody = emailFormatHelper.replaceEmailBodyWithParams( surveyCompletionUnpleasant.getMail_body(),
                 surveyCompletionUnpleasant.getParam_order() );
 
@@ -1020,7 +1038,8 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
         } else {
 
             emailServices.sendDefaultSurveyCompletionMail( custEmail,
-                emailFormatHelper.getCustomerDisplayNameForEmail( custFirstName, custLastName ), agentName, user.getEmailId(), companyName, logoUrl );
+                emailFormatHelper.getCustomerDisplayNameForEmail( custFirstName, custLastName ), agentName, user.getEmailId(),
+                companyName, logoUrl );
         }
         LOG.info( "sendSurveyCompletionUnpleasantMail() finished." );
     }
@@ -1686,6 +1705,71 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
             numOfRows );
         LOG.info( "Method getSurveysReporetedAsAbusive() to retrieve surveys marked as abusive, finished" );
         return abusiveSurveyReports;
+    }
+
+
+    @Override
+    @Transactional
+    public void updateModifiedOnINHierarchyForSurvey( SurveyDetails surveyDetails )
+    {
+        LOG.debug( "method updateModifiedOnINHierarchyForSurvey() started" );
+        long companyId = surveyDetails.getCompanyId();
+        if ( companyId > 0l ) {
+            organizationUnitSettingsDao.updateKeyOrganizationUnitSettingsByCriteria(
+                MongoOrganizationUnitSettingDaoImpl.KEY_MODIFIED_ON, System.currentTimeMillis(),
+                MongoOrganizationUnitSettingDaoImpl.KEY_IDENTIFIER, companyId,
+                MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION );
+
+            Company company = companyDao.findById( Company.class, companyId );
+            if ( company != null ) {
+                company.setModifiedOn( new Timestamp( System.currentTimeMillis() ) );
+                companyDao.update( company );
+            }
+        }
+
+        long regionId = surveyDetails.getRegionId();
+        if ( regionId > 0l ) {
+            organizationUnitSettingsDao.updateKeyOrganizationUnitSettingsByCriteria(
+                MongoOrganizationUnitSettingDaoImpl.KEY_MODIFIED_ON, System.currentTimeMillis(),
+                MongoOrganizationUnitSettingDaoImpl.KEY_IDENTIFIER, regionId,
+                MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION );
+
+            Region region = regionDao.findById( Region.class, regionId );
+            if ( region != null ) {
+                region.setModifiedOn( new Timestamp( System.currentTimeMillis() ) );
+                regionDao.update( region );
+            }
+        }
+
+        long branchId = surveyDetails.getBranchId();
+        if ( branchId > 0l ) {
+            organizationUnitSettingsDao.updateKeyOrganizationUnitSettingsByCriteria(
+                MongoOrganizationUnitSettingDaoImpl.KEY_MODIFIED_ON, System.currentTimeMillis(),
+                MongoOrganizationUnitSettingDaoImpl.KEY_IDENTIFIER, branchId,
+                MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION );
+
+            Branch branch = branchDao.findById( Branch.class, branchId );
+            if ( branch != null ) {
+                branch.setModifiedOn( new Timestamp( System.currentTimeMillis() ) );
+                branchDao.update( branch );
+            }
+        }
+
+        long agentId = surveyDetails.getAgentId();
+        if ( agentId > 0l ) {
+            organizationUnitSettingsDao.updateKeyOrganizationUnitSettingsByCriteria(
+                MongoOrganizationUnitSettingDaoImpl.KEY_MODIFIED_ON, System.currentTimeMillis(),
+                MongoOrganizationUnitSettingDaoImpl.KEY_IDENTIFIER, agentId,
+                MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION );
+
+            User agent = userDao.findById( User.class, agentId );
+            if ( agent != null ) {
+                agent.setModifiedOn( new Timestamp( System.currentTimeMillis() ) );
+                userDao.update( agent );
+            }
+        }
+
+        LOG.debug( "method updateModifiedOnINHierarchyForSurvey() finished" );
     }
 }
 // JIRA SS-119 by RM-05:EOC
