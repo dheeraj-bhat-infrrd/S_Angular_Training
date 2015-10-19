@@ -4,9 +4,11 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,6 +22,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+
 import com.amazonaws.util.json.JSONException;
 import com.amazonaws.util.json.JSONObject;
 import com.braintreegateway.exceptions.AuthorizationException;
@@ -860,7 +863,7 @@ public class OrganizationManagementController
                 message = messageUtils.getDisplayMessage( DisplayMessageConstants.SURVEY_COMPLETION_MAILBODY_UPDATE_SUCCESSFUL,
                     DisplayMessageType.SUCCESS_MESSAGE ).getMessage();
             }
-            
+
             else if ( mailCategory != null && mailCategory.equals( "surveycompletionunpleasantmail" ) ) {
 
                 mailSubject = request.getParameter( "survey-completion-unpleasant-subject" );
@@ -884,7 +887,8 @@ public class OrganizationManagementController
                 session.setAttribute( CommonConstants.SURVEY_COMPLETION_UNPLEASANT_MAIL_SUBJECT_IN_SESSION, mailSubject );
                 session.setAttribute( CommonConstants.SURVEY_COMPLETION_UNPLEASANT_MAIL_BODY_IN_SESSION, mailBody );
 
-                message = messageUtils.getDisplayMessage( DisplayMessageConstants.SURVEY_COMPLETION_UNPLEASANT_MAILBODY_UPDATE_SUCCESSFUL,
+                message = messageUtils.getDisplayMessage(
+                    DisplayMessageConstants.SURVEY_COMPLETION_UNPLEASANT_MAILBODY_UPDATE_SUCCESSFUL,
                     DisplayMessageType.SUCCESS_MESSAGE ).getMessage();
             }
 
@@ -1028,18 +1032,19 @@ public class OrganizationManagementController
                 session.setAttribute( CommonConstants.SURVEY_COMPLETION_MAIL_BODY_IN_SESSION, mailBody );
                 session.setAttribute( CommonConstants.SURVEY_COMPLETION_MAIL_SUBJECT_IN_SESSION, mailSubject );
             }
-            
+
             else if ( mailCategory != null && mailCategory.equals( "surveycompletionunpleasantmail" ) ) {
                 defaultMailContent = organizationManagementService.deleteMailBodyFromSetting( companySettings,
                     CommonConstants.SURVEY_COMPLETION_UNPLEASANT_MAIL_BODY_CATEGORY );
 
                 mailBody = defaultMailContent.getMail_body();
-                mailBody = emailFormatHelper.replaceEmailBodyWithParams( mailBody,
-                    organizationManagementService.getSurveyParamOrder( CommonConstants.SURVEY_COMPLETION_UNPLEASANT_MAIL_BODY_CATEGORY ) );
+                mailBody = emailFormatHelper.replaceEmailBodyWithParams( mailBody, organizationManagementService
+                    .getSurveyParamOrder( CommonConstants.SURVEY_COMPLETION_UNPLEASANT_MAIL_BODY_CATEGORY ) );
                 //mailBody = mailBody.replaceAll("\\[LogoUrl\\]", applicationLogoUrl);
 
                 mailSubject = defaultMailContent.getMail_subject();
-                message = messageUtils.getDisplayMessage( DisplayMessageConstants.SURVEY_COMPLETION_UNPLEASANT_MAILBODY_UPDATE_SUCCESSFUL,
+                message = messageUtils.getDisplayMessage(
+                    DisplayMessageConstants.SURVEY_COMPLETION_UNPLEASANT_MAILBODY_UPDATE_SUCCESSFUL,
                     DisplayMessageType.SUCCESS_MESSAGE ).getMessage();
 
                 session.setAttribute( CommonConstants.SURVEY_COMPLETION_UNPLEASANT_MAIL_BODY_IN_SESSION, mailBody );
@@ -1896,6 +1901,7 @@ public class OrganizationManagementController
                 DotLoopCrmInfo dotLoopCrmInfo = new DotLoopCrmInfo();
                 dotLoopCrmInfo.setCrm_source( CommonConstants.CRM_SOURCE_DOTLOOP );
                 dotLoopCrmInfo.setApi( apiKey );
+                dotLoopCrmInfo.setRecordsBeenFetched( false );
                 OrganizationUnitSettings unitSettings = null;
                 String collectionName = "";
                 if ( entityType.equalsIgnoreCase( CommonConstants.COMPANY_ID ) ) {
@@ -1964,6 +1970,85 @@ public class OrganizationManagementController
             message = messageUtils.getDisplayMessage( e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE ).getMessage();
         }
         return message;
+    }
+
+
+    @ResponseBody
+    @RequestMapping ( value = "/logincompanyadminas", method = RequestMethod.GET)
+    public String loginCompanyAdminAsUser( Model model, HttpServletRequest request )
+    {
+
+        LOG.info( "Inside loginCompanyAdminAsUser() method in organization management controller" );
+
+        String columnName = request.getParameter( "colName" );
+        String columnValue = request.getParameter( "colValue" );
+
+        try {
+
+            if ( columnName == null || columnName.isEmpty() ) {
+                throw new InvalidInputException( "Column name passed null/empty" );
+            }
+
+            if ( columnValue == null || columnValue.isEmpty() ) {
+                throw new InvalidInputException( "Column value passed null/empty" );
+            }
+
+            long id = 01;
+
+            try {
+                id = Long.parseLong( columnValue );
+            } catch ( NumberFormatException e ) {
+                throw new InvalidInputException( "Invalid id was passed", e );
+            }
+
+            HttpSession session = request.getSession();
+            Long superAdminUserId = (Long) session.getAttribute( CommonConstants.REALTECH_USER_ID );
+            User companyAdminUser = sessionHelper.getCurrentUser();
+            session.invalidate();
+
+            User newUser = userManagementService.getUserByUserId( id );
+
+            HttpSession newSession = request.getSession( true );
+            newSession.setAttribute( CommonConstants.COMPANY_ADMIN_SWITCH_USER_ID, companyAdminUser.getUserId() );
+            if ( superAdminUserId != null )
+                newSession.setAttribute( CommonConstants.REALTECH_USER_ID, superAdminUserId );
+            sessionHelper.loginAdminAs( newUser.getLoginName(), CommonConstants.BYPASS_PWD );
+
+        } catch ( NonFatalException e ) {
+            LOG.error( "NonFatalException occurred in loginCompanyAdminAsUser(), reason : " + e.getMessage() );
+        }
+        return "success";
+    }
+
+
+    @ResponseBody
+    @RequestMapping ( value = "/switchtocompanyadmin", method = RequestMethod.GET)
+    public String switchToCompanyAdminUser( Model model, HttpServletRequest request )
+    {
+
+        HttpSession session = request.getSession();
+        Long companyAdminUserid = (Long) session.getAttribute( CommonConstants.COMPANY_ADMIN_SWITCH_USER_ID );
+
+        // Logout current user
+        session.invalidate();
+        SecurityContextHolder.clearContext();
+
+        session = request.getSession( true );
+
+        try {
+            User companyAdminUser = userManagementService.getUserByUserId( companyAdminUserid );
+
+            // Added as details are fetched in lazy mode
+            int isOwnerValue = companyAdminUser.getIsOwner();
+            if ( isOwnerValue != 1 ) {
+                throw new InvalidInputException( "Admin user in session is not company admin" );
+            }
+            sessionHelper.loginAdminAs( companyAdminUser.getLoginName(), CommonConstants.BYPASS_PWD );
+        } catch ( NonFatalException e ) {
+            LOG.error( "Exception occurred in switchToAdminUser() method , reason : " + e.getMessage() );
+            return "failure";
+        }
+        return "success";
     }
 
 

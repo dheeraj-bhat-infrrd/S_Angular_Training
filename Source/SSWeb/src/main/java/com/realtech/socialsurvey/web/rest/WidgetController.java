@@ -40,7 +40,20 @@ public class WidgetController
     @Autowired
     ProfileManagementService profileManagementService;
 
-    @RequestMapping ( value = "/{profileType}/{iden}" ,method = RequestMethod.GET )
+
+    /**
+     * Method to show widget jsp in the iframe
+     * 
+     * @param profileType
+     * @param iden
+     * @param model
+     * @param request
+     * @param redirectAttributes
+     * @return
+     * @throws InvalidInputException
+     * @throws NoRecordsFetchedException
+     */
+    @RequestMapping ( value = "/{profileType}/{iden}", method = RequestMethod.GET)
     public String fetchWidget( @PathVariable String profileType, @PathVariable long iden, Model model,
         HttpServletRequest request, RedirectAttributes redirectAttributes ) throws InvalidInputException,
         NoRecordsFetchedException
@@ -55,37 +68,44 @@ public class WidgetController
         if ( iden <= 0l ) {
             LOG.error( "Invalid iden : " + iden );
         }
+        /*
+         * Get average rating, review count and surveys for the specified profile
+         */
+        //If profile is of type company
         if ( profileType.equals( PROFILE_TYPE_COMPANY ) ) {
             OrganizationUnitSettings companySettings = organizationManagementService.getCompanySettings( iden );
             averageRating = profileManagementService.getAverageRatings( iden, CommonConstants.PROFILE_LEVEL_COMPANY, false );
             reviewsCount = profileManagementService.getReviewsCount( iden, CommonConstants.MIN_RATING_SCORE,
                 CommonConstants.MAX_RATING_SCORE, CommonConstants.PROFILE_LEVEL_COMPANY, false, false );
-            surveys = profileManagementService.getReviews( iden, -1, -1, -1, WIDGET_MAX_REVIEWS, CommonConstants.PROFILE_LEVEL_COMPANY, false,
-                null, null, CommonConstants.REVIEWS_SORT_CRITERIA_FEATURE );
+            surveys = profileManagementService.getReviews( iden, -1, -1, -1, WIDGET_MAX_REVIEWS,
+                CommonConstants.PROFILE_LEVEL_COMPANY, false, null, null, CommonConstants.REVIEWS_SORT_CRITERIA_FEATURE );
             model.addAttribute( "profile", companySettings );
+            //If profile is of type region
         } else if ( profileType.equals( PROFILE_TYPE_REGION ) ) {
             OrganizationUnitSettings regionSettings = organizationManagementService.getRegionSettings( iden );
             averageRating = profileManagementService.getAverageRatings( iden, CommonConstants.PROFILE_LEVEL_REGION, false );
             reviewsCount = profileManagementService.getReviewsCount( iden, CommonConstants.MIN_RATING_SCORE,
                 CommonConstants.MAX_RATING_SCORE, CommonConstants.PROFILE_LEVEL_REGION, false, false );
-            surveys = profileManagementService.getReviews( iden, -1, -1, -1, WIDGET_MAX_REVIEWS, CommonConstants.PROFILE_LEVEL_REGION, false,
-                null, null, CommonConstants.REVIEWS_SORT_CRITERIA_FEATURE );
+            surveys = profileManagementService.getReviews( iden, -1, -1, -1, WIDGET_MAX_REVIEWS,
+                CommonConstants.PROFILE_LEVEL_REGION, false, null, null, CommonConstants.REVIEWS_SORT_CRITERIA_FEATURE );
             model.addAttribute( "profile", regionSettings );
+            //If profile is of type branch
         } else if ( profileType.equals( PROFILE_TYPE_BRANCH ) ) {
             OrganizationUnitSettings branchSettings = organizationManagementService.getBranchSettingsDefault( iden );
             averageRating = profileManagementService.getAverageRatings( iden, CommonConstants.PROFILE_LEVEL_BRANCH, false );
             reviewsCount = profileManagementService.getReviewsCount( iden, CommonConstants.MIN_RATING_SCORE,
                 CommonConstants.MAX_RATING_SCORE, CommonConstants.PROFILE_LEVEL_BRANCH, false, false );
-            surveys = profileManagementService.getReviews( iden, -1, -1, -1, WIDGET_MAX_REVIEWS, CommonConstants.PROFILE_LEVEL_BRANCH, false,
-                null, null, CommonConstants.REVIEWS_SORT_CRITERIA_FEATURE );
+            surveys = profileManagementService.getReviews( iden, -1, -1, -1, WIDGET_MAX_REVIEWS,
+                CommonConstants.PROFILE_LEVEL_BRANCH, false, null, null, CommonConstants.REVIEWS_SORT_CRITERIA_FEATURE );
             model.addAttribute( "profile", branchSettings );
+            //If profile is of type individual
         } else if ( profileType.equals( PROFILE_TYPE_INDIVIDUAL ) ) {
             OrganizationUnitSettings agentSettings = organizationManagementService.getAgentSettings( iden );
             averageRating = profileManagementService.getAverageRatings( iden, CommonConstants.PROFILE_LEVEL_INDIVIDUAL, false );
             reviewsCount = profileManagementService.getReviewsCount( iden, CommonConstants.MIN_RATING_SCORE,
                 CommonConstants.MAX_RATING_SCORE, CommonConstants.PROFILE_LEVEL_INDIVIDUAL, false, false );
-            surveys = profileManagementService.getReviews( iden, -1, -1, -1, WIDGET_MAX_REVIEWS, CommonConstants.PROFILE_LEVEL_INDIVIDUAL,
-                false, null, null, CommonConstants.REVIEWS_SORT_CRITERIA_FEATURE );
+            surveys = profileManagementService.getReviews( iden, -1, -1, -1, WIDGET_MAX_REVIEWS,
+                CommonConstants.PROFILE_LEVEL_INDIVIDUAL, false, null, null, CommonConstants.REVIEWS_SORT_CRITERIA_FEATURE );
             model.addAttribute( "profile", agentSettings );
         } else {
             throw new InvalidInputException( "Invalid profileType : " + profileType );
@@ -94,6 +114,7 @@ public class WidgetController
         model.addAttribute( "averageRating", averageRating );
         model.addAttribute( "reviewsCount", reviewsCount );
         model.addAttribute( "surveys", surveys );
+        LOG.info( "Finished fetching widget data for profile type : " + profileType + " and id : " + iden );
         return JspResolver.WIDGET_PAGE;
     }
 }
