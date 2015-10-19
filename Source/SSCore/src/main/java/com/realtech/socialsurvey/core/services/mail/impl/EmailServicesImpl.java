@@ -983,19 +983,22 @@ public class EmailServicesImpl implements EmailServices
         emailSender.sendEmailWithBodyReplacements( emailEntity, subjectFileName, messageBodyReplacements, false );
         LOG.info( "Successfully sent survey completion mail" );
     }
-    
+
+
     @Async
     @Override
-    public void sendDefaultSurveyCompletionUnpleasantMail( String recipientMailId, String displayName, String agentName, String agentEmail,
-        String companyName, String logoUrl ) throws InvalidInputException, UndeliveredEmailException
+    public void sendDefaultSurveyCompletionUnpleasantMail( String recipientMailId, String displayName, String agentName,
+        String agentEmail, String companyName, String logoUrl ) throws InvalidInputException, UndeliveredEmailException
     {
         if ( recipientMailId == null || recipientMailId.isEmpty() ) {
             LOG.error( "Recipient email Id is empty or null for sending survey completion unpleasant mail " );
-            throw new InvalidInputException( "Recipient email Id is empty or null for sending survey completion unpleasant mail " );
+            throw new InvalidInputException(
+                "Recipient email Id is empty or null for sending survey completion unpleasant mail " );
         }
         if ( displayName == null || displayName.isEmpty() ) {
             LOG.error( "displayName parameter is empty or null for sending account upgrade mail " );
-            throw new InvalidInputException( "displayName parameter is empty or null for sending survey completion unpleasant mail " );
+            throw new InvalidInputException(
+                "displayName parameter is empty or null for sending survey completion unpleasant mail " );
         }
 
         LOG.info( "Sending survey completion email to : " + recipientMailId );
@@ -1009,7 +1012,8 @@ public class EmailServicesImpl implements EmailServices
         if ( logoUrl == null || logoUrl.equalsIgnoreCase( "" ) ) {
             messageBodyReplacements.setReplacementArgs( Arrays.asList( appLogoUrl, displayName, agentName, companyName ) );
         } else {
-            messageBodyReplacements.setReplacementArgs( Arrays.asList( logoUrl, displayName, agentName, agentName, companyName ) );
+            messageBodyReplacements
+                .setReplacementArgs( Arrays.asList( logoUrl, displayName, agentName, agentName, companyName ) );
         }
 
 
@@ -1955,8 +1959,12 @@ public class EmailServicesImpl implements EmailServices
             }
         } else {
             try {
-                sendDefaultSurveyReminderMail( survey.getCustomerEmailId(), logoUrl, survey.getCustomerFirstName(), agentName,
-                    agentEmailId, surveyLink, agentPhone, agentTitle, companyName );
+                sendDefaultSurveyReminderMail(
+                    survey.getCustomerEmailId(),
+                    logoUrl,
+                    emailFormatHelper.getCustomerDisplayNameForEmail( survey.getCustomerFirstName(),
+                        survey.getCustomerLastName() ), agentName, agentEmailId, surveyLink, agentPhone, agentTitle,
+                    companyName );
             } catch ( InvalidInputException | UndeliveredEmailException e ) {
                 LOG.error( "Exception caught in IncompleteSurveyReminderSender.main while trying to send reminder mail to "
                     + survey.getCustomerFirstName() + " for completion of survey. Nested exception is ", e );
