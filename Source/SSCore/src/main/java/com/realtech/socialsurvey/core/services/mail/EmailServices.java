@@ -407,8 +407,4 @@ public interface EmailServices
 
     void sendReportBugMailToAdmin( String displayName, String errorMsg, String recipientMailId ) throws InvalidInputException,
         UndeliveredEmailException;
-
-
-    void sendDefaultSurveyCompletionUnpleasantMail( String recipientMailId, String displayName, String agentName,
-        String agentEmail, String companyName, String logoUrl ) throws InvalidInputException, UndeliveredEmailException;
 }
