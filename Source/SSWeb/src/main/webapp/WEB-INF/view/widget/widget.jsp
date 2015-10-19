@@ -84,10 +84,10 @@
 		</div>
 	</div>
 	<div class="clearfix widget-review-block">
-		<a class="float-left review-count-left cursor-pointer"
-			id="prof-company-review-count" href = "${ profileLink }" target="_blank">
+		<div class="float-left review-count-left"
+			id="prof-company-review-count">
 			<span>${reviewsCount}</span> Review(s)
-		</a>
+		</div>
 		<div class="float-left">
 			<c:choose>
 				<c:when test="${profileLevel == 'INDIVIDUAL'}">
@@ -120,7 +120,7 @@
 						</c:otherwise>
 					</c:choose>
 					<div class="review-author">${author}</div>
-					<div class="review-date"><fmt:formatDate value="${reviewItem.modifiedOn}" pattern="M dd, yyyyy"/></div>
+					<div class="review-date"><fmt:formatDate value="${reviewItem.modifiedOn}" pattern="MMMM d, yyyy"/></div>
 					<div class="review-body review-widget" id="review-${ loop.index }">${reviewItem.review}</div>
 				</div>
 			</c:forEach>
@@ -153,8 +153,14 @@
 		$('.review-item').each(function(i){
 			var container = document.getElementById("review-" + i);
 			if(container.scrollHeight > container.offsetHeight){
-				$("#review-item-" + i).append("<a href=\" " + url + "\" target=\"_blank\">More</a>");
+				$("#review-item-" + i).append('<span class=\"review-more-button review-more-wid\" data-index=\"'+i+'\" \'>More</span>');
 			}
+		});
+		$(".review-more-wid").click(function(e){
+			e.stopPropagation();
+			var index = $(this).data("index");
+			$(this).hide();
+			$("#review-"+index).removeClass('review-widget');
 		});
 	</script>
 </body>
