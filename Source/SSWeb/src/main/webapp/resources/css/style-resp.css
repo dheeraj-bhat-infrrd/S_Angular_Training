@@ -1560,6 +1560,9 @@
 	.st-subject-cont {
 		display: table;
 	}
+	.v-tbl-wid {
+		padding-right: 20px;
+	}
 }
 
 
