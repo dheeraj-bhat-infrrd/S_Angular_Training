@@ -8,11 +8,12 @@
 $(document).ready(function() {
 	var iden = "${ iden }";
 	var profileLevel = "${ profileLevel }";
+	var appBaseUrl = "${ applicationBaseUrl }";
 	var body = "";
 	if (iden == undefined || profileLevel == undefined || profileLevel == ""){
 		body = "Incorrect parameters. Please check your selection.";
 	} else {
-		body = "&lt;iframe src=\"http://localhost:8080/rest/widget/" + profileLevel + "/" + iden + "\" height=\"100%\" style=\"border : 0\"&gt;&lt;/iframe&gt;";
+		body = "&lt;iframe src=\"" + appBaseUrl +  "rest/widget/" + profileLevel + "/" + iden + "\" height=\"100%\" style=\"border : 0\"&gt;&lt;/iframe&gt;";
 	}
 	$("#widget-code-area").html(body);
 });
