@@ -610,9 +610,9 @@ public class AdminController
 
 
     @RequestMapping ( value = "/generateApiKey", method = RequestMethod.POST)
-    public String generateApiKey( Model model, HttpServletRequest request )
+    public @ResponseBody String generateApiKey( Model model, HttpServletRequest request )
     {
-        LOG.info( "Method to get abusive surveys generateApiKey() started." );
+        LOG.info( "Method to get generateApiKey() started." );
         String message = "";
         Map<String, String> map = new HashMap<String, String>();
         boolean error = false;
@@ -620,15 +620,15 @@ public class AdminController
         String apiKey = request.getParameter( "API_KEY" );
         String apiSecret = request.getParameter( "API_SECRET" );
         if ( companyId == null || companyId.isEmpty() ) {
-            message = CommonConstants.INVALID_COMPANY_ID;
+            message = DisplayMessageConstants.INVALID_COMPANY_ID;
             error = true;
         }
         if ( apiKey == null || apiKey.isEmpty() ) {
-            message = CommonConstants.INVALID_API_KEY;
+            message = DisplayMessageConstants.INVALID_API_KEY;
             error = true;
         }
         if ( apiSecret == null || apiSecret.isEmpty() ) {
-            message = CommonConstants.INVALID_API_SECRET;
+            message = DisplayMessageConstants.INVALID_API_SECRET;
             error = true;
         }
         if ( !error ) {
@@ -639,10 +639,10 @@ public class AdminController
                 userManagementService.validateUserApiKey( apiKey, apiSecret, Long.valueOf( companyId ) );
             } catch ( NumberFormatException e ) {
                 LOG.error( "Invalid Company Id " );
-                message = CommonConstants.INVALID_COMPANY_ID;
+                message = DisplayMessageConstants.INVALID_COMPANY_ID;
                 error = true;
             } catch ( InvalidInputException e ) {
-                message = CommonConstants.INVALID_DETAILS_PROVIDED;
+                message = DisplayMessageConstants.INVALID_DETAILS_PROVIDED;
                 error = true;
             }
         }
@@ -664,7 +664,7 @@ public class AdminController
             try {
                 message = encryptionHelper.encryptAES( plainText.toString(), "" );
             } catch ( InvalidInputException e ) {
-                message = CommonConstants.TRY_AGAIN;
+                message = DisplayMessageConstants.TRY_AGAIN;
             }
         }
 

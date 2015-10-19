@@ -1293,7 +1293,7 @@ public class SurveyManagementController
     @RequestMapping ( value = "/bulk/uploadSurvey", method = RequestMethod.POST)
     public String bulkUploadSurvey( HttpServletRequest request )
     {
-        String authorizationHeader = request.getHeader( "AuthorizationHeader" );
+        String authorizationHeader = request.getHeader( "Authorization" );
         Map<String, String> params = new HashMap<String, String>();
         String message = "";
         String surveyJsonString = "";
@@ -1301,7 +1301,7 @@ public class SurveyManagementController
         long companyId = 0;
 
         if ( authorizationHeader == null || authorizationHeader.isEmpty() ) {
-            message = CommonConstants.INVALID_AUTHORIZATION_HEADER;
+            message = DisplayMessageConstants.INVALID_AUTHORIZATION_HEADER;
             error = true;
         }
         if ( !error ) {
@@ -1315,7 +1315,7 @@ public class SurveyManagementController
                     params.put( keyValuePair[0], keyValuePair[1] );
                 }
             } catch ( InvalidInputException e ) {
-                message = CommonConstants.INVALID_AUTHORIZATION_HEADER;
+                message = DisplayMessageConstants.INVALID_AUTHORIZATION_HEADER;
                 error = true;
             }
         }
@@ -1330,7 +1330,7 @@ public class SurveyManagementController
             LOG.debug( "The authorization header is valid " );
             surveyJsonString = request.getParameter( "SurveyList" );
             if ( surveyJsonString == null || surveyJsonString.isEmpty() ) {
-                message = CommonConstants.INVALID_SURVEY_JSON;
+                message = DisplayMessageConstants.INVALID_SURVEY_JSON;
                 error = true;
             }
         }

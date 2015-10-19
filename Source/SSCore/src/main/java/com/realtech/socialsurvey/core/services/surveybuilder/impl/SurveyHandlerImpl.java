@@ -1722,8 +1722,9 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
     {
         Map<BulkSurveyDetail, String> map = new HashMap<BulkSurveyDetail, String>();
         LOG.debug( "Inside method processBulkSurvey " );
-        boolean error = false;
+
         for ( BulkSurveyDetail bulkSurveyDetail : bulkSurveyDetailList ) {
+            boolean error = false;
             String message = "";
             if ( bulkSurveyDetail != null ) {
                 LOG.debug( "processing survey for agent " + bulkSurveyDetail.getAgentFirstName() );
@@ -1747,6 +1748,16 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
                     SurveyPreInitiation surveyPreInitiation = createSurveyPreInitiationFromBulkSurvey( bulkSurveyDetail,
                         companyId );
                     try {
+                        HashMap<String, Object> queries = new HashMap<>();
+                        queries.put( CommonConstants.SURVEY_AGENT_EMAIL_ID_COLUMN, surveyPreInitiation.getAgentEmailId() );
+                        queries.put( CommonConstants.CUSTOMER_EMAIL_ID_KEY_COLUMN, surveyPreInitiation.getCustomerEmailId() );
+                        List<SurveyPreInitiation> incompleteSurveyCustomers = surveyPreInitiationDao.findByKeyValue(
+                            SurveyPreInitiation.class, queries );
+                        if ( incompleteSurveyCustomers != null && incompleteSurveyCustomers.size() > 0 ) {
+                            LOG.warn( "Survey request already sent" );
+                            surveyPreInitiation.setStatus( CommonConstants.STATUS_SURVEYPREINITIATION_DUPLICATE_RECORD );
+                            message = "Duplicate Survey";
+                        }
                         saveSurveyPreInitiationObject( surveyPreInitiation );
                     } catch ( InvalidInputException e ) {
                         message = "Not Able to store this survey ";
