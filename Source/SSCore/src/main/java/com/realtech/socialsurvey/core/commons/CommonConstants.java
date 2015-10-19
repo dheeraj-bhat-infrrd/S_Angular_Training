@@ -167,6 +167,7 @@ public interface CommonConstants
      */
     public static final String AGENT_ID_COLUMN = "agentId";
     public static final String AGENT_EMAIL_ID_COLUMN = "emailId";
+    public static final String SURVEY_AGENT_EMAIL_ID_COLUMN = "agentEmailId";
     public static final String CUSTOMER_EMAIL_COLUMN = "customerEmail";
     public static final String CREATED_ON = "createdOn";
     public static final String CREATED_BY = "createdBy";
@@ -730,18 +731,5 @@ public interface CommonConstants
     public static final int FILE_UPLOAD_HIERARCHY_TYPE = 1;
     public static final int FILE_UPLOAD_SURVEY_TYPE = 2;
 
-    public static final String INVALID_AUTHORIZATION_HEADER = "Please provide a valid authorization header";
-
-    public static final String INVALID_SURVEY_JSON = "Please provide a valid survey json ";
-
-    public static final String INVALID_COMPANY_ID = "Please provide a valid company id";
-
-    public static final String INVALID_API_KEY = "Please provide a valid api key";
-
-    public static final String INVALID_API_SECRET = "Please provide a valid api secret";
-
-    public static final String INVALID_DETAILS_PROVIDED = "Please provide valid details ";
-
-    public static final String TRY_AGAIN = "Please try again after some time ";
 
 }
