@@ -1022,7 +1022,7 @@ public class EmailServicesImpl implements EmailServices
         LOG.info( "Successfully sent survey completion mail" );
     }
 
-
+    
     @Async
     @Override
     public void queueSurveyReminderMail( String recipientMailId, String displayName, String agentName, String link,

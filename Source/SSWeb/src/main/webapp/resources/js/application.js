@@ -1116,7 +1116,7 @@ function resizeAdjBuildSurvey(){
 }
 
 // On Hover
-$(document).on('click', '.bd-srv-tbl-row', function() {
+$(document).on('click touchstart', '.bd-srv-tbl-row', function() {
 	if ($(window).width() < 768) {
 		if ($(this).find('.srv-tbl-rem').css('display') == 'none') {
 			$(this).find('.srv-tbl-rem').show();
@@ -3246,6 +3246,15 @@ function updateReminderSettingsCallBack(response){
 // Ratings Settings
 function autoAppendRatingDropdown(ratingId, classes) {
 	autoAppendDropdown(ratingId, classes, 5, 0.5);
+}
+
+//Ratings Settings
+function autoAppendRatingDropdown(ratingId, classes, maxPoint, minPoint, diff) {
+	var value = diff;
+	while (maxPoint >= minPoint) {
+		$(ratingId).append($('<div/>').addClass(classes).text(maxPoint));
+		maxPoint -= diff;
+	}
 }
 
 function updatePostScore(formid) {
@@ -8854,6 +8863,12 @@ $('body').on('click','.st-dd-item-auto-post',function() {
 });
 
 $('body').on('click','.st-dd-item-min-post',function() {
+	var pageHash = window.location.hash;
+	if(pageHash.toLowerCase() == "#showcomplaintregsettings") {
+		$('#comp-rating-post').val($(this).html());
+		return;
+	}
+	
 	$('#rating-min-post').val($(this).html());
 	$('#st-dd-wrapper-min-post').slideToggle(200);
 	
