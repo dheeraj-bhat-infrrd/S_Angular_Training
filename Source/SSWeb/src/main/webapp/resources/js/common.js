@@ -221,8 +221,6 @@ function callAjaxGetWithPayloadData(url, callBackFunction, payload,isAsync){
 			hideOverlay();
 		},
 		error : function(e) {
-			alert(url);
-			if(e.status == 0) return;
 			if(e.status == 504) {
 				redirectToLoginPageOnSessionTimeOut(e.status);
 				return;

@@ -2101,100 +2101,92 @@ public class OrganizationManagementController
 
     @RequestMapping ( value = "/updatecomplaintregsettings", method = RequestMethod.POST)
     @ResponseBody
-    public String updateComplaintRegistrationsettings( Model model, HttpServletRequest request ) throws InvalidInputException
+    public String updateComplaintRegistrationsettings( Model model, HttpServletRequest request )
     {
         LOG.info( "Updating Complaint Registration Settings" );
-        String entityType = request.getParameter( "columnName" );
-        String entityIdStr = request.getParameter( "columnValue" );
         String ratingText = request.getParameter( "rating" );
         String moodText = request.getParameter( "mood" );
         String mailId = request.getParameter( "mailId" );
         String enabled = request.getParameter( "enabled" );
         boolean isComplaintHandlingEnabled = false;
 
-        long entityId = 0;
         String message = "";
         String mailIDStr = new String();
         HttpSession session = request.getSession();
         User user = sessionHelper.getCurrentUser();
+        OrganizationUnitSettings unitSettings = null;
         ComplaintRegistrationSettings originalComplaintRegSettings = new ComplaintRegistrationSettings();
 
-        if(!user.isCompanyAdmin())
-            throw new AuthorizationException( "User is not authorized to access this page");
-        
-        if ( mailId == null || mailId.isEmpty() ) {
-            throw new InvalidInputException( "Mail Id(s) of Complaint Handler(s) is null", DisplayMessageConstants.GENERAL_ERROR );
-        }
-        
-        if ( !mailId.contains( "," ) ) {
-            if ( !organizationManagementService.validateEmail( mailId ) )
-                throw new InvalidInputException( mailId + " entered as send alert to input is invalid",
-                    DisplayMessageConstants.GENERAL_ERROR );
-            else 
-                mailIDStr = mailId;
-        } else {
-            String mailIds[] = mailId.split( "," );
-            for ( String mailID : mailIds ) {
-                if ( !organizationManagementService.validateEmail( mailID.trim() ) )
-                    throw new InvalidInputException( mailID + " entered as send alert to input is invalid",
-                        DisplayMessageConstants.GENERAL_ERROR );
-                else 
-                    mailIDStr += mailID.trim() + " , ";
-            }
-            mailIDStr = mailIDStr.substring( 0, mailIDStr.length() - 2);
-        }
-        
-        if ( enabled == null || enabled.isEmpty() ) {
-            isComplaintHandlingEnabled = false;
-        } else if ( enabled.equalsIgnoreCase( "enable" ) )
-            isComplaintHandlingEnabled = true;
-        
-        if ( ratingText == null || ratingText.isEmpty() ) {
-            throw new InvalidInputException( "Rating selected is null", DisplayMessageConstants.GENERAL_ERROR );
-        }
-        
-        if ( moodText == null || moodText.isEmpty() ) {
-            throw new InvalidInputException( "Mood text selected is null", DisplayMessageConstants.GENERAL_ERROR );
-        }
-        
-        if ( entityIdStr == null || entityIdStr.isEmpty() ) {
-            entityId = (long) session.getAttribute( CommonConstants.ENTITY_ID_COLUMN );
-        } else {
-            try {
-                if ( entityIdStr != null && !entityIdStr.equals( "" ) ) {
-                    entityId = Long.parseLong( entityIdStr );
-                } else {
-                    throw new NumberFormatException();
-                }
-            } catch ( NumberFormatException e ) {
-                LOG.error( "Number format exception occurred while parsing the entity id. Reason :" + e.getMessage(), e );
-            }
-        }
-
-        if ( entityType == null || entityType.isEmpty() ) {
-            entityType = (String) session.getAttribute( CommonConstants.ENTITY_TYPE_COLUMN );
-        }
-
         try {
-            OrganizationUnitSettings unitSettings = null;
-            if ( entityType.equalsIgnoreCase( CommonConstants.COMPANY_ID ) )
-                unitSettings = organizationManagementService.getCompanySettings( entityId );
 
-            double rating = Double.parseDouble( ratingText );
-            if ( rating == 0 ) {
-                LOG.warn( "Rating score is 0." );
-                throw new InvalidInputException( "Rating score is 0.", DisplayMessageConstants.GENERAL_ERROR );
-            }
+            if ( !user.isCompanyAdmin() )
+                throw new AuthorizationException( "User is not authorized to access this page" );
+
+            if ( enabled == null || enabled.isEmpty() ) {
+                isComplaintHandlingEnabled = false;
+            } else if ( enabled.equalsIgnoreCase( "enable" ) )
+                isComplaintHandlingEnabled = true;
+
+            long entityId = (long) session.getAttribute( CommonConstants.ENTITY_ID_COLUMN );
+            
+            unitSettings = organizationManagementService.getCompanySettings( entityId );
 
             if ( unitSettings.getSurvey_settings().getComplaint_reg_settings() != null )
                 originalComplaintRegSettings = unitSettings.getSurvey_settings().getComplaint_reg_settings();
 
-            originalComplaintRegSettings.setRating( (float) rating );
-            originalComplaintRegSettings.setMood( moodText );
-            originalComplaintRegSettings.setMailId( mailId );
-            originalComplaintRegSettings.setEnabled( isComplaintHandlingEnabled );
+            if ( isComplaintHandlingEnabled ) {
+                if ( mailId == null || mailId.isEmpty() ) {
+                    throw new InvalidInputException( "Mail Id(s) of Complaint Handler(s) is null",
+                        DisplayMessageConstants.GENERAL_ERROR );
+                }
 
+                if ( !mailId.contains( "," ) ) {
+                    if ( !organizationManagementService.validateEmail( mailId ) )
+                        throw new InvalidInputException( "Mail id - " + mailId + " entered as send alert to input is invalid",
+                            DisplayMessageConstants.GENERAL_ERROR );
+                    else
+                        mailIDStr = mailId;
+                } else {
+                    String mailIds[] = mailId.split( "," );
+                    
+                    if(mailIds.length == 0)
+                        throw new InvalidInputException( "Mail id - " + mailId + " entered as send alert to input is empty",
+                        DisplayMessageConstants.GENERAL_ERROR );
+                    
+                    for ( String mailID : mailIds ) {
+                        if ( !organizationManagementService.validateEmail( mailID.trim() ) )
+                            throw new InvalidInputException( "Mail id - " + mailID + " entered amongst the mail ids as send alert to input is invalid",
+                                DisplayMessageConstants.GENERAL_ERROR );
+                        else
+                            mailIDStr += mailID.trim() + " , ";
+                    }
+                    mailIDStr = mailIDStr.substring( 0, mailIDStr.length() - 2 );
+                }
+
+                if ( ( ratingText == null || ratingText.isEmpty() ) && ( moodText == null || moodText.isEmpty() ) ) {
+                    throw new InvalidInputException( "Please select a Rating value and Review Mood selected.", DisplayMessageConstants.GENERAL_ERROR );
+                }
+                
+                if ( ratingText == null || ratingText.isEmpty() ) {
+                    ratingText = "0";
+                }
+
+                if ( moodText == null || moodText.isEmpty() ) {
+                    moodText = "";
+                }
+
+                double rating = Double.parseDouble( ratingText );
+
+                originalComplaintRegSettings.setRating( (float) rating );
+                originalComplaintRegSettings.setMood( moodText );
+                originalComplaintRegSettings.setMailId( mailId );
+            }
+
+            originalComplaintRegSettings.setEnabled( isComplaintHandlingEnabled );
             unitSettings.getSurvey_settings().setComplaint_reg_settings( originalComplaintRegSettings );
+            
+            if( !isComplaintHandlingEnabled && originalComplaintRegSettings.getMailId().trim().isEmpty() )
+                return "";
 
             LOG.info( "Updating Complaint Registration Settings" );
 

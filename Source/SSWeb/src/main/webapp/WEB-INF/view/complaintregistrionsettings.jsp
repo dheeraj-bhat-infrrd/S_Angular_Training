@@ -25,7 +25,7 @@
 <div class="prof-main-content-wrapper margin-top-25 margin-bottom-25">
 	<div class="container">
 		<div class="complaint-cont">
-			<form action="./updatecomplaintregsettings.do" method="post">
+			<form id="comp-reg-form" method="post">
 				<!-- Mail Id Input -->
 				<div class="bd-hr-form-item clearfix">
 					<div class="float-left bd-frm-left"><spring:message code="label.complaintreg.mail.text" /></div>
@@ -33,18 +33,26 @@
 						value="${complaintRegSettings.mailId}"></div>
 				</div>
 				<div>
-					<input type="checkbox" name="enabled" value="enable"> <label
-						for="enabled"><spring:message
-							code="label.complaintreg.rating.text" /></label>
+					<input type="checkbox" name="enabled" value="enable">
+					<label	for="enabled">
+						<spring:message code="label.complaintreg.trigger.text" />
+					</label>
 					<!-- set the min rating -->
+					<div class="mood-text">
+						<spring:message	code="label.complaintreg.rating.text" />
+					</div>
 					<div class="clearfix">
 						<div class="float-left">
-							<input type="text" name="rating-min-post" id="rating-min-post"
+							<input type="text" name="rating" id="comp-rating-post"
 								class="st-item-row-txt cursor-pointer dd-arrow-dn"
-								autocomplete="off" value="${minpostscore}">
+								autocomplete="off" value="${complaintRegSettings.rating}">
 							<div class="st-dd-wrapper hide" id="st-dd-wrapper-min-post"></div>
 						</div>
 					</div>
+				</div>
+				
+				<div class="mood-text">
+					<spring:message code="label.complaintreg.or.text" />
 				</div>
 	
 				<!-- Mood selection -->
@@ -52,21 +60,26 @@
 					<spring:message code="label.complaintreg.mood.text" />
 				</div>
 				<div class="clearfix">
-					<div class="sq-smile-icn-container compl-input-cont opacity-red" data-mood="ok">
-						<div id="neutral-smile" class="sq-smile-icn-wrapper sq-neutral-smile"></div>
-						<div class="sq-smile-icn-text sq-smile-neutral-text float-left">
-							<spring:message code="label.smile.neutral.text" />
-						</div>
-					</div>
 					<div class="sq-smile-icn-container compl-input-cont opacity-red" data-mood="unpleasant">
 						<div id="sad-smile" class="sq-smile-icn-wrapper sq-sad-smile"></div>
 						<div class="sq-smile-icn-text sq-smile-sad-text float-left">
 							<spring:message code="label.smile.sad.text" />
 						</div>
 					</div>
+					
+					<div class="mood-text">
+						<spring:message code="label.complaintreg.or.text" />
+					</div>
+				
+					<div class="sq-smile-icn-container compl-input-cont opacity-red" data-mood="ok">
+						<div id="neutral-smile" class="sq-smile-icn-wrapper sq-neutral-smile"></div>
+						<div class="sq-smile-icn-text sq-smile-neutral-text float-left">
+							<spring:message code="label.smile.neutral.text" />
+						</div>
+					</div>
 				</div>
 				<input type="hidden" id="survey-mood" name="mood"/> 
-				<div class="bd-btn-save cursor-pointer">Save</div>
+				<div id="comp-reg-form-submit" class="bd-btn-save cursor-pointer">Save</div>
 			</form>
 		</div>
 	</div>
@@ -94,9 +107,9 @@
 <script>
 	$(document).ready(function() {
 		autoAppendRatingDropdown('#st-dd-wrapper-min-post',
-				"st-dd-item st-dd-item-min-post");
-		$('#rating-min-post').off('click');
-		$('#rating-min-post').on('click', function() {
+				"st-dd-item st-dd-item-min-post", 5, 0, 0.5);
+		$('#comp-rating-post').off('click');
+		$('#comp-rating-post').on('click', function() {
 			$('#st-dd-wrapper-min-post').slideToggle(200);
 		});
 		$('.sq-smile-icn-container').off('click');
@@ -128,6 +141,14 @@
 					}
 				}
 			}
+		});
+		
+		$(document).on('click','#comp-reg-form-submit',function(){
+			var formData = $('#comp-reg-form').serialize();
+			callAjaxPostWithPayloadData("/updatecomplaintregsettings.do", function(data){
+				$('#overlay-toast').html(data);
+				showToast();
+			}, formData,  true );
 		});
 	});
 </script>
