@@ -1879,28 +1879,33 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
 
 
     @Transactional
-    public Map<BulkSurveyDetail, String> processBulkSurvey( List<BulkSurveyDetail> bulkSurveyDetailList, long companyId )
+    public List<BulkSurveyDetail> processBulkSurvey( List<BulkSurveyDetail> bulkSurveyDetailList, long companyId )
     {
-        Map<BulkSurveyDetail, String> map = new HashMap<BulkSurveyDetail, String>();
+        List<BulkSurveyDetail> list = new ArrayList<BulkSurveyDetail>();
         LOG.debug( "Inside method processBulkSurvey " );
 
         for ( BulkSurveyDetail bulkSurveyDetail : bulkSurveyDetailList ) {
             boolean error = false;
+            String status = CommonConstants.BULK_SURVEY_VALID;
             String message = "";
             if ( bulkSurveyDetail != null ) {
                 LOG.debug( "processing survey for agent " + bulkSurveyDetail.getAgentFirstName() );
                 if ( bulkSurveyDetail.getAgentFirstName() == null || bulkSurveyDetail.getAgentFirstName().isEmpty() ) {
                     message = "Invalid Agent Name ";
+                    status = CommonConstants.BULK_SURVEY_INVALID;
                     error = true;
                 } else if ( bulkSurveyDetail.getAgentEmailId() == null || bulkSurveyDetail.getAgentEmailId().isEmpty() ) {
                     message = "Agent Email Address Not Found ";
+                    status = CommonConstants.BULK_SURVEY_INVALID;
                     error = true;
                 } else if ( bulkSurveyDetail.getCustomerFirstName() == null
                     || bulkSurveyDetail.getCustomerFirstName().isEmpty() ) {
                     message = "Customer name Not Found ";
+                    status = CommonConstants.BULK_SURVEY_INVALID;
                     error = true;
                 } else if ( bulkSurveyDetail.getCustomerEmailId() == null || bulkSurveyDetail.getCustomerEmailId().isEmpty() ) {
                     message = "Customer Email Address Not Found ";
+                    status = CommonConstants.BULK_SURVEY_INVALID;
                     error = true;
                 }
                 if ( !error ) {
@@ -1917,18 +1922,25 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
                         if ( incompleteSurveyCustomers != null && incompleteSurveyCustomers.size() > 0 ) {
                             LOG.warn( "Survey request already sent" );
                             surveyPreInitiation.setStatus( CommonConstants.STATUS_SURVEYPREINITIATION_DUPLICATE_RECORD );
+                            status = CommonConstants.BULK_SURVEY_INVALID;
                             message = "Duplicate Survey";
                         }
                         saveSurveyPreInitiationObject( surveyPreInitiation );
                     } catch ( InvalidInputException e ) {
                         message = "Not Able to store this survey ";
+                        status = CommonConstants.BULK_SURVEY_INVALID;
                     }
                 }
-                map.put( bulkSurveyDetail, message );
+                bulkSurveyDetail.setStatus( status );
+                if ( status.equalsIgnoreCase( CommonConstants.BULK_SURVEY_INVALID ) ) {
+                    bulkSurveyDetail.setReason( message );
+                }
+                list.add( bulkSurveyDetail );
+
             }
 
         }
-        return map;
+        return list;
     }
 
 

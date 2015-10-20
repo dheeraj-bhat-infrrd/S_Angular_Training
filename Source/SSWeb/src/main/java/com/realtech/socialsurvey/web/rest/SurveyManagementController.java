@@ -1739,8 +1739,8 @@ public class SurveyManagementController
 
         if ( !error ) {
             bulkSurveyList = new Gson().fromJson( surveyJsonString, new TypeToken<List<BulkSurveyDetail>>() {}.getType() );
-            Map<BulkSurveyDetail, String> map = surveyHandler.processBulkSurvey( bulkSurveyList, companyId );
-            message = new Gson().toJson( map );
+            List<BulkSurveyDetail> list = surveyHandler.processBulkSurvey( bulkSurveyList, companyId );
+            message = new Gson().toJson( list );
         }
         return message;
     }
