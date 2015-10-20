@@ -1023,6 +1023,7 @@ function showDisplayPic() {
 					
 					$("#dsh-prsn-img").css("background", "url(" + imageUrl + ") no-repeat center");
 					$("#dsh-prsn-img").css("background-size", "cover");
+					$("#dsh-prsn-img").attr("data-img",imageUrl);
 				}
 				return data.responseJSON;
 			}
@@ -1115,7 +1116,7 @@ function resizeAdjBuildSurvey(){
 }
 
 // On Hover
-$(document).on('click', '.bd-srv-tbl-row', function() {
+$(document).on('click touchstart', '.bd-srv-tbl-row', function() {
 	if ($(window).width() < 768) {
 		if ($(this).find('.srv-tbl-rem').css('display') == 'none') {
 			$(this).find('.srv-tbl-rem').show();
@@ -1816,7 +1817,43 @@ function bindUserSelector() {
  * binds the click and keyup of region selector
  */
 function bindRegionSelectorEvents(){
-	$("#selected-region-txt").keyup(function(e) {
+	callAjaxGET("/fetchregions.do", function(data) {
+		var regionList = [];
+		if(data != undefined && data != "")
+			regionList = $.parseJSON(data);
+		var searchData = [];
+		for(var i=0, j=0; i<regionList.length; i++) {
+			if(regionList[i].isDefaultBySystem == 0) {
+				searchData[j] = {};
+				searchData[j].label = regionList[i].regionName;
+				searchData[j].regionId = regionList[i].regionId;
+				j++;				
+			}
+		}
+		$("#selected-region-txt").autocomplete({
+			source : searchData,
+			minLength: 0,
+			delay : 0,
+			autoFocus : true,
+			select: function(event, ui) {
+				$("#selected-region-txt").val(ui.item.label);
+				$('#selected-region-id-hidden').val(ui.item.regionId);
+				return false;
+			},
+			close: function(event, ui) {},
+			create: function(event, ui) {
+		        $('.ui-helper-hidden-accessible').remove();
+			}
+		}).autocomplete("instance")._renderItem = function(ul, item) {
+			return $("<li>").append(item.label).appendTo(ul);
+	  	};
+	  	$("#selected-region-txt").off('focus');
+		$("#selected-region-txt").focus(function(){            
+            $(this).autocomplete('search');
+        });
+	}, true);
+	
+	/*$("#selected-region-txt").keyup(function(e) {
 		if(e.which != 38 && e.which != 40 && e.which != 13) {
 			var text = $("#selected-region-txt").val();
 			if (text.length > 0) {
@@ -1838,14 +1875,52 @@ function bindRegionSelectorEvents(){
 			}
 			populateRegionsSelector(regionPattern);
 		}		
-	});
+	});*/
 }
 
 /**
  * binds the click and keyup of office selector
  */
 function bindOfficeSelectorEvents(){
-	$("#office-selector").click(function(e){
+	callAjaxGET("/fetchbranches.do", function(data) {
+		var branchList = [];
+		if(data != undefined && data != "")
+		branchList = $.parseJSON(data);
+		var searchData = [];
+		for(var i=0,j=0; i<branchList.length; i++) {
+			if(branchList[i].isDefaultBySystem == 0) {
+				searchData[j] = {};
+				searchData[j].label = branchList[i].branchName;
+				searchData[j].branchId = branchList[i].branchId;
+				searchData[j].regionId = branchList[i].regionId;
+				j++;
+			}
+		}
+		$("#selected-office-txt").autocomplete({
+			source : searchData,
+			minLength: 0,
+			delay : 0,
+			autoFocus : true,
+			select: function(event, ui) {
+				$("#selected-office-txt").val(ui.item.label);
+				$('#selected-office-id-hidden').val(ui.item.branchId);
+				$('#selected-region-id-hidden').val(ui.item.regionId);
+				return false;
+			},
+			close: function(event, ui) {},
+			create: function(event, ui) {
+		        $('.ui-helper-hidden-accessible').remove();
+			}
+		}).autocomplete("instance")._renderItem = function(ul, item) {
+			return $("<li>").append(item.label).appendTo(ul);
+	  	};
+	  	$("#selected-office-txt").off('focus');
+		$("#selected-office-txt").focus(function(){            
+            $(this).autocomplete('search');
+        });
+	}, true);
+	
+	/*$("#office-selector").click(function(e){
 		e.stopPropagation();
 		if(!$('#selected-office-txt').is(':disabled')){
 			var officePattern = $("#selected-office-txt").val();
@@ -1865,7 +1940,7 @@ function bindOfficeSelectorEvents(){
 		}else {
 			$("#offices-droplist").slideUp(200);
 		}
-	});
+	});*/
 }
 
 /**
@@ -4386,7 +4461,6 @@ $(document).on('click', '#page-next.paginate-button', function(){
 		}
 	}
 });
-
 function updatePaginateButtons() {
 	var numFound = $('#u-tbl-header').attr('data-num-found');
 	if (numFound > userBatchSize) {
@@ -7732,6 +7806,30 @@ function userSwitchToAdmin() {
 	}, true);
 }
 
+//function to switch to company admin 
+function userSwitchToCompAdmin() {
+	callAjaxGET("/switchtocompanyadmin.do", function(data){
+		if(data == "success") {
+			//window.location = window.location.origin + '/userlogin.do';
+			window.location = getLocationOrigin() + '/userlogin.do';
+		}
+	}, true);
+}
+
+function bindUserLoginEvent() {
+	$('.user-login-icn').on('click', function(e) {
+		e.stopImmediatePropagation();
+		var payload = {
+			"colName" : "userId",
+			"colValue" : $(this).attr('data-iden')
+		};
+		callAjaxGETWithTextData("/logincompanyadminas.do", function(data) {
+			// window.location = window.location.origin + '/userlogin.do';
+			window.location = getLocationOrigin() + '/userlogin.do';
+		}, true, payload);
+	});
+}
+
 function initializeVerticalAutcomplete() {
 	$('#prof-vertical').autocomplete({
 		minLength: 1,
@@ -8077,9 +8175,67 @@ function editProfileUrl() {
 	}, true);
 	
 }
+// Get all the required elements and show popup
 
+function generateWidget(iden, profileLevel) {
+	callAjaxGET("./showwidgetpage.do?profileLevel=" + profileLevel + "&iden="
+			+ iden, callBackShowWidget);
+}
+
+function callBackShowWidget(data) {
+	var header = "Widget";
+	createWidgetPopup(header, data);
+
+	$('#overlay-continue').click(function() {
+		copyToClipboard("widget-code-area");
+		$('#overlay-continue').unbind('click');
+	});
+
+	$('.overlay-disable-wrapper').addClass('pu_arrow_rt');
+	disableBodyScroll();
+	//$('body').css('overflow', 'hidden');
+	$('body').scrollTop('0');
+}
+
+function createWidgetPopup(header, body) {
+	$('#overlay-header').html(header);
+	$('#overlay-text').html(body);
+	$('#overlay-continue').html("Copy to clipboard");
+	$('#overlay-cancel').html("Close");
+
+	$('#overlay-main').show();
+}
+
+function copyToClipboard(elementId) {
+
+	// Create a "hidden" input
+	var aux = document.createElement("input");
+
+	// Assign it the value of the specified element
+	var encoded = document.getElementById(elementId).innerHTML;
+	var decoded = $("<div/>").html(encoded).text();
+	aux.setAttribute("value", decoded);
+
+	// Append it to the body
+	document.body.appendChild(aux);
+
+	// Highlight its content
+	aux.select();
+
+	// Copy the highlighted text
+	document.execCommand("copy");
+
+	// Remove it from the body
+	document.body.removeChild(aux);
+
+	// Show toast
+	$('#overlay-toast').html("Copied to clipboard");
+	showToast();
+
+}
 /**
  * Warning popup
+ * 
  * @param header
  * @param body
  */
@@ -8090,7 +8246,6 @@ function createEditProfileUrlPopup(header, body) {
 	$('#overlay-cancel').html("Cancel");
 	$('#overlay-continue').off();
 	$('#overlay-continue').click(function(){
-		//Add method to show the zillow type popup
 		$('#overlay-continue').unbind('click');
 		$('#overlay-cancel').unbind('click');
 		updateProfileUrl();
@@ -8100,7 +8255,6 @@ function createEditProfileUrlPopup(header, body) {
 	$('#overlay-main').show();
 	disableBodyScroll();
 }
-
 function updateProfileUrl(){
 	window.open("./editprofileurl.do","_blank", "width=800,height=600,scrollbars=yes");
 }
@@ -8801,3 +8955,126 @@ $('body').on('click', '#atpst-chk-box', function() {
 		updateAutoPostSetting(false);
 	}
 });
+
+//Dashboard fb and twitter share
+function getDashboardImageandCaption(loop) {
+	var name = "";
+	var designation = "";
+	var company = "";
+	var pictureandCaptionLink = "";
+	var fblink = "";
+	if ($("#fb_" + loop) != undefined) {
+
+		fblink = $("#fb_" + loop).data('link');
+	}
+
+	var imgId = $('#dsh-prsn-img').attr('data-img') || "";
+
+	if (document.getElementById("name") != null) {
+		name = document.getElementById("name").innerHTML;
+	}
+
+	if (document.getElementById("designation") != null) {
+		designation = document.getElementById("designation").innerHTML;
+	}
+
+	if (document.getElementById("company") != null) {
+		company = document.getElementById("company").innerHTML;
+
+	}
+
+	pictureandCaptionLink = "&picture=" + imgId + "&caption=" + name + ","
+			+ designation + "," + company;
+	fblink = fblink.concat(pictureandCaptionLink);
+	if (document.getElementById('fb_' + loop) != null)
+		document.getElementById('fb_' + loop).setAttribute('data-link', fblink);
+}
+
+function twitterDashboardFn(loop, twitterElement) {
+	var twitText = "";
+	var twitLink = $("#twitt_" + loop).data('link');
+	var String = twitLink.substring(twitLink.indexOf("=") + 1, twitLink
+			.lastIndexOf("&"));
+	var twitId = 'twttxt_' + loop;
+	if ($("#" + twitId) != undefined) {
+		twitText = $("#" + twitId).val();
+	}
+
+	var length = twitText.length;
+	if (length > 109) {
+		var arr = twitLink.split('');
+		var twittStrnDot = "...";
+		var substringed = twitText.substring(0, 105);
+		var finalString = substringed.concat(twittStrnDot);
+		if ($("#" + twitId) != undefined) {
+			$("#" + twitId).val(finalString);
+		}
+
+		twitLink = twitLink.replace(String, finalString);
+		if (document.getElementById('twitt_' + loop) != undefined)
+			document.getElementById('twitt_' + loop).setAttribute('data-link',
+					twitLink);
+	}
+
+}
+
+
+//Edit profile fb and twitter share functions
+function twitterProfileFn(loop, twitterElement) {
+
+	var twitLink = $("#twitt_" + loop).data('link');
+	var String = twitLink.substring(twitLink.indexOf("=") + 1, twitLink
+			.lastIndexOf("&"));
+	var twitId = 'twttxt_' + loop;
+	var twitText = $("#" + twitId).val();
+	var length = twitText.length;
+	if (length > 109) {
+		var arr = twitLink.split('');
+		var twittStrnDot = "...";
+		var substringed = twitText.substring(0, 105);
+		var finalString = substringed.concat(twittStrnDot);
+		$("#" + twitId).val(finalString);
+		twitLink = twitLink.replace(String, finalString);
+
+		if (document.getElementById('twitt_' + loop) != null) {
+
+			document.getElementById('twitt_' + loop).setAttribute('data-link',
+					twitLink);
+		}
+
+	}
+
+}
+function getImageandCaptionProfile(loop) {
+
+	var pictureandCaptionLink = "";
+	var fblink = $("#fb_" + loop).data('link');
+	var name = "";
+	var title = "";
+	var vertical = "";
+	var imgid = "";
+	if (document.getElementById("prof-image-edit") != null
+			&& document.getElementById("prof-image-edit").getAttribute("src") != null) {
+
+		imgid = document.getElementById("prof-image-edit").getAttribute("src");
+	}
+	if ($("#prof-name") != undefined) {
+		name = $("#prof-name").val();
+	}
+	if ($("#prof-title") != undefined) {
+
+		title = $("#prof-title").val();
+	}
+	if ($("#prof-vertical") != undefined) {
+
+		vertical = $("#prof-vertical").val();
+	}
+	pictureandCaptionLink = "&picture=" + imgid + "&caption=" + name + ","
+			+ title + "," + vertical;
+
+	fblink = fblink.concat(pictureandCaptionLink);
+	if (document.getElementById('fb_' + loop) != null) {
+		document.getElementById('fb_' + loop).setAttribute('data-link', fblink);
+	}
+
+}

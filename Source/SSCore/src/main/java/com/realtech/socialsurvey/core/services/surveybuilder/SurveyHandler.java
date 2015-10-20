@@ -2,9 +2,7 @@ package com.realtech.socialsurvey.core.services.surveybuilder;
 
 import java.util.List;
 import java.util.Map;
-
 import org.apache.solr.client.solrj.SolrServerException;
-
 import com.realtech.socialsurvey.core.entities.AbusiveSurveyReportWrapper;
 import com.realtech.socialsurvey.core.entities.Company;
 import com.realtech.socialsurvey.core.entities.SurveyDetails;
@@ -197,6 +195,9 @@ public interface SurveyHandler
     public List<AbusiveSurveyReportWrapper> getSurveysReporetedAsAbusive( int startIndex, int numOfRows );
 
     void sendSurveyCompletionMail( String custEmail, String custFirstName, String custLastName, User user )
+        throws InvalidInputException, UndeliveredEmailException, ProfileNotFoundException;
+    
+    void sendSurveyCompletionUnpleasantMail( String custEmail, String custFirstName, String custLastName, User user )
         throws InvalidInputException, UndeliveredEmailException, ProfileNotFoundException;
 
 

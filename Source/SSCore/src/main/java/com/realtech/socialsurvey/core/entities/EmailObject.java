@@ -1,6 +1,7 @@
 package com.realtech.socialsurvey.core.entities;
 
 import java.io.Serializable;
+import java.sql.Timestamp;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -29,6 +30,19 @@ public class EmailObject implements Serializable
     private byte[] emailBinaryObject;
 
 
+    @Column ( name = "MODIFIED_ON")
+    private Timestamp modifiedOn;
+
+    @Column ( name = "CREATED_ON")
+    private Timestamp createdOn;
+
+    @Column ( name = "MODIFIED_BY")
+    private String modifiedBy;
+
+    @Column ( name = "CREATED_BY")
+    private String createdBy;
+
+
     public Long getId()
     {
         return Id;
@@ -50,6 +64,54 @@ public class EmailObject implements Serializable
     public void setEmailBinaryObject( byte[] emailBinaryObject )
     {
         this.emailBinaryObject = emailBinaryObject;
+    }
+
+
+    public Timestamp getModifiedOn()
+    {
+        return modifiedOn;
+    }
+
+
+    public void setModifiedOn( Timestamp modifiedOn )
+    {
+        this.modifiedOn = modifiedOn;
+    }
+
+
+    public Timestamp getCreatedOn()
+    {
+        return createdOn;
+    }
+
+
+    public void setCreatedOn( Timestamp createdOn )
+    {
+        this.createdOn = createdOn;
+    }
+
+
+    public String getModifiedBy()
+    {
+        return modifiedBy;
+    }
+
+
+    public void setModifiedBy( String modifiedBy )
+    {
+        this.modifiedBy = modifiedBy;
+    }
+
+
+    public String getCreatedBy()
+    {
+        return createdBy;
+    }
+
+
+    public void setCreatedBy( String createdBy )
+    {
+        this.createdBy = createdBy;
     }
 
 

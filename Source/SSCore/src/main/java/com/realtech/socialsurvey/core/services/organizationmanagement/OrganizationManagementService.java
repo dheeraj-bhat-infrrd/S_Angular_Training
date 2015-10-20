@@ -775,8 +775,14 @@ public interface OrganizationManagementService
         MalformedURLException;
 
 
+    public String fetchBranchesByCompany( long companyId ) throws InvalidInputException, SolrException, MalformedURLException;
+
+
     public Map<Long, RegionFromSearch> fetchRegionsMapByCompany( long companyId ) throws InvalidInputException, SolrException,
         MalformedURLException;
+
+
+    public String fetchRegionsByCompany( long companyId ) throws InvalidInputException, SolrException, MalformedURLException;
 
 
     /**
@@ -1039,9 +1045,13 @@ public interface OrganizationManagementService
 
     /**
      * @param profileId
+     * @param collectionName
+     * @param collectionId
      * @return
+     * @throws InvalidInputException
      */
-    public long getLoopsCountByProfile( String profileId ) throws InvalidInputException;
+    public long getLoopsCountByProfile( String profileId, String collectionName, long collectionId )
+        throws InvalidInputException;
 
 
     /**
@@ -1050,14 +1060,17 @@ public interface OrganizationManagementService
     public void saveLoopsForProfile( LoopProfileMapping loopProfileMapping ) throws InvalidInputException;
 
 
+
     /**
-     * Gets loop profile mapping object by profile id and loop id
      * @param profileId
      * @param loopId
+     * @param collectionName
+     * @param collectionId
      * @return
      * @throws InvalidInputException
      */
-    public LoopProfileMapping getLoopByProfileAndLoopId( String profileId, String loopId ) throws InvalidInputException;
+    public LoopProfileMapping getLoopByProfileAndLoopId( String profileId, String loopId, String collectionName,
+        long collectionId ) throws InvalidInputException;
 
 
     /**

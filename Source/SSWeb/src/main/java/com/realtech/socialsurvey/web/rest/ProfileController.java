@@ -5,13 +5,11 @@ import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
-
 import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrDocumentList;
 import org.slf4j.Logger;
@@ -23,7 +21,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
-
 import com.google.gson.Gson;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.dao.impl.MongoOrganizationUnitSettingDaoImpl;
@@ -62,7 +59,6 @@ import com.realtech.socialsurvey.core.services.settingsmanagement.SettingsManage
 import com.realtech.socialsurvey.core.services.surveybuilder.SurveyHandler;
 import com.realtech.socialsurvey.web.common.ErrorCodes;
 import com.realtech.socialsurvey.web.common.ErrorResponse;
-
 import ezvcard.Ezvcard;
 import ezvcard.VCard;
 import ezvcard.VCardVersion;
@@ -805,7 +801,8 @@ public class ProfileController
                     organizationManagementService.updateScoreForSurvey(
                         MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION, regionProfile, surveySettings );
                     // update survey settings in the profile object
-                    regionProfile.setSurvey_settings( surveySettings );
+                    regionProfile.setSurvey_settings(surveySettings);
+
                 } else {
                     if ( regionProfile.getSurvey_settings().getShow_survey_above_score() <= 0 ) {
                         regionProfile.getSurvey_settings().setAutoPostEnabled( true );
@@ -888,7 +885,7 @@ public class ProfileController
     @ResponseBody
     @RequestMapping ( value = "/company/{companyId}/reviewcount")
     public Response getReviewCountForCompany( @PathVariable long companyId, @QueryParam ( value = "minScore") Double minScore,
-        @QueryParam ( value = "maxScore") Double maxScore )
+        @QueryParam ( value = "maxScore") Double maxScore, @QueryParam ( value = "notRecommended") Boolean notRecommended )
     {
         LOG.info( "Service to fetch the reviews count called for companyId :" + companyId + " ,minScore:" + minScore
             + " and maxScore:" + maxScore );
@@ -906,10 +903,13 @@ public class ProfileController
             if ( maxScore == null ) {
                 maxScore = CommonConstants.MAX_RATING_SCORE;
             }
+            if ( notRecommended == null ) {
+                notRecommended = false;
+            }
             long reviewsCount = 0;
             try {
                 reviewsCount = profileManagementService.getReviewsCount( companyId, minScore, maxScore,
-                    CommonConstants.PROFILE_LEVEL_COMPANY, false );
+                    CommonConstants.PROFILE_LEVEL_COMPANY, false, notRecommended );
                 String json = new Gson().toJson( reviewsCount );
                 LOG.debug( "reviews count json : " + json );
                 response = Response.ok( json ).build();
@@ -977,7 +977,7 @@ public class ProfileController
     @ResponseBody
     @RequestMapping ( value = "/region/{regionId}/reviewcount")
     public Response getReviewCountForRegion( @PathVariable long regionId, @QueryParam ( value = "minScore") Double minScore,
-        @QueryParam ( value = "maxScore") Double maxScore )
+        @QueryParam ( value = "maxScore") Double maxScore, @QueryParam ( value = "notRecommended") Boolean notRecommended )
     {
         LOG.info( "Service to fetch the reviews count called for regionId :" + regionId + " ,minScore:" + minScore
             + " and maxScore:" + maxScore );
@@ -995,10 +995,13 @@ public class ProfileController
             if ( maxScore == null ) {
                 maxScore = CommonConstants.MAX_RATING_SCORE;
             }
+            if ( notRecommended ==  null ) {
+                notRecommended = false;
+            }
             long reviewsCount = 0;
             try {
                 reviewsCount = profileManagementService.getReviewsCount( regionId, minScore, maxScore,
-                    CommonConstants.PROFILE_LEVEL_REGION, false );
+                    CommonConstants.PROFILE_LEVEL_REGION, false, notRecommended );
                 String json = new Gson().toJson( reviewsCount );
                 LOG.debug( "reviews count json : " + json );
                 response = Response.ok( json ).build();
@@ -1065,7 +1068,7 @@ public class ProfileController
     @ResponseBody
     @RequestMapping ( value = "/branch/{branchId}/reviewcount")
     public Response getReviewCountForBranch( @PathVariable long branchId, @QueryParam ( value = "minScore") Double minScore,
-        @QueryParam ( value = "maxScore") Double maxScore )
+        @QueryParam ( value = "maxScore") Double maxScore, @QueryParam ( value = "notRecommended") Boolean notRecommended )
     {
         LOG.info( "Service to fetch the reviews count called for branchId :" + branchId + " ,minScore:" + minScore
             + " and maxScore:" + maxScore );
@@ -1083,10 +1086,13 @@ public class ProfileController
             if ( maxScore == null ) {
                 maxScore = CommonConstants.MAX_RATING_SCORE;
             }
+            if ( notRecommended == null ) {
+                notRecommended = false;
+            }
             long reviewsCount = 0;
             try {
                 reviewsCount = profileManagementService.getReviewsCount( branchId, minScore, maxScore,
-                    CommonConstants.PROFILE_LEVEL_BRANCH, false );
+                    CommonConstants.PROFILE_LEVEL_BRANCH, false, notRecommended );
                 String json = new Gson().toJson( reviewsCount );
                 LOG.debug( "reviews count json : " + json );
                 response = Response.ok( json ).build();
@@ -1158,6 +1164,8 @@ public class ProfileController
                     surveySettings.setAutoPostEnabled( true );
                     organizationManagementService.updateScoreForSurvey(
                         MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION, branchProfile, surveySettings );
+
+                    branchProfile.setSurvey_settings( surveySettings );
                     // update survey settings in the profile object
                     branchProfile.setSurvey_settings( surveySettings );
                 } else {
@@ -1243,7 +1251,7 @@ public class ProfileController
     @ResponseBody
     @RequestMapping ( value = "/individual/{agentId}/reviewcount")
     public Response getReviewCountForAgent( @PathVariable long agentId, @QueryParam ( value = "minScore") Double minScore,
-        @QueryParam ( value = "maxScore") Double maxScore )
+        @QueryParam ( value = "maxScore") Double maxScore, @QueryParam ( value = "notRecommended") Boolean notRecommended )
     {
         LOG.info( "Service to fetch the reviews count called for agentId :" + agentId + " ,minScore:" + minScore
             + " and maxScore:" + maxScore );
@@ -1261,10 +1269,13 @@ public class ProfileController
             if ( maxScore == null ) {
                 maxScore = CommonConstants.MAX_RATING_SCORE;
             }
+            if ( notRecommended == null ) {
+                notRecommended = false;
+            }
             long reviewsCount = 0;
             try {
                 reviewsCount = profileManagementService.getReviewsCount( agentId, minScore, maxScore,
-                    CommonConstants.PROFILE_LEVEL_INDIVIDUAL, false );
+                    CommonConstants.PROFILE_LEVEL_INDIVIDUAL, false, notRecommended );
                 String json = new Gson().toJson( reviewsCount );
                 LOG.debug( "reviews count json : " + json );
                 response = Response.ok( json ).build();
@@ -1342,6 +1353,7 @@ public class ProfileController
                 surveySettings.setAutoPostEnabled( true );
                 organizationManagementService.updateScoreForSurvey(
                     MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION, agentProfile, surveySettings );
+
                 // update survey settings in the profile object
                 agentProfile.setSurvey_settings( surveySettings );
             }

@@ -3,83 +3,6 @@
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"%>
 <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions"%>
 <%@ taglib uri="http://www.springframework.org/tags" prefix="spring"%>
-
-<script type="text/javascript"
-	src="//apis.google.com/js/plusone.js"></script>
-	<script type="text/javascript" async src="//platform.twitter.com/widgets.js"></script>
-<script type="text/javascript">
-  (function() {
-   var po = document.createElement('script'); po.type = 'text/javascript'; po.async = true;
-   po.src = 'https://apis.google.com/js/client:plusone.js';
-   var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(po, s);
- })();
-</script>
-<script type="text/javascript">
-
-function twitterFn (loop,twitterElement) {
-	
-  	var twitLink = $("#twitt_"+loop).data('link');
-  	var String=twitLink.substring(twitLink.indexOf("=")+1,twitLink.lastIndexOf("&"));
-	var twitId = 'twttxt_'+loop;
-	var twitText = $("#"+twitId).val();
-	var length = twitText.length;
-	if(length > 109)
-		{
-		var arr = twitLink.split('');
-   		var twittStrnDot = "...";
-		var substringed = twitText.substring(0, 105);
-		var finalString = substringed.concat(twittStrnDot);
-		$("#"+twitId).val(finalString);
-		twitLink = twitLink.replace(String,finalString);
-		
-		if(document.getElementById('twitt_'+loop) != null)
-			{
-			
-			document.getElementById('twitt_'+loop).setAttribute('data-link',twitLink);	
-			}
-		
-		}
-	 
-
-}
-function getImageandCaption(loop)
-{
-	
-var pictureandCaptionLink="";
-var fblink = $("#fb_"+loop).data('link');
-var name ="";
-var title ="";
-var vertical ="";
-var imgid="";
-if(document.getElementById("prof-image-edit") != null && document.getElementById("prof-image-edit").getAttribute("src") != null )
-	{
-	
-	imgid = document.getElementById("prof-image-edit").getAttribute("src");
-	}
-	if($("#prof-name") != undefined)
-		{
-      	name = $("#prof-name").val();
-		}
-	if($("#prof-title") != undefined)
-	{
-	
-		title = $("#prof-title").val();
-	}
-	if($("#prof-vertical") != undefined)
-	{
-	
-		vertical = $("#prof-vertical").val();
-	}
-	pictureandCaptionLink = "&picture="+imgid+"&caption="+name+","+title+","+vertical;
-
-fblink = fblink.concat(pictureandCaptionLink);
-if(document.getElementById('fb_'+loop) != null)
-	{
-	document.getElementById('fb_'+loop).setAttribute('data-link',fblink);
-	}
-
-	}
-</script>
 <c:choose>
 	<c:when test="${not empty reviews}">
 		<c:forEach var="reviewItem" varStatus="loop" items="${reviews}">
@@ -141,13 +64,13 @@ if(document.getElementById('fb_'+loop) != null)
 					</div>
 					<div class="float-left icn-share icn-plus-open"></div>
 					<div class="float-left clearfix ppl-share-social hide">
-						<span id = "fb_${loop.index}"class="float-left ppl-share-icns icn-fb" title="Facebook" onclick = "getImageandCaption(${loop.index});"
+						<span id = "fb_${loop.index}"class="float-left ppl-share-icns icn-fb" title="Facebook" onclick = "getImageandCaptionProfile(${loop.index});"
 							data-link="https://www.facebook.com/dialog/feed?${reviewItem.faceBookShareUrl}&link=${reviewItem.completeProfileUrl}&description=<fmt:formatNumber type="number" pattern="${ scoreformat }" value="${reviewItem.score}" />-star response from ${ customerDisplayName } for ${reviewItem.agentName} at SocialSurvey - ${reviewItem.review} .&redirect_uri=https://www.facebook.com"></span>
 						
 						
 						    <input type="hidden" id="twttxt_${loop.index}" class ="twitterText_loop" value ="<fmt:formatNumber type="number" pattern="${ scoreformat }" value="${reviewItem.score}" />-star response from ${ customerDisplayName } for ${reviewItem.agentName} at SocialSurvey - ${reviewItem.review}"/>
 							
-							<span class="float-left ppl-share-icns icn-twit" id ="twitt_${loop.index}" onclick="twitterFn(${loop.index},this);" data-link="https://twitter.com/intent/tweet?text=<fmt:formatNumber type="number" pattern="${ scoreformat }" value="${reviewItem.score}" />-star response from ${ customerDisplayName } for ${reviewItem.agentName} at SocialSurvey - ${reviewItem.review}&url=${reviewItem.completeProfileUrl}"></span>
+							<span class="float-left ppl-share-icns icn-twit" id ="twitt_${loop.index}" onclick="twitterProfileFn(${loop.index},this);" data-link="https://twitter.com/intent/tweet?text=<fmt:formatNumber type="number" pattern="${ scoreformat }" value="${reviewItem.score}" />-star response from ${ customerDisplayName } for ${reviewItem.agentName} at SocialSurvey - ${reviewItem.review}&url=${reviewItem.completeProfileUrl}"></span>
 							 <span
 							class="float-left ppl-share-icns icn-lin" title="LinkedIn"
 							data-link="https://www.linkedin.com/shareArticle?mini=true&url=${reviewItem.completeProfileUrl} &title=&summary=<fmt:formatNumber type="number" pattern="${ scoreformat }" value="${reviewItem.score}" />-star response from ${ customerDisplayName } for ${reviewItem.agentName} at SocialSurvey - ${reviewItem.review} + &source="></span>
@@ -191,6 +114,8 @@ if(document.getElementById('fb_'+loop) != null)
 		</span>
 	</c:otherwise>
 </c:choose>
+<script type="text/javascript" src="//apis.google.com/js/client:plusone.js" async="async"></script>
+<script type="text/javascript" src="//apis.google.com/js/plusone.js" async="async"></script>
 <script>
 $(document).ready(function(){
 	
