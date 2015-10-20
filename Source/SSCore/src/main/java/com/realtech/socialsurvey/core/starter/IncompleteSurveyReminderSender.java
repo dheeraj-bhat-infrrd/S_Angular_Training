@@ -6,13 +6,11 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
-
 import org.quartz.JobDataMap;
 import org.quartz.JobExecutionContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.quartz.QuartzJobBean;
-
 import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.entities.AgentSettings;
 import com.realtech.socialsurvey.core.entities.Company;
@@ -239,7 +237,11 @@ public class IncompleteSurveyReminderSender extends QuartzJobBean
             }
             mailBody = mailBody.replaceAll( "\\[BaseUrl\\]", applicationBaseUrl );
             mailBody = mailBody.replaceAll( "\\[AgentName\\]", "" );
-            mailBody = mailBody.replaceAll( "\\[FirstName\\]", survey.getCustomerFirstName() );
+            mailBody = mailBody
+                .replaceAll(
+                    "\\[FirstName\\]",
+                    emailFormatHelper.getCustomerDisplayNameForEmail( survey.getCustomerFirstName(),
+                        survey.getCustomerLastName() ) );
             mailBody = mailBody
                 .replaceAll(
                     "\\[Name\\]",
@@ -269,8 +271,9 @@ public class IncompleteSurveyReminderSender extends QuartzJobBean
             }
         } else {
             try {
-                emailServices.sendDefaultSurveyReminderMail( survey.getCustomerEmailId(), logoUrl , survey.getCustomerFirstName(),
-                    agentName, agentEmailId, surveyLink, agentPhone, agentTitle, companyName );
+                emailServices.sendDefaultSurveyReminderMail(survey.getCustomerEmailId(),logoUrl,
+                    emailFormatHelper.getCustomerDisplayNameForEmail( survey.getCustomerFirstName(),
+                        survey.getCustomerLastName() ), agentName, agentEmailId, surveyLink, agentPhone, agentTitle, companyName );
 
             } catch ( InvalidInputException | UndeliveredEmailException e ) {
                 LOG.error( "Exception caught in IncompleteSurveyReminderSender.main while trying to send reminder mail to "
@@ -411,7 +414,8 @@ public class IncompleteSurveyReminderSender extends QuartzJobBean
         } else {
             try {
                 emailServices.sendDefaultSurveyInvitationMail(
-                    survey.getCustomerEmailId(), logoUrl,
+                    survey.getCustomerEmailId(),
+                    logoUrl,
                     emailFormatHelper.getCustomerDisplayNameForEmail( survey.getCustomerFirstName(),
                         survey.getCustomerLastName() ),
                     user.getFirstName() + ( user.getLastName() != null ? " " + user.getLastName() : "" ), surveyLink,

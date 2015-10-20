@@ -11,11 +11,12 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
 import javax.imageio.ImageIO;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import javax.ws.rs.QueryParam;
-import javax.ws.rs.core.Response;
+
 import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrDocumentList;
 import org.slf4j.Logger;
@@ -31,7 +32,9 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
+
 import sun.misc.BASE64Decoder;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.type.TypeFactory;
 import com.google.gson.Gson;
@@ -184,8 +187,6 @@ public class ProfileManagementController
         LOG.info( "Method showProfileEditPage() called from ProfileManagementService" );
         HttpSession session = request.getSession( false );
         User user = sessionHelper.getCurrentUser();
-        AccountType accountType = (AccountType) session.getAttribute( CommonConstants.ACCOUNT_TYPE_IN_SESSION );
-        UserSettings userSettings = (UserSettings) session.getAttribute( CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION );
         long entityId = 0;
         String entityIdStr = request.getParameter( "entityId" );
         if ( entityIdStr == null || entityIdStr.isEmpty() ) {
@@ -255,7 +256,7 @@ public class ProfileManagementController
                 model.addAttribute( "averageRating", averageRating );
 
                 long reviewsCount = profileManagementService.getReviewsCount( companyId, CommonConstants.MIN_RATING_SCORE,
-                    CommonConstants.MAX_RATING_SCORE, CommonConstants.PROFILE_LEVEL_COMPANY, false );
+                    CommonConstants.MAX_RATING_SCORE, CommonConstants.PROFILE_LEVEL_COMPANY, false, false );
                 model.addAttribute( "reviewsCount", reviewsCount );
             } catch ( InvalidInputException e ) {
                 throw new InternalServerException( new ProfileServiceErrorCode(
@@ -307,7 +308,7 @@ public class ProfileManagementController
                 model.addAttribute( "averageRating", averageRating );
 
                 long reviewsCount = profileManagementService.getReviewsCount( regionId, CommonConstants.MIN_RATING_SCORE,
-                    CommonConstants.MAX_RATING_SCORE, CommonConstants.PROFILE_LEVEL_REGION, false );
+                    CommonConstants.MAX_RATING_SCORE, CommonConstants.PROFILE_LEVEL_REGION, false, false  );
                 model.addAttribute( "reviewsCount", reviewsCount );
             } catch ( InvalidInputException e ) {
                 throw new InternalServerException( new ProfileServiceErrorCode(
@@ -363,7 +364,7 @@ public class ProfileManagementController
                 model.addAttribute( "averageRating", averageRating );
 
                 long reviewsCount = profileManagementService.getReviewsCount( branchId, CommonConstants.MIN_RATING_SCORE,
-                    CommonConstants.MAX_RATING_SCORE, CommonConstants.PROFILE_LEVEL_BRANCH, false );
+                    CommonConstants.MAX_RATING_SCORE, CommonConstants.PROFILE_LEVEL_BRANCH, false, false  );
                 model.addAttribute( "reviewsCount", reviewsCount );
             } catch ( InvalidInputException e ) {
                 throw new InternalServerException( new ProfileServiceErrorCode(
@@ -426,7 +427,7 @@ public class ProfileManagementController
                     CommonConstants.PROFILE_LEVEL_INDIVIDUAL, false );
                 model.addAttribute( "averageRating", averageRating );
                 long reviewsCount = profileManagementService.getReviewsCount( agentId, CommonConstants.MIN_RATING_SCORE,
-                    CommonConstants.MAX_RATING_SCORE, CommonConstants.PROFILE_LEVEL_INDIVIDUAL, false );
+                    CommonConstants.MAX_RATING_SCORE, CommonConstants.PROFILE_LEVEL_INDIVIDUAL, false, false  );
                 model.addAttribute( "reviewsCount", reviewsCount );
 
                 profileSettings = individualProfile;
@@ -490,42 +491,6 @@ public class ProfileManagementController
             response = new Gson().toJson( errorResponse );
         }
         return response;
-    }
-
-
-    private OrganizationUnitSettings fetchUserProfile( Model model, User user, AccountType accountType, UserSettings settings,
-        long branchId, long regionId, int profilesMaster )
-    {
-        LOG.debug( "Method fetchUserProfile() called from ProfileManagementService" );
-        OrganizationUnitSettings profile = null;
-        try {
-            profile = profileManagementService.aggregateUserProfile( user, accountType, settings, branchId, regionId,
-                profilesMaster );
-        } catch ( InvalidInputException | NoRecordsFetchedException e ) {
-            LOG.error( "InvalidInputException while fetching profile. Reason :" + e.getMessage(), e );
-            model
-                .addAttribute( "message", messageUtils.getDisplayMessage( e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE ) );
-        }
-        LOG.debug( "Method fetchUserProfile() finished from ProfileManagementService" );
-        return profile;
-    }
-
-
-    private LockSettings fetchParentLockSettings( Model model, User user, AccountType accountType, UserSettings settings,
-        long branchId, long regionId, int profilesMaster )
-    {
-        LOG.debug( "Method fetchParentLockSettings() called from ProfileManagementService" );
-        LockSettings parentLock = null;
-        try {
-            parentLock = profileManagementService.aggregateParentLockSettings( user, accountType, settings, branchId, regionId,
-                profilesMaster );
-        } catch ( InvalidInputException | NoRecordsFetchedException e ) {
-            LOG.error( "InvalidInputException while fetching profile. Reason :" + e.getMessage(), e );
-            model
-                .addAttribute( "message", messageUtils.getDisplayMessage( e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE ) );
-        }
-        LOG.debug( "Method fetchParentLockSettings() finished from ProfileManagementService" );
-        return parentLock;
     }
 
 
@@ -1592,7 +1557,7 @@ public class ProfileManagementController
                 if ( logoFileName == null || logoFileName.isEmpty() ) {
                     throw new InvalidInputException( "Logo passed is null or empty" );
                 }
-                logoUrl = fileUploadService.fileUploadHandler( fileLocal, logoFileName );
+                logoUrl = fileUploadService.uploadLogo( fileLocal, logoFileName );
                 logoUrl = amazonEndpoint + CommonConstants.FILE_SEPARATOR + amazonLogoBucket + CommonConstants.FILE_SEPARATOR
                     + logoUrl;
             } catch ( NonFatalException e ) {
@@ -1746,7 +1711,7 @@ public class ProfileManagementController
 
                 // uploading image
                 File fileLocal = new File( filePath );
-                profileImageUrl = fileUploadService.fileUploadHandler( fileLocal, imageFileName );
+                profileImageUrl = fileUploadService.uploadProfileImageFile( fileLocal, imageFileName, false );
                 profileImageUrl = amazonEndpoint + CommonConstants.FILE_SEPARATOR + amazonImageBucket
                     + CommonConstants.FILE_SEPARATOR + profileImageUrl;
             } catch ( NonFatalException e ) {
@@ -4568,7 +4533,7 @@ public class ProfileManagementController
         HttpSession session = request.getSession( false );
         User user = sessionHelper.getCurrentUser();
 
-        boolean fetchAbusive = true;
+        boolean fetchAbusive = false;
         List<SurveyDetails> reviewItems = null;
         try {
             long entityId = (long) session.getAttribute( CommonConstants.ENTITY_ID_COLUMN );
@@ -4617,7 +4582,8 @@ public class ProfileManagementController
     {
         LOG.info( "Method fetchReviewCount() called from ProfileManagementController" );
 
-        boolean fetchAbusive = true;
+        boolean fetchAbusive = false;
+        boolean notRecommended;
         long reviewCount = 0l;
         try {
             String entityType = (String) request.getSession( false ).getAttribute( CommonConstants.ENTITY_TYPE_COLUMN );
@@ -4627,7 +4593,12 @@ public class ProfileManagementController
 
             double maxScore = CommonConstants.MAX_RATING_SCORE;
             double minScore = Double.parseDouble( request.getParameter( "minScore" ) );
-
+            String notRecommendedStr = request.getParameter( "notRecommended" );
+            if ( notRecommendedStr == null || notRecommendedStr.isEmpty() ) {
+                notRecommended = false;
+            } else {
+                notRecommended = Boolean.parseBoolean( notRecommendedStr );
+            }
             if ( entityType.equals( CommonConstants.COMPANY_ID_COLUMN ) ) {
                 long companyId = Long.parseLong( request.getParameter( "companyId" ) );
                 if ( companyId == 0l ) {
@@ -4636,7 +4607,7 @@ public class ProfileManagementController
                 }
 
                 reviewCount = profileManagementService.getReviewsCount( companyId, minScore, maxScore,
-                    CommonConstants.PROFILE_LEVEL_COMPANY, fetchAbusive );
+                    CommonConstants.PROFILE_LEVEL_COMPANY, fetchAbusive, notRecommended );
             } else if ( entityType.equals( CommonConstants.REGION_ID_COLUMN ) ) {
                 long regionId = Long.parseLong( request.getParameter( "regionId" ) );
                 if ( regionId == 0l ) {
@@ -4645,7 +4616,7 @@ public class ProfileManagementController
                 }
 
                 reviewCount = profileManagementService.getReviewsCount( regionId, minScore, maxScore,
-                    CommonConstants.PROFILE_LEVEL_REGION, fetchAbusive );
+                    CommonConstants.PROFILE_LEVEL_REGION, fetchAbusive, notRecommended );
             } else if ( entityType.equals( CommonConstants.BRANCH_ID_COLUMN ) ) {
                 long branchId = Long.parseLong( request.getParameter( "branchId" ) );
                 if ( branchId == 0l ) {
@@ -4654,7 +4625,7 @@ public class ProfileManagementController
                 }
 
                 reviewCount = profileManagementService.getReviewsCount( branchId, minScore, maxScore,
-                    CommonConstants.PROFILE_LEVEL_BRANCH, fetchAbusive );
+                    CommonConstants.PROFILE_LEVEL_BRANCH, fetchAbusive, notRecommended );
             } else if ( entityType.equals( CommonConstants.AGENT_ID_COLUMN ) ) {
                 long agentId = Long.parseLong( request.getParameter( "agentId" ) );
                 if ( agentId == 0l ) {
@@ -4663,7 +4634,7 @@ public class ProfileManagementController
                 }
 
                 reviewCount = profileManagementService.getReviewsCount( agentId, minScore, maxScore,
-                    CommonConstants.PROFILE_LEVEL_INDIVIDUAL, fetchAbusive );
+                    CommonConstants.PROFILE_LEVEL_INDIVIDUAL, fetchAbusive, notRecommended );
             }
         } catch ( InvalidInputException e ) {
             throw new InternalServerException( new ProfileServiceErrorCode(
@@ -5020,7 +4991,32 @@ public class ProfileManagementController
         return JspResolver.PROFILE_URL_CHANGE;
     }
 
-
+    /**
+     * Method to show the widget popup
+     * 
+     * @param iden
+     * @param accountType
+     * @return
+     */
+    @RequestMapping ( value = "/showwidgetpage", method = RequestMethod.GET)
+    public String showWidgetPage( Model model, HttpServletRequest request, @QueryParam ( value = "iden") long iden,
+        @QueryParam ( value = "profileLevel") String profileLevel )
+    {
+        LOG.info( "Method called to show widget page" );
+        if ( iden <= 0l ) {
+            LOG.error( "iden is empty" );
+        } else {
+            model.addAttribute( "iden", iden );
+        }
+        if ( profileLevel == null || profileLevel.isEmpty() ) {
+            LOG.error( "account type is empty" );
+        }
+        model.addAttribute( "profileLevel", profileLevel );
+        model.addAttribute( "applicationBaseUrl", applicationBaseUrl );
+        LOG.info( "Method to show widget page finished" );
+        return JspResolver.WIDGET_CODE_PAGE;
+    }
+    
     @ResponseBody
     @RequestMapping ( value = "/updatepositions")
     public String updatePositions( HttpServletRequest request, Model model )

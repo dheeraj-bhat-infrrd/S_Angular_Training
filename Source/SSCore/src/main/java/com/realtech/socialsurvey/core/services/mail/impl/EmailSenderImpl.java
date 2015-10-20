@@ -3,7 +3,6 @@ package com.realtech.socialsurvey.core.services.mail.impl;
 import java.io.UnsupportedEncodingException;
 import java.util.List;
 import java.util.Properties;
-
 import javax.mail.Address;
 import javax.mail.Message;
 import javax.mail.MessagingException;
@@ -12,12 +11,10 @@ import javax.mail.Transport;
 import javax.mail.internet.AddressException;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
-
 import com.realtech.socialsurvey.core.dao.GenericDao;
 import com.realtech.socialsurvey.core.entities.EmailEntity;
 import com.realtech.socialsurvey.core.entities.EmailObject;
@@ -46,6 +43,13 @@ public final class EmailSenderImpl implements EmailSender
 
     @Autowired
     private GenericDao<EmailObject, Long> emailDao;
+
+
+    @Override
+    public boolean sendEmailByEmailEntity( EmailEntity emailEntity ) throws InvalidInputException
+    {
+        return false;
+    }
 
 
     /**
@@ -129,7 +133,8 @@ public final class EmailSenderImpl implements EmailSender
      * @throws UndeliveredEmailException
      */
     public void sendEmailWithBodyReplacements( EmailEntity emailEntity, String subjectFileName,
-        FileContentReplacements messageBodyReplacements ) throws InvalidInputException, UndeliveredEmailException
+        FileContentReplacements messageBodyReplacements, boolean isImmediate ) throws InvalidInputException,
+        UndeliveredEmailException
     {
         LOG.info( "Method sendEmailWithBodyReplacements called for emailEntity : " + emailEntity + " subjectFileName : "
             + subjectFileName + " and messageBodyReplacements : " + messageBodyReplacements );
@@ -161,7 +166,8 @@ public final class EmailSenderImpl implements EmailSender
 
 
     public void sendEmailWithSubjectAndBodyReplacements( EmailEntity emailEntity, FileContentReplacements subjectReplacements,
-        FileContentReplacements messageBodyReplacements ) throws InvalidInputException, UndeliveredEmailException
+        FileContentReplacements messageBodyReplacements, boolean isImmediate ) throws InvalidInputException,
+        UndeliveredEmailException
     {
         LOG.info( "Method sendEmailWithBodyReplacements called for emailEntity : " + emailEntity + " subjectReplacements : "
             + subjectReplacements + " and messageBodyReplacements : " + messageBodyReplacements );
@@ -202,8 +208,8 @@ public final class EmailSenderImpl implements EmailSender
      * @throws UndeliveredEmailException
      */
     @Override
-    public void sendEmail( EmailEntity emailEntity, String subject, String mailBody ) throws InvalidInputException,
-        UndeliveredEmailException
+    public void sendEmail( EmailEntity emailEntity, String subject, String mailBody, boolean isImmediate )
+        throws InvalidInputException, UndeliveredEmailException
     {
         LOG.info( "Method sendEmail called for subject : " + subject );
 
@@ -322,4 +328,5 @@ public final class EmailSenderImpl implements EmailSender
         emailDao.save( emailObject );
 
     }
+
 }

@@ -3,13 +3,6 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions"%>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
-<script>
-(function() {
-	   var po = document.createElement('script'); po.type = 'text/javascript'; po.async = true;
-	   po.src = 'https://apis.google.com/js/client:plusone.js';
-	   var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(po, s);
-	 })();
-</script>
 <c:if test="${not empty profile}">
 	<c:if test="${not empty profile.contact_details && not empty profile.contact_details.name}">
 		<c:set var="profName" value="${profile.contact_details.name}"></c:set>
@@ -63,15 +56,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta charset="utf-8">
     <link rel="shortcut icon" href="/favicon.ico" sizes="16x16">
-    <link rel="stylesheet" href="${initParam.resourcesPath}/resources/css/perfect-scrollbar.min.css">
-    <link rel="stylesheet" href="${initParam.resourcesPath}/resources/css/bootstrap.min.css">
-    <link rel="stylesheet" href="${initParam.resourcesPath}/resources/css/rangeslider.css">
-    <link rel="stylesheet" href="${initParam.resourcesPath}/resources/css/style.css">
-    <link rel="stylesheet" href="${initParam.resourcesPath}/resources/css/style-common.css">
-    <link rel="stylesheet" href="${initParam.resourcesPath}/resources/css/style-common-1.1.css">
-    <link rel="stylesheet" href="${initParam.resourcesPath}/resources/css/style-resp.css">
-    <link rel="stylesheet" href="${initParam.resourcesPath}/resources/css/style-resp-1.1.css">
-    <script src='//www.google.com/recaptcha/api.js'></script>
+	<link rel="stylesheet" href="${initParam.resourcesPath}/resources/css/bootstrap.min.css">
+	<link rel="stylesheet" href="${initParam.resourcesPath}/resources/css/perfect-scrollbar.min.css">
+	<link rel="stylesheet" href="${initParam.resourcesPath}/resources/css/rangeslider.css">
+	<link rel="stylesheet" href="${initParam.resourcesPath}/resources/css/style-common.css">
+	<link rel="stylesheet" href="${initParam.resourcesPath}/resources/css/style-common-1.1.css">
+	<link rel="stylesheet" href="${initParam.resourcesPath}/resources/css/style-resp.css">
+	<link rel="stylesheet" href="${initParam.resourcesPath}/resources/css/style-resp-1.1.css">
     <c:if test="${not empty profile}">
     	<c:if test="${not empty profile.contact_details && not empty profile.contact_details.name }">
     		<c:set var="profName" value="${profile.contact_details.name }"></c:set>
@@ -255,7 +246,14 @@
 						</div>
 						<c:choose>
 						<c:when test="${profileLevel == 'INDIVIDUAL'}">
-							<a href="/rest/survey/showsurveypage/${profile.iden}" target="_blank"><span class="prof-btn-survey float-left" id="read-write-share-btn">Write a Review</span></a>
+							<c:choose>
+								<c:when test="${not empty profile.surveyUrl}">
+									<a href="${profile.surveyUrl}" target="_blank"><span class="prof-btn-survey float-left" id="read-write-share-btn">Write a Review</span></a>
+								</c:when>
+								 <c:otherwise>
+									<a href="/rest/survey/showsurveypage/${profile.iden}" target="_blank"><span class="prof-btn-survey float-left" id="read-write-share-btn">Write a Review</span></a>
+								</c:otherwise>						
+							</c:choose>
 						</c:when>
 						<c:otherwise>
 							<a href="/initfindapro.do?profileLevel=${profileLevel}&iden=${profile.iden}&searchCriteria=${profile.contact_details.name}" target="_blank"><span class="prof-btn-survey float-left" id="read-write-share-btn">Write a Review</span></a>
@@ -571,38 +569,18 @@
     </div>
 </div>
 
-<!-- <div id="outer_captcha" style="display: none;">
-	<div id="recaptcha"></div>
-</div> -->
-
 <div class="mobile-tabs hide clearfix">
     <div class="float-left mob-icn mob-icn-active icn-person"></div>
     <div class="float-left mob-icn icn-ppl"></div>
     <div class="float-left mob-icn icn-star-smile"></div>
     <div class="float-left mob-icn inc-more"></div>
 </div>
-<!-- <div style="display: none">
-	<script src="https://www.google.com/recaptcha/api/challenge?k=6LdlHOsSAAAAAM8ypy8W2KXvgMtY2dFsiQT3HVq-"></script>
-</div> -->
-
-<!-- Code snippet to show aggregated ratings for agent in Google results : BOC-->
-<%-- <div class="hide" itemscope itemtype="http://schema.org/Product">
-	<span itemprop="name">Social Survey</span>
-	<span id="agent-desc" itemprop="title"></span>
-	<div itemprop="aggregateRating" itemscope itemtype="http://schema.org/AggregateRating">Rated 
-		<span id="prof-schema-agent-rating" itemprop="ratingValue">${floatingAverageRating }</span>/5 based on 
-		<span id="prof-schema-reviews" itemprop="reviewCount">${reviewsCount}</span> reviews
-	</div>
-</div> --%>
-<!-- EOC -->
-
+<script src='//www.google.com/recaptcha/api.js'></script>
+<script type="text/javascript" src="https://apis.google.com/js/client:plusone.js" async="async"></script>
 <script src="${initParam.resourcesPath}/resources/js/jquery-2.1.1.min.js"></script>
-<script src="${initParam.resourcesPath}/resources/js/bootstrap.min.js"></script>
 <script src="${initParam.resourcesPath}/resources/js/date.js"></script>
 <script src="${initParam.resourcesPath}/resources/js/script.js"></script>
-<script src="${initParam.resourcesPath}/resources/js/index.js"></script>
 <script src="${initParam.resourcesPath}/resources/js/common.js"></script>
-<script src="${initParam.resourcesPath}/resources/js/profile_common.js"></script>
 <script src="${initParam.resourcesPath}/resources/js/profile.js"></script>
 <script src="${initParam.resourcesPath}/resources/js/googletracking.js"></script>
 <script src="${initParam.resourcesPath}/resources/js/googlemaps.js"></script>
@@ -651,108 +629,6 @@
        
         $(window).resize(adjustImage);
         
-        $('.icn-person').click(function() {
-            $('.mob-icn').removeClass('mob-icn-active');
-            $(this).addClass('mob-icn-active');
-            $('#prof-company-intro').show();
-            $('#contact-info').show();
-            $('#prof-agent-container').hide();
-            $('#reviews-container').hide();
-            $('#recent-post-container').hide();
-        });
-
-        $('.icn-ppl').click(function() {
-            $('.mob-icn').removeClass('mob-icn-active');
-            $(this).addClass('mob-icn-active');
-            $('#recent-post-container').show();
-            $('#contact-info').hide();
-            $('#prof-agent-container').hide();
-            $('#prof-company-intro').hide();
-            $('#reviews-container').hide();
-        });
-
-        $('.icn-star-smile').click(function() {
-            $('.mob-icn').removeClass('mob-icn-active');
-            $(this).addClass('mob-icn-active');
-            $('#reviews-container').show();
-            $('#contact-info').hide();
-            $('#prof-agent-container').hide();
-            $('#prof-company-intro').hide();
-            $('#recent-post-container').hide();
-        });
-
-        $('.inc-more').click(function() {
-            $('.mob-icn').removeClass('mob-icn-active');
-            $(this).addClass('mob-icn-active');
-            $('#prof-agent-container').show();
-            $('#prof-company-intro').hide();
-            $('#contact-info').hide();
-            $('#reviews-container').hide();
-            $('#recent-post-container').hide();
-        });
-        
-        $(document).on('click','.bd-q-contact-us',function(){
-            $('#contact-us-pu-wrapper').show();
-            $('body').addClass('body-no-scroll-y');
-        });
-        
-        $(document).on('click','.bd-q-btn-cancel',function(){
-            $('#contact-us-pu-wrapper').hide();
-            $('body').removeClass('body-no-scroll-y');
-        });
-        
-        $('.lp-button').click(function(event){
-        	
-        	if(validateContactUsForm()){
-        		//url = window.location.origin + "/pages/profile/sendmail.do";
-        		url = getLocationOrigin() + "/pages/profile/sendmail.do";
-    			data = "";
-    			if($("#agent-profile-name").val() != ""){
-    				data += "profilename=" + $("#agent-profile-name").val();
-    				data += "&profiletype=" + $("#profile-fetch-info").attr("profile-level");
-    			}
-    			else if($("#company-profile-name").val() != ""){
-    				data += "profilename=" + $("#company-profile-name").val();
-    				data += "&profiletype=" + $("#profile-fetch-info").attr("profile-level");
-    			}
-    			else if($("#region-profile-name").val() != ""){
-    				data += "profilename=" + $("#region-profile-name").val();
-    				data += "&profiletype=" + $("#profile-fetch-info").attr("profile-level");
-    			}
-    			else if($("#branch-profile-name").val() != ""){
-    				data += "profilename=" + $("#branch-profile-name").val();
-    				data += "&profiletype=" + $("#profile-fetch-info").attr("profile-level");
-    			}
-    			
-    			data += "&name=" + $('#lp-input-name').val();
-    			data += "&email=" + $('#lp-input-email').val();
-    			data += "&message=" + $('#lp-input-message').val();
-    			data += "&g-recaptcha-response=" + $('#g-recaptcha-response').val();
-    			//data += "&recaptcha_input=" + $('#captcha-text').val();
-    			showOverlay();
-    			callAjaxPostWithPayloadData(url,showMessage,data,true);
-        	}			
-		});
-        
-        function showMessage(data){
-        	var jsonData = JSON.parse(data);
-        	if(jsonData["success"] == 1){
-	    		showInfoMobileAndWeb(jsonData["message"]);
-    			$(".reg-cap-reload").click();
-    			
-    			// resetting contact form and captcha
-    			$('#prof-contact-form')[0].reset();
-    			var recaptchaframe = $('.g-recaptcha iframe');
-    	        var recaptchaSoure = recaptchaframe[0].src;
-    	        recaptchaframe[0].src = '';
-    	        setInterval(function () { recaptchaframe[0].src = recaptchaSoure; }, 500);
-        	}
-        	else{
-        		showErrorMobileAndWeb(jsonData["message"]);
-    			$(".reg-cap-reload").click();
-        	}
-        }
-        
     	// Google analytics for reviews
     	setTimeout(function() {
     		ga('send', {
@@ -763,103 +639,6 @@
         		'eventValue': gaName
         	});
 		}, 2000);
-    	
-    	
-    	// Find a pro
-    	$('#find-pro-form input').keyup(function(e) {
-    		if(e.which == 13)
-    			submitFindProForm();
-		});
-    	
-    	$('#find-pro-submit').click(function(e) {
-    		e.preventDefault();
-    		submitFindProForm();
-    	});
-    	
-    	function submitFindProForm() {
-			$('#find-pro-form').submit();
-    		showOverlay();
-    	}
-    	
-    	// Contact us form validation functions
-    	function validateMessage(elementId) {
-    		if ($('#'+elementId).val() != "") {
-    			return true;
-	    	} else {
-	    		showErrorMobileAndWeb('Please enter your message!');
-	    		return false;
-	    	}
-    	}
-    	
-    	function validateName(elementId){
-    		if ($('#'+elementId).val() != "") {
-    			if (nameRegex.test($('#'+elementId).val()) == true) {
-    				return true;
-    			} else {
-    				showErrorMobileAndWeb('Please enter your valid name!');
-    				return false;
-    			}
-    		} else {
-    			showErrorMobileAndWeb('Please enter your valid name!');
-    			return false;
-    		}
-    	}
-    	
-    	function validateContactUsForm() {
-        	isContactUsFormValid = true;
-
-        	var isFocussed = false;
-        	if($(window).width() < 768){
-        		isSmallScreen = true;
-        	}
-        	
-        	// Validate form input elements
-    		if (!validateName('lp-input-name')) {
-    			isContactUsFormValid = false;
-    			if (!isFocussed) {
-        			$('#lp-input-name').focus();
-        			isFocussed=true;
-        		}
-        		return isContactUsFormValid;
-    		}
-        	
-    		if (!validateEmailId('lp-input-email')) {
-    			isContactUsFormValid = false;
-    			if (!isFocussed) {
-        			$('#lp-input-email').focus();
-        			isFocussed=true;
-        		}
-        		return isContactUsFormValid;
-    		}
-    		
-    		if (!validateMessage('lp-input-message')) {
-    			isContactUsFormValid = false;
-    			if (!isFocussed) {
-        			$('#lp-input-message').focus();
-        			isFocussed=true;
-        		}
-        		return isContactUsFormValid;
-    		}
-    		
-    		if (!validateMessage('captcha-text')) {
-    			isContactUsFormValid = false;
-    			if (!isFocussed) {
-        			$('#captcha-text').focus();
-        			isFocussed=true;
-        		}
-        		return isContactUsFormValid;
-    		}
-    		
-        	return isContactUsFormValid;
-    	}    	
-		$("#prof-company-review-count").click(function(){
-			if(window.innerWidth < 768){
-				$('.icn-star-smile').click();					
-			}
-			$('html, body').animate({
-				scrollTop : $('#reviews-container').offset().top
-			},500);
-		});
     });
 </script>
 </body>

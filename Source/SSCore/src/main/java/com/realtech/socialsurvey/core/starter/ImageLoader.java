@@ -6,16 +6,13 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.Map;
 import java.util.Map.Entry;
-
 import javax.imageio.ImageIO;
-
 import org.apache.commons.io.FileUtils;
 import org.quartz.JobDataMap;
 import org.quartz.JobExecutionContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.quartz.QuartzJobBean;
-
 import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.dao.impl.MongoOrganizationUnitSettingDaoImpl;
 import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
@@ -168,7 +165,7 @@ public class ImageLoader extends QuartzJobBean
                     } else if ( imageName.endsWith( ".png" ) || imageName.endsWith( ".PNG" ) ) {
                         ImageIO.write( image, "png", tempImage );
                     }
-                    fileName = fileUploadService.fileUploadHandler( tempImage, imageName );
+                    fileName = fileUploadService.uploadProfileImageFile( tempImage, imageName, false );
                     FileUtils
                         .deleteQuietly( new File( CommonConstants.TEMP_FOLDER + CommonConstants.FILE_SEPARATOR + imageName ) );
                     LOG.info( "Successfully retrieved photo of contact" );

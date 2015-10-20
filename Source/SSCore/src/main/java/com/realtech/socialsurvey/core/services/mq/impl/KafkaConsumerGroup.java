@@ -6,11 +6,11 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import org.springframework.context.ApplicationContext;
 import kafka.consumer.Consumer;
 import kafka.consumer.ConsumerConfig;
 import kafka.consumer.KafkaStream;
 import kafka.javaapi.consumer.ConsumerConnector;
+import org.springframework.context.ApplicationContext;
 
 /**
  * High level consumer for Kafka topics
