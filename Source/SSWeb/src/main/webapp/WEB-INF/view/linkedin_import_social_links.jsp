@@ -3,32 +3,32 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 
 <div class="wc-social-icn-row clearfix">
-	<div class="wc-social-icn float-left i-fb"
+	<div class="wc-social-icn float-left icn-wide-fb"
 		onclick="authenticate('facebook');"></div>
 	<div id="fb-profile-url" class="wc-icn-txt float-left">${facebookProfileUrl}</div>
 </div>
 <div class="wc-social-icn-row clearfix">
-	<div class="wc-social-icn float-left i-twt"
+	<div class="wc-social-icn float-left icn-wide-twitter"
 		onclick="authenticate('twitter');"></div>
 	<div id="twitter-profile-url" class="wc-icn-txt float-left">${twitterProfileUrl}</div>
 </div>
 <div class="wc-social-icn-row clearfix">
-	<div class="wc-social-icn float-left i-ln"
+	<div class="wc-social-icn float-left icn-wide-linkedin"
 		onclick="authenticate('linkedin');"></div>
 	<div id="linkedin-profile-url" class="wc-icn-txt float-left">${linkedinProfileUrl}</div>
 </div>
 <div class="wc-social-icn-row clearfix">
-	<div class="wc-social-icn float-left i-gplus"
+	<div class="wc-social-icn float-left icn-wide-gplus"
 		onclick="authenticate('google');"></div>
 	<div id="ggl-profile-url" class="wc-icn-txt float-left">${googleProfileUrl}</div>
 </div>
 <div class="wc-social-icn-row clearfix">
-	<div class="wc-social-icn float-left i-zillow"
+	<div class="wc-social-icn float-left icn-wide-zillow"
 		onclick="authenticate('zillow');"></div>
 	<div id="zillow-profile-url" class="wc-icn-txt float-left">${zillowProfileUrl}</div>
 </div>
 <div class="wc-social-icn-row clearfix">
-	<div class="wc-social-icn i-yelp float-left" onclick="showYelpInput();"></div>
+	<div class="wc-social-icn icn-wide-yelp float-left" onclick="showYelpInput();"></div>
 	<input id="yelp-profile-url"
 		class="wc-icn-txt float-left wc-form-input hide">
 	<div id="yelp-profile-url-display" class="wc-icn-txt float-left"></div>
