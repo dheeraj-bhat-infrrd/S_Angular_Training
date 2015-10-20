@@ -723,7 +723,7 @@ public class ProfileController
                 numRows = -1;
             }
             if ( sortCriteria == null ) {
-                sortCriteria = "date";
+                sortCriteria = CommonConstants.REVIEWS_SORT_CRITERIA_FEATURE;
             }
             try {
                 List<SurveyDetails> reviews = profileManagementService.getReviews( companyId, minScore, maxScore, start,
@@ -788,7 +788,7 @@ public class ProfileController
                 numRows = -1;
             }
             if ( sortCriteria == null ) {
-                sortCriteria = "date";
+                sortCriteria = CommonConstants.REVIEWS_SORT_CRITERIA_FEATURE;
             }
             try {
 
@@ -801,7 +801,7 @@ public class ProfileController
                     organizationManagementService.updateScoreForSurvey(
                         MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION, regionProfile, surveySettings );
                     // update survey settings in the profile object
-                    regionProfile.setSurvey_settings(surveySettings);
+                    regionProfile.setSurvey_settings( surveySettings );
 
                 } else {
                     if ( regionProfile.getSurvey_settings().getShow_survey_above_score() <= 0 ) {
@@ -995,7 +995,7 @@ public class ProfileController
             if ( maxScore == null ) {
                 maxScore = CommonConstants.MAX_RATING_SCORE;
             }
-            if ( notRecommended ==  null ) {
+            if ( notRecommended == null ) {
                 notRecommended = false;
             }
             long reviewsCount = 0;
@@ -1153,7 +1153,7 @@ public class ProfileController
                 numRows = -1;
             }
             if ( sortCriteria == null ) {
-                sortCriteria = "date";
+                sortCriteria = CommonConstants.REVIEWS_SORT_CRITERIA_FEATURE;
             }
             try {
 
@@ -1335,7 +1335,7 @@ public class ProfileController
                 numRows = -1;
             }
             if ( sortCriteria == null || sortCriteria.equalsIgnoreCase( CommonConstants.REVIEWS_SORT_CRITERIA_DEFAULT ) ) {
-                sortCriteria = CommonConstants.REVIEWS_SORT_CRITERIA_DATE;
+                sortCriteria = CommonConstants.REVIEWS_SORT_CRITERIA_FEATURE;
             }
             agentProfile = organizationManagementService.getAgentSettings( agentId );
 
