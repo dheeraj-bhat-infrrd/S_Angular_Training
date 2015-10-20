@@ -734,10 +734,13 @@ public interface CommonConstants
     public static final int FILE_UPLOAD_SURVEY_TYPE = 2;
 
 
-
     public static final String AGENT_MEDIA_POST_DETAILS_COLUMN = "agentMediaPostDetails";
     public static final String BRANCH_MEDIA_POST_DETAILS_COLUMN = "branchMediaPostDetailsList";
     public static final String COMPANY_MEDIA_POST_DETAILS_COLUMN = "companyMediaPostDetails";
     public static final String REGION_MEDIA_POST_DETAILS_COLUMN = "regionMediaPostDetailsList";
 
+
+    public static final String BULK_SURVEY_VALID = "Valid";
+
+    public static final String BULK_SURVEY_INVALID = "Invalid";
 }
