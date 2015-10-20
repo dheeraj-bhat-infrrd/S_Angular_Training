@@ -241,7 +241,7 @@ public interface SurveyHandler
      * @param companyId
      * @return
      */
-    public Map<BulkSurveyDetail, String> processBulkSurvey( List<BulkSurveyDetail> bulkSurveyDetailList, long companyId );
+    public List<BulkSurveyDetail> processBulkSurvey( List<BulkSurveyDetail> bulkSurveyDetailList, long companyId );
 
 
 }

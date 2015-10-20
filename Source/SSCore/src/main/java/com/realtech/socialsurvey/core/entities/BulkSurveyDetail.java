@@ -18,6 +18,10 @@ public class BulkSurveyDetail
 
     private String loanClosedDate;
 
+    private String status;
+
+    private String reason;
+
 
     public String getCustomerFirstName()
     {
@@ -100,6 +104,30 @@ public class BulkSurveyDetail
     public void setLoanClosedDate( String loanClosedDate )
     {
         this.loanClosedDate = loanClosedDate;
+    }
+
+
+    public String getStatus()
+    {
+        return status;
+    }
+
+
+    public void setStatus( String status )
+    {
+        this.status = status;
+    }
+
+
+    public String getReason()
+    {
+        return reason;
+    }
+
+
+    public void setReason( String reason )
+    {
+        this.reason = reason;
     }
 
 }
