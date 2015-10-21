@@ -7655,3 +7655,14 @@ label.url-change-input-label {
 .compl-input-cont {
 	width: 300px !important;
 }
+
+.coml-checkbox-cont {
+	display: table;
+}
+
+.compl-box-txt {
+	line-height: normal;
+	display: table-cell;
+	vertical-align: middle;
+	height: 50px;
+}

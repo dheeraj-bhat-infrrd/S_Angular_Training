@@ -37,7 +37,7 @@
 					<div class="float-left">
 						<div id="compl-checkbox" class="bd-check-img bd-check-img-checked float-right compl-checkbox"></div>
 					</div>
-					<div class="float-left compl-box-txt"><spring:message code="label.complaintreg.trigger.text" /></div>
+					<div class="compl-box-txt"><spring:message code="label.complaintreg.trigger.text" /></div>
 					<!-- set the min rating -->
 				</div>
 				<div class="mood-text">
@@ -67,6 +67,10 @@
 						</div>
 					</div>
 					
+					<div class="mood-text">
+						<spring:message code="label.complaintreg.or.text" />
+					</div>
+				
 					<div class="sq-smile-icn-container compl-input-cont opacity-red" data-mood="ok">
 						<div id="neutral-smile" class="sq-smile-icn-wrapper sq-neutral-smile"></div>
 						<div class="sq-smile-icn-text sq-smile-neutral-text float-left">
@@ -103,19 +107,14 @@
 <script>
 	$(document).ready(function() {
 		$(document).attr("title", "Complaint Registration Settings");
-		
-		autoAppendRatingDropdown('#st-dd-wrapper-min-post',
+		autoAppendRatingDropdownComplaint('#st-dd-wrapper-min-post',
 				"st-dd-item st-dd-item-min-post", 5, 0, 0.5);
 		$('#comp-rating-post').off('click');
 		$('#comp-rating-post').on('click', function() {
-			if(!$('input[name="enabled"]').prop( "checked" ))
-				return false;
 			$('#st-dd-wrapper-min-post').slideToggle(200);
 		});
 		$('.sq-smile-icn-container').off('click');
 		$('.sq-smile-icn-container').on('click', function() {
-			if(!$('input[name="enabled"]').prop( "checked" ))
-				return false;
 			var mood = $(this).attr("data-mood");
 			var currentMood = $('#comp-mood').val();
 			
@@ -144,5 +143,6 @@
 				}
 			}
 		});
+		
 	});
 </script>
