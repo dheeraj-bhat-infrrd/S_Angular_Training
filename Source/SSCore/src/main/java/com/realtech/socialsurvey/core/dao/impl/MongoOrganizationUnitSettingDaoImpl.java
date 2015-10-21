@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.regex.Pattern;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
@@ -19,6 +20,7 @@ import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Repository;
+
 import com.mongodb.BasicDBObject;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.dao.OrganizationUnitSettingsDao;
@@ -211,6 +213,23 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
 		mongoTemplate.updateMulti(query, update, OrganizationUnitSettings.class, collectionName);
 		LOG.info("Successfully completed updation of unit settings");
 	}
+	
+	
+	/**
+     * Updates a particular key of organization unit settings based on criteria specified
+     */
+    @Override
+    public void updateKeyOrganizationUnitSettingsByInCriteria(String keyToUpdate, Object updatedRecord, String criteriaKey, List<Object> criteriaValue,
+            String collectionName) {
+        LOG.info("Method updateKeyOrganizationUnitSettingsByInCriteria called in collection name :" + collectionName + " for keyToUpdate :"
+                + keyToUpdate + " criteria key :" + criteriaKey);
+        Query query = new Query();
+        query.addCriteria(Criteria.where(criteriaKey).in(criteriaValue));
+        Update update = new Update().set(keyToUpdate, updatedRecord);
+        LOG.debug("Updating unit settings based on in criteria");
+        mongoTemplate.updateMulti(query, update, OrganizationUnitSettings.class, collectionName);
+        LOG.info("Successfully completed updation of unit settings");
+    } 
 
 	/**
 	 * Method to fetch organization settings based on profile name

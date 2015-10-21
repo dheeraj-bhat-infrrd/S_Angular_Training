@@ -27,10 +27,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.google.gson.Gson;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
-import com.realtech.socialsurvey.core.dao.BranchDao;
-import com.realtech.socialsurvey.core.dao.CompanyDao;
 import com.realtech.socialsurvey.core.dao.OrganizationUnitSettingsDao;
-import com.realtech.socialsurvey.core.dao.RegionDao;
 import com.realtech.socialsurvey.core.dao.SurveyDetailsDao;
 import com.realtech.socialsurvey.core.dao.SurveyPreInitiationDao;
 import com.realtech.socialsurvey.core.dao.UserDao;
@@ -38,11 +35,9 @@ import com.realtech.socialsurvey.core.dao.UserProfileDao;
 import com.realtech.socialsurvey.core.dao.impl.MongoOrganizationUnitSettingDaoImpl;
 import com.realtech.socialsurvey.core.entities.AbusiveSurveyReportWrapper;
 import com.realtech.socialsurvey.core.entities.AgentSettings;
-import com.realtech.socialsurvey.core.entities.Branch;
 import com.realtech.socialsurvey.core.entities.Company;
 import com.realtech.socialsurvey.core.entities.MailContent;
 import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
-import com.realtech.socialsurvey.core.entities.Region;
 import com.realtech.socialsurvey.core.entities.SurveyDetails;
 import com.realtech.socialsurvey.core.entities.SurveyPreInitiation;
 import com.realtech.socialsurvey.core.entities.SurveyResponse;
@@ -86,14 +81,6 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
     @Autowired
     private UserDao userDao;
 
-    @Autowired
-    private CompanyDao companyDao;
-
-    @Autowired
-    private BranchDao branchDao;
-
-    @Autowired
-    private RegionDao regionDao;
 
     @Autowired
     private UserProfileDao userProfileDao;
@@ -204,6 +191,8 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
 
         if ( survey == null ) {
             surveyDetailsDao.insertSurveyDetails( surveyDetails );
+            LOG.info( "Updating modified on column in aagent hierarchy fro agent " );
+            updateModifiedOnColumnForAgentHierachy( agentId );
             return null;
         } else {
             return survey;
@@ -216,6 +205,14 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
     public void insertSurveyDetails( SurveyDetails surveyDetails )
     {
         surveyDetailsDao.insertSurveyDetails( surveyDetails );
+        if(surveyDetails.getAgentId()  > 0l){
+            LOG.info( "Updating modified on column in aagent hierarchy fro agent " );
+            try {
+                updateModifiedOnColumnForAgentHierachy( surveyDetails.getAgentId() );
+            } catch ( InvalidInputException e ) {
+               LOG.error( "passed agent id in method updateModifiedOnColumnForAgentHierachy() is invalid" );
+            }
+        }        
     }
 
 
@@ -1710,66 +1707,63 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
 
     @Override
     @Transactional
-    public void updateModifiedOnINHierarchyForSurvey( SurveyDetails surveyDetails )
+    public void updateModifiedOnColumnForAgentHierachy( long agentId ) throws InvalidInputException
     {
-        LOG.debug( "method updateModifiedOnINHierarchyForSurvey() started" );
-        long companyId = surveyDetails.getCompanyId();
+        LOG.debug( "method updateModifiedOnColumnForAgentHierachy() started" );
+        if(agentId <= 0l){
+            throw new InvalidInputException( "passend agentid is incorrect" );
+        }
+        
+        User agent = userDao.findById( User.class, agentId );
+        if(agent == null){
+            throw new InvalidInputException( "No user in db for passed userId" );
+        }
+        
+        if(agent.getCompany() == null){
+            throw new InvalidInputException( "No Company in db for passed userId" );
+        }
+        
+        long companyId = agent.getCompany().getCompanyId();
+        List<Object> branchIdList = new ArrayList<Object>();
+        List<Object> regionIdList = new ArrayList<Object>();
+        List<UserProfile> userProfiles = agent.getUserProfiles();
+        
+        for(UserProfile profile : userProfiles){
+            if(profile.getBranchId() > 0l && ! branchIdList.contains( profile.getBranchId() )){
+                branchIdList.add( profile.getBranchId() );
+            }
+            
+            if(profile.getRegionId() > 0l && ! regionIdList.contains( profile.getRegionId() )){
+                regionIdList.add( profile.getRegionId() );
+            }
+        }
+        
+        
         if ( companyId > 0l ) {
             organizationUnitSettingsDao.updateKeyOrganizationUnitSettingsByCriteria(
                 MongoOrganizationUnitSettingDaoImpl.KEY_MODIFIED_ON, System.currentTimeMillis(),
                 MongoOrganizationUnitSettingDaoImpl.KEY_IDENTIFIER, companyId,
                 MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION );
-
-            Company company = companyDao.findById( Company.class, companyId );
-            if ( company != null ) {
-                company.setModifiedOn( new Timestamp( System.currentTimeMillis() ) );
-                companyDao.update( company );
-            }
         }
 
-        long regionId = surveyDetails.getRegionId();
-        if ( regionId > 0l ) {
-            organizationUnitSettingsDao.updateKeyOrganizationUnitSettingsByCriteria(
-                MongoOrganizationUnitSettingDaoImpl.KEY_MODIFIED_ON, System.currentTimeMillis(),
-                MongoOrganizationUnitSettingDaoImpl.KEY_IDENTIFIER, regionId,
-                MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION );
-
-            Region region = regionDao.findById( Region.class, regionId );
-            if ( region != null ) {
-                region.setModifiedOn( new Timestamp( System.currentTimeMillis() ) );
-                regionDao.update( region );
-            }
-        }
-
-        long branchId = surveyDetails.getBranchId();
-        if ( branchId > 0l ) {
-            organizationUnitSettingsDao.updateKeyOrganizationUnitSettingsByCriteria(
-                MongoOrganizationUnitSettingDaoImpl.KEY_MODIFIED_ON, System.currentTimeMillis(),
-                MongoOrganizationUnitSettingDaoImpl.KEY_IDENTIFIER, branchId,
-                MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION );
-
-            Branch branch = branchDao.findById( Branch.class, branchId );
-            if ( branch != null ) {
-                branch.setModifiedOn( new Timestamp( System.currentTimeMillis() ) );
-                branchDao.update( branch );
-            }
-        }
-
-        long agentId = surveyDetails.getAgentId();
         if ( agentId > 0l ) {
             organizationUnitSettingsDao.updateKeyOrganizationUnitSettingsByCriteria(
                 MongoOrganizationUnitSettingDaoImpl.KEY_MODIFIED_ON, System.currentTimeMillis(),
                 MongoOrganizationUnitSettingDaoImpl.KEY_IDENTIFIER, agentId,
                 MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION );
-
-            User agent = userDao.findById( User.class, agentId );
-            if ( agent != null ) {
-                agent.setModifiedOn( new Timestamp( System.currentTimeMillis() ) );
-                userDao.update( agent );
-            }
         }
-
-        LOG.debug( "method updateModifiedOnINHierarchyForSurvey() finished" );
+        
+        organizationUnitSettingsDao.updateKeyOrganizationUnitSettingsByInCriteria(
+            MongoOrganizationUnitSettingDaoImpl.KEY_MODIFIED_ON, System.currentTimeMillis(),
+            MongoOrganizationUnitSettingDaoImpl.KEY_IDENTIFIER, branchIdList,
+            MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION );
+        
+        organizationUnitSettingsDao.updateKeyOrganizationUnitSettingsByInCriteria(
+            MongoOrganizationUnitSettingDaoImpl.KEY_MODIFIED_ON, System.currentTimeMillis(),
+            MongoOrganizationUnitSettingDaoImpl.KEY_IDENTIFIER, regionIdList,
+            MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION );
+        
+        LOG.debug( "method updateModifiedOnColumnForAgentHierachy() finished" );
     }
 }
 // JIRA SS-119 by RM-05:EOC

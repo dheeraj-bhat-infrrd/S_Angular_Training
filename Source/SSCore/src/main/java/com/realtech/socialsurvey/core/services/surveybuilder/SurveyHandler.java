@@ -205,6 +205,6 @@ public interface SurveyHandler
         throws InvalidInputException, UndeliveredEmailException, ProfileNotFoundException;
 
 
-    void updateModifiedOnINHierarchyForSurvey( SurveyDetails surveyDetails );
+    void updateModifiedOnColumnForAgentHierachy( long agentId ) throws InvalidInputException;
 
 }
