@@ -3252,7 +3252,7 @@ function autoAppendRatingDropdown(ratingId, classes) {
 }
 
 //Ratings Settings
-function autoAppendRatingDropdown(ratingId, classes, maxPoint, minPoint, diff) {
+function autoAppendRatingDropdownComplaint(ratingId, classes, maxPoint, minPoint, diff) {
 	var value = diff;
 	while (maxPoint >= minPoint) {
 		$(ratingId).append($('<div/>').addClass(classes).text(maxPoint));
@@ -8869,6 +8869,7 @@ $('body').on('click','.st-dd-item-min-post',function() {
 	var pageHash = window.location.hash;
 	if(pageHash.toLowerCase() == "#showcomplaintregsettings") {
 		$('#comp-rating-post').val($(this).html());
+		$('#st-dd-wrapper-min-post').slideToggle(200);
 		return;
 	}
 	
