@@ -7615,3 +7615,30 @@ label.url-change-input-label {
 .v-tbl-wid{
 	width : 4%;
 }
+
+.review-widget{
+   display: inline;
+   overflow: hidden;
+   text-overflow: ellipsis;
+   display: -webkit-box;
+   max-height: 48px;      /* fallback */
+   -webkit-line-clamp: 2; /* number of lines to show */
+   -webkit-box-orient: vertical;
+}
+
+.review-widget a {
+    position: absolute;
+}
+
+.widget-review-score {
+	margin-left: 8px;
+	line-height: 38px;
+}
+
+.widget-survey-btn {
+	margin-left: 25px;
+}
+
+.widget-review-block {
+	margin-top: 10px;
+}
