@@ -149,11 +149,12 @@
 		}
 		var rating = document.getElementById("rating").innerText;
 		changeWidgetRatingPattern(rating, $('#wdg-rating-cont'));
-		var url = "${ profileLink }";
 		$('.review-item').each(function(i){
 			var container = document.getElementById("review-" + i);
 			if(container.scrollHeight > container.offsetHeight){
 				$("#review-item-" + i).append('<span class=\"review-more-button review-more-wid\" data-index=\"'+i+'\" \'>More</span>');
+				$("#review-item-" + i).append('<span class=\"review-more-button review-less-wid\" data-index=\"'+i+'\" \'>Less</span>');
+				$(".review-less-wid").hide();
 			}
 		});
 		$(".review-more-wid").click(function(e){
@@ -161,6 +162,14 @@
 			var index = $(this).data("index");
 			$(this).hide();
 			$("#review-"+index).removeClass('review-widget');
+			$(this).parent().find(".review-less-wid").show();
+		});
+		$(".review-less-wid").click(function(e){
+			e.stopPropagation();
+			var index = $(this).data("index");
+			$(this).hide();
+			$("#review-"+index).addClass('review-widget');
+			$(this).parent().find(".review-more-wid").show();
 		});
 	</script>
 </body>

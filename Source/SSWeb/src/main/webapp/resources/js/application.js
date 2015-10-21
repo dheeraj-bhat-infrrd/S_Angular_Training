@@ -1274,7 +1274,8 @@ $(document).on('click', '.bd-q-pu-close', function() {
 });
 
 // Question edit
-$(document).on('click', '.srv-tbl-edit', function() {
+$(document).on('click touchstart', '.srv-tbl-edit', function(e) {
+	e.stopPropagation();
 	var questionId = $(this).parent().parent().data('questionid');
 	var url = "./getsurveyquestion.do?questionId=" + questionId;
 
@@ -1529,7 +1530,8 @@ $(document).on('click', '.srv-tbl-rem', function(e){
 });
 
 // Reorder Question in survey
-$(document).on('click', '.srv-tbl-move-up', function(){
+$(document).on('click touchstart', '.srv-tbl-move-up', function(e){
+	e.stopPropagation();
 	var formData = new FormData();
 	formData.append("questionId", $(this).parent().parent().data('questionid'));
 	formData.append("reorderType", "up");
@@ -1537,7 +1539,8 @@ $(document).on('click', '.srv-tbl-move-up', function(){
 	callAjaxPOSTWithTextData("./reorderQuestion.do", commonActiveSurveyCallback, true, formData);
 });
 
-$(document).on('click', '.srv-tbl-move-dn', function(){
+$(document).on('click touchstart', '.srv-tbl-move-dn', function(e){
+	e.stopPropagation();
 	var formData = new FormData();
 	formData.append("questionId", $(this).parent().parent().data('questionid'));
 	formData.append("reorderType", "down");
@@ -9111,19 +9114,23 @@ function getImageandCaptionProfile(loop) {
 
 //complaint registration event binding
 $(document).on('click','#comp-reg-form-submit',function(){
-	var formData = $('#comp-reg-form').serialize();
-	callAjaxPostWithPayloadData("/updatecomplaintregsettings.do", function(data){
-		$('#overlay-toast').html(data);
-		showToast();
-	}, formData,  true );
+	if(validateComplaintRegistraionForm()) {
+		var formData = $('#comp-reg-form').serialize();
+		callAjaxPostWithPayloadData("/updatecomplaintregsettings.do", function(data){
+			$('#overlay-toast').html(data);
+			showToast();
+		}, formData,  true );
+	}
 });
 
 $(document).on('click touchstart','#compl-checkbox', function() {
 	if($(this).hasClass('bd-check-img-checked')) {
-		$(this).removeClass('bd-check-img-checked');
-		$('input[name="enabled"]').prop( "checked" , true);
+		if(validateMultipleEmailIds('comp-mailId')) {
+			$(this).removeClass('bd-check-img-checked');
+			$('input[name="enabled"]').prop( "checked" , true);
+		}
 	} else {
-		$(this).addClass('bd-check-img-checked');
-		$('input[name="enabled"]').prop( "checked" , false);
+			$(this).addClass('bd-check-img-checked');
+			$('input[name="enabled"]').prop( "checked" , false);
 	}
 });
