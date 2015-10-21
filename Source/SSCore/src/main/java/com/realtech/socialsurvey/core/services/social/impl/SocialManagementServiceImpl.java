@@ -9,6 +9,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpPost;
@@ -22,6 +23,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.DependsOn;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
+
 import twitter4j.StatusUpdate;
 import twitter4j.Twitter;
 import twitter4j.TwitterException;
@@ -29,6 +31,7 @@ import twitter4j.TwitterFactory;
 import twitter4j.auth.RequestToken;
 import twitter4j.conf.Configuration;
 import twitter4j.conf.ConfigurationBuilder;
+
 import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.dao.OrganizationUnitSettingsDao;
 import com.realtech.socialsurvey.core.dao.SurveyDetailsDao;
@@ -38,14 +41,19 @@ import com.realtech.socialsurvey.core.dao.impl.MongoOrganizationUnitSettingDaoIm
 import com.realtech.socialsurvey.core.entities.AgentSettings;
 import com.realtech.socialsurvey.core.entities.Branch;
 import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
+
 import com.realtech.socialsurvey.core.entities.Region;
+import com.realtech.socialsurvey.core.entities.ProfileStage;
 import com.realtech.socialsurvey.core.entities.SocialMediaTokens;
 import com.realtech.socialsurvey.core.entities.User;
 import com.realtech.socialsurvey.core.entities.UserProfile;
+import com.realtech.socialsurvey.core.enums.ProfileStages;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.exception.NonFatalException;
+import com.realtech.socialsurvey.core.services.organizationmanagement.ProfileManagementService;
 import com.realtech.socialsurvey.core.services.organizationmanagement.UserManagementService;
 import com.realtech.socialsurvey.core.services.social.SocialManagementService;
+
 import facebook4j.Facebook;
 import facebook4j.FacebookException;
 import facebook4j.FacebookFactory;
@@ -77,6 +85,9 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
 
     @Autowired
     private SurveyDetailsDao surveyDetailsDao;
+
+    @Autowired
+    private ProfileManagementService profileManagementService;
 
     // Facebook
     @Value ( "${FB_CLIENT_ID}")
@@ -461,37 +472,52 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
         LOG.debug( "Method disconnectSocialNetwork() called" );
 
         String keyToUpdate = null;
-
+        boolean ignore = false;
+        ProfileStage profileStage = new ProfileStage();
         switch ( socialMedia ) {
             case CommonConstants.FACEBOOK_SOCIAL_SITE:
+                profileStage.setOrder( ProfileStages.FACEBOOK_PRF.getOrder() );
+                profileStage.setProfileStageKey( ProfileStages.FACEBOOK_PRF.name() );
                 keyToUpdate = MongoOrganizationUnitSettingDaoImpl.KEY_FACEBOOK_SOCIAL_MEDIA_TOKEN;
                 break;
 
             case CommonConstants.TWITTER_SOCIAL_SITE:
+                profileStage.setOrder( ProfileStages.TWITTER_PRF.getOrder() );
+                profileStage.setProfileStageKey( ProfileStages.TWITTER_PRF.name() );
                 keyToUpdate = MongoOrganizationUnitSettingDaoImpl.KEY_TWITTER_SOCIAL_MEDIA_TOKEN;
                 break;
 
             case CommonConstants.GOOGLE_SOCIAL_SITE:
+                profileStage.setOrder( ProfileStages.GOOGLE_PRF.getOrder() );
+                profileStage.setProfileStageKey( ProfileStages.GOOGLE_PRF.name() );
                 keyToUpdate = MongoOrganizationUnitSettingDaoImpl.KEY_GOOGLE_SOCIAL_MEDIA_TOKEN;
                 break;
 
             case CommonConstants.LINKEDIN_SOCIAL_SITE:
+                profileStage.setOrder( ProfileStages.LINKEDIN_PRF.getOrder() );
+                profileStage.setProfileStageKey( ProfileStages.LINKEDIN_PRF.name() );
                 keyToUpdate = MongoOrganizationUnitSettingDaoImpl.KEY_LINKEDIN_SOCIAL_MEDIA_TOKEN;
                 break;
 
             case CommonConstants.ZILLOW_SOCIAL_SITE:
+                profileStage.setOrder( ProfileStages.ZILLOW_PRF.getOrder() );
+                profileStage.setProfileStageKey( ProfileStages.ZILLOW_PRF.name() );
                 keyToUpdate = MongoOrganizationUnitSettingDaoImpl.KEY_ZILLOW_SOCIAL_MEDIA_TOKEN;
                 break;
 
             case CommonConstants.YELP_SOCIAL_SITE:
+                profileStage.setOrder( ProfileStages.YELP_PRF.getOrder() );
+                profileStage.setProfileStageKey( ProfileStages.YELP_PRF.name() );
                 keyToUpdate = MongoOrganizationUnitSettingDaoImpl.KEY_YELP_SOCIAL_MEDIA_TOKEN;
                 break;
 
             case CommonConstants.LENDINGTREE_SOCIAL_SITE:
+                ignore = true;
                 keyToUpdate = MongoOrganizationUnitSettingDaoImpl.KEY_LENDINGTREE_SOCIAL_MEDIA_TOKEN;
                 break;
 
             case CommonConstants.REALTOR_SOCIAL_SITE:
+                ignore = true;
                 keyToUpdate = MongoOrganizationUnitSettingDaoImpl.KEY_REALTOR_SOCIAL_MEDIA_TOKEN;
                 break;
 
@@ -501,6 +527,17 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
 
         OrganizationUnitSettings organizationUnitSettings = organizationUnitSettingsDao.removeKeyInOrganizationSettings(
             unitSettings, keyToUpdate, collectionName );
+
+        if ( !ignore ) {
+            profileStage.setStatus( CommonConstants.STATUS_ACTIVE );
+            List<ProfileStage> profileStageList = unitSettings.getProfileStages();
+            if ( !profileStageList.contains( profileStage ) ) {
+                profileStageList.add( profileStage );
+            } else {
+                profileStageList.add( profileStageList.indexOf( profileStage ), profileStage );
+            }
+            profileManagementService.updateProfileStages( profileStageList, unitSettings, collectionName );
+        }
 
         LOG.debug( "Method disconnectSocialNetwork() finished" );
 
