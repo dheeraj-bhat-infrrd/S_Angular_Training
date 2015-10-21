@@ -779,10 +779,20 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
     {
         LOG.info( "Method to find multiple users on the basis of list of user id started for user ids " + userIds );
         List<ProListUser> users = new ArrayList<ProListUser>();
-        List<AgentSettings> agentSettingsList = organizationUnitSettingsDao.fetchMultipleAgentSettingsById( userIds );
-        if ( agentSettingsList == null ) {
-            throw new InvalidInputException( "No settings found for user :" + userIds + " in getUserByUserId" );
+        List<AgentSettings> agentSettingsList = new ArrayList<AgentSettings>();
+        for ( Long id : userIds ) {
+            AgentSettings agentSettings = null;
+            try {
+                agentSettings = organizationManagementService.getAgentSettings( id );
+            } catch ( NoRecordsFetchedException e ) {
+                LOG.error( "Exception caught ", e );
+            }
+            if ( agentSettings != null ) {
+                agentSettingsList.add( agentSettings );
+            }
+
         }
+
 
         for ( AgentSettings agentSettings : agentSettingsList ) {
             ProListUser user = new ProListUser();
@@ -1271,7 +1281,7 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 
             for ( UserProfile currentProfile : userProfileList ) {
                 Branch branch = branchDao.findById( Branch.class, currentProfile.getBranchId() );
-                if(currentProfile.getStatus() == CommonConstants.STATUS_ACTIVE){
+                if ( currentProfile.getStatus() == CommonConstants.STATUS_ACTIVE ) {
                     if ( currentProfile.getProfilesMaster().getProfileId() == CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID
                         && branch.getIsDefaultBySystem() == CommonConstants.IS_DEFAULT_BY_SYSTEM_NO ) {
                         agentProfileWithoutDefaultBranch = currentProfile;
@@ -1286,7 +1296,7 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
                         companyAdminProfile = currentProfile;
                     }
                 }
-                
+
             }
 
             if ( agentProfileWithoutDefaultBranch != null ) {
@@ -1301,7 +1311,7 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
                 profileToMakePrimary = companyAdminProfile;
             }
 
-            if(profileToMakePrimary == null){
+            if ( profileToMakePrimary == null ) {
                 throw new InvalidInputException( "No user profile present for the specified userId" );
             }
             profileToMakePrimary.setIsPrimary( CommonConstants.IS_PRIMARY_TRUE );
