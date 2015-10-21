@@ -6389,7 +6389,8 @@ tr.u-tbl-header td {
 }
 
 .settings-rating-wrapper .rating-image {
-	height: 50px;
+	height: 30px;
+	margin: 10px 0;
 }
 
 .settings-rating-wrapper .rating-rounded {
@@ -6498,6 +6499,10 @@ tr.u-tbl-header td {
 .prof-details-header .social-item-icon {
 	height: 31px;
 	margin: 4px 3px;
+}
+
+.pp-social-icn .social-item-icon {
+	width: 28px;
 }
 
 .social-item-icon {
