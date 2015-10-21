@@ -14,6 +14,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
@@ -23,6 +24,7 @@ import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
+
 import com.google.gson.Gson;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.dao.OrganizationUnitSettingsDao;
@@ -78,6 +80,7 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
 
     @Autowired
     private UserDao userDao;
+
 
     @Autowired
     private UserProfileDao userProfileDao;
@@ -188,6 +191,8 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
 
         if ( survey == null ) {
             surveyDetailsDao.insertSurveyDetails( surveyDetails );
+            LOG.info( "Updating modified on column in aagent hierarchy fro agent " );
+            updateModifiedOnColumnForAgentHierachy( agentId );
             return null;
         } else {
             return survey;
@@ -200,6 +205,14 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
     public void insertSurveyDetails( SurveyDetails surveyDetails )
     {
         surveyDetailsDao.insertSurveyDetails( surveyDetails );
+        if(surveyDetails.getAgentId()  > 0l){
+            LOG.info( "Updating modified on column in aagent hierarchy fro agent " );
+            try {
+                updateModifiedOnColumnForAgentHierachy( surveyDetails.getAgentId() );
+            } catch ( InvalidInputException e ) {
+               LOG.error( "passed agent id in method updateModifiedOnColumnForAgentHierachy() is invalid" );
+            }
+        }        
     }
 
 
@@ -787,8 +800,8 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
         }
         LOG.info( "sendSurveyRestartMail() finished." );
     }
-    
-    
+
+
     @Override
     public void sendSurveyCompletionMail( String custEmail, String custFirstName, String custLastName, User user )
         throws InvalidInputException, UndeliveredEmailException, ProfileNotFoundException
@@ -903,7 +916,8 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
         }
         LOG.info( "sendSurveyCompletionMail() finished." );
     }
-    
+
+
     @Override
     public void sendSurveyCompletionUnpleasantMail( String custEmail, String custFirstName, String custLastName, User user )
         throws InvalidInputException, UndeliveredEmailException, ProfileNotFoundException
@@ -979,13 +993,14 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
             && companySettings.getMail_content().getSurvey_completion_unpleasant_mail() != null ) {
 
             MailContent surveyCompletionUnpleasant = companySettings.getMail_content().getSurvey_completion_unpleasant_mail();
-            
+
             // If Mail Body is empty redirect to survey completion mail method
-            if ( surveyCompletionUnpleasant.getMail_body() == null || surveyCompletionUnpleasant.getMail_body().trim().length() == 0 ) {
-                sendSurveyCompletionMail( custEmail, custFirstName, custLastName, user );  
+            if ( surveyCompletionUnpleasant.getMail_body() == null
+                || surveyCompletionUnpleasant.getMail_body().trim().length() == 0 ) {
+                sendSurveyCompletionMail( custEmail, custFirstName, custLastName, user );
                 return;
             }
-                
+
             String mailBody = emailFormatHelper.replaceEmailBodyWithParams( surveyCompletionUnpleasant.getMail_body(),
                 surveyCompletionUnpleasant.getParam_order() );
 
@@ -1020,7 +1035,8 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
         } else {
 
             emailServices.sendDefaultSurveyCompletionMail( custEmail,
-                emailFormatHelper.getCustomerDisplayNameForEmail( custFirstName, custLastName ), agentName, user.getEmailId(), companyName, logoUrl );
+                emailFormatHelper.getCustomerDisplayNameForEmail( custFirstName, custLastName ), agentName, user.getEmailId(),
+                companyName, logoUrl );
         }
         LOG.info( "sendSurveyCompletionUnpleasantMail() finished." );
     }
@@ -1686,6 +1702,68 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
             numOfRows );
         LOG.info( "Method getSurveysReporetedAsAbusive() to retrieve surveys marked as abusive, finished" );
         return abusiveSurveyReports;
+    }
+
+
+    @Override
+    @Transactional
+    public void updateModifiedOnColumnForAgentHierachy( long agentId ) throws InvalidInputException
+    {
+        LOG.debug( "method updateModifiedOnColumnForAgentHierachy() started" );
+        if(agentId <= 0l){
+            throw new InvalidInputException( "passend agentid is incorrect" );
+        }
+        
+        User agent = userDao.findById( User.class, agentId );
+        if(agent == null){
+            throw new InvalidInputException( "No user in db for passed userId" );
+        }
+        
+        if(agent.getCompany() == null){
+            throw new InvalidInputException( "No Company in db for passed userId" );
+        }
+        
+        long companyId = agent.getCompany().getCompanyId();
+        List<Object> branchIdList = new ArrayList<Object>();
+        List<Object> regionIdList = new ArrayList<Object>();
+        List<UserProfile> userProfiles = agent.getUserProfiles();
+        
+        for(UserProfile profile : userProfiles){
+            if(profile.getBranchId() > 0l && ! branchIdList.contains( profile.getBranchId() )){
+                branchIdList.add( profile.getBranchId() );
+            }
+            
+            if(profile.getRegionId() > 0l && ! regionIdList.contains( profile.getRegionId() )){
+                regionIdList.add( profile.getRegionId() );
+            }
+        }
+        
+        
+        if ( companyId > 0l ) {
+            organizationUnitSettingsDao.updateKeyOrganizationUnitSettingsByCriteria(
+                MongoOrganizationUnitSettingDaoImpl.KEY_MODIFIED_ON, System.currentTimeMillis(),
+                MongoOrganizationUnitSettingDaoImpl.KEY_IDENTIFIER, companyId,
+                MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION );
+        }
+
+        if ( agentId > 0l ) {
+            organizationUnitSettingsDao.updateKeyOrganizationUnitSettingsByCriteria(
+                MongoOrganizationUnitSettingDaoImpl.KEY_MODIFIED_ON, System.currentTimeMillis(),
+                MongoOrganizationUnitSettingDaoImpl.KEY_IDENTIFIER, agentId,
+                MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION );
+        }
+        
+        organizationUnitSettingsDao.updateKeyOrganizationUnitSettingsByInCriteria(
+            MongoOrganizationUnitSettingDaoImpl.KEY_MODIFIED_ON, System.currentTimeMillis(),
+            MongoOrganizationUnitSettingDaoImpl.KEY_IDENTIFIER, branchIdList,
+            MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION );
+        
+        organizationUnitSettingsDao.updateKeyOrganizationUnitSettingsByInCriteria(
+            MongoOrganizationUnitSettingDaoImpl.KEY_MODIFIED_ON, System.currentTimeMillis(),
+            MongoOrganizationUnitSettingDaoImpl.KEY_IDENTIFIER, regionIdList,
+            MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION );
+        
+        LOG.debug( "method updateModifiedOnColumnForAgentHierachy() finished" );
     }
 }
 // JIRA SS-119 by RM-05:EOC
