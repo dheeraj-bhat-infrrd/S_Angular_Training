@@ -72,16 +72,15 @@ select:focus, button:focus{
 	outline:none;
 }
 
-code {
-	color: #000;
-	background: #FFF;
-}
-
 .input-error {
 	border: 1px solid red !important;
 	margin-top: -1px !important;
 	z-index: 99999;
 	position: relative;
+}
+
+.clear-both {
+	clear: both;
 }
 
 .box-border-box {
@@ -5497,10 +5496,6 @@ tr.u-tbl-header td {
 	background: url(../images/edit_user.png) no-repeat center;
 }
 
-.v-icn-wid {
-	background: url(../images/generate_widget.png) no-repeat center;
-}
-
 .v-um-tbl-wrapper {
 	margin-top: 15px;
 	padding: 0 10px;
@@ -7609,6 +7604,7 @@ label.url-change-input-label {
 	width : 100%;
 	height : 80px;
 }
+
 .v-tbl-wid{
 	width : 4%;
 }
@@ -7638,4 +7634,32 @@ label.url-change-input-label {
 
 .widget-review-block {
 	margin-top: 10px;
+}
+
+.complaint-cont {
+	width: 500px;
+	max-width: 100%;
+	margin: 0 auto;
+}
+
+.mood-text {
+    line-height: 55px;
+    margin-top: 10px;
+    font-size: 24px;
+    font-family: 'opensanssemibold';
+}
+
+.compl-input-cont {
+	width: 300px !important;
+}
+
+.coml-checkbox-cont {
+	display: table;
+}
+
+.compl-box-txt {
+	line-height: normal;
+	display: table-cell;
+	vertical-align: middle;
+	height: 50px;
 }
