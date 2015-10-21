@@ -1659,7 +1659,7 @@ button.paypal.is-active {
 
 .social-item-icon {
 	height: 50px;
-	width: 28px;
+	width: 33px;
 	margin: 0 3px;
 	cursor: pointer;
 }
@@ -1781,35 +1781,35 @@ button.paypal.is-active {
 }
 
 .icn-fb {
-	background: url(../images/icons_social.png) no-repeat 0 center;
+	background: url(../csssprites/icons_social.png) no-repeat 0 0;
 }
 
 .icn-twit {
-	background: url(../images/icons_social.png) no-repeat -350px center;
+	background: url(../csssprites/icons_social.png) no-repeat -350px 0;
 }
 
 .icn-lin {
-	background: url(../images/icons_social.png) no-repeat -150px center;
+	background: url(../csssprites/icons_social.png) no-repeat -150px 0;
 }
 
 .icn-ss {
-	background: url(../images/smileys.png) no-repeat -120px center;
+	background: url(../csssprites/smileys.png) no-repeat -138px -19px;
 }
 
 .icn-yelp {
-	background: url(../images/icons_social.png) no-repeat -300px center;
+	background: url(../csssprites/icons_social.png) no-repeat -300px 0;
 }
 
 .icn-zillow {
-	background: url(../images/icons_social.png) no-repeat -250px center;
+	background: url(../csssprites/icons_social.png) no-repeat -250px 0;
 }
 
 .icn-lendingtree {
-	background: url(../images/icons_social.png) no-repeat -100px center;
+	background: url(../csssprites/icons_social.png) no-repeat -100px 0;
 }
 
 .icn-realtor {
-	background: url(../images/icons_social.png) no-repeat -200px center;
+	background: url(../csssprites/icons_social.png) no-repeat -200px 0;
 }
 
 .icn-tele-blue {
@@ -1817,7 +1817,7 @@ button.paypal.is-active {
 }
 
 .icn-gplus {
-	background: url(../images/icons_social.png) no-repeat -50px center;
+	background: url(../csssprites/icons_social.png) no-repeat -50px 0;
 	border:0px;
 }
 
@@ -1900,8 +1900,9 @@ button.paypal.is-active {
 
 .ppl-share-icns {
 	cursor: pointer;
+	margin-top: 3px;
 	margin-right: 5px;
-	height: 36px;
+	height: 28px;
 	width: 28px;
 }
 
@@ -2741,7 +2742,7 @@ button.paypal.is-active {
 	cursor: pointer;
 	width: 62px;
 	height: 62px;
-	background: url(../images/sq-star.png) no-repeat center;
+	background: url(../csssprites/smileys.png) no-repeat -206px -66px;
 }
 
 .sq-smile-icn-wrapper {
@@ -2805,46 +2806,30 @@ button.paypal.is-active {
 }
 
 .sq-smile {
+	float: left;
+	cursor: pointer;
+	width: 62px;
+	height: 62px;
 }
 
 .sq-smile-1 {
-	float: left;
-	cursor: pointer;
-	width: 62px;
-	height: 62px;
-	background: url(../images/smiley-bg-rat-1.png) no-repeat center;
+	background: url(../csssprites/smileys.png) no-repeat -227px -150px;
 }
 
 .sq-smile-2 {
-	float: left;
-	cursor: pointer;
-	width: 62px;
-	height: 62px;
-	background: url(../images/smiley-bg-rat-2.png) no-repeat center;
+	background: url(../csssprites/smileys.png) no-repeat -170px -150px;
 }
 
 .sq-smile-3 {
-	float: left;
-	cursor: pointer;
-	width: 62px;
-	height: 62px;
-	background: url(../images/smiley-bg-rat-3.png) no-repeat center;
+	background: url(../csssprites/smileys.png) no-repeat -112px -150px;
 }
 
 .sq-smile-4 {
-	float: left;
-	cursor: pointer;
-	width: 62px;
-	height: 62px;
-	background: url(../images/smiley-bg-rat-4.png) no-repeat center;
+	background: url(../csssprites/smileys.png) no-repeat -54px -150px;
 }
 
 .sq-smile-5 {
-	float: left;
-	cursor: pointer;
-	width: 62px;
-	height: 62px;
-	background: url(../images/smiley-bg-rat-5.png) no-repeat center;
+	background: url(../csssprites/smileys.png) no-repeat 0px -150px;
 }
 
 .sq-full-smile {
@@ -5732,7 +5717,7 @@ tr.u-tbl-header td {
 
 .soc-nw-icns {
 	margin-bottom: 10px;
-	width: 180px;
+	width: 182px;
 	height: 30px;
 	background-color: #f1f1f1;
 }
@@ -5746,39 +5731,39 @@ tr.u-tbl-header td {
 }
 
 .icn-wide-fb {
-	background: url(../images/fb_wide.png) no-repeat center;
+	background: url(../csssprites/social_wide.png) no-repeat -5px -282px;
 }
 
 .icn-wide-gplus {
-	background: url(../images/gPlus_wide.png) no-repeat center;
+	background: url(../csssprites/social_wide.png) no-repeat  -5px -325px;
 }
 
 .icn-wide-twitter {
-	background: url(../images/twiter_wide.png) no-repeat center;
+	background: url(../csssprites/social_wide.png) no-repeat -5px -107px;
 }
 
 .icn-wide-rss {
-	background: url(../images/rss_wide.png) no-repeat center;
+	background: url(../csssprites/social_wide.png) no-repeat -5px -63px;
 }
 
 .icn-wide-zillow {
-	background: url(../images/zillow_wide.png) no-repeat center;
+	background: url(../csssprites/social_wide.png) no-repeat -5px -194px;
 }
 
 .icn-wide-linkedin {
-	background: url(../images/linkedin_wide.png) no-repeat center;
+	background: url(../csssprites/social_wide.png) no-repeat -5px -238px;
 }
 
 .icn-wide-yelp {
-	background: url(../images/yelp_wide.png) no-repeat center;
+	background: url(../csssprites/social_wide.png) no-repeat -5px -150px;
 }
 
 .icn-wide-lendingtree {
-	background: url(../images/lendingtree_wide.png) no-repeat center;
+	background: url(../csssprites/social_wide.png) no-repeat -5px -369px;
 }
 
 .icn-wide-realtor {
-	background: url(../images/realtor_wide.png) no-repeat center;
+	background: url(../csssprites/social_wide.png) no-repeat -5px -19px;
 }
 
 .dd-arrow-dn {
@@ -6181,13 +6166,11 @@ tr.u-tbl-header td {
 }
 
 .bd-ans-smiley {
-	background: url(../images/smiley.png) no-repeat center;
-	background-size: auto 100%;
+	background: url(../csssprites/smileys.png) no-repeat -132px -219px;
 }
 
 .bd-ans-star {
-	background: url(../images/stars.png) no-repeat center;
-	background-size: auto 100%;
+	background: url(../csssprites/smileys.png) no-repeat 10px -219px;
 }
 
 .bd-ans-scale {
@@ -6406,7 +6389,8 @@ tr.u-tbl-header td {
 }
 
 .settings-rating-wrapper .rating-image {
-	height: 50px;
+	height: 30px;
+	margin: 10px 0;
 }
 
 .settings-rating-wrapper .rating-rounded {
@@ -6414,23 +6398,23 @@ tr.u-tbl-header td {
 }
 
 .smiley-rat-1{
-	background: url(../images/smileys.png) no-repeat 0 center;
+	background: url(../csssprites/smileys.png) no-repeat -15px -19px;
 }
 
 .smiley-rat-2{
-	background: url(../images/smileys.png) no-repeat -30px center;
+	background: url(../csssprites/smileys.png) no-repeat -45px -19px;
 }
 
 .smiley-rat-3{
-	background: url(../images/smileys.png) no-repeat -60px center;
+	background: url(../csssprites/smileys.png) no-repeat -76px -19px;
 }
 
 .smiley-rat-4{
-	background: url(../images/smileys.png) no-repeat -90px center;
+	background: url(../csssprites/smileys.png) no-repeat -106px -19px;
 }
 
 .smiley-rat-5{
-	background: url(../images/smileys.png) no-repeat -120px center;
+	background: url(../csssprites/smileys.png) no-repeat -138px -19px;
 }
 
 .smiley-bg-rat-1{
@@ -6512,8 +6496,21 @@ tr.u-tbl-header td {
 	padding-left: 30px;
 }
 
-.prof-details-header .social-item-icon{
-	height: 40px;
+.prof-details-header .social-item-icon {
+	height: 31px;
+	margin: 4px 3px;
+}
+
+.pp-social-icn .social-item-icon {
+	width: 28px;
+}
+
+.social-item-icon {
+	background-position-y: 3px;
+}
+
+.icn-social-add {
+    background-position-y: -38px;
 }
 
 .lp-input-cont {

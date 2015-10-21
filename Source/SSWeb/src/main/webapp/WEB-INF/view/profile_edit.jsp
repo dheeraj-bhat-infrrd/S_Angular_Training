@@ -23,12 +23,22 @@
 	<c:set value="${contactdetail.web_addresses}" var="webAddresses"></c:set>
 </c:if>
 <c:if test="${not empty socialMediaTokens}">
-	<c:set value="${socialMediaTokens.facebookToken}" var="facebookToken"></c:set>
-	<c:set value="${socialMediaTokens.twitterToken}" var="twitterToken"></c:set>
-	<c:set value="${socialMediaTokens.linkedInToken}" var="linkedInToken"></c:set>
-	<c:set value="${socialMediaTokens.googleToken}" var="googleToken"></c:set>
+	<c:if test="${not empty socialMediaTokens.facebookToken && not empty socialMediaTokens.facebookToken.facebookPageLink}">
+		<c:set value="${socialMediaTokens.facebookToken.facebookPageLink}" var="fbLink"></c:set>
+	</c:if>
+	<c:if test="${not empty socialMediaTokens.twitterToken && not empty socialMediaTokens.twitterToken.twitterPageLink}">
+		<c:set value="${socialMediaTokens.twitterToken.twitterPageLink}" var="twtLink"></c:set>
+	</c:if>
+	<c:if test="${not empty socialMediaTokens.linkedInToken && not empty socialMediaTokens.linkedInToken.linkedInPageLink}">
+		<c:set value="${socialMediaTokens.linkedInToken.linkedInPageLink}" var="lnLink"></c:set>
+	</c:if>
+	<c:if test="${not empty socialMediaTokens.googleToken && not empty socialMediaTokens.googleToken.profileLink}">
+		<c:set value="${socialMediaTokens.googleToken.profileLink}" var="googleLink"></c:set>
+	</c:if>
+	<c:if test="${not empty socialMediaTokens.zillowToken && not empty socialMediaTokens.zillowToken.zillowProfileLink}">
+		<c:set value="${socialMediaTokens.zillowToken.zillowProfileLink}" var="zillowLink"></c:set>
+	</c:if>
 	<c:set value="${socialMediaTokens.yelpToken}" var="yelpToken"></c:set>
-	<c:set value="${socialMediaTokens.zillowToken}" var="zillowToken"></c:set>
 	<c:set value="${socialMediaTokens.lendingTreeToken}" var="lendingTreeToken"></c:set>
 	<c:set value="${socialMediaTokens.realtorToken}" var="realtorToken"></c:set>
 </c:if>
@@ -96,34 +106,6 @@
 			<div class="float-left hm-header-row-left hm-header-row-left-edit-pr"><spring:message code="label.profileheader.key" /></div>
 			<!-- Add user assignment dropdown -->
 			<jsp:include page="user_assignment_dropdown.jsp"></jsp:include>
-			<%-- <c:if test="${not empty assignments}">
-				<div id="pe-dd-wrapper" class="float-right header-right clearfix hr-dsh-adj-rt hdr-prof-sel">
-					<div class="float-left hr-txt1"><spring:message code="label.viewas.key" /></div>
-					<div id="profile-sel" class="float-left hr-txt2 cursor-pointer">${entityName}</div>
-					<div id="pe-dd-wrapper-profiles" class="va-dd-wrapper hide">
-						<c:forEach var="company" items="${assignments.companies}">
-							<div class="pe-dd-item" data-column-type="companyId"
-								data-column-name="${company.value}"
-								data-column-value="${company.key}">${company.value}</div>
-						</c:forEach>
-						<c:forEach var="region" items="${assignments.regions}">
-							<div class="pe-dd-item" data-column-type="regionId" 
-								data-column-name="${region.value}"
-								data-column-value="${region.key}">${region.value}</div>
-						</c:forEach>
-						<c:forEach var="branch" items="${assignments.branches}">
-							<div class="pe-dd-item" data-column-type="branchId"
-								data-column-name="${branch.value}"
-								data-column-value="${branch.key}">${branch.value}</div>
-						</c:forEach>
-						<c:forEach var="agent" items="${assignments.agents}">
-							<div class="pe-dd-item" data-column-type="agentId"
-								data-column-name="${agent.value}"
-								data-column-value="${agent.key}">${agent.value}</div>
-						</c:forEach>
-					</div>
-				</div>
-			</c:if> --%>
 		</div>
 	</div>
 </div>
@@ -177,18 +159,14 @@
 
 					<c:if test="${accountMasterId != 5}">
 						<div id="prof-edit-social-link" class="prof-edit-social-link float-right hm-hr-row-right clearfix">
-							<%-- <div id="icn-fb" class="float-left social-item-icon icn-fb" data-link="${facebookToken.facebookPageLink}" title="Facebook"></div>
-							<div id="icn-twit" class="float-left social-item-icon icn-twit" data-link="${twitterToken.twitterPageLink}" title="Twitter"></div>
-							<div id="icn-lin" class="float-left social-item-icon icn-lin" data-link="${linkedInToken.linkedInPageLink}" title="LinkedIn"></div>
-                            <div id="icn-gplus" class="float-left social-item-icon icn-gplus" data-link="${googleToken.profileLink}" title="Google+"></div> --%>
-							<div id="icn-fb" class="float-left social-item-icon icn-fb" onclick="openAuthPage('facebook');" title="Facebook"></div>
-							<div id="icn-twit" class="float-left social-item-icon icn-twit" onclick="openAuthPage('twitter');" title="Twitter"></div>
-							<div id="icn-lin" class="float-left social-item-icon icn-lin" onclick="openAuthPage('linkedin');" title="LinkedIn"></div>
-                            <div id="icn-gplus" class="float-left social-item-icon icn-gplus" onclick="openAuthPage('google');" title="Google+"></div>
-							<div id="icn-yelp" class="float-left social-item-icon icn-yelp" data-link="${yelpToken.yelpPageLink}" title="Yelp"></div>
-							<div id="icn-zillow" class="float-left social-item-icon icn-zillow" title="Zillow" onclick="openAuthPage('zillow');"></div>
-							<div id="icn-lendingtree" class="float-left social-item-icon icn-lendingtree" data-link="${lendingTreeToken.lendingTreeProfileLink}" title="LendingTree"></div>
-							<div id="icn-realtor" class="float-left social-item-icon icn-realtor" data-link="${realtorToken.realtorProfileLink}" title="Realtor"></div>
+							<div id="icn-fb" class="float-left social-item-icon icn-fb" data-source="facebook" data-link="${fbLink}" onclick="openAuthPage('facebook');" title="Facebook"></div>
+							<div id="icn-twit" class="float-left social-item-icon icn-twit" data-source="twitter" data-link="${twtLink}" onclick="openAuthPage('twitter');" title="Twitter"></div>
+							<div id="icn-lin" class="float-left social-item-icon icn-lin" data-source="linkedin" data-link="${lnLink}" onclick="openAuthPage('linkedin');" title="LinkedIn"></div>
+                            <div id="icn-gplus" class="float-left social-item-icon icn-gplus" data-source="google" data-link="${googleLink}" onclick="openAuthPage('google');" title="Google+"></div>
+							<div id="icn-yelp" class="float-left social-item-icon icn-yelp" data-source="yelp" data-link="${yelpToken.yelpPageLink}" title="Yelp"></div>
+							<div id="icn-zillow" class="float-left social-item-icon icn-zillow" data-source="zillow" title="Zillow" data-link="${zillowLink}" onclick="openAuthPage('zillow');"></div>
+							<div id="icn-lendingtree" class="float-left social-item-icon icn-lendingtree" data-source="lendingtree" data-link="${lendingTreeToken.lendingTreeProfileLink}" title="LendingTree"></div>
+							<div id="icn-realtor" class="float-left social-item-icon icn-realtor" data-source="realtor" data-link="${realtorToken.realtorProfileLink}" title="Realtor"></div>
 							<input id="social-token-text" type="text" class="social-token-text hide"
 								placeholder='<spring:message code="label.socialpage.placeholder.key"/>'>
 						</div>
@@ -648,4 +626,12 @@
 				}
 			});
 	};
+	
+	$('#prof-edit-social-link').children('.social-item-icon').each(function() {
+		var dataLink = $(this).attr('data-link');
+		if(dataLink == undefined || dataLink == "") {
+			$(this).addClass('icn-social-add');
+		}
+	});
+	
 </script>

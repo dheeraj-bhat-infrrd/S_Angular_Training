@@ -7106,7 +7106,7 @@ function updateYelpLink(link) {
 	};
 	if (isValidUrl(link)) {
 		callAjaxPostWithPayloadData("./updateyelplink.do", callBackUpdateSocialLink, payload);
-        $('#icn-yelp').attr("data-link", link);
+		showProfileLinkInEditProfilePage("yelp", link);
 	} else {
 		$('#overlay-toast').html("Enter a valid url");
 		showToast();
@@ -7124,7 +7124,7 @@ function updateYelpLink(link) {
 	$('#social-token-text').val(link);
 });*/
 
-function updateZillowLink(link) {
+/*function updateZillowLink(link) {
 	var payload = {
 		"zillowlink" : link
 	};
@@ -7135,7 +7135,7 @@ function updateZillowLink(link) {
 		$('#overlay-toast').html("Enter a valid url");
 		showToast();
 	}
-}
+}*/
 
 // Update Social links - lendingTree
 $('body').on('click', '#prof-edit-social-link .icn-lendingtree', function() {
@@ -7154,7 +7154,7 @@ function updateLendingTreeLink(link) {
 	};
 	if (isValidUrl(link)) {
 		callAjaxPostWithPayloadData("./updatelendingtreelink.do", callBackUpdateSocialLink, payload);
-        $('#icn-lendingtree').attr("data-link", link);
+		showProfileLinkInEditProfilePage("lendingtree", link);
 	} else {
 		$('#overlay-toast').html("Enter a valid url");
 		showToast();
@@ -7177,7 +7177,7 @@ function updateRealtorLink(link) {
 	};
 	if (isValidUrl(link)) {
 		callAjaxPostWithPayloadData("./updateRealtorlink.do", callBackUpdateSocialLink, payload);
-        $('#icn-realtor').attr("data-link", link);
+		showProfileLinkInEditProfilePage("realtor", link);
 	} else {
 		$('#overlay-toast').html("Enter a valid url");
 		showToast();
@@ -7188,7 +7188,6 @@ function callBackUpdateSocialLink(data) {
 	$('#prof-message-header').html(data);
 	$('#overlay-toast').html($('#display-msg-div').text().trim());
 	showToast();
-	
 	$('#social-token-text').val('');
 }
 
@@ -8561,18 +8560,8 @@ function disconnectSocialMedia(socialMedia) {
 
 
 function showProfileLinkInEditProfilePage(source, profileUrl){
-	if(source=='facebook'){
-		$('#edt-prof-fb-lnk').html(profileUrl);
-	}
-	else if(source=='twitter'){
-		$('#edt-prof-twt-lnk').html(profileUrl);
-	}
-	else if(source=='linkedin'){
-		$('#edt-prof-linkedin-lnk').html(profileUrl);
-	}
-	else if(source=='google'){
-		$('#edt-prof-ggl-lnk').html(profileUrl);
-	}
+	$('.social-item-icon[data-source="' + source + '"').attr('data-link',
+			profileUrl).removeClass('icn-social-add');
 }
 
 // Send Survey Agent
