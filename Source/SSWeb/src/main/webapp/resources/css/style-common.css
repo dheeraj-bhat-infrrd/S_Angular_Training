@@ -1659,7 +1659,7 @@ button.paypal.is-active {
 
 .social-item-icon {
 	height: 50px;
-	width: 28px;
+	width: 33px;
 	margin: 0 3px;
 	cursor: pointer;
 }
@@ -6496,8 +6496,16 @@ tr.u-tbl-header td {
 }
 
 .prof-details-header .social-item-icon {
-	height: 28px;
-	margin: 6px 3px;
+	height: 31px;
+	margin: 4px 3px;
+}
+
+.social-item-icon {
+	background-position-y: 3px;
+}
+
+.icn-social-add {
+    background-position-y: -38px;
 }
 
 .lp-input-cont {
