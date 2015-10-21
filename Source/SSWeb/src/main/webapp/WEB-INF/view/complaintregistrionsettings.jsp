@@ -30,10 +30,10 @@
 				<div class="bd-hr-form-item clearfix">
 					<div class="float-left bd-frm-left"><spring:message code="label.complaintreg.mail.text" /></div>
 					<div class="float-left bd-frm-right"><input class="bd-frm-rt-txt" type="text" name="mailId"
-						value="${complaintRegSettings.mailId}"></div>
+						id="comp-mailId" value="${complaintRegSettings.mailId}"></div>
 				</div>
 				<div class="coml-checkbox-cont clearfix">
-					<input type="checkbox" name="enabled" value="enable" class="hide">
+					<input id="comp-enabled" type="checkbox" name="enabled" value="enable" class="hide">
 					<div class="float-left">
 						<div id="compl-checkbox" class="bd-check-img bd-check-img-checked float-right compl-checkbox"></div>
 					</div>
@@ -67,10 +67,6 @@
 						</div>
 					</div>
 					
-					<div class="mood-text">
-						<spring:message code="label.complaintreg.or.text" />
-					</div>
-				
 					<div class="sq-smile-icn-container compl-input-cont opacity-red" data-mood="ok">
 						<div id="neutral-smile" class="sq-smile-icn-wrapper sq-neutral-smile"></div>
 						<div class="sq-smile-icn-text sq-smile-neutral-text float-left">
@@ -78,7 +74,7 @@
 						</div>
 					</div>
 				</div>
-				<input type="hidden" id="survey-mood" name="mood"/> 
+				<input type="hidden" id="comp-mood" name="mood"/> 
 				<div id="comp-reg-form-submit" class="bd-btn-save cursor-pointer">Save</div>
 			</form>
 		</div>
@@ -106,42 +102,47 @@
 
 <script>
 	$(document).ready(function() {
+		$(document).attr("title", "Complaint Registration Settings");
+		
 		autoAppendRatingDropdown('#st-dd-wrapper-min-post',
 				"st-dd-item st-dd-item-min-post", 5, 0, 0.5);
 		$('#comp-rating-post').off('click');
 		$('#comp-rating-post').on('click', function() {
+			if(!$('input[name="enabled"]').prop( "checked" ))
+				return false;
 			$('#st-dd-wrapper-min-post').slideToggle(200);
 		});
 		$('.sq-smile-icn-container').off('click');
 		$('.sq-smile-icn-container').on('click', function() {
+			if(!$('input[name="enabled"]').prop( "checked" ))
+				return false;
 			var mood = $(this).attr("data-mood");
-			var currentMood = $('#survey-mood').val();
+			var currentMood = $('#comp-mood').val();
 			
 			//check for toggle state
 			
 			//set the mood
 			if($(this).hasClass('opacity-red')) {
-				$('#survey-mood').val(mood);
+				$('#comp-mood').val(mood);
 				if(mood.toLowerCase() == "ok") {
 					$('.sq-smile-icn-container').removeClass('opacity-red');
 				} else if (mood.toLowerCase() == "unpleasant") {
 					$(this).removeClass('opacity-red');
 				}
 			} else {
-				$('#survey-mood').val('');
+				$('#comp-mood').val('');
 				
 				if(mood.toLowerCase() == "ok") {
 					$('.sq-smile-icn-container').addClass('opacity-red');
 				} else if (mood.toLowerCase() == "unpleasant") {
 					if(currentMood == "ok") {
 						$('.sq-smile-icn-container[data-mood="ok"]').addClass('opacity-red');
-						$('#survey-mood').val(mood);
+						$('#comp-mood').val(mood);
 					} else if(currentMood == "unpleasant"){
 						$(this).addClass('opacity-red');
 					}
 				}
 			}
 		});
-		
 	});
 </script>

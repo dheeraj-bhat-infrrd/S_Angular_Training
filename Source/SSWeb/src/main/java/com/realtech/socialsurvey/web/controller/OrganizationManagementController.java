@@ -2126,6 +2126,34 @@ public class OrganizationManagementController
                 isComplaintHandlingEnabled = false;
             } else if ( enabled.equalsIgnoreCase( "enable" ) )
                 isComplaintHandlingEnabled = true;
+            
+            if ( mailId == null || mailId.isEmpty() ) {
+                throw new InvalidInputException( "Mail Id(s) of Complaint Handler(s) is null",
+                    DisplayMessageConstants.GENERAL_ERROR );
+            }
+            
+            if ( !mailId.contains( "," ) ) {
+                if ( !organizationManagementService.validateEmail( mailId ) )
+                    throw new InvalidInputException( "Mail id - " + mailId + " entered as send alert to input is invalid",
+                        DisplayMessageConstants.GENERAL_ERROR );
+                else
+                    mailIDStr = mailId;
+            } else {
+                String mailIds[] = mailId.split( "," );
+                
+                if(mailIds.length == 0)
+                    throw new InvalidInputException( "Mail id - " + mailId + " entered as send alert to input is empty",
+                    DisplayMessageConstants.GENERAL_ERROR );
+                
+                for ( String mailID : mailIds ) {
+                    if ( !organizationManagementService.validateEmail( mailID.trim() ) )
+                        throw new InvalidInputException( "Mail id - " + mailID + " entered amongst the mail ids as send alert to input is invalid",
+                            DisplayMessageConstants.GENERAL_ERROR );
+                    else
+                        mailIDStr += mailID.trim() + " , ";
+                }
+                mailIDStr = mailIDStr.substring( 0, mailIDStr.length() - 2 );
+            }
 
             long entityId = (long) session.getAttribute( CommonConstants.ENTITY_ID_COLUMN );
             
@@ -2135,34 +2163,6 @@ public class OrganizationManagementController
                 originalComplaintRegSettings = unitSettings.getSurvey_settings().getComplaint_reg_settings();
 
             if ( isComplaintHandlingEnabled ) {
-                if ( mailId == null || mailId.isEmpty() ) {
-                    throw new InvalidInputException( "Mail Id(s) of Complaint Handler(s) is null",
-                        DisplayMessageConstants.GENERAL_ERROR );
-                }
-
-                if ( !mailId.contains( "," ) ) {
-                    if ( !organizationManagementService.validateEmail( mailId ) )
-                        throw new InvalidInputException( "Mail id - " + mailId + " entered as send alert to input is invalid",
-                            DisplayMessageConstants.GENERAL_ERROR );
-                    else
-                        mailIDStr = mailId;
-                } else {
-                    String mailIds[] = mailId.split( "," );
-                    
-                    if(mailIds.length == 0)
-                        throw new InvalidInputException( "Mail id - " + mailId + " entered as send alert to input is empty",
-                        DisplayMessageConstants.GENERAL_ERROR );
-                    
-                    for ( String mailID : mailIds ) {
-                        if ( !organizationManagementService.validateEmail( mailID.trim() ) )
-                            throw new InvalidInputException( "Mail id - " + mailID + " entered amongst the mail ids as send alert to input is invalid",
-                                DisplayMessageConstants.GENERAL_ERROR );
-                        else
-                            mailIDStr += mailID.trim() + " , ";
-                    }
-                    mailIDStr = mailIDStr.substring( 0, mailIDStr.length() - 2 );
-                }
-
                 if ( ( ratingText == null || ratingText.isEmpty() ) && ( moodText == null || moodText.isEmpty() ) ) {
                     throw new InvalidInputException( "Please select a Rating value and Review Mood selected.", DisplayMessageConstants.GENERAL_ERROR );
                 }
@@ -2179,9 +2179,12 @@ public class OrganizationManagementController
 
                 originalComplaintRegSettings.setRating( (float) rating );
                 originalComplaintRegSettings.setMood( moodText );
-                originalComplaintRegSettings.setMailId( mailId );
+                
             }
-
+            
+            if( !isComplaintHandlingEnabled )
+                originalComplaintRegSettings.setRating( 0 );
+            originalComplaintRegSettings.setMailId( mailId );
             originalComplaintRegSettings.setEnabled( isComplaintHandlingEnabled );
             unitSettings.getSurvey_settings().setComplaint_reg_settings( originalComplaintRegSettings );
             
