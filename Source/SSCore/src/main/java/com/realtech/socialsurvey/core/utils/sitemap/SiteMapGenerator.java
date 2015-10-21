@@ -77,8 +77,8 @@ public class SiteMapGenerator implements Runnable {
 					LOG.debug("Getting sitemap content for company");
 					companyFetcher.setInterval(DAILY_CONTENT);
 					companyFetcher.setCollectionName(MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION);
-					companyFetcher.setPriority( COMPANY_PRIORITY );
-					companyFetcher.setChangeFrequency( COMPANY_FREQUENCY );
+					//companyFetcher.setPriority( COMPANY_PRIORITY );
+					//companyFetcher.setChangeFrequency( COMPANY_FREQUENCY );
 					SiteMapWriter siteMapWriter = new SiteMapWriter(companySiteMapPath, companyFetcher);
 					siteMapWriter.writeSiteMap();
 				}
@@ -88,8 +88,8 @@ public class SiteMapGenerator implements Runnable {
 					LOG.debug("Getting sitemap content for region");
 					regionFetcher.setInterval(DAILY_CONTENT);
 					regionFetcher.setCollectionName(MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION);
-					regionFetcher.setPriority( REGION_PRIORITY );
-					regionFetcher.setChangeFrequency( REGION_FREQUENCY );
+					//regionFetcher.setPriority( REGION_PRIORITY );
+					//regionFetcher.setChangeFrequency( REGION_FREQUENCY );
 					SiteMapWriter siteMapWriter = new SiteMapWriter(regionSiteMapPath, regionFetcher);
 					siteMapWriter.writeSiteMap();
 				}
@@ -99,8 +99,8 @@ public class SiteMapGenerator implements Runnable {
 					LOG.debug("Getting sitemap content for branches");
 					branchFetcher.setInterval(DAILY_CONTENT);
 					branchFetcher.setCollectionName(MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION);
-					branchFetcher.setPriority( BRANCH_PRIORITY );
-					branchFetcher.setChangeFrequency( BRANCH_FREQUENCY );
+					//branchFetcher.setPriority( BRANCH_PRIORITY );
+					//branchFetcher.setChangeFrequency( BRANCH_FREQUENCY );
 					SiteMapWriter siteMapWriter = new SiteMapWriter(branchSiteMapPath, branchFetcher);
 					siteMapWriter.writeSiteMap();
 				}
@@ -110,8 +110,8 @@ public class SiteMapGenerator implements Runnable {
 					LOG.debug("Getting sitemap content for agents");
 					agentFetcher.setInterval(DAILY_CONTENT);
 					agentFetcher.setCollectionName(MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION);
-					agentFetcher.setPriority( INDIVIDUAL_PRIORITY );
-					agentFetcher.setChangeFrequency( INDIVIDUAL_FREQUENCY );
+					//agentFetcher.setPriority( INDIVIDUAL_PRIORITY );
+					//agentFetcher.setChangeFrequency( INDIVIDUAL_FREQUENCY );
 					SiteMapWriter siteMapWriter = new SiteMapWriter(individualSiteMapPath, agentFetcher);
 					siteMapWriter.writeSiteMap();
 				}
