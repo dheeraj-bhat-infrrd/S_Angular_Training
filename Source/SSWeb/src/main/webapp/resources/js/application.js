@@ -3251,6 +3251,15 @@ function autoAppendRatingDropdown(ratingId, classes) {
 	autoAppendDropdown(ratingId, classes, 5, 0.5);
 }
 
+//Ratings Settings
+function autoAppendRatingDropdownComplaint(ratingId, classes, maxPoint, minPoint, diff) {
+	var value = diff;
+	while (maxPoint >= minPoint) {
+		$(ratingId).append($('<div/>').addClass(classes).text(maxPoint));
+		maxPoint -= diff;
+	}
+}
+
 function updatePostScore(formid) {
 	var url = "./updatesurveysettings.do";
 	callAjaxFormSubmit(url, updatePostScoreCallBack, formid);
@@ -8564,6 +8573,21 @@ function showProfileLinkInEditProfilePage(source, profileUrl){
 			profileUrl).removeClass('icn-social-add');
 }
 
+function showSurveysUnderResolution(startIndexCmp, batchSizeCmp){
+	var payload = {
+			"startIndex" : startIndexCmp,
+			"batchSize" : batchSizeCmp
+		};
+		callAjaxGetWithPayloadData("./fetchsurveysunderresolution.do", function(data) {
+			if (startIndexCmp == 0)
+				$('#sur-under-res-list').html(data);
+			else
+				$('#sur-under-res-list').append(data);
+			
+			startIndexCmp += batchSizeCmp;
+		}, payload, false);
+}
+
 // Send Survey Agent
 $(document).on('input', '#wc-review-table-inner[data-role="agent"] input', function() {
 	var parentDiv = $(this).parent().parent();
@@ -8831,6 +8855,13 @@ $('body').on('click','.st-dd-item-auto-post',function() {
 });
 
 $('body').on('click','.st-dd-item-min-post',function() {
+	var pageHash = window.location.hash;
+	if(pageHash.toLowerCase() == "#showcomplaintregsettings") {
+		$('#comp-rating-post').val($(this).html());
+		$('#st-dd-wrapper-min-post').slideToggle(200);
+		return;
+	}
+	
 	$('#rating-min-post').val($(this).html());
 	$('#st-dd-wrapper-min-post').slideToggle(200);
 	
@@ -9070,3 +9101,26 @@ function getImageandCaptionProfile(loop) {
 	}
 
 }
+
+//complaint registration event binding
+$(document).on('click','#comp-reg-form-submit',function(){
+	if(validateComplaintRegistraionForm()) {
+		var formData = $('#comp-reg-form').serialize();
+		callAjaxPostWithPayloadData("/updatecomplaintregsettings.do", function(data){
+			$('#overlay-toast').html(data);
+			showToast();
+		}, formData,  true );
+	}
+});
+
+$(document).on('click touchstart','#compl-checkbox', function() {
+	if($(this).hasClass('bd-check-img-checked')) {
+		if(validateMultipleEmailIds('comp-mailId')) {
+			$(this).removeClass('bd-check-img-checked');
+			$('input[name="enabled"]').prop( "checked" , true);
+		}
+	} else {
+			$(this).addClass('bd-check-img-checked');
+			$('input[name="enabled"]').prop( "checked" , false);
+	}
+});
