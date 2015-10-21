@@ -68,7 +68,7 @@
 						 <span
 							class="float-left ppl-share-icns icn-lin" title="LinkedIn"
 							data-link="https://www.linkedin.com/shareArticle?mini=true&url=${feedback.completeProfileUrl} &title=&summary=<fmt:formatNumber type="number" pattern="${ scoreformat }" value="${feedback.score}" />-star response from ${ customerDisplayName } for ${feedback.agentName} at SocialSurvey - ${feedback.review} + &source="></span>
-                        <span class="float-left ppl-share-icns icn-gplus" title="Google+">
+                        <span class="float-left" title="Google+">
                         <button 
                             class="g-interactivepost float-left ppl-share-icns icn-gplus"
                             data-contenturl="${feedback.completeProfileUrl}"
