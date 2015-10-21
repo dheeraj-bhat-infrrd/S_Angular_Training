@@ -78,13 +78,13 @@
 					<div class="rating-star icn-no-star"></div>
 				</div>
 			</div>
-			<div class="float-left">
+			<div class="float-left widget-review-score">
 				<span id="rating">${floatingAverageRating}</span>
 			</div>
 		</div>
 	</div>
-	<div class="clearfix">
-		<div class="float-left review-count-left cursor-pointer"
+	<div class="clearfix widget-review-block">
+		<div class="float-left review-count-left"
 			id="prof-company-review-count">
 			<span>${reviewsCount}</span> Review(s)
 		</div>
@@ -92,13 +92,13 @@
 			<c:choose>
 				<c:when test="${profileLevel == 'INDIVIDUAL'}">
 					<a href="/rest/survey/showsurveypage/${profile.iden}"
-						target="_blank"><span class="prof-btn-survey float-left"
+						target="_blank"><span class="prof-btn-survey float-right widget-survey-btn"
 						id="read-write-share-btn">Write a Review</span></a>
 				</c:when>
 				<c:otherwise>
 					<a
 						href="/initfindapro.do?profileLevel=${profileLevel}&iden=${profile.iden}&searchCriteria=${profile.contact_details.name}"
-						target="_blank"><span class="prof-btn-survey float-left">Write
+						target="_blank"><span class="prof-btn-survey float-left widget-survey-btn">Write
 							a Review</span></a>
 				</c:otherwise>
 			</c:choose>
@@ -107,8 +107,8 @@
 
 	<c:if test="${not empty surveys}">
 		<div class="reviews">
-			<c:forEach items="${surveys }" var="reviewItem">
-				<div class="review-item">
+			<c:forEach items="${ surveys }" var="reviewItem" varStatus="loop">
+				<div class="review-item" id="review-item-${ loop.index }">
 					<c:choose>
 						<c:when test="${not empty reviewItem.customerLastName }">
 							<c:set
@@ -120,8 +120,8 @@
 						</c:otherwise>
 					</c:choose>
 					<div class="review-author">${author}</div>
-					<div class="review-date"><fmt:formatDate value="${reviewItem.modifiedOn}" pattern="M dd, yyyyy"/></div>
-					<div class="review-body">${reviewItem.review}</div>
+					<div class="review-date"><fmt:formatDate value="${reviewItem.modifiedOn}" pattern="MMMM d, yyyy"/></div>
+					<div class="review-body review-widget" id="review-${ loop.index }">${reviewItem.review}</div>
 				</div>
 			</c:forEach>
 		</div>
@@ -132,25 +132,45 @@
 	<script type="text/javascript">
 		function changeWidgetRatingPattern(rating, ratingParent) {
 			var counter = 0;
+			var integerRating = parseInt(rating * 2);
 			ratingParent.children().each(function() {
-				$(this).addClass("icn-no-star");
-				$(this).removeClass("icn-half-star");
-				$(this).removeClass("icn-full-star");
-
-				if (rating >= counter) {
-					if (rating - counter >= 1) {
+			
+				if (integerRating >= counter) {
+					if (integerRating - counter >= 2) {
 						$(this).removeClass("icn-no-star");
 						$(this).addClass("icn-full-star");
-					} else if (rating - counter == 0.5) {
+					} else if (integerRating - counter == 1) {
 						$(this).removeClass("icn-no-star");
 						$(this).addClass("icn-half-star");
 					}
 				}
-				counter++;
+				counter += 2;
 			});
 		}
 		var rating = document.getElementById("rating").innerText;
 		changeWidgetRatingPattern(rating, $('#wdg-rating-cont'));
+		$('.review-item').each(function(i){
+			var container = document.getElementById("review-" + i);
+			if(container.scrollHeight > container.offsetHeight){
+				$("#review-item-" + i).append('<span class=\"review-more-button review-more-wid\" data-index=\"'+i+'\" \'>More</span>');
+				$("#review-item-" + i).append('<span class=\"review-more-button review-less-wid\" data-index=\"'+i+'\" \'>Less</span>');
+				$(".review-less-wid").hide();
+			}
+		});
+		$(".review-more-wid").click(function(e){
+			e.stopPropagation();
+			var index = $(this).data("index");
+			$(this).hide();
+			$("#review-"+index).removeClass('review-widget');
+			$(this).parent().find(".review-less-wid").show();
+		});
+		$(".review-less-wid").click(function(e){
+			e.stopPropagation();
+			var index = $(this).data("index");
+			$(this).hide();
+			$("#review-"+index).addClass('review-widget');
+			$(this).parent().find(".review-more-wid").show();
+		});
 	</script>
 </body>
 </html>
