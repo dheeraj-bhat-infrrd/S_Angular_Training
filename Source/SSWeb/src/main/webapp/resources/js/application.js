@@ -9114,19 +9114,23 @@ function getImageandCaptionProfile(loop) {
 
 //complaint registration event binding
 $(document).on('click','#comp-reg-form-submit',function(){
-	var formData = $('#comp-reg-form').serialize();
-	callAjaxPostWithPayloadData("/updatecomplaintregsettings.do", function(data){
-		$('#overlay-toast').html(data);
-		showToast();
-	}, formData,  true );
+	if(validateComplaintRegistraionForm()) {
+		var formData = $('#comp-reg-form').serialize();
+		callAjaxPostWithPayloadData("/updatecomplaintregsettings.do", function(data){
+			$('#overlay-toast').html(data);
+			showToast();
+		}, formData,  true );
+	}
 });
 
 $(document).on('click touchstart','#compl-checkbox', function() {
 	if($(this).hasClass('bd-check-img-checked')) {
-		$(this).removeClass('bd-check-img-checked');
-		$('input[name="enabled"]').prop( "checked" , true);
+		if(validateMultipleEmailIds('comp-mailId')) {
+			$(this).removeClass('bd-check-img-checked');
+			$('input[name="enabled"]').prop( "checked" , true);
+		}
 	} else {
-		$(this).addClass('bd-check-img-checked');
-		$('input[name="enabled"]').prop( "checked" , false);
+			$(this).addClass('bd-check-img-checked');
+			$('input[name="enabled"]').prop( "checked" , false);
 	}
 });
