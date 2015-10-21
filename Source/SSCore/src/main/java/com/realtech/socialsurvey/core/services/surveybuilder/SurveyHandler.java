@@ -204,4 +204,7 @@ public interface SurveyHandler
     void sendSocialPostReminderMail( String custEmail, String custFirstName, String custLastName, User user, String links )
         throws InvalidInputException, UndeliveredEmailException, ProfileNotFoundException;
 
+
+    void updateModifiedOnColumnForAgentHierachy( long agentId ) throws InvalidInputException;
+
 }
