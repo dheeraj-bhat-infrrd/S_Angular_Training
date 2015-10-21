@@ -125,9 +125,6 @@ $(window).on('unload', function(){
 					parentWindow.loadSocialMediaUrlInPopup();
 					parentWindow.loadSocialMediaUrlInSettingsPage();
 
-				//	parentWindow.loadSocialMediaUrlInSettingsPage();
-					//parentWindow.showProfileLink("${socialNetwork}", data.responseText);
-
 					parentWindow.showProfileLinkInEditProfilePage("${socialNetwork}", data.responseText);					
 				}
 			});

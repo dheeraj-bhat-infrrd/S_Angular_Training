@@ -1563,6 +1563,12 @@
 	.v-tbl-wid {
 		padding-right: 20px;
 	}
+	.bd-ans-smiley {
+		background: url(../csssprites/smileys.png) no-repeat -56px -150px;
+	}
+	.bd-ans-star {
+		background: url(../csssprites/smileys.png) no-repeat -207px -66px;
+	}
 }
 
 
