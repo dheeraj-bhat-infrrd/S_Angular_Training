@@ -32,25 +32,25 @@
 					<div class="float-left bd-frm-right"><input class="bd-frm-rt-txt" type="text" name="mailId"
 						value="${complaintRegSettings.mailId}"></div>
 				</div>
-				<div>
-					<input type="checkbox" name="enabled" value="enable">
-					<label	for="enabled">
-						<spring:message code="label.complaintreg.trigger.text" />
-					</label>
+				<div class="coml-checkbox-cont clearfix">
+					<input type="checkbox" name="enabled" value="enable" class="hide">
+					<div class="float-left">
+						<div id="compl-checkbox" class="bd-check-img bd-check-img-checked float-right compl-checkbox"></div>
+					</div>
+					<div class="float-left compl-box-txt"><spring:message code="label.complaintreg.trigger.text" /></div>
 					<!-- set the min rating -->
-					<div class="mood-text">
-						<spring:message	code="label.complaintreg.rating.text" />
-					</div>
-					<div class="clearfix">
-						<div class="float-left">
-							<input type="text" name="rating" id="comp-rating-post"
-								class="st-item-row-txt cursor-pointer dd-arrow-dn"
-								autocomplete="off" value="${complaintRegSettings.rating}">
-							<div class="st-dd-wrapper hide" id="st-dd-wrapper-min-post"></div>
-						</div>
-					</div>
 				</div>
-				
+				<div class="mood-text">
+					<spring:message	code="label.complaintreg.rating.text" />
+				</div>
+				<div class="clearfix">
+					<div class="float-left">
+						<input type="text" name="rating" id="comp-rating-post"
+							class="st-item-row-txt cursor-pointer dd-arrow-dn"
+							autocomplete="off" value="${complaintRegSettings.rating}">
+						<div class="st-dd-wrapper hide" id="st-dd-wrapper-min-post"></div>
+					</div>
+				</div>				
 				<div class="mood-text">
 					<spring:message code="label.complaintreg.or.text" />
 				</div>
@@ -143,12 +143,5 @@
 			}
 		});
 		
-		$(document).on('click','#comp-reg-form-submit',function(){
-			var formData = $('#comp-reg-form').serialize();
-			callAjaxPostWithPayloadData("/updatecomplaintregsettings.do", function(data){
-				$('#overlay-toast').html(data);
-				showToast();
-			}, formData,  true );
-		});
 	});
 </script>
