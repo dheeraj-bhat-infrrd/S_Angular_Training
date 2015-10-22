@@ -590,14 +590,13 @@ public class AdminController
     @RequestMapping ( value = "/fetchsurveybyabuse", method = RequestMethod.GET)
     public String fetchSurveyByAbuse( Model model, HttpServletRequest request )
     {
-        LOG.info( "Method to get abusive surveys fetchSurveyByAbuse() finished." );
+        LOG.info( "Method to get abusive surveys fetchSurveyByAbuse() started." );
         try {
             String startIndexStr = request.getParameter( "startIndex" );
             String batchSizeStr = request.getParameter( "batchSize" );
             int startIndex = Integer.parseInt( startIndexStr );
             int batchSize = Integer.parseInt( batchSizeStr );
-            List<AbusiveSurveyReportWrapper> abusiveSurveyReports = surveyHandler.getSurveysReporetedAsAbusive( startIndex,
-                batchSize );
+            List<AbusiveSurveyReportWrapper> abusiveSurveyReports = surveyHandler.getSurveysReportedAsAbusive( startIndex, batchSize );
             model.addAttribute( "abusiveReviewReportList", abusiveSurveyReports );
         } catch ( NumberFormatException e ) {
             LOG.error(

@@ -69,10 +69,15 @@ namespace EncompassSocialSurvey
                 if (crmBatchTracker != null) {
                     lastRunTime = crmBatchTracker.RecentRecordFetchedDate;
                 }
+				Logger.Info("Last Run time  " +lastRunTime);
+				Logger.Info("Company Id  " +crmBatchTracker.CompanyId);
                 LoanIdentityList loanIdentityList = EncompassGlobal.EncompassLoginSession.Loans.Query(createCriteria(lastRunTime, fieldIds[8]));
                 #region Load the list
+				
                 foreach (LoanIdentity id in loanIdentityList)
                 {
+					try
+					{
                     Logger.Debug("Fetching loan from loanid " + id.Guid);
                     StringList fieldValues = EncompassGlobal.EncompassLoginSession.Loans.SelectFields(id.Guid, fieldIds);
 
@@ -162,9 +167,15 @@ namespace EncompassSocialSurvey
                     Logger.Debug("Updating last fetched time");
                     updateLastFetchedTime(fieldValues[8]);
 
-                }
+				} catch (System.Exception ex)
+				{
+					Logger.Error("Caught an exception: LoanUtility.LopopulateLoanList(): ", ex);
+               
+				}
+             }
 
                 #endregion // Load the list
+				
             }
             catch (System.Exception ex)
             {
@@ -185,11 +196,14 @@ namespace EncompassSocialSurvey
         private void updateLastFetchedTime(string field)
         {
             DateTime loanCloseTime = Convert.ToDateTime(field);
-            int result = DateTime.Compare(lastFetchedTime, loanCloseTime);
-            if (result < 0)
-            {
-                lastFetchedTime = loanCloseTime;
-            }
+			if(DateTime.Compare(loanCloseTime,DateTime.Now) < 0)
+			{
+				int result = DateTime.Compare(lastFetchedTime, loanCloseTime);
+				if (result < 0)
+				{
+					lastFetchedTime = loanCloseTime;
+				}
+			}
         }
 
         private void insertOrUpdateCrmBatchTracker(CRMBatchTrackerEntity entity, long companyId, string source)

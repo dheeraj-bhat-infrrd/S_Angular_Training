@@ -872,34 +872,6 @@ span.txt-highlight {
 	cursor: pointer;
 }
 
-.i-fb{
-	background: url(../images/fb_wide.png) no-repeat center;
-}
-
-.i-twt{
-	background: url(../images/twiter_wide.png) no-repeat center;
-}
-
-.i-ln{
-	background: url(../images/linkedin_wide.png) no-repeat center;
-}
-
-.i-gplus{
-	background: url(../images/gPlus_wide.png) no-repeat center;
-}
-
-.i-rss{
-	background: url(../images/rss_wide.png) no-repeat center;
-}
-
-.i-yelp{
-	background: url(../images/yelp_wide.png) no-repeat center;
-}
-
-.i-zillow{
-	background: url(../images/zillow_wide.png) no-repeat center;
-}
-
 .wc-icn-txt{
 	padding-left: 10px;
 	color: #3E9DCB;

@@ -782,10 +782,20 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
     {
         LOG.info( "Method to find multiple users on the basis of list of user id started for user ids " + userIds );
         List<ProListUser> users = new ArrayList<ProListUser>();
-        List<AgentSettings> agentSettingsList = organizationUnitSettingsDao.fetchMultipleAgentSettingsById( userIds );
-        if ( agentSettingsList == null ) {
-            throw new InvalidInputException( "No settings found for user :" + userIds + " in getUserByUserId" );
+        List<AgentSettings> agentSettingsList = new ArrayList<AgentSettings>();
+        for ( Long id : userIds ) {
+            AgentSettings agentSettings = null;
+            try {
+                agentSettings = organizationManagementService.getAgentSettings( id );
+            } catch ( NoRecordsFetchedException e ) {
+                LOG.error( "Exception caught ", e );
+            }
+            if ( agentSettings != null ) {
+                agentSettingsList.add( agentSettings );
+            }
+
         }
+
 
         for ( AgentSettings agentSettings : agentSettingsList ) {
             ProListUser user = new ProListUser();
@@ -801,7 +811,7 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
             user.setAboutMe( agentSettings.getContact_details().getAbout_me() );
             //JIRA SS-1104 search results not updated with correct number of reviews
             long reviewCount = profileManagementService.getReviewsCount( agentSettings.getIden(), 0, 5,
-                CommonConstants.PROFILE_LEVEL_INDIVIDUAL, false, false );
+                CommonConstants.PROFILE_LEVEL_INDIVIDUAL, true, false );
             user.setReviewCount( reviewCount );
             user.setReviewScore( surveyDetailsDao.getRatingForPastNdays( CommonConstants.AGENT_ID, agentSettings.getIden(),
                 CommonConstants.NO_LIMIT, true, false ) );

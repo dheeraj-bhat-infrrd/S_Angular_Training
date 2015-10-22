@@ -1709,8 +1709,8 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
 
 
     @Override
-    @Transactional ( readOnly = true)
-    public List<AbusiveSurveyReportWrapper> getSurveysReporetedAsAbusive( int startIndex, int numOfRows )
+
+    public List<AbusiveSurveyReportWrapper> getSurveysReportedAsAbusive( int startIndex, int numOfRows )
     {
         LOG.info( "Method getSurveysReporetedAsAbusive() to retrieve surveys marked as abusive, started" );
         List<AbusiveSurveyReportWrapper> abusiveSurveyReports = surveyDetailsDao.getSurveysReporetedAsAbusive( startIndex,
@@ -1746,7 +1746,12 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
             }
         }
         return valid;
-
+    }
+    public void updateSurveyAsUnderResolution( String surveyId )
+    {
+       LOG.info( "Method updateSurveyAsUnderResolution() to mark a survey as under resolution started, started" );
+       surveyDetailsDao.updateSurveyAsUnderResolution( surveyId );
+       LOG.info( "Method updateSurveyAsUnderResolution() to mark a survey as under resolution started, ended" );
     }
 
 
@@ -1850,6 +1855,14 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
 
         }
         return socialMediaPostDetails;
+    }
+    public List<AbusiveSurveyReportWrapper> getSurveysReportedAsAbusive( long companyId, int startIndex, int numOfRows )
+    {
+        LOG.info( "Method getSurveysReportedAsAbusive() to retrieve surveys marked as abusive for a company, started" );
+        List<AbusiveSurveyReportWrapper> abusiveSurveyReports = surveyDetailsDao.getSurveysReporetedAsAbusive(companyId, startIndex,
+            numOfRows );
+        LOG.info( "Method getSurveysReportedAsAbusive() to retrieve surveys marked as abusive for a company, finished" );
+        return abusiveSurveyReports;
     }
 
 
@@ -1994,7 +2007,14 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
         cal.set( Calendar.MILLISECOND, 0 );
 
         return ( new java.sql.Timestamp( cal.getTimeInMillis() ) );
-
+    }
+    public List<SurveyDetails> getSurveysUnderResolution( long companyId, int startIndex, int numOfRows )
+    {
+        LOG.info( "Method getSurveysUnderResolution() to retrieve surveys marked as under resolution for a company, started" );
+        List<SurveyDetails> surveyDetails = surveyDetailsDao.getSurveysUnderResolution(companyId, startIndex,
+            numOfRows );
+        LOG.info( "Method getSurveysUnderResolution() to retrieve surveys marked as under resolution for a company, finished" );
+        return surveyDetails;
     }
 }
 // JIRA SS-119 by RM-05:EOC
