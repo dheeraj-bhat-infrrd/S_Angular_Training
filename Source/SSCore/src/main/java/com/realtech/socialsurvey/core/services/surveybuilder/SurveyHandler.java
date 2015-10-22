@@ -117,7 +117,8 @@ public interface SurveyHandler
 
 
     public void sendSurveyRestartMail( String custFirstName, String custLastName, String custEmail,
-        String custRelationWithAgent, User user, String link ) throws InvalidInputException, UndeliveredEmailException, ProfileNotFoundException;
+        String custRelationWithAgent, User user, String link ) throws InvalidInputException, UndeliveredEmailException,
+        ProfileNotFoundException;
 
 
     public SurveyPreInitiation getPreInitiatedSurvey( long agentId, String customerEmail, String custFirstName,
@@ -164,8 +165,9 @@ public interface SurveyHandler
     public void saveSurveyPreInitiationObject( SurveyPreInitiation surveyPreInitiation ) throws InvalidInputException;
 
 
-	void updateSurveyAsAbusive(String surveymongoId, String reporterEmail, String reporterName);
-    
+    void updateSurveyAsAbusive( String surveymongoId, String reporterEmail, String reporterName );
+
+
     /**
      * Sends survey request to the customer on behalf of agent.
      * @param agentId
@@ -181,22 +183,25 @@ public interface SurveyHandler
      * @throws UndeliveredEmailException
      * @throws ProfileNotFoundException 
      */
-    public void initiateSurveyRequest(long agentId, String recipientEmailId, String recipientFirstname, String recipientLastname, String source) throws DuplicateSurveyRequestException, InvalidInputException, SelfSurveyInitiationException, SolrException, NoRecordsFetchedException, UndeliveredEmailException, ProfileNotFoundException;
+    public void initiateSurveyRequest( long agentId, String recipientEmailId, String recipientFirstname,
+        String recipientLastname, String source ) throws DuplicateSurveyRequestException, InvalidInputException,
+        SelfSurveyInitiationException, SolrException, NoRecordsFetchedException, UndeliveredEmailException,
+        ProfileNotFoundException;
 
 
-	void deleteZillowSurveysByEntity(String entityType, long entityId)
-			throws InvalidInputException;
+    void deleteZillowSurveysByEntity( String entityType, long entityId ) throws InvalidInputException;
 
 
-	void deleteExcessZillowSurveysByEntity(String entityType, long entityId)
-			throws InvalidInputException;
+    void deleteExcessZillowSurveysByEntity( String entityType, long entityId ) throws InvalidInputException;
 
 
     public List<AbusiveSurveyReportWrapper> getSurveysReportedAsAbusive( int startIndex, int numOfRows );
 
+
     void sendSurveyCompletionMail( String custEmail, String custFirstName, String custLastName, User user )
         throws InvalidInputException, UndeliveredEmailException, ProfileNotFoundException;
-    
+
+
     void sendSurveyCompletionUnpleasantMail( String custEmail, String custFirstName, String custLastName, User user )
         throws InvalidInputException, UndeliveredEmailException, ProfileNotFoundException;
 
@@ -206,6 +211,7 @@ public interface SurveyHandler
 
 
     void updateModifiedOnColumnForAgentHierachy( long agentId ) throws InvalidInputException;
+
 
     public void updateSurveyAsUnderResolution( String surveyId );
 

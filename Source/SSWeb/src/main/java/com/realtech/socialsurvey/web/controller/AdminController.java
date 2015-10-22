@@ -590,8 +590,10 @@ public class AdminController
             String batchSizeStr = request.getParameter( "batchSize" );
             int startIndex = Integer.parseInt( startIndexStr );
             int batchSize = Integer.parseInt( batchSizeStr );
+
             List<AbusiveSurveyReportWrapper> abusiveSurveyReports = surveyHandler.getSurveysReportedAsAbusive( startIndex,
                 batchSize );
+
             model.addAttribute( "abusiveReviewReportList", abusiveSurveyReports );
         } catch ( NumberFormatException e ) {
             LOG.error(
