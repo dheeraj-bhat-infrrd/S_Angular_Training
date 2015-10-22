@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -121,10 +122,16 @@ public class CloudUploadServiceImpl implements FileUploadService
     @Override
     public void uploadFileAtDefautBucket( File file, String fileName ) throws NonFatalException
     {
-        uploadFile( file, fileName, bucket );
+        uploadFile( file, fileName, bucket, false );
     }
+    
 
-
+    @Override
+    public void uploadFileAtSpeicifiedBucket(File file, String fileName, String bucketName, boolean expireImmediately) throws NonFatalException{
+    	LOG.info("Uploading file : "+fileName + " at bucket: " + bucketName);
+    	uploadFile(file, fileName, bucketName, expireImmediately);
+    }
+    
     private String uploadImage( File convFile, String logoName, String bucket, boolean preserveFileName ) throws InvalidInputException
     {
     	LOG.debug("Uploading file. preserving file name: "+preserveFileName);
@@ -150,7 +157,7 @@ public class CloudUploadServiceImpl implements FileUploadService
         }
 
         try {
-            uploadFile( convFile, fileName, bucket );
+            uploadFile( convFile, fileName, bucket, false );
         } catch ( NonFatalException e ) {
             throw new InvalidInputException( "Could not upload file: " + e.getMessage(), e );
         }
@@ -160,7 +167,7 @@ public class CloudUploadServiceImpl implements FileUploadService
     }
 
 
-    private void uploadFile( File file, String fileName, String bucket ) throws NonFatalException
+    private void uploadFile( File file, String fileName, String bucket, boolean expireImmediately ) throws NonFatalException
     {
         LOG.info( "Uploading file: " + fileName + " to Amazon S3" );
         if ( file == null || !file.exists() || fileName == null || fileName.isEmpty() ) {
@@ -179,10 +186,15 @@ public class CloudUploadServiceImpl implements FileUploadService
         int maxAgeValue = (int) ( ( cal.getTimeInMillis() - System.currentTimeMillis() ) / 1000 ) ;
 
         ObjectMetadata metadata = new ObjectMetadata();
-        metadata.setCacheControl( CACHE_MAX_AGE + maxAgeValue + CACHE_VALUE_SEPERATOR + CACHE_PUBLIC );
-        // TODO: set expiration date properly later
-        metadata.setExpirationTime( cal.getTime() );
-        metadata.setHeader( "Expires", new SimpleDateFormat( "EEE, dd MMM yyyy HH:mm:ss z" ).format( cal.getTime() ) );
+        if(expireImmediately){
+        	metadata.setCacheControl(CACHE_PUBLIC);
+        	metadata.setExpirationTime( new Date( System.currentTimeMillis() ) );
+        }else{
+        	metadata.setCacheControl( CACHE_MAX_AGE + maxAgeValue + CACHE_VALUE_SEPERATOR + CACHE_PUBLIC );
+        	// TODO: set expiration date properly later
+        	metadata.setExpirationTime( cal.getTime() );
+            metadata.setHeader( "Expires", new SimpleDateFormat( "EEE, dd MMM yyyy HH:mm:ss z" ).format( cal.getTime() ) );
+        }
         PutObjectRequest putObjectRequest = new PutObjectRequest( bucket, fileName, file );
         putObjectRequest.setMetadata( metadata );
         putObjectRequest.withCannedAcl( CannedAccessControlList.PublicRead );
