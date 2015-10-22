@@ -1767,6 +1767,7 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
         
     }
     
+
     public void updateSurveyAsUnderResolution( String surveyId )
     {
        LOG.info( "Method updateSurveyAsUnderResolution() to mark a survey as under resolution started, started" );
