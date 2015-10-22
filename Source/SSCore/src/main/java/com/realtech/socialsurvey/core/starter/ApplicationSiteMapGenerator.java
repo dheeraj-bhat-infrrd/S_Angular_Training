@@ -14,26 +14,27 @@ import com.realtech.socialsurvey.core.utils.sitemap.SiteMapGenerator;
 
 /**
  * Started app to generate sitemap for the application
- *
  */
 @Component("appsitemapgenerator")
-public class ApplicationSiteMapGenerator extends QuartzJobBean{
-	
+public class ApplicationSiteMapGenerator extends QuartzJobBean {
+
 	public static final Logger LOG = LoggerFactory.getLogger(ApplicationSiteMapGenerator.class);
-	
+
 	private SiteMapGenerator companySiteMapGenerator;
 	private SiteMapGenerator regionSiteMapGenerator;
 	private SiteMapGenerator branchSiteMapGenerator;
 	private SiteMapGenerator agentSiteMapGenerator;
 	private FileUploadService uploadService;
-	
+
 	private String envPrefix;
-	
+
 	private String companySiteMapPath;
 	private String regionSiteMapPath;
 	private String branchSiteMapPath;
 	private String individualSiteMapPath;
-	
+
+	private String siteMapBucket;
+
 	@Override
 	protected void executeInternal(JobExecutionContext jobExecutionContext) {
 		LOG.info("Starting up the ApplicationSiteMapGenerator.");
@@ -67,30 +68,31 @@ public class ApplicationSiteMapGenerator extends QuartzJobBean{
 		// upload company sitemap
 		try {
 			uploadFile(companySiteMapPath, uploadService, envPrefix);
-		}catch (NonFatalException e) {
+		}
+		catch (NonFatalException e) {
 			LOG.error("Could not upload company sitemap to amazon", e);
 		}
-			try {
-				uploadFile(regionSiteMapPath, uploadService, envPrefix);
-			}
-			catch (NonFatalException e) {
-				LOG.error("Could not upload region sitemap to amazon", e);
-			}
-			try {
-				uploadFile(branchSiteMapPath, uploadService, envPrefix);
-			}
-			catch (NonFatalException e) {
-				LOG.error("Could not upload office sitemap to amazon", e);
-			}
-		try{
+		try {
+			uploadFile(regionSiteMapPath, uploadService, envPrefix);
+		}
+		catch (NonFatalException e) {
+			LOG.error("Could not upload region sitemap to amazon", e);
+		}
+		try {
+			uploadFile(branchSiteMapPath, uploadService, envPrefix);
+		}
+		catch (NonFatalException e) {
+			LOG.error("Could not upload office sitemap to amazon", e);
+		}
+		try {
 			uploadFile(individualSiteMapPath, uploadService, envPrefix);
 		}
 		catch (NonFatalException e) {
 			LOG.error("Could not upload individual sitemap to amazon", e);
 		}
-		
+
 	}
-	
+
 	private void initializeDependencies(JobDataMap jobMap) {
 		companySiteMapGenerator = (SiteMapGenerator) jobMap.get("companySiteMapGenerator");
 		regionSiteMapGenerator = (SiteMapGenerator) jobMap.get("regionSiteMapGenerator");
@@ -102,12 +104,14 @@ public class ApplicationSiteMapGenerator extends QuartzJobBean{
 		regionSiteMapPath = (String) jobMap.get("regionSiteMapPath");
 		branchSiteMapPath = (String) jobMap.get("branchSiteMapPath");
 		individualSiteMapPath = (String) jobMap.get("individualSiteMapPath");
+		siteMapBucket = (String) jobMap.get("siteMapBucket");
 	}
-	
-	public void uploadFile(String filePath, FileUploadService uploadService, String envPrefix) throws NonFatalException{
-		LOG.info("Uploading "+filePath+" to Amazon");
-		uploadService.uploadFileAtDefautBucket(new File(filePath), envPrefix+ CommonConstants.FILE_SEPARATOR +filePath.substring(filePath.lastIndexOf(CommonConstants.FILE_SEPARATOR)+1));
-		
+
+	public void uploadFile(String filePath, FileUploadService uploadService, String envPrefix) throws NonFatalException {
+		LOG.info("Uploading " + filePath + " to Amazon");
+		uploadService.uploadFileAtSpeicifiedBucket(new File(filePath),
+				filePath.substring(filePath.lastIndexOf(CommonConstants.FILE_SEPARATOR) + 1), siteMapBucket, true);
+
 	}
 
 }
