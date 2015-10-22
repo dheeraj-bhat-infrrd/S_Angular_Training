@@ -223,6 +223,7 @@ public class DotloopReviewProcessor extends QuartzJobBean
             LOG.debug( "Insert into tracker." );
             try {
                 loop = setHierarchyInformationInLoop( loop, collectionName, organizationUnitId );
+                loop.setCreatedOn(new Timestamp(System.currentTimeMillis()));
                 organizationManagementService.saveLoopsForProfile( loop );
             } catch ( InvalidInputException e ) {
                 LOG.warn( "Could not insert loop " + loop.getLoopId() + " for profile " + loop.getProfileId() );
