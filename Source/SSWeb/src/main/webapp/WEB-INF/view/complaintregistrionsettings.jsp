@@ -28,58 +28,54 @@
 			<form id="comp-reg-form" method="post">
 				<!-- Mail Id Input -->
 				<div class="bd-hr-form-item clearfix">
-					<div class="float-left bd-frm-left"><spring:message code="label.complaintreg.mail.text" /></div>
-					<div class="float-left bd-frm-right"><input class="bd-frm-rt-txt" type="text" name="mailId"
-						id="comp-mailId" value="${complaintRegSettings.mailId}"></div>
+					<div class="float-left compl-input-text"><spring:message code="label.complaintreg.mail.text" /></div>
+					<div class="float-left bd-frm-right"><input class="bd-frm-rt-txt compl-input" name="mailId"
+						id="comp-mailId" value="${complaintRegSettings.mailId}" placeholder='<spring:message code="label.addmultipleemailids.key"/>'></div>
 				</div>
-				<div class="coml-checkbox-cont clearfix">
-					<input id="comp-enabled" type="checkbox" name="enabled" value="enable" class="hide">
-					<div class="float-left">
-						<div id="compl-checkbox" class="bd-check-img bd-check-img-checked float-right compl-checkbox"></div>
+
+				<div class="clearfix compl-type-sel-cont">
+					<div class="float-left compl-option-sel">
+						<input id="comp-enabled" type="checkbox" name="enabled" value="enable" class="hide">
+						<div class="float-left">
+							<div id="compl-checkbox" class="bd-check-img bd-check-img-checked float-right compl-checkbox"></div>
+						</div>
+						<div class="float-left compl-box-txt">
+							Capture score below
+						</div>
 					</div>
-					<div class="compl-box-txt"><spring:message code="label.complaintreg.trigger.text" /></div>
-					<!-- set the min rating -->
-				</div>
-				<div class="mood-text">
-					<spring:message	code="label.complaintreg.rating.text" />
-				</div>
-				<div class="clearfix">
-					<div class="float-left">
+					<div class="float-left compl-option-sel">
 						<input type="text" name="rating" id="comp-rating-post"
-							class="st-item-row-txt cursor-pointer dd-arrow-dn"
+							class="st-item-row-txt cursor-pointer dd-arrow-dn comp-rating-post"
 							autocomplete="off" value="${complaintRegSettings.rating}">
 						<div class="st-dd-wrapper hide" id="st-dd-wrapper-min-post"></div>
 					</div>
-				</div>				
-				<div class="mood-text">
-					<spring:message code="label.complaintreg.or.text" />
-				</div>
-	
-				<!-- Mood selection -->
-				<div class="mood-text">
-					<spring:message code="label.complaintreg.mood.text" />
-				</div>
-				<div class="clearfix">
-					<div class="sq-smile-icn-container compl-input-cont opacity-red" data-mood="unpleasant">
-						<div id="sad-smile" class="sq-smile-icn-wrapper sq-sad-smile"></div>
-						<div class="sq-smile-icn-text sq-smile-sad-text float-left">
-							<spring:message code="label.smile.sad.text" />
+					<div class="float-left compl-option-sel">
+						<div class="mood-text">
+							<spring:message	code="label.complaintreg.or.text" />
 						</div>
 					</div>
-					
-					<div class="mood-text">
-						<spring:message code="label.complaintreg.or.text" />
+					<div class="float-left compl-option-sel">
+						<div class="sq-smile-icn-container compl-input-cont opacity-red" data-mood="unpleasant">
+							<div class="sq-smile-icn-text sq-smile-sad-text compl-sml-txt">
+								<spring:message code="label.complaint.sad.text" />
+							</div>
+						</div>
 					</div>
-				
-					<div class="sq-smile-icn-container compl-input-cont opacity-red" data-mood="ok">
-						<div id="neutral-smile" class="sq-smile-icn-wrapper sq-neutral-smile"></div>
-						<div class="sq-smile-icn-text sq-smile-neutral-text float-left">
-							<spring:message code="label.smile.neutral.text" />
+					<div class="float-left compl-option-sel">
+						<div class="mood-text">
+							<spring:message	code="label.complaintreg.or.text" />
+						</div>
+					</div>
+					<div class="float-left compl-option-sel">
+						<div class="sq-smile-icn-container compl-input-cont opacity-red" data-mood="ok">
+							<div class="sq-smile-icn-text sq-smile-neutral-text compl-sml-txt">
+								<spring:message code="label.complaint.ok.text" />
+							</div>
 						</div>
 					</div>
 				</div>
 				<input type="hidden" id="comp-mood" name="mood"/> 
-				<div id="comp-reg-form-submit" class="bd-btn-save cursor-pointer">Save</div>
+				<div id="comp-reg-form-submit" class="bd-btn-save cursor-pointer compl-save-btn">Save</div>
 			</form>
 		</div>
 	</div>
