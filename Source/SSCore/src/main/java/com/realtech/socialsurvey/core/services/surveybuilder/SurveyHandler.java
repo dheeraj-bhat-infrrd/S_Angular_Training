@@ -192,7 +192,7 @@ public interface SurveyHandler
 			throws InvalidInputException;
 
 
-    public List<AbusiveSurveyReportWrapper> getSurveysReporetedAsAbusive( int startIndex, int numOfRows );
+    public List<AbusiveSurveyReportWrapper> getSurveysReportedAsAbusive( int startIndex, int numOfRows );
 
     void sendSurveyCompletionMail( String custEmail, String custFirstName, String custLastName, User user )
         throws InvalidInputException, UndeliveredEmailException, ProfileNotFoundException;
@@ -206,5 +206,13 @@ public interface SurveyHandler
 
 
     void updateModifiedOnColumnForAgentHierachy( long agentId ) throws InvalidInputException;
+
+    public void updateSurveyAsUnderResolution( String surveyId );
+
+
+    public List<AbusiveSurveyReportWrapper> getSurveysReportedAsAbusive( long companyId, int startIndex, int numOfRows );
+
+
+    public List<SurveyDetails> getSurveysUnderResolution( long companyId, int startIndex, int numOfRows );
 
 }
