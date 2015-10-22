@@ -7637,20 +7637,16 @@ label.url-change-input-label {
 }
 
 .complaint-cont {
-	width: 500px;
-	max-width: 100%;
-	margin: 0 auto;
 }
 
 .mood-text {
-    line-height: 55px;
-    margin-top: 10px;
-    font-size: 24px;
+    line-height: 40px;
+    font-size: 14px;
     font-family: 'opensanssemibold';
 }
 
 .compl-input-cont {
-	width: 300px !important;
+    height: 40px;
 }
 
 .coml-checkbox-cont {
@@ -7658,8 +7654,40 @@ label.url-change-input-label {
 }
 
 .compl-box-txt {
-	line-height: normal;
-	display: table-cell;
-	vertical-align: middle;
-	height: 50px;
+	line-height: 50px;
+}
+
+.compl-save-btn {
+	margin: 15px 0px 0 0px;
+}
+
+.compl-input-text {
+    line-height: 40px;
+    padding-right: 20px;
+}
+
+.compl-type-sel-cont {
+    margin: 0 -7.5px;
+}
+
+.compl-option-sel {
+    margin: 0 10px;
+}
+
+.compl-sml-txt {
+    width: auto;
+    padding: 0 20px;
+    height: 40px;
+    line-height: 40px;
+    font-size: 16px;
+}
+
+.compl-input {
+	width: 500px;
+	max-width: 100%;
+}
+
+.comp-rating-post {
+	height: 40px;
+	line-height: 40px;
 }
