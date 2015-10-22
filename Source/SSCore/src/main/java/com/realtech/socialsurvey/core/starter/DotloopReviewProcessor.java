@@ -48,7 +48,7 @@ import com.realtech.socialsurvey.core.services.surveybuilder.SurveyHandler;
 public class DotloopReviewProcessor extends QuartzJobBean
 {
 
-    private static final Logger LOG = LoggerFactory.getLogger( ZillowReviewProcessor.class );
+    private static final Logger LOG = LoggerFactory.getLogger( DotloopReviewProcessor.class );
 
     private DotloopIntergrationApiBuilder dotloopIntegrationApiBuilder;
 
