@@ -13,6 +13,7 @@ import com.amazonaws.services.s3.AmazonS3;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.exception.FatalException;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
+import com.realtech.socialsurvey.core.exception.NonFatalException;
 import com.realtech.socialsurvey.core.services.upload.FileUploadService;
 import com.realtech.socialsurvey.core.utils.DisplayMessageConstants;
 import com.realtech.socialsurvey.core.utils.EncryptionHelper;
@@ -119,5 +120,10 @@ public class FileUploadServiceImpl implements FileUploadService {
 	public String uploadLogoImageFile(File file, String imageName, boolean preserveFileName) throws InvalidInputException {
 		// TODO Auto-generated method stub
 		return null;
+	}
+	
+	@Override
+	public void uploadFileAtSpeicifiedBucket(File file, String fileName, String bucketName, boolean expireImmediately) throws NonFatalException{
+		
 	}
 }
