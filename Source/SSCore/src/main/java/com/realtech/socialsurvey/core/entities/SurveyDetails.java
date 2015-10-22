@@ -44,6 +44,8 @@ public class SurveyDetails
     private String faceBookShareUrl;
     private boolean isAbusive;
     private String _id;
+    private boolean underResolution;
+    private boolean isAbuseRepByUser;
 
 
     public String get_id() {
@@ -497,5 +499,29 @@ public class SurveyDetails
     public void setAbusive( boolean isAbusive )
     {
         this.isAbusive = isAbusive;
+    }
+
+
+    public boolean isUnderResolution()
+    {
+        return underResolution;
+    }
+
+
+    public void setUnderResolution( boolean underResolution )
+    {
+        this.underResolution = underResolution;
+    }
+
+
+    public boolean isAbuseRepByUser()
+    {
+        return isAbuseRepByUser;
+    }
+
+
+    public void setAbuseRepByUser( boolean isAbuseRepByUser )
+    {
+        this.isAbuseRepByUser = isAbuseRepByUser;
     }
 }

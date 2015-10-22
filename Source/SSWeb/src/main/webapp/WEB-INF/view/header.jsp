@@ -195,6 +195,9 @@
 								<spring:message code="label.settings.key" />
 							</div>
 							<c:if test="${highestrole == 1}">
+								<div class="hdr-link-item-dropdown-item" onclick="showMainContent('./showcomplaintregsettings.do');">
+									<spring:message code="label.complaintregsettings.key" />
+								</div>
 								<div class="hdr-link-item-dropdown-item" onclick="showMainContent('./showemailsettings.do');">
 									<spring:message code="label.emailsettings.key" />
 								</div>
