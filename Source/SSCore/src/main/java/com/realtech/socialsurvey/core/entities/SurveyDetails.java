@@ -45,6 +45,8 @@ public class SurveyDetails
     private boolean isAbusive;
     private String _id;
     private SocialMediaPostDetails socialMediaPostDetails;
+    private boolean underResolution;
+    private boolean isAbuseRepByUser;
 
 
     public String get_id()
@@ -512,5 +514,27 @@ public class SurveyDetails
     public void setSocialMediaPostDetails( SocialMediaPostDetails socialMediaPostDetails )
     {
         this.socialMediaPostDetails = socialMediaPostDetails;
+    }
+    public boolean isUnderResolution()
+    {
+        return underResolution;
+    }
+
+
+    public void setUnderResolution( boolean underResolution )
+    {
+        this.underResolution = underResolution;
+    }
+
+
+    public boolean isAbuseRepByUser()
+    {
+        return isAbuseRepByUser;
+    }
+
+
+    public void setAbuseRepByUser( boolean isAbuseRepByUser )
+    {
+        this.isAbuseRepByUser = isAbuseRepByUser;
     }
 }

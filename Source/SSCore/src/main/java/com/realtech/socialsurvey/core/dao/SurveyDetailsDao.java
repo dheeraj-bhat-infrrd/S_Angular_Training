@@ -165,4 +165,17 @@ public interface SurveyDetailsDao
 
 
     public long getSocialPostsCountBasedOnHierarchy( int numberOfDays, String collectionName, long collectionId );
+    public void updateSurveyAsUnderResolution( String surveyId );
+
+
+    public List<AbusiveSurveyReportWrapper> getSurveysReporetedAsAbusive( long companyId, int start, int rows );
+
+    
+    public long getSurveysUnderResolutionCount( long companyId );
+    
+    
+    public List<SurveyDetails> getSurveysUnderResolution( long companyId, int start, int rows );
+
+
+    long getSurveysReporetedAsAbusiveCount( long companyId );
 }

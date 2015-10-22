@@ -8,10 +8,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
-
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.apache.solr.common.SolrDocument;
@@ -26,9 +24,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
-
 import twitter4j.TwitterException;
-
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
@@ -39,6 +35,7 @@ import com.realtech.socialsurvey.core.entities.AgentMediaPostDetails;
 import com.realtech.socialsurvey.core.entities.AgentSettings;
 import com.realtech.socialsurvey.core.entities.BranchMediaPostDetails;
 import com.realtech.socialsurvey.core.entities.BulkSurveyDetail;
+import com.realtech.socialsurvey.core.entities.ComplaintRegistrationSettings;
 import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
 import com.realtech.socialsurvey.core.entities.RegionMediaPostDetails;
 import com.realtech.socialsurvey.core.entities.SocialMediaPostDetails;
@@ -75,7 +72,6 @@ import com.realtech.socialsurvey.web.common.ErrorCodes;
 import com.realtech.socialsurvey.web.common.ErrorResponse;
 import com.realtech.socialsurvey.web.common.JspResolver;
 import com.realtech.socialsurvey.web.util.RequestUtils;
-
 import facebook4j.FacebookException;
 
 
@@ -175,7 +171,7 @@ public class SurveyManagementController
     /*
      * Method to store final feedback of the survey from customer.
      */
-    @ResponseBody
+	@ResponseBody
     @RequestMapping ( value = "/data/storeFeedback")
     public String storeFeedbackAndCloseSurvey( HttpServletRequest request )
     {
@@ -288,6 +284,23 @@ public class SurveyManagementController
                         emailServices.sendSurveyCompletionMailToAdminsAndAgent( admin.getValue(), admin.getKey(), surveyDetail,
                             customerName, surveyScore );
                     }
+                }
+                
+                OrganizationUnitSettings companySettings = organizationManagementService.getCompanySettings( survey
+                    .getCompanyId() );
+                if ( companySettings.getSurvey_settings().getComplaint_reg_settings() != null ) {
+                    ComplaintRegistrationSettings complaintRegistrationSettings = companySettings.getSurvey_settings()
+                        .getComplaint_reg_settings();
+
+                    if ( complaintRegistrationSettings.isEnabled()
+                        && ( ( survey.getScore() > 0d && complaintRegistrationSettings.getRating() > 0d && survey.getScore() < complaintRegistrationSettings
+                            .getRating() ) || (!complaintRegistrationSettings.getMood().trim().isEmpty() && complaintRegistrationSettings.getMoodList().contains( mood.toLowerCase() ) ) ) ) {
+                        survey.setUnderResolution( true );
+                        surveyHandler.updateSurveyAsUnderResolution( survey.get_id() );
+                        emailServices.sendComplaintHandleMail( complaintRegistrationSettings.getMailId(), customerName,
+                            customerEmail, mood, surveyScore );
+                    }
+
                 }
             } catch ( InvalidInputException e ) {
                 LOG.error( "Exception occurred while trying to send survey completion mail to : " + customerEmail );

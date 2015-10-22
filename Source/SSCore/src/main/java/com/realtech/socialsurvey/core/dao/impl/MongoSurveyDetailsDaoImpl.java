@@ -214,6 +214,7 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
         update.set( CommonConstants.IS_ABUSIVE_COLUMN, true );
         update.set( CommonConstants.CREATED_ON, new Date() );
         update.set( CommonConstants.MODIFIED_ON_COLUMN, new Date() );
+        update.set( CommonConstants.IS_ABUSIVE_REPORTED_BY_USER_COLUMN, true );
         mongoTemplate.updateMulti( query, update, SURVEY_DETAILS_COLLECTION );
 
         query = new Query();
@@ -1779,7 +1780,76 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
         update.set( CommonConstants.MODIFIED_ON_COLUMN, new Date() );
         mongoTemplate.updateMulti( query, update, SURVEY_DETAILS_COLLECTION );
         LOG.info( "Method insertSurveyDetails() to insert details of survey finished." );
+    }
+    public void updateSurveyAsUnderResolution( String surveyId )
+    {
+        LOG.info( "Method updateSurveyAsUnderResolution() to mark survey as under resolution started." );
+        Query query = new Query();
+        query.addCriteria( Criteria.where( CommonConstants.DEFAULT_MONGO_ID_COLUMN ).is( surveyId ) );
+        Update update = new Update();
+        update.set( CommonConstants.UNDER_RESOLUTION_COLUMN, true );
+        mongoTemplate.upsert( query, update, SURVEY_DETAILS_COLLECTION );
+        LOG.info( "Method updateSurveyAsUnderResolution() to mark survey as under resolution finished." );
+    }
 
+
+    @Override
+    public List<AbusiveSurveyReportWrapper> getSurveysReporetedAsAbusive( long companyId, int start, int rows )
+    {
+        LOG.info( "Method getSurveysReporetedAsAbusive() to retrieve surveys marked as abusive for a company started." );
+        Query query = new Query( Criteria.where( CommonConstants.IS_ABUSIVE_COLUMN ).is( true ) );
+        query.addCriteria(  Criteria.where( CommonConstants.COMPANY_ID_COLUMN ).is( companyId ) );
+        query.with( new Sort( Sort.Direction.ASC, CommonConstants.DEFAULT_MONGO_ID_COLUMN ) );
+        if ( start > -1 ) {
+            query.skip( start );
+        }
+        if ( rows > -1 ) {
+            query.limit( rows );
+        }
+
+        List<SurveyDetails> surveys = mongoTemplate.find( query, SurveyDetails.class, SURVEY_DETAILS_COLLECTION );
+        if ( surveys == null || surveys.size() == 0 )
+            return null;
+
+        List<String> surveyIds = new ArrayList<String>();
+        for ( SurveyDetails survey : surveys ) {
+            surveyIds.add( survey.get_id() );
+        }
+
+        query = new Query( Criteria.where( CommonConstants.SURVEY_ID_COLUMN ).in( surveyIds ) );
+        query.with( new Sort( Sort.Direction.ASC, CommonConstants.SURVEY_ID_COLUMN ) );
+        if ( start > -1 ) {
+            query.skip( start );
+        }
+        if ( rows > -1 ) {
+            query.limit( rows );
+        }
+
+        List<AbuseReporterDetails> absReporterDetails = mongoTemplate.find( query, AbuseReporterDetails.class,
+            ABS_REPORTER_DETAILS_COLLECTION );
+
+        List<AbusiveSurveyReportWrapper> abusiveSurveyReports = new ArrayList<AbusiveSurveyReportWrapper>();
+        for ( SurveyDetails survey : surveys ) {
+            if ( absReporterDetails != null && absReporterDetails.size() > 0 ) {
+                boolean reporterDetailsFound = false;
+                for ( AbuseReporterDetails absReporterDetail : absReporterDetails ) {
+                    if ( absReporterDetail.getSurveyId().equals(survey.get_id()) ) {
+                        abusiveSurveyReports.add( new AbusiveSurveyReportWrapper( survey, absReporterDetail ) );
+                        reporterDetailsFound = true;
+                        break;
+                    }
+                }
+                if(!reporterDetailsFound)
+                 // to handle existing surveys where reporter info not saved
+                    abusiveSurveyReports.add( new AbusiveSurveyReportWrapper( survey, null ) );
+            } else {
+                // to handle existing surveys where reporter info not saved
+                abusiveSurveyReports.add( new AbusiveSurveyReportWrapper( survey, null ) );
+            }
+        }
+
+        LOG.info( "Method getSurveysReporetedAsAbusive() to retrieve surveys marked as abusive for a company finished." );
+        return abusiveSurveyReports;
     }
 
 
@@ -1793,5 +1863,47 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
 
         surveys = mongoTemplate.find( query, SurveyDetails.class, SURVEY_DETAILS_COLLECTION );
         return surveys;
+    }
+    public List<SurveyDetails> getSurveysUnderResolution( long companyId, int start, int rows )
+    {
+        Query query = new Query( Criteria.where( CommonConstants.COMPANY_ID_COLUMN ).is( companyId ) );
+        query.addCriteria(  Criteria.where( CommonConstants.IS_UNDER_RESOLUTION_COLUMN ).is( true ) );
+        query.with( new Sort( Sort.Direction.ASC, CommonConstants.DEFAULT_MONGO_ID_COLUMN ) );
+        if ( start > -1 ) {
+            query.skip( start );
+        }
+        if ( rows > -1 ) {
+            query.limit( rows );
+        }
+
+        List<SurveyDetails> surveys = mongoTemplate.find( query, SurveyDetails.class, SURVEY_DETAILS_COLLECTION );
+        if ( surveys == null || surveys.size() == 0 )
+            return null;
+        else
+            return surveys;
+    }
+
+
+    @Override
+    public long getSurveysUnderResolutionCount( long companyId )
+    {
+        LOG.info( "Method getSurveysUnderResolutionCount() to get count of surveys marked as under resolution for a company started." );
+        Query query = new Query( Criteria.where( CommonConstants.UNDER_RESOLUTION_COLUMN ).is( true ) );
+        query.addCriteria(  Criteria.where( CommonConstants.COMPANY_ID_COLUMN ).is( companyId ) ); 
+        long count = mongoTemplate.find( query, SurveyDetails.class, SURVEY_DETAILS_COLLECTION ).size();
+        LOG.info( "Method getSurveysUnderResolutionCount() to get count of surveys marked as under resolution for a company finished." );
+        return count;
+    
+    }
+    
+    @Override
+    public long getSurveysReporetedAsAbusiveCount( long companyId )
+    {
+        LOG.info( "Method getSurveysReporetedAsAbusiveCount() to get count of surveys marked as abusive for a company started." );
+        Query query = new Query( Criteria.where( CommonConstants.IS_ABUSIVE_COLUMN ).is( true ) );
+        query.addCriteria(  Criteria.where( CommonConstants.COMPANY_ID_COLUMN ).is( companyId ) ); 
+        long count = mongoTemplate.find( query, SurveyDetails.class, SURVEY_DETAILS_COLLECTION ).size();
+        LOG.info( "Method getSurveysUnderResolutionCount() to get count of surveys marked as abusive for a company finished." );
+        return count;
     }
 }
