@@ -128,7 +128,7 @@ public class CloudUploadServiceImpl implements FileUploadService
 
     @Override
     public void uploadFileAtSpeicifiedBucket(File file, String fileName, String bucketName, boolean expireImmediately) throws NonFatalException{
-    	LOG.info("Uploading file : "+fileName + " at bucket: "+bucket);
+    	LOG.info("Uploading file : "+fileName + " at bucket: " + bucketName);
     	uploadFile(file, fileName, bucketName, expireImmediately);
     }
     
