@@ -1995,6 +1995,8 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 
         socialPost.setTimeInMillis( System.currentTimeMillis() );
         socialPostDao.addPostToUserProfile( socialPost );
+        LOG.info( "Updating modified on column in aagent hierarchy fro agent " + user.getFirstName() );
+        surveyHandler.updateModifiedOnColumnForAgentHierachy( user.getUserId() );
         LOG.info( "Method to add post to a user's profile finished." );
     }
 
@@ -2015,7 +2017,10 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
             throw new InvalidInputException( "Not a SocialSurvey Status", DisplayMessageConstants.GENERAL_ERROR );
         }
 
+        long agentId = socialPost.getAgentId();
         socialPostDao.removePostFromUsersProfile( socialPost );
+        LOG.info( "Updating modified on column in aagent hierarchy fro agent " );
+        surveyHandler.updateModifiedOnColumnForAgentHierachy( agentId );
         LOG.info( "Method to delete post to a user's profile finished." );
     }
 

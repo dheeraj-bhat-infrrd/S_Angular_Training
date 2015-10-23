@@ -129,6 +129,11 @@
 						<a href="javascript:showMainContent('./showcompanysettings.do')"><spring:message code="label.editsettings.key" /></a>
 					</div>
 				</c:if>
+				<c:if test="${highestrole == 1}">
+					<div class="header-links-item">
+						<a href="javascript:showMainContent('./showcomplaintregsettings.do')"><spring:message code="label.complaintregsettings.key" /></a>
+					</div>
+				</c:if>
 				<!-- show apps for company admin other then free account -->
 				<c:if test="${highestrole == 1 && accountMasterId != 5}">
 					<div class="header-links-item">

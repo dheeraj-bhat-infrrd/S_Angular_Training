@@ -35,7 +35,7 @@
 
 				<div class="clearfix compl-type-sel-cont">
 					<div class="float-left compl-option-sel">
-						<input id="comp-enabled" type="checkbox" name="enabled" value="enable" class="hide">
+						<input id="comp-enabled" type="checkbox" name="enabled" class="hide">
 						<div class="float-left">
 							<div id="compl-checkbox" class="bd-check-img bd-check-img-checked float-right compl-checkbox"></div>
 						</div>
@@ -107,10 +107,14 @@
 				"st-dd-item st-dd-item-min-post", 5, 0, 0.5);
 		$('#comp-rating-post').off('click');
 		$('#comp-rating-post').on('click', function() {
+			if(!$('input[name="enabled"]').prop( "checked" ))
+				return;
 			$('#st-dd-wrapper-min-post').slideToggle(200);
 		});
 		$('.sq-smile-icn-container').off('click');
 		$('.sq-smile-icn-container').on('click', function() {
+			if(!$('input[name="enabled"]').prop( "checked" ))
+				return;
 			var mood = $(this).attr("data-mood");
 			var currentMood = $('#comp-mood').val();
 			
