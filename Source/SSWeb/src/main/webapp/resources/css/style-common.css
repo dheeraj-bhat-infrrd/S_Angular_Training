@@ -6471,6 +6471,11 @@ tr.u-tbl-header td {
     white-space: nowrap;
 }
 
+.edit-pro-rat-txt {
+	width: 70%;
+	width: calc(100% - 58px);
+}
+
 .web-address-txt {
     line-height: 30px;
     padding-left: 5px;
