@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!--
+ This is the Social Survey Solr schema file for core ss-regions. This file should be named "schema.xml" and
+ should be in the conf directory under the solr home
+ (i.e. ./solr/socialsurvey/ss-regions/conf/schema.xml by default)
+ or located where the classloader for the Solr webapp can find it.
+-->
+
+<schema name="db" version="1.1">
+  <types>
+   <fieldType name="string"  class="solr.StrField" sortMissingLast="true" omitNorms="true"/>
+   <fieldType name="long" class="solr.TrieLongField" precisionStep="0" positionIncrementGap="0"/>
+   <fieldType name="boolean" class="solr.BoolField" omitNorms="true"/>
+   <fieldType name="text" class="solr.TextField" positionIncrementGap="100"  autoGeneratePhraseQueries="true">
+      <analyzer type="index">
+	<tokenizer class="solr.KeywordTokenizerFactory" />
+	<filter class="solr.LowerCaseFilterFactory"/>
+      </analyzer>
+      <analyzer type="query">
+	<tokenizer class="solr.KeywordTokenizerFactory"/>
+	<filter class="solr.LowerCaseFilterFactory"/>
+      </analyzer>
+   </fieldType>
+   <fieldType name="textEmailId" class="solr.TextField" sortMissingLast="true" omitNorms="true" autoGeneratePhraseQueries="true">
+      <analyzer type="index">
+	<tokenizer class="solr.KeywordTokenizerFactory"/>
+	<filter class="solr.LowerCaseFilterFactory"/>
+      </analyzer>
+      <analyzer type="query">
+	<tokenizer class="solr.KeywordTokenizerFactory"/>
+	<filter class="solr.LowerCaseFilterFactory"/>
+      </analyzer>
+   </fieldType>
+   <fieldType name="integer" class="solr.IntField" omitNorms="true"/>
+  </types>
+
+  <fields>
+    <field name="id" type="string" indexed="true" stored="true" required="true" multiValued="false" />
+    <field name="source" type="string" indexed="true" stored="true" />
+    <field name="companyId" type="long" indexed="true" stored="true" />
+    <field name="regionId" type="long" indexed="true" stored="true" />
+    <field name="branchId" type="long" indexed="true" stored="true" />
+    <field name="userId" type="long" indexed="true" stored="true" />
+    <field name="timeInMillis" type="long" indexed="true" stored="true" />
+    <field name="postId" type="string" indexed="true" stored="true" />
+    <field name="postText" type="string" indexed="true" stored="true" />
+    <field name="postedBy" type="string" indexed="true" stored="true" />
+    <field name="postUrl" type="string" indexed="true" stored="true" />
+    <field name="_version_" type="long" indexed="true" stored="true" multiValued="false"/>
+  </fields>
+
+  <uniqueKey>id</uniqueKey>
+
+ <!-- field for the QueryParser to use when an explicit fieldname is absent -->
+ <defaultSearchField>source</defaultSearchField>
+
+ <!-- SolrQueryParser configuration: defaultOperator="AND|OR" -->
+ <solrQueryParser defaultOperator="OR"/>
+
+</schema>
