@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
+
 import org.apache.commons.lang.StringUtils;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellStyle;
@@ -26,8 +27,10 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+
 import com.realtech.socialsurvey.core.commons.AgentRankingReportComparator;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
+import com.realtech.socialsurvey.core.commons.SocialPostsComparator;
 import com.realtech.socialsurvey.core.commons.SurveyResultsComparator;
 import com.realtech.socialsurvey.core.dao.GenericDao;
 import com.realtech.socialsurvey.core.dao.OrganizationUnitSettingsDao;
@@ -35,12 +38,15 @@ import com.realtech.socialsurvey.core.dao.SurveyDetailsDao;
 import com.realtech.socialsurvey.core.dao.impl.MongoSocialPostDaoImpl;
 import com.realtech.socialsurvey.core.entities.AgentRankingReport;
 import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
+import com.realtech.socialsurvey.core.entities.SocialPost;
 import com.realtech.socialsurvey.core.entities.SurveyDetails;
 import com.realtech.socialsurvey.core.entities.SurveyPreInitiation;
 import com.realtech.socialsurvey.core.entities.SurveyResponse;
 import com.realtech.socialsurvey.core.entities.User;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
+import com.realtech.socialsurvey.core.exception.NoRecordsFetchedException;
 import com.realtech.socialsurvey.core.services.organizationmanagement.DashboardService;
+import com.realtech.socialsurvey.core.services.organizationmanagement.OrganizationManagementService;
 import com.realtech.socialsurvey.core.services.surveybuilder.SurveyHandler;
 
 // JIRA SS-137 BY RM05:BOC
@@ -65,6 +71,9 @@ public class DashboardServiceImpl implements DashboardService, InitializingBean 
 
 	@Autowired
 	private GenericDao<SurveyPreInitiation, Long> surveyPreInitiationDao;
+	
+	@Autowired
+	private OrganizationManagementService organizationManagementService;
 
 	@Override
 	public long getAllSurveyCountForPastNdays(String columnName, long columnValue, int numberOfDays) {
@@ -275,74 +284,107 @@ public class DashboardServiceImpl implements DashboardService, InitializingBean 
 		return workbook;
 	}
 
-	/*
-	 * Method to create excel file for Social posts.
-	 */
-	@Override
-	public XSSFWorkbook downloadSocialMonitorData(List<SurveyDetails> surveyDetails, String fileName) {
-		// Blank workbook
-		XSSFWorkbook workbook = new XSSFWorkbook();
 
-		// Create a blank sheet
-		XSSFSheet sheet = workbook.createSheet();
-		XSSFDataFormat df = workbook.createDataFormat();
-		CellStyle style = workbook.createCellStyle();
-		style.setDataFormat(df.getFormat("d-mm-yyyy"));
-		Integer counter = 1;
+    /*
+     * Method to create excel file for Social posts.
+     */
+    @Override
+    public XSSFWorkbook downloadSocialMonitorData( List<SocialPost> socialPosts, String fileName )
+    {
+        // Blank workbook
+        XSSFWorkbook workbook = new XSSFWorkbook();
 
-		// Sorting SurveyResults
-		Collections.sort(surveyDetails, new SurveyResultsComparator());
+        // Create a blank sheet
+        XSSFSheet sheet = workbook.createSheet();
+        XSSFDataFormat df = workbook.createDataFormat();
+        CellStyle style = workbook.createCellStyle();
+        style.setDataFormat( df.getFormat( "d-mm-yyyy" ) );
+        Integer counter = 1;
 
-		// This data needs to be written (List<Object>)
-		Map<String, List<Object>> data = new TreeMap<>();
-		List<Object> surveyDetailsToPopulate = new ArrayList<>();
-		for (SurveyDetails survey : surveyDetails) {
-			if (survey.getSharedOn() != null && !survey.getSharedOn().isEmpty()) {
-				surveyDetailsToPopulate.add(survey.getReview());
-				surveyDetailsToPopulate.add(DATE_FORMATTER.format(survey.getModifiedOn()));
-				surveyDetailsToPopulate.add(StringUtils.join(survey.getSharedOn(), ","));
+        // Sorting SurveyResults
+        Collections.sort( socialPosts, new SocialPostsComparator() );
 
-				String agentName = survey.getAgentName();
-				surveyDetailsToPopulate.add(agentName.substring(0, agentName.lastIndexOf(' ')));
-				surveyDetailsToPopulate.add(agentName.substring(agentName.lastIndexOf(' ') + 1));
+        // This data needs to be written (List<Object>)
+        Map<String, List<Object>> data = new TreeMap<>();
+        List<Object> socialPostsToPopulate = new ArrayList<>();
+        for ( SocialPost post : socialPosts ) {
+            if ( post.getSource() != null && !post.getSource().isEmpty() ) {
+                socialPostsToPopulate.add( post.getPostText() );
+                socialPostsToPopulate.add( DATE_FORMATTER.format( new Date( post.getTimeInMillis() ) ) );
+                socialPostsToPopulate.add( post.getSource() );
+                try {
+                    if ( post.getAgentId() > 0 ) {
+                        socialPostsToPopulate.add( "user" );
 
-				data.put((++counter).toString(), surveyDetailsToPopulate);
-				surveyDetailsToPopulate = new ArrayList<>();
-			}
-		}
+                        socialPostsToPopulate.add( organizationManagementService.getAgentSettings( post.getAgentId() )
+                            .getProfileName() );
 
-		// Setting up headers
-		surveyDetailsToPopulate.add(CommonConstants.HEADER_POST_COMMENT);
-		surveyDetailsToPopulate.add(CommonConstants.HEADER_POST_DATE);
-		surveyDetailsToPopulate.add(CommonConstants.HEADER_POST_SOURCE);
-		surveyDetailsToPopulate.add(CommonConstants.HEADER_AGENT_FIRST_NAME);
-		surveyDetailsToPopulate.add(CommonConstants.HEADER_AGENT_LAST_NAME);
+                    } else if ( post.getBranchId() > 0 ) {
+                        socialPostsToPopulate.add( "branch" );
+                        socialPostsToPopulate.add( organizationManagementService.getBranchSettingsDefault( post.getBranchId() )
+                            .getProfileName() );
+                    } else if ( post.getRegionId() > 0 ) {
+                        socialPostsToPopulate.add( "region" );
+                        socialPostsToPopulate.add( organizationManagementService.getRegionSettings( post.getRegionId() )
+                            .getProfileName() );
+                    } else if ( post.getCompanyId() > 0 ) {
+                        socialPostsToPopulate.add( "company" );
+                        socialPostsToPopulate.add( organizationManagementService.getCompanySettings( post.getCompanyId() )
+                            .getProfileName() );
+                    } else {
+                        socialPostsToPopulate.add( "unavailable" );
+                        socialPostsToPopulate.add( "unavailable" );
+                    }
+                    socialPostsToPopulate.add( post.getPostedBy() );
+                    socialPostsToPopulate.add( post.getPostUrl() );
+                } catch ( InvalidInputException e ) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                } catch ( NoRecordsFetchedException e ) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                }
 
-		data.put("1", surveyDetailsToPopulate);
+                data.put( ( ++counter ).toString(), socialPostsToPopulate );
+                socialPostsToPopulate = new ArrayList<>();
+            }
+        }
 
-		// Iterate over data and write to sheet
-		Set<String> keyset = data.keySet();
-		int rownum = 0;
-		for (String key : keyset) {
-			Row row = sheet.createRow(rownum++);
-			List<Object> objArr = data.get(key);
-			int cellnum = 0;
-			for (Object obj : objArr) {
-				Cell cell = row.createCell(cellnum++);
-				if (obj instanceof String)
-					cell.setCellValue((String) obj);
-				else if (obj instanceof Integer)
-					cell.setCellValue((Integer) obj);
-				else if (obj instanceof Double)
-					cell.setCellValue((Double) obj);
-				else if (obj instanceof Date) {
-					cell.setCellStyle(style);
-					cell.setCellValue((Date) obj);
-				}
-			}
-		}
-		return workbook;
-	}
+        // Setting up headers
+        socialPostsToPopulate.add( CommonConstants.HEADER_POST_COMMENT );
+        socialPostsToPopulate.add( CommonConstants.HEADER_POST_DATE );
+        socialPostsToPopulate.add( CommonConstants.HEADER_POST_SOURCE );
+        socialPostsToPopulate.add( CommonConstants.HEADER_POST_LEVEL );
+        socialPostsToPopulate.add( CommonConstants.HEADER_POST_LEVEL_NAME );
+        socialPostsToPopulate.add( CommonConstants.HEADER_POSTED_BY );
+        socialPostsToPopulate.add( CommonConstants.HEADER_POST_URL );
+
+
+        data.put( "1", socialPostsToPopulate );
+
+        // Iterate over data and write to sheet
+        Set<String> keyset = data.keySet();
+        int rownum = 0;
+        for ( String key : keyset ) {
+            Row row = sheet.createRow( rownum++ );
+            List<Object> objArr = data.get( key );
+            int cellnum = 0;
+            for ( Object obj : objArr ) {
+                Cell cell = row.createCell( cellnum++ );
+                if ( obj instanceof String )
+                    cell.setCellValue( (String) obj );
+                else if ( obj instanceof Integer )
+                    cell.setCellValue( (Integer) obj );
+                else if ( obj instanceof Double )
+                    cell.setCellValue( (Double) obj );
+                else if ( obj instanceof Date ) {
+                    cell.setCellStyle( style );
+                    cell.setCellValue( (Date) obj );
+                }
+            }
+        }
+        return workbook;
+    }
 
 	/*
 	 * Method to create excel file from all the completed survey data.

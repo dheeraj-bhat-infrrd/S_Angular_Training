@@ -17,7 +17,9 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
+
 import javax.annotation.Resource;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
@@ -27,8 +29,10 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.DependsOn;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
+
 import retrofit.client.Response;
 import retrofit.mime.TypedByteArray;
+
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonMappingException;
@@ -41,6 +45,7 @@ import com.realtech.socialsurvey.core.dao.OrganizationUnitSettingsDao;
 import com.realtech.socialsurvey.core.dao.SocialPostDao;
 import com.realtech.socialsurvey.core.dao.SurveyDetailsDao;
 import com.realtech.socialsurvey.core.dao.SurveyPreInitiationDao;
+import com.realtech.socialsurvey.core.dao.UserDao;
 import com.realtech.socialsurvey.core.dao.UserProfileDao;
 import com.realtech.socialsurvey.core.dao.impl.MongoOrganizationUnitSettingDaoImpl;
 import com.realtech.socialsurvey.core.entities.Achievement;
@@ -137,6 +142,10 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
     @Qualifier ( "branch")
     private BranchDao branchDao;
 
+    @Resource
+    @Qualifier ( "user")
+    private UserDao usersDao;
+    
     @Autowired
     private GenericDao<User, Long> userDao;
 
@@ -2019,7 +2028,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
         LOG.info( "Method to delete post to a user's profile finished." );
     }
 
-
+    
     /*
      * Method to fetch social posts for a particular user.
      */
@@ -2049,6 +2058,74 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
     }
 
 
+    /*
+     * Method to fetch social posts for a particular user.
+     */
+    @Override
+    public List<SocialPost> getCumulativeSocialPosts( long entityId, String entityType, int startIndex, int numOfRows,
+        String profileLevel, Date startDate, Date endDate ) throws InvalidInputException, NoRecordsFetchedException
+    {
+        LOG.info( "Method to fetch social posts , getCumulativeSocialPosts() started." );
+        List<SocialPost> posts = new ArrayList<SocialPost>();
+        if ( entityType == null ) {
+            throw new InvalidInputException( "No entity type found in session", DisplayMessageConstants.GENERAL_ERROR );
+        }
+
+        //If agent, get social posts for only that agent.
+        if ( entityType.equals( CommonConstants.AGENT_ID_COLUMN ) ) {
+            posts = socialPostDao.getSocialPosts( entityId, CommonConstants.AGENT_ID, startIndex, numOfRows );
+            //If company, get social posts for that company, all the regions, branches and agents in that company.
+        } else if ( entityType.equals( CommonConstants.COMPANY_ID_COLUMN ) ) {
+            //Get social posts for company
+            posts = socialPostDao.getSocialPosts( entityId, CommonConstants.COMPANY_ID, startIndex, numOfRows );
+            Company company = organizationManagementService.getCompanyById( entityId );
+            //Get social posts for all the regions in the company.
+            for ( Region region : company.getRegions() ) {
+                posts.addAll( socialPostDao.getSocialPosts( region.getRegionId(), CommonConstants.REGION_ID, startIndex,
+                    numOfRows ) );
+            }
+            //Get social posts for all the branches in the company
+            for ( Branch branch : company.getBranches() ) {
+                posts.addAll( socialPostDao.getSocialPosts( branch.getBranchId(), CommonConstants.BRANCH_ID, startIndex,
+                    numOfRows ) );
+            }
+            //Get social posts for all the users in the company
+            for ( User user : company.getUsers() ) {
+                posts
+                    .addAll( socialPostDao.getSocialPosts( user.getUserId(), CommonConstants.AGENT_ID, startIndex, numOfRows ) );
+            }
+            //Get all social posts for region
+        } else if ( entityType.equals( CommonConstants.REGION_ID_COLUMN ) ) {
+            Region region = userManagementService.getRegionById( entityId );
+            //Get social posts for the region
+            posts = socialPostDao.getSocialPosts( entityId, CommonConstants.REGION_ID, startIndex, numOfRows );
+            //Get social posts for all the branches in the region
+            for ( Branch branch : region.getBranches() ) {
+                posts.addAll( socialPostDao.getSocialPosts( branch.getBranchId(), CommonConstants.BRANCH_ID, startIndex,
+                    numOfRows ) );
+            }
+            //Get social posts for all the users in the region
+            
+            if (  getIndividualsByRegionId( entityId ) != null ) {
+                for ( AgentSettings user : getIndividualsByRegionId( entityId ) ) {
+                    posts.addAll( socialPostDao.getSocialPosts( user.getIden(), CommonConstants.AGENT_ID, startIndex, numOfRows ) );
+                }
+            }
+            //Get all social posts for branch
+        } else if ( entityType.equals( CommonConstants.BRANCH_ID_COLUMN ) ) {
+            //Get social posts for the branch
+            posts = socialPostDao.getSocialPosts( entityId, CommonConstants.BRANCH_ID, startIndex, numOfRows );
+            //Get social posts for all the users in the branch
+            if ( getIndividualsByBranchId( entityId ) != null ) {
+                for ( AgentSettings user : getIndividualsByBranchId( entityId ) ) {
+                    posts.addAll( socialPostDao.getSocialPosts( user.getIden(), CommonConstants.AGENT_ID, startIndex, numOfRows ) );
+                }
+            }
+        }
+        LOG.info( "Method to fetch social posts , getCumulativeSocialPosts() finished." );
+        return posts;
+    }
+    
     /*
      * Method to fetch social posts for a particular user.
      */

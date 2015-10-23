@@ -9,11 +9,14 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
 import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrDocumentList;
+
 import com.realtech.socialsurvey.core.entities.Branch;
 import com.realtech.socialsurvey.core.entities.Company;
 import com.realtech.socialsurvey.core.entities.Region;
+import com.realtech.socialsurvey.core.entities.SocialPost;
 import com.realtech.socialsurvey.core.entities.User;
 import com.realtech.socialsurvey.core.entities.UserFromSearch;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
@@ -303,5 +306,18 @@ public interface SolrSearchService
 
 
     public Long fetchRegionCountByCompany( long companyId ) throws InvalidInputException, SolrException, MalformedURLException;
+
+
+    void addSocialPostsToSolr( List<SocialPost> socialPosts ) throws SolrException;
+
+
+    Collection<SocialPost> getSocialPostsFromSolrDocuments( SolrDocumentList documentList );
+
+
+    SolrDocumentList fetchSocialPostsByEntity( String entityType, long entityId, int startIndex, int noOfRows )
+        throws InvalidInputException, SolrException, MalformedURLException;
+
+    SolrDocumentList searchPostText( String entityType, long entityId, int startIndex, int noOfRows, String searchQuery )
+        throws InvalidInputException, SolrException, MalformedURLException;
 }
 // JIRA:SS-62 BY RM 02 EOC

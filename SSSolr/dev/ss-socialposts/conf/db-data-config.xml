@@ -1,0 +1,26 @@
+<dataConfig>
+    <dataSource name="mymongodb" type="MongoDataSource" database="ss_db" />
+  <document>
+     <!-- if query="" then it imports everything -->
+     <entity name="socialposts"
+             processor="MongoEntityProcessor"
+             query='{ postText : { $not: { $regex: ".*Star Survey Response.*" } } }'
+             deltaImportQuery='{ postText : { $not: { $regex: ".*Star Survey Response.*" } }, id : { $eq : "${dih.delta.id}" } }'
+             deltaQuery='{ postText : { $not: { $regex: ".*Star Survey Response.*" } }, id : { $gt : "${dih.delta.id}" } }'
+             collection="SOCIAL_POST"
+             datasource="mymongodb"
+             transformer="MongoMapperTransformer">
+             <field column="id"  name="id" mongoField="_id" />
+             <field column="source" name="source" mongoField="source"/>
+             <field column="companyId" name="companyId" mongoField="companyId"/>
+             <field column="regionId" name="regionId" mongoField="regionId"/>
+             <field column="branchId" name="branchId" mongoField="branchId"/>
+             <field column="userId" name="userId" mongoField="agentId"/>
+             <field column="timeInMillis" name="timeInMillis" mongoField="timeInMillis"/>
+             <field column="postId" name="postId" mongoField="postId"/>
+             <field column="postText" name="postText" mongoField="postText"/>
+             <field column="postedBy" name="postedBy" mongoField="postedBy"/>
+             <field column="postUrl" name="postUrl" mongoField="postUrl"/>
+    </entity>
+  </document>
+</dataConfig>
