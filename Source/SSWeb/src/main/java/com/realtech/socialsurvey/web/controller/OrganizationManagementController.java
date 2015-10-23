@@ -2152,7 +2152,7 @@ public class OrganizationManagementController
                     else
                         mailIDStr += mailID.trim() + " , ";
                 }
-                mailIDStr = mailIDStr.substring( 0, mailIDStr.length() - 2 );
+                mailId = mailIDStr.substring( 0, mailIDStr.length() - 2 );
             }
 
             long entityId = (long) session.getAttribute( CommonConstants.ENTITY_ID_COLUMN );
@@ -2182,8 +2182,6 @@ public class OrganizationManagementController
                 
             }
             
-            if( !isComplaintHandlingEnabled )
-                originalComplaintRegSettings.setRating( 0 );
             originalComplaintRegSettings.setMailId( mailId );
             originalComplaintRegSettings.setEnabled( isComplaintHandlingEnabled );
             unitSettings.getSurvey_settings().setComplaint_reg_settings( originalComplaintRegSettings );
