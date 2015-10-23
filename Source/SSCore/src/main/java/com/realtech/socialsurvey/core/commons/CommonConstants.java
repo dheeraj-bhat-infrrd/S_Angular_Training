@@ -412,6 +412,7 @@ public interface CommonConstants
     /**
      * Solr document related constants
      */
+    public static final String SOURCE_SOLR = "source";
     public static final String REGION_ID_SOLR = "regionId";
     public static final String COMPANY_ID_SOLR = "companyId";
     public static final String IS_DEFAULT_BY_SYSTEM_SOLR = "isDefaultBySystem";
@@ -444,6 +445,12 @@ public interface CommonConstants
     public static final String PROFILE_IMAGE_URL_SOLR = "profileImageUrl";
     public static final String REVIEW_COUNT_SOLR = "reviewCount";
     public static final String TITLE_SOLR = "title";
+    public static final String TIME_IN_MILLIS_SOLR = "timeInMillis";
+    public static final String POST_ID_SOLR = "postId";
+    public static final String POST_TEXT_SOLR = "postText";
+    public static final String POSTED_BY_SOLR = "postedBy";
+    public static final String POST_URL_SOLR = "postUrl";
+    public static final String ID_SOLR = "id";
 
     /*
      * Payment detail constants
@@ -665,6 +672,10 @@ public interface CommonConstants
     public static final String HEADER_POST_COMMENT = "Post Comment";
     public static final String HEADER_POST_DATE = "Post Date";
     public static final String HEADER_POST_SOURCE = "Source";
+    public static final String HEADER_POSTED_BY = "Posted By";
+    public static final String HEADER_POST_URL = "Post URL";
+    public static final String HEADER_POST_LEVEL = "Post Level";
+    public static final String HEADER_POST_LEVEL_NAME = "Post Level Name";
 
 
     public static final String VALID_USERS_LIST = "validUsersList";

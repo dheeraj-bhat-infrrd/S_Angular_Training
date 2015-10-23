@@ -16,9 +16,11 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
+
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.apache.solr.common.SolrDocument;
 import org.slf4j.Logger;
@@ -30,6 +32,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.type.TypeFactory;
 import com.google.gson.Gson;
@@ -39,6 +42,7 @@ import com.realtech.socialsurvey.core.entities.AgentSettings;
 import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
 import com.realtech.socialsurvey.core.entities.ProfileStage;
 import com.realtech.socialsurvey.core.entities.SocialMediaTokens;
+import com.realtech.socialsurvey.core.entities.SocialPost;
 import com.realtech.socialsurvey.core.entities.SurveyDetails;
 import com.realtech.socialsurvey.core.entities.SurveyPreInitiation;
 import com.realtech.socialsurvey.core.entities.SurveyRecipient;
@@ -1456,9 +1460,9 @@ public class DashboardController
     }
 
 
-    /*
+/*    
      * Method to download file containing incomplete surveys
-     */
+     
     @RequestMapping ( value = "/downloaddashboardsocialmonitor")
     public void getSocialMonitorFile( Model model, HttpServletRequest request, HttpServletResponse response )
     {
@@ -1559,8 +1563,110 @@ public class DashboardController
         }
         LOG.info( "Method getSocialMonitorFile() finished." );
     }
+*/
+    /*
+     * Method to download file containing incomplete surveys
+     */
+    @RequestMapping ( value = "/downloaddashboardsocialmonitor")
+    public void getSocialMonitorFile( Model model, HttpServletRequest request, HttpServletResponse response )
+    {
+        LOG.info( "Method to get file containg Social Monitors list getSocialMonitorFile() started." );
+        User user = sessionHelper.getCurrentUser();
+        boolean realTechAdmin = user.isSuperAdmin();
+        List<SocialPost> socialPosts = new ArrayList<>();
 
+        try {
+            String columnName = request.getParameter( "columnName" );
+            if ( !realTechAdmin && ( columnName == null || columnName.isEmpty() ) ) {
+                LOG.error( "Invalid value (null/empty) passed for profile level." );
+                throw new InvalidInputException( "Invalid value (null/empty) passed for profile level." );
+            }
 
+            String startDateStr = request.getParameter( "startDate" );
+            String endDateStr = request.getParameter( "endDate" );
+
+            Date startDate = null;
+            Date endDate = Calendar.getInstance().getTime();
+            if ( startDateStr != null && !startDateStr.isEmpty() ) {
+                try {
+                    startDate = new SimpleDateFormat( CommonConstants.DATE_FORMAT ).parse( startDateStr );
+                } catch ( ParseException e ) {
+                    LOG.error( "ParseException caught in getSocialMonitorFile() while parsing startDate. Nested exception is ",
+                        e );
+                }
+            }
+            if ( endDateStr != null && !endDateStr.isEmpty() ) {
+                try {
+                    endDate = new SimpleDateFormat( CommonConstants.DATE_FORMAT ).parse( endDateStr );
+                } catch ( ParseException e ) {
+                    LOG.error( "ParseException caught in getSocialMonitorFile() while parsing startDate. Nested exception is ",
+                        e );
+                }
+            }
+
+            String profileLevel = getProfileLevel( columnName );
+            long iden = 0;
+
+            if ( realTechAdmin ) {
+                profileLevel = CommonConstants.PROFILE_LEVEL_REALTECH_ADMIN;
+            }
+
+            if ( profileLevel.equals( CommonConstants.PROFILE_LEVEL_COMPANY ) ) {
+                iden = user.getCompany().getCompanyId();
+            } else if ( profileLevel.equals( CommonConstants.PROFILE_LEVEL_INDIVIDUAL ) ) {
+                iden = user.getUserId();
+            } else {
+                String columnValue = request.getParameter( "columnValue" );
+                if ( columnValue != null && !columnValue.isEmpty() ) {
+                    try {
+                        iden = Long.parseLong( columnValue );
+                    } catch ( NumberFormatException e ) {
+                        LOG.error(
+                            "NumberFormatExcept;ion caught while parsing columnValue in getSocialMonitorFile(). Nested exception is ",
+                            e );
+                        throw e;
+                    }
+                }
+            }
+
+            try {
+                Date date = new Date();
+                socialPosts = profileManagementService.getCumulativeSocialPosts( iden, columnName, -1, -1, profileLevel, startDate, endDate );
+                String fileName = "Social_Monitor-" + profileLevel + "-" + user.getFirstName() + "_" + user.getLastName() + "-"
+                    + ( new Timestamp( date.getTime() ) ) + EXCEL_FILE_EXTENSION;
+                XSSFWorkbook workbook = dashboardService.downloadSocialMonitorData( socialPosts, fileName );
+                response.setContentType( EXCEL_FORMAT );
+                String headerKey = CONTENT_DISPOSITION_HEADER;
+                String headerValue = String.format( "attachment; filename=\"%s\"", new File( fileName ).getName() );
+                response.setHeader( headerKey, headerValue );
+
+                // write into file
+                OutputStream responseStream = null;
+                try {
+                    responseStream = response.getOutputStream();
+                    workbook.write( responseStream );
+                } catch ( IOException e ) {
+                    LOG.error( "IOException caught in getSocialMonitorFile(). Nested exception is ", e );
+                } finally {
+                    try {
+                        responseStream.close();
+                    } catch ( IOException e ) {
+                        LOG.error( "IOException caught in getSocialMonitorFile(). Nested exception is ", e );
+                    }
+                }
+                response.flushBuffer();
+            } catch ( InvalidInputException e ) {
+                LOG.error( "InvalidInputException caught in getSocialMonitorFile(). Nested exception is ", e );
+                throw e;
+            } catch ( IOException e ) {
+                LOG.error( "IOException caught in getSocialMonitorFile(). Nested exception is ", e );
+            }
+        } catch ( NonFatalException e ) {
+            LOG.error( "Non fatal exception caught in getSocialMonitorFile(). Nested exception is ", e );
+        }
+        LOG.info( "Method getSocialMonitorFile() finished." );
+    }
+    
     /*
      * Method to download file containing incomplete surveys
      */
