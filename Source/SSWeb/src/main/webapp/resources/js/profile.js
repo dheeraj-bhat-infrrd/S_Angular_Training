@@ -115,7 +115,7 @@ function validateContactUsForm() {
 	return isContactUsFormValid;
 } 
 
-$(document).on('click', '.icn-person', function() {
+$(document).on('click touchstart', '.icn-person', function() {
     $('.mob-icn').removeClass('mob-icn-active');
     $(this).addClass('mob-icn-active');
     $('#prof-company-intro').show();
@@ -125,7 +125,7 @@ $(document).on('click', '.icn-person', function() {
     $('#recent-post-container').hide();
 });
 
-$(document).on('click', '.icn-ppl', function() {
+$(document).on('click touchstart', '.icn-ppl', function() {
     $('.mob-icn').removeClass('mob-icn-active');
     $(this).addClass('mob-icn-active');
     $('#recent-post-container').show();
@@ -135,7 +135,7 @@ $(document).on('click', '.icn-ppl', function() {
     $('#reviews-container').hide();
 });
 
-$(document).on('click', '.icn-star-smile', function() {
+$(document).on('click touchstart', '.icn-star-smile', function() {
     $('.mob-icn').removeClass('mob-icn-active');
     $(this).addClass('mob-icn-active');
     $('#reviews-container').show();
@@ -145,7 +145,7 @@ $(document).on('click', '.icn-star-smile', function() {
     $('#recent-post-container').hide();
 });
 
-$(document).on('click', '.inc-more', function() {
+$(document).on('click touchstart', '.inc-more', function() {
     $('.mob-icn').removeClass('mob-icn-active');
     $(this).addClass('mob-icn-active');
     $('#prof-agent-container').show();
@@ -240,7 +240,7 @@ function fetchCompanyProfile() {
 	if(result.survey_settings != undefined && result.survey_settings.show_survey_above_score != undefined) {
 		minScore = result.survey_settings.show_survey_above_score;
 	}
-	fetchReviewsCountBasedOnProfileLevel('COMPANY',result.iden,paintHiddenReviewsCount,0,minScore);
+	fetchReviewsCountBasedOnProfileLevel('COMPANY',result.iden,paintHiddenReviewsCount,0,minScore, true);
 	fetchReviewsBasedOnProfileLevel('COMPANY', result.iden,startIndex,numOfRows,minScore);	
 	fetchZillowReviewsBasedOnProfile('COMPANY',result.iden);
 }
@@ -1008,7 +1008,7 @@ function fetchReviewsBasedOnProfileLevel(profileLevel, currentProfileIden,
 }
 
 function fetchReviewsCountBasedOnProfileLevel(profileLevel, iden,
-		callbackFunction, minScore, maxScore) {
+		callbackFunction, minScore, maxScore, notRecommended) {
 	if (iden == undefined || iden == "") {
 		return;
 	}
@@ -1029,6 +1029,9 @@ function fetchReviewsCountBasedOnProfileLevel(profileLevel, iden,
 		url += "individual/";
 	}
 	url += iden + '/reviewcount?minScore=' + minScore + '&maxScore=' + maxScore;
+	if(notRecommended != undefined && typeof(notRecommended) === "boolean") {
+		url += '&notRecommended=' + notRecommended;
+	}
 	callAjaxGET(url, callbackFunction, false);
 }
 
@@ -1115,7 +1118,7 @@ function fetchRegionProfile() {
 	}
 	startIndex = 0;
 	fetchReviewsBasedOnProfileLevel('REGION', result.iden,startIndex,numOfRows,minScore);
-	fetchReviewsCountBasedOnProfileLevel('REGION',result.iden, paintHiddenReviewsCount, 0, minScore);
+	fetchReviewsCountBasedOnProfileLevel('REGION',result.iden, paintHiddenReviewsCount, 0, minScore, true);
 	fetchZillowReviewsBasedOnProfile('REGION',result.iden);
 }
 
@@ -1129,7 +1132,7 @@ function fetchBranchProfile() {
 	}
 	startIndex = 0;
 	fetchReviewsBasedOnProfileLevel('BRANCH', result.iden, startIndex, numOfRows, minScore);
-	fetchReviewsCountBasedOnProfileLevel('BRANCH',result.iden, paintHiddenReviewsCount, 0, minScore);
+	fetchReviewsCountBasedOnProfileLevel('BRANCH',result.iden, paintHiddenReviewsCount, 0, minScore, true);
 	fetchZillowReviewsBasedOnProfile('BRANCH',result.iden);
 }
 
@@ -1266,7 +1269,7 @@ function fetchAgentProfile(){
 	}
 	startIndex = 0;
 	fetchReviewsBasedOnProfileLevel('INDIVIDUAL', result.iden, startIndex, numOfRows, minScore);
-	fetchReviewsCountBasedOnProfileLevel('INDIVIDUAL',result.iden, paintHiddenReviewsCount, 0, minScore);
+	fetchReviewsCountBasedOnProfileLevel('INDIVIDUAL',result.iden, paintHiddenReviewsCount, 0, minScore, true);
 	fetchZillowReviewsBasedOnProfile('INDIVIDUAL',result.iden);
 }
 
