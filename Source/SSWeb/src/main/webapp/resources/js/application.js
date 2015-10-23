@@ -9118,9 +9118,11 @@ $(document).on('click touchstart','#compl-checkbox', function() {
 		if(validateMultipleEmailIds('comp-mailId')) {
 			$(this).removeClass('bd-check-img-checked');
 			$('input[name="enabled"]').prop( "checked" , true);
+			$('input[name="enabled"]').val("enable");
 		}
 	} else {
 			$(this).addClass('bd-check-img-checked');
 			$('input[name="enabled"]').prop( "checked" , false);
+			$('input[name="enabled"]').val("");
 	}
 });
