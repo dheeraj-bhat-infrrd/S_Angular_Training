@@ -4,6 +4,7 @@ import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
@@ -12,6 +13,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
+
 import com.realtech.socialsurvey.core.dao.OrganizationUnitSettingsDao;
 import com.realtech.socialsurvey.core.dao.impl.MongoOrganizationUnitSettingDaoImpl;
 import com.realtech.socialsurvey.core.entities.ProfileUrlEntity;
@@ -23,12 +25,14 @@ public class MongoSiteMapContentFetcher implements SitemapContentFecher, Initial
 
 	private static final Logger LOG = LoggerFactory.getLogger(MongoSiteMapContentFetcher.class);
 	
-	private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd");
+	private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss Z");
 
 	private String collectionName;
 	private String interval;
+	private float priority;
+	private String changeFrequency;
 
-	private int limit = 50;
+    private int limit = 50;
 	private long count;
 	private int recordsFetched;
 	private boolean areMoreRecordsPresent;
@@ -50,6 +54,16 @@ public class MongoSiteMapContentFetcher implements SitemapContentFecher, Initial
 	public void setCollectionName(String collectionName){
 		this.collectionName = collectionName;
 	}
+	
+	public void setPriority( float priority )
+    {
+        this.priority = priority;
+    }
+	
+	public void setChangeFrequency( String changeFrequency )
+    {
+        this.changeFrequency = changeFrequency;
+    }
 
 	@Override
 	public List<SiteMapEntry> getInitialContent() {
@@ -122,6 +136,10 @@ public class MongoSiteMapContentFetcher implements SitemapContentFecher, Initial
 		for (ProfileUrlEntity profileUrl : profileUrls) {
 			LOG.info("Converting " + profileUrl + " to SME");
 			entry = new SiteMapEntry();
+			//set priority
+			entry.setPriority( priority );
+			//set frequency
+			entry.setChangeFrequency( changeFrequency );
 			// generate location
 			entry.setLocation(generateLocation(profileUrl.getProfileUrl()));
 			Timestamp modifiedOnTimestamp =  new Timestamp(profileUrl.getModifiedOn());
