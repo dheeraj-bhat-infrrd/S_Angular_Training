@@ -12,9 +12,11 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
+
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.noggit.JSONUtil;
 import org.slf4j.Logger;
@@ -27,6 +29,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
+
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
@@ -48,7 +51,7 @@ import com.realtech.socialsurvey.core.services.admin.AdminAuthenticationService;
 import com.realtech.socialsurvey.core.services.organizationmanagement.OrganizationManagementService;
 import com.realtech.socialsurvey.core.services.organizationmanagement.UserManagementService;
 import com.realtech.socialsurvey.core.services.payment.Payment;
-import com.realtech.socialsurvey.core.services.payment.exception.SubscriptionCancellationUnsuccessfulException;
+import com.realtech.socialsurvey.core.services.payment.exception.CustomerDeletionUnsuccessfulException;
 import com.realtech.socialsurvey.core.services.search.SolrSearchService;
 import com.realtech.socialsurvey.core.services.search.exception.SolrException;
 import com.realtech.socialsurvey.core.services.surveybuilder.SurveyHandler;
@@ -86,9 +89,10 @@ public class AdminController
 
     @Autowired
     private Payment payment;
-    
+
     @Autowired
     private SurveyHandler surveyHandler;
+
 
     @RequestMapping ( value = "/admindashboard")
     public String adminDashboard( Model model, HttpServletRequest request )
@@ -105,23 +109,23 @@ public class AdminController
     {
         Company company = organizationManagementService.getCompanyById( companyId );
         String message = CommonConstants.SUCCESS_ATTRIBUTE;
-        // unsubscribe company from braintree
-        List<LicenseDetail> licenseDetailList = company.getLicenseDetails();
-        if(licenseDetailList != null){
-        	for(LicenseDetail detail : licenseDetailList){
-        		String subscriptionId = detail.getSubscriptionId();
-        		if(detail.getSubscriptionIdSource().equals(CommonConstants.SUBSCRIPTION_ID_SOURCE_BRAINTREE)){
-        			try {
-						payment.unsubscribe(subscriptionId);
-					} catch (SubscriptionCancellationUnsuccessfulException | InvalidInputException e) {
-						LOG.error( "Exception Caught " + e.getMessage() );
-	                    message = CommonConstants.ERROR;
-					}
-        		}
-        	}
-        }
-        
+        // delete company from braintree
+
         if ( company != null ) {
+            try {
+                List<LicenseDetail> licenseDetails = company.getLicenseDetails();
+                if ( licenseDetails.size() > 0 ) {
+                    LicenseDetail licenseDetail = licenseDetails.get( 0 );
+                    if ( licenseDetail.getPaymentMode().equals( CommonConstants.BILLING_MODE_AUTO ) ) {
+                        LOG.debug( "Deleting company from braintree " );
+                        payment.deleteCustomer( Long.toString( company.getCompanyId() ) );
+                    }
+                }
+
+            } catch ( CustomerDeletionUnsuccessfulException | InvalidInputException e ) {
+                LOG.error( "Exception Caught " + e.getMessage() );
+                message = CommonConstants.ERROR;
+            }
             if ( company.getStatus() == CommonConstants.STATUS_INACTIVE ) {
                 try {
                     organizationManagementService.purgeCompany( company );
@@ -183,30 +187,34 @@ public class AdminController
                 LOG.debug( "fetching users under company from solr" );
                 users = organizationManagementService.getUsersUnderCompanyFromSolr( company, start );
             } catch ( NoRecordsFetchedException e ) {
-            	OrganizationUnitSettings companySettings = organizationManagementService.getCompanySettings(companyId);
-            	if(companySettings != null && companySettings.getContact_details() != null){
-            		ContactDetailsSettings companyContactDetail =  companySettings.getContact_details();
-            		if(companyContactDetail.getContact_numbers() != null){
-            			model.addAttribute("workContactNo" ,companyContactDetail.getContact_numbers().getWork() );
-            		}
-            		if(companyContactDetail.getMail_ids() != null){
-            			model.addAttribute("workMailId" ,companyContactDetail.getMail_ids().getWork() );
-            			// Get the user user name
-            			if(companyContactDetail.getMail_ids().getWork() != null && !companyContactDetail.getMail_ids().getWork().isEmpty()){
-            				User user = userManagementService.getUserByEmail(companyContactDetail.getMail_ids().getWork());
-            				model.addAttribute("userName", user.getFirstName()+" "+(user.getLastName()!=null?user.getLastName():""));
-            			}
-            		}
-            	}
+                OrganizationUnitSettings companySettings = organizationManagementService.getCompanySettings( companyId );
+                if ( companySettings != null && companySettings.getContact_details() != null ) {
+                    ContactDetailsSettings companyContactDetail = companySettings.getContact_details();
+                    if ( companyContactDetail.getContact_numbers() != null ) {
+                        model.addAttribute( "workContactNo", companyContactDetail.getContact_numbers().getWork() );
+                    }
+                    if ( companyContactDetail.getMail_ids() != null ) {
+                        model.addAttribute( "workMailId", companyContactDetail.getMail_ids().getWork() );
+                        // Get the user user name
+                        if ( companyContactDetail.getMail_ids().getWork() != null
+                            && !companyContactDetail.getMail_ids().getWork().isEmpty() ) {
+                            User user = userManagementService.getUserByEmail( companyContactDetail.getMail_ids().getWork() );
+                            model.addAttribute( "userName",
+                                user.getFirstName() + " " + ( user.getLastName() != null ? user.getLastName() : "" ) );
+                        }
+                    }
+                }
                 LOG.error( "No records found for company branch or region, reason : " + e.getMessage() );
-                model.addAttribute( "message", messageUtils.getDisplayMessage( DisplayMessageConstants.COMPANY_NOT_REGISTERD,
+                model.addAttribute(
+                    "message",
+                    messageUtils.getDisplayMessage( DisplayMessageConstants.COMPANY_NOT_REGISTERD,
                         DisplayMessageType.SUCCESS_MESSAGE ).getMessage() );
-                
+
                 return JspResolver.ADMIN_COMPANY_NOT_REGISTERED;
             }
             model.addAttribute( "companyObj", company );
-            
-          //add profile image url
+
+            //add profile image url
             /*for(RegionFromSearch region : regions){
                 OrganizationUnitSettings regionSetting =  organizationManagementService.getRegionSettings( region.getRegionId() );
                 region.setProfileImageUrl( regionSetting.getProfileImageUrl() );
@@ -221,7 +229,7 @@ public class AdminController
                 OrganizationUnitSettings userSetting =  organizationManagementService.getAgentSettings( user.getUserId() );
                 user.setProfileImageUrl( userSetting.getProfileImageUrl() );
             }*/
-            
+
             model.addAttribute( "regions", regions );
             model.addAttribute( "branches", branches );
             model.addAttribute( "individuals", users );
@@ -322,8 +330,8 @@ public class AdminController
             }
 
             users = userManagementService.checkUserCanEdit( admin, adminUser, users );
-            
-          //add profile image url            
+
+            //add profile image url            
             /*for(BranchFromSearch branch : branches){
                 OrganizationUnitSettings branchSetting =  organizationManagementService.getBranchSettingsDefault( branch.getBranchId() );
                 branch.setProfileImageUrl( branchSetting.getProfileImageUrl() );
@@ -333,7 +341,7 @@ public class AdminController
                 OrganizationUnitSettings userSetting =  organizationManagementService.getAgentSettings( user.getUserId() );
                 user.setProfileImageUrl( userSetting.getProfileImageUrl() );
             }*/
-            
+
             model.addAttribute( "branches", branches );
             model.addAttribute( "individuals", users );
             model.addAttribute( "regionId", regionId );
@@ -398,13 +406,13 @@ public class AdminController
             }
 
             usersList = userManagementService.checkUserCanEdit( admin, adminUser, usersList );
-            
-          //add profile image url
+
+            //add profile image url
             /*for(UserFromSearch user : usersList){
                 OrganizationUnitSettings userSetting =  organizationManagementService.getAgentSettings( user.getUserId() );
                 user.setProfileImageUrl( userSetting.getProfileImageUrl() );
             }*/
-            
+
 
             model.addAttribute( "users", usersList );
             model.addAttribute( "branchId", branchId );
@@ -504,7 +512,8 @@ public class AdminController
 
         return JspResolver.ADMIN_INVITE_VIEW;
     }
- 
+
+
     @RequestMapping ( value = "/downloadcompanyregistrationreport")
     public void downloadCompanyRegistrationReport( HttpServletRequest request, HttpServletResponse response )
     {
@@ -561,15 +570,16 @@ public class AdminController
             LOG.error( "Non fatal exception occured while downloading the company report , reason " + e.getMessage() );
         }
     }
-    
+
+
     @RequestMapping ( value = "/showabusereports", method = RequestMethod.GET)
     public String showAbuseReports()
     {
         LOG.info( "Inside showAbuseReports() method" );
-        
+
         return JspResolver.ADMIN_ABUSE_REPORTS_VIEW;
     }
-    
+
 
     @RequestMapping ( value = "/fetchsurveybyabuse", method = RequestMethod.GET)
     public String fetchSurveyByAbuse( Model model, HttpServletRequest request )
@@ -580,10 +590,14 @@ public class AdminController
             String batchSizeStr = request.getParameter( "batchSize" );
             int startIndex = Integer.parseInt( startIndexStr );
             int batchSize = Integer.parseInt( batchSizeStr );
-            List<AbusiveSurveyReportWrapper> abusiveSurveyReports = surveyHandler.getSurveysReportedAsAbusive( startIndex, batchSize );
+
+            List<AbusiveSurveyReportWrapper> abusiveSurveyReports = surveyHandler.getSurveysReportedAsAbusive( startIndex,
+                batchSize );
+
             model.addAttribute( "abusiveReviewReportList", abusiveSurveyReports );
         } catch ( NumberFormatException e ) {
-            LOG.error( "NumberFormat exception caught in fetchSurveyByAbuse() while fetching abusive reviews. Nested exception is ", e );
+            LOG.error(
+                "NumberFormat exception caught in fetchSurveyByAbuse() while fetching abusive reviews. Nested exception is ", e );
             model.addAttribute( "message", e.getMessage() );
         }
         LOG.info( "Method to get abusive surveys fetchSurveyByAbuse() finished." );
