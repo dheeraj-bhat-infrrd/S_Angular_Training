@@ -13,7 +13,7 @@ $(document).ready(function() {
 	if (iden == undefined || profileLevel == undefined || profileLevel == ""){
 		body = "Incorrect parameters. Please check your selection.";
 	} else {
-		body = "&lt;iframe src=\"" + appBaseUrl +  "rest/widget/" + profileLevel + "/" + iden + "\" height=\"100%\" style=\"border : 0\"&gt;&lt;/iframe&gt;";
+		body = "&lt;iframe src=\"" + appBaseUrl +  "rest/widget/" + profileLevel + "/" + iden + "\" frameborder=\"0\" width=\"100%\" scrolling=\"no\" onload=\"this.style.height=this.contentDocument.body.scrollHeight +'px';\" /&gt;";
 	}
 	$("#widget-code-area").html(body);
 });
