@@ -56,6 +56,7 @@ namespace EncompassSocialSurvey.DAL
                                         , STATUS
                                         , CREATED_ON
                                         , MODIFIED_ON
+										, COLLECTION_NAME
                                           )
                                         VALUES(
                                           ?SURVEY_SOURCE
@@ -74,6 +75,7 @@ namespace EncompassSocialSurvey.DAL
                                         , ?STATUS
                                         , ?CREATED_ON
                                         , ?MODIFIED_ON
+										, ?COLLECTION_NAME
                                         ) ;";
 
         public bool UpdateCrmBatchTracker(CRMBatchTrackerEntity entity)
@@ -177,6 +179,7 @@ namespace EncompassSocialSurvey.DAL
                     commandToInsert.Parameters.Add("?STATUS", MySqlDbType.Int32).Value = loan.Status;
                     commandToInsert.Parameters.Add("?CREATED_ON", MySqlDbType.DateTime).Value = loan.CreatedOn;
                     commandToInsert.Parameters.Add("?MODIFIED_ON", MySqlDbType.DateTime).Value = DateTime.Now;
+					commandToInsert.Parameters.Add("?COLLECTION_NAME", MySqlDbType.VarChar, 250).Value = "COMPANY_SETTINGS";
 
                     //
                     commandToInsert.ExecuteNonQuery();

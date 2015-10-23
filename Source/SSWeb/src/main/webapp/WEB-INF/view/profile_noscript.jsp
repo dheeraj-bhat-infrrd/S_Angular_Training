@@ -172,27 +172,29 @@
 </div>
 
 <div id="profile-main-content" class="prof-main-content-wrapper margin-top-10 margin-bottom-25">
-    <div itemscope itemtype="https://schema.org/LocalBusiness" class="">
+    <div itemscope itemtype="https://schema.org/ProfilePage" class="">
     	<div class="container">
         <div class="row prof-pic-name-wrapper">
 			<c:if test="${not empty profile.profileImageUrl }">
 				<c:set var="profileNameClass" value="profile-name-img-wrapper"></c:set>
 				<div id="prog-img-container" class="col-lg-4 col-md-4 col-sm-4 col-xs-6 prof-wrapper prof-img-wrapper prog-img-container">
 					<div class="prog-img-container">
-			            <img itemprop="image" class="prof-image pos-relative" src="${profile.profileImageUrl}" alt="Photo of ${profName}"></img>
+			            <img itemprop="primaryImageOfPage" class="prof-image pos-relative" src="${profile.profileImageUrl}" alt="Photo of ${profName}"></img>
 		            </div>
 	            </div>
 			</c:if>
             <div class="col-lg-4 col-md-4 col-sm-4 col-xs-6 prof-wrapper pos-relative prof-name-wrapper ${profileNameClass}">
                 <div class="prof-name-container">
+                	<div itemprop="about" itemscope="" itemtype="http://schema.org/Person">
                 	<div itemprop="name" class="prof-name">${profName}</div>
                 	<div class="prof-address">
                 		<c:if test="${not empty profile.vertical}">
                 			<div class="prof-addline1">${profile.vertical}</div>
                 		</c:if>
                 		<c:if test="${not empty profile.contact_details &&  not empty profile.contact_details.title}">
-                			<div class="prof-addline2">${profile.contact_details.title}</div>
+                			<div itemprop="jobTitle" class="prof-addline2">${profile.contact_details.title}</div>
                 		</c:if>
+                	</div>
                 	</div>
                 	<!-- Apply aggregate rating only when we have reviews -->
                 	<c:choose>
@@ -236,6 +238,7 @@
             		</c:otherwise>
             	</c:choose>
             	<c:if test="${not empty contact_details}">
+            	<div itemprop="about" itemscope="" itemtype="http://schema.org/Person">
                 <div class="prof-user-address" itemprop="address" itemscope itemtype="http://schema.org/PostalAddress">
                 	<c:if test="${not empty contact_details.address1 || not empty contact_details.address2 }">
                 		<div itemprop="streetAddress">
@@ -263,6 +266,7 @@
                 			<meta itemprop="addressCountry" content="${contact_details.country}"/>
                 		</c:if>
                 	</c:if>
+                </div>
                 </div>
                 </c:if>
             </div>
@@ -338,7 +342,7 @@
                 
                <c:if test="${not empty profile.contact_details }">
                 	<c:if test="${not empty profile.contact_details.web_addresses || not empty profile.contact_details.contact_numbers}">
-						<div id="contact-info" class="prof-left-row prof-left-info bord-bot-dc prof-contact-info">
+						<div class="prof-left-row prof-left-info bord-bot-dc prof-contact-info">
 							<div class="left-contact-wrapper">
 								<div class="left-panel-header">
 									<spring:message code="label.contactinformation.key" />
@@ -354,7 +358,7 @@
 									<c:if test="${not empty profile.contact_details.contact_numbers && not empty profile.contact_details.contact_numbers.work}">
 										<div class="lp-con-row lp-row clearfix">
 											<div class="float-left lp-con-icn icn-phone"></div>
-											<div class="float-left lp-con-row-item" itemprop="telephone">${profile.contact_details.contact_numbers.work}</div>
+											<div class="float-left lp-con-row-item">${profile.contact_details.contact_numbers.work}</div>
 										</div>
 									</c:if>
 								</div>
@@ -557,7 +561,7 @@
                     <div class="main-con-header">About ${profName}</div>
                     <c:choose>
                     	<c:when test="${not empty profile.contact_details && not empty profile.contact_details.about_me }">
-                    		<div class="pe-whitespace intro-body">${profile.contact_details.about_me}</div>
+                    		<div itemprop="description" class="pe-whitespace intro-body">${profile.contact_details.about_me}</div>
                     	</c:when>
                     	<c:otherwise>
                     		<c:choose>
@@ -647,9 +651,9 @@
 								<div itemprop="review" itemscope itemtype="http://schema.org/Review" class="ppl-review-item" data-cust-first-name="${reviewItem.customerFirstName }"
 									data-cust-last-name="${reviewItem.customerLastName }" data-agent-name="${reviewItem.agentName }"
 									data-rating="${reviewItem.score }" data-review="${reviewItem.review}">
-									<div itemprop="itemReviewed" itemscope itemtype="http://schema.org/Product">
+									<%-- <div itemprop="itemReviewed" itemscope itemtype="http://schema.org/ProfilePage">
 										<meta itemprop="name" content="${reviewItem.agentName}">
-									</div>
+									</div> --%>
 									<div class="ppl-header-wrapper clearfix">
 										<div class="float-left ppl-header-left">
 											<div itemprop="author" itemscope itemtype="http://schema.org/Person" class="ppl-head-1"><span itemprop="name">${reviewItem.customerFirstName } ${reviewItem.customerLastName }</span></div>

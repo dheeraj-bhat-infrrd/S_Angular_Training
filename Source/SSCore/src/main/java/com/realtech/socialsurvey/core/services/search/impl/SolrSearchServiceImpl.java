@@ -403,6 +403,7 @@ public class SolrSearchServiceImpl implements SolrSearchService
 
 
     /**
+<<<<<<< HEAD
      * Method to get solr input document from social post
      * @param socialPost
      * @return
@@ -431,6 +432,8 @@ public class SolrSearchServiceImpl implements SolrSearchService
 
 
     /**
+=======
+>>>>>>> upstream/devel
      * Method to get solr document from a region
      * 
      * @param region
@@ -570,9 +573,9 @@ public class SolrSearchServiceImpl implements SolrSearchService
 
             String[] fields = { CommonConstants.USER_ID_SOLR, CommonConstants.USER_DISPLAY_NAME_SOLR,
                 CommonConstants.TITLE_SOLR, CommonConstants.ABOUT_ME_SOLR, CommonConstants.PROFILE_IMAGE_URL_SOLR,
-                CommonConstants.PROFILE_URL_SOLR };
+                CommonConstants.PROFILE_URL_SOLR, CommonConstants.REVIEW_COUNT_SOLR };
             solrQuery.setFields( fields );
-
+            solrQuery.setSort( CommonConstants.REVIEW_COUNT_SOLR, ORDER.desc );
             String query = "";
             if ( !patternFirst.equals( "" ) && !patternLast.equals( "" ) ) {
                 query = CommonConstants.USER_FIRST_NAME_SOLR + ":" + patternFirst + "*" + " AND "
@@ -1210,7 +1213,6 @@ public class SolrSearchServiceImpl implements SolrSearchService
         return regionsResult;
     }
 
-
     /**
      * Method to fetch social posts from solr given the entity
      */
@@ -1275,7 +1277,6 @@ public class SolrSearchServiceImpl implements SolrSearchService
         LOG.info( "Method searchPostText() finished for entity id : " + entityId + " and entity type : " + entityType );
         return results;
     }
-
 
     @Override
     public String fetchBranchesByCompany( long companyId, int size ) throws InvalidInputException, SolrException,
@@ -1543,7 +1544,6 @@ public class SolrSearchServiceImpl implements SolrSearchService
         LOG.info( "Method to add branches to solr finshed" );
     }
 
-
     /**
      * Method to index a list of social posts in Solr
      */
@@ -1575,7 +1575,6 @@ public class SolrSearchServiceImpl implements SolrSearchService
         }
         LOG.info( "Method to add social posts to solr finshed" );
     }
-
 
     @Override
     public void addUsersToSolr( List<User> users ) throws SolrException
@@ -1943,7 +1942,6 @@ public class SolrSearchServiceImpl implements SolrSearchService
         return matchedRegions.values();
     }
 
-
     /**
      * Method to get a list of social posts given the Solr document.
      */
@@ -1972,7 +1970,6 @@ public class SolrSearchServiceImpl implements SolrSearchService
         LOG.info( "Method getSocialPostsFromSolrDocuments() finished" );
         return matchedSocialPosts;
     }
-
 
     @SuppressWarnings ( "unchecked")
     public Collection<UserFromSearch> getUsersFromSolrDocuments( SolrDocumentList documentList ) throws InvalidInputException

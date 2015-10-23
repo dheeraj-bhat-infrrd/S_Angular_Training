@@ -4,17 +4,14 @@ import java.sql.Timestamp;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
 import org.quartz.JobDataMap;
 import org.quartz.JobExecutionContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.quartz.QuartzJobBean;
 import org.springframework.stereotype.Component;
-
 import retrofit.client.Response;
 import retrofit.mime.TypedByteArray;
-
 import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
 import com.google.gson.reflect.TypeToken;
@@ -31,6 +28,7 @@ import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
 import com.realtech.socialsurvey.core.entities.Region;
 import com.realtech.socialsurvey.core.entities.SurveyPreInitiation;
 import com.realtech.socialsurvey.core.entities.User;
+import com.realtech.socialsurvey.core.exception.FatalException;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.exception.NoRecordsFetchedException;
 import com.realtech.socialsurvey.core.integration.dotloop.DotloopIntegrationApi;
@@ -48,7 +46,7 @@ import com.realtech.socialsurvey.core.services.surveybuilder.SurveyHandler;
 public class DotloopReviewProcessor extends QuartzJobBean
 {
 
-    private static final Logger LOG = LoggerFactory.getLogger( ZillowReviewProcessor.class );
+    private static final Logger LOG = LoggerFactory.getLogger( DotloopReviewProcessor.class );
 
     private DotloopIntergrationApiBuilder dotloopIntegrationApiBuilder;
 
@@ -70,6 +68,8 @@ public class DotloopReviewProcessor extends QuartzJobBean
 
     private static final String SELLER_ROLE = "Seller";
     private static final String BUYER_ROLE = "Buyer";
+    
+    private static final String SOLD_STATUS = "Sold";
 
 
     @Override
@@ -100,14 +100,14 @@ public class DotloopReviewProcessor extends QuartzJobBean
                         LOG.debug( "API key is " + dotLoopCrmInfo.getApi() );
                         try {
                             fetchReviewfromDotloop( dotLoopCrmInfo, collectionName, organizationUnitSettings );
+                            if ( !dotLoopCrmInfo.isRecordsBeenFetched() ) {
+                                LOG.debug( "This was the first fetch hence updating recordsFetched to true " );
+                                dotLoopCrmInfo.setRecordsBeenFetched( true );
+                                updateDotLoopCrmInfo( collectionName, organizationUnitSettings, dotLoopCrmInfo );
+                            }
                         } catch ( Exception e ) {
                             LOG.error( "Exception caught for collection " + collectionName + "having iden as "
                                 + organizationUnitSettings.getIden(), e );
-                        }
-                        if ( !dotLoopCrmInfo.isRecordsBeenFetched() ) {
-                            LOG.debug( "This was the first fetch hence updating recordsFetched to true " );
-                            dotLoopCrmInfo.setRecordsBeenFetched( true );
-                            updateDotLoopCrmInfo( collectionName, organizationUnitSettings, dotLoopCrmInfo );
                         }
                     }
                 }
@@ -193,6 +193,12 @@ public class DotloopReviewProcessor extends QuartzJobBean
         for ( LoopProfileMapping loop : loops ) {
             // Setting profile id for the loop
             loop.setProfileId( profileId );
+            // if status is not sold, stop the process and send a mail to the admin
+            if(!loop.getLoopStatus().equalsIgnoreCase(SOLD_STATUS)){
+            	LOG.warn("Found a loop status which is not sold.");
+            	// TODO: send a mail to admim
+            	throw new FatalException("Found a loop status which is not sold.");
+            }
             if ( !byPassRecords ) {
                 // check if the record is present in the database then skip the loop. if not, then
                 // process it
@@ -217,6 +223,7 @@ public class DotloopReviewProcessor extends QuartzJobBean
             LOG.debug( "Insert into tracker." );
             try {
                 loop = setHierarchyInformationInLoop( loop, collectionName, organizationUnitId );
+                loop.setCreatedOn(new Timestamp(System.currentTimeMillis()));
                 organizationManagementService.saveLoopsForProfile( loop );
             } catch ( InvalidInputException e ) {
                 LOG.warn( "Could not insert loop " + loop.getLoopId() + " for profile " + loop.getProfileId() );
@@ -299,6 +306,8 @@ public class DotloopReviewProcessor extends QuartzJobBean
                         surveyPreInitiation.setEngagementClosedTime( new Timestamp( System.currentTimeMillis() ) );
                         surveyPreInitiation.setStatus( CommonConstants.STATUS_SURVEYPREINITIATION_NOT_PROCESSED );
                         surveyPreInitiation.setSurveySource( CommonConstants.CRM_SOURCE_DOTLOOP );
+                        // adding the loop view id in the source id for back tracking
+                        surveyPreInitiation.setSurveySourceId(String.valueOf(loop.getLoopViewId()));
                         try {
                             surveyHandler.saveSurveyPreInitiationObject( surveyPreInitiation );
                         } catch ( InvalidInputException e ) {

@@ -48,6 +48,16 @@ public interface FileUploadService {
 	public void uploadFileAtDefautBucket(File file, String fileName) throws NonFatalException;
 	
 	/**
+	 * Uploads the given file in the specified bucket
+	 * @param file
+	 * @param fileName
+	 * @param bucketName
+	 * @param expireImmediately
+	 * @throws NonFatalException
+	 */
+	public void uploadFileAtSpeicifiedBucket(File file, String fileName, String bucketName, boolean expireImmediately) throws NonFatalException;
+	
+	/**
 	 * Uploads logo file
 	 * @param file
 	 * @param imageName

@@ -37,6 +37,7 @@
 				<entry key="regionSiteMapPath" value="${REGION_SITEMAP_PATH}" />
 				<entry key="branchSiteMapPath" value="${BRANCH_SITEMAP_PATH}" />
 				<entry key="individualSiteMapPath" value="${INDIVIDUAL_SITEMAP_PATH}" />
+				<entry key="siteMapBucket" value="${SITEMAP_BUCKET}" />
 			</map>
 		</property>
 		<property name="durability" value="true" />

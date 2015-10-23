@@ -1679,13 +1679,45 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
 
 
     @Override
-    public List<AbusiveSurveyReportWrapper> getSurveysReporetedAsAbusive( int startIndex, int numOfRows )
+    public List<AbusiveSurveyReportWrapper> getSurveysReportedAsAbusive( int startIndex, int numOfRows )
     {
         LOG.info( "Method getSurveysReporetedAsAbusive() to retrieve surveys marked as abusive, started" );
         List<AbusiveSurveyReportWrapper> abusiveSurveyReports = surveyDetailsDao.getSurveysReporetedAsAbusive( startIndex,
             numOfRows );
         LOG.info( "Method getSurveysReporetedAsAbusive() to retrieve surveys marked as abusive, finished" );
         return abusiveSurveyReports;
+    }
+
+
+    @Override
+    public void updateSurveyAsUnderResolution( String surveyId )
+    {
+       LOG.info( "Method updateSurveyAsUnderResolution() to mark a survey as under resolution started, started" );
+       surveyDetailsDao.updateSurveyAsUnderResolution( surveyId );
+       LOG.info( "Method updateSurveyAsUnderResolution() to mark a survey as under resolution started, ended" );
+        
+    }
+
+
+    @Override
+    public List<AbusiveSurveyReportWrapper> getSurveysReportedAsAbusive( long companyId, int startIndex, int numOfRows )
+    {
+        LOG.info( "Method getSurveysReportedAsAbusive() to retrieve surveys marked as abusive for a company, started" );
+        List<AbusiveSurveyReportWrapper> abusiveSurveyReports = surveyDetailsDao.getSurveysReporetedAsAbusive(companyId, startIndex,
+            numOfRows );
+        LOG.info( "Method getSurveysReportedAsAbusive() to retrieve surveys marked as abusive for a company, finished" );
+        return abusiveSurveyReports;
+    }
+
+
+    @Override
+    public List<SurveyDetails> getSurveysUnderResolution( long companyId, int startIndex, int numOfRows )
+    {
+        LOG.info( "Method getSurveysUnderResolution() to retrieve surveys marked as under resolution for a company, started" );
+        List<SurveyDetails> surveyDetails = surveyDetailsDao.getSurveysUnderResolution(companyId, startIndex,
+            numOfRows );
+        LOG.info( "Method getSurveysUnderResolution() to retrieve surveys marked as under resolution for a company, finished" );
+        return surveyDetails;
     }
 }
 // JIRA SS-119 by RM-05:EOC
