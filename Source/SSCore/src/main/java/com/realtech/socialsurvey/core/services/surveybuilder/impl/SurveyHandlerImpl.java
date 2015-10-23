@@ -91,6 +91,7 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
     @Autowired
     private UserDao userDao;
 
+
     @Autowired
     private UserProfileDao userProfileDao;
 
@@ -203,6 +204,8 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
 
         if ( survey == null ) {
             surveyDetailsDao.insertSurveyDetails( surveyDetails );
+            LOG.info( "Updating modified on column in aagent hierarchy fro agent " );
+            updateModifiedOnColumnForAgentHierachy( agentId );
             return null;
         } else {
             return survey;
@@ -215,6 +218,14 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
     public void insertSurveyDetails( SurveyDetails surveyDetails )
     {
         surveyDetailsDao.insertSurveyDetails( surveyDetails );
+        if(surveyDetails.getAgentId()  > 0l){
+            LOG.info( "Updating modified on column in aagent hierarchy fro agent " );
+            try {
+                updateModifiedOnColumnForAgentHierachy( surveyDetails.getAgentId() );
+            } catch ( InvalidInputException e ) {
+               LOG.error( "passed agent id in method updateModifiedOnColumnForAgentHierachy() is invalid" );
+            }
+        }        
     }
 
 
@@ -1747,6 +1758,68 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
         }
         return valid;
     }
+
+    public void updateModifiedOnColumnForAgentHierachy( long agentId ) throws InvalidInputException
+    {
+        LOG.debug( "method updateModifiedOnColumnForAgentHierachy() started" );
+        if(agentId <= 0l){
+            throw new InvalidInputException( "passend agentid is incorrect" );
+        }
+        
+        User agent = userDao.findById( User.class, agentId );
+        if(agent == null){
+            throw new InvalidInputException( "No user in db for passed userId" );
+        }
+        
+        if(agent.getCompany() == null){
+            throw new InvalidInputException( "No Company in db for passed userId" );
+        }
+        
+        long companyId = agent.getCompany().getCompanyId();
+        List<Object> branchIdList = new ArrayList<Object>();
+        List<Object> regionIdList = new ArrayList<Object>();
+        List<UserProfile> userProfiles = agent.getUserProfiles();
+        
+        for(UserProfile profile : userProfiles){
+            if(profile.getBranchId() > 0l && ! branchIdList.contains( profile.getBranchId() )){
+                branchIdList.add( profile.getBranchId() );
+            }
+            
+            if(profile.getRegionId() > 0l && ! regionIdList.contains( profile.getRegionId() )){
+                regionIdList.add( profile.getRegionId() );
+            }
+        }
+        
+        
+        if ( companyId > 0l ) {
+            organizationUnitSettingsDao.updateKeyOrganizationUnitSettingsByCriteria(
+                MongoOrganizationUnitSettingDaoImpl.KEY_MODIFIED_ON, System.currentTimeMillis(),
+                MongoOrganizationUnitSettingDaoImpl.KEY_IDENTIFIER, companyId,
+                MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION );
+        }
+
+        if ( agentId > 0l ) {
+            organizationUnitSettingsDao.updateKeyOrganizationUnitSettingsByCriteria(
+                MongoOrganizationUnitSettingDaoImpl.KEY_MODIFIED_ON, System.currentTimeMillis(),
+                MongoOrganizationUnitSettingDaoImpl.KEY_IDENTIFIER, agentId,
+                MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION );
+        }
+        
+        organizationUnitSettingsDao.updateKeyOrganizationUnitSettingsByInCriteria(
+            MongoOrganizationUnitSettingDaoImpl.KEY_MODIFIED_ON, System.currentTimeMillis(),
+            MongoOrganizationUnitSettingDaoImpl.KEY_IDENTIFIER, branchIdList,
+            MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION );
+        
+        organizationUnitSettingsDao.updateKeyOrganizationUnitSettingsByInCriteria(
+            MongoOrganizationUnitSettingDaoImpl.KEY_MODIFIED_ON, System.currentTimeMillis(),
+            MongoOrganizationUnitSettingDaoImpl.KEY_IDENTIFIER, regionIdList,
+            MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION );
+        
+        LOG.debug( "method updateModifiedOnColumnForAgentHierachy() finished" );
+        
+    }
+    
+
     public void updateSurveyAsUnderResolution( String surveyId )
     {
        LOG.info( "Method updateSurveyAsUnderResolution() to mark a survey as under resolution started, started" );

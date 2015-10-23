@@ -53,7 +53,7 @@ import com.realtech.socialsurvey.core.services.admin.AdminAuthenticationService;
 import com.realtech.socialsurvey.core.services.organizationmanagement.OrganizationManagementService;
 import com.realtech.socialsurvey.core.services.organizationmanagement.UserManagementService;
 import com.realtech.socialsurvey.core.services.payment.Payment;
-import com.realtech.socialsurvey.core.services.payment.exception.SubscriptionCancellationUnsuccessfulException;
+import com.realtech.socialsurvey.core.services.payment.exception.CustomerDeletionUnsuccessfulException;
 import com.realtech.socialsurvey.core.services.search.SolrSearchService;
 import com.realtech.socialsurvey.core.services.search.exception.SolrException;
 import com.realtech.socialsurvey.core.services.surveybuilder.SurveyHandler;
@@ -115,23 +115,24 @@ public class AdminController
     {
         Company company = organizationManagementService.getCompanyById( companyId );
         String message = CommonConstants.SUCCESS_ATTRIBUTE;
-        // unsubscribe company from braintree
-        List<LicenseDetail> licenseDetailList = company.getLicenseDetails();
-        if ( licenseDetailList != null ) {
-            for ( LicenseDetail detail : licenseDetailList ) {
-                String subscriptionId = detail.getSubscriptionId();
-                if ( detail.getSubscriptionIdSource().equals( CommonConstants.SUBSCRIPTION_ID_SOURCE_BRAINTREE ) ) {
-                    try {
-                        payment.unsubscribe( subscriptionId );
-                    } catch ( SubscriptionCancellationUnsuccessfulException | InvalidInputException e ) {
-                        LOG.error( "Exception Caught " + e.getMessage() );
-                        message = CommonConstants.ERROR;
-                    }
-                }
-            }
-        }
+
+        // delete company from braintree
 
         if ( company != null ) {
+            try {
+                List<LicenseDetail> licenseDetails = company.getLicenseDetails();
+                if ( licenseDetails.size() > 0 ) {
+                    LicenseDetail licenseDetail = licenseDetails.get( 0 );
+                    if ( licenseDetail.getPaymentMode().equals( CommonConstants.BILLING_MODE_AUTO ) ) {
+                        LOG.debug( "Deleting company from braintree " );
+                        payment.deleteCustomer( Long.toString( company.getCompanyId() ) );
+                    }
+                }
+
+            } catch ( CustomerDeletionUnsuccessfulException | InvalidInputException e ) {
+                LOG.error( "Exception Caught " + e.getMessage() );
+                message = CommonConstants.ERROR;
+            }
             if ( company.getStatus() == CommonConstants.STATUS_INACTIVE ) {
                 try {
                     organizationManagementService.purgeCompany( company );
@@ -596,7 +597,10 @@ public class AdminController
             String batchSizeStr = request.getParameter( "batchSize" );
             int startIndex = Integer.parseInt( startIndexStr );
             int batchSize = Integer.parseInt( batchSizeStr );
-            List<AbusiveSurveyReportWrapper> abusiveSurveyReports = surveyHandler.getSurveysReportedAsAbusive( startIndex, batchSize );
+
+            List<AbusiveSurveyReportWrapper> abusiveSurveyReports = surveyHandler.getSurveysReportedAsAbusive( startIndex,
+                batchSize );
+
             model.addAttribute( "abusiveReviewReportList", abusiveSurveyReports );
         } catch ( NumberFormatException e ) {
             LOG.error(

@@ -243,6 +243,9 @@ public interface SurveyHandler
      */
     public List<BulkSurveyDetail> processBulkSurvey( List<BulkSurveyDetail> bulkSurveyDetailList, long companyId );
 
+    void updateModifiedOnColumnForAgentHierachy( long agentId ) throws InvalidInputException;
+
+
     public void updateSurveyAsUnderResolution( String surveyId );
 
 
