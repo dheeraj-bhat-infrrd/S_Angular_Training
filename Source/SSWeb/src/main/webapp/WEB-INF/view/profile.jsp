@@ -326,7 +326,7 @@
 						</a>
 						</div>
 					</c:if> --%>
-					<div id="social-token-container" class="float-right hm-hr-row-right clearfix hide">
+					<div id="social-token-container" class="float-right hm-hr-row-right pp-social-icn clearfix hide">
 						<c:if test="${not empty profile.socialMediaTokens}">
 							<div id="social-connect-txt" class="float-left social-connect-txt">Connect with ${profName }:</div>
 							<c:if test="${not empty profile.socialMediaTokens.facebookToken && not empty profile.socialMediaTokens.facebookToken.facebookPageLink}">

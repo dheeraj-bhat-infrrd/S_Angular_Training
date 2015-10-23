@@ -74,7 +74,7 @@
 							 <span
 							class="float-left ppl-share-icns icn-lin" title="LinkedIn"
 							data-link="https://www.linkedin.com/shareArticle?mini=true&url=${reviewItem.completeProfileUrl} &title=&summary=<fmt:formatNumber type="number" pattern="${ scoreformat }" value="${reviewItem.score}" />-star response from ${ customerDisplayName } for ${reviewItem.agentName} at SocialSurvey - ${reviewItem.review} + &source="></span>
-						<span class="float-left ppl-share-icns icn-gplus" title="Google+">
+						<span class="float-left" title="Google+">
 							<button
 								class="g-interactivepost float-left ppl-share-icns icn-gplus"
 								data-contenturl="${reviewItem.completeProfileUrl}"
