@@ -9102,6 +9102,134 @@ function getImageandCaptionProfile(loop) {
 
 }
 
+function showSearchedPostsSolr(fromstart, companyId, searchQuery) {
+	if(fromstart){
+		proPostStartIndex = 0;
+	}
+	var payload = {
+			"entityType" : "companyId",
+			"entityId" : companyId,
+			"batchSize" : proPostBatchSize,
+			"startIndex" : proPostStartIndex,
+			"searchQuery" : searchQuery
+		};
+	callAjaxGetWithPayloadData("./searchSocialPosts.do", function(response) {
+		var data = $.parseJSON(response);
+		if (fromstart) {
+			proPostStartIndex = 0;
+			proPostCount = data.count + 1;
+		}
+		paintPostsSolr(data.socialMonitorPosts, companyId);
+		proPostStartIndex += proPostBatchSize;
+	}, payload, true);
+}
+
+function showPostsSolr(fromstart, companyId) {
+	var payload = {
+			"entityType" : "companyId",
+			"entityId" : companyId,
+			"batchSize" : proPostBatchSize,
+			"startIndex" : proPostStartIndex
+		};
+	callAjaxGetWithPayloadData("./findsocialpostsforentity.do", function(response) {
+		var data = $.parseJSON(response);
+		if (fromstart) {
+			proPostStartIndex = 0;
+			proPostCount = data.count + 1;
+		}
+		paintPostsSolr(data.socialMonitorPosts, companyId);
+		proPostStartIndex += proPostBatchSize;
+	}, payload, true);
+}
+
+function paintPostsSolr(posts, companyId) {
+	var divToPopulate = "";
+	$.each(posts, function(i, post) {
+		var iconClass = "";
+		var href="javascript:void(0)";
+		if(post.source == "google"){
+			iconClass = "icn-gplus";
+		}
+		else if(post.source == "SocialSurvey")
+			iconClass = "icn-ss";
+		else if(post.source == "facebook"){
+			iconClass = "icn-fb";
+			href="http://www.facebook.com/"+post.postId;
+		}
+		else if(post.source == "twitter"){
+			iconClass = "icn-twit";
+			var res = post.postText.split("http");
+			href="http"+res[1];
+		}
+		else if(post.source == "linkedin"){
+			iconClass = "icn-lin";
+		}
+		if(typeof post.postUrl!=  "undefined" ){
+			 href= post.postUrl;
+		}
+		var hrefComplet='<a href='+href+' target="_blank">';
+		
+		divToPopulate += '<div class="tweet-panel-item bord-bot-dc clearfix">'		
+				+ hrefComplet
+				+ '<div class="tweet-icn ' + iconClass + ' float-left"></div>'
+				+"</a>"
+				+ '<div class="tweet-txt float-left">'
+				+ '<div class="tweet-text-main">' + linkify(post.postText) + '</div>'
+				+ '<div class="tweet-text-link"><em>' + post.postedBy
+				+ '</em></div>' + '<div class="tweet-text-time"><em>'
+				+ convertUserDateToWeekFormt(new Date(post.timeInMillis)) + '</em></div>';
+		if (post.companyName != undefined && post.companyName != "") {
+			divToPopulate += '<div class="tweet-text-time"><em>Company Name : ' + post.companyName + '</em></div>';
+		}
+		if (post.regionName != undefined && post.regionName != "") {
+			divToPopulate += '<div class="tweet-text-time"><em>Region Name : ' + post.regionName + '</em></div>';
+		}
+		if (post.branchName != undefined && post.branchName != "") {
+			divToPopulate += '<div class="tweet-text-time"><em>Office Name : ' + post.branchName + '</em></div>';
+		}
+		if (post.agentName != undefined && post.agentName != "") {
+			divToPopulate += '<div class="tweet-text-time"><em>User Name : ' + post.agentName + '</em></div>';
+		}
+		divToPopulate += '</div>';
+		
+		if(post.source == "SocialSurvey"){
+			var divToDeleteSurvey = '<div class="dlt-survey-wrapper hide"><div surveymongoid=' + post._id + ' class="post-dlt-icon reg-err-pu-close float-left">'
+								+ '</div></div>';
+			divToPopulate += divToDeleteSurvey;
+		}
+		
+		divToPopulate += '</div>';
+		
+		
+		
+	});
+	if (proPostStartIndex == 0){
+		$('#prof-posts').html(divToPopulate);
+		$('#prof-posts').perfectScrollbar({
+			suppressScrollX : true
+		});
+		$('#prof-posts').perfectScrollbar('update');
+	}
+	else{
+		$('#prof-posts').append(divToPopulate);
+		$('#prof-posts').perfectScrollbar('update');
+	}
+
+	$('#prof-posts').on('scroll',function(){
+		var scrollContainer = this;
+		if (scrollContainer.scrollTop === scrollContainer.scrollHeight
+					- scrollContainer.clientHeight) {
+				if (proPostStartIndex < proPostCount)
+					showPostsSolr(false, companyId);
+		}
+	});
+}
+
+function setColDetails(currentProfileName, currentProfileValue){
+	colName = currentProfileName;
+	colValue = currentProfileValue;
+}
+
 //complaint registration event binding
 $(document).on('click','#comp-reg-form-submit',function(){
 	if(validateComplaintRegistraionForm()) {

@@ -4194,6 +4194,22 @@ img.prof-image {
 	text-transform: initial;
 }
 
+.sm-btn-dl-sd-admin{
+	float: right;
+	margin-right: 10px;
+	color: #009FE0;
+	border-radius: 3px;
+	line-height: 32px;
+	border: 1px solid #009FE0;
+	height: 32px;
+	width: 500px;
+	max-width: 90%;
+	max-width: calc(100% - 20px);
+	text-align: center;
+	font-size: 13px;
+	text-transform: initial;
+}
+
 .dsh-dwnld-btn {
 	width: 45%;
 	padding-left: 5px;
@@ -7634,6 +7650,14 @@ label.url-change-input-label {
 
 .widget-review-block {
 	margin-top: 10px;
+}
+
+.sm-tweet-panel {
+	max-height: 700px;
+}
+
+.clear-none{
+	clear: none;
 }
 
 .complaint-cont {
