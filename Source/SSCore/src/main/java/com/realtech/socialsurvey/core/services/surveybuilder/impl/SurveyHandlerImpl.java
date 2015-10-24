@@ -191,8 +191,8 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
 
         if ( survey == null ) {
             surveyDetailsDao.insertSurveyDetails( surveyDetails );
-            LOG.info( "Updating modified on column in aagent hierarchy fro agent " );
-            updateModifiedOnColumnForAgentHierachy( agentId );
+            // LOG.info( "Updating modified on column in aagent hierarchy fro agent " );
+            // updateModifiedOnColumnForAgentHierachy( agentId );
             return null;
         } else {
             return survey;
