@@ -1608,6 +1608,7 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
     @Override
     public Boolean checkIfTimeIntervalHasExpired( long lastRemindedTime, long systemTime, int reminderInterval )
     {
+    	LOG.debug("Checking time interval expiry: lastRemindedTime "+lastRemindedTime+"\t systemTime: "+systemTime+"\t reminderInterval: "+reminderInterval);
         long remainingTime = systemTime - lastRemindedTime;
         int remainingDays = (int) ( remainingTime / ( 1000 * 60 * 60 * 24 ) );
         if ( remainingDays >= reminderInterval ) {
