@@ -195,7 +195,9 @@ public class SurveyManagementController
             SurveyPreInitiation surveyPreInitiation = surveyHandler.getPreInitiatedSurvey( agentId, customerEmail, firstName,
                 lastName );
             surveyHandler.deleteSurveyPreInitiationDetailsPermanently( surveyPreInitiation );
-
+            
+            // update the modified time of hierarchy for seo
+            surveyHandler.updateModifiedOnColumnForAgentHierachy(agentId);
             // TODO Search Engine Optimization
             if ( mood == null || mood.isEmpty() ) {
                 LOG.error( "Null/empty value found for mood in storeFeedback()." );
