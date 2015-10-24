@@ -131,8 +131,8 @@ public class SurveyManagementController
     @Value ( "${GATEWAY_QUESTION}")
     private String gatewayQuestion;
 
-    @Value ( "${APPLICATION_SUPPORT_EMAIL}")
-    private String applicationSupportEmail;
+    @Value ( "${APPLICATION_ADMIN_EMAIL}")
+    private String applicationAdminEmail;
 
     @Value ( "${APPLICATION_ADMIN_NAME}")
     private String applicationAdminName;
@@ -1286,7 +1286,7 @@ public class SurveyManagementController
             errorMsg += "<br>StackTrace : <br>" + ExceptionUtils.getStackTrace( e ).replaceAll( "\n", "<br>" ) + "<br>";
             LOG.info( "Error message built for the auto post failure" );
             LOG.info( "Sending bug mail to admin for the auto post failure" );
-            emailServices.sendReportBugMailToAdmin( applicationAdminName, errorMsg, applicationSupportEmail );
+            emailServices.sendReportBugMailToAdmin( applicationAdminName, errorMsg, applicationAdminEmail );
             LOG.info( "Sent bug mail to admin for the auto post failure" );
         } catch ( UndeliveredEmailException ude ) {
             LOG.error( "error while sending report bug mail to admin ", ude );
