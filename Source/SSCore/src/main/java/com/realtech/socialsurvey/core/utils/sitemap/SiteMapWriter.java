@@ -46,7 +46,7 @@ public class SiteMapWriter {
 			List<SiteMapEntry> entries = contentFetcher.getInitialContent();
 			boolean continueLooping = true;
 			if(entries.size() > 0){
-				LOG.debug("Creating sitemap file");
+				LOG.trace("Creating sitemap file");
 				writer = factory.createXMLStreamWriter(new FileWriter(siteMapFileName));
 				// start the document
 				writeHeader(writer, true);
@@ -58,7 +58,7 @@ public class SiteMapWriter {
 						for(SiteMapEntry entry: entries){
 							// start the url tag
 							writeURLElement(writer, true);
-							LOG.debug("Setting sitemap entry: "+entry.toString());
+							LOG.trace("Setting sitemap entry: "+entry.toString());
 							// Write the location
 							if(entry.getLocation() != null && !entry.getLocation().isEmpty()){
 								writeElement(writer, KEY_LOC, entry.getLocation());
@@ -113,42 +113,42 @@ public class SiteMapWriter {
 	}
 	
 	private void writeHeader(XMLStreamWriter writer, boolean isStart) throws XMLStreamException{
-		LOG.debug("Writing the header with isStart "+isStart);
+		LOG.trace("Writing the header with isStart "+isStart);
 		if(isStart){
-			LOG.debug("Starting document");
+			LOG.trace("Starting document");
 			writer.writeStartDocument();
 		}else{
-			LOG.debug("Ending document");
+			LOG.trace("Ending document");
 			writer.writeEndDocument();
 		}
 	}
 	
 	private void writeUrlSet(XMLStreamWriter writer, boolean isStart) throws XMLStreamException{
-		LOG.debug("Writing urlset with isStart "+isStart);
+		LOG.trace("Writing urlset with isStart "+isStart);
 		if(isStart){
-			LOG.debug("Starting xmlns element");
+			LOG.trace("Starting xmlns element");
 			writer.writeStartElement(KEY_URLSET);
 			writer.writeAttribute(KEY_XMLNS, XMLNS_VAL);
 		}else{
-			LOG.debug("Ending xmlns element");
+			LOG.trace("Ending xmlns element");
 			writer.writeEndElement();
 		}
 	}
 	
 	private void writeElement(XMLStreamWriter writer, String elementName, String elementValue) throws XMLStreamException{
-		LOG.debug("Writing "+elementName+" with value "+elementValue);
+		LOG.trace("Writing "+elementName+" with value "+elementValue);
 		writer.writeStartElement(elementName);
 		writer.writeCharacters(elementValue);
 		writer.writeEndElement();
 	}
 	
 	private void writeURLElement(XMLStreamWriter writer, boolean isStart) throws XMLStreamException{
-		LOG.debug("Writing url element with isStart "+isStart);
+		LOG.trace("Writing url element with isStart "+isStart);
 		if(isStart){
-			LOG.debug("Starting url element");
+			LOG.trace("Starting url element");
 			writer.writeStartElement(KEY_URL);
 		}else{
-			LOG.debug("Ending url element");
+			LOG.trace("Ending url element");
 			writer.writeEndElement();
 		}
 	}
