@@ -3,34 +3,25 @@
 		<loc>
 			https://socialsurvey.me/explore/sitemap-index.xml
 		</loc>
-		<priority>1.0</priority>
 	</sitemap>
 	<sitemap>
 		<loc>
 			https://socialsurvey.me/explore/sitemap_companies.xml
 		</loc>
-		<changefreq>hourly</changefreq>
-		<priority>0.2</priority>
 	</sitemap>
 	<sitemap>
 		<loc>
 			https://socialsurvey.me/explore/sitemap_offices.xml
 		</loc>
-		<changefreq>hourly</changefreq>
-		<priority>0.6</priority>
 	</sitemap>
 	<sitemap>
 		<loc>
 			https://socialsurvey.me/explore/sitemap_regions.xml
 		</loc>
-		<changefreq>hourly</changefreq>
-		<priority>0.4</priority>
 	</sitemap>
 	<sitemap>
 		<loc>
 			https://socialsurvey.me/explore/sitemap_users.xml
 		</loc>
-		<changefreq>hourly</changefreq>
-		<priority>0.8</priority>
 	</sitemap>
 </sitemapindex>
