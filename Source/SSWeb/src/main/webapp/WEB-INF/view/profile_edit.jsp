@@ -460,6 +460,9 @@
 		
 		adjustImage();
 		$(window).resize(adjustImage);
+		$(document).ajaxStop(function() {
+			adjustImage();
+		});
 		
 		if ($('#aboutme-status').val() != 'new') {
 			$('#intro-body-text').text($('#intro-body-text-edit').val().trim());
