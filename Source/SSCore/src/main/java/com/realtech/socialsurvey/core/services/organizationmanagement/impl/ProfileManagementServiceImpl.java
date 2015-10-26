@@ -2021,9 +2021,23 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
         }
 
         long agentId = socialPost.getAgentId();
+        long regionId = socialPost.getRegionId();
+        long companyId = socialPost.getCompanyId();
+        long branchId = socialPost.getBranchId();
         socialPostDao.removePostFromUsersProfile( socialPost );
         LOG.info( "Updating modified on column in aagent hierarchy fro agent " );
-        surveyHandler.updateModifiedOnColumnForAgentHierachy( agentId );
+        if ( companyId > 0 ) {
+            surveyHandler.updateModifiedOnColumnForEntity( CommonConstants.COMPANY_ID_COLUMN, companyId );
+        }
+        if ( regionId > 0 ) {
+            surveyHandler.updateModifiedOnColumnForEntity( CommonConstants.REGION_ID_COLUMN, regionId );
+        }
+        if ( branchId > 0 ) {
+            surveyHandler.updateModifiedOnColumnForEntity( CommonConstants.BRANCH_ID_COLUMN, branchId );
+        }
+        if ( agentId > 0 ) {
+            surveyHandler.updateModifiedOnColumnForEntity( CommonConstants.AGENT_ID_COLUMN, agentId );
+        }
         LOG.info( "Method to delete post to a user's profile finished." );
     }
 
