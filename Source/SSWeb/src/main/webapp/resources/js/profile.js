@@ -771,7 +771,7 @@ function paintReviews(result){
 			reviewsHtml += '</div>';
 		}*/
 		if (date != null) {
-			date = convertUTCToUserDate(date);
+			date = convertUserDateToLocale(date);
 			reviewsHtml += '		<div class="ppl-head-2">' + date.toString("MMMM d, yyyy") + '</div>'; 
 		}
 		
