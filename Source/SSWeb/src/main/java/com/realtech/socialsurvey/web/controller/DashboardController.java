@@ -271,8 +271,9 @@ public class DashboardController
             throw e;
         }
 
-        if ( realtechAdmin )
+        if ( realtechAdmin ){
             columnName = null;
+        }
         double surveyScore = (double) Math.round( dashboardService.getSurveyScore( columnName, columnValue, numberOfDays,
             realtechAdmin ) * 1000.0 ) / 1000.0;
         int sentSurveyCount = (int) dashboardService.getAllSurveyCountForPastNdays( columnName, columnValue, numberOfDays );
@@ -280,9 +281,9 @@ public class DashboardController
             numberOfDays );
         socialPostsCount += (int) dashboardService.getSocialPostsForPastNdays( columnName, columnValue, numberOfDays );
         int profileCompleteness = 0;
-        if ( !realtechAdmin )
+        if ( !realtechAdmin ){
             profileCompleteness = dashboardService.getProfileCompletionPercentage( user, columnName, columnValue, unitSettings );
-
+        }
         model.addAttribute( "socialScore", surveyScore );
         if ( sentSurveyCount > 999 )
             model.addAttribute( "surveyCount", "1K+" );
