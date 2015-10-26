@@ -19,6 +19,16 @@ namespace EncompassSocialSurvey
 
         public const string SETUP_ENVIRONMENT_TEST = "test";
 
+        public const string SENDGRID_USERNAME = "sendgird_username_property";
+
+        public const string SENDGRID_FROM_NAME = "sendgird_name_property";
+
+        public const string SENDGRID_FROM_ADDRESS = "sendgird_from_address_property";
+
+        public const string SENDGRID_PASSWORD = "sendgird_password_property";
+
+        public const string ADMIN_EMAIL_ADDRESS = "application_admin_email";
+
         private static StringList fieldIds = null;
         
         // MM/dd/yyyy
