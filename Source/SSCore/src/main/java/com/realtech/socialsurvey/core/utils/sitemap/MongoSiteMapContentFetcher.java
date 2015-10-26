@@ -130,7 +130,7 @@ public class MongoSiteMapContentFetcher implements SitemapContentFecher {
 		List<SiteMapEntry> entries = new ArrayList<SiteMapEntry>();
 		SiteMapEntry entry = null;
 		for (ProfileUrlEntity profileUrl : profileUrls) {
-			LOG.info("Converting " + profileUrl + " to SME");
+			LOG.trace("Converting " + profileUrl + " to SME");
 			entry = new SiteMapEntry();
 			//set priority
 			entry.setPriority( priority );
