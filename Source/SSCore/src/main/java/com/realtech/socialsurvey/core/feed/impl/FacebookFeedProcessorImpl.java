@@ -245,11 +245,11 @@ public class FacebookFeedProcessorImpl implements SocialNetworkDataProcessor<Pos
 
 
     @Override
-    public void processFeed( List<Post> posts, String collection ) throws NonFatalException
+    public boolean processFeed( List<Post> posts, String collection ) throws NonFatalException
     {
         LOG.info( "Process posts for organizationUnit " + collection );
         if ( posts == null || posts.isEmpty() ) {
-            return;
+            return false;
         }
 
         if ( lastFetchedTill == null ) {
@@ -257,6 +257,7 @@ public class FacebookFeedProcessorImpl implements SocialNetworkDataProcessor<Pos
         }
 
         FacebookSocialPost feed;
+        boolean inserted = false;
         for ( Post post : posts ) {
 
             //skip the post if it contains no message.
@@ -277,25 +278,20 @@ public class FacebookFeedProcessorImpl implements SocialNetworkDataProcessor<Pos
             feed.setPostedBy( post.getFrom().getName() );
             feed.setTimeInMillis( post.getUpdatedTime().getTime() );
             feed.setPostUrl( facebookUri.concat( post.getId() ) );
-            String entityType = "";
             switch ( collection ) {
                 case MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION:
-                    entityType = CommonConstants.COMPANY_ID_COLUMN;
                     feed.setCompanyId( profileId );
                     break;
 
                 case MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION:
-                    entityType = CommonConstants.REGION_ID_COLUMN;
                     feed.setRegionId( profileId );
                     break;
 
                 case MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION:
-                    entityType = CommonConstants.BRANCH_ID_COLUMN;
                     feed.setBranchId( profileId );
                     break;
 
                 case MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION:
-                    entityType = CommonConstants.AGENT_ID_COLUMN;
                     feed.setAgentId( profileId );
                     break;
             }
@@ -303,15 +299,17 @@ public class FacebookFeedProcessorImpl implements SocialNetworkDataProcessor<Pos
             lastFetchedPostId = post.getId();
 
             // pushing to mongo
-            surveyHandler.updateModifiedOnColumnForEntity( entityType, profileId );
+
             mongoTemplate.insert( feed, CommonConstants.SOCIAL_POST_COLLECTION );
+            inserted = true;
         }
+        return inserted;
     }
 
 
     @Override
     @Transactional
-    public void postProcess( long iden, String collection ) throws NonFatalException
+    public void postProcess( long iden, String collection, boolean anyRecordInserted ) throws NonFatalException
     {
         if ( lastFetchedPostId == null || lastFetchedPostId.isEmpty() ) {
             lastFetchedPostId = "0";
@@ -321,6 +319,18 @@ public class FacebookFeedProcessorImpl implements SocialNetworkDataProcessor<Pos
         }
 
         status.setLastFetchedPostId( lastFetchedPostId );
+
+        if ( anyRecordInserted ) {
+            if ( collection.equalsIgnoreCase( MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION ) ) {
+                surveyHandler.updateModifiedOnColumnForEntity( CommonConstants.COMPANY_ID_COLUMN, profileId );
+            } else if ( collection.equalsIgnoreCase( MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION ) ) {
+                surveyHandler.updateModifiedOnColumnForEntity( CommonConstants.REGION_ID_COLUMN, profileId );
+            } else if ( collection.equalsIgnoreCase( MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION ) ) {
+                surveyHandler.updateModifiedOnColumnForEntity( CommonConstants.BRANCH_ID_COLUMN, profileId );
+            } else if ( collection.equalsIgnoreCase( MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION ) ) {
+                surveyHandler.updateModifiedOnColumnForEntity( CommonConstants.AGENT_ID_COLUMN, profileId );
+            }
+        }
 
         feedStatusDao.saveOrUpdate( status );
     }
