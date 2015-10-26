@@ -302,6 +302,7 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
 		Query query = new Query();
 		query.addCriteria(Criteria.where(KEY_DEFAULT_BY_SYSTEM).is(false));
 		query.fields().include(KEY_PROFILE_URL).include(KEY_MODIFIED_ON).exclude("_id");
+		query.with(new Sort(Sort.Direction.DESC,KEY_MODIFIED_ON));
 		if (skipCount > 0) {
 			query.skip(skipCount);
 		}
