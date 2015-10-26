@@ -111,7 +111,7 @@ public class MongoSiteMapContentFetcher implements SitemapContentFecher {
 
 	private String generateLocation(String profileUrl) {
 		// check the collection name and generate location accordingly
-		LOG.debug("Generating location url for " + profileUrl + " for collection " + collectionName);
+		LOG.trace("Generating location url for " + profileUrl + " for collection " + collectionName);
 		if (collectionName.equals(MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION)) {
 			return applicationUrl + "pages/company" + profileUrl;
 		}
