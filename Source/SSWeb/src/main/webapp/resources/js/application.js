@@ -7212,7 +7212,7 @@ function isValidUrl(url){
 
 // Adjust image
 function adjustImage() {
-	$('.mobile-tabs').children('.mob-icn-active').click();
+	//$('.mobile-tabs').children('.mob-icn-active').click();
 	var windW = window.innerWidth;
 	if (windW < 768) {
 		//$('.mobile-tabs').children('.mob-icn-active').click();
