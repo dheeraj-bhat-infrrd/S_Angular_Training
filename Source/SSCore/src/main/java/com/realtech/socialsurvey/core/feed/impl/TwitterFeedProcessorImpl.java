@@ -41,264 +41,277 @@ import com.realtech.socialsurvey.core.feed.SocialNetworkDataProcessor;
 import com.realtech.socialsurvey.core.services.mail.EmailServices;
 import com.realtech.socialsurvey.core.services.surveybuilder.SurveyHandler;
 
-@Component("twitterFeed")
-@Scope(value = ConfigurableBeanFactory.SCOPE_PROTOTYPE)
-public class TwitterFeedProcessorImpl implements SocialNetworkDataProcessor<Status, TwitterToken> {
 
-	private static final Logger LOG = LoggerFactory.getLogger(TwitterFeedProcessorImpl.class);
-	private static final String FEED_SOURCE = "twitter";
-	private static final int RETRIES_INITIAL = 0;
-	private static final int PAGE_SIZE = 200;
-	private static final String twitterUriSplitStr = "http";
+@Component ( "twitterFeed")
+@Scope ( value = ConfigurableBeanFactory.SCOPE_PROTOTYPE)
+public class TwitterFeedProcessorImpl implements SocialNetworkDataProcessor<Status, TwitterToken>
+{
 
-	@Autowired
-	private GenericDao<FeedStatus, Long> feedStatusDao;
+    private static final Logger LOG = LoggerFactory.getLogger( TwitterFeedProcessorImpl.class );
+    private static final String FEED_SOURCE = "twitter";
+    private static final int RETRIES_INITIAL = 0;
+    private static final int PAGE_SIZE = 200;
+    private static final String twitterUriSplitStr = "http";
 
-	@Autowired
-	private MongoTemplate mongoTemplate;
+    @Autowired
+    private GenericDao<FeedStatus, Long> feedStatusDao;
 
-	@Autowired
-	private OrganizationUnitSettingsDao settingsDao;
-	
-	@Autowired
-	private SurveyHandler surveyHandler;
+    @Autowired
+    private MongoTemplate mongoTemplate;
 
-	@Autowired
-	private EmailServices emailServices;
+    @Autowired
+    private OrganizationUnitSettingsDao settingsDao;
 
-	@Value("${SOCIAL_CONNECT_RETRY_THRESHOLD}")
-	private long socialConnectRetryThreshold;
+    @Autowired
+    private SurveyHandler surveyHandler;
 
-	@Value("${SOCIAL_CONNECT_REMINDER_THRESHOLD}")
-	private long socialConnectThreshold;
+    @Autowired
+    private EmailServices emailServices;
 
-	@Value("${SOCIAL_CONNECT_REMINDER_INTERVAL_DAYS}")
-	private long socialConnectInterval;
+    @Value ( "${SOCIAL_CONNECT_RETRY_THRESHOLD}")
+    private long socialConnectRetryThreshold;
 
-	@Value("${TWITTER_CONSUMER_KEY}")
-	private String twitterConsumerKey;
+    @Value ( "${SOCIAL_CONNECT_REMINDER_THRESHOLD}")
+    private long socialConnectThreshold;
 
-	@Value("${TWITTER_CONSUMER_SECRET}")
-	private String twitterConsumerSecret;
+    @Value ( "${SOCIAL_CONNECT_REMINDER_INTERVAL_DAYS}")
+    private long socialConnectInterval;
 
-	private FeedStatus status;
-	private long profileId;
-	private Timestamp lastFetchedTill;
-	private String lastFetchedPostId = "";
+    @Value ( "${TWITTER_CONSUMER_KEY}")
+    private String twitterConsumerKey;
 
-	@Override
-	@Transactional
-	public void preProcess(long iden, String collection, TwitterToken token) {
-		List<FeedStatus> statuses = null;
-		Map<String, Object> queries = new HashMap<>();
-		queries.put(CommonConstants.FEED_SOURCE_COLUMN, FEED_SOURCE);
+    @Value ( "${TWITTER_CONSUMER_SECRET}")
+    private String twitterConsumerSecret;
 
-		switch (collection) {
-			case MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION:
-				queries.put(CommonConstants.COMPANY_ID_COLUMN, iden);
+    private FeedStatus status;
+    private long profileId;
+    private Timestamp lastFetchedTill;
+    private String lastFetchedPostId = "";
 
-				statuses = feedStatusDao.findByKeyValue(FeedStatus.class, queries);
-				if (statuses != null && statuses.size() > 0) {
-					status = statuses.get(CommonConstants.INITIAL_INDEX);
-				}
 
-				if (status == null) {
-					status = new FeedStatus();
-					status.setFeedSource(FEED_SOURCE);
-					status.setCompanyId(iden);
-				}
-				else {
-					lastFetchedPostId = status.getLastFetchedPostId();
-				}
-				break;
+    @Override
+    @Transactional
+    public void preProcess( long iden, String collection, TwitterToken token )
+    {
+        List<FeedStatus> statuses = null;
+        Map<String, Object> queries = new HashMap<>();
+        queries.put( CommonConstants.FEED_SOURCE_COLUMN, FEED_SOURCE );
 
-			case MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION:
-				queries.put(CommonConstants.REGION_ID_COLUMN, iden);
+        switch ( collection ) {
+            case MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION:
+                queries.put( CommonConstants.COMPANY_ID_COLUMN, iden );
 
-				statuses = feedStatusDao.findByKeyValue(FeedStatus.class, queries);
-				if (statuses != null && statuses.size() > 0) {
-					status = statuses.get(CommonConstants.INITIAL_INDEX);
-				}
+                statuses = feedStatusDao.findByKeyValue( FeedStatus.class, queries );
+                if ( statuses != null && statuses.size() > 0 ) {
+                    status = statuses.get( CommonConstants.INITIAL_INDEX );
+                }
 
-				if (status == null) {
-					status = new FeedStatus();
-					status.setFeedSource(FEED_SOURCE);
-					status.setRegionId(iden);
-				}
-				else {
-					lastFetchedPostId = status.getLastFetchedPostId();
-				}
-				break;
+                if ( status == null ) {
+                    status = new FeedStatus();
+                    status.setFeedSource( FEED_SOURCE );
+                    status.setCompanyId( iden );
+                } else {
+                    lastFetchedPostId = status.getLastFetchedPostId();
+                }
+                break;
 
-			case MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION:
-				queries.put(CommonConstants.BRANCH_ID_COLUMN, iden);
+            case MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION:
+                queries.put( CommonConstants.REGION_ID_COLUMN, iden );
 
-				statuses = feedStatusDao.findByKeyValue(FeedStatus.class, queries);
-				if (statuses != null && statuses.size() > 0) {
-					status = statuses.get(CommonConstants.INITIAL_INDEX);
-				}
+                statuses = feedStatusDao.findByKeyValue( FeedStatus.class, queries );
+                if ( statuses != null && statuses.size() > 0 ) {
+                    status = statuses.get( CommonConstants.INITIAL_INDEX );
+                }
 
-				if (status == null) {
-					status = new FeedStatus();
-					status.setFeedSource(FEED_SOURCE);
-					status.setBranchId(iden);
-				}
-				else {
-					lastFetchedPostId = status.getLastFetchedPostId();
-				}
-				break;
+                if ( status == null ) {
+                    status = new FeedStatus();
+                    status.setFeedSource( FEED_SOURCE );
+                    status.setRegionId( iden );
+                } else {
+                    lastFetchedPostId = status.getLastFetchedPostId();
+                }
+                break;
 
-			case MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION:
-				queries.put(CommonConstants.AGENT_ID_COLUMN, iden);
+            case MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION:
+                queries.put( CommonConstants.BRANCH_ID_COLUMN, iden );
 
-				statuses = feedStatusDao.findByKeyValue(FeedStatus.class, queries);
-				if (statuses != null && statuses.size() > 0) {
-					status = statuses.get(CommonConstants.INITIAL_INDEX);
-				}
+                statuses = feedStatusDao.findByKeyValue( FeedStatus.class, queries );
+                if ( statuses != null && statuses.size() > 0 ) {
+                    status = statuses.get( CommonConstants.INITIAL_INDEX );
+                }
 
-				if (status == null) {
-					status = new FeedStatus();
-					status.setFeedSource(FEED_SOURCE);
-					status.setAgentId(iden);
-				}
-				else {
-					lastFetchedPostId = status.getLastFetchedPostId();
-				}
-				break;
-		}
-		profileId = iden;
-	}
+                if ( status == null ) {
+                    status = new FeedStatus();
+                    status.setFeedSource( FEED_SOURCE );
+                    status.setBranchId( iden );
+                } else {
+                    lastFetchedPostId = status.getLastFetchedPostId();
+                }
+                break;
 
-	@Override
-	@Transactional
-	public List<Status> fetchFeed(long iden, String collection, TwitterToken token) throws NonFatalException {
-		LOG.info("Getting tweets for " + collection + " with id: " + iden);
+            case MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION:
+                queries.put( CommonConstants.AGENT_ID_COLUMN, iden );
 
-		// Settings Consumer and Access Tokens
-		Twitter twitter = new TwitterFactory().getInstance();
-		twitter.setOAuthConsumer(twitterConsumerKey, twitterConsumerSecret);
-		twitter.setOAuthAccessToken(new AccessToken(token.getTwitterAccessToken(), token.getTwitterAccessTokenSecret()));
+                statuses = feedStatusDao.findByKeyValue( FeedStatus.class, queries );
+                if ( statuses != null && statuses.size() > 0 ) {
+                    status = statuses.get( CommonConstants.INITIAL_INDEX );
+                }
 
-		// building query to fetch
-		List<Status> tweets = new ArrayList<Status>();
-		try {
-			int pageNo = 1;
-			ResponseList<Status> resultList;
-			do {
-				if (lastFetchedPostId.equals("")) {
-					resultList = twitter.getUserTimeline(new Paging(pageNo, PAGE_SIZE));
-				}
-				else {
-					resultList = twitter.getUserTimeline(new Paging(pageNo, PAGE_SIZE).sinceId(Long.parseLong(lastFetchedPostId)));
-				}
+                if ( status == null ) {
+                    status = new FeedStatus();
+                    status.setFeedSource( FEED_SOURCE );
+                    status.setAgentId( iden );
+                } else {
+                    lastFetchedPostId = status.getLastFetchedPostId();
+                }
+                break;
+        }
+        profileId = iden;
+    }
 
-				tweets.addAll(resultList);
-				pageNo++;
-			}
-			while (resultList.size() == PAGE_SIZE);
 
-			status.setRetries(RETRIES_INITIAL);
-		}
-		catch (TwitterException e) {
-			LOG.error("Exception in Twitter feed extration. Reason: " + e.getMessage());
+    @Override
+    @Transactional
+    public List<Status> fetchFeed( long iden, String collection, TwitterToken token ) throws NonFatalException
+    {
+        LOG.info( "Getting tweets for " + collection + " with id: " + iden );
 
-			if (lastFetchedPostId == null || lastFetchedPostId.isEmpty()) {
-				lastFetchedPostId = "0";
-			}
+        // Settings Consumer and Access Tokens
+        Twitter twitter = new TwitterFactory().getInstance();
+        twitter.setOAuthConsumer( twitterConsumerKey, twitterConsumerSecret );
+        twitter.setOAuthAccessToken( new AccessToken( token.getTwitterAccessToken(), token.getTwitterAccessTokenSecret() ) );
 
-			// setting no.of retries
-			status.setRetries(status.getRetries() + 1);
-			status.setLastFetchedPostId(lastFetchedPostId);
+        // building query to fetch
+        List<Status> tweets = new ArrayList<Status>();
+        try {
+            int pageNo = 1;
+            ResponseList<Status> resultList;
+            do {
+                if ( lastFetchedPostId.equals( "" ) ) {
+                    resultList = twitter.getUserTimeline( new Paging( pageNo, PAGE_SIZE ) );
+                } else {
+                    resultList = twitter.getUserTimeline( new Paging( pageNo, PAGE_SIZE ).sinceId( Long
+                        .parseLong( lastFetchedPostId ) ) );
+                }
 
-			Timestamp timestamp = new Timestamp(System.currentTimeMillis());
-			DateTime currentTime = new DateTime(timestamp.getTime());
-			DateTime sentTime = new DateTime(status.getReminderSentOn().getTime());
-			Days days = Days.daysBetween(sentTime, currentTime);
+                tweets.addAll( resultList );
+                pageNo++;
+            } while ( resultList.size() == PAGE_SIZE );
 
-			// sending reminder mail and increasing counter
-			if (status.getRemindersSent() < socialConnectThreshold && days.getDays() >= socialConnectInterval
-					&& status.getRetries() >= socialConnectRetryThreshold) {
-				ContactDetailsSettings contactDetailsSettings = settingsDao.fetchOrganizationUnitSettingsById(iden, collection).getContact_details();
-				String userEmail = contactDetailsSettings.getMail_ids().getWork();
+            status.setRetries( RETRIES_INITIAL );
+        } catch ( TwitterException e ) {
+            LOG.error( "Exception in Twitter feed extration. Reason: " + e.getMessage() );
 
-				emailServices.sendSocialConnectMail(userEmail, contactDetailsSettings.getName(), userEmail, FEED_SOURCE);
+            if ( lastFetchedPostId == null || lastFetchedPostId.isEmpty() ) {
+                lastFetchedPostId = "0";
+            }
 
-				status.setReminderSentOn(timestamp);
-				status.setRemindersSent(status.getRemindersSent() + 1);
-			}
+            // setting no.of retries
+            status.setRetries( status.getRetries() + 1 );
+            status.setLastFetchedPostId( lastFetchedPostId );
 
-			feedStatusDao.saveOrUpdate(status);
-		}
-		return tweets;
-	}
+            Timestamp timestamp = new Timestamp( System.currentTimeMillis() );
+            DateTime currentTime = new DateTime( timestamp.getTime() );
+            DateTime sentTime = new DateTime( status.getReminderSentOn().getTime() );
+            Days days = Days.daysBetween( sentTime, currentTime );
 
-	@Override
-	public void processFeed(List<Status> tweets, String collection) throws NonFatalException {
-		LOG.info("Process tweets for organizationUnit " + collection);
+            // sending reminder mail and increasing counter
+            if ( status.getRemindersSent() < socialConnectThreshold && days.getDays() >= socialConnectInterval
+                && status.getRetries() >= socialConnectRetryThreshold ) {
+                ContactDetailsSettings contactDetailsSettings = settingsDao
+                    .fetchOrganizationUnitSettingsById( iden, collection ).getContact_details();
+                String userEmail = contactDetailsSettings.getMail_ids().getWork();
 
-		Collections.sort(tweets, new TwitterStatusTimeComparator());
-		TwitterSocialPost post;
-		for (Status tweet : tweets) {
-			if (tweet.getText() == null || tweet.getText().isEmpty()) {
-				continue;
-			}
+                emailServices.sendSocialConnectMail( userEmail, contactDetailsSettings.getName(), userEmail, FEED_SOURCE );
 
-			post = new TwitterSocialPost();
-			post.setTweet(tweet);
-			post.setPostText(tweet.getText());
-			post.setSource(FEED_SOURCE);
-			post.setPostId(String.valueOf(tweet.getId()));
-			post.setPostedBy(tweet.getUser().getName());
-			post.setTimeInMillis(tweet.getCreatedAt().getTime());
+                status.setReminderSentOn( timestamp );
+                status.setRemindersSent( status.getRemindersSent() + 1 );
+            }
 
-			String[] twitterHref = tweet.getText().split(twitterUriSplitStr);
-			if (twitterHref.length > 1) {
-				String postUrl = twitterHref[1];
-				post.setPostUrl(twitterUriSplitStr.concat(postUrl));
-			}
-			String entityType = "";
-			switch (collection) {
-				case MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION:
-				    entityType = CommonConstants.COMPANY_ID_COLUMN;
-					post.setCompanyId(profileId);
-					break;
+            feedStatusDao.saveOrUpdate( status );
+        }
+        return tweets;
+    }
 
-				case MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION:
-				    entityType = CommonConstants.REGION_ID_COLUMN;
-					post.setRegionId(profileId);
-					break;
 
-				case MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION:
-				    entityType = CommonConstants.BRANCH_ID_COLUMN;
-					post.setBranchId(profileId);
-					break;
+    @Override
+    public boolean processFeed( List<Status> tweets, String collection ) throws NonFatalException
+    {
+        LOG.info( "Process tweets for organizationUnit " + collection );
+        boolean inserted = false;
+        Collections.sort( tweets, new TwitterStatusTimeComparator() );
+        TwitterSocialPost post;
+        for ( Status tweet : tweets ) {
+            if ( tweet.getText() == null || tweet.getText().isEmpty() ) {
+                continue;
+            }
 
-				case MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION:
-				    entityType = CommonConstants.AGENT_ID_COLUMN;
-					post.setAgentId(profileId);
-					break;
-			}
+            post = new TwitterSocialPost();
+            post.setTweet( tweet );
+            post.setPostText( tweet.getText() );
+            post.setSource( FEED_SOURCE );
+            post.setPostId( String.valueOf( tweet.getId() ) );
+            post.setPostedBy( tweet.getUser().getName() );
+            post.setTimeInMillis( tweet.getCreatedAt().getTime() );
 
-			// updating last fetched details
-			lastFetchedTill = new Timestamp(tweet.getCreatedAt().getTime());
-			lastFetchedPostId = String.valueOf(tweet.getId());
+            String[] twitterHref = tweet.getText().split( twitterUriSplitStr );
+            if ( twitterHref.length > 1 ) {
+                String postUrl = twitterHref[1];
+                post.setPostUrl( twitterUriSplitStr.concat( postUrl ) );
+            }
+            switch ( collection ) {
+                case MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION:
+                    post.setCompanyId( profileId );
+                    break;
 
-			// pushing to mongo
-			surveyHandler.updateModifiedOnColumnForEntity( entityType, profileId );
-			mongoTemplate.insert(post, CommonConstants.SOCIAL_POST_COLLECTION);
-		}
-	}
+                case MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION:
+                    post.setRegionId( profileId );
+                    break;
 
-	@Override
-	@Transactional
-	public void postProcess(long iden, String collection) throws NonFatalException {
-		if (lastFetchedPostId == null || lastFetchedPostId.isEmpty()) {
-			lastFetchedPostId = "0";
-		}
+                case MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION:
+                    post.setBranchId( profileId );
+                    break;
 
-		status.setLastFetchedTill(lastFetchedTill);
-		status.setLastFetchedPostId(lastFetchedPostId);
+                case MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION:
+                    post.setAgentId( profileId );
+                    break;
+            }
 
-		feedStatusDao.saveOrUpdate(status);
-	}
+            // updating last fetched details
+            lastFetchedTill = new Timestamp( tweet.getCreatedAt().getTime() );
+            lastFetchedPostId = String.valueOf( tweet.getId() );
+
+            // pushing to mongo
+            mongoTemplate.insert( post, CommonConstants.SOCIAL_POST_COLLECTION );
+            inserted = true;
+        }
+        return inserted;
+    }
+
+
+    @Override
+    @Transactional
+    public void postProcess( long iden, String collection, boolean anyRecordInserted ) throws NonFatalException
+    {
+        if ( lastFetchedPostId == null || lastFetchedPostId.isEmpty() ) {
+            lastFetchedPostId = "0";
+        }
+
+        status.setLastFetchedTill( lastFetchedTill );
+        status.setLastFetchedPostId( lastFetchedPostId );
+
+        if ( anyRecordInserted ) {
+            if ( collection.equalsIgnoreCase( MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION ) ) {
+                surveyHandler.updateModifiedOnColumnForEntity( CommonConstants.COMPANY_ID_COLUMN, profileId );
+            } else if ( collection.equalsIgnoreCase( MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION ) ) {
+                surveyHandler.updateModifiedOnColumnForEntity( CommonConstants.REGION_ID_COLUMN, profileId );
+            } else if ( collection.equalsIgnoreCase( MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION ) ) {
+                surveyHandler.updateModifiedOnColumnForEntity( CommonConstants.BRANCH_ID_COLUMN, profileId );
+            } else if ( collection.equalsIgnoreCase( MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION ) ) {
+                surveyHandler.updateModifiedOnColumnForEntity( CommonConstants.AGENT_ID_COLUMN, profileId );
+            }
+        }
+
+        feedStatusDao.saveOrUpdate( status );
+    }
 }

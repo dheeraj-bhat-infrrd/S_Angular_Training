@@ -573,12 +573,12 @@
     .posts-panel-item, .ppl-review-item,.ppl-review-item-last{
         padding: 15px;
     }
-    .tweet-icn{
-        min-width: 32px;
-        width: 14%;
-        margin-right: 0;
-    }
-    .tweet-txt{
+    .tweet-icn {
+		min-width: 32px;
+		width: 5%;
+		margin: 0 10px;
+	}
+	.tweet-txt{
         min-width: 235px;
         width: 85%;
     }
@@ -1890,9 +1890,6 @@
 	.web-addr-header {
 		padding-left: 10px;
 	}
-	.social-item-icon {
-		width: 32px;
-	}
 }
 
 /* ============== MEDIUM SIZED SCREENS ==============*/
@@ -2154,7 +2151,7 @@
     #recent-post-container,#reviews-container,
     #prof-company-intro,#prof-agent-container,#ppl-post-cont,
     #contact-wrapper,#intro-about-me{
-        display: block !important;
+        display: block;
     }
     .mob-contact-btn-wrapper{
         display: none;

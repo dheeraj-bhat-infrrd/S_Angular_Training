@@ -42,12 +42,14 @@ import com.realtech.socialsurvey.core.entities.AgentSettings;
 
 import com.realtech.socialsurvey.core.entities.BranchMediaPostDetails;
 import com.realtech.socialsurvey.core.entities.BulkSurveyDetail;
+import com.realtech.socialsurvey.core.entities.Branch;
 import com.realtech.socialsurvey.core.entities.Company;
 import com.realtech.socialsurvey.core.entities.CompanyMediaPostDetails;
 import com.realtech.socialsurvey.core.entities.MailContent;
 import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
 import com.realtech.socialsurvey.core.entities.RegionMediaPostDetails;
 import com.realtech.socialsurvey.core.entities.SocialMediaPostDetails;
+import com.realtech.socialsurvey.core.entities.Region;
 import com.realtech.socialsurvey.core.entities.SurveyDetails;
 import com.realtech.socialsurvey.core.entities.SurveyPreInitiation;
 import com.realtech.socialsurvey.core.entities.SurveyResponse;
@@ -205,7 +207,7 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
         if ( survey == null ) {
             surveyDetailsDao.insertSurveyDetails( surveyDetails );
             // LOG.info( "Updating modified on column in aagent hierarchy fro agent " );
-            updateModifiedOnColumnForAgentHierachy( agentId );
+            // updateModifiedOnColumnForAgentHierachy( agentId );
             return null;
         } else {
             return survey;
@@ -1820,6 +1822,22 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
 
             if ( profile.getRegionId() > 0l && !regionIdList.contains( profile.getRegionId() ) ) {
                 regionIdList.add( profile.getRegionId() );
+            }
+        }
+
+        if ( branchIdList != null ) {
+            for ( Object branchId : branchIdList ) {
+                Long longId = ( (Number) branchId ).longValue();
+                Branch branch = userManagementService.getBranchById( longId );
+                if ( branch != null ) {
+                    Region region = branch.getRegion();
+                    if ( region != null ) {
+                        long regionId = region.getRegionId();
+                        if ( regionId > 0l && !regionIdList.contains( regionId ) ) {
+                            regionIdList.add( regionId );
+                        }
+                    }
+                }
             }
         }
 
