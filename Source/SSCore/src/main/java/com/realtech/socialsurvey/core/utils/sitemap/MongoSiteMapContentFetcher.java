@@ -4,8 +4,10 @@ import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.TimeZone;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
@@ -18,11 +20,11 @@ import com.realtech.socialsurvey.core.entities.SiteMapEntry;
 
 @Component
 @Scope(value = ConfigurableBeanFactory.SCOPE_PROTOTYPE)
-public class MongoSiteMapContentFetcher implements SitemapContentFecher {
+public class MongoSiteMapContentFetcher implements SitemapContentFecher, InitializingBean {
 
 	private static final Logger LOG = LoggerFactory.getLogger(MongoSiteMapContentFetcher.class);
 	
-	private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
+	private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSXXX");
 
 	private String collectionName;
 	private String interval;
@@ -144,6 +146,12 @@ public class MongoSiteMapContentFetcher implements SitemapContentFecher {
 			entries.add(entry);
 		}
 		return entries;
+	}
+
+	@Override
+	public void afterPropertiesSet() throws Exception {
+		// Setting the UTC time zone
+		DATE_FORMAT.setTimeZone(TimeZone.getDefault());
 	}
 
 
