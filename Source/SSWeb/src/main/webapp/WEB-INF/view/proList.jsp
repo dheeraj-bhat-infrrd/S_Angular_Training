@@ -87,7 +87,7 @@
 								<input id="fp-profile-level-fetch-info" data-searchcriteria="${searchCriteria}"
 									data-profile-level="${profileLevel}" data-iden="${iden}" type="hidden"/>
 							</div>
-							<div class="ctnt-list-header-right float-right">
+							<div id="srch-num-list" class="ctnt-list-header-right float-right hide">
 								<span id="srch-num" class="srch-num"><spring:message code="label.no.key" /></span>
 								<spring:message code="label.profilelistfound.key" />
 							</div>
