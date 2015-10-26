@@ -257,7 +257,7 @@
 								</div>
 							</c:when>
 							<c:otherwise>
-								<div class="initial-dd-item" onclick="userLogout();">
+								<div class="initial-dd-item" id="user-logout" onclick="userLogout();">
 									<spring:message code="label.logout.key" />
 								</div>
 							</c:otherwise>
