@@ -5496,6 +5496,10 @@ tr.u-tbl-header td {
 	background: url(../images/edit_user.png) no-repeat center;
 }
 
+.v-icn-wid {
+	background: url(../images/generate_widget.png) no-repeat center;
+}
+
 .v-um-tbl-wrapper {
 	margin-top: 15px;
 	padding: 0 10px;
