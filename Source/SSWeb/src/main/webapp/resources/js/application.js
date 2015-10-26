@@ -4827,7 +4827,8 @@ function paginateUsersProList(response) {
 				}
 				
 				$('#pro-total-pages').text(totalPage);
-			}			
+			} 
+			$('#srch-num-list').show();
 		}
 		paintProList(reponseJson.users);
 	}
@@ -7211,6 +7212,7 @@ function isValidUrl(url){
 
 // Adjust image
 function adjustImage() {
+	$('.mobile-tabs').children('.mob-icn-active').click();
 	var windW = window.innerWidth;
 	if (windW < 768) {
 		//$('.mobile-tabs').children('.mob-icn-active').click();
@@ -7226,8 +7228,10 @@ function adjustImage() {
 		var rowW = $('.lp-con-row').width() - 50 - 50; // left image-50;
 														// right-locks-50
 		$('.lp-con-row-item').width(rowW + 'px');
-		// $('.lp-con-row-item').width('auto');
 		$('.footer-main-wrapper').show();
+		//show all the containers
+        $('#reviews-container, #prof-company-intro, #prof-agent-container').show();
+        $('#recent-post-container, #ppl-post-cont, #contact-wrapper, #intro-about-me').show();
 	}
 }
 

@@ -127,8 +127,8 @@
     			<textarea id="report-abuse-txtbox" class="report-abuse-txtbox" placeholder='<spring:message code="label.publicprofile.reportabuse.key"/>'></textarea>
     		</div>
     		<div class="rpa-overlay-btn-cont clearfix">
-    			<div class="rpa-btn rpa-report-btn ol-btn cursor-pointer">Report</div>
-    			<div class="rpa-btn rpa-cancel-btn ol-btn cursor-pointer">Cancel</div>
+    			<div class="rpa-btn rpa-report-btn ol-btn cursor-pointer"><spring:message code="label.report.key"/></div>
+    			<div class="rpa-btn rpa-cancel-btn ol-btn cursor-pointer"><spring:message code="label.cancel.key"/></div>
     		</div>
     	</div>
     </div>
@@ -137,15 +137,15 @@
             <div class="contact-us-pu">
                 <div class="bd-quest-item">
                     <div class="bd-q-pu-header bd-q-pu-header-adj clearfix">
-                        <div class="float-left bd-q-pu-header-lft">Please enter your message.</div>
+                        <div class="float-left bd-q-pu-header-lft"><spring:message code="label.publicprofile.entermessage.key"/></div>
                     </div>
                     <div class="bd-q-pu-txt-wrapper pos-relative">
                         <textarea class="bd-q-pu-txtarea"></textarea>
                     </div>
                 </div>
                 <div class="cntct-us-btns-wrapper clearfix">
-                    <div class="bd-q-btn-cancel float-left">Cancel</div>
-                    <div class="bd-q-btn-done-pu float-left">Send</div>
+                    <div class="bd-q-btn-cancel float-left"><spring:message code="label.cancel.key"/></div>
+                    <div class="bd-q-btn-done-pu float-left"><spring:message code="label.send.key"/></div>
                 </div>
             </div>
         </div>
@@ -312,20 +312,6 @@
 							</div>
 						</div>
 					</c:if>
-					<%-- <c:if test="${not empty profile.contact_details && not empty profile.contact_details.web_addresses && not empty profile.contact_details.web_addresses.work}">
-						<div id="web-addr-header" class="web-addr-header float-left clearfix">
-							<div class="web-address-img float-left"></div>
-							<div id="web-address-txt" class="web-address-txt float-left web-address-link" title="${profile.contact_details.web_addresses.work}" data-link="${profile.contact_details.web_addresses.work}">${profile.contact_details.web_addresses.work}</div>
-						</div>
-					</c:if>
-					<c:if test="${not empty profile.contact_details && not empty profile.contact_details.contact_numbers && not empty profile.contact_details.contact_numbers.work}">
-						<div class="web-addr-header float-left clearfix">
-						<a href="tel:${profile.contact_details.contact_numbers.work}">
-							<div class="phn-num-img float-left"></div>
-							<div class="phone-number-txt float-left">${profile.contact_details.contact_numbers.work}</div>
-						</a>
-						</div>
-					</c:if> --%>
 					<div id="social-token-container" class="float-right hm-hr-row-right pp-social-icn clearfix hide">
 						<c:if test="${not empty profile.socialMediaTokens}">
 							<div id="social-connect-txt" class="float-left social-connect-txt">Connect with ${profName }:</div>
@@ -441,24 +427,24 @@
                     	<div class="left-contact-wrapper">
                     		<div id="prof-contact-hdr" class="left-panel-header prof-contact-hdr">Contact ${profName}</div>
                     		<div class="left-panel-content">
-                    			<form id="prof-contact-form" action="">
+                    			<form id="prof-contact-form">
 	                    			<div class="lp-row">
 	                    				<div class="lp-input-cont">
 	                    					<div class="float-left lp-username-icn lp-input-icn"></div>
-	                    					<input id="lp-input-name" type="text" class="lp-input" placeholder="Your name">
+	                    					<input id="lp-input-name" type="text" class="lp-input" placeholder='<spring:message code="label.publicprofile.nameplaceholder.key"/>'>
 	                    				</div>
 	                    			</div>
 	                    			<div class="lp-row">
 	                    				<div class="lp-input-cont lp-email">
 	                    					<div class="float-left lp-email-icn lp-input-icn"></div>
-	                    					<input id="lp-input-email" type="email" class="lp-input" placeholder="Email Address">
+	                    					<input id="lp-input-email" type="email" class="lp-input" placeholder='<spring:message code="label.emailid.key"/>'>
 	                    				</div>
 	                    			</div>
 	                    			<div class="lp-row">
 	                    				<div class="lp-input-cont lp-textarea-cont">
 	                    					<div class="float-left lp-textarea-icn lp-input-icn"></div>
-	                    					<textarea id="lp-input-message" type="email" class="lp-input"
-	                    						placeholder="I'd like to get in contact with you about.."></textarea>
+	                    					<textarea id="lp-input-message" class="lp-input"
+	                    						placeholder='<spring:message code="label.publicprofile.contactus.textplaceholder.key"/>'></textarea>
 	                    				</div>
 	                    			</div>
 	                    			<div class="lp-row">
@@ -478,10 +464,10 @@
 										</div>
 	                    			</div>
 	                    			<div class="lp-row">
-	                    				<div class="lp-button">Submit Your Message</div>
+	                    				<div class="lp-button"><spring:message code="label.publicprofile.submitmessage.key"/></div>
 	                    			</div>
 	                    			<div class="privacy-policy-disclaimer">
-	                    				We will only use information you provide on this form to send your message to this professional.
+	                    				<spring:message code="label.publicprofile.privacydisclaimer.key"/>
 	                    			</div>
 	                    			<div id="privacy-policy-link" class="privacy-policy-link"><a href="https://www.socialsurvey.me/survey/privacy-policy/">Privacy Policy</a></div>
                     			</form>
@@ -534,15 +520,15 @@
                     	</c:otherwise>
                     </c:choose>
                 </div>
-                <div class="rt-content-main bord-bot-dc clearfix hide" id="recent-post-container">
+                <div class="rt-content-main bord-bot-dc clearfix" id="recent-post-container" style="display: none;">
                     <div class="float-left panel-tweet-wrapper">
-                        <div class="main-con-header">Recent Posts</div>
+                        <div class="main-con-header"><spring:message code="label.publicprofile.recentpost.key"/></div>
                         <div class="tweet-panel tweet-panel-left tweet-panel-left-adj" id="prof-posts">
                             <!--  latest posts get populated here -->
                         </div>
                     </div>
                 </div>
-                <div class="people-say-wrapper rt-content-main hide" id="reviews-container">
+                <div class="people-say-wrapper rt-content-main" id="reviews-container" style="display: none;">
                 	<div class="clearfix hide">
 	                    <div class="main-con-header float-left" id="prof-reviews-header">
 	                    	<span class="ppl-say-txt-st"><spring:message code="label.peoplesayabout.key"/></span>
