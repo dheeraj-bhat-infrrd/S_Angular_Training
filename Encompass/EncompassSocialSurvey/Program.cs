@@ -13,10 +13,8 @@ namespace EncompassSocialSurvey
             log4net.Config.BasicConfigurator.Configure();
 
             Logger.Info("Entering into method: Program.Main()");
-
             try
             {
-
                 Logger.Debug("Getting company details ");
                 CompanyCredentialService _ccService = new CompanyCredentialService();
                 var companyCredentials = _ccService.GetCompanyCredentials();

@@ -1772,6 +1772,35 @@ public class EmailServicesImpl implements EmailServices
 
         LOG.info( "Method sendCorruptDataFromCrmNotificationMail() finished." );
     }
+    
+    
+    @Override
+    public void sendInvalidEmailsNotificationMail( String firstName, String lastName, String recipientMailId,
+        Map<String, String> attachmentsDetails ) throws InvalidInputException, UndeliveredEmailException
+    {
+        LOG.info( "Method sendInvalidEmailsNotificationMail() started." );
+        if ( recipientMailId == null || recipientMailId.isEmpty() ) {
+            LOG.error( "Recipient email Id is empty or null for sending corrupt CRM data notification mail " );
+            throw new InvalidInputException(
+                "Recipient email Id is empty or null for sending corrupt CRM data notification mail " );
+        }
+
+        EmailEntity emailEntity = prepareEmailEntityForSendingEmail( recipientMailId );
+        emailEntity.setAttachmentDetail( attachmentsDetails );
+        String subjectFileName = EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER
+            + EmailTemplateConstants.INVALID_EMAILS_MAIL_SUBJECT;
+        String displayName = firstName + " " + lastName;
+        displayName.replaceAll( "null", "" );
+        FileContentReplacements messageBodyReplacements = new FileContentReplacements();
+        messageBodyReplacements.setFileName( EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER
+            + EmailTemplateConstants.INVALID_EMAILS_MAIL_BODY );
+        messageBodyReplacements.setReplacementArgs( Arrays.asList( appLogoUrl, displayName ) );
+
+        LOG.debug( "Calling email sender to send mail" );
+        emailSender.sendEmailWithBodyReplacements( emailEntity, subjectFileName, messageBodyReplacements, false );
+
+        LOG.info( "Method sendCorruptDataFromCrmNotificationMail() finished." );
+    }
 
 
     @Override

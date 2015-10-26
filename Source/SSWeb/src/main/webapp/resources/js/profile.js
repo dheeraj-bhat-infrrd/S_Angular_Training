@@ -225,6 +225,9 @@ function adjustImage(){
     }else{
         $('.lp-con-row-item').width('auto');
         $('.footer-main-wrapper').show();
+        //show all the containers
+        $('#reviews-container, #prof-company-intro, #prof-agent-container').show();
+        $('#recent-post-container, #ppl-post-cont, #contact-wrapper, #intro-about-me').show();
     }
 }
 
