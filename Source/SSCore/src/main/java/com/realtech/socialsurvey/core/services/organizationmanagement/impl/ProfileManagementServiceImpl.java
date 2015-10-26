@@ -1414,6 +1414,9 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
             compositeUserObject = new UserCompositeEntity();
             compositeUserObject.setUser( user );
             compositeUserObject.setAgentSettings( agentSettings );
+        }else{
+        	LOG.warn("No profile found with profile name: "+agentProfileName);
+        	throw new ProfileNotFoundException("No profile found with profile name: "+agentProfileName);
         }
         LOG.info( "Returning the user composite object." );
         return compositeUserObject;
