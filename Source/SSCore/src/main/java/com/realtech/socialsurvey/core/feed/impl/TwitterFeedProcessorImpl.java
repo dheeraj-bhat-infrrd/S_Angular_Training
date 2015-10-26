@@ -6,6 +6,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
 import org.joda.time.DateTime;
 import org.joda.time.Days;
 import org.slf4j.Logger;
@@ -17,6 +18,7 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
+
 import twitter4j.Paging;
 import twitter4j.ResponseList;
 import twitter4j.Status;
@@ -24,6 +26,7 @@ import twitter4j.Twitter;
 import twitter4j.TwitterException;
 import twitter4j.TwitterFactory;
 import twitter4j.auth.AccessToken;
+
 import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.commons.TwitterStatusTimeComparator;
 import com.realtech.socialsurvey.core.dao.GenericDao;
@@ -36,6 +39,7 @@ import com.realtech.socialsurvey.core.entities.TwitterToken;
 import com.realtech.socialsurvey.core.exception.NonFatalException;
 import com.realtech.socialsurvey.core.feed.SocialNetworkDataProcessor;
 import com.realtech.socialsurvey.core.services.mail.EmailServices;
+import com.realtech.socialsurvey.core.services.surveybuilder.SurveyHandler;
 
 @Component("twitterFeed")
 @Scope(value = ConfigurableBeanFactory.SCOPE_PROTOTYPE)
@@ -55,6 +59,9 @@ public class TwitterFeedProcessorImpl implements SocialNetworkDataProcessor<Stat
 
 	@Autowired
 	private OrganizationUnitSettingsDao settingsDao;
+	
+	@Autowired
+	private SurveyHandler surveyHandler;
 
 	@Autowired
 	private EmailServices emailServices;
@@ -249,20 +256,25 @@ public class TwitterFeedProcessorImpl implements SocialNetworkDataProcessor<Stat
 				String postUrl = twitterHref[1];
 				post.setPostUrl(twitterUriSplitStr.concat(postUrl));
 			}
+			String entityType = "";
 			switch (collection) {
 				case MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION:
+				    entityType = CommonConstants.COMPANY_ID_COLUMN;
 					post.setCompanyId(profileId);
 					break;
 
 				case MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION:
+				    entityType = CommonConstants.REGION_ID_COLUMN;
 					post.setRegionId(profileId);
 					break;
 
 				case MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION:
+				    entityType = CommonConstants.BRANCH_ID_COLUMN;
 					post.setBranchId(profileId);
 					break;
 
 				case MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION:
+				    entityType = CommonConstants.AGENT_ID_COLUMN;
 					post.setAgentId(profileId);
 					break;
 			}
@@ -272,6 +284,7 @@ public class TwitterFeedProcessorImpl implements SocialNetworkDataProcessor<Stat
 			lastFetchedPostId = String.valueOf(tweet.getId());
 
 			// pushing to mongo
+			surveyHandler.updateModifiedOnColumnForEntity( entityType, profileId );
 			mongoTemplate.insert(post, CommonConstants.SOCIAL_POST_COLLECTION);
 		}
 	}
