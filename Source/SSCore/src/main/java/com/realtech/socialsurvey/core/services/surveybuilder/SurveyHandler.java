@@ -254,4 +254,7 @@ public interface SurveyHandler
 
     public List<SurveyDetails> getSurveysUnderResolution( long companyId, int startIndex, int numOfRows );
 
+
+    public void updateModifiedOnColumnForEntity( String collectionName, long entityId );
+
 }

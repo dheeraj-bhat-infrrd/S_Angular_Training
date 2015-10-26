@@ -4,16 +4,13 @@ import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
-
 import com.realtech.socialsurvey.core.dao.OrganizationUnitSettingsDao;
 import com.realtech.socialsurvey.core.dao.impl.MongoOrganizationUnitSettingDaoImpl;
 import com.realtech.socialsurvey.core.entities.ProfileUrlEntity;
@@ -21,11 +18,11 @@ import com.realtech.socialsurvey.core.entities.SiteMapEntry;
 
 @Component
 @Scope(value = ConfigurableBeanFactory.SCOPE_PROTOTYPE)
-public class MongoSiteMapContentFetcher implements SitemapContentFecher, InitializingBean {
+public class MongoSiteMapContentFetcher implements SitemapContentFecher {
 
 	private static final Logger LOG = LoggerFactory.getLogger(MongoSiteMapContentFetcher.class);
 	
-	private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss Z");
+	private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
 
 	private String collectionName;
 	private String interval;
@@ -36,7 +33,6 @@ public class MongoSiteMapContentFetcher implements SitemapContentFecher, Initial
 	private long count;
 	private int recordsFetched;
 	private boolean areMoreRecordsPresent;
-	private Timestamp minLastModifiedTimeInterval;
 
 	@Autowired
 	private OrganizationUnitSettingsDao organizationUnitSettingsDao;
@@ -144,20 +140,11 @@ public class MongoSiteMapContentFetcher implements SitemapContentFecher, Initial
 			entry.setLocation(generateLocation(profileUrl.getProfileUrl()));
 			Timestamp modifiedOnTimestamp =  new Timestamp(profileUrl.getModifiedOn());
 			// change the modified time if the modified on is older than the configured value
-			if(minLastModifiedTimeInterval.after(modifiedOnTimestamp)){
-				entry.setLastModifiedDate(DATE_FORMAT.format(new Timestamp(System.currentTimeMillis())));
-			}else{
-				entry.setLastModifiedDate(DATE_FORMAT.format(modifiedOnTimestamp));
-			}
+			entry.setLastModifiedDate(DATE_FORMAT.format(modifiedOnTimestamp));
 			entries.add(entry);
 		}
 		return entries;
 	}
 
-	@Override
-	public void afterPropertiesSet() throws Exception {
-		LOG.debug("Setting the minimum last modified time allowes");
-		minLastModifiedTimeInterval = new Timestamp(System.currentTimeMillis() - (Integer.parseInt(lastModifiedTimeInterval) * 24 * 60 * 60 * 1000));
-	}
 
 }
