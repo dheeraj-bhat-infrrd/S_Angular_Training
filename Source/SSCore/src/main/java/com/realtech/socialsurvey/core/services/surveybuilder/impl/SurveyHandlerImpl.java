@@ -192,7 +192,7 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
         if ( survey == null ) {
             surveyDetailsDao.insertSurveyDetails( surveyDetails );
             // LOG.info( "Updating modified on column in aagent hierarchy fro agent " );
-            // updateModifiedOnColumnForAgentHierachy( agentId );
+            updateModifiedOnColumnForAgentHierachy( agentId );
             return null;
         } else {
             return survey;
@@ -205,14 +205,14 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
     public void insertSurveyDetails( SurveyDetails surveyDetails )
     {
         surveyDetailsDao.insertSurveyDetails( surveyDetails );
-        if(surveyDetails.getAgentId()  > 0l){
+        if ( surveyDetails.getAgentId() > 0l ) {
             LOG.info( "Updating modified on column in aagent hierarchy fro agent " );
             try {
                 updateModifiedOnColumnForAgentHierachy( surveyDetails.getAgentId() );
             } catch ( InvalidInputException e ) {
-               LOG.error( "passed agent id in method updateModifiedOnColumnForAgentHierachy() is invalid" );
+                LOG.error( "passed agent id in method updateModifiedOnColumnForAgentHierachy() is invalid" );
             }
-        }        
+        }
     }
 
 
@@ -1585,7 +1585,8 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
     @Override
     public Boolean checkIfTimeIntervalHasExpired( long lastRemindedTime, long systemTime, int reminderInterval )
     {
-    	LOG.debug("Checking time interval expiry: lastRemindedTime "+lastRemindedTime+"\t systemTime: "+systemTime+"\t reminderInterval: "+reminderInterval);
+        LOG.debug( "Checking time interval expiry: lastRemindedTime " + lastRemindedTime + "\t systemTime: " + systemTime
+            + "\t reminderInterval: " + reminderInterval );
         long remainingTime = systemTime - lastRemindedTime;
         int remainingDays = (int) ( remainingTime / ( 1000 * 60 * 60 * 24 ) );
         if ( remainingDays >= reminderInterval ) {
@@ -1708,38 +1709,69 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
 
     @Override
     @Transactional
+    public void updateModifiedOnColumnForEntity( String entityType, long entityId )
+    {
+        LOG.debug( "method updateModifiedOnColumnForEntity() started" );
+        if ( entityType.equalsIgnoreCase( CommonConstants.COMPANY_ID_COLUMN ) ) {
+            organizationUnitSettingsDao.updateKeyOrganizationUnitSettingsByCriteria(
+                MongoOrganizationUnitSettingDaoImpl.KEY_MODIFIED_ON, System.currentTimeMillis(),
+                MongoOrganizationUnitSettingDaoImpl.KEY_IDENTIFIER, entityId,
+                MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION );
+        } else if ( entityType.equalsIgnoreCase( CommonConstants.REGION_ID_COLUMN ) ) {
+            organizationUnitSettingsDao.updateKeyOrganizationUnitSettingsByCriteria(
+                MongoOrganizationUnitSettingDaoImpl.KEY_MODIFIED_ON, System.currentTimeMillis(),
+                MongoOrganizationUnitSettingDaoImpl.KEY_IDENTIFIER, entityId,
+                MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION );
+        } else if ( entityType.equalsIgnoreCase( CommonConstants.BRANCH_ID_COLUMN ) ) {
+            organizationUnitSettingsDao.updateKeyOrganizationUnitSettingsByCriteria(
+                MongoOrganizationUnitSettingDaoImpl.KEY_MODIFIED_ON, System.currentTimeMillis(),
+                MongoOrganizationUnitSettingDaoImpl.KEY_IDENTIFIER, entityId,
+                MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION );
+        } else if ( entityType.equalsIgnoreCase( CommonConstants.AGENT_ID_COLUMN ) ) {
+            organizationUnitSettingsDao.updateKeyOrganizationUnitSettingsByCriteria(
+                MongoOrganizationUnitSettingDaoImpl.KEY_MODIFIED_ON, System.currentTimeMillis(),
+                MongoOrganizationUnitSettingDaoImpl.KEY_IDENTIFIER, entityId,
+                MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION );
+        }
+
+
+    }
+
+
+    @Override
+    @Transactional
     public void updateModifiedOnColumnForAgentHierachy( long agentId ) throws InvalidInputException
     {
         LOG.debug( "method updateModifiedOnColumnForAgentHierachy() started" );
-        if(agentId <= 0l){
+        if ( agentId <= 0l ) {
             throw new InvalidInputException( "passend agentid is incorrect" );
         }
-        
+
         User agent = userDao.findById( User.class, agentId );
-        if(agent == null){
+        if ( agent == null ) {
             throw new InvalidInputException( "No user in db for passed userId" );
         }
-        
-        if(agent.getCompany() == null){
+
+        if ( agent.getCompany() == null ) {
             throw new InvalidInputException( "No Company in db for passed userId" );
         }
-        
+
         long companyId = agent.getCompany().getCompanyId();
         List<Object> branchIdList = new ArrayList<Object>();
         List<Object> regionIdList = new ArrayList<Object>();
         List<UserProfile> userProfiles = agent.getUserProfiles();
-        
-        for(UserProfile profile : userProfiles){
-            if(profile.getBranchId() > 0l && ! branchIdList.contains( profile.getBranchId() )){
+
+        for ( UserProfile profile : userProfiles ) {
+            if ( profile.getBranchId() > 0l && !branchIdList.contains( profile.getBranchId() ) ) {
                 branchIdList.add( profile.getBranchId() );
             }
-            
-            if(profile.getRegionId() > 0l && ! regionIdList.contains( profile.getRegionId() )){
+
+            if ( profile.getRegionId() > 0l && !regionIdList.contains( profile.getRegionId() ) ) {
                 regionIdList.add( profile.getRegionId() );
             }
         }
-        
-        
+
+
         if ( companyId > 0l ) {
             organizationUnitSettingsDao.updateKeyOrganizationUnitSettingsByCriteria(
                 MongoOrganizationUnitSettingDaoImpl.KEY_MODIFIED_ON, System.currentTimeMillis(),
@@ -1753,28 +1785,30 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
                 MongoOrganizationUnitSettingDaoImpl.KEY_IDENTIFIER, agentId,
                 MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION );
         }
-        
-        organizationUnitSettingsDao.updateKeyOrganizationUnitSettingsByInCriteria(
-            MongoOrganizationUnitSettingDaoImpl.KEY_MODIFIED_ON, System.currentTimeMillis(),
-            MongoOrganizationUnitSettingDaoImpl.KEY_IDENTIFIER, branchIdList,
-            MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION );
-        
-        organizationUnitSettingsDao.updateKeyOrganizationUnitSettingsByInCriteria(
-            MongoOrganizationUnitSettingDaoImpl.KEY_MODIFIED_ON, System.currentTimeMillis(),
-            MongoOrganizationUnitSettingDaoImpl.KEY_IDENTIFIER, regionIdList,
-            MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION );
-        
+
+        if ( !branchIdList.isEmpty() ) {
+            organizationUnitSettingsDao.updateKeyOrganizationUnitSettingsByInCriteria(
+                MongoOrganizationUnitSettingDaoImpl.KEY_MODIFIED_ON, System.currentTimeMillis(),
+                MongoOrganizationUnitSettingDaoImpl.KEY_IDENTIFIER, branchIdList,
+                MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION );
+        }
+        if ( !regionIdList.isEmpty() ) {
+            organizationUnitSettingsDao.updateKeyOrganizationUnitSettingsByInCriteria(
+                MongoOrganizationUnitSettingDaoImpl.KEY_MODIFIED_ON, System.currentTimeMillis(),
+                MongoOrganizationUnitSettingDaoImpl.KEY_IDENTIFIER, regionIdList,
+                MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION );
+        }
         LOG.debug( "method updateModifiedOnColumnForAgentHierachy() finished" );
-        
+
     }
-    
+
 
     public void updateSurveyAsUnderResolution( String surveyId )
     {
-       LOG.info( "Method updateSurveyAsUnderResolution() to mark a survey as under resolution started, started" );
-       surveyDetailsDao.updateSurveyAsUnderResolution( surveyId );
-       LOG.info( "Method updateSurveyAsUnderResolution() to mark a survey as under resolution started, ended" );
-        
+        LOG.info( "Method updateSurveyAsUnderResolution() to mark a survey as under resolution started, started" );
+        surveyDetailsDao.updateSurveyAsUnderResolution( surveyId );
+        LOG.info( "Method updateSurveyAsUnderResolution() to mark a survey as under resolution started, ended" );
+
     }
 
 
@@ -1782,8 +1816,8 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
     public List<AbusiveSurveyReportWrapper> getSurveysReportedAsAbusive( long companyId, int startIndex, int numOfRows )
     {
         LOG.info( "Method getSurveysReportedAsAbusive() to retrieve surveys marked as abusive for a company, started" );
-        List<AbusiveSurveyReportWrapper> abusiveSurveyReports = surveyDetailsDao.getSurveysReporetedAsAbusive(companyId, startIndex,
-            numOfRows );
+        List<AbusiveSurveyReportWrapper> abusiveSurveyReports = surveyDetailsDao.getSurveysReporetedAsAbusive( companyId,
+            startIndex, numOfRows );
         LOG.info( "Method getSurveysReportedAsAbusive() to retrieve surveys marked as abusive for a company, finished" );
         return abusiveSurveyReports;
     }
@@ -1793,8 +1827,7 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
     public List<SurveyDetails> getSurveysUnderResolution( long companyId, int startIndex, int numOfRows )
     {
         LOG.info( "Method getSurveysUnderResolution() to retrieve surveys marked as under resolution for a company, started" );
-        List<SurveyDetails> surveyDetails = surveyDetailsDao.getSurveysUnderResolution(companyId, startIndex,
-            numOfRows );
+        List<SurveyDetails> surveyDetails = surveyDetailsDao.getSurveysUnderResolution( companyId, startIndex, numOfRows );
         LOG.info( "Method getSurveysUnderResolution() to retrieve surveys marked as under resolution for a company, finished" );
         return surveyDetails;
     }
