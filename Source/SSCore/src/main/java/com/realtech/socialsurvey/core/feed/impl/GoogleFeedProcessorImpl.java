@@ -360,11 +360,11 @@ public class GoogleFeedProcessorImpl implements SocialNetworkDataProcessor<Googl
 
 
     @Override
-    public void processFeed( List<GooglePlusPost> posts, String collection ) throws NonFatalException
+    public boolean processFeed( List<GooglePlusPost> posts, String collection ) throws NonFatalException
     {
         LOG.info( "Process tweets for organizationUnit " + collection );
         Date lastFetchedOn = null;
-
+        boolean inserted = false;
         GooglePlusSocialPost socialPost = null;
         for ( GooglePlusPost post : posts ) {
             if ( post.getId().equalsIgnoreCase( status.getLastFetchedPostId() ) ) {
@@ -396,44 +396,40 @@ public class GoogleFeedProcessorImpl implements SocialNetworkDataProcessor<Googl
 
             if ( socialPost == null )
                 break;
-            String entityType = "";
             switch ( collection ) {
                 case MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION:
-                    entityType = CommonConstants.COMPANY_ID_COLUMN;
                     socialPost.setCompanyId( profileId );
                     break;
 
                 case MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION:
-                    entityType = CommonConstants.REGION_ID_COLUMN;
                     socialPost.setRegionId( profileId );
                     break;
 
                 case MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION:
-                    entityType = CommonConstants.BRANCH_ID_COLUMN;
                     socialPost.setBranchId( profileId );
                     break;
 
                 case MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION:
-                    entityType = CommonConstants.AGENT_ID_COLUMN;
                     socialPost.setAgentId( profileId );
                     break;
             }
 
             // pushing to mongo
-            surveyHandler.updateModifiedOnColumnForEntity( entityType, profileId );
             mongoTemplate.insert( socialPost, CommonConstants.SOCIAL_POST_COLLECTION );
+            inserted = true;
         }
 
         // updating last fetched details
         if ( lastFetchedOn != null ) {
             lastFetchedTill = new Timestamp( lastFetchedOn.getTime() );
         }
+        return inserted;
     }
 
 
     @Override
     @Transactional
-    public void postProcess( long iden, String collection ) throws NonFatalException
+    public void postProcess( long iden, String collection, boolean anyRecordInserted ) throws NonFatalException
     {
         if ( lastFetchedPostId == null || lastFetchedPostId.isEmpty() ) {
             lastFetchedPostId = "0";
@@ -441,6 +437,17 @@ public class GoogleFeedProcessorImpl implements SocialNetworkDataProcessor<Googl
 
         status.setLastFetchedTill( lastFetchedTill );
         status.setLastFetchedPostId( lastFetchedPostId );
+        if ( anyRecordInserted ) {
+            if ( collection.equalsIgnoreCase( MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION ) ) {
+                surveyHandler.updateModifiedOnColumnForEntity( CommonConstants.COMPANY_ID_COLUMN, profileId );
+            } else if ( collection.equalsIgnoreCase( MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION ) ) {
+                surveyHandler.updateModifiedOnColumnForEntity( CommonConstants.REGION_ID_COLUMN, profileId );
+            } else if ( collection.equalsIgnoreCase( MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION ) ) {
+                surveyHandler.updateModifiedOnColumnForEntity( CommonConstants.BRANCH_ID_COLUMN, profileId );
+            } else if ( collection.equalsIgnoreCase( MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION ) ) {
+                surveyHandler.updateModifiedOnColumnForEntity( CommonConstants.AGENT_ID_COLUMN, profileId );
+            }
+        }
 
         feedStatusDao.saveOrUpdate( status );
     }
