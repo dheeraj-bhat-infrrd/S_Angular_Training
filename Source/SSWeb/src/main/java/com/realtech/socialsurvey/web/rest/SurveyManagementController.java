@@ -35,7 +35,7 @@ import com.realtech.socialsurvey.core.entities.AgentMediaPostDetails;
 import com.realtech.socialsurvey.core.entities.AgentSettings;
 import com.realtech.socialsurvey.core.entities.BranchMediaPostDetails;
 import com.realtech.socialsurvey.core.entities.BulkSurveyDetail;
-import com.realtech.socialsurvey.core.entities.ComplaintRegistrationSettings;
+import com.realtech.socialsurvey.core.entities.ComplaintResolutionSettings;
 import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
 import com.realtech.socialsurvey.core.entities.RegionMediaPostDetails;
 import com.realtech.socialsurvey.core.entities.SocialMediaPostDetails;
@@ -290,9 +290,10 @@ public class SurveyManagementController
                 
                 OrganizationUnitSettings companySettings = organizationManagementService.getCompanySettings( survey
                     .getCompanyId() );
-                if ( companySettings.getSurvey_settings().getComplaint_reg_settings() != null ) {
-                    ComplaintRegistrationSettings complaintRegistrationSettings = companySettings.getSurvey_settings()
-                        .getComplaint_reg_settings();
+                if ( companySettings.getSurvey_settings() != null
+                    && companySettings.getSurvey_settings().getComplaint_res_settings() != null ) {
+                    ComplaintResolutionSettings complaintRegistrationSettings = companySettings.getSurvey_settings()
+                        .getComplaint_res_settings();
 
                     if ( complaintRegistrationSettings.isEnabled()
                         && ( ( survey.getScore() > 0d && complaintRegistrationSettings.getRating() > 0d && survey.getScore() < complaintRegistrationSettings
