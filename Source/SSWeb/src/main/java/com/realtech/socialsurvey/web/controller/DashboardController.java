@@ -274,14 +274,19 @@ public class DashboardController
         if ( realtechAdmin ){
             columnName = null;
         }
+        LOG.debug("Getting the survey score.");
         double surveyScore = (double) Math.round( dashboardService.getSurveyScore( columnName, columnValue, numberOfDays,
             realtechAdmin ) * 1000.0 ) / 1000.0;
+        LOG.debug("Getting the sent surveys count.");
         int sentSurveyCount = (int) dashboardService.getAllSurveyCountForPastNdays( columnName, columnValue, numberOfDays );
+        LOG.debug("Getting the social posts count with hierarchy.");
         int socialPostsCount = (int) dashboardService.getSocialPostsForPastNdaysWithHierarchy( columnName, columnValue,
             numberOfDays );
+        LOG.debug("Getting the social posts count.");
         socialPostsCount += (int) dashboardService.getSocialPostsForPastNdays( columnName, columnValue, numberOfDays );
         int profileCompleteness = 0;
         if ( !realtechAdmin ){
+        	LOG.debug("Getting profile completeness.");
             profileCompleteness = dashboardService.getProfileCompletionPercentage( user, columnName, columnValue, unitSettings );
         }
         model.addAttribute( "socialScore", surveyScore );
@@ -296,6 +301,7 @@ public class DashboardController
             model.addAttribute( "socialPosts", socialPostsCount );
 
         model.addAttribute( "profileCompleteness", profileCompleteness );
+        LOG.debug("Getting the badges.");
         model.addAttribute( "badges",
             dashboardService.getBadges( surveyScore, sentSurveyCount, socialPostsCount, profileCompleteness ) );
 
