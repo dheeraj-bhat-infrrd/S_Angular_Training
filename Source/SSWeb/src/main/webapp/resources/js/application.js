@@ -7212,10 +7212,9 @@ function isValidUrl(url){
 
 // Adjust image
 function adjustImage() {
-	//$('.mobile-tabs').children('.mob-icn-active').click();
 	var windW = window.innerWidth;
 	if (windW < 768) {
-		//$('.mobile-tabs').children('.mob-icn-active').click();
+		$('.mobile-tabs').children('.mob-icn-active').click();
 		var imgW = $('#prof-image').width();
 		$('#prof-image').height(imgW * 0.7);
 		var h2 = $('.prog-img-container').height() - 11;
@@ -9129,4 +9128,130 @@ $(document).on('click touchstart','#compl-checkbox', function() {
 			$('input[name="enabled"]').prop( "checked" , false);
 			$('input[name="enabled"]').val("");
 	}
+});
+
+//function to remove social post
+function removeUserPost(surveyMongoId) {
+
+	$('#overlay-continue').removeAttr("onclick");
+	$('#overlay-main').hide();
+	var payload = {
+		"statusmongoid" : surveyMongoId
+	};
+	
+	callAjaxPostWithPayloadData("./deletestatus.do", function(data) {
+		if (data.errCode == undefined) {
+			$('#overlay-toast').html(data.responseText);
+			showToast();
+			showPosts(true);
+		} else {
+			$('#overlay-toast').html(data.responseText);
+			showToast();
+		}
+	}, payload, true);
+}
+
+//Edit profile events
+$(document).on('click', '#prof-post-btn', function() {
+	var textContent = $('#status-body-text-edit').val().trim();
+	if (textContent == undefined || textContent == "") {
+		$('#overlay-toast').html("Please enter valid data to post");
+		showToast();
+		return;
+	}
+	
+	$('#status-body-text-edit').val('');
+	var payload = {
+		"text" : textContent
+	};
+	
+
+	callAjaxPostWithPayloadData("./savestatus.do", function(data) {
+		if (data.errCode == undefined) {
+			showPosts(true);
+		}
+	}, payload, true);
+});
+
+$(document).on('click', '.ppl-share-wrapper .icn-remove', function() {
+	$(this).hide();
+	$(this).parent().find('.ppl-share-social').hide();
+	$(this).parent().find('.icn-plus-open').show();
+});
+
+$(document).on('click touchstart', '.icn-person', function() {
+	$('.mob-icn').removeClass('mob-icn-active');
+	$(this).addClass('mob-icn-active');
+	$('#contact-wrapper').show();
+	$('#prof-agent-container').hide();
+	$('#intro-about-me').hide();
+	$('#reviews-container').hide();
+	$('#ppl-post-cont').hide();
+});
+
+$(document).on('click touchstart', '.icn-ppl', function() {
+	$('.mob-icn').removeClass('mob-icn-active');
+	$(this).addClass('mob-icn-active');
+	$('#ppl-post-cont').show();
+	$('#contact-wrapper').hide();
+	$('#prof-agent-container').hide();
+	$('#intro-about-me').hide();
+	$('#reviews-container').hide();
+});
+
+$(document).on('click touchstart', '.icn-star-smile', function() {
+	$('.mob-icn').removeClass('mob-icn-active');
+	$(this).addClass('mob-icn-active');
+	$('#reviews-container').show();
+	$('#contact-wrapper').hide();
+	$('#prof-agent-container').hide();
+	$('#intro-about-me').hide();
+	$('#ppl-post-cont').hide();
+});
+
+$(document).on('click touchstart', '.inc-more', function() {
+	$('.mob-icn').removeClass('mob-icn-active');
+	$(this).addClass('mob-icn-active');
+	$('#prof-agent-container').show();
+	$('#intro-about-me').hide();
+	$('#contact-wrapper').hide();
+	$('#reviews-container').hide();
+	$('#ppl-post-cont').hide();
+});
+
+$(document).on('mouseover', '#prof-basic-container', function(e){
+	$('#prof-basic-container .prof-edit-field-icn').show();
+	$('#prof-basic-container .prof-edditable').addClass('prof-name-edit');
+});
+$(document).on('mouseleave', '#prof-basic-container', function(e){
+	if(!$('#prof-basic-container input').is(':focus')){
+		$('#prof-basic-container .prof-edit-field-icn').hide();
+		$('#prof-basic-container .prof-edditable').removeClass('prof-name-edit');			
+	}
+});
+
+$(document).on('mouseover', '#prof-posts .tweet-panel-item' , function(e){
+	$(this).find('.dlt-survey-wrapper').removeClass('hide');
+});
+
+$(document).on('mouseleave', '#prof-posts .tweet-panel-item', function(e){
+	$(this).find('.dlt-survey-wrapper').addClass('hide');
+});
+
+
+$(document).on('click' , '#prof-posts .post-dlt-icon' , function(e){
+	var surveyMongoId = $(this).attr('surveymongoid');
+	$('#overlay-main').show();
+	$('#overlay-continue').show();
+	$('#overlay-continue').html("Delete");
+	$('#overlay-cancel').html("Cancel");
+	$('#overlay-header').html("Delete Post");
+	$('#overlay-text').html("Are you sure you want to delete the post ?");
+	$('#overlay-continue').attr("onclick", "removeUserPost('" + surveyMongoId + "');");
+
+});
+
+$(document).on('click', '.ppl-share-wrapper .icn-plus-open', function() {
+	$(this).hide();
+	$(this).parent().find('.ppl-share-social,.icn-remove').show();
 });
