@@ -2094,60 +2094,6 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
     }
 
 
-    private SurveyPreInitiation createSurveyPreInitiationFromBulkSurvey( BulkSurveyDetail bulkSurveyDetail, long companyId,
-        long userId )
-    {
-        LOG.info( "Inside method bulkSurveyDetail" );
-        SurveyPreInitiation surveyPreInitiation = new SurveyPreInitiation();
-
-        surveyPreInitiation.setCreatedOn( new Timestamp( System.currentTimeMillis() ) );
-        surveyPreInitiation.setModifiedOn( new Timestamp( System.currentTimeMillis() ) );
-        surveyPreInitiation.setCustomerEmailId( bulkSurveyDetail.getCustomerEmailId() );
-        surveyPreInitiation.setCustomerFirstName( bulkSurveyDetail.getCustomerFirstName() );
-        surveyPreInitiation.setLastReminderTime( utils.convertEpochDateToTimestamp() );
-        if ( bulkSurveyDetail.getLoanClosedDate() == null || bulkSurveyDetail.getLoanClosedDate().isEmpty() ) {
-            surveyPreInitiation.setEngagementClosedTime( new Timestamp( System.currentTimeMillis() ) );
-        } else {
-            surveyPreInitiation.setEngagementClosedTime( convertStringToTimestamp( bulkSurveyDetail.getLoanClosedDate() ) );
-        }
-        surveyPreInitiation.setAgentId( userId );
-        surveyPreInitiation.setAgentEmailId( bulkSurveyDetail.getAgentEmailId() );
-        surveyPreInitiation.setCollectionName( MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION );
-        surveyPreInitiation.setCompanyId( companyId );
-        if ( bulkSurveyDetail.getCustomerLastName() != null ) {
-            surveyPreInitiation.setCustomerLastName( bulkSurveyDetail.getCustomerLastName() );
-        }
-        if ( bulkSurveyDetail.getAgentLastName() != null ) {
-            surveyPreInitiation.setAgentName( bulkSurveyDetail.getAgentFirstName() + " " + bulkSurveyDetail.getAgentLastName() );
-        } else {
-            surveyPreInitiation.setAgentName( bulkSurveyDetail.getAgentFirstName() );
-        }
-        surveyPreInitiation.setStatus( CommonConstants.STATUS_SURVEYPREINITIATION_PROCESSED );
-        surveyPreInitiation.setSurveySource( CommonConstants.SURVEY_SOURCE_BULK_UPLOAD );
-        return surveyPreInitiation;
-
-
-    }
-
-
-    private Timestamp convertStringToTimestamp( String dateString )
-    {
-        DateFormat format = new SimpleDateFormat( "MMMM d, yyyy", Locale.ENGLISH );
-        Date date = null;
-
-        try {
-            date = format.parse( dateString );
-        } catch ( ParseException e ) {
-            LOG.error( "Exception caught ", e );
-        }
-        Calendar cal = Calendar.getInstance();
-        cal.setTime( date );
-        cal.set( Calendar.MILLISECOND, 0 );
-
-        return ( new java.sql.Timestamp( cal.getTimeInMillis() ) );
-    }
-
-
     public List<SurveyDetails> getSurveysUnderResolution( long companyId, int startIndex, int numOfRows )
     {
         LOG.info( "Method getSurveysUnderResolution() to retrieve surveys marked as under resolution for a company, started" );
