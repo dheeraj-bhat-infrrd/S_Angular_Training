@@ -8859,7 +8859,7 @@ $('body').on('click','.st-dd-item-auto-post',function() {
 
 $('body').on('click','.st-dd-item-min-post',function() {
 	var pageHash = window.location.hash;
-	if(pageHash.toLowerCase() == "#showcomplaintregsettings") {
+	if(pageHash.toLowerCase() == "#showcomplaintressettings") {
 		$('#comp-rating-post').val($(this).html());
 		$('#st-dd-wrapper-min-post').slideToggle(200);
 		return;
@@ -9109,7 +9109,7 @@ function getImageandCaptionProfile(loop) {
 $(document).on('click','#comp-reg-form-submit',function(){
 	if(validateComplaintRegistraionForm()) {
 		var formData = $('#comp-reg-form').serialize();
-		callAjaxPostWithPayloadData("/updatecomplaintregsettings.do", function(data){
+		callAjaxPostWithPayloadData("/updatecomplaintressettings.do", function(data){
 			$('#overlay-toast').html(data);
 			showToast();
 		}, formData,  true );

@@ -2079,7 +2079,7 @@ public class OrganizationManagementController
     }
 
 
-    @RequestMapping ( value = "/showcomplaintregsettings", method = RequestMethod.GET)
+    @RequestMapping ( value = "/showcomplaintressettings", method = RequestMethod.GET)
     public String showComplaintRegistrationSettings( Model model, HttpServletRequest request )
     {
         LOG.info( "Method showComplaintRegistrationSettings of UserManagementController called" );
@@ -2121,11 +2121,11 @@ public class OrganizationManagementController
     }
 
 
-    @RequestMapping ( value = "/updatecomplaintregsettings", method = RequestMethod.POST)
+    @RequestMapping ( value = "/updatecomplaintressettings", method = RequestMethod.POST)
     @ResponseBody
-    public String updateComplaintRegistrationsettings( Model model, HttpServletRequest request )
+    public String updateComplaintResolutionsettings( Model model, HttpServletRequest request )
     {
-        LOG.info( "Updating Complaint Registration Settings" );
+        LOG.info( "Updating Complaint Resolution Settings" );
         String ratingText = request.getParameter( "rating" );
         String moodText = request.getParameter( "mood" );
         String mailId = request.getParameter( "mailId" );
@@ -2230,10 +2230,10 @@ public class OrganizationManagementController
             if( !isComplaintHandlingEnabled && originalComplaintRegSettings.getMailId().trim().isEmpty() )
                 return "";
 
-            LOG.info( "Updating Complaint Registration Settings" );
+            LOG.info( "Updating Complaint Resolution Settings" );
 
             if ( organizationManagementService.updateSurveySettings( unitSettings, unitSettings.getSurvey_settings() ) ) {
-                LOG.info( "Updated Complaint Registration Settings" );
+                LOG.info( "Updated Complaint Resolution Settings" );
                 message = messageUtils.getDisplayMessage( DisplayMessageConstants.COMPLAINT_REGISTRATION_SUCCESSFUL,
                     DisplayMessageType.SUCCESS_MESSAGE ).getMessage();
             }
