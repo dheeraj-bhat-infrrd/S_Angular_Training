@@ -130,20 +130,12 @@
 											</c:if>
 										</div>
 										<div class="float-left ctnt-list-item-btn-wrap clearfix">
-											<fmt:formatNumber var="fractionReviewScore" type="number" value="${userItem.reviewScore}" maxFractionDigits="2" minFractionDigits="2"/>
+											<fmt:formatNumber var="fractionReviewScore" type="number" value="${userItem.reviewScore}" maxFractionDigits="1" minFractionDigits="1"/>
 											<fmt:formatNumber var="integerAverageRating" type="number" value="${userItem.reviewScore}" maxFractionDigits="0"/>
 									   		<c:set var="integerAverageRating" value="${integerAverageRating}"></c:set>
 									   		<c:if test="${integerAverageRating == 0}">
 									   			<c:set var="integerAverageRating" value="1"></c:set>
 									   		</c:if>
-									   		<c:choose>
-												<c:when test="${ fractionReviewScore % 1 == 0 }">
-													<fmt:formatNumber var="fractionReviewScore" type="number" value="${userItem.reviewScore}" maxFractionDigits="0"/>
-												</c:when>
-												<c:otherwise>
-													<fmt:formatNumber var="fractionReviewScore" type="number" value="${userItem.reviewScore}" maxFractionDigits="1" minFractionDigits="1"/>
-												</c:otherwise>
-											</c:choose>
 											<div class="float-left" data-score="${fractionReviewScore}">
 												<div class="rating-image float-left smiley-rat-${integerAverageRating}"></div>
 												<div class="rating-rounded float-left">${fractionReviewScore}</div>
