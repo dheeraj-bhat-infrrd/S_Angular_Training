@@ -2050,11 +2050,43 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
                     status = CommonConstants.BULK_SURVEY_INVALID;
                     error = true;
                 }
+                User user = null;
+                if ( !error ) {
+                    String agentEmailId = bulkSurveyDetail.getAgentEmailId();
+                    try {
+                        user = userManagementService.getUserByEmailAndCompany( companyId, agentEmailId );
+                    } catch ( InvalidInputException e ) {
+                        message = "Agent does not belong to this Company " + companyId;
+                        status = CommonConstants.BULK_SURVEY_INVALID;
+                        error = true;
+                    } catch ( NoRecordsFetchedException e ) {
+                        message = "Agent does not belong to this Company " + companyId;
+                        status = CommonConstants.BULK_SURVEY_INVALID;
+                        error = true;
+                    }
+                    if ( user == null ) {
+                        message = "Agent does not belong to this Company " + companyId;
+                        status = CommonConstants.BULK_SURVEY_INVALID;
+                        error = true;
+                    }
+                }
+                if ( !error ) {
+                    LOG.debug( "Checking whether the agent is sending survey to himself " );
+                    String agentEmailid = bulkSurveyDetail.getAgentEmailId();
+                    String customerMailId = bulkSurveyDetail.getCustomerEmailId();
+                    if ( agentEmailid != null && customerMailId != null ) {
+                        if ( agentEmailid.equalsIgnoreCase( customerMailId ) ) {
+                            message = "Agent cannot send a survey request to himself";
+                            status = CommonConstants.BULK_SURVEY_INVALID;
+                            error = true;
+                        }
+                    }
+                }
                 if ( !error ) {
                     LOG.debug( "This survey contains valid data " );
                     message = "Valid Survey";
                     SurveyPreInitiation surveyPreInitiation = createSurveyPreInitiationFromBulkSurvey( bulkSurveyDetail,
-                        companyId );
+                        companyId, user.getUserId() );
                     try {
                         HashMap<String, Object> queries = new HashMap<>();
                         queries.put( CommonConstants.SURVEY_AGENT_EMAIL_ID_COLUMN, surveyPreInitiation.getAgentEmailId() );
@@ -2086,7 +2118,8 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
     }
 
 
-    private SurveyPreInitiation createSurveyPreInitiationFromBulkSurvey( BulkSurveyDetail bulkSurveyDetail, long companyId )
+    private SurveyPreInitiation createSurveyPreInitiationFromBulkSurvey( BulkSurveyDetail bulkSurveyDetail, long companyId,
+        long userId )
     {
         LOG.info( "Inside method bulkSurveyDetail" );
         SurveyPreInitiation surveyPreInitiation = new SurveyPreInitiation();
@@ -2101,7 +2134,7 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
         } else {
             surveyPreInitiation.setEngagementClosedTime( convertStringToTimestamp( bulkSurveyDetail.getLoanClosedDate() ) );
         }
-        surveyPreInitiation.setAgentId( 0 );
+        surveyPreInitiation.setAgentId( userId );
         surveyPreInitiation.setAgentEmailId( bulkSurveyDetail.getAgentEmailId() );
         surveyPreInitiation.setCollectionName( MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION );
         surveyPreInitiation.setCompanyId( companyId );
@@ -2113,7 +2146,7 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
         } else {
             surveyPreInitiation.setAgentName( bulkSurveyDetail.getAgentFirstName() );
         }
-        surveyPreInitiation.setStatus( CommonConstants.STATUS_SURVEYPREINITIATION_NOT_PROCESSED );
+        surveyPreInitiation.setStatus( CommonConstants.STATUS_SURVEYPREINITIATION_PROCESSED );
         surveyPreInitiation.setSurveySource( CommonConstants.SURVEY_SOURCE_BULK_UPLOAD );
         return surveyPreInitiation;
 
