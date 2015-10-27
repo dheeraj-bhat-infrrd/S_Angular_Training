@@ -290,6 +290,10 @@ public class SurveyManagementController
                 
                 OrganizationUnitSettings companySettings = organizationManagementService.getCompanySettings( survey
                     .getCompanyId() );
+                
+                if ( companySettings == null )
+                    throw new NonFatalException( "Company settings cannot be found for id : " + survey.getCompanyId() );
+                
                 if ( companySettings.getSurvey_settings() != null
                     && companySettings.getSurvey_settings().getComplaint_res_settings() != null ) {
                     ComplaintResolutionSettings complaintRegistrationSettings = companySettings.getSurvey_settings()
