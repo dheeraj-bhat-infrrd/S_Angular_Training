@@ -2086,16 +2086,20 @@ public class OrganizationManagementController
         HttpSession session = request.getSession( false );
         User user = sessionHelper.getCurrentUser();
 
-        if(!user.isCompanyAdmin())
-            throw new AuthorizationException( "User is not authorized to access this page");
-        
+        if ( !user.isCompanyAdmin() )
+            throw new AuthorizationException( "User is not authorized to access this page" );
+
         OrganizationUnitSettings unitSettings = null;
         long entityId = user.getCompany().getCompanyId();
         try {
             unitSettings = organizationManagementService.getCompanySettings( entityId );
 
+            if ( unitSettings == null )
+                throw new NonFatalException( "Company settings cannot be found for id : " + entityId );
+
             ComplaintResolutionSettings complaintRegistrationSettings = new ComplaintResolutionSettings();
-            if ( unitSettings.getSurvey_settings() != null && unitSettings.getSurvey_settings().getComplaint_res_settings() != null ) {
+            if ( unitSettings.getSurvey_settings() != null
+                && unitSettings.getSurvey_settings().getComplaint_res_settings() != null ) {
                 complaintRegistrationSettings = unitSettings.getSurvey_settings().getComplaint_res_settings();
             }
 
@@ -2103,7 +2107,12 @@ public class OrganizationManagementController
             model.addAttribute( "columnValue", entityId );
             session.setAttribute( CommonConstants.COMPLAIN_REG_SETTINGS, complaintRegistrationSettings );
         } catch ( InvalidInputException e ) {
-            LOG.error( "InvalidInputException while fetching profile details. Reason :" + e.getMessage(), e );
+            LOG.error( "InvalidInputException while fetching complaint resolution details. Reason :" + e.getMessage(), e );
+            model.addAttribute( "message",
+                messageUtils.getDisplayMessage( DisplayMessageConstants.GENERAL_ERROR, DisplayMessageType.ERROR_MESSAGE ) );
+            return JspResolver.MESSAGE_HEADER;
+        } catch ( NonFatalException e ) {
+            LOG.error( "NonFatalException while fetching complaint resolution details. Reason :" + e.getMessage(), e );
             model.addAttribute( "message",
                 messageUtils.getDisplayMessage( DisplayMessageConstants.GENERAL_ERROR, DisplayMessageType.ERROR_MESSAGE ) );
             return JspResolver.MESSAGE_HEADER;
@@ -2171,6 +2180,9 @@ public class OrganizationManagementController
             long entityId = (long) session.getAttribute( CommonConstants.ENTITY_ID_COLUMN );
             
             unitSettings = organizationManagementService.getCompanySettings( entityId );
+            
+            if ( unitSettings == null )
+                throw new NonFatalException("Company settings cannot be found for id : " + entityId );
 
             if( unitSettings.getSurvey_settings() == null ) {
                 // Adding default text for various flows of survey.
