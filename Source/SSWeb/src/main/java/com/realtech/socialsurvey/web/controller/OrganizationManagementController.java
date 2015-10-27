@@ -2177,7 +2177,7 @@ public class OrganizationManagementController
                 mailId = mailIDStr.substring( 0, mailIDStr.length() - 2 );
             }
 
-            long entityId = (long) session.getAttribute( CommonConstants.ENTITY_ID_COLUMN );
+            long entityId = user.getCompany().getCompanyId();
             
             unitSettings = organizationManagementService.getCompanySettings( entityId );
             

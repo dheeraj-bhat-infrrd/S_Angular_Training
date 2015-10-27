@@ -17,7 +17,7 @@ public class ComplaintResolutionSettings
 
     public ComplaintResolutionSettings()
     {
-        rating = CommonConstants.DEFAULT_AUTOPOST_SCORE;
+        rating = CommonConstants.DEFAULT_COMPLAINT_RES_SCORE;
         mailId = "";
         mood = "";
         enabled = false;
