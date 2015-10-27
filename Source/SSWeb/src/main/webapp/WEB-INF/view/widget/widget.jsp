@@ -24,7 +24,7 @@
 	href="${initParam.resourcesPath}/resources/css/style-resp-1.1.css">
 <c:if test="${not empty averageRating}">
 	<fmt:formatNumber var="floatingAverageRating" type="number"
-		value="${averageRating}" maxFractionDigits="2" minFractionDigits="3" />
+		value="${averageRating}" maxFractionDigits="1" minFractionDigits="1" />
 	<fmt:formatNumber var="floatingAverageGoogleRating" type="number"
 		value="${averageRating}" maxFractionDigits="1" minFractionDigits="1" />
 	<fmt:formatNumber var="integerAverageRating" type="number"
@@ -36,16 +36,6 @@
 		<c:set var="integerAverageRating" value="1"></c:set>
 	</c:if>
 </c:if>
-<c:choose>
-	<c:when test="${ floatingAverageRating % 1 == 0 }">
-		<fmt:formatNumber var="floatingAverageRating" type="number"
-			value="${averageRating}" maxFractionDigits="0" />
-	</c:when>
-	<c:otherwise>
-		<fmt:formatNumber var="floatingAverageRating" type="number"
-			value="${averageRating}" maxFractionDigits="3" minFractionDigits="3" />
-	</c:otherwise>
-</c:choose>
 <style type="text/css">
 .review-item {
     padding: 10px 0;
