@@ -263,10 +263,12 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
             userTimestamp = Long.valueOf( urlParameters.get( CommonConstants.CURRENT_TIMESTAMP ) );
         }
         int days = CommonConstants.EXPIRE_AFTER_DAYS;
-        long milliseconds = days * 24 * 60 * 60 * 1000;
-        if ( systemTimestamp - userTimestamp > milliseconds ) {
-            linkExpired = true;
-
+        // check added to include/exclude link expiry logic.
+        if(days > 0){
+	        long milliseconds = days * 24 * 60 * 60 * 1000;
+	        if ( systemTimestamp - userTimestamp > milliseconds ) {
+	            linkExpired = true;
+	        }
         }
         return linkExpired;
     }
