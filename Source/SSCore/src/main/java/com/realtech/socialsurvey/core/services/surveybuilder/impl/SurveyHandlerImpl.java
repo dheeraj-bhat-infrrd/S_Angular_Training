@@ -2065,7 +2065,7 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
                         error = true;
                     }
                     if ( user == null ) {
-                        message = "Agent does not belong to this Company " + companyId;
+                        message = "Agent does not belong to this Company ";
                         status = CommonConstants.BULK_SURVEY_INVALID;
                         error = true;
                     }
