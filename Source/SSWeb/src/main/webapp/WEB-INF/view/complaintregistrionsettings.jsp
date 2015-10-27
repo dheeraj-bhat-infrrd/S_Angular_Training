@@ -83,7 +83,7 @@
 
 <script>
 	$(document).ready(function() {
-		$(document).attr("title", "Complaint Registration Settings");
+		$(document).attr("title", "Complaint Resolution Settings" );
 		
 		if (${complaintRegSettings.enabled}) {
 			$('#compl-checkbox').removeClass('bd-check-img-checked');
