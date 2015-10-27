@@ -343,6 +343,7 @@ public interface CommonConstants
     public static final String REGION_PROFILE_FIXED_URL = "pages";
     public static final String COMPANY_PROFILE_FIXED_URL = "pages/company";
     public static final float DEFAULT_AUTOPOST_SCORE = 3.5f;
+    public static final float DEFAULT_COMPLAINT_RES_SCORE = 2.5f;
     public static final int DEFAULT_REMINDERMAIL_INTERVAL = 3;
     public static final String USER_SELECTION_TYPE_SINGLE = "single";
     public static final String USER_SELECTION_TYPE_MULTIPLE = "multiple";
