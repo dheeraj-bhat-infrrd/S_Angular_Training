@@ -1423,6 +1423,9 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
             compositeUserObject = new UserCompositeEntity();
             compositeUserObject.setUser( user );
             compositeUserObject.setAgentSettings( agentSettings );
+        }else{
+        	LOG.warn("No profile found with profile name: "+agentProfileName);
+        	throw new ProfileNotFoundException("No profile found with profile name: "+agentProfileName);
         }
         LOG.info( "Returning the user composite object." );
         return compositeUserObject;
@@ -1489,7 +1492,8 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 
 
     @Override
-    public long getReviewsCountForCompany( long companyId, double minScore, double maxScore, boolean fetchAbusive, boolean notRecommended )
+    public long getReviewsCountForCompany( long companyId, double minScore, double maxScore, boolean fetchAbusive,
+        boolean notRecommended )
     {
         LOG.info( "Method getReviewsCountForCompany called for companyId:" + companyId + " minscore:" + minScore + " maxscore:"
             + maxScore );
@@ -1697,8 +1701,8 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
      * score specified
      */
     @Override
-    public long getReviewsCount( long iden, double minScore, double maxScore, String profileLevel, boolean fetchAbusive, boolean notRecommended )
-        throws InvalidInputException
+    public long getReviewsCount( long iden, double minScore, double maxScore, String profileLevel, boolean fetchAbusive,
+        boolean notRecommended ) throws InvalidInputException
     {
         LOG.info( "Method getReviewsCount called for iden:" + iden + " minscore:" + minScore + " maxscore:" + maxScore
             + " profilelevel:" + profileLevel );
@@ -1707,7 +1711,8 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
         }
         long reviewsCount = 0;
         String idenColumnName = getIdenColumnNameFromProfileLevel( profileLevel );
-        reviewsCount = surveyDetailsDao.getFeedBacksCount( idenColumnName, iden, minScore, maxScore, fetchAbusive, notRecommended );
+        reviewsCount = surveyDetailsDao.getFeedBacksCount( idenColumnName, iden, minScore, maxScore, fetchAbusive,
+            notRecommended );
 
         LOG.info( "Method getReviewsCount executed successfully. Returning reviewsCount:" + reviewsCount );
         return reviewsCount;
@@ -1999,11 +2004,14 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
         } else if ( entityType.equals( CommonConstants.BRANCH_ID_COLUMN ) ) {
             socialPost.setBranchId( entityId );
         } else if ( entityType.equals( CommonConstants.AGENT_ID_COLUMN ) ) {
-            socialPost.setAgentId( user.getUserId() );
+            entityId = user.getUserId();
+            socialPost.setAgentId( entityId );
         }
 
         socialPost.setTimeInMillis( System.currentTimeMillis() );
         socialPostDao.addPostToUserProfile( socialPost );
+        LOG.info( "Updating modified on column in aagent hierarchy fro agent " + user.getFirstName() );
+        surveyHandler.updateModifiedOnColumnForEntity( entityType, entityId );
         LOG.info( "Method to add post to a user's profile finished." );
     }
 
@@ -2024,7 +2032,24 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
             throw new InvalidInputException( "Not a SocialSurvey Status", DisplayMessageConstants.GENERAL_ERROR );
         }
 
+        long agentId = socialPost.getAgentId();
+        long regionId = socialPost.getRegionId();
+        long companyId = socialPost.getCompanyId();
+        long branchId = socialPost.getBranchId();
         socialPostDao.removePostFromUsersProfile( socialPost );
+        LOG.info( "Updating modified on column in aagent hierarchy fro agent " );
+        if ( companyId > 0 ) {
+            surveyHandler.updateModifiedOnColumnForEntity( CommonConstants.COMPANY_ID_COLUMN, companyId );
+        }
+        if ( regionId > 0 ) {
+            surveyHandler.updateModifiedOnColumnForEntity( CommonConstants.REGION_ID_COLUMN, regionId );
+        }
+        if ( branchId > 0 ) {
+            surveyHandler.updateModifiedOnColumnForEntity( CommonConstants.BRANCH_ID_COLUMN, branchId );
+        }
+        if ( agentId > 0 ) {
+            surveyHandler.updateModifiedOnColumnForEntity( CommonConstants.AGENT_ID_COLUMN, agentId );
+        }
         LOG.info( "Method to delete post to a user's profile finished." );
     }
 
@@ -2409,7 +2434,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
             throw new InvalidInputException( "Invalid value passed for iden of profile level." );
         }
         Map<Long, AgentRankingReport> agentReportData = new HashMap<>();
-        surveyDetailsDao.getAverageScore( startDate, endDate, agentReportData, columnName, iden , false );
+        surveyDetailsDao.getAverageScore( startDate, endDate, agentReportData, columnName, iden, false );
         surveyDetailsDao.getCompletedSurveysCount( startDate, endDate, agentReportData, columnName, iden, false );
         // FIX for JIRA: SS-1112: BOC
         // surveyPreInitiationDao.getIncompleteSurveysCount( startDate, endDate, agentReportData );

@@ -1658,7 +1658,7 @@ button.paypal.is-active {
 
 .social-item-icon {
 	height: 50px;
-	width: 33px;
+	width: 34px;
 	margin: 0 3px;
 	cursor: pointer;
 }
@@ -5512,6 +5512,10 @@ tr.u-tbl-header td {
 	background: url(../images/edit_user.png) no-repeat center;
 }
 
+.v-icn-wid {
+	background: url(../images/generate_widget.png) no-repeat center;
+}
+
 .v-um-tbl-wrapper {
 	margin-top: 15px;
 	padding: 0 10px;
@@ -6464,6 +6468,11 @@ tr.u-tbl-header td {
     text-overflow: ellipsis;
     overflow: hidden;
     white-space: nowrap;
+}
+
+.edit-pro-rat-txt {
+	width: 70%;
+	width: calc(100% - 58px);
 }
 
 .web-address-txt {

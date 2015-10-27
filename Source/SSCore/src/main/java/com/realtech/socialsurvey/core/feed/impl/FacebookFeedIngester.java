@@ -13,47 +13,55 @@ import com.realtech.socialsurvey.core.exception.NonFatalException;
 import com.realtech.socialsurvey.core.feed.SocialNetworkDataProcessor;
 import facebook4j.Post;
 
+
 @Component
-@Scope(value = ConfigurableBeanFactory.SCOPE_PROTOTYPE)
-public class FacebookFeedIngester implements Runnable {
+@Scope ( value = ConfigurableBeanFactory.SCOPE_PROTOTYPE)
+public class FacebookFeedIngester implements Runnable
+{
 
-	private static final Logger LOG = LoggerFactory.getLogger(FacebookFeedIngester.class);
+    private static final Logger LOG = LoggerFactory.getLogger( FacebookFeedIngester.class );
 
-	@Resource
-	@Qualifier("facebookFeed")
-	private SocialNetworkDataProcessor<Post, FacebookToken> processor;
+    @Resource
+    @Qualifier ( "facebookFeed")
+    private SocialNetworkDataProcessor<Post, FacebookToken> processor;
 
-	private FacebookToken token;
-	private String collectionName;
-	private long iden;
+    private FacebookToken token;
+    private String collectionName;
+    private long iden;
 
-	public void setToken(FacebookToken token) {
-		this.token = token;
-	}
 
-	public void setCollectionName(String collectionName) {
-		this.collectionName = collectionName;
-	}
+    public void setToken( FacebookToken token )
+    {
+        this.token = token;
+    }
 
-	public void setIden(long iden) {
-		this.iden = iden;
-	}
 
-	@Override
-	public void run() {
-		LOG.info("Starting the ingestion thread for facebook for " + collectionName + " with iden: " + iden);
-		try {
-			processor.preProcess(iden, collectionName, token);
-			List<Post> posts = processor.fetchFeed(iden, collectionName, token);
-			processor.processFeed(posts, collectionName);
-			processor.postProcess(iden, collectionName);
-		}
-		catch (NonFatalException e) {
-			LOG.error("Exception caught while processesing facebook statuses for " + collectionName + " with iden: " + iden, e);
-			e.printStackTrace();
-		}
-		finally {
-			LOG.info("Done fetching facebook posts for " + collectionName + " with iden: " + iden);
-		}
-	}
+    public void setCollectionName( String collectionName )
+    {
+        this.collectionName = collectionName;
+    }
+
+
+    public void setIden( long iden )
+    {
+        this.iden = iden;
+    }
+
+
+    @Override
+    public void run()
+    {
+        LOG.info( "Starting the ingestion thread for facebook for " + collectionName + " with iden: " + iden );
+        try {
+            processor.preProcess( iden, collectionName, token );
+            List<Post> posts = processor.fetchFeed( iden, collectionName, token );
+            boolean anyRecordInserted = processor.processFeed( posts, collectionName );
+            processor.postProcess( iden, collectionName, anyRecordInserted );
+        } catch ( NonFatalException e ) {
+            LOG.error( "Exception caught while processesing facebook statuses for " + collectionName + " with iden: " + iden, e );
+            e.printStackTrace();
+        } finally {
+            LOG.info( "Done fetching facebook posts for " + collectionName + " with iden: " + iden );
+        }
+    }
 }

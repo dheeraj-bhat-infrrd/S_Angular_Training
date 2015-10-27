@@ -262,7 +262,10 @@
 				<entry key="userManagementService" value-ref="userManagementService" />
 				<entry key="surveyHandler" value-ref="surveyHandler" />
 				<entry key="utils" value-ref="utils" />
+				<entry key="emailServices" value-ref="emailServices" />
 				<entry key="maskEmail" value="${MASK_EMAIL_ADDRESS}" />
+				<entry key="applicationAdminEmail" value="${APPLICATION_ADMIN_EMAIL}" />
+				<entry key="applicationAdminName" value="${APPLICATION_ADMIN_NAME}" />
 			</map>
 		</property>
 		<property name="durability" value="true" />
