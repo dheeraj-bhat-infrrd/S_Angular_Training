@@ -39,17 +39,16 @@ import com.realtech.socialsurvey.core.dao.impl.MongoOrganizationUnitSettingDaoIm
 import com.realtech.socialsurvey.core.entities.AbusiveSurveyReportWrapper;
 import com.realtech.socialsurvey.core.entities.AgentMediaPostDetails;
 import com.realtech.socialsurvey.core.entities.AgentSettings;
-
+import com.realtech.socialsurvey.core.entities.Branch;
 import com.realtech.socialsurvey.core.entities.BranchMediaPostDetails;
 import com.realtech.socialsurvey.core.entities.BulkSurveyDetail;
-import com.realtech.socialsurvey.core.entities.Branch;
 import com.realtech.socialsurvey.core.entities.Company;
 import com.realtech.socialsurvey.core.entities.CompanyMediaPostDetails;
 import com.realtech.socialsurvey.core.entities.MailContent;
 import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
+import com.realtech.socialsurvey.core.entities.Region;
 import com.realtech.socialsurvey.core.entities.RegionMediaPostDetails;
 import com.realtech.socialsurvey.core.entities.SocialMediaPostDetails;
-import com.realtech.socialsurvey.core.entities.Region;
 import com.realtech.socialsurvey.core.entities.SurveyDetails;
 import com.realtech.socialsurvey.core.entities.SurveyPreInitiation;
 import com.realtech.socialsurvey.core.entities.SurveyResponse;
@@ -2065,44 +2064,21 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
                         error = true;
                     }
                     if ( user == null ) {
-                        message = "Agent does not belong to this Company " + companyId;
+                        message = "Agent does not belong to this Company ";
                         status = CommonConstants.BULK_SURVEY_INVALID;
                         error = true;
                     }
                 }
                 if ( !error ) {
-                    LOG.debug( "Checking whether the agent is sending survey to himself " );
-                    String agentEmailid = bulkSurveyDetail.getAgentEmailId();
-                    String customerMailId = bulkSurveyDetail.getCustomerEmailId();
-                    if ( agentEmailid != null && customerMailId != null ) {
-                        if ( agentEmailid.equalsIgnoreCase( customerMailId ) ) {
-                            message = "Agent cannot send a survey request to himself";
-                            status = CommonConstants.BULK_SURVEY_INVALID;
-                            error = true;
-                        }
-                    }
-                }
-                if ( !error ) {
-                    LOG.debug( "This survey contains valid data " );
-                    message = "Valid Survey";
-                    SurveyPreInitiation surveyPreInitiation = createSurveyPreInitiationFromBulkSurvey( bulkSurveyDetail,
-                        companyId, user.getUserId() );
                     try {
-                        HashMap<String, Object> queries = new HashMap<>();
-                        queries.put( CommonConstants.SURVEY_AGENT_EMAIL_ID_COLUMN, surveyPreInitiation.getAgentEmailId() );
-                        queries.put( CommonConstants.CUSTOMER_EMAIL_ID_KEY_COLUMN, surveyPreInitiation.getCustomerEmailId() );
-                        List<SurveyPreInitiation> incompleteSurveyCustomers = surveyPreInitiationDao.findByKeyValue(
-                            SurveyPreInitiation.class, queries );
-                        if ( incompleteSurveyCustomers != null && incompleteSurveyCustomers.size() > 0 ) {
-                            LOG.warn( "Survey request already sent" );
-                            surveyPreInitiation.setStatus( CommonConstants.STATUS_SURVEYPREINITIATION_DUPLICATE_RECORD );
-                            status = CommonConstants.BULK_SURVEY_INVALID;
-                            message = "Duplicate Survey";
-                        }
-                        saveSurveyPreInitiationObject( surveyPreInitiation );
-                    } catch ( InvalidInputException e ) {
-                        message = "Not Able to store this survey ";
+                        initiateSurveyRequest( user.getUserId(), bulkSurveyDetail.getCustomerEmailId(),
+                            bulkSurveyDetail.getCustomerFirstName(), bulkSurveyDetail.getCustomerLastName(),
+                            CommonConstants.SURVEY_SOURCE_BULK_UPLOAD );
+                        status = CommonConstants.BULK_SURVEY_VALID;
+                    } catch ( DuplicateSurveyRequestException | InvalidInputException | SelfSurveyInitiationException
+                        | SolrException | NoRecordsFetchedException | UndeliveredEmailException | ProfileNotFoundException e ) {
                         status = CommonConstants.BULK_SURVEY_INVALID;
+                        message = e.getMessage();
                     }
                 }
                 bulkSurveyDetail.setStatus( status );
