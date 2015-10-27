@@ -35,12 +35,12 @@
 
 				<div class="clearfix compl-type-sel-cont">
 					<div class="float-left compl-option-sel">
-						<input id="comp-enabled" type="checkbox" name="enabled" value="enable" class="hide">
+						<input id="comp-enabled" type="checkbox" name="enabled" class="hide">
 						<div class="float-left">
-							<div id="compl-checkbox" class="bd-check-img bd-check-img-checked float-right compl-checkbox"></div>
+							<div id="compl-checkbox" class="bd-check-img float-right compl-checkbox bd-check-img-checked"></div>
 						</div>
 						<div class="float-left compl-box-txt">
-							Capture score below
+							<spring:message code="label.complaintreg.capture.text" />
 						</div>
 					</div>
 					<div class="float-left compl-option-sel">
@@ -55,7 +55,7 @@
 						</div>
 					</div>
 					<div class="float-left compl-option-sel">
-						<div class="sq-smile-icn-container compl-input-cont opacity-red" data-mood="unpleasant">
+						<div id="comp-mood-unpleasant" class="sq-smile-icn-container compl-input-cont opacity-red" data-mood="unpleasant">
 							<div class="sq-smile-icn-text sq-smile-sad-text compl-sml-txt">
 								<spring:message code="label.complaint.sad.text" />
 							</div>
@@ -67,7 +67,7 @@
 						</div>
 					</div>
 					<div class="float-left compl-option-sel">
-						<div class="sq-smile-icn-container compl-input-cont opacity-red" data-mood="ok">
+						<div id="comp-mood-ok" class="sq-smile-icn-container compl-input-cont opacity-red" data-mood="ok">
 							<div class="sq-smile-icn-text sq-smile-neutral-text compl-sml-txt">
 								<spring:message code="label.complaint.ok.text" />
 							</div>
@@ -81,36 +81,39 @@
 	</div>
 </div>
 
-
-<!-- window to display reviews flagged as under resolution  
-<div>
-	<div>
-		<spring:message code="label.complaintres.review.text" />
-	</div>
-	<div><spring:message code="label.complaintres.reviewdesc.text" /></div>
-	
-	<c:if test="${not empty complaintRegSettings.mailId }">
-		<div><spring:message code="label.complaintres.criteria.text" /></div>
-		<div><spring:message code="label.complaintreg.rating.text" /> : ${complaintRegSettings.rating}</div>
-		<div><spring:message code="label.complaintreg.mood.text" /> : ${complaintRegSettings.mood}</div>
-	</c:if>
-	<div id="sur-under-res-list">
-		<!-- Javascript will display reviews under Complaint resolution 
-	</div>
-</div>
--->
-
 <script>
 	$(document).ready(function() {
 		$(document).attr("title", "Complaint Registration Settings");
+		
+		if (${complaintRegSettings.enabled}) {
+			$('#compl-checkbox').removeClass('bd-check-img-checked');
+			$('input[name="enabled"]').prop( "checked" , true);
+			$('input[name="enabled"]').val("enable");
+		}
+		
+		if(${not empty complaintRegSettings.mood}) {
+			$('#comp-mood').val("${complaintRegSettings.mood}".toLowerCase());
+			if ("${complaintRegSettings.mood}".toLowerCase() == "ok") {
+				$('#comp-mood-ok').removeClass('opacity-red');
+				$('#comp-mood-unpleasant').removeClass('opacity-red');
+			}
+			if ("${complaintRegSettings.mood}".toLowerCase() == "unpleasant") {
+				$('#comp-mood-unpleasant').removeClass('opacity-red');
+			}
+		}
+				
 		autoAppendRatingDropdownComplaint('#st-dd-wrapper-min-post',
 				"st-dd-item st-dd-item-min-post", 5, 0, 0.5);
 		$('#comp-rating-post').off('click');
 		$('#comp-rating-post').on('click', function() {
+			if(!$('input[name="enabled"]').prop( "checked" ))
+				return;
 			$('#st-dd-wrapper-min-post').slideToggle(200);
 		});
 		$('.sq-smile-icn-container').off('click');
 		$('.sq-smile-icn-container').on('click', function() {
+			if(!$('input[name="enabled"]').prop( "checked" ))
+				return;
 			var mood = $(this).attr("data-mood");
 			var currentMood = $('#comp-mood').val();
 			

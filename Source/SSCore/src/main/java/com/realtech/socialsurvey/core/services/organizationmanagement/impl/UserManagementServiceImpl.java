@@ -112,6 +112,9 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
     private GenericDao<ProfilesMaster, Integer> profilesMasterDao;
 
     @Autowired
+    private GenericDao<UserApiKey, Long> userApiKeyDao;
+
+    @Autowired
     private GenericDao<UsercountModificationNotification, Long> userCountModificationDao;
 
     @Autowired
@@ -2932,6 +2935,36 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 
         LOG.debug( "method getPrimaryUserProfileByAgentId ended with user id " + entityId );
         return userProfileDetailMap;
+    }
+
+
+    @Override
+    @Transactional
+    public boolean validateUserApiKey( String apiKey, String apiSecret, long companyId ) throws InvalidInputException
+    {
+        boolean valid = false;
+        LOG.debug( "Validating whether the values provided are valid for company " + companyId );
+        if ( apiSecret == null || apiSecret.isEmpty() ) {
+            LOG.warn( "Api Secret is null" );
+            throw new InvalidInputException( "Invalid api secret" );
+        }
+        if ( apiKey == null || apiKey.isEmpty() ) {
+            LOG.warn( "Api key is null" );
+            throw new InvalidInputException( "Invalid api key" );
+        }
+
+        Map<String, Object> queryMap = new HashMap<String, Object>();
+        queryMap.put( CommonConstants.API_SECRET_COLUMN, apiSecret.trim() );
+        queryMap.put( CommonConstants.API_KEY_COLUMN, apiKey.trim() );
+        queryMap.put( CommonConstants.COMPANY_ID_COLUMN, companyId );
+        queryMap.put( CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_ACTIVE );
+        long count = apiKeyDao.findNumberOfRowsByKeyValue( UserApiKey.class, queryMap );
+        LOG.debug( "Found " + count + " records from the api keys" );
+        if ( count > 0l ) {
+            LOG.info( "API key is valid" );
+            valid = true;
+        }
+        return valid;
     }
 
 

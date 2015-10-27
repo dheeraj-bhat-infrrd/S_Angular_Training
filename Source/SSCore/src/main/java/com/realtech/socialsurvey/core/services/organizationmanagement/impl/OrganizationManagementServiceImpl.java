@@ -89,6 +89,7 @@ import com.realtech.socialsurvey.core.entities.SurveyCompanyMapping;
 import com.realtech.socialsurvey.core.entities.SurveyPreInitiation;
 import com.realtech.socialsurvey.core.entities.SurveySettings;
 import com.realtech.socialsurvey.core.entities.User;
+import com.realtech.socialsurvey.core.entities.UserApiKey;
 import com.realtech.socialsurvey.core.entities.UserFromSearch;
 import com.realtech.socialsurvey.core.entities.UserProfile;
 import com.realtech.socialsurvey.core.entities.VerticalCrmMapping;
@@ -143,6 +144,9 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 
     @Autowired
     private GenericDao<SurveyPreInitiation, Long> surveyPreInitiationDao;
+
+    @Autowired
+    private GenericDao<UserApiKey, Long> userApiKeyDao;
 
     @Autowired
     private GenericDao<LicenseDetail, Long> licenceDetailDao;
@@ -4642,6 +4646,14 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
         if ( surveyPreInitiationList != null ) {
             for ( SurveyPreInitiation surveyPreInitiation : surveyPreInitiationList ) {
                 surveyPreInitiationDao.delete( surveyPreInitiation );
+            }
+        }
+
+        LOG.debug( "Deleting user api keys for this company " );
+        List<UserApiKey> userApiKeyList = userApiKeyDao.findByColumn( UserApiKey.class, "companyId", companyId );
+        if ( userApiKeyList != null ) {
+            for ( UserApiKey userApiKey : userApiKeyList ) {
+                userApiKeyDao.delete( userApiKey );
             }
         }
     }

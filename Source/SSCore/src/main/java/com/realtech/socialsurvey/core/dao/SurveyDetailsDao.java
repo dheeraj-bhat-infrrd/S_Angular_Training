@@ -133,15 +133,21 @@ public interface SurveyDetailsDao
 
     public SurveyDetails getSurveyBySourceSourceIdAndMongoCollection( String surveySourceId, long iden, String collectionName );
 
-	void updateSurveyAsAbusive(String surveyMongoId, String reporterEmail, String reporterName);
-	void removeZillowSurveysByEntity(String entityType, long entityId);
 
-	void removeExcessZillowSurveysByEntity(String entityType, long entityId);
+    void updateSurveyAsAbusive( String surveyMongoId, String reporterEmail, String reporterName );
+
+
+    void removeZillowSurveysByEntity( String entityType, long entityId );
+
+
+    void removeExcessZillowSurveysByEntity( String entityType, long entityId );
+
 
     public List<AbusiveSurveyReportWrapper> getSurveysReporetedAsAbusive( int start, int rows );
 
-    
+
     public long getSurveysReporetedAsAbusiveCount();
+
 
     void updateZillowCallCount();
 
@@ -152,6 +158,13 @@ public interface SurveyDetailsDao
     void resetZillowCallCount();
 
 
+    public void updateSurveyDetails( SurveyDetails surveyDetails );
+
+
+    public List<SurveyDetails> getSurveyDetailsByAgentAndCompany( long companyId );
+
+
+    public long getSocialPostsCountBasedOnHierarchy( int numberOfDays, String collectionName, long collectionId );
     public void updateSurveyAsUnderResolution( String surveyId );
 
 

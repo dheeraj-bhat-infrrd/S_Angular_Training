@@ -141,7 +141,7 @@
 					<div class="prof-link-header float-left clearfix">
 						<div id="prof-header-rating" class="rating-image float-left smiley-rat-5"></div>
 						<c:if test="${not empty completeProfileUrl}">
-							<div id="prof-header-url" class="rating-image-txt float-left">
+							<div id="prof-header-url" class="rating-image-txt float-left edit-pro-rat-txt">
 								<a href="${completeProfileUrl}" target="_blank">${completeProfileUrl}</a>
 							</div>
 							<c:if test="${ profilemasterid != 1 }">
@@ -460,6 +460,9 @@
 		
 		adjustImage();
 		$(window).resize(adjustImage);
+		$(document).ajaxStop(function() {
+			adjustImage();
+		});
 		
 		if ($('#aboutme-status').val() != 'new') {
 			$('#intro-body-text').text($('#intro-body-text-edit').val().trim());
@@ -515,7 +518,7 @@
 		$(this).parent().find('.icn-plus-open').show();
 	});
 
-	$('.icn-person').click(function() {
+	$('.icn-person').on('click touchstart', function() {
 		$('.mob-icn').removeClass('mob-icn-active');
 		$(this).addClass('mob-icn-active');
 		$('#contact-wrapper').show();
@@ -526,7 +529,7 @@
 		adjustImage();
 	});
 
-	$('.icn-ppl').click(function() {
+	$('.icn-ppl').on('click touchstart', function() {
 		$('.mob-icn').removeClass('mob-icn-active');
 		$(this).addClass('mob-icn-active');
 		$('#ppl-post-cont').show();
@@ -536,7 +539,7 @@
 		$('#reviews-container').hide();
 	});
 
-	$('.icn-star-smile').click(function() {
+	$('.icn-star-smile').on('click touchstart', function() {
 		$('.mob-icn').removeClass('mob-icn-active');
 		$(this).addClass('mob-icn-active');
 		$('#reviews-container').show();
@@ -546,7 +549,7 @@
 		$('#ppl-post-cont').hide();
 	});
 
-	$('.inc-more').click(function() {
+	$('.inc-more').on('click touchstart', function() {
 		$('.mob-icn').removeClass('mob-icn-active');
 		$(this).addClass('mob-icn-active');
 		$('#prof-agent-container').show();

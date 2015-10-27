@@ -2,9 +2,14 @@ package com.realtech.socialsurvey.core.services.surveybuilder;
 
 import java.util.List;
 import java.util.Map;
+
 import org.apache.solr.client.solrj.SolrServerException;
+
 import com.realtech.socialsurvey.core.entities.AbusiveSurveyReportWrapper;
+import com.realtech.socialsurvey.core.entities.BulkSurveyDetail;
 import com.realtech.socialsurvey.core.entities.Company;
+import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
+import com.realtech.socialsurvey.core.entities.SocialMediaPostDetails;
 import com.realtech.socialsurvey.core.entities.SurveyDetails;
 import com.realtech.socialsurvey.core.entities.SurveyPreInitiation;
 import com.realtech.socialsurvey.core.entities.User;
@@ -117,7 +122,8 @@ public interface SurveyHandler
 
 
     public void sendSurveyRestartMail( String custFirstName, String custLastName, String custEmail,
-        String custRelationWithAgent, User user, String link ) throws InvalidInputException, UndeliveredEmailException, ProfileNotFoundException;
+        String custRelationWithAgent, User user, String link ) throws InvalidInputException, UndeliveredEmailException,
+        ProfileNotFoundException;
 
 
     public SurveyPreInitiation getPreInitiatedSurvey( long agentId, String customerEmail, String custFirstName,
@@ -164,8 +170,9 @@ public interface SurveyHandler
     public void saveSurveyPreInitiationObject( SurveyPreInitiation surveyPreInitiation ) throws InvalidInputException;
 
 
-	void updateSurveyAsAbusive(String surveymongoId, String reporterEmail, String reporterName);
-    
+    void updateSurveyAsAbusive( String surveymongoId, String reporterEmail, String reporterName );
+
+
     /**
      * Sends survey request to the customer on behalf of agent.
      * @param agentId
@@ -181,28 +188,62 @@ public interface SurveyHandler
      * @throws UndeliveredEmailException
      * @throws ProfileNotFoundException 
      */
-    public void initiateSurveyRequest(long agentId, String recipientEmailId, String recipientFirstname, String recipientLastname, String source) throws DuplicateSurveyRequestException, InvalidInputException, SelfSurveyInitiationException, SolrException, NoRecordsFetchedException, UndeliveredEmailException, ProfileNotFoundException;
+    public void initiateSurveyRequest( long agentId, String recipientEmailId, String recipientFirstname,
+        String recipientLastname, String source ) throws DuplicateSurveyRequestException, InvalidInputException,
+        SelfSurveyInitiationException, SolrException, NoRecordsFetchedException, UndeliveredEmailException,
+        ProfileNotFoundException;
 
 
-	void deleteZillowSurveysByEntity(String entityType, long entityId)
-			throws InvalidInputException;
+    void deleteZillowSurveysByEntity( String entityType, long entityId ) throws InvalidInputException;
 
 
-	void deleteExcessZillowSurveysByEntity(String entityType, long entityId)
-			throws InvalidInputException;
+    void deleteExcessZillowSurveysByEntity( String entityType, long entityId ) throws InvalidInputException;
 
 
     public List<AbusiveSurveyReportWrapper> getSurveysReportedAsAbusive( int startIndex, int numOfRows );
 
+
     void sendSurveyCompletionMail( String custEmail, String custFirstName, String custLastName, User user )
         throws InvalidInputException, UndeliveredEmailException, ProfileNotFoundException;
-    
+
+
     void sendSurveyCompletionUnpleasantMail( String custEmail, String custFirstName, String custLastName, User user )
         throws InvalidInputException, UndeliveredEmailException, ProfileNotFoundException;
 
 
     void sendSocialPostReminderMail( String custEmail, String custFirstName, String custLastName, User user, String links )
         throws InvalidInputException, UndeliveredEmailException, ProfileNotFoundException;
+
+
+    public SocialMediaPostDetails getSocialMediaPostDetailsBySurvey( SurveyDetails surveyDetails,
+        OrganizationUnitSettings companyUnitSettings, List<OrganizationUnitSettings> regionUnitSettings,
+        List<OrganizationUnitSettings> branchUnitSettings );
+
+
+    void updateSurveyDetails( SurveyDetails surveyDetails );
+
+
+    public List<SurveyDetails> getSurveyDetailsByAgentAndCompany( long companyId );
+
+
+    public Boolean canPostOnSocialMedia( OrganizationUnitSettings unitSetting, Double rating );
+
+
+    /**
+     * @param params
+     * @return
+     */
+    public boolean validateDecryptedApiParams( Map<String, String> params );
+
+
+    /**
+     * @param bulkSurveyDetailList
+     * @param companyId
+     * @return
+     */
+    public List<BulkSurveyDetail> processBulkSurvey( List<BulkSurveyDetail> bulkSurveyDetailList, long companyId );
+
+    void updateModifiedOnColumnForAgentHierachy( long agentId ) throws InvalidInputException;
 
 
     public void updateSurveyAsUnderResolution( String surveyId );
@@ -212,5 +253,8 @@ public interface SurveyHandler
 
 
     public List<SurveyDetails> getSurveysUnderResolution( long companyId, int startIndex, int numOfRows );
+
+
+    public void updateModifiedOnColumnForEntity( String collectionName, long entityId );
 
 }
