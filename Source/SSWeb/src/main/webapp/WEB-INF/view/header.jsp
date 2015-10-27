@@ -256,12 +256,10 @@
 									<spring:message code="label.switch.key" />
 								</div>
 							</c:when>
-							<c:otherwise>
-								<div class="initial-dd-item" id="user-logout" onclick="userLogout();">
-									<spring:message code="label.logout.key" />
-								</div>
-							</c:otherwise>
 						</c:choose>
+						<div class="initial-dd-item" id="user-logout" onclick="userLogout();">
+							<spring:message code="label.logout.key" />
+						</div>
 					</div>
 				</div>
                 <c:if test="${displaylogo != null}">
