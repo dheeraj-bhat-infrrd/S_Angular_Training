@@ -46,7 +46,7 @@
 					<div class="float-left compl-option-sel">
 						<input type="text" name="rating" id="comp-rating-post"
 							class="st-item-row-txt cursor-pointer dd-arrow-dn comp-rating-post"
-							autocomplete="off" value="${complaintRegSettings.rating}">
+							autocomplete="off" value="${complaintRegSettings.rating}" readonly>
 						<div class="st-dd-wrapper hide" id="st-dd-wrapper-min-post"></div>
 					</div>
 					<div class="float-left compl-option-sel">

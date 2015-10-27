@@ -32,7 +32,7 @@ import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.dao.impl.MongoOrganizationUnitSettingDaoImpl;
 import com.realtech.socialsurvey.core.entities.AbusiveSurveyReportWrapper;
 import com.realtech.socialsurvey.core.entities.AccountsMaster;
-import com.realtech.socialsurvey.core.entities.ComplaintRegistrationSettings;
+import com.realtech.socialsurvey.core.entities.ComplaintResolutionSettings;
 import com.realtech.socialsurvey.core.entities.DotLoopCrmInfo;
 import com.realtech.socialsurvey.core.entities.EncompassCrmInfo;
 import com.realtech.socialsurvey.core.entities.LicenseDetail;
@@ -135,6 +135,20 @@ public class OrganizationManagementController
 
     @Value ( "${AMAZON_LOGO_BUCKET}")
     private String logoBucket;
+
+    @Value ( "${HAPPY_TEXT}")
+    private String happyText;
+    @Value ( "${NEUTRAL_TEXT}")
+    private String neutralText;
+    @Value ( "${SAD_TEXT}")
+    private String sadText;
+
+    @Value ( "${HAPPY_TEXT_COMPLETE}")
+    private String happyTextComplete;
+    @Value ( "${NEUTRAL_TEXT_COMPLETE}")
+    private String neutralTextComplete;
+    @Value ( "${SAD_TEXT_COMPLETE}")
+    private String sadTextComplete;
 
     @Autowired
     private SettingsManager settingsManager;
@@ -2065,32 +2079,40 @@ public class OrganizationManagementController
     }
 
 
-    @RequestMapping ( value = "/showcomplaintregsettings", method = RequestMethod.GET)
+    @RequestMapping ( value = "/showcomplaintressettings", method = RequestMethod.GET)
     public String showComplaintRegistrationSettings( Model model, HttpServletRequest request )
     {
         LOG.info( "Method showComplaintRegistrationSettings of UserManagementController called" );
         HttpSession session = request.getSession( false );
         User user = sessionHelper.getCurrentUser();
 
-        if(!user.isCompanyAdmin())
-            throw new AuthorizationException( "User is not authorized to access this page");
-        
+        if ( !user.isCompanyAdmin() )
+            throw new AuthorizationException( "User is not authorized to access this page" );
+
         OrganizationUnitSettings unitSettings = null;
         long entityId = user.getCompany().getCompanyId();
         try {
             unitSettings = organizationManagementService.getCompanySettings( entityId );
 
-            ComplaintRegistrationSettings complaintRegistrationSettings = unitSettings.getSurvey_settings()
-                .getComplaint_reg_settings();
-            if ( complaintRegistrationSettings == null ) {
-                complaintRegistrationSettings = new ComplaintRegistrationSettings();
+            if ( unitSettings == null )
+                throw new NonFatalException( "Company settings cannot be found for id : " + entityId );
 
+            ComplaintResolutionSettings complaintRegistrationSettings = new ComplaintResolutionSettings();
+            if ( unitSettings.getSurvey_settings() != null
+                && unitSettings.getSurvey_settings().getComplaint_res_settings() != null ) {
+                complaintRegistrationSettings = unitSettings.getSurvey_settings().getComplaint_res_settings();
             }
+
             model.addAttribute( "columnName", CommonConstants.COMPANY_ID_COLUMN );
             model.addAttribute( "columnValue", entityId );
             session.setAttribute( CommonConstants.COMPLAIN_REG_SETTINGS, complaintRegistrationSettings );
         } catch ( InvalidInputException e ) {
-            LOG.error( "InvalidInputException while fetching profile details. Reason :" + e.getMessage(), e );
+            LOG.error( "InvalidInputException while fetching complaint resolution details. Reason :" + e.getMessage(), e );
+            model.addAttribute( "message",
+                messageUtils.getDisplayMessage( DisplayMessageConstants.GENERAL_ERROR, DisplayMessageType.ERROR_MESSAGE ) );
+            return JspResolver.MESSAGE_HEADER;
+        } catch ( NonFatalException e ) {
+            LOG.error( "NonFatalException while fetching complaint resolution details. Reason :" + e.getMessage(), e );
             model.addAttribute( "message",
                 messageUtils.getDisplayMessage( DisplayMessageConstants.GENERAL_ERROR, DisplayMessageType.ERROR_MESSAGE ) );
             return JspResolver.MESSAGE_HEADER;
@@ -2099,11 +2121,11 @@ public class OrganizationManagementController
     }
 
 
-    @RequestMapping ( value = "/updatecomplaintregsettings", method = RequestMethod.POST)
+    @RequestMapping ( value = "/updatecomplaintressettings", method = RequestMethod.POST)
     @ResponseBody
-    public String updateComplaintRegistrationsettings( Model model, HttpServletRequest request )
+    public String updateComplaintResolutionsettings( Model model, HttpServletRequest request )
     {
-        LOG.info( "Updating Complaint Registration Settings" );
+        LOG.info( "Updating Complaint Resolution Settings" );
         String ratingText = request.getParameter( "rating" );
         String moodText = request.getParameter( "mood" );
         String mailId = request.getParameter( "mailId" );
@@ -2115,7 +2137,7 @@ public class OrganizationManagementController
         HttpSession session = request.getSession();
         User user = sessionHelper.getCurrentUser();
         OrganizationUnitSettings unitSettings = null;
-        ComplaintRegistrationSettings originalComplaintRegSettings = new ComplaintRegistrationSettings();
+        ComplaintResolutionSettings originalComplaintRegSettings = new ComplaintResolutionSettings();
 
         try {
 
@@ -2158,9 +2180,28 @@ public class OrganizationManagementController
             long entityId = (long) session.getAttribute( CommonConstants.ENTITY_ID_COLUMN );
             
             unitSettings = organizationManagementService.getCompanySettings( entityId );
+            
+            if ( unitSettings == null )
+                throw new NonFatalException("Company settings cannot be found for id : " + entityId );
 
-            if ( unitSettings.getSurvey_settings().getComplaint_reg_settings() != null )
-                originalComplaintRegSettings = unitSettings.getSurvey_settings().getComplaint_reg_settings();
+            if( unitSettings.getSurvey_settings() == null ) {
+                // Adding default text for various flows of survey.
+                SurveySettings surveySettings = new SurveySettings();
+                surveySettings.setHappyText( happyText );
+                surveySettings.setNeutralText( neutralText );
+                surveySettings.setSadText( sadText );
+                surveySettings.setHappyTextComplete( happyTextComplete );
+                surveySettings.setNeutralTextComplete( neutralTextComplete );
+                surveySettings.setSadTextComplete( sadTextComplete );
+                surveySettings.setAutoPostEnabled( true );
+                surveySettings.setShow_survey_above_score( CommonConstants.DEFAULT_AUTOPOST_SCORE );
+
+                surveySettings.setSurvey_reminder_interval_in_days( CommonConstants.DEFAULT_REMINDERMAIL_INTERVAL );
+                unitSettings.setSurvey_settings( surveySettings );
+            }
+
+            if ( unitSettings.getSurvey_settings().getComplaint_res_settings() != null )
+                originalComplaintRegSettings = unitSettings.getSurvey_settings().getComplaint_res_settings();
 
             if ( isComplaintHandlingEnabled ) {
                 if ( ( ratingText == null || ratingText.isEmpty() ) && ( moodText == null || moodText.isEmpty() ) ) {
@@ -2184,15 +2225,15 @@ public class OrganizationManagementController
             
             originalComplaintRegSettings.setMailId( mailId );
             originalComplaintRegSettings.setEnabled( isComplaintHandlingEnabled );
-            unitSettings.getSurvey_settings().setComplaint_reg_settings( originalComplaintRegSettings );
+            unitSettings.getSurvey_settings().setComplaint_res_settings( originalComplaintRegSettings );
             
             if( !isComplaintHandlingEnabled && originalComplaintRegSettings.getMailId().trim().isEmpty() )
                 return "";
 
-            LOG.info( "Updating Complaint Registration Settings" );
+            LOG.info( "Updating Complaint Resolution Settings" );
 
             if ( organizationManagementService.updateSurveySettings( unitSettings, unitSettings.getSurvey_settings() ) ) {
-                LOG.info( "Updated Complaint Registration Settings" );
+                LOG.info( "Updated Complaint Resolution Settings" );
                 message = messageUtils.getDisplayMessage( DisplayMessageConstants.COMPLAINT_REGISTRATION_SUCCESSFUL,
                     DisplayMessageType.SUCCESS_MESSAGE ).getMessage();
             }
