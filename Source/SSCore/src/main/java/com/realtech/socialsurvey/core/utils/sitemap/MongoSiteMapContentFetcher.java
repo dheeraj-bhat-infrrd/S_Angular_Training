@@ -25,6 +25,14 @@ public class MongoSiteMapContentFetcher implements SitemapContentFecher, Initial
 	private static final Logger LOG = LoggerFactory.getLogger(MongoSiteMapContentFetcher.class);
 	
 	private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSXXX");
+	
+	// needs to be removed
+	private static final String HOURLY_FREQUENCY = "hourly";
+	
+	private static final float COMPANY_PRIORITY = 0.2f;
+	private static final float REGION_PRIORITY = 0.4f;
+	private static final float BRANCH_PRIORITY = 0.6f;
+	private static final float USERS_PRIORITY = 0.8f;
 
 	private String collectionName;
 	private String interval;
@@ -135,10 +143,20 @@ public class MongoSiteMapContentFetcher implements SitemapContentFecher, Initial
 			LOG.trace("Converting " + profileUrl + " to SME");
 			entry = new SiteMapEntry();
 			//set priority
-			entry.setPriority( priority );
+			// entry.setPriority( priority );
 			//set frequency
-			entry.setChangeFrequency( changeFrequency );
+			// entry.setChangeFrequency( changeFrequency );
+			entry.setChangeFrequency( HOURLY_FREQUENCY );
 			// generate location
+			if(collectionName.equals(MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION)){
+				entry.setPriority( COMPANY_PRIORITY );
+			}else if(collectionName.equals(MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION)){
+				entry.setPriority( REGION_PRIORITY );
+			}else if(collectionName.equals(MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION)){
+				entry.setPriority( BRANCH_PRIORITY );
+			}else if(collectionName.equals(MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION)){
+				entry.setPriority( USERS_PRIORITY );
+			}
 			entry.setLocation(generateLocation(profileUrl.getProfileUrl()));
 			Timestamp modifiedOnTimestamp =  new Timestamp(profileUrl.getModifiedOn());
 			// change the modified time if the modified on is older than the configured value
