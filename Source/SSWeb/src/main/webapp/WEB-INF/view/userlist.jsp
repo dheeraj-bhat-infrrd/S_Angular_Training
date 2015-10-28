@@ -24,6 +24,7 @@
 		</td>
 		<td class="v-tbl-ln-of text-center"><spring:message code="label.individual.key" /></td>
 		<td class="v-tbl-mail"></td>
+		<td class="v-tbl-wid"></td>
 		<td class="v-tbl-online"></td>
 		<td class="v-tbl-rem"></td>
 		<td class="v-tbl-edit"></td>
@@ -111,7 +112,7 @@
 					<td class="v-tbl-edit ${admincaneditclass} v-icn-edit-user edit-user" title="<spring:message code="label.edit.key" />"></td>
 				</tr>
 				<tr class="u-tbl-row u-tbl-row-sel hide user-assignment-edit-row">
-					<td id="user-details-and-assignments-${userfromsearch.userId}" class="u-tbl-edit-td user-assignment-edit-div" colspan="9">
+					<td id="user-details-and-assignments-${userfromsearch.userId}" class="u-tbl-edit-td user-assignment-edit-div" colspan="10">
 						<!-- data populated from um-edit-row.jsp -->
 					</td>
 				</tr>
