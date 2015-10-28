@@ -2672,8 +2672,26 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
         if ( user == null ) {
             throw new InvalidInputException( "No user present for the specified companyId" );
         }
-        user.setFirstName( individualName.substring( 0, individualName.indexOf( ' ' ) ) );
-        user.setLastName( individualName.substring( individualName.indexOf( ' ' ) + 1 ) );
+        String nameArray[] = null;
+        if ( individualName != null && !individualName.equalsIgnoreCase( "" ) ) {
+            nameArray = individualName.split( " " );
+        }
+
+        if ( nameArray == null ) {
+            throw new InvalidInputException( "Invalid name, please provide a valid name " );
+        }
+
+        user.setFirstName( nameArray[0] );
+        String lastName = "";
+        if ( nameArray.length > 1 ) {
+            for ( int i = 1; i < nameArray.length - 1; i++ ) {
+                lastName += nameArray[i] + " ";
+            }
+        }
+        if ( lastName != null && !lastName.equalsIgnoreCase( "" ) ) {
+            lastName = lastName.trim();
+            user.setLastName( lastName );
+        }
         user.setModifiedBy( String.valueOf( userId ) );
         user.setModifiedOn( new Timestamp( System.currentTimeMillis() ) );
         userDao.update( user );
