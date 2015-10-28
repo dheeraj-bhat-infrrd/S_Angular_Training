@@ -7700,3 +7700,7 @@ label.url-change-input-label {
 	height: 40px;
 	line-height: 40px;
 }
+
+.compl-sq-smile-sad-text-disabled {
+	background: #333;
+}
