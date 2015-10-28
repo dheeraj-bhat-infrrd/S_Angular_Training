@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.sql.Timestamp;
 import java.text.DateFormat;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -12,8 +13,10 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
@@ -23,8 +26,10 @@ import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
+
 import com.google.gson.Gson;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
+import com.realtech.socialsurvey.core.commons.Utils;
 import com.realtech.socialsurvey.core.dao.OrganizationUnitSettingsDao;
 import com.realtech.socialsurvey.core.dao.SurveyDetailsDao;
 import com.realtech.socialsurvey.core.dao.SurveyPreInitiationDao;
@@ -32,10 +37,18 @@ import com.realtech.socialsurvey.core.dao.UserDao;
 import com.realtech.socialsurvey.core.dao.UserProfileDao;
 import com.realtech.socialsurvey.core.dao.impl.MongoOrganizationUnitSettingDaoImpl;
 import com.realtech.socialsurvey.core.entities.AbusiveSurveyReportWrapper;
+import com.realtech.socialsurvey.core.entities.AgentMediaPostDetails;
 import com.realtech.socialsurvey.core.entities.AgentSettings;
+import com.realtech.socialsurvey.core.entities.Branch;
+import com.realtech.socialsurvey.core.entities.BranchMediaPostDetails;
+import com.realtech.socialsurvey.core.entities.BulkSurveyDetail;
 import com.realtech.socialsurvey.core.entities.Company;
+import com.realtech.socialsurvey.core.entities.CompanyMediaPostDetails;
 import com.realtech.socialsurvey.core.entities.MailContent;
 import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
+import com.realtech.socialsurvey.core.entities.Region;
+import com.realtech.socialsurvey.core.entities.RegionMediaPostDetails;
+import com.realtech.socialsurvey.core.entities.SocialMediaPostDetails;
 import com.realtech.socialsurvey.core.entities.SurveyDetails;
 import com.realtech.socialsurvey.core.entities.SurveyPreInitiation;
 import com.realtech.socialsurvey.core.entities.SurveyResponse;
@@ -78,6 +91,7 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
 
     @Autowired
     private UserDao userDao;
+
 
     @Autowired
     private UserProfileDao userProfileDao;
@@ -132,6 +146,9 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
 
     @Value ( "${SOCIAL_POST_REMINDER_INTERVAL}")
     private int socialPostReminderInterval;
+
+    @Autowired
+    private Utils utils;
 
 
     /**
@@ -188,6 +205,8 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
 
         if ( survey == null ) {
             surveyDetailsDao.insertSurveyDetails( surveyDetails );
+            // LOG.info( "Updating modified on column in aagent hierarchy fro agent " );
+            // updateModifiedOnColumnForAgentHierachy( agentId );
             return null;
         } else {
             return survey;
@@ -200,6 +219,14 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
     public void insertSurveyDetails( SurveyDetails surveyDetails )
     {
         surveyDetailsDao.insertSurveyDetails( surveyDetails );
+        if ( surveyDetails.getAgentId() > 0l ) {
+            LOG.info( "Updating modified on column in aagent hierarchy fro agent " );
+            try {
+                updateModifiedOnColumnForAgentHierachy( surveyDetails.getAgentId() );
+            } catch ( InvalidInputException e ) {
+                LOG.error( "passed agent id in method updateModifiedOnColumnForAgentHierachy() is invalid" );
+            }
+        }
     }
 
 
@@ -263,6 +290,16 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
         surveyDetails = surveyDetailsDao.getSurveyByAgentIdAndCustomerEmail( agentId, customerEmail, firstName, lastName );
         LOG.info( "Method getSurveyDetails() to return survey details by agent id and customer email finished." );
         return surveyDetails;
+    }
+
+
+    @Override
+    public List<SurveyDetails> getSurveyDetailsByAgentAndCompany( long companyId )
+    {
+        LOG.info( "Method getSurveyDetails() to return survey details by agent id and customer email started." );
+        List<SurveyDetails> surveys = surveyDetailsDao.getSurveyDetailsByAgentAndCompany( companyId );
+        LOG.info( "Method getSurveyDetails() to return survey details by agent id and customer email finished." );
+        return surveys;
     }
 
 
@@ -787,8 +824,8 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
         }
         LOG.info( "sendSurveyRestartMail() finished." );
     }
-    
-    
+
+
     @Override
     public void sendSurveyCompletionMail( String custEmail, String custFirstName, String custLastName, User user )
         throws InvalidInputException, UndeliveredEmailException, ProfileNotFoundException
@@ -903,7 +940,8 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
         }
         LOG.info( "sendSurveyCompletionMail() finished." );
     }
-    
+
+
     @Override
     public void sendSurveyCompletionUnpleasantMail( String custEmail, String custFirstName, String custLastName, User user )
         throws InvalidInputException, UndeliveredEmailException, ProfileNotFoundException
@@ -979,13 +1017,14 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
             && companySettings.getMail_content().getSurvey_completion_unpleasant_mail() != null ) {
 
             MailContent surveyCompletionUnpleasant = companySettings.getMail_content().getSurvey_completion_unpleasant_mail();
-            
+
             // If Mail Body is empty redirect to survey completion mail method
-            if ( surveyCompletionUnpleasant.getMail_body() == null || surveyCompletionUnpleasant.getMail_body().trim().length() == 0 ) {
-                sendSurveyCompletionMail( custEmail, custFirstName, custLastName, user );  
+            if ( surveyCompletionUnpleasant.getMail_body() == null
+                || surveyCompletionUnpleasant.getMail_body().trim().length() == 0 ) {
+                sendSurveyCompletionMail( custEmail, custFirstName, custLastName, user );
                 return;
             }
-                
+
             String mailBody = emailFormatHelper.replaceEmailBodyWithParams( surveyCompletionUnpleasant.getMail_body(),
                 surveyCompletionUnpleasant.getParam_order() );
 
@@ -1020,7 +1059,8 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
         } else {
 
             emailServices.sendDefaultSurveyCompletionMail( custEmail,
-                emailFormatHelper.getCustomerDisplayNameForEmail( custFirstName, custLastName ), agentName, user.getEmailId(), companyName, logoUrl );
+                emailFormatHelper.getCustomerDisplayNameForEmail( custFirstName, custLastName ), agentName, user.getEmailId(),
+                companyName, logoUrl );
         }
         LOG.info( "sendSurveyCompletionUnpleasantMail() finished." );
     }
@@ -1569,7 +1609,8 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
     @Override
     public Boolean checkIfTimeIntervalHasExpired( long lastRemindedTime, long systemTime, int reminderInterval )
     {
-    	LOG.debug("Checking time interval expiry: lastRemindedTime "+lastRemindedTime+"\t systemTime: "+systemTime+"\t reminderInterval: "+reminderInterval);
+        LOG.debug( "Checking time interval expiry: lastRemindedTime " + lastRemindedTime + "\t systemTime: " + systemTime
+            + "\t reminderInterval: " + reminderInterval );
         long remainingTime = systemTime - lastRemindedTime;
         int remainingDays = (int) ( remainingTime / ( 1000 * 60 * 60 * 24 ) );
         if ( remainingDays >= reminderInterval ) {
@@ -1650,6 +1691,7 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
 
 
     @Override
+    @Transactional
     public void deleteZillowSurveysByEntity( String entityType, long entityId ) throws InvalidInputException
     {
         LOG.info( "Method deleteZillowSurveysByEntity() started" );
@@ -1665,6 +1707,7 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
 
 
     @Override
+    @Transactional
     public void deleteExcessZillowSurveysByEntity( String entityType, long entityId ) throws InvalidInputException
     {
         LOG.info( "Method deleteExcessZillowSurveysByEntity() started" );
@@ -1680,13 +1723,383 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
 
 
     @Override
-    public List<AbusiveSurveyReportWrapper> getSurveysReporetedAsAbusive( int startIndex, int numOfRows )
+    public List<AbusiveSurveyReportWrapper> getSurveysReportedAsAbusive( int startIndex, int numOfRows )
     {
         LOG.info( "Method getSurveysReporetedAsAbusive() to retrieve surveys marked as abusive, started" );
         List<AbusiveSurveyReportWrapper> abusiveSurveyReports = surveyDetailsDao.getSurveysReporetedAsAbusive( startIndex,
             numOfRows );
         LOG.info( "Method getSurveysReporetedAsAbusive() to retrieve surveys marked as abusive, finished" );
         return abusiveSurveyReports;
+    }
+
+
+    @Override
+    @Transactional
+    public void updateSurveyDetails( SurveyDetails surveyDetails )
+    {
+        surveyDetailsDao.updateSurveyDetails( surveyDetails );
+    }
+
+
+    public boolean validateDecryptedApiParams( Map<String, String> params )
+    {
+        boolean valid = false;
+        if ( params != null ) {
+            String comapnyId = params.get( CommonConstants.COMPANY_ID_COLUMN );
+            String apiKey = params.get( CommonConstants.API_KEY_COLUMN );
+            String apiSecret = params.get( CommonConstants.API_SECRET_COLUMN );
+            try {
+                if ( userManagementService.validateUserApiKey( apiKey, apiSecret, Long.valueOf( comapnyId ) ) ) {
+                    valid = true;
+                }
+            } catch ( NumberFormatException e ) {
+                LOG.error( "Exception caught ", e );
+            } catch ( InvalidInputException e ) {
+                LOG.error( "Exception caught ", e );
+            }
+        }
+        return valid;
+    }
+
+
+    public void updateModifiedOnColumnForEntity( String entityType, long entityId )
+    {
+        LOG.debug( "method updateModifiedOnColumnForEntity() started" );
+        if ( entityType.equalsIgnoreCase( CommonConstants.COMPANY_ID_COLUMN ) ) {
+            organizationUnitSettingsDao.updateKeyOrganizationUnitSettingsByCriteria(
+                MongoOrganizationUnitSettingDaoImpl.KEY_MODIFIED_ON, System.currentTimeMillis(),
+                MongoOrganizationUnitSettingDaoImpl.KEY_IDENTIFIER, entityId,
+                MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION );
+        } else if ( entityType.equalsIgnoreCase( CommonConstants.REGION_ID_COLUMN ) ) {
+            organizationUnitSettingsDao.updateKeyOrganizationUnitSettingsByCriteria(
+                MongoOrganizationUnitSettingDaoImpl.KEY_MODIFIED_ON, System.currentTimeMillis(),
+                MongoOrganizationUnitSettingDaoImpl.KEY_IDENTIFIER, entityId,
+                MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION );
+        } else if ( entityType.equalsIgnoreCase( CommonConstants.BRANCH_ID_COLUMN ) ) {
+            organizationUnitSettingsDao.updateKeyOrganizationUnitSettingsByCriteria(
+                MongoOrganizationUnitSettingDaoImpl.KEY_MODIFIED_ON, System.currentTimeMillis(),
+                MongoOrganizationUnitSettingDaoImpl.KEY_IDENTIFIER, entityId,
+                MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION );
+        } else if ( entityType.equalsIgnoreCase( CommonConstants.AGENT_ID_COLUMN ) ) {
+            organizationUnitSettingsDao.updateKeyOrganizationUnitSettingsByCriteria(
+                MongoOrganizationUnitSettingDaoImpl.KEY_MODIFIED_ON, System.currentTimeMillis(),
+                MongoOrganizationUnitSettingDaoImpl.KEY_IDENTIFIER, entityId,
+                MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION );
+        }
+
+
+    }
+
+
+    @Override
+    @Transactional
+    public void updateModifiedOnColumnForAgentHierachy( long agentId ) throws InvalidInputException
+    {
+        LOG.debug( "method updateModifiedOnColumnForAgentHierachy() started" );
+        if ( agentId <= 0l ) {
+            throw new InvalidInputException( "passend agentid is incorrect" );
+        }
+
+        User agent = userDao.findById( User.class, agentId );
+        if ( agent == null ) {
+            throw new InvalidInputException( "No user in db for passed userId" );
+        }
+
+        if ( agent.getCompany() == null ) {
+            throw new InvalidInputException( "No Company in db for passed userId" );
+        }
+
+        long companyId = agent.getCompany().getCompanyId();
+        List<Object> branchIdList = new ArrayList<Object>();
+        List<Object> regionIdList = new ArrayList<Object>();
+        List<UserProfile> userProfiles = agent.getUserProfiles();
+
+        for ( UserProfile profile : userProfiles ) {
+            if ( profile.getBranchId() > 0l && !branchIdList.contains( profile.getBranchId() ) ) {
+                branchIdList.add( profile.getBranchId() );
+            }
+
+            if ( profile.getRegionId() > 0l && !regionIdList.contains( profile.getRegionId() ) ) {
+                regionIdList.add( profile.getRegionId() );
+            }
+        }
+
+        if ( branchIdList != null ) {
+            for ( Object branchId : branchIdList ) {
+                Long longId = ( (Number) branchId ).longValue();
+                Branch branch = userManagementService.getBranchById( longId );
+                if ( branch != null ) {
+                    Region region = branch.getRegion();
+                    if ( region != null ) {
+                        long regionId = region.getRegionId();
+                        if ( regionId > 0l && !regionIdList.contains( regionId ) ) {
+                            regionIdList.add( regionId );
+                        }
+                    }
+                }
+            }
+        }
+
+
+        if ( companyId > 0l ) {
+            organizationUnitSettingsDao.updateKeyOrganizationUnitSettingsByCriteria(
+                MongoOrganizationUnitSettingDaoImpl.KEY_MODIFIED_ON, System.currentTimeMillis(),
+                MongoOrganizationUnitSettingDaoImpl.KEY_IDENTIFIER, companyId,
+                MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION );
+        }
+
+        if ( agentId > 0l ) {
+            organizationUnitSettingsDao.updateKeyOrganizationUnitSettingsByCriteria(
+                MongoOrganizationUnitSettingDaoImpl.KEY_MODIFIED_ON, System.currentTimeMillis(),
+                MongoOrganizationUnitSettingDaoImpl.KEY_IDENTIFIER, agentId,
+                MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION );
+        }
+
+        if ( !branchIdList.isEmpty() ) {
+            organizationUnitSettingsDao.updateKeyOrganizationUnitSettingsByInCriteria(
+                MongoOrganizationUnitSettingDaoImpl.KEY_MODIFIED_ON, System.currentTimeMillis(),
+                MongoOrganizationUnitSettingDaoImpl.KEY_IDENTIFIER, branchIdList,
+                MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION );
+        }
+        if ( !regionIdList.isEmpty() ) {
+            organizationUnitSettingsDao.updateKeyOrganizationUnitSettingsByInCriteria(
+                MongoOrganizationUnitSettingDaoImpl.KEY_MODIFIED_ON, System.currentTimeMillis(),
+                MongoOrganizationUnitSettingDaoImpl.KEY_IDENTIFIER, regionIdList,
+                MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION );
+        }
+        LOG.debug( "method updateModifiedOnColumnForAgentHierachy() finished" );
+
+    }
+
+
+    public void updateSurveyAsUnderResolution( String surveyId )
+    {
+
+        LOG.info( "Method updateSurveyAsUnderResolution() to mark a survey as under resolution started, started" );
+        surveyDetailsDao.updateSurveyAsUnderResolution( surveyId );
+        LOG.info( "Method updateSurveyAsUnderResolution() to mark a survey as under resolution started, ended" );
+    }
+
+
+    @Override
+    public SocialMediaPostDetails getSocialMediaPostDetailsBySurvey( SurveyDetails surveyDetails,
+        OrganizationUnitSettings companyUnitSettings, List<OrganizationUnitSettings> regionUnitSettings,
+        List<OrganizationUnitSettings> branchUnitSettings )
+    {
+        SocialMediaPostDetails socialMediaPostDetails = null;
+        AgentMediaPostDetails agentMediaPostDetails = null;
+        CompanyMediaPostDetails companyMediaPostDetails = null;
+        List<BranchMediaPostDetails> branchMediaPostDetailsList = null;
+        List<RegionMediaPostDetails> regionMediaPostDetailsList = null;
+        if ( surveyDetails == null ) {
+            throw new FatalException( "Survey cannot be null  " );
+        } else {
+            socialMediaPostDetails = surveyDetails.getSocialMediaPostDetails();
+            if ( socialMediaPostDetails == null ) {
+                socialMediaPostDetails = new SocialMediaPostDetails();
+            }
+            agentMediaPostDetails = socialMediaPostDetails.getAgentMediaPostDetails();
+            if ( agentMediaPostDetails == null ) {
+                agentMediaPostDetails = new AgentMediaPostDetails();
+                agentMediaPostDetails.setAgentId( surveyDetails.getAgentId() );
+
+            }
+            companyMediaPostDetails = socialMediaPostDetails.getCompanyMediaPostDetails();
+            if ( companyMediaPostDetails == null ) {
+                companyMediaPostDetails = new CompanyMediaPostDetails();
+                companyMediaPostDetails.setCompanyId( surveyDetails.getCompanyId() );
+
+            }
+            regionMediaPostDetailsList = socialMediaPostDetails.getRegionMediaPostDetailsList();
+            if ( regionMediaPostDetailsList == null ) {
+                regionMediaPostDetailsList = new ArrayList<RegionMediaPostDetails>();
+            }
+            for ( OrganizationUnitSettings setting : regionUnitSettings ) {
+                boolean found = false;
+                for ( int i = 0; i < regionMediaPostDetailsList.size(); i++ ) {
+
+                    RegionMediaPostDetails regionMediaPostDetails = regionMediaPostDetailsList.get( i );
+                    if ( regionMediaPostDetails.getRegionId() == setting.getIden() ) {
+                        found = true;
+                        break;
+                    }
+                }
+                if ( !found ) {
+                    RegionMediaPostDetails regionMediaPostDetails = new RegionMediaPostDetails();
+                    regionMediaPostDetails.setRegionId( setting.getIden() );
+                    regionMediaPostDetailsList.add( regionMediaPostDetails );
+                }
+            }
+            branchMediaPostDetailsList = socialMediaPostDetails.getBranchMediaPostDetailsList();
+            if ( branchMediaPostDetailsList == null ) {
+                branchMediaPostDetailsList = new ArrayList<BranchMediaPostDetails>();
+            }
+            for ( OrganizationUnitSettings setting : branchUnitSettings ) {
+                boolean found = false;
+                BranchMediaPostDetails branchMediaPostDetails = null;
+                for ( int i = 0; i < branchMediaPostDetailsList.size(); i++ ) {
+                    BranchMediaPostDetails branchMediaPostDetailsObject = branchMediaPostDetailsList.get( i );
+                    if ( branchMediaPostDetailsObject.getBranchId() == setting.getIden() ) {
+                        found = true;
+                        break;
+                    }
+                }
+                if ( !found ) {
+                    branchMediaPostDetails = new BranchMediaPostDetails();
+                    branchMediaPostDetails.setBranchId( setting.getIden() );
+                }
+
+                LOG.debug( "Adding the region this branch belongs too " );
+                try {
+                    OrganizationUnitSettings regionSetting = profileManagementService.getRegionProfileByBranch( setting );
+                    boolean regionFound = false;
+                    for ( int i = 0; i < regionMediaPostDetailsList.size(); i++ ) {
+
+                        RegionMediaPostDetails regionMediaPostDetails = regionMediaPostDetailsList.get( i );
+                        if ( regionMediaPostDetails.getRegionId() == regionSetting.getIden() ) {
+                            regionFound = true;
+                            break;
+                        }
+                    }
+                    if ( !regionFound ) {
+                        RegionMediaPostDetails regionMediaPostDetails = new RegionMediaPostDetails();
+                        regionMediaPostDetails.setRegionId( regionSetting.getIden() );
+                        regionMediaPostDetailsList.add( regionMediaPostDetails );
+                    }
+                    branchMediaPostDetails.setRegionId( regionSetting.getIden() );
+                } catch ( ProfileNotFoundException e ) {
+                    LOG.error( "Unable to find the profile", e );
+                }
+
+                branchMediaPostDetailsList.add( branchMediaPostDetails );
+
+            }
+            socialMediaPostDetails.setAgentMediaPostDetails( agentMediaPostDetails );
+            socialMediaPostDetails.setBranchMediaPostDetailsList( branchMediaPostDetailsList );
+            socialMediaPostDetails.setRegionMediaPostDetailsList( regionMediaPostDetailsList );
+            socialMediaPostDetails.setCompanyMediaPostDetails( companyMediaPostDetails );
+
+        }
+        return socialMediaPostDetails;
+    }
+
+
+    public List<AbusiveSurveyReportWrapper> getSurveysReportedAsAbusive( long companyId, int startIndex, int numOfRows )
+    {
+        LOG.info( "Method getSurveysReportedAsAbusive() to retrieve surveys marked as abusive for a company, started" );
+        List<AbusiveSurveyReportWrapper> abusiveSurveyReports = surveyDetailsDao.getSurveysReporetedAsAbusive( companyId,
+            startIndex, numOfRows );
+        LOG.info( "Method getSurveysReportedAsAbusive() to retrieve surveys marked as abusive for a company, finished" );
+        return abusiveSurveyReports;
+    }
+
+
+    @Override
+    public Boolean canPostOnSocialMedia( OrganizationUnitSettings unitSetting, Double rating )
+    {
+        boolean canPost = false;
+        if ( unitSetting != null ) {
+            if ( unitSetting.getSurvey_settings() != null ) {
+                if ( unitSetting.getSurvey_settings().getAuto_post_score() < rating ) {
+                    canPost = true;
+                }
+            } else {
+                if ( CommonConstants.DEFAULT_AUTOPOST_SCORE < rating ) {
+                    canPost = true;
+
+                }
+            }
+        } else {
+            if ( CommonConstants.DEFAULT_AUTOPOST_SCORE < rating ) {
+                canPost = true;
+
+            }
+        }
+        return canPost;
+    }
+
+
+    @Transactional
+    public List<BulkSurveyDetail> processBulkSurvey( List<BulkSurveyDetail> bulkSurveyDetailList, long companyId )
+    {
+        List<BulkSurveyDetail> list = new ArrayList<BulkSurveyDetail>();
+        LOG.debug( "Inside method processBulkSurvey " );
+
+        for ( BulkSurveyDetail bulkSurveyDetail : bulkSurveyDetailList ) {
+            boolean error = false;
+            String status = CommonConstants.BULK_SURVEY_VALID;
+            String message = "";
+            if ( bulkSurveyDetail != null ) {
+                LOG.debug( "processing survey for agent " + bulkSurveyDetail.getAgentFirstName() );
+                if ( bulkSurveyDetail.getAgentFirstName() == null || bulkSurveyDetail.getAgentFirstName().isEmpty() ) {
+                    message = "Invalid Agent Name ";
+                    status = CommonConstants.BULK_SURVEY_INVALID;
+                    error = true;
+                } else if ( bulkSurveyDetail.getAgentEmailId() == null || bulkSurveyDetail.getAgentEmailId().isEmpty() ) {
+                    message = "Agent Email Address Not Found ";
+                    status = CommonConstants.BULK_SURVEY_INVALID;
+                    error = true;
+                } else if ( bulkSurveyDetail.getCustomerFirstName() == null
+                    || bulkSurveyDetail.getCustomerFirstName().isEmpty() ) {
+                    message = "Customer name Not Found ";
+                    status = CommonConstants.BULK_SURVEY_INVALID;
+                    error = true;
+                } else if ( bulkSurveyDetail.getCustomerEmailId() == null || bulkSurveyDetail.getCustomerEmailId().isEmpty() ) {
+                    message = "Customer Email Address Not Found ";
+                    status = CommonConstants.BULK_SURVEY_INVALID;
+                    error = true;
+                }
+                User user = null;
+                if ( !error ) {
+                    String agentEmailId = bulkSurveyDetail.getAgentEmailId();
+                    try {
+                        user = userManagementService.getUserByEmailAndCompany( companyId, agentEmailId );
+                    } catch ( InvalidInputException e ) {
+                        message = "Agent does not belong to this Company " + companyId;
+                        status = CommonConstants.BULK_SURVEY_INVALID;
+                        error = true;
+                    } catch ( NoRecordsFetchedException e ) {
+                        message = "Agent does not belong to this Company " + companyId;
+                        status = CommonConstants.BULK_SURVEY_INVALID;
+                        error = true;
+                    }
+                    if ( user == null ) {
+                        message = "Agent does not belong to this Company ";
+                        status = CommonConstants.BULK_SURVEY_INVALID;
+                        error = true;
+                    }
+                }
+                if ( !error ) {
+                    try {
+                        initiateSurveyRequest( user.getUserId(), bulkSurveyDetail.getCustomerEmailId(),
+                            bulkSurveyDetail.getCustomerFirstName(), bulkSurveyDetail.getCustomerLastName(),
+                            CommonConstants.SURVEY_SOURCE_BULK_UPLOAD );
+                        status = CommonConstants.BULK_SURVEY_VALID;
+                    } catch ( DuplicateSurveyRequestException | InvalidInputException | SelfSurveyInitiationException
+                        | SolrException | NoRecordsFetchedException | UndeliveredEmailException | ProfileNotFoundException e ) {
+                        status = CommonConstants.BULK_SURVEY_INVALID;
+                        message = e.getMessage();
+                    }
+                }
+                bulkSurveyDetail.setStatus( status );
+                if ( status.equalsIgnoreCase( CommonConstants.BULK_SURVEY_INVALID ) ) {
+                    bulkSurveyDetail.setReason( message );
+                }
+                list.add( bulkSurveyDetail );
+
+            }
+
+        }
+        return list;
+    }
+
+
+    public List<SurveyDetails> getSurveysUnderResolution( long companyId, int startIndex, int numOfRows )
+    {
+        LOG.info( "Method getSurveysUnderResolution() to retrieve surveys marked as under resolution for a company, started" );
+        List<SurveyDetails> surveyDetails = surveyDetailsDao.getSurveysUnderResolution( companyId, startIndex, numOfRows );
+        LOG.info( "Method getSurveysUnderResolution() to retrieve surveys marked as under resolution for a company, finished" );
+        return surveyDetails;
     }
 }
 // JIRA SS-119 by RM-05:EOC

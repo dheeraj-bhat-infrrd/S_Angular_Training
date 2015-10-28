@@ -9,6 +9,9 @@ using System.Collections.Generic;
 using System;
 using EncompassSocialSurvey.Service;
 using EncompassSocialSurvey.Entity;
+using System.Net;
+using System.Net.Mail;
+using SendGrid;
 
 namespace EncompassSocialSurvey
 {
@@ -187,10 +190,43 @@ namespace EncompassSocialSurvey
             Logger.Debug("Updating crm batch tracker");
             if (returnLoansViewModel.Count > 0) {
                 insertOrUpdateCrmBatchTracker(crmBatchTracker, runningCompanyId, EncompassSocialSurverConstant.SURVEY_SOURCE);
-             }
+            }
+            else
+            {
+                Logger.Debug("Notifying admin no records were fetched in this run ");
+                sendMailToAdmin(runningCompanyId);
+            }
             
             Logger.Info("Exiting the method LoanUtility.LopopulateLoanList()");
             return returnLoansViewModel;
+        }
+
+
+        public void sendMailToAdmin(long runningCompanyId)
+        {
+            try {
+                Logger.Debug("Sending mail to admin because no records were fetched in this run ");
+                var sendgridUsername = System.Configuration.ConfigurationManager.AppSettings[EncompassSocialSurverConstant.SENDGRID_USERNAME];
+                var sendgridPassword = System.Configuration.ConfigurationManager.AppSettings[EncompassSocialSurverConstant.SENDGRID_PASSWORD];
+                var adminEmailAddress = System.Configuration.ConfigurationManager.AppSettings[EncompassSocialSurverConstant.ADMIN_EMAIL_ADDRESS];
+                var sendgridFromAddress = System.Configuration.ConfigurationManager.AppSettings[EncompassSocialSurverConstant.SENDGRID_FROM_ADDRESS];
+                var sendgridName = System.Configuration.ConfigurationManager.AppSettings[EncompassSocialSurverConstant.SENDGRID_FROM_NAME];
+                var credentials = new NetworkCredential(sendgridUsername, sendgridPassword);
+                SendGridMessage myMessage = new SendGridMessage();
+                myMessage.AddTo(adminEmailAddress);
+                myMessage.From = new MailAddress(sendgridFromAddress, sendgridName);
+                myMessage.Subject = "No Records Fetched In This Run !!!";
+                myMessage.Text = "Encompass was not able to fetch any new records for company id " + runningCompanyId + " which ran on " + DateTime.Now;
+                var transportWeb = new Web(credentials);
+                transportWeb.DeliverAsync(myMessage);
+                
+
+            }
+            catch(Exception ex)
+            {
+                Logger.Error("Caught an exception: LoanUtility.sendMailToAdmin(): ", ex);
+            }
+
         }
 
         private void updateLastFetchedTime(string field)

@@ -3,6 +3,7 @@ package com.realtech.socialsurvey.core.services.payment;
 import java.math.BigDecimal;
 import java.sql.Timestamp;
 import java.util.Map;
+
 import com.braintreegateway.BraintreeGateway;
 import com.braintreegateway.Subscription;
 import com.braintreegateway.Transaction;
@@ -16,6 +17,7 @@ import com.realtech.socialsurvey.core.exception.NonFatalException;
 import com.realtech.socialsurvey.core.services.mail.UndeliveredEmailException;
 import com.realtech.socialsurvey.core.services.payment.exception.CardUpdateUnsuccessfulException;
 import com.realtech.socialsurvey.core.services.payment.exception.CreditCardException;
+import com.realtech.socialsurvey.core.services.payment.exception.CustomerDeletionUnsuccessfulException;
 import com.realtech.socialsurvey.core.services.payment.exception.PaymentException;
 import com.realtech.socialsurvey.core.services.payment.exception.PaymentRetryUnsuccessfulException;
 import com.realtech.socialsurvey.core.services.payment.exception.SubscriptionCancellationUnsuccessfulException;
@@ -249,5 +251,8 @@ public interface Payment {
 	 * @throws InvalidInputException
 	 */
 	public void insertIntoLicenseTable(int accountsMasterId, User user, String subscriptionId) throws InvalidInputException;
+
+
+    void deleteCustomer( String customerId ) throws CustomerDeletionUnsuccessfulException, InvalidInputException;
 		
 }

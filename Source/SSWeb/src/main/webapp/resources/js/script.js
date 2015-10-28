@@ -766,3 +766,55 @@ function validateSignUpForm(){
 	}
 	return true;
 }
+
+//Function to validate multiple email ids in a form
+function validateMultipleEmailIds(elementId){
+	var emailIdStr = $('#'+elementId).val();
+	if (emailIdStr != "") {
+		emailIdStr = emailIdStr.trim();
+		var emailIds  = emailIdStr.split(",")
+		for (i = 0; i < emailIds.length; i++) { 
+			if (emailRegex.test(emailIds[i].trim()) == false) {
+				showErrorMobileAndWeb('Please enter a valid Email Address');
+				return false;
+			}
+		}
+		return true;
+	} else {
+		showErrorMobileAndWeb('Please enter a valid Email Address');
+		return false;
+	}
+}
+
+//Function to validate complaint registraion form
+function validateComplaintRegistraionForm(){
+	var validate = true;
+
+	//hide the server error
+	$("#serverSideerror").hide();
+	
+	// validate error code on email id
+	validate = validateMultipleEmailIds('comp-mailId')
+	
+	// check if checkbox is enabled
+	if($('input[name="enabled"]').prop( "checked" )) {
+		// check whether rating selectd is 0 and mood is empty
+		var rating = $("#comp-rating-post").val();
+		var mood = $("#comp-mood").val();
+		
+		if(rating == 0 && mood =='') {
+			// reset the check box if score is 0 and mood not selected
+			$('#compl-checkbox').addClass('bd-check-img-checked');
+			$('input[name="enabled"]').prop( "checked" , false);
+			$('input[name="enabled"]').val("");
+		}	
+		
+	}
+
+	if (!validate) {
+		return false;
+	} else {
+		/* Form validated. */
+		return true;
+	}
+}

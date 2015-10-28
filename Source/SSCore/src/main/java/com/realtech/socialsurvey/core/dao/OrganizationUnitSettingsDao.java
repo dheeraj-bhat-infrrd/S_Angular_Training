@@ -1,8 +1,10 @@
 package com.realtech.socialsurvey.core.dao;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
 import com.realtech.socialsurvey.core.entities.AgentRankingReport;
 import com.realtech.socialsurvey.core.entities.AgentSettings;
 import com.realtech.socialsurvey.core.entities.FeedIngestionEntity;
@@ -194,4 +196,8 @@ public interface OrganizationUnitSettingsDao
 	 * @throws NoRecordsFetchedException
 	 */
 	public List<OrganizationUnitSettings> getOrganizationUnitListWithCRMSource(String source, String collectionName) throws InvalidInputException, NoRecordsFetchedException;
+
+
+    void updateKeyOrganizationUnitSettingsByInCriteria( String keyToUpdate, Object updatedRecord, String criteriaKey,
+        List<Object> criteriaValue, String collectionName );
 }
