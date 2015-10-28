@@ -20,6 +20,9 @@
 				<div class="float-left hm-header-row-left text-center">
 					<spring:message code="label.socialmonitor.key" />
 				</div>
+				<div class="float-right sm-header-row-left text-center">
+					<spring:message code="label.lastbuild.key" />
+				</div>
 			</div>
 		</div>
 	</div>

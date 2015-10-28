@@ -693,6 +693,12 @@ html.is-modern.card-root.js.no-touch.csstransitions.svg.inlinesvg.placeholder
 	/*    font-weight: bold !important;*/
 }
 
+.sm-header-row-left {
+	font-size: 16px;
+	line-height: 45px;
+	/*    font-weight: bold !important;*/
+}
+
 .padding-10 {
 	padding-top: 10px;
 }

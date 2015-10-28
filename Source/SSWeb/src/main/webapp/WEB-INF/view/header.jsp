@@ -156,14 +156,14 @@
 						<a href="javascript:showMainContent('./showusermangementpage.do')"><spring:message code="label.header.usermanagement.key" /></a>
 					</div>
 				</c:if>
-				<c:if test="${ highestrole == 1 }">
-					<div class="header-links-item">
-						<a href="javascript:showMainContent('./showsocialmonitortpage.do')"><spring:message code="label.socialmonitor.key" /></a>
-					</div>
-				</c:if>
 				<c:if test="${accountMasterId < 4 }">	
 					<div class="header-links-item">
 						<a href="javascript:showMainContent('./upgradepage.do')"><spring:message code="label.header.upgrade.key" /></a>
+					</div>
+				</c:if>
+				<c:if test="${ highestrole == 1 }">
+					<div class="header-links-item">
+						<a href="javascript:showMainContent('./showsocialmonitortpage.do')"><spring:message code="label.socialmonitor.key" /></a>
 					</div>
 				</c:if>
 				<div class="header-links-item">
@@ -189,11 +189,6 @@
 				<c:if test="${accountMasterId > 1 && accountMasterId < 5 && highestrole != 4 }">
 					<div class="hdr-link-item">
 						<a href="javascript:showMainContent('./showusermangementpage.do')" onclick="showOverlay();"><spring:message code="label.header.usermanagement.key" /></a>
-					</div>
-				</c:if>
-				<c:if test="${ highestrole == 1 }">
-					<div class="hdr-link-item">
-						<a href="javascript:showMainContent('./showsocialmonitortpage.do')" onclick="showOverlay();"><spring:message code="label.socialmonitor.key" /></a>
 					</div>
 				</c:if>
 				<c:if test="${highestrole == 1 && accountMasterId != 5}">
@@ -223,6 +218,11 @@
 								</div>
 							</c:if>
 						</div>
+					</div>
+				</c:if>
+				<c:if test="${ highestrole == 1 }">
+					<div class="hdr-link-item">
+						<a href="javascript:showMainContent('./showsocialmonitortpage.do')" onclick="showOverlay();"><spring:message code="label.socialmonitor.key" /></a>
 					</div>
 				</c:if>
 				<div class="hdr-link-item">
