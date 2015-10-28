@@ -1,5 +1,6 @@
 package com.realtech.socialsurvey.core.dao;
 
+import java.sql.Timestamp;
 import java.text.ParseException;
 import java.util.Date;
 import java.util.List;
@@ -8,6 +9,7 @@ import com.realtech.socialsurvey.core.entities.AbusiveSurveyReportWrapper;
 import com.realtech.socialsurvey.core.entities.AgentRankingReport;
 import com.realtech.socialsurvey.core.entities.SurveyDetails;
 import com.realtech.socialsurvey.core.entities.SurveyResponse;
+import com.realtech.socialsurvey.core.exception.InvalidInputException;
 
 
 public interface SurveyDetailsDao
@@ -89,6 +91,18 @@ public interface SurveyDetailsDao
         int noOfPastDaysToConsider, String criteriaColumn, boolean realtechAdmin ) throws ParseException;
 
 
+    /**
+     * Gets an aggregated count for completed survey
+     * @param organizationUnitColumn
+     * @param organizationUnitColumnValue
+     * @param startDate
+     * @param endDate
+     * @param aggregateBy
+     * @return
+     * @throws InvalidInputException
+     */
+    public Map<Integer, Integer> getCompletedSurveyAggregationCount(String organizationUnitColumn, long organizationUnitColumnValue, Timestamp startDate, Timestamp endDate, String aggregateBy) throws InvalidInputException;
+    
     public Map<String, Long> getSentSurveyByCriteria( String columnName, long columnValue, int noOfDays,
         int noOfPastDaysToConsider, String criteriaColumn, boolean realtechAdmin ) throws ParseException;
 

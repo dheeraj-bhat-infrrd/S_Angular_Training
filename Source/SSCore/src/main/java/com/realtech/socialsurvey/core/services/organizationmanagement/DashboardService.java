@@ -4,14 +4,13 @@ import java.io.IOException;
 import java.text.ParseException;
 import java.util.List;
 import java.util.Map;
-
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
-
 import com.realtech.socialsurvey.core.entities.AgentRankingReport;
 import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
 import com.realtech.socialsurvey.core.entities.SurveyDetails;
 import com.realtech.socialsurvey.core.entities.SurveyPreInitiation;
 import com.realtech.socialsurvey.core.entities.User;
+import com.realtech.socialsurvey.core.exception.InvalidInputException;
 
 
 // JIRA SS-137 BY RM05:BOC
@@ -43,7 +42,7 @@ public interface DashboardService
 
 
     public Map<String, Map<String, Long>> getSurveyDetailsForGraph( String columnName, long columnValue, int numberOfDays,
-        boolean realtechAdmin ) throws ParseException;
+        boolean realtechAdmin ) throws ParseException, InvalidInputException;
 
 
     public XSSFWorkbook downloadIncompleteSurveyData( List<SurveyPreInitiation> surveyDetails, String fileLocation )
