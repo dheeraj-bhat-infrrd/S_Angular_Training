@@ -1330,22 +1330,12 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
                 status = CommonConstants.STATUS_SURVEYPREINITIATION_CORRUPT_RECORD;
                 unavailableAgents.add( survey );
                 companies.add( survey.getCompanyId() );
-            } else if ( survey.getCustomerFirstName() == null || survey.getCustomerFirstName().isEmpty() ) {
-                if ( survey.getCustomerLastName() == null || survey.getCustomerLastName().isEmpty() ) {
+            } else if ( (survey.getCustomerFirstName() == null || survey.getCustomerFirstName().isEmpty()) && ( survey.getCustomerLastName() == null || survey.getCustomerLastName().isEmpty() )) {
                     LOG.error( "No Name found for customer, hence this is an invalid survey "
                         + survey.getSurveyPreIntitiationId() );
                     status = CommonConstants.STATUS_SURVEYPREINITIATION_CORRUPT_RECORD;
                     customersWithoutName.add( survey );
-                }
 
-            } else if ( survey.getCustomerLastName() == null || survey.getCustomerLastName().isEmpty() ) {
-                if ( survey.getCustomerFirstName() == null || survey.getCustomerFirstName().isEmpty() ) {
-                    LOG.error( "No Name found for customer, hence this is an invalid survey "
-                        + survey.getSurveyPreIntitiationId() );
-                    status = CommonConstants.STATUS_SURVEYPREINITIATION_CORRUPT_RECORD;
-                    customersWithoutName.add( survey );
-                    companies.add( survey.getCompanyId() );
-                }
             } else if ( survey.getCustomerEmailId() == null || survey.getCustomerEmailId().isEmpty() ) {
                 LOG.error( "No customer email id found, invalid survey " + survey.getSurveyPreIntitiationId() );
                 status = CommonConstants.STATUS_SURVEYPREINITIATION_CORRUPT_RECORD;
@@ -1395,6 +1385,7 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
         LOG.info( "Inside method validateUnitSettingsForDotloop " );
         int status = CommonConstants.STATUS_SURVEYPREINITIATION_PROCESSED;
         if ( surveyPreInitiation != null ) {
+        	LOG.info( "Processing survey pre initiation id: "+surveyPreInitiation.getSurveyPreIntitiationId() );
             boolean found = false;
             if ( surveyPreInitiation.getCompanyId() == user.getCompany().getCompanyId() ) {
                 LOG.debug( "Though the company id is same, the region or branch might be different " );
