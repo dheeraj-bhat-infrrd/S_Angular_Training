@@ -1019,6 +1019,46 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
     }
 
 
+    @Override
+    public Map<Integer, Integer> getCompletedSurveyAggregationCount(String organizationUnitColumn, long organizationUnitColumnValue, Timestamp startDate, Timestamp endDate, String aggregateBy) throws InvalidInputException{
+    	Map<Integer, Integer> aggregatedResult = null;
+    	LOG.info("Aggregating completed surveys. Input organizationUnitColumn: "+organizationUnitColumn+" \t organizationUnitColumnValue: "+organizationUnitColumnValue+" \t startDate: "+startDate+" \t endDate: "+endDate+" \t aggregateBy: "+aggregateBy);
+    	if(aggregateBy == null || aggregateBy.isEmpty()){
+    		LOG.debug("aggregate by field is empty");
+    		throw new InvalidInputException("aggregate by field is empty");
+    	}
+    	LOG.debug("Getting the result aggregated by "+aggregateBy);
+    	TypedAggregation<SurveyDetails> aggregation = null;
+    	if(organizationUnitColumn == null){
+    		LOG.debug("Getting aggregated completed survey results for all");
+    		aggregation = new TypedAggregation<SurveyDetails>( SurveyDetails.class,
+    				Aggregation.match( Criteria.where( CommonConstants.STAGE_COLUMN ).is( CommonConstants.SURVEY_STAGE_COMPLETE ) ),
+    				Aggregation.match( Criteria.where( CommonConstants.MODIFIED_ON_COLUMN ).gte( new Date(startDate.getTime()) ) ),
+    				Aggregation.match( Criteria.where( CommonConstants.MODIFIED_ON_COLUMN ).lte( new Date(endDate.getTime()) ) ),
+    				Aggregation.project( CommonConstants.MODIFIED_ON_COLUMN ).andExpression( aggregateBy + "(" + CommonConstants.MODIFIED_ON_COLUMN + ")" ).as( "groupCol" ), 
+    				Aggregation.group( "groupCol" ).count().as( "count" ) );
+    	}else{
+    		LOG.debug("Getting aggregated completed survey for "+organizationUnitColumn+" and value "+organizationUnitColumnValue);
+    		aggregation = new TypedAggregation<SurveyDetails>( SurveyDetails.class,
+    				Aggregation.match( Criteria.where( organizationUnitColumn ).is( organizationUnitColumnValue ) ),
+    				Aggregation.match( Criteria.where( CommonConstants.STAGE_COLUMN ).is( CommonConstants.SURVEY_STAGE_COMPLETE ) ),
+    				Aggregation.match( Criteria.where( CommonConstants.MODIFIED_ON_COLUMN ).gte( new Date(startDate.getTime()) ) ), 
+    				Aggregation.match( Criteria.where( CommonConstants.MODIFIED_ON_COLUMN ).lte( new Date(endDate.getTime()) ) ),
+    				Aggregation.project( CommonConstants.MODIFIED_ON_COLUMN ).andExpression( aggregateBy + "(" + CommonConstants.MODIFIED_ON_COLUMN + ")" ).as( "groupCol" ), 
+    				Aggregation.group( "groupCol" ).count().as( "count" ) );
+    	}
+    	AggregationResults<SurveyDetails> result = mongoTemplate.aggregate( aggregation, SURVEY_DETAILS_COLLECTION, SurveyDetails.class );
+    	if(result != null){
+    		LOG.debug("Found aggregated results");
+    		aggregatedResult =  new HashMap<>();
+    		@SuppressWarnings ( "unchecked") List<BasicDBObject> aggregatedData = (List<BasicDBObject>) result.getRawResults().get("result");
+    		for(BasicDBObject data: aggregatedData){
+    			aggregatedResult.put(Integer.parseInt(data.get(CommonConstants.DEFAULT_MONGO_ID_COLUMN).toString()),Integer.parseInt(data.get( "count" ).toString()));
+    		}
+    	}
+    	LOG.info("Returning aggregating completed survey results");
+    	return aggregatedResult;
+    }
     /*
      * Method to get count of sent surveys based upon criteria(Weekly/Monthly/Yearly).
      */
@@ -1175,8 +1215,7 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
         LOG.info( "Method to get count of sent surveys based upon criteria(Weekly/Monthly/Yearly) getSentSurveyByCriteria() finished." );
         return sentSurveys;
     }
-
-
+    
     /*
      * Method to get count of completed surveys based upon criteria(Weekly/Monthly/Yearly).
      */

@@ -1,6 +1,7 @@
 package com.realtech.socialsurvey.core.services.organizationmanagement.impl;
 
 import java.io.IOException;
+import java.sql.Timestamp;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -202,29 +203,40 @@ public class DashboardServiceImpl implements DashboardService, InitializingBean
 
     @Override
     public Map<String, Map<String, Long>> getSurveyDetailsForGraph( String columnName, long columnValue, int numberOfDays,
-        boolean realtechAdmin ) throws ParseException
+        boolean realtechAdmin ) throws ParseException, InvalidInputException
     {
+    	LOG.info("Getting survey details for graph for "+columnName+" with value "+columnValue+" for number of days "+numberOfDays+". Reatech admin flag: "+realtechAdmin);
         String criteria = "";
         int noOfDaysToConsider = -1;
+        Calendar currentTime = Calendar.getInstance();
+        Calendar startTime = Calendar.getInstance();
         switch ( numberOfDays ) {
             case 30:
                 noOfDaysToConsider = numberOfDays + Calendar.getInstance().get( Calendar.DAY_OF_WEEK );
                 criteria = "week";
+                startTime.add(Calendar.DATE, -30);
                 break;
             case 60:
                 noOfDaysToConsider = numberOfDays + Calendar.getInstance().get( Calendar.DAY_OF_WEEK );
                 criteria = "week";
+                startTime.add(Calendar.DATE, -60);
                 break;
             case 90:
                 noOfDaysToConsider = numberOfDays + Calendar.getInstance().get( Calendar.DAY_OF_WEEK );
                 criteria = "week";
+                startTime.add(Calendar.DATE, -90);
                 break;
             case 365:
                 noOfDaysToConsider = numberOfDays + Calendar.getInstance().get( Calendar.DAY_OF_MONTH );
                 criteria = "month";
+                startTime.add(Calendar.DATE, -365);
                 break;
         }
-
+        startTime.set(Calendar.HOUR_OF_DAY, 0);
+        startTime.set(Calendar.MINUTE, 0);
+        startTime.set(Calendar.SECOND, 0);
+        startTime.set(Calendar.MILLISECOND, 0);
+        Map<Integer, Integer> completedSurveys = surveyDetailsDao.getCompletedSurveyAggregationCount(columnName, columnValue, new Timestamp(startTime.getTimeInMillis()), new Timestamp(currentTime.getTimeInMillis()), criteria);
         Map<String, Map<String, Long>> map = new HashMap<String, Map<String, Long>>();
         map.put( "clicked", surveyDetailsDao.getClickedSurveyByCriteria( columnName, columnValue, numberOfDays,
             noOfDaysToConsider, criteria, realtechAdmin ) );
