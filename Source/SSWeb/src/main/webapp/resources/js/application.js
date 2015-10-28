@@ -135,6 +135,11 @@ function showMainContentCallBack(data) {
 }
 
 
+//Function to logout
+function userLogout() {
+	window.location.href = 'j_spring_security_logout';
+}
+
 /*
  * This module helps in browser navigation support to give a single page app
  * 
