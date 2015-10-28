@@ -131,7 +131,7 @@
 				</c:if>
 				<c:if test="${highestrole == 1}">
 					<div class="header-links-item">
-						<a href="javascript:showMainContent('./showcomplaintregsettings.do')"><spring:message code="label.complaintregsettings.key" /></a>
+						<a href="javascript:showMainContent('./showcomplaintressettings.do')"><spring:message code="label.complaintregsettings.key" /></a>
 					</div>
 				</c:if>
 				<!-- show apps for company admin other then free account -->
@@ -205,7 +205,7 @@
 								<spring:message code="label.settings.key" />
 							</div>
 							<c:if test="${highestrole == 1}">
-								<div class="hdr-link-item-dropdown-item" onclick="showMainContent('./showcomplaintregsettings.do');">
+								<div class="hdr-link-item-dropdown-item" onclick="showMainContent('./showcomplaintressettings.do');">
 									<spring:message code="label.complaintregsettings.key" />
 								</div>
 								<div class="hdr-link-item-dropdown-item" onclick="showMainContent('./showemailsettings.do');">
@@ -266,12 +266,10 @@
 									<spring:message code="label.switch.key" />
 								</div>
 							</c:when>
-							<c:otherwise>
-								<div class="initial-dd-item" id="user-logout" onclick="userLogout();">
-									<spring:message code="label.logout.key" />
-								</div>
-							</c:otherwise>
 						</c:choose>
+						<div class="initial-dd-item" id="user-logout" onclick="userLogout();">
+							<spring:message code="label.logout.key" />
+						</div>
 					</div>
 				</div>
                 <c:if test="${displaylogo != null}">

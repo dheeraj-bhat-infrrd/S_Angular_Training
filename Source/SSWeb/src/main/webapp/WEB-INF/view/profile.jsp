@@ -97,7 +97,7 @@
     		<link rel="canonical" href="${profile.completeProfileUrl}">
     	</c:if>
     	<c:if test="${not empty averageRating}">
-    		<fmt:formatNumber var="floatingAverageRating" type="number" value="${averageRating}" maxFractionDigits="2" minFractionDigits="3"/>
+    		<fmt:formatNumber var="floatingAverageRating" type="number" value="${averageRating}" maxFractionDigits="1" minFractionDigits="1"/>
     		<fmt:formatNumber var="floatingAverageGoogleRating" type="number" value="${averageRating}" maxFractionDigits="1" minFractionDigits="1"/>
     		<fmt:formatNumber var="integerAverageRating" type="number" value="${averageRating}" maxFractionDigits="0"/>
     		<c:if test="${integerAverageRating == 6}">
@@ -107,14 +107,6 @@
     			<c:set var="integerAverageRating" value="1"></c:set>
     		</c:if>
     	</c:if>
-    	<c:choose>
-			<c:when test="${ floatingAverageRating % 1 == 0 }">
-				<fmt:formatNumber var="floatingAverageRating" type="number" value="${averageRating}" maxFractionDigits="0"/>
-			</c:when>
-			<c:otherwise>
-				<fmt:formatNumber var="floatingAverageRating" type="number" value="${averageRating}" maxFractionDigits="1" minFractionDigits="1"/>
-			</c:otherwise>
-		</c:choose>
     </c:if>
 </head>
 <body>

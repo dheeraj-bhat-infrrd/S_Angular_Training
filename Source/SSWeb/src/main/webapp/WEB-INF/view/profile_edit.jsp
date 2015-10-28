@@ -441,200 +441,39 @@
 	<div class="float-left mob-icn inc-more"></div>
 </div>
 <script>
-	$(document).ready(function() {
-		
-		$('.va-dd-wrapper').perfectScrollbar({
-			suppressScrollX : true
-		});
-		$('.va-dd-wrapper').perfectScrollbar('update');
-		
-		hideOverlay();
-		countPosts();
-		$(document).attr("title", "Profile Settings");
-		
-		if ($("#da-dd-wrapper-profiles").children('.da-dd-item').length <= 1) {
-			$('#da-dd-wrapper').remove();
-		} else {
-			$('#da-dd-wrapper').show();
-		}
-		
-		adjustImage();
-		$(window).resize(adjustImage);
-		$(document).ajaxStop(function() {
-			adjustImage();
-		});
-		
-		if ($('#aboutme-status').val() != 'new') {
-			$('#intro-body-text').text($('#intro-body-text-edit').val().trim());
-		}
-		paintForProfile();
-		focusOnElement();
-		$('.ppl-share-wrapper .icn-plus-open').click(function() {
-			$(this).hide();
-			$(this).parent().find('.ppl-share-social,.icn-remove').show();
-		});
-		
-		$('#prof-post-btn').unbind('click');
-		$('#prof-post-btn').click(function() {
-			var textContent = $('#status-body-text-edit').val().trim();
-			if (textContent == undefined || textContent == "") {
-				$('#overlay-toast').html("Please enter valid data to post");
-				showToast();
-				return;
-			}
-			
-			$('#status-body-text-edit').val('');
-			var payload = {
-				"text" : textContent
-			};
-			$.ajax({
-				url : "./savestatus.do",
-				type : "POST",
-				dataType : "text",
-				async : false,
-				data : payload,
-				success : function(data) {
-					if (data.errCode == undefined)
-						success = true;
-				},
-				complete : function(data) {
-					if (success) {
-						showPosts(true);
-					}
-				},
-				error : function(e) {
-					if(e.status == 504) {
-						redirectToLoginPageOnSessionTimeOut(e.status);
-						return;
-					}
-					redirectErrorpage();
-				}
-			});
-		});
-
-	$('.ppl-share-wrapper .icn-remove').click(function() {
-		$(this).hide();
-		$(this).parent().find('.ppl-share-social').hide();
-		$(this).parent().find('.icn-plus-open').show();
+$(document).ready(function() {
+	
+	$('.va-dd-wrapper').perfectScrollbar({
+		suppressScrollX : true
 	});
-
-	$('.icn-person').on('click touchstart', function() {
-		$('.mob-icn').removeClass('mob-icn-active');
-		$(this).addClass('mob-icn-active');
-		$('#contact-wrapper').show();
-		$('#prof-agent-container').hide();
-		$('#intro-about-me').hide();
-		$('#reviews-container').hide();
-		$('#ppl-post-cont').hide();
+	$('.va-dd-wrapper').perfectScrollbar('update');
+	
+	hideOverlay();
+	countPosts();
+	$(document).attr("title", "Profile Settings");
+	
+	if ($("#da-dd-wrapper-profiles").children('.da-dd-item').length <= 1) {
+		$('#da-dd-wrapper').remove();
+	} else {
+		$('#da-dd-wrapper').show();
+	}
+	
+	adjustImage();
+	$(window).resize(adjustImage);
+	$(document).ajaxStop(function() {
 		adjustImage();
 	});
-
-	$('.icn-ppl').on('click touchstart', function() {
-		$('.mob-icn').removeClass('mob-icn-active');
-		$(this).addClass('mob-icn-active');
-		$('#ppl-post-cont').show();
-		$('#contact-wrapper').hide();
-		$('#prof-agent-container').hide();
-		$('#intro-about-me').hide();
-		$('#reviews-container').hide();
-	});
-
-	$('.icn-star-smile').on('click touchstart', function() {
-		$('.mob-icn').removeClass('mob-icn-active');
-		$(this).addClass('mob-icn-active');
-		$('#reviews-container').show();
-		$('#contact-wrapper').hide();
-		$('#prof-agent-container').hide();
-		$('#intro-about-me').hide();
-		$('#ppl-post-cont').hide();
-	});
-
-	$('.inc-more').on('click touchstart', function() {
-		$('.mob-icn').removeClass('mob-icn-active');
-		$(this).addClass('mob-icn-active');
-		$('#prof-agent-container').show();
-		$('#intro-about-me').hide();
-		$('#contact-wrapper').hide();
-		$('#reviews-container').hide();
-		$('#ppl-post-cont').hide();
-	});
-	$('#prof-basic-container').on('mouseover',function(e){
-		$('#prof-basic-container .prof-edit-field-icn').show();
-		$('#prof-basic-container .prof-edditable').addClass('prof-name-edit');
-	});
-	$('#prof-basic-container').on('mouseleave',function(e){
-		if(!$('#prof-basic-container input').is(':focus')){
-			$('#prof-basic-container .prof-edit-field-icn').hide();
-			$('#prof-basic-container .prof-edditable').removeClass('prof-name-edit');			
-		}
-	});
 	
-	$('#prof-posts').on('mouseover', '.tweet-panel-item' , function(e){
-		$(this).find('.dlt-survey-wrapper').removeClass('hide');
-	});
-
-	$('#prof-posts').on('mouseleave', '.tweet-panel-item', function(e){
-		$(this).find('.dlt-survey-wrapper').addClass('hide');
-	});
-
-	
-	$('#prof-posts').on('click' , '.post-dlt-icon' , function(e){
-		var surveyMongoId = $(this).attr('surveymongoid');
-		
-		$('#overlay-main').show();
-		$('#overlay-continue').show();
-		$('#overlay-continue').html("Delete");
-		$('#overlay-cancel').html("Cancel");
-		$('#overlay-header').html("Delete Post");
-		$('#overlay-text').html("Are you sure you want to delete the post ?");
-		$('#overlay-continue').attr("onclick", "removeUserPost('" + surveyMongoId + "');");
-
-	});
-
-});
-	
-	function removeUserPost(surveyMongoId){
-		
-		$('#overlay-continue').removeAttr("onclick");
-		$('#overlay-main').hide();
-		var payload = {
-				"statusmongoid" : surveyMongoId
-			};
-			$.ajax({
-				url : "./deletestatus.do",
-				type : "POST",
-				dataType : "text",
-				async : false,
-				data : payload,
-				success : function(data) {
-					if (data.errCode == undefined)
-						success = true;
-				},
-				complete : function(data) {
-					if (success) {
-						$('#overlay-toast').html(data.responseText);
-						showToast();
-						showPosts(true);
-					}else{
-						$('#overlay-toast').html(data.responseText);
-						showToast();
-					}
-				},
-				error : function(e) {
-					if(e.status == 504) {
-						redirectToLoginPageOnSessionTimeOut(e.status);
-						return;
-					}
-					redirectErrorpage();
-				}
-			});
-	};
-	
+	if ($('#aboutme-status').val() != 'new') {
+		$('#intro-body-text').text($('#intro-body-text-edit').val().trim());
+	}
+	paintForProfile();
+	focusOnElement();
 	$('#prof-edit-social-link').children('.social-item-icon').each(function() {
 		var dataLink = $(this).attr('data-link');
 		if(dataLink == undefined || dataLink == "") {
 			$(this).addClass('icn-social-add');
 		}
 	});
-	
+});
 </script>

@@ -343,6 +343,7 @@ public interface CommonConstants
     public static final String REGION_PROFILE_FIXED_URL = "pages";
     public static final String COMPANY_PROFILE_FIXED_URL = "pages/company";
     public static final float DEFAULT_AUTOPOST_SCORE = 3.5f;
+    public static final float DEFAULT_COMPLAINT_RES_SCORE = 2.5f;
     public static final int DEFAULT_REMINDERMAIL_INTERVAL = 3;
     public static final String USER_SELECTION_TYPE_SINGLE = "single";
     public static final String USER_SELECTION_TYPE_MULTIPLE = "multiple";
@@ -642,7 +643,7 @@ public interface CommonConstants
     public static final long DEFAULT_VERTICAL_CRM_ID = -1;
     public static final Integer DEFAULT_VERTICAL_ID = -1;
 
-    public static final int EXPIRE_AFTER_DAYS = 3;
+    public static final int EXPIRE_AFTER_DAYS = -1;
     public static final int DECIMALS_TO_ROUND_OFF = 3;
 
     //Constants for survey request send type
