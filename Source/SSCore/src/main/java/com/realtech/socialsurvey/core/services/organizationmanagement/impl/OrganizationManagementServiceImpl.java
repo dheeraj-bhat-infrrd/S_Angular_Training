@@ -4110,7 +4110,35 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
         users = new Gson().fromJson( usersJson, searchedUsersList );
         return users;
     }
+    
 
+    /**
+     * Method to get all users under the company from solr
+     * 
+     * @param company
+     * @param start
+     * @return
+     * @throws InvalidInputException
+     * @throws NoRecordsFetchedException
+     * @throws SolrException
+     */
+    @Override
+    @Transactional
+    public String getAllUsersUnderCompanyFromSolr( Company company ) throws InvalidInputException, NoRecordsFetchedException,
+        SolrException
+    {
+        if ( company == null ) {
+            throw new InvalidInputException( "company is null in getUsersUnderCompanyFromSolr" );
+        }
+        LOG.info( "Method getAllUsersUnderCompanyFromSolr called for company:" + company );
+        int usersCount = (int) solrSearchService.getUsersCountByIden( company.getCompanyId(), CommonConstants.COMPANY_ID_SOLR,
+            false );
+        Collection<UserFromSearch> usersResult = solrSearchService.searchUsersByIden( company.getCompanyId(),
+            CommonConstants.COMPANY_ID_SOLR, false, 0, usersCount );
+        String usersJson = new Gson().toJson( usersResult );
+        LOG.debug( "Solr result returned for users of company is:" + usersJson );
+        return usersJson;
+    }
 
     @Override
     @Transactional

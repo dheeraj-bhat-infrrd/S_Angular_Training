@@ -4,6 +4,7 @@ import java.net.MalformedURLException;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -81,6 +82,7 @@ import com.realtech.socialsurvey.core.services.organizationmanagement.ProfileMan
 import com.realtech.socialsurvey.core.services.organizationmanagement.ProfileNotFoundException;
 import com.realtech.socialsurvey.core.services.organizationmanagement.UserManagementService;
 import com.realtech.socialsurvey.core.services.search.SolrSearchService;
+import com.realtech.socialsurvey.core.services.search.exception.SolrException;
 import com.realtech.socialsurvey.core.services.settingsmanagement.SettingsSetter;
 import com.realtech.socialsurvey.core.services.social.SocialAsyncService;
 import com.realtech.socialsurvey.core.services.social.SocialManagementService;
@@ -2459,6 +2461,14 @@ public class SocialManagementController
             model.addAttribute( "message",
                 messageUtils.getDisplayMessage( nonFatalException.getErrorCode(), DisplayMessageType.ERROR_MESSAGE ) );
         }
+        try {
+            //Get last build time from solr for social posts
+            Date lastBuild = solrSearchService.getLastBuildTimeForSocialPosts();
+            model.addAttribute( "lastBuild", lastBuild );
+        } catch ( SolrException e ) {
+            LOG.error( "SolrException while getting last build time. Reason", e );
+        }
+        
         if ( entityType.equals( CommonConstants.COMPANY_ID_COLUMN ) ) {
             model.addAttribute( "columnName", entityType );
             model.addAttribute( "columnValue", entityId );

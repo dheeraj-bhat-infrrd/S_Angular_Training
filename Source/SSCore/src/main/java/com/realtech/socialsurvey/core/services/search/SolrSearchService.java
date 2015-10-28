@@ -6,6 +6,7 @@ package com.realtech.socialsurvey.core.services.search;
 import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.util.Collection;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -319,5 +320,8 @@ public interface SolrSearchService
 
     SolrDocumentList searchPostText( String entityType, long entityId, int startIndex, int noOfRows, String searchQuery )
         throws InvalidInputException, SolrException, MalformedURLException;
+
+
+    Date getLastBuildTimeForSocialPosts() throws SolrException;
 }
 // JIRA:SS-62 BY RM 02 EOC

@@ -1148,4 +1148,8 @@ public interface OrganizationManagementService
 
     public Boolean validateEmail( String emailId ) throws InvalidInputException;
 
+
+    String getAllUsersUnderCompanyFromSolr( Company company ) throws InvalidInputException, NoRecordsFetchedException,
+        SolrException;
+
 }

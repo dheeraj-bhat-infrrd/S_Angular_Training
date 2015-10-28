@@ -2098,52 +2098,52 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 
         //If agent, get social posts for only that agent.
         if ( entityType.equals( CommonConstants.AGENT_ID_COLUMN ) ) {
-            posts = socialPostDao.getSocialPosts( entityId, CommonConstants.AGENT_ID, startIndex, numOfRows );
+            posts = socialPostDao.getSocialPosts( entityId, CommonConstants.AGENT_ID, startIndex, numOfRows, startDate, endDate );
             //If company, get social posts for that company, all the regions, branches and agents in that company.
         } else if ( entityType.equals( CommonConstants.COMPANY_ID_COLUMN ) ) {
             //Get social posts for company
-            posts = socialPostDao.getSocialPosts( entityId, CommonConstants.COMPANY_ID, startIndex, numOfRows );
+            posts = socialPostDao.getSocialPosts( entityId, CommonConstants.COMPANY_ID, startIndex, numOfRows, startDate, endDate );
             Company company = organizationManagementService.getCompanyById( entityId );
             //Get social posts for all the regions in the company.
             for ( Region region : company.getRegions() ) {
                 posts.addAll( socialPostDao.getSocialPosts( region.getRegionId(), CommonConstants.REGION_ID, startIndex,
-                    numOfRows ) );
+                    numOfRows, startDate, endDate ) );
             }
             //Get social posts for all the branches in the company
             for ( Branch branch : company.getBranches() ) {
                 posts.addAll( socialPostDao.getSocialPosts( branch.getBranchId(), CommonConstants.BRANCH_ID, startIndex,
-                    numOfRows ) );
+                    numOfRows, startDate, endDate ) );
             }
             //Get social posts for all the users in the company
             for ( User user : company.getUsers() ) {
                 posts
-                    .addAll( socialPostDao.getSocialPosts( user.getUserId(), CommonConstants.AGENT_ID, startIndex, numOfRows ) );
+                    .addAll( socialPostDao.getSocialPosts( user.getUserId(), CommonConstants.AGENT_ID, startIndex, numOfRows, startDate, endDate ) );
             }
             //Get all social posts for region
         } else if ( entityType.equals( CommonConstants.REGION_ID_COLUMN ) ) {
             Region region = userManagementService.getRegionById( entityId );
             //Get social posts for the region
-            posts = socialPostDao.getSocialPosts( entityId, CommonConstants.REGION_ID, startIndex, numOfRows );
+            posts = socialPostDao.getSocialPosts( entityId, CommonConstants.REGION_ID, startIndex, numOfRows, startDate, endDate );
             //Get social posts for all the branches in the region
             for ( Branch branch : region.getBranches() ) {
                 posts.addAll( socialPostDao.getSocialPosts( branch.getBranchId(), CommonConstants.BRANCH_ID, startIndex,
-                    numOfRows ) );
+                    numOfRows, startDate, endDate ) );
             }
             //Get social posts for all the users in the region
             
             if (  getIndividualsByRegionId( entityId ) != null ) {
                 for ( AgentSettings user : getIndividualsByRegionId( entityId ) ) {
-                    posts.addAll( socialPostDao.getSocialPosts( user.getIden(), CommonConstants.AGENT_ID, startIndex, numOfRows ) );
+                    posts.addAll( socialPostDao.getSocialPosts( user.getIden(), CommonConstants.AGENT_ID, startIndex, numOfRows, startDate, endDate ) );
                 }
             }
             //Get all social posts for branch
         } else if ( entityType.equals( CommonConstants.BRANCH_ID_COLUMN ) ) {
             //Get social posts for the branch
-            posts = socialPostDao.getSocialPosts( entityId, CommonConstants.BRANCH_ID, startIndex, numOfRows );
+            posts = socialPostDao.getSocialPosts( entityId, CommonConstants.BRANCH_ID, startIndex, numOfRows, startDate, endDate );
             //Get social posts for all the users in the branch
             if ( getIndividualsByBranchId( entityId ) != null ) {
                 for ( AgentSettings user : getIndividualsByBranchId( entityId ) ) {
-                    posts.addAll( socialPostDao.getSocialPosts( user.getIden(), CommonConstants.AGENT_ID, startIndex, numOfRows ) );
+                    posts.addAll( socialPostDao.getSocialPosts( user.getIden(), CommonConstants.AGENT_ID, startIndex, numOfRows, startDate, endDate ) );
                 }
             }
         }

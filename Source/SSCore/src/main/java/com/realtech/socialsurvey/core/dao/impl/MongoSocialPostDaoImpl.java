@@ -2,6 +2,7 @@ package com.realtech.socialsurvey.core.dao.impl;
 
 import java.util.Date;
 import java.util.List;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,6 +11,7 @@ import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Repository;
+
 import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.dao.SocialPostDao;
 import com.realtech.socialsurvey.core.entities.SocialPost;
@@ -69,12 +71,13 @@ public class MongoSocialPostDaoImpl implements SocialPostDao {
         return getSocialPosts( iden, key, skip, limit, null, null );
     }
 
-	// Method to fetch social posts for a particular user given the start date and end date
+
+    // Method to fetch social posts for a particular user given the start date and end date
     @Override
     public List<SocialPost> getSocialPosts( long iden, String key, int skip, int limit, Date startDate, Date endDate )
     {
         LOG.info( "Fetching Social Posts" );
-        Query query = new Query( Criteria.where( key ).is( iden ) );
+        Query query = new Query();
         query.fields().include( KEY_POST_ID );
         query.fields().include( KEY_POST_TEXT );
         query.fields().include( KEY_POSTED_BY );
@@ -86,13 +89,23 @@ public class MongoSocialPostDaoImpl implements SocialPostDao {
         query.fields().include( KEY_BRANCH_ID );
         query.fields().include( KEY_REGION_ID );
         query.fields().include( KEY_COMPANY_ID );
-        
 
-        if ( startDate != null ) {
+
+        if ( startDate != null && endDate == null ) {
+            query.addCriteria( Criteria.where( key ).is( iden ) );
             query.addCriteria( Criteria.where( KEY_TIME_IN_MILLIS ).gte( startDate.getTime() ) );
         }
-        if ( endDate != null ) {
+        if ( endDate != null && startDate == null ) {
+            query.addCriteria( Criteria.where( key ).is( iden ) );
             query.addCriteria( Criteria.where( KEY_TIME_IN_MILLIS ).lte( endDate.getTime() ) );
+        } else if ( startDate != null && endDate != null ) {
+            query.addCriteria( Criteria
+                .where( key )
+                .is( iden )
+                .andOperator( Criteria.where( KEY_TIME_IN_MILLIS ).gte( startDate.getTime() ),
+                    Criteria.where( KEY_TIME_IN_MILLIS ).lte( endDate.getTime() ) ) );
+        } else {
+            query.addCriteria( Criteria.where( key ).is( iden ) );
         }
         if ( skip != -1 )
             query.skip( skip );

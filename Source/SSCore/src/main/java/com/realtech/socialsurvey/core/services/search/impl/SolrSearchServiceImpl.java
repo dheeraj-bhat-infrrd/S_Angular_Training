@@ -5,6 +5,7 @@ import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
@@ -12,11 +13,14 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
+
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrQuery.ORDER;
 import org.apache.solr.client.solrj.SolrServer;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.impl.HttpSolrServer;
+import org.apache.solr.client.solrj.request.LukeRequest;
+import org.apache.solr.client.solrj.response.LukeResponse;
 import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.client.solrj.response.UpdateResponse;
 import org.apache.solr.common.SolrDocument;
@@ -27,6 +31,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
+
 import com.google.gson.Gson;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.dao.OrganizationUnitSettingsDao;
@@ -72,7 +77,7 @@ public class SolrSearchServiceImpl implements SolrSearchService
 
     @Value ( "${SOLR_SOCIAL_POST_URL}")
     private String solrSocialPostUrl;
-
+    
     @Autowired
     private SolrSearchUtils solrSearchUtils;
 
@@ -2010,5 +2015,43 @@ public class SolrSearchServiceImpl implements SolrSearchService
         }
 
         return matchedUsers.values();
+    }
+    
+
+    /**
+     * Method to get last build time for social posts in Solr(Social Monitor)
+     * @return
+     * @throws SolrException 
+     * @throws SolrServerException 
+     */
+    @Override
+    public Date getLastBuildTimeForSocialPosts() throws SolrException
+    {
+        LOG.info( "Method getLastBuildTimeForSocialPosts() started" );
+        LukeResponse response = null;
+        Date lastBuildTime = null;
+        //Luke request handler gives the last commitTimeMSec
+        SolrServer solrServer = new HttpSolrServer( solrSocialPostUrl );
+        LukeRequest luke = new LukeRequest();
+        luke.setShowSchema( false );
+        try {
+            response = luke.process( solrServer );
+            if ( response != null ) {
+                //Get the lastModified field from the luke response
+                lastBuildTime = (Date) response.getIndexInfo().get( CommonConstants.LUKE_LAST_MODIFIED );
+                if ( lastBuildTime != null ) {
+                    LOG.debug( "Last Build Time : " + lastBuildTime );
+                } else {
+                    throw new SolrException( "The lastModified field is empty" );
+                }
+            } else {
+                throw new SolrException( "The response is empty" );
+            }
+        } catch ( SolrServerException | IOException e ) {
+            LOG.error( "Error getting response from LukeRequest" );
+            throw new SolrException( "Error getting response from LukeRequest" );
+        }
+        LOG.info( "Method getLastBuildTimeForSocialPosts() finished" );
+        return lastBuildTime;
     }
 }
