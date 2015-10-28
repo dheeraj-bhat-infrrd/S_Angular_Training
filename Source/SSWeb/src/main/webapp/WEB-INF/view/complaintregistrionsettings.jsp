@@ -46,7 +46,7 @@
 					<div class="float-left compl-option-sel">
 						<input type="text" name="rating" id="comp-rating-post"
 							class="st-item-row-txt cursor-pointer dd-arrow-dn comp-rating-post"
-							autocomplete="off" value="${complaintRegSettings.rating}">
+							autocomplete="off" value="${complaintRegSettings.rating}" readonly>
 						<div class="st-dd-wrapper hide" id="st-dd-wrapper-min-post"></div>
 					</div>
 					<div class="float-left compl-option-sel">
@@ -83,7 +83,7 @@
 
 <script>
 	$(document).ready(function() {
-		$(document).attr("title", "Complaint Registration Settings");
+		$(document).attr("title", "Complaint Resolution Settings" );
 		
 		if (${complaintRegSettings.enabled}) {
 			$('#compl-checkbox').removeClass('bd-check-img-checked');

@@ -620,8 +620,8 @@ public class AdminController
         Map<String, String> map = new HashMap<String, String>();
         boolean error = false;
         String companyId = request.getParameter( "companyId" );
-        String apiKey = request.getParameter( "API_KEY" );
-        String apiSecret = request.getParameter( "API_SECRET" );
+        String apiKey = request.getParameter( "apiKey" );
+        String apiSecret = request.getParameter( "apiSecret" );
         if ( companyId == null || companyId.isEmpty() ) {
             message = DisplayMessageConstants.INVALID_COMPANY_ID;
             error = true;

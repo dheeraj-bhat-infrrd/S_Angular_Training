@@ -39,17 +39,16 @@ import com.realtech.socialsurvey.core.dao.impl.MongoOrganizationUnitSettingDaoIm
 import com.realtech.socialsurvey.core.entities.AbusiveSurveyReportWrapper;
 import com.realtech.socialsurvey.core.entities.AgentMediaPostDetails;
 import com.realtech.socialsurvey.core.entities.AgentSettings;
-
+import com.realtech.socialsurvey.core.entities.Branch;
 import com.realtech.socialsurvey.core.entities.BranchMediaPostDetails;
 import com.realtech.socialsurvey.core.entities.BulkSurveyDetail;
-import com.realtech.socialsurvey.core.entities.Branch;
 import com.realtech.socialsurvey.core.entities.Company;
 import com.realtech.socialsurvey.core.entities.CompanyMediaPostDetails;
 import com.realtech.socialsurvey.core.entities.MailContent;
 import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
+import com.realtech.socialsurvey.core.entities.Region;
 import com.realtech.socialsurvey.core.entities.RegionMediaPostDetails;
 import com.realtech.socialsurvey.core.entities.SocialMediaPostDetails;
-import com.realtech.socialsurvey.core.entities.Region;
 import com.realtech.socialsurvey.core.entities.SurveyDetails;
 import com.realtech.socialsurvey.core.entities.SurveyPreInitiation;
 import com.realtech.socialsurvey.core.entities.SurveyResponse;
@@ -2050,27 +2049,36 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
                     status = CommonConstants.BULK_SURVEY_INVALID;
                     error = true;
                 }
+                User user = null;
                 if ( !error ) {
-                    LOG.debug( "This survey contains valid data " );
-                    message = "Valid Survey";
-                    SurveyPreInitiation surveyPreInitiation = createSurveyPreInitiationFromBulkSurvey( bulkSurveyDetail,
-                        companyId );
+                    String agentEmailId = bulkSurveyDetail.getAgentEmailId();
                     try {
-                        HashMap<String, Object> queries = new HashMap<>();
-                        queries.put( CommonConstants.SURVEY_AGENT_EMAIL_ID_COLUMN, surveyPreInitiation.getAgentEmailId() );
-                        queries.put( CommonConstants.CUSTOMER_EMAIL_ID_KEY_COLUMN, surveyPreInitiation.getCustomerEmailId() );
-                        List<SurveyPreInitiation> incompleteSurveyCustomers = surveyPreInitiationDao.findByKeyValue(
-                            SurveyPreInitiation.class, queries );
-                        if ( incompleteSurveyCustomers != null && incompleteSurveyCustomers.size() > 0 ) {
-                            LOG.warn( "Survey request already sent" );
-                            surveyPreInitiation.setStatus( CommonConstants.STATUS_SURVEYPREINITIATION_DUPLICATE_RECORD );
-                            status = CommonConstants.BULK_SURVEY_INVALID;
-                            message = "Duplicate Survey";
-                        }
-                        saveSurveyPreInitiationObject( surveyPreInitiation );
+                        user = userManagementService.getUserByEmailAndCompany( companyId, agentEmailId );
                     } catch ( InvalidInputException e ) {
-                        message = "Not Able to store this survey ";
+                        message = "Agent does not belong to this Company " + companyId;
                         status = CommonConstants.BULK_SURVEY_INVALID;
+                        error = true;
+                    } catch ( NoRecordsFetchedException e ) {
+                        message = "Agent does not belong to this Company " + companyId;
+                        status = CommonConstants.BULK_SURVEY_INVALID;
+                        error = true;
+                    }
+                    if ( user == null ) {
+                        message = "Agent does not belong to this Company ";
+                        status = CommonConstants.BULK_SURVEY_INVALID;
+                        error = true;
+                    }
+                }
+                if ( !error ) {
+                    try {
+                        initiateSurveyRequest( user.getUserId(), bulkSurveyDetail.getCustomerEmailId(),
+                            bulkSurveyDetail.getCustomerFirstName(), bulkSurveyDetail.getCustomerLastName(),
+                            CommonConstants.SURVEY_SOURCE_BULK_UPLOAD );
+                        status = CommonConstants.BULK_SURVEY_VALID;
+                    } catch ( DuplicateSurveyRequestException | InvalidInputException | SelfSurveyInitiationException
+                        | SolrException | NoRecordsFetchedException | UndeliveredEmailException | ProfileNotFoundException e ) {
+                        status = CommonConstants.BULK_SURVEY_INVALID;
+                        message = e.getMessage();
                     }
                 }
                 bulkSurveyDetail.setStatus( status );
@@ -2083,59 +2091,6 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
 
         }
         return list;
-    }
-
-
-    private SurveyPreInitiation createSurveyPreInitiationFromBulkSurvey( BulkSurveyDetail bulkSurveyDetail, long companyId )
-    {
-        LOG.info( "Inside method bulkSurveyDetail" );
-        SurveyPreInitiation surveyPreInitiation = new SurveyPreInitiation();
-
-        surveyPreInitiation.setCreatedOn( new Timestamp( System.currentTimeMillis() ) );
-        surveyPreInitiation.setModifiedOn( new Timestamp( System.currentTimeMillis() ) );
-        surveyPreInitiation.setCustomerEmailId( bulkSurveyDetail.getCustomerEmailId() );
-        surveyPreInitiation.setCustomerFirstName( bulkSurveyDetail.getCustomerFirstName() );
-        surveyPreInitiation.setLastReminderTime( utils.convertEpochDateToTimestamp() );
-        if ( bulkSurveyDetail.getLoanClosedDate() == null || bulkSurveyDetail.getLoanClosedDate().isEmpty() ) {
-            surveyPreInitiation.setEngagementClosedTime( new Timestamp( System.currentTimeMillis() ) );
-        } else {
-            surveyPreInitiation.setEngagementClosedTime( convertStringToTimestamp( bulkSurveyDetail.getLoanClosedDate() ) );
-        }
-        surveyPreInitiation.setAgentId( 0 );
-        surveyPreInitiation.setAgentEmailId( bulkSurveyDetail.getAgentEmailId() );
-        surveyPreInitiation.setCollectionName( MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION );
-        surveyPreInitiation.setCompanyId( companyId );
-        if ( bulkSurveyDetail.getCustomerLastName() != null ) {
-            surveyPreInitiation.setCustomerLastName( bulkSurveyDetail.getCustomerLastName() );
-        }
-        if ( bulkSurveyDetail.getAgentLastName() != null ) {
-            surveyPreInitiation.setAgentName( bulkSurveyDetail.getAgentFirstName() + " " + bulkSurveyDetail.getAgentLastName() );
-        } else {
-            surveyPreInitiation.setAgentName( bulkSurveyDetail.getAgentFirstName() );
-        }
-        surveyPreInitiation.setStatus( CommonConstants.STATUS_SURVEYPREINITIATION_NOT_PROCESSED );
-        surveyPreInitiation.setSurveySource( CommonConstants.SURVEY_SOURCE_BULK_UPLOAD );
-        return surveyPreInitiation;
-
-
-    }
-
-
-    private Timestamp convertStringToTimestamp( String dateString )
-    {
-        DateFormat format = new SimpleDateFormat( "MMMM d, yyyy", Locale.ENGLISH );
-        Date date = null;
-
-        try {
-            date = format.parse( dateString );
-        } catch ( ParseException e ) {
-            LOG.error( "Exception caught ", e );
-        }
-        Calendar cal = Calendar.getInstance();
-        cal.setTime( date );
-        cal.set( Calendar.MILLISECOND, 0 );
-
-        return ( new java.sql.Timestamp( cal.getTimeInMillis() ) );
     }
 
 
