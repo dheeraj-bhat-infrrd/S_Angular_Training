@@ -4184,7 +4184,6 @@ img.prof-image {
 }
 
 .dash-btn-dl-sd-admin {
-	clear: both;
 	float: right;
 	margin-right: 10px;
 	color: #009FE0;
@@ -4201,6 +4200,7 @@ img.prof-image {
 }
 
 .sm-btn-dl-sd-admin{
+	clear: both;
 	float: right;
 	margin-right: 10px;
 	color: #009FE0;
@@ -4208,7 +4208,7 @@ img.prof-image {
 	line-height: 32px;
 	border: 1px solid #009FE0;
 	height: 32px;
-	width: 500px;
+	width: 360px;
 	max-width: 90%;
 	max-width: calc(100% - 20px);
 	text-align: center;
@@ -7116,6 +7116,14 @@ a.sq-btn-post-social:hover, a.sq-btn-post-social:visited {
   height: 30px;
 }
 
+.sm-down-rep-button{
+  width: 40.5%;
+  float: right;
+  background-color: #009FE0;
+  color: white;
+  height: 30px;
+}
+
 .jcrop-img-upload {
 	max-width: 470px;
 	max-height: 470px;
@@ -7729,4 +7737,12 @@ label.url-change-input-label {
 .comp-rating-post {
 	height: 40px;
 	line-height: 40px;
+}
+
+.search-panel-item {
+	margin-left: 10px;
+}
+
+.search-panel {
+	margin-bottom: 27px;
 }
