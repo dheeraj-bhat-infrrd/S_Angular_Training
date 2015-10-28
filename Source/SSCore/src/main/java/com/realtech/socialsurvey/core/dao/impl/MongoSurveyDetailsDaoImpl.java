@@ -14,6 +14,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,6 +27,7 @@ import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Repository;
+
 import com.mongodb.BasicDBObject;
 import com.mongodb.DBObject;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
@@ -778,7 +780,7 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
          * fetching only completed surveys
          */
         query.addCriteria( Criteria.where( CommonConstants.STAGE_COLUMN ).is( CommonConstants.SURVEY_STAGE_COMPLETE ) );
-
+        query.fields().exclude( "surveyResponse" );
         if ( startDate != null && endDate != null ) {
             query.addCriteria( Criteria.where( CommonConstants.MODIFIED_ON_COLUMN ).gte( startDate )
                 .andOperator( Criteria.where( CommonConstants.MODIFIED_ON_COLUMN ).lte( endDate ) ) );
@@ -1956,5 +1958,44 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
         long count = mongoTemplate.find( query, SurveyDetails.class, SURVEY_DETAILS_COLLECTION ).size();
         LOG.info( "Method getSurveysUnderResolutionCount() to get count of surveys marked as abusive for a company finished." );
         return count;
+    }
+
+
+    /*
+     * 
+     */
+    @Override
+    public Map<Long, Integer> getSurveyCountInATimePeriod( String columnName, long startDate, double startScore,
+        double limitScore, boolean fetchAbusive ) throws ParseException
+    {
+        LOG.info( "Method to get getSurveyCountInATimePeriod called" );
+        TypedAggregation<SurveyDetails> aggregation;
+
+        Criteria scoreCriteria = new Criteria().andOperator( Criteria.where( CommonConstants.SCORE_COLUMN ).gte( startScore ),
+            Criteria.where( CommonConstants.SCORE_COLUMN ).lte( limitScore ) );
+
+        Criteria fetchAbusiveCriteria = Criteria.where( CommonConstants.IS_ABUSIVE_COLUMN ).is( fetchAbusive );
+        Date date = new Date( startDate );
+
+        aggregation = new TypedAggregation<SurveyDetails>( SurveyDetails.class, Aggregation.match( Criteria.where(
+            CommonConstants.MODIFIED_ON_COLUMN ).gte( date ) ), Aggregation.match( fetchAbusiveCriteria ),
+            Aggregation.match( scoreCriteria ), Aggregation.match( Criteria.where( CommonConstants.STAGE_COLUMN ).is(
+                CommonConstants.SURVEY_STAGE_COMPLETE ) ), Aggregation.group( columnName ).count()
+                .as( "count" ) );
+
+
+        AggregationResults<SurveyDetails> result = mongoTemplate.aggregate( aggregation, SURVEY_DETAILS_COLLECTION,
+            SurveyDetails.class );
+        Map<Long, Integer> surveyCountForEntities = new HashMap<>();
+
+
+        @SuppressWarnings ( "unchecked") List<BasicDBObject> surveyCountList = (List<BasicDBObject>) result.getRawResults()
+            .get( "result" );
+        for ( BasicDBObject o : surveyCountList ) {
+            surveyCountForEntities.put( Long.parseLong( o.get( CommonConstants.DEFAULT_MONGO_ID_COLUMN ).toString() ),
+                Integer.parseInt( o.get( "count" ).toString() ) );
+        }
+
+        return surveyCountForEntities;
     }
 }
