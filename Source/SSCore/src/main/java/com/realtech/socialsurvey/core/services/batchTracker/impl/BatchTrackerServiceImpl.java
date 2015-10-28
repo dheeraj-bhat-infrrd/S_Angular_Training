@@ -2,6 +2,7 @@ package com.realtech.socialsurvey.core.services.batchTracker.impl;
 
 import java.sql.Timestamp;
 import java.text.ParseException;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -45,12 +46,13 @@ public class BatchTrackerServiceImpl implements BatchTrackerService
     public long getLastRunTimeByBatchType( String batchType ) throws NoRecordsFetchedException
     {
         LOG.debug( "method getLastRunTimeByBatchType() started for batch type : " + batchType );
-        List<BatchTracker> batchTrackerList = batchTrackerDao.findByColumn( BatchTracker.class,
-            CommonConstants.BATCH_TYPE_COLUMN, batchType );
-        if ( batchTrackerList.size() <= 0 || batchTrackerList.get( CommonConstants.INITIAL_INDEX ) == null ) {
-            throw new NoRecordsFetchedException( "No record Fatched For batch type : " + batchType );
-        }
 
+        HashMap<String, Object> queries = new HashMap<>();
+        queries.put( "batchType", batchType );
+        List<BatchTracker> batchTrackerList = batchTrackerDao.findByKeyValue( BatchTracker.class, queries );
+        if ( batchTrackerList == null || batchTrackerList.isEmpty() ) {
+            throw new NoRecordsFetchedException( "Invalid batch type" );
+        }
         BatchTracker batchTracker = batchTrackerList.get( CommonConstants.INITIAL_INDEX );
 
         LOG.debug( "method getLastRunTimeByBatchType() ended for batch type : " + batchType );
