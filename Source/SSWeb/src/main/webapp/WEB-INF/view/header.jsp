@@ -129,6 +129,11 @@
 						<a href="javascript:showMainContent('./showcompanysettings.do')"><spring:message code="label.editsettings.key" /></a>
 					</div>
 				</c:if>
+				<c:if test="${highestrole == 1}">
+					<div class="header-links-item">
+						<a href="javascript:showMainContent('./showcomplaintressettings.do')"><spring:message code="label.complaintregsettings.key" /></a>
+					</div>
+				</c:if>
 				<!-- show apps for company admin other then free account -->
 				<c:if test="${highestrole == 1 && accountMasterId != 5}">
 					<div class="header-links-item">
@@ -195,6 +200,9 @@
 								<spring:message code="label.settings.key" />
 							</div>
 							<c:if test="${highestrole == 1}">
+								<div class="hdr-link-item-dropdown-item" onclick="showMainContent('./showcomplaintressettings.do');">
+									<spring:message code="label.complaintregsettings.key" />
+								</div>
 								<div class="hdr-link-item-dropdown-item" onclick="showMainContent('./showemailsettings.do');">
 									<spring:message code="label.emailsettings.key" />
 								</div>
@@ -248,12 +256,10 @@
 									<spring:message code="label.switch.key" />
 								</div>
 							</c:when>
-							<c:otherwise>
-								<div class="initial-dd-item" onclick="userLogout();">
-									<spring:message code="label.logout.key" />
-								</div>
-							</c:otherwise>
 						</c:choose>
+						<div class="initial-dd-item" id="user-logout" onclick="userLogout();">
+							<spring:message code="label.logout.key" />
+						</div>
 					</div>
 				</div>
                 <c:if test="${displaylogo != null}">

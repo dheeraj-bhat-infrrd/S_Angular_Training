@@ -1274,7 +1274,8 @@ $(document).on('click', '.bd-q-pu-close', function() {
 });
 
 // Question edit
-$(document).on('click', '.srv-tbl-edit', function() {
+$(document).on('click touchstart', '.srv-tbl-edit', function(e) {
+	e.stopPropagation();
 	var questionId = $(this).parent().parent().data('questionid');
 	var url = "./getsurveyquestion.do?questionId=" + questionId;
 
@@ -1529,7 +1530,8 @@ $(document).on('click', '.srv-tbl-rem', function(e){
 });
 
 // Reorder Question in survey
-$(document).on('click', '.srv-tbl-move-up', function(){
+$(document).on('click touchstart', '.srv-tbl-move-up', function(e){
+	e.stopPropagation();
 	var formData = new FormData();
 	formData.append("questionId", $(this).parent().parent().data('questionid'));
 	formData.append("reorderType", "up");
@@ -1537,7 +1539,8 @@ $(document).on('click', '.srv-tbl-move-up', function(){
 	callAjaxPOSTWithTextData("./reorderQuestion.do", commonActiveSurveyCallback, true, formData);
 });
 
-$(document).on('click', '.srv-tbl-move-dn', function(){
+$(document).on('click touchstart', '.srv-tbl-move-dn', function(e){
+	e.stopPropagation();
 	var formData = new FormData();
 	formData.append("questionId", $(this).parent().parent().data('questionid'));
 	formData.append("reorderType", "down");
@@ -3248,6 +3251,15 @@ function autoAppendRatingDropdown(ratingId, classes) {
 	autoAppendDropdown(ratingId, classes, 5, 0.5);
 }
 
+//Ratings Settings
+function autoAppendRatingDropdownComplaint(ratingId, classes, maxPoint, minPoint, diff) {
+	var value = diff;
+	while (maxPoint >= minPoint) {
+		$(ratingId).append($('<div/>').addClass(classes).text(maxPoint));
+		maxPoint -= diff;
+	}
+}
+
 function updatePostScore(formid) {
 	var url = "./updatesurveysettings.do";
 	callAjaxFormSubmit(url, updatePostScoreCallBack, formid);
@@ -4815,7 +4827,8 @@ function paginateUsersProList(response) {
 				}
 				
 				$('#pro-total-pages').text(totalPage);
-			}			
+			} 
+			$('#srch-num-list').show();
 		}
 		paintProList(reponseJson.users);
 	}
@@ -7103,7 +7116,7 @@ function updateYelpLink(link) {
 	};
 	if (isValidUrl(link)) {
 		callAjaxPostWithPayloadData("./updateyelplink.do", callBackUpdateSocialLink, payload);
-        $('#icn-yelp').attr("data-link", link);
+		showProfileLinkInEditProfilePage("yelp", link);
 	} else {
 		$('#overlay-toast').html("Enter a valid url");
 		showToast();
@@ -7121,7 +7134,7 @@ function updateYelpLink(link) {
 	$('#social-token-text').val(link);
 });*/
 
-function updateZillowLink(link) {
+/*function updateZillowLink(link) {
 	var payload = {
 		"zillowlink" : link
 	};
@@ -7132,7 +7145,7 @@ function updateZillowLink(link) {
 		$('#overlay-toast').html("Enter a valid url");
 		showToast();
 	}
-}
+}*/
 
 // Update Social links - lendingTree
 $('body').on('click', '#prof-edit-social-link .icn-lendingtree', function() {
@@ -7151,7 +7164,7 @@ function updateLendingTreeLink(link) {
 	};
 	if (isValidUrl(link)) {
 		callAjaxPostWithPayloadData("./updatelendingtreelink.do", callBackUpdateSocialLink, payload);
-        $('#icn-lendingtree').attr("data-link", link);
+		showProfileLinkInEditProfilePage("lendingtree", link);
 	} else {
 		$('#overlay-toast').html("Enter a valid url");
 		showToast();
@@ -7174,7 +7187,7 @@ function updateRealtorLink(link) {
 	};
 	if (isValidUrl(link)) {
 		callAjaxPostWithPayloadData("./updateRealtorlink.do", callBackUpdateSocialLink, payload);
-        $('#icn-realtor').attr("data-link", link);
+		showProfileLinkInEditProfilePage("realtor", link);
 	} else {
 		$('#overlay-toast').html("Enter a valid url");
 		showToast();
@@ -7185,7 +7198,6 @@ function callBackUpdateSocialLink(data) {
 	$('#prof-message-header').html(data);
 	$('#overlay-toast').html($('#display-msg-div').text().trim());
 	showToast();
-	
 	$('#social-token-text').val('');
 }
 
@@ -7202,7 +7214,7 @@ function isValidUrl(url){
 function adjustImage() {
 	var windW = window.innerWidth;
 	if (windW < 768) {
-		//$('.mobile-tabs').children('.mob-icn-active').click();
+		$('.mobile-tabs').children('.mob-icn-active').click();
 		var imgW = $('#prof-image').width();
 		$('#prof-image').height(imgW * 0.7);
 		var h2 = $('.prog-img-container').height() - 11;
@@ -7215,8 +7227,10 @@ function adjustImage() {
 		var rowW = $('.lp-con-row').width() - 50 - 50; // left image-50;
 														// right-locks-50
 		$('.lp-con-row-item').width(rowW + 'px');
-		// $('.lp-con-row-item').width('auto');
 		$('.footer-main-wrapper').show();
+		//show all the containers
+        $('#reviews-container, #prof-company-intro, #prof-agent-container').show();
+        $('#recent-post-container, #ppl-post-cont, #contact-wrapper, #intro-about-me').show();
 	}
 }
 
@@ -8558,18 +8572,23 @@ function disconnectSocialMedia(socialMedia) {
 
 
 function showProfileLinkInEditProfilePage(source, profileUrl){
-	if(source=='facebook'){
-		$('#edt-prof-fb-lnk').html(profileUrl);
-	}
-	else if(source=='twitter'){
-		$('#edt-prof-twt-lnk').html(profileUrl);
-	}
-	else if(source=='linkedin'){
-		$('#edt-prof-linkedin-lnk').html(profileUrl);
-	}
-	else if(source=='google'){
-		$('#edt-prof-ggl-lnk').html(profileUrl);
-	}
+	$('.social-item-icon[data-source="' + source + '"').attr('data-link',
+			profileUrl).removeClass('icn-social-add');
+}
+
+function showSurveysUnderResolution(startIndexCmp, batchSizeCmp){
+	var payload = {
+			"startIndex" : startIndexCmp,
+			"batchSize" : batchSizeCmp
+		};
+		callAjaxGetWithPayloadData("./fetchsurveysunderresolution.do", function(data) {
+			if (startIndexCmp == 0)
+				$('#sur-under-res-list').html(data);
+			else
+				$('#sur-under-res-list').append(data);
+			
+			startIndexCmp += batchSizeCmp;
+		}, payload, false);
 }
 
 // Send Survey Agent
@@ -8839,6 +8858,13 @@ $('body').on('click','.st-dd-item-auto-post',function() {
 });
 
 $('body').on('click','.st-dd-item-min-post',function() {
+	var pageHash = window.location.hash;
+	if(pageHash.toLowerCase() == "#showcomplaintressettings") {
+		$('#comp-rating-post').val($(this).html());
+		$('#st-dd-wrapper-min-post').slideToggle(200);
+		return;
+	}
+	
 	$('#rating-min-post').val($(this).html());
 	$('#st-dd-wrapper-min-post').slideToggle(200);
 	
@@ -9078,3 +9104,154 @@ function getImageandCaptionProfile(loop) {
 	}
 
 }
+
+//complaint registration event binding
+$(document).on('click','#comp-reg-form-submit',function(){
+	if(validateComplaintRegistraionForm()) {
+		var formData = $('#comp-reg-form').serialize();
+		callAjaxPostWithPayloadData("/updatecomplaintressettings.do", function(data){
+			$('#overlay-toast').html(data);
+			showToast();
+		}, formData,  true );
+	}
+});
+
+$(document).on('click touchstart','#compl-checkbox', function() {
+	if($(this).hasClass('bd-check-img-checked')) {
+		if(validateMultipleEmailIds('comp-mailId')) {
+			$(this).removeClass('bd-check-img-checked');
+			$('input[name="enabled"]').prop( "checked" , true);
+			$('input[name="enabled"]').val("enable");
+		}
+	} else {
+			$(this).addClass('bd-check-img-checked');
+			$('input[name="enabled"]').prop( "checked" , false);
+			$('input[name="enabled"]').val("");
+	}
+});
+
+//function to remove social post
+function removeUserPost(surveyMongoId) {
+
+	$('#overlay-continue').removeAttr("onclick");
+	$('#overlay-main').hide();
+	var payload = {
+		"statusmongoid" : surveyMongoId
+	};
+	
+	callAjaxPostWithPayloadData("./deletestatus.do", function(data) {
+		if (data.errCode == undefined) {
+			$('#overlay-toast').html(data.responseText);
+			showToast();
+			showPosts(true);
+		} else {
+			$('#overlay-toast').html(data.responseText);
+			showToast();
+		}
+	}, payload, true);
+}
+
+//Edit profile events
+$(document).on('click', '#prof-post-btn', function() {
+	var textContent = $('#status-body-text-edit').val().trim();
+	if (textContent == undefined || textContent == "") {
+		$('#overlay-toast').html("Please enter valid data to post");
+		showToast();
+		return;
+	}
+	
+	$('#status-body-text-edit').val('');
+	var payload = {
+		"text" : textContent
+	};
+	
+
+	callAjaxPostWithPayloadData("./savestatus.do", function(data) {
+		if (data.errCode == undefined) {
+			showPosts(true);
+		}
+	}, payload, true);
+});
+
+$(document).on('click', '.ppl-share-wrapper .icn-remove', function() {
+	$(this).hide();
+	$(this).parent().find('.ppl-share-social').hide();
+	$(this).parent().find('.icn-plus-open').show();
+});
+
+$(document).on('click touchstart', '.icn-person', function() {
+	$('.mob-icn').removeClass('mob-icn-active');
+	$(this).addClass('mob-icn-active');
+	$('#contact-wrapper').show();
+	$('#prof-agent-container').hide();
+	$('#intro-about-me').hide();
+	$('#reviews-container').hide();
+	$('#ppl-post-cont').hide();
+});
+
+$(document).on('click touchstart', '.icn-ppl', function() {
+	$('.mob-icn').removeClass('mob-icn-active');
+	$(this).addClass('mob-icn-active');
+	$('#ppl-post-cont').show();
+	$('#contact-wrapper').hide();
+	$('#prof-agent-container').hide();
+	$('#intro-about-me').hide();
+	$('#reviews-container').hide();
+});
+
+$(document).on('click touchstart', '.icn-star-smile', function() {
+	$('.mob-icn').removeClass('mob-icn-active');
+	$(this).addClass('mob-icn-active');
+	$('#reviews-container').show();
+	$('#contact-wrapper').hide();
+	$('#prof-agent-container').hide();
+	$('#intro-about-me').hide();
+	$('#ppl-post-cont').hide();
+});
+
+$(document).on('click touchstart', '.inc-more', function() {
+	$('.mob-icn').removeClass('mob-icn-active');
+	$(this).addClass('mob-icn-active');
+	$('#prof-agent-container').show();
+	$('#intro-about-me').hide();
+	$('#contact-wrapper').hide();
+	$('#reviews-container').hide();
+	$('#ppl-post-cont').hide();
+});
+
+$(document).on('mouseover', '#prof-basic-container', function(e){
+	$('#prof-basic-container .prof-edit-field-icn').show();
+	$('#prof-basic-container .prof-edditable').addClass('prof-name-edit');
+});
+$(document).on('mouseleave', '#prof-basic-container', function(e){
+	if(!$('#prof-basic-container input').is(':focus')){
+		$('#prof-basic-container .prof-edit-field-icn').hide();
+		$('#prof-basic-container .prof-edditable').removeClass('prof-name-edit');			
+	}
+});
+
+$(document).on('mouseover', '#prof-posts .tweet-panel-item' , function(e){
+	$(this).find('.dlt-survey-wrapper').removeClass('hide');
+});
+
+$(document).on('mouseleave', '#prof-posts .tweet-panel-item', function(e){
+	$(this).find('.dlt-survey-wrapper').addClass('hide');
+});
+
+
+$(document).on('click' , '#prof-posts .post-dlt-icon' , function(e){
+	var surveyMongoId = $(this).attr('surveymongoid');
+	$('#overlay-main').show();
+	$('#overlay-continue').show();
+	$('#overlay-continue').html("Delete");
+	$('#overlay-cancel').html("Cancel");
+	$('#overlay-header').html("Delete Post");
+	$('#overlay-text').html("Are you sure you want to delete the post ?");
+	$('#overlay-continue').attr("onclick", "removeUserPost('" + surveyMongoId + "');");
+
+});
+
+$(document).on('click', '.ppl-share-wrapper .icn-plus-open', function() {
+	$(this).hide();
+	$(this).parent().find('.ppl-share-social,.icn-remove').show();
+});

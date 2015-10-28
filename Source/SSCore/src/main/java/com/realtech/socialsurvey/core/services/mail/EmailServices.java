@@ -348,8 +348,8 @@ public interface EmailServices
         String stackTrace ) throws InvalidInputException, UndeliveredEmailException;
 
 
-    public void sendDefaultSurveyRestartMail( String recipientMailId, String logoUrl, String displayName, String agentName, String link,
-        String agentEmailId, String agentSignature ) throws InvalidInputException, UndeliveredEmailException;
+    public void sendDefaultSurveyRestartMail( String recipientMailId, String logoUrl, String displayName, String agentName,
+        String link, String agentEmailId, String agentSignature ) throws InvalidInputException, UndeliveredEmailException;
 
 
     public void sendSocialConnectMail( String recipientMailId, String displayName, String loginName, String account )
@@ -407,4 +407,24 @@ public interface EmailServices
 
     void sendReportBugMailToAdmin( String displayName, String errorMsg, String recipientMailId ) throws InvalidInputException,
         UndeliveredEmailException;
+
+
+    void sendDefaultSurveyCompletionUnpleasantMail( String recipientMailId, String displayName, String agentName,
+        String agentEmail, String companyName, String logoUrl ) throws InvalidInputException, UndeliveredEmailException;
+
+
+    void sendComplaintHandleMail( String recipientMailId, String customerName, String customerMailId, String mood, String rating )
+        throws InvalidInputException, UndeliveredEmailException;
+
+
+    /**
+     * @param firstName
+     * @param lastName
+     * @param recipientMailId
+     * @param attachmentsDetails
+     * @throws InvalidInputException
+     * @throws UndeliveredEmailException
+     */
+    public void sendInvalidEmailsNotificationMail( String firstName, String lastName, String recipientMailId,
+        Map<String, String> attachmentsDetails ) throws InvalidInputException, UndeliveredEmailException;
 }

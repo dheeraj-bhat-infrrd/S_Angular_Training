@@ -103,6 +103,9 @@ public final class EmailTemplateConstants {
 	public static final String CORRUPT_PREINITIATION_RECORD_MAIL_SUBJECT = "CorruptRecordsFromCrmMailSubject.txt";
 	public static final String CORRUPT_PREINITIATION_RECORD_MAIL_BODY = "CorruptRecordsFromCrmMailBody.html";
 	
+	public static final String INVALID_EMAILS_MAIL_SUBJECT = "InvalidEmailsMailSubject.txt";
+    public static final String INVALID_EMAILS_MAIL_BODY = "InvalidEmailsMailBody.html";
+	
 	public static final String RECORDS_NOT_UPLOADED_MAIL_SUBJECT = "RecordsNotUploadedMailSubject.txt";
     public static final String RECORDS_NOT_UPLOADED_MAIL_BODY = "RecordsNotUploadedMailBody.html";
     
@@ -115,4 +118,6 @@ public final class EmailTemplateConstants {
     public static final String SURVEY_COMPLETION_UNPLEASANT_MAIL_BODY = "SurveyCompletionUnpleasantMailBody.html";
     public static final String SURVEY_COMPLETION_UNPLEASANT_MAIL_SUBJECT = "SurveyCompletionUnpleasantMailSubject.txt";
     
+    public static final String SURVEY_COMPLAINT_HANDLER_MAIL_SUBJECT = "SurveyComplaintHandlerMailSubject.txt";
+    public static final String SURVEY_COMPLAINT_HANDLER_MAIL_BODY = "SurveyComplaintHandlerMailBody.html";
 }

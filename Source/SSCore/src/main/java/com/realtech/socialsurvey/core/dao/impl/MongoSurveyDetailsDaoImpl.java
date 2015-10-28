@@ -33,6 +33,8 @@ import com.realtech.socialsurvey.core.dao.SurveyDetailsDao;
 import com.realtech.socialsurvey.core.entities.AbuseReporterDetails;
 import com.realtech.socialsurvey.core.entities.AbusiveSurveyReportWrapper;
 import com.realtech.socialsurvey.core.entities.AgentRankingReport;
+import com.realtech.socialsurvey.core.entities.BranchMediaPostDetails;
+import com.realtech.socialsurvey.core.entities.RegionMediaPostDetails;
 import com.realtech.socialsurvey.core.entities.ReporterDetail;
 import com.realtech.socialsurvey.core.entities.SurveyDetails;
 import com.realtech.socialsurvey.core.entities.SurveyPreInitiation;
@@ -59,6 +61,7 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
 
     @Autowired
     private MongoTemplate mongoTemplate;
+
 
     @Autowired
     private SurveyPreInitiationService surveyPreInitiationService;
@@ -211,6 +214,7 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
         update.set( CommonConstants.IS_ABUSIVE_COLUMN, true );
         update.set( CommonConstants.CREATED_ON, new Date() );
         update.set( CommonConstants.MODIFIED_ON_COLUMN, new Date() );
+        update.set( CommonConstants.IS_ABUSIVE_REPORTED_BY_USER_COLUMN, true );
         mongoTemplate.updateMulti( query, update, SURVEY_DETAILS_COLLECTION );
 
         query = new Query();
@@ -587,6 +591,138 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
         if ( shares != null && shares.size() != 0 ) {
             socialPostCount = (int) shares.get( CommonConstants.INITIAL_INDEX ).get( "count" );
         }
+        return socialPostCount;
+    }
+
+
+    @Override
+    public long getSocialPostsCountBasedOnHierarchy( int numberOfDays, String columnName, long columnValue )
+    {
+        LOG.info( "Method to count number of social posts by customers, getSocialPostsCount() started." );
+        long socialPostCount = 0;
+        Date endDate = Calendar.getInstance().getTime();
+        Date startDate = getNdaysBackDate( numberOfDays );
+        Query query = new Query();
+        if ( columnName == null ) {
+        } else {
+            query.addCriteria( Criteria.where( CommonConstants.SOCIAL_MEDIA_POST_DETAILS_COLUMN ).ne( null ) );
+            if ( columnName.equalsIgnoreCase( CommonConstants.COMPANY_ID_COLUMN ) ) {
+                query.addCriteria( Criteria.where(
+                    CommonConstants.SOCIAL_MEDIA_POST_DETAILS_COLUMN + "." + CommonConstants.COMPANY_MEDIA_POST_DETAILS_COLUMN )
+                    .ne( null ) );
+                query.addCriteria( Criteria.where(
+                    CommonConstants.SOCIAL_MEDIA_POST_DETAILS_COLUMN + "." + CommonConstants.COMPANY_MEDIA_POST_DETAILS_COLUMN
+                        + "." + CommonConstants.COMPANY_ID_COLUMN ).is( columnValue ) );
+            } else if ( columnName.equalsIgnoreCase( CommonConstants.REGION_ID_COLUMN ) ) {
+                query.addCriteria( Criteria.where(
+                    CommonConstants.SOCIAL_MEDIA_POST_DETAILS_COLUMN + "." + CommonConstants.REGION_MEDIA_POST_DETAILS_COLUMN )
+                    .ne( null ) );
+                query.addCriteria( Criteria.where(
+                    CommonConstants.SOCIAL_MEDIA_POST_DETAILS_COLUMN + "." + CommonConstants.REGION_MEDIA_POST_DETAILS_COLUMN
+                        + "." + CommonConstants.REGION_ID_COLUMN ).is( columnValue ) );
+
+            } else if ( columnName.equalsIgnoreCase( CommonConstants.BRANCH_ID_COLUMN ) ) {
+                query.addCriteria( Criteria.where(
+                    CommonConstants.SOCIAL_MEDIA_POST_DETAILS_COLUMN + "." + CommonConstants.BRANCH_MEDIA_POST_DETAILS_COLUMN )
+                    .ne( null ) );
+                query.addCriteria( Criteria.where(
+                    CommonConstants.SOCIAL_MEDIA_POST_DETAILS_COLUMN + "." + CommonConstants.BRANCH_MEDIA_POST_DETAILS_COLUMN
+                        + "." + CommonConstants.BRANCH_ID_COLUMN ).is( columnValue ) );
+            } else if ( columnName.equalsIgnoreCase( CommonConstants.AGENT_ID_COLUMN ) ) {
+
+                query.addCriteria( Criteria.where(
+                    CommonConstants.SOCIAL_MEDIA_POST_DETAILS_COLUMN + "." + CommonConstants.AGENT_MEDIA_POST_DETAILS_COLUMN )
+                    .ne( null ) );
+                query.addCriteria( Criteria.where(
+                    CommonConstants.SOCIAL_MEDIA_POST_DETAILS_COLUMN + "." + CommonConstants.AGENT_MEDIA_POST_DETAILS_COLUMN
+                        + "." + CommonConstants.AGENT_ID_COLUMN ).is( columnValue ) );
+
+            }
+
+            query.addCriteria( Criteria.where( CommonConstants.MODIFIED_ON_COLUMN ).gte( startDate ).lte( endDate ) );
+
+            List<SurveyDetails> surveyDetails = mongoTemplate.find( query, SurveyDetails.class, SURVEY_DETAILS_COLLECTION );
+
+            if ( surveyDetails != null ) {
+                for ( SurveyDetails survey : surveyDetails ) {
+                    if ( columnName.equalsIgnoreCase( CommonConstants.COMPANY_ID_COLUMN ) ) {
+                        List<String> sharedOnAgent = survey.getSocialMediaPostDetails().getAgentMediaPostDetails()
+                            .getSharedOn();
+                        if ( sharedOnAgent != null ) {
+                            socialPostCount += sharedOnAgent.size();
+                        }
+                        if ( survey.getSocialMediaPostDetails().getBranchMediaPostDetailsList() != null ) {
+                            for ( BranchMediaPostDetails branchMediaPostDetails : survey.getSocialMediaPostDetails()
+                                .getBranchMediaPostDetailsList() ) {
+                                if ( branchMediaPostDetails.getSharedOn() != null ) {
+                                    socialPostCount += branchMediaPostDetails.getSharedOn().size();
+                                }
+                            }
+                        }
+                        if ( survey.getSocialMediaPostDetails().getRegionMediaPostDetailsList() != null ) {
+                            for ( RegionMediaPostDetails regionMediaPostDetails : survey.getSocialMediaPostDetails()
+                                .getRegionMediaPostDetailsList() ) {
+                                if ( regionMediaPostDetails.getSharedOn() != null ) {
+                                    socialPostCount += regionMediaPostDetails.getSharedOn().size();
+                                }
+                            }
+                        }
+                        if ( survey.getSocialMediaPostDetails().getCompanyMediaPostDetails() != null ) {
+                            List<String> sharedOnCompany = survey.getSocialMediaPostDetails().getCompanyMediaPostDetails()
+                                .getSharedOn();
+                            if ( sharedOnCompany != null ) {
+                                socialPostCount += sharedOnCompany.size();
+                            }
+                        }
+
+                    } else if ( columnName.equalsIgnoreCase( CommonConstants.REGION_ID_COLUMN ) ) {
+                        List<String> sharedOnAgent = survey.getSocialMediaPostDetails().getAgentMediaPostDetails()
+                            .getSharedOn();
+                        if ( sharedOnAgent != null ) {
+                            socialPostCount += sharedOnAgent.size();
+                        }
+                        if ( survey.getSocialMediaPostDetails().getRegionMediaPostDetailsList() != null ) {
+                            for ( RegionMediaPostDetails regionMediaPostDetails : survey.getSocialMediaPostDetails()
+                                .getRegionMediaPostDetailsList() ) {
+                                if ( regionMediaPostDetails.getSharedOn() != null ) {
+                                    socialPostCount += regionMediaPostDetails.getSharedOn().size();
+                                }
+                            }
+                        }
+                        if ( survey.getSocialMediaPostDetails().getBranchMediaPostDetailsList() != null ) {
+                            for ( BranchMediaPostDetails branchMediaPostDetails : survey.getSocialMediaPostDetails()
+                                .getBranchMediaPostDetailsList() ) {
+                                if ( branchMediaPostDetails.getRegionId() == columnValue ) {
+                                    if ( branchMediaPostDetails.getSharedOn() != null ) {
+                                        socialPostCount += branchMediaPostDetails.getSharedOn().size();
+                                    }
+                                }
+                            }
+                        }
+
+                    } else if ( columnName.equalsIgnoreCase( CommonConstants.BRANCH_ID_COLUMN ) ) {
+                        List<String> sharedOnAgent = survey.getSocialMediaPostDetails().getAgentMediaPostDetails()
+                            .getSharedOn();
+                        if ( sharedOnAgent != null ) {
+                            socialPostCount += sharedOnAgent.size();
+                        }
+                        for ( BranchMediaPostDetails branchMediaPostDetails : survey.getSocialMediaPostDetails()
+                            .getBranchMediaPostDetailsList() ) {
+                            socialPostCount += branchMediaPostDetails.getSharedOn().size();
+                        }
+
+                    } else if ( columnName.equalsIgnoreCase( CommonConstants.AGENT_ID_COLUMN ) ) {
+
+                        List<String> sharedOn = survey.getSocialMediaPostDetails().getAgentMediaPostDetails().getSharedOn();
+                        if ( sharedOn != null ) {
+                            socialPostCount += sharedOn.size();
+                        }
+                    }
+                }
+
+            }
+        }
+
         return socialPostCount;
     }
 
@@ -1389,21 +1525,24 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
         TypedAggregation<SurveyDetails> aggregation;
         if ( startDate != null && endDate != null ) {
             aggregation = new TypedAggregation<SurveyDetails>( SurveyDetails.class, Aggregation.match( Criteria.where(
-                columnName ).is( columnValue ) ),Aggregation.match( Criteria.where( CommonConstants.IS_ABUSIVE_COLUMN ).is( fetchAbusive ) ), Aggregation.match( Criteria.where( CommonConstants.CREATED_ON ).gte(
-                startDate ) ), Aggregation.match( Criteria.where( CommonConstants.CREATED_ON ).lte( endDate ) ), Aggregation
-                .group( CommonConstants.AGENT_ID_COLUMN ).count().as( "count" ) );
-        } else if ( startDate != null && endDate == null )
-            aggregation = new TypedAggregation<SurveyDetails>( SurveyDetails.class, Aggregation.match( Criteria.where(
-                columnName ).is( columnValue ) ),Aggregation.match( Criteria.where( CommonConstants.IS_ABUSIVE_COLUMN ).is( fetchAbusive ) ), Aggregation.match( Criteria.where( CommonConstants.CREATED_ON ).gte(
-                startDate ) ), Aggregation.group( CommonConstants.AGENT_ID_COLUMN ).count().as( "count" ) );
-        else if ( startDate == null && endDate != null )
-            aggregation = new TypedAggregation<SurveyDetails>( SurveyDetails.class, Aggregation.match( Criteria.where(
-                columnName ).is( columnValue ) ),Aggregation.match( Criteria.where( CommonConstants.IS_ABUSIVE_COLUMN ).is( fetchAbusive ) ),
+                columnName ).is( columnValue ) ), Aggregation.match( Criteria.where( CommonConstants.IS_ABUSIVE_COLUMN ).is(
+                fetchAbusive ) ), Aggregation.match( Criteria.where( CommonConstants.CREATED_ON ).gte( startDate ) ),
                 Aggregation.match( Criteria.where( CommonConstants.CREATED_ON ).lte( endDate ) ), Aggregation
                     .group( CommonConstants.AGENT_ID_COLUMN ).count().as( "count" ) );
+        } else if ( startDate != null && endDate == null )
+            aggregation = new TypedAggregation<SurveyDetails>( SurveyDetails.class, Aggregation.match( Criteria.where(
+                columnName ).is( columnValue ) ), Aggregation.match( Criteria.where( CommonConstants.IS_ABUSIVE_COLUMN ).is(
+                fetchAbusive ) ), Aggregation.match( Criteria.where( CommonConstants.CREATED_ON ).gte( startDate ) ),
+                Aggregation.group( CommonConstants.AGENT_ID_COLUMN ).count().as( "count" ) );
+        else if ( startDate == null && endDate != null )
+            aggregation = new TypedAggregation<SurveyDetails>( SurveyDetails.class, Aggregation.match( Criteria.where(
+                columnName ).is( columnValue ) ), Aggregation.match( Criteria.where( CommonConstants.IS_ABUSIVE_COLUMN ).is(
+                fetchAbusive ) ), Aggregation.match( Criteria.where( CommonConstants.CREATED_ON ).lte( endDate ) ), Aggregation
+                .group( CommonConstants.AGENT_ID_COLUMN ).count().as( "count" ) );
         else {
             aggregation = new TypedAggregation<SurveyDetails>( SurveyDetails.class, Aggregation.match( Criteria.where(
-                columnName ).is( columnValue ) ),Aggregation.match( Criteria.where( CommonConstants.IS_ABUSIVE_COLUMN ).is( fetchAbusive ) ), Aggregation.group( CommonConstants.AGENT_ID_COLUMN ).count().as( "count" ) );
+                columnName ).is( columnValue ) ), Aggregation.match( Criteria.where( CommonConstants.IS_ABUSIVE_COLUMN ).is(
+                fetchAbusive ) ), Aggregation.group( CommonConstants.AGENT_ID_COLUMN ).count().as( "count" ) );
         }
 
         AggregationResults<SurveyDetails> result = mongoTemplate.aggregate( aggregation, SURVEY_DETAILS_COLLECTION,
@@ -1626,5 +1765,145 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
         Update update = new Update().set( "count", count );
         mongoTemplate.upsert( query, update, ZILLOW_CALL_COUNT );
         LOG.info( "Method updateZillowCallCount() finished" );
+    }
+
+
+    @Override
+    public void updateSurveyDetails( SurveyDetails surveyDetails )
+    {
+        LOG.info( "Method insertSurveyDetails() to insert details of survey started." );
+        Query query = new Query();
+        query.addCriteria( Criteria.where( CommonConstants.AGENT_ID_COLUMN ).is( surveyDetails.getAgentId() ) );
+        query.addCriteria( Criteria.where( CommonConstants.CUSTOMER_EMAIL_COLUMN ).is( surveyDetails.getCustomerEmail() ) );
+        Update update = new Update();
+        update.set( CommonConstants.SOCIAL_MEDIA_POST_DETAILS_COLUMN, surveyDetails.getSocialMediaPostDetails() );
+        update.set( CommonConstants.MODIFIED_ON_COLUMN, new Date() );
+        mongoTemplate.updateMulti( query, update, SURVEY_DETAILS_COLLECTION );
+        LOG.info( "Method insertSurveyDetails() to insert details of survey finished." );
+    }
+    public void updateSurveyAsUnderResolution( String surveyId )
+    {
+        LOG.info( "Method updateSurveyAsUnderResolution() to mark survey as under resolution started." );
+        Query query = new Query();
+        query.addCriteria( Criteria.where( CommonConstants.DEFAULT_MONGO_ID_COLUMN ).is( surveyId ) );
+        Update update = new Update();
+        update.set( CommonConstants.UNDER_RESOLUTION_COLUMN, true );
+        mongoTemplate.upsert( query, update, SURVEY_DETAILS_COLLECTION );
+        LOG.info( "Method updateSurveyAsUnderResolution() to mark survey as under resolution finished." );
+    }
+
+
+    @Override
+    public List<AbusiveSurveyReportWrapper> getSurveysReporetedAsAbusive( long companyId, int start, int rows )
+    {
+        LOG.info( "Method getSurveysReporetedAsAbusive() to retrieve surveys marked as abusive for a company started." );
+        Query query = new Query( Criteria.where( CommonConstants.IS_ABUSIVE_COLUMN ).is( true ) );
+        query.addCriteria(  Criteria.where( CommonConstants.COMPANY_ID_COLUMN ).is( companyId ) );
+        query.with( new Sort( Sort.Direction.ASC, CommonConstants.DEFAULT_MONGO_ID_COLUMN ) );
+        if ( start > -1 ) {
+            query.skip( start );
+        }
+        if ( rows > -1 ) {
+            query.limit( rows );
+        }
+
+        List<SurveyDetails> surveys = mongoTemplate.find( query, SurveyDetails.class, SURVEY_DETAILS_COLLECTION );
+        if ( surveys == null || surveys.size() == 0 )
+            return null;
+
+        List<String> surveyIds = new ArrayList<String>();
+        for ( SurveyDetails survey : surveys ) {
+            surveyIds.add( survey.get_id() );
+        }
+
+        query = new Query( Criteria.where( CommonConstants.SURVEY_ID_COLUMN ).in( surveyIds ) );
+        query.with( new Sort( Sort.Direction.ASC, CommonConstants.SURVEY_ID_COLUMN ) );
+        if ( start > -1 ) {
+            query.skip( start );
+        }
+        if ( rows > -1 ) {
+            query.limit( rows );
+        }
+
+        List<AbuseReporterDetails> absReporterDetails = mongoTemplate.find( query, AbuseReporterDetails.class,
+            ABS_REPORTER_DETAILS_COLLECTION );
+
+        List<AbusiveSurveyReportWrapper> abusiveSurveyReports = new ArrayList<AbusiveSurveyReportWrapper>();
+        for ( SurveyDetails survey : surveys ) {
+            if ( absReporterDetails != null && absReporterDetails.size() > 0 ) {
+                boolean reporterDetailsFound = false;
+                for ( AbuseReporterDetails absReporterDetail : absReporterDetails ) {
+                    if ( absReporterDetail.getSurveyId().equals(survey.get_id()) ) {
+                        abusiveSurveyReports.add( new AbusiveSurveyReportWrapper( survey, absReporterDetail ) );
+                        reporterDetailsFound = true;
+                        break;
+                    }
+                }
+                if(!reporterDetailsFound)
+                 // to handle existing surveys where reporter info not saved
+                    abusiveSurveyReports.add( new AbusiveSurveyReportWrapper( survey, null ) );
+            } else {
+                // to handle existing surveys where reporter info not saved
+                abusiveSurveyReports.add( new AbusiveSurveyReportWrapper( survey, null ) );
+            }
+        }
+
+        LOG.info( "Method getSurveysReporetedAsAbusive() to retrieve surveys marked as abusive for a company finished." );
+        return abusiveSurveyReports;
+    }
+
+
+    @Override
+    public List<SurveyDetails> getSurveyDetailsByAgentAndCompany( long companyId )
+    {
+        LOG.info( "Method getSurveyDetailsByAgentAndCompany() to insert details of survey started." );
+        List<SurveyDetails> surveys = new ArrayList<SurveyDetails>();
+        Query query = new Query();
+        query.addCriteria( Criteria.where( CommonConstants.COMPANY_ID_COLUMN ).is( companyId ) );
+
+        surveys = mongoTemplate.find( query, SurveyDetails.class, SURVEY_DETAILS_COLLECTION );
+        return surveys;
+    }
+    public List<SurveyDetails> getSurveysUnderResolution( long companyId, int start, int rows )
+    {
+        Query query = new Query( Criteria.where( CommonConstants.COMPANY_ID_COLUMN ).is( companyId ) );
+        query.addCriteria(  Criteria.where( CommonConstants.IS_UNDER_RESOLUTION_COLUMN ).is( true ) );
+        query.with( new Sort( Sort.Direction.ASC, CommonConstants.DEFAULT_MONGO_ID_COLUMN ) );
+        if ( start > -1 ) {
+            query.skip( start );
+        }
+        if ( rows > -1 ) {
+            query.limit( rows );
+        }
+
+        List<SurveyDetails> surveys = mongoTemplate.find( query, SurveyDetails.class, SURVEY_DETAILS_COLLECTION );
+        if ( surveys == null || surveys.size() == 0 )
+            return null;
+        else
+            return surveys;
+    }
+
+
+    @Override
+    public long getSurveysUnderResolutionCount( long companyId )
+    {
+        LOG.info( "Method getSurveysUnderResolutionCount() to get count of surveys marked as under resolution for a company started." );
+        Query query = new Query( Criteria.where( CommonConstants.UNDER_RESOLUTION_COLUMN ).is( true ) );
+        query.addCriteria(  Criteria.where( CommonConstants.COMPANY_ID_COLUMN ).is( companyId ) ); 
+        long count = mongoTemplate.find( query, SurveyDetails.class, SURVEY_DETAILS_COLLECTION ).size();
+        LOG.info( "Method getSurveysUnderResolutionCount() to get count of surveys marked as under resolution for a company finished." );
+        return count;
+    
+    }
+    
+    @Override
+    public long getSurveysReporetedAsAbusiveCount( long companyId )
+    {
+        LOG.info( "Method getSurveysReporetedAsAbusiveCount() to get count of surveys marked as abusive for a company started." );
+        Query query = new Query( Criteria.where( CommonConstants.IS_ABUSIVE_COLUMN ).is( true ) );
+        query.addCriteria(  Criteria.where( CommonConstants.COMPANY_ID_COLUMN ).is( companyId ) ); 
+        long count = mongoTemplate.find( query, SurveyDetails.class, SURVEY_DETAILS_COLLECTION ).size();
+        LOG.info( "Method getSurveysUnderResolutionCount() to get count of surveys marked as abusive for a company finished." );
+        return count;
     }
 }

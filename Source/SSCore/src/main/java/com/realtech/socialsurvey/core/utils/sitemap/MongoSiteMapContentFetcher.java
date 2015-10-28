@@ -4,6 +4,7 @@ import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.TimeZone;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
@@ -23,16 +24,25 @@ public class MongoSiteMapContentFetcher implements SitemapContentFecher, Initial
 
 	private static final Logger LOG = LoggerFactory.getLogger(MongoSiteMapContentFetcher.class);
 	
-	private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd");
+	private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSXXX");
+	
+	// needs to be removed
+	private static final String HOURLY_FREQUENCY = "hourly";
+	
+	private static final float COMPANY_PRIORITY = 0.2f;
+	private static final float REGION_PRIORITY = 0.4f;
+	private static final float BRANCH_PRIORITY = 0.6f;
+	private static final float USERS_PRIORITY = 0.8f;
 
 	private String collectionName;
 	private String interval;
+	private float priority;
+	private String changeFrequency;
 
-	private int limit = 50;
+    private int limit = 50;
 	private long count;
 	private int recordsFetched;
 	private boolean areMoreRecordsPresent;
-	private Timestamp minLastModifiedTimeInterval;
 
 	@Autowired
 	private OrganizationUnitSettingsDao organizationUnitSettingsDao;
@@ -50,6 +60,16 @@ public class MongoSiteMapContentFetcher implements SitemapContentFecher, Initial
 	public void setCollectionName(String collectionName){
 		this.collectionName = collectionName;
 	}
+	
+	public void setPriority( float priority )
+    {
+        this.priority = priority;
+    }
+	
+	public void setChangeFrequency( String changeFrequency )
+    {
+        this.changeFrequency = changeFrequency;
+    }
 
 	@Override
 	public List<SiteMapEntry> getInitialContent() {
@@ -120,17 +140,27 @@ public class MongoSiteMapContentFetcher implements SitemapContentFecher, Initial
 		List<SiteMapEntry> entries = new ArrayList<SiteMapEntry>();
 		SiteMapEntry entry = null;
 		for (ProfileUrlEntity profileUrl : profileUrls) {
-			LOG.info("Converting " + profileUrl + " to SME");
+			LOG.trace("Converting " + profileUrl + " to SME");
 			entry = new SiteMapEntry();
+			//set priority
+			// entry.setPriority( priority );
+			//set frequency
+			// entry.setChangeFrequency( changeFrequency );
+			entry.setChangeFrequency( HOURLY_FREQUENCY );
 			// generate location
+			if(collectionName.equals(MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION)){
+				entry.setPriority( COMPANY_PRIORITY );
+			}else if(collectionName.equals(MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION)){
+				entry.setPriority( REGION_PRIORITY );
+			}else if(collectionName.equals(MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION)){
+				entry.setPriority( BRANCH_PRIORITY );
+			}else if(collectionName.equals(MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION)){
+				entry.setPriority( USERS_PRIORITY );
+			}
 			entry.setLocation(generateLocation(profileUrl.getProfileUrl()));
 			Timestamp modifiedOnTimestamp =  new Timestamp(profileUrl.getModifiedOn());
 			// change the modified time if the modified on is older than the configured value
-			if(minLastModifiedTimeInterval.after(modifiedOnTimestamp)){
-				entry.setLastModifiedDate(DATE_FORMAT.format(new Timestamp(System.currentTimeMillis())));
-			}else{
-				entry.setLastModifiedDate(DATE_FORMAT.format(modifiedOnTimestamp));
-			}
+			entry.setLastModifiedDate(DATE_FORMAT.format(modifiedOnTimestamp));
 			entries.add(entry);
 		}
 		return entries;
@@ -138,8 +168,9 @@ public class MongoSiteMapContentFetcher implements SitemapContentFecher, Initial
 
 	@Override
 	public void afterPropertiesSet() throws Exception {
-		LOG.debug("Setting the minimum last modified time allowes");
-		minLastModifiedTimeInterval = new Timestamp(System.currentTimeMillis() - (Integer.parseInt(lastModifiedTimeInterval) * 24 * 60 * 60 * 1000));
+		// Setting the UTC time zone
+		DATE_FORMAT.setTimeZone(TimeZone.getDefault());
 	}
+
 
 }

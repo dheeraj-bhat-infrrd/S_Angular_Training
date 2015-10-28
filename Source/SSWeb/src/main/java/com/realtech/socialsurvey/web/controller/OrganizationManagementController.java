@@ -25,11 +25,14 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.amazonaws.util.json.JSONException;
 import com.amazonaws.util.json.JSONObject;
+import com.braintreegateway.exceptions.AuthorizationException;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.dao.impl.MongoOrganizationUnitSettingDaoImpl;
+import com.realtech.socialsurvey.core.entities.AbusiveSurveyReportWrapper;
 import com.realtech.socialsurvey.core.entities.AccountsMaster;
+import com.realtech.socialsurvey.core.entities.ComplaintResolutionSettings;
 import com.realtech.socialsurvey.core.entities.DotLoopCrmInfo;
 import com.realtech.socialsurvey.core.entities.EncompassCrmInfo;
 import com.realtech.socialsurvey.core.entities.LicenseDetail;
@@ -38,6 +41,7 @@ import com.realtech.socialsurvey.core.entities.MailContent;
 import com.realtech.socialsurvey.core.entities.MailContentSettings;
 import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
 import com.realtech.socialsurvey.core.entities.StateLookup;
+import com.realtech.socialsurvey.core.entities.SurveyDetails;
 import com.realtech.socialsurvey.core.entities.SurveySettings;
 import com.realtech.socialsurvey.core.entities.User;
 import com.realtech.socialsurvey.core.entities.UserProfile;
@@ -65,6 +69,7 @@ import com.realtech.socialsurvey.core.services.settingsmanagement.SettingsLocker
 import com.realtech.socialsurvey.core.services.settingsmanagement.SettingsManager;
 import com.realtech.socialsurvey.core.services.settingsmanagement.SettingsSetter;
 import com.realtech.socialsurvey.core.services.surveybuilder.SurveyBuilder;
+import com.realtech.socialsurvey.core.services.surveybuilder.SurveyHandler;
 import com.realtech.socialsurvey.core.services.upload.FileUploadService;
 import com.realtech.socialsurvey.core.utils.DisplayMessageConstants;
 import com.realtech.socialsurvey.core.utils.EmailFormatHelper;
@@ -131,8 +136,25 @@ public class OrganizationManagementController
     @Value ( "${AMAZON_LOGO_BUCKET}")
     private String logoBucket;
 
+    @Value ( "${HAPPY_TEXT}")
+    private String happyText;
+    @Value ( "${NEUTRAL_TEXT}")
+    private String neutralText;
+    @Value ( "${SAD_TEXT}")
+    private String sadText;
+
+    @Value ( "${HAPPY_TEXT_COMPLETE}")
+    private String happyTextComplete;
+    @Value ( "${NEUTRAL_TEXT_COMPLETE}")
+    private String neutralTextComplete;
+    @Value ( "${SAD_TEXT_COMPLETE}")
+    private String sadTextComplete;
+
     @Autowired
     private SettingsManager settingsManager;
+    
+    @Autowired
+    private SurveyHandler surveyHandler;
 
 
     /**
@@ -2055,5 +2077,197 @@ public class OrganizationManagementController
         LOG.debug( "Encompass validation passed." );
         return true;
     }
+
+
+    @RequestMapping ( value = "/showcomplaintressettings", method = RequestMethod.GET)
+    public String showComplaintRegistrationSettings( Model model, HttpServletRequest request )
+    {
+        LOG.info( "Method showComplaintRegistrationSettings of UserManagementController called" );
+        HttpSession session = request.getSession( false );
+        User user = sessionHelper.getCurrentUser();
+
+        if ( !user.isCompanyAdmin() )
+            throw new AuthorizationException( "User is not authorized to access this page" );
+
+        OrganizationUnitSettings unitSettings = null;
+        long entityId = user.getCompany().getCompanyId();
+        try {
+            unitSettings = organizationManagementService.getCompanySettings( entityId );
+
+            if ( unitSettings == null )
+                throw new NonFatalException( "Company settings cannot be found for id : " + entityId );
+
+            ComplaintResolutionSettings complaintRegistrationSettings = new ComplaintResolutionSettings();
+            if ( unitSettings.getSurvey_settings() != null
+                && unitSettings.getSurvey_settings().getComplaint_res_settings() != null ) {
+                complaintRegistrationSettings = unitSettings.getSurvey_settings().getComplaint_res_settings();
+            }
+
+            model.addAttribute( "columnName", CommonConstants.COMPANY_ID_COLUMN );
+            model.addAttribute( "columnValue", entityId );
+            session.setAttribute( CommonConstants.COMPLAIN_REG_SETTINGS, complaintRegistrationSettings );
+        } catch ( InvalidInputException e ) {
+            LOG.error( "InvalidInputException while fetching complaint resolution details. Reason :" + e.getMessage(), e );
+            model.addAttribute( "message",
+                messageUtils.getDisplayMessage( DisplayMessageConstants.GENERAL_ERROR, DisplayMessageType.ERROR_MESSAGE ) );
+            return JspResolver.MESSAGE_HEADER;
+        } catch ( NonFatalException e ) {
+            LOG.error( "NonFatalException while fetching complaint resolution details. Reason :" + e.getMessage(), e );
+            model.addAttribute( "message",
+                messageUtils.getDisplayMessage( DisplayMessageConstants.GENERAL_ERROR, DisplayMessageType.ERROR_MESSAGE ) );
+            return JspResolver.MESSAGE_HEADER;
+        }
+        return JspResolver.COMPLAINT_REGISTRATION_SETTINGS;
+    }
+
+
+    @RequestMapping ( value = "/updatecomplaintressettings", method = RequestMethod.POST)
+    @ResponseBody
+    public String updateComplaintResolutionsettings( Model model, HttpServletRequest request )
+    {
+        LOG.info( "Updating Complaint Resolution Settings" );
+        String ratingText = request.getParameter( "rating" );
+        String moodText = request.getParameter( "mood" );
+        String mailId = request.getParameter( "mailId" );
+        String enabled = request.getParameter( "enabled" );
+        boolean isComplaintHandlingEnabled = false;
+
+        String message = "";
+        String mailIDStr = new String();
+        HttpSession session = request.getSession();
+        User user = sessionHelper.getCurrentUser();
+        OrganizationUnitSettings unitSettings = null;
+        ComplaintResolutionSettings originalComplaintRegSettings = new ComplaintResolutionSettings();
+
+        try {
+
+            if ( !user.isCompanyAdmin() )
+                throw new AuthorizationException( "User is not authorized to access this page" );
+
+            if ( enabled == null || enabled.isEmpty() ) {
+                isComplaintHandlingEnabled = false;
+            } else if ( enabled.equalsIgnoreCase( "enable" ) )
+                isComplaintHandlingEnabled = true;
+            
+            if ( mailId == null || mailId.isEmpty() ) {
+                throw new InvalidInputException( "Mail Id(s) of Complaint Handler(s) is null",
+                    DisplayMessageConstants.GENERAL_ERROR );
+            }
+            
+            if ( !mailId.contains( "," ) ) {
+                if ( !organizationManagementService.validateEmail( mailId ) )
+                    throw new InvalidInputException( "Mail id - " + mailId + " entered as send alert to input is invalid",
+                        DisplayMessageConstants.GENERAL_ERROR );
+                else
+                    mailIDStr = mailId;
+            } else {
+                String mailIds[] = mailId.split( "," );
+                
+                if(mailIds.length == 0)
+                    throw new InvalidInputException( "Mail id - " + mailId + " entered as send alert to input is empty",
+                    DisplayMessageConstants.GENERAL_ERROR );
+                
+                for ( String mailID : mailIds ) {
+                    if ( !organizationManagementService.validateEmail( mailID.trim() ) )
+                        throw new InvalidInputException( "Mail id - " + mailID + " entered amongst the mail ids as send alert to input is invalid",
+                            DisplayMessageConstants.GENERAL_ERROR );
+                    else
+                        mailIDStr += mailID.trim() + " , ";
+                }
+                mailId = mailIDStr.substring( 0, mailIDStr.length() - 2 );
+            }
+
+            long entityId = user.getCompany().getCompanyId();
+            
+            unitSettings = organizationManagementService.getCompanySettings( entityId );
+            
+            if ( unitSettings == null )
+                throw new NonFatalException("Company settings cannot be found for id : " + entityId );
+
+            if( unitSettings.getSurvey_settings() == null ) {
+                // Adding default text for various flows of survey.
+                SurveySettings surveySettings = new SurveySettings();
+                surveySettings.setHappyText( happyText );
+                surveySettings.setNeutralText( neutralText );
+                surveySettings.setSadText( sadText );
+                surveySettings.setHappyTextComplete( happyTextComplete );
+                surveySettings.setNeutralTextComplete( neutralTextComplete );
+                surveySettings.setSadTextComplete( sadTextComplete );
+                surveySettings.setAutoPostEnabled( true );
+                surveySettings.setShow_survey_above_score( CommonConstants.DEFAULT_AUTOPOST_SCORE );
+
+                surveySettings.setSurvey_reminder_interval_in_days( CommonConstants.DEFAULT_REMINDERMAIL_INTERVAL );
+                unitSettings.setSurvey_settings( surveySettings );
+            }
+
+            if ( unitSettings.getSurvey_settings().getComplaint_res_settings() != null )
+                originalComplaintRegSettings = unitSettings.getSurvey_settings().getComplaint_res_settings();
+
+            if ( isComplaintHandlingEnabled ) {
+                if ( ( ratingText == null || ratingText.isEmpty() ) && ( moodText == null || moodText.isEmpty() ) ) {
+                    throw new InvalidInputException( "Please select a Rating value and Review Mood selected.", DisplayMessageConstants.GENERAL_ERROR );
+                }
+                
+                if ( ratingText == null || ratingText.isEmpty() ) {
+                    ratingText = "0";
+                }
+
+                if ( moodText == null || moodText.isEmpty() ) {
+                    moodText = "";
+                }
+
+                double rating = Double.parseDouble( ratingText );
+
+                originalComplaintRegSettings.setRating( (float) rating );
+                originalComplaintRegSettings.setMood( moodText );
+                
+            }
+            
+            originalComplaintRegSettings.setMailId( mailId );
+            originalComplaintRegSettings.setEnabled( isComplaintHandlingEnabled );
+            unitSettings.getSurvey_settings().setComplaint_res_settings( originalComplaintRegSettings );
+            
+            if( !isComplaintHandlingEnabled && originalComplaintRegSettings.getMailId().trim().isEmpty() )
+                return "";
+
+            LOG.info( "Updating Complaint Resolution Settings" );
+
+            if ( organizationManagementService.updateSurveySettings( unitSettings, unitSettings.getSurvey_settings() ) ) {
+                LOG.info( "Updated Complaint Resolution Settings" );
+                message = messageUtils.getDisplayMessage( DisplayMessageConstants.COMPLAINT_REGISTRATION_SUCCESSFUL,
+                    DisplayMessageType.SUCCESS_MESSAGE ).getMessage();
+            }
+        } catch ( NonFatalException e ) {
+            LOG.error( "NonFatalException while updating complaint registration settings. Reason : " + e.getMessage(), e );
+            message = messageUtils.getDisplayMessage( e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE ).getMessage();
+        }
+
+        return message;
+    }
+
+
+    @RequestMapping ( value = "/fetchsurveysunderresolution", method = RequestMethod.GET)
+    public String fetchSurveysUnderResolution( Model model, HttpServletRequest request )
+    {
+        LOG.info( "Method to get surveys under resolution for a company fetchSurveysUnderResolution() started." );
+        try {
+            User user = sessionHelper.getCurrentUser();
+            String startIndexStr = request.getParameter( "startIndex" );
+            String batchSizeStr = request.getParameter( "batchSize" );
+            int startIndex = Integer.parseInt( startIndexStr );
+            int batchSize = Integer.parseInt( batchSizeStr );
+            
+            List<SurveyDetails> surveyDetails = surveyHandler.getSurveysUnderResolution( user
+                .getCompany().getCompanyId(), startIndex, batchSize );
+            model.addAttribute( "reviews", surveyDetails );
+        } catch ( NumberFormatException e ) {
+            LOG.error(
+                "NumberFormat exception caught in fetchSurveysUnderResolution() while fetching surveys under resolution for a company. Nested exception is ", e );
+            model.addAttribute( "message", e.getMessage() );
+        }
+        LOG.info( "Method to get surveys under resolution for a company fetchSurveysUnderResolution() finished." );
+        return JspResolver.REVIEWS_UNDER_RESOLUTION_REPORTS;
+    }
+
 }
 // JIRA: SS-24 BY RM02 EOC

@@ -24,7 +24,7 @@
 	href="${initParam.resourcesPath}/resources/css/style-resp-1.1.css">
 <c:if test="${not empty averageRating}">
 	<fmt:formatNumber var="floatingAverageRating" type="number"
-		value="${averageRating}" maxFractionDigits="2" minFractionDigits="3" />
+		value="${averageRating}" maxFractionDigits="1" minFractionDigits="1" />
 	<fmt:formatNumber var="floatingAverageGoogleRating" type="number"
 		value="${averageRating}" maxFractionDigits="1" minFractionDigits="1" />
 	<fmt:formatNumber var="integerAverageRating" type="number"
@@ -36,16 +36,6 @@
 		<c:set var="integerAverageRating" value="1"></c:set>
 	</c:if>
 </c:if>
-<c:choose>
-	<c:when test="${ floatingAverageRating % 1 == 0 }">
-		<fmt:formatNumber var="floatingAverageRating" type="number"
-			value="${averageRating}" maxFractionDigits="0" />
-	</c:when>
-	<c:otherwise>
-		<fmt:formatNumber var="floatingAverageRating" type="number"
-			value="${averageRating}" maxFractionDigits="3" minFractionDigits="3" />
-	</c:otherwise>
-</c:choose>
 <style type="text/css">
 .review-item {
     padding: 10px 0;
@@ -149,11 +139,12 @@
 		}
 		var rating = document.getElementById("rating").innerText;
 		changeWidgetRatingPattern(rating, $('#wdg-rating-cont'));
-		var url = "${ profileLink }";
 		$('.review-item').each(function(i){
 			var container = document.getElementById("review-" + i);
 			if(container.scrollHeight > container.offsetHeight){
 				$("#review-item-" + i).append('<span class=\"review-more-button review-more-wid\" data-index=\"'+i+'\" \'>More</span>');
+				$("#review-item-" + i).append('<span class=\"review-more-button review-less-wid\" data-index=\"'+i+'\" \'>Less</span>');
+				$(".review-less-wid").hide();
 			}
 		});
 		$(".review-more-wid").click(function(e){
@@ -161,6 +152,14 @@
 			var index = $(this).data("index");
 			$(this).hide();
 			$("#review-"+index).removeClass('review-widget');
+			$(this).parent().find(".review-less-wid").show();
+		});
+		$(".review-less-wid").click(function(e){
+			e.stopPropagation();
+			var index = $(this).data("index");
+			$(this).hide();
+			$("#review-"+index).addClass('review-widget');
+			$(this).parent().find(".review-more-wid").show();
 		});
 	</script>
 </body>

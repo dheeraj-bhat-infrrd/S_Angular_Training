@@ -12,6 +12,7 @@ import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
@@ -19,6 +20,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
+
 import com.braintreegateway.BraintreeGateway;
 import com.braintreegateway.ClientTokenRequest;
 import com.braintreegateway.CreditCard;
@@ -54,6 +56,7 @@ import com.realtech.socialsurvey.core.services.organizationmanagement.Organizati
 import com.realtech.socialsurvey.core.services.payment.Payment;
 import com.realtech.socialsurvey.core.services.payment.exception.CardUpdateUnsuccessfulException;
 import com.realtech.socialsurvey.core.services.payment.exception.CreditCardException;
+import com.realtech.socialsurvey.core.services.payment.exception.CustomerDeletionUnsuccessfulException;
 import com.realtech.socialsurvey.core.services.payment.exception.PaymentException;
 import com.realtech.socialsurvey.core.services.payment.exception.PaymentRetryUnsuccessfulException;
 import com.realtech.socialsurvey.core.services.payment.exception.SubscriptionCancellationUnsuccessfulException;
@@ -957,6 +960,31 @@ public class BrainTreePaymentImpl implements Payment, InitializingBean {
 		}
 	}
 
+	
+	/*
+     * (non-Javadoc)
+     * @see com.realtech.socialsurvey.core.services.payment.Payment#deleteCustomer(java.lang.String)
+     */
+    @Override
+    public void deleteCustomer(String customerId) throws CustomerDeletionUnsuccessfulException, InvalidInputException {
+
+        if (customerId == null || customerId.isEmpty()) {
+            LOG.error("customerId parameter given to delete the customer is null or empty");
+            throw new InvalidInputException("customerId parameter given to delete the customer is null or empty");
+        }
+        LOG.info("Deleting the customer with id : " + customerId);
+
+        Result<Customer> result = gateway.customer().delete( customerId );
+
+        if (result.isSuccess()) {
+            LOG.info("Customer deletion successful!");
+        }
+        else {
+            LOG.error("Customer deletion unsuccessful : Message : " + result.getMessage());
+            throw new CustomerDeletionUnsuccessfulException("Customer deletion unsuccessful : Message : " + result.getMessage());
+        }
+    }
+	
 	/**
 	 * Makes a braintree api call to upgrade a subscription.
 	 * 
