@@ -4,6 +4,7 @@ import java.text.ParseException;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+
 import com.realtech.socialsurvey.core.entities.AbusiveSurveyReportWrapper;
 import com.realtech.socialsurvey.core.entities.AgentRankingReport;
 import com.realtech.socialsurvey.core.entities.SurveyDetails;
@@ -178,4 +179,8 @@ public interface SurveyDetailsDao
 
 
     long getSurveysReporetedAsAbusiveCount( long companyId );
+
+
+    Map<Long, Integer> getSurveyCountInATimePeriod( String columnName, long startDate,
+        double startScore, double limitScore, boolean fetchAbusive ) throws ParseException;
 }
