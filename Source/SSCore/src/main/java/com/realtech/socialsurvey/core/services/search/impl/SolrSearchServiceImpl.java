@@ -1489,7 +1489,8 @@ public class SolrSearchServiceImpl implements SolrSearchService
 
 
     @Override
-    public void updateCompletedSurveyCountForUserInSolr( long agentId, int incrementCount ) throws SolrException
+    public void updateCompletedSurveyCountForUserInSolr( long agentId, int incrementCount ) throws SolrException,
+        NoRecordsFetchedException
     {
         LOG.info( "Method to increase completed survey count updateCompletedSurveyCountForUserInSolr() finished." );
         SolrServer solrServer;
@@ -1500,8 +1501,8 @@ public class SolrSearchServiceImpl implements SolrSearchService
         QueryResponse response;
         try {
             response = solrServer.query( solrQuery );
-            if ( response.getResults() != null ) {
-                response.getResults().get( CommonConstants.INITIAL_INDEX );
+            if ( response.getResults() == null || response.getResults().size() <= 0 ) {
+                throw new NoRecordsFetchedException( "No user found in solr with agentId : " + agentId );
             }
             SolrDocumentList results = response.getResults();
             SolrDocument document = results.get( CommonConstants.INITIAL_INDEX );
@@ -1518,6 +1519,40 @@ public class SolrSearchServiceImpl implements SolrSearchService
 
             solrServer.add( inputDoc );
             solrServer.commit();
+        } catch ( SolrServerException | IOException e ) {
+            LOG.error( "Exception while editing user in solr. Reason : " + e.getMessage(), e );
+            throw new SolrException( "Exception while adding regions to solr. Reason : " + e.getMessage(), e );
+        }
+        LOG.info( "Method to increase completed survey count updateCompletedSurveyCountForUserInSolr() finished." );
+    }
+
+
+    @Override
+    public void updateCompletedSurveyCountForMultipleUserInSolr( Map<Long, Integer> usersReviewCount ) throws SolrException
+    {
+        LOG.info( "Method to increase completed survey count updateCompletedSurveyCountForUserInSolr() finished." );
+        SolrServer solrServer;
+        solrServer = new HttpSolrServer( solrUserUrl );
+
+        List<SolrInputDocument> inputDocList = new ArrayList<SolrInputDocument>();
+        Map<String, Integer> editKeyValues;
+        SolrInputDocument inputDoc;
+
+        for ( Map.Entry<Long, Integer> entry : usersReviewCount.entrySet() ) {
+            editKeyValues = new HashMap<String, Integer>();
+            editKeyValues.put( SOLR_EDIT_REPLACE, entry.getValue() );
+            // Adding fields to be updated
+            inputDoc = new SolrInputDocument();
+            inputDoc.setField( CommonConstants.USER_ID_SOLR, entry.getKey() );
+            inputDoc.setField( CommonConstants.REVIEW_COUNT_SOLR, editKeyValues );
+            inputDocList.add( inputDoc );
+        }
+
+        try {
+            if(inputDocList.size() > 0){
+                solrServer.add( inputDocList );
+                solrServer.commit();
+            }
         } catch ( SolrServerException | IOException e ) {
             LOG.error( "Exception while editing user in solr. Reason : " + e.getMessage(), e );
             throw new SolrException( "Exception while adding regions to solr. Reason : " + e.getMessage(), e );
