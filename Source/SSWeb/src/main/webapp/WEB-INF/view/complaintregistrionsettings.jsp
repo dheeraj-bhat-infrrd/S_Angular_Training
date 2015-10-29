@@ -56,7 +56,7 @@
 					</div>
 					<div class="float-left compl-option-sel">
 						<div id="comp-mood-unpleasant" class="sq-smile-icn-container compl-input-cont opacity-red" data-mood="unpleasant">
-							<div class="sq-smile-icn-text sq-smile-sad-text compl-sml-txt">
+							<div id="comp-mood-unpleasant-icn" class="sq-smile-icn-text sq-smile-sad-text compl-sml-txt compl-sq-smile-sad-text-disabled">
 								<spring:message code="label.complaint.sad.text" />
 							</div>
 						</div>
@@ -68,7 +68,7 @@
 					</div>
 					<div class="float-left compl-option-sel">
 						<div id="comp-mood-ok" class="sq-smile-icn-container compl-input-cont opacity-red" data-mood="ok">
-							<div class="sq-smile-icn-text sq-smile-neutral-text compl-sml-txt">
+							<div id="comp-mood-ok-icn" class="sq-smile-icn-text sq-smile-neutral-text compl-sml-txt compl-sq-smile-sad-text-disabled">
 								<spring:message code="label.complaint.ok.text" />
 							</div>
 						</div>
@@ -94,10 +94,13 @@
 		if(${not empty complaintRegSettings.mood}) {
 			$('#comp-mood').val("${complaintRegSettings.mood}".toLowerCase());
 			if ("${complaintRegSettings.mood}".toLowerCase() == "ok") {
+				$('#comp-mood-ok-icn').removeClass('compl-sq-smile-sad-text-disabled');
+				$('#comp-mood-unpleasant-icn').removeClass('compl-sq-smile-sad-text-disabled');
 				$('#comp-mood-ok').removeClass('opacity-red');
 				$('#comp-mood-unpleasant').removeClass('opacity-red');
 			}
 			if ("${complaintRegSettings.mood}".toLowerCase() == "unpleasant") {
+				$('#comp-mood-unpleasant-icn').removeClass('compl-sq-smile-sad-text-disabled');
 				$('#comp-mood-unpleasant').removeClass('opacity-red');
 			}
 		}
@@ -124,20 +127,27 @@
 				$('#comp-mood').val(mood);
 				if(mood.toLowerCase() == "ok") {
 					$('.sq-smile-icn-container').removeClass('opacity-red');
+					$('#comp-mood-ok-icn').removeClass('compl-sq-smile-sad-text-disabled');
+					$('#comp-mood-unpleasant-icn').removeClass('compl-sq-smile-sad-text-disabled');
 				} else if (mood.toLowerCase() == "unpleasant") {
 					$(this).removeClass('opacity-red');
+					$('#comp-mood-unpleasant-icn').removeClass('compl-sq-smile-sad-text-disabled');
 				}
 			} else {
 				$('#comp-mood').val('');
 				
 				if(mood.toLowerCase() == "ok") {
 					$('.sq-smile-icn-container').addClass('opacity-red');
+					$('#comp-mood-ok-icn').addClass('compl-sq-smile-sad-text-disabled');
+					$('#comp-mood-unpleasant-icn').addClass('compl-sq-smile-sad-text-disabled');
 				} else if (mood.toLowerCase() == "unpleasant") {
 					if(currentMood == "ok") {
 						$('.sq-smile-icn-container[data-mood="ok"]').addClass('opacity-red');
+						$('#comp-mood-ok-icn').addClass('compl-sq-smile-sad-text-disabled');
 						$('#comp-mood').val(mood);
 					} else if(currentMood == "unpleasant"){
 						$(this).addClass('opacity-red');
+						$('#comp-mood-unpleasant-icn').addClass('compl-sq-smile-sad-text-disabled');
 					}
 				}
 			}

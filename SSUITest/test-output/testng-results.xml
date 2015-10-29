@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testng-results skipped="0" failed="0" total="2" passed="2">
+  <reporter-output>
+  </reporter-output>
+  <suite name="Default suite" duration-ms="34166" started-at="2015-10-28T11:15:33Z" finished-at="2015-10-28T11:16:07Z">
+    <groups>
+      <group name="home">
+        <method signature="TestHomePage.testUserLogin()[pri:0, instance:com.realtech.socialsurvey.version1.testcase.TestHomePage@13a45c84]" name="testUserLogin" class="com.realtech.socialsurvey.version1.testcase.TestHomePage"/>
+        <method signature="TestHomePage.testUserLogout()[pri:0, instance:com.realtech.socialsurvey.version1.testcase.TestHomePage@13a45c84]" name="testUserLogout" class="com.realtech.socialsurvey.version1.testcase.TestHomePage"/>
+      </group> <!-- home -->
+    </groups>
+    <test name="Default test" duration-ms="34166" started-at="2015-10-28T11:15:33Z" finished-at="2015-10-28T11:16:07Z">
+      <class name="com.realtech.socialsurvey.version1.testcase.TestHomePage">
+        <test-method status="PASS" signature="setUp()[pri:0, instance:com.realtech.socialsurvey.version1.testcase.TestHomePage@13a45c84]" name="setUp" is-config="true" duration-ms="10078" started-at="2015-10-28T16:45:33Z" finished-at="2015-10-28T16:45:43Z">
+          <reporter-output>
+          </reporter-output>
+        </test-method> <!-- setUp -->
+        <test-method status="PASS" signature="testUserLogin()[pri:0, instance:com.realtech.socialsurvey.version1.testcase.TestHomePage@13a45c84]" name="testUserLogin" duration-ms="10913" started-at="2015-10-28T16:45:43Z" finished-at="2015-10-28T16:45:54Z">
+          <reporter-output>
+          </reporter-output>
+        </test-method> <!-- testUserLogin -->
+        <test-method status="PASS" signature="tearDown(org.testng.ITestResult, org.testng.ITestContext)[pri:0, instance:com.realtech.socialsurvey.version1.testcase.TestHomePage@13a45c84]" name="tearDown" is-config="true" duration-ms="77" started-at="2015-10-28T16:45:54Z" finished-at="2015-10-28T16:45:54Z">
+          <params>
+            <param index="0">
+              <value>
+                <![CDATA[[TestResult name=testUserLogin status=SUCCESS method=TestHomePage.testUserLogin()[pri:0, instance:com.realtech.socialsurvey.version1.testcase.TestHomePage@13a45c84] output={null}]]]>
+              </value>
+            </param>
+            <param index="1">
+              <value>
+                <![CDATA[org.testng.TestRunner@4dc5b8f6]]>
+              </value>
+            </param>
+          </params>
+          <reporter-output>
+          </reporter-output>
+        </test-method> <!-- tearDown -->
+        <test-method status="PASS" signature="setUp()[pri:0, instance:com.realtech.socialsurvey.version1.testcase.TestHomePage@13a45c84]" name="setUp" is-config="true" duration-ms="10161" started-at="2015-10-28T16:45:54Z" finished-at="2015-10-28T16:46:04Z">
+          <reporter-output>
+          </reporter-output>
+        </test-method> <!-- setUp -->
+        <test-method status="PASS" signature="testUserLogout()[pri:0, instance:com.realtech.socialsurvey.version1.testcase.TestHomePage@13a45c84]" name="testUserLogout" duration-ms="2814" started-at="2015-10-28T16:46:04Z" depends-on-methods="com.realtech.socialsurvey.version1.testcase.TestHomePage.testUserLogin" finished-at="2015-10-28T16:46:07Z">
+          <reporter-output>
+          </reporter-output>
+        </test-method> <!-- testUserLogout -->
+        <test-method status="PASS" signature="tearDown(org.testng.ITestResult, org.testng.ITestContext)[pri:0, instance:com.realtech.socialsurvey.version1.testcase.TestHomePage@13a45c84]" name="tearDown" is-config="true" duration-ms="93" started-at="2015-10-28T16:46:07Z" finished-at="2015-10-28T16:46:07Z">
+          <params>
+            <param index="0">
+              <value>
+                <![CDATA[[TestResult name=testUserLogout status=SUCCESS method=TestHomePage.testUserLogout()[pri:0, instance:com.realtech.socialsurvey.version1.testcase.TestHomePage@13a45c84] output={null}]]]>
+              </value>
+            </param>
+            <param index="1">
+              <value>
+                <![CDATA[org.testng.TestRunner@4dc5b8f6]]>
+              </value>
+            </param>
+          </params>
+          <reporter-output>
+          </reporter-output>
+        </test-method> <!-- tearDown -->
+      </class> <!-- com.realtech.socialsurvey.version1.testcase.TestHomePage -->
+    </test> <!-- Default test -->
+  </suite> <!-- Default suite -->
+</testng-results>
