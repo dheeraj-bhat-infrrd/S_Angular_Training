@@ -35,7 +35,9 @@ public class GlobalConstants
     
     //Default values
     public static final String USER_NAME = "shubham@raremile.com";
-    public static final String USER_PASSWORD = "test12";    
+    public static final String EMAILID_INCORRECT = "shubham@rarem";
+    public static final String USER_PASSWORD = "test12";
+    public static final String USER_PASSWORD_INCORRECT = "blahblah";
     
     //Register New User
     public static final String REG_FIRST_NAME = "satish";

@@ -7,6 +7,7 @@ import org.testng.annotations.Test;
 
 import com.realtech.socialsurvey.constants.GlobalConstants;
 import com.realtech.socialsurvey.version1.page.HomePage;
+import com.realtech.socialsurvey.version1.page.LoginPage;
 
 
 public class TestHomePage extends BaseTestCase
@@ -14,12 +15,12 @@ public class TestHomePage extends BaseTestCase
     private static final Logger LOG = LoggerFactory.getLogger( HomePage.class );
 
 
-    @Test ( groups = "home", testName = "TCSS-1")
+    /*@Test ( groups = "home", testName = "TCSS-1")
     public void testHomePage()
     {
         LOG.trace( "\n\n*** Started Testing: testHomePage" );
         try {
-            HomePage homePage = new HomePage( driver );
+            new HomePage( driver );
         } catch ( Exception e ) {
             e.printStackTrace( System.out );
             LOG.error( "*** Exception While Testing: testHomePage" );
@@ -58,7 +59,26 @@ public class TestHomePage extends BaseTestCase
     }
 
 
-    @Test ( groups = "home", testName = "TCSS-4", dependsOnMethods = "testUserLogin")
+    @Test ( groups = "home", testName = "TCSS-4")
+    public void testUserLoginInvalidCreditentials()
+    {
+        LOG.trace( "\n\n*** Started Testing: testUserLoginInvalid" );
+        try {
+            HomePage homePage = new HomePage( driver );
+            homePage.loginUser( GlobalConstants.USER_NAME, GlobalConstants.USER_PASSWORD_INCORRECT );
+        } catch ( Error e ) {
+            LOG.trace( "*** Login failed: testUserLoginInvalid : " + e.getMessage() );
+
+            //check if it ended up on login page
+            LoginPage loginPage = new LoginPage( driver );
+            if ( loginPage.getErrorMessage().equalsIgnoreCase( LoginPage.INVALID_CREDENTIALS_MESSAGE ) ) {
+                LOG.trace( "\n\n*** Test case passed: testUserLoginInvalid" );
+            }
+        }
+    }
+
+
+    @Test ( groups = "home", testName = "TCSS-5", dependsOnMethods = "testUserLogin")
     public void testUserLogout()
     {
         LOG.trace( "\n\n*** Started Testing: testUserLogout" );
@@ -73,7 +93,7 @@ public class TestHomePage extends BaseTestCase
     }
 
 
-    @Test ( groups = "home", testName = "TCSS-5")
+    @Test ( groups = "home", testName = "TCSS-6")
     public void testUserRegister()
     {
         LOG.trace( "\n\n*** Started Testing: testUserRegister" );
@@ -88,7 +108,7 @@ public class TestHomePage extends BaseTestCase
     }
 
 
-    @Test ( groups = "prosearch", testName = "TCSS-6")
+    @Test ( groups = "home", testName = "TCSS-7")
     public void testProSearch()
     {
         LOG.trace( "\n\n*** Started Testing: testProSearch" );
@@ -99,6 +119,87 @@ public class TestHomePage extends BaseTestCase
             e.printStackTrace( System.out );
             LOG.error( "*** Exception While Testing: testProSearch" );
             Assert.fail( "Exception Occurred While Testing: testProSearch: " + e.getMessage() );
+        }
+    }
+
+
+    @Test ( groups = "home", testName = "TCSS-8")
+    public void testPricingLinkClick()
+    {
+        LOG.trace( "\n\n*** Started Testing: testPricingLinkClick" );
+        try {
+            HomePage homePage = new HomePage( driver );
+            homePage.clickPricingLink();
+        } catch ( Exception e ) {
+            e.printStackTrace( System.out );
+            LOG.error( "*** Exception While Testing: testPricingLinkClick" );
+            Assert.fail( "Exception Occurred While Testing: testPricingLinkClick: " + e.getMessage() );
+        }
+    }
+
+
+    @Test ( groups = "home", testName = "TCSS-9")
+    public void testPrivacyLinkClick()
+    {
+        LOG.trace( "\n\n*** Started Testing: testPrivacyClick" );
+        try {
+            HomePage homePage = new HomePage( driver );
+            homePage.clickPrivacyLink();
+        } catch ( Exception e ) {
+            e.printStackTrace( System.out );
+            LOG.error( "*** Exception While Testing: testPrivacyClick" );
+            Assert.fail( "Exception Occurred While Testing: testPrivacyClick: " + e.getMessage() );
+        }
+    }
+
+
+    @Test ( groups = "home", testName = "TCSS-10")
+    public void testFeaturesLinkClick()
+    {
+        LOG.trace( "\n\n*** Started Testing: testFeaturesLinkClick" );
+        try {
+            HomePage homePage = new HomePage( driver );
+            homePage.clickFeaturesLink();
+        } catch ( Exception e ) {
+            e.printStackTrace( System.out );
+            LOG.error( "*** Exception While Testing: testFeaturesLinkClick" );
+            Assert.fail( "Exception Occurred While Testing: testFeaturesLinkClick: " + e.getMessage() );
+        }
+    }
+
+
+    @Test ( groups = "home", testName = "TCSS-11")
+    public void testTermsLinkClick()
+    {
+        LOG.trace( "\n\n*** Started Testing: testTermsLinkClick" );
+        try {
+            HomePage homePage = new HomePage( driver );
+            homePage.clickTermsLink();
+        } catch ( Exception e ) {
+            e.printStackTrace( System.out );
+            LOG.error( "*** Exception While Testing: testTermsLinkClick" );
+            Assert.fail( "Exception Occurred While Testing: testTermsLinkClick: " + e.getMessage() );
+        }
+    }*/
+
+
+    @Test ( groups = "home", testName = "TCSS-12")
+    public void testUserLoginInvalidEmailId()
+    {
+        LOG.trace( "\n\n*** Started Testing: testUserLoginInvalidEmailId" );
+        HomePage homePage = null;
+        try {
+            homePage = new HomePage( driver );
+            homePage.loginUser( GlobalConstants.EMAILID_INCORRECT, GlobalConstants.USER_PASSWORD );
+        } catch ( Error e ) {
+            LOG.trace( "*** Login failed: testUserLoginInvalidEmailId : " + e.getMessage() );
+
+            //check if it ended up on login page
+            if ( homePage != null ) {
+                if ( homePage.getToastMessage().equalsIgnoreCase( HomePage.INVALID_EMAILID_MESSAGE ) ) {
+                    LOG.trace( "\n\n*** Test case passed: testUserLoginInvalidEmailId" );
+                }
+            }
         }
     }
 }
