@@ -48,7 +48,7 @@
 						<div class="float-left h-pwd-wrapper">
 							<div class="h-lbl clearfix">
 								<div class="float-left">Password</div>
-								<div class="float-right fgt-pwd"><span onclick ="openForgotPasswordPage();">Forgot Password?</span></div>
+								<div class="float-right fgt-pwd"><span id="forgot-pwd" onclick ="openForgotPasswordPage();">Forgot Password?</span></div>
 							</div>
 							<div class="h-inp-wrapper">
 								<div class="m-inp-img m-inp-img-pwd"></div>
