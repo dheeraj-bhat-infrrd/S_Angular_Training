@@ -187,4 +187,94 @@ public class SurveyPreInitiationDaoImpl extends GenericDaoImpl<SurveyPreInitiati
 		query.setParameterList("incompleteSurveyIds", incompleteSurveyIds);
 		query.executeUpdate();
 	}
+	
+	
+	@Override
+	public Map<Integer, Integer> getIncompletSurveyAggregationCount(long companyId, int status, Timestamp startDate, Timestamp endDate, List<Long> agentIds, String aggregateBy) throws InvalidInputException{
+		LOG.info("Getting incomplete survey aggregated count for company id : "+companyId+" \t status: "+status+"\t startDate "+startDate+"\t end date: "+endDate+"\t aggregatedBy: "+aggregateBy);
+		StringBuilder queryBuilder = new StringBuilder();
+		if(aggregateBy == null || aggregateBy.isEmpty()){
+			LOG.error("Aggregate by is null");
+			throw new InvalidInputException("Aggregate by is null");
+		}
+		boolean whereFlag = false; // used if where is 
+		if(aggregateBy.equals(CommonConstants.AGGREGATE_BY_WEEK)){
+			queryBuilder.append("SELECT YEARWEEK(CREATED_ON) AS SENT_DATE, COUNT(SURVEY_PRE_INITIATION_ID) AS NUM_OF_SURVEYS FROM SURVEY_PRE_INITIATION WHERE ");
+		}else if(aggregateBy.equals(CommonConstants.AGGREGATE_BY_DAY)){
+			queryBuilder.append("SELECT DATE(CREATED_ON) AS SENT_DATE, COUNT(SURVEY_PRE_INITIATION_ID) AS NUM_OF_SURVEYS FROM SURVEY_PRE_INITIATION WHERE ");
+		}else if(aggregateBy.equals(CommonConstants.AGGREGATE_BY_MONTH)){
+			queryBuilder.append("SELECT EXTRACT(YEAR_MONTH FROM CREATED_ON) AS SENT_DATE, COUNT(SURVEY_PRE_INITIATION_ID) AS NUM_OF_SURVEYS FROM SURVEY_PRE_INITIATION WHERE ");
+		}
+		if(companyId > 0l){
+			queryBuilder.append(" COMPANY_ID = :companyId");
+			whereFlag = true;
+		}
+		if(whereFlag){
+			queryBuilder.append(" AND STATUS = :status");
+			whereFlag = true;
+		}else{
+			queryBuilder.append(" STATUS = :status");
+		}
+		if(startDate != null){
+			if(whereFlag){
+				queryBuilder.append(" AND CREATED_ON >= :startDate");
+				whereFlag = true;
+			}else{
+				queryBuilder.append(" CREATED_ON >= :startDate");
+			}
+		}
+		if(endDate != null){
+			if(whereFlag){
+				queryBuilder.append(" AND CREATED_ON <= :endDate");
+				whereFlag = true;
+			}else{
+				queryBuilder.append(" CREATED_ON <= :endDate");
+			}
+		}
+		if(agentIds != null && agentIds.size() > 0){
+			if(agentIds.size() == 1){
+				if(whereFlag){
+					queryBuilder.append(" AND AGENT_ID = :agentId");
+					whereFlag = true;
+				}else{
+					queryBuilder.append(" AGENT_ID = :agentId");
+				}
+			}else{
+				if(whereFlag){
+					queryBuilder.append(" AND AGENT_ID IN :agentIds");
+					whereFlag = true;
+				}else{
+					queryBuilder.append(" AGENT_ID IN :agentIds");
+				}
+			}
+		}
+		if(aggregateBy.equals(CommonConstants.AGGREGATE_BY_WEEK)){
+			queryBuilder.append(" GROUP BY YEARWEEK(CREATED_ON) ORDER BY SENT_DATE");
+		}else if(aggregateBy.equals(CommonConstants.AGGREGATE_BY_DAY)){
+			queryBuilder.append(" GROUP BY DATE(CREATED_ON) ORDER BY SENT_DATE");
+		}else if(aggregateBy.equals(CommonConstants.AGGREGATE_BY_MONTH)){
+			queryBuilder.append(" GROUP BY EXTRACT(YEAR_MONTH FROM CREATED_ON) ORDER BY SENT_DATE");
+		}
+		Query query = null;
+		query = getSession().createSQLQuery(queryBuilder.toString());
+		if(companyId > 0l){
+			query.setParameter("companyId", companyId);
+		}
+		query.setParameter("status", status);
+		if(startDate != null){
+			query.setParameter("startDate", startDate);
+		}
+		if(endDate != null){
+			query.setParameter("endDate", endDate);
+		}
+		if(agentIds != null && agentIds.size() > 0){
+			if(agentIds.size() == 1){
+				query.setParameter("agentId", agentIds.get(CommonConstants.INITIAL_INDEX));
+			}else{
+				query.setParameter("agentIds", agentIds);
+			}
+		}
+		List result = query.list();
+		return null;
+	}
 }
