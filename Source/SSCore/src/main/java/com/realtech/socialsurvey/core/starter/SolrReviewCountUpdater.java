@@ -1,8 +1,6 @@
 package com.realtech.socialsurvey.core.starter;
 
 import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -16,6 +14,8 @@ import org.springframework.scheduling.quartz.QuartzJobBean;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.exception.NoRecordsFetchedException;
 import com.realtech.socialsurvey.core.services.batchTracker.BatchTrackerService;
+
+
 /**
  * 
  * @author rohit
@@ -25,10 +25,11 @@ import com.realtech.socialsurvey.core.services.batchTracker.BatchTrackerService;
 
 public class SolrReviewCountUpdater extends QuartzJobBean
 {
-    
+
     public static final Logger LOG = LoggerFactory.getLogger( SolrReviewCountUpdater.class );
-    
+
     private BatchTrackerService batchTrackerService;
+
 
     @Override
     protected void executeInternal( JobExecutionContext jobExecutionContext ) throws JobExecutionException
@@ -42,23 +43,24 @@ public class SolrReviewCountUpdater extends QuartzJobBean
             List<Long> userIdList = batchTrackerService.getUserIdListToBeUpdated( lastRunTime );
             //getting no of reviews for the agents 
             Map<Long, Integer> agentsReviewCount = batchTrackerService.getReviewCountForAgents( userIdList );
-            
-            batchTrackerService.updateReviewCountForAgentsInSolr( agentsReviewCount );                
-            
+
+            batchTrackerService.updateReviewCountForAgentsInSolr( agentsReviewCount );
+
             //updating last run time for batch in database
             batchTrackerService.updateModifiedOnColumnByBatchType( CommonConstants.BATCH_TYPE_REVIEW_COUNT_UPDATER );
         } catch ( NoRecordsFetchedException e ) {
-           LOG.error( "No entry found for batch tracker in database" );
+            LOG.error( "No entry found for batch tracker in database" );
         } catch ( ParseException e ) {
             LOG.error( "Error while parsing the data fetched from mongo for survey count" );
         }
-        
+
     }
+
 
     private void initializeDependencies( JobDataMap jobMap )
     {
-        batchTrackerService = (BatchTrackerService ) jobMap.get( "batchTrackerService" );
-        
+        batchTrackerService = (BatchTrackerService) jobMap.get( "batchTrackerService" );
+
     }
 
 }

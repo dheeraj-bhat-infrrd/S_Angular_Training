@@ -2015,7 +2015,10 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
         AggregationResults<SurveyDetails> result = mongoTemplate.aggregate( aggregation, SURVEY_DETAILS_COLLECTION,
             SurveyDetails.class );
         Map<Long, Integer> surveyCountForEntities = new HashMap<>();
-
+        //inserting count as zero for all records. aggregation doesn't return group with zero record.
+        for(Long agentId : agentIdList){
+            surveyCountForEntities.put( agentId, 0 );
+        }
 
         @SuppressWarnings ( "unchecked") List<BasicDBObject> surveyCountList = (List<BasicDBObject>) result.getRawResults()
             .get( "result" );
