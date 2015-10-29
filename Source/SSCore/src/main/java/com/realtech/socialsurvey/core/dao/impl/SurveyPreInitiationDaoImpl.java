@@ -1,8 +1,10 @@
 package com.realtech.socialsurvey.core.dao.impl;
 
+import java.math.BigInteger;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -190,8 +192,9 @@ public class SurveyPreInitiationDaoImpl extends GenericDaoImpl<SurveyPreInitiati
 	
 	
 	@Override
-	public Map<Integer, Integer> getIncompletSurveyAggregationCount(long companyId, int status, Timestamp startDate, Timestamp endDate, List<Long> agentIds, String aggregateBy) throws InvalidInputException{
+	public Map<Integer, Integer> getIncompletSurveyAggregationCount(long companyId, long agentId, int status, Timestamp startDate, Timestamp endDate, Set<Long> agentIds, String aggregateBy) throws InvalidInputException{
 		LOG.info("Getting incomplete survey aggregated count for company id : "+companyId+" \t status: "+status+"\t startDate "+startDate+"\t end date: "+endDate+"\t aggregatedBy: "+aggregateBy);
+		Map<Integer, Integer> aggregateResult = null;
 		StringBuilder queryBuilder = new StringBuilder();
 		if(aggregateBy == null || aggregateBy.isEmpty()){
 			LOG.error("Aggregate by is null");
@@ -211,41 +214,39 @@ public class SurveyPreInitiationDaoImpl extends GenericDaoImpl<SurveyPreInitiati
 		}
 		if(whereFlag){
 			queryBuilder.append(" AND STATUS = :status");
-			whereFlag = true;
 		}else{
 			queryBuilder.append(" STATUS = :status");
+			whereFlag = true;
 		}
 		if(startDate != null){
 			if(whereFlag){
 				queryBuilder.append(" AND CREATED_ON >= :startDate");
-				whereFlag = true;
 			}else{
 				queryBuilder.append(" CREATED_ON >= :startDate");
+				whereFlag = true;
 			}
 		}
 		if(endDate != null){
 			if(whereFlag){
 				queryBuilder.append(" AND CREATED_ON <= :endDate");
-				whereFlag = true;
 			}else{
 				queryBuilder.append(" CREATED_ON <= :endDate");
+				whereFlag = true;
 			}
 		}
-		if(agentIds != null && agentIds.size() > 0){
-			if(agentIds.size() == 1){
-				if(whereFlag){
-					queryBuilder.append(" AND AGENT_ID = :agentId");
-					whereFlag = true;
-				}else{
-					queryBuilder.append(" AGENT_ID = :agentId");
-				}
+		if(agentId > 0l){
+			if(whereFlag){
+				queryBuilder.append(" AND AGENT_ID = :agentId");
 			}else{
-				if(whereFlag){
-					queryBuilder.append(" AND AGENT_ID IN :agentIds");
-					whereFlag = true;
-				}else{
-					queryBuilder.append(" AGENT_ID IN :agentIds");
-				}
+				queryBuilder.append(" AGENT_ID = :agentId");
+				whereFlag = true;
+			}
+		}else if(agentIds != null && agentIds.size() > 0){
+			if(whereFlag){
+				queryBuilder.append(" AND AGENT_ID IN (:agentIds)");
+			}else{
+				queryBuilder.append(" AGENT_ID IN (:agentIds)");
+				whereFlag = true;
 			}
 		}
 		if(aggregateBy.equals(CommonConstants.AGGREGATE_BY_WEEK)){
@@ -267,14 +268,19 @@ public class SurveyPreInitiationDaoImpl extends GenericDaoImpl<SurveyPreInitiati
 		if(endDate != null){
 			query.setParameter("endDate", endDate);
 		}
-		if(agentIds != null && agentIds.size() > 0){
-			if(agentIds.size() == 1){
-				query.setParameter("agentId", agentIds.get(CommonConstants.INITIAL_INDEX));
-			}else{
-				query.setParameter("agentIds", agentIds);
+		if(agentId > 0l){
+			query.setParameter("agentId", agentId);
+		}else if(agentIds != null && agentIds.size() > 0){
+			query.setParameterList("agentIds", agentIds);
+		}
+		@SuppressWarnings("unchecked")
+		List<Object[]> results = query.list();
+		if(results != null && results.size() > 0){
+			aggregateResult = new HashMap<Integer, Integer>();
+			for(Object[] result : results){
+				aggregateResult.put((Integer)result[0], ((BigInteger)result[1]).intValue());
 			}
 		}
-		List result = query.list();
-		return null;
+		return aggregateResult;
 	}
 }
