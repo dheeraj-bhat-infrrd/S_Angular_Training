@@ -280,8 +280,3 @@
 			</div>
 		</div>
 	</div>
-	<script>
-		function userLogout(){
-			window.location.href = 'j_spring_security_logout';
-		}
-	</script>

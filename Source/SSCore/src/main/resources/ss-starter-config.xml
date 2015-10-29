@@ -362,7 +362,7 @@
 	<bean id="crmdataagentidmappercron"
 		class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
 		<property name="jobDetail" ref="crmdataagentidmapperjobdetail" />
-		<property name="cronExpression" value="0 05 * * * ?" />
+		<property name="cronExpression" value="0 10 * * * ?" />
 	</bean>
 
 	<!-- setting cron for loading image from linkedin to amazon server -->
