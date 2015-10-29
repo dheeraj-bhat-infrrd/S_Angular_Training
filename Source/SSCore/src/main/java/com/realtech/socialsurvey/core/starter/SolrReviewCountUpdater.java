@@ -1,6 +1,9 @@
 package com.realtech.socialsurvey.core.starter;
 
 import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.List;
 import java.util.Map;
 
 import org.quartz.JobDataMap;
@@ -35,10 +38,13 @@ public class SolrReviewCountUpdater extends QuartzJobBean
         try {
             //getting last run time of batch
             long lastRunTime = batchTrackerService.getLastRunTimeByBatchType( CommonConstants.BATCH_TYPE_REVIEW_COUNT_UPDATER );
-            //getting no of reviews changed after last run for each agent  
-            Map<Long, Integer> agentsReviewCount = batchTrackerService.getReviewCountForAgentsByModifiedOn( lastRunTime );
-            //updating count in solr
-            batchTrackerService.updateReviewCountForAgentsInSolr( agentsReviewCount );
+            //get user id list for them review count will be updated
+            List<Long> userIdList = batchTrackerService.getUserIdListToBeUpdated( lastRunTime );
+            //getting no of reviews for the agents 
+            Map<Long, Integer> agentsReviewCount = batchTrackerService.getReviewCountForAgents( userIdList );
+            
+            batchTrackerService.updateReviewCountForAgentsInSolr( agentsReviewCount );                
+            
             //updating last run time for batch in database
             batchTrackerService.updateModifiedOnColumnByBatchType( CommonConstants.BATCH_TYPE_REVIEW_COUNT_UPDATER );
         } catch ( NoRecordsFetchedException e ) {

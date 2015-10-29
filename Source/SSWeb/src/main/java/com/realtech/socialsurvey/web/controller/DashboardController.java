@@ -138,20 +138,6 @@ public class DashboardController
     private final String CONTENT_DISPOSITION_HEADER = "Content-Disposition";
     private final String EXCEL_FILE_EXTENSION = ".xlsx";
 
-    @ResponseBody
-    @RequestMapping ( value = "/justfortesting")
-    public String testMethod( @RequestParam long dateTime ) throws NonFatalException
-    {
-        try {
-            return batchTrackerService.getReviewCountForAgentsByModifiedOn( dateTime ).toString();
-        } catch ( ParseException e ) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
-        return "";
-
-    }
-
     /*
      * Method to initiate dashboard
      */

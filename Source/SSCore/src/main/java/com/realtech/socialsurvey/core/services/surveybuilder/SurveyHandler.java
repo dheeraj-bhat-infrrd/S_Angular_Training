@@ -98,10 +98,10 @@ public interface SurveyHandler
     public String getMoodsToSendMail();
 
 
-    public void increaseSurveyCountForAgent( long agentId ) throws SolrException;
+    public void increaseSurveyCountForAgent( long agentId ) throws SolrException, NoRecordsFetchedException;
 
 
-    public void decreaseSurveyCountForAgent( long agentId ) throws SolrException;
+    public void decreaseSurveyCountForAgent( long agentId ) throws SolrException, NoRecordsFetchedException;
 
 
     public void updateSharedOn( String socialSite, long agentId, String customerEmail );
