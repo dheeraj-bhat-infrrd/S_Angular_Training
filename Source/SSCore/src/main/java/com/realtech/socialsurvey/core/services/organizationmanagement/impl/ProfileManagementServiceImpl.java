@@ -1480,7 +1480,8 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 
 
     @Override
-    public long getReviewsCountForCompany( long companyId, double minScore, double maxScore, boolean fetchAbusive, boolean notRecommended )
+    public long getReviewsCountForCompany( long companyId, double minScore, double maxScore, boolean fetchAbusive,
+        boolean notRecommended )
     {
         LOG.info( "Method getReviewsCountForCompany called for companyId:" + companyId + " minscore:" + minScore + " maxscore:"
             + maxScore );
@@ -1688,8 +1689,8 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
      * score specified
      */
     @Override
-    public long getReviewsCount( long iden, double minScore, double maxScore, String profileLevel, boolean fetchAbusive, boolean notRecommended )
-        throws InvalidInputException
+    public long getReviewsCount( long iden, double minScore, double maxScore, String profileLevel, boolean fetchAbusive,
+        boolean notRecommended ) throws InvalidInputException
     {
         LOG.info( "Method getReviewsCount called for iden:" + iden + " minscore:" + minScore + " maxscore:" + maxScore
             + " profilelevel:" + profileLevel );
@@ -1698,7 +1699,8 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
         }
         long reviewsCount = 0;
         String idenColumnName = getIdenColumnNameFromProfileLevel( profileLevel );
-        reviewsCount = surveyDetailsDao.getFeedBacksCount( idenColumnName, iden, minScore, maxScore, fetchAbusive, notRecommended );
+        reviewsCount = surveyDetailsDao.getFeedBacksCount( idenColumnName, iden, minScore, maxScore, fetchAbusive,
+            notRecommended );
 
         LOG.info( "Method getReviewsCount executed successfully. Returning reviewsCount:" + reviewsCount );
         return reviewsCount;
@@ -2332,7 +2334,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
             throw new InvalidInputException( "Invalid value passed for iden of profile level." );
         }
         Map<Long, AgentRankingReport> agentReportData = new HashMap<>();
-        surveyDetailsDao.getAverageScore( startDate, endDate, agentReportData, columnName, iden , false );
+        surveyDetailsDao.getAverageScore( startDate, endDate, agentReportData, columnName, iden, false );
         surveyDetailsDao.getCompletedSurveysCount( startDate, endDate, agentReportData, columnName, iden, false );
         // FIX for JIRA: SS-1112: BOC
         // surveyPreInitiationDao.getIncompleteSurveysCount( startDate, endDate, agentReportData );
@@ -2570,8 +2572,26 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
         if ( user == null ) {
             throw new InvalidInputException( "No user present for the specified companyId" );
         }
-        user.setFirstName( individualName.substring( 0, individualName.indexOf( ' ' ) ) );
-        user.setLastName( individualName.substring( individualName.indexOf( ' ' ) + 1 ) );
+        String nameArray[] = null;
+        if ( individualName != null && !individualName.equalsIgnoreCase( "" ) ) {
+            nameArray = individualName.split( " " );
+        }
+
+        if ( nameArray == null ) {
+            throw new InvalidInputException( "Invalid name, please provide a valid name " );
+        }
+
+        user.setFirstName( nameArray[0] );
+        String lastName = "";
+        if ( nameArray.length > 1 ) {
+            for ( int i = 1; i < nameArray.length - 1; i++ ) {
+                lastName += nameArray[i] + " ";
+            }
+        }
+        if ( lastName != null && !lastName.equalsIgnoreCase( "" ) ) {
+            lastName = lastName.trim();
+            user.setLastName( lastName );
+        }
         user.setModifiedBy( String.valueOf( userId ) );
         user.setModifiedOn( new Timestamp( System.currentTimeMillis() ) );
         userDao.update( user );
