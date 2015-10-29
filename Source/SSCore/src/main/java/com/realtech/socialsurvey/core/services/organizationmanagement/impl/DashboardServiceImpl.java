@@ -27,12 +27,13 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 import com.realtech.socialsurvey.core.commons.AgentRankingReportComparator;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.commons.SurveyResultsComparator;
-import com.realtech.socialsurvey.core.dao.GenericDao;
 import com.realtech.socialsurvey.core.dao.OrganizationUnitSettingsDao;
 import com.realtech.socialsurvey.core.dao.SurveyDetailsDao;
+import com.realtech.socialsurvey.core.dao.SurveyPreInitiationDao;
 import com.realtech.socialsurvey.core.dao.impl.MongoSocialPostDaoImpl;
 import com.realtech.socialsurvey.core.entities.AgentRankingReport;
 import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
@@ -67,7 +68,7 @@ public class DashboardServiceImpl implements DashboardService, InitializingBean
     private OrganizationUnitSettingsDao organizationUnitSettingsDao;
 
     @Autowired
-    private GenericDao<SurveyPreInitiation, Long> surveyPreInitiationDao;
+    private SurveyPreInitiationDao surveyPreInitiationDao;
 
 
     @Override
@@ -201,6 +202,7 @@ public class DashboardServiceImpl implements DashboardService, InitializingBean
     }
 
 
+    @Transactional
     @Override
     public Map<String, Map<String, Long>> getSurveyDetailsForGraph( String columnName, long columnValue, int numberOfDays,
         boolean realtechAdmin ) throws ParseException, InvalidInputException
@@ -213,30 +215,32 @@ public class DashboardServiceImpl implements DashboardService, InitializingBean
         switch ( numberOfDays ) {
             case 30:
                 noOfDaysToConsider = numberOfDays + Calendar.getInstance().get( Calendar.DAY_OF_WEEK );
-                criteria = "week";
+                criteria = CommonConstants.AGGREGATE_BY_WEEK;
                 startTime.add(Calendar.DATE, -30);
                 break;
             case 60:
                 noOfDaysToConsider = numberOfDays + Calendar.getInstance().get( Calendar.DAY_OF_WEEK );
-                criteria = "week";
+                criteria = CommonConstants.AGGREGATE_BY_WEEK;
                 startTime.add(Calendar.DATE, -60);
                 break;
             case 90:
                 noOfDaysToConsider = numberOfDays + Calendar.getInstance().get( Calendar.DAY_OF_WEEK );
-                criteria = "week";
+                criteria = CommonConstants.AGGREGATE_BY_WEEK;
                 startTime.add(Calendar.DATE, -90);
                 break;
             case 365:
                 noOfDaysToConsider = numberOfDays + Calendar.getInstance().get( Calendar.DAY_OF_MONTH );
-                criteria = "month";
+                criteria = CommonConstants.AGGREGATE_BY_MONTH;
                 startTime.add(Calendar.DATE, -365);
                 break;
         }
+        // strip the time component of start time
         startTime.set(Calendar.HOUR_OF_DAY, 0);
         startTime.set(Calendar.MINUTE, 0);
         startTime.set(Calendar.SECOND, 0);
         startTime.set(Calendar.MILLISECOND, 0);
         Map<Integer, Integer> completedSurveys = surveyDetailsDao.getCompletedSurveyAggregationCount(columnName, columnValue, new Timestamp(startTime.getTimeInMillis()), new Timestamp(currentTime.getTimeInMillis()), criteria);
+        surveyPreInitiationDao.getIncompletSurveyAggregationCount(columnValue, CommonConstants.STATUS_ACTIVE, new Timestamp(startTime.getTimeInMillis()), new Timestamp(currentTime.getTimeInMillis()), null, criteria);
         Map<String, Map<String, Long>> map = new HashMap<String, Map<String, Long>>();
         map.put( "clicked", surveyDetailsDao.getClickedSurveyByCriteria( columnName, columnValue, numberOfDays,
             noOfDaysToConsider, criteria, realtechAdmin ) );
