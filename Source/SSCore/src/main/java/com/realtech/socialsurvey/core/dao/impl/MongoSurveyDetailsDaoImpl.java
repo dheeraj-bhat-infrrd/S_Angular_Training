@@ -1969,7 +1969,7 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
         Date startDate = new Date( modifiedAfter );
 
         Query query = new Query( Criteria.where( CommonConstants.MODIFIED_ON_COLUMN ).gte( startDate ) );
-        
+
 
         query.fields().include( columnName );
 
@@ -2016,14 +2016,15 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
             SurveyDetails.class );
         Map<Long, Integer> surveyCountForEntities = new HashMap<>();
         //inserting count as zero for all records. aggregation doesn't return group with zero record.
-        for(Long agentId : agentIdList){
+        for ( Long agentId : agentIdList ) {
             surveyCountForEntities.put( agentId, 0 );
         }
 
         @SuppressWarnings ( "unchecked") List<BasicDBObject> surveyCountList = (List<BasicDBObject>) result.getRawResults()
             .get( "result" );
+
         for ( BasicDBObject o : surveyCountList ) {
-            surveyCountForEntities.put( Long.parseLong( o.get( CommonConstants.DEFAULT_MONGO_ID_COLUMN ).toString() ),
+            surveyCountForEntities.put( new Double( o.get( CommonConstants.DEFAULT_MONGO_ID_COLUMN ).toString() ).longValue(),
                 Integer.parseInt( o.get( "count" ).toString() ) );
         }
 
