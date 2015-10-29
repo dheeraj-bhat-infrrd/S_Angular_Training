@@ -3,11 +3,15 @@ package com.realtech.socialsurvey.version1.page;
 import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.testng.Assert;
 
 
 public class HomePage extends BasePage
 {
+
+    private static final Logger LOG = LoggerFactory.getLogger( HomePage.class );
 
     public static final String HOME_PAGE_TITLE = "Professional Reputation Management | SocialSurvey.me";
     public static final String FORGOT_PASSWORD_PAGE_LOCATOR = "id=forgot-pwd";
@@ -107,8 +111,8 @@ public class HomePage extends BasePage
 
     public RegistrationSuccessPage registerUser( String firstNameString, String lastNameString, String emailIdString )
     {
-        System.out.println( "Register user with firstName : " + firstNameString + ", lastName : " + lastNameString
-            + " &emailId : " + emailIdString );
+        LOG.trace( "Register user with firstName : " + firstNameString + ", lastName : " + lastNameString + " &emailId : "
+            + emailIdString );
 
 
         WebElement firstName = getElement( FIRST_NAME_LOCATOR );
