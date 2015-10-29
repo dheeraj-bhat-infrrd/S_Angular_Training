@@ -122,11 +122,11 @@ public interface SurveyDetailsDao
 
 
     public void getAverageScore( Date startDate, Date endDate, Map<Long, AgentRankingReport> agentReportData,
-        String columnName, long columnValue , boolean fetchAbusive );
+        String columnName, long columnValue, boolean fetchAbusive );
 
 
     public void getCompletedSurveysCount( Date startDate, Date endDate, Map<Long, AgentRankingReport> agentReportData,
-        String colunmName, long columnValue, boolean fetchAbusive  );
+        String colunmName, long columnValue, boolean fetchAbusive );
 
 
     public long noOfPreInitiatedSurveys( String columnName, long columnValue, Date startDate, Date endDate );
@@ -166,21 +166,25 @@ public interface SurveyDetailsDao
 
 
     public long getSocialPostsCountBasedOnHierarchy( int numberOfDays, String collectionName, long collectionId );
+
+
     public void updateSurveyAsUnderResolution( String surveyId );
 
 
     public List<AbusiveSurveyReportWrapper> getSurveysReporetedAsAbusive( long companyId, int start, int rows );
 
-    
+
     public long getSurveysUnderResolutionCount( long companyId );
-    
-    
+
+
     public List<SurveyDetails> getSurveysUnderResolution( long companyId, int start, int rows );
 
 
     long getSurveysReporetedAsAbusiveCount( long companyId );
 
 
-    Map<Long, Integer> getSurveyCountInATimePeriod( String columnName, long startDate,
-        double startScore, double limitScore, boolean fetchAbusive ) throws ParseException;
+    public Map<Long, Integer> getSurveyCountForAgents( List<Long> agentIdList, boolean fetchAbusive ) throws ParseException;
+
+
+    public List<Long> getEntityIdListForModifiedReview( String columnName, long modifiedAfter );
 }

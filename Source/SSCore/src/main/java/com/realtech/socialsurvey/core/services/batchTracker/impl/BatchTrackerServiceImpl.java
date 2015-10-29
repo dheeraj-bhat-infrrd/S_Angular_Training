@@ -47,9 +47,7 @@ public class BatchTrackerServiceImpl implements BatchTrackerService
     {
         LOG.debug( "method getLastRunTimeByBatchType() started for batch type : " + batchType );
 
-        HashMap<String, Object> queries = new HashMap<>();
-        queries.put( "batchType", batchType );
-        List<BatchTracker> batchTrackerList = batchTrackerDao.findByKeyValue( BatchTracker.class, queries );
+        List<BatchTracker> batchTrackerList = batchTrackerDao.findByColumn( BatchTracker.class, CommonConstants.BATCH_TYPE_COLUMN, batchType );
         if ( batchTrackerList == null || batchTrackerList.isEmpty() ) {
             throw new NoRecordsFetchedException( "Invalid batch type" );
         }
@@ -74,10 +72,23 @@ public class BatchTrackerServiceImpl implements BatchTrackerService
         }
 
         BatchTracker batchTracker = batchTrackerList.get( CommonConstants.INITIAL_INDEX );
+        batchTracker.setLastRunTime( new Timestamp( System.currentTimeMillis() ) );
         batchTracker.setModifiedOn( new Timestamp( System.currentTimeMillis() ) );
         batchTrackerDao.update( batchTracker );
 
         LOG.debug( "method updateModifiedOnColumnByBatchType() ended for batch type : " + batchType );
+    }
+
+
+    @Override
+    @Transactional
+    public List<Long> getUserIdListToBeUpdated( long modifiedOn )
+    {
+        LOG.debug( "method getReviewCountForAgentsByModifiedOn() started " );
+        List<Long> agentsIdList = surveyDetailsDao.getEntityIdListForModifiedReview( CommonConstants.AGENT_ID_COLUMN,
+            modifiedOn );
+        LOG.debug( "method getReviewCountForAgentsByModifiedOn() ended " );
+        return agentsIdList;
     }
 
 
@@ -87,12 +98,11 @@ public class BatchTrackerServiceImpl implements BatchTrackerService
      */
     @Override
     @Transactional
-    public Map<Long, Integer> getReviewCountForAgentsByModifiedOn( long modifiedOn ) throws ParseException
+    public Map<Long, Integer> getReviewCountForAgents( List<Long> agentIdList ) throws ParseException
     {
-        LOG.debug( "method getReviewCountForAgentsByModifiedOn() started " );
-        Map<Long, Integer> agentsReviewCount = surveyDetailsDao.getSurveyCountInATimePeriod( CommonConstants.AGENT_ID_COLUMN,
-            modifiedOn, 0, 5, false );
-        LOG.debug( "method getReviewCountForAgentsByModifiedOn() ended " );
+        LOG.debug( "method getReviewCountForAgents() started " );
+        Map<Long, Integer> agentsReviewCount = surveyDetailsDao.getSurveyCountForAgents( agentIdList, false );
+        LOG.debug( "method getReviewCountForAgents() ended " );
         return agentsReviewCount;
     }
 
@@ -106,17 +116,12 @@ public class BatchTrackerServiceImpl implements BatchTrackerService
     public void updateReviewCountForAgentsInSolr( Map<Long, Integer> agentsReviewCount )
     {
         LOG.debug( "method updateReviewCountForAgentsInSolr() started" );
-        for ( Map.Entry<Long, Integer> entry : agentsReviewCount.entrySet() ) {
-            long agentId = entry.getKey();
-            int incrementCount = entry.getValue();
-            try {
-                solrSearchService.updateCompletedSurveyCountForUserInSolr( agentId, incrementCount );
-            } catch ( SolrException e ) {
-                LOG.error( "Error while updating review count for agent with id : " + agentId );
-            }
+        try {
+            solrSearchService.updateCompletedSurveyCountForMultipleUserInSolr( agentsReviewCount );
+        } catch ( SolrException e ) {
+            LOG.error( "Error while updating review count" );
         }
         LOG.debug( "method updateReviewCountForAgentsInSolr() ended" );
     }
-
 
 }

@@ -288,7 +288,7 @@
 	<bean id="solrreviewcounterupdatercron"
 		class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
 		<property name="jobDetail" ref="solrreviewcounterupdaterjobdetail" />
-		<property name="cronExpression" value="0 0/1 * * * ?" />
+		<property name="cronExpression" value="0 0 0/3 * * ?" />
 	</bean>
 	
 	<!-- setting cron for Account deactivator -->
