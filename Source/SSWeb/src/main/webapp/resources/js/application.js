@@ -9105,13 +9105,13 @@ function getImageandCaptionProfile(loop) {
 
 }
 
-function showSearchedPostsSolr(fromstart, companyId, searchQuery) {
+function showSearchedPostsSolr(fromstart, entityType, entityId, searchQuery) {
 	if(fromstart){
 		proPostStartIndex = 0;
 	}
 	var payload = {
-			"entityType" : "companyId",
-			"entityId" : companyId,
+			"entityType" : entityType,
+			"entityId" : entityId,
 			"batchSize" : proPostBatchSize,
 			"startIndex" : proPostStartIndex,
 			"searchQuery" : searchQuery
@@ -9122,15 +9122,15 @@ function showSearchedPostsSolr(fromstart, companyId, searchQuery) {
 			proPostStartIndex = 0;
 			proPostCount = data.count + 1;
 		}
-		paintPostsSolr(data.socialMonitorPosts, companyId);
+		paintPostsSolr(data.socialMonitorPosts, entityType, entityId);
 		proPostStartIndex += proPostBatchSize;
 	}, payload, true);
 }
-
-function showPostsSolr(fromstart, companyId) {
+ 
+function showPostsSolr(fromstart, entityType, entityId) {
 	var payload = {
-			"entityType" : "companyId",
-			"entityId" : companyId,
+			"entityType" : entityType,
+			"entityId" : entityId,
 			"batchSize" : proPostBatchSize,
 			"startIndex" : proPostStartIndex
 		};
@@ -9140,12 +9140,12 @@ function showPostsSolr(fromstart, companyId) {
 			proPostStartIndex = 0;
 			proPostCount = data.count + 1;
 		}
-		paintPostsSolr(data.socialMonitorPosts, companyId);
+		paintPostsSolr(data.socialMonitorPosts, entityType, entityId);
 		proPostStartIndex += proPostBatchSize;
 	}, payload, true);
 }
 
-function paintPostsSolr(posts, companyId) {
+function paintPostsSolr(posts, entityType, entityId) {
 	var divToPopulate = "";
 	$.each(posts, function(i, post) {
 		var iconClass = "";
@@ -9223,7 +9223,7 @@ function paintPostsSolr(posts, companyId) {
 		if (scrollContainer.scrollTop === scrollContainer.scrollHeight
 					- scrollContainer.clientHeight) {
 				if (proPostStartIndex < proPostCount)
-					showPostsSolr(false, companyId);
+					showPostsSolr(false, entityType, entityId);
 		}
 	});
 }
