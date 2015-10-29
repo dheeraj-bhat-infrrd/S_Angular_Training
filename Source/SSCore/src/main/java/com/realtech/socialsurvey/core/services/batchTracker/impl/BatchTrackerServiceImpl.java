@@ -2,7 +2,6 @@ package com.realtech.socialsurvey.core.services.batchTracker.impl;
 
 import java.sql.Timestamp;
 import java.text.ParseException;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
