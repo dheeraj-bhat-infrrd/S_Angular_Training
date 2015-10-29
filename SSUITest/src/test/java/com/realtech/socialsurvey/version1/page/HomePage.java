@@ -15,6 +15,10 @@ public class HomePage extends BasePage
 
     public static final String HOME_PAGE_TITLE = "Professional Reputation Management | SocialSurvey.me";
     public static final String FORGOT_PASSWORD_PAGE_LOCATOR = "id=forgot-pwd";
+    public static final String PRIVACY_PAGE_LOCATOR = "link=Privacy Policy";
+    public static final String PRICING_PAGE_LOCATOR = "link=Pricing";
+    public static final String FEATURES_PAGE_LOCATOR = "link=Features";
+    public static final String TERMS_PAGE_LOCATOR = "link=Terms of Service";
     public static final String DASHBOARD_LOGOUT_LOCATOR = "id=user-logout";
     public static final String USER_NAME_LOCATOR = "id=login-user-id";
     public static final String USER_PASSWORD_LOCATOR = "id=login-pwd";
@@ -23,6 +27,9 @@ public class HomePage extends BasePage
     public static final String EMAIL_ID_LOCATOR = "name=emailId";
     private static final String PRO_FIRST_NAME_LOCATOR = "id=find-pro-first-name";
     private static final String PRO_LAST_NAME_LOCATOR = "id=find-pro-last-name";
+
+    public static final String TOAST_MESSAGE_LOCATOR = "id=overlay-toast";
+    public static final String INVALID_EMAILID_MESSAGE = "Please enter a valid user name.";
 
 
     public HomePage( WebDriver driver )
@@ -90,6 +97,62 @@ public class HomePage extends BasePage
     }
 
 
+    public PricingPage clickPricingLink()
+    {
+        navigateToPricingPage();
+        waitForAjax();
+        return new PricingPage( driver );
+    }
+
+
+    public void navigateToPricingPage()
+    {
+        navigateToPage( PRICING_PAGE_LOCATOR );
+    }
+
+
+    public PrivacyPage clickPrivacyLink()
+    {
+        navigateToPrivacyPage();
+        waitForAjax();
+        return new PrivacyPage( driver );
+    }
+
+
+    public void navigateToPrivacyPage()
+    {
+        navigateToPage( PRIVACY_PAGE_LOCATOR );
+    }
+
+
+    public FeaturesPage clickFeaturesLink()
+    {
+        navigateToFeaturesPage();
+        waitForAjax();
+        return new FeaturesPage( driver );
+    }
+
+
+    public void navigateToFeaturesPage()
+    {
+        navigateToPage( FEATURES_PAGE_LOCATOR );
+    }
+
+
+    public TermsPage clickTermsLink()
+    {
+        navigateToTermsPage();
+        waitForAjax();
+        return new TermsPage( driver );
+    }
+
+
+    public void navigateToTermsPage()
+    {
+        navigateToPage( TERMS_PAGE_LOCATOR );
+    }
+
+
     public DashboardPage loginUser( String userNameString, String passwordString )
     {
 
@@ -103,6 +166,7 @@ public class HomePage extends BasePage
 
         //Press enter to login
         password.sendKeys( Keys.ENTER );
+
 
         waitForAjax();
         return new DashboardPage( driver );
@@ -161,6 +225,13 @@ public class HomePage extends BasePage
         navigateToPage( DASHBOARD_LOGOUT_LOCATOR );
         waitForAjax();
         return new HomePage( driver );
+    }
+
+
+    public String getToastMessage()
+    {
+        WebElement toastMessage = getElement( TOAST_MESSAGE_LOCATOR );
+        return toastMessage.getText();
     }
 
 }
