@@ -213,21 +213,21 @@ public class UserProfileDaoImpl extends GenericDaoImpl<UserProfile, Long> implem
     public Set<Long> findUserIdsByBranch( long branchId )
     {
         LOG.info( "Method call started for findUserIdsByBranch for branch : " + branchId );
-        Set<Long> agentIds = new HashSet<Long>();
+        Set<Long> userIds = new HashSet<Long>();
 
         LOG.info( "Fetching users for branch : " + branchId );
-        Query query = getSession().getNamedQuery( "UserProfile.getProfileIdsByBranch" );
+        Query query = getSession().createSQLQuery( "SELECT USER_ID FROM USER_PROFILE WHERE STATUS = ? and BRANCH_ID = ?" );
         query.setParameter( 0, CommonConstants.STATUS_ACTIVE );
         query.setParameter( 1, branchId );
 
-        List<Long> rows = (List<Long>) query.list();
-        for ( Long row : rows ) {
-            agentIds.add( Long.valueOf( String.valueOf( row ) ) );
+        List<Integer> rows = (List<Integer>) query.list();
+        for ( Integer row : rows ) {
+            userIds.add( Long.valueOf( row.intValue() ) );
         }
 
-        LOG.info( "Fetched users for branch : " + branchId );
+        LOG.info( "Fetched " + userIds.size() + " users for branch : " + branchId );
         LOG.info( "Method call ended for findUserIdsByBranch for branch : " + branchId );
-        return agentIds;
+        return userIds;
     }
 
 
@@ -235,20 +235,20 @@ public class UserProfileDaoImpl extends GenericDaoImpl<UserProfile, Long> implem
     public Set<Long> findUserIdsByRegion( long regionId )
     {
         LOG.info( "Method call started for findUserIdsByRegion for region : " + regionId );
-        Set<Long> agentIds = new HashSet<Long>();
+        Set<Long> userIds = new HashSet<Long>();
 
         LOG.info( "Fetching users for region : " + regionId );
-        Query query = getSession().getNamedQuery( "UserProfile.getProfileIdsByRegion" );
+        Query query = getSession().createSQLQuery( "SELECT USER_ID FROM USER_PROFILE WHERE STATUS = ? and REGION_ID = ?" );
         query.setParameter( 0, CommonConstants.STATUS_ACTIVE );
         query.setParameter( 1, regionId );
 
-        List<Long> rows = (List<Long>) query.list();
-        for ( Long row : rows ) {
-            agentIds.add( Long.valueOf( String.valueOf( row ) ) );
+        List<Integer> rows = (List<Integer>) query.list();
+        for ( Integer row : rows ) {
+            userIds.add( Long.valueOf( row.intValue() ) );
         }
 
-        LOG.info( "Fetched users for region : " + regionId );
+        LOG.info( "Fetched " + userIds.size() + " users for region : " + regionId );
         LOG.info( "Method call ended for findUserIdsByRegion for region : " + regionId );
-        return agentIds;
+        return userIds;
     }
 }
