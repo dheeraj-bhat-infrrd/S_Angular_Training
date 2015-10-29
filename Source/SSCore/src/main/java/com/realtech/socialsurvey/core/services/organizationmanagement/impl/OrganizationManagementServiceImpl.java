@@ -80,6 +80,7 @@ import com.realtech.socialsurvey.core.entities.MailContent;
 import com.realtech.socialsurvey.core.entities.MailContentSettings;
 import com.realtech.socialsurvey.core.entities.MailIdSettings;
 import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
+import com.realtech.socialsurvey.core.entities.ProfileImageUrlData;
 import com.realtech.socialsurvey.core.entities.ProfilesMaster;
 import com.realtech.socialsurvey.core.entities.Region;
 import com.realtech.socialsurvey.core.entities.RegionFromSearch;
@@ -5199,5 +5200,22 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
         return organizationUnitSettingsList;
     }
 
+
+    /**
+     * Method to fetch profile image url for a list of entities
+     * 
+     * @param entityType
+     * @param entityList
+     * @return
+     * @throws InvalidInputException
+     */
+    @Override
+    @Transactional
+    public List<ProfileImageUrlData> fetchProfileImageUrlsForEntityList( String entityType, HashSet<Long> entityList )
+        throws InvalidInputException
+    {
+        LOG.info( "Method fetchProfileImageUrlsForEntityList() called" );
+        return organizationUnitSettingsDao.fetchProfileImageUrlsForEntityList( entityType, entityList );
+    }
 }
 // JIRA: SS-27: By RM05: EOC

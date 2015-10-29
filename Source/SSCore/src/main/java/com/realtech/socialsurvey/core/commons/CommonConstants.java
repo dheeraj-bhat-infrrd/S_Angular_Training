@@ -196,7 +196,7 @@ public interface CommonConstants
     public static final String UNDER_RESOLUTION_COLUMN = "underResolution";
     public static final String IS_ABUSIVE_REPORTED_BY_USER_COLUMN = "isAbuseRepByUser";
     public static final String IS_UNDER_RESOLUTION_COLUMN = "underResolution";
-
+    public static final String IDEN = "iden";
     /**
      * Constants to be used in code for referencing variables(i.e in maps or session attributes)
      */

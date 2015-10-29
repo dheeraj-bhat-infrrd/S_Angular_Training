@@ -9133,24 +9133,6 @@ function showSearchedPostsSolr(fromstart, entityType, entityId, searchQuery) {
 		proPostStartIndex += proPostBatchSize;
 	}, payload, true);
 }
- 
-function showPostsSolr(fromstart, entityType, entityId) {
-	var payload = {
-			"entityType" : entityType,
-			"entityId" : entityId,
-			"batchSize" : proPostBatchSize,
-			"startIndex" : proPostStartIndex
-		};
-	callAjaxGetWithPayloadData("./findsocialpostsforentity.do", function(response) {
-		var data = $.parseJSON(response);
-		if (fromstart) {
-			proPostStartIndex = 0;
-			proPostCount = data.count + 1;
-		}
-		paintPostsSolr(data.socialMonitorPosts, entityType, entityId);
-		proPostStartIndex += proPostBatchSize;
-	}, payload, true);
-}
 
 function paintPostsSolr(posts, entityType, entityId) {
 	var divToPopulate = "";
