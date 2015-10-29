@@ -2,6 +2,7 @@ package com.realtech.socialsurvey.core.dao.impl;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -28,6 +29,7 @@ import com.realtech.socialsurvey.core.entities.AgentRankingReport;
 import com.realtech.socialsurvey.core.entities.AgentSettings;
 import com.realtech.socialsurvey.core.entities.FeedIngestionEntity;
 import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
+import com.realtech.socialsurvey.core.entities.ProfileImageUrlData;
 import com.realtech.socialsurvey.core.entities.ProfileUrlEntity;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.exception.NoRecordsFetchedException;
@@ -528,5 +530,59 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
     	}
     	LOG.info("Successfully found unit settings for source "+source);
     	return organizationUnitsSettingsList;
+    }
+    
+
+    /**
+     * Method to fetch profile image urls for an entity list
+     * 
+     * @param entityType
+     * @param entityId
+     * @return
+     * @throws InvalidInputException 
+     */
+    @SuppressWarnings ( "unchecked")
+    @Override
+    public List<ProfileImageUrlData> fetchProfileImageUrlsForEntityList( String entityType, HashSet<Long> entityList )
+        throws InvalidInputException
+    {
+        LOG.info( "Fetching profile image urls for entity type : " + entityType );
+        String collectionName = null;
+        if ( entityType.equals( CommonConstants.COMPANY_ID_COLUMN ) ) {
+            collectionName = CommonConstants.COMPANY_SETTINGS_COLLECTION;
+        } else if ( entityType.equals( CommonConstants.REGION_ID_COLUMN ) ) {
+            collectionName = CommonConstants.REGION_SETTINGS_COLLECTION;
+        } else if ( entityType.equals( CommonConstants.BRANCH_ID_COLUMN ) ) {
+            collectionName = CommonConstants.BRANCH_ID_COLUMN;
+        } else if ( entityType.equals( CommonConstants.USER_ID ) ) {
+            collectionName = CommonConstants.AGENT_SETTINGS_COLLECTION;
+        }
+        if ( entityType == null || entityType.isEmpty() ) {
+            throw new InvalidInputException( "Invalid entity sent" );
+        }
+        List<ProfileImageUrlData> profileImageUrlList = new ArrayList<ProfileImageUrlData>();
+        for ( Long id : entityList ) {
+            if ( id <= 0 ) {
+                throw new InvalidInputException( "Invalid entityId" );
+            }
+            Query query = new Query();
+            query.addCriteria( Criteria.where( CommonConstants.IDEN ).is( id ) );
+            query.fields().include( CommonConstants.PROFILE_IMAGE_URL_SOLR ).exclude( CommonConstants.DEFAULT_MONGO_ID_COLUMN );
+            HashMap<String, String> imageUrlMap = mongoTemplate.findOne( query, HashMap.class, collectionName );
+            String profileImageUrl = null;
+            if ( imageUrlMap != null && !( imageUrlMap.isEmpty() ) ) {
+                profileImageUrl = imageUrlMap.get( "profileImageUrl" );
+            }
+            if ( profileImageUrl == null || profileImageUrl.isEmpty() ) {
+                profileImageUrl = "";
+            }
+            ProfileImageUrlData profileImageUrlData = new ProfileImageUrlData();
+            profileImageUrlData.setEntityId( id );
+            profileImageUrlData.setEntityType( entityType );
+            profileImageUrlData.setProfileImageUrl( profileImageUrl );
+            profileImageUrlList.add( profileImageUrlData );
+        }
+        LOG.info( "Method fetchProfileImageUrlsForEntityList() finished" );
+        return profileImageUrlList;
     }
 }

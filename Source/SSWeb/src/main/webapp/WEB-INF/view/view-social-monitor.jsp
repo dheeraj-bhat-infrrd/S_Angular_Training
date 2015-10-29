@@ -163,7 +163,7 @@
 			var currentProfileName = "${columnName}";
 			var currentProfileValue = "${columnValue}";
 			setColDetails(currentProfileName, currentProfileValue);
-			showPostsSolr( true, "companyId", "${entityId}" );
+			showSearchedPostsSolr( true, "companyId", "${entityId}", "" );
 			if ($('#server-message>div').hasClass("error-message")) {
 				$('#server-message').show();
 			}
