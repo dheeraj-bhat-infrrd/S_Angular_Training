@@ -135,6 +135,11 @@ function showMainContentCallBack(data) {
 }
 
 
+//Function to logout
+function userLogout() {
+	window.location.href = 'j_spring_security_logout';
+}
+
 /*
  * This module helps in browser navigation support to give a single page app
  * 
@@ -179,6 +184,7 @@ function retrieveState() {
 $(document).on('click',  function(e){
 	if($('#overlay-send-survey').is(':visible')){
 		$('#overlay-send-survey').hide();
+		enableBodyScroll();
 	}
 });
 
@@ -186,6 +192,7 @@ $(document).on('keyup',  function(e){
 	if (e.keyCode == 27){
 		if($('#overlay-send-survey').is(':visible')){
 			$('#overlay-send-survey').hide();
+			enableBodyScroll();
 		}
 	}
 });

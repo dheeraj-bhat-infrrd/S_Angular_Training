@@ -2793,7 +2793,7 @@ button.paypal.is-active {
 }
 
 .opacity-red {
-	opacity : .4;
+	opacity : .1;
 }
 
 .sq-full-star {
@@ -7699,4 +7699,8 @@ label.url-change-input-label {
 .comp-rating-post {
 	height: 40px;
 	line-height: 40px;
+}
+
+.compl-sq-smile-sad-text-disabled {
+	background: #333;
 }
