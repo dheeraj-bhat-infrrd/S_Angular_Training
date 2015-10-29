@@ -235,7 +235,7 @@ public class UserProfileDaoImpl extends GenericDaoImpl<UserProfile, Long> implem
     public Set<Long> findUserIdsByRegion( long regionId )
     {
         LOG.info( "Method call started for findUserIdsByRegion for region : " + regionId );
-        Set<Long> agentIds = new HashSet<Long>();
+        Set<Long> userIds = new HashSet<Long>();
 
         LOG.info( "Fetching users for region : " + regionId );
         Query query = getSession().createSQLQuery( "SELECT USER_ID FROM USER_PROFILE WHERE STATUS = ? and REGION_ID = ?" );
@@ -244,11 +244,11 @@ public class UserProfileDaoImpl extends GenericDaoImpl<UserProfile, Long> implem
 
         List<Integer> rows = (List<Integer>) query.list();
         for ( Integer row : rows ) {
-            agentIds.add( Long.valueOf( row.intValue() ) );
+            userIds.add( Long.valueOf( row.intValue() ) );
         }
 
-        LOG.info( "Fetched users for region : " + regionId );
+        LOG.info( "Fetched " + userIds.size() + " users for region : " + regionId );
         LOG.info( "Method call ended for findUserIdsByRegion for region : " + regionId );
-        return agentIds;
+        return userIds;
     }
 }
