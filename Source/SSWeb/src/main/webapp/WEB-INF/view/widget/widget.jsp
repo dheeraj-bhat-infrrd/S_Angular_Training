@@ -120,6 +120,17 @@
 	<script
 		src="${initParam.resourcesPath}/resources/js/jquery-2.1.1.min.js"></script>
 	<script type="text/javascript">
+		//all content including images has been loaded
+		window.onload = function() {
+		    // post our message to the parent
+		    window.parent.postMessage(
+		        // get height of the content
+		        document.body.scrollHeight
+		        // set target domain
+		        ,"*"
+		    )
+		};
+		
 		function changeWidgetRatingPattern(rating, ratingParent) {
 			var counter = 0;
 			var integerRating = parseInt(rating * 2);
