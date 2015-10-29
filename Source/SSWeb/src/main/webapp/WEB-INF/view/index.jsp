@@ -15,7 +15,9 @@
 	<link rel="canonical" href="https://socialsurvey.me">
 	<link rel="shortcut icon" href="/favicon.ico" sizes="16x16">
 	<link rel="stylesheet" href="${initParam.resourcesPath}/resources/css/bootstrap.min.css">
+	<link rel="stylesheet" href="${initParam.resourcesPath}/resources/css/style-common.css">
 	<link rel="stylesheet" href="${initParam.resourcesPath}/resources/css/style-common-1.1.css">
+	<link rel="stylesheet" href="${initParam.resourcesPath}/resources/css/style-resp.css">
 	<link rel="stylesheet" href="${initParam.resourcesPath}/resources/css/style-resp-1.1.css">
 </head>
 
@@ -24,6 +26,10 @@
 <c:if test="${not empty user }">
 	<c:redirect url="/userlogin.do"></c:redirect>
 </c:if>
+
+<div id="toast-container" class="toast-container">
+   <span id="overlay-toast" class="overlay-toast"></span>
+</div>
 
 <body class="index-body">
 	<div class="body-wrapper">
