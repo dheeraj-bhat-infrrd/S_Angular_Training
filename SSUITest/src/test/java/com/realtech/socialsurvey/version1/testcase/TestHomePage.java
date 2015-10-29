@@ -7,6 +7,7 @@ import org.testng.annotations.Test;
 
 import com.realtech.socialsurvey.constants.GlobalConstants;
 import com.realtech.socialsurvey.version1.page.HomePage;
+import com.realtech.socialsurvey.version1.page.LoginPage;
 
 
 public class TestHomePage extends BaseTestCase
@@ -19,7 +20,7 @@ public class TestHomePage extends BaseTestCase
     {
         LOG.trace( "\n\n*** Started Testing: testHomePage" );
         try {
-            HomePage homePage = new HomePage( driver );
+            new HomePage( driver );
         } catch ( Exception e ) {
             e.printStackTrace( System.out );
             LOG.error( "*** Exception While Testing: testHomePage" );
@@ -58,7 +59,26 @@ public class TestHomePage extends BaseTestCase
     }
 
 
-    @Test ( groups = "home", testName = "TCSS-4", dependsOnMethods = "testUserLogin")
+    @Test ( groups = "home", testName = "TCSS-4")
+    public void testUserLoginInvalidCreditentials()
+    {
+        LOG.trace( "\n\n*** Started Testing: testUserLoginInvalid" );
+        try {
+            HomePage homePage = new HomePage( driver );
+            homePage.loginUser( GlobalConstants.USER_NAME, GlobalConstants.USER_PASSWORD_INCORRECT );
+        } catch ( Error e ) {
+            LOG.trace( "*** Login failed: testUserLoginInvalid : " + e.getMessage() );
+
+            //check if it ended up on login page
+            LoginPage loginPage = new LoginPage( driver );
+            if ( loginPage.getErrorMessage().equalsIgnoreCase( LoginPage.INVALID_CREDENTIALS_MESSAGE ) ) {
+                LOG.trace( "\n\n*** Test case passed: testUserLoginInvalid" );
+            }
+        }
+    }
+
+
+    @Test ( groups = "home", testName = "TCSS-5", dependsOnMethods = "testUserLogin")
     public void testUserLogout()
     {
         LOG.trace( "\n\n*** Started Testing: testUserLogout" );
@@ -73,7 +93,7 @@ public class TestHomePage extends BaseTestCase
     }
 
 
-    @Test ( groups = "home", testName = "TCSS-5")
+    @Test ( groups = "home", testName = "TCSS-6")
     public void testUserRegister()
     {
         LOG.trace( "\n\n*** Started Testing: testUserRegister" );
@@ -88,7 +108,7 @@ public class TestHomePage extends BaseTestCase
     }
 
 
-    @Test ( groups = "prosearch", testName = "TCSS-6")
+    @Test ( groups = "home", testName = "TCSS-7")
     public void testProSearch()
     {
         LOG.trace( "\n\n*** Started Testing: testProSearch" );

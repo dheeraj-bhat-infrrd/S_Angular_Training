@@ -103,7 +103,9 @@ public class HomePage extends BasePage
 
         //Press enter to login
         password.sendKeys( Keys.ENTER );
-
+        
+        
+        
         waitForAjax();
         return new DashboardPage( driver );
     }
