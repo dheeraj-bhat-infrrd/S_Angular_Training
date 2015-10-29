@@ -11,7 +11,7 @@ public class DashboardPage extends BasePage
     {
         super( driver );
         if ( !getTitle().equals( DASHBOARD_PAGE_TITLE ) ) {
-            Assert.fail( "This is not home page. Current page is: " + getTitle() );
+            Assert.fail( "This is not dashboard page. Current page is: " + getTitle() );
         }
 
         waitForAjax();
