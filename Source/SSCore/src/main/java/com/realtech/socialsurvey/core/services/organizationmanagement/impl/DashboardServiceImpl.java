@@ -34,6 +34,7 @@ import com.realtech.socialsurvey.core.commons.SurveyResultsComparator;
 import com.realtech.socialsurvey.core.dao.OrganizationUnitSettingsDao;
 import com.realtech.socialsurvey.core.dao.SurveyDetailsDao;
 import com.realtech.socialsurvey.core.dao.SurveyPreInitiationDao;
+import com.realtech.socialsurvey.core.dao.UserProfileDao;
 import com.realtech.socialsurvey.core.dao.impl.MongoSocialPostDaoImpl;
 import com.realtech.socialsurvey.core.entities.AgentRankingReport;
 import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
@@ -69,6 +70,9 @@ public class DashboardServiceImpl implements DashboardService, InitializingBean
 
     @Autowired
     private SurveyPreInitiationDao surveyPreInitiationDao;
+    
+    @Autowired
+    private UserProfileDao userProfileDao;
 
 
     @Override
@@ -239,8 +243,27 @@ public class DashboardServiceImpl implements DashboardService, InitializingBean
         startTime.set(Calendar.MINUTE, 0);
         startTime.set(Calendar.SECOND, 0);
         startTime.set(Calendar.MILLISECOND, 0);
+        
+        LOG.debug("Getting sent surveys aggregation");
         Map<Integer, Integer> completedSurveys = surveyDetailsDao.getCompletedSurveyAggregationCount(columnName, columnValue, new Timestamp(startTime.getTimeInMillis()), new Timestamp(currentTime.getTimeInMillis()), criteria);
-        surveyPreInitiationDao.getIncompletSurveyAggregationCount(columnValue, CommonConstants.STATUS_ACTIVE, new Timestamp(startTime.getTimeInMillis()), new Timestamp(currentTime.getTimeInMillis()), null, criteria);
+        // TODO: remove hard coding
+        long companyId = -1;
+        long agentId = -1;
+        Set<Long> agentIds = null;
+        if(columnName.equals("companyId")){
+        	// agent list will be null
+        	companyId = columnValue;
+        }else if(columnName.equals("agentId")){
+        	// agent list will have one element, the agent id
+        	agentId = columnValue;
+        }else if(columnName.equals("regionId")){
+        	agentIds = userProfileDao.findUserIdsByRegion(columnValue);
+        }else if(columnName.equals("branchId")){
+        	agentIds = userProfileDao.findUserIdsByBranch(columnValue);
+        }
+        Map<Integer, Integer> incompleteSurveys = surveyPreInitiationDao.getIncompletSurveyAggregationCount(companyId, agentId, CommonConstants.STATUS_ACTIVE, new Timestamp(startTime.getTimeInMillis()), new Timestamp(currentTime.getTimeInMillis()), agentIds, criteria);
+        
+        
         Map<String, Map<String, Long>> map = new HashMap<String, Map<String, Long>>();
         map.put( "clicked", surveyDetailsDao.getClickedSurveyByCriteria( columnName, columnValue, numberOfDays,
             noOfDaysToConsider, criteria, realtechAdmin ) );
