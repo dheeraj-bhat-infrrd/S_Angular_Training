@@ -1947,6 +1947,7 @@ public class SolrSearchServiceImpl implements SolrSearchService
         return matchedRegions.values();
     }
 
+
     /**
      * Method to get a list of social posts given the Solr document.
      */
@@ -1957,19 +1958,52 @@ public class SolrSearchServiceImpl implements SolrSearchService
         List<SocialPost> matchedSocialPosts = new ArrayList<SocialPost>();
         for ( SolrDocument document : documentList ) {
             SocialPost post = new SocialPost();
+            if ( document.get( CommonConstants.SOURCE_SOLR ) != null
+                && !( document.get( CommonConstants.SOURCE_SOLR ).toString().isEmpty() ) ) {
+                post.setSource( document.get( CommonConstants.SOURCE_SOLR ).toString() );
+            } else {
+                post.setSource( "" );
+            }
+            if ( document.get( CommonConstants.COMPANY_ID_SOLR ) != null
+                && !( document.get( CommonConstants.COMPANY_ID_SOLR ).toString().isEmpty() ) ) {
+                post.setCompanyId( Long.parseLong( document.get( CommonConstants.COMPANY_ID_SOLR ).toString() ) );
+            }
+            if ( document.get( CommonConstants.REGION_ID_SOLR ) != null
+                && !( document.get( CommonConstants.REGION_ID_SOLR ).toString().isEmpty() ) ) {
+                post.setRegionId( Long.parseLong( document.get( CommonConstants.REGION_ID_SOLR ).toString() ) );
+            }
+            if ( document.get( CommonConstants.BRANCH_ID_SOLR ) != null
+                && !( document.get( CommonConstants.BRANCH_ID_SOLR ).toString().isEmpty() ) ) {
+                post.setBranchId( Long.parseLong( document.get( CommonConstants.BRANCH_ID_SOLR ).toString() ) );
+            }
+            if ( document.get( CommonConstants.USER_ID_SOLR ) != null
+                && !( document.get( CommonConstants.USER_ID_SOLR ).toString().isEmpty() ) ) {
+                post.setAgentId( Long.parseLong( document.get( CommonConstants.USER_ID_SOLR ).toString() ) );
+            }
+            if ( document.get( CommonConstants.TIME_IN_MILLIS_SOLR ) != null
+                && !( document.get( CommonConstants.TIME_IN_MILLIS_SOLR ).toString().isEmpty() ) ) {
+                post.setTimeInMillis( Long.parseLong( document.get( CommonConstants.TIME_IN_MILLIS_SOLR ).toString() ) );
+            }
+            if ( document.get( CommonConstants.POST_ID_SOLR ) != null
+                && !( document.get( CommonConstants.POST_ID_SOLR ).toString().isEmpty() ) ) {
+                post.setPostId( document.get( CommonConstants.POST_ID_SOLR ).toString() );
+            }
+            if ( document.get( CommonConstants.POST_TEXT_SOLR ) != null
+                && !( document.get( CommonConstants.POST_TEXT_SOLR ).toString().isEmpty() ) ) {
+                post.setPostText( document.get( CommonConstants.POST_TEXT_SOLR ).toString() );
+            }
 
-            post.setSource( document.get( CommonConstants.SOURCE_SOLR ).toString() );
-            post.setCompanyId( Long.parseLong( document.get( CommonConstants.COMPANY_ID_SOLR ).toString() ) );
-            post.setRegionId( Long.parseLong( document.get( CommonConstants.REGION_ID_SOLR ).toString() ) );
-            post.setBranchId( Long.parseLong( document.get( CommonConstants.BRANCH_ID_SOLR ).toString() ) );
-            post.setAgentId( Long.parseLong( document.get( CommonConstants.USER_ID_SOLR ).toString() ) );
-            post.setTimeInMillis( Long.parseLong( document.get( CommonConstants.TIME_IN_MILLIS_SOLR ).toString() ) );
-            post.setPostId( document.get( CommonConstants.POST_ID_SOLR ).toString() );
-            post.setPostText( document.get( CommonConstants.POST_TEXT_SOLR ).toString() );
-            if ( document.get( CommonConstants.POST_URL_SOLR ) != null )
+            if ( document.get( CommonConstants.POST_URL_SOLR ) != null ) {
                 post.setPostUrl( document.get( CommonConstants.POST_URL_SOLR ).toString() );
-            post.setPostedBy( document.get( CommonConstants.POSTED_BY_SOLR ).toString() );
-            post.set_id( document.get( CommonConstants.ID_SOLR ).toString() );
+            }
+            if ( document.get( CommonConstants.POSTED_BY_SOLR ) != null
+                && !( document.get( CommonConstants.POSTED_BY_SOLR ).toString().isEmpty() ) ) {
+                post.setPostedBy( document.get( CommonConstants.POSTED_BY_SOLR ).toString() );
+            }
+            if ( document.get( CommonConstants.ID_SOLR ) != null
+                && !( document.get( CommonConstants.ID_SOLR ).toString().isEmpty() ) ) {
+                post.set_id( document.get( CommonConstants.ID_SOLR ).toString() );
+            }
             matchedSocialPosts.add( post );
         }
         LOG.info( "Method getSocialPostsFromSolrDocuments() finished" );

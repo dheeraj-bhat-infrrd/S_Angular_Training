@@ -31,7 +31,8 @@
 			<div id="search-panel" class="float-left">
 				<div id="hierarchy-selection-panel" class="float-left clearfix">
 					<select id="select-hierarchy-level" class="float-left dash-sel-item">
-						<option value="agentId" data-entity="user"><spring:message code="label.user.key" /></option>
+						<option value="companyId" data-entity="user"><spring:message code="label.company.key" /></option>
+						<option value="userId" data-entity="user"><spring:message code="label.user.key" /></option>
 						<option value="branchId" data-entity="branch"><spring:message code="label.office.key" /></option>
 						<option value="regionId" data-entity="region"><spring:message code="label.region.key" /></option>
 					</select>
@@ -74,6 +75,7 @@
 		function getRelevantEntities(){
 			//Remove pre-existing options
 			$('#entity-selection-panel').find('option').remove();
+			$("#select-entity-id").show();
 			//Get the entity type
 			var entityType = $("#select-hierarchy-level").val();
 			//If branch
@@ -121,7 +123,7 @@
 					});
 					
 				}, true);
-			} else if (entityType == "agentId") {
+			} else if (entityType == "userId") {
 				callAjaxGET("/fetchusers.do", function(data) {
 					var userList = [];
 					if(data != undefined && data != "")
@@ -145,6 +147,8 @@
 					});
 					
 				}, true);
+			} else if (entityType == "companyId") {
+				$("#select-entity-id").hide();
 			}
 		}
 		
@@ -159,7 +163,7 @@
 			var currentProfileName = "${columnName}";
 			var currentProfileValue = "${columnValue}";
 			setColDetails(currentProfileName, currentProfileValue);
-			showPostsSolr( true, "${entityId}" );
+			showPostsSolr( true, "companyId", "${entityId}" );
 			if ($('#server-message>div').hasClass("error-message")) {
 				$('#server-message').show();
 			}
@@ -167,7 +171,14 @@
 		});
 		
 		function postsSearch(){
-			showSearchedPostsSolr(true, "${ entityId }", $("#post-search-query").val());
+			var entityType = $("#select-hierarchy-level").val();
+			var entityId;
+			entityId = $("#select-entity-id").val();
+			if(entityType == undefined || entityId == undefined || entityId <= 0 || entityType == "companyId"){
+				entityType = "companyId";
+				entityId = "${ entityId }";
+			}
+			showSearchedPostsSolr(true, entityType, entityId, $("#post-search-query").val());
 		}
 	</script>
 </body>
