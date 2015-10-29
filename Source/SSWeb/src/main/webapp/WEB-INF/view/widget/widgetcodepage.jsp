@@ -13,7 +13,8 @@ $(document).ready(function() {
 	if (iden == undefined || profileLevel == undefined || profileLevel == ""){
 		body = "Incorrect parameters. Please check your selection.";
 	} else {
-		body = "&lt;iframe id = \"ss-widget-iframe\" src=\"" + appBaseUrl +  "rest/widget/" + profileLevel + "/" + iden + "\" frameborder=\"0\" width=\"100%\"  height=\"500px\" scrolling=\"no\" /&gt;";
+		body = "&lt;iframe id = \"ss-widget-iframe\" src=\"" + appBaseUrl +  "rest/widget/" + profileLevel + "/" + iden + "\" frameborder=\"0\" width=\"100%\" height=\"500px\" style=\"overflow-y: scroll;\" /&gt;";
+		body += "&lt;script type=\"text/javascript\"&gt;$(document).ready(function(){ var myEventMethod = window.addEventListener ? \"addEventListener\" : \"attachEvent\"; var myEventListener = window[myEventMethod]; var myEventMessage = myEventMethod == \"attachEvent\" ? \"onmessage\" : \"message\"; myEventListener(myEventMessage, function (e) { if (e.data === parseInt(e.data)) document.getElementById('ss-widget-iframe').height = e.data + \"px\";    }, false);});&lt;/script&gt;";
 	}
 	$("#widget-code-area").html(body);
 });

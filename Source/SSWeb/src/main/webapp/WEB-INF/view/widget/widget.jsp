@@ -69,15 +69,15 @@
 				</div>
 			</div>
 			<div class="float-left widget-review-score">
-				<span id="rating">${floatingAverageRating}</span>
+				<a  href = "${ profileLink }" target="_blank"><span id="rating">${floatingAverageRating}</span></a>
 			</div>
 		</div>
 	</div>
-	<div class="clearfix widget-review-block">
-		<div class="float-left review-count-left"
-			id="prof-company-review-count">
+	<div class="clearfix widget-review-block ">
+		<a class="float-left review-count-left  cursor-pointer"
+			id="prof-company-review-count"  href="${ profileLink }" target="_blank">
 			<span>${reviewsCount}</span> Review(s)
-		</div>
+		</a>
 		<div class="float-left">
 			<c:choose>
 				<c:when test="${profileLevel == 'INDIVIDUAL'}">
@@ -120,25 +120,6 @@
 	<script
 		src="${initParam.resourcesPath}/resources/js/jquery-2.1.1.min.js"></script>
 	<script type="text/javascript">
-		$(document).ready(function(){
-			// browser compatibility: get method for event 
-		    // addEventListener(FF, Webkit, Opera, IE9+) and attachEvent(IE5-8)
-		    var myEventMethod = 
-		        window.addEventListener ? "addEventListener" : "attachEvent";
-		    // create event listener
-		    var myEventListener = window[myEventMethod];
-		    // browser compatibility: attach event uses onmessage
-		    var myEventMessage = 
-		        myEventMethod == "attachEvent" ? "onmessage" : "message";
-		    // register callback function on incoming message
-		    myEventListener(myEventMessage, function (e) {
-		        // we will get a string (better browser support) and validate
-		        // if it is an int - set the height of the iframe #my-iframe-id
-		        if (e.data === parseInt(e.data)) 
-		            document.getElementById('ss-widget-iframe').height = e.data + "px";
-		    }, false);
-		});
-		
 		//all content including images has been loaded
 		window.onload = function() {
 		    // post our message to the parent
@@ -169,6 +150,7 @@
 		}
 		var rating = document.getElementById("rating").innerText;
 		changeWidgetRatingPattern(rating, $('#wdg-rating-cont'));
+		var url = "${ profileLink }";
 		$('.review-item').each(function(i){
 			var container = document.getElementById("review-" + i);
 			if(container.scrollHeight > container.offsetHeight){

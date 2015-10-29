@@ -22,9 +22,7 @@ import javax.persistence.Table;
 @NamedQueries({
 		@NamedQuery(name = "UserProfile.updateProfileByUser", query = "update UserProfile u set u.status = ?, u.modifiedBy = ?, u.modifiedOn = ? where u.user = ?"),
 		@NamedQuery(name = "UserProfile.updateProfileByUserAndBranch", query = "update UserProfile u set u.status = ?, u.modifiedBy = ?, u.modifiedOn = ? where u.user = ? and u.branchId = ?"),
-		@NamedQuery(name = "UserProfile.updateProfileByUserAndRegion", query = "update UserProfile u set u.status = ?, u.modifiedBy = ?, u.modifiedOn = ? where u.user = ? and u.regionId = ?"),
-		@NamedQuery ( name = "UserProfile.getProfileIdsByBranch", query = "select u.userProfileId from UserProfile u where u.status = ? and u.branchId = ?"),
-		@NamedQuery ( name = "UserProfile.getProfileIdsByRegion", query = "select u.userProfileId from UserProfile u where u.status = ? and u.regionId = ?") })
+		@NamedQuery(name = "UserProfile.updateProfileByUserAndRegion", query = "update UserProfile u set u.status = ?, u.modifiedBy = ?, u.modifiedOn = ? where u.user = ? and u.regionId = ?") })
 public class UserProfile implements Serializable {
 
 	private static final long serialVersionUID = 1L;
