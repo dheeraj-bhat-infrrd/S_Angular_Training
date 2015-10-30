@@ -9,8 +9,10 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
 import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrDocumentList;
+
 import com.realtech.socialsurvey.core.entities.Branch;
 import com.realtech.socialsurvey.core.entities.Company;
 import com.realtech.socialsurvey.core.entities.Region;
@@ -254,7 +256,7 @@ public interface SolrSearchService
     public void addUsersToSolr( List<User> users ) throws SolrException;
 
 
-    public void updateCompletedSurveyCountForUserInSolr( long agentId, int incrementCount ) throws SolrException;
+    public void updateCompletedSurveyCountForUserInSolr( long agentId, int incrementCount) throws SolrException, NoRecordsFetchedException;
 
 
     public Map<String, String> getCompanyAdmin( long companyId ) throws SolrException;
@@ -303,5 +305,8 @@ public interface SolrSearchService
 
 
     public Long fetchRegionCountByCompany( long companyId ) throws InvalidInputException, SolrException, MalformedURLException;
+
+
+    public void updateCompletedSurveyCountForMultipleUserInSolr( Map<Long, Integer> usersReviewCount ) throws SolrException;
 }
 // JIRA:SS-62 BY RM 02 EOC
