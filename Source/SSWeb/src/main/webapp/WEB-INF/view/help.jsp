@@ -35,17 +35,6 @@
 
 <div class="dash-wrapper-main">
 	<div class="dash-container container">
-		<div id="prof-container" data-profile-master-id="${profileMasterId}"
-			data-column-name="${columnName}" data-account-type="${accounttype}"
-			data-column-value="${columnValue}"
-			class=" dash-prof-wrapper">
-			<div id="dash-profile-detail-circles" class="row row-dash-top-adj">
-				<!-- Populated by dashboard_profiledetail.jsp -->
-			</div>
-		</div>
-
-
-
 		<div class="dash-stats-wrapper bord-bot-dc clearfix help">
 	
 			<div class="contact-div">
@@ -103,11 +92,3 @@
 		</div>
 	</div>
 </div>
-<!-- <script>
-	$(document).ready(function() {
-	
-		
-		
-		
-	});
-</script>  -->
