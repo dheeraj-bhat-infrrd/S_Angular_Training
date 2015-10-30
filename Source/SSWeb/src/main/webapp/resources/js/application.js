@@ -765,7 +765,22 @@ function paintSurveyGraph() {
 		type = 'Month';
 	}
 	
-	$.each(graphData.clicked, function(key, value) {
+	var keys = getKeysFromGraphFormat(format);
+	
+
+	for (var i = 0; i < keys.length; i++) {
+		if(format == '365') {
+			allTimeslots[i] = convertYearMonthKeyToDate(keys[i]);	
+		} else {
+			allTimeslots[i] = convertYearWeekKeyToDate(keys[i]);
+		}
+		clickedSurveys[i] = graphData.clicked[keys[i]] || 0;
+		sentSurveys[i] = graphData.sent[keys[i]] || 0;
+		completedSurveys[i] = graphData.complete[keys[i]] || 0;
+		socialPosts[i] = graphData.socialposts[keys[i]] || 0;
+	}
+	
+	/*$.each(graphData.clicked, function(key, value) {
 		if(format == '365') {
 			allTimeslots[index] = convertYearMonthKeyToDate(key);	
 		} else {
@@ -823,7 +838,7 @@ function paintSurveyGraph() {
 	if (timeslots.length > allTimeslots.length) {
 		allTimeslots = timeslots;
 		timeslots = [];
-	}
+	}*/
 	
 	/*if (format != '365') {
 		allTimeslots.reverse();
@@ -905,6 +920,32 @@ function convertYearMonthKeyToDate(key) {
 		month : monthNumber,
 		year : year
 	}).toString("MMM d, yyyy");
+}
+
+function getKeysFromGraphFormat(format) {
+	var firstDate = Date.today().add({days:-parseInt(format)});
+	var keys = [];
+	if(format == '365') {
+		var key = firstDate.getFullYear().toString() + (firstDate.getMonth()+1).toString();
+		keys.push(key);
+		for (var i=1; i<12; i++){
+			var date = Date.today().add({days:-parseInt(format)}).addMonths(i);
+			keys.push(date.getFullYear().toString() + (date.getMonth()+1).toString());
+		}
+		
+	} else {
+		var count = parseInt(parseInt(format) / 7);
+		if(parseInt(format) % 7 != 0) {
+			count += 1;
+		}
+		var key = firstDate.getFullYear().toString() + (firstDate.getWeek() - 1).toString();
+		keys.push(key);
+		for (var i=1; i<count; i++){
+			var date = firstDate.add({days:7});
+			keys.push(date.getFullYear().toString() + (date.getWeek() - 1).toString());
+		}
+	}
+	return keys;
 }
 
 //Being called from dashboard.jsp on key up event.
