@@ -112,6 +112,9 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
     private GenericDao<ProfilesMaster, Integer> profilesMasterDao;
 
     @Autowired
+    private GenericDao<UserApiKey, Long> userApiKeyDao;
+
+    @Autowired
     private GenericDao<UsercountModificationNotification, Long> userCountModificationDao;
 
     @Autowired
@@ -260,10 +263,12 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
             userTimestamp = Long.valueOf( urlParameters.get( CommonConstants.CURRENT_TIMESTAMP ) );
         }
         int days = CommonConstants.EXPIRE_AFTER_DAYS;
-        long milliseconds = days * 24 * 60 * 60 * 1000;
-        if ( systemTimestamp - userTimestamp > milliseconds ) {
-            linkExpired = true;
-
+        // check added to include/exclude link expiry logic.
+        if(days > 0){
+	        long milliseconds = days * 24 * 60 * 60 * 1000;
+	        if ( systemTimestamp - userTimestamp > milliseconds ) {
+	            linkExpired = true;
+	        }
         }
         return linkExpired;
     }
@@ -808,7 +813,7 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
             user.setAboutMe( agentSettings.getContact_details().getAbout_me() );
             //JIRA SS-1104 search results not updated with correct number of reviews
             long reviewCount = profileManagementService.getReviewsCount( agentSettings.getIden(), 0, 5,
-                CommonConstants.PROFILE_LEVEL_INDIVIDUAL, true, false );
+                CommonConstants.PROFILE_LEVEL_INDIVIDUAL, false, false );
             user.setReviewCount( reviewCount );
             user.setReviewScore( surveyDetailsDao.getRatingForPastNdays( CommonConstants.AGENT_ID, agentSettings.getIden(),
                 CommonConstants.NO_LIMIT, true, false ) );
@@ -2932,6 +2937,36 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 
         LOG.debug( "method getPrimaryUserProfileByAgentId ended with user id " + entityId );
         return userProfileDetailMap;
+    }
+
+
+    @Override
+    @Transactional
+    public boolean validateUserApiKey( String apiKey, String apiSecret, long companyId ) throws InvalidInputException
+    {
+        boolean valid = false;
+        LOG.debug( "Validating whether the values provided are valid for company " + companyId );
+        if ( apiSecret == null || apiSecret.isEmpty() ) {
+            LOG.warn( "Api Secret is null" );
+            throw new InvalidInputException( "Invalid api secret" );
+        }
+        if ( apiKey == null || apiKey.isEmpty() ) {
+            LOG.warn( "Api key is null" );
+            throw new InvalidInputException( "Invalid api key" );
+        }
+
+        Map<String, Object> queryMap = new HashMap<String, Object>();
+        queryMap.put( CommonConstants.API_SECRET_COLUMN, apiSecret.trim() );
+        queryMap.put( CommonConstants.API_KEY_COLUMN, apiKey.trim() );
+        queryMap.put( CommonConstants.COMPANY_ID_COLUMN, companyId );
+        queryMap.put( CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_ACTIVE );
+        long count = apiKeyDao.findNumberOfRowsByKeyValue( UserApiKey.class, queryMap );
+        LOG.debug( "Found " + count + " records from the api keys" );
+        if ( count > 0l ) {
+            LOG.info( "API key is valid" );
+            valid = true;
+        }
+        return valid;
     }
 
 

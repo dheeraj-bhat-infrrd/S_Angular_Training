@@ -4,9 +4,12 @@ import java.net.MalformedURLException;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
@@ -55,6 +58,7 @@ import com.realtech.socialsurvey.core.entities.GoogleToken;
 import com.realtech.socialsurvey.core.entities.LinkedInToken;
 import com.realtech.socialsurvey.core.entities.LinkedinUserProfileResponse;
 import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
+import com.realtech.socialsurvey.core.entities.ProfileImageUrlData;
 import com.realtech.socialsurvey.core.entities.ProfileStage;
 import com.realtech.socialsurvey.core.entities.Region;
 import com.realtech.socialsurvey.core.entities.SocialMediaTokens;
@@ -81,6 +85,7 @@ import com.realtech.socialsurvey.core.services.organizationmanagement.ProfileMan
 import com.realtech.socialsurvey.core.services.organizationmanagement.ProfileNotFoundException;
 import com.realtech.socialsurvey.core.services.organizationmanagement.UserManagementService;
 import com.realtech.socialsurvey.core.services.search.SolrSearchService;
+import com.realtech.socialsurvey.core.services.search.exception.SolrException;
 import com.realtech.socialsurvey.core.services.settingsmanagement.SettingsSetter;
 import com.realtech.socialsurvey.core.services.social.SocialAsyncService;
 import com.realtech.socialsurvey.core.services.social.SocialManagementService;
@@ -2459,6 +2464,14 @@ public class SocialManagementController
             model.addAttribute( "message",
                 messageUtils.getDisplayMessage( nonFatalException.getErrorCode(), DisplayMessageType.ERROR_MESSAGE ) );
         }
+        try {
+            //Get last build time from solr for social posts
+            Date lastBuild = solrSearchService.getLastBuildTimeForSocialPosts();
+            model.addAttribute( "lastBuild", lastBuild );
+        } catch ( SolrException e ) {
+            LOG.error( "SolrException while getting last build time. Reason", e );
+        }
+        
         if ( entityType.equals( CommonConstants.COMPANY_ID_COLUMN ) ) {
             model.addAttribute( "columnName", entityType );
             model.addAttribute( "columnValue", entityId );
@@ -2480,112 +2493,6 @@ public class SocialManagementController
 
 
     /**
-     * Method to find all social posts in Solr given the company ID
-     * @param model
-     * @param request
-     * @return
-     */
-    @ResponseBody
-    @RequestMapping ( value = "/findsocialpostsforentity", method = RequestMethod.GET)
-    public String findSocialPostsForCompany( Model model, HttpServletRequest request )
-    {
-        LOG.info( "Method findSocialPostsForCompany() started." );
-        int startIndex = 0;
-        int batchSize = 0;
-        String posts = "";
-        long count = 0;
-        try {
-            String startIndexStr = request.getParameter( "startIndex" );
-            String batchSizeStr = request.getParameter( "batchSize" );
-            String entityType = request.getParameter( "entityType" );
-            long entityId = Long.parseLong( request.getParameter( "entityId" ) );
-            try {
-                if ( startIndexStr == null || startIndexStr.isEmpty() ) {
-                    LOG.error( "Invalid value found in startIndex. It cannot be null or empty." );
-                    throw new InvalidInputException( "Invalid value found in startIndex. It cannot be null or empty." );
-                }
-                if ( batchSizeStr == null || batchSizeStr.isEmpty() ) {
-                    LOG.error( "Invalid value found in batchSizeStr. It cannot be null or empty." );
-                    batchSize = SOLR_BATCH_SIZE;
-                }
-
-                startIndex = Integer.parseInt( startIndexStr );
-                batchSize = Integer.parseInt( batchSizeStr );
-            } catch ( NumberFormatException e ) {
-                LOG.error( "NumberFormatException while finding social posts. Reason : " + e.getMessage(), e );
-                throw new NonFatalException( "NumberFormatException while searching for social posts", e );
-            }
-
-            User admin = sessionHelper.getCurrentUser();
-            if ( admin == null ) {
-                LOG.error( "No user found in session" );
-                throw new InvalidInputException( "No user found in session", DisplayMessageConstants.NO_USER_IN_SESSION );
-            }
-
-            // fetching users from solr
-            try {
-                SolrDocumentList results = solrSearchService.fetchSocialPostsByEntity( entityType, entityId, startIndex,
-                    batchSize );
-                count = results.getNumFound();
-                Collection<SocialPost> postlist = solrSearchService.getSocialPostsFromSolrDocuments( results );
-                SocialMonitorData socialMonitorData = new SocialMonitorData();
-                //Store the posts, along with agent,branch,region and company names where present.
-                Collection<SocialMonitorPost> socialMonitorPosts = new ArrayList<SocialMonitorPost>();
-                for ( SocialPost item : postlist ) {
-                    SocialMonitorPost socialMonitorPost = new SocialMonitorPost();
-
-                    socialMonitorPost.set_id( item.get_id() );
-                    socialMonitorPost.setCompanyId( item.getCompanyId() );
-                    socialMonitorPost.setRegionId( item.getRegionId() );
-                    socialMonitorPost.setBranchId( item.getBranchId() );
-                    socialMonitorPost.setAgentId( item.getAgentId() );
-                    socialMonitorPost.setTimeInMillis( item.getTimeInMillis() );
-                    socialMonitorPost.setPostId( item.getPostId() );
-                    socialMonitorPost.setPostedBy( item.getPostedBy() );
-                    socialMonitorPost.setPostText( item.getPostText() );
-                    socialMonitorPost.setPostUrl( item.getPostUrl() );
-                    socialMonitorPost.setSource( item.getSource() );
-                    if ( item.getCompanyId() > 0 ) {
-                        socialMonitorPost.setCompanyName( organizationManagementService
-                            .getCompanySettings( item.getCompanyId() ).getProfileName() );
-                    }
-                    if ( item.getRegionId() > 0 ) {
-                        socialMonitorPost.setRegionName( organizationManagementService.getRegionSettings( item.getRegionId() )
-                            .getProfileName() );
-                    }
-                    if ( item.getBranchId() > 0 ) {
-                        socialMonitorPost.setBranchName( organizationManagementService.getBranchSettings( item.getBranchId() )
-                            .getRegionName() );
-                    }
-                    if ( item.getAgentId() > 0 ) {
-                        socialMonitorPost.setAgentName( organizationManagementService.getAgentSettings( item.getAgentId() )
-                            .getProfileName() );
-                    }
-
-                    socialMonitorPosts.add( socialMonitorPost );
-                }
-                socialMonitorData.setSocialMonitorPosts( (List<SocialMonitorPost>) socialMonitorPosts );
-                socialMonitorData.setCount( count );
-                posts = new Gson().toJson( socialMonitorData );
-            } catch ( MalformedURLException e ) {
-                LOG.error( "MalformedURLException while searching for social posts. Reason : " + e.getMessage(), e );
-                throw new NonFatalException( "MalformedURLException while searching for social posts.",
-                    DisplayMessageConstants.GENERAL_ERROR, e );
-            }
-        } catch ( NonFatalException nonFatalException ) {
-            LOG.error( "NonFatalException while searching for social posts. Reason : " + nonFatalException.getStackTrace(),
-                nonFatalException );
-            model.addAttribute( "message",
-                messageUtils.getDisplayMessage( nonFatalException.getErrorCode(), DisplayMessageType.ERROR_MESSAGE ) );
-            return JspResolver.MESSAGE_HEADER;
-        }
-
-        LOG.info( "Method findSocialPostsForCompany() finished." );
-        return posts;
-    }
-
-
-    /**
      * Method to search for social posts given a search query
      * 
      * @param model
@@ -2601,7 +2508,10 @@ public class SocialManagementController
         int batchSize = 0;
         String posts = "";
         long count = 0;
-
+        Set<Long> userIdSet = new HashSet<Long>();
+        Set<Long> branchIdSet = new HashSet<Long>();
+        Set<Long> regionIdSet = new HashSet<Long>();
+        Set<Long> companyIdSet = new HashSet<Long>();
         try {
             String startIndexStr = request.getParameter( "startIndex" );
             String batchSizeStr = request.getParameter( "batchSize" );
@@ -2626,6 +2536,7 @@ public class SocialManagementController
             String searchQuery = request.getParameter( "searchQuery" );
             if ( searchQuery == null || searchQuery.isEmpty() ) {
                 LOG.error( "Invalid search key passed in method searchSocialPosts()." );
+                searchQuery = "";
             } else {
                 model.addAttribute( "currentSearchQuery", searchQuery.trim() );
             }
@@ -2645,6 +2556,7 @@ public class SocialManagementController
                 //Store the posts, along with agent,branch,region and company names where present.
                 SocialMonitorData socialMonitorData = new SocialMonitorData();
                 Collection<SocialMonitorPost> socialMonitorPosts = new ArrayList<SocialMonitorPost>();
+                List<ProfileImageUrlData> profileImageUrlList = new ArrayList<ProfileImageUrlData>();
                 for ( SocialPost item : postlist ) {
                     SocialMonitorPost socialMonitorPost = new SocialMonitorPost();
 
@@ -2662,24 +2574,46 @@ public class SocialManagementController
                     if ( item.getCompanyId() > 0 ) {
                         socialMonitorPost.setCompanyName( organizationManagementService
                             .getCompanySettings( item.getCompanyId() ).getProfileName() );
+                        companyIdSet.add( item.getCompanyId() );
                     }
                     if ( item.getRegionId() > 0 ) {
                         socialMonitorPost.setRegionName( organizationManagementService.getRegionSettings( item.getRegionId() )
                             .getProfileName() );
+                        regionIdSet.add( item.getRegionId() );
                     }
                     if ( item.getBranchId() > 0 ) {
                         socialMonitorPost.setBranchName( organizationManagementService.getBranchSettings( item.getBranchId() )
                             .getRegionName() );
+                        branchIdSet.add( item.getBranchId() );
                     }
                     if ( item.getAgentId() > 0 ) {
                         socialMonitorPost.setAgentName( organizationManagementService.getAgentSettings( item.getAgentId() )
                             .getProfileName() );
+                        userIdSet.add( item.getAgentId() );
                     }
 
                     socialMonitorPosts.add( socialMonitorPost );
                 }
+                //Get profile Images
+                if ( !( companyIdSet.isEmpty() ) ) {
+                    profileImageUrlList.addAll( organizationManagementService.fetchProfileImageUrlsForEntityList(
+                        CommonConstants.COMPANY_ID_COLUMN, (HashSet<Long>) companyIdSet ) );
+                }
+                if ( !( regionIdSet.isEmpty() ) ) {
+                    profileImageUrlList.addAll( organizationManagementService.fetchProfileImageUrlsForEntityList(
+                        CommonConstants.REGION_ID_COLUMN, (HashSet<Long>) regionIdSet ) );
+                }
+                if ( !( branchIdSet.isEmpty() ) ) {
+                    profileImageUrlList.addAll( organizationManagementService.fetchProfileImageUrlsForEntityList(
+                        CommonConstants.BRANCH_ID_COLUMN, (HashSet<Long>) branchIdSet ) );
+                }
+                if ( !( userIdSet.isEmpty() ) ) {
+                    profileImageUrlList.addAll( organizationManagementService.fetchProfileImageUrlsForEntityList(
+                        CommonConstants.USER_ID, (HashSet<Long>) userIdSet ) );
+                }
                 socialMonitorData.setSocialMonitorPosts( (List<SocialMonitorPost>) socialMonitorPosts );
                 socialMonitorData.setCount( count );
+                socialMonitorData.setProfileImageUrlDataList( profileImageUrlList );
                 posts = new Gson().toJson( socialMonitorData );
 
             } catch ( MalformedURLException e ) {

@@ -1423,6 +1423,9 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
             compositeUserObject = new UserCompositeEntity();
             compositeUserObject.setUser( user );
             compositeUserObject.setAgentSettings( agentSettings );
+        }else{
+        	LOG.warn("No profile found with profile name: "+agentProfileName);
+        	throw new ProfileNotFoundException("No profile found with profile name: "+agentProfileName);
         }
         LOG.info( "Returning the user composite object." );
         return compositeUserObject;
@@ -1489,7 +1492,8 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 
 
     @Override
-    public long getReviewsCountForCompany( long companyId, double minScore, double maxScore, boolean fetchAbusive, boolean notRecommended )
+    public long getReviewsCountForCompany( long companyId, double minScore, double maxScore, boolean fetchAbusive,
+        boolean notRecommended )
     {
         LOG.info( "Method getReviewsCountForCompany called for companyId:" + companyId + " minscore:" + minScore + " maxscore:"
             + maxScore );
@@ -1697,8 +1701,8 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
      * score specified
      */
     @Override
-    public long getReviewsCount( long iden, double minScore, double maxScore, String profileLevel, boolean fetchAbusive, boolean notRecommended )
-        throws InvalidInputException
+    public long getReviewsCount( long iden, double minScore, double maxScore, String profileLevel, boolean fetchAbusive,
+        boolean notRecommended ) throws InvalidInputException
     {
         LOG.info( "Method getReviewsCount called for iden:" + iden + " minscore:" + minScore + " maxscore:" + maxScore
             + " profilelevel:" + profileLevel );
@@ -1707,7 +1711,8 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
         }
         long reviewsCount = 0;
         String idenColumnName = getIdenColumnNameFromProfileLevel( profileLevel );
-        reviewsCount = surveyDetailsDao.getFeedBacksCount( idenColumnName, iden, minScore, maxScore, fetchAbusive, notRecommended );
+        reviewsCount = surveyDetailsDao.getFeedBacksCount( idenColumnName, iden, minScore, maxScore, fetchAbusive,
+            notRecommended );
 
         LOG.info( "Method getReviewsCount executed successfully. Returning reviewsCount:" + reviewsCount );
         return reviewsCount;
@@ -1999,11 +2004,14 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
         } else if ( entityType.equals( CommonConstants.BRANCH_ID_COLUMN ) ) {
             socialPost.setBranchId( entityId );
         } else if ( entityType.equals( CommonConstants.AGENT_ID_COLUMN ) ) {
-            socialPost.setAgentId( user.getUserId() );
+            entityId = user.getUserId();
+            socialPost.setAgentId( entityId );
         }
 
         socialPost.setTimeInMillis( System.currentTimeMillis() );
         socialPostDao.addPostToUserProfile( socialPost );
+        LOG.info( "Updating modified on column in aagent hierarchy fro agent " + user.getFirstName() );
+        surveyHandler.updateModifiedOnColumnForEntity( entityType, entityId );
         LOG.info( "Method to add post to a user's profile finished." );
     }
 
@@ -2024,7 +2032,24 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
             throw new InvalidInputException( "Not a SocialSurvey Status", DisplayMessageConstants.GENERAL_ERROR );
         }
 
+        long agentId = socialPost.getAgentId();
+        long regionId = socialPost.getRegionId();
+        long companyId = socialPost.getCompanyId();
+        long branchId = socialPost.getBranchId();
         socialPostDao.removePostFromUsersProfile( socialPost );
+        LOG.info( "Updating modified on column in aagent hierarchy fro agent " );
+        if ( companyId > 0 ) {
+            surveyHandler.updateModifiedOnColumnForEntity( CommonConstants.COMPANY_ID_COLUMN, companyId );
+        }
+        if ( regionId > 0 ) {
+            surveyHandler.updateModifiedOnColumnForEntity( CommonConstants.REGION_ID_COLUMN, regionId );
+        }
+        if ( branchId > 0 ) {
+            surveyHandler.updateModifiedOnColumnForEntity( CommonConstants.BRANCH_ID_COLUMN, branchId );
+        }
+        if ( agentId > 0 ) {
+            surveyHandler.updateModifiedOnColumnForEntity( CommonConstants.AGENT_ID_COLUMN, agentId );
+        }
         LOG.info( "Method to delete post to a user's profile finished." );
     }
 
@@ -2073,52 +2098,52 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 
         //If agent, get social posts for only that agent.
         if ( entityType.equals( CommonConstants.AGENT_ID_COLUMN ) ) {
-            posts = socialPostDao.getSocialPosts( entityId, CommonConstants.AGENT_ID, startIndex, numOfRows );
+            posts = socialPostDao.getSocialPosts( entityId, CommonConstants.AGENT_ID, startIndex, numOfRows, startDate, endDate );
             //If company, get social posts for that company, all the regions, branches and agents in that company.
         } else if ( entityType.equals( CommonConstants.COMPANY_ID_COLUMN ) ) {
             //Get social posts for company
-            posts = socialPostDao.getSocialPosts( entityId, CommonConstants.COMPANY_ID, startIndex, numOfRows );
+            posts = socialPostDao.getSocialPosts( entityId, CommonConstants.COMPANY_ID, startIndex, numOfRows, startDate, endDate );
             Company company = organizationManagementService.getCompanyById( entityId );
             //Get social posts for all the regions in the company.
             for ( Region region : company.getRegions() ) {
                 posts.addAll( socialPostDao.getSocialPosts( region.getRegionId(), CommonConstants.REGION_ID, startIndex,
-                    numOfRows ) );
+                    numOfRows, startDate, endDate ) );
             }
             //Get social posts for all the branches in the company
             for ( Branch branch : company.getBranches() ) {
                 posts.addAll( socialPostDao.getSocialPosts( branch.getBranchId(), CommonConstants.BRANCH_ID, startIndex,
-                    numOfRows ) );
+                    numOfRows, startDate, endDate ) );
             }
             //Get social posts for all the users in the company
             for ( User user : company.getUsers() ) {
                 posts
-                    .addAll( socialPostDao.getSocialPosts( user.getUserId(), CommonConstants.AGENT_ID, startIndex, numOfRows ) );
+                    .addAll( socialPostDao.getSocialPosts( user.getUserId(), CommonConstants.AGENT_ID, startIndex, numOfRows, startDate, endDate ) );
             }
             //Get all social posts for region
         } else if ( entityType.equals( CommonConstants.REGION_ID_COLUMN ) ) {
             Region region = userManagementService.getRegionById( entityId );
             //Get social posts for the region
-            posts = socialPostDao.getSocialPosts( entityId, CommonConstants.REGION_ID, startIndex, numOfRows );
+            posts = socialPostDao.getSocialPosts( entityId, CommonConstants.REGION_ID, startIndex, numOfRows, startDate, endDate );
             //Get social posts for all the branches in the region
             for ( Branch branch : region.getBranches() ) {
                 posts.addAll( socialPostDao.getSocialPosts( branch.getBranchId(), CommonConstants.BRANCH_ID, startIndex,
-                    numOfRows ) );
+                    numOfRows, startDate, endDate ) );
             }
             //Get social posts for all the users in the region
             
             if (  getIndividualsByRegionId( entityId ) != null ) {
                 for ( AgentSettings user : getIndividualsByRegionId( entityId ) ) {
-                    posts.addAll( socialPostDao.getSocialPosts( user.getIden(), CommonConstants.AGENT_ID, startIndex, numOfRows ) );
+                    posts.addAll( socialPostDao.getSocialPosts( user.getIden(), CommonConstants.AGENT_ID, startIndex, numOfRows, startDate, endDate ) );
                 }
             }
             //Get all social posts for branch
         } else if ( entityType.equals( CommonConstants.BRANCH_ID_COLUMN ) ) {
             //Get social posts for the branch
-            posts = socialPostDao.getSocialPosts( entityId, CommonConstants.BRANCH_ID, startIndex, numOfRows );
+            posts = socialPostDao.getSocialPosts( entityId, CommonConstants.BRANCH_ID, startIndex, numOfRows, startDate, endDate );
             //Get social posts for all the users in the branch
             if ( getIndividualsByBranchId( entityId ) != null ) {
                 for ( AgentSettings user : getIndividualsByBranchId( entityId ) ) {
-                    posts.addAll( socialPostDao.getSocialPosts( user.getIden(), CommonConstants.AGENT_ID, startIndex, numOfRows ) );
+                    posts.addAll( socialPostDao.getSocialPosts( user.getIden(), CommonConstants.AGENT_ID, startIndex, numOfRows, startDate, endDate ) );
                 }
             }
         }
@@ -2295,25 +2320,24 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
                 queries.put( "regionId", iden );
                 // queries.put("profilesMaster",
                 // userManagementService.getProfilesMasterById(CommonConstants.PROFILES_MASTER_REGION_ADMIN_PROFILE_ID));
-                users = userProfileDao.findByKeyValue( UserProfile.class, queries );
-                break;
+                // users = userProfileDao.findByKeyValue( UserProfile.class, queries );
+                // break;
+                userIds = userProfileDao.findUserIdsByRegion( iden );
+                return userIds;
             case CommonConstants.PROFILE_LEVEL_BRANCH:
                 queries.put( "branchId", iden );
                 // queries.put("profilesMaster",
                 // userManagementService.getProfilesMasterById(CommonConstants.PROFILES_MASTER_BRANCH_ADMIN_PROFILE_ID));
-                users = userProfileDao.findByKeyValue( UserProfile.class, queries );
-                break;
+                // users = userProfileDao.findByKeyValue( UserProfile.class, queries );
+                // break;
+                userIds = userProfileDao.findUserIdsByBranch( iden );
+                return userIds;
             case CommonConstants.PROFILE_LEVEL_INDIVIDUAL:
                 userIds.add( iden );
                 return userIds;
             default:
                 throw new InvalidInputException( "Invalid profile level while getting iden column name" );
         }
-        for ( UserProfile user : users ) {
-            userIds.add( user.getUser().getUserId() );
-        }
-
-        return userIds;
     }
 
 
@@ -2409,7 +2433,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
             throw new InvalidInputException( "Invalid value passed for iden of profile level." );
         }
         Map<Long, AgentRankingReport> agentReportData = new HashMap<>();
-        surveyDetailsDao.getAverageScore( startDate, endDate, agentReportData, columnName, iden , false );
+        surveyDetailsDao.getAverageScore( startDate, endDate, agentReportData, columnName, iden, false );
         surveyDetailsDao.getCompletedSurveysCount( startDate, endDate, agentReportData, columnName, iden, false );
         // FIX for JIRA: SS-1112: BOC
         // surveyPreInitiationDao.getIncompleteSurveysCount( startDate, endDate, agentReportData );
@@ -2647,8 +2671,26 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
         if ( user == null ) {
             throw new InvalidInputException( "No user present for the specified companyId" );
         }
-        user.setFirstName( individualName.substring( 0, individualName.indexOf( ' ' ) ) );
-        user.setLastName( individualName.substring( individualName.indexOf( ' ' ) + 1 ) );
+        String nameArray[] = null;
+        if ( individualName != null && !individualName.equalsIgnoreCase( "" ) ) {
+            nameArray = individualName.split( " " );
+        }
+
+        if ( nameArray == null ) {
+            throw new InvalidInputException( "Invalid name, please provide a valid name " );
+        }
+
+        user.setFirstName( nameArray[0] );
+        String lastName = "";
+        if ( nameArray.length > 1 ) {
+            for ( int i = 1; i < nameArray.length - 1; i++ ) {
+                lastName += nameArray[i] + " ";
+            }
+        }
+        if ( lastName != null && !lastName.equalsIgnoreCase( "" ) ) {
+            lastName = lastName.trim();
+            user.setLastName( lastName );
+        }
         user.setModifiedBy( String.valueOf( userId ) );
         user.setModifiedOn( new Timestamp( System.currentTimeMillis() ) );
         userDao.update( user );

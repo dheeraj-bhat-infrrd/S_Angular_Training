@@ -39,7 +39,10 @@ import com.realtech.socialsurvey.core.dao.UserDao;
 import com.realtech.socialsurvey.core.dao.UserProfileDao;
 import com.realtech.socialsurvey.core.dao.impl.MongoOrganizationUnitSettingDaoImpl;
 import com.realtech.socialsurvey.core.entities.AgentSettings;
+import com.realtech.socialsurvey.core.entities.Branch;
 import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
+
+import com.realtech.socialsurvey.core.entities.Region;
 import com.realtech.socialsurvey.core.entities.ProfileStage;
 import com.realtech.socialsurvey.core.entities.SocialMediaTokens;
 import com.realtech.socialsurvey.core.entities.User;
@@ -361,42 +364,67 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
 
     @Override
     @Transactional
-    public List<OrganizationUnitSettings> getSettingsForBranchesAndRegionsInHierarchy( long agentId )
+    public Map<String, List<OrganizationUnitSettings>> getSettingsForBranchesAndRegionsInHierarchy( long agentId )
         throws InvalidInputException
     {
         LOG.info( "Method to get settings of branches and regions current agent belongs to, getSettingsForBranchesAndRegionsInHierarchy() started." );
-        List<OrganizationUnitSettings> settings = new ArrayList<>();
+        User user = userDao.findById( User.class, agentId );
+        Map<String, List<OrganizationUnitSettings>> map = new HashMap<String, List<OrganizationUnitSettings>>();
+        List<OrganizationUnitSettings> companySettings = new ArrayList<>();
+        List<OrganizationUnitSettings> branchSettings = new ArrayList<>();
+        List<OrganizationUnitSettings> regionSettings = new ArrayList<>();
         Set<Long> branchIds = new HashSet<>();
         Set<Long> regionIds = new HashSet<>();
-        Set<Long> companyIds = new HashSet<>();
         Map<String, Object> queries = new HashMap<>();
-        queries.put( CommonConstants.USER_COLUMN, userDao.findById( User.class, agentId ) );
+        queries.put( CommonConstants.USER_COLUMN, user );
         queries.put( CommonConstants.PROFILE_MASTER_COLUMN,
             userManagementService.getProfilesMasterById( CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID ) );
         List<UserProfile> userProfiles = userProfileDao.findByKeyValue( UserProfile.class, queries );
         for ( UserProfile userProfile : userProfiles ) {
-            branchIds.add( userProfile.getBranchId() );
-            regionIds.add( userProfile.getRegionId() );
-            companyIds.add( userProfile.getCompany().getCompanyId() );
+            long branchId = userProfile.getBranchId();
+            if ( branchId > 0 ) {
+                Branch branch = userManagementService.getBranchById( branchId );
+                if ( branch != null ) {
+                    if ( branch.getIsDefaultBySystem() == CommonConstants.IS_DEFAULT_BY_SYSTEM_NO ) {
+                        LOG.debug( "This agent belongs to branch " );
+                        branchIds.add( userProfile.getBranchId() );
+                    } else {
+                        long regionId = userProfile.getRegionId();
+                        if ( regionId > 0 ) {
+                            Region region = userManagementService.getRegionById( regionId );
+                            if ( region != null ) {
+                                LOG.info( "This agent belongs to region " );
+                                if ( region.getIsDefaultBySystem() == CommonConstants.IS_DEFAULT_BY_SYSTEM_NO ) {
+                                    regionIds.add( regionId );
+                                }
+                            }
+                        }
+                    }
+                }
+            }
         }
 
         for ( Long branchId : branchIds ) {
-            settings.add( organizationUnitSettingsDao.fetchOrganizationUnitSettingsById( branchId,
+            branchSettings.add( organizationUnitSettingsDao.fetchOrganizationUnitSettingsById( branchId,
                 CommonConstants.BRANCH_SETTINGS_COLLECTION ) );
         }
 
         for ( Long regionId : regionIds ) {
-            settings.add( organizationUnitSettingsDao.fetchOrganizationUnitSettingsById( regionId,
+            regionSettings.add( organizationUnitSettingsDao.fetchOrganizationUnitSettingsById( regionId,
                 CommonConstants.REGION_SETTINGS_COLLECTION ) );
         }
 
-        for ( Long companyId : companyIds ) {
-            settings.add( organizationUnitSettingsDao.fetchOrganizationUnitSettingsById( companyId,
-                CommonConstants.COMPANY_SETTINGS_COLLECTION ) );
-        }
 
+        companySettings.add( organizationUnitSettingsDao.fetchOrganizationUnitSettingsById( user.getCompany().getCompanyId(),
+            CommonConstants.COMPANY_SETTINGS_COLLECTION ) );
+
+
+        map.put( MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION, companySettings );
+        map.put( MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION, regionSettings );
+        map.put( MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION, branchSettings );
         LOG.info( "Method to get settings of branches and regions current agent belongs to, getSettingsForBranchesAndRegionsInHierarchy() finished." );
-        return settings;
+
+        return map;
     }
 
 
@@ -460,28 +488,24 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
                 break;
 
             case CommonConstants.GOOGLE_SOCIAL_SITE:
-
                 profileStage.setOrder( ProfileStages.GOOGLE_PRF.getOrder() );
                 profileStage.setProfileStageKey( ProfileStages.GOOGLE_PRF.name() );
                 keyToUpdate = MongoOrganizationUnitSettingDaoImpl.KEY_GOOGLE_SOCIAL_MEDIA_TOKEN;
                 break;
 
             case CommonConstants.LINKEDIN_SOCIAL_SITE:
-
                 profileStage.setOrder( ProfileStages.LINKEDIN_PRF.getOrder() );
                 profileStage.setProfileStageKey( ProfileStages.LINKEDIN_PRF.name() );
                 keyToUpdate = MongoOrganizationUnitSettingDaoImpl.KEY_LINKEDIN_SOCIAL_MEDIA_TOKEN;
                 break;
 
             case CommonConstants.ZILLOW_SOCIAL_SITE:
-
                 profileStage.setOrder( ProfileStages.ZILLOW_PRF.getOrder() );
                 profileStage.setProfileStageKey( ProfileStages.ZILLOW_PRF.name() );
                 keyToUpdate = MongoOrganizationUnitSettingDaoImpl.KEY_ZILLOW_SOCIAL_MEDIA_TOKEN;
                 break;
 
             case CommonConstants.YELP_SOCIAL_SITE:
-
                 profileStage.setOrder( ProfileStages.YELP_PRF.getOrder() );
                 profileStage.setProfileStageKey( ProfileStages.YELP_PRF.name() );
                 keyToUpdate = MongoOrganizationUnitSettingDaoImpl.KEY_YELP_SOCIAL_MEDIA_TOKEN;
@@ -503,7 +527,6 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
 
         OrganizationUnitSettings organizationUnitSettings = organizationUnitSettingsDao.removeKeyInOrganizationSettings(
             unitSettings, keyToUpdate, collectionName );
-
 
         if ( !ignore ) {
             profileStage.setStatus( CommonConstants.STATUS_ACTIVE );

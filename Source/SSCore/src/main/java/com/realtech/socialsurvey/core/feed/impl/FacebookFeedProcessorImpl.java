@@ -7,6 +7,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
 import org.joda.time.DateTime;
 import org.joda.time.Days;
 import org.slf4j.Logger;
@@ -18,6 +19,7 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
+
 import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.dao.GenericDao;
 import com.realtech.socialsurvey.core.dao.OrganizationUnitSettingsDao;
@@ -29,6 +31,8 @@ import com.realtech.socialsurvey.core.entities.FeedStatus;
 import com.realtech.socialsurvey.core.exception.NonFatalException;
 import com.realtech.socialsurvey.core.feed.SocialNetworkDataProcessor;
 import com.realtech.socialsurvey.core.services.mail.EmailServices;
+import com.realtech.socialsurvey.core.services.surveybuilder.SurveyHandler;
+
 import facebook4j.Facebook;
 import facebook4j.FacebookException;
 import facebook4j.FacebookFactory;
@@ -37,274 +41,297 @@ import facebook4j.Reading;
 import facebook4j.ResponseList;
 import facebook4j.auth.AccessToken;
 
-@Component("facebookFeed")
-@Scope(value = ConfigurableBeanFactory.SCOPE_PROTOTYPE)
-public class FacebookFeedProcessorImpl implements SocialNetworkDataProcessor<Post, FacebookToken> {
 
-	private static final Logger LOG = LoggerFactory.getLogger(FacebookFeedProcessorImpl.class);
-	private static final String FEED_SOURCE = "facebook";
-	private static final int RETRIES_INITIAL = 0;
-	private static final int PAGE_SIZE = 200;
+@Component ( "facebookFeed")
+@Scope ( value = ConfigurableBeanFactory.SCOPE_PROTOTYPE)
+public class FacebookFeedProcessorImpl implements SocialNetworkDataProcessor<Post, FacebookToken>
+{
 
-	@Autowired
-	private GenericDao<FeedStatus, Long> feedStatusDao;
+    private static final Logger LOG = LoggerFactory.getLogger( FacebookFeedProcessorImpl.class );
+    private static final String FEED_SOURCE = "facebook";
+    private static final int RETRIES_INITIAL = 0;
+    private static final int PAGE_SIZE = 200;
 
-	@Autowired
-	private MongoTemplate mongoTemplate;
+    @Autowired
+    private GenericDao<FeedStatus, Long> feedStatusDao;
 
-	@Autowired
-	private OrganizationUnitSettingsDao settingsDao;
+    @Autowired
+    private MongoTemplate mongoTemplate;
 
-	@Autowired
-	private EmailServices emailServices;
+    @Autowired
+    private OrganizationUnitSettingsDao settingsDao;
 
-	@Value("${SOCIAL_CONNECT_RETRY_THRESHOLD}")
-	private long socialConnectRetryThreshold;
+    @Autowired
+    private SurveyHandler surveyHandler;
 
-	@Value("${SOCIAL_CONNECT_REMINDER_THRESHOLD}")
-	private long socialConnectThreshold;
+    @Autowired
+    private EmailServices emailServices;
 
-	@Value("${SOCIAL_CONNECT_REMINDER_INTERVAL_DAYS}")
-	private long socialConnectInterval;
+    @Value ( "${SOCIAL_CONNECT_RETRY_THRESHOLD}")
+    private long socialConnectRetryThreshold;
 
-	@Value("${FB_CLIENT_ID}")
-	private String facebookClientId;
+    @Value ( "${SOCIAL_CONNECT_REMINDER_THRESHOLD}")
+    private long socialConnectThreshold;
 
-	@Value("${FB_CLIENT_SECRET}")
-	private String facebookClientSecret;
+    @Value ( "${SOCIAL_CONNECT_REMINDER_INTERVAL_DAYS}")
+    private long socialConnectInterval;
 
-	@Value("${FB_URI}")
-	private String facebookUri;
+    @Value ( "${FB_CLIENT_ID}")
+    private String facebookClientId;
 
-	private FeedStatus status;
-	private long profileId;
-	private Date lastFetchedTill;
-	private String lastFetchedPostId = "";
+    @Value ( "${FB_CLIENT_SECRET}")
+    private String facebookClientSecret;
 
-	@Override
-	@Transactional
-	public void preProcess(long iden, String collection, FacebookToken token) {
-		List<FeedStatus> statuses = null;
-		Map<String, Object> queries = new HashMap<>();
-		queries.put(CommonConstants.FEED_SOURCE_COLUMN, FEED_SOURCE);
+    @Value ( "${FB_URI}")
+    private String facebookUri;
 
-		switch (collection) {
-			case MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION:
-				queries.put(CommonConstants.COMPANY_ID_COLUMN, iden);
+    private FeedStatus status;
+    private long profileId;
+    private Date lastFetchedTill;
+    private String lastFetchedPostId = "";
 
-				statuses = feedStatusDao.findByKeyValue(FeedStatus.class, queries);
-				if (statuses != null && statuses.size() > 0) {
-					status = statuses.get(CommonConstants.INITIAL_INDEX);
-				}
 
-				if (status == null) {
-					status = new FeedStatus();
-					status.setFeedSource(FEED_SOURCE);
-					status.setCompanyId(iden);
-				}
-				else {
-					lastFetchedTill = new Date(status.getLastFetchedTill().getTime());
-					lastFetchedPostId = status.getLastFetchedPostId();
-				}
-				break;
+    @Override
+    @Transactional
+    public void preProcess( long iden, String collection, FacebookToken token )
+    {
+        List<FeedStatus> statuses = null;
+        Map<String, Object> queries = new HashMap<>();
+        queries.put( CommonConstants.FEED_SOURCE_COLUMN, FEED_SOURCE );
 
-			case MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION:
-				queries.put(CommonConstants.REGION_ID_COLUMN, iden);
+        switch ( collection ) {
+            case MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION:
+                queries.put( CommonConstants.COMPANY_ID_COLUMN, iden );
 
-				statuses = feedStatusDao.findByKeyValue(FeedStatus.class, queries);
-				if (statuses != null && statuses.size() > 0) {
-					status = statuses.get(CommonConstants.INITIAL_INDEX);
-				}
+                statuses = feedStatusDao.findByKeyValue( FeedStatus.class, queries );
+                if ( statuses != null && statuses.size() > 0 ) {
+                    status = statuses.get( CommonConstants.INITIAL_INDEX );
+                }
 
-				if (status == null) {
-					status = new FeedStatus();
-					status.setFeedSource(FEED_SOURCE);
-					status.setRegionId(iden);
-				}
-				else {
-					lastFetchedTill = new Date(status.getLastFetchedTill().getTime());
-					lastFetchedPostId = status.getLastFetchedPostId();
-				}
-				break;
+                if ( status == null ) {
+                    status = new FeedStatus();
+                    status.setFeedSource( FEED_SOURCE );
+                    status.setCompanyId( iden );
+                } else {
+                    lastFetchedTill = new Date( status.getLastFetchedTill().getTime() );
+                    lastFetchedPostId = status.getLastFetchedPostId();
+                }
+                break;
 
-			case MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION:
-				queries.put(CommonConstants.BRANCH_ID_COLUMN, iden);
+            case MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION:
+                queries.put( CommonConstants.REGION_ID_COLUMN, iden );
 
-				statuses = feedStatusDao.findByKeyValue(FeedStatus.class, queries);
-				if (statuses != null && statuses.size() > 0) {
-					status = statuses.get(CommonConstants.INITIAL_INDEX);
-				}
+                statuses = feedStatusDao.findByKeyValue( FeedStatus.class, queries );
+                if ( statuses != null && statuses.size() > 0 ) {
+                    status = statuses.get( CommonConstants.INITIAL_INDEX );
+                }
 
-				if (status == null) {
-					status = new FeedStatus();
-					status.setFeedSource(FEED_SOURCE);
-					status.setBranchId(iden);
-				}
-				else {
-					lastFetchedTill = new Date(status.getLastFetchedTill().getTime());
-					lastFetchedPostId = status.getLastFetchedPostId();
-				}
-				break;
+                if ( status == null ) {
+                    status = new FeedStatus();
+                    status.setFeedSource( FEED_SOURCE );
+                    status.setRegionId( iden );
+                } else {
+                    lastFetchedTill = new Date( status.getLastFetchedTill().getTime() );
+                    lastFetchedPostId = status.getLastFetchedPostId();
+                }
+                break;
 
-			case MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION:
-				queries.put(CommonConstants.AGENT_ID_COLUMN, iden);
+            case MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION:
+                queries.put( CommonConstants.BRANCH_ID_COLUMN, iden );
 
-				statuses = feedStatusDao.findByKeyValue(FeedStatus.class, queries);
-				if (statuses != null && statuses.size() > 0) {
-					status = statuses.get(CommonConstants.INITIAL_INDEX);
-				}
+                statuses = feedStatusDao.findByKeyValue( FeedStatus.class, queries );
+                if ( statuses != null && statuses.size() > 0 ) {
+                    status = statuses.get( CommonConstants.INITIAL_INDEX );
+                }
 
-				if (status == null) {
-					status = new FeedStatus();
-					status.setFeedSource(FEED_SOURCE);
-					status.setAgentId(iden);
-				}
-				else {
-					lastFetchedTill = new Date(status.getLastFetchedTill().getTime());
-					lastFetchedPostId = status.getLastFetchedPostId();
-				}
-				break;
-		}
-		profileId = iden;
-	}
+                if ( status == null ) {
+                    status = new FeedStatus();
+                    status.setFeedSource( FEED_SOURCE );
+                    status.setBranchId( iden );
+                } else {
+                    lastFetchedTill = new Date( status.getLastFetchedTill().getTime() );
+                    lastFetchedPostId = status.getLastFetchedPostId();
+                }
+                break;
 
-	@Override
-	@Transactional
-	public List<Post> fetchFeed(long iden, String collection, FacebookToken token) throws NonFatalException {
-		LOG.info("Getting posts for " + collection + " with id: " + iden);
+            case MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION:
+                queries.put( CommonConstants.AGENT_ID_COLUMN, iden );
 
-		// Settings Consumer and Access Tokens
-		Facebook facebook = new FacebookFactory().getInstance();
-		facebook.setOAuthAppId(facebookClientId, facebookClientSecret);
-		facebook.setOAuthAccessToken(new AccessToken(token.getFacebookAccessTokenToPost()));
+                statuses = feedStatusDao.findByKeyValue( FeedStatus.class, queries );
+                if ( statuses != null && statuses.size() > 0 ) {
+                    status = statuses.get( CommonConstants.INITIAL_INDEX );
+                }
 
-		// building query to fetch
-		List<Post> posts = new ArrayList<Post>();
-		try {
-			ResponseList<Post> resultList;
-			if (lastFetchedTill != null) {
-				Calendar calender = Calendar.getInstance();
-				calender.setTimeInMillis(lastFetchedTill.getTime());
-				calender.add(Calendar.SECOND, 1);
-				Date lastFetchedTillWithoneSecChange = calender.getTime();
-				resultList = facebook.getPosts(new Reading().limit(PAGE_SIZE).since(lastFetchedTillWithoneSecChange));
-			}
-			else {
-				resultList = facebook.getPosts(new Reading().limit(PAGE_SIZE));
-			}
-			posts.addAll(resultList);
+                if ( status == null ) {
+                    status = new FeedStatus();
+                    status.setFeedSource( FEED_SOURCE );
+                    status.setAgentId( iden );
+                } else {
+                    lastFetchedTill = new Date( status.getLastFetchedTill().getTime() );
+                    lastFetchedPostId = status.getLastFetchedPostId();
+                }
+                break;
+        }
+        profileId = iden;
+    }
 
-			while (resultList.getPaging() != null && resultList.getPaging().getNext() != null) {
-				resultList = facebook.fetchNext(resultList.getPaging());
-				posts.addAll(resultList);
-			}
 
-			status.setRetries(RETRIES_INITIAL);
-		}
-		catch (FacebookException e) {
-			LOG.error("Exception in Facebook feed extration. Reason: " + e.getMessage());
+    @Override
+    @Transactional
+    public List<Post> fetchFeed( long iden, String collection, FacebookToken token ) throws NonFatalException
+    {
+        LOG.info( "Getting posts for " + collection + " with id: " + iden );
 
-			if (lastFetchedPostId == null || lastFetchedPostId.isEmpty()) {
-				lastFetchedPostId = "0";
-			}
+        // Settings Consumer and Access Tokens
+        Facebook facebook = new FacebookFactory().getInstance();
+        facebook.setOAuthAppId( facebookClientId, facebookClientSecret );
+        facebook.setOAuthAccessToken( new AccessToken( token.getFacebookAccessTokenToPost() ) );
 
-			// increasing no.of retries
-			status.setRetries(status.getRetries() + 1);
-			status.setLastFetchedPostId(lastFetchedPostId);
+        // building query to fetch
+        List<Post> posts = new ArrayList<Post>();
+        try {
+            ResponseList<Post> resultList;
+            if ( lastFetchedTill != null ) {
+                Calendar calender = Calendar.getInstance();
+                calender.setTimeInMillis( lastFetchedTill.getTime() );
+                calender.add( Calendar.SECOND, 1 );
+                Date lastFetchedTillWithoneSecChange = calender.getTime();
+                resultList = facebook.getPosts( new Reading().limit( PAGE_SIZE ).since( lastFetchedTillWithoneSecChange ) );
+            } else {
+                resultList = facebook.getPosts( new Reading().limit( PAGE_SIZE ) );
+            }
+            posts.addAll( resultList );
 
-			Timestamp timestamp = new Timestamp(System.currentTimeMillis());
-			DateTime currentTime = new DateTime(timestamp.getTime());
-			DateTime sentTime = new DateTime(status.getReminderSentOn().getTime());
-			Days days = Days.daysBetween(sentTime, currentTime);
+            while ( resultList.getPaging() != null && resultList.getPaging().getNext() != null ) {
+                resultList = facebook.fetchNext( resultList.getPaging() );
+                posts.addAll( resultList );
+            }
 
-			// sending reminder mail and increasing counter
-			if (status.getRemindersSent() < socialConnectThreshold && days.getDays() >= socialConnectInterval
-					&& status.getRetries() >= socialConnectRetryThreshold) {
-				ContactDetailsSettings contactDetailsSettings = settingsDao.fetchOrganizationUnitSettingsById(iden, collection).getContact_details();
-				String userEmail = contactDetailsSettings.getMail_ids().getWork();
+            status.setRetries( RETRIES_INITIAL );
+        } catch ( FacebookException e ) {
+            LOG.error( "Exception in Facebook feed extration. Reason: " + e.getMessage() );
 
-				emailServices.sendSocialConnectMail(userEmail, contactDetailsSettings.getName(), userEmail, FEED_SOURCE);
+            if ( lastFetchedPostId == null || lastFetchedPostId.isEmpty() ) {
+                lastFetchedPostId = "0";
+            }
 
-				status.setReminderSentOn(timestamp);
-				status.setRemindersSent(status.getRemindersSent() + 1);
-			}
+            // increasing no.of retries
+            status.setRetries( status.getRetries() + 1 );
+            status.setLastFetchedPostId( lastFetchedPostId );
 
-			feedStatusDao.saveOrUpdate(status);
-		}
+            Timestamp timestamp = new Timestamp( System.currentTimeMillis() );
+            DateTime currentTime = new DateTime( timestamp.getTime() );
+            DateTime sentTime = new DateTime( status.getReminderSentOn().getTime() );
+            Days days = Days.daysBetween( sentTime, currentTime );
 
-		return posts;
-	}
+            // sending reminder mail and increasing counter
+            if ( status.getRemindersSent() < socialConnectThreshold && days.getDays() >= socialConnectInterval
+                && status.getRetries() >= socialConnectRetryThreshold ) {
+                ContactDetailsSettings contactDetailsSettings = settingsDao
+                    .fetchOrganizationUnitSettingsById( iden, collection ).getContact_details();
+                String userEmail = contactDetailsSettings.getMail_ids().getWork();
 
-	@Override
-	public void processFeed(List<Post> posts, String collection) throws NonFatalException {
-		LOG.info("Process posts for organizationUnit " + collection);
-		if (posts == null || posts.isEmpty()) {
-			return;
-		}
+                emailServices.sendSocialConnectMail( userEmail, contactDetailsSettings.getName(), userEmail, FEED_SOURCE );
 
-		if (lastFetchedTill == null) {
-			lastFetchedTill = posts.get(0).getUpdatedTime();
-		}
+                status.setReminderSentOn( timestamp );
+                status.setRemindersSent( status.getRemindersSent() + 1 );
+            }
 
-		FacebookSocialPost feed;
-		for (Post post : posts) {
-			
-			//skip the post if it contains no message.
-			if(post.getMessage() == null || post.getMessage() == "")
-				continue;
-			
-			if (lastFetchedTill.before(post.getUpdatedTime())) {
-				lastFetchedTill = post.getUpdatedTime();
-			}
+            feedStatusDao.saveOrUpdate( status );
+        }
 
-			feed = new FacebookSocialPost();
-			feed.setPost(post);
-			
-			feed.setPostText(post.getMessage());
+        return posts;
+    }
 
-			feed.setSource(FEED_SOURCE);
-			feed.setPostId(post.getId());
-			feed.setPostedBy(post.getFrom().getName());
-			feed.setTimeInMillis(post.getUpdatedTime().getTime());
-			feed.setPostUrl(facebookUri.concat(post.getId()));
 
-			switch (collection) {
-				case MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION:
-					feed.setCompanyId(profileId);
-					break;
+    @Override
+    public boolean processFeed( List<Post> posts, String collection ) throws NonFatalException
+    {
+        LOG.info( "Process posts for organizationUnit " + collection );
+        if ( posts == null || posts.isEmpty() ) {
+            return false;
+        }
 
-				case MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION:
-					feed.setRegionId(profileId);
-					break;
+        if ( lastFetchedTill == null ) {
+            lastFetchedTill = posts.get( 0 ).getUpdatedTime();
+        }
 
-				case MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION:
-					feed.setBranchId(profileId);
-					break;
+        FacebookSocialPost feed;
+        boolean inserted = false;
+        for ( Post post : posts ) {
 
-				case MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION:
-					feed.setAgentId(profileId);
-					break;
-			}
+            //skip the post if it contains no message.
+            if ( post.getMessage() == null || post.getMessage() == "" )
+                continue;
 
-			lastFetchedPostId = post.getId();
+            if ( lastFetchedTill.before( post.getUpdatedTime() ) ) {
+                lastFetchedTill = post.getUpdatedTime();
+            }
 
-			// pushing to mongo
-			mongoTemplate.insert(feed, CommonConstants.SOCIAL_POST_COLLECTION);
-		}
-	}
+            feed = new FacebookSocialPost();
+            feed.setPost( post );
 
-	@Override
-	@Transactional
-	public void postProcess(long iden, String collection) throws NonFatalException {
-		if (lastFetchedPostId == null || lastFetchedPostId.isEmpty()) {
-			lastFetchedPostId = "0";
-		}
-		if (lastFetchedTill != null) {
-			status.setLastFetchedTill(new Timestamp(lastFetchedTill.getTime()));
-		}
+            feed.setPostText( post.getMessage() );
 
-		status.setLastFetchedPostId(lastFetchedPostId);
+            feed.setSource( FEED_SOURCE );
+            feed.setPostId( post.getId() );
+            feed.setPostedBy( post.getFrom().getName() );
+            feed.setTimeInMillis( post.getUpdatedTime().getTime() );
+            feed.setPostUrl( facebookUri.concat( post.getId() ) );
+            switch ( collection ) {
+                case MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION:
+                    feed.setCompanyId( profileId );
+                    break;
 
-		feedStatusDao.saveOrUpdate(status);
-	}
+                case MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION:
+                    feed.setRegionId( profileId );
+                    break;
+
+                case MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION:
+                    feed.setBranchId( profileId );
+                    break;
+
+                case MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION:
+                    feed.setAgentId( profileId );
+                    break;
+            }
+
+            lastFetchedPostId = post.getId();
+
+            // pushing to mongo
+
+            mongoTemplate.insert( feed, CommonConstants.SOCIAL_POST_COLLECTION );
+            inserted = true;
+        }
+        return inserted;
+    }
+
+
+    @Override
+    @Transactional
+    public void postProcess( long iden, String collection, boolean anyRecordInserted ) throws NonFatalException
+    {
+        if ( lastFetchedPostId == null || lastFetchedPostId.isEmpty() ) {
+            lastFetchedPostId = "0";
+        }
+        if ( lastFetchedTill != null ) {
+            status.setLastFetchedTill( new Timestamp( lastFetchedTill.getTime() ) );
+        }
+
+        status.setLastFetchedPostId( lastFetchedPostId );
+
+        if ( anyRecordInserted ) {
+            if ( collection.equalsIgnoreCase( MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION ) ) {
+                surveyHandler.updateModifiedOnColumnForEntity( CommonConstants.COMPANY_ID_COLUMN, profileId );
+            } else if ( collection.equalsIgnoreCase( MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION ) ) {
+                surveyHandler.updateModifiedOnColumnForEntity( CommonConstants.REGION_ID_COLUMN, profileId );
+            } else if ( collection.equalsIgnoreCase( MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION ) ) {
+                surveyHandler.updateModifiedOnColumnForEntity( CommonConstants.BRANCH_ID_COLUMN, profileId );
+            } else if ( collection.equalsIgnoreCase( MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION ) ) {
+                surveyHandler.updateModifiedOnColumnForEntity( CommonConstants.AGENT_ID_COLUMN, profileId );
+            }
+        }
+
+        feedStatusDao.saveOrUpdate( status );
+    }
 }

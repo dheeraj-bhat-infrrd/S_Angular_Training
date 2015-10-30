@@ -135,6 +135,11 @@ function showMainContentCallBack(data) {
 }
 
 
+//Function to logout
+function userLogout() {
+	window.location.href = 'j_spring_security_logout';
+}
+
 /*
  * This module helps in browser navigation support to give a single page app
  * 
@@ -179,6 +184,7 @@ function retrieveState() {
 $(document).on('click',  function(e){
 	if($('#overlay-send-survey').is(':visible')){
 		$('#overlay-send-survey').hide();
+		enableBodyScroll();
 	}
 });
 
@@ -186,6 +192,7 @@ $(document).on('keyup',  function(e){
 	if (e.keyCode == 27){
 		if($('#overlay-send-survey').is(':visible')){
 			$('#overlay-send-survey').hide();
+			enableBodyScroll();
 		}
 	}
 });
@@ -4827,7 +4834,8 @@ function paginateUsersProList(response) {
 				}
 				
 				$('#pro-total-pages').text(totalPage);
-			}			
+			} 
+			$('#srch-num-list').show();
 		}
 		paintProList(reponseJson.users);
 	}
@@ -7213,7 +7221,7 @@ function isValidUrl(url){
 function adjustImage() {
 	var windW = window.innerWidth;
 	if (windW < 768) {
-		//$('.mobile-tabs').children('.mob-icn-active').click();
+		$('.mobile-tabs').children('.mob-icn-active').click();
 		var imgW = $('#prof-image').width();
 		$('#prof-image').height(imgW * 0.7);
 		var h2 = $('.prog-img-container').height() - 11;
@@ -7226,8 +7234,10 @@ function adjustImage() {
 		var rowW = $('.lp-con-row').width() - 50 - 50; // left image-50;
 														// right-locks-50
 		$('.lp-con-row-item').width(rowW + 'px');
-		// $('.lp-con-row-item').width('auto');
 		$('.footer-main-wrapper').show();
+		//show all the containers
+        $('#reviews-container, #prof-company-intro, #prof-agent-container').show();
+        $('#recent-post-container, #ppl-post-cont, #contact-wrapper, #intro-about-me').show();
 	}
 }
 
@@ -8856,7 +8866,7 @@ $('body').on('click','.st-dd-item-auto-post',function() {
 
 $('body').on('click','.st-dd-item-min-post',function() {
 	var pageHash = window.location.hash;
-	if(pageHash.toLowerCase() == "#showcomplaintregsettings") {
+	if(pageHash.toLowerCase() == "#showcomplaintressettings") {
 		$('#comp-rating-post').val($(this).html());
 		$('#st-dd-wrapper-min-post').slideToggle(200);
 		return;
@@ -9102,13 +9112,13 @@ function getImageandCaptionProfile(loop) {
 
 }
 
-function showSearchedPostsSolr(fromstart, companyId, searchQuery) {
+function showSearchedPostsSolr(fromstart, entityType, entityId, searchQuery) {
 	if(fromstart){
 		proPostStartIndex = 0;
 	}
 	var payload = {
-			"entityType" : "companyId",
-			"entityId" : companyId,
+			"entityType" : entityType,
+			"entityId" : entityId,
 			"batchSize" : proPostBatchSize,
 			"startIndex" : proPostStartIndex,
 			"searchQuery" : searchQuery
@@ -9119,31 +9129,17 @@ function showSearchedPostsSolr(fromstart, companyId, searchQuery) {
 			proPostStartIndex = 0;
 			proPostCount = data.count + 1;
 		}
-		paintPostsSolr(data.socialMonitorPosts, companyId);
+		paintPostsSolr(data, entityType, entityId, searchQuery);
 		proPostStartIndex += proPostBatchSize;
 	}, payload, true);
 }
 
-function showPostsSolr(fromstart, companyId) {
-	var payload = {
-			"entityType" : "companyId",
-			"entityId" : companyId,
-			"batchSize" : proPostBatchSize,
-			"startIndex" : proPostStartIndex
-		};
-	callAjaxGetWithPayloadData("./findsocialpostsforentity.do", function(response) {
-		var data = $.parseJSON(response);
-		if (fromstart) {
-			proPostStartIndex = 0;
-			proPostCount = data.count + 1;
-		}
-		paintPostsSolr(data.socialMonitorPosts, companyId);
-		proPostStartIndex += proPostBatchSize;
-	}, payload, true);
-}
-
-function paintPostsSolr(posts, companyId) {
+function paintPostsSolr(data, entityType, entityId, searchQuery) {
+	var posts = data.socialMonitorPosts;
+	var profilePics = data.profileImageUrlDataList;
 	var divToPopulate = "";
+	var profImgClass = "sm-default-img";
+	var profImgStyle = "";
 	$.each(posts, function(i, post) {
 		var iconClass = "";
 		var href="javascript:void(0)";
@@ -9167,9 +9163,41 @@ function paintPostsSolr(posts, companyId) {
 		if(typeof post.postUrl!=  "undefined" ){
 			 href= post.postUrl;
 		}
-		var hrefComplet='<a href='+href+' target="_blank">';
+		var profileImg = "";
+		$.each(profilePics,  function(i, pic){
+			if(post.companyId > 0 && pic.entityType == "companyId" && pic.entityId == post.companyId){
+				profileImg = pic.profileImageUrl;
+			} else if(post.regionId > 0 && pic.entityType == "regionId" && pic.entityId == post.regionId){
+				profileImg = pic.profileImageUrl;
+			} else if(post.branchId > 0 && pic.entityType == "branchId" && pic.entityId == post.branchId){
+				profileImg = pic.profileImageUrl;
+			} else if(post.agentId > 0 && pic.entityType == "userId" && pic.entityId == post.agentId){
+				profileImg = pic.profileImageUrl;
+			}
+		});
+		if(profileImg != ""){
+			profImgClass = "sm-custom-img";
+			profImgStyle = 'style="background:url(' + profileImg + ') no-repeat center; background-size: 50px;"';
+		}
 		
-		divToPopulate += '<div class="tweet-panel-item bord-bot-dc clearfix">'		
+		var hrefComplet='<a href='+href+' target="_blank">';
+		divToPopulate += '<div class="tweet-panel-item bord-bot-dc sm-tweet-item clearfix">';
+		var profName = "";
+		if (post.companyName != undefined && post.companyName != "") {
+			profName = post.companyName;
+		}
+		if (post.regionName != undefined && post.regionName != "") {
+			profName = post.regionName;
+		}
+		if (post.branchName != undefined && post.branchName != "") {
+			profName = post.branchName;
+		}
+		if (post.agentName != undefined && post.agentName != "") {
+			profName = post.agentName;
+		}
+		divToPopulate += '<div class="float-left ' + profImgClass + '" ' + profImgStyle + ' ></div>';
+		divToPopulate += '<div class="sm-prof-name">' + profName + '</div>'
+				+ '<div class="sm-post-row float-left">'
 				+ hrefComplet
 				+ '<div class="tweet-icn ' + iconClass + ' float-left"></div>'
 				+"</a>"
@@ -9178,28 +9206,10 @@ function paintPostsSolr(posts, companyId) {
 				+ '<div class="tweet-text-link"><em>' + post.postedBy
 				+ '</em></div>' + '<div class="tweet-text-time"><em>'
 				+ convertUserDateToWeekFormt(new Date(post.timeInMillis)) + '</em></div>';
-		if (post.companyName != undefined && post.companyName != "") {
-			divToPopulate += '<div class="tweet-text-time"><em>Company Name : ' + post.companyName + '</em></div>';
-		}
-		if (post.regionName != undefined && post.regionName != "") {
-			divToPopulate += '<div class="tweet-text-time"><em>Region Name : ' + post.regionName + '</em></div>';
-		}
-		if (post.branchName != undefined && post.branchName != "") {
-			divToPopulate += '<div class="tweet-text-time"><em>Office Name : ' + post.branchName + '</em></div>';
-		}
-		if (post.agentName != undefined && post.agentName != "") {
-			divToPopulate += '<div class="tweet-text-time"><em>User Name : ' + post.agentName + '</em></div>';
-		}
 		divToPopulate += '</div>';
 		
-		if(post.source == "SocialSurvey"){
-			var divToDeleteSurvey = '<div class="dlt-survey-wrapper hide"><div surveymongoid=' + post._id + ' class="post-dlt-icon reg-err-pu-close float-left">'
-								+ '</div></div>';
-			divToPopulate += divToDeleteSurvey;
-		}
-		
 		divToPopulate += '</div>';
-		
+		divToPopulate += '</div>';
 		
 		
 	});
@@ -9220,7 +9230,7 @@ function paintPostsSolr(posts, companyId) {
 		if (scrollContainer.scrollTop === scrollContainer.scrollHeight
 					- scrollContainer.clientHeight) {
 				if (proPostStartIndex < proPostCount)
-					showPostsSolr(false, companyId);
+					showSearchedPostsSolr(false, entityType, entityId, searchQuery);
 		}
 	});
 }
@@ -9234,7 +9244,7 @@ function setColDetails(currentProfileName, currentProfileValue){
 $(document).on('click','#comp-reg-form-submit',function(){
 	if(validateComplaintRegistraionForm()) {
 		var formData = $('#comp-reg-form').serialize();
-		callAjaxPostWithPayloadData("/updatecomplaintregsettings.do", function(data){
+		callAjaxPostWithPayloadData("/updatecomplaintressettings.do", function(data){
 			$('#overlay-toast').html(data);
 			showToast();
 		}, formData,  true );
@@ -9246,9 +9256,137 @@ $(document).on('click touchstart','#compl-checkbox', function() {
 		if(validateMultipleEmailIds('comp-mailId')) {
 			$(this).removeClass('bd-check-img-checked');
 			$('input[name="enabled"]').prop( "checked" , true);
+			$('input[name="enabled"]').val("enable");
 		}
 	} else {
 			$(this).addClass('bd-check-img-checked');
 			$('input[name="enabled"]').prop( "checked" , false);
+			$('input[name="enabled"]').val("");
 	}
+});
+
+//function to remove social post
+function removeUserPost(surveyMongoId) {
+
+	$('#overlay-continue').removeAttr("onclick");
+	$('#overlay-main').hide();
+	var payload = {
+		"statusmongoid" : surveyMongoId
+	};
+	
+	callAjaxPostWithPayloadData("./deletestatus.do", function(data) {
+		if (data.errCode == undefined) {
+			$('#overlay-toast').html(data.responseText);
+			showToast();
+			showPosts(true);
+		} else {
+			$('#overlay-toast').html(data.responseText);
+			showToast();
+		}
+	}, payload, true);
+}
+
+//Edit profile events
+$(document).on('click', '#prof-post-btn', function() {
+	var textContent = $('#status-body-text-edit').val().trim();
+	if (textContent == undefined || textContent == "") {
+		$('#overlay-toast').html("Please enter valid data to post");
+		showToast();
+		return;
+	}
+	
+	$('#status-body-text-edit').val('');
+	var payload = {
+		"text" : textContent
+	};
+	
+
+	callAjaxPostWithPayloadData("./savestatus.do", function(data) {
+		if (data.errCode == undefined) {
+			showPosts(true);
+		}
+	}, payload, true);
+});
+
+$(document).on('click', '.ppl-share-wrapper .icn-remove', function() {
+	$(this).hide();
+	$(this).parent().find('.ppl-share-social').hide();
+	$(this).parent().find('.icn-plus-open').show();
+});
+
+$(document).on('click touchstart', '.icn-person', function() {
+	$('.mob-icn').removeClass('mob-icn-active');
+	$(this).addClass('mob-icn-active');
+	$('#contact-wrapper').show();
+	$('#prof-agent-container').hide();
+	$('#intro-about-me').hide();
+	$('#reviews-container').hide();
+	$('#ppl-post-cont').hide();
+});
+
+$(document).on('click touchstart', '.icn-ppl', function() {
+	$('.mob-icn').removeClass('mob-icn-active');
+	$(this).addClass('mob-icn-active');
+	$('#ppl-post-cont').show();
+	$('#contact-wrapper').hide();
+	$('#prof-agent-container').hide();
+	$('#intro-about-me').hide();
+	$('#reviews-container').hide();
+});
+
+$(document).on('click touchstart', '.icn-star-smile', function() {
+	$('.mob-icn').removeClass('mob-icn-active');
+	$(this).addClass('mob-icn-active');
+	$('#reviews-container').show();
+	$('#contact-wrapper').hide();
+	$('#prof-agent-container').hide();
+	$('#intro-about-me').hide();
+	$('#ppl-post-cont').hide();
+});
+
+$(document).on('click touchstart', '.inc-more', function() {
+	$('.mob-icn').removeClass('mob-icn-active');
+	$(this).addClass('mob-icn-active');
+	$('#prof-agent-container').show();
+	$('#intro-about-me').hide();
+	$('#contact-wrapper').hide();
+	$('#reviews-container').hide();
+	$('#ppl-post-cont').hide();
+});
+
+$(document).on('mouseover', '#prof-basic-container', function(e){
+	$('#prof-basic-container .prof-edit-field-icn').show();
+	$('#prof-basic-container .prof-edditable').addClass('prof-name-edit');
+});
+$(document).on('mouseleave', '#prof-basic-container', function(e){
+	if(!$('#prof-basic-container input').is(':focus')){
+		$('#prof-basic-container .prof-edit-field-icn').hide();
+		$('#prof-basic-container .prof-edditable').removeClass('prof-name-edit');			
+	}
+});
+
+$(document).on('mouseover', '#prof-posts .tweet-panel-item' , function(e){
+	$(this).find('.dlt-survey-wrapper').removeClass('hide');
+});
+
+$(document).on('mouseleave', '#prof-posts .tweet-panel-item', function(e){
+	$(this).find('.dlt-survey-wrapper').addClass('hide');
+});
+
+
+$(document).on('click' , '#prof-posts .post-dlt-icon' , function(e){
+	var surveyMongoId = $(this).attr('surveymongoid');
+	$('#overlay-main').show();
+	$('#overlay-continue').show();
+	$('#overlay-continue').html("Delete");
+	$('#overlay-cancel').html("Cancel");
+	$('#overlay-header').html("Delete Post");
+	$('#overlay-text').html("Are you sure you want to delete the post ?");
+	$('#overlay-continue').attr("onclick", "removeUserPost('" + surveyMongoId + "');");
+
+});
+
+$(document).on('click', '.ppl-share-wrapper .icn-plus-open', function() {
+	$(this).hide();
+	$(this).parent().find('.ppl-share-social,.icn-remove').show();
 });

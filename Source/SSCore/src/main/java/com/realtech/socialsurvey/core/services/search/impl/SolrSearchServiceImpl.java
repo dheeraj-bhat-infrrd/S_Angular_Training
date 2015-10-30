@@ -5,6 +5,7 @@ import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
@@ -12,11 +13,14 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
+
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrQuery.ORDER;
 import org.apache.solr.client.solrj.SolrServer;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.impl.HttpSolrServer;
+import org.apache.solr.client.solrj.request.LukeRequest;
+import org.apache.solr.client.solrj.response.LukeResponse;
 import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.client.solrj.response.UpdateResponse;
 import org.apache.solr.common.SolrDocument;
@@ -27,6 +31,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
+
 import com.google.gson.Gson;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.dao.OrganizationUnitSettingsDao;
@@ -72,7 +77,7 @@ public class SolrSearchServiceImpl implements SolrSearchService
 
     @Value ( "${SOLR_SOCIAL_POST_URL}")
     private String solrSocialPostUrl;
-
+    
     @Autowired
     private SolrSearchUtils solrSearchUtils;
 
@@ -1632,7 +1637,8 @@ public class SolrSearchServiceImpl implements SolrSearchService
 
 
     @Override
-    public void updateCompletedSurveyCountForUserInSolr( long agentId, int incrementCount ) throws SolrException
+    public void updateCompletedSurveyCountForUserInSolr( long agentId, int incrementCount ) throws SolrException,
+        NoRecordsFetchedException
     {
         LOG.info( "Method to increase completed survey count updateCompletedSurveyCountForUserInSolr() finished." );
         SolrServer solrServer;
@@ -1643,8 +1649,8 @@ public class SolrSearchServiceImpl implements SolrSearchService
         QueryResponse response;
         try {
             response = solrServer.query( solrQuery );
-            if ( response.getResults() != null ) {
-                response.getResults().get( CommonConstants.INITIAL_INDEX );
+            if ( response.getResults() == null || response.getResults().size() <= 0 ) {
+                throw new NoRecordsFetchedException( "No user found in solr with agentId : " + agentId );
             }
             SolrDocumentList results = response.getResults();
             SolrDocument document = results.get( CommonConstants.INITIAL_INDEX );
@@ -1661,6 +1667,40 @@ public class SolrSearchServiceImpl implements SolrSearchService
 
             solrServer.add( inputDoc );
             solrServer.commit();
+        } catch ( SolrServerException | IOException e ) {
+            LOG.error( "Exception while editing user in solr. Reason : " + e.getMessage(), e );
+            throw new SolrException( "Exception while adding regions to solr. Reason : " + e.getMessage(), e );
+        }
+        LOG.info( "Method to increase completed survey count updateCompletedSurveyCountForUserInSolr() finished." );
+    }
+
+
+    @Override
+    public void updateCompletedSurveyCountForMultipleUserInSolr( Map<Long, Integer> usersReviewCount ) throws SolrException
+    {
+        LOG.info( "Method to increase completed survey count updateCompletedSurveyCountForUserInSolr() finished." );
+        SolrServer solrServer;
+        solrServer = new HttpSolrServer( solrUserUrl );
+
+        List<SolrInputDocument> inputDocList = new ArrayList<SolrInputDocument>();
+        Map<String, Integer> editKeyValues;
+        SolrInputDocument inputDoc;
+
+        for ( Map.Entry<Long, Integer> entry : usersReviewCount.entrySet() ) {
+            editKeyValues = new HashMap<String, Integer>();
+            editKeyValues.put( SOLR_EDIT_REPLACE, entry.getValue() );
+            // Adding fields to be updated
+            inputDoc = new SolrInputDocument();
+            inputDoc.setField( CommonConstants.USER_ID_SOLR, entry.getKey() );
+            inputDoc.setField( CommonConstants.REVIEW_COUNT_SOLR, editKeyValues );
+            inputDocList.add( inputDoc );
+        }
+
+        try {
+            if ( inputDocList.size() > 0 ) {
+                solrServer.add( inputDocList );
+                solrServer.commit();
+            }
         } catch ( SolrServerException | IOException e ) {
             LOG.error( "Exception while editing user in solr. Reason : " + e.getMessage(), e );
             throw new SolrException( "Exception while adding regions to solr. Reason : " + e.getMessage(), e );
@@ -1942,6 +1982,7 @@ public class SolrSearchServiceImpl implements SolrSearchService
         return matchedRegions.values();
     }
 
+
     /**
      * Method to get a list of social posts given the Solr document.
      */
@@ -1952,19 +1993,52 @@ public class SolrSearchServiceImpl implements SolrSearchService
         List<SocialPost> matchedSocialPosts = new ArrayList<SocialPost>();
         for ( SolrDocument document : documentList ) {
             SocialPost post = new SocialPost();
+            if ( document.get( CommonConstants.SOURCE_SOLR ) != null
+                && !( document.get( CommonConstants.SOURCE_SOLR ).toString().isEmpty() ) ) {
+                post.setSource( document.get( CommonConstants.SOURCE_SOLR ).toString() );
+            } else {
+                post.setSource( "" );
+            }
+            if ( document.get( CommonConstants.COMPANY_ID_SOLR ) != null
+                && !( document.get( CommonConstants.COMPANY_ID_SOLR ).toString().isEmpty() ) ) {
+                post.setCompanyId( Long.parseLong( document.get( CommonConstants.COMPANY_ID_SOLR ).toString() ) );
+            }
+            if ( document.get( CommonConstants.REGION_ID_SOLR ) != null
+                && !( document.get( CommonConstants.REGION_ID_SOLR ).toString().isEmpty() ) ) {
+                post.setRegionId( Long.parseLong( document.get( CommonConstants.REGION_ID_SOLR ).toString() ) );
+            }
+            if ( document.get( CommonConstants.BRANCH_ID_SOLR ) != null
+                && !( document.get( CommonConstants.BRANCH_ID_SOLR ).toString().isEmpty() ) ) {
+                post.setBranchId( Long.parseLong( document.get( CommonConstants.BRANCH_ID_SOLR ).toString() ) );
+            }
+            if ( document.get( CommonConstants.USER_ID_SOLR ) != null
+                && !( document.get( CommonConstants.USER_ID_SOLR ).toString().isEmpty() ) ) {
+                post.setAgentId( Long.parseLong( document.get( CommonConstants.USER_ID_SOLR ).toString() ) );
+            }
+            if ( document.get( CommonConstants.TIME_IN_MILLIS_SOLR ) != null
+                && !( document.get( CommonConstants.TIME_IN_MILLIS_SOLR ).toString().isEmpty() ) ) {
+                post.setTimeInMillis( Long.parseLong( document.get( CommonConstants.TIME_IN_MILLIS_SOLR ).toString() ) );
+            }
+            if ( document.get( CommonConstants.POST_ID_SOLR ) != null
+                && !( document.get( CommonConstants.POST_ID_SOLR ).toString().isEmpty() ) ) {
+                post.setPostId( document.get( CommonConstants.POST_ID_SOLR ).toString() );
+            }
+            if ( document.get( CommonConstants.POST_TEXT_SOLR ) != null
+                && !( document.get( CommonConstants.POST_TEXT_SOLR ).toString().isEmpty() ) ) {
+                post.setPostText( document.get( CommonConstants.POST_TEXT_SOLR ).toString() );
+            }
 
-            post.setSource( document.get( CommonConstants.SOURCE_SOLR ).toString() );
-            post.setCompanyId( Long.parseLong( document.get( CommonConstants.COMPANY_ID_SOLR ).toString() ) );
-            post.setRegionId( Long.parseLong( document.get( CommonConstants.REGION_ID_SOLR ).toString() ) );
-            post.setBranchId( Long.parseLong( document.get( CommonConstants.BRANCH_ID_SOLR ).toString() ) );
-            post.setAgentId( Long.parseLong( document.get( CommonConstants.USER_ID_SOLR ).toString() ) );
-            post.setTimeInMillis( Long.parseLong( document.get( CommonConstants.TIME_IN_MILLIS_SOLR ).toString() ) );
-            post.setPostId( document.get( CommonConstants.POST_ID_SOLR ).toString() );
-            post.setPostText( document.get( CommonConstants.POST_TEXT_SOLR ).toString() );
-            if ( document.get( CommonConstants.POST_URL_SOLR ) != null )
+            if ( document.get( CommonConstants.POST_URL_SOLR ) != null ) {
                 post.setPostUrl( document.get( CommonConstants.POST_URL_SOLR ).toString() );
-            post.setPostedBy( document.get( CommonConstants.POSTED_BY_SOLR ).toString() );
-            post.set_id( document.get( CommonConstants.ID_SOLR ).toString() );
+            }
+            if ( document.get( CommonConstants.POSTED_BY_SOLR ) != null
+                && !( document.get( CommonConstants.POSTED_BY_SOLR ).toString().isEmpty() ) ) {
+                post.setPostedBy( document.get( CommonConstants.POSTED_BY_SOLR ).toString() );
+            }
+            if ( document.get( CommonConstants.ID_SOLR ) != null
+                && !( document.get( CommonConstants.ID_SOLR ).toString().isEmpty() ) ) {
+                post.set_id( document.get( CommonConstants.ID_SOLR ).toString() );
+            }
             matchedSocialPosts.add( post );
         }
         LOG.info( "Method getSocialPostsFromSolrDocuments() finished" );
@@ -2010,5 +2084,43 @@ public class SolrSearchServiceImpl implements SolrSearchService
         }
 
         return matchedUsers.values();
+    }
+    
+
+    /**
+     * Method to get last build time for social posts in Solr(Social Monitor)
+     * @return
+     * @throws SolrException 
+     * @throws SolrServerException 
+     */
+    @Override
+    public Date getLastBuildTimeForSocialPosts() throws SolrException
+    {
+        LOG.info( "Method getLastBuildTimeForSocialPosts() started" );
+        LukeResponse response = null;
+        Date lastBuildTime = null;
+        //Luke request handler gives the last commitTimeMSec
+        SolrServer solrServer = new HttpSolrServer( solrSocialPostUrl );
+        LukeRequest luke = new LukeRequest();
+        luke.setShowSchema( false );
+        try {
+            response = luke.process( solrServer );
+            if ( response != null ) {
+                //Get the lastModified field from the luke response
+                lastBuildTime = (Date) response.getIndexInfo().get( CommonConstants.LUKE_LAST_MODIFIED );
+                if ( lastBuildTime != null ) {
+                    LOG.debug( "Last Build Time : " + lastBuildTime );
+                } else {
+                    throw new SolrException( "The lastModified field is empty" );
+                }
+            } else {
+                throw new SolrException( "The response is empty" );
+            }
+        } catch ( SolrServerException | IOException e ) {
+            LOG.error( "Error getting response from LukeRequest" );
+            throw new SolrException( "Error getting response from LukeRequest" );
+        }
+        LOG.info( "Method getLastBuildTimeForSocialPosts() finished" );
+        return lastBuildTime;
     }
 }

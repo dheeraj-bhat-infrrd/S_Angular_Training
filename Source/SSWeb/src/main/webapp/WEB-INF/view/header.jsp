@@ -129,6 +129,11 @@
 						<a href="javascript:showMainContent('./showcompanysettings.do')"><spring:message code="label.editsettings.key" /></a>
 					</div>
 				</c:if>
+				<c:if test="${highestrole == 1}">
+					<div class="header-links-item">
+						<a href="javascript:showMainContent('./showcomplaintressettings.do')"><spring:message code="label.complaintregsettings.key" /></a>
+					</div>
+				</c:if>
 				<!-- show apps for company admin other then free account -->
 				<c:if test="${highestrole == 1 && accountMasterId != 5}">
 					<div class="header-links-item">
@@ -151,14 +156,14 @@
 						<a href="javascript:showMainContent('./showusermangementpage.do')"><spring:message code="label.header.usermanagement.key" /></a>
 					</div>
 				</c:if>
-				<c:if test="${ highestrole == 1 }">
-					<div class="header-links-item">
-						<a href="javascript:showMainContent('./showsocialmonitortpage.do')"><spring:message code="label.socialmonitor.key" /></a>
-					</div>
-				</c:if>
 				<c:if test="${accountMasterId < 4 }">	
 					<div class="header-links-item">
 						<a href="javascript:showMainContent('./upgradepage.do')"><spring:message code="label.header.upgrade.key" /></a>
+					</div>
+				</c:if>
+				<c:if test="${ highestrole == 1 }">
+					<div class="header-links-item">
+						<a href="javascript:showMainContent('./showsocialmonitortpage.do')"><spring:message code="label.socialmonitor.key" /></a>
 					</div>
 				</c:if>
 				<div class="header-links-item">
@@ -186,11 +191,6 @@
 						<a href="javascript:showMainContent('./showusermangementpage.do')" onclick="showOverlay();"><spring:message code="label.header.usermanagement.key" /></a>
 					</div>
 				</c:if>
-				<c:if test="${ highestrole == 1 }">
-					<div class="hdr-link-item">
-						<a href="javascript:showMainContent('./showsocialmonitortpage.do')" onclick="showOverlay();"><spring:message code="label.socialmonitor.key" /></a>
-					</div>
-				</c:if>
 				<c:if test="${highestrole == 1 && accountMasterId != 5}">
 					<div class="hdr-link-item">
 						<a href="javascript:showMainContent('./showbuildsurveypage.do')" onclick="showOverlay();"><spring:message code="label.header.buildsurvey.key" /></a>
@@ -205,7 +205,7 @@
 								<spring:message code="label.settings.key" />
 							</div>
 							<c:if test="${highestrole == 1}">
-								<div class="hdr-link-item-dropdown-item" onclick="showMainContent('./showcomplaintregsettings.do');">
+								<div class="hdr-link-item-dropdown-item" onclick="showMainContent('./showcomplaintressettings.do');">
 									<spring:message code="label.complaintregsettings.key" />
 								</div>
 								<div class="hdr-link-item-dropdown-item" onclick="showMainContent('./showemailsettings.do');">
@@ -218,6 +218,11 @@
 								</div>
 							</c:if>
 						</div>
+					</div>
+				</c:if>
+				<c:if test="${ highestrole == 1 }">
+					<div class="hdr-link-item">
+						<a href="javascript:showMainContent('./showsocialmonitortpage.do')" onclick="showOverlay();"><spring:message code="label.socialmonitor.key" /></a>
 					</div>
 				</c:if>
 				<div class="hdr-link-item">
@@ -261,12 +266,10 @@
 									<spring:message code="label.switch.key" />
 								</div>
 							</c:when>
-							<c:otherwise>
-								<div class="initial-dd-item" onclick="userLogout();">
-									<spring:message code="label.logout.key" />
-								</div>
-							</c:otherwise>
 						</c:choose>
+						<div class="initial-dd-item" id="user-logout" onclick="userLogout();">
+							<spring:message code="label.logout.key" />
+						</div>
 					</div>
 				</div>
                 <c:if test="${displaylogo != null}">
@@ -277,8 +280,3 @@
 			</div>
 		</div>
 	</div>
-	<script>
-		function userLogout(){
-			window.location.href = 'j_spring_security_logout';
-		}
-	</script>

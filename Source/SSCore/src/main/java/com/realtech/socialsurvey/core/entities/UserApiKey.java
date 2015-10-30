@@ -10,81 +10,122 @@ import javax.persistence.Id;
 import javax.persistence.NamedQuery;
 import javax.persistence.Table;
 
+
 /**
  * The persistent class for the USER_API_KEYS database table.
  */
 @Entity
-@Table(name = "USER_API_KEYS")
-@NamedQuery(name = "USER_API_KEYS.findAll", query = "SELECT u FROM UserApiKey u")
-public class UserApiKey implements Serializable {
-	private static final long serialVersionUID = 1L;
+@Table ( name = "USER_API_KEYS")
+@NamedQuery ( name = "USER_API_KEYS.findAll", query = "SELECT u FROM UserApiKey u")
+public class UserApiKey implements Serializable
+{
+    private static final long serialVersionUID = 1L;
 
-	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	@Column(name = "USER_API_KEY_ID")
-	private long userApiKeyId;
+    @Id
+    @GeneratedValue ( strategy = GenerationType.IDENTITY)
+    @Column ( name = "USER_API_KEY_ID")
+    private long userApiKeyId;
 
-	@Column(name = "API_SECRET")
-	private String apiSecret;
+    @Column ( name = "API_SECRET")
+    private String apiSecret;
 
-	@Column(name = "API_KEY")
-	private String apiKey;
+    @Column ( name = "API_KEY")
+    private String apiKey;
 
-	@Column(name = "STATUS")
-	private int status;
+    @Column ( name = "COMPANY_ID")
+    private long companyId;
 
-	@Column(name = "CREATED_ON")
-	private Timestamp createdOn;
+    @Column ( name = "STATUS")
+    private int status;
 
-	@Column(name = "MODIFIED_ON")
-	private Timestamp modifiedOn;
+    @Column ( name = "CREATED_ON")
+    private Timestamp createdOn;
 
-	public long getUserApiKeyId() {
-		return userApiKeyId;
-	}
+    @Column ( name = "MODIFIED_ON")
+    private Timestamp modifiedOn;
 
-	public void setUserApiKeyId(long userApiKeyId) {
-		this.userApiKeyId = userApiKeyId;
-	}
 
-	public String getApiSecret() {
-		return apiSecret;
-	}
+    public long getUserApiKeyId()
+    {
+        return userApiKeyId;
+    }
 
-	public void setApiSecret(String apiSecret) {
-		this.apiSecret = apiSecret;
-	}
 
-	public String getApiKey() {
-		return apiKey;
-	}
+    public void setUserApiKeyId( long userApiKeyId )
+    {
+        this.userApiKeyId = userApiKeyId;
+    }
 
-	public void setApiKey(String apiKey) {
-		this.apiKey = apiKey;
-	}
 
-	public int getStatus() {
-		return status;
-	}
+    public String getApiSecret()
+    {
+        return apiSecret;
+    }
 
-	public void setStatus(int status) {
-		this.status = status;
-	}
 
-	public Timestamp getCreatedOn() {
-		return createdOn;
-	}
+    public void setApiSecret( String apiSecret )
+    {
+        this.apiSecret = apiSecret;
+    }
 
-	public void setCreatedOn(Timestamp createdOn) {
-		this.createdOn = createdOn;
-	}
 
-	public Timestamp getModifiedOn() {
-		return modifiedOn;
-	}
+    public String getApiKey()
+    {
+        return apiKey;
+    }
 
-	public void setModifiedOn(Timestamp modifiedOn) {
-		this.modifiedOn = modifiedOn;
-	}
+
+    public void setApiKey( String apiKey )
+    {
+        this.apiKey = apiKey;
+    }
+
+
+    public long getCompanyId()
+    {
+        return companyId;
+    }
+
+
+    public void setCompanyId( long companyId )
+    {
+        this.companyId = companyId;
+    }
+
+
+    public int getStatus()
+    {
+        return status;
+    }
+
+
+    public void setStatus( int status )
+    {
+        this.status = status;
+    }
+
+
+    public Timestamp getCreatedOn()
+    {
+        return createdOn;
+    }
+
+
+    public void setCreatedOn( Timestamp createdOn )
+    {
+        this.createdOn = createdOn;
+    }
+
+
+    public Timestamp getModifiedOn()
+    {
+        return modifiedOn;
+    }
+
+
+    public void setModifiedOn( Timestamp modifiedOn )
+    {
+        this.modifiedOn = modifiedOn;
+    }
 
 }

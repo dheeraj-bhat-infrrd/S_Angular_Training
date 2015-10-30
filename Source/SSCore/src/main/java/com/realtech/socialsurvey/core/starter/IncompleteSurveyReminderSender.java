@@ -6,11 +6,13 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+
 import org.quartz.JobDataMap;
 import org.quartz.JobExecutionContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.quartz.QuartzJobBean;
+
 import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.entities.AgentSettings;
 import com.realtech.socialsurvey.core.entities.Company;
@@ -61,11 +63,15 @@ public class IncompleteSurveyReminderSender extends QuartzJobBean
             Map<String, Integer> reminderMap = surveyHandler.getReminderInformationForCompany( company.getCompanyId() );
             int reminderInterval = reminderMap.get( CommonConstants.SURVEY_REMINDER_INTERVAL );
             int reminderCount = reminderMap.get( CommonConstants.SURVEY_REMINDER_COUNT );
+            LOG.debug("Reminder count for company: "+company.getCompanyId()+" is "+reminderCount);
             SimpleDateFormat sdf = new SimpleDateFormat( "dd/MM/yyyy" );
             Date epochReminderDate = null;
             List<SurveyPreInitiation> incompleteSurveyCustomers = surveyHandler.getIncompleteSurveyCustomersEmail( company );
+            LOG.debug("Found "+(incompleteSurveyCustomers != null? incompleteSurveyCustomers.size():0)+" surveys sent for company id "+ company.getCompanyId());
             for ( SurveyPreInitiation survey : incompleteSurveyCustomers ) {
+            	LOG.debug("Processing survey pre initiation id: "+survey.getSurveyPreIntitiationId());
                 if ( survey.getReminderCounts() <= reminderCount ) {
+                	LOG.debug("Survey pre initiation id: "+survey.getSurveyPreIntitiationId()+" within reminder counts");
                     boolean reminder = false;
                     try {
                         epochReminderDate = sdf.parse( CommonConstants.EPOCH_REMINDER_TIME );
@@ -73,14 +79,18 @@ public class IncompleteSurveyReminderSender extends QuartzJobBean
                         LOG.error( "Exception caught " + e.getMessage() );
                         continue;
                     }
+                    LOG.debug("Last reminder time: "+String.valueOf(survey.getLastReminderTime()));
                     if ( survey.getLastReminderTime().after( epochReminderDate ) ) {
+                    	LOG.debug("Reminder mail for incomplete survey id: "+survey.getSurveyPreIntitiationId());
                         reminder = true;
                     } else {
+                    	LOG.debug("Initial survey request mail for incomplete survey id: "+survey.getSurveyPreIntitiationId());
                         reminder = false;
                     }
                     long surveyLastRemindedTime = survey.getLastReminderTime().getTime();
                     long currentTime = System.currentTimeMillis();
                     if ( surveyHandler.checkIfTimeIntervalHasExpired( surveyLastRemindedTime, currentTime, reminderInterval ) ) {
+                    	LOG.debug("Survey eligible for sending mail with id: "+survey.getSurveyPreIntitiationId());
                         try {
                             /*
                              * if ( survey.getSurveySource().equalsIgnoreCase(
@@ -271,9 +281,13 @@ public class IncompleteSurveyReminderSender extends QuartzJobBean
             }
         } else {
             try {
-                emailServices.sendDefaultSurveyReminderMail(survey.getCustomerEmailId(),logoUrl,
+
+                emailServices.sendDefaultSurveyReminderMail(
+                    survey.getCustomerEmailId(),
+                    logoUrl,
                     emailFormatHelper.getCustomerDisplayNameForEmail( survey.getCustomerFirstName(),
-                        survey.getCustomerLastName() ), agentName, agentEmailId, surveyLink, agentPhone, agentTitle, companyName );
+                        survey.getCustomerLastName() ), agentName, agentEmailId, surveyLink, agentPhone, agentTitle,
+                    companyName );
 
             } catch ( InvalidInputException | UndeliveredEmailException e ) {
                 LOG.error( "Exception caught in IncompleteSurveyReminderSender.main while trying to send reminder mail to "

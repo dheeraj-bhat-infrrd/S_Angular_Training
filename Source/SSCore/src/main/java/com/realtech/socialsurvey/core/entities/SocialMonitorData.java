@@ -11,6 +11,7 @@ public class SocialMonitorData
 {
     private List<SocialMonitorPost> socialMonitorPosts;
     private long count;
+    private List<ProfileImageUrlData> profileImageUrlDataList;
 
 
     public List<SocialMonitorPost> getSocialMonitorPosts()
@@ -34,5 +35,17 @@ public class SocialMonitorData
     public void setCount( long count )
     {
         this.count = count;
+    }
+
+
+    public List<ProfileImageUrlData> getProfileImageUrlDataList()
+    {
+        return profileImageUrlDataList;
+    }
+
+
+    public void setProfileImageUrlDataList( List<ProfileImageUrlData> profileImageUrlDataList )
+    {
+        this.profileImageUrlDataList = profileImageUrlDataList;
     }
 }
