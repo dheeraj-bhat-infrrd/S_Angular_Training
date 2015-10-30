@@ -2243,25 +2243,24 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
                 queries.put( "regionId", iden );
                 // queries.put("profilesMaster",
                 // userManagementService.getProfilesMasterById(CommonConstants.PROFILES_MASTER_REGION_ADMIN_PROFILE_ID));
-                users = userProfileDao.findByKeyValue( UserProfile.class, queries );
-                break;
+                // users = userProfileDao.findByKeyValue( UserProfile.class, queries );
+                // break;
+                userIds = userProfileDao.findUserIdsByRegion( iden );
+                return userIds;
             case CommonConstants.PROFILE_LEVEL_BRANCH:
                 queries.put( "branchId", iden );
                 // queries.put("profilesMaster",
                 // userManagementService.getProfilesMasterById(CommonConstants.PROFILES_MASTER_BRANCH_ADMIN_PROFILE_ID));
-                users = userProfileDao.findByKeyValue( UserProfile.class, queries );
-                break;
+                // users = userProfileDao.findByKeyValue( UserProfile.class, queries );
+                // break;
+                userIds = userProfileDao.findUserIdsByBranch( iden );
+                return userIds;
             case CommonConstants.PROFILE_LEVEL_INDIVIDUAL:
                 userIds.add( iden );
                 return userIds;
             default:
                 throw new InvalidInputException( "Invalid profile level while getting iden column name" );
         }
-        for ( UserProfile user : users ) {
-            userIds.add( user.getUser().getUserId() );
-        }
-
-        return userIds;
     }
 
 

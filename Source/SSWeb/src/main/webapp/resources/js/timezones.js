@@ -11,12 +11,12 @@ function convertUserDateToUTC(date) {
 }
 
 function convertUserDateToLocale(date){
-	var convertedTimestamp= date.getTime() + offset ;
+	var convertedTimestamp= date.getTime() - offset ;
 	return new Date(convertedTimestamp);
 }
 function convertUserDateToLocalWeekFormt(date){
 	var days = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
-	var convertedTimestamp= date.getTime() + offset;
+	var convertedTimestamp= date.getTime() - offset;
 	var date3= new Date(convertedTimestamp);
 	var dayOftheweek = days[ date3.getDay() ];
 	var month=((date3.getMonth() + 1)<10)? "0"+(date3.getMonth() + 1) : (date3.getMonth() + 1);
