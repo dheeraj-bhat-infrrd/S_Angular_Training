@@ -44,7 +44,7 @@
 				</div>
 				<div class="v-um-hdr-right v-um-hdr-search float-left clearfix search-panel-item">
 					<input id="post-search-query" name="post-search-query" class="v-um-inp" placeholder="<spring:message code="label.searchpost.key" />">
-					<span id="sm-search-icn" class="um-search-icn"  onclick="postsSearch();"></span>
+					<span id="sm-search-icn" class="um-search-icn" onclick="postsSearch();"></span>
 				</div>
 			</div>
 			<div class="sm-btn-dl-sd-admin clear-none resp-float">
@@ -72,6 +72,8 @@
 	<div id="temp-message" class="hide"></div>
 
 	<script>
+	//TODO: Move all js to application.js
+	
 		function getRelevantEntities(){
 			//Remove pre-existing options
 			$('#entity-selection-panel').find('option').remove();
@@ -180,6 +182,12 @@
 			}
 			showSearchedPostsSolr(true, entityType, entityId, $("#post-search-query").val());
 		}
+		
+		$(document).keyup("#post-search-query", function(e) {
+		    if(e.which == 13) {
+		    	postsSearch();
+		    }
+		});
 	</script>
 </body>
 </html>

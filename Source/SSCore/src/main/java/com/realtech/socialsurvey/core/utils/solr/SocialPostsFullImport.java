@@ -31,7 +31,7 @@ public class SocialPostsFullImport
     @Autowired
     private SolrSearchService solrSearchService;
 
-    @Value("${BATCH_SIZE}")
+    @Value("${SOCIAL_POST_BATCH_SIZE}")
     private int pageSize;
     
     @Autowired
