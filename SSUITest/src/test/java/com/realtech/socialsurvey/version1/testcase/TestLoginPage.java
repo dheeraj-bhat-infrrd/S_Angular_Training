@@ -109,7 +109,6 @@ public class TestLoginPage extends BaseTestCase
         }
     }
 
-
     @Test ( groups = "login", testName = "TCSSLP-6")
     public void testUserLoginEmptyPassword()
     {
