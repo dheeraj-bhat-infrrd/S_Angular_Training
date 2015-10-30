@@ -5,7 +5,6 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.sql.Timestamp;
 import java.text.DateFormat;
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -13,7 +12,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 
@@ -600,7 +598,7 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
 
 
     @Override
-    public void increaseSurveyCountForAgent( long agentId ) throws SolrException
+    public void increaseSurveyCountForAgent( long agentId ) throws SolrException, NoRecordsFetchedException
     {
         LOG.info( "Method to increase survey count for agent started." );
         organizationUnitSettingsDao.updateCompletedSurveyCountForAgent( agentId, 1 );
@@ -610,7 +608,7 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
 
 
     @Override
-    public void decreaseSurveyCountForAgent( long agentId ) throws SolrException
+    public void decreaseSurveyCountForAgent( long agentId ) throws SolrException, NoRecordsFetchedException
     {
         LOG.info( "Method to decrease survey count for agent started." );
         organizationUnitSettingsDao.updateCompletedSurveyCountForAgent( agentId, -1 );

@@ -74,8 +74,6 @@ public class SurveyPreInitiationServiceImpl implements SurveyPreInitiationServic
 		if (profileLevel == null || profileLevel.isEmpty()) {
 			throw new InvalidInputException("profile level is null or empty while getting agents");
 		}
-		Map<String, Object> queries = new HashMap<>();
-		queries.put(CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_ACTIVE);
 		Set<Long> userIds = new HashSet<>();
 		switch (profileLevel) {
 			case CommonConstants.PROFILE_LEVEL_REGION:

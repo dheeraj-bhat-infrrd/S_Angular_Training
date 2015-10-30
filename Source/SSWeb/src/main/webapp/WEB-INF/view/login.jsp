@@ -1,7 +1,7 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ taglib prefix="spring" uri="http://www.springframework.org/tags"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
-<!DOCTYPE">
+<!DOCTYPE>
 <html>
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
@@ -80,9 +80,7 @@
 <script src="${initParam.resourcesPath}/resources/js/bootstrap.min.js"></script>
 <script src="${initParam.resourcesPath}/resources/js/script.js"></script>
 <script>
-var isLoginFormValid;
 $(document).ready(function(){
-	isLoginFormValid = false;
 
 	if ($('#message').val() != "") {
 		if ($('#message').attr('data-status') == 'ERROR_MESSAGE') {
@@ -111,109 +109,41 @@ $(document).ready(function(){
 		}
 	}
 	
-	// Function to validate the login params
-	$('#login-user-id').blur(function() {
-		if (validateUserId(this.id)) {
-			hideError();
-		}
-	});
-	
-	$('#login-pwd').blur(function(){
-		if (validateLoginPassword(this.id)) {
-			hideError();
-		}
-	});
-
-	function validateLoginForm(id){
-		isLoginFormValid=true;
-		var isFocussed = false;
-		var isSmallScreen = false;
-		if ($(window).width()<768) {
-			isSmallScreen = true;
-		}
+	function validateLoginForm(id) {
 		if (!validateUserId('login-user-id')) {
-			isLoginFormValid=false;
-			if (!isFocussed) {
-				$('#login-user-id').focus();
-				isFocussed=true;
-			}
-			if (isSmallScreen) {
-				return isLoginFormValid;
-			}
+			$('#login-user-id').focus();
+			return false;
 		}
 		if (!validateLoginPassword('login-pwd')) {
-			isLoginFormValid = false;
-			if (!isFocussed) {
-				$('#login-pwd').focus();
-				isFocussed=true;
-			}
-			if (isSmallScreen) {
-				return isLoginFormValid;
-			}
+			$('#login-pwd').focus();
+			return false;
 		}
-		return isLoginFormValid;
+		return true;
 	}
-	
+
 	function validateUserId(elementId) {
-		if ($(window).width()<768) {
-			if ($('#'+elementId).val() != "") {
-				if (emailRegex.test($('#'+elementId).val()) == true) {
-					return true;
-				} else {
-					// $('#overlay-toast').html('Please enter a valid user name.');
-					// showToast();
-					showError('Please enter a valid email address');
-					return false;
-				}
-			} else {
-				// $('#overlay-toast').html('Please enter user name.');
-				// showToast();
-				showError('Please enter email address');
-				return false;
-			}
-		}else{
-			if ($('#'+elementId).val() != "") {
-				if (emailRegex.test($('#'+elementId).val()) == true) {
-					// $('#'+elementId).parent().next('.login-reg-err').hide();
-					return true;
-				} else {
-					// $('#'+elementId).parent().next('.login-reg-err').html('Please enter a valid user name.');
-					// $('#'+elementId).parent().next('.login-reg-err').show();
-					showError('Please enter a valid email address');
-					return false;
-				}
-			} else {
-				// $('#'+elementId).parent().next('.login-reg-err').html('Please enter user name.');
-				// $('#'+elementId).parent().next('.login-reg-err').show();
-				showError('Please enter email address');
-				return false;
-			}
-		}
-	}
-	
-	function validateLoginPassword(elementId){
-		if ($(window).width()<768) {
-			if ($('#'+elementId).val() != "") {
+		if ($('#' + elementId).val() != "") {
+			if (emailRegex.test($('#' + elementId).val()) == true) {
 				return true;
 			} else {
-				// $('#overlay-toast').html('Please enter password.');
-				// showToast();	
-				showError('Please enter password');
+				showError('Please enter a valid user name.');
 				return false;
 			}
 		} else {
-			if ($('#'+elementId).val() != "") {
-					// $('#'+elementId).parent().next('.login-reg-err').hide();
-					return true;
-			} else {
-				// $('#'+elementId).parent().next('.login-reg-err').html('Please enter password.');
-				// $('#'+elementId).parent().next('.login-reg-err').show();	
-				showError('Please enter password');
-				return false;
-			}
+			showError('Please enter user name.');
+			return false;
 		}
 	}
-});
+
+	function validateLoginPassword(elementId) {
+		if ($('#' + elementId).val() != "") {
+			return true;
+		} else {
+			showError('Please enter password.');
+			return false;
+		}
+	}
+	});
 </script>
 
 </body>
