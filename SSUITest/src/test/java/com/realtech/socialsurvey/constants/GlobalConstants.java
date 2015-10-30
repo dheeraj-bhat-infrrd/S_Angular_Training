@@ -41,8 +41,9 @@ public class GlobalConstants
     
     //Register New User
     public static final String REG_FIRST_NAME = "satish";
-    public static final String REG_LAST_NAME = "kumar";
-    public static final String REG_EMAILID = "satish.kumar@mailiantor.com";
+    public static final String REG_LAST_NAME = "patel";
+    public static final String REG_EMAILID = "satish.patel@mailiantor.com";
+    public static final String REG_EXISTING_EMAILID = "shubham@raremile.com";
     
     
     //Pro Name
