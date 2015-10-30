@@ -134,11 +134,13 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 	public User verifyRegisteredUser(String emailId) throws InvalidInputException {
 		LOG.info("Verify whether the User is registered with the emailId");
 		List<User> users = userDao.findByColumn(User.class, CommonConstants.LOGIN_NAME, emailId);
-		if (users == null || users.isEmpty() || users.get(0).getStatus() != CommonConstants.STATUS_ACTIVE) {
+		if (users == null || users.isEmpty()) {
 			LOG.error("No User object found with the passed emailId : " + emailId);
 			throw new InvalidInputException("Email ID not registered with us");
 		}
-		LOG.info("User verified with eamil Id : " + emailId);
+		
+		if(users.get(0).getStatus() == CommonConstants.STATUS_ACTIVE)
+		    LOG.info("User verified with eamil Id : " + emailId);
 		return users.get(0);
 	}
 

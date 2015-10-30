@@ -2311,25 +2311,12 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
         if ( profileLevel == null || profileLevel.isEmpty() ) {
             throw new InvalidInputException( "profile level is null or empty while getting agents" );
         }
-        Map<String, Object> queries = new HashMap<>();
-        queries.put( CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_ACTIVE );
-        List<UserProfile> users = null;
         Set<Long> userIds = new HashSet<>();
         switch ( profileLevel ) {
             case CommonConstants.PROFILE_LEVEL_REGION:
-                queries.put( "regionId", iden );
-                // queries.put("profilesMaster",
-                // userManagementService.getProfilesMasterById(CommonConstants.PROFILES_MASTER_REGION_ADMIN_PROFILE_ID));
-                // users = userProfileDao.findByKeyValue( UserProfile.class, queries );
-                // break;
                 userIds = userProfileDao.findUserIdsByRegion( iden );
                 return userIds;
             case CommonConstants.PROFILE_LEVEL_BRANCH:
-                queries.put( "branchId", iden );
-                // queries.put("profilesMaster",
-                // userManagementService.getProfilesMasterById(CommonConstants.PROFILES_MASTER_BRANCH_ADMIN_PROFILE_ID));
-                // users = userProfileDao.findByKeyValue( UserProfile.class, queries );
-                // break;
                 userIds = userProfileDao.findUserIdsByBranch( iden );
                 return userIds;
             case CommonConstants.PROFILE_LEVEL_INDIVIDUAL:
