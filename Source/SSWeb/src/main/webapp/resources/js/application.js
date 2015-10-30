@@ -5466,7 +5466,7 @@ function showMasterQuestionPage(){
 			}
 		}
 		
-		if ($('#shr-post-chk-box').hasClass('bd-check-img') && (rating >= autoPostScore) && (Boolean(autoPost) == true)) {
+		if ($('#shr-post-chk-box').hasClass('bd-check-img-checked') == false && (rating >= autoPostScore) && (Boolean(autoPost) == true)) {
 			if(isAbusive == false){
 				postToSocialMedia(feedback , isAbusive);
 			}
