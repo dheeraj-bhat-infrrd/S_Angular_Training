@@ -53,6 +53,7 @@ public class GlobalConstants
     //Derived variable
     public static final String SERVER_URL = "http://" + GlobalConstants.get( SERVER_IP ) + ":"
         + GlobalConstants.get( SERVER_PORT );
+    public static final String LOGIN_URL = SERVER_URL + "/login.do";
 
 
     /**
