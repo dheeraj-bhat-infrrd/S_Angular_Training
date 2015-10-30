@@ -748,50 +748,6 @@ function paintSurveyGraph() {
 	var completedSurveys = [];
 	var index = 0;
 
-	$.each(graphData.clicked, function(key, value) {
-		allTimeslots[index] = key;
-		clickedSurveys[index] = value;
-		index++;
-	});
-	
-	index = 0;
-	if (timeslots.length > allTimeslots.length) {
-		allTimeslots = timeslots;
-		timeslots = [];
-	}
-	$.each(graphData.sent, function(key, value) {
-		timeslots[index] = key;
-		sentSurveys[index] = value;
-		index++;
-	});
-	
-	index = 0;
-	if (timeslots.length > allTimeslots.length) {
-		allTimeslots = timeslots;
-		timeslots = [];
-	}
-	$.each(graphData.complete, function(key, value) {
-		timeslots[index] = key;
-		completedSurveys[index] = value;
-		index++;
-	});
-	
-	index = 0;
-	if (timeslots.length > allTimeslots.length) {
-		allTimeslots = timeslots;
-		timeslots = [];
-	}
-	$.each(graphData.socialposts, function(key, value) {
-		timeslots[index] = key;
-		socialPosts[index] = value;
-		index++;
-	});
-	
-	if (timeslots.length > allTimeslots.length) {
-		allTimeslots = timeslots;
-		timeslots = [];
-	}
-	
 	var element = document.getElementById("dsh-grph-format");
 	if(element == null){
 		return;
@@ -808,14 +764,74 @@ function paintSurveyGraph() {
 	} else if (format == '365') {
 		type = 'Month';
 	}
-
-	if (format != '365') {
+	
+	$.each(graphData.clicked, function(key, value) {
+		if(format == '365') {
+			allTimeslots[index] = convertYearMonthKeyToDate(key);	
+		} else {
+			allTimeslots[index] = convertYearWeekKeyToDate(key);
+		}
+		clickedSurveys[index] = value;
+		index++;
+	});
+	
+	index = 0;
+	if (timeslots.length > allTimeslots.length) {
+		allTimeslots = timeslots;
+		timeslots = [];
+	}
+	$.each(graphData.sent, function(key, value) {
+		if(format == '365') {
+			timeslots[index] = convertYearMonthKeyToDate(key);
+		}  else {
+			timeslots[index] = convertYearWeekKeyToDate(key);
+		}
+		sentSurveys[index] = value;
+		index++;
+	});
+	
+	index = 0;
+	if (timeslots.length > allTimeslots.length) {
+		allTimeslots = timeslots;
+		timeslots = [];
+	}
+	$.each(graphData.complete, function(key, value) {
+		if(format == '365') {
+			timeslots[index] = convertYearMonthKeyToDate(key);
+		}  else {
+			timeslots[index] = convertYearWeekKeyToDate(key);
+		}
+		completedSurveys[index] = value;
+		index++;
+	});
+	
+	index = 0;
+	if (timeslots.length > allTimeslots.length) {
+		allTimeslots = timeslots;
+		timeslots = [];
+	}
+	$.each(graphData.socialposts, function(key, value) {
+		if(format == '365') {
+			timeslots[index] = convertYearMonthKeyToDate(key);
+		}  else {
+			timeslots[index] = convertYearWeekKeyToDate(key);
+		}
+		socialPosts[index] = value;
+		index++;
+	});
+	
+	if (timeslots.length > allTimeslots.length) {
+		allTimeslots = timeslots;
+		timeslots = [];
+	}
+	
+	/*if (format != '365') {
 		allTimeslots.reverse();
 		clickedSurveys.reverse();
 		sentSurveys.reverse();
 		completedSurveys.reverse();
 		socialPosts.reverse();
-	}
+	}*/
 	
 	var internalData = [];
 	var nestedInternalData = [];
@@ -873,6 +889,22 @@ function paintSurveyGraph() {
 
 	var chart = new google.visualization.LineChart(document.getElementById('util-gph-item'));
 	chart.draw(data, options);
+}
+
+function convertYearWeekKeyToDate(key) {
+	var year = parseInt(key.substr(0, 4));
+	var weekNumber = key.substr(4);
+	return getDateFromWeekAndYear(year, parseInt(weekNumber) + 1);
+}
+
+function convertYearMonthKeyToDate(key) {
+	var year = parseInt(key.substr(0, 4));
+	var monthNumber = parseInt(key.substr(4)) - 1;
+	return Date.today().set({
+		day : 1,
+		month : monthNumber,
+		year : year
+	}).toString("MMM d, yyyy");
 }
 
 //Being called from dashboard.jsp on key up event.
