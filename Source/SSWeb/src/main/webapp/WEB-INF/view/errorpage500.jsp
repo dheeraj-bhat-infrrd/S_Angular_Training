@@ -65,9 +65,10 @@
                 }
                 $('.error-main-wrapper').css('min-height',minH+'px');
             }
-            $('.err-page-btn').click(function() {
-				window.open(window.location.origin,'_self');
-			});
+            $(document).on('click','.err-page-btn', function() {
+            	callAjaxGET("/removeuseronerror.do", function(){}, false)
+            	window.open(getLocationOrigin(),'_self')
+            });
         });
     </script>
 </body>
