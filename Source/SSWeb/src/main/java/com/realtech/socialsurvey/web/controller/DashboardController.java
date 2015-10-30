@@ -31,6 +31,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -54,6 +55,7 @@ import com.realtech.socialsurvey.core.exception.FatalException;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.exception.NoRecordsFetchedException;
 import com.realtech.socialsurvey.core.exception.NonFatalException;
+import com.realtech.socialsurvey.core.services.batchTracker.BatchTrackerService;
 import com.realtech.socialsurvey.core.services.generator.URLGenerator;
 import com.realtech.socialsurvey.core.services.mail.EmailServices;
 import com.realtech.socialsurvey.core.services.organizationmanagement.DashboardService;
@@ -114,6 +116,9 @@ public class DashboardController
 
     @Autowired
     private EmailFormatHelper emailFormatHelper;
+    
+    @Autowired
+    BatchTrackerService batchTrackerService;
 
     @Value ( "${ENABLE_KAFKA}")
     private String enableKafka;
@@ -133,7 +138,6 @@ public class DashboardController
     private final String EXCEL_FORMAT = "application/vnd.ms-excel";
     private final String CONTENT_DISPOSITION_HEADER = "Content-Disposition";
     private final String EXCEL_FILE_EXTENSION = ".xlsx";
-
 
     /*
      * Method to initiate dashboard
