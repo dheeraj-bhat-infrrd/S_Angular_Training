@@ -74,6 +74,7 @@
 				<value>com.realtech.socialsurvey.core.entities.FileUpload</value>
 				<value>com.realtech.socialsurvey.core.entities.CollectionDotloopProfileMapping</value>
 				<value>com.realtech.socialsurvey.core.entities.LoopProfileMapping</value>
+				<value>com.realtech.socialsurvey.core.entities.BatchTracker</value>
 			</list>
 		</property>
 	</bean>
