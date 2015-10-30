@@ -213,27 +213,22 @@ public class DashboardServiceImpl implements DashboardService, InitializingBean
     {
     	LOG.info("Getting survey details for graph for "+columnName+" with value "+columnValue+" for number of days "+numberOfDays+". Reatech admin flag: "+realtechAdmin);
         String criteria = "";
-        int noOfDaysToConsider = -1;
         Calendar currentTime = Calendar.getInstance();
         Calendar startTime = Calendar.getInstance();
         switch ( numberOfDays ) {
             case 30:
-                noOfDaysToConsider = numberOfDays + Calendar.getInstance().get( Calendar.DAY_OF_WEEK );
                 criteria = CommonConstants.AGGREGATE_BY_WEEK;
                 startTime.add(Calendar.DATE, -30);
                 break;
             case 60:
-                noOfDaysToConsider = numberOfDays + Calendar.getInstance().get( Calendar.DAY_OF_WEEK );
                 criteria = CommonConstants.AGGREGATE_BY_WEEK;
                 startTime.add(Calendar.DATE, -60);
                 break;
             case 90:
-                noOfDaysToConsider = numberOfDays + Calendar.getInstance().get( Calendar.DAY_OF_WEEK );
                 criteria = CommonConstants.AGGREGATE_BY_WEEK;
                 startTime.add(Calendar.DATE, -90);
                 break;
             case 365:
-                noOfDaysToConsider = numberOfDays + Calendar.getInstance().get( Calendar.DAY_OF_MONTH );
                 criteria = CommonConstants.AGGREGATE_BY_MONTH;
                 startTime.add(Calendar.DATE, -365);
                 break;
@@ -276,12 +271,14 @@ public class DashboardServiceImpl implements DashboardService, InitializingBean
         LOG.debug("Getting clicked surveys");
         Map<Integer, Integer> clickedSurveys = surveyDetailsDao.getClickedSurveyAggregationCount(columnName, columnValue, startDate, endDate, criteria);
         
+        LOG.debug("Getting social posts count.");
+        Map<Integer, Integer> socialPosts = surveyDetailsDao.getSocialPostsAggregationCount(columnName, columnValue, startDate, endDate, criteria);
+        
         Map<String, Map<Integer, Integer>> map = new HashMap<String, Map<Integer, Integer>>();
         map.put( "clicked", clickedSurveys );
         map.put( "sent", allSurveysSent );
         map.put( "complete", completedSurveys );
-        map.put( "socialposts", new HashMap<Integer, Integer>() );
-        //map.put( "socialposts", surveyDetailsDao.getSocialPostsCountByCriteria( columnName, columnValue, numberOfDays, noOfDaysToConsider, criteria, realtechAdmin ) );
+        map.put( "socialposts", socialPosts );
         return map;
     }
 

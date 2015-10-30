@@ -5,7 +5,6 @@ import java.text.ParseException;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
-
 import com.realtech.socialsurvey.core.entities.AbusiveSurveyReportWrapper;
 import com.realtech.socialsurvey.core.entities.AgentRankingReport;
 import com.realtech.socialsurvey.core.entities.SurveyDetails;
@@ -88,10 +87,6 @@ public interface SurveyDetailsDao
     public void updateReminderCount( long agentId, String customerEmail );
 
 
-    public Map<String, Long> getClickedSurveyByCriteria( String columnName, long columnValue, int noOfDays,
-        int noOfPastDaysToConsider, String criteriaColumn, boolean realtechAdmin ) throws ParseException;
-
-
     /**
      * Gets an aggregated count for completed survey
      * @param organizationUnitColumn
@@ -116,18 +111,18 @@ public interface SurveyDetailsDao
      */
     public Map<Integer, Integer> getClickedSurveyAggregationCount(String organizationUnitColumn, long organizationUnitColumnValue, Timestamp startDate, Timestamp endDate, String aggregateBy) throws InvalidInputException;
     
-    public Map<String, Long> getSentSurveyByCriteria( String columnName, long columnValue, int noOfDays,
-        int noOfPastDaysToConsider, String criteriaColumn, boolean realtechAdmin ) throws ParseException;
-
-
-    public Map<String, Long> getSocialPostsCountByCriteria( String columnName, long columnValue, int noOfDays,
-        int noOfPastDaysToConsider, String criteriaColumn, boolean realtechAdmin ) throws ParseException;
-
-
-    public Map<String, Long> getCompletedSurveyByCriteria( String columnName, long columnValue, int noOfDays,
-        int noOfPastDaysToConsider, String criteriaColumn, boolean realtechAdmin ) throws ParseException;
-
-
+    /**
+     * Get social posts aggregation
+     * @param organizationUnitColumn
+     * @param organizationUnitColumnValue
+     * @param startDate
+     * @param endDate
+     * @param aggregateBy
+     * @return
+     * @throws InvalidInputException
+     */
+    public Map<Integer, Integer> getSocialPostsAggregationCount(String organizationUnitColumn, long organizationUnitColumnValue, Timestamp startDate, Timestamp endDate, String aggregateBy) throws InvalidInputException;
+    
     public List<SurveyDetails> getIncompleteSurveyCustomers( long companyId, int surveyReminderInterval, int maxReminders );
 
 
