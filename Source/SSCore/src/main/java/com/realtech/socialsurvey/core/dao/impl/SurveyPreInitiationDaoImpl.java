@@ -1,8 +1,10 @@
 package com.realtech.socialsurvey.core.dao.impl;
 
+import java.math.BigInteger;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -186,5 +188,99 @@ public class SurveyPreInitiationDaoImpl extends GenericDaoImpl<SurveyPreInitiati
 		Query query = getSession().createQuery(deleteQuery);
 		query.setParameterList("incompleteSurveyIds", incompleteSurveyIds);
 		query.executeUpdate();
+	}
+	
+	
+	@Override
+	public Map<Integer, Integer> getIncompletSurveyAggregationCount(long companyId, long agentId, int status, Timestamp startDate, Timestamp endDate, Set<Long> agentIds, String aggregateBy) throws InvalidInputException{
+		LOG.info("Getting incomplete survey aggregated count for company id : "+companyId+" \t status: "+status+"\t startDate "+startDate+"\t end date: "+endDate+"\t aggregatedBy: "+aggregateBy);
+		Map<Integer, Integer> aggregateResult = null;
+		StringBuilder queryBuilder = new StringBuilder();
+		if(aggregateBy == null || aggregateBy.isEmpty()){
+			LOG.error("Aggregate by is null");
+			throw new InvalidInputException("Aggregate by is null");
+		}
+		boolean whereFlag = false; // used if where is 
+		if(aggregateBy.equals(CommonConstants.AGGREGATE_BY_WEEK)){
+			queryBuilder.append("SELECT YEARWEEK(CREATED_ON) AS SENT_DATE, COUNT(SURVEY_PRE_INITIATION_ID) AS NUM_OF_SURVEYS FROM SURVEY_PRE_INITIATION WHERE ");
+		}else if(aggregateBy.equals(CommonConstants.AGGREGATE_BY_DAY)){
+			queryBuilder.append("SELECT DATE(CREATED_ON) AS SENT_DATE, COUNT(SURVEY_PRE_INITIATION_ID) AS NUM_OF_SURVEYS FROM SURVEY_PRE_INITIATION WHERE ");
+		}else if(aggregateBy.equals(CommonConstants.AGGREGATE_BY_MONTH)){
+			queryBuilder.append("SELECT EXTRACT(YEAR_MONTH FROM CREATED_ON) AS SENT_DATE, COUNT(SURVEY_PRE_INITIATION_ID) AS NUM_OF_SURVEYS FROM SURVEY_PRE_INITIATION WHERE ");
+		}
+		if(companyId > 0l){
+			queryBuilder.append(" COMPANY_ID = :companyId");
+			whereFlag = true;
+		}
+		if(whereFlag){
+			queryBuilder.append(" AND STATUS = :status");
+		}else{
+			queryBuilder.append(" STATUS = :status");
+			whereFlag = true;
+		}
+		if(startDate != null){
+			if(whereFlag){
+				queryBuilder.append(" AND CREATED_ON >= :startDate");
+			}else{
+				queryBuilder.append(" CREATED_ON >= :startDate");
+				whereFlag = true;
+			}
+		}
+		if(endDate != null){
+			if(whereFlag){
+				queryBuilder.append(" AND CREATED_ON <= :endDate");
+			}else{
+				queryBuilder.append(" CREATED_ON <= :endDate");
+				whereFlag = true;
+			}
+		}
+		if(agentId > 0l){
+			if(whereFlag){
+				queryBuilder.append(" AND AGENT_ID = :agentId");
+			}else{
+				queryBuilder.append(" AGENT_ID = :agentId");
+				whereFlag = true;
+			}
+		}else if(agentIds != null && agentIds.size() > 0){
+			if(whereFlag){
+				queryBuilder.append(" AND AGENT_ID IN (:agentIds)");
+			}else{
+				queryBuilder.append(" AGENT_ID IN (:agentIds)");
+				whereFlag = true;
+			}
+		}
+		if(aggregateBy.equals(CommonConstants.AGGREGATE_BY_WEEK)){
+			queryBuilder.append(" GROUP BY YEARWEEK(CREATED_ON) ORDER BY SENT_DATE");
+		}else if(aggregateBy.equals(CommonConstants.AGGREGATE_BY_DAY)){
+			queryBuilder.append(" GROUP BY DATE(CREATED_ON) ORDER BY SENT_DATE");
+		}else if(aggregateBy.equals(CommonConstants.AGGREGATE_BY_MONTH)){
+			queryBuilder.append(" GROUP BY EXTRACT(YEAR_MONTH FROM CREATED_ON) ORDER BY SENT_DATE");
+		}
+		Query query = null;
+		query = getSession().createSQLQuery(queryBuilder.toString());
+		if(companyId > 0l){
+			query.setParameter("companyId", companyId);
+		}
+		query.setParameter("status", status);
+		if(startDate != null){
+			query.setParameter("startDate", startDate);
+		}
+		if(endDate != null){
+			query.setParameter("endDate", endDate);
+		}
+		if(agentId > 0l){
+			query.setParameter("agentId", agentId);
+		}else if(agentIds != null && agentIds.size() > 0){
+			query.setParameterList("agentIds", agentIds);
+		}
+		@SuppressWarnings("unchecked")
+		List<Object[]> results = query.list();
+		if(results != null && results.size() > 0){
+			aggregateResult = new HashMap<Integer, Integer>();
+			for(Object[] result : results){
+				aggregateResult.put((Integer)result[0], ((BigInteger)result[1]).intValue());
+			}
+		}
+		return aggregateResult;
 	}
 }

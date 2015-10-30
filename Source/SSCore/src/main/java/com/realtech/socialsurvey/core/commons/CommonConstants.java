@@ -750,4 +750,10 @@ public interface CommonConstants
     public static final String BULK_SURVEY_VALID = "Valid";
 
     public static final String BULK_SURVEY_INVALID = "Invalid";
+    
+    // aggregate constants
+    public static final String AGGREGATE_BY_DAY = "day";
+    public static final String AGGREGATE_BY_WEEK = "week";
+    public static final String AGGREGATE_BY_MONTH = "month";
+    public static final String AGGREGATE_BY_YEAR = "year";
 }
