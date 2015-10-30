@@ -20,6 +20,20 @@
 		</property>
 	</bean>
 
+
+	<!-- setting solr review counter updater job detail -->
+	<bean id="solrreviewcounterupdaterjobdetail"
+		class="org.springframework.scheduling.quartz.JobDetailFactoryBean">
+		<property name="jobClass"
+			value="com.realtech.socialsurvey.core.starter.SolrReviewCountUpdater" />
+		<property name="jobDataAsMap">
+			<map>
+				<entry key="batchTrackerService" value-ref="batchTrackerService" />
+			</map>
+		</property>
+		<property name="durability" value="true" />
+	</bean>
+
 	<!-- setting site map generetor job detail -->
 	<bean id="sitemapjobdetail"
 		class="org.springframework.scheduling.quartz.JobDetailFactoryBean">
@@ -270,6 +284,13 @@
 		<property name="durability" value="true" />
 	</bean>
 
+	<!-- setting cron for Review Count Updater -->
+	<bean id="solrreviewcounterupdatercron"
+		class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
+		<property name="jobDetail" ref="solrreviewcounterupdaterjobdetail" />
+		<property name="cronExpression" value="0 0 0/3 * * ?" />
+	</bean>
+	
 	<!-- setting cron for Account deactivator -->
 	<bean id="sitemapgeneratorcron"
 		class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
@@ -401,6 +422,7 @@
 				<ref bean="fileuploadjobdetail" />
 				<ref bean="dotloopjobdetail" />
 				<ref bean="surveyfileuploadjobdetail" />
+				<ref bean="solrreviewcounterupdaterjobdetail" />
 				<!-- <ref bean="imageprocessingjobdetail" />  -->
 				<!-- <ref bean="hierarchysettingsjobdetail" /> -->
 				<!-- <ref bean="zillowjobdetail" /> -->
@@ -422,6 +444,7 @@
 				<ref bean="fileuploadcron" />
 				<ref bean="dotloopcron" />
 				<ref bean="surveyfileuploadcron" />
+				<ref bean="solrreviewcounterupdatercron" />
 				<!-- <ref bean="imageprocessingcron" /> -->
 				<!-- <ref bean="hierarchysettingscron" /> -->
 				<!-- <ref bean="zillowcron" /> -->
@@ -458,6 +481,9 @@
 		class="com.realtech.socialsurvey.core.services.organizationmanagement.impl.OrganizationManagementServiceImpl" />
 	<bean id="solrSearchService"
 		class="com.realtech.socialsurvey.core.services.search.impl.SolrSearchServiceImpl" />
+	<bean id="batchTrackerService"
+		class="com.realtech.socialsurvey.core.services.batchTracker.impl.BatchTrackerServiceImpl" />
+		
 
 	<!-- Update subscription dependencies -->
 	<bean id="reviseSubscription"
