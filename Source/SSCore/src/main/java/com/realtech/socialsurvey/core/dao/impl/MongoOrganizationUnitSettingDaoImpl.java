@@ -553,7 +553,7 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
         } else if ( entityType.equals( CommonConstants.REGION_ID_COLUMN ) ) {
             collectionName = CommonConstants.REGION_SETTINGS_COLLECTION;
         } else if ( entityType.equals( CommonConstants.BRANCH_ID_COLUMN ) ) {
-            collectionName = CommonConstants.BRANCH_ID_COLUMN;
+            collectionName = CommonConstants.BRANCH_SETTINGS_COLLECTION;
         } else if ( entityType.equals( CommonConstants.USER_ID ) ) {
             collectionName = CommonConstants.AGENT_SETTINGS_COLLECTION;
         }
@@ -568,6 +568,8 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
             Query query = new Query();
             query.addCriteria( Criteria.where( CommonConstants.IDEN ).is( id ) );
             query.fields().include( CommonConstants.PROFILE_IMAGE_URL_SOLR ).exclude( CommonConstants.DEFAULT_MONGO_ID_COLUMN );
+            String queryStr = query.toString();
+            LOG.debug( "Query : " + queryStr );
             HashMap<String, String> imageUrlMap = mongoTemplate.findOne( query, HashMap.class, collectionName );
             String profileImageUrl = null;
             if ( imageUrlMap != null && !( imageUrlMap.isEmpty() ) ) {
