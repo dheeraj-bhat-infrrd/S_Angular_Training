@@ -767,17 +767,23 @@ function paintSurveyGraph() {
 	
 	var keys = getKeysFromGraphFormat(format);
 	
-
+	
 	for (var i = 0; i < keys.length; i++) {
 		if(format == '365') {
 			allTimeslots[i] = convertYearMonthKeyToDate(keys[i]);	
 		} else {
 			allTimeslots[i] = convertYearWeekKeyToDate(keys[i]);
 		}
-		clickedSurveys[i] = graphData.clicked[keys[i]] || 0;
-		sentSurveys[i] = graphData.sent[keys[i]] || 0;
-		completedSurveys[i] = graphData.complete[keys[i]] || 0;
-		socialPosts[i] = graphData.socialposts[keys[i]] || 0;
+		if(graphData != undefined) {
+			if(graphData.clicked != undefined)
+				clickedSurveys[i] = graphData.clicked[keys[i]] || 0;
+			if(graphData.sent != undefined)
+				sentSurveys[i] = graphData.sent[keys[i]] || 0;
+			if(graphData.complete != undefined)
+				completedSurveys[i] = graphData.complete[keys[i]] || 0;
+			if(graphData.socialposts != undefined)
+				socialPosts[i] = graphData.socialposts[keys[i]] || 0;
+		}
 	}
 	
 	/*$.each(graphData.clicked, function(key, value) {
