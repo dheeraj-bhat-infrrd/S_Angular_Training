@@ -1,8 +1,11 @@
 package com.realtech.socialsurvey.web.controller;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -30,6 +33,23 @@ public class GenericController {
 		LOG.warn("Error found.");
 		return JspResolver.ERROR_PAGE;
 	}
+
+
+    /**
+     * Method for invalidating user before going back to homepage
+     * when user clicks on Go back to Homepage button in error page.
+     */
+    @RequestMapping ( value = "/removeuseronerror")
+    public String invalidateuser( HttpServletRequest request )
+    {
+        LOG.info( "Invalidating user before going back to home page, invalidateuser() called" );
+        HttpSession session = request.getSession();
+        session.invalidate();
+        SecurityContextHolder.clearContext();
+        LOG.info( "Invalidated user before going back to home page, invalidateuser() call ended" );
+        return JspResolver.INDEX;
+    }
+
 
 	/**
 	 * Method to return GA tracking id
