@@ -48,7 +48,9 @@ public abstract class BaseTestCase
                 TimeUnit.SECONDS );
         driver.manage().window().maximize();
         log.info( "-- Testing on: " + GlobalConstants.SERVER_URL );
-        driver.get( GlobalConstants.SERVER_URL );
+        
+        if(driver.getCurrentUrl() == null || driver.getCurrentUrl().isEmpty())
+            driver.get( GlobalConstants.SERVER_URL );
 
         log.info( "-- Finished Setting up" );
     }
@@ -127,9 +129,9 @@ public abstract class BaseTestCase
 
         if ( !GlobalConstants.get( GlobalConstants.STORE_SCREENSHOT_IN_USER_HOME ).equals( "false" ) ) {
             filePath = System.getProperty( "user.home" ) + File.separator + "Selenium" + File.separator
-                + timeNow.substring( 0, timeNow.indexOf( " " ) ) + File.separator + testCaseName + ".png";
+                + timeNow.substring( 0, timeNow.indexOf( " " ) ) + File.separator + testCaseName + "_" + System.currentTimeMillis() + ".png";
         } else {
-            filePath = GlobalConstants.get( GlobalConstants.SCREENSHOT_FOLDER ) + File.separator + testCaseName + ".png";
+            filePath = GlobalConstants.get( GlobalConstants.SCREENSHOT_FOLDER ) + File.separator + testCaseName + "_" + System.currentTimeMillis() + ".png";
         }
 
         // Now you can do whatever you need to do with it, for example copy somewhere

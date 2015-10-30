@@ -39,6 +39,7 @@ public final class DisplayMessageConstants
     public static final String USER_INACTIVE = "USER_INACTIVE";
     public static final String COMPANY_INACTIVE = "COMPANY_INACTIVE";
     public static final String USER_NOT_PRESENT = "USER_NOT_PRESENT";
+    public static final String USER_PRESENT_NOT_REGISTERED = "USER_PRESENT_NOT_REGISTERED";
     public static final String SUBSCRIPTION_UNSUCCESSFUL = "USER_SUBSCRIPTION_UNSUCCESSFUL";
     public static final String INVALID_REGION_NAME = "INVALID_REGION_NAME";
     public static final String INVALID_REGION_ADDRESS = "INVALID_REGION_ADDRESS";

@@ -14,6 +14,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -780,7 +781,7 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
          * fetching only completed surveys
          */
         query.addCriteria( Criteria.where( CommonConstants.STAGE_COLUMN ).is( CommonConstants.SURVEY_STAGE_COMPLETE ) );
-
+        query.fields().exclude( "surveyResponse" );
         if ( startDate != null && endDate != null ) {
             query.addCriteria( Criteria.where( CommonConstants.MODIFIED_ON_COLUMN ).gte( startDate )
                 .andOperator( Criteria.where( CommonConstants.MODIFIED_ON_COLUMN ).lte( endDate ) ) );
@@ -2085,5 +2086,76 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
         long count = mongoTemplate.find( query, SurveyDetails.class, SURVEY_DETAILS_COLLECTION ).size();
         LOG.info( "Method getSurveysUnderResolutionCount() to get count of surveys marked as abusive for a company finished." );
         return count;
+    }
+
+
+    @Override
+    public List<Long> getEntityIdListForModifiedReview( String columnName, long modifiedAfter )
+    {
+        LOG.debug( "method getEntityIdListForModifiedReview() started" );
+        //TODO change the date to time stamp
+        Date startDate = new Date( modifiedAfter );
+
+        Query query = new Query( Criteria.where( CommonConstants.MODIFIED_ON_COLUMN ).gte( startDate ) );
+
+
+        query.fields().include( columnName );
+
+        List<SurveyDetails> surveys = mongoTemplate.find( query, SurveyDetails.class, SURVEY_DETAILS_COLLECTION );
+
+
+        List<Long> entityIdList = new ArrayList<Long>();
+        long idToAdd = 0l;
+        for ( SurveyDetails survey : surveys ) {
+            if ( columnName.equals( CommonConstants.AGENT_ID_COLUMN ) ) {
+                idToAdd = survey.getAgentId();
+            } else if ( columnName.equals( CommonConstants.BRANCH_ID_COLUMN ) ) {
+                idToAdd = survey.getBranchId();
+            } else if ( columnName.equals( CommonConstants.REGION_ID_COLUMN ) ) {
+                idToAdd = survey.getRegionId();
+            } else if ( columnName.equals( CommonConstants.COMPANY_ID_COLUMN ) ) {
+                idToAdd = survey.getCompanyId();
+            }
+
+            if ( !entityIdList.contains( idToAdd ) && idToAdd > 0l )
+                entityIdList.add( idToAdd );
+        }
+
+        LOG.debug( "method getEntityIdListForModifiedReview() ended" );
+        return entityIdList;
+    }
+
+
+    /*
+     * 
+     */
+    @Override
+    public Map<Long, Integer> getSurveyCountForAgents( List<Long> agentIdList, boolean fetchAbusive ) throws ParseException
+    {
+        LOG.info( "Method to get getSurveyCountForAgents called" );
+        TypedAggregation<SurveyDetails> aggregation = new TypedAggregation<SurveyDetails>( SurveyDetails.class,
+            Aggregation.match( Criteria.where( CommonConstants.STAGE_COLUMN ).is( CommonConstants.SURVEY_STAGE_COMPLETE ) ),
+            Aggregation.match( Criteria.where( CommonConstants.IS_ABUSIVE_COLUMN ).is( fetchAbusive ) ),
+            Aggregation.match( Criteria.where( CommonConstants.AGENT_ID_COLUMN ).in( agentIdList ) ), Aggregation
+                .group( CommonConstants.AGENT_ID_COLUMN ).count().as( "count" ) );
+
+
+        AggregationResults<SurveyDetails> result = mongoTemplate.aggregate( aggregation, SURVEY_DETAILS_COLLECTION,
+            SurveyDetails.class );
+        Map<Long, Integer> surveyCountForEntities = new HashMap<>();
+        //inserting count as zero for all records. aggregation doesn't return group with zero record.
+        for ( Long agentId : agentIdList ) {
+            surveyCountForEntities.put( agentId, 0 );
+        }
+
+        @SuppressWarnings ( "unchecked") List<BasicDBObject> surveyCountList = (List<BasicDBObject>) result.getRawResults()
+            .get( "result" );
+
+        for ( BasicDBObject o : surveyCountList ) {
+            surveyCountForEntities.put( new Double( o.get( CommonConstants.DEFAULT_MONGO_ID_COLUMN ).toString() ).longValue(),
+                Integer.parseInt( o.get( "count" ).toString() ) );
+        }
+
+        return surveyCountForEntities;
     }
 }

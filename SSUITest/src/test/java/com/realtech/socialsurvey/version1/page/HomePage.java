@@ -28,8 +28,16 @@ public class HomePage extends BasePage
     private static final String PRO_FIRST_NAME_LOCATOR = "id=find-pro-first-name";
     private static final String PRO_LAST_NAME_LOCATOR = "id=find-pro-last-name";
 
-    public static final String TOAST_MESSAGE_LOCATOR = "id=overlay-toast";
     public static final String INVALID_EMAILID_MESSAGE = "Please enter a valid user name.";
+    public static final String EMPTY_EMAILID_MESSAGE = "Please enter user name.";
+    public static final String EMPTY_PASSWORD_MESSAGE = "Please enter password.";
+    
+    public static final String REG_EMPTY_FIRST_NAME_MESSAGE = "Please enter first name";
+    public static final String REG_EMPTY_LAST_NAME_MESSAGE = "Please enter a valid last name.";
+    public static final String REG_EMPTY_EMAIL_MESSAGE = "Please enter email address";
+    public static final String REG_INVALID_EMAIL_MESSAGE = "Please enter a valid email address";
+    
+    public static final String HOME_REG_ERROR_MESSAGE_LOCATOR = "id=reg-err-pu-msg";
 
 
     public HomePage( WebDriver driver )
@@ -41,47 +49,6 @@ public class HomePage extends BasePage
 
         waitForAjax();
     }
-
-
-    /**
-     * 
-     * 
-     * @param locators
-     * @return
-     */
-    public boolean navigateToPage( String... locators )
-    {
-
-        //now process the locators      
-        for ( int index = 0; index < locators.length; index++ ) {
-            //Get current element locator
-            String locator = locators[index];
-
-            //check if current element is clickable
-            if ( !isElementClickable( locator ) ) {
-                return false;
-            }
-
-            //check if there's a child element
-            if ( index < ( locators.length - 1 ) ) {
-                //if there is, check if it is visible
-                WebElement childElement = getElement( locators[index + 1] );
-
-                //if it is, then don't click on the current element, just continue with the for loop
-                if ( isVisible( childElement ) ) {
-                    continue;
-                }
-            }
-
-            //if there are no more child elements, or if the child isn't visible, then click on the current element
-            waitForElementToAppear( locator ).click();
-        }
-
-        waitForAjax();
-
-        return true;
-    }
-
 
     public ForgotPasswordPage clickForgotPasswordLink()
     {
@@ -228,9 +195,9 @@ public class HomePage extends BasePage
     }
 
 
-    public String getToastMessage()
+    public String getHomeRegErrorMessage()
     {
-        WebElement toastMessage = getElement( TOAST_MESSAGE_LOCATOR );
+        WebElement toastMessage = getElement( HOME_REG_ERROR_MESSAGE_LOCATOR );
         return toastMessage.getText();
     }
 

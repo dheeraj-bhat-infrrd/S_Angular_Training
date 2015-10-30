@@ -427,7 +427,7 @@ public interface UserManagementService
     void updatePrimaryProfileOfUser( User user ) throws InvalidInputException;
 
 
-    void removeUserProfile( long profileIdToDelete ) throws InvalidInputException, SolrException;
+    void removeUserProfile( long profileIdToDelete  ) throws InvalidInputException;
 
 
     /**
@@ -438,5 +438,9 @@ public interface UserManagementService
      * @throws InvalidInputException
      */
     public boolean validateUserApiKey( String apiKey, String apiSecret, long companyId ) throws InvalidInputException;
+
+
+    void updateUserInSolr( User user ) throws InvalidInputException, SolrException;
+
 }
 // JIRA SS-34 BY RM02 BOC
