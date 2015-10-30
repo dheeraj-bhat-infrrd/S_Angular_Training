@@ -16,7 +16,7 @@ public class TestHomePage extends BaseTestCase
     private static final Logger LOG = LoggerFactory.getLogger( TestHomePage.class );
 
 
-    @Test ( groups = "home", testName = "TCSS-1")
+    @Test ( groups = "home", testName = "TCSSHP-1")
     public void testHomePage()
     {
         LOG.trace( "\n\n*** Started Testing: testHomePage" );
@@ -30,7 +30,7 @@ public class TestHomePage extends BaseTestCase
     }
 
 
-    @Test ( groups = "home", testName = "TCSS-2")
+    @Test ( groups = "home", testName = "TCSSHP-2")
     public void testForgotPasswordClick()
     {
         LOG.trace( "\n\n*** Started Testing: testForgotPasswordClick" );
@@ -45,7 +45,7 @@ public class TestHomePage extends BaseTestCase
     }
 
 
-    @Test ( groups = "home", testName = "TCSS-3")
+    @Test ( groups = "home", testName = "TCSSHP-3")
     public void testUserLogin()
     {
         LOG.trace( "\n\n*** Started Testing: testUserLogin" );
@@ -60,7 +60,7 @@ public class TestHomePage extends BaseTestCase
     }
 
 
-    @Test ( groups = "home", testName = "TCSS-4")
+    @Test ( groups = "home", testName = "TCSSHP-4")
     public void testUserLoginInvalidCreditentials()
     {
         LOG.trace( "\n\n*** Started Testing: testUserLoginInvalid" );
@@ -81,7 +81,7 @@ public class TestHomePage extends BaseTestCase
     }
 
 
-    @Test ( groups = "home", testName = "TCSS-5", dependsOnMethods = "testUserLogin")
+    @Test ( groups = "home", testName = "TCSSHP-5", dependsOnMethods = "testUserLogin")
     public void testUserLogout()
     {
         LOG.trace( "\n\n*** Started Testing: testUserLogout" );
@@ -96,7 +96,7 @@ public class TestHomePage extends BaseTestCase
     }
 
 
-    @Test ( groups = "home", testName = "TCSS-6")
+    @Test ( groups = "home", testName = "TCSSHP-6")
     public void testUserRegister()
     {
         LOG.trace( "\n\n*** Started Testing: testUserRegister" );
@@ -111,7 +111,7 @@ public class TestHomePage extends BaseTestCase
     }
 
 
-    @Test ( groups = "home", testName = "TCSS-7")
+    @Test ( groups = "home", testName = "TCSSHP-7")
     public void testProSearch()
     {
         LOG.trace( "\n\n*** Started Testing: testProSearch" );
@@ -126,7 +126,7 @@ public class TestHomePage extends BaseTestCase
     }
 
 
-    @Test ( groups = "home", testName = "TCSS-8")
+    @Test ( groups = "home", testName = "TCSSHP-8")
     public void testPricingLinkClick()
     {
         LOG.trace( "\n\n*** Started Testing: testPricingLinkClick" );
@@ -141,7 +141,7 @@ public class TestHomePage extends BaseTestCase
     }
 
 
-    @Test ( groups = "home", testName = "TCSS-9")
+    @Test ( groups = "home", testName = "TCSSHP-9")
     public void testPrivacyLinkClick()
     {
         LOG.trace( "\n\n*** Started Testing: testPrivacyClick" );
@@ -156,7 +156,7 @@ public class TestHomePage extends BaseTestCase
     }
 
 
-    @Test ( groups = "home", testName = "TCSS-10")
+    @Test ( groups = "home", testName = "TCSSHP-10")
     public void testFeaturesLinkClick()
     {
         LOG.trace( "\n\n*** Started Testing: testFeaturesLinkClick" );
@@ -171,7 +171,7 @@ public class TestHomePage extends BaseTestCase
     }
 
 
-    @Test ( groups = "home", testName = "TCSS-11")
+    @Test ( groups = "home", testName = "TCSSHP-11")
     public void testTermsLinkClick()
     {
         LOG.trace( "\n\n*** Started Testing: testTermsLinkClick" );
@@ -186,7 +186,7 @@ public class TestHomePage extends BaseTestCase
     }
 
 
-    @Test ( groups = "home", testName = "TCSS-12")
+    @Test ( groups = "home", testName = "TCSSHP-12")
     public void testUserLoginInvalidEmailId()
     {
         LOG.trace( "\n\n*** Started Testing: testUserLoginInvalidEmailId" );
@@ -207,7 +207,7 @@ public class TestHomePage extends BaseTestCase
     }
 
 
-    @Test ( groups = "home", testName = "TCSS-13")
+    @Test ( groups = "home", testName = "TCSSHP-13")
     public void testUserLoginEmptyEmailId()
     {
         LOG.trace( "\n\n*** Started Testing: testUserLoginEmptyEmailId" );
@@ -228,7 +228,7 @@ public class TestHomePage extends BaseTestCase
     }
 
 
-    @Test ( groups = "home", testName = "TCSS-14")
+    @Test ( groups = "home", testName = "TCSSHP-14")
     public void testUserLoginEmptyPassword()
     {
         LOG.trace( "\n\n*** Started Testing: testUserLoginEmptyPassword" );
@@ -249,7 +249,7 @@ public class TestHomePage extends BaseTestCase
     }
 
 
-    @Test ( groups = "home", testName = "TCSS-15")
+    @Test ( groups = "home", testName = "TCSSHP-15")
     public void testUserRegisterWithExistingEmail()
     {
         LOG.trace( "\n\n*** Started Testing: testUserRegisterWithExistingEmail" );
@@ -272,7 +272,7 @@ public class TestHomePage extends BaseTestCase
     }
 
 
-    @Test ( groups = "home", testName = "TCSS-16")
+    @Test ( groups = "home", testName = "TCSSHP-16")
     public void testUserRegisterWithEmptyFirstName()
     {
         LOG.trace( "\n\n*** Started Testing: testUserRegisterWithEmptyFirstName" );
@@ -294,7 +294,7 @@ public class TestHomePage extends BaseTestCase
     }
 
 
-    @Test ( groups = "home", testName = "TCSS-17")
+    @Test ( groups = "home", testName = "TCSSHP-17")
     public void testUserRegisterWithEmptyLastName()
     {
         LOG.trace( "\n\n*** Started Testing: testUserRegisterWithEmptyLastName" );
@@ -316,7 +316,7 @@ public class TestHomePage extends BaseTestCase
     }
 
 
-    @Test ( groups = "home", testName = "TCSS-18")
+    @Test ( groups = "home", testName = "TCSSHP-18")
     public void testUserRegisterWithEmptyEmailId()
     {
         LOG.trace( "\n\n*** Started Testing: testUserRegisterWithEmptyEmailId" );
@@ -338,7 +338,7 @@ public class TestHomePage extends BaseTestCase
     }
 
 
-    @Test ( groups = "home", testName = "TCSS-19")
+    @Test ( groups = "home", testName = "TCSSHP-19")
     public void testUserRegisterWithInvalidEmailId()
     {
         LOG.trace( "\n\n*** Started Testing: testUserRegisterWithInvalidEmailId" );

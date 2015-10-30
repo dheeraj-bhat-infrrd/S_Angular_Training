@@ -50,47 +50,6 @@ public class HomePage extends BasePage
         waitForAjax();
     }
 
-
-    /**
-     * 
-     * 
-     * @param locators
-     * @return
-     */
-    public boolean navigateToPage( String... locators )
-    {
-
-        //now process the locators      
-        for ( int index = 0; index < locators.length; index++ ) {
-            //Get current element locator
-            String locator = locators[index];
-
-            //check if current element is clickable
-            if ( !isElementClickable( locator ) ) {
-                return false;
-            }
-
-            //check if there's a child element
-            if ( index < ( locators.length - 1 ) ) {
-                //if there is, check if it is visible
-                WebElement childElement = getElement( locators[index + 1] );
-
-                //if it is, then don't click on the current element, just continue with the for loop
-                if ( isVisible( childElement ) ) {
-                    continue;
-                }
-            }
-
-            //if there are no more child elements, or if the child isn't visible, then click on the current element
-            waitForElementToAppear( locator ).click();
-        }
-
-        waitForAjax();
-
-        return true;
-    }
-
-
     public ForgotPasswordPage clickForgotPasswordLink()
     {
         navigateToForgotPasswordPage();
