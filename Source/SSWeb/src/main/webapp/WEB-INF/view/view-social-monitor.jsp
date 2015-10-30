@@ -38,9 +38,9 @@
 					</select>
 				</div>
 				<div id="entity-selection-panel" class="float-left clearfix">
-					<select id="select-entity-id" class="float-left dash-sel-item">
-					<!-- Populate this based on what's selected in select-hierarchy-level -->
-					</select>
+					<input id="select-entity-id" class="float-left dash-sel-item">
+					<ul id="autocomplete-ul"></ul>
+					<input type="hidden" name="entity-id" id="selected-entity-id-hidden"/>
 				</div>
 				<div class="v-um-hdr-right v-um-hdr-search float-left clearfix search-panel-item">
 					<input id="post-search-query" name="post-search-query" class="v-um-inp" placeholder="<spring:message code="label.searchpost.key" />">
@@ -59,7 +59,7 @@
 				<input id="dsh-end-date" class="dsh-date-picker" placeholder="<spring:message code="label.enddate.key" />">
 			</div>
 		</div>
-		<div class="v-um-tbl-wrapper" id="social-post-list">
+		<div class="v-sm-tbl-wrapper" id="social-post-list">
 			<div id="ppl-post-cont" class="rt-content-main bord-bot-dc clearfix">
 				<div class="float-left panel-tweet-wrapper">
 					<div id="prof-posts" class="tweet-panel tweet-panel-left sm-tweet-panel">
@@ -72,92 +72,6 @@
 	<div id="temp-message" class="hide"></div>
 
 	<script>
-	//TODO: Move all js to application.js
-	
-		function getRelevantEntities(){
-			//Remove pre-existing options
-			$('#entity-selection-panel').find('option').remove();
-			$("#select-entity-id").show();
-			//Get the entity type
-			var entityType = $("#select-hierarchy-level").val();
-			//If branch
-			if (entityType == "branchId" ) {
-				callAjaxGET("/fetchbranches.do", function(data) {
-					var branchList = [];
-					if(data != undefined && data != "")
-					branchList = $.parseJSON(data);
-					var searchData = [];
-					for(var i=0,j=0; i<branchList.length; i++) {
-						if(branchList[i].isDefaultBySystem == 0) {
-							searchData[j] = {};
-							searchData[j].label = branchList[i].branchName;
-							searchData[j].branchId = branchList[i].branchId;
-							j++;
-						}
-					}
-					$.each(searchData, function (i, item) {
-					    $('#select-entity-id').append($('<option>', { 
-					        value: item.branchId,
-					        text : item.label 
-					    }));
-					});
-					
-				},true);
-			} else if (entityType == "regionId") {
-				callAjaxGET("/fetchregions.do", function(data) {
-					var regionList = [];
-					if(data != undefined && data != "")
-						regionList = $.parseJSON(data);
-					var searchData = [];
-					for(var i=0, j=0; i<regionList.length; i++) {
-						if(regionList[i].isDefaultBySystem == 0) {
-							searchData[j] = {};
-							searchData[j].label = regionList[i].regionName;
-							searchData[j].regionId = regionList[i].regionId;
-							j++;				
-						}
-					}
-					$.each(searchData, function (i, item) {
-					    $('#select-entity-id').append($('<option>', { 
-					        value: item.regionId,
-					        text : item.label 
-					    }));
-					});
-					
-				}, true);
-			} else if (entityType == "userId") {
-				callAjaxGET("/fetchusers.do", function(data) {
-					var userList = [];
-					if(data != undefined && data != "")
-						userList = $.parseJSON(data);
-					var searchData = [];
-					for(var i=0, j=0; i<userList.length; i++) {
-						if(userList[i].isOwner == 0) {
-							searchData[j] = {};
-							searchData[j].label = userList[i].firstName;
-							if(userList[i].lastName != undefined)
-								searchData[j].label += " " + userList[i].lastName;
-							searchData[j].userId = userList[i].userId;
-							j++;				
-						}
-					}
-					$.each(searchData, function (i, item) {
-					    $('#select-entity-id').append($('<option>', { 
-					        value: item.userId,
-					        text : item.label 
-					    }));
-					});
-					
-				}, true);
-			} else if (entityType == "companyId") {
-				$("#select-entity-id").hide();
-			}
-		}
-		
-		$("#hierarchy-selection-panel").on('change', function(){
-			getRelevantEntities();
-		});
-		
 		$(document).ready(function() {
 			hideOverlay();
 			bindDatePickerforSurveyDownload();
@@ -169,25 +83,24 @@
 			if ($('#server-message>div').hasClass("error-message")) {
 				$('#server-message').show();
 			}
+			autocompleteData = [];
+			getRelevantEntities();
+		});
+		$("#select-hierarchy-level").on('change', function(){
+			autocompleteData = [];
 			getRelevantEntities();
 		});
 		
 		function postsSearch(){
 			var entityType = $("#select-hierarchy-level").val();
 			var entityId;
-			entityId = $("#select-entity-id").val();
+			entityId = $("#selected-entity-id-hidden").val();
 			if(entityType == undefined || entityId == undefined || entityId <= 0 || entityType == "companyId"){
 				entityType = "companyId";
 				entityId = "${ entityId }";
 			}
 			showSearchedPostsSolr(true, entityType, entityId, $("#post-search-query").val());
 		}
-		
-		$(document).keyup("#post-search-query", function(e) {
-		    if(e.which == 13) {
-		    	postsSearch();
-		    }
-		});
 	</script>
 </body>
 </html>
