@@ -3783,6 +3783,11 @@ function deleteUserProfile(profileId) {
 			$('#overlay-cancel').click();
 			// remove the tab from UI
 			$('#v-edt-tbl-row-' + profileId).remove();
+		}else{
+			//close the popup
+			$('#overlay-cancel').click();
+			$('#overlay-toast').html(data);
+			showToast();
 		}
 	}, payload, true);
 } 
@@ -4306,12 +4311,6 @@ function saveUserAssignmentCallBack(data) {
 // remove user profile
 $(document).on('click', '.v-icn-rem-userprofile', function() {
 	if ($(this).hasClass('v-tbl-icn-disabled')) {
-		return;
-	}
-
-	if($(this).parent().parent().children('.v-edt-tbl-row').length <= 1) {
-		$('#overlay-toast').html("One user assignment compulsory");
-		showToast();
 		return;
 	}
 	
@@ -5296,15 +5295,9 @@ function storeCustomerAnswer(customerResponse) {
 	});
 }
 
-function updateCustomerResponse(feedback, agreedToShare) {
+function updateCustomerResponse(feedback, agreedToShare , isAbusive) {
 	var success = false;
-	isAbusive = false;
-	var feedbackArr = feedback.split(" ");
-	for (var i = 0; i < feedbackArr.length; i++) {
-		if ($.inArray((feedbackArr[i]).toLowerCase(), swearWords) != -1) {
-			isAbusive = true;
-		}
-	}
+	
 	var payload = {
 		"mood" : mood,
 		"feedback" : feedback,
@@ -5464,8 +5457,19 @@ function showMasterQuestionPage(){
 			showToast();
 			return;
 		}
+		
+		var isAbusive = false;
+		var feedbackArr = feedback.split(" ");
+		for (var i = 0; i < feedbackArr.length; i++) {
+			if ($.inArray((feedbackArr[i]).toLowerCase(), swearWords) != -1) {
+				isAbusive = true;
+			}
+		}
+		
 		if ($('#shr-post-chk-box').hasClass('bd-check-img') && (rating >= autoPostScore) && (Boolean(autoPost) == true)) {
-			postToSocialMedia(feedback);
+			if(isAbusive == false){
+				postToSocialMedia(feedback , isAbusive);
+			}
 			/*$('#social-post-lnk').show();
 			if((mood == 'Great') && (yelpEnabled || googleEnabled) && !(yelpEnabled && googleEnabled)){
 				$('.sq-btn-social-wrapper').css({
@@ -5497,7 +5501,8 @@ function showMasterQuestionPage(){
 			}
 		}
 		
-		updateCustomerResponse(feedback, $('#shr-pst-cb').val());
+		
+		updateCustomerResponse(feedback, $('#shr-pst-cb').val() , isAbusive);
 		$("div[data-ques-type]").hide();
 		$("div[data-ques-type='error']").show();
 		$('#profile-link').html('View ' + agentName + '\'s profile at <a href="' + agentFullProfileLink + '" target="_blank">' + agentFullProfileLink + '</a>');
@@ -5517,7 +5522,7 @@ function showMasterQuestionPage(){
 	return;
 }
 
-function postToSocialMedia(feedback){
+function postToSocialMedia(feedback , isAbusive){
 	var success = false;
 	var payload = {
 		"agentId" : agentId,
@@ -5525,6 +5530,7 @@ function postToSocialMedia(feedback){
 		"lastName" : lastName,
 		"agentName" : agentName,
 		"rating" : rating,
+		"isAbusive" : isAbusive,
 		"customerEmail" : customerEmail,
 		"feedback" : feedback,
 		"agentProfileLink" : agentProfileLink
