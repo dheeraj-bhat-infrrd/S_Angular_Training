@@ -109,7 +109,8 @@ var companyLogo;
 //Verticals master
 var verticalsMasterList;
 
-
+//Variables for social monitor
+var autocompleteData;
 /**
  * js functions for landing page
  */
@@ -9390,3 +9391,137 @@ $(document).on('click', '.ppl-share-wrapper .icn-plus-open', function() {
 	$(this).hide();
 	$(this).parent().find('.ppl-share-social,.icn-remove').show();
 });
+
+function getRelevantEntities(){
+	//Remove pre-existing options
+	$('#select-entity-id').val("");
+	$("#entity-selection-panel").show();
+	//Get the entity type
+	var entityType = $("#select-hierarchy-level").val();
+	//If branch
+	if (entityType == "branchId" ) {
+		callAjaxGET("/fetchbranches.do", function(data) {
+			var branchList = [];
+			if(data != undefined && data != "")
+			branchList = $.parseJSON(data);
+			var searchData = [];
+			for(var i=0,j=0; i<branchList.length; i++) {
+				if(branchList[i].isDefaultBySystem == 0) {
+					searchData[j] = {};
+					searchData[j].label = branchList[i].branchName;
+					searchData[j].branchId = branchList[i].branchId;
+					j++;
+				}
+			}
+			$("#select-entity-id").autocomplete({
+				source : searchData,
+				minLength: 0,
+				delay : 0,
+				autoFocus : true,
+				select: function(event, ui) {
+					$("#select-entity-id").val(ui.item.label);
+					$('#selected-entity-id-hidden').val(ui.item.branchId);
+					return false;
+				},
+				close: function(event, ui) {},
+				create: function(event, ui) {
+			        $('.ui-helper-hidden-accessible').remove();
+				}
+			}).autocomplete("instance")._renderItem = function(ul, item) {
+				return $('<li>').append(item.label).appendTo(ul);
+		  	};
+		  	$("#select-entity-id").off('focus');
+			$("#select-entity-id").focus(function(){            
+	            $(this).autocomplete('search');
+	        });
+			
+		},true);
+	} else if (entityType == "regionId") {
+		callAjaxGET("/fetchregions.do", function(data) {
+			var regionList = [];
+			if(data != undefined && data != "")
+				regionList = $.parseJSON(data);
+			autocompleteData = data;
+			var searchData = [];
+			for(var i=0, j=0; i<regionList.length; i++) {
+				if(regionList[i].isDefaultBySystem == 0) {
+					searchData[j] = {};
+					searchData[j].label = regionList[i].regionName;
+					searchData[j].regionId = regionList[i].regionId;
+					j++;				
+				}
+			}
+			$("#select-entity-id").autocomplete({
+				source : searchData,
+				minLength: 0,
+				delay : 0,
+				autoFocus : true,
+				select: function(event, ui) {
+					$("#select-entity-id").val(ui.item.label);
+					$('#selected-entity-id-hidden').val(ui.item.regionId);
+					return false;
+				},
+				close: function(event, ui) {},
+				create: function(event, ui) {
+			        $('.ui-helper-hidden-accessible').remove();
+				}
+			}).autocomplete("instance")._renderItem = function(ul, item) {
+				return $("<li>").append(item.label).appendTo(ul);
+		  	};
+		  	$("#select-entity-id").off('focus');
+			$("#select-entity-id").focus(function(){            
+	            $(this).autocomplete('search');
+	        }); 
+			
+		}, true);
+	} else if (entityType == "userId") {
+		callAjaxGET("/fetchusers.do", function(data) {
+			var userList = [];
+			if(data != undefined && data != "")
+				userList = $.parseJSON(data);
+			autocompleteData = data;
+			var searchData = [];
+			for(var i=0, j=0; i<userList.length; i++) {
+				if(userList[i].isOwner == 0) {
+					searchData[j] = {};
+					searchData[j].label = userList[i].firstName;
+					if(userList[i].lastName != undefined)
+						searchData[j].label += " " + userList[i].lastName;
+					searchData[j].userId = userList[i].userId;
+					j++;				
+				}
+			}
+			$("#select-entity-id").autocomplete({
+				source : searchData,
+				minLength: 0,
+				delay : 0,
+				autoFocus : true,
+				select: function(event, ui) {
+					$("#select-entity-id").val(ui.item.label);
+					$('#selected-entity-id-hidden').val(ui.item.userId);
+					return false;
+				},
+				close: function(event, ui) {},
+				create: function(event, ui) {
+			        $('.ui-helper-hidden-accessible').remove();
+				}
+			}).autocomplete("instance")._renderItem = function(ul, item) {
+				return $("<li>").append(item.label).appendTo(ul);
+		  	};
+		  	$("#select-entity-id").off('focus');
+			$("#select-entity-id").focus(function(){            
+	            $(this).autocomplete('search');
+	        }); 
+			
+		}, true);
+	} else if (entityType == "companyId") {
+		$("#entity-selection-panel").hide();
+	}
+}
+
+$(document).keyup("#post-search-query", function(e) {
+    if(e.which == 13) {
+    	postsSearch();
+    }
+});
+
