@@ -580,21 +580,29 @@ public class SurveyManagementController
             String ratingStr = request.getParameter( "rating" );
             String customerEmail = request.getParameter( "customerEmail" );
             String feedback = request.getParameter( "feedback" );
+            String isAbusiveStr = request.getParameter( "isAbusive" );
             String serverBaseUrl = requestUtils.getRequestServerName( request );
 
             String customerDisplayName = emailFormatHelper.getCustomerDisplayNameForEmail( custFirstName, custLastName );
 
             long agentId = 0;
             double rating = 0;
+            boolean isAbusive = false;
             try {
                 agentId = Long.parseLong( agentIdStr );
                 rating = Double.parseDouble( ratingStr );
+                isAbusive = Boolean.parseBoolean( isAbusiveStr );
             } catch ( NumberFormatException | NullPointerException e ) {
                 LOG.error(
                     "Number format/Null Pointer exception caught in postToSocialMedia() while trying to convert agent Id. Nested exception is ",
                     e );
                 return e.getMessage();
             }
+            
+            if(isAbusive){
+                return "Can't post the review because it contains the swear words" ;
+            }
+            
             DecimalFormat ratingFormat = CommonConstants.SOCIAL_RANKING_FORMAT;
             if ( rating % 1 == 0 ) {
                 ratingFormat = CommonConstants.SOCIAL_RANKING_WHOLE_FORMAT;
