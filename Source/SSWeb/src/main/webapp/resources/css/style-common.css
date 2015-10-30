@@ -1755,6 +1755,15 @@ button.paypal.is-active {
 	font-size: 11px;
 }
 
+.sm-prof-name {
+	font-size: 15px;
+	line-height: 15px;
+	max-width : 120px;
+	float: left;
+	margin-left: 15px;
+	margin-top: 3%;
+}
+
 .tweet-panel-item,.posts-panel-item {
 	padding-bottom: 10px;
 	margin-bottom: 0px;
@@ -4727,6 +4736,30 @@ select.rfr_txt_fld,select.rfr_input_fld{
 	background-size: 20px;
 }
 
+.sm-default-img {
+	clear: both;
+	background: url(../images/place-holder-individual.png) no-repeat center;
+	background-size: 32px;
+	width: 50px;
+	height: 50px;
+	border-radius: 50%;
+	margin-top: 10px;
+}
+
+.sm-custom-img {
+	clear: both;
+	background-size: 50px;
+	width: 50px;
+	height: 50px;
+	border-radius: 50%;
+	margin-top: 10px;
+}
+
+.sm-post-row {
+	padding-left: 35px;
+	margin-top: 18px;
+}
+
 .dsh-pers-default-img {
 	background: url(../images/place-holder-individual.png) no-repeat center;
 	background-size: 60% auto;
@@ -6359,6 +6392,12 @@ tr.u-tbl-header td {
 
 .tweet-panel-item.bord-bot-dc.clearfix {
 	padding-top: 10px;
+}
+
+.sm-tweet-item {
+	padding-left: 10px;
+	clear: none;
+	float: left;
 }
 
 .cs-gq-lbl {

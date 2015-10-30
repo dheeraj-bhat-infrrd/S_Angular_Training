@@ -2594,6 +2594,7 @@ public class SocialManagementController
 
                     socialMonitorPosts.add( socialMonitorPost );
                 }
+                //Get profile Images
                 if ( !( companyIdSet.isEmpty() ) ) {
                     profileImageUrlList.addAll( organizationManagementService.fetchProfileImageUrlsForEntityList(
                         CommonConstants.COMPANY_ID_COLUMN, (HashSet<Long>) companyIdSet ) );

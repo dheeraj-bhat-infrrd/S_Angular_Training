@@ -6,32 +6,32 @@ package com.realtech.socialsurvey.core.entities;
  */
 public class ProfileImageUrlData
 {
-    private String EntityType;
-    private long EntityId;
+    private String entityType;
+    private long entityId;
     private String profileImageUrl;
 
 
     public String getEntityType()
     {
-        return EntityType;
+        return entityType;
     }
 
 
     public void setEntityType( String entityType )
     {
-        EntityType = entityType;
+        this.entityType = entityType;
     }
 
 
     public long getEntityId()
     {
-        return EntityId;
+        return entityId;
     }
 
 
     public void setEntityId( long entityId )
     {
-        EntityId = entityId;
+        this.entityId = entityId;
     }
 
 

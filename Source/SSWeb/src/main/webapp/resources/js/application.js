@@ -9129,13 +9129,17 @@ function showSearchedPostsSolr(fromstart, entityType, entityId, searchQuery) {
 			proPostStartIndex = 0;
 			proPostCount = data.count + 1;
 		}
-		paintPostsSolr(data.socialMonitorPosts, entityType, entityId);
+		paintPostsSolr(data, entityType, entityId, searchQuery);
 		proPostStartIndex += proPostBatchSize;
 	}, payload, true);
 }
 
-function paintPostsSolr(posts, entityType, entityId) {
+function paintPostsSolr(data, entityType, entityId, searchQuery) {
+	var posts = data.socialMonitorPosts;
+	var profilePics = data.profileImageUrlDataList;
 	var divToPopulate = "";
+	var profImgClass = "sm-default-img";
+	var profImgStyle = "";
 	$.each(posts, function(i, post) {
 		var iconClass = "";
 		var href="javascript:void(0)";
@@ -9159,9 +9163,41 @@ function paintPostsSolr(posts, entityType, entityId) {
 		if(typeof post.postUrl!=  "undefined" ){
 			 href= post.postUrl;
 		}
-		var hrefComplet='<a href='+href+' target="_blank">';
+		var profileImg = "";
+		$.each(profilePics,  function(i, pic){
+			if(post.companyId > 0 && pic.entityType == "companyId" && pic.entityId == post.companyId){
+				profileImg = pic.profileImageUrl;
+			} else if(post.regionId > 0 && pic.entityType == "regionId" && pic.entityId == post.regionId){
+				profileImg = pic.profileImageUrl;
+			} else if(post.branchId > 0 && pic.entityType == "branchId" && pic.entityId == post.branchId){
+				profileImg = pic.profileImageUrl;
+			} else if(post.agentId > 0 && pic.entityType == "userId" && pic.entityId == post.agentId){
+				profileImg = pic.profileImageUrl;
+			}
+		});
+		if(profileImg != ""){
+			profImgClass = "sm-custom-img";
+			profImgStyle = 'style="background:url(' + profileImg + ') no-repeat center; background-size: 50px;"';
+		}
 		
-		divToPopulate += '<div class="tweet-panel-item bord-bot-dc clearfix">'		
+		var hrefComplet='<a href='+href+' target="_blank">';
+		divToPopulate += '<div class="tweet-panel-item bord-bot-dc sm-tweet-item clearfix">';
+		var profName = "";
+		if (post.companyName != undefined && post.companyName != "") {
+			profName = post.companyName;
+		}
+		if (post.regionName != undefined && post.regionName != "") {
+			profName = post.regionName;
+		}
+		if (post.branchName != undefined && post.branchName != "") {
+			profName = post.branchName;
+		}
+		if (post.agentName != undefined && post.agentName != "") {
+			profName = post.agentName;
+		}
+		divToPopulate += '<div class="float-left ' + profImgClass + '" ' + profImgStyle + ' ></div>';
+		divToPopulate += '<div class="sm-prof-name">' + profName + '</div>'
+				+ '<div class="sm-post-row float-left">'
 				+ hrefComplet
 				+ '<div class="tweet-icn ' + iconClass + ' float-left"></div>'
 				+"</a>"
@@ -9170,28 +9206,10 @@ function paintPostsSolr(posts, entityType, entityId) {
 				+ '<div class="tweet-text-link"><em>' + post.postedBy
 				+ '</em></div>' + '<div class="tweet-text-time"><em>'
 				+ convertUserDateToWeekFormt(new Date(post.timeInMillis)) + '</em></div>';
-		if (post.companyName != undefined && post.companyName != "") {
-			divToPopulate += '<div class="tweet-text-time"><em>Company Name : ' + post.companyName + '</em></div>';
-		}
-		if (post.regionName != undefined && post.regionName != "") {
-			divToPopulate += '<div class="tweet-text-time"><em>Region Name : ' + post.regionName + '</em></div>';
-		}
-		if (post.branchName != undefined && post.branchName != "") {
-			divToPopulate += '<div class="tweet-text-time"><em>Office Name : ' + post.branchName + '</em></div>';
-		}
-		if (post.agentName != undefined && post.agentName != "") {
-			divToPopulate += '<div class="tweet-text-time"><em>User Name : ' + post.agentName + '</em></div>';
-		}
 		divToPopulate += '</div>';
 		
-		if(post.source == "SocialSurvey"){
-			var divToDeleteSurvey = '<div class="dlt-survey-wrapper hide"><div surveymongoid=' + post._id + ' class="post-dlt-icon reg-err-pu-close float-left">'
-								+ '</div></div>';
-			divToPopulate += divToDeleteSurvey;
-		}
-		
 		divToPopulate += '</div>';
-		
+		divToPopulate += '</div>';
 		
 		
 	});
@@ -9212,7 +9230,7 @@ function paintPostsSolr(posts, entityType, entityId) {
 		if (scrollContainer.scrollTop === scrollContainer.scrollHeight
 					- scrollContainer.clientHeight) {
 				if (proPostStartIndex < proPostCount)
-					showPostsSolr(false, entityType, entityId);
+					showSearchedPostsSolr(false, entityType, entityId, searchQuery);
 		}
 	});
 }
