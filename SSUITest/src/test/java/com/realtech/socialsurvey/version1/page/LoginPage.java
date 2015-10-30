@@ -1,7 +1,6 @@
 package com.realtech.socialsurvey.version1.page;
 
 import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.WebElement;
 import org.testng.Assert;
 
 
@@ -11,7 +10,6 @@ public class LoginPage extends BasePage
     public static final String LOGIN_PAGE_TITLE = "Login";
     
     public static final String INVALID_CREDENTIALS_MESSAGE = "INVALID EMAIL ADDRESS OR PASSWORD";
-    public static final String ERROR_LOCATOR = "id=err-nw-txt";
 
 
     public LoginPage( WebDriver driver )
@@ -24,10 +22,4 @@ public class LoginPage extends BasePage
         waitForAjax();
     }
 
-
-    public String getErrorMessage()
-    {
-        WebElement message = getElement( ERROR_LOCATOR );
-        return message.getText();
-    }
 }
