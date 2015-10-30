@@ -26,7 +26,9 @@ import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Repository;
+import com.mongodb.BasicDBList;
 import com.mongodb.BasicDBObject;
+import com.mongodb.CommandResult;
 import com.mongodb.DBObject;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.dao.SurveyDetailsDao;
@@ -1019,6 +1021,134 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
     }
 
 
+    @SuppressWarnings("unchecked")
+	@Override
+    public Map<Integer, Integer> getCompletedSurveyAggregationCount(String organizationUnitColumn, long organizationUnitColumnValue, Timestamp startDate, Timestamp endDate, String aggregateBy) throws InvalidInputException{
+    	Map<Integer, Integer> aggregatedResult = null;
+    	LOG.info("Aggregating completed surveys. Input organizationUnitColumn: "+organizationUnitColumn+" \t organizationUnitColumnValue: "+organizationUnitColumnValue+" \t startDate: "+startDate+" \t endDate: "+endDate+" \t aggregateBy: "+aggregateBy);
+    	if(aggregateBy == null || aggregateBy.isEmpty()){
+    		LOG.debug("aggregate by field is empty");
+    		throw new InvalidInputException("aggregate by field is empty");
+    	}
+    	LOG.debug("Getting the result aggregated by "+aggregateBy);
+    	// DONT MODIFY IF YOU DONT KNOW WHAT YOU ARE DOING
+    	// Using BasicDBObject for aggregation
+    	BasicDBList pipeline = new BasicDBList();
+    	if(organizationUnitColumn != null && !organizationUnitColumn.isEmpty()){
+    		// adding organization unit
+    		pipeline.add(new BasicDBObject("$match", new BasicDBObject(organizationUnitColumn, organizationUnitColumnValue)));
+    	}
+    	// match survey stage
+    	pipeline.add(new BasicDBObject("$match", new BasicDBObject(CommonConstants.STAGE_COLUMN,CommonConstants.SURVEY_STAGE_COMPLETE)));
+    	// match start date
+    	pipeline.add(new BasicDBObject("$match", new BasicDBObject(CommonConstants.MODIFIED_ON_COLUMN,new BasicDBObject("$gte", new Date(startDate.getTime())))));
+    	// match end date
+    	pipeline.add(new BasicDBObject("$match", new BasicDBObject(CommonConstants.MODIFIED_ON_COLUMN,new BasicDBObject("$lte", new Date(endDate.getTime())))));
+    	// add projection
+    	BasicDBObject projectionObject = new BasicDBObject(CommonConstants.MODIFIED_ON_COLUMN, 1);
+    	BasicDBList modifiedOnList = new BasicDBList();
+    	modifiedOnList.add("$modifiedOn");
+    	BasicDBObject yearDBObject = new BasicDBObject("$year", modifiedOnList);
+		BasicDBList multiplyDBList = new BasicDBList();
+		multiplyDBList.add(yearDBObject);
+		multiplyDBList.add(100);
+		BasicDBObject multiplyDBObject = new BasicDBObject("$multiply",multiplyDBList);
+		BasicDBList addDBList = new BasicDBList();
+		addDBList.add(multiplyDBObject);
+    	BasicDBObject groupColObjectValue = null;
+    	if(aggregateBy.equals(CommonConstants.AGGREGATE_BY_WEEK)){
+    		BasicDBObject weekDBObject = new BasicDBObject("$week", modifiedOnList);
+    		addDBList.add(weekDBObject);
+    	}else if(aggregateBy.equals(CommonConstants.AGGREGATE_BY_MONTH)){
+    		BasicDBObject monthDBObject = new BasicDBObject("$month", modifiedOnList);
+    		addDBList.add(monthDBObject);
+    	}
+    	groupColObjectValue = new BasicDBObject("$add",addDBList);
+    	projectionObject.append("groupCol", groupColObjectValue);
+    	pipeline.add(new BasicDBObject("$project",projectionObject));
+    	// grouping
+    	pipeline.add(new BasicDBObject("$group",new BasicDBObject("_id","$groupCol").append("count", new BasicDBObject("$sum",1))));
+    	BasicDBObject aggregationObject = new BasicDBObject("aggregate",SURVEY_DETAILS_COLLECTION).append("pipeline",pipeline);
+    	
+    	CommandResult aggregateResult = mongoTemplate.executeCommand(aggregationObject);
+    	
+    	List<BasicDBObject> aggregatedData = null;
+    	if(aggregateResult.containsField("result")){
+    		aggregatedData = (List<BasicDBObject>) aggregateResult.get("result");
+    		if(aggregatedData.size() > 0){
+    			aggregatedResult = new HashMap<>();
+	    		for(BasicDBObject data: aggregatedData){
+	    			aggregatedResult.put(Integer.parseInt(data.get(CommonConstants.DEFAULT_MONGO_ID_COLUMN).toString()),Integer.parseInt(data.get( "count" ).toString()));
+	    		}
+    		}
+    	}
+    	LOG.info("Returning aggregating completed survey results");
+    	return aggregatedResult;
+    }
+    
+    @SuppressWarnings("unchecked")
+	@Override
+    public Map<Integer, Integer> getClickedSurveyAggregationCount(String organizationUnitColumn, long organizationUnitColumnValue, Timestamp startDate, Timestamp endDate, String aggregateBy) throws InvalidInputException{
+    	Map<Integer, Integer> aggregatedResult = null;
+    	LOG.info("Aggregating clicked surveys. Input organizationUnitColumn: "+organizationUnitColumn+" \t organizationUnitColumnValue: "+organizationUnitColumnValue+" \t startDate: "+startDate+" \t endDate: "+endDate+" \t aggregateBy: "+aggregateBy);
+    	if(aggregateBy == null || aggregateBy.isEmpty()){
+    		LOG.debug("aggregate by field is empty");
+    		throw new InvalidInputException("aggregate by field is empty");
+    	}
+    	LOG.debug("Getting the result aggregated by "+aggregateBy);
+    	// DONT MODIFY IF YOU DONT KNOW WHAT YOU ARE DOING
+    	// Using BasicDBObject for aggregation
+    	BasicDBList pipeline = new BasicDBList();
+    	if(organizationUnitColumn != null && !organizationUnitColumn.isEmpty()){
+    		// adding organization unit
+    		pipeline.add(new BasicDBObject("$match", new BasicDBObject(organizationUnitColumn, organizationUnitColumnValue)));
+    	}
+    	// match start date
+    	pipeline.add(new BasicDBObject("$match", new BasicDBObject(CommonConstants.CREATED_ON,new BasicDBObject("$gte", new Date(startDate.getTime())))));
+    	// match end date
+    	pipeline.add(new BasicDBObject("$match", new BasicDBObject(CommonConstants.CREATED_ON,new BasicDBObject("$lte", new Date(endDate.getTime())))));
+    	// add projection
+    	BasicDBObject projectionObject = new BasicDBObject(CommonConstants.CREATED_ON, 1);
+    	BasicDBList createdOnList = new BasicDBList();
+    	createdOnList.add("$createdOn");
+    	BasicDBObject yearDBObject = new BasicDBObject("$year", createdOnList);
+		BasicDBList multiplyDBList = new BasicDBList();
+		multiplyDBList.add(yearDBObject);
+		multiplyDBList.add(100);
+		BasicDBObject multiplyDBObject = new BasicDBObject("$multiply",multiplyDBList);
+		BasicDBList addDBList = new BasicDBList();
+		addDBList.add(multiplyDBObject);
+    	BasicDBObject groupColObjectValue = null;
+    	if(aggregateBy.equals(CommonConstants.AGGREGATE_BY_WEEK)){
+    		BasicDBObject weekDBObject = new BasicDBObject("$week", createdOnList);
+    		addDBList.add(weekDBObject);
+    	}else if(aggregateBy.equals(CommonConstants.AGGREGATE_BY_MONTH)){
+    		BasicDBObject monthDBObject = new BasicDBObject("$month", createdOnList);
+    		addDBList.add(monthDBObject);
+    	}
+    	groupColObjectValue = new BasicDBObject("$add",addDBList);
+    	projectionObject.append("groupCol", groupColObjectValue);
+    	pipeline.add(new BasicDBObject("$project",projectionObject));
+    	// grouping
+    	pipeline.add(new BasicDBObject("$group",new BasicDBObject("_id","$groupCol").append("count", new BasicDBObject("$sum",1))));
+    	BasicDBObject aggregationObject = new BasicDBObject("aggregate",SURVEY_DETAILS_COLLECTION).append("pipeline",pipeline);
+    	
+    	CommandResult aggregateResult = mongoTemplate.executeCommand(aggregationObject);
+    	
+    	List<BasicDBObject> aggregatedData = null;
+    	if(aggregateResult.containsField("result")){
+    		aggregatedData = (List<BasicDBObject>) aggregateResult.get("result");
+    		if(aggregatedData.size() > 0){
+    			aggregatedResult = new HashMap<>();
+	    		for(BasicDBObject data: aggregatedData){
+	    			aggregatedResult.put(Integer.parseInt(data.get(CommonConstants.DEFAULT_MONGO_ID_COLUMN).toString()),Integer.parseInt(data.get( "count" ).toString()));
+	    		}
+    		}
+    	}
+    	LOG.info("Returning aggregating completed survey results");
+    	return aggregatedResult;
+    }
+    
     /*
      * Method to get count of sent surveys based upon criteria(Weekly/Monthly/Yearly).
      */
@@ -1175,8 +1305,7 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
         LOG.info( "Method to get count of sent surveys based upon criteria(Weekly/Monthly/Yearly) getSentSurveyByCriteria() finished." );
         return sentSurveys;
     }
-
-
+    
     /*
      * Method to get count of completed surveys based upon criteria(Weekly/Monthly/Yearly).
      */

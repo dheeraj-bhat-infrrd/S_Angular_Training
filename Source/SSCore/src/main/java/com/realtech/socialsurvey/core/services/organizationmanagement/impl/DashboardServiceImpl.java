@@ -1,6 +1,7 @@
 package com.realtech.socialsurvey.core.services.organizationmanagement.impl;
 
 import java.io.IOException;
+import java.sql.Timestamp;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -26,12 +27,14 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 import com.realtech.socialsurvey.core.commons.AgentRankingReportComparator;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.commons.SurveyResultsComparator;
-import com.realtech.socialsurvey.core.dao.GenericDao;
 import com.realtech.socialsurvey.core.dao.OrganizationUnitSettingsDao;
 import com.realtech.socialsurvey.core.dao.SurveyDetailsDao;
+import com.realtech.socialsurvey.core.dao.SurveyPreInitiationDao;
+import com.realtech.socialsurvey.core.dao.UserProfileDao;
 import com.realtech.socialsurvey.core.dao.impl.MongoSocialPostDaoImpl;
 import com.realtech.socialsurvey.core.entities.AgentRankingReport;
 import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
@@ -66,7 +69,10 @@ public class DashboardServiceImpl implements DashboardService, InitializingBean
     private OrganizationUnitSettingsDao organizationUnitSettingsDao;
 
     @Autowired
-    private GenericDao<SurveyPreInitiation, Long> surveyPreInitiationDao;
+    private SurveyPreInitiationDao surveyPreInitiationDao;
+    
+    @Autowired
+    private UserProfileDao userProfileDao;
 
 
     @Override
@@ -200,44 +206,109 @@ public class DashboardServiceImpl implements DashboardService, InitializingBean
     }
 
 
+    @Transactional
     @Override
-    public Map<String, Map<String, Long>> getSurveyDetailsForGraph( String columnName, long columnValue, int numberOfDays,
-        boolean realtechAdmin ) throws ParseException
+    public Map<String, Map<Integer, Integer>> getSurveyDetailsForGraph( String columnName, long columnValue, int numberOfDays,
+        boolean realtechAdmin ) throws ParseException, InvalidInputException
     {
+    	LOG.info("Getting survey details for graph for "+columnName+" with value "+columnValue+" for number of days "+numberOfDays+". Reatech admin flag: "+realtechAdmin);
         String criteria = "";
         int noOfDaysToConsider = -1;
+        Calendar currentTime = Calendar.getInstance();
+        Calendar startTime = Calendar.getInstance();
         switch ( numberOfDays ) {
             case 30:
                 noOfDaysToConsider = numberOfDays + Calendar.getInstance().get( Calendar.DAY_OF_WEEK );
-                criteria = "week";
+                criteria = CommonConstants.AGGREGATE_BY_WEEK;
+                startTime.add(Calendar.DATE, -30);
                 break;
             case 60:
                 noOfDaysToConsider = numberOfDays + Calendar.getInstance().get( Calendar.DAY_OF_WEEK );
-                criteria = "week";
+                criteria = CommonConstants.AGGREGATE_BY_WEEK;
+                startTime.add(Calendar.DATE, -60);
                 break;
             case 90:
                 noOfDaysToConsider = numberOfDays + Calendar.getInstance().get( Calendar.DAY_OF_WEEK );
-                criteria = "week";
+                criteria = CommonConstants.AGGREGATE_BY_WEEK;
+                startTime.add(Calendar.DATE, -90);
                 break;
             case 365:
                 noOfDaysToConsider = numberOfDays + Calendar.getInstance().get( Calendar.DAY_OF_MONTH );
-                criteria = "month";
+                criteria = CommonConstants.AGGREGATE_BY_MONTH;
+                startTime.add(Calendar.DATE, -365);
                 break;
         }
-
-        Map<String, Map<String, Long>> map = new HashMap<String, Map<String, Long>>();
-        map.put( "clicked", surveyDetailsDao.getClickedSurveyByCriteria( columnName, columnValue, numberOfDays,
-            noOfDaysToConsider, criteria, realtechAdmin ) );
-        map.put( "sent", surveyDetailsDao.getSentSurveyByCriteria( columnName, columnValue, numberOfDays, noOfDaysToConsider,
-            criteria, realtechAdmin ) );
-        map.put( "complete", surveyDetailsDao.getCompletedSurveyByCriteria( columnName, columnValue, numberOfDays,
-            noOfDaysToConsider, criteria, realtechAdmin ) );
-        map.put( "socialposts", surveyDetailsDao.getSocialPostsCountByCriteria( columnName, columnValue, numberOfDays,
-            noOfDaysToConsider, criteria, realtechAdmin ) );
+        // strip the time component of start time
+        startTime.set(Calendar.HOUR_OF_DAY, 0);
+        startTime.set(Calendar.MINUTE, 0);
+        startTime.set(Calendar.SECOND, 0);
+        startTime.set(Calendar.MILLISECOND, 0);
+        
+        Timestamp startDate = new Timestamp(startTime.getTimeInMillis());
+        Timestamp endDate = new Timestamp(currentTime.getTimeInMillis());
+        LOG.debug("Getting sent surveys aggregation");
+        Map<Integer, Integer> completedSurveys = surveyDetailsDao.getCompletedSurveyAggregationCount(columnName, columnValue, startDate, endDate, criteria);
+        // Since the values will be modified while aggregating total surveys, copying the value to another map
+        Map<Integer, Integer> completedSurveyToBeProcessed = null;
+        if(completedSurveys != null && completedSurveys.size() > 0){
+        	completedSurveyToBeProcessed = new HashMap<>();
+        	completedSurveyToBeProcessed.putAll(completedSurveys);
+        }
+        // TODO: remove hard coding
+        long companyId = -1;
+        long agentId = -1;
+        Set<Long> agentIds = null;
+        if(columnName.equals("companyId")){
+        	// agent list will be null
+        	companyId = columnValue;
+        }else if(columnName.equals("agentId")){
+        	// agent list will have one element, the agent id
+        	agentId = columnValue;
+        }else if(columnName.equals("regionId")){
+        	agentIds = userProfileDao.findUserIdsByRegion(columnValue);
+        }else if(columnName.equals("branchId")){
+        	agentIds = userProfileDao.findUserIdsByBranch(columnValue);
+        }
+        Map<Integer, Integer> incompleteSurveys = surveyPreInitiationDao.getIncompletSurveyAggregationCount(companyId, agentId, CommonConstants.STATUS_ACTIVE, new Timestamp(startTime.getTimeInMillis()), new Timestamp(currentTime.getTimeInMillis()), agentIds, criteria);
+        LOG.debug("Aggregating completed and incomplete surveys");
+        Map<Integer, Integer> allSurveysSent = aggregateAllSurveysSent(incompleteSurveys, completedSurveyToBeProcessed);
+        
+        LOG.debug("Getting clicked surveys");
+        Map<Integer, Integer> clickedSurveys = surveyDetailsDao.getClickedSurveyAggregationCount(columnName, columnValue, startDate, endDate, criteria);
+        
+        Map<String, Map<Integer, Integer>> map = new HashMap<String, Map<Integer, Integer>>();
+        map.put( "clicked", clickedSurveys );
+        map.put( "sent", allSurveysSent );
+        map.put( "complete", completedSurveys );
+        map.put( "socialposts", new HashMap<Integer, Integer>() );
+        //map.put( "socialposts", surveyDetailsDao.getSocialPostsCountByCriteria( columnName, columnValue, numberOfDays, noOfDaysToConsider, criteria, realtechAdmin ) );
         return map;
     }
 
 
+    private Map<Integer, Integer> aggregateAllSurveysSent(Map<Integer, Integer> incompleteSurveys, Map<Integer, Integer> completedSurveys){
+    	LOG.debug("Aggregating all surveys");
+    	if((incompleteSurveys == null || incompleteSurveys.size() == 0) && (completedSurveys != null && completedSurveys.size() > 0)){
+    		return completedSurveys;
+    	}else if((completedSurveys == null || completedSurveys.size() == 0) && (incompleteSurveys != null && incompleteSurveys.size() > 0)){
+    		return incompleteSurveys;
+    	}else if((completedSurveys == null || completedSurveys.size() == 0) && (incompleteSurveys == null || incompleteSurveys.size() > 0)){
+    		return null;
+    	}else{
+    		// both the maps are present
+    		for(Integer incompleteSurveyKey : incompleteSurveys.keySet()){
+    			if(completedSurveys.containsKey(incompleteSurveyKey)){
+    				int totalValue = incompleteSurveys.get(incompleteSurveyKey) + completedSurveys.get(incompleteSurveyKey);
+    				incompleteSurveys.put(incompleteSurveyKey, totalValue);
+    				// remove the object from the other map
+    				completedSurveys.remove(incompleteSurveyKey);
+    			}
+    		}
+    		// there might be some records left in the completed survey which needs to be put in the other map
+    		incompleteSurveys.putAll(completedSurveys);
+    		return incompleteSurveys;
+    	}
+    }
     /*
      * Method to create excel file from all the incomplete survey data.
      */
