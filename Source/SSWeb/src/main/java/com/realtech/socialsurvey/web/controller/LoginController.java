@@ -30,6 +30,7 @@ import com.realtech.socialsurvey.core.exception.NoRecordsFetchedException;
 import com.realtech.socialsurvey.core.exception.NonFatalException;
 import com.realtech.socialsurvey.core.services.authentication.AuthenticationService;
 import com.realtech.socialsurvey.core.services.generator.URLGenerator;
+import com.realtech.socialsurvey.core.services.mail.UndeliveredEmailException;
 import com.realtech.socialsurvey.core.services.organizationmanagement.OrganizationManagementService;
 import com.realtech.socialsurvey.core.services.organizationmanagement.UserManagementService;
 import com.realtech.socialsurvey.core.services.search.SolrSearchService;
@@ -388,19 +389,40 @@ public class LoginController {
 				throw new InvalidInputException(e.getMessage(), DisplayMessageConstants.USER_NOT_PRESENT, e);
 			}
 
-			// Send reset password link
-			try {
-				authenticationService.sendResetPasswordLink(user.getEmailId(), user.getFirstName() + " " + user.getLastName(),
-						user.getCompany().getCompanyId(), user.getLoginName());
-			}
-			catch (InvalidInputException e) {
-				LOG.error("Invalid Input exception in sending reset password link. Reason " + e.getMessage(), e);
-				throw new InvalidInputException(e.getMessage(), DisplayMessageConstants.GENERAL_ERROR, e);
-			}
+            if ( user.getStatus() != CommonConstants.STATUS_ACTIVE ) {
+                try {
+                    // if user is not active send verification link
+                    LOG.info( "User found for " + emailId + " but not verified" );
+                    LOG.info( "Resending verification mail to mail id : " + emailId );
+                    userManagementService.inviteCorporateToRegister( user.getFirstName(), user.getLastName(), emailId, false );
+                    LOG.info( "Sent successfully verification mail to mail id : " + emailId );
+                    model.addAttribute( "message", messageUtils.getDisplayMessage(
+                        DisplayMessageConstants.USER_PRESENT_NOT_REGISTERED, DisplayMessageType.ERROR_MESSAGE ) );
+                } catch ( InvalidInputException e ) {
+                    LOG.error( "Invalid Input exception while re-sending verification mail to user. Reason " + e.getMessage(),
+                        e );
+                    throw new InvalidInputException( e.getMessage(), DisplayMessageConstants.REGISTRATION_INVITE_GENERAL_ERROR,
+                        e );
+                } catch ( UndeliveredEmailException e ) {
+                    LOG.error(
+                        "Undelivered Email exception while re-sending verification mail to user. Reason " + e.getMessage(), e );
+                    throw new UndeliveredEmailException( e.getMessage(),
+                        DisplayMessageConstants.REGISTRATION_INVITE_GENERAL_ERROR, e );
+                }
+            } else {
+                // Send reset password link
+                try {
+                    authenticationService.sendResetPasswordLink( user.getEmailId(),
+                        user.getFirstName() + " " + user.getLastName(), user.getCompany().getCompanyId(), user.getLoginName() );
+                } catch ( InvalidInputException e ) {
+                    LOG.error( "Invalid Input exception in sending reset password link. Reason " + e.getMessage(), e );
+                    throw new InvalidInputException( e.getMessage(), DisplayMessageConstants.GENERAL_ERROR, e );
+                }
 
-			model.addAttribute("status", DisplayMessageType.SUCCESS_MESSAGE);
-			model.addAttribute("message",
-					messageUtils.getDisplayMessage(DisplayMessageConstants.PASSWORD_RESET_LINK_SUCCESSFUL, DisplayMessageType.SUCCESS_MESSAGE));
+                model.addAttribute( "status", DisplayMessageType.SUCCESS_MESSAGE );
+                model.addAttribute( "message", messageUtils.getDisplayMessage(
+                    DisplayMessageConstants.PASSWORD_RESET_LINK_SUCCESSFUL, DisplayMessageType.SUCCESS_MESSAGE ) );
+            }
 		}
 		catch (NonFatalException e) {
 			LOG.error("NonFatalException while sending the reset password link. Reason : " + e.getStackTrace(), e);
